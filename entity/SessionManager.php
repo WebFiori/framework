@@ -71,7 +71,7 @@ class SessionManager{
      * must be in the array <b>SessionManager::SUPOORTED_LANGS</b>.
      * @since 1.2
      */
-    public function initLang(){
+    private function initLang(){
         $lang = filter_input(INPUT_GET, 'lang');
         if($lang == FALSE || $lang == NULL){
             $lang = filter_input(INPUT_POST, 'lang');
@@ -93,10 +93,13 @@ class SessionManager{
     /**
      * Returns language code.
      * @return string|NULL two digit language code (such as 'EN'). If the session 
-     * is not running, the function will return <b>NULL</b>
+     * is not running, the function will return <b>NULL</b>.
      */
     public function getLang(){
         if($this->isStarted()){
+            if(!isset($_SESSION['lang'])){
+                $this->initLang();
+            }
             return $_SESSION['lang'];
         }
         return NULL;

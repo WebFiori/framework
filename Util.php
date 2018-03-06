@@ -1,10 +1,19 @@
 <?php
+ini_set('display_startup_errors', 1);
+        ini_set('display_errors', 1);
+        error_reporting(-1);
 /**
  * PHP utility class.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.0
+ * @version 1.1
  */
 class Util{
+    /**
+     * Disallow creating instances of the class.
+     */
+    private function __construct() {
+        
+    }
     /**
      * Returns unicode code of a character.
      * Common values: 32 = space, 10 = new line, 13 = carriage return.
@@ -43,7 +52,7 @@ class Util{
      * @param string $input
      * @return string
      */
-    function filterScripts($input){
+    public static function filterScripts($input){
         $retVal = str_replace('<script>', '&lt;script&gt;', $input);
         $retVal = str_replace('</script>', '&lt;/script&gt;', $retVal);
         $retVal = str_replace('<?php', '&lt;?php', $retVal);
@@ -58,7 +67,7 @@ class Util{
      * @return boolean True if the directory is created. Else, it will return false.
      * @since 0.1
      */
-    function newDir($dir){
+    public static function newDir($dir){
         if($dir){
             $dir = str_replace('\\', '/', $dir);
             //echo 'Final Dir = "'.$dir.'"<br/>';
@@ -75,7 +84,7 @@ class Util{
      * @return string
      * @since 0.2
      */
-    function getBaseURL(){
+    public static function getBaseURL(){
         $host = $_SERVER['HTTP_HOST'];
         if(isset($_SERVER['HTTPS'])){
             $protocol = 'https://';
@@ -88,4 +97,18 @@ class Util{
         $toAppend = substr(__DIR__, $len, strlen(__DIR__) - $len);
         return $protocol.$host. str_replace('\\', '/', $toAppend).'/';
     }
-} 
+    /**
+     * Returns the URL of the requested resource.
+     * @return string Requested URL resource.
+     * @since 1.1
+     */
+    public static function getRequestedURL(){
+        $protocol = "http://";
+        if(isset($_SERVER['HTTPS'])){
+            $protocol = "https://";
+        }
+        $server = filter_var(getenv('HTTP_HOST'));
+        $requestedURI = filter_var(getenv('REQUEST_URI'));
+        return $protocol.''.$server.''.$requestedURI;
+    }
+}

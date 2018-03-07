@@ -36,15 +36,15 @@ class SysInfoAPIs extends API{
         parent::__construct();
         $this->setVirsion('1.0.0');
         $a1 = new APIAction();
-        $a1->setActionMethod('get');
+        $a1->setActionMethod('GET');
         $a1->setName('get-template-info');
         $this->addAction($a1);
         $a2 = new APIAction();
-        $a2->setActionMethod('get');
+        $a2->setActionMethod('GET');
         $a2->setName('get-site-info');
         $this->addAction($a2);
         $a3 = new APIAction();
-        $a3->setActionMethod('get');
+        $a3->setActionMethod('GET');
         $a3->setName('get-sys-version');
         $this->addAction($a3);
     } 

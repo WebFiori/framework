@@ -3,9 +3,27 @@
  * Global configuration class. Used by the server part and the presentation part.
  * Do not modify this file manually unless you know what you are doing.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.0
+ * @version 1.1
  */
 class Config{
+    /**
+     * The type version of the template that is used to build the project.
+     * @var string The type version of the template that is used to build the project.
+     * @since 1.0 
+     */
+    private $templateVersionType;
+    /**
+     * The version of the template that is used to build the project.
+     * @var string The version of the template that is used to build the project.
+     * @since 1.0 
+     */
+    private $templateVersion;
+    /**
+     * The release date of the template that is used to build the project.
+     * @var string Release date of of the template that is used to build the project.
+     * @since 1.0 
+     */
+    private $templateDate;
     /**
      *
      * @var boolean 
@@ -53,12 +71,15 @@ class Config{
      */
     private function __construct() {
         $this->isConfigured = TRUE;
-        $this->dbHost = 'localhost';
-        $this->dbUser = 'root';
-        $this->dbPass = '1329704803';
-        $this->dbName = 'y_project';
-        $this->systemVersion = '0.1';
-        $this->versionType = 'Beta';
+        $this->templateDate = '07-03-2018 <DD-MM-YYYY>';
+        $this->templateVersion = '0.1';
+        $this->templateVersionType = 'Alpha';
+        $this->dbHost = '<b style="color:red">&lt;Not Set&gt;</b>';
+        $this->dbUser = '<b style="color:red">&lt;Not Set&gt;</b>';
+        $this->dbPass = '<b style="color:red">&lt;Not Set&gt;</b>';
+        $this->dbName = '<b style="color:red">&lt;Not Set&gt;</b>';
+        $this->systemVersion = '<b style="color:red">&lt;Not Set&gt;</b>';
+        $this->versionType = '<b style="color:red">&lt;Not Set&gt;</b>';
     }
     
     private static $cfg;
@@ -130,14 +151,27 @@ class Config{
     public function getVerType(){
         return $this->versionType;
     }
-    
+    public function getTemplateVersion(){
+        return $this->templateVersion;
+    }
+    public function getTemplateVersionType(){
+        return $this->templateVersionType;
+    }
+    public function getTemplateDate(){
+        return $this->templateDate;
+    }
+
     public function __toString() {
-        $retVal = '<b>System Configuration.</b><br/>';
-        $retVal .= 'System Version: '.$this->getSysVersion().'<br/>';
-        $retVal .= 'Version Type: '. $this->getVerType().'<br/>';
-        $retVal .= 'Database Host: '. $this->getDBHost().'<br/>';
-        $retVal .= 'Database Name: '.$this->getDBName().'<br/>';
-        $retVal .= 'Database Username: '.$this->getDBUser().'<br/>';
+        $retVal = '<b>Project Template Info.</b><br/>';
+        $retVal .= '<b>Template Version:<b> '.$this->getTemplateVersion().'<br/>';
+        $retVal .= '<b>Template Version Type:<b> '.$this->getTemplateVersionType().'<br/>';
+        $retVal .= '<b>Template Release Date:<b> '.$this->getTemplateDate().'<br/><br/>';
+        $retVal .= '<b>System Configuration Info.</b><br/>';
+        $retVal .= '<b>System Version:<b> '.$this->getSysVersion().'<br/>';
+        $retVal .= '<b>Version Type:<b> '. $this->getVerType().'<br/>';
+        $retVal .= '<b>Database Host:<b> '. $this->getDBHost().'<br/>';
+        $retVal .= '<b>Database Name:<b> '.$this->getDBName().'<br/>';
+        $retVal .= '<b>Database Username:<b> '.$this->getDBUser().'<br/><br/>';
         return $retVal;
     }
     

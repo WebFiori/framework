@@ -73,8 +73,9 @@ class SiteConfig{
         $this->webSiteName = 'Programming Academia';
         $this->baseUrl = 'http://localhost/y-project/';
         $this->titleSep = ' | ';
+        $this->homePage = '<b style="color:red">&lt;Not Set&gt;</b>';
         $this->copyright = 'All rights reserved.';
-        $this->description = 'Website Description.';
+        $this->description = '<b style="color:red">&lt;Not Set&gt;</b>';
     }
     /**
      * Returns the base URL that is used to fetch resources.
@@ -143,7 +144,7 @@ class SiteConfig{
         $retVal .= 'Home Page: '.$this->getHomePage().'<br/>';
         $retVal .= 'Description: '.$this->getDesc().'<br/>';
         $retVal .= 'Title Separator: '.$this->getTitleSep().'<br/>';
-        $retVal .= 'Copyright Notice: '.$this->getCopyright().'<br/>';
+        $retVal .= 'Copyright Notice: '.$this->getCopyright().'<br/><br/>';
         return $retVal;
     }
 }

@@ -78,8 +78,8 @@ class Config{
         $this->dbUser = '<b style="color:red">&lt;Not Set&gt;</b>';
         $this->dbPass = '<b style="color:red">&lt;Not Set&gt;</b>';
         $this->dbName = '<b style="color:red">&lt;Not Set&gt;</b>';
-        $this->systemVersion = '<b style="color:red">&lt;Not Set&gt;</b>';
-        $this->versionType = '<b style="color:red">&lt;Not Set&gt;</b>';
+        $this->systemVersion = '0.1';
+        $this->versionType = 'Alpha';
     }
     
     private static $cfg;

@@ -73,7 +73,7 @@ class Config{
         $this->isConfigured = TRUE;
         $this->templateDate = '07-03-2018 <DD-MM-YYYY>';
         $this->templateVersion = '0.1';
-        $this->templateVersionType = 'Alpha';
+        $this->templateVersionType = 'Beta';
         $this->dbHost = '<b style="color:red">&lt;Not Set&gt;</b>';
         $this->dbUser = '<b style="color:red">&lt;Not Set&gt;</b>';
         $this->dbPass = '<b style="color:red">&lt;Not Set&gt;</b>';

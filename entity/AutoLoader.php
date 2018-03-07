@@ -16,9 +16,11 @@ spl_autoload_register(function ($name) {
      * Folders to search in for required classes. Modify as needed.
      */
     $searchFolders = array(
+        '',
         '/entity',
-        '/entity/mysql',
-        '/entity/jsonx',
+        '/entity/rest-easy-1.0',
+        '/entity/jsonx-1.2',
+        '/publish',
         '/functions',
         '/apis'
     );

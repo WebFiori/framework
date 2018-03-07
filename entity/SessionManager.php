@@ -47,7 +47,7 @@ class SessionManager{
      * @since 1.2
      */
     const SUPOORTED_LANGS = array(
-        'EN'
+        'EN','AR'
     );
     private function __construct() {
         
@@ -55,32 +55,50 @@ class SessionManager{
     /**
      * Creates a single instance of <b>SessionManager</b>.
      * @return SessionManager An object of type <b>SessionManager</b>.
+     * @param boolean $use_default If set to true, The session will be started 
+     * using default parameters.
      * @since 1.0
      */
-    public static function get(){
+    public static function get($use_default=true){
         if(self::$singleton != NULL){
             return self::$singleton;
         }
         self::$singleton = new SessionManager();
+        if($use_default){
+            self::$singleton->initSession();
+        }
         return self::$singleton;
     }
     /**
      * Initialize session language. The initialization depends on the attribute 
      * 'lang'. It can be send via 'get' request, 'post' request or a cookie. If 
      * no language code is provided, 'EN' will be used. The provided language 
-     * must be in the array <b>SessionManager::SUPOORTED_LANGS</b>.
+     * must be in the array <b>SessionManager::SUPOORTED_LANGS</b>. Also if the 
+     * language is set, it will not be updated unless the parameter <b>$forceUpdate</b> 
+     * is true.
      * @since 1.2
+     * @param boolean $forceUpdate Set to <b>TRUE</b> if the language is set and want to 
+     * reset it.
      */
-    private function initLang(){
+    private function initLang($forceUpdate=false){
+        if(isset($_SESSION['lang']) && !$forceUpdate){
+            return;
+        }
         $lang = filter_input(INPUT_GET, 'lang');
         if($lang == FALSE || $lang == NULL){
             $lang = filter_input(INPUT_POST, 'lang');
             if($lang == FALSE || $lang == NULL){
                 $lang = filter_input(INPUT_COOKIE, 'lang');
                 if($lang == FALSE || $lang == NULL){
-                    $lang = 'EN';
+                    $lang = NULL;
                 }
             }
+        }
+        if(isset($_SESSION['lang']) && $lang == NULL){
+            return;
+        }
+        else if($lang == NULL){
+            $lang = 'EN';
         }
         $langU = strtoupper($lang);
         if(in_array($langU, self::SUPOORTED_LANGS)){
@@ -94,12 +112,12 @@ class SessionManager{
      * Returns language code.
      * @return string|NULL two digit language code (such as 'EN'). If the session 
      * is not running, the function will return <b>NULL</b>.
+     * @param boolean $forceUpdate Set to <b>TRUE</b> if the language is set and want to 
+     * reset it.
      */
-    public function getLang(){
+    public function getLang($forceUpdate=false){
         if($this->isStarted()){
-            if(!isset($_SESSION['lang'])){
-                $this->initLang();
-            }
+            $this->initLang($forceUpdate);
             return $_SESSION['lang'];
         }
         return NULL;

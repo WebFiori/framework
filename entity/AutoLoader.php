@@ -20,6 +20,7 @@ spl_autoload_register(function ($name) {
         '/entity',
         '/entity/rest-easy-1.0',
         '/entity/jsonx-1.2',
+        '/entity/ph-mysql-1.0',
         '/publish',
         '/functions',
         '/apis'

@@ -171,7 +171,9 @@ class SessionManager{
      */
     public function getUser(){
         if(self::isStarted()){
-            return $_SESSION['user'];
+            if(isset($_SESSION['user'])){
+                return $_SESSION['user'];
+            }
         }
         return NULL;
     }
@@ -242,6 +244,9 @@ class SessionManager{
             session_name($name);
             $started = session_start();
         }
+        else{
+            $started = TRUE;
+        }
         if($started){
             if($useDb == TRUE){
                 return $this->useDb($dbAttributes);
@@ -266,7 +271,9 @@ class SessionManager{
      */
     public function getDBLink(){
         if(self::isStarted()){
-            return $_SESSION['db'];
+            if(isset($_SESSION['db'])){
+                return $_SESSION['db'];
+            }
         }
         return NULL;
     }

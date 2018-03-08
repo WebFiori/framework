@@ -1,0 +1,558 @@
+<?php
+/**
+ * A class that contains all static methods for altering user attributes.
+ * @author Ibrahim <ibinshikh@hotmail.com>
+ * @version 1.1
+ * @uses User The basic user class.
+ * @uses UserQuery It uses the class to send user related queries.
+ * @uses ActivationQuery Used for user activation related queries.
+ * @uses Authenticator Used to log in the user.
+ * @uses DatabaseLink Used to connect to MySQL database.
+ */
+class UserFunctions extends Functions{
+    /**
+     * An instance of <b>UserQuery</b>.
+     * @var UserQuery
+     * @since 1.0 
+     */
+    private $query;
+    /**
+     * An instance of <b>ActivationQuery</b>.
+     * @var ActivationQuery 
+     * @since 1.0
+     */
+    private $acQuery;
+    /**
+     * An instance of <b>UserFunctions</b>.
+     * @var UserFunctions
+     * @since 1.1 
+     */
+    private static $instance;
+    /**
+     * Returns a singleton of the class <b>UserFunctions</b>.
+     * @return UserFunctions an instance of <b>UserFunctions</b>.
+     * @since 1.0
+     */
+    public static function get(){
+        if(self::$instance != NULL){
+            return self::$instance;
+        }
+        self::$instance = new UserFunctions();
+        return self::$instance;
+    }
+    public function __construct() {
+        parent::__construct();
+        $this->query = new UserQuery();
+        $this->acQuery = new ActivationQuery();
+    }
+    /**
+     * A constant that indicates a user is not found.
+     * @var string Constant that indicates a user is not found.
+     * @since 1.0
+     */
+    const NO_SUCH_USER = 'user_not_found';
+    /**
+     * A constant that indicates that username is taken.
+     * @var string Constant that indicates that username is taken.
+     * @since 1.0
+     */
+    const USERNAME_TAKEN = 'username_taken';
+    /**
+     * A constant that indicates a user is already registered.
+     * @var string Constant that indicates a user is already registered. A user 
+     * is considered a registered user if his email address is in the system 
+     * database.
+     * @since 1.0
+     */
+    const USER_ALREAY_REG = 'already_registered';
+    /**
+     * A constant that indicates a given method parameter is an empty string.
+     * @var string Constant that indicates a given method parameter is an empty string.
+     * @since 1.0
+     */
+    const EMPTY_STRING = 'emp_string';
+    /**
+     * A constant that indicates a given user status is not allowed.
+     * @var string Constant that indicates a given user status is not allowed.
+     * @since 1.1
+     * @see UserFunctions::USER_STATUS
+     */
+    const STATUS_NOT_ALLOWED = 'status_not_allowed';
+    /**
+     * A constant that indicates a user account is already activated.
+     * @var string Constant that indicates a user account is already activated.
+     * @since 1.1
+     */
+    const ALREADY_ACTIVATED = 'account-already_active';
+    /**
+     * A set of possible user status.
+     * @var array An array of user status.
+     * @since 1.0
+     */
+    const USER_STATUS = array(
+        'N'=>'New',
+        'A'=>'Active',
+        'S'=>'Suspended'
+    );
+    
+    /**
+     * Checks if a given user info can grant him access to the system or not. It 
+     * uses the email address or the username of the user. One is enough to provide.
+     * @param string $u Username.
+     * @param string $p password.
+     * @param string $e Email address.
+     * @return boolean <b>TRUE</b> if the user is authenticated. Else, it will 
+     * return <b>FALSE</b>.
+     * @since 1.0
+     */
+    public function authenticate($u='',$p='',$e=''){
+        if(strlen($p) != 0){
+            if(strlen($u) != 0 || strlen($e) != 0){
+                $user = new User($u, $p, $e);
+                $auth = new Authenticator($user);
+                if($auth->authenticate()){
+                    $this->getSManager()->setUser($auth->getUser());
+                    return TRUE;
+                }
+            }
+        }
+        return FALSE;
+    }
+    /**
+     * Activate user account given his Activation token. The user must be 
+     * logged in before calling this function.
+     * @param string $activationTok The activation token of the user.
+     * @return User|string|boolean  An object of type <b>User</b> in case the activation process 
+     * is completed. In case of query error, the function will return 
+     * <b>MySQLQuery::QUERY_ERR</b>. If the user account is already activated, the 
+     * function will return <b>UserFunctions::ALREADY_ACTIVATED</b>. If the given token 
+     * does not match, the function will return <b>FALSE</b>. In case the user is not 
+     * logged in, the function will return <b>UserFunctions::NOT_AUTH</b>.
+     * @since 1.0
+     */
+    public function activateAccount($activationTok){
+        $id = $this->getUserID();
+        if($id != NULL){
+            $this->acQuery->getActivationCode($id);
+            if($this->excQ($this->acQuery)){
+                if($this->rows() != 0){
+                    $tok = $this->getRow()[$this->acQuery->getStructure()->getCol('code')->getName()];
+                    if($tok == $activationTok){
+                        $this->acQuery->activate($id);
+                        if($this->excQ($this->acQuery)){
+                            return $this->updateStatus('A', $id);
+                        }
+                        else{
+                            return MySQLQuery::QUERY_ERR;
+                        }
+                    }
+                    else{
+                        return FALSE;
+                    }
+                }
+                else{
+                    return self::ALREADY_ACTIVATED;
+                }
+            }
+            else{
+                return MySQLQuery::QUERY_ERR;
+            }
+        }
+        else{
+            return self::NOT_AUTH;
+        }
+    }
+    /**
+     * Updates the display name of a user given his ID.
+     * @param string $newDispName The new display name.
+     * @param string $userId The ID of the user.
+     * @return User|string  An object of type <b>User</b> in case the display name is updated. 
+     * In case no user was found, the function will return <b>UserFunctions::NO_SUCH_USER</b>. In 
+     * case of query error, the function will return <b>MySQLQuery::QUERY_ERR</b>. 
+     * If the user is not authorized to update user profile, the function will return 
+     * <b>Functions::NOT_AUTH</b>.
+     */
+    public function updateDisplayName($newDispName, $userId){
+        $loggedId = $this->getUserID();
+        if($loggedId != NULL){
+            if($loggedId == $userId || $this->getAccessLevel() == 0){
+                $user = $this->getUserByID($userId);
+                if($user instanceof User){
+                    $this->query->updateDisplayName($newDispName, $user->getID());
+                    if($this->excQ($this->query)){
+                        $user->setDisplayName($newDispName);
+                        return $user;
+                    }
+                    else{
+                        return MySQLQuery::QUERY_ERR;
+                    }
+                }
+                return $user;
+            }
+            else{
+                return self::NOT_AUTH;
+            }
+        }
+        else{
+            return self::NOT_AUTH;
+        }
+    }
+    /**
+     * Updates the status of a user.
+     * @param type $newStatus The new status. It must be a one letter value. A key 
+     * from the array <b>UserFunctions::USER_STATUS</b>.
+     * @param string $userId The ID of the user.
+     * @return User|string  An object of type <b>User</b> in case the status is updated. 
+     * In case no user was found, the function will return <b>UserFunctions::NO_SUCH_USER</b>. In 
+     * case of query error, the function will return <b>MySQLQuery::QUERY_ERR</b>. 
+     * If the user is not authorized to update user profile, the function will return 
+     * <b>Functions::NOT_AUTH</b>. If the given status is not a key in the array 
+     * <b>UserFunctions::USER_STATUS</b>, the function will return 
+     * <b>UserFunctions::STATUS_NOT_ALLOWED</b>.
+     * @since 1.0
+     */
+    public function updateStatus($newStatus, $userId){
+        if(array_key_exists($newStatus, self::USER_STATUS)){
+            $user = $this->getUserByID($userId);
+            if($user instanceof User){
+                $this->query->updateStatus($newStatus, $user->getID());
+                if($this->excQ($this->query)){
+                    $user->setStatus(self::USER_STATUS[$newStatus]);
+                    return $user;
+                }
+                else{
+                    return MySQLQuery::QUERY_ERR;
+                }
+            }
+            return $user;
+        }
+        else{
+            return self::STATUS_NOT_ALLOWED;
+        }
+    }
+    public function updatePassword($oldPass, $newPass, $userId){
+        $user = $this->getUserByID($userId);
+        if($user instanceof User){
+            
+        }
+        return $user;
+    }
+    /**
+     * Updates the email address of a user given his ID.
+     * @param string $email The new Email address.
+     * @param string $userId The ID of the user.
+     * @return User|string  An object of type <b>User</b> in case the email is updated. 
+     * In case no user was found, the function will return <b>UserFunctions::NO_SUCH_USER</b>. In 
+     * case of query error, the function will return <b>MySQLQuery::QUERY_ERR</b>. 
+     * If the user is not authorized to update user profile, the function will return 
+     * <b>Functions::NOT_AUTH</b>. If the given email address belongs to a user 
+     * who is already registered, the function will return <b>UserFunctions::USER_ALREAY_REG</b>.
+     * @since 1.0
+     */
+    public function updateEmail($email, $userId){
+        $loggedId = $this->getUserID();
+        if($loggedId != NULL){
+            if($loggedId == $userId || $this->getAccessLevel() == 0){
+                if($this->getUserByEmail($email) == self::NO_SUCH_USER){
+                    $user = $this->getUserByID($userId);
+                    if($user instanceof User){
+                        $this->query->updateEmail($email, $user->getID());
+                        if($this->excQ($this->query)){
+                            $user->setEmail($email);
+                            return $user;
+                        }
+                        else{
+                            return MySQLQuery::QUERY_ERR;
+                        }
+                    }
+                    return $user;
+                }
+                else{
+                    return self::USER_ALREAY_REG;
+                }
+            }
+            else{
+                return self::NOT_AUTH;
+            }
+        }
+        else{
+            return self::NOT_AUTH;
+        }
+    }
+    /**
+     * Return a user given his ID.
+     * @param string $id The ID of the user. The ID must be equal to the ID of the 
+     * logged in user to get the profile. Also the admin can get user profile.
+     * @return User|string An object of type <b>User</b> if found. In case no user 
+     * was found, the function will return <b>UserFunctions::NO_SUCH_USER</b>. In 
+     * case of query error, the function will return <b>MySQLQuery::QUERY_ERR</b>. 
+     * If the user is not authorized to get user profile, the function will return 
+     * <b>Functions::NOT_AUTH</b>.
+     * @since 1.1
+     */
+    public function getUserByID($id){
+        if($this->getSManager()->getUser() == NULL){
+            return self::NOT_AUTH;
+        }
+        if($this->getUserID() == $id || $this->getAccessLevel() == 0){
+            $this->query->getUserByID($id);
+            if($this->excQ($this->query)){
+                if($this->rows() != 0){
+                    $user = new User();
+                    $row = $this->getRow();
+                    $user->setEmail($row[$this->query->getStructure()->getCol('email')->getName()]);
+                    $user->setID($row[MySQLQuery::ID_COL]);
+                    $user->setStatus(self::USER_STATUS[$row[$this->query->getStructure()->getCol('status')->getName()]]);
+                    $user->setUserName($row[$this->query->getStructure()->getCol('username')->getName()]);
+                    $user->setAccessLevel($row[$this->query->getStructure()->getCol('acc-level')->getName()]);
+                    $user->setDisplayName($row[$this->query->getStructure()->getCol('disp-name')->getName()]);
+                    return $user;
+                }
+                else{
+                    return self::NO_SUCH_USER;
+                }
+            }
+            else{
+                return MySQLQuery::QUERY_ERR;
+            }
+        }
+        else{
+            return self::NOT_AUTH;
+        }
+    }
+    /**
+     * Return a user given his username.
+     * @param string $username The username of the user.
+     * @return User|string An object of type <b>User</b> if found. If the user is not 
+     * found, the function will return <b>UserFunctions::NO_SUCH_USER</b>. If 
+     * an error occur while running the query on the database, The function will 
+     * return <b>MySQLQuery::QUERY_ERR</b>. If the given username is an empty string, 
+     * the function will return <b>UserFunctions::EMPTY_STRING</b>.
+     * @since 1.0
+     */
+    public function getUserByUsername($username){
+        if(strlen($username) != 0){
+            $query = new UserQuery();
+            $query->getUserByUsername($username);
+            if($this->excQ($query)){
+                $row = $this->getRow();
+                if($row != null){
+                    $user = new User(
+                            $row[$query->getStructure()->getCol('username')->getName()],
+                            '',
+                            $row[$query->getStructure()->getCol('email')->getName()]);
+                    $user->setID($row[UserQuery::ID_COL]);
+                    $user->setStatus(
+                            self::USER_STATUS
+                            [$row[
+                                $query->getStructure()->getCol('status')->getName()
+                            ]]
+                            );
+                    $user->setDisplayName($row[$query->getStructure()->getCol('disp-name')->getName()]);
+                    $user->setAccessLevel($row[$query->getStructure()->getCol('acc-level')->getName()]);
+                    return $user;
+                }
+                else{
+                    return self::NO_SUCH_USER;
+                }
+            }
+            else{
+                return MySQLQuery::QUERY_ERR;
+            }
+        }
+        else{
+            return self::EMPTY_STRING;
+        }
+    }
+    /**
+     * Return a user given his email address.
+     * @param string $email The email address of the user.
+     * @return User|string An object of type <b>User</b> if found. If the user is not 
+     * found, the function will return <b>UserFunctions::NO_SUCH_USER</b>. If 
+     * an error occur while running the query on the database, The function will 
+     * return <b>MySQLQuery::QUERY_ERR</b>. If the given email is an empty string, 
+     * the function will return <b>UserFunctions::EMPTY_STRING</b>.
+     * @since 1.0
+     */
+    public function getUserByEmail($email){
+        if(strlen($email) != 0){
+            $query = new UserQuery();
+            $query->getUserByEmail($email);
+            if($this->excQ($query)){
+                $row = $this->getRow();
+                if($row != null){
+                    $user = new User(
+                            $row[$query->getStructure()->getCol('username')->getName()],
+                            '',
+                            $row[$query->getStructure()->getCol('email')->getName()]);
+                    $user->setID($row[UserQuery::ID_COL]);
+                    $user->setStatus(
+                            self::USER_STATUS
+                            [$row[
+                                $query->getStructure()->getCol('status')->getName()
+                            ]]
+                            );
+                    $user->setDisplayName($row[$query->getStructure()->getCol('disp-name')->getName()]);
+                    $user->setAccessLevel($row[$query->getStructure()->getCol('acc-level')->getName()]);
+                    return $user;
+                }
+                else{
+                    return self::NO_SUCH_USER;
+                }
+            }
+            else{
+                return MySQLQuery::QUERY_ERR;
+            }
+        }
+        else{
+            return self::EMPTY_STRING;
+        }
+    }
+    /**
+     * Checks if a given username is taken or not.
+     * @param string $username The username that will be checked.
+     * @return boolean <b>TRUE</b> if the user name is taken. <b>FALSE</b> if 
+     * not taken. <b>MySQLQuery::QUERY_ERR</b> in case of database error. 
+     * If the given username is an empty string, 
+     * the function will return <b>UserFunctions::EMPTY_STRING</b>.
+     * @since 1.0
+     */
+    public function isUsernameTaken($username){
+        $user = $this->getUserByUsername($username);
+        if($user == self::NO_SUCH_USER){
+            return FALSE;
+        }
+        else if($user instanceof User){
+            return TRUE;
+        }
+        return $user;
+    }
+    /**
+     * Checks if a user is already a registered user. A user is considered registered if 
+     * his email is already on the system database.
+     * @param string $email The email address of the user.
+     * @return boolean <b>TRUE</b> if the user email is found. <b>FALSE</b> if 
+     * not. <b>MySQLQuery::QUERY_ERR</b> in case of database query error.
+     * If the given email is an empty string, 
+     * the function will return <b>UserFunctions::EMPTY_STRING</b>.
+     * @since 1.0
+     */
+    public function isUserRegistered($email){
+        $user = $this->getUserByEmail($email);
+        if($user == self::NO_SUCH_USER){
+            return FALSE;
+        }
+        else if($user instanceof User){
+            return TRUE;
+        }
+        return $user;
+    }
+    /**
+     * Returns the registration token of a user given his ID.
+     * @param string $userId The ID of the user.
+     * @return string The activation token as a string. If no user was found, 
+     * the function will return <b>NULL</b>. If something went wrong while running 
+     * database query, the function will return <b>MySQLQuery::QUERY_ERR</b>. 
+     * If the given user ID is an empty string, 
+     * the function will return <b>UserFunctions::EMPTY_STRING</b>.
+     * @since 1.0
+     */
+    private function getRegTok($userId){
+        if(strlen($userId) != 0){
+            $this->acQuery->getActivationCode($userId);
+            if($this->sManager->getDBLink()->executeQuery($this->acQuery)){
+                if($this->sManager->getDBLink()->rows() == 1){
+                    $row = $this->sManager->getDBLink()->getRow();
+                    return $row[$this->acQuery->getStructure()->getCol('code')->getName()];
+                }
+                else{
+                    return NULL;
+                }
+            }
+            else{
+                return MySQLQuery::QUERY_ERR;
+            }
+        }
+        else{
+            return self::EMPTY_STRING;
+        }
+    }
+    /**
+     * Adds a new token to the set of activation tokens.
+     * @param string $userId The user ID.
+     * @return boolean <b>TRUE</b> in case the token is created. The function 
+     * will return <b>MySQLQuery::QUERY_ERR</b> in case of database query error. 
+     * If the given user ID is an empty string, 
+     * the function will return <b>UserFunctions::EMPTY_STRING</b>.
+     * @since 1.0
+     */
+    private function createRegTok($userId){
+        if(strlen($userId) != 0){
+            $this->acQuery->addNew($userId);
+            if($this->sManager->getDBLink()->executeQuery($this->acQuery)){
+                return TRUE;
+            }
+            else{
+                return MySQLQuery::QUERY_ERR;
+            }
+        }
+        else{
+            return self::EMPTY_STRING;
+        }
+    }
+    /**
+     * Adds a new user to the database of the system.
+     * @param User $user An object of type <b>User</b>.
+     * @return string|User An object of type <b>User</b> if the user is added. 
+     * <b>MySQLQuery::QUERY_ERR</b> in case of database query error. 
+     * <b>UserFunctions::USERNAME_TAKEN</b> in case the username is taken. 
+     * <b>UserFunction::USER_ALREAY_REG</b> if the user email is found in the 
+     * system. <b>FALSE</b> in case the given parameter is not an object of 
+     * type <b>User</b>. If the given user object has an empty email, username or password, 
+     * the function will return <b>UserFunctions::EMPTY_STRING</b>.
+     * @since 1.0
+     */
+    public function register($user){
+        if($user instanceof User){
+            $emailCheck = $this->isUserRegistered($user->getEmail());
+            if($emailCheck == FALSE){
+                $usernameCheck = $this->isUsernameTaken($user->getUserName());
+                if($usernameCheck == FALSE){
+                    if(strlen($user->getPassword()) != 0){
+                        $this->query->addUser($user);
+                        if($this->sManager->getDBLink()->executeQuery($this->$query)){
+                            $user = $this->getUserByEmail($user->getEmail());
+                            if($this->createRegTok($user->getID()) == TRUE){
+                                $tok = $this->getRegTok($user->getID());
+                                $user->setActivationTok($tok);
+                                return $user;
+                            }
+                            else{
+                                return MySQLQuery::QUERY_ERR;
+                            }
+                        }
+                        else{
+                            return MySQLQuery::QUERY_ERR;
+                        }
+                    }
+                    else{
+                        return self::EMPTY_STRING;
+                    }
+                }
+                else{
+                    if($usernameCheck == TRUE){
+                        return self::USERNAME_TAKEN;
+                    }
+                    return $usernameCheck;
+                }
+            }
+            else{
+                if($emailCheck == TRUE){
+                    return self::USER_ALREAY_REG;
+                }
+                return $emailCheck;
+            }
+        }
+        return FALSE;
+    }
+}

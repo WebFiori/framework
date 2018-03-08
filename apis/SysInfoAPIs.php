@@ -34,7 +34,7 @@ require_once '../root.php';
 class SysInfoAPIs extends API{
     public function __construct() {
         parent::__construct();
-        $this->setVirsion('1.0.0');
+        $this->setVersion('1.0.0');
         $a1 = new APIAction();
         $a1->setActionMethod('GET');
         $a1->setName('get-template-info');

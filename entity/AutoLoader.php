@@ -18,6 +18,7 @@ spl_autoload_register(function ($name) {
     $searchFolders = array(
         '',
         '/entity',
+        '/entity/queries',
         '/entity/rest-easy-1.0',
         '/entity/jsonx-1.2',
         '/entity/ph-mysql-1.0',
@@ -29,6 +30,7 @@ spl_autoload_register(function ($name) {
         $f = $root.$value.'/'.$name.'.php';
         if(file_exists($f)){
             require $root.$value.'/'.$name.'.php';
+            return;
         }
     }
 });

@@ -24,6 +24,7 @@
  * THE SOFTWARE.
  */
 require_once '../root.php';
+Util::displayErrors();
 /**
  * An API that is used to do any thing that is related to user management.
  *
@@ -37,7 +38,7 @@ class UserAPIs extends API{
     }
     
     private function initAPI(){
-        $this->setVirsion('1.0.0');
+        $this->setVersion('1.0.0');
         $tok = new RequestParameter('token','string', TRUE);
         $userId = new RequestParameter('user-id','integer', FALSE);
         $pass = new RequestParameter('password','string', FALSE);
@@ -69,13 +70,6 @@ class UserAPIs extends API{
         $a3->addParameter($tok);
         $this->addAction($a3,TRUE);
         
-        //action #4
-        $a4 = new APIAction();
-        $a4->setActionMethod('GET');
-        $a4->setName('get-user');
-        $a4->addParameter($userId);
-        $a4->addParameter($tok);
-        $this->addAction($a4,TRUE);
         
         //action #5
         $a5 = new APIAction();
@@ -117,9 +111,164 @@ class UserAPIs extends API{
         $a9->addParameter(new RequestParameter('activation-token','string', FALSE));
         $a9->addParameter($tok);
         $this->addAction($a9,TRUE);
+        
+        $a10 = new APIAction();
+        $a10->setActionMethod('GET');
+        $a10->setName('get-profile');
+        $a10->addParameter($userId);
+        $a10->addParameter($tok);
+        $this->addAction($a10,TRUE);
     }
-    
-    public function checkAction($inputs){
+    private function updateStatus(){
+        $inputs = $this->getInputs();
+        if(isset($inputs['user-id'])){
+            if(isset($inputs['status'])){
+                $user = UserFunctions::get()->updateStatus($inputs['status'], $inputs['user-id']);
+                if($user instanceof User){
+                    $this->sendResponse('User Status Updated', FALSE, 200, '"profile":'.$user->toJSON());
+                }
+                else if($user == UserFunctions::NOT_AUTH){
+                    $this->notAuth();
+                }
+                else if($user == UserFunctions::NO_SUCH_USER){
+                    $this->sendResponse('No Such User', TRUE, 404);
+                }
+                else if($user == MySQLQuery::QUERY_ERR){
+                    $this->databaseErr();
+                }
+                else if($user == UserFunctions::STATUS_NOT_ALLOWED){
+                    $json = new JsonX();
+                    foreach (UserFunctions::USER_STATUS as $k =>$v){
+                        $json->add($k, $v);
+                    }
+                    $this->sendResponse('Status Not Allowed', TRUE, 404, '"status":"'.$inputs['status'].'",'
+                            . '"allowed":'.$json);
+                }
+                else{
+                    $this->sendResponse('Something wrong', TRUE, 404);
+                }
+            }
+            else{
+                $this->missingParam('status');
+            }
+        }
+        else{
+            $this->missingParam('user-id');
+        }
+    }
+    private function updateDisplayName(){
+        $inputs = $this->getInputs();
+        if(isset($inputs['user-id'])){
+            if(isset($inputs['display-name'])){
+                $user = UserFunctions::get()->updateDisplayName($inputs['display-name'], $inputs['user-id']);
+                if($user instanceof User){
+                    $this->sendResponse('Display Name Updated', FALSE, 200, '"user":'.$user->toJSON());
+                }
+                else if($user == UserFunctions::NOT_AUTH){
+                    $this->notAuth();
+                }
+                else if($user == UserFunctions::NO_SUCH_USER){
+                    $this->sendResponse('No Such User', TRUE, 404);
+                }
+                else if($user == MySQLQuery::QUERY_ERR){
+                    $this->databaseErr();
+                }
+                else{
+                    $this->sendResponse('Something wrong', TRUE, 404,'"thing":"'.$user.'"');
+                }
+            }
+            else{
+                $this->missingParam('email');
+            }
+        }
+        else{
+            $this->missingParam('user-id');
+        }
+    }
+    private function updateEmail(){
+        $inputs = $this->getInputs();
+        if(isset($inputs['user-id'])){
+            if(isset($inputs['email'])){
+                $user = UserFunctions::get()->updateEmail($inputs['email'], $inputs['user-id']);
+                if($user instanceof User){
+                    $this->sendResponse('Email Updated', FALSE, 200, '"user":'.$user->toJSON());
+                }
+                else if($user == UserFunctions::NOT_AUTH){
+                    $this->notAuth();
+                }
+                else if($user == UserFunctions::NO_SUCH_USER){
+                    $this->sendResponse('No Such User', TRUE, 404);
+                }
+                else if($user == MySQLQuery::QUERY_ERR){
+                    $this->databaseErr();
+                }
+                else if($user == UserFunctions::USER_ALREAY_REG){
+                    $this->sendResponse('Email Already Registred', TRUE, 404);
+                }
+                else{
+                    $this->sendResponse('Something wrong', TRUE, 404,'"thing":"'.$user.'"');
+                }
+            }
+            else{
+                $this->missingParam('email');
+            }
+        }
+        else{
+            $this->missingParam('user-id');
+        }
+    }
+    private function getProfile(){
+        $inputs = $this->getInputs();
+        if(isset($inputs['user-id'])){
+            $user = UserFunctions::get()->getUserByID($inputs['user-id']);
+            if($user instanceof User){
+                $this->sendResponse('User Profile', FALSE, 200, '"profile":'.$user->toJSON());
+            }
+            else if($user == UserFunctions::NOT_AUTH){
+                $this->notAuth();
+            }
+            else if($user == UserFunctions::NO_SUCH_USER){
+                $this->sendResponse('No Such User', TRUE, 404);
+            }
+            else if($user == MySQLQuery::QUERY_ERR){
+                $this->databaseErr();
+            }
+            else{
+                $this->sendResponse('Something wrong', TRUE, 404);
+            }
+        }
+        else{
+            $this->missingParam('user-id');
+        }
+    }
+    private function activateAccount() {
+        $inputs = $this->getInputs();
+        if(isset($inputs['activation-token'])){
+            $user = UserFunctions::get()->activateAccount($inputs['activation-token']);
+            if($user instanceof User){
+                $this->sendResponse('Activated', FALSE, 200);
+            }
+            else if($user == UserFunctions::NOT_AUTH){
+                $this->notAuth();
+            }
+            else if($user == FALSE){
+                $this->sendResponse('Wrong Token', TRUE, 404);
+            }
+            else if($user == UserFunctions::ALREADY_ACTIVATED){
+                $this->sendResponse('Already Activated', FALSE, 200);
+            }
+            else if($user == MySQLQuery::QUERY_ERR){
+                $this->databaseErr();
+            }
+            else{
+                $this->sendResponse('Something wrong', TRUE, 404);
+            }
+        }
+        else{
+            $this->missingParam('activation-token');
+        }
+    }
+    public function checkAction(){
         $action = parent::getAction();
         if($action == 'add-user'){
             $this->actionNotImpl();
@@ -127,26 +276,26 @@ class UserAPIs extends API{
         else if($action == 'get-users'){
             $this->actionNotImpl();
         }
-        else if($action == 'get-user'){
-            $this->actionNotImpl();
+        else if($action == 'get-profile'){
+            $this->getProfile();
         }
         else if($action == 'update-email'){
-            $this->actionNotImpl();
+            $this->updateEmail();
         }
         else if($action == 'update-password'){
             $this->actionNotImpl();
         }
         else if($action == 'update-display-name'){
-            $this->actionNotImpl();
+            $this->updateDisplayName();
         }
         else if($action == 'update-access-level'){
             $this->actionNotImpl();
         }
         else if($action == 'update-user-status'){
-            $this->actionNotImpl();
+            $this->updateStatus();
         }
         else if($action == 'activate-account'){
-            $this->actionNotImpl();
+            $this->activateAccount();
         }
     }
     public function addUser($inputs){

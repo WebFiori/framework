@@ -6,7 +6,7 @@ define('HASH_ALGO_NAME','sha256');
 /**
  * A class that is used to authenticate system users.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.1
+ * @version 1.2
  */
 class Authenticator{
     /**
@@ -44,8 +44,11 @@ class Authenticator{
                     $this->user = new User($username,'',$email);
                     $this->user->setID($userId);
                     $this->user->setAccessLevel($row['acc_level']);
+                    $this->user->setStatus($row['status']);
                     $exp_time = date("Y-m-d H:i:s", strtotime('+5 minutes'));
                     $this->user->setToken(hash(HASH_ALGO_NAME,$exp_time));
+                    $query->updateLastLogin($userId);
+                    $_SESSION['db']->executeQuery($query);
                     return TRUE;
                 }
                 
@@ -67,8 +70,11 @@ class Authenticator{
                         $this->user = new User($username,'',$email);
                         $this->user->setID($userId);
                         $this->user->setAccessLevel($row['acc_level']);
+                        $this->user->setStatus($row['status']);
                         $exp_time = date("Y-m-d H:i:s", strtotime('+5 minutes'));
                         $this->user->setToken(hash(HASH_ALGO_NAME,$exp_time));
+                        $query->updateLastLogin($userId);
+                        $_SESSION['db']->executeQuery($query);
                         return TRUE;
                 }
             }

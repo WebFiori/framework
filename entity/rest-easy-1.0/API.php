@@ -67,10 +67,10 @@ class API implements JsonI{
         $this->filter = new APIFilter();
         $action = new APIAction();
         $action->setName('api-info');
-        $action->setActionMethod('GET or POST');
+        $action->setActionMethod('GET');
         $this->addAction($action);
         $this->filter->addParameter('action', 'string');
-        $this->setVirsion('0.0.0');
+        $this->setVersion('0.0.0');
     }
     /**
      * 
@@ -136,7 +136,7 @@ class API implements JsonI{
      * @param string $val Version number.
      * @since 1.0
      */
-    public function setVirsion($val){
+    public function setVersion($val){
         $this->apiVersion = $val;
     }
 

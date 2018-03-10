@@ -83,7 +83,15 @@ class UserFunctions extends Functions{
      * @var string Constant that indicates a user account is already activated.
      * @since 1.1
      */
-    const ALREADY_ACTIVATED = 'account-already_active';
+    const ALREADY_ACTIVATED = 'account_already_active';
+    /**
+     * A constant that indicates the old given password does not match the one stored 
+     * in the database.
+     * @var string Constant indicates the old given password does not match the one stored 
+     * in the database.
+     * @since 1.1
+     */
+    const PASSWORD_MISSMATCH = 'password_missmatch';
     /**
      * A set of possible user status.
      * @var array An array of user status.
@@ -117,6 +125,40 @@ class UserFunctions extends Functions{
             }
         }
         return FALSE;
+    }
+    /**
+     * Updates the access level of a user. Only system admin can change access level 
+     * of a user.
+     * @param int $acclvl User access level.
+     * @param string $userId The ID of the user that its access level will be 
+     * updated.
+     * @return User|string An object of type <b>User</b> in case the access level 
+     * is updated. <b>MySQLQuery::QUERY_ERR</b> in case of database query error. 
+     * <b>UserFunctions::NO_SUCH_USER</b> in case no user was found with the 
+     * given iD.
+     * @since 1.1
+     */
+    public function updateAccessLevel($acclvl, $userId){
+        $loggedInAccLevel = $this->getAccessLevel();
+        if($loggedInAccLevel != NULL && $loggedInAccLevel == 0){
+            $user = $this->getUserByID($userId);
+            if($user instanceof User){
+                $this->query->updateAccessLevel($acclvl, $userId);
+                if($this->excQ($this->query)){
+                    $user->setAccessLevel($acclvl);
+                    return $user;
+                }
+                else{
+                    return MySQLQuery::QUERY_ERR;
+                }
+            }
+            else{
+                return $user;
+            }
+        }
+        else{
+            return self::NOT_AUTH;
+        }
     }
     /**
      * Activate user account given his Activation token. The user must be 
@@ -230,12 +272,49 @@ class UserFunctions extends Functions{
             return self::STATUS_NOT_ALLOWED;
         }
     }
+    /**
+     * Updates the password of a user given his ID.
+     * @param string $oldPass The old password.
+     * @param string $newPass The new password.
+     * @param string $userId The ID of the user.
+     * @return boolean|string The function will return <b>TRUE</b> in case the 
+     * password is updated. In case of database query error, the function will 
+     * return <b>MySQLQuery::QUERY_ERR</b> If the old password does not match with 
+     * the one stored in the database, the function will return 
+     * <b>UserFunctions::PASSWORD_MISSMATCH</b>. If the user is not authorized to 
+     * update the password, the function will return <b>UserFunctions::NOT_AUTH</b>. 
+     * If no user was found using the given ID, The function will return 
+     * <b>UserFunctions::NO_SUCH_USER</b>
+     * @since 1.1
+     */
     public function updatePassword($oldPass, $newPass, $userId){
-        $user = $this->getUserByID($userId);
-        if($user instanceof User){
-            
+        $loggedId = $this->getUserID();
+        if($loggedId != NULL){
+            $user = $this->getUserByID($userId);
+            if($user instanceof User){
+                if($user->getID() == $loggedId){
+                    if($user->getPassword() == hash(Authenticator::HASH_ALGO_NAME, $oldPass)){
+                        $this->query->updatePassword(hash(Authenticator::HASH_ALGO_NAME, $newPass), $userId);
+                        if($this->excQ($this->query)){
+                            return TRUE;
+                        }
+                        else{
+                            return MySQLQuery::QUERY_ERR;
+                        }
+                    }
+                    else{
+                        return self::PASSWORD_MISSMATCH;
+                    }
+                }
+                else{
+                    return self::NOT_AUTH;
+                }
+            }
+            return $user;
         }
-        return $user;
+        else{
+            return self::NOT_AUTH;
+        }
     }
     /**
      * Updates the email address of a user given his ID.
@@ -300,6 +379,7 @@ class UserFunctions extends Functions{
                 if($this->rows() != 0){
                     $user = new User();
                     $row = $this->getRow();
+                    $user->setPassword($row[$this->query->getStructure()->getCol('password')->getName()]);
                     $user->setEmail($row[$this->query->getStructure()->getCol('email')->getName()]);
                     $user->setID($row[MySQLQuery::ID_COL]);
                     $user->setStatus(self::USER_STATUS[$row[$this->query->getStructure()->getCol('status')->getName()]]);
@@ -378,22 +458,22 @@ class UserFunctions extends Functions{
         if(strlen($email) != 0){
             $query = new UserQuery();
             $query->getUserByEmail($email);
-            if($this->excQ($query)){
+            if($this->excQ($this->query)){
                 $row = $this->getRow();
                 if($row != null){
                     $user = new User(
-                            $row[$query->getStructure()->getCol('username')->getName()],
+                            $row[$this->query->getStructure()->getCol('username')->getName()],
                             '',
-                            $row[$query->getStructure()->getCol('email')->getName()]);
+                            $row[$this->query->getStructure()->getCol('email')->getName()]);
                     $user->setID($row[UserQuery::ID_COL]);
                     $user->setStatus(
                             self::USER_STATUS
                             [$row[
-                                $query->getStructure()->getCol('status')->getName()
+                            $this->query->getStructure()->getCol('status')->getName()
                             ]]
                             );
-                    $user->setDisplayName($row[$query->getStructure()->getCol('disp-name')->getName()]);
-                    $user->setAccessLevel($row[$query->getStructure()->getCol('acc-level')->getName()]);
+                    $user->setDisplayName($row[$this->query->getStructure()->getCol('disp-name')->getName()]);
+                    $user->setAccessLevel($row[$this->query->getStructure()->getCol('acc-level')->getName()]);
                     return $user;
                 }
                 else{
@@ -428,6 +508,48 @@ class UserFunctions extends Functions{
         return $user;
     }
     /**
+     * Returns an array of all system users.
+     * @return array|string An array of all system users. If the currently logged in 
+     * user is not authorized to view users, The function will return 
+     * <b>Functions::NOT_AUTH</b>. Also the function will return <b>MySQLQuery::QUERY_ERR</b> 
+     * in case of database query error.
+     * @since 1.1
+     */
+    public function getUsers(){
+        $loggedAccessLevel = $this->getAccessLevel();
+        if($loggedAccessLevel != NULL && $loggedAccessLevel == 0){
+            $this->query->getUsers();
+            if($this->excQ($this->query)){
+                $result = $this->getSManager()->getDBLink()->getResult();
+                $users = array();
+                while($row = $result->fetch_assoc()){
+                    $user = new User(
+                            $row[$this->query->getStructure()->getCol('username')->getName()],
+                            '',
+                            $row[$this->query->getStructure()->getCol('email')->getName()]);
+                    $user->setID($row[UserQuery::ID_COL]);
+                    $user->setStatus(
+                            self::USER_STATUS
+                            [$row[
+                            $this->query->getStructure()->getCol('status')->getName()
+                            ]]
+                            );
+                    $user->setDisplayName($row[$this->query->getStructure()->getCol('disp-name')->getName()]);
+                    $user->setAccessLevel($row[$this->query->getStructure()->getCol('acc-level')->getName()]);
+                    array_push($users, $user);
+                }
+                return $users;
+            }
+            else{
+                return MySQLQuery::QUERY_ERR;
+            }
+        }
+        else{
+            return self::NOT_AUTH;
+        }
+    }
+
+    /**
      * Checks if a user is already a registered user. A user is considered registered if 
      * his email is already on the system database.
      * @param string $email The email address of the user.
@@ -460,9 +582,9 @@ class UserFunctions extends Functions{
     private function getRegTok($userId){
         if(strlen($userId) != 0){
             $this->acQuery->getActivationCode($userId);
-            if($this->sManager->getDBLink()->executeQuery($this->acQuery)){
-                if($this->sManager->getDBLink()->rows() == 1){
-                    $row = $this->sManager->getDBLink()->getRow();
+            if($this->excQ($this->acQuery)){
+                if($this->rows() == 1){
+                    $row = $this->getRow();
                     return $row[$this->acQuery->getStructure()->getCol('code')->getName()];
                 }
                 else{
@@ -489,7 +611,7 @@ class UserFunctions extends Functions{
     private function createRegTok($userId){
         if(strlen($userId) != 0){
             $this->acQuery->addNew($userId);
-            if($this->sManager->getDBLink()->executeQuery($this->acQuery)){
+            if($this->excQ($this->acQuery)){
                 return TRUE;
             }
             else{
@@ -500,6 +622,47 @@ class UserFunctions extends Functions{
             return self::EMPTY_STRING;
         }
     }
+    private function addUser($user){
+        $emailCheck = $this->isUserRegistered($user->getEmail());
+        if($emailCheck == FALSE){
+            $usernameCheck = $this->isUsernameTaken($user->getUserName());
+            if($usernameCheck == FALSE){
+                if(strlen($user->getPassword()) != 0){
+                    $this->query->addUser($user);
+                    if($this->excQ($this->query)){
+                        $user = $this->getUserByEmail($user->getEmail());
+                        if($this->createRegTok($user->getID()) == TRUE){
+                            $tok = $this->getRegTok($user->getID());
+                            $user->setActivationTok($tok);
+                            return $user;
+                        }
+                        else{
+                            return MySQLQuery::QUERY_ERR;
+                        }
+                    }
+                    else{
+                        return MySQLQuery::QUERY_ERR;
+                    }
+                }
+                else{
+                    return self::EMPTY_STRING;
+                }
+            }
+            else{
+                if($usernameCheck == TRUE){
+                    return self::USERNAME_TAKEN;
+                }
+                return $usernameCheck;
+            }
+        }
+        else{
+            if($emailCheck == TRUE){
+                return self::USER_ALREAY_REG;
+            }
+            return $emailCheck;
+        }
+    }
+
     /**
      * Adds a new user to the database of the system.
      * @param User $user An object of type <b>User</b>.
@@ -514,43 +677,22 @@ class UserFunctions extends Functions{
      */
     public function register($user){
         if($user instanceof User){
-            $emailCheck = $this->isUserRegistered($user->getEmail());
-            if($emailCheck == FALSE){
-                $usernameCheck = $this->isUsernameTaken($user->getUserName());
-                if($usernameCheck == FALSE){
-                    if(strlen($user->getPassword()) != 0){
-                        $this->query->addUser($user);
-                        if($this->sManager->getDBLink()->executeQuery($this->$query)){
-                            $user = $this->getUserByEmail($user->getEmail());
-                            if($this->createRegTok($user->getID()) == TRUE){
-                                $tok = $this->getRegTok($user->getID());
-                                $user->setActivationTok($tok);
-                                return $user;
-                            }
-                            else{
-                                return MySQLQuery::QUERY_ERR;
-                            }
-                        }
-                        else{
-                            return MySQLQuery::QUERY_ERR;
-                        }
+            if($user->getAccessLevel() != 0){
+                return $this->addUser($user);
+            }
+            else{
+                $loggedAccLevel = $this->getAccessLevel();
+                if($loggedAccLevel != NULL){
+                    if($loggedAccLevel == 0){
+                        return $this->addUser($user);
                     }
                     else{
-                        return self::EMPTY_STRING;
+                        return self::NOT_AUTH;
                     }
                 }
                 else{
-                    if($usernameCheck == TRUE){
-                        return self::USERNAME_TAKEN;
-                    }
-                    return $usernameCheck;
+                    return self::NOT_AUTH;
                 }
-            }
-            else{
-                if($emailCheck == TRUE){
-                    return self::USER_ALREAY_REG;
-                }
-                return $emailCheck;
             }
         }
         return FALSE;

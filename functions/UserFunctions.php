@@ -223,6 +223,9 @@ class UserFunctions extends Functions{
                     $this->query->updateDisplayName($newDispName, $user->getID());
                     if($this->excQ($this->query)){
                         $user->setDisplayName($newDispName);
+                        if($user->getID() == $this->getUserID()){
+                                SessionManager::get()->getUser()->setDisplayName($newDispName);
+                            }
                         return $user;
                     }
                     else{
@@ -332,12 +335,16 @@ class UserFunctions extends Functions{
         $loggedId = $this->getUserID();
         if($loggedId != NULL){
             if($loggedId == $userId || $this->getAccessLevel() == 0){
-                if($this->getUserByEmail($email) == self::NO_SUCH_USER){
+                $check = $this->getUserByEmail($email);
+                if($check == self::NO_SUCH_USER){
                     $user = $this->getUserByID($userId);
                     if($user instanceof User){
                         $this->query->updateEmail($email, $user->getID());
                         if($this->excQ($this->query)){
                             $user->setEmail($email);
+                            if($user->getID() == $this->getUserID()){
+                                SessionManager::get()->getUser()->setEmail($email);
+                            }
                             return $user;
                         }
                         else{
@@ -347,7 +354,7 @@ class UserFunctions extends Functions{
                     return $user;
                 }
                 else{
-                    return self::USER_ALREAY_REG;
+                    return $check;
                 }
             }
             else{
@@ -386,6 +393,8 @@ class UserFunctions extends Functions{
                     $user->setUserName($row[$this->query->getStructure()->getCol('username')->getName()]);
                     $user->setAccessLevel($row[$this->query->getStructure()->getCol('acc-level')->getName()]);
                     $user->setDisplayName($row[$this->query->getStructure()->getCol('disp-name')->getName()]);
+                    $user->setLastLogin($row[$this->query->getStructure()->getCol('last-login')->getName()]);
+                    $user->setRegDate($row[$this->query->getStructure()->getCol('reg-date')->getName()]);
                     return $user;
                 }
                 else{
@@ -412,24 +421,25 @@ class UserFunctions extends Functions{
      */
     public function getUserByUsername($username){
         if(strlen($username) != 0){
-            $query = new UserQuery();
-            $query->getUserByUsername($username);
-            if($this->excQ($query)){
+            $this->query->getUserByUsername($username);
+            if($this->excQ($this->query)){
                 $row = $this->getRow();
                 if($row != null){
                     $user = new User(
-                            $row[$query->getStructure()->getCol('username')->getName()],
+                            $row[$this->query->getStructure()->getCol('username')->getName()],
                             '',
-                            $row[$query->getStructure()->getCol('email')->getName()]);
+                            $row[$this->query->getStructure()->getCol('email')->getName()]);
                     $user->setID($row[UserQuery::ID_COL]);
                     $user->setStatus(
                             self::USER_STATUS
                             [$row[
-                                $query->getStructure()->getCol('status')->getName()
+                                $this->query->getStructure()->getCol('status')->getName()
                             ]]
                             );
-                    $user->setDisplayName($row[$query->getStructure()->getCol('disp-name')->getName()]);
-                    $user->setAccessLevel($row[$query->getStructure()->getCol('acc-level')->getName()]);
+                    $user->setDisplayName($row[$this->query->getStructure()->getCol('disp-name')->getName()]);
+                    $user->setAccessLevel($row[$this->query->getStructure()->getCol('acc-level')->getName()]);
+                    $user->setLastLogin($row[$this->query->getStructure()->getCol('last-login')->getName()]);
+                    $user->setRegDate($row[$this->query->getStructure()->getCol('reg-date')->getName()]);
                     return $user;
                 }
                 else{
@@ -456,8 +466,7 @@ class UserFunctions extends Functions{
      */
     public function getUserByEmail($email){
         if(strlen($email) != 0){
-            $query = new UserQuery();
-            $query->getUserByEmail($email);
+            $this->query->getUserByEmail($email);
             if($this->excQ($this->query)){
                 $row = $this->getRow();
                 if($row != null){
@@ -474,6 +483,8 @@ class UserFunctions extends Functions{
                             );
                     $user->setDisplayName($row[$this->query->getStructure()->getCol('disp-name')->getName()]);
                     $user->setAccessLevel($row[$this->query->getStructure()->getCol('acc-level')->getName()]);
+                    $user->setLastLogin($row[$this->query->getStructure()->getCol('last-login')->getName()]);
+                    $user->setRegDate($row[$this->query->getStructure()->getCol('reg-date')->getName()]);
                     return $user;
                 }
                 else{
@@ -536,6 +547,8 @@ class UserFunctions extends Functions{
                             );
                     $user->setDisplayName($row[$this->query->getStructure()->getCol('disp-name')->getName()]);
                     $user->setAccessLevel($row[$this->query->getStructure()->getCol('acc-level')->getName()]);
+                    $user->setLastLogin($row[$this->query->getStructure()->getCol('last-login')->getName()]);
+                    $user->setRegDate($row[$this->query->getStructure()->getCol('reg-date')->getName()]);
                     array_push($users, $user);
                 }
                 return $users;

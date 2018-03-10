@@ -71,7 +71,7 @@ class SiteConfig{
     
     private function __construct() {
         $this->webSiteName = 'Programming Academia';
-        $this->baseUrl = 'http://localhost/y-project/';
+        $this->baseUrl = 'http://localhost/generic-php/';
         $this->titleSep = ' | ';
         $this->homePage = '<b style="color:red">&lt;Not Set&gt;</b>';
         $this->copyright = 'All rights reserved.';

@@ -36,7 +36,10 @@ class UserAPIs extends API{
         parent::__construct();
         $this->initAPI();
     }
-    
+    /**
+     * Initialize the API Object.
+     * @since 1.0
+     */
     private function initAPI(){
         $this->setVersion('1.0.0');
         $tok = new RequestParameter('token','string', TRUE);
@@ -119,6 +122,10 @@ class UserAPIs extends API{
         $a10->addParameter($tok);
         $this->addAction($a10,TRUE);
     }
+    /**
+     * Called by the routing function to perform the 'update-staus' action
+     * @since 1.0
+     */
     private function updateStatus(){
         $inputs = $this->getInputs();
         if(isset($inputs['user-id'])){
@@ -156,6 +163,10 @@ class UserAPIs extends API{
             $this->missingParam('user-id');
         }
     }
+    /**
+     * Called by the routing function to perform the 'update-display-name' action
+     * @since 1.0
+     */
     private function updateDisplayName(){
         $inputs = $this->getInputs();
         if(isset($inputs['user-id'])){
@@ -185,6 +196,10 @@ class UserAPIs extends API{
             $this->missingParam('user-id');
         }
     }
+    /**
+     * Called by the routing function to perform the 'update-email' action
+     * @since 1.0
+     */
     private function updateEmail(){
         $inputs = $this->getInputs();
         if(isset($inputs['user-id'])){
@@ -217,6 +232,10 @@ class UserAPIs extends API{
             $this->missingParam('user-id');
         }
     }
+    /**
+     * Called by the routing function to perform the 'get-profile' action
+     * @since 1.0
+     */
     private function getProfile(){
         $inputs = $this->getInputs();
         if(isset($inputs['user-id'])){
@@ -241,6 +260,10 @@ class UserAPIs extends API{
             $this->missingParam('user-id');
         }
     }
+    /**
+     * Called by the routing function to perform the 'activate-account' action
+     * @since 1.0
+     */
     private function activateAccount() {
         $inputs = $this->getInputs();
         if(isset($inputs['activation-token'])){
@@ -268,13 +291,76 @@ class UserAPIs extends API{
             $this->missingParam('activation-token');
         }
     }
+    /**
+     * Called by the routing function to perform the 'get-users' action
+     * @since 1.0
+     */
+    private function getUsers(){
+        $users = UserFunctions::get()->getUsers();
+        if($users == UserFunctions::NOT_AUTH){
+            $this->notAuth();
+        }
+        else if($users == MySQLQuery::QUERY_ERR){
+            $this->databaseErr();
+        }
+        else{
+            $json = new JsonX();
+            $json->add('users', $users);
+            $this->sendResponse('List Of Users', FALSE, 200, '"users":'.$json);
+        }
+    }
+    /**
+     * Called by the routing function to perform the 'update-password' action
+     * @since 1.0
+     */
+    public function updatePassword(){
+        $input = $this->getInputs();
+        if(isset($input['old-pass'])){
+            if(isset($input['new-pass'])){
+                if(isset($input['user-id'])){
+                    $r = UserFunctions::get()->updatePassword($input['old-pass'], $input['new-pass'], $input['user-id']);
+                    if($r === TRUE){
+                        $this->sendResponse('Password Updated', FALSE, 200);
+                    }
+                    else if($r == MySQLQuery::QUERY_ERR){
+                        $this->databaseErr();
+                    }
+                    else if($r == UserFunctions::NO_SUCH_USER){
+                        $this->sendResponse('No Such User', TRUE, 404);
+                    }
+                    else if($r == UserFunctions::NOT_AUTH){
+                        $this->notAuth();
+                    }
+                    else if($r == UserFunctions::PASSWORD_MISSMATCH){
+                        $this->sendResponse('Password Missmatch', TRUE, 404);
+                    }
+                    else{
+                        $this->sendResponse('Something Wrong', TRUE, 404);
+                    }
+                }
+                else{
+                    $this->missingParam('user-id');
+                }
+            }
+            else{
+                $this->missingParam('new-pass');
+            }
+        }
+        else{
+            $this->missingParam('old-pass');
+        }
+    }
+    /**
+     * A routing function.
+     * @since 1.0
+     */
     public function checkAction(){
         $action = parent::getAction();
         if($action == 'add-user'){
-            $this->actionNotImpl();
+            $this->addUser();
         }
         else if($action == 'get-users'){
-            $this->actionNotImpl();
+            $this->getUsers();
         }
         else if($action == 'get-profile'){
             $this->getProfile();
@@ -283,13 +369,13 @@ class UserAPIs extends API{
             $this->updateEmail();
         }
         else if($action == 'update-password'){
-            $this->actionNotImpl();
+            $this->updatePassword();
         }
         else if($action == 'update-display-name'){
             $this->updateDisplayName();
         }
         else if($action == 'update-access-level'){
-            $this->actionNotImpl();
+            $this->updateAccessLevel();
         }
         else if($action == 'update-user-status'){
             $this->updateStatus();
@@ -298,27 +384,74 @@ class UserAPIs extends API{
             $this->activateAccount();
         }
     }
-    public function addUser($inputs){
+    /**
+     * Called by the routing function to perform the 'update-access-level' action
+     * @since 1.0
+     */
+    private function updateAccessLevel() {
+        $inputs = $this->getInputs();
+        if(isset($inputs['access-level'])){
+            if(isset($inputs['user-id'])){
+                $result = UserFunctions::get()->updateAccessLevel($inputs['access-level'], $inputs['user-id']);
+                if($result instanceof User){
+                    $this->sendResponse('Access Level Updated', FALSE, 200, '"user":'.$result->toJSON());
+                }
+                else if($result == UserFunctions::NO_SUCH_USER){
+                    $this->sendResponse('No Such User', TRUE, 404);
+                }
+                else if($result == MySQLQuery::QUERY_ERR){
+                    $this->databaseErr();
+                }
+                else if($result == UserFunctions::NOT_AUTH){
+                    $this->notAuth();
+                }
+                else{
+                    $this->sendResponse('Something wrong', TRUE, 404);
+                }
+            }
+            else{
+                $this->missingParam('user-id');
+            }
+        }
+        else{
+            $this->missingParam('access-level');
+        }
+    }
+    /**
+     * Called by the routing function to perform the 'add-user' action
+     * @since 1.0
+     */
+    private function addUser(){
+        $inputs = $this->getInputs();
         if(isset($inputs['username'])){
             if(isset($inputs['email'])){
                 if(isset($inputs['password'])){
                     if(isset($inputs['access-level'])){
                         $user = new User($inputs['username'], hash('sha256',$inputs['password']), $inputs['email']);
-                        $r = UserFunctions::register($user);
+                        $user->setAccessLevel($inputs['access-level']);
+                        $r = UserFunctions::get()->register($user);
                         if($r == MySQLQuery::QUERY_ERR){
                             $this->databaseErr();
                         }
                         else if($r == UserFunctions::USERNAME_TAKEN){
-
+                            $this->sendResponse('Username Taken', TRUE, 404);
                         }
                         else if($r == UserFunctions::USER_ALREAY_REG){
-
+                            $this->sendResponse('User Already Registred', TRUE, 404);
+                        }
+                        else if($r == UserFunctions::NOT_AUTH){
+                            $this->notAuth();
+                        }else if($r == UserFunctions::EMPTY_STRING){
+                            $this->sendResponse('Unkown Empty Parameter', TRUE, 404);
+                        }
+                        else if($r == FALSE){
+                            $this->sendResponse('Unable to Create Profile', TRUE, 404);
                         }
                         else if($r == UserFunctions::EMPTY_STRING){
-
+                            $this->sendResponse('Unkown Empty Parameter', TRUE, 404);
                         }
                         else{
-                            http_response_code(201);
+                            $this->sendResponse('User Profile Created', FALSE, 201, '"user":'.$r->toJSON());
                         }
                     }
                     else{

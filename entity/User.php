@@ -26,9 +26,21 @@ define('ACCESS_LEVEL_5',5);
 /**
  * A class that represents a system user.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.3
+ * @version 1.4
  */
 class User implements JsonI{
+    /**
+     * The last date at which the user did use the system.
+     * @var string
+     * @since 1.4 
+     */
+    private $lastLogin;
+    /**
+     * The date at which the user registered in the system.
+     * @var string
+     * @since 1.4 
+     */
+    private $regDate;
     /**
      * The username of the user.
      * @var string 
@@ -87,6 +99,38 @@ class User implements JsonI{
         $this->password = $password;
         $this->userName = $username;
         $this->setAccessLevel(ACCESS_LEVEL_2);
+    }
+    /**
+     * Returns the value of the property <b>$lastLogin</b>.
+     * @return string Last login date.
+     * @since 1.4
+     */
+    public function getLastLogin(){
+        return $this->regDate;
+    }
+    /**
+     * Returns the value of the property <b>$regDate</b>.
+     * @param string $date Registration date.
+     * @since 1.4
+     */
+    public function getRegDate(){
+        return $this->regDate;
+    }
+    /**
+     * Sets the value of the property <b>$lastLogin</b>.
+     * @param string $date Last login date date.
+     * @since 1.4
+     */
+    public function setLastLogin($date){
+        $this->regDate = $date;
+    }
+    /**
+     * Sets the value of the property <b>$regDate</b>.
+     * @param string $date Registration date.
+     * @since 1.4
+     */
+    public function setRegDate($date){
+        $this->regDate = $date;
     }
     /**
      * Sets the activation token of the user.
@@ -157,6 +201,8 @@ class User implements JsonI{
         $json->add('access-level', $this->getAccessLevel());
         $json->add('email', $this->getEmail());
         $json->add('status', $this->getStatus());
+        $json->add('reg-date', $this->getRegDate());
+        $json->add('last-login', $this->getLastLogin());
         if($this->getToken() !== NULL){
             $json->add('token', $this->getToken());
         }
@@ -275,6 +321,8 @@ class User implements JsonI{
         $retVal .= 'Password: '.$this->getPassword().'<br/>';
         $retVal .= 'Email: '.$this->getEmail().'<br/>';
         $retVal .= 'Access Level: '.$this->getAccessLevel().'<br/>';
+        $retVal .= 'Registration Date: '.$this->getRegDate().'<br/>';
+        $retVal .= 'Last Login: '.$this->getLastLogin().'<br/>';
         $retVal .= 'User ID: '.$this->getID().'<br/>';
         $retVal .= 'Token: '.$this->getToken().'<br/>';
         $retVal .= 'Activation Token: '.$this->getActivationTok().'<br/>';

@@ -1,6 +1,7 @@
 <?php
 /**
  * The name of hash algorithm used to create password hash.
+ * @deprecated since version 1.2 Use <b>Authenticator::HASH_ALGO_NAME </b> Instead.
  */
 define('HASH_ALGO_NAME','sha256');
 /**
@@ -9,6 +10,12 @@ define('HASH_ALGO_NAME','sha256');
  * @version 1.2
  */
 class Authenticator{
+    /**
+     * The name of hash algorithm used to create password hash.
+     * @var string The name of hash algorithm used to create password hash.
+     * @since 1.2
+     */
+    const HASH_ALGO_NAME = 'sha256';
     /**
      * The user object that is associated with the instance.
      * @var User 

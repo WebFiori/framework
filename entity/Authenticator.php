@@ -52,6 +52,8 @@ class Authenticator{
                     $this->user->setID($userId);
                     $this->user->setAccessLevel($row['acc_level']);
                     $this->user->setStatus($row['status']);
+                    $this->user->setLastLogin($row['last_login']);
+                    $this->user->setRegDate($row['reg_date']);
                     $exp_time = date("Y-m-d H:i:s", strtotime('+5 minutes'));
                     $this->user->setToken(hash(HASH_ALGO_NAME,$exp_time));
                     $query->updateLastLogin($userId);
@@ -78,6 +80,8 @@ class Authenticator{
                         $this->user->setID($userId);
                         $this->user->setAccessLevel($row['acc_level']);
                         $this->user->setStatus($row['status']);
+                        $this->user->setLastLogin($row['last_login']);
+                        $this->user->setRegDate($row['reg_date']);
                         $exp_time = date("Y-m-d H:i:s", strtotime('+5 minutes'));
                         $this->user->setToken(hash(HASH_ALGO_NAME,$exp_time));
                         $query->updateLastLogin($userId);

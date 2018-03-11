@@ -71,8 +71,8 @@ class Config{
      */
     private function __construct() {
         $this->isConfigured = TRUE;
-        $this->templateDate = '07-03-2018 <DD-MM-YYYY>';
-        $this->templateVersion = '0.1.1';
+        $this->templateDate = '10-03-2018 (DD-MM-YYYY)';
+        $this->templateVersion = '0.1.2';
         $this->templateVersionType = 'Beta';
         $this->dbHost = 'localhost';
         $this->dbUser = 'root';

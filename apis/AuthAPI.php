@@ -56,7 +56,13 @@ class AuthAPI extends API{
                 if(isset($inputs['password'])){
                     $r = UserFunctions::get()->authenticate($inputs['username'], $inputs['password'], $inputs['username']);
                     if($r == TRUE){
-                        $this->sendResponse('Logged In', FALSE, 200, '"user":'.SessionManager::get()->getUser()->toJSON());
+                        if(SessionManager::get()->getUser()->getStatus() == 'S'){
+                            $this->sendResponse('Account Suspended',TRUE,401);
+                            SessionManager::get()->kill();
+                        }
+                        else{
+                            $this->sendResponse('Logged In', FALSE, 200, '"user":'.SessionManager::get()->getUser()->toJSON());
+                        }
                     }
                     else{
                         $this->sendResponse('Inncorect username, email or password.', TRUE, 401);

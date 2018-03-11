@@ -2,9 +2,15 @@
 /**
  * A helper class to manage system sessions.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.3
+ * @version 1.4
  */
 class SessionManager{
+    /**
+     * The lifetime of the session (in minutes).
+     * @var int lifetime of the session (in minutes). The default is 10.
+     * @since 1.4 
+     */
+    private $lifeTime;
     /**
      * A constant that indicates the name of database host is missing.
      * @var string Constant that indicates the name of database host is missing.
@@ -50,7 +56,7 @@ class SessionManager{
         'EN','AR'
     );
     private function __construct() {
-        
+        $this->lifeTime = 1;
     }
     /**
      * Creates a single instance of <b>SessionManager</b>.
@@ -68,6 +74,25 @@ class SessionManager{
             self::$singleton->initSession();
         }
         return self::$singleton;
+    }
+    /**
+     * Sets the lifetime of the session.
+     * @param int $time Session lifetime (in minutes). it will be set only if 
+     * the given value is greater than 0.
+     * @since 1.4
+     */
+    public function setLifetime($time){
+        if($time > 0){
+            $this->lifeTime = $time;
+        }
+    }
+    /**
+     * Returns the lifetime of the session (in minutes). 
+     * @return int the lifetime of the session (in minutes).
+     * @since 1.4
+     */
+    public function getLifetime(){
+        return $this->lifeTime;
     }
     /**
      * Initialize session language. The initialization depends on the attribute 
@@ -242,6 +267,9 @@ class SessionManager{
     public function initSession($name='pa-sid',$useDb=false,$dbAttributes=array()){
         if(!self::isStarted()){
             session_name($name);
+            $lifeTime = $this->getLifetime() * 60;
+            ini_set('session.gc_maxlifetime', $lifeTime);
+            session_set_cookie_params($lifeTime);
             $started = session_start();
         }
         else{

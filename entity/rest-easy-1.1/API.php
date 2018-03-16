@@ -24,9 +24,46 @@
  */
 /**
  * A class that represents a REST API.
- * @version 1.0
+ * @version 1.1
  */
-class API implements JsonI{
+abstract class API implements JsonI{
+    /**
+     * An array that contains the supported 'POST' request content types.
+     * @var array An array that contains the supported 'POST' request content types.
+     * @since 1.1
+     */
+    const POST_CONTENT_TYPES = array(
+        'application/x-www-form-urlencoded',
+        'multipart/form-data'
+    );
+    /**
+     * An array that contains most common MIME types with file extension as key.
+     * @var array An array that contains most common MIME types with file extension as key.
+     * @since 1.1
+     */
+    const MIME_TYPES = array(
+        'js'=>'application/javascript',
+        'json'=>'application/json',
+        'xml'=>'application/xml',
+        'zip'=>'application/zip',
+        'pdf'=>'application/pdf',
+        'sql'=>'application/sql',
+        'doc'=>'application/msword',
+        'docx'=>'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'xls'=>'application/vnd.ms-excel',
+        'xlsx'=>'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'ppt'=>'application/vnd.ms-powerpoint',
+        'pptx'=>'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+        'mp3'=>'audio/mpeg',
+        'css'=>'text/css',
+        'html'=>'text/html',
+        'csv'=>'text/csv',
+        'txt'=>'text/plain',
+        'png'=>'image/png',
+        'jpeg'=>'image/jpeg',
+        'gif'=>'image/gif',
+        'mp4'=>'video/mp4'
+    );
     /**
      * API request method.
      * @var string 
@@ -55,27 +92,36 @@ class API implements JsonI{
      * Session manager.
      * @var SessionManager
      * @since 1.0 
+     * @deprecated since version 1.1 Will be removed.
      */
     private $settionMngr;
+    
     private $apiVersion;
     
     public function __construct(){
         $this->requestMethod = filter_var(getenv('REQUEST_METHOD'));
         $this->actions = array();
         $this->authActions = array();
-        $this->settionMngr = SessionManager::get();
         $this->filter = new APIFilter();
         $action = new APIAction();
         $action->setName('api-info');
-        $action->setActionMethod('GET');
+        $action->addRequestMethod('get');
         $this->addAction($action);
+        $action2 = new APIAction();
+        $action2->setName('request-info');
+        $action2->addRequestMethod('get');
+        $this->addAction($action2);
         $this->filter->addParameter('action', 'string');
         $this->setVersion('0.0.0');
+        if(class_exists('SessionManager')){
+            $this->settionMngr = SessionManager::get();
+        }
     }
     /**
      * 
      * @return SessionManager
      * @since 1.0
+     * @deprecated since version 1.1 Will be removed.
      */
     public function getSession(){
         return $this->settionMngr;
@@ -85,7 +131,7 @@ class API implements JsonI{
      * @since 1.0
      */
     public function databaseErr(){
-        $this->sendResponse('Database Error', TRUE, 404, $this->getSession()->getDBLink()->toJSON());
+        $this->sendResponse('Database Error', TRUE, 404, '"db":'.$this->getSession()->getDBLink()->toJSON());
     }
     /**
      * Sends a response message to indicate that a user is not authorized to do an API call.
@@ -99,7 +145,14 @@ class API implements JsonI{
      * @since 1.0
      */
     public function actionNotSupported(){
-        $this->sendResponse('Not supported', TRUE, 404);
+        $this->sendResponse('Action not supported', TRUE, 404);
+    }
+    /**
+     * Sends a response message to indicate that request content type is not supported by the API.
+     * @since 1.1
+     */
+    public function contentTypeNotSupported($cType=''){
+        $this->sendResponse('Content type not supported.', TRUE, 404,'"request-content-type":"'.$cType.'"');
     }
     /**
      * Sends a response message to indicate that request method is not supported.
@@ -113,7 +166,7 @@ class API implements JsonI{
      * @since 1.0
      */
     public function actionNotImpl(){
-        $this->sendResponse('Not implemented', TRUE, 404);
+        $this->sendResponse('Action not implemented', TRUE, 404);
     }
     /**
      * Sends a response message to indicate that a request parameter is missing.
@@ -128,7 +181,7 @@ class API implements JsonI{
      * @return string
      * @since 1.0
      */
-    public function getVersion(){
+    public final function getVersion(){
         return $this->apiVersion;
     }
     /**
@@ -136,7 +189,7 @@ class API implements JsonI{
      * @param string $val Version number.
      * @since 1.0
      */
-    public function setVersion($val){
+    public final function setVersion($val){
         $this->apiVersion = $val;
     }
 
@@ -145,7 +198,7 @@ class API implements JsonI{
      * @return array An array of supported API actions.
      * @since 1.0
      */
-    public function getActions(){
+    public final function getActions(){
         return $this->actions;
     }
     /**
@@ -154,7 +207,7 @@ class API implements JsonI{
      * @return array An array of supported API actions.
      * @since 1.0
      */
-    public function getAuthActions(){
+    public final function getAuthActions(){
         return $this->authActions;
     }
     /**
@@ -164,7 +217,7 @@ class API implements JsonI{
      * @return boolean <b>TRUE</b> if the action is added. <b>FAlSE</b> otherwise.
      * @since 1.0
      */
-    public function addAction($action='',$reqPermissions=false){
+    public final function addAction($action='',$reqPermissions=false){
         if($action instanceof APIAction){
             if(!in_array($action, $this->getActions()) && !in_array($action, $this->getAuthActions())){
                 if($reqPermissions == TRUE){
@@ -185,7 +238,7 @@ class API implements JsonI{
      * @return string Request method (POST, GET, etc...).
      * @since 1.0
      */
-    public function getRequestMethod(){
+    public final function getRequestMethod(){
         return $this->requestMethod;
     }
     /**
@@ -207,7 +260,7 @@ class API implements JsonI{
      * if not or it is not set.
      * @since 1.0
      */
-    public function isActionSupported(){
+    public final function isActionSupported(){
         $action = $this->getAction();
         foreach ($this->getActions() as $val){
             if($val->getName() == $action){
@@ -222,25 +275,69 @@ class API implements JsonI{
         return FALSE;
     }
     /**
+     * Returns request content type (For 'POST' requests).
+     * @return string The value of the header 'content-type' in the request.
+     * @since 1.1
+     */
+    public final function getContentType(){
+        $c = filter_input(INPUT_SERVER, 'CONTENT_TYPE');
+        if($c != NULL && $c != FALSE){
+            return strtok($c, ';');
+        }
+        return NULL;
+    }
+    /**
+     * Checks if request content type is supported by the API or not (For 'POST' 
+     * requests).
+     * @return boolean Returns <b>TRUE</b> in case the 'content-type' header is not 
+     * set or the request method is not 'POST'. Also the function will return 
+     * <b>TRUE</b> if the content type is supported. Other than that, the function 
+     * will return <b>FALSE</b>
+     * @since 1.1
+     */
+    public final function isContentTypeSupported(){
+        $c = $this->getContentType();
+        if($c != NULL && $this->getRequestMethod() == 'POST'){
+            return in_array($c, self::POST_CONTENT_TYPES);
+        }
+        return TRUE;
+    }
+
+    /**
      * Checks the status of the API action. It checks if the action is supported by 
      * the API or not. After that, it checks if the user is permitted to perform the 
      * action or not. 
      * @return boolean <b>TRUE</b> if nothing wrong with the action.
      * @since 1.0
      */
-    private function checkAction(){
+    private final function checkAction(){
         $action = $this->getAction();
         if($action != NULL){
             if($this->isActionSupported()){
                 foreach ($this->getAuthActions() as $val){
                     if($val->getName() == $action){
-                        if($this->getSession()->validateToken()){
-                            if($val->getActionMethod() != $this->getRequestMethod()){
-                                $this->requMethNotSupported();
+                        if($this->isAuthorized()){
+                            $reqMethods = $val->getActionMethods();
+                            foreach ($reqMethods as $method){
+                                if($method == $this->getRequestMethod()){
+                                    return TRUE;
+                                }
+                            }
+                            return FALSE;
+                        }
+                        else if($this->getSession() != NULL){
+                            if($this->getSession()->validateToken()){
+                                $reqMethods = $val->getActionMethods();
+                                foreach ($reqMethods as $method){
+                                    if($method == $this->getRequestMethod()){
+                                        return TRUE;
+                                    }
+                                }
                                 return FALSE;
                             }
                             else{
-                                return TRUE;
+                                $this->notAuth();
+                                return FALSE;
                             }
                         }
                         else{
@@ -251,13 +348,13 @@ class API implements JsonI{
                 }
                 foreach ($this->getActions() as $val){
                     if($val->getName() == $action){
-                        if($val->getActionMethod() != $this->getRequestMethod()){
-                            $this->requMethNotSupported();
-                            return FALSE;
+                        $reqMethods = $val->getActionMethods();
+                        foreach ($reqMethods as $method){
+                            if($method == $this->getRequestMethod()){
+                                return TRUE;
+                            }
                         }
-                        else{
-                            return TRUE;
-                        }
+                        return FALSE;
                     }
                 }
                 return TRUE;
@@ -272,32 +369,52 @@ class API implements JsonI{
         return FALSE;
     }
     /**
+     * Checks if a user is authorized to perform an action that require authorization.
+     * @return boolean The function must be implemented by the sub-class in a way 
+     * that makes it return <b>TRUE</b> in case the user is allowed to perform the 
+     * action. If the user is not permitted, the function must return <b>FALSE</b>.
+     * @since 1.1
+     */
+    public abstract function isAuthorized();
+    /**
+     * A function that is used to process the requested action.
+     * @since 1.1
+     */
+    public abstract function processRequest();
+    /**
      * Process user request.
      * @param string $callback A name of a callback function. It must be a function 
      * in the child class.
      * @since 1.0
      */
-    public function process($callback='funcName'){
+    public function process(){
         $reqMeth = $this->getRequestMethod();
-        if($reqMeth == 'GET' || $reqMeth == 'DELETE'){
+        if($reqMeth == 'GET' || $reqMeth == 'DELETE' || $reqMeth = 'PUT'){
             $this->filter->filterGET();
         }
         else if($reqMeth == 'POST'){
             $this->filter->filterPOST();
         }
-        if($this->checkAction()){
-            if($this->getAction() == 'api-info'){
-                echo $this->toJSON();
-            }
-            else{
-                $methodVariable = array($this, $callback);
-                if(is_callable($methodVariable, FALSE,$callback)){
-                    call_user_func(array($this, $callback), $this->filter->getInputs());
+        if($this->isContentTypeSupported()){
+            if($this->checkAction()){
+                if($this->getAction() == 'api-info'){
+                    echo $this->toJSON();
+                }
+                else if($this->getAction() == 'request-info'){
+                    $j = new JsonX();
+                    $j->add('action', $this->getAction());
+                    $j->add('content-type', $this->getContentType());
+                    $j->add('method', $this->getRequestMethod());
+                    $j->add('parameters', $this->getInputs());
+                    $this->send(self::MIME_TYPES['json'], $j);
                 }
                 else{
-                    $this->sendResponse('Nothing to process.');
+                    $this->processRequest();
                 }
             }
+        }
+        else{
+            $this->contentTypeNotSupported($this->getContentType());
         }
     }
     /**
@@ -327,6 +444,15 @@ class API implements JsonI{
         }
     }
     /**
+     * Sends Back a data using specific content type.
+     * @param type $conentType
+     * @param type $data
+     */
+    public function send($conentType,$data){
+        header('content-type:'.$conentType);
+        echo $data;
+    }
+    /**
      * Returns an array of filtered request inputs.
      * @return array An array of filtered request inputs.
      * @since 1.0
@@ -337,10 +463,15 @@ class API implements JsonI{
 
     /**
      * Returns the action that was requested to perform.
-     * @return string The action that was requested to perform.
+     * @return string|NULL The action that was requested to perform. If the action 
+     * is not set, the function will return <b>NULL</b>.
      * @since 1.0
      */
     public function getAction(){
-        return $this->filter->getInputs()['action'];
+        $i = $this->getInputs();
+        if(isset($i['action'])){
+            return $i['action'];
+        }
+        return NULL;
     }
 }

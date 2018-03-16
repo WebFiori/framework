@@ -26,15 +26,30 @@
 /**
  * A class that represents API action.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.0
+ * @version 1.1
  */
 class APIAction implements JsonI{
+    /**
+     * An array that contains the names of request methods.
+     * @var array An array that contains the names of request methods.
+     * @since 1.1
+     */
+    const METHODS = array(
+        'GET','HEAD','POST','PUT','DELETE','TRACE',
+        'OPTIONS','PATCH','CONNECT'
+    );
     /**
      * The name of the action.
      * @var string
      * @since 1.0 
      */
     private $name;
+    /**
+     * An array that contains action request methods.
+     * @var array
+     * @since 1.1 
+     */
+    private $reqMethods = array();
     /**
      * An array that holds an objects of type <b>RequestParameter</b>.
      * @var array
@@ -45,6 +60,7 @@ class APIAction implements JsonI{
      * The request method that is used to fire the action.
      * @var string 'Get' or 'Post' or other... 
      * @since 1.0
+     * @deprecated since version 1.1
      */
     private $actionMethod;
     /**
@@ -58,17 +74,71 @@ class APIAction implements JsonI{
         }
     }
     /**
+     * Adds new action request method.
+     * @param string $method The request method (e.g. 'get', 'post', 'options' ...). It 
+     * can be in upper case or lower case.
+     * @return boolean <b>TRUE</b> in case the request method is added. If the given 
+     * request method is already added or the method is already added, the function 
+     * will return <b>FALSE</b>.
+     * @since 1.1
+     */
+    public function addRequestMethod($method){
+        $uMethod = strtoupper($method);
+        if(in_array($uMethod, self::METHODS)){
+            if(!in_array($uMethod, $this->reqMethods)){
+                array_push($this->reqMethods, $uMethod);
+                return TRUE;
+            }
+        }
+        return FALSE;
+    }
+    /**
+     * Returns an array that contains all action request methods.
+     * @return array An array that contains all action request methods. Request 
+     * methods can be added using the function <b>APIAction::addRequestMethod($method)</b>
+     * @see APIAction::addRequestMethod($method)
+     * @since 1.1
+     * 
+     */
+    public function getActionMethods(){
+        return $this->reqMethods;
+    }
+    /**
+     * Removes a request method from the previously added ones. 
+     * @param string $method The request method (e.g. 'get', 'post', 'options' ...). It 
+     * can be in upper case or lower case.
+     * @return string|NULL The function will return the removed request method. 
+     * In case nothing has changed, the function will return <b>NULL</b>.
+     * @since 1.1
+     */
+    public function removeRequestMethod($method){
+        $uMethod = strtoupper($method);
+        if(in_array($uMethod, $this->getActionMethods())){
+            $count = count($this->getActionMethods());
+            for($x = 0 ; $x < $count ; $x++){
+                if($this->getActionMethods()[$x] == $uMethod){
+                    unset($this->getActionMethods()[$x]);
+                    return $uMethod;
+                }
+            }
+        }
+        return NULL;
+    }
+
+    /**
      * Sets the request method that is used to fire the action.
      * @param string $method The request method (Get, Post...).
      * @since 1.0
+     * @deprecated since version 1.1 Use <b>APIAction::addRequestMethod($method)</b> instead.
      */
     public function setActionMethod($method){
-        $this->actionMethod = $method;
+        $this->actionMethod = strtoupper($method);
     }
     /**
-     * Reqtrns the request method that is used to fire the action.
+     * Returns the request method that is used to fire the action.
      * @return string The request method (Get, Post...).
      * @since 1.0
+     * @deprecated since version 1.1
      */
     public function getActionMethod(){
         return $this->actionMethod;
@@ -106,6 +176,7 @@ class APIAction implements JsonI{
         $json = new JsonX();
         $json->add('name', $this->getName());
         $json->add('request-method', $this->getActionMethod());
+        $json->add('request-methods', $this->reqMethods);
         $json->add('parameters', $this->parameters);
         return $json;
     }

@@ -2,7 +2,7 @@
 /**
  * A class that contains all static methods for altering user attributes.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.1
+ * @version 1.2
  * @uses User The basic user class.
  * @uses UserQuery It uses the class to send user related queries.
  * @uses ActivationQuery Used for user activation related queries.
@@ -243,8 +243,8 @@ class UserFunctions extends Functions{
         }
     }
     /**
-     * Updates the status of a user.
-     * @param type $newStatus The new status. It must be a one letter value. A key 
+     * Updates the status of a user. Only the admin can use this function.
+     * @param string $newStatus The new status. It must be a one letter value. A key 
      * from the array <b>UserFunctions::USER_STATUS</b>.
      * @param string $userId The ID of the user.
      * @return User|string  An object of type <b>User</b> in case the status is updated. 
@@ -253,26 +253,33 @@ class UserFunctions extends Functions{
      * If the user is not authorized to update user profile, the function will return 
      * <b>Functions::NOT_AUTH</b>. If the given status is not a key in the array 
      * <b>UserFunctions::USER_STATUS</b>, the function will return 
-     * <b>UserFunctions::STATUS_NOT_ALLOWED</b>.
-     * @since 1.0
+     * <b>UserFunctions::STATUS_NOT_ALLOWED</b>. <b>Functions::NOT_AUTH</b> is returned 
+     * if the user is not authorized to update status.
+     * @since 1.0 
      */
     public function updateStatus($newStatus, $userId){
-        if(array_key_exists($newStatus, self::USER_STATUS)){
-            $user = $this->getUserByID($userId);
-            if($user instanceof User){
-                $this->query->updateStatus($newStatus, $user->getID());
-                if($this->excQ($this->query)){
-                    $user->setStatus(self::USER_STATUS[$newStatus]);
-                    return $user;
+        $loggedAccessLevel = $this->getAccessLevel();
+        if($loggedAccessLevel != NULL && $loggedAccessLevel == 0){
+            if(array_key_exists($newStatus, self::USER_STATUS)){
+                $user = $this->getUserByID($userId);
+                if($user instanceof User){
+                    $this->query->updateStatus($newStatus, $user->getID());
+                    if($this->excQ($this->query)){
+                        $user->setStatus(self::USER_STATUS[$newStatus]);
+                        return $user;
+                    }
+                    else{
+                        return MySQLQuery::QUERY_ERR;
+                    }
                 }
-                else{
-                    return MySQLQuery::QUERY_ERR;
-                }
+                return $user;
             }
-            return $user;
+            else{
+                return self::STATUS_NOT_ALLOWED;
+            }
         }
         else{
-            return self::STATUS_NOT_ALLOWED;
+            return self::NOT_AUTH;
         }
     }
     /**
@@ -380,35 +387,30 @@ class UserFunctions extends Functions{
         if($this->getSManager()->getUser() == NULL){
             return self::NOT_AUTH;
         }
-        if($this->getUserID() == $id || $this->getAccessLevel() == 0){
-            $this->query->getUserByID($id);
-            if($this->excQ($this->query)){
-                if($this->rows() != 0){
-                    $user = new User();
-                    $row = $this->getRow();
-                    $user->setPassword($row[$this->query->getStructure()->getCol('password')->getName()]);
-                    $user->setEmail($row[$this->query->getStructure()->getCol('email')->getName()]);
-                    $user->setID($row[MySQLQuery::ID_COL]);
-                    $user->setStatus(self::USER_STATUS[$row[$this->query->getStructure()->getCol('status')->getName()]]);
-                    $user->setUserName($row[$this->query->getStructure()->getCol('username')->getName()]);
-                    $user->setAccessLevel($row[$this->query->getStructure()->getCol('acc-level')->getName()]);
-                    $user->setDisplayName($row[$this->query->getStructure()->getCol('disp-name')->getName()]);
-                    $user->setLastLogin($row[$this->query->getStructure()->getCol('last-login')->getName()]);
-                    $user->setRegDate($row[$this->query->getStructure()->getCol('reg-date')->getName()]);
-                    $tok = $this->getRegTok($id);
-                    $user->setActivationTok($tok);
-                    return $user;
-                }
-                else{
-                    return self::NO_SUCH_USER;
-                }
+        $this->query->getUserByID($id);
+        if($this->excQ($this->query)){
+            if($this->rows() != 0){
+                $user = new User();
+                $row = $this->getRow();
+                $user->setPassword($row[$this->query->getStructure()->getCol('password')->getName()]);
+                $user->setEmail($row[$this->query->getStructure()->getCol('email')->getName()]);
+                $user->setID($row[MySQLQuery::ID_COL]);
+                $user->setStatus(self::USER_STATUS[$row[$this->query->getStructure()->getCol('status')->getName()]]);
+                $user->setUserName($row[$this->query->getStructure()->getCol('username')->getName()]);
+                $user->setAccessLevel($row[$this->query->getStructure()->getCol('acc-level')->getName()]);
+                $user->setDisplayName($row[$this->query->getStructure()->getCol('disp-name')->getName()]);
+                $user->setLastLogin($row[$this->query->getStructure()->getCol('last-login')->getName()]);
+                $user->setRegDate($row[$this->query->getStructure()->getCol('reg-date')->getName()]);
+                $tok = $this->getRegTok($id);
+                $user->setActivationTok($tok);
+                return $user;
             }
             else{
-                return MySQLQuery::QUERY_ERR;
+                return self::NO_SUCH_USER;
             }
         }
         else{
-            return self::NOT_AUTH;
+            return MySQLQuery::QUERY_ERR;
         }
     }
     /**

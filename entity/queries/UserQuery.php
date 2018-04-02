@@ -33,22 +33,23 @@ class UserQuery extends MySQLQuery{
         
         //email column
         $this->structure->addColumn('email', new Column('email', 'varchar', 100));
+        $this->structure->getCol('email')->setDefault('--');
         
         //display name column
         $this->structure->addColumn('disp-name', new Column('disp_name', 'varchar', 70));
-        
+        $this->structure->addColumn('disp-name', new Column('disp_name', 'varchar', 70));
         //status column
-        $this->structure->addColumn('status', new Column('status', 'varchar', 1));
+        $this->structure->getCol('disp-name')->setDefault('--');
         
         //access level column
         $this->structure->addColumn('acc-level', new Column('acc_level', 'varchar', 1));
         
         //registration date column
-        $this->structure->addColumn('reg-date', new Column('reg_date', 'timestamp'));
+        $this->structure->addColumn('reg-date', new Column('reg_date', 'datetime'));
         $this->structure->getCol('reg-date')->setDefault('');
         
         //last login column
-        $this->structure->addColumn('last-login', new Column('last_login', 'timestamp'));
+        $this->structure->addColumn('last-login', new Column('last_login', 'datetime'));
     }
     /**
      * Constructs a query that can be used to create the table.

@@ -1,0 +1,257 @@
+<?php
+
+/*
+ * The MIT License
+ *
+ * Copyright 2018 Ibrahim.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+/**
+ * Description of SocketMailer
+ *
+ * @author Ibrahim
+ * @version 1.0
+ */
+class SocketMailer {
+    const NL = "\r\n";
+    /**
+     * The resource that is used to fire commands
+     * @var resource 
+     */
+    private $conn;
+    /**
+     * The name of mail server host.
+     * @var string 
+     */
+    private $host;
+    /**
+     * The port number.
+     * @var int 
+     */
+    private $port;
+    /**
+     * The username that is used to login to the mail server.
+     * @var string 
+     */
+    private $uName;
+    /**
+     * The password that is used in authentication.
+     * @var string 
+     */
+    private $pass;
+    /**
+     * Connection timeout (in minutes)
+     * @var int 
+     */
+    private $timeout;
+    private $receivers;
+    private $cc;
+    private $bcc;
+    private $senderAddress;
+    private $senderName;
+    private $subject;
+    private $log;
+    private $writeMode;
+    public function __construct() {
+        $this->setTimeout(5);
+        $this->receivers = array();
+        $this->cc = array();
+        $this->bcc = array();
+        $this->log = array();
+        $this->subject = 'EMAIL MESSAGE';
+        $this->writeMode = FALSE;
+    }
+    public function getLog() {
+        return $this->log;
+    }
+    public function setSubject($subject){
+        $this->subject = $subject;
+        array_push($this->log, 'Subject Updated to: '.$subject);
+    }
+    public function setSender($name, $address){
+        $this->senderName = $name;
+        $this->senderAddress = $address;
+        array_push($this->log, 'Sender set to: "'.$name.'" \''.$address.'\'');
+    }
+    
+    public function setUsername($u){
+        $this->uName = $u;
+        array_push($this->log, 'Username set to: "'.$u.'"');
+    }
+    
+    public function setPassword($pass){
+        $this->pass = $pass;
+        array_push($this->log, 'Password is set.');
+    }
+
+    public function addReceiver($name, $address, $isCC=false, $isBcc=false){
+        if($isBcc){
+            $this->bcc[$name] = $address;
+            array_push($this->log, 'BCC: "'.$name.'" \''.$address.'\'');
+        }
+        else if($isCC){
+            $this->cc[$name] = $address;
+            array_push($this->log, 'CC: "'.$name.'" \''.$address.'\'');
+        }
+        else{
+            $this->receivers[$name] = $address;
+            array_push($this->log, 'Receiver: "'.$name.'" \''.$address.'\'');
+        }
+    }
+    public function sendMessage(){
+        $this->sendC('MAIL FROM: <'.$this->senderAddress.'>');
+        foreach ($this->receivers as $val){
+            $this->sendC('RCPT TO: <'.$val.'>');
+        }
+        foreach ($this->cc as $val){
+            $this->sendC('RCPT TO: <'.$val.'>');
+        }
+        foreach ($this->bcc as $val){
+            $this->sendC('RCPT TO: <'.$val.'>');
+        }
+        $this->sendC('DATA');
+        $this->sendC('From: "Programming Academia Team" <no-replay@programmingacademia.com>');
+        $this->sendC('To: '.$this->getTo());
+        $this->sendC('CC: '.$this->getCC());
+        $this->sendC('BCC: '.$this->getBcc());
+        $this->sendC('Date:'. date('r (T)'));
+        $this->sendC('Subject:'. $this->subject);
+        $this->sendC('MIME-Version: 1.0');
+        $this->sendC('Content-Type: text/html; charset=UTF-8');
+        $this->sendC('<p>Paragraph</p><p>Another paragraph</p><a href="http://www.programmingacademia.com">A Link</a>');
+        $this->sendC(self::NL.'.');
+        $this->sendC('QUIT');
+    }
+    private function getBcc(){
+        $arr = array();
+        foreach ($this->bcc as $name => $address){
+            array_push($arr, $name.' <'.$address.'>');
+        }
+        return implode(',', $arr);
+    }
+    private function getCC(){
+        $arr = array();
+        foreach ($this->cc as $name => $address){
+            array_push($arr, $name.' <'.$address.'>');
+        }
+        return implode(',', $arr);
+    }
+    
+    private function getTo(){
+        $arr = array();
+        foreach ($this->receivers as $name => $address){
+            array_push($arr, $name.' <'.$address.'>');
+        }
+        return implode(',', $arr);
+    }
+    /**
+     * Checks if the connection is still open or is it closed.
+     * @return noolean <b>TRUE</b> if the connection is open.
+     */
+    public function isConnected() {
+        return is_resource($this->conn);
+    }
+    /**
+     * Sets the connection port.
+     * @param int $port The port number to set.
+     */
+    public function setPort($port) {
+        if($port > 0){
+            $this->port = $port;
+            array_push($this->log, 'Port set to: '.$port);
+        }
+    }
+    public function getTimeout(){
+        return $this->timeout;
+    }
+
+    /**
+     * Sets the name of mail server host.
+     * @param string $host The name of the host (such as mail.mysite.com).
+     */
+    public function setHost($host){
+        $this->host = $host;
+        array_push($this->log, 'Host set to: '.$host);
+    }
+    /**
+     * Sends a command to the mail server.
+     * @param type $command
+     * @return boolean
+     */
+    public function sendC($command){
+        if($this->isConnected()){
+            if($this->writeMode){
+                fwrite($this->conn, $command.self::NL);
+                array_push($this->log, 'Writing: '.$command);
+                if($command == self::NL.'.'){
+                    $this->writeMode = FALSE;
+                    array_push($this->log, 'End of writing mode.');
+                }
+            }
+            else{
+                array_push($this->log, 'Sending the command: '.$command);
+                fwrite($this->conn, $command.self::NL);
+                array_push($this->log, 'Response: '.$this->read());
+                if($command == 'DATA'){
+                    $this->writeMode = TRUE;
+                    array_push($this->log, 'Switched to writing mode');
+                }
+            }
+            return TRUE;
+        }
+        else{
+            return FALSE;
+        }
+    }
+
+    public function read(){
+        $message = '';
+        while(!feof($this->conn)){
+            $str = fgets($this->conn);
+            $message .= $str;
+            if (!isset($str[3]) or (isset($str[3]) and $str[3] == ' ')) {
+                break;
+            }
+        }
+        return $message;
+    }
+    
+    public function connect() {
+        if(!$this->isConnected()){
+            $err = 0;
+            $errStr = '';
+            $this->conn = fsockopen($this->host, $this->port, $err, $errStr, $this->timeout*60);
+            return is_resource($this->conn);
+        }
+        return TRUE;
+    }
+    /**
+     * Sets the timeout time of the connection.
+     * @param int $val The value of timeout (in minutes). The timeout will be updated 
+     * only if the connection is not yet established and the given value is grater 
+     * than 0.
+     */
+    public function setTimeout($val) {
+        if($val >= 1 && !$this->isConnected()){
+            $this->timeout = $val;
+        }
+    }
+}

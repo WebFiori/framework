@@ -56,7 +56,7 @@ class SessionManager{
         'EN','AR'
     );
     private function __construct() {
-        $this->lifeTime = 1;
+        $this->lifeTime = 100;
     }
     /**
      * Creates a single instance of <b>SessionManager</b>.
@@ -182,7 +182,7 @@ class SessionManager{
         if(self::isStarted()){
             if($user instanceof User){
                 $_SESSION['user'] = $user;
-                setcookie('token', $user->getToken());
+                setcookie('token', $user->getToken(), time()+$this->getLifetime()*60, '/');
                 return TRUE;
             }
         }

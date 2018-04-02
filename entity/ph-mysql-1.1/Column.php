@@ -2,16 +2,29 @@
 /**
  * A class that represents a column in MySQL table.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.0
+ * @version 1.1
  */
 class Column{
     /**
      * An array of supported data types.
+     * <p>The supported types are:</p>
+     * <ul>
+     * <li><b>int</b>: Used to store integers. Maximum size is 11.</li>
+     * <li><b>varchar</b>: Used to store strings.</li>
+     * <li><b>timestamp</b>: Used to store changes on the record. Note that only one column 
+     * in the table can have this type.</li>
+     * <li><b>date</b>: Used to store date in the formate 'YYYY-MM-DD' The range is '1000-01-01' to '9999-12-31'.</li>
+     * <li><b>datetime</b>: Used to store a point in time.</li>
+     * <li><b>tinyblob</b></li>
+     * <li><b>mediumblob</b></li>
+     * <li><b>longblob</b></li>
+     * </ul>
      * @var array 
      * @since 1.0
      */
     const DATATYPES = array(
-        'int','varchar','timestamp','mediumblob'
+        'int','varchar','timestamp','tinyblob','mediumblob','longblob',
+        'datetime'
     );
     /**
      * A boolean value. Set to <b>TRUE</b> if column is unique.
@@ -64,19 +77,48 @@ class Column{
      */
     private $default;
     /**
-     * 
-     * @param string $colName The name of the column.
-     * @param string $datatype The type of column data. It must be a value from the 
-     * array <b>Column::DATATYPES</b>.
-     * @param int $size [optional] The size of the column. Used only in case of 
-     * 'varachar' and 'int'.
+     * This value is used in case of the datatype is 'datetime' or 'timestamp'.
+     * @var string
+     * @since 1.1 
      */
-    public function __construct($colName,$datatype,$size=1) {
-        $this->setName($colName);
-        $this->setType($datatype);
-        $this->setSize($size);
+    private $onColUpdate;
+    /**
+     * 
+     * @param string $colName It must be a string and its not empty. 
+     * Also it must not contain any spaces or any characters other than A-Z, a-z and 
+     * underscore. If the given column name is invalid the value 'col' will be 
+     * set as an initial name for the column.
+     * @param string $datatype The type of column data. It must be a value from the 
+     * array <b>Column::DATATYPES</b>. If the given datatype is invalid, 'varchar' 
+     * will be used as default type for the column.
+     * @param int $size [optional] The size of the column. Used only in case of 
+     * 'varachar' and 'int'. If the given size is invalid, 1 will be used as default 
+     * value.
+     */
+    public function __construct($colName='col',$datatype='varchar',$size=1) {
+        if(!$this->setName($colName)){
+            $this->setName('col');
+        }
+        if(!$this->setType($datatype)){
+            $this->setType('varchar');
+        }
+        if($this->getType() == 'varchar' || $this->getType() == 'int'){
+            if(!$this->setSize($size)){
+                $this->setSize(1);
+            }
+        }
         $this->setIsNull(FALSE);
         $this->setIsUnique(FALSE);
+    }
+    /**
+     * A function to call in case the user want to update the date of a column 
+     * that has the type 'datetime' or 'timestamp' automatically if a record is updated.
+     * @since 1.1
+     */
+    public function autoUpdate(){
+        if($this->getType() == 'datetime' || $this->getType() == 'timestamp'){
+            $this->onColUpdate = 'on update now()';
+        }
     }
     /**
      * Sets the value of the property <b>$isUnique</b>.
@@ -102,16 +144,29 @@ class Column{
     }
     /**
      * Sets the name of the column.
-     * @param string $name The name to set. It must be a string and its not empty.
+     * @param string $name The name to set. It must be a string and its not empty. 
+     * Also it must not contain any spaces or any characters other than A-Z, a-z and 
+     * underscore.
      * @return boolean <b>TRUE</b> if the column name updated. If the given value 
-     * is <b>NULL</b> or empty string, the method will return <b>FALSE</b>.
+     * is <b>NULL</b> or invalid string, the method will return <b>FALSE</b>.
      * @since 1.0
      */
     public function setName($name){
         if(gettype($name) == 'string'){
             if(strlen($name) != 0){
-                $this->name = $name;
-                return TRUE;
+                if(strpos($name, ' ') === FALSE){
+                    for ($x = 0 ; $x < strlen($name) ; $x++){
+                        $ch = $name[$x];
+                        if($ch == '_' || ($ch >= 'a' && $ch <= 'z') || ($ch >= 'A' && $ch <= 'Z')){
+                            
+                        }
+                        else{
+                            return FALSE;
+                        }
+                    }
+                    $this->name = $name;
+                    return TRUE;
+                }
             }
         }
         return FALSE;
@@ -127,7 +182,7 @@ class Column{
     /**
      * Updates the value of the property <b>$isNull</b>.
      * @param boolean $bool <b>TRUE</b> if the column allow null values. <b>FALSE</b> 
-     * if not.
+     * if not. If the column is set as a primary, the property will not be updated.
      * @return boolean <b>TRUE</b> If the property value is updated. If the given 
      * value is not a boolean, the function will return <b>FALSE</b>. Also if 
      * the value of the property <b>$isPrimary</b> is <b>TRUE</b>, the function 
@@ -154,7 +209,7 @@ class Column{
     /**
      * Updates the value of the property <b>$isPrimary</b>.
      * @param boolean $bool <b>TRUE</b> if the column is primary key. <b>FALSE</b> 
-     * if not.
+     * if not. Note that once the column become primary, it becomes unique.
      * @return boolean <b>TRUE</b> If the property value is updated. If the given 
      * value is not a boolean, the function will return <b>FALSE</b>.
      * @since 1.0
@@ -162,8 +217,9 @@ class Column{
     public function setIsPrimary($bool){
         if(gettype($bool) == 'boolean'){
             $this->isPrimary = $bool;
-            if($bool){
+            if($bool === TRUE){
                 $this->setIsNull(FALSE);
+                $this->setIsUnique(TRUE);
             }
             return TRUE;
         }
@@ -181,7 +237,8 @@ class Column{
      * Sets the type of column data.
      * @param string $type The type of column data. It must be a value from the 
      * array <b>Column::DATATYPES</b>.
-     * @param int $size Size of column data (for 'int' and 'varchar').
+     * @param int $size Size of column data (for 'int' and 'varchar'). If the passed 
+     * size is invalid, 1 will be used.
      * @param mixed $default Default value for the column.
      * @return boolean <b>TRUE</b> if the data type is set. <b>FALSE</b> otherwise.
      * @since 1.0
@@ -190,7 +247,13 @@ class Column{
         $s_type = strtolower($type);
         if(in_array($s_type, self::DATATYPES)){
             $this->type = $type;
-            $this->setSize($size);
+            if($type == 'varchar' || $type == 'int'){
+                if(!$this->setSize($size)){
+                    $this->setSize(1);
+                }
+            }
+            $this->onColUpdate = NULL;
+            $this->default = NULL;
             if($default != NULL){
                 if($s_type == 'varchar'){
                     $this->setDefault($default.'');
@@ -215,7 +278,7 @@ class Column{
      * 
      * @param mixed $default For integer data type, the passed value must be 
      * an integer. For 'varchar', the passed value must be a string. If the 
-     * datatype is 'timestamp', the default will be 'current_timestamp' regardless 
+     * datatype is 'timestamp' or 'datetime', the default will be 'current_timestamp' regardless 
      * of the passed value.
      * @return boolean <b>TRUE</b> if the value is set. <b>FALSE</b> otherwise.
      * @since 1.0
@@ -234,8 +297,9 @@ class Column{
                 return TRUE;
             }
         }
-        else if($type == 'timestamp'){
+        else if($type == 'timestamp' || $type == 'datetime'){
             $this->default = 'current_timestamp';
+            return TRUE;
         }
         return FALSE;
     }
@@ -295,12 +359,17 @@ class Column{
         } 
         return FALSE;
     }
+    /**
+     * Checks if the column is auto increment or not.
+     * @return boolean <b>TRUE</b> if the column is auto increment.
+     * @since 1.1
+     */
     public function isAutoInc(){
         return $this->isAutoInc;
     }
     /**
      * Returns the size of the column.
-     * @return int
+     * @return int The size of the column. Apply only to 'varchar' and 'int'.
      * @since 1.0
      */
     public function getSize(){
@@ -343,9 +412,22 @@ class Column{
             $retVal .= 'collate '.$this->getCollation().' ';
         }
         if($default != NULL){
-            $retVal .= 'default '.$default.' ';
+            if($this->getType() == 'varchar'){
+                $retVal .= 'default \''.$default.'\' ';
+            }
+            else if($this->getType() == 'timestamp' || $this->getType() == 'datetime'){
+                if($default === 'current_timestamp'){
+                    $retVal .= 'default '.$default.' ';
+                }
+                else{
+                    $retVal .= 'default \''.$default.'\' ';
+                }
+                $retVal .= $this->onColUpdate;
+            }
+            else{
+                $retVal .= 'default '.$default.' ';
+            }
         }
         return $retVal;
     }
 }
-

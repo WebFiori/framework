@@ -59,11 +59,45 @@ class ForeignKey {
     private $keyName;
     /**
      * Sets the name of the key.
-     * @param string $name The name of the key.
+     * @param string $name The name of the key. It must be a string and its not empty. 
+     * Also it must not contain any spaces or any characters other than A-Z, a-z and 
+     * underscore.
+     * @return boolean <b>TRUE</b> if the name of the key is set. <b>FALSE</b> in 
+     * case if the given key name is invalid.
      * @since 1.1
      */
     public function setKeyName($name) {
-        $this->keyName = $name;
+        if($this->validateAttr($name) == TRUE){
+            $this->keyName = $name;
+            return TRUE;
+        }      
+        return FALSE;
+    }
+    /**
+     * A function that is used to validate the names of the key attributes (such as source column 
+     * name or source table name)
+     * @param string $name The string to validate. It must be a string and its not empty. 
+     * Also it must not contain any spaces or any characters other than A-Z, a-z and 
+     * underscore.
+     * @return boolean <b>TRUE</b> if the given parameter is valid. <b>FALSE</b> in 
+     * case if the given parameter is invalid.
+     */
+    private function validateAttr($name){
+        if(strlen($name) != 0){
+            if(strpos($name, ' ') === FALSE){
+                for ($x = 0 ; $x < strlen($name) ; $x++){
+                    $ch = $name[$x];
+                    if($ch == '_' || ($ch >= 'a' && $ch <= 'z') || ($ch >= 'A' && $ch <= 'Z')){
+
+                    }
+                    else{
+                        return FALSE;
+                    }
+                }
+                return TRUE;
+            }
+        }
+        return FALSE;
     }
     /**
      * Returns the name of the key.
@@ -83,11 +117,19 @@ class ForeignKey {
     }
     /**
      * Sets the name of the source column.
-     * @param type $col The name of the column in the source table.
+     * @param string $col The name of the column. It must be a string and its not empty. 
+     * Also it must not contain any spaces or any characters other than A-Z, a-z and 
+     * underscore.
+     * @return boolean <b>TRUE</b> if the source column name is set. <b>FALSE</b> in 
+     * case if the given name is invalid.
      * @since 1.0
      */
     public function setSourceCol($col) {
-        $this->sourceTableCol = $col;
+        if($this->validateAttr($col)){
+            $this->sourceTableCol = $col;
+            return TRUE;
+        }
+        return FALSE;
     }
     /**
      * Returns the name of the referenced column.
@@ -99,11 +141,19 @@ class ForeignKey {
     }
     /**
      * Sets the name of the referenced column.
-     * @param type $col The name of the column in the referenced table.
+     * @param string $col The name of the column. It must be a string and its not empty. 
+     * Also it must not contain any spaces or any characters other than A-Z, a-z and 
+     * underscore.
+     * @return boolean <b>TRUE</b> if the reference column name is set. <b>FALSE</b> in 
+     * case if the given name is invalid.
      * @since 1.0
      */
     public function setReferenceCol($col) {
-        $this->referencedTableCol = $col;
+        if($this->validateAttr($col)){
+            $this->referencedTableCol = $col;
+            return TRUE;
+        }
+        return FALSE;
     }
     /**
      * Returns the name of the table that contains the foreign key.
@@ -115,11 +165,19 @@ class ForeignKey {
     }
     /**
      * Sets the name of the table that will contain the key.
-     * @param string $name The name of the table.
+     * @param string $name The name of the source table. It must be a string and its not empty. 
+     * Also it must not contain any spaces or any characters other than A-Z, a-z and 
+     * underscore.
+     * @return boolean <b>TRUE</b> if the source table name is set. <b>FALSE</b> in 
+     * case if the given name is invalid.
      * @since 1.1
      */
     public function setSourceTable($name) {
-        $this->sourceTable = $name;
+        if($this->validateAttr($name)){
+            $this->sourceTable = $name;
+            return TRUE;
+        }
+        return FALSE;
     }
     /**
      * Returns the condition that will happen if the value of the column in the 
@@ -139,10 +197,10 @@ class ForeignKey {
      */
     public function setOnDelete($val){
         if(in_array(strtolower($val), self::CONDITIONS)){
-            $this->onUpdateCondition = $val;
+            $this->onDeleteCondition = $val;
         }
         elseif ($val == NULL) {
-            $this->onUpdateCondition = NULL;
+            $this->onDeleteCondition = NULL;
         }
     }
     /**
@@ -178,20 +236,62 @@ class ForeignKey {
     public function getReferenceTable(){
         return $this->referencedTable;
     }
-    public function __construct($name='key_name') {
-        $this->setKeyName($name);
-        $this->setSourceCol('source_col');
-        $this->setReferenceCol('referenced_col');
-        $this->setSourceTable('source_table');
-        $this->setReferenceTable('referenced_table');
+    /**
+     * Creates new foreign key.
+     * @param string $name The name of the key. It must be a string and its not empty. 
+     * Also it must not contain any spaces or any characters other than A-Z, a-z and 
+     * underscore. The default value is 'key_name'.
+     * @param string $sourceTblName The name of the table that will contain the key. 
+     * It must be a string and its not empty. 
+     * Also it must not contain any spaces or any characters other than A-Z, a-z and 
+     * underscore. The default value is 'source_table'.
+     * @param string $sourceCol The name of the source column. It must be a string and its not empty. 
+     * Also it must not contain any spaces or any characters other than A-Z, a-z and 
+     * underscore. The default value is 'source_col'.
+     * @param string $refTblName The name of the referenced table. It must be a string and its not empty. 
+     * Also it must not contain any spaces or any characters other than A-Z, a-z and 
+     * underscore. The default value is 'referenced_col'.
+     * @param string $refCol The name of the referenced column. It must be a string and its not empty. 
+     * Also it must not contain any spaces or any characters other than A-Z, a-z and 
+     * underscore.
+     */
+    public function __construct(
+            $name='key_name',
+            $sourceTblName='source_table',
+            $sourceCol='source_col',
+            $refTblName='referenced_table',
+            $refCol='referenced_col') {
+        if(!$this->setKeyName($name)){
+            $this->setKeyName('key_name');
+        }
+        if(!$this->setSourceCol($sourceCol)){
+            $this->setSourceCol('source_col');
+        }
+        if(!$this->setReferenceCol($refCol)){
+            $this->setReferenceCol('referenced_col');
+        }
+        if(!$this->setSourceTable($sourceTblName)){
+            $this->setSourceTable('source_table');
+        }
+        if(!$this->setReferenceTable($refTblName)){
+            $this->setReferenceTable('referenced_table');
+        }
     }
     /**
      * Sets the name of the table that is referenced by the key.
-     * @param type $name The name of the table.
+     * @param string $name The name of the referenced table. It must be a string and its not empty. 
+     * Also it must not contain any spaces or any characters other than A-Z, a-z and 
+     * underscore.
+     * @return boolean <b>TRUE</b> if the referenced table name is set. <b>FALSE</b> in 
+     * case if the given name is invalid.
      * @since 1.0
      */
     public function setReferenceTable($name) {
-        $this->referencedTable = $name;
+        if($this->validateAttr($name)){
+            $this->referencedTable = $name;
+            return TRUE;
+        }
+        return FALSE;
     }
     /**
      * Returns a query that can be used to add the key to the source table.
@@ -203,7 +303,6 @@ class ForeignKey {
         $retVal .= 'add constraint '.$this->getKeyName().' ';
         $retVal .= 'foreign key ('.$this->getSourceCol().') ';
         $retVal .= 'references '.$this->getReferenceTable().'('.$this->getRefrenceCol().') ';
-        
         $onDelete = $this->getOnDelete();
         if($onDelete != NULL){
             $retVal .= 'on delete '.$onDelete.' ';

@@ -93,7 +93,7 @@ class MySQLQuery implements JsonI{
      * @since 1.4
      */
     public function createTable($table){
-        if($table != NULL){
+        if($table instanceof Table){
             $query = 'create table if not exists '.$table->getName().'(';
             $keys = $table->keys();
             $count = count($keys);
@@ -107,7 +107,8 @@ class MySQLQuery implements JsonI{
             }
             $query .= ')';
             $query .= 'ENGINE = '.$table->getEngine().' ';
-            $query .= 'DEFAULT CHARSET = '.$table->getCharSet().'; ';
+            $query .= 'DEFAULT CHARSET = '.$table->getCharSet().' ';
+            $query .= 'collate = utf8_general_ci; ';
             
             //add forign keys
             $count2 = count($table->forignKeys());

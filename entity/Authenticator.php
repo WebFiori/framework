@@ -60,10 +60,17 @@ class Authenticator{
                     $_SESSION['db']->executeQuery($query);
                     return TRUE;
                 }
-                
+                else{
+                    return UserFunctions::NOT_AUTH;
+                }
+            }
+            else{
+                return UserFunctions::NOT_AUTH;
             }
         }
-        return FALSE;
+        else{
+            return MySQLQuery::QUERY_ERR;
+        }
     }
     private function loginUsingUserName($passhash){
         $query = new UserQuery();
@@ -88,21 +95,47 @@ class Authenticator{
                         $_SESSION['db']->executeQuery($query);
                         return TRUE;
                 }
+                else{
+                    return UserFunctions::NOT_AUTH;
+                }
+            }
+            else{
+                return UserFunctions::NOT_AUTH;
             }
         }
-        return FALSE;
+        else{
+            return MySQLQuery::QUERY_ERR;
+        }
     }
     /**
      * Authenticate the user using his username and password. Username can be the 
      * email address of the user.
-     * @return boolean
+     * @return boolean|string The function will return true if the user is logged 
+     * in. If the user is not authenticated, the function will return <b>UserFunctions::NOT_AUTH</b>. 
+     * If an error has happend while checking the database, the function will return 
+     * <b>MySQLQuery::QUERY_ERR</b>.
      */
     public function authenticate(){
         $pssswordHash = hash(HASH_ALGO_NAME, $this->user->getPassword());
-        if($this->loginUsingMail($pssswordHash) || $this->loginUsingUserName($pssswordHash)){
+        $u = $this->loginUsingMail($pssswordHash);
+        if($u === TRUE){
             return TRUE;
         }
-        return FALSE;
+        else if($u == UserFunctions::NOT_AUTH){
+            $u = $this->loginUsingUserName($pssswordHash);
+            if($u === FALSE){
+                return UserFunctions::NOT_AUTH;
+            }
+            else if($u === TRUE){
+                return TRUE;
+            }
+            else if($u == MySQLQuery::QUERY_ERR){
+                return MySQLQuery::QUERY_ERR;
+            }
+        }
+        else if($u == MySQLQuery::QUERY_ERR){
+            return MySQLQuery::QUERY_ERR;
+        }
     }
     
 }

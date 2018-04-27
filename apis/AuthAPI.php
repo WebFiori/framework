@@ -65,6 +65,9 @@ class AuthAPI extends API{
                             $this->sendResponse('Logged In', FALSE, 200, '"user":'.SessionManager::get()->getUser()->toJSON());
                         }
                     }
+                    else if($r == MySQLQuery::QUERY_ERR){
+                        $this->databaseErr();
+                    }
                     else{
                         $this->sendResponse('Inncorect username, email or password.', TRUE, 401);
                     }

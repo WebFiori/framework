@@ -2,7 +2,7 @@
 /**
  * A class that contains all static methods for altering user attributes.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.2
+ * @version 1.3
  * @uses User The basic user class.
  * @uses UserQuery It uses the class to send user related queries.
  * @uses ActivationQuery Used for user activation related queries.
@@ -109,8 +109,9 @@ class UserFunctions extends Functions{
      * @param string $u Username.
      * @param string $p password.
      * @param string $e Email address.
-     * @return boolean <b>TRUE</b> if the user is authenticated. Else, it will 
-     * return <b>FALSE</b>.
+     * @return boolean|string <b>TRUE</b> if the user is authenticated. Else, it will 
+     * return <b>FALSE</b>. In case of database error, the function will return 
+     * <b>MySQLQuery::QUERY_ERR</b>.
      * @since 1.0
      */
     public function authenticate($u='',$p='',$e=''){
@@ -118,9 +119,16 @@ class UserFunctions extends Functions{
             if(strlen($u) != 0 || strlen($e) != 0){
                 $user = new User($u, $p, $e);
                 $auth = new Authenticator($user);
-                if($auth->authenticate()){
+                $result = $auth->authenticate();
+                if($result === TRUE){
                     $this->getSManager()->setUser($auth->getUser());
                     return TRUE;
+                }
+                else if($result === UserFunctions::NOT_AUTH){
+                    return FALSE;
+                }
+                else if($result == MySQLQuery::QUERY_ERR){
+                    return MySQLQuery::QUERY_ERR;
                 }
             }
         }

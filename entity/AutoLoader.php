@@ -10,7 +10,7 @@ spl_autoload_register(function ($name) {
         $root = ROOT_DIR;
     }
     else{
-        $root = 'C:/Server/apache2/htdocs/y-project';
+        throw new Exception('Root Directory is not defined.');
     }
     /**
      * Folders to search in for required classes. Modify as needed.
@@ -19,9 +19,9 @@ spl_autoload_register(function ($name) {
         '',
         '/entity',
         '/entity/queries',
-        '/entity/rest-easy-1.1',
+        '/entity/rest-easy-1.2',
         '/entity/jsonx-1.3',
-        '/entity/ph-mysql-1.1',
+        '/entity/ph-mysql-1.1.1',
         '/entity/php-structures-1.1',
         '/entity/php-structures-1.1/html',
         '/publish',

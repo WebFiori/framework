@@ -36,20 +36,20 @@ class SysInfoAPIs extends API{
         parent::__construct();
         $this->setVersion('1.0.0');
         $a1 = new APIAction();
-        $a1->setActionMethod('GET');
+        $a1->addRequestMethod('GET');
         $a1->setName('get-template-info');
         $this->addAction($a1);
         $a2 = new APIAction();
-        $a2->setActionMethod('GET');
+        $a2->addRequestMethod('GET');
         $a2->setName('get-site-info');
         $this->addAction($a2);
         $a3 = new APIAction();
-        $a3->setActionMethod('GET');
+        $a3->addRequestMethod('GET');
         $a3->setName('get-sys-version');
         $this->addAction($a3);
     } 
     
-    public function processAction(){
+    public function processRequest(){
         $action = $this->getAction();
         if($action == 'get-sys-version'){
             $json = new JsonX();
@@ -75,6 +75,10 @@ class SysInfoAPIs extends API{
             $this->sendResponse('Website Information', FALSE, 200, '"info":'.$json);
         }
     }
+
+    public function isAuthorized() {
+        return SessionManager::get()->validateToken();
+    }
 }
 $SysAPIs = new SysInfoAPIs();
-$SysAPIs->process('processAction');
+$SysAPIs->process();

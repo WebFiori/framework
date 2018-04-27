@@ -47,7 +47,7 @@ class UserAPIs extends API{
         $pass = new RequestParameter('password','string', FALSE);
         //action #1
         $a1 = new APIAction();
-        $a1->setActionMethod('POST');
+        $a1->addRequestMethod('POST');
         $a1->setName('add-user');
         $a1p1 = new RequestParameter('username','string', FALSE);
         $a1p3 = new RequestParameter('email','email', FALSE);
@@ -59,7 +59,7 @@ class UserAPIs extends API{
         
         //action #2
         $a2 = new APIAction();
-        $a2->setActionMethod('POST');
+        $a2->addRequestMethod('POST');
         $a2->setName('update-email');
         $a2->addParameter($userId);
         $a2->addParameter(new RequestParameter('email','email', FALSE));
@@ -68,7 +68,7 @@ class UserAPIs extends API{
         $this->addAction($a2,TRUE);
         //action #3
         $a3 = new APIAction();
-        $a3->setActionMethod('GET');
+        $a3->addRequestMethod('GET');
         $a3->setName('get-users');
         $a3->addParameter($tok);
         $this->addAction($a3,TRUE);
@@ -76,7 +76,7 @@ class UserAPIs extends API{
         
         //action #5
         $a5 = new APIAction();
-        $a5->setActionMethod('POST');
+        $a5->addRequestMethod('POST');
         $a5->setName('update-password');
         $a5->addParameter($userId);
         $a5->addParameter(new RequestParameter('old-pass','string', FALSE));
@@ -93,7 +93,7 @@ class UserAPIs extends API{
         $this->addAction($a6,TRUE);
         
         $a7 = new APIAction();
-        $a7->setActionMethod('POST');
+        $a7->addRequestMethod('POST');
         $a7->setName('update-display-name');
         $a7->addParameter($userId);
         $a7->addParameter(new RequestParameter('display-name','string', FALSE));
@@ -101,7 +101,7 @@ class UserAPIs extends API{
         $this->addAction($a7,TRUE);
         
         $a8 = new APIAction();
-        $a8->setActionMethod('POST');
+        $a8->addRequestMethod('POST');
         $a8->setName('update-access-level');
         $a8->addParameter($userId);
         $a8->addParameter(new RequestParameter('access-level','integer', FALSE));
@@ -109,14 +109,14 @@ class UserAPIs extends API{
         $this->addAction($a8,TRUE);
         
         $a9 = new APIAction();
-        $a9->setActionMethod('POST');
+        $a9->addRequestMethod('POST');
         $a9->setName('activate-account');
         $a9->addParameter(new RequestParameter('activation-token','string', FALSE));
         $a9->addParameter($tok);
         $this->addAction($a9,TRUE);
         
         $a10 = new APIAction();
-        $a10->setActionMethod('GET');
+        $a10->addRequestMethod('GET');
         $a10->setName('get-profile');
         $a10->addParameter($userId);
         $a10->addParameter($tok);
@@ -354,7 +354,7 @@ class UserAPIs extends API{
      * A routing function.
      * @since 1.0
      */
-    public function checkAction(){
+    public function processRequest(){
         $action = parent::getAction();
         if($action == 'add-user'){
             $this->addUser();
@@ -470,7 +470,10 @@ class UserAPIs extends API{
             $this->missingParam('username');
         }
     }
-    
+
+    public function isAuthorized() {
+        return SessionManager::get()->validateToken();
+    }
 }
 $api = new UserAPIs();
-$api->process('checkAction');
+$api->process();

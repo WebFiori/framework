@@ -42,7 +42,7 @@ PageAttributes::get()->loadTheme();
 <html lang = "<?php echo PageAttributes::get()->getLang()?>">
     <head>
         <?php echo staticHeadTag('login', PageAttributes::get()->getLang())?>
-        <script type="text/javascript" src="res/js/js-ajax-helper-0.0.5/AJAX.js"></script>
+        <script type="text/javascript" src="res/js/js-ajax-helper-1.0.0/AJAX.js"></script>
         <script type="text/javascript" src="res/js/APIs.js"></script>
         <script type="text/javascript" src="res/js/langs/lANG_EN.js"></script>
         <link rel="stylesheet" href="res/css/login.css">

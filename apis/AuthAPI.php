@@ -37,19 +37,20 @@ class AuthAPI extends API{
         parent::__construct();
         $this->setVersion('1.0.0');
         $a1 = new APIAction();
-        $a1->setActionMethod('POST');
+        $a1->addRequestMethod('POST');
         $a1->setName('login');
         $a1->addParameter(new RequestParameter('username', 'string'));
         $a1->addParameter(new RequestParameter('password', 'string'));
         $this->addAction($a1);
         
         $a2 = new APIAction();
-        $a2->setActionMethod('POST');
+        $a2->addRequestMethod('POST');
         $a2->setName('logout');
         $this->addAction($a2);
     }
     
-    public function processReq($inputs) {
+    public function processRequest() {
+        $inputs = $this->getInputs();
         $action = $this->getAction();
         if($action == 'login'){
             if(isset($inputs['username'])){
@@ -81,6 +82,10 @@ class AuthAPI extends API{
             $this->sendResponse('Logged Out', FALSE, 200);
         }
     }
+
+    public function isAuthorized() {
+        return TRUE;
+    }
 }
 $api = new AuthAPI();
-$api->process('processReq');
+$api->process();

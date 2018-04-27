@@ -5,9 +5,9 @@
  * @uses Table Used by the 'create table' Query.
  * @uses ForeignKey Used to alter a table and insert a foreign key in it.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.4
+ * @version 1.5
  */
-class MySQLQuery implements JsonI{
+abstract class MySQLQuery implements JsonI{
     /**
      * A constant that indicates an error has occurred while executing the query.
      * @var string 
@@ -366,6 +366,52 @@ class MySQLQuery implements JsonI{
      */
     public function selectMinID($table){
         $this->selectMin($table, self::ID_COL, self::ID_COL); 
+    }
+    /**
+     * Constructs a query that can be used to create the table.
+     * @since 1.5
+     */
+    public function createStructure(){
+        $this->createTable($this->getStructure());
+    }
+    /**
+     * Returns the name of the column from the table given its key.
+     * @param string $colKey The name of the column key.
+     * @return string The name of the column in the table. If no column was 
+     * found, the function will return the string 'NO_SUCH_COL'. If there is 
+     * no table linked with the query object, the function will return the 
+     * string 'NO_STRUCTURE'.
+     * @since 1.5
+     */
+    public function getColName($colKey){
+        $structure = $this->getStructure();
+        if($structure instanceof Table){
+            $col = $structure->getCol($colKey);
+            if($col instanceof Column){
+                return $col->getName();
+            }
+            return 'NO_SUCH_COL';
+        }
+        return $structure;
+    }
+    /**
+     * Returns the table that is used for constructing queries.
+     * @return Table The table that is used for constructing queries.
+     * @since 1.5
+     */
+    public abstract function getStructure();
+    /**
+     * Returns the name of the table that is used to construct queries.
+     * @return string The name of the table that is used to construct queries. 
+     * if no table is given, the function will return the string 'NO_STRUCTURE'.
+     * @since 1.5
+     */
+    public function getStructureName(){
+        $s = $this->getStructure();
+        if($s instanceof Table){
+            return $s->getName();
+        }
+        return 'NO_STRUCTURE';
     }
     public function __toString() {
         return 'Query: '.$this->getQuery().'<br/>'.'Query Type: '.$this->getType().'<br/>';

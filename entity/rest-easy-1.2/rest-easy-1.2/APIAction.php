@@ -124,25 +124,6 @@ class APIAction implements JsonI{
         }
         return NULL;
     }
-
-    /**
-     * Sets the request method that is used to fire the action.
-     * @param string $method The request method (Get, Post...).
-     * @since 1.0
-     * @deprecated since version 1.1 Use <b>APIAction::addRequestMethod($method)</b> instead.
-     */
-    public function setActionMethod($method){
-        $this->actionMethod = strtoupper($method);
-    }
-    /**
-     * Returns the request method that is used to fire the action.
-     * @return string The request method (Get, Post...).
-     * @since 1.0
-     * @deprecated since version 1.1
-     */
-    public function getActionMethod(){
-        return $this->actionMethod;
-    }
     /**
      * Sets the name of the action.
      * @param string $name The name of the action.
@@ -175,7 +156,6 @@ class APIAction implements JsonI{
     public function toJSON() {
         $json = new JsonX();
         $json->add('name', $this->getName());
-        $json->add('request-method', $this->getActionMethod());
         $json->add('request-methods', $this->reqMethods);
         $json->add('parameters', $this->parameters);
         return $json;

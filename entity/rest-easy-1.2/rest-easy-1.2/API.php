@@ -24,7 +24,7 @@
  */
 /**
  * A class that represents a REST API.
- * @version 1.1
+ * @version 1.2
  */
 abstract class API implements JsonI{
     /**
@@ -88,14 +88,7 @@ abstract class API implements JsonI{
      * @since 1.0 
      */
     private $filter;
-    /**
-     * Session manager.
-     * @var SessionManager
-     * @since 1.0 
-     * @deprecated since version 1.1 Will be removed.
-     */
-    private $settionMngr;
-    
+
     private $apiVersion;
     
     public function __construct(){
@@ -112,26 +105,14 @@ abstract class API implements JsonI{
         $action2->addRequestMethod('get');
         $this->addAction($action2);
         $this->filter->addParameter('action', 'string');
-        $this->setVersion('0.0.0');
-        if(class_exists('SessionManager')){
-            $this->settionMngr = SessionManager::get();
-        }
-    }
-    /**
-     * 
-     * @return SessionManager
-     * @since 1.0
-     * @deprecated since version 1.1 Will be removed.
-     */
-    public function getSession(){
-        return $this->settionMngr;
+        $this->setVersion('1.0.0');
     }
     /**
      * Sends a response message to indicate that a database error has occur.
      * @since 1.0
      */
-    public function databaseErr(){
-        $this->sendResponse('Database Error', TRUE, 404, '"db":'.$this->getSession()->getDBLink()->toJSON());
+    public function databaseErr($info=''){
+        $this->sendResponse('Database Error', TRUE, 404, '"err-info":"'.$info.'"');
     }
     /**
      * Sends a response message to indicate that a user is not authorized to do an API call.
@@ -389,7 +370,7 @@ abstract class API implements JsonI{
      */
     public function process(){
         $reqMeth = $this->getRequestMethod();
-        if($reqMeth == 'GET' || $reqMeth == 'DELETE' || $reqMeth = 'PUT'){
+        if($reqMeth == 'GET' || $reqMeth == 'DELETE' || $reqMeth == 'PUT'){
             $this->filter->filterGET();
         }
         else if($reqMeth == 'POST'){

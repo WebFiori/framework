@@ -62,13 +62,48 @@ class SocketMailer {
      * @var int 
      */
     private $timeout;
+    /**
+     * An associative array of mail receivers. Key represents 
+     * receiver name and value represents email address.
+     * @var array
+     */
     private $receivers;
+    /**
+     * An associative array of mail receivers (Carbon Copy). Key represents 
+     * receiver name and value represents email address.
+     * @var array 
+     */
     private $cc;
+    /**
+     * An associative array of mail receivers (Blind Carbon Copy). Key represents 
+     * receiver name and value represents email address.
+     * @var array 
+     */
     private $bcc;
+    /**
+     * The email address of the sender.
+     * @var string 
+     */
     private $senderAddress;
+    /**
+     * The name of the sender.
+     * @var string 
+     */
     private $senderName;
+    /**
+     * The subject of the email message.
+     * @var string 
+     */
     private $subject;
+    /**
+     * An array that contains server messages.
+     * @var array 
+     */
     private $log;
+    /**
+     * If set to true, this means user is in message body writing mode.
+     * @var boolean 
+     */
     private $writeMode;
     public function __construct() {
         $this->setTimeout(5);
@@ -79,29 +114,61 @@ class SocketMailer {
         $this->subject = 'EMAIL MESSAGE';
         $this->writeMode = FALSE;
     }
+    /**
+     * Returns log messages.
+     * @return array
+     */
     public function getLog() {
         return $this->log;
     }
+    /**
+     * Sets the subject of the message.
+     * @param string $subject Email subject.
+     * @since 1.0
+     */
     public function setSubject($subject){
         $this->subject = $subject;
         array_push($this->log, 'Subject Updated to: '.$subject);
     }
+    /**
+     * Sets the name and the address of the sender.
+     * @param string $name The name of the sender.
+     * @param string $address The email address of the sender.
+     * @since 1.0
+     */
     public function setSender($name, $address){
         $this->senderName = $name;
         $this->senderAddress = $address;
         array_push($this->log, 'Sender set to: "'.$name.'" \''.$address.'\'');
     }
-    
+    /**
+     * Sets the login username.
+     * @param string $u Username.
+     * @since 1.0
+     */
     public function setUsername($u){
         $this->uName = $u;
         array_push($this->log, 'Username set to: "'.$u.'"');
     }
-    
+    /**
+     * Sets user password.
+     * @param string $pass User password.
+     * @since 1.0
+     */
     public function setPassword($pass){
         $this->pass = $pass;
         array_push($this->log, 'Password is set.');
     }
-
+    /**
+     * Adds new receiver.
+     * @param string $name The name of the email receiver (such as 'Ibrahim').
+     * @param string $address The email address of the receiver.
+     * @param boolean $isCC [Optional] If set to true, the receiver will receive 
+     * a carbon copy of the message.
+     * @param boolean $isBcc [Optional] If set to true, the receiver will receive 
+     * a blind carbon copy of the message.
+     * @since 1.0
+     */
     public function addReceiver($name, $address, $isCC=false, $isBcc=false){
         if($isBcc){
             $this->bcc[$name] = $address;
@@ -116,6 +183,10 @@ class SocketMailer {
             array_push($this->log, 'Receiver: "'.$name.'" \''.$address.'\'');
         }
     }
+    /**
+     * Send the message.
+     * @since 1.0
+     */
     public function sendMessage(){
         $this->sendC('MAIL FROM: <'.$this->senderAddress.'>');
         foreach ($this->receivers as $val){
@@ -140,6 +211,11 @@ class SocketMailer {
         $this->sendC(self::NL.'.');
         $this->sendC('QUIT');
     }
+    /**
+     * 
+     * @return string
+     * @since 1.0
+     */
     private function getBcc(){
         $arr = array();
         foreach ($this->bcc as $name => $address){
@@ -147,6 +223,11 @@ class SocketMailer {
         }
         return implode(',', $arr);
     }
+    /**
+     * 
+     * @return string
+     * @since 1.0
+     */
     private function getCC(){
         $arr = array();
         foreach ($this->cc as $name => $address){
@@ -154,7 +235,11 @@ class SocketMailer {
         }
         return implode(',', $arr);
     }
-    
+    /**
+     * 
+     * @return string
+     * @since 1.0
+     */
     private function getTo(){
         $arr = array();
         foreach ($this->receivers as $name => $address){
@@ -164,7 +249,8 @@ class SocketMailer {
     }
     /**
      * Checks if the connection is still open or is it closed.
-     * @return noolean <b>TRUE</b> if the connection is open.
+     * @return boolean <b>TRUE</b> if the connection is open.
+     * @since 1.0
      */
     public function isConnected() {
         return is_resource($this->conn);
@@ -172,6 +258,7 @@ class SocketMailer {
     /**
      * Sets the connection port.
      * @param int $port The port number to set.
+     * @since 1.0
      */
     public function setPort($port) {
         if($port > 0){
@@ -179,6 +266,11 @@ class SocketMailer {
             array_push($this->log, 'Port set to: '.$port);
         }
     }
+    /**
+     * 
+     * @return int
+     * @since 1.0
+     */
     public function getTimeout(){
         return $this->timeout;
     }
@@ -186,6 +278,7 @@ class SocketMailer {
     /**
      * Sets the name of mail server host.
      * @param string $host The name of the host (such as mail.mysite.com).
+     * @since 1.0
      */
     public function setHost($host){
         $this->host = $host;
@@ -195,6 +288,7 @@ class SocketMailer {
      * Sends a command to the mail server.
      * @param type $command
      * @return boolean
+     * @since 1.0
      */
     public function sendC($command){
         if($this->isConnected()){
@@ -221,7 +315,11 @@ class SocketMailer {
             return FALSE;
         }
     }
-
+    /**
+     * 
+     * @return string
+     * @since 1.0
+     */
     public function read(){
         $message = '';
         while(!feof($this->conn)){
@@ -233,7 +331,11 @@ class SocketMailer {
         }
         return $message;
     }
-    
+    /**
+     * 
+     * @return boolean
+     * @since 1.0
+     */
     public function connect() {
         if(!$this->isConnected()){
             $err = 0;

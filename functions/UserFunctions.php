@@ -2,7 +2,7 @@
 /**
  * A class that contains all static methods for altering user attributes.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.3
+ * @version 1.4
  * @uses User The basic user class.
  * @uses UserQuery It uses the class to send user related queries.
  * @uses ActivationQuery Used for user activation related queries.
@@ -709,7 +709,11 @@ class UserFunctions extends Functions{
                 $loggedAccLevel = $this->getAccessLevel();
                 if($loggedAccLevel != NULL){
                     if($loggedAccLevel == 0){
-                        return $this->addUser($user);
+                        $u = $this->addUser($user);
+                        if($u instanceof User){
+                            $this->sendWelcomeEmail($u);
+                        }
+                        return $u;
                     }
                     else{
                         return self::NOT_AUTH;
@@ -721,5 +725,28 @@ class UserFunctions extends Functions{
             }
         }
         return FALSE;
+    }
+    /**
+     * 
+     * @param User $user
+     * @since 1.4
+     */
+    private function sendWelcomeEmail($user){
+        $mailAccount = MailConfig::get()->getAccount('no-replay');
+        $m = new SocketMailer();
+        $m->setHost($mailAccount->getServerAddress());
+        $m->setPort(25);
+        if($m->connect()){
+            echo $m->read();
+            $m->sendC('HELP');
+            $m->sendC('EHLO');
+            $m->sendC('AUTH LOGIN');
+            $m->sendC(base64_encode($mailAccount->getUsername()));
+            $m->sendC(base64_encode($mailAccount->getPassword()));
+            $m->setSender($mailAccount->getName(), $mailAccount->getAddress());
+            $m->addReceiver($user->getUserName(), $user->getEmail());
+            $m->setSubject('Activate Your Account');
+            $m->sendMessage();
+        }
     }
 }

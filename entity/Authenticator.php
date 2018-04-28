@@ -7,7 +7,7 @@ define('HASH_ALGO_NAME','sha256');
 /**
  * A class that is used to authenticate system users.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.2
+ * @version 1.3
  */
 class Authenticator{
     /**
@@ -50,12 +50,8 @@ class Authenticator{
                     $email = $row['email'];
                     $this->user = new User($username,'',$email);
                     $this->user->setID($userId);
-                    $this->user->setAccessLevel($row['acc_level']);
-                    $this->user->setStatus($row['status']);
-                    $this->user->setLastLogin($row['last_login']);
-                    $this->user->setRegDate($row['reg_date']);
-                    $exp_time = date("Y-m-d H:i:s", strtotime('+5 minutes'));
-                    $this->user->setToken(hash(HASH_ALGO_NAME,$exp_time));
+                    $salt = date("Y-m-d H:i:s", strtotime('+5 minutes'));
+                    $this->user->setToken(hash(HASH_ALGO_NAME,$salt));
                     $query->updateLastLogin($userId);
                     $_SESSION['db']->executeQuery($query);
                     return TRUE;
@@ -85,12 +81,8 @@ class Authenticator{
                         $email = $row['email'];
                         $this->user = new User($username,'',$email);
                         $this->user->setID($userId);
-                        $this->user->setAccessLevel($row['acc_level']);
-                        $this->user->setStatus($row['status']);
-                        $this->user->setLastLogin($row['last_login']);
-                        $this->user->setRegDate($row['reg_date']);
-                        $exp_time = date("Y-m-d H:i:s", strtotime('+5 minutes'));
-                        $this->user->setToken(hash(HASH_ALGO_NAME,$exp_time));
+                        $salt = date("Y-m-d H:i:s", strtotime('+5 minutes'));
+                        $this->user->setToken(hash(HASH_ALGO_NAME,$salt));
                         $query->updateLastLogin($userId);
                         $_SESSION['db']->executeQuery($query);
                         return TRUE;

@@ -31,7 +31,7 @@ spl_autoload_register(function ($name) {
     foreach ($searchFolders as $value) {
         $f = $root.$value.'/'.$name.'.php';
         if(file_exists($f)){
-            require $root.$value.'/'.$name.'.php';
+            require $f;
             return;
         }
     }

@@ -16,3 +16,4 @@ define('ROOT_DIR',__DIR__);
  */
 define('RES_FOLDER','res');
 require_once ROOT_DIR.'/entity/AutoLoader.php';
+Util::displayErrors();

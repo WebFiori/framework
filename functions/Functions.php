@@ -28,7 +28,7 @@
  * The base class for creating application logic.
  *
  * @author Ibrahim
- * @version 1.0
+ * @version 1.1
  */
 class Functions {
     /**
@@ -40,15 +40,24 @@ class Functions {
     const NOT_AUTH = 'not_autherized';
     
     public function __construct() {
-        $this->sManager = SessionManager::get(FALSE);
-        if(!$this->sManager->initSession('pa-session', TRUE, array(
+        $this->mainSession = new SessionManager('pa-session');
+        $this->mainSession->initSession();
+    }
+    /**
+     * A function that must be called after session is started to 
+     * initiate database connection.
+     * @since 1.1
+     */
+    public function useDatabase() {
+        $result = $this->mainSession->useDb(array(
             'host'=>Config::get()->getDBHost(),
             'user'=>Config::get()->getDBUser(),
             'pass'=>Config::get()->getDBPassword(),
             'db-name'=> Config::get()->getDBName()
-        ))){
+        ));
+        if($result !== TRUE){
             header('content-type:application/json');
-            die($this->sManager->getDBLink()->toJSON());
+            die($this->mainSession->getDBLink()->toJSON());
         }
     }
     /**
@@ -56,7 +65,7 @@ class Functions {
      * @var SessionManager an instance of <b>SessionManager</b>.
      * @since 1.0 
      */
-    private $sManager;
+    private $mainSession;
     /**
      * Execute a query.
      * @param MySQLQuery $qObj An object of type <b>MySQLQuery</b>.
@@ -65,8 +74,8 @@ class Functions {
      * @since 1.0
      */
     public function excQ($qObj){
-        if($this->sManager->getDBLink() != NULL){
-            return $this->sManager->getDBLink()->executeQuery($qObj);
+        if($this->mainSession->getDBLink() != NULL){
+            return $this->mainSession->getDBLink()->executeQuery($qObj);
         }
         return FALSE;
     }
@@ -75,8 +84,8 @@ class Functions {
      * @return SessionManager An object of type <b>SessionManager</b>
      * @since 1.0
      */
-    public function getSManager(){
-        return $this->sManager;
+    public function getMainSession(){
+        return $this->mainSession;
     }
     /**
      * Returns the number of rows resulted from executing a query.
@@ -86,8 +95,8 @@ class Functions {
      * @since 1.0
      */
     public function rows(){
-        if($this->sManager->getDBLink() != NULL){
-            return $this->getSManager()->getDBLink()->rows();
+        if($this->mainSession->getDBLink() != NULL){
+            return $this->getMainSession()->getDBLink()->rows();
         }
         return NULL;
     }
@@ -99,8 +108,8 @@ class Functions {
      * @since 1.0
      */
     public function getRow(){
-        if($this->getSManager()->getDBLink() != NULL){
-            return $this->getSManager()->getDBLink()->getRow();
+        if($this->getMainSession()->getDBLink() != NULL){
+            return $this->getMainSession()->getDBLink()->getRow();
         }
         return NULL;
     }
@@ -111,8 +120,8 @@ class Functions {
      * @since 1.0
      */
     public function getUserID(){
-        if($this->getSManager()->getUser() != NULL){
-            return $this->getSManager()->getUser()->getID();
+        if($this->getMainSession()->getUser() != NULL){
+            return $this->getMainSession()->getUser()->getID();
         }
         return NULL;
     }
@@ -123,8 +132,8 @@ class Functions {
      * @since 1.0
      */
     public function getAccessLevel(){
-        if($this->getSManager()->getUser() != NULL){
-            return $this->getSManager()->getUser()->getAccessLevel();
+        if($this->getMainSession()->getUser() != NULL){
+            return $this->getMainSession()->getUser()->getAccessLevel();
         }
         return NULL;
     }

@@ -27,9 +27,6 @@
 //first, load the root file
 require_once 'root.php';
 
-//use this to show runtime errors
-Util::displayErrors();
-
 //sets the translation
 PageAttributes::get()->loadTranslation(TRUE);
 

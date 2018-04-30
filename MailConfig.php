@@ -25,7 +25,7 @@
  */
 
 /**
- * Description of MailConfig
+ * A file that contains system emails configurations.
  *
  * @author Ibrahim
  * @version 1.0
@@ -50,6 +50,7 @@ class MailConfig {
         self::$inst = new MailConfig();
         return self::$inst;
     }
+    
     private function __construct() {
         $acc1 = new EmailAccount();
         $acc1->setAddress('mail.programmingacademia.com');
@@ -59,18 +60,20 @@ class MailConfig {
         $this->addAccount($acc1, 'no-replay');
     }
     /**
-     * 
-     * @param type $acc
-     * @param type $name
+     * Adds an email account.
+     * @param EmailAccount $acc an object of type <b>EmailAccount</b>.
+     * @param string $name A name to associate with the email account.
      * @since 1.0
      */
     private function addAccount($acc,$name){
         $this->emailAccounts[$name] = $acc;
     }
     /**
-     * 
-     * @param type $name
-     * @return EmailAccount|null
+     * Returns an email account given its name.
+     * @param string $name The name of the account.
+     * @return EmailAccount|null If the account is found, The function 
+     * will return an object of type <b>EmailAccount</b>. Else, the 
+     * function will return <b>NULL</b>.
      * @since 1.0
      */
     public function getAccount($name){
@@ -78,6 +81,14 @@ class MailConfig {
             return $this->emailAccounts[$name];
         }
         return NULL;
+    }
+    /**
+     * Returns an array that contains all email accounts.
+     * @return array An array that contains all email accounts.
+     * @since 1.0
+     */
+    public function getAccounts(){
+        return $this->emailAccounts;
     }
 }
 class EmailAccount {

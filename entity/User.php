@@ -106,7 +106,7 @@ class User implements JsonI{
      * @since 1.4
      */
     public function getLastLogin(){
-        return $this->regDate;
+        return $this->lastLogin;
     }
     /**
      * Returns the value of the property <b>$regDate</b>.
@@ -122,7 +122,7 @@ class User implements JsonI{
      * @since 1.4
      */
     public function setLastLogin($date){
-        $this->regDate = $date;
+        $this->lastLogin = $date;
     }
     /**
      * Sets the value of the property <b>$regDate</b>.
@@ -203,9 +203,7 @@ class User implements JsonI{
         $json->add('status', $this->getStatus());
         $json->add('reg-date', $this->getRegDate());
         $json->add('last-login', $this->getLastLogin());
-        if($this->getToken() !== NULL){
-            $json->add('token', $this->getToken());
-        }
+        $json->add('display-name', $this->getDisplayName());
         if($this->getActivationTok() !== NULL){
             $json->add('activation-token', $this->getActivationTok());
         }

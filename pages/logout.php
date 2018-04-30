@@ -1,4 +1,6 @@
 <?php
 require_once '../root.php';
-SessionManager::get()->kill();
-header('location: login');
+
+$lang = WebsiteFunctions::get()->getMainSession()->getLang();
+WebsiteFunctions::get()->getMainSession()->kill();
+header('location: '.SiteConfig::get()->getBaseURL().'pages/login?lang='.$lang);

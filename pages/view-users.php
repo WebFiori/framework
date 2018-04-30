@@ -28,7 +28,6 @@
 require_once '../root.php';
 
 //use this to show runtime errors
-Util::displayErrors();
 
 //sets the translation
 PageAttributes::get()->loadTranslation(TRUE);
@@ -45,7 +44,7 @@ PageAttributes::get()->setDescription($lang['description']);
 
 // check if user is logged in
 //if not, go to login page
-if(SessionManager::get()->validateToken() != TRUE){
+if(WebsiteFunctions::get()->getMainSession()->validateToken() != TRUE){
     header('location: login');
 }
 ?>
@@ -65,7 +64,7 @@ if(SessionManager::get()->validateToken() != TRUE){
                         </header>
                         <div style="overflow-x:auto;" class="pa-row">
                             <?php 
-                            if(SessionManager::get()->getUser()->getAccessLevel() == 0){
+                            if(WebsiteFunctions::get()->getAccessLevel() == 0){
                                 $users = UserFunctions::get()->getUsers();
                                 echo '<table border = "1" class="pa-'.PageAttributes::get()->getWritingDir().'-col-ten" >';
                                 echo '<tr>';

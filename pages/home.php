@@ -27,9 +27,6 @@
 //first, load the root file
 require_once '../root.php';
 
-//use this to show runtime errors
-Util::displayErrors();
-
 //sets the translation
 PageAttributes::get()->loadTranslation(TRUE);
 
@@ -45,7 +42,7 @@ PageAttributes::get()->setDescription($lang['description']);
 
 // check if user is logged in
 //if not, go to login page
-if(SessionManager::get()->validateToken() != TRUE){
+if(WebsiteFunctions::get()->getMainSession()->validateToken() != TRUE){
     header('location: login');
 }
 ?>

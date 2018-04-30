@@ -27,13 +27,12 @@
 //first, load the root file
 require_once '../root.php';
 
-//use this to show runtime errors
-Util::displayErrors();
-
-//sets the translation
+if(WebsiteFunctions::get()->getMainSession()->validateToken() === TRUE){
+    header('location: home');
+}
 PageAttributes::get()->loadTranslation(TRUE);
 $pageLbls = LANGUAGE['pages']['login'];
-//load themem
+//load theme
 PageAttributes::get()->loadTheme();
 
 //end of page setup.
@@ -51,7 +50,8 @@ PageAttributes::get()->loadTheme();
                 document.getElementById('message').innerHTML = <?php echo '\''.LANGUAGE['general']['wait'].'\''?>;
                 var username = document.getElementById('username-input').value;
                 var password = document.getElementById('password-input').value;
-                var params = 'action=login&username='+encodeURIComponent(username)+'&password='+password;
+                var params = 'action=login&username='+encodeURIComponent(username)+'&password='+password+
+                        '&duration=120&refresh-timeout=true';
                 var ajax = new AJAX();
                 ajax.setURL(APIS.AuthAPI.link);
                 ajax.setReqMethod('post');
@@ -59,12 +59,12 @@ PageAttributes::get()->loadTheme();
                 ajax.setOnSuccess(function(){
                     console.log(this.response);
                     document.getElementById('message').innerHTML = <?php echo '\''.$pageLbls['success'].'\''?>;
-                    var tok = this.jsonResponse['user']['token'];
+                    //var tok = this.jsonResponse['user']['token'];
                     //exp after 30 min
-                    var date = new Date();
-                    date.setTime(currentTime + 1000*60*30);
-                    var currentTime = date.getTime();
-                    document.cookie = 'token='+tok+';expires ='+date.toUTCString();
+//                    var date = new Date();
+//                    date.setTime(currentTime + 1000*60*30);
+//                    var currentTime = date.getTime();
+//                    document.cookie = 'token='+tok+';expires ='+date.toUTCString();
                     window.location.href = 'pages/home';
                 });
                 ajax.setOnClientError(function(){

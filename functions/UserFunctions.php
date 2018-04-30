@@ -44,6 +44,7 @@ class UserFunctions extends Functions{
         parent::__construct();
         $this->query = new UserQuery();
         $this->acQuery = new ActivationQuery();
+        parent::useDatabase();
     }
     /**
      * A constant that indicates a user is not found.
@@ -109,19 +110,31 @@ class UserFunctions extends Functions{
      * @param string $u Username.
      * @param string $p password.
      * @param string $e Email address.
+     * @param int $sessionTimeout The duration of user session (in minutes). It must be a 
+     * * @param boolean $refreshTimeout If set to <b>TRUE</b> session timeout time will 
+     * be refreshed every time user sends a request.
+     * positive number greater than 0. If invalid number is given, 10 will be used.
      * @return boolean|string <b>TRUE</b> if the user is authenticated. Else, it will 
      * return <b>FALSE</b>. In case of database error, the function will return 
      * <b>MySQLQuery::QUERY_ERR</b>.
      * @since 1.0
      */
-    public function authenticate($u='',$p='',$e=''){
+    public function authenticate($u='',$p='',$e='',$sessionTimeout=10,$refreshTimeout=false){
         if(strlen($p) != 0){
             if(strlen($u) != 0 || strlen($e) != 0){
                 $user = new User($u, $p, $e);
                 $auth = new Authenticator($user);
                 $result = $auth->authenticate();
                 if($result === TRUE){
-                    $this->getSManager()->setUser($auth->getUser());
+                    $tmpu = $this->getUserByID($auth->getUser()->getID());
+                    $tmpu->setEmail('');
+                    $tmpu->setActivationTok('');
+                    $tmpu->setToken($auth->getUser()->getToken());
+                    $this->getMainSession()->setUser($tmpu);
+                    if($sessionTimeout > 0){
+                        $this->getMainSession()->setLifetime($sessionTimeout);
+                    }
+                    $this->getMainSession()->initSession($refreshTimeout, TRUE);
                     return TRUE;
                 }
                 else if($result === UserFunctions::NOT_AUTH){
@@ -382,8 +395,7 @@ class UserFunctions extends Functions{
     }
     /**
      * Return a user given his ID.
-     * @param string $id The ID of the user. The ID must be equal to the ID of the 
-     * logged in user to get the profile. Also the admin can get user profile.
+     * @param string $id The ID of the user.
      * @return User|string An object of type <b>User</b> if found. In case no user 
      * was found, the function will return <b>UserFunctions::NO_SUCH_USER</b>. In 
      * case of query error, the function will return <b>MySQLQuery::QUERY_ERR</b>. 
@@ -392,9 +404,6 @@ class UserFunctions extends Functions{
      * @since 1.1
      */
     public function getUserByID($id){
-        if($this->getSManager()->getUser() == NULL){
-            return self::NOT_AUTH;
-        }
         $this->query->getUserByID($id);
         if($this->excQ($this->query)){
             if($this->rows() != 0){
@@ -543,7 +552,7 @@ class UserFunctions extends Functions{
         if($loggedAccessLevel != NULL && $loggedAccessLevel == 0){
             $this->query->getUsers();
             if($this->excQ($this->query)){
-                $result = $this->getSManager()->getDBLink()->getResult();
+                $result = $this->getMainSession()->getDBLink()->getResult();
                 $users = array();
                 while($row = $result->fetch_assoc()){
                     $user = new User(

@@ -31,7 +31,6 @@
  * @version 1.0
  */
 require_once '../root.php';
-Util::displayErrors();
 class AuthAPI extends API{
     public function __construct() {
         parent::__construct();
@@ -41,6 +40,7 @@ class AuthAPI extends API{
         $a1->setName('login');
         $a1->addParameter(new RequestParameter('username', 'string'));
         $a1->addParameter(new RequestParameter('password', 'string'));
+        $a1->addParameter(new RequestParameter('session-duration', 'int',TRUE));
         $this->addAction($a1);
         
         $a2 = new APIAction();
@@ -55,11 +55,33 @@ class AuthAPI extends API{
         if($action == 'login'){
             if(isset($inputs['username'])){
                 if(isset($inputs['password'])){
-                    $r = UserFunctions::get()->authenticate($inputs['username'], $inputs['password'], $inputs['username']);
+                    if(isset($inputs['duration'])){
+                        if(is_int($inputs['duration'])){
+                            $duration = (int)$inputs['duration'];
+                        }
+                        else{
+                            $duration = 30;
+                        }
+                    }
+                    else{
+                        $duration = 30;
+                    }
+                    if(isset($inputs['refresh-timeout'])){
+                        if($inputs['refresh-timeout'] == 'true'){
+                            $refTimeout = TRUE;
+                        }
+                        else{
+                            $refTimeout = FALSE;
+                        }
+                    }
+                    else{
+                        $refTimeout = FALSE;
+                    }
+                    $r = UserFunctions::get()->authenticate($inputs['username'], $inputs['password'], $inputs['username'],$duration,$refTimeout);
                     if($r == TRUE){
                         if(SessionManager::get()->getUser()->getStatus() == 'S'){
                             $this->sendResponse('Account Suspended',TRUE,401);
-                            SessionManager::get()->kill();
+                            UserFunctions::get()->getMainSession()->kill();
                         }
                         else{
                             $this->sendResponse('Logged In', FALSE, 200, '"user":'.SessionManager::get()->getUser()->toJSON());

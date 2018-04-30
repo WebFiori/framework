@@ -7,7 +7,6 @@
 function staticHeadTag($canonical='',$lang=LANG_EN){
     //must set the language first.
     PageAttributes::get()->setLang($lang);
-    
     $headTag = new HeadTag();
     $headTag->setBaseURL(SiteConfig::get()->getBaseURL());
     $headTag->setCopyright(SiteConfig::get()->getCopyright());
@@ -29,5 +28,19 @@ function staticHeadTag($canonical='',$lang=LANG_EN){
 function dynamicHeadTag($canonical='',$lang=LANG_EN){
     $retVal = '<?php echo staticHeadTag(\''.$canonical.'\',\''.$lang.'\')?>';
     return $retVal;
+}
+
+function getHeadNode($dynamic=TRUE,$canonical=''){
+    $node = new HeadNode();
+    if($dynamic){
+        $textNode = new HTMLNode('', FALSE, TRUE);
+        $textNode->setText(dynamicHeadTag($canonical, PageAttributes::get()->getLang()));
+        $node->addChild($textNode);
+    }
+    else{
+        $node->addMeta('description', PageAttributes::get()->getDescription());
+        $node->setTitle(PageAttributes::get()->getTitle());
+    }
+    return $node;
 }
 

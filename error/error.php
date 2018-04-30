@@ -1,6 +1,5 @@
 <?php 
 require_once '../root.php';
-Util::displayErrors();
 PageAttributes::get()->loadTranslation(TRUE);
 PageAttributes::get()->loadTheme();
 require_once 'ERR_'.PageAttributes::get()->getLang().'.php';

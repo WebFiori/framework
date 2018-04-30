@@ -49,6 +49,7 @@ class UserQuery extends MySQLQuery{
         
         //last login column
         $this->structure->addColumn('last-login', new Column('last_login', 'timestamp'));
+        $this->structure->getCol('last-login')->autoUpdate();
     }
     /**
      * Constructs a query that can be used to create the table.

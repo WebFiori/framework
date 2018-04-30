@@ -50,6 +50,7 @@ class PageAttributes{
         $this->contentDir = NULL;
         $this->description = NULL;
         $this->contentLang = NULL;
+        WebsiteFunctions::get()->getMainSession()->initSession(FALSE, TRUE);
     }
     private static $instance;
     /**
@@ -152,7 +153,7 @@ class PageAttributes{
                 include_once ROOT_DIR.'/entity/langs/Language_'.$this->getLang().'.php';
             }
             else if($uses_session_lang === TRUE){
-                $sLang = SessionManager::get()->getLang(TRUE);
+                $sLang = WebsiteFunctions::get()->getMainSession()->getLang(TRUE);
                 if($sLang != NULL){
                     if($this->setLang($sLang)){
                         include_once ROOT_DIR.'/entity/langs/Language_'.$sLang.'.php';

@@ -40,7 +40,8 @@ class AuthAPI extends API{
         $a1->setName('login');
         $a1->addParameter(new RequestParameter('username', 'string'));
         $a1->addParameter(new RequestParameter('password', 'string'));
-        $a1->addParameter(new RequestParameter('session-duration', 'int',TRUE));
+        $a1->addParameter(new RequestParameter('session-duration', 'integer',TRUE));
+        $a1->addParameter(new RequestParameter('refresh-timeout', 'string',TRUE));
         $this->addAction($a1);
         
         $a2 = new APIAction();
@@ -55,13 +56,8 @@ class AuthAPI extends API{
         if($action == 'login'){
             if(isset($inputs['username'])){
                 if(isset($inputs['password'])){
-                    if(isset($inputs['duration'])){
-                        if(is_int($inputs['duration'])){
-                            $duration = (int)$inputs['duration'];
-                        }
-                        else{
-                            $duration = 30;
-                        }
+                    if(isset($inputs['session-duration'])){
+                        $duration = $inputs['session-duration'];
                     }
                     else{
                         $duration = 30;
@@ -79,12 +75,12 @@ class AuthAPI extends API{
                     }
                     $r = UserFunctions::get()->authenticate($inputs['username'], $inputs['password'], $inputs['username'],$duration,$refTimeout);
                     if($r == TRUE){
-                        if(SessionManager::get()->getUser()->getStatus() == 'S'){
+                        if(UserFunctions::get()->getMainSession()->getUser()->getStatus() == 'S'){
                             $this->sendResponse('Account Suspended',TRUE,401);
                             UserFunctions::get()->getMainSession()->kill();
                         }
                         else{
-                            $this->sendResponse('Logged In', FALSE, 200, '"user":'.SessionManager::get()->getUser()->toJSON());
+                            $this->sendResponse('Logged In', FALSE, 200, '"session":'.UserFunctions::get()->getMainSession()->toJSON());
                         }
                     }
                     else if($r == MySQLQuery::QUERY_ERR){

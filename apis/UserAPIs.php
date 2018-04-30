@@ -24,7 +24,6 @@
  * THE SOFTWARE.
  */
 require_once '../root.php';
-Util::displayErrors();
 /**
  * An API that is used to do any thing that is related to user management.
  *
@@ -72,17 +71,6 @@ class UserAPIs extends API{
         $a3->setName('get-users');
         $a3->addParameter($tok);
         $this->addAction($a3,TRUE);
-        
-        
-        //action #5
-        $a5 = new APIAction();
-        $a5->addRequestMethod('POST');
-        $a5->setName('update-password');
-        $a5->addParameter($userId);
-        $a5->addParameter(new RequestParameter('old-pass','string', FALSE));
-        $a5->addParameter(new RequestParameter('new-pass','string', FALSE));
-        $a5->addParameter($tok);
-        $this->addAction($a5,TRUE);
         
         $a6 = new APIAction();
         $a6->setActionMethod('POST');

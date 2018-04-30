@@ -51,10 +51,18 @@ PageAttributes::get()->loadTheme();
                 var username = document.getElementById('username-input').value;
                 var password = document.getElementById('password-input').value;
                 var params = 'action=login&username='+encodeURIComponent(username)+'&password='+password+
-                        '&duration=120&refresh-timeout=true';
-                var ajax = new AJAX();
-                ajax.setURL(APIS.AuthAPI.link);
-                ajax.setReqMethod('post');
+                        '&session-duration=1440&refresh-timeout=true';
+                var ajax = new AJAX(
+                        {
+                                <?php
+                        if(defined('DEBUG')){
+                            echo '"enable-log":true,';
+                        }
+                        ?>
+                        url:APIS.AuthAPI.link,
+                        method:'post'
+                        }
+                );
                 ajax.setParams(params);
                 ajax.setOnSuccess(function(){
                     console.log(this.response);

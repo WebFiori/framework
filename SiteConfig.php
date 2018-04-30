@@ -24,7 +24,6 @@
  * THE SOFTWARE.
  */
 require_once 'root.php';
-Util::displayErrors();
 /**
  * A configuration file for the presentation part of the system (web pages)
  * 

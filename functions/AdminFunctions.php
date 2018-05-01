@@ -25,10 +25,52 @@
  */
 
 /**
- * Description of AdminFunctions
+ * A class that contains administrative functions
  *
  * @author Ibrahim
+ * @version 1.0
  */
-class AdminFunctions {
-    //put your code here
+class AdminFunctions extends Functions{
+    private static $singleton;
+    /**
+     * 
+     * @return AdminFunctions
+     * @since 1.0
+     */
+    public static function get(){
+        if(self::$singleton !== NULL){
+            return self::$singleton;
+        }
+        self::$singleton = new AdminFunctions();
+        return self::$singleton;
+    }
+    
+    public function __construct() {
+        parent::__construct();
+    }
+    /**
+     * Initialize database if not initialized.
+     * @return boolean <b>TRUE</b> If initialized. <b>FALSE</b> otherwise.
+     * @since 1.0
+     */
+    public function createDatabase(){
+        $this->useDatabase();
+        $schema = new DatabaseSchema();
+        //creating any random query object just to execute create
+        //tables statements.
+        $q = new UserQuery();
+        $q->setQuery($schema->getSchema(), 'update');
+        if($this->excQ($q)){
+            return TRUE;
+        }
+        else{
+            return MySQLQuery::QUERY_ERR;
+        }
+    }
+    
+    public function updateDatabaseAttributes($host,$username,$pass,$dbName,$createDb=false){
+        
+    }
+    
+    
 }

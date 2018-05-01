@@ -47,4 +47,49 @@ class WebsiteFunctions extends Functions{
         parent::__construct();
         
     }
+    
+    public function updateWebsiteName($newName){
+        if($this->getAccessLevel() == 0){
+            
+        }
+        else{
+            return UserFunctions::NOT_AUTH;
+        }
+    }
+    
+    public function updateTitleSep($newSep){
+        if($this->getAccessLevel() == 0){
+            
+        }
+        else{
+            return UserFunctions::NOT_AUTH;
+        }
+    }
+    
+    public function updateWebsiteDescription($newDesc) {
+        if($this->getAccessLevel() == 0){
+            
+        }
+        else{
+            return UserFunctions::NOT_AUTH;
+        }
+    }
+    
+    public function updateCopyrightNotice($newNotice) {
+        if($this->getAccessLevel() == 0){
+            
+        }
+        else{
+            return UserFunctions::NOT_AUTH;
+        }
+    }
+    
+    public function updateHomePage($homePageUrl){
+        if($this->getAccessLevel() == 0){
+            
+        }
+        else{
+            return UserFunctions::NOT_AUTH;
+        }
+    }
 }

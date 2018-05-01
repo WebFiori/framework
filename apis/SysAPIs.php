@@ -40,11 +40,6 @@ class SysAPIs extends API{
         $a1->setName('get-template-info');
         $this->addAction($a1,TRUE);
         
-        $a2 = new APIAction();
-        $a2->addRequestMethod('GET');
-        $a2->setName('get-site-info');
-        $this->addAction($a2,TRUE);
-        
         $a3 = new APIAction();
         $a3->addRequestMethod('GET');
         $a3->setName('get-sys-version');
@@ -68,7 +63,14 @@ class SysAPIs extends API{
         $a6->setName('get-email-accounts');
         $a6->addRequestMethod('get');
         $this->addAction($a6, TRUE);
-
+        
+        $a7 = new APIAction();
+        $a7->setName('run-setup');
+        $a7->addRequestMethod('get');
+        $a7->addParameter(new RequestParameter('username', 'string'));
+        $a7->addParameter(new RequestParameter('password', 'string'));
+        $a7->addParameter(new RequestParameter('email', 'string'));
+        $this->addAction($a7);
     } 
     
     public function processRequest(){
@@ -86,18 +88,11 @@ class SysAPIs extends API{
             $json->add('template-date', Config::get()->getTemplateDate());
             $this->sendResponse('Server PHP Template Information', FALSE, 200, '"info":'.$json);
         }
-        else if($action == 'get-site-info'){
-            $json = new JsonX();
-            $json->add('name', SiteConfig::get()->getWebsiteName());
-            $json->add('description', SiteConfig::get()->getDesc());
-            $json->add('base-url', SiteConfig::get()->getBaseURL());
-            $json->add('home-page', SiteConfig::get()->getHomePage());
-            $json->add('copyright-notice', SiteConfig::get()->getCopyright());
-            $json->add('title-sep', SiteConfig::get()->getTitleSep());
-            $this->sendResponse('Website Information', FALSE, 200, '"info":'.$json);
-        }
         else if($action == 'get-main-session'){
             $this->sendResponse('Main Session Info', FALSE, 200, '"session":'.SystemFunctions::get()->getMainSession()->toJSON());
+        }
+        else if($action == 'run-setup'){
+            $this->actionNotImpl();
         }
         else if($action == 'update-database-attributes'){
             $this->actionNotImpl();

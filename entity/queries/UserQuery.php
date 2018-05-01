@@ -19,6 +19,7 @@ class UserQuery extends MySQLQuery{
     private function init(){
         $this->structure = new Table();
         $this->structure->setName('users');
+        $this->structure->setOrder(0);
         //id column
         $this->structure->addColumn(self::ID_COL, new Column(self::ID_COL, 'int', 11));
         $this->structure->getCol(self::ID_COL)->setIsPrimary(TRUE);

@@ -16,6 +16,7 @@ class ActivationQuery extends MySQLQuery{
      */
     private function init(){
         $this->structure = new Table('activation_codes');
+        $this->structure->setOrder(1);
         $this->structure->addColumn('code', new Column('code', 'varchar', 64));
         $this->structure->addColumn('user-id', new Column('user_id','int',11));
         $this->structure->getCol('user-id')->setIsUnique(TRUE);

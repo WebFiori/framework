@@ -32,6 +32,8 @@ if(WebsiteFunctions::get()->getMainSession()->validateToken() === TRUE){
 }
 PageAttributes::get()->loadTranslation(TRUE);
 $pageLbls = LANGUAGE['pages']['login'];
+PageAttributes::get()->setTitle($pageLbls['title']);
+PageAttributes::get()->setDescription($pageLbls['description']);
 //load theme
 PageAttributes::get()->loadTheme();
 
@@ -50,8 +52,14 @@ PageAttributes::get()->loadTheme();
                 document.getElementById('message').innerHTML = <?php echo '\''.LANGUAGE['general']['wait'].'\''?>;
                 var username = document.getElementById('username-input').value;
                 var password = document.getElementById('password-input').value;
+                if(username === '' || password === ''){
+                    return;
+                }
+                var keepLogged = document.getElementById('keep-me-logged').checked;
+                var sessionDuration = keepLogged === true ? '10080' : '30';
+                var refresh = keepLogged === true ? 'false' : 'true';
                 var params = 'action=login&username='+encodeURIComponent(username)+'&password='+password+
-                        '&session-duration=1440&refresh-timeout=true';
+                        '&session-duration='+sessionDuration+'&refresh-timeout='+refresh;
                 var ajax = new AJAX(
                         {
                                 <?php
@@ -80,6 +88,7 @@ PageAttributes::get()->loadTheme();
                     document.getElementById('message').innerHTML = <?php echo '\''.$pageLbls['errors']['incorrect-login-params'].'\''?>;
                 });
                 ajax.send();
+                return false;
             }
         </script>
     </head>
@@ -87,7 +96,7 @@ PageAttributes::get()->loadTheme();
         <div class="pa-container">
             <div class="pa-row">
                 <div class="pa-row">
-                    <form dir="<?php echo PageAttributes::get()->getWritingDir()?>" onsubmit="login()" dir="rtl"  method="POST" id="login_form" class="pa-row">
+                    <form dir="<?php echo PageAttributes::get()->getWritingDir()?>" dir="rtl"  method="POST" id="login_form" class="pa-row">
                         <div style="margin-bottom: 18%;text-align: center;" class="pa-row">
                             <!--<img id="login_logo" src="res/images/favicon.png" alt="Website Logo">-->
                             <label style="font-weight: bold; display: block; margin:auto; text-align: center; width: 100%;"><?php echo $pageLbls['labels']['main']?></label>
@@ -104,7 +113,11 @@ PageAttributes::get()->loadTheme();
                             <label id="message"></label>
                         </div>
                         <div class="pa-row" style="background-color: #2d8659">
-                            <input id="login_button" value="<?php echo $pageLbls['actions']['login']?>" type="button" onclick="login()"/>
+                            <input type="checkbox" id="keep-me-logged" name="keep-me-logged">
+                            <label for="keep-me-logged"><?php echo $pageLbls['keep-me-logged']?></label>
+                        </div>
+                        <div class="pa-row" style="background-color: #2d8659">
+                            <input id="login_button" value="<?php echo $pageLbls['actions']['login']?>" type="submit" onclick="return login()"/>
                             <!--<button id="cancel_button"><?php //echo DISP_LANG_LOGIN['cancel-label']?></button>-->
                         </div>
                     </form>

@@ -51,7 +51,7 @@ if(WebsiteFunctions::get()->getMainSession()->validateToken() != TRUE){
 <html lang="<?php echo PageAttributes::get()->getLang()?>">
     <head>
         <?php echo staticHeadTag('pages/register', PageAttributes::get()->getLang())?>
-        <script type="text/javascript" src="res/js/js-ajax-helper-0.0.5/AJAX.js"></script>
+        <script type="text/javascript" src="res/js/js-ajax-helper-1.0.0/AJAX.js"></script>
         <script type="text/javascript" src="res/js/APIs.js"></script>
         <script type="text/javascript">
             function register(){

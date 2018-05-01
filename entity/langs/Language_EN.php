@@ -11,8 +11,10 @@ const LANGUAGE = array(
     ),
     'pages'=>array(
         'login'=>array(
+            'description'=>'Login to the system.',
             'title'=>'Login Page',
             'success'=>'You are logged in.',
+            'keep-me-logged'=>'Keep me logged in for one week.',
             'actions'=>array(
                 'login' => 'Login',
             ),

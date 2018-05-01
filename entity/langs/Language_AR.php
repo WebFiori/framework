@@ -12,7 +12,9 @@ const LANGUAGE = array(
     'pages'=>array(
         'login'=>array(
             'title'=>'تسجيل الدخول',
+            'description'=>'تسجيل الدخول إلى النظام.',
             'success'=>'تم تسجيل الدخول.',
+            'keep-me-logged'=>'إحتفظ بتسجيل دخولي لمدة إسبوع.',
             'actions'=>array(
                 'login' => 'تسجيل الدخول',
             ),

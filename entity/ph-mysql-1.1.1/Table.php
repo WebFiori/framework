@@ -3,9 +3,20 @@
  * A class that represents MySQL table.
  *
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.2
+ * @version 1.3
  */
 class Table {
+    /**
+     * The order of the table in the database.
+     * @var int The order of the table in the database. The value 
+     * of this attributes describes the dependencies between tables. For example, 
+     * if we have three tables, 'A', 'B' and 'C'. Let's assume that table 'B' 
+     * references table 'A' and Table 'A' references table 'C'. In this case, 
+     * table 'C' will have order 0, Table 'A' have order 1 and table 'B' have order 
+     * 2.
+     * @since 1.3 
+     */
+    private $order;
     /**
      * An array that contains all table foreign keys.
      * @var array 
@@ -49,6 +60,41 @@ class Table {
         }
         $this->engin = 'InnoDB';
         $this->charSet = 'utf8';
+        $this->order = 0;
+    }
+    /**
+     * Sets the order of the table in the database.
+     * @param int $val The order of the table in the database. The value 
+     * of this attributes describes the dependencies between tables. For example, 
+     * if we have three tables, 'A', 'B' and 'C'. Let's assume that table 'B' 
+     * references table 'A' and Table 'A' references table 'C'. In this case, 
+     * table 'C' will have order 0, Table 'A' have order 1 and table 'B' have order 
+     * 2.
+     * @since 1.3 
+     * @return boolean <b>TRUE</b> if the value of the attribute is set. 
+     * <b>FALSE</b> if not.
+     */
+    public function setOrder($val){
+        if(gettype($val) == 'integer'){
+            if($val > -1){
+                $this->order = $val;
+                return TRUE;
+            }
+        }
+        return FALSE;
+    }
+    /**
+     * Returns the order of the table in the database.
+     * @return int The order of the table in the database. The value 
+     * of this attributes describes the dependencies between tables. For example, 
+     * if we have three tables, 'A', 'B' and 'C'. Let's assume that table 'B' 
+     * references table 'A' and Table 'A' references table 'C'. In this case, 
+     * table 'C' will have order 0, Table 'A' have order 1 and table 'B' have order 
+     * 2.
+     * @since 1.3 
+     */
+    public function getOrder() {
+        return $this->order;
     }
     /**
      * Adds a foreign key to the table.

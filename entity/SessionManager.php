@@ -158,7 +158,7 @@ class SessionManager implements JsonI{
     public function setIsRefresh($bool){
         if(session_status() == PHP_SESSION_ACTIVE){
             if(gettype($bool) == 'boolean'){
-                $_SESSION['refresh'] = TRUE;
+                $_SESSION['refresh'] = $bool;
             }
         }
     }

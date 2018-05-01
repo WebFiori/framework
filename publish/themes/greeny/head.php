@@ -12,7 +12,7 @@ function staticHeadTag($canonical='',$lang=LANG_EN){
     $headTag->setCopyright(SiteConfig::get()->getCopyright());
     
     $headTag->setFavIcon($GLOBALS['THEME_META']['images-directory'].'/favicon.png');
-    $headTag->setTitle(PageAttributes::get()->getTitle());
+    $headTag->setTitle(PageAttributes::get()->getTitle().SiteConfig::get()->getTitleSep().SiteConfig::get()->getWebsiteName());
     $headTag->setDescription(PageAttributes::get()->getDescription());
     if($canonical != '' || $canonical !== FALSE){
         $headTag->setCanonical(SiteConfig::get()->getBaseURL().$canonical);

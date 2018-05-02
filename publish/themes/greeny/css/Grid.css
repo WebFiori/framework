@@ -1,0 +1,87 @@
+/*
+The MIT License
+
+Copyright 2018 Ibrahim.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+*/
+/* 
+    Created on : May 2, 2018, 2:51:07 AM
+    Author     : Ibrahim
+*/
+
+@charset "UTF-8";
+/* 
+    Created on : Jun 6, 2017, 4:00:25 AM
+    Author     : Ibrahim
+    Version    : 1.0, Jun 6, 2017
+*/
+
+@media screen and (max-width: 768px){
+    [class*="-col-"] {
+        width: 99% !important;
+    }
+}
+@media screen and (min-width: 768px) and (max-width: 992px){
+    
+}
+*, *:before, *:after{
+    box-sizing: border-box;
+}
+
+.pa-container, .pa-row{
+    float: left;
+}
+.pa-container{
+    background-color: #006E51;
+    padding: 1%;
+    width: 100%;
+}
+.pa-row{
+    padding: 0.5%;
+    margin: 0.5%;
+    width: 99%;
+    background-color: rgb(230, 255, 230);
+}
+[class*="-col-"] {
+    padding: 0.5%;
+    margin: 0.5%;
+}
+
+[class*="pa-ltr-"]{
+    float: left;
+    direction: ltr;
+}
+[class*="pa-rtl-"]{
+    float: right;
+    direction: rtl;
+}
+
+[class*="-col-one"]{width: 7.333333333%}
+[class*="-col-two"]{width: 15.66666667%}
+[class*="-col-three"]{width: 24%}
+[class*="-col-four"]{width: 32.33333333%}
+[class*="-col-five"]{width: 40.66666667%}
+[class*="-col-six"]{width: 49%}
+[class*="-col-seven"]{width: 57.33333333%}
+[class*="-col-eight"]{width: 65.66666666%}
+[class*="-col-nine"]{width: 74%}
+[class*="-col-ten"]{width: 82.33333333%}
+[class*="-col-eleven"]{width: 90.66666666%}
+[class*="-col-twelve"]{width: 99%}

@@ -17,9 +17,8 @@ $GLOBALS['THEME_META'] = array(
 $GLOBALS['THEME_META']['css-directory'] = $GLOBALS['THEME_META']['directory'].'/css';
 $GLOBALS['THEME_META']['js-directory'] = $GLOBALS['THEME_META']['directory'].'/js';
 $GLOBALS['THEME_META']['images-directory'] = $GLOBALS['THEME_META']['directory'].'/images';
-//load theme components
-require_once 'head.php';
-require_once 'header.php';
-require_once 'footer.php';
-require_once 'aside-nav.php';
-require_once 'page.php';
+//theme components
+$GLOBALS['THEME_COMPONENTS'] = array(
+    'head.php', 'header.php', 'footer.php',
+    'aside-nav.php', 'page.php'
+);

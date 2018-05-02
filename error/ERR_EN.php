@@ -71,3 +71,8 @@ const ERR_505 = array(
     'type'=>'HTTP Version Not Supported',
     'message'=>'The HTTP version used in the request is not supported by the server.'
 );
+const NO_ERR = array(
+    'code'=>0,
+    'type'=>'',
+    'message'=>''
+);

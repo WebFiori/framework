@@ -4,7 +4,7 @@ PageAttributes::get()->loadTranslation(TRUE);
 PageAttributes::get()->loadTheme();
 require_once 'ERR_'.PageAttributes::get()->getLang().'.php';
 $error;
-$errInfo;
+$errInfo = NULL;
 $error = filter_input(INPUT_GET, 'err');
 if($error != FALSE && $error != NULL){
     switch ($error){
@@ -16,6 +16,9 @@ if($error != FALSE && $error != NULL){
         case 501:{$errInfo = ERR_501;break;}
         case 505:{$errInfo = ERR_505;break;}
     }
+}
+if($errInfo === NULL){
+    header('location: '.SiteConfig::get()->getHomePage());
 }
 PageAttributes::get()->setTitle(ERR_PAGE_LANG['error'].' '.$error);
 PageAttributes::get()->setDescription(ERR_PAGE_LANG['error'].' '.$error.'. '.$errInfo['message']);

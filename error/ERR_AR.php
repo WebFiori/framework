@@ -71,3 +71,8 @@ const ERR_505 = array(
     'type'=>'نُسخة HTTP غير مدعومة',
     'message'=>'نُسخة HTTP المُستخدمة من قِبل الطلب غير مدعومة.'
 );
+const NO_ERR = array(
+    'code'=>0,
+    'type'=>'',
+    'message'=>''
+);

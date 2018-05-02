@@ -48,7 +48,7 @@ class HeadTag extends HTMLTag{
         $this->themeColor = '#ccffcc';
         $this->setTitle('Default Title');
         $this->desc = 'Welcome to my web page.';
-        $this->addCSS('res/css/programming-academia.css');
+        //$this->addCSS('res/css/programming-academia.css');
     }
     /**
      * Sets the value for the meta tag 'description'.

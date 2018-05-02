@@ -174,17 +174,33 @@ class PageAttributes{
             throw new Exception('Unable to load transulation. Root directory is not set.');
         }
     }
+    public function getAvailableThemes(){
+        if(defined('ROOT_DIR')){
+            $themeNames = array();
+            $themesDirs = array_diff(scandir(ROOT_DIR.'/'.THEMES_DIR), array('..', '.'));
+            foreach ($themesDirs as $dir){
+                include ROOT_DIR.THEMES_DIR.'/'.$dir.'/theme.php';
+                array_push($themeNames, $GLOBALS['THEME_META']);
+            }
+            return $themeNames;
+        }
+        throw new Exception('Unable to load theme because root directory is not defined.');
+    }
     /**
-     * Loads the website theme.
+     * Loads the web site theme.
      * @return boolean <b>TRUE</b> if selected theme is loaded.
      * @since 1.0
      */
     public function loadTheme(){
         if(defined('ROOT_DIR')){
-            require_once ROOT_DIR.'/'.THEMES_DIR.'/greeny/theme.php';
+            $themeDir = ROOT_DIR.'/'.SiteConfig::get()->getThemeDir();
+            require_once $themeDir.'/theme.php';
+            foreach ($GLOBALS['THEME_COMPONENTS'] as $component){
+                require_once $themeDir.'/'.$component;
+            }
             return TRUE;
         }
-        throw new Exception('Unable to load theme.');
+        throw new Exception('Unable to load theme because root directory is not defined.');
     }
     /**
      * Returns the writing direction of the page.

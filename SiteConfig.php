@@ -67,7 +67,7 @@ class SiteConfig{
      * @since 1.0
      */
     private $baseUrl;
-    
+    private $selectedThemeDir;
     private function __construct() {
         $this->webSiteName = 'Programming Academia';
         $this->baseUrl = 'http://localhost/generic-php/';
@@ -75,6 +75,10 @@ class SiteConfig{
         $this->homePage = '<b style="color:red">&lt;Not Set&gt;</b>';
         $this->copyright = 'All rights reserved.';
         $this->description = '<b style="color:red">&lt;Not Set&gt;</b>';
+        $this->selectedThemeDir = 'publish/themes/greeny';
+    }
+    public function getThemeDir() {
+        return $this->selectedThemeDir;
     }
     /**
      * Returns the base URL that is used to fetch resources.

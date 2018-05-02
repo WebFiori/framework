@@ -46,7 +46,7 @@ class AsideMenu{
     
     public function __toString() {
         $tag = new HTMLTag(4);
-        $tag->openTag('<aside dir="'.$this->getDir().'" id="pa-side-nav" class="pa-'.$this->getDir().'-col-two" itemscope itemtype="http://schema.org/WPSideBar">');
+        $tag->openTag('<aside dir="'.$this->getDir().'" id="side-navigation" itemscope itemtype="http://schema.org/WPSideBar">');
         $tag->openTag('<nav>');
         $tag->openTag('<ul>');
         $count = count($this->links);

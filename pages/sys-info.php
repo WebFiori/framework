@@ -28,16 +28,16 @@
 require_once '../root.php';
 
 //sets the translation
-PageAttributes::get()->loadTranslation(TRUE);
+Page::get()->loadTranslation(TRUE);
 
 //load theme
-PageAttributes::get()->loadTheme();
+Page::get()->loadTheme();
 
 $lang = LANGUAGE['pages']['sys-info'];
 
-PageAttributes::get()->setTitle($lang['title']);
+Page::get()->setTitle($lang['title']);
 
-PageAttributes::get()->setDescription($lang['description']);
+Page::get()->setDescription($lang['description']);
 //end of page setup.
 
 // check if user is logged in
@@ -47,16 +47,16 @@ if(WebsiteFunctions::get()->getMainSession()->validateToken() != TRUE){
 }
 ?>
 <!DOCTYPE html>
-<html lang="<?php echo PageAttributes::get()->getLang()?>">
+<html lang="<?php echo Page::get()->getLang()?>">
     <head>
-        <?php echo staticHeadTag('home', PageAttributes::get()->getLang())?>
+        <?php echo staticHeadTag('home', Page::get()->getLang())?>
     </head>
     <body itemscope itemtype="http://schema.org/WebPage">
         <div class="pa-container">
             <div class="pa-row">
                 <div class="pa-row">
-                    <?php echo staticAsideNav(PageAttributes::get()->getWritingDir(),5);?>
-                    <div id="pa-main-content" itemscope itemtype="http://schema.org/WebPageElement" itemprop="mainContentOfPage" dir="<?php echo PageAttributes::get()->getWritingDir()?>" class="<?php echo 'pa-'.PageAttributes::get()->getWritingDir().'-col-ten'?> show-border">
+                    <?php echo staticAsideNav(Page::get()->getWritingDir(),5);?>
+                    <div id="pa-main-content" itemscope itemtype="http://schema.org/WebPageElement" itemprop="mainContentOfPage" dir="<?php echo Page::get()->getWritingDir()?>" class="<?php echo 'pa-'.Page::get()->getWritingDir().'-col-ten'?> show-border">
                         <header id="header" itemscope itemtype="http://schema.org/WPHeader" class="pa-row">
                             <h1 name="page-title" itemprop="name" id="page-title"><?php echo $lang['title']?></h1>
                         </header>

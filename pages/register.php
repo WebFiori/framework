@@ -29,16 +29,16 @@ require_once '../root.php';
 
 
 //sets the translation
-PageAttributes::get()->loadTranslation(TRUE);
+Page::get()->loadTranslation(TRUE);
 
 //load theme
-PageAttributes::get()->loadTheme();
+Page::get()->loadTheme();
 
 $lang = LANGUAGE['pages']['register'];
 
-PageAttributes::get()->setTitle($lang['title']);
+Page::get()->setTitle($lang['title']);
 
-PageAttributes::get()->setDescription($lang['description']);
+Page::get()->setDescription($lang['description']);
 //end of page setup.
 
 // check if user is logged in
@@ -48,9 +48,9 @@ if(WebsiteFunctions::get()->getMainSession()->validateToken() != TRUE){
 }
 ?>
 <!DOCTYPE html>
-<html lang="<?php echo PageAttributes::get()->getLang()?>">
+<html lang="<?php echo Page::get()->getLang()?>">
     <head>
-        <?php echo staticHeadTag('pages/register', PageAttributes::get()->getLang())?>
+        <?php echo staticHeadTag('pages/register', Page::get()->getLang())?>
         <script type="text/javascript" src="res/js/js-ajax-helper-1.0.0/AJAX.js"></script>
         <script type="text/javascript" src="res/js/APIs.js"></script>
         <script type="text/javascript">
@@ -109,15 +109,15 @@ if(WebsiteFunctions::get()->getMainSession()->validateToken() != TRUE){
         <div class="pa-container">
             <div class="pa-row">
                 <div class="pa-row">
-                    <?php echo staticAsideNav(PageAttributes::get()->getWritingDir(),4);?>
-                    <div id="pa-main-content" itemscope itemtype="http://schema.org/WebPageElement" itemprop="mainContentOfPage" dir="<?php echo PageAttributes::get()->getWritingDir()?>" class="<?php echo 'pa-'.PageAttributes::get()->getWritingDir().'-col-ten'?> show-border">
+                    <?php echo staticAsideNav(Page::get()->getWritingDir(),4);?>
+                    <div id="pa-main-content" itemscope itemtype="http://schema.org/WebPageElement" itemprop="mainContentOfPage" dir="<?php echo Page::get()->getWritingDir()?>" class="<?php echo 'pa-'.Page::get()->getWritingDir().'-col-ten'?> show-border">
                         <header id="header" itemscope itemtype="http://schema.org/WPHeader" class="pa-row">
                             <h1 name="page-title" itemprop="name" id="page-title"><?php echo $lang['title']?></h1>
                         </header>
                         <div class="pa-row">
                             <?php
                                 if(WebsiteFunctions::get()->getAccessLevel() == 0){
-                                    echo '<div style="overflow-x:auto;" class="pa-'.PageAttributes::get()->getWritingDir().'-col-ten">';
+                                    echo '<div style="overflow-x:auto;" class="pa-'.Page::get()->getWritingDir().'-col-ten">';
                                     echo '<table>';
                                     echo '<tr>';
                                     echo '<td><label>'.$lang['labels']['username'].'</label></td>';

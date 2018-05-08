@@ -76,7 +76,7 @@ class UserFunctions extends Functions{
      * A constant that indicates a given user status is not allowed.
      * @var string Constant that indicates a given user status is not allowed.
      * @since 1.1
-     * @see UserFunctions::USER_STATUS
+     * @see User::USER_STATS
      */
     const STATUS_NOT_ALLOWED = 'status_not_allowed';
     /**
@@ -93,16 +93,6 @@ class UserFunctions extends Functions{
      * @since 1.1
      */
     const PASSWORD_MISSMATCH = 'password_missmatch';
-    /**
-     * A set of possible user status.
-     * @var array An array of user status.
-     * @since 1.0
-     */
-    const USER_STATUS = array(
-        'N'=>'New',
-        'A'=>'Active',
-        'S'=>'Suspended'
-    );
     
     /**
      * Checks if a given user info can grant him access to the system or not. It 
@@ -266,14 +256,14 @@ class UserFunctions extends Functions{
     /**
      * Updates the status of a user. Only the admin can use this function.
      * @param string $newStatus The new status. It must be a one letter value. A key 
-     * from the array <b>UserFunctions::USER_STATUS</b>.
+     * from the array <b>User::USER_STATS</b>.
      * @param string $userId The ID of the user.
      * @return User|string  An object of type <b>User</b> in case the status is updated. 
      * In case no user was found, the function will return <b>UserFunctions::NO_SUCH_USER</b>. In 
      * case of query error, the function will return <b>MySQLQuery::QUERY_ERR</b>. 
      * If the user is not authorized to update user profile, the function will return 
      * <b>Functions::NOT_AUTH</b>. If the given status is not a key in the array 
-     * <b>UserFunctions::USER_STATUS</b>, the function will return 
+     * <b>User::USER_STATS</b>, the function will return 
      * <b>UserFunctions::STATUS_NOT_ALLOWED</b>. <b>Functions::NOT_AUTH</b> is returned 
      * if the user is not authorized to update status.
      * @since 1.0 
@@ -281,12 +271,12 @@ class UserFunctions extends Functions{
     public function updateStatus($newStatus, $userId){
         $loggedAccessLevel = $this->getAccessLevel();
         if($loggedAccessLevel != NULL && $loggedAccessLevel == 0){
-            if(array_key_exists($newStatus, self::USER_STATUS)){
+            if(array_key_exists($newStatus, User::USER_STATS)){
                 $user = $this->getUserByID($userId);
                 if($user instanceof User){
                     $this->query->updateStatus($newStatus, $user->getID());
                     if($this->excQ($this->query)){
-                        $user->setStatus(self::USER_STATUS[$newStatus]);
+                        $user->setStatus($newStatus);
                         return $user;
                     }
                     else{
@@ -412,7 +402,7 @@ class UserFunctions extends Functions{
                 $user->setPassword($row[$this->query->getStructure()->getCol('password')->getName()]);
                 $user->setEmail($row[$this->query->getStructure()->getCol('email')->getName()]);
                 $user->setID($row[MySQLQuery::ID_COL]);
-                $user->setStatus(self::USER_STATUS[$row[$this->query->getStructure()->getCol('status')->getName()]]);
+                $user->setStatus($row[$this->query->getStructure()->getCol('status')->getName()]);
                 $user->setUserName($row[$this->query->getStructure()->getCol('username')->getName()]);
                 $user->setAccessLevel($row[$this->query->getStructure()->getCol('acc-level')->getName()]);
                 $user->setDisplayName($row[$this->query->getStructure()->getCol('disp-name')->getName()]);
@@ -451,12 +441,7 @@ class UserFunctions extends Functions{
                             '',
                             $row[$this->query->getStructure()->getCol('email')->getName()]);
                     $user->setID($row[UserQuery::ID_COL]);
-                    $user->setStatus(
-                            self::USER_STATUS
-                            [$row[
-                                $this->query->getStructure()->getCol('status')->getName()
-                            ]]
-                            );
+                    $user->setStatus($row[$this->query->getStructure()->getCol('status')->getName()]);
                     $user->setDisplayName($row[$this->query->getStructure()->getCol('disp-name')->getName()]);
                     $user->setAccessLevel($row[$this->query->getStructure()->getCol('acc-level')->getName()]);
                     $user->setLastLogin($row[$this->query->getStructure()->getCol('last-login')->getName()]);
@@ -496,12 +481,7 @@ class UserFunctions extends Functions{
                             '',
                             $row[$this->query->getStructure()->getCol('email')->getName()]);
                     $user->setID($row[UserQuery::ID_COL]);
-                    $user->setStatus(
-                            self::USER_STATUS
-                            [$row[
-                            $this->query->getStructure()->getCol('status')->getName()
-                            ]]
-                            );
+                    $user->setStatus($row[$this->query->getStructure()->getCol('status')->getName()]);
                     $user->setDisplayName($row[$this->query->getStructure()->getCol('disp-name')->getName()]);
                     $user->setAccessLevel($row[$this->query->getStructure()->getCol('acc-level')->getName()]);
                     $user->setLastLogin($row[$this->query->getStructure()->getCol('last-login')->getName()]);
@@ -560,12 +540,7 @@ class UserFunctions extends Functions{
                             '',
                             $row[$this->query->getStructure()->getCol('email')->getName()]);
                     $user->setID($row[UserQuery::ID_COL]);
-                    $user->setStatus(
-                            self::USER_STATUS
-                            [$row[
-                            $this->query->getStructure()->getCol('status')->getName()
-                            ]]
-                            );
+                    $user->setStatus($row[$this->query->getStructure()->getCol('status')->getName()]);
                     $user->setDisplayName($row[$this->query->getStructure()->getCol('disp-name')->getName()]);
                     $user->setAccessLevel($row[$this->query->getStructure()->getCol('acc-level')->getName()]);
                     $user->setLastLogin($row[$this->query->getStructure()->getCol('last-login')->getName()]);
@@ -656,6 +631,16 @@ class UserFunctions extends Functions{
             return self::EMPTY_STRING;
         }
     }
+    /**
+     * Adds a new user account to the system.
+     * @param User $user An object of type <b>User</b>.
+     * @return string|User The function will return an object of type <b>User</b> 
+     * in case the account is created. Also the function may return <b>MySQLQuery::QUERY_ERR</b> 
+     * in case of database error. Also the function might return <b>UserFunctions::USERNAME_TAKEN</b> if 
+     * the username of the user is taken. Also the function might return <b>UserFunctions::USER_ALREAY_REG</b> if 
+     * the email account of the user is found in the system.
+     * @since 1.0
+     */
     private function addUser($user){
         $emailCheck = $this->isUserRegistered($user->getEmail());
         if($emailCheck == FALSE){
@@ -712,7 +697,11 @@ class UserFunctions extends Functions{
     public function register($user){
         if($user instanceof User){
             if($user->getAccessLevel() != 0){
-                return $this->addUser($user);
+                $u = $this->addUser($user);
+                if($u instanceof User){
+                    MailFunctions::get()->sendWelcomeEmail($u);
+                }
+                return $u;
             }
             else{
                 $loggedAccLevel = $this->getAccessLevel();
@@ -720,7 +709,7 @@ class UserFunctions extends Functions{
                     if($loggedAccLevel == 0){
                         $u = $this->addUser($user);
                         if($u instanceof User){
-                            $this->sendWelcomeEmail($u);
+                            MailFunctions::get()->sendWelcomeEmail($u);
                         }
                         return $u;
                     }
@@ -734,28 +723,5 @@ class UserFunctions extends Functions{
             }
         }
         return FALSE;
-    }
-    /**
-     * 
-     * @param User $user
-     * @since 1.4
-     */
-    private function sendWelcomeEmail($user){
-        $mailAccount = MailConfig::get()->getAccount('no-replay');
-        $m = new SocketMailer();
-        $m->setHost($mailAccount->getServerAddress());
-        $m->setPort(25);
-        if($m->connect()){
-            echo $m->read();
-            $m->sendC('HELP');
-            $m->sendC('EHLO');
-            $m->sendC('AUTH LOGIN');
-            $m->sendC(base64_encode($mailAccount->getUsername()));
-            $m->sendC(base64_encode($mailAccount->getPassword()));
-            $m->setSender($mailAccount->getName(), $mailAccount->getAddress());
-            $m->addReceiver($user->getUserName(), $user->getEmail());
-            $m->setSubject('Activate Your Account');
-            $m->sendMessage();
-        }
     }
 }

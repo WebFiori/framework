@@ -24,7 +24,7 @@ class AsideMenu{
      */
     private $dir;
     
-    public function __construct($dir=PageAttributes::DIR_LTR) {
+    public function __construct($dir=Page::DIR_LTR) {
         $this->dir = $dir;
     }
     

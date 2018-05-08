@@ -306,21 +306,6 @@ abstract class API implements JsonI{
                             }
                             return FALSE;
                         }
-                        else if($this->getSession() != NULL){
-                            if($this->getSession()->validateToken()){
-                                $reqMethods = $val->getActionMethods();
-                                foreach ($reqMethods as $method){
-                                    if($method == $this->getRequestMethod()){
-                                        return TRUE;
-                                    }
-                                }
-                                return FALSE;
-                            }
-                            else{
-                                $this->notAuth();
-                                return FALSE;
-                            }
-                        }
                         else{
                             $this->notAuth();
                             return FALSE;

@@ -6,15 +6,15 @@
  */
 function staticHeadTag($canonical='',$lang=LANG_EN){
     //must set the language first.
-    PageAttributes::get()->setLang($lang);
+    Page::get()->setLang($lang);
     
-    $headTag = new HeadTag();
+    $headTag = new HeadNode();
     $headTag->setBaseURL(SiteConfig::get()->getBaseURL());
     $headTag->setCopyright(SiteConfig::get()->getCopyright());
     
     $headTag->setFavIcon($GLOBALS['THEME_META']['images-directory'].'/favicon.png');
-    $headTag->setTitle(PageAttributes::get()->getTitle().SiteConfig::get()->getTitleSep().SiteConfig::get()->getWebsiteName());
-    $headTag->setDescription(PageAttributes::get()->getDescription());
+    $headTag->setTitle(Page::get()->getTitle().SiteConfig::get()->getTitleSep().SiteConfig::get()->getWebsiteName());
+    $headTag->setDescription(Page::get()->getDescription());
     if($canonical != '' || $canonical !== FALSE){
         $headTag->setCanonical(SiteConfig::get()->getBaseURL().$canonical);
     }

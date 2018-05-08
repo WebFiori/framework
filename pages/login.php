@@ -30,19 +30,19 @@ require_once '../root.php';
 if(WebsiteFunctions::get()->getMainSession()->validateToken() === TRUE){
     header('location: home');
 }
-PageAttributes::get()->loadTranslation(TRUE);
+Page::get()->loadTranslation(TRUE);
 $pageLbls = LANGUAGE['pages']['login'];
-PageAttributes::get()->setTitle($pageLbls['title']);
-PageAttributes::get()->setDescription($pageLbls['description']);
+Page::get()->setTitle($pageLbls['title']);
+Page::get()->setDescription($pageLbls['description']);
 //load theme
-PageAttributes::get()->loadTheme();
+Page::get()->loadTheme();
 
 //end of page setup.
 ?>
 <!DOCTYPE html>
-<html lang = "<?php echo PageAttributes::get()->getLang()?>">
+<html lang = "<?php echo Page::get()->getLang()?>">
     <head>
-        <?php echo staticHeadTag('login', PageAttributes::get()->getLang())?>
+        <?php echo staticHeadTag('login', Page::get()->getLang())?>
         <script type="text/javascript" src="res/js/js-ajax-helper-1.0.0/AJAX.js"></script>
         <script type="text/javascript" src="res/js/APIs.js"></script>
         <script type="text/javascript" src="res/js/langs/lANG_EN.js"></script>
@@ -75,13 +75,12 @@ PageAttributes::get()->loadTheme();
                 ajax.setOnSuccess(function(){
                     console.log(this.response);
                     document.getElementById('message').innerHTML = <?php echo '\''.$pageLbls['success'].'\''?>;
-                    //var tok = this.jsonResponse['user']['token'];
-                    //exp after 30 min
-//                    var date = new Date();
-//                    date.setTime(currentTime + 1000*60*30);
-//                    var currentTime = date.getTime();
-//                    document.cookie = 'token='+tok+';expires ='+date.toUTCString();
-                    window.location.href = 'pages/home';
+                    var user = this.jsonResponse['session']['user'];
+                    console.log(user);
+                    if(user['status'] === 'New'){
+                        window.location.href = 'pages/activate-account';
+                    }
+                    //window.location.href = 'pages/home';
                 });
                 ajax.setOnClientError(function(){
                     console.log(this.response);
@@ -96,7 +95,7 @@ PageAttributes::get()->loadTheme();
         <div class="pa-container">
             <div class="pa-row">
                 <div class="pa-row">
-                    <form dir="<?php echo PageAttributes::get()->getWritingDir()?>" dir="rtl"  method="POST" id="login_form" class="pa-row">
+                    <form dir="<?php echo Page::get()->getWritingDir()?>" dir="rtl"  method="POST" id="login_form" class="pa-row">
                         <div style="margin-bottom: 18%;text-align: center;" class="pa-row">
                             <!--<img id="login_logo" src="res/images/favicon.png" alt="Website Logo">-->
                             <label style="font-weight: bold; display: block; margin:auto; text-align: center; width: 100%;"><?php echo $pageLbls['labels']['main']?></label>

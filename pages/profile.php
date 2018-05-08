@@ -28,16 +28,16 @@
 require_once '../root.php';
 
 //sets the translation
-PageAttributes::get()->loadTranslation(TRUE);
+Page::get()->loadTranslation(TRUE);
 
 //load theme
-PageAttributes::get()->loadTheme();
+Page::get()->loadTheme();
 
 $lang = LANGUAGE['pages']['profile'];
 
-PageAttributes::get()->setTitle($lang['title']);
+Page::get()->setTitle($lang['title']);
 
-PageAttributes::get()->setDescription($lang['description']);
+Page::get()->setDescription($lang['description']);
 //end of page setup.
 
 // check if user is logged in
@@ -51,16 +51,16 @@ $userId = filter_input(INPUT_GET, 'user-id');
 
 ?>
 <!DOCTYPE html>
-<html lang="<?php echo PageAttributes::get()->getLang()?>">
+<html lang="<?php echo Page::get()->getLang()?>">
     <head>
-        <?php echo staticHeadTag('pages/profile', PageAttributes::get()->getLang())?>
+        <?php echo staticHeadTag('pages/profile', Page::get()->getLang())?>
     </head>
     <body itemscope itemtype="http://schema.org/WebPage">
         <div class="pa-container">
             <div class="pa-row">
                 <div class="pa-row">
-                    <?php echo staticAsideNav(PageAttributes::get()->getWritingDir(),2);?>
-                    <div id="pa-main-content" itemscope itemtype="http://schema.org/WebPageElement" itemprop="mainContentOfPage" dir="<?php echo PageAttributes::get()->getWritingDir()?>" class="<?php echo 'pa-'.PageAttributes::get()->getWritingDir().'-col-ten'?> show-border">
+                    <?php echo staticAsideNav(Page::get()->getWritingDir(),2);?>
+                    <div id="pa-main-content" itemscope itemtype="http://schema.org/WebPageElement" itemprop="mainContentOfPage" dir="<?php echo Page::get()->getWritingDir()?>" class="<?php echo 'pa-'.Page::get()->getWritingDir().'-col-ten'?> show-border">
                         <header id="header" itemscope itemtype="http://schema.org/WPHeader" class="pa-row">
                             <h1 name="page-title" itemprop="name" id="page-title"><?php echo $lang['title']?></h1>
                         </header>
@@ -98,7 +98,7 @@ $userId = filter_input(INPUT_GET, 'user-id');
                                 header('location: home');
                             }
                             ?>
-                            <div style="border: 1px solid" class="<?php echo 'pa-'.PageAttributes::get()->getWritingDir().'-col-twelve'?>">
+                            <div style="border: 1px solid" class="<?php echo 'pa-'.Page::get()->getWritingDir().'-col-twelve'?>">
                                 <p><b><?php echo $lang['labels']['actions']?></b></p>
                                 <ul>
                                     <li><a href="pages/update-pass?user-id=<?php echo $userId?>"><?php echo $lang['labels']['update-password']?></a></li>
@@ -107,28 +107,28 @@ $userId = filter_input(INPUT_GET, 'user-id');
                                 </ul>
                             </div>
                             <div class="pa-row">
-                                <div class="<?php echo 'pa-'.PageAttributes::get()->getWritingDir().'-col-twelve'?>">
+                                <div class="<?php echo 'pa-'.Page::get()->getWritingDir().'-col-twelve'?>">
                                     <p><b><?php echo $lang['labels']['username']?></b><?php echo $profile->getUserName()?></p>
                                 </div>
-                                <div class="<?php echo 'pa-'.PageAttributes::get()->getWritingDir().'-col-twelve'?>">
+                                <div class="<?php echo 'pa-'.Page::get()->getWritingDir().'-col-twelve'?>">
                                     <p><b><?php echo $lang['labels']['display-name']?></b><?php echo $profile->getDisplayName()?></p>
                                 </div>
-                                <div class="<?php echo 'pa-'.PageAttributes::get()->getWritingDir().'-col-twelve'?>">
+                                <div class="<?php echo 'pa-'.Page::get()->getWritingDir().'-col-twelve'?>">
                                     <p><b><?php echo $lang['labels']['email']?></b><?php echo $profile->getEmail()?></p>
                                 </div>
-                                <div class="<?php echo 'pa-'.PageAttributes::get()->getWritingDir().'-col-twelve'?>">
+                                <div class="<?php echo 'pa-'.Page::get()->getWritingDir().'-col-twelve'?>">
                                     <p><b><?php echo $lang['labels']['status']?></b><?php echo $profile->getStatus()?></p>
                                 </div>
-                                <div class="<?php echo 'pa-'.PageAttributes::get()->getWritingDir().'-col-twelve'?>">
+                                <div class="<?php echo 'pa-'.Page::get()->getWritingDir().'-col-twelve'?>">
                                     <p><b><?php echo $lang['labels']['reg-date']?></b><?php echo $profile->getRegDate()?></p>
                                 </div>
-                                <div class="<?php echo 'pa-'.PageAttributes::get()->getWritingDir().'-col-twelve'?>">
+                                <div class="<?php echo 'pa-'.Page::get()->getWritingDir().'-col-twelve'?>">
                                     <p><b><?php echo $lang['labels']['last-login']?></b><?php echo $profile->getLastLogin()?></p>
                                 </div>
-                                <div class="<?php echo 'pa-'.PageAttributes::get()->getWritingDir().'-col-twelve'?>">
+                                <div class="<?php echo 'pa-'.Page::get()->getWritingDir().'-col-twelve'?>">
                                     <p><b><?php echo $lang['labels']['access-level']?></b><?php echo $profile->getAccessLevel()?></p>
                                 </div>
-                                <div class="<?php echo 'pa-'.PageAttributes::get()->getWritingDir().'-col-twelve'?>">
+                                <div class="<?php echo 'pa-'.Page::get()->getWritingDir().'-col-twelve'?>">
                                     <p><b><?php echo $lang['labels']['activation-token']?></b><a href="pages/login?ac-tok=<?php echo $profile->getActivationTok()?>"><?php echo $profile->getActivationTok()?></a></p>
                                 </div>
                             </div>

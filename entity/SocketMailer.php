@@ -25,10 +25,10 @@
  */
 
 /**
- * Description of SocketMailer
+ * A class that can be used to send email messages using sockets.
  *
  * @author Ibrahim
- * @version 1.0
+ * @version 1.1
  */
 class SocketMailer {
     const NL = "\r\n";
@@ -184,32 +184,70 @@ class SocketMailer {
         }
     }
     /**
-     * Send the message.
-     * @since 1.0
+     * Checks if the mailer is in message writing mode or not.
+     * @return boolean <b>TRUE</b> if the mailer is in writing mode. The 
+     * mailer will only switch to writing mode after sending the command 'DATA'.
+     * @since 1.1
      */
-    public function sendMessage(){
-        $this->sendC('MAIL FROM: <'.$this->senderAddress.'>');
-        foreach ($this->receivers as $val){
-            $this->sendC('RCPT TO: <'.$val.'>');
+    public function isInWritingMode(){
+        return $this->writeMode;
+    }
+    /**
+     * Returns the name of message sender.
+     * @return string The name of the sender.
+     * @since 1.1
+     */
+    public function getSenderName(){
+        return $this->senderName;
+    }
+    /**
+     * Returns the email address of the sender.
+     * @return string The email address of the sender.
+     * @since 1.1
+     */
+    public function getSenderAddress(){
+        return $this->senderAddress;
+    }
+    /**
+     * Write a message to the buffer.
+     * @param string $msg The message to write. 
+     * @param boolean $sendMessage If set to <b>TRUE</b>, The connection will be closed and the 
+     * message will be sent.
+     */
+    public function write($msg,$sendMessage=false){
+        if($this->isInWritingMode()){
+            $this->sendC($msg);
+            if($sendMessage === TRUE){
+                $this->sendC(self::NL.'.');
+                $this->sendC('QUIT');
+            }
         }
-        foreach ($this->cc as $val){
-            $this->sendC('RCPT TO: <'.$val.'>');
+        else{
+            $this->sendC('MAIL FROM: <'.$this->senderAddress.'>');
+            foreach ($this->receivers as $val){
+                $this->sendC('RCPT TO: <'.$val.'>');
+            }
+            foreach ($this->cc as $val){
+                $this->sendC('RCPT TO: <'.$val.'>');
+            }
+            foreach ($this->bcc as $val){
+                $this->sendC('RCPT TO: <'.$val.'>');
+            }
+            $this->sendC('DATA');
+            $this->sendC('From: "'.$this->getSenderName().'" <'.$this->getSenderAddress().'>');
+            $this->sendC('To: '.$this->getTo());
+            $this->sendC('CC: '.$this->getCC());
+            $this->sendC('BCC: '.$this->getBcc());
+            $this->sendC('Date:'. date('r (T)'));
+            $this->sendC('Subject:'. $this->subject);
+            $this->sendC('MIME-Version: 1.0');
+            $this->sendC('Content-Type: text/html; charset=UTF-8');
+            $this->sendC($msg);
+            if($sendMessage === TRUE){
+                $this->sendC(self::NL.'.');
+                $this->sendC('QUIT');
+            }
         }
-        foreach ($this->bcc as $val){
-            $this->sendC('RCPT TO: <'.$val.'>');
-        }
-        $this->sendC('DATA');
-        $this->sendC('From: "Programming Academia Team" <no-replay@programmingacademia.com>');
-        $this->sendC('To: '.$this->getTo());
-        $this->sendC('CC: '.$this->getCC());
-        $this->sendC('BCC: '.$this->getBcc());
-        $this->sendC('Date:'. date('r (T)'));
-        $this->sendC('Subject:'. $this->subject);
-        $this->sendC('MIME-Version: 1.0');
-        $this->sendC('Content-Type: text/html; charset=UTF-8');
-        $this->sendC('<p>Paragraph</p><p>Another paragraph</p><a href="http://www.programmingacademia.com">A Link</a>');
-        $this->sendC(self::NL.'.');
-        $this->sendC('QUIT');
     }
     /**
      * 
@@ -292,7 +330,7 @@ class SocketMailer {
      */
     public function sendC($command){
         if($this->isConnected()){
-            if($this->writeMode){
+            if($this->isInWritingMode()){
                 fwrite($this->conn, $command.self::NL);
                 array_push($this->log, 'Writing: '.$command);
                 if($command == self::NL.'.'){

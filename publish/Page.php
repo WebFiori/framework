@@ -6,9 +6,9 @@ define('THEMES_DIR','publish/themes');
 /**
  * A class used to initialize main page components.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.0
+ * @version 1.1
  */
-class PageAttributes{
+class Page{
     /**
      * A constant for left to right writing direction.
      * @var string 
@@ -45,24 +45,31 @@ class PageAttributes{
      * @since 1.0 
      */
     private $description;
+    /**
+     * A boolean value that is set to true once the theme is loaded.
+     * @var boolean 
+     * @since 1.1
+     */
+    private $isThemeLoaded;
     private function __construct() {
         $this->title = NULL;
         $this->contentDir = NULL;
         $this->description = NULL;
         $this->contentLang = NULL;
+        $this->isThemeLoaded = FALSE;
         WebsiteFunctions::get()->getMainSession()->initSession(FALSE, TRUE);
     }
     private static $instance;
     /**
-     * Returns a single instance of <b>PageAttributes</b>
-     * @return PageAttributes an instance of <b>PageAttributes</b>.
+     * Returns a single instance of <b>Page</b>
+     * @return Page an instance of <b>Page</b>.
      * @since 1.0
      */
     public static function get(){
         if(self::$instance != NULL){
             return self::$instance;
         }
-        self::$instance = new PageAttributes();
+        self::$instance = new Page();
         return self::$instance;
     }
     /**
@@ -73,7 +80,23 @@ class PageAttributes{
     public function setTitle($val){
         $this->title = $val;
     }
-
+    /**
+     * Returns the document that is associated with the page.
+     * @param type $dynamic
+     * @return HTMLDoc An object of type <b>HTMLDoc</b>.
+     * @throws Exception If page theme is not loaded.
+     * @since 1.1
+     */
+    public function getDocument($dynamic=true){
+        $document = new HTMLDoc();
+        if($this->isThemeLoaded()){
+            $document->setHeadNode(getHeadNode($dynamic));
+            $document->setFooterNode(getFooterNode($dynamic));
+            $document->setLanguage($this->getLang());
+            return $document;
+        }
+        throw new Exception('Theme is not loaded. Call the function Page::loadTheme() first.');
+    }
     /**
      * Returns the title of the page.
      * @return string|NULL The title of the page. If the title is not set, 
@@ -82,6 +105,14 @@ class PageAttributes{
      */
     public function getTitle(){
         return $this->title;
+    }
+    /**
+     * Checks if the selected theme is loaded or not.
+     * @return boolean <b>TRUE</b> if loaded. <b>FALSE</b> if not loaded.
+     * @since 1.1
+     */
+    public function isThemeLoaded(){
+        return $this->isThemeLoaded;
     }
     /**
      * Sets the description of the page.
@@ -110,17 +141,17 @@ class PageAttributes{
     */
     public function setLang($lang='EN'){
         $langU = strtoupper($lang);
-        if(in_array($langU, SessionManager::SUPOORTED_LANGS)){
+        if(in_array($langU, SessionManager::SUPPORTED_LANGS)){
             $langSet = FALSE;
             if($this->contentLang == NULL){
                 $this->contentLang = $langU;
                 $this->loadTranslation();
                 //need to find solution for other languages in setting writing direction
                 if($langU == 'EN'){
-                    $this->setDir(self::DIR_LTR);
+                    $this->setWritingDir(self::DIR_LTR);
                 }
                 else if($langU == 'AR'){
-                    $this->setDir(self::DIR_RTL);
+                    $this->setWritingDir(self::DIR_RTL);
                 }
                 $langSet = TRUE;
             }
@@ -174,6 +205,12 @@ class PageAttributes{
             throw new Exception('Unable to load transulation. Root directory is not set.');
         }
     }
+    /**
+     * Returns an array that contains the meta data of all available themes. 
+     * @return array An array that contains the meta data of all available themes.
+     * @throws Exception If the constant 'ROOT_DIR' is not defined.
+     * @since 1.1 
+     */
     public function getAvailableThemes(){
         if(defined('ROOT_DIR')){
             $themeNames = array();
@@ -187,9 +224,10 @@ class PageAttributes{
         throw new Exception('Unable to load theme because root directory is not defined.');
     }
     /**
-     * Loads the web site theme.
+     * Loads the selected web site theme.
      * @return boolean <b>TRUE</b> if selected theme is loaded.
      * @since 1.0
+     * @throws Exception If the constant 'ROOT_DIR' is not defined.
      */
     public function loadTheme(){
         if(defined('ROOT_DIR')){
@@ -198,6 +236,7 @@ class PageAttributes{
             foreach ($GLOBALS['THEME_COMPONENTS'] as $component){
                 require_once $themeDir.'/'.$component;
             }
+            $this->isThemeLoaded = TRUE;
             return TRUE;
         }
         throw new Exception('Unable to load theme because root directory is not defined.');
@@ -213,13 +252,13 @@ class PageAttributes{
     }
     /**
      * Sets the writing direction of the page.
-     * @param string $dir <b>PageAttributes::DIR_LTR</b> or <b>PageAttributes::DIR_RTL</b>.
+     * @param string $dir <b>Page::DIR_LTR</b> or <b>Page::DIR_RTL</b>.
      * @return boolean True if the direction was not set and its the first time to set. 
      * if it was set before, the method will return false.
-     * @throws Exception If the writing direction is not <b>PageAttributes::DIR_LTR</b> or <b>PageAttributes::DIR_RTL</b>.
+     * @throws Exception If the writing direction is not <b>Page::DIR_LTR</b> or <b>Page::DIR_RTL</b>.
      * @since 1.0
      */
-    function setDir($dir=self::DIR_LTR){
+    function setWritingDir($dir=self::DIR_LTR){
         $dirL = strtolower($dir);
         if($dirL == self::DIR_LTR || $dirL == self::DIR_RTL){
             if($this->getWritingDir()  == NULL){

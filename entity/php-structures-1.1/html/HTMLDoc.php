@@ -28,7 +28,7 @@
  * A class that represents HTML document.
  *
  * @author Ibrahim
- * @version 1.0
+ * @version 1.1
  */
 class HTMLDoc {
     /**
@@ -43,6 +43,24 @@ class HTMLDoc {
      * @since 1.0
      */
     private $body;
+    /**
+     * The footer section of the page.
+     * @var HTMLNode
+     * @since 1.1 
+     */
+    private $footer;
+    /**
+     * The header section of the page.
+     * @var HTMLNode
+     * @since 1.1 
+     */
+    private $header;
+    /**
+     * The aside navigation section of the page.
+     * @var HTMLNode
+     * @since 1.1 
+     */
+    private $asidenav;
     /**
      * The indentation space that is used to make the tags well formated.
      * @var string 
@@ -99,7 +117,11 @@ class HTMLDoc {
         return FALSE;
     }
     
-
+    public function setFooterNode($node) {
+        if($node instanceof HTMLNode){
+            $this->footer = $node;
+        }
+    }
     /**
      * Constructs a new HTML document.
      */
@@ -135,6 +157,9 @@ class HTMLDoc {
             $this->headTag = $node;
         }
     }
+    public function __toString() {
+        return $this->toHTML();
+    }
     /**
      * Returns a string that represents the document.
      * @param boolean $formatted If set to true, The generated document will be 
@@ -168,6 +193,15 @@ class HTMLDoc {
                     $this->tapSpace .= ' ';
                 }
             }
+        }
+        if($this->asidenav != NULL){
+            $this->body->addChild($this->asidenav);
+        }
+        if($this->header !== NULL){
+            $this->body->addChild($this->header);
+        }
+        if($this->footer !== NULL){
+            $this->body->addChild($this->footer);
         }
         $html = new HTMLNode('html', TRUE, FALSE);
         $this->nodesStack = new Stack();

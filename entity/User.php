@@ -26,9 +26,25 @@ define('ACCESS_LEVEL_5',5);
 /**
  * A class that represents a system user.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.4
+ * @version 1.5
  */
 class User implements JsonI{
+    /**
+     * A set of possible user status.
+     * @var array An array of user status.
+     * @since 1.5
+     */
+    const USER_STATS = array(
+        'N'=>'New',
+        'A'=>'Active',
+        'S'=>'Suspended'
+    );
+    /**
+     * A code for the user status.
+     * @var string
+     * @since 1.5 
+     */
+    private $statusCode;
     /**
      * The last date at which the user did use the system.
      * @var string
@@ -191,6 +207,14 @@ class User implements JsonI{
         return $this->accessLevel;
     }
     /**
+     * Returns status code.
+     * @return string The status code of the user (such as 'A').
+     * @since 1.5
+     */
+    public function getStatusCode(){
+        return $this->statusCode;
+    }
+    /**
      * Returns a JsonX object that represents the user.
      * @return string A JSON string.
      * @since 1.0
@@ -201,6 +225,7 @@ class User implements JsonI{
         $json->add('access-level', $this->getAccessLevel());
         $json->add('email', $this->getEmail());
         $json->add('status', $this->getStatus());
+        $json->add('status-code', $this->getStatusCode());
         $json->add('reg-date', $this->getRegDate());
         $json->add('last-login', $this->getLastLogin());
         $json->add('display-name', $this->getDisplayName());
@@ -220,11 +245,19 @@ class User implements JsonI{
 
     /**
      * Sets the value of the property <b>$status</b>
-     * @param string $status Status of the user. 
+     * @param string $status Status code. It must be a key value 
+     * from the array <b>User::USER_STATS</b>.
+     * @return boolean The function will return <b>TRUE</b> if the status 
+     * is updated.
      * @since 1.0
      */
     public function setStatus($status){
-        $this->status = $status;
+        if(array_key_exists($status, User::USER_STATS)){
+            $this->status = User::USER_STATS[$status];
+            $this->statusCode = $status;
+            return TRUE;
+        }
+        return FALSE;
     }
     /**
      * Sets the value of the property <b>accessLevel</b>

@@ -10,6 +10,24 @@ const LANGUAGE = array(
         'loading'=>'Loading...'
     ),
     'pages'=>array(
+        'activate-account'=>array(
+            'title'=>'Account Activation',
+            'description'=>'A page to activate user account.',
+            'success'=>'Account Activated!',
+            'labels'=>array(
+                'main'=>'Activate Your Account',
+                'activation-token'=>'Activation Token:'
+            ),
+            'placeholders'=>array(
+                'activation-token'=>'Enter your activation token here.'
+            ),
+            'actions'=>array(
+                'activate'=>'Activate'
+            ),
+            'errors'=>array(
+                'inncorect-token'=>'Inncorrect Activation token!'
+            )
+        ),
         'login'=>array(
             'description'=>'Login to the system.',
             'title'=>'Login Page',

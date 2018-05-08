@@ -64,18 +64,11 @@ class SessionManager implements JsonI{
      */
     const DB_CONNECTION_ERR = 'unable_to_connect_to_db';
     /**
-     * Singleton of the class.
-     * @var SessionManager
-     * @since 1.0
-     * @deprecated since version 1.5
-     */
-//    private static $singleton;
-    /**
      * An array of supported languages.
      * @var array An array of supported languages.
      * @since 1.2
      */
-    const SUPOORTED_LANGS = array(
+    const SUPPORTED_LANGS = array(
         'EN','AR'
     );
     /**
@@ -91,25 +84,6 @@ class SessionManager implements JsonI{
         $this->resumed = FALSE;
         session_save_path(ROOT_DIR.'/tmp');
     }
-//    /**
-//     * Creates a single instance of <b>SessionManager</b>.
-//     * @return SessionManager An object of type <b>SessionManager</b>.
-//     * @param boolean $use_default If set to true, The session will be started 
-//     * using default parameters. If set to false, the session will not start till 
-//     * the user call the function <b>SessionManager::initSession()</b>.
-//     * @since 1.0
-//     * @deprecated since version 1.5
-//     */
-//    public static function get($session_name='pa-session',$autostart=true){
-//        if(self::$singleton != NULL){
-//            return self::$singleton;
-//        }
-//        self::$singleton = new SessionManager($session_name);
-//        if($autostart){
-//            self::$singleton->initSession($session_name);
-//        }
-//        return self::$singleton;
-//    }
     /**
      * Sets the lifetime of the session.
      * @param int $time Session lifetime (in minutes). it will be set only if 
@@ -200,7 +174,7 @@ class SessionManager implements JsonI{
             return FALSE;
         }
         $langU = strtoupper($lang);
-        if(in_array($langU, self::SUPOORTED_LANGS)){
+        if(in_array($langU, self::SUPPORTED_LANGS)){
             $_SESSION['lang'] = $langU;
         }
         else if($useDefault === TRUE){
@@ -240,7 +214,7 @@ class SessionManager implements JsonI{
      * The token can be send via 'get' request, 'post' request or a cookie. The 
      * token must be stored in the parameter 'token'
      * @return boolean <b>TRUE</b> if the user token is valid. <b>FALSE</b> if 
-     * not. 
+     * not. Also the function will return <b>FALSE</b> if no user is logged in.
      * @since 1.1
      */
     public function validateToken(){
@@ -258,6 +232,7 @@ class SessionManager implements JsonI{
         if($user != NULL){
             return $user->getToken() == $tok;
         }
+        return FALSE;
     }
     /**
      * Sets the user who is using the system. It is used in case of log in.

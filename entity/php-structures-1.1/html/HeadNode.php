@@ -1,277 +1,156 @@
 <?php
-
-/*
- * The MIT License
- *
- * Copyright 2018 Ibrahim.
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
-
 /**
- * A class that represents the head tag of a HTML document.
- *
+ * A class that represents the content of the &lt;head&gt; tag.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.0
+ * @version 1.1
  */
 class HeadNode extends HTMLNode{
-    /**
-     * A node that represents the tag 'base'.
-     * @var HTMLNode
-     * @since 1.0 
-     */
-    private $baseNode;
-    /**
-     * The text node that will hold the title of the page.
-     * @var HTMLNode
-     * @since 1.0 
-     */
-    private $titleNode;
-    /**
-     * A linked list of all link tags that link to CSS files.
-     * @var LinledList
-     * @since 1.0 
-     */
-    private $cssNodes;
-    /**
-     * A linked list of all script tags that link to JS files.
-     * @var LinledList
-     * @since 1.0 
-     */
-    private $jsNodes;
-    /**
-     * A linked list of all meta tags.
-     * @var LinledList
-     * @since 1.0 
-     */
-    private $metaNodes;
-    /**
-     * The canonical URL of the page.
-     * @var string
-     * @since 1.0 
-     */
-    private $canonical;
-    /**
-     * A linked list that contains alternate URLs.
-     * @var LinkedList
-     * @since 1.0 
-     */
-    private $hrefLang;
     public function __construct() {
-        parent::__construct('head', TRUE, FALSE);
-        $this->cssNodes = new LinkedList();
-        $this->jsNodes = new LinkedList();
-        $this->metaNodes = new LinkedList();
-        $this->hrefLang = new LinkedList();
-        $this->setTitle('Default');
-        $this->addMeta('viewport', 'width=device-width, initial-scale=1.0');
+        parent::__construct('head',TRUE);
+        $charset = new HTMLNode('meta', FALSE);
+        $charset->setAttribute('charset', 'UTF-8');
+        $this->addChild($charset);
+        $tNode = new HTMLNode('title');
+        $this->addChild($tNode);
+        $textNode = new HTMLNode('', FALSE, TRUE);
+        $textNode->setText('Page Title');
+        $base = new HTMLNode('base', FALSE);
+        $base->setAttribute('href', '');
+        $this->addChild($base);
+        $tNode->addChild($textNode);
+        $this->addMeta('description', 'x');
+        $this->addMeta('viewport', 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no');
     }
-    
     /**
-     * Sets the value of the attribute 'href' for the 'base' tag.
-     * @param string $url The value to set.
+     * Sets the value for the meta tag 'description'.
+     * @param string $desc The description of the page.
      * @since 1.0
      */
-    public function setBase($url){
-        if(gettype($url) == 'string' && strlen($url) != 0){
-            $this->baseNode = new HTMLNode('base', FALSE, FALSE);
-            $this->baseNode->setAttribute('href',$url);
-        }
+    public function setDescription($desc){
+        $this->getChildByAttributeValue('name', 'description')->setAttribute('content', $desc);
     }
     /**
-     * Returns a node that represents the tag 'base'.
-     * @return HTMLNode|NULL A node that represents the tag 'base'. If the 
-     * base URL is not set, The function will return <b>NULL</b>.
-     * @since 1.0
-     */
-    public function getBase(){
-        return $this->baseNode;
-    }
-
-    /**
-     * Sets the title of the document.
-     * @param string $title The title to set.
+     * Sets the value for the tag 'title'.
+     * @param string $title The title of the page.
      * @since 1.0
      */
     public function setTitle($title){
-        if(gettype($title) == 'string'){
-            $this->titleNode = new HTMLNode('', FALSE, TRUE);
-            $this->titleNode->setText($title);
+        $chNodes = $this->childNodes();
+        for($x = 0 ; $x < $chNodes->size() ; $x++){
+            if($chNodes->get($x)->getName() == 'title'){
+                $chNodes->get($x)->childNodes()->get(0)->setText($title);
+            }
         }
     }
     /**
-     * Returns a linked list of all link tags that link to a CSS file.
-     * @return LinkedList A linked list of all link tags that link to a CSS file.
-     * @since 1.0
-     */
-    public function getCSSNodes(){
-        return $this->cssNodes;
-    }
-    /**
-     * Returns a linked list of all script tags that link to a JS file.
-     * @return LinkedList A linked list of all script tags that link to a JS file.
-     * @since 1.0
-     */
-    public function getJSNodes(){
-        return $this->jsNodes;
-    }
-    /**
-     * Returns a linked list of all meta tags.
-     * @return LinkedList A linked list of all meta tags.
-     * @since 1.0
-     */
-    public function getMetaNodes(){
-        return $this->metaNodes;
-    }
-    /**
-     * Adds new meta tag.
-     * @param string $name The value of the property 'name'.
-     * @param string $content The value of the property 'content'.
-     * @since 1.0
+     * Adds new meta node to the head tag.
+     * @param string $name The value of the attribute 'name' of the meta tag.
+     * @param string $content The value of the attribute 'content' of the meta tag.
+     * @since 1.1
      */
     public function addMeta($name,$content){
-        if(gettype($name) == 'string' && gettype($content) == 'string'){
-            if(strlen($name) != 0 && strlen($content) != 0){
-                $meta = new HTMLNode('meta', FALSE, FALSE);
-                $meta->setAttribute('name', $name);
-                $meta->setAttribute('content', $content);
-                $this->metaNodes->add($meta);
-            }
-        }
-    }
-    /**
-     * Adds new CSS source file.
-     * @param string $href The link to the file.
-     * @since 1.0
-     */
-    public function addCSS($href){
-        if(gettype($href) == 'string' && strlen($href) != 0){
-            $tag = new HTMLNode('link', FALSE, FALSE);
-            $tag->setAttribute('rel','stylesheet');
-            $tag->setAttribute('href', $href);
-            $this->cssNodes->add($tag);
-        }
-    }
-    /**
-     * Adds new JavsScript source file.
-     * @param string $loc The location of the file.
-     * @since 1.0
-     */
-    public function addJs($loc){
-        if(gettype($loc) == 'string' && strlen($loc) != 0){
-            $tag = new HTMLNode('script', TRUE, FALSE);
-            $tag->setAttribute('type','text/javascript');
-            $tag->setAttribute('src', $loc);
-            $this->jsNodes->add($tag);
-        }
-    }
-    /**
-     * Sets the canonical URL.
-     * @param string $link The URL to set.
-     * @since 1.0
-     */
-    public function setCanonical($link){
-        if(gettype($link) == 'string' && strlen($link) != 0){
-            $this->canonical = $link;
-        }
-    }
-    /**
-     * Returns the canonical URL if set.
-     * @return string|NULL The canonical URL if set. If the URL is not set, 
-     * the function will return <b>NULL</b>.
-     * @since 1.0
-     */
-    public function getCanonical(){
-        return $this->canonical;
-    }
-    /**
-     * Adds new alternate tag to the header.
-     * @param string $url The link to the alternate page.
-     * @param string $lang The language of the page.
-     * @since 1.0
-     */
-    public function addAlternate($url,$lang){
-        if(gettype($url) == 'string' && gettype($lang) == 'string'){
-            if(strlen($url) != 0 && strlen($lang) != 0){
-                $node = new HTMLNode('link', FALSE, FALSE);
-                $node->setAttribute('rel','alternate');
-                $node->setAttribute('hreflang', $lang);
-                $node->setAttribute('href', $url);
-                $this->hrefLang->add($node);
-            }
-        }
-    }
-    /**
-     * Returns a linked list of all alternate nodes that was added to the header.
-     * @return LinkedList
-     * @since 1.0
-     */
-    public function getAlternates() {
-        return $this->hrefLang;
+        $metaNode = new HTMLNode('meta', FALSE, FALSE);
+        $metaNode->setAttribute('name', $name);
+        $metaNode->setAttribute('content', $content);
+        $this->addChild($metaNode);
     }
     
     /**
-     * Returns a linked list of all child nodes.
-     * @return LinkedList
+     * Include the default meta tags.
      * @since 1.0
      */
-    public function childNodes() {
-        $chls = new LinkedList();
-        if($this->getBase() != NULL){
-            $chls->add($this->getBase());
+    private function metaTags(){
+        array_push($this->headerTags, '<meta charset="UTF-8">');
+        array_push($this->headerTags, '<meta name="description" content="'.$this->desc.'">');
+        array_push($this->headerTags, '<meta name="generator" content="PA CMS '.Config::get()->getSysVersion().'">');
+        array_push($this->headerTags, '<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">');
+        array_push($this->headerTags, '<meta name="theme-color" content="'.$this->getThemeColor().'">');
+        array_push($this->headerTags, '<meta name="robots" content="index, follow">');
+        if($this->getAuthor()){
+            array_push($this->headerTags, '<meta name="author" content="'.$this->getAuthor().'">');
         }
-        if($this->getCanonical() != NULL){
-            $can = new HTMLNode('link', FALSE, FALSE);
-            $can->setAttribute('rel','canonical');
-            $can->setAttribute('href', $this->getCanonical());
-            $chls->add($can);
+        if($this->getContactMail()){
+            array_push($this->headerTags, '<meta name="contact" content="'.$this->getContactMail().'">');
         }
-        $metaCharset = new HTMLNode('meta', FALSE, FALSE);
-        $metaCharset->setAttribute('charset','UTF-8');
-        $chls->add($metaCharset);
-        $tNode = new HTMLNode('title', TRUE, FALSE);
-        $tNode->addChild($this->titleNode);
-        $chls->add($tNode);
-        
-        $metaNodes = $this->getMetaNodes();
-        for($x = 0 ; $x < $metaNodes->size(); $x++){
-            $chls->add($metaNodes->get($x));
+        if($this->getCopyright()){
+            array_push($this->headerTags, '<meta name="copyright" content="'.$this->getCopyright().'">');
         }
-        
-        $cssNodes = $this->getCSSNodes();
-        for($x = 0 ; $x < $cssNodes->size(); $x++){
-            $chls->add($cssNodes->get($x));
+        $keywords = '';
+        $count = count($this->keywords);
+        if($count !== 0){
+            for($i = 0 ; $i < $count ; $i++){
+                if($i + 1 == $count){
+                    $keywords .= $this->keywords[$i];
+                }
+                else{
+                    $keywords .= $this->keywords[$i].',';
+                }
+            }
+            array_push($this->headerTags, '<meta name="keywords" content="'.$keywords.'">');
         }
-        
-        $hrefLangNodes = $this->getAlternates();
-        for($x = 0 ; $x < $hrefLangNodes->size(); $x++){
-            $chls->add($hrefLangNodes->get($x));
+    }
+
+
+    /**
+     * Sets the base URL.
+     * @param string $url The Base URL (Such as http://www.example.com).
+     * @since 1.0
+     */
+    public function setBaseURL($url){
+        $chNodes = $this->childNodes();
+        for($x = 0 ; $x < $chNodes->size() ; $x++){
+            if($chNodes->get($x)->getName() == 'base'){
+                $chNodes->get($x)->setAttribute('href',$url);
+            }
         }
-        
-        $jsNodes = $this->getJSNodes();
-        for($x = 0 ; $x < $jsNodes->size(); $x++){
-            $chls->add($jsNodes->get($x));
-        }
-        $parentCh = parent::childNodes();
-        for($x = 0 ; $x < $parentCh->size() ; $x++){
-            $chls->add($parentCh->get($x));
-        }
-        return $chls;
+    }
+    /**
+     * Adds a link node to include in the header of the web page.
+     * @param string $pathToCss A path to the CSS file.
+     * @since 1.1
+     */
+    public function addLink($rel,$href){
+        $node = new HTMLNode('link',FALSE);
+        $node->setAttribute('rel', $rel);
+        $node->setAttribute('href', $href);
+        $this->addChild($node);
+    }
+    /**
+     * Adds a CSS file to include in the header of the web page.
+     * @param string $pathToCss A path to the CSS file.
+     * @since 1.0
+     */
+    public function addCSS($pathToCss){
+        $node = new HTMLNode('link',FALSE);
+        $node->setAttribute('rel', 'stylesheet');
+        $node->setAttribute('href', $pathToCss);
+        $this->addChild($node);
+    }
+    
+    /**
+     * Adds a JS file to include in the header of the web page.
+     * @param string $pathToJs A path to the javascript file.
+     * @since 1.0
+     */
+    public function addJS($pathToJs){
+        $node = new HTMLNode('script', TRUE);
+        $node->setAttribute('type', 'text/javascript');
+        $node->setAttribute('src', $pathToJs);
+        $this->addChild($node);
+    }
+
+    /**
+     * Adds a new alternate link of the page has more than one language.
+     * @param string $file_path the path to the alternate version of the page.
+     * @param string $lang the language code of the alternate version (en, ar, ...).
+     * @param string $lang_name The language name (Arabic, English).
+     * @since 1.0
+     */
+    public function addAlternateURL($file_path,$lang){
+        $node = new HTMLNode('link', FALSE);
+        $node->setAttribute('rel', 'alternate');
+        $node->setAttribute('hreflang', $lang);
+        $node->setAttribute('href', $file_path);
+        $this->addChild($node);
     }
 }

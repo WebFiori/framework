@@ -105,7 +105,7 @@ class WebsiteAPIs extends API{
             $this->actionNotImpl();
         }
         else if($action == 'get-website-session-info'){
-            $this->sendResponse('Main Session Info', FALSE, 200, '"session":'.PageAttributes::get()->getSession()->toJSON());
+            $this->sendResponse('Main Session Info', FALSE, 200, '"session":'.Page::get()->getSession()->toJSON());
         }
     }
 

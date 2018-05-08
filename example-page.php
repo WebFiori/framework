@@ -28,35 +28,13 @@
 require_once 'root.php';
 
 //sets the translation
-PageAttributes::get()->loadTranslation(TRUE);
+//load theme
+Page::get()->loadTheme();
+Page::get()->setTitle('Example Page');
+Page::get()->setWritingDir('ltr');
+Page::get()->setLang('En');
+echo Page::get()->getDocument(FALSE);
 
-//load themem
-PageAttributes::get()->loadTheme();
 
-//end of page setup.
-?>
-<!DOCTYPE html>
-<html>
-    <head>
-        <?php echo staticHeadTag('example-page', PageAttributes::get()->getLang())?>
-    </head>
-    <body itemscope itemtype="http://schema.org/WebPage">
-        <div class="pa-container">
-            <div class="pa-row">
-                <div class="pa-row">
-                    <div id="pa-main-content" itemscope itemtype="http://schema.org/WebPageElement" itemprop="mainContentOfPage" dir="<?php echo PageAttributes::get()->getWritingDir()?>" class="<?php echo 'pa-'.PageAttributes::get()->getWritingDir().'-col-twelve'?> show-border">
-                        <header id="header" itemscope itemtype="http://schema.org/WPHeader" class="pa-row">
-                            <h1 name="page-title" itemprop="name" id="page-title">This is a Test Page</h1>
-                        </header>
-                        <div class="pa-row">
-                            This is only to check if UI Components load fine.
-                        </div>
-                        <?php echo staticFooter()?>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </body>
-</html>
 
 

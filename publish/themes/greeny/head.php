@@ -2,24 +2,24 @@
 
 /**
  * Modify the content of this function to add custom head tags.
- * @return string Head tags as HTML string.
+ * @return HTMLNode Head tags as HTML string.
  */
-function staticHeadTag($canonical='',$lang=LANG_EN){
+function staticHeadTag($canonical='',$lang='en'){
     //must set the language first.
-    PageAttributes::get()->setLang($lang);
-    $headTag = new HeadTag();
+    Page::get()->setLang($lang);
+    $headTag = new HeadNode();
+    $headTag->setTitle(Page::get()->getTitle().SiteConfig::get()->getTitleSep().SiteConfig::get()->getWebsiteName());
+    $headTag->setDescription(Page::get()->getDescription());
     $headTag->setBaseURL(SiteConfig::get()->getBaseURL());
-    $headTag->setCopyright(SiteConfig::get()->getCopyright());
-    
-    $headTag->setFavIcon($GLOBALS['THEME_META']['images-directory'].'/favicon.png');
-    $headTag->setTitle(PageAttributes::get()->getTitle().SiteConfig::get()->getTitleSep().SiteConfig::get()->getWebsiteName());
-    $headTag->setDescription(PageAttributes::get()->getDescription());
+    $headTag->addLink('icon', $GLOBALS['THEME_META']['images-directory'].'/favicon.png');
     if($canonical != '' || $canonical !== FALSE){
-        $headTag->setCanonical(SiteConfig::get()->getBaseURL().$canonical);
+        $headTag->addLink('canonical',SiteConfig::get()->getBaseURL().$canonical);
     }
     $headTag->addCSS($GLOBALS['THEME_META']['css-directory'].'\programming-academia.css');
-    $retVal = ''.$headTag;
-    return $retVal;
+    $headTag->addMeta('copyright', SiteConfig::get()->getCopyright());
+    $headTag->addMeta('robots', 'index, follow');
+    
+    return $headTag;
 }
 /**
  * Returns a string of PHP code that can be used to include the head tag dynamically.
@@ -31,16 +31,11 @@ function dynamicHeadTag($canonical='',$lang=LANG_EN){
 }
 
 function getHeadNode($dynamic=TRUE,$canonical=''){
-    $node = new HeadNode();
     if($dynamic){
         $textNode = new HTMLNode('', FALSE, TRUE);
-        $textNode->setText(dynamicHeadTag($canonical, PageAttributes::get()->getLang()));
-        $node->addChild($textNode);
+        $textNode->setText(dynamicHeadTag($canonical, Page::get()->getLang()));
+        return $textNode;
     }
-    else{
-        $node->addMeta('description', PageAttributes::get()->getDescription());
-        $node->setTitle(PageAttributes::get()->getTitle());
-    }
-    return $node;
+    return staticHeadTag($canonical);
 }
 

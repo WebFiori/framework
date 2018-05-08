@@ -53,11 +53,14 @@ class MailConfig {
     
     private function __construct() {
         $acc1 = new EmailAccount();
-        $acc1->setAddress('mail.programmingacademia.com');
+        $acc1->setServerAddress('mail.programmingacademia.com');
+        $acc1->setAddress('no-replay@programmingacademia.com');
         $acc1->setUsername('no-replay@programmingacademia.com');
         $acc1->setPassword('132970');
         $acc1->setName('Programming Academia Team');
+        $acc1->setPort(25);
         $this->addAccount($acc1, 'no-replay');
+        
     }
     /**
      * Adds an email account.
@@ -97,6 +100,7 @@ class EmailAccount {
     private $password;
     private $name;
     private $emailServerAddress;
+    private $port;
     
     public function setServerAddress($addr){
         $this->emailServerAddress = $addr;
@@ -137,5 +141,13 @@ class EmailAccount {
     
     public function getServerAddress() {
         return $this->emailServerAddress;
+    }
+    
+    public function getPort() {
+        return $this->port;
+    }
+    
+    public function setPort($port){
+        $this->port = $port;
     }
 }

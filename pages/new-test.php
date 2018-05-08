@@ -28,13 +28,13 @@
 require_once '../root.php';
 
 //sets the translation
-PageAttributes::get()->loadTranslation(TRUE);
+Page::get()->loadTranslation(TRUE);
 
 //load theme
-PageAttributes::get()->loadTheme();
+Page::get()->loadTheme();
 
-PageAttributes::get()->setTitle('Test Page As php');
+Page::get()->setTitle('Test Page As php');
 
-PageAttributes::get()->setDescription('This is a test page');
+Page::get()->setDescription('This is a test page');
 
 publishAsPHP('test');

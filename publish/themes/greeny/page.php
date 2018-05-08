@@ -27,23 +27,23 @@
  * 
  * @return HTMLDoc
  */
-function getDoc(){
+function getDoc($dynamic=TRUE){
     $document = new HTMLDoc();
     $document->setHeadNode(getHeadNode());
-    $document->setLanguage(PageAttributes::get()->getLang());
+    $document->setLanguage(Page::get()->getLang());
     return $document;
 }
 
 function publishAsHTML($path){
     $document = new HTMLDoc();
     $document->setHeadNode(getHeadNode());
-    $document->setLanguage(PageAttributes::get()->getLang());
+    $document->setLanguage(Page::get()->getLang());
     $document->saveToFile($path, TRUE, 'html');
 }
 
 function publishAsPHP($path){
     $document = new HTMLDoc();
     $document->setHeadNode(getHeadNode(TRUE,'http://localhost/test.php'));
-    $document->setLanguage(PageAttributes::get()->getLang());
+    $document->setLanguage(Page::get()->getLang());
     $document->saveToFile($path, TRUE, 'php');
 }

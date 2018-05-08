@@ -10,6 +10,24 @@ const LANGUAGE = array(
         'loading'=>'جاري التحميل...'
     ),
     'pages'=>array(
+        'activate-account'=>array(
+            'title'=>'تفعيل حساب المستخدم',
+            'description'=>'صفحة تفعيل الحساب',
+            'success'=>'Account Activated!',
+            'labels'=>array(
+                'main'=>'تفعيل حسابك بالنظام',
+                'activation-token'=>'رمز التفعيل:'
+            ),
+            'placeholders'=>array(
+                'activation-token'=>' أدخل رمز تفعيل الحساب هنا.'
+            ),
+            'actions'=>array(
+                'activate'=>'تفعيل'
+            ),
+            'errors'=>array(
+                'inncorect-token'=>'رمز التفعيل غير صحيح!'
+            )
+        ),
         'login'=>array(
             'title'=>'تسجيل الدخول',
             'description'=>'تسجيل الدخول إلى النظام.',

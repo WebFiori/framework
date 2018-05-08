@@ -1,8 +1,8 @@
 <?php
 
 function dynamicFooter(){
-    if(PageAttributes::get()->getLang() != NULL){
-        if(PageAttributes::get()->getWritingDir()){
+    if(Page::get()->getLang() != NULL){
+        if(Page::get()->getWritingDir()){
             return '<?php echo staticFooter()?>';
         }
         else{
@@ -15,9 +15,9 @@ function dynamicFooter(){
 }
 
 function staticFooter(){
-    if(PageAttributes::get()->getWritingDir() != null && PageAttributes::get()->getLang() != NULL){
+    if(Page::get()->getWritingDir() != null && Page::get()->getLang() != NULL){
         $tag = new HTMLTag(5);
-        $tag->openTag('<footer id="footer" dir="'.PageAttributes::get()->getWritingDir().'" name="footer" itemtype="http://schema.org/WPFooter">');
+        $tag->openTag('<footer id="footer" dir="'.Page::get()->getWritingDir().'" name="footer" itemtype="http://schema.org/WPFooter">');
 
         $tag->closeTag('</footer>');
         return $tag.'';

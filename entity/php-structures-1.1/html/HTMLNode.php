@@ -28,7 +28,7 @@
  * A class that represents HTML or XML tag.
  *
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.0
+ * @version 1.1
  */
 class HTMLNode {
     /**
@@ -214,7 +214,46 @@ class HTMLNode {
         }
         return $retVal;
     }
-    
+    /**
+     * Returns a node based on its attribute value.
+     * @param string $attrName The name of the attribute.
+     * @param string $attrVal The value of the attribute.
+     * @return HTMLNode|NULL The function will return an object of type <b>HTMLNode</b> 
+     * if a node is found. Other than that, the function will return <b>NULL</b>.
+     */
+    public function getChildByAttributeValue($attrName,$attrVal) {
+        for($x = 0 ; $x < $this->childNodes()->size() ; $x++){
+            $ch = $this->childNodes()->get($x);
+            if($ch->hasAttribute($attrName)){
+                if($ch->getAttributeValue($attrName) == $attrVal){
+                    return $ch;
+                }
+            }
+        }
+        return NULL;
+    }
+    /**
+     * Returns the value of an attribute.
+     * @param string $attrName The name of the attribute.
+     * @return string|NULL The function will return the value of the attribute 
+     * if found. If no such attribute, the function will return NULL.
+     * @since 1.1
+     */
+    public function getAttributeValue($attrName) {
+        if($this->hasAttribute($attrName)){
+            return $this->attributes[$attrName];
+        }
+        return NULL;
+    }
+    /**
+     * Checks if the node has a given attribute or not.
+     * @param type $attrName The name of the attribute.
+     * @return boolean <b>TRUE</b> if the attribute is set.
+     * @since 1.1
+     */
+    public function hasAttribute($attrName){
+        return isset($this->attributes[$attrName]);
+    }
     public function __toString() {
         if($this->isTextNode()){
             return $this->getName();

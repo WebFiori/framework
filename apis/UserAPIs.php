@@ -54,6 +54,7 @@ class UserAPIs extends API{
         $a1->addParameter($pass);
         $a1->addParameter($a1p3);
         $a1->addParameter(new RequestParameter('access-level','integer', FALSE));
+        $a1->addParameter(new RequestParameter('display-name', 'string', TRUE));
         $this->addAction($a1);
         
         //action #2
@@ -73,7 +74,7 @@ class UserAPIs extends API{
         $this->addAction($a3,TRUE);
         
         $a6 = new APIAction();
-        $a6->setActionMethod('POST');
+        $a6->addRequestMethod('POST');
         $a6->setName('update-user-status');
         $a6->addParameter($userId);
         $a6->addParameter(new RequestParameter('status','string', FALSE));
@@ -460,7 +461,10 @@ class UserAPIs extends API{
     }
 
     public function isAuthorized() {
-        return SessionManager::get()->validateToken();
+        if($this->getAction() !== 'add-user'){
+            return UserFunctions::get()->getMainSession()->validateToken();
+        }
+        return TRUE;
     }
 }
 $api = new UserAPIs();

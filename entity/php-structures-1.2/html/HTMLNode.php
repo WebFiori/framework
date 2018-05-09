@@ -28,9 +28,15 @@
  * A class that represents HTML or XML tag.
  *
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.1
+ * @version 1.2
  */
 class HTMLNode {
+    /**
+     * The parent node of the instance.
+     * @var HTMLNode
+     * @since 1.2 
+     */
+    private $parentNode;
     /**
      * The name of the tag (such as 'div')
      * @var string
@@ -88,6 +94,23 @@ class HTMLNode {
         $this->attributes = array();
     }
     /**
+     * Returns the parent node.
+     * @return HTMLNode | NULL An object of type <b>HTMLNode</b> if the node 
+     * has a parent. If the node has no parent, the function will return <b>NULL</b>.
+     * @since 1.2
+     */
+    public function getParentNode() {
+        return $this->parentNode;
+    }
+    /**
+     * 
+     * @param HTMLNode $node
+     * @since 1.2
+     */
+    private function setParentNode($node){
+        $this->parentNode = $node;
+    }
+    /**
      * Returns a linked list of all child nodes.
      * @return LinkedList
      * @since 1.0
@@ -102,6 +125,117 @@ class HTMLNode {
      */
     public function isTextNode() {
         return $this->isText;
+    }
+    /**
+     * Checks if a given node is a child of the instance
+     * @param HTMLNode $node The node that will be checked.
+     * @return boolean <b>TRUE</b> is returned if the node is a child 
+     * of the instance. <b>FALSE</b> if not.
+     * @since 1.2
+     */
+    public function hasNode($node) {
+        if($node instanceof HTMLNode){
+            return $this->childNodes()->indexOf($node) != -1;
+        }
+        return FALSE;
+    }
+    /**
+     * Replace a node with a new one.
+     * @param HTMLNode $oldNode The old node. It must be a child of the instance.
+     * @param HTMLNode $replacement The replacement node.
+     * @return boolean <b>TRUE</b> is returned if the node replaced. <b>FALSE</b> if not.
+     * @since 1.2
+     */
+    public function replaceNode($oldNode,$replacement) {
+        if($oldNode instanceof HTMLNode){
+            if($this->hasNode($oldNode)){
+                if($replacement instanceof HTMLNode){
+                    $this->childNodes()->replace($this->childNodes()->indexOf($oldNode), $replacement);
+                    return TRUE;
+                }
+            }
+        }
+        return FALSE;
+    }
+    /**
+     * 
+     * @param string $val
+     * @param LinkedList $chList
+     * @param LinkedList $list
+     * @return LinkedList
+     */
+    private function _getChildrenByTag($val,$chList,$list){
+        $chCount = $chList->size();
+        for($x = 0 ; $x < $chCount ; $x++){
+            $child = $chList->get($x);
+            $tmpList = $child->_getChildrenByTag($val,$child->childNodes(),new LinkedList());
+            for($y = 0 ; $y < $tmpList->size() ; $y++){
+                $list->add($tmpList->get($y));
+            }
+        }
+        for($x = 0 ; $x < $chCount ; $x++){
+            $child = $chList->get($x);
+            if($child->getName() == $val){
+                $list->add($child);
+            }
+        }
+        return $list;
+    }
+    /**
+     * Returns a linked list that contains all child nodes which has the given 
+     * tag name.
+     * @param string $val The name of the tag (such as 'div' or 'a').
+     * @return LinkedList A linked list that contains all child nodes which has the given 
+     * tag name.
+     * @since 1.2
+     */
+    public function getChildrenByTag($val){
+        $val = $val.'';
+        $list = new LinkedList();
+        if(strlen($val) != 0){
+            return $this->_getChildrenByTag($val, $this->childNodes(), $list);
+        }
+        return $list;
+    }
+    /**
+     * 
+     * @param type $val
+     * @param LinkedList $chNodes
+     * @return NULL|HTMLNode Description
+     */
+    private function _getChildByID($val,$chNodes){
+        $chCount = $chNodes->size();
+        for($x = 0 ; $x < $chCount ; $x++){
+            $child = $chNodes->get($x);
+            $tmpCh = $child->_getChildByID($val,$child->childNodes());
+            if($tmpCh instanceof HTMLNode){
+                return $tmpCh;
+            }
+        }
+        for($x = 0 ; $x < $chCount ; $x++){
+            $child = $chNodes->get($x);
+            if($child->hasAttribute('id')){
+                $attrVal = $child->getAttributeValue('id');
+                if($attrVal == $val){
+                    return $child;
+                }
+            }
+        }
+        return NULL;
+    }
+    /**
+     * Returns a child node given its ID.
+     * @param string $val The ID of the child.
+     * @return NULL|HTMLNode The function returns an object of type <b>HTMLNode</b> 
+     * if found. If no node has the given ID, the function will return <b>NULL</b>.
+     * @since 1.2
+     */
+    public function getChildByID($val){
+        $val = $val.'';
+        if(strlen($val) != 0){
+            return $this->_getChildByID($val, $this->childNodes());
+        }
+        return NULL;
     }
     /**
      * Checks if the node require ending tag or not.
@@ -143,8 +277,80 @@ class HTMLNode {
      */
     public function setAttribute($name,$val=''){
         if(!$this->isTextNode() && gettype($name) == 'string' && strlen($name) != 0){
-            $this->attributes[$name] = $val;
+            $lower = strtolower($name);
+            if($name == 'dir'){
+                $lowerVal = strtolower($val);
+                if($val == 'ltr' || $val == 'rtl'){
+                    $this->attributes[$lower] = $lowerVal;
+                }
+            }
+            else{
+                $this->attributes[$lower] = $val;
+            }
         }
+    }
+    /**
+     * Sets the value of the attribute 'id' of the node.
+     * @param string $idVal The value to set.
+     * @since 1.2
+     */
+    public function setID($idVal){
+        $this->setAttribute('id',$idVal);
+    }
+    /**
+     * Sets the value of the attribute 'tabindex' of the node.
+     * @param int $val The value to set. From MDN: An integer attribute indicating if 
+     * the element can take input focus. It can takes several values: 
+     * <ul>
+     * <li>A negative value means that the element should be focusable, but 
+     * should not be reachable via sequential keyboard navigation.</li>
+     * <li>0 means that the element should be focusable and reachable via sequential 
+     * keyboard navigation, but its relative order is defined by the platform convention</li>
+     * <li>A positive value means that the element should be focusable 
+     * and reachable via sequential keyboard navigation; the order in 
+     * which the elements are focused is the increasing value of the 
+     * tabindex. If several elements share the same tabindex, their relative 
+     * order follows their relative positions in the document.</li>
+     * </ul>
+     * @since 1.2
+     */
+    public function setTabIndex($val){
+        $this->setAttribute('tabindex', $val);
+    }
+    /**
+     * Sets the value of the attribute 'title' of the node.
+     * @param string $val The value to set. From MDN: Contains a 
+     * text representing advisory information related to the element 
+     * it belongs to. Such information can typically, but not necessarily, 
+     * be presented to the user as a tooltip.
+     * @since 1.2
+     */
+    public function setTitle($val){
+        $this->setAttribute('title', $val);
+    }
+    /**
+     * Sets the value of the attribute 'dir' of the node.
+     * @param string $val The value to set. It can be 'ltr' or 'rtl'.
+     * @since 1.2
+     */
+    public function setWritingDir($val){
+        $this->setAttribute('dir', $val);
+    }
+    /**
+     * Sets the value of the attribute 'class' of the node.
+     * @param string $val The value to set.
+     * @since 1.2
+     */
+    public function setClassName($val){
+        $this->setAttribute('class',$val);
+    }
+    /**
+     * Sets the value of the attribute 'name' of the node.
+     * @param string $val The value to set.
+     * @since 1.2
+     */
+    public function setName($val){
+        $this->setAttribute('name',$val);
     }
     /**
      * Removes an attribute from the node given its name.
@@ -164,6 +370,27 @@ class HTMLNode {
         $this->childNodes->clear();
     }
     /**
+     * Removes a child node.
+     * @param HTMLNode $node The node that will be removed.
+     * @return HTMLNode|NULL The function will return the node if removed. 
+     * If not removed, the function will return <b>NULL</b>.
+     * @since 1.2
+     */
+    public function removeNode($node) {
+        if($node instanceof HTMLNode){
+            $count = $this->childNodes()->size();
+            for($x = 0 ; $x < $count ; $x++){
+                $child = $this->childNodes()->get($x);
+                if($child === $node){
+                    $this->childNodes()->remove($x);
+                    $child->setParentNode(NULL);
+                    return $child;
+                }
+            }
+        }
+        return NULL;
+    }
+    /**
      * Adds new child node.
      * @param HTMLNode $node The node that will be added. The node can have 
      * child notes only if two conditions are met. If the node is not a text node 
@@ -174,6 +401,7 @@ class HTMLNode {
         if(!$this->isTextNode() && $this->mustClose()){
             if($node instanceof HTMLNode){
                 $this->childNodes->add($node);
+                $node->setParentNode($this);
             }
         }
     }
@@ -215,7 +443,7 @@ class HTMLNode {
         return $retVal;
     }
     /**
-     * Returns a node based on its attribute value.
+     * Returns a node based on its attribute value (Direct childs).
      * @param string $attrName The name of the attribute.
      * @param string $attrVal The value of the attribute.
      * @return HTMLNode|NULL The function will return an object of type <b>HTMLNode</b> 

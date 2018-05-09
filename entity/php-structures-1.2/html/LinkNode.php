@@ -23,7 +23,7 @@
  * THE SOFTWARE.
  */
 /**
- * A class that represents &lt;a&gt; tag.
+ * A class that represents &lt;a&gt; tag with text only.
  * @author Ibrahim <ibinshikh@hotmail.com>
  * @version 1.0
  */

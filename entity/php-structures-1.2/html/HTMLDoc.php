@@ -28,39 +28,27 @@
  * A class that represents HTML document.
  *
  * @author Ibrahim
- * @version 1.1
+ * @version 1.2
  */
 class HTMLDoc {
+    /**
+     * The parent HTML Node.
+     * @var HTMLNode
+     * @since 1.2 
+     */
+    private $htmlNode;
     /**
      * The head tag of the document.
      * @var HTMLNode 
      * @since 1.0
      */
-    private $headTag;
+    private $headNode;
     /**
      * The body tag of the document
      * @var HTMLNode 
      * @since 1.0
      */
     private $body;
-    /**
-     * The footer section of the page.
-     * @var HTMLNode
-     * @since 1.1 
-     */
-    private $footer;
-    /**
-     * The header section of the page.
-     * @var HTMLNode
-     * @since 1.1 
-     */
-    private $header;
-    /**
-     * The aside navigation section of the page.
-     * @var HTMLNode
-     * @since 1.1 
-     */
-    private $asidenav;
     /**
      * The indentation space that is used to make the tags well formated.
      * @var string 
@@ -86,12 +74,6 @@ class HTMLDoc {
      */
     private $nodesStack;
     /**
-     * The language of the document. A two characters string.
-     * @var string
-     * @since 1.0 
-     */
-    private $docLang;
-    /**
      * New line character.
      * @var string 
      * @since 1.0
@@ -116,18 +98,41 @@ class HTMLDoc {
         }
         return FALSE;
     }
-    
-    public function setFooterNode($node) {
-        if($node instanceof HTMLNode){
-            $this->footer = $node;
+    /**
+     * Returns a linked list that contains all children which has the given tag 
+     * value.
+     * @param string $val The value of the tag (such as 'div' or 'input').
+     * @return LinkedList A linked list that contains all children which has the given tag 
+     * value. 
+     * @since 1.2
+     */
+    public function getChildrenByTag($val) {
+        $list = new LinkedList();
+        $hNodes = $this->headNode->getChildrenByTag($val);
+        for($x = 0 ; $x < $hNodes->size() ; $x++){
+            $list->add($hNodes->get($x));
         }
+        return $list;
+    }
+    /**
+     * Returns a child node given its ID.
+     * @param string $id The ID of the child.
+     * @return NULL|HTMLNode The function returns an object of type <b>HTMLNode</b> 
+     * if found. If no node has the given ID, the function will return <b>NULL</b>.
+     * @since 1.2
+     */
+    public function getChildByID($id) {
+        return $this->htmlNode->getChildByID($id);
     }
     /**
      * Constructs a new HTML document.
      */
     public function __construct() {
         $this->body = new HTMLNode('body', TRUE, FALSE);
-        $this->headTag = new HeadNode();
+        $this->headNode = new HeadNode();
+        $this->htmlNode = new HTMLNode('html');
+        $this->htmlNode->addChild($this->headNode);
+        $this->htmlNode->addChild($this->body);
     }
     /**
      * Sets the language of the document.
@@ -136,16 +141,20 @@ class HTMLDoc {
      */
     public function setLanguage($lang){
         if(strlen($lang) == 2){
-            $this->docLang = $lang;
+            $this->htmlNode->setAttribute('lang', $lang);
         }
     }
     /**
      * Returns the language of the document.
-     * @return string A two characters language code.
+     * @return string A two characters language code. If the language is 
+     * not set, the function will return empty string.
      * @since 1.0
      */
     public function getLanguage(){
-        return $this->docLang;
+        if($this->htmlNode->hasAttribute('lang')){
+            return $this->htmlNode->getAttributeValue('lang');
+        }
+        return '';
     }
     /**
      * Sets the value of the head node.
@@ -154,7 +163,8 @@ class HTMLDoc {
      */
     public function setHeadNode($node){
         if($node instanceof HeadNode){
-            $this->headTag = $node;
+            $this->htmlNode->replaceNode($this->headNode, $node);
+            $this->headNode = $node;
         }
     }
     public function __toString() {
@@ -194,25 +204,26 @@ class HTMLDoc {
                 }
             }
         }
-        if($this->asidenav != NULL){
-            $this->body->addChild($this->asidenav);
-        }
-        if($this->header !== NULL){
-            $this->body->addChild($this->header);
-        }
-        if($this->footer !== NULL){
-            $this->body->addChild($this->footer);
-        }
-        $html = new HTMLNode('html', TRUE, FALSE);
         $this->nodesStack = new Stack();
         $this->document = '<!DOCTYPE html>'.$this->nl;
-        $html->addChild($this->headTag);
-        $html->addChild($this->body);
-        if($this->getLanguage() != NULL){
-            $html->setAttribute('lang', $this->getLanguage());
-        }
-        $this->pushNode($html,$formatted);
+        $this->pushNode($this->htmlNode,$formatted);
         return $this->document;
+    }
+    /**
+     * Returns the node that represents the 'head' node.
+     * @return HeadNode The node that represents the 'head' node.
+     * @since 1.2
+     */
+    public function getHeadNode() {
+        return $this->headNode;
+    }
+    /**
+     * Returns the node that represents the body of the document.
+     * @return HTMLNode The node that represents the body.
+     * @since 1.2
+     */
+    public function getBody() {
+        return $this->body;
     }
     /**
      * Appends new node to the body of the document.

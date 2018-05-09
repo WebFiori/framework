@@ -28,7 +28,7 @@
  * A class that represents a linked list.
  *
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.1
+ * @version 1.2
  */
 class LinkedList {
     /**
@@ -50,7 +50,7 @@ class LinkedList {
      */
     private $size;
     /**
-     * Creats new instance of the class.
+     * Creates new instance of the class.
      */
     public function __construct() {
         $this->head = NULL;
@@ -291,6 +291,70 @@ class LinkedList {
                     }
                     $node = $nextNode;
                     $nextNode = $nextNode->next();
+                }
+            }
+        }
+        return FALSE;
+    }
+    /**
+     * Returns the index of an element.
+     * @param mixed $el The element to search for. Note that the function is using 
+     * strict comparison operator to search (===).
+     * @return int The index of the element if found. If the list does not contain 
+     * the element, the function will return -1.
+     * @since 1.2
+     */
+    public function indexOf($el){
+        if($this->size() == 1){
+            return $this->head->data() === $el ? 0 : -1;
+        }
+        else if($this->size() == 0){
+            return -1;
+        }
+        else{
+            $tmpIndex = 0;
+            $node = $this->head;
+            while ($node->next() != NULL){
+                if($node->data() === $el){
+                    return $tmpIndex;
+                }
+                $node = $node->next();
+                $tmpIndex++;
+            }
+            if($node->data() === $el){
+                return $tmpIndex;
+            }
+        }
+        return -1;
+    }
+    /**
+     * Replace an element given its index.
+     * @param int $index The index of the element that will be replaced.
+     * @param mixed $newEl The element that will be replaced.
+     * @return boolean|mixed The function will return the old element if replaced. 
+     * if the element is not replaced, the function will return <b>FALSE</b>.
+     * @since 1.2
+     */
+    public function replace($index,$newEl){
+        if($this->size() != 0){
+            if($index >= 0 && $index < $this->size()){
+                if($this->size() == 1 && $index == 0){
+                    $oldEl = $this->head->data();
+                    $this->head->setData($newEl);
+                    return $oldEl;
+                }
+                else{
+                    $tmpIndex = 0;
+                    $node = $this->head;
+                    while ($node->next() != NULL){
+                        if($tmpIndex == $index){
+                            $oldEl = $node->data();
+                            $node->setData($newEl);
+                            return $oldEl;
+                        }
+                        $node = $node->next();
+                        $tmpIndex++;
+                    }
                 }
             }
         }

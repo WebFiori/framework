@@ -33,13 +33,6 @@ class ActivationQuery extends MySQLQuery{
         $this->structure->addForeignKey($key);
     }
     /**
-     * Constructs a query that can be used to create the table.
-     * @since 1.0
-     */
-    public function createStructure(){
-        $this->createTable($this->getStructure());
-    }
-    /**
      * Returns the table that is linked with query operations.
      * @return Table an object of type <b>Table</b>.
      * @since 1.0
@@ -59,10 +52,7 @@ class ActivationQuery extends MySQLQuery{
      * @since 1.0
      */
     public function activate($userId) {
-        $this->delete(
-                $this->getStructure()->getName(), 
-                $userId,
-                $this->getStructure()->getCol('user-id')->getName());
+        $this->delete($userId, $this->getColName('user-id'));
     }
     /**
      * Constructs a query that can be used to get a user activation code.
@@ -70,10 +60,7 @@ class ActivationQuery extends MySQLQuery{
      * @since 1.0
      */
     public function getActivationCode($userId) {
-        $this->selectByColVal(
-                $this->getStructure()->getName(), 
-                $this->getStructure()->getCol('user-id')->getName(), 
-                $userId);
+        $this->selectByColVal($this->getColName('user-id'), $userId);
     }
     /**
      * Constructs a query that can be used to add new record to the activation codes 
@@ -83,9 +70,9 @@ class ActivationQuery extends MySQLQuery{
      */
     public function addNew($id){
         $arr = array(
-        $this->getStructure()->getCol('user-id')->getName()=>$id,
-        $this->getStructure()->getCol('code')->getName()=>'\''.hash('sha256',date('Y-m-d h:i:s')).'\''
+        $this->getColName('user-id')=>$id,
+        $this->getColName('code')=>'\''.hash('sha256',date('Y-m-d h:i:s')).'\''
         );
-        $this->insert($this->getStructure()->getName(), $arr);
+        $this->insert($arr);
     }
 }

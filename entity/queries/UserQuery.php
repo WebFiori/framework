@@ -3,7 +3,7 @@
  * A class that can be used to constructs different queries that is related to 
  * user.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.3
+ * @version 1.4
  */
 class UserQuery extends MySQLQuery{
     /**
@@ -27,7 +27,7 @@ class UserQuery extends MySQLQuery{
         
         //username column
         $this->structure->addColumn('username', new Column('username', 'varchar', 30));
-        $this->structure->getCol('username')->setIsUnique(TRUE);
+        $this->getCol('username')->setIsUnique(TRUE);
         
         //password column
         $this->structure->addColumn('password', new Column('pass', 'varchar', 64));
@@ -46,18 +46,11 @@ class UserQuery extends MySQLQuery{
         
         //registration date column
         $this->structure->addColumn('reg-date', new Column('reg_date', 'timestamp'));
-        $this->structure->getCol('reg-date')->setDefault('');
+        $this->getCol('reg-date')->setDefault('');
         
         //last login column
-        $this->structure->addColumn('last-login', new Column('last_login', 'timestamp'));
+        $this->addColumn('last-login', new Column('last_login', 'timestamp'));
         $this->structure->getCol('last-login')->autoUpdate();
-    }
-    /**
-     * Constructs a query that can be used to create the table.
-     * @since 1.1
-     */
-    public function createStructure(){
-        $this->createTable($this->getStructure());
     }
     /**
      * Returns the table that is linked with query operations.
@@ -80,10 +73,8 @@ class UserQuery extends MySQLQuery{
      * @since 1.3
      */
     public function updateAccessLevel($new, $id){
-        $arr = array(
-            $this->getStructure()->getCol('acc-level')->getName()=>$new
-        );
-        $this->update($this->getStructure()->getName(), $arr, $id);
+        $arr = array($this->getColName('acc-level')=>$new);
+        $this->update($arr, $id);
     }
     /**
      * Constructs a query that can be used to update 
@@ -93,10 +84,8 @@ class UserQuery extends MySQLQuery{
      * @since 1.3
      */
     public function updateDisplayName($newName, $id){
-        $arr = array(
-            $this->getStructure()->getCol('disp-name')->getName()=>'\''.$newName.'\''
-        );
-        $this->update($this->getStructure()->getName(), $arr, $id);
+        $arr = array($this->getColName('disp-name')=>'\''.$newName.'\'');
+        $this->update($arr, $id);
     }
     /**
      * Constructs a query that can be used to update the status of a user.
@@ -105,9 +94,7 @@ class UserQuery extends MySQLQuery{
      * @since 1.3
      */
     public function updateStatus($newStatus,$id){
-        $arr = array(
-            $this->getStructure()->getCol('status')->getName()=>'\''.$newStatus.'\''
-        );
+        $arr = array($this->getColName('status')=>'\''.$newStatus.'\'');
         $this->update($this->getStructure()->getName(), $arr, $id);
     }
     /**
@@ -116,7 +103,7 @@ class UserQuery extends MySQLQuery{
      * @since 1.0
      */
     public function getUserByID($id){
-        $this->selectByID($this->getStructure()->getName(), $id);
+        $this->selectByID($id);
     }
     /**
      * Constructs a query that can be used to get user information given his email 
@@ -125,11 +112,7 @@ class UserQuery extends MySQLQuery{
      * @since 1.0
      */
     public function getUserByEmail($email) {
-        $this->selectByColVal(
-                $this->getStructure()->getName(), 
-                $this->getStructure()->getCol('email')->getName(), 
-                '\''.$email.'\''
-                );
+        $this->selectByColVal($this->getColName('email'),'\''.$email.'\'');
     }
     /**
      * Constructs a query that can be used to get user information given his 
@@ -138,11 +121,7 @@ class UserQuery extends MySQLQuery{
      * @since 1.0
      */
     public function getUserByUsername($username){
-        $this->selectByColVal(
-                $this->getStructure()->getName(), 
-                $this->getStructure()->getCol('username')->getName(),
-                '\''. $username.'\''
-                );
+        $this->selectByColVal($this->getColName('username'),'\''. $username.'\'');
     }
     /**
      * Constructs a query that can be used to update the value of the column 
@@ -152,10 +131,8 @@ class UserQuery extends MySQLQuery{
      */
     public function updateLastLogin($id){
         $date = date('Y-m-d h:i:s');
-        $arr = array(
-            $this->getStructure()->getCol('last-login')->getName()=>'\''.$date.'\''
-        );
-        $this->update($this->getStructure()->getName(), $arr, $id);
+        $arr = array($this->getColName('last-login')=>'\''.$date.'\'');
+        $this->update($this->getStructureName(), $arr, $id);
     }
     /**
      * Constructs a query that can be used to insert a new user.
@@ -165,15 +142,15 @@ class UserQuery extends MySQLQuery{
     public function addUser($user) {
         if($user instanceof User){
             $arr = array(
-                $this->getStructure()->getCol('username')->getName()=>'\''.$user->getUserName().'\'',
-                $this->getStructure()->getCol('password')->getName()=>'\''.$user->getPassword().'\'',
-                $this->getStructure()->getCol('email')->getName()=>'\''.$user->getEmail().'\'',
-                $this->getStructure()->getCol('acc-level')->getName()=>$user->getAccessLevel(),
-                $this->getStructure()->getCol('disp-name')->getName()=>'\''.$user->getDisplayName().'\'',
-                $this->getStructure()->getCol('last-login')->getName()=>'\''. date('Y-m-d h:i:s').'\'',
-                $this->getStructure()->getCol('status')->getName()=>'\'N\''
+                $this->getColName('username')=>'\''.$user->getUserName().'\'',
+                $this->getColName('password')=>'\''.$user->getPassword().'\'',
+                $this->getColName('email')=>'\''.$user->getEmail().'\'',
+                $this->getColName('acc-level')=>$user->getAccessLevel(),
+                $this->getColName('disp-name')=>'\''.$user->getDisplayName().'\'',
+                $this->getColName('last-login')=>'\''. date('Y-m-d h:i:s').'\'',
+                $this->getColName('status')=>'\'N\''
             );
-            $this->insert($this->getStructure()->getName(), $arr);
+            $this->insert($arr);
         }
     }
     /**
@@ -183,10 +160,8 @@ class UserQuery extends MySQLQuery{
      * @since 1.0
      */
     public function updateEmail($newMail,$id){
-        $arr = array(
-            $this->getStructure()->getCol('email')->getName()=>'\''.$newMail.'\''
-        );
-        $this->update($this->getStructure()->getName(), $arr, $id);
+        $arr = array($this->getColName('email')=>'\''.$newMail.'\'');
+        $this->update($arr, $id);
     }
     /**
      * Constructs a query that can be used to update the password of a user given 
@@ -196,16 +171,14 @@ class UserQuery extends MySQLQuery{
      * @since 1.0
      */
     public function updatePassword($newPassHashed,$id) {
-        $arr = array(
-            $this->getStructure()->getCol('password')->getName()=>'\''.$newPassHashed.'\''
-        );
-        $this->update($this->getStructure()->getName(), $arr, $id);
+        $arr = array($this->getColName('password')=>'\''.$newPassHashed.'\'');
+        $this->update($arr, $id);
     }
     /**
      * Constructs a query that can be used to get all system users.
      * @since 1.0
      */
     public function getUsers(){
-        $this->selectAll($this->getStructure()->getName());
+        $this->selectAll();
     }
 }

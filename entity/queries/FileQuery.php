@@ -28,7 +28,7 @@
  * A base class for file based operations. Files are stored as blobs.
  *
  * @author Ibrahim
- * @version 1.0
+ * @version 1.1
  */
 class FileQuery extends MySQLQuery{
     /**
@@ -51,8 +51,8 @@ class FileQuery extends MySQLQuery{
         parent::__construct();
         $this->structure = new Table($tableName);
         $this->structure->addColumn('file-id', new Column('f_id', 'int',11));
-        $this->structure->getCol('file-id')->setIsPrimary(TRUE);
-        $this->structure->getCol('file-id')->setIsAutoInc(TRUE);
+        $this->getCol('file-id')->setIsPrimary(TRUE);
+        $this->getCol('file-id')->setIsAutoInc(TRUE);
         
         $xStoreType = strtolower($storeType);
         if($xStoreType == 'tinyblob' || $xStoreType == 'mediumblob' || $xStoreType == 'longblob'){
@@ -63,13 +63,13 @@ class FileQuery extends MySQLQuery{
         }
         
         $this->structure->addColumn('file-name', new Column('mime', 'varchar', 255));
-        $this->structure->getCol('file-name')->setDefault('File');
+        $this->getCol('file-name')->setDefault('File');
         $this->structure->addColumn('mime-type', new Column('mime', 'varchar', 250));
         $this->structure->addColumn('date-added', new Column('added_on', 'timestamp'));
-        $this->structure->getCol('date-added')->setDefault('');
-        $this->structure->addColumn('last-updated', new Column('last_updated', 'timestamp'));
-        $this->structure->getCol('last-updated')->setDefault('');
-        $this->structure->getCol('last-updated')->autoUpdate();
+        $this->getCol('date-added')->setDefault('');
+        $this->structure->addColumn('last-updated', new Column('last_updated', 'datetime'));
+        $this->getCol('last-updated')->setDefault('');
+        $this->getCol('last-updated')->autoUpdate();
     }
     /**
      * Returns the table that is used for constructing queries.
@@ -85,7 +85,7 @@ class FileQuery extends MySQLQuery{
      * @since 1.0
      */
     public function getFile($fId) {
-        $this->selectByColVal($this->getStructureName(), $this->getColName('file-id'), $fId);
+        $this->selectByColVal($this->getColName('file-id'), $fId);
     }
     /**
      * Constructs a query that can be used to add new file to the database. 
@@ -98,24 +98,25 @@ class FileQuery extends MySQLQuery{
         $this->getColName('file-name')=>'\''.$file->getName().'\'',
         $this->getColName('mime-type')=>'\''.$file->getMIMEType().'\''
         );
-        $this->insert($this->getStructureName(), $arr);
+        $this->insert($arr);
     }
     /**
      * @since 1.0
      */
     public function getLastFileID(){
-        $this->selectMaxID($this->getStructureName());
+        $this->selectMaxID();
     }
     /**
      * Adds new file or updates an already added file.
-     * @param File $file An object of type <b>File</b>.
+     * @param File $file An object of type <b>File</b>. This function can be only 
+     * apply to an already exist file.
      * @since 1.0
      */
     public function addOrUpdateFile($file){
         $array = array(
             $this->getColName('file')=>$file->getPath()
         );
-        $this->updateBlobFromFile($this->getStructure()->getName(), $array, $file->getID());
+        $this->updateBlobFromFile($array, $file->getID());
     }
     /**
      * Constructs a query that can be used to removes a file given its ID.
@@ -123,6 +124,6 @@ class FileQuery extends MySQLQuery{
      * @since 1.0
      */
     public function removeFile($fid){
-        $this->delete($this->getStructureName(), $fid, $this->getColName('file-id'));
+        $this->delete($fid, $this->getColName('file-id'));
     }
 }

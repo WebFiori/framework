@@ -229,9 +229,7 @@ class User implements JsonI{
         $json->add('reg-date', $this->getRegDate());
         $json->add('last-login', $this->getLastLogin());
         $json->add('display-name', $this->getDisplayName());
-        if($this->getActivationTok() !== NULL){
-            $json->add('activation-token', $this->getActivationTok());
-        }
+        $json->add('token', $this->getToken());
         return $json;
     }
     /**

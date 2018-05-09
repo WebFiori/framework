@@ -71,15 +71,7 @@ class DatabaseLink implements JsonI{
     public function getErrorMessage(){
         return $this->lastErrorMessage;
     }
-    /*
-     * 
-     * @param type $str
-     * @return type
-     */
-//    public function escapeString($str){
-//        return mysqli_real_escape_string ( $this->link , $str );
-//    }
-    
+
     public function __construct($host, $user, $password) {
         //set_error_handler(errorHandeler('Connection to database was refused!'));
         $this->link = @mysqli_connect($host, $user, $password);

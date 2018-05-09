@@ -3,9 +3,16 @@
  * A class that represents a foreign key.
  *
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.1
+ * @version 1.2
  */
 class ForeignKey {
+    /**
+     * A constant that is returned by some functions to tell that the 
+     * name of the foreign key is invalid.
+     * @var string 
+     * @since 1.2
+     */
+    const INV_KEY_NAME = 'inv_key_nm';
     /**
      * An array of allowed conditions for 'on delete' and 'on update'.
      * @var array 
@@ -62,7 +69,8 @@ class ForeignKey {
      * @param string $name The name of the key. It must be a string and its not empty. 
      * Also it must not contain any spaces or any characters other than A-Z, a-z and 
      * underscore.
-     * @return boolean <b>TRUE</b> if the name of the key is set. <b>FALSE</b> in 
+     * @return boolean|string <b>TRUE</b> if the name of the key is set. The function will 
+     * return the constant <b>ForeignKey::INV_KEY_NAME</b> in 
      * case if the given key name is invalid.
      * @since 1.1
      */
@@ -71,7 +79,7 @@ class ForeignKey {
             $this->keyName = $name;
             return TRUE;
         }      
-        return FALSE;
+        return ForeignKey::INV_KEY_NAME;
     }
     /**
      * A function that is used to validate the names of the key attributes (such as source column 

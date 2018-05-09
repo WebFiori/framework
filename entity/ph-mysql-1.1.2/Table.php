@@ -3,9 +3,23 @@
  * A class that represents MySQL table.
  *
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.3
+ * @version 1.4
  */
 class Table {
+    /**
+     * A constant that is returned by some functions to tell that the 
+     * table does not have a given column name.
+     * @var string 
+     * @since 1.4
+     */
+    const NO_SUCH_COL = 'no_such_col';
+    /**
+     * A constant that is returned by some functions to tell that the 
+     * name of the table is invalid.
+     * @var string 
+     * @since 1.4
+     */
+    const INV_TABLE_NAME = 'inv_table_name';
     /**
      * The order of the table in the database.
      * @var int The order of the table in the database. The value 
@@ -55,7 +69,7 @@ class Table {
      * 'table' will be used as default.
      */
     public function __construct($tName = 'table') {
-        if(!$this->setName($tName)){
+        if($this->setName($tName)== Table::INV_TABLE_NAME){
             $this->setName('table');
         }
         $this->engin = 'InnoDB';
@@ -115,6 +129,48 @@ class Table {
             $key->setSourceTable($this->getName());
             array_push($this->foreignKeys, $key);
             return TRUE;
+        }
+        return FALSE;
+    }
+    /**
+     * Adds a foreign key to the table.
+     * @param Table $refTable The table that will be referenced.
+     * @param string $refColName The name of the column that will be referenced. It must 
+     * be a column in the referenced table.
+     * @param string $targetCol The target column. It must be a column in the current 
+     * instance.
+     * @param string $keyname The name of the foreign key.
+     * @return boolean <b>TRUE</b> if the key is added. <b>FALSE</b> otherwise.
+     * @see ForeignKey
+     */
+    public function addReference($refTable,$refColName,$targetCol,$keyname){
+        if($refTable instanceof Table){
+            $fk = new ForeignKey();
+            if($fk->setKeyName($keyname) === TRUE){
+                if($fk->setReferenceCol($refColName) === TRUE){
+                    if($fk->setReferenceTable($refTable->getName()) === TRUE){
+                        if($this->hasColumn($targetCol)){
+                            $fk->setSourceCol($targetCol);
+                            $fk->setReferenceTable($this->getName());
+                            return $this->addForeignKey($fk);
+                        }
+                    }
+                }
+            }
+        }
+        return FALSE;
+    }
+    /**
+     * Checks if a key with the given name exist on the table or not.
+     * @param string $keyName The name of the key.
+     * @return boolean <b>TRUE</b> if the table has a key. <b>FALSE</b> if not.
+     * @since 1.4
+     */
+    public function hasForeignKey($keyName){
+        foreach ($this->forignKeys() as $val){
+            if($keyName == $val->getKeyName()){
+                return TRUE;
+            }
         }
         return FALSE;
     }
@@ -194,6 +250,15 @@ class Table {
             }
         }
         return FALSE;
+    }
+    /**
+     * Checks if the table has a column or not.
+     * @param @param string $key The index at which the column might be exist.
+     * @return boolean <b>TRUE</b> if the column exist. <b>FALSE</b> otherwise.
+     * @since 1.4
+     */
+    public function hasColumn($colKey) {
+        return isset($this->colSet[$colKey]);
     }
     /**
      * Returns the column object given the key that it was stored in.

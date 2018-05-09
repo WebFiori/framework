@@ -2,9 +2,30 @@
 /**
  * A class that represents a column in MySQL table.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.1
+ * @version 1.2
  */
 class Column{
+    /**
+     * A constant that is returned by some functions to tell that the 
+     * name of a column is invalid.
+     * @var string 
+     * @since 1.2
+     */
+    const INV_COL_NAME = 'inv_col_nm';
+    /**
+     * A constant that is returned by some functions to tell that the 
+     * datatype of a column is invalid.
+     * @var string 
+     * @since 1.2
+     */
+    const INV_COL_DATATYPE = 'inv_col_datatype';
+    /**
+     * A constant that is returned by some functions to tell that the 
+     * size datatype of a column is invalid (for 'varchar' and 'int').
+     * @var string 
+     * @since 1.2
+     */
+    const INV_DATASIZE = 'inv_col_datatype';
     /**
      * An array of supported data types.
      * <p>The supported types are:</p>
@@ -96,14 +117,14 @@ class Column{
      * value.
      */
     public function __construct($colName='col',$datatype='varchar',$size=1) {
-        if(!$this->setName($colName)){
+        if($this->setName($colName) == Column::INV_COL_NAME){
             $this->setName('col');
         }
-        if(!$this->setType($datatype)){
+        if($this->setType($datatype) == Column::INV_COL_DATATYPE){
             $this->setType('varchar');
         }
         if($this->getType() == 'varchar' || $this->getType() == 'int'){
-            if(!$this->setSize($size)){
+            if($this->setSize($size) == Column::INV_DATASIZE){
                 $this->setSize(1);
             }
         }
@@ -148,7 +169,7 @@ class Column{
      * Also it must not contain any spaces or any characters other than A-Z, a-z and 
      * underscore.
      * @return boolean <b>TRUE</b> if the column name updated. If the given value 
-     * is <b>NULL</b> or invalid string, the method will return <b>FALSE</b>.
+     * is <b>NULL</b> or invalid string, the method will return <b>Column::INV_COL_NAME</b>.
      * @since 1.0
      */
     public function setName($name){
@@ -161,7 +182,7 @@ class Column{
                             
                         }
                         else{
-                            return FALSE;
+                            return Column::INV_COL_NAME;
                         }
                     }
                     $this->name = $name;
@@ -169,7 +190,7 @@ class Column{
                 }
             }
         }
-        return FALSE;
+        return Column::INV_COL_NAME;
     }
     /**
      * Returns the name of the column.
@@ -240,7 +261,7 @@ class Column{
      * @param int $size Size of column data (for 'int' and 'varchar'). If the passed 
      * size is invalid, 1 will be used.
      * @param mixed $default Default value for the column.
-     * @return boolean <b>TRUE</b> if the data type is set. <b>FALSE</b> otherwise.
+     * @return boolean <b>TRUE</b> if the data type is set. <b>Column::INV_COL_DATATYPE</b> otherwise.
      * @since 1.0
      */
     public function setType($type,$size=1,$default=null){
@@ -264,7 +285,7 @@ class Column{
             }
             return TRUE;
         }
-        return FALSE;
+        return Column::INV_COL_DATATYPE;
     }
     /**
      * Returns the type of column data (such as 'varchar').
@@ -297,8 +318,12 @@ class Column{
                 return TRUE;
             }
         }
-        else if($type == 'timestamp' || $type == 'datetime'){
+        else if($type == 'timestamp'){
             $this->default = 'current_timestamp';
+            return TRUE;
+        }
+        else if($type == 'datetime'){
+            $this->default = 'now()';
             return TRUE;
         }
         return FALSE;
@@ -317,7 +342,9 @@ class Column{
      * @param int $size The size to set. If the data type of the column is 'int', 
      * the maximum size is 11. If a number greater than 11 is given, the value will 
      * be set to 11. The maximum size for the 'varchar' is not specified.
-     * @return boolean <b>TRUE</b> if the size is set. <b>FALSE</b> otherwise.
+     * @return boolean <b>TRUE</b> if the size is set. The function will return 
+     * <b>Column::INV_DATASIZE</b> in case the size is invalid or datatype does not support 
+     * size attribute.
      * @since 1.0
      */
     public function setSize($size){
@@ -338,7 +365,7 @@ class Column{
                 return TRUE;
             }
         }
-        return false;
+        return Column::INV_DATASIZE;
     }
     /**
      * Sets the value of the property <b>$isAutoInc</b>.
@@ -416,7 +443,7 @@ class Column{
                 $retVal .= 'default \''.$default.'\' ';
             }
             else if($this->getType() == 'timestamp' || $this->getType() == 'datetime'){
-                if($default === 'current_timestamp'){
+                if($default == 'current_timestamp' || $default == 'now()'){
                     $retVal .= 'default '.$default.' ';
                 }
                 else{

@@ -5,7 +5,7 @@
  * @param int $activeURL The number of the currently open page.
  * @return string HTML code.
  */
-function staticAsideNav($dir,$activeURL=0){
+function getAsideNavNode($dir,$activeURL=0){
     $menu = new AsideMenu($dir);
 
     return ''.$menu;

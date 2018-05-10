@@ -69,7 +69,7 @@ class Table {
      * 'table' will be used as default.
      */
     public function __construct($tName = 'table') {
-        if($this->setName($tName)== Table::INV_TABLE_NAME){
+        if($this->setName($tName) !== TRUE){
             $this->setName('table');
         }
         $this->engin = 'InnoDB';

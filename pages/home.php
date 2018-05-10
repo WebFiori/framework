@@ -49,13 +49,13 @@ if(WebsiteFunctions::get()->getMainSession()->validateToken() != TRUE){
 <!DOCTYPE html>
 <html lang="<?php echo Page::get()->getLang()?>">
     <head>
-        <?php echo staticHeadTag('home', Page::get()->getLang())?>
+        <?php echo getHeadNode('home', Page::get()->getLang())?>
     </head>
     <body itemscope itemtype="http://schema.org/WebPage">
         <div class="pa-container">
             <div class="pa-row">
                 <div class="pa-row">
-                    <?php echo staticAsideNav(Page::get()->getWritingDir(),1);?>
+                    <?php echo getAsideNavNode(Page::get()->getWritingDir(),1);?>
                     <div id="pa-main-content" itemscope itemtype="http://schema.org/WebPageElement" itemprop="mainContentOfPage" dir="<?php echo Page::get()->getWritingDir()?>" class="<?php echo 'pa-'.Page::get()->getWritingDir().'-col-ten'?> show-border">
                         <header id="header" itemscope itemtype="http://schema.org/WPHeader" class="pa-row">
                             <h1 name="page-title" itemprop="name" id="page-title"><?php echo $lang['title']?></h1>
@@ -63,7 +63,7 @@ if(WebsiteFunctions::get()->getMainSession()->validateToken() != TRUE){
                         <div class="pa-row">
                             Home Page
                         </div>
-                        <?php echo staticFooter()?>
+                        <?php echo getFooterNode()?>
                     </div>
                 </div>
             </div>

@@ -49,7 +49,7 @@ Page::get()->loadTheme();
 <!DOCTYPE html>
 <html lang = "<?php echo Page::get()->getLang()?>">
     <head>
-        <?php echo staticHeadTag('login', Page::get()->getLang())?>
+        <?php echo getHeadNode('login', Page::get()->getLang())?>
         <link rel="stylesheet" href="res/css/login.css">
         <script type="text/javascript" src="res/js/APIs.js"></script>
         <script type="text/javascript" src="res/js/js-ajax-helper-1.0.0/AJAX.js"></script>

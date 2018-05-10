@@ -50,7 +50,7 @@ if(WebsiteFunctions::get()->getMainSession()->validateToken() != TRUE){
 <!DOCTYPE html>
 <html lang="<?php echo Page::get()->getLang()?>">
     <head>
-        <?php echo staticHeadTag('pages/register', Page::get()->getLang())?>
+        <?php echo getHeadNode('pages/register', Page::get()->getLang())?>
         <script type="text/javascript" src="res/js/js-ajax-helper-1.0.0/AJAX.js"></script>
         <script type="text/javascript" src="res/js/APIs.js"></script>
         <script type="text/javascript">
@@ -109,7 +109,7 @@ if(WebsiteFunctions::get()->getMainSession()->validateToken() != TRUE){
         <div class="pa-container">
             <div class="pa-row">
                 <div class="pa-row">
-                    <?php echo staticAsideNav(Page::get()->getWritingDir(),4);?>
+                    <?php echo getAsideNavNode(Page::get()->getWritingDir(),4);?>
                     <div id="pa-main-content" itemscope itemtype="http://schema.org/WebPageElement" itemprop="mainContentOfPage" dir="<?php echo Page::get()->getWritingDir()?>" class="<?php echo 'pa-'.Page::get()->getWritingDir().'-col-ten'?> show-border">
                         <header id="header" itemscope itemtype="http://schema.org/WPHeader" class="pa-row">
                             <h1 name="page-title" itemprop="name" id="page-title"><?php echo $lang['title']?></h1>
@@ -152,7 +152,7 @@ if(WebsiteFunctions::get()->getMainSession()->validateToken() != TRUE){
                                 }
                             ?>
                         </div>
-                        <?php echo staticFooter()?>
+                        <?php echo getFooterNode()?>
                     </div>
                 </div>
             </div>

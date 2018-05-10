@@ -34,97 +34,66 @@ Page::get()->loadTranslation(TRUE);
 $pageLbls = LANGUAGE['pages']['login'];
 Page::get()->setTitle($pageLbls['title']);
 Page::get()->setDescription($pageLbls['description']);
-//load theme
 Page::get()->loadTheme();
-
+$document = Page::get()->getDocument();
+$document->getHeadNode()->addCSS('publish/themes/greeny/css/login.css');
+$document->getHeadNode()->addJs('publish/themes/greeny/js/login.js');
+$container = new HTMLNode();
+$document->addNode($container);
+$container->setClassName('pa-container');
+$container->addChild(createLoginForm($pageLbls));
+echo $document->toHTML(FALSE);
 //end of page setup.
-?>
-<!DOCTYPE html>
-<html lang = "<?php echo Page::get()->getLang()?>">
-    <head>
-        <?php echo staticHeadTag('login', Page::get()->getLang())?>
-        <script type="text/javascript" src="res/js/js-ajax-helper-1.0.0/AJAX.js"></script>
-        <script type="text/javascript" src="res/js/APIs.js"></script>
-        <script type="text/javascript" src="res/js/langs/lANG_EN.js"></script>
-        <link rel="stylesheet" href="res/css/login.css">
-        <script type="text/javascript">
-            function login(){
-                document.getElementById('message').innerHTML = <?php echo '\''.LANGUAGE['general']['wait'].'\''?>;
-                var username = document.getElementById('username-input').value;
-                var password = document.getElementById('password-input').value;
-                if(username === '' || password === ''){
-                    return;
-                }
-                var keepLogged = document.getElementById('keep-me-logged').checked;
-                var sessionDuration = keepLogged === true ? '10080' : '30';
-                var refresh = keepLogged === true ? 'false' : 'true';
-                var params = 'action=login&username='+encodeURIComponent(username)+'&password='+password+
-                        '&session-duration='+sessionDuration+'&refresh-timeout='+refresh;
-                var ajax = new AJAX(
-                        {
-                                <?php
-                        if(defined('DEBUG')){
-                            echo '"enable-log":true,';
-                        }
-                        ?>
-                        url:APIS.AuthAPI.link,
-                        method:'post'
-                        }
-                );
-                ajax.setParams(params);
-                ajax.setOnSuccess(function(){
-                    console.log(this.response);
-                    document.getElementById('message').innerHTML = <?php echo '\''.$pageLbls['success'].'\''?>;
-                    var user = this.jsonResponse['session']['user'];
-                    console.log(user);
-                    if(user['status'] === 'New'){
-                        window.location.href = 'pages/activate-account';
-                    }
-                    //window.location.href = 'pages/home';
-                });
-                ajax.setOnClientError(function(){
-                    console.log(this.response);
-                    document.getElementById('message').innerHTML = <?php echo '\''.$pageLbls['errors']['incorrect-login-params'].'\''?>;
-                });
-                ajax.send();
-                return false;
-            }
-        </script>
-    </head>
-    <body itemscope itemtype="http://schema.org/WebPage">
-        <div class="pa-container">
-            <div class="pa-row">
-                <div class="pa-row">
-                    <form dir="<?php echo Page::get()->getWritingDir()?>" dir="rtl"  method="POST" id="login_form" class="pa-row">
-                        <div style="margin-bottom: 18%;text-align: center;" class="pa-row">
-                            <!--<img id="login_logo" src="res/images/favicon.png" alt="Website Logo">-->
-                            <label style="font-weight: bold; display: block; margin:auto; text-align: center; width: 100%;"><?php echo $pageLbls['labels']['main']?></label>
-                        </div>
-                        <div class="pa-row" style="background-color: #2d8659">
-                            <label for="username"><?php echo $pageLbls['labels']['username']?></label><br/>
-                            <input id="username-input" spellcheck="off" form="login_form" required placeholder="<?php echo $pageLbls['placeholders']['username']?>" type="text" name="username"/>
-                        </div>
-                        <div class="pa-row" style="background-color: #2d8659">
-                            <label for="password"><?php echo $pageLbls['labels']['password']?></label><br/>
-                            <input autocomplete="off" id="password-input" spellcheck="off" form="login_form" required placeholder="<?php echo $pageLbls['placeholders']['password']?>" type="password" name="password"/>
-                        </div>
-                        <div class="pa-row" style="background-color: #2d8659">
-                            <label id="message"></label>
-                        </div>
-                        <div class="pa-row" style="background-color: #2d8659">
-                            <input type="checkbox" id="keep-me-logged" name="keep-me-logged">
-                            <label for="keep-me-logged"><?php echo $pageLbls['keep-me-logged']?></label>
-                        </div>
-                        <div class="pa-row" style="background-color: #2d8659">
-                            <input id="login_button" value="<?php echo $pageLbls['actions']['login']?>" type="submit" onclick="return login()"/>
-                            <!--<button id="cancel_button"><?php //echo DISP_LANG_LOGIN['cancel-label']?></button>-->
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </body>
-</html>
 
-
-
+function createLoginForm($pageLbls){
+    $form = new HTMLNode('form');
+    $form->setID('login-form');
+    $form->setAttribute('method', 'post');
+    $form->setWritingDir(Page::get()->getWritingDir());
+    $form->setID('login-form');
+    $form->setClassName('pa-row');
+    $formLabeldiv = new HTMLNode();
+    $usernameDiv = new HTMLNode();
+    $usernameDiv->setAttribute('style', 'background-color: #2d8659');
+    $usernameDiv->setClassName('pa-row');
+    $usernameDiv->addChild(new Label($pageLbls['labels']['username']));
+    $usernameDiv->addChild(new Br());
+    $usernameDiv->addChild(new Input('text'));
+    $usernameDiv->childNodes()->get(2)->setID('username-input');
+    $usernameDiv->childNodes()->get(2)->setAttribute('required');
+    $passwordDiv = new HTMLNode();
+    $passwordDiv->setAttribute('style', 'background-color: #2d8659');
+    $passwordDiv->setClassName('pa-row');
+    $passwordDiv->addChild(new Label($pageLbls['labels']['password']));
+    $passwordDiv->addChild(new Br());
+    $passwordDiv->addChild(new Input('password'));
+    $passwordDiv->childNodes()->get(2)->setID('password-input');
+    $passwordDiv->childNodes()->get(2)->setAttribute('required');
+    $messageDiv = new HTMLNode();
+    $messageDiv->setAttribute('style', 'background-color: #2d8659');
+    $messageDiv->setClassName('pa-row');
+    $messageDiv->addChild(new Label(''));
+    $messageDiv->childNodes()->get(0)->setID('message');
+    $keepLoginDiv = new HTMLNode();
+    $keepLoginDiv->setAttribute('style', 'background-color: #2d8659');
+    $keepLoginDiv->setClassName('pa-row');
+    $keepLoginDiv->addChild(new Input('checkbox'));
+    $keepLoginDiv->addChild(new Label($pageLbls['labels']['keep-me-logged']));
+    $keepLoginDiv->childNodes()->get(0)->setID('keep-me-logged');
+    $submitDiv = new HTMLNode();
+    $submitDiv->setAttribute('style', 'background-color: #2d8659');
+    $submitDiv->setClassName('pa-row');
+    $submitDiv->addChild(new Input('submit'));
+    $submitDiv->childNodes()->get(0)->setID('login-button');
+    $submitDiv->childNodes()->get(0)->setValue($pageLbls['actions']['login']);
+    $submitDiv->childNodes()->get(0)->setAttribute('onclick','return login()');
+    $formLabeldiv->setAttribute('style', 'margin-bottom: 18%;text-align: center;');
+    $form->addChild($formLabeldiv);
+    $form->addChild($usernameDiv);
+    $form->addChild($passwordDiv);
+    $form->addChild($keepLoginDiv);
+    $form->addChild($messageDiv);
+    $form->addChild($submitDiv);
+    $formLabeldiv->addChild(new Label($pageLbls['labels']['main']));
+    return $form;
+}

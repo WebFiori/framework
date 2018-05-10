@@ -483,11 +483,44 @@ class HTMLNode {
         return isset($this->attributes[$attrName]);
     }
     public function __toString() {
-        if($this->isTextNode()){
-            return $this->getName();
+        return $this->toHTML();
+    }
+    private $document;
+    private $nodesStack;
+    public function toHTML(){
+        $this->document = '';
+        $this->nodesStack = new Stack();
+        $this->pushNode($this);
+        return $this->document;
+    }
+    /**
+     * 
+     * @param HTMLNode $node
+     */
+    private function pushNode($node) {
+        if($node->isTextNode()){
+            $this->document .= $node->getText();
         }
         else{
-            return $this->getName().'[children-count:'.$this->childNodes()->size().', attributes-count:'.count($this->getAttributes()).']';
+            if($node->mustClose()){
+                $chCount = $node->childNodes()->size();
+                $this->nodesStack->push($node);
+                $this->document .= $node->asHTML();
+                for($x = 0 ; $x < $chCount ; $x++){
+                    $nodeAtx = $node->childNodes()->get($x);
+                    $this->pushNode($nodeAtx);
+                }
+                $this->popNode();
+            }
+            else{
+                $this->document .= $node->asHTML();
+            }
+        }
+    }
+    private function popNode(){
+        $node = $this->nodesStack->pop();
+        if($node != NULL){
+            $this->document .= '</'.$node->getName().'>';
         }
     }
 }

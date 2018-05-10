@@ -49,7 +49,7 @@ class UserQuery extends MySQLQuery{
         $this->getCol('reg-date')->setDefault('');
         
         //last login column
-        $this->addColumn('last-login', new Column('last_login', 'timestamp'));
+        $this->structure->addColumn('last-login', new Column('last_login', 'timestamp'));
         $this->structure->getCol('last-login')->autoUpdate();
     }
     /**
@@ -132,7 +132,7 @@ class UserQuery extends MySQLQuery{
     public function updateLastLogin($id){
         $date = date('Y-m-d h:i:s');
         $arr = array($this->getColName('last-login')=>'\''.$date.'\'');
-        $this->update($this->getStructureName(), $arr, $id);
+        $this->update($arr, $id);
     }
     /**
      * Constructs a query that can be used to insert a new user.

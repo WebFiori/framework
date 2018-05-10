@@ -32,7 +32,6 @@ const LANGUAGE = array(
             'description'=>'Login to the system.',
             'title'=>'Login Page',
             'success'=>'You are logged in.',
-            'keep-me-logged'=>'Keep me logged in for one week.',
             'actions'=>array(
                 'login' => 'Login',
             ),
@@ -40,6 +39,7 @@ const LANGUAGE = array(
                 'main'=>'Login to The System',
                 'username' => 'Username or email:',
                 'password' => 'Password:',
+                'keep-me-logged'=>'Keep me logged in for one week.',
             ),
             'placeholders'=>array(
                 'username' => 'Enter Your Username or Email',

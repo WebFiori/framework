@@ -26,7 +26,7 @@ Page::get()->setDescription(ERR_PAGE_LANG['error'].' '.$error.'. '.$errInfo['mes
 <!DOCTYPE html>
 <html <?php echo 'lang="'.Page::get()->getLang().'"'?> >
     <head>
-        <?php echo staticHeadTag('errors/error?err='.$error, Page::get()->getLang())?>
+        <?php echo getHeadNode('errors/error?err='.$error, Page::get()->getLang())?>
     </head>
     <body itemscope itemtype="http://schema.org/WebPage">
         <div class="pa-container">
@@ -46,7 +46,7 @@ Page::get()->setDescription(ERR_PAGE_LANG['error'].' '.$error.'. '.$errInfo['mes
                                 </div>
                             </div>
                         </div>
-                        <?php echo staticFooter()?>
+                        <?php echo getFooterNode()?>
                     </div>
                 </div>
             </div>

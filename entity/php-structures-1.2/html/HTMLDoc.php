@@ -162,7 +162,7 @@ class HTMLDoc {
      * @since 1.0
      */
     public function setHeadNode($node){
-        if($node instanceof HeadNode){
+        if($node instanceof HTMLNode){
             $this->htmlNode->replaceNode($this->headNode, $node);
             $this->headNode = $node;
         }

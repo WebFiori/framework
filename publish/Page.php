@@ -6,7 +6,7 @@ define('THEMES_DIR','publish/themes');
 /**
  * A class used to initialize main page components.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.1
+ * @version 1.2
  */
 class Page{
     /**
@@ -28,6 +28,18 @@ class Page{
      */
     private $contentDir;
     /**
+     * A variable that is set to <b>TRUE</b> if page has footer.
+     * @var boolean A variable that is set to <b>TRUE</b> if page has footer.
+     * @since 1.2 
+     */
+    private $incFooter;
+    /**
+     * A variable that is set to <b>TRUE</b> if page has header.
+     * @var boolean A variable that is set to <b>TRUE</b> if page has header.
+     * @since 1.2 
+     */
+    private $incHeader;
+    /**
      * The language of the page.
      * @var string
      * @since 1.0 
@@ -46,19 +58,47 @@ class Page{
      */
     private $description;
     /**
+     * The canonical page URL.
+     * @var type 
+     * @since 1.2
+     */
+    private $canonical;
+    /**
      * A boolean value that is set to true once the theme is loaded.
      * @var boolean 
      * @since 1.1
      */
     private $isThemeLoaded;
+    /**
+     * Sets the canonical URL of the page.
+     * @since 1.2
+     * @param string $url The canonical URL of the page.
+     */
+    public function setCanonical($url){
+        if(strlen($url) != 0){
+            $this->canonical = $url;
+        }
+    }
+    /**
+     * Returns the canonical URL of the page.
+     * @return NULL|string The function will return the  canonical URL of the page 
+     * if set. If not, the function will return <b>NULL</b>.
+     * @since 1.2
+     */
+    public function getCanonical() {
+        return $this->canonical;
+    }
     private function __construct() {
         $this->title = NULL;
         $this->contentDir = NULL;
         $this->description = NULL;
         $this->contentLang = NULL;
         $this->isThemeLoaded = FALSE;
+        $this->incFooter = FALSE;
+        $this->incHeader = FALSE;
         WebsiteFunctions::get()->getMainSession()->initSession(FALSE, TRUE);
     }
+    
     private static $instance;
     /**
      * Returns a single instance of <b>Page</b>
@@ -87,12 +127,13 @@ class Page{
      * @throws Exception If page theme is not loaded.
      * @since 1.1
      */
-    public function getDocument($dynamic=true){
+    public function getDocument($dynamic=false){
         $document = new HTMLDoc();
         if($this->isThemeLoaded()){
-            $document->setHeadNode(getHeadNode($dynamic));
-            $document->setFooterNode(getFooterNode($dynamic));
             $document->setLanguage($this->getLang());
+            $document->setHeadNode($this->getHead($dynamic));
+            $document->addNode($this->getHeader($dynamic));
+            $document->addNode($this->getFooter($dynamic));
             return $document;
         }
         throw new Exception('Theme is not loaded. Call the function Page::loadTheme() first.');
@@ -270,6 +311,78 @@ class Page{
         else{
             throw new Exception('Unknown writing direction: '.$dir);
         }
+    }
+    /**
+     * Sets the property that is used to check if page has a header section or not.
+     * @param boolean $bool <b>TRUE</b> to include the header section. <b>FALSE</b> if 
+     * not.
+     * @since 1.2
+     */
+    public function setHasHeader($bool){
+        if(gettype($bool) == 'boolean'){
+            $this->incHeader = $bool;
+        }
+    }
+    /**
+     * Sets the property that is used to check if page has a footer section or not.
+     * @param boolean $bool <b>TRUE</b> to include the footer section. <b>FALSE</b> if 
+     * not.
+     * @since 1.2
+     */
+    public function setHasFooter($bool){
+        if(gettype($bool) == 'boolean'){
+            $this->incFooter = $bool;
+        }
+    }
+    /**
+     * Checks if the page will have a footer section or not.
+     * @return boolean <b>TRUE</b> if the page has a footer section.
+     * @since 1.2
+     */
+    public function hasFooter(){
+        return $this->incFooter;
+    }
+    /**
+     * Checks if the page will have a header section or not.
+     * @return boolean <b>TRUE</b> if the page has a header section.
+     * @since 1.2
+     */
+    public function hasHeader(){
+        return $this->incHeader;
+    }
+    
+    private function getHeader($dynamic=true){
+        if($this->hasHeader()){
+            if($dynamic){
+                $node = new HTMLNode('', FALSE, TRUE);
+                $node->setText('<?php getHeaderNode() ?>');
+                return $node;
+            }
+            else{
+                return dynamicPageHeader();
+            }
+        }
+    }
+    private function getFooter($dynamic=true){
+        if($this->hasFooter()){
+            if($dynamic){
+                $node = new HTMLNode('', FALSE, TRUE);
+                $node->setText('<?php getFooterNode() ?>');
+                return $node;
+            }
+            else{
+                return getFooterNode();
+            }
+        }
+    }
+    
+    private function getHead($dynamic=true){
+        if($dynamic){
+            $textNode = new HTMLNode('', FALSE, TRUE);
+            $textNode->setText('<?php getHeadNode(\''.$this->getCanonical().'\',\''.$this->getTitle().'\',\''.$this->getDescription().'\') ?>');
+            return $textNode;
+        }
+        return getHeadNode($this->getCanonical(), $this->getTitle(), $this->getDescription());
     }
 }
 

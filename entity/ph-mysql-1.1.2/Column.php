@@ -117,14 +117,14 @@ class Column{
      * value.
      */
     public function __construct($colName='col',$datatype='varchar',$size=1) {
-        if($this->setName($colName) == Column::INV_COL_NAME){
+        if($this->setName($colName) !== TRUE){
             $this->setName('col');
         }
-        if($this->setType($datatype) == Column::INV_COL_DATATYPE){
+        if($this->setType($datatype) !== TRUE){
             $this->setType('varchar');
         }
         if($this->getType() == 'varchar' || $this->getType() == 'int'){
-            if($this->setSize($size) == Column::INV_DATASIZE){
+            if($this->setSize($size) !== TRUE){
                 $this->setSize(1);
             }
         }

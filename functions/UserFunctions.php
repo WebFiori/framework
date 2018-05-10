@@ -235,8 +235,8 @@ class UserFunctions extends Functions{
                     if($this->excQ($this->query)){
                         $user->setDisplayName($newDispName);
                         if($user->getID() == $this->getUserID()){
-                                SessionManager::get()->getUser()->setDisplayName($newDispName);
-                            }
+                            $this->getMainSession()->getUser()->setDisplayName($newDispName);
+                        }
                         return $user;
                     }
                     else{
@@ -361,7 +361,7 @@ class UserFunctions extends Functions{
                         if($this->excQ($this->query)){
                             $user->setEmail($email);
                             if($user->getID() == $this->getUserID()){
-                                SessionManager::get()->getUser()->setEmail($email);
+                                $this->getMainSession()->getUser()->setEmail($email);
                             }
                             return $user;
                         }

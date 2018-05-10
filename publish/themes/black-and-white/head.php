@@ -4,7 +4,7 @@
  * Modify the content of this function to add custom head tags.
  * @return string Head tags as HTML string.
  */
-function staticHeadTag($canonical='',$lang=LANG_EN){
+function getHeadNode($canonical='',$lang=LANG_EN){
     //must set the language first.
     Page::get()->setLang($lang);
     

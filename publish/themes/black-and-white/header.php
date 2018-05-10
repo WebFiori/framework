@@ -6,7 +6,7 @@
  * components.
  * @return string The header as HTML string.
  */
-function staticPageHeader(){
+function getHeaderNode(){
         $header = new HTMLTag(3);
         $header->openTag('<div id="page-header">');
 

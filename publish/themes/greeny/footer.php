@@ -1,20 +1,5 @@
 <?php
-
-function dynamicFooter(){
-    if(Page::get()->getLang() != NULL){
-        if(Page::get()->getWritingDir()){
-            return '<?php echo staticFooter()?>';
-        }
-        else{
-            throw new Exception('Writing direction of the page is not set.');
-        }
-    }
-    else{
-        throw new Exception('Language of the page is not set.');
-    }
-}
-
-function staticFooter(){
+function getFooterNode(){
     if(Page::get()->getWritingDir() != null && Page::get()->getLang() != NULL){
         $node = new HTMLNode('div');
         $node->setAttribute('class', 'pa-row');
@@ -42,16 +27,5 @@ function staticFooter(){
         $div->addChild($textNode);
         $fNode->addChild($div);
         return $node;
-    }
-}
-
-function getFooterNode($dynamic=TRUE){
-    if($dynamic){
-        $node = new HTMLNode('', FALSE, TRUE);
-        $node->setText(dynamicFooter());
-        return $node;
-    }
-    else{
-        return staticFooter();
     }
 }

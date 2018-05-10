@@ -5,7 +5,10 @@
  * @param int $activeURL The number of the currently open page.
  * @return string HTML code.
  */
-function staticAsideNav($dir,$activeURL=0){
+function getAsideNavNode($dir,$activeURL=0){
+    $menu = new HTMLNode('div');
+    $menu->setID('aside-nav-container');
+    return $menu;
     $menu = new AsideMenu($dir);
     $menu->addLink('pages/logout',LANGUAGE['aside']['logout']);
     $menu->addLink('pages/home',LANGUAGE['aside']['home']);
@@ -15,13 +18,5 @@ function staticAsideNav($dir,$activeURL=0){
     $menu->addLink('pages/sys-info',LANGUAGE['aside']['sys-info']);
     $menu->setActive($activeURL);
     return ''.$menu;
-}
-/**
- * Returns a string of PHP code that can be used to include aside navigation in 
- * the page dynamically. 
- * @return string
- */
-function dynamicAsideNanv($dir,$active=0){
-    return '<?php echo staticAsideNav(\''.$dir.'\','.$active.')?>'; 
 }
 

@@ -14,7 +14,7 @@ function dynamicFooter(){
     }
 }
 
-function staticFooter(){
+function getFooterNode(){
     if(Page::get()->getWritingDir() != null && Page::get()->getLang() != NULL){
         $tag = new HTMLTag(5);
         $tag->openTag('<footer id="footer" dir="'.Page::get()->getWritingDir().'" name="footer" itemtype="http://schema.org/WPFooter">');

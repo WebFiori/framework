@@ -6,7 +6,10 @@
  * components.
  * @return string The header as HTML string.
  */
-function staticPageHeader(){
+function getHeaderNode(){
+    $headerSec = new HTMLNode();
+    $headerSec->setClassName('pa-row');
+    
     if(isLangAndDirSet()){
         $arMainMenu = array();
         array_push($arMainMenu, new Link('ar\java\datatypes', 'أنواع البيانات'));
@@ -63,16 +66,7 @@ function staticPageHeader(){
         $header->closeTag('</div>');
         $header->closeTag('</div>');
         $header->closeTag('</div>');
-        return ''.$header;
+        return $headerSec;
     }
-}
-/**
- * Returns a string of PHP code that can be used to include the top part of 
- * the page dynamically. Do not modify.
- * @return string
- */
-function dynamicPageHeader(){
-    $retVal = '<?php echo staticPageHeader()?>';
-    return $retVal;
 }
 

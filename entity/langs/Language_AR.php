@@ -10,6 +10,28 @@ const LANGUAGE = array(
         'loading'=>'جاري التحميل...'
     ),
     'pages'=>array(
+        'setup'=>array(
+            'welcome'=>array(
+                'title'=>'',
+                'description'=>''
+            ),
+            'database-setup'=>array(
+                'title'=>'',
+                'description'=>''
+            ),
+            'admin-account'=>array(
+                'title'=>'',
+                'description'=>''
+            ),
+            'website-config'=>array(
+                'title'=>'',
+                'description'=>''
+            ),
+            'finish'=>array(
+                'title'=>'',
+                'description'=>''
+            )
+        ),
         'activate-account'=>array(
             'title'=>'تفعيل حساب المستخدم',
             'description'=>'صفحة تفعيل الحساب',

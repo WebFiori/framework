@@ -10,6 +10,28 @@ const LANGUAGE = array(
         'loading'=>'Loading...'
     ),
     'pages'=>array(
+        'setup'=>array(
+            'welcome'=>array(
+                'title'=>'Welcome',
+                'description'=>'Fist page.'
+            ),
+            'database-setup'=>array(
+                'title'=>'Database Setup',
+                'description'=>''
+            ),
+            'admin-account'=>array(
+                'title'=>'Creating Admin Account',
+                'description'=>''
+            ),
+            'website-config'=>array(
+                'title'=>'Configuing Website',
+                'description'=>''
+            ),
+            'finish'=>array(
+                'title'=>'Finished',
+                'description'=>''
+            )
+        ),
         'activate-account'=>array(
             'title'=>'Account Activation',
             'description'=>'A page to activate user account.',

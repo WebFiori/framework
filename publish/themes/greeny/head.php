@@ -16,7 +16,6 @@ function getHeadNode($canonical='',$title='',$description=''){
     $headTag->addCSS($GLOBALS['THEME_META']['css-directory'].'\programming-academia.css');
     $headTag->addJs('res/js/js-ajax-helper-1.0.0/AJAX.js');
     $headTag->addJs('res/js/APIs.js');
-    $headTag->addMeta('copyright', SiteConfig::get()->getCopyright());
     $headTag->addMeta('robots', 'index, follow');
     return $headTag;
 }

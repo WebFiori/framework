@@ -37,12 +37,12 @@ class SysAPIs extends API{
         $this->setVersion('1.0.1');
         $a1 = new APIAction();
         $a1->addRequestMethod('GET');
-        $a1->setName('get-template-info');
+        $a1->setName('get-site-info');
         $this->addAction($a1,TRUE);
         
         $a3 = new APIAction();
         $a3->addRequestMethod('GET');
-        $a3->setName('get-sys-version');
+        $a3->setName('get-sys-info');
         $this->addAction($a3,TRUE);
         
         $a4 = new APIAction();
@@ -65,37 +65,44 @@ class SysAPIs extends API{
         $this->addAction($a6, TRUE);
         
         $a7 = new APIAction();
-        $a7->setName('run-setup');
-        $a7->addRequestMethod('get');
+        $a7->setName('create-first-account');
+        $a7->addRequestMethod('post');
         $a7->addParameter(new RequestParameter('username', 'string'));
         $a7->addParameter(new RequestParameter('password', 'string'));
         $a7->addParameter(new RequestParameter('email', 'string'));
         $this->addAction($a7);
+        
+        $a8 = new APIAction();
+        $a8->setName('update-site-info');
+        $a8->addRequestMethod('post');
+        $a8->addParameter(new RequestParameter('site-name', 'string'));
+        $a8->addParameter(new RequestParameter('description', 'string'));
+        $this->addAction($a8, TRUE);
     } 
     
     public function processRequest(){
         $action = $this->getAction();
-        if($action == 'get-sys-version'){
+        if($action == 'get-sys-info'){
             $json = new JsonX();
-            $json->add('version', Config::get()->getSysVersion());
-            $json->add('version-type', Config::get()->getVerType());
-            $this->sendResponse('Server version Information', FALSE, 200, '"info":'.$json);
+            $json->add('system-info', SystemFunctions::get()->getConfigVars());
+            $this->sendResponse('Software Information', FALSE, 200, '"info":'.$json);
         }
-        else if($action == 'get-template-info'){
+        else if($action == 'get-site-info'){
             $json = new JsonX();
-            $json->add('version', Config::get()->getTemplateVersion());
-            $json->add('version-type', Config::get()->getTemplateVersionType());
-            $json->add('template-date', Config::get()->getTemplateDate());
-            $this->sendResponse('Server PHP Template Information', FALSE, 200, '"info":'.$json);
+            $json->add('site-info', SystemFunctions::get()->getSiteConfigVars());
+            $this->sendResponse('Website Information', FALSE, 200, '"info":'.$json);
         }
         else if($action == 'get-main-session'){
             $this->sendResponse('Main Session Info', FALSE, 200, '"session":'.SystemFunctions::get()->getMainSession()->toJSON());
         }
-        else if($action == 'run-setup'){
+        else if($action == 'update-site-info'){
+            $this->actionNotImpl();
+        }
+        else if($action == 'create-first-account'){
             $this->actionNotImpl();
         }
         else if($action == 'update-database-attributes'){
-            $this->actionNotImpl();
+            $this->updateDBAttrs();
         }
         else if($action == 'get-email-accounts'){
             $j = new JsonX();
@@ -112,9 +119,62 @@ class SysAPIs extends API{
             $this->sendResponse('Email Accounts', FALSE, 200, '"accounts":'.$j);
         }
     }
-
+    /**
+     * A function that is called to update database attributes
+     * @since 1.0
+     */
+    private function updateDBAttrs() {
+        $i = $this->getInputs();
+        if(isset($i['host'])){
+            if(isset($i['database-username'])){
+                if(isset($i['database-password'])){
+                    if(isset($i['database-name'])){
+                        $r = SystemFunctions::get()->updateDBAttributes($i['host'], $i['database-username'], $i['database-password'], $i['database-name']);
+                        if($r === TRUE){
+                            $this->sendResponse('Database Updated.');
+                        }
+                        else{
+                            $this->sendResponse(SessionManager::DB_CONNECTION_ERR, TRUE, 404, '"details":'.
+                            SystemFunctions::get()->getMainSession()->getDBLink()->toJSON());
+                        }
+                    }
+                    else{
+                        $this->missingParam('database-name');
+                    }
+                }
+                else{
+                    $this->missingParam('database-password');
+                }
+            }
+            else{
+                $this->missingParam('database-username');
+            }
+        }
+        else{
+            $this->missingParam('host');
+        }
+    }
+    
     public function isAuthorized() {
-        return SystemFunctions::get()->getAccessLevel() == 0;
+        $a = $this->getAction();
+        if($a == 'update-database-attributes'){
+            if(class_exists('Config')){
+                return !Config::get()->isConfig() || 
+                    SystemFunctions::get()->getAccessLevel() == 0;
+            }
+            else{
+                return TRUE;
+            }
+        }
+        else if($a == 'create-first-account'){
+            
+        }
+        else if($a == 'get-site-info' || $a == 'get-sys-info'){
+            return SystemFunctions::get()->getAccessLevel() == 0;
+        }
+        else{
+            return SystemFunctions::get()->getAccessLevel() == 0;
+        }
     }
 }
 $SysAPIs = new SysAPIs();

@@ -90,7 +90,7 @@ class Functions {
     /**
      * Returns the number of rows resulted from executing a query.
      * @return int|NULL Number of rows resulted from executing a query. The 
-     * function will return <b>NULL</b> in case no connection was established to 
+     * function will return <b>-1</b> in case no connection was established to 
      * the database.
      * @since 1.0
      */
@@ -98,7 +98,7 @@ class Functions {
         if($this->mainSession->getDBLink() != NULL){
             return $this->getMainSession()->getDBLink()->rows();
         }
-        return NULL;
+        return -1;
     }
     /**
      * Returns A row that is resulted from executing a query.
@@ -116,25 +116,25 @@ class Functions {
     /**
      * Returns the ID of the user who is currently logged in.
      * @return int|NULL The ID of the user who is currently logged in. The 
-     * function will return <b>NULL</b> in case no user is logged in.
+     * function will return <b>-1</b> in case no user is logged in.
      * @since 1.0
      */
     public function getUserID(){
         if($this->getMainSession()->getUser() != NULL){
-            return $this->getMainSession()->getUser()->getID();
+            return intval($this->getMainSession()->getUser()->getID());
         }
-        return NULL;
+        return -1;
     }
     /**
      * Returns the access level of the logged in user.
-     * @return int|NULL The access level of the logged in user. The 
-     * function will return <b>NULL</b> in case no user is logged in.
+     * @return int The access level of the logged in user. The 
+     * function will return <b>-1</b> in case no user is logged in.
      * @since 1.0
      */
     public function getAccessLevel(){
         if($this->getMainSession()->getUser() != NULL){
-            return $this->getMainSession()->getUser()->getAccessLevel();
+            return intval($this->getMainSession()->getUser()->getAccessLevel());
         }
-        return NULL;
+        return -1;
     }
 }

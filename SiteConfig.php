@@ -23,7 +23,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-require_once 'root.php';
+
 /**
  * A configuration file for the presentation part of the system (web pages)
  * 
@@ -54,31 +54,43 @@ class SiteConfig{
      * @var string 
      * @since 1.0
      */
-    private $copyright;
+    private $homePage;
     /**
      *
-     * @var string 
-     * @since 1.0
+     * @var type 
      */
-    private $homePage;
+    private $adminPanelThemeDir;
     /**
      *
      * @var string 
      * @since 1.0
      */
     private $baseUrl;
+    /**
+     * Configuration file version number.
+     * @var string 
+     * @since 1.2
+     */
+    private $configVision;
     private $selectedThemeDir;
     private function __construct() {
+        $this->configVision = '1.2';
         $this->webSiteName = 'Programming Academia';
         $this->baseUrl = 'http://localhost/generic-php/';
         $this->titleSep = ' | ';
         $this->homePage = '<b style="color:red">&lt;Not Set&gt;</b>';
-        $this->copyright = 'All rights reserved.';
         $this->description = '<b style="color:red">&lt;Not Set&gt;</b>';
         $this->selectedThemeDir = 'publish/themes/greeny';
+        $this->adminPanelThemeDir = 'publish/themes/greeny';
     }
     public function getThemeDir() {
         return $this->selectedThemeDir;
+    }
+    public function getAdminThemeDir(){
+        return $this->adminPanelThemeDir;
+    }
+    public function getConfigFileVersion(){
+        return $this->configVision;
     }
     /**
      * Returns the base URL that is used to fetch resources.
@@ -100,14 +112,6 @@ class SiteConfig{
         }
         self::$siteCfg = new SiteConfig();
         return self::$siteCfg;
-    }
-    /**
-     * Returns the copyright notice of the website.
-     * @return string The copyright notice of the website.
-     * @since 1.0
-     */
-    public function getCopyright(){
-        return $this->copyright;
     }
     /**
      * Returns the description of the website.
@@ -147,7 +151,6 @@ class SiteConfig{
         $retVal .= 'Home Page: '.$this->getHomePage().'<br/>';
         $retVal .= 'Description: '.$this->getDesc().'<br/>';
         $retVal .= 'Title Separator: '.$this->getTitleSep().'<br/>';
-        $retVal .= 'Copyright Notice: '.$this->getCopyright().'<br/><br/>';
         return $retVal;
     }
 }

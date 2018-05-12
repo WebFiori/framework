@@ -3,7 +3,7 @@
  * Global configuration class. Used by the server part and the presentation part.
  * Do not modify this file manually unless you know what you are doing.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.1
+ * @version 1.2
  */
 class Config{
     /**
@@ -25,47 +25,53 @@ class Config{
      */
     private $templateDate;
     /**
-     *
+     * A boolean value. Set to true once system configuration is completed.
      * @var boolean 
      * @since 1.0
      */
     private $isConfigured;
     /**
-     *
+     * The name of database host.
      * @var string 
      * @since 1.0
      */
     private $dbHost;
     /**
-     *
+     * The name of database username. It must be a user with all privileges over the database.
      * @var string 
      * @since 1.0
      */
     private $dbUser;
     /**
-     *
+     * The database user's password.
      * @var string 
      * @since 1.0
      */
     private $dbPass;
     /**
-     *
+     * The name of database schema.
      * @var string 
      * @since 1.0
      */
     private $dbName;
     /**
-     *
+     * System version number.
      * @var string 
      * @since 1.0
      */
     private $systemVersion;
     /**
-     *
+     * Type of system version (beta, alpha, etc...)
      * @var string 
      * @since 1.0
      */
     private $versionType;
+    /**
+     * Configuration file version number.
+     * @var string 
+     * @since 1.2
+     */
+    private $configVision;
     /**
      * Initialize configuration.
      */
@@ -74,6 +80,7 @@ class Config{
         $this->templateDate = '10-03-2018 (DD-MM-YYYY)';
         $this->templateVersion = '0.1.2';
         $this->templateVersionType = 'Beta';
+        $this->configVision = '1.2';
         $this->dbHost = 'localhost';
         $this->dbUser = 'root';
         $this->dbPass = '132970';
@@ -81,11 +88,15 @@ class Config{
         $this->systemVersion = '0.1';
         $this->versionType = 'Alpha';
     }
-    
+    /**
+     * An instance of <b>Config</b>.
+     * @var Config 
+     * @since 1.0
+     */
     private static $cfg;
     /**
      * Returns an instance of the configuration file.
-     * @return Config
+     * @return Config An object of type <b>Config</b>.
      * @since 1.0
      */
     public static function get(){
@@ -94,6 +105,14 @@ class Config{
         }
         self::$cfg = new Config();
         return self::$cfg;
+    }
+    /**
+     * Returns the version number of configuration file.
+     * @return string The version number of configuration file.
+     * @since 1.2
+     */
+    public function getConfigFileVersion(){
+        return $this->configVision;
     }
     /**
      * Checks if the system is configured or not.
@@ -151,12 +170,27 @@ class Config{
     public function getVerType(){
         return $this->versionType;
     }
+    /**
+     * Returns template version.
+     * @return string Template version.
+     * @since 1.2
+     */
     public function getTemplateVersion(){
         return $this->templateVersion;
     }
+    /**
+     * Returns template version type.
+     * @return string Template version type.
+     * @since 1.2
+     */
     public function getTemplateVersionType(){
         return $this->templateVersionType;
     }
+    /**
+     * Returns the date at which the template is released.
+     * @return string The date at which the template is released.
+     * @since 1.0
+     */
     public function getTemplateDate(){
         return $this->templateDate;
     }

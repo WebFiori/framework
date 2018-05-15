@@ -2,9 +2,76 @@
 /**
  * PHP utility class.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.1
+ * @version 1.2
  */
 class Util{
+    /**
+     * A constant that is returned by <b>Util::checkSystemStatus()</b> to indicate 
+     * that the file 'Config.php' is missing.
+     * @since 1.2
+     */
+    const MISSING_CONF_FILE = 'missing_config_file';
+    /**
+     * A constant that is returned by <b>Util::checkSystemStatus()</b> to indicate 
+     * that the file 'SiteConfig.php' is missing.
+     * @since 1.2
+     */
+    const MISSING_SITE_CONF_FILE = 'missing_site_config_file';
+    /**
+     * A constant that is returned by <b>Util::checkSystemStatus()</b> to indicate 
+     * that system is not configured yet.
+     * @since 1.2
+     */
+    const NEED_CONF = 'sys_conf_err';
+    /**
+     * A constant that is returned by <b>Util::checkSystemStatus()</b> to indicate 
+     * that database connection was not established.
+     * @since 1.2
+     */
+    const DB_NEED_CONF = 'db_conf_err';
+    /**
+     *
+     * @var DatabaseLink 
+     */
+    private static $dbTestInstance;
+    /**
+     * 
+     * @return DatabaseLink
+     */
+    public static function getDatabaseTestInstance(){
+        Util::checkSystemStatus();
+        return self::$dbTestInstance;
+    }
+    /**
+     * 
+     * @return boolean|string The function will return <b>TRUE</b> in case everything 
+     * was fine. If the file 'Config.php' was not found, The function will return 
+     * <b>Util::MISSING_CONF_FILE</b>. If the file 'SiteConfig.php' was not found, The function will return 
+     * <b>Util::MISSING_CONF_FILE</b>. If the system is not configured yet, the function 
+     * will return <b>Util::NEED_CONF</b>. If the system is unable to connect to 
+     * the database, the function will return <b>Util::DB_NEED_CONF</b>.
+     * @since 1.2
+     */
+    public static function checkSystemStatus(){
+        if(class_exists('Config')){
+            if(class_exists('SiteConfig')){
+                if(Config::get()->isConfig() === TRUE){
+                    self::$dbTestInstance = new DatabaseLink(Config::get()->getDBHost(), Config::get()->getDBUser(), Config::get()->getDBPassword());
+                    if(self::$dbTestInstance->isConnected()){
+                        if(self::$dbTestInstance->setDB(Config::get()->getDBName())){
+                            return TRUE;
+                        }
+                    }
+                    return Util::DB_NEED_CONF;
+                }
+                else{
+                    return Util::NEED_CONF;
+                }
+            }
+            return Util::MISSING_SITE_CONF_FILE;
+        }
+        return Util::MISSING_CONF_FILE;
+    }
     /**
      * Disallow creating instances of the class.
      */
@@ -79,7 +146,7 @@ class Util{
     }
     /**
      * This function is used to construct a default base URL.
-     * @return string
+     * @return string The base URL (such as 'http//www.example.com/')
      * @since 0.2
      */
     public static function getBaseURL(){

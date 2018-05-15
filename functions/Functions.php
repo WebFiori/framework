@@ -33,12 +33,17 @@
 class Functions {
     /**
      * A constant that indicates a user is not authorized to perform specific 
-     * action.
+     * function.
      * @var string 
      * @since 1.0
      */
     const NOT_AUTH = 'not_autherized';
-    
+    /**
+     * A constant that indicates a given method parameter is an empty string.
+     * @var string Constant that indicates a given method parameter is an empty string.
+     * @since 1.0
+     */
+    const EMPTY_STRING = 'emp_string';
     public function __construct() {
         $this->mainSession = new SessionManager('pa-session');
         $this->mainSession->initSession();
@@ -49,6 +54,14 @@ class Functions {
      * @since 1.1
      */
     public function useDatabase() {
+        if(gettype($GLOBALS['SYS_STATUS']) == 'string' && $GLOBALS['SYS_STATUS'] == Util::DB_NEED_CONF && !defined('SETUP_MODE')){
+            header('content-type:application/json');
+            http_response_code(500);
+            die('{"message":"'.$GLOBALS['SYS_STATUS'].'","type":"error",'
+                    . '"details":"It seems the system is unable to connect to the database.",'
+                    . '"config-page":"'.Util::getBaseURL().'pages/setup/welcome",'
+                    . '"db-instance:'.Util::getDatabaseTestInstance()->toJSON().'}');
+        }
         $result = $this->mainSession->useDb(array(
             'host'=>Config::get()->getDBHost(),
             'user'=>Config::get()->getDBUser(),

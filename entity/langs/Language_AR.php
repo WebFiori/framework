@@ -12,23 +12,30 @@ const LANGUAGE = array(
     'pages'=>array(
         'setup'=>array(
             'welcome'=>array(
-                'title'=>'',
-                'description'=>''
+                'title'=>'اهلاً و سهلاً',
+                'description'=>'',
+                'labels'=>array(
+                    'welcome'=>'صفحة الترحيب',
+                    'database-setup'=>'تهيئة قاعدة البيانات',
+                    'admin-account'=>'حساب المسؤول',
+                    'website-config'=>'تهيئة الموقع',
+                    'finish'=>'الإنهاء'
+                )
             ),
             'database-setup'=>array(
-                'title'=>'',
+                'title'=>'تهيئة قاعدة البيانات',
                 'description'=>''
             ),
             'admin-account'=>array(
-                'title'=>'',
+                'title'=>'إنشاء حساب مسؤول النظام',
                 'description'=>''
             ),
             'website-config'=>array(
-                'title'=>'',
+                'title'=>'تهيئة الموقع',
                 'description'=>''
             ),
             'finish'=>array(
-                'title'=>'',
+                'title'=>'إنهاء',
                 'description'=>''
             )
         ),

@@ -13,7 +13,14 @@ const LANGUAGE = array(
         'setup'=>array(
             'welcome'=>array(
                 'title'=>'Welcome',
-                'description'=>'Fist page.'
+                'description'=>'Fist page.',
+                'labels'=>array(
+                    'welcome'=>'Welcome',
+                    'database-setup'=>'Database Setup',
+                    'admin-account'=>'Admin Account',
+                    'website-config'=>'Website Configuration',
+                    'finish'=>'Finish'
+                )
             ),
             'database-setup'=>array(
                 'title'=>'Database Setup',

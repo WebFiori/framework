@@ -67,12 +67,6 @@ class UserFunctions extends Functions{
      */
     const USER_ALREAY_REG = 'already_registered';
     /**
-     * A constant that indicates a given method parameter is an empty string.
-     * @var string Constant that indicates a given method parameter is an empty string.
-     * @since 1.0
-     */
-    const EMPTY_STRING = 'emp_string';
-    /**
      * A constant that indicates a given user status is not allowed.
      * @var string Constant that indicates a given user status is not allowed.
      * @since 1.1

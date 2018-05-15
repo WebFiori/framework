@@ -37,10 +37,12 @@ class LinkNode extends HTMLNode{
     public function __construct($href,$label,$target='') {
         parent::__construct('a', TRUE, FALSE);
         $this->setAttribute('href',$href);
-        $this->setAttribute('target',$target);
+        if(strlen($target) != 0){
+            $this->setAttribute('target',$target);
+        }
         $textNode = new HTMLNode('', FALSE, TRUE);
         $textNode->setText($label);
-        $this->addChild($textNode);
+        parent::addChild($textNode);
     }
     /**
      * Sets the value of the property 'href' of the link tag.
@@ -50,9 +52,13 @@ class LinkNode extends HTMLNode{
     public function setHref($link) {
         $this->setAttribute('href', $link);
     }
-    
-    private function addChild($node) {
-        parent::addChild($node);
+    /**
+     * A function that does nothing.
+     * @param type $node
+     * @since 1.0
+     */
+    public function addChild($node) {
+        
     }
     /**
      * Sets the value of the property 'target' of the link tag.

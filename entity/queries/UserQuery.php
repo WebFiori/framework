@@ -3,7 +3,7 @@
  * A class that can be used to constructs different queries that is related to 
  * user.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.4
+ * @version 1.5
  */
 class UserQuery extends MySQLQuery{
     /**
@@ -64,6 +64,24 @@ class UserQuery extends MySQLQuery{
     public function __construct() {
         parent::__construct();
         $this->init();
+    }
+    /**
+     * Constructs a query that can be used to remove a user account from 
+     * the database.
+     * @param string $userId The ID of the user.
+     * @since 1.5
+     */
+    public function removeUser($userId) {
+        $this->delete($userId);
+    }
+    /**
+     * Constructs a query that can be used to get users by 
+     * access level.
+     * @param string $accLvl Access level of the user.
+     * @since 1.5
+     */
+    public function getUsersByAccessLevel($accLvl) {
+        $this->selectByColVal($this->getColName('acc-level'), $accLvl);
     }
     /**
      * Constructs a query that can be used to update 

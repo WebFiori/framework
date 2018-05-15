@@ -6,7 +6,7 @@ define('THEMES_DIR','publish/themes');
 /**
  * A class used to initialize main page components.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.2
+ * @version 1.3
  */
 class Page{
     /**
@@ -261,6 +261,24 @@ class Page{
                 array_push($themeNames, $GLOBALS['THEME_META']);
             }
             return $themeNames;
+        }
+        throw new Exception('Unable to load theme because root directory is not defined.');
+    }
+    /**
+     * Loads the selected admin panel theme.
+     * @return boolean <b>TRUE</b> if selected theme is loaded.
+     * @since 1.0
+     * @throws Exception If the constant 'ROOT_DIR' is not defined.
+     */
+    public function loadAdminTheme(){
+        if(defined('ROOT_DIR')){
+            $themeDir = ROOT_DIR.'/'.SiteConfig::get()->getAdminThemeDir();
+            require_once $themeDir.'/theme.php';
+            foreach ($GLOBALS['THEME_COMPONENTS'] as $component){
+                require_once $themeDir.'/'.$component;
+            }
+            $this->isThemeLoaded = TRUE;
+            return TRUE;
         }
         throw new Exception('Unable to load theme because root directory is not defined.');
     }

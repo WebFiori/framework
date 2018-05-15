@@ -25,6 +25,7 @@
  */
 
 require_once '../root.php';
+define('SETUP_MODE', '');
 /**
  * An API used to get or information about the system.
  *
@@ -76,7 +77,10 @@ class SysAPIs extends API{
         $a8->setName('update-site-info');
         $a8->addRequestMethod('post');
         $a8->addParameter(new RequestParameter('site-name', 'string'));
-        $a8->addParameter(new RequestParameter('description', 'string'));
+        $a8->addParameter(new RequestParameter('site-description', 'string'));
+        $a8->addParameter(new RequestParameter('title-sep', 'string', TRUE));
+        $a8->addParameter(new RequestParameter('home-page', 'string',TRUE));
+        $a8->addParameter(new RequestParameter('site-theme', 'string',TRUE));
         $this->addAction($a8, TRUE);
     } 
     
@@ -120,6 +124,38 @@ class SysAPIs extends API{
         }
     }
     /**
+     * A function that is used to update website related info.
+     * @since 1.0
+     */
+    private function updateSiteInfo() {
+        $i = $this->getInputs();
+        if(isset($i['site-name'])){
+            if(isset($i['site-description'])){
+                $cfgArr = array(
+                    'website-name'=>$i['site-name'],
+                    'description'=>$i['site-description']
+                );
+                if(isset($i['title-sep'])){
+                    $cfgArr['title-separator'] = $i['title-sep'];
+                }
+                if(isset($i['home-page'])){
+                    $cfgArr['home-page'] = $i['home-page'];
+                }
+                if(isset($i['site-theme'])){
+                    $cfgArr['theme-directory'] = $i['site-theme'];
+                }
+                SystemFunctions::get()->updateSiteInfo($cfgArr);
+                $this->sendResponse('Site info updated.');
+            }
+            else{
+                $this->missingParam('description');
+            }
+        }
+        else{
+            $this->missingParam('site-name');
+        }
+    }
+    /**
      * A function that is called to update database attributes
      * @since 1.0
      */
@@ -157,10 +193,15 @@ class SysAPIs extends API{
     
     public function isAuthorized() {
         $a = $this->getAction();
-        if($a == 'update-database-attributes'){
+        if($a == 'update-database-attributes' || 'update-site-info'){
             if(class_exists('Config')){
-                return !Config::get()->isConfig() || 
+                if(class_exists('SiteConfig')){
+                    return !Config::get()->isConfig() || 
                     SystemFunctions::get()->getAccessLevel() == 0;
+                }
+                else{
+                    return TRUE;
+                }
             }
             else{
                 return TRUE;

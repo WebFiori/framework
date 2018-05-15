@@ -23,7 +23,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-require_once '../root.php';
+
 /**
  * Description of SystemFunctions
  *
@@ -76,6 +76,24 @@ class SystemFunctions extends Functions{
         self::$singleton = new SystemFunctions();
         return self::$singleton;
     }
+    /**
+     * Creates the file 'SiteConfig.php' if it does not exist.
+     * @since 1.0
+     */
+    public function createSiteConfigFile() {
+        if(!class_exists('SiteConfig')){
+            $this->writeSiteConfig(SystemFunctions::INITIAL_WEBSITE_CONFIG_VARS);
+        }
+    }
+    /**
+     * Creates the file 'Config.php' if it does not exist.
+     * @since 1.0
+     */
+    public function createConfigFile() {
+        if(!class_exists('Config')){
+            $this->writeConfig(SystemFunctions::INITIAL_CONFIG_VARS);
+        }
+    }
     public function __construct() {
         parent::__construct();
     }
@@ -108,6 +126,30 @@ class SystemFunctions extends Functions{
             return TRUE;
         }
         return $r;
+    }
+    /**
+     * Updates web site configuration based on some attributes.
+     * @param array $websiteInfoArr an associative array. The array can 
+     * have the following indices: 
+     * <ul>
+     * <li><b>website-name</b>:</li>
+     * <li><b>base-url</b>:</li>
+     * <li><b>title-separator</b>:</li>
+     * <li><b>home-page</b>:</li>
+     * <li><b>theme-directory</b>:</li>
+     * <li><b>admin-theme-directory</b>:</li>
+     * <li><b>site-description</b>:</li>
+     * </ul> 
+     * @since 1.0
+     */
+    public function updateSiteInfo($websiteInfoArr){
+        $confArr = $this->getSiteConfigVars();
+        foreach ($confArr as $k=>$v){
+            if(isset($websiteInfoArr[$k])){
+                $confArr[$k] = $v;
+            }
+        }
+        $this->updateSiteInfo($confArr);
     }
     /**
      * Returns an associative array that contains web site configuration 
@@ -149,13 +191,178 @@ class SystemFunctions extends Functions{
         return $cfgArr;
     }
     /**
+     * A function to save changes to web site configuration file.
+     * @param array $configArr An array that contains system configuration 
+     * variables.
+     * @since 1.0
+     */
+    private function writeSiteConfig($configArr){
+        $fh = new FileHandler(ROOT_DIR.'/SiteConfig.php');
+        $fh->write('<?php', TRUE, TRUE);
+        $fh->write('class SiteConfig{', TRUE, TRUE);
+        $fh->addTab();
+        $fh->write('/**
+     * The name of the web site (Such as \'Programming Academia\')
+     * @var string 
+     * @since 1.0
+     */
+    private $webSiteName;
+    /**
+     * A general description for the web site.
+     * @var string 
+     * @since 1.0
+     */
+    private $description;
+    /**
+     *
+     * @var string 
+     * @since 1.0
+     */
+    private $titleSep;
+    /**
+     * The URL of the home page.
+     * @var string 
+     * @since 1.0
+     */
+    private $homePage;
+    /**
+     * The directory of the theme that is used by web site administration pages. 
+     * @var string
+     * @since 1.0 
+     */
+    private $adminPanelThemeDir;
+    /**
+     * The base URL that is used by all web site pages to fetch resource files.
+     * @var string 
+     * @since 1.0
+     */
+    private $baseUrl;
+    /**
+     * Configuration file version number.
+     * @var string 
+     * @since 1.2
+     */
+    private $configVision;
+    /**
+     * The directory of web site pages theme.
+     * @var string
+     * @since 1.0 
+     */
+    private $selectedThemeDir;
+    /**
+     * A singleton instance of the class.
+     * @var SiteConfig 
+     * @since 1.0
+     */
+    private static $siteCfg;
+    /**
+     * Returns an instance of the configuration file.
+     * @return SiteConfig
+     * @since 1.0
+     */
+    public static function get(){
+        if(self::$siteCfg != NULL){
+            return self::$siteCfg;
+        }
+        self::$siteCfg = new SiteConfig();
+        return self::$siteCfg;
+    }', TRUE, TRUE);
+        $fh->write('private function __construct() {
+        $this->configVision = \''.$configArr['config-file-virsion'].'\';
+        $this->webSiteName = \''.$configArr['website-name'].'\';
+        $this->baseUrl = \''.$configArr['base-url'].'\';
+        $this->titleSep = \''.$configArr['title-separator'].'\';
+        $this->homePage = \''.$configArr['home-page'].'\';
+        $this->description = \''.$configArr['site-description'].'\';
+        $this->selectedThemeDir = \''.$configArr['theme-directory'].'\';
+        $this->adminPanelThemeDir = \''.$configArr['admin-theme-directory'].'\';
+    }', TRUE, TRUE);
+        $fh->write('/**
+     * Returns the directory at which the web site theme exist.
+     * @return string The directory at which the web site theme exist.
+     * @since 1.0
+     */
+    public function getThemeDir() {
+        return $this->selectedThemeDir;
+    }
+    /**
+     * Returns the directory at which the administrator pages theme exists.
+     * @return string The directory at which the administrator pages theme exists.
+     * @since 1.0
+     */
+    public function getAdminThemeDir(){
+        return $this->adminPanelThemeDir;
+    }
+    /**
+     * Returns version number of the configuration file.
+     * @return string The version number of the configuration file.
+     * @since 1.0
+     */
+    public function getConfigVersion(){
+        return $this->configVision;
+    }
+    /**
+     * Returns the base URL that is used to fetch resources.
+     * @return string the base URL.
+     * @since 1.0
+     */
+    public function getBaseURL(){
+        return $this->baseUrl;
+    }
+    
+    /**
+     * Returns the description of the web site.
+     * @return string The description of the web site.
+     * @since 1.0
+     */
+    public function getDesc(){
+        return $this->description;
+    }
+    /**
+     * Returns the character (or string) that is used to separate page title from website name.
+     * @return string
+     * @since 1.0
+     */
+    public function getTitleSep(){
+        return $this->titleSep;
+    }
+    /**
+     * Returns the home page name of the website.
+     * @return string The home page name of the website.
+     * @since 1.0
+     */
+    public function getHomePage(){
+        return $this->homePage;
+    }
+    /**
+     * Returns the name of the website.
+     * @return string The name of the website.
+     * @since 1.0
+     */
+    public function getWebsiteName(){
+        return $this->webSiteName;
+    }
+    public function __toString() {
+        $retVal = \'<b>Website Configuration</b><br/>\';
+        $retVal .= \'Website Name: \'.$this->getWebsiteName().\'<br/>\';
+        $retVal .= \'Home Page: \'.$this->getHomePage().\'<br/>\';
+        $retVal .= \'Config Version: \'.$this->getConfigVersion().\'<br/>\';
+        $retVal .= \'Description: \'.$this->getDesc().\'<br/>\';
+        $retVal .= \'Title Separator: \'.$this->getTitleSep().\'<br/>\';
+        return $retVal;
+    }', TRUE, TRUE);
+        $fh->reduceTab();
+        $fh->write('}', TRUE, TRUE);
+        $fh->close();
+    }
+    /**
      * A function to save changes to configuration file.
      * @param type $configArr An array that contains system configuration 
      * variables.
      * @since 1.0
      */
     private function writeConfig($configArr){
-        $fh = new FileHandler(ROOT_DIR.'/CFG_Test.php');
+        $fh = new FileHandler(ROOT_DIR.'/Config.php');
         $fh->write('<?php', TRUE, TRUE);
         $fh->write('/**
  * Global configuration class. Used by the server part and the presentation part.
@@ -271,7 +478,7 @@ class SystemFunctions extends Functions{
      * @return string The version number of configuration file.
      * @since 1.2
      */
-    public function getConfigFileVersion(){
+    public function getConfigVersion(){
         return $this->configVision;
     }
     /**
@@ -360,6 +567,7 @@ class SystemFunctions extends Functions{
         $retVal .= \'<b>Template Version:<b> \'.$this->getTemplateVersion().\'<br/>\';
         $retVal .= \'<b>Template Version Type:<b> \'.$this->getTemplateVersionType().\'<br/>\';
         $retVal .= \'<b>Template Release Date:<b> \'.$this->getTemplateDate().\'<br/><br/>\';
+        $retVal .= \'Config Version: \'.$this->getConfigVersion().\'<br/>\';
         $retVal .= \'<b>System Configuration Info.</b><br/>\';
         $retVal .= \'<b>System Version:<b> \'.$this->getSysVersion().\'<br/>\';
         $retVal .= \'<b>Version Type:<b> \'. $this->getVerType().\'<br/>\';
@@ -375,12 +583,12 @@ class SystemFunctions extends Functions{
     
     public function isSetupFinished(){
         if(class_exists('Config')){
-            return Config::get()->isConfig();
+            if(class_exists('SiteConfig')){
+                return Config::get()->isConfig();
+            }
+            throw new Exception('SiteConfig.php is missing.');
         }
         throw new Exception('Config.php is missing.');
     }
 }
-//
-//$sf = SystemFunctions::get();
-//$sf->writeConfig($sf->getConfigVars());
 //echo hash('sha256', '123456654321');

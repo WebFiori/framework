@@ -25,22 +25,37 @@
  */
 
 /**
- * Description of Label
+ * A class that represents &lt;label&gt; tag.
  *
  * @author Ibrahim
+ * @version 1.0
  */
 class Label extends HTMLNode{
-    public function __construct($text) {
+    /**
+     * Creates a new label node with specific text on it.
+     * @param string $text The text that will be displayed by the label. 
+     * Default is empty string.
+     * @since 1.0
+     */
+    public function __construct($text='') {
         parent::__construct('label');
         $textNode = new HTMLNode('', FALSE, TRUE);
         $textNode->setText($text);
         parent::addChild($textNode);
     }
-    
+    /**
+     * Sets the text that will be displayed by the label.
+     * @param string $text The text that will be displayed by the label.
+     * @since 1.0
+     */
     public function setText($text) {
         $this->childNodes()->get(0)->setText($text);
     }
-    
+    /**
+     * A function that does nothing.
+     * @param type $node
+     * @since 1.0
+     */
     public function addChild($node) {
         
     }

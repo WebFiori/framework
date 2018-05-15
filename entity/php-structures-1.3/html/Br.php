@@ -25,17 +25,29 @@
  */
 
 /**
- * Description of Br
+ * A class that represents &lt;br&gt; tag.
  *
  * @author Ibrahim
+ * @version 1.0
  */
 class Br extends HTMLNode{
     public function __construct() {
         parent::__construct('br', FALSE, FALSE);
     }
+    /**
+     * A function that does nothing.
+     * @param type $param
+     * @param type $param2
+     * @since 1.0
+     */
     public function setAttribute($param,$param2='') {
         
     }
+    /**
+     * A function that does nothing.
+     * @param type $param
+     * @since 1.0
+     */
     public function addChild($param) {
         
     }

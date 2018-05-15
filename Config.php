@@ -3,7 +3,7 @@
  * Global configuration class. Used by the server part and the presentation part.
  * Do not modify this file manually unless you know what you are doing.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.2
+ * @version 1.1
  */
 class Config{
     /**
@@ -76,17 +76,17 @@ class Config{
      * Initialize configuration.
      */
     private function __construct() {
-        $this->isConfigured = TRUE;
+        $this->isConfigured = FALSE;
         $this->templateDate = '10-03-2018 (DD-MM-YYYY)';
         $this->templateVersion = '0.1.2';
         $this->templateVersionType = 'Beta';
         $this->configVision = '1.2';
         $this->dbHost = 'localhost';
-        $this->dbUser = 'root';
-        $this->dbPass = '132970';
-        $this->dbName = 'test';
-        $this->systemVersion = '0.1';
-        $this->versionType = 'Alpha';
+        $this->dbUser = '';
+        $this->dbPass = '';
+        $this->dbName = '';
+        $this->systemVersion = '1.0';
+        $this->versionType = 'Stable';
     }
     /**
      * An instance of <b>Config</b>.
@@ -111,7 +111,7 @@ class Config{
      * @return string The version number of configuration file.
      * @since 1.2
      */
-    public function getConfigFileVersion(){
+    public function getConfigVersion(){
         return $this->configVision;
     }
     /**
@@ -164,7 +164,7 @@ class Config{
     }
     /**
      * Return the type of system version.
-     * @return string Version type (Such as 'alpha', 'beta').
+     * @return string Version type (Such as alpha or beta).
      * @since 1.0
      */
     public function getVerType(){
@@ -200,6 +200,7 @@ class Config{
         $retVal .= '<b>Template Version:<b> '.$this->getTemplateVersion().'<br/>';
         $retVal .= '<b>Template Version Type:<b> '.$this->getTemplateVersionType().'<br/>';
         $retVal .= '<b>Template Release Date:<b> '.$this->getTemplateDate().'<br/><br/>';
+        $retVal .= 'Config Version: '.$this->getConfigVersion().'<br/>';
         $retVal .= '<b>System Configuration Info.</b><br/>';
         $retVal .= '<b>System Version:<b> '.$this->getSysVersion().'<br/>';
         $retVal .= '<b>Version Type:<b> '. $this->getVerType().'<br/>';
@@ -208,5 +209,4 @@ class Config{
         $retVal .= '<b>Database Username:<b> '.$this->getDBUser().'<br/><br/>';
         return $retVal;
     }
-    
 }

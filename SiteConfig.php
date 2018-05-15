@@ -1,44 +1,13 @@
 <?php
-
-/*
- * The MIT License
- *
- * Copyright 2018 Ibrahim.
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
-
-/**
- * A configuration file for the presentation part of the system (web pages)
- * 
- * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.0
- */
 class SiteConfig{
     /**
-     *
+     * The name of the web site (Such as 'Programming Academia')
      * @var string 
      * @since 1.0
      */
     private $webSiteName;
     /**
-     *
+     * A general description for the web site.
      * @var string 
      * @since 1.0
      */
@@ -50,18 +19,19 @@ class SiteConfig{
      */
     private $titleSep;
     /**
-     *
+     * The URL of the home page.
      * @var string 
      * @since 1.0
      */
     private $homePage;
     /**
-     *
-     * @var type 
+     * The directory of the theme that is used by web site administration pages. 
+     * @var string
+     * @since 1.0 
      */
     private $adminPanelThemeDir;
     /**
-     *
+     * The base URL that is used by all web site pages to fetch resource files.
      * @var string 
      * @since 1.0
      */
@@ -72,34 +42,17 @@ class SiteConfig{
      * @since 1.2
      */
     private $configVision;
-    private $selectedThemeDir;
-    private function __construct() {
-        $this->configVision = '1.2';
-        $this->webSiteName = 'Programming Academia';
-        $this->baseUrl = 'http://localhost/generic-php/';
-        $this->titleSep = ' | ';
-        $this->homePage = '<b style="color:red">&lt;Not Set&gt;</b>';
-        $this->description = '<b style="color:red">&lt;Not Set&gt;</b>';
-        $this->selectedThemeDir = 'publish/themes/greeny';
-        $this->adminPanelThemeDir = 'publish/themes/greeny';
-    }
-    public function getThemeDir() {
-        return $this->selectedThemeDir;
-    }
-    public function getAdminThemeDir(){
-        return $this->adminPanelThemeDir;
-    }
-    public function getConfigFileVersion(){
-        return $this->configVision;
-    }
     /**
-     * Returns the base URL that is used to fetch resources.
-     * @return string the base URL.
+     * The directory of web site pages theme.
+     * @var string
+     * @since 1.0 
+     */
+    private $selectedThemeDir;
+    /**
+     * A singleton instance of the class.
+     * @var SiteConfig 
      * @since 1.0
      */
-    public function getBaseURL(){
-        return $this->baseUrl;
-    }
     private static $siteCfg;
     /**
      * Returns an instance of the configuration file.
@@ -113,9 +66,52 @@ class SiteConfig{
         self::$siteCfg = new SiteConfig();
         return self::$siteCfg;
     }
+    private function __construct() {
+        $this->configVision = '1.0';
+        $this->webSiteName = 'Programming Academia';
+        $this->baseUrl = Util::getBaseURL();
+        $this->titleSep = ' | ';
+        $this->homePage = 'index';
+        $this->description = '';
+        $this->selectedThemeDir = 'publish/themes/greeny';
+        $this->adminPanelThemeDir = 'publish/themes/greeny';
+    }
     /**
-     * Returns the description of the website.
-     * @return string The description of the website.
+     * Returns the directory at which the web site theme exist.
+     * @return string The directory at which the web site theme exist.
+     * @since 1.0
+     */
+    public function getThemeDir() {
+        return $this->selectedThemeDir;
+    }
+    /**
+     * Returns the directory at which the administrator pages theme exists.
+     * @return string The directory at which the administrator pages theme exists.
+     * @since 1.0
+     */
+    public function getAdminThemeDir(){
+        return $this->adminPanelThemeDir;
+    }
+    /**
+     * Returns version number of the configuration file.
+     * @return string The version number of the configuration file.
+     * @since 1.0
+     */
+    public function getConfigVersion(){
+        return $this->configVision;
+    }
+    /**
+     * Returns the base URL that is used to fetch resources.
+     * @return string the base URL.
+     * @since 1.0
+     */
+    public function getBaseURL(){
+        return $this->baseUrl;
+    }
+    
+    /**
+     * Returns the description of the web site.
+     * @return string The description of the web site.
      * @since 1.0
      */
     public function getDesc(){
@@ -149,6 +145,7 @@ class SiteConfig{
         $retVal = '<b>Website Configuration</b><br/>';
         $retVal .= 'Website Name: '.$this->getWebsiteName().'<br/>';
         $retVal .= 'Home Page: '.$this->getHomePage().'<br/>';
+        $retVal .= 'Config Version: '.$this->getConfigVersion().'<br/>';
         $retVal .= 'Description: '.$this->getDesc().'<br/>';
         $retVal .= 'Title Separator: '.$this->getTitleSep().'<br/>';
         return $retVal;

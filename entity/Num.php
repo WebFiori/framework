@@ -44,6 +44,21 @@ class Num {
         12=>'C',13=>'D',14=>'E',15=>'F',
     );
     /**
+     * A constant that indicates a binary number is invalid.
+     * @since 1.0
+     */
+    const INV_BINARY = 'invalid_binary_number';
+    /**
+     * A constant that indicates a hexadecimal number is invalid.
+     * @since 1.0
+     */
+    const INV_HEX = 'invalid_hexadecimal_number';
+    /**
+     * A constant that indicates an integer number is invalid.
+     * @since 1.0
+     */
+    const INV_DECIMAL = 'invalid_decimal_number';
+    /**
      * An array that contains integer values as keys along binary representation 
      * as value.
      * @since 1.0
@@ -52,48 +67,94 @@ class Num {
         0=>'0',1=>'1'
     );
     /**
-     * A function that is used to pad a binary number with extra zeros.
-     * @param string $binay
-     * @param type $zerosCount
-     * @return string
+     * A function that is used to extend a binary number with extra zeros or ones.
+     * @param string $binary The string representation of the binary number.
+     * @param int $count The number of zeros or ones that will be added to 
+     * the binary number.
+     * @param string $val The value that will be used to extend the number. 
+     * It can be '0' or '1'. 
+     * In case of invalid value or no value given, default is '0'.
+     * @param boolean $left A boolean to indicate where the zeros or ones will 
+     * be added. <b>TRUE</b> to add the numbers to the left and <b>FALSE</b> 
+     * to add numbers to the right. Default is <b>TRUE</b>.
+     * @return string The new extended binary number. If the given binary 
+     * string is invalid, the function will return <b>Num::INV_BINARY</b>.
      * @since 1.0
      */
-    private static function padWithZeros($binay,$zerosCount){
-        for($x = 0 ; $x < $zerosCount ; $x++){
-            $binay = '0'.$binay;
+    public static function extendBinary($binary,$count,$val='0',$left=true){
+        if(Num::isBinary($binary)){
+            if($val != '0' && $val != '1'){
+                $val = '0';
+            }
+            if($left === TRUE){
+                for($x = 0 ; $x < $count ; $x++){
+                    $binary = $val.$binary;
+                }
+            }
+            else{
+                for($x = 0 ; $x < $count ; $x++){
+                    $binary = $binary.$val;
+                }
+            }
+            return $binary;
         }
-        return $binay;
+        return Num::INV_BINARY;
     }
-    /**
-     * A function that is used to pad a binary number with extra ones.
-     * @param string $binay
-     * @param type $onesCount
-     * @return string
-     * @since 1.0
-     */
-    private static function padWithOnes($binay,$onesCount){
-        for($x = 0 ; $x < $onesCount ; $x++){
-            $binay = '1'.$binay;
-        }
-        return $binay;
-    }
-    public static function binarySub($binary1,$binary2) {
-        
-    }
+    
     public static function hexSub($hex1,$hex2){
         
     }
+    public static function binarySub($binary1,$binary2) {
+        if(Num::isBinary($binary1)){
+            if(Num::isBinary($binary2)){
+                $len1 = strlen($binary1);
+                $len2 = strlen($binary2);
+                if($len1 > $len2){
+                    $binary2 = Num::extendBinary($binary2, $len1 - $len2, $binary2[0]);
+                    $len2 = strlen($binary2);
+                }
+                else if($len1 < $len2){
+                    $binary1 = Num::extendBinary($binary1, $len2 - $len1, $binary1[0]);
+                    $len1 = strlen($binary1);
+                }
+                if($binary1[0] == '0'){
+                    //num - num or 
+                    //num - (-num) = num + num
+                    $b2Inv = Num::invertBinary($binary2);
+                    $binary2 = Num::binaryAdd($b2Inv, '01');
+                    $result = Num::binaryAdd($binary1, $binary2);
+                    if($result[0] == 1){
+                        return substr($result, 1);
+                    }
+                    return $result;
+                }
+                else{
+                    return Num::binaryAdd($binary1, $binary2);
+                }
+            }
+        }
+    }
+    /**
+     * Adds two binary numbers.
+     * @param string $binary1 The first binary number as string of zeros and ones 
+     * represented in two's complement.
+     * @param string $binary2 The second binary number as string of zeros and ones 
+     * represented in two's complement.
+     * @return string The result of adding the two numbers. If one or both 
+     * binary numbers are invalid, the function will return <b>Num::INV_BINARY</b>.
+     * @since 1.0
+     */
     public static function binaryAdd($binary1,$binary2) {
         if(Num::isBinary($binary1)){
             if(Num::isBinary($binary2)){
                 $len1 = strlen($binary1);
                 $len2 = strlen($binary2);
                 if($len1 > $len2){
-                    $binary2 = Num::padWithZeros($binary2, $len1 - $len2);
+                    $binary2 = Num::extendBinary($binary2, $len1 - $len2, $binary2[0]);
                     $len2 = strlen($binary2);
                 }
                 else if($len1 < $len2){
-                    $binary1 = Num::padWithZeros($binary1, $len2 - $len1);
+                    $binary1 = Num::extendBinary($binary1, $len2 - $len1, $binary1[0]);
                     $len1 = strlen($binary1);
                 }
                 $carry = 0;
@@ -113,13 +174,16 @@ class Num {
                         $carry = 1;
                     }
                 }
-                if($carry != 0){
-                    $result = '1'.$result;
-                }
+//                if($carry != 0){
+//                    $result = '1'.$result;
+//                }
+//                if($binary1[0] == '0' && $binary2[0] == '0' && $result[0] == '1'){
+//                    $result = '0'.$result;
+//                }
                 return $result;
             }
         }
-        return FALSE;
+        return Num::INV_BINARY;
     }
     public static function hexAdd($hex1,$hex2){
         
@@ -207,24 +271,93 @@ class Num {
      * @param int $val The integer that will be converted.
      * @return string A string of zeros and ones representing the integer 
      * in binary. The returned number will be represented in 2's complement 
-     * representation.
+     * representation. If the given parameter is not an integer, the function will 
+     * return <b>Num::INV_DECIMAL</b>.
      * @since 1.0
      */
     public static function intToBinary($val){
-        $isNeg = $val < 0 ? TRUE : FALSE;
-        if($isNeg){
-            $val = $val * -1;
+        if(gettype($val) == 'integer'){
+            $isNeg = $val < 0 ? TRUE : FALSE;
+            if($isNeg){
+                $val = $val * -1;
+            }
+            $binary = Num::_intToBinay($val);
+            if($isNeg){
+                $padded = Num::extendBinary($binary, 4 - strlen($binary) % 4, '0');
+                $inv = Num::invertBinary($padded);
+                return Num::binaryAdd($inv, '01');
+            }
+            else{
+                $padded = Num::extendBinary($binary, 4 - strlen($binary) % 4, '0');
+                return $padded;
+            }
         }
-        $binary = Num::_intToBinay($val);
-        $padded = Num::padWithZeros($binary, 4 - strlen($binary) % 4);
-        if($isNeg){
-            $inv = Num::invertBinary($padded);
-            return Num::binaryAdd($inv, '1');
-        }
-        return $padded;
+        return Num::INV_DECIMAL;
     }
+    /**
+     * Converts a binary string to its hexadecimal representation. 
+     * @param string $binary A string of binary digits.
+     * @param boolean $zeroExt [Optional] If the number of digits in the given binary string 
+     * is not a multiple of 4 and this attribute is set to <b>TRUE</b>, an additional 
+     * zeros will be added to the left of the string till its length is multiple of 4. 
+     * If the attribute is set to <b>FALSE</b>, an additional 
+     * ones will be added to the left of the string till its length is multiple of 4. 
+     * Default is <b>TRUE</b>.
+     * @return string The hexadecimal representation of the given binary string.
+     * @since 1.0
+     */
+    public static function binaryToHex($binary,$zeroExt=true) {
+        if(Num::isBinary($binary)){
+            $len = strlen($binary);
+            if($len % 4 != 0){
+                if($zeroExt == TRUE){
+                    $binary = Num::extendBinary($binary, 4 - $len % 4, '0');
+                }
+                else{
+                    $binary = Num::extendBinary($binary, 4 - $len % 4, '1');
+                }
+            }
+            $loopLen = strlen($binary) / 4;
+            $retVal = '';
+            for($x = 0 ; $x < $loopLen ; $x++){
+                $retVal .= Num::binaryToHexDigit(substr($binary, $x * 4, 4));
+            }
+            return $retVal;
+        }
+        return Num::INV_BINARY;
+    }
+    /**
+     * Converts a binary string to its signed integer value.
+     * @param string $binary A binary string (such as '0010101').
+     * @return int|string If the given string is a valid binary number, the 
+     * integer value of the binary number is returned. If the given binary 
+     * string is invalid binary number, the function will return <b>Num::INV_BINARY</b>.
+     * @since 1.0
+     */
     public static function binaryToInt($binary) {
-        
+        if(Num::isBinary($binary)){
+            $len = strlen($binary);
+            if($len % 4 != 0){
+                $binary = Num::extendBinary($binary, 3 - $len % 4, $binary[0]);
+            }
+            $isNeg = $binary[0] == '1' ? TRUE : FALSE;
+            if($isNeg){
+                $inv = Num::invertBinary($binary);
+                $binary = Num::binaryAdd($inv, '01');
+            }
+            $newLen = strlen($binary);
+            $retVal = 0;
+            for($x = 0 ; $x < $newLen ; $x++){
+                if($binary[$x] == 1){
+                    $retVal += pow(2,$newLen - $x - 1);
+                }
+            }
+            if($isNeg === TRUE){
+                return $retVal * -1;
+            }
+            return $retVal;
+        }
+        return Num::INV_BINARY;
     }
     /**
      * Converts a signed integer to its hexadecimal representation.
@@ -245,32 +378,90 @@ class Num {
         }
         return $retVal.Num::HEX_DIGITS[$rem];
     }
-    public static function hexToInt($binary) {
-        
+    /**
+     * Returns the binary representation of a hexadecimal number as string.
+     * @param string $hex A number written in hexadecimal (such as 'FA2E3B').
+     * @return string The binary representation of the given hexadecimal number. 
+     * if the given number is invalid, the function will return <b>Num::INV_HEX</b>.
+     * @since 1.0
+     */
+    public static function hexToBinary($hex) {
+        if(Num::isHex($hex)){
+            $retVal = '';
+            $len = strlen($hex);
+            for($x = 0 ; $x < $len ; $x++){
+                $retVal .= Num::hexToBinaryDigits(strtoupper($hex[$x]));
+            }
+            return $retVal;
+        }
+        return Num::INV_HEX;
+    }
+    /**
+     * Returns the signed integer value of a hexadecimal number.
+     * @param string $hex A number written in hexadecimal (such as 'FA2E3B').
+     * @return int|string The signed integer value of a hexadecimal number. 
+     * if the given number is invalid, the function will return <b>Num::INV_HEX</b>.
+     * @since 1.0
+     */
+    public static function hexToInt($hex) {
+        $binary = Num::hexToBinary($hex);
+        $result = $binary == Num::INV_HEX ? $binary : Num::binaryToInt($binary);
+        return $result;
     }
     /**
      * Converts a signed integer to its hexadecimal representation.
      * @param int $val The integer that will be converted.
      * @return string A string that representing the integer 
      * in hexadecimal. The returned number will be represented in 2's complement 
-     * representation.
+     * representation. If the given parameter is not an integer, the function will 
+     * return <b>Num::INV_DECIMAL</b>.
      * @since 1.0
      */
     public static function intToHex($val){
-        $isNeg = $val < 0 ? TRUE : FALSE;
-        $binary = Num::intToBinary($val);
-        $retVal = '';
-        $len = strlen($binary);
-        for($x = 0 ; $x < $len ; $x += 4){
-            $bits = substr($binary, $x, 4);
-            $hexDigit = Num::binaryToHexDigit($bits);
-            if($x == 0 && $isNeg && $hexDigit != 'F'){
-                $retVal .= 'F';
+        if(gettype($val) == 'integer'){
+            $isNeg = $val < 0 ? TRUE : FALSE;
+            $binary = Num::intToBinary($val);
+            $len = strlen($binary);
+            if($len % 4 != 0){
+                $binary = Num::extendBinary($binary, 4 - $len % 4, $binary[0]);
             }
-            $retVal .= $hexDigit;
+            $retVal = '';
+            for($x = 0 ; $x < $len ; $x += 4){
+                $bits = substr($binary, $x, 4);
+                $hexDigit = Num::binaryToHexDigit($bits);
+                if($x == 0 && $isNeg && $hexDigit != 'F'){
+                    $retVal .= 'F';
+                }
+                $retVal .= $hexDigit;
+            }
+            return $retVal;
         }
-        return $retVal;
+        return Num::INV_DECIMAL;
     }
+    /**
+     * Converts a hexadecimal digit to its binary representation.
+     * @param string $hexDigit The hexadecimal digit.
+     * @return string A string of 4 binary digits that represents the hexadecimal digit.
+     * @since 1.0
+     */
+    private static function hexToBinaryDigits($hexDigit){
+        $count = count(Num::HEX_DIGITS);
+        for($x = 0 ; $x < $count ; $x++){
+            if(Num::HEX_DIGITS[$x] == $hexDigit){
+                $asB = Num::intToBinary($x);
+                if(strlen($asB) == 8){
+                    return substr($asB, 4);
+                }
+                return $asB;
+            }
+        }
+    }
+    /**
+     * Converts a string of 4 binary digits to its hex digit representation.
+     * @param string $val A string of 4 binary digits.
+     * @return string A single digit that represents the 4 binary digits.
+     * @since 1.0
+     */
     private static function binaryToHexDigit($val) {
         $index = 0;
         for($x = 3 ; $x >= 0 ; $x--){
@@ -289,15 +480,46 @@ class Num {
 ini_set('display_startup_errors', 1);
 ini_set('display_errors', 1);
 error_reporting(-1);
-$start = -254;
-$end = 254;
+$start = -1;
+$end = 0;
 for($x = $start; $x <= $end ; $x++){
-    $conv = Num::intToBinary($x);
-    $conv2 = Num::intToHex($x);
-    echo $x.' as binary = '.$conv.'<br/>';
-    echo $x.' as hex = '.$conv2.'<br/>';
+    //test2($x,1);
 }
-
-$b1 = '1111';
-$b2 = '1';
-echo $b1 .' + '. $b2 .' = '.Num::binaryAdd($b1, $b2).'<br/>';
+test2(-1, -1);
+test2(-1, 0);
+test2(0, -1);
+test2(0, 0);
+test2(1, 0);
+test2(0, 1);
+test2(1, 1);
+function test2($num1,$num2){
+    echo '------Num1 = '.$num1.' Num2 = '.$num2.'--------<br/>';
+    $num1AsBinary = Num::intToBinary($num1);
+    echo 'Num::intToBinary('.$num1.') = '.$num1AsBinary.'<br/>';
+    $num2AsBinary = Num::intToBinary($num2);
+    echo 'Num::intToBinary('.$num2.') = '.$num2AsBinary.'<br/>';
+    $num1BplusNum2B = Num::binaryAdd($num1AsBinary, $num2AsBinary);
+    echo 'Num::binaryAdd('.$num1AsBinary.','.$num2AsBinary.') = '.$num1BplusNum2B.'<br/>';
+    $bResultAsInt = Num::binaryToInt($num1BplusNum2B);
+    echo 'Num::binaryToInt('.$num1BplusNum2B.') = '.$bResultAsInt.'<br/>';
+    
+    $num1BsubNum2B = Num::binarySub($num1AsBinary, $num2AsBinary);
+    echo 'Num::binarySub('.$num1AsBinary.','.$num2AsBinary.') = '.$num1BsubNum2B.'<br/>';
+    $bSubResultAsInt = Num::binaryToInt($num1BsubNum2B);
+    echo 'Num::binaryToInt('.$num1BsubNum2B.') = '.$bSubResultAsInt.'<br/><br/>';
+}
+function test($num){
+    echo '-------Given number: '.$num.'--------<br/>';
+    $numAsB = Num::intToBinary($num);
+    echo 'Num::intToBinary('.$num.') = '.$numAsB.'<br/>';
+    $numAsHex = Num::intToHex($num);
+    echo 'Num::intToHex('.$num.') = '.$numAsHex.'<br/>';
+    $bNumAsInt = Num::binaryToInt($numAsB);
+    echo 'Num::binaryToInt('.$numAsB.') = '.$bNumAsInt.'<br/>';
+    $HexAsB = Num::hexToBinary($numAsHex);
+    echo 'Num::hexToBinary('.$numAsHex.') = '.$HexAsB.'<br/>';
+    $bAsHex = Num::binaryToHex($numAsB);
+    echo 'Num::binaryToHex('.$numAsB.') = '.$bAsHex.'<br/>';
+    $HexAsI = Num::hexToInt($numAsHex);
+    echo 'Num::hexToInt('.$numAsHex.') = '.$HexAsI.'<br/>';
+}

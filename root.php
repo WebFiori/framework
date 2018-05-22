@@ -11,6 +11,13 @@ date_default_timezone_set('Asia/Riyadh');
  * The root directory that is used to load all other required system files.
  */
 define('ROOT_DIR',__DIR__);
+
+//fallback for older php versions that does not 
+//support the constant PHP_INT_MIN
+if(!defined('PHP_INT_MIN')){
+    define('PHP_INT_MIN', ~PHP_INT_MAX);
+}
+
 /**
  * A folder used to hold system resources (such as images).
  */

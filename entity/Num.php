@@ -100,9 +100,41 @@ class Num {
         }
         return Num::INV_BINARY;
     }
-    
+    /**
+     * Adds two hexadecimal numbers.
+     * @param string $hex1 The first hexadecimal number as string represented in two's complement.
+     * @param string $hex2 The second binary number as string represented in two's complement.
+     * @return string The result of adding the two numbers as hexadecimal string. If one or both 
+     * hexadecimal numbers are invalid, the function will return <b>Num::INV_HEX</b>.
+     * @since 1.0
+     */
+    public static function hexAdd($hex1,$hex2){
+        $num1AsB = Num::hexToBinary($hex1);
+        if($num1AsB != Num::INV_HEX){
+            $num2AsB = Num::hexToBinary($hex2);
+            if($num2AsB != Num::INV_HEX){
+                return Num::binaryToHex(Num::binaryAdd($num1AsB, $num2AsB));
+            }
+        }
+        return Num::INV_HEX;
+    }
+    /**
+     * Subtracts two hexadecimal numbers.
+     * @param string $hex1 The first hexadecimal number as string represented in two's complement.
+     * @param string $hex2 The second binary number as string represented in two's complement.
+     * @return string The result of subtracting the two numbers as hexadecimal string. If one or both 
+     * hexadecimal numbers are invalid, the function will return <b>Num::INV_HEX</b>.
+     * @since 1.0
+     */
     public static function hexSub($hex1,$hex2){
-        
+        $num1AsB = Num::hexToBinary($hex1);
+        if($num1AsB != Num::INV_HEX){
+            $num2AsB = Num::hexToBinary($hex2);
+            if($num2AsB != Num::INV_HEX){
+                return Num::binaryToHex(Num::binarySub($num1AsB, $num2AsB));
+            }
+        }
+        return Num::INV_HEX;
     }
     /**
      * Returns the value of the constant <b>PHP_INT_MIN</b> as binary string.
@@ -120,6 +152,16 @@ class Num {
     public static function getPHPMaxBinaryInt() {
         return Num::intToBinary(PHP_INT_MAX);
     }
+    /**
+     * Subtracts two binary numbers.
+     * @param string $binary1 The first binary number as string of zeros and ones 
+     * represented in two's complement.
+     * @param string $binary2 The second binary number as string of zeros and ones 
+     * represented in two's complement.
+     * @return string The result of subtracting the two numbers as binary string. If one or both 
+     * binary numbers are invalid, the function will return <b>Num::INV_BINARY</b>.
+     * @since 1.0
+     */
     public static function binarySub($binary1,$binary2) {
         if(Num::isBinary($binary1)){
             if(Num::isBinary($binary2)){
@@ -178,7 +220,7 @@ class Num {
      * represented in two's complement.
      * @param string $binary2 The second binary number as string of zeros and ones 
      * represented in two's complement.
-     * @return string The result of adding the two numbers. If one or both 
+     * @return string The result of adding the two numbers as binary string. If one or both 
      * binary numbers are invalid, the function will return <b>Num::INV_BINARY</b>.
      * @since 1.0
      */
@@ -228,9 +270,6 @@ class Num {
             }
         }
         return Num::INV_BINARY;
-    }
-    public static function hexAdd($hex1,$hex2){
-        
     }
     /**
      * Checks if a given sequence of characters represents a binary number or 

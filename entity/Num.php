@@ -104,6 +104,22 @@ class Num {
     public static function hexSub($hex1,$hex2){
         
     }
+    /**
+     * Returns the value of the constant <b>PHP_INT_MIN</b> as binary string.
+     * @return string The value of the constant <b>PHP_INT_MIN</b> as binary string.
+     * @since 1.0
+     */
+    public static function getPHPMinBinaryInt() {
+        return Num::intToBinary(PHP_INT_MIN);
+    }
+    /**
+     * Returns the value of the constant <b>PHP_INT_MAX</b> as binary string.
+     * @return string The value of the constant <b>PHP_INT_MAX</b> as binary string.
+     * @since 1.0
+     */
+    public static function getPHPMaxBinaryInt() {
+        return Num::intToBinary(PHP_INT_MAX);
+    }
     public static function binarySub($binary1,$binary2) {
         if(Num::isBinary($binary1)){
             if(Num::isBinary($binary2)){
@@ -117,20 +133,42 @@ class Num {
                     $binary1 = Num::extendBinary($binary1, $len2 - $len1, $binary1[0]);
                     $len1 = strlen($binary1);
                 }
-                if($binary1[0] == '0'){
-                    //num - num or 
-                    //num - (-num) = num + num
+                if($binary1[0] == $binary2[0]){
                     $b2Inv = Num::invertBinary($binary2);
                     $binary2 = Num::binaryAdd($b2Inv, '01');
-                    $result = Num::binaryAdd($binary1, $binary2);
-                    if($result[0] == 1){
-                        return substr($result, 1);
-                    }
-                    return $result;
-                }
-                else{
                     return Num::binaryAdd($binary1, $binary2);
                 }
+                $b2Inv = Num::invertBinary($binary2);
+                $binary2 = Num::binaryAdd($b2Inv, '01');
+                $carry = 0;
+                $result = '';
+                for($x = $len1 - 1 ; $x >= 0 ; $x--){
+                    $r = intval($binary1[$x]) + intval($binary2[$x]) + $carry;
+                    if($r == 0 || $r == 1){
+                        $result = $r.''.$result;
+                        $carry = 0;
+                    }
+                    else if($r == 2){
+                        $result = '0'.$result;
+                        $carry = 1;
+                    }
+                    else if($r == 3){
+                        $result = '1'.$result;
+                        $carry = 1;
+                    }
+                }
+                //check for overflow
+                //Overflow rule : If two numbers with the same sign 
+                //(both positive or both negative) are added, then overflow 
+                //occurs if and only if the result has the opposite sign.
+                $b1Sign = $binary1[0];
+                $b2Sign = $binary2[0];
+                if($b1Sign == $b2Sign){
+                    if($result[0] != $b1Sign){
+                        $result = $carry.$result;
+                    }
+                }
+                return $result;
             }
         }
     }
@@ -174,12 +212,18 @@ class Num {
                         $carry = 1;
                     }
                 }
-//                if($carry != 0){
-//                    $result = '1'.$result;
-//                }
-//                if($binary1[0] == '0' && $binary2[0] == '0' && $result[0] == '1'){
-//                    $result = '0'.$result;
-//                }
+                //check for overflow
+                //Overflow rule : If two numbers with the same sign 
+                //(both positive or both negative) are added, then overflow 
+                //occurs if and only if the result has the opposite sign.
+                $b1Sign = $binary1[0];
+                $b2Sign = $binary2[0];
+                if($b1Sign == $b2Sign){
+                    if($result[0] != $b1Sign){
+                        $result = $carry.$result;
+                        echo 'overflow<br/>';
+                    }
+                }
                 return $result;
             }
         }
@@ -476,50 +520,4 @@ class Num {
         }
         return Num::HEX_DIGITS[$index];
     }
-}
-ini_set('display_startup_errors', 1);
-ini_set('display_errors', 1);
-error_reporting(-1);
-$start = -1;
-$end = 0;
-for($x = $start; $x <= $end ; $x++){
-    //test2($x,1);
-}
-test2(-1, -1);
-test2(-1, 0);
-test2(0, -1);
-test2(0, 0);
-test2(1, 0);
-test2(0, 1);
-test2(1, 1);
-function test2($num1,$num2){
-    echo '------Num1 = '.$num1.' Num2 = '.$num2.'--------<br/>';
-    $num1AsBinary = Num::intToBinary($num1);
-    echo 'Num::intToBinary('.$num1.') = '.$num1AsBinary.'<br/>';
-    $num2AsBinary = Num::intToBinary($num2);
-    echo 'Num::intToBinary('.$num2.') = '.$num2AsBinary.'<br/>';
-    $num1BplusNum2B = Num::binaryAdd($num1AsBinary, $num2AsBinary);
-    echo 'Num::binaryAdd('.$num1AsBinary.','.$num2AsBinary.') = '.$num1BplusNum2B.'<br/>';
-    $bResultAsInt = Num::binaryToInt($num1BplusNum2B);
-    echo 'Num::binaryToInt('.$num1BplusNum2B.') = '.$bResultAsInt.'<br/>';
-    
-    $num1BsubNum2B = Num::binarySub($num1AsBinary, $num2AsBinary);
-    echo 'Num::binarySub('.$num1AsBinary.','.$num2AsBinary.') = '.$num1BsubNum2B.'<br/>';
-    $bSubResultAsInt = Num::binaryToInt($num1BsubNum2B);
-    echo 'Num::binaryToInt('.$num1BsubNum2B.') = '.$bSubResultAsInt.'<br/><br/>';
-}
-function test($num){
-    echo '-------Given number: '.$num.'--------<br/>';
-    $numAsB = Num::intToBinary($num);
-    echo 'Num::intToBinary('.$num.') = '.$numAsB.'<br/>';
-    $numAsHex = Num::intToHex($num);
-    echo 'Num::intToHex('.$num.') = '.$numAsHex.'<br/>';
-    $bNumAsInt = Num::binaryToInt($numAsB);
-    echo 'Num::binaryToInt('.$numAsB.') = '.$bNumAsInt.'<br/>';
-    $HexAsB = Num::hexToBinary($numAsHex);
-    echo 'Num::hexToBinary('.$numAsHex.') = '.$HexAsB.'<br/>';
-    $bAsHex = Num::binaryToHex($numAsB);
-    echo 'Num::binaryToHex('.$numAsB.') = '.$bAsHex.'<br/>';
-    $HexAsI = Num::hexToInt($numAsHex);
-    echo 'Num::hexToInt('.$numAsHex.') = '.$HexAsI.'<br/>';
 }

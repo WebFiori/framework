@@ -26,7 +26,7 @@
 /**
  * A class that represents API action.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.1
+ * @version 1.2
  */
 class APIAction implements JsonI{
     /**
@@ -57,12 +57,69 @@ class APIAction implements JsonI{
      */
     private $parameters = array();
     /**
-     * The request method that is used to fire the action.
-     * @var string 'Get' or 'Post' or other... 
-     * @since 1.0
-     * @deprecated since version 1.1
+     * An optional description for the action.
+     * @var sting
+     * @since 1.2 
      */
-    private $actionMethod;
+    private $actionDesc;
+    /**
+     * An attribute that is used to tell since which API version the 
+     * action was added.
+     * @var string
+     * @since 1.2 
+     */
+    private $sinceVersion;
+    /**
+     * Creates new instance of <b>APIAction</b>.
+     * @param string $name [Optional] The name of the action. A valid action name must 
+     * follow the following rules:
+     * <ul>
+     * <li>It can contain the letters [A-Z] and [a-z].</li>
+     * <li>It can contain the numbers [0-9].</li>
+     * <li>It can have the character '-' and the character '_'.</li>
+     * </ul>
+     */
+    public function __construct($name='') {
+        if(!$this->setName($name)){
+            $this->setName('an-action');
+        }
+    }
+    /**
+     * Sets the description of the action.
+     * @param sting $desc Action description. Used to help front-end to identify 
+     * the use of the action.
+     * @since 1.2
+     */
+    public function setDescription($desc) {
+        $this->actionDesc = $desc;
+    }
+    /**
+     * Returns the description of the action.
+     * @return string|NULL The description of the action. If the description is 
+     * not set, the function will return <b>NULL</b>.
+     * @since 1.2
+     */
+    public function getDescription() {
+        return $this->actionDesc;
+    }
+    /**
+     * Sets the version number at which the action was added to the API.
+     * @param string The version number at which the action was added to the API. This 
+     * function is called automatically when an action is added to any object of 
+     * type <b>API</b>.
+     * @since 1.2
+     */
+    public function setSince($sinceAPIv) {
+        $this->sinceVersion = $sinceAPIv;
+    }
+    /**
+     * Returns the version number at which the action was added to the API.
+     * @return string The version number at which the action was added to the API.
+     * @since 1.2
+     */
+    public function getSince() {
+        return $this->sinceVersion;
+    }
     /**
      * Adds new request parameter for the action.
      * @param RequestParameter $param The action that will be added.
@@ -126,11 +183,37 @@ class APIAction implements JsonI{
     }
     /**
      * Sets the name of the action.
-     * @param string $name The name of the action.
+     * @param string $name The name of the action. A valid action name must 
+     * follow the following rules:
+     * <ul>
+     * <li>It can contain the letters [A-Z] and [a-z].</li>
+     * <li>It can contain the numbers [0-9].</li>
+     * <li>It can have the character '-' and the character '_'.</li>
+     * </ul>
+     * @return boolean If the given name is valid, the function will return 
+     * <b>TRUE</b> once the name is set. <b>FALSE</b> is returned if the given 
+     * name is invalid.
      * @since 1.0
      */
     public function setName($name){
-        $this->name = $name;
+        $name .= '';
+        $len = strlen($name);
+        if($len != 0){
+            if(strpos($name, ' ') === FALSE){
+                    for ($x = 0 ; $x < $len ; $x++){
+                        $ch = $name[$x];
+                        if($ch == '_' || $ch == '-' || ($ch >= 'a' && $ch <= 'z') || ($ch >= 'A' && $ch <= 'Z') || ($ch >= '0' && $ch <= '9')){
+                            
+                        }
+                        else{
+                            return FALSE;
+                        }
+                    }
+                    $this->name = $name;
+                    return TRUE;
+                }
+        }
+        return FALSE;
     }
     /**
      * Returns an array that contains an objects of type <b>RequestParameter</b>.
@@ -139,6 +222,24 @@ class APIAction implements JsonI{
      */
     public function getParameters(){
         return $this->parameters;
+    }
+    /**
+     * Returns action parameter given its name.
+     * @param string $paramName The name of the parameter.
+     * @return RequestParameter | NULL Returns an objects of type <b>RequestParameter</b> if 
+     * a parameter with the given name was found. <b>NULL</b> if nothing is found.
+     * @since 1.2
+     */
+    public function getParameterByName($paramName) {
+        $paramName .= '';
+        if(strlen($paramName) != 0){
+            foreach ($this->parameters as $param){
+                if($param->getName() == $paramName){
+                    return $param;
+                }
+            }
+        }
+        return NULL;
     }
     /**
      * Returns the name of the action.
@@ -156,6 +257,8 @@ class APIAction implements JsonI{
     public function toJSON() {
         $json = new JsonX();
         $json->add('name', $this->getName());
+        $json->add('since', $this->getSince());
+        $json->add('description', $this->getDescription());
         $json->add('request-methods', $this->reqMethods);
         $json->add('parameters', $this->parameters);
         return $json;

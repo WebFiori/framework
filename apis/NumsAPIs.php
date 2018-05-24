@@ -23,7 +23,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
+require_once '../root.php';
 /**
  * Description of NumsAPIs
  *
@@ -39,13 +39,14 @@ class NumsAPIs extends API{
         $a1->addRequestMethod('get');
         $a1->addParameter(new RequestParameter('integer', 'integer'));
         $a1->getParameterByName('integer')->setDescription('The integer that will be converted.');
-        $a1->addParameter(new RequestParameter('bytes', 'integer'));
+        $a1->addParameter(new RequestParameter('bytes', 'integer',TRUE));
         $a1->getParameterByName('bytes')->setDescription('Optional paameter. The number of bytes '
-                . 'that the binary number will contains. Default is 32. If the '
+                . 'that the binary number will contains. Default is 4. If the '
                 . 'given number is less than the number of bytes in the converted number, '
                 . 'Default is used. Minimum value is 1 byte and maximum is 16 bytes.');
         $a1->getParameterByName('bytes')->setMaxVal(16);
         $a1->getParameterByName('bytes')->setMinVal(1);
+        $a1->getParameterByName('bytes')->setDefault(4);
         $this->addAction($a1);
         
         $a2 = new APIAction();
@@ -55,13 +56,14 @@ class NumsAPIs extends API{
         $a2->addRequestMethod('get');
         $a2->addParameter(new RequestParameter('integer', 'integer'));
         $a2->getParameterByName('integer')->setDescription('The integer that will be converted.');
-        $a2->addParameter(new RequestParameter('bytes', 'integer'));
+        $a2->addParameter(new RequestParameter('bytes', 'integer',TRUE));
         $a2->getParameterByName('bytes')->setDescription('Optional paameter. The number of bytes '
-                . 'that the binary number will contains. Default is 32. If the '
+                . 'that the binary number will contains. Default is 4. If the '
                 . 'given number is less than the number of bytes in the converted number, '
                 . 'Default is used. Minimum value is 1 byte and maximum is 16 bytes.');
         $a2->getParameterByName('bytes')->setMaxVal(16);
         $a2->getParameterByName('bytes')->setMinVal(1);
+        $a2->getParameterByName('bytes')->setDefault(4);
         $this->addAction($a2);
         
         $a3 = new APIAction();
@@ -78,13 +80,14 @@ class NumsAPIs extends API{
         $a4->addRequestMethod('get');
         $a4->addParameter(new RequestParameter('binary', 'string'));
         $a4->getParameterByName('binary')->setDescription('The binary number as string. It must be in two\'s complement representation.');
-        $a4->addParameter(new RequestParameter('bytes', 'integer'));
+        $a4->addParameter(new RequestParameter('bytes', 'integer',TRUE));
         $a4->getParameterByName('bytes')->setDescription('Optional paameter. The number of bytes '
-                . 'that the binary number will contains. Default is 32. If the '
+                . 'that the binary number will contains. Default is 4. If the '
                 . 'given number is less than the number of bytes in the converted number, '
                 . 'Default is used. Minimum value is 1 byte and maximum is 16 bytes.');
         $a4->getParameterByName('bytes')->setMaxVal(16);
         $a4->getParameterByName('bytes')->setMinVal(1);
+        $a4->getParameterByName('bytes')->setDefault(4);
         $this->addAction($a4);
         
         $a5 = new APIAction();
@@ -99,14 +102,15 @@ class NumsAPIs extends API{
         $a6->setDescription('Converts a hexadecimal number given in in 2\'s complement to its binary representation.');
         $a6->addRequestMethod('get');
         $a6->addParameter(new RequestParameter('hex', 'string'));
-        $a6->getParameterByName('binary')->setDescription('The hexadecimal number as string. It must be in two\'s complement representation.');
-        $a6->addParameter(new RequestParameter('bytes', 'integer'));
+        $a6->getParameterByName('hex')->setDescription('The hexadecimal number as string. It must be in two\'s complement representation.');
+        $a6->addParameter(new RequestParameter('bytes', 'integer',TRUE));
         $a6->getParameterByName('bytes')->setDescription('Optional paameter. The number of bytes '
-                . 'that the binary number will contains. Default is 32. If the '
+                . 'that the binary number will contains. Default is 4. If the '
                 . 'given number is less than the number of bytes in the converted number, '
                 . 'Default is used. Minimum value is 1 byte and maximum is 16 bytes.');
         $a6->getParameterByName('bytes')->setMaxVal(16);
         $a6->getParameterByName('bytes')->setMinVal(1);
+        $a6->getParameterByName('bytes')->setDefault(4);
         $this->addAction($a6);
         
         $a7 = new APIAction();
@@ -153,20 +157,99 @@ class NumsAPIs extends API{
     public function isAuthorized() {
         return TRUE;
     }
+    private function binaryToHex(){
+        $defBits = 32;
+        $binary = $this->getInputs()['binary'];
+        $bytes = $this->getInputs()['bytes'];
+        $j = new JsonX();
+        $j->add('as-binary', '');
+        $j->add('as-hex', '');
+        $j->add('bits', 0);
+        $j->add('bytes', 0);
+        $len = strlen($binary);
+        if($bytes*8 > $len){
+            
+            $binaryExt = Num::binaryExtend($binary,$bytes*8 - strlen($binary), $binary[0]);
+        }
+        else{
+            $j->add('bytes', $defBits/8);
+            $binaryExt = Num::binaryExtend($binary,$defBits - strlen($binary), $binary[0]);
+        }
+        $j->add('as-binary', $binaryExt);
+        if($binaryExt != Num::INV_BINARY){
+            $j->add('bytes', strlen($binaryExt)/8);
+            $j->add('bits', strlen($binaryExt));
+            $j->add('as-hex', Num::binaryToHex($binaryExt));
+        }
+        $this->sendResponse('Finished.', FALSE, 200, '"response":'.$j);
+    }
 
+    private function intToHex() {
+        $j = new JsonX();
+        $int = $this->getInputs()['integer'];
+        $bytes = $this->getInputs()['bytes'];
+        $defaultBitsCount = 32;
+        $j->add('as-integer', $int);
+        $j->add('as-hex', '');
+        $j->add('bits', 0);
+        $j->add('bytes', 0);
+        $hex = Num::intToHex($int);
+        $asBinary = Num::hexToBinary($hex);
+        if($hex != Num::INV_HEX){
+            $len = strlen($asBinary);
+            if($bytes*8 > $len){
+                $j->add('bytes', $bytes);
+                $asBinaryExt = Num::binaryExtend($asBinary, $bytes*8 - $len, $asBinary[0]);
+            } 
+            else{
+                $asBinaryExt = Num::binaryExtend($asBinary, $defaultBitsCount - $len, $asBinary[0]);
+                $j->add('bytes', $defaultBitsCount/8);
+            }
+            $j->add('bits', strlen($asBinaryExt));
+        }
+        $j->add('as-hex', Num::binaryToHex($asBinaryExt));
+        $this->sendResponse('Finished.', FALSE, 200, '"response":'.$j);
+    }
+    
+    private function intToBinary() {
+        $j = new JsonX();
+        $int = $this->getInputs()['integer'];
+        $bytes = $this->getInputs()['bytes'];
+        $defaultBitsCount = 32;
+        $j->add('as-integer', $int);
+        $j->add('as-binary', '');
+        $j->add('bits', 0);
+        $j->add('bytes', 0);
+        $binary = Num::intToBinary($int);
+        if($binary != Num::INV_BINARY){
+            $len = strlen($binary);
+            if($bytes*8 > $len){
+                $j->add('bytes', $bytes);
+                $asBinaryExt = Num::binaryExtend($binary, $bytes*8 - $len, $binary[0]);
+            } 
+            else{
+                $asBinaryExt = Num::binaryExtend($binary, $defaultBitsCount - $len, $binary[0]);
+                $j->add('bytes', $defaultBitsCount/8);
+            }
+            $j->add('bits', strlen($asBinaryExt));
+        }
+        $j->add('as-binary', $asBinaryExt);
+        $this->sendResponse('Finished.', FALSE, 200, '"response":'.$j);
+    }
+    
     public function processRequest() {
         $a = $this->getAction();
         if($a == 'int-to-binary'){
-            $this->actionNotImpl();
+            $this->intToBinary();
         }
         else if($a == 'int-to-hex'){
-            $this->actionNotImpl();
+            $this->intToHex();
         }
         else if($a == 'binary-to-int'){
             $this->actionNotImpl();
         }
         else if($a == 'binary-to-hex'){
-            $this->actionNotImpl();
+            $this->binaryToHex();
         }
         else if($a == 'hex-to-binary'){
             $this->actionNotImpl();
@@ -189,3 +272,5 @@ class NumsAPIs extends API{
     }
 
 }
+$api = new NumsAPIs();
+$api->process();

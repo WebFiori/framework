@@ -19,7 +19,7 @@ spl_autoload_register(function ($name) {
         '',
         '/entity',
         '/entity/queries',
-        '/entity/rest-easy-1.2',
+        '/entity/rest-easy-1.3',
         '/entity/jsonx-1.3',
         '/entity/ph-mysql-1.1.2',
         '/entity/php-structures-1.3',

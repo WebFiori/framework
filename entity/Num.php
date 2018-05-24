@@ -67,7 +67,7 @@ class Num {
         0=>'0',1=>'1'
     );
     /**
-     * A function that is used to extend a binary number with extra zeros or ones.
+     * Extends a binary number with extra zeros or ones.
      * @param string $binary The string representation of the binary number.
      * @param int $count The number of zeros or ones that will be added to 
      * the binary number.
@@ -81,7 +81,7 @@ class Num {
      * string is invalid, the function will return <b>Num::INV_BINARY</b>.
      * @since 1.0
      */
-    public static function extendBinary($binary,$count,$val='0',$left=true){
+    public static function binaryExtend($binary,$count,$val='0',$left=true){
         if(Num::isBinary($binary)){
             if($val != '0' && $val != '1'){
                 $val = '0';
@@ -137,6 +137,22 @@ class Num {
         return Num::INV_HEX;
     }
     /**
+     * Returns the value of the constant <b>PHP_INT_MIN</b> as hexadecimal string.
+     * @return string The value of the constant <b>PHP_INT_MIN</b> as hexadecimal string.
+     * @since 1.0
+     */
+    public static function getPHPMinHexInt() {
+        return Num::binaryToHex(Num::intToBinary(PHP_INT_MIN), FALSE);
+    }
+    /**
+     * Returns the value of the constant <b>PHP_INT_MAX</b> as hexadecimal string.
+     * @return string The value of the constant <b>PHP_INT_MAX</b> as hexadecimal string.
+     * @since 1.0
+     */
+    public static function getPHPMaxHexInt() {
+        return Num::binaryToHex(Num::intToBinary(PHP_INT_MAX));
+    }
+    /**
      * Returns the value of the constant <b>PHP_INT_MIN</b> as binary string.
      * @return string The value of the constant <b>PHP_INT_MIN</b> as binary string.
      * @since 1.0
@@ -168,11 +184,11 @@ class Num {
                 $len1 = strlen($binary1);
                 $len2 = strlen($binary2);
                 if($len1 > $len2){
-                    $binary2 = Num::extendBinary($binary2, $len1 - $len2, $binary2[0]);
+                    $binary2 = Num::binaryExtend($binary2, $len1 - $len2, $binary2[0]);
                     $len2 = strlen($binary2);
                 }
                 else if($len1 < $len2){
-                    $binary1 = Num::extendBinary($binary1, $len2 - $len1, $binary1[0]);
+                    $binary1 = Num::binaryExtend($binary1, $len2 - $len1, $binary1[0]);
                     $len1 = strlen($binary1);
                 }
                 if($binary1[0] == $binary2[0]){
@@ -230,11 +246,11 @@ class Num {
                 $len1 = strlen($binary1);
                 $len2 = strlen($binary2);
                 if($len1 > $len2){
-                    $binary2 = Num::extendBinary($binary2, $len1 - $len2, $binary2[0]);
+                    $binary2 = Num::binaryExtend($binary2, $len1 - $len2, $binary2[0]);
                     $len2 = strlen($binary2);
                 }
                 else if($len1 < $len2){
-                    $binary1 = Num::extendBinary($binary1, $len2 - $len1, $binary1[0]);
+                    $binary1 = Num::binaryExtend($binary1, $len2 - $len1, $binary1[0]);
                     $len1 = strlen($binary1);
                 }
                 $carry = 0;
@@ -366,12 +382,12 @@ class Num {
             }
             $binary = Num::_intToBinay($val);
             if($isNeg){
-                $padded = Num::extendBinary($binary, 4 - strlen($binary) % 4, '0');
+                $padded = Num::binaryExtend($binary, 4 - strlen($binary) % 4, '0');
                 $inv = Num::invertBinary($padded);
                 return Num::binaryAdd($inv, '01');
             }
             else{
-                $padded = Num::extendBinary($binary, 4 - strlen($binary) % 4, '0');
+                $padded = Num::binaryExtend($binary, 4 - strlen($binary) % 4, '0');
                 return $padded;
             }
         }
@@ -394,10 +410,10 @@ class Num {
             $len = strlen($binary);
             if($len % 4 != 0){
                 if($zeroExt == TRUE){
-                    $binary = Num::extendBinary($binary, 4 - $len % 4, '0');
+                    $binary = Num::binaryExtend($binary, 4 - $len % 4, '0');
                 }
                 else{
-                    $binary = Num::extendBinary($binary, 4 - $len % 4, '1');
+                    $binary = Num::binaryExtend($binary, 4 - $len % 4, '1');
                 }
             }
             $loopLen = strlen($binary) / 4;
@@ -421,7 +437,7 @@ class Num {
         if(Num::isBinary($binary)){
             $len = strlen($binary);
             if($len % 4 != 0){
-                $binary = Num::extendBinary($binary, 3 - $len % 4, $binary[0]);
+                $binary = Num::binaryExtend($binary, 3 - $len % 4, $binary[0]);
             }
             $isNeg = $binary[0] == '1' ? TRUE : FALSE;
             if($isNeg){
@@ -506,7 +522,7 @@ class Num {
             $binary = Num::intToBinary($val);
             $len = strlen($binary);
             if($len % 4 != 0){
-                $binary = Num::extendBinary($binary, 4 - $len % 4, $binary[0]);
+                $binary = Num::binaryExtend($binary, 4 - $len % 4, $binary[0]);
             }
             $retVal = '';
             for($x = 0 ; $x < $len ; $x += 4){

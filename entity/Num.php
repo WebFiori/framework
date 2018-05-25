@@ -229,6 +229,7 @@ class Num {
                 return $result;
             }
         }
+        return Num::INV_BINARY;
     }
     /**
      * Adds two binary numbers.

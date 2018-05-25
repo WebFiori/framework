@@ -25,13 +25,21 @@
  */
 require_once '../root.php';
 /**
- * Description of NumsAPIs
+ * An API that has functionality to do with numbers.
  *
  * @author Ibrahim
+ * @version 1.0
  */
 class NumsAPIs extends API{
+    /**
+     * The default number of bytes in any returned result.
+     * @var int The default number of bytes in any returned result.
+     * @since 1.0
+     */
+    private $defaultBytesCount;
     public function __construct() {
         parent::__construct();
+        $this->defaultBytesCount = 4;
         $this->setVersion('1.0.0');
         $a1 = new APIAction();
         $a1->setName('int-to-binary');
@@ -157,8 +165,40 @@ class NumsAPIs extends API{
     public function isAuthorized() {
         return TRUE;
     }
+    
+    private function hexToBinary(){
+        $defBits = $this->defaultBytesCount*8;
+        $hex = $this->getInputs()['hex'];
+        $bytes = $this->getInputs()['bytes'];
+        $j = new JsonX();
+        $j->add('as-binary', '');
+        $j->add('as-hex', '');
+        $j->add('bits', 0);
+        $j->add('bytes', 0);
+        $asBinary = Num::hexToBinary($hex);
+        if($asBinary != Num::INV_HEX){
+            $len = strlen($asBinary);
+            if($bytes*8 > $len){
+                $binaryExt = Num::binaryExtend($asBinary,$bytes*8 - $len, $asBinary[0]);
+            }
+            else{
+                $j->add('bytes', $defBits/8);
+                $binaryExt = Num::binaryExtend($asBinary,$defBits - strlen($asBinary), $asBinary[0]);
+            }
+            $j->add('as-binary', $binaryExt);
+            $j->add('bytes', strlen($binaryExt)/8);
+            $j->add('bits', strlen($binaryExt));
+            $asHex = Num::binaryToHex($binaryExt);
+            $j->add('as-hex', $asHex);
+        }
+        else{
+            $j->add('as-hex', $asBinary);
+        }
+        $this->sendResponse('Finished.', FALSE, 200, '"response":'.$j);
+    }
+    
     private function binaryToHex(){
-        $defBits = 32;
+        $defBits = $this->defaultBytesCount*8;
         $binary = $this->getInputs()['binary'];
         $bytes = $this->getInputs()['bytes'];
         $j = new JsonX();
@@ -168,7 +208,6 @@ class NumsAPIs extends API{
         $j->add('bytes', 0);
         $len = strlen($binary);
         if($bytes*8 > $len){
-            
             $binaryExt = Num::binaryExtend($binary,$bytes*8 - strlen($binary), $binary[0]);
         }
         else{
@@ -188,7 +227,7 @@ class NumsAPIs extends API{
         $j = new JsonX();
         $int = $this->getInputs()['integer'];
         $bytes = $this->getInputs()['bytes'];
-        $defaultBitsCount = 32;
+        $defaultBitsCount = $this->defaultBytesCount*8;
         $j->add('as-integer', $int);
         $j->add('as-hex', '');
         $j->add('bits', 0);
@@ -215,7 +254,7 @@ class NumsAPIs extends API{
         $j = new JsonX();
         $int = $this->getInputs()['integer'];
         $bytes = $this->getInputs()['bytes'];
-        $defaultBitsCount = 32;
+        $defaultBitsCount = $this->defaultBytesCount*8;
         $j->add('as-integer', $int);
         $j->add('as-binary', '');
         $j->add('bits', 0);
@@ -252,7 +291,7 @@ class NumsAPIs extends API{
             $this->binaryToHex();
         }
         else if($a == 'hex-to-binary'){
-            $this->actionNotImpl();
+            $this->hexToBinary();
         }
         else if($a == 'hex-to-int'){
             $this->actionNotImpl();

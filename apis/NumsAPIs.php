@@ -250,6 +250,22 @@ class NumsAPIs extends API{
         $this->sendResponse('Finished.', FALSE, 200, '"response":'.$j);
     }
     
+    private function binaryToInt(){
+        $binary = $this->getInputs()['binary'];
+        $asInt = Num::binaryToInt($binary);
+        $j = new JsonX();
+        $j->add('as-int', $asInt);
+        $this->sendResponse('Finished.', FALSE, 200, '"response":'.$j);
+    }
+    
+    private function hexToInt(){
+        $hex = $this->getInputs()['hex'];
+        $asInt = Num::hexToInt($hex);
+        $j = new JsonX();
+        $j->add('as-int', $asInt);
+        $this->sendResponse('Finished.', FALSE, 200, '"response":'.$j);
+    }
+    
     private function intToBinary() {
         $j = new JsonX();
         $int = $this->getInputs()['integer'];
@@ -285,7 +301,7 @@ class NumsAPIs extends API{
             $this->intToHex();
         }
         else if($a == 'binary-to-int'){
-            $this->actionNotImpl();
+            $this->binaryToInt();
         }
         else if($a == 'binary-to-hex'){
             $this->binaryToHex();
@@ -294,7 +310,7 @@ class NumsAPIs extends API{
             $this->hexToBinary();
         }
         else if($a == 'hex-to-int'){
-            $this->actionNotImpl();
+            $this->hexToInt();
         }
         else if($a == 'binary-add'){
             $this->actionNotImpl();

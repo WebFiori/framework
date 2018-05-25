@@ -165,6 +165,14 @@ class NumsAPIs extends API{
         $a9->getParameterByName('hex-1')->setDescription('The first hexadecimal number given in two\'s complement representation.');
         $a9->addParameter(new RequestParameter('hex-2', 'string'));
         $a9->getParameterByName('hex-2')->setDescription('The second hexadecimal number given in two\'s complement representation.');
+        $a9->addParameter(new RequestParameter('bytes', 'integer',TRUE));
+        $a9->getParameterByName('bytes')->setDescription('Optional paameter. The number of bytes '
+                . 'that the binary number will contains. Default is 4. If the '
+                . 'given number is less than the number of bytes in the converted number, '
+                . 'Default is used. Minimum value is 1 byte and maximum is 16 bytes.');
+        $a9->getParameterByName('bytes')->setMaxVal(16);
+        $a9->getParameterByName('bytes')->setMinVal(1);
+        $a9->getParameterByName('bytes')->setDefault(4);
         $this->addAction($a9);
         
         $a10 = new APIAction();
@@ -175,6 +183,14 @@ class NumsAPIs extends API{
         $a10->getParameterByName('hex-1')->setDescription('The first hexadecimal number given in two\'s complement representation.');
         $a10->addParameter(new RequestParameter('hex-2', 'string'));
         $a10->getParameterByName('hex-2')->setDescription('The second hexadecimal number given in two\'s complement representation.');
+        $a10->addParameter(new RequestParameter('bytes', 'integer',TRUE));
+        $a10->getParameterByName('bytes')->setDescription('Optional paameter. The number of bytes '
+                . 'that the binary number will contains. Default is 4. If the '
+                . 'given number is less than the number of bytes in the converted number, '
+                . 'Default is used. Minimum value is 1 byte and maximum is 16 bytes.');
+        $a10->getParameterByName('bytes')->setMaxVal(16);
+        $a10->getParameterByName('bytes')->setMinVal(1);
+        $a10->getParameterByName('bytes')->setDefault(4);
         $this->addAction($a10);
     }
     
@@ -417,6 +433,119 @@ class NumsAPIs extends API{
         }
         $this->sendResponse('Finished.', FALSE, 200, '"response":'.$j);
     }
+    
+    private function hexSub(){
+        $defBits = $this->defaultBytesCount * 8;
+        $j = new JsonX();
+        $j->add('hex-1', '');
+        $j->add('hex-1-as-int', '');
+        $j->add('hex-2', '');
+        $j->add('hex-2-as-int', '');
+        $j->add('hex-sub', '');
+        $j->add('sub-as-int', '');
+        $j->add('sub-bytes', 0);
+        $j->add('sub-bits', 0);
+        $hex1 = $this->getInputs()['hex-1'];
+        $hex2 = $this->getInputs()['hex-2'];
+        $bytes = $this->getInputs()['bytes'];
+        $result = Num::hexSub($hex1, $hex2);
+        if($result != Num::INV_HEX){
+            $j->add('hex-1', $hex1);
+            $j->add('hex-1-as-int', Num::hexToInt($hex1));
+            $j->add('hex-2', $hex2);
+            $j->add('hex-2-as-int', Num::hexToInt($hex2));
+            $resultAsBinary = Num::hexToBinary($result);
+            $len = strlen($resultAsBinary);
+            if($bytes*8 > $len){
+                $resultAsBinary = Num::binaryExtend($resultAsBinary, $bytes*8 - $len, $resultAsBinary[0]);
+            }
+            else if($len > $defBits){
+                $ext = 8 - $len % 8;
+                $resultAsBinary = Num::binaryExtend($resultAsBinary, $ext, $resultAsBinary[0]);
+            }
+            else{
+                $resultAsBinary = Num::binaryExtend($resultAsBinary, $defBits - $len, $resultAsBinary[0]);
+            }
+            $j->add('sub-bytes', strlen($resultAsBinary)/8);
+            $j->add('sub-bits', strlen($resultAsBinary));
+            $j->add('hex-sub', Num::binaryToHex($resultAsBinary));
+            $j->add('sub-as-int', Num::binaryToInt($resultAsBinary));
+        }
+        else{
+            $isHex1 = Num::isHex($hex1);
+            $isHex = Num::isHex($hex2);
+            if(!$isHex1 && !$isHex){
+                $j->add('hex-1', $result);
+                $j->add('hex-2', $result);
+            }
+            else if(!$isHex1){
+                $j->add('hex-2', $hex2);
+                $j->add('hex-1', $result);
+            }
+            else{
+                $j->add('hex-2', $result);
+                $j->add('hex-1', $hex1);
+            }
+        }
+        $this->sendResponse('Finished.', FALSE, 200, '"response":'.$j);
+    }
+
+    private function hexAdd(){
+        $defBits = $this->defaultBytesCount * 8;
+        $j = new JsonX();
+        $j->add('hex-1', '');
+        $j->add('hex-1-as-int', '');
+        $j->add('hex-2', '');
+        $j->add('hex-2-as-int', '');
+        $j->add('hex-sub', '');
+        $j->add('sub-as-int', '');
+        $j->add('sub-bytes', 0);
+        $j->add('sub-bits', 0);
+        $hex1 = $this->getInputs()['hex-1'];
+        $hex2 = $this->getInputs()['hex-2'];
+        $bytes = $this->getInputs()['bytes'];
+        $result = Num::hexAdd($hex1, $hex2);
+        if($result != Num::INV_HEX){
+            $j->add('hex-1', $hex1);
+            $j->add('hex-1-as-int', Num::hexToInt($hex1));
+            $j->add('hex-2', $hex2);
+            $j->add('hex-2-as-int', Num::hexToInt($hex2));
+            $resultAsBinary = Num::hexToBinary($result);
+            $len = strlen($resultAsBinary);
+            if($bytes*8 > $len){
+                $resultAsBinary = Num::binaryExtend($resultAsBinary, $bytes*8 - $len, $resultAsBinary[0]);
+            }
+            else if($len > $defBits){
+                $ext = 8 - $len % 8;
+                $resultAsBinary = Num::binaryExtend($resultAsBinary, $ext, $resultAsBinary[0]);
+            }
+            else{
+                $resultAsBinary = Num::binaryExtend($resultAsBinary, $defBits - $len, $resultAsBinary[0]);
+            }
+            $j->add('sub-bytes', strlen($resultAsBinary)/8);
+            $j->add('sub-bits', strlen($resultAsBinary));
+            $j->add('hex-sub', Num::binaryToHex($resultAsBinary));
+            $j->add('sub-as-int', Num::binaryToInt($resultAsBinary));
+        }
+        else{
+            $isHex1 = Num::isHex($hex1);
+            $isHex = Num::isHex($hex2);
+            if(!$isHex1 && !$isHex){
+                $j->add('hex-1', $result);
+                $j->add('hex-2', $result);
+            }
+            else if(!$isHex1){
+                $j->add('hex-2', $hex2);
+                $j->add('hex-1', $result);
+            }
+            else{
+                $j->add('hex-2', $result);
+                $j->add('hex-1', $hex1);
+            }
+        }
+        $this->sendResponse('Finished.', FALSE, 200, '"response":'.$j);
+    }
+
     public function processRequest() {
         $a = $this->getAction();
         if($a == 'int-to-binary'){
@@ -444,10 +573,10 @@ class NumsAPIs extends API{
             $this->binarySub();
         }
         else if($a == 'hex-add'){
-            $this->actionNotImpl();
+            $this->hexAdd();
         }
         else if($a == 'hex-sub'){
-            $this->actionNotImpl();
+            $this->hexSub();
         }
     }
 

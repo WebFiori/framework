@@ -279,7 +279,6 @@ class Num {
                 if($b1Sign == $b2Sign){
                     if($result[0] != $b1Sign){
                         $result = $carry.$result;
-                        echo 'overflow<br/>';
                     }
                 }
                 return $result;

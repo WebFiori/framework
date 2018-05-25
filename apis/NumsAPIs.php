@@ -129,6 +129,14 @@ class NumsAPIs extends API{
         $a7->getParameterByName('binary-1')->setDescription('The first binary number given in two\'s complement representation.');
         $a7->addParameter(new RequestParameter('binary-2', 'string'));
         $a7->getParameterByName('binary-2')->setDescription('The second binary number given in two\'s complement representation.');
+        $a7->addParameter(new RequestParameter('bytes', 'integer',TRUE));
+        $a7->getParameterByName('bytes')->setDescription('Optional paameter. The number of bytes '
+                . 'that the binary number will contains. Default is 4. If the '
+                . 'given number is less than the number of bytes in the converted number, '
+                . 'Default is used. Minimum value is 1 byte and maximum is 16 bytes.');
+        $a7->getParameterByName('bytes')->setMaxVal(16);
+        $a7->getParameterByName('bytes')->setMinVal(1);
+        $a7->getParameterByName('bytes')->setDefault(4);
         $this->addAction($a7);
         
         $a8 = new APIAction();
@@ -292,6 +300,60 @@ class NumsAPIs extends API{
         $this->sendResponse('Finished.', FALSE, 200, '"response":'.$j);
     }
     
+    private function binaryAdd(){
+        $defBits = $this->defaultBytesCount * 8;
+        $j = new JsonX();
+        $j->add('binary-1', '');
+        $j->add('binary-1-as-int', '');
+        $j->add('binary-2', '');
+        $j->add('binary-2-as-int', '');
+        $j->add('binary-sum', '');
+        $j->add('sum-as-int', '');
+        $j->add('sum-bytes', 0);
+        $j->add('sum-bits', 0);
+        $binary1 = $this->getInputs()['binary-1'];
+        $binary2 = $this->getInputs()['binary-2'];
+        $bytes = $this->getInputs()['bytes'];
+        $sum = Num::binaryAdd($binary1, $binary2);
+        if($sum != Num::INV_BINARY){
+            $j->add('binary-1', $binary1);
+            $j->add('binary-1-as-int', Num::binaryToInt($binary1));
+            $j->add('binary-2', $binary2);
+            $j->add('binary-2-as-int', Num::binaryToInt($binary2));
+            $sumLen = strlen($sum);
+            if($bytes*8 > $sumLen){
+                $sum = Num::binaryExtend($sum, $bytes*8 - $sumLen, $sum[0]);
+            }
+            else if($sumLen > $defBits){
+                $ext = 8 - $sumLen % 8;
+                $sum = Num::binaryExtend($sum, $ext, $sum[0]);
+            }
+            else{
+                $sum = Num::binaryExtend($sum, $defBits - $sumLen, $sum[0]);
+            }
+            $j->add('sum-bytes', strlen($sum)/8);
+            $j->add('sum-bits', strlen($sum));
+            $j->add('binary-sum', $sum);
+            $j->add('sum-as-int', Num::binaryToInt($sum));
+        }
+        else{
+            $isBinary1 = Num::isBinary($binary1);
+            $isBinary2 = Num::isBinary($binary2);
+            if(!$isBinary1 && !$isBinary2){
+                $j->add('binary-1', $sum);
+                $j->add('binary-2', $sum);
+            }
+            else if(!$isBinary1){
+                $j->add('binary-2', $binary2);
+                $j->add('binary-1', $sum);
+            }
+            else{
+                $j->add('binary-2', $sum);
+                $j->add('binary-1', $binary1);
+            }
+        }
+        $this->sendResponse('Finished.', FALSE, 200, '"response":'.$j);
+    }
     public function processRequest() {
         $a = $this->getAction();
         if($a == 'int-to-binary'){
@@ -313,7 +375,7 @@ class NumsAPIs extends API{
             $this->hexToInt();
         }
         else if($a == 'binary-add'){
-            $this->actionNotImpl();
+            $this->binaryAdd();
         }
         else if($a == 'binary-sub'){
             $this->actionNotImpl();

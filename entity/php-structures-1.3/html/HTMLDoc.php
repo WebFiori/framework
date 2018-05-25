@@ -245,12 +245,13 @@ class HTMLDoc {
         }
         else{
             if($node->mustClose()){
-                $chCount = $node->childNodes()->size();
+                $nodeChilds = $node->childNodes();
+                $chCount = $nodeChilds->size();
                 $this->nodesStack->push($node);
                 $this->document .= $this->getTab().$node->asHTML().$this->nl;
                 $this->addTab();
                 for($x = 0 ; $x < $chCount ; $x++){
-                    $nodeAtx = $node->childNodes()->get($x);
+                    $nodeAtx = $nodeChilds->get($x);
                     $this->pushNode($nodeAtx);
                 }
                 $this->reduceTab();

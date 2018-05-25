@@ -6,9 +6,15 @@ define('THEMES_DIR','publish/themes');
 /**
  * A class used to initialize main page components.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.3
+ * @version 1.4
  */
 class Page{
+    /**
+     * The document that represents the page.
+     * @var HTMLDoc 
+     * @since 1.4
+     */
+    private $document;
     /**
      * A constant for left to right writing direction.
      * @var string 
@@ -122,19 +128,21 @@ class Page{
     }
     /**
      * Returns the document that is associated with the page.
-     * @param type $dynamic
+     * @param boolean $dynamic 
      * @return HTMLDoc An object of type <b>HTMLDoc</b>.
      * @throws Exception If page theme is not loaded.
      * @since 1.1
      */
     public function getDocument($dynamic=false){
-        $document = new HTMLDoc();
         if($this->isThemeLoaded()){
-            $document->setLanguage($this->getLang());
-            $document->setHeadNode($this->getHead($dynamic));
-            $document->addNode($this->getHeader($dynamic));
-            $document->addNode($this->getFooter($dynamic));
-            return $document;
+            if($this->document == NULL){
+                $this->document = new HTMLDoc();
+                $this->document->setLanguage($this->getLang());
+                $this->document->setHeadNode($this->getHead($dynamic));
+                $this->document->addNode($this->getHeader($dynamic));
+                $this->document->addNode($this->getFooter($dynamic));
+            }
+            return $this->document;
         }
         throw new Exception('Theme is not loaded. Call the function Page::loadTheme() first.');
     }

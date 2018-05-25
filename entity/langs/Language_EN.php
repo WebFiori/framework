@@ -5,38 +5,54 @@
  * @version 1.0
  */
 const LANGUAGE = array(
+    'dir'=>'ltr',
     'general'=>array(
         'wait'=>'Please wait a moment 🙂',
-        'loading'=>'Loading...'
+        'loading'=>'Loading...',
+        'next'=>'Next',
+        'prev'=>'Previous'
     ),
     'pages'=>array(
         'setup'=>array(
+            'setup-steps'=>array(
+                'welcome'=>'Welcome',
+                'database-setup'=>'Database Setup',
+                'admin-account'=>'Admin Account',
+                'website-config'=>'Website Configuration',
+                'finish'=>'Finish'
+            ),
             'welcome'=>array(
                 'title'=>'Welcome',
                 'description'=>'Fist page.',
-                'labels'=>array(
-                    'welcome'=>'Welcome',
-                    'database-setup'=>'Database Setup',
-                    'admin-account'=>'Admin Account',
-                    'website-config'=>'Website Configuration',
-                    'finish'=>'Finish'
+                'help'=>array(
+                    'h-1'=>'Welcome to application setup. Since this is your first '
+                    . 'time using the app, you must setup few things.',
+                    'h-2'=>'The first thing that we need from you is to provide the '
+                    . 'application with database connection information. After that, you '
+                    . 'will have to create an admin account. The final step is to configure '
+                    . 'some of the basic website settings.'
                 )
             ),
             'database-setup'=>array(
                 'title'=>'Database Setup',
-                'description'=>''
+                'description'=>'',
+                'help'=>''
+                
             ),
             'admin-account'=>array(
                 'title'=>'Creating Admin Account',
-                'description'=>''
+                'description'=>'',
+                'help'=>''
             ),
             'website-config'=>array(
                 'title'=>'Configuing Website',
-                'description'=>''
+                'description'=>'',
+                'help'=>''
             ),
             'finish'=>array(
                 'title'=>'Finished',
-                'description'=>''
+                'description'=>'',
+                'help'=>''
             )
         ),
         'activate-account'=>array(

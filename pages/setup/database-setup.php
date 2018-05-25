@@ -23,14 +23,90 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+define('SETUP_MODE', '');
 require_once '../../root.php';
 if(Config::get()->isConfig()){
     header('location: '.SiteConfig::get()->getHomePage());
 }
 Page::get()->loadTranslation(TRUE);
 $pageLbls = LANGUAGE['pages']['setup']['database-setup'];
+Page::get()->setWritingDir(LANGUAGE['dir']);
 Page::get()->setTitle($pageLbls['title']);
 Page::get()->setDescription($pageLbls['description']);
-Page::get()->loadTheme();
+Page::get()->loadAdminTheme();
 $document = Page::get()->getDocument();
+$container = new HTMLNode();
+$document->addNode($container);
+$container->setClassName('pa-container');
+$container->addChild(stepsCounter(LANGUAGE['pages']['setup']['setup-steps'],1));
+$container->addChild(pageBody($pageLbls['help']));
+$container->addChild(footer());
 echo $document->toHTML();
+
+function pageBody($h){
+    $body = new HTMLNode();
+    $body->setClassName('pa-row');
+    
+    return $body;
+}
+
+function footer(){
+    $node = new HTMLNode();
+    $node->setClassName('pa-row');
+    return $node;
+}
+
+function stepsCounter($lang,$active){
+    $node = new HTMLNode();
+    $node->setClassName('pa-row');
+    $step1 = new HTMLNode();
+    $step1->setClassName('pa-'.Page::get()->getWritingDir().'-col-two');
+    $step1Text = new HTMLNode('', FALSE, TRUE);
+    $step1Text->setText($lang['welcome']);
+    $step1->addChild($step1Text);
+    $node->addChild($step1);
+    
+    $step2 = new HTMLNode();
+    $step2->setClassName('pa-'.Page::get()->getWritingDir().'-col-two');
+    $step2Text = new HTMLNode('', FALSE, TRUE);
+    $step2Text->setText($lang['database-setup']);
+    $step2->addChild($step2Text);
+    $node->addChild($step2);
+    
+    $step3 = new HTMLNode();
+    $step3->setClassName('pa-'.Page::get()->getWritingDir().'-col-two');
+    $step3Text = new HTMLNode('', FALSE, TRUE);
+    $step3Text->setText($lang['admin-account']);
+    $step3->addChild($step3Text);
+    $node->addChild($step3);
+    
+    $step4 = new HTMLNode();
+    $step4->setClassName('pa-'.Page::get()->getWritingDir().'-col-two');
+    $step4Text = new HTMLNode('', FALSE, TRUE);
+    $step4Text->setText($lang['website-config']);
+    $step4->addChild($step4Text);
+    $node->addChild($step4);
+    
+    $step5 = new HTMLNode();
+    $step5->setClassName('pa-'.Page::get()->getWritingDir().'-col-two');
+    $step5Text = new HTMLNode('', FALSE, TRUE);
+    $step5Text->setText($lang['finish']);
+    $step5->addChild($step5Text);
+    $node->addChild($step5);
+    if($active == 0){
+        $step1->setAttribute('style', 'background-color:#efaa32');
+    }
+    else if($active == 1){
+        $step2->setAttribute('style', 'background-color:#efaa32');
+    }
+    else if($active == 2){
+        $step3->setAttribute('style', 'background-color:#efaa32');
+    }
+    else if($active == 3){
+        $step4->setAttribute('style', 'background-color:#efaa32');
+    }
+    else if($active == 4){
+        $step5->setAttribute('style', 'background-color:#efaa32');
+    }
+    return $node;
+}

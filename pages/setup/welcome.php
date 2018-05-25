@@ -28,30 +28,58 @@ require_once '../../root.php';
 if(Config::get()->isConfig()){
     header('location: '.SiteConfig::get()->getHomePage());
 }
-
 Page::get()->loadTranslation(TRUE);
 $pageLbls = LANGUAGE['pages']['setup']['welcome'];
+Page::get()->setWritingDir(LANGUAGE['dir']);
 Page::get()->setTitle($pageLbls['title']);
 Page::get()->setDescription($pageLbls['description']);
-Page::get()->loadTheme();
+Page::get()->loadAdminTheme();
 $document = Page::get()->getDocument();
 $container = new HTMLNode();
 $document->addNode($container);
 $container->setClassName('pa-container');
-$container->addChild(stepsCounter($pageLbls,0));
+$container->addChild(stepsCounter(LANGUAGE['pages']['setup']['setup-steps'],0));
 $container->addChild(langSwitch());
-
+$container->addChild(pageBody($pageLbls));
+$container->addChild(footer());
 echo $document->toHTML();
+
+function pageBody($lbls){
+    $body = new HTMLNode();
+    $body->setClassName('pa-row');
+    $col = new HTMLNode();
+    $col->setClassName('pa-'.Page::get()->getWritingDir().'-col-twelve');
+    $p1 = new PNode();
+    $p1->addText($lbls['help']['h-1']);
+    $col->addChild($p1);
+    $p2 = new PNode();
+    $p2->addText($lbls['help']['h-2']);
+    $col->addChild($p2);
+    $body->addChild($col);
+    return $body;
+}
 
 function langSwitch(){
     $node = new HTMLNode();
     $node->setClassName('pa-row');
-    $arLang = new LinkNode('pages/welcome?lang=ar', 'العربية');
-    $arLang->setClassName('pa-ltr-col-two');
+    $arLang = new LinkNode('pages/setup/welcome?lang=ar', 'العربية');
+    $arLang->setClassName('pa-'.Page::get()->getWritingDir().'-col-two');
     $node->addChild($arLang);
-    $enLang = new LinkNode('pages/welcome?lang=en', 'English');
-    $enLang->setClassName('pa-ltr-col-two');
+    $enLang = new LinkNode('pages/setup/welcome?lang=en', 'English');
+    $enLang->setClassName('pa-'.Page::get()->getWritingDir().'-col-two');
     $node->addChild($enLang);
+    return $node;
+}
+
+function footer(){
+    $node = new HTMLNode();
+    $node->setClassName('pa-row');
+    $col = new HTMLNode();
+    $col->setClassName('pa-'.Page::get()->getWritingDir().'-col-two');
+    $node->addChild($col);
+    $link = new LinkNode('pages/setup/database-setup', LANGUAGE['general']['next']);
+    $col->addChild($link);
+    $link->setAttribute('style', 'border-radius:10px;background-color:#feeeee;width: 200px !important;');
     return $node;
 }
 
@@ -61,35 +89,35 @@ function stepsCounter($lang,$active){
     $step1 = new HTMLNode();
     $step1->setClassName('pa-'.Page::get()->getWritingDir().'-col-two');
     $step1Text = new HTMLNode('', FALSE, TRUE);
-    $step1Text->setText($lang['labels']['welcome']);
+    $step1Text->setText($lang['welcome']);
     $step1->addChild($step1Text);
     $node->addChild($step1);
     
     $step2 = new HTMLNode();
     $step2->setClassName('pa-'.Page::get()->getWritingDir().'-col-two');
     $step2Text = new HTMLNode('', FALSE, TRUE);
-    $step2Text->setText($lang['labels']['database-setup']);
+    $step2Text->setText($lang['database-setup']);
     $step2->addChild($step2Text);
     $node->addChild($step2);
     
     $step3 = new HTMLNode();
     $step3->setClassName('pa-'.Page::get()->getWritingDir().'-col-two');
     $step3Text = new HTMLNode('', FALSE, TRUE);
-    $step3Text->setText($lang['labels']['admin-account']);
-    $step3->addChild($step1Text);
+    $step3Text->setText($lang['admin-account']);
+    $step3->addChild($step3Text);
     $node->addChild($step3);
     
     $step4 = new HTMLNode();
     $step4->setClassName('pa-'.Page::get()->getWritingDir().'-col-two');
     $step4Text = new HTMLNode('', FALSE, TRUE);
-    $step4Text->setText($lang['labels']['website-config']);
+    $step4Text->setText($lang['website-config']);
     $step4->addChild($step4Text);
     $node->addChild($step4);
     
     $step5 = new HTMLNode();
     $step5->setClassName('pa-'.Page::get()->getWritingDir().'-col-two');
     $step5Text = new HTMLNode('', FALSE, TRUE);
-    $step5Text->setText($lang['labels']['finish']);
+    $step5Text->setText($lang['finish']);
     $step5->addChild($step5Text);
     $node->addChild($step5);
     if($active == 0){

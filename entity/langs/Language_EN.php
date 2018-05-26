@@ -10,7 +10,8 @@ const LANGUAGE = array(
         'wait'=>'Please wait a moment 🙂',
         'loading'=>'Loading...',
         'next'=>'Next',
-        'prev'=>'Previous'
+        'prev'=>'Previous',
+        'disconnected'=>'Please check that you are connected to the internet.'
     ),
     'pages'=>array(
         'setup'=>array(
@@ -36,8 +37,37 @@ const LANGUAGE = array(
             'database-setup'=>array(
                 'title'=>'Database Setup',
                 'description'=>'',
-                'help'=>''
-                
+                'labels'=>array(
+                    'username'=>'Username:',
+                    'host'=>'Host Address:',
+                    'password'=>'Password:',
+                    'database-name'=>'Database Name:',
+                    'check-connection'=>'Check Connection',
+                    'connected'=>'Connection Established Successfully!'
+                ),
+                'placeholders'=>array(
+                    'username'=>'The username of database user.',
+                    'host'=>'localhost or some URL or IP address.',
+                    'password'=>'The password of database user.',
+                    'database-name'=>'The name of the database.',
+                ),
+                'status'=>array(
+                    'checking-connection'=>'Validating connection info...',
+                ),
+                'help'=>array(
+                    'h-1'=>'In this step, you are required to privide your MySQL database information. '
+                    . 'First of all, We need from you to give us your database host. The database host can '
+                    . 'be a URL or an IP address. If your database is in the same server as the website, use \'localhost\'.',
+                    'h-2'=>'The second thing we need is a user account that is used to access the database. '
+                    . 'The account must have all prevelages over the database (select, insert, update, delete etc...). ',
+                    'h-3'=>'The last thing that we need is the name of database instance that will be used.'
+                ),
+                'errors'=>array(
+                    2002=>'Check that your host name is correct and that your host has MySql Server installed.',
+                    1045=>'Check that your database username and password are correct.',
+                    1044=>'You don\'t have permissions to access the given database.',
+                    1049=>'Check that the database name is correct.'
+                )
             ),
             'admin-account'=>array(
                 'title'=>'Creating Admin Account',

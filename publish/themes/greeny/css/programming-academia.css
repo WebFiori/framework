@@ -251,6 +251,9 @@
 *, *:before, *:after{
     box-sizing: border-box;
 }
+*[disabled]{
+    cursor: not-allowed;
+}
 #facebook-share,
 #twitter-share,
 #google-plus-share,

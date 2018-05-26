@@ -34,25 +34,129 @@ Page::get()->setWritingDir(LANGUAGE['dir']);
 Page::get()->setTitle($pageLbls['title']);
 Page::get()->setDescription($pageLbls['description']);
 Page::get()->loadAdminTheme();
+$jsonx = new JsonX();
+$jsonx->add('disconnected', LANGUAGE['general']['disconnected']);
+$jsonx->add('success', $pageLbls['labels']['connected']);
+$jsonx->add('checking-connection', $pageLbls['status']['checking-connection']);
+foreach ($pageLbls['errors'] as $k => $v){
+    $jsonx->add(''.$k, $v);
+}
+$js = new JsCode;
+$js->addCode('window.onload = function(){'
+        . 'window.messages = '.$jsonx.';'
+        . 'document.getElementById(\'database-host-input\').oninput = dbInputChanged;
+        document.getElementById(\'username-input\').oninput = dbInputChanged;
+        document.getElementById(\'password-input\').oninput = dbInputChanged;
+        document.getElementById(\'db-name-input\').oninput = dbInputChanged;'
+        . '}');
 $document = Page::get()->getDocument();
+$document->getHeadNode()->addChild($js);
+$document->getHeadNode()->addJs('res/js/setup.js');
 $container = new HTMLNode();
 $document->addNode($container);
 $container->setClassName('pa-container');
 $container->addChild(stepsCounter(LANGUAGE['pages']['setup']['setup-steps'],1));
-$container->addChild(pageBody($pageLbls['help']));
-$container->addChild(footer());
+$container->addChild(pageBody($pageLbls));
+$container->addChild(footer(LANGUAGE['general']['next']));
 echo $document->toHTML();
 
-function pageBody($h){
+function createDbInfoForm($lbls,$placeholders){
+    $form = new HTMLNode('form');
+    $form->setClassName('pa-row');
+    $hostNode = new HTMLNode();
+    $hostNode->setClassName('pa-'.Page::get()->getWritingDir().'-col-twelve');
+    $hostLabel = new Label($lbls['host']);
+    $hostLabel->setClassName('pa-'.Page::get()->getWritingDir().'-col-ten');
+    $hostInput = new Input();
+    $hostInput->setPlaceholder($placeholders['host']);
+    $hostInput->setID('database-host-input');
+    $hostInput->setClassName('pa-'.Page::get()->getWritingDir().'-ltr-col-four');
+    $hostNode->addChild($hostLabel);
+    $hostNode->addChild($hostInput);
+    
+    $usernameNode = new HTMLNode();
+    $usernameNode->setClassName('pa-'.Page::get()->getWritingDir().'-col-twelve');
+    $usernameLabel = new Label($lbls['username']);
+    $usernameLabel->setClassName('pa-'.Page::get()->getWritingDir().'-col-ten');
+    $usernameInput = new Input();
+    $usernameInput->setID('username-input');
+    $usernameInput->setClassName('pa-'.Page::get()->getWritingDir().'-ltr-col-four');
+    $usernameInput->setPlaceholder($placeholders['username']);
+    $usernameNode->addChild($usernameLabel);
+    $usernameNode->addChild($usernameInput);
+    
+    $passwordNode = new HTMLNode();
+    $passwordNode->setClassName('pa-'.Page::get()->getWritingDir().'-col-twelve');
+    $passwordLabel = new Label($lbls['password']);
+    $passwordLabel->setClassName('pa-'.Page::get()->getWritingDir().'-col-ten');
+    $passwordInput = new Input('password');
+    $passwordInput->setID('password-input');
+    $passwordInput->setClassName('pa-'.Page::get()->getWritingDir().'-ltr-col-four');
+    $passwordInput->setPlaceholder($placeholders['password']);
+    $passwordNode->addChild($passwordLabel);
+    $passwordNode->addChild($passwordInput);
+    
+    $dbNameNode = new HTMLNode();
+    $dbNameNode->setClassName('pa-'.Page::get()->getWritingDir().'-col-twelve');
+    $dbNameLabel = new Label($lbls['database-name']);
+    $dbNameLabel->setClassName('pa-'.Page::get()->getWritingDir().'-col-ten');
+    $dbNameInput = new Input('text');
+    $dbNameInput->setClassName('pa-'.Page::get()->getWritingDir().'-ltr-col-four');
+    $dbNameInput->setPlaceholder($placeholders['database-name']);
+    $dbNameInput->setID('db-name-input');
+    $dbNameNode->addChild($dbNameLabel);
+    $dbNameNode->addChild($dbNameInput);
+    
+    $form->addChild($hostNode);
+    $form->addChild($usernameNode);
+    $form->addChild($passwordNode);
+    $form->addChild($dbNameNode);
+    $submit = new Input('submit');
+    $submit->setAttribute('data-action', 'ok');
+    $submit->setValue($lbls['check-connection']);
+    $submit->setAttribute('onclick', 'return checkConectionParams()');
+    $submit->setAttribute('disabled', '');
+    $submit->setID('check-input');
+    $submit->setClassName('pa-'.Page::get()->getWritingDir().'-ltr-col-four');
+    $messageNode = new PNode();
+    $messageNode->setID('message-display');
+    $messageNode->setClassName('pa-'.Page::get()->getWritingDir().'-ltr-col-twelve');
+    $form->addChild($submit);
+    $form->addChild($messageNode);
+    return $form;
+}
+function pageBody($pageLang){
     $body = new HTMLNode();
     $body->setClassName('pa-row');
-    
+    $col = new HTMLNode();
+    $col->setClassName('pa-'.Page::get()->getWritingDir().'-col-twelve');
+    $body->addChild($col);
+    $p1 = new PNode();
+    $p1->addText($pageLang['help']['h-1']);
+    $col->addChild($p1);
+    $p2 = new PNode();
+    $p2->addText($pageLang['help']['h-2']);
+    $col->addChild($p2);
+    $p3 = new PNode();
+    $p3->addText($pageLang['help']['h-3']);
+    $col->addChild($p3);
+    $col->addChild(createDbInfoForm($pageLang['labels'], $pageLang['placeholders']));
     return $body;
 }
 
-function footer(){
+function footer($nextText){
     $node = new HTMLNode();
     $node->setClassName('pa-row');
+    $nextButton = new HTMLNode('button');
+    $nextButton->setAttribute('onclick', 'window.location.href = \'pages/setup/admin-account\'');
+    $nextButton->setAttribute('disabled', '');
+    $nextButton->setClassName('pa-'.Page::get()->getWritingDir().'-col-three');
+    $nextButton->setID('next-button');
+    $nextButton->setAttribute('data-action', 'ok');
+    $buttonText = new HTMLNode('', FALSE, TRUE);
+    $buttonText->setText($nextText);
+    $nextButton->addChild($buttonText);
+    $node->addChild($nextButton);
     return $node;
 }
 

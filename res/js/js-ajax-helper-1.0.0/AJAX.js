@@ -239,10 +239,10 @@ function AJAX(config={
                     var jsonResponse = null;
                 }
                 for(var i = 0 ; i < this.onservererrorpool.length ; i++){
-                    this.onservererrorpool[i].func.status = this.status;
-                    this.onservererrorpool[i].func.response = this.responseText;
-                    this.onservererrorpool[i].func.xmlResponse = this.responseXML;
-                    this.onservererrorpool[i].func.jsonResponse = jsonResponse;
+                    this.onservererrorpool[i].status = this.status;
+                    this.onservererrorpool[i].response = this.responseText;
+                    this.onservererrorpool[i].xmlResponse = this.responseXML;
+                    this.onservererrorpool[i].jsonResponse = jsonResponse;
                     if(this.onservererrorpool[i].call === true){
                         this.onservererrorpool[i].func();
                     }

@@ -23,9 +23,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
-require_once '../root.php';
 define('SETUP_MODE', '');
+require_once '../root.php';
 /**
  * An API used to get or information about the system.
  *
@@ -129,31 +128,22 @@ class SysAPIs extends API{
      */
     private function updateSiteInfo() {
         $i = $this->getInputs();
-        if(isset($i['site-name'])){
-            if(isset($i['site-description'])){
-                $cfgArr = array(
-                    'website-name'=>$i['site-name'],
-                    'description'=>$i['site-description']
-                );
-                if(isset($i['title-sep'])){
-                    $cfgArr['title-separator'] = $i['title-sep'];
-                }
-                if(isset($i['home-page'])){
-                    $cfgArr['home-page'] = $i['home-page'];
-                }
-                if(isset($i['site-theme'])){
-                    $cfgArr['theme-directory'] = $i['site-theme'];
-                }
-                SystemFunctions::get()->updateSiteInfo($cfgArr);
-                $this->sendResponse('Site info updated.');
-            }
-            else{
-                $this->missingParam('description');
-            }
+        $cfgArr = array(
+            'website-name'=>$i['site-name'],
+            'description'=>$i['site-description']
+        );
+        if(isset($i['title-sep'])){
+            $cfgArr['title-separator'] = $i['title-sep'];
         }
-        else{
-            $this->missingParam('site-name');
+        if(isset($i['home-page'])){
+            $cfgArr['home-page'] = $i['home-page'];
         }
+        if(isset($i['site-theme'])){
+            $cfgArr['theme-directory'] = $i['site-theme'];
+        }
+        SystemFunctions::get()->updateSiteInfo($cfgArr);
+        $this->sendResponse('Site info updated.');
+            
     }
     /**
      * A function that is called to update database attributes
@@ -161,33 +151,13 @@ class SysAPIs extends API{
      */
     private function updateDBAttrs() {
         $i = $this->getInputs();
-        if(isset($i['host'])){
-            if(isset($i['database-username'])){
-                if(isset($i['database-password'])){
-                    if(isset($i['database-name'])){
-                        $r = SystemFunctions::get()->updateDBAttributes($i['host'], $i['database-username'], $i['database-password'], $i['database-name']);
-                        if($r === TRUE){
-                            $this->sendResponse('Database Updated.');
-                        }
-                        else{
-                            $this->sendResponse(SessionManager::DB_CONNECTION_ERR, TRUE, 404, '"details":'.
-                            SystemFunctions::get()->getMainSession()->getDBLink()->toJSON());
-                        }
-                    }
-                    else{
-                        $this->missingParam('database-name');
-                    }
-                }
-                else{
-                    $this->missingParam('database-password');
-                }
-            }
-            else{
-                $this->missingParam('database-username');
-            }
+        $r = SystemFunctions::get()->updateDBAttributes($i['host'], $i['database-username'], $i['database-password'], $i['database-name']);
+        if($r === TRUE){
+            $this->sendResponse('Database Updated.');
         }
         else{
-            $this->missingParam('host');
+            $this->sendResponse(SessionManager::DB_CONNECTION_ERR, TRUE, 404, '"details":'.
+            SystemFunctions::get()->getMainSession()->getDBLink()->toJSON());
         }
     }
     

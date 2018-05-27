@@ -57,7 +57,7 @@ $document->addNode($container);
 $container->setClassName('pa-container');
 $container->addChild(stepsCounter(LANGUAGE['pages']['setup']['setup-steps'],1));
 $container->addChild(pageBody($pageLbls));
-$container->addChild(footer(LANGUAGE['general']['next']));
+$container->addChild(footer());
 echo $document->toHTML();
 
 function createDbInfoForm($lbls,$placeholders){
@@ -144,18 +144,18 @@ function pageBody($pageLang){
     return $body;
 }
 
-function footer($nextText){
+function footer(){
     $node = new HTMLNode();
     $node->setClassName('pa-row');
     $nextButton = new HTMLNode('button');
-    $nextButton->setAttribute('onclick', 'window.location.href = \'pages/setup/admin-account\'');
+    $nextButton->setAttribute('onclick', 'window.location.href = \'pages/setup/email-account\'');
     $nextButton->setAttribute('disabled', '');
     $nextButton->setClassName('pa-'.Page::get()->getWritingDir().'-col-three');
     $nextButton->setID('next-button');
     $nextButton->setAttribute('data-action', 'ok');
-    $buttonText = new HTMLNode('', FALSE, TRUE);
-    $buttonText->setText($nextText);
-    $nextButton->addChild($buttonText);
+    $nextText = new HTMLNode('', FALSE, TRUE);
+    $nextText->setText(LANGUAGE['general']['next']);
+    $nextButton->addChild($nextText);
     $node->addChild($nextButton);
     return $node;
 }
@@ -180,23 +180,30 @@ function stepsCounter($lang,$active){
     $step3 = new HTMLNode();
     $step3->setClassName('pa-'.Page::get()->getWritingDir().'-col-two');
     $step3Text = new HTMLNode('', FALSE, TRUE);
-    $step3Text->setText($lang['admin-account']);
+    $step3Text->setText($lang['email-account']);
     $step3->addChild($step3Text);
     $node->addChild($step3);
     
     $step4 = new HTMLNode();
     $step4->setClassName('pa-'.Page::get()->getWritingDir().'-col-two');
     $step4Text = new HTMLNode('', FALSE, TRUE);
-    $step4Text->setText($lang['website-config']);
+    $step4Text->setText($lang['admin-account']);
     $step4->addChild($step4Text);
     $node->addChild($step4);
     
     $step5 = new HTMLNode();
     $step5->setClassName('pa-'.Page::get()->getWritingDir().'-col-two');
     $step5Text = new HTMLNode('', FALSE, TRUE);
-    $step5Text->setText($lang['finish']);
+    $step5Text->setText($lang['website-config']);
     $step5->addChild($step5Text);
     $node->addChild($step5);
+    
+    $step6 = new HTMLNode();
+    $step6->setClassName('pa-'.Page::get()->getWritingDir().'-col-two');
+    $step6Text = new HTMLNode('', FALSE, TRUE);
+    $step6Text->setText($lang['finish']);
+    $step6->addChild($step6Text);
+    $node->addChild($step6);
     if($active == 0){
         $step1->setAttribute('style', 'background-color:#efaa32');
     }
@@ -211,6 +218,9 @@ function stepsCounter($lang,$active){
     }
     else if($active == 4){
         $step5->setAttribute('style', 'background-color:#efaa32');
+    }
+    else if($active == 5){
+        $step6->setAttribute('style', 'background-color:#efaa32');
     }
     return $node;
 }

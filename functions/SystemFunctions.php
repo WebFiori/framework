@@ -28,9 +28,14 @@
  * Description of SystemFunctions
  *
  * @author Ibrahim
- * @version 1.0
+ * @version 1.1
  */
 class SystemFunctions extends Functions{
+    /**
+     * A constant that indicates the selected database schema has tables.
+     * @since 1.1
+     */
+    const DB_NOT_EMPTY = 'db_has_tables';
     /**
      * An array that contains initial system configuration variables.
      * @since 1.0
@@ -105,8 +110,10 @@ class SystemFunctions extends Functions{
      * @param string $dbPass The password of the database user.
      * @param string $dbName The name of database schema.
      * @return boolean|string The function will return <b>TRUE</b> in case 
-     * of valid database attributes. Other than that, the function will return 
-     * <b>SessionManager::DB_CONNECTION_ERR</b>.
+     * of valid database attributes. Also the function will return 
+     * <b>SessionManager::DB_CONNECTION_ERR</b> in case the connection was not 
+     * established. If the connection is established and the database is not 
+     * empty, the function will return <b>SystemFunctions::DB_NOT_EMPTY</b>.
      * @since 1.0
      */
     public function updateDBAttributes($dbHost,$dbUser,$dbPass,$dbName){
@@ -117,15 +124,31 @@ class SystemFunctions extends Functions{
             'db-name'=>$dbName
         ));
         if($r === TRUE){
-            $config = $this->getConfigVars();
-            $config['database-host'] = $dbHost;
-            $config['database-username'] = $dbUser;
-            $config['database-password'] = $dbPass;
-            $config['database-name'] = $dbName;
-            $this->writeConfig($config);
-            return TRUE;
+            $tablesCount = $this->getSchemaTablesCount($dbName);
+            if($tablesCount == 0){
+                $config = $this->getConfigVars();
+                $config['database-host'] = $dbHost;
+                $config['database-username'] = $dbUser;
+                $config['database-password'] = $dbPass;
+                $config['database-name'] = $dbName;
+                $this->writeConfig($config);
+                return TRUE;
+            }
+            else if($tablesCount == MySQLQuery::QUERY_ERR){
+                return MySQLQuery::QUERY_ERR;
+            }
+            return self::DB_NOT_EMPTY;
         }
         return $r;
+    }
+    private function getSchemaTablesCount($schema){
+        $q = new UserQuery();
+        $q->schemaTablesCount($schema);
+        if($this->excQ($q)){
+            $count = $this->getRow()['tables_count'];
+            return $count;
+        }
+        return MySQLQuery::QUERY_ERR;
     }
     /**
      * Updates web site configuration based on some attributes.

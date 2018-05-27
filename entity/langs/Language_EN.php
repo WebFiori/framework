@@ -11,6 +11,7 @@ const LANGUAGE = array(
         'loading'=>'Loading...',
         'next'=>'Next',
         'prev'=>'Previous',
+        'skip'=>'Skip',
         'disconnected'=>'Please check that you are connected to the internet.'
     ),
     'pages'=>array(
@@ -19,8 +20,30 @@ const LANGUAGE = array(
                 'welcome'=>'Welcome',
                 'database-setup'=>'Database Setup',
                 'admin-account'=>'Admin Account',
+                'email-account'=>'Email Setup',
                 'website-config'=>'Website Configuration',
                 'finish'=>'Finish'
+            ),
+            'email-account'=>array(
+                'title'=>'Email Account',
+                'description'=>'',
+                'labels'=>array(
+                    'name'=>'',
+                    'server-address'=>'',
+                    'email-address'=>'',
+                    'username'=>'',
+                    'password'=>'',
+                    'port'=>''
+                ),
+                'placeholders'=>array(
+                    'name'=>'',
+                    'server-address'=>'',
+                    'email-address'=>'',
+                    'username'=>'',
+                    'password'=>'',
+                    'port'=>''
+                ),
+                'errors'=>array()
             ),
             'welcome'=>array(
                 'title'=>'Welcome',
@@ -29,9 +52,15 @@ const LANGUAGE = array(
                     'h-1'=>'Welcome to application setup. Since this is your first '
                     . 'time using the app, you must setup few things.',
                     'h-2'=>'The first thing that we need from you is to provide the '
-                    . 'application with database connection information. After that, you '
+                    . 'application with database connection information. Next, you will have to enter '
+                    . 'the information of SMTP Email account that will be used to send system '
+                    . 'notifications to users and admin. After that, you '
                     . 'will have to create an admin account. The final step is to configure '
-                    . 'some of the basic website settings.'
+                    . 'some of the basic website settings.',
+                    'h-3'=>'Before you continue with the setup, please make sure that you '
+                    . 'have the following things ready:',
+                    'h-4'=>'MySQL Database Account Information.',
+                    'h-5'=>'SMTP Email Account Information.',
                 )
             ),
             'database-setup'=>array(
@@ -66,7 +95,8 @@ const LANGUAGE = array(
                     2002=>'Check that your host name is correct and that your host has MySql Server installed.',
                     1045=>'Check that your database username and password are correct.',
                     1044=>'You don\'t have permissions to access the given database.',
-                    1049=>'Check that the database name is correct.'
+                    1049=>'Check that the database name is correct.',
+                    10000=>'The given database is not empty. Selected database must have no tables.'
                 )
             ),
             'admin-account'=>array(

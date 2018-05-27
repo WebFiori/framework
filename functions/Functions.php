@@ -68,9 +68,12 @@ class Functions {
             'pass'=>Config::get()->getDBPassword(),
             'db-name'=> Config::get()->getDBName()
         ));
-        if($result !== TRUE){
+        if($result !== TRUE && !defined('SETUP_MODE')){
             header('content-type:application/json');
             die($this->mainSession->getDBLink()->toJSON());
+        }
+        else if($result !== TRUE && defined('SETUP_MODE')){
+            return FALSE;
         }
     }
     /**

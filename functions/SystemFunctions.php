@@ -28,7 +28,7 @@
  * Description of SystemFunctions
  *
  * @author Ibrahim
- * @version 1.1
+ * @version 1.2
  */
 class SystemFunctions extends Functions{
     /**
@@ -36,6 +36,21 @@ class SystemFunctions extends Functions{
      * @since 1.1
      */
     const DB_NOT_EMPTY = 'db_has_tables';
+    /**
+     * A constant that indicates the file Config.php was not found.
+     * @since 1.2
+     */
+    const SYS_CONFIG_MISSING = 'config_file_missing';
+    /**
+     * A constant that indicates the file SiteConfig.php was not found.
+     * @since 1.2
+     */
+    const SITE_CONFIG_MISSING = 'site_config_file_missing';
+    /**
+     * A constant that indicates the file MailConfig.php was not found.
+     * @since 1.2
+     */
+    const MAIL_CONFIG_MISSING = 'mail_config_file_missing';
     /**
      * An array that contains initial system configuration variables.
      * @since 1.0
@@ -606,12 +621,14 @@ class SystemFunctions extends Functions{
     
     public function isSetupFinished(){
         if(class_exists('Config')){
-            if(class_exists('SiteConfig')){
-                return Config::get()->isConfig();
+            if(class_exists('MailConfig')){
+                if(class_exists('SiteConfig')){
+                    return Config::get()->isConfig();
+                }
+                throw new Exception('SiteConfig.php is missing.');
             }
             throw new Exception('SiteConfig.php is missing.');
         }
         throw new Exception('Config.php is missing.');
     }
 }
-//echo hash('sha256', '123456654321');

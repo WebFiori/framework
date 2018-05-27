@@ -155,6 +155,9 @@ class SysAPIs extends API{
         if($r === TRUE){
             $this->sendResponse('Database Updated.');
         }
+        else if($r == SystemFunctions::DB_NOT_EMPTY){
+            $this->sendResponse(SystemFunctions::DB_NOT_EMPTY, TRUE, 404, '"details":{"detailed-message":"The selected schema is not empty.","error-code":10000}');
+        }
         else{
             $this->sendResponse(SessionManager::DB_CONNECTION_ERR, TRUE, 404, '"details":'.
             SystemFunctions::get()->getMainSession()->getDBLink()->toJSON());

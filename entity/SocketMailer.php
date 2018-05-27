@@ -114,6 +114,16 @@ class SocketMailer {
         $this->subject = 'EMAIL MESSAGE';
         $this->writeMode = FALSE;
     }
+    public function login($username,$password) {
+        if($this->isConnected()){
+            $this->sendC('AUTH LOGIN');
+            $this->sendC(base64_encode($username));
+            $this->sendC(base64_encode($password));
+        }
+        else{
+            array_push($this->log, 'Unable to login. No connection available.');
+        }
+    }
     /**
      * Returns log messages.
      * @return array
@@ -215,6 +225,7 @@ class SocketMailer {
      * message will be sent.
      */
     public function write($msg,$sendMessage=false){
+        array_push($this->log, '');
         if($this->isInWritingMode()){
             $this->sendC($msg);
             if($sendMessage === TRUE){
@@ -223,6 +234,7 @@ class SocketMailer {
             }
         }
         else{
+            array_push($this->log, 'Switching to message writing mode.');
             $this->sendC('MAIL FROM: <'.$this->senderAddress.'>');
             foreach ($this->receivers as $val){
                 $this->sendC('RCPT TO: <'.$val.'>');
@@ -376,10 +388,20 @@ class SocketMailer {
      */
     public function connect() {
         if(!$this->isConnected()){
+            set_error_handler(function(){});
             $err = 0;
             $errStr = '';
             $this->conn = fsockopen($this->host, $this->port, $err, $errStr, $this->timeout*60);
-            return is_resource($this->conn);
+            set_error_handler(NULL);
+            if(is_resource($this->conn)){
+                array_push($this->log, 'Connected');
+                $this->sendC('EHLO');
+                return TRUE;
+            }
+            else{
+                array_push($this->log, 'Unable to connect. Check your connection parameters.');
+                return FALSE;
+            }
         }
         return TRUE;
     }

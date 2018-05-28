@@ -21,6 +21,51 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+function checkMailParams(){
+    var ajax = new AJAX({
+        method:'post',
+        url:'apis/SysAPIs'
+    });
+    var form = new FormData();
+    form.append('action','update-send-email-account');
+    form.append('server-address',window.mailAttrs['server-address']);
+    form.append('server-port',window.mailAttrs['port']);
+    form.append('email-address',window.mailAttrs['address']);
+    form.append('username',window.mailAttrs['username']);
+    form.append('password',window.mailAttrs['password']);
+    form.append('name',window.mailAttrs['name']);
+    var messageDisplay = document.getElementById('message-display');
+    var submitButton = document.getElementById('check-input');
+    submitButton.setAttribute('disabled','');
+    messageDisplay.innerHTML = '<b>'+window.messages['checking-connection']+'</b>';
+    ajax.setParams(form);
+    ajax.setOnSuccess(function(){
+        console.log(this.jsonResponse);
+        submitButton.removeAttribute('disabled');
+        messageDisplay.innerHTML = '<b style="color:green">'+window.messages['success']+'</b>';
+        document.getElementById('next-button').removeAttribute('disabled');
+    });
+    ajax.setOnClientError(function(){
+        console.log(this.jsonResponse);
+        submitButton.removeAttribute('disabled');
+        messageDisplay.innerHTML = '<b style="color:red">'+window.messages[this.jsonResponse['message']]+'</b>';
+        document.getElementById('next-button').setAttribute('disabled','');
+    });
+    ajax.setOnServerError(function(){
+        console.log(this.jsonResponse);
+        submitButton.removeAttribute('disabled');
+        messageDisplay.innerHTML = '<b style="color:red">'+window.messages[this.jsonResponse['message']]+'</b>';
+        document.getElementById('next-button').setAttribute('disabled','');
+    });
+    ajax.setOnDisconnected(function(){
+        console.log('Disconnected!');
+        submitButton.removeAttribute('disabled');
+        messageDisplay.innerHTML = '<b style="color:red">'+window.messages['disconnected']+'</b>';
+        document.getElementById('next-button').setAttribute('disabled','');
+    });
+    ajax.send();
+    return false;
+}
 function checkConectionParams(){
     var ajax = new AJAX({
         method:'post',
@@ -64,6 +109,7 @@ function checkConectionParams(){
     ajax.send();
     return false;
 }
+
 function dbInputChanged(){
     var host = document.getElementById('database-host-input').value;
     if(host !== ''){
@@ -81,6 +127,38 @@ function dbInputChanged(){
                     };
                     document.getElementById('check-input').removeAttribute('disabled');
                     return;
+                }
+            }
+        }
+    }
+    document.getElementById('check-input').setAttribute('disabled','');
+}
+
+function emailInputChanged(){
+    var host = document.getElementById('server-address-input').value;
+    if(host !== ''){
+        var port = document.getElementById('port-input').value;
+        if(port !== ''){
+            var address = document.getElementById('address-input').value;
+            if(address !== ''){
+                var username = document.getElementById('username-input').value;
+                if(username !== ''){
+                    var password = document.getElementById('password-input').value;
+                    if(password !== ''){
+                        var name = document.getElementById('account-name-input').value;
+                        if(name !== ''){
+                            document.getElementById('check-input').removeAttribute('disabled');
+                            window.mailAttrs = {
+                                'server-address':host,
+                                port:port,
+                                address:address,
+                                username:username,
+                                password:password,
+                                name:name
+                            };
+                            return;
+                        }
+                    }
                 }
             }
         }

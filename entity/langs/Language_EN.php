@@ -12,6 +12,7 @@ const LANGUAGE = array(
         'next'=>'Next',
         'prev'=>'Previous',
         'skip'=>'Skip',
+        'connected'=>'Connected!',
         'disconnected'=>'Please check that you are connected to the internet.'
     ),
     'pages'=>array(
@@ -28,22 +29,37 @@ const LANGUAGE = array(
                 'title'=>'Email Account',
                 'description'=>'',
                 'labels'=>array(
-                    'name'=>'',
-                    'server-address'=>'',
-                    'email-address'=>'',
-                    'username'=>'',
-                    'password'=>'',
-                    'port'=>''
+                    'name'=>'Account Name:',
+                    'server-address'=>'Server Address:',
+                    'email-address'=>'Email Address:',
+                    'username'=>'Username',
+                    'password'=>'Password:',
+                    'check-connection'=>'Check Connection',
+                    'connected'=>'Connection Established Successfully!',
+                    'port'=>'Server Port:'
                 ),
                 'placeholders'=>array(
-                    'name'=>'',
-                    'server-address'=>'',
-                    'email-address'=>'',
-                    'username'=>'',
-                    'password'=>'',
-                    'port'=>''
+                    'name'=>'Something like: \'Programming Academia Team\'',
+                    'server-address'=>'mail.example.com',
+                    'email-address'=>'ma_address@example.com',
+                    'username'=>'Server username.',
+                    'password'=>'Login password.',
+                    'port'=>'25'
                 ),
-                'errors'=>array()
+                'status'=>array(
+                    'checking-connection'=>'Validating connection info...',
+                ),
+                'errors'=>array(
+                    'inv_mail_host_or_port'=>'Incorrect server address or port.',
+                    'inv_username_or_pass'=>'Incorrect username or password.'
+                ),
+                'help'=>array(
+                    'h-1'=>'In this step, we need from you to give us the information of '
+                    . 'the email account hat we are going to use in order to send notifications. '
+                    . 'We need from you to give us SMTP server information (Port and address) in addition to '
+                    . 'SMTP account information.',
+                    'h-2'=>'If you don\' have the information, you can skip this step.'
+                )
             ),
             'welcome'=>array(
                 'title'=>'Welcome',

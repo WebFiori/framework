@@ -12,6 +12,7 @@ const LANGUAGE = array(
         'next'=>'التالي',
         'prev'=>'السابق',
         'skip'=>'تخطي',
+        'connected'=>'تم الإتصال بنجاح.',
         'disconnected'=>'الرجاء التحقق من إتصالك بالإنترنت.'
     ),
     'pages'=>array(
@@ -25,25 +26,38 @@ const LANGUAGE = array(
                 'finish'=>'الإنهاء'
             ),
             'email-account'=>array(
-                'title'=>'Email Account',
-                'description'=>'',
                 'labels'=>array(
-                    'name'=>'',
-                    'server-address'=>'',
-                    'email-address'=>'',
-                    'username'=>'',
-                    'password'=>'',
-                    'port'=>''
+                    'name'=>'إسم الحساب:',
+                    'server-address'=>'عنوان الخادم:',
+                    'email-address'=>'عنوان البريد الإلكتروني:',
+                    'username'=>'إسم المستخدم:',
+                    'password'=>'كلمة المرور:',
+                    'port'=>'رقم بوابة الخادم:',
+                    'check-connection'=>'تفقد الإتصال',
+                    'connected'=>'تم الإتصال بنجاح!'
                 ),
                 'placeholders'=>array(
-                    'name'=>'',
-                    'server-address'=>'',
-                    'email-address'=>'',
-                    'username'=>'',
-                    'password'=>'',
-                    'port'=>''
+                    'name'=>'إسم يعكس هدف الحساب (مثلا, إشعارات الموقع)',
+                    'server-address'=>'عنوان خادم إرسال البريد الإلكتروني (مثلا, mail.example.com)',
+                    'email-address'=>'my_address@example.com',
+                    'username'=>'إسم المستخدم لتسجيل الدخول للخادم.',
+                    'password'=>'كلمة مرور الحساب.',
+                    'port'=>'25'
                 ),
-                'errors'=>array()
+                'status'=>array(
+                    'checking-connection'=>'جاري تفقد معلومات الإتصال...',
+                ),
+                'errors'=>array(
+                    'inv_mail_host_or_port'=>'عنوان خادم البريد الإلكتروني اوالبوابة غير صحيحين.',
+                    'inv_username_or_pass'=>'إسم المستخدم او كلمة المرور غير صحيحين.'
+                ),
+                'help'=>array(
+                    'h-1'=>'In this step, we need from you to give us the information of '
+                    . 'the email account hat we are going to use in order to send notifications. '
+                    . 'We need from you to give us SMTP server information (Port and address) in addition to '
+                    . 'SMTP account information.',
+                    'h-2'=>'If you don\' have the information, you can skip this step.'
+                )
             ),
             'welcome'=>array(
                 'title'=>'اهلاً و سهلاً',

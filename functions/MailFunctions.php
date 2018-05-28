@@ -23,7 +23,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 /**
  * A class for the functions that is related to mailing.
  *
@@ -37,6 +36,12 @@ class MailFunctions extends Functions{
      * @since 1.1
      */
     const INV_HOST_OR_PORT = 'inv_mail_host_or_port';
+    /**
+     * A constant that indicates the given username or password  
+     * is invalid.
+     * @since 1.1
+     */
+    const INV_CREDENTIALS = 'inv_username_or_pass';
     /**
      *
      * @var MailFunctions 
@@ -74,7 +79,7 @@ class MailFunctions extends Functions{
      * @since 1.1
      */
     private function writeMailConfig($emailAccountsArr){
-        $fh = new FileHandler(ROOT_DIR.'/MailConfig_test.php');
+        $fh = new FileHandler(ROOT_DIR.'/MailConfig.php');
         $fh->write('<?php', TRUE, TRUE);
         $fh->write('/**
  * A file that contains system email addresses configurations.
@@ -174,19 +179,37 @@ class MailFunctions extends Functions{
             $mailer->write($msg,TRUE);
         }
     }
+    /**
+     * Update the email address that is used to send system notifications.
+     * @param EmailAccount $emailAccount An instance of <b>EmailAccount</b>.
+     * @return boolean|string The function will return <b>TRUE</b> if the email 
+     * account updated. If the email account contains wrong server information, 
+     * the function will return <b>MailFunctions::INV_HOST_OR_PORT</b>. If the 
+     * given email account contains wrong login info, the function will return 
+     * <b>MailFunctions::INV_CREDENTIALS</b>. Other than that, the function 
+     * will return <b>FALSE</b>.
+     * @since 1.1
+     */
     public function updateEmailAccount($emailAccount) {
         if($emailAccount instanceof EmailAccount){
             $sm = $this->getSocketMailer($emailAccount);
-            
+            if($sm instanceof SocketMailer){
+                $arr = array($emailAccount);
+                $this->writeMailConfig($arr);
+                return TRUE;
+            }
+            return $sm;
         }
+        return FALSE;
     }
     /**
      * Returns a new instance of the class <b>SocketMailer</b>.
      * @param EmailAccount $emailAcc An account that is used to initiate 
      * socket mailer.
-     * @return SocketMailer|NULL The function will return an instance of <b>SocketMailer</b> 
+     * @return SocketMailer|string The function will return an instance of <b>SocketMailer</b> 
      * on successful connection. If no connection is established, the function will 
-     * return <b>NULL</b>.
+     * return <b>MailFunctions::INV_HOST_OR_PORT</b>. If user authentication fails, 
+     * the function will return <b></b>.
      * @since 1.0
      */
     private function getSocketMailer($emailAcc){
@@ -194,13 +217,12 @@ class MailFunctions extends Functions{
         $m->setHost($emailAcc->getServerAddress());
         $m->setPort($emailAcc->getPort());
         if($m->connect()){
-            $m->sendC('EHLO');
-            $m->sendC('AUTH LOGIN');
-            $m->sendC(base64_encode($emailAcc->getUsername()));
-            $m->sendC(base64_encode($emailAcc->getPassword()));
             $m->setSender($emailAcc->getName(), $emailAcc->getAddress());
-            return $m;
+            if($m->login($emailAcc->getUsername(), $emailAcc->getPassword())){
+                return $m;
+            }
+            return MailFunctions::INV_CREDENTIALS;
         }
-        return NULL;
+        return MailFunctions::INV_HOST_OR_PORT;
     }
 }

@@ -29,12 +29,13 @@ require_once '../root.php';
  * An API used to get or information about the system.
  *
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.0
+ * @version 1.1
  */
 class SysAPIs extends API{
     public function __construct() {
         parent::__construct();
         $this->setVersion('1.0.1');
+        $this->setDescription('System and system configuratin APIs.');
         $a1 = new APIAction();
         $a1->addRequestMethod('GET');
         $a1->setName('get-site-info');
@@ -81,6 +82,19 @@ class SysAPIs extends API{
         $a8->addParameter(new RequestParameter('home-page', 'string',TRUE));
         $a8->addParameter(new RequestParameter('site-theme', 'string',TRUE));
         $this->addAction($a8, TRUE);
+        
+        $this->setVersion('1.1.0');
+        $a9 = new APIAction('update-send-email-account');
+        $a9->addRequestMethod('post');
+        $a9->addParameter(new RequestParameter('server-address', 'string'));
+        $a9->addParameter(new RequestParameter('server-port', 'integer'));
+        $a9->getParameterByName('server-port')->setMinVal(0);
+        $a9->getParameterByName('server-port')->setMaxVal(5000);
+        $a9->addParameter(new RequestParameter('email-address', 'email'));
+        $a9->addParameter(new RequestParameter('username', 'string'));
+        $a9->addParameter(new RequestParameter('password', 'string'));
+        $a9->addParameter(new RequestParameter('name', 'string'));
+        $this->addAction($a9, TRUE);
     } 
     
     public function processRequest(){
@@ -107,6 +121,9 @@ class SysAPIs extends API{
         else if($action == 'update-database-attributes'){
             $this->updateDBAttrs();
         }
+        else if($action == 'update-send-email-account'){
+            $this->updateSendMail();
+        }
         else if($action == 'get-email-accounts'){
             $j = new JsonX();
             $accountNum = 0;
@@ -120,6 +137,30 @@ class SysAPIs extends API{
                 $accountNum++;
             }
             $this->sendResponse('Email Accounts', FALSE, 200, '"accounts":'.$j);
+        }
+    }
+    /**
+     * Updates the email that is used to send system notifications.
+     * @since 1.1
+     */
+    private function updateSendMail() {
+        $i = $this->getInputs();
+        $account = new EmailAccount();
+        $account->setAddress($i['email-address']);
+        $account->setServerAddress($i['server-address']);
+        $account->setPort($i['server-port']);
+        $account->setName($i['name']);
+        $account->setPassword($i['password']);
+        $account->setUsername($i['username']);
+        $r = MailFunctions::get()->updateEmailAccount($account);
+        if($r === TRUE){
+            $this->sendResponse('Account Updated');
+        }
+        else if($r == MailFunctions::INV_CREDENTIALS){
+            $this->sendResponse($r, TRUE, 404, '"details":"The given username and password are invalid."');
+        }
+        else{
+            $this->sendResponse($r, TRUE, 404, '"details":"The given server address or port are invalid."');
         }
     }
     /**

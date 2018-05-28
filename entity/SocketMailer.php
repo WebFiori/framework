@@ -28,7 +28,7 @@
  * A class that can be used to send email messages using sockets.
  *
  * @author Ibrahim
- * @version 1.1
+ * @version 1.2
  */
 class SocketMailer {
     const NL = "\r\n";
@@ -37,6 +37,12 @@ class SocketMailer {
      * @var resource 
      */
     private $conn;
+    /**
+     * A boolean that is set to true if authentication succeeded.
+     * @var boolean
+     * @since 1.2 
+     */
+    private $isLoggedIn;
     /**
      * The name of mail server host.
      * @var string 
@@ -106,27 +112,84 @@ class SocketMailer {
      */
     private $writeMode;
     public function __construct() {
+        $this->log = array();
+        array_push($this->log, 'Creating new instance of SocketMailer.');
         $this->setTimeout(5);
         $this->receivers = array();
         $this->cc = array();
         $this->bcc = array();
-        $this->log = array();
-        $this->subject = 'EMAIL MESSAGE';
+        $this->setSubject('EMAIL MESSAGE');
         $this->writeMode = FALSE;
+        $this->isLoggedIn = FALSE;
     }
+    /**
+     * Checks if the user is logged in or not.
+     * @return boolean The function will return <b>TRUE</b> if the user is 
+     * logged in to the mail server. <b>FALSE</b> if not.
+     * @since 1.2
+     */
+    public function isLoggedIn() {
+        return $this->isLoggedIn;
+    }
+    /**
+     * Authenticate the user given email server username and password. Authentication 
+     * must be done after connecting to the server.
+     * @param string $username The email server username.
+     * @param string $password The user password.
+     * @return boolean The function will return <b>TRUE</b> if the user is 
+     * logged in to the mail server. <b>FALSE</b> if not. The user might not be logged 
+     * in in 3 cases:
+     * <ul>
+     * <li>If the mailer is not connected to the email server.</li>
+     * <li>If the sender address is not set.</li>
+     * <li>If the given username and password are incorrect.</li>
+     * </ul>
+     * @since 1.2
+     */
     public function login($username,$password) {
         if($this->isConnected()){
-            $this->sendC('AUTH LOGIN');
-            $this->sendC(base64_encode($username));
-            $this->sendC(base64_encode($password));
+            if(strlen($this->getSenderAddress()) != 0){
+                array_push($this->log, 'Validating user credentials.');
+                $this->sendC('AUTH LOGIN');
+                $this->sendC(base64_encode($username));
+                $this->sendC(base64_encode($password));
+                //a command to check if authentication is done
+                $this->sendC('MAIL FROM: <'.$this->getSenderAddress().'>');
+
+                if($this->getLastLogMessage() == 'Response: 235 Authentication succeeded'){
+                    array_push($this->log, 'Logged in. Valid credentials.');
+                    $this->isLoggedIn = TRUE;
+                }
+                else{
+                    array_push($this->log, 'Unable to login. Invalid credentials.');
+                    $this->isLoggedIn = FALSE;
+                }
+            }
+            else{
+                array_push($this->log, 'Unable to login. Sender not set.');
+            }
         }
         else{
             array_push($this->log, 'Unable to login. No connection available.');
         }
+        return $this->isLoggedIn();
+    }
+    /**
+     * Returns the last logged message after executing some command.
+     * @return string The last logged message after executing some command.
+     * @since 1.2
+     */
+    public function getLastLogMessage(){
+        $count = count($this->getLog());
+        if($count == 0){
+            return '';
+        }
+        return $this->getLog()[$count - 1];
     }
     /**
      * Returns log messages.
-     * @return array
+     * @return array An array that contains all logged messages.
+     * @ince 1.0
      */
     public function getLog() {
         return $this->log;
@@ -223,6 +286,7 @@ class SocketMailer {
      * @param string $msg The message to write. 
      * @param boolean $sendMessage If set to <b>TRUE</b>, The connection will be closed and the 
      * message will be sent.
+     * @since 1.0
      */
     public function write($msg,$sendMessage=false){
         array_push($this->log, '');
@@ -234,30 +298,34 @@ class SocketMailer {
             }
         }
         else{
-            array_push($this->log, 'Switching to message writing mode.');
-            $this->sendC('MAIL FROM: <'.$this->senderAddress.'>');
-            foreach ($this->receivers as $val){
-                $this->sendC('RCPT TO: <'.$val.'>');
+            if(strlen($this->getSenderAddress()) != 0){
+                array_push($this->log, 'Switching to message writing mode.');
+                foreach ($this->receivers as $val){
+                    $this->sendC('RCPT TO: <'.$val.'>');
+                }
+                foreach ($this->cc as $val){
+                    $this->sendC('RCPT TO: <'.$val.'>');
+                }
+                foreach ($this->bcc as $val){
+                    $this->sendC('RCPT TO: <'.$val.'>');
+                }
+                $this->sendC('DATA');
+                $this->sendC('From: "'.$this->getSenderName().'" <'.$this->getSenderAddress().'>');
+                $this->sendC('To: '.$this->getTo());
+                $this->sendC('CC: '.$this->getCC());
+                $this->sendC('BCC: '.$this->getBcc());
+                $this->sendC('Date:'. date('r (T)'));
+                $this->sendC('Subject:'. $this->subject);
+                $this->sendC('MIME-Version: 1.0');
+                $this->sendC('Content-Type: text/html; charset=UTF-8');
+                $this->sendC($msg);
+                if($sendMessage === TRUE){
+                    $this->sendC(self::NL.'.');
+                    $this->sendC('QUIT');
+                }
             }
-            foreach ($this->cc as $val){
-                $this->sendC('RCPT TO: <'.$val.'>');
-            }
-            foreach ($this->bcc as $val){
-                $this->sendC('RCPT TO: <'.$val.'>');
-            }
-            $this->sendC('DATA');
-            $this->sendC('From: "'.$this->getSenderName().'" <'.$this->getSenderAddress().'>');
-            $this->sendC('To: '.$this->getTo());
-            $this->sendC('CC: '.$this->getCC());
-            $this->sendC('BCC: '.$this->getBcc());
-            $this->sendC('Date:'. date('r (T)'));
-            $this->sendC('Subject:'. $this->subject);
-            $this->sendC('MIME-Version: 1.0');
-            $this->sendC('Content-Type: text/html; charset=UTF-8');
-            $this->sendC($msg);
-            if($sendMessage === TRUE){
-                $this->sendC(self::NL.'.');
-                $this->sendC('QUIT');
+            else{
+                array_push($this->log, 'Unable to switch to message writing mode. Sender address not set.');
             }
         }
     }
@@ -353,7 +421,7 @@ class SocketMailer {
             else{
                 array_push($this->log, 'Sending the command: '.$command);
                 fwrite($this->conn, $command.self::NL);
-                array_push($this->log, 'Response: '.$this->read());
+                array_push($this->log, trim('Response: '.$this->read()));
                 if($command == 'DATA'){
                     $this->writeMode = TRUE;
                     array_push($this->log, 'Switched to writing mode');
@@ -382,8 +450,10 @@ class SocketMailer {
         return $message;
     }
     /**
-     * 
-     * @return boolean
+     * Connect to the mail server.
+     * @return boolean <b>TRUE</b> if the connection established or already 
+     * connected. <b>FALSE</b> if not. Once the connection is established, the 
+     * function will send the command 'EHLO' to the server. 
      * @since 1.0
      */
     public function connect() {
@@ -413,6 +483,7 @@ class SocketMailer {
      */
     public function setTimeout($val) {
         if($val >= 1 && !$this->isConnected()){
+            array_push($this->log, 'Timeout set to '.$val.' minutes.');
             $this->timeout = $val;
         }
     }

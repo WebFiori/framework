@@ -34,19 +34,138 @@ Page::get()->setWritingDir(LANGUAGE['dir']);
 Page::get()->setTitle($pageLbls['title']);
 Page::get()->setDescription($pageLbls['description']);
 Page::get()->loadAdminTheme();
+$js = new JsCode;
+$jsonx = new JsonX();
+$jsonx->add('disconnected', LANGUAGE['general']['disconnected']);
+$jsonx->add('success', $pageLbls['labels']['connected']);
+$jsonx->add('checking-connection', $pageLbls['status']['checking-connection']);
+$jsonx->add('inv_mail_host_or_port', $pageLbls['errors']['inv_mail_host_or_port']);
+$jsonx->add('inv_username_or_pass', $pageLbls['errors']['inv_username_or_pass']);
+$js->addCode('window.onload = function(){'
+        . 'window.messages = '.$jsonx.';'
+        . 'document.getElementById(\'server-address-input\').oninput = emailInputChanged;'
+        . 'document.getElementById(\'port-input\').oninput = emailInputChanged;'
+        . 'document.getElementById(\'address-input\').oninput = emailInputChanged;'
+        . 'document.getElementById(\'username-input\').oninput = emailInputChanged;'
+        . 'document.getElementById(\'password-input\').oninput = emailInputChanged;'
+        . 'document.getElementById(\'account-name-input\').oninput = emailInputChanged;'
+        . '}');
 $document = Page::get()->getDocument();
+$document->getHeadNode()->addChild($js);
+$document->getHeadNode()->addJs('res/js/setup.js');
 $container = new HTMLNode();
 $document->addNode($container);
 $container->setClassName('pa-container');
 $container->addChild(stepsCounter(LANGUAGE['pages']['setup']['setup-steps'],2));
-$container->addChild(pageBody());
+$container->addChild(pageBody($pageLbls));
 $container->addChild(footer());
 echo $document->toHTML();
 
-function pageBody(){
+function createEmailForm($lbls,$placeholders){
+    $form = new HTMLNode('form');
+    $form->setClassName('pa-row');
+    
+    $hostNode = new HTMLNode();
+    $hostNode->setClassName('pa-'.Page::get()->getWritingDir().'-col-twelve');
+    $hostLabel = new Label($lbls['server-address']);
+    $hostLabel->setClassName('pa-'.Page::get()->getWritingDir().'-col-ten');
+    $hostInput = new Input();
+    $hostInput->setPlaceholder($placeholders['server-address']);
+    $hostInput->setID('server-address-input');
+    $hostInput->setClassName('pa-'.Page::get()->getWritingDir().'-ltr-col-four');
+    $hostNode->addChild($hostLabel);
+    $hostNode->addChild($hostInput);
+    $form->addChild($hostNode);
+    
+    $portNode = new HTMLNode();
+    $portNode->setClassName('pa-'.Page::get()->getWritingDir().'-col-twelve');
+    $portLabel = new Label($lbls['port']);
+    $portLabel->setClassName('pa-'.Page::get()->getWritingDir().'-col-ten');
+    $portInput = new Input();
+    $portInput->setPlaceholder($placeholders['port']);
+    $portInput->setID('port-input');
+    $portInput->setClassName('pa-'.Page::get()->getWritingDir().'-ltr-col-four');
+    $portNode->addChild($portLabel);
+    $portNode->addChild($portInput);
+    $form->addChild($portNode);
+    
+    $addressNode = new HTMLNode();
+    $addressNode->setClassName('pa-'.Page::get()->getWritingDir().'-col-twelve');
+    $addressLabel = new Label($lbls['email-address']);
+    $addressLabel->setClassName('pa-'.Page::get()->getWritingDir().'-col-ten');
+    $addressInput = new Input();
+    $addressInput->setPlaceholder($placeholders['email-address']);
+    $addressInput->setID('address-input');
+    $addressInput->setClassName('pa-'.Page::get()->getWritingDir().'-ltr-col-four');
+    $addressNode->addChild($addressLabel);
+    $addressNode->addChild($addressInput);
+    $form->addChild($addressNode);
+    
+    $usernameNode = new HTMLNode();
+    $usernameNode->setClassName('pa-'.Page::get()->getWritingDir().'-col-twelve');
+    $usernameLabel = new Label($lbls['username']);
+    $usernameLabel->setClassName('pa-'.Page::get()->getWritingDir().'-col-ten');
+    $usernameInput = new Input();
+    $usernameInput->setPlaceholder($placeholders['username']);
+    $usernameInput->setID('username-input');
+    $usernameInput->setClassName('pa-'.Page::get()->getWritingDir().'-ltr-col-four');
+    $usernameNode->addChild($usernameLabel);
+    $usernameNode->addChild($usernameInput);
+    $form->addChild($usernameNode);
+    
+    $passwordNode = new HTMLNode();
+    $passwordNode->setClassName('pa-'.Page::get()->getWritingDir().'-col-twelve');
+    $passwordLabel = new Label($lbls['password']);
+    $passwordLabel->setClassName('pa-'.Page::get()->getWritingDir().'-col-ten');
+    $passwordInput = new Input();
+    $passwordInput->setPlaceholder($placeholders['password']);
+    $passwordInput->setID('password-input');
+    $passwordInput->setClassName('pa-'.Page::get()->getWritingDir().'-ltr-col-four');
+    $passwordNode->addChild($passwordLabel);
+    $passwordNode->addChild($passwordInput);
+    $form->addChild($passwordNode);
+    
+    $nameNode = new HTMLNode();
+    $nameNode->setClassName('pa-'.Page::get()->getWritingDir().'-col-twelve');
+    $nameLabel = new Label($lbls['name']);
+    $nameLabel->setClassName('pa-'.Page::get()->getWritingDir().'-col-ten');
+    $nameInput = new Input();
+    $nameInput->setPlaceholder($placeholders['name']);
+    $nameInput->setID('account-name-input');
+    $nameInput->setClassName('pa-'.Page::get()->getWritingDir().'-ltr-col-four');
+    $nameNode->addChild($nameLabel);
+    $nameNode->addChild($nameInput);
+    $form->addChild($nameNode);
+    
+    $submit = new Input('submit');
+    $submit->setAttribute('data-action', 'ok');
+    $submit->setValue($lbls['check-connection']);
+    $submit->setAttribute('onclick', 'return checkMailParams()');
+    $submit->setAttribute('disabled', '');
+    $submit->setID('check-input');
+    $submit->setClassName('pa-'.Page::get()->getWritingDir().'-ltr-col-four');
+    $messageNode = new PNode();
+    $messageNode->setID('message-display');
+    $messageNode->setClassName('pa-'.Page::get()->getWritingDir().'-ltr-col-twelve');
+    $form->addChild($submit);
+    $form->addChild($messageNode);
+    
+    return $form;
+}
+
+function pageBody($pageLabels){
     $body = new HTMLNode();
     $body->setClassName('pa-row');
-    
+    $col = new HTMLNode();
+    $col->setClassName('pa-'.Page::get()->getWritingDir().'-col-twelve');
+    $p1 = new PNode();
+    $p1->addText($pageLabels['help']['h-1']);
+    $col->addChild($p1);
+    $p2 = new PNode();
+    $p2->addText($pageLabels['help']['h-2']);
+    $col->addChild($p2);
+    $body->addChild($col);
+    $body->addChild(createEmailForm($pageLabels['labels'], $pageLabels['placeholders']));
     return $body;
 }
 
@@ -66,7 +185,6 @@ function footer(){
     
     $nextButton = new HTMLNode('button');
     $nextButton->setAttribute('onclick', 'window.location.href = \'pages/setup/admin-account\'');
-    $nextButton->setAttribute('disabled', '');
     $nextButton->setClassName('pa-'.Page::get()->getWritingDir().'-col-three');
     $nextButton->setID('next-button');
     $nextButton->setAttribute('data-action', 'ok');
@@ -74,16 +192,6 @@ function footer(){
     $nextText->setText(LANGUAGE['general']['next']);
     $nextButton->addChild($nextText);
     $node->addChild($nextButton);
-    
-    $skipButton = new HTMLNode('button');
-    $skipButton->setAttribute('onclick', 'window.location.href = \'pages/setup/admin-account\'');
-    $skipButton->setClassName('pa-'.Page::get()->getWritingDir().'-col-three');
-    $skipButton->setID('skip-button');
-    $skipButton->setAttribute('data-action', 'ok');
-    $skipText = new HTMLNode('', FALSE, TRUE);
-    $skipText->setText(LANGUAGE['general']['skip']);
-    $skipButton->addChild($skipText);
-    $node->addChild($skipButton);
     return $node;
 }
 

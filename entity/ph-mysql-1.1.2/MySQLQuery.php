@@ -144,26 +144,26 @@ abstract class MySQLQuery implements JsonI{
      */
     private function createTable($table){
         if($table instanceof Table){
-            $query = 'create table if not exists '.$table->getName().'(';
+            $query = 'create table if not exists '.$table->getName().'('."\n";
             $keys = $table->keys();
             $count = count($keys);
             for($x = 0 ; $x < $count ; $x++){
                 if($x + 1 == $count){
-                    $query .= $table->columns()[$keys[$x]];
+                    $query .= '    '.$table->columns()[$keys[$x]]."\n";
                 }
                 else{
-                    $query .= $table->columns()[$keys[$x]].', ';
+                    $query .= '    '.$table->columns()[$keys[$x]].",\n";
                 }
             }
-            $query .= ')';
-            $query .= 'ENGINE = '.$table->getEngine().' ';
-            $query .= 'DEFAULT CHARSET = '.$table->getCharSet().' ';
-            $query .= 'collate = utf8_general_ci; ';
+            $query .= ')'."\n";
+            $query .= 'ENGINE = '.$table->getEngine()."\n";
+            $query .= 'DEFAULT CHARSET = '.$table->getCharSet()."\n";
+            $query .= 'collate = utf8_general_ci;'."\n";
             
             //add forign keys
             $count2 = count($table->forignKeys());
             for($x = 0 ; $x < $count2 ; $x++){
-                $query .= $table->forignKeys()[$x]->getAlterStatement().'; ';
+                $query .= $table->forignKeys()[$x]->getAlterStatement().";\n";
             }
             $this->setQuery($query, 'create');
         }

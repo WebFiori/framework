@@ -28,7 +28,7 @@
  * Description of SystemFunctions
  *
  * @author Ibrahim
- * @version 1.2
+ * @version 1.3
  */
 class SystemFunctions extends Functions{
     /**
@@ -155,6 +155,24 @@ class SystemFunctions extends Functions{
             return self::DB_NOT_EMPTY;
         }
         return $r;
+    }
+    /**
+     * Updates system configuration status. Only 
+     * a user that is logged in as super admin can perform that task.
+     * @param boolean $isConfig <b>TRUE</b> to set system as configured. 
+     * <b>FALSE</b> to make it not configured.
+     * @return boolean The function will return <b>TRUE</b> if system configuration 
+     * status updated.
+     * @since 1.3
+     */
+    public function configured($isConfig=true){
+        if($this->getAccessLevel() == 0){
+            $confVars = $this->getConfigVars();
+            $confVars['is-config'] = $isConfig === TRUE ? 'TRUE' : 'FALSE';
+            $this->writeConfig($confVars);
+            return TRUE;
+        }
+        return FALSE;
     }
     private function getSchemaTablesCount($schema){
         $q = new UserQuery();

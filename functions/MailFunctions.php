@@ -27,7 +27,7 @@
  * A class for the functions that is related to mailing.
  *
  * @author Ibrahim
- * @version 1.1
+ * @version 1.2
  */
 class MailFunctions extends Functions{
     /**
@@ -158,6 +158,73 @@ class MailFunctions extends Functions{
     }', TRUE, TRUE);
         $fh->write('}', TRUE, TRUE);
         $fh->close();
+    }
+    /**
+     * Sends a notification email to let the user know about password change. The 
+     * change is done by super admin.
+     * @param User $user An object of type <b>User</b>
+     * @since 1.1
+     */
+    public function notifyOfPasswordChangeAdmin($user){
+        $noReplayAcc = MailConfig::get()->getAccount('no-replay');
+        if($noReplayAcc instanceof EmailAccount){
+            $mailer = $this->getSocketMailer($noReplayAcc);
+            $mailer->addReceiver($user->getUserName(), $user->getEmail());
+            $mailer->setSubject('Password Reset By Admin');
+            $msg = '<p>Dear,</p>';
+            $msg .= '<p>We would like to inform you that system adminstrator has reset your account password.<p>';
+            $msg .= '<p>Thank you for your time.</p>';
+            $msg .= '<p><b>'.$noReplayAcc->getName().'</b></p>';
+            $mailer->write($msg,TRUE);
+        }
+    }
+    /**
+     * Sends a notification email to let the user know about password change.
+     * @param User $user An object of type <b>User</b>
+     * @since 1.1
+     */
+    public function notifyOfPasswordChange($user){
+        $noReplayAcc = MailConfig::get()->getAccount('no-replay');
+        if($noReplayAcc instanceof EmailAccount){
+            $mailer = $this->getSocketMailer($noReplayAcc);
+            $mailer->addReceiver($user->getUserName(), $user->getEmail());
+            $mailer->setSubject('Account Password has Changed');
+            $msg = '<p>Dear,</p>';
+            $msg .= '<p>We would like to inform you that your password has been changed. '
+                    . 'if you are not the one who did the change, please contact us. '
+                    . 'if you are the one who did the update, you can simply ignore this message.<p>';
+            $msg .= '<p>Thank you for your time.</p>';
+            $msg .= '<p><b>'.$noReplayAcc->getName().'</b></p>';
+            $mailer->write($msg,TRUE);
+        }
+    }
+    /**
+     * Send an email message to the email of the first user was ever created.
+     * @param User $adminAcc The first user account.
+     * @since 1.2
+     */
+    public function sendFirstMail($adminAcc) {
+        $noReplayAcc = MailConfig::get()->getAccount('no-replay');
+        if($noReplayAcc instanceof EmailAccount){
+            $mailer = $this->getSocketMailer($noReplayAcc);
+            $mailer->addReceiver($adminAcc->getUserName(), $adminAcc->getEmail());
+            $mailer->setSubject('Welcome');
+            $msg = '<p>Dear,</p>';
+            $msg .= '<p>This email is used to confirm your admin account information. '
+                    . 'Please note that you should never forget your password and keep it '
+                    . 'in a safe place.'
+                    . '</p>'
+                    . '<ul>'
+                    . '<li><b>Username:</b> '.$adminAcc->getUserName().'</li>'
+                    . '<li><b>Display name:</b> '.$adminAcc->getDisplayName().'</li>'
+                    . '<li><b>Email Address:</b> '.$adminAcc->getEmail().'</li>'
+                    . '</ul>'
+                    . '<p>You can start using the system and manage it by logging in at '
+                    . '<a target="_blank" href="'.SiteConfig::get()->getBaseURL().'/pages/login">'.SiteConfig::get()->getBaseURL().'/pages/login</a>.</p>';
+            $msg .= '<p>Thank you for your time.</p>';
+            $msg .= '<p><b>'.$noReplayAcc->getName().'</b></p>';
+            $mailer->write($msg,TRUE);
+        }
     }
     /**
      * Sends a welcome email to a newly added account.

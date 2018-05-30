@@ -54,7 +54,7 @@ function checkMailParams(){
     ajax.setOnServerError(function(){
         console.log(this.jsonResponse);
         submitButton.removeAttribute('disabled');
-        messageDisplay.innerHTML = '<b style="color:red">'+window.messages[this.jsonResponse['message']]+'</b>';
+        messageDisplay.innerHTML = '<b style="color:red">Server Error (500)</b>';
         document.getElementById('next-button').setAttribute('disabled','');
     });
     ajax.setOnDisconnected(function(){
@@ -66,6 +66,59 @@ function checkMailParams(){
     ajax.send();
     return false;
 }
+
+function runSetup(){
+    var ajax = new AJAX({
+        method:'post',
+        url:'apis/SysAPIs'
+    });
+    var form = new FormData();
+    form.append('action','create-first-account');
+    form.append('username',window.account['username']);
+    form.append('password',window.account['password']);
+    form.append('email',window.account['email']);
+    var messageDisplay = document.getElementById('message-display');
+    var submitButton = document.getElementById('check-input');
+    submitButton.setAttribute('disabled','');
+    var prevButton = document.getElementById('prev-button');
+    prevButton.setAttribute('disabled','');
+    messageDisplay.innerHTML = '<b>'+window.messages['creating-account']+'</b>';
+    ajax.setParams(form);
+    ajax.setOnSuccess(function(){
+        document.getElementById('next-button').removeAttribute('disabled');
+        messageDisplay.innerHTML = '<b style="color:green">'+window.messages['account-created']+'</b>';
+    });
+    ajax.setOnClientError(function(){
+        console.log(this.response);
+        var msg = this.jsonResponse['message'];
+        if(msg === 'The following parameter(s) has invalid values: \'email\'.'){
+            messageDisplay.innerHTML = '<b style="color:red">'+window.messages['inv-email']+'</b>';
+        }
+        else if(msg === 'query_error'){
+            messageDisplay.innerHTML = '<b style="color:red">query_error: '+this.jsonResponse['details']['error-message']+'</b>';
+        }
+        else{
+            messageDisplay.innerHTML = '<b style="color:red">Something Went Wrong!</b>';
+        }
+        submitButton.removeAttribute('disabled');
+        document.getElementById('next-button').setAttribute('disabled','');
+    });
+    ajax.setOnServerError(function(){
+        console.log(this.jsonResponse);
+        submitButton.removeAttribute('disabled');
+        messageDisplay.innerHTML = '<b style="color:red">Server Error (500)</b>';
+        document.getElementById('next-button').setAttribute('disabled','');
+    });
+    ajax.setOnDisconnected(function(){
+        console.log('Disconnected!');
+        submitButton.removeAttribute('disabled');
+        messageDisplay.innerHTML = '<b style="color:red">'+window.messages['disconnected']+'</b>';
+        document.getElementById('next-button').setAttribute('disabled','');
+    });
+    ajax.send();
+    return false;
+}
+
 function checkConectionParams(){
     var ajax = new AJAX({
         method:'post',
@@ -97,7 +150,7 @@ function checkConectionParams(){
     ajax.setOnServerError(function(){
         console.log(this.jsonResponse);
         submitButton.removeAttribute('disabled');
-        messageDisplay.innerHTML = '<b style="color:red">'+window.messages[this.jsonResponse['details']['error-code']]+'</b>';
+        messageDisplay.innerHTML = '<b style="color:red">Server Error (500)</b>';
         document.getElementById('next-button').setAttribute('disabled','');
     });
     ajax.setOnDisconnected(function(){
@@ -110,6 +163,34 @@ function checkConectionParams(){
     return false;
 }
 
+function adminAccInputsChanged(){
+    var username = document.getElementById('username-input').value;
+    if(username !== ''){
+        var password = document.getElementById('password-input').value;
+        if(password !== ''){
+            var messageDisplay = document.getElementById('message-display');
+            var confPass = document.getElementById('conf-pass-input').value;
+            if(confPass === password){
+                messageDisplay.innerHTML = '';
+                var email = document.getElementById('address-input').value;
+                if(email !== ''){
+                    window.account = {
+                        username:username,
+                        password:password,
+                        email:email
+                    };
+                    document.getElementById('check-input').removeAttribute('disabled');
+                    return;
+                }
+            }
+            else{
+                
+                messageDisplay.innerHTML = '<b style="color:red">'+window.messages['password-missmatch']+'</b>';
+            }
+        }
+    }
+    document.getElementById('check-input').setAttribute('disabled','');
+}
 function dbInputChanged(){
     var host = document.getElementById('database-host-input').value;
     if(host !== ''){
@@ -164,4 +245,8 @@ function emailInputChanged(){
         }
     }
     document.getElementById('check-input').setAttribute('disabled','');
+}
+
+function updateSiteInfo(){
+    return false;
 }

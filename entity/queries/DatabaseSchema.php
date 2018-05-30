@@ -23,29 +23,48 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-require_once '../../root.php';
 /**
  * A class to initiate database tables.
  *
  * @author Ibrahim
- * @version 1.0
+ * @version 1.1
  */
 class DatabaseSchema {
+    private static $schema;
+    
+    public function get() {
+        if(self::$schema != NULL){
+            return self::$schema;
+        }
+        self::$schema = new DatabaseSchema();
+        return self::$schema;
+    }
+    
     private $queries;
+    public function getSchema() {
+        $schema = '';
+        foreach ($this->queries as $query){
+            $queryObj = new $query();
+            $queryObj->createStructure();
+            $schema .= $queryObj->getQuery();
+        }
+        return $schema;
+    }
     public function __construct() {
         $this->queries = array();
-        array_push($this->queries, 'UserQuery');
-        array_push($this->queries, 'ActivationQuery');
-        array_push($this->queries, 'FileQuery');
         
     }
-    public function getSchema() {
-        $scema = '';
-        foreach ($this->queries as $q){
-            $qObj = new $q();
-            $qObj->createStructure();
-            $scema.= $qObj->getQuery().' ';
+    
+    public function add($queryClassName) {
+        if(class_exists($queryClassName)){
+            foreach ($this->queries as $q){
+                if($q == $queryClassName){
+                    return FALSE;
+                }
+            }
+            array_push($this->queries, $queryClassName);
+            return TRUE;
         }
-        return $scema;
+        return FALSE;
     }
 }

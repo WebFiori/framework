@@ -13,7 +13,8 @@ const LANGUAGE = array(
         'prev'=>'Previous',
         'skip'=>'Skip',
         'connected'=>'Connected!',
-        'disconnected'=>'Please check that you are connected to the internet.'
+        'disconnected'=>'Please check that you are connected to the internet.',
+        'save'=>'Save Changes'
     ),
     'pages'=>array(
         'setup'=>array(
@@ -118,12 +119,50 @@ const LANGUAGE = array(
             'admin-account'=>array(
                 'title'=>'Creating Admin Account',
                 'description'=>'',
-                'help'=>''
+                'labels'=>array(
+                    'username'=>'Username:',
+                    'password'=>'Password:',
+                    'conf-password'=>'Confirm Password:',
+                    'email-address'=>'Email Address:',
+                    'run-setup'=>'Run Setup',
+                    'acount-created'=>'Admin Account Created!'
+                ),
+                'status'=>array(
+                    'creating-acc'=>'Creating Admin Account...'
+                ),
+                'placeholders'=>array(
+                    'username'=>'Type in a username (Only English Chraracters and numbers)',
+                    'password'=>'Choose a strong password.',
+                    'conf-password'=>'Type in your password again.',
+                    'email-address'=>'Type in your email address.'
+                ),
+                'errors'=>array(
+                    'password-missmatch'=>'The typed passwords does not match.',
+                    'inv-email'=>'The given email address is invalid.'
+                ),
+                'help'=>array(
+                    'h-1'=>'In this step, you have to create one admin account. '
+                    . 'This account will have all the control over every functionality in '
+                    . 'the system. We need from you to choose a nice username, a password and '
+                    . 'an email address to comunicate with you in case of important things. '
+                    . 'Please do not forget your password. Because once this happens, you will '
+                    . 'loose access to the system for ever.',
+                    'h-2'=>'<b>Note that once you finish this step, there is no going back.<b>'
+                )
             ),
             'website-config'=>array(
                 'title'=>'Configuing Website',
                 'description'=>'',
-                'help'=>''
+                'labels'=>array(
+                    'site-name'=>'Website Name:',
+                    
+                ),
+                'placeholders'=>array(
+                    'site-name'=>'Choose a name that reflects site content.'
+                ),
+                'help'=>array(
+                    
+                )
             ),
             'finish'=>array(
                 'title'=>'Finished',

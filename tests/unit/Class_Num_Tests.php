@@ -31,6 +31,8 @@ $start = -8;
 $end = 8;
 maxBinayIntTest();
 minBinayIntTest();
+minHexIntTest();
+maxHexIntTest();
 for($x = $start; $x <= $end ; $x++){
     for($y = $start ; $y <= $end ; $y++){
         //binarySubTest($x, $y, ($x - $y));
@@ -118,6 +120,40 @@ function minBinayIntTest(){
     echo 'Minimum integer in binay = '.$b.'<br/>';
     $bAsInt = Num::binaryToInt($b);
     echo 'Num::binaryToInt('.$b.') = '.$bAsInt.'<br/>';
+    if($bAsInt == PHP_INT_MIN){
+        echo 'Test Result: <b style="color:green">PASS</b><br/>';
+        $GLOBALS['PASSED_TESTS']++;
+    }
+    else{
+        echo 'Test Result: <b style="color:red">FAIL</b><br/>';
+        $GLOBALS['FAILED_TESTS']++;
+    }
+}
+
+function maxHexIntTest(){
+    echo '---------------maxHexIntTest()----------------<br/>';
+    $GLOBALS['NUM_OF_TESTS']++;
+    $b = Num::getPHPMaxHexInt();
+    echo 'Maximum integer in hex = '.$b.'<br/>';
+    $bAsInt = Num::hexToInt($b);
+    echo 'Num::hexToInt('.$b.') = '.$bAsInt.'<br/>';
+    if($bAsInt == PHP_INT_MAX){
+        echo 'Test Result: <b style="color:green">PASS</b><br/>';
+        $GLOBALS['PASSED_TESTS']++;
+    }
+    else{
+        echo 'Test Result: <b style="color:red">FAIL</b><br/>';
+        $GLOBALS['FAILED_TESTS']++;
+    }
+}
+
+function minHexIntTest(){
+    echo '---------------minHexIntTest()----------------<br/>';
+    $GLOBALS['NUM_OF_TESTS']++;
+    $b = Num::getPHPMinHexInt();
+    echo 'Minimum integer in hex = '.$b.'<br/>';
+    $bAsInt = Num::hexToInt($b);
+    echo 'Num::hexToInt('.$b.') = '.$bAsInt.'<br/>';
     if($bAsInt == PHP_INT_MIN){
         echo 'Test Result: <b style="color:green">PASS</b><br/>';
         $GLOBALS['PASSED_TESTS']++;

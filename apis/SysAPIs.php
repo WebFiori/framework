@@ -70,7 +70,7 @@ class SysAPIs extends API{
         $a7->addRequestMethod('post');
         $a7->addParameter(new RequestParameter('username', 'string'));
         $a7->addParameter(new RequestParameter('password', 'string'));
-        $a7->addParameter(new RequestParameter('email', 'string'));
+        $a7->addParameter(new RequestParameter('email', 'email'));
         $this->addAction($a7);
         
         $a8 = new APIAction();
@@ -116,7 +116,23 @@ class SysAPIs extends API{
             $this->actionNotImpl();
         }
         else if($action == 'create-first-account'){
-            $this->actionNotImpl();
+            $i = $this->getInputs();
+            $user = new User();
+            $user->setEmail($i['email']);
+            $user->setPassword(hash('sha256', $i['password']));
+            $user->setUserName($i['username']);
+            $r = AdminFunctions::get()->runSetup($user);
+            if($r === TRUE){
+                UserFunctions::get()->authenticate($i['username'], $i['password'], $i['email'], 30, TRUE);
+                SystemFunctions::get()->configured(TRUE);
+                $this->sendResponse('Setup Completed');
+            }
+            else if($r === MySQLQuery::QUERY_ERR){
+                $this->sendResponse($r, TRUE, 404, '"details":'.SystemFunctions::get()->getMainSession()->getDBLink()->toJSON());
+            }
+            else{
+                $this->sendResponse($r, TRUE,404);
+            }
         }
         else if($action == 'update-database-attributes'){
             $this->updateDBAttrs();
@@ -207,7 +223,7 @@ class SysAPIs extends API{
     
     public function isAuthorized() {
         $a = $this->getAction();
-        if($a == 'update-database-attributes' || 'update-site-info'){
+        if($a == 'update-database-attributes' || 'update-site-info' || 'update-send-email-account'){
             if(class_exists('Config')){
                 if(class_exists('SiteConfig')){
                     return !Config::get()->isConfig() || 
@@ -222,13 +238,16 @@ class SysAPIs extends API{
             }
         }
         else if($a == 'create-first-account'){
-            
-        }
-        else if($a == 'get-site-info' || $a == 'get-sys-info'){
-            return SystemFunctions::get()->getAccessLevel() == 0;
+            if(class_exists('Config')){
+                return !Config::get()->isConfig();
+            }
+            return FALSE;
         }
         else{
-            return SystemFunctions::get()->getAccessLevel() == 0;
+            if(class_exists('Config')){
+                return SystemFunctions::get()->getAccessLevel() == 0;
+            }
+            return TRUE;
         }
     }
 }

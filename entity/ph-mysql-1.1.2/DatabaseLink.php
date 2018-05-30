@@ -63,8 +63,8 @@ class DatabaseLink implements JsonI{
      */
     private $link;
     /**
-     * Returns the last generated error message.
-     * @return string The last generated error message.
+     * The last executed query.
+     * @var string The last executed query.
      * @since 1.0
      */
     private $lastQuery;
@@ -180,8 +180,17 @@ class DatabaseLink implements JsonI{
     public function executeQuery($query){
         $this->lastQuery = $query;
         if($this->isConnected()){
+            $eploded = explode(';', $query->getQuery());
+            if(count($eploded) != 1){
+                $r = mysqli_multi_query($this->link, $query->getQuery());
+                if(mysqli_more_results($this->link)){
+                    while ($this->link->next_result()) {}
+                }
+                return  $r;
+            }
             if($query->getType() == 'select' || $query->getType() == 'show'
                || $query->getType() == 'describe' ){
+                
                 $r = mysqli_query($this->link, $query->getQuery());
                 if($r){
                     $this->result = $r;

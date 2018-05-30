@@ -35,23 +35,45 @@ Page::get()->setWritingDir(LANGUAGE['dir']);
 Page::get()->setTitle($pageLbls['title']);
 Page::get()->setDescription($pageLbls['description']);
 Page::get()->loadAdminTheme();
+$js = new JsCode;
+$jsonx = new JsonX();
+$jsonx->add('disconnected', LANGUAGE['general']['disconnected']);
+$jsonx->add('account-created', $pageLbls['labels']['acount-created']);
+$jsonx->add('creating-account', $pageLbls['status']['creating-acc']);
+$jsonx->add('password-missmatch', $pageLbls['errors']['password-missmatch']);
+$jsonx->add('inv-email', $pageLbls['errors']['inv-email']);
+$js->addCode('window.onload = function(){'
+        . 'window.messages = '.$jsonx.';'
+        . 'document.getElementById(\'address-input\').oninput = adminAccInputsChanged;'
+        . 'document.getElementById(\'username-input\').oninput = adminAccInputsChanged;'
+        . 'document.getElementById(\'password-input\').oninput = adminAccInputsChanged;'
+        . 'document.getElementById(\'conf-pass-input\').oninput = adminAccInputsChanged;'
+        . '}');
 $document = Page::get()->getDocument();
+$document->getHeadNode()->addChild($js);
+$document->getHeadNode()->addJs('res/js/setup.js');
 $container = new HTMLNode();
 $document->addNode($container);
 $container->setClassName('pa-container');
 $container->addChild(stepsCounter(LANGUAGE['pages']['setup']['setup-steps'],3));
-$container->addChild(pageBody());
+$container->addChild(pageBody($pageLbls));
 $container->addChild(footer());
 echo $document->toHTML();
 
-function pageBody(){
+function pageBody($pageLabels){
     $body = new HTMLNode();
     $body->setClassName('pa-row');
+    $col = new HTMLNode();
+    $col->setClassName('pa-'.Page::get()->getWritingDir().'-col-twelve');
+    $p1 = new PNode();
+    $p1->addText($pageLabels['help']['h-1']);
+    $col->addChild($p1);
+    $p2 = new PNode();
+    $p2->addText($pageLabels['help']['h-2']);
+    $col->addChild($p2);
+    $body->addChild($col);
+    $body->addChild(createAdminInfoForm($pageLabels['labels'], $pageLabels['placeholders']));
     return $body;
-}
-
-function createAdminInfoForm(){
-    
 }
 
 function footer(){
@@ -59,7 +81,7 @@ function footer(){
     $node->setClassName('pa-row');
     
     $prevButton = new HTMLNode('button');
-    $prevButton->setAttribute('onclick', 'window.location.href = \'pages/setup/email-account\'');
+    $prevButton->setAttribute('onclick', 'window.location.href = \'pages/setup/website-config\'');
     $prevButton->setClassName('pa-'.Page::get()->getWritingDir().'-col-three');
     $prevButton->setID('prev-button');
     $prevButton->setAttribute('data-action', 'ok');
@@ -79,6 +101,74 @@ function footer(){
     $nextButton->addChild($nextText);
     $node->addChild($nextButton);
     return $node;
+}
+
+function createAdminInfoForm($lbls,$placeholders){
+    $form = new HTMLNode('form');
+    $form->setClassName('pa-row');
+    
+    $usernameNode = new HTMLNode();
+    $usernameNode->setClassName('pa-'.Page::get()->getWritingDir().'-col-twelve');
+    $usernameLabel = new Label($lbls['username']);
+    $usernameLabel->setClassName('pa-'.Page::get()->getWritingDir().'-col-ten');
+    $usernameInput = new Input();
+    $usernameInput->setPlaceholder($placeholders['username']);
+    $usernameInput->setID('username-input');
+    $usernameInput->setClassName('pa-'.Page::get()->getWritingDir().'-ltr-col-four');
+    $usernameNode->addChild($usernameLabel);
+    $usernameNode->addChild($usernameInput);
+    $form->addChild($usernameNode);
+    
+    $passwordNode = new HTMLNode();
+    $passwordNode->setClassName('pa-'.Page::get()->getWritingDir().'-col-twelve');
+    $passwordLabel = new Label($lbls['password']);
+    $passwordLabel->setClassName('pa-'.Page::get()->getWritingDir().'-col-ten');
+    $passwordInput = new Input('password');
+    $passwordInput->setPlaceholder($placeholders['password']);
+    $passwordInput->setID('password-input');
+    $passwordInput->setClassName('pa-'.Page::get()->getWritingDir().'-ltr-col-four');
+    $passwordNode->addChild($passwordLabel);
+    $passwordNode->addChild($passwordInput);
+    $form->addChild($passwordNode);
+    
+    $confPasswordNode = new HTMLNode();
+    $confPasswordNode->setClassName('pa-'.Page::get()->getWritingDir().'-col-twelve');
+    $confPasswordLabel = new Label($lbls['conf-password']);
+    $confPasswordLabel->setClassName('pa-'.Page::get()->getWritingDir().'-col-ten');
+    $confPasswordInput = new Input('password');
+    $confPasswordInput->setPlaceholder($placeholders['conf-password']);
+    $confPasswordInput->setID('conf-pass-input');
+    $confPasswordInput->setClassName('pa-'.Page::get()->getWritingDir().'-ltr-col-four');
+    $confPasswordNode->addChild($confPasswordLabel);
+    $confPasswordNode->addChild($confPasswordInput);
+    $form->addChild($confPasswordNode);
+    
+    $addressNode = new HTMLNode();
+    $addressNode->setClassName('pa-'.Page::get()->getWritingDir().'-col-twelve');
+    $addressLabel = new Label($lbls['email-address']);
+    $addressLabel->setClassName('pa-'.Page::get()->getWritingDir().'-col-ten');
+    $addressInput = new Input();
+    $addressInput->setPlaceholder($placeholders['email-address']);
+    $addressInput->setID('address-input');
+    $addressInput->setClassName('pa-'.Page::get()->getWritingDir().'-ltr-col-four');
+    $addressNode->addChild($addressLabel);
+    $addressNode->addChild($addressInput);
+    $form->addChild($addressNode);
+
+    $submit = new Input('submit');
+    $submit->setAttribute('data-action', 'ok');
+    $submit->setValue($lbls['run-setup']);
+    $submit->setAttribute('onclick', 'return runSetup()');
+    $submit->setAttribute('disabled', '');
+    $submit->setID('check-input');
+    $submit->setClassName('pa-'.Page::get()->getWritingDir().'-ltr-col-four');
+    $messageNode = new PNode();
+    $messageNode->setID('message-display');
+    $messageNode->setClassName('pa-'.Page::get()->getWritingDir().'-ltr-col-twelve');
+    $form->addChild($submit);
+    $form->addChild($messageNode);
+    
+    return $form;
 }
 
 function stepsCounter($lang,$active){

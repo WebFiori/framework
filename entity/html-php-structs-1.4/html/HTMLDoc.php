@@ -28,7 +28,7 @@
  * A class that represents HTML document.
  *
  * @author Ibrahim
- * @version 1.2
+ * @version 1.3
  */
 class HTMLDoc {
     /**
@@ -49,18 +49,7 @@ class HTMLDoc {
      * @since 1.0
      */
     private $body;
-    /**
-     * The indentation space that is used to make the tags well formated.
-     * @var string 
-     */
-    private $tapSpace;
-    /**
-     * A number that represents the number of open tags (0 no tag. 1 one tag. 2 
-     * is 2 tags and so on). It is also used as tab indicator.
-     * @var int 
-     * @since 1.0
-     */
-    private $tabCount = 0;
+
     /**
      * The whole document as HTML string.
      * @var string
@@ -68,17 +57,16 @@ class HTMLDoc {
      */
     private $document;
     /**
-     * A stack that contains an objects of type <b>HTMLNode</b>. Used to build 
-     * the document.
-     * @var Stack 
-     */
-    private $nodesStack;
-    /**
      * New line character.
      * @var string 
      * @since 1.0
      */
     private $nl = "\n";
+    /**
+     * A constant that represents new line character
+     * @since 1.3
+     */
+    const NL = "\n";
     /**
      * Saves the document into a file.
      * @param string $path The location where the content will be written to.
@@ -108,11 +96,26 @@ class HTMLDoc {
      */
     public function getChildrenByTag($val) {
         $list = new LinkedList();
-        $hNodes = $this->headNode->getChildrenByTag($val);
-        for($x = 0 ; $x < $hNodes->size() ; $x++){
-            $list->add($hNodes->get($x));
-        }
+        $this->_getChildrenByTag($val, $list, $this->htmlNode);
         return $list;
+    }
+    /**
+     * 
+     * @param sring $val
+     * @param LinkedList $list
+     * @param HTMLNode $child
+     */
+    private function _getChildrenByTag($val,$list,$child){
+        if($child->getName() == $val){
+            $list->add($child);
+        }
+        if(!$child->isTextNode()){
+            $children = $child->childNodes();
+            $chCount = $children->size();
+            for($x = 0 ; $x < $chCount ; $x++){
+                $this->_getChildrenByTag($val, $list, $children->get($x));
+            }
+        }
     }
     /**
      * Returns a child node given its ID.
@@ -157,7 +160,7 @@ class HTMLDoc {
         return '';
     }
     /**
-     * Sets the value of the head node.
+     * Updates the head node that is used by the document.
      * @param HeadNode $node The node to set.
      * @since 1.0
      */
@@ -167,46 +170,29 @@ class HTMLDoc {
             $this->headNode = $node;
         }
     }
+    /**
+     * Returns a string of HTML code that represents the document.
+     * @return string A string of HTML code that represents the document.
+     */
     public function __toString() {
-        return $this->toHTML();
+        return $this->toHTML(FALSE);
     }
     /**
-     * Returns a string that represents the document.
-     * @param boolean $formatted If set to true, The generated document will be 
-     * well formatted.
-     * @return string A string that represents the document.
+     * Returns HTML string that represents the document.
+     * @param boolean $formatted [Optional] If set to <b>TRUE</b>, The generated HTML code will be 
+     * well formatted. Default is <b>TRUE</b>.
+     * @return string HTML string that represents the document.
      * @since 1.0
      */
     public function toHTML($formatted=true){
         if(!$formatted){
             $this->nl = '';
-            $this->tapSpace = '';
         }
         else{
-            $this->nl = "\n";
-            $tabCount=0;
-            $tabSpacesCount=4;
-            if($tabCount > -1){
-                $this->tabCount = $tabCount;
-            }
-            else{
-                $this->tabCount = 0;
-            }
-            $this->tapSpace = '';
-            if($tabSpacesCount > 0 && $tabSpacesCount < 9){
-                for($x = 0 ; $x < $tabSpacesCount ; $x++){
-                    $this->tapSpace .= ' ';
-                }
-            }
-            else{
-                for($x = 0 ; $x < 4 ; $x++){
-                    $this->tapSpace .= ' ';
-                }
-            }
+            $this->nl = self::NL;
         }
-        $this->nodesStack = new Stack();
         $this->document = '<!DOCTYPE html>'.$this->nl;
-        $this->pushNode($this->htmlNode,$formatted);
+        $this->document .= $this->htmlNode->toHTML($formatted);
         return $this->document;
     }
     /**
@@ -233,74 +219,6 @@ class HTMLDoc {
     public function addNode($node){
         if($node instanceof HTMLNode){
             $this->body->addChild($node);
-        }
-    }
-    /**
-     * 
-     * @param HTMLNode $node
-     */
-    private function pushNode($node) {
-        if($node->isTextNode()){
-            $this->document .= $this->getTab().$node->getText().$this->nl;
-        }
-        else{
-            if($node->mustClose()){
-                $nodeChilds = $node->childNodes();
-                $chCount = $nodeChilds->size();
-                $this->nodesStack->push($node);
-                $this->document .= $this->getTab().$node->asHTML().$this->nl;
-                $this->addTab();
-                for($x = 0 ; $x < $chCount ; $x++){
-                    $nodeAtx = $nodeChilds->get($x);
-                    $this->pushNode($nodeAtx);
-                }
-                $this->reduceTab();
-                $this->popNode();
-            }
-            else{
-                $this->document .= $this->getTab().$node->asHTML().$this->nl;
-            }
-        }
-    }
-    private function popNode(){
-        $node = $this->nodesStack->pop();
-        if($node != NULL){
-            $this->document .= $this->getTab().'</'.$node->getName().'>'.$this->nl;
-        }
-    }
-    /**
-     * Increase tab size by 1.
-     * @since 1.0
-     */
-    private function addTab(){
-        $this->tabCount += 1;
-    }
-    
-    /**
-     * Reduce tab size by 1.
-     * If the tab size is 0, it will not reduce it more.
-     * @since 1.0
-     */
-    private function reduceTab(){
-        if($this->tabCount > 0){
-            $this->tabCount -= 1;
-        }
-    }
-    /**
-     * Returns the currently used tag space. 
-     * @return string
-     * @since 1.0
-     */
-    private function getTab(){
-        if($this->tabCount == 0){
-            return '';
-        }
-        else{
-            $tab = '';
-            for($i = 0 ; $i < $this->tabCount ; $i++){
-                $tab .= $this->tapSpace;
-            }
-            return $tab;
         }
     }
 }

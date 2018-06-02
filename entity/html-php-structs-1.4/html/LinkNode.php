@@ -32,13 +32,17 @@ class LinkNode extends HTMLNode{
      * Constructs a new instance of the class
      * @param string $href The link.
      * @param string $label The label to display.
-     * @param string $target [optional] The value to set for the attribute 'target'.
+     * @param string $target [Optional] The value to set for the attribute 'target'. 
+     * Default is '_blank'.
      */
-    public function __construct($href,$label,$target='') {
+    public function __construct($href,$label,$target='_blank') {
         parent::__construct('a', TRUE, FALSE);
         $this->setAttribute('href',$href);
         if(strlen($target) != 0){
             $this->setAttribute('target',$target);
+        }
+        else{
+            $this->setAttribute('target', '_blank');
         }
         $textNode = new HTMLNode('', FALSE, TRUE);
         $textNode->setText($label);

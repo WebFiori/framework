@@ -28,6 +28,7 @@ class SiteConfig{
      * The directory of the theme that is used by web site administration pages. 
      * @var string
      * @since 1.0 
+     * @deprecated since version 1.3
      */
     private $adminPanelThemeDir;
     /**
@@ -36,6 +37,18 @@ class SiteConfig{
      * @since 1.0
      */
     private $baseUrl;
+    /**
+     * The name of base website UI Theme.
+     * @var string 
+     * @since 1.3
+     */
+    private $baseThemeName;
+    /**
+     * The name of admin control pages Theme.
+     * @var string 
+     * @since 1.3
+     */
+    private $adminThemeName;
     /**
      * Configuration file version number.
      * @var string 
@@ -46,6 +59,7 @@ class SiteConfig{
      * The directory of web site pages theme.
      * @var string
      * @since 1.0 
+     * @deprecated since version 1.3
      */
     private $selectedThemeDir;
     /**
@@ -67,10 +81,12 @@ class SiteConfig{
         return self::$siteCfg;
     }
     private function __construct() {
-        $this->configVision = '1.0';
+        $this->configVision = '1.1';
         $this->webSiteName = 'Programming Academia';
-        $this->baseUrl = Util::getBaseURL();
+        $this->baseUrl = 'http://localhost/generic-php/';
         $this->titleSep = ' | ';
+        $this->baseThemeName = 'Greeny By Ibrahim Ali';
+        $this->adminThemeName = 'Greeny By Ibrahim Ali';
         $this->homePage = 'index';
         $this->description = '';
         $this->selectedThemeDir = 'publish/themes/greeny';
@@ -80,6 +96,7 @@ class SiteConfig{
      * Returns the directory at which the web site theme exist.
      * @return string The directory at which the web site theme exist.
      * @since 1.0
+     * @deprecated since version 1.3
      */
     public function getThemeDir() {
         return $this->selectedThemeDir;
@@ -88,9 +105,26 @@ class SiteConfig{
      * Returns the directory at which the administrator pages theme exists.
      * @return string The directory at which the administrator pages theme exists.
      * @since 1.0
+     * @deprecated since version 1.3
      */
     public function getAdminThemeDir(){
         return $this->adminPanelThemeDir;
+    }
+    /**
+     * Returns the name of base theme that is used in website pages.
+     * @return string The name of base theme that is used in website pages.
+     * @since 1.3
+     */
+    public function getBaseThemeName(){
+        return $this->baseThemeName;
+    }
+    /**
+     * Returns the name of the theme that is used in admin control pages.
+     * @return string The name of the theme that is used in admin control pages.
+     * @since 1.3
+     */
+    public function getAdminThemeName(){
+        return $this->adminThemeName;
     }
     /**
      * Returns version number of the configuration file.

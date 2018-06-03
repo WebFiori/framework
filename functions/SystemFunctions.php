@@ -62,8 +62,10 @@ class SystemFunctions extends Functions{
         'home-page'=>'index',
         'theme-directory'=>'publish/themes/greeny',
         'admin-theme-directory'=>'publish/themes/greeny',
+        'admin-theme-name'=>'Greeny By Ibrahim Ali',
+        'theme-name'=>'Greeny By Ibrahim Ali',
         'site-description'=>'',
-        'config-file-virsion'=>'1.0',
+        'config-file-virsion'=>'1.1',
     );
     /**
      * An array that contains initial system configuration variables.
@@ -102,7 +104,8 @@ class SystemFunctions extends Functions{
      */
     public function createSiteConfigFile() {
         if(!class_exists('SiteConfig')){
-            $this->writeSiteConfig(SystemFunctions::INITIAL_WEBSITE_CONFIG_VARS);
+            $initCfg = $this->getSiteConfigVars();
+            $this->writeSiteConfig($initCfg);
         }
     }
     /**
@@ -111,7 +114,8 @@ class SystemFunctions extends Functions{
      */
     public function createConfigFile() {
         if(!class_exists('Config')){
-            $this->writeConfig(SystemFunctions::INITIAL_CONFIG_VARS);
+            $cfg = $this->getSiteConfigVars();
+            $this->writeConfig($cfg);
         }
     }
     public function __construct() {
@@ -216,6 +220,7 @@ class SystemFunctions extends Functions{
      */
     public function getSiteConfigVars(){
         $cfgArr = SystemFunctions::INITIAL_WEBSITE_CONFIG_VARS;
+        $cfgArr['base-url'] = Util::getBaseURL();
         if(class_exists('SiteConfig')){
             $cfgArr['website-name'] = SiteConfig::get()->getWebsiteName();
             $cfgArr['base-url'] = SiteConfig::get()->getBaseURL();
@@ -224,6 +229,8 @@ class SystemFunctions extends Functions{
             $cfgArr['theme-directory'] = SiteConfig::get()->getThemeDir();
             $cfgArr['admin-theme-directory'] = SiteConfig::get()->getAdminThemeDir();
             $cfgArr['site-description'] = SiteConfig::get()->getDesc();
+            $cfgArr['theme-name'] = SiteConfig::get()->getBaseThemeName();
+            $cfgArr['admin-theme-name'] = SiteConfig::get()->getAdminThemeName();
         }
         return $cfgArr;
     }
@@ -285,6 +292,7 @@ class SystemFunctions extends Functions{
      * The directory of the theme that is used by web site administration pages. 
      * @var string
      * @since 1.0 
+     * @deprecated since version 1.3
      */
     private $adminPanelThemeDir;
     /**
@@ -293,6 +301,18 @@ class SystemFunctions extends Functions{
      * @since 1.0
      */
     private $baseUrl;
+    /**
+     * The name of base website UI Theme.
+     * @var string 
+     * @since 1.3
+     */
+    private $baseThemeName;
+    /**
+     * The name of admin control pages Theme.
+     * @var string 
+     * @since 1.3
+     */
+    private $adminThemeName;
     /**
      * Configuration file version number.
      * @var string 
@@ -303,6 +323,7 @@ class SystemFunctions extends Functions{
      * The directory of web site pages theme.
      * @var string
      * @since 1.0 
+     * @deprecated since version 1.3
      */
     private $selectedThemeDir;
     /**
@@ -328,6 +349,8 @@ class SystemFunctions extends Functions{
         $this->webSiteName = \''.$configArr['website-name'].'\';
         $this->baseUrl = \''.$configArr['base-url'].'\';
         $this->titleSep = \''.$configArr['title-separator'].'\';
+        $this->baseThemeName = \''.$configArr['theme-name'].'\';
+        $this->adminThemeName = \''.$configArr['admin-theme-name'].'\';
         $this->homePage = \''.$configArr['home-page'].'\';
         $this->description = \''.$configArr['site-description'].'\';
         $this->selectedThemeDir = \''.$configArr['theme-directory'].'\';
@@ -337,6 +360,7 @@ class SystemFunctions extends Functions{
      * Returns the directory at which the web site theme exist.
      * @return string The directory at which the web site theme exist.
      * @since 1.0
+     * @deprecated since version 1.3
      */
     public function getThemeDir() {
         return $this->selectedThemeDir;
@@ -345,9 +369,26 @@ class SystemFunctions extends Functions{
      * Returns the directory at which the administrator pages theme exists.
      * @return string The directory at which the administrator pages theme exists.
      * @since 1.0
+     * @deprecated since version 1.3
      */
     public function getAdminThemeDir(){
         return $this->adminPanelThemeDir;
+    }
+    /**
+     * Returns the name of base theme that is used in website pages.
+     * @return string The name of base theme that is used in website pages.
+     * @since 1.3
+     */
+    public function getBaseThemeName(){
+        return $this->baseThemeName;
+    }
+    /**
+     * Returns the name of the theme that is used in admin control pages.
+     * @return string The name of the theme that is used in admin control pages.
+     * @since 1.3
+     */
+    public function getAdminThemeName(){
+        return $this->adminThemeName;
     }
     /**
      * Returns version number of the configuration file.

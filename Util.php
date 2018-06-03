@@ -79,6 +79,13 @@ class Util{
         
     }
     /**
+     * Call the function 'print_r' and insert 'pre' around it.
+     * @param mixed $expr
+     */
+    public static function print_r($expr){
+        ?><pre><?php print_r($expr)?></pre><?php
+    }
+    /**
      * Returns unicode code of a character.
      * Common values: 32 = space, 10 = new line, 13 = carriage return.
      * @param type $u a character.

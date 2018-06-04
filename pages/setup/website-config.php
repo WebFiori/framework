@@ -24,10 +24,9 @@
  * THE SOFTWARE.
  */
 
-define('SETUP_MODE', '');
 require_once '../../root.php';
-if(Config::get()->isConfig()){
-    header('location: '.SiteConfig::get()->getHomePage());
+if(WebsiteFunctions::get()->getMainSession()->validateToken() != TRUE){
+    header('location: '.SiteConfig::get()->getBaseURL().'pages/login');
 }
 Page::get()->loadTranslation(TRUE);
 $pageLbls = LANGUAGE['pages']['setup']['website-config'];
@@ -35,24 +34,101 @@ Page::get()->setWritingDir(LANGUAGE['dir']);
 Page::get()->setTitle($pageLbls['title']);
 Page::get()->setDescription($pageLbls['description']);
 Page::get()->loadAdminTheme();
+$js = new JsCode;
+$jsonx = new JsonX();
+$jsonx->add('disconnected', LANGUAGE['general']['disconnected']);
+$jsonx->add('saved', LANGUAGE['general']['saved']);
+$jsonx->add('saving', LANGUAGE['general']['saving']);
+$js->addCode('window.onload = function(){'
+        . 'window.messages = '.$jsonx.';'
+        . 'document.getElementById(\'site-name-input\').oninput = siteInfoInputsChanged;'
+        . 'document.getElementById(\'site-description-input\').oninput = siteInfoInputsChanged;'
+        . '}');
 $document = Page::get()->getDocument();
+$document->getHeadNode()->addChild($js);
+$document->getHeadNode()->addJs('res/js/setup.js');
 $container = new HTMLNode();
 $document->addNode($container);
 $container->setClassName('pa-container');
-$container->addChild(stepsCounter(LANGUAGE['pages']['setup']['setup-steps'],3));
-$container->addChild(pageBody());
+$container->addChild(stepsCounter(LANGUAGE['pages']['setup']['setup-steps'],4));
+$container->addChild(pageBody($pageLbls));
 $container->addChild(footer());
 echo $document->toHTML();
 
-function pageBody(){
+function pageBody($pageLabels){
     $body = new HTMLNode();
     $body->setClassName('pa-row');
+    $col = new HTMLNode();
+    $col->setClassName('pa-'.Page::get()->getWritingDir().'-col-twelve');
+    $p1 = new PNode();
+    $p1->addText($pageLabels['help']['h-1']);
+    $col->addChild($p1);
+    $p2 = new PNode();
+    $p2->addText($pageLabels['help']['h-2']);
+    $col->addChild($p2);
+    $body->addChild($col);
+    $body->addChild(createSiteInfoForm($pageLabels['labels'], $pageLabels['placeholders']));
     return $body;
+}
+
+function createSiteInfoForm($lbls,$placeholders){
+    $form = new HTMLNode('form');
+    $form->setClassName('pa-row');
+    
+    $siteNameNode = new HTMLNode();
+    $siteNameNode->setClassName('pa-'.Page::get()->getWritingDir().'-col-twelve');
+    $siteNameLabel = new Label($lbls['site-name']);
+    $siteNameLabel->setClassName('pa-'.Page::get()->getWritingDir().'-col-ten');
+    $siteNameInput = new Input();
+    $siteNameInput->setPlaceholder($placeholders['site-name']);
+    $siteNameInput->setID('site-name-input');
+    $siteNameInput->setClassName('pa-'.Page::get()->getWritingDir().'-ltr-col-four');
+    $siteNameNode->addChild($siteNameLabel);
+    $siteNameNode->addChild($siteNameInput);
+    $form->addChild($siteNameNode);
+    
+    $descNode = new HTMLNode();
+    $descNode->setClassName('pa-'.Page::get()->getWritingDir().'-col-twelve');
+    $descLabel = new Label($lbls['site-description']);
+    $descLabel->setClassName('pa-'.Page::get()->getWritingDir().'-col-ten');
+    $descInput = new Input();
+    $descInput->setPlaceholder($placeholders['site-description']);
+    $descInput->setID('site-description-input');
+    $descInput->setClassName('pa-'.Page::get()->getWritingDir().'-ltr-col-seven');
+    $descNode->addChild($descLabel);
+    $descNode->addChild($descInput);
+    $form->addChild($descNode);
+    
+    $submit = new Input('submit');
+    $submit->setAttribute('data-action', 'ok');
+    $submit->setValue(LANGUAGE['general']['save']);
+    $submit->setAttribute('onclick', 'return updateSiteInfo()');
+    $submit->setAttribute('disabled', '');
+    $submit->setID('save-input');
+    $submit->setClassName('pa-'.Page::get()->getWritingDir().'-ltr-col-four');
+    $messageNode = new PNode();
+    $messageNode->setID('message-display');
+    $messageNode->setClassName('pa-'.Page::get()->getWritingDir().'-ltr-col-twelve');
+    $form->addChild($submit);
+    $form->addChild($messageNode);
+    
+    return $form;
 }
 
 function footer(){
     $node = new HTMLNode();
     $node->setClassName('pa-row');
+
+    $nextButton = new HTMLNode('button');
+    $nextButton->setAttribute('onclick', 'window.location.href = \'pages/home\'');
+    $nextButton->setAttribute('disabled', '');
+    $nextButton->setClassName('pa-'.Page::get()->getWritingDir().'-col-three');
+    $nextButton->setID('finish-button');
+    $nextButton->setAttribute('data-action', 'ok');
+    $nextText = new HTMLNode('', FALSE, TRUE);
+    $nextText->setText(LANGUAGE['general']['finish']);
+    $nextButton->addChild($nextText);
+    $node->addChild($nextButton);
     return $node;
 }
 
@@ -76,7 +152,7 @@ function stepsCounter($lang,$active){
     $step3 = new HTMLNode();
     $step3->setClassName('pa-'.Page::get()->getWritingDir().'-col-two');
     $step3Text = new HTMLNode('', FALSE, TRUE);
-    $step3Text->setText($lang['database-setup']);
+    $step3Text->setText($lang['email-account']);
     $step3->addChild($step3Text);
     $node->addChild($step3);
     
@@ -94,12 +170,6 @@ function stepsCounter($lang,$active){
     $step5->addChild($step5Text);
     $node->addChild($step5);
     
-    $step6 = new HTMLNode();
-    $step6->setClassName('pa-'.Page::get()->getWritingDir().'-col-two');
-    $step6Text = new HTMLNode('', FALSE, TRUE);
-    $step6Text->setText($lang['finish']);
-    $step6->addChild($step6Text);
-    $node->addChild($step6);
     if($active == 0){
         $step1->setAttribute('style', 'background-color:#efaa32');
     }
@@ -114,9 +184,6 @@ function stepsCounter($lang,$active){
     }
     else if($active == 4){
         $step5->setAttribute('style', 'background-color:#efaa32');
-    }
-    else if($active == 5){
-        $step6->setAttribute('style', 'background-color:#efaa32');
     }
     return $node;
 }

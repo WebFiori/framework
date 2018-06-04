@@ -139,12 +139,6 @@ function stepsCounter($lang,$active){
     $step5->addChild($step5Text);
     $node->addChild($step5);
     
-    $step6 = new HTMLNode();
-    $step6->setClassName('pa-'.Page::get()->getWritingDir().'-col-two');
-    $step6Text = new HTMLNode('', FALSE, TRUE);
-    $step6Text->setText($lang['finish']);
-    $step6->addChild($step6Text);
-    $node->addChild($step6);
     if($active == 0){
         $step1->setAttribute('style', 'background-color:#efaa32');
     }
@@ -159,9 +153,6 @@ function stepsCounter($lang,$active){
     }
     else if($active == 4){
         $step5->setAttribute('style', 'background-color:#efaa32');
-    }
-    else if($active == 5){
-        $step6->setAttribute('style', 'background-color:#efaa32');
     }
     return $node;
 }

@@ -9,12 +9,15 @@ const LANGUAGE = array(
     'general'=>array(
         'wait'=>'Please wait a moment 🙂',
         'loading'=>'Loading...',
+        'saving'=>'Saving...',
         'next'=>'Next',
+        'saved'=>'Saved!',
         'prev'=>'Previous',
         'skip'=>'Skip',
         'connected'=>'Connected!',
         'disconnected'=>'Please check that you are connected to the internet.',
-        'save'=>'Save Changes'
+        'save'=>'Save Changes',
+        'finish'=>'Finish'
     ),
     'pages'=>array(
         'setup'=>array(
@@ -155,13 +158,20 @@ const LANGUAGE = array(
                 'description'=>'',
                 'labels'=>array(
                     'site-name'=>'Website Name:',
-                    
+                    'site-description'=>'Website Description:'
                 ),
                 'placeholders'=>array(
-                    'site-name'=>'Choose a name that reflects site content.'
+                    'site-name'=>'Choose a name that reflects site content.',
+                    'site-description'=>'Give a short description for your website.'
                 ),
                 'help'=>array(
-                    
+                    'h-1'=>'This is the last step in the setup process. What we need from '
+                    . 'you is to give your website a name. This name will usually appear '
+                    . 'along side the name of the page that you are browsing. It can be seen '
+                    . 'in browser\'s top bar.',
+                    'h-2'=>'The second thing that we need is a short description for your website. '
+                    . 'The given description will usually appear by default in the pages that does not '
+                    . 'have descripion.'
                 )
             ),
             'finish'=>array(
@@ -186,6 +196,45 @@ const LANGUAGE = array(
             ),
             'errors'=>array(
                 'inncorect-token'=>'Inncorrect Activation token!'
+            )
+        ),
+        'settings'=>array(
+            'title'=>'',
+            'description'=>'',
+            'settings'=>array(
+                'website-settings'=>array(
+                    
+                ),
+                'database-settings'=>array(
+                    
+                ),
+                'smtp-settings'=>array(
+                    'labels'=>array(
+                        'name'=>'Account Name:',
+                        'server-address'=>'Server Address:',
+                        'email-address'=>'Email Address:',
+                        'username'=>'Username',
+                        'password'=>'Password:',
+                        'check-connection'=>'Check Connection',
+                        'connected'=>'Connection Established Successfully!',
+                        'port'=>'Server Port:'
+                    ),
+                    'placeholders'=>array(
+                        'name'=>'Something like: \'Programming Academia Team\'',
+                        'server-address'=>'mail.example.com',
+                        'email-address'=>'ma_address@example.com',
+                        'username'=>'Server username.',
+                        'password'=>'Login password.',
+                        'port'=>'25'
+                    ),
+                    'status'=>array(
+                        'checking-connection'=>'Validating connection info...',
+                    ),
+                    'errors'=>array(
+                        'inv_mail_host_or_port'=>'Incorrect server address or port.',
+                        'inv_username_or_pass'=>'Incorrect username or password.'
+                    )
+                )
             )
         ),
         'login'=>array(

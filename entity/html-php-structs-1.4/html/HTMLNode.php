@@ -250,9 +250,11 @@ class HTMLNode {
         $chCount = $chNodes->size();
         for($x = 0 ; $x < $chCount ; $x++){
             $child = $chNodes->get($x);
-            $tmpCh = $child->_getChildByID($val,$child->childNodes());
-            if($tmpCh instanceof HTMLNode){
-                return $tmpCh;
+            if(!$child->isTextNode()){
+                $tmpCh = $child->_getChildByID($val,$child->childNodes());
+                if($tmpCh instanceof HTMLNode){
+                    return $tmpCh;
+                }
             }
         }
         for($x = 0 ; $x < $chCount ; $x++){

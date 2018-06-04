@@ -82,7 +82,7 @@ class SiteConfig{
     }
     private function __construct() {
         $this->configVision = '1.1';
-        $this->webSiteName = 'Programming Academia';
+        $this->webSiteName = 'Hello Website';
         $this->baseUrl = 'http://localhost/generic-php/';
         $this->titleSep = ' | ';
         $this->baseThemeName = 'Greeny By Ibrahim Ali';

@@ -1,0 +1,23 @@
+var xhr = new XMLHttpRequest();
+xhr.open('post','http://localhost/alshama-project/apis/AuthAPI')
+xhr.onreadystatechange = function(){
+	if(this.readyState === 4){
+		console.log(this.responseText);
+	}
+}
+xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+xhr.send('action=login&username=ibinshikh@hotmail.com&password=123456654321')
+
+------
+
+var xhr = new XMLHttpRequest();
+xhr.open('post','http://localhost/generic-php/apis/SysAPI')
+xhr.onreadystatechange = function(){
+	if(this.readyState === 4){
+		console.log(this.responseText);
+	}
+}
+xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+xhr.send('action=update-database-attributes')
+
+-------

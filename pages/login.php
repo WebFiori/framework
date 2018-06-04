@@ -26,23 +26,23 @@
 
 //first, load the root file
 require_once '../root.php';
-
 if(WebsiteFunctions::get()->getMainSession()->validateToken() === TRUE){
     header('location: home');
 }
-Page::get()->loadTranslation(TRUE);
+$page = Page::get();
+$page->loadTranslation(TRUE);
 $pageLbls = LANGUAGE['pages']['login'];
-Page::get()->setTitle($pageLbls['title']);
-Page::get()->setDescription($pageLbls['description']);
-Page::get()->loadTheme();
-$document = Page::get()->getDocument();
-$document->getHeadNode()->addCSS('publish/themes/greeny/css/login.css');
-$document->getHeadNode()->addJs('publish/themes/greeny/js/login.js');
+$page->setTitle($pageLbls['title']);
+$page->setDescription($pageLbls['description']);
+$page->usingTheme(SiteConfig::get()->getAdminThemeName());
+
+$page->getDocument()->getHeadNode()->addCSS('publish/themes/greeny/css/login.css');
+$page->getDocument()->getHeadNode()->addJs('publish/themes/greeny/js/login.js');
 $container = new HTMLNode();
-$document->addNode($container);
+$page->insertNode($container);
 $container->setClassName('pa-container');
 $container->addChild(createLoginForm($pageLbls));
-echo $document->toHTML(FALSE);
+echo $page->getDocument()->toHTML(FALSE);
 //end of page setup.
 
 function createLoginForm($pageLbls){
@@ -54,7 +54,7 @@ function createLoginForm($pageLbls){
     $form->setClassName('pa-row');
     $formLabeldiv = new HTMLNode();
     $usernameDiv = new HTMLNode();
-    $usernameDiv->setAttribute('style', 'background-color: #2d8659');
+    //$usernameDiv->setAttribute('style', 'background-color: #2d8659');
     $usernameDiv->setClassName('pa-row');
     $usernameDiv->addChild(new Label($pageLbls['labels']['username']));
     $usernameDiv->addChild(new Br());
@@ -62,7 +62,7 @@ function createLoginForm($pageLbls){
     $usernameDiv->childNodes()->get(2)->setID('username-input');
     $usernameDiv->childNodes()->get(2)->setAttribute('required');
     $passwordDiv = new HTMLNode();
-    $passwordDiv->setAttribute('style', 'background-color: #2d8659');
+    //$passwordDiv->setAttribute('style', 'background-color: #2d8659');
     $passwordDiv->setClassName('pa-row');
     $passwordDiv->addChild(new Label($pageLbls['labels']['password']));
     $passwordDiv->addChild(new Br());
@@ -70,23 +70,24 @@ function createLoginForm($pageLbls){
     $passwordDiv->childNodes()->get(2)->setID('password-input');
     $passwordDiv->childNodes()->get(2)->setAttribute('required');
     $messageDiv = new HTMLNode();
-    $messageDiv->setAttribute('style', 'background-color: #2d8659');
+    //$messageDiv->setAttribute('style', 'background-color: #2d8659');
     $messageDiv->setClassName('pa-row');
     $messageDiv->addChild(new Label(''));
     $messageDiv->childNodes()->get(0)->setID('message');
     $keepLoginDiv = new HTMLNode();
-    $keepLoginDiv->setAttribute('style', 'background-color: #2d8659');
+    //$keepLoginDiv->setAttribute('style', 'background-color: #2d8659');
     $keepLoginDiv->setClassName('pa-row');
     $keepLoginDiv->addChild(new Input('checkbox'));
     $keepLoginDiv->addChild(new Label($pageLbls['labels']['keep-me-logged']));
     $keepLoginDiv->childNodes()->get(0)->setID('keep-me-logged');
     $submitDiv = new HTMLNode();
-    $submitDiv->setAttribute('style', 'background-color: #2d8659');
+    //$submitDiv->setAttribute('style', 'background-color: #2d8659');
     $submitDiv->setClassName('pa-row');
     $submitDiv->addChild(new Input('submit'));
     $submitDiv->childNodes()->get(0)->setID('login-button');
     $submitDiv->childNodes()->get(0)->setValue($pageLbls['actions']['login']);
     $submitDiv->childNodes()->get(0)->setAttribute('onclick','return login()');
+    //$submitDiv->childNodes()->get(0)->setAttribute('style','background-color:rgb(0, 155, 119)');
     $formLabeldiv->setAttribute('style', 'margin-bottom: 18%;text-align: center;');
     $form->addChild($formLabeldiv);
     $form->addChild($usernameDiv);

@@ -113,7 +113,7 @@ class SysAPIs extends API{
             $this->sendResponse('Main Session Info', FALSE, 200, '"session":'.SystemFunctions::get()->getMainSession()->toJSON());
         }
         else if($action == 'update-site-info'){
-            $this->actionNotImpl();
+            $this->updateSiteInfo();
         }
         else if($action == 'create-first-account'){
             $i = $this->getInputs();
@@ -196,7 +196,7 @@ class SysAPIs extends API{
             $cfgArr['home-page'] = $i['home-page'];
         }
         if(isset($i['site-theme'])){
-            $cfgArr['theme-directory'] = $i['site-theme'];
+            $cfgArr['theme-name'] = $i['site-theme'];
         }
         SystemFunctions::get()->updateSiteInfo($cfgArr);
         $this->sendResponse('Site info updated.');

@@ -246,7 +246,60 @@ function emailInputChanged(){
     }
     document.getElementById('check-input').setAttribute('disabled','');
 }
-
+function siteInfoInputsChanged(){
+    var saveButton = document.getElementById('save-input');
+    var siteName = document.getElementById('site-name-input').value;
+    if(siteName !== ''){
+        var siteDesc = document.getElementById('site-description-input').value;
+        if(siteDesc !== ''){
+            saveButton.removeAttribute('disabled');
+            window.siteInfo = {
+                name:siteName,
+                desc:siteDesc
+            };
+            return;
+        }
+    }
+    saveButton.setAttribute('disabled','');
+}
 function updateSiteInfo(){
+    var ajax = new AJAX({
+        method:'post',
+        url:'apis/SysAPIs'
+    });
+    var form = new FormData();
+    form.append('action','update-site-info');
+    form.append('site-name',window.siteInfo['name']);
+    form.append('site-description',window.siteInfo['desc']);
+    var messageDisplay = document.getElementById('message-display');
+    var submitButton = document.getElementById('save-input');
+    submitButton.setAttribute('disabled','');
+    messageDisplay.innerHTML = '<b>'+window.messages['saving']+'</b>';
+    ajax.setParams(form);
+    ajax.setOnSuccess(function(){
+        console.log(this.jsonResponse);
+        submitButton.removeAttribute('disabled');
+        messageDisplay.innerHTML = '<b style="color:green">'+window.messages['saved']+'</b>';
+        document.getElementById('finish-button').removeAttribute('disabled');
+    });
+    ajax.setOnClientError(function(){
+        console.log(this.jsonResponse);
+        submitButton.removeAttribute('disabled');
+        messageDisplay.innerHTML = '<b style="color:red">'+this.jsonResponse['message']+'</b>';
+        document.getElementById('finish-button').setAttribute('disabled','');
+    });
+    ajax.setOnServerError(function(){
+        console.log(this.jsonResponse);
+        submitButton.removeAttribute('disabled');
+        messageDisplay.innerHTML = '<b style="color:red">Server Error (500)</b>';
+        document.getElementById('finish-button').setAttribute('disabled','');
+    });
+    ajax.setOnDisconnected(function(){
+        console.log('Disconnected!');
+        submitButton.removeAttribute('disabled');
+        messageDisplay.innerHTML = '<b style="color:red">'+window.messages['disconnected']+'</b>';
+        document.getElementById('finish-button').setAttribute('disabled','');
+    });
+    ajax.send();
     return false;
 }

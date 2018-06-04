@@ -114,7 +114,7 @@ class SystemFunctions extends Functions{
      */
     public function createConfigFile() {
         if(!class_exists('Config')){
-            $cfg = $this->getSiteConfigVars();
+            $cfg = $this->getConfigVars();
             $this->writeConfig($cfg);
         }
     }
@@ -206,10 +206,10 @@ class SystemFunctions extends Functions{
         $confArr = $this->getSiteConfigVars();
         foreach ($confArr as $k=>$v){
             if(isset($websiteInfoArr[$k])){
-                $confArr[$k] = $v;
+                $confArr[$k] = $websiteInfoArr[$k];
             }
         }
-        $this->updateSiteInfo($confArr);
+        $this->writeSiteConfig($confArr);
     }
     /**
      * Returns an associative array that contains web site configuration 
@@ -686,7 +686,7 @@ class SystemFunctions extends Functions{
                 }
                 throw new Exception('SiteConfig.php is missing.');
             }
-            throw new Exception('SiteConfig.php is missing.');
+            throw new Exception('MailConfig.php is missing.');
         }
         throw new Exception('Config.php is missing.');
     }

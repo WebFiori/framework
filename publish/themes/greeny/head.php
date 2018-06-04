@@ -4,16 +4,17 @@
  * Modify the content of this function to add custom head tags.
  * @return HeadNode Head tag as <b>HeadNode</b> object.
  */
-function getHeadNode($canonical='',$title='',$description=''){
+function getHeadNode(){
+    $page = Page::get();
     $headTag = new HeadNode();
-    $headTag->setTitle(Page::get()->getTitle().SiteConfig::get()->getTitleSep().SiteConfig::get()->getWebsiteName());
-    $headTag->addMeta('description',Page::get()->getDescription());
+    $headTag->setTitle($page->getTitle().SiteConfig::get()->getTitleSep().SiteConfig::get()->getWebsiteName());
+    $headTag->addMeta('description',$page->getDescription());
     $headTag->setBase(SiteConfig::get()->getBaseURL());
-    $headTag->addLink('icon', $GLOBALS['THEME_META']['images-directory'].'/favicon.png');
-    if($canonical != '' || $canonical !== FALSE){
-        $headTag->setCanonical(SiteConfig::get()->getBaseURL().$canonical);
-    }
-    $headTag->addCSS($GLOBALS['THEME_META']['css-directory'].'\programming-academia.css');
+    $headTag->addLink('icon', $page->getThemeImagesDir().'/favicon.png');
+    $headTag->setCanonical(SiteConfig::get()->getBaseURL().$page->getCanonical());
+    $headTag->addCSS($page->getThemeCSSDir().'/Grid.css');
+    $headTag->addCSS($page->getThemeCSSDir().'/colors.css');
+    $headTag->addCSS($page->getThemeCSSDir().'/theme-specific.css');
     $headTag->addJs('res/js/js-ajax-helper-1.0.0/AJAX.js');
     $headTag->addJs('res/js/APIs.js');
     $headTag->addMeta('robots', 'index, follow');

@@ -1,4 +1,3 @@
-@charset "UTF-8";
 /*
 The MIT License
 
@@ -23,58 +22,31 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 /* 
-    Created on : Jun 6, 2017, 4:00:25 AM
+    Created on : Jun 4, 2018, 8:55:40 AM
     Author     : Ibrahim
-    Version    : 1.0, Jun 6, 2017
 */
 
-@media screen and (max-width: 768px){
-    [class*="-col-"] {
-        width: 99% !important;
-    }
+h1#page-title{
+    font-weight: bold;
+    background-color: rgb(95, 158, 160);
+    box-shadow: 2px 0px 4px 1px rgba(0,88,188,0.4);
 }
-@media screen and (min-width: 768px) and (max-width: 992px){
-    
+h1#page-title[dir=ltr]{
+    border-left: 5px solid rgb(15, 87, 51);
 }
-*, *:before, *:after{
-    box-sizing: border-box;
+h1#page-title[dir=rtl]{
+    border-right: 5px solid rgb(15, 87, 51);
 }
-
-.pa-container, .pa-row{
-    float: left;
+h2#post-title{
+    box-shadow: -4px 6px 2px 0px rgba(88,88,88,0.9);
+    background-color: rgba(153, 204, 255, 0.5);
 }
-.pa-container{
-    padding: 1%;
-    width: 100%;
+.show-border{
+    border: 1px solid #000;
 }
-.pa-row{
-    padding: 0.5%;
-    margin: 0.5%;
-    width: 99%;
+.show-border[dir=ltr]{
+    border-left: 3px solid black;
 }
-[class*="-col-"] {
-    padding: 0.5%;
-    margin: 0.5%;
+.show-border[dir=rtl]{
+    border-right: 3px solid black;
 }
-
-[class*="pa-ltr-"]{
-    float: left;
-    direction: ltr;
-}
-[class*="pa-rtl-"]{
-    float: right;
-    direction: rtl;
-}
-
-[class*="-col-one"]{width: 7.333333333%}
-[class*="-col-two"]{width: 15.66666667%}
-[class*="-col-three"]{width: 24%}
-[class*="-col-four"]{width: 32.33333333%}
-[class*="-col-five"]{width: 40.66666667%}
-[class*="-col-six"]{width: 49%}
-[class*="-col-seven"]{width: 57.33333333%}
-[class*="-col-eight"]{width: 65.66666666%}
-[class*="-col-nine"]{width: 74%}
-[class*="-col-ten"]{width: 82.33333333%}
-[class*="-col-eleven"]{width: 90.66666666%}
-[class*="-col-twelve"]{width: 99%}

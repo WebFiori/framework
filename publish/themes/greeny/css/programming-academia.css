@@ -503,15 +503,6 @@ div#pa-social-media-container .pa-share-text-container, div#pa-social-media-cont
 .pa-next-button *, .pa-prev-button *{
     color: white !important;
 }
-.show-border{
-    border: 1px solid #000;
-}
-.show-border[dir=ltr]{
-    border-left: 3px solid black;
-}
-.show-border[dir=rtl]{
-    border-right: 3px solid black;
-}
 #pa-notifications-container{
     position: fixed;
     bottom: 0;
@@ -657,21 +648,7 @@ pa-notification-text{
 [class*="-col-eleven"]{width: 90.66666666%}
 [class*="-col-twelve"]{width: 99%}
 /*IDs*/
-h1#page-title{
-    font-weight: bold;
-    background-color: rgb(95, 158, 160);
-    box-shadow: 2px 0px 4px 1px rgba(0,88,188,0.4);
-}
-h1#page-title[dir=ltr]{
-    border-left: 5px solid rgb(15, 87, 51);
-}
-h1#page-title[dir=rtl]{
-    border-right: 5px solid rgb(15, 87, 51);
-}
-h2#post-title{
-    box-shadow: -4px 6px 2px 0px rgba(88,88,88,0.9);
-    background-color: rgba(153, 204, 255, 0.5);
-}
+
 #pa-logo{
     background-color: #29a3a3;
 }
@@ -718,9 +695,6 @@ p{
 aside{
     font-size: 12pt;
 }
-html{
-   background-color: black;
-}
 body{
     margin: 0;
 }
@@ -735,12 +709,6 @@ input[type=submit], input[type=button]{
 input[disabled=true],input[disabled='']{
     background-color: lightgrey;
     cursor:auto;
-}
-a{
-    color: #378e80;
-    text-decoration: none;
-    font-weight: bold;
-    cursor: pointer;
 }
 pre{
     margin: 0;

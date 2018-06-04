@@ -1,4 +1,3 @@
-@charset "UTF-8";
 /*
 The MIT License
 
@@ -23,58 +22,36 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 /* 
-    Created on : Jun 6, 2017, 4:00:25 AM
+    Created on : Jun 4, 2018, 7:50:42 AM
     Author     : Ibrahim
-    Version    : 1.0, Jun 6, 2017
 */
-
-@media screen and (max-width: 768px){
-    [class*="-col-"] {
-        width: 99% !important;
-    }
+*[disabled]{
+    cursor: not-allowed !important;
 }
-@media screen and (min-width: 768px) and (max-width: 992px){
-    
-}
-*, *:before, *:after{
-    box-sizing: border-box;
-}
-
-.pa-container, .pa-row{
-    float: left;
+html{
+   background-color: black;
 }
 .pa-container{
-    padding: 1%;
-    width: 100%;
+    background-color: #006E51;
 }
 .pa-row{
-    padding: 0.5%;
-    margin: 0.5%;
-    width: 99%;
+    background-color: rgb(230, 255, 230);
 }
-[class*="-col-"] {
-    padding: 0.5%;
-    margin: 0.5%;
+[class*='col']{
+    
 }
-
-[class*="pa-ltr-"]{
-    float: left;
-    direction: ltr;
+a{
+    color: #378e80;
+    text-decoration: none;
+    font-weight: bold;
+    cursor: pointer;
 }
-[class*="pa-rtl-"]{
-    float: right;
-    direction: rtl;
+button, input[type=submit]{
+    background-color:rgb(0, 155, 119);
+    color: white;
+    border: 1px solid white;
 }
-
-[class*="-col-one"]{width: 7.333333333%}
-[class*="-col-two"]{width: 15.66666667%}
-[class*="-col-three"]{width: 24%}
-[class*="-col-four"]{width: 32.33333333%}
-[class*="-col-five"]{width: 40.66666667%}
-[class*="-col-six"]{width: 49%}
-[class*="-col-seven"]{width: 57.33333333%}
-[class*="-col-eight"]{width: 65.66666666%}
-[class*="-col-nine"]{width: 74%}
-[class*="-col-ten"]{width: 82.33333333%}
-[class*="-col-eleven"]{width: 90.66666666%}
-[class*="-col-twelve"]{width: 99%}
+button:hover, input[type=submit]:hover{
+    background-color:rgb(55, 155, 119);
+    cursor: pointer;
+}

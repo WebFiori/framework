@@ -13,23 +13,18 @@ input[type=password]{
     height: 40px;
 }
 #login-form{
-    background-color: #2d8659;
+    /*background-color: #2d8659;*/
     border: dotted #133546 1px;
     width:40%;
     margin-left: 30%;
     margin-right: 30%;
 }
 #login-button{
-    background-color: rgb(0, 155, 119);
+    /*background-color: rgb(0, 155, 119);*/
     color:white;
     width:49%;
     height: 25px;
     border: 1px solid
-}
-#cancel_button{
-    background-color: #9B2335;
-    color:white;
-    width:49%;
 }
 #username-input{
     width: 100%;

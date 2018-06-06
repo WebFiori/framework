@@ -28,7 +28,7 @@
  * A class that represents HTML or XML tag.
  *
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.3
+ * @version 1.4
  */
 class HTMLNode {
     /**
@@ -85,7 +85,7 @@ class HTMLNode {
      * @var LinkedList
      * @since 1.0 
      */
-    private $childNodes;
+    private $childrenList;
     /**
      * A boolean value. If set to true, The node must be closed while building 
      * the document.
@@ -126,7 +126,7 @@ class HTMLNode {
         else{
             $this->requireClose = $reqClose === TRUE ? TRUE : FALSE;
             $this->isText = FALSE;
-            $this->childNodes = new LinkedList();
+            $this->childrenList = new LinkedList();
             $this->attributes = array();
         }
     }
@@ -136,7 +136,7 @@ class HTMLNode {
      * has a parent. If the node has no parent, the function will return <b>NULL</b>.
      * @since 1.2
      */
-    public function getParentNode() {
+    public function getParent() {
         return $this->parentNode;
     }
     /**
@@ -144,7 +144,7 @@ class HTMLNode {
      * @param HTMLNode $node
      * @since 1.2
      */
-    private function setParentNode($node){
+    private function setParent($node){
         $this->parentNode = $node;
     }
     /**
@@ -153,8 +153,8 @@ class HTMLNode {
      * given node is a text node, the function will return <b>NULL</b>.
      * @since 1.0
      */
-    public function childNodes(){
-        return $this->childNodes;
+    public function children(){
+        return $this->childrenList;
     }
     /**
      * Checks if the node is a text node or not.
@@ -172,27 +172,27 @@ class HTMLNode {
      * text node, the function will always return <b>FALSE</b>.
      * @since 1.2
      */
-    public function hasNode($node) {
+    public function hasChild($node) {
         if(!$this->isTextNode()){
             if($node instanceof HTMLNode){
-                return $this->childNodes()->indexOf($node) != -1;
+                return $this->children()->indexOf($node) != -1;
             }
         }
         return FALSE;
     }
     /**
-     * Replace a node with a new one.
+     * Replace a direct child node with a new one.
      * @param HTMLNode $oldNode The old node. It must be a child of the instance.
      * @param HTMLNode $replacement The replacement node.
      * @return boolean <b>TRUE</b> is returned if the node replaced. <b>FALSE</b> if not.
      * @since 1.2
      */
-    public function replaceNode($oldNode,$replacement) {
+    public function replaceChild($oldNode,$replacement) {
         if(!$this->isTextNode()){
             if($oldNode instanceof HTMLNode){
-                if($this->hasNode($oldNode)){
+                if($this->hasChild($oldNode)){
                     if($replacement instanceof HTMLNode){
-                        $this->childNodes()->replace($this->childNodes()->indexOf($oldNode), $replacement);
+                        $this->children()->replace($this->children()->indexOf($oldNode), $replacement);
                         return TRUE;
                     }
                 }
@@ -211,9 +211,11 @@ class HTMLNode {
         $chCount = $chList->size();
         for($x = 0 ; $x < $chCount ; $x++){
             $child = $chList->get($x);
-            $tmpList = $child->_getChildrenByTag($val,$child->childNodes(),new LinkedList());
-            for($y = 0 ; $y < $tmpList->size() ; $y++){
-                $list->add($tmpList->get($y));
+            if(!$child->isTextNode()){
+                $tmpList = $child->_getChildrenByTag($val,$child->children(),new LinkedList());
+                for($y = 0 ; $y < $tmpList->size() ; $y++){
+                    $list->add($tmpList->get($y));
+                }
             }
         }
         for($x = 0 ; $x < $chCount ; $x++){
@@ -236,7 +238,7 @@ class HTMLNode {
         $val = $val.'';
         $list = new LinkedList();
         if(strlen($val) != 0){
-            return $this->_getChildrenByTag($val, $this->childNodes(), $list);
+            return $this->_getChildrenByTag($val, $this->children(), $list);
         }
         return $list;
     }
@@ -251,7 +253,7 @@ class HTMLNode {
         for($x = 0 ; $x < $chCount ; $x++){
             $child = $chNodes->get($x);
             if(!$child->isTextNode()){
-                $tmpCh = $child->_getChildByID($val,$child->childNodes());
+                $tmpCh = $child->_getChildByID($val,$child->children());
                 if($tmpCh instanceof HTMLNode){
                     return $tmpCh;
                 }
@@ -279,7 +281,7 @@ class HTMLNode {
         if(!$this->isTextNode()){
             $val = $val.'';
             if(strlen($val) != 0){
-                return $this->_getChildByID($val, $this->childNodes());
+                return $this->_getChildByID($val, $this->children());
             }
         }
         return NULL;
@@ -418,25 +420,26 @@ class HTMLNode {
      */
     public function removeAllChildNodes() {
         if(!$this->isTextNode()){
-            $this->childNodes->clear();
+            $this->childrenList->clear();
         }
     }
     /**
-     * Removes a child node.
+     * Removes a direct child node.
      * @param HTMLNode $node The node that will be removed.
      * @return HTMLNode|NULL The function will return the node if removed. 
      * If not removed, the function will return <b>NULL</b>.
      * @since 1.2
      */
-    public function removeNode($node) {
+    public function removeChild($node) {
         if(!$this->isTextNode()){
             if($node instanceof HTMLNode){
-                $count = $this->childNodes()->size();
+                $children = $this->children();
+                $count = $children->size();
                 for($x = 0 ; $x < $count ; $x++){
-                    $child = $this->childNodes()->get($x);
-                    if($child === $node){
-                        $this->childNodes()->remove($x);
-                        $child->setParentNode(NULL);
+                    $child = $children->get($x);
+                    if($child == $node){
+                        $children->remove($x);
+                        $child->setParent(NULL);
                         return $child;
                     }
                 }
@@ -454,8 +457,8 @@ class HTMLNode {
     public function addChild($node) {
         if(!$this->isTextNode() && $this->mustClose()){
             if($node instanceof HTMLNode){
-                $this->childNodes->add($node);
-                $node->setParentNode($this);
+                $node->setParent($this);
+                $this->childrenList->add($node);
             }
         }
     }
@@ -547,12 +550,12 @@ class HTMLNode {
         }
         else{
             if($node->mustClose()){
-                $chCount = $node->childNodes()->size();
+                $chCount = $node->children()->size();
                 $this->nodesStack->push($node);
                 $this->htmlString .= $this->getTab().$node->asHTML().$this->nl;
                 $this->addTab();
                 for($x = 0 ; $x < $chCount ; $x++){
-                    $nodeAtx = $node->childNodes()->get($x);
+                    $nodeAtx = $node->children()->get($x);
                     $this->pushNode($nodeAtx);
                 }
                 $this->reduceTab();
@@ -588,6 +591,30 @@ class HTMLNode {
         }
     }
     /**
+     * Returns the node as readable HTML code wrapped inside 'pre' element.
+     * @param boolean $formatted [Optional] Set to <b>TRUE</b> to return a well formatted 
+     * HTML document. Default is <b>TRUE</b>.
+     * @return string The node as readable HTML code wrapped inside 'pre' element.
+     * @since 1.4
+     */
+    public function asCode($formatted=true) {
+        $ashtml = $this->toHTML($formatted);
+        $greaterRep = str_replace('>', '&gt;', $ashtml);
+        $retVal = str_replace('<', '&lt;', $greaterRep);
+        return '<pre>'.$retVal.'</pre>';
+    }
+    /**
+     * Returns the number of child nodes attached to the node.
+     * @return int The number of child nodes attached to the node.
+     * @since 1.4
+     */
+    public function childrenCount() {
+        if(!$this->isTextNode()){
+            return $this->children()->size();
+        }
+        return 0;
+    }
+    /**
      * Returns the currently used tag space. 
      * @return string
      * @since 1.0
@@ -613,8 +640,8 @@ class HTMLNode {
      */
     public function getChildByAttributeValue($attrName,$attrVal) {
         if(!$this->isTextNode()){
-            for($x = 0 ; $x < $this->childNodes()->size() ; $x++){
-                $ch = $this->childNodes()->get($x);
+            for($x = 0 ; $x < $this->children()->size() ; $x++){
+                $ch = $this->children()->get($x);
                 if($ch->hasAttribute($attrName)){
                     if($ch->getAttributeValue($attrName) == $attrVal){
                         return $ch;

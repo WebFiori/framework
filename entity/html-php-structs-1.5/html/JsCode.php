@@ -23,7 +23,7 @@
  * THE SOFTWARE.
  */
 /**
- * A node that represents in line javascript code that can be inserted on a 
+ * A node that represents in line JavaScript code that can be inserted on a 
  * head node.
  *
  * @author Ibrahim

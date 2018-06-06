@@ -1,5 +1,4 @@
 <?php
-
 /*
  * The MIT License
  *
@@ -23,33 +22,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 /**
- * A class that represents &lt;label&gt; tag.
- *
- * @author Ibrahim
+ * A class that represents &lt;a&gt; tag with text only.
+ * @author Ibrahim <ibinshikh@hotmail.com>
  * @version 1.0
  */
-class Label extends HTMLNode{
+class LinkNode extends HTMLNode{
     /**
-     * Creates a new label node with specific text on it.
-     * @param string $text The text that will be displayed by the label. 
-     * Default is empty string.
-     * @since 1.0
+     * Constructs a new instance of the class
+     * @param string $href The link.
+     * @param string $label The label to display.
+     * @param string $target [Optional] The value to set for the attribute 'target'. 
+     * Default is '_blank'.
      */
-    public function __construct($text='') {
-        parent::__construct('label');
+    public function __construct($href,$label,$target='_blank') {
+        parent::__construct('a', TRUE, FALSE);
+        $this->setAttribute('href',$href);
+        if(strlen($target) != 0){
+            $this->setAttribute('target',$target);
+        }
+        else{
+            $this->setAttribute('target', '_blank');
+        }
         $textNode = new HTMLNode('', FALSE, TRUE);
-        $textNode->setText($text);
+        $textNode->setText($label);
         parent::addChild($textNode);
     }
     /**
-     * Sets the text that will be displayed by the label.
-     * @param string $text The text that will be displayed by the label.
+     * Sets the value of the property 'href' of the link tag.
+     * @param string $link The value to set.
      * @since 1.0
      */
-    public function setText($text) {
-        $this->childNodes()->get(0)->setText($text);
+    public function setHref($link) {
+        $this->setAttribute('href', $link);
     }
     /**
      * A function that does nothing.
@@ -58,5 +63,21 @@ class Label extends HTMLNode{
      */
     public function addChild($node) {
         
+    }
+    /**
+     * Sets the value of the property 'target' of the link tag.
+     * @param string $name The value to set.
+     * @since 1.0
+     */
+    public function setTarget($name){
+        $this->setAttribute('target', $name);
+    }
+    /**
+     * Sets the text that will be seen by the user.
+     * @param string $text The text to set.
+     * @since 1.0
+     */
+    public function setText($text){
+        $this->children()->get(0)->setText($text);
     }
 }

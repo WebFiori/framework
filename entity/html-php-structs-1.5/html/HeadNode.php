@@ -44,42 +44,31 @@ class HeadNode extends HTMLNode{
      */
     private $titleNode;
     /**
-     * A linked list of all link tags that link to CSS files.
-     * @var LinledList
-     * @since 1.0 
-     */
-    private $cssNodes;
-    /**
      * A linked list of all script tags that link to JS files.
      * @var LinledList
      * @since 1.0 
      */
-    private $jsNodes;
-    /**
-     * A linked list of all meta tags.
-     * @var LinledList
-     * @since 1.0 
-     */
-    private $metaNodes;
     /**
      * The canonical URL of the page.
-     * @var string
+     * @var HTMLNode
      * @since 1.0 
      */
     private $canonical;
     /**
-     * A linked list that contains alternate URLs.
-     * @var LinkedList
-     * @since 1.0 
+     * Creates new HTML node with name = 'head'.
+     * @param string $title [Optional] The value to set for the node 'title'. Default 
+     * is 'Default'. 
+     * @param string $canonical [Optional] The value to set for the link node 
+     * with attribute = 'canonical'. Default is empty string.
+     * @param string $base [Optional] The value to set for the node 'base'. Default 
+     * is empty string.
+     * @since 1.0
      */
-    private $hrefLang;
-    public function __construct() {
+    public function __construct($title='Default',$canonical='',$base='') {
         parent::__construct('head', TRUE, FALSE);
-        $this->cssNodes = new LinkedList();
-        $this->jsNodes = new LinkedList();
-        $this->metaNodes = new LinkedList();
-        $this->hrefLang = new LinkedList();
-        $this->setTitle('Default');
+        $this->setBase($base);
+        $this->setTitle($title);
+        $this->setCanonical($canonical);
         $this->addMeta('viewport', 'width=device-width, initial-scale=1.0');
     }
     
@@ -90,7 +79,12 @@ class HeadNode extends HTMLNode{
      */
     public function setBase($url){
         if(gettype($url) == 'string' && strlen($url) != 0){
-            $this->baseNode = new HTMLNode('base', FALSE, FALSE);
+            if($this->baseNode == NULL){
+                $this->baseNode = new HTMLNode('base', FALSE, FALSE);
+            }
+            if(!$this->hasChild($this->baseNode)){
+                $this->addChild($this->baseNode);
+            }
             $this->baseNode->setAttribute('href',$url);
         }
     }
@@ -105,39 +99,82 @@ class HeadNode extends HTMLNode{
     }
 
     /**
-     * Sets the title of the document.
+     * Sets the text value of the node 'title'.
      * @param string $title The title to set.
      * @since 1.0
      */
     public function setTitle($title){
         if(gettype($title) == 'string'){
-            $this->titleNode = new HTMLNode('', FALSE, TRUE);
-            $this->titleNode->setText($title);
+            if($this->titleNode == NULL){
+                $this->titleNode = new HTMLNode('title');
+                $this->titleNode->addChild(new HTMLNode('', '', TRUE));
+            }
+            if(!$this->hasChild($this->titleNode)){
+                $this->addChild($this->titleNode);
+            }
+            $this->titleNode->children()->get(0)->setText($title);
         }
     }
     /**
      * Returns a linked list of all link tags that link to a CSS file.
-     * @return LinkedList A linked list of all link tags that link to a CSS file.
+     * @return LinkedList A linked list of all link tags that link to a CSS file. If 
+     * the node has no CSS link tags, the function will return an empty list.
      * @since 1.0
      */
     public function getCSSNodes(){
-        return $this->cssNodes;
+        $children = $this->children();
+        $chCount = $children->size();
+        $list = new LinkedList();
+        for($x = 0 ; $x < $chCount ; $x++){
+            $child = $children->get($x);
+            $childName = $child->getName();
+            if($childName == 'link'){
+                if($child->hasAttribut('rel') && $child->getAttributeValue('rel') == 'stylesheet'){
+                    $list->add($child);
+                }
+            }
+        }
+        return $list;
     }
     /**
      * Returns a linked list of all script tags that link to a JS file.
-     * @return LinkedList A linked list of all script tags that link to a JS file.
+     * @return LinkedList A linked list of all script tags with type = "text/javascript". 
+     * If the node has no such nodes, the list will be empty.
      * @since 1.0
      */
     public function getJSNodes(){
-        return $this->jsNodes;
+        $children = $this->children();
+        $chCount = $children->size();
+        $list = new LinkedList();
+        for($x = 0 ; $x < $chCount ; $x++){
+            $child = $children->get($x);
+            $childName = $child->getName();
+            if($childName == 'script'){
+                if($child->hasAttribut('type') && $child->getAttributeValue('type') == 'text/javascript'){
+                    $list->add($child);
+                }
+            }
+        }
+        return $list;
     }
     /**
      * Returns a linked list of all meta tags.
-     * @return LinkedList A linked list of all meta tags.
+     * @return LinkedList A linked list of all meta tags. If the node 
+     * has no meta nodes, the list will be empty.
      * @since 1.0
      */
     public function getMetaNodes(){
-        return $this->metaNodes;
+        $children = $this->children();
+        $chCount = $children->size();
+        $list = new LinkedList();
+        for($x = 0 ; $x < $chCount ; $x++){
+            $child = $children->get($x);
+            $childName = $child->getName();
+            if($childName == 'meta'){
+                $list->add($child);
+            }
+        }
+        return $list;
     }
     /**
      * Adds new meta tag.
@@ -151,7 +188,7 @@ class HeadNode extends HTMLNode{
                 $meta = new HTMLNode('meta', FALSE, FALSE);
                 $meta->setAttribute('name', $name);
                 $meta->setAttribute('content', $content);
-                $this->metaNodes->add($meta);
+                $this->addChild($meta);
             }
         }
     }
@@ -165,7 +202,7 @@ class HeadNode extends HTMLNode{
             $tag = new HTMLNode('link', FALSE, FALSE);
             $tag->setAttribute('rel','stylesheet');
             $tag->setAttribute('href', $href);
-            $this->cssNodes->add($tag);
+            $this->addChild($tag);
         }
     }
     /**
@@ -178,7 +215,7 @@ class HeadNode extends HTMLNode{
             $tag = new HTMLNode('script', TRUE, FALSE);
             $tag->setAttribute('type','text/javascript');
             $tag->setAttribute('src', $loc);
-            $this->jsNodes->add($tag);
+            $this->addChild($tag);
         }
     }
     /**
@@ -188,7 +225,14 @@ class HeadNode extends HTMLNode{
      */
     public function setCanonical($link){
         if(gettype($link) == 'string' && strlen($link) != 0){
-            $this->canonical = $link;
+            if($this->canonical == NULL){
+                $this->canonical = new HTMLNode('link');
+                $this->canonical->setAttribute('rel', 'canonical');
+            }
+            if(!$this->hasChild($this->canonical)){
+                $this->addChild($this->canonical);
+            }
+            $this->canonical->setAttribute('href', $link);
         }
     }
     /**
@@ -213,7 +257,7 @@ class HeadNode extends HTMLNode{
                 $node->setAttribute('rel','alternate');
                 $node->setAttribute('hreflang', $lang);
                 $node->setAttribute('href', $url);
-                $this->hrefLang->add($node);
+                $this->addChild($node);
             }
         }
     }
@@ -221,72 +265,40 @@ class HeadNode extends HTMLNode{
      * Adds new 'link' node.
      * @param string $rel The value of the attribute 'rel'.
      * @param string $href The value of the attribute 'href'.
+     * @param array $otherAttrs An associative array of keys and values. 
+     * The keys will be used as an attribute and the key value will be used 
+     * as attribute value.
      * @since 1.1
      */
-    public function addLink($rel,$href){
+    public function addLink($rel,$href,$otherAttrs=array()){
         if(strlen($rel) != 0 && strlen($href) != 0){
             $node = new HTMLNode('link', FALSE, FALSE);
             $node->setAttribute('rel',$rel);
             $node->setAttribute('href', $href);
+            foreach ($otherAttrs as $key => $value) {
+                $node->setAttribute($key, $value);
+            }
             $this->addChild($node);
         }
     }
-
     /**
      * Returns a linked list of all alternate nodes that was added to the header.
      * @return LinkedList
      * @since 1.0
      */
     public function getAlternates() {
-        return $this->hrefLang;
-    }
-    
-    /**
-     * Returns a linked list of all child nodes.
-     * @return LinkedList
-     * @since 1.0
-     */
-    public function childNodes() {
-        $chls = new LinkedList();
-        if($this->getBase() != NULL){
-            $chls->add($this->getBase());
+        $children = $this->children();
+        $chCount = $children->size();
+        $list = new LinkedList();
+        for($x = 0 ; $x < $chCount ; $x++){
+            $child = $children->get($x);
+            $childName = $child->getName();
+            if($childName == 'link'){
+                if($child->hasAttribut('rel') && $child->getAttributeValue('rel') == 'alternate'){
+                    $list->add($child);
+                }
+            }
         }
-        if($this->getCanonical() != NULL){
-            $can = new HTMLNode('link', FALSE, FALSE);
-            $can->setAttribute('rel','canonical');
-            $can->setAttribute('href', $this->getCanonical());
-            $chls->add($can);
-        }
-        $metaCharset = new HTMLNode('meta', FALSE, FALSE);
-        $metaCharset->setAttribute('charset','UTF-8');
-        $chls->add($metaCharset);
-        $tNode = new HTMLNode('title', TRUE, FALSE);
-        $tNode->addChild($this->titleNode);
-        $chls->add($tNode);
-        
-        $metaNodes = $this->getMetaNodes();
-        for($x = 0 ; $x < $metaNodes->size(); $x++){
-            $chls->add($metaNodes->get($x));
-        }
-        
-        $cssNodes = $this->getCSSNodes();
-        for($x = 0 ; $x < $cssNodes->size(); $x++){
-            $chls->add($cssNodes->get($x));
-        }
-        
-        $hrefLangNodes = $this->getAlternates();
-        for($x = 0 ; $x < $hrefLangNodes->size(); $x++){
-            $chls->add($hrefLangNodes->get($x));
-        }
-        
-        $jsNodes = $this->getJSNodes();
-        for($x = 0 ; $x < $jsNodes->size(); $x++){
-            $chls->add($jsNodes->get($x));
-        }
-        $parentCh = parent::childNodes();
-        for($x = 0 ; $x < $parentCh->size() ; $x++){
-            $chls->add($parentCh->get($x));
-        }
-        return $chls;
+        return $list;
     }
 }

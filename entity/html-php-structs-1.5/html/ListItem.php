@@ -59,8 +59,8 @@ class ListItem extends HTMLNode{
      */
     public function setText($text) {
         if($this->isTextOnly()){
-            if($this->childNodes()->get(0) != NULL){
-                $this->childNodes()->get(0)->setText($text);
+            if($this->children()->get(0) != NULL){
+                $this->children()->get(0)->setText($text);
             }
             else{
                 $textNode = new HTMLNode('', '', TRUE);

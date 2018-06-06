@@ -22,8 +22,8 @@ spl_autoload_register(function ($name) {
         '/entity/rest-easy-1.3',
         '/entity/jsonx-1.3',
         '/entity/ph-mysql-1.1.2',
-        '/entity/html-php-structs-1.4/structs',
-        '/entity/html-php-structs-1.4/html',
+        '/entity/html-php-structs-1.5/structs',
+        '/entity/html-php-structs-1.5/html',
         '/publish',
         '/functions',
         '/apis'

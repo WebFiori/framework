@@ -9,6 +9,7 @@ define('THEMES_DIR','publish/themes');
  * @version 1.6
  */
 class Page{
+    private $isDynamic;
     /**
      * The document that represents the page.
      * @var HTMLDoc 
@@ -39,6 +40,12 @@ class Page{
      * @since 1.2 
      */
     private $incFooter;
+    /**
+     * A variable that is set to <b>TRUE</b> if page has aside area.
+     * @var boolean A variable that is set to <b>TRUE</b> if page has footer.
+     * @since 1.2 
+     */
+    private $incAside;
     /**
      * A variable that is set to <b>TRUE</b> if page has header.
      * @var boolean A variable that is set to <b>TRUE</b> if page has header.
@@ -106,11 +113,36 @@ class Page{
         $this->description = NULL;
         $this->contentLang = NULL;
         $this->isThemeLoaded = FALSE;
-        $this->incFooter = FALSE;
-        $this->incHeader = FALSE;
+        $this->incFooter = TRUE;
+        $this->incHeader = TRUE;
+        $this->isDynamic = TRUE;
+        $this->incAside = TRUE;
+        $this->setLang();
+        $this->setWritingDir();
         WebsiteFunctions::get()->getMainSession()->initSession(FALSE, TRUE);
     }
-    
+    public function isDynamicDoc() {
+        return $this->isDynamic;
+    }
+    /**
+     * 
+     * @param HTMLNode $node
+     */
+    public function insertNode($node) {
+        if($node instanceof HTMLNode){
+            if($this->document == NULL){
+                $this->getDocument();
+            }
+            if($this->hasFooter()){
+                $footer = $this->document->getChildByID('page-footer');
+                $this->document->getBody()->replaceChild($footer, $node);
+                $this->document->addChild($footer);
+            }
+            else{
+                $this->document->addChild($node);
+            }
+        }
+    }
     private static $instance;
     /**
      * Returns a single instance of <b>Page</b>
@@ -145,11 +177,19 @@ class Page{
     public function getDocument($dynamic=false){
         if($this->isThemeLoaded()){
             if($this->document == NULL){
+                $this->isDynamic = $dynamic;
                 $this->document = new HTMLDoc();
                 $this->document->setLanguage($this->getLang());
-                $this->document->setHeadNode($this->getHead($dynamic));
-                $this->document->addNode($this->getHeader($dynamic));
-                $this->document->addNode($this->getFooter($dynamic));
+                $this->document->setHeadNode($this->_getHead($dynamic));
+                $this->document->addChild($this->_getHeader($dynamic));
+                $body = new HTMLNode();
+                $body->setID('page-body');
+                $body->addChild($this->_getAside($dynamic));
+                $contentArea = new HTMLNode();
+                $contentArea->setID('main-content-area');
+                $body->addChild($contentArea);
+                $this->document->addChild($body);
+                $this->document->addChild($this->_getFooter($dynamic));
                 $this->document->getHeadNode()->setBase(SiteConfig::get()->getBaseURL());
                 $this->document->getHeadNode()->addMeta('description', $this->getDescription());
                 $this->document->getHeadNode()->setTitle($this->getTitle().SiteConfig::get()->getTitleSep().SiteConfig::get()->getWebsiteName());
@@ -445,6 +485,20 @@ class Page{
      */
     public function setHasHeader($bool){
         if(gettype($bool) == 'boolean'){
+            if($this->document != NULL){
+                if($this->incHeader == FALSE && $bool == TRUE){
+                    $children = $this->document->getBody()->children();
+                    $this->document->getBody()->removeAllChildNodes();
+                    $this->document->addChild($this->_getHeader($this->isDynamicDoc()));
+                    for($x = 0 ; $x < $children->size() ; $x++){
+                        $this->document->addChild($children->get($x));
+                    }
+                }
+                else if($this->incHeader == TRUE && $bool == FALSE){
+                    $header = $this->document->getChildByID('page-header');
+                    $this->document->removeChild($header);
+                }
+            }
             $this->incHeader = $bool;
         }
     }
@@ -456,6 +510,15 @@ class Page{
      */
     public function setHasFooter($bool){
         if(gettype($bool) == 'boolean'){
+            if($this->document != NULL){
+                if($this->incFooter == FALSE && $bool == TRUE){
+                    $this->document->addChild($this->_getFooter($this->isDynamicDoc()));
+                }
+                else if($this->incFooter == TRUE && $bool == FALSE){
+                    $footer = $this->document->getChildByID('page-footer');
+                    $this->document->removeChild($footer);
+                }
+            }
             $this->incFooter = $bool;
         }
     }
@@ -475,8 +538,31 @@ class Page{
     public function hasHeader(){
         return $this->incHeader;
     }
+    /**
+     * Checks if the page will have an aside section or not.
+     * @return boolean <b>TRUE</b> if the page has an aside section.
+     * @since 1.6
+     */
+    public function hasAside() {
+        return $this->incAside;
+    }
     
-    private function getHeader($dynamic=true){
+    private function _getAside($dynamic=true) {
+        if($this->hasAside()){
+            if($dynamic){
+                $node = new HTMLNode('', FALSE, TRUE);
+                $node->setText('<?php echo getAsideNode() ?>');
+                return $node;
+            }
+            else{
+                $h = getAsideNode();
+                $h->setID('aside-container');
+                return $h;
+            }
+        }
+    }
+    
+    private function _getHeader($dynamic=true){
         if($this->hasHeader()){
             if($dynamic){
                 $node = new HTMLNode('', FALSE, TRUE);
@@ -484,12 +570,14 @@ class Page{
                 return $node;
             }
             else{
-                return getHeaderNode();
+                $h = getHeaderNode();
+                $h->setID('page-header');
+                return $h;
             }
         }
     }
     
-    private function getFooter($dynamic=true){
+    private function _getFooter($dynamic=true){
         if($this->hasFooter()){
             if($dynamic){
                 $node = new HTMLNode('', FALSE, TRUE);
@@ -497,12 +585,14 @@ class Page{
                 return $node;
             }
             else{
-                return getFooterNode();
+                $f = getFooterNode();
+                $f->setID('page-footer');
+                return $f;
             }
         }
     }
     
-    private function getHead($dynamic=true){
+    private function _getHead($dynamic=true){
         if($dynamic){
             $textNode = new HTMLNode('', FALSE, TRUE);
             $textNode->setText('<?php echo getHeadNode() ?>');

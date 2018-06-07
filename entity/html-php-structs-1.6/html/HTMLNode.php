@@ -192,8 +192,7 @@ class HTMLNode {
             if($oldNode instanceof HTMLNode){
                 if($this->hasChild($oldNode)){
                     if($replacement instanceof HTMLNode){
-                        $this->children()->replace($this->children()->indexOf($oldNode), $replacement);
-                        return TRUE;
+                        return $this->children()->replace($oldNode, $replacement);
                     }
                 }
             }
@@ -433,15 +432,10 @@ class HTMLNode {
     public function removeChild($node) {
         if(!$this->isTextNode()){
             if($node instanceof HTMLNode){
-                $children = $this->children();
-                $count = $children->size();
-                for($x = 0 ; $x < $count ; $x++){
-                    $child = $children->get($x);
-                    if($child == $node){
-                        $children->remove($x);
-                        $child->setParent(NULL);
-                        return $child;
-                    }
+                $child = $this->children()->removeElement($node);
+                if($child instanceof HTMLNode){
+                    $child->setParent(NULL);
+                    return $child;
                 }
             }
         }

@@ -348,24 +348,26 @@ class LinkedList {
      * @param mixed $val The element that will be removed. The function 
      * will remove the first occurrence of the element if it is repeated. Note 
      * that the function use strict comparison to check for equality.
-     * @return mixed The function will return <b>TRUE</b> if the given element 
-     * is removed. Other than that, the function will return <b>FALSE</b>.
+     * @return mixed The function will return The element after removal if the given element 
+     * is removed. Other than that, the function will return <b>NULL</b>.
      * @since 1.0
      */
     public function removeElement($val){
         if($this->size() == 1){
             if($this->head->data() === $val){
+                $el = $this->head->data();
                 if($this->removeFirst() != NULL){
                     $this->reduceSize();
-                    return TRUE;
+                    return $el;
                 }
             }
         }
         else if($this->size() > 1){
             if($this->head->data() === $val){
+                $el = $this->head->data();
                 if($this->removeFirst() != NULL){
                     $this->reduceSize();
-                    return TRUE;
+                    return $el;
                 }
             }
             else{
@@ -376,14 +378,14 @@ class LinkedList {
                     if($data === $val){
                         $node->setNext($nextNode->next());
                         $this->reduceSize();
-                        return TRUE;
+                        return $data;
                     }
                     $node = $nextNode;
                     $nextNode = $nextNode->next();
                 }
             }
         }
-        return FALSE;
+        return NULL;
     }
     /**
      * Returns the index of an element.

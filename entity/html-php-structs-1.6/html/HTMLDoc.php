@@ -137,6 +137,8 @@ class HTMLDoc {
      */
     public function __construct() {
         $this->body = new HTMLNode('body', TRUE, FALSE);
+        $this->body->setAttribute('itemscope', '');
+        $this->body->setAttribute('itemtype', 'http://schema.org/WebPage');
         $this->headNode = new HeadNode();
         $this->htmlNode = new HTMLNode('html');
         $this->htmlNode->addChild($this->headNode);

@@ -161,7 +161,8 @@ class Stack{
                 $nextNode = $nextNode->next();
             }
             $data = $nextNode->data();
-            $node->setNext(NULL);
+            $null = NULL;
+            $node->setNext($null);
             $this->tail = $node;
             $this->size--;
             return $data;

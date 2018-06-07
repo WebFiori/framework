@@ -25,7 +25,18 @@ THE SOFTWARE.
     Created on : Jun 4, 2018, 8:55:40 AM
     Author     : Ibrahim
 */
-
+@media screen and (max-width: 768px){
+    #pa-side-nav {
+	position: fixed;
+	overflow: auto;
+	width: 85% !important;
+	height: 45%;
+	background-color: transparent !important;
+	left: -440px;
+        border-bottom-width: 0 !important;
+        border-top-width: 0 !important;
+    }
+}
 h1#page-title{
     font-weight: bold;
     background-color: rgb(95, 158, 160);
@@ -49,4 +60,16 @@ h2#post-title{
 }
 .show-border[dir=rtl]{
     border-right: 3px solid black;
+}
+#pa-side-nav{
+    border: solid 1px black;
+    padding: 0;
+    font-weight: bold;
+    font-family: arial;
+}
+#pa-side-nav[dir=ltr]{
+    border-left-width: 10px;
+}
+#pa-side-nav[dir=rtl]{
+    border-right-width: 10px;
 }

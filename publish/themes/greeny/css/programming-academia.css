@@ -585,20 +585,6 @@ pa-notification-text{
     left: 10px;
     font-weight: bold;
 }
-.pa-container, .pa-row{
-    float: left;
-}
-.pa-container{
-    background-color: #006E51;
-    padding: 1%;
-    width: 100%;
-}
-.pa-row{
-    padding: 0.5%;
-    margin: 0.5%;
-    width: 99%;
-    background-color: rgb(230, 255, 230);
-}
 .pa-bg-1{
     background-color: #9B2335;
     color: white;
@@ -621,32 +607,8 @@ pa-notification-text{
 #pa-main-nav > nav ul li.lang-switch:hover a{
     color: white;
 }
-[class*="-col-"] {
-    padding: 0.5%;
-    margin: 0.5%;
-}
 
-[class*="pa-ltr-"]{
-    float: left;
-    direction: ltr;
-}
-[class*="pa-rtl-"]{
-    float: right;
-    direction: rtl;
-}
 
-[class*="-col-one"]{width: 7.333333333%}
-[class*="-col-two"]{width: 15.66666667%}
-[class*="-col-three"]{width: 24%}
-[class*="-col-four"]{width: 32.33333333%}
-[class*="-col-five"]{width: 40.66666667%}
-[class*="-col-six"]{width: 49%}
-[class*="-col-seven"]{width: 57.33333333%}
-[class*="-col-eight"]{width: 65.66666666%}
-[class*="-col-nine"]{width: 74%}
-[class*="-col-ten"]{width: 82.33333333%}
-[class*="-col-eleven"]{width: 90.66666666%}
-[class*="-col-twelve"]{width: 99%}
 /*IDs*/
 
 #pa-logo{

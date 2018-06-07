@@ -7,11 +7,16 @@
  * @return string The header as HTML string.
  */
 function getHeaderNode(){
+    $page = Page::get();
     $headerSec = new HTMLNode();
     $headerSec->setClassName('pa-row');
+    $headerBody = new HTMLNode();
+    $headerBody->setClassName('pa-'.$page->getWritingDir().'-col-twelve show-border');
+    $headerBody->setWritingDir($page->getWritingDir());
     $text = new HTMLNode('', '', TRUE);
     $text->setText('Header Section');
-    $headerSec->addChild($text);
+    $headerBody->addChild($text);
+    $headerSec->addChild($headerBody);
     return $headerSec;
 }
 

@@ -40,6 +40,9 @@ html{
 [class*='col']{
     
 }
+#pa-side-nav{
+    background-color: rgba(153, 204, 255, 0.9);
+}
 a{
     color: #378e80;
     text-decoration: none;

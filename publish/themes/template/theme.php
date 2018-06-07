@@ -13,7 +13,7 @@ $GLOBALS['THEME'] = array(
         'directory'=>'/template'
     ),
     'COMPONENTS'=>array(
-        'aside-nav.php','footer.php','head.php',
+        'aside.php','footer.php','head.php',
         'header.php'
     ),
     'css-dir'=>'template/css',

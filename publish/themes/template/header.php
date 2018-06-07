@@ -8,7 +8,6 @@
  */
 function getHeaderNode(){
     $headerSec = new HTMLNode();
-    $headerSec->setID('header-section');
     return $headerSec;
 }
 

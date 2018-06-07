@@ -5,10 +5,11 @@
  * @return HeadNode Head tag as <b>HeadNode</b> object.
  */
 function getHeadNode(){
+    $page = Page::get();
     $headTag = new HeadNode();
-    $headTag->setTitle(Page::get()->getTitle().SiteConfig::get()->getTitleSep().SiteConfig::get()->getWebsiteName());
+    $headTag->setTitle($page->getTitle().SiteConfig::get()->getTitleSep().SiteConfig::get()->getWebsiteName());
+    $headTag->addMeta('description',$page->getDescription());
     $headTag->setBase(SiteConfig::get()->getBaseURL());
-    $headTag->addMeta('description', Page::get()->getDescription());
     return $headTag;
 }
 

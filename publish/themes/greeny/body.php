@@ -23,27 +23,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-/**
- * 
- * @return HTMLDoc
- */
-function getDoc($dynamic=TRUE){
-    $document = new HTMLDoc();
-    $document->setHeadNode(getHeadNode());
-    $document->setLanguage(Page::get()->getLang());
-    return $document;
-}
 
-function publishAsHTML($path){
-    $document = new HTMLDoc();
-    $document->setHeadNode(getHeadNode());
-    $document->setLanguage(Page::get()->getLang());
-    $document->saveToFile($path, TRUE, 'html');
-}
-
-function publishAsPHP($path){
-    $document = new HTMLDoc();
-    $document->setHeadNode(getHeadNode(TRUE,'http://localhost/test.php'));
-    $document->setLanguage(Page::get()->getLang());
-    $document->saveToFile($path, TRUE, 'php');
+function buildBody(){
+    $page = Page::get();
+    
 }

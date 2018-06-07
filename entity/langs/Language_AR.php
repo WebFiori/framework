@@ -1,4 +1,116 @@
 <?php
+$Language = new Language('rtl',array(
+    'general',
+    'aside-menu',
+    'pages/setup',
+    'pages/setup/setup-steps',
+    'pages/setup/welcome/help',
+    'pages/setup/database-setup/labels',
+    'pages/setup/database-setup/placeholders',
+    'pages/setup/database-setup/errors',
+    'pages/setup/database-setup/help',
+    'pages/setup/admin-account/labels',
+    'pages/setup/admin-account/placeholders',
+    'pages/setup/admin-account/errors',
+    'pages/setup/admin-account/help',
+    'pages/setup/email-account/labels',
+    'pages/setup/email-account/placeholders',
+    'pages/setup/email-account/errors',
+    'pages/setup/email-account/help',
+    'pages/setup/website-config/labels',
+    'pages/setup/website-config/placeholders',
+    'pages/setup/website-config/errors',
+    'pages/setup/website-config/help',
+));
+$Language->set('general', 'wait', '');
+$Language->set('general', 'loading', '');
+$Language->set('general', 'loaded', '');
+$Language->set('general', 'save', '');
+$Language->set('general', 'saving', '');
+$Language->set('general', 'saved', '');
+$Language->set('general', 'remove', '');
+$Language->set('general', 'removing', '');
+$Language->set('general', 'removed', '');
+$Language->set('general', 'delete', '');
+$Language->set('general', 'deleting', '');
+$Language->set('general', 'deleted', '');
+$Language->set('general', 'connected', '');
+$Language->set('general', 'disconnected', '');
+$Language->set('general', 'next', '');
+$Language->set('general', 'previous', '');
+$Language->set('general', 'skip', '');
+$Language->setMultiple('pages/setup/setup-steps', array(
+    'welcome'=>'صفحة الترحيب',
+    'database-setup'=>'تهيئة قاعدة البيانات',
+    'email-account'=>'البريد الإلكتروني',
+    'admin-account'=>'حساب المسؤول',
+    'website-config'=>'تهيئة الموقع',
+));
+$Language->setMultiple('pages/setup/welcome',array(
+    'title'=>'',
+    'description'=>''
+));
+$Language->setMultiple('pages/setup/database-setup',array(
+    'title'=>'',
+    'description'=>''
+));
+$Language->setMultiple('pages/setup/admin-account',array(
+    'title'=>'',
+    'description'=>''
+));
+$Language->setMultiple('pages/setup/email-account',array(
+    'title'=>'',
+    'description'=>''
+));
+$Language->setMultiple('pages/setup/website-config',array(
+    'title'=>'',
+    'description'=>''
+));
+$Language->setMultiple('pages/login',array(
+    'title'=>'',
+    'description'=>''
+));
+$Language->setMultiple('pages/home',array(
+    'title'=>'',
+    'description'=>''
+));
+$Language->setMultiple('pages/activate-account',array(
+    'title'=>'',
+    'description'=>''
+));
+$Language->setMultiple('pages/profile',array(
+    'title'=>'',
+    'description'=>''
+));
+$Language->setMultiple('pages/register',array(
+    'title'=>'',
+    'description'=>''
+));
+$Language->setMultiple('pages/settings',array(
+    'title'=>'',
+    'description'=>''
+));
+$Language->setMultiple('pages/sys-info',array(
+    'title'=>'',
+    'description'=>''
+));
+$Language->setMultiple('pages/update-disp-name',array(
+    'title'=>'',
+    'description'=>''
+));
+$Language->setMultiple('pages/update-email',array(
+    'title'=>'',
+    'description'=>''
+));
+$Language->setMultiple('pages/update-pass',array(
+    'title'=>'',
+    'description'=>''
+));
+$Language->setMultiple('pages/view-users',array(
+    'title'=>'',
+    'description'=>''
+));
+Util::print_r($Language->getLanguageVars());
 /**
  * A language file that represents Arabic language.
  * @author Ibrahim <ibinshik@hotmail.com>

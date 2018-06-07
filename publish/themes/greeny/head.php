@@ -6,6 +6,7 @@
  */
 function getHeadNode(){
     $page = Page::get();
+    $page->getDocument()->getBody()->setClassName('pa-container');
     $headTag = new HeadNode();
     $headTag->setTitle($page->getTitle().SiteConfig::get()->getTitleSep().SiteConfig::get()->getWebsiteName());
     $headTag->addMeta('description',$page->getDescription());

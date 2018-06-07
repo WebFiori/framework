@@ -48,7 +48,7 @@ $document = Page::get()->getDocument();
 $document->getHeadNode()->addChild($js);
 $document->getHeadNode()->addJs('res/js/setup.js');
 $container = new HTMLNode();
-$document->addNode($container);
+$document->addChild($container);
 $container->setClassName('pa-container');
 $container->addChild(stepsCounter(LANGUAGE['pages']['setup']['setup-steps'],4));
 $container->addChild(pageBody($pageLbls));

@@ -36,7 +36,7 @@ Page::get()->setDescription($pageLbls['description']);
 Page::get()->loadAdminTheme();
 $document = Page::get()->getDocument();
 $container = new HTMLNode();
-$document->addNode($container);
+$document->addChild($container);
 $container->setClassName('pa-container');
 $container->addChild(stepsCounter(LANGUAGE['pages']['setup']['setup-steps'],0));
 $container->addChild(langSwitch());

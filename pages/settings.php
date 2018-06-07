@@ -25,12 +25,18 @@
  */
 
 require_once '../root.php';
-if(WebsiteFunctions::get()->getMainSession()->validateToken() != TRUE){
-    header('location: login');
-}
 $page = Page::get();
-$page->usingTheme('Greeny By Ibrahim Ali');
+$page->usingTheme(SiteConfig::get()->getAdminThemeName());
+$page->getDocument()->getBody()->setClassName('pa-container');
 $container = new HTMLNode();
-$container->setAttribute('class', 'pa-container');
-$page->getDocument()->addNode($container);
+$container->setAttribute('class', 'pa-row');
+$asideNav = new HTMLNode();
+$asideNav->setClassName('pa-'.$page->getWritingDir().'-col-two');
+$asideNav->setWritingDir($page->getWritingDir());
+$asideNav->setID('pa-side-nav');
+$container->addChild($asideNav);
+$body = new HTMLNode();
+$body->setClassName('pa-'.$page->getWritingDir().'-col-ten');
+$container->addChild($body);
+$page->insertNode($container);
 echo $page->getDocument();

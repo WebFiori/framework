@@ -27,48 +27,19 @@
 //first, load the root file
 require_once '../root.php';
 
+$page = Page::get();
 //sets the translation
-Page::get()->loadTranslation(TRUE);
-
-//load theme
-Page::get()->loadTheme();
-
+$page->loadTranslation(TRUE);
 $lang = LANGUAGE['pages']['home'];
-
-Page::get()->setTitle($lang['title']);
-
-Page::get()->setDescription($lang['description']);
-//end of page setup.
-
-// check if user is logged in
-//if not, go to login page
+$page->usingTheme(SiteConfig::get()->getAdminThemeName());
+$page->setTitle($lang['title']);
+$page->setDescription($lang['description']);
 if(WebsiteFunctions::get()->getMainSession()->validateToken() != TRUE){
     header('location: login');
 }
-?>
-<!DOCTYPE html>
-<html lang="<?php echo Page::get()->getLang()?>">
-    <head>
-        <?php echo getHeadNode()?>
-    </head>
-    <body itemscope itemtype="http://schema.org/WebPage">
-        <div class="pa-container">
-            <div class="pa-row">
-                <div class="pa-row">
-                    <?php echo getAsideNavNode(1);?>
-                    <div id="pa-main-content" itemscope itemtype="http://schema.org/WebPageElement" itemprop="mainContentOfPage" dir="<?php echo Page::get()->getWritingDir()?>" class="<?php echo 'pa-'.Page::get()->getWritingDir().'-col-ten'?> show-border">
-                        <header id="header" itemscope itemtype="http://schema.org/WPHeader" class="pa-row">
-                            <h1 name="page-title" itemprop="name" id="page-title"><?php echo $lang['title']?></h1>
-                        </header>
-                        <div class="pa-row">
-                            Home Page
-                        </div>
-                        <?php echo getFooterNode()?>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </body>
-</html>
+$page->getDocument();
+$page->setHasHeader(FALSE);
+echo $page->getDocument();
+
 
 

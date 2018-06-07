@@ -103,6 +103,17 @@ class Language {
     /**
      * 
      * @param string $dir
+     * @param array $arr
+     * @since 1.0
+     */
+    public function setMultiple($dir,$arr=array()) {
+        foreach ($arr as $k => $v){
+            $this->set($dir, $k, $v);
+        }
+    }
+    /**
+     * 
+     * @param string $dir
      * @param string $varName
      * @param string $varValue
      * @return boolean

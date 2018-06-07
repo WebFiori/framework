@@ -28,7 +28,7 @@
  * A class that represents a linked list.
  *
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.2
+ * @version 1.3
  */
 class LinkedList {
     /**
@@ -176,6 +176,82 @@ class LinkedList {
         return NULL;
     }
     /**
+     * Returns an array that represents the list.
+     * @return array An array that represents the list.
+     * @since 1.3
+     */
+    public function toArray() {
+        $array = array();
+        if($this->size() == 1){
+            array_push($array, $this->head->data());
+        }
+        else if($this->size() == 0){
+            
+        }
+        else{
+            $node = $this->head;
+            while ($node->next() != NULL){
+                array_push($array, $node->data());
+                $node = $node->next();
+            }
+            array_push($array, $node->data());
+        }
+        return $array;
+    }
+    /**
+     * Sort the elements of the list using insertion sort algorithm.
+     * @param boolean $ascending If set to <b>TRUE</b> list elements 
+     * will be sorted in ascending order (From lower to higher). Else, 
+     * they will be sorted in descending order (From higher to lower).
+     * @return boolean The function will return <b>TRUE</b> if list 
+     * elements have been sorted. The only case that the function 
+     * will return <b>FALSE</b> is when the list has an object which does 
+     * not implement the interface <b>Comparable</b>.
+     * @since 1.3
+     */
+    public function insertionSort($ascending=true) {
+        $array = $this->toArray();
+        $count = count($array);
+        for($i = 0 ; $i < $count ; $i++){
+            $val = $array[$i];
+            $j = $i - 1;
+            if(gettype($val) == 'object'){
+                if($val instanceof Comparable){
+                    while($j >= 0 && $val->compare($array[$j]) < 0){
+                        $array[$j + 1] = $array[$j];
+                        $j--;
+                    }
+                    $array[$j + 1] = $val;
+                }
+                else{
+                    return FALSE;
+                }
+            }
+            else{
+                while($j >= 0 && $array[$j] > $val){
+                    $array[$j + 1] = $array[$j];
+                    $j--;
+                }
+                $array[$j + 1] = $val;
+            }
+	}
+        while ($this->size() != 0){
+            $this->remove(0);
+        }
+        if($ascending === TRUE){
+            foreach ($array as $val){
+                $this->add($val);
+            }
+        }
+        else{
+            $count = count($array);
+            for($x = $count - 1 ; $x > -1 ; $x--){
+                $this->add($array[$x]);
+            }
+        }
+        return TRUE;
+    }
+    /**
      * Removes an element given its index.
      * @param int $index The index of the element.
      * @return mixed If the given index is in the range <b>[0, LinkedList::size() - 1]</b>, 
@@ -200,7 +276,7 @@ class LinkedList {
                         if($i == $index){
                             $data = $nextNode->data();
                             $node->setNext($nextNode->next());
-                            $this->size--;
+                            $this->reduceSize();
                             return $data;
                         }
                         $node = $nextNode;
@@ -222,13 +298,13 @@ class LinkedList {
             $data = $this->head->data();
             $this->head = NULL;
             $this->tail = NULL;
-            $this->size--;
+            $this->reduceSize();
             return $data;
         }
         else if($this->size() > 1){
             $data = $this->head->data();
             $this->head = $this->head->next();
-            $this->size--;
+            $this->reduceSize();
             return $data;
         }
         return NULL;
@@ -251,10 +327,21 @@ class LinkedList {
                 $nextNode = $nextNode->next();
             }
             $data = $nextNode->data();
-            $node->setNext(NULL);
+            $null = NULL;
+            $node->setNext($null);
             return $data;
         }
         return NULL;
+    }
+    /**
+     * Reduce the size of the list.
+     * called after removing an element.
+     * @since 1.3
+     */
+    private function reduceSize() {
+        if($this->size > 0){
+            $this->size--;
+        }
     }
     /**
      * Removes a specific element from the list.
@@ -269,6 +356,7 @@ class LinkedList {
         if($this->size() == 1){
             if($this->head->data() === $val){
                 if($this->removeFirst() != NULL){
+                    $this->reduceSize();
                     return TRUE;
                 }
             }
@@ -276,6 +364,7 @@ class LinkedList {
         else if($this->size() > 1){
             if($this->head->data() === $val){
                 if($this->removeFirst() != NULL){
+                    $this->reduceSize();
                     return TRUE;
                 }
             }
@@ -286,7 +375,7 @@ class LinkedList {
                     $data = $nextNode->data();
                     if($data === $val){
                         $node->setNext($nextNode->next());
-                        $this->size--;
+                        $this->reduceSize();
                         return TRUE;
                     }
                     $node = $nextNode;
@@ -328,33 +417,36 @@ class LinkedList {
         return -1;
     }
     /**
-     * Replace an element given its index.
-     * @param int $index The index of the element that will be replaced.
-     * @param mixed $newEl The element that will be replaced.
-     * @return boolean|mixed The function will return the old element if replaced. 
+     * Replace an element with new one.
+     * @param mixed $oldEl The element that will be replaced.
+     * @param mixed $newEl The element that will replace the old one.
+     * @return boolean The function will return <b>TRUE</b> if replaced. 
      * if the element is not replaced, the function will return <b>FALSE</b>.
      * @since 1.2
      */
-    public function replace($index,$newEl){
-        if($this->size() != 0){
-            if($index >= 0 && $index < $this->size()){
-                if($this->size() == 1 && $index == 0){
-                    $oldEl = $this->head->data();
-                    $this->head->setData($newEl);
-                    return $oldEl;
-                }
-                else{
-                    $tmpIndex = 0;
-                    $node = $this->head;
-                    while ($node->next() != NULL){
-                        if($tmpIndex == $index){
-                            $oldEl = $node->data();
-                            $node->setData($newEl);
-                            return $oldEl;
-                        }
-                        $node = $node->next();
-                        $tmpIndex++;
+    public function replace($oldEl,$newEl){
+        if($this->size() == 1){
+            if($this->head->data() === $oldEl){
+                $this->head->setData($newEl);
+                return TRUE;
+            }
+        }
+        else if($this->size() > 1){
+            if($this->head->data() === $oldEl){
+                $this->head->setData($newEl);
+                return TRUE;
+            }
+            else{
+                $node = $this->head;
+                $nextNode = $this->head->next();
+                while ($nextNode != NULL){
+                    $data = $nextNode->data();
+                    if($data === $oldEl){
+                        $nextNode->setData($newEl);
+                        return TRUE;
                     }
+                    $node = $nextNode;
+                    $nextNode = $nextNode->next();
                 }
             }
         }
@@ -398,19 +490,21 @@ class LinkedList {
         return $this->size;
     }
     public function __toString() {
-        $retVal = 'List[';
+        $retVal = '<pre>List['."\n";
         $node = $this->head;
+        $index = 0;
         while ($node != NULL){
             $data = $node->data();
             if($node->next() == NULL){
-                $retVal .= $data.'('. gettype($data).')';
+                $retVal .= '    '.$index.'=>'.$data.'('. gettype($data).")\n";
             }
             else{
-                $retVal .= $data.'('. gettype($data).'), ';
+                $retVal .= '    '.$index.'=>'.$data.'('. gettype($data)."),\n";
             }
+            $index++;
             $node = $node->next();
         }
-        $retVal .= ']';
+        $retVal .= ']</pre>';
         return $retVal;
     }
 }

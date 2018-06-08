@@ -28,9 +28,17 @@
  * A class that is used to define language variables.
  *
  * @author Ibrahim
- * @version 1.0
+ * @version 1.1
  */
 class Language {
+    /**
+     * An associative array that contains loaded languages.
+     * @var array The key of the array represents two 
+     * characters language code. The index will contain an object of type <b>Language</b>.
+     * <b>Language</b>.
+     * @since 1.1 
+     */
+    private static $loadedLangs = array();
     /**
      * A constant for left to right writing direction.
      * @var string 
@@ -49,19 +57,87 @@ class Language {
      */
     private $languageVars;
     /**
+     * Returns an associative array that contains an objects of type <b>Language</b>.
+     * @return array The key of the array represents two 
+     * characters language code. The index will contain an object of type <b>Language</b>.
+     * @since 1.1
+     */
+    public static function getLoadedLangs(){
+        return self::$loadedLangs;
+    }
+    /**
+     * Loads a language file based on language code.
+     * @param string $langCode A two digits language code (such as 'ar').
+     * @throws Exception An exception will be thrown if no language file 
+     * was found that matches the given language code. Language files must 
+     * have the name 'Language_XX' where 'XX' is language code. Also the function 
+     * will throw an exception when the variable 'ROOT_DIR' is not defined.
+     * @since 1.1
+     */
+    public static function loadTranslation($langCode='EN'){
+        if(defined('ROOT_DIR')){
+            $uLangCode = strtoupper($langCode);
+            $langFile = ROOT_DIR.'/entity/langs/Language_'.$uLangCode.'.php';
+            if(file_exists($langFile)){
+                require $langFile;
+            }
+            else{
+                throw new Exception('Unable to load translation file. The file \''.$langFile.'\' does not exists.');
+            }
+        }
+        else{
+            throw new Exception('Unable to load translation file. ROOT_DIR is undefined.');
+        }
+    }
+    
+    /**
      * Creates new instance of the class.
      * @param string $dir 'ltr' or 'rtl'.
+     * @param string $code Language code (such as 'AR').
      * @param array $initials An initial array of directories.
      * @since 1.0
      */
-    public function __construct($dir='ltr',$initials=array()) {
+    public function __construct($dir='ltr',$code='XX',$initials=array()) {
         $this->languageVars = array();
+        if(!$this->setCode($code)){
+            $this->setCode('XX');
+        }
         if($this->setWritingDir($dir)){
             $this->setWritingDir('ltr');
         }
         foreach ($initials as $val){
             $this->createDirectory($val);
         }
+    }
+    /**
+     * Sets the language code.
+     * @param string $code Language code (such as 'AR').
+     * @return boolean The function will return <b>TRUE</b> if the language 
+     * code is set. If not set, the function will return <b>FALSE</b>.
+     * @since 1.1
+     */
+    public function setCode($code) {
+        if(strlen($code) == 2){
+            if(isset(self::$loadedLangs[$this->getCode()])){
+                unset(self::$loadedLangs[$this->getCode()]);
+            }
+            $this->languageVars['code'] = strtoupper($code);
+            self::$loadedLangs[$this->getCode()] = $this;
+            return TRUE;
+        }
+        return FALSE;
+    }
+    /**
+     * Returns the language code.
+     * @return string Language code in upper case (such as 'AR'). If language 
+     * code is not set, default is returned which is 'XX'.
+     * @since 1.1
+     */
+    public function getCode() {
+        if(isset($this->languageVars['code'])){
+            return $this->languageVars['code'];
+        }
+        return 'XX';
     }
     /**
      * Creates a sub array to define language variables.
@@ -101,9 +177,11 @@ class Language {
         }
     }
     /**
-     * 
-     * @param string $dir
-     * @param array $arr
+     * Sets multiple language variables.
+     * @param string $dir A string that looks like a 
+     * directory. 
+     * @param array $arr An associative array. The key will act as the variable 
+     * and the value of the key will act as the variable value.
      * @since 1.0
      */
     public function setMultiple($dir,$arr=array()) {
@@ -112,11 +190,13 @@ class Language {
         }
     }
     /**
-     * 
-     * @param string $dir
-     * @param string $varName
-     * @param string $varValue
-     * @return boolean
+     * Sets or updates a language variable.
+     * @param string $dir A string that looks like a 
+     * directory. 
+     * @param string $varName The name of the variable.
+     * @param string $varValue The value of the variable.
+     * @return boolean The function will return <b>TRUE</b> if the variable is set. 
+     * Other than that, the function will return <b>FALSE</b>.
      * @since 1.0
      */
     public function set($dir,$varName,$varValue) {
@@ -137,6 +217,7 @@ class Language {
                 }
             }
         }
+        return FALSE;
     }
     
     private function _set($subs,&$top,$var,$val,$index) {
@@ -155,9 +236,10 @@ class Language {
         return FALSE;
     }
     /**
-     * 
-     * @param string $name
-     * @return string
+     * Returns the value of a language variable.
+     * @param string $name A directory to the language variable (such as 'pages/login/login-label').
+     * @return string|array|NULL 
+     * @since 1.0
      */
     public function get($name) {
         if(gettype($name) == 'string'){
@@ -191,9 +273,12 @@ class Language {
         return NULL;
     }
     /**
-     * 
-     * @param type $dir
-     * @return boolean
+     * Sets language writing direction.
+     * @param string $dir 'ltr' or 'rtl'.
+     * @return boolean The function will return <b>TRUE</b> if the language 
+     * writing direction is updated. The only case that the function 
+     * will return <b>FALSE</b> is when the writing direction is invalid (
+     * Any value other than 'ltr' and 'rtl').
      * @since 1.0
      */
     public function setWritingDir($dir) {
@@ -205,16 +290,16 @@ class Language {
         return FALSE;
     }
     /**
-     * 
-     * @return string
+     * Returns language writing direction.
+     * @return string 'ltr' or 'rtl'.
      * @since 1.0
      */
     public function getWritingDir() {
         return $this->languageVars['dir'];
     }
     /**
-     * 
-     * @return array
+     * Returns an associative array that contains language definition.
+     * @return array An associative array that contains language definition.
      * @since 1.0
      */
     public function getLanguageVars() {

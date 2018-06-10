@@ -28,12 +28,7 @@
 require_once '../root.php';
 
 $page = Page::get();
-//sets the translation
-$page->loadTranslation(TRUE);
-$lang = LANGUAGE['pages']['home'];
 $page->usingTheme(SiteConfig::get()->getAdminThemeName());
-$page->setTitle($lang['title']);
-$page->setDescription($lang['description']);
 if(WebsiteFunctions::get()->getMainSession()->validateToken() != TRUE){
     header('location: login');
 }

@@ -30,18 +30,16 @@ if(WebsiteFunctions::get()->getMainSession()->validateToken() === TRUE){
     header('location: home');
 }
 $page = Page::get();
-$page->loadTranslation(TRUE);
-$pageLbls = LANGUAGE['pages']['login'];
-$page->setTitle($pageLbls['title']);
-$page->setDescription($pageLbls['description']);
 $page->usingTheme(SiteConfig::get()->getAdminThemeName());
+$pageLbls = $page->getPageLanguage()->get('pages/login');
 $page->setHasHeader(FALSE);
 $page->setHasFooter(FALSE);
 $page->getDocument()->getHeadNode()->addCSS('publish/themes/greeny/css/login.css');
 $page->getDocument()->getHeadNode()->addJs('publish/themes/greeny/js/login.js');
 $page->getDocument()->getBody()->setClassName('pa-container');
 $container = new HTMLNode();
-$page->insertNode($container);
+$page->insertNode($container,'page-body');
+$page->getDocument()->getChildByID('page-header')->removeAllChildNodes();
 $container->setClassName('pa-row');
 $container->addChild(createLoginForm($pageLbls));
 echo $page->getDocument()->toHTML(FALSE);

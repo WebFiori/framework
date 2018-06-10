@@ -31,3 +31,4 @@ $doc = $page->getDocument(TRUE);
 $page->setTitle('Hello');
 $page->setDescription('Hello Page Description');
 echo $page->getDocument();
+$page->saveToFile('test-save-function-file',FALSE);

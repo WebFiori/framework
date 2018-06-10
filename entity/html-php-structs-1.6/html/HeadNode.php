@@ -226,7 +226,7 @@ class HeadNode extends HTMLNode{
     public function setCanonical($link){
         if(gettype($link) == 'string' && strlen($link) != 0){
             if($this->canonical == NULL){
-                $this->canonical = new HTMLNode('link');
+                $this->canonical = new HTMLNode('link',FALSE);
                 $this->canonical->setAttribute('rel', 'canonical');
             }
             if(!$this->hasChild($this->canonical)){

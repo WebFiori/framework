@@ -75,6 +75,7 @@ class SysAPIs extends API{
         
         $a8 = new APIAction();
         $a8->setName('update-site-info');
+        $a8->setDescription('Updates general website information.');
         $a8->addRequestMethod('post');
         $a8->addParameter(new RequestParameter('site-name', 'string'));
         $a8->addParameter(new RequestParameter('site-description', 'string'));
@@ -85,6 +86,7 @@ class SysAPIs extends API{
         
         $this->setVersion('1.1.0');
         $a9 = new APIAction('update-send-email-account');
+        $a9->setDescription('Updates the email account (SMTP Account) that is used to send system messages.');
         $a9->addRequestMethod('post');
         $a9->addParameter(new RequestParameter('server-address', 'string'));
         $a9->addParameter(new RequestParameter('server-port', 'integer'));
@@ -95,6 +97,30 @@ class SysAPIs extends API{
         $a9->addParameter(new RequestParameter('password', 'string'));
         $a9->addParameter(new RequestParameter('name', 'string'));
         $this->addAction($a9, TRUE);
+        
+        $this->setVersion('1.1.1');
+        
+        $a10 = new APIAction('get-installed-themes');
+        $a10->setDescription('Gets all the themes in the directory \'publish/themes\'.');
+        $a10->addRequestMethod('get');
+        $this->addAction($a10, TRUE);
+        
+        $a11 = new APIAction('update-notifications-email');
+        $a11->setDescription('Updates the email address that is used to send notifications to '
+                . 'about system events.');
+        $a11->addRequestMethod('post');
+        $a11->addParameter(new RequestParameter('email-address', 'email'));
+        $this->addAction($a11, TRUE);
+        
+        $a12 = new APIAction('confirm-notifications-email');
+        $a12->setDescription('Confirms the updated email address that is used to send notifications to '
+                . 'about system events.');
+        $a12->addRequestMethod('post');
+        $a12->addRequestMethod('get');
+        $a12->addParameter(new RequestParameter('confirmation-token', 'string'));
+        $a12->getParameterByName('confirmation-token')->setDescription('The token that was sent to the email address.');
+        $this->addAction($a12, TRUE);
+        
     } 
     
     public function processRequest(){
@@ -103,6 +129,26 @@ class SysAPIs extends API{
             $json = new JsonX();
             $json->add('system-info', SystemFunctions::get()->getConfigVars());
             $this->sendResponse('Software Information', FALSE, 200, '"info":'.$json);
+        }
+        else if($action == 'update-notifications-email'){
+            $this->actionNotImpl();
+        }
+        else if($action == 'confirm-notifications-email'){
+            $this->actionNotImpl();
+        }
+        else if($action == 'get-installed-themes'){
+            $themes = Page::get()->getAvailableThemes();
+            $json = new JsonX();
+            $index = 0;
+            foreach ($themes as $theme){
+                $themeJson = new JsonX();
+                foreach ($theme['META'] as $k => $v){
+                    $themeJson->add($k, $v);
+                }
+                $json->add('theme-'.$index, $themeJson);
+                $index++;
+            }
+            $this->sendResponse('All Themes', FALSE, 200, '"response":'.$json);
         }
         else if($action == 'get-site-info'){
             $json = new JsonX();

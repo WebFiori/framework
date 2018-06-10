@@ -10,7 +10,7 @@ $GLOBALS['THEME'] = array(
         'license'=>'n/a',
         'license-url'=>'',
         'description'=>'A base template that can be used to create themes.',
-        'directory'=>'/template'
+        'directory'=>'template'
     ),
     'COMPONENTS'=>array(
         'aside.php','footer.php','head.php',

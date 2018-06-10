@@ -6,7 +6,7 @@ define('THEMES_DIR','publish/themes');
 /**
  * A class used to initialize main page components.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.6
+ * @version 1.7
  */
 class Page{
     /**
@@ -193,17 +193,60 @@ class Page{
         }
     }
     /**
+     * Saves the page to a file.
+     * @param string $path The location where the file will be written to 
+     * (such as 'pages/system/view-users'. 'view-users' is the page name).
+     *  Note that the last part of the 
+     * path will be the name of the file. It must be without extention.
+     * @param boolean $isDynamic Set to <b>TRUE</b> to save the file as 
+     * dynamic PHP web page. If the user wants a plain HTML, set this attribute 
+     * to <b>FALSE</b>.
+     * @return boolean The function will return <b>TRUE</b> if the file is saved. 
+     * If not, the function will return <b>FALSE</b>
+     * @since 1.7
+     */
+    public function saveToFile($path,$isDynamic=false){
+        if($isDynamic === TRUE){
+            $path = str_replace('\\', '/', $path);
+            $fArr = explode('/', $path);
+            $name = $fArr[count($fArr) - 1];
+            $f = fopen($path.'.php', 'w+');
+            if($f != FALSE){
+                $root = str_replace('\\', '/', ROOT_DIR);
+                fwrite($f, "<?php\n");
+                fwrite($f, 'require \''.$root.'/root.php\';'."\n");
+                fwrite($f, '$page = Page::get();'."\n");
+                fwrite($f, '$page->usingTheme(SiteConfig::get()->getBaseThemeName());'."\n");
+                fwrite($f, '$page->setLang(WebsiteFunctions::get()->getMainSession()->getLang());'."\n");
+                if($this->getLanguage() != NULL){
+                    fwrite($f, '$page->usingLanguage();'."\n");
+                    if($this->getLanguage()->get('pages/'.$name) === NULL){
+                        fwrite($f, '// Notice: \'pages/'.$name.'\' is not set on loaded language.'."\n");
+                        fwrite($f, '// Page title and description will not set because of that.'."\n");
+                    }
+                }
+                else{
+                    fwrite($f, '// Notice: Static page title and description will be used.'."\n");
+                    fwrite($f, '$page->setTitle(\''.$this->getTitle().'\');'."\n");
+                    fwrite($f, '$page->setDescription(\''.$this->getDescription().'\');'."\n");
+                }
+                fwrite($f, 'echo $page->getDocument();'."\n");
+                fclose($f);
+                return TRUE;
+            }
+            return FALSE;
+        }
+        else{
+            return $this->getDocument()->saveToFile($path, TRUE, 'html');
+        }
+    }
+    /**
      * Returns the document that is associated with the page.
-     * @param boolean $dynamic Set to <b>TRUE</b> to make the content 
-     * of the page dynamic (Mix of php code and HTML). <b>FALSE</b> to 
-     * make it static (HTML only). Note that once this function is called, 
-     * the value of this attribute will not be changed in second call. 
-     * Default is <b>FALSE</b>.
      * @return HTMLDoc An object of type <b>HTMLDoc</b>.
      * @throws Exception If page theme is not loaded.
      * @since 1.1
      */
-    public function getDocument($dynamic=false){
+    public function getDocument(){
         if($this->isThemeLoaded()){
             if($this->document == NULL){
                 $headNode = $this->_getHead();
@@ -297,10 +340,10 @@ class Page{
     * @param boolean $uses_session_lang [Optional] If <b>TRUE</b> is given and language is not 
     * set, the language of the session will be used. Default is <b>TRUE</b>.
     */
-    public function loadTranslation(){
+    public function usingLanguage(){
         if($this->getLang() != NULL){
             Language::loadTranslation($this->getLang());
-            $pageLang = $this->getPageLanguage();
+            $pageLang = $this->getLanguage();
             $this->setWritingDir($pageLang->getWritingDir());
             $this->setTitle($pageLang->get('pages/'.$this->getPageName().'/title'));
             $this->setDescription($pageLang->get('pages/'.$this->getPageName().'/description'));
@@ -333,10 +376,11 @@ class Page{
      * Returns the language variables based on loaded translation.
      * @return Language|NULL an object of type <b>Language</b> if language 
      * is loaded. If no language found, <b>NULL</b> is returned. This 
-     * function should be called after calling the function <b>Page::loadTranslation()</b>.
+     * function should be called after calling the function <b>Page::loadTranslation()</b> in 
+     * order for the function to return non-null value.
      * @since 1.6
      */
-    public function getPageLanguage() {
+    public function getLanguage() {
         $loadedLangs = Language::getLoadedLangs();
         if(isset($loadedLangs[$this->getLang()])){
             return $loadedLangs[$this->getLang()];
@@ -514,7 +558,7 @@ class Page{
     /**
      * Sets the property that is used to check if page has a header section or not.
      * @param boolean $bool <b>TRUE</b> to include the header section. <b>FALSE</b> if 
-     * not.
+     * not. <b>HAS BUG</b>
      * @since 1.2
      */
     public function setHasHeader($bool){
@@ -536,10 +580,24 @@ class Page{
             $this->incHeader = $bool;
         }
     }
+    public function setHasAside($bool){
+        if(gettype($bool) == 'boolean'){
+            if($this->document != NULL){
+                if($this->incAside == FALSE && $bool == TRUE){
+                    
+                }
+                else if($this->incFooter == TRUE && $bool == FALSE){
+                    
+                }
+            }
+            $this->incAside = $bool;
+        }
+    }
+
     /**
      * Sets the property that is used to check if page has a footer section or not.
      * @param boolean $bool <b>TRUE</b> to include the footer section. <b>FALSE</b> if 
-     * not.
+     * not. <b>HAS BUG</b>
      * @since 1.2
      */
     public function setHasFooter($bool){
@@ -621,6 +679,9 @@ class Page{
                 $this->getCanonical(),
                 SiteConfig::get()->getBaseURL()
             );
+            $metaCharset = new HTMLNode('meta', FALSE);
+            $metaCharset->setAttribute('charset', 'UTF-8');
+            $headNode->addChild($metaCharset);
             $descNode = new HTMLNode('meta', FALSE);
             $descNode->setAttribute('name', 'description');
             $descNode->setAttribute('content', $this->getDescription());

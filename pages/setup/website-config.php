@@ -28,17 +28,19 @@ require_once '../../root.php';
 if(WebsiteFunctions::get()->getMainSession()->validateToken() != TRUE){
     header('location: '.SiteConfig::get()->getBaseURL().'pages/login');
 }
-Page::get()->loadTranslation(TRUE);
-$pageLbls = LANGUAGE['pages']['setup']['website-config'];
-Page::get()->setWritingDir(LANGUAGE['dir']);
-Page::get()->setTitle($pageLbls['title']);
-Page::get()->setDescription($pageLbls['description']);
-Page::get()->loadAdminTheme();
+$page = Page::get();
+$page->setHasHeader(FALSE);
+$page->setHasAside(FALSE);
+
+$page->usingTheme(SiteConfig::get()->getAdminThemeName());
+$pageLbls = $page->getLanguage()->get('pages/setup/website-config');
+$page->insertNode(stepsCounter($page->getLanguage()->get('pages/setup/setup-steps'),4), 'main-content-area');
+
 $js = new JsCode;
 $jsonx = new JsonX();
-$jsonx->add('disconnected', LANGUAGE['general']['disconnected']);
-$jsonx->add('saved', LANGUAGE['general']['saved']);
-$jsonx->add('saving', LANGUAGE['general']['saving']);
+$jsonx->add('disconnected', $page->getLanguage()->get('general/disconnected'));
+$jsonx->add('saved', $page->getLanguage()->get('general/saved'));
+$jsonx->add('saving', $page->getLanguage()->get('general/saving'));
 $js->addCode('window.onload = function(){'
         . 'window.messages = '.$jsonx.';'
         . 'document.getElementById(\'site-name-input\').oninput = siteInfoInputsChanged;'
@@ -47,15 +49,11 @@ $js->addCode('window.onload = function(){'
 $document = Page::get()->getDocument();
 $document->getHeadNode()->addChild($js);
 $document->getHeadNode()->addJs('res/js/setup.js');
-$container = new HTMLNode();
-$document->addChild($container);
-$container->setClassName('pa-container');
-$container->addChild(stepsCounter(LANGUAGE['pages']['setup']['setup-steps'],4));
-$container->addChild(pageBody($pageLbls));
-$container->addChild(footer());
+$page->insertNode(pageBody($pageLbls,$page->getLanguage()),'main-content-area');
+$page->insertNode(footer($page->getLanguage()),'main-content-area');
 echo $document->toHTML();
 
-function pageBody($pageLabels){
+function pageBody($pageLabels,$lang){
     $body = new HTMLNode();
     $body->setClassName('pa-row');
     $col = new HTMLNode();
@@ -67,11 +65,11 @@ function pageBody($pageLabels){
     $p2->addText($pageLabels['help']['h-2']);
     $col->addChild($p2);
     $body->addChild($col);
-    $body->addChild(createSiteInfoForm($pageLabels['labels'], $pageLabels['placeholders']));
+    $body->addChild(createSiteInfoForm($pageLabels['labels'], $pageLabels['placeholders'],$lang));
     return $body;
 }
 
-function createSiteInfoForm($lbls,$placeholders){
+function createSiteInfoForm($lbls,$placeholders,$lang){
     $form = new HTMLNode('form');
     $form->setClassName('pa-row');
     
@@ -101,7 +99,7 @@ function createSiteInfoForm($lbls,$placeholders){
     
     $submit = new Input('submit');
     $submit->setAttribute('data-action', 'ok');
-    $submit->setValue(LANGUAGE['general']['save']);
+    $submit->setValue($lang->get('general/save'));
     $submit->setAttribute('onclick', 'return updateSiteInfo()');
     $submit->setAttribute('disabled', '');
     $submit->setID('save-input');
@@ -114,8 +112,12 @@ function createSiteInfoForm($lbls,$placeholders){
     
     return $form;
 }
-
-function footer(){
+/**
+ * 
+ * @param Language $lang
+ * @return \HTMLNode
+ */
+function footer($lang){
     $node = new HTMLNode();
     $node->setClassName('pa-row');
 
@@ -126,7 +128,7 @@ function footer(){
     $nextButton->setID('finish-button');
     $nextButton->setAttribute('data-action', 'ok');
     $nextText = new HTMLNode('', FALSE, TRUE);
-    $nextText->setText(LANGUAGE['general']['finish']);
+    $nextText->setText($lang->get('general/finish'));
     $nextButton->addChild($nextText);
     $node->addChild($nextButton);
     return $node;

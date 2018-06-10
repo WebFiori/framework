@@ -23,23 +23,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 define('SETUP_MODE', '');
 require_once '../../root.php';
 if(Config::get()->isConfig()){
     header('location: '.SiteConfig::get()->getHomePage());
 }
-Page::get()->loadTranslation(TRUE);
-$pageLbls = LANGUAGE['pages']['setup']['admin-account'];
-Page::get()->setWritingDir(LANGUAGE['dir']);
-Page::get()->setTitle($pageLbls['title']);
-Page::get()->setDescription($pageLbls['description']);
-Page::get()->loadAdminTheme();
+$page = Page::get();
+$page->setHasHeader(FALSE);
+$page->setHasAside(FALSE);
+
+$page->usingTheme(SiteConfig::get()->getAdminThemeName());
+$pageLbls = $page->getLanguage()->get('pages/setup/admin-account');
+$page->insertNode(stepsCounter($page->getLanguage()->get('pages/setup/setup-steps'),3), 'main-content-area');
 $js = new JsCode;
 $jsonx = new JsonX();
-$jsonx->add('disconnected', LANGUAGE['general']['disconnected']);
-$jsonx->add('account-created', $pageLbls['labels']['acount-created']);
-$jsonx->add('creating-account', $pageLbls['status']['creating-acc']);
+$jsonx->add('disconnected', $page->getLanguage()->get('general/disconnected'));
+$jsonx->add('account-created', $page->getLanguage()->get('general/saved'));
+$jsonx->add('creating-account', $page->getLanguage()->get('general/saving'));
 $jsonx->add('password-missmatch', $pageLbls['errors']['password-missmatch']);
 $jsonx->add('inv-email', $pageLbls['errors']['inv-email']);
 $js->addCode('window.onload = function(){'
@@ -49,16 +49,13 @@ $js->addCode('window.onload = function(){'
         . 'document.getElementById(\'password-input\').oninput = adminAccInputsChanged;'
         . 'document.getElementById(\'conf-pass-input\').oninput = adminAccInputsChanged;'
         . '}');
-$document = Page::get()->getDocument();
+$document = $page->getDocument();
 $document->getHeadNode()->addChild($js);
 $document->getHeadNode()->addJs('res/js/setup.js');
-$container = new HTMLNode();
-$document->addChild($container);
-$container->setClassName('pa-container');
-$container->addChild(stepsCounter(LANGUAGE['pages']['setup']['setup-steps'],3));
-$container->addChild(pageBody($pageLbls));
-$container->addChild(footer());
-echo $document->toHTML();
+
+$page->insertNode(pageBody($pageLbls),'main-content-area');
+$page->insertNode(footer($page->getLanguage()),'main-content-area');
+echo $page->getDocument();
 
 function pageBody($pageLabels){
     $body = new HTMLNode();
@@ -75,8 +72,12 @@ function pageBody($pageLabels){
     $body->addChild(createAdminInfoForm($pageLabels['labels'], $pageLabels['placeholders']));
     return $body;
 }
-
-function footer(){
+/**
+ * 
+ * @param Language $lang
+ * @return \HTMLNode
+ */
+function footer($lang){
     $node = new HTMLNode();
     $node->setClassName('pa-row');
     
@@ -86,7 +87,7 @@ function footer(){
     $prevButton->setID('prev-button');
     $prevButton->setAttribute('data-action', 'ok');
     $prevText = new HTMLNode('', FALSE, TRUE);
-    $prevText->setText(LANGUAGE['general']['prev']);
+    $prevText->setText($lang->get('general/previous'));
     $prevButton->addChild($prevText);
     $node->addChild($prevButton);
     
@@ -97,7 +98,7 @@ function footer(){
     $nextButton->setID('next-button');
     $nextButton->setAttribute('data-action', 'ok');
     $nextText = new HTMLNode('', FALSE, TRUE);
-    $nextText->setText(LANGUAGE['general']['next']);
+    $nextText->setText($lang->get('general/next'));
     $nextButton->addChild($nextText);
     $node->addChild($nextButton);
     return $node;

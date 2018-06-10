@@ -28,21 +28,17 @@ require_once '../../root.php';
 if(Config::get()->isConfig()){
     header('location: '.SiteConfig::get()->getHomePage());
 }
-Page::get()->loadTranslation(TRUE);
-$pageLbls = LANGUAGE['pages']['setup']['welcome'];
-Page::get()->setWritingDir(LANGUAGE['dir']);
-Page::get()->setTitle($pageLbls['title']);
-Page::get()->setDescription($pageLbls['description']);
-Page::get()->loadAdminTheme();
-$document = Page::get()->getDocument();
-$container = new HTMLNode();
-$document->addChild($container);
-$container->setClassName('pa-container');
-$container->addChild(stepsCounter(LANGUAGE['pages']['setup']['setup-steps'],0));
-$container->addChild(langSwitch());
-$container->addChild(pageBody($pageLbls));
-$container->addChild(footer());
-echo $document->toHTML();
+$page = Page::get();
+$page->setHasHeader(FALSE);
+$page->setHasAside(FALSE);
+
+$page->usingTheme(SiteConfig::get()->getAdminThemeName());
+$pageLbls = $page->getLanguage()->get('pages/setup/welcome');
+$page->insertNode(stepsCounter($page->getLanguage()->get('pages/setup/setup-steps'),0), 'main-content-area');
+$page->insertNode(langSwitch(),'main-content-area');
+$page->insertNode(pageBody($pageLbls),'main-content-area');
+$page->insertNode(footer($page->getLanguage()),'main-content-area');
+echo $page->getDocument();
 
 function pageBody($lbls){
     $body = new HTMLNode();
@@ -85,8 +81,12 @@ function langSwitch(){
     $node->addChild($enLang);
     return $node;
 }
-
-function footer(){
+/**
+ * 
+ * @param Language $lang
+ * @return HTMLNode
+ */
+function footer($lang){
     $node = new HTMLNode();
     $node->setClassName('pa-row');
     $nextButton = new HTMLNode('button');
@@ -95,7 +95,7 @@ function footer(){
     $nextButton->setID('next-button');
     $nextButton->setAttribute('data-action', 'ok');
     $nextText = new HTMLNode('', FALSE, TRUE);
-    $nextText->setText(LANGUAGE['general']['next']);
+    $nextText->setText($lang->get('general/next'));
     $nextButton->addChild($nextText);
     $node->addChild($nextButton);
     return $node;

@@ -28,16 +28,18 @@ require_once '../../root.php';
 if(Config::get()->isConfig()){
     header('location: '.SiteConfig::get()->getHomePage());
 }
-Page::get()->loadTranslation(TRUE);
-$pageLbls = LANGUAGE['pages']['setup']['database-setup'];
-Page::get()->setWritingDir(LANGUAGE['dir']);
-Page::get()->setTitle($pageLbls['title']);
-Page::get()->setDescription($pageLbls['description']);
-Page::get()->loadAdminTheme();
+$page = Page::get();
+$page->setHasHeader(FALSE);
+$page->setHasAside(FALSE);
+
+$page->usingTheme(SiteConfig::get()->getAdminThemeName());
+$pageLbls = $page->getLanguage()->get('pages/setup/database-setup');
+$page->insertNode(stepsCounter($page->getLanguage()->get('pages/setup/setup-steps'),1), 'main-content-area');
+
 $jsonx = new JsonX();
-$jsonx->add('disconnected', LANGUAGE['general']['disconnected']);
+$jsonx->add('disconnected', $page->getLanguage()->get('general/disconnected'));
 $jsonx->add('success', $pageLbls['labels']['connected']);
-$jsonx->add('checking-connection', $pageLbls['status']['checking-connection']);
+$jsonx->add('checking-connection', $page->getLanguage()->get('general/validating'));
 foreach ($pageLbls['errors'] as $k => $v){
     $jsonx->add(''.$k, $v);
 }
@@ -52,12 +54,8 @@ $js->addCode('window.onload = function(){'
 $document = Page::get()->getDocument();
 $document->getHeadNode()->addChild($js);
 $document->getHeadNode()->addJs('res/js/setup.js');
-$container = new HTMLNode();
-$document->addChild($container);
-$container->setClassName('pa-container');
-$container->addChild(stepsCounter(LANGUAGE['pages']['setup']['setup-steps'],1));
-$container->addChild(pageBody($pageLbls));
-$container->addChild(footer());
+$page->insertNode(pageBody($pageLbls),'main-content-area');
+$page->insertNode(footer($page->getLanguage()),'main-content-area');
 echo $document->toHTML();
 
 function createDbInfoForm($lbls,$placeholders){
@@ -143,8 +141,12 @@ function pageBody($pageLang){
     $col->addChild(createDbInfoForm($pageLang['labels'], $pageLang['placeholders']));
     return $body;
 }
-
-function footer(){
+/**
+ * 
+ * @param Language $lang
+ * @return \HTMLNode
+ */
+function footer($lang){
     $node = new HTMLNode();
     $node->setClassName('pa-row');
     $nextButton = new HTMLNode('button');
@@ -154,7 +156,7 @@ function footer(){
     $nextButton->setID('next-button');
     $nextButton->setAttribute('data-action', 'ok');
     $nextText = new HTMLNode('', FALSE, TRUE);
-    $nextText->setText(LANGUAGE['general']['next']);
+    $nextText->setText($lang->get('general/next'));
     $nextButton->addChild($nextText);
     $node->addChild($nextButton);
     return $node;

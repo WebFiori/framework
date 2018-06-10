@@ -32,15 +32,16 @@
 class PasswordAPIs extends API{
     public function __construct() {
         parent::__construct();
-        $a1 = new APIAction();
-        $a1->setName('forgot-password');
+        $a1 = new APIAction('forgot-password');
+        $a1->setDescription('An API to call in case the user has forgotten his password.');
         $a1->addRequestMethod('post');
         $a1->addParameter(new RequestParameter('email', 'string'));
         $this->addAction($a1);
         
-        $a2 = new APIAction();
-        $a2->setName('reset-password');
+        $a2 = new APIAction('reset-password');
+        $a2->addRequestMethod('post');
         $a2->addParameter(new RequestParameter('new-password', 'string'));
+        $a2->addParameter(new RequestParameter('conf-new-password', 'string'));
         $a2->addParameter(new RequestParameter('reset-token', 'string'));
         
         $a3 = new APIAction();
@@ -49,6 +50,7 @@ class PasswordAPIs extends API{
         $a3->addParameter(new RequestParameter('user-id', 'int'));
         $a3->addParameter(new RequestParameter('old-pass','string'));
         $a3->addParameter(new RequestParameter('new-pass','string'));
+        $a3->addParameter(new RequestParameter('conf-new-pass','string'));
         $a3->addParameter(new RequestParameter('token', 'string', TRUE));
         $this->addAction($a3,TRUE);
     }
@@ -71,7 +73,6 @@ class PasswordAPIs extends API{
         else{
             return TRUE;
         }
-        return FALSE;
     }
 
     public function processRequest() {

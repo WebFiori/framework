@@ -14,7 +14,7 @@ $GLOBALS['THEME'] = array(
     ),
     'COMPONENTS'=>array(
         'aside.php','footer.php','head.php',
-        'header.php'
+        'header.php','after.php'
     ),
     'css-dir'=>'template/css',
     'js-dir'=>'template/js',

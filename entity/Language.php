@@ -102,7 +102,7 @@ class Language {
         if(!$this->setCode($code)){
             $this->setCode('XX');
         }
-        if($this->setWritingDir($dir)){
+        if(!$this->setWritingDir($dir)){
             $this->setWritingDir('ltr');
         }
         foreach ($initials as $val){

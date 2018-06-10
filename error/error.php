@@ -1,6 +1,6 @@
 <?php 
 require_once '../root.php';
-Page::get()->loadTranslation(TRUE);
+Page::get()->usingLanguage(TRUE);
 Page::get()->loadTheme();
 require_once 'ERR_'.Page::get()->getLang().'.php';
 $error;

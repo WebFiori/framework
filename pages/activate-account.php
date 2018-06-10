@@ -37,7 +37,7 @@ if($mainSession->validateToken() === TRUE){
 else{
     header('location: login');
 }
-Page::get()->loadTranslation(TRUE);
+Page::get()->usingLanguage(TRUE);
 $pageLbls = LANGUAGE['pages']['activate-account'];
 Page::get()->setTitle($pageLbls['title']);
 Page::get()->setDescription($pageLbls['description']);

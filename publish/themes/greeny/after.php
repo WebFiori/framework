@@ -27,9 +27,14 @@
 function afterThemeLoaded(){
     $page = Page::get();
     $page->setLang(WebsiteFunctions::get()->getMainSession()->getLang(TRUE));
-    $page->loadTranslation();
+    $page->usingLanguage();
     $page->getDocument()->getBody()->setClassName('pa-container');
     $page->getDocument()->getChildByID('page-body')->setClassName('pa-row');
-    $page->getDocument()->getChildByID('aside-container')->setClassName('pa-'.$page->getWritingDir().'-col-two');
-    $page->getDocument()->getChildByID('main-content-area')->setClassName('pa-'.$page->getWritingDir().'-col-ten');
+    if($page->hasAside()){
+        $page->getDocument()->getChildByID('aside-container')->setClassName('pa-'.$page->getWritingDir().'-col-two');
+        $page->getDocument()->getChildByID('main-content-area')->setClassName('pa-'.$page->getWritingDir().'-col-ten');
+    }
+    else{
+        $page->getDocument()->getChildByID('main-content-area')->setClassName('pa-'.$page->getWritingDir().'-col-twelve');
+    }
 }

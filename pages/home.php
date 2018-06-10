@@ -24,17 +24,19 @@
  * THE SOFTWARE.
  */
 
-//first, load the root file
 require_once '../root.php';
 
-$page = Page::get();
-$page->usingTheme(SiteConfig::get()->getAdminThemeName());
+// check if user is logged in
+//if not, go to login page
 if(WebsiteFunctions::get()->getMainSession()->validateToken() != TRUE){
     header('location: login');
 }
-$page->getDocument();
-$page->setHasHeader(FALSE);
+
+$page = Page::get();
+$page->usingTheme(SiteConfig::get()->getAdminThemeName());
+$page->usingLanguage();
+$lang = $page->getLanguage()->get('pages/profile');
+
+
 echo $page->getDocument();
-
-
 

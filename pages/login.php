@@ -31,12 +31,17 @@ if(WebsiteFunctions::get()->getMainSession()->validateToken() === TRUE){
 }
 $page = Page::get();
 $page->usingTheme(SiteConfig::get()->getAdminThemeName());
-$pageLbls = $page->getPageLanguage()->get('pages/login');
+$pageLbls = $page->getLanguage()->get('pages/login');
+
+
 $page->setHasHeader(FALSE);
 $page->setHasFooter(FALSE);
+
+
 $page->getDocument()->getHeadNode()->addCSS('publish/themes/greeny/css/login.css');
 $page->getDocument()->getHeadNode()->addJs('publish/themes/greeny/js/login.js');
 $page->getDocument()->getBody()->setClassName('pa-container');
+
 $container = new HTMLNode();
 $page->insertNode($container,'page-body');
 $page->getDocument()->getChildByID('page-header')->removeAllChildNodes();

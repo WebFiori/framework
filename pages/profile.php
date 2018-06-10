@@ -27,118 +27,18 @@
 //first, load the root file
 require_once '../root.php';
 
-//sets the translation
-Page::get()->loadTranslation(TRUE);
-
-//load theme
-Page::get()->loadTheme();
-
-$lang = LANGUAGE['pages']['profile'];
-
-Page::get()->setTitle($lang['title']);
-
-Page::get()->setDescription($lang['description']);
-//end of page setup.
-
 // check if user is logged in
 //if not, go to login page
 if(WebsiteFunctions::get()->getMainSession()->validateToken() != TRUE){
     header('location: login');
 }
 
+$page = Page::get();
+$page->usingTheme(SiteConfig::get()->getAdminThemeName());
+$page->usingLanguage();
+$lang = $page->getLanguage()->get('pages/profile');
+
 //check user type
 $userId = filter_input(INPUT_GET, 'user-id');
 
-?>
-<!DOCTYPE html>
-<html lang="<?php echo Page::get()->getLang()?>">
-    <head>
-        <?php echo getHeadNode('pages/profile', Page::get()->getLang())?>
-    </head>
-    <body itemscope itemtype="http://schema.org/WebPage">
-        <div class="pa-container">
-            <div class="pa-row">
-                <div class="pa-row">
-                    <?php echo getAsideNavNode(Page::get()->getWritingDir(),2);?>
-                    <div id="pa-main-content" itemscope itemtype="http://schema.org/WebPageElement" itemprop="mainContentOfPage" dir="<?php echo Page::get()->getWritingDir()?>" class="<?php echo 'pa-'.Page::get()->getWritingDir().'-col-ten'?> show-border">
-                        <header id="header" itemscope itemtype="http://schema.org/WPHeader" class="pa-row">
-                            <h1 name="page-title" itemprop="name" id="page-title"><?php echo $lang['title']?></h1>
-                        </header>
-                        <div class="pa-row">
-                            <?php
-                            if($userId != NULL && $userId != FALSE){
-                                if($userId != WebsiteFunctions::get()->getUserID()){
-                                    if(WebsiteFunctions::get()->getAccessLevel() != 0){
-                                        $profile = new User();
-                                        $profile->setAccessLevel('<b style="color:red">NOT AUTHORIZED</b>');
-                                        $profile->setDisplayName('<b style="color:red">NOT AUTHORIZED</b>');
-                                        $profile->setEmail('<b style="color:red">NOT AUTHORIZED</b>');
-                                        $profile->setStatus('<b style="color:red">NOT AUTHORIZED</b>');
-                                        $profile->setActivationTok('<b style="color:red">NOT AUTHORIZED</b>');
-                                        $profile->setUserName('<b style="color:red">NOT AUTHORIZED</b>');
-                                    }
-                                    else{
-                                        $profile = UserFunctions::get()->getUserByID($userId);
-                                        if($profile == UserFunctions::NO_SUCH_USER){
-                                            $profile = new User();
-                                            $profile->setAccessLevel(UserFunctions::NO_SUCH_USER);
-                                            $profile->setDisplayName(UserFunctions::NO_SUCH_USER);
-                                            $profile->setEmail(UserFunctions::NO_SUCH_USER);
-                                            $profile->setStatus(UserFunctions::NO_SUCH_USER);
-                                            $profile->setActivationTok(UserFunctions::NO_SUCH_USER);
-                                            $profile->setUserName(UserFunctions::NO_SUCH_USER);
-                                        }
-                                    }
-                                }
-                                else{
-                                    $profile = UserFunctions::get()->getUserByID(WebsiteFunctions::get()->getUserID());
-                                }
-                            }
-                            else{
-                                header('location: home');
-                            }
-                            ?>
-                            <div style="border: 1px solid" class="<?php echo 'pa-'.Page::get()->getWritingDir().'-col-twelve'?>">
-                                <p><b><?php echo $lang['labels']['actions']?></b></p>
-                                <ul>
-                                    <li><a href="pages/update-pass?user-id=<?php echo $userId?>"><?php echo $lang['labels']['update-password']?></a></li>
-                                    <li><a href="pages/update-email?user-id=<?php echo $userId?>"><?php echo $lang['labels']['update-email']?></a></li>
-                                    <li><a href="pages/update-disp-name?user-id=<?php echo $userId?>"><?php echo $lang['labels']['update-disp-name']?></a></li>
-                                </ul>
-                            </div>
-                            <div class="pa-row">
-                                <div class="<?php echo 'pa-'.Page::get()->getWritingDir().'-col-twelve'?>">
-                                    <p><b><?php echo $lang['labels']['username']?></b><?php echo $profile->getUserName()?></p>
-                                </div>
-                                <div class="<?php echo 'pa-'.Page::get()->getWritingDir().'-col-twelve'?>">
-                                    <p><b><?php echo $lang['labels']['display-name']?></b><?php echo $profile->getDisplayName()?></p>
-                                </div>
-                                <div class="<?php echo 'pa-'.Page::get()->getWritingDir().'-col-twelve'?>">
-                                    <p><b><?php echo $lang['labels']['email']?></b><?php echo $profile->getEmail()?></p>
-                                </div>
-                                <div class="<?php echo 'pa-'.Page::get()->getWritingDir().'-col-twelve'?>">
-                                    <p><b><?php echo $lang['labels']['status']?></b><?php echo $profile->getStatus()?></p>
-                                </div>
-                                <div class="<?php echo 'pa-'.Page::get()->getWritingDir().'-col-twelve'?>">
-                                    <p><b><?php echo $lang['labels']['reg-date']?></b><?php echo $profile->getRegDate()?></p>
-                                </div>
-                                <div class="<?php echo 'pa-'.Page::get()->getWritingDir().'-col-twelve'?>">
-                                    <p><b><?php echo $lang['labels']['last-login']?></b><?php echo $profile->getLastLogin()?></p>
-                                </div>
-                                <div class="<?php echo 'pa-'.Page::get()->getWritingDir().'-col-twelve'?>">
-                                    <p><b><?php echo $lang['labels']['access-level']?></b><?php echo $profile->getAccessLevel()?></p>
-                                </div>
-                                <div class="<?php echo 'pa-'.Page::get()->getWritingDir().'-col-twelve'?>">
-                                    <p><b><?php echo $lang['labels']['activation-token']?></b><a href="pages/login?ac-tok=<?php echo $profile->getActivationTok()?>"><?php echo $profile->getActivationTok()?></a></p>
-                                </div>
-                            </div>
-                        </div>
-                        <?php echo getFooterNode()?>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </body>
-</html>
-
-
+echo $page->getDocument();

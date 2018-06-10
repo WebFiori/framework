@@ -29,7 +29,7 @@ require_once '../root.php';
 
 
 //sets the translation
-Page::get()->loadTranslation(TRUE);
+Page::get()->usingLanguage(TRUE);
 
 //load theme
 Page::get()->loadTheme();

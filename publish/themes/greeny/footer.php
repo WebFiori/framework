@@ -5,7 +5,6 @@ function getFooterNode(){
     $fNode = new HTMLNode('footer');
     $fNode->setAttribute('dir', Page::get()->getWritingDir());
     $fNode->setAttribute('class','pa-'.Page::get()->getWritingDir().'-col-twelve show-border');
-    $fNode->setAttribute('name', 'footer');
     $fNode->setAttribute('itemtype','http://schema.org/WPFooter');
     $fNav = new HTMLNode('nav');
     $fNavUl = new HTMLNode('ul');

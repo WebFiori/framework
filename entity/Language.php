@@ -201,7 +201,8 @@ class Language {
      */
     public function set($dir,$varName,$varValue) {
         if(gettype($dir) == 'string' && strlen($dir) != 0){
-            if(gettype($varName) == 'string' && strlen($varName) != 0){
+            $varName = ''.$varName;
+            if(strlen($varName) != 0){
                 $trim = trim($dir, '/');
                 $subSplit = explode('/', $trim);
                 if(count($subSplit) == 1){

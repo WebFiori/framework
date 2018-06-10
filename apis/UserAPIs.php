@@ -41,74 +41,75 @@ class UserAPIs extends API{
      */
     private function initAPI(){
         $this->setVersion('1.0.0');
-        $tok = new RequestParameter('token','string', TRUE);
-        $userId = new RequestParameter('user-id','integer', FALSE);
-        $pass = new RequestParameter('password','string', FALSE);
-        //action #1
-        $a1 = new APIAction();
+        $a1 = new APIAction('add-user');
         $a1->addRequestMethod('POST');
-        $a1->setName('add-user');
-        $a1p1 = new RequestParameter('username','string', FALSE);
-        $a1p3 = new RequestParameter('email','email', FALSE);
-        $a1->addParameter($a1p1);
-        $a1->addParameter($pass);
-        $a1->addParameter($a1p3);
-        $a1->addParameter(new RequestParameter('access-level','integer', FALSE));
+        $a1->addParameter(new RequestParameter('username', 'string'));
+        $a1->addParameter(new RequestParameter('email', 'email'));
+        $a1->addParameter(new RequestParameter('password', 'string'));
+        $a1->addParameter(new RequestParameter('conf-password', 'string'));
+        $a1->addParameter(new RequestParameter('access-level', 'integer'));
+        $a1->getParameterByName('access-level')->setMinVal(0);
+        $a1->getParameterByName('access-level')->setMaxVal(10);
         $a1->addParameter(new RequestParameter('display-name', 'string', TRUE));
         $this->addAction($a1);
         
         //action #2
-        $a2 = new APIAction();
+        $a2 = new APIAction('update-email');
         $a2->addRequestMethod('POST');
-        $a2->setName('update-email');
-        $a2->addParameter($userId);
-        $a2->addParameter(new RequestParameter('email','email', FALSE));
-        $a2->addParameter($pass);
-        $a2->addParameter($tok);
+        $a2->addParameter(new RequestParameter('old-email','email'));
+        $a2->addParameter(new RequestParameter('new-email','email'));
+        $a2->addParameter(new RequestParameter('password','string'));
+        $a2->addParameter(new RequestParameter('token', 'string', TRUE));
         $this->addAction($a2,TRUE);
+        
+        $a2S = new APIAction('confirm-updated-email');
+        $a2S->addRequestMethod('get');
+        $a2S->addRequestMethod('post');
+        $a2->addParameter(new RequestParameter('token', 'string', TRUE));
+        $a2->addParameter(new RequestParameter('confirmation-token', 'string', TRUE));
+        
         //action #3
-        $a3 = new APIAction();
+        $a3 = new APIAction('get-users');
         $a3->addRequestMethod('GET');
-        $a3->setName('get-users');
-        $a3->addParameter($tok);
+        $a3->addParameter(new RequestParameter('token', 'string', TRUE));
         $this->addAction($a3,TRUE);
         
         $a6 = new APIAction();
         $a6->addRequestMethod('POST');
         $a6->setName('update-user-status');
-        $a6->addParameter($userId);
+        $a6->addParameter(new RequestParameter('user-id', 'integer'));
         $a6->addParameter(new RequestParameter('status','string', FALSE));
-        $a6->addParameter($tok);
+        $a6->addParameter(new RequestParameter('token', 'string', TRUE));
         $this->addAction($a6,TRUE);
         
         $a7 = new APIAction();
         $a7->addRequestMethod('POST');
         $a7->setName('update-display-name');
-        $a7->addParameter($userId);
-        $a7->addParameter(new RequestParameter('display-name','string', FALSE));
-        $a7->addParameter($tok);
+        $a7->addParameter(new RequestParameter('user-id', 'integer'));
+        $a7->addParameter(new RequestParameter('display-name','string'));
+        $a7->addParameter(new RequestParameter('token', 'string', TRUE));
         $this->addAction($a7,TRUE);
         
         $a8 = new APIAction();
         $a8->addRequestMethod('POST');
         $a8->setName('update-access-level');
-        $a8->addParameter($userId);
-        $a8->addParameter(new RequestParameter('access-level','integer', FALSE));
-        $a8->addParameter($tok);
+        $a8->addParameter(new RequestParameter('user-id', 'integer'));
+        $a8->addParameter(new RequestParameter('access-level','integer'));
+        $a8->addParameter(new RequestParameter('token', 'string', TRUE));
         $this->addAction($a8,TRUE);
         
         $a9 = new APIAction();
         $a9->addRequestMethod('POST');
         $a9->setName('activate-account');
-        $a9->addParameter(new RequestParameter('activation-token','string', FALSE));
-        $a9->addParameter($tok);
+        $a9->addParameter(new RequestParameter('activation-token','string'));
+        $a9->addParameter(new RequestParameter('token', 'string', TRUE));
         $this->addAction($a9,TRUE);
         
         $a10 = new APIAction();
         $a10->addRequestMethod('GET');
         $a10->setName('get-profile');
-        $a10->addParameter($userId);
-        $a10->addParameter($tok);
+        $a10->addParameter(new RequestParameter('user-id', 'integer'));
+        $a10->addParameter(new RequestParameter('token', 'string', TRUE));
         $this->addAction($a10,TRUE);
     }
     /**

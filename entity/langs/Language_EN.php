@@ -1,4 +1,40 @@
 <?php
+$Language = new Language('ltr', 'en', array(
+    'pages/setup/setup-steps',
+    'pages/home',
+    'pages/login/labels',
+    'pages/login/placeholders',
+    'pages/login/errors',
+    'pages/login/actions'
+));
+$Language->setMultiple('pages/login/labels', array(
+    'main'=>'Login to The System',
+    'username' => 'Username or email:',
+    'password' => 'Password:',
+    'keep-me-logged'=>'Keep me logged in for one week.',
+));
+$Language->setMultiple('pages/login/placeholders', array(
+    'username' => 'Enter Your Username or Email',
+    'password' => 'Enter Your Password Here',
+));
+$Language->setMultiple('pages/login/errors', array(
+    'something-wrong'=>'Something went wrong. Try again in few moments. Sorry about that 😲',
+    'incorrect-login-params' => 'Inccorrect username, email or password!',
+    'err-missing-pass' => 'Missing Password!',
+    'err-missing-username' => 'Missing Username!'
+));
+$Language->setMultiple('pages/login/actions', array(
+    'login'=>'Login',
+    'fogot-pass'=>'Did you Forgot your Password?'
+));
+$Language->setMultiple('pages/home', array(
+    'title'=>'Home Page',
+    'description'=>'This is my home page.'
+));
+$Language->setMultiple('pages/login', array(
+    'title'=>'Login',
+    'description'=>'Login to the system.'
+));
 /**
  * A language file that represents English language.
  * @author Ibrahim <ibinshik@hotmail.com>

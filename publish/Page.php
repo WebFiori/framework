@@ -9,6 +9,11 @@ define('THEMES_DIR','publish/themes');
  * @version 1.6
  */
 class Page{
+    /**
+     *
+     * @var type 
+     * @since 1.6
+     */
     private $isDynamic;
     /**
      * The document that represents the page.
@@ -16,18 +21,6 @@ class Page{
      * @since 1.4
      */
     private $document;
-    /**
-     * A constant for left to right writing direction.
-     * @var string 
-     * @since 1.0
-     */
-    const DIR_LTR = 'ltr';
-    /**
-     * A constant for right to left writing direction.
-     * @var string 
-     * @since 1.0
-     */
-    const DIR_RTL = 'rtl';
     /**
      * The writing direction of the page.
      * @var string
@@ -89,6 +82,12 @@ class Page{
      */
     private $theme;
     /**
+     * The name of request page.
+     * @var string
+     * @since 1.6 
+     */
+    private $name;
+    /**
      * Sets the canonical URL of the page.
      * @since 1.2
      * @param string $url The canonical URL of the page.
@@ -117,31 +116,54 @@ class Page{
         $this->incHeader = TRUE;
         $this->isDynamic = TRUE;
         $this->incAside = TRUE;
-        $this->setLang();
         $this->setWritingDir();
         WebsiteFunctions::get()->getMainSession()->initSession(FALSE, TRUE);
+        
+        $arr = explode('/', filter_var($_SERVER['REQUEST_URI']));
+        $file = $arr[count($arr) - 1];
+        $fix = explode('.', $file)[0];
+        $this->name = explode('?', $fix)[0];
     }
+    /**
+     * Returns the name of requested page.
+     * @return string The name of the requested page.
+     * @since 1.6
+     */
+    public function getPageName() {
+        return $this->name;
+    }
+    /**
+     * Checks if the type of page will be dynamic or static.
+     * @return boolean The function will return <b>TRUE</b> if document 
+     * type is dynamic. Otherwise, the function will return <b>FALSE</b>.
+     * @since 1.6
+     */
     public function isDynamicDoc() {
         return $this->isDynamic;
     }
     /**
-     * 
-     * @param HTMLNode $node
+     * Adds a child node inside the body of a node given its ID.
+     * @param HTMLNode $node The node that will be inserted.
+     * @param string $parentNodeId The ID of the node that the given node 
+     * will be inserted to.
+     * @return boolean The function will return <b>TRUE</b> if the given node 
+     * was inserted. If it is not, the function will return <b>FALSE</b>.
+     * @since 1.6
      */
-    public function insertNode($node) {
-        if($node instanceof HTMLNode){
-            if($this->document == NULL){
-                $this->getDocument();
-            }
-            if($this->hasFooter()){
-                $footer = $this->document->getChildByID('page-footer');
-                $this->document->getBody()->replaceChild($footer, $node);
-                $this->document->addChild($footer);
-            }
-            else{
-                $this->document->addChild($node);
+    public function insertNode($node,$parentNodeId='') {
+        if(strlen($parentNodeId) != 0){
+            if($node instanceof HTMLNode){
+                if($this->document == NULL){
+                    $this->getDocument();
+                }
+                $parentNode = $this->document->getChildByID($parentNodeId);
+                if($parentNode instanceof HTMLNode){
+                    $parentNode->addChild($node);
+                    return TRUE;
+                }
             }
         }
+        return FALSE;
     }
     private static $instance;
     /**
@@ -158,18 +180,25 @@ class Page{
     }
     /**
      * Sets the title of the page.
-     * @param string $val The title of the page.
+     * @param string $val The title of the page. If <b>NULL</b> is given, 
+     * the title will not updated.
      * @since 1.0
      */
     public function setTitle($val){
-        $this->title = $val;
-        if($this->document != NULL){
-            $this->document->getHeadNode()->setTitle($this->getTitle().SiteConfig::get()->getTitleSep().SiteConfig::get()->getWebsiteName());
+        if($val != NULL){
+            $this->title = $val;
+            if($this->document != NULL){
+                $this->document->getHeadNode()->setTitle($this->getTitle().SiteConfig::get()->getTitleSep().SiteConfig::get()->getWebsiteName());
+            }
         }
     }
     /**
      * Returns the document that is associated with the page.
-     * @param boolean $dynamic 
+     * @param boolean $dynamic Set to <b>TRUE</b> to make the content 
+     * of the page dynamic (Mix of php code and HTML). <b>FALSE</b> to 
+     * make it static (HTML only). Note that once this function is called, 
+     * the value of this attribute will not be changed in second call. 
+     * Default is <b>FALSE</b>.
      * @return HTMLDoc An object of type <b>HTMLDoc</b>.
      * @throws Exception If page theme is not loaded.
      * @since 1.1
@@ -177,22 +206,22 @@ class Page{
     public function getDocument($dynamic=false){
         if($this->isThemeLoaded()){
             if($this->document == NULL){
-                $this->isDynamic = $dynamic;
+                $headNode = $this->_getHead();
+                $footerNode = $this->_getFooter();
+                $asideNode = $this->_getAside();
+                $headerNode = $this->_getHeader();
                 $this->document = new HTMLDoc();
                 $this->document->setLanguage($this->getLang());
-                $this->document->setHeadNode($this->_getHead($dynamic));
-                $this->document->addChild($this->_getHeader($dynamic));
+                $this->document->setHeadNode($headNode);
+                $this->document->addChild($headerNode);
                 $body = new HTMLNode();
                 $body->setID('page-body');
-                $body->addChild($this->_getAside($dynamic));
+                $body->addChild($asideNode);
                 $contentArea = new HTMLNode();
                 $contentArea->setID('main-content-area');
                 $body->addChild($contentArea);
                 $this->document->addChild($body);
-                $this->document->addChild($this->_getFooter($dynamic));
-                $this->document->getHeadNode()->setBase(SiteConfig::get()->getBaseURL());
-                $this->document->getHeadNode()->addMeta('description', $this->getDescription());
-                $this->document->getHeadNode()->setTitle($this->getTitle().SiteConfig::get()->getTitleSep().SiteConfig::get()->getWebsiteName());
+                $this->document->addChild($footerNode);
             }
             return $this->document;
         }
@@ -217,13 +246,24 @@ class Page{
     }
     /**
      * Sets the description of the page.
-     * @param string $val The description of the page.
+     * @param string $val The description of the page. If <b>NULL</b> is given, 
+     * description will not change.
      * @since 1.0
      */
     public function setDescription($val){
-        $this->description = $val;
-        if($this->document != NULL){
-            $this->document->getHeadNode()->addMeta('description', $val);
+        if($val != NULL){
+            $this->description = $val;
+            if($this->document != NULL ){
+                $headCh = $this->document->getHeadNode()->children();
+                $headChCount = $headCh->size();
+                for($x = 0 ; $x < $headChCount ; $x++){
+                    $node = $headCh->get($x);
+                    if($node->getAttributeValue('name') == 'description'){
+                        $node->setAttribute('content',$val);
+                        return;
+                    }
+                }
+            }
         }
     }
     /**
@@ -236,6 +276,40 @@ class Page{
         return $this->description;
     }
     /**
+     * Returns the language.
+     * @return string|NULL Two digit language code. In case language is not set, the 
+     * function will return <b>NULL</b>
+     * @since 1.0
+     */
+    public function getLang(){
+        return $this->contentLang;
+    }
+   /**
+    * Load the translation file based on the language code. The function uses 
+    * two checks to load the translation. If the page language is set using 
+    * the function <b>Page::setLang()</b>, then the language that will be loaded 
+    * will be based on the value returned by the function <b>Page::getLang()</b>. 
+    * The other way is if the language is not set and the attribute <b>$uses_session_lang</b> 
+    * is set to <b>TRUE</b>, session language will be used.
+    * @throws Exception in case the language is not supported, or the session 
+    * is not running, or <b>ROOT_DIR</b> is not defined.
+    * @since 1.0
+    * @param boolean $uses_session_lang [Optional] If <b>TRUE</b> is given and language is not 
+    * set, the language of the session will be used. Default is <b>TRUE</b>.
+    */
+    public function loadTranslation(){
+        if($this->getLang() != NULL){
+            Language::loadTranslation($this->getLang());
+            $pageLang = $this->getPageLanguage();
+            $this->setWritingDir($pageLang->getWritingDir());
+            $this->setTitle($pageLang->get('pages/'.$this->getPageName().'/title'));
+            $this->setDescription($pageLang->get('pages/'.$this->getPageName().'/description'));
+        }
+        else{
+            throw new Exception('Unable to load transulation. Page language is not set.');
+        }
+    }
+    /**
      * Sets the display language of the page.
      * @param string $lang a two digit language code such as AR or EN.
      * @return boolean True if the language was not set and its the first time to set. 
@@ -246,68 +320,28 @@ class Page{
     public function setLang($lang='EN'){
         $langU = strtoupper($lang);
         if(in_array($langU, SessionManager::SUPPORTED_LANGS)){
-            $langSet = FALSE;
-            if($this->contentLang == NULL){
-                $this->contentLang = $langU;
-                $this->loadTranslation();
-                //need to find solution for other languages in setting writing direction
-                if($langU == 'EN'){
-                    $this->setWritingDir(self::DIR_LTR);
-                }
-                else if($langU == 'AR'){
-                    $this->setWritingDir(self::DIR_RTL);
-                }
-                $langSet = TRUE;
+            $this->contentLang = $langU;
+            if($this->document != NULL){
+                $this->document->setLanguage($langU);
             }
-            return $langSet;
         }
         else{
             throw new Exception('Unknown language code: '.$lang);
         }
     }
     /**
-     * Returns the language.
-     * @return string|NULL Two digit language code. In case language is not set, the 
-     * function will return <b>NULL</b>
-     * @since 1.0
+     * Returns the language variables based on loaded translation.
+     * @return Language|NULL an object of type <b>Language</b> if language 
+     * is loaded. If no language found, <b>NULL</b> is returned. This 
+     * function should be called after calling the function <b>Page::loadTranslation()</b>.
+     * @since 1.6
      */
-    public function getLang(){
-        return $this->contentLang;
-    }
-   /**
-    * Load the translation file based on the language 
-    * @throws Exception in case the language is not supported, or the session 
-    * is not running, or <b>ROOT_DIR</b> is not defined.
-    * @since 1.0
-    * @param boolean $uses_session_lang If <b>TRUE<b> is given and language is not 
-    * set, the language of the session will be used. 
-    */
-    public function loadTranslation($uses_session_lang=true){
-        if(defined('ROOT_DIR')){
-            if($this->getLang() != NULL){
-                include_once ROOT_DIR.'/entity/langs/Language_'.$this->getLang().'.php';
-            }
-            else if($uses_session_lang === TRUE){
-                $sLang = WebsiteFunctions::get()->getMainSession()->getLang(TRUE);
-                if($sLang != NULL){
-                    if($this->setLang($sLang)){
-                        include_once ROOT_DIR.'/entity/langs/Language_'.$sLang.'.php';
-                    }
-                    else{
-                        throw new Exception('Unable to set language to \''.$sLang.'\'.');
-                    }
-                }
-                else{
-                    throw new Exception('Unable to load transulation. Session Language is not set.');
-                }
-            }
-            else{
-                throw new Exception('Unable to load transulation. Language is not set.');
-            }
+    public function getPageLanguage() {
+        $loadedLangs = Language::getLoadedLangs();
+        if(isset($loadedLangs[$this->getLang()])){
+            return $loadedLangs[$this->getLang()];
         }
-        else{
-            throw new Exception('Unable to load transulation. Root directory is not set.');
-        }
+        return NULL;
     }
     /**
      * Returns an array that contains the meta data of all available themes. 
@@ -378,6 +412,9 @@ class Page{
                         }
                     }
                     $this->isThemeLoaded = TRUE;
+                    if(function_exists('afterThemeLoaded')){
+                        afterThemeLoaded();
+                    }
                     return TRUE;
                 }
                 throw new Exception('The variable \'COMPONENTS\' is missing from the theme definition.');
@@ -464,14 +501,11 @@ class Page{
      * @throws Exception If the writing direction is not <b>Page::DIR_LTR</b> or <b>Page::DIR_RTL</b>.
      * @since 1.0
      */
-    function setWritingDir($dir=self::DIR_LTR){
+    function setWritingDir($dir='ltr'){
         $dirL = strtolower($dir);
-        if($dirL == self::DIR_LTR || $dirL == self::DIR_RTL){
-            if($this->getWritingDir()  == NULL){
-                $this->contentDir = $dirL;
-                return TRUE;
-            }
-            return FALSE;
+        if($dirL == Language::DIR_LTR || $dirL == Language::DIR_RTL){
+            $this->contentDir = $dirL;
+            return TRUE;
         }
         else{
             throw new Exception('Unknown writing direction: '.$dir);
@@ -489,7 +523,7 @@ class Page{
                 if($this->incHeader == FALSE && $bool == TRUE){
                     $children = $this->document->getBody()->children();
                     $this->document->getBody()->removeAllChildNodes();
-                    $this->document->addChild($this->_getHeader($this->isDynamicDoc()));
+                    $this->document->addChild($this->_getHeader());
                     for($x = 0 ; $x < $children->size() ; $x++){
                         $this->document->addChild($children->get($x));
                     }
@@ -512,7 +546,7 @@ class Page{
         if(gettype($bool) == 'boolean'){
             if($this->document != NULL){
                 if($this->incFooter == FALSE && $bool == TRUE){
-                    $this->document->addChild($this->_getFooter($this->isDynamicDoc()));
+                    $this->document->addChild($this->_getFooter());
                 }
                 else if($this->incFooter == TRUE && $bool == FALSE){
                     $footer = $this->document->getChildByID('page-footer');
@@ -547,58 +581,65 @@ class Page{
         return $this->incAside;
     }
     
-    private function _getAside($dynamic=true) {
+    private function _getAside() {
         if($this->hasAside()){
-            if($dynamic){
-                $node = new HTMLNode('', FALSE, TRUE);
-                $node->setText('<?php echo getAsideNode() ?>');
-                return $node;
-            }
-            else{
+            if($this->document == NULL){
                 $h = getAsideNode();
                 $h->setID('aside-container');
                 return $h;
             }
+            return $this->document->getChildByID('aside-container');
         }
     }
     
-    private function _getHeader($dynamic=true){
+    private function _getHeader(){
         if($this->hasHeader()){
-            if($dynamic){
-                $node = new HTMLNode('', FALSE, TRUE);
-                $node->setText('<?php echo getHeaderNode() ?>');
-                return $node;
-            }
-            else{
+            if($this->document == NULL){
                 $h = getHeaderNode();
                 $h->setID('page-header');
                 return $h;
             }
+            return $this->document->getChildByID('page-header');
         }
     }
     
-    private function _getFooter($dynamic=true){
+    private function _getFooter(){
         if($this->hasFooter()){
-            if($dynamic){
-                $node = new HTMLNode('', FALSE, TRUE);
-                $node->setText('<?php echo getFooterNode() ?>');
-                return $node;
-            }
-            else{
+            if($this->document == NULL){
                 $f = getFooterNode();
                 $f->setID('page-footer');
                 return $f;
             }
+            return $this->document->getChildByID('page-footer');
         }
     }
     
-    private function _getHead($dynamic=true){
-        if($dynamic){
-            $textNode = new HTMLNode('', FALSE, TRUE);
-            $textNode->setText('<?php echo getHeadNode() ?>');
-            return $textNode;
+    private function _getHead(){
+        if($this->document === NULL){
+            $headNode = new HeadNode(
+                $this->getTitle().SiteConfig::get()->getTitleSep().SiteConfig::get()->getWebsiteName(),
+                $this->getCanonical(),
+                SiteConfig::get()->getBaseURL()
+            );
+            $descNode = new HTMLNode('meta', FALSE);
+            $descNode->setAttribute('name', 'description');
+            $descNode->setAttribute('content', $this->getDescription());
+            $headNode->addChild($descNode);
+            $tmpHead = getHeadNode();
+            $children = $tmpHead->children();
+            $count = $children->size();
+            for($x = 0 ; $x < $count ; $x++){
+                $node = $children->get($x);
+                $nodeName = $node->getName();
+                if($nodeName != 'base' && $nodeName != 'title'){
+                    if($node->getAttributeValue('name') != 'description'){
+                        $headNode->addChild($node);
+                    }
+                }
+            }
+            return $headNode;
         }
-        return getHeadNode();
+        return $this->document->getHeadNode();
     }
 }
 

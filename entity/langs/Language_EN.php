@@ -25,13 +25,9 @@ $Language = new Language('ltr', 'en', array(
     'pages/login/errors',
     'pages/login/actions',
     'pages/activate-account/labels',
-    'pages/register/labels',
-    'pages/sys-info/labels',
-    'pages/update-disp-name/labels',
-    'pages/update-email/labels',
-    'pages/update-pass/labels',
-    'pages/view-users/labels',
-    'pages/settings/labels',
+    'pages/activate-account/placeholders',
+    'pages/activate-account/actions',
+    'pages/activate-account/errors',
 ));
 $Language->set('general', 'wait', 'Please wait a moment...');
 $Language->set('general', 'loading', 'Loading...');
@@ -208,6 +204,23 @@ $Language->setMultiple('pages/home', array(
 $Language->setMultiple('pages/login', array(
     'title'=>'Login',
     'description'=>'Login to the system.'
+));
+$Language->setMultiple('pages/activate-account', array(
+    'title'=>'Account Activation',
+    'description'=>'A page to activate user account.'
+));
+$Language->setMultiple('pages/activate-account/labels', array(
+    'main'=>'Activate Your Account',
+    'activation-token'=>'Activation Token:'
+));
+$Language->setMultiple('pages/activate-account/placeholders', array(
+    'activation-token'=>'Type in or paste your activation token here.'
+));
+$Language->setMultiple('pages/activate-account/actions', array(
+    'activate'=>'Activate Account'
+));
+$Language->setMultiple('pages/activate-account/errors', array(
+    'inncorect-token'=>'Inncorrect Activation token!'
 ));
 /**
  * A language file that represents English language.

@@ -28,6 +28,8 @@ $Language = new Language('ltr', 'en', array(
     'pages/activate-account/placeholders',
     'pages/activate-account/actions',
     'pages/activate-account/errors',
+    'pages/activate-account/status',
+    'email/'
 ));
 $Language->set('general', 'wait', 'Please wait a moment...');
 $Language->set('general', 'loading', 'Loading...');
@@ -44,11 +46,12 @@ $Language->set('general', 'delete', 'Delete');
 $Language->set('general', 'deleting', 'Deleting...');
 $Language->set('general', 'deleted', 'Deleted.');
 $Language->set('general', 'connected', 'Connected.');
-$Language->set('general', 'disconnected', 'Disconnected.');
+$Language->set('general', 'disconnected', 'Disconnected. Please check your interned connection.');
 $Language->set('general', 'next', 'Next');
 $Language->set('general', 'previous', 'Previous');
 $Language->set('general', 'skip', 'Skip');
 $Language->set('general', 'finish', 'Finish');
+$Language->set('general', 'server-err', 'Unkouwn Server Error!');
 $Language->setMultiple('pages/setup/setup-steps', array(
     'welcome'=>'Welcome',
     'database-setup'=>'Database Setup',
@@ -212,6 +215,10 @@ $Language->setMultiple('pages/activate-account', array(
 $Language->setMultiple('pages/activate-account/labels', array(
     'main'=>'Activate Your Account',
     'activation-token'=>'Activation Token:'
+));
+$Language->setMultiple('pages/activate-account/status', array(
+    'activating'=>'Activating your account. Please wait a moment...',
+    'activated'=>'Your account was activated successfully.'
 ));
 $Language->setMultiple('pages/activate-account/placeholders', array(
     'activation-token'=>'Type in or paste your activation token here.'

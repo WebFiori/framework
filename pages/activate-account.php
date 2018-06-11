@@ -31,7 +31,7 @@ require_once '../root.php';
 $activationTok = filter_input(INPUT_GET, 'activation-token');
 if($activationTok != NULL && $activationTok != FALSE){
     if(WebsiteFunctions::get()->getMainSession()->validateToken() != TRUE){
-        header('location: login');
+        header('location: '.SiteConfig::get()->getBaseURL().'pages/login?activation-token='.$activationTok);
     }
     else{
         $user = WebsiteFunctions::get()->getMainSession()->getUser();

@@ -113,7 +113,7 @@ class UserQuery extends MySQLQuery{
      */
     public function updateStatus($newStatus,$id){
         $arr = array($this->getColName('status')=>'\''.$newStatus.'\'');
-        $this->update($this->getStructure()->getName(), $arr, $id);
+        $this->update($arr, $id);
     }
     /**
      * Constructs a query that can be used to get a user given his ID.

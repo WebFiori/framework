@@ -239,8 +239,14 @@ class MailFunctions extends Functions{
             $mailer->setSubject('Activate Your Account');
             $msg = '<p>Dear Mr. '.$user->getUserName().', Welcome to <b>'.SiteConfig::get()->getWebsiteName().'</b>.</p>';
             $msg .= '<p>A new user account has been created for you. In order to start using '
-                    . 'the system, you must activate your account by clicking on the '
-                    . '<a href="'.SiteConfig::get()->getBaseURL().'apis/UserAPIs?action=activate-account&activation-token='.$user->getActivationTok().'" _target="_blank"><b>This Link</b></a> and logging in.</p>';
+                    . 'the system, you must activate your account by loging in '
+                    . '<a href="'.SiteConfig::get()->getBaseURL().'pages/activate-account?activation-token='.$user->getActivationTok().'" _target="_blank"><b>Here</b></a>.</p>'
+                    . '<ul>'
+                    . '<li><b>Username:</b> '.$user->getUserName().'</li>'
+                    . '<li><b>Display name:</b> '.$user->getDisplayName().'</li>'
+                    . '<li><b>Email Address:</b> '.$user->getEmail().'</li>'
+                    . '</ul>'
+                    . '';
             $msg .= '<p>Thank you for your time.</p>';
             $msg .= '<p><b>'.$noReplayAcc->getName().'</b></p>';
             $mailer->write($msg,TRUE);

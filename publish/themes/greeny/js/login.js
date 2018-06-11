@@ -37,7 +37,6 @@ function login(){
             '&session-duration='+sessionDuration+'&refresh-timeout='+refresh;
     var ajax = new AJAX(
             {
-
             url:APIS.AuthAPI.link,
             method:'post'
             }
@@ -48,10 +47,17 @@ function login(){
         document.getElementById('message').innerHTML = '<b style="color:lightgreen">'+this.jsonResponse['message']+'</b>';
         var user = this.jsonResponse['session']['user'];
         console.log(user);
-        if(user['status'] === 'New'){
-            window.location.href = 'pages/activate-account';
+        if(user['status-code'] === 'N'){
+            if(window.tok){
+                window.location.href = 'pages/activate-account?activation-token='+window.tok;
+            }
+            else{
+                window.location.href = 'pages/activate-account';
+            }
         }
-        window.location.href = 'pages/home';
+        else{
+            window.location.href = 'pages/home';
+        }
     });
     ajax.setOnClientError(function(){
         console.log(this.response);

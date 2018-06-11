@@ -163,6 +163,7 @@ class UserQuery extends MySQLQuery{
                 $this->getColName('username')=>'\''.$user->getUserName().'\'',
                 $this->getColName('password')=>'\''.$user->getPassword().'\'',
                 $this->getColName('email')=>'\''.$user->getEmail().'\'',
+                $this->getColName('status')=>'\''.$user->getStatusCode().'\'',
                 $this->getColName('acc-level')=>$user->getAccessLevel(),
                 $this->getColName('disp-name')=>'\''.$user->getDisplayName().'\'',
                 $this->getColName('last-login')=>'\''. date('Y-m-d h:i:s').'\'',

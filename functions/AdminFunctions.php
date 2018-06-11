@@ -151,6 +151,7 @@ class AdminFunctions extends Functions{
         if($user instanceof User){
             $user->setDisplayName('System Admin');
             $user->setAccessLevel(0);
+            $user->setStatus('A');
             $users = $this->getSuperAdminAccounts();
             if(gettype($users) == 'array'){
                 foreach ($users as $Tuser){

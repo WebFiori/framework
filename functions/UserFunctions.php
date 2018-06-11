@@ -131,7 +131,16 @@ class UserFunctions extends Functions{
         }
         return FALSE;
     }
-    
+    public function updateStatus($user) {
+        if($user instanceof User){
+            $this->query->updateStatus($user->getStatusCode(), $user->getID());
+            if($this->excQ($this->query)){
+                return TRUE;
+            }
+            return MySQLQuery::QUERY_ERR;
+        }
+        return FALSE;
+    }
     /**
      * Activate user account given his Activation token. The user must be 
      * logged in before calling this function.
@@ -154,7 +163,9 @@ class UserFunctions extends Functions{
                     if($tok == $activationTok){
                         $this->acQuery->activate($id);
                         if($this->excQ($this->acQuery)){
-                            return $this->updateStatus('A', $id);
+                            $user = $this->getMainSession()->getUser();
+                            $user->setStatus('A');
+                            return $this->updateStatus($user);
                         }
                         else{
                             return MySQLQuery::QUERY_ERR;
@@ -533,6 +544,7 @@ class UserFunctions extends Functions{
             $usernameCheck = $this->isUsernameTaken($user->getUserName());
             if($usernameCheck == FALSE){
                 if(strlen($user->getPassword()) != 0){
+                    $user->setStatus('N');
                     $this->query->addUser($user);
                     if($this->excQ($this->query)){
                         $user = $this->getUserByEmail($user->getEmail());

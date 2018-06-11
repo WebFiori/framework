@@ -26,6 +26,7 @@
 
 //first, load the root file
 require_once '../root.php';
+$activationTok = filter_input(INPUT_GET, 'activation-token');
 if(WebsiteFunctions::get()->getMainSession()->validateToken() === TRUE){
     header('location: home');
 }
@@ -41,7 +42,13 @@ $page->setHasFooter(FALSE);
 $page->getDocument()->getHeadNode()->addCSS('publish/themes/greeny/css/login.css');
 $page->getDocument()->getHeadNode()->addJs('publish/themes/greeny/js/login.js');
 $page->getDocument()->getBody()->setClassName('pa-container');
-
+if($activationTok != NULL && $activationTok != FALSE){
+    $js = new JsCode();
+    $js->addCode('window.onload = function(){'
+            . 'window.tok = \''.$activationTok.'\';'
+            . '}');
+    $page->getDocument()->getHeadNode()->addChild($js);
+}
 $container = new HTMLNode();
 $page->insertNode($container,'page-body');
 $page->getDocument()->getChildByID('page-header')->removeAllChildNodes();

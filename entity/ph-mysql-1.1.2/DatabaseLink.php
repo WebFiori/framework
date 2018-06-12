@@ -167,7 +167,8 @@ class DatabaseLink implements JsonI{
      */
     public function getRow(){
         if($this->result){
-            return mysqli_fetch_assoc($this->result);
+            $r =  mysqli_fetch_assoc($this->result);
+            return $r;
         }
     }
     /**
@@ -180,7 +181,7 @@ class DatabaseLink implements JsonI{
     public function executeQuery($query){
         $this->lastQuery = $query;
         if($this->isConnected()){
-            $eploded = explode(';', $query->getQuery());
+            $eploded = explode(';', trim($query->getQuery(), ';'));
             if(count($eploded) != 1){
                 $r = mysqli_multi_query($this->link, $query->getQuery());
                 if(mysqli_more_results($this->link)){

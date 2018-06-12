@@ -95,9 +95,9 @@ class UserFunctions extends Functions{
      * @param string $p password.
      * @param string $e Email address.
      * @param int $sessionTimeout The duration of user session (in minutes). It must be a 
-     * * @param boolean $refreshTimeout If set to <b>TRUE</b> session timeout time will 
-     * be refreshed every time user sends a request.
      * positive number greater than 0. If invalid number is given, 10 will be used.
+     * @param boolean $refreshTimeout If set to <b>TRUE</b> session timeout time will 
+     * be refreshed every time user sends a request.
      * @return boolean|string <b>TRUE</b> if the user is authenticated. Else, it will 
      * return <b>FALSE</b>. In case of database error, the function will return 
      * <b>MySQLQuery::QUERY_ERR</b>.

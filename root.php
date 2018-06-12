@@ -31,6 +31,7 @@ $GLOBALS['SYS_STATUS'] = Util::checkSystemStatus();
 if($GLOBALS['SYS_STATUS'] !== TRUE){
     if($GLOBALS['SYS_STATUS'] == Util::MISSING_CONF_FILE){
         SystemFunctions::get()->createConfigFile();
+        MailFunctions::get()->createEmailConfigFile();
         $GLOBALS['SYS_STATUS'] = Util::checkSystemStatus();
     }
     if(gettype($GLOBALS['SYS_STATUS']) == 'string' && $GLOBALS['SYS_STATUS'] == Util::MISSING_SITE_CONF_FILE){

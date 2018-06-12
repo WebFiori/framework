@@ -31,6 +31,11 @@
  * @version 1.3
  */
 class SystemFunctions extends Functions{
+    const USER_REG_STATS = array(
+        'C'=>'Closed',
+        'O'=>'Open',
+        'AO'=>'Admin Only'
+    );
     /**
      * A constant that indicates the selected database schema has tables.
      * @since 1.1
@@ -76,12 +81,13 @@ class SystemFunctions extends Functions{
         'template-date'=>'10-03-2018 (DD-MM-YYYY)',
         'template-version'=>'0.1.2',
         'template-version-type'=>'Beta',
-        'config-file-virsion'=>'1.2',
+        'config-file-virsion'=>'1.3',
         'database-host'=>'localhost',
         'database-username'=>'',
         'database-password'=>'',
         'database-name'=>'',
         'system-version'=>'1.0',
+        'user-reg-status'=>'C',
         'system-version-type'=>'Stable'
     );
     
@@ -182,8 +188,7 @@ class SystemFunctions extends Functions{
         $q = new UserQuery();
         $q->schemaTablesCount($schema);
         if($this->excQ($q)){
-            $count = $this->getRow()['tables_count'];
-            return $count;
+            return intval($this->getRow()['tables_count']);
         }
         return MySQLQuery::QUERY_ERR;
     }
@@ -250,6 +255,7 @@ class SystemFunctions extends Functions{
             $cfgArr['database-username'] = $cfgs->getDBUser();
             $cfgArr['database-password'] = $cfgs->getDBPassword();
             $cfgArr['database-name'] = $cfgs->getDBName();
+            $cfgArr['user-reg-status'] = $cfgs->getUserRegStatus();
         }
         return $cfgArr;
     }
@@ -465,7 +471,7 @@ class SystemFunctions extends Functions{
  * Global configuration class. Used by the server part and the presentation part.
  * Do not modify this file manually unless you know what you are doing.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.1
+ * @version 1.3
  */', TRUE, TRUE);
         $fh->write('class Config{', TRUE, TRUE);
         $fh->addTab();
@@ -513,6 +519,12 @@ class SystemFunctions extends Functions{
      */
     private $dbPass;
     /**
+     * User resgistration status.
+     * @var string 
+     * @since 1.3
+     */
+    private $userRegStats;
+    /**
      * The name of database schema.
      * @var string 
      * @since 1.0
@@ -549,6 +561,7 @@ class SystemFunctions extends Functions{
         $this->dbUser = \''.$configArr['database-username'].'\';
         $this->dbPass = \''.$configArr['database-password'].'\';
         $this->dbName = \''.$configArr['database-name'].'\';
+        $this->userRegStats = \''.$configArr['user-reg-status'].'\';
         $this->systemVersion = \''.$configArr['system-version'].'\';
         $this->versionType = \''.$configArr['system-version-type'].'\';
     }', TRUE, TRUE);
@@ -569,6 +582,9 @@ class SystemFunctions extends Functions{
         }
         self::$cfg = new Config();
         return self::$cfg;
+    }
+    public function getUserRegStatus(){
+        return $this->userRegStats;
     }
     /**
      * Returns the version number of configuration file.

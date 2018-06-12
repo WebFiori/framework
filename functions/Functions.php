@@ -125,7 +125,8 @@ class Functions {
      */
     public function getRow(){
         if($this->getMainSession()->getDBLink() != NULL){
-            return $this->getMainSession()->getDBLink()->getRow();
+            $row = $this->getMainSession()->getDBLink()->getRow();
+            return $row;
         }
         return NULL;
     }

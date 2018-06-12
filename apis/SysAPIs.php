@@ -169,9 +169,13 @@ class SysAPIs extends API{
             $user->setUserName($i['username']);
             $r = AdminFunctions::get()->runSetup($user);
             if($r === TRUE){
-                UserFunctions::get()->authenticate($i['username'], $i['password'], $i['email'], 30, TRUE);
-                SystemFunctions::get()->configured(TRUE);
-                $this->sendResponse('Setup Completed');
+                if(UserFunctions::get()->authenticate($i['username'], $i['password'], $i['email'], 30, TRUE) == TRUE){
+                    SystemFunctions::get()->configured(TRUE);
+                    $this->sendResponse('Setup Completed');
+                }
+                else{
+                    $this->sendResponse('Something went wrong.', TRUE, 404);
+                }
             }
             else if($r === MySQLQuery::QUERY_ERR){
                 $this->sendResponse($r, TRUE, 404, '"details":'.SystemFunctions::get()->getMainSession()->getDBLink()->toJSON());

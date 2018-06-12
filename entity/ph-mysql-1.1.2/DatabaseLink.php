@@ -184,8 +184,8 @@ class DatabaseLink implements JsonI{
             $eploded = explode(';', trim($query->getQuery(), ';'));
             if(count($eploded) != 1){
                 $r = mysqli_multi_query($this->link, $query->getQuery());
-                if(mysqli_more_results($this->link)){
-                    while ($this->link->next_result()) {}
+                while(mysqli_more_results($this->link)){
+                    $this->link->next_result();
                 }
                 return  $r;
             }

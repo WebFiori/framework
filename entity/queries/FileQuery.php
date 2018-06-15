@@ -88,19 +88,29 @@ class FileQuery extends MySQLQuery{
         $this->selectByColVal($this->getColName('file-id'), $fId);
     }
     /**
-     * Constructs a query that can be used to add new file to the database. 
+     * Constructs a query that can be used to add new file to the database.  
      * Note that the generated query will only add file info to the database 
-     * and not the file it self.
+     * in addition to creating file ID. The information include: 
+     * <ul>
+     * <li>File Name</li>
+     * <li>MIME Type</li>
+     * <li>Date Added</li>
+     * </ul>
+     * In order to add the file it self, first get the ID of the file after 
+     * adding it by using the function <b>FileQuery::getLastFileID()</b> 
+     * and call the function <b>FileQuery::addOrUpdateFile()</b> 
+     * to add the file as blob in the database.
      * @param File $file An object of type <b>File</b>.
      */
     public function addFileInfo($file) {
         $arr = array(
-        $this->getColName('file-name')=>'\''.$file->getName().'\'',
-        $this->getColName('mime-type')=>'\''.$file->getMIMEType().'\''
+            $this->getColName('file-name')=>'\''.$file->getName().'\'',
+            $this->getColName('mime-type')=>'\''.$file->getMIMEType().'\''
         );
         $this->insert($arr);
     }
     /**
+     * Constructs a query that can be used to get the ID of the last added file.
      * @since 1.0
      */
     public function getLastFileID(){
@@ -114,7 +124,9 @@ class FileQuery extends MySQLQuery{
      */
     public function addOrUpdateFile($file){
         $array = array(
-            $this->getColName('file')=>$file->getPath()
+            $this->getColName('file')=>$file->getPath(),
+            $this->getColName('file-name')=>$file->getName(),
+            $this->getColName('mime-type')=>$file->getMIMEType()
         );
         $this->updateBlobFromFile($array, $file->getID());
     }

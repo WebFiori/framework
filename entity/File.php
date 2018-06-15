@@ -2,9 +2,15 @@
 /**
  * A class that represents a file.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.0
+ * @version 1.1
  */
 class File implements JsonI{
+    /**
+     * The size of the file in bytes.
+     * @var int
+     * @since 1.1 
+     */
+    private $fSize;
     /**
      * The full path to the file.
      * @var string 
@@ -50,7 +56,14 @@ class File implements JsonI{
     public function getPath(){
         return $this->path;
     }
-
+    public function setSize($size){
+        if($size >= 0){
+            $this->fSize = $size;
+        }
+    }
+    public function getSize() {
+        return $this->fSize;
+    }
     /**
      * Sets the name of the file (such as 'my-image.png')
      * @param string $name The name of the file.

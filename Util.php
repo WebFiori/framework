@@ -131,22 +131,27 @@ class Util{
         return $retVal;
     }
     /**
-     * Creates a new directory.
-     * The method first checks if the directory is exist or not. If it is exist, 
-     * it will return false. Else, it will create the directory and return true. If 
-     * an error has happened while creating the directory, the method will return false.
-     * @param string $dir a new directory (e.g. en/res/new-dir)
-     * @return boolean True if the directory is created. Else, it will return false.
+     * Checks if a given directory exists or not.
+     * @param string $dir A string in a form of directory (Such as 'root/home/res').
+     * @param boolean $createIfNot If set to <b>TRUE</b> and the given directory does 
+     * not exists, The function will try to create the directory.
+     * @return boolean In general, the function will return <b>FALSE</b> if the 
+     * given directory does not exists. The function will return <b>TRUE</b> only 
+     * in two cases, If the directory exits or it does not exists but was created.
      * @since 0.1
      */
-    public static function newDir($dir){
+    public static function isDirectory($dir,$createIfNot=false){
         if($dir){
             $dir = str_replace('\\', '/', $dir);
-            //echo 'Final Dir = "'.$dir.'"<br/>';
             if(!is_dir($dir)){
-                if(mkdir($dir, 0755 , true)){
-                    return TRUE;
+                if($createIfNot === TRUE){
+                    if(mkdir($dir, 0755 , true)){
+                        return TRUE;
+                    }
                 }
+            }
+            else{
+                return TRUE;
             }
         }
         return FALSE;

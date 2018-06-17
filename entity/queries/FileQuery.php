@@ -61,8 +61,8 @@ class FileQuery extends MySQLQuery{
         else{
             throw new Exception('Invalid file type: '.$storeType);
         }
-        
-        $this->structure->addColumn('file-name', new Column('mime', 'varchar', 255));
+        $this->getCol('file')->setIsNull(TRUE);
+        $this->structure->addColumn('file-name', new Column('f_name', 'varchar', 255));
         $this->getCol('file-name')->setDefault('File');
         $this->structure->addColumn('mime-type', new Column('mime', 'varchar', 250));
         $this->structure->addColumn('date-added', new Column('added_on', 'timestamp'));
@@ -114,7 +114,7 @@ class FileQuery extends MySQLQuery{
      * @since 1.0
      */
     public function getLastFileID(){
-        $this->selectMaxID();
+        $this->selectMax($this->getColName('file-id'), 'f_id');
     }
     /**
      * Adds new file or updates an already added file.
@@ -124,11 +124,9 @@ class FileQuery extends MySQLQuery{
      */
     public function addOrUpdateFile($file){
         $array = array(
-            $this->getColName('file')=>$file->getPath(),
-            $this->getColName('file-name')=>$file->getName(),
-            $this->getColName('mime-type')=>$file->getMIMEType()
+            $this->getColName('file')=>$file->getPath()
         );
-        $this->updateBlobFromFile($array, $file->getID());
+        $this->updateBlobFromFile($array, $file->getID(), $this->getColName('file-id'));
     }
     /**
      * Constructs a query that can be used to removes a file given its ID.

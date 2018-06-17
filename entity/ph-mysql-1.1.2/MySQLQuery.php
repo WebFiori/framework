@@ -418,7 +418,7 @@ abstract class MySQLQuery implements JsonI{
      * @param string $id  the ID of the record that will be updated.
      * @since 1.2
      */
-    public function updateBlobFromFile($arr,$id){
+    public function updateBlobFromFile($arr,$id,$idColName=self::ID_COL){
         $cols = '';
         $count = count($arr);
         $index = 0;
@@ -440,7 +440,7 @@ abstract class MySQLQuery implements JsonI{
             }
             $index++;
         }
-        $this->setQuery('update '.$this->getStructureName().' set '.$cols.' where '.self::ID_COL.' = '.$id, 'update');
+        $this->setQuery('update '.$this->getStructureName().' set '.$cols.' where '.$idColName.' = '.$id, 'update');
     }
     /**
      * Returns a JSON string that represents the query.

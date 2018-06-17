@@ -174,6 +174,26 @@ class JsonX {
         }
         return FALSE;
     }
+    private function stringAsBoolean($str){
+        $lower = strtolower($str);
+        $boolTypes = array(
+            't'=>TRUE,
+            'f'=>FALSE,
+            'yes'=>TRUE,
+            'no'=>FALSE,
+            'true'=>TRUE,
+            'false'=>FALSE,
+            'on'=>TRUE,
+            'off'=>FALSE,
+            'y'=>TRUE,
+            'n'=>FALSE,
+            'ok'=>TRUE
+        );
+        if(isset($boolTypes[$lower])){
+            return $boolTypes[$lower];
+        }
+        return 'INV';
+    }
     /**
      * Adds a boolean value (true or false) to the JSON data.
      * @param string $key The name of the key.
@@ -210,7 +230,7 @@ class JsonX {
      * @return boolean <b>FALSE</b> if the given key is invalid or the given value 
      * is not an array.
      */
-    public function addArray($key, $value,$asObject=false){
+    public function addArray($key, $value,$asObject=true){
         if(JsonX::isValidKey($key)){
             if(gettype($value) == 'array'){
                 $this->attributes[$key] = $this->arrayToJSONString($value,$asObject);
@@ -285,10 +305,22 @@ class JsonX {
                     }
                     else if($valueType == 'string'){
                         if($asObject === TRUE){
-                            $arr .= '"'.$keys[$x].'":"'.JsonX::escapeJSONSpecialChars($valueAtKey).'"'.$comma;
+                            $asBool = $this->stringAsBoolean($valueAtKey);
+                            if(gettype($asBool) == 'boolean'){
+                                $arr .= '"'.$keys[$x].'":"'. $asBool === TRUE ? 'true'.$comma : 'false'.$comma;
+                            }
+                            else{
+                                $arr .= '"'.$keys[$x].'":"'.JsonX::escapeJSONSpecialChars($valueAtKey).'"'.$comma;
+                            }
                         }
                         else{
-                            $arr .= '"'.JsonX::escapeJSONSpecialChars($valueAtKey).'"'.$comma;
+                            $asBool = $this->stringAsBoolean($valueAtKey);
+                            if(gettype($asBool) == 'boolean'){
+                                $arr .= $asBool === true ? 'true'.$comma : 'false'.$comma;
+                            }
+                            else{
+                                $arr .= '"'.JsonX::escapeJSONSpecialChars($valueAtKey).'"'.$comma;
+                            }
                         }
                     }
                     else if($valueType == 'boolean'){
@@ -323,7 +355,14 @@ class JsonX {
                         $arr .= '"'.$keys[$x].'":';
                         $type = gettype($valueAtKey);
                         if($type == 'string'){
-                            $arr .= '"'.self::escapeJSONSpecialChars($valueAtKey).'"'.$comma;
+                            $asBool = $this->stringAsBoolean($valueAtKey);
+                            if(gettype($asBool) == 'boolean'){
+                                $result = $asBool === TRUE ? 'true'.$comma : 'false'.$comma;
+                                $arr .= $result;
+                            }
+                            else{
+                                $arr .= '"'.self::escapeJSONSpecialChars($valueAtKey).'"'.$comma;
+                            }
                         }
                         else if($type == 'integer' || $type == 'double'){
                             $arr .= $valueAtKey.$comma;
@@ -387,12 +426,26 @@ class JsonX {
      */
     private static function isValidKey($key){
         $key_type = gettype($key);
-        return $key_type == 'string';
+        return $key_type == 'string' && strlen($key) != 0;
     }
     /**
      * Adds a new key to the JSON data with its value as string.
      * @param string $key The name of the key.
-     * @param string $val The value of the string.
+     * @param string $val The value of the string. Note that if the given string 
+     * is one of the following, it will be converted into boolean (case insensitive).
+     * <ul>
+     * <li>yes => <b>TRUE</b></li>
+     * <li>no => <b>FALSE</b></li>
+     * <li>y => <b>TRUE</b></li>
+     * <li>n => <b>FALSE</b></li>
+     * <li>t => <b>TRUE</b></li>
+     * <li>f => <b>FALSE</b></li>
+     * <li>true => <b>TRUE</b></li>
+     * <li>false => <b>FALSE</b></li>
+     * <li>on => <b>TRUE</b></li>
+     * <li>off => <b>FALSE</b></li>
+     * <li>ok => <b>TRUE</b></li>
+     * </ul>
      * @return boolean <b>TRUE</b> in case the string is added. If the given value 
      * is not a string or the given key is invalid, the method will return <b>FALSE</b>.
      * @since 1.0
@@ -400,6 +453,12 @@ class JsonX {
     public function addString($key, $val){
         if(JsonX::isValidKey($key)){
             if(gettype($val) == 'string'){
+                if($val != 'INV'){
+                    $boolVal = $this->stringAsBoolean($val);
+                    if($boolVal != 'INV'){
+                        return $this->addBoolean($key, $boolVal);
+                    }
+                }
                 $this->attributes[$key] = '"'. JsonX::escapeJSONSpecialChars($val).'"';
                 return TRUE;
             }

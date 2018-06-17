@@ -35,6 +35,7 @@ class FileFunctions extends Functions{
     const NO_SUCH_DIR = 'no_such_dir';
     const NOT_EXIST = 'not_exist';
     const NOT_ALLOWED = 'not_allowed_type';
+    const NO_SUCH_FILE = 'no_such_file';
     /**
      *
      * @var type 
@@ -102,6 +103,30 @@ class FileFunctions extends Functions{
         self::$instance = new FileFunctions();
         return self::$instance;
     }
+    public function getFileInfo($fileId) {
+        
+    }
+    /**
+     * 
+     * @param type $fileId
+     * @return File
+     */
+    public function getFile($fileId){
+        $this->useDatabase();
+        $this->fileQuery->getFile($fileId);
+        if($this->excQ($this->fileQuery)){
+            $row = $this->getRow();
+            if($row != NULL){
+                $file = new File();
+                $file->setRawData($row[$this->fileQuery->getColName('file')]);
+                $file->setMIMEType($row[$this->fileQuery->getColName('mime-type')]);
+                $file->setName($row[$this->fileQuery->getColName('file-name')]);
+                return $file;
+            }
+            return self::NO_SUCH_FILE;
+        }
+        return MySQLQuery::QUERY_ERR;
+    }
     /**
      * 
      * @param type $options
@@ -165,7 +190,6 @@ class FileFunctions extends Functions{
                         $fileObj->setID($fileId);
                         if($fileId != MySQLQuery::QUERY_ERR){
                             $this->fileQuery->addOrUpdateFile($fileObj);
-                            //Util::print_r($this->fileQuery->getQuery());
                             if($this->excQ($this->fileQuery)){
                                 $statusArr['files'][$k]['database-uploaded'] = 'true';
                             }

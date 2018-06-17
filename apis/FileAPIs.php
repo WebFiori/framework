@@ -79,6 +79,7 @@ class FileAPIs extends API{
         $this->addAction($a2);
         
         $a3 = new APIAction('get-file');
+        $a3->addRequestMethod('get');
         $a3->setDescription('Returns a downloadable version of the file from the database given its ID.');
         $a3->addParameter(new RequestParameter('file-id', 'integer'));
         $a3->getParameterByName('file-id')->setDescription('The ID of the file taken from the database.');
@@ -134,6 +135,19 @@ class FileAPIs extends API{
         $action = $this->getAction();
         if($action == 'upload-files'){
             $this->processUpload();
+        }
+        else if($action == 'get-file'){
+            $file = FileFunctions::get()->getFile($this->getInputs()['file-id']);
+            if($file instanceof File){
+                header('Content-Disposition: inline; filename="'.$file->getName().'"');
+                $this->send($file->getMIMEType(), $file->getRawData());
+            }
+            else if($file == FileFunctions::NO_SUCH_FILE){
+                $this->sendResponse('Not found', TRUE, 404);
+            }
+            else if($file == MySQLQuery::QUERY_ERR){
+                $this->databaseErr();
+            }
         }
     }
     

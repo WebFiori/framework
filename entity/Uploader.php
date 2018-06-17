@@ -11,6 +11,42 @@ class Uploader implements JsonI{
      * @since 1.1
      */
     const ALLOWED_FILE_TYPES = array(
+        '3gp'=>array(
+            'mime'=>'video/3gpp',
+            'ext'=>'3gp'
+        ),
+        'mp4'=>array(
+            'mime'=>'video/mp4',
+            'ext'=>'mp4'
+        ),
+        'mov'=>array(
+            'mime'=>'video/quicktime',
+            'ext'=>'mov'
+        ),
+        'wmv'=>array(
+            'mime'=>'video/x-ms-wmv',
+            'ext'=>'wmv'
+        ),
+        'flv'=>array(
+            'mime'=>'video/x-flv',
+            'ext'=>'flv'
+        ),
+        'zip'=>array(
+            'mime'=>'application/zip',
+            'ext'=>'zip'
+        ),
+        'php'=>array(
+            'mime'=>'text/plain',
+            'ext'=>'php'
+        ),
+        'avi'=>array(
+            'mime'=>'video/avi',
+            'ext'=>'avi'
+        ),
+        'mp3'=>array(
+            'mime'=>'audio/mpeg',
+            'ext'=>'mp3'
+        ),
         'xls'=>array(
             'mime'=>'application/vnd.ms-excel',
             'ext'=>'xls'
@@ -40,6 +76,7 @@ class Uploader implements JsonI{
             'ext'=>'jpeg'
         )
     );
+    private $baseUrl;
     private $files;
     /**
      * A constant to indicate that a file extension is not allowed to be uploaded.
@@ -63,33 +100,11 @@ class Uploader implements JsonI{
      * @since 1.0 
      */
     private $uploadStatusMessage;
-    /**
-     * The size of the uploaded file in bytes.
-     * @var int 
-     */
-    private $fSize;
-    /**
-     * The name of the uploaded file.
-     * @var string 
-     */
-    private $fName;
-    /**
-     * A code that indicates the status of the upload.
-     * @var int 
-     */
-    private $err;
-    /**
-     * Set to true if the file is already uploaded and want to replace.
-     * @var boolean  
-     * @since 1.0
-     * 
-     */
-    private $isReplace;
+
+    public function setBaseURL($url) {
+        $this->baseUrl = $url;
+    }
     public function __construct() {
-        $this->isReplace = false;
-        $this->err = 0;
-        $this->fSize = 0;
-        $this->fName = '';
         $this->uploadStatusMessage = 'NO ACTION';
     }
     /**
@@ -98,13 +113,6 @@ class Uploader implements JsonI{
      * @since 1.0
      */
     private $uploadDir;
-    /**
-     * The maximum file size allowed in Bytes.
-     * Remember that 1KB = 1000B
-     * @var int the size of file in Bytes. 
-     * @since 1.0
-     */
-    private $fileSize;
     /**
      * An array that contains all the allowed file types.
      * @var array An array of strings. 
@@ -119,33 +127,8 @@ class Uploader implements JsonI{
     public function setUploadDir($dir){
         $this->uploadDir = str_replace('/', '\\', $dir);
     }
-    /**
-     * Sets the maximum size of file in bytes.
-     * Remember that one KB = 1000 Bytes.
-     * @param type $limit The maximum file size.
-     * @since 1.0
-     */
-    public function setLimit($limit){
-        $size = filter_input(INPUT_REQUEST, 'MAX_FILE_SIZE');
-        if($size){
-            $this->fileSize = (int)$size;
-        }
-        else{
-            if($limit != null){
-                $this->fileSize = $limit;
-            }
-        }
-    }
     public function getFiles() {
         return $this->files;
-    }
-    /**
-     * Checks if the file is replaceable if it is exist.
-     * @return boolean <b>TRUE</b> if the file is replaceable.
-     * @since 1.0
-     */
-    public function isReplace(){
-        return $this->isReplace;
     }
 
     /**
@@ -176,14 +159,6 @@ class Uploader implements JsonI{
         return $this->uploadDir;
     }
     /**
-     * Returns the maximum allowed size for a file to upload.
-     * @return int Size of file.
-     * @since 1.0
-     */
-    public function getLimit(){
-        return $this->fileSize;
-    }
-    /**
      * Sets The name of the index at which the file is stored in the array $_FILES.
      * @param string $name The name of the index at which the file is stored in the array $_FILES.
      * The value of this property is usually equals to the HTML element that is used in 
@@ -201,37 +176,16 @@ class Uploader implements JsonI{
     public function getExts(){
         return $this->extentions;
     }
-    /**
-     * Returns the message that was generated after calling the function <b>upload()</b>.
-     * @return string The message that was generated after calling the function <b>upload()</b>.
-     * @since 1.0
-     */
-    public function getUploadMessage(){
-        return $this->uploadStatusMessage;
-    }
-    /**
-     * Returns the error code that was generated after calling the function <b>upload()</b>.
-     * @return string The error code that was generated after calling the function <b>upload()</b>.
-     * @since 1.0
-     */
-    public function getErrCode(){
-        return $this->err;
-    }
-    public function getFileName(){
-        return $this->fName;
-    }
-    public function getFileSize(){
-        return $this->fSize;
-    }
-    public function getMIMEType(){
-        return self::ALLOWED_FILE_TYPES[$this->getFileExt()]['mime'];
-    }
-    public function getFileExt(){
-        return strtolower(pathinfo($this->getFileName(), PATHINFO_EXTENSION));
+    public static function getMIMEType($ext){
+        $x = self::ALLOWED_FILE_TYPES[$ext];
+        if($x != NULL){
+            return $x['mime'];
+        }
+        return NULL;
     }
     private function isValidExt($fileName){
         $ext = pathinfo($fileName, PATHINFO_EXTENSION);
-        return in_array($ext, $this->getExts()) || in_array(strtolower($ext), $this->getExts());
+        return in_array($ext, $this->getExts(),TRUE) || in_array(strtolower($ext), $this->getExts(),TRUE);
     }
     private function isError($code){
         switch($code){
@@ -267,15 +221,6 @@ class Uploader implements JsonI{
         return TRUE;
     }
     /**
-     * Returns the location at which the file was uploaded to including file name.
-     * @return string The full path to the file.
-     * @since 1.1
-     */
-    public function getFilePath(){
-        $path = $this->getUploadDir().'\\'.$this->getFileName();      
-        return str_replace('\\', '/', $path);
-    }
-    /**
      * Upload the file to the server.
      * @param bolean $replaceIfExist If a file with the given name found 
      * and this attribute is set to true, the file will be replaced.
@@ -293,6 +238,62 @@ class Uploader implements JsonI{
             if($fileOrFiles != null){
                 if(gettype($fileOrFiles['name']) == 'array'){
                     //multi-upload
+                    $filesCount = count($fileOrFiles['name']);
+                    for($x = 0 ; $x < $filesCount ; $x++){
+                        $fileInfoArr = array();
+                        $fileInfoArr['name'] = $fileOrFiles['name'][$x];
+                        $fileInfoArr['size'] = $fileOrFiles['size'][$x];
+                        $fileInfoArr['upload-path'] = $this->getUploadDir();
+                        $fileInfoArr['upload-error'] = 0;
+                        $fileInfoArr['url'] = 'N/A';
+                        if(!$this->isError($fileOrFiles['error'][$x])){
+                            if($this->isValidExt($fileInfoArr['name'])){
+                                if(Util::isDirectory($this->getUploadDir()) == TRUE){
+                                    $targetDir = $this->getUploadDir().'\\'.$fileInfoArr['name'];
+                                    $targetDir = str_replace('\\', '/', $targetDir);
+                                    if(!file_exists($targetDir)){
+                                        $fileInfoArr['is-exist'] = 'NO';
+                                        $fileInfoArr['is-replace'] = 'NO';
+                                        if(move_uploaded_file($fileOrFiles["tmp_name"][$x], $targetDir)){
+                                            $fileInfoArr['uploaded'] = 'true';
+                                        }
+                                        else{
+                                            $fileInfoArr['uploaded'] = 'NO';
+                                        }
+                                    }
+                                    else{
+                                        $fileInfoArr['is-exist'] = 'true';
+                                        if($replaceIfExist){
+                                            $fileInfoArr['is-replace'] = 'true';
+                                            unlink($targetDir);
+                                            if(move_uploaded_file($fileOrFiles["tmp_name"][$x], $targetDir)){
+                                                $fileInfoArr['uploaded'] = 'true';
+                                            }
+                                            else{
+                                                $fileInfoArr['uploaded'] = 'false';
+                                            }
+                                        }
+                                        else{
+                                            $fileInfoArr['is-replace'] = 'false';
+                                        }
+                                    }
+                                }
+                                else{
+                                    $fileInfoArr['upload-error'] = FileFunctions::NO_SUCH_DIR;
+                                    $fileInfoArr['uploaded'] = 'false';
+                                }
+                            }
+                            else{
+                                $fileInfoArr['uploaded'] = 'false';
+                                $fileInfoArr['upload-error'] = FileFunctions::NOT_ALLOWED;
+                            }
+                        }
+                        else{
+                            $fileInfoArr['uploaded'] = 'false';
+                            $fileInfoArr['upload-error'] = $fileOrFiles['error'][$x];
+                        }
+                        array_push($this->files, $fileInfoArr);
+                    }
                 }
                 else{
                     //single file upload
@@ -301,50 +302,51 @@ class Uploader implements JsonI{
                     $fileInfoArr['size'] = $fileOrFiles['size'];
                     $fileInfoArr['upload-path'] = $this->getUploadDir();
                     $fileInfoArr['upload-error'] = 0;
+                    $fileInfoArr['url'] = 'N/A';
                     if(!$this->isError($fileOrFiles['error'])){
-                        if($this->isValidExt($fileOrFiles['name'])){
+                        if($this->isValidExt($fileInfoArr['name'])){
                             if(Util::isDirectory($this->getUploadDir()) == TRUE){
-                                $targetDir = $this->getUploadDir().'\\'.$this->getFileName();
+                                $targetDir = $this->getUploadDir().'\\'.$fileInfoArr['name'];
                                 $targetDir = str_replace('\\', '/', $targetDir);
                                 if(!file_exists($targetDir)){
-                                    $fileInfoArr['is-exist'] = 'NO';
-                                    $fileInfoArr['is-replace'] = 'NO';
+                                    $fileInfoArr['is-exist'] = 'false';
+                                    $fileInfoArr['is-replace'] = 'false';
                                     if(move_uploaded_file($fileOrFiles["tmp_name"], $targetDir)){
-                                        $fileInfoArr['uploaded'] = 'YES';
+                                        $fileInfoArr['uploaded'] = 'true';
                                     }
                                     else{
-                                        $fileInfoArr['uploaded'] = 'NO';
+                                        $fileInfoArr['uploaded'] = 'false';
                                     }
                                 }
                                 else{
-                                    $fileInfoArr['is-exist'] = 'YES';
+                                    $fileInfoArr['is-exist'] = 'true';
                                     if($replaceIfExist){
-                                        $fileInfoArr['is-replace'] = 'YES';
+                                        $fileInfoArr['is-replace'] = 'true';
                                         unlink($targetDir);
                                         if(move_uploaded_file($fileOrFiles["tmp_name"], $targetDir)){
-                                            $fileInfoArr['uploaded'] = 'YES';
+                                            $fileInfoArr['uploaded'] = 'true';
                                         }
                                         else{
-                                            $fileInfoArr['uploaded'] = 'NO';
+                                            $fileInfoArr['uploaded'] = 'false';
                                         }
                                     }
                                     else{
-                                        $fileInfoArr['is-replace'] = 'NO';
+                                        $fileInfoArr['is-replace'] = 'false';
                                     }
                                 }
                             }
                             else{
                                 $fileInfoArr['upload-error'] = FileFunctions::NO_SUCH_DIR;
-                                $fileInfoArr['uploaded'] = 'NO';
+                                $fileInfoArr['uploaded'] = 'false';
                             }
                         }
                         else{
-                            $fileInfoArr['uploaded'] = 'NO';
+                            $fileInfoArr['uploaded'] = 'false';
                             $fileInfoArr['upload-error'] = FileFunctions::NOT_ALLOWED;
                         }
                     }
                     else{
-                        $fileInfoArr['uploaded'] = 'NO';
+                        $fileInfoArr['uploaded'] = 'false';
                         $fileInfoArr['upload-error'] = $fileOrFiles['error'];
                     }
                     array_push($this->files, $fileInfoArr);
@@ -366,14 +368,7 @@ class Uploader implements JsonI{
      */
     public function toJSON(){
         $j = new JsonX();
-        $j->add('limit', ($this->getLimit()/1000).' KB"');
-        $j->add('file-size', ($this->getFileSize()/1000).' KB"');
         $j->add('upload-directory', $this->getUploadDir());
-        $j->add('file-name', $this->getFileName());
-        $j->add('associated-name', $this->getAssociatedName());
-        $j->add('file-path', $this->getFilePath());
-        $j->add('error-code', $this->getErrCode());
-        $j->add('upload-message', $this->getUploadMessage());
         $j->add('allowed-types', $this->getExts());
         return $j;
     }

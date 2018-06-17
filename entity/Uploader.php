@@ -254,7 +254,14 @@ class Uploader implements JsonI{
                                     if(!file_exists($targetDir)){
                                         $fileInfoArr['is-exist'] = 'NO';
                                         $fileInfoArr['is-replace'] = 'NO';
-                                        if(move_uploaded_file($fileOrFiles["tmp_name"][$x], $targetDir)){
+                                            if(move_uploaded_file($fileOrFiles["tmp_name"][$x], $targetDir)){
+                                                if(function_exists('mime_content_type')){
+                                                $fileInfoArr['mime'] = mime_content_type($fileInfoArr['upload-path']);
+                                            }
+                                            else{
+                                                $ext = pathinfo($fileInfoArr['name'], PATHINFO_EXTENSION);
+                                                $fileInfoArr['mime'] = self::getMIMEType($ext);
+                                            }
                                             $fileInfoArr['uploaded'] = 'true';
                                         }
                                         else{
@@ -262,9 +269,17 @@ class Uploader implements JsonI{
                                         }
                                     }
                                     else{
+                                        if(function_exists('mime_content_type')){
+                                            $fileInfoArr['mime'] = mime_content_type($fileInfoArr['upload-path']);
+                                        }
+                                        else{
+                                            $ext = pathinfo($fileInfoArr['name'], PATHINFO_EXTENSION);
+                                            $fileInfoArr['mime'] = self::getMIMEType($ext);
+                                        }
                                         $fileInfoArr['is-exist'] = 'true';
                                         if($replaceIfExist){
                                             $fileInfoArr['is-replace'] = 'true';
+                                            
                                             unlink($targetDir);
                                             if(move_uploaded_file($fileOrFiles["tmp_name"][$x], $targetDir)){
                                                 $fileInfoArr['uploaded'] = 'true';
@@ -303,6 +318,7 @@ class Uploader implements JsonI{
                     $fileInfoArr['upload-path'] = $this->getUploadDir();
                     $fileInfoArr['upload-error'] = 0;
                     $fileInfoArr['url'] = 'N/A';
+                    $fileInfoArr['mime'] = 'N/A';
                     if(!$this->isError($fileOrFiles['error'])){
                         if($this->isValidExt($fileInfoArr['name'])){
                             if(Util::isDirectory($this->getUploadDir()) == TRUE){
@@ -313,6 +329,13 @@ class Uploader implements JsonI{
                                     $fileInfoArr['is-replace'] = 'false';
                                     if(move_uploaded_file($fileOrFiles["tmp_name"], $targetDir)){
                                         $fileInfoArr['uploaded'] = 'true';
+                                        if(function_exists('mime_content_type')){
+                                            $fileInfoArr['mime'] = mime_content_type($fileInfoArr['upload-path']);
+                                        }
+                                        else{
+                                            $ext = pathinfo($fileInfoArr['name'], PATHINFO_EXTENSION);
+                                            $fileInfoArr['mime'] = self::getMIMEType($ext);
+                                        }
                                     }
                                     else{
                                         $fileInfoArr['uploaded'] = 'false';
@@ -320,6 +343,13 @@ class Uploader implements JsonI{
                                 }
                                 else{
                                     $fileInfoArr['is-exist'] = 'true';
+                                    if(function_exists('mime_content_type')){
+                                        $fileInfoArr['mime'] = mime_content_type($fileInfoArr['upload-path']);
+                                    }
+                                    else{
+                                        $ext = pathinfo($fileInfoArr['name'], PATHINFO_EXTENSION);
+                                        $fileInfoArr['mime'] = self::getMIMEType($ext);
+                                    }
                                     if($replaceIfExist){
                                         $fileInfoArr['is-replace'] = 'true';
                                         unlink($targetDir);

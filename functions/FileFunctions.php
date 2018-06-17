@@ -65,7 +65,7 @@ class FileFunctions extends Functions{
     public function addFileType($type) {
         foreach (Uploader::ALLOWED_FILE_TYPES as $k=>$v){
             if($k == $type){
-                array_push($this->uploadTypes, Uploader::ALLOWED_FILE_TYPES[$k]);
+                $this->uploadTypes[$type] = $v;
                 return TRUE;
             }
         }
@@ -102,30 +102,17 @@ class FileFunctions extends Functions{
         self::$instance = new FileFunctions();
         return self::$instance;
     }
-    public function extractFilesData($arrName){
-        $this->files = array();
-        $fileOrFiles = $_FILES[$arrName];
-        Util::print_r($fileOrFiles);
-        if(gettype($fileOrFiles['name']) == 'array'){
-            //multi-upload
-            echo 'multi-up';
-        }
-        else{
-            //single file upload
-            echo 'single-up';
-        }
-    }
     /**
      * 
      * @param type $options
      * @return type
      */
     public function upload($namesArr,$options=array(
-        'store-in-database'=>false,
-        'store-path'=>'',
-        'replace-if-exists'=>false,
-        'store-and-remove'=>false,
-        'create-path-if-not-exist'=>false
+        'upload-to-database'=>false,
+        'upload-path'=>'uploads',
+        'replace-in-path'=>false,
+        'upload-and-remove'=>false,
+        'create-path'=>false
     )){
         $statusArr = array();
         $statusArr['upload-options'] = $options;
@@ -135,31 +122,20 @@ class FileFunctions extends Functions{
         else{
             $statusArr['upload-types'] = $this->uploadTypes;
         }
+        $statusArr['names'] = array();
+        $replaceIfExists = isset($options['replace-in-path']) ? $options['replace-in-path'] === TRUE : FALSE;
+        if(isset($options['upload-path']) && strlen($options['upload-path']) != 0){
+            $path = ROOT_DIR.'\\'.$options['upload-path'];
+        }
+        else{
+            $path = ROOT_DIR.'\\'.'uploads';
+        }
+        if(isset($options['create-path']) && $options['create-path'] === TRUE){
+            Util::isDirectory($path, TRUE);
+        }
+        $index = 0;
         foreach ($namesArr as $val){
-            if(isset($options['store-path']) && strlen($options['store-path']) != 0){
-                $path = ROOT_DIR.'\\'.$options['store-path'];
-            }
-            else{
-                $path = ROOT_DIR.'\\'.'uploads';
-            }
-            if($path == ROOT_DIR.'\\'.'uploads'){
-                $isDir = Util::isDirectory($path, TRUE);
-            }
-            else{
-                if(isset($options['create-path-if-not-exist'])){
-                    $isDir = Util::isDirectory($path, $options['create-path-if-not-exist']);
-                }
-                else{
-                    if($path == ROOT_DIR.'\\'.'uploads'){
-                        $isDir = Util::isDirectory($path, TRUE);
-                    }
-                    else{
-                        $isDir = Util::isDirectory($path);
-                    }
-                }
-            }
-            
-            $replaceIfExists = isset($options['replace-if-exists']) ? $options['replace-if-exists'] === TRUE : FALSE;
+            array_push($statusArr['names'], $val);
             $uploader = new Uploader();
             $uploader->setAssociatedFileName($val);
             $uploader->setUploadDir($path);
@@ -167,7 +143,6 @@ class FileFunctions extends Functions{
                 $uploader->addExt($type);
             }
             $files = $uploader->upload($replaceIfExists);
-            $index = 0;
             foreach ($files as $file){
                 $statusArr['file-'.$index] = $file;
                 $index++;

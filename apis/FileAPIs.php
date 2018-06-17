@@ -41,15 +41,24 @@ class FileAPIs extends API{
         $a1->getParameterByName('upload-path')->setDescription('Optional Parameter. The path where the file will be uploaded to. '
                 . 'If no path is given, the default will be \'ROOT_DIR/uploads\'');
         $a1->getParameterByName('upload-path')->setDefault('uploads');
-        $a1->addParameter(new RequestParameter('replace-if-exists', 'boolean',TRUE));
-        $a1->getParameterByName('replace-if-exists')->setDescription('Optional Parameter. If the file was uploaded to a directory and there was a '
-                . 'file which has the same type and name and this parameter is set to true, the '
-                . 'file will be replaced. Default is false.');
-        $a1->getParameterByName('replace-if-exists')->setDefault(FALSE);
-        $a1->addParameter(new RequestParameter('store-in-database', 'boolean',TRUE));
-        $a1->getParameterByName('store-in-database')->setDescription('Optional Parameter. If set to '
+        $a1->addParameter(new RequestParameter('replace-in-path', 'boolean',TRUE));
+        $a1->getParameterByName('replace-in-path')->setDescription('Optional parameter. Used only in '
+                . 'case of the upload was to a path. If a file with the given name and type was found '
+                . 'in the upload path, the file will be replaced. Default is false.');
+        $a1->getParameterByName('replace-in-path')->setDefault('f');
+        $a1->addParameter(new RequestParameter('database-upload', 'boolean',TRUE));
+        $a1->getParameterByName('database-upload')->setDescription('Optional Parameter. If set to '
                 . 'true, The file will be stored in the database as blob. Default is false.');
-        $a1->getParameterByName('store-in-database')->setDefault(FALSE);
+        $a1->getParameterByName('database-upload')->setDefault('f');
+        $a1->addParameter(new RequestParameter('create-path', 'boolean',TRUE));
+        $a1->getParameterByName('create-path')->setDefault('f');
+        $a1->getParameterByName('create-path')->setDescription('Optional parameter. Used only in '
+                . 'case of the upload was to a path. If the given path does not exists in system files, it '
+                . 'will be created if this option is set to true. Default is false.');
+        $a1->addParameter(new RequestParameter('upload-and-remove', 'boolean', TRUE));
+        $a1->getParameterByName('upload-and-remove')->setDefault('f');
+        $a1->getParameterByName('upload-and-remove')->setDescription('Optional parameter. If the '
+                . 'set to true, the file will be removed from the path that it was uploaded to. Default is false.');
         $a1->addParameter(new RequestParameter('name', 'string'));
         $a1->getParameterByName('name')->setDescription('The name of the file (or array) that will contain uploaded file. '
                 . 'The value of this parameter is usually the value of the attribute \'name\' for the HTML input element '
@@ -76,11 +85,11 @@ class FileAPIs extends API{
         $this->addAction($a3);
         
         $this->uploadOptions = $options=array(
-            'store-in-database'=>false,
-            'store-path'=>'uploads',
-            'replace-if-exists'=>false,
-            'store-and-remove'=>false,
-            'create-path-if-not-exist'=>false
+            'database-upload'=>false,
+            'upload-path'=>'uploads',
+            'replace-in-path'=>false,
+            'upload-and-remove'=>false,
+            'create-path'=>false
         );
     }
     
@@ -88,9 +97,9 @@ class FileAPIs extends API{
         return $this->uploadOptions;
     }
     
-    public function setUploadOption($optionName,$val) {
+    private function setUploadOption($optionName,$val) {
         if(isset($this->uploadOptions[$optionName])){
-            $this->uploadOptions = $val;
+            $this->uploadOptions[$optionName] = $val;
             return TRUE;
         }
         return FALSE;
@@ -101,12 +110,19 @@ class FileAPIs extends API{
         $name = $i['name'];
         $namesArr = explode(',', trim($name, ','));
         FileFunctions::get()->addFileType('jpg');
+        $this->setUploadOption('replace-in-path', $i['replace-in-path']);
+        $this->setUploadOption('upload-path', $i['upload-path']);
+        $this->setUploadOption('create-path', $i['create-path']);
+        $this->setUploadOption('database-upload', $i['database-upload']);
+        $this->setUploadOption('upload-and-remove', $i['upload-and-remove']);
         $resultsArr = FileFunctions::get()->upload($namesArr, $this->getUploadOptions());
         if($resultsArr == FileFunctions::NO_TYPES){
             $this->sendResponse($resultsArr, TRUE, 404,'"details":"No file types where added to allowed upload types"');
         }
         else{
-            Util::print_r($resultsArr);
+            $jsonx = new JsonX();
+            $jsonx->add('response', $resultsArr);
+            $this->sendResponse('Upload Info', FALSE, 200, '"json-response":'.$jsonx);
         }
     }
     
@@ -120,7 +136,10 @@ class FileAPIs extends API{
             $this->processUpload();
         }
     }
-
+    
+    private function createJsonX($array) {
+        
+    }
 }
 $api = new FileAPIs();
 $api->process();

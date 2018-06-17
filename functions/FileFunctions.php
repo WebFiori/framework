@@ -123,6 +123,7 @@ class FileFunctions extends Functions{
             $statusArr['upload-types'] = $this->uploadTypes;
         }
         $statusArr['names'] = array();
+        $statusArr['files'] = array();
         $replaceIfExists = isset($options['replace-in-path']) ? $options['replace-in-path'] === TRUE : FALSE;
         if(isset($options['upload-path']) && strlen($options['upload-path']) != 0){
             $path = ROOT_DIR.'\\'.$options['upload-path'];
@@ -144,10 +145,65 @@ class FileFunctions extends Functions{
             }
             $files = $uploader->upload($replaceIfExists);
             foreach ($files as $file){
-                $statusArr['file-'.$index] = $file;
+                $statusArr['files']['file-'.$index] = $file;
                 $index++;
             }
         }
+        if(isset($options['database-upload']) && $options['database-upload'] === TRUE){
+            $this->useDatabase();
+            foreach ($statusArr['files'] as $k => $file){
+                if($file['uploaded'] == 'true'){
+                    $fileObj = new File();
+                    $fileObj->setName($file['name']);
+                    $fileObj->setMIMEType($file['mime']);
+                    $path = $file['upload-path'].'\\'.$file['name'];
+                    $fileObj->setPath($path);
+                    $this->fileQuery->addFileInfo($fileObj);
+                    if($this->excQ($this->fileQuery)){
+                        $fileId = $this->getLastAddedFileId();
+                        $statusArr['files'][$k]['id'] = $fileId;
+                        $fileObj->setID($fileId);
+                        if($fileId != MySQLQuery::QUERY_ERR){
+                            $this->fileQuery->addOrUpdateFile($fileObj);
+                            //Util::print_r($this->fileQuery->getQuery());
+                            if($this->excQ($this->fileQuery)){
+                                $statusArr['files'][$k]['database-uploaded'] = 'true';
+                            }
+                            else{
+                                $statusArr['files'][$k]['database-uploaded'] = MySQLQuery::QUERY_ERR;
+                            }
+                        }
+                        else{
+                            $statusArr['files'][$k]['database-uploaded'] = 'N/A';
+                        }
+                    }
+                    else{
+                        $statusArr['files'][$k]['database-uploaded'] = MySQLQuery::QUERY_ERR;
+                    }
+                }
+            }
+        }
+        if(isset($options['upload-and-remove']) && $options['upload-and-remove']){
+            foreach ($statusArr['files'] as $k => $file){
+                if($file['uploaded'] == 'true'){
+                    $dir = $file['upload-path'].'\\'.$file['name'];
+                    $result = unlink($dir);
+                    if($result === TRUE){
+                        $statusArr['files'][$k]['removed-from-path'] = 'true';
+                    }
+                    else{
+                        $statusArr['files'][$k]['removed-from-path'] = 'false';
+                    }
+                }
+            }
+        }
         return $statusArr;
+    }
+    public function getLastAddedFileId() {
+        $this->fileQuery->getLastFileID();
+        if($this->excQ($this->fileQuery)){
+            return intval($this->getRow()['f_id']);
+        }
+        return MySQLQuery::QUERY_ERR;
     }
 }

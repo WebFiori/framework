@@ -122,7 +122,7 @@ class FileAPIs extends API{
         else{
             $jsonx = new JsonX();
             $jsonx->add('response', $resultsArr);
-            $this->sendResponse('Upload Info', FALSE, 200, '"json-response":'.$jsonx);
+            $this->send('application/json', $jsonx);
         }
     }
     

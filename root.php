@@ -2,7 +2,11 @@
 mb_internal_encoding('UTF-8');
 mb_http_output('UTF-8');
 mb_http_input('UTF-8');
-mb_regex_encoding('UTF-8'); 
+mb_regex_encoding('UTF-8');
+/**
+ * Set memory limit to 2GB
+ */
+ini_set('memory_limit', '2048M');
 /**
  * See http://php.net/manual/en/timezones.php for supported time zones
  */
@@ -12,8 +16,10 @@ date_default_timezone_set('Asia/Riyadh');
  */
 define('ROOT_DIR',__DIR__);
 
-//fallback for older php versions that does not 
-//support the constant PHP_INT_MIN
+/**
+ * Fallback for older php versions that does not
+ * support the constant PHP_INT_MIN
+ */
 if(!defined('PHP_INT_MIN')){
     define('PHP_INT_MIN', ~PHP_INT_MAX);
 }
@@ -22,6 +28,9 @@ if(!defined('PHP_INT_MIN')){
  * A folder used to hold system resources (such as images).
  */
 define('RES_FOLDER','res');
+/**
+ * Load Auto-loader. It simply a file that loads classes as needed.
+ */
 require_once ROOT_DIR.'/entity/AutoLoader.php';
 Util::displayErrors();
 

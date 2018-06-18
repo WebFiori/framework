@@ -25,12 +25,37 @@
  */
 require_once '../root.php';
 /**
- * Description of FileAPIs
+ * A REST API that provides the basic file related operations. 
+ * The user can extend this API to add his own File Related APIs.
  *
- * @author Ibrahim
+ * @author Ibrahim <ibinshikh@hotmail.com>
+ * @version 1.0
  */
 class FileAPIs extends API{
+    /**
+     * An array of upload options
+     * @var array An associative array that contains upload options. 
+     * the array will have the following keys:
+     * <ul>
+     * <li><b>database-upload</b>: A boolean value. Set to <b>TRUE</b> if 
+     * the file will be stored in the database.</li>
+     * <li><b>upload-path</b>: A string. A directory that will contain file 
+     * uploads.</li>
+     * <li><b>replace-in-path</b>: A boolean value. If set to <b>TRUE</b> 
+     * and there was a file which has the same type and name in upload directory, 
+     * the file will be replaced.</li>
+     * <li><b>upload-and-remove</b>: A boolean value. If set to <b>TRUE</b>, 
+     * the file will be uploaded temporary to upload path and then removed. 
+     * It is good practice to set it to <b>TRUE</b> if the uploads will 
+     * be stored to database.</li>
+     * <li><b>create-path</b>: A boolean value. If set to <b>TRUE</b> and <b>upload-path</b> 
+     * does not exists, it will be created.</li>
+     * </ul> 
+     */
     private $uploadOptions;
+    /**
+     * Creates new instance.
+     */
     public function __construct() {
         parent::__construct('1.0.0');
         $this->setDescription('An API that is used to handel file upload operations.');
@@ -85,6 +110,13 @@ class FileAPIs extends API{
         $a3->getParameterByName('file-id')->setDescription('The ID of the file taken from the database.');
         $this->addAction($a3);
         
+        $a4 = new APIAction('get-file-info');
+        $a4->addRequestMethod('get');
+        $a4->setDescription('Returns file information from the database given its ID.');
+        $a4->addParameter(new RequestParameter('file-id', 'integer'));
+        $a4->getParameterByName('file-id')->setDescription('The ID of the file taken from the database.');
+        $this->addAction($a4);
+        
         $this->uploadOptions = $options=array(
             'database-upload'=>false,
             'upload-path'=>'uploads',
@@ -93,24 +125,68 @@ class FileAPIs extends API{
             'create-path'=>false
         );
     }
-    
+    /**
+     * Returns an associative array that contains upload options.
+     * @return array An associative array that contains upload options. 
+     * the array will have the following keys:
+     * <ul>
+     * <li><b>database-upload</b>: A boolean value. Set to <b>TRUE</b> if 
+     * the file will be stored in the database.</li>
+     * <li><b>upload-path</b>: A string. A directory that will contain file 
+     * uploads.</li>
+     * <li><b>replace-in-path</b>: A boolean value. If set to <b>TRUE</b> 
+     * and there was a file which has the same type and name in upload directory, 
+     * the file will be replaced.</li>
+     * <li><b>upload-and-remove</b>: A boolean value. If set to <b>TRUE</b>, 
+     * the file will be uploaded temporary to upload path and then removed. 
+     * It is good practice to set it to <b>TRUE</b> if the uploads will 
+     * be stored to database.</li>
+     * <li><b>create-path</b>: A boolean value. If set to <b>TRUE</b> and <b>upload-path</b> 
+     * does not exists, it will be created.</li>
+     * </ul>
+     */
     public function getUploadOptions() {
         return $this->uploadOptions;
     }
-    
-    private function setUploadOption($optionName,$val) {
+    /**
+     * Sets the value of an upload option.
+     * @param string $optionName The name of the option. The available options are: 
+     * <ul>
+     * <li><b>database-upload</b>: A boolean value. Set to <b>TRUE</b> if 
+     * the file will be stored in the database.</li>
+     * <li><b>upload-path</b>: A string. A directory that will contain file 
+     * uploads.</li>
+     * <li><b>replace-in-path</b>: A boolean value. If set to <b>TRUE</b> 
+     * and there was a file which has the same type and name in upload directory, 
+     * the file will be replaced.</li>
+     * <li><b>upload-and-remove</b>: A boolean value. If set to <b>TRUE</b>, 
+     * the file will be uploaded temporary to upload path and then removed. 
+     * It is good practice to set it to <b>TRUE</b> if the uploads will 
+     * be stored to database.</li>
+     * <li><b>create-path</b>: A boolean value. If set to <b>TRUE</b> and <b>upload-path</b> 
+     * does not exists, it will be created.</li>
+     * @param mixed $val The value of the option.
+     * @return boolean The function will return <b>TRUE</b> once the option 
+     * is updated.
+     * @since 1.0
+     */
+    public function setUploadOption($optionName,$val) {
         if(isset($this->uploadOptions[$optionName])){
             $this->uploadOptions[$optionName] = $val;
             return TRUE;
         }
         return FALSE;
     }
-    
-    private function processUpload(){
+    /**
+     * Process upload request.
+     * @since 1.0
+     */
+    public final function processUpload(){
         $i = $this->getInputs();
         $name = $i['name'];
         $namesArr = explode(',', trim($name, ','));
         FileFunctions::get()->addFileType('jpg');
+        FileFunctions::get()->addFileType('mp4');
         $this->setUploadOption('replace-in-path', $i['replace-in-path']);
         $this->setUploadOption('upload-path', $i['upload-path']);
         $this->setUploadOption('create-path', $i['create-path']);
@@ -126,33 +202,95 @@ class FileAPIs extends API{
             $this->send('application/json', $jsonx);
         }
     }
-    
+    /**
+     * This function must be overridden by sub classes to check 
+     * authorization.
+     * @return boolean The function should return <b>TRUE</b> if the 
+     * user is authorized to perform specific action. <b>FALSE</b> if not.
+     * @since 1.0
+     */
     public function isAuthorized() {
         return TRUE;
     }
-
+    /**
+     * Sends back file information as JSON if it is exists in the database given its ID. 
+     * This function must be called only if 
+     * the action is 'get-file-info'.
+     * @since 1.0 
+     */
+    public final function getFileInfo() {
+        $file = FileFunctions::get()->getFile($this->getInputs()['file-id']);
+        if($file instanceof File){
+            $this->send('application/json', $file);
+        }
+        else if($file == FileFunctions::NO_SUCH_FILE){
+            $this->sendResponse('Not found', TRUE, 404);
+        }
+        else if($file == MySQLQuery::QUERY_ERR){
+            $this->databaseErr();
+        }
+    }
+    /**
+     * Sends back the file if it is exists in the database given its ID. 
+     * This function must be called only if 
+     * the action is 'get-file'.
+     * @since 1.0 
+     */
+    public final function getFile() {
+        $file = FileFunctions::get()->getFile($this->getInputs()['file-id']);
+        if($file instanceof File){
+            header('Content-Disposition: inline; filename="'.$file->getName().'"');
+            $this->send($file->getMIMEType(), $file->getRawData());
+        }
+        else if($file == FileFunctions::NO_SUCH_FILE){
+            $this->sendResponse('Not found', TRUE, 404);
+        }
+        else if($file == MySQLQuery::QUERY_ERR){
+            $this->databaseErr();
+        }
+    }
+    /**
+     * Removes a file given its ID. This function must be called only if 
+     * the action is 'remove-file'.
+     * @since 1.0
+     */
+    public final function removeFile() {
+        $r = FileFunctions::get()->removeFile($this->getInputs()['file-id']);
+        if($r instanceof File){
+            $this->sendResponse('File Removed');
+        }
+        else if($r == FileFunctions::NO_SUCH_FILE){
+            $this->sendResponse('Not found', TRUE, 404);
+        }
+        else if($r == MySQLQuery::QUERY_ERR){
+            $this->databaseErr();
+        }
+    }
+    /**
+     * Process request. This function can only process the 
+     * following actions: 
+     * <ul>
+     * <li>upload-files</li>
+     * <li>get-file</li>
+     * <li>get-file-info</li>
+     * <li>remove-file</li>
+     * </ul>
+     * @since 1.0
+     */
     public function processRequest() {
         $action = $this->getAction();
         if($action == 'upload-files'){
             $this->processUpload();
         }
         else if($action == 'get-file'){
-            $file = FileFunctions::get()->getFile($this->getInputs()['file-id']);
-            if($file instanceof File){
-                header('Content-Disposition: inline; filename="'.$file->getName().'"');
-                $this->send($file->getMIMEType(), $file->getRawData());
-            }
-            else if($file == FileFunctions::NO_SUCH_FILE){
-                $this->sendResponse('Not found', TRUE, 404);
-            }
-            else if($file == MySQLQuery::QUERY_ERR){
-                $this->databaseErr();
-            }
+            $this->getFile();
         }
-    }
-    
-    private function createJsonX($array) {
-        
+        else if($action == 'remove-file'){
+            $this->removeFile();
+        }
+        else if($action == 'get-file-info'){
+            $this->getFileInfo();
+        }
     }
 }
 $api = new FileAPIs();

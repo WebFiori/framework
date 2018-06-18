@@ -27,7 +27,7 @@
 /**
  * A base class for file based operations. Files are stored as blobs.
  *
- * @author Ibrahim
+ * @author Ibrahim <ibinshikh@hotmail.com>
  * @version 1.1
  */
 class FileQuery extends MySQLQuery{
@@ -127,6 +127,15 @@ class FileQuery extends MySQLQuery{
             $this->getColName('file')=>$file->getPath()
         );
         $this->updateBlobFromFile($array, $file->getID(), $this->getColName('file-id'));
+    }
+    /**
+     * Constructs a query that can be used to get file size. 
+     * The result of the query will be stored in a column named <b>'file_size'</b>.
+     * @param int $fid The ID of the file.
+     * @since 1.1
+     */
+    public function fileSize($fid){
+        $this->setQuery('SELECT OCTET_LENGTH('.$this->getColName('file').') as file_size FROM new_empty.files where '.$this->getColName('file-id').' = '.$fid.';', 'select');
     }
     /**
      * Constructs a query that can be used to removes a file given its ID.

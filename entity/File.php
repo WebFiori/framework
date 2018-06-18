@@ -140,7 +140,13 @@ class File implements JsonI{
         $jsonX->add('mime', $this->getMIMEType());
         $jsonX->add('name', $this->getName());
         $jsonX->add('path', $this->getPath());
+        $jsonX->add('size-in-bytes', $this->getSize());
+        $jsonX->add('size-in-kbytes', $this->getSize()/8);
+        $jsonX->add('size-in-mbytes', $this->getSize()/1000000);
         return $jsonX;
+    }
+    public function __toString() {
+        return $this->toJSON().'';
     }
 }
 

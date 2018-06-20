@@ -392,7 +392,16 @@ class UserAPIs extends API{
     }
     public function isAuthorized() {
         if($this->getAction() !== 'add-user'){
-            return UserFunctions::get()->getMainSession()->validateToken();
+            if(Config::get()->getUserRegStatus() == 'O'){
+                return TRUE;
+            }
+            else if(Config::get()->getUserRegStatus() == 'AO'){
+                return SystemFunctions::get()->getMainSession()->validateToken() && 
+                       SystemFunctions::get()->getAccessLevel() == 0 ;
+            }
+            else{
+                return FALSE;
+            }
         }
         return TRUE;
     }

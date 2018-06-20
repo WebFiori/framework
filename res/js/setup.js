@@ -265,7 +265,7 @@ function siteInfoInputsChanged(){
 function updateSiteInfo(){
     var ajax = new AJAX({
         method:'post',
-        url:'apis/SysAPIs'
+        url:'apis/WebsiteAPIs'
     });
     var form = new FormData();
     form.append('action','update-site-info');

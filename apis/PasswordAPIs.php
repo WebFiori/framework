@@ -84,7 +84,13 @@ class PasswordAPIs extends API{
             $this->actionNotImpl();
         }
         else if($action == 'forgot-password'){
-            $this->actionNotImpl();
+            $r = PasswordFunctions::get()->passwordForgotten($this->getInputs()['email']);
+            if($r === MySQLQuery::QUERY_ERR){
+                $this->databaseErr();
+            }
+            else{
+                $this->sendResponse('Reset Request Created');
+            }
         }
     }
 

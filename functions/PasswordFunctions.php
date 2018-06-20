@@ -25,11 +25,18 @@
  */
 
 /**
- * Description of PasswordFunctions
+ * Password reset controller.
  *
- * @author Ibrahim
+ * @author Ibrahim <ibinshikh@hotmail.com>
+ * @version 1.0
  */
 class PasswordFunctions extends Functions{
+    /**
+     * An object that is used to construct password reset related queries.
+     * @var PasswordResetQuery
+     * @since 1.0 
+     */
+    private $resetQuery;
     private static $singleton;
     /**
      * 
@@ -43,8 +50,38 @@ class PasswordFunctions extends Functions{
         self::$singleton = new PasswordFunctions();
         return self::$singleton;
     }
+    
     public function __construct() {
         parent::__construct();
         parent::useDatabase();
+        $this->resetQuery = new PasswordResetQuery();
+    }
+    /**
+     * Request a password reset for a user given his email address.
+     * @param string $emailAddress The email address of the user.
+     * @return boolean | string The function will return <b>TRUE</b> if 
+     * a password reset request was created. If a database error happens, 
+     * the function will return <b>MySQLQuery::QUERY_ERR</b>. If 
+     * no user was found which has the given email address, the function will 
+     * return <b>UserFunctions::NO_SUCH_USER</b>.
+     * @since 1.0
+     */
+    public function passwordForgotten($emailAddress) {
+        $user = UserFunctions::get()->getUserByEmail($emailAddress);
+        if($user instanceof User){
+            $resetTok = hash('sha256', date(DATE_ISO8601).$user->getID().$user->getRegDate());
+            $user->setResetToken($resetTok);
+            $this->resetQuery->add($user);
+            if($this->excQ($this->resetQuery)){
+                MailFunctions::get()->sendPasswordChangeConfirm($user);
+                return TRUE;
+            }
+            else{
+                return MySQLQuery::QUERY_ERR;
+            }
+        }
+        else{
+            return UserFunctions::NO_SUCH_USER;
+        }
     }
 }

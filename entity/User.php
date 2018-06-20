@@ -26,7 +26,7 @@ define('ACCESS_LEVEL_5',5);
 /**
  * A class that represents a system user.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.5
+ * @version 1.6
  */
 class User implements JsonI{
     /**
@@ -39,6 +39,30 @@ class User implements JsonI{
         'A'=>'Active',
         'S'=>'Suspended'
     );
+    /**
+     * The number of times the user has requested a password reset.
+     * @var int
+     * @since 1.6 
+     */
+    private $resetPassCounts;
+    /**
+     * The reset token that is used to reset user's password
+     * @var string
+     * @since 1.6 
+     */
+    private $resetTok;
+    /**
+     * The time and date at which user password was last reseed.
+     * @var string
+     * @since 1.6 
+     */
+    private $lastPasswordReseted;
+    /**
+     * The time and date at which the user has requested password reset
+     * @var string 
+     * @since 1.6
+     */
+    private $resetRequestTime;
     /**
      * A code for the user status.
      * @var string
@@ -114,6 +138,8 @@ class User implements JsonI{
         $this->email = $email;
         $this->password = $password;
         $this->userName = $username;
+        $this->resetPassCounts = 0;
+        $this->id = 0;
         $this->setAccessLevel(ACCESS_LEVEL_2);
     }
     /**
@@ -131,6 +157,80 @@ class User implements JsonI{
      */
     public function getRegDate(){
         return $this->regDate;
+    }
+    /**
+     * Returns a string that represents the time at which the user has 
+     * request password reset.
+     * @return string|NULL A string that represents the time at which the user has 
+     * request password reset. If not set, the function will return <b>NULL</b>
+     * @since 1.6
+     */
+    public function getResetRequestTime() {
+        return $this->resetRequestTime;
+    }
+    /**
+     * Sets the time at which the user has requested password reset.
+     * @param string $time The time at which the user has requested password reset.
+     * @since 1.6
+     */
+    public function setResetRequestTime($time) {
+        $this->resetRequestTime = $time;
+    }
+    /**
+     * Returns the date at which user password was reseted.
+     * @return string|NULL the date at which user password was reseted. 
+     * If not set, the function will return <b>NULL</b>.
+     * @since 1.6
+     */
+    public function getLastPasswordResetDate() {
+        return $this->lastPasswordReseted;
+    }
+    /**
+     * Sets the date at which user password was reseted.
+     * @param string $date The date at which user password was reseted.
+     * @since 1.6
+     */
+    public function setLastPasswordResetDate($date) {
+        $this->lastPasswordReseted = $date;
+    }
+    /**
+     * Returns password reset token.
+     * @return string|NULL Password reset token. If not set, 
+     * the function will return <b>NULL</b>.
+     * @since 1.6
+     */
+    public function getResetToken() {
+        return $this->resetTok;
+    }
+    /**
+     * Sets password reset token.
+     * @param string $tok Password reset token.
+     * @since 1.6
+     */
+    public function setResetToken($tok) {
+        $this->resetTok = $tok;
+    }
+    /**
+     * Returns the number of times the user has requested that his password 
+     * to be reseted.
+     * @return int The number of times the user has requested that his password 
+     * to be reseted.
+     * @since 1.6
+     */
+    public function getResetCount() {
+        return $this->resetPassCounts;
+    }
+    /**
+     * Sets the number of times the user has requested that his password 
+     * to be reseted.
+     * @param int $times The number of times the user has requested that his password 
+     * to be reseted.
+     * @since 1.6
+     */
+    public function setResetCount($times) {
+        if(gettype($times) == 'integer'){
+            $this->resetPassCounts = $times;
+        }
     }
     /**
      * Sets the value of the property <b>$lastLogin</b>.
@@ -175,11 +275,14 @@ class User implements JsonI{
     }
     /**
      * Sets the display name of the user.
-     * @param string $name Display name.
+     * @param string $name Display name. It will be set only if it was a string 
+     * with length that is greater than 0 (Not empty string).
      * @since 1.2
      */
     public function setDisplayName($name){
-        $this->dispName = $name;
+        if(gettype($name) == 'string' && strlen($name) != 0){
+            $this->dispName = $name;
+        }
     }
 
     /**
@@ -192,7 +295,8 @@ class User implements JsonI{
     }
     /**
      * Returns the value of the property <b>$userTok</b>
-     * @return string User access token.
+     * @return string|NULL User access token. If not set, the function 
+     * will return <b>NULL</b>.
      * @since 1.1
      */
     public function getToken(){
@@ -200,7 +304,7 @@ class User implements JsonI{
     }
     /**
      * Returns the value of the property <b>$accessLevel</b>
-     * @return int 0 or 1 or 2.
+     * @return int 0 or 1 or 2 etc...
      * @since 1.0
      */
     public function getAccessLevel(){
@@ -208,7 +312,9 @@ class User implements JsonI{
     }
     /**
      * Returns status code.
-     * @return string The status code of the user (such as 'A').
+     * @return string|NULL The status code of the user (such as 'A'). 
+     * If user status is not set, the function will return <b>NULL</b>.
+     * @see User::setStatus($status)
      * @since 1.5
      */
     public function getStatusCode(){
@@ -230,11 +336,17 @@ class User implements JsonI{
         $json->add('last-login', $this->getLastLogin());
         $json->add('display-name', $this->getDisplayName());
         $json->add('token', $this->getToken());
+        $json->add('reset-count', $this->getResetCount());
+        $json->add('reset-time', $this->getResetRequestTime());
+        $json->add('reset-token', $this->getResetToken());
+        $json->add('last-reset-time', $this->getLastPasswordResetDate());
         return $json;
     }
     /**
      * Returns the status of the user.
-     * @return string The status of the user.
+     * @return string|NULL The status of the user. 
+     * If user status is not set, the function will return <b>NULL</b>.
+     * @see User::setStatus($status)
      * @since 1.3
      */
     public function getStatus(){
@@ -341,20 +453,11 @@ class User implements JsonI{
         return $this->email;
     }
     /**
-     * Returns a string representation of the user.
+     * Returns a JSON string representation of the user.
      * @return string
      * @since 1.0
      */
     public function __toString() {
-        $retVal = 'Username: '.$this->getUserName().'<br/>';
-        $retVal .= 'Password: '.$this->getPassword().'<br/>';
-        $retVal .= 'Email: '.$this->getEmail().'<br/>';
-        $retVal .= 'Access Level: '.$this->getAccessLevel().'<br/>';
-        $retVal .= 'Registration Date: '.$this->getRegDate().'<br/>';
-        $retVal .= 'Last Login: '.$this->getLastLogin().'<br/>';
-        $retVal .= 'User ID: '.$this->getID().'<br/>';
-        $retVal .= 'Token: '.$this->getToken().'<br/>';
-        $retVal .= 'Activation Token: '.$this->getActivationTok().'<br/>';
-        return $retVal;
+        return $this->toJSON();
     }
 }

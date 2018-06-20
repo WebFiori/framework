@@ -23,7 +23,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
+require_once '../root.php';
 /**
  * Description of PasswordAPIs
  *
@@ -95,3 +95,5 @@ class PasswordAPIs extends API{
     }
 
 }
+$a = new PasswordAPIs();
+$a->process();

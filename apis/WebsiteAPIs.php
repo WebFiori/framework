@@ -40,38 +40,21 @@ class WebsiteAPIs extends API{
         $this->addAction($a1, TRUE);
         
         $a2 = new APIAction();
-        $a2->setName('update-title-sep');
+        $a2->setName('update-site-info');
+        $a2->setDescription('Updates general website information.');
         $a2->addRequestMethod('post');
-        $a2->addParameter(new RequestParameter('sep', 'string'));
+        $a2->addParameter(new RequestParameter('site-name', 'string',TRUE));
+        $a2->addParameter(new RequestParameter('site-description', 'string',TRUE));
+        $a2->addParameter(new RequestParameter('title-sep', 'string', TRUE));
+        $a2->addParameter(new RequestParameter('home-page', 'string',TRUE));
+        $a2->addParameter(new RequestParameter('site-theme', 'string',TRUE));
         $this->addAction($a2, TRUE);
         
         $a3 = new APIAction();
-        $a3->setName('update-home-page');
-        $a3->addRequestMethod('post');
-        $a3->addParameter(new RequestParameter('home-page', 'string'));
-        $this->addAction($a3, TRUE);
+        $a3->setName('get-website-info');
+        $a3->addRequestMethod('get');
+        $this->addAction($a3);
         
-        $a4 = new APIAction();
-        $a4->setName('update-copyright-notice');
-        $a4->addRequestMethod('post');
-        $a4->addParameter(new RequestParameter('notice', 'string'));
-        $this->addAction($a3, TRUE);
-        
-        $a5 = new APIAction();
-        $a5->setName('update-website-description');
-        $a5->addRequestMethod('post');
-        $a5->addParameter(new RequestParameter('description', 'string'));
-        $this->addAction($a5, TRUE);
-        
-        $a6 = new APIAction();
-        $a6->setName('get-website-info');
-        $a6->addRequestMethod('get');
-        $this->addAction($a6);
-        
-        $a7 = new APIAction();
-        $a7->setName('get-website-session-info');
-        $a7->addRequestMethod('get');
-        $this->addAction($a7);
     }
     public function isAuthorized() {
         return WebsiteFunctions::get()->getAccessLevel() == 0;
@@ -81,32 +64,35 @@ class WebsiteAPIs extends API{
         $action = $this->getAction();
         if($action == 'get-website-info'){
             $j = new JsonX();
-            $j->add('website-name', SiteConfig::get()->getWebsiteName());
-            $j->add('base-url', SiteConfig::get()->getBaseURL());
-            $j->add('description', SiteConfig::get()->getDesc());
-            $j->add('copyright-notice', SiteConfig::get()->getCopyright());
-            $j->add('home-page', SiteConfig::get()->getHomePage());
-            $j->add('title-sep', SiteConfig::get()->getTitleSep());
-            $this->sendResponse('Website Information', FALSE, 200, '"info":'.$j);
+            $j->addArray('website', WebsiteFunctions::get()->getSiteConfigVars());
+            $this->send('application/json', $j);
         }
-        else if($action == 'update-website-description'){
-            $this->actionNotImpl();
+        else if($action == 'update-site-info'){
+            $this->updateSiteInfo();
         }
-        else if($action == 'update-copyright-notice'){
-            $this->actionNotImpl();
+    }
+    /**
+     * A function that is used to update website related info.
+     * @since 1.0
+     */
+    private function updateSiteInfo() {
+        $i = $this->getInputs();
+        $cfgArr = array(
+            'website-name'=>$i['site-name'],
+            'description'=>$i['site-description']
+        );
+        if(isset($i['title-sep'])){
+            $cfgArr['title-separator'] = $i['title-sep'];
         }
-        else if($action == 'update-home-page'){
-            $this->actionNotImpl();
+        if(isset($i['home-page'])){
+            $cfgArr['home-page'] = $i['home-page'];
         }
-        else if($action == 'update-title-sep'){
-            $this->actionNotImpl();
+        if(isset($i['site-theme'])){
+            $cfgArr['theme-name'] = $i['site-theme'];
         }
-        else if($action == 'update-website-name'){
-            $this->actionNotImpl();
-        }
-        else if($action == 'get-website-session-info'){
-            $this->sendResponse('Main Session Info', FALSE, 200, '"session":'.Page::get()->getSession()->toJSON());
-        }
+        SystemFunctions::get()->updateSiteInfo($cfgArr);
+        $this->sendResponse('Site info updated.');
+            
     }
 
 }

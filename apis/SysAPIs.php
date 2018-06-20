@@ -36,11 +36,7 @@ class SysAPIs extends API{
         parent::__construct();
         $this->setVersion('1.0.1');
         $this->setDescription('System and system configuratin APIs.');
-        $a1 = new APIAction();
-        $a1->addRequestMethod('GET');
-        $a1->setName('get-site-info');
-        $this->addAction($a1,TRUE);
-        
+
         $a3 = new APIAction();
         $a3->addRequestMethod('GET');
         $a3->setName('get-sys-info');
@@ -73,17 +69,6 @@ class SysAPIs extends API{
         $a7->addParameter(new RequestParameter('email', 'email'));
         $this->addAction($a7);
         
-        $a8 = new APIAction();
-        $a8->setName('update-site-info');
-        $a8->setDescription('Updates general website information.');
-        $a8->addRequestMethod('post');
-        $a8->addParameter(new RequestParameter('site-name', 'string'));
-        $a8->addParameter(new RequestParameter('site-description', 'string'));
-        $a8->addParameter(new RequestParameter('title-sep', 'string', TRUE));
-        $a8->addParameter(new RequestParameter('home-page', 'string',TRUE));
-        $a8->addParameter(new RequestParameter('site-theme', 'string',TRUE));
-        $this->addAction($a8, TRUE);
-        
         $this->setVersion('1.1.0');
         $a9 = new APIAction('update-send-email-account');
         $a9->setDescription('Updates the email account (SMTP Account) that is used to send system messages.');
@@ -104,7 +89,6 @@ class SysAPIs extends API{
         $a10->setDescription('Gets all the themes in the directory \'publish/themes\'.');
         $a10->addRequestMethod('get');
         $this->addAction($a10, TRUE);
-        
         $a11 = new APIAction('update-notifications-email');
         $a11->setDescription('Updates the email address that is used to send notifications to '
                 . 'about system events.');
@@ -128,7 +112,7 @@ class SysAPIs extends API{
         if($action == 'get-sys-info'){
             $json = new JsonX();
             $json->add('system-info', SystemFunctions::get()->getConfigVars());
-            $this->sendResponse('Software Information', FALSE, 200, '"info":'.$json);
+            $this->send('application/json', $json);
         }
         else if($action == 'update-notifications-email'){
             $this->actionNotImpl();
@@ -148,18 +132,10 @@ class SysAPIs extends API{
                 $json->add('theme-'.$index, $themeJson);
                 $index++;
             }
-            $this->sendResponse('All Themes', FALSE, 200, '"response":'.$json);
-        }
-        else if($action == 'get-site-info'){
-            $json = new JsonX();
-            $json->add('site-info', SystemFunctions::get()->getSiteConfigVars());
-            $this->sendResponse('Website Information', FALSE, 200, '"info":'.$json);
+            $this->send('application/json', $json);
         }
         else if($action == 'get-main-session'){
-            $this->sendResponse('Main Session Info', FALSE, 200, '"session":'.SystemFunctions::get()->getMainSession()->toJSON());
-        }
-        else if($action == 'update-site-info'){
-            $this->updateSiteInfo();
+            $this->send('application/json', SystemFunctions::get()->getMainSession()->toJSON());
         }
         else if($action == 'create-first-account'){
             $i = $this->getInputs();
@@ -229,29 +205,7 @@ class SysAPIs extends API{
             $this->sendResponse($r, TRUE, 404, '"details":"The given server address or port are invalid."');
         }
     }
-    /**
-     * A function that is used to update website related info.
-     * @since 1.0
-     */
-    private function updateSiteInfo() {
-        $i = $this->getInputs();
-        $cfgArr = array(
-            'website-name'=>$i['site-name'],
-            'description'=>$i['site-description']
-        );
-        if(isset($i['title-sep'])){
-            $cfgArr['title-separator'] = $i['title-sep'];
-        }
-        if(isset($i['home-page'])){
-            $cfgArr['home-page'] = $i['home-page'];
-        }
-        if(isset($i['site-theme'])){
-            $cfgArr['theme-name'] = $i['site-theme'];
-        }
-        SystemFunctions::get()->updateSiteInfo($cfgArr);
-        $this->sendResponse('Site info updated.');
-            
-    }
+    
     /**
      * A function that is called to update database attributes
      * @since 1.0
@@ -273,7 +227,7 @@ class SysAPIs extends API{
     
     public function isAuthorized() {
         $a = $this->getAction();
-        if($a == 'update-database-attributes' || 'update-site-info' || 'update-send-email-account'){
+        if($a == 'update-database-attributes'|| 'update-send-email-account'){
             if(class_exists('Config')){
                 if(class_exists('SiteConfig')){
                     return !Config::get()->isConfig() || 

@@ -27,7 +27,7 @@
  * A class for the functions that is related to mailing.
  *
  * @author Ibrahim
- * @version 1.2
+ * @version 1.3
  */
 class MailFunctions extends Functions{
     /**
@@ -113,15 +113,17 @@ class MailFunctions extends Functions{
         $fh->addTab();
         $fh->reduceTab();
         //adding email accounts
+        $index=0;
         foreach ($emailAccountsArr as $emailAcc){
-            $fh->write('$acc1 = new EmailAccount();
-        $acc1->setServerAddress(\''.$emailAcc->getServerAddress().'\');
-        $acc1->setAddress(\''.$emailAcc->getAddress().'\');
-        $acc1->setUsername(\''.$emailAcc->getUsername().'\');
-        $acc1->setPassword(\''.$emailAcc->getPassword().'\');
-        $acc1->setName(\''.$emailAcc->getName().'\');
-        $acc1->setPort('.$emailAcc->getPort().');
-        $this->addAccount($acc1, \'no-replay\');',TRUE,TRUE);
+            $fh->write('$acc'.$index.' = new EmailAccount();
+        $acc'.$index.'->setServerAddress(\''.$emailAcc->getServerAddress().'\');
+        $acc'.$index.'->setAddress(\''.$emailAcc->getAddress().'\');
+        $acc'.$index.'->setUsername(\''.$emailAcc->getUsername().'\');
+        $acc'.$index.'->setPassword(\''.$emailAcc->getPassword().'\');
+        $acc'.$index.'->setName(\''.$emailAcc->getName().'\');
+        $acc'.$index.'->setPort('.$emailAcc->getPort().');
+        $this->addAccount($acc'.$index.', \'no-replay\');',TRUE,TRUE);
+            $index++;
         }
         $fh->write('}', TRUE, TRUE);
         $fh->reduceTab();
@@ -173,6 +175,26 @@ class MailFunctions extends Functions{
             $mailer->setSubject('Password Reset By Admin');
             $msg = '<p>Dear,</p>';
             $msg .= '<p>We would like to inform you that system adminstrator has reset your account password.<p>';
+            $msg .= '<p>Thank you for your time.</p>';
+            $msg .= '<p><b>'.$noReplayAcc->getName().'</b></p>';
+            $mailer->write($msg,TRUE);
+        }
+    }
+    /**
+     * 
+     * @param User $user
+     * @since 1.3
+     */
+    public function sendPasswordChangeConfirm($user) {
+        $noReplayAcc = MailConfig::get()->getAccount('no-replay');
+        if($noReplayAcc instanceof EmailAccount){
+            $mailer = $this->getSocketMailer($noReplayAcc);
+            $mailer->addReceiver($user->getUserName(), $user->getEmail());
+            $mailer->setSubject('Password Reset');
+            $msg = '<p>Dear,</p>';
+            $msg .= '<p>We would like to inform you that you have requested to reset your account\'s password.<p>';
+            $msg .= '<p>In order to complete the reset process, please click on <a href="'.SiteConfig::get()->getBaseURL().'pages/reset-password?token='.$user->getResetToken().'" target="_blank">this link</a> and update your password.<p>'
+                    . '<p>If you did not request a password reset, please inform us as soon as possible.</p>';
             $msg .= '<p>Thank you for your time.</p>';
             $msg .= '<p><b>'.$noReplayAcc->getName().'</b></p>';
             $mailer->write($msg,TRUE);

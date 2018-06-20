@@ -3,7 +3,7 @@
  * A class that can be used to constructs different queries that is related to 
  * user.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.5
+ * @version 1.6
  */
 class UserQuery extends MySQLQuery{
     /**
@@ -51,6 +51,39 @@ class UserQuery extends MySQLQuery{
         //last login column
         $this->structure->addColumn('last-login', new Column('last_login', 'timestamp'));
         $this->structure->getCol('last-login')->autoUpdate();
+        
+        //a column to count number of times pasword reset was requested
+        $this->structure->addColumn('reset-pass-count', new Column('reset_pass_requests', 'int', 2));
+        $this->structure->getCol('reset-pass-count')->setDefault(0);
+        $this->structure->getCol('reset-pass-count')->setIsNull(TRUE);
+        //last time password was resetted.
+        $this->structure->addColumn('last-password-reset', new Column('last_pass_reset', 'datetime'));
+        $this->structure->getCol('last-password-reset')->setIsNull(TRUE);
+    }
+    /**
+     * Constructs a query that can be used to update the number 
+     * of times the user has reseted his password.
+     * @param int $userId The ID of the user.
+     * @param int $newCount Te new number.
+     * @since 1.6
+     */
+    public function updateResetsCount($userId,$newCount) {
+        $arr = array(
+            $this->getColName('reset-pass-count')=>$newCount
+        );
+        $this->update($arr, $userId, $this->getColName('id'));
+    }
+    /**
+     * Constructs a query that can be used to update the last time 
+     * user password was reseted.
+     * @param int $userId The ID of the user.
+     * @since 1.6
+     */
+    public function updateLastPassResetTime($userId) {
+        $arr = array(
+            $this->getColName('last-password-reset')=>'\''.date('Y-m-d h:i:s').'\''
+        );
+        $this->update($arr, $userId);
     }
     /**
      * Returns the table that is linked with query operations.

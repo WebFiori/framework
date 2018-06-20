@@ -44,7 +44,7 @@ if($GLOBALS['SYS_STATUS'] !== TRUE){
         $GLOBALS['SYS_STATUS'] = Util::checkSystemStatus();
     }
     if(gettype($GLOBALS['SYS_STATUS']) == 'string' && $GLOBALS['SYS_STATUS'] == Util::MISSING_SITE_CONF_FILE){
-        SystemFunctions::get()->createSiteConfigFile();
+        WebsiteFunctions::get()->createSiteConfigFile();
         $GLOBALS['SYS_STATUS'] = Util::checkSystemStatus();
     }
     if(gettype($GLOBALS['SYS_STATUS']) == 'string' && $GLOBALS['SYS_STATUS'] == Util::NEED_CONF && !defined('SETUP_MODE')){

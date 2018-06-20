@@ -45,19 +45,31 @@ Object.defineProperties(APIS,{
     UserAPIs:{
         value:{},
         enumerable:true
+    },
+    FileAPIs:{
+        value:{},
+        enumerable:true
+    },
+    SysAPIs:{
+        value:{},
+        enumerable:true
+    },
+    NumsAPIs:{
+        value:{},
+        enumerable:true
+    },
+    PasswordAPIs:{
+        value:{},
+        enumerable:true
+    },
+    WebsiteAPIs:{
+        value:{},
+        enumerable:true
     }
 });
 Object.defineProperties(APIS.AuthAPI,{
     link:{
         value: APIS.base+'/AuthAPI',
-        enumerable:true
-    },
-    name:{
-        value:'Authentication API',
-        enumerable:true
-    },
-    description:{
-        value:'An API that is used to login and logout users off the system.',
         enumerable:true
     }
 });
@@ -65,14 +77,35 @@ Object.defineProperties(APIS.UserAPIs,{
     link:{
         value: APIS.base+'/UserAPIs',
         enumerable:true
-    },
-    name:{
-        value:'User APIs',
-        enumerable:true
-    },
-    description:{
-        value:'An API that is used to perform actions related to system users.',
+    }
+});
+Object.defineProperties(APIS.FileAPIs,{
+    link:{
+        value: APIS.base+'/FileAPIs',
         enumerable:true
     }
 });
-
+Object.defineProperties(APIS.NumsAPIs,{
+    link:{
+        value: APIS.base+'/NumsAPIs',
+        enumerable:true
+    }
+});
+Object.defineProperties(APIS.PasswordAPIs,{
+    link:{
+        value: APIS.base+'/PasswordAPIs',
+        enumerable:true
+    }
+});
+Object.defineProperties(APIS.SysAPIs,{
+    link:{
+        value: APIS.base+'/SysAPIs',
+        enumerable:true
+    }
+});
+Object.defineProperties(APIS.WebsiteAPIs,{
+    link:{
+        value: APIS.base+'/WebsiteAPIs',
+        enumerable:true
+    }
+});

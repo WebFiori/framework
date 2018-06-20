@@ -95,6 +95,7 @@ class AdminFunctions extends Functions{
         $schema->add('UserQuery');
         $schema->add('ActivationQuery');
         $schema->add('FileQuery');
+        $schema->add('PasswordResetQuery');
         //creating any random query object just to execute create
         //tables statements.
         $q = new UserQuery();
@@ -149,9 +150,6 @@ class AdminFunctions extends Functions{
      */
     private function createSuperAdminAccount($user){
         if($user instanceof User){
-            $user->setDisplayName('System Admin');
-            $user->setAccessLevel(0);
-            $user->setStatus('A');
             $users = $this->getSuperAdminAccounts();
             if(gettype($users) == 'array'){
                 foreach ($users as $Tuser){
@@ -160,6 +158,9 @@ class AdminFunctions extends Functions{
                 if(strlen($user->getEmail()) != 0){
                     if(strlen($user->getUserName()) != 0){
                         if(strlen($user->getPassword()) != 0){
+                            $user->setDisplayName('System Admin');
+                            $user->setAccessLevel(0);
+                            $user->setStatus('A');
                             $this->query->addUser($user);
                             if($this->excQ($this->query)){
                                 MailFunctions::get()->sendFirstMail($user);

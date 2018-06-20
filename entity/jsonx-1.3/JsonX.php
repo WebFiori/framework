@@ -432,7 +432,7 @@ class JsonX {
      * Adds a new key to the JSON data with its value as string.
      * @param string $key The name of the key.
      * @param string $val The value of the string. Note that if the given string 
-     * is one of the following, it will be converted into boolean (case insensitive).
+     * is one of the following and the parameter <b>$toBool</b> is set to <b>TRUE</b>, it will be converted into boolean (case insensitive).
      * <ul>
      * <li>yes => <b>TRUE</b></li>
      * <li>no => <b>FALSE</b></li>
@@ -446,17 +446,21 @@ class JsonX {
      * <li>off => <b>FALSE</b></li>
      * <li>ok => <b>TRUE</b></li>
      * </ul>
+     * @param boolean $toBool If set to <b>TRUE</b> and the string represents a boolean 
+     * value, then the string will be added as a boolean.
      * @return boolean <b>TRUE</b> in case the string is added. If the given value 
      * is not a string or the given key is invalid, the method will return <b>FALSE</b>.
      * @since 1.0
      */
-    public function addString($key, $val){
+    public function addString($key, $val,$toBool=false){
         if(JsonX::isValidKey($key)){
             if(gettype($val) == 'string'){
-                if($val != 'INV'){
-                    $boolVal = $this->stringAsBoolean($val);
-                    if($boolVal != 'INV'){
-                        return $this->addBoolean($key, $boolVal);
+                if($toBool === TRUE){
+                    if($val != 'INV'){
+                        $boolVal = $this->stringAsBoolean($val);
+                        if($boolVal != 'INV'){
+                            return $this->addBoolean($key, $boolVal);
+                        }
                     }
                 }
                 $this->attributes[$key] = '"'. JsonX::escapeJSONSpecialChars($val).'"';

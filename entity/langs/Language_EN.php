@@ -29,6 +29,11 @@ $Language = new Language('ltr', 'en', array(
     'pages/activate-account/actions',
     'pages/activate-account/errors',
     'pages/activate-account/status',
+    'pages/new-password/labels',
+    'pages/new-password/placeholders',
+    'pages/new-password/actions',
+    'pages/new-password/errors',
+    'pages/new-password/status',
     'email/'
 ));
 $Language->set('general', 'wait', 'Please wait a moment...');
@@ -208,6 +213,8 @@ $Language->setMultiple('pages/login', array(
     'title'=>'Login',
     'description'=>'Login to the system.'
 ));
+
+
 $Language->setMultiple('pages/activate-account', array(
     'title'=>'Account Activation',
     'description'=>'A page to activate user account.'
@@ -228,6 +235,33 @@ $Language->setMultiple('pages/activate-account/actions', array(
 ));
 $Language->setMultiple('pages/activate-account/errors', array(
     'inncorect-token'=>'Inncorrect Activation token!'
+));
+
+$Language->setMultiple('pages/new-password', array(
+    'title'=>'Create New Password',
+    'description'=>'A page to create new password.'
+));
+$Language->setMultiple('pages/new-password/labels', array(
+    'main'=>'Creating New Password',
+    'email'=>'Email Address:',
+    'password'=>'New Password:',
+    'conf-pass'=>'Confirm Password:',
+));
+$Language->setMultiple('pages/new-password/status', array(
+    'reseting'=>'Updating your password. Please wait a moment...',
+    'reseted'=>'Your account password was updated successfully.'
+));
+$Language->setMultiple('pages/new-password/placeholders', array(
+    'email'=>'Type in your email address here.',
+    'password'=>'Type in your new password here.',
+    'conf-pass'=>'Type in the same new password here.',
+));
+$Language->setMultiple('pages/new-password/actions', array(
+    'reset'=>'Reset Password'
+));
+$Language->setMultiple('pages/new-password/errors', array(
+    'password-missmatch'=>'The given two passwords do not match.',
+    'inv-email'=>'The given email address is invalid.',
 ));
 /**
  * A language file that represents English language.

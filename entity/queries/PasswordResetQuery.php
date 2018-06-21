@@ -42,10 +42,20 @@ class PasswordResetQuery extends MySQLQuery{
         $this->structure = new Table('pass_reset');
         $this->structure->addColumn('user-id', new Column('user_id', 'int', 11));
         $this->structure->getCol('user-id')->setIsPrimary(TRUE);
-        $this->structure->addColumn('password-reset-token', new Column('pass_reset_tok', 'varchar', 64));
-        $this->structure->getCol('password-reset-token')->setIsNull(TRUE);
+        $this->structure->addColumn('reset-token', new Column('pass_reset_tok', 'varchar', 64));
+        $this->structure->getCol('reset-token')->setIsUnique(TRUE);
+        $this->structure->getCol('reset-token')->setIsNull(TRUE);
         $this->structure->addColumn('request-time', new Column('date', 'timestamp'));
         $this->structure->getCol('request-time')->setDefault('');
+    }
+    /**
+     * Constructs a query that can be used to remove a record 
+     * using password reset token.
+     * @param string $token Password reset token.
+     * @since 1.0
+     */
+    public function removeByToken($token) {
+        $this->delete('\''.$token.'\'', $this->getColName('reset-token'));
     }
     /**
      * Constructs a query that is used to insert new record in the 
@@ -56,7 +66,7 @@ class PasswordResetQuery extends MySQLQuery{
     public function add($user) {
         $arr = array(
             $this->getColName('user-id')=>$user->getID(),
-            $this->getColName('password-reset-token')=>'\''.$user->getResetToken().'\''
+            $this->getColName('reset-token')=>'\''.$user->getResetToken().'\''
         );
         $this->insert($arr);
     }
@@ -67,6 +77,14 @@ class PasswordResetQuery extends MySQLQuery{
      */
     public function get($userId) {
         $this->selectByColVal($this->getColName('user-id'), $userId);
+    }
+    /**
+     * 
+     * @param type $token
+     * @since 1.0
+     */
+    public function getByResetToken($token) {
+        $this->selectByColVal($this->getColName('reset-token'),'\''.$token.'\'');
     }
     /**
      * Constructs a query that can be used to remove user reset record.

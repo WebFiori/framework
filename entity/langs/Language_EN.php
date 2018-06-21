@@ -248,8 +248,8 @@ $Language->setMultiple('pages/new-password/labels', array(
     'conf-pass'=>'Confirm Password:',
 ));
 $Language->setMultiple('pages/new-password/status', array(
-    'reseting'=>'Updating your password. Please wait a moment...',
-    'reseted'=>'Your account password was updated successfully.'
+    'resetting'=>'Updating your password. Please wait a moment...',
+    'resetted'=>'Your account password was updated successfully.'
 ));
 $Language->setMultiple('pages/new-password/placeholders', array(
     'email'=>'Type in your email address here.',

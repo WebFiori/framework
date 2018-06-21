@@ -56,15 +56,18 @@ function createPage($tok=null){
     $page->getDocument()->getHeadNode()->addJs('res/js/reset.js');
     
     $lang = $page->getLanguage();
-    $page->insertNode(createSubmitForm($tok,$lang), 'main-content-area');
+    $page->insertNode(createSubmitForm($lang), 'main-content-area');
     $jsonx = new JsonX();
     $jsonx->add('disconnected', $lang->get('general/disconnected'));
-    $jsonx->add('activating', $lang->get('pages/new-password/status/resetting'));
-    $jsonx->add('activated', $lang->get('pages/new-password/status/resetted'));
+    $jsonx->add('resetting', $lang->get('pages/new-password/status/resetting'));
+    $jsonx->add('resetted', $lang->get('pages/new-password/status/resetted'));
+    $jsonx->add('password-missmatch', $lang->get('pages/new-password/errors/password-missmatch'));
+    $jsonx->add('inv-email', $lang->get('pages/new-password/errors/inv-email'));
     $jsonx->add('server-err', $lang->get('general/server-err'));
     $js = new JsCode();
     $js->addCode('window.onload = function(){'
             . 'window.messages = '.$jsonx.';'
+            . 'window.token = \''.$tok.'\';'
             . 'document.getElementById(\'email-input\').oninput = resetPassInputChanged;'
             . 'document.getElementById(\'password-input\').oninput = resetPassInputChanged;'
             . 'document.getElementById(\'conf-pass-input\').oninput = resetPassInputChanged;'
@@ -73,7 +76,7 @@ function createPage($tok=null){
     echo $page->getDocument();
 }
 
-function createSubmitForm($tok=null , $lang=NULL){
+function createSubmitForm($lang=NULL){
     $form = new HTMLNode('form');
     $form->setID('login-form');
     $form->setAttribute('method', 'post');
@@ -94,7 +97,7 @@ function createSubmitForm($tok=null , $lang=NULL){
     $passDiv->setClassName('pa-row');
     $passDiv->addChild(new Label($lang->get('pages/new-password/labels/password')));
     $passDiv->addChild(new Br());
-    $passDiv->addChild(new Input('email'));
+    $passDiv->addChild(new Input('password'));
     $passDiv->children()->get(2)->setID('password-input');
     $passDiv->children()->get(2)->setAttribute('required');
     $passDiv->children()->get(2)->setAttribute('placeholder',$lang->get('pages/reset-passwor/placeholders/password'));
@@ -103,7 +106,7 @@ function createSubmitForm($tok=null , $lang=NULL){
     $confPassDiv->setClassName('pa-row');
     $confPassDiv->addChild(new Label($lang->get('pages/new-password/labels/conf-pass')));
     $confPassDiv->addChild(new Br());
-    $confPassDiv->addChild(new Input('email'));
+    $confPassDiv->addChild(new Input('password'));
     $confPassDiv->children()->get(2)->setID('conf-pass-input');
     $confPassDiv->children()->get(2)->setAttribute('required');
     $confPassDiv->children()->get(2)->setAttribute('placeholder',$lang->get('pages/reset-passwor/placeholders/conf-pass'));
@@ -126,6 +129,7 @@ function createSubmitForm($tok=null , $lang=NULL){
     $form->addChild($emailDiv);
     $form->addChild($passDiv);
     $form->addChild($confPassDiv);
+    $form->addChild($messageDiv);
     $form->addChild($submitDiv);
     $formLabeldiv->addChild(new Label($lang->get('pages/new-password/title')));
     return $form; 

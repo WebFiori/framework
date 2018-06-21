@@ -23,8 +23,66 @@
  */
 
 function resetPassInputChanged(){
-    
+    var messageDisplay = document.getElementById('message');
+    var email = document.getElementById('email-input').value;
+    if(email !== ''){
+        var pass = document.getElementById('password-input').value;
+        if(pass !== ''){
+            var confPass = document.getElementById('conf-pass-input').value;
+            if(pass === confPass){
+                messageDisplay.innerHTML = '';
+                document.getElementById('submit-button').removeAttribute('disabled');
+                if(window['request-parameters'] !== undefined){
+                    window['request-parameters'] = {
+                        email:email,
+                        'new-password':pass,
+                        'conf-pass':confPass
+                    };
+                }
+                else{
+                    window['request-parameters'] = {
+                        email:email,
+                        'new-password':pass,
+                        'conf-pass':confPass,
+                        token:window.token,
+                        callbacks:{
+                            onsuccess:[function(){
+                                document.getElementById('submit-button').removeAttribute('disabled');
+                                messageDisplay.innerHTML = '<b style="color:green">'+window.messages['resetted']+'</b>';
+                            }],
+                            onclienterr:[function(){
+                                if(this.jsonResponse['message'] === 'The following parameter(s) has invalid values: \'email\'.'){
+                                    messageDisplay.innerHTML = window.messages['inv-email'];
+                                }
+                                else{
+                                    messageDisplay.innerHTML = this.jsonResponse['message'];
+                                }
+                                document.getElementById('submit-button').removeAttribute('disabled');
+                            }],
+                            onservererr:[function(){
+                                messageDisplay.innerHTML = window.messages['server-err'];
+                                document.getElementById('submit-button').removeAttribute('disabled');
+                            }],
+                            ondisconnected:[function(){
+                                messageDisplay.innerHTML = window.messages['disconnected'];
+                                document.getElementById('submit-button').removeAttribute('disabled');
+                            }]
+                        }
+                    };
+                    return;
+                }
+            }
+            else{
+                messageDisplay.innerHTML = window.messages['password-missmatch'];
+            }
+        }
+    }
+    document.getElementById('submit-button').setAttribute('disabled','');
 }
 function resetPass(){
+    var messageDisplay = document.getElementById('message');
+    messageDisplay.innerHTML = window.messages['resetting'];
+    document.getElementById('submit-button').setAttribute('disabled','');
+    resetPassword(window['request-parameters']);
     return false;
 }

@@ -43,6 +43,8 @@ class PasswordAPIs extends API{
         $a2->addParameter(new RequestParameter('new-password', 'string'));
         $a2->addParameter(new RequestParameter('conf-new-password', 'string'));
         $a2->addParameter(new RequestParameter('reset-token', 'string'));
+        $a2->addParameter(new RequestParameter('email', 'email'));
+        $this->addAction($a2);
         
         $a3 = new APIAction();
         $a3->addRequestMethod('POST');
@@ -93,7 +95,8 @@ class PasswordAPIs extends API{
             }
         }
     }
-
+    
+    
 }
 $a = new PasswordAPIs();
 $a->process();

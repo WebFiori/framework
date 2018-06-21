@@ -32,11 +32,22 @@
  */
 class PasswordFunctions extends Functions{
     /**
+     * Expiry time for a password reset token in minutes.
+     * @var int
+     * @since 1.0
+     */
+    const TOKEN_VALIDTY_TIME = 1440;
+    /**
      * An object that is used to construct password reset related queries.
      * @var PasswordResetQuery
      * @since 1.0 
      */
     private $resetQuery;
+    /**
+     *
+     * @var PasswordFunctions
+     * @since 1.0 
+     */
     private static $singleton;
     /**
      * 
@@ -83,5 +94,40 @@ class PasswordFunctions extends Functions{
         else{
             return UserFunctions::NO_SUCH_USER;
         }
+    }
+    /**
+     * Checks if password reset token is valid or not.
+     * @param string $token Password reset token.
+     * @return boolean|string If the given token is valid, the function will return 
+     * <b>TRUE</b>. A token is considered as valid if the time at which the token 
+     * was created subtracted from current time 
+     * is not greater than <b>PasswordFunctions::TOKEN_VALIDTY_TIME</b>. If a 
+     * database error has occurred, the function will return 
+     * <b>MySQLQuery::QUERY_ERR</b>.
+     * @since 1.0
+     */
+    public function validateResetToken($token) {
+        $this->resetQuery->getByResetToken($token);
+        if($this->excQ($this->resetQuery)){
+            $row = $this->getRow();
+            if($row != NULL){
+                $tokDate = strtotime($row[$this->resetQuery->getColName('request-time')]);
+                $now = time();
+                $passedMinutes = ($now - $tokDate)/60;
+                if($passedMinutes > self::TOKEN_VALIDTY_TIME){
+                    $this->resetQuery->removeByToken($token);
+                    if($this->excQ($this->resetQuery)){
+                        return FALSE;
+                    }
+                    else{
+                        return MySQLQuery::QUERY_ERR;
+                    }
+                }
+                else{
+                    return TRUE;
+                }
+            }
+        }
+        return FALSE;
     }
 }

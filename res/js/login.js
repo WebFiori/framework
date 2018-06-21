@@ -162,7 +162,8 @@ function login(loginParams={
 }
 /**
  * Sends AJAX request to the server for creating a password reset request.
- * @param {type} params
+ * @param {Object} params params An object that holds request parameters. 
+ * The structure of the object is as follows:
  * <pre>
  * {<br/>
  * &nbsp;&nbsp;email:''<br/>
@@ -249,5 +250,133 @@ function forgotPassword(params={
             }
         }
         ajax.send();
+    }
+}
+/**
+ * Sends AJAX request to the server for resetting user password.
+ * @param {Object} params An object that holds request parameters. 
+ * The structure of the object is as follows:
+ * <pre>
+ * {<br/>
+ * &nbsp;&nbsp;email:''<br/>
+ * &nbsp;&nbsp;token:''<br/>
+ * &nbsp;&nbsp;'new-password':''<br/>
+ * &nbsp;&nbsp;'conf-pass':''<br/>
+ * &nbsp;&nbsp;callbacks:{<br/>
+ * &nbsp;&nbsp;&nbsp;&nbsp;onsuccess:[]<br/>
+ * &nbsp;&nbsp;&nbsp;&nbsp;onclienterr:[]<br/>
+ * &nbsp;&nbsp;&nbsp;&nbsp;onservererr:[]<br/>
+ * &nbsp;&nbsp;&nbsp;&nbsp;ondisconnected:[]<br/>
+ * &nbsp;&nbsp;}<br/>
+ * }
+ * </pre>
+ * The parameters description:
+ * <ul>
+ * <li><b>email</b>: The email address of the user.</li>
+ * <li><b>token</b>: Reset token. Usually sent to the user using 
+ * his email address.</li>
+ * <li><b>new-password</b>: The new password.</li>
+ * <li><b>conf-pass</b>: Same new password.</li>
+ * </ul>
+ * In addition to the given parameters, the object can have an optional 
+ * attributes (an object) for calling back functions for specific events. the attribute 
+ * name is <b>callbacks</b>. The object will have the following arrays of callbacks: 
+ * <ul>
+ * <li><b>onsucess</b>: An array that contains functions to call in case 
+ * of successful login.</li>
+ * <li><b>onclienterr</b>: An array that contains functions to call in case 
+ * of 4xx error.</li>
+ * <li><b>onservererr</b>: An array that contains functions to call in case 
+ * of 5xx error.</li>
+ * <li><b>ondisconnected</b>: An array that contains functions to call in case 
+ * of no internet access is available.</li>
+ * </ul>
+ * @see AJAX.js
+ * @returns {undefined}
+ */
+function resetPassword(params={
+    email:'',
+    token:'',
+    'new-password':'',
+    'conf-pass':'',
+    callbacks:{
+        onsucess:[],
+        onclienterr:[],
+        onservererr:[],
+        ondisconnected:[]
+    }
+}){
+    if(typeof params === 'object'){
+        if(params.email !== undefined && params.email !== null && params.email.length !== 0){
+            if(params.token !== undefined && params.token !== null && params.token.length !== 0){
+                if(params['new-password'] !== undefined && params['new-password'] !== null && params['new-password'].length !== 0){
+                    if(params['conf-pass'] !== undefined && params['conf-pass'] !== null && params['conf-pass'].length !== 0){
+                        var ajax = new AJAX({
+                            method:'post',
+                            url:APIS.PasswordAPIs.link
+                        });
+                        var reqParams = 'action=reset-password&email='+encodeURIComponent(params.email)+
+                                '&reset-token='+encodeURIComponent(params.token)+
+                                '&new-password='+encodeURIComponent(params['new-password'])+
+                                '&conf-new-password='+encodeURIComponent(params['conf-pass']);
+                        ajax.setParams(reqParams);
+                        if(typeof params['callbacks'] === 'object'){
+                            var calls = params['callbacks'];
+                            if(Array.isArray(calls['onsucess'])){
+                                for(var x = 0 ; x < calls['onsucess'].length ; x++){
+                                    var call = calls['onsucess'][x];
+                                    if(typeof call === 'function'){
+                                        ajax.setOnSuccess(call);
+                                    }
+                                }
+                            }
+
+                            if(Array.isArray(calls['onclienterr'])){
+                                for(var x = 0 ; x < calls['onclienterr'].length ; x++){
+                                    var call = calls['onclienterr'][x];
+                                    if(typeof call === 'function'){
+                                        ajax.setOnClientError(call);
+                                    }
+                                }
+                            }
+
+                            if(Array.isArray(calls['onservererr'])){
+                                for(var x = 0 ; x < calls['onservererr'].length ; x++){
+                                    var call = calls['onservererr'][x];
+                                    if(typeof call === 'function'){
+                                        ajax.setOnServerError(call);
+                                    }
+                                }
+                            }
+
+                            if(Array.isArray(calls['ondisconnected'])){
+                                for(var x = 0 ; x < calls['ondisconnected'].length ; x++){
+                                    var call = calls['ondisconnected'][x];
+                                    if(typeof call === 'function'){
+                                        ajax.setOnDisconnected(call);
+                                    }
+                                }
+                            }
+                        }
+                        ajax.send();
+                    }
+                    else{
+                        console.error('The parameter \'params[\'conf-pass\']\' is undefined, null or empty string.');
+                    }
+                }
+                else{
+                    console.error('The parameter \'params[\'new-password\']\' is undefined, null or empty string.');
+                }
+            }
+            else{
+                console.error('The parameter \'params.token\' is undefined, null or empty string.');
+            }
+        }
+        else{
+            console.error('The parameter \'params.email\' is undefined, null or empty string.');
+        }
+    }
+    else{
+        console.error('The given parameter is not an object.');
     }
 }

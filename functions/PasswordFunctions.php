@@ -38,11 +38,29 @@ class PasswordFunctions extends Functions{
      */
     const TOKEN_VALIDTY_TIME = 1440;
     /**
+     * A constant that indicates a reset token is invalid.
+     * @var string 
+     * @since 1.0
+     */
+    const INV_TOKEN = 'inv_token';
+    /**
+     * A constant that indicates a reset token is not found.
+     * @var string 
+     * @since 1.0
+     */
+    const NO_SUCH_TOKEN = 'no_such_token';
+    /**
      * An object that is used to construct password reset related queries.
      * @var PasswordResetQuery
      * @since 1.0 
      */
     private $resetQuery;
+    /**
+     *
+     * @var UserQuery 
+     * @since 1.0
+     */
+    private $userQuery;
     /**
      *
      * @var PasswordFunctions
@@ -66,6 +84,7 @@ class PasswordFunctions extends Functions{
         parent::__construct();
         parent::useDatabase();
         $this->resetQuery = new PasswordResetQuery();
+        $this->userQuery = new UserQuery();
     }
     /**
      * Request a password reset for a user given his email address.
@@ -80,6 +99,11 @@ class PasswordFunctions extends Functions{
     public function passwordForgotten($emailAddress) {
         $user = UserFunctions::get()->getUserByEmail($emailAddress);
         if($user instanceof User){
+            
+            //used to remove a token 
+            //if already exists
+            $this->validateResetToken($this->getResetToken($user->getID()));
+            
             $resetTok = hash('sha256', date(DATE_ISO8601).$user->getID().$user->getRegDate());
             $user->setResetToken($resetTok);
             $this->resetQuery->add($user);
@@ -94,6 +118,70 @@ class PasswordFunctions extends Functions{
         else{
             return UserFunctions::NO_SUCH_USER;
         }
+    }
+    /**
+     * Reset user password given his email address and reset token.
+     * @param string $email The email address of the user.
+     * @param string $token Password reset token.
+     * @param string $newPass The new user password.
+     * @return boolean|string The function will return <b>TRUE</b> once the 
+     * user password is changed. If a database error happens, 
+     * the function will return <b>MySQLQuery::QUERY_ERR</b>. If the given token 
+     * is invalid or the user has no reset token or the user 
+     * does not exits, the function will return <b>PasswordFunctions::INV_TOKEN</b>.
+     * @since 1.0
+     */
+    public function resetPassword($email,$token,$newPass) {
+        if($this->validateResetToken($token) === TRUE){
+            $user = UserFunctions::get()->getUserByEmail($email);
+            if($user instanceof User){
+                $resetToken = $this->getResetToken($user->getID());
+                if($resetToken == MySQLQuery::QUERY_ERR || $resetToken == PasswordFunctions::INV_TOKEN){
+                    return $resetToken;
+                }
+                else{
+                    if($resetToken == $token){
+                        $this->userQuery->updatePassword(hash(Authenticator::HASH_ALGO_NAME, $newPass), $user->getID());
+                        if($this->excQ($this->userQuery)){
+                            $this->resetQuery->removeByToken($token);
+                            if($this->excQ($this->resetQuery)){
+                                $count = $user->getResetCount();
+                                $this->userQuery->updateLastPassResetTime($user->getID(), ++$count);
+                                if($this->excQ($this->userQuery)){
+                                    MailFunctions::get()->notifyOfPasswordChange($user);
+                                    return TRUE;
+                                }
+                            }
+                        }
+                        return MySQLQuery::QUERY_ERR;
+                    }
+                    else{
+                        return PasswordFunctions::INV_TOKEN;
+                    }
+                }
+            }
+        }
+        return self::INV_TOKEN;
+    }
+    /**
+     * Returns password reset token given his ID.
+     * @param int $userId The ID of the user.
+     * @return string The user reset token if found. If the given user 
+     * does not have a reset token, the function will return 
+     * <b>PasswordFunctions::INV_TOKEN</b>. If a database error 
+     * occur, the function will return <b>MySQLQuery::QUERY_ERR</b>.
+     * @since 1.0
+     */
+    private function getResetToken($userId) {
+        $this->resetQuery->get($userId);
+        if($this->excQ($this->resetQuery)){
+            $row = $this->getRow();
+            if($row != NULL){
+                return $row[$this->resetQuery->getColName('reset-token')];
+            }
+            return PasswordFunctions::INV_TOKEN;
+        }
+        return MySQLQuery::QUERY_ERR;
     }
     /**
      * Checks if password reset token is valid or not.

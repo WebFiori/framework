@@ -29,9 +29,10 @@ if(!defined('PHP_INT_MIN')){
  */
 define('RES_FOLDER','res');
 /**
- * Load Auto-loader. It simply a file that loads classes as needed.
+ * Initialize autoloader.
  */
 require_once ROOT_DIR.'/entity/AutoLoader.php';
+AutoLoader::get();
 Util::displayErrors();
 
 //at this stage, only check for configuration files

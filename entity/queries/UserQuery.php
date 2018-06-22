@@ -61,27 +61,15 @@ class UserQuery extends MySQLQuery{
         $this->structure->getCol('last-password-reset')->setIsNull(TRUE);
     }
     /**
-     * Constructs a query that can be used to update the number 
-     * of times the user has reseted his password.
-     * @param int $userId The ID of the user.
-     * @param int $newCount Te new number.
-     * @since 1.6
-     */
-    public function updateResetsCount($userId,$newCount) {
-        $arr = array(
-            $this->getColName('reset-pass-count')=>$newCount
-        );
-        $this->update($arr, $userId, $this->getColName('id'));
-    }
-    /**
      * Constructs a query that can be used to update the last time 
      * user password was reseted.
      * @param int $userId The ID of the user.
      * @since 1.6
      */
-    public function updateLastPassResetTime($userId) {
+    public function updateLastPassResetTime($userId,$resetCount=0) {
         $arr = array(
-            $this->getColName('last-password-reset')=>'\''.date('Y-m-d h:i:s').'\''
+            $this->getColName('last-password-reset')=>'\''.date('Y-m-d h:i:s').'\'',
+            $this->getColName('reset-pass-count')=>$resetCount
         );
         $this->update($arr, $userId);
     }

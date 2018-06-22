@@ -76,19 +76,37 @@ class PasswordAPIs extends API{
             return TRUE;
         }
     }
-
+    
+    public function resetPassword() {
+        $i = $this->getInputs();
+        if($i['new-password'] == $i['conf-new-password']){
+            $r = PasswordFunctions::get()->resetPassword($i['email'], $i['reset-token'], $i['new-password']);
+            if($r === TRUE){
+                $this->sendResponse('Password Updated');
+            }
+            else if($r == MySQLQuery::QUERY_ERR){
+                $this->databaseErr();
+            }
+            else{
+                $this->sendResponse($r, TRUE, 404);
+            }
+        }
+        else{
+            $this->sendResponse('The given two passwords do not match.', TRUE, 404);
+        }
+    }
     public function processRequest() {
         $action = $this->getAction();
         if($action == 'update-password'){
             $this->actionNotImpl();
         }
         else if($action == 'reset-password'){
-            $this->actionNotImpl();
+            $this->resetPassword();
         }
         else if($action == 'forgot-password'){
             $r = PasswordFunctions::get()->passwordForgotten($this->getInputs()['email']);
             if($r === MySQLQuery::QUERY_ERR){
-                $this->databaseErr();
+                $this->databaseErr(PasswordFunctions::get()->getMainSession()->getDBLink()->toJSON());
             }
             else{
                 $this->sendResponse('Reset Request Created');

@@ -342,6 +342,8 @@ class UserFunctions extends Functions{
                 $user->setDisplayName($row[$this->query->getStructure()->getCol('disp-name')->getName()]);
                 $user->setLastLogin($row[$this->query->getStructure()->getCol('last-login')->getName()]);
                 $user->setRegDate($row[$this->query->getStructure()->getCol('reg-date')->getName()]);
+                $user->setLastPasswordResetDate($row[$this->query->getColName('last-password-reset')]);
+                $user->setResetCount($row[$this->query->getColName('reset-pass-count')]);
                 $tok = $this->getRegTok($id);
                 $user->setActivationTok($tok);
                 return $user;
@@ -380,6 +382,8 @@ class UserFunctions extends Functions{
                     $user->setAccessLevel($row[$this->query->getStructure()->getCol('acc-level')->getName()]);
                     $user->setLastLogin($row[$this->query->getStructure()->getCol('last-login')->getName()]);
                     $user->setRegDate($row[$this->query->getStructure()->getCol('reg-date')->getName()]);
+                    $user->setLastPasswordResetDate($row[$this->query->getColName('last-password-reset')]);
+                    $user->setResetCount($row[$this->query->getColName('reset-pass-count')]);
                     return $user;
                 }
                 else{
@@ -420,6 +424,8 @@ class UserFunctions extends Functions{
                     $user->setAccessLevel($row[$this->query->getStructure()->getCol('acc-level')->getName()]);
                     $user->setLastLogin($row[$this->query->getStructure()->getCol('last-login')->getName()]);
                     $user->setRegDate($row[$this->query->getStructure()->getCol('reg-date')->getName()]);
+                    $user->setLastPasswordResetDate($row[$this->query->getColName('last-password-reset')]);
+                    $user->setResetCount($row[$this->query->getColName('reset-pass-count')]);
                     return $user;
                 }
                 else{

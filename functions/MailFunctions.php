@@ -193,7 +193,7 @@ class MailFunctions extends Functions{
             $mailer->setSubject('Password Reset');
             $msg = '<p>Dear,</p>';
             $msg .= '<p>We would like to inform you that you have requested to reset your account\'s password.<p>';
-            $msg .= '<p>In order to complete the reset process, please click on <a href="'.SiteConfig::get()->getBaseURL().'pages/reset-password?token='.$user->getResetToken().'" target="_blank">this link</a> and update your password.<p>'
+            $msg .= '<p>In order to complete the reset process, please click on <a href="'.SiteConfig::get()->getBaseURL().'pages/new-password?token='.$user->getResetToken().'" target="_blank">this link</a> and update your password.<p>'
                     . '<p>If you did not request a password reset, please inform us as soon as possible.</p>';
             $msg .= '<p>Thank you for your time.</p>';
             $msg .= '<p><b>'.$noReplayAcc->getName().'</b></p>';

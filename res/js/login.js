@@ -56,7 +56,7 @@
  * attributes (an object) for calling back functions for specific events. the attribute 
  * name is <b>callbacks</b>. The object will have the following arrays of callbacks: 
  * <ul>
- * <li><b>onsucess</b>: An array that contains functions to call in case 
+ * <li><b>onsuccess</b>: An array that contains functions to call in case 
  * of successful login.</li>
  * <li><b>onclienterr</b>: An array that contains functions to call in case 
  * of 4xx error.</li>
@@ -74,7 +74,7 @@ function login(loginParams={
     'session-duration':10,
     'refresh-timeout':false,
     callbacks:{
-        onsucess:[],
+        onsuccess:[],
         onclienterr:[],
         onservererr:[],
         ondisconnected:[]
@@ -110,9 +110,9 @@ function login(loginParams={
                 ajax.setParams(params);
                 if(typeof loginParams['callbacks'] === 'object'){
                     var calls = loginParams['callbacks'];
-                    if(Array.isArray(calls['onsucess'])){
-                        for(var x = 0 ; x < calls['onsucess'].length ; x++){
-                            var call = calls['onsucess'][x];
+                    if(Array.isArray(calls['onsuccess'])){
+                        for(var x = 0 ; x < calls['onsuccess'].length ; x++){
+                            var call = calls['onsuccess'][x];
                             if(typeof call === 'function'){
                                 ajax.setOnSuccess(call);
                             }
@@ -183,7 +183,7 @@ function login(loginParams={
  * attributes (an object) for calling back functions for specific events. the attribute 
  * name is <b>callbacks</b>. The object will have the following arrays of callbacks: 
  * <ul>
- * <li><b>onsucess</b>: An array that contains functions to call in case 
+ * <li><b>onsuccess</b>: An array that contains functions to call in case 
  * of successful login.</li>
  * <li><b>onclienterr</b>: An array that contains functions to call in case 
  * of 4xx error.</li>
@@ -198,7 +198,7 @@ function login(loginParams={
 function forgotPassword(params={
     email:'',
     callbacks:{
-        onsucess:[],
+        onsuccess:[],
         onclienterr:[],
         onservererr:[],
         ondisconnected:[]
@@ -213,9 +213,9 @@ function forgotPassword(params={
         ajax.setParams(reqParams);
         if(typeof params['callbacks'] === 'object'){
             var calls = params['callbacks'];
-            if(Array.isArray(calls['onsucess'])){
-                for(var x = 0 ; x < calls['onsucess'].length ; x++){
-                    var call = calls['onsucess'][x];
+            if(Array.isArray(calls['onsuccess'])){
+                for(var x = 0 ; x < calls['onsuccess'].length ; x++){
+                    var call = calls['onsuccess'][x];
                     if(typeof call === 'function'){
                         ajax.setOnSuccess(call);
                     }
@@ -282,7 +282,7 @@ function forgotPassword(params={
  * attributes (an object) for calling back functions for specific events. the attribute 
  * name is <b>callbacks</b>. The object will have the following arrays of callbacks: 
  * <ul>
- * <li><b>onsucess</b>: An array that contains functions to call in case 
+ * <li><b>onsuccess</b>: An array that contains functions to call in case 
  * of successful login.</li>
  * <li><b>onclienterr</b>: An array that contains functions to call in case 
  * of 4xx error.</li>
@@ -300,7 +300,7 @@ function resetPassword(params={
     'new-password':'',
     'conf-pass':'',
     callbacks:{
-        onsucess:[],
+        onsuccess:[],
         onclienterr:[],
         onservererr:[],
         ondisconnected:[]
@@ -322,9 +322,9 @@ function resetPassword(params={
                         ajax.setParams(reqParams);
                         if(typeof params['callbacks'] === 'object'){
                             var calls = params['callbacks'];
-                            if(Array.isArray(calls['onsucess'])){
-                                for(var x = 0 ; x < calls['onsucess'].length ; x++){
-                                    var call = calls['onsucess'][x];
+                            if(Array.isArray(calls['onsuccess'])){
+                                for(var x = 0 ; x < calls['onsuccess'].length ; x++){
+                                    var call = calls['onsuccess'][x];
                                     if(typeof call === 'function'){
                                         ajax.setOnSuccess(call);
                                     }
@@ -374,6 +374,133 @@ function resetPassword(params={
         }
         else{
             console.error('The parameter \'params.email\' is undefined, null or empty string.');
+        }
+    }
+    else{
+        console.error('The given parameter is not an object.');
+    }
+}
+/**
+ * Sends AJAX request to the server updating user password.
+ * @param {Object} params An object that holds request parameters. 
+ * The structure of the object is as follows:
+ * <pre>
+ * {<br/>
+ * &nbsp;&nbsp;'user-id':''<br/>
+ * &nbsp;&nbsp;'old-password':''<br/>
+ * &nbsp;&nbsp;'new-password':''<br/>
+ * &nbsp;&nbsp;'conf-pass':''<br/>
+ * &nbsp;&nbsp;callbacks:{<br/>
+ * &nbsp;&nbsp;&nbsp;&nbsp;onsuccess:[]<br/>
+ * &nbsp;&nbsp;&nbsp;&nbsp;onclienterr:[]<br/>
+ * &nbsp;&nbsp;&nbsp;&nbsp;onservererr:[]<br/>
+ * &nbsp;&nbsp;&nbsp;&nbsp;ondisconnected:[]<br/>
+ * &nbsp;&nbsp;}<br/>
+ * }
+ * </pre>
+ * The parameters description:
+ * <ul>
+ * <li><b>user-id</b>: The ID of the user that his password will be updated.</li>
+ * <li><b>old-password</b>: The old password of the user.</li>
+ * <li><b>new-password</b>: The new password.</li>
+ * <li><b>conf-pass</b>: Same new password.</li>
+ * </ul>
+ * In addition to the given parameters, the object can have an optional 
+ * attributes (an object) for calling back functions for specific events. the attribute 
+ * name is <b>callbacks</b>. The object will have the following arrays of callbacks: 
+ * <ul>
+ * <li><b>onsuccess</b>: An array that contains functions to call in case 
+ * of successful login.</li>
+ * <li><b>onclienterr</b>: An array that contains functions to call in case 
+ * of 4xx error.</li>
+ * <li><b>onservererr</b>: An array that contains functions to call in case 
+ * of 5xx error.</li>
+ * <li><b>ondisconnected</b>: An array that contains functions to call in case 
+ * of no internet access is available.</li>
+ * </ul>
+ * @see AJAX.js
+ * @returns {undefined}
+ */
+function updatePassword(params={
+    'user-id':'',
+    'new-password':'',
+    'conf-pass':'',
+    'old-password':'',
+    callbacks:{
+        onsuccess:[],
+        onclienterr:[],
+        onservererr:[],
+        ondisconnected:[]
+    }
+}){
+    if(typeof params === 'object'){
+        if(params['user-id'] !== undefined && params['user-id'] !== null && params['user-id'].length !== 0){
+            if(params['old-password'] !== undefined && params['old-password'] !== null && params['old-password'].length !== 0){
+                if(params['new-password'] !== undefined && params['new-password'] !== null && params['new-password'].length !== 0){
+                    if(params['conf-pass'] !== undefined && params['conf-pass'] !== null && params['conf-pass'].length !== 0){
+                        var ajax = new AJAX({
+                            method:'post',
+                            url:APIS.PasswordAPIs.link
+                        });
+                        var reqParams = 'action=update-password&user-id='+encodeURIComponent(params['user-id'])+
+                                '&old-password='+encodeURIComponent(params['old-password'])+
+                                '&new-password='+encodeURIComponent(params['new-password'])+
+                                '&conf-new-password='+encodeURIComponent(params['conf-pass']);
+                        ajax.setParams(reqParams);
+                        if(typeof params['callbacks'] === 'object'){
+                            var calls = params['callbacks'];
+                            if(Array.isArray(calls['onsuccess'])){
+                                for(var x = 0 ; x < calls['onsuccess'].length ; x++){
+                                    var call = calls['onsuccess'][x];
+                                    if(typeof call === 'function'){
+                                        ajax.setOnSuccess(call);
+                                    }
+                                }
+                            }
+
+                            if(Array.isArray(calls['onclienterr'])){
+                                for(var x = 0 ; x < calls['onclienterr'].length ; x++){
+                                    var call = calls['onclienterr'][x];
+                                    if(typeof call === 'function'){
+                                        ajax.setOnClientError(call);
+                                    }
+                                }
+                            }
+
+                            if(Array.isArray(calls['onservererr'])){
+                                for(var x = 0 ; x < calls['onservererr'].length ; x++){
+                                    var call = calls['onservererr'][x];
+                                    if(typeof call === 'function'){
+                                        ajax.setOnServerError(call);
+                                    }
+                                }
+                            }
+
+                            if(Array.isArray(calls['ondisconnected'])){
+                                for(var x = 0 ; x < calls['ondisconnected'].length ; x++){
+                                    var call = calls['ondisconnected'][x];
+                                    if(typeof call === 'function'){
+                                        ajax.setOnDisconnected(call);
+                                    }
+                                }
+                            }
+                        }
+                        ajax.send();
+                    }
+                    else{
+                        console.error('The parameter \'params[\'conf-pass\']\' is undefined, null or empty string.');
+                    }
+                }
+                else{
+                    console.error('The parameter \'params[\'new-password\']\' is undefined, null or empty string.');
+                }
+            }
+            else{
+                console.error('The parameter \'params[\'old-password\']\' is undefined, null or empty string.');
+            }
+        }
+        else{
+            console.error('The parameter \'params[\'user-id\']\' is undefined, null or empty string.');
         }
     }
     else{

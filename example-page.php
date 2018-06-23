@@ -24,16 +24,19 @@
  * THE SOFTWARE.
  */
 
-//first, load the root file
+//first, load the root
 require_once 'root.php';
 
-//sets the translation
 //load theme
-Page::get()->loadTheme();
-Page::get()->setTitle('Example Page');
-Page::get()->setWritingDir('ltr');
-Page::get()->setLang('En');
-echo Page::get()->getDocument(FALSE);
+$page = Page::get();
+
+//load UI template components (JS, CSS and others)
+$page->usingTheme($themeName='Greeny By Ibrahim Ali');
+
+//sets the title of the page
+$page->setTitle('Example Page');
+
+echo $page->getDocument();
 
 
 

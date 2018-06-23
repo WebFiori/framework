@@ -79,14 +79,6 @@ class UserFunctions extends Functions{
      * @since 1.1
      */
     const ALREADY_ACTIVATED = 'account_already_active';
-    /**
-     * A constant that indicates the old given password does not match the one stored 
-     * in the database.
-     * @var string Constant indicates the old given password does not match the one stored 
-     * in the database.
-     * @since 1.1
-     */
-    const PASSWORD_MISSMATCH = 'password_missmatch';
     
     /**
      * Checks if a given user info can grant him access to the system or not. It 
@@ -220,52 +212,6 @@ class UserFunctions extends Functions{
             else{
                 return self::NOT_AUTH;
             }
-        }
-        else{
-            return self::NOT_AUTH;
-        }
-    }
-    
-    /**
-     * Updates the password of a user given his ID.
-     * @param string $oldPass The old password.
-     * @param string $newPass The new password.
-     * @param string $userId The ID of the user.
-     * @return boolean|string The function will return <b>TRUE</b> in case the 
-     * password is updated. In case of database query error, the function will 
-     * return <b>MySQLQuery::QUERY_ERR</b> If the old password does not match with 
-     * the one stored in the database, the function will return 
-     * <b>UserFunctions::PASSWORD_MISSMATCH</b>. If the user is not authorized to 
-     * update the password, the function will return <b>UserFunctions::NOT_AUTH</b>. 
-     * If no user was found using the given ID, The function will return 
-     * <b>UserFunctions::NO_SUCH_USER</b>
-     * @since 1.1
-     */
-    public function updatePassword($oldPass, $newPass, $userId){
-        $loggedId = $this->getUserID();
-        if($loggedId != NULL){
-            $user = $this->getUserByID($userId);
-            if($user instanceof User){
-                if($user->getID() == $loggedId){
-                    if($user->getPassword() == hash(Authenticator::HASH_ALGO_NAME, $oldPass)){
-                        $this->query->updatePassword(hash(Authenticator::HASH_ALGO_NAME, $newPass), $userId);
-                        if($this->excQ($this->query)){
-                            MailFunctions::get()->notifyOfPasswordChange($user);
-                            return TRUE;
-                        }
-                        else{
-                            return MySQLQuery::QUERY_ERR;
-                        }
-                    }
-                    else{
-                        return self::PASSWORD_MISSMATCH;
-                    }
-                }
-                else{
-                    return self::NOT_AUTH;
-                }
-            }
-            return $user;
         }
         else{
             return self::NOT_AUTH;

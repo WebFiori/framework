@@ -25,12 +25,20 @@
  */
 
 /**
- * Password reset controller.
+ * Password related operations controller.
  *
  * @author Ibrahim <ibinshikh@hotmail.com>
  * @version 1.0
  */
 class PasswordFunctions extends Functions{
+    /**
+     * A constant that indicates the old given password does not match the one stored 
+     * in the database.
+     * @var string Constant indicates the old given password does not match the one stored 
+     * in the database.
+     * @since 1.1
+     */
+    const PASSWORD_MISSMATCH = 'password_missmatch';
     /**
      * Expiry time for a password reset token in minutes.
      * @var int
@@ -85,6 +93,39 @@ class PasswordFunctions extends Functions{
         parent::useDatabase();
         $this->resetQuery = new PasswordResetQuery();
         $this->userQuery = new UserQuery();
+    }
+    /**
+     * Updates the password of a user given his ID.
+     * @param string $oldPass The old password.
+     * @param string $newPass The new password.
+     * @param string $userId The ID of the user.
+     * @return boolean|string The function will return <b>TRUE</b> in case the 
+     * password is updated. In case of database query error, the function will 
+     * return <b>MySQLQuery::QUERY_ERR</b> If the old password does not match with 
+     * the one stored in the database, the function will return 
+     * <b>PasswordFunctions::PASSWORD_MISSMATCH</b>.  
+     * If no user was found using the given ID, The function will return 
+     * <b>UserFunctions::NO_SUCH_USER</b>
+     * @since 1.1
+     */
+    public function updatePassword($oldPass, $newPass, $userId){
+        $user = $this->getUserByID($userId);
+        if($user instanceof User){
+            if($user->getPassword() == hash(Authenticator::HASH_ALGO_NAME, $oldPass)){
+                $this->query->updatePassword(hash(Authenticator::HASH_ALGO_NAME, $newPass), $userId);
+                if($this->excQ($this->query)){
+                    MailFunctions::get()->notifyOfPasswordChange($user);
+                    return TRUE;
+                }
+                else{
+                    return MySQLQuery::QUERY_ERR;
+                }
+            }
+            else{
+                return self::PASSWORD_MISSMATCH;
+            }
+        }
+        return $user;
     }
     /**
      * Request a password reset for a user given his email address.

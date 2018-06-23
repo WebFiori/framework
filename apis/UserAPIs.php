@@ -264,32 +264,7 @@ class UserAPIs extends API{
             $this->sendResponse('List Of Users', FALSE, 200, '"users":'.$json);
         }
     }
-    /**
-     * Called by the routing function to perform the 'update-password' action
-     * @since 1.0
-     */
-    public function updatePassword(){
-        $input = $this->getInputs();
-        $r = UserFunctions::get()->updatePassword($input['old-pass'], $input['new-pass'], $input['user-id']);
-        if($r === TRUE){
-            $this->sendResponse('Password Updated', FALSE, 200);
-        }
-        else if($r == MySQLQuery::QUERY_ERR){
-            $this->databaseErr();
-        }
-        else if($r == UserFunctions::NO_SUCH_USER){
-            $this->sendResponse('No Such User', TRUE, 404);
-        }
-        else if($r == UserFunctions::NOT_AUTH){
-            $this->notAuth();
-        }
-        else if($r == UserFunctions::PASSWORD_MISSMATCH){
-            $this->sendResponse('Password Missmatch', TRUE, 404);
-        }
-        else{
-            $this->sendResponse('Something Wrong', TRUE, 404);
-        }
-    }
+    
     /**
      * A routing function.
      * @since 1.0
@@ -307,9 +282,6 @@ class UserAPIs extends API{
         }
         else if($action == 'update-email'){
             $this->updateEmail();
-        }
-        else if($action == 'update-password'){
-            $this->updatePassword();
         }
         else if($action == 'update-display-name'){
             $this->updateDisplayName();

@@ -65,16 +65,15 @@ class PasswordAPIs extends API{
             }
             else{
                 $i = $this->getInputs();
-                if(isset($i['user-id'])){
-                    if($i['user-id'] == PasswordFunctions::get()->getUserID()){
-                        return TRUE;
-                    }
+                if($i['user-id'] == PasswordFunctions::get()->getUserID()){
+                    return TRUE;
                 }
             }
         }
         else{
             return TRUE;
         }
+        return FALSE;
     }
     
     public function resetPassword() {
@@ -95,10 +94,36 @@ class PasswordAPIs extends API{
             $this->sendResponse('The given two passwords do not match.', TRUE, 404);
         }
     }
+    /**
+     * Called by the routing function to perform the 'update-password' action
+     * @since 1.0
+     */
+    public function updatePassword(){
+        $input = $this->getInputs();
+        $r = PasswordFunctions::get()->updatePassword($input['old-pass'], $input['new-pass'], $input['user-id']);
+        if($r === TRUE){
+            $this->sendResponse('Password Updated', FALSE, 200);
+        }
+        else if($r == MySQLQuery::QUERY_ERR){
+            $this->databaseErr();
+        }
+        else if($r == UserFunctions::NO_SUCH_USER){
+            $this->sendResponse('No Such User', TRUE, 404);
+        }
+        else if($r == UserFunctions::NOT_AUTH){
+            $this->notAuth();
+        }
+        else if($r == UserFunctions::PASSWORD_MISSMATCH){
+            $this->sendResponse('Password Missmatch', TRUE, 404);
+        }
+        else{
+            $this->sendResponse('Something Wrong', TRUE, 404);
+        }
+    }
     public function processRequest() {
         $action = $this->getAction();
         if($action == 'update-password'){
-            $this->actionNotImpl();
+            $this->updatePassword();
         }
         else if($action == 'reset-password'){
             $this->resetPassword();

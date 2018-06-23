@@ -112,7 +112,7 @@ function createSubmitForm($tok=null , $lang=NULL){
     $submitDiv->addChild(new Input('submit'));
     $submitDiv->children()->get(0)->setID('activate-button');
     $submitDiv->children()->get(0)->setValue($lang->get('pages/activate-account/actions/activate'));
-    $submitDiv->children()->get(0)->setAttribute('onclick','return activateAccount()');
+    $submitDiv->children()->get(0)->setAttribute('onclick','return sendActivateReq()');
     if($tok == NULL){
         $submitDiv->children()->get(0)->setAttribute('disabled');
     }

@@ -1,5 +1,7 @@
 <?php
 require_once 'root.php';
+$uri = filter_var($_SERVER['REQUEST_URI']);
+$split = Router::splitURI($uri);
 ?>
 <!DOCTYPE html>
 <html>
@@ -8,6 +10,9 @@ require_once 'root.php';
         <title>Index</title>
     </head>
     <body style="color:green;background-color: black">
+        <?php
+            Util::print_r($split);
+        ?>
         <p>Hello Word! I'm A live!</p>
         <p>This is the index page of generic PHP web applications building template.</p>
         <?php

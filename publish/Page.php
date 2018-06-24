@@ -331,14 +331,9 @@ class Page{
     * Load the translation file based on the language code. The function uses 
     * two checks to load the translation. If the page language is set using 
     * the function <b>Page::setLang()</b>, then the language that will be loaded 
-    * will be based on the value returned by the function <b>Page::getLang()</b>. 
-    * The other way is if the language is not set and the attribute <b>$uses_session_lang</b> 
-    * is set to <b>TRUE</b>, session language will be used.
-    * @throws Exception in case the language is not supported, or the session 
-    * is not running, or <b>ROOT_DIR</b> is not defined.
+    * will be based on the value returned by the function <b>Page::getLang()</b>.
+    * @throws Exception in case the language is not set, or <b>ROOT_DIR</b> is not defined.
     * @since 1.0
-    * @param boolean $uses_session_lang [Optional] If <b>TRUE</b> is given and language is not 
-    * set, the language of the session will be used. Default is <b>TRUE</b>.
     */
     public function usingLanguage(){
         if($this->getLang() != NULL){

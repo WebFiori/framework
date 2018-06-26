@@ -26,7 +26,7 @@
 /**
  * A class that represents request parameter.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.1
+ * @version 1.2
  */
 class RequestParameter implements JsonI{
     /**
@@ -66,7 +66,25 @@ class RequestParameter implements JsonI{
      * @since 1.1
      */
     private $maxVal;
+    /**
+     * The description of the parameter.
+     * @var string
+     * @since 1.0 
+     */
     private $desc;
+    /**
+     * A callback that is used to make a custom filtered value.
+     * @var Fulnction
+     * @since 1.2 
+     */
+    private $customFilterFunc;
+    /**
+     * A boolean value that is set to true in case the 
+     * basic filter will be applied before custom one.
+     * @var boolean
+     * @since 1.2 
+     */
+    private $applyBasicFilter;
     /**
      * Sets the description of the parameter.
      * @param sting $desc Parameter description. Used to help front-end to identify 
@@ -101,6 +119,7 @@ class RequestParameter implements JsonI{
         if(!$this->setType($type)){
             $this->type = 'string';
         }
+        $this->applyBasicFilter = FALSE;
     }
     /**
      * Returns the minimum numeric value the parameter can accept.
@@ -292,5 +311,49 @@ class RequestParameter implements JsonI{
             $json->add('max-val', $this->getMaxVal());
         }
         return $json;
+    }
+    /**
+     * Sets a callback function to work as a filter for the inputs.
+     * @param Function $function A callback function. The callback function 
+     * will have two parameters passed to it. The first one is an associative 
+     * array that contains the not-filtered value and the value filtered 
+     * using basic filter. The values are contained in two 
+     * indices: <b>'original-value'</b> and <b>'basic-filter-result'</b>. 
+     * The second parameter is an object of type <b>RequestParameter</b> 
+     * which contains original information for the filter. The function 
+     * must be implemented in a way that makes it return <b>FALSE</b> if the 
+     * parameter has invalid value. If the parameter is filtered and 
+     * was validated, the function must return the valid and filtered 
+     * value.
+     * @param boolean $applyBasicFilter [Optional] If set to <b>TRUE</b>, 
+     * the basic filter will be applied to the parameter. Default 
+     * is <b>TRUE</b>.
+     * @since 1.2
+     */
+    public function setCustomFilterFunction($function,$applyBasicFilter=true) {
+        if(is_callable($function)){
+            $this->customFilterFunc = $function;
+        }
+        $this->applyBasicFilter = $applyBasicFilter === TRUE ? TRUE : FALSE;
+    }
+    /**
+     * Checks if we need to apply basic filter or not 
+     * before applying custom filter callback.
+     * @return boolean The function will return <b>TRUE</b> 
+     * if the basic filter will be applied before applying custom filter.
+     * @since 1.2
+     */
+    public function applyBasicFilter() {
+        return $this->applyBasicFilter;
+    }
+    /**
+     * Returns the function that is used as a custom filter 
+     * for the parameter.
+     * @return Function | NULL The function that is used as a custom filter 
+     * for the parameter. If not set, the function will return <b>NULL</b>.
+     * @since 1.2
+     */
+    public function getCustomFilterFunction() {
+        return $this->customFilterFunc;
     }
 }

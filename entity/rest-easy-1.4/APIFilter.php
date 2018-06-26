@@ -26,7 +26,7 @@
 /**
  * A class used to filter request parameters.
  * @author Ibrahim Ali <ibinshikh@hotmail.com>
- * @version 1.1
+ * @version 1.2
  */
 class APIFilter{
     /**
@@ -43,6 +43,12 @@ class APIFilter{
      * @since 1.0 
      */
     private $inputs;
+    /**
+     * An array that contains non-filtered data.
+     * @var array
+     * @since 1.2 
+     */
+    private $nonFilteredInputs;
     /**
      * Array that contains filter definitions.
      * @var array
@@ -103,6 +109,9 @@ class APIFilter{
             );
             if($reqParam->getDefault() != NULL){
                 $attribute['options']['options']['default'] = $reqParam->getDefault();
+            }
+            if($reqParam->getCustomFilterFunction() != NULL){
+                $attribute['options']['filter-func'] = $reqParam->getCustomFilterFunction();
             }
             $paramType = $reqParam->getType();
             if($paramType == 'integer'){
@@ -171,24 +180,70 @@ class APIFilter{
         return $this->inputs;
     }
     /**
+     * Returns the array that contains request inputs without filters applied.
+     * @return array The array that contains request inputs.
+     * @since 1.2
+     */
+    public function getNonFiltered(){
+        return $this->nonFilteredInputs;
+    }
+
+    /**
      * Filter GET parameters.
      * @since 1.0
      */
     public function filterGET(){
-        $this->inputs = filter_var_array($_GET, $this->defenitions, FALSE);
         foreach ($this->paramDefs as $def){
             $name = $def['parameter']->getName();
             if(isset($_GET[$name])){
-                if($def['parameter']->getType() == 'boolean'){
-                    $this->inputs[$name] = $this->filterBoolean(filter_input(INPUT_GET, $name));
+                $this->nonFilteredInputs[$name] = $_GET[$name];
+                if($def['options']['filter-func']){
+                    $filteredValue = '';
+                    $arr = array(
+                        'original-value'=>$_GET[$name],
+                    );
+                    if($def['parameter']->applyBasicFilter() === TRUE){
+                        if($def['parameter']->getType() == 'boolean'){
+                            $filteredValue = $this->filterBoolean(filter_input(INPUT_GET, $name));
+                        }
+                        else{
+                            $filteredValue = filter_input(INPUT_GET, $name);
+                            foreach ($def['filters'] as $val) {
+                                $filteredValue = filter_var($filteredValue, $val, $def['options']);
+                            }
+                            if($filteredValue == FALSE){
+                                $filteredValue = 'INV';
+                            }
+                        }
+                        $arr['basic-filter-result'] = $filteredValue;
+                    }
+                    else{
+                        $filteredValue = 'INV';
+                        $arr['basic-filter-result'] = 'NOT APLICABLE';
+                    }
+                    $r = call_user_func($def['options']['filter-func'],$arr,$def['parameter']);
+                    if($r == NULL){
+                        $this->inputs[$name] = FALSE;
+                    }
+                    else{
+                        $this->inputs[$name] = $r;
+                    }
+                    if($this->inputs[$name] == FALSE && $def['parameter']->getType() != 'boolean'){
+                        $this->inputs[$name] = 'INV';
+                    }
                 }
                 else{
-                    $this->inputs[$name] = filter_input(INPUT_GET, $name);
-                    foreach ($def['filters'] as $val) {
-                        $this->inputs[$name] = filter_var($this->inputs[$name], $val, $def['options']);
+                    if($def['parameter']->getType() == 'boolean'){
+                        $this->inputs[$name] = $this->filterBoolean(filter_input(INPUT_GET, $name));
                     }
-                    if($this->inputs[$name] == FALSE){
-                        $this->inputs[$name] = 'INV';
+                    else{
+                        $this->inputs[$name] = filter_input(INPUT_GET, $name);
+                        foreach ($def['filters'] as $val) {
+                            $this->inputs[$name] = filter_var($this->inputs[$name], $val, $def['options']);
+                        }
+                        if($this->inputs[$name] == FALSE){
+                            $this->inputs[$name] = 'INV';
+                        }
                     }
                 }
             }
@@ -204,20 +259,57 @@ class APIFilter{
      * @since 1.0
      */
     public function filterPOST(){
-        $this->inputs = filter_var_array($_POST, $this->defenitions, FALSE);
         foreach ($this->paramDefs as $def){
             $name = $def['parameter']->getName();
             if(isset($_POST[$name])){
-                if($def['parameter']->getType() == 'boolean'){
-                    $this->inputs[$name] = $this->filterBoolean(filter_input(INPUT_POST, $name));
+                $this->nonFilteredInputs[$name] = $_POST[$name];
+                if($def['options']['filter-func']){
+                    $filteredValue = '';
+                    $arr = array(
+                        'original-value'=>$_POST[$name],
+                    );
+                    if($def['parameter']->applyBasicFilter() === TRUE){
+                        if($def['parameter']->getType() == 'boolean'){
+                            $filteredValue = $this->filterBoolean(filter_input(INPUT_GET, $name));
+                        }
+                        else{
+                            $filteredValue = filter_input(INPUT_GET, $name);
+                            foreach ($def['filters'] as $val) {
+                                $filteredValue = filter_var($filteredValue, $val, $def['options']);
+                            }
+                            if($filteredValue == FALSE){
+                                $filteredValue = 'INV';
+                            }
+                        }
+                        $arr['basic-filter-result'] = $filteredValue;
+                    }
+                    else{
+                        $filteredValue = 'INV';
+                        $arr['basic-filter-result'] = 'NOT APLICABLE';
+                    }
+                    $r = call_user_func($def['options']['filter-func'],$arr,$def['parameter']);
+                    if($r == NULL){
+                        $this->inputs[$name] = FALSE;
+                    }
+                    else{
+                        $this->inputs[$name] = $r;
+                    }
+                    if($this->inputs[$name] == FALSE && $def['parameter']->getType() != 'boolean'){
+                        $this->inputs[$name] = 'INV';
+                    }
                 }
                 else{
-                    $this->inputs[$name] = filter_input(INPUT_POST, $name);
-                    foreach ($def['filters'] as $val) {
-                        $this->inputs[$name] = filter_var($this->inputs[$name], $val, $def['options']);
+                    if($def['parameter']->getType() == 'boolean'){
+                        $this->inputs[$name] = $this->filterBoolean(filter_input(INPUT_GET, $name));
                     }
-                    if($this->inputs[$name] == FALSE){
-                        $this->inputs[$name] = 'INV';
+                    else{
+                        $this->inputs[$name] = filter_input(INPUT_GET, $name);
+                        foreach ($def['filters'] as $val) {
+                            $this->inputs[$name] = filter_var($this->inputs[$name], $val, $def['options']);
+                        }
+                        if($this->inputs[$name] === FALSE){
+                            $this->inputs[$name] = 'INV';
+                        }
                     }
                 }
             }
@@ -236,6 +328,7 @@ class APIFilter{
         $this->defenitions = array();
         $this->paramDefs = array();
         $this->inputs = NULL;
+        $this->nonFilteredInputs = NULL;
     }
 }
 

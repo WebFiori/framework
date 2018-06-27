@@ -41,6 +41,7 @@ $page->setHasFooter(FALSE);
 
 $page->getDocument()->getHeadNode()->addCSS('publish/themes/greeny/css/login.css');
 $page->getDocument()->getHeadNode()->addJs('publish/themes/greeny/js/login.js');
+$page->getDocument()->getHeadNode()->addJs('res/js/login.js');
 $page->getDocument()->getBody()->setClassName('pa-container');
 if($activationTok != NULL && $activationTok != FALSE){
     $js = new JsCode();
@@ -54,7 +55,7 @@ $page->insertNode($container,'page-body');
 $page->getDocument()->getChildByID('page-header')->removeAllChildNodes();
 $container->setClassName('pa-row');
 $container->addChild(createLoginForm($pageLbls));
-echo $page->getDocument()->toHTML(FALSE);
+echo $page->getDocument()->toHTML(TRUE);
 //end of page setup.
 
 function createLoginForm($pageLbls){
@@ -98,7 +99,7 @@ function createLoginForm($pageLbls){
     $submitDiv->addChild(new Input('submit'));
     $submitDiv->children()->get(0)->setID('login-button');
     $submitDiv->children()->get(0)->setValue($pageLbls['actions']['login']);
-    $submitDiv->children()->get(0)->setAttribute('onclick','return login()');
+    $submitDiv->children()->get(0)->setAttribute('onclick','return sendLoginRequest()');
     //$submitDiv->childNodes()->get(0)->setAttribute('style','background-color:rgb(0, 155, 119)');
     $formLabeldiv->setAttribute('style', 'margin-bottom: 18%;text-align: center;');
     $form->addChild($formLabeldiv);

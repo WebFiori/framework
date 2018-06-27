@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  */
 
-function login(){
+function sendLoginRequest(){
     document.getElementById('message').innerHTML = '<b style="color:black">Logging in...</b>';
     var username = document.getElementById('username-input').value;
     var password = document.getElementById('password-input').value;
@@ -32,42 +32,47 @@ function login(){
     }
     var keepLogged = document.getElementById('keep-me-logged').checked;
     var sessionDuration = keepLogged === true ? '10080' : '30';
-    var refresh = keepLogged === true ? 'false' : 'true';
-    var params = 'action=login&username='+encodeURIComponent(username)+'&password='+password+
-            '&session-duration='+sessionDuration+'&refresh-timeout='+refresh;
-    var ajax = new AJAX(
-            {
-            url:APIS.AuthAPI.link,
-            method:'post'
-            }
-    );
-    ajax.setParams(params);
-    ajax.setOnSuccess(function(){
-        console.log(this.response);
-        document.getElementById('message').innerHTML = '<b style="color:lightgreen">'+this.jsonResponse['message']+'</b>';
-        var user = this.jsonResponse['session']['user'];
-        console.log(user);
-        if(user['status-code'] === 'N'){
-            if(window.tok){
-                window.location.href = 'pages/activate-account?activation-token='+window.tok;
-            }
-            else{
-                window.location.href = 'pages/activate-account';
-            }
+    var refresh = keepLogged === true ? false : true;
+    var loginParams = {
+        username:username,
+        password:password,
+        'session-duration':sessionDuration,
+        'refresh-timeout':refresh,
+        callbacks:{
+            onsuccess:[
+                function(){
+                    console.log(this.response);
+                    document.getElementById('message').innerHTML = '<b style="color:lightgreen">'+this.jsonResponse['message']+'</b>';
+                    var user = this.jsonResponse['session']['user'];
+                    console.log(user);
+                    if(user['status-code'] === 'N'){
+                        if(window.tok){
+                            window.location.href = 'pages/activate-account?activation-token='+window.tok;
+                        }
+                        else{
+                            window.location.href = 'pages/activate-account';
+                        }
+                    }
+                    else{
+                        window.location.href = 'pages/home';
+                    }
+                }
+            ],
+            onclienterr:[
+                function(){
+                    console.log(this.response);
+                    if(this.jsonResponse !== null){
+                        document.getElementById('message').innerHTML = '<b style="color: #ff8080;">'+this.jsonResponse['message']+'</b>';
+                    }
+                    else{
+                        document.getElementById('message').innerHTML = '<b style="color:#ff8080">Something went wrong!</b>';
+                    }
+                }
+            ],
+            onservererr:[],
+            ondisconnected:[]
         }
-        else{
-            window.location.href = 'pages/home';
-        }
-    });
-    ajax.setOnClientError(function(){
-        console.log(this.response);
-        if(this.jsonResponse !== null){
-            document.getElementById('message').innerHTML = '<b style="color: #ff8080;">'+this.jsonResponse['message']+'</b>';
-        }
-        else{
-            document.getElementById('message').innerHTML = '<b style="color:#ff8080">Something went wrong!</b>';
-        }
-    });
-    ajax.send();
+    };
+    login(loginParams);
     return false;
 }

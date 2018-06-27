@@ -26,7 +26,7 @@
 /**
  * A class that represents API action.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.2
+ * @version 1.3
  */
 class APIAction implements JsonI{
     /**
@@ -70,6 +70,13 @@ class APIAction implements JsonI{
      */
     private $sinceVersion;
     /**
+     * An array that contains descriptions of 
+     * possible responses.
+     * @var array
+     * @since 1.3 
+     */
+    private $responses;
+    /**
      * Creates new instance of <b>APIAction</b>.
      * @param string $name [Optional] The name of the action. A valid action name must 
      * follow the following rules:
@@ -82,6 +89,25 @@ class APIAction implements JsonI{
     public function __construct($name='') {
         if(!$this->setName($name)){
             $this->setName('an-action');
+        }
+    }
+    /**
+     * Returns an array that contains information about possible responses.
+     * @return array An array that contains information about possible responses.
+     * @since 1.3
+     */
+    public function getResponsesDescriptions() {
+        return $this->responses;
+    }
+    /**
+     * Adds response description.
+     * @param string $description A paragraph that describes one of 
+     * the possible responses due to performing the action.
+     * @since 1.3
+     */
+    public function addResponseDescription($description) {
+        if(strlen($description) != 0){
+            $this->responses[] = $description;
         }
     }
     /**
@@ -200,18 +226,18 @@ class APIAction implements JsonI{
         $len = strlen($name);
         if($len != 0){
             if(strpos($name, ' ') === FALSE){
-                    for ($x = 0 ; $x < $len ; $x++){
-                        $ch = $name[$x];
-                        if($ch == '_' || $ch == '-' || ($ch >= 'a' && $ch <= 'z') || ($ch >= 'A' && $ch <= 'Z') || ($ch >= '0' && $ch <= '9')){
-                            
-                        }
-                        else{
-                            return FALSE;
-                        }
+                for ($x = 0 ; $x < $len ; $x++){
+                    $ch = $name[$x];
+                    if($ch == '_' || $ch == '-' || ($ch >= 'a' && $ch <= 'z') || ($ch >= 'A' && $ch <= 'Z') || ($ch >= '0' && $ch <= '9')){
+
                     }
-                    $this->name = $name;
-                    return TRUE;
+                    else{
+                        return FALSE;
+                    }
                 }
+                $this->name = $name;
+                return TRUE;
+            }
         }
         return FALSE;
     }
@@ -261,6 +287,7 @@ class APIAction implements JsonI{
         $json->add('description', $this->getDescription());
         $json->add('request-methods', $this->reqMethods);
         $json->add('parameters', $this->parameters);
+        $json->add('responses', $this->getResponsesDescriptions());
         return $json;
     }
 

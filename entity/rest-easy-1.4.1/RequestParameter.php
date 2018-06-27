@@ -301,13 +301,13 @@ class RequestParameter implements JsonI{
         $json->add('type', $this->getType());
         $json->add('description', $this->getDescription());
         $json->add('is-optional', $this->isOptional());
-        if($this->getDefault() != NULL){
+        if($this->getDefault() !== NULL){
             $json->add('default', $this->getDefault());
         }
-        if($this->getMinVal() != NULL){
+        if($this->getMinVal() !== NULL){
             $json->add('min-val', $this->getMinVal());
         }
-        if($this->getMaxVal() != NULL){
+        if($this->getMaxVal() !== NULL){
             $json->add('max-val', $this->getMaxVal());
         }
         return $json;

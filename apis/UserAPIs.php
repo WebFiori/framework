@@ -363,7 +363,7 @@ class UserAPIs extends API{
         }
     }
     public function isAuthorized() {
-        if($this->getAction() !== 'add-user'){
+        if($this->getAction() == 'add-user'){
             if(Config::get()->getUserRegStatus() == 'O'){
                 return TRUE;
             }

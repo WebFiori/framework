@@ -65,7 +65,7 @@ function createPage($tok=null){
     $page->usingTheme(SiteConfig::get()->getAdminThemeName());
     $page->usingLanguage();
     $page->getDocument()->getHeadNode()->addCSS('publish/themes/greeny/css/login.css');
-    $page->getDocument()->getHeadNode()->addJs('publish/themes/greeny/js/activate.js');
+    $page->getDocument()->getHeadNode()->addJs('res/js/activate.js');
     //$page->getDocument()->getHeadNode()->addJs('publish/themes/greeny/js/AJAX.js');
     $lang = $page->getLanguage();
     $page->insertNode(createSubmitForm($tok,$lang), 'main-content-area');

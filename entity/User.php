@@ -458,6 +458,6 @@ class User implements JsonI{
      * @since 1.0
      */
     public function __toString() {
-        return $this->toJSON();
+        return $this->toJSON().'';
     }
 }

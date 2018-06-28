@@ -2,9 +2,16 @@
 /**
  * A class that represents a column in MySQL table.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.2
+ * @version 1.4
  */
 class Column{
+    /**
+     * A constant that indicates the datatype of the 
+     * column does not support size.
+     * @var string
+     * @since 1.4
+     */
+    const SIZE_NOT_SUPPORTED = 'TYPE_DOES_NOT_SUPPORT_SIZE';
     /**
      * A constant that is returned by some functions to tell that the 
      * name of a column is invalid.
@@ -45,7 +52,7 @@ class Column{
      */
     const DATATYPES = array(
         'int','varchar','timestamp','tinyblob','mediumblob','longblob',
-        'datetime'
+        'datetime','text','mediumtext'
     );
     /**
      * A boolean value. Set to <b>TRUE</b> if column is unique.
@@ -120,13 +127,16 @@ class Column{
         if($this->setName($colName) !== TRUE){
             $this->setName('col');
         }
-        if($this->setType($datatype) !== TRUE){
+        if(!$this->setType($datatype)){
             $this->setType('varchar');
         }
-        if($this->getType() == 'varchar' || $this->getType() == 'int'){
-            if($this->setSize($size) !== TRUE){
+        if($this->getType() == 'varchar' || $this->getType() == 'int' || $this->getType() == 'text'){
+            if(!$this->setSize($size)){
                 $this->setSize(1);
             }
+        }
+        if($datatype == 'varchar' && $size > 21845){
+            $this->setType('mediumtext');
         }
         $this->setIsNull(FALSE);
         $this->setIsUnique(FALSE);
@@ -178,7 +188,7 @@ class Column{
                 if(strpos($name, ' ') === FALSE){
                     for ($x = 0 ; $x < strlen($name) ; $x++){
                         $ch = $name[$x];
-                        if($ch == '_' || ($ch >= 'a' && $ch <= 'z') || ($ch >= 'A' && $ch <= 'Z')){
+                        if($ch == '_' || ($ch >= 'a' && $ch <= 'z') || ($ch >= 'A' && $ch <= 'Z') || ($ch >= '0' && $ch <= '9')){
                             
                         }
                         else{
@@ -299,14 +309,16 @@ class Column{
      * 
      * @param mixed $default For integer data type, the passed value must be 
      * an integer. For 'varchar', the passed value must be a string. If the 
-     * datatype is 'timestamp' or 'datetime', the default will be 'current_timestamp' regardless 
+     * datatype is 'timestamp', the default will be 'current_timestamp' regardless 
+     * of the passed value. If the 
+     * datatype is 'datetime', the default will be 'now()' regardless 
      * of the passed value.
      * @return boolean <b>TRUE</b> if the value is set. <b>FALSE</b> otherwise.
      * @since 1.0
      */
     public function setDefault($default){
         $type = $this->getType();
-        if($type == 'varchar'){
+        if($type == 'varchar' || $type == 'text' || $type == 'mediumtext'){
             if(gettype($default) == 'string'){
                 $this->default = MySQLQuery::escapeMySQLSpeciarChars($default);
                 return TRUE;
@@ -344,12 +356,14 @@ class Column{
      * be set to 11. The maximum size for the 'varchar' is not specified.
      * @return boolean <b>TRUE</b> if the size is set. The function will return 
      * <b>Column::INV_DATASIZE</b> in case the size is invalid or datatype does not support 
-     * size attribute.
+     * size attribute. Also The function will return 
+     * <b>Column::SIZE_NOT_SUPPORTED</b> in case the datatype of the column does not 
+     * support size.
      * @since 1.0
      */
     public function setSize($size){
         $type = $this->getType();
-        if($type == 'varchar'){
+        if($type == 'varchar' || $type == 'text'){
             if($size > 0){
                 $this->size = $size;
                 return TRUE;
@@ -364,6 +378,9 @@ class Column{
                 $this->size = 11;
                 return TRUE;
             }
+        }
+        else{
+            return Column::SIZE_NOT_SUPPORTED;
         }
         return Column::INV_DATASIZE;
     }
@@ -413,7 +430,7 @@ class Column{
     public function __toString() {
         $retVal = $this->getName().' ';
         $type = $this->getType();
-        if($type == 'int' || $type == 'varchar'){
+        if($type == 'int' || $type == 'varchar' || $type == 'text'){
             $retVal .= $type.'('.$this->getSize().') ';
         }
         else{

@@ -136,23 +136,51 @@ class Table {
      * Adds a foreign key to the table.
      * @param Table $refTable The table that will be referenced.
      * @param string $refColName The name of the column that will be referenced. It must 
-     * be a column in the referenced table.
+     * be a column in the referenced table. The value of this attribute is a 
+     * value that once passed to the function <b>Table::getColumn()</b> will 
+     * return an object of type <b>Column</b>.
      * @param string $targetCol The target column. It must be a column in the current 
-     * instance.
+     * instance. The value of this attribute is a 
+     * value that once passed to the function <b>Table::getColumn()</b> will 
+     * return an object of type <b>Column</b>.
      * @param string $keyname The name of the foreign key.
+     * @param string $onupdate [Optional] The 'on update' condition for the key. it can be one 
+     * of the following: 
+     * <ul>
+     * <li>set null</li>
+     * <li>cascade</li>
+     * <li>restrict</li>
+     * <li>set default</li>
+     * <li>no action</li>
+     * </ul>
+     * Default value is 'set null'.
+     * @param string $ondelete [Optional] The 'on delete' condition for the key. it can be one 
+     * of the following: 
+     * <ul>
+     * <li>set null</li>
+     * <li>cascade</li>
+     * <li>restrict</li>
+     * <li>set default</li>
+     * <li>no action</li>
+     * </ul>
+     * Default value is 'set null'.
      * @return boolean <b>TRUE</b> if the key is added. <b>FALSE</b> otherwise.
      * @see ForeignKey
      */
-    public function addReference($refTable,$refColName,$targetCol,$keyname){
+    public function addReference($refTable,$refColName,$targetCol,$keyname,$onupdate='set null',$ondelete='set null'){
         if($refTable instanceof Table){
             $fk = new ForeignKey();
             if($fk->setKeyName($keyname) === TRUE){
-                if($fk->setReferenceCol($refColName) === TRUE){
-                    if($fk->setReferenceTable($refTable->getName()) === TRUE){
-                        if($this->hasColumn($targetCol)){
-                            $fk->setSourceCol($targetCol);
-                            $fk->setReferenceTable($this->getName());
-                            return $this->addForeignKey($fk);
+                if($refTable->hasColumn($refColName)){
+                    if($fk->setReferenceCol($refTable->getCol($refColName)->getName()) === TRUE){
+                        if($fk->setReferenceTable($refTable->getName()) === TRUE){
+                            if($this->hasColumn($targetCol)){
+                                $fk->setSourceCol($this->getCol($targetCol)->getName());
+                                $fk->setSourceTable($this->getName());
+                                $fk->setOnDelete($ondelete);
+                                $fk->setOnUpdate($onupdate);
+                                return $this->addForeignKey($fk);
+                            }
                         }
                     }
                 }
@@ -214,7 +242,7 @@ class Table {
                 if(strpos($param, ' ') === FALSE){
                     for ($x = 0 ; $x < strlen($param) ; $x++){
                         $ch = $param[$x];
-                        if($ch == '_' || ($ch >= 'a' && $ch <= 'z') || ($ch >= 'A' && $ch <= 'Z')){
+                        if($ch == '_' || ($ch >= 'a' && $ch <= 'z') || ($ch >= 'A' && $ch <= 'Z') || ($ch >= '0' && $ch <= '9')){
                             
                         }
                         else{

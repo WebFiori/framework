@@ -5,9 +5,14 @@
  * @uses Table Used by the 'create table' Query.
  * @uses ForeignKey Used to alter a table and insert a foreign key in it.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.8
+ * @version 1.8.1
  */
 abstract class MySQLQuery implements JsonI{
+    /**
+     * Line feed character.
+     * @since 1.8.1
+     */
+    const NL = "\n";
     /**
      * A constant that indicates an error has occurred while executing the query.
      * @var string 
@@ -116,14 +121,14 @@ abstract class MySQLQuery implements JsonI{
      * @since 1.4
      */
     public function alter($alterOps){
-        $q = 'alter table '.$this->getStructureName().' ';
+        $q = 'alter table '.$this->getStructureName().self::NL;
         $count = count($alterOps);
         for($x = 0 ; $x < $count ; $x++){
             if($x + 1 == $count){
-                $q .= $alterOps[$x].';';
+                $q .= $alterOps[$x].';'.self::NL;
             }
             else{
-                $q .= $alterOps[$x].', ';
+                $q .= $alterOps[$x].','.self::NL;
             }
         }
         $this->setQuery($q, 'alter');
@@ -142,28 +147,40 @@ abstract class MySQLQuery implements JsonI{
      * @param Table $table an instance of <b>Table</b>.
      * @since 1.4
      */
-    private function createTable($table){
+    private function createTable($table,$inclComments=false){
         if($table instanceof Table){
-            $query = 'create table if not exists '.$table->getName().'('."\n";
+            $query = '';
+            if($inclComments){
+                $query .= '-- Structure of the table \''.$this->getStructureName().'\''.self::NL;
+                $query .= '-- Number of columns: \''.count($this->getStructure()->columns()).'\''.self::NL;
+                $query .= '-- Number of forign keys: \''.count($this->getStructure()->forignKeys()).'\''.self::NL;
+            }
+            $query = 'create table if not exists '.$table->getName().'('.self::NL;
             $keys = $table->keys();
             $count = count($keys);
             for($x = 0 ; $x < $count ; $x++){
                 if($x + 1 == $count){
-                    $query .= '    '.$table->columns()[$keys[$x]]."\n";
+                    $query .= '    '.$table->columns()[$keys[$x]].self::NL;
                 }
                 else{
-                    $query .= '    '.$table->columns()[$keys[$x]].",\n";
+                    $query .= '    '.$table->columns()[$keys[$x]].','.self::NL;
                 }
             }
-            $query .= ')'."\n";
-            $query .= 'ENGINE = '.$table->getEngine()."\n";
-            $query .= 'DEFAULT CHARSET = '.$table->getCharSet()."\n";
-            $query .= 'collate = utf8_general_ci;'."\n";
+            $query .= ')'.self::NL;
+            $query .= 'ENGINE = '.$table->getEngine().self::NL;
+            $query .= 'DEFAULT CHARSET = '.$table->getCharSet().self::NL;
+            $query .= 'collate = utf8_general_ci;'.self::NL;
             
             //add forign keys
             $count2 = count($table->forignKeys());
+            if($inclComments && $count2 != 0){
+                $query .= '-- Forign keys of the table '.self::NL;
+            }
             for($x = 0 ; $x < $count2 ; $x++){
-                $query .= $table->forignKeys()[$x]->getAlterStatement().";\n";
+                $query .= $table->forignKeys()[$x]->getAlterStatement().';'.self::NL;
+            }
+            if($inclComments){
+                $query .= '-- End of the Structure of the table \''.$this->getStructureName().'\''.self::NL;
             }
             $this->setQuery($query, 'create');
         }
@@ -266,7 +283,9 @@ abstract class MySQLQuery implements JsonI{
      * @param string $col The name of the column in the table.
      * @param string $val The value that is used to filter data.
      * @param string $cond [Optional] The condition of select statement. It can be '=' or 
-     * '!='. If anything else is given, '=' will be used. Default is '='.
+     * '!='. If anything else is given, '=' will be used. Note that if 
+     * the parameter <b>$val</b> is equal to 'IS NULL' or 'IS NOT NULL', 
+     * This parameter is ignored. Default is '='.
      * @param int $limit [Optional] The value of the attribute 'limit' of the select statement. 
      * If zero or a negative value is given, it will not be included in the generated 
      * MySQL query. Default is -1.
@@ -285,11 +304,17 @@ abstract class MySQLQuery implements JsonI{
         else{
             $lmit = '';
         }
-        if(trim($cond) == '!='){
-            $this->setQuery(self::SELECT.$this->getStructureName().' where '.$col.' != '.$val.' '.$lmit, 'select');
+        $valUpper = strtoupper(trim($val));
+        if($valUpper == 'IS NOT NULL' || $valUpper == 'IS NULL'){
+            $this->setQuery(self::SELECT.$this->getStructureName().' where '.$col.' '.$val.' '.$lmit, 'select');
         }
         else{
-            $this->setQuery(self::SELECT.$this->getStructureName().' where '.$col.' = '.$val.' '.$lmit, 'select');
+            if(trim($cond) == '!='){
+                $this->setQuery(self::SELECT.$this->getStructureName().' where '.$col.' != '.$val.' '.$lmit, 'select');
+            }
+            else{
+                $this->setQuery(self::SELECT.$this->getStructureName().' where '.$col.' = '.$val.' '.$lmit, 'select');
+            }
         }
     }
     /**
@@ -297,7 +322,9 @@ abstract class MySQLQuery implements JsonI{
      * @param array $cols An array that contains an objects of type <b>Column</b>.
      * @param array $vals An array that contains values. 
      * @param array $valsConds An array that can contains two possible values: 
-     * '=' or '!='. If anything else is given at specific index, '=' will be used.
+     * '=' or '!='. If anything else is given at specific index, '=' will be used. 
+     * Note that if the value at <b>$vals[$index]</b> is equal to 'IS NULL' or 'IS NOT NULL', 
+     * The value at <b>$valsConds[$index]</b> is ignored. 
      * @param array $jointOps An array of conditions (Such as 'or', 'and', 'xor').
      * @since 1.6
      */
@@ -311,22 +338,33 @@ abstract class MySQLQuery implements JsonI{
                 $equalityCond = '=';
             }
             if($col instanceof Column){
-                if($index + 1 == $count){
-                    $where .= $col->getName().' '.$equalityCond.' ';
-                    if($col->getType() == 'varchar' || $col->getType() == 'datetime' || $col->getType() == 'timestamp' || $col->getType() == 'text' || $col->getType() == 'mediumtext'){
-                        $where .= '\''.$vals[$index].'\'' ;
+                $valUpper = strtoupper(trim($vals[$index]));
+                if($valUpper == 'IS NULL' || $valUpper == 'IS NOT NULL'){
+                    if($index + 1 == $count){
+                        $where .= $col->getName().' '.$vals[$index].'';
                     }
                     else{
-                        $where .= $vals[$index];
+                        $where .= $col->getName().' '.$vals[$index].' '.$jointOps[$index].' ';
                     }
                 }
                 else{
-                    $where .= $col->getName().' '.$equalityCond.' ';
-                    if($col->getType() == 'varchar' || $col->getType() == 'datetime' || $col->getType() == 'timestamp' || $col->getType() == 'text' || $col->getType() == 'mediumtext'){
-                        $where .= '\''.$vals[$index].'\' '.$jointOps[$index].' ' ;
+                    if($index + 1 == $count){
+                        $where .= $col->getName().' '.$equalityCond.' ';
+                        if($col->getType() == 'varchar' || $col->getType() == 'datetime' || $col->getType() == 'timestamp' || $col->getType() == 'text' || $col->getType() == 'mediumtext'){
+                            $where .= '\''.$vals[$index].'\'' ;
+                        }
+                        else{
+                            $where .= $vals[$index];
+                        }
                     }
                     else{
-                        $where .= $vals[$index].' '.$jointOps[$index].' ';
+                        $where .= $col->getName().' '.$equalityCond.' ';
+                        if($col->getType() == 'varchar' || $col->getType() == 'datetime' || $col->getType() == 'timestamp' || $col->getType() == 'text' || $col->getType() == 'mediumtext'){
+                            $where .= '\''.$vals[$index].'\' '.$jointOps[$index].' ' ;
+                        }
+                        else{
+                            $where .= $vals[$index].' '.$jointOps[$index].' ';
+                        }
                     }
                 }
             }
@@ -341,7 +379,7 @@ abstract class MySQLQuery implements JsonI{
         else{
             $lmit = '';
         }
-        $this->setQuery(self::SELECT.$this->getStructureName().' where '.$where, 'select');
+        $this->setQuery(self::SELECT.$this->getStructureName().' where '.$where.' '.$lmit.';', 'select');
     }
     /**
      * Constructs a query that can be used to get table data by using ID column.
@@ -501,10 +539,12 @@ abstract class MySQLQuery implements JsonI{
     }
     /**
      * Constructs a query that can be used to create the table.
+     * @param boolean $inclComments If set to <b>TRUE</b>, the generated MySQL 
+     * query will have basic comments explaining the structure.
      * @since 1.5
      */
-    public function createStructure(){
-        $this->createTable($this->getStructure());
+    public function createStructure($inclComments=false){
+        $this->createTable($this->getStructure($inclComments));
     }
     /**
      * Returns the name of the column from the table given its key.

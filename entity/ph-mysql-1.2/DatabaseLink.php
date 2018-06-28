@@ -167,8 +167,7 @@ class DatabaseLink implements JsonI{
      */
     public function getRow(){
         if($this->result){
-            $r =  mysqli_fetch_assoc($this->result);
-            return $r;
+            return mysqli_fetch_assoc($this->result);
         }
     }
     /**

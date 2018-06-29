@@ -23,11 +23,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+defined('ROOT_DIR') or die('Direct Access Not Allowed.');
 
-//first, load the root
-require_once 'root.php';
-
-//load theme
 $page = Page::get();
 
 //load UI template components (JS, CSS and others)

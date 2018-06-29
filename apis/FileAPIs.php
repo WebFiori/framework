@@ -23,7 +23,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-require_once '../root.php';
+defined('ROOT_DIR') or die('Direct Access Not Allowed.');
 /**
  * A REST API that provides the basic file related operations. 
  * The user can extend this API to add his own File Related APIs.

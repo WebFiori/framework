@@ -23,8 +23,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+defined('ROOT_DIR') or die('Direct Access Not Allowed.');
+
 define('SETUP_MODE', '');
-require_once '../root.php';
 /**
  * An API used to get or information about the system.
  *

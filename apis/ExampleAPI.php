@@ -24,8 +24,7 @@
  * THE SOFTWARE.
  */
 
-//first, load the root
-require '../root.php';
+defined('ROOT_DIR') or die('Direct Access Not Allowed.');
 
 //create class and extend the base class API
 class ExampleAPI extends API{
@@ -56,6 +55,9 @@ class ExampleAPI extends API{
         if($a == 'say-hello'){
             //say hello by sending html document
             $this->send('text/html', '<html><head><title>Say Hello</title></head><body><p>hello</p></body></html>');
+        }
+        else{
+            $this->send('application/json', '{"description":"This is a test api"}');
         }
     }
 

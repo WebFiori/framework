@@ -23,7 +23,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-require_once '../root.php';
+defined('ROOT_DIR') or die('Direct Access Not Allowed.');
 /**
  * An API that has functionality to do with numbers.
  *

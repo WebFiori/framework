@@ -23,8 +23,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
-require_once '../root.php';
+defined('ROOT_DIR') or die('Direct Access Not Allowed.');
 
 // check if user is logged in
 //if not, go to login page

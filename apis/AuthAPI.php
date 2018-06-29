@@ -30,7 +30,8 @@
  * @author Ibrahim
  * @version 1.0
  */
-require_once '../root.php';
+defined('ROOT_DIR') or die('Direct Access Not Allowed.');
+
 class AuthAPI extends API{
     public function __construct() {
         parent::__construct();

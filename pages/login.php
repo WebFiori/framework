@@ -25,7 +25,7 @@
  */
 
 //first, load the root file
-require_once '../root.php';
+defined('ROOT_DIR') or die('Direct Access Not Allowed.');
 $activationTok = filter_input(INPUT_GET, 'activation-token');
 if(WebsiteFunctions::get()->getMainSession()->validateToken() === TRUE){
     header('location: home');

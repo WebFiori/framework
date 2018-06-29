@@ -56,10 +56,12 @@ class Util{
         if(class_exists('Config')){
             if(class_exists('SiteConfig')){
                 if(Config::get()->isConfig() === TRUE){
-                    self::$dbTestInstance = new DatabaseLink(Config::get()->getDBHost(), Config::get()->getDBUser(), Config::get()->getDBPassword());
-                    if(self::$dbTestInstance->isConnected()){
-                        if(self::$dbTestInstance->setDB(Config::get()->getDBName())){
-                            return TRUE;
+                    if(class_exists('DatabaseLink')){
+                        self::$dbTestInstance = new DatabaseLink(Config::get()->getDBHost(), Config::get()->getDBUser(), Config::get()->getDBPassword());
+                        if(self::$dbTestInstance->isConnected()){
+                            if(self::$dbTestInstance->setDB(Config::get()->getDBName())){
+                                return TRUE;
+                            }
                         }
                     }
                     return Util::DB_NEED_CONF;

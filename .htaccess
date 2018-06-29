@@ -3,7 +3,8 @@ RewriteEngine on
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME}\.php -f
 RewriteRule ^(.*)$ $1.php
-#ReWriteRule ^(.*)$ index.php [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+ReWriteRule ^(.*)$ index.php [L,QSA]
 #disable opcache
 #RewriteBase /
 #RewriteCond %{REQUEST_FILENAME} !-f

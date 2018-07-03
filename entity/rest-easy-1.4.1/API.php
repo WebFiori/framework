@@ -536,7 +536,6 @@ abstract class API implements JsonI{
                     $this->filter->clear();
                     foreach ($params as $param) {
                         $this->filter->addRequestPaameter($param);
-                        $this->filter->addParameter($param->getName(), $param->getType());
                     }
                     $reqMeth = $this->getRequestMethod();
                     if($reqMeth == 'GET' || $reqMeth == 'DELETE' || $reqMeth == 'PUT'){

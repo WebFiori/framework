@@ -41,7 +41,7 @@ class AutoLoader{
                 '/entity/queries',
                 '/entity/rest-easy-1.4.1',
                 '/entity/jsonx-1.4',
-                '/entity/ph-mysql-1.1.2',
+                '/entity/ph-mysql-1.2',
                 '/entity/html-php-structs-1.6/structs',
                 '/entity/html-php-structs-1.6/html',
                 '/publish',

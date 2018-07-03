@@ -23,10 +23,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-defined('ROOT_DIR') or die('Direct Access Not Allowed.');
 if(WebsiteFunctions::get()->getMainSession()->validateToken() != TRUE){
     header('location: '.SiteConfig::get()->getBaseURL().'pages/login');
 }
+SystemFunctions::get()->setSetupStage('website');
 $page = Page::get();
 $page->setHasHeader(FALSE);
 $page->setHasAside(FALSE);

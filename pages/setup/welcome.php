@@ -23,11 +23,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-defined('ROOT_DIR') or die('Direct Access Not Allowed.');
-define('SETUP_MODE', '');
 if(Config::get()->isConfig()){
     header('location: '.SiteConfig::get()->getHomePage());
 }
+SystemFunctions::get()->setSetupStage('w');
 $page = Page::get();
 $page->setHasHeader(FALSE);
 $page->setHasAside(FALSE);
@@ -90,7 +89,7 @@ function footer($lang){
     $node = new HTMLNode();
     $node->setClassName('pa-row');
     $nextButton = new HTMLNode('button');
-    $nextButton->setAttribute('onclick', 'window.location.href = \'pages/setup/database-setup\'');
+    $nextButton->setAttribute('onclick', 'window.location.href = \'s/database-setup\'');
     $nextButton->setClassName('pa-'.Page::get()->getWritingDir().'-col-three');
     $nextButton->setID('next-button');
     $nextButton->setAttribute('data-action', 'ok');

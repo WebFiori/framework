@@ -23,11 +23,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-defined('ROOT_DIR') or die('Direct Access Not Allowed.');
-define('SETUP_MODE', '');
 if(Config::get()->isConfig()){
     header('location: '.SiteConfig::get()->getHomePage());
 }
+SystemFunctions::get()->setSetupStage('smtp');
 $page = Page::get();
 $page->setHasHeader(FALSE);
 $page->setHasAside(FALSE);
@@ -114,7 +113,7 @@ function createEmailForm($lbls,$placeholders){
     $passwordNode->setClassName('pa-'.Page::get()->getWritingDir().'-col-twelve');
     $passwordLabel = new Label($lbls['password']);
     $passwordLabel->setClassName('pa-'.Page::get()->getWritingDir().'-col-ten');
-    $passwordInput = new Input();
+    $passwordInput = new Input('password');
     $passwordInput->setPlaceholder($placeholders['password']);
     $passwordInput->setID('password-input');
     $passwordInput->setClassName('pa-'.Page::get()->getWritingDir().'-ltr-col-four');
@@ -175,7 +174,7 @@ function footer($lang){
     $node->setClassName('pa-row');
     
     $prevButton = new HTMLNode('button');
-    $prevButton->setAttribute('onclick', 'window.location.href = \'pages/setup/database-setup\'');
+    $prevButton->setAttribute('onclick', 'window.location.href = \'s/database-setup\'');
     $prevButton->setClassName('pa-'.Page::get()->getWritingDir().'-col-three');
     $prevButton->setID('prev-button');
     $prevButton->setAttribute('data-action', 'ok');
@@ -185,7 +184,7 @@ function footer($lang){
     $node->addChild($prevButton);
     
     $nextButton = new HTMLNode('button');
-    $nextButton->setAttribute('onclick', 'window.location.href = \'pages/setup/admin-account\'');
+    $nextButton->setAttribute('onclick', 'window.location.href = \'s/admin-account\'');
     $nextButton->setClassName('pa-'.Page::get()->getWritingDir().'-col-three');
     $nextButton->setID('next-button');
     $nextButton->setAttribute('data-action', 'ok');

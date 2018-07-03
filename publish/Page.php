@@ -1,9 +1,5 @@
 <?php
 /**
- * The directory where themes will be stored.
- */
-define('THEMES_DIR','publish/themes');
-/**
  * A class used to initialize main page components.
  * @author Ibrahim <ibinshikh@hotmail.com>
  * @version 1.7
@@ -70,14 +66,8 @@ class Page{
      */
     private $canonical;
     /**
-     * A boolean value that is set to true once the theme is loaded.
-     * @var boolean 
-     * @since 1.1
-     */
-    private $isThemeLoaded;
-    /**
-     * An array that contains loaded theme info.
-     * @var array 
+     * An object of type <b>Theme</b> that contains loaded theme info.
+     * @var Theme 
      * @since 1.6
      */
     private $theme;
@@ -111,7 +101,6 @@ class Page{
         $this->contentDir = NULL;
         $this->description = NULL;
         $this->contentLang = NULL;
-        $this->isThemeLoaded = FALSE;
         $this->incFooter = TRUE;
         $this->incHeader = TRUE;
         $this->isDynamic = TRUE;
@@ -165,6 +154,11 @@ class Page{
         }
         return FALSE;
     }
+    /**
+     * A single instance of the class.
+     * @var Page 
+     * @since 1.0
+     */
     private static $instance;
     /**
      * Returns a single instance of <b>Page</b>
@@ -268,7 +262,7 @@ class Page{
             }
             return $this->document;
         }
-        throw new Exception('Theme is not loaded. Call the function Page::loadTheme() first.');
+        throw new Exception('Theme is not loaded. A theme must be loaded before using the document.');
     }
     /**
      * Returns the title of the page.
@@ -285,7 +279,7 @@ class Page{
      * @since 1.1
      */
     public function isThemeLoaded(){
-        return $this->isThemeLoaded;
+        return $this->theme instanceof Theme;
     }
     /**
      * Sets the description of the page.
@@ -383,84 +377,23 @@ class Page{
         return NULL;
     }
     /**
-     * Returns an array that contains the meta data of all available themes. 
-     * @return array An associative array that contains all themes information. The key 
-     * is the theme name and the value is theme info.
-     * @throws Exception If the constant 'ROOT_DIR' is not defined.
-     * @since 1.1 
-     */
-    public function getAvailableThemes(){
-        if(defined('ROOT_DIR')){
-            $themeNames = array();
-            $themesDirs = array_diff(scandir(ROOT_DIR.'/'.THEMES_DIR), array('..', '.'));
-            foreach ($themesDirs as $dir){
-                include ROOT_DIR.'/'.THEMES_DIR.'/'.$dir.'/theme.php';
-                if(isset($GLOBALS['THEME'])){
-                    $themeNames[$GLOBALS['THEME']['META']['name']] = $GLOBALS['THEME'];
-                    unset($GLOBALS['THEME']);
-                }
-            }
-            return $themeNames;
-        }
-        throw new Exception('Unable to load theme because root directory is not defined.');
-    }
-    /**
-     * Loads the selected admin panel theme.
-     * @return boolean <b>TRUE</b> if selected theme is loaded.
-     * @since 1.0
-     * @throws Exception If the constant 'ROOT_DIR' is not defined.
-     * @deprecated since version 1.4
-     */
-    public function loadAdminTheme(){
-        return $this->usingTheme(SiteConfig::get()->getAdminThemeName());
-    }
-    /**
      * Loads a theme given its name.
      * @param string $themeName [Optional] The name of the theme as specified by the 
      * variable 'name' in theme definition. If the given name is <b>NULL</b>, the 
      * function will load the default theme as specified by the function 
      * <b>SiteConfig::getBaseThemeName()</b>.
-     * @return boolean The function will return <b>TRUE</b> once the 
-     * theme is loaded.
-     * @throws Exception The first case that the function will throw an exception 
-     * is when the constant 'ROOT_DIR' is not defined. Also the function will throw 
+     * @throws Exception The function will throw 
      * an exception if no theme was found which has the given name. Another case is 
-     * when the file 'theme.php' of the theme is missing. Also if the variabale 
-     * 'THEME_COMPONENTS' is not defined. Finally, an exception will be thrown 
-     * if theme component is not found.
+     * when the file 'theme.php' of the theme is missing. 
+     * Finally, an exception will be thrown if theme component is not found.
      * @since 1.4
+     * @see Theme::usingTheme()
      */
     public function usingTheme($themeName=null) {
-        if(defined('ROOT_DIR')){
-            if($themeName == NULL){
-                $themeName = SiteConfig::get()->getBaseThemeName();
-            }
-            $themes = $this->getAvailableThemes();
-            if(isset($themes[$themeName])){
-                $this->theme = $themes[$themeName];
-                $theme = $this->getTheme();
-                $themeDir = ROOT_DIR.'/'.THEMES_DIR.'/'.$theme['META']['directory'];
-                require_once $themeDir.'/theme.php';
-                if(isset($theme['COMPONENTS'])){
-                    foreach ($theme['COMPONENTS'] as $component){
-                        if(file_exists($themeDir.'/'.$component)){
-                            require_once $themeDir.'/'.$component;
-                        }
-                        else{
-                            throw new Exception('Component \''.$component.'\' of the theme not found. Eather define it or remove it from the array \'COMPONENTS\'.');
-                        }
-                    }
-                    $this->isThemeLoaded = TRUE;
-                    if(function_exists('afterThemeLoaded')){
-                        afterThemeLoaded();
-                    }
-                    return TRUE;
-                }
-                throw new Exception('The variable \'COMPONENTS\' is missing from the theme definition.');
-            }
-            throw new Exception('No such theme: \''.$themeName.'\'.');
-        }
-        throw new Exception('Unable to load theme because root directory is not defined.');
+        $themeNamel = $themeName === NULL ? $themeName : SiteConfig::get()->getBaseThemeName();
+        $tmpTheme = Theme::usingTheme($themeNamel);
+        $this->theme = $tmpTheme;
+        $this->theme->invokeAfterLoaded();
     }
     /**
      * Returns the directory at which CSS files of the theme exists.
@@ -472,7 +405,7 @@ class Page{
     public function getThemeCSSDir() {
         if($this->isThemeLoaded()){
             $theme = $this->getTheme();
-            return THEMES_DIR.'/'.$theme['css-dir'];
+            return Theme::THEMES_DIR.'/'.$theme->getDirectoryName().'/'.$theme->getCssDirName();
         }
         return '';
     }
@@ -486,7 +419,7 @@ class Page{
     public function getThemeImagesDir() {
         if($this->isThemeLoaded()){
             $theme = $this->getTheme();
-            return THEMES_DIR.'/'.$theme['images-dir'];
+            return Theme::THEMES_DIR.'/'.$theme->getDirectoryName().'/'.$theme->getImagesDirName();
         }
         return '';
     }
@@ -500,28 +433,18 @@ class Page{
     public function getThemeJSDir() {
         if($this->isThemeLoaded()){
             $theme = $this->getTheme();
-            return THEMES_DIR.'/'.$theme['js-dir'];
+            return Theme::THEMES_DIR.'/'.$theme->getDirectoryName().'/'.$theme->getJsDirName();
         }
         return '';
     }
     /**
-     * Returns an array that contains theme information.
-     * @return array|NULL An array that contains theme information. If the theme 
+     * Returns an object of type <b>Theme</b> that contains loaded theme information.
+     * @return Theme|NULL An object of type <b>Theme</b> that contains theme information. If the theme 
      * is not loaded, the function will return <b>NULL</b>.
      * @since 1.6
      */
     public function getTheme() {
         return $this->theme;
-    }
-    /**
-     * Loads the selected web site theme.
-     * @return boolean <b>TRUE</b> if selected theme is loaded.
-     * @since 1.0
-     * @throws Exception If the constant 'ROOT_DIR' is not defined.
-     * @deprecated since version 1.4
-     */
-    public function loadTheme(){
-        return $this->usingTheme(SiteConfig::get()->getBaseThemeName());
     }
     /**
      * Returns the writing direction of the page.
@@ -575,6 +498,7 @@ class Page{
             $this->incHeader = $bool;
         }
     }
+    
     public function setHasAside($bool){
         if(gettype($bool) == 'boolean'){
             if($this->document != NULL){

@@ -24,7 +24,10 @@
  * THE SOFTWARE.
  */
 
-defined('ROOT_DIR') or die('Direct Access Not Allowed.');
+if(!defined('ROOT_DIR')){
+    header('HTTP/1.1 403 Forbidden');
+    exit;
+}
 
 //create class and extend the base class API
 class ExampleAPI extends API{

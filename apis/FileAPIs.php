@@ -23,7 +23,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-defined('ROOT_DIR') or die('Direct Access Not Allowed.');
+if(!defined('ROOT_DIR')){
+    header('HTTP/1.1 403 Forbidden');
+    exit;
+}
 /**
  * A REST API that provides the basic file related operations. 
  * The user can extend this API to add his own File Related APIs.

@@ -30,11 +30,43 @@
  * @author Ibrahim
  */
 class Router {
+    /**
+     * A constant for the route of views. It is simply the root directory where web 
+     * pages should be created.
+     * @since 1.0
+     */
     const VIEW_ROUTE = '/pages';
+    /**
+     * A constant for the route of APIs. It is simply the root directory where APIs 
+     * should be created.
+     * @since 1.0
+     */
     const API_ROUTE = '/apis';
+    /**
+     * A constant for the case when the route is a function call.
+     * @since 1.0
+     */
+    const FUNCTION_ROUTE = 'func';
+    /**
+     * A constant for custom directory route.
+     * @since 1.0
+     */
+    const CUSTOMIZED = '/';
+    /**
+     * A callback function to call in case if a rout is 
+     * not found.
+     * @var Function 
+     * @since 1.0
+     */
+    private $onNotFound;
+    /**
+     * A single instance of the router.
+     * @var Router
+     * @since 1.0 
+     */
     private static $router;
     /**
-     * Returns a single instance of the router.
+     * Creates and Returns a single instance of the router.
      * @return Router
      * @since 1.0
      */
@@ -57,27 +89,9 @@ class Router {
      */
     private function __construct() {
         $this->routes = array();
-        $this->addRoute('/SysAPIs', 'SysAPIs.php', self::API_ROUTE);
-        $this->addRoute('/AuthAPI', 'AuthAPI.php', self::API_ROUTE);
-        $this->addRoute('/FileAPIs', 'FileAPIs.php', self::API_ROUTE);
-        $this->addRoute('/UserAPIs', 'UserAPIs.php', self::API_ROUTE);
-        $this->addRoute('/NumsAPIs', 'NumsAPIs.php', self::API_ROUTE);
-        $this->addRoute('/WebsiteAPIs', 'WebsiteAPIs.php', self::API_ROUTE);
-        $this->addRoute('/PasswordAPIs', 'PasswordAPIs.php', self::API_ROUTE);
-        $this->addRoute('/apis/{example}', 'ExampleAPI.php', self::API_ROUTE);
-        $this->addRoute('/views/{example}', 'example-page.php', self::VIEW_ROUTE);
+        $this->onNotFound = function (){};
         $this->addRoute('/', 'default.html', self::VIEW_ROUTE);
-        $this->addRoute('/index', 'login.php', self::VIEW_ROUTE);
-        $this->addRoute('/setup/welcome', 'setup/welcome.php', self::VIEW_ROUTE);
-        $this->addRoute('/setup/admin-account', 'setup/admin-account.php', self::VIEW_ROUTE);
-        $this->addRoute('/setup/database', 'setup/database-setup.php', self::VIEW_ROUTE);
-        $this->addRoute('/setup/email', 'setup/email-account.php', self::VIEW_ROUTE);
-        $this->addRoute('/setup/website', 'setup/website-config.php', self::VIEW_ROUTE);
-        $this->addRoute('/home', 'home.php', self::VIEW_ROUTE);
-        $this->addRoute('/login', 'login.php', self::VIEW_ROUTE);
-        $this->addRoute('/logout', 'logout.php', self::VIEW_ROUTE);
-        $this->addRoute('/new-password', 'new-password.php', self::VIEW_ROUTE);
-        $this->addRoute('/activate-account', 'activate-account.php', self::VIEW_ROUTE);
+        $this->addRoute('/index', 'default.html', self::VIEW_ROUTE);
     }
     /**
      * 
@@ -88,18 +102,38 @@ class Router {
      * @since 1.0
      */
     public function addRoute($rquestedUri,$routeTo,$routeType) {
-        if($routeType == self::API_ROUTE || $routeType == self::VIEW_ROUTE){
+        if($routeType == self::API_ROUTE || 
+           $routeType == self::VIEW_ROUTE || 
+           $routeType == self::CUSTOMIZED || $routeType == self::FUNCTION_ROUTE){
             $requestedUriBoken = Router::splitURI($rquestedUri);
-            $routeBroken = Router::splitURI($routeTo);
             if($requestedUriBoken['protocol'] == ''){
                 $rquestedUri = trim(SiteConfig::get()->getBaseURL(),'/').$rquestedUri;
                 $requestedUriBoken = Router::splitURI($rquestedUri);
             }
-            $routeFile = ROOT_DIR.$routeType.'/'.$routeBroken['uri-without-query-string'];
-            if(file_exists($routeFile)){
+            if($routeType != self::FUNCTION_ROUTE){
+                $routeBroken = Router::splitURI($routeTo);
+                $routeFile = ROOT_DIR.$routeType.'/'.$routeBroken['uri-without-query-string'];
+                if(file_exists($routeFile)){
+                    $this->routes[$requestedUriBoken['uri-without-query-string']] = array(
+                        'route-type'=>$routeType,
+                        'requested-uri-format'=>$requestedUriBoken['uri'],
+                        'route-to'=>$routeFile,
+                        'variables'=>array()
+                    );
+                    foreach ($requestedUriBoken['uri-broken'] as $val){
+                        $len = strlen($val);
+                        if($val[0] == '{' && $val[$len - 1] == '}'){
+                            array_push($this->routes[$requestedUriBoken['uri-without-query-string']]['variables'], $val);
+                        }
+                    }
+                    return TRUE;
+                }
+            }
+            else{
                 $this->routes[$requestedUriBoken['uri-without-query-string']] = array(
+                    'route-type'=>$routeType,
                     'requested-uri-format'=>$requestedUriBoken['uri'],
-                    'route-to'=>$routeFile,
+                    'route-to'=>$routeTo,
                     'variables'=>array()
                 );
                 foreach ($requestedUriBoken['uri-broken'] as $val){
@@ -112,6 +146,11 @@ class Router {
             }
         }
         return FALSE;
+    }
+    public function setOnNotFound($function) {
+        if(is_callable($function)){
+            $this->onNotFound = $function;
+        }
     }
     /**
      * Breaks a URI into its basic components. This function can break 
@@ -178,31 +217,60 @@ class Router {
      * @since 1.0
      */
     public function route($uri) {
-        $uriSplit = Router::splitURI($uri);
-        if($uriSplit['protocol'] == ''){
-            $uri = trim(SiteConfig::get()->getBaseURL(),'/').$uri;
+        if(count($this->routes) != 0){
             $uriSplit = Router::splitURI($uri);
-        }
-        $origUri = $uri;
-        foreach ($this->routes as $route){
-            $this->routes[$route['requested-uri-format']]['var-values'] = $this->extractVarsValue($uri, $route);
-        }
-        foreach ($this->routes as $route){
-            if(isset($route['var-values']) && count($route['var-values']) != 0){
-                foreach ($route['var-values'] as $key => $value){
-                    $keyTrim = trim($key, '{');
-                    $_GET[trim($keyTrim,'}')] = $value;
-                    $uri = str_replace($value, $key, $uri);
+            if($uriSplit['protocol'] == ''){
+                $uri = trim(SiteConfig::get()->getBaseURL(),'/').$uri;
+                $uriSplit = Router::splitURI($uri);
+            }
+            $origUri = $uri;
+            $requestMethod = filter_var(getenv('REQUEST_METHOD'));
+            foreach ($this->routes as $route){
+                $this->routes[$route['requested-uri-format']]['var-values'] = $this->extractVarsValue($uri, $route);
+            }
+            foreach ($this->routes as $route){
+                if(isset($route['var-values']) && count($route['var-values']) != 0){
+                    foreach ($route['var-values'] as $key => $value){
+                        $keyTrim = trim($key, '{');
+                        if($requestMethod == 'GET' || $requestMethod == 'DELETE'){
+                            $_GET[trim($keyTrim,'}')] = $value;
+                        }
+                        else if($requestMethod == 'POST' || $requestMethod == 'PUT'){
+                            $_POST[trim($keyTrim,'}')] = $value;
+                        }
+                        $uri = str_replace($value, $key, $uri);
+                    }
                 }
             }
-        }
-        if(isset($this->routes[$uri])){
-            require_once $this->routes[$uri]['route-to'];
+            if(isset($this->routes[$uri])){
+                if($this->routes[$uri]['route-type'] != self::FUNCTION_ROUTE){
+                    require_once $this->routes[$uri]['route-to'];
+                }
+                else{
+                    call_user_func($this->routes[$uri]['route-to']);
+                }
+                return TRUE;
+            }
+            else{
+                call_user_func($this->onNotFound);
+                return FALSE;
+            }
         }
         else{
-            http_response_code(404);
-            echo 'The resource at <b>'.$origUri.'</b> was Not Found';
+            die('No routes are available.');
         }
+    }
+    /**
+     * Removes all added routes.
+     * @since 1.0
+     */
+    public function clear() {
+        $this->routes = array();
+    }
+    
+    public function notFound($origUri) {
+        http_response_code(404);
+        die('The resource at <b>'.$origUri.'</b> was Not Found');
     }
     
     private function extractVarsValue($requestedUri,$routeArr) {

@@ -54,47 +54,7 @@ class APIFilter{
      * @var array
      * @since 1.0 
      */
-    private $defenitions = array();
     private $paramDefs = array();
-    /**
-     * Adds new value to filter from request body.
-     * @param string $name The name of the variable.
-     * @param string $type The type of the variable. It must be a value from the 
-     * array <b>APIFilter::TYPES</b>.
-     * @return boolean <b>TRUE</b> in case the filter is applied. <b>FALSE<b> 
-     * otherwise.
-     * @since 1.0
-     * @deprecated since version 1.0 Use <b>APIFilter::addRequestPaameter()</b> instead.
-     */
-    public function addParameter($name,$type){
-        $sType = strtolower($type);
-        if(strlen($name) != 0){
-            if(!in_array($name, $this->defenitions)){
-                if(in_array($type, self::TYPES)){
-                    if($sType == 'integer'){
-                        $this->defenitions[$name] = FILTER_SANITIZE_NUMBER_INT;
-                        return TRUE;
-                    }
-                    else if($sType == 'string'){
-                        $this->defenitions[$name] = FILTER_SANITIZE_STRING;
-                        return TRUE;
-                    }
-                    else if($sType == 'email'){
-                        $this->defenitions[$name] = FILTER_SANITIZE_EMAIL;
-                        return TRUE;
-                    }
-                    else if($sType == 'float'){
-                        $this->defenitions[$name] = FILTER_SANITIZE_NUMBER_FLOAT;
-                        return TRUE;
-                    }
-                    else{
-                        $this->defenitions[$name] = FILTER_DEFAULT;
-                    }
-                }
-            }
-        }
-        return FALSE;
-    }
     /**
      * Adds a new request parameter to the filter.
      * @param RequestParameter $reqParam The request parameter that will be added.
@@ -196,18 +156,19 @@ class APIFilter{
         foreach ($this->paramDefs as $def){
             $name = $def['parameter']->getName();
             if(isset($_GET[$name])){
-                $this->nonFilteredInputs[$name] = $_GET[$name];
+                $toBeFiltered = $_GET[$name];
+                $this->nonFilteredInputs[$name] = $toBeFiltered;
                 if(isset($def['options']['filter-func'])){
                     $filteredValue = '';
                     $arr = array(
-                        'original-value'=>$_GET[$name],
+                        'original-value'=>$toBeFiltered,
                     );
                     if($def['parameter']->applyBasicFilter() === TRUE){
                         if($def['parameter']->getType() == 'boolean'){
-                            $filteredValue = $this->filterBoolean(filter_input(INPUT_GET, $name));
+                            $filteredValue = $this->filterBoolean(filter_var($toBeFiltered));
                         }
                         else{
-                            $filteredValue = filter_input(INPUT_GET, $name);
+                            $filteredValue = filter_var($toBeFiltered);
                             foreach ($def['filters'] as $val) {
                                 $filteredValue = filter_var($filteredValue, $val, $def['options']);
                             }
@@ -234,14 +195,14 @@ class APIFilter{
                 }
                 else{
                     if($def['parameter']->getType() == 'boolean'){
-                        $this->inputs[$name] = $this->filterBoolean(filter_input(INPUT_GET, $name));
+                        $this->inputs[$name] = $this->filterBoolean(filter_var($toBeFiltered));
                     }
                     else{
-                        $this->inputs[$name] = filter_input(INPUT_GET, $name);
+                        $this->inputs[$name] = filter_var($toBeFiltered);
                         foreach ($def['filters'] as $val) {
                             $this->inputs[$name] = filter_var($this->inputs[$name], $val, $def['options']);
                         }
-                        if($this->inputs[$name] == FALSE){
+                        if($this->inputs[$name] === FALSE){
                             $this->inputs[$name] = 'INV';
                         }
                     }
@@ -262,18 +223,19 @@ class APIFilter{
         foreach ($this->paramDefs as $def){
             $name = $def['parameter']->getName();
             if(isset($_POST[$name])){
-                $this->nonFilteredInputs[$name] = $_POST[$name];
+                $toBeFiltered = $_POST[$name];
+                $this->nonFilteredInputs[$name] = $toBeFiltered;
                 if(isset($def['options']['filter-func'])){
                     $filteredValue = '';
                     $arr = array(
-                        'original-value'=>$_POST[$name],
+                        'original-value'=>$toBeFiltered,
                     );
                     if($def['parameter']->applyBasicFilter() === TRUE){
                         if($def['parameter']->getType() == 'boolean'){
-                            $filteredValue = $this->filterBoolean(filter_input(INPUT_POST, $name));
+                            $filteredValue = $this->filterBoolean(filter_var($toBeFiltered));
                         }
                         else{
-                            $filteredValue = filter_input(INPUT_POST, $name);
+                            $filteredValue = filter_var($toBeFiltered);
                             foreach ($def['filters'] as $val) {
                                 $filteredValue = filter_var($filteredValue, $val, $def['options']);
                             }
@@ -300,10 +262,10 @@ class APIFilter{
                 }
                 else{
                     if($def['parameter']->getType() == 'boolean'){
-                        $this->inputs[$name] = $this->filterBoolean(filter_input(INPUT_POST, $name));
+                        $this->inputs[$name] = $this->filterBoolean(filter_var($toBeFiltered));
                     }
                     else{
-                        $this->inputs[$name] = filter_input(INPUT_POST, $name);
+                        $this->inputs[$name] = filter_var($toBeFiltered);
                         foreach ($def['filters'] as $val) {
                             $this->inputs[$name] = filter_var($this->inputs[$name], $val, $def['options']);
                         }
@@ -325,7 +287,6 @@ class APIFilter{
      * @since 1.1
      */
     public function clear() {
-        $this->defenitions = array();
         $this->paramDefs = array();
         $this->inputs = NULL;
         $this->nonFilteredInputs = NULL;

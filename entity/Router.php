@@ -223,11 +223,12 @@ class Router {
                 $uri = trim(SiteConfig::get()->getBaseURL(),'/').$uri;
                 $uriSplit = Router::splitURI($uri);
             }
-            $origUri = $uri;
             $requestMethod = filter_var(getenv('REQUEST_METHOD'));
             foreach ($this->routes as $route){
+                
                 $this->routes[$route['requested-uri-format']]['var-values'] = $this->extractVarsValue($uri, $route);
             }
+            
             foreach ($this->routes as $route){
                 if(isset($route['var-values']) && count($route['var-values']) != 0){
                     foreach ($route['var-values'] as $key => $value){
@@ -240,6 +241,9 @@ class Router {
                         }
                         $uri = str_replace($value, $key, $uri);
                     }
+                }
+                if(isset($this->routes[$uri])){
+                    break;
                 }
             }
             if(isset($this->routes[$uri])){

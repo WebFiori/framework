@@ -93,7 +93,7 @@ class WebsiteAPIs extends API{
         if(isset($i['site-theme'])){
             $cfgArr['theme-name'] = $i['site-theme'];
         }
-        SystemFunctions::get()->updateSiteInfo($cfgArr);
+        WebsiteFunctions::get()->updateSiteInfo($cfgArr);
         $this->sendResponse('Site info updated.');
             
     }

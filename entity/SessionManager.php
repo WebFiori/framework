@@ -2,7 +2,7 @@
 /**
  * A helper class to manage system sessions.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.5
+ * @version 1.6
  */
 class SessionManager implements JsonI{
     /**
@@ -71,6 +71,9 @@ class SessionManager implements JsonI{
     const SUPPORTED_LANGS = array(
         'EN','AR'
     );
+    public function __toString() {
+        return $this->toJSON().'';
+    }
     /**
      * Creates new session manager.
      * @param string $session_name The name of the session.
@@ -78,11 +81,27 @@ class SessionManager implements JsonI{
      */
     public function __construct($session_name='pa-seesion') {
         $this->sessionName = $session_name;
-        //initial life time: 100 minutes.
-        $this->lifeTime = 100;
+        //initial life time: 120 minutes.
+        $this->lifeTime = 120;
         $this->sessionStatus = 'Not Running';
         $this->resumed = FALSE;
+        if(session_status() == PHP_SESSION_ACTIVE){
+            session_write_close();
+            session_id($this->generateSessionID());
+        }
         session_save_path(ROOT_DIR.'/tmp');
+    }
+    /**
+     * Generate a random session ID.
+     * @return string A new random session ID.
+     * @since 1.6
+     */
+    private function generateSessionID() {
+        $date = date(DATE_ISO8601);
+        $hash = hash('sha256', $date);
+        $time = time() + rand(0, 1000);
+        $hash2 = hash('sha256',$hash.$time);
+        return substr($hash2, 0, 27);
     }
     /**
      * Sets the lifetime of the session.
@@ -154,9 +173,18 @@ class SessionManager implements JsonI{
         if(isset($_SESSION['lang']) && !$forceUpdate){
             return FALSE;
         }
-        $lang = filter_input(INPUT_GET, 'lang');
+        //the value of default language.
+        //used in case no language found 
+        //in $_GET['lang']
+        $defaultLang = 'EN';
+        $lang = NULL;
+        if(isset($_GET['lang'])){
+            $lang = filter_var($_GET['lang'],FILTER_SANITIZE_STRING);
+        }
         if($lang == FALSE || $lang == NULL){
-            $lang = filter_input(INPUT_POST, 'lang');
+            if(isset($_POST['lang'])){
+                $lang = filter_var($_POST['lang'],FILTER_SANITIZE_STRING);
+            }
             if($lang == FALSE || $lang == NULL){
                 $lang = filter_input(INPUT_COOKIE, 'lang');
                 if($lang == FALSE || $lang == NULL){
@@ -168,7 +196,7 @@ class SessionManager implements JsonI{
             return FALSE;
         }
         else if($lang == NULL && $useDefault === TRUE){
-            $lang = 'EN';
+            $lang = $defaultLang;
         }
         else if($lang == NULL && $useDefault !== TRUE){
             return FALSE;
@@ -178,7 +206,7 @@ class SessionManager implements JsonI{
             $_SESSION['lang'] = $langU;
         }
         else if($useDefault === TRUE){
-            $_SESSION['lang'] = 'EN';
+            $_SESSION['lang'] = $defaultLang;
         }
         else{
             return FALSE;
@@ -220,9 +248,9 @@ class SessionManager implements JsonI{
     public function validateToken(){
         $tok = filter_input(INPUT_COOKIE, 'token');
         if($tok === FALSE || $tok === NULL){
-            $tok = filter_input(INPUT_GET, 'token');
+            $tok = filter_var($_GET['token'],FILTER_SANITIZE_STRING);
             if($tok === FALSE || $tok === NULL){
-                $tok = filter_input(INPUT_POST, 'token');
+                $tok = filter_var($_POST['token'],FILTER_SANITIZE_STRING);
                 if($tok === FALSE || $tok === NULL){
                     return FALSE;
                 }
@@ -326,6 +354,9 @@ class SessionManager implements JsonI{
      * @since 1.0
      * @param boolean $refresh [optional] If set to true, The due time of the session will 
      * be refreshed if the session is not timed out. Default is <b>FALSE</b>. 
+     * @param boolean $useDefaultLang [Optional] If the session is new and 
+     * there was no language parameter was found in the request and this parameter 
+     * is set to <b>TRUE</b>, default language will be used (EN). 
      * @param boolean $useDb [optional] If set to <b>TRUE</b>, an attempt to connect 
      * to a database will be done. 
      * @param array $dbAttributes Database connection info.
@@ -380,6 +411,7 @@ class SessionManager implements JsonI{
             $_SESSION['started-at'] = time();
             $_SESSION['resumed-at'] = time();
             $_SESSION['lifetime'] = $this->getLifetime();
+            $_SESSION['name'] = $this->getName();
             if(gettype($refresh) === 'boolean'){
                 $_SESSION['refresh'] = $refresh;
             }
@@ -535,6 +567,13 @@ class SessionManager implements JsonI{
     public function isResumed(){
         return $this->resumed;
     }
+    public static function getSessionIDFromCookie($sessionName) {
+        $sid = filter_input(INPUT_COOKIE, $sessionName);
+        if($sid !== NULL && $sid !== FALSE){
+            return $sid;
+        }
+        return FALSE;
+    }
     /**
      * Checks if there exist a session with the given session name or not. If there 
      * is a one and it is not timed out, the function will resume it.
@@ -545,10 +584,9 @@ class SessionManager implements JsonI{
      */
     public function resume(){
         if($this->hasCookie()){
-            if(!isset($_SESSION)){
-                session_name($this->getName());
-                session_start();
-            }
+            session_name($this->getName());
+            session_id(self::getSessionIDFromCookie($this->getName()));
+            session_start();
             if($this->validateAttrs()){
                 if(!$this->isTimeout()){
                     $this->resumed = true;
@@ -575,7 +613,7 @@ class SessionManager implements JsonI{
         }
         else{
             $this->kill();
-            $this->sessionStatus = 'Killed for invalid cookie';
+            $this->sessionStatus = 'Killed. Eaher has no cookie or invalid cookie';
         }
         return FALSE;
     }

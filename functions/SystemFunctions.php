@@ -36,6 +36,13 @@ class SystemFunctions extends Functions{
         'O'=>'Open',
         'AO'=>'Admin Only'
     );
+    public static $SETUP_STAGES = array(
+        'w'=>'welcome',
+        'db'=>'database-setup',
+        'smtp'=>'smtp-account-setup',
+        'admin'=>'admin-account',
+        'site'=>'site-configuration'
+    );
     /**
      * A constant that indicates the selected database schema has tables.
      * @since 1.1
@@ -89,7 +96,24 @@ class SystemFunctions extends Functions{
         self::$singleton = new SystemFunctions();
         return self::$singleton;
     }
-    
+    private $setupSession;
+    public function initSetupSession() {
+        $this->setupSession = new SessionManager('setup-session');
+        $this->setupSession->initSession(TRUE, TRUE);
+        if(!isset($_SESSION['setup-step'])){
+            $_SESSION['setup-step'] = self::$SETUP_STAGES['w'];
+        }
+    }
+    public function setSetupStage($stageCode) {
+        $this->initSetupSession();
+        if(isset($this->SETUP_STAGES[$stageCode])){
+            $_SESSION['setup-step'] = self::$SETUP_STAGES[$stageCode];
+        }
+    }
+    public function getSetupStep() {
+        $this->initSetupSession();
+        return $_SESSION['setup-step'];
+    }
     /**
      * Creates the file 'Config.php' if it does not exist.
      * @since 1.0
@@ -197,8 +221,12 @@ class SystemFunctions extends Functions{
      * @since 1.0
      */
     private function writeConfig($configArr){
-        $fh = new FileHandler(ROOT_DIR.'/Config.php');
+        $fh = new FileHandler(ROOT_DIR.'/entity/Config.php');
         $fh->write('<?php', TRUE, TRUE);
+        $fh->write('if(!defined(\'ROOT_DIR\')){
+    header(\'HTTP/1.1 403 Forbidden\');
+    exit;
+}', TRUE, TRUE);
         $fh->write('/**
  * Global configuration class. Used by the server part and the presentation part.
  * Do not modify this file manually unless you know what you are doing.

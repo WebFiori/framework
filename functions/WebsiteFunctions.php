@@ -23,7 +23,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
+if(!defined('ROOT_DIR')){
+    header('HTTP/1.1 403 Forbidden');
+    exit;
+}
 /**
  * Description of WebsiteFunctions
  *
@@ -132,8 +135,12 @@ class WebsiteFunctions extends Functions{
      * @since 1.0
      */
     private function writeSiteConfig($configArr){
-        $fh = new FileHandler(ROOT_DIR.'/SiteConfig.php');
+        $fh = new FileHandler(ROOT_DIR.'/entity/SiteConfig.php');
         $fh->write('<?php', TRUE, TRUE);
+        $fh->write('if(!defined(\'ROOT_DIR\')){
+    header(\'HTTP/1.1 403 Forbidden\');
+    exit;
+}', TRUE, TRUE);
         $fh->write('class SiteConfig{', TRUE, TRUE);
         $fh->addTab();
         $fh->write('/**

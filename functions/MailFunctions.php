@@ -79,8 +79,12 @@ class MailFunctions extends Functions{
      * @since 1.1
      */
     private function writeMailConfig($emailAccountsArr){
-        $fh = new FileHandler(ROOT_DIR.'/MailConfig.php');
+        $fh = new FileHandler(ROOT_DIR.'/entity/MailConfig.php');
         $fh->write('<?php', TRUE, TRUE);
+        $fh->write('if(!defined(\'ROOT_DIR\')){
+    header(\'HTTP/1.1 403 Forbidden\');
+    exit;
+}', TRUE, TRUE);
         $fh->write('/**
  * A file that contains system email addresses configurations.
  *

@@ -24,7 +24,7 @@
 function checkMailParams(){
     var ajax = new AJAX({
         method:'post',
-        url:'apis/SysAPIs'
+        url:APIS.SysAPIs.link
     });
     var form = new FormData();
     form.append('action','update-send-email-account');
@@ -70,7 +70,7 @@ function checkMailParams(){
 function runSetup(){
     var ajax = new AJAX({
         method:'post',
-        url:'apis/SysAPIs'
+        url:APIS.SysAPIs.link
     });
     var form = new FormData();
     form.append('action','create-first-account');
@@ -122,7 +122,7 @@ function runSetup(){
 function checkConectionParams(){
     var ajax = new AJAX({
         method:'post',
-        url:'apis/SysAPIs'
+        url:APIS.SysAPIs.link
     });
     var form = new FormData();
     form.append('action','update-database-attributes');
@@ -265,7 +265,7 @@ function siteInfoInputsChanged(){
 function updateSiteInfo(){
     var ajax = new AJAX({
         method:'post',
-        url:'apis/WebsiteAPIs'
+        url:APIS.WebsiteAPIs.link
     });
     var form = new FormData();
     form.append('action','update-site-info');

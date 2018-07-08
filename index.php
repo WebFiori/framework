@@ -75,19 +75,19 @@ function createRoutes(){
         }
     }, Router::FUNCTION_ROUTE);
     $router->addRoute('/SysAPIs', 'SysAPIs.php', Router::API_ROUTE);
-    $router->addRoute('/SysAPIs/{action}', 'SysAPIs.php', Router::API_ROUTE);
-    $router->addRoute('/AuthAPI/{action}', 'AuthAPI.php', Router::API_ROUTE);
-    $router->addRoute('/ExampleAPI/{action}', 'ExampleAPI.php', Router::API_ROUTE);
-    $router->addRoute('/NumsAPIs/{action}', 'NumsAPIs.php', Router::API_ROUTE);
-    $router->addRoute('/PasswordAPIs/{action}', 'PasswordAPIs.php', Router::API_ROUTE);
-    $router->addRoute('/UserAPIs/{action}', 'UserAPIs.php', Router::API_ROUTE);
-    $router->addRoute('/WebsiteAPIs/{action}', 'WebsiteAPIs.php', Router::API_ROUTE);
+    $router->addRoute('/SysAPIs', 'SysAPIs.php', Router::API_ROUTE);
+    $router->addRoute('/AuthAPI', 'AuthAPI.php', Router::API_ROUTE);
+    $router->addRoute('/ExampleAPI', 'ExampleAPI.php', Router::API_ROUTE);
+    $router->addRoute('/NumsAPIs', 'NumsAPIs.php', Router::API_ROUTE);
+    $router->addRoute('/PasswordAPIs', 'PasswordAPIs.php', Router::API_ROUTE);
+    $router->addRoute('/UserAPIs', 'UserAPIs.php', Router::API_ROUTE);
     $router->addRoute('/WebsiteAPIs', 'WebsiteAPIs.php', Router::API_ROUTE);
     $router->addRoute('/login', 'login.php', Router::VIEW_ROUTE);
     $router->addRoute('/home', 'home.php', Router::VIEW_ROUTE);
     $router->addRoute('/activate-account', 'acctivate-account.php', Router::VIEW_ROUTE);
     $router->addRoute('/logout', 'logout.php', Router::VIEW_ROUTE);
     $router->addRoute('/new-password', 'new-password.php', Router::VIEW_ROUTE);
+    $router->addRoute('/alyaseen-home', 'alyaseen-home.php', Router::VIEW_ROUTE);
 }
 /**
  * Returns the requested URI.

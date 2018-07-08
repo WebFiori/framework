@@ -390,8 +390,10 @@ class Page{
      * @see Theme::usingTheme()
      */
     public function usingTheme($themeName=null) {
-        $themeNamel = $themeName === NULL ? $themeName : SiteConfig::get()->getBaseThemeName();
-        $tmpTheme = Theme::usingTheme($themeNamel);
+        if($themeName === NULL){
+            $themeName = SiteConfig::get()->getBaseThemeName();
+        }
+        $tmpTheme = Theme::usingTheme($themeName);
         $this->theme = $tmpTheme;
         $this->theme->invokeAfterLoaded();
     }

@@ -85,7 +85,7 @@ class Theme {
      * @since 1.0
      */
     public static function usingTheme($themeName=null) {
-        if($themeName == NULL){
+        if($themeName === NULL){
             $themeName = SiteConfig::get()->getBaseThemeName();
         }
         $themeToLoad = NULL;

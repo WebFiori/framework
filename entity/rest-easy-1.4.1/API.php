@@ -631,10 +631,14 @@ abstract class API implements JsonI{
     public function getAction(){
         $reqMeth = $this->getRequestMethod();
         if($reqMeth == 'GET' || $reqMeth == 'DELETE' || $reqMeth == 'PUT'){
-            return filter_var($_GET['action']);
+            if(isset($_GET['action'])){
+                return filter_var($_GET['action']);
+            }
         }
         else if($reqMeth == 'POST'){
-            return filter_var($_POST['action']);
+            if(isset($_POST['action'])){
+                return filter_var($_POST['action']);
+            }
         }
         return NULL;
     }

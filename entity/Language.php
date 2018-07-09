@@ -80,19 +80,14 @@ class Language {
      * @since 1.1
      */
     public static function loadTranslation($langCode='EN'){
-        if(defined('ROOT_DIR')){
-            $uLangCode = strtoupper($langCode);
-            $langFile = ROOT_DIR.'/entity/langs/Language_'.$uLangCode.'.php';
-            if(file_exists($langFile)){
-                require $langFile;
-                return self::$loadedLangs[$uLangCode];
-            }
-            else{
-                throw new Exception('Unable to load translation file. The file \''.$langFile.'\' does not exists.');
-            }
+        $uLangCode = strtoupper($langCode);
+        $langFile = ROOT_DIR.'/entity/langs/Language_'.$uLangCode.'.php';
+        if(file_exists($langFile)){
+            require $langFile;
+            return self::$loadedLangs[$uLangCode];
         }
         else{
-            throw new Exception('Unable to load translation file. ROOT_DIR is undefined.');
+            throw new Exception('Unable to load translation file. The file \''.$langFile.'\' does not exists.');
         }
     }
     

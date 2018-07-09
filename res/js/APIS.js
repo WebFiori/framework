@@ -33,7 +33,7 @@ Object.defineProperties(APIS,{
         /**
          * The Base APIs URL. Modify as needed.
          */
-        value:'apis',
+        value:'http://localhost/generic-php',
         enumerable:true
     }
 });

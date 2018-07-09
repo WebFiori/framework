@@ -373,10 +373,10 @@ class JsonX {
                     }
                     else if($valueType == 'array'){
                         if($asObject === TRUE){
-                            $arr .= '"'.$keys[$x].'":'.$this->arrayToJSONString($valueAtKey,$asObject);
+                            $arr .= '"'.$keys[$x].'":'.$this->arrayToJSONString($valueAtKey,$asObject).$comma;
                         }
                         else{
-                            $arr .= '"'.$keys[$x].'":'.$this->arrayToJSONString($valueAtKey,$asObject);
+                            $arr .= '"'.$keys[$x].'":'.$this->arrayToJSONString($valueAtKey,$asObject).$comma;
                         }
                     }
                 }

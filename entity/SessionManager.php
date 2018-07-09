@@ -1,4 +1,8 @@
 <?php
+if(!defined('ROOT_DIR')){
+    http_response_code(403);
+    die('{"message":"Forbidden"}');
+}
 /**
  * A helper class to manage system sessions.
  * @author Ibrahim <ibinshikh@hotmail.com>
@@ -248,9 +252,13 @@ class SessionManager implements JsonI{
     public function validateToken(){
         $tok = filter_input(INPUT_COOKIE, 'token');
         if($tok === FALSE || $tok === NULL){
-            $tok = filter_var($_GET['token'],FILTER_SANITIZE_STRING);
+            if(isset($_GET['token'])){
+                $tok = filter_var($_GET['token'],FILTER_SANITIZE_STRING);
+            }
             if($tok === FALSE || $tok === NULL){
-                $tok = filter_var($_POST['token'],FILTER_SANITIZE_STRING);
+                if(isset($_POST['token'])){
+                    $tok = filter_var($_POST['token'],FILTER_SANITIZE_STRING);
+                }
                 if($tok === FALSE || $tok === NULL){
                     return FALSE;
                 }

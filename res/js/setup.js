@@ -101,6 +101,7 @@ function runSetup(){
             messageDisplay.innerHTML = '<b style="color:red">Something Went Wrong!</b>';
         }
         submitButton.removeAttribute('disabled');
+        prevButton.removeAttribute('diabled');
         document.getElementById('next-button').setAttribute('disabled','');
     });
     ajax.setOnServerError(function(){

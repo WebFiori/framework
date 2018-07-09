@@ -23,7 +23,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
+if(!defined('ROOT_DIR')){
+    http_response_code(403);
+    die('{"message":"Forbidden"}');
+}
 /**
  * A class that is used to define language variables.
  *
@@ -72,6 +75,8 @@ class Language {
      * was found that matches the given language code. Language files must 
      * have the name 'Language_XX' where 'XX' is language code. Also the function 
      * will throw an exception when the variable 'ROOT_DIR' is not defined.
+     * @return Language an object of type <b>Language</b> is returned if 
+     * the language was loaded.
      * @since 1.1
      */
     public static function loadTranslation($langCode='EN'){
@@ -80,6 +85,7 @@ class Language {
             $langFile = ROOT_DIR.'/entity/langs/Language_'.$uLangCode.'.php';
             if(file_exists($langFile)){
                 require $langFile;
+                return self::$loadedLangs[$uLangCode];
             }
             else{
                 throw new Exception('Unable to load translation file. The file \''.$langFile.'\' does not exists.');

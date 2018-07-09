@@ -97,7 +97,17 @@ class Language {
             throw new Exception('Unable to load translation file. The file \''.$langFile.'\' does not exists.');
         }
     }
-    
+    /**
+     * Unload translation based on its language code.
+     * @param string $langCode  two digits language code (such as 'ar').
+     * @since 1.2 
+     */
+    public static function unloadTranslation($langCode){
+        $uLangCode = strtoupper($langCode);
+        if(isset(self::$loadedLangs[$uLangCode])){
+            unset(self::$loadedLangs[$langCode]);
+        }
+    }
     /**
      * Creates new instance of the class.
      * @param string $dir 'ltr' or 'rtl'.

@@ -29,6 +29,8 @@
  */
 function getHeadNode(){
     $page = Page::get();
+    $page->setLang(WebsiteFunctions::get()->getMainSession()->getLang(TRUE));
+    $page->usingLanguage();
     $headTag = new HeadNode();
     $headTag->setBase(SiteConfig::get()->getBaseURL());
     $headTag->addLink('icon', $page->getThemeImagesDir().'/favicon.png');
@@ -37,6 +39,61 @@ function getHeadNode(){
     $headTag->addCSS($page->getThemeCSSDir().'/theme-specific.css');
     $headTag->addMeta('robots', 'index, follow');
     return $headTag;
+}
+/**
+ * 
+ * @param Language $language
+ */
+function extendLanguage(){
+    Page::get()->getLanguage()->createDirectory('alyaseen-agri/main-nav');
+    Page::get()->getLanguage()->createDirectory('alyaseen-agri/home/headers');
+    Page::get()->getLanguage()->createDirectory('alyaseen-agri/home/sections-contents');
+    Page::get()->getLanguage()->createDirectory('alyaseen-agri/contact-us');
+    Page::get()->getLanguage()->createDirectory('alyaseen-agri/branches');
+    Page::get()->getLanguage()->createDirectory('alyaseen-agri/suppliers');
+    if(Page::get()->getLanguage()->getCode() == 'AR'){
+        Page::get()->getLanguage()->setMultiple('alyaseen-agri/main-nav', array(
+            'our-products'=>'منتجاتنا',
+            'branches'=>'الفروع',
+            'about-management'=>'حول الإدارة',
+            'contact-us'=>'الإتصال بنا',
+            'suppliers'=>'الموردون'
+        ));
+        Page::get()->getLanguage()->setMultiple('alyaseen-agri/home/headers', array(
+            'h1'=>'التأسيس',
+            'h2'=>'نشاطنا',
+            'h3'=>'مدى عملنا',
+            'h4'=>'إستراتيجيتنا المستقبلية',
+        ));
+        Page::get()->getLanguage()->setMultiple('alyaseen-agri/home/sections-contents', array(
+            'p1'=>'تأسست شركتنا عام 1980 م بفرع واحد في الأحساء و تطورت أعمالها حتى وصل عدد فروعها إلى احدى عشرة فروع منتشرة على مستوى السوق الزراعي في المملكة',
+            'p2'=>'من نشاطاتنا تسويق المدخلات الزراعية مثل البذور و الأسمدة و الكيماويات الزراعية و مواد زراعية لمزارعي الخضروات في المملكة',
+            'p3'=>'شركتنا رائدة في السوق الزراعية السعودية بتخصصها في خدمة مزارعي الخضروات بشكل خاص والسوق الزراعية بشكل عام. لدينا توليفة من المدخلات الزراعية المتميزة والتي تفي بهذه الأغراض',
+            'p4'=>'نحن شركة ذات دوافع تسويقية. نبذل جهود كبيرة لدراسة السوق الزراعية السعودية وتحديد مستوياتها كمقدمة لتلبية طلبات عملائنا بما يرضيهم من مدخلات زراعية مميزة الجودة والسعر وبذا نحقق حصة تسويقية مرضية من حجم السوق العالمي في جدتها وجودتها مما يعطي عملائنا من الشركات الزراعية الكبرى والأفراد من المزارعين مردودات مالية مجزية',
+        ));
+    }
+    else{
+        Page::get()->getLanguage()->setMultiple('alyaseen-agri/main-nav', array(
+            'our-products'=>'Products',
+            'branches'=>'Branches',
+            'about-management'=>'About Management',
+            'contact-us'=>'Contact Us',
+            'suppliers'=>'Suppliers'
+        ));
+        Page::get()->getLanguage()->setMultiple('alyaseen-agri/home/headers', array(
+            'h1'=>'Our Vision',
+            'h2'=>'Our Mission',
+            'h3'=>'Our Goals',
+            'h4'=>'Our Business',
+        ));
+        Page::get()->getLanguage()->setMultiple('alyaseen-agri/home/sections-contents', array(
+            'p1'=>'Achieve Leadership and Excellence in the Saudi Agricultural Market.',
+            'p2'=>'Provide efficient and Cost-Effective solutions to our customers.',
+            'p3'=>'Continuous quest for excellence in performance. Transfer ideal technologies to the Saudi Agricultural Market. Attain adequate financial returns to ourselves and to our ',
+            'p4'=>'We service the Saudi vegetable growers in particular and also the farming community in general through our Eleven branches by supplying outstanding range of vegetable seeds, excellent specialty fertilizers and efficient agrochemicals, and an assortment of other agricultural inputs.
+We have won -over the years- a prominent position in our market and have a wide spectrum of customers ranging from the individual vegetable growers to the large Saudi shareholding Agricultural companies. We take great pride in satisfying both ends of this range.',
+        ));
+    }
 }
 
 

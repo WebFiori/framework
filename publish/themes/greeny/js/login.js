@@ -47,14 +47,14 @@ function sendLoginRequest(){
                     console.log(user);
                     if(user['status-code'] === 'N'){
                         if(window.tok){
-                            window.location.href = 'pages/activate-account?activation-token='+window.tok;
+                            window.location.href = 'activate-account?activation-token='+window.tok;
                         }
                         else{
-                            window.location.href = 'pages/activate-account';
+                            window.location.href = 'activate-account';
                         }
                     }
                     else{
-                        window.location.href = 'pages/home';
+                        window.location.href = 'home';
                     }
                 }
             ],

@@ -1,4 +1,8 @@
 <?php
+if(!defined('ROOT_DIR')){
+    http_response_code(403);
+    die('{"message":"Forbidden"}');
+}
 /**
  * English language definition.
  */

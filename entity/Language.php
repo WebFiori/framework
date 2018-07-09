@@ -81,7 +81,8 @@ class Language {
      * @throws Exception An exception will be thrown if no language file 
      * was found that matches the given language code. Language files must 
      * have the name 'Language_XX' where 'XX' is language code. Also the function 
-     * will throw an exception when the variable 'ROOT_DIR' is not defined.
+     * will throw an exception when the translation file is loaded but no object 
+     * of type <b>Language</b> was stored in the set of loaded translations.
      * @return Language an object of type <b>Language</b> is returned if 
      * the language was loaded.
      * @since 1.1
@@ -91,7 +92,12 @@ class Language {
         $langFile = ROOT_DIR.'/entity/langs/Language_'.$uLangCode.'.php';
         if(file_exists($langFile)){
             require $langFile;
-            return self::$loadedLangs[$uLangCode];
+            if(isset(self::$loadedLangs[$uLangCode])){
+                return self::$loadedLangs[$uLangCode];
+            }
+            else{
+                throw new Exception('The translation file was found. But no object of type \'Language\' is stored.');
+            }
         }
         else{
             throw new Exception('Unable to load translation file. The file \''.$langFile.'\' does not exists.');
@@ -110,11 +116,11 @@ class Language {
     }
     /**
      * Creates new instance of the class.
-     * @param string $dir 'ltr' or 'rtl'.
-     * @param string $code Language code (such as 'AR').
-     * @param array $initials An initial array of directories.
-     * @param boolean $addtoLoadedAfterCreate If set to <b>TRUE</b>, the language object that 
-     * will be created will be added to the set of loaded languages.
+     * @param string $dir [Optional] 'ltr' or 'rtl'. Default is 'ltr'.
+     * @param string $code [Optional] Language code (such as 'AR'). Default is 'XX'
+     * @param array $initials [Optional] An initial array of directories.
+     * @param boolean $addtoLoadedAfterCreate [Optional] If set to <b>TRUE</b>, the language object that 
+     * will be created will be added to the set of loaded languages. Default is <b>TRUE</b>.
      * @since 1.0
      */
     public function __construct($dir='ltr',$code='XX',$initials=array(),$addtoLoadedAfterCreate=true) {

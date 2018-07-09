@@ -31,56 +31,80 @@ $document->getChildByID('page-header')->setClassName('pa-row');
 $document->getChildByID('page-body')->setClassName('pa-row');
 $document->getChildByID('page-footer')->setClassName('pa-row');
 $newsContainer = $document->getBody()->getChildByID('aside-container');
-$newsContainer->setClassName('pa-'.$page->getWritingDir().'-col-three');
-$p = new PNode();
-$p->addText('Latest News',array('bold'=>TRUE));
-$newsContainer->addChild($p);
-for($x = 0 ; $x < 4 ; $x++){
-    $newsContainer->addChild(createNewsContainer($page->getWritingDir()));
-}
+$newsContainer->setClassName('pa-'.$page->getWritingDir().'-col-one');
+$arr1 = $page->getLanguage()->get('alyaseen-agri/home');
 $mainContentArea = $document->getBody()->getChildByID('main-content-area');
-$mainContentArea->setClassName('pa-'.$page->getWritingDir().'-col-nine');
-$p2 = new PNode();
-$p2->addText('Our Products', array('bold'=>TRUE));
-$mainContentArea->addChild($p2);
-for($x = 0 ; $x < 4 ; $x++){
-    $mainContentArea->addChild(createProductsRow($page->getWritingDir()));
+$mainContentArea->setClassName('pa-'.$page->getWritingDir().'-col-four');
+for($x = 0 ; $x < count($arr1['headers']) ; $x++){
+    $mainContentArea->addChild(createSection($arr1['headers']['h'.($x + 1)], $arr1['sections-contents']['p'.($x + 1)]));
 }
+$document->getBody()->getChildByID('page-body')->addChild(createBranchesMap($page->getLanguage()));
 echo $page->getDocument();
 
-function createNewsContainer($dir='ltr'){
+
+/**
+ * 
+ * @param Language $lang
+ */
+function createBranchesMap($lang){
     $node = new HTMLNode();
-    $node->setClassName('pa-row');
-    $p = new PNode();
-    $img = new HTMLNode('img');
-    $img->setClassName('news-img');
-    $img->setAttribute('src', 'publish/themes/alyaseen-agri/images/favicon.png');
-    $p->addChild($img);
-    $link = new LinkNode('', 'A_Link_to_article');
-    $p->addChild($link);
-    $node->addChild($p);
+    $node->setClassName('pa-'.$lang->getWritingDir().'-col-six');
+    $section = new HTMLNode('section');
+    $secHeader = new HTMLNode('h3');
+    $secHeadTitle = new HTMLNode('', '', TRUE);
+    $secHeadTitle->setText($lang->get('alyaseen-agri/main-nav/branches'));
+    $secHeader->addChild($secHeadTitle);
+    $section->addChild($secHeader);
+    $node->addChild($section);
     return $node;
 }
-function createProductsRow($dir='ltr'){
-    $row = new HTMLNode();
-    $row->setClassName('pa-row');
-    for($x = 0 ; $x < 4 ; $x++){
-        $row->addChild(createProductContainer($dir));
-    }
-    return $row;
-}
-function createProductContainer($dir='ltr'){
-    $node = new HTMLNode();
-    $node->setClassName('pa-'.$dir.'-col-three');
-    $prodImg = new HTMLNode('img',FALSE);
-    $prodImg->setClassName('product-img');
-    $prodImg->setAttribute('src', 'publish/themes/alyaseen-agri/images/favicon.png');
-    $prodLink = new LinkNode('', 'A_Product');
-    $p = new PNode();
-    $p->addChild($prodImg);
-    $p2 = new PNode();
-    $p2->addChild($prodLink);
-    $node->addChild($p);
-    $node->addChild($p2);
+
+function createSection($title,$paragText){
+    $node = new HTMLNode('section');
+    $titleNode = new HTMLNode('h3');
+    $titleText = new HTMLNode('', '', TRUE);
+    $titleText->setText($title);
+    $titleNode->addChild($titleText);
+    $node->addChild($titleNode);
+    
+    $paragraph = new PNode();
+    $paragraph->addText($paragText);
+    $node->addChild($paragraph);
     return $node;
 }
+//function createNewsContainer($dir='ltr'){
+//    $node = new HTMLNode();
+//    $node->setClassName('pa-row');
+//    $p = new PNode();
+//    $img = new HTMLNode('img');
+//    $img->setClassName('news-img');
+//    $img->setAttribute('src', 'publish/themes/alyaseen-agri/images/favicon.png');
+//    $p->addChild($img);
+//    $link = new LinkNode('', 'A_Link_to_article');
+//    $p->addChild($link);
+//    $node->addChild($p);
+//    return $node;
+//}
+//function createProductsRow($dir='ltr'){
+//    $row = new HTMLNode();
+//    $row->setClassName('pa-row');
+//    for($x = 0 ; $x < 4 ; $x++){
+//        $row->addChild(createProductContainer($dir));
+//    }
+//    return $row;
+//}
+//function createProductContainer($dir='ltr'){
+//    $node = new HTMLNode();
+//    $node->setClassName('pa-'.$dir.'-col-three');
+//    $prodImg = new HTMLNode('img',FALSE);
+//    $prodImg->setClassName('product-img');
+//    $prodImg->setAttribute('src', 'publish/themes/alyaseen-agri/images/favicon.png');
+//    $prodLink = new LinkNode('', 'A_Product');
+//    $p = new PNode();
+//    $p->addChild($prodImg);
+//    $p2 = new PNode();
+//    $p2->addChild($prodLink);
+//    $node->addChild($p);
+//    $node->addChild($p2);
+//    return $node;
+//}

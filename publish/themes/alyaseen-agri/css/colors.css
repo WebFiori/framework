@@ -29,16 +29,32 @@ THE SOFTWARE.
     cursor: not-allowed !important;
 }
 html{
-   background-color: rgb(12, 114, 64);
+   background: linear-gradient(-90deg, #71b280, #267871);
 }
 .pa-container{
     background-color: #006E51;
 }
 .pa-row{
-    background-color: white;
+    background-color: transparent;
 }
 [class*='col']{
     
+}
+#page-header *{
+    background-color: transparent;
+}
+#page-header a{
+    color: white;
+}
+#page-body{
+    background-color: white;
+}
+#page-footer{
+    color:gray;
+    background: linear-gradient(90deg,#ffffff,#71b280);
+}
+#page-header{
+    background-color: #71b280;
 }
 #pa-side-nav{
     background-color: white;

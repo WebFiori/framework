@@ -10,16 +10,19 @@ function getHeaderNode(){
     $page = Page::get();
     $headerSec = new HTMLNode();
     $logoContainer = new HTMLNode();
-    $logoContainer->setClassName('pa-'.$page->getWritingDir().'-col-three');
-    $logo = new HTMLNode('img', FALSE);
-    if($page->getLang() == 'AR'){
-        $logo->setAttribute('src', $page->getThemeImagesDir().'/company-logo-2-ar.jpg');
-    }
-    else{
-        $logo->setAttribute('src', $page->getThemeImagesDir().'/company-logo-2-en.jpg');
-    }
-    $logo->setAttribute('style', 'height:100px');
-    $logoContainer->addChild($logo);
+    $logoContainer->setClassName('pa-'.$page->getWritingDir().'-col-four');
+//    $logo = new HTMLNode('img', FALSE);
+//    if($page->getLang() == 'AR'){
+//        $logo->setAttribute('src', $page->getThemeImagesDir().'/company-logo-2-ar.jpg');
+//    }
+//    else{
+//        $logo->setAttribute('src', $page->getThemeImagesDir().'/company-logo-2-en.jpg');
+//    }
+//    $logo->setAttribute('style', 'height:100px');
+    $p = new PNode();
+    $p->addText('شركة الياسين الزراعية', array('bold'=>TRUE));
+    $p->setAttribute('style', 'font-size: 2.25rem;margin:0;font-family: \'Noto Kufi Arabic\', sans-serif; ');
+    $logoContainer->addChild($p);
     $headerSec->addChild($logoContainer);
     //end of logo UI
     //
@@ -32,50 +35,27 @@ function getHeaderNode(){
     $ul->setAttribute('dir', $page->getWritingDir());
     $menu->addChild($ul);
     $headerSec->addChild($menu);
-    if($page->getLang() == 'AR'){
-        $item1 = new ListItem();
-        $link1 = new LinkNode(SiteConfig::get()->getBaseURL().'our-products', 'منتجاتنا');
-        $item1->addChild($link1);
-        $ul->addChild($item1);
-        $item1 = new ListItem();
-        $link1 = new LinkNode(SiteConfig::get()->getBaseURL().'news', 'أخبار الشركة');
-        $item1->addChild($link1);
-        $ul->addChild($item1);
-        $item1 = new ListItem();
-        $link1 = new LinkNode(SiteConfig::get()->getBaseURL().'about', 'حول الشركة');
-        $item1->addChild($link1);
-        $ul->addChild($item1);
-        $item1 = new ListItem();
-        $link1 = new LinkNode(SiteConfig::get()->getBaseURL().'contact-us', 'خدمة العملاء');
-        $item1->addChild($link1);
-        $ul->addChild($item1);
-        $item1 = new ListItem();
-        $link1 = new LinkNode(SiteConfig::get()->getBaseURL().'careers', 'مركز التوظيف');
-        $item1->addChild($link1);
-        $ul->addChild($item1);
-    }
-    else{
-        $item1 = new ListItem();
-        $link1 = new LinkNode(SiteConfig::get()->getBaseURL().'our-products', 'Our Products');
-        $item1->addChild($link1);
-        $ul->addChild($item1);
-        $item1 = new ListItem();
-        $link1 = new LinkNode(SiteConfig::get()->getBaseURL().'news', 'Company News');
-        $item1->addChild($link1);
-        $ul->addChild($item1);
-        $item1 = new ListItem();
-        $link1 = new LinkNode(SiteConfig::get()->getBaseURL().'about', 'About Us');
-        $item1->addChild($link1);
-        $ul->addChild($item1);
-        $item1 = new ListItem();
-        $link1 = new LinkNode(SiteConfig::get()->getBaseURL().'contact-us', 'Customer Service');
-        $item1->addChild($link1);
-        $ul->addChild($item1);
-        $item1 = new ListItem();
-        $link1 = new LinkNode(SiteConfig::get()->getBaseURL().'careers', 'Careers');
-        $item1->addChild($link1);
-        $ul->addChild($item1);
-    }
+    $lang = $page->getLanguage();
+    $item1 = new ListItem();
+    $link1 = new LinkNode(SiteConfig::get()->getBaseURL().'our-products', $lang->get('alyaseen-agri/main-nav/our-branches'));
+    $item1->addChild($link1);
+    $ul->addChild($item1);
+    $item1 = new ListItem();
+    $link1 = new LinkNode(SiteConfig::get()->getBaseURL().'our-products', $lang->get('alyaseen-agri/main-nav/about-management'));
+    $item1->addChild($link1);
+    $ul->addChild($item1);
+    $item1 = new ListItem();
+    $link1 = new LinkNode(SiteConfig::get()->getBaseURL().'branches', $lang->get('alyaseen-agri/main-nav/branches'));
+    $item1->addChild($link1);
+    $ul->addChild($item1);
+    $item1 = new ListItem();
+    $link1 = new LinkNode(SiteConfig::get()->getBaseURL().'contact-us', $lang->get('alyaseen-agri/main-nav/contact-us'));
+    $item1->addChild($link1);
+    $ul->addChild($item1);
+    $link1 = new LinkNode(SiteConfig::get()->getBaseURL().'suppliers', $lang->get('alyaseen-agri/main-nav/suppliers'));
+    $item1 = new ListItem();
+    $item1->addChild($link1);
+    $ul->addChild($item1);
     return $headerSec;
 }
 

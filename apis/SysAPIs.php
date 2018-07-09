@@ -24,10 +24,9 @@
  * THE SOFTWARE.
  */
 if(!defined('ROOT_DIR')){
-    header('HTTP/1.1 403 Forbidden');
-    exit;
+    http_response_code(403);
+    die('{"message":"Forbidden"}');
 }
-
 define('SETUP_MODE', '');
 /**
  * An API used to get or information about the system.
@@ -109,6 +108,11 @@ class SysAPIs extends API{
         $a12->getParameterByName('confirmation-token')->setDescription('The token that was sent to the email address.');
         $this->addAction($a12, TRUE);
         
+        $this->setVersion('1.1.2');
+        $a13 = new APIAction('get-language');
+        $a13->addRequestMethod('get');
+        $a13->addParameter(new RequestParameter('language-code', 'string'));
+        $this->addAction($a13, TRUE);
     } 
     
     public function processRequest(){
@@ -169,6 +173,16 @@ class SysAPIs extends API{
         }
         else if($action == 'update-send-email-account'){
             $this->updateSendMail();
+        }
+        else if($action == 'get-language'){
+            try{
+                $langx = Language::loadTranslation($this->getInputs()['language-code']);
+                $j = new JsonX;
+                $j->addArray('language', $langx->getLanguageVars(),TRUE);
+                $this->send('application/json', $j);
+            } catch (Exception $ex) {
+                $this->sendResponse('No Such Language.', TRUE, 404);
+            }
         }
         else if($action == 'get-email-accounts'){
             $j = new JsonX();

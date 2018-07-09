@@ -75,7 +75,6 @@ function createRoutes(){
         }
     }, Router::FUNCTION_ROUTE);
     $router->addRoute('/SysAPIs', 'SysAPIs.php', Router::API_ROUTE);
-    $router->addRoute('/SysAPIs', 'SysAPIs.php', Router::API_ROUTE);
     $router->addRoute('/AuthAPI', 'AuthAPI.php', Router::API_ROUTE);
     $router->addRoute('/ExampleAPI', 'ExampleAPI.php', Router::API_ROUTE);
     $router->addRoute('/NumsAPIs', 'NumsAPIs.php', Router::API_ROUTE);

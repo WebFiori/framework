@@ -121,7 +121,7 @@ function footer($lang){
     $node->setClassName('pa-row');
 
     $nextButton = new HTMLNode('button');
-    $nextButton->setAttribute('onclick', 'window.location.href = \'pages/home\'');
+    $nextButton->setAttribute('onclick', 'window.location.href = \'home\'');
     $nextButton->setAttribute('disabled', '');
     $nextButton->setClassName('pa-'.Page::get()->getWritingDir().'-col-three');
     $nextButton->setID('finish-button');

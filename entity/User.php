@@ -1,4 +1,8 @@
 <?php
+if(!defined('ROOT_DIR')){
+    http_response_code(403);
+    die('{"message":"Forbidden"}');
+}
 /**
  * A user with this level of access have control over every thing (An Admin).
  */

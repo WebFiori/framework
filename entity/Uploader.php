@@ -1,4 +1,8 @@
 <?php
+if(!defined('ROOT_DIR')){
+    http_response_code(403);
+    die('{"message":"Forbidden"}');
+}
 /**
  * A helper class that is used to upload files to the server file system.
  * @author Ibrahim <ibinshikh@hotmail.com>

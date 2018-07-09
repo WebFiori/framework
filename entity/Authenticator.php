@@ -1,4 +1,8 @@
 <?php
+if(!defined('ROOT_DIR')){
+    http_response_code(403);
+    die('{"message":"Forbidden"}');
+}
 /**
  * The name of hash algorithm used to create password hash.
  * @deprecated since version 1.2 Use <b>Authenticator::HASH_ALGO_NAME </b> Instead.

@@ -1,4 +1,8 @@
 <?php
+if(!defined('ROOT_DIR')){
+    http_response_code(403);
+    die('{"message":"Forbidden"}');
+}
 /**
  * A class that contains all static methods for altering user attributes.
  * @author Ibrahim <ibinshikh@hotmail.com>

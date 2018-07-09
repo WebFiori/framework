@@ -1,4 +1,8 @@
 <?php
+if(!defined('ROOT_DIR')){
+    http_response_code(403);
+    die('{"message":"Forbidden"}');
+}
 /**
  * A class used to initialize main page components.
  * @author Ibrahim <ibinshikh@hotmail.com>

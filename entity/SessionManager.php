@@ -93,7 +93,7 @@ class SessionManager implements JsonI{
             session_write_close();
             session_id($this->generateSessionID());
         }
-        session_save_path(ROOT_DIR.'/tmp');
+        //session_save_path(ROOT_DIR.'/tmp');
     }
     /**
      * Generate a random session ID.

@@ -31,7 +31,7 @@ if(!defined('ROOT_DIR')){
  * A class that is used to define language variables.
  *
  * @author Ibrahim
- * @version 1.1
+ * @version 1.2
  */
 class Language {
     /**
@@ -42,6 +42,13 @@ class Language {
      * @since 1.1 
      */
     private static $loadedLangs = array();
+    /**
+     * An attribute that will be set to <b>TRUE</b> if the language 
+     * is added to the set of loaded languages.
+     * @var boolean
+     * @since 1.2 
+     */
+    private $loadLang;
     /**
      * A constant for left to right writing direction.
      * @var string 
@@ -96,10 +103,13 @@ class Language {
      * @param string $dir 'ltr' or 'rtl'.
      * @param string $code Language code (such as 'AR').
      * @param array $initials An initial array of directories.
+     * @param boolean $addtoLoadedAfterCreate If set to <b>TRUE</b>, the language object that 
+     * will be created will be added to the set of loaded languages.
      * @since 1.0
      */
-    public function __construct($dir='ltr',$code='XX',$initials=array()) {
+    public function __construct($dir='ltr',$code='XX',$initials=array(),$addtoLoadedAfterCreate=true) {
         $this->languageVars = array();
+        $this->loadLang = $addtoLoadedAfterCreate === TRUE ? TRUE : FALSE;
         if(!$this->setCode($code)){
             $this->setCode('XX');
         }
@@ -111,6 +121,15 @@ class Language {
         }
     }
     /**
+     * Checks if the language is added to the set of loaded languages.
+     * @return boolean The function will return <b>TRUE</b> if the language is added to 
+     * the set of loaded languages.
+     * @since 1.2
+     */
+    public function isLoaded() {
+        return $this->loadLang;
+    }
+    /**
      * Sets the language code.
      * @param string $code Language code (such as 'AR').
      * @return boolean The function will return <b>TRUE</b> if the language 
@@ -119,11 +138,15 @@ class Language {
      */
     public function setCode($code) {
         if(strlen($code) == 2){
-            if(isset(self::$loadedLangs[$this->getCode()])){
-                unset(self::$loadedLangs[$this->getCode()]);
+            if($this->isLoaded()){
+                if(isset(self::$loadedLangs[$this->getCode()])){
+                    unset(self::$loadedLangs[$this->getCode()]);
+                }
             }
             $this->languageVars['code'] = strtoupper($code);
-            self::$loadedLangs[$this->getCode()] = $this;
+            if($this->isLoaded()){
+                self::$loadedLangs[$this->getCode()] = $this;
+            }
             return TRUE;
         }
         return FALSE;

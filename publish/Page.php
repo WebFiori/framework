@@ -6,7 +6,7 @@ if(!defined('ROOT_DIR')){
 /**
  * A class used to initialize main page components.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.7
+ * @version 1.8
  */
 class Page{
     /**
@@ -58,6 +58,20 @@ class Page{
      */
     private $title;
     /**
+     * The name of the website that will be appended with the title of 
+     * the page.
+     * @var string 
+     * @since 1.8
+     */
+    private $websiteName;
+    /**
+     * The character or string that is used to separate web page title 
+     * and website name.
+     * @var string
+     * @since 1.8 
+     */
+    private $titleSep;
+    /**
      * The description of the page.
      * @var string
      * @since 1.0 
@@ -101,7 +115,7 @@ class Page{
         return $this->canonical;
     }
     private function __construct() {
-        $this->title = NULL;
+        $this->title = 'Default';
         $this->contentDir = NULL;
         $this->description = NULL;
         $this->contentLang = NULL;
@@ -109,13 +123,74 @@ class Page{
         $this->incHeader = TRUE;
         $this->isDynamic = TRUE;
         $this->incAside = TRUE;
+        $this->websiteName = 'My Website';
+        $this->titleSep = ' | ';
         $this->setWritingDir();
         WebsiteFunctions::get()->getMainSession()->initSession(FALSE, TRUE);
-        
         $arr = explode('/', filter_var($_SERVER['REQUEST_URI']));
         $file = $arr[count($arr) - 1];
         $fix = explode('.', $file)[0];
         $this->name = explode('?', $fix)[0];
+        $this->setCanonical(SiteConfig::get()->getBaseURL(). trim(filter_var($_SERVER['REQUEST_URI']), '/'));
+    }
+    /**
+     * Returns the name of the website.
+     * @return string The name of the website. If the name was not set 
+     * using the function <b>Page::setWebsiteName()</b>, the returned value will 
+     * be 'My Website'.
+     * @since 1.8
+     */
+    public function getWebsiteName() {
+        return $this->websiteName;
+    }
+    /**
+     * Sets the name of the website.
+     * @param string $name The name of the website that will be appended with the title of 
+     * the page. It will be updated only if the given string is not empty. 
+     * Also note that if page document was created, 
+     * calling this function will set the value of the &lt;titlt&gt; node. 
+     * The format of the title is <b>PAGE_NAME TITLE_SEP WEBSITE_NAME</b>. 
+     * for example, if the page name is 'Home' and title separator is 
+     * '|' and the name of the website is 'Programming Academia'. The title 
+     * of the page will be 'Home | Programming Academia'.
+     * @since 1.8
+     */
+    public function setWebsiteName($name) {
+        if(strlen($name) != 0){
+            $this->websiteName = $name;
+            $this->setTitle($this->getTitle());
+        }
+    }
+    /**
+     * Returns the character or string that is used to separate web page title 
+     * and website name.
+     * @return string The character or string that is used to separate web page title 
+     * and website name. If the separator was not set 
+     * using the function <b>Page::setTitleSep()</b>, the returned value will 
+     * be ' | '.
+     * @since 1.8
+     */
+    public function getTitleSep() {
+        return $this->titleSep;
+    }
+    /**
+     * Sets the character or string that is used to separate web page title 
+     * @param string $str The new character or string that will be used to 
+     * separate page title and website name. It will be set only if it is not 
+     * empty string. Also note that if page document was created, 
+     * calling this function will set the value of the &lt;titlt&gt; node. 
+     * The format of the title is <b>PAGE_NAME TITLE_SEP WEBSITE_NAME</b>. 
+     * for example, if the page name is 'Home' and title separator is 
+     * '|' and the name of the website is 'Programming Academia'. The title 
+     * of the page will be 'Home | Programming Academia'.
+     * @since 1.8
+     */
+    public function setTitleSep($str) {
+        $trimmed = trim($str);
+        if(strlen($trimmed) != 0){
+            $this->titleSep = ' '.$trimmed.' ';
+            $this->setTitle($this->getTitle());
+        }
     }
     /**
      * Returns the name of requested page.
@@ -179,19 +254,27 @@ class Page{
     /**
      * Sets the title of the page.
      * @param string $val The title of the page. If <b>NULL</b> is given, 
-     * the title will not updated.
+     * the title will not updated. Also note that if page document was created, 
+     * calling this function will set the value of the &lt;titlt&gt; node. 
+     * The format of the title is <b>PAGE_NAME TITLE_SEP WEBSITE_NAME</b>. 
+     * for example, if the page name is 'Home' and title separator is 
+     * '|' and the name of the website is 'Programming Academia'. The title 
+     * of the page will be 'Home | Programming Academia'.
      * @since 1.0
      */
     public function setTitle($val){
         if($val != NULL){
             $this->title = $val;
+            Util::print_r($this->title);
+            var_dump($this->document);
             if($this->document != NULL){
-                $this->document->getHeadNode()->setTitle($this->getTitle().SiteConfig::get()->getTitleSep().SiteConfig::get()->getWebsiteName());
+                echo 'here';
+                $this->document->getHeadNode()->setTitle($this->getTitle().$this->getTitleSep().$this->getWebsiteName());
             }
         }
     }
     /**
-     * Saves the page to a file.
+     * Saves the page to a stand alone file (self contained).
      * @param string $path The location where the file will be written to 
      * (such as 'pages/system/view-users'. 'view-users' is the page name).
      *  Note that the last part of the 
@@ -239,6 +322,16 @@ class Page{
         }
     }
     /**
+     * Reset the page document.
+     * @since 1.7
+     */
+    public function refreshDocument() {
+        if($this->document != NULL){
+            $this->document = NULL;
+            $this->getDocument();
+        }
+    }
+    /**
      * Returns the document that is associated with the page.
      * @return HTMLDoc An object of type <b>HTMLDoc</b>.
      * @throws Exception If page theme is not loaded.
@@ -262,6 +355,9 @@ class Page{
             $body->addChild($contentArea);
             $this->document->addChild($body);
             $this->document->addChild($footerNode);
+            if(function_exists('buildBody')){
+                buildBody();
+            }
         }
         return $this->document;
     }
@@ -335,8 +431,6 @@ class Page{
             Language::loadTranslation($this->getLang());
             $pageLang = $this->getLanguage();
             $this->setWritingDir($pageLang->getWritingDir());
-            $this->setTitle($pageLang->get('pages/'.$this->getPageName().'/title'));
-            $this->setDescription($pageLang->get('pages/'.$this->getPageName().'/description'));
         }
         else{
             throw new Exception('Unable to load transulation. Page language is not set.');
@@ -382,7 +476,9 @@ class Page{
      * @param string $themeName [Optional] The name of the theme as specified by the 
      * variable 'name' in theme definition. If the given name is <b>NULL</b>, the 
      * function will load the default theme as specified by the function 
-     * <b>SiteConfig::getBaseThemeName()</b>.
+     * <b>SiteConfig::getBaseThemeName()</b>. Note that once the theme is updated, 
+     * the document content of the page will reset if it was set before calling this 
+     * function.
      * @throws Exception The function will throw 
      * an exception if no theme was found which has the given name. Another case is 
      * when the file 'theme.php' of the theme is missing. 
@@ -396,6 +492,7 @@ class Page{
         }
         $tmpTheme = Theme::usingTheme($themeName);
         $this->theme = $tmpTheme;
+        $this->refreshDocument();
         $this->theme->invokeAfterLoaded();
     }
     /**
@@ -566,11 +663,11 @@ class Page{
             if($this->document == NULL){
                 if(function_exists('getAsideNode')){
                     $h = getAsideNode();
-                    $h->setID('aside-container');
+                    $h->setID('side-content-area');
                 }
                 else{
                     $h = new HTMLNode();
-                    $h->setID('aside-container');
+                    $h->setID('side-content-area');
                 }
                 return $h;
             }
@@ -615,7 +712,7 @@ class Page{
     private function _getHead(){
         if($this->document === NULL){
             $headNode = new HeadNode(
-                $this->getTitle().SiteConfig::get()->getTitleSep().SiteConfig::get()->getWebsiteName(),
+                $this->getTitle().$this->getTitleSep().$this->getWebsiteName(),
                 $this->getCanonical(),
                 SiteConfig::get()->getBaseURL()
             );

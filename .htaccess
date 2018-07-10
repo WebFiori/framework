@@ -11,9 +11,9 @@ ReWriteRule ^(.*)$ index.php [L,QSA]
 #RewriteCond %{REQUEST_FILENAME} !-d
 #RewriteRule ^(.*)$ http://localhost/generic-php/rout/index.php?url=$1 [L,QSA]
 DirectoryIndex index.php
-<IfModule mod_php5.c>
+#<IfModule mod_php5.c>
    php_flag opcache.enable Off
-</IfModule>
+#</IfModule>
 #used for ssl redirect
 #RewriteCond %{SERVER_PORT} 80
 #RewriteRule ^(.*)$ https://www.programmingacademia.com/$1 [R=301,L]

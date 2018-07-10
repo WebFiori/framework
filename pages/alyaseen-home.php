@@ -26,12 +26,6 @@
 $page = Page::get();
 $page->usingTheme('Alyaseen Agri By Ibrahim Ali');
 $document = $page->getDocument();
-$document->getBody()->setClassName('container');
-$document->getChildByID('page-header')->setClassName('pa-row');
-$document->getChildByID('page-body')->setClassName('pa-row');
-$document->getChildByID('page-footer')->setClassName('pa-row');
-$newsContainer = $document->getBody()->getChildByID('aside-container');
-$newsContainer->setClassName('pa-'.$page->getWritingDir().'-col-one');
 $arr1 = $page->getLanguage()->get('alyaseen-agri/home');
 $mainContentArea = $document->getBody()->getChildByID('main-content-area');
 $mainContentArea->setClassName('pa-'.$page->getWritingDir().'-col-four');
@@ -55,6 +49,11 @@ function createBranchesMap($lang){
     $secHeadTitle->setText($lang->get('alyaseen-agri/main-nav/branches'));
     $secHeader->addChild($secHeadTitle);
     $section->addChild($secHeader);
+    $mapFrame = new HTMLNode('iframe');
+    $mapFrame->setAttribute('src', 'https://www.google.com/maps/d/embed?mid=1qcxQ-YBFQ8WRkgjwIwao-OyuG2aUeKu7&hl='. strtolower($lang->getCode()));
+    $mapFrame->setAttribute('width', '100%');
+    $mapFrame->setAttribute('height', '500px');
+    $section->addChild($mapFrame);
     $node->addChild($section);
     return $node;
 }

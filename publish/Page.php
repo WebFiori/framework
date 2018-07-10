@@ -245,28 +245,25 @@ class Page{
      * @since 1.1
      */
     public function getDocument(){
-        if($this->isThemeLoaded()){
-            if($this->document == NULL){
-                $headNode = $this->_getHead();
-                $footerNode = $this->_getFooter();
-                $asideNode = $this->_getAside();
-                $headerNode = $this->_getHeader();
-                $this->document = new HTMLDoc();
-                $this->document->setLanguage($this->getLang());
-                $this->document->setHeadNode($headNode);
-                $this->document->addChild($headerNode);
-                $body = new HTMLNode();
-                $body->setID('page-body');
-                $body->addChild($asideNode);
-                $contentArea = new HTMLNode();
-                $contentArea->setID('main-content-area');
-                $body->addChild($contentArea);
-                $this->document->addChild($body);
-                $this->document->addChild($footerNode);
-            }
-            return $this->document;
+        if($this->document == NULL){
+            $headNode = $this->_getHead();
+            $footerNode = $this->_getFooter();
+            $asideNode = $this->_getAside();
+            $headerNode = $this->_getHeader();
+            $this->document = new HTMLDoc();
+            $this->document->setLanguage($this->getLang());
+            $this->document->setHeadNode($headNode);
+            $this->document->addChild($headerNode);
+            $body = new HTMLNode();
+            $body->setID('page-body');
+            $body->addChild($asideNode);
+            $contentArea = new HTMLNode();
+            $contentArea->setID('main-content-area');
+            $body->addChild($contentArea);
+            $this->document->addChild($body);
+            $this->document->addChild($footerNode);
         }
-        throw new Exception('Theme is not loaded. A theme must be loaded before using the document.');
+        return $this->document;
     }
     /**
      * Returns the title of the page.
@@ -567,8 +564,14 @@ class Page{
     private function _getAside() {
         if($this->hasAside()){
             if($this->document == NULL){
-                $h = getAsideNode();
-                $h->setID('aside-container');
+                if(function_exists('getAsideNode')){
+                    $h = getAsideNode();
+                    $h->setID('aside-container');
+                }
+                else{
+                    $h = new HTMLNode();
+                    $h->setID('aside-container');
+                }
                 return $h;
             }
             return $this->document->getChildByID('aside-container');
@@ -578,8 +581,14 @@ class Page{
     private function _getHeader(){
         if($this->hasHeader()){
             if($this->document == NULL){
-                $h = getHeaderNode();
-                $h->setID('page-header');
+                if(function_exists('getHeaderNode')){
+                    $h = getHeaderNode();
+                    $h->setID('page-header');
+                }
+                else{
+                    $h = new HTMLNode();
+                    $h->setID('page-header');
+                }
                 return $h;
             }
             return $this->document->getChildByID('page-header');
@@ -589,8 +598,14 @@ class Page{
     private function _getFooter(){
         if($this->hasFooter()){
             if($this->document == NULL){
-                $f = getFooterNode();
-                $f->setID('page-footer');
+                if(function_exists('getFooterNode')){
+                    $f = getFooterNode();
+                    $f->setID('page-footer');
+                }
+                else{
+                    $f = new HTMLNode();
+                    $f->setID('page-footer');
+                }
                 return $f;
             }
             return $this->document->getChildByID('page-footer');
@@ -611,15 +626,17 @@ class Page{
             $descNode->setAttribute('name', 'description');
             $descNode->setAttribute('content', $this->getDescription());
             $headNode->addChild($descNode);
-            $tmpHead = getHeadNode();
-            $children = $tmpHead->children();
-            $count = $children->size();
-            for($x = 0 ; $x < $count ; $x++){
-                $node = $children->get($x);
-                $nodeName = $node->getName();
-                if($nodeName != 'base' && $nodeName != 'title'){
-                    if($node->getAttributeValue('name') != 'description'){
-                        $headNode->addChild($node);
+            if(function_exists('getHeadNode')){
+                $tmpHead = getHeadNode();
+                $children = $tmpHead->children();
+                $count = $children->size();
+                for($x = 0 ; $x < $count ; $x++){
+                    $node = $children->get($x);
+                    $nodeName = $node->getName();
+                    if($nodeName != 'base' && $nodeName != 'title'){
+                        if($node->getAttributeValue('name') != 'description'){
+                            $headNode->addChild($node);
+                        }
                     }
                 }
             }

@@ -26,10 +26,11 @@
 ini_set('display_startup_errors', 1);
 ini_set('display_errors', 1);
 error_reporting(-1);
-require_once '../../root.php';
+//require_once '../../root.php';
 $page = Page::get();
-////$page->usingTheme(SiteConfig::get()->getAdminThemeName());
+$page->usingTheme('Alyaseen Agri By Ibrahim Ali');
 //$doc = $page->getDocument(TRUE);
-//$page->setTitle('Hello');
-//$page->setDescription('Hello Page Description');
+$page->setTitle($page->getPageName());
+$page->setDescription('Hello Page Description');
+$page->getDocument();
 echo $page->getDocument();

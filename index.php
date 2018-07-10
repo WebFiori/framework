@@ -38,6 +38,7 @@ else{
 function createRoutes(){
     $GLOBALS['REQUEST_URI'] = getRequestedURI();
     $router = Router::get();
+    $router->addRoute('/page-test', 'tests/unit/PageTest.php', Router::CUSTOMIZED);
     $router->addRoute('/s/welcome', 'setup/welcome.php', Router::VIEW_ROUTE);
     $router->addRoute('/s/database-setup', 'setup/database-setup.php', Router::VIEW_ROUTE);
     $router->addRoute('/s/smtp-account', 'setup/email-account.php', Router::VIEW_ROUTE);

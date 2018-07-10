@@ -72,39 +72,3 @@ function createSection($title,$paragText){
     $node->addChild($paragraph);
     return $node;
 }
-//function createNewsContainer($dir='ltr'){
-//    $node = new HTMLNode();
-//    $node->setClassName('pa-row');
-//    $p = new PNode();
-//    $img = new HTMLNode('img');
-//    $img->setClassName('news-img');
-//    $img->setAttribute('src', 'publish/themes/alyaseen-agri/images/favicon.png');
-//    $p->addChild($img);
-//    $link = new LinkNode('', 'A_Link_to_article');
-//    $p->addChild($link);
-//    $node->addChild($p);
-//    return $node;
-//}
-//function createProductsRow($dir='ltr'){
-//    $row = new HTMLNode();
-//    $row->setClassName('pa-row');
-//    for($x = 0 ; $x < 4 ; $x++){
-//        $row->addChild(createProductContainer($dir));
-//    }
-//    return $row;
-//}
-//function createProductContainer($dir='ltr'){
-//    $node = new HTMLNode();
-//    $node->setClassName('pa-'.$dir.'-col-three');
-//    $prodImg = new HTMLNode('img',FALSE);
-//    $prodImg->setClassName('product-img');
-//    $prodImg->setAttribute('src', 'publish/themes/alyaseen-agri/images/favicon.png');
-//    $prodLink = new LinkNode('', 'A_Product');
-//    $p = new PNode();
-//    $p->addChild($prodImg);
-//    $p2 = new PNode();
-//    $p2->addChild($prodLink);
-//    $node->addChild($p);
-//    $node->addChild($p2);
-//    return $node;
-//}

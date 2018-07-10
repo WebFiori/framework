@@ -31,6 +31,9 @@ function getHeadNode(){
     $page = Page::get();
     $page->setLang(WebsiteFunctions::get()->getMainSession()->getLang(TRUE));
     $page->usingLanguage();
+    extendLanguage();
+    $page->setWebsiteName($page->getLanguage()->get('general/website-name'));
+    $page->setTitle('Hello');
     $headTag = new HeadNode();
     $headTag->setBase(SiteConfig::get()->getBaseURL());
     $headTag->addLink('icon', $page->getThemeImagesDir().'/favicon.png');
@@ -52,6 +55,11 @@ function extendLanguage(){
     Page::get()->getLanguage()->createDirectory('alyaseen-agri/branches');
     Page::get()->getLanguage()->createDirectory('alyaseen-agri/suppliers');
     if(Page::get()->getLanguage()->getCode() == 'AR'){
+        Page::get()->getLanguage()->set('general', 'website-name', 'شركة الياسين الزراعية');
+        Page::get()->getLanguage()->setMultiple('alyaseen-agri/home', array(
+            'title'=>'الرئيسية',
+            'description'=>'الصفحة الرئيسية لشركة الياسين الزراعية.'
+        ));
         Page::get()->getLanguage()->setMultiple('alyaseen-agri/main-nav', array(
             'our-products'=>'منتجاتنا',
             'branches'=>'الفروع',
@@ -73,6 +81,11 @@ function extendLanguage(){
         ));
     }
     else{
+        Page::get()->getLanguage()->set('general', 'website-name', 'Alyaseen Agricultar Company');
+        Page::get()->getLanguage()->setMultiple('alyaseen-agri/home', array(
+            'title'=>'Home',
+            'description'=>'Home page of alyaseen agri co.'
+        ));
         Page::get()->getLanguage()->setMultiple('alyaseen-agri/main-nav', array(
             'our-products'=>'Products',
             'branches'=>'Branches',

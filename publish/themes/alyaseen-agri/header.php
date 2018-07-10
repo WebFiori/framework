@@ -11,16 +11,8 @@ function getHeaderNode(){
     $headerSec = new HTMLNode();
     $logoContainer = new HTMLNode();
     $logoContainer->setClassName('pa-'.$page->getWritingDir().'-col-four');
-//    $logo = new HTMLNode('img', FALSE);
-//    if($page->getLang() == 'AR'){
-//        $logo->setAttribute('src', $page->getThemeImagesDir().'/company-logo-2-ar.jpg');
-//    }
-//    else{
-//        $logo->setAttribute('src', $page->getThemeImagesDir().'/company-logo-2-en.jpg');
-//    }
-//    $logo->setAttribute('style', 'height:100px');
     $p = new PNode();
-    $p->addText('شركة الياسين الزراعية', array('bold'=>TRUE));
+    $p->addText($page->getLanguage()->get('general/website-name'), array('bold'=>TRUE));
     $p->setAttribute('style', 'font-size: 2.25rem;margin:0;font-family: \'Noto Kufi Arabic\', sans-serif; ');
     $logoContainer->addChild($p);
     $headerSec->addChild($logoContainer);

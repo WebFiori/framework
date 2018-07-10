@@ -10,7 +10,7 @@ $theme->setJsDirName('js');
 $theme->setCssDirName('css');
 $theme->addComponents(array(
     'head.php', 'header.php', 'footer.php',
-    'aside.php'
+    'aside.php','body.php'
 ));
 $theme->setAfterLoaded(function(){
     $page = Page::get();

@@ -26,5 +26,12 @@
 
 function buildBody(){
     $page = Page::get();
+    $document = $page->getDocument();
     $page->getDocument()->getBody()->setClassName('container');
+    $document->getBody()->setClassName('container');
+    $document->getChildByID('page-header')->setClassName('pa-row');
+    $document->getChildByID('page-body')->setClassName('pa-row');
+    $document->getChildByID('page-footer')->setClassName('pa-row');
+    $newsContainer = $document->getBody()->getChildByID('side-content-area');
+    $newsContainer->setClassName('pa-'.$page->getWritingDir().'-col-one');
 }

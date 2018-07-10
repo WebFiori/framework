@@ -21,7 +21,7 @@ $theme->setAfterLoaded(function(){
     $page->getDocument()->getBody()->setClassName('pa-container');
     $page->getDocument()->getChildByID('page-body')->setClassName('pa-row');
     if($page->hasAside()){
-        $page->getDocument()->getChildByID('aside-container')->setClassName('pa-'.$page->getWritingDir().'-col-two');
+        $page->getDocument()->getChildByID('side-content-area')->setClassName('pa-'.$page->getWritingDir().'-col-two');
         $page->getDocument()->getChildByID('main-content-area')->setClassName('pa-'.$page->getWritingDir().'-col-ten');
     }
     else{

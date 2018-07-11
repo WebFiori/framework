@@ -128,13 +128,7 @@ class Page{
         $this->incAside = TRUE;
         $this->setWritingDir();
         WebsiteFunctions::get()->getMainSession()->initSession(FALSE, TRUE);
-        $arr = explode('/', filter_var($_SERVER['REQUEST_URI']));
-        $file = $arr[count($arr) - 1];
-        $fix = explode('.', $file)[0];
-        $this->name = explode('?', $fix)[0];
-        $this->setCanonical(SiteConfig::get()->getBaseURL(). trim(filter_var($_SERVER['REQUEST_URI']), '/'));
-        
-        
+        $this->setCanonical(Util::getRequestedURL());
         $this->document->setLanguage($this->getLang());
         $headNode = new HeadNode(
             $this->getTitle().$this->getTitleSep().$this->getWebsiteName(),

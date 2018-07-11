@@ -31,6 +31,7 @@ if(!defined('ROOT_DIR')){
  * Description of Router
  *
  * @author Ibrahim
+ * @version 1.0
  */
 class Router {
     /**
@@ -93,8 +94,8 @@ class Router {
     private function __construct() {
         $this->routes = array();
         $this->onNotFound = function (){};
-        $this->addRoute('/', 'default.html', self::VIEW_ROUTE);
-        $this->addRoute('/index', 'default.html', self::VIEW_ROUTE);
+//        $this->addRoute('/', 'default.html', self::VIEW_ROUTE);
+//        $this->addRoute('/index', 'default.html', self::VIEW_ROUTE);
     }
     /**
      * 
@@ -150,6 +151,12 @@ class Router {
         }
         return FALSE;
     }
+    /**
+     * Sets a function to call in case a given rout is not found.
+     * @param Function $function The function which will be called if 
+     * the rout is not found.
+     * @since 1.0
+     */
     public function setOnNotFound($function) {
         if(is_callable($function)){
             $this->onNotFound = $function;
@@ -184,34 +191,17 @@ class Router {
             'uri-broken'=>array(),
             'query-string-breaked'=>array()
         );
+        //first, split query string from the URI
         $split = explode('?', $uri);
+        //Query string will be in $split[1] if any
         $retVal['query-string'] = isset($split[1]) ? $split[1] : '';
+        //$split[0] will contain the URI without query string.
         $retVal['uri-without-query-string'] = trim($split[0], '/');
-        $uriSplit = explode('/', $retVal['uri-without-query-string']);
-        $uriSplitCount = count($uriSplit);
-        for ($x = 0 ; $x < $uriSplitCount ; $x++){
-            if($uriSplit[$x] != ''){
-                if($uriSplit[$x] == 'http:' || $uriSplit[$x] == 'https:'){
-                    $retVal['protocol'] = trim($uriSplit[$x], ':');
-                }
-                else{
-                    if($x == 2 && ($retVal['protocol'] == 'http' || $retVal == 'https')){
-                        $retVal['domain'] = trim($uriSplit[$x], 'www.');
-                    }
-                    else{
-                        array_push($retVal['uri-broken'], $uriSplit[$x]);
-                    }
-                }
-            }
-        }
-        if($retVal['query-string'] != ''){
-            $queryStringSplit = explode('&', $retVal['query-string']);
-            foreach ($queryStringSplit as $val){
-                $qSplit = explode('=', $val);
-                $arr = array('key'=>$qSplit[0],'value'=>$qSplit[1]);
-                array_push($retVal['query-string-breaked'], $arr);
-            }
-        }
+        //after that, we need to check the start of the URI if 
+        //it contains one of the following: 'http://', 'https://', 
+        $splitx = explode('://', $retVal['uri-without-query-string']);
+        $retVal['protocol'] = isset($splitx[1]) ? $splitx[0] : '';
+        
         return $retVal;
     }
     /**

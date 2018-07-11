@@ -115,7 +115,10 @@ class Page{
         return $this->canonical;
     }
     private function __construct() {
-        $this->title = 'Default';
+        $this->document = new HTMLDoc();
+        $this->setTitle('Default X');
+        $this->setWebsiteName('My X Website');
+        $this->setTitleSep('|');
         $this->contentDir = NULL;
         $this->description = NULL;
         $this->contentLang = NULL;
@@ -123,8 +126,6 @@ class Page{
         $this->incHeader = TRUE;
         $this->isDynamic = TRUE;
         $this->incAside = TRUE;
-        $this->websiteName = 'My Website';
-        $this->titleSep = ' | ';
         $this->setWritingDir();
         WebsiteFunctions::get()->getMainSession()->initSession(FALSE, TRUE);
         $arr = explode('/', filter_var($_SERVER['REQUEST_URI']));
@@ -132,6 +133,30 @@ class Page{
         $fix = explode('.', $file)[0];
         $this->name = explode('?', $fix)[0];
         $this->setCanonical(SiteConfig::get()->getBaseURL(). trim(filter_var($_SERVER['REQUEST_URI']), '/'));
+        
+        
+        $this->document->setLanguage($this->getLang());
+        $headNode = new HeadNode(
+            $this->getTitle().$this->getTitleSep().$this->getWebsiteName(),
+            $this->getCanonical(),
+            SiteConfig::get()->getBaseURL()
+        );
+        $this->document->setHeadNode($headNode);
+        $headerNode = new HTMLNode();
+        $headerNode->setID('page-header');
+        $this->document->addChild($headerNode);
+        $body = new HTMLNode();
+        $body->setID('page-body');
+        $asideNode = new HTMLNode();
+        $asideNode->setID('side-content-area');
+        $body->addChild($asideNode);
+        $contentArea = new HTMLNode();
+        $contentArea->setID('main-content-area');
+        $body->addChild($contentArea);
+        $this->document->addChild($body);
+        $footerNode = new HTMLNode();
+        $footerNode->setID('page-footer');
+        $this->document->addChild($footerNode);
     }
     /**
      * Returns the name of the website.
@@ -265,12 +290,7 @@ class Page{
     public function setTitle($val){
         if($val != NULL){
             $this->title = $val;
-            Util::print_r($this->title);
-            var_dump($this->document);
-            if($this->document != NULL){
-                echo 'here';
-                $this->document->getHeadNode()->setTitle($this->getTitle().$this->getTitleSep().$this->getWebsiteName());
-            }
+            $this->document->getHeadNode()->setTitle($this->getTitle().$this->getTitleSep().$this->getWebsiteName());
         }
     }
     /**
@@ -322,43 +342,12 @@ class Page{
         }
     }
     /**
-     * Reset the page document.
-     * @since 1.7
-     */
-    public function refreshDocument() {
-        if($this->document != NULL){
-            $this->document = NULL;
-            $this->getDocument();
-        }
-    }
-    /**
      * Returns the document that is associated with the page.
      * @return HTMLDoc An object of type <b>HTMLDoc</b>.
      * @throws Exception If page theme is not loaded.
      * @since 1.1
      */
     public function getDocument(){
-        if($this->document == NULL){
-            $headNode = $this->_getHead();
-            $footerNode = $this->_getFooter();
-            $asideNode = $this->_getAside();
-            $headerNode = $this->_getHeader();
-            $this->document = new HTMLDoc();
-            $this->document->setLanguage($this->getLang());
-            $this->document->setHeadNode($headNode);
-            $this->document->addChild($headerNode);
-            $body = new HTMLNode();
-            $body->setID('page-body');
-            $body->addChild($asideNode);
-            $contentArea = new HTMLNode();
-            $contentArea->setID('main-content-area');
-            $body->addChild($contentArea);
-            $this->document->addChild($body);
-            $this->document->addChild($footerNode);
-            if(function_exists('buildBody')){
-                buildBody();
-            }
-        }
         return $this->document;
     }
     /**
@@ -492,7 +481,25 @@ class Page{
         }
         $tmpTheme = Theme::usingTheme($themeName);
         $this->theme = $tmpTheme;
-        $this->refreshDocument();
+        $this->document = new HTMLDoc();
+        $headNode = $this->_getHead(TRUE);
+        $footerNode = $this->_getFooter(TRUE);
+        $asideNode = $this->_getAside(TRUE);
+        $headerNode = $this->_getHeader(TRUE);
+        $this->document->setLanguage($this->getLang());
+        $this->document->setHeadNode($headNode);
+        $this->document->addChild($headerNode);
+        $body = new HTMLNode();
+        $body->setID('page-body');
+        $body->addChild($asideNode);
+        $mainContentArea = new HTMLNode();
+        $mainContentArea->setID('main-content-area');
+        $body->addChild($mainContentArea);
+        $this->document->addChild($body);
+        $this->document->addChild($footerNode);
+        if(function_exists('buildBody')){
+            buildBody();
+        }
         $this->theme->invokeAfterLoaded();
     }
     /**
@@ -658,9 +665,9 @@ class Page{
         return $this->incAside;
     }
     
-    private function _getAside() {
+    private function _getAside($new=false) {
         if($this->hasAside()){
-            if($this->document == NULL){
+            if($new === TRUE){
                 if(function_exists('getAsideNode')){
                     $h = getAsideNode();
                     $h->setID('side-content-area');
@@ -675,9 +682,9 @@ class Page{
         }
     }
     
-    private function _getHeader(){
+    private function _getHeader($new=false){
         if($this->hasHeader()){
-            if($this->document == NULL){
+            if($new === TRUE){
                 if(function_exists('getHeaderNode')){
                     $h = getHeaderNode();
                     $h->setID('page-header');
@@ -692,9 +699,9 @@ class Page{
         }
     }
     
-    private function _getFooter(){
+    private function _getFooter($new=false){
         if($this->hasFooter()){
-            if($this->document == NULL){
+            if($new === TRUE){
                 if(function_exists('getFooterNode')){
                     $f = getFooterNode();
                     $f->setID('page-footer');
@@ -709,8 +716,8 @@ class Page{
         }
     }
     
-    private function _getHead(){
-        if($this->document === NULL){
+    private function _getHead($new=false){
+        if($new === TRUE){
             $headNode = new HeadNode(
                 $this->getTitle().$this->getTitleSep().$this->getWebsiteName(),
                 $this->getCanonical(),
@@ -725,6 +732,9 @@ class Page{
             $headNode->addChild($descNode);
             if(function_exists('getHeadNode')){
                 $tmpHead = getHeadNode();
+                $headNode->setTitle($this->getTitle().$this->getTitleSep().$this->getWebsiteName());
+                $headNode->setBase($tmpHead->getBase()->getAttributeValue('href'));
+                $headNode->setCanonical($this->getCanonical());
                 $children = $tmpHead->children();
                 $count = $children->size();
                 for($x = 0 ; $x < $count ; $x++){

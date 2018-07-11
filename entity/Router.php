@@ -189,7 +189,7 @@ class Router {
             'uri-without-query-string'=>'',
             'query-string'=>'',
             'uri-broken'=>array(),
-            'query-string-breaked'=>array()
+            'query-string-broken'=>array()
         );
         //first, split query string from the URI
         $split = explode('?', $uri);

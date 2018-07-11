@@ -724,15 +724,15 @@ class Page{
             $metaCharset = new HTMLNode('meta', FALSE);
             $metaCharset->setAttribute('charset', 'UTF-8');
             $headNode->addChild($metaCharset);
-            $descNode = new HTMLNode('meta', FALSE);
-            $descNode->setAttribute('name', 'description');
-            $descNode->setAttribute('content', $this->getDescription());
-            $headNode->addChild($descNode);
             if(function_exists('getHeadNode')){
                 $tmpHead = getHeadNode();
                 $headNode->setTitle($this->getTitle().$this->getTitleSep().$this->getWebsiteName());
                 $headNode->setBase($tmpHead->getBase()->getAttributeValue('href'));
                 $headNode->setCanonical($this->getCanonical());
+                $descNode = new HTMLNode('meta', FALSE);
+                $descNode->setAttribute('name', 'description');
+                $descNode->setAttribute('content', $this->getDescription());
+                $headNode->addChild($descNode);
                 $children = $tmpHead->children();
                 $count = $children->size();
                 for($x = 0 ; $x < $count ; $x++){
@@ -744,6 +744,12 @@ class Page{
                         }
                     }
                 }
+            }
+            else {
+                $descNode = new HTMLNode('meta', FALSE);
+                $descNode->setAttribute('name', 'description');
+                $descNode->setAttribute('content', $this->getDescription());
+                $headNode->addChild($descNode);
             }
             return $headNode;
         }

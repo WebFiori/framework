@@ -380,6 +380,10 @@ class Page{
                         return;
                     }
                 }
+                $descNode = new HTMLNode('meta', FALSE);
+                $descNode->setAttribute('name', 'description');
+                $descNode->setAttribute('content', $val);
+                $this->document->getHeadNode()->addChild($descNode);
             }
         }
     }

@@ -51,6 +51,22 @@ class RouterUri {
         return $canRoute;
     }
     /**
+     * Print the details of the generated URI.
+     * @since 1.0
+     */
+    public function printUri() {
+        Util::print_r($this->uriBroken);
+    }
+    /**
+     * Returns the location where the URI will route to.
+     * @return string | Function Usually, the route can be either a function 
+     * or a path to a PHP file.
+     * @since 1.0
+     */
+    public function getRouteTo() {
+        return $this->routeTo;
+    }
+    /**
      * Sets the route which the URI will take to.
      * @param string|function $routeTo Usually, the route can be either a 
      * PHP file or it can be a function.
@@ -150,7 +166,7 @@ class RouterUri {
      * @return string The original requested URI.
      * @since 1.0
      */
-    public function getRequestedUri() {
+    public function getUri() {
         return $this->uriBroken['uri'];
     }
     /**
@@ -191,6 +207,37 @@ class RouterUri {
             return $this->uriBroken['uri-vars'][$varName];
         }
         return NULL;
+    }
+    /**
+     * Checks if the URI has any variables or not.
+     * @return boolean If the URI has any variables, the function will 
+     * return <b>TRUE</b>.
+     * @since 1.0
+     */
+    public function hasVars() {
+        return count($this->getUriVars()) != 0;
+    }
+    /**
+     * Returns an associative array which contains all URI parts.
+     * @return array The function will return an associative array that 
+     * contains the components of the URI. The array will have the 
+     * following indices:
+     * <ul>
+     * <li><b>uri</b>: The original URI.</li>
+     * <li><b>port</b>: The port number taken from the authority part.</li>
+     * <li><b>host</b>: Will be always empty string.</li>
+     * <li><b>authority</b>: Authority part of the URI.</li>
+     * <li><b>scheme</b>: Scheme part of the URI (e.g. http or https).</li>
+     * <li><b>query-string</b>: Query string if the URI has any.</li>
+     * <li><b>fragment</b>: Any string that comes after the character '#' in the URI.</li>
+     * <li><b>path</b>: An array that contains the names of path directories</li>
+     * <li><b>query-string-vars</b>: An array that contains query string parameter and values.</li>
+     * <li><b>uri-vars</b>: An array that contains URI path variable and values.</li>
+     * </ul>
+     * @since 1.0
+     */
+    public function getComponents() {
+        return $this->uriBroken;
     }
     /**
      * Returns an associative array which contains URI parameters.
@@ -289,17 +336,18 @@ class RouterUri {
      * @param RouterUri $otherUri The URI which 'this' URI will be checked against. 
      * @return boolean The function will return <b>TRUE</b> if the URIs are 
      * equal. Two URIs are considered equal if they have the same authority and the 
-     * same variables names.
+     * same path directory names.
      * @since 1.0
      */
     public function equals($otherUri) {
         if($otherUri instanceof RouterUri){
             $isEqual = TRUE;
             if($this->getAuthority() == $otherUri->getAuthority()){
-                $thisKeys = array_keys($this->getUriVars());
+                $thisPathNames = $this->getPathArray();
+                $otherPathNames = $otherUri->getPathArray();
                 $boolsArr = array();
-                foreach ($thisKeys as $key){
-                    $boolsArr[] = array_key_exists($key, $otherUri->getUriVars());
+                foreach ($thisPathNames as $path1){
+                    $boolsArr[] = in_array($path1, $otherPathNames);
                 }
                 foreach ($boolsArr as $bool){
                     $isEqual = $isEqual && $bool;

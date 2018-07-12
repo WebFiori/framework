@@ -130,7 +130,12 @@ class HTMLDoc {
      * @since 1.2
      */
     public function getChildByID($id) {
-        return $this->htmlNode->getChildByID($id);
+        $el = $this->htmlNode->getChildByID($id);
+        if($el == NULL){
+            $el = $this->body->getChildByID($id);
+            return $el;
+        }
+        return $el;
     }
     /**
      * Constructs a new HTML document.

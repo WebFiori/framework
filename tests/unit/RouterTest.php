@@ -7,16 +7,23 @@
  */
 require_once '../../root.php';
 Util::displayErrors();
-$r = Router::get();
-Util::print_r('Router Test');
-$uri = new RouterUri('https://www3.programmingacademia.com:80/{some-var}/hell/{other-var}/?do=dnt&y=#xyz', '');
-//$uri->setUriVar('some-var', 'en');
-$uri->setUriVar('other-var', 'niv');
-printUriDetails($uri);
-$uri2 = new RouterUri('http://www3.programmingacademia.com:80/{sme-var}/work/{other-var}/?do=dont&y=#xyz', '');
-printUriDetails($uri2);
-isURIEqualAnother($uri, $uri2);
-echo $uri->isAllVarsSet() === TRUE ? 'ALL Set' : 'Not ALL set';
+$router = Router::get();
+$router->addRoute('/hello/{someone}', function(){
+    echo 'Hello Mr. '. filter_var($_GET['someone']);
+}, Router::FUNCTION_ROUTE);
+$router->addRoute('/add-numbers/{first}/{second}', function(){
+    $fNum = filter_var($_GET['first']);
+    $sNum = filter_var($_GET['second']);
+    Util::print_r('First Number: '.$fNum);
+    Util::print_r('Second Number: '.$sNum);
+    $sum = $fNum + $sNum;
+    Util::print_r('Sum: '.$sum);
+}, Router::FUNCTION_ROUTE);
+$router->addRoute('/pay/{someone}', function(){
+    Util::print_r('Pay Mr. '.$_GET['someone'].' 100 SAR.');
+}, Router::FUNCTION_ROUTE);
+$router->route('http://localhost/generic-php/add-numbers/5/5');
+//$router->printRoutes();
 /**
  * 
  * @param RouterUri $uri
@@ -31,9 +38,7 @@ function printUriDetails($uri){
             . '<br/>Authority: '.$uri->getAuthority()
             . '<br/>Port: '.$uri->getPort()
             . '<br/>Path: '.$uri->getPath()
-            . '<br/>'
-            . '<br/>'
-            . '<br/>');
+            );
     Util::print_r('Query String Params:');
     Util::print_r($uri->getQueryStringVars());
     Util::print_r('URI Params:');

@@ -31,6 +31,6 @@ $page = Page::get();
 $page->usingTheme('Alyaseen Agri By Ibrahim Ali');
 //$doc = $page->getDocument(TRUE);
 $page->setTitle($page->getPageName());
-$page->setDescription('Hello Page Description');
+//$page->setDescription('Hello Page Description');
 $page->getDocument();
 echo $page->getDocument();

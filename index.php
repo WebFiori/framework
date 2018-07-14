@@ -22,7 +22,7 @@ if($GLOBALS['SYS_STATUS'] === Util::NEED_CONF){
         Router::get()->route($requestedURI);
     }
     else{
-        Router::get()->route('/'.Util::NEED_CONF);
+        Router::get()->route(SiteConfig::get()->getBaseURL().Util::NEED_CONF);
     }
 }
 else{
@@ -33,15 +33,8 @@ else{
  */
 function createRoutes(){
     $router = Router::get();
-    $router->addRoute('/add/{first}/{second}', function(){
-        $fNum = filter_var($_GET['first']);
-        $sNum = filter_var($_GET['second']);
-        Util::print_r('First Number: '.$fNum);
-        Util::print_r('Second Number: '.$sNum);
-        $sum = $fNum + $sNum;
-        Util::print_r('Sum: '.$sum);
-    }, Router::FUNCTION_ROUTE);
-    $router->addRoute('/page-test', 'tests/unit/PageTest.php', Router::CUSTOMIZED);
+    
+    //routes to configuration views
     $router->addRoute('/s/welcome', 'setup/welcome.php', Router::VIEW_ROUTE);
     $router->addRoute('/s/database-setup', 'setup/database-setup.php', Router::VIEW_ROUTE);
     $router->addRoute('/s/smtp-account', 'setup/email-account.php', Router::VIEW_ROUTE);
@@ -78,13 +71,18 @@ function createRoutes(){
             header('location: '.SiteConfig::get()->getBaseURL());
         }
     }, Router::FUNCTION_ROUTE);
-    $router->addRoute('/SysAPIs', 'SysAPIs.php', Router::API_ROUTE);
-    $router->addRoute('/AuthAPI', 'AuthAPI.php', Router::API_ROUTE);
-    $router->addRoute('/ExampleAPI', 'ExampleAPI.php', Router::API_ROUTE);
-    $router->addRoute('/NumsAPIs', 'NumsAPIs.php', Router::API_ROUTE);
-    $router->addRoute('/PasswordAPIs', 'PasswordAPIs.php', Router::API_ROUTE);
-    $router->addRoute('/UserAPIs', 'UserAPIs.php', Router::API_ROUTE);
-    $router->addRoute('/WebsiteAPIs', 'WebsiteAPIs.php', Router::API_ROUTE);
+    
+    //Creating API Routes
+    $router->addRoute('/SysAPIs/{action}', 'SysAPIs.php', Router::API_ROUTE);
+    $router->addRoute('/AuthAPI/{action}', 'AuthAPI.php', Router::API_ROUTE);
+    $router->addRoute('/ExampleAPI/{action}', 'ExampleAPI.php', Router::API_ROUTE);
+    $router->addRoute('/NumsAPIs/{action}', 'NumsAPIs.php', Router::API_ROUTE);
+    $router->addRoute('/PasswordAPIs/{action}', 'PasswordAPIs.php', Router::API_ROUTE);
+    $router->addRoute('/UserAPIs/{action}', 'UserAPIs.php', Router::API_ROUTE);
+    $router->addRoute('/WebsiteAPIs/{action}', 'WebsiteAPIs.php', Router::API_ROUTE);
+    
+    //other views
+    //add your own or remove existing ones
     $router->addRoute('/login', 'login.php', Router::VIEW_ROUTE);
     $router->addRoute('/home', 'home.php', Router::VIEW_ROUTE);
     $router->addRoute('/activate-account', 'acctivate-account.php', Router::VIEW_ROUTE);

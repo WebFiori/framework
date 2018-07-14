@@ -34,11 +34,20 @@ if(!defined('ROOT_DIR')){
  * @version 1.3
  */
 class SystemFunctions extends Functions{
+    /**
+     * An array of possible user registration statuses.
+     * @since 1.3
+     */
     const USER_REG_STATS = array(
         'C'=>'Closed',
         'O'=>'Open',
         'AO'=>'Admin Only'
     );
+    /**
+     * An array of system setup steps
+     * @var array
+     * @since 1.3 
+     */
     public static $SETUP_STAGES = array(
         'w'=>'welcome',
         'db'=>'database-setup',
@@ -72,9 +81,9 @@ class SystemFunctions extends Functions{
      */
     const INITIAL_CONFIG_VARS = array(
         'is-config'=>'FALSE',
-        'template-date'=>'10-03-2018 (DD-MM-YYYY)',
-        'template-version'=>'0.1.4',
-        'template-version-type'=>'Beta',
+        'lisks-date'=>'10-03-2018 (DD-MM-YYYY)',
+        'lisks-version'=>'0.1.4',
+        'lisks-version-type'=>'Beta',
         'config-file-version'=>'1.3',
         'database-host'=>'localhost',
         'database-username'=>'',
@@ -240,23 +249,23 @@ class SystemFunctions extends Functions{
         $fh->addTab();
         //stat here
         $fh->write('/**
-     * The type version of the template that is used to build the project.
-     * @var string The type version of the template that is used to build the project.
+     * The type framework version that is used to build the project.
+     * @var string The framework version that is used to build the project.
      * @since 1.0 
      */
-    private $templateVersionType;
+    private $lisksVersionType;
     /**
-     * The version of the template that is used to build the project.
-     * @var string The version of the template that is used to build the project.
+     * The version of the framework that is used to build the project.
+     * @var string The version of the framework that is used to build the project.
      * @since 1.0 
      */
-    private $templateVersion;
+    private $liskisVersion;
     /**
-     * The release date of the template that is used to build the project.
-     * @var string Release date of of the template that is used to build the project.
+     * The release date of the framework that is used to build the project.
+     * @var string Release date of of the framework that is used to build the project.
      * @since 1.0 
      */
-    private $templateDate;
+    private $lisksDate;
     /**
      * A boolean value. Set to true once system configuration is completed.
      * @var boolean 
@@ -316,9 +325,9 @@ class SystemFunctions extends Functions{
      */
     private function __construct() {
         $this->isConfigured = '.$configArr['is-config'].';
-        $this->templateDate = \''.$configArr['template-date'].'\';
-        $this->templateVersion = \''.$configArr['template-version'].'\';
-        $this->templateVersionType = \''.$configArr['template-version-type'].'\';
+        $this->lisksDate = \''.$configArr['lisks-date'].'\';
+        $this->lisksVersion = \''.$configArr['lisks-version'].'\';
+        $this->lisksVersionType = \''.$configArr['lisks-version-type'].'\';
         $this->configVision = \''.$configArr['config-file-version'].'\';
         $this->dbHost = \''.$configArr['database-host'].'\';
         $this->dbUser = \''.$configArr['database-username'].'\';
@@ -414,43 +423,28 @@ class SystemFunctions extends Functions{
         return $this->versionType;
     }
     /**
-     * Returns template version.
-     * @return string Template version.
+     * Returns framework version number.
+     * @return string Framework version number.
      * @since 1.2
      */
-    public function getTemplateVersion(){
-        return $this->templateVersion;
+    public function getLisksVersion(){
+        return $this->lisksVersion;
     }
     /**
-     * Returns template version type.
-     * @return string Template version type.
+     * Returns framework version type.
+     * @return string framework version type.
      * @since 1.2
      */
-    public function getTemplateVersionType(){
-        return $this->templateVersionType;
+    public function getLisksVersionType(){
+        return $this->lisksVersionType;
     }
     /**
-     * Returns the date at which the template is released.
-     * @return string The date at which the template is released.
+     * Returns the date at which the framework is released.
+     * @return string The date at which the framework is released.
      * @since 1.0
      */
-    public function getTemplateDate(){
-        return $this->templateDate;
-    }
-
-    public function __toString() {
-        $retVal = \'<b>Project Template Info.</b><br/>\';
-        $retVal .= \'<b>Template Version:<b> \'.$this->getTemplateVersion().\'<br/>\';
-        $retVal .= \'<b>Template Version Type:<b> \'.$this->getTemplateVersionType().\'<br/>\';
-        $retVal .= \'<b>Template Release Date:<b> \'.$this->getTemplateDate().\'<br/><br/>\';
-        $retVal .= \'Config Version: \'.$this->getConfigVersion().\'<br/>\';
-        $retVal .= \'<b>System Configuration Info.</b><br/>\';
-        $retVal .= \'<b>System Version:<b> \'.$this->getSysVersion().\'<br/>\';
-        $retVal .= \'<b>Version Type:<b> \'. $this->getVerType().\'<br/>\';
-        $retVal .= \'<b>Database Host:<b> \'. $this->getDBHost().\'<br/>\';
-        $retVal .= \'<b>Database Name:<b> \'.$this->getDBName().\'<br/>\';
-        $retVal .= \'<b>Database Username:<b> \'.$this->getDBUser().\'<br/><br/>\';
-        return $retVal;
+    public function getLisksDate(){
+        return $this->lisksDate;
     }', TRUE, TRUE);
         $fh->reduceTab();
         $fh->write('}', TRUE, TRUE);

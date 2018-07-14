@@ -11,13 +11,12 @@ function getHeaderNode(){
     $headerSec = new HTMLNode();
     $logoContainer = new HTMLNode();
     $logoContainer->setClassName('pa-'.$page->getWritingDir().'-col-four');
+    $lang = WebsiteFunctions::get()->getMainSession()->getLang(TRUE);
     $p = new PNode();
-    $p->addText($page->getLanguage()->get('general/website-name'), array('bold'=>TRUE));
-    $p->setAttribute('style', 'font-size: 2.25rem;margin:0;font-family: \'Noto Kufi Arabic\', sans-serif; ');
+    $p->addText('My Website Name', array('bold'=>TRUE));
     $logoContainer->addChild($p);
     $headerSec->addChild($logoContainer);
     //end of logo UI
-    //
     //starting of main menu items
     $menu = new HTMLNode('nav');
     $menu->setID('main-nav');
@@ -29,22 +28,22 @@ function getHeaderNode(){
     $headerSec->addChild($menu);
     $lang = $page->getLanguage();
     $item1 = new ListItem();
-    $link1 = new LinkNode(SiteConfig::get()->getBaseURL().'our-products', $lang->get('alyaseen-agri/main-nav/our-branches'));
+    $link1 = new LinkNode(SiteConfig::get()->getBaseURL(), 'Menu Item 1');
     $item1->addChild($link1);
     $ul->addChild($item1);
     $item1 = new ListItem();
-    $link1 = new LinkNode(SiteConfig::get()->getBaseURL().'our-products', $lang->get('alyaseen-agri/main-nav/about-management'));
+    $link1 = new LinkNode(SiteConfig::get()->getBaseURL(), 'Menu Item 2');
     $item1->addChild($link1);
     $ul->addChild($item1);
     $item1 = new ListItem();
-    $link1 = new LinkNode(SiteConfig::get()->getBaseURL().'branches', $lang->get('alyaseen-agri/main-nav/branches'));
+    $link1 = new LinkNode(SiteConfig::get()->getBaseURL(), 'Menu Item 3');
     $item1->addChild($link1);
     $ul->addChild($item1);
     $item1 = new ListItem();
-    $link1 = new LinkNode(SiteConfig::get()->getBaseURL().'contact-us', $lang->get('alyaseen-agri/main-nav/contact-us'));
+    $link1 = new LinkNode(SiteConfig::get()->getBaseURL(), 'Menu Item 4');
     $item1->addChild($link1);
     $ul->addChild($item1);
-    $link1 = new LinkNode(SiteConfig::get()->getBaseURL().'suppliers', $lang->get('alyaseen-agri/main-nav/suppliers'));
+    $link1 = new LinkNode(SiteConfig::get()->getBaseURL(), 'Menu Item 5');
     $item1 = new ListItem();
     $item1->addChild($link1);
     $ul->addChild($item1);

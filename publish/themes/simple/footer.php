@@ -47,15 +47,10 @@ function getFooterNode(){
     $contactInfo = new HTMLNode();
     $contactInfo->setClassName('pa-row');
     $p = new PNode();
-    $p->addText('013 581 5588', array('new-line'=>TRUE));
-    $p->addText('info@alyaseenagri.com',array('new-line'=>TRUE));
+    $p->addText('013 xxx xxxx', array('new-line'=>TRUE));
+    $p->addText('youremail@example.com',array('new-line'=>TRUE));
     $contactInfo->addChild($p);
     $node->addChild($contactInfo);
-    if($page->getLang() == 'AR'){
-        $p->addText('شركة الياسين الزراعية, جميع الحقوق محفوظة © 2018');
-    }
-    else{
-        $p->addText('Al Yaseen Agricultural Company, All Rights Reserved © 2018');
-    }
+    $p->addText('Your Copyright Notice © 2018');
     return $node;
 }

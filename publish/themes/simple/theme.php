@@ -1,10 +1,10 @@
 <?php
 $theme = new Theme();
 $theme->setAuthor('Ibrahim Ali');
-$theme->setName('Alyaseen Agri By Ibrahim Ali');
+$theme->setName('Alyaseen Simple By Ibrahim Ali');
 $theme->setVersion('1.0');
-$theme->setDescription('Theme for the website of alyaseen agri co.');
-$theme->setDirectoryName('alyaseen-agri');
+$theme->setDescription('Just another simple theme.');
+$theme->setDirectoryName('simple');
 $theme->setImagesDirName('images');
 $theme->setJsDirName('js');
 $theme->setCssDirName('css');

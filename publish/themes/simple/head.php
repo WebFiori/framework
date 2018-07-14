@@ -34,6 +34,7 @@ function getHeadNode(){
     extendLanguage();
     $page->setWebsiteName($page->getLanguage()->get('general/website-name'));
     $page->setTitle('Hello');
+    $page->setDescription('Heloow ');
     $headTag = new HeadNode();
     $headTag->setBase(SiteConfig::get()->getBaseURL());
     $headTag->addLink('icon', $page->getThemeImagesDir().'/favicon.png');

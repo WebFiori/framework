@@ -5,7 +5,7 @@
  * @param int $activeURL The number of the currently open page.
  * @return string HTML code.
  */
-function getAsideNode($activeURL=0){
+function getAsideNode(){
     $menu = new HTMLNode('div');
     return $menu;
 }

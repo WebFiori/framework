@@ -154,8 +154,8 @@ class Router {
            $routeType == self::CUSTOMIZED || 
            $routeType == self::FUNCTION_ROUTE){
             if($routeType != self::FUNCTION_ROUTE){
-                $path = $this->fixPath($routeType.$path);
-                $routeTo = ROOT_DIR.$this->fixPath($routeTo);
+                $path = $this->fixPath($path);
+                $routeTo = ROOT_DIR.$this->fixPath($routeType.$routeTo);
             }
             if(!$this->hasRoute($path)){
                 $routeUri = new RouterUri($this->getBase().$path, $routeTo);

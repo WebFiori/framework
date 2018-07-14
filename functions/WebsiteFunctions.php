@@ -38,15 +38,19 @@ class WebsiteFunctions extends Functions{
      * @since 1.0
      */
     const INITIAL_WEBSITE_CONFIG_VARS = array(
-        'website-name'=>'Programming Academia',
+        'website-names'=>array(
+            'EN'=>'Programming Academia',
+            'AR'=>'أكاديميا البرمجة'
+        ),
         'base-url'=>'',
         'title-separator'=>' | ',
         'home-page'=>'index',
-        'theme-directory'=>'publish/themes/greeny',
-        'admin-theme-directory'=>'publish/themes/greeny',
         'admin-theme-name'=>'Greeny By Ibrahim Ali',
         'theme-name'=>'Greeny By Ibrahim Ali',
-        'site-description'=>'',
+        'site-descriptions'=>array(
+            'EN'=>'',
+            'AR'=>''
+        ),
         'config-file-version'=>'1.1',
     );
     /**
@@ -68,9 +72,7 @@ class WebsiteFunctions extends Functions{
     }
     public function __construct() {
         parent::__construct();
-        
     }
-    
     /**
      * Creates the file 'SiteConfig.php' if it does not exist.
      * @since 1.0
@@ -116,13 +118,13 @@ class WebsiteFunctions extends Functions{
         $cfgArr = WebsiteFunctions::INITIAL_WEBSITE_CONFIG_VARS;
         $cfgArr['base-url'] = Util::getBaseURL();
         if(class_exists('SiteConfig')){
-            $cfgArr['website-name'] = SiteConfig::get()->getWebsiteName();
+            $cfgArr['website-names'] = SiteConfig::get()->getWebsiteNames();
             $cfgArr['base-url'] = SiteConfig::get()->getBaseURL();
             $cfgArr['title-separator'] = SiteConfig::get()->getTitleSep();
             $cfgArr['home-page'] = SiteConfig::get()->getHomePage();
             $cfgArr['theme-directory'] = SiteConfig::get()->getThemeDir();
             $cfgArr['admin-theme-directory'] = SiteConfig::get()->getAdminThemeDir();
-            $cfgArr['site-description'] = SiteConfig::get()->getDesc();
+            $cfgArr['site-descriptions'] = SiteConfig::get()->getDescriptions();
             $cfgArr['theme-name'] = SiteConfig::get()->getBaseThemeName();
             $cfgArr['admin-theme-name'] = SiteConfig::get()->getAdminThemeName();
         }
@@ -144,17 +146,17 @@ class WebsiteFunctions extends Functions{
         $fh->write('class SiteConfig{', TRUE, TRUE);
         $fh->addTab();
         $fh->write('/**
-     * The name of the web site (Such as \'Programming Academia\')
+     * An array which contains all website names in different languages.
      * @var string 
      * @since 1.0
      */
-    private $webSiteName;
+    private $webSiteNames;
     /**
-     * A general description for the web site.
+     * An array which contains different descriptions in different languages.
      * @var string 
      * @since 1.0
      */
-    private $description;
+    private $descriptions;
     /**
      *
      * @var string 
@@ -167,13 +169,6 @@ class WebsiteFunctions extends Functions{
      * @since 1.0
      */
     private $homePage;
-    /**
-     * The directory of the theme that is used by web site administration pages. 
-     * @var string
-     * @since 1.0 
-     * @deprecated since version 1.3
-     */
-    private $adminPanelThemeDir;
     /**
      * The base URL that is used by all web site pages to fetch resource files.
      * @var string 
@@ -199,13 +194,6 @@ class WebsiteFunctions extends Functions{
      */
     private $configVision;
     /**
-     * The directory of web site pages theme.
-     * @var string
-     * @since 1.0 
-     * @deprecated since version 1.3
-     */
-    private $selectedThemeDir;
-    /**
      * A singleton instance of the class.
      * @var SiteConfig 
      * @since 1.0
@@ -223,36 +211,28 @@ class WebsiteFunctions extends Functions{
         self::$siteCfg = new SiteConfig();
         return self::$siteCfg;
     }', TRUE, TRUE);
+        $names = 'array(';
+        $configArr['website-names'];
+        foreach ($configArr['website-names'] as $k => $v){
+            $names .= '\''.$k.'\'=>\''.$v.'\',';
+        }
+        $names .= ')';
+        $descriptions = 'array(';
+        foreach ($configArr['site-descriptions'] as $k => $v){
+            $descriptions .= '\''.$k.'\'=>\''.$v.'\',';
+        }
+        $descriptions .= ')';
         $fh->write('private function __construct() {
         $this->configVision = \''.$configArr['config-file-version'].'\';
-        $this->webSiteName = \''.$configArr['website-name'].'\';
+        $this->webSiteNames = '.$names.';
         $this->baseUrl = \''.$configArr['base-url'].'\';
         $this->titleSep = \' '. trim($configArr['title-separator']).' \';
         $this->baseThemeName = \''.$configArr['theme-name'].'\';
         $this->adminThemeName = \''.$configArr['admin-theme-name'].'\';
         $this->homePage = \''.$configArr['home-page'].'\';
-        $this->description = \''.$configArr['site-description'].'\';
-        $this->selectedThemeDir = \''.$configArr['theme-directory'].'\';
-        $this->adminPanelThemeDir = \''.$configArr['admin-theme-directory'].'\';
+        $this->descriptions = '.$descriptions.';
     }', TRUE, TRUE);
-        $fh->write('/**
-     * Returns the directory at which the web site theme exist.
-     * @return string The directory at which the web site theme exist.
-     * @since 1.0
-     * @deprecated since version 1.3
-     */
-    public function getThemeDir() {
-        return $this->selectedThemeDir;
-    }
-    /**
-     * Returns the directory at which the administrator pages theme exists.
-     * @return string The directory at which the administrator pages theme exists.
-     * @since 1.0
-     * @deprecated since version 1.3
-     */
-    public function getAdminThemeDir(){
-        return $this->adminPanelThemeDir;
-    }
+        $fh->write('
     /**
      * Returns the name of base theme that is used in website pages.
      * @return string The name of base theme that is used in website pages.
@@ -287,12 +267,14 @@ class WebsiteFunctions extends Functions{
     }
     
     /**
-     * Returns the description of the web site.
-     * @return string The description of the web site.
+     * Returns an associative array which contains different website descriptions 
+     * in different languages.
+     * @return string An associative array which contains different website descriptions 
+     * in different languages.
      * @since 1.0
      */
-    public function getDesc(){
-        return $this->description;
+    public function getDescriptions(){
+        return $this->descriptions;
     }
     /**
      * Returns the character (or string) that is used to separate page title from website name.
@@ -311,22 +293,14 @@ class WebsiteFunctions extends Functions{
         return $this->homePage;
     }
     /**
-     * Returns the name of the website.
-     * @return string The name of the website.
+     * Returns an array which contains diffrent website names in different languages.
+     * @return array An array which contains diffrent website names in different languages.
      * @since 1.0
      */
-    public function getWebsiteName(){
-        return $this->webSiteName;
+    public function getWebsiteNames(){
+        return $this->webSiteNames;
     }
-    public function __toString() {
-        $retVal = \'<b>Website Configuration</b><br/>\';
-        $retVal .= \'Website Name: \'.$this->getWebsiteName().\'<br/>\';
-        $retVal .= \'Home Page: \'.$this->getHomePage().\'<br/>\';
-        $retVal .= \'Config Version: \'.$this->getConfigVersion().\'<br/>\';
-        $retVal .= \'Description: \'.$this->getDesc().\'<br/>\';
-        $retVal .= \'Title Separator: \'.$this->getTitleSep().\'<br/>\';
-        return $retVal;
-    }', TRUE, TRUE);
+    ', TRUE, TRUE);
         $fh->reduceTab();
         $fh->write('}', TRUE, TRUE);
         $fh->close();

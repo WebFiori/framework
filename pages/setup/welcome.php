@@ -34,6 +34,7 @@ $page->usingTheme(SiteConfig::get()->getAdminThemeName());
 $pageLbls = $page->getLanguage()->get('pages/setup/welcome');
 $translation = $page->getLanguage();
 $page->setTitle($translation->get('pages/setup/welcome/title'));
+$page->setDescription($translation->get('pages/setup/welcome/description'));
 $page->insertNode(stepsCounter($page->getLanguage()->get('pages/setup/setup-steps'),0), 'main-content-area');
 $page->insertNode(langSwitch(),'main-content-area');
 $page->insertNode(pageBody($pageLbls),'main-content-area');

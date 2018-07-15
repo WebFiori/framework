@@ -33,6 +33,9 @@ $page->setHasAside(FALSE);
 
 $page->usingTheme(SiteConfig::get()->getAdminThemeName());
 $pageLbls = $page->getLanguage()->get('pages/setup/email-account');
+$translation = $page->getLanguage();
+$page->setTitle($translation->get('pages/setup/email-account/title'));
+$page->setDescription($translation->get('pages/setup/email-account/description'));
 $page->insertNode(stepsCounter($page->getLanguage()->get('pages/setup/setup-steps'),2), 'main-content-area');
 $js = new JsCode;
 $jsonx = new JsonX();

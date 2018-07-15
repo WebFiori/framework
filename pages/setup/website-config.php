@@ -33,6 +33,9 @@ $page->setHasAside(FALSE);
 
 $page->usingTheme(SiteConfig::get()->getAdminThemeName());
 $pageLbls = $page->getLanguage()->get('pages/setup/website-config');
+$translation = $page->getLanguage();
+$page->setTitle($translation->get('pages/setup/website-config/title'));
+$page->setDescription($translation->get('pages/setup/website-config/description'));
 $page->insertNode(stepsCounter($page->getLanguage()->get('pages/setup/setup-steps'),4), 'main-content-area');
 
 $js = new JsCode;

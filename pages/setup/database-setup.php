@@ -34,7 +34,9 @@ $page->setHasAside(FALSE);
 $page->usingTheme(SiteConfig::get()->getAdminThemeName());
 $pageLbls = $page->getLanguage()->get('pages/setup/database-setup');
 $page->insertNode(stepsCounter($page->getLanguage()->get('pages/setup/setup-steps'),1), 'main-content-area');
-
+$translation = $page->getLanguage();
+$page->setTitle($translation->get('pages/setup/database-setup/title'));
+$page->setDescription($translation->get('pages/setup/database-setup/description'));
 $jsonx = new JsonX();
 $jsonx->add('disconnected', $page->getLanguage()->get('general/disconnected'));
 $jsonx->add('success', $pageLbls['labels']['connected']);

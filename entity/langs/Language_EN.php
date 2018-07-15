@@ -186,6 +186,10 @@ $Language->setMultiple('pages/setup/database-setup/help', array(
     . 'The account must have all prevelages over the database (select, insert, update, delete etc...). ',
     'h-3'=>'The last thing that we need is the name of database instance that will be used.'
 ));
+$Language->setMultiple('pages/setup/database-setup', array(
+    'title'=>'Database Setup',
+    'description'=>'Setting up your database connection.'
+));
 $Language->setMultiple('pages/setup/email-account/labels', array(
     'name'=>'Account Name:',
     'server-address'=>'Server Address:',
@@ -215,6 +219,10 @@ $Language->setMultiple('pages/setup/email-account/help', array(
     . 'SMTP account information.',
     'h-2'=>'If you don\' have the information, you can skip this step.'
 ));
+$Language->setMultiple('pages/setup/email-account', array(
+    'title'=>'SMTP Account',
+    'description'=>'SMTP account information.'
+));
 $Language->setMultiple('pages/setup/admin-account/labels', array(
     'username'=>'Username:',
     'password'=>'Password:',
@@ -241,6 +249,10 @@ $Language->setMultiple('pages/setup/admin-account/help', array(
     . 'loose access to the system for ever.',
     'h-2'=>'<b>Note that once you finish this step, there is no going back.<b>'
 ));
+$Language->setMultiple('pages/setup/admin-account', array(
+    'title'=>'Adminstrator Account',
+    'description'=>'Setup adminstrator account.'
+));
 $Language->setMultiple('pages/setup/website-config/labels', array(
     'site-name'=>'Website Name:',
     'site-description'=>'Website Description:',
@@ -263,6 +275,10 @@ $Language->setMultiple('pages/setup/website-config/help', array(
     'h-2'=>'The second thing that we need is a short description for your website. '
     . 'The given description will usually appear by default in the pages that does not '
     . 'have descripion.'
+));
+$Language->setMultiple('pages/setup/admin-account', array(
+    'title'=>'Website Configuration',
+    'description'=>'Final step in setup.'
 ));
 $Language->setMultiple('pages/login/labels', array(
     'main'=>'Login to The System',

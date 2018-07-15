@@ -138,10 +138,12 @@ $Language->setMultiple('pages/setup/setup-steps', array(
     'website-config'=>'Website Configuration',
 ));
 $Language->setMultiple('pages/setup/welcome/help', array(
-    'h-1'=>'Welcome to application setup. Since this is your first '
-    . 'time using the app, you must setup few things.',
+    'h-1'=>'Welcome to <b>LisksCode</b> framework setup. Since This is the '
+    . 'first time you are using the framework, we will need from you '
+    . 'to give us few moments to setup the basic settings. You can change '
+    . 'your settings later if you want.',
     'h-2'=>'The first thing that we need from you is to provide the '
-    . 'application with database connection information. Next, you will have to enter '
+    . 'us with MySQL database connection information. Next, you will have to enter '
     . 'the information of SMTP Email account that will be used to send system '
     . 'notifications to users and admin. After that, you '
     . 'will have to create an admin account. The final step is to configure '
@@ -150,6 +152,10 @@ $Language->setMultiple('pages/setup/welcome/help', array(
     . 'have the following things ready:',
     'h-4'=>'MySQL Database Account Information.',
     'h-5'=>'SMTP Email Account Information.',
+));
+$Language->setMultiple('pages/setup/welcome', array(
+    'title'=>'Welcome',
+    'description'=>'Welcome to setup.'
 ));
 $Language->setMultiple('pages/setup/database-setup/labels', array(
     'username'=>'Username:',

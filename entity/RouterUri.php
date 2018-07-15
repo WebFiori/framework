@@ -349,6 +349,9 @@ class RouterUri {
                 foreach ($thisPathNames as $path1){
                     $boolsArr[] = in_array($path1, $otherPathNames);
                 }
+                foreach ($otherPathNames as $path){
+                    $boolsArr[] = in_array($path, $thisPathNames);
+                }
                 foreach ($boolsArr as $bool){
                     $isEqual = $isEqual && $bool;
                 }

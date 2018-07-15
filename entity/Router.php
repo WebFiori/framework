@@ -181,14 +181,16 @@ class Router {
      * @since 1.1
      */
     private function fixPath($path) {
-        if($path[strlen($path) - 1] == '/' || $path[0] == '/'){
-            while($path[0] == '/' || $path[strlen($path) - 1] == '/'){
-                $path = trim($path, '/');
+        if($path != '/'){
+            if($path[strlen($path) - 1] == '/' || $path[0] == '/'){
+                while($path[0] == '/' || $path[strlen($path) - 1] == '/'){
+                    $path = trim($path, '/');
+                }
+                $path = '/'.$path;
             }
-            $path = '/'.$path;
-        }
-        if($path[0] != '/'){
-            $path = '/'.$path;
+            if($path[0] != '/'){
+                $path = '/'.$path;
+            }
         }
         return $path;
     }
@@ -235,7 +237,28 @@ class Router {
                             return;
                         }
                         else{
-                            require_once $route->getRouteTo();
+                            $file = $route->getRouteTo();
+                            if(file_exists($file)){
+                                require_once $file;
+                            }
+                            else{
+                                header("HTTP/1.1 500 Server Error");
+                                die(''
+                                . '<!DOCTYPE html>'
+                                . '<html>'
+                                . '<head>'
+                                . '<title>Server Error</title>'
+                                . '</head>'
+                                . '<body>'
+                                . '<h1>500 - Server Error</h1>'
+                                . '<hr>'
+                                . '<p>'
+                                . 'The resource <b>'.Util::getRequestedURL().'</b> was availble. '
+                                        . 'But the admin did not configure its route correctly.'
+                                . '</p>'
+                                . '</body>'
+                                . '</html>');
+                            }
                             return;
                         }
                     }
@@ -264,16 +287,16 @@ class Router {
                             }
                         }
                     }
-                }
-                //if all variables are set, then we found our route
-                if($route->isAllVarsSet()){
-                    if(is_callable($route->getRouteTo())){
-                        call_user_func($route->getRouteTo());
-                        return;
-                    }
-                    else{
-                        require_once $route->getRouteTo();
-                        return;
+                    //if all variables are set, then we found our route
+                    if($route->isAllVarsSet()){
+                        if(is_callable($route->getRouteTo())){
+                            call_user_func($route->getRouteTo());
+                            return;
+                        }
+                        else{
+                            require_once $route->getRouteTo();
+                            return;
+                        }
                     }
                 }
             }

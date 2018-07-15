@@ -24,14 +24,18 @@
  * THE SOFTWARE.
  */
 /**
- * A class to initiate database tables.
+ * A class to create database schema.
  *
  * @author Ibrahim
  * @version 1.1
  */
 class DatabaseSchema {
     private static $schema;
-    
+    /**
+     * Returns a singleton of the class <b>DatabaseSchema</b>.
+     * @return DatabaseSchema
+     * @since 1.0
+     */
     public function get() {
         if(self::$schema != NULL){
             return self::$schema;
@@ -39,8 +43,19 @@ class DatabaseSchema {
         self::$schema = new DatabaseSchema();
         return self::$schema;
     }
-    
+    /**
+     * An array which contains all the names of the classes which 
+     * extends the base class <b>MySQLQuery</b>.
+     * @var array
+     * @since 1.0 
+     */
     private $queries;
+    /**
+     * Returns a string which represents the database schema.
+     * @return string A string which represents the database schema. If 
+     * the string is executed, it will create database tables.
+     * @since 1.0
+     */
     public function getSchema() {
         $schema = '';
         foreach ($this->queries as $query){
@@ -50,11 +65,20 @@ class DatabaseSchema {
         }
         return $schema;
     }
-    public function __construct() {
-        $this->queries = array();
-        
-    }
     
+    private function __construct() {
+        $this->queries = array();
+    }
+    /**
+     * Adds a query builder class name to the set of classes that represents 
+     * database tables.
+     * @param string $queryClassName The name of query builder class.
+     * @return boolean Once the name is added, the function will return <b>TRUE</b>. 
+     * If the given name is already added or it is invalid, the function will 
+     * return <b>FALSE</b>. The given name will be considered invalid only if 
+     * no class was found which correspond to the given name.
+     * @since 1.0
+     */
     public function add($queryClassName) {
         if(class_exists($queryClassName)){
             foreach ($this->queries as $q){

@@ -26,17 +26,22 @@
 /**
  * A class to create database schema.
  *
- * @author Ibrahim
- * @version 1.1
+ * @author Ibrahim <ibinshikh@hotmail.com>
+ * @version 1.2
  */
 class DatabaseSchema {
+    /**
+     * Singleton of <b>DatabaseSchema</b>.
+     * @var DatabaseSchema
+     * @since 1.0 
+     */
     private static $schema;
     /**
      * Returns a singleton of the class <b>DatabaseSchema</b>.
      * @return DatabaseSchema
      * @since 1.0
      */
-    public function get() {
+    public static function get() {
         if(self::$schema != NULL){
             return self::$schema;
         }
@@ -58,14 +63,55 @@ class DatabaseSchema {
      */
     public function getSchema() {
         $schema = '';
-        foreach ($this->queries as $query){
-            $queryObj = new $query();
-            $queryObj->createStructure();
-            $schema .= $queryObj->getQuery();
+        $lastSchemaIndex = $this->getLastOrder();
+        for($x = 0 ;$x <= $lastSchemaIndex ; $x++){
+            Util::print_r($x);
+            if(isset($this->queries[$x])){
+                $queryObj = new $this->queries[$x]();
+                $queryObj->createStructure();
+                $schema .= $queryObj->getQuery();
+            }
         }
         return $schema;
     }
-    
+    /**
+     * Returns the order of query builder class given its name.
+     * @param string $queryClassName The name of the query builder class. 
+     * @return int If the given query builder class was added, the function will return 
+     * its order. If no class was found which has the given name, the function will 
+     * return -1.
+     * @since 1.2
+     */
+    public function getOrder($queryClassName) {
+        $count = count($this->queries);
+        $keys = array_keys($this->queries);
+        for($x = 0 ; $x < $count ; $x++){
+            if($queryClassName == $this->queries[$keys[$x]]){
+                return $keys[$x];
+            }
+        }
+        return -1;
+    }
+    /**
+     * Returns the order of the last query builder class name.
+     * @return int The order of the last  query builder class name. If the 
+     * schema has no query builder class names, the function will return -1.
+     * @since 1.2
+     */
+    public function getLastOrder() {
+        $keys = array_keys($this->queries);
+        $count = count($keys);
+        if($count > 0){
+            $max = $keys[0];
+            foreach ($keys as $index){
+                if($index > $max){
+                    $max = $index;
+                }
+            }
+            return $max;
+        }
+        return -1;
+    }
     private function __construct() {
         $this->queries = array();
     }
@@ -73,22 +119,56 @@ class DatabaseSchema {
      * Adds a query builder class name to the set of classes that represents 
      * database tables.
      * @param string $queryClassName The name of query builder class.
+     * @param int $order The order of query builder table in the database. Used to 
+     * make sure that the tables that are referenced by other tables put first. 
+     * It must be a value greater than or equal to 0. If the given order is 
+     * taken, the name will be added to the last position.
      * @return boolean Once the name is added, the function will return <b>TRUE</b>. 
      * If the given name is already added or it is invalid, the function will 
      * return <b>FALSE</b>. The given name will be considered invalid only if 
      * no class was found which correspond to the given name.
      * @since 1.0
      */
-    public function add($queryClassName) {
+    public function add($queryClassName,$order) {
         if(class_exists($queryClassName)){
             foreach ($this->queries as $q){
                 if($q == $queryClassName){
                     return FALSE;
                 }
             }
-            array_push($this->queries, $queryClassName);
+            if(gettype($order) == 'integer'){
+                if(!isset($this->queries[$order])){
+                    $this->queries[$order] = $queryClassName;
+                }
+                else{
+                    $lstOrder = $this->getLastOrder();
+                    if($lstOrder != -1){
+                        $this->queries[$lstOrder] = $queryClassName;
+                    }
+                    else{
+                        $this->queries[0] = $queryClassName;
+                    }
+                }
+            }
+            else{
+                $lstOrder = $this->getLastOrder();
+                if($lstOrder != -1){
+                    $this->queries[$lstOrder] = $queryClassName;
+                }
+                else{
+                    $this->queries[0] = $queryClassName;
+                }
+            }
             return TRUE;
         }
         return FALSE;
+    }
+    /**
+     * Returns the array which contains the names of query bulder classes.
+     * @return array The array which contains the names of query bulder classes.
+     * @since 1.2
+     */
+    public function getClassNames() {
+        return $this->queries;
     }
 }

@@ -188,7 +188,6 @@ class UserQuery extends MySQLQuery{
                 $this->getColName('acc-level')=>$user->getAccessLevel(),
                 $this->getColName('disp-name')=>'\''.$user->getDisplayName().'\'',
                 $this->getColName('last-login')=>'\''. date('Y-m-d h:i:s').'\'',
-                $this->getColName('status')=>'\'N\''
             );
             $this->insert($arr);
         }

@@ -94,11 +94,7 @@ class AdminFunctions extends Functions{
      */
     private function createDatabase(){
         $this->useDatabase();
-        $schema = new DatabaseSchema();
-        $schema->add('UserQuery');
-        $schema->add('ActivationQuery');
-        $schema->add('FileQuery');
-        $schema->add('PasswordResetQuery');
+        $schema = DatabaseSchema::get();
         //creating any random query object just to execute create
         //tables statements.
         $q = new UserQuery();

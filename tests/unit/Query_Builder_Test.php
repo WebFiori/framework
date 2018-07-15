@@ -8,10 +8,10 @@
 
 require '../../root.php';
 Util::displayErrors();
-class Q1 extends QueryBuilder{
+class Q1 extends MySQLQuery{
     private $table;
     public function __construct() {
-        parent::__construct(10);
+        parent::__construct();
         $this->table = new Table('q1_table');
     }
     public function getStructure() {
@@ -19,10 +19,10 @@ class Q1 extends QueryBuilder{
     }
 
 }
-class Q2 extends QueryBuilder{
+class Q2 extends MySQLQuery{
     private $table;
     public function __construct() {
-        parent::__construct(3);
+        parent::__construct();
         $this->table = new Table('q2_table');
     }
     public function getStructure() {
@@ -31,7 +31,7 @@ class Q2 extends QueryBuilder{
 
 }
 
-$q1 = new Q1();
-$q2 = new Q2();
+DatabaseSchema::get()->add('Q1', 60);
+DatabaseSchema::get()->add('Q2', 30);
 Util::print_r(DatabaseSchema::get()->getClassNames());
 Util::print_r(DatabaseSchema::get()->getSchema());

@@ -108,12 +108,20 @@ class DatabaseSchema {
                     $max = $index;
                 }
             }
+            if($max < 20){
+                return 20;
+            }
             return $max;
         }
         return -1;
     }
     private function __construct() {
-        $this->queries = array();
+        $this->queries = array(
+            0=>'UserQuery',
+            1=>'ActivationQuery',
+            2=>'PasswordResetQuery',
+            3=>'FileQuery'
+        );
     }
     /**
      * Adds a query builder class name to the set of classes that represents 
@@ -121,7 +129,7 @@ class DatabaseSchema {
      * @param string $queryClassName The name of query builder class.
      * @param int $order The order of query builder table in the database. Used to 
      * make sure that the tables that are referenced by other tables put first. 
-     * It must be a value greater than or equal to 0. If the given order is 
+     * It must be a value greater than or equal to 20. If the given order is 
      * taken, the name will be added to the last position.
      * @return boolean Once the name is added, the function will return <b>TRUE</b>. 
      * If the given name is already added or it is invalid, the function will 
@@ -137,16 +145,18 @@ class DatabaseSchema {
                 }
             }
             if(gettype($order) == 'integer'){
-                if(!isset($this->queries[$order])){
-                    $this->queries[$order] = $queryClassName;
-                }
-                else{
-                    $lstOrder = $this->getLastOrder();
-                    if($lstOrder != -1){
-                        $this->queries[$lstOrder] = $queryClassName;
+                if($order >= 20){
+                    if(!isset($this->queries[$order])){
+                        $this->queries[$order] = $queryClassName;
                     }
                     else{
-                        $this->queries[0] = $queryClassName;
+                        $lstOrder = $this->getLastOrder();
+                        if($lstOrder != -1){
+                            $this->queries[$lstOrder] = $queryClassName;
+                        }
+                        else{
+                            $this->queries[0] = $queryClassName;
+                        }
                     }
                 }
             }
@@ -156,7 +166,7 @@ class DatabaseSchema {
                     $this->queries[$lstOrder] = $queryClassName;
                 }
                 else{
-                    $this->queries[0] = $queryClassName;
+                    $this->queries[20] = $queryClassName;
                 }
             }
             return TRUE;

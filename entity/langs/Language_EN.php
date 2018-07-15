@@ -276,7 +276,7 @@ $Language->setMultiple('pages/setup/website-config/help', array(
     . 'The given description will usually appear by default in the pages that does not '
     . 'have descripion.'
 ));
-$Language->setMultiple('pages/setup/admin-account', array(
+$Language->setMultiple('pages/setup/website-config', array(
     'title'=>'Website Configuration',
     'description'=>'Final step in setup.'
 ));

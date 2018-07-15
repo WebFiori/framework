@@ -13,12 +13,13 @@ createRoutes();
 //other errors checked as needed later.
 if($GLOBALS['SYS_STATUS'] === Util::NEED_CONF){
     $requestedURI = Util::getRequestedURL();
-    if($requestedURI == '/s/welcome' ||
-       $requestedURI == '/s/database-setup' ||
-       $requestedURI == '/s/smtp-account' || 
-       $requestedURI == '/s/admin-account' ||
-       $requestedURI == '/s/website-config' ||
-       $requestedURI == '/SysAPIs'){
+    $b = SiteConfig::get()->getBaseURL();
+    if($requestedURI == $b.'s/welcome' ||
+       $requestedURI == $b.'s/database-setup' ||
+       $requestedURI == $b.'s/smtp-account' || 
+       $requestedURI == $b.'s/admin-account' ||
+       $requestedURI == $b.'s/website-config' ||
+       $requestedURI == $b.'SysAPIs'){
         Router::get()->route($requestedURI);
     }
     else{
@@ -35,11 +36,11 @@ function createRoutes(){
     $router = Router::get();
     
     //routes to configuration views
-    $router->addRoute('/s/welcome', 'setup/welcome.php', Router::VIEW_ROUTE);
-    $router->addRoute('/s/database-setup', 'setup/database-setup.php', Router::VIEW_ROUTE);
-    $router->addRoute('/s/smtp-account', 'setup/email-account.php', Router::VIEW_ROUTE);
-    $router->addRoute('/s/admin-account', 'setup/admin-account.php', Router::VIEW_ROUTE);
-    $router->addRoute('/s/website-config', 'setup/website-config.php', Router::VIEW_ROUTE);
+    $router->addRoute('/s/welcome', '/setup/welcome.php', Router::VIEW_ROUTE);
+    $router->addRoute('/s/database-setup', '/setup/database-setup.php', Router::VIEW_ROUTE);
+    $router->addRoute('/s/smtp-account', '/setup/email-account.php', Router::VIEW_ROUTE);
+    $router->addRoute('/s/admin-account', '/setup/admin-account.php', Router::VIEW_ROUTE);
+    $router->addRoute('/s/website-config', '/setup/website-config.php', Router::VIEW_ROUTE);
     $router->addRoute('/'.Util::NEED_CONF, function(){
         if(isset($GLOBALS['SYS_STATUS']) && $GLOBALS['SYS_STATUS'] === Util::NEED_CONF){
             SystemFunctions::get()->initSetupSession();
@@ -73,20 +74,21 @@ function createRoutes(){
     }, Router::FUNCTION_ROUTE);
     
     //Creating API Routes
-    $router->addRoute('/SysAPIs/{action}', 'SysAPIs.php', Router::API_ROUTE);
-    $router->addRoute('/AuthAPI/{action}', 'AuthAPI.php', Router::API_ROUTE);
-    $router->addRoute('/ExampleAPI/{action}', 'ExampleAPI.php', Router::API_ROUTE);
-    $router->addRoute('/NumsAPIs/{action}', 'NumsAPIs.php', Router::API_ROUTE);
-    $router->addRoute('/PasswordAPIs/{action}', 'PasswordAPIs.php', Router::API_ROUTE);
-    $router->addRoute('/UserAPIs/{action}', 'UserAPIs.php', Router::API_ROUTE);
-    $router->addRoute('/WebsiteAPIs/{action}', 'WebsiteAPIs.php', Router::API_ROUTE);
+    $router->addRoute('/SysAPIs', '/SysAPIs.php', Router::API_ROUTE);
+    $router->addRoute('/SysAPIs/{action}', '/SysAPIs.php', Router::API_ROUTE);
+    $router->addRoute('/AuthAPI/{action}', '/AuthAPI.php', Router::API_ROUTE);
+    $router->addRoute('/ExampleAPI/{action}', '/ExampleAPI.php', Router::API_ROUTE);
+    $router->addRoute('/NumsAPIs/{action}', '/NumsAPIs.php', Router::API_ROUTE);
+    $router->addRoute('/PasswordAPIs/{action}', '/PasswordAPIs.php', Router::API_ROUTE);
+    $router->addRoute('/UserAPIs/{action}', '/UserAPIs.php', Router::API_ROUTE);
+    $router->addRoute('/WebsiteAPIs/{action}', '/WebsiteAPIs.php', Router::API_ROUTE);
     
     //other views
     //add your own or remove existing ones
-    $router->addRoute('/login', 'login.php', Router::VIEW_ROUTE);
-    $router->addRoute('/home', 'home.php', Router::VIEW_ROUTE);
-    $router->addRoute('/activate-account', 'acctivate-account.php', Router::VIEW_ROUTE);
+    $router->addRoute('/login', '/login.php', Router::VIEW_ROUTE);
+    $router->addRoute('/home', '/home.php', Router::VIEW_ROUTE);
+    $router->addRoute('/activate-account', '/acctivate-account.php', Router::VIEW_ROUTE);
     $router->addRoute('/logout', 'logout.php', Router::VIEW_ROUTE);
-    $router->addRoute('/new-password', 'new-password.php', Router::VIEW_ROUTE);
-    $router->addRoute('/alyaseen-home', 'alyaseen-home.php', Router::VIEW_ROUTE);
+    $router->addRoute('/new-password', '/new-password.php', Router::VIEW_ROUTE);
+    $router->addRoute('/alyaseen-home', '/alyaseen-home.php', Router::VIEW_ROUTE);
 }

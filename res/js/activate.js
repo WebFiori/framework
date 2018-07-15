@@ -30,7 +30,7 @@ function sendActivateReq(){
             onsuccess:[
                 function(){
                     messageDisplay.innerHTML = '<b style="color:green">'+window.messages['activated']+'</b>';
-                    window.location.href = 'pages/home';
+                    window.location.href = '/';
                 }
             ],
             onclienterr:[
@@ -75,9 +75,9 @@ function activateAccount(params={
         if(params['activation-token'] !== undefined && params['activation-token'] !== null && params['activation-token'].length !== 0){
             var ajax = new AJAX({
                 method:'post',
-                url:APIS.UserAPIs.link
+                url:APIS.UserAPIs.link+'/activate-account'
             });
-            var reqParams = 'action=activate-account&activation-token='+encodeURIComponent(params['activation-token']);
+            var reqParams = 'activation-token='+encodeURIComponent(params['activation-token']);
             ajax.setParams(reqParams);
             if(typeof params['callbacks'] === 'object'){
                 var calls = params['callbacks'];

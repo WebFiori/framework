@@ -100,11 +100,11 @@ function login(loginParams={
                 else{
                     var refresh = 'n';
                 }
-                var params = 'action=login&username='+encodeURIComponent(loginParams['username'])+
+                var params = 'username='+encodeURIComponent(loginParams['username'])+
                         '&password='+encodeURIComponent(loginParams['password'])+
                         '&session-duration='+duration+'&refresh-timeout='+refresh;
                 var ajax = new AJAX({
-                    url:APIS.AuthAPI.link,
+                    url:APIS.AuthAPI.link+'/login',
                     method:'post'
                 });
                 ajax.setParams(params);
@@ -205,9 +205,9 @@ function forgotPassword(params={
     }
 }){
     if(params.email !== undefined && params.email !== null && params.email.length !== 0){
-        var reqParams = 'action=forgot-password&email='+params.email;
+        var reqParams = 'email='+params.email;
         var ajax = new AJAX({
-            url:APIS.PasswordAPIs.link,
+            url:APIS.PasswordAPIs.link+'/forgot-password',
             method:'post'
         });
         ajax.setParams(reqParams);
@@ -313,9 +313,9 @@ function resetPassword(params={
                     if(params['conf-pass'] !== undefined && params['conf-pass'] !== null && params['conf-pass'].length !== 0){
                         var ajax = new AJAX({
                             method:'post',
-                            url:APIS.PasswordAPIs.link
+                            url:APIS.PasswordAPIs.link+'/reset-password'
                         });
-                        var reqParams = 'action=reset-password&email='+encodeURIComponent(params.email)+
+                        var reqParams = 'email='+encodeURIComponent(params.email)+
                                 '&reset-token='+encodeURIComponent(params.token)+
                                 '&new-password='+encodeURIComponent(params['new-password'])+
                                 '&conf-new-password='+encodeURIComponent(params['conf-pass']);
@@ -440,9 +440,9 @@ function updatePassword(params={
                     if(params['conf-pass'] !== undefined && params['conf-pass'] !== null && params['conf-pass'].length !== 0){
                         var ajax = new AJAX({
                             method:'post',
-                            url:APIS.PasswordAPIs.link
+                            url:APIS.PasswordAPIs.link+'/update-password'
                         });
-                        var reqParams = 'action=update-password&user-id='+encodeURIComponent(params['user-id'])+
+                        var reqParams = 'user-id='+encodeURIComponent(params['user-id'])+
                                 '&old-password='+encodeURIComponent(params['old-password'])+
                                 '&new-password='+encodeURIComponent(params['new-password'])+
                                 '&conf-new-password='+encodeURIComponent(params['conf-pass']);

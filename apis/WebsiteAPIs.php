@@ -46,8 +46,6 @@ class WebsiteAPIs extends API{
         $a2->setName('update-site-info');
         $a2->setDescription('Updates general website information.');
         $a2->addRequestMethod('post');
-        $a2->addParameter(new RequestParameter('site-name', 'string',TRUE));
-        $a2->addParameter(new RequestParameter('site-description', 'string',TRUE));
         $a2->addParameter(new RequestParameter('title-sep', 'string', TRUE));
         $a2->addParameter(new RequestParameter('home-page', 'string',TRUE));
         $a2->addParameter(new RequestParameter('site-theme', 'string',TRUE));
@@ -58,6 +56,18 @@ class WebsiteAPIs extends API{
         $a3->addRequestMethod('get');
         $this->addAction($a3);
         
+        $this->setVersion('1.0.1');
+        $a4 = new APIAction('add-website');
+        $a4->addParameter(new RequestParameter('site-name', 'string'));
+        $a4->addParameter(new RequestParameter('language', 'string'));
+        $a4->addParameter(new RequestParameter('site-description', 'string'));
+        $this->addAction($a4, TRUE);
+        
+        $a5 = new APIAction('update-website');
+        $a5->addParameter(new RequestParameter('site-name', 'string'));
+        $a5->addParameter(new RequestParameter('language', 'string'));
+        $a5->addParameter(new RequestParameter('site-description', 'string'));
+        $this->addAction($a4, TRUE);
     }
     public function isAuthorized() {
         return WebsiteFunctions::get()->getAccessLevel() == 0;
@@ -72,6 +82,12 @@ class WebsiteAPIs extends API{
         }
         else if($action == 'update-site-info'){
             $this->updateSiteInfo();
+        }
+        else if($action == 'add-website'){
+            $this->actionNotImpl();
+        }
+        else if($action == 'update-website'){
+            $this->actionNotImpl();
         }
     }
     /**

@@ -87,8 +87,10 @@ function createRoutes(){
     //add your own or remove existing ones
     $router->addRoute('/login', '/login.php', Router::VIEW_ROUTE);
     $router->addRoute('/home', '/home.php', Router::VIEW_ROUTE);
-    $router->addRoute('/activate-account', '/acctivate-account.php', Router::VIEW_ROUTE);
+    $router->addRoute('/activate-account', '/activate-account.php', Router::VIEW_ROUTE);
     $router->addRoute('/logout', 'logout.php', Router::VIEW_ROUTE);
     $router->addRoute('/new-password', '/new-password.php', Router::VIEW_ROUTE);
-    $router->addRoute('/alyaseen-home', '/alyaseen-home.php', Router::VIEW_ROUTE);
+    
+    //index route
+    $router->addRoute('/', '/default.html', Router::VIEW_ROUTE);
 }

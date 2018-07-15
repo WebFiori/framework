@@ -6,10 +6,13 @@
  */
 function getHeadNode(){
     $page = Page::get();
+    $lang = WebsiteFunctions::get()->getMainSession()->getLang(TRUE);
+    $page->setLang($lang);
     $headTag = new HeadNode();
     $headTag->setBase(SiteConfig::get()->getBaseURL());
     $headTag->addLink('icon', $page->getThemeImagesDir().'/favicon.png');
     $headTag->setCanonical(SiteConfig::get()->getBaseURL().$page->getCanonical());
+    $page->setWebsiteName(SiteConfig::get()->getWebsiteNames()[$lang]);
     $headTag->addCSS($page->getThemeCSSDir().'/Grid.css');
     $headTag->addCSS($page->getThemeCSSDir().'/colors.css');
     $headTag->addCSS($page->getThemeCSSDir().'/theme-specific.css');

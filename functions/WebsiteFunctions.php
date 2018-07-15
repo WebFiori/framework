@@ -60,7 +60,7 @@ class WebsiteFunctions extends Functions{
     private static $singleton;
     /**
      * 
-     * @return SystemFunctions
+     * @return WebsiteFunctions
      * @since 1.0
      */
     public static function get(){
@@ -88,13 +88,13 @@ class WebsiteFunctions extends Functions{
      * @param array $websiteInfoArr an associative array. The array can 
      * have the following indices: 
      * <ul>
-     * <li><b>website-name</b>:</li>
+     * <li><b>website-names</b>:</li>
      * <li><b>base-url</b>:</li>
      * <li><b>title-separator</b>:</li>
      * <li><b>home-page</b>:</li>
-     * <li><b>theme-directory</b>:</li>
-     * <li><b>admin-theme-directory</b>:</li>
-     * <li><b>site-description</b>:</li>
+     * <li><b>theme-name</b>:</li>
+     * <li><b>admin-theme-name</b>:</li>
+     * <li><b>site-descriptions</b>:</li>
      * </ul> 
      * @since 1.0
      */
@@ -122,8 +122,6 @@ class WebsiteFunctions extends Functions{
             $cfgArr['base-url'] = SiteConfig::get()->getBaseURL();
             $cfgArr['title-separator'] = SiteConfig::get()->getTitleSep();
             $cfgArr['home-page'] = SiteConfig::get()->getHomePage();
-            $cfgArr['theme-directory'] = SiteConfig::get()->getThemeDir();
-            $cfgArr['admin-theme-directory'] = SiteConfig::get()->getAdminThemeDir();
             $cfgArr['site-descriptions'] = SiteConfig::get()->getDescriptions();
             $cfgArr['theme-name'] = SiteConfig::get()->getBaseThemeName();
             $cfgArr['admin-theme-name'] = SiteConfig::get()->getAdminThemeName();

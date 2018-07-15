@@ -31,7 +31,7 @@ function sendLoginRequest(){
         return false;
     }
     var keepLogged = document.getElementById('keep-me-logged').checked;
-    var sessionDuration = keepLogged === true ? '10080' : '30';
+    var sessionDuration = keepLogged === true ? 10080 : 30;
     var refresh = keepLogged === true ? false : true;
     var loginParams = {
         username:username,

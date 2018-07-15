@@ -88,7 +88,7 @@ function createRoutes(){
     $router->addRoute('/login', '/login.php', Router::VIEW_ROUTE);
     $router->addRoute('/home', '/home.php', Router::VIEW_ROUTE);
     $router->addRoute('/activate-account', '/activate-account.php', Router::VIEW_ROUTE);
-    $router->addRoute('/logout', 'logout.php', Router::VIEW_ROUTE);
+    $router->addRoute('/logout', '/logout.php', Router::VIEW_ROUTE);
     $router->addRoute('/new-password', '/new-password.php', Router::VIEW_ROUTE);
     
     //index route

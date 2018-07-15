@@ -33,7 +33,7 @@ if(!defined('ROOT_DIR')){
  * @author Ibrahim
  * @version 1.0
  */
-class Theme {
+class Theme implements JsonI{
     /**
      * The directory where themes is located in.
      * @since 1.0
@@ -397,4 +397,24 @@ class Theme {
     public static function getLoadedThemes(){
         return self::$loadedThemes;
     }
+    
+    public function getVersion() {
+        return $this->themeMeta['version'];
+    }
+    
+    public function getAuthor() {
+        return $this->themeMeta['author'];
+    }
+    public function toJSON() {
+        $j = new JsonX();
+        $j->add('name', $this->getName());
+        $j->add('version', $this->getVersion());
+        $j->add('author', $this->getAuthor());
+        $j->add('images-dir-name', $this->getImagesDirName());
+        $j->add('css-dir-name', $this->getCssDirName());
+        $j->add('js-dir-name', $this->getJsDirName());
+        $j->add('components', $this->getComponents());
+        return $j;
+    }
+
 }

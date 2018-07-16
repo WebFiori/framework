@@ -30,7 +30,7 @@
  * @author Ibrahim
  * @version 1.0
  */
-class APIRoutes {
+class ViewRoutes {
     /**
      * Create all views routes. Include your own here.
      * @since 1.0

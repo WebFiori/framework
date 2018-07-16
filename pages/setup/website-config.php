@@ -74,30 +74,24 @@ function pageBody($pageLabels,$lang){
 function createSiteInfoForm($lbls,$placeholders,$lang){
     $form = new HTMLNode('form');
     $form->setClassName('pa-row');
-    
-    $siteNameNode = new HTMLNode();
-    $siteNameNode->setClassName('pa-'.Page::get()->getWritingDir().'-col-twelve');
+
     $siteNameLabel = new Label($lbls['site-name']);
-    $siteNameLabel->setClassName('pa-'.Page::get()->getWritingDir().'-col-ten');
+    $siteNameLabel->setClassName('pa-'.Page::get()->getWritingDir().'-col-twelve');
     $siteNameInput = new Input();
     $siteNameInput->setPlaceholder($placeholders['site-name']);
     $siteNameInput->setID('site-name-input');
-    $siteNameInput->setClassName('pa-'.Page::get()->getWritingDir().'-ltr-col-four');
-    $siteNameNode->addChild($siteNameLabel);
-    $siteNameNode->addChild($siteNameInput);
-    $form->addChild($siteNameNode);
+    $siteNameInput->setClassName('pa-'.Page::get()->getWritingDir().'-ltr-col-five');
+    $form->addChild($siteNameLabel);
+    $form->addChild($siteNameInput);;
     
-    $descNode = new HTMLNode();
-    $descNode->setClassName('pa-'.Page::get()->getWritingDir().'-col-twelve');
     $descLabel = new Label($lbls['site-description']);
-    $descLabel->setClassName('pa-'.Page::get()->getWritingDir().'-col-ten');
+    $descLabel->setClassName('pa-'.Page::get()->getWritingDir().'-col-twelve');
     $descInput = new Input();
     $descInput->setPlaceholder($placeholders['site-description']);
     $descInput->setID('site-description-input');
-    $descInput->setClassName('pa-'.Page::get()->getWritingDir().'-ltr-col-seven');
-    $descNode->addChild($descLabel);
-    $descNode->addChild($descInput);
-    $form->addChild($descNode);
+    $descInput->setClassName('pa-'.Page::get()->getWritingDir().'-ltr-col-five');
+    $form->addChild($descLabel);
+    $form->addChild($descInput);
     
     $submit = new Input('submit');
     $submit->setAttribute('data-action', 'ok');
@@ -105,7 +99,7 @@ function createSiteInfoForm($lbls,$placeholders,$lang){
     $submit->setAttribute('onclick', 'return updateSiteInfo()');
     $submit->setAttribute('disabled', '');
     $submit->setID('save-input');
-    $submit->setClassName('pa-'.Page::get()->getWritingDir().'-ltr-col-four');
+    $submit->setClassName('pa-'.Page::get()->getWritingDir().'-ltr-col-three');
     $messageNode = new PNode();
     $messageNode->setID('message-display');
     $messageNode->setClassName('pa-'.Page::get()->getWritingDir().'-ltr-col-twelve');

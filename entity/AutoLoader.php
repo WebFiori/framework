@@ -51,25 +51,21 @@ class AutoLoader{
         if(self::$loader != NULL){
             return self::$loader;
         }
-        if(defined('ROOT_DIR')){
-            self::$loader = new AutoLoader(ROOT_DIR, array(
-                '',
-                '/entity',
-                '/entity/queries',
-                '/entity/rest-easy-1.4.1',
-                '/entity/jsonx-1.4',
-                '/entity/ph-mysql-1.2',
-                '/entity/html-php-structs-1.6/structs',
-                '/entity/html-php-structs-1.6/html',
-                '/publish',
-                '/functions',
-                '/apis'
-            ));
-            return self::$loader;
-        }
-        else{
-            throw new Exception('Root Directory is not defined.');
-        }
+        self::$loader = new AutoLoader(ROOT_DIR, array(
+            '',
+            '/entity',
+            '/entity/queries',
+            '/entity/rest-easy-1.4.1',
+            '/entity/jsonx-1.4',
+            '/entity/ph-mysql-1.2',
+            '/entity/html-php-structs-1.6/structs',
+            '/entity/html-php-structs-1.6/html',
+            '/entity/router',
+            '/publish',
+            '/functions',
+            '/apis'
+        ));
+        return self::$loader;
     }
     
     private function __construct($root='',$searchFolders=array()) {

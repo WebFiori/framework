@@ -24,14 +24,27 @@
  * THE SOFTWARE.
  */
 if(!defined('ROOT_DIR')){
-    http_response_code(403);
-    die('{"message":"Forbidden"}');
+    header("HTTP/1.1 403 Forbidden");
+    die(''
+        . '<!DOCTYPE html>'
+        . '<html>'
+        . '<head>'
+        . '<title>Forbidden</title>'
+        . '</head>'
+        . '<body>'
+        . '<h1>403 - Forbidden</h1>'
+        . '<hr>'
+        . '<p>'
+        . 'Direct access not allowed.'
+        . '</p>'
+        . '</body>'
+        . '</html>');
 }
 /**
  * A base class that is used to construct website UI.
  *
- * @author Ibrahim
- * @version 1.0
+ * @author Ibrahim <ibinshikh@hotmail.com>
+ * @version 1.1
  */
 class Theme implements JsonI{
     /**
@@ -86,12 +99,12 @@ class Theme implements JsonI{
      */
     public function __construct() {
         $this->themeMeta = array(
-            'name'=>'My New Theme',
+            'name'=>'',
             'url'=>'',
             'author'=>'',
             'author-url'=>'',
             'version'=>'1.0.0',
-            'license'=>'n/a',
+            'license'=>'',
             'license-url'=>'',
             'description'=>'',
             'directory'=>''
@@ -115,7 +128,8 @@ class Theme implements JsonI{
     }
     /**
      * Returns an array which contains the names of theme components files.
-     * @return array An array which contains the names of theme components files.
+     * @return array An array which contains the names of theme components files. 
+     * The components of a theme are usually .php files.
      * @since 1.0
      */
     public function getComponents() {
@@ -241,7 +255,8 @@ class Theme implements JsonI{
     }
     /**
      * Returns the name of the theme.
-     * @return string The name of the theme.
+     * @return string The name of the theme. If it is not set, 
+     * the function will return empty string.
      * @since 1.0
      */
     public function getName() {
@@ -320,7 +335,8 @@ class Theme implements JsonI{
     }
     /**
      * Returns the name of the directory where all theme files are kept.
-     * @return string The name of the directory where all theme files are kept.
+     * @return string The name of the directory where all theme files are kept. 
+     * If it is not set, the function will return empty string.
      * @since 1.0
      */
     public function getDirectoryName() {
@@ -397,14 +413,74 @@ class Theme implements JsonI{
     public static function getLoadedThemes(){
         return self::$loadedThemes;
     }
-    
+    /**
+     * Returns theme version number.
+     * @return string theme version number. The format if the version number 
+     * is 'x.x.x' where 'x' can be any number. If it is not set, the 
+     * function will return '1.0.0'
+     * @since 1.1
+     */
     public function getVersion() {
         return $this->themeMeta['version'];
     }
-    
+    /**
+     * Returns the name of theme author.
+     * @return string The name of theme author. If author name is not set, the 
+     * function will return empty string.
+     * @since 1.1
+     */
     public function getAuthor() {
         return $this->themeMeta['author'];
     }
+    /**
+     * Returns the name of theme license.
+     * @return string The name of theme license. If it is not set, 
+     * the function will return empty string.
+     */
+    public function getLicenseName() {
+        return $this->themeMeta['license'];
+    }
+    /**
+     * Returns a URL which should contain a full version of theme license.
+     * @return string A URL which contain a full version of theme license. 
+     * If it is not set, the function will return empty string.
+     * @since 1.1
+     */
+    public function getLicenseUrl(){
+        return $this->themeMeta['license-url'];
+    }
+    /**
+     * Returns the URL which takes the users to author's website.
+     * @return string The URL which takes users to author's website. 
+     * If author URL is not set, the function will return empty string.
+     * @since 1.1
+     */
+    public function getAuthorUrl() {
+        return $this->themeMeta['author-url'];
+    }
+    /**
+     * Returns A URL which should point to theme website.
+     * @return string A URL which should point to theme website. Usually, 
+     * this one is the same as author URL.
+     * If it is not set, the function will return empty string.
+     * @since 1.1
+     */
+    public function getUrl() {
+        return $this->themeMeta['url'];
+    }
+    /**
+     * Returns the description of the theme.
+     * @return string The description of the theme. If the description is not 
+     * set, the function will return empty string.
+     * @since 1.1
+     */
+    public function getDescription() {
+        return $this->themeMeta['description'];
+    }
+    /**
+     * 
+     * @return JsonX
+     */
     public function toJSON() {
         $j = new JsonX();
         $j->add('name', $this->getName());

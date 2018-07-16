@@ -10,7 +10,7 @@ Util::displayErrors();
 $router = Router::get();
 $router->addRoute('/hello/{someone}', function(){
     echo 'Hello Mr. '. filter_var($_GET['someone']);
-}, Router::FUNCTION_ROUTE);
+}, Router::CLOSURE_ROUTE);
 $router->addRoute('/add-numbers/{first}/{second}', function(){
     $fNum = filter_var($_GET['first']);
     $sNum = filter_var($_GET['second']);
@@ -18,11 +18,11 @@ $router->addRoute('/add-numbers/{first}/{second}', function(){
     Util::print_r('Second Number: '.$sNum);
     $sum = $fNum + $sNum;
     Util::print_r('Sum: '.$sum);
-}, Router::FUNCTION_ROUTE);
+}, Router::CLOSURE_ROUTE);
 $router->addRoute('/pay/{someone}', function(){
     Util::print_r('Pay Mr. '.$_GET['someone'].' 100 SAR.');
-}, Router::FUNCTION_ROUTE);
-$router->route('http://localhost/generic-php/add-numbers/5/5');
+}, Router::CLOSURE_ROUTE);
+$router->sendToRoute('http://localhost/generic-php/add-numbers/5/5');
 //$router->printRoutes();
 /**
  * 

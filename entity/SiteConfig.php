@@ -72,13 +72,13 @@ class SiteConfig{
     }
     private function __construct() {
         $this->configVision = '1.1';
-        $this->webSiteNames = array('EN'=>'Hello My Site','AR'=>'أكاديميا البرمجة',);
+        $this->webSiteNames = array('EN'=>'Programming Academia','AR'=>'أكاديميا البرمجة',);
         $this->baseUrl = 'http://localhost/generic-php/';
         $this->titleSep = ' | ';
         $this->baseThemeName = 'Greeny By Ibrahim Ali';
         $this->adminThemeName = 'Greeny By Ibrahim Ali';
-        $this->homePage = '/login';
-        $this->descriptions = array('EN'=>'Test For Update','AR'=>'',);
+        $this->homePage = 'index';
+        $this->descriptions = array('EN'=>'','AR'=>'',);
     }
     
     /**

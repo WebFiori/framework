@@ -41,10 +41,11 @@ if(!defined('ROOT_DIR')){
         . '</html>');
 }
 /**
- * Description of Router
+ * The basic class that is used to route user requests to the correct 
+ * location.
  *
  * @author Ibrahim
- * @version 1.1
+ * @version 1.2
  */
 class Router {
     /**
@@ -63,7 +64,7 @@ class Router {
      * A constant for the case when the route is a function call.
      * @since 1.0
      */
-    const FUNCTION_ROUTE = 'func';
+    const CLOSURE_ROUTE = 'func';
     /**
      * A constant for custom directory route.
      * @since 1.0
@@ -132,6 +133,14 @@ class Router {
         $this->baseUrl = trim(SiteConfig::get()->getBaseURL(), '/');
     }
     /**
+     * Redirect a URI to its route.
+     * @param string $uri The URI.
+     * @since 1.2
+     */
+    public static function route($uri) {
+        Router::get()->sendToRoute($uri);
+    }
+    /**
      * Returns the value of the base URL which is appended to the path.
      * @return string
      * @since 1.0
@@ -154,7 +163,7 @@ class Router {
      * or in other sub-directory under the same folder.</li>
      * <li><b>Router::CUSTOMIZED</b> : If the PHP file is inside the root folder or in 
      * other sub-directory under the root.</li>
-     * <li><b>Router::FUNCTION_ROUTE</b> If the route is a callback function.</li>
+     * <li><b>Router::CLOSURE_ROUTE</b> If the route is a closure function.</li>
      * </ul>
      * @return boolean If the route is added, the function will return <b>TRUE</b>. 
      * The function one return <b>FALSE</b> only in two cases, either the route type 
@@ -165,10 +174,15 @@ class Router {
         if($routeType == self::API_ROUTE || 
            $routeType == self::VIEW_ROUTE || 
            $routeType == self::CUSTOMIZED || 
-           $routeType == self::FUNCTION_ROUTE){
-            if($routeType != self::FUNCTION_ROUTE){
+           $routeType == self::CLOSURE_ROUTE){
+            if($routeType != self::CLOSURE_ROUTE){
                 $path = $this->fixPath($path);
                 $routeTo = ROOT_DIR.$this->fixPath($routeType.$routeTo);
+            }
+            else{
+                if(!($routeTo instanceof Closure)){
+                    return FALSE;
+                }
             }
             if(!$this->hasRoute($path)){
                 $routeUri = new RouterUri($this->getBase().$path, $routeTo);
@@ -177,6 +191,120 @@ class Router {
             }
         }
         return FALSE;
+    }
+    /**
+     * Returns an associative array of all available routes.
+     * @return array An associative array of all available routes. The 
+     * keys will be requested URIs and the values are the routes.
+     * @since 1.2
+     */
+    public static function routes() {
+        $routesArr = array();
+        foreach (Router::get()->getRoutes() as $routeUri){
+            $routesArr[$routeUri->getUri()] = $routeUri->getRouteTo();
+        }
+        return $routesArr;
+    }
+    /**
+     * Returns an array which contains all routes as RouteURI object.
+     * @return array An array which contains all routes as RouteURI object.
+     * @since 1.2
+     */
+    public function getRoutes() {
+        return $this->routes;
+    }
+    /**
+     * Adds new route to a view file.
+     * @param string $path The path part of the URI. For example, if the 
+     * requested URI is 'http://www.example.com/user/ibrahim', the path 
+     * part of the URI is '/user/ibrahim'. It is possible to include variables 
+     * in the path. To include a variable in the path, its name must be enclosed 
+     * between {}. The value of the variable will be stored in either the array 
+     * $_GET or $_POST after the requested URI is resolved. If we use the same 
+     * example above to get any user profile, We would add the following as 
+     * a path: 'user/{username}'. In this case, username will be available in 
+     * $_GET['username']. 
+     * @param string $viewFile The path to the view file. The root folder for 
+     * all views is '/pages'. If the view name is 'view-user.php', then the 
+     * value of this parameter must be '/view-user.php'. If the view is in a 
+     * sub-directory inside the views directory, then the name of the 
+     * directory must be included.
+     * @return boolean The function will return TRUE if the route was created. 
+     * If a route for the given path was already created, the function will return 
+     * FALSE. Also if the given view file was not found, the function will not 
+     * create any route and return FALSE.
+     * @since 1.2
+     */
+    public static function view($path,$viewFile) {
+        return Router::get()->addRoute($path, $viewFile, Router::VIEW_ROUTE);
+    }
+    /**
+     * Adds new route to an API file.
+     * @param string $path The path part of the URI. For example, if the 
+     * requested URI is 'http://www.example.com/user/ibrahim', the path 
+     * part of the URI is '/user/ibrahim'. It is possible to include variables 
+     * in the path. To include a variable in the path, its name must be enclosed 
+     * between {}. The value of the variable will be stored in either the array 
+     * $_GET or $_POST after the requested URI is resolved. If we use the same 
+     * example above to get any user profile, We would add the following as 
+     * a path: 'user/{username}'. In this case, username will be available in 
+     * $_GET['username']. 
+     * @param string $apiFile The path to the API file. The root folder for 
+     * all APIs is '/apis'. If the API name is 'get-user-profile.php', then the 
+     * value of this parameter must be '/get-user-profile.php'. If the API is in a 
+     * sub-directory inside the APIs directory, then the name of the 
+     * directory must be included.
+     * @return boolean The function will return TRUE if the route was created. 
+     * If a route for the given path was already created, the function will return 
+     * FALSE. Also if the given view file was not found, the function will not 
+     * create any route and return FALSE.
+     * @since 1.2
+     */
+    public static function api($path,$apiFile) {
+        return Router::get()->addRoute($path, $apiFile, Router::API_ROUTE);
+    }
+    /**
+     * Adds new closure route.
+     * @param string $path The path part of the URI. For example, if the 
+     * requested URI is 'http://www.example.com/user/ibrahim', the path 
+     * part of the URI is '/user/ibrahim'. It is possible to include variables 
+     * in the path. To include a variable in the path, its name must be enclosed 
+     * between {}. The value of the variable will be stored in either the array 
+     * $_GET or $_POST after the requested URI is resolved. If we use the same 
+     * example above to get any user profile, We would add the following as 
+     * a path: 'user/{username}'. In this case, username will be available in 
+     * $_GET['username']. 
+     * @param string $closure A closure. It is simply a function.
+     * @return boolean The function will return TRUE if the route was created. 
+     * If a route for the given path was already created, the function will return 
+     * FALSE. Also if the given view file was not found, the function will not 
+     * create any route and return FALSE.
+     * @since 1.2
+     */
+    public static function closure($path,$closure) {
+        return Router::get()->addRoute($path, $closure, Router::CLOSURE_ROUTE);
+    }
+    /**
+     * Adds new route to a file inside the root folder.
+     * @param string $path The path part of the URI. For example, if the 
+     * requested URI is 'http://www.example.com/user/ibrahim', the path 
+     * part of the URI is '/user/ibrahim'. It is possible to include variables 
+     * in the path. To include a variable in the path, its name must be enclosed 
+     * between {}. The value of the variable will be stored in either the array 
+     * $_GET or $_POST after the requested URI is resolved. If we use the same 
+     * example above to get any user profile, We would add the following as 
+     * a path: 'user/{username}'. In this case, username will be available in 
+     * $_GET['username']. 
+     * @param string $route The path to the file. It can be any file in the scope 
+     * of the variable ROOT_DIR.
+     * @return boolean The function will return TRUE if the route was created. 
+     * If a route for the given path was already created, the function will return 
+     * FALSE. Also if the given view file was not found, the function will not 
+     * create any route and return FALSE.
+     * @since 1.2
+     */
+    public static function other($path,$route) {
+        return Router::get()->addRoute($path, $route, Router::CUSTOMIZED);
     }
     /**
      * Display all routes details.
@@ -238,7 +366,7 @@ class Router {
      * @param string $uri A URI such as 'http://www.example.com/hello/ibrahim'
      * @since 1.0
      */
-    public function route($uri) {
+    public function sendToRoute($uri) {
         if(count($this->routes) != 0){
             $routeUri = new RouterUri($uri, '');
             //first, search for the URI wuthout checking variables

@@ -44,7 +44,7 @@ if(!defined('ROOT_DIR')){
  * Description of SystemFunctions
  *
  * @author Ibrahim
- * @version 1.3
+ * @version 1.4
  */
 class SystemFunctions extends Functions{
     /**
@@ -102,15 +102,17 @@ class SystemFunctions extends Functions{
         'database-username'=>'',
         'database-password'=>'',
         'database-name'=>'',
-        'system-version'=>'1.0',
         'user-reg-status'=>'C',
         'user-reg-status-description'=>SystemFunctions::USER_REG_STATS['C'],
-        'system-version-type'=>'Stable'
     );
-    
+    /**
+     * An instance of SystemFunctions
+     * @var SystemFunctions
+     * @since 1.0 
+     */
     private static $singleton;
     /**
-     * 
+     * Returns a single instance of the class.
      * @return SystemFunctions
      * @since 1.0
      */
@@ -121,7 +123,16 @@ class SystemFunctions extends Functions{
         self::$singleton = new SystemFunctions();
         return self::$singleton;
     }
+    /**
+     * A SessionManager used in case of application setup
+     * @var SessionManager
+     * @since 1.3 
+     */
     private $setupSession;
+    /**
+     * Initiate the session manager that is used to manage setup steps.
+     * @since 1.3
+     */
     public function initSetupSession() {
         $this->setupSession = new SessionManager('setup-session');
         $this->setupSession->initSession(TRUE, TRUE);
@@ -129,12 +140,24 @@ class SystemFunctions extends Functions{
             $_SESSION['setup-step'] = self::$SETUP_STAGES['w'];
         }
     }
+    /**
+     * Updates the current setup step.
+     * @param string $stageCode The code of the current stage. It 
+     * must be a value from the constant SystemFunctions::SETUP_STAGES.
+     * @since 1.3
+     */
     public function setSetupStage($stageCode) {
         $this->initSetupSession();
         if(isset($this->SETUP_STAGES[$stageCode])){
             $_SESSION['setup-step'] = self::$SETUP_STAGES[$stageCode];
         }
     }
+    /**
+     * Returns the name of current setup step.
+     * @return string The name of current setup step. It will be a value 
+     * from the array SystemFunctions::SETUP_STAGES.
+     * @since 1.3
+     */
     public function getSetupStep() {
         $this->initSetupSession();
         return $_SESSION['setup-step'];
@@ -149,6 +172,9 @@ class SystemFunctions extends Functions{
             $this->writeConfig($cfg);
         }
     }
+    /**
+     * Creates new instance of the class.
+     */
     public function __construct() {
         parent::__construct();
     }
@@ -249,8 +275,21 @@ class SystemFunctions extends Functions{
         $fh = new FileHandler(ROOT_DIR.'/entity/Config.php');
         $fh->write('<?php', TRUE, TRUE);
         $fh->write('if(!defined(\'ROOT_DIR\')){
-    header(\'HTTP/1.1 403 Forbidden\');
-    exit;
+    header("HTTP/1.1 403 Forbidden");
+    die(\'\'
+        . \'<!DOCTYPE html>\'
+        . \'<html>\'
+        . \'<head>\'
+        . \'<title>Forbidden</title>\'
+        . \'</head>\'
+        . \'<body>\'
+        . \'<h1>403 - Forbidden</h1>\'
+        . \'<hr>\'
+        . \'<p>\'
+        . \'Direct access not allowed.\'
+        . \'</p>\'
+        . \'</body>\'
+        . \'</html>\');
 }', TRUE, TRUE);
         $fh->write('/**
  * Global configuration class. Used by the server part and the presentation part.
@@ -272,7 +311,7 @@ class SystemFunctions extends Functions{
      * @var string The version of the framework that is used to build the project.
      * @since 1.0 
      */
-    private $liskisVersion;
+    private $lisksVersion;
     /**
      * The release date of the framework that is used to build the project.
      * @var string Release date of of the framework that is used to build the project.
@@ -316,18 +355,6 @@ class SystemFunctions extends Functions{
      */
     private $dbName;
     /**
-     * System version number.
-     * @var string 
-     * @since 1.0
-     */
-    private $systemVersion;
-    /**
-     * Type of system version (beta, alpha, etc...)
-     * @var string 
-     * @since 1.0
-     */
-    private $versionType;
-    /**
      * Configuration file version number.
      * @var string 
      * @since 1.2
@@ -347,8 +374,6 @@ class SystemFunctions extends Functions{
         $this->dbPass = \''.$configArr['database-password'].'\';
         $this->dbName = \''.$configArr['database-name'].'\';
         $this->userRegStats = \''.$configArr['user-reg-status'].'\';
-        $this->systemVersion = \''.$configArr['system-version'].'\';
-        $this->versionType = \''.$configArr['system-version-type'].'\';
     }', TRUE, TRUE);
         $fh->write('/**
      * An instance of <b>Config</b>.
@@ -368,6 +393,11 @@ class SystemFunctions extends Functions{
         self::$cfg = new Config();
         return self::$cfg;
     }
+    /**
+     * Returns user registration status.
+     * @return User registration status.
+     * @since 1.3
+     */
     public function getUserRegStatus(){
         return $this->userRegStats;
     }
@@ -420,22 +450,6 @@ class SystemFunctions extends Functions{
         return $this->dbPass;
     }
     /**
-     * Returns the version of the system.
-     * @return string System version (such as 1.0)
-     * @since 1.0
-     */
-    public function getSysVersion(){
-        return $this->systemVersion;
-    }
-    /**
-     * Return the type of system version.
-     * @return string Version type (Such as alpha or beta).
-     * @since 1.0
-     */
-    public function getVerType(){
-        return $this->versionType;
-    }
-    /**
      * Returns framework version number.
      * @return string Framework version number.
      * @since 1.2
@@ -463,7 +477,15 @@ class SystemFunctions extends Functions{
         $fh->write('}', TRUE, TRUE);
         $fh->close();
     }
-    
+    /**
+     * Checks if the application is setup or not.
+     * @return boolean If the system is configured, the function will return 
+     * <b>TRUE</b>. If it is not configured, It will return <b>FALSE</b>. Note 
+     * that the function will throw an exception in case one of the 3 main 
+     * configuration files is missing.
+     * @throws Exception
+     * @since 1.0
+     */
     public function isSetupFinished(){
         if(class_exists('Config')){
             if(class_exists('MailConfig')){

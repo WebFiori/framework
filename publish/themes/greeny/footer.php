@@ -13,9 +13,7 @@ function getFooterNode(){
     $node->addChild($fNode);
     $div = new HTMLNode('div');
     $div->setAttribute('class', 'pa-ltr-col-twelve');
-    $textNode = new HTMLNode('', FALSE, TRUE);
-    $textNode->setText('<b style="color:gray;font-size:8pt;">Powered By: <a href="http://www.liskscode.org" target="_blank">LisksCode</a> v'.Config::get()->getLisksVersion().'</b>');
-    $div->addChild($textNode);
+    $div->addChild($div::createTextNode('<b style="color:gray;font-size:8pt;">Powered By: <a href="http://www.liskscode.org" target="_blank">LisksCode</a> v'.Config::get()->getLisksVersion().'</b>'));
     $fNode->addChild($div);
     return $node;
 }

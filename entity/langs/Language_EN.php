@@ -176,6 +176,7 @@ $Language->setMultiple('pages/setup/database-setup/errors', array(
     1045=>'Check that your database username and password are correct.',
     1044=>'You don\'t have permissions to access the given database.',
     1049=>'Check that the database name is correct.',
+    2054=>'It seems your user name or password are incorrect.',
     10000=>'The given database is not empty. Selected database must have no tables.'
 ));
 $Language->setMultiple('pages/setup/database-setup/help', array(

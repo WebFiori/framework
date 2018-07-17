@@ -23,7 +23,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-header("HTTP/1.1 403 Forbidden");
+if(!defined('ROOT_DIR')){
+    header("HTTP/1.1 403 Forbidden");
     die(''
         . '<!DOCTYPE html>'
         . '<html>'
@@ -38,6 +39,7 @@ header("HTTP/1.1 403 Forbidden");
         . '</p>'
         . '</body>'
         . '</html>');
+}
 /**
  * A class that represents an email account which is used to send or receive messages.
  *

@@ -23,6 +23,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+if(!defined('ROOT_DIR')){
+    header("HTTP/1.1 403 Forbidden");
+    die(''
+        . '<!DOCTYPE html>'
+        . '<html>'
+        . '<head>'
+        . '<title>Forbidden</title>'
+        . '</head>'
+        . '<body>'
+        . '<h1>403 - Forbidden</h1>'
+        . '<hr>'
+        . '<p>'
+        . 'Direct access not allowed.'
+        . '</p>'
+        . '</body>'
+        . '</html>');
+}
 if(WebsiteFunctions::get()->getMainSession()->validateToken() != TRUE){
     header('location: '.SiteConfig::get()->getBaseURL().'pages/login');
 }
@@ -82,7 +99,7 @@ function createSiteInfoForm($lbls,$placeholders,$lang){
     $siteNameInput->setID('site-name-input');
     $siteNameInput->setClassName('pa-'.Page::get()->getWritingDir().'-ltr-col-five');
     $form->addChild($siteNameLabel);
-    $form->addChild($siteNameInput);;
+    $form->addChild($siteNameInput);
     
     $descLabel = new Label($lbls['site-description']);
     $descLabel->setClassName('pa-'.Page::get()->getWritingDir().'-col-twelve');
@@ -123,9 +140,7 @@ function footer($lang){
     $nextButton->setClassName('pa-'.Page::get()->getWritingDir().'-col-three');
     $nextButton->setID('finish-button');
     $nextButton->setAttribute('data-action', 'ok');
-    $nextText = new HTMLNode('', FALSE, TRUE);
-    $nextText->setText($lang->get('general/finish'));
-    $nextButton->addChild($nextText);
+    $nextButton->addChild(HTMLNode::createTextNode($lang->get('general/finish')));
     $node->addChild($nextButton);
     return $node;
 }
@@ -135,37 +150,27 @@ function stepsCounter($lang,$active){
     $node->setClassName('pa-row');
     $step1 = new HTMLNode();
     $step1->setClassName('pa-'.Page::get()->getWritingDir().'-col-two');
-    $step1Text = new HTMLNode('', FALSE, TRUE);
-    $step1Text->setText($lang['welcome']);
-    $step1->addChild($step1Text);
+    $step1->addChild(HTMLNode::createTextNode($lang['welcome']));
     $node->addChild($step1);
     
     $step2 = new HTMLNode();
     $step2->setClassName('pa-'.Page::get()->getWritingDir().'-col-two');
-    $step2Text = new HTMLNode('', FALSE, TRUE);
-    $step2Text->setText($lang['database-setup']);
-    $step2->addChild($step2Text);
+    $step2->addChild(HTMLNode::createTextNode($lang['database-setup']));
     $node->addChild($step2);
     
     $step3 = new HTMLNode();
     $step3->setClassName('pa-'.Page::get()->getWritingDir().'-col-two');
-    $step3Text = new HTMLNode('', FALSE, TRUE);
-    $step3Text->setText($lang['email-account']);
-    $step3->addChild($step3Text);
+    $step3->addChild(HTMLNode::createTextNode($lang['email-account']));
     $node->addChild($step3);
     
     $step4 = new HTMLNode();
     $step4->setClassName('pa-'.Page::get()->getWritingDir().'-col-two');
-    $step4Text = new HTMLNode('', FALSE, TRUE);
-    $step4Text->setText($lang['admin-account']);
-    $step4->addChild($step4Text);
+    $step4->addChild(HTMLNode::createTextNode($lang['admin-account']));
     $node->addChild($step4);
     
     $step5 = new HTMLNode();
     $step5->setClassName('pa-'.Page::get()->getWritingDir().'-col-two');
-    $step5Text = new HTMLNode('', FALSE, TRUE);
-    $step5Text->setText($lang['website-config']);
-    $step5->addChild($step5Text);
+    $step5->addChild(HTMLNode::createTextNode($lang['website-config']));
     $node->addChild($step5);
     
     if($active == 0){

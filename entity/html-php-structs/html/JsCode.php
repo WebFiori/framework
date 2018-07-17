@@ -34,7 +34,7 @@ class JsCode extends HTMLNode{
      * Creates a new instance of the class.
      */
     public function __construct() {
-        parent::__construct('script', TRUE, FALSE);
+        parent::__construct('script');
         parent::setAttribute('type', 'text/javascript');
     }
     /**
@@ -43,9 +43,7 @@ class JsCode extends HTMLNode{
      * @since 1.0
      */
     public function addCode($jsCode) {
-        $textNode = new HTMLNode('', FALSE, TRUE);
-        $textNode->setText($jsCode);
-        parent::addChild($textNode);
+        parent::addChild(self::createTextNode($jsCode));
     }
     /**
      * A function that does nothing.
@@ -56,13 +54,18 @@ class JsCode extends HTMLNode{
         
     }
     /**
-     * A function that does nothing.
-     * @param type $param
-     * @param type $param2
+     * Sets a value for an attribute.
+     * @param string $name The name of the attribute. If the attribute does not 
+     * exist, it will be created. If already exists, its value will be updated. 
+     * If the attribute name is 'type', nothing will happen, 
+     * the attribute will never be created.
+     * @param string $val [Optional] The value of the attribute. Default is empty string.
      * @since 1.0
      */
-    public function setAttribute($param,$param2='') {
-        
+    public function setAttribute($name,$val='') {
+        if($name != 'type'){
+            parent::setAttribute($name, $val);
+        }
     }
     /**
      * A function that does nothing.

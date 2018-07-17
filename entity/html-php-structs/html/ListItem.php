@@ -63,9 +63,7 @@ class ListItem extends HTMLNode{
                 $this->children()->get(0)->setText($text);
             }
             else{
-                $textNode = new HTMLNode('', '', TRUE);
-                $textNode->setText($text);
-                parent::addChild($textNode);
+                parent::addChild(self::createTextNode($text));
             }
         }
     }

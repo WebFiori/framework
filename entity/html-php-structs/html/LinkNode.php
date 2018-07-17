@@ -36,7 +36,7 @@ class LinkNode extends HTMLNode{
      * Default is '_blank'.
      */
     public function __construct($href,$label,$target='_blank') {
-        parent::__construct('a', TRUE, FALSE);
+        parent::__construct('a');
         $this->setAttribute('href',$href);
         if(strlen($target) != 0){
             $this->setAttribute('target',$target);
@@ -44,9 +44,7 @@ class LinkNode extends HTMLNode{
         else{
             $this->setAttribute('target', '_blank');
         }
-        $textNode = new HTMLNode('', FALSE, TRUE);
-        $textNode->setText($label);
-        parent::addChild($textNode);
+        parent::addChild(self::createTextNode($label));
     }
     /**
      * Sets the value of the property 'href' of the link tag.

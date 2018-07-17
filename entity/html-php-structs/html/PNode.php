@@ -76,8 +76,7 @@ class PNode extends HTMLNode{
         'new-line'=>false
     )) {
         if(strlen($text) != 0){
-            $textNode = new HTMLNode('', FALSE, TRUE);
-            $textNode->setText($text);
+            $textNode = self::createTextNode($text);
             if(gettype($options) == 'array'){
                 $css = '';
                 $emNode = NULL;

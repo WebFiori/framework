@@ -130,12 +130,7 @@ class HTMLDoc {
      * @since 1.2
      */
     public function getChildByID($id) {
-        $el = $this->htmlNode->getChildByID($id);
-        if($el == NULL){
-            $el = $this->body->getChildByID($id);
-            return $el;
-        }
-        return $el;
+        return $this->htmlNode->getChildByID($id);
     }
     /**
      * Constructs a new HTML document.
@@ -209,16 +204,31 @@ class HTMLDoc {
     }
     /**
      * Returns the document as readable HTML code wrapped inside 'pre' element.
-     * @param boolean $formatted [Optional] Set to <b>TRUE</b> to return a well formatted 
-     * HTML document. Default is <b>TRUE</b>.
+     * @param array $formattingOptions [Optional] An associative array which contains 
+     * an options for formatting the code. The available options are:
+     * <ul>
+     * <li><b>tab-spaces</b>: The number of spaces in a tab. Usually 4.</li>
+     * <li><b>with-colors</b>: A boolean value. If set to TRUE, the code will 
+     * be highlighted with colors.</li>
+     * <li><b>initial-tab</b>: Number of initial tabs</li>
+     * <li><b>colors</b>: An associative array of highlight colors.</li>
+     * </ul>
+     * The array 'colors' has the following options:
+     * <ul>
+     * <li><b>bg-color</b>: The 'pre' block background color.</li>
+     * <li><b>attribute-color</b>: HTML attribute name color.</li>
+     * <li><b>attribute-value-color</b>: HTML attribute value color.</li>
+     * <li><b>text-color</b>: Normal text color.</li>
+     * <li><b>comment-color</b>: Comment color.</li>
+     * <li><b>operator-color</b>: Assignment operator color.</li>
+     * <li><b>lt-gt-color</b>: Less than and greater than color.</li>
+     * <li><b>node-name-color</b>: Node name color.</li>
+     * </ul>
      * @return string The document as readable HTML code wrapped inside 'pre' element.
      * @since 1.4
      */
-    public function asCode($formatted=true) {
-        $ashtml = $this->toHTML($formatted);
-        $greaterRep = str_replace('>', '&gt;', $ashtml);
-        $retVal = str_replace('<', '&lt;', $greaterRep);
-        return '<pre>'.$retVal.'</pre>';
+    public function asCode($formattingOptions=HTMLNode::DEFAULT_CODE_FORMAT) {
+        return $this->htmlNode->asCode($formattingOptions);
     }
     /**
      * Removes a child node from the document.
@@ -231,7 +241,13 @@ class HTMLDoc {
     public function removeChild($node) {
         if($node instanceof HTMLNode){
             if($node->getName() != 'body' && $node->getName() != 'head'){
-                return $this->htmlNode->removeChild($node);
+                $removed = $this->htmlNode->removeChild($node);
+                if($removed == NULL){
+                    $removed = $this->body->removeChild($node);
+                    if($removed == NULL){
+                        return $this->headNode->removeChild($node);
+                    }
+                }
             }
         }
         return NULL;

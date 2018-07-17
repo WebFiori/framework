@@ -71,12 +71,7 @@ class HeadNode extends HTMLNode{
         $this->setCanonical($canonical);
         $this->addMeta('viewport', 'width=device-width, initial-scale=1.0');
     }
-    public function getTitle() {
-        if($this->titleNode != NULL){
-            return $this->titleNode->children()->get(0)->getText();
-        }
-        return '';
-    }
+    
     /**
      * Sets the value of the attribute 'href' for the 'base' tag.
      * @param string $url The value to set.
@@ -112,7 +107,7 @@ class HeadNode extends HTMLNode{
         if(gettype($title) == 'string'){
             if($this->titleNode == NULL){
                 $this->titleNode = new HTMLNode('title');
-                $this->titleNode->addChild(new HTMLNode('', '', TRUE));
+                $this->titleNode->addChild(self::createTextNode($title));
             }
             if(!$this->hasChild($this->titleNode)){
                 $this->addChild($this->titleNode);

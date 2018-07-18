@@ -216,11 +216,18 @@ class RouterUri {
     }
     /**
      * Returns the original requested URI.
+     * @param boolean $incQueryStr If set to TRUE, the query string part 
+     * will be included in the URL.
      * @return string The original requested URI.
      * @since 1.0
      */
-    public function getUri() {
-        return $this->uriBroken['uri'];
+    public function getUri($incQueryStr=false) {
+        if($incQueryStr === TRUE){
+            return $this->uriBroken['uri'];
+        }
+        else{
+            return $this->getScheme().':'.$this->getAuthority().$this->getPath();
+        }
     }
     /**
      * Checks if the URI has a variable or not given its name.
@@ -337,7 +344,7 @@ class RouterUri {
             ),
             'uri-vars'=>array(
                 
-            )
+            ),
         );
         //First step, extract the fragment
         $split1 = explode('#', $uri);
@@ -381,6 +388,12 @@ class RouterUri {
         foreach ($split6 as $param){
             $split7 = explode('=', $param);
             $retVal['query-string-vars'][$split7[0]] = isset($split7[1]) ? $split7[1] : '';
+//            $var = $retVal['query-string-vars'][$split7[0]];
+//            if(strlen($var) > 0){
+//                if($var[0] == '{' && $var[strlen($var) - 1] == '}'){
+//                    $retVal['uri-vars'][trim($var, '{}')] = NULL;
+//                }
+//            }
         }
         return $retVal;
     }

@@ -249,14 +249,23 @@ function emailInputChanged(){
 }
 function siteInfoInputsChanged(){
     var saveButton = document.getElementById('save-input');
+    var langCode = document.getElementById('language-code-select').value;
+    console.log(this);
+    if(this.id === 'language-code-select'){
+        document.getElementById('site-name-input').value = window.sites[langCode]['name'];
+        document.getElementById('site-description-input').value = window.sites[langCode]['description'];
+    }
     var siteName = document.getElementById('site-name-input').value;
     if(siteName !== ''){
         var siteDesc = document.getElementById('site-description-input').value;
         if(siteDesc !== ''){
             saveButton.removeAttribute('disabled');
+            window.sites[langCode]['description'] = siteDesc;
+            window.sites[langCode]['name'] = siteName;
             window.siteInfo = {
                 name:siteName,
-                desc:siteDesc
+                desc:siteDesc,
+                'lang-code':langCode
             };
             return;
         }
@@ -266,12 +275,12 @@ function siteInfoInputsChanged(){
 function updateSiteInfo(){
     var ajax = new AJAX({
         method:'post',
-        url:APIS.WebsiteAPIs.link
+        url:APIS.WebsiteAPIs.link+'/update-website'
     });
     var form = new FormData();
-    form.append('action','update-site-info');
     form.append('site-name',window.siteInfo['name']);
     form.append('site-description',window.siteInfo['desc']);
+    form.append('language',window.siteInfo['lang-code']);
     var messageDisplay = document.getElementById('message-display');
     var submitButton = document.getElementById('save-input');
     submitButton.setAttribute('disabled','');

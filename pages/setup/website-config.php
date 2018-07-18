@@ -60,10 +60,22 @@ $jsonx = new JsonX();
 $jsonx->add('disconnected', $page->getLanguage()->get('general/disconnected'));
 $jsonx->add('saved', $page->getLanguage()->get('general/saved'));
 $jsonx->add('saving', $page->getLanguage()->get('general/saving'));
+$langsJson = new JsonX();
+$langs = WebsiteFunctions::get()->getSiteConfigVars();
+foreach ($langs['website-names'] as $k => $v){
+    $arr = array(
+        'name'=>$v,
+        'description'=>$langs['site-descriptions'][$k]
+    );
+    $langsJson->addArray($k, $arr);
+}
 $js->addCode('window.onload = function(){'
         . 'window.messages = '.$jsonx.';'
+        . 'window.sites = '.$langsJson.';'
         . 'document.getElementById(\'site-name-input\').oninput = siteInfoInputsChanged;'
         . 'document.getElementById(\'site-description-input\').oninput = siteInfoInputsChanged;'
+        . 'document.getElementById(\'language-code-select\').oninput = siteInfoInputsChanged;'
+        . 'document.getElementById(\'language-code-select\').oninput();'
         . '}');
 $document = Page::get()->getDocument();
 $document->getHeadNode()->addChild($js);
@@ -87,11 +99,31 @@ function pageBody($pageLabels,$lang){
     $body->addChild(createSiteInfoForm($pageLabels['labels'], $pageLabels['placeholders'],$lang));
     return $body;
 }
-
+/**
+ * 
+ * @param type $lbls
+ * @param type $placeholders
+ * @param Language $lang
+ * @return \HTMLNode
+ */
 function createSiteInfoForm($lbls,$placeholders,$lang){
     $form = new HTMLNode('form');
     $form->setClassName('pa-row');
-
+    
+    $selectLbl = new Label($lang->get('pages/setup/website-config/labels/select-lang'));
+    $selectLbl->setClassName('pa-'.Page::get()->getWritingDir().'-col-twelve');
+    $langSelect = new HTMLNode('select');
+    $langSelect->setID('language-code-select');
+    $langSelect->setClassName('pa-'.Page::get()->getWritingDir().'-ltr-col-two');
+    $langs = WebsiteFunctions::get()->getSiteConfigVars();
+    foreach ($langs['website-names'] as $k => $v){
+        $option = new HTMLNode('option');
+        $option->setAttribute('value', $k);
+        $option->addChild($option::createTextNode($k));
+        $langSelect->addChild($option);
+    }
+    $form->addChild($selectLbl);
+    $form->addChild($langSelect);
     $siteNameLabel = new Label($lbls['site-name']);
     $siteNameLabel->setClassName('pa-'.Page::get()->getWritingDir().'-col-twelve');
     $siteNameInput = new Input();
@@ -120,9 +152,8 @@ function createSiteInfoForm($lbls,$placeholders,$lang){
     $messageNode = new PNode();
     $messageNode->setID('message-display');
     $messageNode->setClassName('pa-'.Page::get()->getWritingDir().'-ltr-col-twelve');
-    $form->addChild($submit);
     $form->addChild($messageNode);
-    
+    $form->addChild($submit);
     return $form;
 }
 /**

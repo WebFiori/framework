@@ -611,7 +611,7 @@ class HTMLNode {
         $this->htmlString = '';
         $this->nodesStack = new Stack();
         $this->_pushNode($this,$formatted);
-        return $this->htmlString.'</pre>';
+        return $this->htmlString;
     }
     /**
      * 

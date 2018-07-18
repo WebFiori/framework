@@ -43,7 +43,7 @@ class ViewRoutes {
             Router::view('/s/admin-account', '/setup/admin-account.php');
             Router::view('/s/website-config', '/setup/website-config.php');
         }
-        Router::view('/login', '/login.php');
+        Router::view('/login?lang={lang-code}', '/login.php');
         Router::view('/home', '/home.php');
         Router::view('/activate-account', '/activate-account.php');
         Router::view('/logout', '/logout.php');

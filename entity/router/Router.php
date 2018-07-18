@@ -186,6 +186,7 @@ class Router {
             }
             if(!$this->hasRoute($path)){
                 $routeUri = new RouterUri($this->getBase().$path, $routeTo);
+                $routeUri->setType($routeType);
                 $this->routes[] = $routeUri;
                 return TRUE;
             }

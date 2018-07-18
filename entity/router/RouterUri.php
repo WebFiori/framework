@@ -1,9 +1,26 @@
 <?php
-
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * The MIT License
+ *
+ * Copyright 2018 Ibrahim.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
  */
 if(!defined('ROOT_DIR')){
     header("HTTP/1.1 403 Forbidden");
@@ -26,7 +43,7 @@ if(!defined('ROOT_DIR')){
  * A class that is used to split URIs and get their parameters and others
  *
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.0
+ * @version 1.1
  */
 class RouterUri {
     /**
@@ -39,8 +56,15 @@ class RouterUri {
      * The URI broken into its sub-components (scheme, authority ...) as an associative 
      * array.
      * @var array 
+     * @since 1.0
      */
     private $uriBroken;
+    /**
+     * The type of the route.
+     * @var string
+     * @since 1.1 
+     */
+    private $type;
     /**
      * Creates new instance.
      * @param string $requestedUri The URI such as 'https://www3.programmingacademia.com:80/{some-var}/hell/{other-var}/?do=dnt&y=#xyz'
@@ -49,6 +73,22 @@ class RouterUri {
     public function __construct($requestedUri,$routeTo) {
         $this->setRoute($routeTo);
         $this->uriBroken = self::splitURI($requestedUri);
+    }
+    /**
+     * Returns the type of element that the URI will route to.
+     * @return string The type of element that the URI will route to.
+     * @since 1.1
+     */
+    public function getType() {
+        return $this->type;
+    }
+    /**
+     * Sets the type of element that the URI will route to.
+     * @param string $type The type of element that the URI will route to.
+     * @since 1.1
+     */
+    public function setType($type) {
+        $this->type = $type;
     }
     /**
      * Checks if all URI variables has values or not.

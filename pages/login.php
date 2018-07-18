@@ -68,7 +68,7 @@ if($activationTok != NULL && $activationTok != FALSE){
 }
 $container = new HTMLNode();
 $page->insertNode($container,'page-body');
-$page->getDocument()->getChildByID('page-header')->removeAllChildNodes();
+//$page->getDocument()->getChildByID('page-header')->removeAllChildNodes();
 $container->setClassName('pa-row');
 $container->addChild(createLoginForm($pageLbls));
 echo $page->getDocument()->toHTML(TRUE);

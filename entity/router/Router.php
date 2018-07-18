@@ -406,7 +406,8 @@ class Router {
                     }
                 }
             }
-            //if no route found, try to replace variables with values
+            //if no route found, try to replace variables with values 
+            //note that query string vars are optional.
             $pathArray = $routeUri->getPathArray();
             $requestMethod = filter_var(getenv('REQUEST_METHOD'));
             foreach ($this->routes as $route){
@@ -429,7 +430,7 @@ class Router {
                             }
                         }
                     }
-                    //if all variables are set, then we found our route
+                    //if all variables are set, then we found our route.
                     if($route->isAllVarsSet()){
                         if(is_callable($route->getRouteTo())){
                             call_user_func($route->getRouteTo());

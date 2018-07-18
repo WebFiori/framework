@@ -36,6 +36,11 @@ class ClosureRoutes {
      * @since 1.0
      */
     public static function create() {
+        Router::closure('/sitemap', function(){
+            $viewsSiteMap = ViewRoutes::createSiteMap();
+            header('content-type: text/xml');
+            echo $viewsSiteMap;
+        });
         Router::closure('/'.Util::NEED_CONF, function(){
             if(isset($GLOBALS['SYS_STATUS']) && $GLOBALS['SYS_STATUS'] === Util::NEED_CONF){
                 SystemFunctions::get()->initSetupSession();

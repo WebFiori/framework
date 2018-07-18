@@ -1,7 +1,20 @@
 <?php
 if(!defined('ROOT_DIR')){
-    http_response_code(403);
-    die('{"message":"Forbidden"}');
+    header("HTTP/1.1 403 Forbidden");
+    die(''
+        . '<!DOCTYPE html>'
+        . '<html>'
+        . '<head>'
+        . '<title>Forbidden</title>'
+        . '</head>'
+        . '<body>'
+        . '<h1>403 - Forbidden</h1>'
+        . '<hr>'
+        . '<p>'
+        . 'Direct access not allowed.'
+        . '</p>'
+        . '</body>'
+        . '</html>');
 }
 /**
  * English language definition.
@@ -257,9 +270,10 @@ $Language->setMultiple('pages/setup/admin-account', array(
 $Language->setMultiple('pages/setup/website-config/labels', array(
     'site-name'=>'Website Name:',
     'site-description'=>'Website Description:',
-    'title-sep'=>'',
-    'home-page'=>'',
-    'selected-theme'=>''
+    'title-sep'=>'Title Separator',
+    'home-page'=>'Home Page:',
+    'selected-theme'=>'Selected Theme Name:',
+    'select-lang'=>'Select Language:'
 ));
 $Language->setMultiple('pages/setup/website-config/placeholders', array(
     'site-name'=>'Choose a name that reflects site content.',

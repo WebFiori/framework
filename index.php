@@ -35,7 +35,7 @@ require_once ROOT_DIR.'/entity/AutoLoader.php';
 AutoLoader::get();
 Util::displayErrors();
 $GLOBALS['SYS_STATUS'] = Util::checkSystemStatus();
-if($GLOBALS['SYS_STATUS'] === Util::MISSING_CONF_FILE){
+if($GLOBALS['SYS_STATUS'] === Util::MISSING_CONF_FILE || $GLOBALS['SYS_STATUS'] === Util::MISSING_SITE_CONF_FILE){
     SystemFunctions::get()->createConfigFile();
     WebsiteFunctions::get()->createSiteConfigFile();
     MailFunctions::get()->createEmailConfigFile();

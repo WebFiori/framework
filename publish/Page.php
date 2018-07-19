@@ -19,7 +19,7 @@ if(!defined('ROOT_DIR')){
 /**
  * A class used to initialize main page components.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.8
+ * @version 1.9
  */
 class Page{
     /**
@@ -127,6 +127,19 @@ class Page{
     public function getCanonical() {
         return $this->canonical;
     }
+    /**
+     * Sets or gets the canonical URL of the page.
+     * @param string $new [Optional] The new canonical URL.
+     * @return string The canonical URL of the page.
+     * @since 1.9
+     */
+    public static function canonical($new=null){
+        $page = Page::get();
+        if($new != NULL && strlen($new) != 0){
+            $page->setCanonical($new);
+        }
+        return $page->getCanonical();
+    }
     private function __construct() {
         $this->document = new HTMLDoc();
         $this->setTitle('Default X');
@@ -166,6 +179,20 @@ class Page{
         $this->document->addChild($footerNode);
     }
     /**
+     * Sets or returns the name of page website.
+     * @param string $new [Optional] The new name to set. It must be not-empty 
+     * string in order to update.
+     * @return string The name of page website. Default is 'My Website'.
+     * @since 1.9
+     */
+    public static function siteName($new=null) {
+        $page = Page::get();
+        if($new != NULL && strlen($new) != 0){
+            $page->setWebsiteName($new);
+        }
+        return $page->getWebsiteName();
+    }
+    /**
      * Returns the name of the website.
      * @return string The name of the website. If the name was not set 
      * using the function <b>Page::setWebsiteName()</b>, the returned value will 
@@ -192,6 +219,21 @@ class Page{
             $this->websiteName = $name;
             $this->setTitle($this->getTitle());
         }
+    }
+    /**
+     * Sets or returns the string that is used to separate website name from 
+     * the title of the page.
+     * @param string $new [Optional] The new title separator.
+     * @return string The string that is used to separate website name from 
+     * the title of the page.
+     * @since 1.9
+     */
+    public static function separator($new=null){
+        $page = Page::get();
+        if($new != NULL && strlen($new) != 0){
+            $page->setTitleSep($new);
+        }
+        return $page->getTitleSep();
     }
     /**
      * Returns the character or string that is used to separate web page title 
@@ -248,6 +290,18 @@ class Page{
      * will be inserted to.
      * @return boolean The function will return <b>TRUE</b> if the given node 
      * was inserted. If it is not, the function will return <b>FALSE</b>.
+     * @since 1.9
+     */
+    public function insert($node,$parentNodeId){
+        return Page::get()->insertNode($node, $parentNodeId);
+    }
+    /**
+     * Adds a child node inside the body of a node given its ID.
+     * @param HTMLNode $node The node that will be inserted.
+     * @param string $parentNodeId The ID of the node that the given node 
+     * will be inserted to.
+     * @return boolean The function will return <b>TRUE</b> if the given node 
+     * was inserted. If it is not, the function will return <b>FALSE</b>.
      * @since 1.6
      */
     public function insertNode($node,$parentNodeId='') {
@@ -282,6 +336,24 @@ class Page{
         }
         self::$instance = new Page();
         return self::$instance;
+    }
+    /**
+     * Sets or gets the title of the page.
+     * @param string $new [Optional] The title of the page. Note that if page document was created, 
+     * calling this function will set the value of the &lt;titlt&gt; node. 
+     * The format of the title is <b>PAGE_NAME TITLE_SEP WEBSITE_NAME</b>. 
+     * for example, if the page name is 'Home' and title separator is 
+     * '|' and the name of the website is 'Programming Academia'. The title 
+     * of the page will be 'Home | Programming Academia'.
+     * @since 1.9
+     * @return string The title of the page.
+     */
+    public static function title($new=null) {
+        $page = Page::get();
+        if($new != NULL && strlen($new) != 0){
+            $page->setTitle($new);
+        }
+        return $page->getTitle();
     }
     /**
      * Sets the title of the page.
@@ -373,6 +445,19 @@ class Page{
      */
     public function isThemeLoaded(){
         return $this->theme instanceof Theme;
+    }
+    /**
+     * Sets or gets the description of the page.
+     * @param string $new [Optional] The description of the page.
+     * @since 1.9
+     * @return string The description of the page.
+     */
+    public function description($new=null) {
+        $page = Page::get();
+        if($new != NULL && strlen($new) != 0){
+            $page->setDescription($new);
+        }
+        return $page->getDescription();
     }
     /**
      * Sets the description of the page.

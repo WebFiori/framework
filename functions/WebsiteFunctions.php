@@ -56,6 +56,7 @@ class WebsiteFunctions extends Functions{
             'AR'=>'أكاديميا البرمجة'
         ),
         'base-url'=>'',
+        'primary-language'=>'EN',
         'title-separator'=>' | ',
         'home-page'=>'index',
         'admin-theme-name'=>'Greeny By Ibrahim Ali',
@@ -135,6 +136,7 @@ class WebsiteFunctions extends Functions{
             $cfgArr['base-url'] = SiteConfig::get()->getBaseURL();
             $cfgArr['title-separator'] = SiteConfig::get()->getTitleSep();
             $cfgArr['home-page'] = SiteConfig::get()->getHomePage();
+            $cfgArr['primary-language'] = SiteConfig::get()->getPrimaryLanguage();
             $cfgArr['site-descriptions'] = SiteConfig::get()->getDescriptions();
             $cfgArr['theme-name'] = SiteConfig::get()->getBaseThemeName();
             $cfgArr['admin-theme-name'] = SiteConfig::get()->getAdminThemeName();
@@ -162,6 +164,10 @@ class WebsiteFunctions extends Functions{
      * @since 1.0
      */
     private $webSiteNames;
+    /**
+     * The primary language of the website.
+     */
+    private $primaryLang;
     /**
      * An array which contains different descriptions in different languages.
      * @var string 
@@ -238,12 +244,21 @@ class WebsiteFunctions extends Functions{
         $this->webSiteNames = '.$names.';
         $this->baseUrl = \''.$configArr['base-url'].'\';
         $this->titleSep = \' '. trim($configArr['title-separator']).' \';
+        $this->primaryLang = \' '. trim($configArr['primary-language']).' \';
         $this->baseThemeName = \''.$configArr['theme-name'].'\';
         $this->adminThemeName = \''.$configArr['admin-theme-name'].'\';
         $this->homePage = \''.$configArr['home-page'].'\';
         $this->descriptions = '.$descriptions.';
     }', TRUE, TRUE);
         $fh->write('
+    /**
+     * Returns the primary language of the website.
+     * @return string Language code of the primary language.
+     * @since 1.3
+     */
+    public function getPrimaryLanguage(){
+        return $this->primaryLang;
+    }
     /**
      * Returns the name of base theme that is used in website pages.
      * @return string The name of base theme that is used in website pages.

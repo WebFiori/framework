@@ -75,6 +75,16 @@ class WebsiteAPIs extends API{
                 . 'value of this attribute is the name of the theme that is used '
                 . 'across website pages. If the given theme does not exists, Website '
                 . 'information won\'t update.');
+        $a2->addParameter(new RequestParameter('main-language', 'string',TRUE));
+        $a2->getParameterByName('main-language')->setDescription('Two characters that represents language code. '
+                . 'It is the unique identifier for the language.');
+        $a2->getParameterByName('main-language')->setCustomFilterFunction(function($val){
+            $langCode = $val['basic-filter-result'];
+            if(strlen($langCode) == 2){
+                return $langCode;
+            }
+            return FALSE;
+        });
         $this->addAction($a2, TRUE);
         
         $a3 = new APIAction();
@@ -224,6 +234,9 @@ class WebsiteAPIs extends API{
         }
         if(isset($i['home-page'])){
             $cfgArr['home-page'] = $i['home-page'];
+        }
+        if(isset($i['main-language'])){
+            $cfgArr['primary-language'] = strtoupper($i['main-language']);
         }
         if(isset($i['site-theme'])){
             try{

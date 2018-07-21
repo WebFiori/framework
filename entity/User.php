@@ -157,6 +157,13 @@ class User implements JsonI{
      * @var string 
      */
     private $dispName;
+    /**
+     * Creates new instance of the class.
+     * @param string $username Username of the user.
+     * @param string $password The login password of the user.
+     * @param string $email Email address of the user.
+     * @since 1.0
+     */
     function __construct($username='',$password='',$email=''){
         $this->email = $email;
         $this->password = $password;
@@ -166,18 +173,75 @@ class User implements JsonI{
         $this->setAccessLevel(ACCESS_LEVEL_2);
         $this->userPrivileges = array();
     }
-    
+    /**
+     * Adds a user to a users group given group ID.
+     * @param string $groupId The ID of the group.
+     * @since 1.7
+     */
+    public function addToGroup($groupId) {
+        $g = Access::getGroup($groupId);
+        if($g instanceof UsersGroup){
+            foreach ($g->privileges() as $p){
+                $this->addPrivilege($p->getID());
+            }
+        }
+    }
+    /**
+     * Adds new privilege to the array of user privileges.
+     * @param string $privilegeId The ID of the privilege. It must be exist in 
+     * the class 'Access' or it won't be added. If the privilege is already 
+     * added, It will be not added again. 
+     * @return boolean The function will return TRUE if the privilege is 
+     * added. FALSE if not.
+     * @since 1.7
+     */
     public function addPrivilege($privilegeId){
         $p = Access::getPrivilege($privilegeId);
         if($p != NULL){
             foreach ($this->userPrivileges as $prev){
                 if($prev->getID() == $p->getID()){
-                    return;
+                    return FALSE;
                 }
             }
             $this->userPrivileges[] = $p;
+            return TRUE;
         }
+        return FALSE;
     }
+    /**
+     * Checks if the user belongs to a user group given its ID.
+     * @param string $groupId The ID of the group.
+     * @return boolean The function will return TRUE if the user belongs 
+     * to the users group. The user will be considered a part of the group 
+     * only if he has all the permissions in the group.
+     * @since 1.7
+     */
+    public function inGroup($groupId) {
+        $g = Access::getGroup($groupId);
+        if($g instanceof UsersGroup){
+            $inGroup = TRUE;
+            foreach ($g->privileges() as $groupPrivilege){
+                $inGroup = $inGroup && $this->hasPrivilege($groupPrivilege->getID());
+            }
+            return $inGroup;
+        }
+        return FALSE;
+    }
+    /**
+     * Returns an array which contains all user privileges.
+     * @return array An array which contains an objects of type Privilege.
+     * @since 1.7
+     */
+    public function privileges() {
+        return $this->userPrivileges;
+    }
+    /**
+     * Checks if a user has privilege or not given its ID.
+     * @param string $privilegeId The ID of the privilege.
+     * @return boolean The function will return TRUE if the user has the given 
+     * privilege. FALSE if not.
+     * @since 1.7
+     */
     public function hasPrivilege($privilegeId) {
         foreach ($this->userPrivileges as $p){
             if($p->getID() == $privilegeId){

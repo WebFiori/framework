@@ -50,6 +50,94 @@ class Access {
         return self::$access;
     }
     
+    public static function privileges($groupId=null) {
+        return Access::get()->_privileges($groupId);
+    }
+    /**
+     * 
+     * @param type $str
+     * @param User $user
+     */
+    public static function resolvePriviliges($str,&$user) {
+        if(strlen($str) > 0){
+            if($user instanceof User){
+                $privilegesSplit = explode(';', $str);
+                foreach ($privilegesSplit as $privilegeStr){
+                    $prSplit = explode('-', $privilegeStr);
+                    if(count($prSplit) == 2){
+                        $pirivelegeId = $prSplit[0];
+                        $userHasPr = $prSplit[1] == '1' ? TRUE : FALSE;
+                        if($userHasPr === TRUE){
+                            $user->addPrivilege($pirivelegeId);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    /**
+     * 
+     * @param User $user
+     * @return string
+     */
+    public static function createPermissionsStr($user){
+        return Access::get()->_createPermissionsStr($user);
+    }
+    /**
+     * 
+     * @param User $user
+     */
+    private function _createPermissionsStr($user) {
+        if($user instanceof User){
+            $privileges = Access::privileges();
+            $str = '';
+            $count = count($privileges);
+            $index = 0;
+            foreach ($privileges as $pr){
+                if($user->hasPrivilege($pr->getID())){
+                    if($index + 1 == $count){
+                        $str .= $pr->getID().'-1';
+                    }
+                    else{
+                        $str .= $pr->getID().'-1;';
+                    }
+                }
+                else{
+                    if($index + 1 == $count){
+                        $str .= $pr->getID().'-0';
+                    }
+                    else{
+                        $str .= $pr->getID().'-0;';
+                    }
+                }
+                $index++;
+            }
+            return $str;
+        }
+        return '';
+    }
+    
+    private function _privileges($groupId=null){
+        if($groupId != NULL){
+            foreach ($this->userGroups as $group){
+                if($group->getID() == $groupId){
+                    return $group->privileges();
+                }
+            }
+            return array();
+        }
+        else{
+            $prArr = array();
+            foreach ($this->userGroups as $group){
+                foreach ($group->privileges() as $pr){
+                    $prArr[] = $pr;
+                }
+            }
+            return $prArr;
+        }
+    }
+
+
     public function addGroup($groupName) {
         foreach ($this->userGroups as $group){
             if($groupName == $group->getName()){
@@ -60,7 +148,12 @@ class Access {
             $this->userGroups[] = $g;
         }
     }
-    
+    public static function groups(){
+        return Access::get()->_groups();
+    }
+    private function _groups(){
+        return $this->userGroups;
+    }
     private function _getGroup($groupId) {
         foreach ($this->userGroups as $g){
             if($g->getID() == $groupId){

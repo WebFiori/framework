@@ -153,8 +153,21 @@ class WebsiteFunctions extends Functions{
         $fh = new FileHandler(ROOT_DIR.'/entity/SiteConfig.php');
         $fh->write('<?php', TRUE, TRUE);
         $fh->write('if(!defined(\'ROOT_DIR\')){
-    header(\'HTTP/1.1 403 Forbidden\');
-    exit;
+    header("HTTP/1.1 403 Forbidden");
+    die(\'\'
+        . \'<!DOCTYPE html>\'
+        . \'<html>\'
+        . \'<head>\'
+        . \'<title>Forbidden</title>\'
+        . \'</head>\'
+        . \'<body>\'
+        . \'<h1>403 - Forbidden</h1>\'
+        . \'<hr>\'
+        . \'<p>\'
+        . \'Direct access not allowed.\'
+        . \'</p>\'
+        . \'</body>\'
+        . \'</html>\');
 }', TRUE, TRUE);
         $fh->write('class SiteConfig{', TRUE, TRUE);
         $fh->addTab();
@@ -244,7 +257,7 @@ class WebsiteFunctions extends Functions{
         $this->webSiteNames = '.$names.';
         $this->baseUrl = \''.$configArr['base-url'].'\';
         $this->titleSep = \' '. trim($configArr['title-separator']).' \';
-        $this->primaryLang = \' '. trim($configArr['primary-language']).' \';
+        $this->primaryLang = \''. trim($configArr['primary-language']).'\';
         $this->baseThemeName = \''.$configArr['theme-name'].'\';
         $this->adminThemeName = \''.$configArr['admin-theme-name'].'\';
         $this->homePage = \''.$configArr['home-page'].'\';

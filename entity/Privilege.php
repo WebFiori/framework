@@ -25,41 +25,74 @@
  */
 
 /**
- * Description of Privilege
+ * A class that represents a privilege.
  *
  * @author Ibrahim
+ * @version 1.0
  */
 class Privilege {
+    /**
+     * The ID of the privilege.
+     * @var string
+     * @since 1.0 
+     */
     private $code;
+    /**
+     * The name of the privilege.
+     * @var string
+     * @since 1.0 
+     */
     private $name;
-    private $isEnabled;
-    public function __construct() {
-        $this->isEnabled = FALSE;
+    /**
+     * Creates new instance of the class
+     * @param string $id The unique identifier of the privilege. Default is 
+     * 'PR'.
+     * @param string $name The name of the privilege. It is provided only 
+     * in case of displaying privilege in some UI view.
+     * @since 1.0
+     */
+    public function __construct($id='PR',$name='PR_NAME') {
+        $this->setID($id);
+        $this->setName($name);
     }
+    /**
+     * Sets the name of the privilege.
+     * @param string $name The name of the privilege. It is only set when 
+     * the given string is not empty.
+     * @since 1.0
+     */
     public function setName($name) {
         if(strlen($name) > 0){
             $this->name = $name.'';
         }
     }
-    
+    /**
+     * Returns the name of the privilege.
+     * @return string The name of the privilege. If the name was not updated, 
+     * the function will return 'PR_NAME'.
+     * @since 1.0
+     */
     public function getName() {
         return $this->name;
     }
-    
+    /**
+     * Returns the ID of the privilege.
+     * @return string The ID of the privilege. If the ID was not set, 
+     * the function will return 'PR'.
+     * @since 1.0
+     */
     public function getID() {
         return $this->code;
     }
-    
+    /**
+     * Sets the ID of the privilege
+     * @param string $code The ID of the privilege. Only set if the given string 
+     * is not empty.
+     * @since 1.0
+     */
     public function setID($code) {
         if(strlen($code) > 0){
             $this->code = $code.'';
         }
-    }
-    
-    public function enabled($enable=null){
-        if($enable != NULL){
-            $this->isEnabled = $enable === TRUE ? TRUE : FALSE;
-        }
-        return $this->isEnabled;
     }
 }

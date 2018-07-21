@@ -44,7 +44,7 @@ if(!defined('ROOT_DIR')){
  * The base class for creating application logic.
  *
  * @author Ibrahim
- * @version 1.1
+ * @version 1.2
  */
 class Functions {
     /**
@@ -118,6 +118,25 @@ class Functions {
      */
     public function getMainSession(){
         return $this->mainSession;
+    }
+    /**
+     * Returns language code from the session manager.
+     * @param boolean $forceUpdate If set to TRUE, language code will 
+     * be forced to update based on the value of the attribute 'lang' 
+     * of a GET or POST request or a cookie.
+     * @return strint A two characters  that represents language code.
+     * @since 1.2
+     */
+    public final function getSessionLang($forceUpdate=true){
+        return $this->getMainSession()->getLang($forceUpdate);
+    }
+    /**
+     * Returns the link that is used to connect to the database.
+     * @return DatabaseLink The link that is used to connect to the database.
+     * @since 1.2
+     */
+    public function getDBLink() {
+        return $this->getMainSession()->getDBLink();
     }
     /**
      * Returns the number of rows resulted from executing a query.

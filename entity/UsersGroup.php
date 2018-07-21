@@ -23,7 +23,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
+if(!defined('ROOT_DIR')){
+    header("HTTP/1.1 403 Forbidden");
+    die(''
+        . '<!DOCTYPE html>'
+        . '<html>'
+        . '<head>'
+        . '<title>Forbidden</title>'
+        . '</head>'
+        . '<body>'
+        . '<h1>403 - Forbidden</h1>'
+        . '<hr>'
+        . '<p>'
+        . 'Direct access not allowed.'
+        . '</p>'
+        . '</body>'
+        . '</html>');
+}
 /**
  * A class that represents a set of privileges
  *
@@ -106,23 +122,41 @@ class UsersGroup {
         }
         return FALSE;
     }
-    
+    /**
+     * Returns the name of the group.
+     * @return string The name of the group.
+     * @since 1.0
+     */
     public function getName(){
         return $this->groupName;
     }
-    
+    /**
+     * Returns an array that contains all group privileges.
+     * @return array An array that contains an objects of type Privilige.
+     * @since 1.0
+     */
     public function privileges() {
         return $this->privilegesArr;
     }
-    
+    /**
+     * Adds new privilege to the array of group privileges.
+     * @param Privilege $pr An object of type Privilege. Note that 
+     * the privilege will be added only if there us no privilege in 
+     * the group which has the same ID.
+     * @return boolean The function will return TRUE if the privilege was 
+     * added.
+     * @since 1.0
+     */
     public function addPrivilage($pr) {
         if($pr instanceof Privilege){
             foreach ($this->privilegesArr as $prev){
                 if($prev->getID() == $pr->getID()){
-                    return;
+                    return FALSE;
                 }
             }
             $this->privilegesArr[] = $pr;
+            return TRUE;
         }
+        return FALSE;
     }
 }

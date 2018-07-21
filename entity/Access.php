@@ -23,40 +23,106 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
+if(!defined('ROOT_DIR')){
+    header("HTTP/1.1 403 Forbidden");
+    die(''
+        . '<!DOCTYPE html>'
+        . '<html>'
+        . '<head>'
+        . '<title>Forbidden</title>'
+        . '</head>'
+        . '<body>'
+        . '<h1>403 - Forbidden</h1>'
+        . '<hr>'
+        . '<p>'
+        . 'Direct access not allowed.'
+        . '</p>'
+        . '</body>'
+        . '</html>');
+}
 /**
- * Description of Access
+ * A class to manage user groups and privileges.
  *
  * @author Ibrahim
+ * @version 1.0
  */
 class Access {
+    /**
+     * An instance of the class.
+     * @var Access
+     * @since 1.0 
+     */
     private static $access;
+    /**
+     * An array which contains an objects of type UsersGroup.
+     * @var UsersGroup
+     * @since 1.0 
+     */
     private $userGroups;
-    public function __construct() {
+    /**
+     * Creates new instance.
+     * @since 1.0
+     */
+    private function __construct() {
         $this->userGroups = array();
-        $superAdminG = new UsersGroup();
-        $superAdminG->setID('SU_GROUP');
-        $this->userGroups[] = $superAdminG;
+        $this->_createGroup('SUPER_ADMIN');
+        $this->_createPrivilege('SUPER_ADMIN', 'UPDATE_USER_PERMISSIONS');
+        $this->_createPrivilege('SUPER_ADMIN', 'ADD_USER');
+        $this->_createPrivilege('SUPER_ADMIN', 'REMOVE_USER');
+        $this->_createPrivilege('SUPER_ADMIN', 'UPDATE_USER_STATUS');
+        $this->_createPrivilege('SUPER_ADMIN', 'ACTIVATE_USER');
+        $this->_createPrivilege('SUPER_ADMIN', 'UPDATE_USER_PASSWORD');
+        $this->_createPrivilege('SUPER_ADMIN', 'RESET_USER_PASSWORD');
+        $this->_createPrivilege('SUPER_ADMIN', 'UPDATE_USER_EMAIL');
+        $this->_createPrivilege('SUPER_ADMIN', 'UPDATE_USER_DISPLAY_NAME');
+        $this->_createPrivilege('SUPER_ADMIN', 'GET_USER_PROFILE');
+        
+        $this->_createPrivilege('SUPER_ADMIN', 'UPDATE_USER_REGISTRATION_STATUS');
+        $this->_createPrivilege('SUPER_ADMIN', 'UPDATE_DB');
+        $this->_createPrivilege('SUPER_ADMIN', 'UPDATE_SYS_CONFIG_STATUS');
+        $this->_createPrivilege('SUPER_ADMIN', 'UPDATE_SITE_INFO');
+        $this->_createPrivilege('SUPER_ADMIN', 'UPDATE_SMTP_ACCOUNT');
+        $this->_createPrivilege('SUPER_ADMIN', 'UPLOAD_FILE');
+        $this->_createPrivilege('SUPER_ADMIN', 'EDIT_UPLOADED_FILE');
+        $this->_createPrivilege('SUPER_ADMIN', 'REMOVE_UPLOADED_FILE');
     }
     /**
-     * 
+     * Returns a single instance of the class.
      * @return Access
+     * @since 1.0
      */
-    public static function get(){
+    private static function get(){
         if(self::$access != NULL){
             return self::$access;
         }
         self::$access = new Access();
         return self::$access;
     }
-    
+    /**
+     * Returns an array which contains all privileges or privileges 
+     * in a specific user group.
+     * @param string|NULL $groupId [Optional] The ID of the group which its 
+     * privileges will be returned. If NULL is given, all privileges will be 
+     * returned. 
+     * Default is NULL.
+     * @return array An array which contains an objects of type Privilege. If 
+     * the given group ID does not exist, the returned array will be empty.
+     * @since 1.0
+     */
     public static function privileges($groupId=null) {
         return Access::get()->_privileges($groupId);
     }
     /**
-     * 
-     * @param type $str
-     * @param User $user
+     * Adds privileges to a user given privileges string.
+     * @param string $str A string of privileges. The format of the string must 
+     * follow the following format: 'PRIVILEGE_1-0;PRIVILEGE_2-1;' where 
+     * 'PRIVILEGE_1' and 'PRIVILEGE_2' are names of privileges and the number 
+     * that comes after the dash is the status of the privilege. If 0, then the 
+     * user will not have the given privilege. If 1, the user will have the 
+     * privilege. In the given example, The user will have only 'PRIVILEGE_2'. Each 
+     * privilege must be separated from the other by a semicolon.
+     * @param User $user The user which the permissions will be added to
+     * @since 1.0
      */
     public static function resolvePriviliges($str,&$user) {
         if(strlen($str) > 0){
@@ -76,9 +142,17 @@ class Access {
         }
     }
     /**
-     * 
-     * @param User $user
-     * @return string
+     * Creates a string of permissions given a user.
+     * @param User $user The user which the permissions string 
+     * will be created from.
+     * @return string A string of privileges. The format of the string will 
+     * follow the following format: 'PRIVILEGE_1-0;PRIVILEGE_2-1;' where 
+     * 'PRIVILEGE_1' and 'PRIVILEGE_2' are names of privileges and the number 
+     * that comes after the dash is the status of the privilege. If 0, then the 
+     * user will not have the given privilege. If 1, the user will have the 
+     * privilege. In the given example, The user will have only 'PRIVILEGE_2'. Each 
+     * privilege will be separated from the other by a semicolon.
+     * @since 1.0
      */
     public static function createPermissionsStr($user){
         return Access::get()->_createPermissionsStr($user);
@@ -136,24 +210,48 @@ class Access {
             return $prArr;
         }
     }
-
-
-    public function addGroup($groupName) {
+    /**
+     * Adds new group with new ID.
+     * @param string $groupId The ID of the group. If a group with the given 
+     * ID already exist, The function will not add it.
+     * @return boolean The function will return TRUE if a new group with the 
+     * given ID is created. FALSE if not.
+     * @since 1.0
+     */
+    public function addGroup($groupId) {
         foreach ($this->userGroups as $group){
-            if($groupName == $group->getName()){
-                return;
+            if($groupId == $group->getID()){
+                return FALSE;
             }
             $g = new UsersGroup();
-            $g->setName($groupName);
+            $g->setID($groupId);
             $this->userGroups[] = $g;
+            return TRUE;
         }
+        return FALSE;
     }
+    /**
+     * Returns an array which contains all user groups.
+     * @return array An array that contains an objects of type UsersGroup.
+     * @since 1.0
+     */
     public static function groups(){
         return Access::get()->_groups();
     }
+    /**
+     * 
+     * @return type
+     * @since 1.0
+     */
     private function _groups(){
         return $this->userGroups;
     }
+    /**
+     * 
+     * @param string $groupId
+     * @return UsersGroup|NULL
+     * @since 1.0
+     */
     private function _getGroup($groupId) {
         foreach ($this->userGroups as $g){
             if($g->getID() == $groupId){
@@ -162,11 +260,22 @@ class Access {
         }
         return NULL;
     }
-    
+    /**
+     * Returns a privilege object given its ID.
+     * @param string $id The ID of the privilege.
+     * @return Privilege|NULL If a privilege with the given ID was found in 
+     * any user group, It will be returned. If not, the function will return 
+     * NULL.
+     * @since 1.0
+     */
     public static function getPrivilege($id){
         return Access::get()->_getPrivilege($id);
     }
-
+    /**
+     * 
+     * @param type $privId
+     * @return type
+     */
     private function _getPrivilege($privId) {
         foreach ($this->userGroups as $g){
             foreach ($g->privileges() as $p){
@@ -177,12 +286,18 @@ class Access {
         }
         return NULL;
     }
-    
+    /**
+     * Checks if a privilege does exist or not given its ID.
+     * @param string $id The ID of the privilege.
+     * @return boolean The function will return TRUE if a privilege 
+     * with the given ID was found. FALSE if not.
+     * @since 1.0
+     */
     public static function hasPrivilege($id) {
         return Access::get()->_hasPrivilege($id);
     }
     
-    public function _hasPrivilege($privilegId) {
+    private function _hasPrivilege($privilegId) {
         foreach ($this->userGroups as $g){
             foreach ($g->privileges() as $p){
                 if($p->getID() == $privilegId){
@@ -192,15 +307,32 @@ class Access {
         }
         return FALSE;
     }
-    
+    /**
+     * Checks if a users group does exist or not given its ID.
+     * @param string $groupId The ID of the group.
+     * @return boolean The function will return TRUE if a users group 
+     * with the given ID was found. FALSE if not.
+     * @since 1.0
+     */
     public static function hasGroup($groupId){
         return Access::get()->_hasGroup($groupId);
     }
-    
+    /**
+     * Returns a UsersGroup object given its ID.
+     * @param string $groupId The ID of the users group.
+     * @return UsersGroup|NULL If a users group with the given ID was found, 
+     * It will be returned. If not, the function will return NULL.
+     * @since 1.0
+     */
     public static function getGroup($groupId){
         return Access::get()->_getGroup($groupId);
     }
-    
+    /**
+     * 
+     * @param string $groupId
+     * @return boolean
+     * @since 1.0
+     */
     private function _hasGroup($groupId){
         foreach ($this->userGroups as $group){
             if($groupId == $group->getID()){
@@ -209,32 +341,67 @@ class Access {
         }
         return FALSE;
     }
-    
+    /**
+     * Creates new users group using specific ID.
+     * @param string $groupId The ID of the group. The ID must not contain 
+     * any of the following characters, ';','-' or a space.
+     * @since 1.0
+     */
     public static function newGroup($groupId) {
         Access::get()->_createGroup($groupId);
     }
     
     private function _createGroup($groupId){
-        foreach ($this->userGroups as $g){
-            if($g->getID() == $groupId){
-                return;
+        if($this->validateId($groupId)){
+            foreach ($this->userGroups as $g){
+                if($g->getID() == $groupId){
+                    return;
+                }
             }
+            $group = new UsersGroup();
+            $group->setID($groupId);
+            $this->userGroups[] = $group;
         }
-        $group = new UsersGroup();
-        $group->setID($groupId);
-        $this->userGroups[] = $group;
     }
     
+    private function validateId($id){
+        $len = strlen($id);
+        if($len > 0){
+            $valid = TRUE;
+            for($x = 0 ; $x < $len ; $x++){
+                $valid = $valid && $id[$x] != ';' && $id[$x] != ' ' && $id[$x] != '-';
+            }
+            return $valid;
+        }
+        return FALSE;
+    }
+    /**
+     * Creates new privilege in a specific group given its ID.
+     * @param string $groupId The ID of the group that the privilege will be 
+     * added to. It must be a group in the groups array of the access class.
+     * @param string $privilegeId The ID of the privilege. The ID must not contain 
+     * any of the following characters, ';','-' or a space.
+     * @since 1.0
+     */
     public static function newPrivilege($groupId,$privilegeId){
         Access::get()->_createPrivilege($groupId, $privilegeId);
     }
-
-        private function _createPrivilege($groupId,$privilegeId){
-        if($this->_hasGroup($groupId)){
-            if(!$this->_hasPrivilege($privilegeId)){
+    /**
+     * 
+     * @param type $groupId
+     * @param type $privilegeId
+     * @since 1.0
+     */
+    private function _createPrivilege($groupId,$privilegeId){
+        if($this->validateId($privilegeId)){
+            if($this->_hasGroup($groupId)){
+                $g = $this->_getGroup($groupId);
                 $p = new Privilege();
                 $p->setID($privilegeId);
-                $this->_getGroup($groupId)->addPrivilage($p);
+                if(!$g->hasPrivilege($p)){
+                    $this->_getGroup($groupId)->addPrivilage($p);
+                    $this->getGroup('SUPER_ADMIN')->addPrivilage($p);
+                }
             }
         }
     }

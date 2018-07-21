@@ -43,9 +43,15 @@ define('ACCESS_LEVEL_5',5);
 /**
  * A class that represents a system user.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.6
+ * @version 1.7
  */
 class User implements JsonI{
+    /**
+     * An array which contains user permissions.
+     * @var array
+     * @since 1.7 
+     */
+    private $userPrivileges;
     /**
      * A set of possible user status.
      * @var array An array of user status.
@@ -158,6 +164,27 @@ class User implements JsonI{
         $this->resetPassCounts = 0;
         $this->id = 0;
         $this->setAccessLevel(ACCESS_LEVEL_2);
+        $this->userPrivileges = array();
+    }
+    
+    public function addPrivilege($privilegeId){
+        $p = Access::getPrivilege($privilegeId);
+        if($p != NULL){
+            foreach ($this->userPrivileges as $prev){
+                if($prev->getID() == $p->getID()){
+                    return;
+                }
+            }
+            $this->userPrivileges[] = $p;
+        }
+    }
+    public function hasPrivilege($privilegeId) {
+        foreach ($this->userPrivileges as $p){
+            if($p->getID() == $privilegeId){
+                return TRUE;
+            }
+        }
+        return FALSE;
     }
     /**
      * Returns the value of the property <b>$lastLogin</b>.

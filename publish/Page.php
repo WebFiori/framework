@@ -421,6 +421,14 @@ class Page{
         }
     }
     /**
+     * Returns the document that is linked with the page.
+     * @return HTMLDoc The document that is linked with the page.
+     * @since 1.9
+     */
+    public static function document() {
+        return Page::get()->getDocument();
+    }
+    /**
      * Returns the document that is associated with the page.
      * @return HTMLDoc An object of type <b>HTMLDoc</b>.
      * @throws Exception If page theme is not loaded.
@@ -494,21 +502,12 @@ class Page{
     public function getDescription(){
         return $this->description;
     }
-    /**
-     * Returns the language.
-     * @return string|NULL Two digit language code. In case language is not set, the 
-     * function will return <b>NULL</b>
-     * @since 1.0
-     */
-    public function getLang(){
-        return $this->contentLang;
-    }
    /**
     * Load the translation file based on the language code. The function uses 
     * two checks to load the translation. If the page language is set using 
-    * the function <b>Page::setLang()</b>, then the language that will be loaded 
-    * will be based on the value returned by the function <b>Page::getLang()</b>.
-    * @throws Exception in case the language is not set, or <b>ROOT_DIR</b> is not defined.
+    * the function Page::setLang(), then the language that will be loaded 
+    * will be based on the value returned by the function Page::getLang(). If 
+    * the language is not set, The function will throw an exception.
     * @since 1.0
     */
     public function usingLanguage(){
@@ -522,6 +521,32 @@ class Page{
         }
     }
     /**
+     * Sets or gets language code of the page.
+     * @param string $new A two digit language code such as AR or EN. 
+     * An exception will be thrown if the given language is not supported.
+     * @return string | NULL Two digit language code. In case language is not set, the 
+     * function will return NULL
+     * @see Page::setLang()
+     * @throws Exception
+     * @since 1.9
+     */
+    public static function lang($new=null){
+        $page = Page::get();
+        if($new != NULL && strlen($new) == 2){
+            $page->setLang($new);
+        }
+        return $page->getLang();
+    }
+    /**
+     * Returns the language.
+     * @return string|NULL Two digit language code. In case language is not set, the 
+     * function will return NULL
+     * @since 1.0
+     */
+    public function getLang(){
+        return $this->contentLang;
+    }
+    /**
      * Sets the display language of the page.
      * @param string $lang a two digit language code such as AR or EN.
      * @return boolean True if the language was not set and its the first time to set. 
@@ -530,7 +555,7 @@ class Page{
      * @since 1.0
     */
     public function setLang($lang='EN'){
-        $langU = strtoupper($lang);
+        $langU = strtoupper(trim($lang));
         if(in_array($langU, SessionManager::SUPPORTED_LANGS)){
             $this->contentLang = $langU;
             if($this->document != NULL){
@@ -540,6 +565,28 @@ class Page{
         else{
             throw new Exception('Unknown language code: '.$lang);
         }
+    }
+    /**
+     * Display the page in the web browser.
+     * @since 1.9
+     */
+    public static function render() {
+        echo Page::get()->getDocument()->toHTML();
+    }
+    /**
+     * Loads and returns translation based on page language code.
+     * @return Language | NULL An object of type Language is returned 
+     * if the language is loaded. Other than that, the function will return 
+     * NULL.
+     * @since 1.9
+     */
+    public static function translation(){
+        $page = Page::get();
+        if($page->getLang() != NULL){
+            $page->usingLanguage();
+            return $page->getLanguage();
+        }
+        return NULL;
     }
     /**
      * Returns the language variables based on loaded translation.
@@ -555,6 +602,23 @@ class Page{
             return $loadedLangs[$this->getLang()];
         }
         return NULL;
+    }
+    /**
+     * Loads or returns page theme.
+     * @param string [Optional] $name The name of the theme which will be 
+     * loaded. If NULL is given, nothing will be loaded.
+     * @return Theme | NULL If a theme is already loaded, the function will 
+     * return the loaded theme contained in an object of type Theme. If no 
+     * theme is loaded, the function will return NULL.
+     * @see Page::usingTheme()
+     * @since 1.9
+     */
+    public static function theme($name=null){
+        $page = Page::get();
+        if($name != NULL && strlen($name) != 0){
+            $page->usingTheme($name);
+        }
+        return $page->getTheme();
     }
     /**
      * Loads a theme given its name.
@@ -599,6 +663,16 @@ class Page{
         $this->theme->invokeAfterLoaded();
     }
     /**
+     * Returns the directory at which CSS files of loaded theme exists.
+     * @return string The directory at which CSS files of the theme exists 
+     * (e.g. 'publish/my-theme/css' ). 
+     * If the theme is not loaded, the function will return empty string.
+     * @since 1.9
+     */
+    public static function cssDir(){
+        return Page::get()->getThemeCSSDir();
+    }
+    /**
      * Returns the directory at which CSS files of the theme exists.
      * @return string The directory at which CSS files of the theme exists 
      * (e.g. 'publish/my-theme/css' ). 
@@ -613,6 +687,16 @@ class Page{
         return '';
     }
     /**
+     * Returns the directory at which image files of loaded theme exists.
+     * @return string The directory at which image files of the theme exists 
+     * (e.g. 'publish/my-theme/images' ). 
+     * If the theme is not loaded, the function will return empty string.
+     * @since 1.9
+     */
+    public static function imagesDir(){
+        return Page::get()->getThemeImagesDir();
+    }
+    /**
      * Returns the directory at which image files of the theme exists.
      * @return string The directory at which image files of the theme exists 
      * (e.g. 'publish/my-theme/images' ). 
@@ -625,6 +709,16 @@ class Page{
             return Theme::THEMES_DIR.'/'.$theme->getDirectoryName().'/'.$theme->getImagesDirName();
         }
         return '';
+    }
+    /**
+     * Returns the directory at which JavaScript files of the theme exists.
+     * @return string The directory at which JavaScript files of the theme exists 
+     * (e.g. 'publish/my-theme/js' ). 
+     * If the theme is not loaded, the function will return empty string.
+     * @since 1.9
+     */
+    public static function jsDir(){
+        return Page::get()->getThemeJSDir();
     }
     /**
      * Returns the directory at which JavaScript files of the theme exists.
@@ -648,6 +742,21 @@ class Page{
      */
     public function getTheme() {
         return $this->theme;
+    }
+    /**
+     * Sets or gets page writing direction.
+     * @param string $new 'ltr' or 'rtl'.
+     * @return string | NULL If the writing direction was set, 
+     * the function will return it. If not, the function will return NULL.
+     * @since 1.9
+     */
+    public function dir($new=null) {
+        $page = Page::get();
+        $lNew = strtolower($new);
+        if($lNew == 'ltr' || $lNew == 'rtl'){
+            $page->setWritingDir($new);
+        }
+        return $page->getWritingDir();
     }
     /**
      * Returns the writing direction of the page.

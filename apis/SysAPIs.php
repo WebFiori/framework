@@ -272,6 +272,9 @@ class SysAPIs extends API{
                 return TRUE;
             }
         }
+        else if($a == 'get-main-session'){
+            return SystemFunctions::get()->hasPrivilege('GET_USER_SESSION');
+        }
         else if($a == 'create-first-account'){
             if(class_exists('Config')){
                 return !Config::get()->isConfig();

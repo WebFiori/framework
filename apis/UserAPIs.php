@@ -63,9 +63,6 @@ class UserAPIs extends API{
         $a1->addParameter(new RequestParameter('email', 'email'));
         $a1->addParameter(new RequestParameter('password', 'string'));
         $a1->addParameter(new RequestParameter('conf-password', 'string'));
-        $a1->addParameter(new RequestParameter('access-level', 'integer'));
-        $a1->getParameterByName('access-level')->setMinVal(0);
-        $a1->getParameterByName('access-level')->setMaxVal(10);
         $a1->addParameter(new RequestParameter('display-name', 'string', TRUE));
         $this->addAction($a1);
         
@@ -130,26 +127,7 @@ class UserAPIs extends API{
         
         $this->setVersion('1.0.1');
         
-        $a11 = new APIAction('get-privileges');
-        $a11->addRequestMethod('get');
-        $a11->addParameter(new RequestParameter('group-id', 'string',TRUE));
-        $a11->getParameterByName('group-id')->setDefault('ALL');
-        $this->addAction($a11,TRUE);
         
-        $a12 = new APIAction('get-user-privileges');
-        $a12->addParameter(new RequestParameter('user-id', 'string'));
-        $a12->addRequestMethod('get');
-        $this->addAction($a12,TRUE);
-        
-        $a13 = new APIAction('update-user-privileges');
-        $a13->addRequestMethod('post');
-        $a13->addParameter(new RequestParameter('user-id', 'string'));
-        $a13->addParameter(new RequestParameter('privileges-string', 'string'));
-        $this->addAction($a13, TRUE);
-        
-        $a14 = new APIAction('get-privileges-groups');
-        $a14->addRequestMethod('get');
-        $this->addAction($a14, TRUE);
     }
     /**
      * Called by the routing function to perform the 'update-staus' action
@@ -369,7 +347,6 @@ class UserAPIs extends API{
             return;
         }
         $user = new User($inputs['username'], hash('sha256',$inputs['password']), $inputs['email']);
-        $user->setAccessLevel($inputs['access-level']);
         if(isset($inputs['display-name']) && strlen($inputs['display-name']) != 0){
             $user->setDisplayName($inputs['display-name']);
         }
@@ -385,6 +362,9 @@ class UserAPIs extends API{
         }
         else if($r == UserFunctions::USER_ALREAY_REG){
             $this->sendResponse('User Already Registred', TRUE, 404);
+        }
+        else if($r == UserFunctions::REG_CLOSED){
+            $this->sendResponse($r,TRUE,401,'"details":"The settings of the system does not allow user registration."');
         }
         else if($r == UserFunctions::NOT_AUTH){
             $this->notAuth();

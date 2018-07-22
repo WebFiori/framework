@@ -45,5 +45,6 @@ class APIRoutes {
         Router::api('/PasswordAPIs/{action}', '/PasswordAPIs.php');
         Router::api('/UserAPIs/{action}', '/UserAPIs.php');
         Router::api('/WebsiteAPIs/{action}', '/WebsiteAPIs.php');
+        Router::api('/AccessAPIs/{action}', '/AccessControlAPIs.php');
     }
 }

@@ -263,7 +263,7 @@ class MailFunctions extends Functions{
                     . '<li><b>Email Address:</b> '.$adminAcc->getEmail().'</li>'
                     . '</ul>'
                     . '<p>You can start using the system and manage it by logging in at '
-                    . '<a target="_blank" href="'.SiteConfig::get()->getBaseURL().'/pages/login">'.SiteConfig::get()->getBaseURL().'/pages/login</a>.</p>';
+                    . '<a target="_blank" href="'.SiteConfig::get()->getBaseURL().'login">'.SiteConfig::get()->getBaseURL().'login</a>.</p>';
             $msg .= '<p>Thank you for your time.</p>';
             $msg .= '<p><b>'.$noReplayAcc->getName().'</b></p>';
             $mailer->write($msg,TRUE);
@@ -280,10 +280,10 @@ class MailFunctions extends Functions{
             $mailer = $this->getSocketMailer($noReplayAcc);
             $mailer->addReceiver($user->getUserName(), $user->getEmail());
             $mailer->setSubject('Activate Your Account');
-            $msg = '<p>Dear Mr. '.$user->getUserName().', Welcome to <b>'.SiteConfig::get()->getWebsiteName().'</b>.</p>';
+            $msg = '<p>Dear Mr. '.$user->getUserName().', Welcome to <b>'.SiteConfig::get()->getWebsiteNames()['EN'].'</b>.</p>';
             $msg .= '<p>A new user account has been created for you. In order to start using '
                     . 'the system, you must activate your account by loging in '
-                    . '<a href="'.SiteConfig::get()->getBaseURL().'pages/activate-account?activation-token='.$user->getActivationTok().'" _target="_blank"><b>Here</b></a>.</p>'
+                    . '<a href="'.SiteConfig::get()->getBaseURL().'activate-account?activation-token='.$user->getActivationTok().'" _target="_blank"><b>Here</b></a>.</p>'
                     . '<ul>'
                     . '<li><b>Username:</b> '.$user->getUserName().'</li>'
                     . '<li><b>Display name:</b> '.$user->getDisplayName().'</li>'

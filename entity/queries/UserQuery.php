@@ -41,9 +41,6 @@ class UserQuery extends MySQLQuery{
         //status column
         $this->structure->addColumn('status', new Column('status', 'varchar', 1));
         
-        //access level column
-        $this->structure->addColumn('acc-level', new Column('acc_level', 'varchar', 1));
-        
         //registration date column
         $this->structure->addColumn('reg-date', new Column('reg_date', 'timestamp'));
         $this->getCol('reg-date')->setDefault('');
@@ -102,26 +99,6 @@ class UserQuery extends MySQLQuery{
      */
     public function removeUser($userId) {
         $this->delete($userId);
-    }
-    /**
-     * Constructs a query that can be used to get users by 
-     * access level.
-     * @param string $accLvl Access level of the user.
-     * @since 1.5
-     */
-    public function getUsersByAccessLevel($accLvl) {
-        $this->selectByColVal($this->getColName('acc-level'), $accLvl);
-    }
-    /**
-     * Constructs a query that can be used to update 
-     * the access level of a user given his ID.
-     * @param string $new The new access level.
-     * @param string $id The ID of the user.
-     * @since 1.3
-     */
-    public function updateAccessLevel($new, $id){
-        $arr = array($this->getColName('acc-level')=>$new);
-        $this->update($arr, $id);
     }
     /**
      * Constructs a query that can be used to update 
@@ -193,7 +170,6 @@ class UserQuery extends MySQLQuery{
                 $this->getColName('password')=>'\''.$user->getPassword().'\'',
                 $this->getColName('email')=>'\''.$user->getEmail().'\'',
                 $this->getColName('status')=>'\''.$user->getStatusCode().'\'',
-                $this->getColName('acc-level')=>$user->getAccessLevel(),
                 $this->getColName('disp-name')=>'\''.$user->getDisplayName().'\'',
                 $this->getColName('last-login')=>'\''. date('Y-m-d h:i:s').'\'',
                 $this->getColName('privileges')=>'\''.Access::createPermissionsStr($user).'\''

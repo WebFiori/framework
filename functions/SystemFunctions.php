@@ -227,7 +227,7 @@ class SystemFunctions extends Functions{
      * @since 1.3
      */
     public function configured($isConfig=true){
-        if($this->getAccessLevel() == 0){
+        if($this->hasPrivilege('SYS_STATUS_UPDATE')){
             $confVars = $this->getConfigVars();
             $confVars['is-config'] = $isConfig === TRUE ? 'TRUE' : 'FALSE';
             $this->writeConfig($confVars);
@@ -244,7 +244,19 @@ class SystemFunctions extends Functions{
         return MySQLQuery::QUERY_ERR;
     }
     
-    
+    public function updateUserRegStatus($newStatusCode) {
+        if($this->hasPrivilege('UPDATE_USER_REG_STATUS')){
+            $copy = self::USER_REG_STATS;
+            if(isset($copy[$newStatusCode])){
+                $cfg = $this->getConfigVars();
+                $cfg['user-reg-status'] = $newStatusCode;
+                $this->writeConfig($cfg);
+                return TRUE;
+            }
+            return FALSE;
+        }
+        return self::NOT_AUTH;
+    }
     /**
      * Returns an associative array that contains system configuration 
      * info.

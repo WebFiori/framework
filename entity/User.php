@@ -17,30 +17,6 @@ if(!defined('ROOT_DIR')){
         . '</html>');
 }
 /**
- * A user with this level of access have control over every thing (An Admin).
- */
-define('ACCESS_LEVEL_0',0);
-/**
- * You define what this user can do.
- */
-define('ACCESS_LEVEL_1',1);
-/**
- * You define what this user can do.
- */
-define('ACCESS_LEVEL_2',2);
-/**
- * You define what this user can do.
- */
-define('ACCESS_LEVEL_3',3);
-/**
- * You define what this user can do.
- */
-define('ACCESS_LEVEL_4',4);
-/**
- * You define what this user can do.
- */
-define('ACCESS_LEVEL_5',5);
-/**
  * A class that represents a system user.
  * @author Ibrahim <ibinshikh@hotmail.com>
  * @version 1.7
@@ -129,12 +105,6 @@ class User implements JsonI{
      */
     private $id;
     /**
-     * Access level of the user.
-     * @var int 
-     * @since 1.0
-     */
-    private $accessLevel;
-    /**
      * Access token of the user.
      * @var string 
      * @since 1.0
@@ -170,7 +140,6 @@ class User implements JsonI{
         $this->userName = $username;
         $this->resetPassCounts = 0;
         $this->id = 0;
-        $this->setAccessLevel(ACCESS_LEVEL_2);
         $this->userPrivileges = array();
     }
     /**
@@ -418,14 +387,6 @@ class User implements JsonI{
         return $this->userTok;
     }
     /**
-     * Returns the value of the property <b>$accessLevel</b>
-     * @return int 0 or 1 or 2 etc...
-     * @since 1.0
-     */
-    public function getAccessLevel(){
-        return $this->accessLevel;
-    }
-    /**
      * Returns status code.
      * @return string|NULL The status code of the user (such as 'A'). 
      * If user status is not set, the function will return <b>NULL</b>.
@@ -443,13 +404,13 @@ class User implements JsonI{
     public function toJSON(){
         $json = new JsonX();
         $json->add('user-id', $this->getID());
-        $json->add('access-level', $this->getAccessLevel());
         $json->add('email', $this->getEmail());
         $json->add('status', $this->getStatus());
         $json->add('status-code', $this->getStatusCode());
         $json->add('reg-date', $this->getRegDate());
         $json->add('last-login', $this->getLastLogin());
         $json->add('display-name', $this->getDisplayName());
+        $json->add('username', $this->getUserName());
         $json->add('token', $this->getToken());
         $json->add('reset-count', $this->getResetCount());
         $json->add('reset-time', $this->getResetRequestTime());
@@ -483,25 +444,6 @@ class User implements JsonI{
             return TRUE;
         }
         return FALSE;
-    }
-    /**
-     * Sets the value of the property <b>accessLevel</b>
-     * @param int $acc 0, 1, 2, 3, 4 or 5. If the given value does not equal to any one 
-     * of the three, 5 will be used.
-     * @since 1.0
-     */
-    public function setAccessLevel($acc){
-        if($acc == ACCESS_LEVEL_0 || 
-                $acc == ACCESS_LEVEL_1 || 
-                $acc == ACCESS_LEVEL_2 || 
-                $acc == ACCESS_LEVEL_3 || 
-                $acc == ACCESS_LEVEL_4 || 
-                $acc == ACCESS_LEVEL_5){
-            $this->accessLevel = $acc;
-        }
-        else{
-            $this->accessLevel = 5;
-        }
     }
     /**
      * Sets the ID of the user.

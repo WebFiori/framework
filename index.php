@@ -35,7 +35,7 @@ require_once ROOT_DIR.'/entity/AutoLoader.php';
 AutoLoader::get();
 Util::displayErrors();
 $GLOBALS['SYS_STATUS'] = Util::checkSystemStatus();
-if($GLOBALS['SYS_STATUS'] === Util::MISSING_CONF_FILE || $GLOBALS['SYS_STATUS'] === Util::MISSING_SITE_CONF_FILE){
+if($GLOBALS['SYS_STATUS'] == Util::MISSING_CONF_FILE || $GLOBALS['SYS_STATUS'] == Util::MISSING_SITE_CONF_FILE){
     SystemFunctions::get()->createConfigFile();
     WebsiteFunctions::get()->createSiteConfigFile();
     MailFunctions::get()->createEmailConfigFile();
@@ -44,7 +44,7 @@ if($GLOBALS['SYS_STATUS'] === Util::MISSING_CONF_FILE || $GLOBALS['SYS_STATUS'] 
 createRoutes();
 //at this stage, only check for configuration files
 //other errors checked as needed later.
-if($GLOBALS['SYS_STATUS'] === Util::NEED_CONF){
+if($GLOBALS['SYS_STATUS'] !== TRUE && $GLOBALS['SYS_STATUS'] == Util::NEED_CONF){
     $requestedURI = Util::getRequestedURL();
     $b = SiteConfig::get()->getBaseURL();
     if($requestedURI == $b.'s/welcome' ||
@@ -56,6 +56,7 @@ if($GLOBALS['SYS_STATUS'] === Util::NEED_CONF){
         Router::route($requestedURI);
     }
     else{
+        //Util::print_r($GLOBALS);
         Router::route(SiteConfig::get()->getBaseURL().Util::NEED_CONF);
     }
 }

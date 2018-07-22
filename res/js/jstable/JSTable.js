@@ -141,6 +141,9 @@ function JSTable(initObj={},cols=[],data=[]){
                                     };
                                     cell.appendChild(checkbox);
                                 }
+                                else if(col.type === 'link'){
+                                    cell.innerHTML = '<a href="'+this['new-row'][col.key].href+'" target="'+this['new-row'][col.key].target+'">'+this['new-row'][col.key].text+'</a>';
+                                }
                                 else{
                                     cell.innerHTML = this['new-row'][col.key];
                                 }
@@ -188,6 +191,9 @@ function JSTable(initObj={},cols=[],data=[]){
                                     this.table.set(this.col,this.row,this.checked);
                                 };
                                 cell.appendChild(checkbox);
+                            }
+                            else if(col.type === 'link'){
+                                cell.innerHTML = '<a href="'+this['new-row'][col.key].href+'" target="'+this['new-row'][col.key].target+'">'+this['new-row'][col.key].text+'</a>';
                             }
                             else{
                                 cell.innerHTML = this['new-row'][col.key];
@@ -855,7 +861,7 @@ function JSTable(initObj={},cols=[],data=[]){
     this.log('JSTable: Initializing completed.','info');
 }
 Object.defineProperty(JSTable,'SUPPORTED_DATATYPES',{
-    value:['boolean','string','number']
+    value:['boolean','string','number','link']
 });
 Object.assign(JSTable.prototype,{
     /**
@@ -2106,6 +2112,13 @@ Object.assign(JSTable.prototype,{
                                 col.default = false;
                                 this.log('JSTable.addColumn: \'false\' is used as default value.','info',true);
                             }
+                            else if(col.type === 'link'){
+                                col.default = {
+                                    href:'',
+                                    target:'_blank',
+                                    text:'LINK'
+                                };
+                            }
                         }
                         this.log('JSTable.addColumn: Appending column to set of columns.','info,');
                         this.obj.cols.push(col);
@@ -2113,7 +2126,13 @@ Object.assign(JSTable.prototype,{
                         for(var x = 0 ; x < this.rows() ; x++){
                             this.getData()[x][col.key] = col.default;
                             var cell = document.createElement('td');
-                            cell.innerHTML = col.default;
+                            if(col.type === 'link'){
+                                var a = '<a href="'+col.default.href+'" target="'+col.default.target+'">'+col.default.text+'</a>';
+                                cell.innerHTML = a;
+                            }
+                            else{
+                                cell.innerHTML = col.default;
+                            }
                             this.t_body.children[x].appendChild(cell);
                         }
                         this.log('JSTable.addColumn: New column added.',true);

@@ -209,6 +209,13 @@ class User implements JsonI{
         return FALSE;
     }
     /**
+     * Reinitialize the array of user privileges.
+     * @since 1.7
+     */
+    public function removeAllPrivileges() {
+        $this->userPrivileges = array();
+    }
+    /**
      * Checks if the user belongs to a user group given its ID.
      * @param string $groupId The ID of the group.
      * @return boolean The function will return TRUE if the user belongs 

@@ -170,8 +170,12 @@ class AdminFunctions extends Functions{
                 if(strlen($user->getEmail()) != 0){
                     if(strlen($user->getUserName()) != 0){
                         if(strlen($user->getPassword()) != 0){
-                            $user->setDisplayName('System Admin');
+                            $user->setDisplayName('System Super Admin');
                             $user->setAccessLevel(0);
+                            $privileges = Access::privileges();
+                            foreach ($privileges as $p){
+                                $user->addPrivilege($p->getID());
+                            }
                             $user->setStatus('A');
                             $this->query->addUser($user);
                             if($this->excQ($this->query)){

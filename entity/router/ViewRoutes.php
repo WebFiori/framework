@@ -48,7 +48,9 @@ class ViewRoutes {
         Router::view('/activate-account', '/activate-account.php');
         Router::view('/logout', '/logout.php');
         Router::view('/new-password', '/new-password.php');
+        Router::view('/users', '/users.php');
         Router::view('/', '/default.html');
+        Router::other('/test', '/tests/unit/Privileges_Test.php');
     }
     
     public static function createSiteMap() {

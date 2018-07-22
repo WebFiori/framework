@@ -49,7 +49,22 @@ Page::document()->getHeadNode()->addJs('res/js/jstable/JSTable.js');
 $users = UserFunctions::get()->getUsers();
 $jsonx = new JsonX();
 if(gettype($users) == 'array'){
-    $jsonx->addArray('users', $users, FALSE);
+    $usersArrClean = array();
+    foreach($users as $user){
+        $userJ = new JsonX();
+        $userJ->add('user-id', $user->getID());
+        $userJ->add('email', $user->getEmail());
+        $userJ->add('display-name', $user->getDisplayName());
+        $userJ->add('reg-date', $user->getRegDate());
+        $userJ->add('last-login', $user->getLastLogin());
+        $linkJ = new JsonX();
+        $linkJ->add('href', SiteConfig::get()->getBaseURL().'user/'.$user->getUserName());
+        $linkJ->add('text', $user->getUserName());
+        $linkJ->add('target', '_blank');
+        $userJ->add('username', $linkJ);
+        $usersArrClean[] = $userJ;
+    }
+    $jsonx->add('users', $usersArrClean);
 }
 else{
     $jsonx->add('err', $users);
@@ -65,12 +80,11 @@ $jsCode->addCode('window.onload = function(){'
         . '"parent-html-id":"main-content-area",'
         . 'cols:['
         . '{title:"User ID",key:"user-id"},'
-        . '{title:"Username",key:"username"},'
+        . '{title:"Username",type:"",key:"username",type:"link"},'
         . '{title:"Email",key:"email"},'
         . '{title:"Display Name",key:"display-name"},'
         . '{title:"Registration Date",key:"reg-date"},'
         . '{title:"Last Login",key:"last-login"},'
-        . '{title:"Status",key:"status"}'
         . '],data:window.users.users}'
         . ');'
         . '};');

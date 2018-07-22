@@ -126,6 +126,20 @@ class SysAPIs extends API{
         $a13->addRequestMethod('get');
         $a13->addParameter(new RequestParameter('language-code', 'string'));
         $this->addAction($a13, TRUE);
+        
+        $this->setVersion('1.1.3');
+        $a14 = new APIAction('update-user-reg-status');
+        $a14->addRequestMethod('post');
+        $a14->addParameter(new RequestParameter('status-code', 'string'));
+        $a14->getParameterByName('status-code')->setCustomFilterFunction(function($val){
+            $value = $val['basic-filter-result'];
+            $exist = array_key_exists($value, SystemFunctions::USER_REG_STATS);
+            if($exist === TRUE){
+                return $value;
+            }
+            return FALSE;
+        }, TRUE);
+        $this->addAction($a14, TRUE);
     } 
     
     public function processRequest(){
@@ -134,6 +148,10 @@ class SysAPIs extends API{
             $json = new JsonX();
             $json->add('system-info', SystemFunctions::get()->getConfigVars());
             $this->send('application/json', $json);
+        }
+        else if($action == 'update-user-reg-status'){
+            SystemFunctions::get()->updateUserRegStatus($this->getInputs()['status-code']);
+            $this->sendResponse('Updated.');
         }
         else if($action == 'update-notifications-email'){
             $this->actionNotImpl();
@@ -258,11 +276,10 @@ class SysAPIs extends API{
     
     public function isAuthorized() {
         $a = $this->getAction();
-        if($a == 'update-database-attributes'|| 'update-send-email-account'){
+        if($a == 'update-database-attributes'|| $a == 'update-send-email-account'){
             if(class_exists('Config')){
                 if(class_exists('SiteConfig')){
-                    return !Config::get()->isConfig() || 
-                    SystemFunctions::get()->getAccessLevel() == 0;
+                    return !Config::get()->isConfig();
                 }
                 else{
                     return TRUE;
@@ -271,6 +288,9 @@ class SysAPIs extends API{
             else{
                 return TRUE;
             }
+        }
+        else if($a == 'update-user-reg-status'){
+            return SystemFunctions::get()->hasPrivilege('UPDATE_USER_REG_STATUS');
         }
         else if($a == 'get-main-session'){
             return SystemFunctions::get()->hasPrivilege('GET_USER_SESSION');

@@ -138,16 +138,6 @@ class AdminFunctions extends Functions{
         return UserFunctions::NO_SUCH_USER;
     }
     /**
-     * Checks if the system has a super admin account or not.
-     * @return boolean <b>TRUE</b> is returned if the system has 
-     * at least one super admin account. A super addmin account is a user 
-     * with access level = 0.
-     * @since 1.0
-     */
-    public function hasAdminAccount(){
-        return count($this->getSuperAdminAccounts()) !== 0;
-    }
-    /**
      * Creates a super admin account.
      * @param User $user An object of type <b>User</b>. The user will be added 
      * as a super admin (access level = 0).
@@ -162,32 +152,22 @@ class AdminFunctions extends Functions{
      */
     private function createSuperAdminAccount($user){
         if($user instanceof User){
-            $users = $this->getSuperAdminAccounts();
-            if(gettype($users) == 'array'){
-                foreach ($users as $Tuser){
-                    $this->removeAccount($Tuser->getID());
-                }
-                if(strlen($user->getEmail()) != 0){
-                    if(strlen($user->getUserName()) != 0){
-                        if(strlen($user->getPassword()) != 0){
-                            $user->setDisplayName('System Super Admin');
-                            $user->setAccessLevel(0);
-                            $privileges = Access::privileges();
-                            foreach ($privileges as $p){
-                                $user->addPrivilege($p->getID());
-                            }
-                            $user->setStatus('A');
-                            $this->query->addUser($user);
-                            if($this->excQ($this->query)){
-                                MailFunctions::get()->sendFirstMail($user);
-                                return TRUE;
-                            }
-                            else{
-                                return MySQLQuery::QUERY_ERR;
-                            }
+            if(strlen($user->getEmail()) != 0){
+                if(strlen($user->getUserName()) != 0){
+                    if(strlen($user->getPassword()) != 0){
+                        $user->setDisplayName('System Super Admin');
+                        $privileges = Access::privileges();
+                        foreach ($privileges as $p){
+                            $user->addPrivilege($p->getID());
                         }
-                        else {
-                            return Functions::EMPTY_STRING;
+                        $user->setStatus('A');
+                        $this->query->addUser($user);
+                        if($this->excQ($this->query)){
+                            MailFunctions::get()->sendFirstMail($user);
+                            return TRUE;
+                        }
+                        else{
+                            return MySQLQuery::QUERY_ERR;
                         }
                     }
                     else {
@@ -198,8 +178,8 @@ class AdminFunctions extends Functions{
                     return Functions::EMPTY_STRING;
                 }
             }
-            else{
-                return $users;
+            else {
+                return Functions::EMPTY_STRING;
             }
         }
         return FALSE;

@@ -106,7 +106,7 @@ class AuthAPI extends API{
                 $refTimeout = FALSE;
             }
             $r = UserFunctions::get()->authenticate($inputs['username'], $inputs['password'], $inputs['username'],$duration,$refTimeout);
-            if($r == TRUE){
+            if($r === TRUE){
                 if(UserFunctions::get()->getMainSession()->getUser()->getStatus() == 'S'){
                     $this->sendResponse('Account Suspended',TRUE,401);
                     UserFunctions::get()->getMainSession()->kill();
@@ -117,6 +117,9 @@ class AuthAPI extends API{
             }
             else if($r == MySQLQuery::QUERY_ERR){
                 $this->databaseErr(UserFunctions::get()->getMainSession()->getDBLink()->getErrorMessage());
+            }
+            else if($r == UserFunctions::LOGIN_SUSPENDED){
+                $this->sendResponse('Your account is suspended', TRUE, 401);
             }
             else{
                 $this->sendResponse('Inncorect username, email or password.', TRUE, 401);

@@ -88,6 +88,12 @@ class UserQuery extends MySQLQuery{
         parent::__construct();
         $this->init();
     }
+    public function updateUserPermissions($permissionsStr,$userId) {
+        $arr = array(
+            $this->getColName('privileges')=>$permissionsStr
+        );
+        $this->update($arr, $userId);
+    }
     /**
      * Constructs a query that can be used to remove a user account from 
      * the database.

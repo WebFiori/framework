@@ -70,6 +70,12 @@ class UserFunctions extends Functions{
      */
     const NO_SUCH_USER = 'user_not_found';
     /**
+     * A constant that indicates a user registration is closed.
+     * @var string Constant that indicates a user registration is closed.
+     * @since 1.5
+     */
+    const REG_CLOSED = 'reg_closed';
+    /**
      * A constant that indicates that username is taken.
      * @var string Constant that indicates that username is taken.
      * @since 1.0
@@ -150,6 +156,21 @@ class UserFunctions extends Functions{
             }
         }
         return FALSE;
+    }
+    public function getUsers() {
+        if($this->hasPrivilege('GET_USER_PROFILE_ALL')){
+            $this->query->getUsers();
+            if($this->excQ($this->query)){
+                $result = $this->getDBLink()->getResult();
+                $usersArr = array();
+                while($row = $result->fetch_assoc()){
+                    $usersArr[] = $this->createUserFromRow($row);
+                }
+                return $usersArr;
+            }
+            return MySQLQuery::QUERY_ERR;
+        }
+        return self::NOT_AUTH;
     }
     /**
      * Updates the status of a user account.
@@ -465,6 +486,24 @@ class UserFunctions extends Functions{
     }
     /**
      * 
+     * @param User $user
+     * @since 1.5
+     */
+    public function updateUserPrivileges($user) {
+        if($user instanceof User){
+            if($this->hasPrivilege('UPDATE_USER_PERMISSIONS') && $this->getUserID() != $user->getID()){
+                $this->query->updateUserPermissions(Access::createPermissionsStr($user),$user->getID());
+                if($this->excQ($this->query)){
+                    return TRUE;
+                }
+                return MySQLQuery::QUERY_ERR;
+            }
+            return self::NOT_AUTH;
+        }
+        return FALSE;
+    }
+    /**
+     * 
      * @param type $row
      * @return User
      * @since 1.5
@@ -636,6 +675,7 @@ class UserFunctions extends Functions{
             if($usernameCheck == FALSE){
                 if(strlen($user->getPassword()) != 0){
                     $user->setStatus('N');
+                    $user->addToGroup('BASIC_USER');
                     $this->query->addUser($user);
                     if($this->excQ($this->query)){
                         $user = $this->getUserByEmail($user->getEmail());
@@ -704,7 +744,7 @@ class UserFunctions extends Functions{
                 }
             }
             else{
-                return self::NOT_AUTH;
+                return self::REG_CLOSED;
             }
         }
         return FALSE;

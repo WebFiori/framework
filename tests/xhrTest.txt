@@ -35,7 +35,18 @@ xhr.send('site-name=Hello&language=en&description=Test')
 ---
 
 var xhr = new XMLHttpRequest();
-xhr.open('post','http://localhost/WebsiteAPIs/update-site-info')
+xhr.open('post','http://localhost/generic-php/UserAPIs/add-user')
+xhr.onreadystatechange = function(){
+	if(this.readyState === 4){
+		console.log(this.responseText);
+	}
+}
+xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+xhr.send('username=Ibrahim&password=123&conf-password=123&email=ibinshikh@outlook.com')
+---
+
+var xhr = new XMLHttpRequest();
+xhr.open('post','http://localhost/generic-php/SysAPIs/update-user-reg-status')
 xhr.onreadystatechange = function(){
 	if(this.readyState === 4){
 		console.log(this.responseText);

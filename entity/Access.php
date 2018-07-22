@@ -82,6 +82,8 @@ class Access {
         $this->_createPrivilege('SUPER_ADMIN', 'GET_USER_PROFILE_ALL');
         $this->_createPrivilege('SUPER_ADMIN', 'GET_PRIVILEGES');
         $this->_createPrivilege('SUPER_ADMIN', 'GET_USER_SESSION');
+        $this->_createPrivilege('SUPER_ADMIN', 'SYS_STATUS_UPDATE');
+        $this->_createPrivilege('SUPER_ADMIN', 'UPDATE_USER_REG_STATUS');
         
         $this->_createPrivilege('SUPER_ADMIN', 'UPDATE_USER_REGISTRATION_STATUS');
         $this->_createPrivilege('SUPER_ADMIN', 'UPDATE_DB');

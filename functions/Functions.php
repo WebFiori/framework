@@ -41,7 +41,7 @@ if(!defined('ROOT_DIR')){
         . '</html>');
 }
 /**
- * The base class for creating application logic.
+ * The base class for creating application logic and connecting to the database.
  *
  * @author Ibrahim
  * @version 1.2
@@ -70,12 +70,14 @@ class Functions {
      * @since 1.1
      */
     public function useDatabase() {
-        if(gettype($GLOBALS['SYS_STATUS']) == 'string' && $GLOBALS['SYS_STATUS'] == Util::DB_NEED_CONF && !defined('SETUP_MODE')){
+        if(gettype($GLOBALS['SYS_STATUS']) == 'string' && 
+                $GLOBALS['SYS_STATUS'] == Util::DB_NEED_CONF && 
+                !defined('SETUP_MODE')){
             header('content-type:application/json');
             http_response_code(500);
             die('{"message":"'.$GLOBALS['SYS_STATUS'].'","type":"error",'
                     . '"details":"It seems the system is unable to connect to the database.",'
-                    . '"config-page":"'.Util::getBaseURL().'pages/setup/welcome",'
+                    . '"config-page":"'.Util::getBaseURL().'s/welcome",'
                     . '"db-instance:'.Util::getDatabaseTestInstance()->toJSON().'}');
         }
         $result = $this->mainSession->useDb(array(
@@ -108,6 +110,21 @@ class Functions {
     public function excQ($qObj){
         if($this->mainSession->getDBLink() != NULL){
             return $this->mainSession->getDBLink()->executeQuery($qObj);
+        }
+        return FALSE;
+    }
+    /**
+     * Checks if the current session user has a privilege or not given privilege 
+     * ID.
+     * @param string $pId The ID of the privilege.
+     * @return boolean If the user has the given privilege, the function will 
+     * return TRUE. If the user does not have the privilege, the function will 
+     * return FALSE.
+     * @since 1.2
+     */
+    public function hasPrivilege($pId){
+        if($this->getUserID() != -1){
+            return $this->mainSession->getUser()->hasPrivilege($pId);
         }
         return FALSE;
     }

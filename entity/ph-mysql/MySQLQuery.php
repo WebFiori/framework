@@ -275,7 +275,7 @@ abstract class MySQLQuery implements JsonI{
         else{
             $lmit = '';
         }
-        $this->setQuery(self::SELECT.$this->getStructureName().' '.$limit, 'select');
+        $this->setQuery(self::SELECT.$this->getStructureName().' '.$lmit, 'select');
     }
     /**
      * Constructs a query that can be used to get table data based on a specific 

@@ -19,7 +19,7 @@ if(!defined('ROOT_DIR')){
 /**
  * A class that contains all static methods for altering user attributes.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.4
+ * @version 1.5
  * @uses User The basic user class.
  * @uses UserQuery It uses the class to send user related queries.
  * @uses ActivationQuery Used for user activation related queries.
@@ -96,6 +96,12 @@ class UserFunctions extends Functions{
      * @since 1.1
      */
     const ALREADY_ACTIVATED = 'account_already_active';
+    /**
+     * A constant that indicates a user account is not allowed to login.
+     * @var string Constant constant that indicates a user account is not allowed to login.
+     * @since 1.5
+     */
+    const LOGIN_SUSPENDED = 'login_suspended';
     
     /**
      * Checks if a given user info can grant him access to the system or not. It 
@@ -105,11 +111,12 @@ class UserFunctions extends Functions{
      * @param string $e Email address.
      * @param int $sessionTimeout The duration of user session (in minutes). It must be a 
      * positive number greater than 0. If invalid number is given, 10 will be used.
-     * @param boolean $refreshTimeout If set to <b>TRUE</b> session timeout time will 
+     * @param boolean $refreshTimeout If set to TRUE, session timeout time will 
      * be refreshed every time user sends a request.
-     * @return boolean|string <b>TRUE</b> if the user is authenticated. Else, it will 
-     * return <b>FALSE</b>. In case of database error, the function will return 
-     * <b>MySQLQuery::QUERY_ERR</b>.
+     * @return boolean|string TRUE if the user is authenticated. Else, it will 
+     * return FALSE. In case of database error, the function will return 
+     * MySQLQuery::QUERY_ERR. In case the user is suspended from login, 
+     * the function will return UserFunctions::LOGIN_SUSPENDED
      * @since 1.0
      */
     public function authenticate($u='',$p='',$e='',$sessionTimeout=10,$refreshTimeout=false){
@@ -119,16 +126,20 @@ class UserFunctions extends Functions{
                 $auth = new Authenticator($user);
                 $result = $auth->authenticate();
                 if($result === TRUE){
-                    $tmpu = $this->getUserByID($auth->getUser()->getID());
-                    $tmpu->setEmail('');
-                    $tmpu->setActivationTok('');
-                    $tmpu->setToken($auth->getUser()->getToken());
-                    $this->getMainSession()->setUser($tmpu);
-                    if($sessionTimeout > 0){
-                        $this->getMainSession()->setLifetime($sessionTimeout);
+                    $this->getMainSession()->setUser($auth->getUser());
+                    if($this->hasPrivilege('LOGIN') === TRUE){
+                        $user = $this->getUserByID($this->getUserID());
+                        $user->setActivationTok('');
+                        $user->setToken($auth->getUser()->getToken());
+                        $this->getMainSession()->setUser($user);
+                        if($sessionTimeout > 0){
+                            $this->getMainSession()->setLifetime($sessionTimeout);
+                        }
+                        $this->getMainSession()->initSession($refreshTimeout, TRUE);
+                        return TRUE;
                     }
-                    $this->getMainSession()->initSession($refreshTimeout, TRUE);
-                    return TRUE;
+                    $this->getMainSession()->kill();
+                    return self::LOGIN_SUSPENDED;
                 }
                 else if($result === UserFunctions::NOT_AUTH){
                     return FALSE;
@@ -140,76 +151,132 @@ class UserFunctions extends Functions{
         }
         return FALSE;
     }
-    public function updateStatus($user) {
-        if($user instanceof User){
-            $this->query->updateStatus($user->getStatusCode(), $user->getID());
-            if($this->excQ($this->query)){
-                return TRUE;
-            }
-            return MySQLQuery::QUERY_ERR;
-        }
-        return FALSE;
-    }
     /**
-     * Activate user account given his Activation token. The user must be 
-     * logged in before calling this function.
-     * @param string $activationTok The activation token of the user.
-     * @return User|string|boolean  An object of type <b>User</b> in case the activation process 
-     * is completed. In case of query error, the function will return 
-     * <b>MySQLQuery::QUERY_ERR</b>. If the user account is already activated, the 
-     * function will return <b>UserFunctions::ALREADY_ACTIVATED</b>. If the given token 
-     * does not match, the function will return <b>FALSE</b>. In case the user is not 
-     * logged in, the function will return <b>UserFunctions::NOT_AUTH</b>.
+     * Updates the status of a user account.
+     * @param User $user An object of type User.
+     * @return boolean|string If the user status is updated, the function will 
+     * return TRUE. If not, The function will return FALSE. If the logged in 
+     * user does not have the privilege 'UPDATE_USER_STATUS', the function 
+     * will return Functions::NOT_AUTH.
      * @since 1.0
      */
-    public function activateAccount($activationTok){
-        $id = $this->getUserID();
-        if($id != NULL){
-            $this->acQuery->getActivationCode($id);
-            if($this->excQ($this->acQuery)){
-                if($this->rows() != 0){
-                    $tok = $this->getRow()[$this->acQuery->getStructure()->getCol('code')->getName()];
-                    if($tok == $activationTok){
-                        $this->acQuery->activate($id);
-                        if($this->excQ($this->acQuery)){
-                            $user = $this->getMainSession()->getUser();
-                            $user->setStatus('A');
-                            return $this->updateStatus($user);
+    public function updateStatus($user=null) {
+        if($this->hasPrivilege('UPDATE_USER_STATUS')){
+            if($user instanceof User){
+                $this->query->updateStatus($user->getStatusCode(), $user->getID());
+                if($this->excQ($this->query)){
+                    return TRUE;
+                }
+                return MySQLQuery::QUERY_ERR;
+            }
+            return FALSE;
+        }
+        return self::NOT_AUTH;
+    }
+    /**
+     * Activate user account given his Activation token.
+     * @param string $activationTok The activation token of the user.
+     * @param string $userId [Optional] If specified, The user which his account will 
+     * be activated is the one with the given ID.
+     * @return User|string|boolean  An object of type User in case the activation process 
+     * is completed. In case of query error, the function will return 
+     * MySQLQuery::QUERY_ERR. If the user account is already activated, the 
+     * function will return UserFunctions::ALREADY_ACTIVATED. If the given token 
+     * does not match, the function will return FALSE. In case the user is not 
+     * logged in or the logged in user does not have the privilege 'ACTIVATE_ACCOUNT' while 
+     * trying to activate another account, 
+     * the function will return Functions::NOT_AUTH.
+     * @since 1.0
+     */
+    public function activateAccount($activationTok,$userId=null){
+        if($userId === NULL){
+            $id = $this->getUserID();
+            if($id != NULL){
+                $this->acQuery->getActivationCode($id);
+                if($this->excQ($this->acQuery)){
+                    if($this->rows() != 0){
+                        $tok = $this->getRow()[$this->acQuery->getStructure()->getCol('code')->getName()];
+                        if($tok == $activationTok){
+                            $this->acQuery->activate($id);
+                            if($this->excQ($this->acQuery)){
+                                $user = $this->getMainSession()->getUser();
+                                $user->setStatus('A');
+                                return $this->updateStatus($user);
+                            }
+                            else{
+                                return MySQLQuery::QUERY_ERR;
+                            }
                         }
                         else{
-                            return MySQLQuery::QUERY_ERR;
+                            return FALSE;
                         }
                     }
                     else{
-                        return FALSE;
+                        return self::ALREADY_ACTIVATED;
                     }
                 }
                 else{
-                    return self::ALREADY_ACTIVATED;
+                    return MySQLQuery::QUERY_ERR;
                 }
             }
             else{
-                return MySQLQuery::QUERY_ERR;
+                return self::NOT_AUTH;
             }
         }
         else{
-            return self::NOT_AUTH;
+            $user = $this->getUserByID($userId);
+            if($user instanceof User){
+                $this->acQuery->getActivationCode($user->getID());
+                if($this->excQ($this->acQuery)){
+                    if($this->rows() != 0){
+                        $tok = $this->getRow()[$this->acQuery->getStructure()->getCol('code')->getName()];
+                        if($tok == $activationTok){
+                            if($this->hasPrivilege('ACTIVATE_ACCOUNT')){
+                                $this->acQuery->activate($id);
+                                if($this->excQ($this->acQuery)){
+                                    $user = $this->getMainSession()->getUser();
+                                    $user->setStatus('A');
+                                    return $this->updateStatus($user);
+                                }
+                                else{
+                                    return MySQLQuery::QUERY_ERR;
+                                }
+                            }
+                            else{
+                                return self::NOT_AUTH;
+                            }
+                        }
+                        else{
+                            return FALSE;
+                        }
+                    }
+                    else{
+                        return self::ALREADY_ACTIVATED;
+                    }
+                }
+                else{
+                    return MySQLQuery::QUERY_ERR;
+                }
+            }
+            return $user;
         }
     }
     /**
-     * Updates the display name of a user given his ID.
+     * Updates the display name of a legged in user or another user given his ID.
      * @param string $newDispName The new display name.
-     * @param string $userId The ID of the user.
-     * @return User|string  An object of type <b>User</b> in case the display name is updated. 
-     * In case no user was found, the function will return <b>UserFunctions::NO_SUCH_USER</b>. In 
-     * case of query error, the function will return <b>MySQLQuery::QUERY_ERR</b>. 
-     * If the user is not authorized to update user profile, the function will return 
-     * <b>Functions::NOT_AUTH</b>.
+     * @param string $userId [Optional] The ID of the user. If omitted, the display name of the 
+     * logged in user will be updated.
+     * @return User|string  An object of type User in case the display name is updated. 
+     * In case no user was found, the function will return UserFunctions::NO_SUCH_USER. In 
+     * case of query error, the function will return MySQLQuery::QUERY_ERR. 
+     * If the legged in user does not have the permission 'UPDATE_USER_DISPLAY_NAME' or 
+     * the privilege 'UPDATE_USER_DISPLAY_NAME_ALL', 
+     * the function will return Functions::NOT_AUTH.
+     * @since 1.0
      */
-    public function updateDisplayName($newDispName, $userId){
-        $loggedId = $this->getUserID();
-        if($loggedId != NULL){
-            if($loggedId == $userId || $this->getAccessLevel() == 0){
+    public function updateDisplayName($newDispName, $userId=null){
+        if($userId != NULL && $userId != $this->getUserID()){
+            if($this->hasPrivilege('UPDATE_USER_DISPLAY_NAME_ALL')){
                 $user = $this->getUserByID($userId);
                 if($user instanceof User){
                     $this->query->updateDisplayName($newDispName, $user->getID());
@@ -226,140 +293,202 @@ class UserFunctions extends Functions{
                 }
                 return $user;
             }
-            else{
-                return self::NOT_AUTH;
-            }
+            return self::NOT_AUTH;
         }
         else{
+            if($this->hasPrivilege('UPDATE_USER_DISPLAY_NAME')){
+                $this->query->updateDisplayName($newDispName, $this->getUserID());
+                if($this->excQ($this->query)){
+                    $this->getMainSession()->getUser()->setDisplayName($newDispName);
+                    return $this->getMainSession()->getUser();
+                }
+                else{
+                    return MySQLQuery::QUERY_ERR;
+                }
+            }
             return self::NOT_AUTH;
         }
     }
     /**
-     * Updates the email address of a user given his ID.
+     * Updates the email address of a logged in user or another user given his ID.
      * @param string $email The new Email address.
-     * @param string $userId The ID of the user.
-     * @return User|string  An object of type <b>User</b> in case the email is updated. 
-     * In case no user was found, the function will return <b>UserFunctions::NO_SUCH_USER</b>. In 
-     * case of query error, the function will return <b>MySQLQuery::QUERY_ERR</b>. 
-     * If the user is not authorized to update user profile, the function will return 
-     * <b>Functions::NOT_AUTH</b>. If the given email address belongs to a user 
-     * who is already registered, the function will return <b>UserFunctions::USER_ALREAY_REG</b>.
+     * @param string $userId [Optional] The ID of the user. If not provided, the email 
+     * address of the logged in user will be updated.
+     * @return User|string  An object of type User in case the email is updated. 
+     * In case no user was found which has the given ID, 
+     * the function will return UserFunctions::NO_SUCH_USER. In 
+     * case of query error, the function will return MySQLQuery::QUERY_ERR. 
+     * If the user does not have the privilege 'UPDATE_USER_EMAIL_ALL' or the privilege 
+     * 'UPDATE_USER_EMAIL', the function will return Functions::NOT_AUTH. 
+     * If the given email address belongs to a user who is already registered, 
+     * the function will return UserFunctions::USER_ALREAY_REG.
      * @since 1.0
      */
-    public function updateEmail($email, $userId){
-        $loggedId = $this->getUserID();
-        if($loggedId != NULL){
-            if($loggedId == $userId || $this->getAccessLevel() == 0){
-                $check = $this->getUserByEmail($email);
-                if($check == self::NO_SUCH_USER){
-                    $user = $this->getUserByID($userId);
-                    if($user instanceof User){
+    public function updateEmail($email, $userId=null){
+        if($userId != NULL && $userId != $this->getUserID()){
+            if($this->hasPrivilege('UPDATE_USER_EMAIL_ALL')){
+                $user = $this->getUserByID($userId);
+                if($user instanceof User){
+                    $check = $this->getUserByEmail($email);
+                    if($check == UserFunctions::NO_SUCH_USER){
                         $this->query->updateEmail($email, $user->getID());
                         if($this->excQ($this->query)){
                             $user->setEmail($email);
-                            if($user->getID() == $this->getUserID()){
-                                $this->getMainSession()->getUser()->setEmail($email);
-                            }
                             return $user;
                         }
                         else{
                             return MySQLQuery::QUERY_ERR;
                         }
                     }
-                    return $user;
+                    else{
+                        return UserFunctions::USER_ALREAY_REG;
+                    }
                 }
-                else{
-                    return $check;
-                }
-            }
-            else{
-                return self::NOT_AUTH;
-            }
-        }
-        else{
-            return self::NOT_AUTH;
-        }
-    }
-    /**
-     * Return a user given his ID.
-     * @param string $id The ID of the user.
-     * @return User|string An object of type <b>User</b> if found. In case no user 
-     * was found, the function will return <b>UserFunctions::NO_SUCH_USER</b>. In 
-     * case of query error, the function will return <b>MySQLQuery::QUERY_ERR</b>. 
-     * If the user is not authorized to get user profile, the function will return 
-     * <b>Functions::NOT_AUTH</b>.
-     * @since 1.1
-     */
-    public function getUserByID($id){
-        $this->query->getUserByID($id);
-        if($this->excQ($this->query)){
-            if($this->rows() != 0){
-                $user = new User();
-                $row = $this->getRow();
-                $user->setPassword($row[$this->query->getStructure()->getCol('password')->getName()]);
-                $user->setEmail($row[$this->query->getStructure()->getCol('email')->getName()]);
-                $user->setID($row[MySQLQuery::ID_COL]);
-                $user->setStatus($row[$this->query->getStructure()->getCol('status')->getName()]);
-                $user->setUserName($row[$this->query->getStructure()->getCol('username')->getName()]);
-                $user->setAccessLevel($row[$this->query->getStructure()->getCol('acc-level')->getName()]);
-                $user->setDisplayName($row[$this->query->getStructure()->getCol('disp-name')->getName()]);
-                $user->setLastLogin($row[$this->query->getStructure()->getCol('last-login')->getName()]);
-                $user->setRegDate($row[$this->query->getStructure()->getCol('reg-date')->getName()]);
-                $user->setLastPasswordResetDate($row[$this->query->getColName('last-password-reset')]);
-                $user->setResetCount($row[$this->query->getColName('reset-pass-count')]);
-                $tok = $this->getRegTok($id);
-                $user->setActivationTok($tok);
                 return $user;
             }
             else{
-                return self::NO_SUCH_USER;
+                return Functions::NOT_AUTH;
             }
         }
         else{
-            return MySQLQuery::QUERY_ERR;
+            if($this->hasPrivilege('UPDATE_USER_EMAIL')){
+                $check = $this->getUserByEmail($email);
+                if($check == UserFunctions::NO_SUCH_USER){
+                    $this->query->updateEmail($email, $this->getUserID());
+                    if($this->excQ($this->query)){
+                        $this->getMainSession()->getUser()->setEmail($email);
+                        return $this->getMainSession()->getUser();
+                    }
+                    else{
+                        return MySQLQuery::QUERY_ERR;
+                    }
+                }
+                else{
+                    return UserFunctions::USER_ALREAY_REG;
+                }
+            }
+            else{
+                return Functions::NOT_AUTH;
+            }
         }
     }
     /**
-     * Return a user given his username.
-     * @param string $username The username of the user.
-     * @return User|string An object of type <b>User</b> if found. If the user is not 
-     * found, the function will return <b>UserFunctions::NO_SUCH_USER</b>. If 
-     * an error occur while running the query on the database, The function will 
-     * return <b>MySQLQuery::QUERY_ERR</b>. If the given username is an empty string, 
-     * the function will return <b>UserFunctions::EMPTY_STRING</b>.
-     * @since 1.0
+     * Returns logged in user profile or another user given his ID.
+     * @param string $id [Optional] The ID of the user. If omitted, the returned 
+     * info will belong to the logged in user.
+     * @return User|string An object of type User if found. In case no user 
+     * was found, the function will return UserFunctions::NO_SUCH_USER. In 
+     * case of query error, the function will return MySQLQuery::QUERY_ERR. 
+     * If the logged in user does not have the privilege 'GET_USER_PROFILE_ALL' or 
+     * the privilege 'GET_USER_PROFILE', the function will return 
+     * Functions::NOT_AUTH.
+     * @since 1.1
      */
-    public function getUserByUsername($username){
-        if(strlen($username) != 0){
-            $this->query->getUserByUsername($username);
-            if($this->excQ($this->query)){
-                $row = $this->getRow();
-                if($row != null){
-                    $user = new User(
-                            $row[$this->query->getStructure()->getCol('username')->getName()],
-                            '',
-                            $row[$this->query->getStructure()->getCol('email')->getName()]);
-                    $user->setID($row[UserQuery::ID_COL]);
-                    $user->setStatus($row[$this->query->getStructure()->getCol('status')->getName()]);
-                    $user->setDisplayName($row[$this->query->getStructure()->getCol('disp-name')->getName()]);
-                    $user->setAccessLevel($row[$this->query->getStructure()->getCol('acc-level')->getName()]);
-                    $user->setLastLogin($row[$this->query->getStructure()->getCol('last-login')->getName()]);
-                    $user->setRegDate($row[$this->query->getStructure()->getCol('reg-date')->getName()]);
-                    $user->setLastPasswordResetDate($row[$this->query->getColName('last-password-reset')]);
-                    $user->setResetCount($row[$this->query->getColName('reset-pass-count')]);
-                    return $user;
-                }
-                else{
+    public function getUserByID($id=null){
+        if($id != NULL){
+            if($this->getUserID() != -1 && $this->getUserID() != $id && $this->hasPrivilege('GET_USER_PROFILE_ALL')){
+                $this->query->getUserByID($id);
+                if($this->excQ($this->query)){
+                    if($this->rows() != 0){
+                        $row = $this->getRow();
+                        return $this->createUserFromRow($row);
+                    }
                     return self::NO_SUCH_USER;
                 }
+                return MySQLQuery::QUERY_ERR;
+            }
+            else if($this->getUserID() == $id && $this->hasPrivilege('GET_USER_PROFILE')){
+                $this->query->getUserByID($id);
+                if($this->excQ($this->query)){
+                    if($this->rows() != 0){
+                        $row = $this->getRow();
+                        return $this->createUserFromRow($row);
+                    }
+                    return self::NO_SUCH_USER;
+                }
+                return MySQLQuery::QUERY_ERR;
+            }
+            return self::NOT_AUTH;
+        }
+        else if($this->hasPrivilege('GET_USER_PROFILE')){
+            $this->query->getUserByID($this->getUserID());
+            if($this->excQ($this->query)){
+                $user = new User();
+                $row = $this->getRow();
+                return $user;
             }
             else{
                 return MySQLQuery::QUERY_ERR;
             }
         }
-        else{
-            return self::EMPTY_STRING;
+        return self::NOT_AUTH;
+    }
+    /**
+     * Returns logged in user profile or another user given his username.
+     * @param string $username [Optional] The username of the user. If omitted, 
+     * the returned profile will belong to the logged in user. In this case, 
+     * this parameter is ignored.
+     * @return User|string An object of type User if found. If the user is not 
+     * found, the function will return UserFunctions::NO_SUCH_USER. If 
+     * an error occur while running the query on the database, The function will 
+     * return MySQLQuery::QUERY_ERR. If the given username is an empty string, 
+     * the function will return UserFunctions::EMPTY_STRING. 
+     * If the logged in user does not have the privilege 'GET_USER_PROFILE_ALL' 
+     * or the privilege 'GET_USER_PROFILE', the function will return 
+     * Functions::NOT_AUTH.
+     * @since 1.0
+     */
+    public function getUserByUsername($username=null){
+        if($username != null){
+            if($this->getUserID() != -1){
+                if($this->getMainSession()->getUser()->getUserName() != $username && $this->hasPrivilege('GET_USER_PROFILE_ALL')){
+                    $this->query->getUserByUsername($username);
+                    if($this->excQ($this->query)){
+                        $row = $this->getRow();
+                        if($row != null){
+                            return $this->createUserFromRow($row);
+                        }
+                        return self::NO_SUCH_USER;
+                    }
+                    return MySQLQuery::QUERY_ERR;
+                }
+                else if($this->getMainSession()->getUser()->getUserName() == $username && $this->hasPrivilege('GET_USER_PROFILE')){
+                    return $this->getMainSession()->getUser();
+                }
+                return self::NOT_AUTH;
+            }
         }
+        else if($this->hasPrivilege('GET_USER_PROFILE')){
+            return $this->getMainSession()->getUser();
+        }
+        return self::NOT_AUTH;
+    }
+    /**
+     * 
+     * @param type $row
+     * @return User
+     * @since 1.5
+     */
+    private function createUserFromRow($row){
+        $user = new User(
+                $row[$this->query->getStructure()->getCol('username')->getName()],
+                '',
+                $row[$this->query->getStructure()->getCol('email')->getName()]);
+        $user->setPassword($row[$this->query->getStructure()->getCol('password')->getName()]);
+        $user->setEmail($row[$this->query->getStructure()->getCol('email')->getName()]);
+        $user->setID($row[MySQLQuery::ID_COL]);
+        $user->setStatus($row[$this->query->getStructure()->getCol('status')->getName()]);
+        $user->setUserName($row[$this->query->getStructure()->getCol('username')->getName()]);
+        $user->setAccessLevel($row[$this->query->getStructure()->getCol('acc-level')->getName()]);
+        $user->setDisplayName($row[$this->query->getStructure()->getCol('disp-name')->getName()]);
+        $user->setLastLogin($row[$this->query->getStructure()->getCol('last-login')->getName()]);
+        $user->setRegDate($row[$this->query->getStructure()->getCol('reg-date')->getName()]);
+        $user->setLastPasswordResetDate($row[$this->query->getColName('last-password-reset')]);
+        $user->setResetCount($row[$this->query->getColName('reset-pass-count')]);
+        $tok = $this->getRegTok($user->getID());
+        $user->setActivationTok($tok);
+        Access::resolvePriviliges($row[$this->query->getColName('privileges')], $user);
+        return $user;
     }
     /**
      * Return a user given his email address.
@@ -371,45 +500,38 @@ class UserFunctions extends Functions{
      * the function will return <b>UserFunctions::EMPTY_STRING</b>.
      * @since 1.0
      */
-    public function getUserByEmail($email){
-        if(strlen($email) != 0){
-            $this->query->getUserByEmail($email);
-            if($this->excQ($this->query)){
-                $row = $this->getRow();
-                if($row != null){
-                    $user = new User(
-                            $row[$this->query->getStructure()->getCol('username')->getName()],
-                            '',
-                            $row[$this->query->getStructure()->getCol('email')->getName()]);
-                    $user->setID($row[UserQuery::ID_COL]);
-                    $user->setStatus($row[$this->query->getStructure()->getCol('status')->getName()]);
-                    $user->setDisplayName($row[$this->query->getStructure()->getCol('disp-name')->getName()]);
-                    $user->setAccessLevel($row[$this->query->getStructure()->getCol('acc-level')->getName()]);
-                    $user->setLastLogin($row[$this->query->getStructure()->getCol('last-login')->getName()]);
-                    $user->setRegDate($row[$this->query->getStructure()->getCol('reg-date')->getName()]);
-                    $user->setLastPasswordResetDate($row[$this->query->getColName('last-password-reset')]);
-                    $user->setResetCount($row[$this->query->getColName('reset-pass-count')]);
-                    return $user;
+    public function getUserByEmail($email=null){
+        if($email != NULL){
+            if($this->getUserID() != -1){
+                if($email != $this->getMainSession()->getUser()->getEmail() && $this->hasPrivilege('GET_USER_PROFILE_ALL')){
+                    $this->query->getUserByEmail($email);
+                    if($this->excQ($this->query)){
+                        $row = $this->getRow();
+                        if($row != null){
+                            return $this->createUserFromRow($row);
+                        }
+                        return self::NO_SUCH_USER;
+                    }
+                    return MySQLQuery::QUERY_ERR;
                 }
-                else{
-                    return self::NO_SUCH_USER;
+                else if($email != $this->getMainSession()->getUser()->getEmail() && $this->hasPrivilege('GET_USER_PROFILE')){
+                    return $this->getMainSession()->getUser();
                 }
-            }
-            else{
-                return MySQLQuery::QUERY_ERR;
+                return self::NOT_AUTH;
             }
         }
-        else{
-            return self::EMPTY_STRING;
+        else if($this->hasPrivilege('GET_USER_PROFILE')){
+            return $this->getMainSession()->getUser();
         }
+        return self::NOT_AUTH;
     }
     /**
      * Checks if a given username is taken or not.
      * @param string $username The username that will be checked.
-     * @return boolean <b>TRUE</b> if the user name is taken. <b>FALSE</b> if 
-     * not taken. <b>MySQLQuery::QUERY_ERR</b> in case of database error. 
+     * @return boolean TRUE if the user name is taken. FALSE if 
+     * not taken. MySQLQuery::QUERY_ERR in case of database error. 
      * If the given username is an empty string, 
-     * the function will return <b>UserFunctions::EMPTY_STRING</b>.
+     * the function will return UserFunctions::EMPTY_STRING.
      * @since 1.0
      */
     public function isUsernameTaken($username){
@@ -428,10 +550,10 @@ class UserFunctions extends Functions{
      * Checks if a user is already a registered user. A user is considered registered if 
      * his email is already on the system database.
      * @param string $email The email address of the user.
-     * @return boolean <b>TRUE</b> if the user email is found. <b>FALSE</b> if 
-     * not. <b>MySQLQuery::QUERY_ERR</b> in case of database query error.
+     * @return boolean TRUE if the user email is found. FALSE if 
+     * not. MySQLQuery::QUERY_ERR in case of database query error.
      * If the given email is an empty string, 
-     * the function will return <b>UserFunctions::EMPTY_STRING</b>.
+     * the function will return UserFunctions::EMPTY_STRING.
      * @since 1.0
      */
     public function isUserRegistered($email){
@@ -448,10 +570,10 @@ class UserFunctions extends Functions{
      * Returns the registration token of a user given his ID.
      * @param string $userId The ID of the user.
      * @return string The activation token as a string. If no user was found, 
-     * the function will return <b>NULL</b>. If something went wrong while running 
-     * database query, the function will return <b>MySQLQuery::QUERY_ERR</b>. 
+     * the function will return NULL. If something went wrong while running 
+     * database query, the function will return MySQLQuery::QUERY_ERR. 
      * If the given user ID is an empty string, 
-     * the function will return <b>UserFunctions::EMPTY_STRING</b>.
+     * the function will return UserFunctions::EMPTY_STRING.
      * @since 1.0
      */
     private function getRegTok($userId){
@@ -477,10 +599,10 @@ class UserFunctions extends Functions{
     /**
      * Adds a new token to the set of activation tokens.
      * @param string $userId The user ID.
-     * @return boolean <b>TRUE</b> in case the token is created. The function 
-     * will return <b>MySQLQuery::QUERY_ERR</b> in case of database query error. 
+     * @return boolean TRUE in case the token is created. The function 
+     * will return MySQLQuery::QUERY_ERR in case of database query error. 
      * If the given user ID is an empty string, 
-     * the function will return <b>UserFunctions::EMPTY_STRING</b>.
+     * the function will return UserFunctions::EMPTY_STRING.
      * @since 1.0
      */
     private function createRegTok($userId){
@@ -499,11 +621,11 @@ class UserFunctions extends Functions{
     }
     /**
      * Adds a new user account to the system.
-     * @param User $user An object of type <b>User</b>.
-     * @return string|User The function will return an object of type <b>User</b> 
-     * in case the account is created. Also the function may return <b>MySQLQuery::QUERY_ERR</b> 
-     * in case of database error. Also the function might return <b>UserFunctions::USERNAME_TAKEN</b> if 
-     * the username of the user is taken. Also the function might return <b>UserFunctions::USER_ALREAY_REG</b> if 
+     * @param User $user An object of type User.
+     * @return string|User The function will return an object of type User 
+     * in case the account is created. Also the function may return MySQLQuery::QUERY_ERR 
+     * in case of database error. Also the function might return UserFunctions::USERNAME_TAKEN if 
+     * the username of the user is taken. Also the function might return <b>UserFunctions::USER_ALREAY_REG if 
      * the email account of the user is found in the system.
      * @since 1.0
      */
@@ -551,42 +673,38 @@ class UserFunctions extends Functions{
 
     /**
      * Adds a new user to the database of the system.
-     * @param User $user An object of type <b>User</b>.
-     * @return string|User An object of type <b>User</b> if the user is added. 
-     * <b>MySQLQuery::QUERY_ERR</b> in case of database query error. 
-     * <b>UserFunctions::USERNAME_TAKEN</b> in case the username is taken. 
-     * <b>UserFunction::USER_ALREAY_REG</b> if the user email is found in the 
-     * system. <b>FALSE</b> in case the given parameter is not an object of 
-     * type <b>User</b>. If the given user object has an empty email, username or password, 
-     * the function will return <b>UserFunctions::EMPTY_STRING</b>.
+     * @param User $user An object of type User.
+     * @return string|User An object of type User if the user is added. 
+     * MySQLQuery::QUERY_ERR in case of database query error. 
+     * UserFunctions::USERNAME_TAKEN in case the username is taken. 
+     * UserFunction::USER_ALREAY_REG if the user email is found in the 
+     * system. FALSE in case the given parameter is not an object of 
+     * type User. If the given user object has an empty email, username or password, 
+     * the function will return UserFunctions::EMPTY_STRING. If the registration 
+     * is closed or the admin has no permission to create users, the function will 
+     * return Functions::NOT_AUTH.
      * @since 1.0
      */
     public function register($user){
         if($user instanceof User){
-            if($user->getAccessLevel() != 0 && $user->getAccessLevel() != 1){
+            if(Config::get()->getUserRegStatus() == 'O'){
                 $u = $this->addUser($user);
                 if($u instanceof User){
                     MailFunctions::get()->sendWelcomeEmail($u);
                 }
                 return $u;
             }
+            else if(Config::get()->getUserRegStatus() == 'AO'){
+                if($this->hasPrivilege('ADD_USER')){
+                    $u = $this->addUser($user);
+                    if($u instanceof User){
+                        MailFunctions::get()->sendWelcomeEmail($u);
+                    }
+                    return $u;
+                }
+            }
             else{
-                $loggedAccLevel = $this->getAccessLevel();
-                if($loggedAccLevel != NULL){
-                    if($loggedAccLevel == 0){
-                        $u = $this->addUser($user);
-                        if($u instanceof User){
-                            MailFunctions::get()->sendWelcomeEmail($u);
-                        }
-                        return $u;
-                    }
-                    else{
-                        return self::NOT_AUTH;
-                    }
-                }
-                else{
-                    return self::NOT_AUTH;
-                }
+                return self::NOT_AUTH;
             }
         }
         return FALSE;

@@ -49,6 +49,7 @@ class ViewRoutes {
         Router::view('/logout', '/logout.php');
         Router::view('/new-password', '/new-password.php');
         Router::view('/users', '/users.php');
+        Router::view('/user/{id-or-username}', '/user-view.php');
         Router::view('/', '/default.html');
         Router::other('/test', '/tests/unit/Privileges_Test.php');
     }

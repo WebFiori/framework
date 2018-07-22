@@ -71,6 +71,7 @@ class Authenticator{
                     $this->user->setToken(hash(HASH_ALGO_NAME,$salt));
                     $query->updateLastLogin($userId);
                     $_SESSION['db']->executeQuery($query);
+                    Access::resolvePriviliges($row['privileges'], $this->user);
                     return TRUE;
                 }
                 else{
@@ -102,6 +103,7 @@ class Authenticator{
                         $this->user->setToken(hash(HASH_ALGO_NAME,$salt));
                         $query->updateLastLogin($userId);
                         $_SESSION['db']->executeQuery($query);
+                        Access::resolvePriviliges($row['privileges'], $this->user);
                         return TRUE;
                 }
                 else{

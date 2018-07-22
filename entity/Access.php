@@ -68,14 +68,18 @@ class Access {
         $this->_createGroup('SUPER_ADMIN');
         $this->_createPrivilege('SUPER_ADMIN', 'UPDATE_USER_PERMISSIONS');
         $this->_createPrivilege('SUPER_ADMIN', 'ADD_USER');
+        $this->_createPrivilege('SUPER_ADMIN', 'LOGIN');
         $this->_createPrivilege('SUPER_ADMIN', 'REMOVE_USER');
         $this->_createPrivilege('SUPER_ADMIN', 'UPDATE_USER_STATUS');
         $this->_createPrivilege('SUPER_ADMIN', 'ACTIVATE_USER');
         $this->_createPrivilege('SUPER_ADMIN', 'UPDATE_USER_PASSWORD');
         $this->_createPrivilege('SUPER_ADMIN', 'RESET_USER_PASSWORD');
         $this->_createPrivilege('SUPER_ADMIN', 'UPDATE_USER_EMAIL');
+        $this->_createPrivilege('SUPER_ADMIN', 'UPDATE_USER_EMAIL_ALL');
         $this->_createPrivilege('SUPER_ADMIN', 'UPDATE_USER_DISPLAY_NAME');
+        $this->_createPrivilege('SUPER_ADMIN', 'UPDATE_USER_DISPLAY_NAME_ALL');
         $this->_createPrivilege('SUPER_ADMIN', 'GET_USER_PROFILE');
+        $this->_createPrivilege('SUPER_ADMIN', 'GET_USER_PROFILE_ALL');
         
         $this->_createPrivilege('SUPER_ADMIN', 'UPDATE_USER_REGISTRATION_STATUS');
         $this->_createPrivilege('SUPER_ADMIN', 'UPDATE_DB');
@@ -352,7 +356,7 @@ class Access {
     }
     
     private function _createGroup($groupId){
-        if($this->validateId($groupId)){
+        if($this->_validateId($groupId)){
             foreach ($this->userGroups as $g){
                 if($g->getID() == $groupId){
                     return;
@@ -364,7 +368,7 @@ class Access {
         }
     }
     
-    private function validateId($id){
+    private function _validateId($id){
         $len = strlen($id);
         if($len > 0){
             $valid = TRUE;
@@ -393,14 +397,14 @@ class Access {
      * @since 1.0
      */
     private function _createPrivilege($groupId,$privilegeId){
-        if($this->validateId($privilegeId)){
+        if($this->_validateId($privilegeId)){
             if($this->_hasGroup($groupId)){
                 $g = $this->_getGroup($groupId);
                 $p = new Privilege();
                 $p->setID($privilegeId);
                 if(!$g->hasPrivilege($p)){
                     $this->_getGroup($groupId)->addPrivilage($p);
-                    $this->getGroup('SUPER_ADMIN')->addPrivilage($p);
+                    $this->_getGroup('SUPER_ADMIN')->addPrivilage($p);
                 }
             }
         }

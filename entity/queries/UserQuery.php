@@ -59,6 +59,8 @@ class UserQuery extends MySQLQuery{
         //last time password was resetted.
         $this->structure->addColumn('last-password-reset', new Column('last_pass_reset', 'datetime'));
         $this->structure->getCol('last-password-reset')->setIsNull(TRUE);
+        
+        $this->structure->addColumn('privileges', new Column('privileges', 'varchar', '32000'));
     }
     /**
      * Constructs a query that can be used to update the last time 
@@ -188,6 +190,7 @@ class UserQuery extends MySQLQuery{
                 $this->getColName('acc-level')=>$user->getAccessLevel(),
                 $this->getColName('disp-name')=>'\''.$user->getDisplayName().'\'',
                 $this->getColName('last-login')=>'\''. date('Y-m-d h:i:s').'\'',
+                $this->getColName('privileges')=>'\''.Access::createPermissionsStr($user).'\''
             );
             $this->insert($arr);
         }

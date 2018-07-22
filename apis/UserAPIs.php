@@ -127,6 +127,29 @@ class UserAPIs extends API{
         $a10->addParameter(new RequestParameter('user-id', 'integer'));
         $a10->addParameter(new RequestParameter('token', 'string', TRUE));
         $this->addAction($a10,TRUE);
+        
+        $this->setVersion('1.0.1');
+        
+        $a11 = new APIAction('get-privileges');
+        $a11->addRequestMethod('get');
+        $a11->addParameter(new RequestParameter('group-id', 'string',TRUE));
+        $a11->getParameterByName('group-id')->setDefault('ALL');
+        $this->addAction($a11,TRUE);
+        
+        $a12 = new APIAction('get-user-privileges');
+        $a12->addParameter(new RequestParameter('user-id', 'string'));
+        $a12->addRequestMethod('get');
+        $this->addAction($a12,TRUE);
+        
+        $a13 = new APIAction('update-user-privileges');
+        $a13->addRequestMethod('post');
+        $a13->addParameter(new RequestParameter('user-id', 'string'));
+        $a13->addParameter(new RequestParameter('privileges-string', 'string'));
+        $this->addAction($a13, TRUE);
+        
+        $a14 = new APIAction('get-privileges-groups');
+        $a14->addRequestMethod('get');
+        $this->addAction($a14, TRUE);
     }
     /**
      * Called by the routing function to perform the 'update-staus' action

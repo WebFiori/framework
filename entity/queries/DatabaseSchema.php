@@ -65,7 +65,6 @@ class DatabaseSchema {
         $schema = '';
         $lastSchemaIndex = $this->getLastOrder();
         for($x = 0 ;$x <= $lastSchemaIndex ; $x++){
-            Util::print_r($x);
             if(isset($this->queries[$x])){
                 $queryObj = new $this->queries[$x]();
                 $queryObj->createStructure();

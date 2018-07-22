@@ -212,7 +212,7 @@ class UserFunctions extends Functions{
     public function activateAccount($activationTok,$userId=null){
         if($userId === NULL){
             $id = $this->getUserID();
-            if($id != NULL){
+            if($id !== NULL){
                 $this->acQuery->getActivationCode($id);
                 if($this->excQ($this->acQuery)){
                     if($this->rows() != 0){
@@ -296,7 +296,7 @@ class UserFunctions extends Functions{
      * @since 1.0
      */
     public function updateDisplayName($newDispName, $userId=null){
-        if($userId != NULL && $userId != $this->getUserID()){
+        if($userId !== NULL && $userId != $this->getUserID()){
             if($this->hasPrivilege('UPDATE_USER_DISPLAY_NAME_ALL')){
                 $user = $this->getUserByID($userId);
                 if($user instanceof User){
@@ -346,7 +346,7 @@ class UserFunctions extends Functions{
      * @since 1.0
      */
     public function updateEmail($email, $userId=null){
-        if($userId != NULL && $userId != $this->getUserID()){
+        if($userId !== NULL && $userId != $this->getUserID()){
             if($this->hasPrivilege('UPDATE_USER_EMAIL_ALL')){
                 $user = $this->getUserByID($userId);
                 if($user instanceof User){
@@ -406,7 +406,7 @@ class UserFunctions extends Functions{
      * @since 1.1
      */
     public function getUserByID($id=null){
-        if($id != NULL){
+        if($id !== NULL){
             if($this->getUserID() != -1 && $this->getUserID() != $id && $this->hasPrivilege('GET_USER_PROFILE_ALL')){
                 $this->query->getUserByID($id);
                 if($this->excQ($this->query)){
@@ -460,7 +460,7 @@ class UserFunctions extends Functions{
      * @since 1.0
      */
     public function getUserByUsername($username=null){
-        if($username != null){
+        if($username !== null){
             if($this->getUserID() != -1){
                 if($this->getMainSession()->getUser()->getUserName() != $username && $this->hasPrivilege('GET_USER_PROFILE_ALL')){
                     $this->query->getUserByUsername($username);
@@ -510,15 +510,10 @@ class UserFunctions extends Functions{
      */
     private function createUserFromRow($row){
         $user = new User(
-                $row[$this->query->getStructure()->getCol('username')->getName()],
+                $row[$this->query->getColName('username')],
                 '',
-                $row[$this->query->getStructure()->getCol('email')->getName()]);
-        $user->setPassword($row[$this->query->getStructure()->getCol('password')->getName()]);
-        $user->setEmail($row[$this->query->getStructure()->getCol('email')->getName()]);
+                $row[$this->query->getColName('email')]);
         $user->setID($row[MySQLQuery::ID_COL]);
-        $user->setStatus($row[$this->query->getStructure()->getCol('status')->getName()]);
-        $user->setUserName($row[$this->query->getStructure()->getCol('username')->getName()]);
-        $user->setAccessLevel($row[$this->query->getStructure()->getCol('acc-level')->getName()]);
         $user->setDisplayName($row[$this->query->getStructure()->getCol('disp-name')->getName()]);
         $user->setLastLogin($row[$this->query->getStructure()->getCol('last-login')->getName()]);
         $user->setRegDate($row[$this->query->getStructure()->getCol('reg-date')->getName()]);
@@ -540,7 +535,7 @@ class UserFunctions extends Functions{
      * @since 1.0
      */
     public function getUserByEmail($email=null){
-        if($email != NULL){
+        if($email !== NULL){
             if($this->getUserID() != -1){
                 if($email != $this->getMainSession()->getUser()->getEmail() && $this->hasPrivilege('GET_USER_PROFILE_ALL')){
                     $this->query->getUserByEmail($email);

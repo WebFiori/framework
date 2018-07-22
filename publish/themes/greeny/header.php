@@ -13,9 +13,7 @@ function getHeaderNode(){
     $headerBody = new HTMLNode();
     $headerBody->setClassName('pa-'.$page->getWritingDir().'-col-twelve show-border');
     $headerBody->setWritingDir($page->getWritingDir());
-    $text = new HTMLNode('', '', TRUE);
-    $text->setText('Header Section');
-    $headerBody->addChild($text);
+    $headerBody->addChild(HTMLNode::createTextNode('Header Sec'));
     $headerSec->addChild($headerBody);
     return $headerSec;
 }

@@ -135,5 +135,7 @@ class AuthAPI extends API{
         return TRUE;
     }
 }
-$api = new AuthAPI();
-$api->process();
+if(defined('API_CALL') && API_CALL === TRUE){
+    $api = new AuthAPI();
+    $api->process();
+}

@@ -309,5 +309,7 @@ class SysAPIs extends API{
         }
     }
 }
-$SysAPIs = new SysAPIs();
-$SysAPIs->process();
+if(defined('API_CALL') && API_CALL === TRUE){
+    $SysAPIs = new SysAPIs();
+    $SysAPIs->process();
+}

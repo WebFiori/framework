@@ -309,5 +309,7 @@ class FileAPIs extends API{
         }
     }
 }
-$api = new FileAPIs();
-$api->process();
+if(defined('API_CALL') && API_CALL === TRUE){
+    $api = new FileAPIs();
+    $api->process();
+}

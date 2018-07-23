@@ -157,5 +157,7 @@ class PasswordAPIs extends API{
     
     
 }
-$a = new PasswordAPIs();
-$a->process();
+if(defined('API_CALL') && API_CALL === TRUE){
+    $a = new PasswordAPIs();
+    $a->process();
+}

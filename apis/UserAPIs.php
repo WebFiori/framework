@@ -397,5 +397,7 @@ class UserAPIs extends API{
         return TRUE;
     }
 }
-$api = new UserAPIs();
-$api->process();
+if(defined('API_CALL') && API_CALL === TRUE){
+    $api = new UserAPIs();
+    $api->process();
+}

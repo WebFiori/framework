@@ -207,4 +207,6 @@ class AccessControlAPIs extends API{
     }
 
 }
-$api = new AccessControlAPIs();
+if(defined('API_CALL') && API_CALL === TRUE){
+    $api = new AccessControlAPIs();
+}

@@ -256,5 +256,7 @@ class WebsiteAPIs extends API{
     }
 
 }
-$api = new WebsiteAPIs();
-$api->process();
+if(defined('API_CALL') && API_CALL === TRUE){
+    $api = new WebsiteAPIs();
+    $api->process();
+}

@@ -437,6 +437,9 @@ class Router {
                             return;
                         }
                         else{
+                            if($route->getType() == self::API_ROUTE){
+                                define('API_CALL', TRUE);
+                            }
                             require_once $route->getRouteTo();
                             return;
                         }

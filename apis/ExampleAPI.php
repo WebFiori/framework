@@ -77,8 +77,12 @@ class ExampleAPI extends API{
     }
 
 }
-//create an instance of the API
-$api = new ExampleAPI();
-//call the function process() 
-// to process user request.
-$api->process();
+//if the constant is defined, then we are 
+//coming throgh a route and not autoloading
+if(defined('API_CALL') && API_CALL === TRUE){
+    //create an instance of the API
+    $api = new ExampleAPI();
+    //call the function process() 
+    // to process user request.
+    $api->process();
+}

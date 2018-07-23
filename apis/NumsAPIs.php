@@ -597,5 +597,7 @@ class NumsAPIs extends API{
     }
 
 }
-$api = new NumsAPIs();
-$api->process();
+if(defined('API_CALL') && API_CALL === TRUE){
+    $api = new NumsAPIs();
+    $api->process();
+}

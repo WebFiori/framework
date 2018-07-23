@@ -56,8 +56,12 @@ if($GLOBALS['SYS_STATUS'] !== TRUE && $GLOBALS['SYS_STATUS'] == Util::NEED_CONF)
         Router::route($requestedURI);
     }
     else{
-        //Util::print_r($GLOBALS);
-        Router::route(SiteConfig::get()->getBaseURL().Util::NEED_CONF);
+        if(isset($_COOKIE['setup-session'])){
+            Router::route($requestedURI);
+        }
+        else{
+            Router::route(SiteConfig::get()->getBaseURL().Util::NEED_CONF);
+        }
     }
 }
 else{

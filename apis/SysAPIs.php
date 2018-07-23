@@ -302,9 +302,6 @@ class SysAPIs extends API{
             return FALSE;
         }
         else{
-            if(class_exists('Config')){
-                return SystemFunctions::get()->getAccessLevel() == 0;
-            }
             return TRUE;
         }
     }

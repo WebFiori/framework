@@ -194,16 +194,4 @@ class Functions {
         }
         return -1;
     }
-    /**
-     * Returns the access level of the logged in user.
-     * @return int The access level of the logged in user. The 
-     * function will return -1 in case no user is logged in.
-     * @since 1.0
-     */
-    public function getAccessLevel(){
-        if($this->getMainSession()->getUser() != NULL){
-            return intval($this->getMainSession()->getUser()->getAccessLevel());
-        }
-        return -1;
-    }
 }

@@ -127,18 +127,33 @@ class PasswordFunctions extends Functions{
     public function updatePassword($oldPass, $newPass, $userId){
         $user = $this->getUserByID($userId);
         if($user instanceof User){
-            if($user->getPassword() == hash(Authenticator::HASH_ALGO_NAME, $oldPass)){
-                $this->query->updatePassword(hash(Authenticator::HASH_ALGO_NAME, $newPass), $userId);
-                if($this->excQ($this->query)){
-                    MailFunctions::get()->notifyOfPasswordChange($user);
-                    return TRUE;
+            if($this->getUserID() == $user->getID()){
+                if($this->hasPrivilege('UPDATE_USER_PASS')){
+                    if($user->getPassword() == hash(Authenticator::HASH_ALGO_NAME, $oldPass)){
+                        $this->query->updatePassword(hash(Authenticator::HASH_ALGO_NAME, $newPass), $userId);
+                        if($this->excQ($this->query)){
+                            MailFunctions::get()->notifyOfPasswordChange($user);
+                            return TRUE;
+                        }
+                        return MySQLQuery::QUERY_ERR;
+                    }
+                    return self::PASSWORD_MISSMATCH;
                 }
-                else{
-                    return MySQLQuery::QUERY_ERR;
-                }
+                return self::NOT_AUTH;
             }
             else{
-                return self::PASSWORD_MISSMATCH;
+                if($this->hasPrivilege('UPDATE_USER_PASS_ALL')){
+                    if($user->getPassword() == hash(Authenticator::HASH_ALGO_NAME, $oldPass)){
+                        $this->query->updatePassword(hash(Authenticator::HASH_ALGO_NAME, $newPass), $userId);
+                        if($this->excQ($this->query)){
+                            MailFunctions::get()->notifyOfPasswordChange($user);
+                            return TRUE;
+                        }
+                        return MySQLQuery::QUERY_ERR;
+                    }
+                    return self::PASSWORD_MISSMATCH;
+                }
+                return self::NOT_AUTH;
             }
         }
         return $user;

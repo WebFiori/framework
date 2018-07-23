@@ -155,7 +155,7 @@ class WebsiteAPIs extends API{
         $this->addAction($a7, TRUE);
     }
     public function isAuthorized() {
-        return WebsiteFunctions::get()->getAccessLevel() == 0;
+        return WebsiteFunctions::get()->hasPrivilege('SITE_SETTINGS_UPDATE');
     }
 
     public function processRequest() {

@@ -387,8 +387,7 @@ class UserAPIs extends API{
                 return TRUE;
             }
             else if(Config::get()->getUserRegStatus() == 'AO'){
-                return SystemFunctions::get()->getMainSession()->validateToken() && 
-                       SystemFunctions::get()->getAccessLevel() == 0 ;
+                return SystemFunctions::get()->hasPrivilege('ADD_USER');
             }
             else{
                 return FALSE;

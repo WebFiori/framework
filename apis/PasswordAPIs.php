@@ -76,14 +76,11 @@ class PasswordAPIs extends API{
     public function isAuthorized() {
         $action = $this->getAction();
         if($action == 'update-password'){
-            if(PasswordFunctions::get()->getAccessLevel() == 0){
+            if(PasswordFunctions::get()->hasPrivilege('UPDATE_USER_PASS_ALL')){
                 return TRUE;
             }
             else{
-                $i = $this->getInputs();
-                if($i['user-id'] == PasswordFunctions::get()->getUserID()){
-                    return TRUE;
-                }
+                return PasswordFunctions::get()->hasPrivilege('UPDATE_USER_PASS');
             }
         }
         else{

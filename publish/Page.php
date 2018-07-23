@@ -292,7 +292,7 @@ class Page{
      * was inserted. If it is not, the function will return <b>FALSE</b>.
      * @since 1.9
      */
-    public function insert($node,$parentNodeId){
+    public static function insert($node,$parentNodeId='main-content-area'){
         return Page::get()->insertNode($node, $parentNodeId);
     }
     /**
@@ -460,7 +460,7 @@ class Page{
      * @since 1.9
      * @return string The description of the page.
      */
-    public function description($new=null) {
+    public static function description($new=null) {
         $page = Page::get();
         if($new != NULL && strlen($new) != 0){
             $page->setDescription($new);
@@ -524,7 +524,7 @@ class Page{
      * Sets or gets language code of the page.
      * @param string $new A two digit language code such as AR or EN. 
      * An exception will be thrown if the given language is not supported.
-     * @return string | NULL Two digit language code. In case language is not set, the 
+     * @return string|NULL Two digit language code. In case language is not set, the 
      * function will return NULL
      * @see Page::setLang()
      * @throws Exception
@@ -575,7 +575,7 @@ class Page{
     }
     /**
      * Loads and returns translation based on page language code.
-     * @return Language | NULL An object of type Language is returned 
+     * @return Language|NULL An object of type Language is returned 
      * if the language is loaded. Other than that, the function will return 
      * NULL.
      * @since 1.9
@@ -607,7 +607,7 @@ class Page{
      * Loads or returns page theme.
      * @param string [Optional] $name The name of the theme which will be 
      * loaded. If NULL is given, nothing will be loaded.
-     * @return Theme | NULL If a theme is already loaded, the function will 
+     * @return Theme|NULL If a theme is already loaded, the function will 
      * return the loaded theme contained in an object of type Theme. If no 
      * theme is loaded, the function will return NULL.
      * @see Page::usingTheme()
@@ -746,7 +746,7 @@ class Page{
     /**
      * Sets or gets page writing direction.
      * @param string $new 'ltr' or 'rtl'.
-     * @return string | NULL If the writing direction was set, 
+     * @return string|NULL If the writing direction was set, 
      * the function will return it. If not, the function will return NULL.
      * @since 1.9
      */
@@ -760,7 +760,7 @@ class Page{
     }
     /**
      * Returns the writing direction of the page.
-     * @return string | NULL 'ltr' or 'rtl'. If the writing direction is not set, 
+     * @return string|NULL 'ltr' or 'rtl'. If the writing direction is not set, 
      * the function will return <b>NULL</b>
      * @since 1.0
      */
@@ -844,6 +844,48 @@ class Page{
             }
             $this->incFooter = $bool;
         }
+    }
+    /**
+     * Sets or checks if the page will have aside area or not.
+     * @param boolean|NULL $bool [Optional] If set to TRUE, the generated page 
+     * will have a 'div' element with ID = 'side-content-area'. If set to 
+     * FALSE, the generated page will have no such element.
+     * @return boolean The function will return TRUE if the page will have 
+     * aside area.
+     */
+    public static function aside($bool=null) {
+        if($bool !== NULL){
+            Page::get()->setHasAside($bool);
+        }
+        return Page::get()->hasAside();
+    }
+    /**
+     * Sets or checks if the page will have footer area or not.
+     * @param boolean|NULL $bool [Optional] If set to TRUE, the generated page 
+     * will have a 'div' element with ID = 'page-footer'. If set to 
+     * FALSE, the generated page will have no such element.
+     * @return boolean The function will return TRUE if the page will have 
+     * footer area.
+     */
+    public static function footer($bool=null) {
+        if($bool !== NULL){
+            Page::get()->setHasFooter($bool);
+        }
+        return Page::get()->hasFooter();
+    }
+    /**
+     * Sets or checks if the page will have header area or not.
+     * @param boolean|NULL $bool [Optional] If set to TRUE, the generated page 
+     * will have a 'div' element with ID = 'page-header'. If set to 
+     * FALSE, the generated page will have no such element.
+     * @return boolean The function will return TRUE if the page will have 
+     * header area.
+     */
+    public static function header($bool=null) {
+        if($bool !== NULL){
+            Page::get()->setHasHeader($bool);
+        }
+        return Page::get()->hasHeader();
     }
     /**
      * Checks if the page will have a footer section or not.

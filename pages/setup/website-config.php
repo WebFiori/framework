@@ -44,22 +44,21 @@ if(WebsiteFunctions::get()->getMainSession()->validateToken() != TRUE){
     header('location: '.SiteConfig::get()->getBaseURL().'pages/login');
 }
 SystemFunctions::get()->setSetupStage('website');
-$page = Page::get();
-$page->setHasHeader(FALSE);
-$page->setHasAside(FALSE);
+Page::header(FALSE);
+Page::aside(FALSE);
 
-$page->usingTheme(SiteConfig::get()->getAdminThemeName());
-$pageLbls = $page->getLanguage()->get('pages/setup/website-config');
-$translation = $page->getLanguage();
-$page->setTitle($translation->get('pages/setup/website-config/title'));
-$page->setDescription($translation->get('pages/setup/website-config/description'));
-$page->insertNode(stepsCounter($page->getLanguage()->get('pages/setup/setup-steps'),4), 'main-content-area');
+Page::theme(SiteConfig::get()->getAdminThemeName());
+$pageLbls = Page::translation()->get('pages/setup/website-config');
+$translation = Page::translation();
+Page::title($translation->get('pages/setup/website-config/title'));
+Page::description($translation->get('pages/setup/website-config/description'));
+Page::insert(stepsCounter(Page::translation()->get('pages/setup/setup-steps'),4), 'main-content-area');
 
 $js = new JsCode;
 $jsonx = new JsonX();
-$jsonx->add('disconnected', $page->getLanguage()->get('general/disconnected'));
-$jsonx->add('saved', $page->getLanguage()->get('general/saved'));
-$jsonx->add('saving', $page->getLanguage()->get('general/saving'));
+$jsonx->add('disconnected', Page::translation()->get('general/disconnected'));
+$jsonx->add('saved', Page::translation()->get('general/saved'));
+$jsonx->add('saving', Page::translation()->get('general/saving'));
 $langsJson = new JsonX();
 $langs = WebsiteFunctions::get()->getSiteConfigVars();
 foreach ($langs['website-names'] as $k => $v){
@@ -77,18 +76,18 @@ $js->addCode('window.onload = function(){'
         . 'document.getElementById(\'language-code-select\').oninput = siteInfoInputsChanged;'
         . 'document.getElementById(\'language-code-select\').oninput();'
         . '}');
-$document = Page::get()->getDocument();
+$document = Page::document();
 $document->getHeadNode()->addChild($js);
 $document->getHeadNode()->addJs('res/js/setup.js');
-$page->insertNode(pageBody($pageLbls,$page->getLanguage()),'main-content-area');
-$page->insertNode(footer($page->getLanguage()),'main-content-area');
+Page::insert(pageBody($pageLbls,Page::translation()),'main-content-area');
+Page::insert(footer(Page::translation()),'main-content-area');
 echo $document->toHTML();
 
 function pageBody($pageLabels,$lang){
     $body = new HTMLNode();
     $body->setClassName('pa-row');
     $col = new HTMLNode();
-    $col->setClassName('pa-'.Page::get()->getWritingDir().'-col-twelve');
+    $col->setClassName('pa-'.Page::dir().'-col-12');
     $p1 = new PNode();
     $p1->addText($pageLabels['help']['h-1']);
     $col->addChild($p1);
@@ -111,10 +110,10 @@ function createSiteInfoForm($lbls,$placeholders,$lang){
     $form->setClassName('pa-row');
     
     $selectLbl = new Label($lang->get('pages/setup/website-config/labels/select-lang'));
-    $selectLbl->setClassName('pa-'.Page::get()->getWritingDir().'-col-twelve');
+    $selectLbl->setClassName('pa-'.Page::dir().'-col-12');
     $langSelect = new HTMLNode('select');
     $langSelect->setID('language-code-select');
-    $langSelect->setClassName('pa-'.Page::get()->getWritingDir().'-ltr-col-two');
+    $langSelect->setClassName('pa-'.Page::dir().'-ltr-col-2');
     $langs = WebsiteFunctions::get()->getSiteConfigVars();
     foreach ($langs['website-names'] as $k => $v){
         $option = new HTMLNode('option');
@@ -125,20 +124,20 @@ function createSiteInfoForm($lbls,$placeholders,$lang){
     $form->addChild($selectLbl);
     $form->addChild($langSelect);
     $siteNameLabel = new Label($lbls['site-name']);
-    $siteNameLabel->setClassName('pa-'.Page::get()->getWritingDir().'-col-twelve');
+    $siteNameLabel->setClassName('pa-'.Page::dir().'-col-12');
     $siteNameInput = new Input();
     $siteNameInput->setPlaceholder($placeholders['site-name']);
     $siteNameInput->setID('site-name-input');
-    $siteNameInput->setClassName('pa-'.Page::get()->getWritingDir().'-ltr-col-five');
+    $siteNameInput->setClassName('pa-'.Page::dir().'-ltr-col-5');
     $form->addChild($siteNameLabel);
     $form->addChild($siteNameInput);
     
     $descLabel = new Label($lbls['site-description']);
-    $descLabel->setClassName('pa-'.Page::get()->getWritingDir().'-col-twelve');
+    $descLabel->setClassName('pa-'.Page::dir().'-col-12');
     $descInput = new Input();
     $descInput->setPlaceholder($placeholders['site-description']);
     $descInput->setID('site-description-input');
-    $descInput->setClassName('pa-'.Page::get()->getWritingDir().'-ltr-col-five');
+    $descInput->setClassName('pa-'.Page::dir().'-ltr-col-5');
     $form->addChild($descLabel);
     $form->addChild($descInput);
     
@@ -148,10 +147,10 @@ function createSiteInfoForm($lbls,$placeholders,$lang){
     $submit->setAttribute('onclick', 'return updateSiteInfo()');
     $submit->setAttribute('disabled', '');
     $submit->setID('save-input');
-    $submit->setClassName('pa-'.Page::get()->getWritingDir().'-ltr-col-three');
+    $submit->setClassName('pa-'.Page::dir().'-ltr-col-3');
     $messageNode = new PNode();
     $messageNode->setID('message-display');
-    $messageNode->setClassName('pa-'.Page::get()->getWritingDir().'-ltr-col-twelve');
+    $messageNode->setClassName('pa-'.Page::dir().'-ltr-col-12');
     $form->addChild($messageNode);
     $form->addChild($submit);
     return $form;
@@ -168,7 +167,7 @@ function footer($lang){
     $nextButton = new HTMLNode('button');
     $nextButton->setAttribute('onclick', 'window.location.href = \'home\'');
     $nextButton->setAttribute('disabled', '');
-    $nextButton->setClassName('pa-'.Page::get()->getWritingDir().'-col-three');
+    $nextButton->setClassName('pa-'.Page::dir().'-col-3');
     $nextButton->setID('finish-button');
     $nextButton->setAttribute('data-action', 'ok');
     $nextButton->addChild(HTMLNode::createTextNode($lang->get('general/finish')));
@@ -180,27 +179,27 @@ function stepsCounter($lang,$active){
     $node = new HTMLNode();
     $node->setClassName('pa-row');
     $step1 = new HTMLNode();
-    $step1->setClassName('pa-'.Page::get()->getWritingDir().'-col-two');
+    $step1->setClassName('pa-'.Page::dir().'-col-2');
     $step1->addChild(HTMLNode::createTextNode($lang['welcome']));
     $node->addChild($step1);
     
     $step2 = new HTMLNode();
-    $step2->setClassName('pa-'.Page::get()->getWritingDir().'-col-two');
+    $step2->setClassName('pa-'.Page::dir().'-col-2');
     $step2->addChild(HTMLNode::createTextNode($lang['database-setup']));
     $node->addChild($step2);
     
     $step3 = new HTMLNode();
-    $step3->setClassName('pa-'.Page::get()->getWritingDir().'-col-two');
+    $step3->setClassName('pa-'.Page::dir().'-col-2');
     $step3->addChild(HTMLNode::createTextNode($lang['email-account']));
     $node->addChild($step3);
     
     $step4 = new HTMLNode();
-    $step4->setClassName('pa-'.Page::get()->getWritingDir().'-col-two');
+    $step4->setClassName('pa-'.Page::dir().'-col-2');
     $step4->addChild(HTMLNode::createTextNode($lang['admin-account']));
     $node->addChild($step4);
     
     $step5 = new HTMLNode();
-    $step5->setClassName('pa-'.Page::get()->getWritingDir().'-col-two');
+    $step5->setClassName('pa-'.Page::dir().'-col-2');
     $step5->addChild(HTMLNode::createTextNode($lang['website-config']));
     $node->addChild($step5);
     

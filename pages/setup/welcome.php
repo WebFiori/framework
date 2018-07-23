@@ -44,25 +44,24 @@ if(Config::get()->isConfig()){
     header('location: '.SiteConfig::get()->getHomePage());
 }
 SystemFunctions::get()->setSetupStage('w');
-$page = Page::get();
-$page->setHasHeader(FALSE);
-$page->setHasAside(FALSE);
-$page->usingTheme(SiteConfig::get()->getAdminThemeName());
-$pageLbls = $page->getLanguage()->get('pages/setup/welcome');
-$translation = $page->getLanguage();
-$page->setTitle($translation->get('pages/setup/welcome/title'));
-$page->setDescription($translation->get('pages/setup/welcome/description'));
-$page->insertNode(stepsCounter($page->getLanguage()->get('pages/setup/setup-steps'),0), 'main-content-area');
-$page->insertNode(langSwitch(),'main-content-area');
-$page->insertNode(pageBody($pageLbls),'main-content-area');
-$page->insertNode(footer($page->getLanguage()),'main-content-area');
-echo $page->getDocument();
+Page::header(FALSE);
+Page::aside(FALSE);
+Page::theme(SiteConfig::get()->getAdminThemeName());
+$pageLbls = Page::translation()->get('pages/setup/welcome');
+$translation = Page::translation();
+Page::title($translation->get('pages/setup/welcome/title'));
+Page::description($translation->get('pages/setup/welcome/description'));
+Page::insert(stepsCounter(Page::translation()->get('pages/setup/setup-steps'),0), 'main-content-area');
+Page::insert(langSwitch(),'main-content-area');
+Page::insert(pageBody($pageLbls),'main-content-area');
+Page::insert(footer(Page::translation()),'main-content-area');
+Page::render();
 
 function pageBody($lbls){
     $body = new HTMLNode();
     $body->setClassName('pa-row');
     $col = new HTMLNode();
-    $col->setClassName('pa-'.Page::get()->getWritingDir().'-col-twelve');
+    $col->setClassName('pa-'.Page::dir().'-col-12');
     $p1 = new PNode();
     $p1->addText($lbls['help']['h-1']);
     $col->addChild($p1);
@@ -86,10 +85,10 @@ function langSwitch(){
     $node = new HTMLNode();
     $node->setClassName('pa-row');
     $arLang = new LinkNode('pages/setup/welcome?lang=ar', 'العربية');
-    $arLang->setClassName('pa-'.Page::get()->getWritingDir().'-col-two');
+    $arLang->setClassName('pa-'.Page::dir().'-col-2');
     $node->addChild($arLang);
     $enLang = new LinkNode('pages/setup/welcome?lang=en', 'English');
-    $enLang->setClassName('pa-'.Page::get()->getWritingDir().'-col-two');
+    $enLang->setClassName('pa-'.Page::dir().'-col-2');
     $node->addChild($enLang);
     return $node;
 }
@@ -103,7 +102,7 @@ function footer($lang){
     $node->setClassName('pa-row');
     $nextButton = new HTMLNode('button');
     $nextButton->setAttribute('onclick', 'window.location.href = \'s/database-setup\'');
-    $nextButton->setClassName('pa-'.Page::get()->getWritingDir().'-col-three');
+    $nextButton->setClassName('pa-'.Page::dir().'-col-3');
     $nextButton->setID('next-button');
     $nextButton->setAttribute('data-action', 'ok');
     $nextButton->addChild(HTMLNode::createTextNode($lang->get('general/next')));
@@ -115,27 +114,27 @@ function stepsCounter($lang,$active){
     $node = new HTMLNode();
     $node->setClassName('pa-row');
     $step1 = new HTMLNode();
-    $step1->setClassName('pa-'.Page::get()->getWritingDir().'-col-two');
+    $step1->setClassName('pa-'.Page::dir().'-col-2');
     $step1->addChild(HTMLNode::createTextNode($lang['welcome']));
     $node->addChild($step1);
     
     $step2 = new HTMLNode();
-    $step2->setClassName('pa-'.Page::get()->getWritingDir().'-col-two');
+    $step2->setClassName('pa-'.Page::dir().'-col-2');
     $step2->addChild(HTMLNode::createTextNode($lang['database-setup']));
     $node->addChild($step2);
     
     $step3 = new HTMLNode();
-    $step3->setClassName('pa-'.Page::get()->getWritingDir().'-col-two');
+    $step3->setClassName('pa-'.Page::dir().'-col-2');
     $step3->addChild(HTMLNode::createTextNode($lang['email-account']));
     $node->addChild($step3);
     
     $step4 = new HTMLNode();
-    $step4->setClassName('pa-'.Page::get()->getWritingDir().'-col-two');
+    $step4->setClassName('pa-'.Page::dir().'-col-2');
     $step4->addChild(HTMLNode::createTextNode($lang['admin-account']));
     $node->addChild($step4);
     
     $step5 = new HTMLNode();
-    $step5->setClassName('pa-'.Page::get()->getWritingDir().'-col-two');
+    $step5->setClassName('pa-'.Page::dir().'-col-2');
     $step5->addChild(HTMLNode::createTextNode($lang['website-config']));
     $node->addChild($step5);
     

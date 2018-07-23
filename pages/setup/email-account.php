@@ -44,21 +44,20 @@ if(Config::get()->isConfig()){
     header('location: '.SiteConfig::get()->getHomePage());
 }
 SystemFunctions::get()->setSetupStage('smtp');
-$page = Page::get();
-$page->setHasHeader(FALSE);
-$page->setHasAside(FALSE);
+Page::header(FALSE);
+Page::aside(FALSE);
 
-$page->usingTheme(SiteConfig::get()->getAdminThemeName());
-$pageLbls = $page->getLanguage()->get('pages/setup/email-account');
-$translation = $page->getLanguage();
-$page->setTitle($translation->get('pages/setup/email-account/title'));
-$page->setDescription($translation->get('pages/setup/email-account/description'));
-$page->insertNode(stepsCounter($page->getLanguage()->get('pages/setup/setup-steps'),2), 'main-content-area');
+Page::theme(SiteConfig::get()->getAdminThemeName());
+$pageLbls = Page::translation()->get('pages/setup/email-account');
+$translation = Page::translation();
+Page::title($translation->get('pages/setup/email-account/title'));
+Page::description($translation->get('pages/setup/email-account/description'));
+Page::insert(stepsCounter(Page::translation()->get('pages/setup/setup-steps'),2), 'main-content-area');
 $js = new JsCode;
 $jsonx = new JsonX();
-$jsonx->add('disconnected', $page->getLanguage()->get('general/disconnected'));
+$jsonx->add('disconnected', Page::translation()->get('general/disconnected'));
 $jsonx->add('success', $pageLbls['labels']['connected']);
-$jsonx->add('checking-connection', $page->getLanguage()->get('general/checking'));
+$jsonx->add('checking-connection', Page::translation()->get('general/checking'));
 $jsonx->add('inv_mail_host_or_port', $pageLbls['errors']['inv_mail_host_or_port']);
 $jsonx->add('inv_username_or_pass', $pageLbls['errors']['inv_username_or_pass']);
 $js->addCode('window.onload = function(){'
@@ -70,85 +69,85 @@ $js->addCode('window.onload = function(){'
         . 'document.getElementById(\'password-input\').oninput = emailInputChanged;'
         . 'document.getElementById(\'account-name-input\').oninput = emailInputChanged;'
         . '}');
-$document = $page->getDocument();
+$document = Page::document();
 $document->getHeadNode()->addChild($js);
 $document->getHeadNode()->addJs('res/js/setup.js');
-$page->insertNode(pageBody($pageLbls),'main-content-area');
-$page->insertNode(footer($page->getLanguage()),'main-content-area');
-echo $page->getDocument();
+Page::insert(pageBody($pageLbls),'main-content-area');
+Page::insert(footer(Page::translation()),'main-content-area');
+Page::render();
 
 function createEmailForm($lbls,$placeholders){
     $form = new HTMLNode('form');
     $form->setClassName('pa-row');
     
     $hostNode = new HTMLNode();
-    $hostNode->setClassName('pa-'.Page::get()->getWritingDir().'-col-twelve');
+    $hostNode->setClassName('pa-'.Page::dir().'-col-12');
     $hostLabel = new Label($lbls['server-address']);
-    $hostLabel->setClassName('pa-'.Page::get()->getWritingDir().'-col-ten');
+    $hostLabel->setClassName('pa-'.Page::dir().'-col-10');
     $hostInput = new Input();
     $hostInput->setPlaceholder($placeholders['server-address']);
     $hostInput->setID('server-address-input');
-    $hostInput->setClassName('pa-'.Page::get()->getWritingDir().'-ltr-col-four');
+    $hostInput->setClassName('pa-'.Page::dir().'-ltr-col-4');
     $hostNode->addChild($hostLabel);
     $hostNode->addChild($hostInput);
     $form->addChild($hostNode);
     
     $portNode = new HTMLNode();
-    $portNode->setClassName('pa-'.Page::get()->getWritingDir().'-col-twelve');
+    $portNode->setClassName('pa-'.Page::dir().'-col-12');
     $portLabel = new Label($lbls['port']);
-    $portLabel->setClassName('pa-'.Page::get()->getWritingDir().'-col-ten');
+    $portLabel->setClassName('pa-'.Page::dir().'-col-10');
     $portInput = new Input();
     $portInput->setPlaceholder($placeholders['port']);
     $portInput->setID('port-input');
-    $portInput->setClassName('pa-'.Page::get()->getWritingDir().'-ltr-col-four');
+    $portInput->setClassName('pa-'.Page::dir().'-col-4');
     $portNode->addChild($portLabel);
     $portNode->addChild($portInput);
     $form->addChild($portNode);
     
     $addressNode = new HTMLNode();
-    $addressNode->setClassName('pa-'.Page::get()->getWritingDir().'-col-twelve');
+    $addressNode->setClassName('pa-'.Page::dir().'-col-12');
     $addressLabel = new Label($lbls['email-address']);
-    $addressLabel->setClassName('pa-'.Page::get()->getWritingDir().'-col-ten');
+    $addressLabel->setClassName('pa-'.Page::dir().'-col-10');
     $addressInput = new Input();
     $addressInput->setPlaceholder($placeholders['email-address']);
     $addressInput->setID('address-input');
-    $addressInput->setClassName('pa-'.Page::get()->getWritingDir().'-ltr-col-four');
+    $addressInput->setClassName('pa-'.Page::dir().'-col-4');
     $addressNode->addChild($addressLabel);
     $addressNode->addChild($addressInput);
     $form->addChild($addressNode);
     
     $usernameNode = new HTMLNode();
-    $usernameNode->setClassName('pa-'.Page::get()->getWritingDir().'-col-twelve');
+    $usernameNode->setClassName('pa-'.Page::dir().'-col-12');
     $usernameLabel = new Label($lbls['username']);
-    $usernameLabel->setClassName('pa-'.Page::get()->getWritingDir().'-col-ten');
+    $usernameLabel->setClassName('pa-'.Page::dir().'-col-10');
     $usernameInput = new Input();
     $usernameInput->setPlaceholder($placeholders['username']);
     $usernameInput->setID('username-input');
-    $usernameInput->setClassName('pa-'.Page::get()->getWritingDir().'-ltr-col-four');
+    $usernameInput->setClassName('pa-'.Page::dir().'-col-4');
     $usernameNode->addChild($usernameLabel);
     $usernameNode->addChild($usernameInput);
     $form->addChild($usernameNode);
     
     $passwordNode = new HTMLNode();
-    $passwordNode->setClassName('pa-'.Page::get()->getWritingDir().'-col-twelve');
+    $passwordNode->setClassName('pa-'.Page::dir().'-col-12');
     $passwordLabel = new Label($lbls['password']);
-    $passwordLabel->setClassName('pa-'.Page::get()->getWritingDir().'-col-ten');
+    $passwordLabel->setClassName('pa-'.Page::dir().'-col-10');
     $passwordInput = new Input('password');
     $passwordInput->setPlaceholder($placeholders['password']);
     $passwordInput->setID('password-input');
-    $passwordInput->setClassName('pa-'.Page::get()->getWritingDir().'-ltr-col-four');
+    $passwordInput->setClassName('pa-'.Page::dir().'-col-4');
     $passwordNode->addChild($passwordLabel);
     $passwordNode->addChild($passwordInput);
     $form->addChild($passwordNode);
     
     $nameNode = new HTMLNode();
-    $nameNode->setClassName('pa-'.Page::get()->getWritingDir().'-col-twelve');
+    $nameNode->setClassName('pa-'.Page::dir().'-col-12');
     $nameLabel = new Label($lbls['name']);
-    $nameLabel->setClassName('pa-'.Page::get()->getWritingDir().'-col-ten');
+    $nameLabel->setClassName('pa-'.Page::dir().'-col-10');
     $nameInput = new Input();
     $nameInput->setPlaceholder($placeholders['name']);
     $nameInput->setID('account-name-input');
-    $nameInput->setClassName('pa-'.Page::get()->getWritingDir().'-ltr-col-four');
+    $nameInput->setClassName('pa-'.Page::dir().'-col-4');
     $nameNode->addChild($nameLabel);
     $nameNode->addChild($nameInput);
     $form->addChild($nameNode);
@@ -159,10 +158,10 @@ function createEmailForm($lbls,$placeholders){
     $submit->setAttribute('onclick', 'return checkMailParams()');
     $submit->setAttribute('disabled', '');
     $submit->setID('check-input');
-    $submit->setClassName('pa-'.Page::get()->getWritingDir().'-ltr-col-four');
+    $submit->setClassName('pa-'.Page::dir().'-col-4');
     $messageNode = new PNode();
     $messageNode->setID('message-display');
-    $messageNode->setClassName('pa-'.Page::get()->getWritingDir().'-ltr-col-twelve');
+    $messageNode->setClassName('pa-'.Page::dir().'-col-12');
     $form->addChild($submit);
     $form->addChild($messageNode);
     
@@ -173,7 +172,7 @@ function pageBody($pageLabels){
     $body = new HTMLNode();
     $body->setClassName('pa-row');
     $col = new HTMLNode();
-    $col->setClassName('pa-'.Page::get()->getWritingDir().'-col-twelve');
+    $col->setClassName('pa-'.Page::dir().'-col-12');
     $p1 = new PNode();
     $p1->addText($pageLabels['help']['h-1']);
     $col->addChild($p1);
@@ -195,7 +194,7 @@ function footer($lang){
     
     $prevButton = new HTMLNode('button');
     $prevButton->setAttribute('onclick', 'window.location.href = \'s/database-setup\'');
-    $prevButton->setClassName('pa-'.Page::get()->getWritingDir().'-col-three');
+    $prevButton->setClassName('pa-'.Page::dir().'-col-3');
     $prevButton->setID('prev-button');
     $prevButton->setAttribute('data-action', 'ok');
     $prevButton->addChild(HTMLNode::createTextNode($lang->get('general/previous')));
@@ -203,7 +202,7 @@ function footer($lang){
     
     $nextButton = new HTMLNode('button');
     $nextButton->setAttribute('onclick', 'window.location.href = \'s/admin-account\'');
-    $nextButton->setClassName('pa-'.Page::get()->getWritingDir().'-col-three');
+    $nextButton->setClassName('pa-'.Page::dir().'-col-3');
     $nextButton->setID('next-button');
     $nextButton->setAttribute('data-action', 'ok');
     $nextButton->addChild(HTMLNode::createTextNode($lang->get('general/next')));
@@ -215,27 +214,27 @@ function stepsCounter($lang,$active){
     $node = new HTMLNode();
     $node->setClassName('pa-row');
     $step1 = new HTMLNode();
-    $step1->setClassName('pa-'.Page::get()->getWritingDir().'-col-two');
+    $step1->setClassName('pa-'.Page::dir().'-col-2');
     $step1->addChild(HTMLNode::createTextNode($lang['welcome']));
     $node->addChild($step1);
     
     $step2 = new HTMLNode();
-    $step2->setClassName('pa-'.Page::get()->getWritingDir().'-col-two');
+    $step2->setClassName('pa-'.Page::dir().'-col-2');
     $step2->addChild(HTMLNode::createTextNode($lang['database-setup']));
     $node->addChild($step2);
     
     $step3 = new HTMLNode();
-    $step3->setClassName('pa-'.Page::get()->getWritingDir().'-col-two');
+    $step3->setClassName('pa-'.Page::dir().'-col-2');
     $step3->addChild(HTMLNode::createTextNode($lang['email-account']));
     $node->addChild($step3);
     
     $step4 = new HTMLNode();
-    $step4->setClassName('pa-'.Page::get()->getWritingDir().'-col-two');
+    $step4->setClassName('pa-'.Page::dir().'-col-2');
     $step4->addChild(HTMLNode::createTextNode($lang['admin-account']));
     $node->addChild($step4);
     
     $step5 = new HTMLNode();
-    $step5->setClassName('pa-'.Page::get()->getWritingDir().'-col-two');
+    $step5->setClassName('pa-'.Page::dir().'-col-2');
     $step5->addChild(HTMLNode::createTextNode($lang['website-config']));
     $node->addChild($step5);
     

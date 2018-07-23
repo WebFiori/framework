@@ -11,9 +11,9 @@ function getHeaderNode(){
     $headerSec = new HTMLNode();
     $headerSec->setClassName('pa-row');
     $headerBody = new HTMLNode();
-    $headerBody->setClassName('pa-'.$page->getWritingDir().'-col-twelve show-border');
+    $headerBody->setClassName('pa-'.$page->getWritingDir().'-col-12 show-border');
     $headerBody->setWritingDir($page->getWritingDir());
-    $headerBody->addChild(HTMLNode::createTextNode('Header Sec'));
+    $headerBody->addTextNode('Header Sec');
     $headerSec->addChild($headerBody);
     return $headerSec;
 }

@@ -5,7 +5,8 @@ $theme->setAuthorUrl('http://ibrahim-2017.blogspot.com');
 $theme->setName('Greeny By Ibrahim Ali');
 $theme->setVersion('1.0');
 $theme->setDescription('First theme ever made. A nice green colored elements That '
-        . 'makes you thing about the nature.');
+        . 'makes you thing about the nature. Use it as a template and a guide for creating '
+        . 'new themes.');
 $theme->setDirectoryName('greeny');
 $theme->setImagesDirName('images');
 $theme->setJsDirName('js');
@@ -15,17 +16,17 @@ $theme->addComponents(array(
     'aside.php'
 ));
 $theme->setAfterLoaded(function(){
-    $page = Page::get();
-    $page->setLang(WebsiteFunctions::get()->getMainSession()->getLang(TRUE));
-    $page->usingLanguage();
-    $page->getDocument()->getBody()->setClassName('pa-container');
-    $page->getDocument()->getChildByID('page-body')->setClassName('pa-row');
-    if($page->hasAside()){
-        $page->getDocument()->getChildByID('side-content-area')->setClassName('pa-'.$page->getWritingDir().'-col-two');
-        $page->getDocument()->getChildByID('main-content-area')->setClassName('pa-'.$page->getWritingDir().'-col-ten');
+    Page::lang(WebsiteFunctions::get()->getMainSession()->getLang(TRUE));
+    Page::translation();
+    Page::document()->getBody()->setClassName('pa-container');
+    Page::document()->getChildByID('page-body')->setClassName('pa-row');
+    if(Page::aside()){
+        Page::document()->getChildByID('side-content-area')->setClassName('pa-'.Page::dir().'-col-2 show-border');
+        Page::document()->getChildByID('main-content-area')->setClassName('pa-'.Page::dir().'-col-10 show-border');
     }
     else{
-        $page->getDocument()->getChildByID('main-content-area')->setClassName('pa-'.$page->getWritingDir().'-col-twelve');
+        Page::document()->getChildByID('main-content-area')->setClassName('pa-'.Page::dir().'-col-12 show-border');
     }
+    Page::document()->getChildByID('main-content-area')->addTextNode('Main Content Area.');
 });
 

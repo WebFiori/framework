@@ -54,3 +54,14 @@ xhr.onreadystatechange = function(){
 }
 xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 xhr.send('')
+
++-------------
+var xhr = new XMLHttpRequest();
+xhr.open('post','http://localhost/generic-php/AccessAPIs/update-user-privileges')
+xhr.onreadystatechange = function(){
+	if(this.readyState === 4){
+		console.log(this.responseText);
+	}
+}
+xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+xhr.send('user-id=1&privileges-string=LOGIN-1;')

@@ -132,6 +132,38 @@ else{
  */
 function displayUser($user){
     Page::theme('Greeny By Ibrahim Ali');
-    Page::document()->getChildByID('main-content-area')->addChild(HTMLNode::createTextNode($user));
+    Page::document()->getChildByID('main-content-area')->addChild(createUserInfoView($user));
     Page::render();
+}
+/**
+ * 
+ * @param User $user
+ * @return \HTMLNode
+ */
+function createUserInfoView($user){
+    $node = new HTMLNode();
+    $node->setClassName('pa-row');
+    $infoNode = new HTMLNode('table');
+    $infoNode->setClassName('pa-'.Page::dir().'-col-6');
+    $infoNode->addChild(createUserInfoTableRow('User ID:', $user->getID()));
+    $infoNode->addChild(createUserInfoTableRow('Username:', $user->getUserName()));
+    $infoNode->addChild(createUserInfoTableRow('Display Name:', $user->getDisplayName()));
+    $infoNode->addChild(createUserInfoTableRow('Email Address:', $user->getEmail()));
+    $infoNode->addChild(createUserInfoTableRow('Registration Date:', $user->getRegDate()));
+    $infoNode->addChild(createUserInfoTableRow('Last Login:', $user->getLastLogin()));
+    $infoNode->addChild(createUserInfoTableRow('Last Password Reset Date:', $user->getLastPasswordResetDate()));
+    $infoNode->addChild(createUserInfoTableRow('Password Reset Count:', $user->getResetCount()));
+    $node->addChild($infoNode);
+    return $node;
+}
+
+function createUserInfoTableRow($label,$content){
+    $row = new HTMLNode('tr');
+    $td1 = new HTMLNode('td');
+    $td1->addChild(HTMLNode::createTextNode('<b>'.$label.'</b>'));
+    $row->addChild($td1);
+    $td2 = new HTMLNode('td');
+    $td2->addChild(HTMLNode::createTextNode($content));
+    $row->addChild($td2);
+    return $row;
 }

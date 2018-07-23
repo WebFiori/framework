@@ -750,7 +750,7 @@ class Page{
      * the function will return it. If not, the function will return NULL.
      * @since 1.9
      */
-    public function dir($new=null) {
+    public static function dir($new=null) {
         $page = Page::get();
         $lNew = strtolower($new);
         if($lNew == 'ltr' || $lNew == 'rtl'){

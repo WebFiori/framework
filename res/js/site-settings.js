@@ -57,10 +57,9 @@ function updateSiteSettings(settings={
 }){
     var ajax = new AJAX({
         method:'post',
-        url:APIS.SysAPIs.link
+        url:APIS.WebsiteAPIs.link+'/update-site-info'
     });
     var form = new FormData();
-    form.append('action','update-site-info');
     if(settings['name'] !== undefined){
         form.append('site-name',settings['name']);
     }

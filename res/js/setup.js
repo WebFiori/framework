@@ -24,10 +24,9 @@
 function checkMailParams(){
     var ajax = new AJAX({
         method:'post',
-        url:APIS.SysAPIs.link
+        url:APIS.SysAPIs.link+'/update-send-email-account'
     });
     var form = new FormData();
-    form.append('action','update-send-email-account');
     form.append('server-address',window.mailAttrs['server-address']);
     form.append('server-port',window.mailAttrs['port']);
     form.append('email-address',window.mailAttrs['address']);
@@ -70,10 +69,9 @@ function checkMailParams(){
 function runSetup(){
     var ajax = new AJAX({
         method:'post',
-        url:APIS.SysAPIs.link
+        url:APIS.SysAPIs.link+'/create-first-account'
     });
     var form = new FormData();
-    form.append('action','create-first-account');
     form.append('username',window.account['username']);
     form.append('password',window.account['password']);
     form.append('email',window.account['email']);
@@ -123,10 +121,9 @@ function runSetup(){
 function checkConectionParams(){
     var ajax = new AJAX({
         method:'post',
-        url:APIS.SysAPIs.link
+        url:APIS.SysAPIs.link+'/update-database-attributes'
     });
     var form = new FormData();
-    form.append('action','update-database-attributes');
     form.append('host',window.dbAttrs['host']);
     form.append('database-username',window.dbAttrs['username']);
     form.append('database-password',window.dbAttrs['password']);

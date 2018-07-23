@@ -28,7 +28,7 @@
  * A class that represents HTML or XML tag.
  *
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.5
+ * @version 1.6
  */
 class HTMLNode {
     /**
@@ -151,6 +151,26 @@ class HTMLNode {
             $this->requireClose = $reqClose === TRUE ? TRUE : FALSE;
             $this->childrenList = new LinkedList();
             $this->attributes = array();
+        }
+    }
+    /**
+     * Adds a text node as a child.
+     * @param string $text The text that will be in the node.
+     * @since 1.6
+     */
+    public function addTextNode($text) {
+        if($this->mustClose()){
+            $this->addChild(self::createTextNode($text));
+        }
+    }
+    /**
+     * Adds a comment node as a child.
+     * @param string $text The text that will be in the node.
+     * @since 1.6
+     */
+    public function addCommentNode($text) {
+        if($this->mustClose()){
+            $this->addChild(self::createComment($text));
         }
     }
     /**

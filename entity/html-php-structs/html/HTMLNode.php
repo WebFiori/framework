@@ -513,7 +513,7 @@ class HTMLNode {
      * , the node is not a comment node and the node must have ending tag.
      * @since 1.0
      */
-    public function addChild(&$node) {
+    public function addChild($node) {
         if(!$this->isTextNode() && !$this->isComment() && $this->mustClose()){
             if($node instanceof HTMLNode){
                 $node->_setParent($this);

@@ -39,7 +39,7 @@ class UnorderedList extends HTMLNode{
      * @param ListItem $listItem The list item that will be added.
      * @since 1.0
      */
-    public function addListItem(&$listItem) {
+    public function addListItem($listItem) {
         $this->addChild($listItem);
     }
     /**
@@ -47,7 +47,7 @@ class UnorderedList extends HTMLNode{
      * @param UnorderedList $ul An object of type <b>UnorderedList</b>
      * @since 1.0
      */
-    public function addSubList(&$ul){
+    public function addSubList($ul){
         $this->addChild($ul);
     }
     /**
@@ -55,7 +55,7 @@ class UnorderedList extends HTMLNode{
      * @param ListItem|UnorderedList $node The node that will be added.
      * @since 1.0
      */
-    public function addChild(&$node) {
+    public function addChild($node) {
         if($node instanceof ListItem){
             parent::addChild($node);
         }

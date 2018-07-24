@@ -82,7 +82,7 @@ class ListItem extends HTMLNode{
      * than the text in its body.
      * @since 1.1
      */
-    public function addChild(&$node) {
+    public function addChild($node) {
         if(!$this->isTextOnly()){
             parent::addChild($node);
         }

@@ -48,7 +48,7 @@ class Br extends HTMLNode{
      * @param type $param
      * @since 1.0
      */
-    public function addChild(&$param) {
+    public function addChild($param) {
         
     }
 }

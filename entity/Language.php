@@ -85,7 +85,7 @@ class Language {
      * characters language code. The index will contain an object of type <b>Language</b>.
      * @since 1.1
      */
-    public static function getLoadedLangs(){
+    public static function &getLoadedLangs(){
         return self::$loadedLangs;
     }
     /**
@@ -100,7 +100,7 @@ class Language {
      * the language was loaded.
      * @since 1.1
      */
-    public static function loadTranslation($langCode='EN'){
+    public static function &loadTranslation($langCode='EN'){
         $uLangCode = strtoupper($langCode);
         $langFile = ROOT_DIR.'/entity/langs/Language_'.$uLangCode.'.php';
         if(file_exists($langFile)){
@@ -174,7 +174,7 @@ class Language {
             }
             $this->languageVars['code'] = strtoupper($code);
             if($this->isLoaded()){
-                self::$loadedLangs[$this->getCode()] = $this;
+                self::$loadedLangs[$this->getCode()] = &$this;
             }
             return TRUE;
         }

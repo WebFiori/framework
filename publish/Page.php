@@ -307,10 +307,7 @@ class Page{
     public function insertNode($node,$parentNodeId='') {
         if(strlen($parentNodeId) != 0){
             if($node instanceof HTMLNode){
-                if($this->document == NULL){
-                    $this->getDocument();
-                }
-                $parentNode = $this->document->getChildByID($parentNodeId);
+                $parentNode = &$this->document->getChildByID($parentNodeId);
                 if($parentNode instanceof HTMLNode){
                     $parentNode->addChild($node);
                     return TRUE;
@@ -384,6 +381,7 @@ class Page{
      * @return boolean The function will return <b>TRUE</b> if the file is saved. 
      * If not, the function will return <b>FALSE</b>
      * @since 1.7
+     * @deprecated since version 1.8
      */
     public function saveToFile($path,$isDynamic=false){
         if($isDynamic === TRUE){
@@ -425,7 +423,7 @@ class Page{
      * @return HTMLDoc The document that is linked with the page.
      * @since 1.9
      */
-    public static function document() {
+    public static function &document() {
         return Page::get()->getDocument();
     }
     /**
@@ -434,7 +432,7 @@ class Page{
      * @throws Exception If page theme is not loaded.
      * @since 1.1
      */
-    public function getDocument(){
+    public function &getDocument(){
         return $this->document;
     }
     /**
@@ -477,10 +475,10 @@ class Page{
         if($val != NULL){
             $this->description = $val;
             if($this->document != NULL ){
-                $headCh = $this->document->getHeadNode()->children();
+                $headCh = &$this->document->getHeadNode()->children();
                 $headChCount = $headCh->size();
                 for($x = 0 ; $x < $headChCount ; $x++){
-                    $node = $headCh->get($x);
+                    $node = &$headCh->get($x);
                     if($node->getAttributeValue('name') == 'description'){
                         $node->setAttribute('content',$val);
                         return;
@@ -512,9 +510,11 @@ class Page{
     */
     public function usingLanguage(){
         if($this->getLang() != NULL){
-            Language::loadTranslation($this->getLang());
-            $pageLang = $this->getLanguage();
-            $this->setWritingDir($pageLang->getWritingDir());
+            if($this->getLanguage() === NULL){
+                Language::loadTranslation($this->getLang());
+                $pageLang = $this->getLanguage();
+                $this->setWritingDir($pageLang->getWritingDir());
+            }
         }
         else{
             throw new Exception('Unable to load transulation. Page language is not set.');
@@ -580,7 +580,7 @@ class Page{
      * NULL.
      * @since 1.9
      */
-    public static function translation(){
+    public static function &translation(){
         $page = Page::get();
         if($page->getLang() != NULL){
             $page->usingLanguage();
@@ -596,12 +596,13 @@ class Page{
      * order for the function to return non-null value.
      * @since 1.6
      */
-    public function getLanguage() {
-        $loadedLangs = Language::getLoadedLangs();
+    public function &getLanguage() {
+        $loadedLangs = &Language::getLoadedLangs();
         if(isset($loadedLangs[$this->getLang()])){
             return $loadedLangs[$this->getLang()];
         }
-        return NULL;
+        $null = NULL;
+        return $null;
     }
     /**
      * Loads or returns page theme.
@@ -657,9 +658,6 @@ class Page{
         $body->addChild($mainContentArea);
         $this->document->addChild($body);
         $this->document->addChild($footerNode);
-        if(function_exists('buildBody')){
-            buildBody();
-        }
         $this->theme->invokeAfterLoaded();
     }
     /**
@@ -793,17 +791,17 @@ class Page{
      */
     public function setHasHeader($bool){
         if(gettype($bool) == 'boolean'){
-            if($this->document != NULL){
-                if($this->incHeader == FALSE && $bool == TRUE){
-                    $children = $this->document->getBody()->children();
-                    $this->document->getBody()->removeAllChildNodes();
-                    $this->document->addChild($this->_getHeader());
-                    for($x = 0 ; $x < $children->size() ; $x++){
-                        $this->document->addChild($children->get($x));
-                    }
+            if($this->incHeader == FALSE && $bool == TRUE){
+                $children = $this->document->getBody()->children();
+                $this->document->getBody()->removeAllChildNodes();
+                $this->document->addChild($this->_getHeader());
+                for($x = 0 ; $x < $children->size() ; $x++){
+                    $this->document->addChild($children->get($x));
                 }
-                else if($this->incHeader == TRUE && $bool == FALSE){
-                    $header = $this->document->getChildByID('page-header');
+            }
+            else if($this->incHeader == TRUE && $bool == FALSE){
+                $header = $this->document->getChildByID('page-header');
+                if($header instanceof HTMLNode){
                     $this->document->removeChild($header);
                 }
             }
@@ -813,12 +811,13 @@ class Page{
     
     public function setHasAside($bool){
         if(gettype($bool) == 'boolean'){
-            if($this->document != NULL){
-                if($this->incAside == FALSE && $bool == TRUE){
-                    
-                }
-                else if($this->incFooter == TRUE && $bool == FALSE){
-                    
+            if($this->incAside == FALSE && $bool == TRUE){
+                
+            }
+            else if($this->incAside == TRUE && $bool == FALSE){
+                $aside = $this->document->getChildByID('side-content-area');
+                if($aside instanceof HTMLNode){
+                    $this->document->removeChild($aside);
                 }
             }
             $this->incAside = $bool;
@@ -833,12 +832,12 @@ class Page{
      */
     public function setHasFooter($bool){
         if(gettype($bool) == 'boolean'){
-            if($this->document != NULL){
-                if($this->incFooter == FALSE && $bool == TRUE){
-                    $this->document->addChild($this->_getFooter());
-                }
-                else if($this->incFooter == TRUE && $bool == FALSE){
-                    $footer = $this->document->getChildByID('page-footer');
+            if($this->incFooter == FALSE && $bool == TRUE){
+                $this->document->addChild($this->_getFooter());
+            }
+            else if($this->incFooter == TRUE && $bool == FALSE){
+                $footer = $this->document->getChildByID('page-footer');
+                if($footer instanceof HTMLNode){
                     $this->document->removeChild($footer);
                 }
             }

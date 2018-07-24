@@ -28,9 +28,14 @@
  * A class that represents a linked list.
  *
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.3
+ * @version 1.4
  */
 class LinkedList {
+    /**
+     * A null guard for the functions that return null reference.
+     * @since 1.4
+     */
+    private $null;
     /**
      * The first node in the list.
      * @var Node
@@ -53,17 +58,18 @@ class LinkedList {
      * Creates new instance of the class.
      */
     public function __construct() {
+        $this->null = NULL;
         $this->head = NULL;
         $this->tail = NULL;
         $this->size = 0;
     }
     /**
      * Returns the number of times a given element has appeared on the list.
-     * @param mixed $el The element that will be checked.
+     * @param mixed $el The element that will be counted.
      * @return int The number of times the element has appeared on the list.
      * @since 1.0
      */
-    public function count($el){
+    public function count(&$el){
         $count = 0;
         if($this->size() == 1){
             if($this->head->data() === $el){
@@ -85,11 +91,11 @@ class LinkedList {
      * Checks if a given element is in the list or not.
      * @param mixed $el The element that will be checked. The comparison is based 
      * on strict equality operator '==='.
-     * @return boolean <b>TRUE</b> if the element is on the list. Other than that, 
-     * the function will return <b>FALSE</b>.
+     * @return boolean TRUE if the element is on the list. Other than that, 
+     * the function will return FALSE.
      * @since 1.0
      */
-    public function contains($el){
+    public function contains(&$el){
         if($this->size() == 0){
             return FALSE;
         }
@@ -110,29 +116,33 @@ class LinkedList {
     /**
      * Returns the first element that was added to the list.
      * @return mixed The first element that was added to the list. If the list 
-     * is empty, The function will return <b>NULL</b>.
+     * is empty, The function will return NULL.
      * @since 1.1
      */
-    public function getFirst(){
+    public function &getFirst(){
         if($this->size() >= 1){
-            return $this->head->data();
+            $data = &$this->head->data();
+            return $data;
         }
-        return NULL;
+        return $this->null;
     }
     /**
      * Returns the last element that was added to the list.
      * @return mixed The last element that was added to the list. If the list 
-     * is empty, The function will return <b>NULL</b>.
+     * is empty, The function will return NULL.
      * @since 1.1
      */
-    public function getLast(){
+    public function &getLast(){
         if($this->size() == 1){
-            return $this->getFirst();
+            $data = &$this->getFirst();
         }
         else if($this->size() > 1){
-            return $this->tail->data();
+            $data = &$this->tail->data();
         }
-        return NULL;
+        else{
+            $data = $this->null;
+        }
+        return $data;
     }
     /**
      * Removes all of the elements from the list.
@@ -146,25 +156,27 @@ class LinkedList {
     /**
      * Returns the element at the specified index.
      * @return mixed The element at the specified index. If the list 
-     * is empty or the given index is not in the list, The function will 
-     * return <b>NULL</b>.
+     * is empty or the given index is out of list bounds, The function will 
+     * return NULL.
      * @since 1.1
      */
-    public function get($index){
+    public function &get($index){
         if(gettype($index) == 'integer'){
             if($index < $this->size() && $index > -1){
                 if($index == 0){
-                    return $this->getFirst();
+                    $first = &$this->getFirst();
+                    return $first;
                 }
                 else if($index == $this->size() - 1){
-                    return $this->getLast();
+                    $last = &$this->getLast();
+                    return $last;
                 }
                 else{
                     $nextNode = $this->head->next();
                     $node = $this->head;
                     for($i = 1 ; ; $i++){
                         if($i == $index){
-                            $data = $nextNode->data();
+                            $data = &$nextNode->data();
                             return $data;
                         }
                         $node = $nextNode;
@@ -173,7 +185,7 @@ class LinkedList {
                 }
             }
         }
-        return NULL;
+        return $this->null;
     }
     /**
      * Returns an array that represents the list.
@@ -200,13 +212,13 @@ class LinkedList {
     }
     /**
      * Sort the elements of the list using insertion sort algorithm.
-     * @param boolean $ascending If set to <b>TRUE</b> list elements 
+     * @param boolean $ascending If set to TRUElist elements 
      * will be sorted in ascending order (From lower to higher). Else, 
      * they will be sorted in descending order (From higher to lower).
-     * @return boolean The function will return <b>TRUE</b> if list 
+     * @return boolean The function will return TRUE if list 
      * elements have been sorted. The only case that the function 
-     * will return <b>FALSE</b> is when the list has an object which does 
-     * not implement the interface <b>Comparable</b>.
+     * will return FALSE is when the list has an object which does 
+     * not implement the interface Comparable.
      * @since 1.3
      */
     public function insertionSort($ascending=true) {
@@ -254,13 +266,13 @@ class LinkedList {
     /**
      * Removes an element given its index.
      * @param int $index The index of the element.
-     * @return mixed If the given index is in the range <b>[0, LinkedList::size() - 1]</b>, 
+     * @return mixed If the given index is in the range [0, LinkedList::size() - 1] 
      * the element at the given index is returned. If the list is empty or the given 
-     * index is out of the range, the function will return <b>NULL</b>. Also the 
-     * function will return <b>NULL</b> if the given index is not an integer.
+     * index is out of the range, the function will return NULL. Also the 
+     * function will return NULL if the given index is not an integer.
      * @since 1.0
      */
-    public function remove($index){
+    public function &remove($index){
         if(gettype($index) == 'integer'){
             if($index < $this->size() && $index > -1){
                 if($index == 0){
@@ -285,15 +297,15 @@ class LinkedList {
                 }
             }
         }
-        return NULL;
+        return $this->null;
     }
     /**
      * Removes the first element in the list.
      * @return mixed If the list has elements, the first element is returned. 
-     * If the list is empty, the function will return <b>NULL</b>.
+     * If the list is empty, the function will return NULL.
      * @since 1.0
      */
-    public function removeFirst() {
+    public function &removeFirst() {
         if($this->size() == 1){
             $data = $this->head->data();
             $this->head = NULL;
@@ -307,15 +319,15 @@ class LinkedList {
             $this->reduceSize();
             return $data;
         }
-        return NULL;
+        return $this->null;
     }
     /**
      * Removes the last element in the list.
      * @return mixed If the list has elements, the last element is returned. 
-     * If the list is empty, the function will return <b>NULL</b>.
+     * If the list is empty, the function will return NULL.
      * @since 1.0
      */
-    public function removeLast(){
+    public function &removeLast(){
         if($this->size() == 1){
             return $this->removeFirst();
         }
@@ -331,7 +343,7 @@ class LinkedList {
             $node->setNext($null);
             return $data;
         }
-        return NULL;
+        return $this->null;
     }
     /**
      * Reduce the size of the list.
@@ -349,10 +361,10 @@ class LinkedList {
      * will remove the first occurrence of the element if it is repeated. Note 
      * that the function use strict comparison to check for equality.
      * @return mixed The function will return The element after removal if the given element 
-     * is removed. Other than that, the function will return <b>NULL</b>.
+     * is removed. Other than that, the function will return NULL.
      * @since 1.0
      */
-    public function removeElement($val){
+    public function &removeElement(&$val){
         if($this->size() == 1){
             if($this->head->data() === $val){
                 $el = $this->head->data();
@@ -385,7 +397,7 @@ class LinkedList {
                 }
             }
         }
-        return NULL;
+        return $this->null;
     }
     /**
      * Returns the index of an element.
@@ -395,7 +407,7 @@ class LinkedList {
      * the element, the function will return -1.
      * @since 1.2
      */
-    public function indexOf($el){
+    public function indexOf(&$el){
         if($this->size() == 1){
             return $this->head->data() === $el ? 0 : -1;
         }
@@ -422,11 +434,11 @@ class LinkedList {
      * Replace an element with new one.
      * @param mixed $oldEl The element that will be replaced.
      * @param mixed $newEl The element that will replace the old one.
-     * @return boolean The function will return <b>TRUE</b> if replaced. 
-     * if the element is not replaced, the function will return <b>FALSE</b>.
+     * @return boolean The function will return TRUE if replaced. 
+     * if the element is not replaced, the function will return FALSE.
      * @since 1.2
      */
-    public function replace($oldEl,$newEl){
+    public function replace(&$oldEl,&$newEl){
         if($this->size() == 1){
             if($this->head->data() === $oldEl){
                 $this->head->setData($newEl);
@@ -457,10 +469,10 @@ class LinkedList {
     /**
      * Adds new element to the list.
      * @param mixed $el The element that will be added. It can be of any type.
-     * @return boolean <b>TRUE</b> if the element is added.
+     * @return boolean TRUE if the element is added.
      * @since 1.0
      */
-    public function add($el){
+    public function add(&$el){
         if($this->head == NULL){
             $this->head = new Node($el);
             $this->size = 1;
@@ -491,6 +503,12 @@ class LinkedList {
     public function size(){
         return $this->size;
     }
+    /**
+     * Returns a string that represents the list and its element.
+     * @return string A string that represents the list and its element. The 
+     * string will be wrapped inside a 'pre' html element to make it well 
+     * formatted and viewable in the web browser.
+     */
     public function __toString() {
         $retVal = '<pre>List['."\n";
         $node = $this->head;

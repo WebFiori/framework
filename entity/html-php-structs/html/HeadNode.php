@@ -104,7 +104,7 @@ class HeadNode extends HTMLNode{
      * @since 1.0
      */
     public function setTitle($title){
-        if(gettype($title) == 'string'){
+        if(strlen($title) != 0){
             if($this->titleNode == NULL){
                 $this->titleNode = new HTMLNode('title');
                 $this->titleNode->addChild(self::createTextNode($title));
@@ -126,7 +126,7 @@ class HeadNode extends HTMLNode{
         $chCount = $children->size();
         $list = new LinkedList();
         for($x = 0 ; $x < $chCount ; $x++){
-            $child = $children->get($x);
+            $child = &$children->get($x);
             $childName = $child->getName();
             if($childName == 'link'){
                 if($child->hasAttribut('rel') && $child->getAttributeValue('rel') == 'stylesheet'){
@@ -147,7 +147,7 @@ class HeadNode extends HTMLNode{
         $chCount = $children->size();
         $list = new LinkedList();
         for($x = 0 ; $x < $chCount ; $x++){
-            $child = $children->get($x);
+            $child = &$children->get($x);
             $childName = $child->getName();
             if($childName == 'script'){
                 if($child->hasAttribut('type') && $child->getAttributeValue('type') == 'text/javascript'){
@@ -168,7 +168,7 @@ class HeadNode extends HTMLNode{
         $chCount = $children->size();
         $list = new LinkedList();
         for($x = 0 ; $x < $chCount ; $x++){
-            $child = $children->get($x);
+            $child = &$children->get($x);
             $childName = $child->getName();
             if($childName == 'meta'){
                 $list->add($child);
@@ -198,7 +198,7 @@ class HeadNode extends HTMLNode{
      * @since 1.0
      */
     public function addCSS($href){
-        if(gettype($href) == 'string' && strlen($href) != 0){
+        if(strlen($href) != 0){
             $tag = new HTMLNode('link', FALSE, FALSE);
             $tag->setAttribute('rel','stylesheet');
             $tag->setAttribute('href', $href);
@@ -211,7 +211,7 @@ class HeadNode extends HTMLNode{
      * @since 1.0
      */
     public function addJs($loc){
-        if(gettype($loc) == 'string' && strlen($loc) != 0){
+        if(strlen($loc) != 0){
             $tag = new HTMLNode('script', TRUE, FALSE);
             $tag->setAttribute('type','text/javascript');
             $tag->setAttribute('src', $loc);
@@ -224,7 +224,7 @@ class HeadNode extends HTMLNode{
      * @since 1.0
      */
     public function setCanonical($link){
-        if(gettype($link) == 'string' && strlen($link) != 0){
+        if(strlen($link) != 0){
             if($this->canonical == NULL){
                 $this->canonical = new HTMLNode('link',FALSE);
                 $this->canonical->setAttribute('rel', 'canonical');
@@ -251,14 +251,12 @@ class HeadNode extends HTMLNode{
      * @since 1.0
      */
     public function addAlternate($url,$lang){
-        if(gettype($url) == 'string' && gettype($lang) == 'string'){
-            if(strlen($url) != 0 && strlen($lang) != 0){
-                $node = new HTMLNode('link', FALSE, FALSE);
-                $node->setAttribute('rel','alternate');
-                $node->setAttribute('hreflang', $lang);
-                $node->setAttribute('href', $url);
-                $this->addChild($node);
-            }
+        if(strlen($url) != 0 && strlen($lang) != 0){
+            $node = new HTMLNode('link', FALSE, FALSE);
+            $node->setAttribute('rel','alternate');
+            $node->setAttribute('hreflang', $lang);
+            $node->setAttribute('href', $url);
+            $this->addChild($node);
         }
     }
     /**
@@ -291,7 +289,7 @@ class HeadNode extends HTMLNode{
         $chCount = $children->size();
         $list = new LinkedList();
         for($x = 0 ; $x < $chCount ; $x++){
-            $child = $children->get($x);
+            $child = &$children->get($x);
             $childName = $child->getName();
             if($childName == 'link'){
                 if($child->hasAttribut('rel') && $child->getAttributeValue('rel') == 'alternate'){

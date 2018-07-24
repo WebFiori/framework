@@ -27,9 +27,14 @@
  * A class that represents a stack data structure.
  *
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.0
+ * @version 1.1
  */
 class Stack{
+    /**
+     * A null guard for the functions that return null reference.
+     * @since 1.1
+     */
+    private $null;
     /**
      * The bottom node of the stack.
      * @var Node
@@ -56,12 +61,13 @@ class Stack{
     private $max;
     /**
      * Constructs a new instance of the class.
-     * @param int $max The maximum number of elements the stack can hold. 
+     * @param int $max [Optional] The maximum number of elements the stack can hold. 
      * if a negative number is given or 0, the stack will have unlimited number 
      * of elements. Also if the given value is not an integer, the maximum will be set 
-     * to unlimited.
+     * to unlimited. Default is 0.
      */
     public function __construct($max=0) {
+        $this->null = NULL;
         $this->head = NULL;
         $this->tail = NULL;
         $this->size = 0;
@@ -75,8 +81,10 @@ class Stack{
     /**
      * Returns the number of maximum elements the stack can hold.
      * @return int If the maximum number of elements was set to 0 or a 
-     * negative number, the function will return <b>-1</b>. Other than that, 
-     * the function will return the maximum number of elements
+     * negative number, the function will return -1 which indicates that 
+     * the stack can have infinite number of elements. Other than that, 
+     * the function will return the maximum number of elements.
+     * @since 1.0
      */
     public function max(){
         if($this->max <= 0){
@@ -86,15 +94,15 @@ class Stack{
     }
     /**
      * Adds new element to the top of the stack.
-     * @param mixed $el The element that will be added. If it is <b>NULL</b>, the 
+     * @param mixed $el The element that will be added. If it is NULL, the 
      * function will not add it.
-     * @return boolean The function will return <b>TRUE</b> if the element is added. 
-     * The function will return <b>FALSE</b> only in two cases, If the maximum 
+     * @return boolean The function will return TRUE if the element is added. 
+     * The function will return FALSE only in two cases, If the maximum 
      * number of elements is reached and trying to add new one or the given element 
-     * is <b>NULL</b>.
+     * is NULL.
      * @since 1.0
      */
-    public function push($el) {
+    public function push(&$el) {
         if($el != NULL){
             if($this->validateSize()){
                 if($this->size() == 0){
@@ -122,10 +130,10 @@ class Stack{
     /**
      * Returns the element that exist on the top of the stack.
      * @return mixed The element at the top. If the stack is empty, the function 
-     * will return <b>NULL</b>.
+     * will return NULL.
      * @since 1.0
      */
-    public function peek(){
+    public function &peek(){
         if($this->size() == 1){
             return $this->head->data();
         }
@@ -133,18 +141,18 @@ class Stack{
             return $this->tail->data();
         }
         else{
-            return NULL;
+            return $this->null;
         }
     }
     /**
      * Removes an element from the top of the stack.
      * @return mixed The element after removal from the stack. If the stack is 
-     * empty, the function will return <b>NULL</b>.
+     * empty, the function will return NULL.
      * @since 1.0
      */
-    public function pop(){
+    public function &pop(){
         if($this->size() == 0){
-            return NULL;
+            return $this->null;
         }
         else if($this->size() == 1){
             $data = $this->head->data();
@@ -170,7 +178,7 @@ class Stack{
     }
     /**
      * Checks if the stack can hold more elements or not.
-     * @return boolean <b>TRUE</b> if the stack can hold more elements.
+     * @return boolean TRUE if the stack can hold more elements.
      * @since 1.0
      */
     private function validateSize(){
@@ -192,6 +200,12 @@ class Stack{
     public function size(){
         return $this->size;
     }
+    /**
+     * Returns a string that represents the stack and its element.
+     * @return string A string that represents the stack and its element. The 
+     * string will be wrapped inside a 'pre' html element to make it well 
+     * formatted and viewable in the web browser.
+     */
     public function __toString() {
         $retVal = 'Stack[';
         $node = $this->head;

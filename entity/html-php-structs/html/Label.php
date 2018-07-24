@@ -49,12 +49,4 @@ class Label extends HTMLNode{
     public function setText($text) {
         $this->children()->get(0)->setText($text);
     }
-    /**
-     * A function that does nothing.
-     * @param type $node
-     * @since 1.0
-     */
-    public function addChild($node) {
-        
-    }
 }

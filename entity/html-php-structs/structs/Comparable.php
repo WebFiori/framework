@@ -25,7 +25,8 @@
  */
 
 /**
- *
+ * An interface that is used to compare objects. It is used by the class 
+ * LinkedList's sorting function in order to compare objects.
  * @author Ibrahim
  * @version 1.0
  */

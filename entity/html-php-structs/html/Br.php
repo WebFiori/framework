@@ -32,7 +32,7 @@
  */
 class Br extends HTMLNode{
     public function __construct() {
-        parent::__construct('br', FALSE, FALSE);
+        parent::__construct('br', FALSE);
     }
     /**
      * A function that does nothing.
@@ -48,7 +48,7 @@ class Br extends HTMLNode{
      * @param type $param
      * @since 1.0
      */
-    public function addChild($param) {
+    public function addChild(&$param) {
         
     }
 }

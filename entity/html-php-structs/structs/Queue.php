@@ -27,9 +27,14 @@
  * A class that represents a stack data structure.
  *
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.0
+ * @version 1.1
  */
 class Queue{
+    /**
+     * A null guard for the functions that return null reference.
+     * @since 1.1
+     */
+    private $null;
     /**
      * The first element in the queue.
      * @var Node
@@ -57,14 +62,15 @@ class Queue{
     private $max;
     /**
      * Constructs a new instance of the class.
-     * @param int $max The maximum number of elements the queue can hold. 
+     * @param int $max [Optional] The maximum number of elements the queue can hold. 
      * if a negative number is given or 0, the queue will have unlimited number 
      * of elements. Also if the given value is not an integer, the maximum will be set 
-     * to unlimited.
+     * to unlimited. Default is 0.
      */
     public function __construct($max=0) {
         $this->head = NULL;
         $this->tail = NULL;
+        $this->null = NULL;
         $this->size = 0;
         if(gettype($max) == 'integer'){
             $this->max = $max;
@@ -75,15 +81,15 @@ class Queue{
     }
     /**
      * Adds new element to the bottom of the queue.
-     * @param mixed $el The element that will be added. If it is <b>NULL</b>, the 
+     * @param mixed $el The element that will be added. If it is NULL, the 
      * function will not add it.
-     * @return boolean The function will return <b>TRUE</b> if the element is added. 
-     * The function will return <b>FALSE</b> only in two cases, If the maximum 
+     * @return boolean The function will return TRUE if the element is added. 
+     * The function will return FALSE only in two cases, If the maximum 
      * number of elements is reached and trying to add new one or the given element 
-     * is <b>NULL</b>.
+     * is NULL.
      * @since 1.0
      */
-    public function enqueue($el){
+    public function enqueue(&$el){
         if($this->validateSize()){
             if($el != NULL){
                 if($this->size() == 0){
@@ -114,8 +120,10 @@ class Queue{
     /**
      * Returns the number of maximum elements the queue can hold.
      * @return int If the maximum number of elements was set to 0 or a 
-     * negative number, the function will return <b>-1</b>. Other than that, 
-     * the function will return the maximum number of elements
+     * negative number, the function will return -1 which indicates 
+     * that the queue can have any number of elements. Other than that, 
+     * the function will return the maximum number of elements.
+     * @since 1.0
      */
     public function max(){
         if($this->max <= 0){
@@ -126,24 +134,24 @@ class Queue{
     /**
      * Returns the element that exist on the top of the queue.
      * @return mixed The element at the top. If the stack is empty, the function 
-     * will return <b>NULL</b>.
+     * will return NULL.
      * @since 1.0
      */
-    public function peek(){
+    public function &peek(){
         if($this->size() >= 1){
             return $this->head->data();
         }
         else{
-            return NULL;
+            return $this->null;
         }
     }
     /**
      * Removes the top element from the stack.
      * @return mixed The element after removal from the queue. If the queue is 
-     * empty, the function will return <b>NULL</b>.
+     * empty, the function will return NULL.
      * @since 1.0
      */
-    public function dequeue(){
+    public function &dequeue(){
         if($this->size > 1){
             $data = $this->head->data();
             $this->head = $this->head->next();
@@ -158,7 +166,7 @@ class Queue{
             return $data;
         }
         else{
-            return NULL;
+            return $this->null;
         }
     }
     /**
@@ -171,7 +179,7 @@ class Queue{
     }
     /**
      * Checks if the queue can hold more elements or not.
-     * @return boolean <b>TRUE</b> if the queue can hold more elements.
+     * @return boolean TRUE if the queue can hold more elements.
      * @since 1.0
      */
     private function validateSize(){
@@ -184,6 +192,12 @@ class Queue{
         }
         return FALSE;
     }
+    /**
+     * Returns a string that represents the queue and its element.
+     * @return string A string that represents the queue and its element. The 
+     * string will be wrapped inside a 'pre' html element to make it well 
+     * formatted and viewable in the web browser.
+     */
     public function __toString() {
         $retVal = 'Queue[';
         $node = $this->head;

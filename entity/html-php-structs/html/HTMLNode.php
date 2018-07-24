@@ -25,12 +25,17 @@
  */
 
 /**
- * A class that represents HTML or XML tag.
+ * A class that represents HTML element.
  *
  * @author Ibrahim <ibinshikh@hotmail.com>
  * @version 1.6
  */
 class HTMLNode {
+    /**
+     * A null guard for the functions that return null reference.
+     * @since 1.6
+     */
+    private $null;
     /**
      * Default formatting for the code.
      * @var array
@@ -129,20 +134,26 @@ class HTMLNode {
      * Constructs a new instance of the class.
      * @param string $name [Optional] The name of the node (such as 'div').  If 
      * we want to create a comment node, the name should be '#comment'. If 
-     * we want to create a text node, the name should be '#text'.Default value 
-     * is 'div'.
+     * we want to create a text node, the name should be '#text'. If empty string is 
+     * given, default value will be used. The Default value is 'div'.
      * @param boolean $reqClose [Optional] If set to <b>TRUE</b>, this means that the node 
      * must end with closing tag. If $name is set to '#text' or '#comment', 
      * this argument is ignored. Default is <b>TRUE</b>.
      * 
      */
     public function __construct($name='div',$reqClose=true) {
+        $this->null = NULL;
         $nameUpper = strtoupper($name);
         if($name == '#TEXT' || $nameUpper == '#COMMENT'){
             $this->name = $nameUpper;
         }
         else{
-            $this->name = strtolower($name);
+            if($name == ''){
+                $this->name = 'div';
+            }
+            else{
+                $this->name = strtolower($name);
+            }
         }
         if($this->isTextNode() === TRUE || $this->isComment()){
             $this->requireClose = FALSE;
@@ -151,26 +162,6 @@ class HTMLNode {
             $this->requireClose = $reqClose === TRUE ? TRUE : FALSE;
             $this->childrenList = new LinkedList();
             $this->attributes = array();
-        }
-    }
-    /**
-     * Adds a text node as a child.
-     * @param string $text The text that will be in the node.
-     * @since 1.6
-     */
-    public function addTextNode($text) {
-        if($this->mustClose()){
-            $this->addChild(self::createTextNode($text));
-        }
-    }
-    /**
-     * Adds a comment node as a child.
-     * @param string $text The text that will be in the node.
-     * @since 1.6
-     */
-    public function addCommentNode($text) {
-        if($this->mustClose()){
-            $this->addChild(self::createComment($text));
         }
     }
     /**
@@ -188,7 +179,7 @@ class HTMLNode {
      * has a parent. If the node has no parent, the function will return <b>NULL</b>.
      * @since 1.2
      */
-    public function getParent() {
+    public function &getParent() {
         return $this->parentNode;
     }
     /**
@@ -196,7 +187,7 @@ class HTMLNode {
      * @param HTMLNode $node
      * @since 1.2
      */
-    private function _setParent($node){
+    private function _setParent(&$node){
         $this->parentNode = $node;
     }
     /**
@@ -205,7 +196,7 @@ class HTMLNode {
      * given node is a text node, the function will return <b>NULL</b>.
      * @since 1.0
      */
-    public function children(){
+    public function &children(){
         return $this->childrenList;
     }
     /**
@@ -215,7 +206,7 @@ class HTMLNode {
      * @return HTMLNode An object of type HTMLNode.
      * @since 1.5
      */
-    public static function createTextNode($nodeText){
+    public static function &createTextNode($nodeText){
         $text = new HTMLNode('#TEXT');
         $text->setText($nodeText);
         return $text;
@@ -227,28 +218,28 @@ class HTMLNode {
      * @return HTMLNode An object of type HTMLNode.
      * @since 1.5
      */
-    public static function createComment($text) {
+    public static function &createComment($text) {
         $comment = new HTMLNode('#COMMENT');
         $comment->setText($text);
         return $comment;
     }
     /**
      * Checks if the node is a text node or not.
-     * @return boolean <b>TRUE</b> if the node is a text node.
+     * @return boolean TRUE if the node is a text node. FALSE otherwise.
      * @since 1.0
      */
     public function isTextNode() {
         return $this->getName() == '#TEXT';
     }
     /**
-     * Checks if a given node is a child of the instance.
+     * Checks if a given node is a direct child of the instance.
      * @param HTMLNode $node The node that will be checked.
-     * @return boolean <b>TRUE</b> is returned if the node is a child 
-     * of the instance. <b>FALSE</b> if not. Also if the current instance is a 
-     * text node, the function will always return <b>FALSE</b>.
+     * @return boolean TRUE is returned if the node is a child 
+     * of the instance. FALSE if not. Also if the current instance is a 
+     * text node or a comment node, the function will always return FALSE.
      * @since 1.2
      */
-    public function hasChild($node) {
+    public function hasChild(&$node) {
         if(!$this->isTextNode() && !$this->isComment()){
             if($node instanceof HTMLNode){
                 return $this->children()->indexOf($node) != -1;
@@ -260,10 +251,10 @@ class HTMLNode {
      * Replace a direct child node with a new one.
      * @param HTMLNode $oldNode The old node. It must be a child of the instance.
      * @param HTMLNode $replacement The replacement node.
-     * @return boolean <b>TRUE</b> is returned if the node replaced. <b>FALSE</b> if not.
+     * @return boolean TRUE is returned if the node replaced. FALSE</b> if not.
      * @since 1.2
      */
-    public function replaceChild($oldNode,$replacement) {
+    public function replaceChild(&$oldNode,&$replacement) {
         if(!$this->isTextNode() && !$this->isComment()){
             if($oldNode instanceof HTMLNode){
                 if($this->hasChild($oldNode)){
@@ -323,12 +314,12 @@ class HTMLNode {
      * @param LinkedList $chNodes
      * @return NULL|HTMLNode Description
      */
-    private function _getChildByID($val,$chNodes){
+    private function &_getChildByID($val,$chNodes){
         $chCount = $chNodes->size();
         for($x = 0 ; $x < $chCount ; $x++){
             $child = $chNodes->get($x);
             if(!$child->isTextNode()){
-                $tmpCh = $child->_getChildByID($val,$child->children());
+                $tmpCh = &$child->_getChildByID($val,$child->children());
                 if($tmpCh instanceof HTMLNode){
                     return $tmpCh;
                 }
@@ -343,27 +334,27 @@ class HTMLNode {
                 }
             }
         }
-        return NULL;
+        return $this->null;
     }
     /**
      * Returns a child node given its ID.
      * @param string $val The ID of the child.
-     * @return NULL|HTMLNode The function returns an object of type <b>HTMLNode</b> 
-     * if found. If no node has the given ID, the function will return <b>NULL</b>.
+     * @return NULL|HTMLNode The function returns an object of type HTMLNode 
+     * if found. If no node has the given ID, the function will return NULL.
      * @since 1.2
      */
-    public function getChildByID($val){
+    public function &getChildByID($val){
         if(!$this->isTextNode() && !$this->isComment()){
             $val = $val.'';
             if(strlen($val) != 0){
                 return $this->_getChildByID($val, $this->children());
             }
         }
-        return NULL;
+        return $this->null;
     }
     /**
      * Checks if the node require ending tag or not.
-     * @return boolean <b>TRUE</b> if the node does require ending tag.
+     * @return boolean TRUE if the node does require ending tag.
      * @since 1.0
      */
     public function mustClose() {
@@ -373,7 +364,7 @@ class HTMLNode {
      * Returns the name of the node.
      * @return string The name of the node. If the node is a text node, the 
      * function will return the value '#TEXT'. If the node is a comment node, the 
-     * function will return the value '#TEXT'.
+     * function will return the value '#COMMENT'.
      * @since 1.0
      */
     public function getName(){
@@ -500,29 +491,29 @@ class HTMLNode {
      * Removes a direct child node.
      * @param HTMLNode $node The node that will be removed.
      * @return HTMLNode|NULL The function will return the node if removed. 
-     * If not removed, the function will return <b>NULL</b>.
+     * If not removed, the function will return NULL.
      * @since 1.2
      */
-    public function removeChild($node) {
+    public function &removeChild(&$node) {
         if(!$this->isTextNode() && !$this->isComment()){
             if($node instanceof HTMLNode){
-                $child = $this->children()->removeElement($node);
+                $child = &$this->children()->removeElement($node);
                 if($child instanceof HTMLNode){
-                    $child->_setParent(NULL);
+                    $child->_setParent($this->null);
                     return $child;
                 }
             }
         }
-        return NULL;
+        return $this->null;
     }
     /**
      * Adds new child node.
      * @param HTMLNode $node The node that will be added. The node can have 
-     * child notes only if two conditions are met. If the node is not a text node 
-     * and the node must have ending tag.
+     * child nodes only if 3 conditions are met. If the node is not a text node 
+     * , the node is not a comment node and the node must have ending tag.
      * @since 1.0
      */
-    public function addChild($node) {
+    public function addChild(&$node) {
         if(!$this->isTextNode() && !$this->isComment() && $this->mustClose()){
             if($node instanceof HTMLNode){
                 $node->_setParent($this);
@@ -531,10 +522,29 @@ class HTMLNode {
         }
     }
     /**
-     * Sets the value of the property <b>$text</b>.
+     * Adds a text node as a child.
+     * @param string $text The text that will be in the node.
+     * @since 1.6
+     */
+    public function addTextNode($text) {
+        if($this->mustClose()){
+            $this->addChild(self::createTextNode($text));
+        }
+    }
+    /**
+     * Adds a comment node as a child.
+     * @param string $text The text that will be in the node.
+     * @since 1.6
+     */
+    public function addCommentNode($text) {
+        if($this->mustClose()){
+            $this->addChild(self::createComment($text));
+        }
+    }
+    /**
+     * Sets the value of the property $text.
      * @param string $text The text to set. If the node is not a text node or 
-     * a comment node, 
-     * the value will never be set.
+     * a comment node, the value will never be set.
      * @since 1.0
      */
     public function setText($text) {
@@ -545,11 +555,15 @@ class HTMLNode {
     /**
      * Returns the value of the text that this node represents.
      * @return string If the node is a text node or a comment node, 
-     * the function will return the text in the body of the node.
+     * the function will return the text in the body of the node. If not, 
+     * the function will return empty string.
      * @since 1.0
      */
     public function getText() {
-        return $this->text;
+        if($this->isComment() || $this->isTextNode()){
+            return $this->text;
+        }
+        return '';
     }
     /**
      * Returns the node as HTML comment.
@@ -594,11 +608,12 @@ class HTMLNode {
     }
     /**
      * Returns HTML string that represents the node as a whole.
-     * @param boolean $formatted [Optional] Set to <b>TRUE</b> to return a well formatted 
-     * HTML document. Default is <b>FALSE</b>.
+     * @param boolean $formatted [Optional] Set to TRUE to return a well formatted 
+     * HTML document. Default is FALSE.
      * @param int $initTab [Optional] Initial tab count. Used in case of the document is 
-     * well formatted.
+     * well formatted. This number represents the size of code indentation.
      * @return string HTML string that represents the node.
+     * @since 1.0
      */
     public function toHTML($formatted=false,$initTab=0) {
         if(!$formatted){
@@ -637,7 +652,7 @@ class HTMLNode {
      * 
      * @param HTMLNode $node
      */
-    private function _pushNode($node) {
+    private function _pushNode(&$node) {
         if($node->isTextNode()){
             $this->htmlString .= $this->_getTab().$node->getText().$this->nl;
         }
@@ -651,7 +666,7 @@ class HTMLNode {
                 $this->htmlString .= $this->_getTab().$node->open().$this->nl;
                 $this->_addTab();
                 for($x = 0 ; $x < $chCount ; $x++){
-                    $nodeAtx = $node->children()->get($x);
+                    $nodeAtx = &$node->children()->get($x);
                     $this->_pushNode($nodeAtx);
                 }
                 $this->_reduceTab();
@@ -663,7 +678,7 @@ class HTMLNode {
         }
     }
     private function _popNode(){
-        $node = $this->nodesStack->pop();
+        $node = &$this->nodesStack->pop();
         if($node != NULL){
             $this->htmlString .= $this->_getTab().'</'.$node->getName().'>'.$this->nl;
         }
@@ -798,7 +813,7 @@ class HTMLNode {
      * @param array $FO Formatting options.
      * @since 1.5
      */
-    private function _pushNodeAsCode($node,$FO) {
+    private function _pushNodeAsCode(&$node,$FO) {
         if($node->isTextNode()){
             $this->codeString .= $this->_getTab().$node->getText().$this->nl;
         }
@@ -817,7 +832,7 @@ class HTMLNode {
                 $this->codeString .= $this->_getTab().$node->_openAsCode($FO).$this->nl;
                 $this->_addTab();
                 for($x = 0 ; $x < $chCount ; $x++){
-                    $nodeAtx = $node->children()->get($x);
+                    $nodeAtx = &$node->children()->get($x);
                     $this->_pushNodeAsCode($nodeAtx,$FO);
                 }
                 $this->_reduceTab();
@@ -834,7 +849,7 @@ class HTMLNode {
      * @since 1.5
      */
     private function _popNodeAsCode($FO){
-        $node = $this->nodesStack->pop();
+        $node = &$this->nodesStack->pop();
         if($node != NULL){
             $this->codeString .= $this->_getTab().$node->_closeAsCode($FO).$this->nl;
         }
@@ -917,10 +932,13 @@ class HTMLNode {
      * Returns a node based on its attribute value (Direct child).
      * @param string $attrName The name of the attribute.
      * @param string $attrVal The value of the attribute.
-     * @return HTMLNode|NULL The function will return an object of type <b>HTMLNode</b> 
-     * if a node is found. Other than that, the function will return <b>NULL</b>.
+     * @return HTMLNode|NULL The function will return an object of type HTMLNode 
+     * if a node is found. Other than that, the function will return NULL. Note 
+     * that if there are multiple children with the same attribute and value, 
+     * the first occurence is returned.
+     * @since 1.2
      */
-    public function getChildByAttributeValue($attrName,$attrVal) {
+    public function &getChildByAttributeValue($attrName,$attrVal) {
         if(!$this->isTextNode() && !$this->isComment()){
             for($x = 0 ; $x < $this->children()->size() ; $x++){
                 $ch = $this->children()->get($x);
@@ -931,7 +949,7 @@ class HTMLNode {
                 }
             }
         }
-        return NULL;
+        return $this->null;
     }
     /**
      * Returns the value of an attribute.
@@ -959,7 +977,7 @@ class HTMLNode {
         return FALSE;
     }
     /**
-     * Returns HTML string that represents the node as a whole.
+     * Returns non-foratted HTML string that represents the node as a whole.
      * @return string HTML string that represents the node as a whole.
      */
     public function __toString() {

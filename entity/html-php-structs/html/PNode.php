@@ -132,7 +132,7 @@ class PNode extends HTMLNode{
      * @param HTMLNode $node The node that will be added. The paragraph element 
      * can only accept the addition of inline HTML elements.
      */
-    public function addChild($node) {
+    public function addChild(&$node) {
         if($node instanceof HTMLNode){
             if(in_array($node->getName(), PNode::ALLOWED_CHILDS) || $node->isTextNode()){
                 parent::addChild($node);
@@ -144,6 +144,7 @@ class PNode extends HTMLNode{
      * @since 1.0
      */
     public function addLineBreak() {
-        $this->addChild(new Br());
+        $br = new Br();
+        $this->addChild($br);
     }
 }

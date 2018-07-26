@@ -1,14 +1,13 @@
 <?php
 
 /**
- * Modify the content of this function to add custom head tags.
- * @return HeadNode Head tag as <b>HeadNode</b> object.
+ * Modify the content of this function to add custom head tags. In addition to that, 
+ * load your CSS and JS theme files here. Also you can include external CSS or 
+ * JS files.
+ * @return HeadNode Head node as 'HeadNode' object.
  */
 function getHeadNode(){
-    $page = Page::get();
     $headTag = new HeadNode();
-    $headTag->setTitle($page->getTitle().SiteConfig::get()->getTitleSep().SiteConfig::get()->getWebsiteName());
-    $headTag->addMeta('description',$page->getDescription());
     $headTag->setBase(SiteConfig::get()->getBaseURL());
     return $headTag;
 }

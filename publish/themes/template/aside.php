@@ -1,12 +1,14 @@
 <?php
 /**
- * This function is used to include aside navigation menu in the page.
- * @param string $dir 
- * @param int $activeURL The number of the currently open page.
- * @return string HTML code.
+ * This function is used to generate the content of the aside area. Usually, 
+ * this area contain ads, images, links or widgets. Modify the content of 
+ * this function to customize the aside area.
+ * @return HTMLNode The function should return the aside area as 'HTMLNode' 
+ * object.
  */
-function getAsideNode($activeURL=0){
+function getAsideNode(){
     $menu = new HTMLNode('div');
+    $menu->addTextNode('Aside');
     return $menu;
 }
 

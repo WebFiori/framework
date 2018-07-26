@@ -43,7 +43,7 @@ if(!defined('ROOT_DIR')){
  * A class that is used to split URIs and get their parameters and others
  *
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.1
+ * @version 1.2
  */
 class RouterUri {
     /**
@@ -66,13 +66,22 @@ class RouterUri {
      */
     private $type;
     /**
+     * 
+     * @var type 
+     * @since 1.2
+     */
+    private $closureParams = array();
+    /**
      * Creates new instance.
      * @param string $requestedUri The URI such as 'https://www3.programmingacademia.com:80/{some-var}/hell/{other-var}/?do=dnt&y=#xyz'
-     * @param type $routeTo The 
+     * @param string $routeTo The file that the route will take the user to ar a closure.
+     * @param array $closureParams [Optional] If the closure needs to use parameters, 
+     * it is possible to supply them using this array.
      */
-    public function __construct($requestedUri,$routeTo) {
+    public function __construct($requestedUri,$routeTo,$closureParams=array()) {
         $this->setRoute($routeTo);
         $this->uriBroken = self::splitURI($requestedUri);
+        $this->setClosureParams($closureParams);
     }
     /**
      * Returns the type of element that the URI will route to.
@@ -89,6 +98,21 @@ class RouterUri {
      */
     public function setType($type) {
         $this->type = $type;
+    }
+    /**
+     * Sets the array of closure parameters.
+     * @param array $arr An array that contains all the values that will be 
+     * passed to the closure.
+     * @since 1.2
+     */
+    public function setClosureParams($arr){
+        if(gettype($arr) == 'array'){
+            $this->closureParams = $arr;
+        }
+    }
+
+    public function getClosureParams() {
+        return $this->closureParams;
     }
     /**
      * Checks if all URI variables has values or not.

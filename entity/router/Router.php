@@ -45,7 +45,7 @@ if(!defined('ROOT_DIR')){
  * location.
  *
  * @author Ibrahim
- * @version 1.2
+ * @version 1.3
  */
 class Router {
     /**
@@ -165,12 +165,14 @@ class Router {
      * other sub-directory under the root.</li>
      * <li><b>Router::CLOSURE_ROUTE</b> If the route is a closure function.</li>
      * </ul>
+     * @param array $closureParams [Optinal] If the route type is closure route, 
+     * it is possible to pass values to it using this array.
      * @return boolean If the route is added, the function will return <b>TRUE</b>. 
      * The function one return <b>FALSE</b> only in two cases, either the route type 
      * is not correct or a similar route was already added.
      * @since 1.0
      */
-    public function addRoute($path,$routeTo,$routeType) {
+    public function addRoute($path,$routeTo,$routeType,$closureParams=array()) {
         if($routeType == self::API_ROUTE || 
            $routeType == self::VIEW_ROUTE || 
            $routeType == self::CUSTOMIZED || 
@@ -185,7 +187,7 @@ class Router {
                 }
             }
             if(!$this->hasRoute($path)){
-                $routeUri = new RouterUri($this->getBase().$path, $routeTo);
+                $routeUri = new RouterUri($this->getBase().$path, $routeTo, $closureParams);
                 $routeUri->setType($routeType);
                 $this->routes[] = $routeUri;
                 return TRUE;
@@ -280,10 +282,12 @@ class Router {
      * If a route for the given path was already created, the function will return 
      * FALSE. Also if the given view file was not found, the function will not 
      * create any route and return FALSE.
+     * @param array $closureParams [Optinal] If the route type is closure route, 
+     * it is possible to pass values to it using this array.
      * @since 1.2
      */
-    public static function closure($path,$closure) {
-        return Router::get()->addRoute($path, $closure, Router::CLOSURE_ROUTE);
+    public static function closure($path,$closure,$closureParams=array()) {
+        return Router::get()->addRoute($path, $closure, Router::CLOSURE_ROUTE,$closureParams);
     }
     /**
      * Adds new route to a file inside the root folder.
@@ -375,7 +379,7 @@ class Router {
                 if(!$route->hasVars()){
                     if($route->getUri() == $routeUri->getUri()){
                         if(is_callable($route->getRouteTo())){
-                            call_user_func($route->getRouteTo());
+                            call_user_func($route->getRouteTo(),$route->getClosureParams());
                             return;
                         }
                         else{
@@ -433,7 +437,7 @@ class Router {
                     //if all variables are set, then we found our route.
                     if($route->isAllVarsSet()){
                         if(is_callable($route->getRouteTo())){
-                            call_user_func($route->getRouteTo());
+                            call_user_func($route->getRouteTo(),$route->getClosureParams());
                             return;
                         }
                         else{

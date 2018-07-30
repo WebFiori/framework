@@ -154,7 +154,7 @@ class DatabaseLink implements JsonI{
     /**
      * Returns the result set in case of executing select query.
      * The method will return <b>NULL</b> in case of none-select queries.
-     * @return mysqli_result | NULL
+     * @return mysqli_result|NULL
      * @since 1.0
      */
     public function getResult(){

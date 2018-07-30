@@ -2,9 +2,15 @@
 /**
  * A class that represents a column in MySQL table.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.4
+ * @version 1.5
  */
 class Column{
+    /**
+     * The table that this column belongs to.
+     * @var Table
+     * @since 1.5 
+     */
+    private $ownerTable;
     /**
      * A constant that indicates the datatype of the 
      * column does not support size.
@@ -140,6 +146,30 @@ class Column{
         }
         $this->setIsNull(FALSE);
         $this->setIsUnique(FALSE);
+    }
+    /**
+     * Sets or unset the owner table of the column.
+     * @param Table|NULL $table The owner of the column. If NULL is given, 
+     * The owner will be unset. This function should 
+     * not be called manually.
+     * @since 1.5
+     */
+    public function setOwner(&$table) {
+        if($table instanceof Table){
+            $this->ownerTable = $table;
+        }
+        else if($table === NULL){
+            $this->ownerTable = NULL;
+        }
+    }
+    /**
+     * Returns the table which owns this column.
+     * @return Table|NULL The owner table of the column. 
+     * If the column has no owner, the function will return NULL.
+     * @since 1.5
+     */
+    public function &getOwner() {
+        return $this->ownerTable;
     }
     /**
      * A function to call in case the user want to update the date of a column 
@@ -421,11 +451,11 @@ class Column{
     }
     /**
      * Returns the value of column collation.
-     * @return string The string 'utf8_general_ci'.
+     * @return string The string 'utf8mb4_unicode_520_ci'.
      * @since 1.0
      */
     public function getCollation(){
-        return 'utf8_general_ci';
+        return 'utf8mb4_unicode_520_ci';
     }
     public function __toString() {
         $retVal = $this->getName().' ';
@@ -443,9 +473,20 @@ class Column{
             $retVal .= 'null ';
         }
         if($this->isPrimary()){
-            $retVal .= 'primary key ';
-            if($this->isAutoInc()){
-                $retVal .= 'auto_increment ';
+            $t = &$this->getOwner();
+            if($t != NULL){
+                if($t->primaryKeyColsCount() == 1){
+                    $retVal .= 'primary key ';
+                    if($this->isAutoInc()){
+                        $retVal .= 'auto_increment ';
+                    }
+                }
+            }
+            else{
+                $retVal .= 'primary key ';
+                if($this->isAutoInc()){
+                    $retVal .= 'auto_increment ';
+                }
             }
         }
         if($this->isUnique()){

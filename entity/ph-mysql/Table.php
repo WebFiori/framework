@@ -3,7 +3,7 @@
  * A class that represents MySQL table.
  *
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.4
+ * @version 1.5
  */
 class Table {
     /**
@@ -63,17 +63,17 @@ class Table {
     private $charSet;
     /**
      * Creates a new instance of the class.
-     * @param string $tName The name of the table. It must be a 
+     * @param string $tName [Optional] The name of the table. It must be a 
      * string and its not empty. Also it must not contain any spaces or any 
-     * characters other than A-Z, a-z and underscore. If the given name is invalid, 
-     * 'table' will be used as default.
+     * characters other than A-Z, a-z and underscore. If the given name is invalid 
+     * or not provided, 'table' will be used as default.
      */
     public function __construct($tName = 'table') {
         if($this->setName($tName) !== TRUE){
             $this->setName('table');
         }
         $this->engin = 'InnoDB';
-        $this->charSet = 'utf8';
+        $this->charSet = 'utf8mb4';
         $this->order = 0;
     }
     /**
@@ -85,8 +85,8 @@ class Table {
      * table 'C' will have order 0, Table 'A' have order 1 and table 'B' have order 
      * 2.
      * @since 1.3 
-     * @return boolean <b>TRUE</b> if the value of the attribute is set. 
-     * <b>FALSE</b> if not.
+     * @return boolean TRUE if the value of the attribute is set. 
+     * FALSE if not.
      */
     public function setOrder($val){
         if(gettype($val) == 'integer'){
@@ -112,12 +112,13 @@ class Table {
     }
     /**
      * Adds a foreign key to the table.
-     * @param ForeignKey $key an object of type <b>ForeignKey</b>. Note that it 
+     * @param ForeignKey $key an object of type 'ForeignKey'. Note that it 
      * will be added only if no key was added to the table which has the same name 
      * as the given key.
      * @since 1.1
-     * @return boolean <b>TRUE</b> if the key is added. <b>FALSE</b> otherwise.
+     * @return boolean TRUE if the key is added. FALSE otherwise.
      * @see ForeignKey
+     * @since 1.0
      */
     public function addForeignKey($key){
         if($key instanceof ForeignKey){
@@ -133,16 +134,75 @@ class Table {
         return FALSE;
     }
     /**
+     * Returns the name of table primary key.
+     * @return string The returned value will be the name of the table added 
+     * to it the suffix '_pk'.
+     * @since 1.5
+     */
+    public function getPrimaryKeyName() {
+        return $this->getName().'_pk';
+    }
+    /**
+     * Returns the number of columns that will act as one primary key.
+     * @return int The number of columns that will act as one primary key. If 
+     * the table has no primary key, the function will return 0. If one column 
+     * is used as primary, the function will return 1. If two, the function 
+     * will return 2 and so on.
+     * @since 1.5
+     */
+    public function primaryKeyColsCount(){
+        $count = 0;
+        foreach ($this->colSet as $col){
+            if($col->isPrimary()){
+                $count++;
+            }
+        }
+        return $count;
+    }
+    /**
+     * Returns a string that can be used to alter the table and add primary 
+     * key constraint to it.
+     * @return string A string that can be used to alter the table and add primary 
+     * key constraint to it. If the table has no primary keys or has only one, 
+     * the returned string will be empty.
+     * @since 1.5
+     */
+    public function getCreatePrimaryKeyStatement() {
+        $primaryCount = $this->primaryKeyColsCount();
+        if($primaryCount == 1){
+            return '';
+        }
+        else if($primaryCount != 0){
+            $stm = 'alter table '.$this->getName().' add constraint '.$this->getPrimaryKeyName().' primary key (';
+            $index = 0;
+            foreach ($this->colSet as $col){
+                if($col->isPrimary()){
+                    if($index + 1 == $primaryCount){
+                        $stm .= $col->getName().')';
+                    }
+                    else{
+                        $stm .= $col->getName().',';
+                    }
+                    $index++;
+                }
+            }
+            return $stm;
+        }
+        else{
+            return '';
+        }
+    }
+    /**
      * Adds a foreign key to the table.
      * @param Table $refTable The table that will be referenced.
      * @param string $refColName The name of the column that will be referenced. It must 
      * be a column in the referenced table. The value of this attribute is a 
-     * value that once passed to the function <b>Table::getColumn()</b> will 
-     * return an object of type <b>Column</b>.
+     * value that once passed to the function Table::getColumn() will 
+     * return an object of type 'Column'.
      * @param string $targetCol The target column. It must be a column in the current 
      * instance. The value of this attribute is a 
-     * value that once passed to the function <b>Table::getColumn()</b> will 
-     * return an object of type <b>Column</b>.
+     * value that once passed to the function Table::getColumn() will 
+     * return an object of type 'Column'.
      * @param string $keyname The name of the foreign key.
      * @param string $onupdate [Optional] The 'on update' condition for the key. it can be one 
      * of the following: 
@@ -164,22 +224,74 @@ class Table {
      * <li>no action</li>
      * </ul>
      * Default value is 'set null'.
-     * @return boolean <b>TRUE</b> if the key is added. <b>FALSE</b> otherwise.
+     * @return boolean TRUE if the key is added. FALSE otherwise.
      * @see ForeignKey
+     * @since 1.0
      */
     public function addReference($refTable,$refColName,$targetCol,$keyname,$onupdate='set null',$ondelete='set null'){
+        return $this->addMultiReference($refTable, array($refColName), array($targetCol), $keyname, $onupdate, $ondelete);
+    }
+    /**
+     * Adds a foreign key which references multiple columns.
+     * @param Table $refTable The referenced table.
+     * @param array $refColsArr An array which contains the names of referenced 
+     * columns. The names of columns  must in the referenced table. 
+     * If one of the names is passed to the function Table::getColumn(), it 
+     * should return an object of type 'Column'.
+     * @param array $targetColsArr An array which contains the targeted columns. 
+     * @param string $keyname The name of the key.
+     * @param string $onupdate [Optional] The 'on update' condition for the key. it can be one 
+     * of the following: 
+     * <ul>
+     * <li>set null</li>
+     * <li>cascade</li>
+     * <li>restrict</li>
+     * <li>set default</li>
+     * <li>no action</li>
+     * </ul>
+     * Default value is 'set null'.
+     * @param string $ondelete [Optional] The 'on delete' condition for the key. it can be one 
+     * of the following: 
+     * <ul>
+     * <li>set null</li>
+     * <li>cascade</li>
+     * <li>restrict</li>
+     * <li>set default</li>
+     * <li>no action</li>
+     * </ul>
+     * Default value is 'set null'.
+     * @return boolean
+     * @since 1.5
+     */
+    public function addMultiReference($refTable,$refColsArr,$targetColsArr,$keyname,$onupdate='set null',$ondelete='set null') {
         if($refTable instanceof Table){
-            $fk = new ForeignKey();
-            if($fk->setKeyName($keyname) === TRUE){
-                if($refTable->hasColumn($refColName)){
-                    if($fk->setReferenceCol($refTable->getCol($refColName)->getName()) === TRUE){
-                        if($fk->setReferenceTable($refTable->getName()) === TRUE){
-                            if($this->hasColumn($targetCol)){
-                                $fk->setSourceCol($this->getCol($targetCol)->getName());
-                                $fk->setSourceTable($this->getName());
-                                $fk->setOnDelete($ondelete);
-                                $fk->setOnUpdate($onupdate);
-                                return $this->addForeignKey($fk);
+            if(count($refColsArr) == count($targetColsArr)){
+                $fk = new ForeignKey();
+                if($fk->setKeyName($keyname) === TRUE){
+                    $hasAllCols = TRUE;
+                    foreach ($refColsArr as $col){
+                        $hasAllCols = $hasAllCols && $refTable->hasColumn($col);
+                    }
+                    if($hasAllCols){
+                        $allAdded = TRUE;
+                        foreach ($refColsArr as $col){
+                            $allAdded = $allAdded && $fk->addReferenceCol($refTable->getCol($col)->getName());
+                        }
+                        if($allAdded){
+                            if($fk->setReferenceTable($refTable->getName()) === TRUE){
+                                foreach ($targetColsArr as $col){
+                                    $hasAllCols = $hasAllCols && $this->hasColumn($col);
+                                }
+                                if($hasAllCols){
+                                    foreach ($targetColsArr as $col){
+                                        $allAdded = $allAdded && $fk->addSourceCol($this->getCol($col)->getName());
+                                    }
+                                    if($allAdded){
+                                        $fk->setOnDelete($ondelete);
+                                        $fk->setOnUpdate($onupdate);
+                                        return $this->addForeignKey($fk);
+                                    }
+                                }
                             }
                         }
                     }
@@ -189,9 +301,25 @@ class Table {
         return FALSE;
     }
     /**
-     * Checks if a key with the given name exist on the table or not.
+     * Returns the columns of the table which are a part of the primary key.
+     * @return array An array which contains an objects of type 'Column'. If 
+     * the table has no primary key, the array will be empty.
+     * @since 1.5.1
+     */
+    public function getPrimaryKeyCols() {
+        $arr = array();
+        foreach ($this->columns() as $col){
+            if($col->isPrimary()){
+                $arr[] = $col;
+            }
+        }
+        return $arr;
+    }
+    /**
+     * Checks if a foreign key with the given name exist on the table or not.
      * @param string $keyName The name of the key.
-     * @return boolean <b>TRUE</b> if the table has a key. <b>FALSE</b> if not.
+     * @return boolean TRUE if the table has a foreign key with the given name. 
+     * FALSE if not.
      * @since 1.4
      */
     public function hasForeignKey($keyName){
@@ -232,7 +360,7 @@ class Table {
      * @param string $param The name of the table (such as 'users'). It must be a 
      * string and its not empty. Also it must not contain any spaces or any 
      * characters other than A-Z, a-z and underscore.
-     * @return boolean <b>TRUE</b> if the name of the table is set. <b>FALSE</b> 
+     * @return boolean TRUE if the name of the table is set. FALSE 
      * in case the given name is invalid.
      * @since 1.0
      */
@@ -259,10 +387,10 @@ class Table {
     /**
      * Adds new column to the table.
      * @param string $key The index at which the column will be added to.
-     * @param Column $col An object of type <b>Column</b>. Note that the column will 
+     * @param Column $col An object of type Column. Note that the column will 
      * be added only if no column was found in the table which has the same name 
      * as the given column.
-     * @return boolean <b>TRUE</b> if the column is added. <b>FALSE</b> otherwise.
+     * @return boolean TRUE if the column is added. FALSE otherwise.
      * @since 1.0
      */
     public function addColumn($key,$col) {
@@ -273,6 +401,7 @@ class Table {
                         return FALSE;
                     }
                 }
+                $col->setOwner($this);
                 $this->colSet[$key] = $col;
                 return TRUE;
             }
@@ -281,8 +410,8 @@ class Table {
     }
     /**
      * Checks if the table has a column or not.
-     * @param @param string $key The index at which the column might be exist.
-     * @return boolean <b>TRUE</b> if the column exist. <b>FALSE</b> otherwise.
+     * @param string $colKey The index at which the column might be exist.
+     * @return boolean TRUE if the column exist. FALSE otherwise.
      * @since 1.4
      */
     public function hasColumn($colKey) {
@@ -291,32 +420,24 @@ class Table {
     /**
      * Returns the column object given the key that it was stored in.
      * @param string $key The name of the key.
-     * @return Column|NULL An object of type <b>Column</b> if the given column 
-     * was found. <b>NULL</b> in case of no column was found.
+     * @return Column|NULL A reference to an object of type Column if the given 
+     * column was found. NULL in case of no column was found.
      * @since 1.0
      */
-    public function getCol($key){
+    public function &getCol($key){
         if(isset($this->colSet[$key])){
             return $this->colSet[$key];
         }
-        return NULL;
+        $null = NULL;
+        return $null;
     }
     /**
-     * Returns an array that contains all the set of keys the columns was stored in.
+     * Returns an array that contains all the keys the columns was stored in 
+     * the table.
      * @return array an array that contains all the set of keys.
      * @since 1.2
      */
     public function colsKeys(){
-        return array_keys($this->colSet);
-    }
-
-    /**
-     * Returns an array that contains all the set of keys the columns was stored in.
-     * @return array an array that contains all the set of keys.
-     * @since 1.0
-     * @deprecated since version 1.2 Use <b>Table::colsKeys()</b>
-     */
-    public function keys(){
         return array_keys($this->colSet);
     }
     /**

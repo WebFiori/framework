@@ -193,7 +193,7 @@ class SessionManager implements JsonI{
         //the value of default language.
         //used in case no language found 
         //in $_GET['lang']
-        $defaultLang = SiteConfig::get()->getPrimaryLanguage();
+        $defaultLang = class_exists('SiteConfig') ? SiteConfig::get()->getPrimaryLanguage() : 'EN';
         $lang = NULL;
         if(isset($_GET['lang'])){
             $lang = filter_var($_GET['lang'],FILTER_SANITIZE_STRING);

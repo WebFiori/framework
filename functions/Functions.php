@@ -108,6 +108,7 @@ class Functions {
      * @since 1.0
      */
     public function excQ($qObj){
+        $this->useDatabase();
         if($this->mainSession->getDBLink() != NULL){
             return $this->mainSession->getDBLink()->executeQuery($qObj);
         }

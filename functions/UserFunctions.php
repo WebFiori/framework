@@ -61,7 +61,6 @@ class UserFunctions extends Functions{
         parent::__construct();
         $this->query = new UserQuery();
         $this->acQuery = new ActivationQuery();
-        parent::useDatabase();
     }
     /**
      * A constant that indicates a user is not found.

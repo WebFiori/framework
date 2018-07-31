@@ -35,13 +35,13 @@ require_once ROOT_DIR.'/entity/AutoLoader.php';
 AutoLoader::get();
 Util::displayErrors();
 $GLOBALS['SYS_STATUS'] = Util::checkSystemStatus();
+createRoutes();
 if($GLOBALS['SYS_STATUS'] == Util::MISSING_CONF_FILE || $GLOBALS['SYS_STATUS'] == Util::MISSING_SITE_CONF_FILE){
     SystemFunctions::get()->createConfigFile();
     WebsiteFunctions::get()->createSiteConfigFile();
     MailFunctions::get()->createEmailConfigFile();
     $GLOBALS['SYS_STATUS'] = Util::checkSystemStatus();
 }
-createRoutes();
 //at this stage, only check for configuration files
 //other errors checked as needed later.
 if($GLOBALS['SYS_STATUS'] !== TRUE && $GLOBALS['SYS_STATUS'] == Util::NEED_CONF){

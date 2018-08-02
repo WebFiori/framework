@@ -19,7 +19,7 @@ if(!defined('ROOT_DIR')){
 /**
  * PHP utility class.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.2
+ * @version 1.3
  */
 class Util{
     /**
@@ -59,6 +59,22 @@ class Util{
         Util::checkSystemStatus();
         return self::$dbTestInstance;
     }
+    /**
+     * Returns the IP address of the user who is connected to the server.
+     * @return string The IP address of the user who is connected to the server. 
+     * The value is taken from the array $_SERVER at index 'REMOTE_ADDR'.
+     * @since 1.3
+     */
+    public static function getIpAddress() {
+        $ip = filter_var($_SERVER['REMOTE_ADDR'],FILTER_VALIDATE_IP);
+        if($ip == '::1'){
+            return '127.0.0.1';
+        }
+        else{
+            return $ip;
+        }
+    }
+
     /**
      * 
      * @return boolean|string The function will return <b>TRUE</b> in case everything 

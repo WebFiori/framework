@@ -19,7 +19,7 @@ if(!defined('ROOT_DIR')){
 /**
  * A helper class to manage system sessions.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.6
+ * @version 1.7
  */
 class SessionManager implements JsonI{
     /**
@@ -88,21 +88,77 @@ class SessionManager implements JsonI{
     const SUPPORTED_LANGS = array(
         'EN','AR'
     );
+    /**
+     * A constant that indicates the session is not started yet.
+     * @since 1.7
+     */
+    const NOT_RUNNING = 'status_not_running';
+    /**
+     * A constant that indicates the session has timed out.
+     * @since 1.7
+     */
+    const EXPIRED = 'status_session_timeout';
+    /**
+     * A constant that indicates the session has just started.
+     * @since 1.7
+     */
+    const NEW_SESSION = 'status_new_session';
+    /**
+     * A constant that indicates the session is resumed.
+     * @since 1.7
+     */
+    const RESUMED = 'status_session_resumed';
+    /**
+     * A constant that indicates the session has invalid state (Usually one 
+     * missing session variable).
+     * @since 1.7
+     */
+    const INV_STATE = 'status_invalid_state';
+    /**
+     * A constant that indicates the session has invalid cookie.
+     * @since 1.7
+     */
+    const INV_COOKIE = 'status_inv_cookie';
+    /**
+     * A constant that indicates the IP address of the request does not match 
+     * the one stored in the session.
+     * @since 1.7
+     */
+    const INV_IP_ADDRESS = 'status_inv_ip_address';
+    /**
+     * A constant that indicates the session has been killed by calling the 
+     * function 'SessionManager::kill()'.
+     * @since 1.7
+     */
+    const KILLED = 'status_session_killed';
+    /**
+     * Returns a JSON string that represents the session.
+     * @return string
+     * @since 1.0
+     */
     public function __toString() {
         return $this->toJSON().'';
     }
     /**
      * Creates new session manager.
-     * @param string $session_name The name of the session.
+     * @param string $session_name [Optional] The name of the session. It 
+     * must be non-empty string to be set. The default value is 'pa-session'.
      * @since 1.0
      */
     public function __construct($session_name='pa-seesion') {
-        $this->sessionName = $session_name;
+        if(strlen($session_name) != 0){
+            $this->sessionName = $session_name;
+        }
+        else{
+            $this->sessionName = 'pa-session';
+        }
         //initial life time: 120 minutes.
         $this->lifeTime = 120;
-        $this->sessionStatus = 'Not Running';
+        $this->sessionStatus = self::NOT_RUNNING;
         $this->resumed = FALSE;
         if(session_status() == PHP_SESSION_ACTIVE){
+            //if the session is active, we might need to switch
+            //to new session
             session_write_close();
             session_id($this->generateSessionID());
         }
@@ -124,7 +180,7 @@ class SessionManager implements JsonI{
      * Sets the lifetime of the session.
      * @param int $time Session lifetime (in minutes). it will be set only if 
      * the given value is greater than 0.
-     * @return boolean <b>TRUE</b> if time is updated. <b>FALSE</b> otherwise.
+     * @return boolean TRUE if time is updated. FALSE otherwise.
      * @since 1.4
      */
     public function setLifetime($time){
@@ -161,7 +217,7 @@ class SessionManager implements JsonI{
     /**
      * Sets if the session timeout will be refreshed with every request 
      * or not.
-     * @param boolean $bool If set to <b>TRUE</b>, timeout time will be refreshed. 
+     * @param boolean $bool If set to TRUE, timeout time will be refreshed. 
      * Note that the property will be updated only if the session is running.
      * @since 1.5
      */
@@ -176,15 +232,17 @@ class SessionManager implements JsonI{
      * Initialize session language. The initialization depends on the attribute 
      * 'lang'. It can be send via 'get' request, 'post' request or a cookie. If 
      * no language code is provided, 'EN' will be used. The provided language 
-     * must be in the array <b>SessionManager::SUPOORTED_LANGS</b>. If the given 
-     * language code is not in the given array, 'EN' will be used. Also if the 
-     * language is set before, it will not be updated unless the parameter <b>$forceUpdate</b> 
-     * is set to true.
+     * must be in the array 'SessionManager::SUPOORTED_LANGS'. If the given 
+     * language code is not in the given array, The used value will depend on the existence 
+     * of the class 'SiteConfig'. If it is exist, The value that is returned by 
+     * 'SiteConfig::getPrimaryLanguage()' will be used. If the class does not 
+     * exist, 'EN' will be used. Also if the language is set before, it will 
+     * not be updated unless the parameter '$forceUpdate' is set to TRUE.
      * @since 1.2
-     * @param boolean $forceUpdate Set to <b>TRUE</b> if the language is set and want to 
+     * @param boolean $forceUpdate Set to TRUE if the language is set and want to 
      * reset it.
-     * @return boolean The function will return <b>TRUE</b> if the language is set or 
-     * updated. Other than that, the function will return <b>FALSE</b>.
+     * @return boolean The function will return TRUE if the language is set or 
+     * updated. Other than that, the function will return FALSE.
      */
     private function initLang($forceUpdate=false,$useDefault=false){
         if(isset($_SESSION['lang']) && !$forceUpdate){
@@ -233,14 +291,14 @@ class SessionManager implements JsonI{
      * Returns session language code.
      * @return string|NULL two digit language code (such as 'EN'). If the session 
      * is not running or the language is not set, the function will return <b>NULL</b>.
-     * @param boolean $forceUpdate Set to <b>TRUE</b> if the language is set and want to 
+     * @param boolean $forceUpdate Set to TRUE if the language is set and want to 
      * reset it. The reset process depends on the attribute 
      * 'lang'. It can be send via 'get' request, 'post' request or a cookie. If 
-     * no language code is provided and the parameter <b>$forceUpdate</b> is set 
-     * to <b>TRUE</b>, 'EN' will be used. The provided language 
-     * must be in the array <b>SessionManager::SUPOORTED_LANGS</b>. If the given 
-     * language code is not in the given array and the parameter <b>$forceUpdate</b> is set 
-     * to <b>TRUE</b>, 'EN' will be used.
+     * no language code is provided and the parameter '$forceUpdate' is set 
+     * to TRUE, 'EN' will be used. The provided language 
+     * must be in the array 'SessionManager::SUPOORTED_LANGS'. If the given 
+     * language code is not in the given array and the parameter '$forceUpdate' is set 
+     * to TRUE, 'EN' will be used.
      */
     public function getLang($forceUpdate=false){
         if($this->isResumed()){
@@ -258,9 +316,10 @@ class SessionManager implements JsonI{
      * the token that is sent with the request and the token in the session. 
      * The token can be send via 'get' request, 'post' request or a cookie. The 
      * token must be stored in the parameter 'token'
-     * @return boolean <b>TRUE</b> if the user token is valid. <b>FALSE</b> if 
-     * not. Also the function will return <b>FALSE</b> if no user is logged in.
+     * @return boolean TRUE if the user token is valid. FALSE if 
+     * not. Also the function will return FALSE if no user is logged in.
      * @since 1.1
+     * @deprecated since version 1.7
      */
     public function validateToken(){
         $tok = filter_input(INPUT_COOKIE, 'token');
@@ -418,12 +477,7 @@ class SessionManager implements JsonI{
         throw new Exception('Session is not running');
     }
     private function start($refresh,$useDb,$lifeTime,$dbAttributes,$useDefaultLang=false){
-        if($this->sessionStatus != NULL){
-            $this->sessionStatus = 'New Session (A session with given name was exists. '.$this->sessionStatus.')';
-        }
-        else{
-            $this->sessionStatus = 'New Session';
-        }
+        $this->sessionStatus = self::NEW_SESSION;
         session_name($this->getName());
         session_set_cookie_params($lifeTime,"/");
         $started = session_start();
@@ -433,6 +487,11 @@ class SessionManager implements JsonI{
             $_SESSION['resumed-at'] = time();
             $_SESSION['lifetime'] = $this->getLifetime();
             $_SESSION['name'] = $this->getName();
+            $ip = filter_var($_SERVER['REMOTE_ADDR'],FILTER_VALIDATE_IP);
+            if($ip == '::1'){
+                $ip = '127.0.0.1';
+            }
+            $_SESSION['ip-address'] = $ip;
             if(gettype($refresh) === 'boolean'){
                 $_SESSION['refresh'] = $refresh;
             }
@@ -446,15 +505,21 @@ class SessionManager implements JsonI{
         }
         return $started;
     }
+    /**
+     * Validate session variables. Must be called after session is started.
+     * @return boolean  If the variables 'started-at', '', '', and '' are 
+     * set, The function will return TRUE. Other than that, it will return 
+     * FALSE.
+     */
     private function validateAttrs(){
         return isset($_SESSION['started-at']) &&
         isset($_SESSION['resumed-at']) &&
         isset($_SESSION['lifetime']) &&
-        isset($_SESSION['refresh']);
+        isset($_SESSION['refresh']) && isset($_SESSION['ip-address']);
     }
     /**
      * Stops the session and delete all stored session variables.
-     * @return boolean <b>TRUE</b> if the session stopped. <b>FALSE</b> if not.
+     * @return boolean TRUE if the session stopped. FALSE if not.
      * @since 1.0
      */
     public function kill(){
@@ -463,7 +528,7 @@ class SessionManager implements JsonI{
             if(session_status() == PHP_SESSION_ACTIVE){
                 setcookie($this->getName(), '', 0, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
                 session_destroy();
-                $this->sessionStatus = 'Killed';
+                $this->sessionStatus = self::KILLED;
                 return TRUE;
             }
         }
@@ -472,8 +537,8 @@ class SessionManager implements JsonI{
 
     /**
      * Returns the link that is used to connect to the database.
-     * @return DatabaseLink|NULL An instance of <b>DatabaseLink</b> if the 
-     * session is running. <b>NULL</b> if the session is not running or the 
+     * @return DatabaseLink|NULL An instance of 'DatabaseLink' if the 
+     * session is running. NULL if the session is not running or the 
      * session does not use database connection.
      */
     public function getDBLink(){
@@ -498,8 +563,8 @@ class SessionManager implements JsonI{
     }
     /**
      * Checks if the given session name has a cookie or not.
-     * @return boolean <b>TRUE</b> if a cookie with the name of 
-     * the session is fount. <b>FALSE</b> otherwise.
+     * @return boolean TRUE if a cookie with the name of 
+     * the session is fount. FALSE otherwise.
      * @since 1.5
      */
     public function hasCookie(){
@@ -513,8 +578,8 @@ class SessionManager implements JsonI{
      * Returns the time at which the session was resumed in (in seconds).
      * @return int The time at which the session was resumed in. If the session 
      * is new, this value will be the same as the session start time. If no 
-     * session is active, the function will return the constant <b>PHP_SESSION_NONE</b>. 
-     * If sessions are disabled, the function will return the constant <b>PHP_SESSION_DISABLED</b>.
+     * session is active, the function will return the constant 'PHP_SESSION_NONE'. 
+     * If sessions are disabled, the function will return the constant 'PHP_SESSION_DISABLED'.
      * @since 1.5
      */
     public function getResumTime(){
@@ -524,10 +589,23 @@ class SessionManager implements JsonI{
         return session_status();
     }
     /**
+     * Returns the IP address at which the session was started running from.
+     * @return string The IP address at which the session was started running from. If no 
+     * session is active, the function will return the constant 'PHP_SESSION_NONE'. 
+     * If sessions are disabled, the function will return the constant 'PHP_SESSION_DISABLED'.
+     * @since 1.7
+     */
+    public function getStartIpAddress(){
+        if(session_status() == PHP_SESSION_ACTIVE){
+            return $_SESSION['ip-address'];
+        }
+        return session_status();
+    }
+    /**
      * Returns the time at which the session was started in (in seconds).
      * @return int The time at which the session was started in. If no 
-     * session is active, the function will return the constant <b>PHP_SESSION_NONE</b>. 
-     * If sessions are disabled, the function will return the constant <b>PHP_SESSION_DISABLED</b>.
+     * session is active, the function will return the constant 'PHP_SESSION_NONE'. 
+     * If sessions are disabled, the function will return the constant 'PHP_SESSION_DISABLED'.
      * @since 1.5
      */
     public function getStartTime(){
@@ -568,9 +646,9 @@ class SessionManager implements JsonI{
     }
     /**
      * Checks if the session has timed out or not.
-     * @return boolean|int <b>TRUE</b> if the session has timed out. <b>FALSE</b> if not. If no 
-     * session is active, the function will return the constant <b>PHP_SESSION_NONE</b>. 
-     * If sessions are disabled, the function will return the constant <b>PHP_SESSION_DISABLED</b>.
+     * @return boolean|int TRUE if the session has timed out. FALSE if not. If no 
+     * session is active, the function will return the constant 'PHP_SESSION_NONE'. 
+     * If sessions are disabled, the function will return the constant 'PHP_SESSION_DISABLED'.
      * @since 1.5
      */
     public function isTimeout(){
@@ -581,13 +659,20 @@ class SessionManager implements JsonI{
     }
     /**
      * Checks if the session is resumed or not.
-     * @return boolean <b>TRUE</b> if the session is resumed or its new. If the session is 
-     *  not resumed, the function will return <b>FALSE</b>.
+     * @return boolean TRUE if the session is resumed or its new. If the session is 
+     *  not resumed, the function will return FALSE.
      * @since 1.5
      */
     public function isResumed(){
         return $this->resumed;
     }
+    /**
+     * Returns the ID of a session from a cookie given its name.
+     * @param string $sessionName The name of the session.
+     * @return boolean|string If the ID is found, the function will return it. 
+     * If the session cookie was not found, the function will return FALSE.
+     * @since 1.6
+     */
     public static function getSessionIDFromCookie($sessionName) {
         $sid = filter_input(INPUT_COOKIE, $sessionName);
         if($sid !== NULL && $sid !== FALSE){
@@ -598,8 +683,8 @@ class SessionManager implements JsonI{
     /**
      * Checks if there exist a session with the given session name or not. If there 
      * is a one and it is not timed out, the function will resume it.
-     * @return boolean <b>TRUE</b> if there is a session with the given name 
-     * and it is resumed. <b>FALSE</b> otherwise. If the session is timed out, the 
+     * @return boolean TRUE if there is a session with the given name 
+     * and it is resumed. FALSE= otherwise. If the session is timed out, the 
      * function will kill it.
      * @since 1.0
      */
@@ -610,31 +695,41 @@ class SessionManager implements JsonI{
             session_start();
             if($this->validateAttrs()){
                 if(!$this->isTimeout()){
-                    $this->resumed = true;
-                    $this->sessionStatus = 'Session Resumed';
-                    //update resume time
-                    $_SESSION['resumed-at'] = time();
-                    if($this->isRefresh()){
-                        //refresh time till session cookie is dead
-                        $params = session_get_cookie_params();
-                        setcookie($this->getName(), $this->getID(),time()+$this->getLifetime() * 60, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
-                        $this->setUser($this->getUser());
+                    $ip = filter_var($_SERVER['REMOTE_ADDR'],FILTER_VALIDATE_IP);
+                    if($ip == '::1'){
+                        $ip = '127.0.0.1';
                     }
-                    return TRUE;
+                    if($this->getStartIpAddress() == $ip){
+                        $this->resumed = true;
+                        $this->sessionStatus = self::RESUMED;
+                        //update resume time
+                        $_SESSION['resumed-at'] = time();
+                        if($this->isRefresh()){
+                            //refresh time till session cookie is dead
+                            $params = session_get_cookie_params();
+                            setcookie($this->getName(), $this->getID(),time()+$this->getLifetime() * 60, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
+                            $this->setUser($this->getUser());
+                        }
+                        return TRUE;
+                    }
+                    else{
+                        $this->kill();
+                        $this->sessionStatus = self::INV_IP_ADDRESS;
+                    }
                 }
                 else{
                     $this->kill();
-                    $this->sessionStatus = 'Session timed out';
+                    $this->sessionStatus = self::EXPIRED;
                 }
             }
             else{
                 $this->kill();
-                $this->sessionStatus = 'Invalid session state';
+                $this->sessionStatus = self::INV_STATE;
             }
         }
         else{
             $this->kill();
-            $this->sessionStatus = 'Killed. Eaher has no cookie or invalid cookie';
+            $this->sessionStatus = self::INV_COOKIE;
         }
         return FALSE;
     }
@@ -655,7 +750,7 @@ class SessionManager implements JsonI{
         return $this->sessionName;
     }
     /**
-     * Returns a <b>JsonX</b> object that represents the manager.
+     * Returns a 'JsonX' object that represents the manager.
      * @return JsonX
      * @since 1.5
      */

@@ -150,7 +150,6 @@ class FileFunctions extends Functions{
      * @since 1.0
      */
     public function removeFile($fId) {
-        $this->useDatabase();
         $file = $this->getFile($fId);
         if($file instanceof File){
             $this->fileQuery->removeFile($fId);
@@ -171,7 +170,6 @@ class FileFunctions extends Functions{
      * @since 1.0
      */
     public function getFileSize($id){
-        $this->useDatabase();
         $this->fileQuery->fileSize($id);
         if($this->excQ($this->fileQuery)){
             $row = $this->getRow();
@@ -204,7 +202,6 @@ class FileFunctions extends Functions{
      * @since 1.0
      */
     public function getFile($fileId){
-        $this->useDatabase();
         $this->fileQuery->getFile($fileId);
         if($this->excQ($this->fileQuery)){
             $row = $this->getRow();
@@ -296,7 +293,6 @@ class FileFunctions extends Functions{
             }
         }
         if(isset($options['database-upload']) && $options['database-upload'] === TRUE){
-            $this->useDatabase();
             foreach ($statusArr['files'] as $k => $file){
                 if($file['uploaded'] == 'true'){
                     $fileObj = new File();

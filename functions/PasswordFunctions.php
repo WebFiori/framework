@@ -106,7 +106,6 @@ class PasswordFunctions extends Functions{
     
     public function __construct() {
         parent::__construct();
-        parent::useDatabase();
         $this->resetQuery = new PasswordResetQuery();
         $this->userQuery = new UserQuery();
     }

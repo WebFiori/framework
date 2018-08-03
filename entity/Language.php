@@ -51,12 +51,12 @@ class Language {
      * An associative array that contains loaded languages.
      * @var array The key of the array represents two 
      * characters language code. The index will contain an object of type <b>Language</b>.
-     * <b>Language</b>.
+     * 'Language'.
      * @since 1.1 
      */
     private static $loadedLangs = array();
     /**
-     * An attribute that will be set to <b>TRUE</b> if the language 
+     * An attribute that will be set to 'TRUE' if the language 
      * is added to the set of loaded languages.
      * @var boolean
      * @since 1.2 
@@ -80,9 +80,10 @@ class Language {
      */
     private $languageVars;
     /**
-     * Returns an associative array that contains an objects of type <b>Language</b>.
+     * Returns a reference to an associative array that contains an objects of 
+     * type 'Language'.
      * @return array The key of the array represents two 
-     * characters language code. The index will contain an object of type <b>Language</b>.
+     * characters language code. The index will contain an object of type 'Language'.
      * @since 1.1
      */
     public static function &getLoadedLangs(){
@@ -95,8 +96,8 @@ class Language {
      * was found that matches the given language code. Language files must 
      * have the name 'Language_XX' where 'XX' is language code. Also the function 
      * will throw an exception when the translation file is loaded but no object 
-     * of type <b>Language</b> was stored in the set of loaded translations.
-     * @return Language an object of type <b>Language</b> is returned if 
+     * of type 'Language' was stored in the set of loaded translations.
+     * @return Language an object of type 'Language' is returned if 
      * the language was loaded.
      * @since 1.1
      */
@@ -132,8 +133,8 @@ class Language {
      * @param string $dir [Optional] 'ltr' or 'rtl'. Default is 'ltr'.
      * @param string $code [Optional] Language code (such as 'AR'). Default is 'XX'
      * @param array $initials [Optional] An initial array of directories.
-     * @param boolean $addtoLoadedAfterCreate [Optional] If set to <b>TRUE</b>, the language object that 
-     * will be created will be added to the set of loaded languages. Default is <b>TRUE</b>.
+     * @param boolean $addtoLoadedAfterCreate [Optional] If set to TRUE, the language object that 
+     * will be created will be added to the set of loaded languages. Default is TRUE.
      * @since 1.0
      */
     public function __construct($dir='ltr',$code='XX',$initials=array(),$addtoLoadedAfterCreate=true) {
@@ -151,7 +152,7 @@ class Language {
     }
     /**
      * Checks if the language is added to the set of loaded languages.
-     * @return boolean The function will return <b>TRUE</b> if the language is added to 
+     * @return boolean The function will return TRUE if the language is added to 
      * the set of loaded languages.
      * @since 1.2
      */
@@ -161,8 +162,8 @@ class Language {
     /**
      * Sets the language code.
      * @param string $code Language code (such as 'AR').
-     * @return boolean The function will return <b>TRUE</b> if the language 
-     * code is set. If not set, the function will return <b>FALSE</b>.
+     * @return boolean The function will return TRUE if the language 
+     * code is set. If not set, the function will return FALSE.
      * @since 1.1
      */
     public function setCode($code) {
@@ -292,25 +293,32 @@ class Language {
     /**
      * Returns the value of a language variable.
      * @param string $name A directory to the language variable (such as 'pages/login/login-label').
-     * @return string|array|NULL 
+     * @return string|array If the given directory represents a label, the 
+     * function will return its value. If it represents an array, the array will 
+     * be returned. If nothing was found, the returned value will be the passed 
+     * value to the function. 
      * @since 1.0
      */
     public function get($name) {
+        $toReturn = $name;
         if(gettype($name) == 'string'){
             $trim = trim($name, '/');
             $subSplit = explode('/', $trim);
             if(count($subSplit) == 1){
                 if(isset($this->languageVars[$subSplit[0]])){
-                    return $this->languageVars[$subSplit[0]];
+                    $toReturn = $this->languageVars[$subSplit[0]];
                 }
             }
             else{
                 if(isset($this->languageVars[$subSplit[0]])){
-                    return $this->_get($subSplit, $this->languageVars[$subSplit[0]], 1);
+                    $val = $this->_get($subSplit, $this->languageVars[$subSplit[0]], 1);
+                    if($val != NULL){
+                        $toReturn = $val;
+                    }
                 }
             }
         }
-        return NULL;
+        return $toReturn;
     }
     private function _get(&$subs,&$top,$index){
         $count = count($subs);

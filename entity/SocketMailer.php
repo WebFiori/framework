@@ -44,7 +44,7 @@ if(!defined('ROOT_DIR')){
  * A class that can be used to send email messages using sockets.
  *
  * @author Ibrahim
- * @version 1.2
+ * @version 1.3
  */
 class SocketMailer {
     const NL = "\r\n";
@@ -127,8 +127,22 @@ class SocketMailer {
      * @var boolean 
      */
     private $writeMode;
+    /**
+     * A boundary variable used to separate email message parts.
+     * @var string
+     * @since 1.3 
+     */
     private $boundry;
+    /**
+     * An array that contains an objects of type 'File'. 
+     * @var array 
+     * @since 1.3
+     */
     private $attachments;
+    /**
+     * Creates new instance of the class.
+     * @since 1.0
+     */
     public function __construct() {
         $this->log = array();
         array_push($this->log, 'Creating new instance of SocketMailer.');
@@ -139,7 +153,7 @@ class SocketMailer {
         $this->setSubject('EMAIL MESSAGE');
         $this->writeMode = FALSE;
         $this->isLoggedIn = FALSE;
-        $this->boundry = hash('sha256', date());
+        $this->boundry = hash('sha256', date(DATE_ISO8601));
         $this->attachments = array();
     }
     /**
@@ -355,9 +369,9 @@ class SocketMailer {
                 $this->sendC('Date:'. date('r (T)'));
                 $this->sendC('Subject:'. $this->subject);
                 $this->sendC('MIME-Version: 1.0');
-                $this->sendC('Content-Type: multipart/mixed; boundary="'.$this->boundry.'"charset=UTF-8'.self::NL);
-                $this->sendC('--'.$this->boundry.self::NL);
-                $this->sendC('Content-Type: text/html; "charset=UTF-8'.self::NL);
+                $this->sendC('Content-Type: multipart/mixed; boundary="'.$this->boundry.'"'.self::NL);
+                $this->sendC('--'.$this->boundry);
+                $this->sendC('Content-Type: text/html; charset="UTF-8"'.self::NL);
                 $this->sendC($msg);
                 if($sendMessage === TRUE){
                     $this->appendAttachments();
@@ -371,6 +385,7 @@ class SocketMailer {
         }
     }
     /**
+     * A function that is used to include email attachments.
      * @since 1.3
      */
     private function appendAttachments(){
@@ -382,13 +397,14 @@ class SocketMailer {
                     $content = fread($handle, $fileSize);
                     fclose($handle);
                     $contentChunk = chunk_split(base64_encode($content));
-                    $this->sendC('--'.$this->boundry.self::NL);
-                    $this->sendC('Content-Type: '.$file->getMIMEType().'; name="'.$file->getName().'"'.self::NL);
-                    $this->sendC('Content-Transfer-Encoding: base64'.self::NL);
-                    $this->sendC('Content-Disposition: attachment; filename="'.$file->getName().'"');
-                    $this->sendC($contentChunk.self::NL);
+                    $this->sendC('--'.$this->boundry);
+                    $this->sendC('Content-Type: '.$file->getMIMEType().'; name="'.$file->getName().'"');
+                    $this->sendC('Content-Transfer-Encoding: base64');
+                    $this->sendC('Content-Disposition: attachment; filename="'.$file->getName().'"'.self::NL);
+                    $this->sendC($contentChunk);
                 }
             }
+            $this->sendC('--'.$this->boundry.'--');
         }
     }
     /**

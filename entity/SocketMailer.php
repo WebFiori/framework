@@ -127,6 +127,8 @@ class SocketMailer {
      * @var boolean 
      */
     private $writeMode;
+    private $boundry;
+    private $attachments;
     public function __construct() {
         $this->log = array();
         array_push($this->log, 'Creating new instance of SocketMailer.');
@@ -137,6 +139,25 @@ class SocketMailer {
         $this->setSubject('EMAIL MESSAGE');
         $this->writeMode = FALSE;
         $this->isLoggedIn = FALSE;
+        $this->boundry = hash('sha256', date());
+        $this->attachments = array();
+    }
+    /**
+     * Adds new attachment to the message.
+     * @param File $attachment An object of type 'File' which contains all 
+     * needed information about the file.
+     * @since 1.3
+     */
+    public function addAttachment($attachment) {
+        if(class_exists('File')){
+            if($attachment instanceof File){
+                if(file_exists($attachment->getPath())){
+                    $this->attachments[] = $attachment;
+                    return TRUE;
+                }
+            }
+        }
+        return FALSE;
     }
     /**
      * Checks if the user is logged in or not.
@@ -300,7 +321,7 @@ class SocketMailer {
     /**
      * Write a message to the buffer.
      * @param string $msg The message to write. 
-     * @param boolean $sendMessage If set to <b>TRUE</b>, The connection will be closed and the 
+     * @param boolean $sendMessage If set to TRUE, The connection will be closed and the 
      * message will be sent.
      * @since 1.0
      */
@@ -309,6 +330,7 @@ class SocketMailer {
         if($this->isInWritingMode()){
             $this->sendC($msg);
             if($sendMessage === TRUE){
+                $this->appendAttachments();
                 $this->sendC(self::NL.'.');
                 $this->sendC('QUIT');
             }
@@ -333,15 +355,39 @@ class SocketMailer {
                 $this->sendC('Date:'. date('r (T)'));
                 $this->sendC('Subject:'. $this->subject);
                 $this->sendC('MIME-Version: 1.0');
-                $this->sendC('Content-Type: text/html; charset=UTF-8');
+                $this->sendC('Content-Type: multipart/mixed; boundary="'.$this->boundry.'"charset=UTF-8'.self::NL);
+                $this->sendC('--'.$this->boundry.self::NL);
+                $this->sendC('Content-Type: text/html; "charset=UTF-8'.self::NL);
                 $this->sendC($msg);
                 if($sendMessage === TRUE){
+                    $this->appendAttachments();
                     $this->sendC(self::NL.'.');
                     $this->sendC('QUIT');
                 }
             }
             else{
                 array_push($this->log, 'Unable to switch to message writing mode. Sender address not set.');
+            }
+        }
+    }
+    /**
+     * @since 1.3
+     */
+    private function appendAttachments(){
+        if(count($this->attachments) != 0){
+            foreach ($this->attachments as $file){
+                if($file instanceof File){
+                    $fileSize = filesize($file->getPath());
+                    $handle = fopen($file->getPath(), 'r');
+                    $content = fread($handle, $fileSize);
+                    fclose($handle);
+                    $contentChunk = chunk_split(base64_encode($content));
+                    $this->sendC('--'.$this->boundry.self::NL);
+                    $this->sendC('Content-Type: '.$file->getMIMEType().'; name="'.$file->getName().'"'.self::NL);
+                    $this->sendC('Content-Transfer-Encoding: base64'.self::NL);
+                    $this->sendC('Content-Disposition: attachment; filename="'.$file->getName().'"');
+                    $this->sendC($contentChunk.self::NL);
+                }
             }
         }
     }

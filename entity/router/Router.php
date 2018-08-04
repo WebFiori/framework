@@ -45,7 +45,7 @@ if(!defined('ROOT_DIR')){
  * location.
  *
  * @author Ibrahim
- * @version 1.3
+ * @version 1.3.1
  */
 class Router {
     /**
@@ -102,13 +102,13 @@ class Router {
         return self::$router;
     }
     /**
-     * An array which contains an objects of type <b>RouteUri</b>.
+     * An array which contains an objects of type 'RouteUri'.
      * @var array
      * @since 1.0 
      */
     private $routes;
     /**
-     * Creates new instance of <b>Router</b>
+     * Creates new instance of 'Router'
      * @since 1.0
      */
     private function __construct() {
@@ -130,7 +130,12 @@ class Router {
                     . '</body>'
                     . '</html>');
         };
-        $this->baseUrl = trim(SiteConfig::get()->getBaseURL(), '/');
+        if(class_exists('SiteConfig')){
+            $this->baseUrl = trim(SiteConfig::get()->getBaseURL(), '/');
+        }
+        else{
+            $this->baseUrl = trim(Util::getBaseURL(), '/');
+        }
     }
     /**
      * Redirect a URI to its route.
@@ -266,6 +271,17 @@ class Router {
     public static function api($path,$apiFile) {
         return Router::get()->addRoute($path, $apiFile, Router::API_ROUTE);
     }
+    /**
+     * Returns the base URL which is used to create routes.
+     * @return string The base URL which is used to create routes. The returned 
+     * value is based on one of two values. Either the value that is returned 
+     * by the function 'Util::getBaseURL()' or the function 'SiteConfig::getBaseURL()'.
+     * @since 1.3.1
+     */
+    public static function base(){
+        return Router::get()->getBase();
+    }
+
     /**
      * Adds new closure route.
      * @param string $path The path part of the URI. For example, if the 

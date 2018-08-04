@@ -67,14 +67,14 @@ class BasicMailFunctions extends Functions{
     private static $instance;
     /**
      * Returns a singleton of the class.
-     * @return MailFunctions
+     * @return BasicMailFunctions
      * @since 1.0
      */
     public static function get(){
         if(self::$instance != NULL){
             return self::$instance;
         }
-        self::$instance = new MailFunctions();
+        self::$instance = new BasicMailFunctions();
         return self::$instance;
     }
     public function __construct() {
@@ -250,7 +250,7 @@ class BasicMailFunctions extends Functions{
      * the function will return 'MailFunctions::INV_CREDENTIALS'.
      * @since 1.0
      */
-    private function getSocketMailer($emailAcc){
+    public function getSocketMailer($emailAcc){
         $m = new SocketMailer();
         $m->setHost($emailAcc->getServerAddress());
         $m->setPort($emailAcc->getPort());

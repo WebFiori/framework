@@ -100,8 +100,11 @@ class LisksCode{
             $this->WF->createSiteConfigFile();
             $this->BMF->createEmailConfigFile();
             $this->sysStatus = Util::checkSystemStatus();
-            
         }
+        if(!$this->SF->isSetupFinished()){
+            $this->firstUse();
+        }
+        Router::route(Util::getRequestedURL());
     }
     /**
      * 
@@ -166,7 +169,7 @@ class LisksCode{
 
         //once configuration is finished, call the function SystemFunctions::configured()
 
-        //$SF->configured();
+        $this->SF->configured(FALSE);
         if(!$this->SF->isSetupFinished()){
             die('System is not ready for use.');
         }

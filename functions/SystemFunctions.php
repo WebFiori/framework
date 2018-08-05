@@ -57,18 +57,6 @@ class SystemFunctions extends Functions{
         'AO'=>'Admin Only'
     );
     /**
-     * An array of system setup steps
-     * @var array
-     * @since 1.3 
-     */
-    public static $SETUP_STAGES = array(
-        'w'=>'welcome',
-        'db'=>'database-setup',
-        'smtp'=>'smtp-account-setup',
-        'admin'=>'admin-account',
-        'site'=>'site-configuration'
-    );
-    /**
      * A constant that indicates the selected database schema has tables.
      * @since 1.1
      */
@@ -116,51 +104,12 @@ class SystemFunctions extends Functions{
      * @return SystemFunctions
      * @since 1.0
      */
-    public static function get(){
+    public static function &get(){
         if(self::$singleton !== NULL){
             return self::$singleton;
         }
         self::$singleton = new SystemFunctions();
         return self::$singleton;
-    }
-    /**
-     * A SessionManager used in case of application setup
-     * @var SessionManager
-     * @since 1.3 
-     */
-    private $setupSession;
-    /**
-     * Initiate the session manager that is used to manage setup steps.
-     * @since 1.3
-     */
-    public function initSetupSession() {
-        $this->setupSession = new SessionManager('setup-session');
-        $this->setupSession->initSession(TRUE, TRUE);
-        if(!isset($_SESSION['setup-step'])){
-            $_SESSION['setup-step'] = self::$SETUP_STAGES['w'];
-        }
-    }
-    /**
-     * Updates the current setup step.
-     * @param string $stageCode The code of the current stage. It 
-     * must be a value from the constant SystemFunctions::SETUP_STAGES.
-     * @since 1.3
-     */
-    public function setSetupStage($stageCode) {
-        $this->initSetupSession();
-        if(isset($this->SETUP_STAGES[$stageCode])){
-            $_SESSION['setup-step'] = self::$SETUP_STAGES[$stageCode];
-        }
-    }
-    /**
-     * Returns the name of current setup step.
-     * @return string The name of current setup step. It will be a value 
-     * from the array SystemFunctions::SETUP_STAGES.
-     * @since 1.3
-     */
-    public function getSetupStep() {
-        $this->initSetupSession();
-        return $_SESSION['setup-step'];
     }
     /**
      * Creates the file 'Config.php' if it does not exist.
@@ -188,8 +137,7 @@ class SystemFunctions extends Functions{
      * @return boolean|string The function will return <b>TRUE</b> in case 
      * of valid database attributes. Also the function will return 
      * <b>SessionManager::DB_CONNECTION_ERR</b> in case the connection was not 
-     * established. If the connection is established and the database is not 
-     * empty, the function will return <b>SystemFunctions::DB_NOT_EMPTY</b>.
+     * established.
      * @since 1.0
      */
     public function updateDBAttributes($dbHost,$dbUser,$dbPass,$dbName){
@@ -199,63 +147,18 @@ class SystemFunctions extends Functions{
             'pass'=>$dbPass,
             'db-name'=>$dbName
         ));
-        if($r === TRUE){
-            $tablesCount = $this->getSchemaTablesCount($dbName);
-            if($tablesCount == 0){
-                $config = $this->getConfigVars();
-                $config['database-host'] = $dbHost;
-                $config['database-username'] = $dbUser;
-                $config['database-password'] = $dbPass;
-                $config['database-name'] = $dbName;
-                $this->writeConfig($config);
-                return TRUE;
-            }
-            else if($tablesCount == MySQLQuery::QUERY_ERR){
-                return MySQLQuery::QUERY_ERR;
-            }
-            return self::DB_NOT_EMPTY;
-        }
         return $r;
     }
     /**
-     * Updates system configuration status. Only 
-     * a user that is logged in as super admin can perform that task.
-     * @param boolean $isConfig <b>TRUE</b> to set system as configured. 
-     * <b>FALSE</b> to make it not configured.
-     * @return boolean The function will return <b>TRUE</b> if system configuration 
-     * status updated.
+     * Updates system configuration status.
+     * @param boolean $isConfig TRUE to set system as configured. 
+     * FALSE to make it not configured.
      * @since 1.3
      */
     public function configured($isConfig=true){
-        if($this->hasPrivilege('SYS_STATUS_UPDATE')){
-            $confVars = $this->getConfigVars();
-            $confVars['is-config'] = $isConfig === TRUE ? 'TRUE' : 'FALSE';
-            $this->writeConfig($confVars);
-            return TRUE;
-        }
-        return FALSE;
-    }
-    private function getSchemaTablesCount($schema){
-        $q = new UserQuery();
-        $q->schemaTablesCount($schema);
-        if($this->excQ($q)){
-            return intval($this->getRow()['tables_count']);
-        }
-        return MySQLQuery::QUERY_ERR;
-    }
-    
-    public function updateUserRegStatus($newStatusCode) {
-        if($this->hasPrivilege('UPDATE_USER_REG_STATUS')){
-            $copy = self::USER_REG_STATS;
-            if(isset($copy[$newStatusCode])){
-                $cfg = $this->getConfigVars();
-                $cfg['user-reg-status'] = $newStatusCode;
-                $this->writeConfig($cfg);
-                return TRUE;
-            }
-            return FALSE;
-        }
-        return self::NOT_AUTH;
+        $confVars = $this->getConfigVars();
+        $confVars['is-config'] = $isConfig === TRUE ? 'TRUE' : 'FALSE';
+        $this->writeConfig($confVars);
     }
     /**
      * Returns an associative array that contains system configuration 
@@ -492,7 +395,7 @@ class SystemFunctions extends Functions{
     /**
      * Checks if the application is setup or not.
      * @return boolean If the system is configured, the function will return 
-     * <b>TRUE</b>. If it is not configured, It will return <b>FALSE</b>. Note 
+     * TRUE. If it is not configured, It will return FALSE. Note 
      * that the function will throw an exception in case one of the 3 main 
      * configuration files is missing.
      * @throws Exception

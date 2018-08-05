@@ -77,7 +77,7 @@ class WebsiteFunctions extends Functions{
      * @return WebsiteFunctions
      * @since 1.0
      */
-    public static function get(){
+    public static function &get(){
         if(self::$singleton !== NULL){
             return self::$singleton;
         }

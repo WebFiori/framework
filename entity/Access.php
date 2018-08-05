@@ -66,43 +66,6 @@ class Access {
     private function __construct() {
         $this->userGroups = array();
         $this->_createGroup('SUPER_ADMIN');
-        $this->_createPrivilege('SUPER_ADMIN', 'UPDATE_USER_PERMISSIONS');
-        $this->_createPrivilege('SUPER_ADMIN', 'ADD_USER');
-        $this->_createPrivilege('SUPER_ADMIN', 'LOGIN');
-        $this->_createPrivilege('SUPER_ADMIN', 'REMOVE_USER');
-        $this->_createPrivilege('SUPER_ADMIN', 'UPDATE_USER_STATUS');
-        $this->_createPrivilege('SUPER_ADMIN', 'ACTIVATE_USER');
-        $this->_createPrivilege('SUPER_ADMIN', 'UPDATE_USER_PASSWORD');
-        $this->_createPrivilege('SUPER_ADMIN', 'RESET_USER_PASSWORD');
-        $this->_createPrivilege('SUPER_ADMIN', 'UPDATE_USER_EMAIL');
-        $this->_createPrivilege('SUPER_ADMIN', 'UPDATE_USER_EMAIL_ALL');
-        $this->_createPrivilege('SUPER_ADMIN', 'UPDATE_USER_DISPLAY_NAME');
-        $this->_createPrivilege('SUPER_ADMIN', 'UPDATE_USER_DISPLAY_NAME_ALL');
-        $this->_createPrivilege('SUPER_ADMIN', 'UPDATE_USER_PASS_ALL');
-        $this->_createPrivilege('SUPER_ADMIN', 'UPDATE_USER_PASS');
-        $this->_createPrivilege('SUPER_ADMIN', 'GET_USER_PROFILE');
-        $this->_createPrivilege('SUPER_ADMIN', 'GET_USER_PROFILE_ALL');
-        $this->_createPrivilege('SUPER_ADMIN', 'GET_PRIVILEGES');
-        $this->_createPrivilege('SUPER_ADMIN', 'GET_USER_SESSION');
-        $this->_createPrivilege('SUPER_ADMIN', 'SYS_STATUS_UPDATE');
-        $this->_createPrivilege('SUPER_ADMIN', 'SITE_SETTINGS_UPDATE');
-        $this->_createPrivilege('SUPER_ADMIN', 'UPDATE_USER_REG_STATUS');
-        
-        $this->_createPrivilege('SUPER_ADMIN', 'UPDATE_USER_REGISTRATION_STATUS');
-        $this->_createPrivilege('SUPER_ADMIN', 'UPDATE_DB');
-        $this->_createPrivilege('SUPER_ADMIN', 'UPDATE_SYS_CONFIG_STATUS');
-        $this->_createPrivilege('SUPER_ADMIN', 'UPDATE_SITE_INFO');
-        $this->_createPrivilege('SUPER_ADMIN', 'UPDATE_SMTP_ACCOUNT');
-        $this->_createPrivilege('SUPER_ADMIN', 'UPLOAD_FILE');
-        $this->_createPrivilege('SUPER_ADMIN', 'EDIT_UPLOADED_FILE');
-        $this->_createPrivilege('SUPER_ADMIN', 'REMOVE_UPLOADED_FILE');
-        
-        $this->_createGroup('BASIC_USER');
-        $this->_createPrivilege('BASIC_USER', 'LOGIN');
-        $this->_createPrivilege('BASIC_USER', 'GET_USER_PROFILE');
-        $this->_createPrivilege('BASIC_USER', 'UPDATE_USER_DISPLAY_NAME');
-        $this->_createPrivilege('BASIC_USER', 'UPDATE_USER_EMAIL');
-        $this->_createPrivilege('SUPER_ADMIN', 'UPDATE_USER_PASS');
     }
     /**
      * Returns a single instance of the class.

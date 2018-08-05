@@ -70,14 +70,13 @@ class Functions {
      * @since 1.1
      */
     public function useDatabase() {
-        if(gettype($GLOBALS['SYS_STATUS']) == 'string' && 
-                $GLOBALS['SYS_STATUS'] == Util::DB_NEED_CONF && 
+        $systemStatus = LisksCode::sysStatus();
+        if($systemStatus == Util::DB_NEED_CONF && 
                 !defined('SETUP_MODE')){
             header('content-type:application/json');
             http_response_code(500);
-            die('{"message":"'.$GLOBALS['SYS_STATUS'].'","type":"error",'
+            die('{"message":"'.$systemStatus.'","type":"error",'
                     . '"details":"It seems the system is unable to connect to the database.",'
-                    . '"config-page":"'.Util::getBaseURL().'s/welcome",'
                     . '"db-instance:'.Util::getDatabaseTestInstance()->toJSON().'}');
         }
         $result = $this->mainSession->useDb(array(
@@ -96,15 +95,15 @@ class Functions {
     }
     /**
      * A session manager.
-     * @var SessionManager an instance of <b>SessionManager</b>.
+     * @var SessionManager an instance of 'SessionManager'.
      * @since 1.0 
      */
     private $mainSession;
     /**
      * Execute a query.
-     * @param MySQLQuery $qObj An object of type <b>MySQLQuery</b>.
-     * @return boolean <b>TRUE</b> if no errors occur while executing the query.
-     *  <b>FAlSE</b> in case of error.
+     * @param MySQLQuery $qObj An object of type 'MySQLQuery'.
+     * @return boolean 'TRUE' if no errors occur while executing the query.
+     * FAlSE in case of error.
      * @since 1.0
      */
     public function excQ($qObj){

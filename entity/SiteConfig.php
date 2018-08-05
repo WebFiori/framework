@@ -1,7 +1,20 @@
 <?php
 if(!defined('ROOT_DIR')){
-    header('HTTP/1.1 403 Forbidden');
-    exit;
+    header("HTTP/1.1 403 Forbidden");
+    die(''
+        . '<!DOCTYPE html>'
+        . '<html>'
+        . '<head>'
+        . '<title>Forbidden</title>'
+        . '</head>'
+        . '<body>'
+        . '<h1>403 - Forbidden</h1>'
+        . '<hr>'
+        . '<p>'
+        . 'Direct access not allowed.'
+        . '</p>'
+        . '</body>'
+        . '</html>');
 }
 class SiteConfig{
     /**
@@ -10,6 +23,10 @@ class SiteConfig{
      * @since 1.0
      */
     private $webSiteNames;
+    /**
+     * The primary language of the website.
+     */
+    private $primaryLang;
     /**
      * An array which contains different descriptions in different languages.
      * @var string 
@@ -72,15 +89,24 @@ class SiteConfig{
     }
     private function __construct() {
         $this->configVision = '1.1';
-        $this->webSiteNames = array('EN'=>'Programming Academia','AR'=>'أكاديميا البرمجة',);
-        $this->baseUrl = 'http://localhost/generic-php/';
-        $this->titleSep = ' | ';
-        $this->baseThemeName = 'Greeny By Ibrahim Ali';
+        $this->webSiteNames = array('EN'=>'',);
+        $this->baseUrl = '';
+        $this->titleSep = '  ';
+        $this->primaryLang = '';
+        $this->baseThemeName = '';
         $this->adminThemeName = 'Greeny By Ibrahim Ali';
         $this->homePage = 'index';
-        $this->descriptions = array('EN'=>'','AR'=>'',);
+        $this->descriptions = array('EN'=>'',);
     }
     
+    /**
+     * Returns the primary language of the website.
+     * @return string Language code of the primary language.
+     * @since 1.3
+     */
+    public function getPrimaryLanguage(){
+        return $this->primaryLang;
+    }
     /**
      * Returns the name of base theme that is used in website pages.
      * @return string The name of base theme that is used in website pages.

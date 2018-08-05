@@ -36,25 +36,13 @@ class ViewRoutes {
      * @since 1.0
      */
     public static function create(){
-        if(Util::checkSystemStatus() == Util::NEED_CONF){
-            Router::view('/s/welcome', '/setup/welcome.php');
-            Router::view('/s/database-setup', '/setup/database-setup.php');
-            Router::view('/s/smtp-account', '/setup/email-account.php');
-            Router::view('/s/admin-account', '/setup/admin-account.php');
-            Router::view('/s/website-config', '/setup/website-config.php');
-        }
-        Router::view('/login?lang={lang-code}', '/login.php');
-        Router::view('/home', '/home.php');
-        Router::view('/activate-account', '/activate-account.php');
-        Router::view('/logout', '/logout.php');
-        Router::view('/new-password', '/new-password.php');
-        Router::view('/users', '/users.php');
-        Router::view('/help/apis/{api-name}', '/api-help-view.php');
-        Router::view('/user/{id-or-username}', '/user-view.php');
         Router::view('/', '/default.html');
-        Router::other('/test', '/tests/unit/Privileges_Test.php');
     }
-    
+    /**
+     * A test for creating a site map from views URIs
+     * @return string An XML string.
+     * @since 1.0
+     */
     public static function createSiteMap() {
         $urlSet = new HTMLNode('urlset');
         $urlSet->setAttribute('xmlns', 'http://www.sitemaps.org/schemas/sitemap/0.9');

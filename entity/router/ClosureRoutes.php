@@ -36,41 +36,10 @@ class ClosureRoutes {
      * @since 1.0
      */
     public static function create() {
-        Router::closure('/sitemap', function(){
-            $viewsSiteMap = ViewRoutes::createSiteMap();
-            header('content-type: text/xml');
-            echo $viewsSiteMap;
-        });
-        Router::closure('/'.Util::NEED_CONF, function(){
-            if(isset($GLOBALS['SYS_STATUS']) && $GLOBALS['SYS_STATUS'] === Util::NEED_CONF){
-                SystemFunctions::get()->initSetupSession();
-                $currentStage = SystemFunctions::get()->getSetupStep();
-                switch ($currentStage){
-                    case SystemFunctions::$SETUP_STAGES['w']:{
-                        require_once ROOT_DIR.'/pages/setup/welcome.php';
-                        break;
-                    }
-                    case SystemFunctions::$SETUP_STAGES['db']:{
-                        require_once ROOT_DIR.'/pages/setup/database-setup.php';
-                        break;
-                    }
-                    case SystemFunctions::$SETUP_STAGES['admin']:{
-                        require_once ROOT_DIR.'/pages/setup/admin-account.php';
-                        break;
-                    }
-                    case SystemFunctions::$SETUP_STAGES['smtp']:{
-                        require_once ROOT_DIR.'/pages/setup/email-account.php';
-                        break;
-                    }
-                    case SystemFunctions::$SETUP_STAGES['website']:{
-                        require_once ROOT_DIR.'/pages/setup/website-config.php';
-                        break;
-                    }
-                }
-            }
-            else{
-                header('location: '.SiteConfig::get()->getBaseURL());
-            }
-        });
+        $arrayOfParams = array('LisksCode Framework');
+        Router::closure('/closure', function($params){
+            echo 'This is a closure route.';
+            Util::print_r($params);
+        }, $arrayOfParams);
     }
 }

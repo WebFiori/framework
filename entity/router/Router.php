@@ -178,25 +178,27 @@ class Router {
      * @since 1.0
      */
     public function addRoute($path,$routeTo,$routeType,$closureParams=array()) {
-        if($routeType == self::API_ROUTE || 
-           $routeType == self::VIEW_ROUTE || 
-           $routeType == self::CUSTOMIZED || 
-           $routeType == self::CLOSURE_ROUTE){
-            if($routeType != self::CLOSURE_ROUTE){
-                $path = $this->fixPath($path);
-                $routeTo = ROOT_DIR.$this->fixPath($routeType.$routeTo);
-            }
-            else{
-                if(!($routeTo instanceof Closure)){
-                    return FALSE;
-                }
-            }
-            if(!$this->hasRoute($path)){
-                $routeUri = new RouterUri($this->getBase().$path, $routeTo, $closureParams);
-                $routeUri->setType($routeType);
-                $this->routes[] = $routeUri;
-                return TRUE;
-            }
+        if(strlen($this->getBase()) != 0){
+            if($routeType == self::API_ROUTE || 
+            $routeType == self::VIEW_ROUTE || 
+            $routeType == self::CUSTOMIZED || 
+            $routeType == self::CLOSURE_ROUTE){
+             if($routeType != self::CLOSURE_ROUTE){
+                 $path = $this->fixPath($path);
+                 $routeTo = ROOT_DIR.$this->fixPath($routeType.$routeTo);
+             }
+             else{
+                 if(!($routeTo instanceof Closure)){
+                     return FALSE;
+                 }
+             }
+             if(!$this->hasRoute($path)){
+                 $routeUri = new RouterUri($this->getBase().$path, $routeTo, $closureParams);
+                 $routeUri->setType($routeType);
+                 $this->routes[] = $routeUri;
+                 return TRUE;
+             }
+         }
         }
         return FALSE;
     }

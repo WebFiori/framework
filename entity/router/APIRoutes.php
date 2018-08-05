@@ -36,15 +36,6 @@ class APIRoutes {
      * @since 1.0
      */
     public static function create() {
-        Router::api('/SysAPIs/{action}', '/SysAPIs.php');
-        Router::api('/SysAPIs', '/SysAPIs.php');
-        Router::api('/SysAPIs/{action}', '/SysAPIs.php');
-        Router::api('/AuthAPI/{action}', '/AuthAPI.php');
         Router::api('/ExampleAPI/{action}', '/ExampleAPI.php');
-        Router::api('/NumsAPIs/{action}', '/NumsAPIs.php');
-        Router::api('/PasswordAPIs/{action}', '/PasswordAPIs.php');
-        Router::api('/UserAPIs/{action}', '/UserAPIs.php');
-        Router::api('/WebsiteAPIs/{action}', '/WebsiteAPIs.php');
-        Router::api('/AccessAPIs/{action}', '/AccessControlAPIs.php');
     }
 }

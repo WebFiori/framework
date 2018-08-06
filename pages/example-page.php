@@ -23,6 +23,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
+/*
+ * The next block of code can be added to every view or .php 
+ * file to prevent direct access.
+ */
 if(!defined('ROOT_DIR')){
     header("HTTP/1.1 403 Forbidden");
     die(''
@@ -40,15 +45,21 @@ if(!defined('ROOT_DIR')){
         . '</body>'
         . '</html>');
 }
-$page = Page::get();
 
 //load UI template components (JS, CSS and others)
-$page->usingTheme($themeName='Greeny By Ibrahim Ali');
+//it is optional. to use a theme but recomended
+Page::theme($themeName='Greeny By Ibrahim Ali');
 
 //sets the title of the page
-$page->setTitle('Example Page');
+Page::title('Example Page');
 
-echo $page->getDocument();
+//adds a paragraph to the body of the page.
+$p = new PNode();
+$p->addText('Hello from LisksCode Framework!');
+Page::insert($p);
+
+//display the view
+Page::render();
 
 
 

@@ -90,7 +90,7 @@ class SiteConfig{
     private function __construct() {
         $this->configVision = '1.1';
         $this->webSiteNames = array('EN'=>'',);
-        $this->baseUrl = '';
+        $this->baseUrl = 'http://localhost/generic-php/';
         $this->titleSep = '  ';
         $this->primaryLang = '';
         $this->baseThemeName = '';

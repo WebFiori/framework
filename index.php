@@ -165,7 +165,6 @@ class LisksCode{
         $siteInfoArr['primary-language'] = '';
         $siteInfoArr['theme-name'] = '';
         $siteInfoArr['title-separator'] = '';
-        $siteInfoArr['base-url'] = '';
         $siteInfoArr['site-descriptions'] = array('EN'=>'');
         $siteInfoArr['website-names'] = array('EN'=>'');
         $this->WF->updateSiteInfo($siteInfoArr);
@@ -191,7 +190,7 @@ class LisksCode{
         $this->BMF->updateOrAddEmailAccount($account);
 
         //once configuration is finished, call the function SystemFunctions::configured()
-        $this->SF->configured();
+        //$this->SF->configured();
         if(!$this->SF->isSetupFinished()){
             die('System is not ready for use.');
         }

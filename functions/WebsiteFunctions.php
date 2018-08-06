@@ -130,16 +130,16 @@ class WebsiteFunctions extends Functions{
      */
     public function getSiteConfigVars(){
         $cfgArr = WebsiteFunctions::INITIAL_WEBSITE_CONFIG_VARS;
-        $cfgArr['base-url'] = Util::getBaseURL();
         if(class_exists('SiteConfig')){
-            $cfgArr['website-names'] = SiteConfig::get()->getWebsiteNames();
-            $cfgArr['base-url'] = SiteConfig::get()->getBaseURL();
-            $cfgArr['title-separator'] = SiteConfig::get()->getTitleSep();
-            $cfgArr['home-page'] = SiteConfig::get()->getHomePage();
-            $cfgArr['primary-language'] = SiteConfig::get()->getPrimaryLanguage();
-            $cfgArr['site-descriptions'] = SiteConfig::get()->getDescriptions();
-            $cfgArr['theme-name'] = SiteConfig::get()->getBaseThemeName();
-            $cfgArr['admin-theme-name'] = SiteConfig::get()->getAdminThemeName();
+            $SC = SiteConfig::get();
+            $cfgArr['website-names'] = $SC->getWebsiteNames();
+            $cfgArr['base-url'] = $SC->getBaseURL();
+            $cfgArr['title-separator'] = $SC->getTitleSep();
+            $cfgArr['home-page'] = $SC->getHomePage();
+            $cfgArr['primary-language'] = $SC->getPrimaryLanguage();
+            $cfgArr['site-descriptions'] = $SC->getDescriptions();
+            $cfgArr['theme-name'] = $SC->getBaseThemeName();
+            $cfgArr['admin-theme-name'] = $SC->getAdminThemeName();
         }
         return $cfgArr;
     }

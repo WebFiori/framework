@@ -82,8 +82,8 @@ class SystemFunctions extends Functions{
      */
     const INITIAL_CONFIG_VARS = array(
         'is-config'=>'FALSE',
-        'lisks-date'=>'10-03-2018 (DD-MM-YYYY)',
-        'lisks-version'=>'0.1.4',
+        'lisks-date'=>'06-08-2018 (DD-MM-YYYY)',
+        'lisks-version'=>'1.0.0-PR1',
         'lisks-version-type'=>'Beta',
         'config-file-version'=>'1.3',
         'database-host'=>'localhost',

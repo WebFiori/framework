@@ -1,7 +1,20 @@
 <?php
 if(!defined('ROOT_DIR')){
-    header('HTTP/1.1 403 Forbidden');
-    exit;
+    header("HTTP/1.1 403 Forbidden");
+    die(''
+        . '<!DOCTYPE html>'
+        . '<html>'
+        . '<head>'
+        . '<title>Forbidden</title>'
+        . '</head>'
+        . '<body>'
+        . '<h1>403 - Forbidden</h1>'
+        . '<hr>'
+        . '<p>'
+        . 'Direct access not allowed.'
+        . '</p>'
+        . '</body>'
+        . '</html>');
 }
 /**
  * A file that contains system email addresses configurations.
@@ -30,14 +43,6 @@ class MailConfig{
         return self::$inst;
     }
     private function __construct() {
-    $acc0 = new EmailAccount();
-        $acc0->setServerAddress('mail.programmingacademia.com');
-        $acc0->setAddress('no-replay@programmingacademia.com');
-        $acc0->setUsername('no-replay@programmingacademia.com');
-        $acc0->setPassword('132970');
-        $acc0->setName('Programming Academia Team');
-        $acc0->setPort(25);
-        $this->addAccount($acc0, 'no-replay');
     }
 /**
      * Adds an email account.

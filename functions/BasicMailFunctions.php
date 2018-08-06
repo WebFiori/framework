@@ -99,8 +99,21 @@ class BasicMailFunctions extends Functions{
         $fh = new FileHandler(ROOT_DIR.'/entity/MailConfig.php');
         $fh->write('<?php', TRUE, TRUE);
         $fh->write('if(!defined(\'ROOT_DIR\')){
-    header(\'HTTP/1.1 403 Forbidden\');
-    exit;
+    header("HTTP/1.1 403 Forbidden");
+    die(\'\'
+        . \'<!DOCTYPE html>\'
+        . \'<html>\'
+        . \'<head>\'
+        . \'<title>Forbidden</title>\'
+        . \'</head>\'
+        . \'<body>\'
+        . \'<h1>403 - Forbidden</h1>\'
+        . \'<hr>\'
+        . \'<p>\'
+        . \'Direct access not allowed.\'
+        . \'</p>\'
+        . \'</body>\'
+        . \'</html>\');
 }', TRUE, TRUE);
         $fh->write('/**
  * A file that contains system email addresses configurations.

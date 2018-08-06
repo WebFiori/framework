@@ -88,14 +88,14 @@ class Config{
      */
     private function __construct() {
         $this->isConfigured = FALSE;
-        $this->lisksDate = '10-03-2018 (DD-MM-YYYY)';
-        $this->lisksVersion = '0.1.4';
+        $this->lisksDate = '06-08-2018 (DD-MM-YYYY)';
+        $this->lisksVersion = '1.0.0-PR1';
         $this->lisksVersionType = 'Beta';
         $this->configVision = '1.3';
         $this->dbHost = 'localhost';
-        $this->dbUser = 'root';
-        $this->dbPass = '132970';
-        $this->dbName = 'test';
+        $this->dbUser = '';
+        $this->dbPass = '';
+        $this->dbName = '';
         $this->userRegStats = 'C';
     }
     /**

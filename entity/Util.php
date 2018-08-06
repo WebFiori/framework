@@ -77,12 +77,12 @@ class Util{
 
     /**
      * 
-     * @return boolean|string The function will return <b>TRUE</b> in case everything 
+     * @return boolean|string The function will return TRUE in case everything 
      * was fine. If the file 'Config.php' was not found, The function will return 
-     * <b>Util::MISSING_CONF_FILE</b>. If the file 'SiteConfig.php' was not found, The function will return 
-     * <b>Util::MISSING_CONF_FILE</b>. If the system is not configured yet, the function 
-     * will return <b>Util::NEED_CONF</b>. If the system is unable to connect to 
-     * the database, the function will return <b>Util::DB_NEED_CONF</b>.
+     * 'Util::MISSING_CONF_FILE'. If the file 'SiteConfig.php' was not found, The function will return 
+     * 'Util::MISSING_CONF_FILE'. If the system is not configured yet, the function 
+     * will return 'Util::NEED_CONF'. If the system is unable to connect to 
+     * the database, the function will return 'Util::DB_NEED_CONF'.
      * @since 1.2
      */
     public static function checkSystemStatus(){

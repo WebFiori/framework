@@ -7,38 +7,47 @@
  */
 class LisksCode{
     /**
-     *
+     * A variable to store system status. The variable will be set to TRUE 
+     * if everything is Ok.
      * @var boolean|string 
+     * @since 1.0
      */
     private $sysStatus;
     /**
-     *
+     * An instance of autoloader class.
      * @var AutoLoader 
+     * @since 1.0
      */
     private $AU;
     /**
-     * 
+     * An instance of system functions class.
      * @var SystemFunctions 
+     * @since 1.0
      */
     private $SF;
     /**
-     *
+     * An instance of web site functions class.
      * @var WebsiteFunctions 
+     * @since 1.0
      */
     private $WF;
     /**
-     *
+     * An instance of basic mail functions class.
      * @var BasicMailFunctions 
+     * @since 1.0
      */
     private $BMF;
     /**
-     *
-     * @var LisksCode 
+     * A single instance of the class LisksCode.
+     * @var LisksCode
+     * @since 1.0 
      */
     private static $LC;
     /**
-     * 
-     * @return LisksCode
+     * Initiate the framework and return a single instance of the class that can 
+     * be used to update some settings.
+     * @return LisksCode An instance of 'LisksCode'.
+     * @since 1.0
      */
     public static function &getAndStart(){
         if(self::$LC != NULL){
@@ -107,17 +116,23 @@ class LisksCode{
         Router::route(Util::getRequestedURL());
     }
     /**
-     * 
-     * @param type $refresh
-     * @return boolean|string
+     * Returns the current status of the system.
+     * @return boolean|string If the system is configured correctly, the function 
+     * will return TRUE. If the file 'Config.php' was not found, The function will return 
+     * 'Util::MISSING_CONF_FILE'. If the file 'SiteConfig.php' was not found, The function will return 
+     * 'Util::MISSING_CONF_FILE'. If the system is not configured yet, the function 
+     * will return 'Util::NEED_CONF'. If the system is unable to connect to 
+     * the database, the function will return 'Util::DB_NEED_CONF'.
+     * @since 1.0
      */
-    public static function sysStatus($refresh=true){
-        return self::get()->getSystemStatus($refresh);
+    public static function sysStatus(){
+        return self::get()->getSystemStatus(TRUE);
     }
     /**
      * 
      * @param type $refresh
      * @return boolean|string
+     * @since 1.0
      */
     private function getSystemStatus($refresh=true) {
         if($refresh === TRUE){
@@ -125,13 +140,21 @@ class LisksCode{
         }
         return $this->sysStatus;
     }
-    
+    /**
+     * Initiate routes.
+     * @since 1.0
+     */
     private function initRoutes(){
         APIRoutes::create();
         ViewRoutes::create();
         ClosureRoutes::create();
     }
-    
+    /**
+     * This function is called when the status of the system does not equal 
+     * to TRUE. It is used to configure some of the basic settings in case 
+     * of first use. Modify the content of this function as needed.
+     * @since 1.0
+     */
     private function firstUse(){
         //in this part, you can configure the ststem. 
         //the first thing you might need to do is to update basic website
@@ -168,11 +191,11 @@ class LisksCode{
         $this->BMF->updateOrAddEmailAccount($account);
 
         //once configuration is finished, call the function SystemFunctions::configured()
-
-        $this->SF->configured(FALSE);
+        $this->SF->configured();
         if(!$this->SF->isSetupFinished()){
             die('System is not ready for use.');
         }
+        
     }
 }
 

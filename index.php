@@ -191,11 +191,45 @@ class LisksCode{
 
         //once configuration is finished, call the function SystemFunctions::configured()
         //$this->SF->configured();
-        if(!$this->SF->isSetupFinished()){
-            die('System is not ready for use.');
-        }
         
+        
+        //do not remove next lines of code.
+        //Used to show error message in case the 
+        //system is not configured.
+        if(!$this->SF->isSetupFinished()){
+            $this->needConfigration();
+        }
+    }
+    private function needConfigration(){
+        header('HTTP/1.1 503 Service Unavailable');
+        die(''
+        . '<!DOCTYPE html>'
+        . '<html>'
+        . '<head>'
+        . '<title>Service Unavailable</title>'
+        . '</head>'
+        . '<body>'
+        . '<h1>503 - Service Unavailable</h1>'
+        . '<hr>'
+        . '<p>'
+        . 'This error means that the system is not configured yet or this is the first run.'
+        . 'If you think that your system is configured, then refresh this page and the '
+        . 'error should be gone. If you did not configure the system yet, then do the following:'
+        . '</p>'
+        . '<ul>'
+        . '<li>Open the file \'index.php\' in any editor.</li>'
+        . '<li>Inside the class \'LisksCode\', go to the body of the function \'firstUse()\'.</li>'
+        . '<li>Modify the body of the function as instructed.</li>'
+        . '</ul>'
+        . '<p>'
+        . 'Once you do that, you are ready to go and use the system.'
+        . '</p>'
+        . '<p>System Powerd By: <a href="https://github.com/usernane/liskscode" target="_blank"><b>'
+                . 'LisksCode Framework v'.Config::get()->getLisksVersion().' ('.Config::get()->getLisksVersionType().')'
+                . '</b></a></p>'
+        . '</body>'
+        . '</html>');
     }
 }
-
+//start the system
 LisksCode::getAndStart();

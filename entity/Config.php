@@ -93,9 +93,9 @@ class Config{
         $this->lisksVersionType = 'Beta';
         $this->configVision = '1.3';
         $this->dbHost = 'localhost';
-        $this->dbUser = '';
-        $this->dbPass = '';
-        $this->dbName = '';
+        $this->dbUser = 'root';
+        $this->dbPass = '132970';
+        $this->dbName = 'test';
         $this->userRegStats = 'C';
     }
     /**

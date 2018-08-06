@@ -61,6 +61,7 @@ class AutoLoader{
             '/entity/html-php-structs/structs',
             '/entity/html-php-structs/html',
             '/entity/router',
+            '/entity/mail',
             '/publish',
             '/functions',
             '/apis'

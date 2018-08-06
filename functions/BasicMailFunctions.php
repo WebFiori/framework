@@ -259,8 +259,8 @@ class BasicMailFunctions extends Functions{
             if($m->login($emailAcc->getUsername(), $emailAcc->getPassword())){
                 return $m;
             }
-            return MailFunctions::INV_CREDENTIALS;
+            return BasicMailFunctions::INV_CREDENTIALS;
         }
-        return MailFunctions::INV_HOST_OR_PORT;
+        return BasicMailFunctions::INV_HOST_OR_PORT;
     }
 }

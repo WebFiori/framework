@@ -44,17 +44,39 @@ class LisksCode{
      */
     private static $LC;
     /**
+     * A mutex lock to disallow class access during initialization state.
+     * @var int
+     * @since 1.0 
+     */
+    private static $classStatus = 'NONE';
+    /**
      * Initiate the framework and return a single instance of the class that can 
      * be used to update some settings.
      * @return LisksCode An instance of 'LisksCode'.
      * @since 1.0
      */
     public static function &getAndStart(){
-        if(self::$LC != NULL){
-            return self::$LC;
+        if(self::$classStatus == 'NONE'){
+            if(self::$LC === NULL){
+                self::$classStatus = 'INITIALIZING';
+                self::$LC = new LisksCode();
+            }
         }
-        self::$LC = new LisksCode();
+        else if(self::$classStatus == 'INITIALIZING'){
+            throw new Exception('Using the class \'LisksCode\' while it is not fully initialized.');
+        }
         return self::$LC;
+    }
+    /**
+     * Returns the status of the class.
+     * @return string The returned value will be one of 3 values: 'NONE' if 
+     * the constructor of the class is not called. 'INITIALIZING' if the execution 
+     * is happening inside the constructor of the class. 'INITIALIZED' once the 
+     * code in the constructor is executed.
+     * @since 1.0
+     */
+    public static function getClassStatus() {
+        return self::$classStatus;
     }
     /**
      * The entry point for initiating the system.
@@ -113,7 +135,7 @@ class LisksCode{
         if(!$this->SF->isSetupFinished()){
             $this->firstUse();
         }
-        Router::route(Util::getRequestedURL());
+        self::$classStatus = 'INITIALIZED';
     }
     /**
      * Returns the current status of the system.
@@ -126,7 +148,10 @@ class LisksCode{
      * @since 1.0
      */
     public static function sysStatus(){
-        return self::get()->getSystemStatus(TRUE);
+        if(self::getClassStatus() == 'INITIALIZED'){
+            return self::getAndStart()->getSystemStatus(TRUE);
+        }
+        return self::$classStatus;
     }
     /**
      * 
@@ -162,20 +187,32 @@ class LisksCode{
 
         $siteInfoArr = $this->WF->getSiteConfigVars();
         $siteInfoArr['base-url'] = Util::getBaseURL();
-        $siteInfoArr['primary-language'] = '';
-        $siteInfoArr['theme-name'] = '';
-        $siteInfoArr['title-separator'] = '';
-        $siteInfoArr['site-descriptions'] = array('EN'=>'');
-        $siteInfoArr['website-names'] = array('EN'=>'');
+        $siteInfoArr['primary-language'] = 'AR';
+        $siteInfoArr['theme-name'] = 'Greeny By Ibrahim Ali';
+        $siteInfoArr['title-separator'] = '|';
+        $siteInfoArr['site-descriptions'] = array('AR'=>'');
+        $siteInfoArr['website-names'] = array('AR'=>'الياسين الزراعية');
         $this->WF->updateSiteInfo($siteInfoArr);
 
         //After that, if your app uses MySQL database, you can set connection 
         //parameters here. If it does not, skip this step.
-        $dbHost = '';
-        $dbUser = '';
-        $dbPass = '';
-        $dbName = '';
-        $this->SF->updateDBAttributes($dbHost, $dbUser, $dbPass, $dbName);
+        $dbHost = 'localhost';
+        $dbUser = 'root';
+        $dbPass = 'alyaseen03';
+        $dbName = 'crm';
+        if($this->SF->updateDBAttributes($dbHost, $dbUser, $dbPass, $dbName) === TRUE){
+            $schema = DatabaseSchema::get();
+            $query = new UserQuery();
+            $query->setQuery($schema->getSchema(), 'update');
+            if($this->SF->excQ($query) !== TRUE){
+                header('HTTP/1.1 503 Service Unavailable');
+                die($this->SF->getDBLink()->toJSON().'');
+            }
+        }
+        else{
+            header('HTTP/1.1 503 Service Unavailable');
+            die($this->SF->getDBLink()->toJSON().'');
+        }
 
 
         //Also, you can add SMTP email account that you can use to send email 
@@ -188,10 +225,9 @@ class LisksCode{
         $account->setPort(25);
         $account->setServerAddress('mail.example.com');
         $this->BMF->updateOrAddEmailAccount($account);
-
+        
         //once configuration is finished, call the function SystemFunctions::configured()
         //$this->SF->configured();
-        
         
         //do not remove next lines of code.
         //Used to show error message in case the 
@@ -200,6 +236,11 @@ class LisksCode{
             $this->needConfigration();
         }
     }
+    /**
+     * Show an error message that tells the user about system status and how to 
+     * configure it.
+     * @since 1.0
+     */
     private function needConfigration(){
         header('HTTP/1.1 503 Service Unavailable');
         die(''
@@ -230,6 +271,20 @@ class LisksCode{
         . '</body>'
         . '</html>');
     }
+    /**
+     * Show an error message that tells the user about system status and how to 
+     * configure it.
+     * @since 1.0
+     */
+    public static function configErr() {
+        
+    }
 }
 //start the system
 LisksCode::getAndStart();
+if(LisksCode::sysStatus() === TRUE){
+    Router::route(Util::getRequestedURL());
+}
+else{
+    LisksCode::configErr();
+}

@@ -88,7 +88,7 @@ class Util{
     public static function checkSystemStatus(){
         if(class_exists('Config')){
             if(class_exists('SiteConfig')){
-                if(Config::get()->isConfig() === TRUE){
+                if(Config::get()->isConfig() === TRUE || LisksCode::getClassStatus() == 'INITIALIZING'){
                     if(class_exists('DatabaseLink')){
                         self::$dbTestInstance = new DatabaseLink(Config::get()->getDBHost(), Config::get()->getDBUser(), Config::get()->getDBPassword());
                         if(self::$dbTestInstance->isConnected()){

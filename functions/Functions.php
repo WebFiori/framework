@@ -70,27 +70,32 @@ class Functions {
      * @since 1.1
      */
     public function useDatabase() {
-        $systemStatus = LisksCode::sysStatus();
-        if($systemStatus == Util::DB_NEED_CONF && 
+        $systemStatus = Util::checkSystemStatus();
+        if($systemStatus === TRUE){
+            $result = $this->mainSession->useDb(array(
+                'host'=>Config::get()->getDBHost(),
+                'user'=>Config::get()->getDBUser(),
+                'pass'=>Config::get()->getDBPassword(),
+                'db-name'=> Config::get()->getDBName()
+            ));
+            if($result !== TRUE && !defined('SETUP_MODE')){
+                header('content-type:application/json');
+                die($this->mainSession->getDBLink()->toJSON());
+            }
+            else if($result !== TRUE && defined('SETUP_MODE')){
+                return FALSE;
+            }
+        }
+        else if($systemStatus == Util::DB_NEED_CONF && 
                 !defined('SETUP_MODE')){
             header('content-type:application/json');
             http_response_code(500);
             die('{"message":"'.$systemStatus.'","type":"error",'
                     . '"details":"It seems the system is unable to connect to the database.",'
-                    . '"db-instance:'.Util::getDatabaseTestInstance()->toJSON().'}');
+                    . '"db-instance":'.Util::getDatabaseTestInstance()->toJSON().'}');
         }
-        $result = $this->mainSession->useDb(array(
-            'host'=>Config::get()->getDBHost(),
-            'user'=>Config::get()->getDBUser(),
-            'pass'=>Config::get()->getDBPassword(),
-            'db-name'=> Config::get()->getDBName()
-        ));
-        if($result !== TRUE && !defined('SETUP_MODE')){
-            header('content-type:application/json');
-            die($this->mainSession->getDBLink()->toJSON());
-        }
-        else if($result !== TRUE && defined('SETUP_MODE')){
-            return FALSE;
+        else{
+            die('{"message":"Invalid system status.","details":"'.$systemStatus.'"}');
         }
     }
     /**

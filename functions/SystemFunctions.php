@@ -147,6 +147,14 @@ class SystemFunctions extends Functions{
             'pass'=>$dbPass,
             'db-name'=>$dbName
         ));
+        if($r === TRUE){
+            $configVars = $this->getConfigVars();
+            $configVars['database-host'] = $dbHost;
+            $configVars['database-username'] = $dbUser;
+            $configVars['database-password'] = $dbPass;
+            $configVars['database-name'] = $dbName;
+            $this->writeConfig($configVars);
+        }
         return $r;
     }
     /**

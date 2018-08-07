@@ -19,7 +19,9 @@ if(!defined('ROOT_DIR')){
 /**
  * English language definition.
  */
-$Language = new Language('ltr', 'en', array(
+$Language = new Language('rtl', 'ar', array(
+    'general/week-day',
+    'general/month',
     'general/action',
     'general/status',
     'general/error',
@@ -128,3 +130,28 @@ $Language->set('general/action', 'next', 'التالي');
 $Language->set('general/action', 'previous', 'السابق');
 $Language->set('general/action', 'skip', 'تخطي');
 $Language->set('general/action', 'finish', 'إنهاء');
+
+$Language->setMultiple('general/week-day', array(
+    '0'=>'الأحد',
+    '1'=>'الأثنين',
+    '2'=>'الثلاثاء',
+    '3'=>'الأربعاء',
+    '4'=>'الخميس',
+    '5'=>'الجمعة',
+    '6'=>'السبت',
+));
+
+$Language->setMultiple('general/month', array(
+    '0'=>'يناير',
+    '1'=>'فبراير',
+    '2'=>'مارس',
+    '3'=>'أبريل',
+    '4'=>'مايو',
+    '5'=>'يونيو',
+    '6'=>'يوليو',
+    '7'=>'اغسطس',
+    '8'=>'سبتمبر',
+    '9'=>'أكتوبر',
+    '10'=>'نوفمبر',
+    '11'=>'ديسمبر',
+));

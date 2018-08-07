@@ -4,6 +4,8 @@ $theme->setAuthor('Ibrahim Ali');
 $theme->setAuthorUrl('http://ibrahim-2017.blogspot.com');
 $theme->setName('Greeny By Ibrahim Ali');
 $theme->setVersion('1.0');
+$theme->setLicenseName('MIT License');
+$theme->setLicenseUrl('https://opensource.org/licenses/MIT');
 $theme->setDescription('First theme ever made. A nice green colored elements That '
         . 'makes you thing about the nature. Use it as a template and a guide for creating '
         . 'new themes.');
@@ -13,7 +15,7 @@ $theme->setJsDirName('js');
 $theme->setCssDirName('css');
 $theme->addComponents(array(
     'head.php', 'header.php', 'footer.php',
-    'aside.php'
+    'aside.php', 'UIFunctions.php'
 ));
 $theme->setAfterLoaded(function(){
     Page::lang(WebsiteFunctions::get()->getMainSession()->getLang(TRUE));

@@ -28,7 +28,7 @@
  * A class that represents HTML element.
  *
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.6
+ * @version 1.7
  */
 class HTMLNode {
     /**
@@ -359,6 +359,49 @@ class HTMLNode {
      */
     public function mustClose() {
         return $this->requireClose;
+    }
+    /**
+     * Updates the name of the node.
+     * @param string $name The new name. If the node type is a text or a comment, 
+     * you can only switch between the two types. If the node type is of 
+     * another type and has child nodes, the type will change only if the 
+     * attribute $reqClose is set to TRUE. If has no children, it will switch 
+     * without problems. If the node is inline, the type will switch without 
+     * problems.
+     * @param boolean $reqClose [Optional] Set to TRUE if the node must have ending 
+     * tag.
+     * @return boolean The function will return TRUE if the type is updated.
+     * @since 1.7
+     */
+    public function setNodeName($name,$reqClose=true) {
+        if($this->isTextNode() || $this->isComment()){
+            $uName = strtoupper($name);
+            if(($this->isTextNode() && $uName == '#COMMENT') || ($this->isComment() && $uName == '#TEXT')){
+                $this->name = $uName;
+                return TRUE;
+            }
+            else {
+                return FALSE;
+            }
+        }
+        else{
+            $lName = strtoupper($name);
+            if(strlen($lName) != 0){
+                if($this->mustClose() && $reqClose !== TRUE){
+                    if($this->childrenCount() == 0){
+                        $this->name = $lName;
+                        $this->requireClose = FALSE;
+                        return TRUE;
+                    }
+                }
+                else{
+                    $this->name = $lName;
+                    $this->requireClose = $reqClose === TRUE ? TRuE : FALSE;
+                    return TRUE;
+                }
+            }
+        }
+        return FALSE;
     }
     /**
      * Returns the name of the node.

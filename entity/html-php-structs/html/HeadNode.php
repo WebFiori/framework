@@ -65,11 +65,11 @@ class HeadNode extends HTMLNode{
      * @since 1.0
      */
     public function __construct($title='Default',$canonical='',$base='') {
-        parent::__construct('head', TRUE, FALSE);
+        parent::__construct('head');
         $this->setBase($base);
         $this->setTitle($title);
         $this->setCanonical($canonical);
-        $this->addMeta('viewport', 'width=device-width, initial-scale=1.0');
+        $this->addMeta('viewport', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
     }
     
     /**

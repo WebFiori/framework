@@ -113,6 +113,57 @@ class Util{
     private function __construct() {
         
     }
+    public function getWeekDates(){
+        $datesArr = array();
+        $startDay = '';
+        $startYear = '';
+        $startMonth = '';
+        
+        $todayNumberInMonth = intval(date('d'));
+        
+        $weekStartDay = 7;
+        $todayNumberInWeek = date('N');
+        
+        $thisMonth = intval(date('m'));
+        $thisYear = date('Y');
+        
+        $daysInMonth = cal_days_in_month(CAL_GREGORIAN,$thisMonth,$thisYear);
+        
+        if($todayNumberInWeek == $weekStartDay){
+            $startDay = $todayNumberInMonth < 10 ? '0'.$todayNumberInMonth : $todayNumberInMonth;
+            $startYear = $thisYear;
+            $startMonth = $thisMonth < 10 ? '0'.$thisMonth : $thisMonth;
+        }
+        else{
+            //same week but in the middle
+            $backInTime = $todayNumberInMonth - $todayNumberInWeek;
+            if($backInTime > 0){
+                $startDay =  $backInTime < 10 ? '0'.$backInTime : $backInTime;
+                $startMonth = $thisMonth < 10 ? '0'.$thisMonth : $thisMonth;
+                $startYear = $thisYear;
+            }
+            else{
+                $prevMonthNum = $thisMonth - 1 != 0 ? $thisMonth - 1 : 12;
+                $startMonth = $prevMonthNum < 10 ? '0'.$prevMonthNum : $prevMonthNum;
+                $startYear = $prevMonthNum == 12 ? $thisYear - 1 : $thisYear;
+                $daysInMonth = cal_days_in_month(CAL_GREGORIAN,$prevMonthNum,$startYear);
+                $startDay = $daysInMonth - (-1)*$backInTime;
+            }
+        }
+        for($x = 0 ; $x < 7 ; $x++){
+            if($startDay > $daysInMonth){
+                $startDay = 1;
+                $startMonth += 1;
+                $startMonth = $startMonth > 12 ? 1 : $startMonth;
+                $startMonth = $startMonth < 10 ? '0'.$startMonth : $startMonth;
+                $startYear = $startMonth == 1 ? $startYear + 1 : $startYear;
+            }
+            $startDay = $startDay < 10 ? '0'.$startDay : $startDay;
+            $datesArr[] = $startDay.'-'.$startMonth.'-'.$startYear;
+            $startDay += 1;
+        }
+        return $datesArr;
+    }
     /**
      * Call the function 'print_r' and insert 'pre' around it.
      * @param mixed $expr

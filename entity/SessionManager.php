@@ -478,6 +478,7 @@ class SessionManager implements JsonI{
     }
     private function start($refresh,$useDb,$lifeTime,$dbAttributes,$useDefaultLang=false){
         $this->sessionStatus = self::NEW_SESSION;
+        ini_set('session.gc_maxlifetime', $this->getLifetime());
         session_name($this->getName());
         session_set_cookie_params($lifeTime,"/");
         $started = session_start();
@@ -691,6 +692,7 @@ class SessionManager implements JsonI{
     public function resume(){
         if($this->hasCookie()){
             session_name($this->getName());
+            ini_set('session.gc_maxlifetime', $this->getLifetime());
             session_id(self::getSessionIDFromCookie($this->getName()));
             session_start();
             if($this->validateAttrs()){

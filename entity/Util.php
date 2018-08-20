@@ -195,14 +195,15 @@ class Util{
     }
     /**
      * Call this function to display errors and warnings.
-     * Used for debugging.
+     * Used for debugging. Also, enable logging.
      * @since 0.2
      */
     public static function displayErrors(){
         ini_set('display_startup_errors', 1);
         ini_set('display_errors', 1);
         error_reporting(-1);
-        define('DEBUG', 1);
+        Logger::enabled(TRUE);
+        Logger::log('Logging Mode Enabled',null,TRUE);
     }
     /**
      * This function is used to filter scripting code such as 

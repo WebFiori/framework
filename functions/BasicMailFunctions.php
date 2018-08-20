@@ -86,7 +86,12 @@ class BasicMailFunctions extends Functions{
      */
     public function createEmailConfigFile(){
         if(!class_exists('MailConfig')){
+            Logger::log('Creating Configuration File \'MailConfig.php\'');
             $this->writeMailConfig(array());
+            Logger::log('Creatied.');
+        }
+        else{
+            Logger::log('Configuration File \'MailConfig.php\' Already Exist.');
         }
     }
     /**

@@ -93,8 +93,13 @@ class WebsiteFunctions extends Functions{
      */
     public function createSiteConfigFile() {
         if(!class_exists('SiteConfig')){
+            Logger::log('Creating Configuration File \'SiteConfig.php\'');
             $initCfg = $this->getSiteConfigVars();
             $this->writeSiteConfig($initCfg);
+            Logger::log('Creatied.');
+        }
+        else{
+            Logger::log('Configuration File \'SiteConfig.php\' Already Exist.');
         }
     }
     /**

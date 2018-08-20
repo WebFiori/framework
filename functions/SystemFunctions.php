@@ -117,8 +117,13 @@ class SystemFunctions extends Functions{
      */
     public function createConfigFile() {
         if(!class_exists('Config')){
+            Logger::log('Creating Configuration File \'Config.php\'');
             $cfg = $this->getConfigVars();
             $this->writeConfig($cfg);
+            Logger::log('Created.');
+        }
+        else{
+            Logger::log('Configuration File \'Config.php\' Already Exist.');
         }
     }
     /**

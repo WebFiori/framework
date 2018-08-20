@@ -28,7 +28,10 @@
  * The next block of code can be added to every view or .php 
  * file to prevent direct access.
  */
+Logger::logName('views-log');
+Logger::log('Checking if scripit is accessed directly.');
 if(!defined('ROOT_DIR')){
+    Logger::log('Direct access. Forbidden',NULL,TRUE);
     header("HTTP/1.1 403 Forbidden");
     die(''
         . '<!DOCTYPE html>'
@@ -45,12 +48,14 @@ if(!defined('ROOT_DIR')){
         . '</body>'
         . '</html>');
 }
-
+Logger::log('No Direct access.');
 //load UI template components (JS, CSS and others)
 //it is optional. to use a theme but recomended
+Logger::log('Loading theme \'Greeny By Ibrahim Ali\'');
 Page::theme($themeName='Greeny By Ibrahim Ali');
 
 //sets the title of the page
+Logger::log('Setting view title to \'Example Page\'');
 Page::title('Example Page');
 
 //adds a paragraph to the body of the page.
@@ -60,6 +65,7 @@ Page::insert($p);
 
 //display the view
 Page::render();
+Logger::log('Example view loaded.',NULL,TRUE);
 
 
 

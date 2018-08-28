@@ -174,9 +174,12 @@ class SystemFunctions extends Functions{
      * @since 1.3
      */
     public function configured($isConfig=true){
+        Logger::logFuncCall(__METHOD__);
         $confVars = $this->getConfigVars();
         $confVars['is-config'] = $isConfig === TRUE ? 'TRUE' : 'FALSE';
+        Logger::log('Is Configured = '.$confVars['is-config'], 'debug');
         $this->writeConfig($confVars);
+        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * Returns an associative array that contains system configuration 

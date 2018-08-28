@@ -112,6 +112,18 @@ class Logger {
         return self::$logger;
     }
     /**
+     * Adds a log message to log function return value (debug).
+     * @param mixed $val The return value of a function.
+     * @param type $logName [Optional] The name of the log file. If it is not 
+     * NULL, the log will be written to the given file name.
+     * @param boolean $addDashes If set to true, a line of dashes will be inserted 
+     * after the message. Used to organize log messages.
+     * @since 1.1
+     */
+    public static function logReturnValue($val,$logName=null,$addDashes=false) {
+        Logger::log('Return value = \''.$val.'\' ('. gettype($val).').','debug', $logName, $addDashes);
+    }
+    /**
      * Enable, disable or check if logging is enabled.
      * @param boolean $isEnabled If provided and set to true, logging will be 
      * enabled. If provided and not true, logging will be disabled.

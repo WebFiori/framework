@@ -43,9 +43,17 @@ if(!defined('ROOT_DIR')){
  * A class that is used to log messages to a file.
  *
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.0
+ * @version 1.1
  */
 class Logger {
+    /**
+     * An array which contains a key that describes the meaning of a log message.
+     * @since 1.0
+     */
+    const MESSSAGE_TYPES = array(
+        'DEBUG','INFO','ERROR','WARNING'
+    );
+
     /**
      * An instance of 'Logger'.
      * @var Logger 
@@ -121,9 +129,9 @@ class Logger {
      * after the message. Used to organize log messages.
      * @since 1.0
      */
-    public static function log($message,$logName=null,$addDashes=false){
+    public static function log($message,$messageType='info',$logName=null,$addDashes=false){
         self::logName($logName);
-        self::_get()->writeToLog($message,$addDashes);
+        self::_get()->writeToLog($message,$messageType,$addDashes);
     }
     /**
      * Sets or returns the full directory of the log file.
@@ -226,11 +234,13 @@ class Logger {
      * @param type $addDashes
      * @since 1.0
      */
-    private function writeToLog($content,$addDashes=false) {
+    private function writeToLog($content,$type='',$addDashes=false) {
         if($this->_isEnabled()){
+            $upperType = strtoupper($type);
+            $bType = in_array($upperType, self::MESSSAGE_TYPES) ? $upperType : 'INFO';
             $this->handelr = fopen($this->_getDirectory().'/'.$this->_getLogName().'.txt', 'a+');
             $time = date('Y-m-d h:i:s T');
-            fwrite($this->handelr, '['.$time.']  '.$content."\n");
+            fwrite($this->handelr, '['.$time.']  '.$bType.': '.$content."\n");
             if($addDashes === TRUE){
                 fwrite($this->handelr, '-------------------------------------'."\n");
             }

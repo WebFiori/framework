@@ -116,10 +116,9 @@ class DatabaseSchema {
     }
     private function __construct() {
         $this->queries = array(
-            0=>'UserQuery',
-            1=>'ActivationQuery',
-            2=>'PasswordResetQuery',
-            3=>'FileQuery'
+            //add your query class names in here
+            
+            //0=>'ExampleQuery'
         );
     }
     /**

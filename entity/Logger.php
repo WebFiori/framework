@@ -48,12 +48,17 @@ if(!defined('ROOT_DIR')){
 class Logger {
     /**
      * An array which contains a key that describes the meaning of a log message.
-     * @since 1.0
+     * @since 1.1
      */
     const MESSSAGE_TYPES = array(
         'DEBUG','INFO','ERROR','WARNING'
     );
-
+    /**
+     * A stack that contains all the called functions.
+     * @var Stack
+     * @since 1.0 
+     */
+    private $functionsStack;
     /**
      * An instance of 'Logger'.
      * @var Logger 
@@ -93,6 +98,7 @@ class Logger {
         }
         $this->_setLogName('log');
         $this->isEnabled = FALSE;
+        $this->functionsStack = new Stack();
     }
     /**
      * Returns a singleton of the class.
@@ -123,15 +129,62 @@ class Logger {
     /**
      * Writes a message to the log file.
      * @param string $message The message that will be written.
+     * @param string $messageType [Optional] The type of the message that will be logged. 
+     * it can have one of 4 values, 'info', 'warning', 'error' or 'debug'. Note 
+     * that the last type will be logged only if the constant 'DEBUG' is defined. 
+     * The default value is 'info'.
      * @param string $logName [Optional] The name of the log file. If it is not 
      * NULL, the log will be written to the given file name.
-     * @param boolean $addDashes If set to true, a line of dashes will be inserted 
+     * @param boolean $addDashes [Optional] If set to true, a line of dashes will be inserted 
      * after the message. Used to organize log messages.
      * @since 1.0
      */
     public static function log($message,$messageType='info',$logName=null,$addDashes=false){
         self::logName($logName);
         self::_get()->writeToLog($message,$messageType,$addDashes);
+    }
+    /**
+     * Adds a debug message to a log file that says the given function was called. 
+     * The message will be logged only if the constant 'DEBUG' is defined.
+     * @param string $funcName The name of the function. To get the name of the 
+     * function in its body, Use the magic constant '__METHOD__' or '__FUNCTION__'. 
+     * It is recommended to always use '__METHOD__' as this constant will return 
+     * class name with it if the function is inside a class.
+     * @param string $logFileName [Optional] The name of the log file. If it is not 
+     * NULL, the log will be written to the given file name.
+     * @param string $addDashes [Optional] If set to true, a line of dashes will be inserted 
+     * after the message. Used to organize log messages.
+     * @since 1.1
+     */
+    public static function logFuncCall($funcName,$logFileName=null,$addDashes=false) {
+        self::_get()->_logFuncCall($funcName, $logFileName, $addDashes);
+    }
+    /**
+     * Adds a debug message to a log file that says the execution of a given 
+     * function was finished. The message will be logged only if the constant 
+     * 'DEBUG' is defined.
+     * @param string $funcName The name of the function. To get the name of the 
+     * function in its body, Use the magic constant '__METHOD__' or '__FUNCTION__'. 
+     * It is recommended to always use '__METHOD__' as this constant will return 
+     * class name with it if the function is inside a class.
+     * @param string $logFileName [Optional] The name of the log file. If it is not 
+     * NULL, the log will be written to the given file name.
+     * @param string $addDashes [Optional] If set to true, a line of dashes will be inserted 
+     * after the message. Used to organize log messages.
+     * @since 1.1
+     */
+    public static function logFuncReturn($funcName,$logFileName=null,$addDashes=false) {
+        self::_get()->_logFuncReturn($funcName, $logFileName, $addDashes);
+    }
+    /**
+     * Adds a message to the last selected log file that states the client 
+     * request was processed. This function is usually called after calling 
+     * the function 'die()' or 'exit()'. Also if no server code will be 
+     * executed after.
+     * @since 1.1
+     */
+    public static function requestCompleted() {
+        Logger::log('Processing of client request is finished.', 'info', NULL, TRUE);
     }
     /**
      * Sets or returns the full directory of the log file.
@@ -169,13 +222,28 @@ class Logger {
      * @since 1.0
      */
     public static function clear(){
-        self::_get()->clearLog();
+        self::_get()->_clearLog();
     }
     /**
      * @since 1.0
      */
-    private function clearLog() {
+    private function _clearLog() {
         file_put_contents($this->_getLogName(), "");
+    }
+    /**
+     * 
+     * @param type $funcName
+     * @param type $logFileName
+     * @param type $addDashes
+     * @since 1.1
+     */
+    private function _logFuncCall($funcName,$logFileName=null,$addDashes=false) {
+        $this->functionsStack->push($funcName);
+        $this->log('A call to the function <'.$funcName.'>', 'debug', $logFileName, $addDashes);
+    }
+    private function _logFuncReturn($funcName,$logFileName=null,$addDashes=false) {
+        $this->log('Return back from <'.$funcName.'>', 'debug', $logFileName,$addDashes);
+        $this->functionsStack->pop();
     }
     /**
      * 
@@ -238,13 +306,24 @@ class Logger {
         if($this->_isEnabled()){
             $upperType = strtoupper($type);
             $bType = in_array($upperType, self::MESSSAGE_TYPES) ? $upperType : 'INFO';
-            $this->handelr = fopen($this->_getDirectory().'/'.$this->_getLogName().'.txt', 'a+');
-            $time = date('Y-m-d h:i:s T');
-            fwrite($this->handelr, '['.$time.']  '.$bType.': '.$content."\n");
-            if($addDashes === TRUE){
-                fwrite($this->handelr, '-------------------------------------'."\n");
+            if($bType == 'DEBUG' && !(defined('DEBUG'))){
+                
             }
-            fclose($this->handelr);
+            else{
+                $this->handelr = fopen($this->_getDirectory().'/'.$this->_getLogName().'.txt', 'a+');
+                $time = date('Y-m-d h:i:s T');
+                if($this->functionsStack->size() != 0){
+                    fwrite($this->handelr, '['.$time.']  '.$bType.': ['.$this->functionsStack->peek().'] '.$content."\n");
+                }
+                else{
+                    fwrite($this->handelr, '['.$time.']  '.$bType.': '.$content."\n");
+                }
+                if($addDashes === TRUE){
+                    fwrite($this->handelr, '-------------------------------------'."\n");
+                }
+                fclose($this->handelr);
+            }
         }
     }
+    
 }

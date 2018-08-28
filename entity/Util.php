@@ -86,6 +86,7 @@ class Util{
      * @since 1.2
      */
     public static function checkSystemStatus(){
+        Logger::logFuncCall(__METHOD__);
         Logger::log('Checking system status...', 'info', 'initialization-log');
         $returnValue = '';
         if(class_exists('Config')){
@@ -97,6 +98,12 @@ class Util{
                             if(self::$dbTestInstance->setDB(Config::get()->getDBName())){
                                 $returnValue = TRUE;
                             }
+                            else{
+                                $returnValue = Util::DB_NEED_CONF;
+                            }
+                        }
+                        else{
+                            $returnValue = Util::DB_NEED_CONF;
                         }
                     }
                     else{
@@ -114,7 +121,9 @@ class Util{
         else{
             $returnValue = Util::MISSING_CONF_FILE;
         }
-        Logger::log('System status: '.$returnValue, 'debug', 'initialization-log');
+        Logger::logReturnValue($returnValue);
+        Logger::logFuncReturn(__METHOD__);
+        return $returnValue;
     }
     /**
      * Disallow creating instances of the class.

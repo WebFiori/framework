@@ -89,14 +89,14 @@ class SiteConfig{
     }
     private function __construct() {
         $this->configVision = '1.1';
-        $this->webSiteNames = array('EN'=>'',);
+        $this->webSiteNames = array('AR'=>'أكاديميا البرمجة','EN'=>'Programming Academia',);
         $this->baseUrl = 'http://localhost/generic-php/';
-        $this->titleSep = '  ';
-        $this->primaryLang = '';
-        $this->baseThemeName = '';
+        $this->titleSep = ' | ';
+        $this->primaryLang = 'AR';
+        $this->baseThemeName = 'Greeny By Ibrahim Ali';
         $this->adminThemeName = 'Greeny By Ibrahim Ali';
         $this->homePage = 'index';
-        $this->descriptions = array('EN'=>'',);
+        $this->descriptions = array('AR'=>'','EN'=>'',);
     }
     
     /**

@@ -118,6 +118,7 @@ class WebsiteFunctions extends Functions{
      * @since 1.0
      */
     public function updateSiteInfo($websiteInfoArr){
+        Logger::logFuncCall(__METHOD__);
         $confArr = $this->getSiteConfigVars();
         foreach ($confArr as $k=>$v){
             if(isset($websiteInfoArr[$k])){
@@ -125,6 +126,7 @@ class WebsiteFunctions extends Functions{
             }
         }
         $this->writeSiteConfig($confArr);
+        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * Returns an associative array that contains web site configuration 
@@ -155,6 +157,17 @@ class WebsiteFunctions extends Functions{
      * @since 1.0
      */
     private function writeSiteConfig($configArr){
+        Logger::logFuncCall(__METHOD__);
+        foreach ($configArr as $k => $v){
+            if(gettype($v) == 'array'){
+                foreach ($v as $lCode => $text){
+                    Logger::log($k.' => ['.$lCode.' => '.$text.']', 'debug');
+                }
+            }
+            else{
+                Logger::log($k.' => '.$v, 'debug');
+            }
+        }
         $fh = new FileHandler(ROOT_DIR.'/entity/SiteConfig.php');
         $fh->write('<?php', TRUE, TRUE);
         $fh->write('if(!defined(\'ROOT_DIR\')){
@@ -348,5 +361,6 @@ class WebsiteFunctions extends Functions{
         $fh->reduceTab();
         $fh->write('}', TRUE, TRUE);
         $fh->close();
+        Logger::logFuncReturn(__METHOD__);
     }
 }

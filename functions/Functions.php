@@ -70,6 +70,7 @@ class Functions {
      * @since 1.1
      */
     public function useDatabase() {
+        Logger::logFuncCall(__METHOD__);
         $systemStatus = Util::checkSystemStatus();
         if($systemStatus === TRUE){
             $result = $this->mainSession->useDb(array(
@@ -79,15 +80,29 @@ class Functions {
                 'db-name'=> Config::get()->getDBName()
             ));
             if($result !== TRUE && !defined('SETUP_MODE')){
+                Logger::log('Unable to connect to the database.', 'error');
+                $dbLink = $this->getDBLink();
+                Logger::log('Error Code: '.$dbLink->getErrorCode(), 'error');
+                Logger::log('Error Message: '.$dbLink->getErrorMessage(), 'error');
+                Logger::requestCompleted();
                 header('content-type:application/json');
                 die($this->mainSession->getDBLink()->toJSON());
             }
             else if($result !== TRUE && defined('SETUP_MODE')){
+                Logger::log('Unable to connect to the database while in setup mode.', 'warning');
+                $dbLink = $this->getDBLink();
+                Logger::log('Error Code: '.$dbLink->getErrorCode(), 'error');
+                Logger::log('Error Message: '.$dbLink->getErrorMessage(), 'error');
+                Logger::logFuncReturn(__METHOD__);
                 return FALSE;
             }
         }
-        else if($systemStatus == Util::DB_NEED_CONF && 
-                !defined('SETUP_MODE')){
+        else if($systemStatus == Util::DB_NEED_CONF && !defined('SETUP_MODE')){
+            Logger::log('Unable to connect to the database.', 'error');
+            $dbLink = $this->getDBLink();
+            Logger::log('Error Code: '.$dbLink->getErrorCode(), 'error');
+            Logger::log('Error Message: '.$dbLink->getErrorMessage(), 'error');
+            Logger::requestCompleted();
             header('content-type:application/json');
             http_response_code(500);
             die('{"message":"'.$systemStatus.'","type":"error",'
@@ -95,6 +110,8 @@ class Functions {
                     . '"db-instance":'.Util::getDatabaseTestInstance()->toJSON().'}');
         }
         else{
+            Logger::log('Invalid system status.', 'error');
+            Logger::requestCompleted();
             die('{"message":"Invalid system status.","details":"'.$systemStatus.'"}');
         }
     }
@@ -112,10 +129,26 @@ class Functions {
      * @since 1.0
      */
     public function excQ($qObj){
-        $this->useDatabase();
-        if($this->mainSession->getDBLink() != NULL){
-            return $this->mainSession->getDBLink()->executeQuery($qObj);
+        Logger::logFuncCall(__METHOD__);
+        if($qObj instanceof MySQLQuery){
+            $this->useDatabase();
+            $dbLink = $this->getDBLink();
+            if($dbLink != NULL){
+                Logger::log('Executing database query...');
+                $result = $dbLink->executeQuery($qObj);
+                if($result !== TRUE){
+                    Logger::log('An error has occured while executing the query.', 'error');
+                    Logger::log('Error Code: '.$dbLink->getErrorCode(), 'error');
+                    Logger::log('Error Message: '.$dbLink->getErrorMessage(), 'error');
+                }
+                return $result;
+            }
+            Logger::log('Database link is null.', 'warning');
         }
+        else{
+            Logger::log('The given instance is not a sub-class of \'MySQLQuery\'.', 'warning');
+        }
+        Logger::logFuncReturn(__METHOD__);
         return FALSE;
     }
     /**
@@ -139,6 +172,8 @@ class Functions {
      * @since 1.0
      */
     public function getMainSession(){
+        Logger::logFuncCall(__METHOD__);
+        Logger::logFuncReturn(__METHOD__);
         return $this->mainSession;
     }
     /**

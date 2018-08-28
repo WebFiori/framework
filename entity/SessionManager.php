@@ -396,6 +396,8 @@ class SessionManager implements JsonI{
      * @since 1.3
      */
     public function useDb($dbAttrs=array()){
+        Logger::logFuncCall(__METHOD__);
+        $retVal = FALSE;
         if($this->isResumed()){
             if(isset($dbAttrs['host'])){
                 if(isset($dbAttrs['user'])){
@@ -404,29 +406,32 @@ class SessionManager implements JsonI{
                             $_SESSION['db'] = new DatabaseLink($dbAttrs['host'],$dbAttrs['user'],$dbAttrs['pass']);
                             if($_SESSION['db']->isConnected()){
                                 if($_SESSION['db']->setDB($dbAttrs['db-name'])){
-                                    return TRUE;
+                                    $retVal = TRUE;
                                 }
                             }
                             else{
-                                return self::DB_CONNECTION_ERR;
+                                $retVal = self::DB_CONNECTION_ERR;
                             }
                         }
                         else{
-                            return self::MISSING_DB_NAME;
+                            $retVal = self::MISSING_DB_NAME;
                         }
                     }
                     else{
-                        return self::MISSING_DB_PASS;
+                        $retVal = self::MISSING_DB_PASS;
                     }
                 }
                 else{
-                    return self::MISSING_DB_USER;
+                    $retVal = self::MISSING_DB_USER;
                 }
             }
             else{
-                return self::MISSING_DB_HOST;
+                $retVal = self::MISSING_DB_HOST;
             }
         }
+        Logger::log('Return value = '.$retVal, 'debug');
+        Logger::logFuncReturn(__METHOD__);
+        return $retVal;
     }
     /**
      * Initialize the session.

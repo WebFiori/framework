@@ -86,6 +86,8 @@ class Util{
      * @since 1.2
      */
     public static function checkSystemStatus(){
+        Logger::log('Checking system status...', 'info', 'initialization-log');
+        $returnValue = '';
         if(class_exists('Config')){
             if(class_exists('SiteConfig')){
                 if(Config::get()->isConfig() === TRUE || LisksCode::getClassStatus() == 'INITIALIZING'){
@@ -93,19 +95,26 @@ class Util{
                         self::$dbTestInstance = new DatabaseLink(Config::get()->getDBHost(), Config::get()->getDBUser(), Config::get()->getDBPassword());
                         if(self::$dbTestInstance->isConnected()){
                             if(self::$dbTestInstance->setDB(Config::get()->getDBName())){
-                                return TRUE;
+                                $returnValue = TRUE;
                             }
                         }
                     }
-                    return Util::DB_NEED_CONF;
+                    else{
+                        $returnValue = Util::DB_NEED_CONF;
+                    }
                 }
                 else{
-                    return Util::NEED_CONF;
+                    $returnValue = Util::NEED_CONF;
                 }
             }
-            return Util::MISSING_SITE_CONF_FILE;
+            else{
+                $returnValue = Util::MISSING_SITE_CONF_FILE;
+            }
         }
-        return Util::MISSING_CONF_FILE;
+        else{
+            $returnValue = Util::MISSING_CONF_FILE;
+        }
+        Logger::log('System status: '.$returnValue, 'debug', 'initialization-log');
     }
     /**
      * Disallow creating instances of the class.
@@ -195,7 +204,9 @@ class Util{
     }
     /**
      * Call this function to display errors and warnings.
-     * Used for debugging. Also, enable logging.
+     * Used for debugging. Also, enable logging for info, warning and error 
+     * messages. To enable logging for debug info, define the constant 
+     * 'DEBUG'
      * @since 0.2
      */
     public static function displayErrors(){
@@ -203,7 +214,7 @@ class Util{
         ini_set('display_errors', 1);
         error_reporting(-1);
         Logger::enabled(TRUE);
-        Logger::log('Logging Mode Enabled',null,TRUE);
+        Logger::log('Logging Mode Enabled','info');
     }
     /**
      * This function is used to filter scripting code such as 

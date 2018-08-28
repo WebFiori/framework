@@ -146,6 +146,7 @@ class SystemFunctions extends Functions{
      * @since 1.0
      */
     public function updateDBAttributes($dbHost,$dbUser,$dbPass,$dbName){
+        Logger::logFuncCall(__METHOD__);
         $r = $this->getMainSession()->useDb(array(
             'user'=>$dbUser,
             'host'=>$dbHost,
@@ -160,6 +161,10 @@ class SystemFunctions extends Functions{
             $configVars['database-name'] = $dbName;
             $this->writeConfig($configVars);
         }
+        else{
+            Logger::log('The database connect function did not return TRUE.', 'warning');
+        }
+        Logger::logFuncReturn(__METHOD__);
         return $r;
     }
     /**
@@ -200,7 +205,13 @@ class SystemFunctions extends Functions{
      * @since 1.0
      */
     private function writeConfig($configArr){
-        $fh = new FileHandler(ROOT_DIR.'/entity/Config.php');
+        Logger::logFuncCall(__METHOD__);
+        $configFileLoc = ROOT_DIR.'/entity/Config.php';
+        Logger::log('Saving configuration variables to the file \''.$configFileLoc.'\'.');
+        foreach ($configArr as $k => $v){
+            Logger::log($k.' => '.$v, 'debug');
+        }
+        $fh = new FileHandler($configFileLoc);
         $fh->write('<?php', TRUE, TRUE);
         $fh->write('if(!defined(\'ROOT_DIR\')){
     header("HTTP/1.1 403 Forbidden");
@@ -404,6 +415,7 @@ class SystemFunctions extends Functions{
         $fh->reduceTab();
         $fh->write('}', TRUE, TRUE);
         $fh->close();
+        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * Checks if the application is setup or not.

@@ -122,11 +122,16 @@ class LisksCode{
         $this->BMF = BasicMailFunctions::get();
 
         //uncomment next line to show runtime errors and warnings
+        //also enable logging for info, warnings and errors 
         Util::displayErrors();
+        Logger::logName('initialization-log');
+        //enable logging of debug info.
+        define('DEBUG', '');
 
         $this->sysStatus = Util::checkSystemStatus();
         $this->initRoutes();
         if($this->sysStatus == Util::MISSING_CONF_FILE || $this->sysStatus == Util::MISSING_SITE_CONF_FILE){
+            Logger::log('Missing configuration file. Attempting to create all configuration files.', 'warning', 'initialization-log');
             $this->SF->createConfigFile();
             $this->WF->createSiteConfigFile();
             $this->BMF->createEmailConfigFile();
@@ -170,9 +175,11 @@ class LisksCode{
      * @since 1.0
      */
     private function initRoutes(){
+        Logger::log('Initializing routes...', 'info', 'initialization-log');
         APIRoutes::create();
         ViewRoutes::create();
         ClosureRoutes::create();
+        Logger::log('Routes initialization completed.', 'info', 'initialization-log');
     }
     /**
      * This function is called when the status of the system does not equal 
@@ -181,6 +188,7 @@ class LisksCode{
      * @since 1.0
      */
     private function firstUse(){
+        Logger::logFuncCall(__METHOD__, 'initialization-log');
         //in this part, you can configure the ststem. 
         //the first thing you might need to do is to update basic website
         //attributes.
@@ -190,41 +198,55 @@ class LisksCode{
         $siteInfoArr['primary-language'] = 'AR';
         $siteInfoArr['theme-name'] = 'Greeny By Ibrahim Ali';
         $siteInfoArr['title-separator'] = '|';
-        $siteInfoArr['site-descriptions'] = array('AR'=>'');
-        $siteInfoArr['website-names'] = array('AR'=>'الياسين الزراعية');
+        $siteInfoArr['site-descriptions'] = array('AR'=>'','EN'=>'');
+        $siteInfoArr['website-names'] = array('AR'=>'أكاديميا البرمجة','EN'=>'Programming Academia');
         $this->WF->updateSiteInfo($siteInfoArr);
 
         //After that, if your app uses MySQL database, you can set connection 
         //parameters here. If it does not, skip this step.
         $dbHost = 'localhost';
         $dbUser = 'root';
-        $dbPass = 'alyaseen03';
-        $dbName = 'crm';
+        $dbPass = '';
+        $dbName = '';
+        
         if($this->SF->updateDBAttributes($dbHost, $dbUser, $dbPass, $dbName) === TRUE){
+            
+            //since this is the first use, we need to initialize database schema.
+            //create any query object to use it for executing SQL statements that 
+            //is used to build the database.
+            Logger::log('Initializing database...','info','initialization-log');
             $schema = DatabaseSchema::get();
-            $query = new UserQuery();
+            Logger::log('Database Schema: ', 'debug','initialization-log');
+            Logger::log($schema->getSchema(), 'debug','initialization-log');
+            $query = new ExampleQuery();
             $query->setQuery($schema->getSchema(), 'update');
             if($this->SF->excQ($query) !== TRUE){
+                Logger::log('Initialization faild.', 'error','initialization-log');
+                Logger::requestCompleted();
                 header('HTTP/1.1 503 Service Unavailable');
                 die($this->SF->getDBLink()->toJSON().'');
             }
         }
         else{
+            Logger::log('Initialization faild.', 'error','initialization-log');
+            $dbLink = $this->SF->getDBLink();
+            Logger::requestCompleted();
             header('HTTP/1.1 503 Service Unavailable');
-            die($this->SF->getDBLink()->toJSON().'');
+            die($dbLink->toJSON().'');
         }
 
 
         //Also, you can add SMTP email account that you can use to send email 
         //messages if your system uses this functionality.
-        $account = new EmailAccount();
-        $account->setName('no-replay');
-        $account->setAddress('myAddress@example.com');
-        $account->setPassword('xxx');
-        $account->setUsername('hello@example.com');
-        $account->setPort(25);
-        $account->setServerAddress('mail.example.com');
-        $this->BMF->updateOrAddEmailAccount($account);
+        
+        //$account = new EmailAccount();
+        //$account->setName('no-replay');
+        //$account->setAddress('myAddress@example.com');
+        //$account->setPassword('xxx');
+        //$account->setUsername('hello@example.com');
+        //$account->setPort(25);
+        //$account->setServerAddress('mail.example.com');
+       // $this->BMF->updateOrAddEmailAccount($account);
         
         //once configuration is finished, call the function SystemFunctions::configured()
         //$this->SF->configured();
@@ -233,8 +255,10 @@ class LisksCode{
         //Used to show error message in case the 
         //system is not configured.
         if(!$this->SF->isSetupFinished()){
+            Logger::log('Initialization faild.','error','initialization-log');
             $this->needConfigration();
         }
+        Logger::logFuncReturn(__METHOD__, 'initialization-log');
     }
     /**
      * Show an error message that tells the user about system status and how to 
@@ -242,6 +266,8 @@ class LisksCode{
      * @since 1.0
      */
     private function needConfigration(){
+        Logger::logFuncCall(__METHOD__, 'initialization-log');
+        Logger::requestCompleted();
         header('HTTP/1.1 503 Service Unavailable');
         die(''
         . '<!DOCTYPE html>'
@@ -277,7 +303,7 @@ class LisksCode{
      * @since 1.0
      */
     public static function configErr() {
-        
+        $this->needConfigration();
     }
 }
 //start the system

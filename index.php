@@ -76,6 +76,9 @@ class LisksCode{
      * @since 1.0
      */
     public static function getClassStatus() {
+        Logger::logFuncCall(__METHOD__);
+        Logger::logReturnValue(self::$classStatus);
+        Logger::logFuncReturn(__METHOD__);
         return self::$classStatus;
     }
     /**
@@ -127,7 +130,6 @@ class LisksCode{
         Logger::logName('initialization-log');
         //enable logging of debug info.
         define('DEBUG', '');
-
         $this->sysStatus = Util::checkSystemStatus();
         $this->initRoutes();
         if($this->sysStatus == Util::MISSING_CONF_FILE || $this->sysStatus == Util::MISSING_SITE_CONF_FILE){
@@ -140,6 +142,7 @@ class LisksCode{
         if(!$this->SF->isSetupFinished()){
             $this->firstUse();
         }
+        Logger::log('Initializing completed.');
         self::$classStatus = 'INITIALIZED';
     }
     /**
@@ -153,10 +156,14 @@ class LisksCode{
      * @since 1.0
      */
     public static function sysStatus(){
+        Logger::logFuncCall(__METHOD__);
+        $retVal = self::$classStatus;
         if(self::getClassStatus() == 'INITIALIZED'){
-            return self::getAndStart()->getSystemStatus(TRUE);
+            $retVal = self::getAndStart()->getSystemStatus(TRUE);
         }
-        return self::$classStatus;
+        Logger::logReturnValue($retVal);
+        Logger::logFuncReturn(__METHOD__);
+        return $retVal;
     }
     /**
      * 
@@ -165,9 +172,14 @@ class LisksCode{
      * @since 1.0
      */
     private function getSystemStatus($refresh=true) {
+        Logger::logFuncCall(__METHOD__);
+        Logger::log('Refresh status = '.$refresh, 'debug');
         if($refresh === TRUE){
+            Logger::log('Updating system status.');
             $this->sysStatus = Util::checkSystemStatus();
         }
+        Logger::logReturnValue($this->sysStatus);
+        Logger::logFuncReturn(__METHOD__);
         return $this->sysStatus;
     }
     /**
@@ -303,12 +315,18 @@ class LisksCode{
      * @since 1.0
      */
     public static function configErr() {
-        $this->needConfigration();
+        LisksCode::getAndStart()->needConfigration();
     }
 }
 //start the system
 LisksCode::getAndStart();
-if(LisksCode::sysStatus() === TRUE){
+define('INITIAL_SYS_STATUS',LisksCode::sysStatus());
+Logger::log('INITIAL_SYS_STATUS = '.INITIAL_SYS_STATUS, 'debug');
+if(INITIAL_SYS_STATUS === TRUE){
+    Router::route(Util::getRequestedURL());
+}
+else if(INITIAL_SYS_STATUS == Util::DB_NEED_CONF){
+    Logger::log('Unable to connect to database.', 'warning');
     Router::route(Util::getRequestedURL());
 }
 else{

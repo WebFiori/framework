@@ -132,13 +132,13 @@ $Language->set('general/action', 'skip', 'Skip');
 $Language->set('general/action', 'finish', 'Finish');
 
 $Language->setMultiple('general/week-day', array(
-    '0'=>'Sunday',
-    '1'=>'Monday',
-    '2'=>'Tuesday',
-    '3'=>'Wednesday',
-    '4'=>'Thursday',
-    '5'=>'Friday',
-    '6'=>'Saturday',
+    'd0'=>'Sunday',
+    'd1'=>'Monday',
+    'd2'=>'Tuesday',
+    'd3'=>'Wednesday',
+    'd4'=>'Thursday',
+    'd5'=>'Friday',
+    'd6'=>'Saturday',
 ));
 
 $Language->setMultiple('general/month', array(

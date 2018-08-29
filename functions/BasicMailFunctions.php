@@ -269,16 +269,38 @@ class BasicMailFunctions extends Functions{
      * @since 1.0
      */
     public function getSocketMailer($emailAcc){
-        $m = new SocketMailer();
-        $m->setHost($emailAcc->getServerAddress());
-        $m->setPort($emailAcc->getPort());
-        if($m->connect()){
-            $m->setSender($emailAcc->getName(), $emailAcc->getAddress());
-            if($m->login($emailAcc->getUsername(), $emailAcc->getPassword())){
-                return $m;
+        Logger::logFuncCall(__METHOD__);
+        if($emailAcc instanceof EmailAccount){
+            $retVal = BasicMailFunctions::INV_HOST_OR_PORT;
+            Logger::log('Creating new instance of \'SocketMailer\' using given email account.');
+            Logger::log('Server Address: \''.$emailAcc->getServerAddress().'\'', 'debug');
+            Logger::log('Port: \''.$emailAcc->getPort().'\'', 'debug');
+            Logger::log('Username: \''.$emailAcc->getUsername().'\'', 'debug');
+            Logger::log('Password: \''.$emailAcc->getPassword().'\'', 'debug');
+            Logger::log('Email Address: \''.$emailAcc->getAddress().'\'', 'debug');
+            Logger::log('Account Name: \''.$emailAcc->getName().'\'', 'debug');
+            $m = new SocketMailer();
+            $m->setHost($emailAcc->getServerAddress());
+            $m->setPort($emailAcc->getPort());
+            Logger::log('Testing connection...');
+            if($m->connect()){
+                Logger::log('Connected to email server.');
+                Logger::log('Validating credentials...');
+                $m->setSender($emailAcc->getName(), $emailAcc->getAddress());
+                if($m->login($emailAcc->getUsername(), $emailAcc->getPassword())){
+                    Logger::log('Logged in to the email server.');
+                    $retVal = $m;
+                }
+                else{
+                    Logger::log('Unable to login.','warning');
+                    $retVal = BasicMailFunctions::INV_CREDENTIALS;
+                }
             }
-            return BasicMailFunctions::INV_CREDENTIALS;
+            Logger::logFuncReturn(__METHOD__);
+            return $retVal;
         }
-        return BasicMailFunctions::INV_HOST_OR_PORT;
+        Logger::log('The given parameter is not an instance of \'EmailAccount\'.', 'warning');
+        Logger::logFuncReturn(__METHOD__);
+        return FALSE;
     }
 }

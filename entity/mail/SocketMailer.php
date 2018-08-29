@@ -44,7 +44,7 @@ if(!defined('ROOT_DIR')){
  * A class that can be used to send email messages using sockets.
  *
  * @author Ibrahim
- * @version 1.3
+ * @version 1.4
  */
 class SocketMailer {
     const NL = "\r\n";
@@ -140,12 +140,18 @@ class SocketMailer {
      */
     private $attachments;
     /**
+     * The last message that was sent by email server.
+     * @var string
+     * @since 1.4 
+     */
+    private $lastResponse;
+    /**
      * Creates new instance of the class.
      * @since 1.0
      */
     public function __construct() {
-        $this->log = array();
-        array_push($this->log, 'Creating new instance of SocketMailer.');
+        Logger::logFuncCall(__FUNCTION__);
+        Logger::log('Creating new instance of SocketMailer.');
         $this->setTimeout(5);
         $this->receivers = array();
         $this->cc = array();
@@ -155,28 +161,44 @@ class SocketMailer {
         $this->isLoggedIn = FALSE;
         $this->boundry = hash('sha256', date(DATE_ISO8601));
         $this->attachments = array();
+        $this->lastResponse = '';
+        Logger::logFuncReturn(__FUNCTION__);
     }
     /**
      * Adds new attachment to the message.
      * @param File $attachment An object of type 'File' which contains all 
-     * needed information about the file.
+     * needed information about the file. It will be added only if the file 
+     * exist in the path or the raw data of the file is set.
      * @since 1.3
      */
     public function addAttachment($attachment) {
+        Logger::logFuncCall(__METHOD__);
+        Logger::log('Checking if class \'File\' exist...');
         if(class_exists('File')){
+            Logger::log('Checking if passed parameter is an instance of \'File\'...');
             if($attachment instanceof File){
-                if(file_exists($attachment->getPath())){
+                Logger::log('Checking file path and row data...');
+                if(file_exists($attachment->getPath()) || $attachment->getRawData() !== NULL){
                     $this->attachments[] = $attachment;
+                    Logger::log('Attachment added.');
+                    Logger::logFuncReturn(__METHOD__);
                     return TRUE;
                 }
+                else{
+                    Logger::log('Attachment not added. No file in the path and no raw data.', 'warning');
+                }
+            }
+            else{
+                Logger::log('Attachment not added. Given parameter is not an instance of \'File\'.', 'warning');
             }
         }
+        Logger::logFuncReturn(__METHOD__);
         return FALSE;
     }
     /**
      * Checks if the user is logged in or not.
-     * @return boolean The function will return <b>TRUE</b> if the user is 
-     * logged in to the mail server. <b>FALSE</b> if not.
+     * @return boolean The function will return TRUE if the user is 
+     * logged in to the mail server. FALSE if not.
      * @since 1.2
      */
     public function isLoggedIn() {
@@ -187,8 +209,8 @@ class SocketMailer {
      * must be done after connecting to the server.
      * @param string $username The email server username.
      * @param string $password The user password.
-     * @return boolean The function will return <b>TRUE</b> if the user is 
-     * logged in to the mail server. <b>FALSE</b> if not. The user might not be logged 
+     * @return boolean The function will return TRUE if the user is 
+     * logged in to the mail server. FALSE if not. The user might not be logged 
      * in in 3 cases:
      * <ul>
      * <li>If the mailer is not connected to the email server.</li>
@@ -198,31 +220,38 @@ class SocketMailer {
      * @since 1.2
      */
     public function login($username,$password) {
+        Logger::logFuncCall(__METHOD__);
+        Logger::log('Checking if connected to mail server...');
         if($this->isConnected()){
+            Logger::log('Connected.');
+            Logger::log('Checking if connected to mail server...');
             if(strlen($this->getSenderAddress()) != 0){
-                array_push($this->log, 'Validating user credentials.');
+                Logger::log('Validating user credentials...');
                 $this->sendC('AUTH LOGIN');
                 $this->sendC(base64_encode($username));
                 $this->sendC(base64_encode($password));
+                
+                Logger::log('Checking if authentication is success or not.');
                 //a command to check if authentication is done
                 $this->sendC('MAIL FROM: <'.$this->getSenderAddress().'>');
 
                 if($this->getLastLogMessage() == 'Response: 235 Authentication succeeded'){
-                    array_push($this->log, 'Logged in. Valid credentials.');
+                    Logger::log('Logged in. Valid credentials.');
                     $this->isLoggedIn = TRUE;
                 }
                 else{
-                    array_push($this->log, 'Unable to login. Invalid credentials.');
+                    Logger::log('Unable to login. Invalid credentials.','warning');
                     $this->isLoggedIn = FALSE;
                 }
             }
             else{
-                array_push($this->log, 'Unable to login. Sender not set.');
+                Logger::log('Unable to login. Sender not set.','warning');
             }
         }
         else{
-            array_push($this->log, 'Unable to login. No connection available.');
+            Logger::log('Unable to login. No connection available.','warning');
         }
+        Logger::logFuncReturn(__METHOD__);
         return $this->isLoggedIn();
     }
     /**
@@ -231,19 +260,7 @@ class SocketMailer {
      * @since 1.2
      */
     public function getLastLogMessage(){
-        $count = count($this->getLog());
-        if($count == 0){
-            return '';
-        }
-        return $this->getLog()[$count - 1];
-    }
-    /**
-     * Returns log messages.
-     * @return array An array that contains all logged messages.
-     * @ince 1.0
-     */
-    public function getLog() {
-        return $this->log;
+        return $this->lastResponse;
     }
     /**
      * Sets the subject of the message.
@@ -251,8 +268,17 @@ class SocketMailer {
      * @since 1.0
      */
     public function setSubject($subject){
-        $this->subject = $subject;
-        array_push($this->log, 'Subject Updated to: '.$subject);
+        Logger::logFuncCall(__METHOD__);
+        Logger::log('Validating message title...');
+        Logger::log('New subject: \''.$subject.'\'.', 'debug');
+        if(gettype($subject) == 'string' && strlen($subject) > 0){
+            $this->subject = $subject;
+            Logger::log('Subject updated.');
+        }
+        else{
+            Logger::log('Invalid email subject.', 'warning');
+        }
+        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * Sets the name and the address of the sender.
@@ -261,9 +287,12 @@ class SocketMailer {
      * @since 1.0
      */
     public function setSender($name, $address){
+        Logger::logFuncCall(__METHOD__);
+        Logger::log('New sender name: \''.$name.'\'.', 'debug');
+        Logger::log('New sender address: \''.$address.'\'.', 'debug');
         $this->senderName = $name;
         $this->senderAddress = $address;
-        array_push($this->log, 'Sender set to: "'.$name.'" \''.$address.'\'');
+        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * Sets the login username.
@@ -271,8 +300,10 @@ class SocketMailer {
      * @since 1.0
      */
     public function setUsername($u){
+        Logger::logFuncCall(__METHOD__);
+        Logger::log('New username: \''.$u.'\'.', 'debug');
         $this->uName = $u;
-        array_push($this->log, 'Username set to: "'.$u.'"');
+        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * Sets user password.
@@ -280,8 +311,10 @@ class SocketMailer {
      * @since 1.0
      */
     public function setPassword($pass){
+        Logger::logFuncCall(__METHOD__);
+        Logger::log('New password: \''.$pass.'\'.', 'debug');
         $this->pass = $pass;
-        array_push($this->log, 'Password is set.');
+        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * Adds new receiver.
@@ -294,22 +327,28 @@ class SocketMailer {
      * @since 1.0
      */
     public function addReceiver($name, $address, $isCC=false, $isBcc=false){
+        Logger::logFuncCall(__METHOD__);
+        Logger::log('Name: \''.$name.'\'.', 'debug');
+        Logger::log('Address: \''.$address.'\'.', 'debug');
+        Logger::log('Is CC: \''.$isCC.'\'.', 'debug');
+        Logger::log('Is Bcc: \''.$isBcc.'\'.', 'debug');
         if($isBcc){
             $this->bcc[$name] = $address;
-            array_push($this->log, 'BCC: "'.$name.'" \''.$address.'\'');
+            Logger::log('Receiver will receive the message as Bcc.');
         }
         else if($isCC){
             $this->cc[$name] = $address;
-            array_push($this->log, 'CC: "'.$name.'" \''.$address.'\'');
+            Logger::log('Receiver will receive the message as CC.');
         }
         else{
             $this->receivers[$name] = $address;
-            array_push($this->log, 'Receiver: "'.$name.'" \''.$address.'\'');
+            Logger::log('Receiver will receive the message directly.');
         }
+        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * Checks if the mailer is in message writing mode or not.
-     * @return boolean <b>TRUE</b> if the mailer is in writing mode. The 
+     * @return boolean TRUE if the mailer is in writing mode. The 
      * mailer will only switch to writing mode after sending the command 'DATA'.
      * @since 1.1
      */
@@ -340,18 +379,33 @@ class SocketMailer {
      * @since 1.0
      */
     public function write($msg,$sendMessage=false){
-        array_push($this->log, '');
+        Logger::logFuncCall(__METHOD__);
+        Logger::log('Message = \''.$msg.'\'.', 'debug');
+        Logger::log('Send Message = \''.$sendMessage.'\'.', 'debug');
+        Logger::log('Checking if in writing mode.');
         if($this->isInWritingMode()){
+            Logger::log('In writing mode.');
             $this->sendC($msg);
+            Logger::log('Checking if message must be sent.');
             if($sendMessage === TRUE){
+                Logger::log('Must be sent. Appending attachments (if any).');
                 $this->appendAttachments();
                 $this->sendC(self::NL.'.');
                 $this->sendC('QUIT');
+                Logger::log('Message sent.');
+            }
+            else{
+                Logger::log('No need to send now.');
             }
         }
         else{
+            Logger::log('Not in writing mode.');
+            Logger::log('Checking sender address validity...');
+            Logger::log('Sender address = \''.$this->getSenderAddress().'\'', 'debug');
             if(strlen($this->getSenderAddress()) != 0){
-                array_push($this->log, 'Switching to message writing mode.');
+                Logger::log('Valid sender address.');
+                Logger::log('Switching to message writing mode.');
+                Logger::log('Adding message receivers...');
                 foreach ($this->receivers as $val){
                     $this->sendC('RCPT TO: <'.$val.'>');
                 }
@@ -361,6 +415,7 @@ class SocketMailer {
                 foreach ($this->bcc as $val){
                     $this->sendC('RCPT TO: <'.$val.'>');
                 }
+                Logger::log('Finished.');
                 $this->sendC('DATA');
                 $this->sendC('From: "'.$this->getSenderName().'" <'.$this->getSenderAddress().'>');
                 $this->sendC('To: '.$this->getTo());
@@ -373,25 +428,33 @@ class SocketMailer {
                 $this->sendC('--'.$this->boundry);
                 $this->sendC('Content-Type: text/html; charset="UTF-8"'.self::NL);
                 $this->sendC($msg);
+                Logger::log('Checking if message must be sent.');
                 if($sendMessage === TRUE){
+                    Logger::log('Must be sent. Appending attachments (if any).');
                     $this->appendAttachments();
                     $this->sendC(self::NL.'.');
                     $this->sendC('QUIT');
+                    Logger::log('Message sent.');
+                }
+                else{
+                    Logger::log('No need to send now.');
                 }
             }
             else{
-                array_push($this->log, 'Unable to switch to message writing mode. Sender address not set.');
+                Logger::log('Unable to switch to message writing mode. Sender address not set.','error');
             }
         }
+        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * A function that is used to include email attachments.
      * @since 1.3
      */
     private function appendAttachments(){
+        Logger::logFuncCall(__METHOD__);
         if(count($this->attachments) != 0){
             foreach ($this->attachments as $file){
-                if($file instanceof File){
+                if(file_exists($file->getPath())){
                     $fileSize = filesize($file->getPath());
                     $handle = fopen($file->getPath(), 'r');
                     $content = fread($handle, $fileSize);
@@ -403,9 +466,20 @@ class SocketMailer {
                     $this->sendC('Content-Disposition: attachment; filename="'.$file->getName().'"'.self::NL);
                     $this->sendC($contentChunk);
                 }
+                else{
+                    $content = $file->getRawData();
+                    $fileSize = strlen($content);
+                    $contentChunk = chunk_split(base64_encode($content));
+                    $this->sendC('--'.$this->boundry);
+                    $this->sendC('Content-Type: '.$file->getMIMEType().'; name="'.$file->getName().'"');
+                    $this->sendC('Content-Transfer-Encoding: base64');
+                    $this->sendC('Content-Disposition: attachment; filename="'.$file->getName().'"'.self::NL);
+                    $this->sendC($contentChunk);
+                }
             }
             $this->sendC('--'.$this->boundry.'--');
         }
+        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * 
@@ -445,7 +519,7 @@ class SocketMailer {
     }
     /**
      * Checks if the connection is still open or is it closed.
-     * @return boolean <b>TRUE</b> if the connection is open.
+     * @return boolean TRUE if the connection is open.
      * @since 1.0
      */
     public function isConnected() {
@@ -457,10 +531,17 @@ class SocketMailer {
      * @since 1.0
      */
     public function setPort($port) {
+        Logger::logFuncCall(__METHOD__);
+        Logger::log('Updating port number.');
+        Logger::log('New port number: \''.$port.'\'.', 'debug');
         if($port > 0){
+            Logger::log('Port number updated.');
             $this->port = $port;
-            array_push($this->log, 'Port set to: '.$port);
         }
+        else{
+            Logger::log('Invalid port number.', 'warning');
+        }
+        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * 
@@ -477,8 +558,11 @@ class SocketMailer {
      * @since 1.0
      */
     public function setHost($host){
+        Logger::logFuncCall(__METHOD__);
+        Logger::log('New host address: \''.$host.'\'.', 'debug');
         $this->host = $host;
-        array_push($this->log, 'Host set to: '.$host);
+        Logger::log('Host address updated.');
+        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * Sends a command to the mail server.
@@ -487,29 +571,41 @@ class SocketMailer {
      * @since 1.0
      */
     public function sendC($command){
+        Logger::logFuncCall(__METHOD__);
         if($this->isConnected()){
             if($this->isInWritingMode()){
                 fwrite($this->conn, $command.self::NL);
-                array_push($this->log, 'Writing: '.$command);
+                Logger::log('Writing content...');
+                Logger::log('Content = \''.$command.'\'.', 'debug');
                 if($command == self::NL.'.'){
+                    Logger::log('End of message writing mode.');
                     $this->writeMode = FALSE;
-                    array_push($this->log, 'End of writing mode.');
                 }
             }
             else{
-                array_push($this->log, 'Sending the command: '.$command);
+                Logger::log('Sending the command \''.$command.'\'.');
                 fwrite($this->conn, $command.self::NL);
-                array_push($this->log, trim('Response: '.$this->read()));
+                $response = trim($this->read());
+                Logger::log('Server response: '.$response);
+                $this->lastResponse = $response;
+                Logger::log('Checking if the command is \'DATA\'.');
                 if($command == 'DATA'){
                     $this->writeMode = TRUE;
-                    array_push($this->log, 'Switched to writing mode');
+                    Logger::log('Switched to message writing mode');
+                }
+                else{
+                    Logger::log('No need to switch to message writing mode');
                 }
             }
+            Logger::logFuncReturn(__METHOD__);
             return TRUE;
         }
         else{
+            Logger::log('No command executed since not connected.', 'warning');
+            Logger::logFuncReturn(__METHOD__);
             return FALSE;
         }
+        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * 
@@ -517,7 +613,9 @@ class SocketMailer {
      * @since 1.0
      */
     public function read(){
+        Logger::logFuncCall(__METHOD__);
         $message = '';
+        Logger::log('Reading server response...');
         while(!feof($this->conn)){
             $str = fgets($this->conn);
             $message .= $str;
@@ -525,6 +623,8 @@ class SocketMailer {
                 break;
             }
         }
+        Logger::log('Reading finished.');
+        Logger::logFuncReturn(__METHOD__);
         return $message;
     }
     /**
@@ -535,23 +635,28 @@ class SocketMailer {
      * @since 1.0
      */
     public function connect() {
+        Logger::logFuncCall(__METHOD__);
+        $retVal = TRUE;
+        Logger::log('Checking if already connected...');
         if(!$this->isConnected()){
+            Logger::log('Not connected. Trying to connect.');
             set_error_handler(function(){});
             $err = 0;
             $errStr = '';
             $this->conn = fsockopen($this->host, $this->port, $err, $errStr, $this->timeout*60);
             set_error_handler(NULL);
             if(is_resource($this->conn)){
-                array_push($this->log, 'Connected');
+                Logger::log('Connected.');
                 $this->sendC('EHLO');
-                return TRUE;
+                $retVal = TRUE;
             }
             else{
-                array_push($this->log, 'Unable to connect. Check your connection parameters.');
-                return FALSE;
+                Logger::log('Unable to connect. Check your connection parameters.','warning');
+                $retVal = FALSE;
             }
         }
-        return TRUE;
+        Logger::logFuncReturn(__METHOD__);
+        return $retVal;
     }
     /**
      * Sets the timeout time of the connection.
@@ -560,9 +665,15 @@ class SocketMailer {
      * than 0.
      */
     public function setTimeout($val) {
+        Logger::logFuncCall(__METHOD__);
+        Logger::log('Setting timeout to \''.$val.'\'', 'debug');
         if($val >= 1 && !$this->isConnected()){
-            array_push($this->log, 'Timeout set to '.$val.' minutes.');
             $this->timeout = $val;
+            Logger::log('Timeout updated.');
         }
+        else{
+            Logger::log('Invalid timeout time: \''.$val.'\'.', 'warning');
+        }
+        Logger::logFuncReturn(__METHOD__);
     }
 }

@@ -69,91 +69,110 @@ class EmaiMessage {
      * @since 1.0
      */
     private function __construct($sendAccountName='') {
+        Logger::logFuncCall(__METHOD__);
+        Logger::log('Creating new instance of \'EmailMessage\'.', 'info');
         if(class_exists('MailConfig')){
+            Logger::log('Checking the existance of the account \''.$sendAccountName.'\'.', 'debug');
             $acc = MailConfig::get()->getAccount($sendAccountName);
             if($acc instanceof EmailAccount){
+                Logger::log('SMTP Account retrieved.');
+                Logger::log('Getting socket mailer ready.');
                 $this->socketMailer = BasicMailFunctions::get()->getSocketMailer($acc);
                 if($this->socketMailer == BasicMailFunctions::INV_CREDENTIALS){
+                    Logger::log('Unable to login to the email server using provided parameters. An exception is thrown.', 'error');
+                    Logger::requestCompleted();
                     throw new Exception('The account "'.$sendAccountName.'" has inalid credintials.');
                 }
                 else if($this->socketMailer == BasicMailFunctions::INV_HOST_OR_PORT){
+                    Logger::log('Unable to connect to the email server. Incorrect port or server address. An exception is thrown.', 'error');
+                    Logger::requestCompleted();
                     throw new Exception('The account "'.$sendAccountName.'" has inalid host or port number.');
                 }
                 else{
+                    Logger::log('Instance created with no errors.');
+                    Logger::logFuncReturn(__METHOD__);
                     $this->asHtml = new HTMLDoc();
                     return;
                 }
             }
+            Logger::log('No email account with the name \'MailConfig\' was found. An exception is thrown.', 'error');
+            Logger::requestCompleted();
             throw new Exception('The account "'.$sendAccountName.'" does not exist.');
         }
+        Logger::log('Class \'MailConfig\' is missing. An exception is thrown.', 'error');
+        Logger::requestCompleted();
         throw new Exception('Class "MailConfig" not found.');
     }
     /**
-     * 
-     * @param File $file
+     * Adds a file to the email message as an attachment.
+     * @param File $file The file that will be added. It will be added only if the file 
+     * exist in the path or the raw data of the file is set.
      * @since 1.0
      */
     public static function attach($file) {
-        self::createInstance()->getSocketMailer()->addAttachment($file);
+        self::createInstance()->_getSocketMailer()->addAttachment($file);
     }
     /**
-     * 
-     * @param type $text
+     * Adds a text node to the body of the message.
+     * @param string $text The text that will be in the body of the node.
      * @since 1.0
      */
     public static function write($text) {
-        self::createInstance()->getDocument()->addChild(HTMLNode::createTextNode($text));
+        self::createInstance()->_getDocument()->addChild(HTMLNode::createTextNode($text));
     }
     /**
-     * 
-     * @param type $htmlNode
+     * Adds a child HTML node to the body of the message.
+     * @param HTMLNode $htmlNode An instance of 'HTMLNode'.
      * @since 1.0
      */
     public static function insertNode($htmlNode) {
-        self::createInstance()->getDocument()->addChild($htmlNode);
+        self::createInstance()->_getDocument()->addChild($htmlNode);
     }
     /**
-     * 
-     * @param HTMLDoc $new
+     * Sets or returns the HTML document that is associated with the email 
+     * message.
+     * @param HTMLDoc $new [Optional] If it is not NULL, the HTML document 
+     * that is associated with the message will be set to the given one.
+     * @return HTMLDoc The document that is associated with the email message.
      * @since 1.0
      */
     public static function document($new=null){
         if($new != NULL){
-            self::createInstance()->setDocument($new);
+            self::createInstance()->_setDocument($new);
         }
-        return self::createInstance()->getDocument();
+        return self::createInstance()->_getDocument();
     }
     /**
-     * 
+     * Adds new receiver address to the list of message receivers.
      * @param string $name The name of the email receiver (such as 'Ibrahim').
-     * @param string $email The email address of the receiver.
-     * @param boolean $isCC [Optional] If set to true, the receiver will receive 
-     * a carbon copy of the message.
-     * @param boolean $isBcc [Optional] If set to true, the receiver will receive 
-     * a blind carbon copy of the message.
+     * @param string $email The email address of the receiver (such as 'example@example.com').
+     * @param boolean $isCC [Optional] If set to TRUE, the receiver will receive 
+     * a carbon copy of the message (CC).
+     * @param boolean $isBcc [Optional] If set to TRUE, the receiver will receive 
+     * a blind carbon copy of the message (Bcc).
      * @since 1.0
      */
     public static function addReciver($name,$email,$isCC=false,$isBcc=false){
-        self::createInstance()->getSocketMailer()->addReceiver($name, $email, $isCC, $isBcc);
+        self::createInstance()->_getSocketMailer()->addReceiver($name, $email, $isCC, $isBcc);
     }
     /**
-     * 
-     * @param string $subject
+     * Sets the subject of the email message.
+     * @param string $subject The subject of the email message.
      * @since 1.0
      */
     public static function subject($subject) {
-        self::createInstance()->getSocketMailer()->setSubject($subject);
+        self::createInstance()->_getSocketMailer()->setSubject($subject);
     }
     /**
      * @since 1.0
      */
     public static function send(){
-        self::createInstance()->sendMessage();
+        self::createInstance()->_sendMessage();
     }
     /**
      * @since 1.0
      */
-    private function sendMessage() {
+    private function _sendMessage() {
         $this->socketMailer->write($this->asHtml->toHTML(), TRUE);
     }
     /**
@@ -161,7 +180,7 @@ class EmaiMessage {
      * @return SocketMailer
      * @since 1.0
      */
-    private function &getSocketMailer() {
+    private function &_getSocketMailer() {
         return $this->socketMailer;
     }
     /**
@@ -169,14 +188,14 @@ class EmaiMessage {
      * @return HTMLDoc
      * @since 1.0
      */
-    private function &getDocument() {
+    private function &_getDocument() {
         return $this->asHtml;
     }
     /**
      * 
      * @param HTMLDoc $doc
      */
-    private function setDocument($doc) {
+    private function _setDocument($doc) {
         if($doc instanceof HTMLDoc){
             $this->asHtml = $doc;
         }

@@ -78,10 +78,14 @@ class WebsiteFunctions extends Functions{
      * @since 1.0
      */
     public static function &get(){
-        if(self::$singleton !== NULL){
-            return self::$singleton;
+        Logger::logFuncCall(__METHOD__);
+        if(self::$singleton === NULL){
+            Logger::log('Initializing \'WebsiteFunctions\' instance...');
+            self::$singleton = new WebsiteFunctions();
+            Logger::log('Initializing of \'WebsiteFunctions\' completed.');
         }
-        self::$singleton = new WebsiteFunctions();
+        Logger::log('Returning \'WebsiteFunctions\' instance.');
+        Logger::logFuncReturn(__METHOD__);
         return self::$singleton;
     }
     public function __construct() {
@@ -92,6 +96,7 @@ class WebsiteFunctions extends Functions{
      * @since 1.0
      */
     public function createSiteConfigFile() {
+        Logger::logFuncCall(__METHOD__);
         if(!class_exists('SiteConfig')){
             Logger::log('Creating Configuration File \'SiteConfig.php\'');
             $initCfg = $this->getSiteConfigVars();
@@ -101,6 +106,7 @@ class WebsiteFunctions extends Functions{
         else{
             Logger::log('Configuration File \'SiteConfig.php\' Already Exist.');
         }
+        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * Updates web site configuration based on some attributes.

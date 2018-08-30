@@ -105,10 +105,14 @@ class SystemFunctions extends Functions{
      * @since 1.0
      */
     public static function &get(){
-        if(self::$singleton !== NULL){
-            return self::$singleton;
+        Logger::logFuncCall(__METHOD__);
+        if(self::$singleton === NULL){
+            Logger::log('Initializing \'SystemFunctions\' instance...');
+            self::$singleton = new SystemFunctions();
+            Logger::log('Initializing of \'SystemFunctions\' completed.');
         }
-        self::$singleton = new SystemFunctions();
+        Logger::log('Returning \'SystemFunctions\' instance.');
+        Logger::logFuncReturn(__METHOD__);
         return self::$singleton;
     }
     /**
@@ -116,6 +120,7 @@ class SystemFunctions extends Functions{
      * @since 1.0
      */
     public function createConfigFile() {
+        Logger::logFuncCall(__METHOD__);
         if(!class_exists('Config')){
             Logger::log('Creating Configuration File \'Config.php\'');
             $cfg = $this->getConfigVars();
@@ -125,6 +130,7 @@ class SystemFunctions extends Functions{
         else{
             Logger::log('Configuration File \'Config.php\' Already Exist.');
         }
+        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * Creates new instance of the class.
@@ -164,6 +170,7 @@ class SystemFunctions extends Functions{
         else{
             Logger::log('The database connect function did not return TRUE.', 'warning');
         }
+        Logger::logReturnValue($r);
         Logger::logFuncReturn(__METHOD__);
         return $r;
     }
@@ -430,15 +437,25 @@ class SystemFunctions extends Functions{
      * @since 1.0
      */
     public function isSetupFinished(){
+        Logger::logFuncCall(__METHOD__);
         if(class_exists('Config')){
             if(class_exists('MailConfig')){
                 if(class_exists('SiteConfig')){
-                    return Config::get()->isConfig();
+                    $retVal = Config::get()->isConfig();
+                    Logger::logReturnValue($retVal);
+                    Logger::logFuncReturn(__METHOD__);
+                    return $retVal;
                 }
+                Logger::log('The file \'SiteConfig.php\' is missing. An exception is thrown.', 'error');
+                Logger::requestCompleted();
                 throw new Exception('SiteConfig.php is missing.');
             }
+            Logger::log('The file \'MailConfig.php\' is missing. An exception is thrown.', 'error');
+            Logger::requestCompleted();
             throw new Exception('MailConfig.php is missing.');
         }
+        Logger::log('The file \'Config.php\' is missing. An exception is thrown.', 'error');
+        Logger::requestCompleted();
         throw new Exception('Config.php is missing.');
     }
 }

@@ -71,10 +71,14 @@ class BasicMailFunctions extends Functions{
      * @since 1.0
      */
     public static function get(){
-        if(self::$instance != NULL){
-            return self::$instance;
+        Logger::logFuncCall(__METHOD__);
+        if(self::$instance === NULL){
+            Logger::log('Initializing \'WebsiteFunctions\' instance...');
+            self::$instance = new BasicMailFunctions();
+            Logger::log('Initializing of \'WebsiteFunctions\' completed.');
         }
-        self::$instance = new BasicMailFunctions();
+        Logger::log('Returning \'WebsiteFunctions\' instance.');
+        Logger::logFuncReturn(__METHOD__);
         return self::$instance;
     }
     public function __construct() {
@@ -85,6 +89,7 @@ class BasicMailFunctions extends Functions{
      * @since 1.0
      */
     public function createEmailConfigFile(){
+        Logger::logFuncCall(__METHOD__);
         if(!class_exists('MailConfig')){
             Logger::log('Creating Configuration File \'MailConfig.php\'');
             $this->writeMailConfig(array());
@@ -93,6 +98,7 @@ class BasicMailFunctions extends Functions{
         else{
             Logger::log('Configuration File \'MailConfig.php\' Already Exist.');
         }
+        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * A function to save changes to mail configuration file.
@@ -101,6 +107,7 @@ class BasicMailFunctions extends Functions{
      * @since 1.1
      */
     private function writeMailConfig($emailAccountsArr){
+        Logger::logFuncCall(__METHOD__);
         $fh = new FileHandler(ROOT_DIR.'/entity/MailConfig.php');
         $fh->write('<?php', TRUE, TRUE);
         $fh->write('if(!defined(\'ROOT_DIR\')){
@@ -199,6 +206,7 @@ class BasicMailFunctions extends Functions{
     }', TRUE, TRUE);
         $fh->write('}', TRUE, TRUE);
         $fh->close();
+        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * Removes SMTP email account if it is exist.
@@ -209,6 +217,8 @@ class BasicMailFunctions extends Functions{
      * @since 1.3
      */
     public function removeAccount($accountName) {
+        Logger::logFuncCall(__METHOD__);
+        $retVal = FALSE;
         if(class_exists('MailConfig')){
             $account = MailConfig::get()->getAccount($accountName);
             if($account instanceof EmailAccount){
@@ -219,10 +229,12 @@ class BasicMailFunctions extends Functions{
                     $toSave[] = $account;
                 }
                 $this->writeMailConfig($toSave);
-                return TRUE;
+                $retVal = TRUE;
             }
         }
-        return FALSE;
+        Logger::logReturnValue($retVal);
+        Logger::logFuncReturn(__METHOD__);
+        return $retVal;
     }
     /**
      * Updates an existing SMTP email account or adds new one.
@@ -236,6 +248,8 @@ class BasicMailFunctions extends Functions{
      * @since 1.1
      */
     public function updateOrAddEmailAccount($emailAccount) {
+        Logger::logFuncCall(__METHOD__);
+        $retVal = FALSE;
         if($emailAccount instanceof EmailAccount){
             $sm = $this->getSocketMailer($emailAccount);
             if($sm instanceof SocketMailer){
@@ -252,11 +266,13 @@ class BasicMailFunctions extends Functions{
                     $arr = array($emailAccount);
                     $this->writeMailConfig($arr);
                 }
-                return TRUE;
+                $retVal = TRUE;
             }
-            return $sm;
+            $retVal = $sm;
         }
-        return FALSE;
+        Logger::logReturnValue($retVal);
+        Logger::logFuncReturn(__METHOD__);
+        return $retVal;
     }
     /**
      * Returns a new instance of the class 'SocketMailer'.

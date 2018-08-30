@@ -60,9 +60,14 @@ class Functions {
      * @since 1.0
      */
     const EMPTY_STRING = 'emp_string';
+    
     public function __construct() {
+        Logger::logFuncCall(__METHOD__);
+        Logger::log('Initializing main session...');
         $this->mainSession = new SessionManager('pa-session');
         $this->mainSession->initSession();
+        Logger::log('Finished initializing main session');
+        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * A function that must be called after session is started to 
@@ -161,10 +166,17 @@ class Functions {
      * @since 1.2
      */
     public function hasPrivilege($pId){
+        Logger::logFuncCall(__METHOD__);
+        Logger::log('Prevalege ID = \''.$pId.'\'.', 'debug');
+        $retVal = FALSE;
         if($this->getUserID() != -1){
-            return $this->mainSession->getUser()->hasPrivilege($pId);
+            $retVal = $this->mainSession->getUser()->hasPrivilege($pId);
         }
-        return FALSE;
+        else{
+            Logger::log('Invalid user in session variable.', 'warning');
+        }
+        Logger::logReturnValue($retVal);
+        return $retVal;
     }
     /**
      * Returns the instance of <b>SessionManager</b> that is used by the logic.
@@ -173,7 +185,6 @@ class Functions {
      */
     public function getMainSession(){
         Logger::logFuncCall(__METHOD__);
-        Logger::logFuncReturn(__METHOD__);
         return $this->mainSession;
     }
     /**
@@ -185,7 +196,11 @@ class Functions {
      * @since 1.2
      */
     public final function getSessionLang($forceUpdate=true){
-        return $this->getMainSession()->getLang($forceUpdate);
+        Logger::logFuncCall(__METHOD__);
+        Logger::log('Force Update = \''.$forceUpdate.'\'', 'debug');
+        $retVal = $this->getMainSession()->getLang($forceUpdate);
+        Logger::logFuncReturn(__METHOD__);
+        return $retVal;
     }
     /**
      * Returns the link that is used to connect to the database.
@@ -193,7 +208,10 @@ class Functions {
      * @since 1.2
      */
     public function getDBLink() {
-        return $this->getMainSession()->getDBLink();
+        Logger::logFuncCall(__METHOD__);
+        $retVal = $this->getMainSession()->getDBLink();
+        Logger::logFuncReturn(__METHOD__);
+        return $retVal;
     }
     /**
      * Returns the number of rows resulted from executing a query.
@@ -203,10 +221,17 @@ class Functions {
      * @since 1.0
      */
     public function rows(){
-        if($this->mainSession->getDBLink() != NULL){
-            return $this->getMainSession()->getDBLink()->rows();
+        Logger::logFuncCall(__METHOD__);
+        $retVal = -1;
+        if($this->mainSession->getDBLink() !== NULL){
+            $retVal = $this->getMainSession()->getDBLink()->rows();
         }
-        return -1;
+        else{
+            Logger::log('Database link is NULL.', 'warning');
+        }
+        Logger::logReturnValue($retVal);
+        Logger::logFuncReturn(__METHOD__);
+        return $retVal;
     }
     /**
      * Returns A row that is resulted from executing a query.
@@ -216,11 +241,17 @@ class Functions {
      * @since 1.0
      */
     public function getRow(){
+        Logger::logFuncCall(__METHOD__);
+        $retVal = NULL;
         if($this->getMainSession()->getDBLink() != NULL){
-            $row = $this->getMainSession()->getDBLink()->getRow();
-            return $row;
+            $retVal = $this->getMainSession()->getDBLink()->getRow();
         }
-        return NULL;
+        else{
+            Logger::log('Database link is NULL.', 'warning');
+        }
+        Logger::logReturnValue($retVal);
+        Logger::logFuncReturn(__METHOD__);
+        return $retVal;
     }
     /**
      * Returns the ID of the user who is currently logged in.
@@ -229,9 +260,16 @@ class Functions {
      * @since 1.0
      */
     public function getUserID(){
+        Logger::logFuncCall(__METHOD__);
+        $retVal = -1;
         if($this->getMainSession()->getUser() != NULL){
-            return intval($this->getMainSession()->getUser()->getID());
+            $retVal = intval($this->getMainSession()->getUser()->getID());
         }
-        return -1;
+        else{
+            Logger::log('The linked user is NULL.', 'warning');
+        }
+        Logger::logReturnValue($retVal);
+        Logger::logFuncReturn(__METHOD__);
+        return $retVal;
     }
 }

@@ -120,16 +120,18 @@ class LisksCode{
          */
         require_once ROOT_DIR.'/entity/AutoLoader.php';
         $this->AU = AutoLoader::get();
+        //uncomment next line to show runtime errors and warnings
+        //also enable logging for info, warnings and errors 
+        Logger::logName('initialization-log');
+        Util::displayErrors();
+        
         $this->SF = SystemFunctions::get();
         $this->WF = WebsiteFunctions::get();
         $this->BMF = BasicMailFunctions::get();
-
-        //uncomment next line to show runtime errors and warnings
-        //also enable logging for info, warnings and errors 
-        Util::displayErrors();
-        Logger::logName('initialization-log');
+        
         //enable logging of debug info.
         define('DEBUG', '');
+        
         $this->sysStatus = Util::checkSystemStatus();
         $this->initRoutes();
         if($this->sysStatus == Util::MISSING_CONF_FILE || $this->sysStatus == Util::MISSING_SITE_CONF_FILE){

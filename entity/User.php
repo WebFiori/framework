@@ -139,7 +139,7 @@ class User implements JsonI{
         $this->password = $password;
         $this->userName = $username;
         $this->resetPassCounts = 0;
-        $this->id = 0;
+        $this->id = -1;
         $this->userPrivileges = array();
     }
     /**

@@ -617,6 +617,7 @@ class SessionManager implements JsonI{
             $_SESSION['resumed-at'] = time();
             $_SESSION['lifetime'] = $this->getLifetime();
             $_SESSION['name'] = $this->getName();
+            $_SESSION['user'] = new User();
             $ip = filter_var($_SERVER['REMOTE_ADDR'],FILTER_VALIDATE_IP);
             if($ip == '::1'){
                 $ip = '127.0.0.1';
@@ -849,6 +850,7 @@ class SessionManager implements JsonI{
     public function resume(){
         Logger::logFuncCall(__METHOD__);
         $retVal = FALSE;
+        Logger::log('Checking if session has a cookie...');
         if($this->hasCookie()){
             session_name($this->getName());
             ini_set('session.gc_maxlifetime', $this->getLifetime());
@@ -856,18 +858,24 @@ class SessionManager implements JsonI{
             ini_set('session.use_cookies', 1);
             session_id(self::getSessionIDFromCookie($this->getName()));
             session_start();
+            Logger::log('Validating session attributes...');
             if($this->validateAttrs()){
+                Logger::log('Checking if session has timed out...');
                 if(!$this->isTimeout()){
                     $ip = filter_var($_SERVER['REMOTE_ADDR'],FILTER_VALIDATE_IP);
                     if($ip == '::1'){
                         $ip = '127.0.0.1';
                     }
+                    Logger::log('Comparing stored IP address and request source IP address...');
                     if($this->getStartIpAddress() == $ip){
+                        Logger::log('Session status updated to \'resumed\'.');
                         $this->resumed = true;
                         $this->sessionStatus = self::RESUMED;
                         //update resume time
                         $_SESSION['resumed-at'] = time();
+                        Logger::log('Resumed at: '.$_SESSION['resumed-at'], 'debug');
                         if($this->isRefresh()){
+                            Logger::log('Refreshing session timeout time...');
                             //refresh time till session cookie is dead
                             $params = session_get_cookie_params();
                             setcookie($this->getName(), $this->getID(),time()+$this->getLifetime() * 60, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
@@ -876,24 +884,29 @@ class SessionManager implements JsonI{
                         $retVal = TRUE;
                     }
                     else{
+                        Logger::log('The Request source IP address does not match stored IP Address.', 'warning');
                         $this->kill();
                         $this->sessionStatus = self::INV_IP_ADDRESS;
                     }
                 }
                 else{
+                    Logger::log('Session has timed out.', 'warning');
                     $this->kill();
                     $this->sessionStatus = self::EXPIRED;
                 }
             }
             else{
+                Logger::log('The session has missing or invalid attributes.', 'warning');
                 $this->kill();
                 $this->sessionStatus = self::INV_STATE;
             }
         }
         else{
+            Logger::log('Session has invalid cookie or has no cookie.','warning');
             $this->kill();
             $this->sessionStatus = self::INV_COOKIE;
         }
+        Logger::logReturnValue($retVal);
         Logger::logFuncReturn(__METHOD__);
         return $retVal;
     }

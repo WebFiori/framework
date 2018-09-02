@@ -19,15 +19,21 @@ if(!defined('ROOT_DIR')){
 /**
  * A helper class to manage system sessions.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.7
+ * @version 1.8
  */
 class SessionManager implements JsonI{
     /**
-     * A variable is set to <b>TRUE</b> if the session is resumed or its new.
+     * A variable is set to TRUE if the session is resumed and set to FALSE if new.
      * @var boolean
      * @since 1.5 
      */
     private $resumed;
+    /**
+     * A variable is set to TRUE if the session is new and set to FALSE if resumed.
+     * @var boolean
+     * @since 1.8 
+     */
+    private $new;
     /**
      * A string that stores session status.
      * @var string
@@ -141,8 +147,10 @@ class SessionManager implements JsonI{
     }
     /**
      * Creates new session manager.
-     * @param string $session_name [Optional] The name of the session. It 
-     * must be non-empty string to be set. The default value is 'pa-session'.
+     * @param string $session_name [Optional] The name of the session. The name 
+     * can consist of any character other than space, comma, semi-colon and 
+     * equal sign. If the name has one of the given characters, the session 
+     * will have new randomly generated name.
      * @since 1.0
      */
     public function __construct($session_name='pa-seesion') {
@@ -161,6 +169,7 @@ class SessionManager implements JsonI{
         $this->setLifetime(120);
         $this->sessionStatus = self::NOT_RUNNING;
         $this->resumed = FALSE;
+        $this->new = FALSE;
         if(session_status() == PHP_SESSION_ACTIVE){
             Logger::log('A session is active. Writing session variables and creating new one.', 'warning');
             Logger::log('Active session name = \''. session_name().'\'.', 'debug');
@@ -172,6 +181,73 @@ class SessionManager implements JsonI{
         }
         Logger::logFuncReturn(__METHOD__);
         //session_save_path(ROOT_DIR.'/tmp');
+    }
+    /**
+     * Switch between sessions. The function first checks if a session is active. 
+     * If a session is active, the function checks if the name that is stored 
+     * in the instance is equal to the name stored in the $_SESSION. if the 
+     * two are different, the function will stop the first session and activate 
+     * the second one.
+     * @return boolean If the session was switched, the function will return TRUE.
+     * @since 1.8
+     */
+    public function switchToSession() {
+        Logger::logFuncCall(__METHOD__);
+        $retVal = FALSE;
+        Logger::log('Checking if a session is active...');
+        if(session_status() == PHP_SESSION_ACTIVE){
+            Logger::log('A session is active.');
+            Logger::log('Comparing $_SESSION[\'session-name\'] with the instance session name...');
+            Logger::log('$_SESSION[\'session-name\'] = \''.$_SESSION['session-name'].'\'', 'debug');
+            if($_SESSION['session-name'] != $this->getName()){
+                Logger::log('The two names are not the same.');
+                Logger::log('Checking if the session is new or resumed one...');
+                $isResumed = $this->isResumed();
+                $isNew = $this->isNew();
+                Logger::log('Resumed = \''.$isResumed.'\'.', 'debug');
+                Logger::log('New = \''.$isNew.'\'.', 'debug');
+                if($isResumed || $isNew){
+                    Logger::log('Resuming the session...', 'warning');
+                    session_write_close();
+                    $this->initSession();
+                    Logger::log('Switching sessions finished.');
+                    $retVal = TRUE;
+                }
+                else{
+                    Logger::log('Unable to switch. The session is not new or not resumed.','warning');
+                }
+            }
+            else{
+                Logger::log('No need to switch sessions.');
+                $retVal = TRUE;
+            }
+        }
+        else{
+            Logger::log('No session is active.');
+            Logger::log('Trying to resume the session...');
+            $resume = $this->resume();
+            if($resume === TRUE){
+                $isResumed = $this->isResumed();
+                $isNew = $this->isNew();
+                Logger::log('Resumed = \''.$isResumed.'\'.', 'debug');
+                Logger::log('New = \''.$isNew.'\'.', 'debug');
+                if($isResumed || $isNew){
+                    Logger::log('Resuming the session...', 'warning');
+                    $this->initSession();
+                    Logger::log('Switching sessions finished.');
+                    $retVal = TRUE;
+                }
+                else{
+                    Logger::log('Unable to switch. The session is not new or not resumed.','warning');
+                }
+            }
+            else{
+                Logger::log('Unable to resume.','warning');
+            }
+        }
+        Logger::logReturnValue($retVal);
+        Logger::logFuncReturn(__METHOD__);
+        return $retVal;
     }
     /**
      * Generate a random session name.
@@ -244,7 +320,7 @@ class SessionManager implements JsonI{
         Logger::log('Given time = \''.$time.'\' ('. gettype($time).').', 'debug');
         if($time > 0){
             Logger::log('Checking if session is active or not...');
-            if(session_status() == PHP_SESSION_ACTIVE){
+            if($this->switchToSession()){
                 Logger::log('It is active. Checking if the session has timed out...');
                 if(!$this->isTimeout()){
                     Logger::log('Session duration updated.');
@@ -279,7 +355,7 @@ class SessionManager implements JsonI{
     public function getLifetime(){
         Logger::logFuncCall(__METHOD__);
         $retVal = $this->lifeTime;
-        if(session_status() == PHP_SESSION_ACTIVE){
+        if($this->switchToSession()){
             if(isset($_SESSION['lifetime'])){
                 Logger::log('Time taken from $_SESSION[\'lifetime\']');
                 $retVal = $_SESSION['lifetime'];
@@ -299,7 +375,7 @@ class SessionManager implements JsonI{
     public function setIsRefresh($bool){
         Logger::logFuncCall(__METHOD__);
         Logger::log('Passed value = \''.$bool.'\'.', 'debug');
-        if(session_status() == PHP_SESSION_ACTIVE){
+        if($this->switchToSession()){
             $_SESSION['refresh'] = $bool === TRUE ? TRUE : FALSE;
             Logger::log('New property value = \''.$_SESSION['refresh'].'\'.', 'debug');
             Logger::log('Property updated.');
@@ -416,7 +492,7 @@ class SessionManager implements JsonI{
     public function getLang($forceUpdate=false){
         Logger::logFuncCall(__METHOD__);
         $retVal = NULL;
-        if($this->isResumed()){
+        if($this->switchToSession()){
             if($forceUpdate === TRUE){
                 $this->initLang($forceUpdate);
             }
@@ -471,7 +547,7 @@ class SessionManager implements JsonI{
         Logger::logFuncCall(__METHOD__);
         $retVal = FALSE;
         Logger::log('Checking if session is resumed...');
-        if($this->isResumed()){
+        if($this->switchToSession()){
             Logger::log('Checking if passed variable is an instance of \'User\'.');
             if($user instanceof User){
                 Logger::log('User updated.');
@@ -499,7 +575,7 @@ class SessionManager implements JsonI{
     public function getUser(){
         Logger::logFuncCall(__METHOD__);
         $retVal = NULL;
-        if($this->isResumed()){
+        if($this->switchToSession()){
             if(isset($_SESSION['user'])){
                 $retVal = $_SESSION['user'];
             }
@@ -537,7 +613,7 @@ class SessionManager implements JsonI{
     public function useDb($dbAttrs=array()){
         Logger::logFuncCall(__METHOD__);
         $retVal = FALSE;
-        if($this->isResumed()){
+        if($this->switchToSession()){
             if(isset($dbAttrs['host'])){
                 if(isset($dbAttrs['user'])){
                     if(isset($dbAttrs['pass'])){
@@ -592,20 +668,13 @@ class SessionManager implements JsonI{
         Logger::logFuncCall(__METHOD__);
         $retVal = FALSE;
         Logger::log('Checking if session is resumed...');
-        if(!$this->isResumed()){
-            Logger::log('Trying to resume or start the session...');
-            if($this->resume()){
-                Logger::log('Session resumed.');
-                $retVal = TRUE;
-            }
-            else{
-                Logger::log('Starting new session...');
-                $lifeTime = $this->getLifetime() * 60;
-                $retVal = $this->start($refresh,$useDb, $lifeTime, $dbAttributes,$useDefaultLang);
-            }
+        if(!$this->switchToSession()){
+            Logger::log('Starting new session...');
+            $lifeTime = $this->getLifetime() * 60;
+            $retVal = $this->start($refresh,$useDb, $lifeTime, $dbAttributes,$useDefaultLang);
         }
         else{
-            Logger::log('Session already running.');
+            Logger::log('Session is resumed.');
             $this->setIsRefresh($refresh);
             $this->initLang(FALSE, $useDefaultLang);
             $retVal = TRUE;
@@ -626,7 +695,7 @@ class SessionManager implements JsonI{
     public function isRefresh(){
         Logger::logFuncCall(__METHOD__);
         Logger::log('Checking if session is active...');
-        if(session_status() == PHP_SESSION_ACTIVE){
+        if($this->switchToSession()){
             if(isset($_SESSION['refresh'])){
                 Logger::logReturnValue($_SESSION['refresh']);
                 Logger::logFuncReturn(__METHOD__);
@@ -639,7 +708,7 @@ class SessionManager implements JsonI{
         else{
             Logger::log('Calling the function while session is not active. An exception is thrown.', 'error');
         }
-        throw new Exception('Session is not running');
+        throw new Exception('Session is not running.');
     }
     private function start($refresh,$useDb,$lifeTime,$dbAttributes,$useDefaultLang=false){
         Logger::logFuncCall(__METHOD__);
@@ -654,7 +723,9 @@ class SessionManager implements JsonI{
         $started = session_start();
         if($started){
             Logger::log('Session started.');
-            $this->resumed = TRUE;
+            $this->resumed = FALSE;
+            $this->new = TRUE;
+            $_SESSION['session-name'] = $this->getName();
             $_SESSION['started-at'] = time();
             $_SESSION['resumed-at'] = time();
             $_SESSION['lifetime'] = $this->getLifetime();
@@ -708,7 +779,7 @@ class SessionManager implements JsonI{
         $retVal = FALSE;
         if(isset($_SESSION)){
             $params = session_get_cookie_params();
-            if(session_status() == PHP_SESSION_ACTIVE){
+            if($this->switchToSession()){
                 setcookie($this->getName(), '', 0, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
                 session_destroy();
                 $this->sessionStatus = self::KILLED;
@@ -729,7 +800,7 @@ class SessionManager implements JsonI{
     public function getDBLink(){
         Logger::logFuncCall(__METHOD__);
         $retVal = NULL;
-        if($this->isResumed()){
+        if($this->switchToSession()){
             if(isset($_SESSION['db'])){
                 $retVal = $_SESSION['db'];
             }
@@ -752,7 +823,7 @@ class SessionManager implements JsonI{
     public function getID(){
         Logger::logFuncCall(__METHOD__);
         $retVal = -1;
-        if(session_status() == PHP_SESSION_ACTIVE){
+        if($this->switchToSession()){
             $retVal = session_id();
         }
         else{
@@ -769,10 +840,14 @@ class SessionManager implements JsonI{
      * @since 1.5
      */
     public function hasCookie(){
+        Logger::logFuncCall(__METHOD__);
+        $retVal = FALSE;
         $sid = filter_input(INPUT_COOKIE, $this->getName());
         if($sid !== NULL && $sid !== FALSE){
-            return TRUE;
+            $retVal = TRUE;
         }
+        Logger::logReturnValue($retVal);
+        Logger::logFuncReturn(__METHOD__);
         return FALSE;
     }
     /**
@@ -784,7 +859,7 @@ class SessionManager implements JsonI{
      * @since 1.5
      */
     public function getResumTime(){
-        if(session_status() == PHP_SESSION_ACTIVE){
+        if($this->switchToSession()){
             return $_SESSION['resumed-at'];
         }
         return session_status();
@@ -797,7 +872,7 @@ class SessionManager implements JsonI{
      * @since 1.7
      */
     public function getStartIpAddress(){
-        if(session_status() == PHP_SESSION_ACTIVE){
+        if($this->switchToSession()){
             return $_SESSION['ip-address'];
         }
         return session_status();
@@ -810,7 +885,7 @@ class SessionManager implements JsonI{
      * @since 1.5
      */
     public function getStartTime(){
-        if(session_status() == PHP_SESSION_ACTIVE){
+        if($this->switchToSession()){
             return $_SESSION['started-at'];
         }
         return session_status();
@@ -822,7 +897,7 @@ class SessionManager implements JsonI{
      * 
      */
     public function getRemainingTime() {
-        if(session_status() == PHP_SESSION_ACTIVE && $this->isRefresh()){
+        if($this->switchToSession() && $this->isRefresh()){
             return $this->getLifetime()*60; 
         }
         else{
@@ -837,7 +912,7 @@ class SessionManager implements JsonI{
      * @since 1.5
      */
     public function getPassedTime() {
-        if(session_status() == PHP_SESSION_ACTIVE){
+        if($this->switchToSession()){
             if(isset($_SESSION['started-at'])){
                 return time() - $_SESSION['started-at'];
             }
@@ -853,19 +928,28 @@ class SessionManager implements JsonI{
      * @since 1.5
      */
     public function isTimeout(){
-        if(session_status() == PHP_SESSION_ACTIVE){
+        if($this->switchToSession()){
             return $this->getRemainingTime() < 0;
         }
         return session_status();
     }
     /**
      * Checks if the session is resumed or not.
-     * @return boolean TRUE if the session is resumed or its new. If the session is 
-     *  not resumed, the function will return FALSE.
+     * @return boolean TRUE if the session is resumed. If the session is 
+     * not resumed, or not running, the function will return FALSE.
      * @since 1.5
      */
     public function isResumed(){
         return $this->resumed;
+    }
+    /**
+     * Checks if the session is resumed or not.
+     * @return boolean TRUE if the session is new. If the session is 
+     * not new, or not running, the function will return FALSE.
+     * @since 1.8
+     */
+    public function isNew() {
+        return $this->new;
     }
     /**
      * Returns the ID of a session from a cookie given its name.
@@ -900,12 +984,6 @@ class SessionManager implements JsonI{
             ini_set('session.use_cookies', 1);
             session_id(self::getSessionIDFromCookie($this->getName()));
             session_start();
-            $sessionTime = $this->getLifetime();
-            Logger::log('Session time = \''.$sessionTime.'\'.', 'debug');
-            Logger::log('Updating the value of \'session.gc_maxlifetime\'...');
-            ini_set('session.gc_maxlifetime', $sessionTime);
-            Logger::log('Updating the value of \'session.gc_maxlifetime\'...');
-            ini_set('session.cookie_lifetime', $sessionTime);
             Logger::log('Validating session attributes...');
             if($this->validateAttrs()){
                 Logger::log('Session attributes are valid.');
@@ -921,8 +999,17 @@ class SessionManager implements JsonI{
                         Logger::log('Session status updated to \'resumed\'.');
                         $this->resumed = true;
                         $this->sessionStatus = self::RESUMED;
+                        $sessionTime = $this->getLifetime();
+                        Logger::log('Session time = \''.$sessionTime.'\'.', 'debug');
+                        Logger::log('Updating the value of \'session.gc_maxlifetime\'...');
+                        ini_set('session.gc_maxlifetime', $sessionTime);
+                        Logger::log('Updating the value of \'session.gc_maxlifetime\'...');
+                        ini_set('session.cookie_lifetime', $sessionTime);
                         //update resume time
                         $_SESSION['resumed-at'] = time();
+                        $_SESSION['session-name'] = $this->getName();
+                        $this->resumed = TRUE;
+                        $this->new = FALSE;
                         Logger::log('Resumed at: '.$_SESSION['resumed-at'], 'debug');
                         if($this->isRefresh()){
                             Logger::log('Refreshing session timeout time...');
@@ -970,7 +1057,8 @@ class SessionManager implements JsonI{
     }
     /**
      * Returns the name of the session.
-     * @return string The name of the session.
+     * @return string The name of the session. The returned value will be not 
+     * the one stored in $_SESSION['session-name'].
      * @since 1.5
      */
     public function getName() {

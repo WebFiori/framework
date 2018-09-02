@@ -72,7 +72,14 @@ class Functions {
      * @since 1.0
      */
     const EMPTY_STRING = 'emp_string';
-    
+    /**
+     * Creates new instance of the class.
+     * @param string $linkedSessionName The name of the session that will 
+     * be linked with the class instance. The name can consist of any character 
+     * other than space, comma, semi-colon and equal sign. If the name has one 
+     * of the given characters, the session will have new randomly generated name.
+     * @since 1.0
+     */
     public function __construct($linkedSessionName='pa-session') {
         Logger::logFuncCall(__METHOD__);
         if(self::$sessions === NULL){
@@ -82,6 +89,9 @@ class Functions {
         Logger::log('Initializing lined session...');
         $linkedSession = new SessionManager($linkedSessionName);
         $linkedSession->initSession();
+        Logger::log('Setting linked session name...');
+        $this->sessionName = $linkedSession->getName();
+        Logger::log('Linked session name = \''.$this->sessionName.'\'.', 'debug');
         self::$sessions[$linkedSession->getName()] = $linkedSession;
         Logger::log('Finished initializing linked session.');
         Logger::logFuncReturn(__METHOD__);
@@ -141,6 +151,7 @@ class Functions {
      * A session manager.
      * @var SessionManager an instance of 'SessionManager'.
      * @since 1.0 
+     * @deprecated since version 1.3
      */
     private $mainSession;
     /**
@@ -202,7 +213,6 @@ class Functions {
      * @deprecated since version 1.3
      */
     public function getMainSession(){
-        Logger::logFuncCall(__METHOD__);
         return $this->getSession();
     }
     /**

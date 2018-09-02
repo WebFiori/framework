@@ -44,9 +44,21 @@ if(!defined('ROOT_DIR')){
  * The base class for creating application logic and connecting to the database.
  *
  * @author Ibrahim
- * @version 1.2
+ * @version 1.3
  */
 class Functions {
+    /**
+     *
+     * @var string
+     * @since 1.3
+     */
+    private $sessionName;
+    /**
+     *
+     * @var array
+     * @since 1.3 
+     */
+    private static $sessions;
     /**
      * A constant that indicates a user is not authorized to perform specific 
      * function.
@@ -61,12 +73,17 @@ class Functions {
      */
     const EMPTY_STRING = 'emp_string';
     
-    public function __construct() {
+    public function __construct($linkedSessionName='pa-session') {
         Logger::logFuncCall(__METHOD__);
-        Logger::log('Initializing main session...');
-        $this->mainSession = new SessionManager('pa-session');
-        $this->mainSession->initSession();
-        Logger::log('Finished initializing main session');
+        if(self::$sessions === NULL){
+            Logger::log('Initializing sessions array...');
+            self::$sessions = array();
+        }
+        Logger::log('Initializing lined session...');
+        $linkedSession = new SessionManager($linkedSessionName);
+        $linkedSession->initSession();
+        self::$sessions[$linkedSession->getName()] = $linkedSession;
+        Logger::log('Finished initializing linked session.');
         Logger::logFuncReturn(__METHOD__);
     }
     /**
@@ -78,7 +95,7 @@ class Functions {
         Logger::logFuncCall(__METHOD__);
         $systemStatus = Util::checkSystemStatus();
         if($systemStatus === TRUE){
-            $result = $this->mainSession->useDb(array(
+            $result = $this->getSession()->useDb(array(
                 'host'=>Config::get()->getDBHost(),
                 'user'=>Config::get()->getDBUser(),
                 'pass'=>Config::get()->getDBPassword(),
@@ -91,7 +108,7 @@ class Functions {
                 Logger::log('Error Message: '.$dbLink->getErrorMessage(), 'error');
                 Logger::requestCompleted();
                 header('content-type:application/json');
-                die($this->mainSession->getDBLink()->toJSON());
+                die($this->getSession()->getDBLink()->toJSON());
             }
             else if($result !== TRUE && defined('SETUP_MODE')){
                 Logger::log('Unable to connect to the database while in setup mode.', 'warning');
@@ -170,7 +187,7 @@ class Functions {
         Logger::log('Prevalege ID = \''.$pId.'\'.', 'debug');
         $retVal = FALSE;
         if($this->getUserID() != -1){
-            $retVal = $this->mainSession->getUser()->hasPrivilege($pId);
+            $retVal = $this->getSession()->getUser()->hasPrivilege($pId);
         }
         else{
             Logger::log('Invalid user in session variable.', 'warning');
@@ -182,10 +199,19 @@ class Functions {
      * Returns the instance of <b>SessionManager</b> that is used by the logic.
      * @return SessionManager An object of type <b>SessionManager</b>
      * @since 1.0
+     * @deprecated since version 1.3
      */
     public function getMainSession(){
         Logger::logFuncCall(__METHOD__);
-        return $this->mainSession;
+        return $this->getSession();
+    }
+    /**
+     * 
+     * @return SessionManager
+     * @since 1.3
+     */
+    public function getSession() {
+        return self::$sessions[$this->sessionName];
     }
     /**
      * Returns language code from the session manager.
@@ -198,7 +224,7 @@ class Functions {
     public final function getSessionLang($forceUpdate=true){
         Logger::logFuncCall(__METHOD__);
         Logger::log('Force Update = \''.$forceUpdate.'\'', 'debug');
-        $retVal = $this->getMainSession()->getLang($forceUpdate);
+        $retVal = $this->getSession()->getLang($forceUpdate);
         Logger::logFuncReturn(__METHOD__);
         return $retVal;
     }
@@ -209,7 +235,7 @@ class Functions {
      */
     public function getDBLink() {
         Logger::logFuncCall(__METHOD__);
-        $retVal = $this->getMainSession()->getDBLink();
+        $retVal = $this->getSession()->getDBLink();
         Logger::logFuncReturn(__METHOD__);
         return $retVal;
     }
@@ -223,8 +249,8 @@ class Functions {
     public function rows(){
         Logger::logFuncCall(__METHOD__);
         $retVal = -1;
-        if($this->mainSession->getDBLink() !== NULL){
-            $retVal = $this->getMainSession()->getDBLink()->rows();
+        if($this->getSession()->getDBLink() !== NULL){
+            $retVal = $this->getSession()->getDBLink()->rows();
         }
         else{
             Logger::log('Database link is NULL.', 'warning');
@@ -243,8 +269,8 @@ class Functions {
     public function getRow(){
         Logger::logFuncCall(__METHOD__);
         $retVal = NULL;
-        if($this->getMainSession()->getDBLink() != NULL){
-            $retVal = $this->getMainSession()->getDBLink()->getRow();
+        if($this->getSession()->getDBLink() != NULL){
+            $retVal = $this->getSession()->getDBLink()->getRow();
         }
         else{
             Logger::log('Database link is NULL.', 'warning');
@@ -262,8 +288,8 @@ class Functions {
     public function getUserID(){
         Logger::logFuncCall(__METHOD__);
         $retVal = -1;
-        if($this->getMainSession()->getUser() != NULL){
-            $retVal = intval($this->getMainSession()->getUser()->getID());
+        if($this->getSession()->getUser() != NULL){
+            $retVal = intval($this->getSession()->getUser()->getID());
         }
         else{
             Logger::log('The linked user is NULL.', 'warning');

@@ -148,13 +148,13 @@ class SessionManager implements JsonI{
     public function __construct($session_name='pa-seesion') {
         Logger::logFuncCall(__METHOD__);
         Logger::log('Validating session name...');
-        if(strlen($session_name) != 0){
+        if($this->validateName($session_name) === TRUE){
             Logger::log('Valid session name.');
             $this->sessionName = $session_name;
         }
         else{
-            Logger::log('Invalid session name. Using default.','warning');
-            $this->sessionName = 'pa-session';
+            Logger::log('Invalid session name. Generating random name.','warning');
+            $this->sessionName = $this->generateRandSessionName();
         }
         Logger::log('Session name is set to \''.$this->sessionName.'\'.', 'debug');
         //initial life time: 120 minutes.
@@ -172,6 +172,48 @@ class SessionManager implements JsonI{
         }
         Logger::logFuncReturn(__METHOD__);
         //session_save_path(ROOT_DIR.'/tmp');
+    }
+    /**
+     * Generate a random session name.
+     * @return string A random session name in the formate 'session-xxxxxxxx'.
+     * @since 1.8
+     */
+    public static function generateRandSessionName(){
+        $retVal = 'session-';
+        for($x = 0 ; $x < 8 ; $x++){
+            $hash = hash('sha256', rand(0, 100).$retVal);
+            $retVal .= $hash[$x + rand(0, 40)];
+        }
+        return $retVal;
+    }
+    /**
+     * Validate the name of the session.
+     * @param string $name The name of the session. The following characters are 
+     * invalid in session name: space, comma, semi-colon and equal sign.
+     * @return boolean The function will return TRUE if the name of the session 
+     * is valid.
+     * @since 1.8
+     */
+    private function validateName($name) {
+        Logger::logFuncCall(__METHOD__);
+        $len = strlen($name);
+        $retVal = TRUE;
+        Logger::log('Validating name length...');
+        if($len != 0){
+            Logger::log('Validating characters in name...');
+            for($x = 0 ; $x < $len ; $x++){
+                $char = $name[$x];
+                Logger::log('Character = \''.$char.'\'.', 'debug');
+                if($char == ' ' || $char == ',' || $char == ';' || $char == '='){
+                    Logger::log('Invalid character was found.','warning');
+                    $retVal = FALSE;
+                    break;
+                }
+            }
+        }
+        Logger::logReturnValue($retVal);
+        Logger::logFuncReturn(__METHOD__);
+        return $retVal;
     }
     /**
      * Generate a random session ID.
@@ -852,16 +894,24 @@ class SessionManager implements JsonI{
         $retVal = FALSE;
         Logger::log('Checking if session has a cookie...');
         if($this->hasCookie()){
+            Logger::log('Session has a cookie.');
             session_name($this->getName());
-            ini_set('session.gc_maxlifetime', $this->getLifetime());
-            ini_set('session.cookie_lifetime', $this->getLifetime());
+            Logger::log('Updating the value of \'session.use_cookies\'...');
             ini_set('session.use_cookies', 1);
             session_id(self::getSessionIDFromCookie($this->getName()));
             session_start();
+            $sessionTime = $this->getLifetime();
+            Logger::log('Session time = \''.$sessionTime.'\'.', 'debug');
+            Logger::log('Updating the value of \'session.gc_maxlifetime\'...');
+            ini_set('session.gc_maxlifetime', $sessionTime);
+            Logger::log('Updating the value of \'session.gc_maxlifetime\'...');
+            ini_set('session.cookie_lifetime', $sessionTime);
             Logger::log('Validating session attributes...');
             if($this->validateAttrs()){
+                Logger::log('Session attributes are valid.');
                 Logger::log('Checking if session has timed out...');
                 if(!$this->isTimeout()){
+                    Logger::log('Session still has time.');
                     $ip = filter_var($_SERVER['REMOTE_ADDR'],FILTER_VALIDATE_IP);
                     if($ip == '::1'){
                         $ip = '127.0.0.1';

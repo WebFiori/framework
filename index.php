@@ -124,7 +124,7 @@ class LisksCode{
         //also enable logging for info, warnings and errors 
         Logger::logName('initialization-log');
         Util::displayErrors();
-        
+        define('DEBUG', '');
         $this->SF = SystemFunctions::get();
         $this->WF = WebsiteFunctions::get();
         $this->BMF = BasicMailFunctions::get();

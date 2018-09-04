@@ -86,7 +86,7 @@ class Functions {
             Logger::log('Initializing sessions array...');
             self::$sessions = array();
         }
-        Logger::log('Initializing lined session...');
+        Logger::log('Initializing linked session...');
         $linkedSession = new SessionManager($linkedSessionName);
         $linkedSession->initSession();
         Logger::log('Setting linked session name...');

@@ -325,13 +325,13 @@ class Logger {
                 $this->handelr = fopen($this->_getDirectory().'/'.$this->_getLogName().'.txt', 'a+');
                 $time = date('Y-m-d h:i:s T');
                 if($this->functionsStack->size() != 0){
-                    fwrite($this->handelr, '['.$time.']  '.$bType.': ['.$this->functionsStack->peek().'] '.$content."\n");
+                    fwrite($this->handelr, '['.$time.']  '.$bType.': ['.$this->functionsStack->peek().'] '.$content."\r\n");
                 }
                 else{
-                    fwrite($this->handelr, '['.$time.']  '.$bType.': '.$content."\n");
+                    fwrite($this->handelr, '['.$time.']  '.$bType.': '.$content."\r\n");
                 }
                 if($addDashes === TRUE){
-                    fwrite($this->handelr, '-------------------------------------'."\n");
+                    fwrite($this->handelr, '-------------------------------------'."\r\n");
                 }
                 fclose($this->handelr);
             }

@@ -141,6 +141,7 @@ class Page{
         return $page->getCanonical();
     }
     private function __construct() {
+        Logger::logFuncCall(__METHOD__);
         $this->document = new HTMLDoc();
         $this->setTitle('Default X');
         $this->setWebsiteName('My X Website');
@@ -177,6 +178,7 @@ class Page{
         $footerNode = new HTMLNode();
         $footerNode->setID('page-footer');
         $this->document->addChild($footerNode);
+        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * Sets or returns the name of page website.

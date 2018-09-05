@@ -150,7 +150,7 @@ class SocketMailer {
      * @since 1.0
      */
     public function __construct() {
-        Logger::logFuncCall(__FUNCTION__);
+        Logger::logFuncCall(__METHOD__);
         Logger::log('Creating new instance of SocketMailer.');
         $this->setTimeout(5);
         $this->receivers = array();
@@ -162,7 +162,7 @@ class SocketMailer {
         $this->boundry = hash('sha256', date(DATE_ISO8601));
         $this->attachments = array();
         $this->lastResponse = '';
-        Logger::logFuncReturn(__FUNCTION__);
+        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * Adds new attachment to the message.
@@ -235,7 +235,7 @@ class SocketMailer {
                 //a command to check if authentication is done
                 $this->sendC('MAIL FROM: <'.$this->getSenderAddress().'>');
 
-                if($this->getLastLogMessage() == 'Response: 235 Authentication succeeded'){
+                if($this->getLastLogMessage() == '235 Authentication succeeded'){
                     Logger::log('Logged in. Valid credentials.');
                     $this->isLoggedIn = TRUE;
                 }

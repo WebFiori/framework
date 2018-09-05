@@ -164,10 +164,12 @@ class EmaiMessage {
         self::createInstance()->_getSocketMailer()->setSubject($subject);
     }
     /**
+     * Sends the message and set message instance to NULL.
      * @since 1.0
      */
     public static function send(){
         self::createInstance()->_sendMessage();
+        self::$em = NULL;
     }
     /**
      * @since 1.0

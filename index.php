@@ -206,28 +206,21 @@ class LisksCode{
         //in this part, you can configure the ststem. 
         
         //the first thing you might need to do is to update basic website
-        //attributes.
-        //$this->setWebsiteAttributes();
+        //attributes. 
+        $this->setWebsiteAttributes();
 
         //After that, if your app uses MySQL database, you can set connection 
-        //parameters here. If it does not, skip this step.
-        //$this->setDatabaseConnection();
+        //parameters here. If it does not, skip this step by commenting 
+        //the next line.
+        $this->setDatabaseConnection();
 
 
         //Also, you can add SMTP email account that you can use to send email 
         //messages if your system uses this functionality.
-        
-        //$account = new EmailAccount();
-        //$account->setName('no-replay');
-        //$account->setAddress('myAddress@example.com');
-        //$account->setPassword('xxx');
-        //$account->setUsername('hello@example.com');
-        //$account->setPort(25);
-        //$account->setServerAddress('mail.example.com');
-        //$this->BMF->updateOrAddEmailAccount($account);
+        $this->addSMTPAccounts();
         
         //once configuration is finished, call the function SystemFunctions::configured()
-        $this->SF->configured();
+        //$this->SF->configured();
         
         //do not remove next lines of code.
         //Used to show error message in case the 
@@ -238,6 +231,24 @@ class LisksCode{
         }
         Logger::logFuncReturn(__METHOD__, 'initialization-log');
     }
+    /**
+     * Adds SMTP accounts during initialization.
+     * @since 1.1
+     */
+    private function addSMTPAccounts() {
+        //$account = new EmailAccount();
+        //$account->setName('no-replay');
+        //$account->setAddress('myAddress@example.com');
+        //$account->setPassword('xxx');
+        //$account->setUsername('hello@example.com');
+        //$account->setPort(25);
+        //$account->setServerAddress('mail.example.com');
+        //$this->BMF->updateOrAddEmailAccount($account);
+    }
+    /**
+     * Updates basic settings of the web site.
+     * @since 1.1
+     */
     private function setWebsiteAttributes() {
         $siteInfoArr = $this->WF->getSiteConfigVars();
         $siteInfoArr['base-url'] = Util::getBaseURL();
@@ -248,7 +259,12 @@ class LisksCode{
         $siteInfoArr['website-names'] = array('AR'=>'أكاديميا البرمجة','EN'=>'Programming Academia');
         $this->WF->updateSiteInfo($siteInfoArr);
     }
+    /**
+     * Updates database settings.
+     * @since 1.1
+     */
     private function setDatabaseConnection() {
+        //only change the values of the following 4 variables.
         $dbHost = 'localhost';
         $dbUser = 'root';
         $dbPass = '';

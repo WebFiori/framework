@@ -3,7 +3,7 @@
  * The instance of this class is used to control basic settings of 
  * the framework. Also, it is the entry point of any request.
  * @author Ibrahim Ali <ibinshikh@hotmail.com>
- * @version 1.0
+ * @version 1.1
  */
 class LisksCode{
     /**
@@ -124,13 +124,13 @@ class LisksCode{
         //also enable logging for info, warnings and errors 
         Logger::logName('initialization-log');
         Util::displayErrors();
-        define('DEBUG', '');
-        $this->SF = SystemFunctions::get();
-        $this->WF = WebsiteFunctions::get();
-        $this->BMF = BasicMailFunctions::get();
         
         //enable logging of debug info.
         define('DEBUG', '');
+        
+        $this->SF = SystemFunctions::get();
+        $this->WF = WebsiteFunctions::get();
+        $this->BMF = BasicMailFunctions::get();
         
         $this->sysStatus = Util::checkSystemStatus();
         $this->initRoutes();
@@ -204,9 +204,41 @@ class LisksCode{
     private function firstUse(){
         Logger::logFuncCall(__METHOD__, 'initialization-log');
         //in this part, you can configure the ststem. 
+        
         //the first thing you might need to do is to update basic website
         //attributes.
+        //$this->setWebsiteAttributes();
 
+        //After that, if your app uses MySQL database, you can set connection 
+        //parameters here. If it does not, skip this step.
+        //$this->setDatabaseConnection();
+
+
+        //Also, you can add SMTP email account that you can use to send email 
+        //messages if your system uses this functionality.
+        
+        //$account = new EmailAccount();
+        //$account->setName('no-replay');
+        //$account->setAddress('myAddress@example.com');
+        //$account->setPassword('xxx');
+        //$account->setUsername('hello@example.com');
+        //$account->setPort(25);
+        //$account->setServerAddress('mail.example.com');
+        //$this->BMF->updateOrAddEmailAccount($account);
+        
+        //once configuration is finished, call the function SystemFunctions::configured()
+        $this->SF->configured();
+        
+        //do not remove next lines of code.
+        //Used to show error message in case the 
+        //system is not configured.
+        if(!$this->SF->isSetupFinished()){
+            Logger::log('Initialization faild.','error','initialization-log');
+            $this->needConfigration();
+        }
+        Logger::logFuncReturn(__METHOD__, 'initialization-log');
+    }
+    private function setWebsiteAttributes() {
         $siteInfoArr = $this->WF->getSiteConfigVars();
         $siteInfoArr['base-url'] = Util::getBaseURL();
         $siteInfoArr['primary-language'] = 'AR';
@@ -215,9 +247,8 @@ class LisksCode{
         $siteInfoArr['site-descriptions'] = array('AR'=>'','EN'=>'');
         $siteInfoArr['website-names'] = array('AR'=>'أكاديميا البرمجة','EN'=>'Programming Academia');
         $this->WF->updateSiteInfo($siteInfoArr);
-
-        //After that, if your app uses MySQL database, you can set connection 
-        //parameters here. If it does not, skip this step.
+    }
+    private function setDatabaseConnection() {
         $dbHost = 'localhost';
         $dbUser = 'root';
         $dbPass = '';
@@ -248,31 +279,6 @@ class LisksCode{
             header('HTTP/1.1 503 Service Unavailable');
             die($dbLink->toJSON().'');
         }
-
-
-        //Also, you can add SMTP email account that you can use to send email 
-        //messages if your system uses this functionality.
-        
-        //$account = new EmailAccount();
-        //$account->setName('no-replay');
-        //$account->setAddress('myAddress@example.com');
-        //$account->setPassword('xxx');
-        //$account->setUsername('hello@example.com');
-        //$account->setPort(25);
-        //$account->setServerAddress('mail.example.com');
-       // $this->BMF->updateOrAddEmailAccount($account);
-        
-        //once configuration is finished, call the function SystemFunctions::configured()
-        //$this->SF->configured();
-        
-        //do not remove next lines of code.
-        //Used to show error message in case the 
-        //system is not configured.
-        if(!$this->SF->isSetupFinished()){
-            Logger::log('Initialization faild.','error','initialization-log');
-            $this->needConfigration();
-        }
-        Logger::logFuncReturn(__METHOD__, 'initialization-log');
     }
     /**
      * Show an error message that tells the user about system status and how to 

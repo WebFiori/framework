@@ -1,26 +1,9 @@
 <?php
-if(!defined('ROOT_DIR')){
-    header("HTTP/1.1 403 Forbidden");
-    die(''
-        . '<!DOCTYPE html>'
-        . '<html>'
-        . '<head>'
-        . '<title>Forbidden</title>'
-        . '</head>'
-        . '<body>'
-        . '<h1>403 - Forbidden</h1>'
-        . '<hr>'
-        . '<p>'
-        . 'Direct access not allowed.'
-        . '</p>'
-        . '</body>'
-        . '</html>');
-}
 /**
  * An autoloader class to load classes as needed during runtime.
  *
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.0
+ * @version 1.1
  */
 class AutoLoader{
     /**
@@ -36,51 +19,110 @@ class AutoLoader{
      */
     private $rootDir;
     /**
-     * A single instance of the class <b>AutoLoader</b>.
+     * A single instance of the class 'AutoLoader'.
      * @var AutoLoader
      * @since 1.0 
      */
     private static $loader;
     /**
-     * Returns an instance of the class <b>AutoLoader</b>.
-     * @return AutoLoader
-     * @throws Exception An exception will be thrown if the constant 
-     * <b>ROOT_DIR</b> is undefined.
+     *
+     * @var Logger 
+     * @ssince 1.1
      */
-    public static function get() {
-        if(self::$loader != NULL){
-            return self::$loader;
+    private static $logger;
+    /**
+     * Returns a singleton instance of the class 'AutoLoader'.
+     * @param $options [Optional] An associative array of options that is used to initialize 
+     * the autoloader. The available options are:
+     * <ul>
+     * <li><b>root</b>: A directory that can be used as a base search folder. 
+     * Default is empty string. Ignored if the constant ROOT_DIR is defined.</li>
+     * <li><b>search-folders</b>: An array which contains a set of folders to search 
+     * on. Default is an empty array.</li>
+     * <li><b>define-root</b>: If set to TRUE, The autoloader will define 
+     * the constant 'ROOT_DIR'. Default is FALSE. Ignored if the constant 
+     * ROOT_DIR is defined.</li>
+     * </ul>
+     * @return AutoLoader
+     * @throws Exception 
+     */
+    public static function &get($options=array(
+        'define-root'=>false,
+        'search-folders'=>array(),
+        'root'=>''
+    )) {
+        //Logger::logFuncCall(__METHOD__);
+        if(self::$loader === NULL){
+            $frameworkSearchFoldres = array(
+                '',
+                '/entity',
+                '/entity/queries',
+                '/entity/rest-easy',
+                '/entity/jsonx',
+                '/entity/ph-mysql',
+                '/entity/html-php-structs/structs',
+                '/entity/html-php-structs/html',
+                '/entity/router',
+                '/entity/mail',
+                '/publish',
+                '/publish/themes',
+                '/functions',
+                '/apis'
+            );
+            if(isset($options['search-folders'])){
+                foreach ($options['search-folders'] as $folder){
+                    $frameworkSearchFoldres[] = '/'.trim($folder,'/');
+                }
+            }
+            $defineRoot = isset($options['define-root']) && $options['define-root'] === TRUE ? TRUE : FALSE;
+            $root = isset($options['define-root']) ? $options['define-root'] : '';
+            self::$loader = new AutoLoader($root, $frameworkSearchFoldres, $defineRoot);
         }
-        self::$loader = new AutoLoader(ROOT_DIR, array(
-            '',
-            '/entity',
-            '/entity/queries',
-            '/entity/rest-easy',
-            '/entity/jsonx',
-            '/entity/ph-mysql',
-            '/entity/html-php-structs/structs',
-            '/entity/html-php-structs/html',
-            '/entity/router',
-            '/entity/mail',
-            '/publish',
-            '/functions',
-            '/apis'
-        ));
+        //Logger::logFuncReturn(__METHOD__);
         return self::$loader;
     }
-    
-    private function __construct($root='',$searchFolders=array()) {
+    /**
+     * 
+     * @param type $root
+     * @param type $searchFolders
+     * @param type $defineRoot
+     * @throws Exception
+     * @since 1.0
+     */
+    private function __construct($root='',$searchFolders=array(),$defineRoot=false) {
+        //Logger::logFuncCall(__METHOD__);
+        //Logger::log('$root = \''.$root.'\'', 'debug');
+        //Logger::log('$defineRoot = \''.$defineRoot.'\'', 'debug');
         if(defined('ROOT_DIR')){
+            //Logger::log('Setting root search directory to ROOT_DIR.');
             $this->rootDir = ROOT_DIR;
         }
         else{
+            //Logger::log('ROOT_DIR is not defined.', 'warning');
             if(strlen($root) != 0 && is_dir($root)){
                 $this->rootDir = $root;
+                if($defineRoot === TRUE){
+                    //Logger::log('Defining ROOT_DIR.');
+                    define('ROOT_DIR', $this->rootDir);
+                    //Logger::log('ROOT_DIR = \''.ROOT_DIR.'\'.','debug');
+                }
+            }
+            else if($defineRoot === TRUE){
+                //Logger::log('ROOT_DIR is not defined.', 'warning');
+                //Logger::log('Defining ROOT_DIR.');
+                $this->rootDir = __DIR__;
+                foreach ($searchFolders as $folder){
+                    $this->rootDir = str_replace($folder, '', $this->rootDir);
+                }
+                define('ROOT_DIR', $this->rootDir);
+                //Logger::log('ROOT_DIR = \''.ROOT_DIR.'\'.','debug');
             }
             else{
-                throw new Exception('Invalid Root Directory: '.$root);
+                //Logger::log('Unable to set root search folder. An exception is thrown.','error');
+                throw new Exception('Unable to set root search folder.');
             }
         }
+        //Logger::log('Root search folder was set to \''.$this->rootDir.'\'.', 'debug');
         if(gettype($searchFolders) == 'array'){
             $this->searchFolders = $searchFolders;
         }
@@ -95,9 +137,13 @@ class AutoLoader{
      * @since 1.0
      */
     public function addSearchDirectory($dir) {
+        //Logger::logFuncCall(__METHOD__);
+        //Logger::log('Passed value = \''.$dir.'\'', 'debug');
         if(strlen($dir) != 0){
-            array_push($this->searchFolders, $dir);
+            array_push($this->searchFolders, '/'. trim($dir, '/'));
+            //Logger::log('Folder added.');
         }
+        //Logger::logFuncReturn(__METHOD__);
     }
     /**
      * Tries to load a class given its name.
@@ -105,13 +151,21 @@ class AutoLoader{
      * @since 1.0
      */
     private function loadClass($className){
+        //Logger::logFuncCall(__METHOD__);
+        //Logger::log('Trying to load the class \''.$className.'\'.');
         foreach ($this->searchFolders as $value) {
             $f = $this->getRoot().$value.'/'.$className.'.php';
+            //Logger::log('Checking if file \''.$f.'\' exist...', 'debug');
             if(file_exists($f)){
+                //Logger::log('Class \''.$className.'\' found. Loading the class...');
                 require $f;
+                //Logger::log('Class \''.$className.'\' loaded.');
+                //Logger::logFuncReturn(__METHOD__);
                 return;
             }
         }
+        //Logger::log('Class \''.$className.'\' was not found.', 'error');
+        //Logger::logFuncReturn(__METHOD__);
     }
     /**
      * Returns the root directory that is used to search inside.

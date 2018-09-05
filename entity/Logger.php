@@ -112,6 +112,14 @@ class Logger {
         return self::$logger;
     }
     /**
+     * Returns a singleton of the class.
+     * @return Logger
+     * @since 1.1
+     */
+    public static function get(){
+        return self::_get();
+    }
+    /**
      * Adds a log message to log function return value (debug).
      * @param mixed $val The return value of a function.
      * @param type $logName [Optional] The name of the log file. If it is not 

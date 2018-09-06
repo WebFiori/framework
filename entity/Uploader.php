@@ -28,6 +28,15 @@ class Uploader implements JsonI{
      * @since 1.1
      */
     const ALLOWED_FILE_TYPES = array(
+        //audio and video
+        'avi'=>array(
+            'mime'=>'video/avi',
+            'ext'=>'avi'
+        ),
+        'mp3'=>array(
+            'mime'=>'audio/mpeg',
+            'ext'=>'mp3'
+        ),
         '3gp'=>array(
             'mime'=>'video/3gpp',
             'ext'=>'3gp'
@@ -48,25 +57,10 @@ class Uploader implements JsonI{
             'mime'=>'video/x-flv',
             'ext'=>'flv'
         ),
-        'zip'=>array(
-            'mime'=>'application/zip',
-            'ext'=>'zip'
-        ),
-        'php'=>array(
-            'mime'=>'text/plain',
-            'ext'=>'php'
-        ),
-        'avi'=>array(
-            'mime'=>'video/avi',
-            'ext'=>'avi'
-        ),
-        'mp3'=>array(
-            'mime'=>'audio/mpeg',
-            'ext'=>'mp3'
-        ),
-        'xls'=>array(
-            'mime'=>'application/vnd.ms-excel',
-            'ext'=>'xls'
+        //images 
+        'jpeg'=>array(
+            'mime'=>'image/jpeg',
+            'ext'=>'jpeg'
         ),
         'jpg'=>array(
             'mime'=>'image/jpeg',
@@ -76,24 +70,60 @@ class Uploader implements JsonI{
             'mime'=>'image/png',
             'ext'=>'png'
         ),
+        //pdf 
         'pdf'=>array(
             'mime'=>'application/pdf',
             'ext'=>'pdf'
         ),
-        'txt'=>array(
-            'mime'=>'text/plain',
-            'ext'=>'txt'
-        ),
+        //MS office documents
         'doc'=>array(
             'mime'=>'application/msword',
             'ext'=>'doc'
         ),
-        'jpeg'=>array(
-            'mime'=>'image/jpeg',
-            'ext'=>'jpeg'
+        'docx'=>array(
+            'mime'=>'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'ext'=>'docx'
+        ),
+        'xls'=>array(
+            'mime'=>'application/vnd.ms-excel',
+            'ext'=>'xls'
+        ),
+        'ppt'=>array(
+            'mime'=>'application/vnd.ms-powerpoint',
+            'ext'=>'ppt'
+        ),
+        'pptx'=>array(
+            'mime'=>'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+            'ext'=>'pptx'
+        ),
+        'xlsx'=>array(
+            'mime'=>'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'ext'=>'xlsx'
+        ),
+        //other text based files
+        'txt'=>array(
+            'mime'=>'text/plain',
+            'ext'=>'txt'
+        ),
+        'php'=>array(
+            'mime'=>'text/plain',
+            'ext'=>'php'
+        ),
+        //other files
+        'zip'=>array(
+            'mime'=>'application/zip',
+            'ext'=>'zip'
+        ),
+        'exe'=>array(
+            'mime'=>'application/vnd.microsoft.portable-executable',
+            'ext'=>'exe'
         )
     );
-    private $baseUrl;
+    /**
+     * An array which contains uploaded files.
+     * @var array
+     * @since 1.0 
+     */
     private $files;
     /**
      * A constant to indicate that a file extension is not allowed to be uploaded.
@@ -117,12 +147,16 @@ class Uploader implements JsonI{
      * @since 1.0 
      */
     private $uploadStatusMessage;
-
-    public function setBaseURL($url) {
-        $this->baseUrl = $url;
-    }
+    /**
+     * Creates new instance of the class.
+     * @since 1.0
+     */
     public function __construct() {
+        Logger::logFuncCall(__METHOD__);
         $this->uploadStatusMessage = 'NO ACTION';
+        $this->files = array();
+        $this->setUploadDir('\\uploades');
+        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * The directory at which the file will be uploaded to.
@@ -138,12 +172,51 @@ class Uploader implements JsonI{
     private $extentions = array();
     /**
      * Sets the directory at which the file will be uploaded to.
-     * @param string $dir Upload Directory.
+     * @param string $dir Upload Directory (such as '/files/uploads'). 
+     * @return boolean If upload directory was updated, the function will 
+     * return TRUE. If not updated, the function will return FALSE.
      * @since 1.0
      */
     public function setUploadDir($dir){
-        $this->uploadDir = str_replace('/', '\\', $dir);
+        Logger::logFuncCall(__METHOD__);
+        $retVal = FALSE;
+        $len = strlen($dir);
+        Logger::log('Checking length...');
+        if($len > 0){
+            Logger::log('Trimming forward and backward slashes...');
+            while($dir[$len] == '/' || $dir[$len] == '\\'){
+                $tmpDir = trim($dir,'/');
+                $dir = trim($tmpDir,'\\');
+                $len = strlen($dir);
+            }
+            while($dir[0] == '/' || $dir[0] == '\\'){
+                $tmpDir = trim($dir,'/');
+                $dir = trim($tmpDir,'\\');
+            }
+            Logger::log('Finished.');
+            Logger::log('Validating trimming result...');
+            if(strlen($dir) > 0){
+                $this->uploadDir = '\\'.str_replace('/', '\\', $dir);
+                Logger::log('New upload directory = \''.$this->uploadDir.'\'', 'debug');
+                $retVal = TRUE;
+            }
+            else{
+                Logger::log('Empty string after trimming.','warning');
+            }
+        }
+        else{
+            Logger::log('Empty string is given.', 'warning');
+        }
+        Logger::logReturnValue($retVal);
+        Logger::logFuncReturn(__METHOD__);
     }
+    /**
+     * Returns an array which contains all information about the uploaded 
+     * files.
+     * @return array
+     * @since 1.0
+     * 
+     */
     public function getFiles() {
         return $this->files;
     }
@@ -155,7 +228,41 @@ class Uploader implements JsonI{
      * @since 1.0
      */
     public function addExt($ext){
-        array_push($this->extentions, $ext);
+        Logger::logFuncCall(__METHOD__);
+        Logger::log('$ext = \''.$ext.'\'','debug');
+        Logger::log('Removing the suffix if any.');
+        $ext = str_replace('.', '', $ext);
+        $len = strlen($ext);
+        $retVal = TRUE;
+        Logger::log('Checking length...');
+        if($len != 0){
+            Logger::log('Validating  characters...');
+            for($x = 0 ; $x < $len ; $x++){
+                $ch = $ext[$x];
+                if($ch == '_' || ($ch >= 'a' && $ch <= 'z') || ($ch >= 'A' && $ch <= 'Z') || ($ch >= '0' && $ch <= '9')){
+                    
+                }
+                else{
+                    Logger::log('Invalid character found: \''.$ch.'\'.', 'warning');
+                    $retVal = FALSE;
+                    break;
+                }
+            }
+            if($retVal === TRUE){
+                $this->extentions[] = $ext;
+                Logger::log('Extention added.');
+            }
+            else{
+                Logger::log('Extention not added.','warning');
+            }
+        }
+        else{
+            Logger::log('Empty string given.', 'warning');
+            $retVal = FALSE;
+        }
+        Logger::logReturnValue($retVal);
+        Logger::logFuncReturn(__METHOD__);
+        return $retVal;
     }
     /**
      * Removes an extention from the array of allowed files types.
@@ -164,7 +271,18 @@ class Uploader implements JsonI{
      * @since 1.0
      */
     public function removeExt($ext){
-        array_pop($this->extentions,$ext);
+        Logger::logFuncCall(__METHOD__);
+        $count = count($this->extentions);
+        $retVal = FALSE;
+        for($x = 0 ; $x < $count ; $x++){
+            if($this->extentions[$x] == $ext){
+                unset($this->extentions[$x]);
+                $retVal = TRUE;
+            }
+        }
+        Logger::logReturnValue($retVal);
+        Logger::logFuncReturn(__METHOD__);
+        return $retVal;
     }
     /**
      * Returns the directory at which the file will be uploaded to.
@@ -183,7 +301,10 @@ class Uploader implements JsonI{
      * @since 1.0
      */
     public function setAssociatedFileName($name){
+        Logger::logFuncCall(__METHOD__);
+        Logger::log('Passed value = \''.$name.'\'.', 'debug');
         $this->asscociatedName = $name;
+        Logger::logFuncCall(__METHOD__);
     }
     /**
      * Returns the array that contains all allowed file types.
@@ -193,17 +314,52 @@ class Uploader implements JsonI{
     public function getExts(){
         return $this->extentions;
     }
+    /**
+     * Returns MIME type of a file extension.
+     * @param string $ext File extension without the suffix (such as 'jpg').
+     * @return string|NULL If the extension MIME type is found, it will be 
+     * returned. If not, the function will return NULL.
+     * @since 1.0
+     */
     public static function getMIMEType($ext){
+        Logger::logFuncCall(__METHOD__);
+        Logger::log('$ext = \''.$ext.'\'', 'debug');
+        $retVal = NULL;
         $x = self::ALLOWED_FILE_TYPES[$ext];
-        if($x != NULL){
-            return $x['mime'];
+        if($x !== NULL){
+            Logger::log('MIME found.');
+            $retVal = $x['mime'];
         }
-        return NULL;
+        else{
+            Logger::log('No MIME type was found for the given value.', 'warning');
+        }
+        Logger::logReturnValue($retVal);
+        Logger::logFuncReturn(__METHOD__);
+        return $retVal;
     }
+    /**
+     * Checks if uploaded file is allowed or not.
+     * @param string $fileName The name of the file (such as 'image.png')
+     * @return boolean If file extension is in the array of allowed types, 
+     * the function will return TRUE.
+     * @since 1.0
+     */
     private function isValidExt($fileName){
+        Logger::logFuncCall(__METHOD__);
+        Logger::log('File name = \''.$fileName.'\'.', 'debug');
         $ext = pathinfo($fileName, PATHINFO_EXTENSION);
-        return in_array($ext, $this->getExts(),TRUE) || in_array(strtolower($ext), $this->getExts(),TRUE);
+        $retVal = in_array($ext, $this->getExts(),TRUE) || in_array(strtolower($ext), $this->getExts(),TRUE);
+        Logger::logReturnValue($retVal);
+        Logger::logFuncCall(__METHOD__);
+        return $retVal;
     }
+    /**
+     * Checks if PHP upload code is error or not.
+     * @param int $code PHP upload code.
+     * @return boolean If the given code does not equal to UPLOAD_ERR_OK, the 
+     * function will return TRUE.
+     * @since 1.0
+     */
     private function isError($code){
         switch($code){
             case UPLOAD_ERR_OK:{
@@ -241,21 +397,38 @@ class Uploader implements JsonI{
      * Upload the file to the server.
      * @param bolean $replaceIfExist If a file with the given name found 
      * and this attribute is set to true, the file will be replaced.
-     * @return boolean
+     * @return array An array which contains uploaded files info. Each index 
+     * will contain an associative array which has the following info:
+     * <ul>
+     * <li><b>file-name</b>: </li>
+     * <li><b>size</b>: </li>
+     * <li><b>upload-path</b>: </li>
+     * <li><b>upload-error</b>: </li>
+     * <li><b>is-exist</b>: </li>
+     * <li><b>is-replace</b>: </li>
+     * <li><b>mime</b>: </li>
+     * <li><b>uploaded</b>: </li>
+     * </ul>
      */
     public function upload($replaceIfExist = false){
+        Logger::logFuncCall(__METHOD__);
         $this->files = array();
-        if($_SERVER['REQUEST_METHOD'] == 'POST'){
+        Logger::log('Checking if request method is \'POST\'.');
+        $reqMeth = $_SERVER['REQUEST_METHOD'];
+        Logger::log('Request method = \''.$reqMeth.'\'.', 'debug');
+        if($reqMeth == 'POST'){
+            Logger::log('Checking if $_FILES[\''.$this->asscociatedName.'\'] is set...');
+            $fileOrFiles = NULL;
             if(isset($_FILES[$this->asscociatedName])){
                 $fileOrFiles = $_FILES[$this->asscociatedName];
+                Logger::log('It is set.');
             }
-            else{
-                return FALSE;
-            }
-            if($fileOrFiles != null){
+            if($fileOrFiles !== null){
                 if(gettype($fileOrFiles['name']) == 'array'){
+                    Logger::log('Multiple files where found.');
                     //multi-upload
                     $filesCount = count($fileOrFiles['name']);
+                    Logger::log('Number of files: \''.$filesCount.'\'.', 'debug');
                     for($x = 0 ; $x < $filesCount ; $x++){
                         $fileInfoArr = array();
                         $fileInfoArr['name'] = $fileOrFiles['name'][$x];
@@ -328,6 +501,7 @@ class Uploader implements JsonI{
                     }
                 }
                 else{
+                    Logger::log('Single file upload.');
                     //single file upload
                     $fileInfoArr = array();
                     $fileInfoArr['name'] = $fileOrFiles['name'];
@@ -400,9 +574,13 @@ class Uploader implements JsonI{
                 }
             }
             else{
-                $this->files[$this->getAssociatedName()] = FileFunctions::NOT_EXIST;
+                Logger::log('The variable $_FILES[\''.$this->asscociatedName.'\'] is not set. No files uploaded.', 'warning');
             }
         }
+        else{
+            Logger::log('Invalid request method. No file(s) were uploaded', 'warning');
+        }
+        Logger::logFuncReturn(__METHOD__);
         return $this->files;
     }
     public function getAssociatedName(){

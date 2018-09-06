@@ -51,12 +51,14 @@ class GreenyTheme{
         $row = self::createRowNode(FALSE, FALSE);
         $labelNode = new Label($lbl);
         $labelNode->setClassName('pa-'.Page::dir().'-col-12-nm-np');
-        $row->addChild($labelNode);
         if($inputType == 'textarea'){
+            $row->addChild($labelNode);
             $input = new HTMLNode('textarea');
             $input->setAttribute('placeholder', $placeholder);
+            $input->setClassName('pa-'.Page::dir().'-col-3');
         }
         else if($inputType == 'select'){
+            $row->addChild($labelNode);
             $input = new HTMLNode('select');
             foreach ($selectArr as $option => $val){
                 $o = new HTMLNode('option');
@@ -64,13 +66,20 @@ class GreenyTheme{
                 $o->addTextNode($val);
                 $input->addChild($o);
             }
+            $input->setClassName('pa-'.Page::dir().'-col-3');
+        }
+        else if($inputType == 'checkbox'){
+            $input = new Input('checkbox');
+            $row->addChild($input);
+            $row->addChild($labelNode);
         }
         else{
+            $row->addChild($labelNode);
             $input = new Input($inputType);
             $input->setAttribute('placeholder', $placeholder);
+            $row->addChild($input);
+            $input->setClassName('pa-'.Page::dir().'-col-3');
         }
-        $input->setClassName('pa-'.Page::dir().'-col-3');
-        $row->addChild($input);
         return $row;
     }
     /**

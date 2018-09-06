@@ -67,7 +67,30 @@ class CronJob {
             }
         }
         else{
-            
+            $split = explode(',', $minutesField);
+            $count = count($split);
+            if($count == 1){
+                $intVal = intval($minutesField);
+                if($intVal >= 0 && $intVal <= 59){
+                    $retVal = 'AT-'.$intVal;
+                }
+            }
+            else{
+                $index = 0;
+                $valsStr = '';
+                foreach ($split as $number){
+                    $intVal = intval($number);
+                    if($intVal >= 0 && $intVal <= 59){
+                        if($index == $count){
+                            $valsStr .= 'AT-'.$intVal;
+                        }
+                        else{
+                            $valsStr .= 'AT-'.$intVal.',';
+                        }
+                    }
+                    $index++;
+                }
+            }
         }
         Logger::logReturnValue($retVal);
         Logger::logFuncReturn(__METHOD__);

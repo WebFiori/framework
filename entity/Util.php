@@ -19,7 +19,7 @@ if(!defined('ROOT_DIR')){
 /**
  * PHP utility class.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.3
+ * @version 1.3.1
  */
 class Util{
     /**
@@ -60,9 +60,8 @@ class Util{
         return self::$dbTestInstance;
     }
     /**
-     * Returns the IP address of the user who is connected to the server.
-     * @return string The IP address of the user who is connected to the server. 
-     * The value is taken from the array $_SERVER at index 'REMOTE_ADDR'.
+     * An alias for the function 'Util::getClientIP()'.
+     * @return string The IP address of the user who has initiated the request.
      * @since 1.3
      */
     public static function getIpAddress() {
@@ -74,7 +73,31 @@ class Util{
             return $ip;
         }
     }
-
+    /**
+     * Returns the IP address of the user who is connected to the server.
+     * @return string The IP address of the user who is connected to the server. 
+     * The value is taken from the array $_SERVER at index 'REMOTE_ADDR'.
+     * @since 1.3.1
+     */
+    public static function getClientIP() {
+        $ip = filter_var($_SERVER['REMOTE_ADDR'],FILTER_VALIDATE_IP);
+        if($ip == '::1'){
+            return '127.0.0.1';
+        }
+        else{
+            return $ip;
+        }
+    }
+    /**
+     * Returns the IPv4 address of server host.
+     * @return string The IPv4 address of server host.
+     * @since 1.3.1
+     */
+    public static function getHostIP(){
+        $host= gethostname();
+        $ip = gethostbyname($host);
+        return $ip;
+    }
     /**
      * 
      * @return boolean|string The function will return TRUE in case everything 

@@ -56,6 +56,7 @@ class AutoLoader{
             $frameworkSearchFoldres = array(
                 '',
                 '/entity',
+                '/entity/cron',
                 '/entity/queries',
                 '/entity/rest-easy',
                 '/entity/jsonx',

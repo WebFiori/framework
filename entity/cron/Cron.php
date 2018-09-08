@@ -5,7 +5,7 @@
  * @author Ibrahim <ibinshikh@hotmail.com>
  * @version 1.0
  */
-class CronExecuter {
+class Cron {
     /**
      * The password that is used to access and execute jobs.
      * @var string
@@ -20,22 +20,23 @@ class CronExecuter {
     private $cronJobsQueue;
     /**
      * An instance of 'CronExecuter'
-     * @var CronExecuter 
+     * @var Cron 
      * @since 1.0
      */
     private static $executer;
     /**
      * Returns a singleton of the class CronExecuter.
-     * @return CronExecuter
+     * @return Cron
      * @since 1.0
      */
     private static function &_get(){
         if(self::$executer === NULL){
-            self::$executer = new CronExecuter();
+            self::$executer = new Cron();
         }
         return self::$executer;
     }
     /**
+     * Creates new instance of the class.
      * @since 1.0
      */
     public function __construct() {
@@ -50,17 +51,21 @@ class CronExecuter {
             Logger::log('Server IP = \''.$serverIp.'\'.', 'debug');
             if($clientIp == $serverIp){
                 Logger::log('Checking if password is required to execute cron jobs...');
-                if(CronExecuter::password() != 'NO_PASSWORD'){
+                if(Cron::password() != 'NO_PASSWORD'){
                     Logger::log('Password required. Checking if password is provided...');
                     $password = isset($_GET['password']) ? filter_var($_GET['password']) : '';
                     Logger::log('Password = \''.$password.'\'.', 'debug');
                     if($password != ''){
                         Logger::log('Checking if password is valid...');
-                        if($password == CronExecuter::password()){
+                        if($password == Cron::password()){
                             Logger::log('Valid password.');
                             Logger::log('Starting the execution of tasks.');
-                            while ($job = CronExecuter::jobsQueue()->dequeue()){
-                                $job->execute();
+                            $totalJobs = Cron::jobsQueue()->size();
+                            $executedJobsCount = 0;
+                            while ($job = Cron::jobsQueue()->dequeue()){
+                                if($job->execute()){
+                                    $executedJobsCount++;
+                                }
                             }
                             Logger::log('Jobs execution finished.');
                             Logger::requestCompleted();
@@ -75,7 +80,10 @@ class CronExecuter {
                             . '<h1>200 - OK</h1>'
                             . '<hr>'
                             . '<p>'
-                            . 'Cron Jobs Executed.'
+                            . 'Total number of jobs: '.$totalJobs
+                            . '</p>'
+                            . '<p>'
+                            . 'Number of jobs executed: '.$executedJobsCount
                             . '</p>'
                             . '</body>'
                             . '</html>');
@@ -120,8 +128,12 @@ class CronExecuter {
                 }
                 else{
                     Logger::log('No password required. Executing jobs...');
-                    while ($job = CronExecuter::jobsQueue()->dequeue()){
-                        $job->execute();
+                    $totalJobs = Cron::jobsQueue()->size();
+                    $executedJobsCount = 0;
+                    while ($job = Cron::jobsQueue()->dequeue()){
+                        if($job->execute()){
+                            $executedJobsCount++;
+                        }
                     }
                     Logger::log('Jobs execution finished.');
                     Logger::requestCompleted();
@@ -136,7 +148,10 @@ class CronExecuter {
                     . '<h1>200 - OK</h1>'
                     . '<hr>'
                     . '<p>'
-                    . 'Cron Jobs Executed.'
+                    . 'Total number of jobs: '.$totalJobs
+                    . '</p>'
+                    . '<p>'
+                    . 'Number of jobs executed: '.$executedJobsCount
                     . '</p>'
                     . '</body>'
                     . '</html>');
@@ -175,9 +190,9 @@ class CronExecuter {
      */
     public static function password($pass=null) {
         if($pass !== NULL){
-            $this->_setPassword($pass);
+            self::_get()->_setPassword($pass);
         }
-        return $this->_getPassword();
+        return self::_get()->_getPassword();
     }
     /**
      * 
@@ -195,7 +210,7 @@ class CronExecuter {
      * @since 1.0
      */
     public static function scheduleJob($job){
-        return $this->_addJob($job);
+        return self::_get()->_addJob($job);
     }
     /**
      * 

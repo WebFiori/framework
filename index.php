@@ -346,6 +346,13 @@ class LisksCode{
 LisksCode::getAndStart();
 define('INITIAL_SYS_STATUS',LisksCode::sysStatus());
 Logger::log('INITIAL_SYS_STATUS = '.INITIAL_SYS_STATUS, 'debug');
+$job = new CronJob('0 3 * * *');
+$job->setOnExecution(function(){
+    $h = fopen(ROOT_DIR.'/xx.txt', 'a+');
+    fwrite($h, 'Job Run at '. date(DATE_ISO8601)."\r\n");
+    fclose($h);
+});
+Cron::scheduleJob($job);
 if(INITIAL_SYS_STATUS === TRUE){
     Router::route(Util::getRequestedURL());
 }

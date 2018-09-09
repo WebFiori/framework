@@ -53,9 +53,17 @@ class Uploader implements JsonI{
             'mime'=>'video/x-ms-wmv',
             'ext'=>'wmv'
         ),
+        'mov'=>array(
+            'mime'=>'video/quicktime',
+            'ext'=>'mov'
+        ),
         'flv'=>array(
             'mime'=>'video/x-flv',
             'ext'=>'flv'
+        ),
+        'midi'=>array(
+            'mime'=>'audio/midi',
+            'ext'=>'midi'
         ),
         //images 
         'jpeg'=>array(
@@ -69,6 +77,14 @@ class Uploader implements JsonI{
         'png'=>array(
             'mime'=>'image/png',
             'ext'=>'png'
+        ),
+        'bmp'=>array(
+            'mime'=>'image/bmp',
+            'ext'=>'bmp'
+        ),
+        'ico'=>array(
+            'mime'=>'image/x-icon',
+            'ext'=>'ico'
         ),
         //pdf 
         'pdf'=>array(
@@ -109,6 +125,30 @@ class Uploader implements JsonI{
             'mime'=>'text/plain',
             'ext'=>'php'
         ),
+        'css'=>array(
+            'mime'=>'text/css',
+            'ext'=>'css'
+        ),
+        'js'=>array(
+            'mime'=>'text/javascribt',
+            'ext'=>'js'
+        ),
+        'asm'=>array(
+            'mime'=>'text/x-asm',
+            'ext'=>'asm'
+        ),
+        'java'=>array(
+            'mime'=>'text/x-java-source',
+            'ext'=>'java'
+        ),
+        'log'=>array(
+            'mime'=>'text/plain',
+            'ext'=>'log'
+        ),
+        'asp'=>array(
+            'mime'=>'text/asp',
+            'ext'=>'asp'
+        ),
         //other files
         'zip'=>array(
             'mime'=>'application/zip',
@@ -117,6 +157,14 @@ class Uploader implements JsonI{
         'exe'=>array(
             'mime'=>'application/vnd.microsoft.portable-executable',
             'ext'=>'exe'
+        ),
+        'psd'=>array(
+            'mime'=>'application/octet-stream',
+            'ext'=>'psd'
+        ),
+        'ai'=>array(
+            'mime'=>'application/postscript',
+            'ext'=>'ai'
         )
     );
     /**

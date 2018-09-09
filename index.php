@@ -3,7 +3,7 @@
  * The instance of this class is used to control basic settings of 
  * the framework. Also, it is the entry point of any request.
  * @author Ibrahim Ali <ibinshikh@hotmail.com>
- * @version 1.1
+ * @version 1.2
  */
 class LisksCode{
     /**
@@ -144,6 +144,7 @@ class LisksCode{
         if(!$this->SF->isSetupFinished()){
             $this->firstUse();
         }
+        $this->initCron();
         Logger::log('Initializing completed.');
         self::$classStatus = 'INITIALIZED';
     }
@@ -297,6 +298,26 @@ class LisksCode{
         }
     }
     /**
+     * Initialize cron jobs.
+     * @since 1.3
+     */
+    public function initCron(){
+        //initialize cron job manager
+        
+        //set access password
+        //the password must be kept in order to disallow any 
+        //unauthorized call to run cron jobs.
+        Cron::password('123456');
+        
+        //add jobs
+//        $job = new CronJob('*/5,*/3 * * * *');
+//        $job->setOnExecution(function($params){
+//            $file = fopen('cron.txt', 'a+');
+//            fwrite($file, 'Job \''.$params[0]->getJobName().'\' executed at '.date(DATE_RFC1123)."\r\n");
+//        },array($job));
+//        Cron::scheduleJob($job);
+    }
+    /**
      * Show an error message that tells the user about system status and how to 
      * configure it.
      * @since 1.0
@@ -342,17 +363,11 @@ class LisksCode{
         LisksCode::getAndStart()->needConfigration();
     }
 }
+
 //start the system
 LisksCode::getAndStart();
 define('INITIAL_SYS_STATUS',LisksCode::sysStatus());
 Logger::log('INITIAL_SYS_STATUS = '.INITIAL_SYS_STATUS, 'debug');
-$job = new CronJob('0 3 * * *');
-$job->setOnExecution(function(){
-    $h = fopen(ROOT_DIR.'/xx.txt', 'a+');
-    fwrite($h, 'Job Run at '. date(DATE_ISO8601)."\r\n");
-    fclose($h);
-});
-Cron::scheduleJob($job);
 if(INITIAL_SYS_STATUS === TRUE){
     Router::route(Util::getRequestedURL());
 }

@@ -201,14 +201,66 @@ class Cron {
             }
         });
     }
-    
+    /**
+     * Creates new cron job.
+     * @param string $when A cron expression.
+     * @param function $function A function to run when it is the time to execute 
+     * the job.
+     * @param array $funcParams An array of parameters that can be passed to the 
+     * function. 
+     * @since 1.0
+     */
     public static function createJob($when='*/5 * * * *',$function='',$funcParams=array()){
-        
+        $job = new CronJob($when);
+        $job->setOnExecution($function, $funcParams);
+        self::scheduleJob($job);
     }
     /**
-     * 
-     * @param type $pass
-     * @return type
+     * Adds a daily job to execute every day at specific hour and minute.
+     * @param string $time [Optional] A time in the form 'hh:mm'. hh can have any value 
+     * between 0 and 23 inclusive. mm can have any value btween 0 and 59 inclusive. 
+     * default is '00:00'.
+     * @param function $func A function that will be executed once it is the 
+     * time to run the job.
+     * @param array $funcParams An array of parameters which will be passed to 
+     * the function.
+     * @since 1.0
+     */
+    public static function dailyJob($time,$func,$funcParams=array()){
+        $split = explode(':', $time);
+        if(count($split) == 2){
+            $job = new CronJob();
+            $job->dailyAt($split[0], $split[1]);
+            $job->setOnExecution($func, $funcParams);
+            self::scheduleJob($job);
+        }
+    }
+    /**
+     * Adds a job that will be executed on specific time weekly.
+     * @param string $time A string in the format 'd-hh:mm'. 'd' can be a number 
+     * between 0 and 7 inclusive or a 3 characters day name. hh can have any value 
+     * between 0 and 23 inclusive. mm can have any value between 0 and 59 inclusive.
+     * @param function $func A function that will be executed once it is the 
+     * time to run the job.
+     * @param array $funcParams An array of parameters which will be passed to 
+     * the function.
+     * @since 1.0
+     */
+    public static function weeklyJob($time,$func,$funcParams=array()){
+        $split1 = explode('-', $time);
+        if(count($split1) == 2){
+            $job = new CronJob();
+            $job->weeklyOn($split1[0], $split1[1]);
+            $job->setOnExecution($func, $funcParams);
+            self::scheduleJob($job);
+        }
+    }
+    /**
+     * Sets or gets the password that is used to protect the cron instance.
+     * @param string $pass If not NULL, the password will be updated to the 
+     * given one.
+     * @return string|NULL If the password is set, the function will return it. 
+     * If not set, the function will return NULL.
      * @since 1.0
      */
     public static function password($pass=null) {
@@ -218,8 +270,8 @@ class Cron {
         return self::_get()->_getPassword();
     }
     /**
-     * 
-     * @return Queue
+     * Returns a queue of all queued jobs.
+     * @return Queue An instance of the class 'Queue'.
      * @since 1.0
      */
     public static function jobsQueue(){
@@ -227,9 +279,9 @@ class Cron {
     }
 
     /**
-     * 
-     * @param type $job
-     * @return type
+     * Adds new cron job.
+     * @param CronJob $job An instance of the class 'CronJob'.
+     * @return boolean If the job is added, the function will return TRUE.
      * @since 1.0
      */
     public static function scheduleJob($job){
@@ -244,6 +296,9 @@ class Cron {
     private function _addJob($job){
         $retVal = FALSE;
         if($job instanceof CronJob){
+            if($job->getJobName() == 'CRON-JOB'){
+                $job->setJobName('job-'.$this->jobsQueue()->size());
+            }
             $retVal = $this->cronJobsQueue->enqueue($job);
         }
         return $retVal;
@@ -265,6 +320,7 @@ class Cron {
         if($this->accessPass == ''){
             return 'NO_PASSWORD';
         }
+        return $this->accessPass;
     }
     /**
      * 

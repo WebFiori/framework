@@ -85,6 +85,12 @@ class CronJob {
      */
     private $events;
     /**
+     * A name for the cron job.
+     * @var string
+     * @since 1.0 
+     */
+    private $jobName;
+    /**
      * Creates new instance of the class.
      * @param string $when [Optional] A cron expression. An exception will be thrown if 
      * the given expression is invalid. Default is '* * * * *' which means run 
@@ -95,6 +101,7 @@ class CronJob {
     public function __construct($when='* * * * *') {
         Logger::logFuncCall(__METHOD__);
         Logger::log('Initializing cron job...');
+        $this->jobName = 'CRON-JOB';
         $this->jobDetails = array(
             'minutes'=>array(),
             'hours'=>array(),
@@ -125,6 +132,102 @@ class CronJob {
             $this->cron();
         }
         Logger::logFuncReturn(__METHOD__);
+    }
+    /**
+     * Sets an optional name for the job.
+     * @param string $name The name of the job.
+     * @since 1.0
+     */
+    public function setJobName($name){
+        if(strlen($name) > 0){
+            $this->jobName = $name;
+        }
+    }
+    /**
+     * Returns the name of the job.
+     * @return The name of the job. If no name is set, the function will return 
+     * 'CRON-JOB'.
+     * @since 1.0
+     */
+    public function getJobName(){
+        return $this->jobName;
+    }
+    /**
+     * Runs the job every day at specific hour and minute.
+     * @param int $hour [Optional] A number between 0 and 23 inclusive. 0 Means daily at 
+     * 12:00 AM and 23 means at 11:00 PM. Default is 0.
+     * @param int $minute [Optional] A number between 0 and 59 inclusive. Represents the 
+     * minute part of an hour. Default is 0.
+     * @since 1.0
+     */
+    public function dailyAt($hour=0,$minute=0){
+        if($hour >= 0 && $hour <= 23){
+            if($minute >= 0 && $minute <= 59){
+                $this->cron($minute.' '.$hour.' * * *');
+            }
+        }
+    }
+    /**
+     * Runs the job weekly at specific day and time.
+     * @param int $dayNameOrNum [Optional] A 3 letter day name (such as 'sun' 
+     * or 'tue') or a day number from 0 to 6. 0 for sunday. Default is 0.
+     * @param string $time [Optional] A time in the form 'hh:mm'. hh can have any value 
+     * between 0 and 23 inclusive. mm can have any value btween 0 and 59 inclusive. 
+     * default is '00:00'.
+     * @since 1.0
+     */
+    public function weeklyOn($dayNameOrNum=0,$time='00:00'){
+        $uDayName = strtoupper($dayNameOrNum);
+        if(in_array($uDayName, self::WEEK_DAYS)){
+            $this->_weeklyOn(self::WEEK_DAYS[$uDayName], $time);
+        }
+        else{
+            if($dayNameOrNum >= 0 && $dayNameOrNum <= 6){
+                $this->_weeklyOn($dayNameOrNum, $time);
+            }
+        }
+    }
+    /**
+     * Runs the job at specific day and time in a specific month.
+     * @param int|string $monthNameOrNum [Optional] Month number from 1 to 12 inclusive 
+     * or 3 letters month name. Default is 'jan'.
+     * @param int $dayNum [Optional] The number of day in the month starting from 1 up to 
+     * 31 inclusive. Default is 1.
+     * @param string $time [Optional] A time in the form 'hh:mm'. hh can have any value 
+     * between 0 and 23 inclusive. mm can have any value btween 0 and 59 inclusive. 
+     * default is '00:00'.
+     * @since 1.0
+     */
+    public function monthlyOn($monthNameOrNum='jan',$dayNum=1,$time='00:00'){
+        if($dayNum >= 1 && $dayNum <= 31){
+            $timeSplit = explode(':', $time);
+            if(count($timeSplit) == 2){
+                $hour = intval($timeSplit[0]);
+                $minute = intval($timeSplit[1]);
+                if($hour >= 0 && $hour <= 23 && $minute >= 0 && $minute <= 59){
+                    $uMonth = strtoupper($monthNameOrNum);
+                    if(in_array($uMonth, self::MONTHS_NAMES)){
+                        $monthNum = self::MONTHS_NAMES[$uMonth];
+                        $this->cron($minute.' '.$hour.' '.$dayNum.' '.$monthNum.' *');
+                    }
+                    else{
+                        if($monthNameOrNum >= 1 && $monthNameOrNum <= 12){
+                            $this->cron($minute.' '.$hour.' '.$dayNum.' '.$monthNameOrNum.' *');
+                        }
+                    }
+                }
+            }
+        }
+    }
+    private function _weeklyOn($day,$time){
+        $timeSplit = explode(':', $time);
+        if(count($timeSplit) == 2){
+            $hour = intval($timeSplit[0]);
+            $minute = intval($timeSplit[1]);
+            if($hour >= 0 && $hour <= 23 && $minute >= 0 && $minute <= 59){
+                $this->cron($minute.' '.$hour.' * * '.$day);
+            }
+        }
     }
     /**
      * Creates a cron job using specific cron expression.
@@ -676,10 +779,12 @@ class CronJob {
         }
         else{
             $retVal = FALSE;
+            Logger::log('Checking if current week day is in range of days...');
             $current = intval(date('w'));
             Logger::log('Current day of week = \''.$current.'\'.', 'debug');
             $ranges = $daysArr['at-range'];
             foreach ($ranges as $range){
+                Logger::log('Min Range Value = \''.$range[0].'\', Max Range Value = \''.$range[1].'\'.', 'debug');
                 if($current >= $range[0] && $current <= $range[1]){
                     Logger::log('It is in given range.');
                     $retVal = TRUE;
@@ -687,8 +792,12 @@ class CronJob {
                 }
             }
             if($retVal === FALSE){
+                Logger::log('Checking if current day is in the set of specific days...');
                 $days = $daysArr['at-x-day'];
                 $retVal = in_array($current, $days);
+                if($retVal === TRUE){
+                    Logger::log('Current day is in the set of specific days.');
+                }
             }
         }
         Logger::logReturnValue($retVal);
@@ -714,6 +823,7 @@ class CronJob {
         else{
             $retVal = FALSE;
             $current = intval(date('m'));
+            Logger::log('Checking if current month is in range of months...');
             Logger::log('Current month = \''.$current.'\'.', 'debug');
             $ranges = $monthsArr['at-range'];
             foreach ($ranges as $range){
@@ -726,7 +836,11 @@ class CronJob {
             }
             if($retVal === FALSE){
                 $months = $monthsArr['at-x-month'];
+                Logger::log('Checking if month is in specific months array.');
                 $retVal = in_array($current, $months);
+                if($retVal === TRUE){
+                    Logger::log('It is in specific months array.');
+                }
             }
         }
         Logger::logReturnValue($retVal);
@@ -763,16 +877,21 @@ class CronJob {
                 }
             }
             if($retVal === FALSE){
+                Logger::log('Checking if job will be executed at the specific hour...');
                 $hours = $hoursArr['at-every-x-hour'];
                 $retVal = in_array($current, $hours);
                 if($retVal === FALSE){
                     $hours = $hoursArr['every-x-hours'];
                     foreach ($hours as $hour){
                         if($current % $hour == 0){
+                            Logger::log('Job will be executed at the specific hour.');
                             $retVal = TRUE;
                             break;
                         }
                     }
+                }
+                else{
+                    Logger::log('Job will be executed at the specific hour.');
                 }
             }
         }

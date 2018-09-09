@@ -120,13 +120,14 @@ class LisksCode{
          */
         require_once ROOT_DIR.'/entity/AutoLoader.php';
         $this->AU = AutoLoader::get();
+        
         //uncomment next line to show runtime errors and warnings
         //also enable logging for info, warnings and errors 
-        Logger::logName('initialization-log');
-        Util::displayErrors();
+        //Logger::logName('initialization-log');
+        //Util::displayErrors();
         
         //enable logging of debug info.
-        define('DEBUG', '');
+        //define('DEBUG', '');
         
         $this->SF = SystemFunctions::get();
         $this->WF = WebsiteFunctions::get();
@@ -213,7 +214,7 @@ class LisksCode{
         //After that, if your app uses MySQL database, you can set connection 
         //parameters here. If it does not, skip this step by commenting 
         //the next line.
-        $this->setDatabaseConnection();
+        //$this->setDatabaseConnection();
 
 
         //Also, you can add SMTP email account that you can use to send email 

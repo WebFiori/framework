@@ -44,7 +44,7 @@ if(!defined('ROOT_DIR')){
  * A base class that is used to construct website UI.
  *
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.1
+ * @version 1.2
  */
 class Theme implements JsonI{
     /**
@@ -95,9 +95,17 @@ class Theme implements JsonI{
      */
     private $afterLoaded;
     /**
+     * An array of callback parameters.
+     * @var array
+     * @since 1.3 
+     */
+    private $afterLoadedParams;
+    /**
      * Creates new instance of the class using default values.
      */
     public function __construct() {
+        Logger::logFuncCall(__METHOD__);
+        Logger::log('Initializing theme...');
         $this->themeMeta = array(
             'name'=>'',
             'url'=>'',
@@ -109,11 +117,13 @@ class Theme implements JsonI{
             'description'=>'',
             'directory'=>''
         );
+        $this->afterLoadedParams = array();
         $this->cssDir = 'css';
         $this->jsDir = 'js';
         $this->imagesDir = 'images';
         $this->themeComponents = array();
         $this->afterLoaded = function(){};
+        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * Adds a set of theme components to the theme.
@@ -122,9 +132,12 @@ class Theme implements JsonI{
      * @since 1.0
      */
     public function addComponents($arr) {
+        Logger::logFuncCall(__METHOD__);
+        Logger::log('Adding set of theme components...');
         foreach ($arr as $component){
             $this->addComponent($component);
         }
+        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * Returns an array which contains the names of theme components files.
@@ -141,7 +154,19 @@ class Theme implements JsonI{
      * @since 1.0
      */
     public function addComponent($componentName) {
-        array_push($this->themeComponents, $componentName);
+        Logger::logFuncCall(__METHOD__);
+        $trimmed = trim($componentName);
+        Logger::log('Checking if component is already added or not...');
+        Logger::log('Component file name = \''.$trimmed.'\'.', 'debug');
+        if(strlen($trimmed) != 0 && !in_array($trimmed, $this->themeComponents)){
+            Logger::log('Adding the component...');
+            $this->themeComponents[] = $trimmed;
+            Logger::log('Component Added.');
+        }
+        else{
+            Logger::log('Already added.');
+        }
+        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * Loads a theme given its name.
@@ -158,59 +183,97 @@ class Theme implements JsonI{
      * @since 1.0
      */
     public static function usingTheme($themeName=null) {
+        Logger::logFuncCall(__METHOD__);
+        Logger::log('Theme name = \''.$themeName.'\' ('. gettype($themeName).').', $themeName);
+        Logger::log('Validating theme name...');
         if($themeName === NULL){
             $themeName = SiteConfig::get()->getBaseThemeName();
+            Logger::log('Given name is NULL. Using the theme \''.$themeName.'\'.', 'warning');
         }
         $themeToLoad = NULL;
+        Logger::log('Checking if theme is already loaded...');
         if(self::isThemeLoaded($themeName)){
+            Logger::log('Theme is already loaded.');
             $themeToLoad = self::$loadedThemes[$themeName];
         }
         else{
+            Logger::log('No theme is loaded. Checking available themes...');
             $themes = self::getAvailableThemes();
             if(isset($themes[$themeName])){
                 $themeToLoad = $themes[$themeName];
+                Logger::log('Theme found. Added to the set of loaded themes.');
                 array_push(self::$loadedThemes, $themeToLoad);
             }
             else{
+                Logger::log('No theme was found which has the given name. An exception is thrown.', 'error');
+                Logger::requestCompleted();
                 throw new Exception('No such theme: \''.$themeName.'\'.');
             }
         }
         if(isset($themeToLoad)){
+            Logger::log('Loading theme meta and components...');
             $themeDir = ROOT_DIR.'/'.self::THEMES_DIR.'/'.$themeToLoad->getDirectoryName();
+            Logger::log('Theme directory: \''.$themeDir.'\'.', $themeName);
+            Logger::log('Checking if the file \'theme.php\' exist in theme directory...');
             if(file_exists($themeDir.'/theme.php')){
+                Logger::log('Loading the file using require_once...');
                 require_once $themeDir.'/theme.php';
+                Logger::log('Loading theme components...');
                 foreach ($themeToLoad->getComponents() as $component){
+                    Logger::log('Checking if file \''.$component.'\' exist...');
                     if(file_exists($themeDir.'/'.$component)){
+                        Logger::log('Loading file using require_once...');
                         require_once $themeDir.'/'.$component;
+                        Logger::log('Component loaded.');
                     }
                     else{
+                        Logger::log('No file was found which represents the component. An exception is thrown.', 'error');
+                        Logger::requestCompleted();
                         throw new Exception('Component \''.$component.'\' of the theme not found. Eather define it or remove it from the array of theme components.');
                     }
                 }
+                Logger::log('Theme loaded.');
+                Logger::logFuncReturn(__METHOD__);
                 return $themeToLoad;
             }
             else{
+                Logger::log('The file \'theme.php\' was not found. An exception is thrown.', 'error');
+                Logger::requestCompleted();
                 throw new Exception('The file \'theme.php\' is missing from the theme with name = \''.$themeName.'\'');
             }
         }
+        Logger::log('No theme was found which has the given name. An exception is thrown.','error');
+        Logger::requestCompleted();
         throw new Exception('No such theme: \''.$themeName.'\'');
     }
     /**
      * Sets the value of the callback which will be called after theme is loaded.
      * @param Function $function The callback.
+     * @param array $params An array of parameters which can be passed to the 
+     * callback.
      * @since 1.0
      */
-    public function setAfterLoaded($function) {
+    public function setAfterLoaded($function,$params=array()) {
+        Logger::logFuncCall(__METHOD__);
+        Logger::log('Checking if first parameter is callable...');
         if(is_callable($function)){
+            Logger::log('It is callable.');
             $this->afterLoaded = $function;
+            if(gettype($params) == 'array'){
+                $this->afterLoadedParams = $params;
+            }
         }
+        else{
+            Logger::log('It is not callable.');
+        }
+        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * Fire the callback function.
      * @since 1.0
      */
     public function invokeAfterLoaded(){
-        call_user_func($this->afterLoaded);
+        call_user_func($this->afterLoaded, $this->afterLoadedParams);
     }
 
     /**
@@ -231,6 +294,8 @@ class Theme implements JsonI{
      * @since 1.1 
      */
     public static function getAvailableThemes(){
+        Logger::logFuncCall(__METHOD__);
+        Logger::log('Building an array of available themes...');
         $themes = array();
         $themesDirs = array_diff(scandir(ROOT_DIR.'/'. self::THEMES_DIR), array('..', '.'));
         foreach ($themesDirs as $dir){
@@ -240,6 +305,7 @@ class Theme implements JsonI{
                 unset($theme);
             }
         }
+        Logger::logFuncReturn(__METHOD__);
         return $themes;
     }
     /**

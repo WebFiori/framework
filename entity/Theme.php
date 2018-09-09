@@ -118,9 +118,9 @@ class Theme implements JsonI{
             'directory'=>''
         );
         $this->afterLoadedParams = array();
-        $this->cssDir = 'css';
-        $this->jsDir = 'js';
-        $this->imagesDir = 'images';
+        $this->setCssDirName('css');
+        $this->setJsDirName('js');
+        $this->setImagesDirName('images');
         $this->themeComponents = array();
         $this->afterLoaded = function(){};
         Logger::logFuncReturn(__METHOD__);
@@ -257,7 +257,7 @@ class Theme implements JsonI{
         Logger::logFuncCall(__METHOD__);
         Logger::log('Checking if first parameter is callable...');
         if(is_callable($function)){
-            Logger::log('It is callable.');
+            Logger::log('It is callable. Callable updated.');
             $this->afterLoaded = $function;
             if(gettype($params) == 'array'){
                 $this->afterLoadedParams = $params;
@@ -315,9 +315,17 @@ class Theme implements JsonI{
      * @since 1.0
      */
     public function setName($name) {
+        Logger::logFuncCall(__METHOD__);
+        Logger::log('Checking if given value is not empty string...');
+        Logger::log('Given Value = \''.$name.'\'.', 'debug');
         if(strlen($name) != 0){
             $this->themeMeta['name'] = $name.'';
+            Logger::log('Theme name updated.');
         }
+        else{
+            Logger::log('Given string is empty.', 'warning');
+        }
+        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * Returns the name of the theme.
@@ -334,7 +342,17 @@ class Theme implements JsonI{
      * @since 1.0
      */
     public function setUrl($url) {
-        $this->themeMeta['url'] = $url.'';
+        Logger::logFuncCall(__METHOD__);
+        Logger::log('Checking if given value is not empty string...');
+        Logger::log('Given Value = \''.$url.'\'.', 'debug');
+        if(strlen($url) > 0){
+            Logger::log('Theme URL updated.');
+            $this->themeMeta['url'] = $url.'';
+        }
+        else{
+            Logger::log('Given string is empty.', 'warning');
+        }
+        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * Sets the name of theme author.
@@ -342,7 +360,17 @@ class Theme implements JsonI{
      * @since 1.0
      */
     public function setAuthor($author) {
-        $this->themeMeta['author'] = $author.'';
+        Logger::logFuncCall(__METHOD__);
+        Logger::log('Checking if given value is not empty string...');
+        Logger::log('Given Value = \''.$author.'\'.', 'debug');
+        if(strlen($author) > 0){
+            Logger::log('Author name updated.');
+            $this->themeMeta['author'] = $author.'';
+        }
+        else{
+            Logger::log('Given string is empty.', 'warning');
+        }
+        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * Sets the URL to the theme author. It can be the same as Theme URL.
@@ -350,7 +378,17 @@ class Theme implements JsonI{
      * @since 1.0
      */
     public function setAuthorUrl($authorUrl) {
-        $this->themeMeta['author-url'] = $authorUrl.'';
+        Logger::logFuncCall(__METHOD__);
+        Logger::log('Checking if given value is not empty string...');
+        Logger::log('Given Value = \''.$authorUrl.'\'.', 'debug');
+        if(strlen($authorUrl) > 0){
+            Logger::log('Author URL updated.');
+            $this->themeMeta['author-url'] = $authorUrl.'';
+        }
+        else{
+            Logger::log('Given string is empty.', 'warning');
+        }
+        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * Sets the version number of the theme.
@@ -359,9 +397,17 @@ class Theme implements JsonI{
      * @since 1.0
      */
     public function setVersion($vNum) {
+        Logger::logFuncCall(__METHOD__);
+        Logger::log('Checking if given value is not empty string...');
+        Logger::log('Given Value = \''.$vNum.'\'.', 'debug');
         if(strlen($vNum) != 0){
             $this->themeMeta['version'] = $vNum.'';
+            Logger::log('Version updated.');
         }
+        else{
+            Logger::log('Given string is empty.', 'warning');
+        }
+        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * Sets the name of theme license.
@@ -369,7 +415,17 @@ class Theme implements JsonI{
      * @since 1.0
      */
     public function setLicenseName($text) {
-        $this->themeMeta['license'] = $text.'';
+        Logger::logFuncCall(__METHOD__);
+        Logger::log('Checking if given value is not empty string...');
+        Logger::log('Given Value = \''.$text.'\'.', 'debug');
+        if(strlen($text) != 0){
+            $this->themeMeta['license'] = $text.'';
+            Logger::log('License name updated.');
+        }
+        else{
+            Logger::log('Given string is empty.', 'warning');
+        }
+        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * Sets a URL to the license where people can find more details about it.
@@ -377,7 +433,17 @@ class Theme implements JsonI{
      * @since 1.0
      */
     public function setLicenseUrl($url) {
-        $this->themeMeta['license-url'] = $url.'';
+        Logger::logFuncCall(__METHOD__);
+        Logger::log('Checking if given value is not empty string...');
+        Logger::log('Given Value = \''.$url.'\'.', 'debug');
+        if(strlen($url) > 0){
+            $this->themeMeta['license-url'] = $url.'';
+            Logger::log('License URL updated.');
+        }
+        else{
+            Logger::log('Given string is empty.', 'warning');
+        }
+        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * Sets the description of the theme.
@@ -386,7 +452,17 @@ class Theme implements JsonI{
      * @since 1.0
      */
     public function setDescription($desc) {
-        $this->themeMeta['description'] = $desc.'';
+        Logger::logFuncCall(__METHOD__);
+        Logger::log('Checking if given value is not empty string...');
+        Logger::log('Given Value = \''.$desc.'\'.', 'debug');
+        if(strlen($desc) > 0){
+            $this->themeMeta['description'] = $desc.'';
+            Logger::log('Theme description updated.');
+        }
+        else{
+            Logger::log('Given string is empty.', 'warning');
+        }
+        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * Sets the name of the directory where all theme files are kept.
@@ -395,9 +471,17 @@ class Theme implements JsonI{
      * @since 1.0
      */
     public function setDirectoryName($name) {
+        Logger::logFuncCall(__METHOD__);
+        Logger::log('Checking if given value is not empty string...');
+        Logger::log('Given Value = \''.$name.'\'.', 'debug');
         if(strlen($name) != 0){
             $this->themeMeta['directory'] = $name.'';
+            Logger::log('Theme directory updated.');
         }
+        else{
+            Logger::log('Given string is empty.', 'warning');
+        }
+        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * Returns the name of the directory where all theme files are kept.
@@ -415,9 +499,17 @@ class Theme implements JsonI{
      * @since 1.0
      */
     public function setImagesDirName($name) {
+        Logger::logFuncCall(__METHOD__);
+        Logger::log('Checking if given value is not empty string...');
+        Logger::log('Given Value = \''.$name.'\'.', 'debug');
         if(strlen($name) != 0){
             $this->imagesDir = $name;
+            Logger::log('Images directory updated.');
         }
+        else{
+            Logger::log('Given string is empty.', 'warning');
+        }
+        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * Returns the name of the directory where theme images are kept.
@@ -436,9 +528,17 @@ class Theme implements JsonI{
      * @since 1.0
      */
     public function setJsDirName($name) {
+        Logger::logFuncCall(__METHOD__);
+        Logger::log('Checking if given value is not empty string...');
+        Logger::log('Given Value = \''.$name.'\'.', 'debug');
         if(strlen($name) != 0){
             $this->jsDir = $name;
+            Logger::log('JavaScript directory updated.');
         }
+        else{
+            Logger::log('Given string is empty.', 'warning');
+        }
+        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * Returns the name of the directory where JavaScript files are kept.
@@ -457,9 +557,17 @@ class Theme implements JsonI{
      * @since 1.0
      */
     public function setCssDirName($name) {
+        Logger::logFuncCall(__METHOD__);
+        Logger::log('Checking if given value is not empty string...');
+        Logger::log('Given Value = \''.$name.'\'.', 'debug');
         if(strlen($name) != 0){
             $this->cssDir = $name;
+            Logger::log('CSS directory updated.');
         }
+        else{
+            Logger::log('Given string is empty.', 'warning');
+        }
+        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * Returns the name of the directory where CSS files are kept.

@@ -90,7 +90,7 @@ class SiteConfig{
     private function __construct() {
         $this->configVision = '1.1';
         $this->webSiteNames = array('AR'=>'أكاديميا البرمجة','EN'=>'Programming Academia',);
-        $this->baseUrl = 'http://localhost/generic-php/';
+        $this->baseUrl = 'http://localhost/liskscode/';
         $this->titleSep = ' | ';
         $this->primaryLang = 'AR';
         $this->baseThemeName = 'Greeny By Ibrahim Ali';

@@ -307,15 +307,15 @@ class LinkedList {
      */
     public function &removeFirst() {
         if($this->size() == 1){
-            $data = $this->head->data();
+            $data = &$this->head->data();
             $this->head = NULL;
             $this->tail = NULL;
             $this->reduceSize();
             return $data;
         }
         else if($this->size() > 1){
-            $data = $this->head->data();
-            $this->head = $this->head->next();
+            $data = &$this->head->data();
+            $this->head = &$this->head->next();
             $this->reduceSize();
             return $data;
         }
@@ -332,13 +332,13 @@ class LinkedList {
             return $this->removeFirst();
         }
         else if($this->size() > 1){
-            $nextNode = $this->head->next();
+            $nextNode = &$this->head->next();
             $node = $this->head;
             while ($nextNode->next() != NULL){
                 $node = $nextNode;
-                $nextNode = $nextNode->next();
+                $nextNode = &$nextNode->next();
             }
-            $data = $nextNode->data();
+            $data = &$nextNode->data();
             $null = NULL;
             $node->setNext($null);
             return $data;
@@ -367,33 +367,31 @@ class LinkedList {
     public function &removeElement(&$val){
         if($this->size() == 1){
             if($this->head->data() === $val){
-                $el = $this->head->data();
+                $el = &$this->head->data();
                 if($this->removeFirst() != NULL){
-                    $this->reduceSize();
                     return $el;
                 }
             }
         }
         else if($this->size() > 1){
             if($this->head->data() === $val){
-                $el = $this->head->data();
+                $el = &$this->head->data();
                 if($this->removeFirst() != NULL){
-                    $this->reduceSize();
                     return $el;
                 }
             }
             else{
                 $node = $this->head;
-                $nextNode = $this->head->next();
+                $nextNode = &$this->head->next();
                 while ($nextNode != NULL){
-                    $data = $nextNode->data();
+                    $data = &$nextNode->data();
                     if($data === $val){
                         $node->setNext($nextNode->next());
                         $this->reduceSize();
                         return $data;
                     }
                     $node = $nextNode;
-                    $nextNode = $nextNode->next();
+                    $nextNode = &$nextNode->next();
                 }
             }
         }
@@ -421,7 +419,7 @@ class LinkedList {
                 if($node->data() === $el){
                     return $tmpIndex;
                 }
-                $node = $node->next();
+                $node = &$node->next();
                 $tmpIndex++;
             }
             if($node->data() === $el){
@@ -452,15 +450,15 @@ class LinkedList {
             }
             else{
                 $node = $this->head;
-                $nextNode = $this->head->next();
+                $nextNode = &$this->head->next();
                 while ($nextNode != NULL){
-                    $data = $nextNode->data();
+                    $data = &$nextNode->data();
                     if($data === $oldEl){
                         $nextNode->setData($newEl);
                         return TRUE;
                     }
                     $node = $nextNode;
-                    $nextNode = $nextNode->next();
+                    $nextNode = &$nextNode->next();
                 }
             }
         }

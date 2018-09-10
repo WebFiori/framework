@@ -251,14 +251,14 @@ class HTMLDoc {
      * @param HTMLNode $ch
      */
     private function _removeChild(&$ch,&$nodeToRemove){
-        $removed = NULL;
         for($x = 0 ; $x < $ch->childrenCount() ; $x++){
             $removed = $this->_removeChild($ch->children()->get($x),$nodeToRemove);
             if($removed instanceof HTMLNode){
                 return $removed;
             }
         }
-        return $ch->removeChild($nodeToRemove);
+        $removed = &$ch->removeChild($nodeToRemove);
+        return $removed;
     }
     /**
      * Returns the node that represents the 'head' node.

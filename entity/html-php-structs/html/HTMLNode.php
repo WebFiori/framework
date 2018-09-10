@@ -314,10 +314,10 @@ class HTMLNode {
      * @param LinkedList $chNodes
      * @return NULL|HTMLNode Description
      */
-    private function &_getChildByID($val,$chNodes){
+    private function &_getChildByID($val,&$chNodes){
         $chCount = $chNodes->size();
         for($x = 0 ; $x < $chCount ; $x++){
-            $child = $chNodes->get($x);
+            $child = &$chNodes->get($x);
             if(!$child->isTextNode()){
                 $tmpCh = &$child->_getChildByID($val,$child->children());
                 if($tmpCh instanceof HTMLNode){
@@ -326,7 +326,7 @@ class HTMLNode {
             }
         }
         for($x = 0 ; $x < $chCount ; $x++){
-            $child = $chNodes->get($x);
+            $child = &$chNodes->get($x);
             if($child->hasAttribute('id')){
                 $attrVal = $child->getAttributeValue('id');
                 if($attrVal == $val){
@@ -347,7 +347,8 @@ class HTMLNode {
         if(!$this->isTextNode() && !$this->isComment()){
             $val = $val.'';
             if(strlen($val) != 0){
-                return $this->_getChildByID($val, $this->children());
+                $ch = &$this->_getChildByID($val, $this->children());
+                return $ch;
             }
         }
         return $this->null;

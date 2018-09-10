@@ -3,7 +3,7 @@
  * A class that represents MySQL table.
  *
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.5
+ * @version 1.6
  */
 class Table {
     /**
@@ -109,6 +109,22 @@ class Table {
      */
     public function getOrder() {
         return $this->order;
+    }
+    /**
+     * Returns the value of table collation.
+     * @param string $mySqlVersion [Optional] Version number of MySQL. Default 
+     * is '8.0'.
+     * @return string If the given value is '5.5' or lower, the function will 
+     * return 'utf8mb4_unicode_ci'. Other than that, the function will return 
+     * 'utf8mb4_unicode_520_ci'.
+     * @since 1.6
+     */
+    public function getCollation($mySqlVersion='8.0'){
+        $split = explode('.', $mySqlVersion);
+        if(isset($split[0]) && $split[0] <= 5 && isset($split[1]) && $split[1] <= 5){
+            return 'utf8mb4_unicode_ci';
+        }
+        return 'utf8mb4_unicode_520_ci';
     }
     /**
      * Adds a foreign key to the table.
@@ -419,7 +435,7 @@ class Table {
     }
     /**
      * Returns the column object given the key that it was stored in.
-     * @param string $key The name of the key.
+     * @param string $key The name of the column key.
      * @return Column|NULL A reference to an object of type Column if the given 
      * column was found. NULL in case of no column was found.
      * @since 1.0
@@ -427,6 +443,35 @@ class Table {
     public function &getCol($key){
         if(isset($this->colSet[$key])){
             return $this->colSet[$key];
+        }
+        $null = NULL;
+        return $null;
+    }
+    /**
+     * Returns the index of a column given its key.
+     * @param string $key The name of the column key.
+     * @return Column|NULL The index of the column if a column was 
+     * found which has the given key. -1 in case of no column was found.
+     * @since 1.6
+     */
+    public function getColIndex($key){
+        if(isset($this->colSet[$key])){
+            return $this->colSet[$key]->getIndex();
+        }
+        return -1;
+    }
+    /**
+     * Returns a column given its index.
+     * @param int $index The index of the column.
+     * @return Column|NULL If a column was found which has the specified index, 
+     * it is returned. Other than that, The function will return NULL.
+     * @since 1.6
+     */
+    public function &getColByIndex($index){
+        foreach ($this->colSet as $k => $col){
+            if($col->getIndex() == $index){
+                return $col;
+            }
         }
         $null = NULL;
         return $null;

@@ -5,9 +5,9 @@
  * @uses Table Used by the 'create table' Query.
  * @uses ForeignKey Used to alter a table and insert a foreign key in it.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.8.3
+ * @version 1.8.4
  */
-abstract class MySQLQuery implements JsonI{
+abstract class MySQLQuery{
     /**
      * Line feed character.
      * @since 1.8.1
@@ -76,6 +76,48 @@ abstract class MySQLQuery implements JsonI{
     public function schemaTablesCount($schemaName){
         $this->query = 'select count(*) as tables_count from information_schema.tables where TABLE_TYPE = \'BASE TABLE\' and TABLE_SCHEMA = \''.$schemaName.'\';';
         $this->queryType = 'select';
+    }
+    /**
+     * Constructs a query which can be used to update the server's global 
+     * variable 'max_allowed_packet'
+     * @param int $size The new size. The maximum value this attribute can 
+     * have is 1073741824 bytes.
+     * @param string $unit One of 4 values: 'B' for byte, 'KB' for kilobyte, 
+     * 'MB' for megabyte and 'GB' for gigabyte. If the given value is none of the 
+     * 4, the type will be set to 'MP'.
+     */
+    public function setMaxPackete($size,$unit='MB'){
+        $max = 1073741824;
+        $updatedSize = 0;
+        $uUnit = strtoupper($unit);
+        if($uUnit != 'MB' && $uUnit != 'B' && $uUnit != 'KB' && $uUnit != 'GB'){
+            $uUnit = 'MB';
+        }
+        switch ($uUnit){
+            case 'B':{
+                $updatedSize = $size < $max && $size > 0 ? $size : $max;
+                break;
+            }
+            case 'KB':{
+                $new = $size*1024;
+                $updatedSize = $new < $max && $new > 0 ? $new : $max;
+                break;
+            }
+            case 'MB':{
+                $new = $size*1024*1024;
+                $updatedSize = $new < $max && $new > 0 ? $new : $max;
+                break;
+            }
+            case 'GB':{
+                $new = $size*1024*1024*1024;
+                $updatedSize = $new < $max && $new > 0 ? $new : $max;
+                break;
+            }
+            default:{
+                $updatedSize = $max;
+            }
+        }
+        $this->query = 'set global max_allowed_packet = '.$updatedSize.';';
     }
     /**
      * Constructs a query that can be used to get all tables in a schema given its name.
@@ -153,7 +195,7 @@ abstract class MySQLQuery implements JsonI{
      * @param boolean $inclComments Description
      * @since 1.4
      */
-    private function createTable($table,$inclComments=false){
+    private function createTable($table,$mysqlVnum='8.0',$inclComments=false){
         if($table instanceof Table){
             $query = '';
             if($inclComments === TRUE){
@@ -176,7 +218,7 @@ abstract class MySQLQuery implements JsonI{
             $query .= ')'.self::NL;
             $query .= 'ENGINE = '.$table->getEngine().self::NL;
             $query .= 'DEFAULT CHARSET = '.$table->getCharSet().self::NL;
-            $query .= 'collate = utf8mb4_unicode_520_ci;'.self::NL;
+            $query .= 'collate = '.$table->getCollation($mysqlVnum).';'.self::NL;
             
             $coutPk = $this->getStructure()->primaryKeyColsCount();
             if($coutPk > 1){
@@ -401,9 +443,15 @@ abstract class MySQLQuery implements JsonI{
             if(isset($selectOptions['condition-cols-and-vals']) && isset($selectOptions['conditions']) && isset($selectOptions['join-operators'])){
                 $cols = array();
                 $vals = array();
-                foreach($selectOptions['condition-cols-and-vals'] as $val => $col){
-                    $cols[] = $col;
-                    $vals[] = $val;
+                foreach($selectOptions['condition-cols-and-vals'] as $valOrColIndex => $colOrVal){
+                    if($colOrVal instanceof Column){
+                        $cols[] = $colOrVal;
+                        $vals[] = $valOrColIndex;
+                    }
+                    else{
+                        $cols[] = $this->getStructure()->getColByIndex($valOrColIndex);
+                        $vals[] = $colOrVal;
+                    }
                 }
                 $where = $this->createWhereConditions($cols, $vals, $selectOptions['conditions'], $selectOptions['join-operators']);
             }
@@ -531,10 +579,14 @@ abstract class MySQLQuery implements JsonI{
     }
     /**
      * Constructs a query that can be used to insert a new record.
-     * @param array $colsAndVals An associative array. The indices should be 
-     * the values of the columns and the value of the index should be an 
-     * object of type 'Column'. If the column has a datatype of 'blob', 
-     * the value should be the file path.
+     * @param array $colsAndVals An associative array. The array can have two 
+     * possible structures:
+     * <ul>
+     * <li>A column index as an index with a value as the value of the column (Recomended).</li>
+     * <li>A value as an index with an object of type 'Column' as it is value.</li>
+     * </ul>
+     * The second way is not recomended as it may caus some issues if two columns 
+     * have the same value.
      * @since 1.8.2
      */
     public function insertRecord($colsAndVals) {
@@ -543,30 +595,35 @@ abstract class MySQLQuery implements JsonI{
         $count = count($colsAndVals);
         $index = 0;
         $comma = '';
-        foreach($colsAndVals as $val=>$colObj){
+        foreach($colsAndVals as $valOrColIndex=>$colObjOrVal){
             if($index + 1 == $count){
                 $comma = '';
             }
             else{
                 $comma = ',';
             }
-            $cols .= $colObj->getName().$comma;
-            $colValLower = strtolower($val);
-            if(trim($colValLower) != 'null'){
-                $type = $colObj->getType();
-                if($type == 'varchar' || $type == 'datetime' || $type == 'timestamp' || $type == 'text' || $type == 'mediumtext'){
-                    $vals .= '\''.self::escapeMySQLSpeciarChars($val).'\''.$comma;
-                }
-                else if($type == 'tinyblob' || $type == 'mediumblob' || $type == 'longblob'){
-                    $fixedPath = str_replace('\\', '/', $val);
-                    if(file_exists($fixedPath)){
-                        $file = fopen($fixedPath, 'r');
-                        $data = '';
-                        if($file !== FALSE){
-                            $fileContent = fread($file, filesize($fixedPath));
-                            if($fileContent !== FALSE){
-                                $data = '\''. addslashes($fileContent).'\'';
-                                $vals .= $data.$comma;
+            if($colObjOrVal instanceof Column){
+                //a value as an index with an object of type Column
+                $cols .= $colObjOrVal->getName().$comma;
+                if($valOrColIndex !== 'null'){
+                    $type = $colObjOrVal->getType();
+                    if($type == 'varchar' || $type == 'datetime' || $type == 'timestamp' || $type == 'text' || $type == 'mediumtext'){
+                        $vals .= '\''.self::escapeMySQLSpeciarChars($valOrColIndex).'\''.$comma;
+                    }
+                    else if($type == 'tinyblob' || $type == 'mediumblob' || $type == 'longblob'){
+                        $fixedPath = str_replace('\\', '/', $valOrColIndex);
+                        if(file_exists($fixedPath)){
+                            $file = fopen($fixedPath, 'r');
+                            $data = '';
+                            if($file !== FALSE){
+                                $fileContent = fread($file, filesize($fixedPath));
+                                if($fileContent !== FALSE){
+                                    $data = '\''. addslashes($fileContent).'\'';
+                                    $vals .= $data.$comma;
+                                }
+                                else{
+                                    $vals .= 'NULL'.$comma;
+                                }
                             }
                             else{
                                 $vals .= 'NULL'.$comma;
@@ -577,15 +634,54 @@ abstract class MySQLQuery implements JsonI{
                         }
                     }
                     else{
-                        $vals .= 'NULL'.$comma;
+                         $vals .= $valOrColIndex.$comma;
                     }
                 }
                 else{
-                     $vals .= $val.$comma;
+                    $vals .= 'NULL'.$comma;
                 }
             }
             else{
-                $vals .= 'null'.$comma;
+                //an index with a value
+                $column = $this->getStructure()->getColByIndex($valOrColIndex);
+                if($column instanceof Column){
+                    $cols .= $column->getName().$comma;
+                    if($colObjOrVal !== 'null'){
+                        $type = $column->getType();
+                        if($type == 'varchar' || $type == 'datetime' || $type == 'timestamp' || $type == 'text' || $type == 'mediumtext'){
+                            $vals .= '\''.self::escapeMySQLSpeciarChars($colObjOrVal).'\''.$comma;
+                        }
+                        else if($type == 'tinyblob' || $type == 'mediumblob' || $type == 'longblob'){
+                            $fixedPath = str_replace('\\', '/', $colObjOrVal);
+                            if(file_exists($fixedPath)){
+                                $file = fopen($fixedPath, 'r');
+                                $data = '';
+                                if($file !== FALSE){
+                                    $fileContent = fread($file, filesize($fixedPath));
+                                    if($fileContent !== FALSE){
+                                        $data = '\''. addslashes($fileContent).'\'';
+                                        $vals .= $data.$comma;
+                                    }
+                                    else{
+                                        $vals .= 'NULL'.$comma;
+                                    }
+                                }
+                                else{
+                                    $vals .= 'NULL'.$comma;
+                                }
+                            }
+                            else{
+                                $vals .= 'NULL'.$comma;
+                            }
+                        }
+                        else{
+                             $vals .= $valOrColIndex.$comma;
+                        }
+                    }
+                    else{
+                        $vals .= 'NULL'.$comma;
+                    }
+                }
             }
             $index++;
         }
@@ -648,9 +744,15 @@ abstract class MySQLQuery implements JsonI{
     public function deleteRecord($columnsAndVals,$valsConds,$jointOps=array()) {
         $cols = array();
         $vals = array();
-        foreach ($columnsAndVals as $val => $colObj){
-            $cols[] = $colObj;
-            $vals[] = $val;
+        foreach ($columnsAndVals as $valOrIndex => $colObjOrVal){
+            if($colObjOrVal instanceof Column){
+                $cols[] = $colObjOrVal;
+                $vals[] = $valOrIndex;
+            }
+            else{
+                $cols[] = $this->getStructure()->getColByIndex($valOrIndex);
+                $vals[] = $colObjOrVal;
+            }
         }
         $query = 'delete from '.$this->getStructureName();
         $this->setQuery($query.$this->createWhereConditions($cols, $vals, $valsConds, $jointOps).';', 'delete');
@@ -690,10 +792,10 @@ abstract class MySQLQuery implements JsonI{
                 $valUpper = strtoupper(trim($vals[$index]));
                 if($valUpper == 'IS NULL' || $valUpper == 'IS NOT NULL'){
                     if($index + 1 == $count){
-                        $where .= $col->getName().' '.$vals[$index].'';
+                        $where .= $col->getName().' '.$valUpper.'';
                     }
                     else{
-                        $where .= $col->getName().' '.$vals[$index].' '.$jointOps[$index].' ';
+                        $where .= $col->getName().' '.$valUpper.' '.$jointOps[$index].' ';
                     }
                 }
                 else{
@@ -768,22 +870,22 @@ abstract class MySQLQuery implements JsonI{
         $comma = '';
         $index = 0;
         $count = count($colsAndNewVals);
-        foreach($colsAndNewVals as $newVal => $colObj){
-            if($colObj instanceof Column){
-                if($index + 1 == $count){
-                    $comma = '';
-                }
-                else{
-                    $comma = ',';
-                }
-                $newValLower = strtolower($newVal);
-                if(trim($newValLower) != 'null'){
-                    $type = $colObj->getType();
+        foreach($colsAndNewVals as $newValOrIndex => $colObjOrNewVal){
+            if($index + 1 == $count){
+                $comma = '';
+            }
+            else{
+                $comma = ',';
+            }
+            if($colObjOrNewVal instanceof Column){
+                $newValLower = strtolower($newValOrIndex);
+                if(trim($newValLower) !== 'null'){
+                    $type = $colObjOrNewVal->getType();
                     if($type == 'varchar' || $type == 'datetime' || $type == 'timestamp' || $type == 'text' || $type == 'mediumtext'){
-                        $colsStr .= ' '.$colObj->getName().' = \''.self::escapeMySQLSpeciarChars($newVal).'\''.$comma ;
+                        $colsStr .= ' '.$colObjOrNewVal->getName().' = \''.self::escapeMySQLSpeciarChars($newValOrIndex).'\''.$comma ;
                     }
                     else if($type == 'tinyblob' || $type == 'mediumblob' || $type == 'longblob'){
-                        $fixedPath = str_replace('\\', '/', $newVal);
+                        $fixedPath = str_replace('\\', '/', $newValOrIndex);
                         if(file_exists($fixedPath)){
                             $file = fopen($fixedPath, 'r');
                             $data = '';
@@ -806,20 +908,67 @@ abstract class MySQLQuery implements JsonI{
                         }
                     }
                     else{
-                        $colsStr .= ' '.$colObj->getName().' = '.$newVal.$comma;
+                        $colsStr .= ' '.$colObjOrNewVal->getName().' = '.$newValOrIndex.$comma;
                     }
                 }
                 else{
-                    $colsStr .= ' '.$colObj->getName().' = null'.$comma;
+                    $colsStr .= ' '.$colObjOrNewVal->getName().' = NULL'.$comma;
+                }
+            }
+            else{
+                $column = $this->getStructure()->getColByIndex($newValOrIndex);
+                if($column instanceof Column){
+                    $newValLower = strtolower($colObjOrNewVal);
+                    if(trim($newValLower) !== 'null'){
+                        $type = $column->getType();
+                        if($type == 'varchar' || $type == 'datetime' || $type == 'timestamp' || $type == 'text' || $type == 'mediumtext'){
+                            $colsStr .= ' '.$column->getName().' = \''.self::escapeMySQLSpeciarChars($colObjOrNewVal).'\''.$comma ;
+                        }
+                        else if($type == 'tinyblob' || $type == 'mediumblob' || $type == 'longblob'){
+                            $fixedPath = str_replace('\\', '/', $colObjOrNewVal);
+                            if(file_exists($fixedPath)){
+                                $file = fopen($fixedPath, 'r');
+                                $data = '';
+                                if($file !== FALSE){
+                                    $fileContent = fread($file, filesize($fixedPath));
+                                    if($fileContent !== FALSE){
+                                        $data = '\''. addslashes($fileContent).'\'';
+                                        $colsStr .= $data.$comma;
+                                    }
+                                    else{
+                                        $colsStr .= 'NULL'.$comma;
+                                    }
+                                }
+                                else{
+                                    $colsStr .= 'NULL'.$comma;
+                                }
+                            }
+                            else{
+                                $colsStr .= 'NULL'.$comma;
+                            }
+                        }
+                        else{
+                            $colsStr .= ' '.$column->getName().' = '.$newValOrIndex.$comma;
+                        }
+                    }
+                    else{
+                        $colsStr .= ' '.$column->getName().' = NULL'.$comma;
+                    }
                 }
             }
             $index++;
         }
         $colsArr = array();
         $valsArr = array();
-        foreach ($colsAndVals as $vl=>$cl){
-            $colsArr[] = $cl;
-            $valsArr[] = $vl;
+        foreach ($colsAndVals as $valueOrIndex=>$colObjOrVal){
+            if($colObjOrNewVal instanceof Column){
+                $colsArr[] = $colObjOrVal;
+                $valsArr[] = $valueOrIndex;
+            }
+            else{
+                $colsArr[] = $this->getStructure()->getColByIndex($valueOrIndex);
+                $valsArr[] = $colObjOrVal;
+            }
         }
         $this->setQuery('update '.$this->getStructureName().' set '.$colsStr.$this->createWhereConditions($colsArr, $valsArr, $valsConds, $jointOps).';', 'update');
     }
@@ -854,18 +1003,6 @@ abstract class MySQLQuery implements JsonI{
             $index++;
         }
         $this->setQuery('update '.$this->getStructureName().' set '.$cols.' where '.$idColName.' = '.$id, 'update');
-    }
-    /**
-     * Returns a JSON string that represents the query.
-     * @return string A JSON object on the following formate: 
-     * <b><br/>{<br/>&nbsp;&nbsp;"query":"",<br/>&nbsp;&nbsp;"query-type":""<br/>}</b>
-     * @since 1.1
-     */
-    public function toJSON(){
-        $json = new JsonX();
-        $json->add('query', $this->getQuery());
-        $json->add('type', $this->getType());
-        return $json;
     }
     /**
      * Constructs a query that can be used to select maximum value of a table column.
@@ -915,6 +1052,8 @@ abstract class MySQLQuery implements JsonI{
     /**
      * Constructs a query that can be used to create the table which is linked 
      * with the query class.
+     * @param string $mySqlVersion [Optional] Version number of MySQL. Default 
+     * is '8.0'.
      * @param boolean $inclComments If set to TRUE, the generated MySQL 
      * query will have basic comments explaining the structure.
      * @return boolean Once the query is structured, the function will return 
@@ -923,10 +1062,10 @@ abstract class MySQLQuery implements JsonI{
      * did not return an object of type 'Table'.
      * @since 1.5
      */
-    public function createStructure($inclComments=false){
+    public function createStructure($mySqlVersion='8.0',$inclComments=false){
         $t = $this->getStructure();
         if($t instanceof Table){
-            $this->createTable($t,$inclComments);
+            $this->createTable($t,$mySqlVersion,$inclComments);
             return TRUE;
         }
         return FALSE;
@@ -966,6 +1105,18 @@ abstract class MySQLQuery implements JsonI{
             return Table::NO_SUCH_COL;
         }
         return self::NO_STRUCTURE;
+    }
+    /**
+     * Returns the index of a column given its key.
+     * @param string $colKey The name of the column key.
+     * @return int  The index of the column if found starting from 0. 
+     * If the column was not found, the function will return -1.
+     * @since 1.8.4
+     */
+    public function getColIndex($colKey){
+        $col = $this->getCol($colKey);
+        $index = $col instanceof Column ? $col->getIndex() : -1;
+        return $index;
     }
     /**
      * Returns the table that is used for constructing queries.

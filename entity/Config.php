@@ -87,7 +87,7 @@ class Config{
      * Initialize configuration.
      */
     private function __construct() {
-        $this->isConfigured = FALSE;
+        $this->isConfigured = TRUE;
         $this->lisksDate = '09-09-2018 (DD-MM-YYYY)';
         $this->lisksVersion = '1.0.0-PR3';
         $this->lisksVersionType = 'Beta';

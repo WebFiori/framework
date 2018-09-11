@@ -43,7 +43,7 @@ if(!defined('ROOT_DIR')){
  * A class that is used to split URIs and get their parameters and others
  *
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.2
+ * @version 1.3
  */
 class RouterUri {
     /**
@@ -72,6 +72,13 @@ class RouterUri {
      */
     private $closureParams = array();
     /**
+     * A boolean value that is set to TRUE if the URI will be included in 
+     * generated site map.
+     * @var boolean 
+     * @since 1.3
+     */
+    private $incInSiteMap;
+    /**
      * Creates new instance.
      * @param string $requestedUri The URI such as 'https://www3.programmingacademia.com:80/{some-var}/hell/{other-var}/?do=dnt&y=#xyz'
      * @param string $routeTo The file that the route will take the user to ar a closure.
@@ -82,6 +89,16 @@ class RouterUri {
         $this->setRoute($routeTo);
         $this->uriBroken = self::splitURI($requestedUri);
         $this->setClosureParams($closureParams);
+        $this->incInSiteMap = FALSE;
+    }
+    /**
+     * Checks if the URI will be included in auto-generated site map or not.
+     * @return boolean If the URI will be included, the Function will return 
+     * TRUE. Default is FALSE.
+     * @since 1.3
+     */
+    public function isInSiteMap(){
+        return $this->incInSiteMap;
     }
     /**
      * Returns the type of element that the URI will route to.

@@ -110,10 +110,13 @@ class DatabaseLink{
      * @since 1.0
      */
     public function isConnected(){
-        $test = mysqli_ping($this->link);
-        if($test === FALSE){
-            $this->lastErrorMessage = mysqli_error($this->link);
-            $this->lastErrorNo = mysqli_errno($this->link);
+        $test = FALSE;
+        if($this->link instanceof mysqli){
+            $test = mysqli_ping($this->link);
+            if($test === FALSE){
+                $this->lastErrorMessage = mysqli_error($this->link);
+                $this->lastErrorNo = mysqli_errno($this->link);
+            }
         }
         return $test;
     }

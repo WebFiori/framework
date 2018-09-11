@@ -97,41 +97,46 @@ class Functions {
         Logger::logFuncReturn(__METHOD__);
     }
     /**
-     * A function that must be called after session is started to 
-     * initiate database connection.
+     * Initiate database connection.
      * @since 1.1
      */
-    public function useDatabase() {
+    public function useDatabase($optionalConnectionParams=array()) {
         Logger::logFuncCall(__METHOD__);
         $systemStatus = Util::checkSystemStatus();
+        $dbLink = $this->getDBLink();
         if($systemStatus === TRUE){
-            $result = $this->getSession()->useDb(array(
-                'host'=>Config::get()->getDBHost(),
-                'user'=>Config::get()->getDBUser(),
-                'pass'=>Config::get()->getDBPassword(),
-                'db-name'=> Config::get()->getDBName()
-            ));
-            if($result !== TRUE && !defined('SETUP_MODE')){
-                Logger::log('Unable to connect to the database.', 'error');
-                $dbLink = $this->getDBLink();
-                Logger::log('Error Code: '.$dbLink->getErrorCode(), 'error');
-                Logger::log('Error Message: '.$dbLink->getErrorMessage(), 'error');
-                Logger::requestCompleted();
-                header('content-type:application/json');
-                die($this->getSession()->getDBLink()->toJSON());
-            }
-            else if($result !== TRUE && defined('SETUP_MODE')){
-                Logger::log('Unable to connect to the database while in setup mode.', 'warning');
-                $dbLink = $this->getDBLink();
-                Logger::log('Error Code: '.$dbLink->getErrorCode(), 'error');
-                Logger::log('Error Message: '.$dbLink->getErrorMessage(), 'error');
+            Logger::log('Checking if optional database parameters are provided or not...');
+            if($optionalConnectionParams != NULL && isset($optionalConnectionParams['host'])
+                    && isset($optionalConnectionParams['user']) &&
+                    isset($optionalConnectionParams['pass']) && 
+                    isset($optionalConnectionParams['db-name'])){
+                Logger::log('They are provided.');
+                $retVal =  $this->_connect($optionalConnectionParams);
                 Logger::logFuncReturn(__METHOD__);
-                return FALSE;
+                return $retVal;
+            }
+            else{
+                Logger::log('No optional paameters give. Cheking if already connected...');
+                if(!$dbLink->isConnected()){
+                    Logger::log('No database connection. Trying to connect...');
+                    $retVal = $this->_connect(array(
+                        'host'=>Config::get()->getDBHost(),
+                        'user'=>Config::get()->getDBUser(),
+                        'pass'=>Config::get()->getDBPassword(),
+                        'db-name'=> Config::get()->getDBName()
+                    ));
+                    Logger::logFuncReturn(__METHOD__);
+                    return $retVal;
+                }
+                else{
+                    Logger::log('Already connected.');
+                    Logger::logFuncReturn(__METHOD__);
+                    return TRUE;
+                }
             }
         }
         else if($systemStatus == Util::DB_NEED_CONF && !defined('SETUP_MODE')){
             Logger::log('Unable to connect to the database.', 'error');
-            $dbLink = $this->getDBLink();
             Logger::log('Error Code: '.$dbLink->getErrorCode(), 'error');
             Logger::log('Error Message: '.$dbLink->getErrorMessage(), 'error');
             Logger::requestCompleted();
@@ -147,6 +152,33 @@ class Functions {
             die('{"message":"Invalid system status.","details":"'.$systemStatus.'"}');
         }
     }
+    private function _connect($connParams){
+        Logger::logFuncCall(__METHOD__);
+        $result = $this->getSession()->useDb(array(
+            'host'=>$connParams['host'],
+            'user'=>$connParams['user'],
+            'pass'=>$connParams['pass'],
+            'db-name'=>$connParams['db-name']
+        ));
+        if($result !== TRUE && !defined('SETUP_MODE')){
+            Logger::log('Unable to connect to the database.', 'error');
+            $dbLink = $this->getDBLink();
+            Logger::log('Error Code: '.$dbLink->getErrorCode(), 'error');
+            Logger::log('Error Message: '.$dbLink->getErrorMessage(), 'error');
+            Logger::requestCompleted();
+            header('content-type:application/json');
+            die('{"error-code":"'.$this->getDBLink()->getErrorCode().'","details":"'.JsonX::escapeJSONSpecialChars($this->getDBLink()->getErrorMessage()).'"}');
+        }
+        else if($result !== TRUE && defined('SETUP_MODE')){
+            Logger::log('Unable to connect to the database while in setup mode.', 'warning');
+            $dbLink = $this->getDBLink();
+            Logger::log('Error Code: '.$dbLink->getErrorCode(), 'error');
+            Logger::log('Error Message: '.$dbLink->getErrorMessage(), 'error');
+            Logger::logFuncReturn(__METHOD__);
+            return FALSE;
+        }
+    }
+
     /**
      * A session manager.
      * @var SessionManager an instance of 'SessionManager'.
@@ -243,9 +275,9 @@ class Functions {
      * @return DatabaseLink The link that is used to connect to the database.
      * @since 1.2
      */
-    public function getDBLink() {
+    public function &getDBLink() {
         Logger::logFuncCall(__METHOD__);
-        $retVal = $this->getSession()->getDBLink();
+        $retVal = &$this->getSession()->getDBLink();
         Logger::logFuncReturn(__METHOD__);
         return $retVal;
     }

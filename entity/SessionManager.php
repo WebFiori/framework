@@ -836,7 +836,7 @@ class SessionManager implements JsonI{
      * session does not use database connection.
      * @since 1.0
      */
-    public function getDBLink(){
+    public function &getDBLink(){
         Logger::logFuncCall(__METHOD__);
         $retVal = NULL;
         Logger::log('Checking if session is active...');

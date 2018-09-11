@@ -308,7 +308,7 @@ abstract class MySQLQuery{
             $this->queryType = $ltype;
         }
         else{
-            throw new Exception('Unsupported query type: '+$type);
+            throw new Exception('Unsupported query type: \''.$type.'\'');
         }
     }
     /**
@@ -440,7 +440,8 @@ abstract class MySQLQuery{
             else{
                 $selectQuery .= '* from '.$this->getStructureName();
             }
-            if(isset($selectOptions['condition-cols-and-vals']) && isset($selectOptions['conditions']) && isset($selectOptions['join-operators'])){
+            $selectOptions['join-operators'] = isset($selectOptions['join-operators']) ? $selectOptions['join-operators'] : array();
+            if(isset($selectOptions['condition-cols-and-vals']) && isset($selectOptions['conditions'])){
                 $cols = array();
                 $vals = array();
                 foreach($selectOptions['condition-cols-and-vals'] as $valOrColIndex => $colOrVal){
@@ -1097,14 +1098,15 @@ abstract class MySQLQuery{
      */
     public function &getCol($colKey){
         $structure = $this->getStructure();
+        $retVal = self::NO_STRUCTURE;
         if($structure instanceof Table){
             $col = $structure->getCol($colKey);
             if($col instanceof Column){
                 return $col;
             }
-            return Table::NO_SUCH_COL;
+            $retVal = Table::NO_SUCH_COL;
         }
-        return self::NO_STRUCTURE;
+        return $retVal;
     }
     /**
      * Returns the index of a column given its key.

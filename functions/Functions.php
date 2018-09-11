@@ -103,7 +103,7 @@ class Functions {
     public function useDatabase($optionalConnectionParams=array()) {
         Logger::logFuncCall(__METHOD__);
         $systemStatus = Util::checkSystemStatus();
-        $dbLink = $this->getDBLink();
+        $dbLink = &$this->getDBLink();
         if($systemStatus === TRUE){
             Logger::log('Checking if optional database parameters are provided or not...');
             if($optionalConnectionParams != NULL && isset($optionalConnectionParams['host'])
@@ -197,7 +197,7 @@ class Functions {
         Logger::logFuncCall(__METHOD__);
         if($qObj instanceof MySQLQuery){
             $this->useDatabase();
-            $dbLink = $this->getDBLink();
+            $dbLink = &$this->getDBLink();
             if($dbLink != NULL){
                 Logger::log('Executing database query...');
                 $result = $dbLink->executeQuery($qObj);
@@ -244,16 +244,18 @@ class Functions {
      * @since 1.0
      * @deprecated since version 1.3
      */
-    public function getMainSession(){
-        return $this->getSession();
+    public function &getMainSession(){
+        $retVal = &$this->getSession();
+        return $retVal;
     }
     /**
      * 
      * @return SessionManager
      * @since 1.3
      */
-    public function getSession() {
-        return self::$sessions[$this->sessionName];
+    public function &getSession() {
+        $retVal = self::$sessions[$this->sessionName];
+        return $retVal;
     }
     /**
      * Returns language code from the session manager.

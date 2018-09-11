@@ -120,6 +120,7 @@ class LisksCode{
          */
         require_once ROOT_DIR.'/entity/AutoLoader.php';
         $this->AU = AutoLoader::get();
+        $this->setAutoloadDirectories();
         
         //uncomment next line to show runtime errors and warnings
         //also enable logging for info, warnings and errors 
@@ -148,6 +149,38 @@ class LisksCode{
         $this->initCron();
         Logger::log('Initializing completed.');
         self::$classStatus = 'INITIALIZED';
+    }
+    /**
+     * Returns a reference to an instance of 'AutoLoader'.
+     * @return AutoLoader A reference to an instance of 'AutoLoader'.
+     * @since 1.2.1
+     */
+    public static function &getAutoloader() {
+        return self::getAndStart()->AU;
+    }
+    /**
+     * Returns a reference to an instance of 'BasicMailFunctions'.
+     * @return BasicMailFunctions A reference to an instance of 'BasicMailFunctions'.
+     * @since 1.2.1
+     */
+    public static function &getBasicMailFunctions() {
+        return self::getAndStart()->BMF;
+    }
+    /**
+     * Returns a reference to an instance of 'SystemFunctions'.
+     * @return SystemFunctions A reference to an instance of 'SystemFunctions'.
+     * @since 1.2.1
+     */
+    public static function &getSysFunctions(){
+        return self::getAndStart()->SF;
+    }
+    /**
+     * Returns a reference to an instance of 'WebsiteFunctions'.
+     * @return WebsiteFunctions A reference to an instance of 'WebsiteFunctions'.
+     * @since 1.2.1
+     */
+    public static function &getWebsiteFunctions() {
+        return self::getAndStart()->WF;
     }
     /**
      * Returns the current status of the system.
@@ -262,6 +295,16 @@ class LisksCode{
         $this->WF->updateSiteInfo($siteInfoArr);
     }
     /**
+     * Add your own custom search folders in here. The autoloader will search 
+     * inside them for classes.
+     * @since 1.2.1
+     */
+    private function setAutoloadDirectories(){
+        //$this->AU->addSearchDirectory('my-system/entities');
+        //$this->AU->addSearchDirectory('my-system/logic');
+        //$this->AU->addSearchDirectory('my-system/apis');
+    }
+    /**
      * Updates database settings.
      * @since 1.1
      */
@@ -302,7 +345,7 @@ class LisksCode{
      * Initialize cron jobs.
      * @since 1.3
      */
-    public function initCron(){
+    private function initCron(){
         //initialize cron job manager
         
         //set access password
@@ -311,12 +354,12 @@ class LisksCode{
         Cron::password('123456');
         
         //add jobs
-//        $job = new CronJob('*/5,*/3 * * * *');
-//        $job->setOnExecution(function($params){
-//            $file = fopen('cron.txt', 'a+');
-//            fwrite($file, 'Job \''.$params[0]->getJobName().'\' executed at '.date(DATE_RFC1123)."\r\n");
-//        },array($job));
-//        Cron::scheduleJob($job);
+        //$job = new CronJob('*/5,*/3 * * * *');
+        //$job->setOnExecution(function($params){
+        //    $file = fopen('cron.txt', 'a+');
+        //    fwrite($file, 'Job \''.$params[0]->getJobName().'\' executed at '.date(DATE_RFC1123)."\r\n");
+        //},array($job));
+        //Cron::scheduleJob($job);
     }
     /**
      * Show an error message that tells the user about system status and how to 

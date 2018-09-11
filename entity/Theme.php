@@ -299,10 +299,13 @@ class Theme implements JsonI{
         $themes = array();
         $themesDirs = array_diff(scandir(ROOT_DIR.'/'. self::THEMES_DIR), array('..', '.'));
         foreach ($themesDirs as $dir){
-            include ROOT_DIR.'/'.self::THEMES_DIR.'/'.$dir.'/theme.php';
-            if(isset($theme)){
-                $themes[$theme->getName()] = $theme;
-                unset($theme);
+            $fullPath = ROOT_DIR.'/'.self::THEMES_DIR.'/'.$dir.'/theme.php';
+            if(file_exists($fullPath)){
+                require $fullPath;
+                if(isset($theme)){
+                    $themes[$theme->getName()] = $theme;
+                    unset($theme);
+                }
             }
         }
         Logger::logFuncReturn(__METHOD__);

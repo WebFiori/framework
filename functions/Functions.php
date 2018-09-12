@@ -245,7 +245,9 @@ class Functions {
      * @deprecated since version 1.3
      */
     public function &getMainSession(){
+        Logger::logFuncCall(__METHOD__);
         $retVal = &$this->getSession();
+        Logger::logFuncReturn(__METHOD__);
         return $retVal;
     }
     /**
@@ -254,7 +256,10 @@ class Functions {
      * @since 1.3
      */
     public function &getSession() {
-        $retVal = self::$sessions[$this->sessionName];
+        Logger::logFuncCall(__METHOD__);
+        Logger::log('Session name = \''.$this->sessionName.'\'.', 'debug');
+        $retVal = &self::$sessions[$this->sessionName];
+        Logger::logFuncReturn(__METHOD__);
         return $retVal;
     }
     /**
@@ -293,8 +298,11 @@ class Functions {
     public function rows(){
         Logger::logFuncCall(__METHOD__);
         $retVal = -1;
-        if($this->getSession()->getDBLink() !== NULL){
-            $retVal = $this->getSession()->getDBLink()->rows();
+        Logger::log('Getting Database link...');
+        $dbLink = $this->getDBLink();
+        Logger::log('Checking if database link is not null...');
+        if($dbLink !== NULL){
+            $retVal = $dbLink->rows();
         }
         else{
             Logger::log('Database link is NULL.', 'warning');
@@ -313,8 +321,11 @@ class Functions {
     public function getRow(){
         Logger::logFuncCall(__METHOD__);
         $retVal = NULL;
-        if($this->getSession()->getDBLink() != NULL){
-            $retVal = $this->getSession()->getDBLink()->getRow();
+        Logger::log('Getting Database link...');
+        $dbLink = $this->getDBLink();
+        Logger::log('Checking if database link is not null...');
+        if($dbLink !== NULL){
+            $retVal = $dbLink->getRow();
         }
         else{
             Logger::log('Database link is NULL.', 'warning');
@@ -332,8 +343,11 @@ class Functions {
     public function getUserID(){
         Logger::logFuncCall(__METHOD__);
         $retVal = -1;
-        if($this->getSession()->getUser() != NULL){
-            $retVal = intval($this->getSession()->getUser()->getID());
+        Logger::log('Getting user from session manager...');
+        $user = $this->getSession()->getUser();
+        Logger::log('Checking if user is null or not...');
+        if($user !== NULL){
+            $retVal = intval($user->getID());
         }
         else{
             Logger::log('The linked user is NULL.', 'warning');

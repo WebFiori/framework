@@ -134,11 +134,11 @@ class Page{
      * @since 1.9
      */
     public static function canonical($new=null){
-        $page = Page::get();
+        $p = &Page::get();
         if($new != NULL && strlen($new) != 0){
-            $page->setCanonical($new);
+            $p->setCanonical($new);
         }
-        return $page->getCanonical();
+        return $p->getCanonical();
     }
     private function __construct() {
         Logger::logFuncCall(__METHOD__);
@@ -188,11 +188,11 @@ class Page{
      * @since 1.9
      */
     public static function siteName($new=null) {
-        $page = Page::get();
+        $p = &Page::get();
         if($new != NULL && strlen($new) != 0){
-            $page->setWebsiteName($new);
+            $p->setWebsiteName($new);
         }
-        return $page->getWebsiteName();
+        return $p->getWebsiteName();
     }
     /**
      * Returns the name of the website.
@@ -231,11 +231,11 @@ class Page{
      * @since 1.9
      */
     public static function separator($new=null){
-        $page = Page::get();
+        $p = &Page::get();
         if($new != NULL && strlen($new) != 0){
-            $page->setTitleSep($new);
+            $p->setTitleSep($new);
         }
-        return $page->getTitleSep();
+        return $p->getTitleSep();
     }
     /**
      * Returns the character or string that is used to separate web page title 
@@ -325,11 +325,11 @@ class Page{
      */
     private static $instance;
     /**
-     * Returns a single instance of <b>Page</b>
-     * @return Page an instance of <b>Page</b>.
+     * Returns a single instance of 'Page'
+     * @return Page an instance of 'Page'.
      * @since 1.0
      */
-    public static function get(){
+    public static function &get(){
         if(self::$instance != NULL){
             return self::$instance;
         }
@@ -348,11 +348,11 @@ class Page{
      * @return string The title of the page.
      */
     public static function title($new=null) {
-        $page = Page::get();
+        $p = &Page::get();
         if($new != NULL && strlen($new) != 0){
-            $page->setTitle($new);
+            $p->setTitle($new);
         }
-        return $page->getTitle();
+        return $p->getTitle();
     }
     /**
      * Sets the title of the page.
@@ -430,7 +430,7 @@ class Page{
     }
     /**
      * Returns the document that is associated with the page.
-     * @return HTMLDoc An object of type <b>HTMLDoc</b>.
+     * @return HTMLDoc An object of type 'HTMLDoc'.
      * @throws Exception If page theme is not loaded.
      * @since 1.1
      */
@@ -461,11 +461,11 @@ class Page{
      * @return string The description of the page.
      */
     public static function description($new=null) {
-        $page = Page::get();
+        $p = &Page::get();
         if($new != NULL && strlen($new) != 0){
-            $page->setDescription($new);
+            $p->setDescription($new);
         }
-        return $page->getDescription();
+        return $p->getDescription();
     }
     /**
      * Sets the description of the page.
@@ -533,11 +533,11 @@ class Page{
      * @since 1.9
      */
     public static function lang($new=null){
-        $page = Page::get();
+        $p = &Page::get();
         if($new != NULL && strlen($new) == 2){
-            $page->setLang($new);
+            $p->setLang($new);
         }
-        return $page->getLang();
+        return $p->getLang();
     }
     /**
      * Returns the language.
@@ -583,10 +583,10 @@ class Page{
      * @since 1.9
      */
     public static function &translation(){
-        $page = Page::get();
-        if($page->getLang() != NULL){
-            $page->usingLanguage();
-            return $page->getLanguage();
+        $p = &Page::get();
+        if($p->getLang() != NULL){
+            $p->usingLanguage();
+            return $p->getLanguage();
         }
         return NULL;
     }
@@ -617,11 +617,11 @@ class Page{
      * @since 1.9
      */
     public static function theme($name=null){
-        $page = Page::get();
+        $p = &Page::get();
         if($name != NULL && strlen($name) != 0){
-            $page->usingTheme($name);
+            $p->usingTheme($name);
         }
-        return $page->getTheme();
+        return $p->getTheme();
     }
     /**
      * Loads a theme given its name.
@@ -639,19 +639,31 @@ class Page{
      * @see Theme::usingTheme()
      */
     public function usingTheme($themeName=null) {
+        Logger::logFuncCall(__METHOD__);
+        Logger::log('Checking if given theme name is null...');
         if($themeName === NULL){
+            Logger::log('Given value is null. Using theme name from configuration file.');
             $themeName = SiteConfig::get()->getBaseThemeName();
         }
+        Logger::log('Theme name = \''.$themeName.'\'.', 'debug');
+        Logger::log('Loading theme...');
         $tmpTheme = Theme::usingTheme($themeName);
         $this->theme = $tmpTheme;
+        Logger::log('Theme loaded.');
+        Logger::log('Constructing page document...');
         $this->document = new HTMLDoc();
+        Logger::log('Initializing document head node...');
         $headNode = $this->_getHead(TRUE);
+        Logger::log('Initializing document footer node...');
         $footerNode = $this->_getFooter(TRUE);
+        Logger::log('Initializing document aside node...');
         $asideNode = $this->_getAside(TRUE);
+        Logger::log('Initializing document header node...');
         $headerNode = $this->_getHeader(TRUE);
         $this->document->setLanguage($this->getLang());
         $this->document->setHeadNode($headNode);
         $this->document->addChild($headerNode);
+        Logger::log('Creating document body...');
         $body = new HTMLNode();
         $body->setID('page-body');
         $body->addChild($asideNode);
@@ -660,7 +672,11 @@ class Page{
         $body->addChild($mainContentArea);
         $this->document->addChild($body);
         $this->document->addChild($footerNode);
+        Logger::log('Document building finished.');
+        Logger::log('Invoking after loaded function...');
         $this->theme->invokeAfterLoaded();
+        Logger::log('Theme initialization finished.');
+        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * Returns the directory at which CSS files of loaded theme exists.
@@ -751,12 +767,12 @@ class Page{
      * @since 1.9
      */
     public static function dir($new=null) {
-        $page = Page::get();
+        $p = &Page::get();
         $lNew = strtolower($new);
         if($lNew == 'ltr' || $lNew == 'rtl'){
-            $page->setWritingDir($new);
+            $p->setWritingDir($new);
         }
-        return $page->getWritingDir();
+        return $p->getWritingDir();
     }
     /**
      * Returns the writing direction of the page.
@@ -855,10 +871,11 @@ class Page{
      * aside area.
      */
     public static function aside($bool=null) {
+        $p = &Page::get();
         if($bool !== NULL){
-            Page::get()->setHasAside($bool);
+            $p->setHasAside($bool);
         }
-        return Page::get()->hasAside();
+        return $p->hasAside();
     }
     /**
      * Sets or checks if the page will have footer area or not.
@@ -869,10 +886,11 @@ class Page{
      * footer area.
      */
     public static function footer($bool=null) {
+        $p = &Page::get();
         if($bool !== NULL){
-            Page::get()->setHasFooter($bool);
+            $p->setHasFooter($bool);
         }
-        return Page::get()->hasFooter();
+        return $p->hasFooter();
     }
     /**
      * Sets or checks if the page will have header area or not.
@@ -883,10 +901,11 @@ class Page{
      * header area.
      */
     public static function header($bool=null) {
+        $p = &Page::get();
         if($bool !== NULL){
-            Page::get()->setHasHeader($bool);
+            $p->setHasHeader($bool);
         }
-        return Page::get()->hasHeader();
+        return $p->hasHeader();
     }
     /**
      * Checks if the page will have a footer section or not.

@@ -460,7 +460,7 @@ class SessionManager implements JsonI{
             $retVal = FALSE;
         }
         Logger::logReturnValue($retVal);
-        Logger::logFuncCall(__METHOD__);
+        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * Returns session language code.
@@ -478,9 +478,12 @@ class SessionManager implements JsonI{
     public function getLang($forceUpdate=false){
         Logger::logFuncCall(__METHOD__);
         $retVal = NULL;
+        Logger::log('Checking if session is active...');
         $isActive = $this->isSessionActive() === TRUE ? TRUE : $this->switchToSession();
         if($isActive){
+            Logger::log('Session is active. Checking if language need update...');
             if($forceUpdate === TRUE){
+                Logger::log('Updating languae...');
                 $this->initLang($forceUpdate);
             }
             if(isset($_SESSION['lang'])){
@@ -839,10 +842,11 @@ class SessionManager implements JsonI{
     public function &getDBLink(){
         Logger::logFuncCall(__METHOD__);
         $retVal = NULL;
-        Logger::log('Checking if session is active...');
-        $isActive = $this->isSessionActive() === TRUE ? TRUE : $this->switchToSession();
-        if($isActive){
+        Logger::log('Checking if session is resumed...');
+        if($this->isResumed()){
+            Logger::log('It is resumed. Checking index $_SESSION[\'db\']...');
             if(isset($_SESSION['db'])){
+                Logger::log('Index is set. Returning database link.');
                 $retVal = $_SESSION['db'];
             }
             else{
@@ -850,7 +854,7 @@ class SessionManager implements JsonI{
             }
         }
         else{
-            Logger::log('Session is not running or not active.', 'warning');
+            Logger::log('Session is not active.', 'warning');
         }
         Logger::logFuncReturn(__METHOD__);
         return $retVal;

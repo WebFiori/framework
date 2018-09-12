@@ -273,7 +273,10 @@ class Theme implements JsonI{
      * @since 1.0
      */
     public function invokeAfterLoaded(){
+        Logger::logFuncCall(__METHOD__);
+        Logger::log('Firing after loaded event...');
         call_user_func($this->afterLoaded, $this->afterLoadedParams);
+        Logger::logFuncReturn(__METHOD__);
     }
 
     /**
@@ -299,13 +302,19 @@ class Theme implements JsonI{
         $themes = array();
         $themesDirs = array_diff(scandir(ROOT_DIR.'/'. self::THEMES_DIR), array('..', '.'));
         foreach ($themesDirs as $dir){
+            Logger::log('Checking if theme main file is exist...');
             $fullPath = ROOT_DIR.'/'.self::THEMES_DIR.'/'.$dir.'/theme.php';
+            Logger::log('Path to theme main file: \''.$fullPath.'\'.', 'debug');
             if(file_exists($fullPath)){
+                Logger::log('File found.');
                 require $fullPath;
                 if(isset($theme)){
                     $themes[$theme->getName()] = $theme;
                     unset($theme);
                 }
+            }
+            else{
+                Logger::log('File not found.');
             }
         }
         Logger::logFuncReturn(__METHOD__);

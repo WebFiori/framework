@@ -64,8 +64,18 @@ $p->addText('Hello from LisksCode Framework!');
 Page::insert($p);
 
 //display the view
-Page::render();
+//Page::render();
 Logger::log('Example view loaded.',NULL,TRUE);
+if(!defined('DEBUG')){
+    define('debug', '');
+}
+Logger::logName('session-1');
+$m1 = new SessionManager('session-1');
+Logger::log('----------');
+Logger::logName('session-2');
+$m2 = new SessionManager('session-2');
+Logger::log('----------');
+Util::print_r(Logger::callStack()->);
 
 
 

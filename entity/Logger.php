@@ -120,6 +120,14 @@ class Logger {
         return self::_get();
     }
     /**
+     * Returns a stack which contains all the called functions.
+     * @return Stack An instance of the class 'Stack'.
+     * @since 1.1.1
+     */
+    public static function callStack(){
+        return self::_get()->functionsStack;
+    }
+    /**
      * Adds a log message to log function return value (debug).
      * @param mixed $val The return value of a function.
      * @param type $logName [Optional] The name of the log file. If it is not 

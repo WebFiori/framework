@@ -101,6 +101,15 @@ class RouterUri {
         return $this->incInSiteMap;
     }
     /**
+     * Sets the value of the property '$incInSiteMap'.
+     * @param boolean $bool If TRUE is given, the URI will be included 
+     * in site map.
+     * @since 1.3
+     */
+    public function setIsInSiteMap($bool) {
+        $this->incInSiteMap = $bool === TRUE ? TRUE : FALSE;
+    }
+    /**
      * Returns the type of element that the URI will route to.
      * @return string The type of element that the URI will route to.
      * @since 1.1

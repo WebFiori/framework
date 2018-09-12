@@ -45,7 +45,7 @@ if(!defined('ROOT_DIR')){
  * location.
  *
  * @author Ibrahim
- * @version 1.3.1
+ * @version 1.3.2
  */
 class Router {
     /**
@@ -138,6 +138,49 @@ class Router {
         }
     }
     /**
+     * Adds an object of type 'RouterUri' as new route.
+     * @param RouterUri $routerUri An object of type 'RouterUri'.
+     * @return boolean If the object is added as new route, the function will 
+     * return TRUE. If the given parameter is not an instance of 'RouterUri' 
+     * or a route is already added, The function will return FALSE.
+     * @since 1.3.2
+     */
+    public static function uriObj($routerUri){
+        if($routerUri instanceof RouterUri){
+            if(!self::get()->hasRoute($routerUri->getPath())){
+                self::get()->routes[] = $routerUri;
+                return TRUE;
+            }
+        }
+        return FALSE;
+    }
+    /**
+     * Adds a route to a basic xml site map. It can be accessed through the 
+     * link '&lt;your domain&gt;/sitemap.xml'.
+     * @since 1.3.2
+     */
+    public static function incSiteMapRoute(){
+        self::closure('/sitemap.xml', function(){
+            $urlSet = new HTMLNode('urlset');
+            $urlSet->setAttribute('xmlns', 'http://www.sitemaps.org/schemas/sitemap/0.9');
+            $urlSet->setAttribute('xmlns:xhtml', 'http://www.w3.org/1999/xhtml');
+            $routes = Router::get()->getRoutes();
+            foreach ($routes as $route){
+                if($route->isInSiteMap()){
+                    $url = new HTMLNode('url');
+                    $loc = new HTMLNode('loc');
+                    $loc->addChild(HTMLNode::createTextNode($route->getUri()));
+                    $url->addChild($loc);
+                    $urlSet->addChild($url);
+                }
+            }
+            $retVal = '<?xml version="1.0" encoding="UTF-8"?>';
+            $retVal .= $urlSet->toHTML();
+            header('content-type:text/xml');
+            echo $retVal;
+        });
+    }
+    /**
      * Redirect a URI to its route.
      * @param string $uri The URI.
      * @since 1.2
@@ -177,7 +220,7 @@ class Router {
      * is not correct or a similar route was already added.
      * @since 1.0
      */
-    public function addRoute($path,$routeTo,$routeType,$closureParams=array()) {
+    public function addRoute($path,$routeTo,$routeType,$closureParams=array(),$incInSiteMap=false) {
         if(strlen($this->getBase()) != 0){
             if($routeType == self::API_ROUTE || 
             $routeType == self::VIEW_ROUTE || 
@@ -195,6 +238,7 @@ class Router {
              if(!$this->hasRoute($path)){
                  $routeUri = new RouterUri($this->getBase().$path, $routeTo, $closureParams);
                  $routeUri->setType($routeType);
+                 $routeUri->setIsInSiteMap($incInSiteMap);
                  $this->routes[] = $routeUri;
                  return TRUE;
              }

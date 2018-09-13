@@ -250,7 +250,7 @@ class Logger {
      * @since 1.1.1
      */
     public static function section(){
-        $this->_get()->_newSec();
+        self::_get()->_newSec();
     }
     /**
      * Removes the whole content of the log file.
@@ -265,7 +265,7 @@ class Logger {
     private function _clearLog() {
         $this->handelr = fopen($this->_getDirectory().'/'.$this->_getLogName().'.txt', 'w+');
         $time = date('Y-m-d h:i:s T');
-        fwrite($this->handelr, '---------------Log Cleared At '.$time.'---------------');
+        fwrite($this->handelr, '---------------Log Cleared At '.$time.'---------------'."\r\n");
         fclose($this->handelr);
     }
     /**
@@ -359,6 +359,28 @@ class Logger {
                 fclose($this->handelr);
                 $addDashes === TRUE ? $this->_newSec() : NULL;
             }
+        }
+    }
+    /**
+     * Show log content as output on screen.
+     * @since 1.1.1
+     */
+    public static function displayLog() {
+        self::_get()->_displayLog();
+    }
+    /**
+     * Show log content in web browser.
+     * @since 1.1.1
+     */
+    private function _displayLog(){
+        $logDir = $this->_getDirectory().'/'.$this->_getLogName().'.txt';
+        if(file_exists($logDir)){
+            $this->handelr = fopen($logDir, 'r');
+            $logData = fread($this->handelr, filesize($logDir));
+            Util::print_r($logData);
+        }
+        else{
+            Util::print_r('------------NO LOG FILE WAS FOUND WHICH HAS GIVEN NAME------------');
         }
     }
     /**

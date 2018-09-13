@@ -48,34 +48,33 @@ if(!defined('ROOT_DIR')){
         . '</body>'
         . '</html>');
 }
-Logger::log('No Direct access.');
-//load UI template components (JS, CSS and others)
-//it is optional. to use a theme but recomended
-Logger::log('Loading theme \'Greeny By Ibrahim Ali\'');
-Page::theme($themeName='Greeny By Ibrahim Ali');
-
-//sets the title of the page
-Logger::log('Setting view title to \'Example Page\'');
-Page::title('Example Page');
-
-//adds a paragraph to the body of the page.
-$p = new PNode();
-$p->addText('Hello from LisksCode Framework!');
-Page::insert($p);
-
-//display the view
-//Page::render();
-Logger::log('Example view loaded.',NULL,TRUE);
+//Logger::log('No Direct access.');
+////load UI template components (JS, CSS and others)
+////it is optional. to use a theme but recomended
+//Logger::log('Loading theme \'Greeny By Ibrahim Ali\'');
+//Page::theme($themeName='Greeny By Ibrahim Ali');
+//
+////sets the title of the page
+//Logger::log('Setting view title to \'Example Page\'');
+//Page::title('Example Page');
+//
+////adds a paragraph to the body of the page.
+//$p = new PNode();
+//$p->addText('Hello from LisksCode Framework!');
+//Page::insert($p);
+//
+////display the view
+////Page::render();
+//Logger::log('Example view loaded.',NULL,TRUE);
 if(!defined('DEBUG')){
     define('debug', '');
 }
 Logger::logName('session-1');
+Logger::clear();
 $m1 = new SessionManager('session-1');
-Logger::log('----------');
-Logger::logName('session-2');
-$m2 = new SessionManager('session-2');
-Logger::log('----------');
-Util::print_r(Logger::callStack()->);
+Logger::section();
+$m1->initSession();
+echo $m1->toJSON();
 
 
 

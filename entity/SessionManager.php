@@ -228,7 +228,7 @@ class SessionManager implements JsonI{
                 }
             }
             else{
-                Logger::log('One of the attributes of the session is missing. Killing the session.','warning');
+                Logger::log('One or more of the attributes of the session is missing. Killing the session.','warning');
                 $this->kill();
             }
         }
@@ -241,7 +241,7 @@ class SessionManager implements JsonI{
                 $retVal = TRUE;
             }
             else{
-                Logger::log('One of the attributes of the session is missing. Killing the session.','warning');
+                Logger::log('One or more of the attributes of the session is missing. Killing the session.','warning');
                 $this->kill();
             }
         }
@@ -358,12 +358,13 @@ class SessionManager implements JsonI{
         if($this->switchToSession()){
             if(isset($_SESSION['lifetime'])){
                 Logger::log('Time taken from $_SESSION[\'lifetime\']');
-                $retVal = $_SESSION['lifetime'];
+                Logger::log('$_SESSION[\'lifetime\'] = \''.$_SESSION['lifetime'].'\'.','debug');
+                $retVal = $_SESSION['lifetime']/60;
             }
         }
         Logger::logReturnValue($retVal);
         Logger::logFuncReturn(__METHOD__);
-        return $this->lifeTime;
+        return $retVal;
     }
     /**
      * Sets if the session timeout will be refreshed with every request 
@@ -781,8 +782,8 @@ class SessionManager implements JsonI{
         Logger::logFuncCall(__METHOD__);
         $this->sessionStatus = self::NEW_SESSION;
         Logger::log('Setting session related ini directives and session variables...');
-        ini_set('session.gc_maxlifetime', $this->getLifetime());
-        ini_set('session.cookie_lifetime', $this->getLifetime());
+        ini_set('session.gc_maxlifetime', $lifeTime);
+        ini_set('session.cookie_lifetime', $lifeTime);
         ini_set('session.use_cookies', 1);
         session_name($this->getName());
         session_set_cookie_params($lifeTime,"/");
@@ -795,7 +796,7 @@ class SessionManager implements JsonI{
             $_SESSION['session-name'] = $this->getName();
             $_SESSION['started-at'] = time();
             $_SESSION['resumed-at'] = time();
-            $_SESSION['lifetime'] = $this->getLifetime();
+            $_SESSION['lifetime'] = $lifeTime;
             $_SESSION['name'] = $this->getName();
             $_SESSION['user'] = new User();
             $ip = filter_var($_SERVER['REMOTE_ADDR'],FILTER_VALIDATE_IP);
@@ -984,7 +985,7 @@ class SessionManager implements JsonI{
         }
         Logger::logReturnValue($retVal);
         Logger::logFuncReturn(__METHOD__);
-        return FALSE;
+        return $retVal;
     }
     /**
      * Returns the time at which the session was resumed in (in seconds).
@@ -1052,14 +1053,17 @@ class SessionManager implements JsonI{
      * @since 1.5
      */
     public function getPassedTime() {
+        Logger::logFuncCall(__METHOD__);
+        $retVal = 0;
+        Logger::log('Checking if session is active...');
         $isActive = $this->isSessionActive() === TRUE ? TRUE : $this->switchToSession();
         if($isActive){
-            if(isset($_SESSION['started-at'])){
-                return time() - $_SESSION['started-at'];
-            }
-            return 0;
+            Logger::log('Session is active. Calculating remaining time...');
+            $retVal = time() - $_SESSION['started-at'];
         }
-        return 0;
+        Logger::logReturnValue($retVal);
+        Logger::logFuncReturn(__METHOD__);
+        return $retVal;
     }
     /**
      * Checks if the session has timed out or not.
@@ -1069,11 +1073,23 @@ class SessionManager implements JsonI{
      * @since 1.5
      */
     public function isTimeout(){
+        Logger::logFuncCall(__METHOD__);
+        $retVal = FALSE;
+        Logger::log('Checking if session is active...');
         $isActive = $this->isSessionActive() === TRUE ? TRUE : $this->switchToSession();
         if($isActive){
-            return $this->getRemainingTime() < 0;
+            Logger::log('Session is active. Checking remaining time...');
+            $remTime = $this->getRemainingTime();
+            Logger::log('Remaining time = \''.$remTime.'\'.', 'debug');
+            $retVal = $remTime < 0;
         }
-        return session_status();
+        else{
+            Logger::log('No session is active.', 'warning');
+            $retVal = session_status();
+        }
+        Logger::logReturnValue($retVal);
+        Logger::logFuncReturn(__METHOD__);
+        return $retVal;
     }
     /**
      * Checks if the session is resumed or not.
@@ -1141,15 +1157,16 @@ class SessionManager implements JsonI{
                         Logger::log('Session status updated to \'resumed\'.');
                         $this->resumed = true;
                         $this->sessionStatus = self::RESUMED;
-                        $sessionTime = $this->getLifetime();
-                        Logger::log('Session time = \''.$sessionTime.'\'.', 'debug');
-                        Logger::log('Updating the value of \'session.gc_maxlifetime\'...');
-                        ini_set('session.gc_maxlifetime', $sessionTime);
-                        Logger::log('Updating the value of \'session.gc_maxlifetime\'...');
-                        ini_set('session.cookie_lifetime', $sessionTime);
                         //update resume time
                         $_SESSION['resumed-at'] = time();
                         $_SESSION['session-name'] = $this->getName();
+                        
+                        $sessionTime = $this->getLifetime();
+                        Logger::log('Session time = \''.$sessionTime.'\' minutes.', 'debug');
+                        Logger::log('Updating the value of \'session.gc_maxlifetime\'...');
+                        ini_set('session.gc_maxlifetime', $sessionTime*60);
+                        Logger::log('Updating the value of \'session.gc_maxlifetime\'...');
+                        ini_set('session.cookie_lifetime', $sessionTime*60);
                         $this->resumed = TRUE;
                         $this->new = FALSE;
                         Logger::log('Resumed at: '.$_SESSION['resumed-at'], 'debug');
@@ -1157,7 +1174,7 @@ class SessionManager implements JsonI{
                             Logger::log('Refreshing session timeout time...');
                             //refresh time till session cookie is dead
                             $params = session_get_cookie_params();
-                            setcookie($this->getName(), $this->getID(),time()+$this->getLifetime() * 60, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
+                            setcookie($this->getName(), $this->getID(),time()+$sessionTime * 60, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
                             $this->setUser($this->getUser());
                         }
                         $retVal = TRUE;

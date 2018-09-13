@@ -43,7 +43,7 @@ if(!defined('ROOT_DIR')){
  * A class that is used to log messages to a file.
  *
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.1
+ * @version 1.1.1
  */
 class Logger {
     /**
@@ -246,6 +246,13 @@ class Logger {
         return self::_get()->_getLogName();
     }
     /**
+     * Adds a new line to separate log parts.
+     * @since 1.1.1
+     */
+    public static function section(){
+        $this->_get()->_newSec();
+    }
+    /**
      * Removes the whole content of the log file.
      * @since 1.0
      */
@@ -256,7 +263,10 @@ class Logger {
      * @since 1.0
      */
     private function _clearLog() {
-        file_put_contents($this->_getLogName(), "");
+        $this->handelr = fopen($this->_getDirectory().'/'.$this->_getLogName().'.txt', 'w+');
+        $time = date('Y-m-d h:i:s T');
+        fwrite($this->handelr, '---------------Log Cleared At '.$time.'---------------');
+        fclose($this->handelr);
     }
     /**
      * 
@@ -266,12 +276,12 @@ class Logger {
      * @since 1.1
      */
     private function _logFuncCall($funcName,$logFileName=null,$addDashes=false) {
-        $this->functionsStack->push($funcName);
         $this->log('A call to the function <'.$funcName.'>', 'debug', $logFileName, $addDashes);
+        $this->functionsStack->push($funcName);
     }
     private function _logFuncReturn($funcName,$logFileName=null,$addDashes=false) {
-        $this->log('Return back from <'.$funcName.'>', 'debug', $logFileName,$addDashes);
         $this->functionsStack->pop();
+        $this->log('Return back from <'.$funcName.'>', 'debug', $logFileName,$addDashes);
     }
     /**
      * 
@@ -346,12 +356,18 @@ class Logger {
                 else{
                     fwrite($this->handelr, '['.$time.']  '.$bType.': '.$content."\r\n");
                 }
-                if($addDashes === TRUE){
-                    fwrite($this->handelr, '-------------------------------------'."\r\n");
-                }
                 fclose($this->handelr);
+                $addDashes === TRUE ? $this->_newSec() : NULL;
             }
         }
     }
-    
+    /**
+     * Add new line which contains asterisks to separate parts of log file.
+     * @since 1.1.1
+     */
+    private function _newSec(){
+        $this->handelr = fopen($this->_getDirectory().'/'.$this->_getLogName().'.txt', 'a+');
+        fwrite($this->handelr, '-+-*******************************************************-+-'."\r\n");
+        fclose($this->handelr);
+    }
 }

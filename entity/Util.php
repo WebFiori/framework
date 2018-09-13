@@ -210,6 +210,8 @@ class Util{
      * @param mixed $expr
      */
     public static function print_r($expr){
+        $expr = str_replace('<', '&lt;', $expr);
+        $expr = str_replace('>', '&gt;', $expr);
         ?><pre><?php print_r($expr)?></pre><?php
     }
     /**

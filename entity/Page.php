@@ -295,7 +295,11 @@ class Page{
      * @since 1.9
      */
     public static function insert($node,$parentNodeId='main-content-area'){
-        return Page::get()->insertNode($node, $parentNodeId);
+        Logger::logFuncCall(__METHOD__);
+        $retVal = Page::get()->insertNode($node, $parentNodeId);
+        Logger::logReturnValue($retVal);
+        Logger::logFuncReturn(__METHOD__);
+        return $retVal;
     }
     /**
      * Adds a child node inside the body of a node given its ID.
@@ -307,16 +311,33 @@ class Page{
      * @since 1.6
      */
     public function insertNode($node,$parentNodeId='') {
+        Logger::logFuncCall(__METHOD__);
+        Logger::log('Checking parent node ID...');
+        $retVal = FALSE;
         if(strlen($parentNodeId) != 0){
+            Logger::log('Checking if the given instance is of type \'HTMLNode\'...');
             if($node instanceof HTMLNode){
+                Logger::log('Checking if parent node exist...');
                 $parentNode = &$this->document->getChildByID($parentNodeId);
                 if($parentNode instanceof HTMLNode){
                     $parentNode->addChild($node);
-                    return TRUE;
+                    Logger::log('Node added.');
+                    $retVal = TRUE;
+                }
+                else{
+                    Logger::log('No node was found which has the ID \''.$parentNodeId.'\'.','warning');
                 }
             }
+            else{
+                Logger::log('Given instance is not of type \'HTMLNode\'. No node was added.','warning');
+            }
         }
-        return FALSE;
+        else{
+            Logger::log('Invalid parent node ID. No node was added.','warning');
+        }
+        Logger::logReturnValue($retVal);
+        Logger::logFuncReturn(__METHOD__);
+        return $retVal;
     }
     /**
      * A single instance of the class.

@@ -69,13 +69,45 @@ if(!defined('ROOT_DIR')){
 if(!defined('DEBUG')){
     define('debug', '');
 }
-Logger::logName('session-1');
-Logger::clear();
-$m1 = new SessionManager('session-1');
-Logger::section();
-$m1->initSession();
-echo $m1->toJSON();
+$s1Name = 'session-1';
+$s2Name = 'session-2';
+$s3Name = 'session-3';
 
+$m1 = newSession($s1Name);
+$m2 = newSession($s2Name);
+$m3 = newSession($s3Name);
+
+startSession($m2);
+startSession($m3);
+startSession($m1);
+
+setLifetime(5, $m1);
+setLifetime(10, $m2);
+setLifetime(15, $m3);
+
+$j = new JsonX();
+$j->add($s1Name, $m1);
+$j->add($s2Name, $m2);
+$j->add($s3Name, $m3);
+echo $j;
+
+function newSession($name){
+    Logger::logName($name);
+    Logger::clear();
+    $m1 = new SessionManager($name);
+    Logger::section();
+    return $m1;
+}
+
+function setLifetime($time,$session){
+    Logger::logName($session->getName());
+    $session->setLifetime($time);
+}
+
+function startSession($session){
+    Logger::logName($session->getName());
+    $session->initSession();
+}
 
 
 

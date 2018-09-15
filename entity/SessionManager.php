@@ -321,17 +321,16 @@ class SessionManager implements JsonI{
         if($time > 0){
             Logger::log('Checking if session is active or not...');
             if($this->isSessionActive()){
+                $this->lifeTime = $time;
+                $_SESSION['lifetime'] = $time*60;
+                $params = session_get_cookie_params();
+                setcookie($this->getName(), $this->getID(),time()+$this->getLifetime() * 60, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
+                $retVal = TRUE;
+                Logger::log('Session duration updated.');
                 Logger::log('It is active. Checking if the session has timed out...');
-                if(!$this->isTimeout()){
-                    Logger::log('Session duration updated.');
-                    $this->lifeTime = $time;
-                    $_SESSION['lifetime'] = $time;
-                    $params = session_get_cookie_params();
-                    setcookie($this->getName(), $this->getID(),time()+$this->getLifetime() * 60, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
-                    $retVal = TRUE;
-                }
-                else{
-                    Logger::log('Session has timed out.', 'warning');
+                if($this->isTimeout()){
+                    Logger::log('Session has timed out. Killing it.', 'warning');
+                    $this->kill();
                 }
             }
             else{

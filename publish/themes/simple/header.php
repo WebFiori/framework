@@ -32,35 +32,12 @@ function getHeaderNode(){
     $menu->setID('main-nav');
     $menu->setClassName('pa-'.Page::dir().'-col-9');
     $ul = new UnorderedList();
+    $ul->setID('main-menu');
     $ul->setClassName('pa-row');
     $ul->setAttribute('dir', Page::dir());
     $menu->addChild($ul);
     $headerSec->addChild($menu);
     
-    $item1 = new ListItem();
-    $link1 = new LinkNode(SiteConfig::get()->getBaseURL(), 'Menu Item 1');
-    $item1->addChild($link1);
-    $ul->addChild($item1);
-    
-    $item2 = new ListItem();
-    $link2 = new LinkNode(SiteConfig::get()->getBaseURL(), 'Menu Item 2');
-    $item2->addChild($link2);
-    $ul->addChild($item2);
-    
-    $item3 = new ListItem();
-    $link3 = new LinkNode(SiteConfig::get()->getBaseURL(), 'Menu Item 3');
-    $item3->addChild($link3);
-    $ul->addChild($item3);
-    
-    $item4 = new ListItem();
-    $link4 = new LinkNode(SiteConfig::get()->getBaseURL(), 'Menu Item 4');
-    $item4->addChild($link4);
-    $ul->addChild($item4);
-    
-    $link5 = new LinkNode(SiteConfig::get()->getBaseURL(), 'Menu Item 5');
-    $item5 = new ListItem();
-    $item5->addChild($link5);
-    $ul->addChild($item5);
     return $headerSec;
 }
 

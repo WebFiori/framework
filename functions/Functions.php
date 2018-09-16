@@ -80,7 +80,7 @@ class Functions {
      * of the given characters, the session will have new randomly generated name.
      * @since 1.0
      */
-    public function __construct($linkedSessionName='pa-session') {
+    public function __construct($linkedSessionName='main') {
         Logger::logFuncCall(__METHOD__);
         if(self::$sessions === NULL){
             Logger::log('Initializing sessions array...');
@@ -178,14 +178,6 @@ class Functions {
             return FALSE;
         }
     }
-
-    /**
-     * A session manager.
-     * @var SessionManager an instance of 'SessionManager'.
-     * @since 1.0 
-     * @deprecated since version 1.3
-     */
-    private $mainSession;
     /**
      * Execute a query.
      * @param MySQLQuery $qObj An object of type 'MySQLQuery'.

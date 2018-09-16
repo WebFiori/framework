@@ -29,9 +29,10 @@
  * file to prevent direct access.
  */
 Logger::logName('views-log');
-Logger::log('Checking if scripit is accessed directly.');
+Logger::section();
+Logger::log('Checking if script is accessed directly.');
 if(!defined('ROOT_DIR')){
-    Logger::log('Direct access. Forbidden',NULL,TRUE);
+    Logger::log('Direct access. Forbidden','error');
     header("HTTP/1.1 403 Forbidden");
     die(''
         . '<!DOCTYPE html>'
@@ -48,66 +49,21 @@ if(!defined('ROOT_DIR')){
         . '</body>'
         . '</html>');
 }
-//Logger::log('No Direct access.');
-////load UI template components (JS, CSS and others)
-////it is optional. to use a theme but recomended
-//Logger::log('Loading theme \'Greeny By Ibrahim Ali\'');
-//Page::theme($themeName='Greeny By Ibrahim Ali');
-//
-////sets the title of the page
-//Logger::log('Setting view title to \'Example Page\'');
-//Page::title('Example Page');
-//
-////adds a paragraph to the body of the page.
-//$p = new PNode();
-//$p->addText('Hello from LisksCode Framework!');
-//Page::insert($p);
-//
-////display the view
-////Page::render();
-//Logger::log('Example view loaded.',NULL,TRUE);
-if(!defined('DEBUG')){
-    define('debug', '');
-}
-$s1Name = 'session-1';
-$s2Name = 'session-2';
-$s3Name = 'session-3';
+Logger::log('No Direct access.');
+//load UI template components (JS, CSS and others)
+//it is optional. to use a theme but recomended
+Logger::log('Loading theme \'Simple By Ibrahim Ali\'');
+Page::theme($themeName='Simple By Ibrahim Ali');
 
-$m1 = newSession($s1Name);
-$m2 = newSession($s2Name);
-$m3 = newSession($s3Name);
+//sets the title of the page
+Logger::log('Setting view title to \'Example Page\'');
+Page::title('Example Page');
 
-startSession($m2);
-startSession($m3);
-startSession($m1);
+//adds a paragraph to the body of the page.
+$p = new PNode();
+$p->addText('Hello from LisksCode Framework!');
+Page::insert($p);
 
-setLifetime(5, $m1);
-setLifetime(10, $m2);
-setLifetime(15, $m3);
-
-$j = new JsonX();
-$j->add($s1Name, $m1);
-$j->add($s2Name, $m2);
-$j->add($s3Name, $m3);
-echo $j;
-
-function newSession($name){
-    Logger::logName($name);
-    Logger::clear();
-    $m1 = new SessionManager($name);
-    Logger::section();
-    return $m1;
-}
-
-function setLifetime($time,$session){
-    Logger::logName($session->getName());
-    $session->setLifetime($time);
-}
-
-function startSession($session){
-    Logger::logName($session->getName());
-    $session->initSession();
-}
-
-
-
+//display the view
+Page::render();
+Logger::log('Example view loaded.');

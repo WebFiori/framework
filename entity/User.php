@@ -29,16 +29,6 @@ class User implements JsonI{
      */
     private $userPrivileges;
     /**
-     * A set of possible user status.
-     * @var array An array of user status.
-     * @since 1.5
-     */
-    const USER_STATS = array(
-        'N'=>'New',
-        'A'=>'Active',
-        'S'=>'Suspended'
-    );
-    /**
      * The number of times the user has requested a password reset.
      * @var int
      * @since 1.6 
@@ -110,12 +100,6 @@ class User implements JsonI{
      * @since 1.0
      */
     private $userTok;
-    /**
-     * The status of the user profile (active, suspended ...)
-     * @var string 
-     * @since 1.1
-     */
-    private $status;
     /**
      * The activation token of the user.
      * @var string
@@ -405,46 +389,17 @@ class User implements JsonI{
         $json = new JsonX();
         $json->add('user-id', $this->getID());
         $json->add('email', $this->getEmail());
-        $json->add('status', $this->getStatus());
-        $json->add('status-code', $this->getStatusCode());
         $json->add('reg-date', $this->getRegDate());
         $json->add('last-login', $this->getLastLogin());
         $json->add('display-name', $this->getDisplayName());
         $json->add('username', $this->getUserName());
-        $json->add('token', $this->getToken());
         $json->add('reset-count', $this->getResetCount());
         $json->add('reset-time', $this->getResetRequestTime());
         $json->add('reset-token', $this->getResetToken());
         $json->add('last-reset-time', $this->getLastPasswordResetDate());
         return $json;
     }
-    /**
-     * Returns the status of the user.
-     * @return string|NULL The status of the user. 
-     * If user status is not set, the function will return <b>NULL</b>.
-     * @see User::setStatus($status)
-     * @since 1.3
-     */
-    public function getStatus(){
-        return $this->status;
-    }
 
-    /**
-     * Sets the value of the property <b>$status</b>
-     * @param string $status Status code. It must be a key value 
-     * from the array <b>User::USER_STATS</b>.
-     * @return boolean The function will return <b>TRUE</b> if the status 
-     * is updated.
-     * @since 1.0
-     */
-    public function setStatus($status){
-        if(array_key_exists($status, User::USER_STATS)){
-            $this->status = User::USER_STATS[$status];
-            $this->statusCode = $status;
-            return TRUE;
-        }
-        return FALSE;
-    }
     /**
      * Sets the ID of the user.
      * @param int $id The ID of the user.

@@ -65,14 +65,13 @@ class Access {
      */
     private function __construct() {
         $this->userGroups = array();
-        $this->_createGroup('SUPER_ADMIN');
     }
     /**
      * Returns a single instance of the class.
      * @return Access
      * @since 1.0
      */
-    private static function get(){
+    private static function &get(){
         if(self::$access != NULL){
             return self::$access;
         }
@@ -234,12 +233,14 @@ class Access {
      * @since 1.0
      */
     private function _getGroup($groupId) {
+        
         foreach ($this->userGroups as $g){
             if($g->getID() == $groupId){
                 return $g;
             }
         }
-        return NULL;
+        $g = NULL;
+        return $g;
     }
     /**
      * Returns a privilege object given its ID.
@@ -250,14 +251,15 @@ class Access {
      * @since 1.0
      */
     public static function getPrivilege($id){
-        return Access::get()->_getPrivilege($id);
+        $pr = &Access::get()->_getPrivilege($id);
+        return $pr;
     }
     /**
      * 
      * @param type $privId
      * @return type
      */
-    private function _getPrivilege($privId) {
+    private function &_getPrivilege($privId) {
         foreach ($this->userGroups as $g){
             foreach ($g->privileges() as $p){
                 if($p->getID() == $privId){
@@ -265,7 +267,8 @@ class Access {
                 }
             }
         }
-        return NULL;
+        $p = NULL;
+        return $p;
     }
     /**
      * Checks if a privilege does exist or not given its ID.
@@ -305,8 +308,9 @@ class Access {
      * It will be returned. If not, the function will return NULL.
      * @since 1.0
      */
-    public static function getGroup($groupId){
-        return Access::get()->_getGroup($groupId);
+    public static function &getGroup($groupId){
+        $g = &Access::get()->_getGroup($groupId);
+        return $g;
     }
     /**
      * 

@@ -132,10 +132,10 @@ class UsersGroup {
     }
     /**
      * Returns an array that contains all group privileges.
-     * @return array An array that contains an objects of type Privilige.
+     * @return array An array that contains an objects of type 'Privilege'.
      * @since 1.0
      */
-    public function privileges() {
+    public function &privileges() {
         return $this->privilegesArr;
     }
     /**

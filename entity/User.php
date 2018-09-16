@@ -149,7 +149,7 @@ class User implements JsonI{
      * @since 1.7
      */
     public function addPrivilege($privilegeId){
-        $p = Access::getPrivilege($privilegeId);
+        $p = &Access::getPrivilege($privilegeId);
         if($p != NULL){
             foreach ($this->userPrivileges as $prev){
                 if($prev->getID() == $p->getID()){
@@ -177,7 +177,7 @@ class User implements JsonI{
      * @since 1.7
      */
     public function inGroup($groupId) {
-        $g = Access::getGroup($groupId);
+        $g = &Access::getGroup($groupId);
         if($g instanceof UsersGroup){
             $inGroup = TRUE;
             foreach ($g->privileges() as $groupPrivilege){

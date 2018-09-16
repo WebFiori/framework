@@ -3,7 +3,7 @@
  * The instance of this class is used to control basic settings of 
  * the framework. Also, it is the entry point of any request.
  * @author Ibrahim Ali <ibinshikh@hotmail.com>
- * @version 1.2
+ * @version 1.3.1
  */
 class LisksCode{
     /**
@@ -125,6 +125,7 @@ class LisksCode{
         //uncomment next line to show runtime errors and warnings
         //also enable logging for info, warnings and errors 
         Logger::logName('initialization-log');
+        Logger::section();
         Util::displayErrors();
         
         //enable logging of debug info.
@@ -137,7 +138,7 @@ class LisksCode{
         $this->sysStatus = Util::checkSystemStatus();
         $this->initRoutes();
         if($this->sysStatus == Util::MISSING_CONF_FILE || $this->sysStatus == Util::MISSING_SITE_CONF_FILE){
-            Logger::log('Missing configuration file. Attempting to create all configuration files.', 'warning', 'initialization-log');
+            Logger::log('One or more configuration file is missing. Attempting to create all configuration files.', 'warning');
             $this->SF->createConfigFile();
             $this->WF->createSiteConfigFile();
             $this->BMF->createEmailConfigFile();
@@ -146,9 +147,13 @@ class LisksCode{
         if(!$this->SF->isSetupFinished()){
             $this->firstUse();
         }
+        
+        //initialize some settings...
         $this->initCron();
+        $this->initPermissions();
         Logger::log('Initializing completed.');
         Logger::logName('system-log');
+        Logger::section();
         self::$classStatus = 'INITIALIZED';
     }
     /**
@@ -209,12 +214,12 @@ class LisksCode{
      * @return boolean|string
      * @since 1.0
      */
-    private function getSystemStatus($refresh=true) {
+    private function getSystemStatus($refresh=true,$testDb=false) {
         Logger::logFuncCall(__METHOD__);
         Logger::log('Refresh status = '.$refresh, 'debug');
         if($refresh === TRUE){
             Logger::log('Updating system status.');
-            $this->sysStatus = Util::checkSystemStatus();
+            $this->sysStatus = Util::checkSystemStatus($testDb);
         }
         Logger::logReturnValue($this->sysStatus);
         Logger::logFuncReturn(__METHOD__);
@@ -256,7 +261,7 @@ class LisksCode{
         $this->addSMTPAccounts();
         
         //once configuration is finished, call the function SystemFunctions::configured()
-        $this->SF->configured();
+        $this->SF->configured(FALSE);
         
         //do not remove next lines of code.
         //Used to show error message in case the 
@@ -288,7 +293,7 @@ class LisksCode{
     private function setWebsiteAttributes() {
         $siteInfoArr = $this->WF->getSiteConfigVars();
         $siteInfoArr['base-url'] = Util::getBaseURL();
-        $siteInfoArr['primary-language'] = 'AR';
+        $siteInfoArr['primary-language'] = 'EN';
         $siteInfoArr['theme-name'] = 'Greeny By Ibrahim Ali';
         $siteInfoArr['title-separator'] = '|';
         $siteInfoArr['site-descriptions'] = array('AR'=>'','EN'=>'');
@@ -343,10 +348,26 @@ class LisksCode{
         }
     }
     /**
+     * Initialize access control class.
+     * @since 1.3.1
+     */
+    private function initPermissions(){
+        Logger::logFuncCall(__METHOD__);
+        
+        //create new group.
+        //$AD = 'ADMIN_GROUP';
+        //Access::newGroup($AD);
+        //add permissions to the group.
+        //Access::newPrivilege($AD, 'LOGIN');
+        
+        Logger::logFuncReturn(__METHOD__);
+    }
+    /**
      * Initialize cron jobs.
      * @since 1.3
      */
     private function initCron(){
+        Logger::logFuncCall(__METHOD__);
         //initialize cron job manager
         
         //set access password
@@ -361,6 +382,7 @@ class LisksCode{
         //    fwrite($file, 'Job \''.$params[0]->getJobName().'\' executed at '.date(DATE_RFC1123)."\r\n");
         //},array($job));
         //Cron::scheduleJob($job);
+        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * Show an error message that tells the user about system status and how to 
@@ -419,6 +441,7 @@ if(INITIAL_SYS_STATUS === TRUE){
 else if(INITIAL_SYS_STATUS == Util::DB_NEED_CONF){
     Logger::log('Unable to connect to database.', 'warning');
     Router::route(Util::getRequestedURL());
+    Logger::requestCompleted();
 }
 else{
     LisksCode::configErr();

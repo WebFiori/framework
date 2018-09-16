@@ -44,7 +44,7 @@ if(!defined('ROOT_DIR')){
  * A base class that is used to construct website UI.
  *
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.2
+ * @version 1.2.1
  */
 class Theme implements JsonI{
     /**
@@ -101,6 +101,18 @@ class Theme implements JsonI{
      */
     private $afterLoadedParams;
     /**
+     * A callback function to call after the theme is loaded.
+     * @var Function
+     * @since 1.2.1
+     */
+    private $beforeLoaded;
+    /**
+     * An array of callback parameters.
+     * @var array
+     * @since 1.2.1
+     */
+    private $beforeLoadedParams;
+    /**
      * Creates new instance of the class using default values.
      */
     public function __construct() {
@@ -117,12 +129,14 @@ class Theme implements JsonI{
             'description'=>'',
             'directory'=>''
         );
-        $this->afterLoadedParams = array();
         $this->setCssDirName('css');
         $this->setJsDirName('js');
         $this->setImagesDirName('images');
         $this->themeComponents = array();
         $this->afterLoaded = function(){};
+        $this->afterLoadedParams = array();
+        $this->beforeLoaded = function(){};
+        $this->beforeLoadedParams = array();
         Logger::logFuncReturn(__METHOD__);
     }
     /**
@@ -211,6 +225,7 @@ class Theme implements JsonI{
             }
         }
         if(isset($themeToLoad)){
+            $themeToLoad->invokeBeforeLoaded();
             Logger::log('Loading theme meta and components...');
             $themeDir = ROOT_DIR.'/'.self::THEMES_DIR.'/'.$themeToLoad->getDirectoryName();
             Logger::log('Theme directory: \''.$themeDir.'\'.', $themeName);
@@ -266,6 +281,38 @@ class Theme implements JsonI{
         else{
             Logger::log('It is not callable.');
         }
+        Logger::logFuncReturn(__METHOD__);
+    }
+    /**
+     * Sets the value of the callback which will be called before theme is loaded.
+     * @param Function $function The callback.
+     * @param array $params An array of parameters which can be passed to the 
+     * callback.
+     * @since 1.2.1
+     */
+    public function setBeforeLoaded($function,$params=array()){
+        Logger::logFuncCall(__METHOD__);
+        Logger::log('Checking if first parameter is callable...');
+        if(is_callable($function)){
+            Logger::log('It is callable. Callable updated.');
+            $this->beforeLoaded = $function;
+            if(gettype($params) == 'array'){
+                $this->beforeLoadedParams = $params;
+            }
+        }
+        else{
+            Logger::log('It is not callable.');
+        }
+        Logger::logFuncReturn(__METHOD__);
+    }
+    /**
+     * Fire the callback function.
+     * @since 1.2.1
+     */
+    public function invokeBeforeLoaded(){
+        Logger::logFuncCall(__METHOD__);
+        Logger::log('Firing before loaded event...');
+        call_user_func($this->beforeLoaded, $this->beforeLoadedParams);
         Logger::logFuncReturn(__METHOD__);
     }
     /**

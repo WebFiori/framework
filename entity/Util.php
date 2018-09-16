@@ -19,7 +19,7 @@ if(!defined('ROOT_DIR')){
 /**
  * PHP utility class.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.3.1
+ * @version 1.3.2
  */
 class Util{
     /**
@@ -49,14 +49,18 @@ class Util{
     /**
      *
      * @var DatabaseLink 
+     * @since 1.2
      */
     private static $dbTestInstance;
     /**
-     * 
-     * @return DatabaseLink
+     * Returns the instance of 'DatabaseLink' which is used to check database 
+     * connection using the function 'Util::checkDbConnection()'.
+     * @return DatabaseLink|NULL The instance of 'DatabaseLink' which is used to check database 
+     * connection using the function 'Util::checkDbConnection()'. If no test was 
+     * performed, the function will return NULL.
+     * @since 1.2
      */
     public static function getDatabaseTestInstance(){
-        Util::checkSystemStatus();
         return self::$dbTestInstance;
     }
     /**
@@ -99,7 +103,66 @@ class Util{
         return $ip;
     }
     /**
-     * 
+     * Test a connection to system databas or external one.
+     * @param array $dbAttrs [Optional] An associative array. The array can 
+     * have 4 indices:
+     * <ul>
+     * <li><b>host</b>: The name of database host. It can be a URL, an IP address 
+     * or 'localhost'.</li>
+     * <li><b>user</b>: The username of the user that will be used to connect to 
+     * the database.</li>
+     * <li><b>pass</b>: The password of the user.</li>
+     * <li><b>db-name</b>: The name of the database.</li>
+     * </ul>
+     * If the given parameter is not provided, the function will try to test 
+     * database settings that where set in the class 'Config'.
+     * @return boolean|string If the connection was established, the function will 
+     * return TRUE. If no connection was established, the function will 
+     * return 'Util::DB_NEED_CONF'.
+     * @since 1.3.2
+     */
+    public static function checkDbConnection($dbAttrs=array()){
+        Logger::logFuncCall(__METHOD__);
+        $C = Config::get();
+        $host = isset($dbAttrs['host']) ? $dbAttrs['host'] : $C->getDBHost();
+        $user = isset($dbAttrs['user']) ? $dbAttrs['user'] : $C->getDBHost();
+        $pass = isset($dbAttrs['pass']) ? $dbAttrs['pass'] : $C->getDBHost();
+        $dbName = isset($dbAttrs['db-name']) ? $dbAttrs['db-name'] : $C->getDBHost();
+        Logger::log('Trying to connect to the database...');
+        Logger::log('DB Host: \''.$host.'\'.', 'debug');
+        Logger::log('DB User: \''.$user.'\'.', 'debug');
+        Logger::log('DB Pass: \''.$pass.'\'.', 'debug');
+        Logger::log('DB Name: \''.$dbName.'\'.', 'debug');
+        self::$dbTestInstance = new DatabaseLink($host, $user, $pass);
+        if(self::$dbTestInstance->isConnected()){
+            Logger::log('Connected to host. Setting database...');
+            if(self::$dbTestInstance->setDB($dbName)){
+                Logger::log('Database set.');
+                $returnValue = TRUE;
+            }
+            else{
+                Logger::log('Unable to set database.','warning');
+                Logger::log('Message: \''.self::$dbTestInstance->getErrorMessage().'\'.');
+                Logger::log('Code: \''.self::$dbTestInstance->getErrorCode().'\'.');
+                $returnValue = Util::DB_NEED_CONF;
+            }
+        }
+        else{
+            Logger::log('Unable to connect.','warning');
+            Logger::log('Message: \''.self::$dbTestInstance->getErrorMessage().'\'.');
+            Logger::log('Code: \''.self::$dbTestInstance->getErrorCode().'\'.');
+            $returnValue = Util::DB_NEED_CONF;
+        }
+        Logger::logReturnValue($returnValue);
+        Logger::logFuncReturn(__METHOD__);
+        return $returnValue;
+    }
+
+    /**
+     * Check the overall status of the system.
+     * @param boolean $checkDb If set to TRUE, the function will also check 
+     * database connection status. The settings of the connection will 
+     * be taken from the class 'Config'.
      * @return boolean|string The function will return TRUE in case everything 
      * was fine. If the file 'Config.php' was not found, The function will return 
      * 'Util::MISSING_CONF_FILE'. If the file 'SiteConfig.php' was not found, The function will return 
@@ -108,40 +171,34 @@ class Util{
      * the database, the function will return 'Util::DB_NEED_CONF'.
      * @since 1.2
      */
-    public static function checkSystemStatus(){
+    public static function checkSystemStatus($checkDb=false){
         Logger::logFuncCall(__METHOD__);
-        Logger::log('Checking system status...', 'info', 'initialization-log');
+        Logger::log('Checking system status...');
         $returnValue = '';
         if(class_exists('Config')){
             if(class_exists('SiteConfig')){
                 if(Config::get()->isConfig() === TRUE || LisksCode::getClassStatus() == 'INITIALIZING'){
-                    if(class_exists('DatabaseLink')){
-                        self::$dbTestInstance = new DatabaseLink(Config::get()->getDBHost(), Config::get()->getDBUser(), Config::get()->getDBPassword());
-                        if(self::$dbTestInstance->isConnected()){
-                            if(self::$dbTestInstance->setDB(Config::get()->getDBName())){
-                                $returnValue = TRUE;
-                            }
-                            else{
-                                $returnValue = Util::DB_NEED_CONF;
-                            }
-                        }
-                        else{
-                            $returnValue = Util::DB_NEED_CONF;
-                        }
+                    if($checkDb === TRUE){
+                        Logger::log('Checking database connection...');
+                        $returnValue = self::checkDbConnection();
                     }
                     else{
-                        $returnValue = Util::DB_NEED_CONF;
+                        Logger::log('No need to check database connection');
+                        $returnValue = TRUE;
                     }
                 }
                 else{
+                    Logger::log('The function \'Config::get()->isConfig()\' returned FALSE or the class \'LisksCode\' is still initializing.', 'warning');
                     $returnValue = Util::NEED_CONF;
                 }
             }
             else{
+                Logger::log('The file \'SiteConfig.php\' is missing.', 'warning');
                 $returnValue = Util::MISSING_SITE_CONF_FILE;
             }
         }
         else{
+            Logger::log('The file \'Config.php\' is missing.', 'warning');
             $returnValue = Util::MISSING_CONF_FILE;
         }
         Logger::logReturnValue($returnValue);

@@ -44,18 +44,9 @@ if(!defined('ROOT_DIR')){
  * Description of SystemFunctions
  *
  * @author Ibrahim
- * @version 1.4
+ * @version 1.4.1
  */
 class SystemFunctions extends Functions{
-    /**
-     * An array of possible user registration statuses.
-     * @since 1.3
-     */
-    const USER_REG_STATS = array(
-        'C'=>'Closed',
-        'O'=>'Open',
-        'AO'=>'Admin Only'
-    );
     /**
      * A constant that indicates the selected database schema has tables.
      * @since 1.1
@@ -83,7 +74,7 @@ class SystemFunctions extends Functions{
     const INITIAL_CONFIG_VARS = array(
         'is-config'=>'FALSE',
         'lisks-date'=>'09-09-2018 (DD-MM-YYYY)',
-        'lisks-version'=>'1.0.0-PR3',
+        'lisks-version'=>'1.0.0-PR4',
         'lisks-version-type'=>'Beta',
         'config-file-version'=>'1.3',
         'database-host'=>'localhost',
@@ -91,7 +82,6 @@ class SystemFunctions extends Functions{
         'database-password'=>'',
         'database-name'=>'',
         'user-reg-status'=>'C',
-        'user-reg-status-description'=>SystemFunctions::USER_REG_STATS['C'],
     );
     /**
      * An instance of SystemFunctions
@@ -322,7 +312,6 @@ class SystemFunctions extends Functions{
         $this->dbUser = \''.$configArr['database-username'].'\';
         $this->dbPass = \''.$configArr['database-password'].'\';
         $this->dbName = \''.$configArr['database-name'].'\';
-        $this->userRegStats = \''.$configArr['user-reg-status'].'\';
     }', TRUE, TRUE);
         $fh->write('/**
      * An instance of <b>Config</b>.

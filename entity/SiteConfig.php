@@ -92,7 +92,7 @@ class SiteConfig{
         $this->webSiteNames = array('AR'=>'أكاديميا البرمجة','EN'=>'Programming Academia',);
         $this->baseUrl = 'http://localhost/liskscode/';
         $this->titleSep = ' | ';
-        $this->primaryLang = 'AR';
+        $this->primaryLang = 'EN';
         $this->baseThemeName = 'Greeny By Ibrahim Ali';
         $this->adminThemeName = 'Greeny By Ibrahim Ali';
         $this->homePage = 'index';

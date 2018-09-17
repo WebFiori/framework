@@ -187,10 +187,10 @@ class SessionManager implements JsonI{
         }
         Logger::logFuncReturn(__METHOD__);
         
-        $sesionSavePath = 'sessions';
-        if(Util::isDirectory($sesionSavePath, TRUE)){
-            session_save_path(ROOT_DIR.'/'.$sesionSavePath);
-        }
+        //$sesionSavePath = 'sessions';
+        //if(Util::isDirectory($sesionSavePath, TRUE)){
+            //session_save_path(ROOT_DIR.'/'.$sesionSavePath);
+        //}
     }
     /**
      * Switch between sessions. The function first checks if a session is active. 

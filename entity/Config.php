@@ -89,14 +89,13 @@ class Config{
     private function __construct() {
         $this->isConfigured = TRUE;
         $this->lisksDate = '09-09-2018 (DD-MM-YYYY)';
-        $this->lisksVersion = '1.0.0-PR3';
+        $this->lisksVersion = '1.0.0-PR4';
         $this->lisksVersionType = 'Beta';
         $this->configVision = '1.3';
         $this->dbHost = 'localhost';
         $this->dbUser = '';
         $this->dbPass = '';
         $this->dbName = '';
-        $this->userRegStats = 'C';
     }
     /**
      * An instance of <b>Config</b>.

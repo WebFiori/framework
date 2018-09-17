@@ -126,10 +126,16 @@ class LisksCode{
         //also enable logging for info, warnings and errors 
         Logger::logName('initialization-log');
         Logger::section();
+        
+        //display PHP warnings and errors
         Util::displayErrors();
         
+        //enable logging.
+        //Logger::enabled(TRUE);
+        //set log file name
+        //Logger::logName('initialization-log');
         //enable logging of debug info.
-        define('DEBUG', '');
+        //define('DEBUG', '');
         
         $this->SF = SystemFunctions::get();
         $this->WF = WebsiteFunctions::get();
@@ -151,7 +157,10 @@ class LisksCode{
         //initialize some settings...
         $this->initCron();
         $this->initPermissions();
+              
         Logger::log('Initializing completed.');
+        
+        //switch to the log file 'system-log.txt'.
         Logger::logName('system-log');
         Logger::section();
         self::$classStatus = 'INITIALIZED';
@@ -261,7 +270,7 @@ class LisksCode{
         $this->addSMTPAccounts();
         
         //once configuration is finished, call the function SystemFunctions::configured()
-        $this->SF->configured(FALSE);
+        $this->SF->configured();
         
         //do not remove next lines of code.
         //Used to show error message in case the 

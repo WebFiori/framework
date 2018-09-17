@@ -187,7 +187,7 @@ class SessionManager implements JsonI{
         }
         Logger::logFuncReturn(__METHOD__);
         
-        $sesionSavePath = 'tmp';
+        $sesionSavePath = 'sessions';
         if(Util::isDirectory($sesionSavePath, TRUE)){
             session_save_path(ROOT_DIR.'/'.$sesionSavePath);
         }

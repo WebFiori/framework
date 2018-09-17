@@ -36,6 +36,34 @@ THE SOFTWARE.
         border-bottom-width: 0 !important;
         border-top-width: 0 !important;
     }
+    #mobile-menu{
+        left: 0;
+        right: 0;
+        top: 0;
+    }
+    ul#main-menu > li{
+        width: 100%;
+        margin: 0 !important;
+        padding: 5px;
+        border-top: 1px solid;
+        display: none;
+    }
+    #logo{
+        width: 15% !important;
+    }
+    #logo[dir='rtl']{
+        float: left;
+    }
+    #logo[dir='ltr']{
+        float: right;
+    }
+    #inner-header{
+        width: 83% !important;
+    }
+    #inner-header p{
+        text-align: center;
+        display: none;
+    }
 }
 *{
     font-family: Tahoma, Arial, sans-serif
@@ -56,6 +84,9 @@ THE SOFTWARE.
 }
 #page-footer{
     font-size: 8pt;
+}
+ul#main-menu > li:hover{
+    background-color: #61e290;
 }
 .social-media-icon{
     width: 25px;

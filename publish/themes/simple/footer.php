@@ -45,12 +45,17 @@ function getFooterNode(){
     
     $node->addChild($socialMedia);
     $contactInfo = new HTMLNode();
-    $contactInfo->setClassName('pa-row');
+    $contactInfo->setClassName('pa-'.Page::dir().'-col-12');
     $p = new PNode();
     $p->addText('013 xxx xxxx', array('new-line'=>TRUE));
     $p->addText('youremail@example.com',array('new-line'=>TRUE));
     $contactInfo->addChild($p);
     $node->addChild($contactInfo);
     $p->addText('Your Copyright Notice © 2018');
+    $div = new HTMLNode('div');
+    $div->setAttribute('class', 'pa-ltr-col-twelve');
+    $div->addTextNode('<b style="color:gray;font-size:8pt;">Powered By: <a href="https://github.com/usernane/liskscode" '
+            . 'target="_blank">LisksCode</a> v'.Config::get()->getLisksVersion().' ('.Config::get()->getLisksVersionType().')');
+    $node->addChild($div);
     return $node;
 }

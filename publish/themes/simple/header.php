@@ -9,7 +9,16 @@
 function getHeaderNode(){
     $headerSec = new HTMLNode();
     $logoContainer = new HTMLNode();
-    $logoContainer->setClassName('pa-'.Page::dir().'-col-4');
+    $logoContainer->setID('inner-header');
+    $logoContainer->setClassName('pa-'.Page::dir().'-col-11-nm-np');
+    $img = new HTMLNode('img', FALSE);
+    $img->setAttribute('src',Page::imagesDir().'/WebsiteIcon_1024x1024.png');
+    $img->setClassName('pa-'.Page::dir().'-col-1-np-nm');
+    $img->setID('logo');
+    $img->setWritingDir(Page::dir());
+    $link = new LinkNode(SiteConfig::get()->getHomePage(), '');
+    $link->addChild($img);
+    $headerSec->addChild($link);
     $langCode = WebsiteFunctions::get()->getMainSession()->getLang(TRUE);
     $p = new PNode();
     $siteNames = SiteConfig::get()->getWebsiteNames();
@@ -36,8 +45,7 @@ function getHeaderNode(){
     $ul->setClassName('pa-row');
     $ul->setAttribute('dir', Page::dir());
     $menu->addChild($ul);
-    $headerSec->addChild($menu);
-    
+    $logoContainer->addChild($menu);
     return $headerSec;
 }
 

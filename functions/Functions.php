@@ -117,13 +117,26 @@ class Functions {
             }
             else{
                 Logger::log('No optional paameters give. Cheking if already connected...');
-                if(!$dbLink->isConnected()){
+                if($dbLink !== NULL && !$dbLink->isConnected()){
                     Logger::log('No database connection. Trying to connect...');
+                    $conf = Config::get();
                     $retVal = $this->_connect(array(
-                        'host'=>Config::get()->getDBHost(),
-                        'user'=>Config::get()->getDBUser(),
-                        'pass'=>Config::get()->getDBPassword(),
-                        'db-name'=> Config::get()->getDBName()
+                        'host'=>$conf->getDBHost(),
+                        'user'=>$conf->getDBUser(),
+                        'pass'=>$conf->getDBPassword(),
+                        'db-name'=> $conf->getDBName()
+                    ));
+                    Logger::logFuncReturn(__METHOD__);
+                    return $retVal;
+                }
+                else if($dbLink === NULL){
+                    Logger::log('No database connection. Trying to connect...');
+                    $conf = Config::get();
+                    $retVal = $this->_connect(array(
+                        'host'=>$conf->getDBHost(),
+                        'user'=>$conf->getDBUser(),
+                        'pass'=>$conf->getDBPassword(),
+                        'db-name'=> $conf->getDBName()
                     ));
                     Logger::logFuncReturn(__METHOD__);
                     return $retVal;
@@ -143,8 +156,8 @@ class Functions {
             header('content-type:application/json');
             http_response_code(500);
             die('{"message":"'.$systemStatus.'","type":"error",'
-                    . '"details":"It seems the system is unable to connect to the database.",'
-                    . '"db-instance":'.Util::getDatabaseTestInstance()->toJSON().'}');
+                    . '"error-code":"'.$dbLink->getErrorCode().'",'
+                    . '"details":"'.JsonX::escapeJSONSpecialChars($dbLink->getErrorMessage()).'"}');
         }
         else{
             Logger::log('Invalid system status.', 'error');
@@ -166,8 +179,13 @@ class Functions {
             Logger::log('Error Code: '.$dbLink->getErrorCode(), 'error');
             Logger::log('Error Message: '.$dbLink->getErrorMessage(), 'error');
             Logger::requestCompleted();
+            http_response_code(500);
             header('content-type:application/json');
-            die('{"error-code":"'.$this->getDBLink()->getErrorCode().'","details":"'.JsonX::escapeJSONSpecialChars($this->getDBLink()->getErrorMessage()).'"}');
+            die('{"message":"Unable to connect to the database.",'
+                    .'"type":"error",'
+                    . '"error-code":"'.$dbLink->getErrorCode().'",'
+                    . '"details":"'.JsonX::escapeJSONSpecialChars($dbLink->getErrorMessage()).'",'
+                    . '"host":"'.$connParams['host'].'"}');
         }
         else if($result !== TRUE && defined('SETUP_MODE')){
             Logger::log('Unable to connect to the database while in setup mode.', 'warning');

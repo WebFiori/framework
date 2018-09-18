@@ -250,7 +250,7 @@ class Access {
      * NULL.
      * @since 1.0
      */
-    public static function getPrivilege($id){
+    public static function &getPrivilege($id){
         $pr = &Access::get()->_getPrivilege($id);
         return $pr;
     }

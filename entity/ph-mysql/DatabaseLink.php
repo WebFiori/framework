@@ -103,7 +103,7 @@ class DatabaseLink{
         return $this->lastErrorNo;
     }
     /**
-     * Checks if the connection is still active or its dead.
+     * Checks if the connection is still active or its dead and try to reconnect.
      * @return boolean true if still active, false if dead. If the connection is 
      * dead, more details can be found by getting the error message and error 
      * number.
@@ -112,10 +112,13 @@ class DatabaseLink{
     public function isConnected(){
         $test = FALSE;
         if($this->link instanceof mysqli){
-            $test = mysqli_ping($this->link);
-            if($test === FALSE){
-                $this->lastErrorMessage = mysqli_error($this->link);
-                $this->lastErrorNo = mysqli_errno($this->link);
+            $this->link = @mysqli_connect($this->host, $this->user, $this->pass);
+            if($this->link){
+                $test = $this->setDB($this->db);
+            }
+            else{
+                $this->lastErrorNo = mysqli_connect_errno();
+                $this->lastErrorMessage = mysqli_connect_error();
             }
         }
         return $test;
@@ -161,15 +164,19 @@ class DatabaseLink{
         return $this->result;
     }
     /**
-     * Returns one row from the result.
+     * Returns one row from the result or the first row from stored result.
      * @return array|NULL an associative array that represents a table row. 
-     * The value is taken from the function 'mysqli_fetch_assoc()'.
+     * The value is taken from the function 'mysqli_fetch_assoc()' if the 
+     * parameter '$fromMysqli' is set to TRUE. 
      * If no results are fetched, the function will return NULL. 
      * @since 1.0
      */
-    public function getRow(){
-        if($this->result){
+    public function getRow($fromMysqli=false){
+        if($fromMysqli === TRUE && $this->result){
             return mysqli_fetch_assoc($this->result);
+        }
+        else if(count($this->resultRows) != 0){
+            return $this->resultRows[0];
         }
         return NULL;
     }

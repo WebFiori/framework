@@ -44,7 +44,7 @@ if(!defined('ROOT_DIR')){
  * The base class for creating application logic and connecting to the database.
  *
  * @author Ibrahim
- * @version 1.3
+ * @version 1.3.1
  */
 class Functions {
     /**
@@ -336,6 +336,30 @@ class Functions {
         Logger::log('Checking if database link is not null...');
         if($dbLink !== NULL){
             $retVal = $dbLink->getRow();
+        }
+        else{
+            Logger::log('Database link is NULL.', 'warning');
+        }
+        Logger::logReturnValue($retVal);
+        Logger::logFuncReturn(__METHOD__);
+        return $retVal;
+    }
+    /**
+     * Returns the next row in the result set that was generated from executing 
+     * a query.
+     * @return array|NULL An associative array that represents the row. If 
+     * there was no result set generated from executing the query or the 
+     * result has no rows, the function will return NULL.
+     * @since 1.3.1
+     */
+    public function nextRow() {
+        Logger::logFuncCall(__METHOD__);
+        $retVal = NULL;
+        Logger::log('Getting Database link...');
+        $dbLink = $this->getDBLink();
+        Logger::log('Checking if database link is not null...');
+        if($dbLink !== NULL){
+            $retVal = $dbLink->nextRow();
         }
         else{
             Logger::log('Database link is NULL.', 'warning');

@@ -43,7 +43,7 @@ if(!defined('ROOT_DIR')){
  * A class that is used to log messages to a file.
  *
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.1.1
+ * @version 1.1.2
  */
 class Logger {
     /**
@@ -137,7 +137,15 @@ class Logger {
      * @since 1.1
      */
     public static function logReturnValue($val,$logName=null,$addDashes=false) {
-        Logger::log('Return value = \''.$val.'\' ('. gettype($val).').','debug', $logName, $addDashes);
+        $logMessage = '';
+        if(gettype($val) == 'array'){
+            $logMessage = self::_createMessageArray($val, 0);
+            Logger::log('Return value = (array).','debug', $logName);
+            Logger::log($logMessage);
+        }
+        else{
+            Logger::log('Return value = \''.$val.'\' ('. gettype($val).').','debug', $logName, $addDashes);
+        }
     }
     /**
      * Enable, disable or check if logging is enabled.
@@ -168,8 +176,39 @@ class Logger {
      * @since 1.0
      */
     public static function log($message,$messageType='info',$logName=null,$addDashes=false){
+        $logMessage = '';
+        if(gettype($message) == 'array'){
+            $logMessage = self::_createMessageArray($message, 0);
+        }
+        else{
+            $logMessage = $message;
+        }
         self::logName($logName);
         self::_get()->writeToLog($message,$messageType,$addDashes);
+    }
+    /**
+     * Generates a readable string which represents an array.
+     * @param type $arr
+     * @param type $depth
+     * @return type
+     * @since 1.1.2
+     */
+    private static function _createMessageArray($arr,$depth){
+        $retVal = '{';
+        $spaces = '';
+        $loop = $depth != 0 ? (4)*$depth : 4;
+        for($x = 0 ; $x < $loop ; $x++){
+            $spaces .= ' ';
+        }
+        foreach ($arr as $k => $v){
+            if(gettype($v) == 'array'){
+                $retVal .= $spaces.'['.$k.']=>'.$this->_createMessageArray($v, $depth + 1)."\r\n";
+            }
+            else{
+                $retVal .= $spaces.'['.$k.']=>'.$v."\r\n";
+            }
+        }
+        return $retVal.'}';
     }
     /**
      * Adds a debug message to a log file that says the given function was called. 

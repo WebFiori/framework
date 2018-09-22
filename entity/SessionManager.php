@@ -19,7 +19,7 @@ if(!defined('ROOT_DIR')){
 /**
  * A helper class to manage system sessions.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.8.2
+ * @version 1.8.3
  */
 class SessionManager implements JsonI{
     /**
@@ -413,21 +413,22 @@ class SessionManager implements JsonI{
     }
     /**
      * Initialize session language. The initialization depends on the attribute 
-     * 'lang'. It can be send via 'get' request, 'post' request or a cookie. If 
-     * no language code is provided, 'EN' will be used. The provided language 
-     * must be in the array 'SessionManager::SUPOORTED_LANGS'. If the given 
-     * language code is not in the given array, The used value will depend on the existence 
-     * of the class 'SiteConfig'. If it is exist, The value that is returned by 
-     * 'SiteConfig::getPrimaryLanguage()' will be used. If the class does not 
-     * exist, 'EN' will be used. Also if the language is set before, it will 
-     * not be updated unless the parameter '$forceUpdate' is set to TRUE.
-     * @since 1.2
+     * 'lang'. It can be send via 'get' request, 'post' request or a cookie. 
+     * The provided language must be in the array 'SessionManager::SUPOORTED_LANGS'. 
+     * If the given language code is not in the given array, 
+     * The used value will depend on the existence of the class 'SiteConfig'. 
+     * If it is exist, The value that is returned by SiteConfig::getPrimaryLanguage()' .
+     * If not, 'EN' is used by default.
+     * Also if the language is set before, it will not be updated unless the parameter '$forceUpdate' is set to TRUE.
      * @param boolean $forceUpdate Set to TRUE if the language is set and want to 
      * reset it.
+     * @param boolean $useDefault [Optional] If set to TRUE, the function will 
+     * use default language if no language attribute is found in request body.
      * @return boolean The function will return TRUE if the language is set or 
      * updated. Other than that, the function will return FALSE.
+     * @since 1.2
      */
-    private function _initLang($forceUpdate=false,$useDefault=false){
+    private function _initLang($forceUpdate=false,$useDefault=true){
         Logger::logFuncCall(__METHOD__);
         Logger::log('Force update = \''.$forceUpdate.'\'.', 'debug');
         Logger::log('Use default = \''.$useDefault.'\'.', 'debug');
@@ -534,37 +535,6 @@ class SessionManager implements JsonI{
         Logger::logReturnValue($retVal);
         Logger::logFuncReturn(__METHOD__);
         return $retVal;
-    }
-    /**
-     * Checks the status of login user token. The function check the match between 
-     * the token that is sent with the request and the token in the session. 
-     * The token can be send via 'get' request, 'post' request or a cookie. The 
-     * token must be stored in the parameter 'token'
-     * @return boolean TRUE if the user token is valid. FALSE if 
-     * not. Also the function will return FALSE if no user is logged in.
-     * @since 1.1
-     * @deprecated since version 1.7
-     */
-    public function validateToken(){
-        $tok = filter_input(INPUT_COOKIE, 'token');
-        if($tok === FALSE || $tok === NULL){
-            if(isset($_GET['token'])){
-                $tok = filter_var($_GET['token'],FILTER_SANITIZE_STRING);
-            }
-            if($tok === FALSE || $tok === NULL){
-                if(isset($_POST['token'])){
-                    $tok = filter_var($_POST['token'],FILTER_SANITIZE_STRING);
-                }
-                if($tok === FALSE || $tok === NULL){
-                    return FALSE;
-                }
-            }
-        }
-        $user = $this->getUser();
-        if($user != NULL){
-            return $user->getToken() == $tok;
-        }
-        return FALSE;
     }
     /**
      * Sets the user who is using the system. It is used in case of log in.
@@ -1150,6 +1120,25 @@ class SessionManager implements JsonI{
         return FALSE;
     }
     /**
+     * Return session ID from session cookie, get or post parameter.
+     * @return string|boolean If session ID is found, the function will 
+     * return it. Note that if it is in a cookie, the name of the cookie must 
+     * be the name of the session in order to take the ID from it. If it is 
+     * in GET or POST request, it must be in a parameter with the name 
+     * 'session-id'.
+     * @since 1.8.3
+     */
+    public function getSessionIDFromRequest(){
+        $sid = self::getSessionIDFromCookie($this->getName());
+        if($sid === FALSE){
+            $sid = filter_var($_POST['session-id'],FILTER_SANITIZE_STRING);
+            if($sid === NULL || $sid === FALSE){
+                $sid = filter_var($_GET['lang'],FILTER_SANITIZE_STRING);
+            }
+        }
+        return $sid;
+    }
+    /**
      * Checks if there exist a session with the given session name or not. If there 
      * is a one and it is not timed out, the function will resume it.
      * @return boolean TRUE if there is a session with the given name 
@@ -1166,7 +1155,7 @@ class SessionManager implements JsonI{
             session_name($this->getName());
             Logger::log('Updating the value of \'session.use_cookies\'...');
             ini_set('session.use_cookies', 1);
-            $sid = self::getSessionIDFromCookie($this->getName());
+            $sid = $this->getSessionIDFromRequest();
             if($sid !== FALSE){
                 $this->sId = $sid;
                 session_id($sid);

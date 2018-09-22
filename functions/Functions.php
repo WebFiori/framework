@@ -98,6 +98,24 @@ class Functions {
     }
     /**
      * Initiate database connection.
+     * @param array $optionalConnectionParams [Optional] An associative array 
+     * which contains database connection information. The indices of the 
+     * array are:
+     * <ul>
+     * <li><b>host</b>: Database host address.</li>
+     * <li><b>user</b>: Database username.</li>
+     * <li><b>pass</b>: Database user's password.</li>
+     * <li><b>db-name</b>: The name of the database.</li>
+     * </ul> 
+     * If this parameter is not provided, connection information will be taken 
+     * from the class 'Config'.
+     * @return boolean If the connection is established, the function will 
+     * return TRUE. If the constant 'SETUP_MODE' is defined and the function 
+     * was unable to establish a connection, it will return FALSE. 
+     * If the constant 'SETUP_MODE' is NOT defined and the function 
+     * was unable to establish a connection, the execution of PHP code will 
+     * stop and the function will send a JSON response to indicate that 
+     * a database connection error has occurred.
      * @since 1.1
      */
     public function useDatabase($optionalConnectionParams=array()) {
@@ -165,6 +183,25 @@ class Functions {
             die('{"message":"Invalid system status.","details":"'.$systemStatus.'"}');
         }
     }
+    /**
+     * Try to connect to database.
+     * @param array $connParams [Optional] An associative array 
+     * which contains database connection information. The indices of the 
+     * array are:
+     * <ul>
+     * <li><b>host</b>: Database host address.</li>
+     * <li><b>user</b>: Database username.</li>
+     * <li><b>pass</b>: Database user's password.</li>
+     * <li><b>db-name</b>: The name of the database.</li>
+     * <ul> 
+     * @return boolean If the connection is established, the function will 
+     * return TRUE. If the constant 'SETUP_MODE' is defined and the function 
+     * was unable to establish a connection, it will return FALSE. 
+     * If the constant 'SETUP_MODE' is NOT defined and the function 
+     * was unable to establish a connection, the execution of PHP code will 
+     * stop and the function will send a JSON response to indicate that 
+     * a database connection error has occurred.
+     */
     private function _connect($connParams){
         Logger::logFuncCall(__METHOD__);
         $result = $this->getSession()->useDb(array(
@@ -198,7 +235,9 @@ class Functions {
     }
     /**
      * Execute a query.
-     * @param MySQLQuery $qObj An object of type 'MySQLQuery'.
+     * @param MySQLQuery $qObj An object of type 'MySQLQuery'. Note that 
+     * this function will call the function 'Functions::useDatabase()' by 
+     * default.
      * @return boolean 'TRUE' if no errors occur while executing the query.
      * FAlSE in case of error.
      * @since 1.0
@@ -206,19 +245,20 @@ class Functions {
     public function excQ($qObj){
         Logger::logFuncCall(__METHOD__);
         if($qObj instanceof MySQLQuery){
-            $this->useDatabase();
-            $dbLink = &$this->getDBLink();
-            if($dbLink != NULL){
-                Logger::log('Executing database query...');
-                $result = $dbLink->executeQuery($qObj);
-                if($result !== TRUE){
-                    Logger::log('An error has occured while executing the query.', 'error');
-                    Logger::log('Error Code: '.$dbLink->getErrorCode(), 'error');
-                    Logger::log('Error Message: '.$dbLink->getErrorMessage(), 'error');
+            if($this->useDatabase()){
+                $dbLink = &$this->getDBLink();
+                if($dbLink != NULL){
+                    Logger::log('Executing database query...');
+                    $result = $dbLink->executeQuery($qObj);
+                    if($result !== TRUE){
+                        Logger::log('An error has occured while executing the query.', 'error');
+                        Logger::log('Error Code: '.$dbLink->getErrorCode(), 'error');
+                        Logger::log('Error Message: '.$dbLink->getErrorMessage(), 'error');
+                    }
+                    return $result;
                 }
-                return $result;
+                Logger::log('Database link is null.', 'warning');
             }
-            Logger::log('Database link is null.', 'warning');
         }
         else{
             Logger::log('The given instance is not a sub-class of \'MySQLQuery\'.', 'warning');
@@ -252,7 +292,7 @@ class Functions {
      * Returns the instance of <b>SessionManager</b> that is used by the logic.
      * @return SessionManager An object of type <b>SessionManager</b>
      * @since 1.0
-     * @deprecated since version 1.3
+     * @deprecated since version 1.3 Use 'Functions::getSession()'
      */
     public function &getMainSession(){
         Logger::logFuncCall(__METHOD__);
@@ -261,8 +301,8 @@ class Functions {
         return $retVal;
     }
     /**
-     * 
-     * @return SessionManager
+     * Returns the instance of 'SessionManager' that is used by the class.
+     * @return SessionManager An instance of 'SessionManager'.
      * @since 1.3
      */
     public function &getSession() {
@@ -309,7 +349,7 @@ class Functions {
         Logger::logFuncCall(__METHOD__);
         $retVal = -1;
         Logger::log('Getting Database link...');
-        $dbLink = $this->getDBLink();
+        $dbLink = &$this->getDBLink();
         Logger::log('Checking if database link is not null...');
         if($dbLink !== NULL){
             $retVal = $dbLink->rows();
@@ -356,7 +396,7 @@ class Functions {
         Logger::logFuncCall(__METHOD__);
         $retVal = NULL;
         Logger::log('Getting Database link...');
-        $dbLink = $this->getDBLink();
+        $dbLink = &$this->getDBLink();
         Logger::log('Checking if database link is not null...');
         if($dbLink !== NULL){
             $retVal = $dbLink->nextRow();

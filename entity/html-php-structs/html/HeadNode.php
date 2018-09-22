@@ -201,7 +201,11 @@ class HeadNode extends HTMLNode{
         if(strlen($href) != 0){
             $tag = new HTMLNode('link', FALSE, FALSE);
             $tag->setAttribute('rel','stylesheet');
-            $tag->setAttribute('href', $href);
+            
+            //used to prevent caching 
+            $version = substr(hash('sha256', time()+rand(0, 10000)), rand(0,10),10);
+            
+            $tag->setAttribute('href', $href.'?cv='.$version);
             $this->addChild($tag);
         }
     }
@@ -214,7 +218,10 @@ class HeadNode extends HTMLNode{
         if(strlen($loc) != 0){
             $tag = new HTMLNode('script', TRUE, FALSE);
             $tag->setAttribute('type','text/javascript');
-            $tag->setAttribute('src', $loc);
+            //used to prevent caching 
+            $version = substr(hash('sha256', time()+rand(0, 10000)), rand(0,10),10);
+            
+            $tag->setAttribute('src', $loc.'?jv='.$version);
             $this->addChild($tag);
         }
     }

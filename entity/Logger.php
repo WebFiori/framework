@@ -137,11 +137,8 @@ class Logger {
      * @since 1.1
      */
     public static function logReturnValue($val,$logName=null,$addDashes=false) {
-        $logMessage = '';
         if(gettype($val) == 'array'){
-            $logMessage = self::_createMessageArray($val, 0);
-            Logger::log('Return value = (array).','debug', $logName);
-            Logger::log($logMessage);
+            Logger::log('Return value = (array).'."\r\n".self::_createMessageArray($val),'debug', $logName);
         }
         else{
             Logger::log('Return value = \''.$val.'\' ('. gettype($val).').','debug', $logName, $addDashes);
@@ -178,13 +175,13 @@ class Logger {
     public static function log($message,$messageType='info',$logName=null,$addDashes=false){
         $logMessage = '';
         if(gettype($message) == 'array'){
-            $logMessage = self::_createMessageArray($message, 0);
+            $logMessage = "\r\n".self::_createMessageArray($message);
         }
         else{
             $logMessage = $message;
         }
         self::logName($logName);
-        self::_get()->writeToLog($message,$messageType,$addDashes);
+        self::_get()->_writeToLog($logMessage,$messageType,$addDashes);
     }
     /**
      * Generates a readable string which represents an array.
@@ -193,22 +190,22 @@ class Logger {
      * @return type
      * @since 1.1.2
      */
-    private static function _createMessageArray($arr,$depth){
-        $retVal = '{';
-        $spaces = '';
-        $loop = $depth != 0 ? (4)*$depth : 4;
+    private static function _createMessageArray($arr,$depth=0,$outerSpace=''){
+        $retVal = 'Array:{x'."\r\n";
+        $innerSpace = '';
+        $loop = $depth != 0 ? (4)*($depth + 1) : 4;
         for($x = 0 ; $x < $loop ; $x++){
-            $spaces .= ' ';
+            $innerSpace .= ' ';
         }
         foreach ($arr as $k => $v){
             if(gettype($v) == 'array'){
-                $retVal .= $spaces.'['.$k.']=>'.$this->_createMessageArray($v, $depth + 1)."\r\n";
+                $retVal .= $innerSpace.'['.$k.']=>'.self::_createMessageArray($v, $depth + 1,$innerSpace)."\r\n";
             }
             else{
-                $retVal .= $spaces.'['.$k.']=>'.$v."\r\n";
+                $retVal .= $innerSpace.'['.$k.']=>'.$v."\r\n";
             }
         }
-        return $retVal.'}';
+        return $retVal.$outerSpace.'}';
     }
     /**
      * Adds a debug message to a log file that says the given function was called. 
@@ -379,7 +376,7 @@ class Logger {
      * @param type $addDashes
      * @since 1.0
      */
-    private function writeToLog($content,$type='',$addDashes=false) {
+    private function _writeToLog($content,$type='',$addDashes=false) {
         if($this->_isEnabled()){
             $upperType = strtoupper($type);
             $bType = in_array($upperType, self::MESSSAGE_TYPES) ? $upperType : 'INFO';
@@ -427,8 +424,10 @@ class Logger {
      * @since 1.1.1
      */
     private function _newSec(){
-        $this->handelr = fopen($this->_getDirectory().'/'.$this->_getLogName().'.txt', 'a+');
-        fwrite($this->handelr, '-+-*******************************************************-+-'."\r\n");
-        fclose($this->handelr);
+        if(self::enabled()){
+            $this->handelr = fopen($this->_getDirectory().'/'.$this->_getLogName().'.txt', 'a+');
+            fwrite($this->handelr, '-+-*******************************************************-+-'."\r\n");
+            fclose($this->handelr);
+        }
     }
 }

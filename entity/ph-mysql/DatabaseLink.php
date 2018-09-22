@@ -3,7 +3,7 @@
  * A class that is used to connect to MySQL database. It works as an interface 
  * for <b>mysqli</b> 
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.2
+ * @version 1.3
  */
 class DatabaseLink{
     /**
@@ -68,6 +68,12 @@ class DatabaseLink{
      * @since 1.2 
      */
     private $resultRows;
+    /**
+     * The index of the current row in result set.
+     * @var int 
+     * @since 1.3
+     */
+    private $currentRow;
     public function getErrorMessage(){
         return $this->lastErrorMessage;
     }
@@ -78,6 +84,7 @@ class DatabaseLink{
         $this->user = $user;
         $this->pass = $password;
         $this->host = $host;
+        $this->currentRow = -1;
         if($this->link){
             
         }
@@ -114,7 +121,12 @@ class DatabaseLink{
         if($this->link instanceof mysqli){
             $this->link = @mysqli_connect($this->host, $this->user, $this->pass);
             if($this->link){
-                $test = $this->setDB($this->db);
+                if($this->db !== NULL){
+                    $test = $this->setDB($this->db);
+                }
+                else{
+                    $test = TRUE;
+                }
             }
             else{
                 $this->lastErrorNo = mysqli_connect_errno();
@@ -123,7 +135,7 @@ class DatabaseLink{
         }
         return $test;
     }
-
+    
     /**
      * Return the number of rows returned by last query.
      * If no result returned, the method will return -1.
@@ -164,19 +176,34 @@ class DatabaseLink{
         return $this->result;
     }
     /**
-     * Returns one row from the result or the first row from stored result.
-     * @return array|NULL an associative array that represents a table row. 
-     * The value is taken from the function 'mysqli_fetch_assoc()' if the 
-     * parameter '$fromMysqli' is set to TRUE. 
+     * Returns the row which the class is pointing to in the result set.
+     * @return array|NULL an associative array that represents a table row.  
      * If no results are fetched, the function will return NULL. 
      * @since 1.0
      */
-    public function getRow($fromMysqli=false){
-        if($fromMysqli === TRUE && $this->result){
-            return mysqli_fetch_assoc($this->result);
+    public function getRow(){
+        if(count($this->resultRows) != 0){
+            if($this->currentRow == -1){
+                return $this->getRows()[0];
+            }
+            else if($this->currentRow < $this->rows()){
+                return $this->getRows()[$this->currentRow];
+            }
         }
-        else if(count($this->resultRows) != 0){
-            return $this->resultRows[0];
+        return NULL;
+    }
+    /**
+     * Returns the next row that was resulted from executing a query that has 
+     * results.
+     * @return array|NULL The next row in the result set. If no more rows are 
+     * in the set, the function will return NULL.
+     * @since 1.3
+     */
+    public function nextRow() {
+        $this->currentRow++;
+        $rows = $this->getRows();
+        if(isset($rows[$this->currentRow])){
+            return $rows[$this->currentRow];
         }
         return NULL;
     }
@@ -233,6 +260,7 @@ class DatabaseLink{
     public function executeQuery($query){
         if($query instanceof MySQLQuery){
             $this->resultRows = NULL;
+            $this->currentRow = -1;
             $this->lastQuery = $query;
             if($this->isConnected()){
                 $eploded = explode(';', trim($query->getQuery(), ';'));

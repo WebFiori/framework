@@ -326,7 +326,7 @@ abstract class API implements JsonI{
      * @return boolean <b>TRUE</b> if the action is added. <b>FAlSE</b> otherwise.
      * @since 1.0
      */
-    public final function addAction($action,$reqPermissions=false){
+    public function addAction($action,$reqPermissions=false){
         if($action instanceof APIAction){
             if(!in_array($action, $this->getActions()) && !in_array($action, $this->getAuthActions())){
                 $action->setSince($this->getVersion());

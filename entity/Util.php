@@ -19,7 +19,7 @@ if(!defined('ROOT_DIR')){
 /**
  * PHP utility class.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.3.2
+ * @version 1.3.3
  */
 class Util{
     /**
@@ -62,6 +62,42 @@ class Util{
      */
     public static function getDatabaseTestInstance(){
         return self::$dbTestInstance;
+    }
+    /**
+     * Returns HTTP request headers.
+     * @return array An associative array of request headers.
+     * @since 1.3.3
+     */
+    public static function getRequestHeaders(){
+        $retVal = array();
+        if(function_exists('apache_request_headers')){
+            $headers = apache_request_headers();
+            foreach ($headers as $k=>$v){
+                $retVal[strtolower($k)] = $v; 
+            }
+        }
+        else{
+            foreach ($_SERVER as $k => $v){
+                $split = explode('_', $k);
+                if($split[0] == 'HTTP'){
+                    $headerName = '';
+                    $count = count($split);
+                    for($x = 0 ; $x < $count ; $x++){
+                        if($x + 1 == $count && $split[$x] != 'HTTP'){
+                            $headerName = $headerName.$split[$x];
+                        }
+                        else if($x == 1 && $split[$x] != 'HTTP'){
+                            $headerName = $split[$x].'-';
+                        }
+                        else if($split[$x] != 'HTTP'){
+                            $headerName = $headerName.$split[$x].'-';
+                        }
+                    }
+                    $retVal[strtolower($headerName)] = $v;
+                }
+            }
+        }
+        return $retVal;
     }
     /**
      * An alias for the function 'Util::getClientIP()'.

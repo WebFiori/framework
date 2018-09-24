@@ -42,7 +42,7 @@ if(!defined('ROOT_DIR')){
         . '</html>');
 }
 //create class and extend the base class API
-class ExampleAPI extends API{
+class ExampleAPI extends ExtendedAPI{
     
     public function __construct() {
         parent::__construct();
@@ -69,13 +69,15 @@ class ExampleAPI extends API{
         $a = $this->getAction();
         if($a == 'say-hello'){
             //say hello by sending html document
-            $this->send('text/html', '<html><head><title>Say Hello</title></head><body><p>hello</p></body></html>');
-        }
-        else{
-            $this->send('application/json', '{"description":"This is a test api"}');
+            $lang = $this->getTranslation()->getCode();
+            if($lang == 'AR'){
+                $this->send('text/html', '<html><head><title>قُل مرحباً</title></head><body><p dir="rtl">مرحباً بالعالم!</p></body></html>');
+            }
+            else{
+                $this->send('text/html', '<html><head><title>Say Hello</title></head><body><p>hello world!</p></body></html>');
+            }
         }
     }
-
 }
 //if the constant is defined, then we are 
 //coming throgh a route and not autoloading

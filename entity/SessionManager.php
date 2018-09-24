@@ -494,7 +494,8 @@ class SessionManager implements JsonI{
         else{
             Logger::log('The given language is not in the array SessionManager::SUPPORTED_LANGS', 'warning');
         }
-        if($useDefault === TRUE && $retVal == FALSE){
+        if($useDefault === TRUE && $retVal == FALSE && !isset($_SESSION['lang'])){
+            Logger::log('Using default language.');
             $_SESSION['lang'] = $defaultLang;
             $retVal = TRUE;
         }
@@ -527,6 +528,7 @@ class SessionManager implements JsonI{
             if($forceUpdate === TRUE){
                 Logger::log('Updating languae...');
                 $this->_initLang($forceUpdate);
+                $retVal = $_SESSION['lang'];
             }
             if(isset($_SESSION['lang'])){
                 $retVal = $_SESSION['lang'];

@@ -27,8 +27,8 @@
  * An extension for the class 'API' that adds support for multi-language 
  * response messages.
  *
- * @author Ibrahim
- * @version 1.0
+ * @author Ibrahim <ibinshikh@hotmail.com>
+ * @version 1.0.1
  */
 abstract class ExtendedAPI extends API{
     private $translation;
@@ -64,6 +64,31 @@ abstract class ExtendedAPI extends API{
         }
     }
     /**
+     * Returns an associative array that contains HTTP authorization header 
+     * content.
+     * @return array An associative array that has two indices: 
+     * <ul>
+     * <li><b>type</b>: Type of authorization (e.g. basic, bearer )</li>
+     * <li><b>credentials</b>: Depending on authorization type, 
+     * this field will have different values.</li>
+     * </ul>
+     * If no authorization header is sent, The two indices will be empty.
+     * @since 1.0.1
+     */
+    public function getAuthorizationHeader(){
+        $retVal = array(
+            'type'=>'',
+            'credentials'=>''
+        );
+        $headers = Util::getRequestHeaders();
+        if(isset($headers['authorization'])){
+            $split = explode(' ', $headers['authorization']);
+            $retVal['type'] = strtolower($split[0]);
+            $retVal['credentials'] = $split[1];
+        }
+        return $retVal;
+    }
+    /**
      * Adds new action to the set of API actions.
      * @param APIAction $action The action that will be added.
      * @param boolean $reqPermission Set to 'TRUE' if the action require user login or 
@@ -71,7 +96,7 @@ abstract class ExtendedAPI extends API{
      * @return boolean 'TRUE' if the action is added. 'FAlSE' otherwise.
      * @since 1.0
      */
-    public function addAction($action,$reqPermission) {
+    public function addAction($action,$reqPermission=false) {
         if($action instanceof APIAction){
             $sid = new RequestParameter('session-id', 'string', TRUE);
             $sid->setDefault('');

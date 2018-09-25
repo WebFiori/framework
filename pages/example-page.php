@@ -57,13 +57,24 @@ Page::theme($themeName='Simple By Ibrahim Ali');
 
 //sets the title of the page
 Logger::log('Setting view title to \'Example Page\'');
-Page::title('Example Page');
+$lang = Page::lang();
+if($lang == 'AR'){
+    Page::title('مثال على صفحة');
 
-//adds a paragraph to the body of the page.
-$p = new PNode();
-$p->addText('Hello from LisksCode Framework!');
-Page::insert($p);
+    //adds a paragraph to the body of the page.
+    $p = new PNode();
+    $p->addText('أهلا و سهلا من إطار "ويب فيوري"!');
+    Page::insert($p);
 
+}
+else{
+    Page::title('Example Page');
+
+    //adds a paragraph to the body of the page.
+    $p = new PNode();
+    $p->addText('Hello from "WebFiori Framework"!');
+    Page::insert($p);
+}
 //display the view
 Page::render();
 Logger::log('Example view loaded.');

@@ -131,11 +131,11 @@ class WebFiori{
         Util::displayErrors();
         
         //enable logging.
-        //Logger::enabled(TRUE);
+        Logger::enabled(TRUE);
         //set log file name
-        //Logger::logName('initialization-log');
+        Logger::logName('initialization-log');
         //enable logging of debug info.
-        //define('DEBUG', '');
+        define('DEBUG', '');
         
         $this->SF = SystemFunctions::get();
         $this->WF = WebsiteFunctions::get();
@@ -444,7 +444,6 @@ class WebFiori{
 WebFiori::getAndStart();
 define('INITIAL_SYS_STATUS',WebFiori::sysStatus());
 Logger::log('INITIAL_SYS_STATUS = '.INITIAL_SYS_STATUS, 'debug');
-Router::other('/test', '/pages/test.php');
 if(INITIAL_SYS_STATUS === TRUE){
     Router::route(Util::getRequestedURL());
 }

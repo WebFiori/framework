@@ -54,8 +54,8 @@ function getFooterNode(){
     $p->addText('Your Copyright Notice © 2018');
     $div = new HTMLNode('div');
     $div->setAttribute('class', 'pa-ltr-col-twelve');
-    $div->addTextNode('<b style="color:gray;font-size:8pt;">Powered By: <a href="https://github.com/usernane/liskscode" '
-            . 'target="_blank">LisksCode</a> v'.Config::get()->getLisksVersion().' ('.Config::get()->getLisksVersionType().')');
+    $div->addTextNode('<b style="color:gray;font-size:8pt;">Powered By: <a href="https://github.com/usernane/webfiori" '
+            . 'target="_blank">WebFiori Framework</a> v'.Config::get()->getVersion().' ('.Config::get()->getVersionType().')');
     $node->addChild($div);
     return $node;
 }

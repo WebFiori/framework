@@ -13,7 +13,7 @@ $theme->addComponents(array(
     'aside.php','GUI.php','LangExt.php'
 ));
 $theme->setBeforeLoaded(function(){
-    $lang = LisksCode::getWebsiteFunctions()->getSessionLang(TRUE);
+    $lang = WebFiori::getWebsiteFunctions()->getSessionLang(TRUE);
     Page::lang($lang);
     if($lang == 'AR'){
         Page::dir('rtl');

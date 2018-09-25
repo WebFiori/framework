@@ -13,8 +13,8 @@ function getFooterNode(){
     $node->addChild($fNode);
     $div = new HTMLNode('div');
     $div->setAttribute('class', 'pa-ltr-col-twelve');
-    $div->addTextNode('<b style="color:gray;font-size:8pt;">Powered By: <a href="https://github.com/usernane/liskscode" '
-            . 'target="_blank">LisksCode</a> v'.Config::get()->getLisksVersion().' ('.Config::get()->getLisksVersionType().')');
+    $div->addTextNode('<b style="color:gray;font-size:8pt;">Powered By: <a href="https://github.com/usernane/webfiori" '
+            . 'target="_blank">WebFiori Framework</a> v'.Config::get()->getVersion().' ('.Config::get()->getVersionType().')');
     $fNode->addChild($div);
     return $node;
 }

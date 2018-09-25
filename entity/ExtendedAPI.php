@@ -153,7 +153,7 @@ abstract class ExtendedAPI extends API{
     }
     /**
      * Sends a response message to indicate that a database error has occur.
-     * @param JsonI|string $info An object of type 'JsonI' that 
+     * @param JsonI|JsonX|string $info An object of type 'JsonI' or 'JsonX' that 
      * describe the error in more details. Also it can be a simple string.
      * @since 1.0
      */
@@ -161,6 +161,9 @@ abstract class ExtendedAPI extends API{
         $message = $this->get('general/db-error');
         if($info instanceof JsonI){
             $this->sendResponse($message, TRUE, 404, '"err-info":'.$info->toJSON());
+        }
+        else if($info instanceof JsonX){
+            $this->sendResponse($message, TRUE, 404, '"err-info":'.$info);
         }
         else{
             $this->sendResponse($message, TRUE, 404, '"err-info":"'.$info.'"');

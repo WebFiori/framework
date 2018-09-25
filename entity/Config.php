@@ -28,19 +28,19 @@ class Config{
      * @var string The framework version that is used to build the project.
      * @since 1.0 
      */
-    private $lisksVersionType;
+    private $versionType;
     /**
      * The version of the framework that is used to build the project.
      * @var string The version of the framework that is used to build the project.
      * @since 1.0 
      */
-    private $lisksVersion;
+    private $version;
     /**
      * The release date of the framework that is used to build the project.
      * @var string Release date of of the framework that is used to build the project.
      * @since 1.0 
      */
-    private $lisksDate;
+    private $releaseDate;
     /**
      * A boolean value. Set to true once system configuration is completed.
      * @var boolean 
@@ -88,9 +88,9 @@ class Config{
      */
     private function __construct() {
         $this->isConfigured = TRUE;
-        $this->lisksDate = '09-09-2018 (DD-MM-YYYY)';
-        $this->lisksVersion = '1.0.0-PR4';
-        $this->lisksVersionType = 'Beta';
+        $this->releaseDate = '09-25-2018 (DD-MM-YYYY)';
+        $this->version = '1.0.0';
+        $this->versionType = 'Stable';
         $this->configVision = '1.3';
         $this->dbHost = 'localhost';
         $this->dbUser = '';
@@ -176,23 +176,23 @@ class Config{
      * @return string Framework version number.
      * @since 1.2
      */
-    public function getLisksVersion(){
-        return $this->lisksVersion;
+    public function getVersion(){
+        return $this->version;
     }
     /**
      * Returns framework version type.
      * @return string framework version type.
      * @since 1.2
      */
-    public function getLisksVersionType(){
-        return $this->lisksVersionType;
+    public function getVersionType(){
+        return $this->versionType;
     }
     /**
      * Returns the date at which the framework is released.
      * @return string The date at which the framework is released.
      * @since 1.0
      */
-    public function getLisksDate(){
-        return $this->lisksDate;
+    public function getReleaseDate(){
+        return $this->releaseDate;
     }
 }

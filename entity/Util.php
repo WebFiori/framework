@@ -213,7 +213,7 @@ class Util{
         $returnValue = '';
         if(class_exists('Config')){
             if(class_exists('SiteConfig')){
-                if(Config::get()->isConfig() === TRUE || LisksCode::getClassStatus() == 'INITIALIZING'){
+                if(Config::get()->isConfig() === TRUE || WebFiori::getClassStatus() == 'INITIALIZING'){
                     if($checkDb === TRUE){
                         Logger::log('Checking database connection...');
                         $returnValue = self::checkDbConnection();
@@ -224,7 +224,7 @@ class Util{
                     }
                 }
                 else{
-                    Logger::log('The function \'Config::get()->isConfig()\' returned FALSE or the class \'LisksCode\' is still initializing.', 'warning');
+                    Logger::log('The function \'Config::get()->isConfig()\' returned FALSE or the core is still initializing.', 'warning');
                     $returnValue = Util::NEED_CONF;
                 }
             }

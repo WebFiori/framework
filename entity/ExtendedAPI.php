@@ -39,7 +39,7 @@ abstract class ExtendedAPI extends API{
      */
     public function __construct($version = '1.0.0') {
         parent::__construct($version);
-        $langCode = LisksCode::getWebsiteFunctions()->getSession()->getLang(TRUE);
+        $langCode = WebFiori::getWebsiteFunctions()->getSession()->getLang(TRUE);
         $this->translation = &Language::loadTranslation($langCode);
         $this->createLangDir('general');
         if($langCode == 'AR'){

@@ -73,15 +73,14 @@ class SystemFunctions extends Functions{
      */
     const INITIAL_CONFIG_VARS = array(
         'is-config'=>'FALSE',
-        'lisks-date'=>'09-09-2018 (DD-MM-YYYY)',
-        'lisks-version'=>'1.0.0-PR4',
-        'lisks-version-type'=>'Beta',
+        'release-date'=>'09-25-2018 (DD-MM-YYYY)',
+        'version'=>'1.0.0',
+        'version-type'=>'Stable',
         'config-file-version'=>'1.3',
         'database-host'=>'localhost',
         'database-username'=>'',
         'database-password'=>'',
         'database-name'=>'',
-        'user-reg-status'=>'C',
     );
     /**
      * An instance of SystemFunctions
@@ -244,19 +243,19 @@ class SystemFunctions extends Functions{
      * @var string The framework version that is used to build the project.
      * @since 1.0 
      */
-    private $lisksVersionType;
+    private $versionType;
     /**
      * The version of the framework that is used to build the project.
      * @var string The version of the framework that is used to build the project.
      * @since 1.0 
      */
-    private $lisksVersion;
+    private $version;
     /**
      * The release date of the framework that is used to build the project.
      * @var string Release date of of the framework that is used to build the project.
      * @since 1.0 
      */
-    private $lisksDate;
+    private $releaseDate;
     /**
      * A boolean value. Set to true once system configuration is completed.
      * @var boolean 
@@ -304,9 +303,9 @@ class SystemFunctions extends Functions{
      */
     private function __construct() {
         $this->isConfigured = '.$configArr['is-config'].';
-        $this->lisksDate = \''.$configArr['lisks-date'].'\';
-        $this->lisksVersion = \''.$configArr['lisks-version'].'\';
-        $this->lisksVersionType = \''.$configArr['lisks-version-type'].'\';
+        $this->releaseDate = \''.$configArr['release-date'].'\';
+        $this->version = \''.$configArr['version'].'\';
+        $this->versionType = \''.$configArr['version-type'].'\';
         $this->configVision = \''.$configArr['config-file-version'].'\';
         $this->dbHost = \''.$configArr['database-host'].'\';
         $this->dbUser = \''.$configArr['database-username'].'\';
@@ -392,24 +391,24 @@ class SystemFunctions extends Functions{
      * @return string Framework version number.
      * @since 1.2
      */
-    public function getLisksVersion(){
-        return $this->lisksVersion;
+    public function getVersion(){
+        return $this->version;
     }
     /**
      * Returns framework version type.
      * @return string framework version type.
      * @since 1.2
      */
-    public function getLisksVersionType(){
-        return $this->lisksVersionType;
+    public function getVersionType(){
+        return $this->versionType;
     }
     /**
      * Returns the date at which the framework is released.
      * @return string The date at which the framework is released.
      * @since 1.0
      */
-    public function getLisksDate(){
-        return $this->lisksDate;
+    public function getReleaseDate(){
+        return $this->releaseDate;
     }', TRUE, TRUE);
         $fh->reduceTab();
         $fh->write('}', TRUE, TRUE);

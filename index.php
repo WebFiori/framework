@@ -5,7 +5,7 @@
  * @author Ibrahim Ali <ibinshikh@hotmail.com>
  * @version 1.3.1
  */
-class LisksCode{
+class WebFiori{
     /**
      * A variable to store system status. The variable will be set to TRUE 
      * if everything is Ok.
@@ -38,8 +38,8 @@ class LisksCode{
      */
     private $BMF;
     /**
-     * A single instance of the class LisksCode.
-     * @var LisksCode
+     * A single instance of the class.
+     * @var WebFiori
      * @since 1.0 
      */
     private static $LC;
@@ -52,18 +52,18 @@ class LisksCode{
     /**
      * Initiate the framework and return a single instance of the class that can 
      * be used to update some settings.
-     * @return LisksCode An instance of 'LisksCode'.
+     * @return WebFiori An instance of the class.
      * @since 1.0
      */
     public static function &getAndStart(){
         if(self::$classStatus == 'NONE'){
             if(self::$LC === NULL){
                 self::$classStatus = 'INITIALIZING';
-                self::$LC = new LisksCode();
+                self::$LC = new WebFiori();
             }
         }
         else if(self::$classStatus == 'INITIALIZING'){
-            throw new Exception('Using the class \'LisksCode\' while it is not fully initialized.');
+            throw new Exception('Using the core class while it is not fully initialized.');
         }
         return self::$LC;
     }
@@ -418,14 +418,14 @@ class LisksCode{
         . '</p>'
         . '<ul>'
         . '<li>Open the file \'index.php\' in any editor.</li>'
-        . '<li>Inside the class \'LisksCode\', go to the body of the function \'firstUse()\'.</li>'
+        . '<li>Inside the class \'WebFiori\', go to the body of the function \'firstUse()\'.</li>'
         . '<li>Modify the body of the function as instructed.</li>'
         . '</ul>'
         . '<p>'
         . 'Once you do that, you are ready to go and use the system.'
         . '</p>'
-        . '<p>System Powerd By: <a href="https://github.com/usernane/liskscode" target="_blank"><b>'
-                . 'LisksCode Framework v'.Config::get()->getLisksVersion().' ('.Config::get()->getLisksVersionType().')'
+        . '<p>System Powerd By: <a href="https://github.com/usernane/webfiori" target="_blank"><b>'
+                . 'WebFiori Framework v'.Config::get()->getVersion().' ('.Config::get()->getVersionType().')'
                 . '</b></a></p>'
         . '</body>'
         . '</html>');
@@ -436,14 +436,15 @@ class LisksCode{
      * @since 1.0
      */
     public static function configErr() {
-        LisksCode::getAndStart()->needConfigration();
+        WebFiori::getAndStart()->needConfigration();
     }
 }
 
 //start the system
-LisksCode::getAndStart();
-define('INITIAL_SYS_STATUS',LisksCode::sysStatus());
+WebFiori::getAndStart();
+define('INITIAL_SYS_STATUS',WebFiori::sysStatus());
 Logger::log('INITIAL_SYS_STATUS = '.INITIAL_SYS_STATUS, 'debug');
+Router::other('/test', '/pages/test.php');
 if(INITIAL_SYS_STATUS === TRUE){
     Router::route(Util::getRequestedURL());
 }
@@ -453,5 +454,5 @@ else if(INITIAL_SYS_STATUS == Util::DB_NEED_CONF){
     Logger::requestCompleted();
 }
 else{
-    LisksCode::configErr();
+    WebFiori::configErr();
 }

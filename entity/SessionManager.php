@@ -201,7 +201,7 @@ class SessionManager implements JsonI{
      * @return boolean If the session was switched, the function will return TRUE.
      * @since 1.8
      */
-    public function switchToSession() {
+    private function _switchToSession() {
         Logger::logFuncCall(__METHOD__);
         $retVal = FALSE;
         Logger::log('Checking if a session is active...');
@@ -244,16 +244,21 @@ class SessionManager implements JsonI{
             Logger::log('No session is active. Activating session...');
             Logger::log('Session Name: \''.$this->getName().'\'.', 'debug');
             Logger::log('Session ID = \''.$this->sId.'\'.', 'debug');
-            session_name($this->getName());
-            session_id($this->sId);
-            session_start();
-            if($this->_validateAttrs() === TRUE){
-                Logger::log('Switched to session.');
-                $retVal = TRUE;
+            if(strlen($this->sId) != 0){
+                session_name($this->getName());
+                session_id($this->sId);
+                session_start();
+                if($this->_validateAttrs() === TRUE){
+                    Logger::log('Switched to session.');
+                    $retVal = TRUE;
+                }
+                else{
+                    Logger::log('One or more of the attributes of the session is missing. Killing the session.','warning');
+                    $this->kill();
+                }
             }
             else{
-                Logger::log('One or more of the attributes of the session is missing. Killing the session.','warning');
-                $this->kill();
+                Logger::log('Session ID is empty string or null.','warning');
             }
         }
         Logger::logReturnValue($retVal);
@@ -339,7 +344,7 @@ class SessionManager implements JsonI{
                 setcookie($this->getName(), $this->getID(),time()+$this->getLifetime() * 60, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
                 $retVal = TRUE;
                 Logger::log('Session duration updated.');
-                Logger::log('It is active. Checking if the session has timed out...');
+                Logger::log('Checking if the session has timed out...');
                 if($this->isTimeout()){
                     Logger::log('Session has timed out. Killing it.', 'warning');
                     $this->kill();
@@ -347,7 +352,7 @@ class SessionManager implements JsonI{
             }
             else{
                 Logger::log('Trying to switch between sessions...');
-                if($this->switchToSession()){
+                if($this->_switchToSession()){
                     $this->lifeTime = $time;
                     $_SESSION['lifetime'] = $time*60;
                     $params = session_get_cookie_params();
@@ -380,7 +385,7 @@ class SessionManager implements JsonI{
     public function getLifetime(){
         Logger::logFuncCall(__METHOD__);
         $retVal = $this->lifeTime;
-        if($this->switchToSession()){
+        if($this->_switchToSession()){
             if(isset($_SESSION['lifetime'])){
                 Logger::log('Time taken from $_SESSION[\'lifetime\']');
                 Logger::log('$_SESSION[\'lifetime\'] = \''.$_SESSION['lifetime'].'\'.','debug');
@@ -401,7 +406,7 @@ class SessionManager implements JsonI{
     public function setIsRefresh($bool){
         Logger::logFuncCall(__METHOD__);
         Logger::log('Passed value = \''.$bool.'\'.', 'debug');
-        if($this->switchToSession()){
+        if($this->_switchToSession()){
             $_SESSION['refresh'] = $bool === TRUE ? TRUE : FALSE;
             Logger::log('New property value = \''.$_SESSION['refresh'].'\'.', 'debug');
             Logger::log('Property updated.');
@@ -522,7 +527,7 @@ class SessionManager implements JsonI{
         Logger::logFuncCall(__METHOD__);
         $retVal = NULL;
         Logger::log('Checking if session is active...');
-        $isActive = $this->isSessionActive() === TRUE ? TRUE : $this->switchToSession();
+        $isActive = $this->isSessionActive() === TRUE ? TRUE : $this->_switchToSession();
         if($isActive){
             Logger::log('Session is active. Checking if language need update...');
             if($forceUpdate === TRUE){
@@ -550,13 +555,12 @@ class SessionManager implements JsonI{
         Logger::logFuncCall(__METHOD__);
         $retVal = FALSE;
         Logger::log('Checking if session is active...');
-        $isActive = $this->isSessionActive() === TRUE ? TRUE : $this->switchToSession();
+        $isActive = $this->isSessionActive() === TRUE ? TRUE : $this->_switchToSession();
         if($isActive){
             Logger::log('Checking if passed variable is an instance of \'User\'.');
             if($user instanceof User){
                 Logger::log('User updated.');
                 $_SESSION['user'] = $user;
-                setcookie('token', $user->getToken(), time()+$this->getLifetime()*60, "/");
                 $retVal = TRUE;
             }
             else{
@@ -580,7 +584,7 @@ class SessionManager implements JsonI{
         Logger::logFuncCall(__METHOD__);
         $retVal = NULL;
         Logger::log('Checking if session is active...');
-        $isActive = $this->isSessionActive() === TRUE ? TRUE : $this->switchToSession();
+        $isActive = $this->isSessionActive() === TRUE ? TRUE : $this->_switchToSession();
         if($isActive){
             if(isset($_SESSION['user'])){
                 $retVal = $_SESSION['user'];
@@ -620,7 +624,7 @@ class SessionManager implements JsonI{
         Logger::logFuncCall(__METHOD__);
         $retVal = FALSE;
         Logger::log('Checking if session is active...');
-        $isActive = $this->isSessionActive() === TRUE ? TRUE : $this->switchToSession();
+        $isActive = $this->isSessionActive() === TRUE ? TRUE : $this->_switchToSession();
         if($isActive){
             if(isset($dbAttrs['host'])){
                 Logger::log('Database host = \''.$dbAttrs['host'].'\'', 'debug');
@@ -691,7 +695,7 @@ class SessionManager implements JsonI{
         Logger::logFuncCall(__METHOD__);
         $retVal = FALSE;
         Logger::log('Trying to switch to session...');
-        if(!$this->switchToSession()){
+        if(!$this->_switchToSession()){
             Logger::log('Unable to switch. Trying to resume session...');
             if(!$this->resume()){
                 Logger::log ('Unable to resume. Starting new session...');
@@ -749,7 +753,7 @@ class SessionManager implements JsonI{
     public function isRefresh(){
         Logger::logFuncCall(__METHOD__);
         Logger::log('Checking if session is active...');
-        $isActive = $this->isSessionActive() === TRUE ? TRUE : $this->switchToSession();
+        $isActive = $this->isSessionActive() === TRUE ? TRUE : $this->_switchToSession();
         if($isActive){
             if(isset($_SESSION['refresh'])){
                 Logger::logReturnValue($_SESSION['refresh']);
@@ -956,7 +960,7 @@ class SessionManager implements JsonI{
         Logger::logFuncCall(__METHOD__);
         $retVal = -1;
         Logger::log('Checking if session is active...');
-        $isActive = $this->isSessionActive() === TRUE ? TRUE : $this->switchToSession();
+        $isActive = $this->isSessionActive() === TRUE ? TRUE : $this->_switchToSession();
         if($isActive){
             $retVal = session_id();
         }
@@ -994,7 +998,7 @@ class SessionManager implements JsonI{
      * @since 1.5
      */
     public function getResumTime(){
-        $isActive = $this->isSessionActive() === TRUE ? TRUE : $this->switchToSession();
+        $isActive = $this->isSessionActive() === TRUE ? TRUE : $this->_switchToSession();
         if($isActive){
             return $_SESSION['resumed-at'];
         }
@@ -1008,7 +1012,7 @@ class SessionManager implements JsonI{
      * @since 1.7
      */
     public function getStartIpAddress(){
-        $isActive = $this->isSessionActive() === TRUE ? TRUE : $this->switchToSession();
+        $isActive = $this->isSessionActive() === TRUE ? TRUE : $this->_switchToSession();
         if($isActive){
             return $_SESSION['ip-address'];
         }
@@ -1022,7 +1026,7 @@ class SessionManager implements JsonI{
      * @since 1.5
      */
     public function getStartTime(){
-        $isActive = $this->isSessionActive() === TRUE ? TRUE : $this->switchToSession();
+        $isActive = $this->isSessionActive() === TRUE ? TRUE : $this->_switchToSession();
         if($isActive){
             return $_SESSION['started-at'];
         }
@@ -1035,7 +1039,7 @@ class SessionManager implements JsonI{
      * 
      */
     public function getRemainingTime() {
-        $isActive = $this->isSessionActive() === TRUE ? TRUE : $this->switchToSession();
+        $isActive = $this->isSessionActive() === TRUE ? TRUE : $this->_switchToSession();
         if($isActive && $this->isRefresh()){
             return $this->getLifetime()*60; 
         }
@@ -1054,7 +1058,7 @@ class SessionManager implements JsonI{
         Logger::logFuncCall(__METHOD__);
         $retVal = 0;
         Logger::log('Checking if session is active...');
-        $isActive = $this->isSessionActive() === TRUE ? TRUE : $this->switchToSession();
+        $isActive = $this->isSessionActive() === TRUE ? TRUE : $this->_switchToSession();
         if($isActive){
             Logger::log('Session is active. Calculating remaining time...');
             $retVal = time() - $_SESSION['started-at'];
@@ -1074,7 +1078,7 @@ class SessionManager implements JsonI{
         Logger::logFuncCall(__METHOD__);
         $retVal = FALSE;
         Logger::log('Checking if session is active...');
-        $isActive = $this->isSessionActive() === TRUE ? TRUE : $this->switchToSession();
+        $isActive = $this->isSessionActive() === TRUE ? TRUE : $this->_switchToSession();
         if($isActive){
             Logger::log('Session is active. Checking remaining time...');
             $remTime = $this->getRemainingTime();
@@ -1188,6 +1192,7 @@ class SessionManager implements JsonI{
                         $_SESSION['session-name'] = $this->getName();
                         
                         $sessionTime = $this->getLifetime();
+                        $_SESSION['lifetime'] = $sessionTime;
                         Logger::log('Session time = \''.$sessionTime.'\' minutes.', 'debug');
                         Logger::log('Updating the value of \'session.gc_maxlifetime\'...');
                         ini_set('session.gc_maxlifetime', $sessionTime*60);

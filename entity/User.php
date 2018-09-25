@@ -397,6 +397,7 @@ class User implements JsonI{
         $json->add('reset-time', $this->getResetRequestTime());
         $json->add('reset-token', $this->getResetToken());
         $json->add('last-reset-time', $this->getLastPasswordResetDate());
+        $json->add('privileges', $this->privileges());
         return $json;
     }
 

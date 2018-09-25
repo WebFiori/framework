@@ -46,7 +46,7 @@ if(!defined('ROOT_DIR')){
  * @author Ibrahim
  * @version 1.0
  */
-class Privilege {
+class Privilege implements JsonI{
     /**
      * The ID of the privilege.
      * @var string
@@ -67,7 +67,7 @@ class Privilege {
      * in case of displaying privilege in some UI view.
      * @since 1.0
      */
-    public function __construct($id='PR',$name='PR_NAME') {
+    public function __construct($id='PR',$name='') {
         $this->setID($id);
         $this->setName($name);
     }
@@ -111,4 +111,12 @@ class Privilege {
             $this->code = $code.'';
         }
     }
+
+    public function toJSON() {
+        $j = new JsonX();
+        $j->add('privilege-id', $this->getID());
+        $j->add('name', $this->getName());
+        return $j;
+    }
+
 }

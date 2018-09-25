@@ -232,7 +232,7 @@ class Access {
      * @return UsersGroup|NULL
      * @since 1.0
      */
-    private function _getGroup($groupId) {
+    private function &_getGroup($groupId) {
         
         foreach ($this->userGroups as $g){
             if($g->getID() == $groupId){
@@ -385,7 +385,6 @@ class Access {
                 $p->setID($privilegeId);
                 if(!$g->hasPrivilege($p)){
                     $this->_getGroup($groupId)->addPrivilage($p);
-                    $this->_getGroup('SUPER_ADMIN')->addPrivilage($p);
                 }
             }
         }

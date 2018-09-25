@@ -46,7 +46,7 @@ if(!defined('ROOT_DIR')){
  * @author Ibrahim
  * @version 1.0
  */
-class UsersGroup {
+class UsersGroup implements JsonI{
     /**
      * The name of the group.
      * @var string
@@ -159,4 +159,13 @@ class UsersGroup {
         }
         return FALSE;
     }
+
+    public function toJSON() {
+        $j = new JsonX();
+        $j->add('group-id', $this->getID());
+        $j->add('name', $this->getName());
+        $j->add('privileges', $this->privileges());
+        return $j;
+    }
+
 }

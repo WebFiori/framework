@@ -171,12 +171,6 @@ class SessionManager implements JsonI{
             $this->sessionName = $this->_generateRandSessionName();
         }
         Logger::log('Session name is set to \''.$this->sessionName.'\'.', 'debug');
-        //initial life time: 120 minutes.
-        $this->setLifetime(120);
-        $this->sessionStatus = self::NOT_RUNNING;
-        $this->resumed = FALSE;
-        $this->new = FALSE;
-        $this->sId = $this->generateSessionID();
         if(session_status() == PHP_SESSION_ACTIVE){
             Logger::log('A session is active. Writing session variables and creating new one.', 'warning');
             Logger::log('Active session name = \''. session_name().'\'.', 'debug');
@@ -185,6 +179,12 @@ class SessionManager implements JsonI{
             //to new session
             session_write_close();
         }
+        //initial life time: 120 minutes.
+        $this->lifeTime = 120;
+        $this->sessionStatus = self::NOT_RUNNING;
+        $this->resumed = FALSE;
+        $this->new = FALSE;
+        $this->sId = $this->generateSessionID();
         Logger::logFuncReturn(__METHOD__);
         
         //$sesionSavePath = 'sessions';
@@ -1190,9 +1190,7 @@ class SessionManager implements JsonI{
                         //update resume time
                         $_SESSION['resumed-at'] = time();
                         $_SESSION['session-name'] = $this->getName();
-                        
                         $sessionTime = $this->getLifetime();
-                        $_SESSION['lifetime'] = $sessionTime;
                         Logger::log('Session time = \''.$sessionTime.'\' minutes.', 'debug');
                         Logger::log('Updating the value of \'session.gc_maxlifetime\'...');
                         ini_set('session.gc_maxlifetime', $sessionTime*60);

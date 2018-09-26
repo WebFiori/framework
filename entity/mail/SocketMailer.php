@@ -725,15 +725,15 @@ class SocketMailer {
                 Logger::log('Connected.');
                 Logger::log('Sending the command \'EHLO\'.');
                 if($this->sendC('EHLO '.$this->host)){
-                    if($port == 465){
-                        Logger::log('Using TLS or SSL. Sending the command \'STARTTLS\'.');
+                    if($port == 587){
+                        Logger::log('Using TLS. Sending the command \'STARTTLS\'.');
                         if($this->sendC('STARTTLS')){
-                            $retVal = TRUE;
+                            $retVal = stream_socket_enable_crypto($this->conn, TRUE, STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT);
                         }
                     }
                     else{
                         Logger::log('No need to use TLS or SSL.');
-                        $retVal = TRUE;
+                        $retVal = stream_socket_enable_crypto($this->conn, TRUE, STREAM_CRYPTO_METHOD_SSLv3_CLIENT);
                     }
                 }
                 

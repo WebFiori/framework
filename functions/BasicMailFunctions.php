@@ -295,7 +295,11 @@ class BasicMailFunctions extends Functions{
             Logger::log('Password: \''.$emailAcc->getPassword().'\'', 'debug');
             Logger::log('Email Address: \''.$emailAcc->getAddress().'\'', 'debug');
             Logger::log('Account Name: \''.$emailAcc->getName().'\'', 'debug');
+            Logger::log('Using TLS = \''.$emailAcc->isTLS().'\'.','debug');
+            Logger::log('Using SSL = \''.$emailAcc->isSSL().'\'.','debug');
             $m = new SocketMailer();
+            $m->isSSL($emailAcc->isSSL());
+            $m->isTLS($emailAcc->isTLS());
             $m->setHost($emailAcc->getServerAddress());
             $m->setPort($emailAcc->getPort());
             Logger::log('Testing connection...');

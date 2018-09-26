@@ -44,7 +44,7 @@ if(!defined('ROOT_DIR')){
  * A class that can be used to send email messages using sockets.
  *
  * @author Ibrahim
- * @version 1.4
+ * @version 1.4.1
  */
 class SocketMailer {
     const NL = "\r\n";
@@ -146,6 +146,18 @@ class SocketMailer {
      */
     private $lastResponse;
     /**
+     * A boolean value that is set to TRUE if connection uses TLS.
+     * @var boolean
+     * @since 1.4.1 
+     */
+    private $useTls;
+    /**
+     * A boolean value that is set to TRUE if connection uses SSL.
+     * @var boolean
+     * @since 1.4.1 
+     */
+    private $useSsl;
+    /**
      * Creates new instance of the class.
      * @since 1.0
      */
@@ -162,6 +174,7 @@ class SocketMailer {
         $this->boundry = hash('sha256', date(DATE_ISO8601));
         $this->attachments = array();
         $this->lastResponse = '';
+        $this->useTls = FALSE;
         Logger::logFuncReturn(__METHOD__);
     }
     /**
@@ -194,6 +207,60 @@ class SocketMailer {
         }
         Logger::logFuncReturn(__METHOD__);
         return FALSE;
+    }
+    /**
+     * Sets or gets the value of the property 'useTls'.
+     * @param boolean|NULL $bool [Optional] TRUE if the connection to the server will use TLS. 
+     * FALSE if not. If NULL is given, the property will not updated. Default 
+     * is NULL.
+     * @return boolean $bool TRUE if the connection to the server will use TLS. 
+     * FALSE if not. Default return value is FALSE
+     * @since 1.0.1
+     */
+    public function isTLS($bool=null){
+        Logger::logFuncCall(__METHOD__);
+        Logger::log('Checking if NULL is given...');
+        if($bool !== NULL){
+            Logger::log('Not NULL. Updating property $useTls...');
+            $this->useTls = $bool === TRUE ? TRUE : FALSE;
+            if($this->useTls){
+                Logger::log('Not NULL. Updating property $useSsl...');
+                $this->useSsl = FALSE;
+            }
+        }
+        else{
+            Logger::log('No need to update.');
+        }
+        Logger::logReturnValue($this->useTls);
+        Logger::logFuncReturn(__METHOD__);
+        return $this->useTls;
+    }
+    /**
+     * Sets or gets the value of the property 'useSsl'.
+     * @param boolean|NULL $bool [Optional] TRUE if the connection to the server will use SSL. 
+     * FALSE if not. If NULL is given, the property will not updated. Default 
+     * is NULL.
+     * @return boolean $bool TRUE if the connection to the server will use SSL. 
+     * FALSE if not. Default return value is FALSE
+     * @since 1.0.1
+     */
+    public function isSSL($bool=null){
+        Logger::logFuncCall(__METHOD__);
+        Logger::log('Checking if NULL is given...');
+        if($bool !== NULL){
+            Logger::log('Not NULL. Updating property $useSsl...');
+            $this->useSsl = $bool === TRUE ? TRUE : FALSE;
+            if($this->useSsl){
+                Logger::log('Not NULL. Updating property $useTls...');
+                $this->useTls = FALSE;
+            }
+        }
+        else{
+            Logger::log('No need to update.');
+        }
+        Logger::logReturnValue($this->useSsl);
+        Logger::logFuncReturn(__METHOD__);
+        return $this->useSsl;
     }
     /**
      * Checks if the user is logged in or not.
@@ -641,14 +708,35 @@ class SocketMailer {
         if(!$this->isConnected()){
             Logger::log('Not connected. Trying to connect.');
             set_error_handler(function(){});
+            Logger::log('Checking if SSL or TLS will be used...');
+            $port = $this->isSSL() ? 465 : $this->isTLS() ? 587 : $this->port;
+            if($port == 465){
+                Logger::log('SSL will be used.');
+            }
+            else if($port == 587){
+                Logger::log('TLS will be used.');
+            }
             $err = 0;
             $errStr = '';
-            $this->conn = fsockopen($this->host, $this->port, $err, $errStr, $this->timeout*60);
+            Logger::log('Trying to connect to \''.$this->host.'\' at port '.$port.'...');
+            $this->conn = fsockopen($this->host, $port, $err, $errStr, $this->timeout*60);
             set_error_handler(NULL);
             if(is_resource($this->conn)){
                 Logger::log('Connected.');
-                $this->sendC('EHLO');
-                $retVal = TRUE;
+                Logger::log('Sending the command \'EHLO\'.');
+                if($this->sendC('EHLO '.$this->host)){
+                    if($port == 465){
+                        Logger::log('Using TLS or SSL. Sending the command \'STARTTLS\'.');
+                        if($this->sendC('STARTTLS')){
+                            $retVal = TRUE;
+                        }
+                    }
+                    else{
+                        Logger::log('No need to use TLS or SSL.');
+                        $retVal = TRUE;
+                    }
+                }
+                
             }
             else{
                 Logger::log('Unable to connect. Check your connection parameters.','warning');

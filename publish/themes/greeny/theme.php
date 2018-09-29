@@ -18,7 +18,7 @@ $theme->addComponents(array(
     'aside.php', 'UIFunctions.php'
 ));
 $theme->setAfterLoaded(function(){
-    Page::lang(WebsiteFunctions::get()->getMainSession()->getLang(TRUE));
+    Page::lang(WebsiteFunctions::get()->getSession()->getLang(TRUE));
     Page::translation();
     Page::document()->getBody()->setClassName('pa-container');
     Page::document()->getChildByID('page-body')->setClassName('pa-row');

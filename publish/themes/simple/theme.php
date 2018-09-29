@@ -23,7 +23,7 @@ $theme->setBeforeLoaded(function(){
     }
 });
 $theme->setAfterLoaded(function(){
-    Page::lang(WebsiteFunctions::get()->getMainSession()->getLang(TRUE));
+    Page::lang(WebsiteFunctions::get()->getSession()->getLang(TRUE));
     Page::document()->getChildByID('main-content-area')->setClassName('pa-'.Page::dir().'-col-10');
     Page::document()->getChildByID('side-content-area')->setClassName('pa-'.Page::dir().'-col-2');
     Page::document()->getChildByID('page-body')->setClassName('pa-row');

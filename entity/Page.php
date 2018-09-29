@@ -154,7 +154,7 @@ class Page{
         $this->isDynamic = TRUE;
         $this->incAside = TRUE;
         $this->setWritingDir();
-        WebsiteFunctions::get()->getMainSession()->initSession(FALSE, TRUE);
+        WebsiteFunctions::get()->getSession()->initSession(FALSE, TRUE);
         $this->setCanonical(Util::getRequestedURL());
         $this->document->setLanguage($this->getLang());
         $headNode = new HeadNode(
@@ -418,7 +418,7 @@ class Page{
                 fwrite($f, 'require \''.$root.'/root.php\';'."\n");
                 fwrite($f, '$page = Page::get();'."\n");
                 fwrite($f, '$page->usingTheme(SiteConfig::get()->getBaseThemeName());'."\n");
-                fwrite($f, '$page->setLang(WebsiteFunctions::get()->getMainSession()->getLang());'."\n");
+                fwrite($f, '$page->setLang(WebsiteFunctions::get()->getSession()->getLang());'."\n");
                 if($this->getLanguage() != NULL){
                     fwrite($f, '$page->usingLanguage();'."\n");
                     if($this->getLanguage()->get('pages/'.$name) === NULL){

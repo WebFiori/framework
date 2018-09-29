@@ -142,7 +142,7 @@ class SystemFunctions extends Functions{
      */
     public function updateDBAttributes($dbHost,$dbUser,$dbPass,$dbName){
         Logger::logFuncCall(__METHOD__);
-        $r = $this->getMainSession()->useDb(array(
+        $r = DBConnectionFactory::mysqlLink(array(
             'user'=>$dbUser,
             'host'=>$dbHost,
             'pass'=>$dbPass,

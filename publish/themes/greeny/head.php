@@ -6,7 +6,7 @@
  */
 function getHeadNode(){
     $page = Page::get();
-    $lang = WebsiteFunctions::get()->getMainSession()->getLang(TRUE);
+    $lang = WebsiteFunctions::get()->getSession()->getLang(TRUE);
     $page->setLang($lang);
     $headTag = new HeadNode();
     $headTag->setBase(SiteConfig::get()->getBaseURL());

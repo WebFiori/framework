@@ -19,7 +19,7 @@ function getHeaderNode(){
     $link = new LinkNode(SiteConfig::get()->getHomePage(), '');
     $link->addChild($img);
     $headerSec->addChild($link);
-    $langCode = WebsiteFunctions::get()->getMainSession()->getLang(TRUE);
+    $langCode = WebsiteFunctions::get()->getSession()->getLang(TRUE);
     $p = new PNode();
     $siteNames = SiteConfig::get()->getWebsiteNames();
     if(isset($siteNames[$langCode])){

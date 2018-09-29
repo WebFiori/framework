@@ -44,9 +44,15 @@ if(!defined('ROOT_DIR')){
  * The base class for creating application logic and connecting to the database.
  *
  * @author Ibrahim
- * @version 1.3.2
+ * @version 1.3.3
  */
 class Functions {
+    /**
+     *
+     * @var DatabaseLink
+     * @since 1.3.3 
+     */
+    private $databaseLink;
     /**
      *
      * @var string
@@ -110,77 +116,55 @@ class Functions {
      * If this parameter is not provided, connection information will be taken 
      * from the class 'Config'.
      * @return boolean If the connection is established, the function will 
-     * return TRUE. If the constant 'SETUP_MODE' is defined and the function 
-     * was unable to establish a connection, it will return FALSE. 
-     * If the constant 'SETUP_MODE' is NOT defined and the function 
-     * was unable to establish a connection, the execution of PHP code will 
-     * stop and the function will send a JSON response to indicate that 
-     * a database connection error has occurred.
+     * return TRUE. If not, the function will return FALSE.
      * @since 1.1
      */
     public function useDatabase($optionalConnectionParams=array()) {
         Logger::logFuncCall(__METHOD__);
-        $systemStatus = Util::checkSystemStatus();
         $dbLink = &$this->getDBLink();
-        if($systemStatus === TRUE){
+        if($dbLink instanceof DatabaseLink){
+            Logger::log('Already connected to database.');
             Logger::log('Checking if optional database parameters are provided or not...');
             if($optionalConnectionParams != NULL && isset($optionalConnectionParams['host'])
                     && isset($optionalConnectionParams['user']) &&
                     isset($optionalConnectionParams['pass']) && 
                     isset($optionalConnectionParams['db-name'])){
                 Logger::log('They are provided.');
-                $retVal =  $this->_connect($optionalConnectionParams);
+                $retVal = FALSE;
+                $result = $this->_connect($optionalConnectionParams);
+                if($result === TRUE){
+                    Logger::log('Connected to database using given parameters.');
+                    $retVal = TRUE;
+                }
+                Logger::logReturnValue($retVal);
+                Logger::logFuncReturn(__METHOD__);
+                return $retVal;
+            }
+        }
+        else{
+            Logger::log('Checking if optional database parameters are provided or not...');
+            if($optionalConnectionParams != NULL && isset($optionalConnectionParams['host'])
+                    && isset($optionalConnectionParams['user']) &&
+                    isset($optionalConnectionParams['pass']) && 
+                    isset($optionalConnectionParams['db-name'])){
+                Logger::log('They are provided.');
+                $retVal = $this->_connect($optionalConnectionParams);
+                Logger::logReturnValue($retVal);
                 Logger::logFuncReturn(__METHOD__);
                 return $retVal;
             }
             else{
-                Logger::log('No optional paameters give. Cheking if already connected...');
-                if($dbLink !== NULL && !$dbLink->isConnected()){
-                    Logger::log('No database connection. Trying to connect...');
-                    $conf = Config::get();
-                    $retVal = $this->_connect(array(
-                        'host'=>$conf->getDBHost(),
-                        'user'=>$conf->getDBUser(),
-                        'pass'=>$conf->getDBPassword(),
-                        'db-name'=> $conf->getDBName()
-                    ));
-                    Logger::logFuncReturn(__METHOD__);
-                    return $retVal;
-                }
-                else if($dbLink === NULL){
-                    Logger::log('No database connection. Trying to connect...');
-                    $conf = Config::get();
-                    $retVal = $this->_connect(array(
-                        'host'=>$conf->getDBHost(),
-                        'user'=>$conf->getDBUser(),
-                        'pass'=>$conf->getDBPassword(),
-                        'db-name'=> $conf->getDBName()
-                    ));
-                    Logger::logFuncReturn(__METHOD__);
-                    return $retVal;
-                }
-                else{
-                    Logger::log('Already connected.');
-                    Logger::logFuncReturn(__METHOD__);
-                    return TRUE;
-                }
+                Logger::log('No database connection. Trying to connect using the parameters from Config.php...');
+                $conf = Config::get();
+                $retVal = $this->_connect(array(
+                    'host'=>$conf->getDBHost(),
+                    'user'=>$conf->getDBUser(),
+                    'pass'=>$conf->getDBPassword(),
+                    'db-name'=> $conf->getDBName()
+                ));
+                Logger::logFuncReturn(__METHOD__);
+                return $retVal;
             }
-        }
-        else if($systemStatus == Util::DB_NEED_CONF && !defined('SETUP_MODE')){
-            Logger::log('Unable to connect to the database.', 'error');
-            Logger::log('Error Code: '.$dbLink->getErrorCode(), 'error');
-            Logger::log('Error Message: '.$dbLink->getErrorMessage(), 'error');
-            Logger::requestCompleted();
-            header('content-type:application/json');
-            http_response_code(500);
-            die('{"message":"'.$systemStatus.'","type":"error",'
-                    . '"error-code":"'.$dbLink->getErrorCode().'",'
-                    . '"details":"'.JsonX::escapeJSONSpecialChars($dbLink->getErrorMessage()).'"}');
-        }
-        else{
-            Logger::log('Invalid system status.', 'error');
-            Logger::requestCompleted();
-            die('{"message":"Invalid system status.","details":"'.$systemStatus.'"}');
         }
     }
     /**
@@ -195,40 +179,25 @@ class Functions {
      * <li><b>db-name</b>: The name of the database.</li>
      * <ul> 
      * @return boolean If the connection is established, the function will 
-     * return TRUE. If the constant 'SETUP_MODE' is defined and the function 
-     * was unable to establish a connection, it will return FALSE. 
-     * If the constant 'SETUP_MODE' is NOT defined and the function 
-     * was unable to establish a connection, the execution of PHP code will 
-     * stop and the function will send a JSON response to indicate that 
-     * a database connection error has occurred.
+     * return TRUE. If not, It will return FALSE.
      */
     private function _connect($connParams){
         Logger::logFuncCall(__METHOD__);
-        $result = $this->getSession()->useDb(array(
+        $result = DBConnectionFactory::mysqlLink(array(
             'host'=>$connParams['host'],
             'user'=>$connParams['user'],
             'pass'=>$connParams['pass'],
             'db-name'=>$connParams['db-name']
         ));
-        if($result !== TRUE && !defined('SETUP_MODE')){
-            Logger::log('Unable to connect to the database.', 'error');
-            $dbLink = $this->getDBLink();
-            Logger::log('Error Code: '.$dbLink->getErrorCode(), 'error');
-            Logger::log('Error Message: '.$dbLink->getErrorMessage(), 'error');
-            Logger::requestCompleted();
-            http_response_code(500);
-            header('content-type:application/json');
-            die('{"message":"Unable to connect to the database.",'
-                    .'"type":"error",'
-                    . '"error-code":"'.$dbLink->getErrorCode().'",'
-                    . '"details":"'.JsonX::escapeJSONSpecialChars($dbLink->getErrorMessage()).'",'
-                    . '"host":"'.$connParams['host'].'"}');
+        if($result instanceof DatabaseLink){
+            Logger::log('Connected to database.');
+            $this->databaseLink = $result;
+            return TRUE;
         }
-        else if($result !== TRUE && defined('SETUP_MODE')){
+        else{
             Logger::log('Unable to connect to the database while in setup mode.', 'warning');
-            $dbLink = $this->getDBLink();
-            Logger::log('Error Code: '.$dbLink->getErrorCode(), 'error');
-            Logger::log('Error Message: '.$dbLink->getErrorMessage(), 'error');
+            Logger::log('Error Code: '.$result['error-code'], 'error');
+            Logger::log('Error Message: '.$result['error-message'], 'error');
             Logger::logFuncReturn(__METHOD__);
             return FALSE;
         }
@@ -247,17 +216,14 @@ class Functions {
         if($qObj instanceof MySQLQuery){
             if($this->useDatabase()){
                 $dbLink = &$this->getDBLink();
-                if($dbLink != NULL){
-                    Logger::log('Executing database query...');
-                    $result = $dbLink->executeQuery($qObj);
-                    if($result !== TRUE){
-                        Logger::log('An error has occured while executing the query.', 'error');
-                        Logger::log('Error Code: '.$dbLink->getErrorCode(), 'error');
-                        Logger::log('Error Message: '.$dbLink->getErrorMessage(), 'error');
-                    }
-                    return $result;
+                Logger::log('Executing database query...');
+                $result = $dbLink->executeQuery($qObj);
+                if($result !== TRUE){
+                    Logger::log('An error has occured while executing the query.', 'error');
+                    Logger::log('Error Code: '.$dbLink->getErrorCode(), 'error');
+                    Logger::log('Error Message: '.$dbLink->getErrorMessage(), 'error');
                 }
-                Logger::log('Database link is null.', 'warning');
+                return $result;
             }
         }
         else{
@@ -289,18 +255,6 @@ class Functions {
         return $retVal;
     }
     /**
-     * Returns the instance of <b>SessionManager</b> that is used by the logic.
-     * @return SessionManager An object of type <b>SessionManager</b>
-     * @since 1.0
-     * @deprecated since version 1.3 Use 'Functions::getSession()'
-     */
-    public function &getMainSession(){
-        Logger::logFuncCall(__METHOD__);
-        $retVal = &$this->getSession();
-        Logger::logFuncReturn(__METHOD__);
-        return $retVal;
-    }
-    /**
      * Returns the instance of 'SessionManager' that is used by the class.
      * @return SessionManager An instance of 'SessionManager'.
      * @since 1.3
@@ -329,14 +283,15 @@ class Functions {
     }
     /**
      * Returns the link that is used to connect to the database.
-     * @return DatabaseLink The link that is used to connect to the database.
+     * @return DatabaseLink|NULL The link that is used to connect to the database. 
+     * If no link is established with the database, the function will return 
+     * NULL.
      * @since 1.2
      */
     public function &getDBLink() {
         Logger::logFuncCall(__METHOD__);
-        $retVal = &$this->getSession()->getDBLink();
         Logger::logFuncReturn(__METHOD__);
-        return $retVal;
+        return $this->databaseLink;
     }
     /**
      * Returns the number of rows resulted from executing a query.
@@ -384,9 +339,9 @@ class Functions {
         Logger::logFuncReturn(__METHOD__);
         return $retVal;
     }
-    /**
-     * Returns A row that is resulted from executing a query.
-     * @return array| NULL An array that contains row info. The 
+   /**
+     * Returns the first that is resulted from executing a query.
+     * @return array|NULL An array that contains row info. The 
      * function will return NULL in case no connection was established to 
      * the database.
      * @since 1.0
@@ -398,7 +353,7 @@ class Functions {
         $dbLink = $this->getDBLink();
         Logger::log('Checking if database link is not null...');
         if($dbLink !== NULL){
-            $retVal = $dbLink->getRow();
+            $retVal = $dbLink->getRows()[0];
         }
         else{
             Logger::log('Database link is NULL.', 'warning');
@@ -441,7 +396,7 @@ class Functions {
         Logger::logFuncCall(__METHOD__);
         $retVal = -1;
         Logger::log('Getting user from session manager...');
-        $user = $this->getSession()->getUser();
+        $user = &$this->getSession()->getUser();
         Logger::log('Checking if user is null or not...');
         if($user !== NULL){
             $retVal = intval($user->getID());

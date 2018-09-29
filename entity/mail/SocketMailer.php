@@ -718,8 +718,23 @@ class SocketMailer {
             }
             $err = 0;
             $errStr = '';
-            Logger::log('Trying to connect to \''.$this->host.'\' at port '.$port.'...');
-            $this->conn = fsockopen($this->host, $port, $err, $errStr, $this->timeout*60);
+            $protocol = $port == 465 ? "ssl://" : '';
+            Logger::log('Trying to connect to \''.$protocol.$this->host.'\' at port '.$port.'...');
+            if(function_exists('stream_socket_client')){
+                Logger::log('Connecting using \'stream_socket_client\'.');
+                $context = stream_context_create (array(
+                    'ssl'=>array(
+                        'verify_peer'=>FALSE,
+                        'verify_peer_name'=>FALSE,
+                        'allow_self_signed'=>TRUE
+                    )
+                ));
+                $this->conn = stream_socket_client($protocol.$this->host.':'.$port, $err, $errStr, $this->timeout*60, STREAM_CLIENT_CONNECT, $context);
+            }
+            else{
+                Logger::log('Connecting using \'fsockopen\'.');
+                $this->conn = fsockopen($protocol.$this->host, $port, $err, $errStr, $this->timeout*60);
+            }
             set_error_handler(NULL);
             if(is_resource($this->conn)){
                 Logger::log('Connected.');
@@ -728,18 +743,41 @@ class SocketMailer {
                     if($port == 587){
                         Logger::log('Using TLS. Sending the command \'STARTTLS\'.');
                         if($this->sendC('STARTTLS')){
-                            $retVal = stream_socket_enable_crypto($this->conn, TRUE, STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT);
+                            $retVal = stream_socket_enable_crypto($this->conn, TRUE, STREAM_CRYPTO_METHOD_ANY_CLIENT);
+                            if($retVal === TRUE){
+                                Logger::log('Secure connection enabled.');
+                                $this->sendC('EHLO '.$this->host);
+                            }
+                            else{
+                                Logger::log('Unable to make secure connection.','error');
+                            }
+                        }
+                        else{
+                            Logger::log('Error while sending the command \'STARTTLS\'.','error');
+                        }
+                    }
+                    else if($port == 465){
+                        Logger::log('SSL will be used.');
+                        $retVal = stream_socket_enable_crypto($this->conn, TRUE, STREAM_CRYPTO_METHOD_ANY_CLIENT);
+                        if($retVal === TRUE){
+                            Logger::log('Secure connection enabled.');
+                            $this->sendC('EHLO '.$this->host);
+                        }
+                        else{
+                            Logger::log('Unable to make secure connection.','error');
                         }
                     }
                     else{
-                        Logger::log('No need to use TLS or SSL.');
-                        $retVal = stream_socket_enable_crypto($this->conn, TRUE, STREAM_CRYPTO_METHOD_SSLv3_CLIENT);
+                        Logger::log('No secure connection will be used.');
+                        $retVal = TRUE;
                     }
                 }
                 
             }
             else{
-                Logger::log('Unable to connect. Check your connection parameters.','warning');
+                Logger::log('Unable to connect. Check your connection parameters.','error');
+                Logger::log('Error code: '.$err.'.');
+                Logger::log('Error message: '.$errStr.'.');
                 $retVal = FALSE;
             }
         }

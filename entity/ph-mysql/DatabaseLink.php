@@ -312,6 +312,8 @@ class DatabaseLink{
         }
         return false;
     }
-    
+    public function __toString() {
+        return '';
+    }
 }
 

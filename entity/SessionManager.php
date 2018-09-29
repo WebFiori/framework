@@ -64,40 +64,6 @@ class SessionManager implements JsonI{
      */
     private $lifeTime;
     /**
-     * A constant that indicates the name of database host is missing.
-     * @var string Constant that indicates the name of database host is missing.
-     * @since 1.3
-     * @see @see SessionManager::useDb($dbAttrs=array())
-     */
-    const MISSING_DB_HOST = 'missing_db_host';
-    /**
-     * A constant that indicates the name of the database is missing.
-     * @var string Constant that indicates the name of the database is missing.
-     * @since 1.3
-     */
-    const MISSING_DB_NAME = 'missing_db_name';
-    /**
-     * A constant that indicates username of the database is missing.
-     * @var string Constant that indicates username of the database is missing.
-     * @since 1.3
-     * @see 
-     */
-    const MISSING_DB_USER = 'missing_db_user';
-    /**
-     * A constant that indicates the user password of the database is missing.
-     * @var string Constant that indicates the user password of the database is missing.
-     * @since 1.3
-     * @see 
-     */
-    const MISSING_DB_PASS = 'missing_db_password';
-    /**
-     * A constant that indicates a database connection error has occur.
-     * @var string Constant that indicates a database connection error has occur.
-     * @since 1.3
-     * @see 
-     */
-    const DB_CONNECTION_ERR = 'unable_to_connect_to_db';
-    /**
      * An array of supported languages.
      * @var array An array of supported languages.
      * @since 1.2
@@ -591,11 +557,11 @@ class SessionManager implements JsonI{
     }
     /**
      * Returns the user who is logged in.
-     * @return User|NULL an object of type User. If the session is not started 
-     * or no used is logged in, the function will return NULL.
+     * @return User|NULL an object of type User. If the session is not started, 
+     * the function will return NULL.
      * @since 1.0
      */
-    public function getUser(){
+    public function &getUser(){
         Logger::logFuncCall(__METHOD__);
         $retVal = NULL;
         Logger::log('Checking if session is active...');
@@ -615,98 +581,18 @@ class SessionManager implements JsonI{
         return $retVal;
     }
     /**
-     * Use database connection in the session.
-     * @param array $dbAttrs An associative array that contains database connection 
-     * parameters. The indices are: <b>'host'</b> (the value should be host name), 
-     * <b>'user'</b> (the value should database username), 
-     * <b>'pass'</b> (the value should be database username password)
-     * and <b>'db-name'</b> (the value should be database instance name). 
-     * @return boolean If the connection is established, the function will return <b>TRUE</b>. 
-     * In case the host name is missing, the function will return 
-     * <b>SessionManager::MISSING_DB_HOST</b>.
-     * In case the username is missing, the function will return 
-     * <b>SessionManager::MISSING_DB_USER</b>.
-     * In case the password is missing, the function will return 
-     * <b>SessionManager::MISSING_DB_PASS</b>.
-     * In case the database name is missing, the function will return 
-     * <b>SessionManager::MISSING_DB_NAME</b>. 
-     * In case of connection error, the function will return <b>SessionManger::DB_CONNECTION_ERR</b>. 
-     * To get more information about the connection error, you can get <b>DatabaseLink<b> 
-     * object using the function <b>SessionManager->getDBLink()</b>. 
-     * @since 1.3
-     */
-    public function useDb($dbAttrs=array()){
-        Logger::logFuncCall(__METHOD__);
-        $retVal = FALSE;
-        Logger::log('Checking if session is active...');
-        $isActive = $this->isSessionActive() === TRUE ? TRUE : $this->_switchToSession();
-        if($isActive){
-            if(isset($dbAttrs['host'])){
-                Logger::log('Database host = \''.$dbAttrs['host'].'\'', 'debug');
-                if(isset($dbAttrs['user'])){
-                    Logger::log('Database username = \''.$dbAttrs['user'].'\'', 'debug');
-                    if(isset($dbAttrs['pass'])){
-                        Logger::log('Database password = \''.$dbAttrs['pass'].'\'', 'debug');
-                        if(isset($dbAttrs['db-name'])){
-                            Logger::log('Database name = \''.$dbAttrs['db-name'].'\'', 'debug');
-                            $_SESSION['db'] = new DatabaseLink($dbAttrs['host'],$dbAttrs['user'],$dbAttrs['pass']);
-                            if($_SESSION['db']->isConnected()){
-                                if($_SESSION['db']->setDB($dbAttrs['db-name'])){
-                                    $retVal = TRUE;
-                                }
-                                else{
-                                    Logger::log('Unable to select database.', 'warning');
-                                }
-                            }
-                            else{
-                                Logger::log('Unable to connect to the database using given info.', 'warning');
-                                $retVal = self::DB_CONNECTION_ERR;
-                            }
-                        }
-                        else{
-                            Logger::log('The attribute \'db-name\' is missing from the array.', 'warning');
-                            $retVal = self::MISSING_DB_NAME;
-                        }
-                    }
-                    else{
-                        Logger::log('The attribute \'pass\' is missing from the array.', 'warning');
-                        $retVal = self::MISSING_DB_PASS;
-                    }
-                }
-                else{
-                    Logger::log('The attribute \'user\' is missing from the array.', 'warning');
-                    $retVal = self::MISSING_DB_USER;
-                }
-            }
-            else{
-                Logger::log('The attribute \'host\' is missing from the array.', 'warning');
-                $retVal = self::MISSING_DB_HOST;
-            }
-        }
-        else{
-            Logger::log('Session is not running or not resumed.', 'warning');
-        }
-        Logger::log('Return value = '.$retVal, 'debug');
-        Logger::logFuncReturn(__METHOD__);
-        return $retVal;
-    }
-    /**
      * Initialize the session.
-     * @see SessionManager::useDb($dbAttrs=array())
      * @since 1.0
      * @param boolean $refresh [optional] If set to true, The due time of the session will 
      * be refreshed if the session is not timed out. Default is FALSE. 
      * @param boolean $useDefaultLang [Optional] If the session is new and 
      * there was no language parameter was found in the request and this parameter 
      * is set to TRUE, default language will be used (EN). 
-     * @param boolean $useDb [optional] If set to <b>TRUE</b>, an attempt to connect 
-     * to a database will be done. 
-     * @param array $dbAttributes Database connection info.
      * @return boolean|string TRUE if the initialization was successful. FALSE 
      * in case of error. Also it is possible that the function will return one 
      * of the database error messages.
      */
-    public function initSession($refresh=false,$useDefaultLang=true,$useDb=false,$dbAttributes=array()){
+    public function initSession($refresh=false,$useDefaultLang=true){
         Logger::logFuncCall(__METHOD__);
         $retVal = FALSE;
         Logger::log('Trying to switch to session...');
@@ -720,7 +606,7 @@ class SessionManager implements JsonI{
                     $this->setLifetime(self::DEFAULT_SESSION_DURATION);
                     $lifeTime = self::DEFAULT_SESSION_DURATION*60;
                 } 
-                $retVal = $this->_start($refresh,$useDb, $lifeTime, $dbAttributes,$useDefaultLang);
+                $retVal = $this->_start($refresh, $lifeTime,$useDefaultLang);
             }
             else{
                 Logger::log('Session resumed.');
@@ -792,14 +678,12 @@ class SessionManager implements JsonI{
     /**
      * The core function of the class. 
      * @param type $refresh
-     * @param type $useDb
      * @param type $lifeTime
-     * @param type $dbAttributes
      * @param type $useDefaultLang
      * @return type
      * @since 1.0
      */
-    private function _start($refresh,$useDb,$lifeTime,$dbAttributes,$useDefaultLang=false){
+    private function _start($refresh,$lifeTime,$useDefaultLang=false){
         Logger::logFuncCall(__METHOD__);
         $this->sessionStatus = self::NEW_SESSION;
         Logger::log('Setting session related ini directives and session variables...');
@@ -828,16 +712,6 @@ class SessionManager implements JsonI{
             $_SESSION['ip-address'] = $ip;
             $_SESSION['refresh'] = $refresh === TRUE ? TRUE : FALSE;
             $this->_initLang(true,$useDefaultLang);
-            if($useDb === TRUE){
-                Logger::log('Using database connection with session.');
-                $started = $this->useDb($dbAttributes);
-                if($started !== TRUE){
-                    Logger::log('Unable to connect to the database.', 'warning');
-                }
-                else{
-                    Logger::log('Connected to the database.');
-                }
-            }
         }
         else{
             Logger::log('The function session_start() has returned FALSE.', 'warning');
@@ -976,33 +850,6 @@ class SessionManager implements JsonI{
         session_destroy();
         $this->sessionStatus = self::KILLED;
         Logger::log('Session Killed.');
-    }
-    /**
-     * Returns the link that is used to connect to the database.
-     * @return DatabaseLink|NULL An instance of 'DatabaseLink' if the 
-     * session is running. NULL if the session is not running or the 
-     * session does not use database connection.
-     * @since 1.0
-     */
-    public function &getDBLink(){
-        Logger::logFuncCall(__METHOD__);
-        $retVal = NULL;
-        Logger::log('Checking if session is resumed...');
-        if($this->isResumed()){
-            Logger::log('It is resumed. Checking index $_SESSION[\'db\']...');
-            if(isset($_SESSION['db'])){
-                Logger::log('Index is set. Returning database link.');
-                $retVal = $_SESSION['db'];
-            }
-            else{
-                Logger::log('The variable $_SESSION[\'db\'] is not set.', 'warning');
-            }
-        }
-        else{
-            Logger::log('Session is not active.', 'warning');
-        }
-        Logger::logFuncReturn(__METHOD__);
-        return $retVal;
     }
     /**
      * Returns the ID of the session.

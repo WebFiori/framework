@@ -83,8 +83,10 @@ abstract class ExtendedAPI extends API{
         $headers = Util::getRequestHeaders();
         if(isset($headers['authorization'])){
             $split = explode(' ', $headers['authorization']);
-            $retVal['type'] = strtolower($split[0]);
-            $retVal['credentials'] = $split[1];
+            if(count($split) == 2){
+                $retVal['type'] = strtolower($split[0]);
+                $retVal['credentials'] = $split[1];
+            }
         }
         return $retVal;
     }
@@ -98,11 +100,6 @@ abstract class ExtendedAPI extends API{
      */
     public function addAction($action,$reqPermission=false) {
         if($action instanceof APIAction){
-            $sid = new RequestParameter('session-id', 'string', TRUE);
-            $sid->setDefault('');
-            $sid->setDescription('The ID of the session that is currently active or '
-                    . 'the session that will be used by request.');
-            $action->addParameter($sid);
             parent::addAction($action, $reqPermission);
         }
         return FALSE;

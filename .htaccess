@@ -8,7 +8,7 @@ ReWriteRule ^(.*)$ index.php [L,QSA]
 #append authorization header 
 RewriteCond %{HTTP:Authorization} ^(.*)
 RewriteRule .* - [e=HTTP_AUTHORIZATION:%1]
-
+RedirectMatch 403 ^/.+\.(tkns)$
 DirectoryIndex index.php
 #disable opcache
 #php_flag opcache.enable Off

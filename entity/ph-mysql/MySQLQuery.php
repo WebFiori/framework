@@ -676,7 +676,7 @@ abstract class MySQLQuery{
                             }
                         }
                         else{
-                             $vals .= $valOrColIndex.$comma;
+                             $vals .= $colObjOrVal.$comma;
                         }
                     }
                     else{
@@ -949,7 +949,7 @@ abstract class MySQLQuery{
                             }
                         }
                         else{
-                            $colsStr .= ' '.$column->getName().' = '.$newValOrIndex.$comma;
+                            $colsStr .= ' '.$column->getName().' = '.$colObjOrNewVal.$comma;
                         }
                     }
                     else{

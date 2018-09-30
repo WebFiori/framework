@@ -244,7 +244,8 @@ class Uploader implements JsonI{
             Logger::log('Finished.');
             Logger::log('Validating trimming result...');
             if(strlen($dir) > 0){
-                $this->uploadDir = '\\'.str_replace('/', '\\', $dir);
+                $dir = str_replace('/', '\\', $dir);
+                $this->uploadDir = !Util::isDirectory($dir) ? '\\'.$dir : $dir;
                 Logger::log('New upload directory = \''.$this->uploadDir.'\'', 'debug');
                 $retVal = TRUE;
             }
@@ -279,14 +280,14 @@ class Uploader implements JsonI{
         Logger::logFuncCall(__METHOD__);
         Logger::log('$ext = \''.$ext.'\'','debug');
         Logger::log('Removing the suffix if any.');
-        $ext = str_replace('.', '', $ext);
-        $len = strlen($ext);
+        $extFix = str_replace('.', '', strtolower($ext));
+        $len = strlen($extFix);
         $retVal = TRUE;
         Logger::log('Checking length...');
         if($len != 0){
             Logger::log('Validating  characters...');
             for($x = 0 ; $x < $len ; $x++){
-                $ch = $ext[$x];
+                $ch = $extFix[$x];
                 if($ch == '_' || ($ch >= 'a' && $ch <= 'z') || ($ch >= 'A' && $ch <= 'Z') || ($ch >= '0' && $ch <= '9')){
                     
                 }
@@ -297,7 +298,7 @@ class Uploader implements JsonI{
                 }
             }
             if($retVal === TRUE){
-                $this->extentions[] = $ext;
+                $this->extentions[] = $extFix;
                 Logger::log('Extention added.');
             }
             else{
@@ -320,10 +321,11 @@ class Uploader implements JsonI{
      */
     public function removeExt($ext){
         Logger::logFuncCall(__METHOD__);
+        $loweCase = strtolower($ext);
         $count = count($this->extentions);
         $retVal = FALSE;
         for($x = 0 ; $x < $count ; $x++){
-            if($this->extentions[$x] == $ext){
+            if($this->extentions[$x] == $loweCase){
                 unset($this->extentions[$x]);
                 $retVal = TRUE;
             }
@@ -372,8 +374,9 @@ class Uploader implements JsonI{
     public static function getMIMEType($ext){
         Logger::logFuncCall(__METHOD__);
         Logger::log('$ext = \''.$ext.'\'', 'debug');
+        $lowerCase = strtolower($ext);
         $retVal = NULL;
-        $x = self::ALLOWED_FILE_TYPES[$ext];
+        $x = self::ALLOWED_FILE_TYPES[$lowerCase];
         if($x !== NULL){
             Logger::log('MIME found.');
             $retVal = $x['mime'];

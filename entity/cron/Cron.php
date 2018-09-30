@@ -65,7 +65,7 @@ class Cron {
     public function __construct() {
         $this->cronJobsQueue = new Queue();
         $this->_setPassword('');
-        Router::closure('/cron-jobs/execute', function(){
+        Router::closure('/cron-jobs/execute/{password}', function(){
             Logger::logFuncCall('CLOSURE_ROUTE');
             Logger::log('Validating source IP address...');
             $clientIp = Util::getClientIP();

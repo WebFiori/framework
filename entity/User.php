@@ -389,15 +389,8 @@ class User implements JsonI{
         $json = new JsonX();
         $json->add('user-id', $this->getID());
         $json->add('email', $this->getEmail());
-        $json->add('reg-date', $this->getRegDate());
-        $json->add('last-login', $this->getLastLogin());
         $json->add('display-name', $this->getDisplayName());
         $json->add('username', $this->getUserName());
-        $json->add('reset-count', $this->getResetCount());
-        $json->add('reset-time', $this->getResetRequestTime());
-        $json->add('reset-token', $this->getResetToken());
-        $json->add('last-reset-time', $this->getLastPasswordResetDate());
-        $json->add('privileges', $this->privileges());
         return $json;
     }
 

@@ -26,7 +26,7 @@
  * A class thar represents a cron job.
  *
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.0
+ * @version 1.0.1
  */
 class CronJob {
     /**
@@ -91,6 +91,12 @@ class CronJob {
      */
     private $jobName;
     /**
+     * The full cron expression.
+     * @var type 
+     * @since 1.0.1
+     */
+    private $cronExpr;
+    /**
      * Creates new instance of the class.
      * @param string $when [Optional] A cron expression. An exception will be thrown if 
      * the given expression is invalid. Default is '* * * * *' which means run 
@@ -134,7 +140,8 @@ class CronJob {
         Logger::logFuncReturn(__METHOD__);
     }
     /**
-     * Sets an optional name for the job.
+     * Sets an optional name for the job. Used in case of forcing the execution 
+     * of specific job.
      * @param string $name The name of the job.
      * @since 1.0
      */
@@ -142,6 +149,14 @@ class CronJob {
         if(strlen($name) > 0){
             $this->jobName = $name;
         }
+    }
+    /**
+     * Returns the cron expression which is associated with the job.
+     * @return string The cron expression which is associated with the job.
+     * @since 1.0.1
+     */
+    public function getExpression() {
+        return $this->cronExpr;
     }
     /**
      * Returns the name of the job.
@@ -153,22 +168,25 @@ class CronJob {
         return $this->jobName;
     }
     /**
-     * Runs the job every day at specific hour and minute.
+     * Schedules a cron job to run every day at specific hour and minute.
      * @param int $hour [Optional] A number between 0 and 23 inclusive. 0 Means daily at 
      * 12:00 AM and 23 means at 11:00 PM. Default is 0.
      * @param int $minute [Optional] A number between 0 and 59 inclusive. Represents the 
      * minute part of an hour. Default is 0.
+     * @return boolean If job time is set, the function will return TRUE. If 
+     * not set, the function will return FALSE.
      * @since 1.0
      */
     public function dailyAt($hour=0,$minute=0){
         if($hour >= 0 && $hour <= 23){
             if($minute >= 0 && $minute <= 59){
-                $this->cron($minute.' '.$hour.' * * *');
+                return $this->cron($minute.' '.$hour.' * * *');
             }
         }
+        return FALSE;
     }
     /**
-     * Runs the job weekly at specific day and time.
+     * Schedules a job to run weekly at specific week day and time.
      * @param int $dayNameOrNum [Optional] A 3 letter day name (such as 'sun' 
      * or 'tue') or a day number from 0 to 6. 0 for sunday. Default is 0.
      * @param string $time [Optional] A time in the form 'hh:mm'. hh can have any value 
@@ -179,16 +197,17 @@ class CronJob {
     public function weeklyOn($dayNameOrNum=0,$time='00:00'){
         $uDayName = strtoupper($dayNameOrNum);
         if(in_array($uDayName, self::WEEK_DAYS)){
-            $this->_weeklyOn(self::WEEK_DAYS[$uDayName], $time);
+            return $this->_weeklyOn(self::WEEK_DAYS[$uDayName], $time);
         }
         else{
             if($dayNameOrNum >= 0 && $dayNameOrNum <= 6){
-                $this->_weeklyOn($dayNameOrNum, $time);
+                return $this->_weeklyOn($dayNameOrNum, $time);
             }
         }
+        return FALSE;
     }
     /**
-     * Runs the job at specific day and time in a specific month.
+     * Schedules a job to run at specific day and time in a specific month.
      * @param int|string $monthNameOrNum [Optional] Month number from 1 to 12 inclusive 
      * or 3 letters month name. Default is 'jan'.
      * @param int $dayNum [Optional] The number of day in the month starting from 1 up to 
@@ -198,7 +217,7 @@ class CronJob {
      * default is '00:00'.
      * @since 1.0
      */
-    public function monthlyOn($monthNameOrNum='jan',$dayNum=1,$time='00:00'){
+    public function onMonth($monthNameOrNum='jan',$dayNum=1,$time='00:00'){
         if($dayNum >= 1 && $dayNum <= 31){
             $timeSplit = explode(':', $time);
             if(count($timeSplit) == 2){
@@ -208,7 +227,7 @@ class CronJob {
                     $uMonth = strtoupper($monthNameOrNum);
                     if(in_array($uMonth, self::MONTHS_NAMES)){
                         $monthNum = self::MONTHS_NAMES[$uMonth];
-                        $this->cron($minute.' '.$hour.' '.$dayNum.' '.$monthNum.' *');
+                        return $this->cron($minute.' '.$hour.' '.$dayNum.' '.$monthNum.' *');
                     }
                     else{
                         if($monthNameOrNum >= 1 && $monthNameOrNum <= 12){
@@ -218,6 +237,29 @@ class CronJob {
                 }
             }
         }
+        return FALSE;
+    }
+    /**
+     * Schedules a cron job to run every month on specific day and time.
+     * @param int $dayNum The number of the day. It can be any value between 
+     * 1 and 31 inclusive.
+     * @param string $time A day time string in the form 'hh:mm'.
+     * @return boolean If the time for the cron job is set, the function will 
+     * return TRUE. If not, it will return FALSE.
+     * @since 1.0.1
+     */
+    public function everyMonthOn($dayNum=1,$time='00:00'){
+        if($dayNum >= 1 && $dayNum <= 31){
+            $timeSplit = explode(':', $time);
+            if(count($timeSplit) == 2){
+                $hour = intval($timeSplit[0]);
+                $minute = intval($timeSplit[1]);
+                if($hour >= 0 && $hour <= 23 && $minute >= 0 && $minute <= 59){
+                    return $this->cron($minute.' '.$hour.' '.$dayNum.' * *');
+                }
+            }
+        }
+        return FALSE;
     }
     private function _weeklyOn($day,$time){
         $timeSplit = explode(':', $time);
@@ -225,12 +267,13 @@ class CronJob {
             $hour = intval($timeSplit[0]);
             $minute = intval($timeSplit[1]);
             if($hour >= 0 && $hour <= 23 && $minute >= 0 && $minute <= 59){
-                $this->cron($minute.' '.$hour.' * * '.$day);
+                return $this->cron($minute.' '.$hour.' * * '.$day);
             }
         }
+        return FALSE;
     }
     /**
-     * Creates a cron job using specific cron expression.
+     * Schedules a job using specific cron expression.
      * @param string $when A cron expression (such as '8 15 * * 1')
      * @return boolean If the given cron expression is valid, the function will 
      * set the time of cron job as specified by the expression and return 
@@ -268,6 +311,7 @@ class CronJob {
                     'days-of-week'=>$daysOfWeekValidity
                 );
                 $retVal = TRUE;
+                $this->cronExpr = $when;
                 Logger::log('Cron job time is set.');
             }
         }
@@ -1086,14 +1130,17 @@ class CronJob {
         Logger::logFuncReturn(__METHOD__);
     }
     /**
+     * Execute the event which should happen when it is time to run the job.
+     * @param boolean $force [Optional] If set to TRUE, the job will be forced to execute 
+     * even if it is not job time. Default is FALSE.
      * @since 1.0
      */
-    public function execute(){
+    public function execute($force=false){
         Logger::logFuncCall(__METHOD__);
         $retVal = FALSE;
         Logger::log('Checking if it is time to run cron job...');
-        if($this->isMinute() && $this->isHour() && $this->isDayOfMonth() && 
-        $this->isMonth() && $this->isDayOfWeek()){
+        if($force === TRUE || ($this->isMinute() && $this->isHour() && $this->isDayOfMonth() && 
+        $this->isMonth() && $this->isDayOfWeek())){
             Logger::log('It is time.');
             Logger::log('Executing the \'on\' event.');
             call_user_func($this->events['on']['func'], $this->events['on']['params']);

@@ -44,9 +44,26 @@ if(!defined('ROOT_DIR')){
  * A class that can be used to send email messages using sockets.
  *
  * @author Ibrahim
- * @version 1.4.2
+ * @version 1.4.3
  */
 class SocketMailer {
+    /**
+     * The priority of the message. Affects 
+     * @var int
+     * @since 1.4.3
+     * @see https://tools.ietf.org/html/rfc4021#page-33
+     */
+    private $priority;
+    /**
+     * A constant that colds the possible values for the header 'Priority'. 
+     * @since 1.4.3
+     * @see https://tools.ietf.org/html/rfc4021#page-33
+     */
+    const PRIORITIES = array(
+        -1=>'non-urgent',
+        0=>'normal',
+        1=>'urgent'
+    );
     const NL = "\r\n";
     /**
      * The resource that is used to fire commands
@@ -175,7 +192,28 @@ class SocketMailer {
         $this->attachments = array();
         $this->lastResponse = '';
         $this->useTls = FALSE;
+        $this->setPriority(0);
         Logger::logFuncReturn(__METHOD__);
+    }
+    /**
+     * Sets the priority of the message.
+     * @param int $priority The priority of the message. -1 for non-urgent, 0 
+     * for normal and 1 for urgent.
+     * @since 1.4.3
+     */
+    public function setPriority($priority){
+        if($priority == -1 || $priority == 0 || $priority == 1){
+            $this->priority = $priority;
+        }
+    }
+    /**
+     * Returns the priority of the message.
+     * @return int The priority of the message. -1 for non-urgent, 0 
+     * for normal and 1 for urgent. Default value is 0.
+     * @since 1.4.3
+     */
+    public function getPriority() {
+        return $this->priority;
     }
     /**
      * Adds new attachment to the message.
@@ -473,17 +511,30 @@ class SocketMailer {
                 Logger::log('Valid sender address.');
                 Logger::log('Switching to message writing mode.');
                 Logger::log('Adding message receivers...');
-                foreach ($this->receivers as $val){
-                    $this->sendC('RCPT TO: <'.$val.'>');
+                foreach ($this->receivers as $address => $name){
+                    $this->sendC('RCPT TO: <'.$address.'>');
                 }
-                foreach ($this->cc as $val){
-                    $this->sendC('RCPT TO: <'.$val.'>');
+                foreach ($this->cc as $address => $name){
+                    $this->sendC('RCPT TO: <'.$address.'>');
                 }
-                foreach ($this->bcc as $val){
-                    $this->sendC('RCPT TO: <'.$val.'>');
+                foreach ($this->bcc as $address => $name){
+                    $this->sendC('RCPT TO: <'.$address.'>');
                 }
                 Logger::log('Finished.');
                 $this->sendC('DATA');
+                $priorityAsInt = $this->getPriority();
+                $priorityHeaderVal = self::PRIORITIES[$priorityAsInt];
+                if($priorityAsInt == -1){
+                    $importanceHeaderVal = 'low';
+                }
+                else if($priorityAsInt == 1){
+                    $importanceHeaderVal = 'High';
+                }
+                else{
+                    $importanceHeaderVal = 'normal';
+                }
+                $this->sendC('Priority: '.$priorityHeaderVal);
+                $this->sendC('Importance: '.$importanceHeaderVal);
                 $this->sendC('From: "'.$this->getSenderName().'" <'.$this->getSenderAddress().'>');
                 $this->sendC('To: '.$this->getTo());
                 $this->sendC('CC: '.$this->getCC());

@@ -28,7 +28,7 @@
  * Description of EmaiMessage
  *
  * @author Ibrahim
- * @version 1.0
+ * @version 1.0.1
  */
 class EmaiMessage {
     /**
@@ -127,6 +127,19 @@ class EmaiMessage {
      */
     public static function insertNode($htmlNode) {
         self::createInstance()->_getDocument()->addChild($htmlNode);
+    }
+    /**
+     * Sets or gets the importance level of email message.
+     * @param int $imp The importance level of the message. -1 for not urgent, 0 
+     * for normal and 1 for urgent.
+     * @return int The importance level of the message.
+     * @since 1.0.1
+     */
+    public static function importance($imp=null) {
+        if($imp !== NULL){
+            self::createInstance()->_getSocketMailer()->setPriority($imp);
+        }
+        return self::createInstance()->_getSocketMailer()->getPriority();
     }
     /**
      * Sets or returns the HTML document that is associated with the email 

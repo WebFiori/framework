@@ -44,7 +44,7 @@ if(!defined('ROOT_DIR')){
  * A class that can be used to send email messages using sockets.
  *
  * @author Ibrahim
- * @version 1.4.1
+ * @version 1.4.2
  */
 class SocketMailer {
     const NL = "\r\n";
@@ -86,19 +86,19 @@ class SocketMailer {
     private $timeout;
     /**
      * An associative array of mail receivers. Key represents 
-     * receiver name and value represents email address.
+     * receiver address and value represents his name.
      * @var array
      */
     private $receivers;
     /**
      * An associative array of mail receivers (Carbon Copy). Key represents 
-     * receiver name and value represents email address.
+     * receiver address and the value represents his name.
      * @var array 
      */
     private $cc;
     /**
      * An associative array of mail receivers (Blind Carbon Copy). Key represents 
-     * receiver name and value represents email address.
+     * receiver address and the value represents his name.
      * @var array 
      */
     private $bcc;
@@ -400,15 +400,15 @@ class SocketMailer {
         Logger::log('Is CC: \''.$isCC.'\'.', 'debug');
         Logger::log('Is Bcc: \''.$isBcc.'\'.', 'debug');
         if($isBcc){
-            $this->bcc[$name] = $address;
+            $this->bcc[$address] = $name;
             Logger::log('Receiver will receive the message as Bcc.');
         }
         else if($isCC){
-            $this->cc[$name] = $address;
+            $this->cc[$address] = $name;
             Logger::log('Receiver will receive the message as CC.');
         }
         else{
-            $this->receivers[$name] = $address;
+            $this->receivers[$address] = $name;
             Logger::log('Receiver will receive the message directly.');
         }
         Logger::logFuncReturn(__METHOD__);
@@ -456,7 +456,7 @@ class SocketMailer {
             Logger::log('Checking if message must be sent.');
             if($sendMessage === TRUE){
                 Logger::log('Must be sent. Appending attachments (if any).');
-                $this->appendAttachments();
+                $this->_appendAttachments();
                 $this->sendC(self::NL.'.');
                 $this->sendC('QUIT');
                 Logger::log('Message sent.');
@@ -498,7 +498,7 @@ class SocketMailer {
                 Logger::log('Checking if message must be sent.');
                 if($sendMessage === TRUE){
                     Logger::log('Must be sent. Appending attachments (if any).');
-                    $this->appendAttachments();
+                    $this->_appendAttachments();
                     $this->sendC(self::NL.'.');
                     $this->sendC('QUIT');
                     Logger::log('Message sent.');
@@ -517,7 +517,7 @@ class SocketMailer {
      * A function that is used to include email attachments.
      * @since 1.3
      */
-    private function appendAttachments(){
+    private function _appendAttachments(){
         Logger::logFuncCall(__METHOD__);
         if(count($this->attachments) != 0){
             foreach ($this->attachments as $file){
@@ -555,7 +555,7 @@ class SocketMailer {
      */
     private function getBcc(){
         $arr = array();
-        foreach ($this->bcc as $name => $address){
+        foreach ($this->bcc as $address => $name){
             array_push($arr, $name.' <'.$address.'>');
         }
         return implode(',', $arr);
@@ -567,7 +567,7 @@ class SocketMailer {
      */
     private function getCC(){
         $arr = array();
-        foreach ($this->cc as $name => $address){
+        foreach ($this->cc as $address => $name){
             array_push($arr, $name.' <'.$address.'>');
         }
         return implode(',', $arr);
@@ -579,7 +579,7 @@ class SocketMailer {
      */
     private function getTo(){
         $arr = array();
-        foreach ($this->receivers as $name => $address){
+        foreach ($this->receivers as $address => $name){
             array_push($arr, $name.' <'.$address.'>');
         }
         return implode(',', $arr);
@@ -696,8 +696,8 @@ class SocketMailer {
     }
     /**
      * Connect to the mail server.
-     * @return boolean <b>TRUE</b> if the connection established or already 
-     * connected. <b>FALSE</b> if not. Once the connection is established, the 
+     * @return boolean TRUE if the connection established or already 
+     * connected. FALSE if not. Once the connection is established, the 
      * function will send the command 'EHLO' to the server. 
      * @since 1.0
      */
@@ -740,32 +740,33 @@ class SocketMailer {
                 Logger::log('Connected.');
                 Logger::log('Sending the command \'EHLO\'.');
                 if($this->sendC('EHLO '.$this->host)){
+                    $retVal = TRUE;
                     if($port == 587){
-                        Logger::log('Using TLS. Sending the command \'STARTTLS\'.');
-                        if($this->sendC('STARTTLS')){
-                            $retVal = stream_socket_enable_crypto($this->conn, TRUE, STREAM_CRYPTO_METHOD_ANY_CLIENT);
-                            if($retVal === TRUE){
-                                Logger::log('Secure connection enabled.');
-                                $this->sendC('EHLO '.$this->host);
-                            }
-                            else{
-                                Logger::log('Unable to make secure connection.','error');
-                            }
-                        }
-                        else{
-                            Logger::log('Error while sending the command \'STARTTLS\'.','error');
-                        }
+                        //Logger::log('Using TLS. Sending the command \'STARTTLS\'.');
+//                        if($this->sendC('STARTTLS')){
+//                            $retVal = stream_socket_enable_crypto($this->conn, TRUE, STREAM_CRYPTO_METHOD_ANY_CLIENT);
+//                            if($retVal === TRUE){
+//                                Logger::log('Secure connection enabled.');
+//                                $this->sendC('EHLO '.$this->host);
+//                            }
+//                            else{
+//                                Logger::log('Unable to make secure connection.','error');
+//                            }
+//                        }
+//                        else{
+//                            Logger::log('Error while sending the command \'STARTTLS\'.','error');
+//                        }
                     }
                     else if($port == 465){
-                        Logger::log('SSL will be used.');
-                        $retVal = stream_socket_enable_crypto($this->conn, TRUE, STREAM_CRYPTO_METHOD_ANY_CLIENT);
-                        if($retVal === TRUE){
-                            Logger::log('Secure connection enabled.');
-                            $this->sendC('EHLO '.$this->host);
-                        }
-                        else{
-                            Logger::log('Unable to make secure connection.','error');
-                        }
+//                        Logger::log('SSL will be used.');
+//                        $retVal = stream_socket_enable_crypto($this->conn, TRUE, STREAM_CRYPTO_METHOD_ANY_CLIENT);
+//                        if($retVal === TRUE){
+//                            Logger::log('Secure connection enabled.');
+//                            $this->sendC('EHLO '.$this->host);
+//                        }
+//                        else{
+//                            Logger::log('Unable to make secure connection.','error');
+//                        }
                     }
                     else{
                         Logger::log('No secure connection will be used.');

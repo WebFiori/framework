@@ -196,7 +196,7 @@ class CronJob {
      */
     public function weeklyOn($dayNameOrNum=0,$time='00:00'){
         $uDayName = strtoupper($dayNameOrNum);
-        if(in_array($uDayName, self::WEEK_DAYS)){
+        if(in_array($uDayName, array_keys(self::WEEK_DAYS))){
             return $this->_weeklyOn(self::WEEK_DAYS[$uDayName], $time);
         }
         else{
@@ -225,7 +225,7 @@ class CronJob {
                 $minute = intval($timeSplit[1]);
                 if($hour >= 0 && $hour <= 23 && $minute >= 0 && $minute <= 59){
                     $uMonth = strtoupper($monthNameOrNum);
-                    if(in_array($uMonth, self::MONTHS_NAMES)){
+                    if(in_array($uMonth, array_keys(self::MONTHS_NAMES))){
                         $monthNum = self::MONTHS_NAMES[$uMonth];
                         return $this->cron($minute.' '.$hour.' '.$dayNum.' '.$monthNum.' *');
                     }
@@ -998,7 +998,7 @@ class CronJob {
     }
     /**
      * 
-     * @param type $minutesField
+     * @param type $dayOfWeekField
      * @return boolean
      * @since 1.0
      */

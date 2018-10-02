@@ -26,7 +26,7 @@
  * A class thar represents a cron job.
  *
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.0.1
+ * @version 1.0.2
  */
 class CronJob {
     /**
@@ -186,11 +186,18 @@ class CronJob {
         return FALSE;
     }
     /**
+     * Schedules a cron job to run every hour.
+     * @since 1.0.2
+     */
+    public function everyHour(){
+        $this->cron('0 * * * *');
+    }
+    /**
      * Schedules a job to run weekly at specific week day and time.
      * @param int $dayNameOrNum [Optional] A 3 letter day name (such as 'sun' 
      * or 'tue') or a day number from 0 to 6. 0 for sunday. Default is 0.
      * @param string $time [Optional] A time in the form 'hh:mm'. hh can have any value 
-     * between 0 and 23 inclusive. mm can have any value btween 0 and 59 inclusive. 
+     * between 0 and 23 inclusive. mm can have any value between 0 and 59 inclusive. 
      * default is '00:00'.
      * @since 1.0
      */

@@ -609,13 +609,14 @@ class Page{
             $p->usingLanguage();
             return $p->getLanguage();
         }
-        return NULL;
+        $null = NULL;
+        return $null;
     }
     /**
      * Returns the language variables based on loaded translation.
-     * @return Language|NULL an object of type <b>Language</b> if language 
-     * is loaded. If no language found, <b>NULL</b> is returned. This 
-     * function should be called after calling the function <b>Page::loadTranslation()</b> in 
+     * @return Language|NULL an object of type 'Language' if language 
+     * is loaded. If no language found, 'NULL' is returned. This 
+     * function should be called after calling the function 'Page::loadTranslation()' in 
      * order for the function to return non-null value.
      * @since 1.6
      */
@@ -647,9 +648,9 @@ class Page{
     /**
      * Loads a theme given its name.
      * @param string $themeName [Optional] The name of the theme as specified by the 
-     * variable 'name' in theme definition. If the given name is <b>NULL</b>, the 
+     * variable 'name' in theme definition. If the given name is 'NULL', the 
      * function will load the default theme as specified by the function 
-     * <b>SiteConfig::getBaseThemeName()</b>. Note that once the theme is updated, 
+     * 'SiteConfig::getBaseThemeName()'. Note that once the theme is updated, 
      * the document content of the page will reset if it was set before calling this 
      * function.
      * @throws Exception The function will throw 

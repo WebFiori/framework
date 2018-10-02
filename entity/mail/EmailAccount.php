@@ -119,15 +119,15 @@ class EmailAccount {
      * FALSE if not. Default return value is FALSE
      * @since 1.0.1
      */
-    public function isTLS($bool=null){
-        if($bool !== NULL){
-            $this->useTls = $bool === TRUE ? TRUE : FALSE;
-            if($this->useTls){
-                $this->useSsl = FALSE;
-            }
-        }
-        return $this->useTls;
-    }
+//    public function isTLS($bool=null){
+//        if($bool !== NULL){
+//            $this->useTls = $bool === TRUE ? TRUE : FALSE;
+//            if($this->useTls){
+//                $this->useSsl = FALSE;
+//            }
+//        }
+//        return $this->useTls;
+//    }
     /**
      * Sets or gets the value of the property 'useSsl'.
      * @param boolean|NULL $bool [Optional] TRUE if the connection to the server will use SSL. 
@@ -137,15 +137,15 @@ class EmailAccount {
      * FALSE if not. Default return value is FALSE
      * @since 1.0.1
      */
-    public function isSSL($bool=null){
-        if($bool !== NULL){
-            $this->useSsl = $bool === TRUE ? TRUE : FALSE;
-            if($this->useSsl){
-                $this->useTls = FALSE;
-            }
-        }
-        return $this->useSsl;
-    }
+//    public function isSSL($bool=null){
+//        if($bool !== NULL){
+//            $this->useSsl = $bool === TRUE ? TRUE : FALSE;
+//            if($this->useSsl){
+//                $this->useTls = FALSE;
+//            }
+//        }
+//        return $this->useSsl;
+//    }
     /**
      * Sets the username that is used to access email server.
      * @param string $u The username that is used to access email server.

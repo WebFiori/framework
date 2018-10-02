@@ -759,18 +759,18 @@ class SocketMailer {
         if(!$this->isConnected()){
             Logger::log('Not connected. Trying to connect.');
             set_error_handler(function(){});
-            Logger::log('Checking if SSL or TLS will be used...');
-            $port = $this->isSSL() ? 465 : $this->isTLS() ? 587 : $this->port;
-            if($port == 465){
-                Logger::log('SSL will be used.');
-            }
-            else if($port == 587){
-                Logger::log('TLS will be used.');
-            }
+//            Logger::log('Checking if SSL or TLS will be used...');
+            $port = $this->port;
+//            if($port == 465){
+//                Logger::log('SSL will be used.');
+//            }
+//            else if($port == 587){
+//                Logger::log('TLS will be used.');
+//            }
             $err = 0;
             $errStr = '';
-            $protocol = $port == 465 ? "ssl://" : '';
-            Logger::log('Trying to connect to \''.$protocol.$this->host.'\' at port '.$port.'...');
+            //$protocol = $port == 465 ? "ssl://" : '';
+            Logger::log('Trying to connect to \''.$this->host.'\' at port '.$port.'...');
             if(function_exists('stream_socket_client')){
                 Logger::log('Connecting using \'stream_socket_client\'.');
                 $context = stream_context_create (array(
@@ -780,11 +780,11 @@ class SocketMailer {
                         'allow_self_signed'=>TRUE
                     )
                 ));
-                $this->conn = stream_socket_client($protocol.$this->host.':'.$port, $err, $errStr, $this->timeout*60, STREAM_CLIENT_CONNECT, $context);
+                $this->conn = stream_socket_client($this->host.':'.$port, $err, $errStr, $this->timeout*60, STREAM_CLIENT_CONNECT, $context);
             }
             else{
                 Logger::log('Connecting using \'fsockopen\'.');
-                $this->conn = fsockopen($protocol.$this->host, $port, $err, $errStr, $this->timeout*60);
+                $this->conn = fsockopen($this->host, $port, $err, $errStr, $this->timeout*60);
             }
             set_error_handler(NULL);
             if(is_resource($this->conn)){
@@ -820,8 +820,8 @@ class SocketMailer {
 //                        }
                     }
                     else{
-                        Logger::log('No secure connection will be used.');
-                        $retVal = TRUE;
+                        //Logger::log('No secure connection will be used.');
+                        //$retVal = TRUE;
                     }
                 }
                 

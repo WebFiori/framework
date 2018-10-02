@@ -8,7 +8,10 @@
  */
 function getHeadNode(){
     $headTag = new HeadNode();
+    //always set base URL to correctly fetch resources
     $headTag->setBase(SiteConfig::get()->getBaseURL());
+    $headTag->addCSS(Page::cssDir().'/cssFile.css');
+    $headTag->addJs(Page::jsDir().'/jsFile.js');
     return $headTag;
 }
 

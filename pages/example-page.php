@@ -28,9 +28,6 @@
  * The next block of code can be added to every view or .php 
  * file to prevent direct access.
  */
-Logger::logName('views-log');
-Logger::section();
-Logger::log('Checking if script is accessed directly.');
 if(!defined('ROOT_DIR')){
     Logger::log('Direct access. Forbidden','error');
     header("HTTP/1.1 403 Forbidden");
@@ -49,32 +46,28 @@ if(!defined('ROOT_DIR')){
         . '</body>'
         . '</html>');
 }
-Logger::log('No Direct access.');
 //load UI template components (JS, CSS and others)
 //it is optional. to use a theme but recomended
-Logger::log('Loading theme \'Simple By Ibrahim Ali\'');
-Page::theme($themeName='Simple By Ibrahim Ali');
+Page::theme($themeName='Template');
 
 //sets the title of the page
-Logger::log('Setting view title to \'Example Page\'');
 $lang = Page::lang();
 if($lang == 'AR'){
     Page::title('مثال على صفحة');
-
     //adds a paragraph to the body of the page.
     $p = new PNode();
     $p->addText('أهلا و سهلا من إطار "ويب فيوري"!');
     Page::insert($p);
-
 }
 else{
     Page::title('Example Page');
-
     //adds a paragraph to the body of the page.
     $p = new PNode();
     $p->addText('Hello from "WebFiori Framework"!');
     Page::insert($p);
 }
+$image = new HTMLNode('img',FALSE);
+$image->setAttribute('src', Page::imagesDir().'/image.png');
+Page::insert($image);
 //display the view
 Page::render();
-Logger::log('Example view loaded.');

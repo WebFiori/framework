@@ -3,9 +3,14 @@
  * The instance of this class is used to control basic settings of 
  * the framework. Also, it is the entry point of any request.
  * @author Ibrahim Ali <ibinshikh@hotmail.com>
- * @version 1.3.1
+ * @version 1.3.2
  */
 class WebFiori{
+    /**
+     * The name of the session that will be used by the core logic files.
+     * @since 1.3.2
+     */
+    const MAIN_SESSION_NAME = 'main';
     /**
      * A variable to store system status. The variable will be set to TRUE 
      * if everything is Ok.

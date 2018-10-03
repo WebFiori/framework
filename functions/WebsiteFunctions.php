@@ -89,7 +89,7 @@ class WebsiteFunctions extends Functions{
         return self::$singleton;
     }
     public function __construct() {
-        parent::__construct();
+        parent::__construct(WebFiori::MAIN_SESSION_NAME);
     }
     /**
      * Creates the file 'SiteConfig.php' if it does not exist.

@@ -125,7 +125,7 @@ class SystemFunctions extends Functions{
      * Creates new instance of the class.
      */
     public function __construct() {
-        parent::__construct();
+        parent::__construct(WebFiori::MAIN_SESSION_NAME);
     }
     /**
      * Update database attributes. 

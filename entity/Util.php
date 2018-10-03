@@ -19,7 +19,7 @@ if(!defined('ROOT_DIR')){
 /**
  * PHP utility class.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.3.3
+ * @version 1.3.4
  */
 class Util{
     /**
@@ -247,7 +247,37 @@ class Util{
     private function __construct() {
         
     }
-    public function getWeekDates(){
+    /**
+     * Returns the number of a day in the week given a date.
+     * @param string $date A date string that has the month, the date and 
+     * year number.
+     * @param $format The format of the given date. The default value is 
+     * 'YYYY-MM-DD'.
+     * @return int|boolean A number between 0 and 6 inclusive. 0 is for Sunday and 
+     * 6 is for Saturday. If the function fails, it will return FALSE.
+     */
+    public static function getGWeekday($date,$format='YYYY-MM-DD') {
+        if($format == 'YYYY-MM-DD'){
+            return date('w', strtotime($date));
+        }
+        else{
+            $split = explode('-', $format);
+            $dateSplit = explode('-', $date);
+            if(count($split) == 3 && count($dateSplit) == 3){
+                //$yearIndex = array_
+            }
+        }
+    }
+    /**
+     * Returns an array that contains the dates of current week's days in 
+     * Gregorian calendar.
+     * @return array an array that contains the dates of current week's days. 
+     * The default format of the dates will be 'Y-m-d'.
+     */
+    public static function getGWeekDates(){
+        $dayFormatters = array('d'=>'01','j'=>'1');
+        $monthFormatters = array('F'=>'January','m'=>'01','M'=>'Jan','n'=>'1');
+        $yearFormatters = array('y'=>'99','Y'=>'1999');
         $datesArr = array();
         $startDay = '';
         $startYear = '';
@@ -293,7 +323,7 @@ class Util{
                 $startYear = $startMonth == 1 ? $startYear + 1 : $startYear;
             }
             $startDay = $startDay < 10 ? '0'.$startDay : $startDay;
-            $datesArr[] = $startDay.'-'.$startMonth.'-'.$startYear;
+            $datesArr[] = $startYear.'-'.$startDay.'-'.$startMonth;
             $startDay += 1;
         }
         return $datesArr;

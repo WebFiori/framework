@@ -35,29 +35,11 @@ class User implements JsonI{
      */
     private $resetPassCounts;
     /**
-     * The reset token that is used to reset user's password
-     * @var string
-     * @since 1.6 
-     */
-    private $resetTok;
-    /**
      * The time and date at which user password was last reseed.
      * @var string
      * @since 1.6 
      */
     private $lastPasswordReseted;
-    /**
-     * The time and date at which the user has requested password reset
-     * @var string 
-     * @since 1.6
-     */
-    private $resetRequestTime;
-    /**
-     * A code for the user status.
-     * @var string
-     * @since 1.5 
-     */
-    private $statusCode;
     /**
      * The last date at which the user did use the system.
      * @var string
@@ -94,18 +76,6 @@ class User implements JsonI{
      * @since 1.0
      */
     private $id;
-    /**
-     * Access token of the user.
-     * @var string 
-     * @since 1.0
-     */
-    private $userTok;
-    /**
-     * The activation token of the user.
-     * @var string
-     * @since 1.3 
-     */
-    private $activationTok;
     /**
      * @since 1.2
      * @var string 
@@ -227,24 +197,6 @@ class User implements JsonI{
         return $this->regDate;
     }
     /**
-     * Returns a string that represents the time at which the user has 
-     * request password reset.
-     * @return string|NULL A string that represents the time at which the user has 
-     * request password reset. If not set, the function will return <b>NULL</b>
-     * @since 1.6
-     */
-    public function getResetRequestTime() {
-        return $this->resetRequestTime;
-    }
-    /**
-     * Sets the time at which the user has requested password reset.
-     * @param string $time The time at which the user has requested password reset.
-     * @since 1.6
-     */
-    public function setResetRequestTime($time) {
-        $this->resetRequestTime = $time;
-    }
-    /**
      * Returns the date at which user password was reseted.
      * @return string|NULL the date at which user password was reseted. 
      * If not set, the function will return <b>NULL</b>.
@@ -260,23 +212,6 @@ class User implements JsonI{
      */
     public function setLastPasswordResetDate($date) {
         $this->lastPasswordReseted = $date;
-    }
-    /**
-     * Returns password reset token.
-     * @return string|NULL Password reset token. If not set, 
-     * the function will return <b>NULL</b>.
-     * @since 1.6
-     */
-    public function getResetToken() {
-        return $this->resetTok;
-    }
-    /**
-     * Sets password reset token.
-     * @param string $tok Password reset token.
-     * @since 1.6
-     */
-    public function setResetToken($tok) {
-        $this->resetTok = $tok;
     }
     /**
      * Returns the number of times the user has requested that his password 
@@ -317,23 +252,6 @@ class User implements JsonI{
         $this->regDate = $date;
     }
     /**
-     * Sets the activation token of the user.
-     * @param string $tok User account activation token.
-     * @since 1.3
-     */
-    public function setActivationTok($tok){
-        $this->activationTok = $tok;
-    }
-    /**
-     * Returns the activation token of the user.
-     * @return string Activation token.
-     * @since 1.3
-     */
-    public function getActivationTok(){
-        return $this->activationTok;
-    }
-
-    /**
      * Returns the display name of the user.
      * @return string The display name of the user.
      * @since 1.2
@@ -351,34 +269,6 @@ class User implements JsonI{
         if(gettype($name) == 'string' && strlen($name) != 0){
             $this->dispName = $name;
         }
-    }
-
-    /**
-     * Sets the value of the property <b>$userTok</b>
-     * @param string $tok User token.
-     * @since 1.1
-     */
-    public function setToken($tok){
-        $this->userTok = $tok;
-    }
-    /**
-     * Returns the value of the property <b>$userTok</b>
-     * @return string|NULL User access token. If not set, the function 
-     * will return <b>NULL</b>.
-     * @since 1.1
-     */
-    public function getToken(){
-        return $this->userTok;
-    }
-    /**
-     * Returns status code.
-     * @return string|NULL The status code of the user (such as 'A'). 
-     * If user status is not set, the function will return <b>NULL</b>.
-     * @see User::setStatus($status)
-     * @since 1.5
-     */
-    public function getStatusCode(){
-        return $this->statusCode;
     }
     /**
      * Returns a JsonX object that represents the user.

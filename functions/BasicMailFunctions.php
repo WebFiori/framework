@@ -70,14 +70,14 @@ class BasicMailFunctions extends Functions{
      * @return BasicMailFunctions
      * @since 1.0
      */
-    public static function get(){
+    public static function &get(){
         Logger::logFuncCall(__METHOD__);
         if(self::$instance === NULL){
-            Logger::log('Initializing \'WebsiteFunctions\' instance...');
+            Logger::log('Initializing \'BasicMailFunctions\' instance...');
             self::$instance = new BasicMailFunctions();
-            Logger::log('Initializing of \'WebsiteFunctions\' completed.');
+            Logger::log('Initializing of \'BasicMailFunctions\' completed.');
         }
-        Logger::log('Returning \'WebsiteFunctions\' instance.');
+        Logger::log('Returning \'BasicMailFunctions\' instance.');
         Logger::logFuncReturn(__METHOD__);
         return self::$instance;
     }
@@ -128,7 +128,7 @@ class BasicMailFunctions extends Functions{
         . \'</html>\');
 }', TRUE, TRUE);
         $fh->write('/**
- * A file that contains system email addresses configurations.
+ * A file that contains SMTP accounts information.
  *
  * @author Ibrahim
  * @version 1.0
@@ -148,7 +148,7 @@ class BasicMailFunctions extends Functions{
      * @return MailConfig
      * @since 1.0
      */
-    public static function get(){
+    public static function &get(){
         if(self::$inst !== NULL){
             return self::$inst;
         }
@@ -295,8 +295,8 @@ class BasicMailFunctions extends Functions{
             Logger::log('Password: \''.$emailAcc->getPassword().'\'', 'debug');
             Logger::log('Email Address: \''.$emailAcc->getAddress().'\'', 'debug');
             Logger::log('Account Name: \''.$emailAcc->getName().'\'', 'debug');
-            Logger::log('Using TLS = \''.$emailAcc->isTLS().'\'.','debug');
-            Logger::log('Using SSL = \''.$emailAcc->isSSL().'\'.','debug');
+//            Logger::log('Using TLS = \''.$emailAcc->isTLS().'\'.','debug');
+//            Logger::log('Using SSL = \''.$emailAcc->isSSL().'\'.','debug');
             $m = new SocketMailer();
             $m->isSSL($emailAcc->isSSL());
             $m->isTLS($emailAcc->isTLS());

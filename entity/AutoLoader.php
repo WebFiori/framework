@@ -3,7 +3,7 @@
  * An autoloader class to load classes as needed during runtime.
  *
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.1
+ * @version 1.1.1
  */
 class AutoLoader{
     /**
@@ -31,7 +31,7 @@ class AutoLoader{
      */
     private static $logger;
     /**
-     * Returns a singleton instance of the class 'AutoLoader'.
+     * Returns a single instance of the class 'AutoLoader'.
      * @param $options [Optional] An associative array of options that is used to initialize 
      * the autoloader. The available options are:
      * <ul>
@@ -39,9 +39,9 @@ class AutoLoader{
      * Default is empty string. Ignored if the constant ROOT_DIR is defined.</li>
      * <li><b>search-folders</b>: An array which contains a set of folders to search 
      * on. Default is an empty array.</li>
-     * <li><b>define-root</b>: If set to TRUE, The autoloader will define 
-     * the constant 'ROOT_DIR'. Default is FALSE. Ignored if the constant 
-     * ROOT_DIR is defined.</li>
+     * <li><b>define-root</b>: If set to TRUE, The autoloader will try to define 
+     * the constant 'ROOT_DIR' based on the autoload folders. 
+     * Default is FALSE. Ignored if the constant ROOT_DIR is defined.</li>
      * </ul>
      * @return AutoLoader
      * @throws Exception 
@@ -68,7 +68,8 @@ class AutoLoader{
                 '/publish',
                 '/publish/themes',
                 '/functions',
-                '/apis'
+                '/apis',
+                '/pages',
             );
             if(isset($options['search-folders'])){
                 foreach ($options['search-folders'] as $folder){
@@ -175,5 +176,13 @@ class AutoLoader{
      */
     public function getRoot(){
         return $this->rootDir;
+    }
+    /**
+     * Returns an array of all added search folders.
+     * @return array An array of all added search folders.
+     * @since 1.1.1
+     */
+    public static function getFolders() {
+        return self::get()->searchFolders;
     }
 }

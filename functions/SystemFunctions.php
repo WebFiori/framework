@@ -81,6 +81,7 @@ class SystemFunctions extends Functions{
         'database-username'=>'',
         'database-password'=>'',
         'database-name'=>'',
+        'database-port'=>'3306'
     );
     /**
      * An instance of SystemFunctions
@@ -140,13 +141,14 @@ class SystemFunctions extends Functions{
      * established.
      * @since 1.0
      */
-    public function updateDBAttributes($dbHost,$dbUser,$dbPass,$dbName){
+    public function updateDBAttributes($dbHost,$dbUser,$dbPass,$dbName,$dbPort){
         Logger::logFuncCall(__METHOD__);
         $r = DBConnectionFactory::mysqlLink(array(
             'user'=>$dbUser,
             'host'=>$dbHost,
             'pass'=>$dbPass,
-            'db-name'=>$dbName
+            'db-name'=>$dbName,
+            'db-port'=>$dbPort
         ));
         if($r === TRUE){
             $configVars = $this->getConfigVars();
@@ -154,6 +156,7 @@ class SystemFunctions extends Functions{
             $configVars['database-username'] = $dbUser;
             $configVars['database-password'] = $dbPass;
             $configVars['database-name'] = $dbName;
+            $configVars['database-port'] = $dbPort;
             $this->writeConfig($configVars);
         }
         else{
@@ -193,7 +196,7 @@ class SystemFunctions extends Functions{
             $cfgArr['database-username'] = $cfgs->getDBUser();
             $cfgArr['database-password'] = $cfgs->getDBPassword();
             $cfgArr['database-name'] = $cfgs->getDBName();
-            $cfgArr['user-reg-status'] = $cfgs->getUserRegStatus();
+            $cfgArr['database-port'] = $cfgs->getDBPort();
         }
         return $cfgArr;
     }
@@ -233,7 +236,7 @@ class SystemFunctions extends Functions{
  * Global configuration class. Used by the server part and the presentation part.
  * Do not modify this file manually unless you know what you are doing.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.3
+ * @version 1.4
  */', TRUE, TRUE);
         $fh->write('class Config{', TRUE, TRUE);
         $fh->addTab();
@@ -281,11 +284,11 @@ class SystemFunctions extends Functions{
      */
     private $dbPass;
     /**
-     * User resgistration status.
+     * Port number of the database.
      * @var string 
-     * @since 1.3
+     * @since 1.4
      */
-    private $userRegStats;
+    private $dbPort;
     /**
      * The name of database schema.
      * @var string 
@@ -311,6 +314,7 @@ class SystemFunctions extends Functions{
         $this->dbUser = \''.$configArr['database-username'].'\';
         $this->dbPass = \''.$configArr['database-password'].'\';
         $this->dbName = \''.$configArr['database-name'].'\';
+        $this->dbPort = \''.$configArr['database-port'].'\';
     }', TRUE, TRUE);
         $fh->write('/**
      * An instance of <b>Config</b>.
@@ -361,6 +365,14 @@ class SystemFunctions extends Functions{
      */
     public function getDBName(){
         return $this->dbName;
+    }
+    /**
+     * Returns the number of the port that is used to connect to the database.
+     * @return string Database name.
+     * @since 1.0
+     */
+    public function getDBPort(){
+        return $this->dbPort;
     }
     /**
      * Returns the name of database host.

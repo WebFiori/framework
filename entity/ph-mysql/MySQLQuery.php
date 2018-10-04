@@ -583,11 +583,12 @@ abstract class MySQLQuery{
      * @param array $colsAndVals An associative array. The array can have two 
      * possible structures:
      * <ul>
-     * <li>A column index as an index with a value as the value of the column (Recomended).</li>
+     * <li>A column index as an index with a value as the value of the column (Recommended).</li>
      * <li>A value as an index with an object of type 'Column' as it is value.</li>
      * </ul>
-     * The second way is not recomended as it may caus some issues if two columns 
-     * have the same value.
+     * The second way is not recommended as it may cause some issues if two columns 
+     * have the same value. To get the correct index of the column, use the function 
+     * 'MySQLQuery::getColumnIndex()'.
      * @since 1.8.2
      */
     public function insertRecord($colsAndVals) {
@@ -850,11 +851,15 @@ abstract class MySQLQuery{
     }
     /**
      * Constructs a query that can be used to update a record.
-     * @param array $colsAndNewVals An associative array. The key must be the 
-     * new value and the value of the index is an object of type 'Column'.
-     * @param array $colsAndVals An associative array that contains columns and 
-     * values for the 'where' clause. The indices should be the values and the 
-     * value at each index should be an object of type 'Column'. 
+     * @param array $colsAndNewVals An associative array. The array can have two 
+     * possible structures:
+     * <ul>
+     * <li>A column index as an index with a value as the value of the column (Recommended).</li>
+     * <li>A value as an index with an object of type 'Column' as it is value.</li>
+     * </ul>
+     * The second way is not recommended as it may cause some issues if two columns 
+     * have the same value. To get the correct index of the column, use the function 
+     * 'MySQLQuery::getColumnIndex()'. 
      * The number of elements in this array must match number of elements 
      * in the array $colsAndNewVals.
      * @param array $valsConds An array that can have only two possible values, 

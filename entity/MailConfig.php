@@ -17,7 +17,7 @@ if(!defined('ROOT_DIR')){
         . '</html>');
 }
 /**
- * A file that contains system email addresses configurations.
+ * A file that contains SMTP accounts information.
  *
  * @author Ibrahim
  * @version 1.0
@@ -35,7 +35,7 @@ class MailConfig{
      * @return MailConfig
      * @since 1.0
      */
-    public static function get(){
+    public static function &get(){
         if(self::$inst !== NULL){
             return self::$inst;
         }

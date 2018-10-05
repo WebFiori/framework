@@ -66,6 +66,9 @@ class ListItem extends HTMLNode{
                 parent::addChild(self::createTextNode($text));
             }
         }
+        else{
+            parent::addChild(self::createTextNode($text));
+        }
     }
     /**
      * Checks if the node only accepts text or not.

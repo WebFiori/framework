@@ -19,7 +19,7 @@ if(!defined('ROOT_DIR')){
 /**
  * PHP utility class.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.3.4
+ * @version 1.3.5
  */
 class Util{
     /**
@@ -62,6 +62,45 @@ class Util{
      */
     public static function getDatabaseTestInstance(){
         return self::$dbTestInstance;
+    }
+    /**
+     * Converts a string to its numeric value.
+     * @param string $str A string that represents a number.
+     * @return int|float|boolean If the given string represents an integer, 
+     * the value is returned as an integer. If the given string represents a float, 
+     * the value is returned as a float. If the function is unable to convert 
+     * the string to its numerical value, it will return FALSE.
+     * @since 1.3.5
+     */
+    public static function numericValue($str){
+        $str = trim($str);
+        $len = strlen($str);
+        $isFloat = FALSE;
+        $retVal = FALSE;
+        for($y = 0 ; $y < $len ; $y++){
+            $char = $str[$y];
+            if($char == '.' && !$isFloat){
+                $isFloat = TRUE;
+            }
+            else if($char == '-' && $y == 0){
+                
+            }
+            else if($char == '.' && $isFloat){
+                return $retVal;
+            }
+            else{
+                if(!($char <= '9' && $char >= '0')){
+                    return $retVal;
+                }
+            }
+        }
+        if($isFloat){
+            $retVal = floatval($str);
+        }
+        else{
+            $retVal = intval($str);
+        }
+        return $retVal;
     }
     /**
      * Returns HTTP request headers.

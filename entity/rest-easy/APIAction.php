@@ -3,7 +3,7 @@
 /* 
  * The MIT License
  *
- * Copyright 2018 Ibrahim.
+ * Copyright 2018 Ibrahim BinAlshikh, rest-easy (v1.4.2).
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -96,7 +96,7 @@ class APIAction implements JsonI{
      * @return array An array that contains information about possible responses.
      * @since 1.3
      */
-    public function getResponsesDescriptions() {
+    public final function getResponsesDescriptions() {
         return $this->responses;
     }
     /**
@@ -105,7 +105,7 @@ class APIAction implements JsonI{
      * the possible responses due to performing the action.
      * @since 1.3
      */
-    public function addResponseDescription($description) {
+    public final function addResponseDescription($description) {
         if(strlen($description) != 0){
             $this->responses[] = $description;
         }
@@ -116,7 +116,7 @@ class APIAction implements JsonI{
      * the use of the action.
      * @since 1.2
      */
-    public function setDescription($desc) {
+    public final function setDescription($desc) {
         $this->actionDesc = $desc;
     }
     /**
@@ -125,7 +125,7 @@ class APIAction implements JsonI{
      * not set, the function will return <b>NULL</b>.
      * @since 1.2
      */
-    public function getDescription() {
+    public final function getDescription() {
         return $this->actionDesc;
     }
     /**
@@ -135,7 +135,7 @@ class APIAction implements JsonI{
      * type <b>API</b>.
      * @since 1.2
      */
-    public function setSince($sinceAPIv) {
+    public final function setSince($sinceAPIv) {
         $this->sinceVersion = $sinceAPIv;
     }
     /**
@@ -143,7 +143,7 @@ class APIAction implements JsonI{
      * @return string The version number at which the action was added to the API.
      * @since 1.2
      */
-    public function getSince() {
+    public final function getSince() {
         return $this->sinceVersion;
     }
     /**
@@ -165,7 +165,7 @@ class APIAction implements JsonI{
      * will return <b>FALSE</b>.
      * @since 1.1
      */
-    public function addRequestMethod($method){
+    public final function addRequestMethod($method){
         $uMethod = strtoupper($method);
         if(in_array($uMethod, self::METHODS)){
             if(!in_array($uMethod, $this->reqMethods)){
@@ -183,7 +183,7 @@ class APIAction implements JsonI{
      * @since 1.1
      * 
      */
-    public function getActionMethods(){
+    public final function getActionMethods(){
         return $this->reqMethods;
     }
     /**
@@ -221,7 +221,7 @@ class APIAction implements JsonI{
      * name is invalid.
      * @since 1.0
      */
-    public function setName($name){
+    public final function setName($name){
         $name .= '';
         $len = strlen($name);
         if($len != 0){
@@ -246,7 +246,7 @@ class APIAction implements JsonI{
      * @return array an array that contains an objects of type <b>RequestParameter</b>.
      * @since 1.0
      */
-    public function getParameters(){
+    public final function getParameters(){
         return $this->parameters;
     }
     /**
@@ -256,7 +256,7 @@ class APIAction implements JsonI{
      * a parameter with the given name was found. <b>NULL</b> if nothing is found.
      * @since 1.2
      */
-    public function getParameterByName($paramName) {
+    public final function getParameterByName($paramName) {
         $paramName .= '';
         if(strlen($paramName) != 0){
             foreach ($this->parameters as $param){
@@ -272,7 +272,7 @@ class APIAction implements JsonI{
      * @return string The name of the action.
      * @since 1.0
      */
-    public function getName(){
+    public final function getName(){
         return $this->name;
     }
     /**

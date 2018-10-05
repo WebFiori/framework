@@ -20,7 +20,7 @@ if(!defined('ROOT_DIR')){
  * Global configuration class. Used by the server part and the presentation part.
  * Do not modify this file manually unless you know what you are doing.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.3
+ * @version 1.4
  */
 class Config{
     /**
@@ -66,11 +66,11 @@ class Config{
      */
     private $dbPass;
     /**
-     * User resgistration status.
+     * Port number of the database.
      * @var string 
-     * @since 1.3
+     * @since 1.4
      */
-    private $userRegStats;
+    private $dbPort;
     /**
      * The name of database schema.
      * @var string 
@@ -96,6 +96,7 @@ class Config{
         $this->dbUser = '';
         $this->dbPass = '';
         $this->dbName = '';
+        $this->dbPort = '3306';
     }
     /**
      * An instance of <b>Config</b>.
@@ -146,6 +147,14 @@ class Config{
      */
     public function getDBName(){
         return $this->dbName;
+    }
+    /**
+     * Returns the number of the port that is used to connect to the database.
+     * @return string Database name.
+     * @since 1.0
+     */
+    public function getDBPort(){
+        return $this->dbPort;
     }
     /**
      * Returns the name of database host.

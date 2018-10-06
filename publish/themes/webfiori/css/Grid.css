@@ -1,0 +1,141 @@
+@charset "UTF-8";
+/*
+The MIT License
+
+Copyright 2018 Ibrahim.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+*/
+/* 
+    Created on : Jun 6, 2017, 4:00:25 AM
+    Author     : Ibrahim
+    Version    : 1.0, Jun 6, 2017
+*/
+
+@media screen and (max-width: 768px){
+    [class*="-col-"] {
+        width: 99% !important;
+    }
+}
+@media screen and (min-width: 768px) and (max-width: 992px){
+    
+}
+*, *:before, *:after{
+    box-sizing: border-box;
+}
+
+.pa-container, 
+.pa-row, 
+.pa-row-nm, 
+.pa-row-np, 
+.pa-row-nm-np, 
+.pa-row-np-nm{
+    float: left;
+}
+.pa-container{
+    width: 100%;
+    margin: 0;
+}
+.pa-row-nm, .pa-row-np{
+    width: 100%;
+}
+.pa-row-np{
+    margin: 0.5%;
+    width: 99%
+}
+.pa-row-nm-np,.pa-row-np-nm{
+    width: 100%;
+}
+.pa-row{
+    padding: 0.5%;
+    margin: 0.5%;
+    width: 99%;
+}
+[class*='-np']{
+    padding: 0 !important;
+}
+[class*='-nm']{
+    margin: 0 !important;
+}
+.pa-container > .pa-row{
+    margin-bottom: 0;
+    margin-top: 0;
+}
+[class*="-col-"] {
+    padding: 0.5%;
+    margin: 0.5%;
+    float: left;
+}
+
+[class*="pa-ltr-"]{
+    float: left;
+    direction: ltr;
+}
+[class*="pa-rtl-"]{
+    float: right;
+    direction: rtl;
+}
+
+[class*="-col-1"]{width: 7.333333333%}
+[class*="-col-1-nm"]{width: 8.333333333%}
+[class*="-col-1-nm-np"],[class*="-col-1-np-nm"]{width: 8.333333333%}
+
+[class*="-col-2"]{width: 15.66666667%}
+[class*="-col-2-nm"]{width: 16.66666667%}
+[class*="-col-2-np-nm"],[class*="-col-2-nm-np"]{width: 16.66666667%}
+
+[class*="-col-3"]{width: 24%}
+[class*="-col-3-nm"]{width: 25%}
+[class*="-col-3-nm-np"],[class*="-col-3-np-nm"]{width: 25%}
+
+[class*="-col-4"]{width: 32.33333333%}
+[class*="-col-4-nm"]{width: 33.33333333%}
+[class*="-col-4-nm-np"],[class*="-col-4-np-nm"]{width: 33.33333333%}
+
+[class*="-col-5"]{width: 40.66666667%}
+[class*="-col-5-nm"]{width: 41.66666667%}
+[class*="-col-5-nm-np"],[class*="-col-5-np-nm"]{width: 41.66666667%}
+
+[class*="-col-6"]{width: 49%}
+[class*="-col-6-nm"]{width: 50%}
+[class*="-col-6-nm-np"],[class*="-col-6-np-nm"]{width: 50%}
+
+[class*="-col-7"]{width: 57.33333333%}
+[class*="-col-7-nm"]{width: 58.33333333%}
+[class*="-col-7-nm-np"],[class*="-col-7-np-nm"]{width: 58.33333333%}
+
+[class*="-col-8"]{width: 65.66666666%}
+[class*="-col-8-nm"]{width: 66.66666666%}
+[class*="-col-8-nm-np"],[class*="-col-8-np-nm"]{width: 66.66666666%}
+
+[class*="-col-9"]{width: 74%}
+[class*="-col-9-nm"]{width: 75%}
+[class*="-col-9-nm-np"],[class*="-col-9-np-nm"]{width: 75%}
+
+[class*="-col-10"]{width: 82.33333333%}
+[class*="-col-10-nm"]{width: 83.33333333%}
+[class*="-col-10-nm-np"],[class*="-col-10-np-nm"]{width: 83.33333333%}
+
+[class*="-col-11"]{width: 90.66666666%}
+[class*="-col-11-nm"]{width: 91.66666666%}
+[class*="-col-11-nm-np"],[class*="-col-11-np-nm"]{width: 91.66666666%}
+
+[class*="-col-12"]{width: 99%}
+[class*="-col-12-nm"]{width: 100%}
+[class*="-col-12-nm-np"],[class*="-col-12-np-nm"]{width: 100%}

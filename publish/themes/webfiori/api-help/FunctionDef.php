@@ -22,15 +22,23 @@ class FunctionDef {
     private $funcReturns;
     private $shortDescription;
     private $longDescription;
+    private $pageUrl;
     public function __construct() {
         $this->funcParams = array();
         $this->funcReturns = array(
-            'return-types'=>'NULL',
-            'description'=>'The function will return <a style="font-family:monospace" href="http://php.net/manual/en/language.types.null.php" target="_blank">NULL</a> by default.'
+            'return-types'=>'',
+            'description'=>''
         );
         
         $this->accessMofifier = '';
     }
+    public function setPageURL($url){
+        $this->pageUrl = $url;
+    }
+    public function getPageURL(){
+        return $this->pageUrl;
+    }
+
     /**
      * Sets function access modifier.
      * @param string $mod Function access modifier (e.g. 'public', 'protected).
@@ -126,7 +134,7 @@ class FunctionDef {
         $node->setClassName($node->getAttributeValue('class').' function-summary');
         $methNameNode = WebFioriGUI::createColNode(12, FALSE, FALSE);
         $methNameNode->setClassName('function-name');
-        $nodeText = $this->getAccessModofier().' function <a class="function-name" href="#'.$this->getName().'">'.$this->getName().'</a>(';
+        $nodeText = $this->getAccessModofier().' function <a class="function-name" href="'.$this->getPageURL().'#'.$this->getName().'">'.$this->getName().'</a>(';
         $count = count($this->funcParams);
         for($x = 0 ; $x < $count ; $x++){
             $param = $this->funcParams['param-'.$x];
@@ -181,14 +189,16 @@ class FunctionDef {
         return $node;
     }
     private function createReturnsBox() {
-        $node = WebFioriGUI::createRowNode(FALSE,FALSE);
-        $textNode = new PNode();
-        $textNode->addText('Returns: <span style="font-family:monospace">'.$this->funcReturns['return-types'].'</span>');
-        $node->addChild($textNode);
-        $descNode = new PNode();
-        $descNode->addText($this->funcReturns['description']);
-        $node->addChild($descNode);
-        return $node;
+        if(strlen($this->funcReturns['return-types']) != 0){
+            $node = WebFioriGUI::createRowNode(FALSE,FALSE);
+            $textNode = new PNode();
+            $textNode->addText('Returns: <span style="font-family:monospace">'.$this->funcReturns['return-types'].'</span>');
+            $node->addChild($textNode);
+            $descNode = new PNode();
+            $descNode->addText($this->funcReturns['description']);
+            $node->addChild($descNode);
+            return $node;
+        }
     }
     private function createParametersBox() {
         $node = WebFioriGUI::createRowNode(FALSE,FALSE);

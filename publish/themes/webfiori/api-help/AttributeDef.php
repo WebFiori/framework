@@ -17,6 +17,7 @@ class AttributeDef {
     private $shortDescription;
     private $longDescription;
     private $accessMofifier;
+    private $pageUrl;
     /**
      * Sets attribute access modifier.
      * @param string $mod Attribute access modifier (e.g. 'public', 'protected', 'const').
@@ -37,6 +38,12 @@ class AttributeDef {
      */
     public function setLongDescription($desc) {
         $this->longDescription = $desc;
+    }
+    public function setPageURL($url){
+        $this->pageUrl = $url;
+    }
+    public function getPageURL(){
+        return $this->pageUrl;
     }
     /**
      * Returns the long description of the attribute.
@@ -94,10 +101,10 @@ class AttributeDef {
     public function summaryHTMLNode() {
         $node = WebFioriGUI::createRowNode(TRUE, FALSE);
         $node->setAttribute('style', 'border: 1px solid;');
-        $node->setClassName($node->getAttributeValue('class').' class-attribute');
+        $node->setClassName($node->getAttributeValue('class').' attribute-summary');
         $attrNameNode = WebFioriGUI::createColNode(12, FALSE, FALSE);
-        $attrNameNode->setClassName('function-name');
-        $nodeText = $this->getAccessModofier().' <a class="class-attribute" href="#'.$this->getName().'">'.$this->getName().'</a>';
+        $attrNameNode->setClassName('class-attribute');
+        $nodeText = $this->getAccessModofier().' <a class="class-attribute" href="'.$this->getPageURL().'#'.$this->getName().'">'.$this->getName().'</a>';
         $attrNameNode->addTextNode($nodeText);
         $node->addChild($attrNameNode);
         $descNode = new PNode();
@@ -105,6 +112,7 @@ class AttributeDef {
         $node->addChild($descNode);
         return $node;
     }
+    
     /**
      * Returns HTML node that contains the details part of the attribute.
      * @return HTMLNode The node will contain attribute name and long description.
@@ -112,9 +120,10 @@ class AttributeDef {
     public function asHTMLNode() {
         $node = WebFioriGUI::createRowNode(TRUE, FALSE);
         $node->setAttribute('style', 'border: 1px solid;');
-        $node->setClassName($node->getAttributeValue('class').' class-attribute');
+        $node->setClassName($node->getAttributeValue('class').' attribute-summary');
         $attrNameNode = WebFioriGUI::createColNode(12, FALSE, FALSE);
-        $attrNameNode->setClassName('function-name');
+        $attrNameNode->setClassName('class-attribute');
+        $attrNameNode->setID($this->getName());
         $nodeText = $this->getAccessModofier().' '.$this->getName();
         $attrNameNode->addTextNode($nodeText);
         $node->addChild($attrNameNode);

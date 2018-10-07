@@ -16,8 +16,11 @@ span.func-param{
     font-family: monospace !important;
 }
 .summary-box-title{
-    padding-left: 15px;
-    background-color: beige;
+    padding-left: 15px !important;
+    background-color: #d33e42;
+    color: white;
+    font-weight: bold;
+    height: 25px;
 }
 .api-page p{
 
@@ -25,7 +28,7 @@ span.func-param{
 .api-page p, .api-page ul,.api-page li{
     font-size: 90%;
 }
-.function-summary{
+.function-summary,.attribute-summary{
     border: 1px solid;
     padding-left: 25px;
     padding-top: 5px;

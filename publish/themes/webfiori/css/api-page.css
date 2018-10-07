@@ -10,7 +10,8 @@ and open the template in the editor.
 
 .function-name, .function-name *
 .class-name, .class-name *
-.interface-name, .interface-name *
+.interface-name, .interface-name *,
+.class-attribute, .class-attribute *
 span.func-param{
     font-family: monospace !important;
 }

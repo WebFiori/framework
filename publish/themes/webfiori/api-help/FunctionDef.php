@@ -7,11 +7,15 @@
  */
 
 /**
- * Description of FunctionDef
+ * A class that is used to build a GUI blocks for function definition. 
  *
  * @author Ibrahim
  */
 class FunctionDef {
+    /**
+     * The name of the function (e.g. 'getNumber')
+     * @var type 
+     */
     private $fName;
     private $accessMofifier;
     private $funcParams;
@@ -27,32 +31,70 @@ class FunctionDef {
         
         $this->accessMofifier = '';
     }
+    /**
+     * Sets function access modifier.
+     * @param string $mod Function access modifier (e.g. 'public', 'protected).
+     */
     public function setAccessModifier($mod) {
         $this->accessMofifier = $mod;
     }
+    /**
+     * Returns function access modifier.
+     * @return string function access modifier (e.g. 'public', 'protected).
+     */
     public function getAccessModofier() {
         return $this->accessMofifier;
     }
+    /**
+     * Sets the long description of the function.
+     * @param string $desc The long description of the function.
+     */
     public function setLongDescription($desc) {
         $this->longDescription = $desc;
     }
-    
+    /**
+     * Returns the long description of the function.
+     * @return string The long description of the function.
+     */
     public function getLongDescription() {
         return $this->longDescription;
     }
-    
+    /**
+     * Sets the short description of the function.
+     * @param string $desc The short description of the function.
+     */
     public function setShortDescription($desc) {
         $this->shortDescription = $desc;
     }
+    /**
+     * Returns the short description of the function.
+     * @return string The short description of the function.
+     */
     public function getShortDescription() {
         return $this->shortDescription;
     }
+    /**
+     * Sets the name of the function.
+     * @param string $name The name of the function (e.g. 'getNumber').
+     */
     public function setName($name) {
         $this->fName = $name;
     }
+    /**
+     * Returns the name of the function.
+     * @return string The name of the function.
+     */
     public function getName() {
         return $this->fName;
     }
+    /**
+     * Adds new function parameter.
+     * @param string $varName The name of the parameter.
+     * @param string $varType Data type of the parameter.
+     * @param string $description The description of the parameter.
+     * @param boolean $isOptional A boolean value to indicate if the 
+     * parameter is optional or not.
+     */
     public function addFuncParam($varName,$varType,$description, $isOptional=false) {
         $paramNum = count($this->funcParams);
         $this->funcParams['param-'.$paramNum] = array(
@@ -62,12 +104,22 @@ class FunctionDef {
             'is-optional'=>$isOptional
         );
     }
+    /**
+     * Sets the return type description.
+     * @param string $returnTypes A string that represents the return types 
+     * of the function.
+     * @param string $desc A string that describes the returned value.
+     */
     public function setReturns($returnTypes, $desc) {
         $this->funcReturns = array(
             'return-types'=>$returnTypes,
             'description'=>$desc
         );
     }
+    /**
+     * Returns HTML node that contains the summary part of the function.
+     * @return HTMLNode The node will contain function name and short description.
+     */
     public function summaryHTMLNode() {
         $node = WebFioriGUI::createRowNode(TRUE, FALSE);
         $node->setAttribute('style', 'border: 1px solid;');
@@ -93,6 +145,11 @@ class FunctionDef {
         $node->addChild($descNode);
         return $node;
     }
+    /**
+     * Returns HTML node that contains the details part of the function.
+     * @return HTMLNode The node will contain function name, long description, 
+     * parameters description and return description.
+     */
     public function asHTMLNode() {
         $node = WebFioriGUI::createRowNode(TRUE, FALSE);
         $node->setAttribute('style', 'border: 1px solid;');

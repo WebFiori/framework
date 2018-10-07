@@ -7,7 +7,7 @@
  */
 
 /**
- * Description of APIPage
+ * A class that is used to display a class API object.
  *
  * @author Ibrahim
  */
@@ -25,7 +25,9 @@ class APIPage {
         Page::document()->getHeadNode()->addCSS(Page::cssDir().'/api-page.css');
         WebFioriGUI::createTitleNode($class->getLongName());
         $this->createClassDescriptionNode($class);
+        Page::insert($class->getAttributesSummaryNode());
         Page::insert($class->getFunctionsSummaryNode());
+        Page::insert($class->getAttributesDetailsNode());
         Page::insert($class->getFunctionsDetailsNode());
         Page::render();
     }

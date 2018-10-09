@@ -2,9 +2,14 @@
 /**
  * A class that represents a column in MySQL table.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.6
+ * @version 1.6.1
  */
 class Column{
+    /**
+     * Version number of MySQL server.
+     * @var string 
+     */
+    private $mySqlVersion;
     /**
      * The table that this column belongs to.
      * @var Table
@@ -137,6 +142,7 @@ class Column{
      * value.
      */
     public function __construct($colName='col',$datatype='varchar',$size=1) {
+        $this->mySqlVersion = '5.5';
         if($this->setName($colName) !== TRUE){
             $this->setName('col');
         }
@@ -155,6 +161,32 @@ class Column{
         $this->setIsUnique(FALSE);
     }
     /**
+     * Sets version number of MySQL server.
+     * @param string $vNum MySQL version number (such as '5.5').
+     * @since 1.6.1
+     */
+    public function setMySQLVersion($vNum) {
+        if(strlen($vNum) > 0){
+            $split = explode('.', $vNum);
+            if(count($split) >= 2){
+                $major = intval($split[0]);
+                $minor = intval($split[1]);
+                if($major >= 0 && $minor >= 0){
+                    $this->mySqlVersion = $vNum;
+                }
+            }
+        }
+    }
+    /**
+     * Returns version number of MySQL server.
+     * @return string MySQL version number (such as '5.5'). If version number 
+     * is not set, The default return value is '5.5'.
+     * @since 1.6.1
+     */
+    public function getMySQLVersion() {
+        return $this->mySqlVersion;
+    }
+    /**
      * Sets or unset the owner table of the column.
      * @param Table|NULL $table The owner of the column. If NULL is given, 
      * The owner will be unset. This function should 
@@ -166,6 +198,7 @@ class Column{
             $this->ownerTable = $table;
             $colsCount = count($table->columns());
             $this->columnIndex = $colsCount == 0 ? 0 : $colsCount;
+            $this->setMySQLVersion($table->getMySQLVersion());
         }
         else if($table === NULL){
             $this->ownerTable = NULL;
@@ -470,16 +503,14 @@ class Column{
     }
     /**
      * Returns the value of column collation.
-     * @param string $mySqlVersion [Optional] Version number of MySQL. Default 
-     * is '8.0'.
-     * @return string If the given value is '5.5' or lower, the function will 
+     * @return string If MySQL version is '5.5' or lower, the function will 
      * return 'utf8mb4_unicode_ci'. Other than that, the function will return 
      * 'utf8mb4_unicode_520_ci'.
      * @since 1.0
      */
-    public function getCollation($mySqlVersion='8.0'){
-        $split = explode('.', $mySqlVersion);
-        if(isset($split[0]) && $split[0] <= 5 && isset($split[1]) && $split[1] <= 5){
+    public function getCollation(){
+        $split = explode('.', $this->getMySQLVersion());
+        if(isset($split[0]) && intval($split[0]) <= 5 && isset($split[1]) && intval($split[1]) <= 5){
             return 'utf8mb4_unicode_ci';
         }
         return 'utf8mb4_unicode_520_ci';

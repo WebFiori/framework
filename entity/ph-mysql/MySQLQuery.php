@@ -195,7 +195,7 @@ abstract class MySQLQuery{
      * @param boolean $inclComments Description
      * @since 1.4
      */
-    private function createTable($table,$mysqlVnum='8.0',$inclComments=false){
+    private function createTable($table,$inclComments=false){
         if($table instanceof Table){
             $query = '';
             if($inclComments === TRUE){
@@ -218,7 +218,7 @@ abstract class MySQLQuery{
             $query .= ')'.self::NL;
             $query .= 'ENGINE = '.$table->getEngine().self::NL;
             $query .= 'DEFAULT CHARSET = '.$table->getCharSet().self::NL;
-            $query .= 'collate = '.$table->getCollation($mysqlVnum).';'.self::NL;
+            $query .= 'collate = '.$table->getCollation().';'.self::NL;
             
             $coutPk = $this->getStructure()->primaryKeyColsCount();
             if($coutPk > 1){
@@ -350,6 +350,9 @@ abstract class MySQLQuery{
      * value of a column. Ignored in case the option 'columns' or 'select-max' is set.</li>
      * <li><b>column</b>: The column which contains maximum or minimum value.</li>
      * <li><b>rename-to</b>: Rename the max or min column to the given name.</li>
+     * <li><b>order-by</b>: An object of type column at which the rows will be ordered by.</li>
+     * <li><b>order-type</b>: A one character string. 'A' for ascending and 'D' 
+     * for descending. Default is 'A'. Used only if 'order-by' is set. </li>
      * </ul>
      * @since 1.8.3
      */
@@ -363,7 +366,9 @@ abstract class MySQLQuery{
         'select-min'=>false,
         'select-max'=>false,
         'column'=>'',
-        'rename-to'=>''
+        'rename-to'=>'',
+        'order-by'=>NULL,
+        'order-type'=>'A'
         )) {
         $table = $this->getStructure();
         if($table instanceof Table){
@@ -378,6 +383,16 @@ abstract class MySQLQuery{
             }
             else{
                 $limitPart = '';
+            }
+            $orderByPart = '';
+            if(isset($selectOptions['order-by']) && ($selectOptions['order-by'] instanceof Column)){
+                $orderType = isset($selectOptions['order-type']) ? strtoupper($selectOptions['order-type']) : 'A';
+                if($orderType == 'D'){
+                    $orderByPart = ' order by '.$selectOptions['order-by']->getName().' desc ';
+                }
+                else{
+                    $orderByPart = ' order by '.$selectOptions['order-by']->getName().' asc ';
+                }
             }
             if(isset($selectOptions['columns']) && count($selectOptions['columns']) != 0){
                 $count = count($selectOptions['columns']);
@@ -459,7 +474,7 @@ abstract class MySQLQuery{
             else{
                 $where = '';
             }
-            $this->setQuery($selectQuery.$where.$limitPart.';', 'select');
+            $this->setQuery($selectQuery.$where.$orderByPart.$limitPart.';', 'select');
             return TRUE;
         }
         return FALSE;
@@ -583,12 +598,11 @@ abstract class MySQLQuery{
      * @param array $colsAndVals An associative array. The array can have two 
      * possible structures:
      * <ul>
-     * <li>A column index as an index with a value as the value of the column (Recommended).</li>
+     * <li>A column index as an index with a value as the value of the column (Recomended).</li>
      * <li>A value as an index with an object of type 'Column' as it is value.</li>
      * </ul>
-     * The second way is not recommended as it may cause some issues if two columns 
-     * have the same value. To get the correct index of the column, use the function 
-     * 'MySQLQuery::getColumnIndex()'.
+     * The second way is not recomended as it may caus some issues if two columns 
+     * have the same value.
      * @since 1.8.2
      */
     public function insertRecord($colsAndVals) {
@@ -645,6 +659,7 @@ abstract class MySQLQuery{
             }
             else{
                 //an index with a value
+                
                 $column = $this->getStructure()->getColByIndex($valOrColIndex);
                 if($column instanceof Column){
                     $cols .= $column->getName().$comma;
@@ -677,7 +692,7 @@ abstract class MySQLQuery{
                             }
                         }
                         else{
-                             $vals .= $colObjOrVal.$comma;
+                            $vals .= $colObjOrVal.$comma;
                         }
                     }
                     else{
@@ -851,15 +866,11 @@ abstract class MySQLQuery{
     }
     /**
      * Constructs a query that can be used to update a record.
-     * @param array $colsAndNewVals An associative array. The array can have two 
-     * possible structures:
-     * <ul>
-     * <li>A column index as an index with a value as the value of the column (Recommended).</li>
-     * <li>A value as an index with an object of type 'Column' as it is value.</li>
-     * </ul>
-     * The second way is not recommended as it may cause some issues if two columns 
-     * have the same value. To get the correct index of the column, use the function 
-     * 'MySQLQuery::getColumnIndex()'. 
+     * @param array $colsAndNewVals An associative array. The key must be the 
+     * new value and the value of the index is an object of type 'Column'.
+     * @param array $colsAndVals An associative array that contains columns and 
+     * values for the 'where' clause. The indices should be the values and the 
+     * value at each index should be an object of type 'Column'. 
      * The number of elements in this array must match number of elements 
      * in the array $colsAndNewVals.
      * @param array $valsConds An array that can have only two possible values, 
@@ -1058,8 +1069,6 @@ abstract class MySQLQuery{
     /**
      * Constructs a query that can be used to create the table which is linked 
      * with the query class.
-     * @param string $mySqlVersion [Optional] Version number of MySQL. Default 
-     * is '8.0'.
      * @param boolean $inclComments If set to TRUE, the generated MySQL 
      * query will have basic comments explaining the structure.
      * @return boolean Once the query is structured, the function will return 
@@ -1068,10 +1077,10 @@ abstract class MySQLQuery{
      * did not return an object of type 'Table'.
      * @since 1.5
      */
-    public function createStructure($mySqlVersion='8.0',$inclComments=false){
+    public function createStructure($inclComments=false){
         $t = $this->getStructure();
         if($t instanceof Table){
-            $this->createTable($t,$mySqlVersion,$inclComments);
+            $this->createTable($t,$inclComments);
             return TRUE;
         }
         return FALSE;

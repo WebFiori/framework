@@ -7,6 +7,11 @@
  */
 class Table {
     /**
+     * Version number of MySQL server.
+     * @var string 
+     */
+    private $mysqlVnum;
+    /**
      * A constant that is returned by some functions to tell that the 
      * table does not have a given column name.
      * @var string 
@@ -72,9 +77,36 @@ class Table {
         if($this->setName($tName) !== TRUE){
             $this->setName('table');
         }
+        $this->mysqlVnum = '5.5';
         $this->engin = 'InnoDB';
         $this->charSet = 'utf8mb4';
         $this->order = 0;
+    }
+    /**
+     * Sets version number of MySQL server.
+     * @param string $vNum MySQL version number (such as '5.5').
+     * @since 1.6.1
+     */
+    public function setMySQLVersion($vNum) {
+        if(strlen($vNum) > 0){
+            $split = explode('.', $vNum);
+            if(count($split) >= 2){
+                $major = intval($split[0]);
+                $minor = intval($split[1]);
+                if($major >= 0 && $minor >= 0){
+                    $this->mysqlVnum = $vNum;
+                }
+            }
+        }
+    }
+    /**
+     * Returns version number of MySQL server.
+     * @return string MySQL version number (such as '5.5'). If version number 
+     * is not set, The default return value is '5.5'.
+     * @since 1.6.1
+     */
+    public function getMySQLVersion() {
+        return $this->mysqlVnum;
     }
     /**
      * Sets the order of the table in the database.
@@ -112,16 +144,14 @@ class Table {
     }
     /**
      * Returns the value of table collation.
-     * @param string $mySqlVersion [Optional] Version number of MySQL. Default 
-     * is '8.0'.
-     * @return string If the given value is '5.5' or lower, the function will 
+     * @return string If MySQL version is '5.5' or lower, the function will 
      * return 'utf8mb4_unicode_ci'. Other than that, the function will return 
      * 'utf8mb4_unicode_520_ci'.
      * @since 1.6
      */
-    public function getCollation($mySqlVersion='8.0'){
-        $split = explode('.', $mySqlVersion);
-        if(isset($split[0]) && $split[0] <= 5 && isset($split[1]) && $split[1] <= 5){
+    public function getCollation(){
+        $split = explode('.', $this->getMySQLVersion());
+        if(isset($split[0]) && intval($split[0]) <= 5 && isset($split[1]) && intval($split[1]) <= 5){
             return 'utf8mb4_unicode_ci';
         }
         return 'utf8mb4_unicode_520_ci';

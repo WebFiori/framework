@@ -53,6 +53,13 @@ class MailConfig{
     private function addAccount($acc,$name){
         $this->emailAccounts[$name] = $acc;
     }
+    private function &_getAccount($name){
+        if(isset($this->emailAccounts[$name])){
+            return $this->emailAccounts[$name];
+        }
+        $null = NULL;
+        return $null;
+    }
     /**
      * Returns an email account given its name.
      * @param string $name The name of the account.
@@ -61,18 +68,18 @@ class MailConfig{
      * function will return <b>NULL</b>.
      * @since 1.0
      */
-    public function getAccount($name){
-        if(isset($this->emailAccounts[$name])){
-            return $this->emailAccounts[$name];
-        }
-        return NULL;
+    public static function &getAccount($name){
+        return self::get()->_getAccount($name);
+    }
+    private function _getAccounts(){
+        return $this->emailAccounts;
     }
     /**
      * Returns an array that contains all email accounts.
      * @return array An array that contains all email accounts.
      * @since 1.0
      */
-    public function getAccounts(){
-        return $this->emailAccounts;
+    public static function getAccounts(){
+        return self::get()->_getAccounts();
     }
 }

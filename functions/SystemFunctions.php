@@ -76,7 +76,7 @@ class SystemFunctions extends Functions{
         'release-date'=>'09-25-2018 (DD-MM-YYYY)',
         'version'=>'1.0.0',
         'version-type'=>'Stable',
-        'config-file-version'=>'1.3',
+        'config-file-version'=>'1.3.1',
         'database-host'=>'localhost',
         'database-username'=>'',
         'database-password'=>'',
@@ -190,13 +190,12 @@ class SystemFunctions extends Functions{
     public function getConfigVars(){
         $cfgArr = SystemFunctions::INITIAL_CONFIG_VARS;
         if(class_exists('Config')){
-            $cfgs = Config::get();
-            $cfgArr['is-config'] = $cfgs->isConfig() === TRUE ? 'TRUE' : 'FALSE';
-            $cfgArr['database-host'] = $cfgs->getDBHost();
-            $cfgArr['database-username'] = $cfgs->getDBUser();
-            $cfgArr['database-password'] = $cfgs->getDBPassword();
-            $cfgArr['database-name'] = $cfgs->getDBName();
-            $cfgArr['database-port'] = $cfgs->getDBPort();
+            $cfgArr['is-config'] = Config::isConfig() === TRUE ? 'TRUE' : 'FALSE';
+            $cfgArr['database-host'] = Config::getDBHost();
+            $cfgArr['database-username'] = Config::getDBUser();
+            $cfgArr['database-password'] = Config::getDBPassword();
+            $cfgArr['database-name'] = Config::getDBName();
+            $cfgArr['database-port'] = Config::getDBPort();
         }
         return $cfgArr;
     }
@@ -236,7 +235,7 @@ class SystemFunctions extends Functions{
  * Global configuration class. Used by the server part and the presentation part.
  * Do not modify this file manually unless you know what you are doing.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.4
+ * @version 1.5
  */', TRUE, TRUE);
         $fh->write('class Config{', TRUE, TRUE);
         $fh->addTab();
@@ -327,100 +326,122 @@ class SystemFunctions extends Functions{
      * @return Config An object of type <b>Config</b>.
      * @since 1.0
      */
-    public static function get(){
+    public static function &get(){
         if(self::$cfg != NULL){
             return self::$cfg;
         }
         self::$cfg = new Config();
         return self::$cfg;
     }
-    /**
-     * Returns user registration status.
-     * @return User registration status.
-     * @since 1.3
-     */
-    public function getUserRegStatus(){
-        return $this->userRegStats;
+    private function _getConfigVersion(){
+        return $this->configVision;
     }
     /**
      * Returns the version number of configuration file.
      * @return string The version number of configuration file.
      * @since 1.2
      */
-    public function getConfigVersion(){
-        return $this->configVision;
+    public static function getConfigVersion(){
+        return self::get()->_getConfigVersion();
+    }
+    private function _isConfig(){
+        return $this->isConfigured;
     }
     /**
      * Checks if the system is configured or not.
      * @return boolean <b>TRUE</b> if the system is configured.
      * @since 1.0
      */
-    public function isConfig(){
-        return $this->isConfigured;
+    public static function isConfig(){
+        return self::get()->_isConfig();
+    }
+    private function _getDBName(){
+        return $this->dbName;
     }
     /**
      * Returns the name of the database.
      * @return string Database name.
      * @since 1.0
      */
-    public function getDBName(){
-        return $this->dbName;
+    public static function getDBName(){
+        return self::get()->_getDBName();
+    }
+    private function _getDBPort(){
+        return $this->dbPort;
     }
     /**
      * Returns the number of the port that is used to connect to the database.
      * @return string Database name.
      * @since 1.0
      */
-    public function getDBPort(){
-        return $this->dbPort;
+    public static function getDBPort(){
+        return self::get()->_getDBPort();
+    }
+    private function _getDBHost(){
+        return $this->dbHost;
     }
     /**
      * Returns the name of database host.
      * @return string Database host.
      * @since 1.0
      */
-    public function getDBHost(){
-        return $this->dbHost;
+    public static function getDBHost(){
+        return self::get()->_getDBHost();
+    }
+    private function _getDBUser(){
+        return $this->dbUser;
     }
     /**
      * Returns the name of the database user.
      * @return string Database username.
      * @since 1.0
      */
-    public function getDBUser(){
-        return $this->dbUser;
+    public static function getDBUser(){
+        return self::get()->_getDBUser();
+    }
+    private function _getDBPassword(){
+        return $this->dbPass;
     }
     /**
      * Returns the password of the database user.
      * @return string Database password.
      * @since 1.0
      */
-    public function getDBPassword(){
-        return $this->dbPass;
+    public static function getDBPassword(){
+        return self::get()->_getDBPassword();
+    }
+    private function _getVersion(){
+        return $this->version;
     }
     /**
      * Returns framework version number.
      * @return string Framework version number.
      * @since 1.2
      */
-    public function getVersion(){
-        return $this->version;
+    public static function getVersion(){
+        return self::get()->_getVersion();
+    }
+    private function _getVersionType(){
+        return $this->versionType;
     }
     /**
      * Returns framework version type.
      * @return string framework version type.
      * @since 1.2
      */
-    public function getVersionType(){
-        return $this->versionType;
+    public static function getVersionType(){
+        return self::get()->_getVersionType();
+    }
+    private function _getReleaseDate(){
+        return $this->releaseDate;
     }
     /**
      * Returns the date at which the framework is released.
      * @return string The date at which the framework is released.
      * @since 1.0
      */
-    public function getReleaseDate(){
-        return $this->releaseDate;
+    public static function getReleaseDate(){
+        return self::get()->_getReleaseDate();
     }', TRUE, TRUE);
         $fh->reduceTab();
         $fh->write('}', TRUE, TRUE);
@@ -441,7 +462,7 @@ class SystemFunctions extends Functions{
         if(class_exists('Config')){
             if(class_exists('MailConfig')){
                 if(class_exists('SiteConfig')){
-                    $retVal = Config::get()->isConfig();
+                    $retVal = Config::isConfig();
                     Logger::logReturnValue($retVal);
                     Logger::logFuncReturn(__METHOD__);
                     return $retVal;

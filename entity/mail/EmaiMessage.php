@@ -73,7 +73,7 @@ class EmaiMessage {
         Logger::log('Creating new instance of \'EmailMessage\'.', 'info');
         if(class_exists('MailConfig')){
             Logger::log('Checking the existance of the account \''.$sendAccountName.'\'.', 'debug');
-            $acc = MailConfig::get()->getAccount($sendAccountName);
+            $acc = MailConfig::getAccount($sendAccountName);
             if($acc instanceof EmailAccount){
                 Logger::log('SMTP Account retrieved.');
                 Logger::log('Getting socket mailer ready.');

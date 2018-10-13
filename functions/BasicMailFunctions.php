@@ -182,6 +182,13 @@ class BasicMailFunctions extends Functions{
     private function addAccount($acc,$name){
         $this->emailAccounts[$name] = $acc;
     }
+    private function &_getAccount($name){
+        if(isset($this->emailAccounts[$name])){
+            return $this->emailAccounts[$name];
+        }
+        $null = NULL;
+        return $null;
+    }
     /**
      * Returns an email account given its name.
      * @param string $name The name of the account.
@@ -190,19 +197,19 @@ class BasicMailFunctions extends Functions{
      * function will return <b>NULL</b>.
      * @since 1.0
      */
-    public function getAccount($name){
-        if(isset($this->emailAccounts[$name])){
-            return $this->emailAccounts[$name];
-        }
-        return NULL;
+    public static function &getAccount($name){
+        return self::get()->_getAccount($name);
+    }
+    private function _getAccounts(){
+        return $this->emailAccounts;
     }
     /**
      * Returns an array that contains all email accounts.
      * @return array An array that contains all email accounts.
      * @since 1.0
      */
-    public function getAccounts(){
-        return $this->emailAccounts;
+    public static function getAccounts(){
+        return self::get()->_getAccounts();
     }', TRUE, TRUE);
         $fh->write('}', TRUE, TRUE);
         $fh->close();
@@ -220,9 +227,9 @@ class BasicMailFunctions extends Functions{
         Logger::logFuncCall(__METHOD__);
         $retVal = FALSE;
         if(class_exists('MailConfig')){
-            $account = MailConfig::get()->getAccount($accountName);
+            $account = &MailConfig::getAccount($accountName);
             if($account instanceof EmailAccount){
-                $accountsArr = MailConfig::get()->getAccounts();
+                $accountsArr = MailConfig::getAccounts();
                 unset($accountsArr[$accountName]);
                 $toSave = array();
                 foreach ($accountsArr as $account){
@@ -254,7 +261,7 @@ class BasicMailFunctions extends Functions{
             $sm = $this->getSocketMailer($emailAccount);
             if($sm instanceof SocketMailer){
                 if(class_exists('MailConfig')){
-                    $accountsArr = MailConfig::get()->getAccounts();
+                    $accountsArr = MailConfig::getAccounts();
                     $accountsArr[$emailAccount->getName()] = $emailAccount;
                     $toSave = array();
                     foreach ($accountsArr as $account){
@@ -298,8 +305,8 @@ class BasicMailFunctions extends Functions{
 //            Logger::log('Using TLS = \''.$emailAcc->isTLS().'\'.','debug');
 //            Logger::log('Using SSL = \''.$emailAcc->isSSL().'\'.','debug');
             $m = new SocketMailer();
-            $m->isSSL($emailAcc->isSSL());
-            $m->isTLS($emailAcc->isTLS());
+            //$m->isSSL($emailAcc->isSSL());
+            //$m->isTLS($emailAcc->isTLS());
             $m->setHost($emailAcc->getServerAddress());
             $m->setPort($emailAcc->getPort());
             Logger::log('Testing connection...');

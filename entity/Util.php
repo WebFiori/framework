@@ -252,7 +252,7 @@ class Util{
         $returnValue = '';
         if(class_exists('Config')){
             if(class_exists('SiteConfig')){
-                if(Config::get()->isConfig() === TRUE || WebFiori::getClassStatus() == 'INITIALIZING'){
+                if(Config::isConfig() === TRUE || WebFiori::getClassStatus() == 'INITIALIZING'){
                     if($checkDb === TRUE){
                         Logger::log('Checking database connection...');
                         $returnValue = self::checkDbConnection();

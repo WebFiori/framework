@@ -66,6 +66,12 @@ class Functions {
      */
     private static $sessions;
     /**
+     * An array that will hold database connection error info.
+     * @var type 
+     * @since 1.3.4
+     */
+    private $connErrDetails;
+    /**
      * A constant that indicates a user is not authorized to perform specific 
      * function.
      * @var string 
@@ -100,6 +106,9 @@ class Functions {
         Logger::log('Linked session name = \''.$this->sessionName.'\'.', 'debug');
         self::$sessions[$linkedSession->getName()] = $linkedSession;
         Logger::log('Finished initializing linked session.');
+        $this->connErrDetails = array();
+        $this->connErrDetails['error-code'] = '';
+        $this->connErrDetails['error-message'] = '';
         Logger::logFuncReturn(__METHOD__);
     }
     /**
@@ -109,6 +118,7 @@ class Functions {
      * array are:
      * <ul>
      * <li><b>host</b>: Database host address.</li>
+     * <li><b>port</b>: Port number.</li>
      * <li><b>user</b>: Database username.</li>
      * <li><b>pass</b>: Database user's password.</li>
      * <li><b>db-name</b>: The name of the database.</li>
@@ -128,7 +138,8 @@ class Functions {
             if($optionalConnectionParams != NULL && isset($optionalConnectionParams['host'])
                     && isset($optionalConnectionParams['user']) &&
                     isset($optionalConnectionParams['pass']) && 
-                    isset($optionalConnectionParams['db-name'])){
+                    isset($optionalConnectionParams['db-name']) && 
+                    isset($optionalConnectionParams['port'])){
                 Logger::log('They are provided.');
                 $retVal = FALSE;
                 $result = $this->_connect($optionalConnectionParams);
@@ -146,7 +157,8 @@ class Functions {
             if($optionalConnectionParams != NULL && isset($optionalConnectionParams['host'])
                     && isset($optionalConnectionParams['user']) &&
                     isset($optionalConnectionParams['pass']) && 
-                    isset($optionalConnectionParams['db-name'])){
+                    isset($optionalConnectionParams['db-name'])&& 
+                    isset($optionalConnectionParams['port'])){
                 Logger::log('They are provided.');
                 $retVal = $this->_connect($optionalConnectionParams);
                 Logger::logReturnValue($retVal);
@@ -160,7 +172,8 @@ class Functions {
                     'host'=>$conf->getDBHost(),
                     'user'=>$conf->getDBUser(),
                     'pass'=>$conf->getDBPassword(),
-                    'db-name'=> $conf->getDBName()
+                    'db-name'=> $conf->getDBName(),
+                    'port'=>$conf->getDBPort()
                 ));
                 Logger::logFuncReturn(__METHOD__);
                 return $retVal;
@@ -187,7 +200,8 @@ class Functions {
             'host'=>$connParams['host'],
             'user'=>$connParams['user'],
             'pass'=>$connParams['pass'],
-            'db-name'=>$connParams['db-name']
+            'db-name'=>$connParams['db-name'],
+            'port'=>$connParams['port']
         ));
         if($result instanceof DatabaseLink){
             Logger::log('Connected to database.');
@@ -195,12 +209,32 @@ class Functions {
             return TRUE;
         }
         else{
+            $this->connErrDetails = $result;
             Logger::log('Unable to connect to the database while in setup mode.', 'warning');
             Logger::log('Error Code: '.$result['error-code'], 'error');
             Logger::log('Error Message: '.$result['error-message'], 'error');
             Logger::logFuncReturn(__METHOD__);
             return FALSE;
         }
+    }
+    /**
+     * Returns an associative array that contains database error info (if any)
+     * @return array An associative array. The array has two 
+     * indices: 
+     * <ul>
+     * <li><b>error-code</b>: Error code.</li>
+     * <li><b>error-code</b>: A message that tells more information about 
+     * the error.</li>
+     * If no errors, the indices will have empty strings.
+     * @since 1.3.4
+     */
+    public function getDBErrDetails() {
+        $dbLink = $this->getDBLink();
+        if($dbLink !== NULL){
+            $this->connErrDetails['error-code'] = $dbLink->getErrorCode();
+            $this->connErrDetails['error-message'] = $dbLink->getErrorMessage();
+        }
+        return $this->connErrDetails;
     }
     /**
      * Execute a query.

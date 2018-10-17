@@ -95,12 +95,17 @@ class Access {
     /**
      * Adds privileges to a user given privileges string.
      * @param string $str A string of privileges. The format of the string must 
-     * follow the following format: 'PRIVILEGE_1-0;PRIVILEGE_2-1;' where 
-     * 'PRIVILEGE_1' and 'PRIVILEGE_2' are names of privileges and the number 
+     * follow the following format: 'PRIVILEGE_1-0;PRIVILEGE_2-1;G-A_GROUP' where 
+     * 'PRIVILEGE_1' and 'PRIVILEGE_2' are IDs of privileges and 'A_GROUP' 
+     * is the ID of a group that the user belongs to. The number 
      * that comes after the dash is the status of the privilege. If 0, then the 
      * user will not have the given privilege. If 1, the user will have the 
-     * privilege. In the given example, The user will have only 'PRIVILEGE_2'. Each 
-     * privilege must be separated from the other by a semicolon.
+     * privilege. In the given example, The user will have only 'PRIVILEGE_2'. and 
+     * he will belong to the group that has the ID 'A_GROUP'. Each 
+     * privilege or a group must be separated from the other by a semicolon. Also 
+     * the group must have the letter 'G' at the start. Note that in the given 
+     * example, if 'PRIVILEGE_1' is in 'A_GROUP', he will not have it even if it is 
+     * in group permissions.
      * @param User $user The user which the permissions will be added to
      * @since 1.0
      */
@@ -108,15 +113,35 @@ class Access {
         if(strlen($str) > 0){
             if($user instanceof User){
                 $privilegesSplit = explode(';', $str);
+                $privilegesToHave = array();
+                $privilegesToNotHave = array();
+                $groupsBelongsTo = array();
                 foreach ($privilegesSplit as $privilegeStr){
                     $prSplit = explode('-', $privilegeStr);
                     if(count($prSplit) == 2){
-                        $pirivelegeId = $prSplit[0];
-                        $userHasPr = $prSplit[1] == '1' ? TRUE : FALSE;
-                        if($userHasPr === TRUE){
-                            $user->addPrivilege($pirivelegeId);
+                        if($prSplit[0] == 'G'){
+                            $groupsBelongsTo[] = $prSplit[1];
+                        }
+                        else{
+                            $pirivelegeId = $prSplit[0];
+                            $userHasPr = $prSplit[1] == '1' ? TRUE : FALSE;
+                            if($userHasPr === TRUE){
+                                $privilegesToHave[] = $pirivelegeId;
+                            }
+                            else{
+                                $privilegesToNotHave[] = $pirivelegeId;
+                            }
                         }
                     }
+                }
+                foreach ($groupsBelongsTo as $groupId){
+                    $user->addToGroup($groupId);
+                }
+                foreach ($privilegesToHave as $privilegeId){
+                    $user->addPrivilege($privilegeId);
+                }
+                foreach ($privilegesToNotHave as $privilegeId){
+                    $user->removePrivilege($privilegeId);
                 }
             }
         }
@@ -126,12 +151,12 @@ class Access {
      * @param User $user The user which the permissions string 
      * will be created from.
      * @return string A string of privileges. The format of the string will 
-     * follow the following format: 'PRIVILEGE_1-0;PRIVILEGE_2-1;' where 
-     * 'PRIVILEGE_1' and 'PRIVILEGE_2' are names of privileges and the number 
-     * that comes after the dash is the status of the privilege. If 0, then the 
-     * user will not have the given privilege. If 1, the user will have the 
-     * privilege. In the given example, The user will have only 'PRIVILEGE_2'. Each 
-     * privilege will be separated from the other by a semicolon.
+     * follow the following format: 'PRIVILEGE_1-1;PRIVILEGE_2-1;G-A_GROUP' where 
+     * 'PRIVILEGE_1' and 'PRIVILEGE_2' are IDs of privileges and 'A_GROUP' 
+     * is the ID of a group that the user belongs to. The number 
+     * that comes after the dash is the status of the privilege. Each 
+     * privilege or a group will be separated from the other by a semicolon. Also 
+     * the group will have the letter 'G' at the start.
      * @since 1.0
      */
     public static function createPermissionsStr($user){
@@ -143,30 +168,36 @@ class Access {
      */
     private function _createPermissionsStr($user) {
         if($user instanceof User){
-            $privileges = Access::privileges();
+            $groups = Access::groups();
             $str = '';
-            $count = count($privileges);
-            $index = 0;
-            foreach ($privileges as $pr){
-                if($user->hasPrivilege($pr->getID())){
-                    if($index + 1 == $count){
-                        $str .= $pr->getID().'-1';
-                    }
-                    else{
-                        $str .= $pr->getID().'-1;';
-                    }
+            $groupsBelongsTo = array();
+            foreach ($groups as $group){
+                if($user->inGroup($group->getID())){
+                    $groupsBelongsTo[] = $group;
+                    $str .= 'G-'.$group->getID().';';
                 }
-                else{
-                    if($index + 1 == $count){
-                        $str .= $pr->getID().'-0';
-                    }
-                    else{
-                        $str .= $pr->getID().'-0;';
-                    }
-                }
-                $index++;
             }
-            return $str;
+            $userPrivileges = $user->privileges();
+            if(count($groupsBelongsTo) != 0){
+                foreach ($userPrivileges as $privilege){
+                    $privilegeHasGroup = FALSE;
+                    foreach ($groupsBelongsTo as $group){
+                        if($group->hasPrivilege($privilege)){
+                            $privilegeHasGroup = TRUE;
+                            break;
+                        }
+                    }
+                    if(!$privilegeHasGroup){
+                        $str .= $privilege->getID().'-1;';
+                    }
+                }
+            }
+            else{
+                foreach ($userPrivileges as $privilege){
+                    $str .= $privilege->getID().'-1;';
+                }
+            }
+            return trim($str,';');
         }
         return '';
     }

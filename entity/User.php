@@ -19,7 +19,7 @@ if(!defined('ROOT_DIR')){
 /**
  * A class that represents a system user.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.7
+ * @version 1.7.1
  */
 class User implements JsonI{
     /**
@@ -128,6 +128,27 @@ class User implements JsonI{
             }
             $this->userPrivileges[] = $p;
             return TRUE;
+        }
+        return FALSE;
+    }
+    /**
+     * Removes a privilege from user privileges array given its ID.
+     * @param string $privilegeId The ID of the privilege.
+     * @return boolean If the privilege is removed, the function will 
+     * return TRUE. Other than that, the function will return FALSE.
+     * @since 1.7.1
+     */
+    public function removePrivilege($privilegeId) {
+        $p = &Access::getPrivilege($privilegeId);
+        if($p != NULL){
+            $count = count($this->userPrivileges);
+            for($x = 0 ; $x < $count ; $x++){
+                $privilege = $this->userPrivileges[$x];
+                if($privilege->getID() == $privilegeId){
+                    unset($this->userPrivileges[$x]);
+                    return TRUE;
+                }
+            }
         }
         return FALSE;
     }

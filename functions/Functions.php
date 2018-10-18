@@ -147,9 +147,17 @@ class Functions {
                     Logger::log('Connected to database using given parameters.');
                     $retVal = TRUE;
                 }
+                else{
+                    Logger::log('Unable to connect to the database.', 'warning');
+                }
                 Logger::logReturnValue($retVal);
                 Logger::logFuncReturn(__METHOD__);
                 return $retVal;
+            }
+            else{
+                Logger::log('Some or all database parameters are missing.');
+                Logger::logFuncReturn(__METHOD__);
+                return TRUE;
             }
         }
         else{
@@ -161,12 +169,17 @@ class Functions {
                     isset($optionalConnectionParams['port'])){
                 Logger::log('They are provided.');
                 $retVal = $this->_connect($optionalConnectionParams);
-                Logger::logReturnValue($retVal);
+                if($retVal === TRUE){
+                    Logger::log('Connected to database using given parameters.');
+                }
+                else{
+                    Logger::log('Unable to connect to the database.', 'warning');
+                }
                 Logger::logFuncReturn(__METHOD__);
                 return $retVal;
             }
             else{
-                Logger::log('No database connection. Trying to connect using the parameters from Config.php...');
+                Logger::log('No database connection parameters. Trying to connect using the parameters from Config.php...');
                 $conf = Config::get();
                 $retVal = $this->_connect(array(
                     'host'=>$conf->getDBHost(),
@@ -175,6 +188,12 @@ class Functions {
                     'db-name'=> $conf->getDBName(),
                     'port'=>$conf->getDBPort()
                 ));
+                if($retVal === TRUE){
+                    Logger::log('Connection to the database was established.');
+                }
+                else{
+                    Logger::log('Unable to connect to the database.', 'warning');
+                }
                 Logger::logFuncReturn(__METHOD__);
                 return $retVal;
             }
@@ -187,6 +206,7 @@ class Functions {
      * array are:
      * <ul>
      * <li><b>host</b>: Database host address.</li>
+     * <li><b>port</b>: Port number.</li>
      * <li><b>user</b>: Database username.</li>
      * <li><b>pass</b>: Database user's password.</li>
      * <li><b>db-name</b>: The name of the database.</li>
@@ -206,6 +226,7 @@ class Functions {
         if($result instanceof DatabaseLink){
             Logger::log('Connected to database.');
             $this->databaseLink = $result;
+            Logger::logFuncReturn(__METHOD__);
             return TRUE;
         }
         else{
@@ -247,9 +268,11 @@ class Functions {
      */
     public function excQ($qObj){
         Logger::logFuncCall(__METHOD__);
+        $retVal = FALSE;
         if($qObj instanceof MySQLQuery){
             if($this->useDatabase()){
                 $dbLink = &$this->getDBLink();
+                Logger::log('Query = \''.$qObj->getQuery().'\'.', 'debug');
                 Logger::log('Executing database query...');
                 $result = $dbLink->executeQuery($qObj);
                 if($result !== TRUE){
@@ -257,14 +280,23 @@ class Functions {
                     Logger::log('Error Code: '.$dbLink->getErrorCode(), 'error');
                     Logger::log('Error Message: '.$dbLink->getErrorMessage(), 'error');
                 }
-                return $result;
+                $retVal = $result;
+            }
+            else{
+                Logger::log('Unable to use database connection.', 'warning');
             }
         }
         else{
             Logger::log('The given instance is not a sub-class of \'MySQLQuery\'.', 'warning');
         }
+        if($retVal === TRUE){
+            Logger::log('Query execited.');
+        }
+        else{
+            Logger::log('Query did not execute.', 'warning');
+        }
         Logger::logFuncReturn(__METHOD__);
-        return FALSE;
+        return $retVal;
     }
     /**
      * Checks if the current session user has a privilege or not given privilege 
@@ -387,7 +419,7 @@ class Functions {
         $dbLink = $this->getDBLink();
         Logger::log('Checking if database link is not null...');
         if($dbLink !== NULL){
-            $retVal = $dbLink->getRows()[0];
+            $retVal = $dbLink->getRow();
         }
         else{
             Logger::log('Database link is NULL.', 'warning');
@@ -421,9 +453,9 @@ class Functions {
         return $retVal;
     }
     /**
-     * Returns the ID of the user who is currently logged in.
-     * @return int The ID of the user who is currently logged in. The 
-     * function will return -1 in case no user is logged in.
+     * Returns the ID of the user from session manager.
+     * @return int The ID of the user taken from session manager. The 
+     * function will return -1 in case no user is set in session manager.
      * @since 1.0
      */
     public function getUserID(){
@@ -431,12 +463,12 @@ class Functions {
         $retVal = -1;
         Logger::log('Getting user from session manager...');
         $user = &$this->getSession()->getUser();
-        Logger::log('Checking if user is null or not...');
+        Logger::log('Checking if session user is null or not...');
         if($user !== NULL){
             $retVal = intval($user->getID());
         }
         else{
-            Logger::log('The linked user is NULL.', 'warning');
+            Logger::log('Session user is NULL.', 'warning');
         }
         Logger::logReturnValue($retVal);
         Logger::logFuncReturn(__METHOD__);

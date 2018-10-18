@@ -122,7 +122,7 @@ abstract class ExtendedAPI extends API{
      * @since 1.0
      */
     public function get($dir) {
-        return $this->getTranslation()->get('api-messages/'.$dir);
+        return $this->getTranslation()->get($dir);
     }
     /**
      * Creates a sub array to define language variables.
@@ -135,7 +135,7 @@ abstract class ExtendedAPI extends API{
      * @since 1.0
      */
     public function createLangDir($dir) {
-        $this->getTranslation()->createDirectory('api-messages/'.$dir);
+        $this->getTranslation()->createDirectory($dir);
     }
     /**
      * Sets multiple language variables.
@@ -146,7 +146,7 @@ abstract class ExtendedAPI extends API{
      * @since 1.0
      */
     public function setLangVars($dir,$arr=array()) {
-        $this->getTranslation()->setMultiple('api-messages/'.$dir, $arr);
+        $this->getTranslation()->setMultiple($dir, $arr);
     }
     /**
      * Sends a response message to indicate that a database error has occur.

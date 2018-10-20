@@ -292,6 +292,15 @@ class File implements JsonI{
             throw new Exception('MIME type of raw data is not set.');
         }
     }
+    /**
+     * @deprecated since version 1.1.1 Will be removed in future.
+     * @param int $size
+     */
+    public function setSize($size){
+        if($size >= 0){
+            $this->fSize = $size;
+        }
+    }
     private function _setSize($size){
         if($size >= 0){
             $this->fSize = $size;

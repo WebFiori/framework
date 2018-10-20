@@ -44,12 +44,12 @@ class FileHandler{
     /**
      * Write new content to the file
      * @param type $content the content that will be written.
-     * @param type $incTab if true, a tab of size 4 will be added before the content.
+     * @param type $incTab if true, a tab will be added before the content.
      * @param type $incNewLine if true, the cursor will move to the next line.
      */
     public function write($content, $incTab = FALSE, $incNewLine = FALSE){
         if($incTab == TRUE && $incNewLine == TRUE){
-            fwrite($this->file, $this->getTab().$content);
+            fwrite($this->file, $this->_getTab().$content);
             $this->newLine();
         }
         else if($incTab == FALSE && $incNewLine == TRUE){
@@ -57,7 +57,7 @@ class FileHandler{
             $this->newLine();
         }
         else if($incTab == TRUE && $incNewLine == FALSE){
-            fwrite($this->file, $this->getTab().$content);
+            fwrite($this->file, $this->_getTab().$content);
         }
         else{
             fwrite($this->file, $content);
@@ -66,7 +66,7 @@ class FileHandler{
     /**
      * Open new html tag.
      * After the tag is written to the file, the tab size will be 
-     * increased by 4 and the cursor will move to the next line.
+     * increased by 1 and the cursor will move to the next line.
      * @param type $tagName the name of the tag with any additional parameters ( 
      * e.g. &lt;div class="a-class" style=""&gt;).
      */
@@ -78,7 +78,7 @@ class FileHandler{
     /**
      * Close an html tag
      * After the tag is written to the file, the tab size will be 
-     * reduced by 4 and the cursor will move to the next line.
+     * reduced by 1 and the cursor will move to the next line.
      * @param type $tagName the name of the tag with any additional parameters ( 
      * e.g. &lt;/div gt;).
      */
@@ -113,7 +113,7 @@ class FileHandler{
         fwrite($this->file, "\n");
     }
     
-    private function getTab(){
+    private function _getTab(){
         if($this->tabCount == 0){
             return '';
         }

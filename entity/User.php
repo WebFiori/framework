@@ -145,7 +145,13 @@ class User implements JsonI{
             for($x = 0 ; $x < $count ; $x++){
                 $privilege = $this->userPrivileges[$x];
                 if($privilege->getID() == $privilegeId){
-                    unset($this->userPrivileges[$x]);
+                    while ($x < $count){
+                        if(isset($this->userPrivileges[$x + 1])){
+                            $this->userPrivileges[$x] = $this->userPrivileges[$x + 1];
+                        }
+                        $x++;
+                    }
+                    unset($this->userPrivileges[$x - 1]);
                     return TRUE;
                 }
             }

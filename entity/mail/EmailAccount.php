@@ -99,8 +99,8 @@ class EmailAccount {
      * @since 1.0.1
      */
     public function __construct() {
-        $this->isSSL(FALSE);
-        $this->isTLS(FALSE);
+        //$this->isSSL(FALSE);
+        //$this->isTLS(FALSE);
     }
     /**
      * Sets the address of the email server.

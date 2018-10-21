@@ -367,15 +367,15 @@ class Uploader implements JsonI{
     /**
      * Returns MIME type of a file extension.
      * @param string $ext File extension without the suffix (such as 'jpg').
-     * @return string|NULL If the extension MIME type is found, it will be 
-     * returned. If not, the function will return NULL.
+     * @return string If the extension MIME type is found, it will be 
+     * returned. If not, the function will return 'application/octet-stream'.
      * @since 1.0
      */
-    public static function getMIMEType($ext){
+    private static function _getMIMEType($ext){
         Logger::logFuncCall(__METHOD__);
         Logger::log('$ext = \''.$ext.'\'', 'debug');
         $lowerCase = strtolower($ext);
-        $retVal = NULL;
+        $retVal = 'application/octet-stream';
         $x = self::ALLOWED_FILE_TYPES[$lowerCase];
         if($x !== NULL){
             Logger::log('MIME found.');
@@ -501,7 +501,7 @@ class Uploader implements JsonI{
                                             }
                                             else{
                                                 $ext = pathinfo($fileInfoArr['name'], PATHINFO_EXTENSION);
-                                                $fileInfoArr['mime'] = self::getMIMEType($ext);
+                                                $fileInfoArr['mime'] = self::_getMIMEType($ext);
                                             }
                                             $fileInfoArr['uploaded'] = 'true';
                                         }
@@ -515,7 +515,7 @@ class Uploader implements JsonI{
                                         }
                                         else{
                                             $ext = pathinfo($fileInfoArr['name'], PATHINFO_EXTENSION);
-                                            $fileInfoArr['mime'] = self::getMIMEType($ext);
+                                            $fileInfoArr['mime'] = self::_getMIMEType($ext);
                                         }
                                         $fileInfoArr['is-exist'] = 'true';
                                         if($replaceIfExist){
@@ -576,7 +576,7 @@ class Uploader implements JsonI{
                                         }
                                         else{
                                             $ext = pathinfo($fileInfoArr['name'], PATHINFO_EXTENSION);
-                                            $fileInfoArr['mime'] = self::getMIMEType($ext);
+                                            $fileInfoArr['mime'] = self::_getMIMEType($ext);
                                         }
                                     }
                                     else{
@@ -590,7 +590,7 @@ class Uploader implements JsonI{
                                     }
                                     else{
                                         $ext = pathinfo($fileInfoArr['name'], PATHINFO_EXTENSION);
-                                        $fileInfoArr['mime'] = self::getMIMEType($ext);
+                                        $fileInfoArr['mime'] = self::_getMIMEType($ext);
                                     }
                                     if($replaceIfExist){
                                         $fileInfoArr['is-replace'] = 'true';

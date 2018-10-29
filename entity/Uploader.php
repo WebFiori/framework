@@ -232,7 +232,7 @@ class Uploader implements JsonI{
         Logger::log('Checking length...');
         if($len > 0){
             Logger::log('Trimming forward and backward slashes...');
-            while($dir[$len] == '/' || $dir[$len] == '\\'){
+            while($dir[$len - 1] == '/' || $dir[$len - 1] == '\\'){
                 $tmpDir = trim($dir,'/');
                 $dir = trim($tmpDir,'\\');
                 $len = strlen($dir);
@@ -258,6 +258,7 @@ class Uploader implements JsonI{
         }
         Logger::logReturnValue($retVal);
         Logger::logFuncReturn(__METHOD__);
+        return $retVal;
     }
     /**
      * Returns an array which contains all information about the uploaded 

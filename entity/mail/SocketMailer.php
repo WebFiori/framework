@@ -229,7 +229,7 @@ class SocketMailer {
             Logger::log('Checking if passed parameter is an instance of \'File\'...');
             if($attachment instanceof File){
                 Logger::log('Checking file path and row data...');
-                if(file_exists($attachment->getPath()) || $attachment->getRawData() !== NULL){
+                if(file_exists($attachment->getAbsolutePath()) || file_exists(str_replace('\\', '/', $attachment->getAbsolutePath())) || $attachment->getRawData() !== NULL){
                     $this->attachments[] = $attachment;
                     Logger::log('Attachment added.');
                     Logger::logFuncReturn(__METHOD__);
@@ -534,6 +534,7 @@ class SocketMailer {
                     $importanceHeaderVal = 'normal';
                 }
                 $this->sendC('Priority: '.$priorityHeaderVal);
+                $this->sendC('Content-Transfer-Encoding: quoted-printable');
                 $this->sendC('Importance: '.$importanceHeaderVal);
                 $this->sendC('From: "'.$this->getSenderName().'" <'.$this->getSenderAddress().'>');
                 $this->sendC('To: '.$this->getTo());
@@ -572,14 +573,12 @@ class SocketMailer {
         Logger::logFuncCall(__METHOD__);
         if(count($this->attachments) != 0){
             foreach ($this->attachments as $file){
-                if(file_exists($file->getPath())){
-                    $fileSize = filesize($file->getPath());
-                    $handle = fopen($file->getPath(), 'r');
-                    $content = fread($handle, $fileSize);
-                    fclose($handle);
+                if($file->read()){
+                    $fileSize = $file->getSize();
+                    $content = $file->getRawData();
                     $contentChunk = chunk_split(base64_encode($content));
                     $this->sendC('--'.$this->boundry);
-                    $this->sendC('Content-Type: '.$file->getMIMEType().'; name="'.$file->getName().'"');
+                    $this->sendC('Content-Type: '.$file->getFileMIMEType().'; name="'.$file->getName().'"');
                     $this->sendC('Content-Transfer-Encoding: base64');
                     $this->sendC('Content-Disposition: attachment; filename="'.$file->getName().'"'.self::NL);
                     $this->sendC($contentChunk);
@@ -589,7 +588,7 @@ class SocketMailer {
                     $fileSize = strlen($content);
                     $contentChunk = chunk_split(base64_encode($content));
                     $this->sendC('--'.$this->boundry);
-                    $this->sendC('Content-Type: '.$file->getMIMEType().'; name="'.$file->getName().'"');
+                    $this->sendC('Content-Type: '.$file->getFileMIMEType().'; name="'.$file->getName().'"');
                     $this->sendC('Content-Transfer-Encoding: base64');
                     $this->sendC('Content-Disposition: attachment; filename="'.$file->getName().'"'.self::NL);
                     $this->sendC($contentChunk);

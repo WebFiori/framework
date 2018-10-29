@@ -41,7 +41,8 @@ if(!defined('ROOT_DIR')){
 }
 /**
  * A class that is used to log messages to a file.
- *
+ * It is used to help system developers to log information that can help in 
+ * finding and tracking the sources bugs.
  * @author Ibrahim <ibinshikh@hotmail.com>
  * @version 1.1.2
  */

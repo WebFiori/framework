@@ -69,7 +69,7 @@ class Cron {
      * Creates new instance of the class.
      * @since 1.0
      */
-    public function __construct() {
+    private function __construct() {
         $this->isLogEnabled = FALSE;
         $this->cronJobsQueue = new Queue();
         $this->_setPassword('');
@@ -453,14 +453,19 @@ class Cron {
      * @since 1.0
      */
     public static function createJob($when='*/5 * * * *',$function='',$funcParams=array()){
-        $job = new CronJob($when);
-        $job->setOnExecution($function, $funcParams);
-        self::scheduleJob($job);
+        try{
+            $job = new CronJob($when);
+            $job->setOnExecution($function, $funcParams);
+            return self::scheduleJob($job);
+        } 
+        catch (Exception $ex) {
+            return FALSE;
+        }
     }
     /**
      * Adds a daily job to execute every day at specific hour and minute.
      * @param string $time [Optional] A time in the form 'hh:mm'. hh can have any value 
-     * between 0 and 23 inclusive. mm can have any value btween 0 and 59 inclusive. 
+     * between 0 and 23 inclusive. mm can have any value between 0 and 59 inclusive. 
      * default is '00:00'.
      * @param function $func A function that will be executed once it is the 
      * time to run the job.
@@ -474,8 +479,9 @@ class Cron {
             $job = new CronJob();
             $job->dailyAt($split[0], $split[1]);
             $job->setOnExecution($func, $funcParams);
-            self::scheduleJob($job);
+            return self::scheduleJob($job);
         }
+        return FALSE;
     }
     /**
      * Adds a job that will be executed on specific time weekly.
@@ -494,8 +500,9 @@ class Cron {
             $job = new CronJob();
             $job->weeklyOn($split1[0], $split1[1]);
             $job->setOnExecution($func, $funcParams);
-            self::scheduleJob($job);
+            return self::scheduleJob($job);
         }
+        return FALSE;
     }
     /**
      * Sets or gets the password that is used to protect the cron instance.
@@ -550,7 +557,7 @@ class Cron {
      * @return Queue
      * @since 1.0
      */
-    public function _getQueue() {
+    private function _getQueue() {
         return $this->cronJobsQueue;
     }
     /**

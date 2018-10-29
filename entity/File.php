@@ -133,7 +133,25 @@ class File implements JsonI{
      * @since 1.0
      */
     public function setPath($path){
-        $this->path = $path;
+        $retVal = FALSE;
+        $len = strlen($path);
+        if($len > 0){
+            while($path[$len - 1] == '/' || $path[$len - 1] == '\\'){
+                $tmpDir = trim($path,'/');
+                $path = trim($tmpDir,'\\');
+                $len = strlen($path);
+            }
+            while($path[0] == '/' || $path[0] == '\\'){
+                $tmpDir = trim($path,'/');
+                $path = trim($tmpDir,'\\');
+            }
+            if(strlen($path) > 0){
+                $path = str_replace('/', '\\', $path);
+                $this->path = !Util::isDirectory($path) ? '\\'.$path : $path;
+                $retVal = TRUE;
+            }
+        }
+        return $retVal;
     }
     /**
      * Returns the full path to the file.
@@ -188,26 +206,40 @@ class File implements JsonI{
     public function read() {
         $path = $this->getAbsolutePath();
         if($path != ''){
-            if(file_exists($path)){
-                $this->_setSize(filesize($path));
-                set_error_handler(function(){});
-                $h = fopen($path, 'rb');
-                if(is_resource($h)){
-                    $this->rawData = fread($h, $this->getSize());
-                    fclose($h);
-                    $ext = pathinfo($this->getName(), PATHINFO_EXTENSION);
-                    $mime = self::getMIMEType($ext);
-                    $mimeSet = $mime === NULL ? 'application/octet-stream' : $mime;
-                    $this->setMIMEType($mimeSet);
-                    restore_error_handler();
-                    return TRUE;
+            if(!$this->_readHelper($path)){
+                $path = str_replace('\\', '/', $this->getAbsolutePath());
+                if(!$this->_readHelper($path)){
+                    throw new Exception('File not found: \''.$path.'\'.');
                 }
-                restore_error_handler();
-                throw new Exception('Unable to open the file \''.$path.'\'.');
+                else{
+                    return;
+                }
             }
-            throw new Exception('File not found: \''.$path.'\'.');
+            else{
+                return;
+            }
         }
         throw new Exception('File absolute path is invalid.');
+    }
+    private function _readHelper($path){
+        if(file_exists($path)){
+            $this->_setSize(filesize($path));
+            set_error_handler(function(){});
+            $h = fopen($path, 'rb');
+            if(is_resource($h)){
+                $this->rawData = fread($h, $this->getSize());
+                fclose($h);
+                $ext = pathinfo($this->getName(), PATHINFO_EXTENSION);
+                $mime = self::getMIMEType($ext);
+                $mimeSet = $mime === NULL ? 'application/octet-stream' : $mime;
+                $this->setMIMEType($mimeSet);
+                restore_error_handler();
+                return TRUE;
+            }
+            restore_error_handler();
+            throw new Exception('Unable to open the file \''.$path.'\'.');
+        }
+        return FALSE;
     }
     /**
      * Write raw binary data into a file.

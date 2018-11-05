@@ -1,9 +1,9 @@
 <?php
 /**
- * An interface for any object that can be represented in JSON notation. The class 
- * follows the specifications found at https://www.json.org/index.html.
+ * A helper class for creating JSON strings. 
+ * The class follows the specifications found at https://www.json.org/index.html.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @since 1.2
+ * @version 1.2
  */
 class JsonX {
     /**
@@ -40,7 +40,9 @@ class JsonX {
      */
     private $attributes = array();
     /**
-     * Adds a new value to the JSON string.
+     * Adds or updates a value.
+     * If a value at the given key is set, the function will update it. Other 
+     * than that, it will create new attribute in the JSON string. 
      * @param string $key The value of the key.
      * @param mixed $value The value of the key. It can be an integer, a double, 
      * a string, an array or an object. If <b>NULL</b> is given, the method will 
@@ -92,7 +94,7 @@ class JsonX {
     /**
      * Adds an object to the JSON string.
      * @param string $key The key value.
-     * @param JsonI|Object $val The object that will be added.
+     * @param JsonI|Object|JSonX $val The object that will be added.
      * @return boolean <p>TRUE</b> if the object is added. If the given 
      * value is an object that does not implement the interface <b>JsonI</b>, 
      * The function will try to extract object information based on its public 
@@ -147,7 +149,7 @@ class JsonX {
     /**
      * Returns a string that represents the value at the given key.
      * @param string $key The value of the key.
-     * @return string | NULL The function will return a string that 
+     * @return string|NULL The function will return a string that 
      * represents the value. If the key does not exists,  the function will 
      * return <b>NULL</b>.
      * @since 1.2
@@ -159,8 +161,8 @@ class JsonX {
         return NULL;
     }
     /**
-     * Returns the data on the object as a JSON string.
-     * @return string
+     * Generates a JSON string using added attributes and return it.
+     * @return string A well-formatted JSON string.
      */
     public function __toString() {
         $retVal = '{';
@@ -179,7 +181,7 @@ class JsonX {
         return $retVal;
     }
     /**
-     * Adds a number to the JSON data.
+     * Adds a number.
      * @param string $key The name of the key.
      * @param int|double $value The value of the key. Note that if the given 
      * number is <b>INF</b> or <b>NAN</b>, The method will add them as a string.
@@ -225,12 +227,12 @@ class JsonX {
         return 'INV';
     }
     /**
-     * Adds a boolean value (true or false) to the JSON data.
+     * Adds a boolean value (true or false).
      * @param string $key The name of the key.
      * @param boolean $val [Optional] <b>TRUE</b> or <b>FALSE</b>. If not specified, 
      * The default will be <b>TRUE</b>.
      * @return boolean <b>TRUE</b> in case the value is set. If the given 
-     * value is not a boolean or the key value is invalid string, the method 
+     * value is not a boolean or the key value is invalid string, the function 
      * will return <b>FALSE</b>.
      * @since 1.0
      */
@@ -249,7 +251,7 @@ class JsonX {
         return FALSE;
     }
     /**
-     * Adds an array to the JSON.
+     * Adds an array.
      * @param string $key The name of the key.
      * @param array $value The array that will be added. If the given array 
      * is indexed array, all values will be added as single entity (e.g. [1, 2, 3]). 
@@ -509,9 +511,9 @@ class JsonX {
     }
     /**
     * Escape JSON special characters from string.
-    * @param string $string A value of one of JSON object properties. If it is 
+    * @param string $string A string to escape special JSON characters from. If it is 
     * null,the method will return empty string.
-    * @return string An escaped version of the string.
+    * @return string A string which has JSON special characters escaped.
     * @since 1.0
     */
    public static function escapeJSONSpecialChars($string){

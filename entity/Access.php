@@ -44,7 +44,7 @@ if(!defined('ROOT_DIR')){
  * A class to manage user groups and privileges.
  *
  * @author Ibrahim
- * @version 1.0
+ * @version 1.0.1
  */
 class Access {
     /**
@@ -148,15 +148,18 @@ class Access {
     }
     /**
      * Creates a string of permissions given a user.
-     * @param User $user The user which the permissions string 
-     * will be created from.
-     * @return string A string of privileges. The format of the string will 
-     * follow the following format: 'PRIVILEGE_1-1;PRIVILEGE_2-1;G-A_GROUP' where 
-     * 'PRIVILEGE_1' and 'PRIVILEGE_2' are IDs of privileges and 'A_GROUP' 
-     * is the ID of a group that the user belongs to. The number 
-     * that comes after the dash is the status of the privilege. Each 
-     * privilege or a group will be separated from the other by a semicolon. Also 
-     * the group will have the letter 'G' at the start.
+     * This function can be handy in case the developer would like to store 
+     * user privileges in a database. The function might return a string which 
+     * might looks like the following string:
+     * <p>'PRIVILEGE_1-1;PRIVILEGE_2-1;G-A_GROUP'</p>  
+     * where 'PRIVILEGE_1' and 'PRIVILEGE_2' are IDs of privileges and 
+     * 'A_GROUP' is the ID of a group that the user belongs to. The number 
+     * that comes after the dash is the status of the privilege. Each privilege 
+     * or a group will be separated from the other by a semicolon. 
+     * Also the group will have the letter 'G' at the start.
+     * @param User $user The user which the permissions string will be created from.
+     * @return string A string of user privileges and the groups that he belongs to 
+     * (if any).
      * @since 1.0
      */
     public static function createPermissionsStr($user){
@@ -229,7 +232,7 @@ class Access {
      * given ID is created. FALSE if not.
      * @since 1.0
      */
-    public function addGroup($groupId) {
+    private function addGroup($groupId) {
         foreach ($this->userGroups as $group){
             if($groupId == $group->getID()){
                 return FALSE;
@@ -242,7 +245,8 @@ class Access {
         return FALSE;
     }
     /**
-     * Returns an array which contains all user groups.
+     * Returns an array which contains all user groups. 
+     * The array will be empty if no user groups has been created.
      * @return array An array that contains an objects of type UsersGroup.
      * @since 1.0
      */
@@ -274,7 +278,11 @@ class Access {
         return $g;
     }
     /**
-     * Returns a privilege object given its ID.
+     * Returns a privilege object given privilege ID. 
+     * This function will search all created groups for a privilege which has the 
+     * given ID. If not found, the function will return NULL. This function also 
+     * can be used to check if a privilege is exist or not. If the function 
+     * has returned NULL, this means the privilege does not exist.
      * @param string $id The ID of the privilege.
      * @return Privilege|NULL If a privilege with the given ID was found in 
      * any user group, It will be returned. If not, the function will return 
@@ -302,7 +310,9 @@ class Access {
         return $p;
     }
     /**
-     * Checks if a privilege does exist or not given its ID.
+     * Checks if a privilege does exist or not given its ID. 
+     * The function will search all created groups for a privilege with the 
+     * given ID.
      * @param string $id The ID of the privilege.
      * @return boolean The function will return TRUE if a privilege 
      * with the given ID was found. FALSE if not.
@@ -333,8 +343,10 @@ class Access {
         return Access::get()->_hasGroup($groupId);
     }
     /**
-     * Returns a UsersGroup object given its ID.
-     * @param string $groupId The ID of the users group.
+     * Returns a UsersGroup object given its ID. 
+     * This function can be used to check if a group is exist or not. If 
+     * the function has returned NULL, this means the group does not exist.
+     * @param string $groupId The ID of the group.
      * @return UsersGroup|NULL If a users group with the given ID was found, 
      * It will be returned. If not, the function will return NULL.
      * @since 1.0
@@ -359,25 +371,34 @@ class Access {
     }
     /**
      * Creates new users group using specific ID.
+     * The group is the base for user privileges. After creating it, the developer 
+     * can add a set of privileges to the group. Note that the group will not created 
+     * only if the name of the group contains invalid characters or it is already 
+     * created.
      * @param string $groupId The ID of the group. The ID must not contain 
-     * any of the following characters, ';','-' or a space.
+     * any of the following characters: ';','-' or a space. If the name contains 
+     * any of the given characters, the group will not created.
+     * @return boolean If the group is created, the function will return TRUE. 
+     * If not, the function will return FALSE.
      * @since 1.0
      */
     public static function newGroup($groupId) {
-        Access::get()->_createGroup($groupId);
+        return Access::get()->_createGroup($groupId);
     }
     
     private function _createGroup($groupId){
         if($this->_validateId($groupId)){
             foreach ($this->userGroups as $g){
                 if($g->getID() == $groupId){
-                    return;
+                    return FALSE;
                 }
             }
             $group = new UsersGroup();
             $group->setID($groupId);
             $this->userGroups[] = $group;
+            return TRUE;
         }
+        return FALSE;
     }
     
     private function _validateId($id){
@@ -397,15 +418,39 @@ class Access {
      * added to. It must be a group in the groups array of the access class.
      * @param string $privilegeId The ID of the privilege. The ID must not contain 
      * any of the following characters, ';','-' or a space.
+     * @return boolean If the privilege was created, the function will return 
+     * TRUE. Other than that, the function will return FALSE.
      * @since 1.0
      */
     public static function newPrivilege($groupId,$privilegeId){
-        Access::get()->_createPrivilege($groupId, $privilegeId);
+        return Access::get()->_createPrivilege($groupId, $privilegeId);
+    }
+    /**
+     * Creates multiple privileges in a group given its ID. 
+     * This function can be used as a shorthand to create multiple privileges in 
+     * a group instead of calling Access::newPrivilege() multiple times.
+     * @param string $groupId The ID of the group. The group must be created 
+     * before starting to create privileges in it.
+     * @param array $prNamesArr An array that contains the names of privileges.
+     * @return array The function will return an array of boolean values. 
+     * each boolean corresponds to the status of each privilege in the array of 
+     * privileges. If the privilege is added, the value will be TRUE. If not, 
+     * it will be FALSE.
+     * @since 1.0.1 
+     */
+    public static function newPrivileges($groupId,$prNamesArr) {
+        $retVal = array();
+        $count = count($prNamesArr);
+        for($x = 0 ; $x < $count ; $x++){
+            $retVal[] = self::newPrivilege($groupId, $prNamesArr[$x]);
+        }
+        return $retVal;
     }
     /**
      * 
      * @param type $groupId
      * @param type $privilegeId
+     * @return boolean Description
      * @since 1.0
      */
     private function _createPrivilege($groupId,$privilegeId){
@@ -415,9 +460,10 @@ class Access {
                 $p = new Privilege();
                 $p->setID($privilegeId);
                 if(!$g->hasPrivilege($p)){
-                    $this->_getGroup($groupId)->addPrivilage($p);
+                    return $this->_getGroup($groupId)->addPrivilage($p);
                 }
             }
         }
+        return FALSE;
     }
 }

@@ -24,9 +24,14 @@
  */
 /**
  * A class that is used to manage cron jobs.
- *
+ * It is used to create jobs, schedule them and execute them. In order to run 
+ * the jobs automatically, the developer must add an entry in the following 
+ * formate in crontab:
+ * <p>* * * * *  /usr/bin/curl {BASE_URL}/cron-jobs/execute/{password}</p>
+ * Where {BASE_URL} is the web site's base URL and {password} is the password 
+ * that was set by the developer to protect the jobs from unauthorized access.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.0
+ * @version 1.0.1
  */
 class Cron {
     /**
@@ -69,7 +74,7 @@ class Cron {
      * Creates new instance of the class.
      * @since 1.0
      */
-    public function __construct() {
+    private function __construct() {
         $this->isLogEnabled = FALSE;
         $this->cronJobsQueue = new Queue();
         $this->_setPassword('');
@@ -431,9 +436,11 @@ class Cron {
         return $this->isLogEnabled;
     }
     /**
-     * Enable or disable logging for jobs execution.
-     * @param boolean $bool If set to TRUE, a log file that contains the details 
-     * of the executed jobs will be created in 'logs' folder.
+     * Enable or disable logging for jobs execution. 
+     * This function is also used to check if logging is enabled or not.
+     * @param boolean $bool [Optional] If set to TRUE, a log file that contains the details 
+     * of the executed jobs will be created in 'logs' folder. Default value 
+     * is NULL.
      * @return boolean If logging is enabled, the function will return TRUE.
      * @since 1.0.1
      */
@@ -444,28 +451,41 @@ class Cron {
         return self::_get()->_isLogEnabled();
     }
     /**
-     * Creates new cron job.
-     * @param string $when A cron expression.
-     * @param function $function A function to run when it is the time to execute 
+     * Creates new job using cron expression.
+     * The job will be created and scheduled only if the given cron expression 
+     * is valid. For more information on cron expressions, go to 
+     * https://en.wikipedia.org/wiki/Cron#CRON_expression. Note that 
+     * the function does not support year field. This means 
+     * the expression will have only 5 fields.
+     * @param string $when A cron expression. 
+     * @param callable $function A function to run when it is the time to execute 
      * the job.
      * @param array $funcParams An array of parameters that can be passed to the 
      * function. 
+     * @return boolean If the job was created and scheduled, the function will 
+     * return TRUE. Other than that, the function will return FALSE.
      * @since 1.0
      */
     public static function createJob($when='*/5 * * * *',$function='',$funcParams=array()){
-        $job = new CronJob($when);
-        $job->setOnExecution($function, $funcParams);
-        self::scheduleJob($job);
+        try{
+            $job = new CronJob($when);
+            $job->setOnExecution($function, $funcParams);
+            return self::scheduleJob($job);
+        } 
+        catch (Exception $ex) {
+            return FALSE;
+        }
     }
     /**
-     * Adds a daily job to execute every day at specific hour and minute.
-     * @param string $time [Optional] A time in the form 'hh:mm'. hh can have any value 
-     * between 0 and 23 inclusive. mm can have any value btween 0 and 59 inclusive. 
-     * default is '00:00'.
-     * @param function $func A function that will be executed once it is the 
+     * Creates a daily job to execute every day at specific hour and minute.
+     * @param string $time A time in the form 'hh:mm'. hh can have any value 
+     * between 0 and 23 inclusive. mm can have any value between 0 and 59 inclusive.
+     * @param callable $func A function that will be executed once it is the 
      * time to run the job.
      * @param array $funcParams An array of parameters which will be passed to 
      * the function.
+     * @return boolean If the job was created and scheduled, the function will 
+     * return TRUE. Other than that, the function will return FALSE.
      * @since 1.0
      */
     public static function dailyJob($time,$func,$funcParams=array()){
@@ -474,18 +494,23 @@ class Cron {
             $job = new CronJob();
             $job->dailyAt($split[0], $split[1]);
             $job->setOnExecution($func, $funcParams);
-            self::scheduleJob($job);
+            return self::scheduleJob($job);
         }
+        return FALSE;
     }
     /**
-     * Adds a job that will be executed on specific time weekly.
+     * Creates a job that will be executed on specific time weekly.
      * @param string $time A string in the format 'd-hh:mm'. 'd' can be a number 
-     * between 0 and 7 inclusive or a 3 characters day name. hh can have any value 
-     * between 0 and 23 inclusive. mm can have any value between 0 and 59 inclusive.
+     * between 0 and 6 inclusive or a 3 characters day name such as 'sun'. 0 is 
+     * for Sunday and 6 is for Saturday.
+     * 'hh' can have any value between 0 and 23 inclusive. mm can have any value 
+     * between 0 and 59 inclusive.
      * @param function $func A function that will be executed once it is the 
      * time to run the job.
      * @param array $funcParams An array of parameters which will be passed to 
      * the function.
+     * @return boolean If the job was created and scheduled, the function will 
+     * return TRUE. Other than that, the function will return FALSE.
      * @since 1.0
      */
     public static function weeklyJob($time,$func,$funcParams=array()){
@@ -494,15 +519,17 @@ class Cron {
             $job = new CronJob();
             $job->weeklyOn($split1[0], $split1[1]);
             $job->setOnExecution($func, $funcParams);
-            self::scheduleJob($job);
+            return self::scheduleJob($job);
         }
+        return FALSE;
     }
     /**
      * Sets or gets the password that is used to protect the cron instance.
+     * The password is used to prevent unauthorized access to execute jobs.
      * @param string $pass If not NULL, the password will be updated to the 
      * given one.
-     * @return string|NULL If the password is set, the function will return it. 
-     * If not set, the function will return NULL.
+     * @return string If the password is set, the function will return it. 
+     * If not set, the function will return the string 'NO_PASSWORD'.
      * @since 1.0
      */
     public static function password($pass=null) {
@@ -513,7 +540,7 @@ class Cron {
     }
     /**
      * Returns a queue of all queued jobs.
-     * @return Queue An instance of the class 'Queue'.
+     * @return Queue An object of type 'Queue' which contains all queued jobs.
      * @since 1.0
      */
     public static function jobsQueue(){
@@ -521,7 +548,7 @@ class Cron {
     }
 
     /**
-     * Adds new cron job.
+     * Adds new job to jobs queue.
      * @param CronJob $job An instance of the class 'CronJob'.
      * @return boolean If the job is added, the function will return TRUE.
      * @since 1.0
@@ -550,7 +577,7 @@ class Cron {
      * @return Queue
      * @since 1.0
      */
-    public function _getQueue() {
+    private function _getQueue() {
         return $this->cronJobsQueue;
     }
     /**

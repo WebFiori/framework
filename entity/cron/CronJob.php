@@ -140,8 +140,10 @@ class CronJob {
         Logger::logFuncReturn(__METHOD__);
     }
     /**
-     * Sets an optional name for the job. Used in case of forcing the execution 
-     * of specific job.
+     * Sets an optional name for the job.
+     * The name is used to make different jobs unique. Each job must 
+     * have its own name. Also, the name of the job is used to force job 
+     * execution. It can be supplied as a part of cron URL. 
      * @param string $name The name of the job.
      * @since 1.0
      */
@@ -160,7 +162,10 @@ class CronJob {
     }
     /**
      * Returns the name of the job.
-     * @return The name of the job. If no name is set, the function will return 
+     * The name is used to make different jobs unique. Each job must 
+     * have its own name. Also, the name of the job is used to force job 
+     * execution. It can be supplied as a part of cron URL. 
+     * @return string The name of the job. If no name is set, the function will return 
      * 'CRON-JOB'.
      * @since 1.0
      */
@@ -168,13 +173,18 @@ class CronJob {
         return $this->jobName;
     }
     /**
-     * Schedules a cron job to run every day at specific hour and minute.
+     * Schedules a cron job to run daily at specific hour and minute.
+     * The job will be executed every day at the given hour and minute. The 
+     * function uses 24 hours mode. If no parameters are given, 
+     * The default time is 00:00 which means that the job will be executed 
+     * daily at midnight.
      * @param int $hour [Optional] A number between 0 and 23 inclusive. 0 Means daily at 
      * 12:00 AM and 23 means at 11:00 PM. Default is 0.
      * @param int $minute [Optional] A number between 0 and 59 inclusive. Represents the 
      * minute part of an hour. Default is 0.
      * @return boolean If job time is set, the function will return TRUE. If 
-     * not set, the function will return FALSE.
+     * not set, the function will return FALSE. It will not set only if the 
+     * given time is not correct.
      * @since 1.0
      */
     public function dailyAt($hour=0,$minute=0){
@@ -199,6 +209,8 @@ class CronJob {
      * @param string $time [Optional] A time in the form 'hh:mm'. hh can have any value 
      * between 0 and 23 inclusive. mm can have any value between 0 and 59 inclusive. 
      * default is '00:00'.
+     * @return boolean If the time for the cron job is set, the function will 
+     * return TRUE. If not, it will return FALSE.
      * @since 1.0
      */
     public function weeklyOn($dayNameOrNum=0,$time='00:00'){
@@ -222,6 +234,8 @@ class CronJob {
      * @param string $time [Optional] A time in the form 'hh:mm'. hh can have any value 
      * between 0 and 23 inclusive. mm can have any value btween 0 and 59 inclusive. 
      * default is '00:00'.
+     * @return boolean If the time for the cron job is set, the function will 
+     * return TRUE. If not, it will return FALSE.
      * @since 1.0
      */
     public function onMonth($monthNameOrNum='jan',$dayNum=1,$time='00:00'){
@@ -250,7 +264,7 @@ class CronJob {
      * Schedules a cron job to run every month on specific day and time.
      * @param int $dayNum The number of the day. It can be any value between 
      * 1 and 31 inclusive.
-     * @param string $time A day time string in the form 'hh:mm'.
+     * @param string $time A day time string in the form 'hh:mm' in 24 hours mode.
      * @return boolean If the time for the cron job is set, the function will 
      * return TRUE. If not, it will return FALSE.
      * @since 1.0.1
@@ -281,7 +295,12 @@ class CronJob {
     }
     /**
      * Schedules a job using specific cron expression.
-     * @param string $when A cron expression (such as '8 15 * * 1')
+     * For more information on cron expressions, go to 
+     * https://en.wikipedia.org/wiki/Cron#CRON_expression. Note that 
+     * the function does not support year field. This means 
+     * the expression will have only 5 fields.
+     * @param string $when A cron expression (such as '8 15 * * 1'). Default 
+     * is '* * * * *' which means run the job every minute.
      * @return boolean If the given cron expression is valid, the function will 
      * set the time of cron job as specified by the expression and return 
      * TRUE. If the expression is invalid, the function will return FALSE.
@@ -1116,7 +1135,7 @@ class CronJob {
     }
     /**
      * Sets the event that will be fired in case it is time to execute the job.
-     * @param function $func The function that will be executed if it is the 
+     * @param callable $func The function that will be executed if it is the 
      * time to execute the job.
      * @param array $funcParams An array which can hold some parameters that 
      * can be passed to the function.
@@ -1137,9 +1156,17 @@ class CronJob {
         Logger::logFuncReturn(__METHOD__);
     }
     /**
-     * Execute the event which should happen when it is time to run the job.
+     * Execute the event which should run when it is time to execute the job. 
+     * This function will be called automatically when cron URL is accessed. The 
+     * function will check if it is time to execute the associated event or 
+     * not. If it is the time, The event will be executed. If 
+     * the job is forced to execute, the event that is associated with the 
+     * job will be executed even if it is not the time to execute the job.
      * @param boolean $force [Optional] If set to TRUE, the job will be forced to execute 
      * even if it is not job time. Default is FALSE.
+     * @return boolean If the event that is associated with the job is executed, 
+     * the function will return TRUE. If it is not executed, the function 
+     * will return FALSE.
      * @since 1.0
      */
     public function execute($force=false){

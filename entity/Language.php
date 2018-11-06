@@ -119,7 +119,7 @@ class Language {
     }
     /**
      * Unload translation based on its language code.
-     * @param string $langCode  two digits language code (such as 'ar').
+     * @param string $langCode A two digits language code (such as 'ar').
      * @since 1.2 
      */
     public static function unloadTranslation($langCode){
@@ -151,7 +151,7 @@ class Language {
         }
     }
     /**
-     * Checks if the language is added to the set of loaded languages.
+     * Checks if the language is added to the set of loaded languages or not.
      * @return boolean The function will return TRUE if the language is added to 
      * the set of loaded languages.
      * @since 1.2
@@ -160,7 +160,7 @@ class Language {
         return $this->loadLang;
     }
     /**
-     * Sets the language code.
+     * Sets the code of the language.
      * @param string $code Language code (such as 'AR').
      * @return boolean The function will return TRUE if the language 
      * code is set. If not set, the function will return FALSE.
@@ -182,7 +182,7 @@ class Language {
         return FALSE;
     }
     /**
-     * Returns the language code.
+     * Returns the language code that the object represents.
      * @return string Language code in upper case (such as 'AR'). If language 
      * code is not set, default is returned which is 'XX'.
      * @since 1.1
@@ -235,7 +235,7 @@ class Language {
      * @param string $dir A string that looks like a 
      * directory. 
      * @param array $arr An associative array. The key will act as the variable 
-     * and the value of the key will act as the variable value.
+     * name and the value of the key will act as the variable value.
      * @since 1.0
      */
     public function setMultiple($dir,$arr=array()) {
@@ -360,8 +360,8 @@ class Language {
         return $this->languageVars['dir'];
     }
     /**
-     * Returns an associative array that contains language definition.
-     * @return array An associative array that contains language definition.
+     * Returns an associative array that contains language variables definition.
+     * @return array An associative array that contains language variables definition. 
      * @since 1.0
      */
     public function getLanguageVars() {

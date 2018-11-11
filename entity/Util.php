@@ -19,7 +19,7 @@ if(!defined('ROOT_DIR')){
 /**
  * PHP utility class.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.3.5
+ * @version 1.3.6
  */
 class Util{
     /**
@@ -178,7 +178,7 @@ class Util{
         return $ip;
     }
     /**
-     * Test a connection to system databas or external one.
+     * Test a connection to system database or external one.
      * @param array $dbAttrs [Optional] An associative array. The array can 
      * have 4 indices:
      * <ul>
@@ -289,15 +289,16 @@ class Util{
     /**
      * Returns the number of a day in the week given a date.
      * @param string $date A date string that has the month, the date and 
-     * year number.
-     * @param $format The format of the given date. The default value is 
-     * 'YYYY-MM-DD'.
-     * @return int|boolean A number between 0 and 6 inclusive. 0 is for Sunday and 
-     * 6 is for Saturday. If the function fails, it will return FALSE.
+     * year number. The string must be provided in the format 'YYYY-MM-DD'.
+     * @return int|boolean ISO-8601 numeric representation of the day that 
+     * represents the given date in the week. 1 for Monday and 7 for Sunday. 
+     * If the function fails, it will return FALSE.
+     * @since 1.3.4
      */
-    public static function getGWeekday($date,$format='YYYY-MM-DD') {
+    public static function getGWeekday($date) {
+        $format='YYYY-MM-DD';
         if($format == 'YYYY-MM-DD'){
-            return date('w', strtotime($date));
+            return date('w', strtotime($date)) + 1;
         }
         else{
             $split = explode('-', $format);
@@ -306,17 +307,16 @@ class Util{
                 //$yearIndex = array_
             }
         }
+        return FALSE;
     }
     /**
-     * Returns an array that contains the dates of current week's days in 
-     * Gregorian calendar.
-     * @return array an array that contains the dates of current week's days. 
-     * The default format of the dates will be 'Y-m-d'.
+     * Returns an array that contains the dates of current week's days in Gregorian calendar.
+     * The returned array will contain the dates starting from Sunday. The format 
+     * of the dates will be 'Y-m-d'.
+     * @return array an array that contains the dates of current week's days.
+     * @since 1.3.4
      */
     public static function getGWeekDates(){
-        $dayFormatters = array('d'=>'01','j'=>'1');
-        $monthFormatters = array('F'=>'January','m'=>'01','M'=>'Jan','n'=>'1');
-        $yearFormatters = array('y'=>'99','Y'=>'1999');
         $datesArr = array();
         $startDay = '';
         $startYear = '';
@@ -324,34 +324,34 @@ class Util{
         
         $todayNumberInMonth = intval(date('d'));
         
-        $weekStartDay = 7;
-        $todayNumberInWeek = date('N');
-        
+        $weekStartDayNum = 7;
+        $todayNumberInWeek = date('N') ;//== $weekStartDayNum ? $weekStartDayNum : date('N') + (7 - $weekStartDayNum);
         $thisMonth = intval(date('m'));
         $thisYear = date('Y');
         
         $daysInMonth = cal_days_in_month(CAL_GREGORIAN,$thisMonth,$thisYear);
         
-        if($todayNumberInWeek == $weekStartDay){
-            $startDay = $todayNumberInMonth < 10 ? '0'.$todayNumberInMonth : $todayNumberInMonth;
-            $startYear = $thisYear;
-            $startMonth = $thisMonth < 10 ? '0'.$thisMonth : $thisMonth;
+        if($todayNumberInWeek >= $weekStartDayNum){
+            $acctuallDayNumberInWeek = $todayNumberInWeek - $weekStartDayNum;
         }
         else{
-            //same week but in the middle
-            $backInTime = $todayNumberInMonth - $todayNumberInWeek;
-            if($backInTime > 0){
-                $startDay =  $backInTime < 10 ? '0'.$backInTime : $backInTime;
-                $startMonth = $thisMonth < 10 ? '0'.$thisMonth : $thisMonth;
-                $startYear = $thisYear;
-            }
-            else{
-                $prevMonthNum = $thisMonth - 1 != 0 ? $thisMonth - 1 : 12;
-                $startMonth = $prevMonthNum < 10 ? '0'.$prevMonthNum : $prevMonthNum;
-                $startYear = $prevMonthNum == 12 ? $thisYear - 1 : $thisYear;
-                $daysInMonth = cal_days_in_month(CAL_GREGORIAN,$prevMonthNum,$startYear);
-                $startDay = $daysInMonth - (-1)*$backInTime;
-            }
+            $acctuallDayNumberInWeek = 7 - $startDay + $todayNumberInWeek;
+        }
+        $backInTime = $todayNumberInMonth - $acctuallDayNumberInWeek;
+        if($backInTime > 0){
+            //we are ok.
+            //in the same month.
+            $startDay = $backInTime;
+            $startMonth = $thisMonth < 10 ? '0'.$thisMonth : $thisMonth;
+            $startYear = $thisYear;
+        }
+        else{
+            //we need to go back to prevuse month. 
+            $prevMonthNum = $thisMonth - 1 != 0 ? $thisMonth - 1 : 12;
+            $startMonth = $prevMonthNum < 10 ? '0'.$prevMonthNum : $prevMonthNum;
+            $startYear = $prevMonthNum == 12 ? $thisYear - 1 : $thisYear;
+            $daysInMonth = cal_days_in_month(CAL_GREGORIAN,$prevMonthNum,$startYear);
+            $startDay = $daysInMonth - (-1)*$backInTime;
         }
         for($x = 0 ; $x < 7 ; $x++){
             if($startDay > $daysInMonth){
@@ -362,7 +362,7 @@ class Util{
                 $startYear = $startMonth == 1 ? $startYear + 1 : $startYear;
             }
             $startDay = $startDay < 10 ? '0'.$startDay : $startDay;
-            $datesArr[] = $startYear.'-'.$startDay.'-'.$startMonth;
+            $datesArr[] = $startYear.'-'.$startMonth.'-'.$startDay;
             $startDay += 1;
         }
         return $datesArr;
@@ -370,6 +370,7 @@ class Util{
     /**
      * Call the function 'print_r' and insert 'pre' around it.
      * @param mixed $expr
+     * @since 1.0
      */
     public static function print_r($expr){
         $expr = str_replace('<', '&lt;', $expr);
@@ -415,6 +416,7 @@ class Util{
      * JavaScript or PHP.
      * @param string $input
      * @return string
+     * @since 0.2
      */
     public static function filterScripts($input){
         $retVal = str_replace('<script>', '&lt;script&gt;', $input);

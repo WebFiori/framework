@@ -135,11 +135,6 @@ class SocketMailer {
      */
     private $subject;
     /**
-     * An array that contains server messages.
-     * @var array 
-     */
-    private $log;
-    /**
      * If set to true, this means user is in message body writing mode.
      * @var boolean 
      */
@@ -340,7 +335,7 @@ class SocketMailer {
                 //a command to check if authentication is done
                 $this->sendC('MAIL FROM: <'.$this->getSenderAddress().'>');
 
-                if($this->getLastLogMessage() == '235 Authentication succeeded'){
+                if($this->getLastLogMessage() == '235 Authentication succeeded' || $this->getLastLogMessage() == '250 OK'){
                     Logger::log('Logged in. Valid credentials.');
                     $this->isLoggedIn = TRUE;
                 }
@@ -788,6 +783,9 @@ class SocketMailer {
             set_error_handler(NULL);
             if(is_resource($this->conn)){
                 Logger::log('Connected.');
+                Logger::log('Reading server response...');
+                $response = $this->read();
+                Logger::log('Server response: \''.$response.'\'');
                 Logger::log('Sending the command \'EHLO\'.');
                 if($this->sendC('EHLO '.$this->host)){
                     $retVal = TRUE;

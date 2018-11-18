@@ -86,7 +86,7 @@ class EmaiMessage {
                 else if($this->socketMailer == BasicMailFunctions::INV_HOST_OR_PORT){
                     Logger::log('Unable to connect to the email server. Incorrect port or server address. An exception is thrown.', 'error');
                     Logger::requestCompleted();
-                    throw new Exception('The account "'.$sendAccountName.'" has inalid host or port number.');
+                    throw new Exception('The account "'.$sendAccountName.'" has inalid host or port number. Port: '.$acc->getPort().', Host: '.$acc->getServerAddress().'.');
                 }
                 else{
                     Logger::log('Instance created with no errors.');

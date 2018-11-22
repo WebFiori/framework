@@ -462,14 +462,18 @@ class Cron {
      * the job.
      * @param array $funcParams An array of parameters that can be passed to the 
      * function. 
+     * @param string $jobName An optional job name.
      * @return boolean If the job was created and scheduled, the function will 
      * return TRUE. Other than that, the function will return FALSE.
      * @since 1.0
      */
-    public static function createJob($when='*/5 * * * *',$function='',$funcParams=array()){
+    public static function createJob($when='*/5 * * * *',$function='',$funcParams=array(),$jobName=''){
         try{
             $job = new CronJob($when);
             $job->setOnExecution($function, $funcParams);
+            if(strlen($jobName) > 0){
+                $job->setJobName($jobName);
+            }
             return self::scheduleJob($job);
         } 
         catch (Exception $ex) {

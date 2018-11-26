@@ -415,6 +415,7 @@ class File implements JsonI{
             fwrite($h, $this->getRawData());
             fclose($h);
             restore_error_handler();
+            return;
         }
         restore_error_handler();
         throw new Exception('Unable to open the file at \''.$path.'\'.');

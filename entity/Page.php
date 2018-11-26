@@ -116,6 +116,9 @@ class Page{
     public function setCanonical($url){
         if(strlen($url) != 0){
             $this->canonical = $url;
+            if($this->document !== NULL){
+                $this->document->getHeadNode()->setCanonical($url);
+            }
         }
     }
     /**
@@ -141,6 +144,12 @@ class Page{
         return $p->getCanonical();
     }
     private function __construct() {
+        $this->_reset();
+    }
+    public static function reset() {
+        Page::get()->_reset();
+    }
+    private function _reset(){
         Logger::logFuncCall(__METHOD__);
         $this->document = new HTMLDoc();
         $this->setTitle('Default X');
@@ -497,7 +506,7 @@ class Page{
     public function setDescription($val){
         if($val != NULL){
             $this->description = $val;
-            if($this->document != NULL ){
+            if($this->document !== NULL ){
                 $headCh = &$this->document->getHeadNode()->children();
                 $headChCount = $headCh->size();
                 for($x = 0 ; $x < $headChCount ; $x++){

@@ -10,9 +10,9 @@ interface JsonI {
     /**
      * Returns an object of type 'JsonX'.
      * This function must be implemented by any class that will be added as an 
-     * attribute to any <b>JsonX</b> instance. It is used to customize the returned 
+     * attribute to any JsonX instance. It is used to customize the returned 
      * JSON string.
-     * @return JsonX An object of type <b>JsonX</b>
+     * @return JsonX An object of type JsonX
      * @since 1.0
      */
     public function toJSON();

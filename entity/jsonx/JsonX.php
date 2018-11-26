@@ -8,6 +8,16 @@
 class JsonX {
     /**
      * An array of supported types.
+     * This array contains the following strings:
+     * <ul>
+     * <li>integer</li>
+     * <li>string</li>
+     * <li>double</li>
+     * <li>boolean</li>
+     * <li>array</li>
+     * <li>NULL</li>
+     * <li>Object</li>
+     * </ul>
      * @var array An array of supported types.
      * @since 1.0
      */
@@ -34,7 +44,9 @@ class JsonX {
         "\\\\","\/",'\"',"\\t","\\r","\\n","\\f"
     );
     /**
-     * An array that contains JSON data.
+     * An associative array that contains JSON data.
+     * The key will represents the attribute in JSON string and the value of 
+     * the index will represents the value of that attribute.
      * @var array 
      * @since 1.0
      */

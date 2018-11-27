@@ -44,7 +44,7 @@ if(!defined('ROOT_DIR')){
  * A class to manage user groups and privileges.
  *
  * @author Ibrahim
- * @version 1.0.1
+ * @version 1.0.2
  */
 class Access {
     /**
@@ -83,8 +83,7 @@ class Access {
      * in a specific user group.
      * @param string|NULL $groupId [Optional] The ID of the group which its 
      * privileges will be returned. If NULL is given, all privileges will be 
-     * returned. 
-     * Default is NULL.
+     * returned. Default is NULL.
      * @return array An array which contains an objects of type Privilege. If 
      * the given group ID does not exist, the returned array will be empty.
      * @since 1.0
@@ -204,7 +203,41 @@ class Access {
         }
         return '';
     }
-    
+    private function _clone($groupId,$newGroup,$newPermissions){
+        if($this->_hasGroup($groupId)){
+            if(!$this->hasGroup($newGroup)){
+                if(self::newGroup($newGroup)){
+                    $oldGroupPermissions = self::getGroup($groupId)->privileges();
+                    foreach ($oldGroupPermissions as $p){
+                        self::newPrivilege($newGroup, $p->getID());
+                    }
+                    return TRUE;
+                }
+            }
+        }
+        return FALSE;
+    }
+    /**
+     * Creates a clone of a group given its ID.
+     * The clone group will contain all the privileges which where added to 
+     * the original group. Also, it is possible to add extra privileges by 
+     * suppling an array that contains the IDs of the new privileges.
+     * @param string $groupId The ID of the group that will be cloned. 
+     * @param type $newGroupId The ID of the new group. It must be unique.
+     * @param type $newPermissions An optional array of new privileges array.
+     * @return boolean If the group was cloned, the function will return 
+     * TRUE. The function will return FALSE if one of the following conditions 
+     * is met:
+     * <ul>
+     * <li>The group which will be cloned does not exist.</li>
+     * <li>A group which has the ID of the new group is already exist.</li>
+     * <li>If the new group was not created for some reason.</li>
+     * </ul>
+     */
+    public static function cloneGroup($groupId,$newGroupId,$newPermissions=array()){
+        return self::get()->_clone($groupId, $newGroupId, $newPermissions);
+    }
+
     private function _privileges($groupId=null){
         if($groupId != NULL){
             foreach ($this->userGroups as $group){
@@ -223,26 +256,6 @@ class Access {
             }
             return $prArr;
         }
-    }
-    /**
-     * Adds new group with new ID.
-     * @param string $groupId The ID of the group. If a group with the given 
-     * ID already exist, The function will not add it.
-     * @return boolean The function will return TRUE if a new group with the 
-     * given ID is created. FALSE if not.
-     * @since 1.0
-     */
-    private function addGroup($groupId) {
-        foreach ($this->userGroups as $group){
-            if($groupId == $group->getID()){
-                return FALSE;
-            }
-            $g = new UsersGroup();
-            $g->setID($groupId);
-            $this->userGroups[] = $g;
-            return TRUE;
-        }
-        return FALSE;
     }
     /**
      * Returns an array which contains all user groups. 
@@ -268,7 +281,6 @@ class Access {
      * @since 1.0
      */
     private function &_getGroup($groupId) {
-        
         foreach ($this->userGroups as $g){
             if($g->getID() == $groupId){
                 return $g;
@@ -343,7 +355,7 @@ class Access {
         return Access::get()->_hasGroup($groupId);
     }
     /**
-     * Returns a UsersGroup object given its ID. 
+     * Returns an object of type UsersGroup given its ID. 
      * This function can be used to check if a group is exist or not. If 
      * the function has returned NULL, this means the group does not exist.
      * @param string $groupId The ID of the group.
@@ -431,9 +443,10 @@ class Access {
      * a group instead of calling Access::newPrivilege() multiple times.
      * @param string $groupId The ID of the group. The group must be created 
      * before starting to create privileges in it.
-     * @param array $prNamesArr An array that contains the names of privileges.
-     * @return array The function will return an array of boolean values. 
-     * each boolean corresponds to the status of each privilege in the array of 
+     * @param array $prNamesArr An associative array that contains the names of privileges.
+     * @return array The function will return an associative array. 
+     * The indices will be the IDs of the privileges and the values will be 
+     * booleans. Each boolean corresponds to the status of each privilege in the array of 
      * privileges. If the privilege is added, the value will be TRUE. If not, 
      * it will be FALSE.
      * @since 1.0.1 
@@ -442,7 +455,7 @@ class Access {
         $retVal = array();
         $count = count($prNamesArr);
         for($x = 0 ; $x < $count ; $x++){
-            $retVal[] = self::newPrivilege($groupId, $prNamesArr[$x]);
+            $retVal[$prNamesArr[$x]] = self::newPrivilege($groupId, $prNamesArr[$x]);
         }
         return $retVal;
     }

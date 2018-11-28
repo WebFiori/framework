@@ -3,7 +3,7 @@
  * An autoloader class to load classes as needed during runtime.
  *
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.1.1
+ * @version 1.1.2
  */
 class AutoLoader{
     /**
@@ -56,17 +56,8 @@ class AutoLoader{
             $frameworkSearchFoldres = array(
                 '',
                 '/entity',
-                '/entity/cron',
-                '/entity/queries',
-                '/entity/rest-easy',
-                '/entity/jsonx',
-                '/entity/ph-mysql',
-                '/entity/html-php-structs/structs',
-                '/entity/html-php-structs/html',
-                '/entity/router',
-                '/entity/mail',
                 '/publish',
-                '/publish/themes',
+                '/publish',
                 '/functions',
                 '/apis',
                 '/pages',
@@ -126,7 +117,9 @@ class AutoLoader{
         }
         //Logger::log('Root search folder was set to \''.$this->rootDir.'\'.', 'debug');
         if(gettype($searchFolders) == 'array'){
-            $this->searchFolders = $searchFolders;
+            foreach ($searchFolders as $folder){
+                $this->addSearchDirectory($folder);
+            }
         }
         spl_autoload_register(function($className){
             AutoLoader::get()->loadClass($className);
@@ -137,15 +130,44 @@ class AutoLoader{
      * folders.
      * @param string $dir A new directory (such as '/entity/html-php-structs-1.6/html').
      * @since 1.0
+     * @deprecated since version 1.1.2
      */
-    public function addSearchDirectory($dir) {
+    public function addSearchDirectory($dir,$incSubFolders=true) {
         //Logger::logFuncCall(__METHOD__);
         //Logger::log('Passed value = \''.$dir.'\'', 'debug');
         if(strlen($dir) != 0){
-            array_push($this->searchFolders, '/'. trim($dir, '/'));
+            
             //Logger::log('Folder added.');
+            $cleanDir = '/'. trim($dir, '/');
+            if($incSubFolders){
+                $dirsStack = array();
+                $dirsStack[] = $cleanDir;
+                while($xDir = array_pop($dirsStack)){
+                    $subDirs = scandir(str_replace('/', '\\', $this->getRoot().$xDir));
+                    foreach ($subDirs as $subDir){
+                        if($subDir != '.' && $subDir != '..'){
+                            $dirsStack[] = $subDir;
+                        }
+                    }
+                    $this->searchFolders[] = $xDir;
+                    echo str_replace('/', '\\', $this->getRoot().$xDir).'<br/>';
+                }
+            }
+            else{
+                $this->searchFolders[] = $cleanDir;
+            }
         }
+        
         //Logger::logFuncReturn(__METHOD__);
+    }
+    /**
+     * 
+     * @param type $dir
+     * @param type $incSubFolders
+     * @since 1.1.2
+     */
+    public static function newSearchFolder($dir,$incSubFolders=true){
+        self::get()->addSearchDirectory($dir,$incSubFolders);
     }
     /**
      * Tries to load a class given its name.

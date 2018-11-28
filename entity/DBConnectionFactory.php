@@ -26,8 +26,9 @@
 
 /**
  * A factory class that is used to create connections to different types of 
- * DBMSs.
- *
+ * DBMSs connections.
+ * Currently, the class only supports MySQL database. More will be added in the 
+ * future.
  * @author Ibrahim <ibinshikh@hotmail.com>
  * @version 1.0
  */
@@ -73,6 +74,8 @@ class DBConnectionFactory {
     const DB_CONNECTION_ERR = 'unable_to_connect_to_db';
     /**
      * Create a link to MySQL database.
+     * This function uses the class DatabaseLink which in turns uses mysqli. 
+     * This means mysqli must be installed first.
      * @param array $connectionParams An associative array that contains 
      * database connection parameters. The indices are: 
      * <ul>
@@ -89,8 +92,8 @@ class DBConnectionFactory {
      * indices: 
      * <ul>
      * <li><b>error-code</b>: Error code. It can be MySQL error code.</li>
-     * <li><b>error-code</b>: A message that tells more information about 
-     * the error.</li>
+     * <li><b>error-message</b>: A message that tells more information about 
+     * the error. It is taken from MySQL server.</li>
      * </ul>
      * @since 1.0
      */
@@ -112,18 +115,12 @@ class DBConnectionFactory {
                         if(isset($connectionParams['db-name'])){
                             Logger::log('Database name = \''.$connectionParams['db-name'].'\'', 'debug');
                             $link = new DatabaseLink($connectionParams['host'],$connectionParams['user'],$connectionParams['pass'],$connectionParams['port']);
-                            if($link->isConnected()){
-                                if($link->setDB($connectionParams['db-name'])){
-                                    $retVal = $link;
-                                }
-                                else{
-                                    Logger::log('Unable to select database.', 'warning');
-                                    $retVal['error-code'] = $link->getErrorCode();
-                                    $retVal['error-message'] = $link->getErrorMessage();
-                                }
+                            if($link->setDB($connectionParams['db-name'])){
+                                Logger::log('Connected.');
+                                $retVal = $link;
                             }
                             else{
-                                Logger::log('Unable to connect to the database using given info.', 'warning');
+                                Logger::log('Unable to select database.', 'warning');
                                 $retVal['error-code'] = $link->getErrorCode();
                                 $retVal['error-message'] = $link->getErrorMessage();
                             }
@@ -157,7 +154,6 @@ class DBConnectionFactory {
             $retVal['error-code'] = self::MISSING_DB_HOST;
             $retVal['error-message'] = 'The attribute \'host\' is missing from the array.';
         }
-        Logger::log($retVal, 'debug');
         Logger::logFuncReturn(__METHOD__);
         return $retVal;
     }

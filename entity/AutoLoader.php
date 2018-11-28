@@ -1,4 +1,5 @@
 <?php
+namespace webfiori\entity;
 /**
  * An autoloader class to load classes as needed during runtime.
  *
@@ -136,28 +137,28 @@ class AutoLoader{
         //Logger::logFuncCall(__METHOD__);
         //Logger::log('Passed value = \''.$dir.'\'', 'debug');
         if(strlen($dir) != 0){
-            
             //Logger::log('Folder added.');
             $cleanDir = '/'. trim($dir, '/');
             if($incSubFolders){
                 $dirsStack = array();
                 $dirsStack[] = $cleanDir;
                 while($xDir = array_pop($dirsStack)){
-                    $subDirs = scandir(str_replace('/', '\\', $this->getRoot().$xDir));
-                    foreach ($subDirs as $subDir){
-                        if($subDir != '.' && $subDir != '..'){
-                            $dirsStack[] = $subDir;
+                    $fullPath = str_replace('/', '\\', $this->getRoot().$xDir);
+                    if(is_dir($fullPath)){
+                        $subDirs = scandir($fullPath);
+                        foreach ($subDirs as $subDir){
+                            if($subDir != '.' && $subDir != '..'){
+                                $dirsStack[] = $xDir.'/'.$subDir;
+                            }
                         }
+                        $this->searchFolders[] = $xDir;
                     }
-                    $this->searchFolders[] = $xDir;
-                    echo str_replace('/', '\\', $this->getRoot().$xDir).'<br/>';
                 }
             }
             else{
                 $this->searchFolders[] = $cleanDir;
             }
         }
-        
         //Logger::logFuncReturn(__METHOD__);
     }
     /**
@@ -171,12 +172,12 @@ class AutoLoader{
     }
     /**
      * Tries to load a class given its name.
-     * @param string $className The name of the class.
+     * @param string $classPath The name of the class.
      * @since 1.0
      */
-    private function loadClass($className){
-        //Logger::logFuncCall(__METHOD__);
-        //Logger::log('Trying to load the class \''.$className.'\'.');
+    private function loadClass($classPath){
+        $cArr = explode('\\', $classPath);
+        $className = $cArr[count($cArr) - 1];
         foreach ($this->searchFolders as $value) {
             $f = $this->getRoot().$value.'/'.$className.'.php';
             //Logger::log('Checking if file \''.$f.'\' exist...', 'debug');

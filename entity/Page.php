@@ -16,6 +16,7 @@ if(!defined('ROOT_DIR')){
         . '</body>'
         . '</html>');
 }
+namespace webfiori\entity;
 /**
  * A class used to initialize main page components.
  * @author Ibrahim <ibinshikh@hotmail.com>

@@ -23,7 +23,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
+namespace webfiori\entity;
 /**
  * A factory class that is used to create connections to different types of 
  * DBMSs connections.

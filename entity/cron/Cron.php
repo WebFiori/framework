@@ -22,6 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+namespace webfiori\entity\cron;
 /**
  * A class that is used to manage cron jobs.
  * It is used to create jobs, schedule them and execute them. In order to run 

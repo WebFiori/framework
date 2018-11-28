@@ -1,4 +1,7 @@
 <?php
+namespace webfiori;
+use webfiori\entity\AutoLoader;
+use webfiori\entity\Logger;
 /**
  * The instance of this class is used to control basic settings of 
  * the framework. Also, it is the entry point of any request.

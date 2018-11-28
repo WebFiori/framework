@@ -16,6 +16,7 @@ if(!defined('ROOT_DIR')){
         . '</body>'
         . '</html>');
 }
+namespace webfiori\entity;
 /**
  * A helper class to manage system sessions.
  * @author Ibrahim <ibinshikh@hotmail.com>

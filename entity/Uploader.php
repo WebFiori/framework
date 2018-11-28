@@ -16,6 +16,7 @@ if(!defined('ROOT_DIR')){
         . '</body>'
         . '</html>');
 }
+namespace webfiori\entity;
 /**
  * A helper class that is used to upload files to the server file system.
  * @author Ibrahim <ibinshikh@hotmail.com>

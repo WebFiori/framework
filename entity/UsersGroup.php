@@ -1,5 +1,5 @@
 <?php
-
+namespace webfiori\entity;
 /*
  * The MIT License
  *

@@ -41,8 +41,7 @@ if(!defined('ROOT_DIR')){
 }
 /**
  * A class that is used to log messages to a file.
- * It is used to help system developers to log information that can help in 
- * finding and tracking the sources bugs.
+ *
  * @author Ibrahim <ibinshikh@hotmail.com>
  * @version 1.1.2
  */
@@ -226,15 +225,16 @@ class Logger {
     }
     /**
      * Adds a debug message to a log file that says the execution of a given 
-     * function was finished. The message will be logged only if the constant 
-     * 'DEBUG' is defined.
-     * @param string $funcName The name of the function. To get the name of the 
+     * function was finished. 
+     * Note that the message will be logged only if the constant 
+     * 'DEBUG' is defined. To get the name of the 
      * function in its body, Use the magic constant '__METHOD__' or '__FUNCTION__'. 
      * It is recommended to always use '__METHOD__' as this constant will return 
      * class name with it if the function is inside a class.
-     * @param string $logFileName [Optional] The name of the log file. If it is not 
-     * NULL, the log will be written to the given file name.
-     * @param string $addDashes [Optional] If set to true, a line of dashes will be inserted 
+     * @param string $funcName The name of the function. 
+     * @param string $logFileName The name of the log file. If it is not 
+     * NULL, the log will be written to the given file name. Default is NULL.
+     * @param string $addDashes If set to true, a line of dashes will be inserted 
      * after the message. Used to organize log messages.
      * @since 1.1
      */
@@ -243,9 +243,11 @@ class Logger {
     }
     /**
      * Adds a message to the last selected log file that states the client 
-     * request was processed. This function is usually called after calling 
+     * request was processed. 
+     * This function is usually called after calling 
      * the function 'die()' or 'exit()'. Also if no server code will be 
-     * executed after.
+     * executed after. The exact message that will be logged is:
+     * <p>"Processing of client request is finished."</p>
      * @since 1.1
      */
     public static function requestCompleted() {
@@ -253,11 +255,11 @@ class Logger {
     }
     /**
      * Sets or returns the full directory of the log file.
-     * @param string $new If provided, the save directory will be set to the 
-     * given one. If the given directory does not exists, the function will 
+     * Note that If the given directory does not exists, the function will 
      * try to create it. The default place for saving logs is ROOT_DIR.'/logs'.
-     * @return string The location where the log files are stored. The default 
-     * place for saving logs is ROOT_DIR.'/logs'.
+     * @param string $new If provided, the save directory will be set to the 
+     * given one. 
+     * @return string The location where the log files are stored.
      * @since 1.0
      */
     public static function directory($new=null) {
@@ -268,12 +270,14 @@ class Logger {
     }
     /**
      * Sets or returns the name of the log file.
-     * @param string $new The name of the log file that the system will be writing 
-     * logs to. This function is used to switch between different log files. The 
-     * name should be provided without any extentions (e.g. 'my-log').
-     * @return string The function will return the name of the log file that the 
-     * logger is using to write logs. Note that log files will always have the 
+     * This function is used to switch between different log files. The 
+     * name should be provided without any extentions (e.g. 'my-log'). 
+     * Note that log files will always have the 
      * extention .txt The default log file name is 'log.txt'.
+     * @param string $new The name of the log file that the system will be writing 
+     * logs to.
+     * @return string The function will return the name of the log file that the 
+     * logger is using to write logs (without extension). 
      * @since 1.0
      */
     public static function logName($new=null) {
@@ -284,6 +288,8 @@ class Logger {
     }
     /**
      * Adds a new line to separate log parts.
+     * The line will have the following text:
+     * <p>-+-*******************************************************-+-</p>
      * @since 1.1.1
      */
     public static function section(){
@@ -291,6 +297,10 @@ class Logger {
     }
     /**
      * Removes the whole content of the log file.
+     * Once the content of the log is cleared, a message at the top of the log 
+     * will appear. The message will say the following:
+     * <p>---------------Log Cleared At YYYY-MM-DD HH:MM:SS +00---------------</p>
+     * The '+00' is the code of the time zone.
      * @since 1.0
      */
     public static function clear(){
@@ -388,10 +398,12 @@ class Logger {
                 $this->handelr = fopen($this->_getDirectory().'/'.$this->_getLogName().'.txt', 'a+');
                 $time = date('Y-m-d h:i:s T');
                 if($this->functionsStack->size() != 0){
-                    fwrite($this->handelr, '['.$time.']  '.$bType.': ['.$this->functionsStack->peek().'] '.$content."\r\n");
+                    $message = '['.$time.'] '.$this->addSpaces($bType).': ['.$this->functionsStack->peek().'] '.$content."\r\n";
+                    fwrite($this->handelr, $message);
                 }
                 else{
-                    fwrite($this->handelr, '['.$time.']  '.$bType.': '.$content."\r\n");
+                    $message = '['.$time.'] '.$this->addSpaces($bType).': '.$content."\r\n";
+                    fwrite($this->handelr, $message);
                 }
                 fclose($this->handelr);
                 $addDashes === TRUE ? $this->_newSec() : NULL;
@@ -399,7 +411,22 @@ class Logger {
         }
     }
     /**
+     * A function that is used to add spaces before message type name to make 
+     * messages well formatted in the log.
+     * @param string $bType
+     * @return string
+     */
+    private function addSpaces($bType){
+        for($x = strlen($bType) ; $x < 10 ; $x++){
+            $bType = ' '.$bType;
+        }
+        return $bType;
+    }
+
+    /**
      * Show log content as output on screen.
+     * This function simply open the log file and display it as output using 
+     * 'echo' command.
      * @since 1.1.1
      */
     public static function displayLog() {

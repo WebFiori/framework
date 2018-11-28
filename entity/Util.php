@@ -19,7 +19,7 @@ if(!defined('ROOT_DIR')){
 /**
  * PHP utility class.
  * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.3.6
+ * @version 1.3.7
  */
 class Util{
     /**
@@ -101,6 +101,25 @@ class Util{
             $retVal = intval($str);
         }
         return $retVal;
+    }
+    /**
+     * Returns the reverse of a string.
+     * This function can be used to reverse the order of any string. 
+     * For example, if the given string is '   Good Morning Buddy', the 
+     * function will return 'ydduB gninriM dooG   '. If NULL is given, the 
+     * function will return empty string.
+     * @param string $str The string that will be reversed.
+     * @return string The string after reversing its order.
+     * @since 1.3.7
+     */
+    public function reverse($str) {
+        $strToReverse = $str.'';
+        $retV = '';
+        $strLen = strlen($strToReverse);
+        for($x = $strLen - 1 ; $x >= 0 ; $x--){
+            $retV .= $strToReverse[$x];
+        }
+        return $retV;
     }
     /**
      * Returns HTTP request headers.

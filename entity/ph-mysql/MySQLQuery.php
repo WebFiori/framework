@@ -1,9 +1,8 @@
 <?php
+namespace phMysql;
 /**
  * A base class that is used to construct MySQL queries. It can be used as a base 
- * class for constructing other MySQL queries.<br/>
- * @uses Table Used by the 'create table' Query.
- * @uses ForeignKey Used to alter a table and insert a foreign key in it.
+ * class for constructing other MySQL queries.
  * @author Ibrahim <ibinshikh@hotmail.com>
  * @version 1.8.4
  */
@@ -66,11 +65,12 @@ abstract class MySQLQuery{
     /**
      * Constructs a query that can be used to get the number of tables in a 
      * schema given its name.
-     * @param string $schemaName The name of the schema. The result of executing 
+     * The result of executing 
      * the query is a table with one row and one column. The column name will be 
      * 'tables_count' which will contain an integer value that indicates the 
      * number of tables in the schema. If the schema does not exist or has no tables, 
      * the result in the given column will be 0.
+     * @param string $schemaName The name of the schema.
      * @since 1.8
      */
     public function schemaTablesCount($schemaName){
@@ -79,9 +79,12 @@ abstract class MySQLQuery{
     }
     /**
      * Constructs a query which can be used to update the server's global 
-     * variable 'max_allowed_packet'
-     * @param int $size The new size. The maximum value this attribute can 
-     * have is 1073741824 bytes.
+     * variable 'max_allowed_packet'.
+     * The value of the attribute is in bytes. The developer might want to 
+     * update the value of this variable if he wants to send large data to 
+     * database using one query. The maximum value this attribute can have is 
+     * 1073741824 bytes.
+     * @param int $size The new size.
      * @param string $unit One of 4 values: 'B' for byte, 'KB' for kilobyte, 
      * 'MB' for megabyte and 'GB' for gigabyte. If the given value is none of the 
      * 4, the type will be set to 'MP'.
@@ -121,10 +124,11 @@ abstract class MySQLQuery{
     }
     /**
      * Constructs a query that can be used to get all tables in a schema given its name.
-     * @param string $schemaName The name of the schema. The result of executing the query 
-     * is a table with one colum. The name of the column is 'TABLE_NAME'. The column 
-     * will simply contain all the names of the tables in the schema. If the given 
-     * schema does not exist or has no tables, The result will be an empty table.
+     * The result of executing the query is a table with one colum. The name 
+     * of the column is 'TABLE_NAME'. The column will simply contain all the 
+     * names of the tables in the schema. If the given schema does not exist 
+     * or has no tables, The result will be an empty table.
+     * @param string $schemaName The name of the schema.
      * @since 1.8 
      */
     public function getSchemaTables($schemaName) {
@@ -134,11 +138,11 @@ abstract class MySQLQuery{
     /**
      * Constructs a query that can be used to get the number of views in a 
      * schema given its name.
-     * @param string $schemaName The name of the schema. The result of executing 
-     * the query is a table with one row and one column. The column name will be 
-     * 'views_count' which will contain an integer value that indicates the 
-     * number of views in the schema. If the schema does not exist or has no views, 
-     * the result in the given column will be 0.
+     * The result of executing the query is a table with one row and one column.
+     *  The column name will be 'views_count' which will contain an integer 
+     * value that indicates the number of views in the schema. If the schema 
+     * does not exist or has no views, the result in the given column will be 0.
+     * @param string $schemaName The name of the schema.
      * @since 1.8
      */
     public function schemaViewsCount($schemaName){
@@ -146,11 +150,13 @@ abstract class MySQLQuery{
         $this->queryType = 'select';
     }
     /**
-     * Constructs a query that can be used to get all views in a schema given its name.
-     * @param string $schemaName The name of the schema. The result of executing the query 
-     * is a table with one colum. The name of the column is 'TABLE_NAME'. The column 
-     * will simply contain all the names of the views in the schema. If the given 
-     * schema does not exist or has no views, The result will be an empty table.
+     * Constructs a query that can be used to get the names of all views in a 
+     * schema given its name.
+     * The result of executing the query is a table with one colum. The name 
+     * of the column is 'TABLE_NAME'. The column will simply contain all the 
+     * names of the views in the schema. If the given schema does not exist 
+     * or has no views, The result will be an empty table.
+     * @param string $schemaName The name of the schema.
      * @since 1.8 
      */
     public function getSchemaViews($schemaName) {
@@ -191,12 +197,12 @@ abstract class MySQLQuery{
     }
     /**
      * Constructs a query that can be used to create a new table.
-     * @param Table $table an instance of <b>Table</b>.
+     * @param MySQLTable $table an instance of <b>Table</b>.
      * @param boolean $inclComments Description
      * @since 1.4
      */
     private function createTable($table,$inclComments=false){
-        if($table instanceof Table){
+        if($table instanceof MySQLTable){
             $query = '';
             if($inclComments === TRUE){
                 $query .= '-- Structure of the table \''.$this->getStructureName().'\''.self::NL;
@@ -279,6 +285,8 @@ abstract class MySQLQuery{
     }
     /**
      * Returns the value of the property $query.
+     * It is simply the query that was constructed by calling any function 
+     * of the class.
      * @return string a MySql query.
      * @since 1.0
      */
@@ -294,12 +302,12 @@ abstract class MySQLQuery{
         return $this->queryType;
     }
     /**
-     * Sets the value of the property $query.
+     * Sets the value of the property $query. 
+     * The type of the query must be taken from the array MySQLQuery::Q_TYPES.
      * @param string $query a MySQL query.
      * @param string $type The type of the query (such as 'select', 'update').
      * @since 1.0
-     * @throws Exception If the given query type is not supported.
-     * @see MySQLQuery::Q_TYPES For supported query types.
+     * @throws Exception If the given query type is not supported. 
      */
     public function setQuery($query,$type){
         $ltype = strtolower($type.'');
@@ -313,7 +321,7 @@ abstract class MySQLQuery{
     }
     /**
      * Constructs a query that can be used to select all columns from a table.
-     * @param int $limit [Optional] The value of the attribute 'limit' of the select statement. 
+     * @param int $limit The value of the attribute 'limit' of the select statement. 
      * If zero or a negative value is given, it will not be ignored. 
      * Default is -1.
      * @param int $offset [Optional] The value of the attribute 'offset' of the select statement. 
@@ -329,16 +337,19 @@ abstract class MySQLQuery{
     }
     /**
      * Constructs a 'select' query.
-     * @param array $selectOptions [Optional] An associative array which contains 
-     * options to construct diffrent select quires. The available options are: 
+     * @param array $selectOptions An associative array which contains 
+     * options to construct different select queries. The available options are: 
      * <ul>
-     * <li><b>colums</b>: An array which can have the keys of columns that 
+     * <li><b>colums</b>: An optional array which can have the keys of columns that 
      * will be select.</li>
      * <li><b>limit</b>: The 'limit' attribute of the query.</li>
      * <li><b>offset</b>: The 'offset' attribute of the query. Ignored if the 
      * option 'limit' is not set.</li>
-     * <li><b>condition-cols-and-vals</b>: An associative array of values 
-     * and objects of type 'Column'. The value is the condition at which the records 
+     * <li><b>condition-cols-and-vals</b>: An associative array. The indices can 
+     * be values the value at each index is an objects of type 'Column'. 
+     * Or the indices can be column indices taken from MySQLTable object and 
+     * the values are set for each index. The second way is recommended as one 
+     * table might have two columns with the same values.
      * will be selected based on.</li>
      * <li><b>conditions</b>: An array that can contains two possible values: 
      * '=' or '!='. If anything else is given at specific index, '=' will be used.</li>
@@ -371,7 +382,7 @@ abstract class MySQLQuery{
         'order-type'=>'A'
         )) {
         $table = $this->getStructure();
-        if($table instanceof Table){
+        if($table instanceof MySQLTable){
             $selectQuery = 'select ';
             $limit = isset($selectOptions['limit']) ? $selectOptions['limit'] : -1;
             $offset = isset($selectOptions['offset']) ? $selectOptions['offset'] : -1;
@@ -484,11 +495,11 @@ abstract class MySQLQuery{
      * column value.
      * @param string $col The name of the column in the table.
      * @param string $val The value that is used to filter data.
-     * @param string $cond [Optional] The condition of select statement. It can be '=' or 
+     * @param string $cond The condition of select statement. It can be '=' or 
      * '!='. If anything else is given, '=' will be used. Note that if 
      * the parameter $val is equal to 'IS NULL' or 'IS NOT NULL', 
      * This parameter is ignored. Default is '='.
-     * @param int $limit [Optional] The value of the attribute 'limit' of the select statement. 
+     * @param int $limit The value of the attribute 'limit' of the select statement. 
      * If zero or a negative value is given, it will not be included in the generated 
      * MySQL query. Default is -1.
      * @param int $offset [Optional] The value of the attribute 'offset' of the select statement. 
@@ -598,10 +609,11 @@ abstract class MySQLQuery{
      * @param array $colsAndVals An associative array. The array can have two 
      * possible structures:
      * <ul>
-     * <li>A column index as an index with a value as the value of the column (Recomended).</li>
+     * <li>A column index taken from MySQLTable object as an index with a 
+     * value as the value of the column (Recommended).</li>
      * <li>A value as an index with an object of type 'Column' as it is value.</li>
      * </ul>
-     * The second way is not recomended as it may caus some issues if two columns 
+     * The second way is not recommended as it may cause some issues if two columns 
      * have the same value.
      * @since 1.8.2
      */
@@ -640,6 +652,7 @@ abstract class MySQLQuery{
                                 else{
                                     $vals .= 'NULL'.$comma;
                                 }
+                                fclose($file);
                             }
                             else{
                                 $vals .= 'NULL'.$comma;
@@ -682,6 +695,7 @@ abstract class MySQLQuery{
                                     else{
                                         $vals .= 'NULL'.$comma;
                                     }
+                                    fclose($file);
                                 }
                                 else{
                                     $vals .= 'NULL'.$comma;
@@ -915,6 +929,7 @@ abstract class MySQLQuery{
                                 else{
                                     $colsStr .= 'NULL'.$comma;
                                 }
+                                fclose($file);
                             }
                             else{
                                 $colsStr .= 'NULL'.$comma;
@@ -955,6 +970,7 @@ abstract class MySQLQuery{
                                     else{
                                         $colsStr .= 'NULL'.$comma;
                                     }
+                                    fclose($file);
                                 }
                                 else{
                                     $colsStr .= 'NULL'.$comma;
@@ -1024,7 +1040,7 @@ abstract class MySQLQuery{
     /**
      * Constructs a query that can be used to select maximum value of a table column.
      * @param string $col The name of the column.
-     * @param string $rename [Optional] The new name of the column that contains max value. 
+     * @param string $rename The new name of the column that contains max value. 
      * The default value is 'max'.
      * @since 1.3
      */
@@ -1038,7 +1054,7 @@ abstract class MySQLQuery{
     /**
      * Constructs a query that can be used to select minimum value of a table column.
      * @param string $col The name of the column.
-     * @param string $rename [Optional] The new name of the column that contains min value. 
+     * @param string $rename The new name of the column that contains min value. 
      * The default value is 'min'.
      * @since 1.3
      */
@@ -1048,23 +1064,6 @@ abstract class MySQLQuery{
             'select-min'=>TRUE,
             'rename-to'=>$rename
         ));
-    }
-    /**
-     * Constructs a query that can be used to get the maximum value of the ID column 
-     * @since 1.3
-     * @deprecated since version 1.8.3
-     */
-    public function selectMaxID(){
-        $this->selectMax(self::ID_COL, self::ID_COL); 
-    }
-    /**
-     * Constructs a query that can be used to get the minimum value of the ID column 
-     * in a table. The value will be contained in a column with the name 'id'.
-     * @since 1.3
-     * @deprecated since version 1.8.3
-     */
-    public function selectMinID(){
-        $this->selectMin(self::ID_COL, self::ID_COL); 
     }
     /**
      * Constructs a query that can be used to create the table which is linked 
@@ -1079,7 +1078,7 @@ abstract class MySQLQuery{
      */
     public function createStructure($inclComments=false){
         $t = $this->getStructure();
-        if($t instanceof Table){
+        if($t instanceof MySQLTable){
             $this->createTable($t,$inclComments);
             return TRUE;
         }
@@ -1089,9 +1088,9 @@ abstract class MySQLQuery{
      * Returns the name of the column from the table given its key.
      * @param string $colKey The name of the column key.
      * @return string The name of the column in the table. If no column was 
-     * found, the function will return the string 'Table::NO_SUCH_COL'. If there is 
+     * found, the function will return the string MySQLTable::NO_SUCH_COL. If there is 
      * no table linked with the query object, the function will return the 
-     * string 'MySQLQuery::NO_STRUCTURE'.
+     * string MySQLQuery::NO_STRUCTURE.
      * @since 1.5
      */
     public function getColName($colKey){
@@ -1105,20 +1104,20 @@ abstract class MySQLQuery{
      * Returns a column from the table given its key.
      * @param string $colKey The name of the column key.
      * @return string|Column The the column in the table. If no column was 
-     * found, the function will return the string 'Table::NO_SUCH_COL'. If there is 
+     * found, the function will return the string 'MySQLTable::NO_SUCH_COL'. If there is 
      * no table linked with the query object, the function will return the 
-     * string 'MySQLQuery::NO_STRUCTURE'.
+     * string MySQLQuery::NO_STRUCTURE.
      * @since 1.6
      */
     public function &getCol($colKey){
         $structure = $this->getStructure();
         $retVal = self::NO_STRUCTURE;
-        if($structure instanceof Table){
+        if($structure instanceof MySQLTable){
             $col = $structure->getCol($colKey);
             if($col instanceof Column){
                 return $col;
             }
-            $retVal = Table::NO_SUCH_COL;
+            $retVal = MySQLTable::NO_SUCH_COL;
         }
         return $retVal;
     }
@@ -1136,19 +1135,19 @@ abstract class MySQLQuery{
     }
     /**
      * Returns the table that is used for constructing queries.
-     * @return Table The table that is used for constructing queries.
+     * @return MySQLTable The table that is used for constructing queries.
      * @since 1.5
      */
     public abstract function getStructure();
     /**
      * Returns the name of the table that is used to construct queries.
      * @return string The name of the table that is used to construct queries. 
-     * if no table is linked, the function will return the string 'MySQLQuery::NO_STRUCTURE'.
+     * if no table is linked, the function will return the string MySQLQuery::NO_STRUCTURE.
      * @since 1.5
      */
     public function getStructureName(){
         $s = $this->getStructure();
-        if($s instanceof Table){
+        if($s instanceof MySQLTable){
             return $s->getName();
         }
         return self::NO_STRUCTURE;

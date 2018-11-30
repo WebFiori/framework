@@ -1,4 +1,5 @@
 <?php
+namespace phMysql;
 /**
  * A class that represents a foreign key.
  *
@@ -29,13 +30,6 @@ class ForeignKey {
      */
     private $sourceTable;
     /**
-     * The name of the column that will reference the other table.
-     * @var string 
-     * @since 1.0  
-     * @deprecated since version 1.3
-     */
-    private $sourceTableCol;
-    /**
      * An array that contains the names of sources columns. 
      * @var array 
      * @since 1.3
@@ -47,13 +41,6 @@ class ForeignKey {
      * @since 1.0 
      */
     private $referencedTable;
-    /**
-     * The name of the column in the referenced table.
-     * @var string  
-     * @since 1.0 
-     * @deprecated since version 1.3
-     */
-    private $referencedTableCol;
     /**
      * An array that contains the names of referenced columns. 
      * @var array 
@@ -97,7 +84,7 @@ class ForeignKey {
     }
     /**
      * A function that is used to validate the names of the key attributes (such as source column 
-     * name or source table name)
+     * name or source table name).
      * @param string $name The string to validate. It must be a string and its not empty. 
      * Also it must not contain any spaces or any characters other than A-Z, a-z and 
      * underscore.
@@ -141,15 +128,6 @@ class ForeignKey {
         return $this->sourceTableCols;
     }
     /**
-     * Returns the name of the column that will contain the value of the reference column.
-     * @return string the name of the source column.
-     * @since 1.0
-     * @deprecated since version 1.3
-     */
-    public function getSourceCol(){
-        return $this->sourceTableCols[0];
-    }
-    /**
      * Adds new source column.
      * @param string $colName The name of the column. It must be a string and its not empty. 
      * Also it must not contain any spaces or any characters other than A-Z, a-z and 
@@ -166,55 +144,12 @@ class ForeignKey {
         return FALSE;
     }
     /**
-     * Sets the name of the source column.
-     * @param string $col The name of the column. It must be a string and its not empty. 
-     * Also it must not contain any spaces or any characters other than A-Z, a-z and 
-     * underscore.
-     * @return boolean TRUE if the source column name is set. FALSE in 
-     * case if the given name is invalid.
-     * @since 1.0
-     * @deprecated since version 1.3
-     */
-    public function setSourceCol($col) {
-        if($this->validateAttr($col)){
-            $this->sourceTableCols[0] = $col;
-            return TRUE;
-        }
-        return FALSE;
-    }
-    /**
      * Returns an array that contains the names of the referenced columns.
      * @return string An array that contains the names of the referenced columns.
      * @since 1.3
      */
     public function getRefrenceCols(){
         return $this->referencedTableCols;
-    }
-    /**
-     * Returns the name of the referenced column.
-     * @return string the name of the referenced column.
-     * @since 1.0
-     * @deprecated since version 1.3
-     */
-    public function getRefrenceCol(){
-        return $this->referencedTableCols[0];
-    }
-    /**
-     * Sets the name of the referenced column.
-     * @param string $col The name of the column. It must be a string and its not empty. 
-     * Also it must not contain any spaces or any characters other than A-Z, a-z and 
-     * underscore.
-     * @return boolean TRUE if the reference column name is set. FALSE in 
-     * case if the given name is invalid.
-     * @since 1.0
-     * @deprecated since version 1.3
-     */
-    public function setReferenceCol($col) {
-        if($this->validateAttr($col)){
-            $this->referencedTableCols[0] = $col;
-            return TRUE;
-        }
-        return FALSE;
     }
     /**
      * Adds new reference column.
@@ -283,7 +218,7 @@ class ForeignKey {
     /**
      * Returns the condition that will happen if the value of the column in the 
      * reference table is updated.
-     * @return string|NULL The on update condition as string or <b>NULL</b> in 
+     * @return string|NULL The on update condition as string or NULL in 
      * case it is not set.
      * @since 1.0 
      */
@@ -292,8 +227,8 @@ class ForeignKey {
     }
     /**
      * Sets the value of the property <b>$onUpdateCondition</b>.
-     * @param string $val A value from the array <b>ForeignKey::CONDITIONS</b>. 
-     * If the given value is <b>NULL</b>, the condition will be set to <b>NULL</b>.
+     * @param string $val A value from the array ForeignKey::CONDITIONS. 
+     * If the given value is NULL, the condition will be set to NULL.
      * @since 1.0
      */
     public function setOnUpdate($val){

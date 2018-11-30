@@ -1,13 +1,14 @@
 <?php
+namespace phMysql;
 /**
  * A class that is used to connect to MySQL database. It works as an interface 
  * for <b>mysqli</b> 
  * @author Ibrahim <ibinshikh@hotmail.com>
  * @version 1.3.1
  */
-class DatabaseLink{
+class MySQLLink{
     /**
-     * The name of database host. It can be an IP address (such as '134.123.111.3:3306') or 
+     * The name of database host. It can be an IP address (such as '134.123.111.3') or 
      * a URL.
      * @var string 
      * @since 1.0
@@ -113,7 +114,7 @@ class DatabaseLink{
         $this->portNum = $port;
         $this->currentRow = -1;
         if($this->link){
-            
+            $this->link->set_charset("utf8");
         }
         else{
             $this->lastErrorNo = mysqli_connect_errno();
@@ -156,7 +157,7 @@ class DatabaseLink{
     public function isConnected(){
         $test = FALSE;
         if($this->link instanceof mysqli){
-            $this->link = @mysqli_connect($this->host, $this->user, $this->pass);
+            $this->link = @mysqli_connect($this->host, $this->user, $this->pass,NULL , $this->portNum);
             if($this->link){
                 if($this->db !== NULL){
                     $test = $this->setDB($this->db);
@@ -175,7 +176,7 @@ class DatabaseLink{
     
     /**
      * Return the number of rows returned by last query.
-     * If no result returned, the method will return -1.
+     * If no result returned by MySQL server, the function will return -1.
      * @return int
      * @since 1.0
      */
@@ -187,21 +188,24 @@ class DatabaseLink{
     }
     /**
      * Select a database instance.
+     * This function will always return FALSE if no connection has been 
+     * established with the database. 
      * @param string $dbName The name of the database instance.
      * @return boolean TRUE if the instance is selected. FALSE
      * otherwise.
      * @since 1.0
      */
     public function setDB($dbName){
-        if(!mysqli_select_db($this->link, $dbName)){
+        if(gettype($this->link) == 'object' && !mysqli_select_db($this->link, $dbName)){
             $this->lastErrorMessage = $this->link->error;
             $this->lastErrorNo = $this->link->errno;
             return false;
         }
         else{
             $this->db = $dbName;
+            return true;
         }
-        return true;
+        return FALSE;
     }
     /**
      * Returns the result set in case of executing select query.
@@ -279,7 +283,17 @@ class DatabaseLink{
             return $this->resultRows;
         }
         $result = $this->getResult();
-        $rows = $result !== NULL ? mysqli_fetch_all($result, MYSQLI_ASSOC) : array();
+        if(function_exists('mysqli_fetch_all')){
+            $rows = $result !== NULL ? mysqli_fetch_all($result, MYSQLI_ASSOC) : array();
+        }
+        else{
+            $rows = array();
+            if($result !== NULL){
+                while ($row = $result->fetch_assoc()){
+                    $rows[] = $row;
+                }
+            }
+        }
         $this->resultRows = $rows;
         return $rows;
     }
@@ -298,7 +312,7 @@ class DatabaseLink{
         $retVal = array();
         $rows = $this->getRows();
         $colNameInDb = $this->getLastQuery()->getColName($colKey);
-        if($colKey != Table::NO_SUCH_COL){
+        if($colKey != MySQLTable::NO_SUCH_COL){
             foreach ($rows as $row){
                 if(isset($row[$colNameInDb])){
                     $retVal[] = $row[$colNameInDb];
@@ -309,7 +323,7 @@ class DatabaseLink{
             }
         }
         else{
-            $retVal = Table::NO_SUCH_COL;
+            $retVal = MySQLTable::NO_SUCH_COL;
         }
         return $retVal;
     }

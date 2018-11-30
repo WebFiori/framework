@@ -49,7 +49,7 @@ if(!defined('ROOT_DIR')){
 class Functions {
     /**
      *
-     * @var DatabaseLink
+     * @var MySQLLink
      * @since 1.3.3 
      */
     private $databaseLink;
@@ -132,7 +132,7 @@ class Functions {
     public function useDatabase($optionalConnectionParams=array()) {
         Logger::logFuncCall(__METHOD__);
         $dbLink = &$this->getDBLink();
-        if($dbLink instanceof DatabaseLink){
+        if($dbLink instanceof MySQLLink){
             Logger::log('Already connected to database.');
             Logger::log('Checking if optional database parameters are provided or not...');
             if($optionalConnectionParams != NULL && isset($optionalConnectionParams['host'])
@@ -223,7 +223,7 @@ class Functions {
             'db-name'=>$connParams['db-name'],
             'port'=>$connParams['port']
         ));
-        if($result instanceof DatabaseLink){
+        if($result instanceof MySQLLink){
             Logger::log('Connected to database.');
             $this->databaseLink = $result;
             Logger::logFuncReturn(__METHOD__);
@@ -349,7 +349,7 @@ class Functions {
     }
     /**
      * Returns the link that is used to connect to the database.
-     * @return DatabaseLink|NULL The link that is used to connect to the database. 
+     * @return MySQLLink|NULL The link that is used to connect to the database. 
      * If no link is established with the database, the function will return 
      * NULL.
      * @since 1.2

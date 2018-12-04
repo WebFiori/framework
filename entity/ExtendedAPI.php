@@ -23,18 +23,20 @@
  * THE SOFTWARE.
  */
 namespace webfiori\entity;
+use restEasy\WebAPI;
 /**
- * An extension for the class 'API' that adds support for multi-language 
+ * An extension for the class 'WebAPI' that adds support for multi-language 
  * response messages.
- *
- * @author Ibrahim <ibinshikh@hotmail.com>
+ * The language can be set by sending a GET or POST request that has the 
+ * parameter 'lang'.
+ * @author Ibrahim
  * @version 1.0.1
  */
-abstract class ExtendedAPI extends API{
+abstract class ExtendedWebAPI extends WebAPI{
     private $translation;
     /**
      * Creates new instance of 'API'.
-     * @param string $version [Optional] initial API version. Default is '1.0.0'.
+     * @param string $version initial API version. Default is '1.0.0'.
      * @since 1.0
      */
     public function __construct($version = '1.0.0') {
@@ -66,13 +68,14 @@ abstract class ExtendedAPI extends API{
     /**
      * Returns an associative array that contains HTTP authorization header 
      * content.
-     * @return array An associative array that has two indices: 
+     * The generated associative array will have two indices: 
      * <ul>
      * <li><b>type</b>: Type of authorization (e.g. basic, bearer )</li>
      * <li><b>credentials</b>: Depending on authorization type, 
      * this field will have different values.</li>
      * </ul>
-     * If no authorization header is sent, The two indices will be empty.
+     * Note that if no authorization header is sent, The two indices will be empty.
+     * @return array An associative array.
      * @since 1.0.1
      */
     public function getAuthorizationHeader(){
@@ -91,21 +94,7 @@ abstract class ExtendedAPI extends API{
         return $retVal;
     }
     /**
-     * Adds new action to the set of API actions.
-     * @param APIAction $action The action that will be added.
-     * @param boolean $reqPermission Set to 'TRUE' if the action require user login or 
-     * any additional permissions.
-     * @return boolean 'TRUE' if the action is added. 'FAlSE' otherwise.
-     * @since 1.0
-     */
-    public function addAction($action,$reqPermission=false) {
-        if($action instanceof APIAction){
-            parent::addAction($action, $reqPermission);
-        }
-        return FALSE;
-    }
-    /**
-     * Returns the language instance which is linked with the instance.
+     * Returns the language instance which is linked with the API instance.
      * @return Language an instance of the class 'Language'.
      * @since 1.0
      */
@@ -126,12 +115,12 @@ abstract class ExtendedAPI extends API{
     }
     /**
      * Creates a sub array to define language variables.
-     * @param string $dir A string that looks like a 
-     * directory. For example, if the given string is 'general', 
+     * An example: if the given string is 'general', 
      * an array with key name 'general' will be created. Another example is 
      * if the given string is 'pages/login', two arrays will be created. The 
      * top one will have the key value 'pages' and another one inside 
      * the pages array with key value 'login'.
+     * @param string $dir A string that looks like a directory.
      * @since 1.0
      */
     public function createLangDir($dir) {
@@ -142,7 +131,7 @@ abstract class ExtendedAPI extends API{
      * @param string $dir A string that looks like a 
      * directory. 
      * @param array $arr An associative array. The key will act as the variable 
-     * and the value of the key will act as the variable value.
+     * and the value of the key will act as the variable value. 
      * @since 1.0
      */
     public function setLangVars($dir,$arr=array()) {
@@ -150,8 +139,22 @@ abstract class ExtendedAPI extends API{
     }
     /**
      * Sends a response message to indicate that a database error has occur.
-     * @param JsonI|JsonX|string $info An object of type 'JsonI' or 'JsonX' that 
-     * describe the error in more details. Also it can be a simple string.
+     * This function will send back a JSON string in the following format:
+     * <p>
+     * {<br/>
+     * &nbsp;&nbsp;"message":"a_message",<br/>
+     * &nbsp;&nbsp;"type":"error",<br/>
+     * &nbsp;&nbsp;"err-info":OTHER_DATA<br/>
+     * }
+     * </p>
+     * In here, 'OTHER_DATA' can be a basic string or JSON string.
+     * Also, The response will sent HTTP code 404 - Not Found.
+     * @param JsonI|JsonX|string $info An object of type JsonI or 
+     * JsonX that describe the error in more details. Also it can be a simple string 
+     * or JSON string. 
+     * Note that the content of the field "message" might differ. It depends on 
+     * the language. If no language is selected or language is not supported, 
+     * English will be used.
      * @since 1.0
      */
     public function databaseErr($info=''){
@@ -167,7 +170,19 @@ abstract class ExtendedAPI extends API{
         }
     }
     /**
-     * Sends a response message to indicate that a user is not authorized to do an API call.
+     * Sends a response message to indicate that a user is not authorized to 
+     * do an API call.
+     * This function will send back a JSON string in the following format:
+     * <p>
+     * {<br/>
+     * &nbsp;&nbsp;"message":"Not authorized",<br/>
+     * &nbsp;&nbsp;"type":"error"<br/>
+     * }
+     * </p>
+     * In addition to the message, The response will sent HTTP code 401 - Not Authorized. 
+     * Note that the content of the field "message" might differ. It depends on 
+     * the language. If no language is selected or language is not supported, 
+     * English will be used.
      * @since 1.0
      */
     public function notAuth(){
@@ -176,6 +191,17 @@ abstract class ExtendedAPI extends API{
     }
     /**
      * Sends a response message to indicate that an action is not supported by the API.
+     * This function will send back a JSON string in the following format:
+     * <p>
+     * {<br/>
+     * &nbsp;&nbsp;"message":"Action not supported",<br/>
+     * &nbsp;&nbsp;"type":"error"<br/>
+     * }
+     * </p>
+     * In addition to the message, The response will sent HTTP code 404 - Not Found. 
+     * Note that the content of the field "message" might differ. It depends on 
+     * the language. If no language is selected or language is not supported, 
+     * English will be used.
      * @since 1.0
      */
     public function actionNotSupported(){
@@ -183,7 +209,20 @@ abstract class ExtendedAPI extends API{
         $this->sendResponse($message, TRUE, 404);
     }
     /**
-     * Sends a response message to indicate that request content type is not supported by the API.
+     * Sends a response message to indicate that request content type is 
+     * not supported by the API.
+     * This function will send back a JSON string in the following format:
+     * <p>
+     * {<br/>
+     * &nbsp;&nbsp;"message":"Content type not supported.",<br/>
+     * &nbsp;&nbsp;"type":"error",<br/>
+     * &nbsp;&nbsp;"request-content-type":"content_type"<br/>
+     * }
+     * </p>
+     * In addition to the message, The response will sent HTTP code 404 - Not Found. 
+     * Note that the content of the field "message" might differ. It depends on 
+     * the language. If no language is selected or language is not supported, 
+     * English will be used.
      * @since 1.1
      */
     public function contentTypeNotSupported($cType=''){
@@ -192,14 +231,36 @@ abstract class ExtendedAPI extends API{
     }
     /**
      * Sends a response message to indicate that request method is not supported.
+     * This function will send back a JSON string in the following format:
+     * <p>
+     * {<br/>
+     * &nbsp;&nbsp;"message":"Method Not Allowed.",<br/>
+     * &nbsp;&nbsp;"type":"error",<br/>
+     * }
+     * </p>
+     * In addition to the message, The response will sent HTTP code 405 - Method Not Allowed. 
+     * Note that the content of the field "message" might differ. It depends on 
+     * the language. If no language is selected or language is not supported, 
+     * English will be used.
      * @since 1.0
      */
-    public function requMethNotAllowed(){
+    public function requestMethodNotAllowed(){
         $message = $this->get('general/http-codes/405/message');
         $this->sendResponse($message, TRUE, 405);
     }
     /**
      * Sends a response message to indicate that an action is not implemented.
+     * This function will send back a JSON string in the following format:
+     * <p>
+     * {<br/>
+     * &nbsp;&nbsp;"message":"Action not implemented.",<br/>
+     * &nbsp;&nbsp;"type":"error",<br/>
+     * }
+     * </p>
+     * In addition to the message, The response will sent HTTP code 404 - Not Found. 
+     * Note that the content of the field "message" might differ. It depends on 
+     * the language. If no language is selected or language is not supported, 
+     * English will be used.
      * @since 1.0
      */
     public function actionNotImpl(){
@@ -208,7 +269,17 @@ abstract class ExtendedAPI extends API{
     }
     /**
      * Sends a response message to indicate that a request parameter or parameters are missing.
-     * @param array $paramsNamesArr An array that contains the name(s) of the parameter(s).
+     * This function will send back a JSON string in the following format:
+     * <p>
+     * {<br/>
+     * &nbsp;&nbsp;"message":"The following required parameter(s) where missing from the request body: 'param_1', 'param_2', 'param_n'",<br/>
+     * &nbsp;&nbsp;"type":"error",<br/>
+     * }
+     * </p>
+     * In addition to the message, The response will sent HTTP code 404 - Not Found. 
+     * Note that the content of the field "message" might differ. It depends on 
+     * the language. If no language is selected or language is not supported, 
+     * English will be used.
      * @since 1.3
      */
     public function missingParams($paramsNamesArr){
@@ -231,7 +302,17 @@ abstract class ExtendedAPI extends API{
     }
     /**
      * Sends a response message to indicate that a request parameter(s) have invalid values.
-     * @param array $paramsNamesArr An array that contains the name(s) of the parameter(s).
+     * This function will send back a JSON string in the following format:
+     * <p>
+     * {<br/>
+     * &nbsp;&nbsp;"message":"The following parameter(s) has invalid values: 'param_1', 'param_2', 'param_n'",<br/>
+     * &nbsp;&nbsp;"type":"error"<br/>
+     * }
+     * </p>
+     * In addition to the message, The response will sent HTTP code 404 - Not Found. 
+     * Note that the content of the field "message" might differ. It depends on 
+     * the language. If no language is selected or language is not supported, 
+     * English will be used.
      * @since 1.3
      */
     public function invParams($paramsNamesArr){

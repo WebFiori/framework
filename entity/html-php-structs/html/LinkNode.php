@@ -22,6 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+namespace phpStructs\html;
 /**
  * A class that represents &lt;a&gt; tag with text only.
  * @author Ibrahim <ibinshikh@hotmail.com>

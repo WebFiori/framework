@@ -22,6 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+namespace phpStructs\html;
 /**
  * A node that represents in line JavaScript code that can be inserted on a 
  * head node.

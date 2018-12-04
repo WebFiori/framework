@@ -23,7 +23,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
+namespace phpStructs\html;
+use phpStructs\LinkedList;
+use phpStructs\Stack;
 /**
  * A class that represents HTML element.
  *

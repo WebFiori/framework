@@ -23,7 +23,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
+namespace phpStructs\html;
 /**
  * A class that represents List Item node.
  *
@@ -65,9 +65,6 @@ class ListItem extends HTMLNode{
             else{
                 parent::addChild(self::createTextNode($text));
             }
-        }
-        else{
-            parent::addChild(self::createTextNode($text));
         }
     }
     /**

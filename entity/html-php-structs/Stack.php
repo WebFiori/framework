@@ -23,10 +23,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+namespace phpStructs;
 /**
  * A class that represents a stack data structure.
  *
- * @author Ibrahim <ibinshikh@hotmail.com>
+ * @author Ibrahim
  * @version 1.1
  */
 class Stack{
@@ -61,7 +62,7 @@ class Stack{
     private $max;
     /**
      * Constructs a new instance of the class.
-     * @param int $max [Optional] The maximum number of elements the stack can hold. 
+     * @param int $max The maximum number of elements the stack can hold. 
      * if a negative number is given or 0, the stack will have unlimited number 
      * of elements. Also if the given value is not an integer, the maximum will be set 
      * to unlimited. Default is 0.

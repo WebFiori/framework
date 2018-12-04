@@ -1,7 +1,8 @@
 <?php
+namespace phpStructs;
 /**
  * The base node class that can be used to construct different data structures.
- * @author Ibrahim <ibinshikh@hotmail.com>
+ * @author Ibrahim
  * @version 1.1
  */
 class Node{
@@ -20,9 +21,9 @@ class Node{
     /**
      * Constructs a new node with specific data and next node.
      * @param mixed $data The data that the node will hold.
-     * @param Node $next The next node. If <b>NULL</b> is given or the given 
-     * value is not an instance of <b>Node</b>, the next node will be set to 
-     * <b>NULL</b>.
+     * @param Node $next The next node. If NULL is given or the given 
+     * value is not an instance of Node, the next node will be set to 
+     * NULL.
      * @since 1.0
      */
     public function __construct(&$data,&$next=null) {
@@ -39,8 +40,8 @@ class Node{
     }
     /**
      * Returns a reference to the next linked node. 
-     * @return mixed If no linked node is set, <b>NULL</b> is returned. Else, 
-     * an instance of <b>Node</b> is returned.
+     * @return mixed If no linked node is set, NULL is returned. Else, 
+     * an instance of Node is returned.
      * @since 1.0
      */
     public function &next(){
@@ -56,8 +57,8 @@ class Node{
     }
     /**
      * Sets the reference to the next linked node.
-     * @param Node $next The next node. If <b>NULL</b> is given, the next node 
-     * will be set to <b>NULL</b>. If the given value is not an instance of <b>Node</b>, 
+     * @param Node $next The next node. If NULL is given, the next node 
+     * will be set to NULL. If the given value is not an instance of Node, 
      * it will be not set.
      * @since 1.0
      */

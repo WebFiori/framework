@@ -23,11 +23,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
+namespace phpStructs;
 /**
  * A class that represents a linked list.
  *
- * @author Ibrahim <ibinshikh@hotmail.com>
+ * @author Ibrahim 
  * @version 1.4
  */
 class LinkedList {
@@ -89,8 +89,9 @@ class LinkedList {
     }
     /**
      * Checks if a given element is in the list or not.
-     * @param mixed $el The element that will be checked. The comparison is based 
-     * on strict equality operator '==='.
+     * Note that the function uses strict equality operator '===' to check 
+     * for element existence.
+     * @param mixed $el The element that will be checked.
      * @return boolean TRUE if the element is on the list. Other than that, 
      * the function will return FALSE.
      * @since 1.0
@@ -188,8 +189,8 @@ class LinkedList {
         return $this->null;
     }
     /**
-     * Returns an array that represents the list.
-     * @return array An array that represents the list.
+     * Returns an array that contains the elements of the list.
+     * @return array An array that contains the elements of the list.
      * @since 1.3
      */
     public function toArray() {
@@ -212,7 +213,7 @@ class LinkedList {
     }
     /**
      * Sort the elements of the list using insertion sort algorithm.
-     * @param boolean $ascending If set to TRUElist elements 
+     * @param boolean $ascending If set to TRUE, list elements 
      * will be sorted in ascending order (From lower to higher). Else, 
      * they will be sorted in descending order (From higher to lower).
      * @return boolean The function will return TRUE if list 
@@ -265,11 +266,12 @@ class LinkedList {
     }
     /**
      * Removes an element given its index.
-     * @param int $index The index of the element.
-     * @return mixed If the given index is in the range [0, LinkedList::size() - 1] 
+     * If the given index is in the range [0, LinkedList::size() - 1] 
      * the element at the given index is returned. If the list is empty or the given 
      * index is out of the range, the function will return NULL. Also the 
      * function will return NULL if the given index is not an integer.
+     * @param int $index The index of the element.
+     * @return mixed The element that was removed. NULL if no element is removed.
      * @since 1.0
      */
     public function &remove($index){
@@ -288,7 +290,7 @@ class LinkedList {
                         if($i == $index){
                             $data = $nextNode->data();
                             $node->setNext($nextNode->next());
-                            $this->reduceSize();
+                            $this->_reduceSize();
                             return $data;
                         }
                         $node = $nextNode;
@@ -310,13 +312,13 @@ class LinkedList {
             $data = &$this->head->data();
             $this->head = NULL;
             $this->tail = NULL;
-            $this->reduceSize();
+            $this->_reduceSize();
             return $data;
         }
         else if($this->size() > 1){
             $data = &$this->head->data();
             $this->head = &$this->head->next();
-            $this->reduceSize();
+            $this->_reduceSize();
             return $data;
         }
         return $this->null;
@@ -350,16 +352,16 @@ class LinkedList {
      * called after removing an element.
      * @since 1.3
      */
-    private function reduceSize() {
+    private function _reduceSize() {
         if($this->size > 0){
             $this->size--;
         }
     }
     /**
      * Removes a specific element from the list.
-     * @param mixed $val The element that will be removed. The function 
-     * will remove the first occurrence of the element if it is repeated. Note 
-     * that the function use strict comparison to check for equality.
+     * The function will remove the first occurrence of the element if it is 
+     * repeated. Note that the function use strict comparison to check for equality.
+     * @param mixed $val The element that will be removed.
      * @return mixed The function will return The element after removal if the given element 
      * is removed. Other than that, the function will return NULL.
      * @since 1.0
@@ -387,7 +389,7 @@ class LinkedList {
                     $data = &$nextNode->data();
                     if($data === $val){
                         $node->setNext($nextNode->next());
-                        $this->reduceSize();
+                        $this->_reduceSize();
                         return $data;
                     }
                     $node = $nextNode;
@@ -399,8 +401,8 @@ class LinkedList {
     }
     /**
      * Returns the index of an element.
-     * @param mixed $el The element to search for. Note that the function is using 
-     * strict comparison operator to search (===).
+     * Note that the function is using strict comparison operator to search (===).
+     * @param mixed $el The element to search for.
      * @return int The index of the element if found. If the list does not contain 
      * the element, the function will return -1.
      * @since 1.2

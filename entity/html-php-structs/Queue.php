@@ -23,10 +23,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+namespace phpStructs;
 /**
- * A class that represents a stack data structure.
+ * A class that represents a queue data structure.
  *
- * @author Ibrahim <ibinshikh@hotmail.com>
+ * @author Ibrahim
  * @version 1.1
  */
 class Queue{
@@ -62,10 +63,11 @@ class Queue{
     private $max;
     /**
      * Constructs a new instance of the class.
-     * @param int $max [Optional] The maximum number of elements the queue can hold. 
+     * @param int $max The maximum number of elements the queue can hold. 
      * if a negative number is given or 0, the queue will have unlimited number 
      * of elements. Also if the given value is not an integer, the maximum will be set 
      * to unlimited. Default is 0.
+     * @since 1.0
      */
     public function __construct($max=0) {
         $this->head = NULL;

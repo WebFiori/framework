@@ -23,7 +23,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
+namespace phpStructs;
 /**
  * An interface that is used to compare objects. It is used by the class 
  * LinkedList's sorting function in order to compare objects.
@@ -33,11 +33,12 @@
 interface Comparable {
     /**
      * Compare the given instance with another object.
-     * @param mixed $other The other variable that will be compared 
-     * with. The implementation of this function should be as follows. 
+     * The implementation of this function should be as follows. 
      * If the two objects are equal, the function should return 0. 
      * If the current instance is greater, the function should return 1. 
      * If the object at the parameter is greater, the function should return -1.
+     * @param mixed $other The other variable that will be compared 
+     * with.
      * @since 1.0
      */
     public function compare($other);

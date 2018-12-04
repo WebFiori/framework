@@ -24,6 +24,7 @@
  * THE SOFTWARE.
  */
 namespace webfiori\entity;
+use phMysql\MySQLLink;
 /**
  * A factory class that is used to create connections to different types of 
  * DBMSs connections.
@@ -114,7 +115,7 @@ class DBConnectionFactory {
                         Logger::log('Database password = \''.$connectionParams['pass'].'\'', 'debug');
                         if(isset($connectionParams['db-name'])){
                             Logger::log('Database name = \''.$connectionParams['db-name'].'\'', 'debug');
-                            $link = new DatabaseLink($connectionParams['host'],$connectionParams['user'],$connectionParams['pass'],$connectionParams['port']);
+                            $link = new MySQLLink($connectionParams['host'],$connectionParams['user'],$connectionParams['pass'],$connectionParams['port']);
                             if($link->setDB($connectionParams['db-name'])){
                                 Logger::log('Connected.');
                                 $retVal = $link;

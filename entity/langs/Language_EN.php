@@ -16,6 +16,7 @@ if(!defined('ROOT_DIR')){
         . '</body>'
         . '</html>');
 }
+use webfiori\entity\Language;
 /**
  * English language definition.
  */

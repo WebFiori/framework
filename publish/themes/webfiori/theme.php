@@ -1,4 +1,10 @@
 <?php
+use webfiori\entity\Theme;
+use webfiori\WebFiori;
+use webfiori\entity\Page;
+use functions\WebsiteFunctions;
+use phpStructs\html\ListItem;
+use phpStructs\html\LinkNode;
 $theme = new Theme();
 $theme->setAuthor('Ibrahim Ali');
 $theme->setName('WebFiori Theme');

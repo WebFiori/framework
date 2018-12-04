@@ -1,4 +1,5 @@
 <?php
+use phpStructs\html\HTMLNode;
 /**
  * This function is used to include aside navigation menu in the page.
  * @param string $dir 

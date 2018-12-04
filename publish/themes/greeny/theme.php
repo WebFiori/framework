@@ -1,4 +1,5 @@
 <?php
+use webfiori\entity\Theme;
 $theme = new Theme();
 $theme->setAuthor('Ibrahim Ali');
 $theme->setAuthorUrl('http://ibrahim-2017.blogspot.com');

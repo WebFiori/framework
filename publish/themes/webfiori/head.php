@@ -23,6 +23,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+use phpStructs\html\HeadNode;
+use webfiori\entity\Page;
 /**
  * Modify the content of this function to add custom head tags.
  * @return HeadNode Head tag as <b>HeadNode</b> object.

@@ -23,6 +23,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+namespace functions;
+use phMysql\MySQLLink;
+use webfiori\entity\SessionManager;
+use webfiori\entity\Logger;
+use webfiori\entity\DBConnectionFactory;
+use phMysql\MySQLQuery;
 if(!defined('ROOT_DIR')){
     header("HTTP/1.1 403 Forbidden");
     die(''

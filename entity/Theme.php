@@ -41,6 +41,7 @@ if(!defined('ROOT_DIR')){
         . '</body>'
         . '</html>');
 }
+use jsonx\JsonI;
 /**
  * A base class that is used to construct website UI.
  *

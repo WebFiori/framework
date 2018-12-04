@@ -17,6 +17,7 @@ if(!defined('ROOT_DIR')){
         . '</body>'
         . '</html>');
 }
+use Config;
 /**
  * PHP utility class.
  * @author Ibrahim <ibinshikh@hotmail.com>

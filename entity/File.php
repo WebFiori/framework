@@ -40,6 +40,7 @@ if(!defined('ROOT_DIR')){
         . '</body>'
         . '</html>');
 }
+use jsonx\JsonI;
 /**
  * A class that represents a file.
  * This class can be used to read and write files in binary. In addition to that, 

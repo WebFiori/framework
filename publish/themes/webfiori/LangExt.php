@@ -1,4 +1,5 @@
 <?php
+use webfiori\entity\Page;
 /**
  * Extending language file by adding more labels.
  *

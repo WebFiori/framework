@@ -1,5 +1,10 @@
 <?php
-
+use phpStructs\html\HTMLNode;
+use webfiori\entity\Page;
+use phpStructs\html\LinkNode;
+use functions\WebsiteFunctions;
+use phpStructs\html\PNode;
+use phpStructs\html\UnorderedList;
 /**
  * Modify the content of this function to customize the top section of the 
  * page. The Top section usually contains main menu, logo, search and other 

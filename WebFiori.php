@@ -1,11 +1,23 @@
 <?php
 namespace webfiori;
+ini_set('display_startup_errors', 1);
+        ini_set('display_errors', 1);
+        error_reporting(-1);
 use webfiori\entity\AutoLoader;
 use webfiori\entity\Logger;
+use webfiori\entity\Util;
+use functions\SystemFunctions;
+use functions\WebsiteFunctions;
+use functions\BasicMailFunctions;
+use webfiori\entity\router\APIRoutes;
+use webfiori\entity\router\ViewRoutes;
+use webfiori\entity\router\ClosureRoutes;
+use webfiori\entity\cron\Cron;
+use webfiori\entity\router\Router;
 /**
  * The instance of this class is used to control basic settings of 
  * the framework. Also, it is the entry point of any request.
- * @author Ibrahim Ali <ibinshikh@hotmail.com>
+ * @author Ibrahim
  * @version 1.3.2
  */
 class WebFiori{

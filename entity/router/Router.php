@@ -41,6 +41,7 @@ if(!defined('ROOT_DIR')){
         . '</body>'
         . '</html>');
 }
+use SiteConfig;
 /**
  * The basic class that is used to route user requests to the correct 
  * location.

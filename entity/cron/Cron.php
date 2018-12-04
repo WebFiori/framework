@@ -23,6 +23,8 @@
  * THE SOFTWARE.
  */
 namespace webfiori\entity\cron;
+use phpStructs\Queue;
+use webfiori\entity\router\Router;
 /**
  * A class that is used to manage cron jobs.
  * It is used to create jobs, schedule them and execute them. In order to run 

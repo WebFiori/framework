@@ -1,4 +1,7 @@
 <?php
+use webfiori\entity\Page;
+use phpStructs\html\HTMLNode;
+use phpStructs\html\PNode;
 function getFooterNode(){
     $page = Page::get();
     $node = new HTMLNode('div');

@@ -22,13 +22,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+namespace restEasy;
+use jsonx\JsonI;
 /**
  * A class that represents a REST API.
- * @version 1.4.1
+ * @version 1.4.2
  */
-abstract class API implements JsonI{
+abstract class WebAPI implements JsonI{
     /**
      * An array that contains the supported 'POST' request content types.
+     * This array has the following values:
+     * <ul>
+     * <li>application/x-www-form-urlencoded</li>
+     * <li>multipart/form-data</li>
+     * </ul>
      * @var array An array that contains the supported 'POST' request content types.
      * @since 1.1
      */
@@ -113,8 +120,18 @@ abstract class API implements JsonI{
      */
     private $apiDesc;
     /**
-     * Creates new instance of <b>API</b>.
-     * @param string $version [Optional] initial API version. Default is '1.0.0'
+     * Creates new instance of the class.
+     * By default, the API will have two actions added to it:
+     * <ul>
+     * <li>api-info</li>
+     * <li>request-info</li>
+     * </ul>
+     * The first action is used to return a JSON string which contains 
+     * all needed information by the front-end to implement the API. The user 
+     * can supply an optional parameter with it which is called 'version' in 
+     * order to get information about specific API version. The 
+     * second action is used to get basic info about the request.
+     * @param string $version initial API version. Default is '1.0.0'
      */
     public function __construct($version='1.0.0'){
         $this->setVersion($version);
@@ -136,6 +153,11 @@ abstract class API implements JsonI{
         $action2->setDescription('Gets basic information about the request.');
         $action2->setName('request-info');
         $action2->addRequestMethod('get');
+        $action2->addRequestMethod('post');
+        $action2->addRequestMethod('delete');
+        $action2->addRequestMethod('put');
+        $action2->addRequestMethod('head');
+        $action2->addRequestMethod('options');
         $this->addAction($action2,TRUE);
         $this->invParamsArr = array();
         $this->missingParamsArr = array();
@@ -152,7 +174,7 @@ abstract class API implements JsonI{
     /**
      * Returns the description of the API.
      * @return string|NULL The description of the API. If the description is 
-     * not set, the function will return <b>NULL</b>.
+     * not set, the function will return NULL.
      * @since 1.3
      */
     public function getDescription() {
@@ -160,8 +182,19 @@ abstract class API implements JsonI{
     }
     /**
      * Sends a response message to indicate that a database error has occur.
-     * @param JsonI|JsonX|string $info An object of type <b>JsonI</b> or 
-     * JsonX that describe the error in more details. Also it can be a simple string.
+     * This function will send back a JSON string in the following format:
+     * <p>
+     * {<br/>
+     * &nbsp;&nbsp;"message":"Database Error",<br/>
+     * &nbsp;&nbsp;"type":"error",<br/>
+     * &nbsp;&nbsp;"err-info":OTHER_DATA<br/>
+     * }
+     * </p>
+     * In here, 'OTHER_DATA' can be a basic string or JSON string.
+     * Also, The response will sent HTTP code 404 - Not Found.
+     * @param JsonI|JsonX|string $info An object of type JsonI or 
+     * JsonX that describe the error in more details. Also it can be a simple string 
+     * or JSON string.
      * @since 1.0
      */
     public function databaseErr($info=''){
@@ -176,7 +209,16 @@ abstract class API implements JsonI{
         }
     }
     /**
-     * Sends a response message to indicate that a user is not authorized to do an API call.
+     * Sends a response message to indicate that a user is not authorized to 
+     * do an API call.
+     * This function will send back a JSON string in the following format:
+     * <p>
+     * {<br/>
+     * &nbsp;&nbsp;"message":"Not authorized",<br/>
+     * &nbsp;&nbsp;"type":"error"<br/>
+     * }
+     * </p>
+     * In addition to the message, The response will sent HTTP code 401 - Not Authorized.
      * @since 1.0
      */
     public function notAuth(){
@@ -184,13 +226,31 @@ abstract class API implements JsonI{
     }
     /**
      * Sends a response message to indicate that an action is not supported by the API.
+     * This function will send back a JSON string in the following format:
+     * <p>
+     * {<br/>
+     * &nbsp;&nbsp;"message":"Action not supported",<br/>
+     * &nbsp;&nbsp;"type":"error"<br/>
+     * }
+     * </p>
+     * In addition to the message, The response will sent HTTP code 404 - Not Found.
      * @since 1.0
      */
     public function actionNotSupported(){
         $this->sendResponse('Action not supported', TRUE, 404);
     }
     /**
-     * Sends a response message to indicate that request content type is not supported by the API.
+     * Sends a response message to indicate that request content type is 
+     * not supported by the API.
+     * This function will send back a JSON string in the following format:
+     * <p>
+     * {<br/>
+     * &nbsp;&nbsp;"message":"Content type not supported.",<br/>
+     * &nbsp;&nbsp;"type":"error",<br/>
+     * &nbsp;&nbsp;"request-content-type":"content_type"<br/>
+     * }
+     * </p>
+     * In addition to the message, The response will sent HTTP code 404 - Not Found.
      * @since 1.1
      */
     public function contentTypeNotSupported($cType=''){
@@ -198,20 +258,44 @@ abstract class API implements JsonI{
     }
     /**
      * Sends a response message to indicate that request method is not supported.
+     * This function will send back a JSON string in the following format:
+     * <p>
+     * {<br/>
+     * &nbsp;&nbsp;"message":"Method Not Allowed.",<br/>
+     * &nbsp;&nbsp;"type":"error",<br/>
+     * }
+     * </p>
+     * In addition to the message, The response will sent HTTP code 405 - Method Not Allowed.
      * @since 1.0
      */
     public function requestMethodNotAllowed(){
-        $this->sendResponse('Method Not Allowed', TRUE, 405);
+        $this->sendResponse('Method Not Allowed.', TRUE, 405);
     }
     /**
      * Sends a response message to indicate that an action is not implemented.
+     * This function will send back a JSON string in the following format:
+     * <p>
+     * {<br/>
+     * &nbsp;&nbsp;"message":"Action not implemented.",<br/>
+     * &nbsp;&nbsp;"type":"error",<br/>
+     * }
+     * </p>
+     * In addition to the message, The response will sent HTTP code 404 - Not Found.
      * @since 1.0
      */
     public function actionNotImpl(){
-        $this->sendResponse('Action not implemented', TRUE, 404);
+        $this->sendResponse('Action not implemented.', TRUE, 404);
     }
     /**
      * Sends a response message to indicate that a request parameter is missing.
+     * This function will send back a JSON string in the following format:
+     * <p>
+     * {<br/>
+     * &nbsp;&nbsp;"message":"The parameter 'param_name' is missing.",<br/>
+     * &nbsp;&nbsp;"type":"error",<br/>
+     * }
+     * </p>
+     * In addition to the message, The response will sent HTTP code 404 - Not Found.
      * @param string $paramName The name of the parameter.
      * @since 1.0
      */
@@ -241,7 +325,14 @@ abstract class API implements JsonI{
     }
     /**
      * Sends a response message to indicate that a request parameter or parameters are missing.
-     * @param array $paramsNamesArr An array that contains the name(s) of the parameter(s).
+     * This function will send back a JSON string in the following format:
+     * <p>
+     * {<br/>
+     * &nbsp;&nbsp;"message":"The following required parameter(s) where missing from the request body: 'param_1', 'param_2', 'param_n'",<br/>
+     * &nbsp;&nbsp;"type":"error",<br/>
+     * }
+     * </p>
+     * In addition to the message, The response will sent HTTP code 404 - Not Found.
      * @since 1.3
      */
     public function missingParams(){
@@ -262,7 +353,14 @@ abstract class API implements JsonI{
     }
     /**
      * Sends a response message to indicate that a request parameter(s) have invalid values.
-     * @param array $paramsNamesArr An array that contains the name(s) of the parameter(s).
+     * This function will send back a JSON string in the following format:
+     * <p>
+     * {<br/>
+     * &nbsp;&nbsp;"message":"The following parameter(s) has invalid values: 'param_1', 'param_2', 'param_n'",<br/>
+     * &nbsp;&nbsp;"type":"error"<br/>
+     * }
+     * </p>
+     * In addition to the message, The response will sent HTTP code 404 - Not Found.
      * @since 1.3
      */
     public function invParams(){
@@ -293,7 +391,7 @@ abstract class API implements JsonI{
      * Sets API version number.
      * @param string $val Version number (such as 1.0.0). Version number 
      * must be provided in the form 'x.x.x'.
-     * @return boolean <b>TRUE</b> if set. <b>FALSE</b> otherwise.
+     * @return boolean TRUE if set. FALSE otherwise.
      * @since 1.0
      */
     public final function setVersion($val){
@@ -339,7 +437,7 @@ abstract class API implements JsonI{
     }
     /**
      * Returns an array of supported API actions.
-     * @return array An array that contains an objects of type <b>APIAction</b>. 
+     * @return array An array that contains an objects of type APIAction. 
      * The actions on the returned array does not require authentication.
      * @since 1.0
      */
@@ -348,7 +446,7 @@ abstract class API implements JsonI{
     }
     /**
      * Returns an array of supported API actions.
-     * @return array An array that contains an objects of type <b>APIAction</b>. 
+     * @return array An array that contains an objects of type APIAction. 
      * The array will contains the actions 
      * that require authentication.
      * @since 1.0
@@ -430,7 +528,7 @@ abstract class API implements JsonI{
     }
     /**
      * Checks if the action that is used to fetch the API is supported or not.
-     * @return boolean <b>TRUE</b> if the API supports the action. <b>FALSE</b> 
+     * @return boolean TRUE if the API supports the action. FALSE 
      * if not or it is not set. The action name must be provided with the request 
      * as a parameter with the name 'action'.
      * @since 1.0
@@ -464,10 +562,10 @@ abstract class API implements JsonI{
     /**
      * Checks if request content type is supported by the API or not (For 'POST' 
      * requests).
-     * @return boolean Returns <b>TRUE</b> in case the 'content-type' header is not 
+     * @return boolean Returns TRUE in case the 'content-type' header is not 
      * set or the request method is not 'POST'. Also the function will return 
-     * <b>TRUE</b> if the content type is supported. Other than that, the function 
-     * will return <b>FALSE</b>
+     * TRUE if the content type is supported. Other than that, the function 
+     * will return FALSE
      * @since 1.1
      */
     public final function isContentTypeSupported(){
@@ -495,7 +593,7 @@ abstract class API implements JsonI{
     }
     /**
      * Checks the status of the API action.
-     * @return boolean TRUE if the following conditions are met:
+     * This function checks if the following conditions are met:
      * <ul>
      * <li>The parameter "action" is set in request body.</li>
      * <li>The action is supported by the API.</li>
@@ -503,6 +601,7 @@ abstract class API implements JsonI{
      * </ul>
      * If one of the conditions is not met, the function will return FALSE and 
      * send back a response to indicate the issue.
+     * @return boolean TRUE if API action is valid.
      * @since 1.0
      */
     private final function _checkAction(){
@@ -554,6 +653,14 @@ abstract class API implements JsonI{
     /**
      * Sends a response message to tell the front-end that the parameter 
      * 'action' is missing from request body.
+     * This function will send back a JSON string in the following format:
+     * <p>
+     * {<br/>
+     * &nbsp;&nbsp;"message":"Action is not set.",<br/>
+     * &nbsp;&nbsp;"type":"error"<br/>
+     * }
+     * </p>
+     * In addition to the message, The response will sent HTTP code 404 - Not Found.
      * @since 1.3.1
      */
     public function missingAPIAction() {
@@ -562,8 +669,8 @@ abstract class API implements JsonI{
     /**
      * Checks if a user is authorized to perform an action that require authorization.
      * @return boolean The function must be implemented by the sub-class in a way 
-     * that makes it return <b>TRUE</b> in case the user is allowed to perform the 
-     * action. If the user is not permitted, the function must return <b>FALSE</b>.
+     * that makes it return TRUE in case the user is allowed to perform the 
+     * action. If the user is not permitted, the function must return FALSE.
      * @since 1.1
      */
     public abstract function isAuthorized();
@@ -573,7 +680,8 @@ abstract class API implements JsonI{
      */
     public abstract function processRequest();
     /**
-     * Process user request. This function must be called after creating any 
+     * Process user request. 
+     * This function must be called after creating any 
      * new instance of the API in order to process user request.
      * @since 1.0
      */
@@ -646,8 +754,15 @@ abstract class API implements JsonI{
     }
     /**
      * Sends a JSON response to the client.
+     * The basic format of the message will be as follows:
+     * <p>
+     * {<br/>
+     * &nbsp;&nbsp;"message":"Action is not set.",<br/>
+     * &nbsp;&nbsp;"type":"error"<br/>
+     * }
+     * If other JSON string is given, It will be included in the response.
      * @param string $message The message to send back.
-     * @param boolean $isErr <b>TRUE</b> if the message represents an error state.
+     * @param boolean $isErr TRUE if the message represents an error state.
      * @param int $code Response code (such as 404 or 200).
      * @param string $otherJsonStr Any other data to send back (it should be a 
      * JSON string).
@@ -671,7 +786,7 @@ abstract class API implements JsonI{
         }
     }
     /**
-     * Sends Back a data using specific content type using code 200.
+     * Sends Back a data using specific content type using HTTP code 200 - Ok.
      * @param string $conentType Response content type (such as 'application/json')
      * @param type $data Any data to send back (it can be a file, a string ...).
      */
@@ -691,7 +806,7 @@ abstract class API implements JsonI{
     /**
      * Returns the action that was requested to perform.
      * @return string|NULL The action that was requested to perform. If the action 
-     * is not set, the function will return <b>NULL</b>.
+     * is not set, the function will return NULL.
      * @since 1.0
      */
     public function getAction(){

@@ -3,7 +3,7 @@
 /* 
  * The MIT License
  *
- * Copyright 2018 Ibrahim BinAlshikh, rest-easy (v1.4.2).
+ * Copyright 2018 Ibrahim BinAlshikh.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,9 +23,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+namespace restEasy;
+use jsonx\JsonI;
 /**
  * A class that represents request parameter.
- * @author Ibrahim <ibinshikh@hotmail.com>
+ * @author Ibrahim
  * @version 1.2
  */
 class RequestParameter implements JsonI{
@@ -43,7 +45,7 @@ class RequestParameter implements JsonI{
     private $name;
     /**
      * Indicates wither the attribute is optional or not.
-     * @var boolean <b>TRUE</b> if the parameter is optional.
+     * @var boolean TRUE if the parameter is optional.
      * @since 1.0
      */
     private $isOptional;
@@ -87,8 +89,8 @@ class RequestParameter implements JsonI{
     private $applyBasicFilter;
     /**
      * Sets the description of the parameter.
-     * @param sting $desc Parameter description. Used to help front-end to identify 
-     * the use of the API.
+     * This function is used to document the API. Used to help front-end developers.
+     * @param sting $desc Parameter description.
      * @since 1.1
      */
     public function setDescription($desc) {
@@ -97,19 +99,21 @@ class RequestParameter implements JsonI{
     /**
      * Returns the description of the parameter.
      * @return string|NULL The description of the parameter. If the description is 
-     * not set, the function will return <b>NULL</b>.
+     * not set, the function will return NULL.
      * @since 1.1
      */
     public function getDescription() {
         return $this->desc;
     }
     /**
-     * Creates new instance of <b>RequestParameter</b>
-     * @param string $name The name of the parameter as it appears in the request body.
+     * Creates new instance of the class.
+     * @param string $name The name of the parameter as it appears in the request body. 
+     * It must be a valid name> If the given name is invalid, the parameter 
+     * name will be set to 'a-parameter'.
      * @param string $type The type of the data that will be in the parameter (integer, 
-     * string, email etc...). It must be a value from the array <b>APIFilter::TYPES</b>. 
+     * string, email etc...). It must be a value from the array APIFilter::TYPES. 
      * If the given type is invalid, 'string' is used.
-     * @param boolean $isOptional Set to <b>TRUE</b> if the parameter is optional.
+     * @param boolean $isOptional Set to TRUE if the parameter is optional.
      */
     public function __construct($name,$type='string',$isOptional=false) {
         if(!$this->setName($name)){
@@ -123,9 +127,10 @@ class RequestParameter implements JsonI{
     }
     /**
      * Returns the minimum numeric value the parameter can accept.
+     * This function apply only to and integer type.
      * @return int|NULL The minimum numeric value the parameter can accept. 
      * If the request parameter type is not numeric, the function will return 
-     * <b>NULL</b>.
+     * NULL.
      * @since 1.1
      */
     public function getMinVal() {
@@ -133,24 +138,26 @@ class RequestParameter implements JsonI{
     }
     /**
      * Returns the maximum numeric value the parameter can accept.
+     * This function apply only to integer type.
      * @return int|NULL The maximum numeric value the parameter can accept. 
      * If the request parameter type is not numeric, the function will return 
-     * <b>NULL</b>.
+     * NULL.
      * @since 1.1
      */
     public function getMaxVal() {
         return $this->maxVal;
     }
     /**
-     * Sets the minimum value.
-     * @param int $val The minimum value to set. The value will be updated 
+     * Sets the minimum value that the parameter can accept.
+     * The value will be updated 
      * only if:
      * <ul>
      * <li>The request parameter type is numeric ('integer').</li>
-     * <li>The given value is less than <b>RequestParameter::getMaxVal()</b></li>
+     * <li>The given value is less than RequestParameter::getMaxVal()</li>
      * </ul>
-     * @return boolean The function will return <b>TRUE</b> once the minimum value 
-     * is updated. <b>FALSE</b> if not.
+     * @param int $val The minimum value to set.
+     * @return boolean The function will return TRUE once the minimum value 
+     * is updated. FALSE if not.
      * @since 1.1
      */
     public function setMinVal($val) {
@@ -166,14 +173,15 @@ class RequestParameter implements JsonI{
     }
     /**
      * Sets the maximum value.
-     * @param int $val The maximum value to set. The value will be updated 
+     * The value will be updated 
      * only if:
      * <ul>
      * <li>The request parameter type is numeric ('integer').</li>
-     * <li>The given value is greater than <b>RequestParameter::getMinVal()</b></li>
+     * <li>The given value is greater than RequestParameter::getMinVal()</li>
      * </ul>
-     * @return boolean The function will return <b>TRUE</b> once the maximum value 
-     * is updated. <b>FALSE</b> if not.
+     * @param int $val The maximum value to set.
+     * @return boolean The function will return TRUE once the maximum value 
+     * is updated. FALSE if not.
      * @since 1.1
      */
     public function setMaxVal($val) {
@@ -191,7 +199,10 @@ class RequestParameter implements JsonI{
     /**
      * Sets a default value for the parameter to use if the parameter is 
      * not provided.
-     * @param type $val The value to set.
+     * This function can be used to include a default value for the parameter if 
+     * it is optional.
+     * @param mixed $val default value for the parameter to use if the parameter is 
+     * not provided.
      * @since 1.1
      */
     public function setDefault($val) {
@@ -200,8 +211,9 @@ class RequestParameter implements JsonI{
     /**
      * Returns the default value to use in case the parameter is 
      * not provided.
-     * @return type The default value to use in case the parameter is 
-     * not provided.
+     * @return mixed|NULL The default value to use in case the parameter is 
+     * not provided. If no default value is provided, the function will 
+     * return NULL.
      * @since 1.1
      */
     public function getDefault() {
@@ -210,8 +222,8 @@ class RequestParameter implements JsonI{
     /**
      * Sets the type of the parameter.
      * @param string $type The type of the parameter. It must be a value 
-     * form the array <b>APIFilter::TYPES</b>.
-     * @return boolean <b>TRUE</b> is returned if the type is updated. <b>FALSE</b> 
+     * form the array APIFilter::TYPES.
+     * @return boolean TRUE is returned if the type is updated. FALSE 
      * if not.
      * @since 1.1
      */
@@ -233,15 +245,16 @@ class RequestParameter implements JsonI{
     }
     /**
      * Sets the name of the parameter.
-     * @param string $name The name of the parameter. A valid parameter name must 
+     * A valid parameter name must 
      * follow the following rules:
      * <ul>
      * <li>It can contain the letters [A-Z] and [a-z].</li>
      * <li>It can contain the numbers [0-9].</li>
      * <li>It can have the character '-' and the character '_'.</li>
      * </ul>
+     * @param string $name The name of the parameter. 
      * @return boolean If the given name is valid, the function will return 
-     * <b>TRUE</b> once the name is set. <b>FALSE</b> is returned if the given 
+     * TRUE once the name is set. FALSE is returned if the given 
      * name is invalid.
      * @since 1.0
      */
@@ -274,8 +287,9 @@ class RequestParameter implements JsonI{
         return $this->name;
     }
     /**
-     * Returns a boolean value that indicates if the parameter is optional or not.
-     * @return boolean <b>TRUE</b> if the parameter is optional and <b>FALSE</b> 
+     * Returns a boolean value that can be used to tell if the parameter is 
+     * optional or not.
+     * @return boolean TRUE if the parameter is optional and FALSE 
      * if not.
      * @since 1.0
      */
@@ -292,7 +306,9 @@ class RequestParameter implements JsonI{
     }
     /**
      * Returns a JsonX object that represents the request parameter.
-     * @return JsonX An object of type <b>JsonX</b>.
+     * This function is used to help front-end developers in showing the 
+     * documentation of the request parameter.
+     * @return JsonX An object of type JsonX.
      * @since 1.0
      */
     public function toJSON() {
@@ -313,21 +329,28 @@ class RequestParameter implements JsonI{
         return $json;
     }
     /**
-     * Sets a callback function to work as a filter for the inputs.
-     * @param Function $function A callback function. The callback function 
+     * Sets a callback function to work as a filter for request parameter.
+     * The callback function 
      * will have two parameters passed to it. The first one is an associative 
      * array that contains the not-filtered value and the value filtered 
      * using basic filter. The values are contained in two 
-     * indices: <b>'original-value'</b> and <b>'basic-filter-result'</b>. 
+     * indices: 
+     * <ul>
+     * <li>original-value</li>
+     * <li>basic-filter-result</li>
+     * </ul>
+     * If the parameter $applyBasicFilter is set to FALSE, the index 'basic-filter-result' 
+     * will have the value 'NOT_APLICABLE'.
      * The second parameter is an object of type <b>RequestParameter</b> 
      * which contains original information for the filter. The function 
-     * must be implemented in a way that makes it return <b>FALSE</b> if the 
+     * must be implemented in a way that makes it return FALSE if the 
      * parameter has invalid value. If the parameter is filtered and 
      * was validated, the function must return the valid and filtered 
      * value.
-     * @param boolean $applyBasicFilter [Optional] If set to <b>TRUE</b>, 
+     * @param callback $function A callback function. 
+     * @param boolean $applyBasicFilter If set to TRUE, 
      * the basic filter will be applied to the parameter. Default 
-     * is <b>TRUE</b>.
+     * is TRUE.
      * @since 1.2
      */
     public function setCustomFilterFunction($function,$applyBasicFilter=true) {
@@ -339,7 +362,7 @@ class RequestParameter implements JsonI{
     /**
      * Checks if we need to apply basic filter or not 
      * before applying custom filter callback.
-     * @return boolean The function will return <b>TRUE</b> 
+     * @return boolean The function will return TRUE 
      * if the basic filter will be applied before applying custom filter.
      * @since 1.2
      */
@@ -349,8 +372,8 @@ class RequestParameter implements JsonI{
     /**
      * Returns the function that is used as a custom filter 
      * for the parameter.
-     * @return Function | NULL The function that is used as a custom filter 
-     * for the parameter. If not set, the function will return <b>NULL</b>.
+     * @return callback|NULL The function that is used as a custom filter 
+     * for the parameter. If not set, the function will return NULL.
      * @since 1.2
      */
     public function getCustomFilterFunction() {

@@ -3,7 +3,7 @@
 /* 
  * The MIT License
  *
- * Copyright 2018 Ibrahim BinAlshikh, rest-easy (v1.4.2).
+ * Copyright 2018 Ibrahim BinAlshikh.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,14 +23,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+namespace restEasy;
+use jsonx\JsonI;
 /**
  * A class that represents API action.
- * @author Ibrahim <ibinshikh@hotmail.com>
+ * @author Ibrahim
  * @version 1.3
  */
 class APIAction implements JsonI{
     /**
      * An array that contains the names of request methods.
+     * This array contains the following strings:
+     * <ul>
+     * <li>GET</li>
+     * <li>HEAD</li>
+     * <li>POST</li>
+     * <li>PUT</li>
+     * <li>DELETE</li>
+     * <li>TRACE</li>
+     * <li>OPTIONS</li>
+     * <li>PATCH</li>
+     * <li>CONNECT</li>
+     * </ul>
      * @var array An array that contains the names of request methods.
      * @since 1.1
      */
@@ -51,7 +65,7 @@ class APIAction implements JsonI{
      */
     private $reqMethods = array();
     /**
-     * An array that holds an objects of type <b>RequestParameter</b>.
+     * An array that holds an objects of type RequestParameter.
      * @var array
      * @since 1.0 
      */
@@ -77,14 +91,15 @@ class APIAction implements JsonI{
      */
     private $responses;
     /**
-     * Creates new instance of <b>APIAction</b>.
-     * @param string $name [Optional] The name of the action. A valid action name must 
-     * follow the following rules:
+     * Creates new instance of the class.
+     * The developer can supply an optional action name. 
+     * A valid action name must follow the following rules:
      * <ul>
      * <li>It can contain the letters [A-Z] and [a-z].</li>
      * <li>It can contain the numbers [0-9].</li>
      * <li>It can have the character '-' and the character '_'.</li>
      * </ul>
+     * @param string $name The name of the action. 
      */
     public function __construct($name='') {
         if(!$this->setName($name)){
@@ -92,7 +107,9 @@ class APIAction implements JsonI{
         }
     }
     /**
-     * Returns an array that contains information about possible responses.
+     * Returns an indexed array that contains information about possible responses.
+     * It is used to describe the API for front-end developers and help them 
+     * identify possible responses if they call the API using the specified action.
      * @return array An array that contains information about possible responses.
      * @since 1.3
      */
@@ -101,6 +118,8 @@ class APIAction implements JsonI{
     }
     /**
      * Adds response description.
+     * It is used to describe the API for front-end developers and help them 
+     * identify possible responses if they call the API using the specified action.
      * @param string $description A paragraph that describes one of 
      * the possible responses due to performing the action.
      * @since 1.3
@@ -112,8 +131,8 @@ class APIAction implements JsonI{
     }
     /**
      * Sets the description of the action.
-     * @param sting $desc Action description. Used to help front-end to identify 
-     * the use of the action.
+     * Used to help front-end to identify the use of the action.
+     * @param sting $desc Action description.
      * @since 1.2
      */
     public final function setDescription($desc) {
@@ -122,7 +141,7 @@ class APIAction implements JsonI{
     /**
      * Returns the description of the action.
      * @return string|NULL The description of the action. If the description is 
-     * not set, the function will return <b>NULL</b>.
+     * not set, the function will return NULL.
      * @since 1.2
      */
     public final function getDescription() {
@@ -130,9 +149,9 @@ class APIAction implements JsonI{
     }
     /**
      * Sets the version number at which the action was added to the API.
-     * @param string The version number at which the action was added to the API. This 
-     * function is called automatically when an action is added to any object of 
-     * type <b>API</b>.
+     * This function is called automatically when an action is added to any object of 
+     * type WebAPI. The developer does not have to use this function.
+     * @param string The version number at which the action was added to the API.
      * @since 1.2
      */
     public final function setSince($sinceAPIv) {
@@ -140,6 +159,8 @@ class APIAction implements JsonI{
     }
     /**
      * Returns the version number at which the action was added to the API.
+     * Version number is set based on the version number which was set in the 
+     * class WebAPI.
      * @return string The version number at which the action was added to the API.
      * @since 1.2
      */
@@ -158,11 +179,13 @@ class APIAction implements JsonI{
     }
     /**
      * Adds new action request method.
-     * @param string $method The request method (e.g. 'get', 'post', 'options' ...). It 
+     * The value that will be passed to this function can be any string 
+     * that represents HTTP request method (e.g. 'get', 'post', 'options' ...). It 
      * can be in upper case or lower case.
-     * @return boolean <b>TRUE</b> in case the request method is added. If the given 
-     * request method is already added or the method is already added, the function 
-     * will return <b>FALSE</b>.
+     * @param string $method The request method.
+     * @return boolean TRUE in case the request method is added. If the given 
+     * request method is already added or the method is unknown, the function 
+     * will return FALSE.
      * @since 1.1
      */
     public final function addRequestMethod($method){
@@ -177,8 +200,8 @@ class APIAction implements JsonI{
     }
     /**
      * Returns an array that contains all action request methods.
-     * @return array An array that contains all action request methods. Request 
-     * methods can be added using the function <b>APIAction::addRequestMethod($method)</b>
+     * Request methods can be added using the function APIAction::addRequestMethod().
+     * @return array An array that contains all action request methods.
      * @see APIAction::addRequestMethod($method)
      * @since 1.1
      * 
@@ -191,7 +214,7 @@ class APIAction implements JsonI{
      * @param string $method The request method (e.g. 'get', 'post', 'options' ...). It 
      * can be in upper case or lower case.
      * @return string|NULL The function will return the removed request method. 
-     * In case nothing has changed, the function will return <b>NULL</b>.
+     * In case nothing has changed, the function will return NULL.
      * @since 1.1
      */
     public function removeRequestMethod($method){
@@ -209,15 +232,15 @@ class APIAction implements JsonI{
     }
     /**
      * Sets the name of the action.
-     * @param string $name The name of the action. A valid action name must 
-     * follow the following rules:
+     * A valid action name must follow the following rules:
      * <ul>
      * <li>It can contain the letters [A-Z] and [a-z].</li>
      * <li>It can contain the numbers [0-9].</li>
      * <li>It can have the character '-' and the character '_'.</li>
      * </ul>
+     * @param string $name The name of the action.
      * @return boolean If the given name is valid, the function will return 
-     * <b>TRUE</b> once the name is set. <b>FALSE</b> is returned if the given 
+     * TRUE once the name is set. FALSE is returned if the given 
      * name is invalid.
      * @since 1.0
      */
@@ -242,8 +265,8 @@ class APIAction implements JsonI{
         return FALSE;
     }
     /**
-     * Returns an array that contains an objects of type <b>RequestParameter</b>.
-     * @return array an array that contains an objects of type <b>RequestParameter</b>.
+     * Returns an array that contains an objects of type RequestParameter.
+     * @return array an array that contains an objects of type RequestParameter.
      * @since 1.0
      */
     public final function getParameters(){
@@ -252,11 +275,11 @@ class APIAction implements JsonI{
     /**
      * Returns action parameter given its name.
      * @param string $paramName The name of the parameter.
-     * @return RequestParameter | NULL Returns an objects of type <b>RequestParameter</b> if 
-     * a parameter with the given name was found. <b>NULL</b> if nothing is found.
+     * @return RequestParameter|NULL Returns an objects of type RequestParameter if 
+     * a parameter with the given name was found. NULL if nothing is found.
      * @since 1.2
      */
-    public final function getParameterByName($paramName) {
+    public final function &getParameterByName($paramName) {
         $paramName .= '';
         if(strlen($paramName) != 0){
             foreach ($this->parameters as $param){
@@ -265,7 +288,8 @@ class APIAction implements JsonI{
                 }
             }
         }
-        return NULL;
+        $null = NULL;
+        return $null;
     }
     /**
      * Returns the name of the action.
@@ -276,8 +300,20 @@ class APIAction implements JsonI{
         return $this->name;
     }
     /**
-     * Returns a <b>JsonX</b> object that represents the action.
-     * @return JsonX an object of type <b>JsonX</b>.
+     * Returns a JsonX object that represents the action.
+     * The generated JSON string from the returned JsonX object will have 
+     * the following format:
+     * <p>
+     * {<br/>
+     * &nbsp;&nbsp;"name":"",<br/>
+     * &nbsp;&nbsp;"since":"",<br/>
+     * &nbsp;&nbsp;"description":"",<br/>
+     * &nbsp;&nbsp;"request-methods":[],<br/>
+     * &nbsp;&nbsp;"parameters":[],<br/>
+     * &nbsp;&nbsp;"responses":"[]"<br/>
+     * }
+     * </p>
+     * @return JsonX an object of type JsonX.
      * @since 1.0
      */
     public function toJSON() {

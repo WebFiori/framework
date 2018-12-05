@@ -42,10 +42,11 @@ if(!defined('ROOT_DIR')){
         . '</html>');
 }
 use jsonx\JsonI;
+use SiteConfig;
 /**
  * A base class that is used to construct website UI.
  *
- * @author Ibrahim <ibinshikh@hotmail.com>
+ * @author Ibrahim
  * @version 1.2.1
  */
 class Theme implements JsonI{
@@ -116,6 +117,21 @@ class Theme implements JsonI{
     private $beforeLoadedParams;
     /**
      * Creates new instance of the class using default values.
+     * The default values will be set as follows:
+     * <ul>
+     * <li>Theme name will be an empty string.</li>
+     * <li>Theme URL will be an empty string.</li>
+     * <li>Author name will be an empty string.</li>
+     * <li>Author URL will be an empty string.</li>
+     * <li>Theme version will be set to '1.0.0'</li>
+     * <li>Theme license will be an empty string.</li>
+     * <li>License URL will be an empty string.</li>
+     * <li>Theme description will be an empty string.</li>
+     * <li>Theme directory name will be an empty string.</li>
+     * <li>Theme CSS directory name will be set to 'css'</li>
+     * <li>Theme JS directory name will be set to 'js'</li>
+     * <li>Theme images directory name will be set to 'images'</li>
+     * </ul>
      */
     public function __construct() {
         Logger::logFuncCall(__METHOD__);
@@ -143,6 +159,9 @@ class Theme implements JsonI{
     }
     /**
      * Adds a set of theme components to the theme.
+     * Theme components are a set of PHP files that must exist inside theme 
+     * directory. The developer can create any number of components and add 
+     * them to the theme.
      * @param array $arr An array that contains the names of components files 
      * (such as 'head.php').
      * @since 1.0
@@ -157,8 +176,9 @@ class Theme implements JsonI{
     }
     /**
      * Returns an array which contains the names of theme components files.
-     * @return array An array which contains the names of theme components files. 
-     * The components of a theme are usually .php files.
+     * Theme components are a set of PHP files that must exist inside theme 
+     * directory.
+     * @return array An array which contains the names of theme components files.
      * @since 1.0
      */
     public function getComponents() {
@@ -166,6 +186,8 @@ class Theme implements JsonI{
     }
     /**
      * Adds a single component to the set of theme components.
+     * Theme components are a set of PHP files that must exist inside theme 
+     * directory.
      * @param string $componentName The name of the component file (such as 'head.php')
      * @since 1.0
      */
@@ -186,16 +208,17 @@ class Theme implements JsonI{
     }
     /**
      * Loads a theme given its name.
-     * @param string $themeName [Optional] The name of the theme as specified by the 
-     * variable 'name' in theme definition. If the given name is <b>NULL</b>, the 
+     * If the given name is <b>NULL</b>, the 
      * function will load the default theme as specified by the function 
      * <b>SiteConfig::getBaseThemeName()</b>.
+     * @param string $themeName The name of the theme. 
      * @return Theme The function will return an object of type <b>Theme</b> once the 
      * theme is loaded. The object will contain all theme information.
      * @throws Exception The function will throw 
      * an exception if no theme was found which has the given name. Another case is 
      * when the file 'theme.php' of the theme is missing. 
-     * Finally, an exception will be thrown if theme component is not found.
+     * Finally, an exception will be thrown if theme component is not found and 
+     * it was added to the theme. 
      * @since 1.0
      */
     public static function usingTheme($themeName=null) {
@@ -218,7 +241,7 @@ class Theme implements JsonI{
             if(isset($themes[$themeName])){
                 $themeToLoad = $themes[$themeName];
                 Logger::log('Theme found. Added to the set of loaded themes.');
-                array_push(self::$loadedThemes, $themeToLoad);
+                self::$loadedThemes[$themeName] = $themeToLoad;
             }
             else{
                 Logger::log('No theme was found which has the given name. An exception is thrown.', 'error');
@@ -265,7 +288,7 @@ class Theme implements JsonI{
     }
     /**
      * Sets the value of the callback which will be called after theme is loaded.
-     * @param Function $function The callback.
+     * @param callable $function The callback.
      * @param array $params An array of parameters which can be passed to the 
      * callback.
      * @since 1.0
@@ -287,7 +310,7 @@ class Theme implements JsonI{
     }
     /**
      * Sets the value of the callback which will be called before theme is loaded.
-     * @param Function $function The callback.
+     * @param callback $function The callback.
      * @param array $params An array of parameters which can be passed to the 
      * callback.
      * @since 1.2.1
@@ -309,6 +332,8 @@ class Theme implements JsonI{
     }
     /**
      * Fire the callback function.
+     * This function must not be used by the developers. It is called automatically 
+     * when the theme is being loaded.
      * @since 1.2.1
      */
     public function invokeBeforeLoaded(){
@@ -319,6 +344,8 @@ class Theme implements JsonI{
     }
     /**
      * Fire the callback function.
+     * This function must not be used by the developers. It is called automatically 
+     * when the theme is loaded.
      * @since 1.0
      */
     public function invokeAfterLoaded(){
@@ -331,8 +358,8 @@ class Theme implements JsonI{
     /**
      * Checks if a theme is loaded or not given its name.
      * @param string $themeName The name of the theme.
-     * @return boolean The function will return <b>TRUE</b> if 
-     * the theme was found in the array of loaded themes. <b>FALSE</b> 
+     * @return boolean The function will return TRUE if 
+     * the theme was found in the array of loaded themes. FALSE
      * if not.
      * @since 1.0
      */
@@ -398,8 +425,8 @@ class Theme implements JsonI{
         return $this->themeMeta['name'];
     }
     /**
-     * Sets the URL of theme designer website. It can be the same as author URL.
-     * @param string $url The URL to theme designer website.
+     * Sets the URL of theme designer web site. It can be the same as author URL.
+     * @param string $url The URL to theme designer web site.
      * @since 1.0
      */
     public function setUrl($url) {
@@ -435,7 +462,7 @@ class Theme implements JsonI{
     }
     /**
      * Sets the URL to the theme author. It can be the same as Theme URL.
-     * @param string $authorUrl The URL to the author's website.
+     * @param string $authorUrl The URL to the author's web site.
      * @since 1.0
      */
     public function setAuthorUrl($authorUrl) {
@@ -713,8 +740,22 @@ class Theme implements JsonI{
         return $this->themeMeta['description'];
     }
     /**
-     * 
-     * @return JsonX
+     * Returns an object of type JsonX that represents the theme.
+     * JSON string that will be generated by the JsonX instance will have 
+     * the following information:
+     * <p>
+     * {<br/>
+     * &nbsp;&nbsp;"name":""<br/>
+     * &nbsp;&nbsp;"version":""<br/>
+     * &nbsp;&nbsp;"author":""<br/>
+     * &nbsp;&nbsp;"images-dir-name":""<br/>
+     * &nbsp;&nbsp;"theme-dir-name":""<br/>
+     * &nbsp;&nbsp;"css-dir-name":""<br/>
+     * &nbsp;&nbsp;"js-dir-name":""<br/>
+     * &nbsp;&nbsp;"components":[]<br/>
+     * }
+     * </p>
+     * @return JsonX An object of type JsonX.
      */
     public function toJSON() {
         $j = new JsonX();
@@ -722,6 +763,7 @@ class Theme implements JsonI{
         $j->add('version', $this->getVersion());
         $j->add('author', $this->getAuthor());
         $j->add('images-dir-name', $this->getImagesDirName());
+        $j->add('theme-dir-name', $this->getDirectoryName());
         $j->add('css-dir-name', $this->getCssDirName());
         $j->add('js-dir-name', $this->getJsDirName());
         $j->add('components', $this->getComponents());

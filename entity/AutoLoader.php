@@ -3,7 +3,7 @@ namespace webfiori\entity;
 /**
  * An autoloader class to load classes as needed during runtime.
  *
- * @author Ibrahim <ibinshikh@hotmail.com>
+ * @author Ibrahim
  * @version 1.1.2
  */
 class AutoLoader{
@@ -26,14 +26,8 @@ class AutoLoader{
      */
     private static $loader;
     /**
-     *
-     * @var Logger 
-     * @ssince 1.1
-     */
-    private static $logger;
-    /**
      * Returns a single instance of the class 'AutoLoader'.
-     * @param $options [Optional] An associative array of options that is used to initialize 
+     * @param $options An associative array of options that is used to initialize 
      * the autoloader. The available options are:
      * <ul>
      * <li><b>root</b>: A directory that can be used as a base search folder. 
@@ -183,7 +177,7 @@ class AutoLoader{
             //Logger::log('Checking if file \''.$f.'\' exist...', 'debug');
             if(file_exists($f)){
                 //Logger::log('Class \''.$className.'\' found. Loading the class...');
-                require $f;
+                require_once $f;
                 //Logger::log('Class \''.$className.'\' loaded.');
                 //Logger::logFuncReturn(__METHOD__);
                 return;

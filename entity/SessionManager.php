@@ -1,4 +1,5 @@
 <?php
+namespace webfiori\entity;
 if(!defined('ROOT_DIR')){
     header("HTTP/1.1 403 Forbidden");
     die(''
@@ -16,10 +17,11 @@ if(!defined('ROOT_DIR')){
         . '</body>'
         . '</html>');
 }
-namespace webfiori\entity;
+use jsonx\JsonI;
+use SiteConfig;
 /**
  * A helper class to manage system sessions.
- * @author Ibrahim <ibinshikh@hotmail.com>
+ * @author Ibrahim 
  * @version 1.8.4
  */
 class SessionManager implements JsonI{

@@ -972,25 +972,25 @@ class Page{
     private function _getAside($new=false) {
         if($this->hasAside()){
             if($new === TRUE){
-                if(function_exists('getAsideNode')){
-                    $h = getAsideNode();
-                    $h->setID('side-content-area');
+                $a = $this->getTheme()->getAsideNode();
+                if($a instanceof HTMLNode){
+                    $a->setID('side-content-area');
                 }
                 else{
-                    $h = new HTMLNode();
-                    $h->setID('side-content-area');
+                    $a = new HTMLNode();
+                    $a->setID('side-content-area');
                 }
-                return $h;
+                return $a;
             }
-            return $this->document->getChildByID('aside-container');
+            return $this->document->getChildByID('side-content-area');
         }
     }
     
     private function _getHeader($new=false){
         if($this->hasHeader()){
             if($new === TRUE){
-                if(function_exists('getHeaderNode')){
-                    $h = getHeaderNode();
+                $h = $this->getTheme()->getHeadrNode();
+                if($h instanceof HTMLNode){
                     $h->setID('page-header');
                 }
                 else{
@@ -1006,8 +1006,8 @@ class Page{
     private function _getFooter($new=false){
         if($this->hasFooter()){
             if($new === TRUE){
-                if(function_exists('getFooterNode')){
-                    $f = getFooterNode();
+                $f = $this->getTheme()->getFooterNode();
+                if($f instanceof HTMLNode){
                     $f->setID('page-footer');
                 }
                 else{
@@ -1030,8 +1030,8 @@ class Page{
             $metaCharset = new HTMLNode('meta', FALSE);
             $metaCharset->setAttribute('charset', 'UTF-8');
             $headNode->addChild($metaCharset);
-            if(function_exists('getHeadNode')){
-                $tmpHead = getHeadNode();
+            $tmpHead = $this->getTheme()->getHeadNode();
+            if($tmpHead instanceof HTMLNode){
                 $headNode->setTitle($this->getTitle().$this->getTitleSep().$this->getWebsiteName());
                 $headNode->setBase($tmpHead->getBase()->getAttributeValue('href'));
                 $headNode->setCanonical($this->getCanonical());

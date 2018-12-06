@@ -464,6 +464,10 @@ class WebFiori{
 WebFiori::getAndStart();
 define('INITIAL_SYS_STATUS',WebFiori::sysStatus());
 Logger::log('INITIAL_SYS_STATUS = '.INITIAL_SYS_STATUS, 'debug');
+Router::closure('/test', function(){
+    $availabelTh = entity\Theme::getAvailableThemes();
+    Util::print_r($availabelTh);
+});
 if(INITIAL_SYS_STATUS === TRUE){
     Router::route(Util::getRequestedURL());
 }

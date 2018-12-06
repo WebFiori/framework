@@ -254,37 +254,27 @@ class Theme implements JsonI{
             Logger::log('Loading theme meta and components...');
             $themeDir = ROOT_DIR.'/'.self::THEMES_DIR.'/'.$themeToLoad->getDirectoryName();
             Logger::log('Theme directory: \''.$themeDir.'\'.', $themeName);
-            Logger::log('Checking if the file \'theme.php\' exist in theme directory...');
-            if(file_exists($themeDir.'/theme.php')){
-                Logger::log('Loading the file using require_once...');
-                require_once $themeDir.'/theme.php';
-                Logger::log('Loading theme components...');
-                foreach ($themeToLoad->getComponents() as $component){
-                    Logger::log('Checking if file \''.$component.'\' exist...');
-                    if(file_exists($themeDir.'/'.$component)){
-                        Logger::log('Loading file using require_once...');
-                        require_once $themeDir.'/'.$component;
-                        Logger::log('Component loaded.');
-                    }
-                    else{
-                        Logger::log('No file was found which represents the component. An exception is thrown.', 'error');
-                        Logger::requestCompleted();
-                        throw new Exception('Component \''.$component.'\' of the theme not found. Eather define it or remove it from the array of theme components.');
-                    }
+            Logger::log('Loading theme components...');
+            foreach ($themeToLoad->getComponents() as $component){
+                Logger::log('Checking if file \''.$component.'\' exist...');
+                if(file_exists($themeDir.'/'.$component)){
+                    Logger::log('Loading file using require_once...');
+                    require_once $themeDir.'/'.$component;
+                    Logger::log('Component loaded.');
                 }
-                Logger::log('Theme loaded.');
-                Logger::logFuncReturn(__METHOD__);
-                return $themeToLoad;
+                else{
+                    Logger::log('No file was found which represents the component. An exception is thrown.', 'error');
+                    Logger::requestCompleted();
+                    throw new Exception('Component \''.$component.'\' of the theme not found. Eather define it or remove it from the array of theme components.');
+                }
             }
-            else{
-                Logger::log('The file \'theme.php\' was not found. An exception is thrown.', 'error');
-                Logger::requestCompleted();
-                throw new Exception('The file \'theme.php\' is missing from the theme with name = \''.$themeName.'\'');
-            }
+            Logger::log('Theme loaded.');
+            Logger::logFuncReturn(__METHOD__);
+            return $themeToLoad;
         }
         Logger::log('No theme was found which has the given name. An exception is thrown.','error');
         Logger::requestCompleted();
-        throw new Exception('No such theme: \''.$themeName.'\'');
+        throw new Exception('No such theme: \''.$themeName.'\'.');
     }
     /**
      * Sets the value of the callback which will be called after theme is loaded.
@@ -378,19 +368,17 @@ class Theme implements JsonI{
         $themes = array();
         $themesDirs = array_diff(scandir(ROOT_DIR.'/'. self::THEMES_DIR), array('..', '.'));
         foreach ($themesDirs as $dir){
-            Logger::log('Checking if theme main file is exist...');
-            $fullPath = ROOT_DIR.'/'.self::THEMES_DIR.'/'.$dir.'/theme.php';
-            Logger::log('Path to theme main file: \''.$fullPath.'\'.', 'debug');
-            if(file_exists($fullPath)){
-                Logger::log('File found.');
-                require $fullPath;
-                if(isset($theme)){
-                    $themes[$theme->getName()] = $theme;
-                    unset($theme);
+            $pathToScan = ROOT_DIR.'/'.self::THEMES_DIR.'/'.$dir;
+            Logger::log('Path to scan: \''.$pathToScan.'\'.', 'debug');
+            $filesInDir = array_diff(scandir($pathToScan), array('..', '.'));
+            foreach ($filesInDir as $fileName){
+                $cName = str_replace('.php', '', $fileName);
+                if(class_exists($cName)){
+                    $instance = new $cName();
+                    if($instance instanceof Theme){
+                        $themes[$instance->getName()] = $instance;
+                    }
                 }
-            }
-            else{
-                Logger::log('File not found.');
             }
         }
         Logger::logFuncReturn(__METHOD__);

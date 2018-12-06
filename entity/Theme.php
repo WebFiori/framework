@@ -49,7 +49,7 @@ use SiteConfig;
  * @author Ibrahim
  * @version 1.2.1
  */
-class Theme implements JsonI{
+abstract class Theme implements JsonI{
     /**
      * The directory where themes is located in.
      * @since 1.0
@@ -757,5 +757,51 @@ class Theme implements JsonI{
         $j->add('components', $this->getComponents());
         return $j;
     }
-
+    /**
+     * Returns an object of type HeadNode that represents HTML &lt;head&gt; node. 
+     * The developer must implement this function such that it returns an 
+     * object of type HeadNode. The developer can use this function to include 
+     * any JavaScript or CSS files that the page needs. Also, it can be used to 
+     * add custom meta tags to &lt;head&gt; node or any tag that can be added 
+     * to the node.
+     * @return HeadNode An object of type HeadNode.
+     * @since 1.2.2
+     */
+    public abstract function getHeadNode();
+    /**
+     * Returns an object of type HTMLNode that represents header section of the page. 
+     * The developer must implement this function such that it returns an 
+     * object of type HTMLNode. Header section of the page usually include a 
+     * main navigation icon, web site name and web site logo. More complex 
+     * layout can include other things such as a search bar, notifications 
+     * area and user profile picture. If the page does not have a header 
+     * section, the developer can make this function return NULL.
+     * @return HTMLNode|NULL An object of type HTMLNode. If the theme has no header 
+     * section, the function might return NULL.
+     * @since 1.2.2
+     */
+    public abstract function getHeadrNode();
+    /**
+     * Returns an object of type HTMLNode that represents footer section of the page. 
+     * The developer must implement this function such that it returns an 
+     * object of type HTMLNode. Footer section of the page usually include links 
+     * to social media profiles, about us page and site map. In addition, 
+     * it might contain copyright notice and contact information. More complex 
+     * layouts can have more items in the footer.
+     * @return HTMLNode An object of type HTMLNode. If the theme has no footer 
+     * section, the function might return NULL.
+     * @since 1.2.2
+     */
+    public abstract function getFooterNode();
+    /**
+     * Returns an object of type HTMLNode that represents aside section of the page. 
+     * The developer must implement this function such that it returns an 
+     * object of type HTMLNode. Aside section of the page most of the time 
+     * contains advertisements. Sometimes, it can contain aside menu for 
+     * the web site or widgets.
+     * @return HTMLNode An object of type HTMLNode. If the theme has no aside 
+     * section, the function might return NULL.
+     * @since 1.2.2
+     */
+    public abstract function getAsideNode();
 }

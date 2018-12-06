@@ -1,5 +1,5 @@
 <?php
-class GreenyTheme{
+class UIFunctions{
     /**
      * 
      * @param type $pageTitle

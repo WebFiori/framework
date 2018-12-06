@@ -1,5 +1,9 @@
 <?php
 use webfiori\entity\Theme;
+use webfiori\entity\Page;
+use phpStructs\html\HTMLNode;
+use phpStructs\html\HeadNode;
+use functions\WebsiteFunctions;
 class GreenyTheme extends Theme{
     public function __construct() {
         parent::__construct();

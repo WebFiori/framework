@@ -51,8 +51,7 @@ class AutoLoader{
             $frameworkSearchFoldres = array(
                 '',
                 '/entity',
-                '/publish',
-                '/publish',
+                '/themes',
                 '/functions',
                 '/apis',
                 '/pages',

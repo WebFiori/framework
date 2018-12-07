@@ -43,18 +43,19 @@ if(!defined('ROOT_DIR')){
 }
 use jsonx\JsonI;
 use SiteConfig;
+use Exception;
 /**
- * A base class that is used to construct website UI.
- *
+ * A base class that is used to construct web site UI.
+ * 
  * @author Ibrahim
  * @version 1.2.1
  */
 abstract class Theme implements JsonI{
     /**
-     * The directory where themes is located in.
+     * The directory where themes are located in.
      * @since 1.0
      */
-    const THEMES_DIR = 'publish/themes';
+    const THEMES_DIR = 'themes';
     /**
      * An array that contains all loaded themes.
      * @var array
@@ -208,17 +209,13 @@ abstract class Theme implements JsonI{
     }
     /**
      * Loads a theme given its name.
-     * If the given name is <b>NULL</b>, the 
-     * function will load the default theme as specified by the function 
-     * <b>SiteConfig::getBaseThemeName()</b>.
+     * If the given name is NULL, the function will load the default theme as 
+     * specified by the function SiteConfig::getBaseThemeName().
      * @param string $themeName The name of the theme. 
-     * @return Theme The function will return an object of type <b>Theme</b> once the 
+     * @return Theme The function will return an object of type Theme once the 
      * theme is loaded. The object will contain all theme information.
      * @throws Exception The function will throw 
-     * an exception if no theme was found which has the given name. Another case is 
-     * when the file 'theme.php' of the theme is missing. 
-     * Finally, an exception will be thrown if theme component is not found and 
-     * it was added to the theme. 
+     * an exception if no theme was found which has the given name.
      * @since 1.0
      */
     public static function usingTheme($themeName=null) {
@@ -358,8 +355,9 @@ abstract class Theme implements JsonI{
     }
     /**
      * Returns an array that contains the meta data of all available themes. 
-     * @return array An associative array that contains all themes information. The key 
-     * is the theme name and the value is theme info.
+     * This function will return an associative array. The key is the theme 
+     * name and the value is an object of type Theme that contains theme info.
+     * @return array An associative array that contains all themes information.
      * @since 1.1 
      */
     public static function getAvailableThemes(){
@@ -392,10 +390,11 @@ abstract class Theme implements JsonI{
      */
     public function setName($name) {
         Logger::logFuncCall(__METHOD__);
+        $trimmed = trim($name);
         Logger::log('Checking if given value is not empty string...');
-        Logger::log('Given Value = \''.$name.'\'.', 'debug');
-        if(strlen($name) != 0){
-            $this->themeMeta['name'] = $name.'';
+        Logger::log('Given Value = \''.$trimmed.'\'.', 'debug');
+        if(strlen($trimmed) != 0){
+            $this->themeMeta['name'] = $trimmed.'';
             Logger::log('Theme name updated.');
         }
         else{
@@ -405,25 +404,27 @@ abstract class Theme implements JsonI{
     }
     /**
      * Returns the name of the theme.
-     * @return string The name of the theme. If it is not set, 
-     * the function will return empty string.
+     * If the name is not set, the function will return empty string.
+     * @return string The name of the theme.
      * @since 1.0
      */
     public function getName() {
         return $this->themeMeta['name'];
     }
     /**
-     * Sets the URL of theme designer web site. It can be the same as author URL.
+     * Sets the URL of theme designer web site. 
+     * Theme URL can be the same as author URL.
      * @param string $url The URL to theme designer web site.
      * @since 1.0
      */
     public function setUrl($url) {
         Logger::logFuncCall(__METHOD__);
+        $trimmed = trim($url);
         Logger::log('Checking if given value is not empty string...');
-        Logger::log('Given Value = \''.$url.'\'.', 'debug');
-        if(strlen($url) > 0){
+        Logger::log('Given Value = \''.$trimmed.'\'.', 'debug');
+        if(strlen($trimmed) > 0){
             Logger::log('Theme URL updated.');
-            $this->themeMeta['url'] = $url.'';
+            $this->themeMeta['url'] = $trimmed.'';
         }
         else{
             Logger::log('Given string is empty.', 'warning');
@@ -437,11 +438,12 @@ abstract class Theme implements JsonI{
      */
     public function setAuthor($author) {
         Logger::logFuncCall(__METHOD__);
+        $trimmed = trim($author);
         Logger::log('Checking if given value is not empty string...');
-        Logger::log('Given Value = \''.$author.'\'.', 'debug');
-        if(strlen($author) > 0){
+        Logger::log('Given Value = \''.$trimmed.'\'.', 'debug');
+        if(strlen($trimmed) > 0){
             Logger::log('Author name updated.');
-            $this->themeMeta['author'] = $author.'';
+            $this->themeMeta['author'] = $trimmed.'';
         }
         else{
             Logger::log('Given string is empty.', 'warning');
@@ -455,11 +457,12 @@ abstract class Theme implements JsonI{
      */
     public function setAuthorUrl($authorUrl) {
         Logger::logFuncCall(__METHOD__);
+        $trimmed = trim($authorUrl);
         Logger::log('Checking if given value is not empty string...');
-        Logger::log('Given Value = \''.$authorUrl.'\'.', 'debug');
-        if(strlen($authorUrl) > 0){
+        Logger::log('Given Value = \''.$trimmed.'\'.', 'debug');
+        if(strlen($trimmed) > 0){
             Logger::log('Author URL updated.');
-            $this->themeMeta['author-url'] = $authorUrl.'';
+            $this->themeMeta['author-url'] = $trimmed.'';
         }
         else{
             Logger::log('Given string is empty.', 'warning');
@@ -542,8 +545,8 @@ abstract class Theme implements JsonI{
     }
     /**
      * Sets the name of the directory where all theme files are kept.
-     * @param string $name The name of the directory. Usually, each theme 
-     * must have a unique directory to prevent collision.
+     * Each theme must have a unique directory to prevent collision.
+     * @param string $name The name of the directory.
      * @since 1.0
      */
     public function setDirectoryName($name) {
@@ -700,8 +703,8 @@ abstract class Theme implements JsonI{
         return $this->themeMeta['license-url'];
     }
     /**
-     * Returns the URL which takes the users to author's website.
-     * @return string The URL which takes users to author's website. 
+     * Returns the URL which takes the users to author's web site.
+     * @return string The URL which takes users to author's web site. 
      * If author URL is not set, the function will return empty string.
      * @since 1.1
      */
@@ -709,8 +712,8 @@ abstract class Theme implements JsonI{
         return $this->themeMeta['author-url'];
     }
     /**
-     * Returns A URL which should point to theme website.
-     * @return string A URL which should point to theme website. Usually, 
+     * Returns A URL which should point to theme web site.
+     * @return string A URL which should point to theme web site. Usually, 
      * this one is the same as author URL.
      * If it is not set, the function will return empty string.
      * @since 1.1

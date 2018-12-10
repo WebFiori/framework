@@ -23,7 +23,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-namespace functions;
+namespace webfiori\functions;;
 use phMysql\MySQLLink;
 use webfiori\entity\SessionManager;
 use webfiori\entity\Logger;

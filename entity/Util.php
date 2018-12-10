@@ -115,7 +115,7 @@ class Util{
      * @return string The string after reversing its order.
      * @since 1.3.7
      */
-    public function reverse($str) {
+    public static function reverse($str) {
         $strToReverse = $str.'';
         $retV = '';
         $strLen = strlen($strToReverse);

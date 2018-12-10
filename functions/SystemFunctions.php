@@ -23,8 +23,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-namespace functions;
-use functions\Functions;
+namespace webfiori\functions;
 use webfiori\entity\Logger;
 use webfiori\WebFiori;
 use webfiori\entity\FileHandler;

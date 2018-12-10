@@ -1,8 +1,5 @@
 <?php
 namespace webfiori;
-ini_set('display_startup_errors', 1);
-        ini_set('display_errors', 1);
-        error_reporting(-1);
 use webfiori\entity\AutoLoader;
 use webfiori\entity\Logger;
 use webfiori\entity\Util;
@@ -14,6 +11,7 @@ use webfiori\entity\router\ViewRoutes;
 use webfiori\entity\router\ClosureRoutes;
 use webfiori\entity\cron\Cron;
 use webfiori\entity\router\Router;
+use Exception;
 /**
  * The instance of this class is used to control basic settings of 
  * the framework. Also, it is the entry point of any request.
@@ -145,15 +143,12 @@ class WebFiori{
         //uncomment next line to show runtime errors and warnings
         //also enable logging for info, warnings and errors 
         Logger::logName('initialization-log');
-        Logger::section();
+        Logger::enabled(TRUE);
+        Logger::clear();
         
         //display PHP warnings and errors
         Util::displayErrors();
-        
-        //enable logging.
-        Logger::enabled(TRUE);
-        //set log file name
-        Logger::logName('initialization-log');
+
         //enable logging of debug info.
         define('DEBUG', '');
         
@@ -437,7 +432,7 @@ class WebFiori{
         . 'error should be gone. If you did not configure the system yet, then do the following:'
         . '</p>'
         . '<ul>'
-        . '<li>Open the file \'index.php\' in any editor.</li>'
+        . '<li>Open the file \'WebFiori.php\' in any editor.</li>'
         . '<li>Inside the class \'WebFiori\', go to the body of the function \'firstUse()\'.</li>'
         . '<li>Modify the body of the function as instructed.</li>'
         . '</ul>'
@@ -445,7 +440,7 @@ class WebFiori{
         . 'Once you do that, you are ready to go and use the system.'
         . '</p>'
         . '<p>System Powerd By: <a href="https://github.com/usernane/webfiori" target="_blank"><b>'
-                . 'WebFiori Framework v'.Config::get()->getVersion().' ('.Config::get()->getVersionType().')'
+                . 'WebFiori Framework v'.Config::getVersion().' ('.Config::getVersionType().')'
                 . '</b></a></p>'
         . '</body>'
         . '</html>');

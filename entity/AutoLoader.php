@@ -1,5 +1,6 @@
 <?php
 namespace webfiori\entity;
+use Exception;
 /**
  * An autoloader class to load classes as needed during runtime.
  *

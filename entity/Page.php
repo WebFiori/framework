@@ -20,8 +20,9 @@ if(!defined('ROOT_DIR')){
 use phpStructs\html\HTMLDoc;
 use functions\WebsiteFunctions;
 use phpStructs\html\HeadNode;
-use SiteConfig;
+use webfiori\SiteConfig;
 use phpStructs\html\HTMLNode;
+use Exception;
 /**
  * A class used to initialize main page components.
  * @author Ibrahim <ibinshikh@hotmail.com>
@@ -175,7 +176,7 @@ class Page{
         $headNode = new HeadNode(
             $this->getTitle().$this->getTitleSep().$this->getWebsiteName(),
             $this->getCanonical(),
-            SiteConfig::get()->getBaseURL()
+            SiteConfig::getBaseURL()
         );
         $this->document->setHeadNode($headNode);
         $headerNode = new HTMLNode();
@@ -408,55 +409,6 @@ class Page{
         }
     }
     /**
-     * Saves the page to a stand alone file (self contained).
-     * @param string $path The location where the file will be written to 
-     * (such as 'pages/system/view-users'. 'view-users' is the page name).
-     *  Note that the last part of the 
-     * path will be the name of the file. It must be without extention.
-     * @param boolean $isDynamic Set to <b>TRUE</b> to save the file as 
-     * dynamic PHP web page. If the user wants a plain HTML, set this attribute 
-     * to <b>FALSE</b>.
-     * @return boolean The function will return <b>TRUE</b> if the file is saved. 
-     * If not, the function will return <b>FALSE</b>
-     * @since 1.7
-     * @deprecated since version 1.8
-     */
-    public function saveToFile($path,$isDynamic=false){
-        if($isDynamic === TRUE){
-            $path = str_replace('\\', '/', $path);
-            $fArr = explode('/', $path);
-            $name = $fArr[count($fArr) - 1];
-            $f = fopen($path.'.php', 'w+');
-            if($f != FALSE){
-                $root = str_replace('\\', '/', ROOT_DIR);
-                fwrite($f, "<?php\n");
-                fwrite($f, 'require \''.$root.'/root.php\';'."\n");
-                fwrite($f, '$page = Page::get();'."\n");
-                fwrite($f, '$page->usingTheme(SiteConfig::get()->getBaseThemeName());'."\n");
-                fwrite($f, '$page->setLang(WebsiteFunctions::get()->getSession()->getLang());'."\n");
-                if($this->getLanguage() != NULL){
-                    fwrite($f, '$page->usingLanguage();'."\n");
-                    if($this->getLanguage()->get('pages/'.$name) === NULL){
-                        fwrite($f, '// Notice: \'pages/'.$name.'\' is not set on loaded language.'."\n");
-                        fwrite($f, '// Page title and description will not set because of that.'."\n");
-                    }
-                }
-                else{
-                    fwrite($f, '// Notice: Static page title and description will be used.'."\n");
-                    fwrite($f, '$page->setTitle(\''.$this->getTitle().'\');'."\n");
-                    fwrite($f, '$page->setDescription(\''.$this->getDescription().'\');'."\n");
-                }
-                fwrite($f, 'echo $page->getDocument();'."\n");
-                fclose($f);
-                return TRUE;
-            }
-            return FALSE;
-        }
-        else{
-            return $this->getDocument()->saveToFile($path, TRUE, 'html');
-        }
-    }
-    /**
      * Returns the document that is linked with the page.
      * @return HTMLDoc The document that is linked with the page.
      * @since 1.9
@@ -680,7 +632,7 @@ class Page{
         Logger::log('Checking if given theme name is null...');
         if($themeName === NULL){
             Logger::log('Given value is null. Using theme name from configuration file.');
-            $themeName = SiteConfig::get()->getBaseThemeName();
+            $themeName = SiteConfig::getBaseThemeName();
         }
         Logger::log('Theme name = \''.$themeName.'\'.', 'debug');
         Logger::log('Loading theme...');
@@ -1025,7 +977,7 @@ class Page{
             $headNode = new HeadNode(
                 $this->getTitle().$this->getTitleSep().$this->getWebsiteName(),
                 $this->getCanonical(),
-                SiteConfig::get()->getBaseURL()
+                SiteConfig::getBaseURL()
             );
             $metaCharset = new HTMLNode('meta', FALSE);
             $metaCharset->setAttribute('charset', 'UTF-8');

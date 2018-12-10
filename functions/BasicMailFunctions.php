@@ -43,6 +43,7 @@ if(!defined('ROOT_DIR')){
 }
 use webfiori\entity\Logger;
 use webfiori\WebFiori;
+use webfiori\entity\FileHandler;
 /**
  * A class for the functions that is related to mailing.
  *
@@ -113,6 +114,7 @@ class BasicMailFunctions extends Functions{
         Logger::logFuncCall(__METHOD__);
         $fh = new FileHandler(ROOT_DIR.'/entity/MailConfig.php');
         $fh->write('<?php', TRUE, TRUE);
+        $fh->write('namespace webfiori;', TRUE, TRUE);
         $fh->write('if(!defined(\'ROOT_DIR\')){
     header("HTTP/1.1 403 Forbidden");
     die(\'\'
@@ -132,7 +134,8 @@ class BasicMailFunctions extends Functions{
 }', TRUE, TRUE);
         $fh->write('/**
  * A file that contains SMTP accounts information.
- *
+ * The developer can create multiple SMTP accounts and add 
+ * Connection information here.
  * @author Ibrahim
  * @version 1.0
  */', TRUE, TRUE);
@@ -147,15 +150,16 @@ class BasicMailFunctions extends Functions{
      */
     private static $inst;
     /**
-     * 
+     * Returnd a singleton instance of the class.
+     * Calling this function multiple times will result in returning 
+     * the same instance every time.
      * @return MailConfig
      * @since 1.0
      */
     public static function &get(){
-        if(self::$inst !== NULL){
-            return self::$inst;
+        if(self::$inst === NULL){
+            self::$inst = new MailConfig();
         }
-        self::$inst = new MailConfig();
         return self::$inst;
     }', TRUE, TRUE);
         $fh->write('private function __construct() {', TRUE, TRUE);
@@ -178,7 +182,9 @@ class BasicMailFunctions extends Functions{
         $fh->reduceTab();
         $fh->write('/**
      * Adds an email account.
-     * @param EmailAccount $acc an object of type <b>EmailAccount</b>.
+     * The developer can use this function to add new account during runtime. 
+     * The account will be removed once the program finishes.
+     * @param EmailAccount $acc an object of type EmailAccount.
      * @param string $name A name to associate with the email account.
      * @since 1.0
      */
@@ -194,10 +200,12 @@ class BasicMailFunctions extends Functions{
     }
     /**
      * Returns an email account given its name.
+     * The function will search for an account with the given name in the set 
+     * of added accounts. If no account was found, NULL is returned.
      * @param string $name The name of the account.
      * @return EmailAccount|null If the account is found, The function 
-     * will return an object of type <b>EmailAccount</b>. Else, the 
-     * function will return <b>NULL</b>.
+     * will return an object of type EmailAccount. Else, the 
+     * function will return NULL.
      * @since 1.0
      */
     public static function &getAccount($name){
@@ -207,8 +215,10 @@ class BasicMailFunctions extends Functions{
         return $this->emailAccounts;
     }
     /**
-     * Returns an array that contains all email accounts.
-     * @return array An array that contains all email accounts.
+     * Returns an associative array that contains all email accounts.
+     * The indices of the array will act as the names of the accounts. 
+     * The value of the index will be an object of type EmailAccount.
+     * @return array An associative array that contains all email accounts.
      * @since 1.0
      */
     public static function getAccounts(){
@@ -247,14 +257,14 @@ class BasicMailFunctions extends Functions{
         return $retVal;
     }
     /**
-     * Updates an existing SMTP email account or adds new one.
+     * Adds new SMTP account or Updates an existing one.
      * @param EmailAccount $emailAccount An instance of 'EmailAccount'.
-     * @return boolean|string The function will return 'TRUE' if the email 
-     * account updated or added. If the email account contains wrong server information, 
-     * the function will return 'MailFunctions::INV_HOST_OR_PORT'. If the 
-     * given email account contains wrong login info, the function will return 
-     * 'MailFunctions::INV_CREDENTIALS'. Other than that, the function 
-     * will return 'FALSE'.
+     * @return boolean|string The function will return TRUE if the email 
+     * account was updated or added. If the email account contains wrong server
+     *  information, the function will return MailFunctions::INV_HOST_OR_PORT. 
+     * If the given email account contains wrong login info, the function will 
+     * return MailFunctions::INV_CREDENTIALS. Other than that, the function 
+     * will return FALSE.
      * @since 1.1
      */
     public function updateOrAddEmailAccount($emailAccount) {
@@ -285,12 +295,14 @@ class BasicMailFunctions extends Functions{
         return $retVal;
     }
     /**
-     * Returns a new instance of the class 'SocketMailer'.
+     * Returns a new instance of the class SocketMailer.
+     * The function will try to establish a connection to SMTP server using 
+     * the given SMTP account.
      * @param EmailAccount $emailAcc An account that is used to initiate 
      * socket mailer.
-     * @return SocketMailer|string The function will return an instance of 'SocketMailer'
+     * @return SocketMailer|string The function will return an instance of SocketMailer
      * on successful connection. If no connection is established, the function will 
-     * return 'MailFunctions::INV_HOST_OR_PORT'. If user authentication fails, 
+     * return MailFunctions::INV_HOST_OR_PORT. If user authentication fails, 
      * the function will return 'MailFunctions::INV_CREDENTIALS'.
      * @since 1.0
      */

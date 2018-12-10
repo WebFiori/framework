@@ -27,7 +27,9 @@ namespace functions;
 use functions\Functions;
 use webfiori\entity\Logger;
 use webfiori\WebFiori;
-use Config;
+use webfiori\entity\FileHandler;
+use webfiori\Config;
+use Exception;
 if(!defined('ROOT_DIR')){
     header("HTTP/1.1 403 Forbidden");
     die(''
@@ -46,10 +48,11 @@ if(!defined('ROOT_DIR')){
         . '</html>');
 }
 /**
- * Description of SystemFunctions
+ * A class that can be used to modify basic configuration settings of 
+ * the website and save them to the file 'Config.php'
  *
  * @author Ibrahim
- * @version 1.4.1
+ * @version 1.4.2
  */
 class SystemFunctions extends Functions{
     /**
@@ -74,14 +77,27 @@ class SystemFunctions extends Functions{
     const MAIL_CONFIG_MISSING = 'mail_config_file_missing';
     /**
      * An array that contains initial system configuration variables.
+     * This array has the following indices and values:
+     * <ul>
+     * <li>is-config = 'FALSE'</li>
+     * <li>release-date = '01-01-2019 (DD-MM-YYYY)'</li>
+     * <li>version = '1.0.1'</li>
+     * <li>version-type = 'Stable'</li>
+     * <li>config-file-version => '1.3.2'</li>
+     * <li>database-host = 'localhost'</li>
+     * <li>database-username = ''</li>
+     * <li>database-password = ''</li>
+     * <li>database-name = ''</li>
+     * <li>database-port = '3306'</li>
+     * </ul>
      * @since 1.0
      */
     const INITIAL_CONFIG_VARS = array(
         'is-config'=>'FALSE',
-        'release-date'=>'09-25-2018 (DD-MM-YYYY)',
-        'version'=>'1.0.0',
+        'release-date'=>'01-01-2019 (DD-MM-YYYY)',
+        'version'=>'1.0.1',
         'version-type'=>'Stable',
-        'config-file-version'=>'1.3.1',
+        'config-file-version'=>'1.3.2',
         'database-host'=>'localhost',
         'database-username'=>'',
         'database-password'=>'',
@@ -129,6 +145,8 @@ class SystemFunctions extends Functions{
     }
     /**
      * Creates new instance of the class.
+     * It is not recommended to use this function. Instead, 
+     * use SystemFunctions::get().
      */
     public function __construct() {
         parent::__construct(WebFiori::MAIN_SESSION_NAME);
@@ -140,9 +158,10 @@ class SystemFunctions extends Functions{
      * @param string $dbUser The username of database user.
      * @param string $dbPass The password of the database user.
      * @param string $dbName The name of database schema.
-     * @return boolean|string The function will return <b>TRUE</b> in case 
+     * @param int $dbPort Port number of database server.
+     * @return boolean|string The function will return TRUE in case 
      * of valid database attributes. Also the function will return 
-     * <b>SessionManager::DB_CONNECTION_ERR</b> in case the connection was not 
+     * DBConnectionFactory::DB_CONNECTION_ERR in case the connection was not 
      * established.
      * @since 1.0
      */
@@ -173,6 +192,8 @@ class SystemFunctions extends Functions{
     }
     /**
      * Updates system configuration status.
+     * This function is useful when the developer would like to create some 
+     * kind of a setup wizard for his web application.
      * @param boolean $isConfig TRUE to set system as configured. 
      * FALSE to make it not configured.
      * @since 1.3
@@ -188,6 +209,19 @@ class SystemFunctions extends Functions{
     /**
      * Returns an associative array that contains system configuration 
      * info.
+     * The array that will be returned will have the following information: 
+     * <ul>
+     * <li>is-config: A string. 'TRUE' or 'FALSE'</li>
+     * <li>release-date: The release date of WebFiori Framework.</li>
+     * <li>version: Version number of WebFiori Framework.</li>
+     * <li>version-type: Type of WebFiori Framework version.</li>
+     * <li>config-file-version: Configuration file version number.</li>
+     * <li>database-host: The address of database server host.</li>
+     * <li>database-username: The user that will be used to access the database.</li>
+     * <li>database-password: The password of database user.</li>
+     * <li>database-name: The name of the database.</li>
+     * <li>database-port: Database host server number.</li>
+     * </ul>
      * @return array An associative array that contains system configuration 
      * info.
      * @since 1.0
@@ -219,6 +253,7 @@ class SystemFunctions extends Functions{
         }
         $fh = new FileHandler($configFileLoc);
         $fh->write('<?php', TRUE, TRUE);
+        $fh->write('namespace webfiori;', FALSE, TRUE);
         $fh->write('if(!defined(\'ROOT_DIR\')){
     header("HTTP/1.1 403 Forbidden");
     die(\'\'
@@ -246,20 +281,20 @@ class SystemFunctions extends Functions{
         $fh->addTab();
         //stat here
         $fh->write('/**
-     * The type framework version that is used to build the project.
-     * @var string The framework version that is used to build the project.
+     * The type framework version that is used to build the system.
+     * @var string The framework version that is used to build the system.
      * @since 1.0 
      */
     private $versionType;
     /**
-     * The version of the framework that is used to build the project.
-     * @var string The version of the framework that is used to build the project.
+     * The version of the framework that is used to build the system.
+     * @var string The version of the framework that is used to build the system.
      * @since 1.0 
      */
     private $version;
     /**
-     * The release date of the framework that is used to build the project.
-     * @var string Release date of of the framework that is used to build the project.
+     * The release date of the framework that is used to build the system.
+     * @var string Release date of of the framework that is used to build the system.
      * @since 1.0 
      */
     private $releaseDate;
@@ -321,14 +356,14 @@ class SystemFunctions extends Functions{
         $this->dbPort = \''.$configArr['database-port'].'\';
     }', TRUE, TRUE);
         $fh->write('/**
-     * An instance of <b>Config</b>.
+     * An instance of Config.
      * @var Config 
      * @since 1.0
      */
     private static $cfg;
     /**
-     * Returns an instance of the configuration file.
-     * @return Config An object of type <b>Config</b>.
+     * Returns a single instance of the configuration file.
+     * @return Config An object of type Config.
      * @since 1.0
      */
     public static function &get(){
@@ -354,7 +389,7 @@ class SystemFunctions extends Functions{
     }
     /**
      * Checks if the system is configured or not.
-     * @return boolean <b>TRUE</b> if the system is configured.
+     * @return boolean TRUE if the system is configured.
      * @since 1.0
      */
     public static function isConfig(){
@@ -375,8 +410,8 @@ class SystemFunctions extends Functions{
         return $this->dbPort;
     }
     /**
-     * Returns the number of the port that is used to connect to the database.
-     * @return string Database name.
+     * Returns server port number that is used to connect to the database.
+     * @return string Server port number.
      * @since 1.0
      */
     public static function getDBPort(){
@@ -387,6 +422,8 @@ class SystemFunctions extends Functions{
     }
     /**
      * Returns the name of database host.
+     * The host can be an IP address, a URL or simply \'localhost\' if the database 
+     * is in the same server that will host the web application.
      * @return string Database host.
      * @since 1.0
      */
@@ -408,8 +445,8 @@ class SystemFunctions extends Functions{
         return $this->dbPass;
     }
     /**
-     * Returns the password of the database user.
-     * @return string Database password.
+     * Returns the password of database user.
+     * @return string Database user\'s password.
      * @since 1.0
      */
     public static function getDBPassword(){
@@ -419,8 +456,8 @@ class SystemFunctions extends Functions{
         return $this->version;
     }
     /**
-     * Returns framework version number.
-     * @return string Framework version number.
+     * Returns WebFiori Framework version number.
+     * @return string WebFiori Framework version number.
      * @since 1.2
      */
     public static function getVersion(){
@@ -430,8 +467,8 @@ class SystemFunctions extends Functions{
         return $this->versionType;
     }
     /**
-     * Returns framework version type.
-     * @return string framework version type.
+     * Returns WebFiori Framework version type.
+     * @return string WebFiori Framework version type.
      * @since 1.2
      */
     public static function getVersionType(){
@@ -441,8 +478,8 @@ class SystemFunctions extends Functions{
         return $this->releaseDate;
     }
     /**
-     * Returns the date at which the framework is released.
-     * @return string The date at which the framework is released.
+     * Returns the date at which the current version of the framework is released.
+     * @return string The date at which the current version of the framework is released.
      * @since 1.0
      */
     public static function getReleaseDate(){
@@ -454,19 +491,19 @@ class SystemFunctions extends Functions{
         Logger::logFuncReturn(__METHOD__);
     }
     /**
-     * Checks if the application is setup or not.
-     * @return boolean If the system is configured, the function will return 
-     * TRUE. If it is not configured, It will return FALSE. Note 
-     * that the function will throw an exception in case one of the 3 main 
+     * Checks if the application setup is completed or not.
+     * Note that the function will throw an exception in case one of the 3 main 
      * configuration files is missing.
-     * @throws Exception
+     * @return boolean If the system is configured, the function will return 
+     * TRUE. If it is not configured, It will return FALSE.
+     * @throws Exception If one of configuration files is missing.
      * @since 1.0
      */
     public function isSetupFinished(){
         Logger::logFuncCall(__METHOD__);
-        if(class_exists('Config')){
-            if(class_exists('MailConfig')){
-                if(class_exists('SiteConfig')){
+        if(class_exists('webfiori\Config')){
+            if(class_exists('webfiori\MailConfig')){
+                if(class_exists('webfiori\SiteConfig')){
                     $retVal = Config::isConfig();
                     Logger::logReturnValue($retVal);
                     Logger::logFuncReturn(__METHOD__);

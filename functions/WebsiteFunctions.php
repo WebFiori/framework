@@ -43,21 +43,42 @@ if(!defined('ROOT_DIR')){
 }
 use webfiori\entity\Logger;
 use webfiori\WebFiori;
-
+use webfiori\entity\FileHandler;
+use SiteConfig;
 /**
- * Description of WebsiteFunctions
+ * A class that can be used to modify basic settings of the website and 
+ * save them to the file 'SiteConfig.php'
  *
  * @author Ibrahim
+ * @version 1.0
  */
 class WebsiteFunctions extends Functions{
     /**
-     * An array that contains initial system configuration variables.
+     * An associative array that contains initial system configuration variables.
+     * The array has the following values:
+     * <ul>
+     * <li>site-descriptions = array(<ul>
+     * <li>EN = 'WebFiori'</li>
+     * <li>AR = 'ويب فيوري'</li>
+     * </ul>)</li>
+     * <li>base-url = ''</li>
+     * <li>primary-language = 'EN'</li>
+     * <li>title-separator = ' | '</li>
+     * <li>home-page = 'index'</li>
+     * <li>admin-theme-name = 'Greeny By Ibrahim Ali'</li>
+     * <li>theme-name = 'Greeny By Ibrahim Ali'</li>
+     * <li>site-descriptions = array(<ul>
+     * <li>EN = ''</li>
+     * <li>AR = ''</li>
+     * </ul>)</li>
+     * <li>config-file-version => 1.2.1</li>
+     * </ul>
      * @since 1.0
      */
     const INITIAL_WEBSITE_CONFIG_VARS = array(
         'website-names'=>array(
-            'EN'=>'Programming Academia',
-            'AR'=>'أكاديميا البرمجة'
+            'EN'=>'WebFiori',
+            'AR'=>'ويب فيوري'
         ),
         'base-url'=>'',
         'primary-language'=>'EN',
@@ -69,7 +90,7 @@ class WebsiteFunctions extends Functions{
             'EN'=>'',
             'AR'=>''
         ),
-        'config-file-version'=>'1.2',
+        'config-file-version'=>'1.2.1',
     );
     /**
      *
@@ -77,7 +98,7 @@ class WebsiteFunctions extends Functions{
      */
     private static $singleton;
     /**
-     * 
+     * Returns a singleton instance of the class.
      * @return WebsiteFunctions
      * @since 1.0
      */
@@ -92,6 +113,11 @@ class WebsiteFunctions extends Functions{
         Logger::logFuncReturn(__METHOD__);
         return self::$singleton;
     }
+    /**
+     * Creates new instance of the class.
+     * It is not recommended to use this function. Instead, 
+     * use WebsiteFunctions::get().
+     */
     public function __construct() {
         parent::__construct(WebFiori::MAIN_SESSION_NAME);
     }
@@ -117,13 +143,25 @@ class WebsiteFunctions extends Functions{
      * @param array $websiteInfoArr an associative array. The array can 
      * have the following indices: 
      * <ul>
-     * <li><b>website-names</b>:</li>
-     * <li><b>base-url</b>:</li>
-     * <li><b>title-separator</b>:</li>
-     * <li><b>home-page</b>:</li>
-     * <li><b>theme-name</b>:</li>
-     * <li><b>admin-theme-name</b>:</li>
-     * <li><b>site-descriptions</b>:</li>
+     * <li><b>website-names</b>: A sub associative array. The index of the 
+     * array should be language code (such as 'EN') and the value 
+     * should be the name of the web site in the given language.</li>
+     * <li><b>base-url</b>: The URL at which system pages will be served from. 
+     * usually, this URL is used in the tag 'base' of the web page.</li>
+     * <li><b>title-separator</b>: A character or a string that is used 
+     * to separate web site name from web page title. Two common 
+     * values are '-' and '|'.</li>
+     * <li><b>home-page</b>: The URL of the home page of the web site. For example, 
+     * If root URL of the web site is 'https://www.example.com', This page is served 
+     * when the user visits this URL.</li>
+     * <li><b>theme-name</b>: The name of the theme that will be used to style 
+     * web site UI.</li>
+     * <li><b>admin-theme-name</b>: If the web site has two UIs (One for normal 
+     * users and another for admins), this one 
+     * can be used to serve the UI for web site admins.</li>
+     * <li><b>site-descriptions</b>: A sub associative array. The index of the 
+     * array should be language code (such as 'EN') and the value 
+     * should be the general web site description in the given language.</li></li>
      * </ul> 
      * @since 1.0
      */
@@ -141,6 +179,24 @@ class WebsiteFunctions extends Functions{
     /**
      * Returns an associative array that contains web site configuration 
      * info.
+     * The returned array will have the following indices: 
+     * <ul>
+     * <li><b>website-names</b>: A sub associative array. The index of the 
+     * array will be language code (such as 'EN') and the value 
+     * will be the name of the web site in the given language.</li>
+     * <li><b>base-url</b>: The URL at which system pages will be served from. 
+     * usually, this URL is used in the tag 'base' of the web page.</li>
+     * <li><b>title-separator</b>: A character or a string that is used 
+     * to separate web site name from web page title.</li>
+     * <li><b>home-page</b>: The URL of the home page of the web site.</li>
+     * <li><b>theme-name</b>: The name of the theme that will be used to style 
+     * web site UI.</li>
+     * <li><b>admin-theme-name</b>: The name of the theme that is used to style 
+     * admin web pages.</li>
+     * <li><b>site-descriptions</b>: A sub associative array. The index of the 
+     * array will be language code (such as 'EN') and the value 
+     * will be the general web site description in the given language.</li></li>
+     * </ul> 
      * @return array An associative array that contains web site configuration 
      * info.
      * @since 1.0
@@ -180,6 +236,7 @@ class WebsiteFunctions extends Functions{
         }
         $fh = new FileHandler(ROOT_DIR.'/entity/SiteConfig.php');
         $fh->write('<?php', TRUE, TRUE);
+        $fh->write('namespace webfiori;',TRUE,TRUE);
         $fh->write('if(!defined(\'ROOT_DIR\')){
     header("HTTP/1.1 403 Forbidden");
     die(\'\'
@@ -297,6 +354,7 @@ class WebsiteFunctions extends Functions{
     }
     /**
      * Returns the primary language of the website.
+     * This function will return a language code such as \'EN\'.
      * @return string Language code of the primary language.
      * @since 1.3
      */
@@ -308,6 +366,7 @@ class WebsiteFunctions extends Functions{
     }
     /**
      * Returns the name of base theme that is used in website pages.
+     * Usually, this theme is used for the normall visitors of the web site.
      * @return string The name of base theme that is used in website pages.
      * @since 1.3
      */
@@ -330,6 +389,8 @@ class WebsiteFunctions extends Functions{
     }
     /**
      * Returns version number of the configuration file.
+     * This value can be used to check for the compatability of configuration 
+     * file
      * @return string The version number of the configuration file.
      * @since 1.0
      */
@@ -341,6 +402,8 @@ class WebsiteFunctions extends Functions{
     }
     /**
      * Returns the base URL that is used to fetch resources.
+     * The return value of this function is usually used by the tag \'base\' 
+     * of web site pages.
      * @return string the base URL.
      * @since 1.0
      */
@@ -353,6 +416,8 @@ class WebsiteFunctions extends Functions{
     /**
      * Returns an associative array which contains different website descriptions 
      * in different languages.
+     * Each index will contain a language code and the value will be the description 
+     * of the website in the given language.
      * @return string An associative array which contains different website descriptions 
      * in different languages.
      * @since 1.0
@@ -365,7 +430,8 @@ class WebsiteFunctions extends Functions{
     }
     /**
      * Returns the character (or string) that is used to separate page title from website name.
-     * @return string
+     * @return string A string such as \' - \' or \' | \'. Note that the function 
+     * will add the two spaces by default.
      * @since 1.0
      */
     public static function getTitleSep(){
@@ -375,8 +441,8 @@ class WebsiteFunctions extends Functions{
         return $this->homePage;
     }
     /**
-     * Returns the home page name of the website.
-     * @return string The home page name of the website.
+     * Returns the home page URL of the website.
+     * @return string The home page URL of the website.
      * @since 1.0
      */
     public static function getHomePage(){
@@ -387,6 +453,8 @@ class WebsiteFunctions extends Functions{
     }
     /**
      * Returns an array which contains diffrent website names in different languages.
+     * Each index will contain a language code and the value will be the name 
+     * of the website in the given language.
      * @return array An array which contains diffrent website names in different languages.
      * @since 1.0
      */

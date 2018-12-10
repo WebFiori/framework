@@ -42,7 +42,7 @@ if(!defined('ROOT_DIR')){
         . '</html>');
 }
 use jsonx\JsonI;
-use SiteConfig;
+use webfiori\SiteConfig;
 use Exception;
 /**
  * A base class that is used to construct web site UI.
@@ -223,7 +223,7 @@ abstract class Theme implements JsonI{
         Logger::log('Theme name = \''.$themeName.'\' ('. gettype($themeName).').', $themeName);
         Logger::log('Validating theme name...');
         if($themeName === NULL){
-            $themeName = SiteConfig::get()->getBaseThemeName();
+            $themeName = SiteConfig::getBaseThemeName();
             Logger::log('Given name is NULL. Using the theme \''.$themeName.'\'.', 'warning');
         }
         $themeToLoad = NULL;

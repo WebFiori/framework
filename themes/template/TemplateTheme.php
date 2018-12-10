@@ -3,6 +3,7 @@ use webfiori\entity\Theme;
 use phpStructs\html\HTMLNode;
 use phpStructs\html\HeadNode;
 use webfiori\entity\Page;
+use webfiori\SiteConfig;
 class TemplateTheme extends Theme{
     public function __construct() {
         parent::__construct();
@@ -46,7 +47,7 @@ class TemplateTheme extends Theme{
     public function getHeadNode() {
         $headTag = new HeadNode();
         //always set base URL to correctly fetch resources
-        $headTag->setBase(SiteConfig::get()->getBaseURL());
+        $headTag->setBase(SiteConfig::getBaseURL());
         $headTag->addCSS(Page::cssDir().'/cssFile.css');
         $headTag->addJs(Page::jsDir().'/jsFile.js');
         return $headTag;

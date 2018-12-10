@@ -9,6 +9,8 @@ use phpStructs\html\HeadNode;
 use phpStructs\html\HTMLNode;
 use phpStructs\html\PNode;
 use phpStructs\html\UnorderedList;
+use webfiori\SiteConfig;
+use webfiori\Config;
 
 class WebFioriTheme extends Theme{
     public function __construct() {
@@ -51,17 +53,17 @@ class WebFioriTheme extends Theme{
             $mainMenu = &Page::document()->getChildByID('main-menu');
 
             $item1 = new ListItem();
-            $link1 = new LinkNode(SiteConfig::get()->getBaseURL(), $translation->get('menus/main-menu/menu-item-1'));
+            $link1 = new LinkNode(SiteConfig::getBaseURL(), $translation->get('menus/main-menu/menu-item-1'));
             $item1->addChild($link1);
             $mainMenu->addChild($item1);
 
             $item2 = new ListItem();
-            $link2 = new LinkNode(SiteConfig::get()->getBaseURL(), $translation->get('menus/main-menu/menu-item-2'));
+            $link2 = new LinkNode(SiteConfig::getBaseURL(), $translation->get('menus/main-menu/menu-item-2'));
             $item2->addChild($link2);
             $mainMenu->addChild($item2);
 
             $item3 = new ListItem();
-            $link3 = new LinkNode(SiteConfig::get()->getBaseURL(), $translation->get('menus/main-menu/menu-item-3'));
+            $link3 = new LinkNode(SiteConfig::getBaseURL(), $translation->get('menus/main-menu/menu-item-3'));
             $item3->addChild($link3);
             $mainMenu->addChild($item3);
 
@@ -129,14 +131,14 @@ class WebFioriTheme extends Theme{
         $div = new HTMLNode('div');
         $div->setAttribute('class', 'pa-ltr-col-twelve');
         $div->addTextNode('<b style="color:gray;font-size:8pt;">Powered By: <a href="https://github.com/usernane/webfiori" '
-                . 'target="_blank">WebFiori Framework</a> v'.Config::get()->getVersion().' ('.Config::get()->getVersionType().')</b>');
+                . 'target="_blank">WebFiori Framework</a> v'.Config::getVersion().' ('.Config::getVersionType().')</b>');
         $node->addChild($div);
         return $node;
     }
 
     public function getHeadNode() {
         $headTag = new HeadNode();
-        $headTag->setBase(SiteConfig::get()->getBaseURL());
+        $headTag->setBase(SiteConfig::getBaseURL());
         $headTag->addLink('icon', Page::imagesDir().'/favicon.png');
         $headTag->addCSS(Page::cssDir().'/Grid.css');
         $headTag->addCSS(Page::cssDir().'/colors.css');
@@ -155,12 +157,12 @@ class WebFioriTheme extends Theme{
         $img->setClassName('pa-'.Page::dir().'-col-1-np-nm');
         $img->setID('logo');
         $img->setWritingDir(Page::dir());
-        $link = new LinkNode(SiteConfig::get()->getHomePage(), '');
+        $link = new LinkNode(SiteConfig::getHomePage(), '');
         $link->addChild($img);
         $headerSec->addChild($link);
         $langCode = WebsiteFunctions::get()->getSession()->getLang(TRUE);
         $p = new PNode();
-        $siteNames = SiteConfig::get()->getWebsiteNames();
+        $siteNames = SiteConfig::getWebsiteNames();
         if(isset($siteNames[$langCode])){
             $p->addText($siteNames[$langCode], array('bold'=>TRUE));
         }

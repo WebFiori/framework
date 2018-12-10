@@ -4,6 +4,8 @@ use webfiori\entity\Page;
 use phpStructs\html\HTMLNode;
 use phpStructs\html\HeadNode;
 use functions\WebsiteFunctions;
+use webfiori\SiteConfig;
+use webfiori\Config;
 class GreenyTheme extends Theme{
     public function __construct() {
         parent::__construct();
@@ -59,7 +61,7 @@ class GreenyTheme extends Theme{
         $div = new HTMLNode('div');
         $div->setAttribute('class', 'pa-ltr-col-twelve');
         $div->addTextNode('<b style="color:gray;font-size:8pt;">Powered By: <a href="https://github.com/usernane/webfiori" '
-                . 'target="_blank">WebFiori Framework</a> v'.Config::get()->getVersion().' ('.Config::get()->getVersionType().')');
+                . 'target="_blank">WebFiori Framework</a> v'.Config::getVersion().' ('.Config::getVersionType().')');
         $fNode->addChild($div);
         return $node;
     }
@@ -69,10 +71,10 @@ class GreenyTheme extends Theme{
         $lang = WebsiteFunctions::get()->getSession()->getLang(TRUE);
         $page->setLang($lang);
         $headTag = new HeadNode();
-        $headTag->setBase(SiteConfig::get()->getBaseURL());
+        $headTag->setBase(SiteConfig::getBaseURL());
         $headTag->addLink('icon', $page->getThemeImagesDir().'/favicon.png');
-        $headTag->setCanonical(SiteConfig::get()->getBaseURL().$page->getCanonical());
-        $page->setWebsiteName(SiteConfig::get()->getWebsiteNames()[$lang]);
+        $headTag->setCanonical(SiteConfig::getBaseURL().$page->getCanonical());
+        $page->setWebsiteName(SiteConfig::getWebsiteNames()[$lang]);
         $headTag->addCSS($page->getThemeCSSDir().'/Grid.css');
         $headTag->addCSS($page->getThemeCSSDir().'/colors.css');
         $headTag->addCSS($page->getThemeCSSDir().'/theme-specific.css');

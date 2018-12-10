@@ -24,6 +24,9 @@
  * THE SOFTWARE.
  */
 namespace webfiori\entity\mail;
+use webfiori\MailConfig;
+use webfiori\entity\File;
+use Exception;
 /**
  * Description of EmaiMessage
  *

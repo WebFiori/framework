@@ -41,6 +41,7 @@ if(!defined('ROOT_DIR')){
         . '</body>'
         . '</html>');
 }
+use Exception;
 /**
  * A class that is used to define language variables.
  *

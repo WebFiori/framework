@@ -23,6 +23,7 @@
  * THE SOFTWARE.
  */
 namespace webfiori\entity\cron;
+use Exception;
 /**
  * A class thar represents a cron job.
  *

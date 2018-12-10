@@ -17,6 +17,7 @@ if(!defined('ROOT_DIR')){
         . '</body>'
         . '</html>');
 }
+use Exception;
 /**
  * This class is used to write HTML or PHP files.
  * @author Ibrahim <ibinshikh@hotmail.com>

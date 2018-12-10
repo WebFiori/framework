@@ -1,4 +1,5 @@
 <?php
+namespace webfiori;
 if(!defined('ROOT_DIR')){
     header("HTTP/1.1 403 Forbidden");
     die(''
@@ -24,20 +25,20 @@ if(!defined('ROOT_DIR')){
  */
 class Config{
     /**
-     * The type framework version that is used to build the project.
-     * @var string The framework version that is used to build the project.
+     * The type framework version that is used to build the system.
+     * @var string The framework version that is used to build the system.
      * @since 1.0 
      */
     private $versionType;
     /**
-     * The version of the framework that is used to build the project.
-     * @var string The version of the framework that is used to build the project.
+     * The version of the framework that is used to build the system.
+     * @var string The version of the framework that is used to build the system.
      * @since 1.0 
      */
     private $version;
     /**
-     * The release date of the framework that is used to build the project.
-     * @var string Release date of of the framework that is used to build the project.
+     * The release date of the framework that is used to build the system.
+     * @var string Release date of of the framework that is used to build the system.
      * @since 1.0 
      */
     private $releaseDate;
@@ -88,10 +89,10 @@ class Config{
      */
     private function __construct() {
         $this->isConfigured = TRUE;
-        $this->releaseDate = '09-25-2018 (DD-MM-YYYY)';
-        $this->version = '1.0.0';
+        $this->releaseDate = '01-01-2019 (DD-MM-YYYY)';
+        $this->version = '1.0.1';
         $this->versionType = 'Stable';
-        $this->configVision = '1.3.1';
+        $this->configVision = '1.3.2';
         $this->dbHost = 'localhost';
         $this->dbUser = '';
         $this->dbPass = '';
@@ -99,14 +100,14 @@ class Config{
         $this->dbPort = '3306';
     }
     /**
-     * An instance of <b>Config</b>.
+     * An instance of Config.
      * @var Config 
      * @since 1.0
      */
     private static $cfg;
     /**
-     * Returns an instance of the configuration file.
-     * @return Config An object of type <b>Config</b>.
+     * Returns a single instance of the configuration file.
+     * @return Config An object of type Config.
      * @since 1.0
      */
     public static function &get(){
@@ -132,7 +133,7 @@ class Config{
     }
     /**
      * Checks if the system is configured or not.
-     * @return boolean <b>TRUE</b> if the system is configured.
+     * @return boolean TRUE if the system is configured.
      * @since 1.0
      */
     public static function isConfig(){
@@ -153,8 +154,8 @@ class Config{
         return $this->dbPort;
     }
     /**
-     * Returns the number of the port that is used to connect to the database.
-     * @return string Database name.
+     * Returns server port number that is used to connect to the database.
+     * @return string Server port number.
      * @since 1.0
      */
     public static function getDBPort(){
@@ -165,6 +166,8 @@ class Config{
     }
     /**
      * Returns the name of database host.
+     * The host can be an IP address, a URL or simply 'localhost' if the database 
+     * is in the same server that will host the web application.
      * @return string Database host.
      * @since 1.0
      */
@@ -186,8 +189,8 @@ class Config{
         return $this->dbPass;
     }
     /**
-     * Returns the password of the database user.
-     * @return string Database password.
+     * Returns the password of database user.
+     * @return string Database user's password.
      * @since 1.0
      */
     public static function getDBPassword(){
@@ -197,8 +200,8 @@ class Config{
         return $this->version;
     }
     /**
-     * Returns framework version number.
-     * @return string Framework version number.
+     * Returns WebFiori Framework version number.
+     * @return string WebFiori Framework version number.
      * @since 1.2
      */
     public static function getVersion(){
@@ -208,8 +211,8 @@ class Config{
         return $this->versionType;
     }
     /**
-     * Returns framework version type.
-     * @return string framework version type.
+     * Returns WebFiori Framework version type.
+     * @return string WebFiori Framework version type.
      * @since 1.2
      */
     public static function getVersionType(){
@@ -219,8 +222,8 @@ class Config{
         return $this->releaseDate;
     }
     /**
-     * Returns the date at which the framework is released.
-     * @return string The date at which the framework is released.
+     * Returns the date at which the current version of the framework is released.
+     * @return string The date at which the current version of the framework is released.
      * @since 1.0
      */
     public static function getReleaseDate(){

@@ -1,4 +1,5 @@
 <?php
+namespace webfiori;
 if(!defined('ROOT_DIR')){
     header("HTTP/1.1 403 Forbidden");
     die(''
@@ -18,7 +19,8 @@ if(!defined('ROOT_DIR')){
 }
 /**
  * A file that contains SMTP accounts information.
- *
+ * The developer can create multiple SMTP accounts and add 
+ * Connection information here.
  * @author Ibrahim
  * @version 1.0
  */
@@ -31,22 +33,25 @@ class MailConfig{
      */
     private static $inst;
     /**
-     * 
+     * Returnd a singleton instance of the class.
+     * Calling this function multiple times will result in returning 
+     * the same instance every time.
      * @return MailConfig
      * @since 1.0
      */
     public static function &get(){
-        if(self::$inst !== NULL){
-            return self::$inst;
+        if(self::$inst === NULL){
+            self::$inst = new MailConfig();
         }
-        self::$inst = new MailConfig();
         return self::$inst;
     }
     private function __construct() {
     }
 /**
      * Adds an email account.
-     * @param EmailAccount $acc an object of type <b>EmailAccount</b>.
+     * The developer can use this function to add new account during runtime. 
+     * The account will be removed once the program finishes.
+     * @param EmailAccount $acc an object of type EmailAccount.
      * @param string $name A name to associate with the email account.
      * @since 1.0
      */
@@ -62,10 +67,12 @@ class MailConfig{
     }
     /**
      * Returns an email account given its name.
+     * The function will search for an account with the given name in the set 
+     * of added accounts. If no account was found, NULL is returned.
      * @param string $name The name of the account.
      * @return EmailAccount|null If the account is found, The function 
-     * will return an object of type <b>EmailAccount</b>. Else, the 
-     * function will return <b>NULL</b>.
+     * will return an object of type EmailAccount. Else, the 
+     * function will return NULL.
      * @since 1.0
      */
     public static function &getAccount($name){
@@ -75,8 +82,10 @@ class MailConfig{
         return $this->emailAccounts;
     }
     /**
-     * Returns an array that contains all email accounts.
-     * @return array An array that contains all email accounts.
+     * Returns an associative array that contains all email accounts.
+     * The indices of the array will act as the names of the accounts. 
+     * The value of the index will be an object of type EmailAccount.
+     * @return array An associative array that contains all email accounts.
      * @since 1.0
      */
     public static function getAccounts(){

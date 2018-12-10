@@ -1,4 +1,5 @@
 <?php
+namespace webfiori;
 if(!defined('ROOT_DIR')){
     header("HTTP/1.1 403 Forbidden");
     die(''
@@ -88,7 +89,7 @@ class SiteConfig{
         return self::$siteCfg;
     }
     private function __construct() {
-        $this->configVision = '1.2';
+        $this->configVision = '1.2.1';
         $this->webSiteNames = array('AR'=>'أكاديميا البرمجة','EN'=>'Programming Academia',);
         $this->baseUrl = 'http://localhost/liskscode/';
         $this->titleSep = ' | ';
@@ -104,6 +105,7 @@ class SiteConfig{
     }
     /**
      * Returns the primary language of the website.
+     * This function will return a language code such as 'EN'.
      * @return string Language code of the primary language.
      * @since 1.3
      */
@@ -115,6 +117,7 @@ class SiteConfig{
     }
     /**
      * Returns the name of base theme that is used in website pages.
+     * Usually, this theme is used for the normall visitors of the web site.
      * @return string The name of base theme that is used in website pages.
      * @since 1.3
      */
@@ -137,6 +140,8 @@ class SiteConfig{
     }
     /**
      * Returns version number of the configuration file.
+     * This value can be used to check for the compatability of configuration 
+     * file
      * @return string The version number of the configuration file.
      * @since 1.0
      */
@@ -148,6 +153,8 @@ class SiteConfig{
     }
     /**
      * Returns the base URL that is used to fetch resources.
+     * The return value of this function is usually used by the tag 'base' 
+     * of web site pages.
      * @return string the base URL.
      * @since 1.0
      */
@@ -160,6 +167,8 @@ class SiteConfig{
     /**
      * Returns an associative array which contains different website descriptions 
      * in different languages.
+     * Each index will contain a language code and the value will be the description 
+     * of the website in the given language.
      * @return string An associative array which contains different website descriptions 
      * in different languages.
      * @since 1.0
@@ -172,7 +181,8 @@ class SiteConfig{
     }
     /**
      * Returns the character (or string) that is used to separate page title from website name.
-     * @return string
+     * @return string A string such as ' - ' or ' | '. Note that the function 
+     * will add the two spaces by default.
      * @since 1.0
      */
     public static function getTitleSep(){
@@ -182,8 +192,8 @@ class SiteConfig{
         return $this->homePage;
     }
     /**
-     * Returns the home page name of the website.
-     * @return string The home page name of the website.
+     * Returns the home page URL of the website.
+     * @return string The home page URL of the website.
      * @since 1.0
      */
     public static function getHomePage(){
@@ -194,6 +204,8 @@ class SiteConfig{
     }
     /**
      * Returns an array which contains diffrent website names in different languages.
+     * Each index will contain a language code and the value will be the name 
+     * of the website in the given language.
      * @return array An array which contains diffrent website names in different languages.
      * @since 1.0
      */

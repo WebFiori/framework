@@ -41,7 +41,7 @@ if(!defined('ROOT_DIR')){
         . '</body>'
         . '</html>');
 }
-use SiteConfig;
+use webfiori\SiteConfig;
 use webfiori\entity\Util;
 /**
  * The basic class that is used to route user requests to the correct 
@@ -134,7 +134,7 @@ class Router {
                     . '</html>');
         };
         if(class_exists('SiteConfig')){
-            $this->baseUrl = trim(SiteConfig::get()->getBaseURL(), '/');
+            $this->baseUrl = trim(SiteConfig::getBaseURL(), '/');
         }
         else{
             $this->baseUrl = trim(Util::getBaseURL(), '/');

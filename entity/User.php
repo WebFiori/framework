@@ -1,6 +1,5 @@
 <?php
 namespace webfiori\entity;
-use jsonx\JsonI;
 if(!defined('ROOT_DIR')){
     header("HTTP/1.1 403 Forbidden");
     die(''
@@ -18,6 +17,8 @@ if(!defined('ROOT_DIR')){
         . '</body>'
         . '</html>');
 }
+use jsonx\JsonI;
+use jsonx\JsonX;
 /**
  * A class that represents a system user.
  * @author Ibrahim <ibinshikh@hotmail.com>

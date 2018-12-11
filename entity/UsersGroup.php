@@ -40,6 +40,7 @@ if(!defined('ROOT_DIR')){
         . '</body>'
         . '</html>');
 }
+use jsonx\JsonI;
 /**
  * A class that represents a set of privileges
  *

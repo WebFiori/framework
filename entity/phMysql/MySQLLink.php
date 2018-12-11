@@ -1,5 +1,6 @@
 <?php
 namespace phMysql;
+use mysqli;
 /**
  * A class that is used to connect to MySQL database. It works as an interface 
  * for <b>mysqli</b> 

@@ -24,6 +24,9 @@
  */
 namespace webfiori\entity;
 use restEasy\WebAPI;
+use webfiori\WebFiori;
+use jsonx\JsonI;
+use jsonx\JsonX;
 /**
  * An extension for the class 'WebAPI' that adds support for multi-language 
  * response messages.
@@ -282,8 +285,9 @@ abstract class ExtendedWebAPI extends WebAPI{
      * English will be used.
      * @since 1.3
      */
-    public function missingParams($paramsNamesArr){
+    public function missingParams(){
         $val = '';
+        $paramsNamesArr = $this->getMissingParameters();
         if(gettype($paramsNamesArr) == 'array'){
             $i = 0;
             $count = count($paramsNamesArr);
@@ -315,8 +319,9 @@ abstract class ExtendedWebAPI extends WebAPI{
      * English will be used.
      * @since 1.3
      */
-    public function invParams($paramsNamesArr){
+    public function invParams(){
         $val = '';
+        $paramsNamesArr = $this->getInvalidParameters();
         if(gettype($paramsNamesArr) == 'array'){
             $i = 0;
             $count = count($paramsNamesArr);

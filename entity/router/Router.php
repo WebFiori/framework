@@ -133,7 +133,7 @@ class Router {
                     . '</body>'
                     . '</html>');
         };
-        if(class_exists('SiteConfig')){
+        if(class_exists('webfiori\SiteConfig')){
             $this->baseUrl = trim(SiteConfig::getBaseURL(), '/');
         }
         else{

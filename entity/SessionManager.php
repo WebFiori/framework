@@ -430,7 +430,7 @@ class SessionManager implements JsonI{
         //the value of default language.
         //used in case no language found 
         //in $_GET['lang']
-        $defaultLang = class_exists('SiteConfig') ? SiteConfig::getPrimaryLanguage() : 'EN';
+        $defaultLang = class_exists('webfiori\SiteConfig') ? SiteConfig::getPrimaryLanguage() : 'EN';
         Logger::log('Default language = \''.$defaultLang.'\'.', 'debug');
         $lang = NULL;
         Logger::log('Trying to get language variable from the array $_GET[].');

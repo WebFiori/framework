@@ -127,7 +127,7 @@ class WebsiteFunctions extends Functions{
      */
     public function createSiteConfigFile() {
         Logger::logFuncCall(__METHOD__);
-        if(!class_exists('SiteConfig')){
+        if(!class_exists('webfiori\SiteConfig')){
             Logger::log('Creating Configuration File \'SiteConfig.php\'');
             $initCfg = $this->getSiteConfigVars();
             $this->writeSiteConfig($initCfg);
@@ -203,7 +203,7 @@ class WebsiteFunctions extends Functions{
      */
     public function getSiteConfigVars(){
         $cfgArr = WebsiteFunctions::INITIAL_WEBSITE_CONFIG_VARS;
-        if(class_exists('SiteConfig')){
+        if(class_exists('webfiori\SiteConfig')){
             $SC = SiteConfig::get();
             $cfgArr['website-names'] = $SC->getWebsiteNames();
             $cfgArr['base-url'] = $SC->getBaseURL();

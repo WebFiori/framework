@@ -131,7 +131,7 @@ class SystemFunctions extends Functions{
      */
     public function createConfigFile() {
         Logger::logFuncCall(__METHOD__);
-        if(!class_exists('Config')){
+        if(!class_exists('webfiori\Config')){
             Logger::log('Creating Configuration File \'Config.php\'');
             $cfg = $this->getConfigVars();
             $this->writeConfig($cfg);
@@ -227,7 +227,7 @@ class SystemFunctions extends Functions{
      */
     public function getConfigVars(){
         $cfgArr = SystemFunctions::INITIAL_CONFIG_VARS;
-        if(class_exists('Config')){
+        if(class_exists('webfiori\Config')){
             $cfgArr['is-config'] = Config::isConfig() === TRUE ? 'TRUE' : 'FALSE';
             $cfgArr['database-host'] = Config::getDBHost();
             $cfgArr['database-username'] = Config::getDBUser();

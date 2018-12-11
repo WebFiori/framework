@@ -221,7 +221,7 @@ class SocketMailer {
     public function addAttachment($attachment) {
         Logger::logFuncCall(__METHOD__);
         Logger::log('Checking if class \'File\' exist...');
-        if(class_exists('File')){
+        if(class_exists('webfiori\entity\File')){
             Logger::log('Checking if passed parameter is an instance of \'File\'...');
             if($attachment instanceof File){
                 Logger::log('Checking file path and row data...');

@@ -94,7 +94,7 @@ class BasicMailFunctions extends Functions{
      */
     public function createEmailConfigFile(){
         Logger::logFuncCall(__METHOD__);
-        if(!class_exists('MailConfig')){
+        if(!class_exists('webfiori\entity\mail\MailConfig')){
             Logger::log('Creating Configuration File \'MailConfig.php\'');
             $this->writeMailConfig(array());
             Logger::log('Creatied.');
@@ -239,7 +239,7 @@ class BasicMailFunctions extends Functions{
     public function removeAccount($accountName) {
         Logger::logFuncCall(__METHOD__);
         $retVal = FALSE;
-        if(class_exists('MailConfig')){
+        if(class_exists('webfiori\entity\mail\MailConfig')){
             $account = &MailConfig::getAccount($accountName);
             if($account instanceof EmailAccount){
                 $accountsArr = MailConfig::getAccounts();
@@ -273,7 +273,7 @@ class BasicMailFunctions extends Functions{
         if($emailAccount instanceof EmailAccount){
             $sm = $this->getSocketMailer($emailAccount);
             if($sm instanceof SocketMailer){
-                if(class_exists('MailConfig')){
+                if(class_exists('webfiori\entity\mail\MailConfig')){
                     $accountsArr = MailConfig::getAccounts();
                     $accountsArr[$emailAccount->getName()] = $emailAccount;
                     $toSave = array();

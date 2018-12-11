@@ -1,4 +1,5 @@
 <?php
+namespace webfiori\entity;
 if(!defined('ROOT_DIR')){
     header("HTTP/1.1 403 Forbidden");
     die(''
@@ -16,13 +17,39 @@ if(!defined('ROOT_DIR')){
         . '</body>'
         . '</html>');
 }
-namespace webfiori\entity;
+use jsonx\JsonI;
+use jsonx\JsonX;
+use webfiori\entity\File;
+use webfiori\entity\Logger;
+use webfiori\entity\Util;
 /**
  * A helper class that is used to upload files to the server file system.
  * @author Ibrahim <ibinshikh@hotmail.com>
  * @version 1.2.1
  */
 class Uploader implements JsonI{
+    /**
+     * A constant that is used to indicates no upload types where added.
+     * @since 1.0
+     */
+    const NO_TYPES = 'no_types_added';
+    /**
+     * A constant that is used to indicates upload directory does not exists.
+     * @since 1.0
+     */
+    const NO_SUCH_DIR = 'no_such_dir';
+    
+    const NOT_EXIST = 'not_exist';
+    /**
+     * A constant that is used to indicates uploaded file type is not allowed.
+     * @since 1.0
+     */
+    const NOT_ALLOWED = 'not_allowed_type';
+    /**
+     * A constant that is used to indicates that a file does not exists.
+     * @since 1.0
+     */
+    const NO_SUCH_FILE = 'no_such_file';
     /**
      * An array of supported file types and their MIME types.
      * @var array 
@@ -551,13 +578,13 @@ class Uploader implements JsonI{
                                     }
                                 }
                                 else{
-                                    $fileInfoArr['upload-error'] = FileFunctions::NO_SUCH_DIR;
+                                    $fileInfoArr['upload-error'] = self::NO_SUCH_DIR;
                                     $fileInfoArr['uploaded'] = 'false';
                                 }
                             }
                             else{
                                 $fileInfoArr['uploaded'] = 'false';
-                                $fileInfoArr['upload-error'] = FileFunctions::NOT_ALLOWED;
+                                $fileInfoArr['upload-error'] = self::NOT_ALLOWED;
                             }
                         }
                         else{
@@ -624,13 +651,13 @@ class Uploader implements JsonI{
                                 }
                             }
                             else{
-                                $fileInfoArr['upload-error'] = FileFunctions::NO_SUCH_DIR;
+                                $fileInfoArr['upload-error'] = self::NO_SUCH_DIR;
                                 $fileInfoArr['uploaded'] = 'false';
                             }
                         }
                         else{
                             $fileInfoArr['uploaded'] = 'false';
-                            $fileInfoArr['upload-error'] = FileFunctions::NOT_ALLOWED;
+                            $fileInfoArr['upload-error'] = self::NOT_ALLOWED;
                         }
                     }
                     else{

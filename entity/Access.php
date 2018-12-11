@@ -252,7 +252,16 @@ class Access {
             $prArr = array();
             foreach ($this->userGroups as $group){
                 foreach ($group->privileges() as $pr){
-                    $prArr[] = $pr;
+                    $alreadyAdded = FALSE;
+                    foreach ($prArr as $pr2){
+                        if($pr2->getID() == $pr->getID()){
+                            $alreadyAdded = TRUE;
+                            break;
+                        }
+                    }
+                    if(!$alreadyAdded){
+                        $prArr[] = $pr;
+                    }
                 }
             }
             return $prArr;

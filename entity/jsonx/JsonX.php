@@ -1,5 +1,6 @@
 <?php
 namespace jsonx;
+use jsonx\JsonI;
 /**
  * An a class that can be used to create well formatted JSON strings. 
  * The class follows the specifications found at https://www.json.org/index.html.
@@ -130,7 +131,7 @@ class JsonX {
      */
     public function addObject($key, $val){
         if(gettype($val) == 'object'){
-            if(is_subclass_of($val, 'JsonI')){
+            if(is_subclass_of($val, 'jsonx\JsonI')){
                 $this->attributes[$key] = ''.$val->toJSON();
                 return TRUE;
             }

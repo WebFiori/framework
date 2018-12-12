@@ -82,6 +82,7 @@ class File implements JsonI{
      * <li>tiff: image/tiff</li>
      * <li>svg: image/svg+xml</li>
      * <li>psd: image/vnd.adobe.photoshop</li>
+     * <li>gif: image/gif</li>
      * </ul></li>
      * <li><b>Documents Formats:</b>
      * <ul>
@@ -156,6 +157,7 @@ class File implements JsonI{
         'tiff'=>'image/tiff',
         'svg'=>'image/svg+xml',
         'psd'=>'image/vnd.adobe.photoshop',
+        'gif'=>'image/gif',
         //pdf 
         'pdf'=>'application/pdf',
         //rich text format

@@ -23,7 +23,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-namespace webfiori\entity;
+namespace webfiori\entity\langs;
 if(!defined('ROOT_DIR')){
     header("HTTP/1.1 403 Forbidden");
     die(''
@@ -41,9 +41,9 @@ if(!defined('ROOT_DIR')){
         . '</body>'
         . '</html>');
 }
-use Exception;
 /**
- * A class that is used to define language variables.
+ * A class that is can be used to make the application ready for 
+ * Internationalization.
  *
  * @author Ibrahim
  * @version 1.2
@@ -96,7 +96,7 @@ class Language {
      * @param string $langCode A two digits language code (such as 'ar').
      * @throws Exception An exception will be thrown if no language file 
      * was found that matches the given language code. Language files must 
-     * have the name 'Language_XX' where 'XX' is language code. Also the function 
+     * have the name 'LanguageXX.php' where 'XX' is language code. Also the function 
      * will throw an exception when the translation file is loaded but no object 
      * of type 'Language' was stored in the set of loaded translations.
      * @return Language an object of type 'Language' is returned if 
@@ -105,14 +105,20 @@ class Language {
      */
     public static function &loadTranslation($langCode='EN'){
         $uLangCode = strtoupper($langCode);
-        $langFile = ROOT_DIR.'/entity/langs/Language_'.$uLangCode.'.php';
+        $langFile = ROOT_DIR.'/entity/langs/Language'.$uLangCode.'.php';
         if(file_exists($langFile)){
             require $langFile;
-            if(isset(self::$loadedLangs[$uLangCode])){
-                return self::$loadedLangs[$uLangCode];
-            }
-            else{
-                throw new Exception('The translation file was found. But no object of type \'Language\' is stored.');
+            $cName = 'Language'.$uLangCode;
+            try{
+                new $cName;
+                if(isset(self::$loadedLangs[$uLangCode])){
+                    return self::$loadedLangs[$uLangCode];
+                }
+                else{
+                    throw new Exception('The translation file was found. But no object of type \'Language\' is stored.');
+                }
+            } catch (Exception $ex) {
+                throw new Exception('No class with the name \''.$cName.'\' was found in languages directory.');
             }
         }
         else{

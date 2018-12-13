@@ -1,5 +1,5 @@
 <?php
-namespace webfiori\langs;
+namespace webfiori\entity\langs;
 if(!defined('ROOT_DIR')){
     header("HTTP/1.1 403 Forbidden");
     die(''
@@ -17,7 +17,6 @@ if(!defined('ROOT_DIR')){
         . '</body>'
         . '</html>');
 }
-use webfiori\entity\Language;
 /**
  * A class that contain some of the common language labels in Arabic.
  * So far, the class has the following variables:
@@ -98,10 +97,11 @@ use webfiori\entity\Language;
  * </li>
  * <ul>
  * @version 1.0
+ * @author Ibrahim
  */
-class LanguageAR extends Language{
+class LanguageEN extends Language{
     public function __construct() {
-        parent::__construct('rtl', 'AR', array(
+        parent::__construct('rtl', 'EN', array(
             'general/week-day',
             'general/g-month',
             'general/i-month',

@@ -320,7 +320,7 @@ class Util{
     public static function getGWeekday($date) {
         $format='YYYY-MM-DD';
         if($format == 'YYYY-MM-DD'){
-            return date('w', strtotime($date)) + 1;
+            return date('N', strtotime($date));
         }
         else{
             $split = explode('-', $format);

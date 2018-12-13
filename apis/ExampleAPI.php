@@ -23,7 +23,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
+namespace examples\webApis;
 if(!defined('ROOT_DIR')){
     header("HTTP/1.1 403 Forbidden");
     die(''
@@ -41,8 +41,11 @@ if(!defined('ROOT_DIR')){
         . '</body>'
         . '</html>');
 }
+use webfiori\entity\ExtendedWebAPI;
+use restEasy\APIAction;
+
 //create class and extend the base class API
-class ExampleAPI extends ExtendedAPI{
+class ExampleAPI extends ExtendedWebAPI{
     
     public function __construct() {
         parent::__construct();

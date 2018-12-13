@@ -29,17 +29,11 @@ use webfiori\entity\Util;
  */
 class Uploader implements JsonI{
     /**
-     * A constant that is used to indicates no upload types where added.
-     * @since 1.0
-     */
-    const NO_TYPES = 'no_types_added';
-    /**
      * A constant that is used to indicates upload directory does not exists.
+     * It usually returned by some functions as error code.
      * @since 1.0
      */
     const NO_SUCH_DIR = 'no_such_dir';
-    
-    const NOT_EXIST = 'not_exist';
     /**
      * A constant that is used to indicates uploaded file type is not allowed.
      * @since 1.0

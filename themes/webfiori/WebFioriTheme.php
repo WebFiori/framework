@@ -2,7 +2,7 @@
 use webfiori\entity\Theme;
 use webfiori\WebFiori;
 use webfiori\entity\Page;
-use functions\WebsiteFunctions;
+use webfiori\functions\WebsiteFunctions;
 use phpStructs\html\ListItem;
 use phpStructs\html\LinkNode;
 use phpStructs\html\HeadNode;

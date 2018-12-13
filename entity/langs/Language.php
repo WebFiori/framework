@@ -24,6 +24,7 @@
  * THE SOFTWARE.
  */
 namespace webfiori\entity\langs;
+use Exception;
 if(!defined('ROOT_DIR')){
     header("HTTP/1.1 403 Forbidden");
     die(''
@@ -105,24 +106,18 @@ class Language {
      */
     public static function &loadTranslation($langCode='EN'){
         $uLangCode = strtoupper($langCode);
-        $langFile = ROOT_DIR.'/entity/langs/Language'.$uLangCode.'.php';
-        if(file_exists($langFile)){
-            require $langFile;
-            $cName = 'Language'.$uLangCode;
-            try{
-                new $cName;
-                if(isset(self::$loadedLangs[$uLangCode])){
-                    return self::$loadedLangs[$uLangCode];
-                }
-                else{
-                    throw new Exception('The translation file was found. But no object of type \'Language\' is stored.');
-                }
-            } catch (Exception $ex) {
-                throw new Exception('No class with the name \''.$cName.'\' was found in languages directory.');
+        $langClassName = 'webfiori\entity\langs\Language'.$uLangCode;
+        $class = new $langClassName();
+        if($class instanceof Language){
+            if(isset(self::$loadedLangs[$uLangCode])){
+                return self::$loadedLangs[$uLangCode];
+            }
+            else{
+                throw new Exception('The translation file was found. But no object of type \'Language\' is stored.');
             }
         }
         else{
-            throw new Exception('Unable to load translation file. The file \''.$langFile.'\' does not exists.');
+            throw new Exception('A language class for the language \''.$langCode.'\' was found. But it is not a sub class of \'Language\'.');
         }
     }
     /**

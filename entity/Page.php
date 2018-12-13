@@ -18,6 +18,7 @@ if(!defined('ROOT_DIR')){
         . '</html>');
 }
 use phpStructs\html\HTMLDoc;
+use webfiori\entity\langs\Language;
 use webfiori\functions\WebsiteFunctions;
 use phpStructs\html\HeadNode;
 use webfiori\SiteConfig;

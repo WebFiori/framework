@@ -37,7 +37,7 @@ class ViewRoutes {
      */
     public static function create(){
         Router::view('/', '/default.html');
-        Router::view('/example', '/example-page.php');
+        Router::view('/example', '/ExamplePage.php');
     }
     /**
      * A test for creating a site map from views URIs

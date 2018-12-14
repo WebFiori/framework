@@ -25,6 +25,7 @@
  */
 namespace restEasy;
 use jsonx\JsonI;
+use jsonx\JsonX;
 /**
  * A class that represents API action.
  * @author Ibrahim

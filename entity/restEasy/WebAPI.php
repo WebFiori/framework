@@ -24,6 +24,7 @@
  */
 namespace restEasy;
 use jsonx\JsonI;
+use jsonx\JsonX;
 /**
  * A class that represents a REST API.
  * @version 1.4.2

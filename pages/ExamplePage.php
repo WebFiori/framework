@@ -23,7 +23,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
+namespace examples\views;
 /*
  * The next block of code can be added to every view or .php 
  * file to prevent direct access.
@@ -49,28 +49,33 @@ if(!defined('ROOT_DIR')){
 use webfiori\entity\Page;
 use phpStructs\html\PNode;
 use phpStructs\html\HTMLNode;
-//load UI template components (JS, CSS and others)
-//it is optional. to use a theme but recomended
-Page::theme($themeName='WebFiori Theme');
+class ExamplePage{
+    public function __construct() {
+        //load UI template components (JS, CSS and others)
+        //it is optional. to use a theme but recomended
+        Page::theme($themeName='WebFiori Theme');
 
-//sets the title of the page
-$lang = Page::lang();
-if($lang == 'AR'){
-    Page::title('مثال على صفحة');
-    //adds a paragraph to the body of the page.
-    $p = new PNode();
-    $p->addText('أهلا و سهلا من إطار "ويب فيوري"!');
-    Page::insert($p);
+        //sets the title of the page
+        $lang = Page::lang();
+        if($lang == 'AR'){
+            Page::title('مثال على صفحة');
+            //adds a paragraph to the body of the page.
+            $p = new PNode();
+            $p->addText('أهلا و سهلا من إطار "ويب فيوري"!');
+            Page::insert($p);
+        }
+        else{
+            Page::title('Example Page');
+            //adds a paragraph to the body of the page.
+            $p = new PNode();
+            $p->addText('Hello from "WebFiori Framework"!');
+            Page::insert($p);
+        }
+        $image = new HTMLNode('img',FALSE);
+        $image->setAttribute('src', Page::imagesDir().'/image.png');
+        Page::insert($image);
+        //display the view
+        Page::render();
+    }
 }
-else{
-    Page::title('Example Page');
-    //adds a paragraph to the body of the page.
-    $p = new PNode();
-    $p->addText('Hello from "WebFiori Framework"!');
-    Page::insert($p);
-}
-$image = new HTMLNode('img',FALSE);
-$image->setAttribute('src', Page::imagesDir().'/image.png');
-Page::insert($image);
-//display the view
-Page::render();
+new ExamplePage();

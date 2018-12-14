@@ -101,7 +101,7 @@ if(!defined('ROOT_DIR')){
  */
 class LanguageEN extends Language{
     public function __construct() {
-        parent::__construct('rtl', 'EN', array(
+        parent::__construct('ltr', 'EN', array(
             'general/week-day',
             'general/g-month',
             'general/i-month',

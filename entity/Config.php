@@ -91,7 +91,7 @@ class Config{
         $this->isConfigured = TRUE;
         $this->releaseDate = '01-01-2019 (DD-MM-YYYY)';
         $this->version = '1.0.1';
-        $this->versionType = 'Stable';
+        $this->versionType = 'Beta';
         $this->configVision = '1.3.2';
         $this->dbHost = 'localhost';
         $this->dbUser = '';

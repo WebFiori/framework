@@ -142,10 +142,23 @@ class AutoLoader{
                         $subDirs = scandir($fullPath);
                         foreach ($subDirs as $subDir){
                             if($subDir != '.' && $subDir != '..'){
-                                $dirsStack[] = $xDir.'/'.$subDir;
+                                $dirsStack[] = $xDir.'\\'.$subDir;
                             }
                         }
                         $this->searchFolders[] = $xDir;
+                    }
+                    else{
+                        $xDir = str_replace('\\', '/', $xDir);
+                        $fullPath = str_replace('\\', '/', $fullPath);
+                        if(is_dir($fullPath)){
+                            $subDirs = scandir($fullPath);
+                            foreach ($subDirs as $subDir){
+                                if($subDir != '.' && $subDir != '..'){
+                                    $dirsStack[] = $xDir.'/'.$subDir;
+                                }
+                            }
+                            $this->searchFolders[] = $xDir;
+                        }
                     }
                 }
             }

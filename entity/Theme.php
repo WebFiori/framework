@@ -48,9 +48,16 @@ use Exception;
  * A base class that is used to construct web site UI.
  * 
  * @author Ibrahim
- * @version 1.2.1
+ * @version 1.2.2
  */
 abstract class Theme implements JsonI{
+    /**
+     * An optional base URL.
+     * This URL is used by the tag 'base' to fetch page resources.
+     * @var string
+     * @since 1.2.2 
+     */
+    private $baseUrl;
     /**
      * The directory where themes are located in.
      * @since 1.0
@@ -157,6 +164,32 @@ abstract class Theme implements JsonI{
         $this->beforeLoaded = function(){};
         $this->beforeLoadedParams = array();
         Logger::logFuncReturn(__METHOD__);
+    }
+    /**
+     * Returns the base URL that will be used by the theme.
+     * The URL is used by the HTML tag 'base' to fetch page resources. 
+     * If the URL is not set by the developer, the function will return the 
+     * URL that is returned by the function SiteConfig::getBaseURL().
+     * @return string The base URL that will be used by the theme.
+     */
+    public function getBaseURL(){
+        if($this->baseUrl !== NULL){
+            return $this->baseUrl;
+        }
+        else{
+            return SiteConfig::getBaseURL();
+        }
+    }
+    /**
+     * Sets The base URL that will be used by the theme.
+     * This URL is used by the HTML tag 'base' to fetch page resources. The 
+     * given string must be non-empty string in order to set.
+     * @param string $url The base URL that will be used by the theme.
+     */
+    public function setBaseURL($url) {
+        if(strlen(trim($url)) > 0){
+            $this->baseUrl = $url;
+        }
     }
     /**
      * Adds a set of theme components to the theme.

@@ -25,6 +25,8 @@
 namespace webfiori\entity;
 use restEasy\WebAPI;
 use webfiori\WebFiori;
+use webfiori\entity\langs\Language;
+use webfiori\SiteConfig;
 use jsonx\JsonI;
 use jsonx\JsonX;
 /**
@@ -44,7 +46,18 @@ abstract class ExtendedWebAPI extends WebAPI{
      */
     public function __construct($version = '1.0.0') {
         parent::__construct($version);
-        $langCode = WebFiori::getWebsiteFunctions()->getSession()->getLang(TRUE);
+        $reqMeth = $this->getRequestMethod();
+        if($reqMeth == 'GET' || $reqMeth == 'DELETE'){
+            $langCode = isset($_GET['lang']) ? filter_var($_GET['lang']) :
+            WebFiori::getWebsiteFunctions()->getSession()->getLang(TRUE);
+        }
+        else if($reqMeth == 'POST' || $reqMeth == 'PUT'){
+            $langCode = isset($_POST['lang']) ? filter_var($_POST['lang']) :
+            WebFiori::getWebsiteFunctions()->getSession()->getLang(TRUE);
+        }
+        else{
+            $langCode = WebFiori::getWebsiteFunctions()->getSession()->getLang(TRUE);
+        }
         $this->translation = &Language::loadTranslation($langCode);
         $this->createLangDir('general');
         if($langCode == 'AR'){

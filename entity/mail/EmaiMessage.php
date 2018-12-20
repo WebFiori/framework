@@ -26,6 +26,10 @@
 namespace webfiori\entity\mail;
 use webfiori\MailConfig;
 use webfiori\entity\File;
+use webfiori\entity\Logger;
+use webfiori\functions\BasicMailFunctions;
+use phpStructs\html\HTMLDoc;
+use phpStructs\html\HTMLNode;
 use Exception;
 /**
  * Description of EmaiMessage

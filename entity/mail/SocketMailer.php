@@ -41,6 +41,8 @@ if(!defined('ROOT_DIR')){
         . '</body>'
         . '</html>');
 }
+use webfiori\entity\Logger;
+use webfiori\entity\File;
 /**
  * A class that can be used to send email messages using sockets.
  *

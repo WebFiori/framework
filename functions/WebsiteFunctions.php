@@ -254,6 +254,7 @@ class WebsiteFunctions extends Functions{
         . \'</body>\'
         . \'</html>\');
 }', TRUE, TRUE);
+        $fh->write('use webfiori/entity/Util;', TRUE, TRUE);
         $fh->write('class SiteConfig{', TRUE, TRUE);
         $fh->addTab();
         $fh->write('/**
@@ -340,12 +341,12 @@ class WebsiteFunctions extends Functions{
         $fh->write('private function __construct() {
         $this->configVision = \''.$configArr['config-file-version'].'\';
         $this->webSiteNames = '.$names.';
-        $this->baseUrl = \''.$configArr['base-url'].'\';
+        $this->baseUrl = Util::getBaseURL();
         $this->titleSep = \' '. trim($configArr['title-separator']).' \';
         $this->primaryLang = \''. trim($configArr['primary-language']).'\';
         $this->baseThemeName = \''.$configArr['theme-name'].'\';
         $this->adminThemeName = \''.$configArr['admin-theme-name'].'\';
-        $this->homePage = \''.$configArr['home-page'].'\';
+        $this->homePage = getBaseURL();
         $this->descriptions = '.$descriptions.';
     }', TRUE, TRUE);
         $fh->write('

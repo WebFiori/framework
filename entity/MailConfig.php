@@ -17,6 +17,7 @@ if(!defined('ROOT_DIR')){
         . '</body>'
         . '</html>');
 }
+use webfiori\entity\mail\EmailAccount;
 /**
  * A file that contains SMTP accounts information.
  * The developer can create multiple SMTP accounts and add 

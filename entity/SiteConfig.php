@@ -17,6 +17,7 @@ if(!defined('ROOT_DIR')){
         . '</body>'
         . '</html>');
 }
+use webfiori\entity\Util;
 class SiteConfig{
     /**
      * An array which contains all website names in different languages.
@@ -91,12 +92,12 @@ class SiteConfig{
     private function __construct() {
         $this->configVision = '1.2.1';
         $this->webSiteNames = array('AR'=>'أكاديميا البرمجة','EN'=>'Programming Academia',);
-        $this->baseUrl = entity\Util::getBaseURL();
+        $this->baseUrl = Util::getBaseURL();
         $this->titleSep = ' | ';
         $this->primaryLang = 'EN';
         $this->baseThemeName = 'Greeny By Ibrahim Ali';
         $this->adminThemeName = 'Greeny By Ibrahim Ali';
-        $this->homePage = 'index';
+        $this->homePage = Util::getBaseURL();
         $this->descriptions = array('AR'=>'','EN'=>'',);
     }
     

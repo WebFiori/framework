@@ -532,9 +532,10 @@ class Uploader implements JsonI{
                                     if(!file_exists($targetDir)){
                                         $fileInfoArr['is-exist'] = FALSE;
                                         $fileInfoArr['is-replace'] = FALSE;
-                                            if(move_uploaded_file($fileOrFiles["tmp_name"][$x], $targetDir)){
-                                                if(function_exists('mime_content_type')){
-                                                $fileInfoArr['mime'] = mime_content_type($fileInfoArr['upload-path'].'\\'.$fileInfoArr['name']);
+                                        if(move_uploaded_file($fileOrFiles["tmp_name"][$x], $targetDir)){
+                                            if(function_exists('mime_content_type')){
+                                                $fPath = str_replace('\\','/',$fileInfoArr['upload-path'].'/'.$fileInfoArr['name']);
+                                                $fileInfoArr['mime'] = mime_content_type($fPath);
                                             }
                                             else{
                                                 $ext = pathinfo($fileInfoArr['name'], PATHINFO_EXTENSION);
@@ -548,7 +549,8 @@ class Uploader implements JsonI{
                                     }
                                     else{
                                         if(function_exists('mime_content_type')){
-                                            $fileInfoArr['mime'] = mime_content_type($fileInfoArr['upload-path'].'\\'.$fileInfoArr['name']);
+                                            $fPath = str_replace('\\','/',$fileInfoArr['upload-path'].'/'.$fileInfoArr['name']);
+                                            $fileInfoArr['mime'] = mime_content_type($fPath);
                                         }
                                         else{
                                             $ext = pathinfo($fileInfoArr['name'], PATHINFO_EXTENSION);
@@ -609,7 +611,8 @@ class Uploader implements JsonI{
                                     if(move_uploaded_file($fileOrFiles["tmp_name"], $targetDir)){
                                         $fileInfoArr['uploaded'] = TRUE;
                                         if(function_exists('mime_content_type')){
-                                            $fileInfoArr['mime'] = mime_content_type($fileInfoArr['upload-path'].'\\'.$fileInfoArr['name']);
+                                            $fPath = str_replace('\\','/',$fileInfoArr['upload-path'].'/'.$fileInfoArr['name']);
+                                            $fileInfoArr['mime'] = mime_content_type($fPath);
                                         }
                                         else{
                                             $ext = pathinfo($fileInfoArr['name'], PATHINFO_EXTENSION);
@@ -623,7 +626,8 @@ class Uploader implements JsonI{
                                 else{
                                     $fileInfoArr['is-exist'] = TRUE;
                                     if(function_exists('mime_content_type')){
-                                        $fileInfoArr['mime'] = mime_content_type($fileInfoArr['upload-path'].'\\'.$fileInfoArr['name']);
+                                        $fPath = str_replace('\\','/',$fileInfoArr['upload-path'].'/'.$fileInfoArr['name']);
+                                        $fileInfoArr['mime'] = mime_content_type($fPath);
                                     }
                                     else{
                                         $ext = pathinfo($fileInfoArr['name'], PATHINFO_EXTENSION);

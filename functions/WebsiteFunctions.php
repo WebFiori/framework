@@ -44,7 +44,7 @@ if(!defined('ROOT_DIR')){
 use webfiori\entity\Logger;
 use webfiori\WebFiori;
 use webfiori\entity\FileHandler;
-use SiteConfig;
+use webfiori\SiteConfig;
 /**
  * A class that can be used to modify basic settings of the website and 
  * save them to the file 'SiteConfig.php'
@@ -254,7 +254,7 @@ class WebsiteFunctions extends Functions{
         . \'</body>\'
         . \'</html>\');
 }', TRUE, TRUE);
-        $fh->write('use webfiori/entity/Util;', TRUE, TRUE);
+        $fh->write('use webfiori\entity\Util;', TRUE, TRUE);
         $fh->write('class SiteConfig{', TRUE, TRUE);
         $fh->addTab();
         $fh->write('/**
@@ -346,7 +346,7 @@ class WebsiteFunctions extends Functions{
         $this->primaryLang = \''. trim($configArr['primary-language']).'\';
         $this->baseThemeName = \''.$configArr['theme-name'].'\';
         $this->adminThemeName = \''.$configArr['admin-theme-name'].'\';
-        $this->homePage = getBaseURL();
+        $this->homePage = Util::getBaseURL();
         $this->descriptions = '.$descriptions.';
     }', TRUE, TRUE);
         $fh->write('

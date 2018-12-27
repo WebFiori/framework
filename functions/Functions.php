@@ -48,10 +48,13 @@ if(!defined('ROOT_DIR')){
         . '</html>');
 }
 /**
- * The base class for creating application logic and connecting to the database.
- *
+ * The base class for creating application logic.
+ * This class provides the basic utilities to connect to database and manage 
+ * the connection. In addition, it can be used to manage system sessions if 
+ * the system uses any. The developer can extend this class to add his own 
+ * logic to the application that he is creating.
  * @author Ibrahim
- * @version 1.3.3
+ * @version 1.3.4
  */
 class Functions {
     /**
@@ -92,6 +95,26 @@ class Functions {
      */
     const EMPTY_STRING = 'emp_string';
     /**
+     * An associative array that contains variables which are used in case no 
+     * session options where provided while initiating a new session.
+     * The array have the following values:
+     * <ul>
+     * <li>duration: 120 </li>
+     * <li>refresh: TRUE </li>
+     * <li>name: '' </li>
+     * <li>user: NULL </li>
+     * <li>variables: empty array. </li>
+     * </ul>
+     * @since 1.3.4
+     */
+    const DEFAULT_SESSTION_OPTIONS = array(
+        'duration'=>120,
+        'refresh'=>true,
+        'name'=>'',
+        'user'=>null,
+        'variables'=>array()
+    );
+    /**
      * Creates new instance of the class.
      * @param string $linkedSessionName The name of the session that will 
      * be linked with the class instance. The name can consist of any character 
@@ -99,20 +122,12 @@ class Functions {
      * of the given characters, the session will have new randomly generated name.
      * @since 1.0
      */
-    public function __construct($linkedSessionName='main') {
+    public function __construct() {
         Logger::logFuncCall(__METHOD__);
         if(self::$sessions === NULL){
             Logger::log('Initializing sessions array...');
             self::$sessions = array();
         }
-        Logger::log('Initializing linked session...');
-        $linkedSession = new SessionManager($linkedSessionName);
-        $linkedSession->initSession();
-        Logger::log('Setting linked session name...');
-        $this->sessionName = $linkedSession->getName();
-        Logger::log('Linked session name = \''.$this->sessionName.'\'.', 'debug');
-        self::$sessions[$linkedSession->getName()] = $linkedSession;
-        Logger::log('Finished initializing linked session.');
         $this->connErrDetails = array();
         $this->connErrDetails['error-code'] = '';
         $this->connErrDetails['error-message'] = '';
@@ -265,7 +280,7 @@ class Functions {
         return $this->connErrDetails;
     }
     /**
-     * Execute a query.
+     * Execute a database query.
      * @param MySQLQuery $qObj An object of type 'MySQLQuery'. Note that 
      * this function will call the function 'Functions::useDatabase()' by 
      * default.
@@ -328,31 +343,96 @@ class Functions {
         return $retVal;
     }
     /**
+     * Initiate new session or use a session which is already initiated.
+     * @param array $options An associative array of options. The available options 
+     * are: 
+     * <ul>
+     * <li>name: The name of the session that will be used or created.</li>
+     * <li>create-new: If no session was found which has the given name and 
+     * this index is set to TRUE, new session will be created.</li>
+     * <li>duration: The duration of the session in minutes (optional). Used only if 
+     * the session is new.</li>
+     * <li>refresh: An optional boolean variable. If set to TRUE, the session timeout time 
+     * will be refreshed with every request. Used only if the session is new.</li>
+     * <li>user: An optional object of type user that represents session user. Used only if 
+     * the session is new.</li>
+     * * <li>variables: An optional associative array of variables to set in the session. Used only if 
+     * the session is new.</li>
+     * </ul>
+     * @return boolean If the session is exist or created, the function will 
+     * return TRUE. Other than that, the function will return FALSE.
+     */
+    public function useSession($options=array()){
+        if(gettype($options) == 'array'){
+            if(isset($options['name'])){
+                $sessionName = $options['name'];
+                if(isset(self::$sessions[$sessionName])){
+                    $this->sessionName = $sessionName;
+                    return TRUE;
+                }
+                else{
+                    if(isset($options['create-new']) && $options['create-new'] === TRUE){
+                        $mngr = new SessionManager($sessionName);
+                        
+                        $sTime = isset($options['duration']) ? $options['duration'] : self::DEFAULT_SESSTION_OPTIONS['duration'];
+                        $mngr->setLifetime($sTime);
+                        
+                        $isRef = isset($options['refresh']) ? $options['refresh'] : self::DEFAULT_SESSTION_OPTIONS['refresh'];
+                        $mngr->setIsRefresh($isRef);
+                        
+                        if($mngr->initSession($isRef)){
+                            $this->sessionName = $sessionName;
+                            $sUser = isset($options['user']) ? $options['user'] : self::DEFAULT_SESSTION_OPTIONS['user'];
+                            $mngr->setUser($sUser);
+                            self::$sessions[$mngr->getName()] = $mngr;
+                            if(isset($options['variables'])){
+                                foreach ($options['variables'] as $k => $v){
+                                    $mngr->setSessionVar($k,$v);
+                                }
+                            }
+                            return TRUE;
+                        }
+                    }
+                }
+            }
+        }
+        return FALSE;
+    }
+    /**
      * Returns the instance of 'SessionManager' that is used by the class.
-     * @return SessionManager An instance of 'SessionManager'.
+     * If the name of the session is NULL, the function will return NULL.
+     * @return SessionManager|NULL An instance of 'SessionManager'.
      * @since 1.3
      */
     public function &getSession() {
         Logger::logFuncCall(__METHOD__);
         Logger::log('Session name = \''.$this->sessionName.'\'.', 'debug');
-        $retVal = &self::$sessions[$this->sessionName];
+        $retVal = NULL;
+        if($this->sessionName !== NULL){
+            $retVal = &self::$sessions[$this->sessionName];
+        }
         Logger::logFuncReturn(__METHOD__);
         return $retVal;
     }
     /**
-     * Returns language code from the session manager.
+     * Returns language code from the currently used session manager.
+     * Note that if the name of the session is not set, the function will 
+     * return NULL.
      * @param boolean $forceUpdate If set to TRUE, language code will 
      * be forced to update based on the value of the attribute 'lang' 
      * of a GET or POST request or a cookie.
-     * @return strint A two characters  that represents language code.
+     * @return string|NULL A two characters  that represents language code.
      * @since 1.2
      */
     public final function getSessionLang($forceUpdate=true){
         Logger::logFuncCall(__METHOD__);
         Logger::log('Force Update = \''.$forceUpdate.'\'', 'debug');
-        $retVal = $this->getSession()->getLang($forceUpdate);
+        $session = $this->getSession();
+        if($session !== NULL){
+            return $session->getLang($forceUpdate);
+        }
         Logger::logFuncReturn(__METHOD__);
-        return $retVal;
+        return NULL;
     }
     /**
      * Returns the link that is used to connect to the database.
@@ -462,20 +542,24 @@ class Functions {
     /**
      * Returns the ID of the user from session manager.
      * @return int The ID of the user taken from session manager. The 
-     * function will return -1 in case no user is set in session manager.
+     * function will return -1 in case no user is set in session manager or in 
+     * case no session is active.
      * @since 1.0
      */
     public function getUserID(){
         Logger::logFuncCall(__METHOD__);
         $retVal = -1;
         Logger::log('Getting user from session manager...');
-        $user = &$this->getSession()->getUser();
-        Logger::log('Checking if session user is null or not...');
-        if($user !== NULL){
-            $retVal = intval($user->getID());
-        }
-        else{
-            Logger::log('Session user is NULL.', 'warning');
+        $sesstion = $this->getSession();
+        if($sesstion !== NULL){
+            $user = &$this->getSession()->getUser();
+            Logger::log('Checking if session user is null or not...');
+            if($user !== NULL){
+                $retVal = intval($user->getID());
+            }
+            else{
+                Logger::log('Session user is NULL.', 'warning');
+            }
         }
         Logger::logReturnValue($retVal);
         Logger::logFuncReturn(__METHOD__);

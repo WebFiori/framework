@@ -163,7 +163,7 @@ class SessionManager implements JsonI{
         $this->sessionStatus = self::NOT_RUNNING;
         $this->resumed = FALSE;
         $this->new = FALSE;
-        $this->sId = $this->generateSessionID();
+        $this->sId = $this->_generateSessionID();
         Logger::logFuncReturn(__METHOD__);
         
         //$sesionSavePath = 'sessions';
@@ -294,7 +294,7 @@ class SessionManager implements JsonI{
      * @return string A new random session ID.
      * @since 1.6
      */
-    private function generateSessionID() {
+    private function _generateSessionID() {
         Logger::logFuncCall(__METHOD__);
         $date = date(DATE_ISO8601);
         $hash = hash('sha256', $date);
@@ -322,8 +322,13 @@ class SessionManager implements JsonI{
             if($this->isSessionActive()){
                 $this->lifeTime = $time;
                 $_SESSION['lifetime'] = $time*60;
+                
                 $params = session_get_cookie_params();
-                setcookie($this->getName(), $this->getID(),time()+$this->getLifetime() * 60, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
+                $secure = isset($params['secure']) ? $params['secure'] : FALSE;
+                $httponly = isset($params['httponly']) ? $params['httponly'] : FALSE;
+                $path = isset($params['path']) ? $params['path'] : '/';
+                session_set_cookie_params(time()+$this->getLifetime() * 60, $path, $params['domain'], $secure, $httponly);
+                
                 $retVal = TRUE;
                 Logger::log('Session duration updated.');
                 Logger::log('Checking if the session has timed out...');
@@ -337,8 +342,13 @@ class SessionManager implements JsonI{
                 if($this->_switchToSession()){
                     $this->lifeTime = $time;
                     $_SESSION['lifetime'] = $time*60;
+                    
                     $params = session_get_cookie_params();
-                    setcookie($this->getName(), $this->getID(),time()+$this->getLifetime() * 60, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
+                    $secure = isset($params['secure']) ? $params['secure'] : FALSE;
+                    $httponly = isset($params['httponly']) ? $params['httponly'] : FALSE;
+                    $path = isset($params['path']) ? $params['path'] : '/';
+                    session_set_cookie_params(time()+$this->getLifetime() * 60, $path, $params['domain'], $secure, $httponly);
+                    
                     $retVal = TRUE;
                     Logger::log('Session duration updated.');
                     Logger::log('It is active. Checking if the session has timed out...');
@@ -850,7 +860,11 @@ class SessionManager implements JsonI{
      */
     private function _kill(){
         $params = session_get_cookie_params();
-        setcookie($this->getName(), '', 0, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
+        $secure = isset($params['secure']) ? $params['secure'] : FALSE;
+        $httponly = isset($params['httponly']) ? $params['httponly'] : FALSE;
+        $path = isset($params['path']) ? $params['path'] : '/';
+        session_set_cookie_params(0, $path, $params['domain'], $secure, $httponly);
+        
         session_destroy();
         $this->sessionStatus = self::KILLED;
         Logger::log('Session Killed.');

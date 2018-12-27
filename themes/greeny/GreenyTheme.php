@@ -26,7 +26,8 @@ class GreenyTheme extends Theme{
             'UIFunctions.php'
         ));
         $this->setAfterLoaded(function(){
-            Page::lang(WebsiteFunctions::get()->getSession()->getLang(TRUE));
+            $session = WebsiteFunctions::get()->getSession();
+            Page::lang($session->getLang(TRUE));
             Page::translation();
             Page::document()->getBody()->setClassName('pa-container');
             Page::document()->getChildByID('page-body')->setClassName('pa-row');
@@ -38,6 +39,14 @@ class GreenyTheme extends Theme{
                 Page::document()->getChildByID('main-content-area')->setClassName('pa-'.Page::dir().'-col-12 show-border');
             }
             Page::document()->getChildByID('main-content-area')->addTextNode('Main Content Area.');
+        });
+        $this->setBeforeLoaded(function(){
+            WebsiteFunctions::get()->useSession(array(
+                'name'=>'lang-session',
+                'create-new'=>true,
+                'duration'=>60*24*7,
+                'refresh'=>TRUE
+            ));
         });
     }
     public function getAsideNode() {
@@ -74,12 +83,12 @@ class GreenyTheme extends Theme{
         $headTag->setBase(SiteConfig::getBaseURL());
         $headTag->addLink('icon', $page->getThemeImagesDir().'/favicon.png');
         $headTag->setCanonical(SiteConfig::getBaseURL().$page->getCanonical());
-        $page->setWebsiteName(SiteConfig::getWebsiteNames()[$lang]);
+        if(isset(SiteConfig::getWebsiteNames()[$lang])){
+            $page->setWebsiteName(SiteConfig::getWebsiteNames()[$lang]);
+        }
         $headTag->addCSS($page->getThemeCSSDir().'/Grid.css');
         $headTag->addCSS($page->getThemeCSSDir().'/colors.css');
         $headTag->addCSS($page->getThemeCSSDir().'/theme-specific.css');
-        $headTag->addJs('res/js/js-ajax-helper-1.0.0/AJAX.js');
-        $headTag->addJs('res/js/APIs.js');
         $headTag->addMeta('robots', 'index, follow');
         return $headTag;
     }

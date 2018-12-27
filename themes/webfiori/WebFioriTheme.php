@@ -29,7 +29,16 @@ class WebFioriTheme extends Theme{
             'api-help/FunctionDef.php'
         ));
         $this->setBeforeLoaded(function(){
-            $lang = WebFiori::getWebsiteFunctions()->getSessionLang(TRUE);
+            $this->setBeforeLoaded(function(){
+                WebsiteFunctions::get()->useSession(array(
+                    'name'=>'lang-session',
+                    'create-new'=>true,
+                    'duration'=>60*24*7,
+                    'refresh'=>TRUE
+                ));
+            });
+            $session = WebsiteFunctions::get()->getSession();
+            $lang = $session->getLang(TRUE);
             Page::lang($lang);
             if($lang == 'AR'){
                 Page::dir('rtl');
@@ -39,7 +48,8 @@ class WebFioriTheme extends Theme{
             }
         });
         $this->setAfterLoaded(function(){
-            Page::lang(WebsiteFunctions::get()->getSession()->getLang(TRUE));
+            $session = WebsiteFunctions::get()->getSession();
+            Page::lang($session->getLang(TRUE));
             Page::document()->getChildByID('main-content-area')->setClassName('pa-'.Page::dir().'-col-10');
             Page::document()->getChildByID('side-content-area')->setClassName('pa-'.Page::dir().'-col-2');
             Page::document()->getChildByID('page-body')->setClassName('pa-row');

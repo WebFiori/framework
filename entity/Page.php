@@ -171,7 +171,6 @@ class Page{
         $this->isDynamic = TRUE;
         $this->incAside = TRUE;
         $this->setWritingDir();
-        WebsiteFunctions::get()->getSession()->initSession(FALSE, TRUE);
         $this->setCanonical(Util::getRequestedURL());
         $this->document->setLanguage($this->getLang());
         $headNode = new HeadNode(
@@ -539,22 +538,18 @@ class Page{
     }
     /**
      * Sets the display language of the page.
+     * The length of the given string must be 2 characters in order to set the 
+     * language code.
      * @param string $lang a two digit language code such as AR or EN.
-     * @return boolean True if the language was not set and its the first time to set. 
-     * if it was set before, the method will return false.
-     * @throws Exception If the language is not supported.
      * @since 1.0
-    */
+     */
     public function setLang($lang='EN'){
         $langU = strtoupper(trim($lang));
-        if(in_array($langU, SessionManager::SUPPORTED_LANGS)){
+        if(strlen($lang) == 2){
             $this->contentLang = $langU;
             if($this->document != NULL){
                 $this->document->setLanguage($langU);
             }
-        }
-        else{
-            throw new Exception('Unknown language code: '.$lang);
         }
     }
     /**

@@ -65,15 +65,13 @@ abstract class ExtendedWebAPI extends WebAPI{
         parent::__construct($version);
         $reqMeth = $this->getRequestMethod();
         if($reqMeth == 'GET' || $reqMeth == 'DELETE'){
-            $langCode = isset($_GET['lang']) ? filter_var($_GET['lang']) :
-            WebFiori::getWebsiteFunctions()->getSession()->getLang(TRUE);
+            $langCode = isset($_GET['lang']) ? filter_var($_GET['lang']) : 'EN';
         }
         else if($reqMeth == 'POST' || $reqMeth == 'PUT'){
-            $langCode = isset($_POST['lang']) ? filter_var($_POST['lang']) :
-            WebFiori::getWebsiteFunctions()->getSession()->getLang(TRUE);
+            $langCode = isset($_POST['lang']) ? filter_var($_POST['lang']) : 'EN';
         }
         else{
-            $langCode = WebFiori::getWebsiteFunctions()->getSession()->getLang(TRUE);
+            $langCode = 'EN';
         }
         $this->translation = &Language::loadTranslation($langCode);
         $this->createLangDir('general');

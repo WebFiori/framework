@@ -116,6 +116,8 @@ class MySQLLink{
         $this->currentRow = -1;
         if($this->link){
             $this->link->set_charset("utf8");
+            mysqli_query($this->link, "set character_set_client='utf8'");
+            mysqli_query ($this->link, "set character_set_results='utf8'" );
         }
         else{
             $this->lastErrorNo = mysqli_connect_errno();
@@ -160,8 +162,11 @@ class MySQLLink{
         if($this->link instanceof mysqli){
             $this->link = @mysqli_connect($this->host, $this->user, $this->pass,NULL , $this->portNum);
             if($this->link){
+                $this->link->set_charset("utf8");
+                mysqli_query($this->link, "set character_set_client='utf8'");
+                mysqli_query($this->link, "set character_set_results='utf8'");
                 if($this->db !== NULL){
-                    $test = $this->setDB($this->db);
+                    $test = mysqli_select_db($this->link, $this->db);
                 }
                 else{
                     $test = TRUE;
@@ -197,16 +202,8 @@ class MySQLLink{
      * @since 1.0
      */
     public function setDB($dbName){
-        if(gettype($this->link) == 'object' && !mysqli_select_db($this->link, $dbName)){
-            $this->lastErrorMessage = $this->link->error;
-            $this->lastErrorNo = $this->link->errno;
-            return false;
-        }
-        else{
-            $this->db = $dbName;
-            return true;
-        }
-        return FALSE;
+        $this->db = $dbName;
+        return $this->reconnect();
     }
     /**
      * Returns the result set in case of executing select query.
@@ -342,6 +339,9 @@ class MySQLLink{
             $this->lastQuery = $query;
             if($this->isConnected()){
                 $eploded = explode(';', trim($query->getQuery(), ';'));
+                if(!$query->isBlobInsertOrUpdate()){
+                    mysqli_query($this->link, 'set collation_connection =\''.$query->getStructure()->getCollation().'\'');
+                }
                 if(count($eploded) != 1){
                     $r = mysqli_multi_query($this->link, $query->getQuery());
                     while(mysqli_more_results($this->link)){
@@ -352,6 +352,7 @@ class MySQLLink{
                         $this->lastErrorMessage = $this->link->error;
                         $this->lastErrorNo = $this->link->errno;
                     }
+                    $query->setIsBlobInsertOrUpdate(FALSE);
                     return $r;
                 }
                 if($query->getType() == 'select' || $query->getType() == 'show'
@@ -367,6 +368,7 @@ class MySQLLink{
                         $this->lastErrorMessage = $this->link->error;
                         $this->lastErrorNo = $this->link->errno;
                         $this->result = NULL;
+                        $query->setIsBlobInsertOrUpdate(FALSE);
                         return false;
                     }
                 }
@@ -377,12 +379,14 @@ class MySQLLink{
                         $this->lastErrorMessage = $this->link->error;
                         $this->lastErrorNo = $this->link->errno;
                         $this->result = NULL;
+                        $query->setIsBlobInsertOrUpdate(FALSE);
                         return false;
                     }
                     else{
                         $this->lastErrorMessage = 'NO ERRORS';
                         $this->lastErrorNo = 0;
                         $this->result = NULL;
+                        $query->setIsBlobInsertOrUpdate(FALSE);
                         return true;
                     }
                 }

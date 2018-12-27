@@ -119,7 +119,7 @@ class WebsiteFunctions extends Functions{
      * use WebsiteFunctions::get().
      */
     public function __construct() {
-        parent::__construct(WebFiori::MAIN_SESSION_NAME);
+        parent::__construct();
     }
     /**
      * Creates the file 'SiteConfig.php' if it does not exist.

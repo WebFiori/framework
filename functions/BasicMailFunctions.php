@@ -88,7 +88,7 @@ class BasicMailFunctions extends Functions{
         return self::$instance;
     }
     public function __construct() {
-        parent::__construct(WebFiori::MAIN_SESSION_NAME);
+        parent::__construct();
     }
     /**
      * Creates the file 'MailConfig.php' if it does not exist.

@@ -148,7 +148,7 @@ class SystemFunctions extends Functions{
      * use SystemFunctions::get().
      */
     public function __construct() {
-        parent::__construct(WebFiori::MAIN_SESSION_NAME);
+        parent::__construct();
     }
     /**
      * Update database attributes. 

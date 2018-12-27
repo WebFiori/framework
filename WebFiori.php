@@ -11,8 +11,8 @@ use webfiori\entity\router\ViewRoutes;
 use webfiori\entity\router\ClosureRoutes;
 use webfiori\entity\cron\Cron;
 use webfiori\entity\router\Router;
-use webfiori\entity\mail\EmailAccount;
 use webfiori\entity\DatabaseSchema;
+use jsonx\JsonX;
 use Exception;
 /**
  * The instance of this class is used to control basic settings of 
@@ -21,11 +21,6 @@ use Exception;
  * @version 1.3.2
  */
 class WebFiori{
-    /**
-     * The name of the session that will be used by the core logic files.
-     * @since 1.3.2
-     */
-    const MAIN_SESSION_NAME = 'main';
     /**
      * A variable to store system status. The variable will be set to TRUE 
      * if everything is Ok.
@@ -133,10 +128,7 @@ class WebFiori{
             define('PHP_INT_MIN', ~PHP_INT_MAX);
         }
 
-        /**
-         * A folder used to hold system resources (such as images).
-         */
-        define('RES_FOLDER','res');
+        
         /**
          * Initialize autoloader.
          */
@@ -147,7 +139,7 @@ class WebFiori{
         //uncomment next line to show runtime errors and warnings
         //also enable logging for info, warnings and errors 
         Logger::logName('initialization-log');
-        Logger::enabled(TRUE);
+        //Logger::enabled(TRUE);
         Logger::clear();
         
         //display PHP warnings and errors
@@ -176,7 +168,64 @@ class WebFiori{
         //initialize some settings...
         $this->initCron();
         $this->initPermissions();
-              
+        Logger::log('Setting Error Handler...');
+        set_error_handler(function($errno, $errstr, $errfile, $errline){
+            header("HTTP/1.1 500 Server Error");
+            if(defined('API_CALL')){
+                $j = new JsonX();
+                $j->add('message',$errstr);
+                $j->add('type','error');
+                $j->add('error-number',$errno);
+                $j->add('file',$errfile);
+                $j->add('line',$errline);
+                die($j);
+            }
+            //let php handle the error since it is not API call.
+            return FALSE;
+        });
+        Logger::log('Setting exceptions handler...');
+        set_exception_handler(function($ex){
+            header("HTTP/1.1 500 Server Error");
+            if(defined('API_CALL')){
+                $j = new JsonX();
+                $j->add('message','500 - Server Error: Uncaught Exception.');
+                $j->add('type','error');
+                $j->add('exception-message',$ex->getMessage());
+                $j->add('exception-code',$ex->getMessage());
+                $j->add('file',$ex->getFile());
+                $j->add('line',$ex->getLine());
+                $stackTrace = new JsonX();
+                $index = 0;
+                $trace = $ex->getTrace();
+                foreach ($trace as $arr){
+                    $stackTrace->add('#'.$index,$arr['file'].' (Line '.$arr['line'].')');
+                    $index++;
+                }
+                $j->add('stack-trace',$stackTrace);
+                die($j);
+            }
+            else{
+                die(''
+                . '<!DOCTYPE html>'
+                . '<html>'
+                . '<head>'
+                . '<title>Uncaught Exception</title>'
+                . '</head>'
+                . '<body>'
+                . '<h1>500 - Server Error: Uncaught Exception.</h1>'
+                . '<hr>'
+                . '<p>'
+                .'<b>Exception Message:</b> '.$ex->getMessage()."<br/>"
+                .'<b>Exception Code:</b> '.$ex->getCode()."<br/>"
+                .'<b>File:</b> '.$ex->getFile()."<br/>"
+                .'<b>Line:</b> '.$ex->getLine()."<br>"
+                .'<b>Stack Trace:</b> '."<br/>"
+                . '</p>'
+                . '<pre>'.$ex->getTraceAsString().'</pre>'
+                . '</body>'
+                . '</html>');
+            }
+        });
         Logger::log('Initializing completed.');
         
         //switch to the log file 'system-log.txt'.
@@ -421,33 +470,54 @@ class WebFiori{
         Logger::logFuncCall(__METHOD__, 'initialization-log');
         Logger::requestCompleted();
         header('HTTP/1.1 503 Service Unavailable');
-        die(''
-        . '<!DOCTYPE html>'
-        . '<html>'
-        . '<head>'
-        . '<title>Service Unavailable</title>'
-        . '</head>'
-        . '<body>'
-        . '<h1>503 - Service Unavailable</h1>'
-        . '<hr>'
-        . '<p>'
-        . 'This error means that the system is not configured yet or this is the first run.'
-        . 'If you think that your system is configured, then refresh this page and the '
-        . 'error should be gone. If you did not configure the system yet, then do the following:'
-        . '</p>'
-        . '<ul>'
-        . '<li>Open the file \'WebFiori.php\' in any editor.</li>'
-        . '<li>Inside the class \'WebFiori\', go to the body of the function \'firstUse()\'.</li>'
-        . '<li>Modify the body of the function as instructed.</li>'
-        . '</ul>'
-        . '<p>'
-        . 'Once you do that, you are ready to go and use the system.'
-        . '</p>'
-        . '<p>System Powerd By: <a href="https://github.com/usernane/webfiori" target="_blank"><b>'
-                . 'WebFiori Framework v'.Config::getVersion().' ('.Config::getVersionType().')'
-                . '</b></a></p>'
-        . '</body>'
-        . '</html>');
+        if(defined('API_CALL')){
+            header('content-type:application/json');
+            $j = new JsonX();
+            $j->add('message', '503 - Service Unavailable');
+            $j->add('type', 'error');
+            $j->add('description','This error means that the system is not configured yet or this is the first run.'
+            . 'If you think that your system is configured, then refresh this page and the '
+            . 'error should be gone. If you did not configure the system yet, then do the following:'
+            . '</p>'
+            . '<ul>'
+            . '<li>Open the file \'WebFiori.php\' in any editor.</li>'
+            . '<li>Inside the class \'WebFiori\', go to the body of the function \'firstUse()\'.</li>'
+            . '<li>Modify the body of the function as instructed.</li>'
+            . '</ul>'
+            . '<p>'
+            . 'Once you do that, you are ready to go and use the system.'
+            . '</p>');
+            die($j);
+        }
+        else{
+            die(''
+            . '<!DOCTYPE html>'
+            . '<html>'
+            . '<head>'
+            . '<title>Service Unavailable</title>'
+            . '</head>'
+            . '<body>'
+            . '<h1>503 - Service Unavailable</h1>'
+            . '<hr>'
+            . '<p>'
+            . 'This error means that the system is not configured yet or this is the first run.'
+            . 'If you think that your system is configured, then refresh this page and the '
+            . 'error should be gone. If you did not configure the system yet, then do the following:'
+            . '</p>'
+            . '<ul>'
+            . '<li>Open the file \'WebFiori.php\' in any editor.</li>'
+            . '<li>Inside the class \'WebFiori\', go to the body of the function \'firstUse()\'.</li>'
+            . '<li>Modify the body of the function as instructed.</li>'
+            . '</ul>'
+            . '<p>'
+            . 'Once you do that, you are ready to go and use the system.'
+            . '</p>'
+            . '<p>System Powerd By: <a href="https://github.com/usernane/webfiori" target="_blank"><b>'
+                    . 'WebFiori Framework v'.Config::getVersion().' ('.Config::getVersionType().')'
+                    . '</b></a></p>'
+            . '</body>'
+            . '</html>');
+        }
     }
     /**
      * Show an error message that tells the user about system status and how to 
@@ -464,8 +534,8 @@ WebFiori::getAndStart();
 define('INITIAL_SYS_STATUS',WebFiori::sysStatus());
 Logger::log('INITIAL_SYS_STATUS = '.INITIAL_SYS_STATUS, 'debug');
 Router::closure('/test', function(){
-    $availabelTh = entity\Theme::getAvailableThemes();
-    Util::print_r($availabelTh);
+    //$x = $_GET['hell'];
+    echo $y;
 });
 if(INITIAL_SYS_STATUS === TRUE){
     Router::route(Util::getRequestedURL());

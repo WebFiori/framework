@@ -255,6 +255,10 @@ class WebsiteFunctions extends Functions{
         . \'</html>\');
 }', TRUE, TRUE);
         $fh->write('use webfiori\entity\Util;', TRUE, TRUE);
+        $fh->write('/**'
+                . ' The main configuration file that is used to control '."\n"
+                . ' Some of basic settings of the website.'
+                . '*/', TRUE, TRUE);
         $fh->write('class SiteConfig{', TRUE, TRUE);
         $fh->addTab();
         $fh->write('/**

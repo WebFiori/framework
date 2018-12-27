@@ -107,17 +107,27 @@ class Language {
     public static function &loadTranslation($langCode='EN'){
         $uLangCode = strtoupper($langCode);
         $langClassName = 'webfiori\entity\langs\Language'.$uLangCode;
-        $class = new $langClassName();
-        if($class instanceof Language){
-            if(isset(self::$loadedLangs[$uLangCode])){
-                return self::$loadedLangs[$uLangCode];
+        if(class_exists($langClassName)){
+            if(!isset(self::$loadedLangs[$langCode])){
+                $class = new $langClassName();
+                if($class instanceof Language){
+                    if(isset(self::$loadedLangs[$uLangCode])){
+                        return self::$loadedLangs[$uLangCode];
+                    }
+                    else{
+                        throw new Exception('The translation file was found. But no object of type \'Language\' is stored.');
+                    }
+                }
+                else{
+                    throw new Exception('A language class for the language \''.$langCode.'\' was found. But it is not a sub class of \'Language\'.');
+                }
             }
             else{
-                throw new Exception('The translation file was found. But no object of type \'Language\' is stored.');
+                return self::$loadedLangs[$uLangCode];
             }
         }
         else{
-            throw new Exception('A language class for the language \''.$langCode.'\' was found. But it is not a sub class of \'Language\'.');
+            throw new Exception('No language class was found for the language \''.$langCode.'\'.');
         }
     }
     /**

@@ -41,7 +41,6 @@ if(!defined('ROOT_DIR')){
         . '</html>');
 }
 use restEasy\WebAPI;
-use webfiori\WebFiori;
 use webfiori\entity\langs\Language;
 use webfiori\SiteConfig;
 use jsonx\JsonI;
@@ -63,17 +62,8 @@ abstract class ExtendedWebAPI extends WebAPI{
      */
     public function __construct($version = '1.0.0') {
         parent::__construct($version);
-        $reqMeth = $this->getRequestMethod();
-        if($reqMeth == 'GET' || $reqMeth == 'DELETE'){
-            $langCode = isset($_GET['lang']) ? filter_var($_GET['lang']) : 'EN';
-        }
-        else if($reqMeth == 'POST' || $reqMeth == 'PUT'){
-            $langCode = isset($_POST['lang']) ? filter_var($_POST['lang']) : 'EN';
-        }
-        else{
-            $langCode = 'EN';
-        }
-        $this->translation = &Language::loadTranslation($langCode);
+        $this->_setTranslation();
+        $langCode = $this->getTranslation()->getCode();
         $this->createLangDir('general');
         if($langCode == 'AR'){
             $this->setLangVars('general', array(
@@ -95,6 +85,22 @@ abstract class ExtendedWebAPI extends WebAPI{
                 'db-error'=>'Database Error.'
             ));
         }
+    }
+    /**
+     * Set the language at which the API is going to use for the response.
+     */
+    private function _setTranslation() {
+        $reqMeth = $this->getRequestMethod();
+        if($reqMeth == 'GET' || $reqMeth == 'DELETE'){
+            $langCode = isset($_GET['lang']) ? filter_var($_GET['lang']) : SiteConfig::getPrimaryLanguage();
+        }
+        else if($reqMeth == 'POST' || $reqMeth == 'PUT'){
+            $langCode = isset($_POST['lang']) ? filter_var($_POST['lang']) : SiteConfig::getPrimaryLanguage();
+        }
+        else{
+            $langCode = SiteConfig::getPrimaryLanguage();
+        }
+        $this->translation = &Language::loadTranslation($langCode);
     }
     /**
      * Returns an associative array that contains HTTP authorization header 
@@ -178,14 +184,14 @@ abstract class ExtendedWebAPI extends WebAPI{
      * &nbsp;&nbsp;"err-info":OTHER_DATA<br/>
      * }
      * </p>
-     * In here, 'OTHER_DATA' can be a basic string or JSON string.
+     * In here, 'OTHER_DATA' can be a basic string.
      * Also, The response will sent HTTP code 404 - Not Found.
      * @param JsonI|JsonX|string $info An object of type JsonI or 
-     * JsonX that describe the error in more details. Also it can be a simple string 
-     * or JSON string. 
+     * JsonX that describe the error in more details. Also it can be a simple string. 
      * Note that the content of the field "message" might differ. It depends on 
      * the language. If no language is selected or language is not supported, 
-     * English will be used.
+     * The language that will be used is the language that was set as default 
+     * language in the class 'SiteConfig'.
      * @since 1.0
      */
     public function databaseErr($info=''){
@@ -197,7 +203,7 @@ abstract class ExtendedWebAPI extends WebAPI{
             $this->sendResponse($message, TRUE, 404, '"err-info":'.$info);
         }
         else{
-            $this->sendResponse($message, TRUE, 404, '"err-info":"'.$info.'"');
+            $this->sendResponse($message, TRUE, 404, '"err-info":"'.JsonX::escapeJSONSpecialChars($info).'"');
         }
     }
     /**
@@ -213,7 +219,8 @@ abstract class ExtendedWebAPI extends WebAPI{
      * In addition to the message, The response will sent HTTP code 401 - Not Authorized. 
      * Note that the content of the field "message" might differ. It depends on 
      * the language. If no language is selected or language is not supported, 
-     * English will be used.
+     * The language that will be used is the language that was set as default 
+     * language in the class 'SiteConfig'.
      * @since 1.0
      */
     public function notAuth(){
@@ -232,7 +239,8 @@ abstract class ExtendedWebAPI extends WebAPI{
      * In addition to the message, The response will sent HTTP code 404 - Not Found. 
      * Note that the content of the field "message" might differ. It depends on 
      * the language. If no language is selected or language is not supported, 
-     * English will be used.
+     * The language that will be used is the language that was set as default 
+     * language in the class 'SiteConfig'.
      * @since 1.0
      */
     public function actionNotSupported(){
@@ -253,7 +261,8 @@ abstract class ExtendedWebAPI extends WebAPI{
      * In addition to the message, The response will sent HTTP code 404 - Not Found. 
      * Note that the content of the field "message" might differ. It depends on 
      * the language. If no language is selected or language is not supported, 
-     * English will be used.
+     * The language that will be used is the language that was set as default 
+     * language in the class 'SiteConfig'.
      * @since 1.1
      */
     public function contentTypeNotSupported($cType=''){
@@ -272,7 +281,8 @@ abstract class ExtendedWebAPI extends WebAPI{
      * In addition to the message, The response will sent HTTP code 405 - Method Not Allowed. 
      * Note that the content of the field "message" might differ. It depends on 
      * the language. If no language is selected or language is not supported, 
-     * English will be used.
+     * The language that will be used is the language that was set as default 
+     * language in the class 'SiteConfig'.
      * @since 1.0
      */
     public function requestMethodNotAllowed(){
@@ -291,7 +301,8 @@ abstract class ExtendedWebAPI extends WebAPI{
      * In addition to the message, The response will sent HTTP code 404 - Not Found. 
      * Note that the content of the field "message" might differ. It depends on 
      * the language. If no language is selected or language is not supported, 
-     * English will be used.
+     * The language that will be used is the language that was set as default 
+     * language in the class 'SiteConfig'.
      * @since 1.0
      */
     public function actionNotImpl(){
@@ -310,7 +321,8 @@ abstract class ExtendedWebAPI extends WebAPI{
      * In addition to the message, The response will sent HTTP code 404 - Not Found. 
      * Note that the content of the field "message" might differ. It depends on 
      * the language. If no language is selected or language is not supported, 
-     * English will be used.
+     * The language that will be used is the language that was set as default 
+     * language in the class 'SiteConfig'.
      * @since 1.3
      */
     public function missingParams(){
@@ -344,7 +356,8 @@ abstract class ExtendedWebAPI extends WebAPI{
      * In addition to the message, The response will sent HTTP code 404 - Not Found. 
      * Note that the content of the field "message" might differ. It depends on 
      * the language. If no language is selected or language is not supported, 
-     * English will be used.
+     * The language that will be used is the language that was set as default 
+     * language in the class 'SiteConfig'.
      * @since 1.3
      */
     public function invParams(){

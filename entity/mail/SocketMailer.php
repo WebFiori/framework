@@ -571,26 +571,16 @@ class SocketMailer {
         Logger::logFuncCall(__METHOD__);
         if(count($this->attachments) != 0){
             foreach ($this->attachments as $file){
-                if($file->read()){
-                    $fileSize = $file->getSize();
-                    $content = $file->getRawData();
-                    $contentChunk = chunk_split(base64_encode($content));
-                    $this->sendC('--'.$this->boundry);
-                    $this->sendC('Content-Type: '.$file->getFileMIMEType().'; name="'.$file->getName().'"');
-                    $this->sendC('Content-Transfer-Encoding: base64');
-                    $this->sendC('Content-Disposition: attachment; filename="'.$file->getName().'"'.self::NL);
-                    $this->sendC($contentChunk);
+                if($file->getRawData() === NULL){
+                    $file->read();
                 }
-                else{
-                    $content = $file->getRawData();
-                    $fileSize = strlen($content);
-                    $contentChunk = chunk_split(base64_encode($content));
-                    $this->sendC('--'.$this->boundry);
-                    $this->sendC('Content-Type: '.$file->getFileMIMEType().'; name="'.$file->getName().'"');
-                    $this->sendC('Content-Transfer-Encoding: base64');
-                    $this->sendC('Content-Disposition: attachment; filename="'.$file->getName().'"'.self::NL);
-                    $this->sendC($contentChunk);
-                }
+                $content = $file->getRawData();
+                $contentChunk = chunk_split(base64_encode($content));
+                $this->sendC('--'.$this->boundry);
+                $this->sendC('Content-Type: '.$file->getFileMIMEType().'; name="'.$file->getName().'"');
+                $this->sendC('Content-Transfer-Encoding: base64');
+                $this->sendC('Content-Disposition: attachment; filename="'.$file->getName().'"'.self::NL);
+                $this->sendC($contentChunk);
             }
             $this->sendC('--'.$this->boundry.'--');
         }

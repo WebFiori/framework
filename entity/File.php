@@ -560,7 +560,8 @@ class File implements JsonI{
      * Returns the raw data of the file.
      * The raw data is simply a string. It can be binary string or any basic 
      * string.
-     * @return string Raw data of the file.
+     * @return string|NULL Raw data of the file. If no data is set, the function 
+     * will return NULL.
      * @since 1.0
      */
     public function getRawData(){

@@ -449,10 +449,10 @@ class Util{
     /**
      * Checks if a given directory exists or not.
      * @param string $dir A string in a form of directory (Such as 'root/home/res').
-     * @param boolean $createIfNot If set to <b>TRUE</b> and the given directory does 
+     * @param boolean $createIfNot If set to TRUE and the given directory does 
      * not exists, The function will try to create the directory.
-     * @return boolean In general, the function will return <b>FALSE</b> if the 
-     * given directory does not exists. The function will return <b>TRUE</b> only 
+     * @return boolean In general, the function will return FALSE if the 
+     * given directory does not exists. The function will return TRUE only 
      * in two cases, If the directory exits or it does not exists but was created.
      * @since 0.1
      */
@@ -473,31 +473,48 @@ class Util{
         return FALSE;
     }
     /**
-     * This function is used to construct a default base URL.
+     * Returns the base URL of the framework.
+     * The returned value will depend on the folder where the framework files 
+     * are located. For example, if your domain is 'example.com' and the framework 
+     * is placed at the root and the requested resource is 'http://example.com/x/y/z', 
+     * then the base URL will be 'http://example.com/'. If the framework is 
+     * placed inside a folder in the server which has the name 'system', and 
+     * the same resource is requested, then the base URL will be 
+     * 'http://example.com/system'.
      * @return string The base URL (such as 'http//www.example.com/')
      * @since 0.2
      */
     public static function getBaseURL(){
-        $host = $_SERVER['HTTP_HOST'];
+        $host = filter_var($_SERVER['HTTP_HOST']);
         if(isset($_SERVER['HTTPS'])){
-            $protocol = 'https://';
+            $secureHost = filter_var($_SERVER['HTTPS']);
         }
         else{
-            $protocol = 'http://';
+            $secureHost = '';
         }
-        $docRoot = $_SERVER['DOCUMENT_ROOT'];
+        $protocol = 'http://';
+        if(strlen($secureHost) != 0){
+            $protocol = 'https://';
+        }
+        $docRoot = filter_var($_SERVER['DOCUMENT_ROOT']);
         $len = strlen($docRoot);
         $toAppend = substr(ROOT_DIR, $len, strlen(ROOT_DIR) - $len);
         return $protocol.$host. str_replace('\\', '/', $toAppend).'/';
     }
     /**
-     * Returns the URL of the requested resource.
-     * @return string Requested URL resource.
+     * Returns the URI of the requested resource.
+     * @return string The URI of the requested resource. 
      * @since 1.1
      */
     public static function getRequestedURL(){
-        $protocol = "http://";
         if(isset($_SERVER['HTTPS'])){
+            $secureHost = filter_var($_SERVER['HTTPS']);
+        }
+        else{
+            $secureHost = '';
+        }
+        $protocol = "http://";
+        if(strlen($secureHost) != 0){
             $protocol = "https://";
         }
         $server = filter_var(getenv('HTTP_HOST'));

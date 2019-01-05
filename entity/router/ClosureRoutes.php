@@ -42,8 +42,9 @@ if(!defined('ROOT_DIR')){
         . '</html>');
 }
 /**
- * A class that only has a function to create closure routes.
- *
+ * A class that only has one method to initiate some of system routes.
+ * The class is meant to only initiate the routes which uses the method 
+ * Router::closure().
  * @author Ibrahim
  * @version 1.0
  */

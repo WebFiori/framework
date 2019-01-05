@@ -148,8 +148,8 @@ class Access {
     }
     /**
      * Creates a string of permissions given a user.
-     * This function can be handy in case the developer would like to store 
-     * user privileges in a database. The function might return a string which 
+     * This method can be handy in case the developer would like to store 
+     * user privileges in a database. The method might return a string which 
      * might looks like the following string:
      * <p>'PRIVILEGE_1-1;PRIVILEGE_2-1;G-A_GROUP'</p>  
      * where 'PRIVILEGE_1' and 'PRIVILEGE_2' are IDs of privileges and 
@@ -212,6 +212,9 @@ class Access {
                     foreach ($oldGroupPermissions as $p){
                         self::newPrivilege($newGroup, $p->getID());
                     }
+                    foreach ($newPermissions as $p){
+                        self::newPrivilege($newGroup, $p);
+                    }
                     return TRUE;
                 }
             }
@@ -226,8 +229,8 @@ class Access {
      * @param string $groupId The ID of the group that will be cloned. 
      * @param type $newGroupId The ID of the new group. It must be unique.
      * @param type $newPermissions An optional array of new privileges array.
-     * @return boolean If the group was cloned, the function will return 
-     * TRUE. The function will return FALSE if one of the following conditions 
+     * @return boolean If the group was cloned, the method will return 
+     * TRUE. The method will return FALSE if one of the following conditions 
      * is met:
      * <ul>
      * <li>The group which will be cloned does not exist.</li>
@@ -301,13 +304,13 @@ class Access {
     }
     /**
      * Returns a privilege object given privilege ID. 
-     * This function will search all created groups for a privilege which has the 
-     * given ID. If not found, the function will return NULL. This function also 
-     * can be used to check if a privilege is exist or not. If the function 
+     * This method will search all created groups for a privilege which has the 
+     * given ID. If not found, the method will return NULL. This method also 
+     * can be used to check if a privilege is exist or not. If the method 
      * has returned NULL, this means the privilege does not exist.
      * @param string $id The ID of the privilege.
      * @return Privilege|NULL If a privilege with the given ID was found in 
-     * any user group, It will be returned. If not, the function will return 
+     * any user group, It will be returned. If not, the method will return 
      * NULL.
      * @since 1.0
      */
@@ -333,10 +336,10 @@ class Access {
     }
     /**
      * Checks if a privilege does exist or not given its ID. 
-     * The function will search all created groups for a privilege with the 
+     * The method will search all created groups for a privilege with the 
      * given ID.
      * @param string $id The ID of the privilege.
-     * @return boolean The function will return TRUE if a privilege 
+     * @return boolean The method will return TRUE if a privilege 
      * with the given ID was found. FALSE if not.
      * @since 1.0
      */
@@ -357,7 +360,7 @@ class Access {
     /**
      * Checks if a users group does exist or not given its ID.
      * @param string $groupId The ID of the group.
-     * @return boolean The function will return TRUE if a users group 
+     * @return boolean The method will return TRUE if a users group 
      * with the given ID was found. FALSE if not.
      * @since 1.0
      */
@@ -366,11 +369,11 @@ class Access {
     }
     /**
      * Returns an object of type UsersGroup given its ID. 
-     * This function can be used to check if a group is exist or not. If 
-     * the function has returned NULL, this means the group does not exist.
+     * This method can be used to check if a group is exist or not. If 
+     * the method has returned NULL, this means the group does not exist.
      * @param string $groupId The ID of the group.
      * @return UsersGroup|NULL If a users group with the given ID was found, 
-     * It will be returned. If not, the function will return NULL.
+     * It will be returned. If not, the method will return NULL.
      * @since 1.0
      */
     public static function &getGroup($groupId){
@@ -400,8 +403,8 @@ class Access {
      * @param string $groupId The ID of the group. The ID must not contain 
      * any of the following characters: ';','-' or a space. If the name contains 
      * any of the given characters, the group will not created.
-     * @return boolean If the group is created, the function will return TRUE. 
-     * If not, the function will return FALSE.
+     * @return boolean If the group is created, the method will return TRUE. 
+     * If not, the method will return FALSE.
      * @since 1.0
      */
     public static function newGroup($groupId) {
@@ -440,8 +443,8 @@ class Access {
      * added to. It must be a group in the groups array of the access class.
      * @param string $privilegeId The ID of the privilege. The ID must not contain 
      * any of the following characters, ';','-' or a space.
-     * @return boolean If the privilege was created, the function will return 
-     * TRUE. Other than that, the function will return FALSE.
+     * @return boolean If the privilege was created, the method will return 
+     * TRUE. Other than that, the method will return FALSE.
      * @since 1.0
      */
     public static function newPrivilege($groupId,$privilegeId){
@@ -449,12 +452,12 @@ class Access {
     }
     /**
      * Creates multiple privileges in a group given its ID. 
-     * This function can be used as a shorthand to create multiple privileges in 
+     * This method can be used as a shorthand to create multiple privileges in 
      * a group instead of calling Access::newPrivilege() multiple times.
      * @param string $groupId The ID of the group. The group must be created 
      * before starting to create privileges in it.
      * @param array $prNamesArr An associative array that contains the names of privileges.
-     * @return array The function will return an associative array. 
+     * @return array The method will return an associative array. 
      * The indices will be the IDs of the privileges and the values will be 
      * booleans. Each boolean corresponds to the status of each privilege in the array of 
      * privileges. If the privilege is added, the value will be TRUE. If not, 

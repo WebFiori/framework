@@ -55,7 +55,7 @@ class DatabaseSchema {
      */
     private static $schema;
     /**
-     * Returns a singleton of the class <b>DatabaseSchema</b>.
+     * Returns a singleton of the class DatabaseSchema.
      * @return DatabaseSchema
      * @since 1.0
      */
@@ -68,7 +68,7 @@ class DatabaseSchema {
     }
     /**
      * An array which contains all the names of the classes which 
-     * extends the base class <b>MySQLQuery</b>.
+     * extends the base class MySQLQuery.
      * @var array
      * @since 1.0 
      */
@@ -94,8 +94,8 @@ class DatabaseSchema {
     /**
      * Returns the order of query builder class given its name.
      * @param string $queryClassName The name of the query builder class. 
-     * @return int If the given query builder class was added, the function will return 
-     * its order. If no class was found which has the given name, the function will 
+     * @return int If the given query builder class was added, the method will return 
+     * its order. If no class was found which has the given name, the method will 
      * return -1.
      * @since 1.2
      */
@@ -112,7 +112,7 @@ class DatabaseSchema {
     /**
      * Returns the order of the last query builder class name.
      * @return int The order of the last  query builder class name. If the 
-     * schema has no query builder class names, the function will return -1.
+     * schema has no query builder class names, the method will return -1.
      * @since 1.2
      */
     public function getLastOrder() {
@@ -142,14 +142,16 @@ class DatabaseSchema {
     /**
      * Adds a query builder class name to the set of classes that represents 
      * database tables.
-     * @param string $queryClassName The name of query builder class.
+     * @param string $queryClassName The name of query builder class. If the 
+     * class is contained in a name space, the name of the name space must 
+     * be included (e.g. 'myNs\myFolder\MyQuery').
      * @param int $order The order of query builder table in the database. Used to 
      * make sure that the tables that are referenced by other tables put first. 
      * It must be a value greater than or equal to 20. If the given order is 
      * taken, the name will be added to the last position.
-     * @return boolean Once the name is added, the function will return <b>TRUE</b>. 
-     * If the given name is already added or it is invalid, the function will 
-     * return <b>FALSE</b>. The given name will be considered invalid only if 
+     * @return boolean Once the name is added, the method will return TRUE. 
+     * If the given name is already added or it is invalid, the method will 
+     * return FALSE. The given name will be considered invalid only if 
      * no class was found which correspond to the given name.
      * @since 1.0
      */
@@ -190,8 +192,8 @@ class DatabaseSchema {
         return FALSE;
     }
     /**
-     * Returns the array which contains the names of query bulder classes.
-     * @return array The array which contains the names of query bulder classes.
+     * Returns the array which contains the names of query builder classes.
+     * @return array The array which contains the names of query builder classes.
      * @since 1.2
      */
     public function getClassNames() {

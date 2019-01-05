@@ -202,8 +202,8 @@ class CronJob {
      * 12:00 AM and 23 means at 11:00 PM. Default is 0.
      * @param int $minute [Optional] A number between 0 and 59 inclusive. Represents the 
      * minute part of an hour. Default is 0.
-     * @return boolean If job time is set, the function will return TRUE. If 
-     * not set, the function will return FALSE. It will not set only if the 
+     * @return boolean If job time is set, the method will return TRUE. If 
+     * not set, the method will return FALSE. It will not set only if the 
      * given time is not correct.
      * @since 1.0
      */
@@ -229,7 +229,7 @@ class CronJob {
      * @param string $time [Optional] A time in the form 'hh:mm'. hh can have any value 
      * between 0 and 23 inclusive. mm can have any value between 0 and 59 inclusive. 
      * default is '00:00'.
-     * @return boolean If the time for the cron job is set, the function will 
+     * @return boolean If the time for the cron job is set, the method will 
      * return TRUE. If not, it will return FALSE.
      * @since 1.0
      */
@@ -254,7 +254,7 @@ class CronJob {
      * @param string $time [Optional] A time in the form 'hh:mm'. hh can have any value 
      * between 0 and 23 inclusive. mm can have any value btween 0 and 59 inclusive. 
      * default is '00:00'.
-     * @return boolean If the time for the cron job is set, the function will 
+     * @return boolean If the time for the cron job is set, the method will 
      * return TRUE. If not, it will return FALSE.
      * @since 1.0
      */
@@ -285,7 +285,7 @@ class CronJob {
      * @param int $dayNum The number of the day. It can be any value between 
      * 1 and 31 inclusive.
      * @param string $time A day time string in the form 'hh:mm' in 24 hours mode.
-     * @return boolean If the time for the cron job is set, the function will 
+     * @return boolean If the time for the cron job is set, the method will 
      * return TRUE. If not, it will return FALSE.
      * @since 1.0.1
      */
@@ -317,13 +317,13 @@ class CronJob {
      * Schedules a job using specific cron expression.
      * For more information on cron expressions, go to 
      * https://en.wikipedia.org/wiki/Cron#CRON_expression. Note that 
-     * the function does not support year field. This means 
+     * the method does not support year field. This means 
      * the expression will have only 5 fields.
      * @param string $when A cron expression (such as '8 15 * * 1'). Default 
      * is '* * * * *' which means run the job every minute.
-     * @return boolean If the given cron expression is valid, the function will 
+     * @return boolean If the given cron expression is valid, the method will 
      * set the time of cron job as specified by the expression and return 
-     * TRUE. If the expression is invalid, the function will return FALSE.
+     * TRUE. If the expression is invalid, the method will return FALSE.
      * @since 1.0
      */
     public function cron($when='* * * * *'){
@@ -811,7 +811,7 @@ class CronJob {
     /**
      * Checks if current day of month in time is a day at which the job must be 
      * executed.
-     * @return boolean The function will return TRUE if the current day of month in 
+     * @return boolean The method will return TRUE if the current day of month in 
      * time is a day at which the job must be executed.
      * @since 1.0
      */
@@ -854,7 +854,7 @@ class CronJob {
     /**
      * Checks if current day of week in time is a day at which the job must be 
      * executed.
-     * @return boolean The function will return TRUE if the current day of week in 
+     * @return boolean The method will return TRUE if the current day of week in 
      * time is a day at which the job must be executed.
      * @since 1.0
      */
@@ -897,7 +897,7 @@ class CronJob {
     /**
      * Checks if current month in time is a month at which the job must be 
      * executed.
-     * @return boolean The function will return TRUE if the current month in 
+     * @return boolean The method will return TRUE if the current month in 
      * time is a month at which the job must be executed.
      * @since 1.0
      */
@@ -940,7 +940,7 @@ class CronJob {
     /**
      * Checks if current hour in time is an hour at which the job must be 
      * executed.
-     * @return boolean The function will return TRUE if the current hour in 
+     * @return boolean The method will return TRUE if the current hour in 
      * time is an hour at which the job must be executed.
      * @since 1.0
      */
@@ -992,7 +992,7 @@ class CronJob {
     /**
      * Checks if current minute in time is a minute at which the job must be 
      * executed.
-     * @return boolean The function will return TRUE if the current minute in 
+     * @return boolean The method will return TRUE if the current minute in 
      * time is a minute at which the job must be executed.
      * @since 1.0
      */
@@ -1177,15 +1177,15 @@ class CronJob {
     }
     /**
      * Execute the event which should run when it is time to execute the job. 
-     * This function will be called automatically when cron URL is accessed. The 
-     * function will check if it is time to execute the associated event or 
+     * This method will be called automatically when cron URL is accessed. The 
+     * method will check if it is time to execute the associated event or 
      * not. If it is the time, The event will be executed. If 
      * the job is forced to execute, the event that is associated with the 
      * job will be executed even if it is not the time to execute the job.
      * @param boolean $force [Optional] If set to TRUE, the job will be forced to execute 
      * even if it is not job time. Default is FALSE.
      * @return boolean If the event that is associated with the job is executed, 
-     * the function will return TRUE. If it is not executed, the function 
+     * the method will return TRUE. If it is not executed, the method 
      * will return FALSE.
      * @since 1.0
      */

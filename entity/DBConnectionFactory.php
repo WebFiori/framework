@@ -92,7 +92,7 @@ class DBConnectionFactory {
     const DB_CONNECTION_ERR = 'unable_to_connect_to_db';
     /**
      * Create a link to MySQL database.
-     * This function uses the class DatabaseLink which in turns uses mysqli. 
+     * This method uses the class DatabaseLink which in turns uses mysqli. 
      * This means mysqli must be installed first.
      * @param array $connectionParams An associative array that contains 
      * database connection parameters. The indices are: 
@@ -104,7 +104,7 @@ class DBConnectionFactory {
      * <li><b>'db-name'</b>: The name of the database (Schema name).</li>
      * </ul>
      * @return array|DatabaseLink If the connection to the database was 
-     * established, the function will return an instance of 'DatabaseLink'. 
+     * established, the method will return an instance of 'DatabaseLink'. 
      * If something went wrong while attempting to connect, an associative 
      * array is returned which contains error details. The array has two 
      * indices: 

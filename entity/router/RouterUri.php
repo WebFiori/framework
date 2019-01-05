@@ -41,9 +41,20 @@ if(!defined('ROOT_DIR')){
         . '</html>');
 }
 /**
- * A class that is used to split URIs and get their parameters and others
- *
- * @author Ibrahim <ibinshikh@hotmail.com>
+ * A class that is used to split URIs and get their parameters.
+ * The main aim of this class is to extract URI parameters including:
+ * <ul>
+ * <li>Host</li>
+ * <li>Authority</li>
+ * <li>Fragment (if any)</li>
+ * <li>Path</li>
+ * <li>Port (if any)</li>
+ * <li>Query string (if any)</li>
+ * <li>Scheme</li>
+ * </ul>
+ * The class is also used for routing.
+ * For more information on URI structure, visit <a target="_blank" href="https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#Examples">Wikipedia</a>.
+ * @author Ibrahim
  * @version 1.3
  */
 class RouterUri {
@@ -94,7 +105,7 @@ class RouterUri {
     }
     /**
      * Checks if the URI will be included in auto-generated site map or not.
-     * @return boolean If the URI will be included, the Function will return 
+     * @return boolean If the URI will be included, the method will return 
      * TRUE. Default is FALSE.
      * @since 1.3
      */
@@ -112,6 +123,13 @@ class RouterUri {
     }
     /**
      * Returns the type of element that the URI will route to.
+     * The type of the element can be 1 of 4 values:
+     * <ul>
+     * <li>Router::API_ROUTE</li>
+     * <li>Router::VIEW_ROUTE</li>
+     * <li>Router::CLOSURE_ROUTE</li>
+     * <li>Router::CUSTOMIZED</li>
+     * </ul>
      * @return string The type of element that the URI will route to.
      * @since 1.1
      */
@@ -120,6 +138,13 @@ class RouterUri {
     }
     /**
      * Sets the type of element that the URI will route to.
+     * The type of the element can be 1 of 4 values:
+     * <ul>
+     * <li>Router::API_ROUTE</li>
+     * <li>Router::VIEW_ROUTE</li>
+     * <li>Router::CLOSURE_ROUTE</li>
+     * <li>Router::CUSTOMIZED</li>
+     * </ul>
      * @param string $type The type of element that the URI will route to.
      * @since 1.1
      */
@@ -137,14 +162,19 @@ class RouterUri {
             $this->closureParams = $arr;
         }
     }
-
+    /**
+     * Returns an array that contains the variables which will be passed to 
+     * the closure.
+     * @return array
+     * @since 1.2
+     */
     public function getClosureParams() {
         return $this->closureParams;
     }
     /**
      * Checks if all URI variables has values or not.
-     * @return boolean The function will return <b>TRUE</b> if all URI 
-     * variables have a value other than <b>NULL</b>.
+     * @return boolean The function will return TRUE if all URI 
+     * variables have a value other than NULL.
      * @since 1.0
      */
     public function isAllVarsSet() {
@@ -156,6 +186,8 @@ class RouterUri {
     }
     /**
      * Print the details of the generated URI.
+     * This method will use the method 'Util::print_r()' to print the array 
+     * that contains URI details.
      * @since 1.0
      */
     public function printUri() {
@@ -163,8 +195,8 @@ class RouterUri {
     }
     /**
      * Returns the location where the URI will route to.
-     * @return string | Function Usually, the route can be either a function 
-     * or a path to a PHP file.
+     * @return string|callable Usually, the route can be either a callable 
+     * or a path to a file. The file can be of any type.
      * @since 1.0
      */
     public function getRouteTo() {
@@ -172,8 +204,8 @@ class RouterUri {
     }
     /**
      * Sets the route which the URI will take to.
-     * @param string|function $routeTo Usually, the route can be either a 
-     * PHP file or it can be a function.
+     * @param string|callable $routeTo Usually, the route can be either a 
+     * file or it can be a callable. The file can be of any type.
      * @since 1.0
      */
     public function setRoute($routeTo) {
@@ -258,7 +290,7 @@ class RouterUri {
         return $retVal;
     }
     /**
-     * Returns host name from the authority part of the URI.
+     * Returns host name from the host part of the URI.
      * @return string The host name such as 'www.programmingacademia.com'.
      * @since 1.0
      */
@@ -282,9 +314,11 @@ class RouterUri {
     }
     /**
      * Checks if the URI has a variable or not given its name.
+     * A variable is a string which is defined while creating the route. 
+     * it is name is included between '{}'.
      * @param string $varName The name of the variable.
      * @return boolean If the given variable name is exist, the function will 
-     * return <b>TRUE</b>. Other than that, the function will return <b>FALSE</b>.
+     * return TRUE. Other than that, the function will return FALSE.
      * @since 1.0
      */
     public function hasUriVar($varName) {
@@ -292,10 +326,12 @@ class RouterUri {
     }
     /**
      * Sets the value of a URI variable.
+     * A variable is a string which is defined while creating the route. 
+     * it is name is included between '{}'.
      * @param string $varName The name of the variable.
      * @param string $value The value of the variable.
-     * @return boolean The function will return <b>TRUE</b> if the variable 
-     * was set. If the variable does not exist, the function will return <b>FALSE</b>.
+     * @return boolean The function will return TRUE if the variable 
+     * was set. If the variable does not exist, the function will return FALSE.
      * @since 1.0
      */
     public function setUriVar($varName,$value) {
@@ -307,10 +343,12 @@ class RouterUri {
     }
     /**
      * Returns the value of URI variable given its name.
+     * A variable is a string which is defined while creating the route. 
+     * it is name is included between '{}'.
      * @param string $varName The name of the variable.
      * @return string|NULL The function will return the value of the 
      * variable if found. If the variable is not set or the variable 
-     * does not exist, the function will return <b>NULL</b>.
+     * does not exist, the function will return NULL.
      * @since 1.0
      */
     public function getUriVar($varName) {
@@ -321,8 +359,10 @@ class RouterUri {
     }
     /**
      * Checks if the URI has any variables or not.
+     * A variable is a string which is defined while creating the route. 
+     * it is name is included between '{}'.
      * @return boolean If the URI has any variables, the function will 
-     * return <b>TRUE</b>.
+     * return TRUE.
      * @since 1.0
      */
     public function hasVars() {
@@ -449,11 +489,12 @@ class RouterUri {
         return $retVal;
     }
     /**
-     * Checks if two URIs are equal or not
+     * Checks if two URIs are equal or not.
+     * Two URIs are considered equal if they have the same authority and the 
+     * same path name.
      * @param RouterUri $otherUri The URI which 'this' URI will be checked against. 
-     * @return boolean The function will return <b>TRUE</b> if the URIs are 
-     * equal. Two URIs are considered equal if they have the same authority and the 
-     * same path directory names.
+     * @return boolean The function will return TRUE if the URIs are 
+     * equal.
      * @since 1.0
      */
     public function equals($otherUri) {

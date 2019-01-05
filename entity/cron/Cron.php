@@ -459,11 +459,11 @@ class Cron {
     }
     /**
      * Enable or disable logging for jobs execution. 
-     * This function is also used to check if logging is enabled or not.
+     * This method is also used to check if logging is enabled or not.
      * @param boolean $bool [Optional] If set to TRUE, a log file that contains the details 
      * of the executed jobs will be created in 'logs' folder. Default value 
      * is NULL.
-     * @return boolean If logging is enabled, the function will return TRUE.
+     * @return boolean If logging is enabled, the method will return TRUE.
      * @since 1.0.1
      */
     public static function execLog($bool=null) {
@@ -477,7 +477,7 @@ class Cron {
      * The job will be created and scheduled only if the given cron expression 
      * is valid. For more information on cron expressions, go to 
      * https://en.wikipedia.org/wiki/Cron#CRON_expression. Note that 
-     * the function does not support year field. This means 
+     * the method does not support year field. This means 
      * the expression will have only 5 fields.
      * @param string $when A cron expression. 
      * @param callable $function A function to run when it is the time to execute 
@@ -485,8 +485,8 @@ class Cron {
      * @param array $funcParams An array of parameters that can be passed to the 
      * function. 
      * @param string $jobName An optional job name.
-     * @return boolean If the job was created and scheduled, the function will 
-     * return TRUE. Other than that, the function will return FALSE.
+     * @return boolean If the job was created and scheduled, the method will 
+     * return TRUE. Other than that, the method will return FALSE.
      * @since 1.0
      */
     public static function createJob($when='*/5 * * * *',$function='',$funcParams=array(),$jobName=''){
@@ -510,8 +510,8 @@ class Cron {
      * time to run the job.
      * @param array $funcParams An array of parameters which will be passed to 
      * the function.
-     * @return boolean If the job was created and scheduled, the function will 
-     * return TRUE. Other than that, the function will return FALSE.
+     * @return boolean If the job was created and scheduled, the method will 
+     * return TRUE. Other than that, the method will return FALSE.
      * @since 1.0
      */
     public static function dailyJob($time,$func,$funcParams=array()){
@@ -531,12 +531,12 @@ class Cron {
      * for Sunday and 6 is for Saturday.
      * 'hh' can have any value between 0 and 23 inclusive. mm can have any value 
      * between 0 and 59 inclusive.
-     * @param function $func A function that will be executed once it is the 
+     * @param callable $func A function that will be executed once it is the 
      * time to run the job.
      * @param array $funcParams An array of parameters which will be passed to 
      * the function.
-     * @return boolean If the job was created and scheduled, the function will 
-     * return TRUE. Other than that, the function will return FALSE.
+     * @return boolean If the job was created and scheduled, the method will 
+     * return TRUE. Other than that, the method will return FALSE.
      * @since 1.0
      */
     public static function weeklyJob($time,$func,$funcParams=array()){
@@ -554,8 +554,8 @@ class Cron {
      * The password is used to prevent unauthorized access to execute jobs.
      * @param string $pass If not NULL, the password will be updated to the 
      * given one.
-     * @return string If the password is set, the function will return it. 
-     * If not set, the function will return the string 'NO_PASSWORD'.
+     * @return string If the password is set, the method will return it. 
+     * If not set, the method will return the string 'NO_PASSWORD'.
      * @since 1.0
      */
     public static function password($pass=null) {
@@ -576,7 +576,7 @@ class Cron {
     /**
      * Adds new job to jobs queue.
      * @param CronJob $job An instance of the class 'CronJob'.
-     * @return boolean If the job is added, the function will return TRUE.
+     * @return boolean If the job is added, the method will return TRUE.
      * @since 1.0
      */
     public static function scheduleJob($job){

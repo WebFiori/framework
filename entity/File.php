@@ -243,8 +243,8 @@ class File implements JsonI{
      * use forward slashes or backward slashes.
      * @param string $path The folder which will contain the file. It must 
      * be non-empty string in order to set.
-     * @return boolean The function will return TRUE if the path is set. Other 
-     * than that, the function will return FALSE.
+     * @return boolean The method will return TRUE if the path is set. Other 
+     * than that, the method will return FALSE.
      * @since 1.0
      */
     public function setPath($path){
@@ -272,10 +272,10 @@ class File implements JsonI{
      * Returns the full path to the file.
      * The full path of the file is a string that contains the path of the 
      * file alongside its name. Assuming that the path is set to "C:/Users/Me/Documents" 
-     * and file name is set to "my-doc.docx", This function will return something like 
+     * and file name is set to "my-doc.docx", This method will return something like 
      * "C:\Users\Me\Documents\my-do.docx".
      * @return string Full path to the file (e.g. 'root\images\hello.png').
-     * If the name of the file is not set or the path is not set, the function 
+     * If the name of the file is not set or the path is not set, the method 
      * will return empty string.
      * @since 1.1.1
      */
@@ -289,10 +289,10 @@ class File implements JsonI{
     }
     /**
      * Returns MIME type of a file type.
-     * The function will try to find MIME type based on its extension. If 
+     * The method will try to find MIME type based on its extension. If 
      * @param string $ext File extension without the suffix (such as 'jpg').
      * @return string|NULL If the extension MIME type is found, it will be 
-     * returned. If not, the function will return NULL.
+     * returned. If not, the method will return NULL.
      * @since 1.1.1
      */
     public static function getMIMEType($ext){
@@ -310,7 +310,7 @@ class File implements JsonI{
      * the path can be something like "C:\Users\Me\Documents". Note that the 
      * returned path will be using backward slashes "\".
      * @return string The path to the file (such as "C:\Users\Me\Documents"). If 
-     * the path is not set, the function will return empty string.
+     * the path is not set, the method will return empty string.
      * @since 1.0
      */
     public function getPath(){
@@ -318,16 +318,16 @@ class File implements JsonI{
     }
     /**
      * Reads the file in binary mode.
-     * First of all, this function checks the existence of the file. If it 
+     * First of all, this method checks the existence of the file. If it 
      * is exist, it tries to open the file in binary mode 'rb'. If a resource 
-     * is created, it is used to read the content of the file. Also, the function 
+     * is created, it is used to read the content of the file. Also, the method 
      * will try to set MIME type of the file. If MIME type was not detected, 
-     * it will set to 'application/octet-stream'. If the function is unable to 
+     * it will set to 'application/octet-stream'. If the method is unable to 
      * read the file, it will throw an exception.
-     * @throws Exception The function will throw an exception with the message 
+     * @throws Exception The method will throw an exception with the message 
      * "File absolute path is invalid." if absolute path is empty string. Also, 
      * an exception with the message "Unable to open the file 'f_path'." if 
-     * the function was unable to create the resource which is used to read 
+     * the method was unable to create the resource which is used to read 
      * the file. An exception with the message "File not found: 'f_path'." 
      * if no file was found which has the given path and name. "f_path" is the 
      * absolute path of the file.
@@ -373,20 +373,20 @@ class File implements JsonI{
     }
     /**
      * Write raw binary data into a file.
-     * The function will write the data using the binary write mode 'wb' mode. 
-     * This means that if the file does not exist, the function will try to 
+     * The method will write the data using the binary write mode 'wb' mode. 
+     * This means that if the file does not exist, the method will try to 
      * created it. If it fails, It will throw an exception. Note that if an 
      * optional path is provided, the name of the file must be set first.
      * @param string $path [Optional] An optional file path such as "C:\Users\Me\Documents". 
      * The path should not include the name of the file. If not provided, 
      * the path that is returned by File::getPath() will be used.
-     * @throws Exception The function will throw an exception with the message 
+     * @throws Exception The method will throw an exception with the message 
      * "File absolute path is invalid." if file absolute path is invalid. Also, 
-     * The function will throw an exception with the message "Path cannot be empty string." 
+     * The method will throw an exception with the message "Path cannot be empty string." 
      * if provided file path is empty string. Also, an exception with the message 
      * "Path cannot be empty string." is thrown if the optional path is provided 
      * but file name is not set. Finally, an exception with the message 
-     * "Unable to open the file at 'f_path'." is thrown in case the function was 
+     * "Unable to open the file at 'f_path'." is thrown in case the method was 
      * unable to create the resource which is used to write data.
      * @since 1.1.1
      */
@@ -427,9 +427,9 @@ class File implements JsonI{
     }
     /**
      * Display the file. 
-     * If the raw data of the file is NULL, the function will 
+     * If the raw data of the file is NULL, the method will 
      * try to read the file that was specified by the name and its path. If 
-     * the function is unable to read the file, an exception is thrown.
+     * the method is unable to read the file, an exception is thrown.
      * @param boolean $asAttachment [Optional] If this parameter is set to 
      * TRUE, the header 'content-disposition' will have the attribute 'attachment' 
      * set instead of 'inline'. This will trigger 'save as' dialog to appear.
@@ -470,8 +470,8 @@ class File implements JsonI{
     }
     /**
      * Returns the size of the file in bytes.
-     * Note that if the file is specified by its path and name, the function 
-     * File::read() must be called before calling this function to update its 
+     * Note that if the file is specified by its path and name, the method 
+     * File::read() must be called before calling this method to update its 
      * size.
      * @return int Size of the file in bytes.
      */
@@ -492,7 +492,7 @@ class File implements JsonI{
      * Returns the name of the file.
      * * The name is used to construct the absolute path of the file in addition 
      * to its path.
-     * @return string The name of the file. If the name is not set, the function 
+     * @return string The name of the file. If the name is not set, the method 
      * will return empty string.
      * @since 1.0
      */
@@ -502,7 +502,7 @@ class File implements JsonI{
     /**
      * Sets the MIME type of the file.
      * It is not recommended to update MIME type of the file manually. Only 
-     * use this function for custom file types. MIME type will be set only 
+     * use this method for custom file types. MIME type will be set only 
      * if its non-empty string.
      * @param string $type MIME type (such as 'application/pdf')
      * @since 1.0
@@ -514,11 +514,11 @@ class File implements JsonI{
     }
     /**
      * Returns MIME type of the file.
-     * Note that if the file is specified by its path and name, the function 
-     * File::read() must be called before calling this function to update its 
+     * Note that if the file is specified by its path and name, the method 
+     * File::read() must be called before calling this method to update its 
      * MIME type.
      * @return string MIME type of the file. If MIME type of the file is not set 
-     * or not detected, the function will return 'application/octet-stream'.
+     * or not detected, the method will return 'application/octet-stream'.
      * @since 1.0
      */
     public function getFileMIMEType(){
@@ -526,7 +526,7 @@ class File implements JsonI{
     }
     /**
      * Sets the ID of the file.
-     * This function is helpful in case the file is stored in database.
+     * This method is helpful in case the file is stored in database.
      * @param string $id The unique ID of the file.
      * @since 1.0
      */
@@ -535,8 +535,8 @@ class File implements JsonI{
     }
     /**
      * Returns the ID of the file.
-     * This function is helpful in case the file is stored in database.
-     * @return string The ID of the file. If the ID is not set, the function 
+     * This method is helpful in case the file is stored in database.
+     * @return string The ID of the file. If the ID is not set, the method 
      * will return -1.
      * @since 1.0
      */
@@ -560,7 +560,7 @@ class File implements JsonI{
      * Returns the raw data of the file.
      * The raw data is simply a string. It can be binary string or any basic 
      * string.
-     * @return string|NULL Raw data of the file. If no data is set, the function 
+     * @return string|NULL Raw data of the file. If no data is set, the method 
      * will return NULL.
      * @since 1.0
      */
@@ -595,7 +595,7 @@ class File implements JsonI{
     }
     /**
      * Creates new instance of the class.
-     * This function will set the path and name to empty string. Also, it will 
+     * This method will set the path and name to empty string. Also, it will 
      * set the size to 0 and ID to -1. Finally, it will set MIME type to 
      * "application/octet-stream"
      */
@@ -608,10 +608,10 @@ class File implements JsonI{
     }
     /**
      * Removes a file given its name and path.
-     * Before calling this function, the name of the file and its path must 
+     * Before calling this method, the name of the file and its path must 
      * be specified.
-     * @return boolean If the file was removed, the function will return 
-     * TRUE. Other than that, the function will return FALSE.
+     * @return boolean If the file was removed, the method will return 
+     * TRUE. Other than that, the method will return FALSE.
      * @since 1.1.2
      */
     public function remove() {

@@ -142,9 +142,9 @@ abstract class ExtendedWebAPI extends WebAPI{
      * Returns the value of a language variable.
      * @param string $dir A directory to the language variable (such as 'pages/login/login-label').
      * @return string|array If the given directory represents a label, the 
-     * function will return its value. If it represents an array, the array will 
+     * method will return its value. If it represents an array, the array will 
      * be returned. If nothing was found, the returned value will be the passed 
-     * value to the function. 
+     * value to the method. 
      * @since 1.0
      */
     public function get($dir) {
@@ -176,7 +176,7 @@ abstract class ExtendedWebAPI extends WebAPI{
     }
     /**
      * Sends a response message to indicate that a database error has occur.
-     * This function will send back a JSON string in the following format:
+     * This method will send back a JSON string in the following format:
      * <p>
      * {<br/>
      * &nbsp;&nbsp;"message":"a_message",<br/>
@@ -209,7 +209,7 @@ abstract class ExtendedWebAPI extends WebAPI{
     /**
      * Sends a response message to indicate that a user is not authorized to 
      * do an API call.
-     * This function will send back a JSON string in the following format:
+     * This method will send back a JSON string in the following format:
      * <p>
      * {<br/>
      * &nbsp;&nbsp;"message":"Not authorized",<br/>
@@ -229,7 +229,7 @@ abstract class ExtendedWebAPI extends WebAPI{
     }
     /**
      * Sends a response message to indicate that an action is not supported by the API.
-     * This function will send back a JSON string in the following format:
+     * This method will send back a JSON string in the following format:
      * <p>
      * {<br/>
      * &nbsp;&nbsp;"message":"Action not supported",<br/>
@@ -250,7 +250,7 @@ abstract class ExtendedWebAPI extends WebAPI{
     /**
      * Sends a response message to indicate that request content type is 
      * not supported by the API.
-     * This function will send back a JSON string in the following format:
+     * This method will send back a JSON string in the following format:
      * <p>
      * {<br/>
      * &nbsp;&nbsp;"message":"Content type not supported.",<br/>
@@ -271,7 +271,7 @@ abstract class ExtendedWebAPI extends WebAPI{
     }
     /**
      * Sends a response message to indicate that request method is not supported.
-     * This function will send back a JSON string in the following format:
+     * This method will send back a JSON string in the following format:
      * <p>
      * {<br/>
      * &nbsp;&nbsp;"message":"Method Not Allowed.",<br/>
@@ -291,7 +291,7 @@ abstract class ExtendedWebAPI extends WebAPI{
     }
     /**
      * Sends a response message to indicate that an action is not implemented.
-     * This function will send back a JSON string in the following format:
+     * This method will send back a JSON string in the following format:
      * <p>
      * {<br/>
      * &nbsp;&nbsp;"message":"Action not implemented.",<br/>
@@ -311,7 +311,7 @@ abstract class ExtendedWebAPI extends WebAPI{
     }
     /**
      * Sends a response message to indicate that a request parameter or parameters are missing.
-     * This function will send back a JSON string in the following format:
+     * This method will send back a JSON string in the following format:
      * <p>
      * {<br/>
      * &nbsp;&nbsp;"message":"The following required parameter(s) where missing from the request body: 'param_1', 'param_2', 'param_n'",<br/>
@@ -346,7 +346,7 @@ abstract class ExtendedWebAPI extends WebAPI{
     }
     /**
      * Sends a response message to indicate that a request parameter(s) have invalid values.
-     * This function will send back a JSON string in the following format:
+     * This method will send back a JSON string in the following format:
      * <p>
      * {<br/>
      * &nbsp;&nbsp;"message":"The following parameter(s) has invalid values: 'param_1', 'param_2', 'param_n'",<br/>

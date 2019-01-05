@@ -3,13 +3,15 @@ namespace webfiori;
 use webfiori\entity\AutoLoader;
 use webfiori\entity\Logger;
 use webfiori\entity\Util;
+use webfiori\entity\mail\EmailAccount;
 use webfiori\functions\SystemFunctions;
 use webfiori\functions\WebsiteFunctions;
 use webfiori\functions\BasicMailFunctions;
 use webfiori\entity\router\APIRoutes;
 use webfiori\entity\router\ViewRoutes;
 use webfiori\entity\router\ClosureRoutes;
-use webfiori\entity\cron\Cron;
+use webfiori\entity\router\OtherRoutes;
+use webfiori\entity\cron\InitCron;
 use webfiori\entity\router\Router;
 use webfiori\entity\DatabaseSchema;
 use jsonx\JsonX;
@@ -134,7 +136,7 @@ class WebFiori{
          */
         require_once ROOT_DIR.'/entity/AutoLoader.php';
         $this->AU = AutoLoader::get();
-        $this->setAutoloadDirectories();
+        $this->initAutoloadDirectories();
         
         //uncomment next line to show runtime errors and warnings
         //also enable logging for info, warnings and errors 
@@ -303,15 +305,28 @@ class WebFiori{
         return $this->sysStatus;
     }
     /**
-     * Initiate routes.
+     * Initialize routes.
+     * This method will call 4 methods in 4 classes:
+     * <ul>
+     * <li>APIRoutes::create()</li>
+     * <li>ViewRoutes::create()</li>
+     * <li>ClosureRoutes::create()</li>
+     * <li>OtherRoutes::create()</li>
+     * </ul>
+     * The developer can create routes inside the body of any of the 4 methods.
      * @since 1.0
      */
-    private function initRoutes(){
-        Logger::log('Initializing routes...', 'info', 'initialization-log');
-        APIRoutes::create();
-        ViewRoutes::create();
-        ClosureRoutes::create();
-        Logger::log('Routes initialization completed.', 'info', 'initialization-log');
+    public function initRoutes(){
+        Logger::logFuncCall(__METHOD__);
+        if(self::getClassStatus() == 'INITIALIZING'){
+            Logger::log('Initializing routes...', 'info', 'initialization-log');
+            APIRoutes::create();
+            ViewRoutes::create();
+            ClosureRoutes::create();
+            OtherRoutes::create();
+            Logger::log('Routes initialization completed.', 'info', 'initialization-log');
+        }
+        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * This function is called when the status of the system does not equal 
@@ -319,109 +334,147 @@ class WebFiori{
      * of first use. Modify the content of this function as needed.
      * @since 1.0
      */
-    private function firstUse(){
+    public function firstUse(){
         Logger::logFuncCall(__METHOD__, 'initialization-log');
-        //in this part, you can configure the ststem. 
+        if(self::getClassStatus()== 'INITIALIZING'){
+            //in this part, you can configure the ststem. 
         
-        //the first thing you might need to do is to update basic website
-        //attributes. 
-        $this->setWebsiteAttributes();
+            //the first thing you might need to do is to update basic website
+            //attributes. 
+            $this->initWebsiteAttributes();
 
-        //After that, if your app uses MySQL database, you can set connection 
-        //parameters here. If it does not, skip this step by commenting 
-        //the next line.
-        //$this->setDatabaseConnection();
+            //After that, if your app uses MySQL database, you can set connection 
+            //parameters here. If it does not, skip this step by commenting 
+            //the next line.
+            //$this->setDatabaseConnection();
 
 
-        //Also, you can add SMTP email account that you can use to send email 
-        //messages if your system uses this functionality.
-        $this->addSMTPAccounts();
-        
-        //once configuration is finished, call the function SystemFunctions::configured()
-        $this->SF->configured();
-        
-        //do not remove next lines of code.
-        //Used to show error message in case the 
-        //system is not configured.
-        if(!$this->SF->isSetupFinished()){
-            Logger::log('Initialization faild.','error','initialization-log');
-            $this->needConfigration();
+            //Also, you can add SMTP email account that you can use to send email 
+            //messages if your system uses this functionality.
+            $this->initSMTPAccounts();
+            
+            //initialize database
+            $this->initDatabase();
+            
+            //once configuration is finished, call the function SystemFunctions::configured()
+            $this->SF->configured();
+
+            //do not remove next lines of code.
+            //Used to show error message in case the 
+            //system is not configured.
+            if(!$this->SF->isSetupFinished()){
+                Logger::log('Initialization faild.','error','initialization-log');
+                $this->needConfigration();
+            }
         }
         Logger::logFuncReturn(__METHOD__, 'initialization-log');
     }
     /**
      * Adds SMTP accounts during initialization.
+     * The developer does not have to call this method manually. It will be 
+     * called only if it is the first run for the system.
      * @since 1.1
      */
-    private function addSMTPAccounts() {
-        //$account = new EmailAccount();
-        //$account->setName('no-replay');
-        //$account->setAddress('myAddress@example.com');
-        //$account->setPassword('xxx');
-        //$account->setUsername('hello@example.com');
-        //$account->setPort(25);
-        //$account->setServerAddress('mail.example.com');
-        //$this->BMF->updateOrAddEmailAccount($account);
+    public function initSMTPAccounts() {
+        Logger::logFuncCall(__METHOD__, 'initialization-log');
+        if(self::getClassStatus()== 'INITIALIZING'){
+            //$acc = new EmailAccount();
+            //$acc->setName('System Admin');
+            //$acc->setServerAddress('mail.example.com');
+            //$acc->setUsername('no-replay@example.com');
+            //$acc->setPassword('JQtnUE2VUm');
+            //$acc->setAddress('no-replay@example.com');
+            //$acc->setPort(587);
+            //$this->BMF->updateOrAddEmailAccount($acc);
+        }
+        Logger::logFuncReturn(__METHOD__, 'initialization-log');
     }
     /**
      * Updates basic settings of the web site.
+     * This function can be used to update the settings which is saved in the 
+     * file 'SiteConfig.php'. The settings include:
+     * <ul>
+     * <li>Base URL of the web site.</li>
+     * <li>Primary language of the web site.</li>
+     * <li>The name of web site theme.</li>
+     * <li>The name of admin theme of the web site.</li>
+     * <li>General descriptions of the web site for different languages.</li>
+     * <li>Names of web site in different languages.</li>
+     * <li>The character or string that is used to separate the name of the web 
+     * site from page title.</li>
+     * </ul>
+     * The developer does not have to call this function manually. It will be 
+     * called only if it is the first run for the system.
      * @since 1.1
      */
-    private function setWebsiteAttributes() {
-        $siteInfoArr = $this->WF->getSiteConfigVars();
-        $siteInfoArr['base-url'] = Util::getBaseURL();
-        $siteInfoArr['primary-language'] = 'EN';
-        $siteInfoArr['theme-name'] = 'Greeny By Ibrahim Ali';
-        $siteInfoArr['title-separator'] = '|';
-        $siteInfoArr['site-descriptions'] = array('AR'=>'','EN'=>'');
-        $siteInfoArr['website-names'] = array('AR'=>'أكاديميا البرمجة','EN'=>'Programming Academia');
-        $this->WF->updateSiteInfo($siteInfoArr);
+    private function initWebsiteAttributes() {
+        Logger::logFuncCall(__METHOD__, 'initialization-log');
+        if(self::getClassStatus()== 'INITIALIZING'){
+            $siteInfoArr = $this->WF->getSiteConfigVars();
+            $siteInfoArr['base-url'] = Util::getBaseURL();
+            $siteInfoArr['primary-language'] = 'EN';
+            $siteInfoArr['theme-name'] = 'Greeny By Ibrahim Ali';
+            $siteInfoArr['title-separator'] = '|';
+            $siteInfoArr['site-descriptions'] = array('AR'=>'','EN'=>'');
+            $siteInfoArr['website-names'] = array('AR'=>'أكاديميا البرمجة','EN'=>'Programming Academia');
+            $this->WF->updateSiteInfo($siteInfoArr);
+        }
+        Logger::logFuncReturn(__METHOD__, 'initialization-log');
     }
     /**
-     * Add your own custom search folders in here. The autoloader will search 
-     * inside them for classes.
+     * Initialize the directories at which the framework will try to load 
+     * classes from. 
+     * If the user has created new folder inside the root framework directory, 
+     * he can add the folder using this method.
      * @since 1.2.1
      */
-    private function setAutoloadDirectories(){
-        //$this->AU->addSearchDirectory('my-system/entities');
-        //$this->AU->addSearchDirectory('my-system/logic');
-        //$this->AU->addSearchDirectory('my-system/apis');
+    public function initAutoloadDirectories(){
+        if(self::getClassStatus()== 'INITIALIZING'){
+            //add your own custom folders here.
+            //$this->AU->addSearchDirectory('my-system/entities');
+            //$this->AU->addSearchDirectory('my-system/logic');
+            //$this->AU->addSearchDirectory('my-system/apis');
+        }
     }
     /**
      * Updates database settings.
      * @since 1.1
      */
-    private function setDatabaseConnection() {
-        //only change the values of the following 4 variables.
-        $dbHost = 'localhost';
-        $dbUser = 'root';
-        $dbPass = '';
-        $dbName = '';
-        
-        if($this->SF->updateDBAttributes($dbHost, $dbUser, $dbPass, $dbName) === TRUE){
-            
-            //since this is the first use, we need to initialize database schema.
-            //create any query object to use it for executing SQL statements that 
-            //is used to build the database.
-            Logger::log('Initializing database...','info','initialization-log');
-            $schema = DatabaseSchema::get();
-            Logger::log('Database Schema: ', 'debug','initialization-log');
-            Logger::log($schema->getSchema(), 'debug','initialization-log');
-            $query = new ExampleQuery();
-            $query->setQuery($schema->getSchema(), 'update');
-            if($this->SF->excQ($query) !== TRUE){
+    private function initDatabase() {
+        if(self::getClassStatus() == 'INITIALIZING'){
+            //only change the values of the following 5 variables.
+            $dbHost = 'localhost';
+            $dbUser = 'root';
+            $dbPass = '';
+            $dbName = '';
+            $dbPort = '3306';
+
+            if($this->SF->updateDBAttributes($dbHost, $dbUser, $dbPass, $dbName, $dbPort) === TRUE){
+
+                //since this is the first use, we need to initialize database schema.
+                //If schema already created, this step can be skipped.
+                //create any query object to use it for executing SQL statements that 
+                //is used to build the database.
+                Logger::log('Initializing database...','info','initialization-log');
+                $schema = DatabaseSchema::get();
+                Logger::log('Database Schema: ', 'debug','initialization-log');
+                Logger::log($schema->getSchema(), 'debug','initialization-log');
+                //$query = new ExampleQuery();
+                //$query->setQuery($schema->getSchema(), 'update');
+                //if($this->SF->excQ($query) !== TRUE){
+                //    Logger::log('Initialization faild.', 'error','initialization-log');
+                //    Logger::requestCompleted();
+                //    header('HTTP/1.1 503 Service Unavailable');
+                //    die($this->SF->getDBLink()->toJSON().'');
+                //}
+            }
+            else{
                 Logger::log('Initialization faild.', 'error','initialization-log');
+                $dbLink = $this->SF->getDBLink();
                 Logger::requestCompleted();
                 header('HTTP/1.1 503 Service Unavailable');
-                die($this->SF->getDBLink()->toJSON().'');
+                die($dbLink->toJSON().'');
             }
-        }
-        else{
-            Logger::log('Initialization faild.', 'error','initialization-log');
-            $dbLink = $this->SF->getDBLink();
-            Logger::requestCompleted();
-            header('HTTP/1.1 503 Service Unavailable');
-            die($dbLink->toJSON().'');
         }
     }
     /**
@@ -441,24 +494,15 @@ class WebFiori{
     }
     /**
      * Initialize cron jobs.
+     * This method will call the method InitCron::init() to initialize cron 
+     * Jobs.
      * @since 1.3
      */
-    private function initCron(){
+    public function initCron(){
         Logger::logFuncCall(__METHOD__);
-        //initialize cron job manager
-        
-        //set access password
-        //the password must be kept in order to disallow any 
-        //unauthorized call to run cron jobs.
-        Cron::password('123456');
-        
-        //add jobs
-        //$job = new CronJob('*/5,*/3 * * * *');
-        //$job->setOnExecution(function($params){
-        //    $file = fopen('cron.txt', 'a+');
-        //    fwrite($file, 'Job \''.$params[0]->getJobName().'\' executed at '.date(DATE_RFC1123)."\r\n");
-        //},array($job));
-        //Cron::scheduleJob($job);
+        if(self::getClassStatus()== 'INITIALIZING'){
+            InitCron::init();
+        }
         Logger::logFuncReturn(__METHOD__);
     }
     /**
@@ -533,10 +577,6 @@ class WebFiori{
 WebFiori::getAndStart();
 define('INITIAL_SYS_STATUS',WebFiori::sysStatus());
 Logger::log('INITIAL_SYS_STATUS = '.INITIAL_SYS_STATUS, 'debug');
-Router::closure('/test', function(){
-    //$x = $_GET['hell'];
-    echo $y;
-});
 if(INITIAL_SYS_STATUS === TRUE){
     Router::route(Util::getRequestedURL());
 }

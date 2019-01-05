@@ -19,13 +19,32 @@ if(!defined('ROOT_DIR')){
 }
 use phpStructs\html\HTMLDoc;
 use webfiori\entity\langs\Language;
-use webfiori\functions\WebsiteFunctions;
 use phpStructs\html\HeadNode;
 use webfiori\SiteConfig;
 use phpStructs\html\HTMLNode;
 use Exception;
 /**
- * A class used to initialize main page components.
+ * A class used to initialize view components.
+ * This class is one of the core components for creating web pages. It is simply 
+ * represents a web page. By default class has a HTML document that contains 
+ * the following basic elements:
+ * <ul>
+ * <li>Head tag that contains CSS, JS and other meta and link tags.</li>
+ * <li>A div element which has the ID 'page-body' that represents the body 
+ * of the page.</li>
+ * <li>A div element which has the ID 'page-header' that represents the header 
+ * section of the page.</li>
+ * <li>A div element which has the ID 'page-footer' that represents the footer 
+ * section of the page.</li>
+ * <li>A div element which has the ID 'main-content-area' that represents the area 
+ * at which user content will be added to.</li>
+ * <li>A div element which has the ID 'side-content-area' that represents the side 
+ * section of the page.</li>
+ * </ul>
+ * In addition to that, this class can be used to set some of the basic attributes 
+ * of the page including page language, title, description, writing direction 
+ * and canonical URL. Also, this class can be used to load a specific theme 
+ * and use it to change the look and feel of the web site.
  * @author Ibrahim <ibinshikh@hotmail.com>
  * @version 1.9
  */
@@ -79,7 +98,7 @@ class Page{
      */
     private $title;
     /**
-     * The name of the website that will be appended with the title of 
+     * The name of the web site that will be appended with the title of 
      * the page.
      * @var string 
      * @since 1.8
@@ -87,7 +106,7 @@ class Page{
     private $websiteName;
     /**
      * The character or string that is used to separate web page title 
-     * and website name.
+     * and web site name.
      * @var string
      * @since 1.8 
      */
@@ -131,8 +150,8 @@ class Page{
     }
     /**
      * Returns the canonical URL of the page.
-     * @return NULL|string The function will return the  canonical URL of the page 
-     * if set. If not, the function will return <b>NULL</b>.
+     * @return NULL|string The method will return the  canonical URL of the page 
+     * if set. If not, the method will return NULL.
      * @since 1.2
      */
     public function getCanonical() {
@@ -140,8 +159,10 @@ class Page{
     }
     /**
      * Sets or gets the canonical URL of the page.
-     * @param string $new [Optional] The new canonical URL.
-     * @return string The canonical URL of the page.
+     * @param string|NULL $new The new canonical URL. If NULL is given, the 
+     * method will not update the canonical URL.
+     * @return string|NULL The canonical URL of the page. If the canonical 
+     * is not set, the method will return NULL.
      * @since 1.9
      */
     public static function canonical($new=null){
@@ -197,10 +218,10 @@ class Page{
         Logger::logFuncReturn(__METHOD__);
     }
     /**
-     * Sets or returns the name of page website.
-     * @param string $new [Optional] The new name to set. It must be not-empty 
+     * Sets or returns the name of page web site.
+     * @param string $new The new name to set. It must be not-empty 
      * string in order to update.
-     * @return string The name of page website. Default is 'My Website'.
+     * @return string The name of page web site. Default is 'My X Website'.
      * @since 1.9
      */
     public static function siteName($new=null) {
@@ -211,25 +232,27 @@ class Page{
         return $p->getWebsiteName();
     }
     /**
-     * Returns the name of the website.
-     * @return string The name of the website. If the name was not set 
-     * using the function <b>Page::setWebsiteName()</b>, the returned value will 
-     * be 'My Website'.
+     * Returns the name of the web site.
+     * @return string The name of the web site. If the name was not set 
+     * using the method Page::siteName(), the returned value will 
+     * be 'My X Website'.
      * @since 1.8
      */
     public function getWebsiteName() {
         return $this->websiteName;
     }
     /**
-     * Sets the name of the website.
-     * @param string $name The name of the website that will be appended with the title of 
-     * the page. It will be updated only if the given string is not empty. 
-     * Also note that if page document was created, 
-     * calling this function will set the value of the &lt;titlt&gt; node. 
-     * The format of the title is <b>PAGE_NAME TITLE_SEP WEBSITE_NAME</b>. 
+     * Sets the name of the web site.
+     * The name of the web site is used in setting the title of the page. 
+     * The format of the title is 'PAGE_NAME TITLE_SEP WEBSITE_NAME'. 
      * for example, if the page name is 'Home' and title separator is 
-     * '|' and the name of the website is 'Programming Academia'. The title 
+     * '|' and the name of the web site is 'Programming Academia'. The title 
      * of the page will be 'Home | Programming Academia'.
+     * The name will be updated only if the given string is not empty. 
+     * Also note that if page document was created, 
+     * calling this method will set the value of the &lt;titlt&gt; node.
+     * @param string $name The name of the web site that will be appended with the title of 
+     * the page. 
      * @since 1.8
      */
     public function setWebsiteName($name) {
@@ -239,10 +262,10 @@ class Page{
         }
     }
     /**
-     * Sets or returns the string that is used to separate website name from 
+     * Sets or returns the string that is used to separate web site name from 
      * the title of the page.
-     * @param string $new [Optional] The new title separator.
-     * @return string The string that is used to separate website name from 
+     * @param string $new The new title separator.
+     * @return string The string that is used to separate web site name from 
      * the title of the page.
      * @since 1.9
      */
@@ -255,10 +278,10 @@ class Page{
     }
     /**
      * Returns the character or string that is used to separate web page title 
-     * and website name.
+     * and web site name.
      * @return string The character or string that is used to separate web page title 
-     * and website name. If the separator was not set 
-     * using the function <b>Page::setTitleSep()</b>, the returned value will 
+     * and web site name. If the separator was not set 
+     * using the method <b>Page::setTitleSep()</b>, the returned value will 
      * be ' | '.
      * @since 1.8
      */
@@ -266,15 +289,17 @@ class Page{
         return $this->titleSep;
     }
     /**
-     * Sets the character or string that is used to separate web page title 
-     * @param string $str The new character or string that will be used to 
-     * separate page title and website name. It will be set only if it is not 
-     * empty string. Also note that if page document was created, 
-     * calling this function will set the value of the &lt;titlt&gt; node. 
-     * The format of the title is <b>PAGE_NAME TITLE_SEP WEBSITE_NAME</b>. 
+     * Sets the character or string that is used to separate web page title.
+     * The given character or string is used in setting the title of the page. 
+     * The format of the title is 'PAGE_NAME TITLE_SEP WEBSITE_NAME'. 
      * for example, if the page name is 'Home' and title separator is 
-     * '|' and the name of the website is 'Programming Academia'. The title 
+     * '|' and the name of the web site is 'Programming Academia'. The title 
      * of the page will be 'Home | Programming Academia'.
+     * The character be updated only if the given string is not empty. 
+     * Also note that if page document was created, 
+     * calling this method will set the value of the &lt;titlt&gt; node.
+     * @param string $str The new character or string that will be used to 
+     * separate page title and web site name.
      * @since 1.8
      */
     public function setTitleSep($str) {
@@ -294,8 +319,8 @@ class Page{
     }
     /**
      * Checks if the type of page will be dynamic or static.
-     * @return boolean The function will return <b>TRUE</b> if document 
-     * type is dynamic. Otherwise, the function will return <b>FALSE</b>.
+     * @return boolean The method will return TRUE if document 
+     * type is dynamic. Otherwise, the function will return FALSE.
      * @since 1.6
      */
     public function isDynamicDoc() {
@@ -306,8 +331,8 @@ class Page{
      * @param HTMLNode $node The node that will be inserted.
      * @param string $parentNodeId The ID of the node that the given node 
      * will be inserted to.
-     * @return boolean The function will return <b>TRUE</b> if the given node 
-     * was inserted. If it is not, the function will return <b>FALSE</b>.
+     * @return boolean The method will return TRUE if the given node 
+     * was inserted. If it is not, the method will return FALSE.
      * @since 1.9
      */
     public static function insert($node,$parentNodeId='main-content-area'){
@@ -322,8 +347,8 @@ class Page{
      * @param HTMLNode $node The node that will be inserted.
      * @param string $parentNodeId The ID of the node that the given node 
      * will be inserted to.
-     * @return boolean The function will return <b>TRUE</b> if the given node 
-     * was inserted. If it is not, the function will return <b>FALSE</b>.
+     * @return boolean The method will return TRUE if the given node 
+     * was inserted. If it is not, the method will return FALSE.
      * @since 1.6
      */
     public function insertNode($node,$parentNodeId='') {
@@ -375,8 +400,8 @@ class Page{
     }
     /**
      * Sets or gets the title of the page.
-     * @param string $new [Optional] The title of the page. Note that if page document was created, 
-     * calling this function will set the value of the &lt;titlt&gt; node. 
+     * @param string $new The title of the page. Note that if page document was created, 
+     * calling this method will set the value of the &lt;titlt&gt; node. 
      * The format of the title is <b>PAGE_NAME TITLE_SEP WEBSITE_NAME</b>. 
      * for example, if the page name is 'Home' and title separator is 
      * '|' and the name of the website is 'Programming Academia'. The title 
@@ -395,7 +420,7 @@ class Page{
      * Sets the title of the page.
      * @param string $val The title of the page. If <b>NULL</b> is given, 
      * the title will not updated. Also note that if page document was created, 
-     * calling this function will set the value of the &lt;titlt&gt; node. 
+     * calling this method will set the value of the &lt;titlt&gt; node. 
      * The format of the title is <b>PAGE_NAME TITLE_SEP WEBSITE_NAME</b>. 
      * for example, if the page name is 'Home' and title separator is 
      * '|' and the name of the website is 'Programming Academia'. The title 
@@ -428,7 +453,7 @@ class Page{
     /**
      * Returns the title of the page.
      * @return string|NULL The title of the page. If the title is not set, 
-     * the function will return <b>NULL</b>
+     * the method will return NULL.
      * @since 1.0
      */
     public function getTitle(){
@@ -436,7 +461,7 @@ class Page{
     }
     /**
      * Checks if the selected theme is loaded or not.
-     * @return boolean <b>TRUE</b> if loaded. <b>FALSE</b> if not loaded.
+     * @return boolean TRUE if loaded. FALSE if not loaded.
      * @since 1.1
      */
     public function isThemeLoaded(){
@@ -444,7 +469,7 @@ class Page{
     }
     /**
      * Sets or gets the description of the page.
-     * @param string $new [Optional] The description of the page.
+     * @param string $new The description of the page.
      * @since 1.9
      * @return string The description of the page.
      */
@@ -484,7 +509,7 @@ class Page{
     /**
      * Returns the description of the page.
      * @return string|NULL The title of the page. If the description is not set, 
-     * the function will return <b>NULL</b>
+     * the method will return NULL
      * @since 1.0
      */
     public function getDescription(){

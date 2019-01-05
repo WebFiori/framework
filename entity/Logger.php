@@ -56,7 +56,7 @@ class Logger {
         'DEBUG','INFO','ERROR','WARNING'
     );
     /**
-     * A stack that contains all the called functions.
+     * A stack that contains all the called methods and functions.
      * @var Stack
      * @since 1.0 
      */
@@ -122,7 +122,7 @@ class Logger {
         return self::_get();
     }
     /**
-     * Returns a stack which contains all the called functions.
+     * Returns a stack which contains all the called functions and methods.
      * @return Stack An instance of the class 'Stack'.
      * @since 1.1.1
      */
@@ -130,9 +130,9 @@ class Logger {
         return self::_get()->functionsStack;
     }
     /**
-     * Adds a log message to log function return value (debug).
+     * Adds a log message to log function or method's return value (debug).
      * @param mixed $val The return value of a function.
-     * @param type $logName [Optional] The name of the log file. If it is not 
+     * @param type $logName The name of the log file. If it is not 
      * NULL, the log will be written to the given file name.
      * @param boolean $addDashes If set to true, a line of dashes will be inserted 
      * after the message. Used to organize log messages.
@@ -150,9 +150,9 @@ class Logger {
      * Enable, disable or check if logging is enabled.
      * @param boolean $isEnabled If provided and set to true, logging will be 
      * enabled. If provided and not true, logging will be disabled.
-     * @return boolean The function will return TRUE if logging is enabled. 
+     * @return boolean The method will return TRUE if logging is enabled. 
      * false otherwise. Default return value is false which means that the 
-     * logger is disabled initially.
+     * logger is disabled.
      * @since 1.0
      */
     public static function enabled($isEnabled=null) {
@@ -164,13 +164,13 @@ class Logger {
     /**
      * Writes a message to the log file.
      * @param string $message The message that will be written.
-     * @param string $messageType [Optional] The type of the message that will be logged. 
+     * @param string $messageType The type of the message that will be logged. 
      * it can have one of 4 values, 'info', 'warning', 'error' or 'debug'. Note 
      * that the last type will be logged only if the constant 'DEBUG' is defined. 
      * The default value is 'info'.
-     * @param string $logName [Optional] The name of the log file. If it is not 
+     * @param string $logName The name of the log file. If it is not 
      * NULL, the log will be written to the given file name.
-     * @param boolean $addDashes [Optional] If set to true, a line of dashes will be inserted 
+     * @param boolean $addDashes If set to true, a line of dashes will be inserted 
      * after the message. Used to organize log messages.
      * @since 1.0
      */
@@ -210,15 +210,16 @@ class Logger {
         return $retVal.$outerSpace.'}';
     }
     /**
-     * Adds a debug message to a log file that says the given function was called. 
+     * Adds a debug message to a log file that says the given method or function was called. 
      * The message will be logged only if the constant 'DEBUG' is defined.
-     * @param string $funcName The name of the function. To get the name of the 
-     * function in its body, Use the magic constant '__METHOD__' or '__FUNCTION__'. 
+     * @param string $funcName The name of the function or the method. To get the 
+     * name of the function in its body, Use the magic constant '__FUNCTION__'. 
+     * To get the name of a method inside class, use the magic constant '__METHOD__'.
      * It is recommended to always use '__METHOD__' as this constant will return 
-     * class name with it if the function is inside a class.
-     * @param string $logFileName [Optional] The name of the log file. If it is not 
+     * class name with it if the method is inside a class.
+     * @param string $logFileName The name of the log file. If it is not 
      * NULL, the log will be written to the given file name.
-     * @param string $addDashes [Optional] If set to true, a line of dashes will be inserted 
+     * @param string $addDashes If set to true, a line of dashes will be inserted 
      * after the message. Used to organize log messages.
      * @since 1.1
      */
@@ -227,13 +228,14 @@ class Logger {
     }
     /**
      * Adds a debug message to a log file that says the execution of a given 
-     * function was finished. 
+     * function or a method was finished. 
      * Note that the message will be logged only if the constant 
-     * 'DEBUG' is defined. To get the name of the 
-     * function in its body, Use the magic constant '__METHOD__' or '__FUNCTION__'. 
+     * 'DEBUG' is defined. To get the 
+     * name of the function in its body, Use the magic constant '__FUNCTION__'. 
+     * To get the name of a method inside class, use the magic constant '__METHOD__'.
      * It is recommended to always use '__METHOD__' as this constant will return 
      * class name with it if the function is inside a class.
-     * @param string $funcName The name of the function. 
+     * @param string $funcName The name of the function or method. 
      * @param string $logFileName The name of the log file. If it is not 
      * NULL, the log will be written to the given file name. Default is NULL.
      * @param string $addDashes If set to true, a line of dashes will be inserted 
@@ -246,7 +248,7 @@ class Logger {
     /**
      * Adds a message to the last selected log file that states the client 
      * request was processed. 
-     * This function is usually called after calling 
+     * This method is usually called after calling 
      * the function 'die()' or 'exit()'. Also if no server code will be 
      * executed after. The exact message that will be logged is:
      * <p>"Processing of client request is finished."</p>
@@ -257,7 +259,7 @@ class Logger {
     }
     /**
      * Sets or returns the full directory of the log file.
-     * Note that If the given directory does not exists, the function will 
+     * Note that If the given directory does not exists, the method will 
      * try to create it. The default place for saving logs is ROOT_DIR.'/logs'.
      * @param string $new If provided, the save directory will be set to the 
      * given one. 
@@ -272,13 +274,13 @@ class Logger {
     }
     /**
      * Sets or returns the name of the log file.
-     * This function is used to switch between different log files. The 
+     * This method is used to switch between different log files. The 
      * name should be provided without any extentions (e.g. 'my-log'). 
      * Note that log files will always have the 
      * extention .txt The default log file name is 'log.txt'.
      * @param string $new The name of the log file that the system will be writing 
      * logs to.
-     * @return string The function will return the name of the log file that the 
+     * @return string The method will return the name of the log file that the 
      * logger is using to write logs (without extension). 
      * @since 1.0
      */

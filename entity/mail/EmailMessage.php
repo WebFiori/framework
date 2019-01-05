@@ -54,7 +54,7 @@ if(!defined('ROOT_DIR')){
  * @author Ibrahim
  * @version 1.0.1
  */
-class EmaiMessage {
+class EmailMessage {
     /**
      *
      * @var HTMLDoc 
@@ -69,20 +69,20 @@ class EmaiMessage {
     private $socketMailer;
     /**
      *
-     * @var EmaiMessage 
+     * @var EmailMessage 
      * @since 1.0
      */
     private static $em;
     /**
      * 
-     * @return EmaiMessage
+     * @return EmailMessage
      * @since 1.0
      */
     public static function &createInstance($sendAccountName=''){
         if(self::$em != NULL){
             return self::$em;
         }
-        self::$em = new EmaiMessage($sendAccountName);
+        self::$em = new EmailMessage($sendAccountName);
         return self::$em;
     }
     /**
@@ -183,9 +183,9 @@ class EmaiMessage {
      * Adds new receiver address to the list of message receivers.
      * @param string $name The name of the email receiver (such as 'Ibrahim').
      * @param string $email The email address of the receiver (such as 'example@example.com').
-     * @param boolean $isCC [Optional] If set to TRUE, the receiver will receive 
+     * @param boolean $isCC If set to TRUE, the receiver will receive 
      * a carbon copy of the message (CC).
-     * @param boolean $isBcc [Optional] If set to TRUE, the receiver will receive 
+     * @param boolean $isBcc If set to TRUE, the receiver will receive 
      * a blind carbon copy of the message (Bcc).
      * @since 1.0
      */

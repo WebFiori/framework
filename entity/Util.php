@@ -124,6 +124,21 @@ class Util{
         }
         return $retV;
     }
+    
+    public static function binaryString($intVal){
+        if(gettype($intVal) == 'integer'){
+            $retVal = '';
+            $q = floor($intVal / 2);
+            $rem = $intVal % 2;
+            while ($q > 0){
+                $retVal = $rem.$retVal;
+                $q = floor($q / 2);
+                $rem = $q % 2;
+            }
+            return $retVal;
+        }
+        return FALSE;
+    }
     /**
      * Returns HTTP request headers.
      * This method will try to extract request headers using two ways, 

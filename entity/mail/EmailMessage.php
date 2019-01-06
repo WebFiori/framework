@@ -49,10 +49,10 @@ if(!defined('ROOT_DIR')){
         . '</html>');
 }
 /**
- * Description of EmaiMessage
+ * A class that can be used to write HTML formatted Email messages.
  *
  * @author Ibrahim
- * @version 1.0.1
+ * @version 1.0.2
  */
 class EmailMessage {
     /**
@@ -74,15 +74,23 @@ class EmailMessage {
      */
     private static $em;
     /**
-     * 
+     * Creates new email message.
+     * @param string $sendAccountName The name of SMTP account that will be used 
+     * to send the message. The account must exist in the file 'MailConfig.php'. 
+     * If it does not exist, an exception will be thrown. The name of the account 
+     * must be supplied only for the first call.
      * @return EmailMessage
      * @since 1.0
      */
     public static function &createInstance($sendAccountName=''){
-        if(self::$em != NULL){
-            return self::$em;
+        Logger::logFuncCall(__METHOD__);
+        Logger::log('Checking if an instance of the class is already active...');
+        if(self::$em === NULL){
+            Logger::log('No instance is active. Creating new one...');
+            self::$em = new EmailMessage($sendAccountName);
         }
-        self::$em = new EmailMessage($sendAccountName);
+        Logger::log('Returning class intance.');
+        Logger::logFuncReturn(__METHOD__);
         return self::$em;
     }
     /**
@@ -98,7 +106,7 @@ class EmailMessage {
         if(class_exists('webfiori\MailConfig')){
             Logger::log('Checking the existance of the account \''.$sendAccountName.'\'.', 'debug');
             $acc = MailConfig::getAccount($sendAccountName);
-            if($acc instanceof EmailAccount){
+            if($acc instanceof SMTPAccount){
                 Logger::log('SMTP Account retrieved.');
                 Logger::log('Getting socket mailer ready.');
                 $this->socketMailer = BasicMailFunctions::get()->getSocketMailer($acc);
@@ -137,6 +145,39 @@ class EmailMessage {
         self::createInstance()->_getSocketMailer()->addAttachment($file);
     }
     /**
+     * Returns an associative array that contains the names and the addresses 
+     * of people who will receive a carbon copy of the message.
+     * The indices of the array will act as the addresses of the receivers and 
+     * the value of each index will contain the name of the receiver.
+     * @return array An array that contains receivers information.
+     * @since 1.0.2
+     */
+    public static function getCC(){
+        return self::createInstance()->_getSocketMailer()->getCC();
+    }
+    /**
+     * Returns an associative array that contains the names and the addresses 
+     * of people who will receive a blind carbon copy of the message.
+     * The indices of the array will act as the addresses of the receivers and 
+     * the value of each index will contain the name of the receiver.
+     * @return array An array that contains receivers information.
+     * @since 1.0.2
+     */
+    public static function getBCC() {
+        return self::createInstance()->_getSocketMailer()->getBCC();
+    }
+    /**
+     * Returns an associative array that contains the names and the addresses 
+     * of people who will receive an original copy of the message.
+     * The indices of the array will act as the addresses of the receivers and 
+     * the value of each index will contain the name of the receiver.
+     * @return array An array that contains receivers information.
+     * @since 1.0.2
+     */
+    public function getReceivers() {
+        return self::createInstance()->_getSocketMailer()->getReceivers();
+    }
+    /**
      * Adds a text node to the body of the message.
      * @param string $text The text that will be in the body of the node.
      * @since 1.0
@@ -168,7 +209,7 @@ class EmailMessage {
     /**
      * Sets or returns the HTML document that is associated with the email 
      * message.
-     * @param HTMLDoc $new [Optional] If it is not NULL, the HTML document 
+     * @param HTMLDoc $new If it is not NULL, the HTML document 
      * that is associated with the message will be set to the given one.
      * @return HTMLDoc The document that is associated with the email message.
      * @since 1.0

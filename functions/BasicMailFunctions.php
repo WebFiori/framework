@@ -44,7 +44,7 @@ if(!defined('ROOT_DIR')){
 use webfiori\entity\Logger;
 use webfiori\WebFiori;
 use webfiori\entity\FileHandler;
-use webfiori\entity\mail\EmailAccount;
+use webfiori\entity\mail\SMTPAccount;
 use webfiori\entity\mail\SocketMailer;
 /**
  * A class for the functions that is related to mailing.
@@ -244,7 +244,7 @@ class BasicMailFunctions extends Functions{
         $retVal = FALSE;
         if(class_exists('webfiori\MailConfig')){
             $account = &MailConfig::getAccount($accountName);
-            if($account instanceof EmailAccount){
+            if($account instanceof SMTPAccount){
                 $accountsArr = MailConfig::getAccounts();
                 unset($accountsArr[$accountName]);
                 $toSave = array();
@@ -261,7 +261,7 @@ class BasicMailFunctions extends Functions{
     }
     /**
      * Adds new SMTP account or Updates an existing one.
-     * @param EmailAccount $emailAccount An instance of 'EmailAccount'.
+     * @param SMTPAccount $emailAccount An instance of 'EmailAccount'.
      * @return boolean|string The function will return TRUE if the email 
      * account was updated or added. If the email account contains wrong server
      *  information, the function will return MailFunctions::INV_HOST_OR_PORT. 
@@ -273,7 +273,7 @@ class BasicMailFunctions extends Functions{
     public function updateOrAddEmailAccount($emailAccount) {
         Logger::logFuncCall(__METHOD__);
         $retVal = FALSE;
-        if($emailAccount instanceof EmailAccount){
+        if($emailAccount instanceof SMTPAccount){
             $sm = $this->getSocketMailer($emailAccount);
             if($sm instanceof SocketMailer){
                 if(class_exists('webfiori\MailConfig')){
@@ -301,7 +301,7 @@ class BasicMailFunctions extends Functions{
      * Returns a new instance of the class SocketMailer.
      * The function will try to establish a connection to SMTP server using 
      * the given SMTP account.
-     * @param EmailAccount $emailAcc An account that is used to initiate 
+     * @param SMTPAccount $emailAcc An account that is used to initiate 
      * socket mailer.
      * @return SocketMailer|string The function will return an instance of SocketMailer
      * on successful connection. If no connection is established, the function will 
@@ -311,7 +311,7 @@ class BasicMailFunctions extends Functions{
      */
     public function getSocketMailer($emailAcc){
         Logger::logFuncCall(__METHOD__);
-        if($emailAcc instanceof EmailAccount){
+        if($emailAcc instanceof SMTPAccount){
             $retVal = BasicMailFunctions::INV_HOST_OR_PORT;
             Logger::log('Creating new instance of \'SocketMailer\' using given email account.');
             Logger::log('Server Address: \''.$emailAcc->getServerAddress().'\'', 'debug');

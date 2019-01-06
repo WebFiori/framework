@@ -44,10 +44,10 @@ if(!defined('ROOT_DIR')){
 /**
  * A class that represents an email account which is used to send or receive messages.
  *
- * @author Ibrahim <ibinshikh@hotmail.com>
+ * @author Ibrahim
  * @version 1.0.1
  */
-class EmailAccount {
+class SMTPAccount {
     /**
      * Email address.
      * @var string 

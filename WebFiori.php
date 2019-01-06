@@ -3,7 +3,7 @@ namespace webfiori;
 use webfiori\entity\AutoLoader;
 use webfiori\entity\Logger;
 use webfiori\entity\Util;
-use webfiori\entity\mail\EmailAccount;
+use webfiori\entity\mail\SMTPAccount;
 use webfiori\functions\SystemFunctions;
 use webfiori\functions\WebsiteFunctions;
 use webfiori\functions\BasicMailFunctions;

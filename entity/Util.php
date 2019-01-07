@@ -22,7 +22,7 @@ use webfiori\WebFiori;
 /**
  * Framework utility class.
  * @author Ibrahim
- * @version 1.3.7
+ * @version 1.3.8
  */
 class Util{
     /**
@@ -124,16 +124,29 @@ class Util{
         }
         return $retV;
     }
-    
+    /**
+     * Converts a positive integer value to binary string.
+     * @param int $intVal The number that will be converted.
+     * @return boolean|string If the given value is an integer and it is greater 
+     * than -1, a string of zeros and ones is returned. Other than that, 
+     * FALSE is returned.
+     * @since 1.3.8
+     */
     public static function binaryString($intVal){
-        if(gettype($intVal) == 'integer'){
+        if(gettype($intVal) == 'integer' && $intVal >= 0){
             $retVal = '';
-            $q = floor($intVal / 2);
-            $rem = $intVal % 2;
-            while ($q > 0){
-                $retVal = $rem.$retVal;
-                $q = floor($q / 2);
-                $rem = $q % 2;
+            if($intVal == 0){
+                $retVal = '0';
+            }
+            else{
+                $q = 100;
+                $bit = $intVal % 2;
+                while ($intVal > 0){
+                    $q = floor($intVal / 2);
+                    $bit = $intVal % 2;
+                    $retVal = $bit.$retVal;
+                    $intVal = $q;
+                }
             }
             return $retVal;
         }

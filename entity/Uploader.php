@@ -30,7 +30,7 @@ use webfiori\entity\Util;
 class Uploader implements JsonI{
     /**
      * A constant that is used to indicates upload directory does not exists.
-     * It usually returned by some functions as error code.
+     * It usually returned by some methods as error code.
      * @since 1.0
      */
     const NO_SUCH_DIR = 'no_such_dir';
@@ -242,14 +242,14 @@ class Uploader implements JsonI{
     private $extentions = array();
     /**
      * Sets the directory at which the file will be uploaded to.
-     * This function does not check whether the directory is exist or not. It 
+     * This method does not check whether the directory is exist or not. It 
      * just validate that the structure of the path is valid by replacing 
      * forward slashes with backward slashes. The directory will never update 
      * if the given string is empty.
      * @param string $dir Upload Directory (such as '/files/uploads' or 
      * 'C:/Server/uploads'). 
-     * @return boolean If upload directory was updated, the function will 
-     * return TRUE. If not updated, the function will return FALSE.
+     * @return boolean If upload directory was updated, the method will 
+     * return TRUE. If not updated, the method will return FALSE.
      * @since 1.0
      */
     public function setUploadDir($dir){
@@ -405,7 +405,7 @@ class Uploader implements JsonI{
      * Returns MIME type of a file extension.
      * @param string $ext File extension without the suffix (such as 'jpg').
      * @return string|NULL If the extension MIME type is found, it will be 
-     * returned. If not, the function will return NULL.
+     * returned. If not, the method will return NULL.
      * @since 1.0
      * @deprecated since 1.2.1
      */
@@ -429,7 +429,7 @@ class Uploader implements JsonI{
      * Checks if uploaded file is allowed or not.
      * @param string $fileName The name of the file (such as 'image.png')
      * @return boolean If file extension is in the array of allowed types, 
-     * the function will return TRUE.
+     * the method will return TRUE.
      * @since 1.0
      */
     private function isValidExt($fileName){
@@ -445,7 +445,7 @@ class Uploader implements JsonI{
      * Checks if PHP upload code is error or not.
      * @param int $code PHP upload code.
      * @return boolean If the given code does not equal to UPLOAD_ERR_OK, the 
-     * function will return TRUE.
+     * method will return TRUE.
      * @since 1.0
      */
     private function isError($code){

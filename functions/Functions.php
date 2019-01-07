@@ -83,7 +83,7 @@ class Functions {
     private $connErrDetails;
     /**
      * A constant that indicates a user is not authorized to perform specific 
-     * function.
+     * actions.
      * @var string 
      * @since 1.0
      */
@@ -147,8 +147,8 @@ class Functions {
      * </ul> 
      * If this parameter is not provided, connection information will be taken 
      * from the class 'Config'.
-     * @return boolean If the connection is established, the function will 
-     * return TRUE. If not, the function will return FALSE.
+     * @return boolean If the connection is established, the method will 
+     * return TRUE. If not, the method will return FALSE.
      * @since 1.1
      */
     public function useDatabase($optionalConnectionParams=array()) {
@@ -233,7 +233,7 @@ class Functions {
      * <li><b>pass</b>: Database user's password.</li>
      * <li><b>db-name</b>: The name of the database.</li>
      * <ul> 
-     * @return boolean If the connection is established, the function will 
+     * @return boolean If the connection is established, the method will 
      * return TRUE. If not, It will return FALSE.
      */
     private function _connect($connParams){
@@ -282,7 +282,7 @@ class Functions {
     /**
      * Execute a database query.
      * @param MySQLQuery $qObj An object of type 'MySQLQuery'. Note that 
-     * this function will call the function 'Functions::useDatabase()' by 
+     * this method will call the method 'Functions::useDatabase()' by 
      * default.
      * @return boolean 'TRUE' if no errors occur while executing the query.
      * FAlSE in case of error.
@@ -324,8 +324,8 @@ class Functions {
      * Checks if the current session user has a privilege or not given privilege 
      * ID.
      * @param string $pId The ID of the privilege.
-     * @return boolean If the user has the given privilege, the function will 
-     * return TRUE. If the user does not have the privilege, the function will 
+     * @return boolean If the user has the given privilege, the method will 
+     * return TRUE. If the user does not have the privilege, the method will 
      * return FALSE.
      * @since 1.2
      */
@@ -359,8 +359,8 @@ class Functions {
      * * <li>variables: An optional associative array of variables to set in the session. Used only if 
      * the session is new.</li>
      * </ul>
-     * @return boolean If the session is exist or created, the function will 
-     * return TRUE. Other than that, the function will return FALSE.
+     * @return boolean If the session is exist or created, the method will 
+     * return TRUE. Other than that, the method will return FALSE.
      */
     public function useSession($options=array()){
         if(gettype($options) == 'array'){
@@ -400,7 +400,7 @@ class Functions {
     }
     /**
      * Returns the instance of 'SessionManager' that is used by the class.
-     * If the name of the session is NULL, the function will return NULL.
+     * If the name of the session is NULL, the method will return NULL.
      * @return SessionManager|NULL An instance of 'SessionManager'.
      * @since 1.3
      */
@@ -416,7 +416,7 @@ class Functions {
     }
     /**
      * Returns language code from the currently used session manager.
-     * Note that if the name of the session is not set, the function will 
+     * Note that if the name of the session is not set, the method will 
      * return NULL.
      * @param boolean $forceUpdate If set to TRUE, language code will 
      * be forced to update based on the value of the attribute 'lang' 
@@ -437,7 +437,7 @@ class Functions {
     /**
      * Returns the link that is used to connect to the database.
      * @return MySQLLink|NULL The link that is used to connect to the database. 
-     * If no link is established with the database, the function will return 
+     * If no link is established with the database, the method will return 
      * NULL.
      * @since 1.2
      */
@@ -449,7 +449,7 @@ class Functions {
     /**
      * Returns the number of rows resulted from executing a query.
      * @return int|NULL Number of rows resulted from executing a query. The 
-     * function will return <b>-1</b> in case no connection was established to 
+     * method will return <b>-1</b> in case no connection was established to 
      * the database.
      * @since 1.0
      */
@@ -495,7 +495,7 @@ class Functions {
    /**
      * Returns the first that is resulted from executing a query.
      * @return array|NULL An array that contains row info. The 
-     * function will return NULL in case no connection was established to 
+     * method will return NULL in case no connection was established to 
      * the database.
      * @since 1.0
      */
@@ -520,7 +520,7 @@ class Functions {
      * a query.
      * @return array|NULL An associative array that represents the row. If 
      * there was no result set generated from executing the query or the 
-     * result has no rows, the function will return NULL.
+     * result has no rows, the method will return NULL.
      * @since 1.3.1
      */
     public function nextRow() {
@@ -542,7 +542,7 @@ class Functions {
     /**
      * Returns the ID of the user from session manager.
      * @return int The ID of the user taken from session manager. The 
-     * function will return -1 in case no user is set in session manager or in 
+     * method will return -1 in case no user is set in session manager or in 
      * case no session is active.
      * @since 1.0
      */

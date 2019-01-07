@@ -124,7 +124,7 @@ class SessionManager implements JsonI{
     const INV_IP_ADDRESS = 'status_inv_ip_address';
     /**
      * A constant that indicates the session has been killed by calling the 
-     * function 'SessionManager::kill()'.
+     * method 'SessionManager::kill()'.
      * @since 1.7
      */
     const KILLED = 'status_session_killed';
@@ -183,12 +183,12 @@ class SessionManager implements JsonI{
     }
     /**
      * Switch between sessions. 
-     * The function first checks if a session is active. 
-     * If a session is active, the function checks if the name that is stored 
+     * The method first checks if a session is active. 
+     * If a session is active, the method checks if the name that is stored 
      * in the instance is equal to the name stored in the $_SESSION. if the 
-     * two are different, the function will stop the first session and activate 
+     * two are different, the method will stop the first session and activate 
      * the second one.
-     * @return boolean If the session was switched, the function will return TRUE.
+     * @return boolean If the session was switched, the method will return TRUE.
      * @since 1.8
      */
     private function _switchToSession() {
@@ -275,7 +275,7 @@ class SessionManager implements JsonI{
      * Validate the name of the session.
      * @param string $name The name of the session. The following characters are 
      * invalid in session name: space, comma, semi-colon and equal sign.
-     * @return boolean The function will return TRUE if the name of the session 
+     * @return boolean The method will return TRUE if the name of the session 
      * is valid.
      * @since 1.8
      */
@@ -389,7 +389,7 @@ class SessionManager implements JsonI{
     /**
      * Returns the lifetime of the session (in minutes). 
      * @return int the lifetime of the session (in minutes). If the 
-     * session is new and the time was not set, the function will return -1.
+     * session is new and the time was not set, the method will return -1.
      * @since 1.4
      */
     public function getLifetime(){
@@ -437,10 +437,10 @@ class SessionManager implements JsonI{
      * Also if the language is set before, it will not be updated unless the parameter '$forceUpdate' is set to TRUE.
      * @param boolean $forceUpdate Set to TRUE if the language is set and want to 
      * reset it.
-     * @param boolean $useDefault If set to TRUE, the function will 
+     * @param boolean $useDefault If set to TRUE, the method will 
      * use default language if no language attribute is found in request body.
-     * @return boolean The function will return TRUE if the language is set or 
-     * updated. Other than that, the function will return FALSE.
+     * @return boolean The method will return TRUE if the language is set or 
+     * updated. Other than that, the method will return FALSE.
      * @since 1.2
      */
     private function _initLang($forceUpdate=false,$useDefault=true){
@@ -523,7 +523,7 @@ class SessionManager implements JsonI{
     /**
      * Returns session language code.
      * @return string|NULL two digit language code (such as 'EN'). If the session 
-     * is not running or the language is not set, the function will return NULL.
+     * is not running or the language is not set, the method will return NULL.
      * @param boolean $forceUpdate Set to TRUE if the language is set and want to 
      * reset it. The reset process depends on the attribute 
      * 'lang'. It can be send via 'get' request, 'post' request or a cookie. If 
@@ -585,7 +585,7 @@ class SessionManager implements JsonI{
     /**
      * Returns the user who is logged in.
      * @return User|NULL an object of type User. If the session is not started, 
-     * the function will return NULL.
+     * the method will return NULL.
      * @since 1.0
      */
     public function &getUser(){
@@ -652,8 +652,8 @@ class SessionManager implements JsonI{
     /**
      * Checks if the current session instance is the active one or not.
      * @return boolean If session is running and the stored session name is the same 
-     * as the session name in the instance, the function will return TRUE. Other than that, 
-     * the function will return FALSE.
+     * as the session name in the instance, the method will return TRUE. Other than that, 
+     * the method will return FALSE.
      * @since 1.8
      */
     public function isSessionActive(){
@@ -676,7 +676,7 @@ class SessionManager implements JsonI{
     }
     /**
      * Checks if session timeout time will be refreshed with every request or not. 
-     * This function must be called only after calling the function 'SessionManager::initSession()'. 
+     * This method must be called only after calling the method 'SessionManager::initSession()'. 
      * or it will throw an exception.
      * @return boolean TRUE If session timeout time will be refreshed with every request. 
      * FALSE if not.
@@ -703,7 +703,7 @@ class SessionManager implements JsonI{
         throw new Exception('Session is not running.');
     }
     /**
-     * The core function of the class. 
+     * The core method of the class. 
      * @param type $refresh
      * @param type $lifeTime
      * @param type $useDefaultLang
@@ -751,7 +751,7 @@ class SessionManager implements JsonI{
      * Validate session variables. Must be called after session is started.
      * @return boolean  If the variables 'started-at', 'resumed-at', 'lifetime', 
      * 'refresh', 'session-name' and 'ip-address' are 
-     * set, The function will return TRUE. Other than that, it will return 
+     * set, The method will return TRUE. Other than that, it will return 
      * FALSE.
      */
     private function _validateAttrs(){
@@ -885,7 +885,7 @@ class SessionManager implements JsonI{
     /**
      * Returns the ID of the session.
      * @return string The ID of the session. If the session is not active, 
-     * the function will return -1.
+     * the method will return -1.
      * @since 1.5
      */
     public function getID(){
@@ -925,8 +925,8 @@ class SessionManager implements JsonI{
      * Returns the time at which the session was resumed in (in seconds).
      * @return int The time at which the session was resumed in. If the session 
      * is new, this value will be the same as the session start time. If no 
-     * session is active, the function will return the constant 'PHP_SESSION_NONE'. 
-     * If sessions are disabled, the function will return the constant 'PHP_SESSION_DISABLED'.
+     * session is active, the method will return the constant 'PHP_SESSION_NONE'. 
+     * If sessions are disabled, the method will return the constant 'PHP_SESSION_DISABLED'.
      * @since 1.5
      */
     public function getResumTime(){
@@ -969,8 +969,8 @@ class SessionManager implements JsonI{
     /**
      * Returns the IP address at which the session was started running from.
      * @return string The IP address at which the session was started running from. If no 
-     * session is active, the function will return the constant 'PHP_SESSION_NONE'. 
-     * If sessions are disabled, the function will return the constant 'PHP_SESSION_DISABLED'.
+     * session is active, the method will return the constant 'PHP_SESSION_NONE'. 
+     * If sessions are disabled, the method will return the constant 'PHP_SESSION_DISABLED'.
      * @since 1.7
      */
     public function getStartIpAddress(){
@@ -986,7 +986,7 @@ class SessionManager implements JsonI{
      * @param string $name The name of the index at which the variable will 
      * be stored in.
      * @param mixed $value The value of the variable.
-     * @return boolean If the variable is set, the function will return TRUE. 
+     * @return boolean If the variable is set, the method will return TRUE. 
      * If not set, it will return FALSE.
      * @since 1.8.5
      */
@@ -1003,7 +1003,7 @@ class SessionManager implements JsonI{
      * @param string $varName The name of the variable.
      * @return mixed If the session is active and the value of the given variable 
      * is set, its value will be returned. If the session is not active or 
-     * the variable is not set, the function will return NULL.
+     * the variable is not set, the method will return NULL.
      * @since 1.8.5
      */
     public function getSessionVar($varName) {
@@ -1016,7 +1016,7 @@ class SessionManager implements JsonI{
     /**
      * Returns the array $_SESSTION of the session at which the session manager is managing.
      * @return array|NULL If the session is active, the array $_SESSION is returned. 
-     * If the session is not active, the function will return NULL.
+     * If the session is not active, the method will return NULL.
      * @since 1.8.5
      */
     public function getSesstionArray() {
@@ -1029,8 +1029,8 @@ class SessionManager implements JsonI{
     /**
      * Returns the time at which the session was started in (in seconds).
      * @return int The time at which the session was started in. If no 
-     * session is active, the function will return the constant 'PHP_SESSION_NONE'. 
-     * If sessions are disabled, the function will return the constant 'PHP_SESSION_DISABLED'.
+     * session is active, the method will return the constant 'PHP_SESSION_NONE'. 
+     * If sessions are disabled, the method will return the constant 'PHP_SESSION_DISABLED'.
      * @since 1.5
      */
     public function getStartTime(){
@@ -1062,8 +1062,8 @@ class SessionManager implements JsonI{
     /**
      * Returns the number of seconds that has been passed since session started.
      * @return int The number of seconds that has been passed since session started. If no 
-     * session is active, the function will return 0. 
-     * If sessions are disabled, the function will return 0.
+     * session is active, the method will return 0. 
+     * If sessions are disabled, the method will return 0.
      * @since 1.5
      */
     public function getPassedTime() {
@@ -1082,8 +1082,8 @@ class SessionManager implements JsonI{
     /**
      * Checks if the session has timed out or not.
      * @return boolean|int TRUE if the session has timed out. FALSE if not. If no 
-     * session is active, the function will return the constant 'PHP_SESSION_NONE'. 
-     * If sessions are disabled, the function will return the constant 'PHP_SESSION_DISABLED'.
+     * session is active, the method will return the constant 'PHP_SESSION_NONE'. 
+     * If sessions are disabled, the method will return the constant 'PHP_SESSION_DISABLED'.
      * @since 1.5
      */
     public function isTimeout(){
@@ -1108,7 +1108,7 @@ class SessionManager implements JsonI{
     /**
      * Checks if the session is resumed or not.
      * @return boolean TRUE if the session is resumed. If the session is 
-     * not resumed, or not running, the function will return FALSE.
+     * not resumed, or not running, the method will return FALSE.
      * @since 1.5
      */
     public function isResumed(){
@@ -1117,7 +1117,7 @@ class SessionManager implements JsonI{
     /**
      * Checks if the session is resumed or not.
      * @return boolean TRUE if the session is new. If the session is 
-     * not new, or not running, the function will return FALSE.
+     * not new, or not running, the method will return FALSE.
      * @since 1.8
      */
     public function isNew() {
@@ -1126,8 +1126,8 @@ class SessionManager implements JsonI{
     /**
      * Returns the ID of a session from a cookie given its name.
      * @param string $sessionName The name of the session.
-     * @return boolean|string If the ID is found, the function will return it. 
-     * If the session cookie was not found, the function will return FALSE.
+     * @return boolean|string If the ID is found, the method will return it. 
+     * If the session cookie was not found, the method will return FALSE.
      * @since 1.6
      */
     public static function getSessionIDFromCookie($sessionName) {
@@ -1139,7 +1139,7 @@ class SessionManager implements JsonI{
     }
     /**
      * Return session ID from session cookie, get or post parameter.
-     * @return string|boolean If session ID is found, the function will 
+     * @return string|boolean If session ID is found, the method will 
      * return it. Note that if it is in a cookie, the name of the cookie must 
      * be the name of the session in order to take the ID from it. If it is 
      * in GET or POST request, it must be in a parameter with the name 
@@ -1158,10 +1158,10 @@ class SessionManager implements JsonI{
     }
     /**
      * Checks if there exist a session with the given session name or not. If there 
-     * is a one and it is not timed out, the function will resume it.
+     * is a one and it is not timed out, the method will resume it.
      * @return boolean TRUE if there is a session with the given name 
      * and it is resumed. FALSE= otherwise. If the session is timed out, the 
-     * function will kill it.
+     * method will kill it.
      * @since 1.0
      */
     public function resume(){

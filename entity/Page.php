@@ -320,7 +320,7 @@ class Page{
     /**
      * Checks if the type of page will be dynamic or static.
      * @return boolean The method will return TRUE if document 
-     * type is dynamic. Otherwise, the function will return FALSE.
+     * type is dynamic. Otherwise, the method will return FALSE.
      * @since 1.6
      */
     public function isDynamicDoc() {
@@ -516,11 +516,11 @@ class Page{
         return $this->description;
     }
    /**
-    * Load the translation file based on the language code. The function uses 
+    * Load the translation file based on the language code. The method uses 
     * two checks to load the translation. If the page language is set using 
-    * the function Page::setLang(), then the language that will be loaded 
-    * will be based on the value returned by the function Page::getLang(). If 
-    * the language is not set, The function will throw an exception.
+    * the method Page::setLang(), then the language that will be loaded 
+    * will be based on the value returned by the method Page::getLang(). If 
+    * the language is not set, The method will throw an exception.
     * @since 1.0
     */
     public function usingLanguage(){
@@ -540,7 +540,7 @@ class Page{
      * @param string $new A two digit language code such as AR or EN. 
      * An exception will be thrown if the given language is not supported.
      * @return string|NULL Two digit language code. In case language is not set, the 
-     * function will return NULL
+     * method will return NULL
      * @see Page::setLang()
      * @throws Exception
      * @since 1.9
@@ -555,7 +555,7 @@ class Page{
     /**
      * Returns the language.
      * @return string|NULL Two digit language code. In case language is not set, the 
-     * function will return NULL
+     * method will return NULL
      * @since 1.0
      */
     public function getLang(){
@@ -587,7 +587,7 @@ class Page{
     /**
      * Loads and returns translation based on page language code.
      * @return Language|NULL An object of type Language is returned 
-     * if the language is loaded. Other than that, the function will return 
+     * if the language is loaded. Other than that, the method will return 
      * NULL.
      * @since 1.9
      */
@@ -604,8 +604,8 @@ class Page{
      * Returns the language variables based on loaded translation.
      * @return Language|NULL an object of type 'Language' if language 
      * is loaded. If no language found, 'NULL' is returned. This 
-     * function should be called after calling the function 'Page::loadTranslation()' in 
-     * order for the function to return non-null value.
+     * method should be called after calling the method 'Page::loadTranslation()' in 
+     * order for the method to return non-null value.
      * @since 1.6
      */
     public function &getLanguage() {
@@ -618,11 +618,11 @@ class Page{
     }
     /**
      * Loads or returns page theme.
-     * @param string [Optional] $name The name of the theme which will be 
+     * @param string $name The name of the theme which will be 
      * loaded. If NULL is given, nothing will be loaded.
-     * @return Theme|NULL If a theme is already loaded, the function will 
+     * @return Theme|NULL If a theme is already loaded, the method will 
      * return the loaded theme contained in an object of type Theme. If no 
-     * theme is loaded, the function will return NULL.
+     * theme is loaded, the method will return NULL.
      * @see Page::usingTheme()
      * @since 1.9
      */
@@ -635,13 +635,13 @@ class Page{
     }
     /**
      * Loads a theme given its name.
-     * @param string $themeName [Optional] The name of the theme as specified by the 
+     * @param string $themeName The name of the theme as specified by the 
      * variable 'name' in theme definition. If the given name is 'NULL', the 
-     * function will load the default theme as specified by the function 
+     * method will load the default theme as specified by the method 
      * 'SiteConfig::getBaseThemeName()'. Note that once the theme is updated, 
      * the document content of the page will reset if it was set before calling this 
-     * function.
-     * @throws Exception The function will throw 
+     * method.
+     * @throws Exception The method will throw 
      * an exception if no theme was found which has the given name. Another case is 
      * when the file 'theme.php' of the theme is missing. 
      * Finally, an exception will be thrown if theme component is not found.
@@ -692,7 +692,7 @@ class Page{
      * Returns the directory at which CSS files of loaded theme exists.
      * @return string The directory at which CSS files of the theme exists 
      * (e.g. 'publish/my-theme/css' ). 
-     * If the theme is not loaded, the function will return empty string.
+     * If the theme is not loaded, the method will return empty string.
      * @since 1.9
      */
     public static function cssDir(){
@@ -702,7 +702,7 @@ class Page{
      * Returns the directory at which CSS files of the theme exists.
      * @return string The directory at which CSS files of the theme exists 
      * (e.g. 'publish/my-theme/css' ). 
-     * If the theme is not loaded, the function will return empty string.
+     * If the theme is not loaded, the method will return empty string.
      * @since 1.6
      */
     public function getThemeCSSDir() {
@@ -716,7 +716,7 @@ class Page{
      * Returns the directory at which image files of loaded theme exists.
      * @return string The directory at which image files of the theme exists 
      * (e.g. 'publish/my-theme/images' ). 
-     * If the theme is not loaded, the function will return empty string.
+     * If the theme is not loaded, the method will return empty string.
      * @since 1.9
      */
     public static function imagesDir(){
@@ -726,7 +726,7 @@ class Page{
      * Returns the directory at which image files of the theme exists.
      * @return string The directory at which image files of the theme exists 
      * (e.g. 'publish/my-theme/images' ). 
-     * If the theme is not loaded, the function will return empty string.
+     * If the theme is not loaded, the method will return empty string.
      * @since 1.6
      */
     public function getThemeImagesDir() {
@@ -740,7 +740,7 @@ class Page{
      * Returns the directory at which JavaScript files of the theme exists.
      * @return string The directory at which JavaScript files of the theme exists 
      * (e.g. 'publish/my-theme/js' ). 
-     * If the theme is not loaded, the function will return empty string.
+     * If the theme is not loaded, the method will return empty string.
      * @since 1.9
      */
     public static function jsDir(){
@@ -750,7 +750,7 @@ class Page{
      * Returns the directory at which JavaScript files of the theme exists.
      * @return string The directory at which JavaScript files of the theme exists 
      * (e.g. 'publish/my-theme/js' ). 
-     * If the theme is not loaded, the function will return empty string.
+     * If the theme is not loaded, the method will return empty string.
      * @since 1.6
      */
     public function getThemeJSDir() {
@@ -761,9 +761,9 @@ class Page{
         return '';
     }
     /**
-     * Returns an object of type <b>Theme</b> that contains loaded theme information.
-     * @return Theme|NULL An object of type <b>Theme</b> that contains theme information. If the theme 
-     * is not loaded, the function will return <b>NULL</b>.
+     * Returns an object of type 'Theme' that contains loaded theme information.
+     * @return Theme|NULL An object of type Theme that contains theme information. If the theme 
+     * is not loaded, the method will return NULL.
      * @since 1.6
      */
     public function getTheme() {
@@ -773,7 +773,7 @@ class Page{
      * Sets or gets page writing direction.
      * @param string $new 'ltr' or 'rtl'.
      * @return string|NULL If the writing direction was set, 
-     * the function will return it. If not, the function will return NULL.
+     * the method will return it. If not, the method will return NULL.
      * @since 1.9
      */
     public static function dir($new=null) {
@@ -787,7 +787,7 @@ class Page{
     /**
      * Returns the writing direction of the page.
      * @return string|NULL 'ltr' or 'rtl'. If the writing direction is not set, 
-     * the function will return <b>NULL</b>
+     * the method will return NULL.
      * @since 1.0
      */
     public function getWritingDir(){
@@ -795,13 +795,13 @@ class Page{
     }
     /**
      * Sets the writing direction of the page.
-     * @param string $dir <b>Page::DIR_LTR</b> or <b>Page::DIR_RTL</b>.
+     * @param string $dir Page::DIR_LTR or Page::DIR_RTL.
      * @return boolean True if the direction was not set and its the first time to set. 
      * if it was set before, the method will return false.
-     * @throws Exception If the writing direction is not <b>Page::DIR_LTR</b> or <b>Page::DIR_RTL</b>.
+     * @throws Exception If the writing direction is not Page::DIR_LTR or Page::DIR_RTL.
      * @since 1.0
      */
-    function setWritingDir($dir='ltr'){
+    public function setWritingDir($dir='ltr'){
         $dirL = strtolower($dir);
         if($dirL == Language::DIR_LTR || $dirL == Language::DIR_RTL){
             $this->contentDir = $dirL;
@@ -813,8 +813,8 @@ class Page{
     }
     /**
      * Sets the property that is used to check if page has a header section or not.
-     * @param boolean $bool <b>TRUE</b> to include the header section. <b>FALSE</b> if 
-     * not. <b>HAS BUG</b>
+     * @param boolean $bool TRUE to include the header section. FALSE if 
+     * not.
      * @since 1.2
      */
     public function setHasHeader($bool){
@@ -836,7 +836,12 @@ class Page{
             $this->incHeader = $bool;
         }
     }
-    
+    /**
+     * Sets the property that is used to check if page has an aside section or not.
+     * @param boolean $bool TRUE to include aside section. FALSE if 
+     * not.
+     * @since 1.2
+     */
     public function setHasAside($bool){
         if(gettype($bool) == 'boolean'){
             if($this->incAside == FALSE && $bool == TRUE){
@@ -854,8 +859,8 @@ class Page{
 
     /**
      * Sets the property that is used to check if page has a footer section or not.
-     * @param boolean $bool <b>TRUE</b> to include the footer section. <b>FALSE</b> if 
-     * not. <b>HAS BUG</b>
+     * @param boolean $bool TRUE to include the footer section. FALSE if 
+     * not.
      * @since 1.2
      */
     public function setHasFooter($bool){
@@ -874,10 +879,10 @@ class Page{
     }
     /**
      * Sets or checks if the page will have aside area or not.
-     * @param boolean|NULL $bool [Optional] If set to TRUE, the generated page 
+     * @param boolean|NULL $bool If set to TRUE, the generated page 
      * will have a 'div' element with ID = 'side-content-area'. If set to 
      * FALSE, the generated page will have no such element.
-     * @return boolean The function will return TRUE if the page will have 
+     * @return boolean The method will return TRUE if the page will have 
      * aside area.
      */
     public static function aside($bool=null) {
@@ -889,10 +894,10 @@ class Page{
     }
     /**
      * Sets or checks if the page will have footer area or not.
-     * @param boolean|NULL $bool [Optional] If set to TRUE, the generated page 
+     * @param boolean|NULL $bool If set to TRUE, the generated page 
      * will have a 'div' element with ID = 'page-footer'. If set to 
      * FALSE, the generated page will have no such element.
-     * @return boolean The function will return TRUE if the page will have 
+     * @return boolean The method will return TRUE if the page will have 
      * footer area.
      */
     public static function footer($bool=null) {
@@ -904,10 +909,10 @@ class Page{
     }
     /**
      * Sets or checks if the page will have header area or not.
-     * @param boolean|NULL $bool [Optional] If set to TRUE, the generated page 
+     * @param boolean|NULL $bool If set to TRUE, the generated page 
      * will have a 'div' element with ID = 'page-header'. If set to 
      * FALSE, the generated page will have no such element.
-     * @return boolean The function will return TRUE if the page will have 
+     * @return boolean The method will return TRUE if the page will have 
      * header area.
      */
     public static function header($bool=null) {
@@ -919,7 +924,7 @@ class Page{
     }
     /**
      * Checks if the page will have a footer section or not.
-     * @return boolean <b>TRUE</b> if the page has a footer section.
+     * @return boolean TRUE if the page has a footer section.
      * @since 1.2
      */
     public function hasFooter(){
@@ -927,7 +932,7 @@ class Page{
     }
     /**
      * Checks if the page will have a header section or not.
-     * @return boolean <b>TRUE</b> if the page has a header section.
+     * @return boolean TRUE if the page has a header section.
      * @since 1.2
      */
     public function hasHeader(){
@@ -935,7 +940,7 @@ class Page{
     }
     /**
      * Checks if the page will have an aside section or not.
-     * @return boolean <b>TRUE</b> if the page has an aside section.
+     * @return boolean TRUE if the page has an aside section.
      * @since 1.6
      */
     public function hasAside() {

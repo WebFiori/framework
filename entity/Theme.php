@@ -168,8 +168,8 @@ abstract class Theme implements JsonI{
     /**
      * Returns the base URL that will be used by the theme.
      * The URL is used by the HTML tag 'base' to fetch page resources. 
-     * If the URL is not set by the developer, the function will return the 
-     * URL that is returned by the function SiteConfig::getBaseURL().
+     * If the URL is not set by the developer, the method will return the 
+     * URL that is returned by the method SiteConfig::getBaseURL().
      * @return string The base URL that will be used by the theme.
      */
     public function getBaseURL(){
@@ -242,12 +242,12 @@ abstract class Theme implements JsonI{
     }
     /**
      * Loads a theme given its name.
-     * If the given name is NULL, the function will load the default theme as 
-     * specified by the function SiteConfig::getBaseThemeName().
+     * If the given name is NULL, the method will load the default theme as 
+     * specified by the method SiteConfig::getBaseThemeName().
      * @param string $themeName The name of the theme. 
-     * @return Theme The function will return an object of type Theme once the 
+     * @return Theme The method will return an object of type Theme once the 
      * theme is loaded. The object will contain all theme information.
-     * @throws Exception The function will throw 
+     * @throws Exception The method will throw 
      * an exception if no theme was found which has the given name.
      * @since 1.0
      */
@@ -351,8 +351,8 @@ abstract class Theme implements JsonI{
         Logger::logFuncReturn(__METHOD__);
     }
     /**
-     * Fire the callback function.
-     * This function must not be used by the developers. It is called automatically 
+     * Fire the callback function which should be called before loading the theme.
+     * This method must not be used by the developers. It is called automatically 
      * when the theme is being loaded.
      * @since 1.2.1
      */
@@ -363,8 +363,8 @@ abstract class Theme implements JsonI{
         Logger::logFuncReturn(__METHOD__);
     }
     /**
-     * Fire the callback function.
-     * This function must not be used by the developers. It is called automatically 
+     * Fire the callback function which should be called after loading the theme.
+     * This method must not be used by the developers. It is called automatically 
      * when the theme is loaded.
      * @since 1.0
      */
@@ -378,7 +378,7 @@ abstract class Theme implements JsonI{
     /**
      * Checks if a theme is loaded or not given its name.
      * @param string $themeName The name of the theme.
-     * @return boolean The function will return TRUE if 
+     * @return boolean The method will return TRUE if 
      * the theme was found in the array of loaded themes. FALSE
      * if not.
      * @since 1.0
@@ -388,7 +388,7 @@ abstract class Theme implements JsonI{
     }
     /**
      * Returns an array that contains the meta data of all available themes. 
-     * This function will return an associative array. The key is the theme 
+     * This method will return an associative array. The key is the theme 
      * name and the value is an object of type Theme that contains theme info.
      * @return array An associative array that contains all themes information.
      * @since 1.1 
@@ -437,7 +437,7 @@ abstract class Theme implements JsonI{
     }
     /**
      * Returns the name of the theme.
-     * If the name is not set, the function will return empty string.
+     * If the name is not set, the method will return empty string.
      * @return string The name of the theme.
      * @since 1.0
      */
@@ -598,7 +598,7 @@ abstract class Theme implements JsonI{
     /**
      * Returns the name of the directory where all theme files are kept.
      * @return string The name of the directory where all theme files are kept. 
-     * If it is not set, the function will return empty string.
+     * If it is not set, the method will return empty string.
      * @since 1.0
      */
     public function getDirectoryName() {
@@ -626,7 +626,7 @@ abstract class Theme implements JsonI{
     /**
      * Returns the name of the directory where theme images are kept.
      * @return string The name of the directory where theme images are kept. If 
-     * the name of the directory was not set by the function <b>Theme::setImagesDirName()</b>, 
+     * the name of the directory was not set by the method Theme::setImagesDirName(), 
      * then the returned value will be 'images'.
      * @since 1.0
      */
@@ -655,7 +655,7 @@ abstract class Theme implements JsonI{
     /**
      * Returns the name of the directory where JavaScript files are kept.
      * @return string The name of the directory where theme JavaScript files kept. If 
-     * the name of the directory was not set by the function <b>Theme::setJsDirName()</b>, 
+     * the name of the directory was not set by the method Theme::setJsDirName(), 
      * then the returned value will be 'js'.
      * @since 1.0
      */
@@ -684,7 +684,7 @@ abstract class Theme implements JsonI{
     /**
      * Returns the name of the directory where CSS files are kept.
      * @return string The name of the directory where theme CSS files kept. If 
-     * the name of the directory was not set by the function <b>Theme::setCssDirName()</b>, 
+     * the name of the directory was not set by the method Theme::setCssDirName(), 
      * then the returned value will be 'css'.
      * @since 1.0
      */
@@ -703,7 +703,7 @@ abstract class Theme implements JsonI{
      * Returns theme version number.
      * @return string theme version number. The format if the version number 
      * is 'x.x.x' where 'x' can be any number. If it is not set, the 
-     * function will return '1.0.0'
+     * method will return '1.0.0'
      * @since 1.1
      */
     public function getVersion() {
@@ -712,7 +712,7 @@ abstract class Theme implements JsonI{
     /**
      * Returns the name of theme author.
      * @return string The name of theme author. If author name is not set, the 
-     * function will return empty string.
+     * method will return empty string.
      * @since 1.1
      */
     public function getAuthor() {
@@ -721,7 +721,7 @@ abstract class Theme implements JsonI{
     /**
      * Returns the name of theme license.
      * @return string The name of theme license. If it is not set, 
-     * the function will return empty string.
+     * the method will return empty string.
      */
     public function getLicenseName() {
         return $this->themeMeta['license'];
@@ -729,7 +729,7 @@ abstract class Theme implements JsonI{
     /**
      * Returns a URL which should contain a full version of theme license.
      * @return string A URL which contain a full version of theme license. 
-     * If it is not set, the function will return empty string.
+     * If it is not set, the method will return empty string.
      * @since 1.1
      */
     public function getLicenseUrl(){
@@ -738,7 +738,7 @@ abstract class Theme implements JsonI{
     /**
      * Returns the URL which takes the users to author's web site.
      * @return string The URL which takes users to author's web site. 
-     * If author URL is not set, the function will return empty string.
+     * If author URL is not set, the method will return empty string.
      * @since 1.1
      */
     public function getAuthorUrl() {
@@ -748,7 +748,7 @@ abstract class Theme implements JsonI{
      * Returns A URL which should point to theme web site.
      * @return string A URL which should point to theme web site. Usually, 
      * this one is the same as author URL.
-     * If it is not set, the function will return empty string.
+     * If it is not set, the method will return empty string.
      * @since 1.1
      */
     public function getUrl() {
@@ -757,7 +757,7 @@ abstract class Theme implements JsonI{
     /**
      * Returns the description of the theme.
      * @return string The description of the theme. If the description is not 
-     * set, the function will return empty string.
+     * set, the method will return empty string.
      * @since 1.1
      */
     public function getDescription() {
@@ -795,8 +795,8 @@ abstract class Theme implements JsonI{
     }
     /**
      * Returns an object of type HeadNode that represents HTML &lt;head&gt; node. 
-     * The developer must implement this function such that it returns an 
-     * object of type HeadNode. The developer can use this function to include 
+     * The developer must implement this method such that it returns an 
+     * object of type HeadNode. The developer can use this method to include 
      * any JavaScript or CSS files that the page needs. Also, it can be used to 
      * add custom meta tags to &lt;head&gt; node or any tag that can be added 
      * to the node.
@@ -806,37 +806,37 @@ abstract class Theme implements JsonI{
     public abstract function getHeadNode();
     /**
      * Returns an object of type HTMLNode that represents header section of the page. 
-     * The developer must implement this function such that it returns an 
+     * The developer must implement this method such that it returns an 
      * object of type HTMLNode. Header section of the page usually include a 
      * main navigation icon, web site name and web site logo. More complex 
      * layout can include other things such as a search bar, notifications 
      * area and user profile picture. If the page does not have a header 
-     * section, the developer can make this function return NULL.
+     * section, the developer can make this method return NULL.
      * @return HTMLNode|NULL An object of type HTMLNode. If the theme has no header 
-     * section, the function might return NULL.
+     * section, the method might return NULL.
      * @since 1.2.2
      */
     public abstract function getHeadrNode();
     /**
      * Returns an object of type HTMLNode that represents footer section of the page. 
-     * The developer must implement this function such that it returns an 
+     * The developer must implement this method such that it returns an 
      * object of type HTMLNode. Footer section of the page usually include links 
      * to social media profiles, about us page and site map. In addition, 
      * it might contain copyright notice and contact information. More complex 
      * layouts can have more items in the footer.
      * @return HTMLNode An object of type HTMLNode. If the theme has no footer 
-     * section, the function might return NULL.
+     * section, the method might return NULL.
      * @since 1.2.2
      */
     public abstract function getFooterNode();
     /**
      * Returns an object of type HTMLNode that represents aside section of the page. 
-     * The developer must implement this function such that it returns an 
+     * The developer must implement this method such that it returns an 
      * object of type HTMLNode. Aside section of the page most of the time 
      * contains advertisements. Sometimes, it can contain aside menu for 
      * the web site or widgets.
      * @return HTMLNode An object of type HTMLNode. If the theme has no aside 
-     * section, the function might return NULL.
+     * section, the method might return NULL.
      * @since 1.2.2
      */
     public abstract function getAsideNode();

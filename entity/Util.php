@@ -155,7 +155,7 @@ class Util{
     /**
      * Returns HTTP request headers.
      * This method will try to extract request headers using two ways, 
-     * first, it will check if the function 'apache_request_headers()' is 
+     * first, it will check if the method 'apache_request_headers()' is 
      * exist or not. If it does, then request headers will be taken from 
      * there. If it does not exist, it will try to extract request headers 
      * from the super global $_SERVER.
@@ -320,7 +320,7 @@ class Util{
                     }
                 }
                 else{
-                    Logger::log('The function \'Config::isConfig()\' returned FALSE or the core is still initializing.', 'warning');
+                    Logger::log('The method \'Config::isConfig()\' returned FALSE or the core is still initializing.', 'warning');
                     $returnValue = Util::NEED_CONF;
                 }
             }

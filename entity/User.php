@@ -117,7 +117,7 @@ class User implements JsonI{
      * @param string $privilegeId The ID of the privilege. It must be exist in 
      * the class 'Access' or it won't be added. If the privilege is already 
      * added, It will be not added again. 
-     * @return boolean The function will return TRUE if the privilege is 
+     * @return boolean The method will return TRUE if the privilege is 
      * added. FALSE if not.
      * @since 1.7
      */
@@ -137,8 +137,8 @@ class User implements JsonI{
     /**
      * Removes a privilege from user privileges array given its ID.
      * @param string $privilegeId The ID of the privilege.
-     * @return boolean If the privilege is removed, the function will 
-     * return TRUE. Other than that, the function will return FALSE.
+     * @return boolean If the privilege is removed, the method will 
+     * return TRUE. Other than that, the method will return FALSE.
      * @since 1.7.1
      */
     public function removePrivilege($privilegeId) {
@@ -171,7 +171,7 @@ class User implements JsonI{
     /**
      * Checks if the user belongs to a user group given its ID.
      * @param string $groupId The ID of the group.
-     * @return boolean The function will return TRUE if the user belongs 
+     * @return boolean The method will return TRUE if the user belongs 
      * to the users group. The user will be considered a part of the group 
      * only if he has all the permissions in the group.
      * @since 1.7
@@ -198,7 +198,7 @@ class User implements JsonI{
     /**
      * Checks if a user has privilege or not given its ID.
      * @param string $privilegeId The ID of the privilege.
-     * @return boolean The function will return TRUE if the user has the given 
+     * @return boolean The method will return TRUE if the user has the given 
      * privilege. FALSE if not.
      * @since 1.7
      */
@@ -211,7 +211,7 @@ class User implements JsonI{
         return FALSE;
     }
     /**
-     * Returns the value of the property <b>$lastLogin</b>.
+     * Returns the value of the property '$lastLogin'.
      * @return string Last login date.
      * @since 1.4
      */
@@ -219,7 +219,7 @@ class User implements JsonI{
         return $this->lastLogin;
     }
     /**
-     * Returns the value of the property <b>$regDate</b>.
+     * Returns the value of the property '$regDate'.
      * @param string $date Registration date.
      * @since 1.4
      */
@@ -229,7 +229,7 @@ class User implements JsonI{
     /**
      * Returns the date at which user password was reseted.
      * @return string|NULL the date at which user password was reseted. 
-     * If not set, the function will return <b>NULL</b>.
+     * If not set, the method will return NULL.
      * @since 1.6
      */
     public function getLastPasswordResetDate() {
@@ -274,7 +274,7 @@ class User implements JsonI{
         $this->lastLogin = $date;
     }
     /**
-     * Sets the value of the property <b>$regDate</b>.
+     * Sets the value of the property '$regDate'.
      * @param string $date Registration date.
      * @since 1.4
      */
@@ -347,7 +347,7 @@ class User implements JsonI{
         $this->password = $password;
     }
     /**
-     * Sets the value of the property <b>$email</b>.
+     * Sets the value of the property '$email'.
      * @param string $email The email to set.
      * @since 1.0
      */
@@ -355,24 +355,24 @@ class User implements JsonI{
         $this->email = $email;
     }
     /**
-     * Returns the value of the property <b>$userName</b>.
-     * @return string The value of the property <b>$userName</b>.
+     * Returns the value of the property '$userName'.
+     * @return string The value of the property '$userName'.
      * @since 1.0
      */
     function getUserName(){
         return $this->userName;
     }
     /**
-     * Returns the value of the property <b>$password</b>.
-     * @return string The value of the property <b>$password</b>.
+     * Returns the value of the property '$password'.
+     * @return string The value of the property '$password'.
      * @since 1.0
      */
     function getPassword(){
         return $this->password;
     }
     /**
-     * Returns the value of the property <b>$email</b>.
-     * @return string The value of the property <b>$email</b>.
+     * Returns the value of the property '$email'.
+     * @return string The value of the property '$email'.
      * @since 1.0
      */
     function getEmail(){

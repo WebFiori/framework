@@ -42,11 +42,10 @@ if(!defined('ROOT_DIR')){
         . '</html>');
 }
 use webfiori\entity\Logger;
-use webfiori\WebFiori;
 use webfiori\entity\FileHandler;
 use webfiori\SiteConfig;
 /**
- * A class that can be used to modify basic settings of the website and 
+ * A class that can be used to modify basic settings of the web site and 
  * save them to the file 'SiteConfig.php'
  *
  * @author Ibrahim
@@ -115,7 +114,7 @@ class WebsiteFunctions extends Functions{
     }
     /**
      * Creates new instance of the class.
-     * It is not recommended to use this function. Instead, 
+     * It is not recommended to use this method. Instead, 
      * use WebsiteFunctions::get().
      */
     public function __construct() {
@@ -217,7 +216,7 @@ class WebsiteFunctions extends Functions{
         return $cfgArr;
     }
     /**
-     * A function to save changes to web site configuration file.
+     * A method to save changes to web site configuration file.
      * @param array $configArr An array that contains system configuration 
      * variables.
      * @since 1.0
@@ -407,7 +406,7 @@ class WebsiteFunctions extends Functions{
     }
     /**
      * Returns the base URL that is used to fetch resources.
-     * The return value of this function is usually used by the tag \'base\' 
+     * The return value of this method is usually used by the tag \'base\' 
      * of web site pages.
      * @return string the base URL.
      * @since 1.0
@@ -435,7 +434,7 @@ class WebsiteFunctions extends Functions{
     }
     /**
      * Returns the character (or string) that is used to separate page title from website name.
-     * @return string A string such as \' - \' or \' | \'. Note that the function 
+     * @return string A string such as \' - \' or \' | \'. Note that the method 
      * will add the two spaces by default.
      * @since 1.0
      */

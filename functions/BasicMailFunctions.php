@@ -47,7 +47,7 @@ use webfiori\entity\FileHandler;
 use webfiori\entity\mail\SMTPAccount;
 use webfiori\entity\mail\SocketMailer;
 /**
- * A class for the functions that is related to mailing.
+ * A class for the methods that is related to mailing.
  *
  * @author Ibrahim
  * @version 1.3
@@ -107,7 +107,7 @@ class BasicMailFunctions extends Functions{
         Logger::logFuncReturn(__METHOD__);
     }
     /**
-     * A function to save changes to mail configuration file.
+     * A method to save changes to mail configuration file.
      * @param type $emailAccountsArr An array that contains an objects of 
      * type 'EmailAccount'. 
      * @since 1.1
@@ -154,7 +154,7 @@ class BasicMailFunctions extends Functions{
     private static $inst;
     /**
      * Returnd a singleton instance of the class.
-     * Calling this function multiple times will result in returning 
+     * Calling this method multiple times will result in returning 
      * the same instance every time.
      * @return MailConfig
      * @since 1.0
@@ -185,7 +185,7 @@ class BasicMailFunctions extends Functions{
         $fh->reduceTab();
         $fh->write('/**
      * Adds an email account.
-     * The developer can use this function to add new account during runtime. 
+     * The developer can use this method to add new account during runtime. 
      * The account will be removed once the program finishes.
      * @param EmailAccount $acc an object of type EmailAccount.
      * @param string $name A name to associate with the email account.
@@ -203,12 +203,12 @@ class BasicMailFunctions extends Functions{
     }
     /**
      * Returns an email account given its name.
-     * The function will search for an account with the given name in the set 
+     * The method will search for an account with the given name in the set 
      * of added accounts. If no account was found, NULL is returned.
      * @param string $name The name of the account.
-     * @return EmailAccount|null If the account is found, The function 
+     * @return EmailAccount|null If the account is found, The method 
      * will return an object of type EmailAccount. Else, the 
-     * function will return NULL.
+     * method will return NULL.
      * @since 1.0
      */
     public static function &getAccount($name){
@@ -235,8 +235,8 @@ class BasicMailFunctions extends Functions{
      * Removes SMTP email account if it is exist.
      * @param string $accountName The name of the email account (such as 'no-replay').
      * @return boolean If the account is not exist or the class 'MailConfig' 
-     * does not exist, the function will return FALSE. If the account was removed, 
-     * The function will return TRUE.
+     * does not exist, the method will return FALSE. If the account was removed, 
+     * The method will return TRUE.
      * @since 1.3
      */
     public function removeAccount($accountName) {
@@ -262,11 +262,11 @@ class BasicMailFunctions extends Functions{
     /**
      * Adds new SMTP account or Updates an existing one.
      * @param SMTPAccount $emailAccount An instance of 'EmailAccount'.
-     * @return boolean|string The function will return TRUE if the email 
+     * @return boolean|string The method will return TRUE if the email 
      * account was updated or added. If the email account contains wrong server
-     *  information, the function will return MailFunctions::INV_HOST_OR_PORT. 
-     * If the given email account contains wrong login info, the function will 
-     * return MailFunctions::INV_CREDENTIALS. Other than that, the function 
+     *  information, the method will return MailFunctions::INV_HOST_OR_PORT. 
+     * If the given email account contains wrong login info, the method will 
+     * return MailFunctions::INV_CREDENTIALS. Other than that, the method 
      * will return FALSE.
      * @since 1.1
      */
@@ -299,14 +299,14 @@ class BasicMailFunctions extends Functions{
     }
     /**
      * Returns a new instance of the class SocketMailer.
-     * The function will try to establish a connection to SMTP server using 
+     * The method will try to establish a connection to SMTP server using 
      * the given SMTP account.
      * @param SMTPAccount $emailAcc An account that is used to initiate 
      * socket mailer.
-     * @return SocketMailer|string The function will return an instance of SocketMailer
-     * on successful connection. If no connection is established, the function will 
+     * @return SocketMailer|string The method will return an instance of SocketMailer
+     * on successful connection. If no connection is established, the method will 
      * return MailFunctions::INV_HOST_OR_PORT. If user authentication fails, 
-     * the function will return 'MailFunctions::INV_CREDENTIALS'.
+     * the method will return 'MailFunctions::INV_CREDENTIALS'.
      * @since 1.0
      */
     public function getSocketMailer($emailAcc){

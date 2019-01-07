@@ -109,7 +109,7 @@ class UsersGroup implements JsonI{
     /**
      * Checks if the group has the given privilege or not.
      * @param Privilege $p An object of type 'Privilige'.
-     * @return boolean The function will return TRUE if the group has the given 
+     * @return boolean The method will return TRUE if the group has the given 
      * privilege. FALSE if not.
      * @since 1.0
      */
@@ -144,7 +144,7 @@ class UsersGroup implements JsonI{
      * @param Privilege $pr An object of type Privilege. Note that 
      * the privilege will be added only if there us no privilege in 
      * the group which has the same ID.
-     * @return boolean The function will return TRUE if the privilege was 
+     * @return boolean The method will return TRUE if the privilege was 
      * added.
      * @since 1.0
      */

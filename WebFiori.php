@@ -1,9 +1,33 @@
 <?php
+/*
+ * The MIT License
+ *
+ * Copyright 2018 ibrah.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 namespace webfiori;
 use webfiori\entity\AutoLoader;
 use webfiori\entity\Logger;
 use webfiori\entity\Util;
 use webfiori\entity\mail\SMTPAccount;
+use webfiori\entity\InitPermissions;
 use webfiori\functions\SystemFunctions;
 use webfiori\functions\WebsiteFunctions;
 use webfiori\functions\BasicMailFunctions;
@@ -269,12 +293,12 @@ class WebFiori{
     }
     /**
      * Returns the current status of the system.
-     * @return boolean|string If the system is configured correctly, the function 
-     * will return TRUE. If the file 'Config.php' was not found, The function will return 
-     * 'Util::MISSING_CONF_FILE'. If the file 'SiteConfig.php' was not found, The function will return 
-     * 'Util::MISSING_CONF_FILE'. If the system is not configured yet, the function 
+     * @return boolean|string If the system is configured correctly, the method 
+     * will return TRUE. If the file 'Config.php' was not found, The method will return 
+     * 'Util::MISSING_CONF_FILE'. If the file 'SiteConfig.php' was not found, The method will return 
+     * 'Util::MISSING_CONF_FILE'. If the system is not configured yet, the method 
      * will return 'Util::NEED_CONF'. If the system is unable to connect to 
-     * the database, the function will return 'Util::DB_NEED_CONF'.
+     * the database, the method will return 'Util::DB_NEED_CONF'.
      * @since 1.0
      */
     public static function sysStatus(){
@@ -329,9 +353,9 @@ class WebFiori{
         Logger::logFuncReturn(__METHOD__);
     }
     /**
-     * This function is called when the status of the system does not equal 
+     * This method is called when the status of the system does not equal 
      * to TRUE. It is used to configure some of the basic settings in case 
-     * of first use. Modify the content of this function as needed.
+     * of first use. Modify the content of this method as needed.
      * @since 1.0
      */
     public function firstUse(){
@@ -356,7 +380,7 @@ class WebFiori{
             //initialize database
             $this->initDatabase();
             
-            //once configuration is finished, call the function SystemFunctions::configured()
+            //once configuration is finished, call the method SystemFunctions::configured()
             $this->SF->configured();
 
             //do not remove next lines of code.
@@ -391,7 +415,7 @@ class WebFiori{
     }
     /**
      * Updates basic settings of the web site.
-     * This function can be used to update the settings which is saved in the 
+     * This method can be used to update the settings which is saved in the 
      * file 'SiteConfig.php'. The settings include:
      * <ul>
      * <li>Base URL of the web site.</li>
@@ -403,11 +427,11 @@ class WebFiori{
      * <li>The character or string that is used to separate the name of the web 
      * site from page title.</li>
      * </ul>
-     * The developer does not have to call this function manually. It will be 
+     * The developer does not have to call this method manually. It will be 
      * called only if it is the first run for the system.
      * @since 1.1
      */
-    private function initWebsiteAttributes() {
+    public function initWebsiteAttributes() {
         Logger::logFuncCall(__METHOD__, 'initialization-log');
         if(self::getClassStatus()== 'INITIALIZING'){
             $siteInfoArr = $this->WF->getSiteConfigVars();
@@ -448,8 +472,8 @@ class WebFiori{
             $dbPass = '';
             $dbName = '';
             $dbPort = '3306';
-
-            if($this->SF->updateDBAttributes($dbHost, $dbUser, $dbPass, $dbName, $dbPort) === TRUE){
+            $connResult = $this->SF->updateDBAttributes($dbHost, $dbUser, $dbPass, $dbName, $dbPort);
+            if($connResult === TRUE){
 
                 //since this is the first use, we need to initialize database schema.
                 //If schema already created, this step can be skipped.
@@ -470,26 +494,26 @@ class WebFiori{
             }
             else{
                 Logger::log('Initialization faild.', 'error','initialization-log');
-                $dbLink = $this->SF->getDBLink();
                 Logger::requestCompleted();
                 header('HTTP/1.1 503 Service Unavailable');
-                die($dbLink->toJSON().'');
+                $j = new JsonX();
+                $j->add('message', 'Database Error.');
+                $j->add('details', $connResult);
+                die($j);
             }
         }
     }
     /**
-     * Initialize access control class.
+     * Initialize user groups and permissions.
+     * This method will call the method InitPermissions::init() to initialize  
+     * user groups and privileges.
      * @since 1.3.1
      */
-    private function initPermissions(){
+    public function initPermissions(){
         Logger::logFuncCall(__METHOD__);
-        
-        //create new group.
-        //$AD = 'ADMIN_GROUP';
-        //Access::newGroup($AD);
-        //add permissions to the group.
-        //Access::newPrivilege($AD, 'LOGIN');
-        
+        if(self::getClassStatus() == 'INITIALIZING'){
+            InitPermissions::init();
+        }
         Logger::logFuncReturn(__METHOD__);
     }
     /**
@@ -525,8 +549,8 @@ class WebFiori{
             . '</p>'
             . '<ul>'
             . '<li>Open the file \'WebFiori.php\' in any editor.</li>'
-            . '<li>Inside the class \'WebFiori\', go to the body of the function \'firstUse()\'.</li>'
-            . '<li>Modify the body of the function as instructed.</li>'
+            . '<li>Inside the class \'WebFiori\', go to the body of the method \'firstUse()\'.</li>'
+            . '<li>Modify the body of the method as instructed.</li>'
             . '</ul>'
             . '<p>'
             . 'Once you do that, you are ready to go and use the system.'
@@ -550,8 +574,8 @@ class WebFiori{
             . '</p>'
             . '<ul>'
             . '<li>Open the file \'WebFiori.php\' in any editor.</li>'
-            . '<li>Inside the class \'WebFiori\', go to the body of the function \'firstUse()\'.</li>'
-            . '<li>Modify the body of the function as instructed.</li>'
+            . '<li>Inside the class \'WebFiori\', go to the body of the method \'firstUse()\'.</li>'
+            . '<li>Modify the body of the method as instructed.</li>'
             . '</ul>'
             . '<p>'
             . 'Once you do that, you are ready to go and use the system.'

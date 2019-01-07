@@ -25,8 +25,8 @@
  */
 namespace webfiori\functions;
 use webfiori\entity\Logger;
-use webfiori\WebFiori;
 use webfiori\entity\FileHandler;
+use webfiori\entity\DBConnectionFactory;
 use webfiori\Config;
 use Exception;
 if(!defined('ROOT_DIR')){
@@ -144,7 +144,7 @@ class SystemFunctions extends Functions{
     }
     /**
      * Creates new instance of the class.
-     * It is not recommended to use this function. Instead, 
+     * It is not recommended to use this method. Instead, 
      * use SystemFunctions::get().
      */
     public function __construct() {
@@ -158,8 +158,8 @@ class SystemFunctions extends Functions{
      * @param string $dbPass The password of the database user.
      * @param string $dbName The name of database schema.
      * @param int $dbPort Port number of database server.
-     * @return boolean|string The function will return TRUE in case 
-     * of valid database attributes. Also the function will return 
+     * @return boolean|string The method will return TRUE in case 
+     * of valid database attributes. Also the method will return 
      * DBConnectionFactory::DB_CONNECTION_ERR in case the connection was not 
      * established.
      * @since 1.0
@@ -171,7 +171,7 @@ class SystemFunctions extends Functions{
             'host'=>$dbHost,
             'pass'=>$dbPass,
             'db-name'=>$dbName,
-            'db-port'=>$dbPort
+            'port'=>$dbPort
         ));
         if($r === TRUE){
             $configVars = $this->getConfigVars();
@@ -183,7 +183,7 @@ class SystemFunctions extends Functions{
             $this->writeConfig($configVars);
         }
         else{
-            Logger::log('The database connect function did not return TRUE.', 'warning');
+            Logger::log('The database connect method did not return TRUE.', 'warning');
         }
         Logger::logReturnValue($r);
         Logger::logFuncReturn(__METHOD__);
@@ -191,7 +191,7 @@ class SystemFunctions extends Functions{
     }
     /**
      * Updates system configuration status.
-     * This function is useful when the developer would like to create some 
+     * This method is useful when the developer would like to create some 
      * kind of a setup wizard for his web application.
      * @param boolean $isConfig TRUE to set system as configured. 
      * FALSE to make it not configured.
@@ -238,7 +238,7 @@ class SystemFunctions extends Functions{
         return $cfgArr;
     }
     /**
-     * A function to save changes to configuration file.
+     * A method to save changes to configuration file.
      * @param type $configArr An array that contains system configuration 
      * variables.
      * @since 1.0
@@ -271,9 +271,10 @@ class SystemFunctions extends Functions{
         . \'</html>\');
 }', TRUE, TRUE);
         $fh->write('/**
- * Global configuration class. Used by the server part and the presentation part.
+ * Global configuration class. 
+ * Used by the server part and the presentation part.
  * Do not modify this file manually unless you know what you are doing.
- * @author Ibrahim <ibinshikh@hotmail.com>
+ * @author Ibrahim
  * @version 1.5
  */', TRUE, TRUE);
         $fh->write('class Config{', TRUE, TRUE);
@@ -491,9 +492,9 @@ class SystemFunctions extends Functions{
     }
     /**
      * Checks if the application setup is completed or not.
-     * Note that the function will throw an exception in case one of the 3 main 
+     * Note that the method will throw an exception in case one of the 3 main 
      * configuration files is missing.
-     * @return boolean If the system is configured, the function will return 
+     * @return boolean If the system is configured, the method will return 
      * TRUE. If it is not configured, It will return FALSE.
      * @throws Exception If one of configuration files is missing.
      * @since 1.0

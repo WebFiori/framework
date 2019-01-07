@@ -18,9 +18,10 @@ if(!defined('ROOT_DIR')){
         . '</html>');
 }
 /**
- * Global configuration class. Used by the server part and the presentation part.
+ * Global configuration class. 
+ * Used by the server part and the presentation part.
  * Do not modify this file manually unless you know what you are doing.
- * @author Ibrahim <ibinshikh@hotmail.com>
+ * @author Ibrahim
  * @version 1.5
  */
 class Config{
@@ -88,10 +89,10 @@ class Config{
      * Initialize configuration.
      */
     private function __construct() {
-        $this->isConfigured = TRUE;
+        $this->isConfigured = FALSE;
         $this->releaseDate = '01-01-2019 (DD-MM-YYYY)';
         $this->version = '1.0.1';
-        $this->versionType = 'Beta';
+        $this->versionType = 'Stable';
         $this->configVision = '1.3.2';
         $this->dbHost = 'localhost';
         $this->dbUser = '';

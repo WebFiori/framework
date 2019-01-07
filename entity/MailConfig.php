@@ -35,7 +35,7 @@ class MailConfig{
     private static $inst;
     /**
      * Returnd a singleton instance of the class.
-     * Calling this function multiple times will result in returning 
+     * Calling this method multiple times will result in returning 
      * the same instance every time.
      * @return MailConfig
      * @since 1.0
@@ -50,7 +50,7 @@ class MailConfig{
     }
 /**
      * Adds an email account.
-     * The developer can use this function to add new account during runtime. 
+     * The developer can use this method to add new account during runtime. 
      * The account will be removed once the program finishes.
      * @param EmailAccount $acc an object of type EmailAccount.
      * @param string $name A name to associate with the email account.
@@ -68,12 +68,12 @@ class MailConfig{
     }
     /**
      * Returns an email account given its name.
-     * The function will search for an account with the given name in the set 
+     * The method will search for an account with the given name in the set 
      * of added accounts. If no account was found, NULL is returned.
      * @param string $name The name of the account.
-     * @return EmailAccount|null If the account is found, The function 
+     * @return EmailAccount|null If the account is found, The method 
      * will return an object of type EmailAccount. Else, the 
-     * function will return NULL.
+     * method will return NULL.
      * @since 1.0
      */
     public static function &getAccount($name){

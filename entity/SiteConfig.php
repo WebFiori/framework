@@ -18,6 +18,8 @@ if(!defined('ROOT_DIR')){
         . '</html>');
 }
 use webfiori\entity\Util;
+/** The main configuration file that is used to control 
+ Some of basic settings of the website.*/
 class SiteConfig{
     /**
      * An array which contains all website names in different languages.
@@ -154,7 +156,7 @@ class SiteConfig{
     }
     /**
      * Returns the base URL that is used to fetch resources.
-     * The return value of this function is usually used by the tag 'base' 
+     * The return value of this method is usually used by the tag 'base' 
      * of web site pages.
      * @return string the base URL.
      * @since 1.0
@@ -182,7 +184,7 @@ class SiteConfig{
     }
     /**
      * Returns the character (or string) that is used to separate page title from website name.
-     * @return string A string such as ' - ' or ' | '. Note that the function 
+     * @return string A string such as ' - ' or ' | '. Note that the method 
      * will add the two spaces by default.
      * @since 1.0
      */

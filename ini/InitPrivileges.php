@@ -2,7 +2,7 @@
 /*
  * The MIT License
  *
- * Copyright 2018 Ibrahim.
+ * Copyright 2019 Ibrahim.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,50 +22,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-namespace webfiori\entity\cron;
-if(!defined('ROOT_DIR')){
-    header("HTTP/1.1 403 Forbidden");
-    die(''
-        . '<!DOCTYPE html>'
-        . '<html>'
-        . '<head>'
-        . '<title>Forbidden</title>'
-        . '</head>'
-        . '<body>'
-        . '<h1>403 - Forbidden</h1>'
-        . '<hr>'
-        . '<p>'
-        . 'Direct access not allowed.'
-        . '</p>'
-        . '</body>'
-        . '</html>');
-}
+namespace webfiori\ini;
+use webfiori\entity\Access;
 /**
- * A class that has one method to initialize cron jobs.
- *
- * @author Eng.Ibrahim
+ * A class that has one method which is used to initialize privileges.
+ * 
+ * @author Ibrahim
  * @version 1.0
  */
-class InitCron {
+class InitPrivileges {
     /**
-     * A method that can be used to initialize cron jobs.
-     * The developer can use this method to create cron jobs.
+     * Initialize user groups and privileges.
+     * The developer can modify the body of this method to create user groups 
+     * and assign privileges to each group. To create new group, use the 
+     * method Access::newGroup(). To create a privilege in a group, use the 
+     * method Access::newPrivilege().
      * @since 1.0
      */
     public static function init() {
-        //set an optional password to protect jobs from 
-        //unauthorized execution access
-        Cron::password('123456');
-        
-        //enable job execution log
-        Cron::execLog(TRUE);
-        
-        //add jobs
-        //$job = new CronJob('*/5,*/3 * * * *');
-        //$job->setOnExecution(function($params){
-        //    $file = fopen('cron.txt', 'a+');
-        //    fwrite($file, 'Job \''.$params[0]->getJobName().'\' executed at '.date(DATE_RFC1123)."\r\n");
-        //},array($job));
-        //Cron::scheduleJob($job);
+        //Access::newGroup('MY_GROUP');
+        //Access::newPrivilege('MY_GROUP', 'MY_PR');
     }
 }

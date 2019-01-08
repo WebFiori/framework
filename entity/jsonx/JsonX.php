@@ -1,6 +1,7 @@
 <?php
 namespace jsonx;
 use jsonx\JsonI;
+use jsonx\JsonX;
 /**
  * An a class that can be used to create well formatted JSON strings. 
  * The class follows the specifications found at https://www.json.org/index.html.
@@ -64,10 +65,10 @@ class JsonX {
     private $attributes = array();
     /**
      * Adds a new value to the JSON string.
-     * This function can be used to add an integer, a double, 
+     * This method can be used to add an integer, a double, 
      * a string, an array or an object. If NULL is given, the method will 
      * set the value at the given key to null. If the given value or key is 
-     * invalid, the function will not add the value and will return FALSE.
+     * invalid, the method will not add the value and will return FALSE.
      * @param string $key The value of the key.
      * @param mixed $value The value of the key.
      * @param array $options An associative array of options. Currently, the 
@@ -79,7 +80,7 @@ class JsonX {
      * <li><b>array-as-object</b>: A boolean value. If set to TRUE, 
      * the array will be added as an object. Default is FALSE.</li>
      * </ul>
-     * @return boolean The function will return TRUE if the value is set. 
+     * @return boolean The method will return TRUE if the value is set. 
      * If the given value or key is invalid, the method will return FALSE.
      * @since 1.1
      */
@@ -120,13 +121,13 @@ class JsonX {
      * the generated JSON string customizable. Also, the object can be of 
      * type JsonX. If the given value is an object that does not implement the 
      * interface JsonI or it is not of type JsonX, 
-     * The function will try to extract object information based on its "get" public 
-     * functions. In that case, the generated JSON will be on the formate 
+     * The method will try to extract object information based on its "get" public 
+     * methods. In that case, the generated JSON will be on the formate 
      * <b>{"prop-0":"prop-1","prop-n":"","":""}</b>.
      * @param string $key The key value.
      * @param JsonI|JsonX|Object $val The object that will be added.
-     * @return boolean The function will return TRUE if the object is added. 
-     * If the key value is invalid string, the function will return FALSE.
+     * @return boolean The method will return TRUE if the object is added. 
+     * If the key value is invalid string, the method will return FALSE.
      * @since 1.0
      */
     public function addObject($key, $val){
@@ -162,7 +163,7 @@ class JsonX {
     /**
      * Checks if the current JsonX instance has the given key or not.
      * @param string $key The value of the key.
-     * @return boolean The function will return TRUE if the 
+     * @return boolean The method will return TRUE if the 
      * key exists. FALSE if not.
      * @since 1.2
      */
@@ -178,8 +179,8 @@ class JsonX {
     /**
      * Returns a string that represents the value at the given key.
      * @param string $key The value of the key.
-     * @return string|NULL The function will return a string that 
-     * represents the value. If the key does not exists,  the function will 
+     * @return string|NULL The method will return a string that 
+     * represents the value. If the key does not exists,  the method will 
      * return NULL.
      * @since 1.2
      */
@@ -212,10 +213,10 @@ class JsonX {
     /**
      * Adds a number to the JSON data.
      * Note that if the given number is the constant <b>INF</b> or the constant 
-     * <b>NAN</b>, The function will add them as a string.
+     * <b>NAN</b>, The method will add them as a string.
      * @param string $key The name of the key.
      * @param int|double $value The value of the key.
-     * @return boolean The function will return TRUE in case the number is 
+     * @return boolean The method will return TRUE in case the number is 
      * added. If the given value is not a number or the key value is invalid 
      * string, the method 
      * will return FALSE. 
@@ -262,7 +263,7 @@ class JsonX {
      * @param string $key The name of the key.
      * @param boolean $val TRUE or FALSE. If not specified, 
      * The default will be TRUE.
-     * @return boolean The function will return TRUE in case the value is set. 
+     * @return boolean The method will return TRUE in case the value is set. 
      * If the given value is not a boolean or the key value is invalid string, 
      * the method will return FALSE.
      * @since 1.0
@@ -290,7 +291,7 @@ class JsonX {
      * @param array $value The array that will be added.
      * @param boolean $asObject If this parameter is set to TRUE, 
      * the array will be added as an object in JSON string. Default is FALSE.
-     * @return boolean The function will return FALSE if the given key is invalid 
+     * @return boolean The method will return FALSE if the given key is invalid 
      * or the given value is not an array.
      */
     public function addArray($key, $value,$asObject=true){
@@ -303,7 +304,7 @@ class JsonX {
         return FALSE;
     }
     /**
-     * A helper function used to parse arrays.
+     * A helper method used to parse arrays.
      * @param array $value
      * @return string A JSON string that represents the array.
      * @since 1.0
@@ -484,7 +485,7 @@ class JsonX {
     /**
      * Checks if the key is a valid key string.
      * @param string $key The key that will be validated.
-     * @return boolean <b>TRUE</b> if the key is valid. False otherwise.
+     * @return boolean TRUE if the key is valid. False otherwise.
      * @since 1.0
      */
     private static function _isValidKey($key){
@@ -512,7 +513,7 @@ class JsonX {
      * </ul>
      * @param boolean $toBool If set to TRUE and the string represents a boolean 
      * value, then the string will be added as a boolean. Default is FALSE.
-     * @return boolean The function will return TRUE in case the string is added. 
+     * @return boolean The method will return TRUE in case the string is added. 
      * If the given value is not a string or the given key is invalid, the 
      * method will return FALSE.
      * @since 1.0
@@ -536,7 +537,7 @@ class JsonX {
     }
     /**
     * Escape JSON special characters from string.
-    * If the given string is NULL,the function will return empty string.
+    * If the given string is NULL,the method will return empty string.
     * @param string $string A value of one of JSON object properties. 
     * @return string An escaped version of the string.
     * @since 1.0

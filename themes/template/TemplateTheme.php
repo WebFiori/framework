@@ -10,7 +10,7 @@ class TemplateTheme extends Theme{
         //the only code that you need in your main theme class.
         $this->setAuthor('Ibrahim Ali');
         $this->setAuthorUrl('http://ibrahim-2017.blogspot.com');
-        $this->setName('Template');
+        $this->setName('Template Theme');
         $this->setVersion('1.0');
         $this->setDescription('Generic Theme Template.');
         $this->setDirectoryName('template');

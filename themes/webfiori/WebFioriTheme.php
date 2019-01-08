@@ -29,14 +29,12 @@ class WebFioriTheme extends Theme{
             'api-help/FunctionDef.php'
         ));
         $this->setBeforeLoaded(function(){
-            $this->setBeforeLoaded(function(){
-                WebsiteFunctions::get()->useSession(array(
-                    'name'=>'lang-session',
-                    'create-new'=>true,
-                    'duration'=>60*24*7,
-                    'refresh'=>TRUE
-                ));
-            });
+            WebsiteFunctions::get()->useSession(array(
+                'name'=>'lang-session',
+                'create-new'=>true,
+                'duration'=>60*24*7,
+                'refresh'=>TRUE
+            ));
             $session = WebsiteFunctions::get()->getSession();
             $lang = $session->getLang(TRUE);
             Page::lang($lang);

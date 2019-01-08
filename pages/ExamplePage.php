@@ -53,7 +53,7 @@ class ExamplePage{
     public function __construct() {
         //load UI template components (JS, CSS and others)
         //it is optional. to use a theme but recomended
-        Page::theme($themeName='Greeny By Ibrahim Ali');
+        Page::theme($themeName='WebFiori Theme');
 
         //sets the title of the page
         $lang = Page::lang();

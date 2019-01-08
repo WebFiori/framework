@@ -175,7 +175,7 @@ abstract class WebAPI implements JsonI{
     /**
      * Returns the description of the API.
      * @return string|NULL The description of the API. If the description is 
-     * not set, the function will return NULL.
+     * not set, the method will return NULL.
      * @since 1.3
      */
     public function getDescription() {
@@ -183,7 +183,7 @@ abstract class WebAPI implements JsonI{
     }
     /**
      * Sends a response message to indicate that a database error has occur.
-     * This function will send back a JSON string in the following format:
+     * This method will send back a JSON string in the following format:
      * <p>
      * {<br/>
      * &nbsp;&nbsp;"message":"Database Error",<br/>
@@ -212,7 +212,7 @@ abstract class WebAPI implements JsonI{
     /**
      * Sends a response message to indicate that a user is not authorized to 
      * do an API call.
-     * This function will send back a JSON string in the following format:
+     * This method will send back a JSON string in the following format:
      * <p>
      * {<br/>
      * &nbsp;&nbsp;"message":"Not authorized",<br/>
@@ -227,7 +227,7 @@ abstract class WebAPI implements JsonI{
     }
     /**
      * Sends a response message to indicate that an action is not supported by the API.
-     * This function will send back a JSON string in the following format:
+     * This method will send back a JSON string in the following format:
      * <p>
      * {<br/>
      * &nbsp;&nbsp;"message":"Action not supported",<br/>
@@ -243,7 +243,7 @@ abstract class WebAPI implements JsonI{
     /**
      * Sends a response message to indicate that request content type is 
      * not supported by the API.
-     * This function will send back a JSON string in the following format:
+     * This method will send back a JSON string in the following format:
      * <p>
      * {<br/>
      * &nbsp;&nbsp;"message":"Content type not supported.",<br/>
@@ -259,7 +259,7 @@ abstract class WebAPI implements JsonI{
     }
     /**
      * Sends a response message to indicate that request method is not supported.
-     * This function will send back a JSON string in the following format:
+     * This method will send back a JSON string in the following format:
      * <p>
      * {<br/>
      * &nbsp;&nbsp;"message":"Method Not Allowed.",<br/>
@@ -274,7 +274,7 @@ abstract class WebAPI implements JsonI{
     }
     /**
      * Sends a response message to indicate that an action is not implemented.
-     * This function will send back a JSON string in the following format:
+     * This method will send back a JSON string in the following format:
      * <p>
      * {<br/>
      * &nbsp;&nbsp;"message":"Action not implemented.",<br/>
@@ -289,7 +289,7 @@ abstract class WebAPI implements JsonI{
     }
     /**
      * Sends a response message to indicate that a request parameter is missing.
-     * This function will send back a JSON string in the following format:
+     * This method will send back a JSON string in the following format:
      * <p>
      * {<br/>
      * &nbsp;&nbsp;"message":"The parameter 'param_name' is missing.",<br/>
@@ -326,7 +326,7 @@ abstract class WebAPI implements JsonI{
     }
     /**
      * Sends a response message to indicate that a request parameter or parameters are missing.
-     * This function will send back a JSON string in the following format:
+     * This method will send back a JSON string in the following format:
      * <p>
      * {<br/>
      * &nbsp;&nbsp;"message":"The following required parameter(s) where missing from the request body: 'param_1', 'param_2', 'param_n'",<br/>
@@ -354,7 +354,7 @@ abstract class WebAPI implements JsonI{
     }
     /**
      * Sends a response message to indicate that a request parameter(s) have invalid values.
-     * This function will send back a JSON string in the following format:
+     * This method will send back a JSON string in the following format:
      * <p>
      * {<br/>
      * &nbsp;&nbsp;"message":"The following parameter(s) has invalid values: 'param_1', 'param_2', 'param_n'",<br/>
@@ -415,7 +415,7 @@ abstract class WebAPI implements JsonI{
      * Returns an API action given its name.
      * @param string $actionName The name of the action.
      * @return APIAction|NULL An object of type 'APIAction' 
-     * if the action is found. If no action was found, The function will return 
+     * if the action is found. If no action was found, The method will return 
      * NULL.
      * @since 1.3
      */
@@ -564,8 +564,8 @@ abstract class WebAPI implements JsonI{
      * Checks if request content type is supported by the API or not (For 'POST' 
      * requests).
      * @return boolean Returns TRUE in case the 'content-type' header is not 
-     * set or the request method is not 'POST'. Also the function will return 
-     * TRUE if the content type is supported. Other than that, the function 
+     * set or the request method is not 'POST'. Also the method will return 
+     * TRUE if the content type is supported. Other than that, the method 
      * will return FALSE
      * @since 1.1
      */
@@ -579,7 +579,7 @@ abstract class WebAPI implements JsonI{
     /**
      * Checks if a client is authorized to call the API using the given 
      * action in request body.
-     * @return boolean The function will return TRUE if the client is allowed 
+     * @return boolean The method will return TRUE if the client is allowed 
      * to call the API using the action in request body.
      * @since 1.3.1
      */
@@ -594,13 +594,13 @@ abstract class WebAPI implements JsonI{
     }
     /**
      * Checks the status of the API action.
-     * This function checks if the following conditions are met:
+     * This method checks if the following conditions are met:
      * <ul>
      * <li>The parameter "action" is set in request body.</li>
      * <li>The action is supported by the API.</li>
      * <li>Request method of the action is correct.</li>
      * </ul>
-     * If one of the conditions is not met, the function will return FALSE and 
+     * If one of the conditions is not met, the method will return FALSE and 
      * send back a response to indicate the issue.
      * @return boolean TRUE if API action is valid.
      * @since 1.0
@@ -654,7 +654,7 @@ abstract class WebAPI implements JsonI{
     /**
      * Sends a response message to tell the front-end that the parameter 
      * 'action' is missing from request body.
-     * This function will send back a JSON string in the following format:
+     * This method will send back a JSON string in the following format:
      * <p>
      * {<br/>
      * &nbsp;&nbsp;"message":"Action is not set.",<br/>
@@ -669,20 +669,20 @@ abstract class WebAPI implements JsonI{
     }
     /**
      * Checks if a user is authorized to perform an action that require authorization.
-     * @return boolean The function must be implemented by the sub-class in a way 
+     * @return boolean The method must be implemented by the sub-class in a way 
      * that makes it return TRUE in case the user is allowed to perform the 
-     * action. If the user is not permitted, the function must return FALSE.
+     * action. If the user is not permitted, the method must return FALSE.
      * @since 1.1
      */
     public abstract function isAuthorized();
     /**
-     * A function that is used to process the requested action.
+     * A method that is used to process the requested action.
      * @since 1.1
      */
     public abstract function processRequest();
     /**
      * Process user request. 
-     * This function must be called after creating any 
+     * This method must be called after creating any 
      * new instance of the API in order to process user request.
      * @since 1.0
      */
@@ -807,7 +807,7 @@ abstract class WebAPI implements JsonI{
     /**
      * Returns the action that was requested to perform.
      * @return string|NULL The action that was requested to perform. If the action 
-     * is not set, the function will return NULL.
+     * is not set, the method will return NULL.
      * @since 1.0
      */
     public function getAction(){

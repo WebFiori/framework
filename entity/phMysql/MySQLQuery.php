@@ -293,7 +293,7 @@ abstract class MySQLQuery{
     }
     /**
      * Returns the value of the property $query.
-     * It is simply the query that was constructed by calling any function 
+     * It is simply the query that was constructed by calling any method 
      * of the class.
      * @return string a MySql query.
      * @since 1.0
@@ -807,7 +807,7 @@ abstract class MySQLQuery{
         $this->setQuery($query.$this->createWhereConditions($cols, $vals, $valsConds, $jointOps).';', 'delete');
     }
     /**
-     * A function that is used to create the 'where' part of any query in case 
+     * A method that is used to create the 'where' part of any query in case 
      * of multiple columns.
      * @param array $cols An array that holds an objects of type 'Column'.
      * @param array $vals An array that contains columns values. The number of 
@@ -1027,7 +1027,7 @@ abstract class MySQLQuery{
     }
     /**
      * Checks if the query represents a blob insert or update.
-     * The aim of this function is to fix an issue with setting the collation 
+     * The aim of this method is to fix an issue with setting the collation 
      * of the connection while executing a query.
      * @return boolean The Function will return TRUE if the query represents an 
      * insert or un update of blob datatype. FALSE if not.
@@ -1083,28 +1083,32 @@ abstract class MySQLQuery{
     }
     /**
      * Constructs a query that can be used to select maximum value of a table column.
-     * @param string $col The name of the column.
+     * @param string $col The name of the column as specified while initializing 
+     * linked table. This value should return an object of type Column 
+     * when passed to the method MySQLQuery::getCol().
      * @param string $rename The new name of the column that contains max value. 
      * The default value is 'max'.
      * @since 1.3
      */
     public function selectMax($col,$rename='max'){
         return $this->select(array(
-            'column'=>$col,
+            'column'=> $this->getColName($col),
             'select-max'=>TRUE,
             'rename-to'=>$rename
         ));
     }
     /**
      * Constructs a query that can be used to select minimum value of a table column.
-     * @param string $col The name of the column.
+     * @param string $col The name of the column as specified while initializing 
+     * linked table. This value should return an object of type Column 
+     * when passed to the method MySQLQuery::getCol().
      * @param string $rename The new name of the column that contains min value. 
      * The default value is 'min'.
      * @since 1.3
      */
     public function selectMin($col,$rename='min'){
         return $this->select(array(
-            'column'=>$col,
+            'column'=>$this->getColName($col),
             'select-min'=>TRUE,
             'rename-to'=>$rename
         ));
@@ -1114,9 +1118,9 @@ abstract class MySQLQuery{
      * with the query class.
      * @param boolean $inclComments If set to TRUE, the generated MySQL 
      * query will have basic comments explaining the structure.
-     * @return boolean Once the query is structured, the function will return 
-     * TRUE. If the query is not created, the function will return FALSE. 
-     * The query will not constructed if the function 'MySQLQuery::getStructure()' 
+     * @return boolean Once the query is structured, the method will return 
+     * TRUE. If the query is not created, the method will return FALSE. 
+     * The query will not constructed if the method 'MySQLQuery::getStructure()' 
      * did not return an object of type 'Table'.
      * @since 1.5
      */
@@ -1132,8 +1136,8 @@ abstract class MySQLQuery{
      * Returns the name of the column from the table given its key.
      * @param string $colKey The name of the column key.
      * @return string The name of the column in the table. If no column was 
-     * found, the function will return the string MySQLTable::NO_SUCH_COL. If there is 
-     * no table linked with the query object, the function will return the 
+     * found, the method will return the string MySQLTable::NO_SUCH_COL. If there is 
+     * no table linked with the query object, the method will return the 
      * string MySQLQuery::NO_STRUCTURE.
      * @since 1.5
      */
@@ -1148,8 +1152,8 @@ abstract class MySQLQuery{
      * Returns a column from the table given its key.
      * @param string $colKey The name of the column key.
      * @return string|Column The the column in the table. If no column was 
-     * found, the function will return the string 'MySQLTable::NO_SUCH_COL'. If there is 
-     * no table linked with the query object, the function will return the 
+     * found, the method will return the string 'MySQLTable::NO_SUCH_COL'. If there is 
+     * no table linked with the query object, the method will return the 
      * string MySQLQuery::NO_STRUCTURE.
      * @since 1.6
      */
@@ -1169,7 +1173,7 @@ abstract class MySQLQuery{
      * Returns the index of a column given its key.
      * @param string $colKey The name of the column key.
      * @return int  The index of the column if found starting from 0. 
-     * If the column was not found, the function will return -1.
+     * If the column was not found, the method will return -1.
      * @since 1.8.4
      */
     public function getColIndex($colKey){
@@ -1186,7 +1190,7 @@ abstract class MySQLQuery{
     /**
      * Returns the name of the table that is used to construct queries.
      * @return string The name of the table that is used to construct queries. 
-     * if no table is linked, the function will return the string MySQLQuery::NO_STRUCTURE.
+     * if no table is linked, the method will return the string MySQLQuery::NO_STRUCTURE.
      * @since 1.5
      */
     public function getStructureName(){

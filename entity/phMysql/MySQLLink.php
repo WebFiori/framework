@@ -3,8 +3,8 @@ namespace phMysql;
 use mysqli;
 /**
  * A class that is used to connect to MySQL database. It works as an interface 
- * for <b>mysqli</b> 
- * @author Ibrahim <ibinshikh@hotmail.com>
+ * for <b>mysqli</b>.
+ * @author Ibrahim
  * @version 1.3.1
  */
 class MySQLLink{
@@ -142,7 +142,7 @@ class MySQLLink{
     }
     /**
      * Reconnect to MySQL server if a connection was established before.
-     * @return boolean If the reconnect attempt was succeeded, the function 
+     * @return boolean If the reconnect attempt was succeeded, the method 
      * will return TRUE.
      * @since 1.3.1
      */
@@ -182,7 +182,7 @@ class MySQLLink{
     
     /**
      * Return the number of rows returned by last query.
-     * If no result returned by MySQL server, the function will return -1.
+     * If no result returned by MySQL server, the method will return -1.
      * @return int
      * @since 1.0
      */
@@ -194,7 +194,7 @@ class MySQLLink{
     }
     /**
      * Select a database instance.
-     * This function will always return FALSE if no connection has been 
+     * This method will always return FALSE if no connection has been 
      * established with the database. 
      * @param string $dbName The name of the database instance.
      * @return boolean TRUE if the instance is selected. FALSE
@@ -218,7 +218,7 @@ class MySQLLink{
     /**
      * Returns the row which the class is pointing to in the result set.
      * @return array|NULL an associative array that represents a table row.  
-     * If no results are fetched, the function will return NULL. 
+     * If no results are fetched, the method will return NULL. 
      * @since 1.0
      */
     public function getRow(){
@@ -236,8 +236,8 @@ class MySQLLink{
         return NULL;
     }
     /**
-     * Helper function that is used to initialize the array of rows in case 
-     * of first call to the function getRow()
+     * Helper method that is used to initialize the array of rows in case 
+     * of first call to the method getRow()
      * @param type $retry
      * @return type
      */
@@ -258,7 +258,7 @@ class MySQLLink{
      * Returns the next row that was resulted from executing a query that has 
      * results.
      * @return array|NULL The next row in the result set. If no more rows are 
-     * in the set, the function will return NULL.
+     * in the set, the method will return NULL.
      * @since 1.3
      */
     public function nextRow() {
@@ -299,10 +299,10 @@ class MySQLLink{
      * Returns an array which contains all data from a specific column given its 
      * name.
      * @param string $colKey The name of the column as specified in the last 
-     * executed query. It must be a value when passed to the function 
+     * executed query. It must be a value when passed to the method 
      * Table::getCol() will return an object of type 'Column'.
      * @return array An array which contains all data from the given column. 
-     * if the column does not exist, the function will return the constant 
+     * if the column does not exist, the method will return the constant 
      * 'Table::NO_SUCH_TABLE'.
      * @since 1.2
      */

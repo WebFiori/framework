@@ -8,7 +8,7 @@ namespace phMysql;
  */
 class ForeignKey {
     /**
-     * A constant that is returned by some functions to tell that the 
+     * A constant that is returned by some methods to tell that the 
      * name of the foreign key is invalid.
      * @var string 
      * @since 1.2
@@ -70,7 +70,7 @@ class ForeignKey {
      * @param string $name The name of the key. It must be a string and its not empty. 
      * Also it must not contain any spaces or any characters other than A-Z, a-z and 
      * underscore.
-     * @return boolean|string TRUE if the name of the key is set. The function will 
+     * @return boolean|string TRUE if the name of the key is set. The method will 
      * return the constant ForeignKey::INV_KEY_NAME in 
      * case if the given key name is invalid.
      * @since 1.1
@@ -83,7 +83,7 @@ class ForeignKey {
         return ForeignKey::INV_KEY_NAME;
     }
     /**
-     * A function that is used to validate the names of the key attributes (such as source column 
+     * A method that is used to validate the names of the key attributes (such as source column 
      * name or source table name).
      * @param string $name The string to validate. It must be a string and its not empty. 
      * Also it must not contain any spaces or any characters other than A-Z, a-z and 
@@ -226,7 +226,7 @@ class ForeignKey {
         return $this->onUpdateCondition;
     }
     /**
-     * Sets the value of the property <b>$onUpdateCondition</b>.
+     * Sets the value of the property $onUpdateCondition.
      * @param string $val A value from the array ForeignKey::CONDITIONS. 
      * If the given value is NULL, the condition will be set to NULL.
      * @since 1.0

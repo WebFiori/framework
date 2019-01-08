@@ -13,14 +13,14 @@ class MySQLTable {
      */
     private $mysqlVnum;
     /**
-     * A constant that is returned by some functions to tell that the 
+     * A constant that is returned by some methods to tell that the 
      * table does not have a given column name.
      * @var string 
      * @since 1.4
      */
     const NO_SUCH_COL = 'no_such_col';
     /**
-     * A constant that is returned by some functions to tell that the 
+     * A constant that is returned by some methods to tell that the 
      * name of the table is invalid.
      * @var string 
      * @since 1.4
@@ -69,7 +69,7 @@ class MySQLTable {
     private $charSet;
     /**
      * Creates a new instance of the class.
-     * This function will initialize the basic settings of the table. It will 
+     * This method will initialize the basic settings of the table. It will 
      * set MySQL version to 5.5, the engine to 'InnoDB', char set to 
      * 'utf8mb4' and the order to 0.  
      * @param string $tName The name of the table. It must be a 
@@ -147,8 +147,8 @@ class MySQLTable {
     }
     /**
      * Returns the value of table collation.
-     * If MySQL version is '5.5' or lower, the function will 
-     * return 'utf8mb4_unicode_ci'. Other than that, the function will return 
+     * If MySQL version is '5.5' or lower, the method will 
+     * return 'utf8mb4_unicode_ci'. Other than that, the method will return 
      * 'utf8mb4_unicode_520_ci'.
      * @return string Table collation.
      * @since 1.6
@@ -195,8 +195,8 @@ class MySQLTable {
     /**
      * Returns the number of columns that will act as one primary key.
      * @return int The number of columns that will act as one primary key. If 
-     * the table has no primary key, the function will return 0. If one column 
-     * is used as primary, the function will return 1. If two, the function 
+     * the table has no primary key, the method will return 0. If one column 
+     * is used as primary, the method will return 1. If two, the method 
      * will return 2 and so on.
      * @since 1.5
      */
@@ -247,11 +247,11 @@ class MySQLTable {
      * @param MySQLTable $refTable The table that will be referenced.
      * @param string $refColName The name of the column that will be referenced. It must 
      * be a column in the referenced table. The value of this attribute is a 
-     * value that once passed to the function MySQLTable::getColumn() will 
+     * value that once passed to the method MySQLTable::getColumn() will 
      * return an object of type 'Column'.
      * @param string $targetCol The target column. It must be a column in the current 
      * instance. The value of this attribute is a 
-     * value that once passed to the function MySQLTable::getColumn() will 
+     * value that once passed to the method MySQLTable::getColumn() will 
      * return an object of type 'Column'.
      * @param string $keyname The name of the foreign key.
      * @param string $onupdate The 'on update' condition for the key. it can be one 
@@ -286,7 +286,7 @@ class MySQLTable {
      * @param MySQLTable $refTable The referenced table.
      * @param array $refColsArr An array which contains the names of referenced 
      * columns. The names of columns  must in the referenced table. 
-     * If one of the names is passed to the function MySQLTable::getColumn(), it 
+     * If one of the names is passed to the method MySQLTable::getColumn(), it 
      * should return an object of type 'Column'.
      * @param array $targetColsArr An array which contains the targeted columns. 
      * @param string $keyname The name of the key.
@@ -498,7 +498,7 @@ class MySQLTable {
      * Returns a column given its index.
      * @param int $index The index of the column.
      * @return Column|NULL If a column was found which has the specified index, 
-     * it is returned. Other than that, The function will return NULL.
+     * it is returned. Other than that, The method will return NULL.
      * @since 1.6
      */
     public function &getColByIndex($index){

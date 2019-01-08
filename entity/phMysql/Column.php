@@ -2,7 +2,7 @@
 namespace phMysql;
 /**
  * A class that represents a column in MySQL table.
- * @author Ibrahim <ibinshikh@hotmail.com>
+ * @author Ibrahim
  * @version 1.6.1
  */
 class Column{
@@ -31,21 +31,21 @@ class Column{
      */
     const SIZE_NOT_SUPPORTED = 'TYPE_DOES_NOT_SUPPORT_SIZE';
     /**
-     * A constant that is returned by some functions to tell that the 
+     * A constant that is returned by some methods to tell that the 
      * name of a column is invalid.
      * @var string 
      * @since 1.2
      */
     const INV_COL_NAME = 'inv_col_nm';
     /**
-     * A constant that is returned by some functions to tell that the 
+     * A constant that is returned by some methods to tell that the 
      * datatype of a column is invalid.
      * @var string 
      * @since 1.2
      */
     const INV_COL_DATATYPE = 'inv_col_datatype';
     /**
-     * A constant that is returned by some functions to tell that the 
+     * A constant that is returned by some methods to tell that the 
      * size datatype of a column is invalid (for 'varchar' and 'int').
      * @var string 
      * @since 1.2
@@ -134,7 +134,7 @@ class Column{
     private $onColUpdate;
     /**
      * Creates new instance of the class.
-     * This function is used to initialize basic attributes of the column. 
+     * This method is used to initialize basic attributes of the column. 
      * First of all, it sets MySQL version number to 5.5. Then it validates the 
      * given column name and datatype and size.
      * @param string $colName It must be a string and its not empty. 
@@ -200,7 +200,7 @@ class Column{
     }
     /**
      * Sets or unset the owner table of the column.
-     * Note that the developer should not call this function manually. It is 
+     * Note that the developer should not call this method manually. It is 
      * used only if the column is added or removed from MySQLTable object.
      * @param MySQLTable|NULL $table The owner of the column. If NULL is given, 
      * The owner will be unset.
@@ -221,7 +221,7 @@ class Column{
     /**
      * Returns the index of the column in its parent table.
      * @return int The index of the column in its parent table starting from 0. 
-     * If the column has no parent table, the function will return -1.
+     * If the column has no parent table, the method will return -1.
      * @since 1.6
      */
     public function getIndex() {
@@ -230,7 +230,7 @@ class Column{
     /**
      * Returns the table which owns this column.
      * @return MySQLTable|NULL The owner table of the column. 
-     * If the column has no owner, the function will return NULL.
+     * If the column has no owner, the method will return NULL.
      * @since 1.5
      */
     public function &getOwner() {
@@ -252,7 +252,7 @@ class Column{
      * @param boolean $bool TRUE if the column value is unique. FALSE 
      * if not.
      * @return boolean TRUE if the value of the property is updated. The only case 
-     * at which the function will return FALSE is when the passed parameter is 
+     * at which the method will return FALSE is when the passed parameter is 
      * not a boolean.
      * @since 1.0
      */
@@ -277,8 +277,8 @@ class Column{
      * Also it must not contain any spaces or any characters other than A-Z, a-z and 
      * underscore.
      * @param string $name The name to set.
-     * @return boolean The function will return TRUE if the column name updated. 
-     * If the given value is NULL or invalid string, the function will return 
+     * @return boolean The method will return TRUE if the column name updated. 
+     * If the given value is NULL or invalid string, the method will return 
      * Column::INV_COL_NAME.
      * @since 1.0
      */
@@ -304,7 +304,7 @@ class Column{
     }
     /**
      * Returns the name of the column.
-     * @return string The name of the column. If the name is not set, the function 
+     * @return string The name of the column. If the name is not set, the method 
      * will return the value 'col'.
      * @since 1.0
      */
@@ -312,15 +312,15 @@ class Column{
         return $this->name;
     }
     /**
-     * Updates the value of the property <b>$isNull</b>.
+     * Updates the value of the property $isNull.
      * This property can be set to TRUE if the column allow the insertion of 
      * null values. Note that if the column is set as a primary, the property 
      * will not be updated.
      * @param boolean $bool TRUE if the column allow null values. FALSE 
      * if not.
      * @return boolean TRUE If the property value is updated. If the given 
-     * value is not a boolean, the function will return FALSE. Also if 
-     * the column represents a primary key, the function will always return FALSE.
+     * value is not a boolean, the method will return FALSE. Also if 
+     * the column represents a primary key, the method will always return FALSE.
      * @since 1.0
      */
     public function setIsNull($bool){
@@ -345,8 +345,8 @@ class Column{
      * Note that once the column become primary, it becomes unique by default.
      * @param boolean $bool <b>TRUE</b> if the column is primary key. FALSE 
      * if not.
-     * @return boolean The function will return TRUE If the property value is 
-     * updated. If the given value is not a boolean, the function will return 
+     * @return boolean The method will return TRUE If the property value is 
+     * updated. If the given value is not a boolean, the method will return 
      * FALSE.
      * @since 1.0
      */
@@ -463,9 +463,9 @@ class Column{
      * number greater than 11 is given, the value will be set to 11. The 
      * maximum size for the 'varchar' is not specified.
      * @param int $size The size to set.
-     * @return boolean TRUE if the size is set. The function will return 
+     * @return boolean TRUE if the size is set. The method will return 
      * Column::INV_DATASIZE in case the size is invalid or datatype does not support 
-     * size attribute. Also The function will return 
+     * size attribute. Also The method will return 
      * Column::SIZE_NOT_SUPPORTED in case the datatype of the column does not 
      * support size.
      * @since 1.0
@@ -531,8 +531,8 @@ class Column{
     }
     /**
      * Returns the value of column collation.
-     * @return string If MySQL version is '5.5' or lower, the function will 
-     * return 'utf8mb4_unicode_ci'. Other than that, the function will return 
+     * @return string If MySQL version is '5.5' or lower, the method will 
+     * return 'utf8mb4_unicode_ci'. Other than that, the method will return 
      * 'utf8mb4_unicode_520_ci'.
      * @since 1.0
      */

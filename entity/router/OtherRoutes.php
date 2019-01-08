@@ -44,7 +44,7 @@ if(!defined('ROOT_DIR')){
  * A class that only has one method to initiate some of system routes.
  * The class is meant to only initiate the routes which uses the method 
  * Router::other().
- * @author Eng.Ibrahim
+ * @author Ibrahim
  * @version 1.0
  */
 class OtherRoutes {

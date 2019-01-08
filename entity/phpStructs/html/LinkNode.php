@@ -25,7 +25,7 @@
 namespace phpStructs\html;
 /**
  * A class that represents &lt;a&gt; tag with text only.
- * @author Ibrahim <ibinshikh@hotmail.com>
+ * @author Ibrahim
  * @version 1.0
  */
 class LinkNode extends HTMLNode{
@@ -33,7 +33,7 @@ class LinkNode extends HTMLNode{
      * Constructs a new instance of the class
      * @param string $href The link.
      * @param string $label The label to display.
-     * @param string $target [Optional] The value to set for the attribute 'target'. 
+     * @param string $target The value to set for the attribute 'target'. 
      * Default is '_self'.
      */
     public function __construct($href,$label,$target='_self') {

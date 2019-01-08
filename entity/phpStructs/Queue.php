@@ -32,7 +32,7 @@ namespace phpStructs;
  */
 class Queue{
     /**
-     * A null guard for the functions that return null reference.
+     * A null guard for the methods that return null reference.
      * @since 1.1
      */
     private $null;
@@ -84,9 +84,9 @@ class Queue{
     /**
      * Adds new element to the bottom of the queue.
      * @param mixed $el The element that will be added. If it is NULL, the 
-     * function will not add it.
-     * @return boolean The function will return TRUE if the element is added. 
-     * The function will return FALSE only in two cases, If the maximum 
+     * method will not add it.
+     * @return boolean The method will return TRUE if the element is added. 
+     * The method will return FALSE only in two cases, If the maximum 
      * number of elements is reached and trying to add new one or the given element 
      * is NULL.
      * @since 1.0
@@ -122,9 +122,9 @@ class Queue{
     /**
      * Returns the number of maximum elements the queue can hold.
      * @return int If the maximum number of elements was set to 0 or a 
-     * negative number, the function will return -1 which indicates 
+     * negative number, the method will return -1 which indicates 
      * that the queue can have any number of elements. Other than that, 
-     * the function will return the maximum number of elements.
+     * the method will return the maximum number of elements.
      * @since 1.0
      */
     public function max(){
@@ -135,7 +135,7 @@ class Queue{
     }
     /**
      * Returns the element that exist on the top of the queue.
-     * @return mixed The element at the top. If the stack is empty, the function 
+     * @return mixed The element at the top. If the stack is empty, the method 
      * will return NULL.
      * @since 1.0
      */
@@ -150,7 +150,7 @@ class Queue{
     /**
      * Removes the top element from the stack.
      * @return mixed The element after removal from the queue. If the queue is 
-     * empty, the function will return NULL.
+     * empty, the method will return NULL.
      * @since 1.0
      */
     public function &dequeue(){

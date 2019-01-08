@@ -27,8 +27,8 @@ namespace phpStructs\html;
 /**
  * A class that represents the head tag of a HTML document.
  *
- * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.1
+ * @author Ibrahim
+ * @version 1.1.1
  */
 class HeadNode extends HTMLNode{
     /**
@@ -56,11 +56,11 @@ class HeadNode extends HTMLNode{
     private $canonical;
     /**
      * Creates new HTML node with name = 'head'.
-     * @param string $title [Optional] The value to set for the node 'title'. Default 
+     * @param string $title The value to set for the node 'title'. Default 
      * is 'Default'. 
-     * @param string $canonical [Optional] The value to set for the link node 
+     * @param string $canonical The value to set for the link node 
      * with attribute = 'canonical'. Default is empty string.
-     * @param string $base [Optional] The value to set for the node 'base'. Default 
+     * @param string $base The value to set for the node 'base'. Default 
      * is empty string.
      * @since 1.0
      */
@@ -91,7 +91,7 @@ class HeadNode extends HTMLNode{
     /**
      * Returns a node that represents the tag 'base'.
      * @return HTMLNode|NULL A node that represents the tag 'base'. If the 
-     * base URL is not set, The function will return <b>NULL</b>.
+     * base URL is not set, The method will return NULL.
      * @since 1.0
      */
     public function getBase(){
@@ -118,7 +118,7 @@ class HeadNode extends HTMLNode{
     /**
      * Returns a linked list of all link tags that link to a CSS file.
      * @return LinkedList A linked list of all link tags that link to a CSS file. If 
-     * the node has no CSS link tags, the function will return an empty list.
+     * the node has no CSS link tags, the method will return an empty list.
      * @since 1.0
      */
     public function getCSSNodes(){
@@ -195,13 +195,17 @@ class HeadNode extends HTMLNode{
     /**
      * Adds new CSS source file.
      * @param string $href The link to the file.
+     * @param $otherAttrs An array that can contain additional 
+     * attributes to set for the link tag.
      * @since 1.0
      */
-    public function addCSS($href){
+    public function addCSS($href, $otherAttrs=array()){
         if(strlen($href) != 0){
             $tag = new HTMLNode('link', FALSE, FALSE);
             $tag->setAttribute('rel','stylesheet');
-            
+            foreach ($otherAttrs as $attr => $attrVal){
+                $tag->setAttribute($attr, $attrVal);
+            }
             //used to prevent caching 
             $version = substr(hash('sha256', time()+rand(0, 10000)), rand(0,10),10);
             
@@ -212,12 +216,17 @@ class HeadNode extends HTMLNode{
     /**
      * Adds new JavsScript source file.
      * @param string $loc The location of the file.
+     * @param $otherAttrs An array that can contain additional 
+     * attributes to set for the script tag (such as 'async').
      * @since 1.0
      */
-    public function addJs($loc){
+    public function addJs($loc, $otherAttrs=array()){
         if(strlen($loc) != 0){
             $tag = new HTMLNode('script', TRUE, FALSE);
             $tag->setAttribute('type','text/javascript');
+            foreach ($otherAttrs as $attr => $attrVal){
+                $tag->setAttribute($attr, $attrVal);
+            }
             //used to prevent caching 
             $version = substr(hash('sha256', time()+rand(0, 10000)), rand(0,10),10);
             
@@ -245,7 +254,7 @@ class HeadNode extends HTMLNode{
     /**
      * Returns the canonical URL if set.
      * @return string|NULL The canonical URL if set. If the URL is not set, 
-     * the function will return <b>NULL</b>.
+     * the method will return NULL.
      * @since 1.0
      */
     public function getCanonical(){

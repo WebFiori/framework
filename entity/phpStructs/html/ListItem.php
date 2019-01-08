@@ -40,10 +40,10 @@ class ListItem extends HTMLNode{
     private $textOnly;
     /**
      * Constructs new list item
-     * @param boolean $textOnly [Optional] Set to <b>TRUE</b> to make the list item 
-     * accepts text only. Default is <b>FALSE</b>.
-     * @param string $text [Optional] The text that will be displayed by the list 
-     * item. Ignored if the parameter <b>$textOnly</b> is set to <b>FALSE</b>.
+     * @param boolean $textOnly Set to TRUE to make the list item 
+     * accepts text only. Default is FALSE.
+     * @param string $text The text that will be displayed by the list 
+     * item. Ignored if the parameter $textOnly is set to FALSE.
      * @since 1.0
      */
     public function __construct($textOnly=false,$text='') {
@@ -78,7 +78,7 @@ class ListItem extends HTMLNode{
     /**
      * Adds new child node to the list item.
      * @param HTMLNode $node The node that will be added. Node that the 
-     * function will work only if the list item allows things other 
+     * method will work only if the list item allows things other 
      * than the text in its body.
      * @since 1.1
      */

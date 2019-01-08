@@ -126,8 +126,8 @@ class HTMLDoc {
     /**
      * Returns a child node given its ID.
      * @param string $id The ID of the child.
-     * @return NULL|HTMLNode The function returns an object of type <b>HTMLNode</b> 
-     * if found. If no node has the given ID, the function will return <b>NULL</b>.
+     * @return NULL|HTMLNode The method returns an object of type HTMLNode. 
+     * if found. If no node has the given ID, the method will return NULL.
      * @since 1.2
      */
     public function &getChildByID($id) {
@@ -158,7 +158,7 @@ class HTMLDoc {
     /**
      * Returns the language of the document.
      * @return string A two characters language code. If the language is 
-     * not set, the function will return empty string.
+     * not set, the method will return empty string.
      * @since 1.0
      */
     public function getLanguage(){
@@ -187,8 +187,8 @@ class HTMLDoc {
     }
     /**
      * Returns HTML string that represents the document.
-     * @param boolean $formatted [Optional] If set to <b>TRUE</b>, The generated HTML code will be 
-     * well formatted. Default is <b>TRUE</b>.
+     * @param boolean $formatted If set to TRUE, The generated HTML code will be 
+     * well formatted. Default is TRUE.
      * @return string HTML string that represents the document.
      * @since 1.0
      */
@@ -205,7 +205,7 @@ class HTMLDoc {
     }
     /**
      * Returns the document as readable HTML code wrapped inside 'pre' element.
-     * @param array $formattingOptions [Optional] An associative array which contains 
+     * @param array $formattingOptions An associative array which contains 
      * an options for formatting the code. The available options are:
      * <ul>
      * <li><b>tab-spaces</b>: The number of spaces in a tab. Usually 4.</li>
@@ -235,8 +235,8 @@ class HTMLDoc {
      * Removes a child node from the document.
      * @param HTMLNode $node The node that will be removed. If the given 
      * node name is 'body' or 'head', The node will never be removed.
-     * @return HTMLNode|NULL The function will return the node if removed. 
-     * If not removed, the function will return <b>NULL</b>.
+     * @return HTMLNode|NULL The method will return the node if removed. 
+     * If not removed, the method will return NULL.
      * @since 1.4
      */
     public function removeChild(&$node) {

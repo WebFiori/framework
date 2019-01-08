@@ -32,7 +32,7 @@ namespace phpStructs;
  */
 class LinkedList {
     /**
-     * A null guard for the functions that return null reference.
+     * A null guard for the methods that return null reference.
      * @since 1.4
      */
     private $null;
@@ -89,11 +89,11 @@ class LinkedList {
     }
     /**
      * Checks if a given element is in the list or not.
-     * Note that the function uses strict equality operator '===' to check 
+     * Note that the method uses strict equality operator '===' to check 
      * for element existence.
      * @param mixed $el The element that will be checked.
      * @return boolean TRUE if the element is on the list. Other than that, 
-     * the function will return FALSE.
+     * the method will return FALSE.
      * @since 1.0
      */
     public function contains(&$el){
@@ -117,7 +117,7 @@ class LinkedList {
     /**
      * Returns the first element that was added to the list.
      * @return mixed The first element that was added to the list. If the list 
-     * is empty, The function will return NULL.
+     * is empty, The method will return NULL.
      * @since 1.1
      */
     public function &getFirst(){
@@ -130,7 +130,7 @@ class LinkedList {
     /**
      * Returns the last element that was added to the list.
      * @return mixed The last element that was added to the list. If the list 
-     * is empty, The function will return NULL.
+     * is empty, The method will return NULL.
      * @since 1.1
      */
     public function &getLast(){
@@ -157,7 +157,7 @@ class LinkedList {
     /**
      * Returns the element at the specified index.
      * @return mixed The element at the specified index. If the list 
-     * is empty or the given index is out of list bounds, The function will 
+     * is empty or the given index is out of list bounds, The method will 
      * return NULL.
      * @since 1.1
      */
@@ -216,8 +216,8 @@ class LinkedList {
      * @param boolean $ascending If set to TRUE, list elements 
      * will be sorted in ascending order (From lower to higher). Else, 
      * they will be sorted in descending order (From higher to lower).
-     * @return boolean The function will return TRUE if list 
-     * elements have been sorted. The only case that the function 
+     * @return boolean The method will return TRUE if list 
+     * elements have been sorted. The only case that the method 
      * will return FALSE is when the list has an object which does 
      * not implement the interface Comparable.
      * @since 1.3
@@ -268,8 +268,8 @@ class LinkedList {
      * Removes an element given its index.
      * If the given index is in the range [0, LinkedList::size() - 1] 
      * the element at the given index is returned. If the list is empty or the given 
-     * index is out of the range, the function will return NULL. Also the 
-     * function will return NULL if the given index is not an integer.
+     * index is out of the range, the method will return NULL. Also the 
+     * method will return NULL if the given index is not an integer.
      * @param int $index The index of the element.
      * @return mixed The element that was removed. NULL if no element is removed.
      * @since 1.0
@@ -304,7 +304,7 @@ class LinkedList {
     /**
      * Removes the first element in the list.
      * @return mixed If the list has elements, the first element is returned. 
-     * If the list is empty, the function will return NULL.
+     * If the list is empty, the method will return NULL.
      * @since 1.0
      */
     public function &removeFirst() {
@@ -326,7 +326,7 @@ class LinkedList {
     /**
      * Removes the last element in the list.
      * @return mixed If the list has elements, the last element is returned. 
-     * If the list is empty, the function will return NULL.
+     * If the list is empty, the method will return NULL.
      * @since 1.0
      */
     public function &removeLast(){
@@ -359,11 +359,11 @@ class LinkedList {
     }
     /**
      * Removes a specific element from the list.
-     * The function will remove the first occurrence of the element if it is 
-     * repeated. Note that the function use strict comparison to check for equality.
+     * The method will remove the first occurrence of the element if it is 
+     * repeated. Note that the method use strict comparison to check for equality.
      * @param mixed $val The element that will be removed.
-     * @return mixed The function will return The element after removal if the given element 
-     * is removed. Other than that, the function will return NULL.
+     * @return mixed The method will return The element after removal if the given element 
+     * is removed. Other than that, the method will return NULL.
      * @since 1.0
      */
     public function &removeElement(&$val){
@@ -401,10 +401,10 @@ class LinkedList {
     }
     /**
      * Returns the index of an element.
-     * Note that the function is using strict comparison operator to search (===).
+     * Note that the method is using strict comparison operator to search (===).
      * @param mixed $el The element to search for.
      * @return int The index of the element if found. If the list does not contain 
-     * the element, the function will return -1.
+     * the element, the method will return -1.
      * @since 1.2
      */
     public function indexOf(&$el){
@@ -434,8 +434,8 @@ class LinkedList {
      * Replace an element with new one.
      * @param mixed $oldEl The element that will be replaced.
      * @param mixed $newEl The element that will replace the old one.
-     * @return boolean The function will return TRUE if replaced. 
-     * if the element is not replaced, the function will return FALSE.
+     * @return boolean The method will return TRUE if replaced. 
+     * if the element is not replaced, the method will return FALSE.
      * @since 1.2
      */
     public function replace(&$oldEl,&$newEl){

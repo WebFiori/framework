@@ -34,7 +34,7 @@ use phpStructs\Stack;
  */
 class HTMLNode {
     /**
-     * A null guard for the functions that return null reference.
+     * A null guard for the methods that return null reference.
      * @since 1.6
      */
     private $null;
@@ -134,13 +134,13 @@ class HTMLNode {
     private $text;
     /**
      * Constructs a new instance of the class.
-     * @param string $name [Optional] The name of the node (such as 'div').  If 
+     * @param string $name The name of the node (such as 'div').  If 
      * we want to create a comment node, the name should be '#comment'. If 
      * we want to create a text node, the name should be '#text'. If empty string is 
      * given, default value will be used. The Default value is 'div'.
-     * @param boolean $reqClose [Optional] If set to <b>TRUE</b>, this means that the node 
+     * @param boolean $reqClose If set to TRUE, this means that the node 
      * must end with closing tag. If $name is set to '#text' or '#comment', 
-     * this argument is ignored. Default is <b>TRUE</b>.
+     * this argument is ignored. Default is TRUE.
      * 
      */
     public function __construct($name='div',$reqClose=true) {
@@ -168,7 +168,7 @@ class HTMLNode {
     }
     /**
      * Checks if the given node represents a comment or not.
-     * @return boolean The function will return TRUE if the given 
+     * @return boolean The method will return TRUE if the given 
      * node is a comment.
      * @since 1.5
      */
@@ -177,8 +177,8 @@ class HTMLNode {
     }
     /**
      * Returns the parent node.
-     * @return HTMLNode | NULL An object of type <b>HTMLNode</b> if the node 
-     * has a parent. If the node has no parent, the function will return <b>NULL</b>.
+     * @return HTMLNode|NULL An object of type HTMLNode if the node 
+     * has a parent. If the node has no parent, the method will return NULL.
      * @since 1.2
      */
     public function &getParent() {
@@ -195,7 +195,7 @@ class HTMLNode {
     /**
      * Returns a linked list of all child nodes.
      * @return LinkedList|NULL A linked list of all child nodes. if the 
-     * given node is a text node, the function will return <b>NULL</b>.
+     * given node is a text node, the method will return NULL.
      * @since 1.0
      */
     public function &children(){
@@ -341,8 +341,8 @@ class HTMLNode {
     /**
      * Returns a child node given its ID.
      * @param string $val The ID of the child.
-     * @return NULL|HTMLNode The function returns an object of type HTMLNode 
-     * if found. If no node has the given ID, the function will return NULL.
+     * @return NULL|HTMLNode The method returns an object of type HTMLNode 
+     * if found. If no node has the given ID, the method will return NULL.
      * @since 1.2
      */
     public function &getChildByID($val){
@@ -371,9 +371,9 @@ class HTMLNode {
      * attribute $reqClose is set to TRUE. If has no children, it will switch 
      * without problems. If the node is inline, the type will switch without 
      * problems.
-     * @param boolean $reqClose [Optional] Set to TRUE if the node must have ending 
+     * @param boolean $reqClose Set to TRUE if the node must have ending 
      * tag.
-     * @return boolean The function will return TRUE if the type is updated.
+     * @return boolean The method will return TRUE if the type is updated.
      * @since 1.7
      */
     public function setNodeName($name,$reqClose=true) {
@@ -409,8 +409,8 @@ class HTMLNode {
     /**
      * Returns the name of the node.
      * @return string The name of the node. If the node is a text node, the 
-     * function will return the value '#TEXT'. If the node is a comment node, the 
-     * function will return the value '#COMMENT'.
+     * method will return the value '#TEXT'. If the node is a comment node, the 
+     * method will return the value '#COMMENT'.
      * @since 1.0
      */
     public function getName(){
@@ -420,7 +420,7 @@ class HTMLNode {
      * Returns an array of all node attributes with the values
      * @return array|NULL an associative array. The keys will act as the attribute 
      * name and the value will act as the value of the attribute. If the node 
-     * is a text node, the function will return <b>NULL</b>.
+     * is a text node, the method will return NULL.
      * @since 1.0 
      */
     public function getAttributes() {
@@ -432,7 +432,7 @@ class HTMLNode {
      * exist, it will be created. If already exists, its value will be updated. 
      * Note that if the node type is text node, 
      * the attribute will never be created.
-     * @param string $val [Optional] The value of the attribute. Default is empty string.
+     * @param string $val The value of the attribute. Default is empty string.
      * @since 1.0
      */
     public function setAttribute($name,$val=''){
@@ -536,8 +536,8 @@ class HTMLNode {
     /**
      * Removes a direct child node.
      * @param HTMLNode $node The node that will be removed.
-     * @return HTMLNode|NULL The function will return the node if removed. 
-     * If not removed, the function will return NULL.
+     * @return HTMLNode|NULL The method will return the node if removed. 
+     * If not removed, the method will return NULL.
      * @since 1.2
      */
     public function &removeChild(&$node) {
@@ -601,8 +601,8 @@ class HTMLNode {
     /**
      * Returns the value of the text that this node represents.
      * @return string If the node is a text node or a comment node, 
-     * the function will return the text in the body of the node. If not, 
-     * the function will return empty string.
+     * the method will return the text in the body of the node. If not, 
+     * the method will return empty string.
      * @since 1.0
      */
     public function getText() {
@@ -614,7 +614,7 @@ class HTMLNode {
     /**
      * Returns the node as HTML comment.
      * @return string The node as HTML comment. if the node is not a comment, 
-     * the function will return empty string.
+     * the method will return empty string.
      * @since 1.5
      */
     public function getComment() {
@@ -654,9 +654,9 @@ class HTMLNode {
     }
     /**
      * Returns HTML string that represents the node as a whole.
-     * @param boolean $formatted [Optional] Set to TRUE to return a well formatted 
+     * @param boolean $formatted Set to TRUE to return a well formatted 
      * HTML document. Default is FALSE.
-     * @param int $initTab [Optional] Initial tab count. Used in case of the document is 
+     * @param int $initTab Initial tab count. Used in case of the document is 
      * well formatted. This number represents the size of code indentation.
      * @return string HTML string that represents the node.
      * @since 1.0
@@ -749,7 +749,7 @@ class HTMLNode {
     }
     /**
      * Returns the node as readable HTML code wrapped inside 'pre' element.
-     * @param array $formattingOptions [Optional] An associative array which contains 
+     * @param array $formattingOptions An associative array which contains 
      * an options for formatting the code. The available options are:
      * <ul>
      * <li><b>tab-spaces</b>: The number of spaces in a tab. Usually 4.</li>
@@ -978,8 +978,8 @@ class HTMLNode {
      * Returns a node based on its attribute value (Direct child).
      * @param string $attrName The name of the attribute.
      * @param string $attrVal The value of the attribute.
-     * @return HTMLNode|NULL The function will return an object of type HTMLNode 
-     * if a node is found. Other than that, the function will return NULL. Note 
+     * @return HTMLNode|NULL The method will return an object of type HTMLNode 
+     * if a node is found. Other than that, the method will return NULL. Note 
      * that if there are multiple children with the same attribute and value, 
      * the first occurence is returned.
      * @since 1.2
@@ -1000,8 +1000,8 @@ class HTMLNode {
     /**
      * Returns the value of an attribute.
      * @param string $attrName The name of the attribute.
-     * @return string|NULL The function will return the value of the attribute 
-     * if found. If no such attribute, the function will return NULL.
+     * @return string|NULL The method will return the value of the attribute 
+     * if found. If no such attribute, the method will return NULL.
      * @since 1.1
      */
     public function getAttributeValue($attrName) {

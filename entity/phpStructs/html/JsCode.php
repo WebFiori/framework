@@ -47,7 +47,7 @@ class JsCode extends HTMLNode{
         parent::addChild(self::createTextNode($jsCode));
     }
     /**
-     * A function that does nothing.
+     * A method that does nothing.
      * @param type $node
      * @since 1.0
      */
@@ -60,7 +60,7 @@ class JsCode extends HTMLNode{
      * exist, it will be created. If already exists, its value will be updated. 
      * If the attribute name is 'type', nothing will happen, 
      * the attribute will never be created.
-     * @param string $val [Optional] The value of the attribute. Default is empty string.
+     * @param string $val The value of the attribute. Default is empty string.
      * @since 1.0
      */
     public function setAttribute($name,$val='') {
@@ -69,7 +69,7 @@ class JsCode extends HTMLNode{
         }
     }
     /**
-     * A function that does nothing.
+     * A method that does nothing.
      * @since 1.0
      * @param type $val
      */
@@ -77,7 +77,7 @@ class JsCode extends HTMLNode{
         
     }
     /**
-     * * A function that does nothing.
+     * * A method that does nothing.
      * @since 1.0
      * @param type $val
      */
@@ -85,7 +85,7 @@ class JsCode extends HTMLNode{
         
     }
     /**
-     * A function that does nothing.
+     * A method that does nothing.
      * @since 1.0
      * @param type $val
      */
@@ -93,7 +93,7 @@ class JsCode extends HTMLNode{
         
     }
     /**
-     * A function that does nothing.
+     * A method that does nothing.
      * @since 1.0
      * @param type $text
      */
@@ -101,7 +101,7 @@ class JsCode extends HTMLNode{
         
     }
     /**
-     * A function that does nothing.
+     * A method that does nothing.
      * @since 1.0
      * @param type $val
      */
@@ -109,7 +109,7 @@ class JsCode extends HTMLNode{
         
     }
     /**
-     * A function that does nothing.
+     * A method that does nothing.
      * @since 1.0
      * @param type $val
      */

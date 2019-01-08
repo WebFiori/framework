@@ -44,7 +44,7 @@ class UnorderedList extends HTMLNode{
     }
     /**
      * Adds a sublist to the main list.
-     * @param UnorderedList $ul An object of type <b>UnorderedList</b>
+     * @param UnorderedList $ul An object of type UnorderedList.
      * @since 1.0
      */
     public function addSubList($ul){

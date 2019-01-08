@@ -32,7 +32,7 @@ namespace phpStructs;
  */
 class Stack{
     /**
-     * A null guard for the functions that return null reference.
+     * A null guard for the methods that return null reference.
      * @since 1.1
      */
     private $null;
@@ -82,9 +82,9 @@ class Stack{
     /**
      * Returns the number of maximum elements the stack can hold.
      * @return int If the maximum number of elements was set to 0 or a 
-     * negative number, the function will return -1 which indicates that 
+     * negative number, the method will return -1 which indicates that 
      * the stack can have infinite number of elements. Other than that, 
-     * the function will return the maximum number of elements.
+     * the method will return the maximum number of elements.
      * @since 1.0
      */
     public function max(){
@@ -96,9 +96,9 @@ class Stack{
     /**
      * Adds new element to the top of the stack.
      * @param mixed $el The element that will be added. If it is NULL, the 
-     * function will not add it.
-     * @return boolean The function will return TRUE if the element is added. 
-     * The function will return FALSE only in two cases, If the maximum 
+     * method will not add it.
+     * @return boolean The method will return TRUE if the element is added. 
+     * The method will return FALSE only in two cases, If the maximum 
      * number of elements is reached and trying to add new one or the given element 
      * is NULL.
      * @since 1.0
@@ -130,7 +130,7 @@ class Stack{
     }
     /**
      * Returns the element that exist on the top of the stack.
-     * @return mixed The element at the top. If the stack is empty, the function 
+     * @return mixed The element at the top. If the stack is empty, the method 
      * will return NULL.
      * @since 1.0
      */
@@ -148,7 +148,7 @@ class Stack{
     /**
      * Removes an element from the top of the stack.
      * @return mixed The element after removal from the stack. If the stack is 
-     * empty, the function will return NULL.
+     * empty, the method will return NULL.
      * @since 1.0
      */
     public function &pop(){

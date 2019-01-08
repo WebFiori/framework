@@ -55,7 +55,7 @@ class Input extends HTMLNode{
     /**
      * Sets the value of the attribute 'type'.
      * @param string $type The type of the input element.
-     * It can be only a value from the array <b>Input::INPUT_TYPES</b>.
+     * It can be only a value from the array Input::INPUT_TYPES.
      * @since 1.0
      */
     public function setType($type) {
@@ -142,7 +142,7 @@ class Input extends HTMLNode{
     /**
      * Sets the value of the attribute 'inputmode'.
      * @param string $mode The value to set. It must be a value from the array 
-     * <b>Input::INPUT_MODES</b>.
+     * Input::INPUT_MODES.
      * @since 1.0
      */
     public function setInputMode($mode) {

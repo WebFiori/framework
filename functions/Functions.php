@@ -29,7 +29,7 @@ use webfiori\entity\SessionManager;
 use webfiori\entity\Logger;
 use webfiori\entity\DBConnectionFactory;
 use phMysql\MySQLQuery;
-use webfiori\Config;
+use webfiori\conf\Config;
 if(!defined('ROOT_DIR')){
     header("HTTP/1.1 403 Forbidden");
     die(''

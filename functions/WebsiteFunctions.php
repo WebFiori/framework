@@ -43,7 +43,7 @@ if(!defined('ROOT_DIR')){
 }
 use webfiori\entity\Logger;
 use webfiori\entity\FileHandler;
-use webfiori\SiteConfig;
+use webfiori\conf\SiteConfig;
 /**
  * A class that can be used to modify basic settings of the web site and 
  * save them to the file 'SiteConfig.php'
@@ -126,7 +126,7 @@ class WebsiteFunctions extends Functions{
      */
     public function createSiteConfigFile() {
         Logger::logFuncCall(__METHOD__);
-        if(!class_exists('webfiori\SiteConfig')){
+        if(!class_exists('webfiori\conf\SiteConfig')){
             Logger::log('Creating Configuration File \'SiteConfig.php\'');
             $initCfg = $this->getSiteConfigVars();
             $this->writeSiteConfig($initCfg);
@@ -202,7 +202,7 @@ class WebsiteFunctions extends Functions{
      */
     public function getSiteConfigVars(){
         $cfgArr = WebsiteFunctions::INITIAL_WEBSITE_CONFIG_VARS;
-        if(class_exists('webfiori\SiteConfig')){
+        if(class_exists('webfiori\conf\SiteConfig')){
             $SC = SiteConfig::get();
             $cfgArr['website-names'] = $SC->getWebsiteNames();
             $cfgArr['base-url'] = $SC->getBaseURL();
@@ -233,9 +233,9 @@ class WebsiteFunctions extends Functions{
                 Logger::log($k.' => '.$v, 'debug');
             }
         }
-        $fh = new FileHandler(ROOT_DIR.'/entity/SiteConfig.php');
+        $fh = new FileHandler(ROOT_DIR.'/conf/SiteConfig.php');
         $fh->write('<?php', TRUE, TRUE);
-        $fh->write('namespace webfiori;',TRUE,TRUE);
+        $fh->write('namespace webfiori\conf;',TRUE,TRUE);
         $fh->write('if(!defined(\'ROOT_DIR\')){
     header("HTTP/1.1 403 Forbidden");
     die(\'\'

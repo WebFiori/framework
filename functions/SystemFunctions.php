@@ -27,7 +27,7 @@ namespace webfiori\functions;
 use webfiori\entity\Logger;
 use webfiori\entity\FileHandler;
 use webfiori\entity\DBConnectionFactory;
-use webfiori\Config;
+use webfiori\conf\Config;
 use Exception;
 if(!defined('ROOT_DIR')){
     header("HTTP/1.1 403 Forbidden");
@@ -93,9 +93,9 @@ class SystemFunctions extends Functions{
      */
     const INITIAL_CONFIG_VARS = array(
         'is-config'=>'FALSE',
-        'release-date'=>'01-01-2019 (DD-MM-YYYY)',
+        'release-date'=>'08-01-2019 (DD-MM-YYYY)',
         'version'=>'1.0.1',
-        'version-type'=>'Stable',
+        'version-type'=>'Beta-2',
         'config-file-version'=>'1.3.2',
         'database-host'=>'localhost',
         'database-username'=>'',
@@ -131,7 +131,7 @@ class SystemFunctions extends Functions{
      */
     public function createConfigFile() {
         Logger::logFuncCall(__METHOD__);
-        if(!class_exists('webfiori\Config')){
+        if(!class_exists('webfiori\conf\Config')){
             Logger::log('Creating Configuration File \'Config.php\'');
             $cfg = $this->getConfigVars();
             $this->writeConfig($cfg);
@@ -227,7 +227,7 @@ class SystemFunctions extends Functions{
      */
     public function getConfigVars(){
         $cfgArr = SystemFunctions::INITIAL_CONFIG_VARS;
-        if(class_exists('webfiori\Config')){
+        if(class_exists('webfiori\conf\Config')){
             $cfgArr['is-config'] = Config::isConfig() === TRUE ? 'TRUE' : 'FALSE';
             $cfgArr['database-host'] = Config::getDBHost();
             $cfgArr['database-username'] = Config::getDBUser();
@@ -245,14 +245,14 @@ class SystemFunctions extends Functions{
      */
     private function writeConfig($configArr){
         Logger::logFuncCall(__METHOD__);
-        $configFileLoc = ROOT_DIR.'/entity/Config.php';
+        $configFileLoc = ROOT_DIR.'/conf/Config.php';
         Logger::log('Saving configuration variables to the file \''.$configFileLoc.'\'.');
         foreach ($configArr as $k => $v){
             Logger::log($k.' => '.$v, 'debug');
         }
         $fh = new FileHandler($configFileLoc);
         $fh->write('<?php', TRUE, TRUE);
-        $fh->write('namespace webfiori;', FALSE, TRUE);
+        $fh->write('namespace webfiori\conf;', FALSE, TRUE);
         $fh->write('if(!defined(\'ROOT_DIR\')){
     header("HTTP/1.1 403 Forbidden");
     die(\'\'
@@ -501,9 +501,9 @@ class SystemFunctions extends Functions{
      */
     public function isSetupFinished(){
         Logger::logFuncCall(__METHOD__);
-        if(class_exists('webfiori\Config')){
-            if(class_exists('webfiori\MailConfig')){
-                if(class_exists('webfiori\SiteConfig')){
+        if(class_exists('webfiori\conf\Config')){
+            if(class_exists('webfiori\conf\MailConfig')){
+                if(class_exists('webfiori\conf\SiteConfig')){
                     $retVal = Config::isConfig();
                     Logger::logReturnValue($retVal);
                     Logger::logFuncReturn(__METHOD__);

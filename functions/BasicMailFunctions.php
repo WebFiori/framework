@@ -96,7 +96,7 @@ class BasicMailFunctions extends Functions{
      */
     public function createEmailConfigFile(){
         Logger::logFuncCall(__METHOD__);
-        if(!class_exists('webfiori\MailConfig')){
+        if(!class_exists('webfiori\conf\MailConfig')){
             Logger::log('Creating Configuration File \'MailConfig.php\'');
             $this->writeMailConfig(array());
             Logger::log('Creatied.');
@@ -114,9 +114,9 @@ class BasicMailFunctions extends Functions{
      */
     private function writeMailConfig($emailAccountsArr){
         Logger::logFuncCall(__METHOD__);
-        $fh = new FileHandler(ROOT_DIR.'/entity/MailConfig.php');
+        $fh = new FileHandler(ROOT_DIR.'/conf/MailConfig.php');
         $fh->write('<?php', TRUE, TRUE);
-        $fh->write('namespace webfiori;', TRUE, TRUE);
+        $fh->write('namespace webfiori\conf;', TRUE, TRUE);
         $fh->write('if(!defined(\'ROOT_DIR\')){
     header("HTTP/1.1 403 Forbidden");
     die(\'\'
@@ -242,7 +242,7 @@ class BasicMailFunctions extends Functions{
     public function removeAccount($accountName) {
         Logger::logFuncCall(__METHOD__);
         $retVal = FALSE;
-        if(class_exists('webfiori\MailConfig')){
+        if(class_exists('webfiori\conf\MailConfig')){
             $account = &MailConfig::getAccount($accountName);
             if($account instanceof SMTPAccount){
                 $accountsArr = MailConfig::getAccounts();
@@ -276,7 +276,7 @@ class BasicMailFunctions extends Functions{
         if($emailAccount instanceof SMTPAccount){
             $sm = $this->getSocketMailer($emailAccount);
             if($sm instanceof SocketMailer){
-                if(class_exists('webfiori\MailConfig')){
+                if(class_exists('webfiori\conf\MailConfig')){
                     $accountsArr = MailConfig::getAccounts();
                     $accountsArr[$emailAccount->getName()] = $emailAccount;
                     $toSave = array();

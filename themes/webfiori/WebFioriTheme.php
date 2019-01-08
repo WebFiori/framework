@@ -9,8 +9,8 @@ use phpStructs\html\HeadNode;
 use phpStructs\html\HTMLNode;
 use phpStructs\html\PNode;
 use phpStructs\html\UnorderedList;
-use webfiori\SiteConfig;
-use webfiori\Config;
+use webfiori\conf\SiteConfig;
+use webfiori\conf\Config;
 
 class WebFioriTheme extends Theme{
     public function __construct() {

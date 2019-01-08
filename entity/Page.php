@@ -20,7 +20,7 @@ if(!defined('ROOT_DIR')){
 use phpStructs\html\HTMLDoc;
 use webfiori\entity\langs\Language;
 use phpStructs\html\HeadNode;
-use webfiori\SiteConfig;
+use webfiori\conf\SiteConfig;
 use phpStructs\html\HTMLNode;
 use Exception;
 /**

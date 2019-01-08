@@ -4,8 +4,8 @@ use webfiori\entity\Page;
 use phpStructs\html\HTMLNode;
 use phpStructs\html\HeadNode;
 use webfiori\functions\WebsiteFunctions;
-use webfiori\SiteConfig;
-use webfiori\Config;
+use webfiori\conf\SiteConfig;
+use webfiori\conf\Config;
 class GreenyTheme extends Theme{
     public function __construct() {
         parent::__construct();

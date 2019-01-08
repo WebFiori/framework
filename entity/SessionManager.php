@@ -19,7 +19,7 @@ if(!defined('ROOT_DIR')){
 }
 use jsonx\JsonI;
 use jsonx\JsonX;
-use webfiori\SiteConfig;
+use webfiori\conf\SiteConfig;
 use Exception;
 /**
  * A helper class to manage system sessions.
@@ -455,7 +455,7 @@ class SessionManager implements JsonI{
         //the value of default language.
         //used in case no language found 
         //in $_GET['lang']
-        $defaultLang = class_exists('webfiori\SiteConfig') ? SiteConfig::getPrimaryLanguage() : 'EN';
+        $defaultLang = class_exists('webfiori\conf\SiteConfig') ? SiteConfig::getPrimaryLanguage() : 'EN';
         Logger::log('Default language = \''.$defaultLang.'\'.', 'debug');
         $lang = NULL;
         Logger::log('Trying to get language variable from the array $_GET[].');

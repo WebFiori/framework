@@ -42,7 +42,7 @@ if(!defined('ROOT_DIR')){
 }
 use restEasy\WebAPI;
 use webfiori\entity\langs\Language;
-use webfiori\SiteConfig;
+use webfiori\conf\SiteConfig;
 use jsonx\JsonI;
 use jsonx\JsonX;
 /**

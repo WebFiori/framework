@@ -41,7 +41,7 @@ if(!defined('ROOT_DIR')){
         . '</body>'
         . '</html>');
 }
-use webfiori\SiteConfig;
+use webfiori\conf\SiteConfig;
 use webfiori\entity\Util;
 use jsonx\JsonX;
 /**
@@ -162,7 +162,7 @@ class Router {
                     . '</body>'
                     . '</html>');
         };
-        if(class_exists('webfiori\SiteConfig')){
+        if(class_exists('webfiori\conf\SiteConfig')){
             $this->baseUrl = trim(SiteConfig::getBaseURL(), '/');
         }
         else{

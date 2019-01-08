@@ -42,7 +42,7 @@ if(!defined('ROOT_DIR')){
         . '</html>');
 }
 use jsonx\JsonI;
-use webfiori\SiteConfig;
+use webfiori\conf\SiteConfig;
 use Exception;
 /**
  * A base class that is used to construct web site UI.

@@ -17,7 +17,8 @@ if(!defined('ROOT_DIR')){
         . '</body>'
         . '</html>');
 }
-use webfiori\Config;
+use webfiori\conf\Config;
+use webfiori\entity\DBConnectionFactory;
 use webfiori\WebFiori;
 /**
  * Framework utility class.
@@ -294,25 +295,40 @@ class Util{
      * Check the overall status of the system.
      * @param boolean $checkDb If set to TRUE, the method will also check 
      * database connection status. The settings of the connection will 
-     * be taken from the class 'Config'.
+     * be taken from the class 'Config'. Default is FALSE.
      * @return boolean|string The method will return TRUE in case everything 
      * was fine. If the file 'Config.php' was not found, The method will return 
      * 'Util::MISSING_CONF_FILE'. If the file 'SiteConfig.php' was not found, The method will return 
      * 'Util::MISSING_CONF_FILE'. If the system is not configured yet, the method 
      * will return 'Util::NEED_CONF'. If the system is unable to connect to 
-     * the database, the method will return 'Util::DB_NEED_CONF'.
+     * the database, the method will return an associative array 
+     * with two indices that contains connection error info. The first 
+     * one is 'error-code' and the second one is 'error-message'.
      * @since 1.2
      */
     public static function checkSystemStatus($checkDb=false){
         Logger::logFuncCall(__METHOD__);
         Logger::log('Checking system status...');
         $returnValue = '';
-        if(class_exists('webfiori\Config')){
-            if(class_exists('webfiori\SiteConfig')){
+        if(class_exists('webfiori\conf\Config')){
+            if(class_exists('webfiori\conf\SiteConfig')){
                 if(Config::isConfig() === TRUE || WebFiori::getClassStatus() == 'INITIALIZING'){
                     if($checkDb === TRUE){
                         Logger::log('Checking database connection...');
-                        $returnValue = self::checkDbConnection();
+                        $returnValue = DBConnectionFactory::mysqlLink(array(
+                            'host'=>Config::getDBHost(),
+                            'port'=> Config::getDBPort(),
+                            'user'=> Config::getDBUser(),
+                            'pass'=> Config::getDBPassword(),
+                            'db-name'=> Config::getDBName()
+                        ));
+                        if(gettype($returnValue) == 'object'){
+                            Logger::log('Connected.');
+                            $returnValue = TRUE;
+                        }
+                        else{
+                            Logger::log('Unable to connect to database.','error');
+                        }
                     }
                     else{
                         Logger::log('No need to check database connection');

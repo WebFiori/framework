@@ -1,5 +1,5 @@
 <?php
-namespace webfiori;
+namespace webfiori\conf;
 if(!defined('ROOT_DIR')){
     header("HTTP/1.1 403 Forbidden");
     die(''
@@ -90,9 +90,9 @@ class Config{
      */
     private function __construct() {
         $this->isConfigured = FALSE;
-        $this->releaseDate = '01-01-2019 (DD-MM-YYYY)';
+        $this->releaseDate = '08-01-2019 (DD-MM-YYYY)';
         $this->version = '1.0.1';
-        $this->versionType = 'Stable';
+        $this->versionType = 'Beta-2';
         $this->configVision = '1.3.2';
         $this->dbHost = 'localhost';
         $this->dbUser = '';

@@ -1,5 +1,5 @@
 <?php
-namespace webfiori;
+namespace webfiori\conf;
 if(!defined('ROOT_DIR')){
     header("HTTP/1.1 403 Forbidden");
     die(''
@@ -93,14 +93,14 @@ class SiteConfig{
     }
     private function __construct() {
         $this->configVision = '1.2.1';
-        $this->webSiteNames = array('AR'=>'أكاديميا البرمجة','EN'=>'Programming Academia',);
+        $this->webSiteNames = array('EN'=>'WebFiori','AR'=>'ويب فيوري',);
         $this->baseUrl = Util::getBaseURL();
         $this->titleSep = ' | ';
         $this->primaryLang = 'EN';
         $this->baseThemeName = 'Greeny By Ibrahim Ali';
         $this->adminThemeName = 'Greeny By Ibrahim Ali';
         $this->homePage = Util::getBaseURL();
-        $this->descriptions = array('AR'=>'','EN'=>'',);
+        $this->descriptions = array('EN'=>'','AR'=>'',);
     }
     
     private function _getPrimaryLanguage(){

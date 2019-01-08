@@ -1,5 +1,5 @@
 <?php
-namespace webfiori;
+namespace webfiori\conf;
 if(!defined('ROOT_DIR')){
     header("HTTP/1.1 403 Forbidden");
     die(''

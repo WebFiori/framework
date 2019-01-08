@@ -89,9 +89,9 @@ class Config{
      * Initialize configuration.
      */
     private function __construct() {
-        $this->isConfigured = FALSE;
+        $this->isConfigured = TRUE;
         $this->releaseDate = '08-01-2019 (DD-MM-YYYY)';
-        $this->version = '1.0.1';
+        $this->version = '1.0.0';
         $this->versionType = 'Beta-2';
         $this->configVision = '1.3.2';
         $this->dbHost = 'localhost';

@@ -94,7 +94,7 @@ class SystemFunctions extends Functions{
     const INITIAL_CONFIG_VARS = array(
         'is-config'=>'FALSE',
         'release-date'=>'08-01-2019 (DD-MM-YYYY)',
-        'version'=>'1.0.1',
+        'version'=>'1.0.0',
         'version-type'=>'Beta-2',
         'config-file-version'=>'1.3.2',
         'database-host'=>'localhost',

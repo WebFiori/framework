@@ -504,8 +504,11 @@ class WebFiori{
             $j->add('type', 'error');
             $j->add('description','This error means that the system is not configured yet. '
                     . 'Make sure to make the method Config::isConfig() return TRUE. '
-                    . 'One way is to go to the file "ini/Config.php". Change attribute value at line 92 to TRUE. '
-                    . 'Or Use the method SystemFunctions::configured(TRUE). You must supply \'TRUE\' as an attribute.');
+                    . 'One way is to go to the file "ini/Config.php". Change attribute value at line 114 to TRUE. '
+                    . 'Or Use the method SystemFunctions::configured(TRUE). You must supply \'TRUE\' as an attribute. '
+                    . 'If you want to make the system do something else if the return value of the '
+                    . 'given method is FALSE, go to the end of the file \'WebFiori.php\' and '
+                    . 'change the code in the \'else\' code block.');
             $j->add('powered-by', 'WebFiori Framework v'.Config::getVersion().' ('.Config::getVersionType().')');
             die($j);
         }
@@ -523,10 +526,15 @@ class WebFiori{
             . 'This error means that the system is not configured yet. '
             . 'Make sure to make the method Config::isConfig() return TRUE. There are two ways '
             . 'to change return value of this method:'
+            . '</p>'
             . '<ul>'
-            . '<li>Go to the file "ini/Config.php". Change attribute value at line 92 to TRUE.</li>'
+            . '<li>Go to the file "ini/Config.php". Change attribute value at line 114 to TRUE.</li>'
             . '<li>Use the method SystemFunctions::configured(TRUE). You must supply \'TRUE\' as an attribute.</li>'
             . '</ul>'
+            . '<p>'
+            . 'If you want to make the system do something else if the return value of the '
+            . 'given method is FALSE, go to the end of the file \'WebFiori.php\' and '
+            . 'change the code in the \'else\' code block.'
             . '</p>'
             . '<p>System Powerd By: <a href="https://github.com/usernane/webfiori" target="_blank"><b>'
                     . 'WebFiori Framework v'.Config::getVersion().' ('.Config::getVersionType().')'
@@ -570,5 +578,10 @@ else{
     //you can modify this part to make 
     //it do something else in case system 
     //configuration is not equal to TRUE
+    
+    //change system config status to configured.
+    //WebFiori::getSysFunctions()->configured(TRUE);
+    
+    //show error message to tell the developer how to configure the system.
     WebFiori::configErr();
 }

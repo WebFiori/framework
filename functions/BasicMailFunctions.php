@@ -1,5 +1,4 @@
 <?php
-
 /*
  * The MIT License
  *
@@ -42,7 +41,6 @@ if(!defined('ROOT_DIR')){
         . '</html>');
 }
 use webfiori\entity\Logger;
-use webfiori\WebFiori;
 use webfiori\entity\FileHandler;
 use webfiori\entity\mail\SMTPAccount;
 use webfiori\entity\mail\SocketMailer;
@@ -116,6 +114,29 @@ class BasicMailFunctions extends Functions{
         Logger::logFuncCall(__METHOD__);
         $fh = new FileHandler(ROOT_DIR.'/conf/MailConfig.php');
         $fh->write('<?php', TRUE, TRUE);
+        $fh->write('/*
+ * The MIT License
+ *
+ * Copyright 2019 Ibrahim, WebFiori Framework.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */');
         $fh->write('namespace webfiori\conf;', TRUE, TRUE);
         $fh->write('if(!defined(\'ROOT_DIR\')){
     header("HTTP/1.1 403 Forbidden");
@@ -344,7 +365,7 @@ class BasicMailFunctions extends Functions{
             Logger::logFuncReturn(__METHOD__);
             return $retVal;
         }
-        Logger::log('The given parameter is not an instance of \'EmailAccount\'.', 'warning');
+        Logger::log('The given parameter is not an instance of \'SMTPAccount\'.', 'warning');
         Logger::logFuncReturn(__METHOD__);
         return FALSE;
     }

@@ -2,7 +2,7 @@
 /*
  * The MIT License
  *
- * Copyright 2018 ibrah.
+ * Copyright 2019 Ibrahim, WebFiori Framework.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -102,6 +102,25 @@ class WebFiori{
     /**
      * Initiate the framework and return a single instance of the class that can 
      * be used to update some settings.
+     * The stages for initializing the framework are as follows:
+     * <ul>
+     * <li>Setting the encoding to UTF-8 for the 'mb' functions.</li>
+     * <li>Setting memory limit to 2GB. Developer can change this if he wants.</li>
+     * <li>Setting time zone. Default is set to 'Asia/Riyadh' For supported 
+     * time zones, see <a target="_blank" href="http://php.net/manual/en/timezones.php">http://php.net/manual/en/timezones.php</a>.</li>
+     * <li>Creating the constant ROOT_DIR.</li>
+     * <li>Loading the auto loder class.</li>
+     * <li>Initializing user-defined autoload directories.</li>
+     * <li>Creating an instance of SystemFunctions, WebsiteFunctions and BasicMailFunctions.</li>
+     * <li>Initializing routes.</li>
+     * <li>Checking system status (database connection and configuration status)</li>
+     * <li>Initializing CRON jobs.</li>
+     * <li>Initializing privileges.</li>
+     * <li>Setting a custom errors and exceptions handler.</li>
+     * <li>Finally, routing if system configuration status is not 
+     * equal to FALSE. If it is FALSE, A message will be displayed to tell 
+     * the developer how do configure it.</li>
+     * </ul>
      * @return WebFiori An instance of the class.
      * @since 1.0
      */
@@ -550,6 +569,6 @@ else if(INITIAL_SYS_STATUS == Util::DB_NEED_CONF){
 else{
     //you can modify this part to make 
     //it do something else in case system 
-    //configuration isnot equal to TRUE
+    //configuration is not equal to TRUE
     WebFiori::configErr();
 }

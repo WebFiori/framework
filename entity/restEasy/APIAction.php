@@ -3,7 +3,7 @@
 /* 
  * The MIT License
  *
- * Copyright 2018 Ibrahim BinAlshikh.
+ * Copyright 2019 Ibrahim BinAlshikh, restEasy library.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -175,7 +175,7 @@ class APIAction implements JsonI{
      */
     public function addParameter($param){
         if($param instanceof RequestParameter){
-            array_push($this->parameters, $param);
+            $this->parameters[] = $param;
         }
     }
     /**
@@ -193,7 +193,7 @@ class APIAction implements JsonI{
         $uMethod = strtoupper($method);
         if(in_array($uMethod, self::METHODS)){
             if(!in_array($uMethod, $this->reqMethods)){
-                array_push($this->reqMethods, $uMethod);
+                $this->reqMethods[] = $uMethod;
                 return TRUE;
             }
         }
@@ -327,6 +327,5 @@ class APIAction implements JsonI{
         $json->add('responses', $this->getResponsesDescriptions());
         return $json;
     }
-
 }
 

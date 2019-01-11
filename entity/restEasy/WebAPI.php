@@ -2,7 +2,7 @@
 /*
  * The MIT License
  *
- * Copyright 2018 Ibrahim BinAlshikh, rest-easy (v1.4.2).
+ * Copyright 2019 Ibrahim BinAlshikh, restEasy library.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +27,16 @@ use jsonx\JsonI;
 use jsonx\JsonX;
 /**
  * A class that represents a REST API.
- * @version 1.4.2
+ * This class is used to create web services.
+ * In order to create a simple web service, the developer must 
+ * follow the following steps:
+ * <ul>
+ * <li>Extend this class.</li>
+ * <li>Create API actions using the class APIAction.</li>
+ * <li>Implement the abstract method <a href="#isAuthorized">WebAPI::isAuthorized?()</a> 
+ * and the method <a href="#processRequest">WebAPI::processRequest()</a></li>
+ * </li>
+ * @version 1.4.3
  */
 abstract class WebAPI implements JsonI{
     /**
@@ -37,40 +46,12 @@ abstract class WebAPI implements JsonI{
      * <li>application/x-www-form-urlencoded</li>
      * <li>multipart/form-data</li>
      * </ul>
-     * @var array An array that contains the supported 'POST' request content types.
+     * @var array An array that contains the supported 'POST' and 'PUT' request content types.
      * @since 1.1
      */
     const POST_CONTENT_TYPES = array(
         'application/x-www-form-urlencoded',
         'multipart/form-data'
-    );
-    /**
-     * An array that contains most common MIME types with file extension as key.
-     * @var array An array that contains most common MIME types with file extension as key.
-     * @since 1.1
-     */
-    const MIME_TYPES = array(
-        'js'=>'application/javascript',
-        'json'=>'application/json',
-        'xml'=>'application/xml',
-        'zip'=>'application/zip',
-        'pdf'=>'application/pdf',
-        'sql'=>'application/sql',
-        'doc'=>'application/msword',
-        'docx'=>'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        'xls'=>'application/vnd.ms-excel',
-        'xlsx'=>'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'ppt'=>'application/vnd.ms-powerpoint',
-        'pptx'=>'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-        'mp3'=>'audio/mpeg',
-        'css'=>'text/css',
-        'html'=>'text/html',
-        'csv'=>'text/csv',
-        'txt'=>'text/plain',
-        'png'=>'image/png',
-        'jpeg'=>'image/jpeg',
-        'gif'=>'image/gif',
-        'mp4'=>'video/mp4'
     );
     /**
      * An array which contains the missing required body parameters.
@@ -206,7 +187,7 @@ abstract class WebAPI implements JsonI{
             $this->sendResponse('Database Error', TRUE, 404, '"err-info":'.$info);
         }
         else{
-            $this->sendResponse('Database Error', TRUE, 404, '"err-info":"'.$info.'"');
+            $this->sendResponse('Database Error', TRUE, 404, '"err-info":"'.JsonX::escapeJSONSpecialChars($info).'"');
         }
     }
     /**
@@ -252,6 +233,8 @@ abstract class WebAPI implements JsonI{
      * }
      * </p>
      * In addition to the message, The response will sent HTTP code 404 - Not Found.
+     * @param string $cType The value of the header 'content-type' taken from 
+     * request header.
      * @since 1.1
      */
     public function contentTypeNotSupported($cType=''){
@@ -459,7 +442,7 @@ abstract class WebAPI implements JsonI{
      * Adds new action to the set of API actions.
      * @param APIAction $action The action that will be added.
      * @param boolean $reqPermissions Set to TRUE if the action require user login or 
-     * any additional permissions.
+     * any additional permissions. Default is FALSE.
      * @return boolean TRUE if the action is added. FAlSE otherwise.
      * @since 1.0
      */
@@ -549,7 +532,7 @@ abstract class WebAPI implements JsonI{
         return FALSE;
     }
     /**
-     * Returns request content type (For 'POST' requests).
+     * Returns request content type.
      * @return string The value of the header 'content-type' in the request.
      * @since 1.1
      */
@@ -562,7 +545,7 @@ abstract class WebAPI implements JsonI{
     }
     /**
      * Checks if request content type is supported by the API or not (For 'POST' 
-     * requests).
+     * and PUT requests only).
      * @return boolean Returns TRUE in case the 'content-type' header is not 
      * set or the request method is not 'POST'. Also the method will return 
      * TRUE if the content type is supported. Other than that, the method 
@@ -571,7 +554,8 @@ abstract class WebAPI implements JsonI{
      */
     public final function isContentTypeSupported(){
         $c = $this->getContentType();
-        if($c != NULL && $this->getRequestMethod() == 'POST'){
+        $rm = $this->getRequestMethod();
+        if($c != NULL && $rm == 'POST' || $rm == 'PUT'){
             return in_array($c, self::POST_CONTENT_TYPES);
         }
         return TRUE;
@@ -721,7 +705,7 @@ abstract class WebAPI implements JsonI{
                 if($processReq){
                     if($this->_isAuthorizedAction()){
                         if($this->getAction() == 'api-info'){
-                            $this->send(self::MIME_TYPES['json'], $this->toJSON());
+                            $this->send('application/json', $this->toJSON());
                         }
                         else if($this->getAction() == 'request-info'){
                             $j = new JsonX();
@@ -729,7 +713,7 @@ abstract class WebAPI implements JsonI{
                             $j->add('content-type', $this->getContentType());
                             $j->add('method', $this->getRequestMethod());
                             $j->add('parameters', $this->getInputs());
-                            $this->send(self::MIME_TYPES['json'], $j);
+                            $this->send('application/json', $j);
                         }
                         else{
                             $this->processRequest();
@@ -760,16 +744,19 @@ abstract class WebAPI implements JsonI{
      * {<br/>
      * &nbsp;&nbsp;"message":"Action is not set.",<br/>
      * &nbsp;&nbsp;"type":"error"<br/>
+     * &nbsp;&nbsp;"more-info":EXTRA_INFO<br/>
      * }
-     * If other JSON string is given, It will be included in the response.
+     * </p>
+     * Where EXTRA_INFO can be a simple string or any JSON data.
      * @param string $message The message to send back.
-     * @param boolean $isErr TRUE if the message represents an error state.
-     * @param int $code Response code (such as 404 or 200).
-     * @param string $otherJsonStr Any other data to send back (it should be a 
-     * JSON string).
+     * @param boolean $isErr TRUE if the message represents an error state. Default 
+     * is FALSE.
+     * @param int $code Response code (such as 404 or 200). Default is 200.
+     * @param string|JsonX|JsonI $otherInfo Any other data to send back it can be a simple 
+     * string, an object of type JsonX or JsonI. Default is empty string.
      * @since 1.0
      */
-    public function sendResponse($message,$isErr=false,$code=200,$otherJsonStr=''){
+    public function sendResponse($message,$isErr=false,$code=200,$otherInfo=''){
         header('content-type:application/json');
         http_response_code($code);
         if($isErr == TRUE){
@@ -779,31 +766,68 @@ abstract class WebAPI implements JsonI{
             $e = 'info';
         }
         $value =  '{"message":"'.$message.'","type":"'.$e.'"';
-        if(strlen($otherJsonStr) != 0){
-            echo $value . ','.$otherJsonStr.'}';
+        if($otherInfo instanceof JsonX){
+            echo $value . ',"more-info":'.$otherInfo.'}';
+        }
+        else if($otherInfo instanceof JsonI){
+            echo $value . ',"more-info":'.$otherInfo->toJSON().'}';
         }
         else{
-            echo $value .'}';
+            if(strlen($otherInfo) != 0){
+                echo $value . ',"more-info":"'.JsonX::escapeJSONSpecialChars($otherInfo).'"}';
+            }
+            else{
+                echo $value .'}';
+            }
         }
     }
     /**
      * Sends Back a data using specific content type using HTTP code 200 - Ok.
      * @param string $conentType Response content type (such as 'application/json')
-     * @param type $data Any data to send back (it can be a file, a string ...).
+     * @param mixed $data Any data to send back. Mostly, it will be a string.
      */
     public function send($conentType,$data){
         header('content-type:'.$conentType);
         echo $data;
     }
     /**
-     * Returns an array of filtered request inputs.
+     * Sends back multiple HTTP headers to the client.
+     * @param array $headersArr An associative array. The keys will act as 
+     * the headers names and the value of each key will represents the value 
+     * of the header.
+     * @since 1.4.3
+     */
+    public function sendHeaders($headersArr) {
+        if(gettype($headersArr) == 'array'){
+            foreach ($headersArr as $header => $val){
+                header($header.':'.$val);
+            }
+        }
+    }
+    /**
+     * Returns an associative array of filtered request inputs.
+     * The indices of the array will represent request parameters and the 
+     * values of each index will represent the value which was set in 
+     * request body. The values will be filtered and might not be exactly the same as 
+     * the values passed in request body.
      * @return array An array of filtered request inputs.
      * @since 1.0
      */
     public function getInputs(){
         return $this->filter->getInputs();
     }
-
+    /**
+     * Returns an associative array of non-filtered request inputs.
+     * The indices of the array will represent request parameters and the 
+     * values of each index will represent the value which was set in 
+     * request body. The values will be exactly the same as 
+     * the values passed in request body.
+     * @return array An array of request parameters.
+     * @since 1.4.3
+     */
+    public function getNonFiltered(){
+        return $this->filter->getNonFiltered();
+    }
     /**
      * Returns the action that was requested to perform.
      * @return string|NULL The action that was requested to perform. If the action 

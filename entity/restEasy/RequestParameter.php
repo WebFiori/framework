@@ -3,7 +3,7 @@
 /* 
  * The MIT License
  *
- * Copyright 2018 Ibrahim BinAlshikh.
+ * Copyright 2019 Ibrahim BinAlshikh, restEasy library.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,9 +29,15 @@ use jsonx\JsonX;
 /**
  * A class that represents request parameter.
  * @author Ibrahim
- * @version 1.2
+ * @version 1.2.1
  */
 class RequestParameter implements JsonI{
+    /**
+     * A boolean value that can be set to TRUE to allow empty strings.
+     * @var boolean 
+     * @since 1.2.1
+     */
+    private $isEmptStrAllowed;
     /**
      * The type of the data the parameter will represents.
      * @var string
@@ -91,7 +97,7 @@ class RequestParameter implements JsonI{
     /**
      * Sets the description of the parameter.
      * This method is used to document the API. Used to help front-end developers.
-     * @param sting $desc Parameter description.
+     * @param string $desc Parameter description.
      * @since 1.1
      */
     public function setDescription($desc) {
@@ -109,12 +115,13 @@ class RequestParameter implements JsonI{
     /**
      * Creates new instance of the class.
      * @param string $name The name of the parameter as it appears in the request body. 
-     * It must be a valid name> If the given name is invalid, the parameter 
+     * It must be a valid name. If the given name is invalid, the parameter 
      * name will be set to 'a-parameter'.
      * @param string $type The type of the data that will be in the parameter (integer, 
      * string, email etc...). It must be a value from the array APIFilter::TYPES. 
-     * If the given type is invalid, 'string' is used.
-     * @param boolean $isOptional Set to TRUE if the parameter is optional.
+     * Default is 'string'.
+     * @param boolean $isOptional Set to TRUE if the parameter is optional. Default 
+     * is FALSE.
      */
     public function __construct($name,$type='string',$isOptional=false) {
         if(!$this->setName($name)){
@@ -125,6 +132,7 @@ class RequestParameter implements JsonI{
             $this->type = 'string';
         }
         $this->applyBasicFilter = FALSE;
+        $this->isEmptStrAllowed = FALSE;
     }
     /**
      * Returns the minimum numeric value the parameter can accept.
@@ -171,6 +179,29 @@ class RequestParameter implements JsonI{
             }
         }
         return FALSE;
+    }
+    /**
+     * Checks if empty strings are allowed as values for the parameter.
+     * By default, The method will return FALSE.
+     * @return boolean TRUE if empty strings are allowed as values for the parameter. 
+     * FALSE if not.
+     * @since 1.2.1
+     */
+    public function isEmptyStringAllowed() {
+        return $this->isEmptStrAllowed;
+    }
+    /**
+     * Allow or disallow empty strings as values for the parameter.
+     * The value of the attribute will be updated only if the type of the 
+     * parameter is set to 'string'.
+     * @param boolean $bool TRUE to allow empty strings and FALSE to disallow 
+     * empty strings.
+     * @since 1.2.1
+     */
+    public function setIsEmptyStringAllowed($bool) {
+        if($this->getType() == 'string'){
+            $this->isEmptStrAllowed = $bool === TRUE ? TRUE : FALSE;
+        }
     }
     /**
      * Sets the maximum value.

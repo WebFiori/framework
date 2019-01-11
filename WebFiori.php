@@ -174,14 +174,14 @@ class WebFiori{
         //uncomment next line to show runtime errors and warnings
         //also enable logging for info, warnings and errors 
         Logger::logName('initialization-log');
-        //Logger::enabled(TRUE);
+        Logger::enabled(TRUE);
         Logger::clear();
         
         //display PHP warnings and errors
         Util::displayErrors();
 
         //enable logging of debug info.
-        define('DEBUG', '');
+        //define('DEBUG', '');
         
         $this->SF = SystemFunctions::get();
         $this->WF = WebsiteFunctions::get();
@@ -196,9 +196,6 @@ class WebFiori{
             $this->WF->createSiteConfigFile();
             $this->BMF->createEmailConfigFile();
             $this->sysStatus = Util::checkSystemStatus(TRUE);
-            
-            //supply TRUE to check database connection
-            //$this->sysStatus = Util::checkSystemStatus(TRUE);
         }
         if(gettype($this->sysStatus) == 'array'){
             $this->dbErrDetails = $this->sysStatus;
@@ -219,6 +216,7 @@ class WebFiori{
                 $j->add('error-number',$errno);
                 $j->add('file',$errfile);
                 $j->add('line',$errline);
+                header('content-type: application/json');
                 die($j);
             }
             //let php handle the error since it is not API call.
@@ -243,6 +241,7 @@ class WebFiori{
                     $index++;
                 }
                 $j->add('stack-trace',$stackTrace);
+                header('content-type: application/json');
                 die($j);
             }
             else{
@@ -269,9 +268,6 @@ class WebFiori{
         });
         Logger::log('Initializing completed.');
         
-        //switch to the log file 'system-log.txt'.
-        Logger::logName('system-log');
-        Logger::section();
         self::$classStatus = 'INITIALIZED';
     }
     /**
@@ -381,7 +377,7 @@ class WebFiori{
         Logger::logFuncCall(__METHOD__);
         $retVal = self::$classStatus;
         if(self::getClassStatus() == 'INITIALIZED'){
-            $retVal = self::getAndStart()->getSystemStatus(TRUE);
+            $retVal = self::getAndStart()->_getSystemStatus(TRUE);
         }
         Logger::logReturnValue($retVal);
         Logger::logFuncReturn(__METHOD__);
@@ -393,12 +389,16 @@ class WebFiori{
      * @return boolean|string
      * @since 1.0
      */
-    private function getSystemStatus($refresh=true,$testDb=false) {
+    private function _getSystemStatus($refresh=true,$testDb=true) {
         Logger::logFuncCall(__METHOD__);
         Logger::log('Refresh status = '.$refresh, 'debug');
         if($refresh === TRUE){
             Logger::log('Updating system status.');
             $this->sysStatus = Util::checkSystemStatus($testDb);
+            if(gettype($this->sysStatus) == 'array'){
+                $this->dbErrDetails = $this->sysStatus;
+                $this->sysStatus = Util::DB_NEED_CONF;
+            }
         }
         Logger::logReturnValue($this->sysStatus);
         Logger::logFuncReturn(__METHOD__);
@@ -436,9 +436,12 @@ class WebFiori{
      * @since 1.2.1
      */
     public function initAutoloadDirectories(){
+        Logger::logFuncCall(__METHOD__);
         if(self::getClassStatus()== 'INITIALIZING'){
             InitAutoLoad::init();
+            Logger::log('Autoload directories initialized.');
         }
+        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * Initialize user groups and permissions.
@@ -471,7 +474,7 @@ class WebFiori{
      * configure it.
      * @since 1.0
      */
-    private function needConfigration(){
+    private function _needConfigration(){
         Logger::logFuncCall(__METHOD__, 'initialization-log');
         Logger::requestCompleted();
         header('HTTP/1.1 503 Service Unavailable');
@@ -519,7 +522,7 @@ class WebFiori{
      * @since 1.0
      */
     public static function configErr() {
-        WebFiori::getAndStart()->needConfigration();
+        WebFiori::getAndStart()->_needConfigration();
     }
 }
 
@@ -528,13 +531,25 @@ WebFiori::getAndStart();
 define('INITIAL_SYS_STATUS',WebFiori::sysStatus());
 Logger::log('INITIAL_SYS_STATUS = '.INITIAL_SYS_STATUS, 'debug');
 if(INITIAL_SYS_STATUS === TRUE){
+    //switch to the log file 'system-log.txt'.
+    Logger::logName('system-log');
+    Logger::section();
     Router::route(Util::getRequestedURL());
 }
 else if(INITIAL_SYS_STATUS == Util::DB_NEED_CONF){
     Logger::log('Unable to connect to database.', 'warning');
+    $err = WebFiori::getDBErrDetails();
+    Logger::log('Database Error Code: '.$err['error-code']);
+    Logger::log('Database Error Message: '.$err['error-message']);
+    //switch to the log file 'system-log.txt'.
+    Logger::logName('system-log');
+    Logger::section();
     Router::route(Util::getRequestedURL());
     Logger::requestCompleted();
 }
 else{
+    //you can modify this part to make 
+    //it do something else in case system 
+    //configuration isnot equal to TRUE
     WebFiori::configErr();
 }

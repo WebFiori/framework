@@ -315,7 +315,7 @@ class Logger {
      */
     private function _clearLog() {
         $this->handelr = fopen($this->_getDirectory().'/'.$this->_getLogName().'.txt', 'w+');
-        $time = date('Y-m-d h:i:s T');
+        $time = date('Y-m-d H:i:s T');
         fwrite($this->handelr, '---------------Log Cleared At '.$time.'---------------'."\r\n");
         fclose($this->handelr);
     }
@@ -400,7 +400,7 @@ class Logger {
             }
             else{
                 $this->handelr = fopen($this->_getDirectory().'/'.$this->_getLogName().'.txt', 'a+');
-                $time = date('Y-m-d h:i:s T');
+                $time = date('Y-m-d H:i:s T');
                 if($this->functionsStack->size() != 0){
                     $message = '['.$time.'] '.$this->addSpaces($bType).': ['.$this->functionsStack->peek().'] '.$content."\r\n";
                     fwrite($this->handelr, $message);

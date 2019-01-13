@@ -46,7 +46,7 @@ use webfiori\entity\File;
  * A class that can be used to send email messages using sockets.
  *
  * @author Ibrahim
- * @version 1.4.4
+ * @version 1.4.5
  */
 class SocketMailer {
     /**
@@ -489,7 +489,7 @@ class SocketMailer {
         Logger::log('Checking if in writing mode.');
         if($this->isInWritingMode()){
             Logger::log('In writing mode.');
-            $this->sendC($msg);
+            $this->sendC(trim($msg,"\t\n\r\0\x0B"));
             Logger::log('Checking if message must be sent.');
             if($sendMessage === TRUE){
                 Logger::log('Must be sent. Appending attachments (if any).');
@@ -536,7 +536,7 @@ class SocketMailer {
                 $this->sendC('Content-Transfer-Encoding: quoted-printable');
                 $this->sendC('Importance: '.$importanceHeaderVal);
                 $this->sendC('From: "'.$this->getSenderName().'" <'.$this->getSenderAddress().'>');
-                $this->sendC('To: '.$this->getTo());
+                $this->sendC('To: '.$this->getReceiversStr());
                 $this->sendC('CC: '.$this->getCCStr());
                 $this->sendC('BCC: '.$this->getBCCStr());
                 $this->sendC('Date:'. date('r (T)'));
@@ -545,7 +545,7 @@ class SocketMailer {
                 $this->sendC('Content-Type: multipart/mixed; boundary="'.$this->boundry.'"'.self::NL);
                 $this->sendC('--'.$this->boundry);
                 $this->sendC('Content-Type: text/html; charset="UTF-8"'.self::NL);
-                $this->sendC($msg);
+                $this->sendC(trim($msg,"\t\n\r\0\x0B"));
                 Logger::log('Checking if message must be sent.');
                 if($sendMessage === TRUE){
                     Logger::log('Must be sent. Appending attachments (if any).');
@@ -623,11 +623,14 @@ class SocketMailer {
         return $this->cc;
     }
     /**
-     * 
-     * @return string
+     * Returns a string that contains the names and the addresses 
+     * of people who will receive a blind carbon copy of the message.
+     * The format of the string will be as follows:
+     * <p>NAME_1 &lt;ADDRESS_1&gt;, NAME_2 &lt;ADDRESS_2&gt; ...</p>
+     * @return string A string that contains receivers information.
      * @since 1.0
      */
-    private function getBCCStr(){
+    public function getBCCStr(){
         $arr = array();
         foreach ($this->bcc as $address => $name){
             array_push($arr, $name.' <'.$address.'>');
@@ -635,11 +638,14 @@ class SocketMailer {
         return implode(',', $arr);
     }
     /**
-     * 
-     * @return string
+     * Returns a string that contains the names and the addresses 
+     * of people who will receive a carbon copy of the message.
+     * The format of the string will be as follows:
+     * <p>NAME_1 &lt;ADDRESS_1&gt;, NAME_2 &lt;ADDRESS_2&gt; ...</p>
+     * @return string A string that contains receivers information.
      * @since 1.0
      */
-    private function getCCStr(){
+    public function getCCStr(){
         $arr = array();
         foreach ($this->cc as $address => $name){
             array_push($arr, $name.' <'.$address.'>');
@@ -647,11 +653,14 @@ class SocketMailer {
         return implode(',', $arr);
     }
     /**
-     * 
-     * @return string
+     * Returns a string that contains the names and the addresses 
+     * of people who will receive an original copy of the message.
+     * The format of the string will be as follows:
+     * <p>NAME_1 &lt;ADDRESS_1&gt;, NAME_2 &lt;ADDRESS_2&gt; ...</p>
+     * @return string A string that contains receivers information.
      * @since 1.0
      */
-    private function getTo(){
+    public function getReceiversStr(){
         $arr = array();
         foreach ($this->receivers as $address => $name){
             array_push($arr, $name.' <'.$address.'>');
@@ -708,8 +717,10 @@ class SocketMailer {
     }
     /**
      * Sends a command to the mail server.
-     * @param type $command
-     * @return boolean
+     * @param string $command Any SMTP command.
+     * @return boolean The method will return always TRUE if the command was 
+     * sent. The only case that the method will return FALSE is when it is not 
+     * connected to the server.
      * @since 1.0
      */
     public function sendC($command){

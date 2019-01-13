@@ -23,13 +23,6 @@
  * THE SOFTWARE.
  */
 namespace webfiori\entity\mail;
-use webfiori\conf\MailConfig;
-use webfiori\entity\File;
-use webfiori\entity\Logger;
-use webfiori\functions\BasicMailFunctions;
-use phpStructs\html\HTMLDoc;
-use phpStructs\html\HTMLNode;
-use Exception;
 if(!defined('ROOT_DIR')){
     header("HTTP/1.1 403 Forbidden");
     die(''
@@ -47,11 +40,18 @@ if(!defined('ROOT_DIR')){
         . '</body>'
         . '</html>');
 }
+use webfiori\conf\MailConfig;
+use webfiori\entity\File;
+use webfiori\entity\Logger;
+use webfiori\functions\BasicMailFunctions;
+use phpStructs\html\HTMLDoc;
+use phpStructs\html\HTMLNode;
+use Exception;
 /**
  * A class that can be used to write HTML formatted Email messages.
  *
  * @author Ibrahim
- * @version 1.0.2
+ * @version 1.0.3
  */
 class EmailMessage {
     /**
@@ -123,6 +123,7 @@ class EmailMessage {
                     Logger::log('Instance created with no errors.');
                     Logger::logFuncReturn(__METHOD__);
                     $this->asHtml = new HTMLDoc();
+                    $this->asHtml->getHeadNode()->addMeta('charset', 'UTF-8');
                     return;
                 }
             }
@@ -173,8 +174,41 @@ class EmailMessage {
      * @return array An array that contains receivers information.
      * @since 1.0.2
      */
-    public function getReceivers() {
+    public static function getReceivers() {
         return self::createInstance()->_getSocketMailer()->getReceivers();
+    }
+    /**
+     * Returns a string that contains the names and the addresses 
+     * of people who will receive an original copy of the message.
+     * The format of the string will be as follows:
+     * <p>NAME_1 &lt;ADDRESS_1&gt;, NAME_2 &lt;ADDRESS_2&gt; ...</p>
+     * @return string A string that contains receivers information.
+     * @since 1.0.3
+     */
+    public static function getReceiversStr() {
+        return self::createInstance()->_getSocketMailer()->getReceiversStr();
+    }
+    /**
+     * Returns a string that contains the names and the addresses 
+     * of people who will receive a carbon copy of the message.
+     * The format of the string will be as follows:
+     * <p>NAME_1 &lt;ADDRESS_1&gt;, NAME_2 &lt;ADDRESS_2&gt; ...</p>
+     * @return string A string that contains receivers information.
+     * @since 1.0.3
+     */
+    public static function getCCStr() {
+        return self::createInstance()->_getSocketMailer()->getCCStr();
+    }
+    /**
+     * Returns a string that contains the names and the addresses 
+     * of people who will receive a blind carbon copy of the message.
+     * The format of the string will be as follows:
+     * <p>NAME_1 &lt;ADDRESS_1&gt;, NAME_2 &lt;ADDRESS_2&gt; ...</p>
+     * @return string A string that contains receivers information.
+     * @since 1.0.3
+     */
+    public static function getBCCStr() {
+        return self::createInstance()->_getSocketMailer()->getBCCStr();
     }
     /**
      * Adds a text node to the body of the message.

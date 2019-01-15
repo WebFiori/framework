@@ -21,7 +21,9 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- */namespace webfiori\conf;
+ */
+ 
+namespace webfiori\conf;
 if(!defined('ROOT_DIR')){
     header("HTTP/1.1 403 Forbidden");
     die(''
@@ -40,8 +42,20 @@ if(!defined('ROOT_DIR')){
         . '</html>');
 }
 use webfiori\entity\Util;
-/** The main configuration file that is used to control 
- Some of basic settings of the website.*/
+/** 
+ * Website configuration class.
+ * This class is used to control the following settings:
+ * <ul>
+ * <li>The base URL of the website.</li>
+ * <li>The primary language of the website.</li>
+ * <li>The name of the website in different languages.</li>
+ * <li>The general description of the website in different languages.</li>
+ * <li>The character that is used to separate the name of the website from page title.</li>
+ * <li>The theme of the website.</li>
+ * <li>Admin theme of the website (if uses one).</li>
+ * <li>The home page of the website.</li>
+ * </ul>
+ */
 class SiteConfig{
     /**
      * An array which contains all website names in different languages.

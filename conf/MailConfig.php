@@ -21,7 +21,9 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- */namespace webfiori\conf;
+ */
+ 
+namespace webfiori\conf;
 if(!defined('ROOT_DIR')){
     header("HTTP/1.1 403 Forbidden");
     die(''
@@ -41,9 +43,9 @@ if(!defined('ROOT_DIR')){
 }
 use webfiori\entity\mail\EmailAccount;
 /**
- * A file that contains SMTP accounts information.
+ * SMTP configuration class.
  * The developer can create multiple SMTP accounts and add 
- * Connection information here.
+ * Connection information inside the body of this class.
  * @author Ibrahim
  * @version 1.0
  */
@@ -56,7 +58,7 @@ class MailConfig{
      */
     private static $inst;
     /**
-     * Returnd a singleton instance of the class.
+     * Return a single instance of the class.
      * Calling this method multiple times will result in returning 
      * the same instance every time.
      * @return MailConfig

@@ -173,6 +173,13 @@ class MySQLLink{
         return $this->isConnected();
     }
     /**
+     * Returns the name of the database that the instance is connected to.
+     * @return string The name of the database.
+     */
+    public function getDBName() {
+        return $this->db;
+    }
+    /**
      * Checks if the connection is still active or its dead and try to reconnect.
      * @return boolean true if still active, false if dead. If the connection is 
      * dead, more details can be found by getting the error message and error 

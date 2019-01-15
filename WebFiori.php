@@ -504,7 +504,7 @@ class WebFiori{
             $j->add('type', 'error');
             $j->add('description','This error means that the system is not configured yet. '
                     . 'Make sure to make the method Config::isConfig() return TRUE. '
-                    . 'One way is to go to the file "ini/Config.php". Change attribute value at line 114 to TRUE. '
+                    . 'One way is to go to the file "ini/Config.php". Change attribute value at line 87 to TRUE. '
                     . 'Or Use the method SystemFunctions::configured(TRUE). You must supply \'TRUE\' as an attribute. '
                     . 'If you want to make the system do something else if the return value of the '
                     . 'given method is FALSE, go to the end of the file \'WebFiori.php\' and '
@@ -528,7 +528,7 @@ class WebFiori{
             . 'to change return value of this method:'
             . '</p>'
             . '<ul>'
-            . '<li>Go to the file "ini/Config.php". Change attribute value at line 114 to TRUE.</li>'
+            . '<li>Go to the file "ini/Config.php". Change attribute value at line 87 to TRUE.</li>'
             . '<li>Use the method SystemFunctions::configured(TRUE). You must supply \'TRUE\' as an attribute.</li>'
             . '</ul>'
             . '<p>'

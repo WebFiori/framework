@@ -136,7 +136,9 @@ class BasicMailFunctions extends Functions{
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- */');
+ */
+ 
+');
         $fh->write('namespace webfiori\conf;', TRUE, TRUE);
         $fh->write('if(!defined(\'ROOT_DIR\')){
     header("HTTP/1.1 403 Forbidden");

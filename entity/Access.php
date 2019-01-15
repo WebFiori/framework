@@ -81,7 +81,7 @@ class Access {
     /**
      * Returns an array which contains all privileges or privileges 
      * in a specific user group.
-     * @param string|NULL $groupId [Optional] The ID of the group which its 
+     * @param string|NULL $groupId The ID of the group which its 
      * privileges will be returned. If NULL is given, all privileges will be 
      * returned. Default is NULL.
      * @return array An array which contains an objects of type Privilege. If 

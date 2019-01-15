@@ -118,7 +118,7 @@ class CronJob {
     private $cronExpr;
     /**
      * Creates new instance of the class.
-     * @param string $when [Optional] A cron expression. An exception will be thrown if 
+     * @param string $when A cron expression. An exception will be thrown if 
      * the given expression is invalid. Default is '* * * * *' which means run 
      * the job every minute.
      * @throws Exception
@@ -198,9 +198,9 @@ class CronJob {
      * function uses 24 hours mode. If no parameters are given, 
      * The default time is 00:00 which means that the job will be executed 
      * daily at midnight.
-     * @param int $hour [Optional] A number between 0 and 23 inclusive. 0 Means daily at 
+     * @param int $hour A number between 0 and 23 inclusive. 0 Means daily at 
      * 12:00 AM and 23 means at 11:00 PM. Default is 0.
-     * @param int $minute [Optional] A number between 0 and 59 inclusive. Represents the 
+     * @param int $minute A number between 0 and 59 inclusive. Represents the 
      * minute part of an hour. Default is 0.
      * @return boolean If job time is set, the method will return TRUE. If 
      * not set, the method will return FALSE. It will not set only if the 
@@ -224,9 +224,9 @@ class CronJob {
     }
     /**
      * Schedules a job to run weekly at specific week day and time.
-     * @param int $dayNameOrNum [Optional] A 3 letter day name (such as 'sun' 
+     * @param int $dayNameOrNum A 3 letter day name (such as 'sun' 
      * or 'tue') or a day number from 0 to 6. 0 for sunday. Default is 0.
-     * @param string $time [Optional] A time in the form 'hh:mm'. hh can have any value 
+     * @param string $time A time in the form 'hh:mm'. hh can have any value 
      * between 0 and 23 inclusive. mm can have any value between 0 and 59 inclusive. 
      * default is '00:00'.
      * @return boolean If the time for the cron job is set, the method will 
@@ -247,11 +247,11 @@ class CronJob {
     }
     /**
      * Schedules a job to run at specific day and time in a specific month.
-     * @param int|string $monthNameOrNum [Optional] Month number from 1 to 12 inclusive 
+     * @param int|string $monthNameOrNum Month number from 1 to 12 inclusive 
      * or 3 letters month name. Default is 'jan'.
-     * @param int $dayNum [Optional] The number of day in the month starting from 1 up to 
+     * @param int $dayNum The number of day in the month starting from 1 up to 
      * 31 inclusive. Default is 1.
-     * @param string $time [Optional] A time in the form 'hh:mm'. hh can have any value 
+     * @param string $time A time in the form 'hh:mm'. hh can have any value 
      * between 0 and 23 inclusive. mm can have any value btween 0 and 59 inclusive. 
      * default is '00:00'.
      * @return boolean If the time for the cron job is set, the method will 
@@ -1182,7 +1182,7 @@ class CronJob {
      * not. If it is the time, The event will be executed. If 
      * the job is forced to execute, the event that is associated with the 
      * job will be executed even if it is not the time to execute the job.
-     * @param boolean $force [Optional] If set to TRUE, the job will be forced to execute 
+     * @param boolean $force If set to TRUE, the job will be forced to execute 
      * even if it is not job time. Default is FALSE.
      * @return boolean If the event that is associated with the job is executed, 
      * the method will return TRUE. If it is not executed, the method 

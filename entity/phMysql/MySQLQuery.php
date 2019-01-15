@@ -355,7 +355,7 @@ abstract class MySQLQuery{
      * @param int $limit The value of the attribute 'limit' of the select statement. 
      * If zero or a negative value is given, it will not be ignored. 
      * Default is -1.
-     * @param int $offset [Optional] The value of the attribute 'offset' of the select statement. 
+     * @param int $offset The value of the attribute 'offset' of the select statement. 
      * If zero or a negative value is given, it will not be ignored. 
      * Default is -1.
      * @since 1.0
@@ -542,7 +542,7 @@ abstract class MySQLQuery{
      * @param int $limit The value of the attribute 'limit' of the select statement. 
      * If zero or a negative value is given, it will not be included in the generated 
      * MySQL query. Default is -1.
-     * @param int $offset [Optional] The value of the attribute 'offset' of the select statement. 
+     * @param int $offset The value of the attribute 'offset' of the select statement. 
      * If zero or a negative value is given, it will not be included in the generated 
      * MySQL query. Default is -1.
      * @since 1.0
@@ -807,7 +807,7 @@ abstract class MySQLQuery{
      * @param array $valsConds An array that can have only two possible values, 
      * '=' and '!='. The number of elements in this array must match number of 
      * elements in the array $cols.
-     * @param array $jointOps [Optional] An array which contains conditional operators 
+     * @param array $jointOps An array which contains conditional operators 
      * to join conditions. The operators can be logical or bitwise. Possible 
      * values include: &&, ||, and, or, |, &, xor. It is optional in case there 
      * is only one condition.
@@ -931,7 +931,7 @@ abstract class MySQLQuery{
      * @param array $valsConds An array that can have only two possible values, 
      * '=' and '!='. The number of elements in this array must match number of 
      * elements in the array $colsAndNewVals.
-     * @param array $jointOps [Optional] An array which contains conditional operators 
+     * @param array $jointOps An array which contains conditional operators 
      * to join conditions. The operators can be logical or bitwise. Possible 
      * values include: &&, ||, and, or, |, &, xor. It is optional in case there 
      * is only one condition.

@@ -94,7 +94,7 @@ class RouterUri {
      * Creates new instance.
      * @param string $requestedUri The URI such as 'https://www3.programmingacademia.com:80/{some-var}/hell/{other-var}/?do=dnt&y=#xyz'
      * @param string $routeTo The file that the route will take the user to ar a closure.
-     * @param array $closureParams [Optional] If the closure needs to use parameters, 
+     * @param array $closureParams If the closure needs to use parameters, 
      * it is possible to supply them using this array.
      */
     public function __construct($requestedUri,$routeTo,$closureParams=array()) {

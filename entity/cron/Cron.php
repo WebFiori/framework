@@ -460,7 +460,7 @@ class Cron {
     /**
      * Enable or disable logging for jobs execution. 
      * This method is also used to check if logging is enabled or not.
-     * @param boolean $bool [Optional] If set to TRUE, a log file that contains the details 
+     * @param boolean $bool If set to TRUE, a log file that contains the details 
      * of the executed jobs will be created in 'logs' folder. Default value 
      * is NULL.
      * @return boolean If logging is enabled, the method will return TRUE.

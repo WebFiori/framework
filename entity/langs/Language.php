@@ -142,10 +142,10 @@ class Language {
     }
     /**
      * Creates new instance of the class.
-     * @param string $dir [Optional] 'ltr' or 'rtl'. Default is 'ltr'.
-     * @param string $code [Optional] Language code (such as 'AR'). Default is 'XX'
-     * @param array $initials [Optional] An initial array of directories.
-     * @param boolean $addtoLoadedAfterCreate [Optional] If set to TRUE, the language object that 
+     * @param string $dir 'ltr' or 'rtl'. Default is 'ltr'.
+     * @param string $code Language code (such as 'AR'). Default is 'XX'
+     * @param array $initials An initial array of directories.
+     * @param boolean $addtoLoadedAfterCreate If set to TRUE, the language object that 
      * will be created will be added to the set of loaded languages. Default is TRUE.
      * @since 1.0
      */

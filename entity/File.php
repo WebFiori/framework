@@ -377,7 +377,7 @@ class File implements JsonI{
      * This means that if the file does not exist, the method will try to 
      * created it. If it fails, It will throw an exception. Note that if an 
      * optional path is provided, the name of the file must be set first.
-     * @param string $path [Optional] An optional file path such as "C:\Users\Me\Documents". 
+     * @param string $path An optional file path such as "C:\Users\Me\Documents". 
      * The path should not include the name of the file. If not provided, 
      * the path that is returned by File::getPath() will be used.
      * @throws Exception The method will throw an exception with the message 
@@ -430,7 +430,7 @@ class File implements JsonI{
      * If the raw data of the file is NULL, the method will 
      * try to read the file that was specified by the name and its path. If 
      * the method is unable to read the file, an exception is thrown.
-     * @param boolean $asAttachment [Optional] If this parameter is set to 
+     * @param boolean $asAttachment If this parameter is set to 
      * TRUE, the header 'content-disposition' will have the attribute 'attachment' 
      * set instead of 'inline'. This will trigger 'save as' dialog to appear.
      * @throws Exception An exception with the message "MIME type of raw data is not set." 

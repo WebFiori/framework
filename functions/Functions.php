@@ -135,7 +135,7 @@ class Functions {
     }
     /**
      * Initiate database connection.
-     * @param array $optionalConnectionParams [Optional] An associative array 
+     * @param array $optionalConnectionParams An associative array 
      * which contains database connection information. The indices of the 
      * array are:
      * <ul>
@@ -223,7 +223,7 @@ class Functions {
     }
     /**
      * Try to connect to database.
-     * @param array $connParams [Optional] An associative array 
+     * @param array $connParams An associative array 
      * which contains database connection information. The indices of the 
      * array are:
      * <ul>

@@ -112,7 +112,7 @@ class SMTPAccount {
     }
     /**
      * Sets or gets the value of the property 'useTls'.
-     * @param boolean|NULL $bool [Optional] TRUE if the connection to the server will use TLS. 
+     * @param boolean|NULL $bool TRUE if the connection to the server will use TLS. 
      * FALSE if not. If NULL is given, the property will not updated. Default 
      * is NULL.
      * @return boolean $bool TRUE if the connection to the server will use TLS. 

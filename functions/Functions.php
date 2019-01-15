@@ -28,6 +28,7 @@ use phMysql\MySQLLink;
 use webfiori\entity\SessionManager;
 use webfiori\entity\Logger;
 use webfiori\entity\DBConnectionFactory;
+use webfiori\entity\DBConnectionInfo;
 use phMysql\MySQLQuery;
 use webfiori\conf\Config;
 if(!defined('ROOT_DIR')){
@@ -54,7 +55,7 @@ if(!defined('ROOT_DIR')){
  * the system uses any. The developer can extend this class to add his own 
  * logic to the application that he is creating.
  * @author Ibrahim
- * @version 1.3.4
+ * @version 1.3.5
  */
 class Functions {
     /**
@@ -115,6 +116,26 @@ class Functions {
         'variables'=>array()
     );
     /**
+     * A default database to connect to.
+     * @var type 
+     */
+    private $defaultConn;
+    /**
+     * Sets a default connection information.
+     * @param string $dbName The name of the database.
+     * @throws Exception If no connection information was found in the class 
+     * 'Config' for the given database, an exception with the message 
+     * 'No connection information was found for the database 'db_name'.' will be thrown.
+     * @since 1.3.5
+     */
+    public function setDefaultDB($dbName) {
+        $connInfo = Config::getDBConnection($dbName);
+        if($connInfo instanceof DBConnectionInfo){
+            $this->defaultConn = $connInfo;
+        }
+        throw new Exception('No connection information was found for the database \''.$dbName.'\'.');
+    }
+    /**
      * Creates new instance of the class.
      * @param string $linkedSessionName The name of the session that will 
      * be linked with the class instance. The name can consist of any character 
@@ -135,129 +156,84 @@ class Functions {
     }
     /**
      * Initiate database connection.
-     * @param array $optionalConnectionParams An associative array 
-     * which contains database connection information. The indices of the 
-     * array are:
-     * <ul>
-     * <li><b>host</b>: Database host address.</li>
-     * <li><b>port</b>: Port number.</li>
-     * <li><b>user</b>: Database username.</li>
-     * <li><b>pass</b>: Database user's password.</li>
-     * <li><b>db-name</b>: The name of the database.</li>
-     * </ul> 
-     * If this parameter is not provided, connection information will be taken 
-     * from the class 'Config'.
+     * @param string $dbName The name of the database. The connection information 
+     * will be taken from the class 'Config'.
      * @return boolean If the connection is established, the method will 
      * return TRUE. If not, the method will return FALSE.
      * @since 1.1
      */
-    public function useDatabase($optionalConnectionParams=array()) {
+    public function useDatabase($dbName=null) {
         Logger::logFuncCall(__METHOD__);
+        Logger::log('Database name = \''.$dbName.'\'.', 'debug');
+        Logger::log('Checking if already connected to a database...');
+        $retVal = FALSE;
         $dbLink = &$this->getDBLink();
         if($dbLink instanceof MySQLLink){
             Logger::log('Already connected to database.');
-            Logger::log('Checking if optional database parameters are provided or not...');
-            if($optionalConnectionParams != NULL && isset($optionalConnectionParams['host'])
-                    && isset($optionalConnectionParams['user']) &&
-                    isset($optionalConnectionParams['pass']) && 
-                    isset($optionalConnectionParams['db-name']) && 
-                    isset($optionalConnectionParams['port'])){
-                Logger::log('They are provided.');
-                $retVal = FALSE;
-                $result = $this->_connect($optionalConnectionParams);
-                if($result === TRUE){
-                    Logger::log('Connected to database using given parameters.');
-                    $retVal = TRUE;
+            Logger::log('Checking if connected to same database...');
+            if($dbName !== null && $dbName != $dbLink->getDBName()){
+                Logger::log('Different database. Trying to connect to the database...');
+                Logger::log('Getting database connection info...');
+                $conInfo = Config::getDBConnection($dbName);
+                if($conInfo instanceof DBConnectionInfo){
+                    $retVal = $this->_connect($conInfo);
                 }
                 else{
-                    Logger::log('Unable to connect to the database.', 'warning');
+                    Logger::log('No connection info was found for a database with the given name.', 'warning');
                 }
-                Logger::logReturnValue($retVal);
-                Logger::logFuncReturn(__METHOD__);
-                return $retVal;
             }
             else{
-                Logger::log('Some or all database parameters are missing.');
-                Logger::logFuncReturn(__METHOD__);
-                return TRUE;
+                Logger::log('Same database or null is given.');
+                $retVal = TRUE;
             }
         }
         else{
-            Logger::log('Checking if optional database parameters are provided or not...');
-            if($optionalConnectionParams != NULL && isset($optionalConnectionParams['host'])
-                    && isset($optionalConnectionParams['user']) &&
-                    isset($optionalConnectionParams['pass']) && 
-                    isset($optionalConnectionParams['db-name'])&& 
-                    isset($optionalConnectionParams['port'])){
-                Logger::log('They are provided.');
-                $retVal = $this->_connect($optionalConnectionParams);
-                if($retVal === TRUE){
-                    Logger::log('Connected to database using given parameters.');
-                }
-                else{
-                    Logger::log('Unable to connect to the database.', 'warning');
-                }
-                Logger::logFuncReturn(__METHOD__);
-                return $retVal;
+            Logger::log('Not connected.');
+            Logger::log('Getting database connection info...');
+            $conInfo = Config::getDBConnection($dbName);
+            if($conInfo instanceof DBConnectionInfo){
+                $retVal = $this->_connect($conInfo);
             }
             else{
-                Logger::log('No database connection parameters. Trying to connect using the parameters from Config.php...');
-                $conf = Config::get();
-                $retVal = $this->_connect(array(
-                    'host'=>$conf->getDBHost(),
-                    'user'=>$conf->getDBUser(),
-                    'pass'=>$conf->getDBPassword(),
-                    'db-name'=> $conf->getDBName(),
-                    'port'=>$conf->getDBPort()
-                ));
-                if($retVal === TRUE){
-                    Logger::log('Connection to the database was established.');
-                }
-                else{
-                    Logger::log('Unable to connect to the database.', 'warning');
-                }
-                Logger::logFuncReturn(__METHOD__);
-                return $retVal;
+                Logger::log('No connection info was found for a database with the given name.', 'warning');
+                Logger::log('Trying to use default connection info...');
+                $retVal = $this->_connect($this->defaultConn);
             }
         }
+        Logger::logReturnValue($retVal);
+        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * Try to connect to database.
-     * @param array $connParams An associative array 
-     * which contains database connection information. The indices of the 
-     * array are:
-     * <ul>
-     * <li><b>host</b>: Database host address.</li>
-     * <li><b>port</b>: Port number.</li>
-     * <li><b>user</b>: Database username.</li>
-     * <li><b>pass</b>: Database user's password.</li>
-     * <li><b>db-name</b>: The name of the database.</li>
-     * <ul> 
+     * @param DBConnectionInfo $connParams An object of type DBConnectionInfo 
+     * that contains connection parameters.
      * @return boolean If the connection is established, the method will 
      * return TRUE. If not, It will return FALSE.
      */
     private function _connect($connParams){
         Logger::logFuncCall(__METHOD__);
-        $result = DBConnectionFactory::mysqlLink(array(
-            'host'=>$connParams['host'],
-            'user'=>$connParams['user'],
-            'pass'=>$connParams['pass'],
-            'db-name'=>$connParams['db-name'],
-            'port'=>$connParams['port']
-        ));
-        if($result instanceof MySQLLink){
-            Logger::log('Connected to database.');
-            $this->databaseLink = $result;
-            Logger::logFuncReturn(__METHOD__);
-            return TRUE;
-        }
-        else{
-            $this->connErrDetails = $result;
-            Logger::log('Unable to connect to the database while in setup mode.', 'warning');
-            Logger::log('Error Code: '.$result['error-code'], 'error');
-            Logger::log('Error Message: '.$result['error-message'], 'error');
-            Logger::logFuncReturn(__METHOD__);
-            return FALSE;
+        if($connParams instanceof DBConnectionInfo){
+            $result = DBConnectionFactory::mysqlLink(array(
+                'host'=>$connParams->getHost(),
+                'user'=>$connParams->getUsername(),
+                'pass'=>$connParams->getPassword(),
+                'db-name'=>$connParams->getDBName(),
+                'port'=>$connParams->getPort()
+            ));
+            if($result instanceof MySQLLink){
+                Logger::log('Connected to database.');
+                $this->databaseLink = $result;
+                Logger::logFuncReturn(__METHOD__);
+                return TRUE;
+            }
+            else{
+                $this->connErrDetails = $result;
+                Logger::log('Unable to connect to the database while in setup mode.', 'warning');
+                Logger::log('Error Code: '.$result['error-code'], 'error');
+                Logger::log('Error Message: '.$result['error-message'], 'error');
+                Logger::logFuncReturn(__METHOD__);
+                return FALSE;
+            }
         }
     }
     /**
@@ -284,15 +260,17 @@ class Functions {
      * @param MySQLQuery $qObj An object of type 'MySQLQuery'. Note that 
      * this method will call the method 'Functions::useDatabase()' by 
      * default.
+     * @param string $dbName An optional database. The query will be executed 
+     * against it if provided.
      * @return boolean 'TRUE' if no errors occur while executing the query.
      * FAlSE in case of error.
      * @since 1.0
      */
-    public function excQ($qObj){
+    public function excQ($qObj,$dbName=null){
         Logger::logFuncCall(__METHOD__);
         $retVal = FALSE;
         if($qObj instanceof MySQLQuery){
-            if($this->useDatabase()){
+            if($this->useDatabase($dbName)){
                 $dbLink = &$this->getDBLink();
                 Logger::log('Query = \''.$qObj->getQuery().'\'.', 'debug');
                 Logger::log('Executing database query...');

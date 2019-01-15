@@ -24,13 +24,6 @@
  * THE SOFTWARE.
  */
 namespace webfiori\functions;
-use phMysql\MySQLLink;
-use webfiori\entity\SessionManager;
-use webfiori\entity\Logger;
-use webfiori\entity\DBConnectionFactory;
-use webfiori\entity\DBConnectionInfo;
-use phMysql\MySQLQuery;
-use webfiori\conf\Config;
 if(!defined('ROOT_DIR')){
     header("HTTP/1.1 403 Forbidden");
     die(''
@@ -48,6 +41,14 @@ if(!defined('ROOT_DIR')){
         . '</body>'
         . '</html>');
 }
+use phMysql\MySQLLink;
+use webfiori\entity\SessionManager;
+use webfiori\entity\Logger;
+use webfiori\entity\DBConnectionFactory;
+use webfiori\entity\DBConnectionInfo;
+use phMysql\MySQLQuery;
+use webfiori\conf\Config;
+use Exception;
 /**
  * The base class for creating application logic.
  * This class provides the basic utilities to connect to database and manage 
@@ -132,6 +133,7 @@ class Functions {
         $connInfo = Config::getDBConnection($dbName);
         if($connInfo instanceof DBConnectionInfo){
             $this->defaultConn = $connInfo;
+            return;
         }
         throw new Exception('No connection information was found for the database \''.$dbName.'\'.');
     }
@@ -156,6 +158,11 @@ class Functions {
     }
     /**
      * Initiate database connection.
+     * This method is used to establish a connection with a database system. 
+     * The developer have only to provide the name of the database to the method. 
+     * Another option is to set a default database name using the method Functions::setDefaultDB(). 
+     * Note that the connection information of the database must exist in the 
+     * class 'Config'.
      * @param string $dbName The name of the database. The connection information 
      * will be taken from the class 'Config'.
      * @return boolean If the connection is established, the method will 
@@ -202,6 +209,7 @@ class Functions {
         }
         Logger::logReturnValue($retVal);
         Logger::logFuncReturn(__METHOD__);
+        return $retVal;
     }
     /**
      * Try to connect to database.

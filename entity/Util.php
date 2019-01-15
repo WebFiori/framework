@@ -42,6 +42,7 @@ if(!defined('ROOT_DIR')){
 }
 use webfiori\conf\Config;
 use webfiori\entity\DBConnectionFactory;
+use webfiori\entity\DBConnectionInfo;
 use webfiori\WebFiori;
 /**
  * Framework utility class.
@@ -329,7 +330,7 @@ class Util{
      * one is 'error-code' and the second one is 'error-message'.
      * @since 1.2
      */
-    public static function checkSystemStatus($checkDb=false){
+    public static function checkSystemStatus($checkDb=false,$dbName=''){
         Logger::logFuncCall(__METHOD__);
         Logger::log('Checking system status...');
         $returnValue = '';
@@ -338,19 +339,28 @@ class Util{
                 if(Config::isConfig() === TRUE || WebFiori::getClassStatus() == 'INITIALIZING'){
                     if($checkDb === TRUE){
                         Logger::log('Checking database connection...');
-                        $returnValue = DBConnectionFactory::mysqlLink(array(
-                            'host'=>Config::getDBHost(),
-                            'port'=> Config::getDBPort(),
-                            'user'=> Config::getDBUser(),
-                            'pass'=> Config::getDBPassword(),
-                            'db-name'=> Config::getDBName()
-                        ));
-                        if(gettype($returnValue) == 'object'){
-                            Logger::log('Connected.');
-                            $returnValue = TRUE;
+                        Logger::log('Database to check = \''.$dbName.'\'.', 'debug');
+                        $connInfo = Config::getDBConnection($dbName);
+                        if($connInfo instanceof DBConnectionInfo){
+                            $returnValue = DBConnectionFactory::mysqlLink(array(
+                                'host'=>$connInfo->getHost(),
+                                'port'=>$connInfo->getPort(),
+                                'user'=>$connInfo->getUsername(),
+                                'pass'=>$connInfo->getPassword(),
+                                'db-name'=>$connInfo->getDBName()
+                            ));
+                            if(gettype($returnValue) == 'object'){
+                                Logger::log('Connected.');
+                                $returnValue = TRUE;
+                            }
+                            else{
+                                Logger::log('Unable to connect to database.','error');
+                                $returnValue = self::DB_NEED_CONF;
+                            }
                         }
                         else{
-                            Logger::log('Unable to connect to database.','error');
+                            Logger::log('No connection information was found for the given database.', 'warning');
+                            $returnValue = self::DB_NEED_CONF;
                         }
                     }
                     else{

@@ -25,7 +25,7 @@
 namespace webfiori\functions;
 use webfiori\entity\Logger;
 use webfiori\entity\FileHandler;
-use webfiori\entity\DBConnectionFactory;
+use webfiori\entity\DBConnectionInfo;
 use webfiori\conf\Config;
 use Exception;
 if(!defined('ROOT_DIR')){
@@ -47,10 +47,12 @@ if(!defined('ROOT_DIR')){
 }
 /**
  * A class that can be used to modify basic configuration settings of 
- * the website and save them to the file 'Config.php'
+ * the web application. 
+ * This class is mainly used to add, update or remove database connections and 
+ * save them to the file 'Config.php'.
  *
  * @author Ibrahim
- * @version 1.4.2
+ * @version 1.4.3
  */
 class SystemFunctions extends Functions{
     /**
@@ -82,11 +84,7 @@ class SystemFunctions extends Functions{
      * <li>version = '1.0.1'</li>
      * <li>version-type = 'Stable'</li>
      * <li>config-file-version => '1.3.2'</li>
-     * <li>database-host = 'localhost'</li>
-     * <li>database-username = ''</li>
-     * <li>database-password = ''</li>
-     * <li>database-name = ''</li>
-     * <li>database-port = '3306'</li>
+     * <li>databases = array()</li>
      * </ul>
      * @since 1.0
      */
@@ -96,11 +94,7 @@ class SystemFunctions extends Functions{
         'version'=>'1.0.0',
         'version-type'=>'Stable',
         'config-file-version'=>'1.3.3',
-        'database-host'=>'localhost',
-        'database-username'=>'',
-        'database-password'=>'',
-        'database-name'=>'',
-        'database-port'=>'3306'
+        'databases'=>array()
     );
     /**
      * An instance of SystemFunctions
@@ -150,43 +144,56 @@ class SystemFunctions extends Functions{
         parent::__construct();
     }
     /**
-     * Update database attributes. 
-     * @param string $dbHost The name of database host. It can be an IP address 
-     * or a URL.
-     * @param string $dbUser The username of database user.
-     * @param string $dbPass The password of the database user.
-     * @param string $dbName The name of database schema.
-     * @param int $dbPort Port number of database server.
-     * @return boolean|string The method will return TRUE in case 
-     * of valid database attributes. Also the method will return 
-     * DBConnectionFactory::DB_CONNECTION_ERR in case the connection was not 
-     * established.
-     * @since 1.0
+     * Adds new database connections information or update existing connections.
+     * The information of the connections will be stored in the file 'Config.php'.
+     * @param array $dbConnectionsInfo An array that contains objects of type DBConnectionInfo. 
+     * @since 1.4.3
      */
-    public function updateDBAttributes($dbHost,$dbUser,$dbPass,$dbName,$dbPort){
+    public function addOrUpdateDBConnections($dbConnectionsInfo){
         Logger::logFuncCall(__METHOD__);
-        $r = DBConnectionFactory::mysqlLink(array(
-            'user'=>$dbUser,
-            'host'=>$dbHost,
-            'pass'=>$dbPass,
-            'db-name'=>$dbName,
-            'port'=>$dbPort
-        ));
-        if($r === TRUE){
-            $configVars = $this->getConfigVars();
-            $configVars['database-host'] = $dbHost;
-            $configVars['database-username'] = $dbUser;
-            $configVars['database-password'] = $dbPass;
-            $configVars['database-name'] = $dbName;
-            $configVars['database-port'] = $dbPort;
-            $this->writeConfig($configVars);
+        Logger::log('Checking if given parameter is an array...');
+        if(gettype($dbConnectionsInfo) == 'array'){
+            Logger::log('An array is given.');
+            Logger::log('Adding connections...');
+            $confVars = $this->getConfigVars();
+            foreach ($dbConnectionsInfo as $con){
+                if($con instanceof DBConnectionInfo){
+                    if(strlen($con->getHost()) > 0 && 
+                       strlen($con->getPort()) > 0 &&
+                       strlen($con->getUsername()) > 0 && 
+                       strlen($con->getPassword()) > 0 && 
+                       strlen($con->getDBName()) > 0){  
+                        $confVars['databases'][$con->getDBName()] = $con;
+                    }
+                }
+            }
+            $this->writeConfig($confVars);
+            Logger::log('Finished.');
         }
-        else{
-            Logger::log('The database connect method did not return TRUE.', 'warning');
-        }
-        Logger::logReturnValue($r);
         Logger::logFuncReturn(__METHOD__);
-        return $r;
+    }
+    /**
+     * Removes a set of database connections.
+     * This method will search for a connection which has the given database 
+     * name. Once it found, it will remove the connection and save the updated 
+     * information to the file 'Config.php'.
+     * @param array $dbNames An array that contains the names of databases.
+     * @since 1.4.3
+     */
+    public function removeDBConnections($dbNames){
+        Logger::logFuncCall(__METHOD__);
+        Logger::log('Checking if given parameter is an array...');
+        if(gettype($dbNames) == 'array'){
+            Logger::log('An array is given.');
+            Logger::log('Removing connections...');
+            $confVars = $this->getConfigVars();
+            foreach ($dbNames as $dbName){  
+                unset($confVars['databases'][$dbName]);
+            }
+            $this->writeConfig($confVars);
+            Logger::log('Finished.');
+        }
+        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * Updates system configuration status.
@@ -215,11 +222,9 @@ class SystemFunctions extends Functions{
      * <li>version: Version number of WebFiori Framework.</li>
      * <li>version-type: Type of WebFiori Framework version.</li>
      * <li>config-file-version: Configuration file version number.</li>
-     * <li>database-host: The address of database server host.</li>
-     * <li>database-username: The user that will be used to access the database.</li>
-     * <li>database-password: The password of database user.</li>
-     * <li>database-name: The name of the database.</li>
-     * <li>database-port: Database host server number.</li>
+     * <li>databases: A sub associative array that contains multiple 
+     * database connections information. The key will be the name of the database 
+     * and the value is an object of type DBConnectionInfo.</li>
      * </ul>
      * @return array An associative array that contains system configuration 
      * info.
@@ -229,11 +234,7 @@ class SystemFunctions extends Functions{
         $cfgArr = SystemFunctions::INITIAL_CONFIG_VARS;
         if(class_exists('webfiori\conf\Config')){
             $cfgArr['is-config'] = Config::isConfig() === TRUE ? 'TRUE' : 'FALSE';
-            $cfgArr['database-host'] = Config::getDBHost();
-            $cfgArr['database-username'] = Config::getDBUser();
-            $cfgArr['database-password'] = Config::getDBPassword();
-            $cfgArr['database-name'] = Config::getDBName();
-            $cfgArr['database-port'] = Config::getDBPort();
+            $cfgArr['databases'] = Config::getDBConnections();
         }
         return $cfgArr;
     }
@@ -247,9 +248,6 @@ class SystemFunctions extends Functions{
         Logger::logFuncCall(__METHOD__);
         $configFileLoc = ROOT_DIR.'/conf/Config.php';
         Logger::log('Saving configuration variables to the file \''.$configFileLoc.'\'.');
-        foreach ($configArr as $k => $v){
-            Logger::log($k.' => '.$v, 'debug');
-        }
         $fh = new FileHandler($configFileLoc);
         $fh->write('<?php', TRUE, TRUE);
         $fh->write('/*
@@ -295,12 +293,13 @@ class SystemFunctions extends Functions{
         . \'</body>\'
         . \'</html>\');
 }', TRUE, TRUE);
+        $fh->write('use webfiori\entity\DBConnectionInfo;', TRUE, TRUE);
         $fh->write('/**
  * Global configuration class. 
  * Used by the server part and the presentation part. It contains framework version 
  * information and database connection settings.
  * @author Ibrahim
- * @version 1.5
+ * @version 1.3.3
  */', TRUE, TRUE);
         $fh->write('class Config{', TRUE, TRUE);
         $fh->addTab();
@@ -330,41 +329,11 @@ class SystemFunctions extends Functions{
      */
     private $isConfigured;
     /**
-     * The name of database host.
-     * @var string 
-     * @since 1.0
+     * An associative array that will contain database connections.
+     * @var type 
      */
-    private $dbHost;
-    /**
-     * The name of database username. It must be a user with all privileges over the database.
-     * @var string 
-     * @since 1.0
-     */
-    private $dbUser;
-    /**
-     * The database user\'s password.
-     * @var string 
-     * @since 1.0
-     */
-    private $dbPass;
-    /**
-     * Port number of the database.
-     * @var string 
-     * @since 1.4
-     */
-    private $dbPort;
-    /**
-     * The name of database schema.
-     * @var string 
-     * @since 1.0
-     */
-    private $dbName;
-    /**
-     * Configuration file version number.
-     * @var string 
-     * @since 1.2
-     */
-    private $configVision;',TRUE,TRUE);
+    private $dbConnections;
+    ',TRUE,TRUE);
         $fh->write('/**
      * Initialize configuration.
      */
@@ -374,12 +343,38 @@ class SystemFunctions extends Functions{
         $this->version = \''.$configArr['version'].'\';
         $this->versionType = \''.$configArr['version-type'].'\';
         $this->configVision = \''.$configArr['config-file-version'].'\';
-        $this->dbHost = \''.$configArr['database-host'].'\';
-        $this->dbUser = \''.$configArr['database-username'].'\';
-        $this->dbPass = \''.$configArr['database-password'].'\';
-        $this->dbName = \''.$configArr['database-name'].'\';
-        $this->dbPort = \''.$configArr['database-port'].'\';
-    }', TRUE, TRUE);
+        $this->dbConnections = array(', TRUE, TRUE);
+        $count = count($configArr['databases']);
+        $i = 0;
+        foreach ($configArr['databases'] as $dbName => $dbConn){
+            if($i + 1 == $count){
+                $fh->write('        \''.$dbName.'\'=> new DBConnectionInfo(\''
+                    .$dbConn->getUsername()
+                    .'\',\''
+                    .$dbConn->getPassword()
+                    .'\',\''
+                    .$dbConn->getDBName()
+                    .'\',\''
+                    .$dbConn->getHost().'\','
+                    . ''
+                    .$dbConn->getPort().')', TRUE, TRUE);
+            }
+            else{
+                $fh->write('        \''.$dbName.'\'=> new DBConnectionInfo(\''
+                    .$dbConn->getUsername()
+                    .'\',\''
+                    .$dbConn->getPassword()
+                    .'\',\''
+                    .$dbConn->getDBName()
+                    .'\',\''
+                    .$dbConn->getHost().'\','
+                    . ''
+                    .$dbConn->getPort().'),', TRUE, TRUE);
+            }
+            $i++;
+        }
+        $fh->write('    );', TRUE, TRUE);
+        $fh->write('}', TRUE, TRUE);
         $fh->write('/**
      * An instance of Config.
      * @var Config 
@@ -427,62 +422,7 @@ class SystemFunctions extends Functions{
     private function _getDBName(){
         return $this->dbName;
     }
-    /**
-     * Returns the name of the database.
-     * @return string Database name.
-     * @since 1.0
-     */
-    public static function getDBName(){
-        return self::get()->_getDBName();
-    }
-    private function _getDBPort(){
-        return $this->dbPort;
-    }
-    /**
-     * Returns server port number that is used to connect to the database.
-     * @return string Server port number.
-     * @since 1.0
-     */
-    public static function getDBPort(){
-        return self::get()->_getDBPort();
-    }
-    private function _getDBHost(){
-        return $this->dbHost;
-    }
-    /**
-     * Returns the name of database host.
-     * The host can be an IP address, a URL or simply \'localhost\' if the database 
-     * is in the same server that will host the web application.
-     * @return string Database host.
-     * @since 1.0
-     */
-    public static function getDBHost(){
-        return self::get()->_getDBHost();
-    }
-    private function _getDBUser(){
-        return $this->dbUser;
-    }
-    /**
-     * Returns the name of the database user.
-     * @return string The username of the user that will be used to access the 
-     * database.
-     * @since 1.0
-     */
-    public static function getDBUser(){
-        return self::get()->_getDBUser();
-    }
-    private function _getDBPassword(){
-        return $this->dbPass;
-    }
-    /**
-     * Returns the password of database user.
-     * @return string The password of the user that will be used to acess the 
-     * database.
-     * @since 1.0
-     */
-    public static function getDBPassword(){
-        return self::get()->_getDBPassword();
-    }
+    
     private function _getVersion(){
         return $this->version;
     }
@@ -517,7 +457,32 @@ class SystemFunctions extends Functions{
      */
     public static function getReleaseDate(){
         return self::get()->_getReleaseDate();
-    }', TRUE, TRUE);
+    }
+    /**
+     * Returns an associative array that contain the information of database connections.
+     * The keys of the array will be the names of databases and the value of 
+     * each key will be an object of type DBConnectionInfo.
+     * @return array An associative array.
+     * @since 1.3.3
+     */
+    public static function getDBConnections(){
+        return self::get()->dbConnections;
+    }
+    /**
+     * Returns database connection information given database name.
+     * @param string $dbName The name of the database.
+     * @return DBConnectionInfo|NULL The method will return an object of type 
+     * DBConnectionInfo if a connection info was found for the given database. 
+     * Other than that, the method will return NULL.
+     * @since 1.3.3
+     */
+    public static function getDBConnection($dbName){
+        $conns = self::getDBConnections();
+        if(isset($conns[$dbName])){
+            return $conns[$dbName];
+        }
+        return NULL;
+    } ', TRUE, TRUE);
         $fh->reduceTab();
         $fh->write('}', TRUE, TRUE);
         $fh->close();
@@ -529,7 +494,9 @@ class SystemFunctions extends Functions{
      * configuration files is missing.
      * @return boolean If the system is configured, the method will return 
      * TRUE. If it is not configured, It will return FALSE.
-     * @throws Exception If one of configuration files is missing.
+     * @throws Exception If one of configuration files is missing. The format 
+     * of exception message will be 'XX.php is missing.' where XX is the name 
+     * of the configuration file.
      * @since 1.0
      */
     public function isSetupFinished(){

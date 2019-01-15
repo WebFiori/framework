@@ -159,9 +159,9 @@ class BasicMailFunctions extends Functions{
 }', TRUE, TRUE);
         $fh->write('use webfiori\entity\mail\EmailAccount;', TRUE, TRUE);
         $fh->write('/**
- * A file that contains SMTP accounts information.
+ * SMTP configuration class.
  * The developer can create multiple SMTP accounts and add 
- * Connection information here.
+ * Connection information inside the body of this class.
  * @author Ibrahim
  * @version 1.0
  */', TRUE, TRUE);
@@ -176,7 +176,7 @@ class BasicMailFunctions extends Functions{
      */
     private static $inst;
     /**
-     * Returnd a singleton instance of the class.
+     * Return a single instance of the class.
      * Calling this method multiple times will result in returning 
      * the same instance every time.
      * @return MailConfig

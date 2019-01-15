@@ -1,13 +1,16 @@
 <?php
 use webfiori\entity\Page;
+use webfiori\entity\langs\Language;
 /**
  * Extending language file by adding more labels.
  *
  * @author Ibrahim
  */
 class LangExt {
-    public static function extLang(){
-        $trans = &Page::translation();
+    public static function extLang(&$trans=null){
+        if(!($trans instanceof Language)){
+            $trans = &Page::translation();
+        }
         $trans->createDirectory('menus/main-menu');
         $langCode = $trans->getCode();
         

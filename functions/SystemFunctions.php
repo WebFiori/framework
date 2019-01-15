@@ -92,10 +92,10 @@ class SystemFunctions extends Functions{
      */
     const INITIAL_CONFIG_VARS = array(
         'is-config'=>'FALSE',
-        'release-date'=>'01-02-2019 (DD-MM-YYYY)',
+        'release-date'=>'2019-02-01',
         'version'=>'1.0.0',
         'version-type'=>'Stable',
-        'config-file-version'=>'1.3.2',
+        'config-file-version'=>'1.3.3',
         'database-host'=>'localhost',
         'database-username'=>'',
         'database-password'=>'',
@@ -191,7 +191,8 @@ class SystemFunctions extends Functions{
     /**
      * Updates system configuration status.
      * This method is useful when the developer would like to create some 
-     * kind of a setup wizard for his web application.
+     * kind of a setup wizard for his web application. This method is used 
+     * to update the value which is returned by the method  Config::isConfig().
      * @param boolean $isConfig TRUE to set system as configured. 
      * FALSE to make it not configured.
      * @since 1.3
@@ -273,7 +274,9 @@ class SystemFunctions extends Functions{
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- */');
+ */
+ 
+');
         $fh->write('namespace webfiori\conf;', FALSE, TRUE);
         $fh->write('if(!defined(\'ROOT_DIR\')){
     header("HTTP/1.1 403 Forbidden");
@@ -294,8 +297,8 @@ class SystemFunctions extends Functions{
 }', TRUE, TRUE);
         $fh->write('/**
  * Global configuration class. 
- * Used by the server part and the presentation part.
- * Do not modify this file manually unless you know what you are doing.
+ * Used by the server part and the presentation part. It contains framework version 
+ * information and database connection settings.
  * @author Ibrahim
  * @version 1.5
  */', TRUE, TRUE);
@@ -384,7 +387,7 @@ class SystemFunctions extends Functions{
      */
     private static $cfg;
     /**
-     * Returns a single instance of the configuration file.
+     * Returns an object that can be used to access configuration information.
      * @return Config An object of type Config.
      * @since 1.0
      */
@@ -400,6 +403,8 @@ class SystemFunctions extends Functions{
     }
     /**
      * Returns the version number of configuration file.
+     * The value is used to check for configuration compatibility since the 
+     * framework is updated and more features are added.
      * @return string The version number of configuration file.
      * @since 1.2
      */
@@ -411,6 +416,8 @@ class SystemFunctions extends Functions{
     }
     /**
      * Checks if the system is configured or not.
+     * This method is helpful in case the developer would like to create some 
+     * kind of a setup wizard for the web application.
      * @return boolean TRUE if the system is configured.
      * @since 1.0
      */
@@ -457,7 +464,8 @@ class SystemFunctions extends Functions{
     }
     /**
      * Returns the name of the database user.
-     * @return string Database username.
+     * @return string The username of the user that will be used to access the 
+     * database.
      * @since 1.0
      */
     public static function getDBUser(){
@@ -468,7 +476,8 @@ class SystemFunctions extends Functions{
     }
     /**
      * Returns the password of database user.
-     * @return string Database user\'s password.
+     * @return string The password of the user that will be used to acess the 
+     * database.
      * @since 1.0
      */
     public static function getDBPassword(){
@@ -479,7 +488,8 @@ class SystemFunctions extends Functions{
     }
     /**
      * Returns WebFiori Framework version number.
-     * @return string WebFiori Framework version number.
+     * @return string WebFiori Framework version number. The version number will 
+     * have the following format: x.x.x
      * @since 1.2
      */
     public static function getVersion(){
@@ -490,7 +500,7 @@ class SystemFunctions extends Functions{
     }
     /**
      * Returns WebFiori Framework version type.
-     * @return string WebFiori Framework version type.
+     * @return string WebFiori Framework version type (e.g. \'Beta\', \'Alpha\', \'Preview\').
      * @since 1.2
      */
     public static function getVersionType(){
@@ -501,6 +511,7 @@ class SystemFunctions extends Functions{
     }
     /**
      * Returns the date at which the current version of the framework is released.
+     * The format of the date will be YYYY-MM-DD.
      * @return string The date at which the current version of the framework is released.
      * @since 1.0
      */

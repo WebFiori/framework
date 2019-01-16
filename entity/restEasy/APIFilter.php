@@ -426,7 +426,10 @@ class APIFilter{
                         if($this->inputs[$name] === FALSE){
                             $this->inputs[$name] = 'INV';
                         }
-                        if($def['parameter']->getType() == 'string' && strlen($filteredValue) == 0 && $def['options']['options']['allow-empty'] === FALSE){
+                        if($def['parameter']->getType() == 'string' &&
+                                $this->inputs[$name] != 'INV' &&
+                                strlen($this->inputs[$name]) == 0 && 
+                                $def['options']['options']['allow-empty'] === FALSE){
                             $this->inputs[$name] = 'INV';
                         }
                     }

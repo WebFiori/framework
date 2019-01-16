@@ -157,7 +157,7 @@ class BasicMailFunctions extends Functions{
         . \'</body>\'
         . \'</html>\');
 }', TRUE, TRUE);
-        $fh->write('use webfiori\entity\mail\EmailAccount;', TRUE, TRUE);
+        $fh->write('use webfiori\entity\mail\SMTPAccount;', TRUE, TRUE);
         $fh->write('/**
  * SMTP configuration class.
  * The developer can create multiple SMTP accounts and add 
@@ -194,7 +194,7 @@ class BasicMailFunctions extends Functions{
         //adding email accounts
         $index=0;
         foreach ($emailAccountsArr as $emailAcc){
-            $fh->write('$acc'.$index.' = new EmailAccount();
+            $fh->write('$acc'.$index.' = new SMTPAccount();
         $acc'.$index.'->setServerAddress(\''.$emailAcc->getServerAddress().'\');
         $acc'.$index.'->setAddress(\''.$emailAcc->getAddress().'\');
         $acc'.$index.'->setUsername(\''.$emailAcc->getUsername().'\');

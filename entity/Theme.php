@@ -402,11 +402,14 @@ abstract class Theme implements JsonI{
             Logger::log('Path to scan: \''.$pathToScan.'\'.', 'debug');
             $filesInDir = array_diff(scandir($pathToScan), array('..', '.'));
             foreach ($filesInDir as $fileName){
-                $cName = str_replace('.php', '', $fileName);
-                if(class_exists($cName)){
-                    $instance = new $cName();
-                    if($instance instanceof Theme){
-                        $themes[$instance->getName()] = $instance;
+                $fileExt = substr($fileName, -4);
+                if($fileExt == '.php'){
+                    $cName = str_replace('.php', '', $fileName);
+                    if(class_exists($cName)){
+                        $instance = new $cName();
+                        if($instance instanceof Theme){
+                            $themes[$instance->getName()] = $instance;
+                        }
                     }
                 }
             }

@@ -210,16 +210,22 @@ class AutoLoader{
     private function loadClass($classPath){
         $cArr = explode('\\', $classPath);
         $className = $cArr[count($cArr) - 1];
+        $loaded = FALSE;
         foreach ($this->searchFolders as $value) {
             $f = $this->getRoot().$value.'/'.$className.'.php';
             //Logger::log('Checking if file \''.$f.'\' exist...', 'debug');
             if(file_exists($f)){
                 //Logger::log('Class \''.$className.'\' found. Loading the class...');
                 require_once $f;
+                $loaded = TRUE;
                 //Logger::log('Class \''.$className.'\' loaded.');
                 //Logger::logFuncReturn(__METHOD__);
-                return;
+                break;
             }
+        }
+        if(!$loaded){
+            throw new Exception('Class \''.$classPath.'\' not found in any include directory. '
+                    . 'Make sure that class path is included in auto-load directories.');
         }
         //Logger::log('Class \''.$className.'\' was not found.', 'error');
         //Logger::logFuncReturn(__METHOD__);

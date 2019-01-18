@@ -386,8 +386,10 @@ class Functions {
     }
     /**
      * Returns the instance of 'SessionManager' that is used by the class.
-     * If the name of the session is NULL, the method will return NULL.
-     * @return SessionManager|NULL An instance of 'SessionManager'.
+     * Before trying to get a session manager, the name of the session must 
+     * be supplied to the method Functions::useSession().
+     * @return SessionManager|NULL An instance of 'SessionManager'. If no 
+     * session is running, the method will return NULL.
      * @since 1.3
      */
     public function &getSession() {
@@ -434,7 +436,7 @@ class Functions {
     }
     /**
      * Returns the number of rows resulted from executing a query.
-     * @return int|NULL Number of rows resulted from executing a query. The 
+     * @return int Number of rows resulted from executing a query. The 
      * method will return <b>-1</b> in case no connection was established to 
      * the database.
      * @since 1.0

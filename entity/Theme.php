@@ -47,7 +47,7 @@ use Exception;
  * A base class that is used to construct web site UI.
  * 
  * @author Ibrahim
- * @version 1.2.2
+ * @version 1.2.3
  */
 abstract class Theme implements JsonI{
     /**
@@ -842,4 +842,20 @@ abstract class Theme implements JsonI{
      * @since 1.2.2
      */
     public abstract function getAsideNode();
+    /**
+     * Creates an instance of 'HTMLNode' given an array of options.
+     * This method is used to allow the creation of multiple HTML elements 
+     * depending on the way the developer will implement it. The method might 
+     * only return a single instance of the class 'HTMLNode' for every call or 
+     * the developer can make it customizable by supporting options. The options 
+     * can be passed as an array. A use case for this method would be as 
+     * follows, the developer would like to create different type of input 
+     * elements. One possible option in the passed array would be 'input-type'. 
+     * By checking this option in the body of the method, the developer can return 
+     * different types of input elements.
+     * @return HTMLNode The developer must implement this method in away that 
+     * makes it return an instance of the class 'HTMLNode'. 
+     * @since 1.2.3
+     */
+    public abstract function createHTMLNode($options=array());
 }

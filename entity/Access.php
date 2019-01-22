@@ -55,7 +55,7 @@ class Access {
     private static $access;
     /**
      * An array which contains an objects of type UsersGroup.
-     * @var UsersGroup
+     * @var PrivilegesGroup
      * @since 1.0 
      */
     private $userGroups;
@@ -289,7 +289,7 @@ class Access {
     /**
      * 
      * @param string $groupId
-     * @return UsersGroup|NULL
+     * @return PrivilegesGroup|NULL
      * @since 1.0
      */
     private function &_getGroup($groupId) {
@@ -371,7 +371,7 @@ class Access {
      * This method can be used to check if a group is exist or not. If 
      * the method has returned NULL, this means the group does not exist.
      * @param string $groupId The ID of the group.
-     * @return UsersGroup|NULL If a users group with the given ID was found, 
+     * @return PrivilegesGroup|NULL If a users group with the given ID was found, 
      * It will be returned. If not, the method will return NULL.
      * @since 1.0
      */
@@ -417,7 +417,7 @@ class Access {
                     return FALSE;
                 }
             }
-            $group = new UsersGroup();
+            $group = new PrivilegesGroup();
             $group->setID($groupId);
             $this->userGroups[] = $group;
             return TRUE;

@@ -104,15 +104,37 @@ class Privilege implements JsonI{
     /**
      * Sets the ID of the privilege
      * @param string $code The ID of the privilege. Only set if the given string 
-     * is not empty.
+     * is not empty. In addition, The ID of the privilege can only consist 
+     * of the following characters: [A-Z], [a-z], [0-9] and underscore.
+     * @return boolean If the ID of the privilege is updated, the method will return 
+     * TRUE. If not updated, it will return FALSE.
      * @since 1.0
      */
     public function setID($code) {
-        if(strlen($code) > 0){
-            $this->code = $code.'';
-        }
-    }
+        $xid = ''.$code;
+        $len = strlen($xid);
+        for ($x = 0 ; $x < $len ; $x++){
+            $ch = $xid[$x];
+            if($ch == '_' || ($ch >= 'a' && $ch <= 'z') || ($ch >= 'A' && $ch <= 'Z') || ($ch >= '0' && $ch <= '9')){
 
+            }
+            else{
+                return FALSE;
+            }
+        }
+        $this->code = $xid;
+        return TRUE;
+    }
+    /**
+     * Returns an object of type JsonX that contains group info as JSON string.
+     * The generated JSON string will have the following format:
+     * <p>
+     * {<br/>
+     * &nbsp;&nbsp;"privilege-id":"",<br/>
+     * &nbsp;&nbsp;"name":"",<br/>
+     * }
+     * </p> 
+     */
     public function toJSON() {
         $j = new JsonX();
         $j->add('privilege-id', $this->getID());

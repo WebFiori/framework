@@ -79,8 +79,8 @@ class Access {
         return self::$access;
     }
     /**
-     * Returns an array which contains all privileges or privileges 
-     * in a specific user group.
+     * Returns an array which contains all privileges 
+     * in a specific group.
      * @param string|NULL $groupId The ID of the group which its 
      * privileges will be returned. If NULL is given, all privileges will be 
      * returned. Default is NULL.
@@ -324,10 +324,29 @@ class Access {
      */
     private function &_getPrivilege($privId) {
         foreach ($this->userGroups as $g){
-            foreach ($g->privileges() as $p){
-                if($p->getID() == $privId){
-                    return $p;
-                }
+            $p = $this->_getPrivilegeH($privId, $g);
+            if($p !== NULL){
+                return $p;
+            }
+        }
+        return $p;
+    }
+    /**
+     * 
+     * @param type $privId
+     * @param PrivilegesGroup $group
+     * @return type
+     */
+    private function &_getPrivilegeH($privId,$group){
+        foreach ($group->privileges() as $p){
+            if($p->getID() == $privId){
+                return $p;
+            }
+        }
+        foreach ($group->childGroups() as $g){
+            $p = $this->_getPrivilegeH($privId, $g);
+            if($p !== NULL){
+                return $p;
             }
         }
         $p = NULL;
@@ -406,11 +425,11 @@ class Access {
      * If not, the method will return FALSE.
      * @since 1.0
      */
-    public static function newGroup($groupId) {
-        return Access::get()->_createGroup($groupId);
+    public static function newGroup($groupId,$parentGroupId=null) {
+        return Access::get()->_createGroup($groupId,$parentGroupId);
     }
     
-    private function _createGroup($groupId){
+    private function _createGroup($groupId,$parentGroupID=null){
         if($this->_validateId($groupId)){
             foreach ($this->userGroups as $g){
                 if($g->getID() == $groupId){

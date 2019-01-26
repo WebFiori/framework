@@ -853,6 +853,7 @@ abstract class Theme implements JsonI{
      * elements. One possible option in the passed array would be 'input-type'. 
      * By checking this option in the body of the method, the developer can return 
      * different types of input elements.
+     * @param array $options An array of options that developer can specify.
      * @return HTMLNode The developer must implement this method in away that 
      * makes it return an instance of the class 'HTMLNode'. 
      * @since 1.2.3

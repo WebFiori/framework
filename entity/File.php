@@ -115,6 +115,7 @@ class File implements JsonI{
      * </ul></li>
      * <li><b>Other Formats:</b>
      * <ul>
+     * <li>sql: application/sql</li>
      * <li>jar: application/java-archive</li>
      * <li>zip: application/zip</li>
      * <li>rar: application/x-rar-compressed</li>
@@ -186,6 +187,7 @@ class File implements JsonI{
         'htm'=>'text/html',
         'html'=>'text/html',
         //other files
+        'sql'=>'application/sql',
         'jar'=>'application/java-archive',
         'zip'=>'application/zip',
         'rar'=>'application/x-rar-compressed',

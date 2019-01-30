@@ -162,12 +162,12 @@ class Access {
     private function _asArrayHelper($group) {
         $retVal = array(
             'group-id'=>$group->getID(),
-            'given-name'=>$group->getName(),
-            'chiled-groups'=>array(),
+            'given-title'=>$group->getName(),
+            'child-groups'=>array(),
             'privileges'=>array()
         );
-        foreach ($group->childGroups() as $group){
-            $retVal['child-groups'][] = $this->_asArrayHelper($group);
+        foreach ($group->childGroups() as $groupX){
+            $retVal['child-groups'][] = $this->_asArrayHelper($groupX);
         }
         foreach ($group->privileges() as $pr){
             $retVal['privileges'][] = array(
@@ -433,33 +433,10 @@ class Access {
     
     private function _hasPrivilege($privilegId,$groupId) {
         $retVal = FALSE;
-        if($groupId !== NULL){
-            foreach ($this->userGroups as $g){
-                if($g->getID() == $groupId){
-                    foreach ($g->privileges() as $p){
-                        if($p->getID() == $privilegId){
-                            $retVal = TRUE;
-                        }
-                        $retVal = FALSE;
-                    }
-                }
-                $retVal = $this->_hasPrivilegeHelper($privilegId, $groupId, $g);
-                if($retVal === TRUE){
-                    break;
-                }
-            }
-        }
-        else{
-            foreach ($this->userGroups as $g){
-                foreach ($g->privileges() as $p){
-                    if($p->getID() == $privilegId){
-                        $retVal = TRUE;
-                    }
-                }
-                $retVal = $this->_hasPrivilegeHelper($privilegId, $groupId, $g);
-                if($retVal === TRUE){
-                    break;
-                }
+        foreach ($this->userGroups as $g){
+            $retVal = $this->_hasPrivilegeHelper($privilegId, $groupId, $g);
+            if($retVal === TRUE){
+                break;
             }
         }
         return $retVal;
@@ -472,23 +449,34 @@ class Access {
      * @param PrivilegesGroup $group
      */
     private function _hasPrivilegeHelper($prId,$groupId,$group) {
-        Util::print_r($groupId.' >> '.$group->getID());
-        foreach ($group->childGroups() as $g){
-            if($groupId !== NULL && $g->getID() == $groupId){
-                foreach ($g->privileges() as $p){
-                    if($p->getID() == $prId){
-                        return TRUE;
-                    }
+        if($groupId !== NULL && $group->getID() == $groupId){
+            foreach ($group->privileges() as $p){
+                if($p->getID() == $prId){
+                    return TRUE;
                 }
             }
-            else{
-                foreach ($g->privileges() as $p){
-                    if($p->getID() == $prId){
-                        return TRUE;
-                    }
+            return FALSE;
+        }
+        else if($groupId == NULL){
+            foreach ($group->privileges() as $p){
+                if($p->getID() == $prId){
+                    return TRUE;
                 }
             }
-            return $this->_hasPrivilegeHelper($prId, $groupId, $g);
+            foreach ($group->childGroups() as $g){
+                $b = $this->_hasPrivilegeHelper($prId, $groupId, $g);
+                if($b === TRUE){
+                    return TRUE;
+                }
+            }
+        }
+        else{
+            foreach ($group->childGroups() as $g){
+                $b = $this->_hasPrivilegeHelper($prId, $groupId, $g);
+                if($b === TRUE){
+                    return TRUE;
+                }
+            }
         }
         return FALSE;
     }
@@ -620,13 +608,16 @@ class Access {
      */
     private function _createPrivilege($groupId,$privilegeId){
         if($this->_validateId($privilegeId)){
-            $g = &$this->_getGroup($groupId);
-            if(($g instanceof PrivilegesGroup) && $groupId == $g->getID()){
-                $p = new Privilege();
-                $p->setID($privilegeId);
-                if(!$g->hasPrivilege($p)){
-                    $g->addPrivilage($p);
-                    return TRUE;
+            $pr = self::getPrivilege($privilegeId);
+            if($pr === NULL){
+                $g = &$this->_getGroup($groupId);
+                if(($g instanceof PrivilegesGroup) && $groupId == $g->getID()){
+                    $p = new Privilege();
+                    $p->setID($privilegeId);
+                    if(!$g->hasPrivilege($p)){
+                        $g->addPrivilage($p);
+                        return TRUE;
+                    }
                 }
             }
         }

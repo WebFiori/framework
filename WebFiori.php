@@ -189,42 +189,6 @@ class WebFiori{
         require_once ROOT_DIR.'/entity/AutoLoader.php';
         $this->AU = AutoLoader::get();
         $this->initAutoloadDirectories();
-        
-        //uncomment next line to show runtime errors and warnings
-        //also enable logging for info, warnings and errors 
-        Logger::logName('initialization-log');
-        Logger::enabled(TRUE);
-        Logger::clear();
-        
-        //display PHP warnings and errors
-        Util::displayErrors();
-
-        //enable logging of debug info.
-        //define('DEBUG', '');
-        
-        $this->SF = SystemFunctions::get();
-        $this->WF = WebsiteFunctions::get();
-        $this->BMF = BasicMailFunctions::get();
-        
-        $this->sysStatus = Util::checkSystemStatus(TRUE);
-        
-        $this->initRoutes();
-        if($this->sysStatus == Util::MISSING_CONF_FILE || $this->sysStatus == Util::MISSING_SITE_CONF_FILE){
-            Logger::log('One or more configuration file is missing. Attempting to create all configuration files.', 'warning');
-            $this->SF->createConfigFile();
-            $this->WF->createSiteConfigFile();
-            $this->BMF->createEmailConfigFile();
-            $this->sysStatus = Util::checkSystemStatus(TRUE);
-        }
-        if(gettype($this->sysStatus) == 'array'){
-            $this->dbErrDetails = $this->sysStatus;
-            $this->sysStatus = Util::DB_NEED_CONF;
-        }
-        //initialize some settings...
-        Logger::log('Initializing cron jobs...');
-        $this->initCron();
-        Logger::log('Initializing permissions...');
-        $this->initPermissions();
         Logger::log('Setting Error Handler...');
         set_error_handler(function($errno, $errstr, $errfile, $errline){
             header("HTTP/1.1 500 Server Error");
@@ -285,6 +249,42 @@ class WebFiori{
                 . '</html>');
             }
         });
+        //uncomment next line to show runtime errors and warnings
+        //also enable logging for info, warnings and errors 
+        Logger::logName('initialization-log');
+        Logger::enabled(TRUE);
+        Logger::clear();
+        
+        //display PHP warnings and errors
+        Util::displayErrors();
+
+        //enable logging of debug info.
+        //define('DEBUG', '');
+        
+        $this->SF = SystemFunctions::get();
+        $this->WF = WebsiteFunctions::get();
+        $this->BMF = BasicMailFunctions::get();
+        
+        $this->sysStatus = Util::checkSystemStatus(TRUE);
+        
+        $this->initRoutes();
+        if($this->sysStatus == Util::MISSING_CONF_FILE || $this->sysStatus == Util::MISSING_SITE_CONF_FILE){
+            Logger::log('One or more configuration file is missing. Attempting to create all configuration files.', 'warning');
+            $this->SF->createConfigFile();
+            $this->WF->createSiteConfigFile();
+            $this->BMF->createEmailConfigFile();
+            $this->sysStatus = Util::checkSystemStatus(TRUE);
+        }
+        if(gettype($this->sysStatus) == 'array'){
+            $this->dbErrDetails = $this->sysStatus;
+            $this->sysStatus = Util::DB_NEED_CONF;
+        }
+        //initialize some settings...
+        Logger::log('Initializing cron jobs...');
+        $this->initCron();
+        Logger::log('Initializing permissions...');
+        $this->initPermissions();
+        
         Logger::log('Initializing completed.');
         
         self::$classStatus = 'INITIALIZED';

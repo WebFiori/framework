@@ -24,9 +24,7 @@ class WebFioriTheme extends Theme{
         $this->setJsDirName('js');
         $this->setCssDirName('css');
         $this->addComponents(array(
-            'WebFioriGUI.php','LangExt.php','api-help/APIPage.php',
-            'api-help/ClassAPI.php','api-help/AttributeDef.php',
-            'api-help/FunctionDef.php'
+            'WebFioriGUI.php','LangExt.php'
         ));
         $this->setBeforeLoaded(function(){
             WebsiteFunctions::get()->useSession(array(

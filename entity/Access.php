@@ -184,10 +184,11 @@ class Access {
      * might looks like the following string:
      * <p>'PRIVILEGE_1-1;PRIVILEGE_2-1;G-A_GROUP'</p>  
      * where 'PRIVILEGE_1' and 'PRIVILEGE_2' are IDs of privileges and 
-     * 'A_GROUP' is the ID of a group that the user belongs to. The number 
+     * 'A_GROUP' is the ID of a group that the user has all its privileges. The number 
      * that comes after the dash is the status of the privilege. Each privilege 
      * or a group will be separated from the other by a semicolon. 
-     * Also the group will have the letter 'G' at the start.
+     * Also the group will have the letter 'G' at the start. Note that if the group 
+     * has sub-groups, this means the user will have the privileges of the sub-groups.s
      * @param User $user The user which the permissions string will be created from.
      * @return string A string of user privileges and the groups that he belongs to 
      * (if any).

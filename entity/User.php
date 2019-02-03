@@ -44,8 +44,8 @@ use jsonx\JsonI;
 use jsonx\JsonX;
 /**
  * A class that represents a system user.
- * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.7.1
+ * @author Ibrahim
+ * @version 1.7.2
  */
 class User implements JsonI{
     /**
@@ -123,16 +123,26 @@ class User implements JsonI{
         $this->userPrivileges = array();
     }
     /**
-     * Adds a user to a users group given group ID.
+     * Adds a user to a privileges group given group ID.
      * @param string $groupId The ID of the group.
      * @since 1.7
      */
     public function addToGroup($groupId) {
         $g = Access::getGroup($groupId);
         if($g instanceof PrivilegesGroup){
-            foreach ($g->privileges() as $p){
-                $this->addPrivilege($p->getID());
-            }
+            $this->_addToGroup($g);
+        }
+    }
+    /**
+     * 
+     * @param PrivilegesGroup $group
+     */
+    private function _addToGroup($group) {
+        foreach ($group->privileges() as $p){
+            $this->addPrivilege($p->getID());
+        }
+        foreach ($group->childGroups() as $g){
+            $this->_addToGroup($g);
         }
     }
     /**
@@ -192,7 +202,11 @@ class User implements JsonI{
         $this->userPrivileges = array();
     }
     /**
-     * Checks if the user belongs to a user group given its ID.
+     * Checks if the user belongs to a privileges group given its ID.
+     * A user will be a part of privileges group only if the group has at least 
+     * one privilege and he has all the 
+     * privileges of that group. In addition, he must have all the privileges 
+     * of all child groups of that group.
      * @param string $groupId The ID of the group.
      * @return boolean The method will return TRUE if the user belongs 
      * to the users group. The user will be considered a part of the group 
@@ -202,14 +216,34 @@ class User implements JsonI{
     public function inGroup($groupId) {
         $g = &Access::getGroup($groupId);
         if($g instanceof PrivilegesGroup){
-            $inGroup = TRUE;
-            foreach ($g->privileges() as $groupPrivilege){
+            return $this->_inGroup($g);
+        }
+        return FALSE;
+    }
+    /**
+     * 
+     * @param PrivilegesGroup $group
+     * @return type
+     */
+    private function _inGroup($group){
+        $inGroup = TRUE;
+        if(count($group->privileges()) !== 0){
+            foreach ($group->privileges() as $groupPrivilege){
                 $inGroup = $inGroup && $this->hasPrivilege($groupPrivilege->getID());
             }
             return $inGroup;
         }
-        return FALSE;
+        else{
+            $inGroup = FALSE;
+        }
+        if($inGroup === TRUE){
+            foreach ($group->childGroups() as $g){
+                $inGroup = $inGroup && $this->_inGroup($g);
+            }
+        }
+        return $inGroup;
     }
+
     /**
      * Returns an array which contains all user privileges.
      * @return array An array which contains an objects of type Privilege.
@@ -325,7 +359,15 @@ class User implements JsonI{
     }
     /**
      * Returns a JsonX object that represents the user.
-     * @return string A JSON string.
+     * The JsonX object will create a JSON string which has the following 
+     * format:
+     * <p>{<br/>
+     * &nbsp;&nbsp;"use-id":-1<br/>
+     * &nbsp;&nbsp;"email":""<br/>
+     * &nbsp;&nbsp;"display-name":""<br/>
+     * &nbsp;&nbsp;"username":""<br/>
+     * }</p>
+     * @return JsonX An object of type JsonX.
      * @since 1.0
      */
     public function toJSON(){
@@ -403,6 +445,14 @@ class User implements JsonI{
     }
     /**
      * Returns a JSON string representation of the user.
+     * The JsonX object will create a JSON string which has the following 
+     * format:
+     * <p>{<br/>
+     * &nbsp;&nbsp;"use-id":-1<br/>
+     * &nbsp;&nbsp;"email":""<br/>
+     * &nbsp;&nbsp;"display-name":""<br/>
+     * &nbsp;&nbsp;"username":""<br/>
+     * }</p>
      * @return string
      * @since 1.0
      */

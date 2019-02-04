@@ -44,7 +44,7 @@ if(!defined('ROOT_DIR')){
  * A class to manage user groups and privileges.
  *
  * @author Ibrahim
- * @version 1.0.2
+ * @version 1.0.3
  */
 class Access {
     /**
@@ -145,6 +145,28 @@ class Access {
             }
         }
     }
+    /**
+     * Returns an array that represents all privileges groups and privileges.
+     * The returned array will be indexed array. At each index, there will be 
+     * an associative array that represents a privileges group. 
+     * The array will contain the following indices:
+     * <ul>
+     * <li>group-id</li>
+     * <li>given-title</li>
+     * <li>child-groups</li>
+     * <li>privileges</li>
+     * </ul>
+     * The index 'child-groups' will contain an indexed array of all child groups 
+     * of a parent group. The index 'privileges' will contain an indexed array that contains 
+     * all the privileges within a group. Each index of the array will contain 
+     * an associative array that represents a privilege. The array will have 
+     * two indices:
+     * <ul>
+     * <li>privilege-id</li>
+     * <li>given-title</li>
+     * </ul>
+     * @return array An array that contains all privileges and groups info.
+     */
     public static function asArray() {
         return self::get()->_asArray();
     }
@@ -188,7 +210,7 @@ class Access {
      * that comes after the dash is the status of the privilege. Each privilege 
      * or a group will be separated from the other by a semicolon. 
      * Also the group will have the letter 'G' at the start. Note that if the group 
-     * has sub-groups, this means the user will have the privileges of the sub-groups.s
+     * has sub-groups, this means the user will have the privileges of the sub-groups.
      * @param User $user The user which the permissions string will be created from.
      * @return string A string of user privileges and the groups that he belongs to 
      * (if any).
@@ -203,14 +225,10 @@ class Access {
      */
     private function _createPermissionsStr($user) {
         if($user instanceof User){
-            $groups = Access::groups();
             $str = '';
             $groupsBelongsTo = array();
-            foreach ($groups as $group){
-                if($user->inGroup($group->getID())){
-                    $groupsBelongsTo[] = $group;
-                    $str .= 'G-'.$group->getID().';';
-                }
+            foreach ($this->userGroups as $group){
+                $this->__createPermissionsStrHelper($user, $group, $groupsBelongsTo, $str);
             }
             $userPrivileges = $user->privileges();
             if(count($groupsBelongsTo) != 0){
@@ -236,42 +254,27 @@ class Access {
         }
         return '';
     }
-    private function _clone($groupId,$newGroup,$newPermissions){
-        if($this->_hasGroup($groupId)){
-            if(!$this->hasGroup($newGroup)){
-                if(self::newGroup($newGroup)){
-                    $oldGroupPermissions = self::getGroup($groupId)->privileges();
-                    foreach ($oldGroupPermissions as $p){
-                        self::newPrivilege($newGroup, $p->getID());
-                    }
-                    foreach ($newPermissions as $p){
-                        self::newPrivilege($newGroup, $p);
-                    }
-                    return TRUE;
+    /**
+     * @param User $user Description
+     * @param PrivilegesGroup $group
+     * @param type $arr
+     */
+    private function __createPermissionsStrHelper($user,$group,&$arr,&$str){
+        if($user->inGroup($group->getID())){
+            $arr[] = $group;
+            $str .= 'G-'.$group->getID().';';
+        }
+        else{
+            foreach ($group->childGroups() as $groupX){
+                if($user->inGroup($groupX->getID())){
+                    $arr[] = $groupX;
+                    $str .= 'G-'.$groupX->getID().';';
+                }
+                else{
+                    $this->__createPermissionsStrHelper($user, $groupX, $arr, $str);
                 }
             }
         }
-        return FALSE;
-    }
-    /**
-     * Creates a clone of a group given its ID.
-     * The clone group will contain all the privileges which where added to 
-     * the original group. Also, it is possible to add extra privileges by 
-     * suppling an array that contains the IDs of the new privileges.
-     * @param string $groupId The ID of the group that will be cloned. 
-     * @param type $newGroupId The ID of the new group. It must be unique.
-     * @param type $newPermissions An optional array of new privileges array.
-     * @return boolean If the group was cloned, the method will return 
-     * TRUE. The method will return FALSE if one of the following conditions 
-     * is met:
-     * <ul>
-     * <li>The group which will be cloned does not exist.</li>
-     * <li>A group which has the ID of the new group is already exist.</li>
-     * <li>If the new group was not created for some reason.</li>
-     * </ul>
-     */
-    public static function cloneGroup($groupId,$newGroupId,$newPermissions=array()){
-        return self::get()->_clone($groupId, $newGroupId, $newPermissions);
     }
 
     private function _privileges($groupId=null){
@@ -567,6 +570,8 @@ class Access {
     }
     /**
      * Creates new privilege in a specific group given its ID.
+     * The method will add the privilege only if it does not exist in any of 
+     * the created groups.
      * @param string $groupId The ID of the group that the privilege will be 
      * added to. It must be a group in the groups array of the access class.
      * @param string $privilegeId The ID of the privilege. The ID must not contain 

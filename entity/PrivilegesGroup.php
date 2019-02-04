@@ -43,7 +43,7 @@ if(!defined('ROOT_DIR')){
 use jsonx\JsonI;
 /**
  * A class that represents a set of privileges.
- *
+ * 
  * @author Ibrahim
  * @version 1.1
  */
@@ -182,14 +182,16 @@ class PrivilegesGroup implements JsonI{
         $parentG = $this->getParentGroup();
         if($parentG !== NULL){
             while ($parentG !== NULL){
-                if($id == $parentG->getID()){
-                    return FALSE;
-                }
                 $parentG = $parentG->getParentGroup();
             }
+            $taken = $this->_checkID($id, $parentG);
+            if($taken === TRUE){
+                return FALSE;
+            }
         }
-        foreach ($this->childGroups() as $g){
-            if($g->getID() == $id){
+        else{
+            $taken = $this->_checkID($id, $this);
+            if($taken === TRUE){
                 return FALSE;
             }
         }
@@ -206,6 +208,22 @@ class PrivilegesGroup implements JsonI{
         return TRUE;
     }
     /**
+     * 
+     * @param type $id
+     * @param PrivilegesGroup $group
+     */
+    private function _checkID($id,$group){
+        if($group->getID() == $id){
+            return TRUE;
+        }
+        $bool = FALSE;
+        foreach ($group->childGroups() as $g){
+            $bool = $bool || $this->_checkID($id, $g);
+        }
+        return $bool;
+    }
+
+    /**
      * Checks if the group has the given privilege or not.
      * This method will only check the given group (does not include parent). 
      * @param Privilege $p An object of type 'Privilige'.
@@ -217,26 +235,51 @@ class PrivilegesGroup implements JsonI{
      * @since 1.0
      */
     public function hasPrivilege($p,$checkChildGroups=true) {
+        $hasPr = FALSE;
         if($p instanceof Privilege){
             foreach ($this->privileges() as $privilege){
                 if($p->getID() == $privilege->getID()){
-                    return TRUE;
+                    $hasPr = TRUE;
                 }
             }
-            if($checkChildGroups === TRUE){
+            if(!$hasPr && $checkChildGroups === TRUE){
                 foreach ($this->childGroups() as $g){
-                    foreach ($g->privileges() as $privilege){
-                        if($p->getID() == $privilege->getID()){
-                            return TRUE;
-                        }
+                    $hasPr = $this->_hasPrivilege($g, $p);
+                    if($hasPr){
+                        break;
                     }
                 }
             }
         }
-        return FALSE;
+        return $hasPr;
+    }
+    /**
+     * 
+     * @param PrivilegesGroup $group
+     * @param Privilege $p Description
+     */
+    public function _hasPrivilege($group,$p) {
+        $hasPr = FALSE;
+        foreach ($group->privileges() as $privilege){
+            if($p->getID() == $privilege->getID()){
+                $hasPr = TRUE;
+                break;
+            }
+        }
+        if(!$hasPr){
+            foreach ($group->childGroups() as $g){
+                $hasPr = $this->_hasPrivilege($g, $p);
+                if($hasPr === TRUE){
+                    break;
+                }
+            }
+        }
+        return $hasPr;
     }
     /**
      * Returns the name of the group.
+     * The name can be used to give a meaningful description of the group 
+     * (like a label).
      * @return string The name of the group.
      * @since 1.0
      */
@@ -245,6 +288,8 @@ class PrivilegesGroup implements JsonI{
     }
     /**
      * Returns an array that contains all group privileges.
+     * The array does not include the privileges of parent group or child 
+     * groups.
      * @return array An array that contains an objects of type 'Privilege'.
      * @since 1.0
      */
@@ -254,10 +299,10 @@ class PrivilegesGroup implements JsonI{
     /**
      * Adds new privilege to the array of group privileges.
      * @param Privilege $pr An object of type Privilege. Note that 
-     * the privilege will be added only if there us no privilege in 
+     * the privilege will be added only if there is no privilege in 
      * the group which has the same ID.
      * @return boolean The method will return TRUE if the privilege was 
-     * added.
+     * added. FALSE otherwise.
      * @since 1.0
      */
     public function addPrivilage(&$pr) {

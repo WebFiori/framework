@@ -1,9 +1,8 @@
 <?php
-
 /*
  * The MIT License
  *
- * Copyright 2018 Ibrahim.
+ * Copyright (c) 2019 Ibrahim BinAlshikh, phpStructs.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,8 +28,8 @@ use phpStructs\Stack;
 /**
  * A class that represents HTML element.
  *
- * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.7
+ * @author Ibrahim
+ * @version 1.7.1
  */
 class HTMLNode {
     /**
@@ -47,15 +46,16 @@ class HTMLNode {
         'tab-spaces'=>4,
         'initial-tab'=>0,
         'with-colors'=>true,
+        'use-pre'=>true,
         'colors'=>array(
             'bg-color'=>'rgb(21, 18, 33)',
-            'text-color'=>'white',
+            'text-color'=>'gray',
             'attribute-color'=>'rgb(0,124,0)',
             'attribute-value-color'=>'rgb(170,85,137)',
             'node-name-color'=>'rgb(204,225,70)',
             'lt-gt-color'=>'rgb(204,225,70)',
             'comment-color'=>'rgb(0,189,36)',
-            'operator-color'=>'white'
+            'operator-color'=>'gray'
         )
     );
     /**
@@ -369,7 +369,7 @@ class HTMLNode {
      * you can only switch between the two types. If the node type is of 
      * another type and has child nodes, the type will change only if the 
      * attribute $reqClose is set to TRUE. If has no children, it will switch 
-     * without problems. If the node is inline, the type will switch without 
+     * without problems. If the node is in-line, the type will switch without 
      * problems.
      * @param boolean $reqClose Set to TRUE if the node must have ending 
      * tag.
@@ -511,6 +511,41 @@ class HTMLNode {
      */
     public function setName($val){
         $this->setAttribute('name',$val);
+    }
+    /**
+     * Sets the value of the attribute 'style' of the node.
+     * @param array $cssStyles An associative array of CSS declarations. The keys of the array should 
+     * be the names of CSS Properties and the values should be the values of 
+     * the attributes (e.g. 'color'=>'white').
+     * @since 1.7.1
+     */
+    public function setStyle($cssStyles=array()) {
+        $styleStr = '';
+        foreach ($cssStyles as $key => $val){
+            $styleStr .= $key.':'.$val.';';
+        }
+        $this->setAttribute('style', $styleStr);
+    }
+    /**
+     * Returns an array that contains in-line CSS declarations.
+     * If the attribute is not set, the array will be empty.
+     * @return array An associative array of CSS declarations. The keys of the array will 
+     * be the names of CSS Properties and the values will be the values of 
+     * the attributes (e.g. 'color'=>'white').
+     * @since 1.0
+     */
+    public function getStyle() {
+        $styleStr = $this->getAttributeValue('style');
+        if($styleStr !== NULL){
+            $retVal = array();
+            $arr1 = explode(';', trim($styleStr,';'));
+            foreach ($arr1 as $val){
+                $exp = explode(':', $val);
+                $retVal[$exp[0]] = $exp[1];
+            }
+            return $retVal;
+        }
+        return array();
     }
     /**
      * Removes an attribute from the node given its name.
@@ -782,11 +817,13 @@ class HTMLNode {
         for($x = 0 ; $x < $spacesCount ; $x++){
             $this->tabSpace .= ' ';
         }
-        if($formattingOptionsV['with-colors'] === TRUE){
-            $this->codeString = '<pre style="background-color:'.$formattingOptionsV['colors']['bg-color'].'; color:'.$formattingOptionsV['colors']['text-color'].'">'.$this->nl;
-        }
-        else{
-            $this->codeString = '<pre>'.$this->nl;
+        if($formattingOptions['use-pre'] === TRUE){
+            if($formattingOptionsV['with-colors'] === TRUE){
+                $this->codeString = '<pre style="margin:0;background-color:'.$formattingOptionsV['colors']['bg-color'].'; color:'.$formattingOptionsV['colors']['text-color'].'">'.$this->nl;
+            }
+            else{
+                $this->codeString = '<pre style="margin:0">'.$this->nl;
+            }
         }
         if($this->getName() == 'html'){
             if($formattingOptionsV['with-colors']){
@@ -800,7 +837,10 @@ class HTMLNode {
         }
         $this->nodesStack = new Stack();
         $this->_pushNodeAsCode($this,$formattingOptionsV);
-        return $this->codeString.'</pre>';
+        if($formattingOptions['use-pre'] === TRUE){
+            return $this->codeString.'</pre>';
+        }
+        return $this->codeString;
     }
     /**
      * 

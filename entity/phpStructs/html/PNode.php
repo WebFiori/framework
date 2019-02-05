@@ -1,9 +1,8 @@
 <?php
-
 /*
  * The MIT License
  *
- * Copyright 2018 Ibrahim.
+ * Copyright (c) 2019 Ibrahim BinAlshikh, phpStructs.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +27,7 @@ namespace phpStructs\html;
  * A class that represents a paragraph element.
  *
  * @author Ibrahim
- * @version 1.0
+ * @version 1.1
  */
 class PNode extends HTMLNode{
     const ALLOWED_CHILDS = array('a','b','br','abbr','dfn','i','em','span','img',
@@ -128,9 +127,17 @@ class PNode extends HTMLNode{
         }
     }
     /**
+     * Clears the text of the paragraph.
+     * @since 1.1
+     */
+    public function clear() {
+        $this->removeAllChildNodes();
+    }
+    /**
      * Adds new child node.
      * @param HTMLNode $node The node that will be added. The paragraph element 
      * can only accept the addition of inline HTML elements.
+     * @since 1.0
      */
     public function addChild($node) {
         if($node instanceof HTMLNode){

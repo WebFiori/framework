@@ -44,9 +44,12 @@ if(!defined('ROOT_DIR')){
 /**
  * A class that is can be used to make the application ready for 
  * Internationalization.
- *
+ * In order to create a language file, the developer must extend this class. 
+ * The language class must be added in the folder '/entity/langs' and the name 
+ * of language file must be 'LanguageXX.php' where 'XX' are two characters that 
+ * represents language code.
  * @author Ibrahim
- * @version 1.2
+ * @version 1.2.1
  */
 class Language {
     /**
@@ -229,6 +232,19 @@ class Language {
                 }
             }
         }
+    }
+    /**
+     * Creates a sub-array for defining language variables given initial set 
+     * of variables.
+     * @param string $dir A string that looks like a 
+     * directory.
+     * @param array $labels An associative array. The key will act as the variable 
+     * name and the value of the key will act as the variable value.
+     * @since 1.2.1
+     */
+    public function createAndSet($dir,$labels) {
+        $this->createDirectory($dir);
+        $this->setMultiple($dir, $labels);
     }
     private function _create($subs,&$top,$index){
         $count = count($subs);

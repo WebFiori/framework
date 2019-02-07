@@ -232,17 +232,25 @@ class WebFiori{
                 . '<!DOCTYPE html>'
                 . '<html>'
                 . '<head>'
+                . '<style>'
+                . '.nice-red{'
+                . 'color:#ff6666;'
+                . '}'
+                . '.mono{'
+                . 'font-family:monospace;'
+                . '}'
+                . '</style>'
                 . '<title>Uncaught Exception</title>'
                 . '</head>'
-                . '<body>'
-                . '<h1>500 - Server Error: Uncaught Exception.</h1>'
+                . '<body style="color:white;background-color:#1a000d;">'
+                . '<h1 style="color:#ff4d4d">500 - Server Error: Uncaught Exception.</h1>'
                 . '<hr>'
                 . '<p>'
-                .'<b>Exception Message:</b> '.$ex->getMessage()."<br/>"
-                .'<b>Exception Code:</b> '.$ex->getCode()."<br/>"
-                .'<b>File:</b> '.$ex->getFile()."<br/>"
-                .'<b>Line:</b> '.$ex->getLine()."<br>"
-                .'<b>Stack Trace:</b> '."<br/>"
+                .'<b class="nice-red mono">Exception Message:</b> <span class="mono">'.$ex->getMessage()."</span><br/>"
+                .'<b class="nice-red mono">Exception Code:</b> <span class="mono">'.$ex->getCode()."</span><br/>"
+                .'<b class="nice-red mono">File:</b> <span class="mono">'.$ex->getFile()."</span><br/>"
+                .'<b class="nice-red mono">Line:</b> <span class="mono">'.$ex->getLine()."</span><br>"
+                .'<b class="nice-red mono">Stack Trace:</b> '."<br/>"
                 . '</p>'
                 . '<pre>'.$ex->getTraceAsString().'</pre>'
                 . '</body>'

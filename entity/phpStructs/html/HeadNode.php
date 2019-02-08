@@ -27,7 +27,7 @@ namespace phpStructs\html;
  * A class that represents the tag &lt;head&lt; of a HTML document.
  *
  * @author Ibrahim
- * @version 1.1.1
+ * @version 1.1.2
  */
 class HeadNode extends HTMLNode{
     /**
@@ -179,17 +179,84 @@ class HeadNode extends HTMLNode{
      * Adds new meta tag.
      * @param string $name The value of the property 'name'.
      * @param string $content The value of the property 'content'.
+     * @param boolean $override A boolean attribute. If a meta node was found 
+     * which has the given name and this attribute is set to TRUE, 
+     * the content of the meta will be overriden by the passed value. 
      * @since 1.0
      */
-    public function addMeta($name,$content){
+    public function addMeta($name,$content,$override=false){
         if(gettype($name) == 'string' && gettype($content) == 'string'){
             if(strlen($name) != 0 && strlen($content) != 0){
-                $meta = new HTMLNode('meta', FALSE, FALSE);
-                $meta->setAttribute('name', $name);
-                $meta->setAttribute('content', $content);
-                $this->addChild($meta);
+                $meta = &$this->getMeta($name);
+                if($meta !== NULL && $override === TRUE){
+                    $meta->setAttribute('content', $content);
+                }
+                else if($meta === NULL){
+                    $meta = new HTMLNode('meta', FALSE, FALSE);
+                    $meta->setAttribute('name', $name);
+                    $meta->setAttribute('content', $content);
+                    $this->addChild($meta);
+                }
             }
         }
+    }
+    /**
+     * Adds new child node.
+     * @param HTMLNode $node The node that will be added. The node can have 
+     * child nodes only if 3 conditions are met. If the node is not a text node 
+     * , the node is not a comment node and the node must have ending tag.
+     * @since 1.0
+     */
+    public function addChild($node) {
+        if($node instanceof HTMLNode){
+            if($node->getName() == 'meta'){
+                if(!$this->hasMeta($node->getAttributeValue('name'))){
+                    parent::addChild($node);
+                }
+            }
+            else{
+                parent::addChild($node);
+            }
+        }
+    }
+    /**
+     * Returns HTML node that represents a meta tag.
+     * @param string $name The value of the attribute 'name' of the meta 
+     * tag.
+     * @return HTMLNode|NULL If a meta tag which has the given name was found, 
+     * It will be returned. If no meta node was found, NULL is returned.
+     * @since 1.1.2
+     */
+    public function &getMeta($name) {
+        for($x = 0 ; $x < $this->childrenCount() ; $x++){
+            $node = $this->children()->get($x);
+            if($node->getName() == 'meta'){
+                if($node->getAttributeValue('name') == $name){
+                    return $node;
+                }
+            }
+        }
+        $null = NULL;
+        return $null;
+    }
+    /**
+     * Checks if a meta tag which has the given name exist or not.
+     * @param string $name The value of the attribute 'name' of the meta 
+     * tag.
+     * @return boolean If a meta tag which has the given name was found, 
+     * TRUE is returned. FALSE otherwise.
+     * @since 1.1.2
+     */
+    public function hasMeta($name) {
+        for($x = 0 ; $x < $this->childrenCount() ; $x++){
+            $node = $this->children()->get($x);
+            if($node->getName() == 'meta'){
+                if($node->getAttributeValue('name') == $name){
+                    return TRUE;
+                }
+            }
+        }
+        return FALSE;
     }
     /**
      * Adds new CSS source file.

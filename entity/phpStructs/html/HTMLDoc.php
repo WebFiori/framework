@@ -188,7 +188,9 @@ class HTMLDoc {
     /**
      * Returns HTML string that represents the document.
      * @param boolean $formatted If set to TRUE, The generated HTML code will be 
-     * well formatted. Default is TRUE.
+     * well formatted. Default is TRUE. Note that this attribute will take 
+     * effect only if the formatting option is not set using the method 
+     * HTMLNode::setIsFormatted().
      * @return string HTML string that represents the document.
      * @since 1.0
      */

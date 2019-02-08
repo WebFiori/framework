@@ -1,9 +1,8 @@
 <?php
-
 /*
  * The MIT License
  *
- * Copyright 2018 Ibrahim.
+ * Copyright (c) 2019 Ibrahim BinAlshikh, phpStructs.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,59 +31,10 @@ namespace phpStructs\html;
  */
 class ListItem extends HTMLNode{
     /**
-     * A boolean value that is set to <b>TRUE</b> in case the list item only 
-     * accepts text.
-     * @var boolean
-     * @since 1.1 
-     */
-    private $textOnly;
-    /**
      * Constructs new list item
-     * @param boolean $textOnly Set to TRUE to make the list item 
-     * accepts text only. Default is FALSE.
-     * @param string $text The text that will be displayed by the list 
-     * item. Ignored if the parameter $textOnly is set to FALSE.
      * @since 1.0
      */
-    public function __construct($textOnly=false,$text='') {
+    public function __construct() {
         parent::__construct('li', TRUE);
-        $this->textOnly = $textOnly === TRUE ? TRUE : FALSE;
-        $this->setText($text);
-    }
-    /**
-     * Sets the text to display on the list item.
-     * @param string $text The text to display. Only set if the node 
-     * accepts text.
-     * @since 1.1
-     */
-    public function setText($text) {
-        if($this->isTextOnly()){
-            if($this->children()->get(0) != NULL){
-                $this->children()->get(0)->setText($text);
-            }
-            else{
-                parent::addChild(self::createTextNode($text));
-            }
-        }
-    }
-    /**
-     * Checks if the node only accepts text or not.
-     * @return boolean <b>TRUE</b> is returned if the node accepts text 
-     * only.
-     */
-    public function isTextOnly() {
-        return $this->textOnly;
-    }
-    /**
-     * Adds new child node to the list item.
-     * @param HTMLNode $node The node that will be added. Node that the 
-     * method will work only if the list item allows things other 
-     * than the text in its body.
-     * @since 1.1
-     */
-    public function addChild($node) {
-        if(!$this->isTextOnly()){
-            parent::addChild($node);
-        }
     }
 }

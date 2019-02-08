@@ -29,9 +29,10 @@ use phpStructs\Stack;
  * A class that represents HTML element.
  *
  * @author Ibrahim
- * @version 1.7.1
+ * @version 1.7.2
  */
 class HTMLNode {
+    private $isFormated;
     /**
      * A null guard for the methods that return null reference.
      * @since 1.6
@@ -596,7 +597,7 @@ class HTMLNode {
      */
     public function addChild($node) {
         if(!$this->isTextNode() && !$this->isComment() && $this->mustClose()){
-            if($node instanceof HTMLNode){
+            if(($node instanceof HTMLNode) && $node !== $this){
                 $node->_setParent($this);
                 $this->childrenList->add($node);
             }
@@ -697,6 +698,9 @@ class HTMLNode {
      * @since 1.0
      */
     public function toHTML($formatted=false,$initTab=0) {
+        if($this->isFormatted() !== NULL){
+            $formatted = $this->isFormatted();
+        }
         if(!$formatted){
             $this->nl = '';
             $this->tabSpace = '';
@@ -730,21 +734,58 @@ class HTMLNode {
         return $this->htmlString;
     }
     /**
+     * Returns the value of the property $isFormatted.
+     * The property is used to control how the HTML code that will be generated 
+     * will look like. If set to TRUE, the code will be user-readable. If set to 
+     * FALSE, it will be compact and the load size will be come less since no 
+     * new line characters or spaces will be added in the code.
+     * @return boolean|NULL If the property is set, the method will return 
+     * its value. If not set, the method will return NULL.
+     * @since 1.7.2
+     */
+    public function isFormatted() {
+        return $this->isFormated;
+    }
+    /**
+     * Sets the value of the property $isFormatted.
+     * @param boolean $bool TRUE to make the document that will be generated 
+     * from the node user-readable. FALSE to make it compact.
+     * @since 1.7.2
+     */
+    public function setIsFormatted($bool) {
+        $this->isFormated = $bool === TRUE;
+    }
+    /**
      * 
      * @param HTMLNode $node
      */
     private function _pushNode(&$node) {
         if($node->isTextNode()){
-            $this->htmlString .= $this->_getTab().$node->getText().$this->nl;
+            if($node->isFormatted() !== NULL && $node->isFormatted() === FALSE){
+                $this->htmlString .= $node->getText();
+            }
+            else{
+                $this->htmlString .= $this->_getTab().$node->getText().$this->nl;
+            }
         }
         else if($node->isComment()){
-            $this->htmlString .= $this->_getTab().$node->getComment().$this->nl;
+            if($node->isFormatted() !== NULL && $node->isFormatted() === FALSE){
+                $this->htmlString .= $node->getComment();
+            }
+            else{
+                $this->htmlString .= $this->_getTab().$node->getComment().$this->nl;
+            }
         }
         else{
             if($node->mustClose()){
                 $chCount = $node->children()->size();
                 $this->nodesStack->push($node);
-                $this->htmlString .= $this->_getTab().$node->open().$this->nl;
+                if($node->isFormatted() !== NULL && $node->isFormatted() === FALSE){
+                    $this->htmlString .= $node->open();
+                }
+                else{
+                    $this->htmlString .= $this->_getTab().$node->open().$this->nl;
+                }
                 $this->_addTab();
                 for($x = 0 ; $x < $chCount ; $x++){
                     $nodeAtx = &$node->children()->get($x);
@@ -761,7 +802,12 @@ class HTMLNode {
     private function _popNode(){
         $node = &$this->nodesStack->pop();
         if($node != NULL){
-            $this->htmlString .= $this->_getTab().'</'.$node->getName().'>'.$this->nl;
+            if($node->isFormatted() !== NULL && $node->isFormatted() === FALSE){
+                $this->htmlString .= '</'.$node->getName().'>';
+            }
+            else{
+                $this->htmlString .= $this->_getTab().'</'.$node->getName().'>'.$this->nl;
+            }
         }
     }
     /**

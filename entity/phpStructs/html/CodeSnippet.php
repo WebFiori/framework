@@ -115,6 +115,7 @@ class CodeSnippet extends HTMLNode{
             )
         );
         $this->pre = new HTMLNode('pre');
+        $this->pre->setIsFormatted(FALSE);
         $this->pre->setStyle(
             array(
                 'margin'=>'0',
@@ -124,6 +125,7 @@ class CodeSnippet extends HTMLNode{
         );
         $this->code = new HTMLNode('code');
         $this->code->setClassName('code');
+        $this->code->setIsFormatted(FALSE);
         $this->code->setStyle(
             array(
                 'line-height'=>'18px !important;',

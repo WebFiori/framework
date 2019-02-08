@@ -605,7 +605,7 @@ class Page{
      * @since 1.9
      */
     public static function render() {
-        echo Page::get()->getDocument()->toHTML();
+        echo Page::get()->getDocument()->toHTML(TRUE);
     }
     /**
      * Loads and returns translation based on page language code.
@@ -1034,7 +1034,10 @@ class Page{
             $tmpHead = $this->getTheme()->getHeadNode();
             if($tmpHead instanceof HTMLNode){
                 $headNode->setTitle($this->getTitle().$this->getTitleSep().$this->getWebsiteName());
-                $headNode->setBase($tmpHead->getBase()->getAttributeValue('href'));
+                $baseNode = $tmpHead->getBase();
+                if($baseNode !== NULL){
+                    $headNode->setBase($tmpHead->getBase()->getAttributeValue('href'));
+                }
                 $headNode->setCanonical($this->getCanonical());
                 $descNode = new HTMLNode('meta', FALSE);
                 $descNode->setAttribute('name', 'description');

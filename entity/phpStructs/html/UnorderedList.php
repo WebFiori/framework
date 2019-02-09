@@ -35,12 +35,15 @@ class UnorderedList extends HTMLNode{
         parent::__construct('ul', TRUE);
     }
     /**
-     * Adds new list item.
-     * @param ListItem $listItem The list item that will be added.
+     * Adds new item to the list.
+     * @param string $listItemText The text that will be displayed by the 
+     * list item.
      * @since 1.0
      */
-    public function addListItem($listItem) {
-        $this->addChild($listItem);
+    public function addListItem($listItemText) {
+        $li = new ListItem();
+        $li->addTextNode($listItemText);
+        $this->addChild($li);
     }
     /**
      * Adds a sublist to the main list.

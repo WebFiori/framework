@@ -127,7 +127,7 @@ class EmailMessage {
                     return;
                 }
             }
-            Logger::log('No email account with the name \'MailConfig\' was found. An exception is thrown.', 'error');
+            Logger::log('No email account with the name \''.$sendAccountName.'\' was found. An exception is thrown.', 'error');
             Logger::requestCompleted();
             throw new Exception('The account "'.$sendAccountName.'" does not exist.');
         }

@@ -2,7 +2,7 @@
 /*
  * The MIT License
  *
- * Copyright 2018 Ibrahim.
+ * Copyright 2018 Ibrahim, WebFiori Framework.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -52,7 +52,7 @@ if(!defined('ROOT_DIR')){
  * <p>* * * * *  /usr/bin/curl {BASE_URL}/cron-jobs/execute/{password}</p>
  * Where {BASE_URL} is the web site's base URL and {password} is the password 
  * that was set by the developer to protect the jobs from unauthorized access.
- * @author Ibrahim <ibinshikh@hotmail.com>
+ * @author Ibrahim
  * @version 1.0.1
  */
 class Cron {
@@ -479,17 +479,17 @@ class Cron {
      * https://en.wikipedia.org/wiki/Cron#CRON_expression. Note that 
      * the method does not support year field. This means 
      * the expression will have only 5 fields.
-     * @param string $when A cron expression. 
+     * @param string $when A cron expression.
+     * @param string $jobName An optional job name. 
      * @param callable $function A function to run when it is the time to execute 
      * the job.
      * @param array $funcParams An array of parameters that can be passed to the 
      * function. 
-     * @param string $jobName An optional job name.
      * @return boolean If the job was created and scheduled, the method will 
      * return TRUE. Other than that, the method will return FALSE.
      * @since 1.0
      */
-    public static function createJob($when='*/5 * * * *',$function='',$funcParams=array(),$jobName=''){
+    public static function createJob($when='*/5 * * * *',$jobName='',$function='',$funcParams=array()){
         try{
             $job = new CronJob($when);
             $job->setOnExecution($function, $funcParams);
@@ -506,18 +506,20 @@ class Cron {
      * Creates a daily job to execute every day at specific hour and minute.
      * @param string $time A time in the form 'hh:mm'. hh can have any value 
      * between 0 and 23 inclusive. mm can have any value between 0 and 59 inclusive.
+     * @param string $name An optional name for the job.
      * @param callable $func A function that will be executed once it is the 
-     * time to run the job.
+     * time to run the job. Default is NULL.
      * @param array $funcParams An array of parameters which will be passed to 
      * the function.
      * @return boolean If the job was created and scheduled, the method will 
      * return TRUE. Other than that, the method will return FALSE.
      * @since 1.0
      */
-    public static function dailyJob($time,$func,$funcParams=array()){
+    public static function dailyJob($time,$name='',$func=null,$funcParams=array()){
         $split = explode(':', $time);
         if(count($split) == 2){
             $job = new CronJob();
+            $job->setJobName($name);
             $job->dailyAt($split[0], $split[1]);
             $job->setOnExecution($func, $funcParams);
             return self::scheduleJob($job);
@@ -531,18 +533,20 @@ class Cron {
      * for Sunday and 6 is for Saturday.
      * 'hh' can have any value between 0 and 23 inclusive. mm can have any value 
      * between 0 and 59 inclusive.
-     * @param callable $func A function that will be executed once it is the 
-     * time to run the job.
+     * @param string $name An optional name for the job.
+     * @param callable|NULL $func A function that will be executed once it is the 
+     * time to run the job. Default is NULL.
      * @param array $funcParams An array of parameters which will be passed to 
      * the function.
      * @return boolean If the job was created and scheduled, the method will 
      * return TRUE. Other than that, the method will return FALSE.
      * @since 1.0
      */
-    public static function weeklyJob($time,$func,$funcParams=array()){
+    public static function weeklyJob($time,$name='',$func=null,$funcParams=array()){
         $split1 = explode('-', $time);
         if(count($split1) == 2){
             $job = new CronJob();
+            $job->setJobName($name);
             $job->weeklyOn($split1[0], $split1[1]);
             $job->setOnExecution($func, $funcParams);
             return self::scheduleJob($job);

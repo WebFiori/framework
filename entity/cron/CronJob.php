@@ -2,7 +2,7 @@
 /*
  * The MIT License
  *
- * Copyright 2018 Ibrahim.
+ * Copyright 2018 Ibrahim, WebFiori Framework.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -163,14 +163,32 @@ class CronJob {
      * Sets an optional name for the job.
      * The name is used to make different jobs unique. Each job must 
      * have its own name. Also, the name of the job is used to force job 
-     * execution. It can be supplied as a part of cron URL. 
+     * execution. It can be supplied as a part of cron URL. Note that the 
+     * name must not contain any of URL-reserved characters.
      * @param string $name The name of the job.
      * @since 1.0
      */
     public function setJobName($name){
-        if(strlen($name) > 0){
+        Logger::logFuncCall(__METHOD__);
+        $name = $name.'';
+        $len = strlen($name);
+        Logger::log('Given name = \''.$name.'\'.', $name);
+        Logger::log('Validating length...');
+        if($len > 0){
+            $notAllowed = array('?',';','&','=','/','@',':');
+            Logger::log('Checking if name does not contain any URL-reserved character...');
+            for($x = 0 ; $x < $len ; $x++){
+                $ch = $name[$x];
+                if(in_array($ch, $notAllowed)){
+                    Logger::log('Invalid character in name.');
+                    Logger::logFuncReturn(__METHOD__);
+                    return;
+                }
+            }
+            Logger::log('The given name is valid. Setting the name.');
             $this->jobName = $name;
         }
+        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * Returns the cron expression which is associated with the job.

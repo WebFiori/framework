@@ -45,7 +45,7 @@ if(!defined('ROOT_DIR')){
 /**
  * A class thar represents a cron job.
  *
- * @author Ibrahim <ibinshikh@hotmail.com>
+ * @author Ibrahim
  * @version 1.0.2
  */
 class CronJob {

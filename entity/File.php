@@ -459,6 +459,7 @@ class File implements JsonI{
             else{
                 header('Content-Disposition: inline; filename="'.$this->getName().'"');
             }
+            header('Content-Length: '.$this->getSize());
             echo $this->getRawData();
         }
         else{

@@ -335,10 +335,10 @@ class File implements JsonI{
      * absolute path of the file.
      * @since 1.1.1
      */
-    public function read() {
+    public function read($from=-1,$to=-1) {
         $path = $this->getAbsolutePath();
         if($path != ''){
-            if(!$this->_readHelper($path)){
+            if(!$this->_readHelper($path,$from,$to)){
                 $path = str_replace('\\', '/', $this->getAbsolutePath());
                 if(!$this->_readHelper($path)){
                     throw new Exception('File not found: \''.$path.'\'.');
@@ -353,7 +353,11 @@ class File implements JsonI{
         }
         throw new Exception('File absolute path is invalid.');
     }
-    private function _readHelper($path){
+    private function _getMemoryLimit() {
+        $memoryLimit = ini_get('memory_limit');
+            $len = strlen($memoryLimit);
+    }
+    private function _readHelper($path,$from,$to){
         if(file_exists($path)){
             $this->_setSize(filesize($path));
             set_error_handler(function(){});
@@ -601,12 +605,17 @@ class File implements JsonI{
      * This method will set the path and name to empty string. Also, it will 
      * set the size to 0 and ID to -1. Finally, it will set MIME type to 
      * "application/octet-stream"
+     * @param string $fName The name of the file such as 'my-file.png'.
+     * @param string $fPath The path of the file such as 'C:/Images/Test'.
+     * @since 1.0
      */
-    public function __construct() {
+    public function __construct($fName='',$fPath='') {
         $this->mimeType = 'application/octet-stream';
-        $this->path = '';
+        if(!$this->setPath($fPath)){
+            $this->path = '';
+        }
+        $this->setName($fName);
         $this->id = -1;
-        $this->fileName = '';
         $this->fSize = 0;
     }
     /**

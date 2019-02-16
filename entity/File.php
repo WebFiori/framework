@@ -355,7 +355,19 @@ class File implements JsonI{
     }
     private function _getMemoryLimit() {
         $memoryLimit = ini_get('memory_limit');
-            $len = strlen($memoryLimit);
+        $len = strlen($memoryLimit);
+        $limit = '';
+        $unit = '';
+        for($x = 0 ; $x < $len ; $x++){
+            $ch = $memoryLimit[$x];
+            if($ch >= '0' && $ch <= '9'){
+                $limit .= $ch;
+            }
+            else{
+                $unit .= $ch;
+            }
+        }
+        echo $limit.' '.$unit;
     }
     private function _readHelper($path,$from,$to){
         if(file_exists($path)){

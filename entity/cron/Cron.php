@@ -53,9 +53,14 @@ if(!defined('ROOT_DIR')){
  * Where {BASE_URL} is the web site's base URL and {password} is the password 
  * that was set by the developer to protect the jobs from unauthorized access.
  * @author Ibrahim
- * @version 1.0.1
+ * @version 1.0.2
  */
 class Cron {
+    /**
+     * An array that contains current timestamp. 
+     * @var array 
+     */
+    private $timestamp;
     /**
      * The password that is used to access and execute jobs.
      * @var string
@@ -93,10 +98,75 @@ class Cron {
         return self::$executer;
     }
     /**
+     * Returns the number of current month as integer.
+     * This method is used by the class 'CronJob' to validate cron job 
+     * execution time. The method will always return a value between 1 and 12 
+     * inclusive.
+     * @return int An integer that represents current month's number.
+     * @since 1.0.2
+     */
+    public static function month(){
+        return self::_get()->timestamp['month'];
+    }
+    /**
+     * Returns the number of current day in the current  month as integer.
+     * This method is used by the class 'CronJob' to validate cron job 
+     * execution time.
+     * @return int An integer that represents current day number in 
+     * the current month.
+     * @since 1.0.2
+     */
+    public static function dayOfMonth(){
+        return self::_get()->timestamp['month-day'];
+    }
+    /**
+     * Returns the number of current day in the current  week as integer.
+     * This method is used by the class 'CronJob' to validate cron job 
+     * execution time. The method will always return a value between 0 and 6 
+     * inclusive. 0 Means Sunday and 6 is for Saturday.
+     * @return int An integer that represents current day number in 
+     * the week.
+     * @since 1.0.2
+     */
+    public static function dayOfWeek(){
+        return self::_get()->timestamp['week-day'];
+    }
+    /**
+     * Returns the number of current hour in the day as integer.
+     * This method is used by the class 'CronJob' to validate cron job 
+     * execution time. The method will always return a value between 0 and 23 
+     * inclusive.
+     * @return int An integer that represents current hour number in 
+     * the day.
+     * @since 1.0.2
+     */
+    public static function hour(){
+        return self::_get()->timestamp['hour'];
+    }
+    /**
+     * Returns the number of current minute in the current hour as integer.
+     * This method is used by the class 'CronJob' to validate cron job 
+     * execution time. The method will always return a value between 0 and 59 
+     * inclusive.
+     * @return int An integer that represents current minute number in 
+     * the current hour.
+     * @since 1.0.2
+     */
+    public static function minute(){
+        return self::_get()->timestamp['hour'];
+    }
+    /**
      * Creates new instance of the class.
      * @since 1.0
      */
     private function __construct() {
+        $this->timestamp = array(
+            'month'=>intval(date('m')),
+            'month-day'=>intval(date('d')),
+            'week-day'=>intval(date('w')),
+            'hour'=>intval(date('H')),
+            'minute'=>intval(date('i'))
+        );
         $this->isLogEnabled = FALSE;
         $this->cronJobsQueue = new Queue();
         $this->_setPassword('');
@@ -506,23 +576,26 @@ class Cron {
      * Creates a daily job to execute every day at specific hour and minute.
      * @param string $time A time in the form 'hh:mm'. hh can have any value 
      * between 0 and 23 inclusive. mm can have any value between 0 and 59 inclusive.
-     * @param string $name An optional name for the job.
+     * @param string $name An optional name for the job. Can be NULL.
      * @param callable $func A function that will be executed once it is the 
-     * time to run the job. Default is NULL.
-     * @param array $funcParams An array of parameters which will be passed to 
-     * the function.
+     * time to run the job.
+     * @param array $funcParams An optional array of parameters which will be passed to 
+     * the callback that will be executed when its time to execute the job.
      * @return boolean If the job was created and scheduled, the method will 
      * return TRUE. Other than that, the method will return FALSE.
      * @since 1.0
      */
-    public static function dailyJob($time,$name='',$func=null,$funcParams=array()){
+    public static function dailyJob($time,$name,$func,$funcParams=array()){
         $split = explode(':', $time);
         if(count($split) == 2){
-            $job = new CronJob();
-            $job->setJobName($name);
-            $job->dailyAt($split[0], $split[1]);
-            $job->setOnExecution($func, $funcParams);
-            return self::scheduleJob($job);
+            if(is_callable($func)){
+                $job = new CronJob();
+                $job->setJobName($name);
+                if($job->dailyAt($split[0], $split[1])){
+                    $job->setOnExecution($func, $funcParams);
+                    return self::scheduleJob($job);
+                }
+            }
         }
         return FALSE;
     }
@@ -533,23 +606,24 @@ class Cron {
      * for Sunday and 6 is for Saturday.
      * 'hh' can have any value between 0 and 23 inclusive. mm can have any value 
      * between 0 and 59 inclusive.
-     * @param string $name An optional name for the job.
+     * @param string $name An optional name for the job. Can be NULL
      * @param callable|NULL $func A function that will be executed once it is the 
-     * time to run the job. Default is NULL.
-     * @param array $funcParams An array of parameters which will be passed to 
+     * time to run the job.
+     * @param array $funcParams An optional array of parameters which will be passed to 
      * the function.
      * @return boolean If the job was created and scheduled, the method will 
      * return TRUE. Other than that, the method will return FALSE.
      * @since 1.0
      */
-    public static function weeklyJob($time,$name='',$func=null,$funcParams=array()){
+    public static function weeklyJob($time,$name,$func,$funcParams=array()){
         $split1 = explode('-', $time);
         if(count($split1) == 2){
             $job = new CronJob();
             $job->setJobName($name);
-            $job->weeklyOn($split1[0], $split1[1]);
-            $job->setOnExecution($func, $funcParams);
-            return self::scheduleJob($job);
+            if($job->weeklyOn($split1[0], $split1[1])){
+                $job->setOnExecution($func, $funcParams);
+                return self::scheduleJob($job);
+            }
         }
         return FALSE;
     }

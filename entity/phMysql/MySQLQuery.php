@@ -949,6 +949,9 @@ abstract class MySQLQuery{
         $valsCount = count($vals);
         $condsCount = count($valsConds);
         $joinOpsCount = count($jointOps);
+        if($colsCount == 0 || $valsCount == 0 || $condsCount == 0){
+            return '';
+        }
         while ($colsCount != $condsCount){
             $valsConds[] = '=';
             $condsCount = count($valsConds);

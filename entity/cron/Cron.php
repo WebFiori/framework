@@ -153,7 +153,7 @@ class Cron {
      * @since 1.0.2
      */
     public static function minute(){
-        return self::_get()->timestamp['hour'];
+        return self::_get()->timestamp['minute'];
     }
     /**
      * Creates new instance of the class.
@@ -520,6 +520,135 @@ class Cron {
         };
         Router::closure('/cron-jobs/execute/force/{job-name}',$forceFunc);
         Router::closure('/cron-jobs/execute/{password}/force/{job-name}',$forceFunc);
+        
+        $viewJobsFunc = function(){
+            Logger::logFuncCall('CLOSURE_ROUTE');
+            Logger::log('Checking if password is required to view cron jobs...');
+            if(Cron::password() != 'NO_PASSWORD'){
+                Logger::log('Password required. Checking if password is provided...');
+                $password = isset($_GET['password']) ? filter_var($_GET['password']) : '';
+                Logger::log('Password = \''.$password.'\'.', 'debug');
+                if($password != ''){
+                    Logger::log('Checking if password is valid...');
+                    if($password == Cron::password()){
+                        Logger::log('Valid password.');
+                        Logger::log('Preparing list of jobs...');
+                        $table = '<table style="border-collapse:collapse;margin-top:30px;" border="1">'
+                                . '<tr style="border-bottom:double;background-color:rgba(66,234,88,0.3);font-weight:bold;">'
+                                . '<th style="padding:5px">Job Name</th>'
+                                . '<th style="padding:5px">Cron Excepression</th>'
+                                . '<th style="padding:5px">Is Minute</th>'
+                                . '<th style="padding:5px">Is Hour</th>'
+                                . '<th style="padding:5px">Is Day of Month</th>'
+                                . '<th style="padding:5px" >Is Month</th>'
+                                . '<th style="padding:5px">Is Day of Week</th></tr>';
+                        $totalTasks = Cron::jobsQueue()->size();
+                        while ($job = Cron::jobsQueue()->dequeue()){
+                            $isMinute = $job->isMinute() === TRUE ? '<td style="rgba(100,255,29,0.3)">Yes</td>' : '<td style="background-color: rgba(255,87,29,0.3);">No</td>';
+                            $isHour = $job->isHour() === TRUE ? '<td style="rgba(100,255,29,0.3)">Yes</td>' : '<td style="background-color: rgba(255,87,29,0.3);">No</td>';
+                            $isDayOfMonth = $job->isDayOfMonth() === TRUE ? '<td style="rgba(100,255,29,0.3)">Yes</td>' : '<td style="background-color: rgba(255,87,29,0.3);">No</td>';
+                            $isMonth = $job->isMonth() === TRUE ? '<td style="rgba(100,255,29,0.3)">Yes</td>' : '<td style="background-color: rgba(255,87,29,0.3);">No</td>';
+                            $isDayOfWeek = $job->isDayOfWeek() === TRUE ? '<td style="rgba(100,255,29,0.3)">Yes</td>' : '<td style="background-color: rgba(255,87,29,0.3);">No</td>';
+                            $table .='<tr><td>'.$job->getJobName().'</td><td>'.$job->getExpression().'</td>'
+                                    . ''.$isMinute.''.$isHour.''.$isDayOfMonth.''
+                                    . ''.$isMonth.''.$isDayOfWeek.'</tr>';
+                        }
+                        $table .= '</table>';
+                        Logger::requestCompleted();
+                        die(''
+                        . '<!DOCTYPE html>'
+                        . '<html>'
+                        . '<head>'
+                        . '<title>Available CRON Tasks</title>'
+                        . '</head>'
+                        . '<body>'
+                        . '<h1>Available CRON Tasks</h1>'
+                        . '<hr>'
+                        . '<p>Total Tasks: '.$totalTasks.'</p>'
+                        . $table
+                        . '</body>'
+                        . '</html>');
+                    }
+                    else{
+                        Logger::log('Invalid password.', 'error');
+                        Logger::requestCompleted();
+                        die(''
+                        . '<!DOCTYPE html>'
+                        . '<html>'
+                        . '<head>'
+                        . '<title>Not Authorized</title>'
+                        . '</head>'
+                        . '<body>'
+                        . '<h1>401 - Not Authorized</h1>'
+                        . '<hr>'
+                        . '<p>'
+                        . 'Invalid password.'
+                        . '</p>'
+                        . '</body>'
+                        . '</html>');
+                    }
+                }
+                else{
+                    Logger::log('No password is provided.', 'error');
+                    Logger::requestCompleted();
+                    die(''
+                    . '<!DOCTYPE html>'
+                    . '<html>'
+                    . '<head>'
+                    . '<title>Not Authorized</title>'
+                    . '</head>'
+                    . '<body>'
+                    . '<h1>401 - Not Authorized</h1>'
+                    . '<hr>'
+                    . '<p>'
+                    . 'Password is missing.'
+                    . '</p>'
+                    . '</body>'
+                    . '</html>');
+                }
+            }
+            else{
+                Logger::log('No password required.');
+                Logger::log('Preparing list of jobs...');
+                $table = '<table style="border-collapse:collapse;margin-top:30px;" border="1">'
+                    . '<tr style="border-bottom:double;background-color:rgba(66,234,88,0.3);font-weight:bold;">'
+                    . '<th style="padding:5px">Job Name</th>'
+                    . '<th style="padding:5px">Cron Excepression</th>'
+                    . '<th style="padding:5px">Is Minute</th>'
+                    . '<th style="padding:5px">Is Hour</th>'
+                    . '<th style="padding:5px">Is Day of Month</th>'
+                    . '<th style="padding:5px" >Is Month</th>'
+                    . '<th style="padding:5px">Is Day of Week</th></tr>';
+                $totalTasks = Cron::jobsQueue()->size();
+                while ($job = Cron::jobsQueue()->dequeue()){
+                    $isMinute = $job->isMinute() === TRUE ? '<td style="rgba(100,255,29,0.3)">Yes</td>' : '<td style="background-color: rgba(255,87,29,0.3);">No</td>';
+                    $isHour = $job->isHour() === TRUE ? '<td style="rgba(100,255,29,0.3)">Yes</td>' : '<td style="background-color: rgba(255,87,29,0.3);">No</td>';
+                    $isDayOfMonth = $job->isDayOfMonth() === TRUE ? '<td style="rgba(100,255,29,0.3)">Yes</td>' : '<td style="background-color: rgba(255,87,29,0.3);">No</td>';
+                    $isMonth = $job->isMonth() === TRUE ? '<td style="rgba(100,255,29,0.3)">Yes</td>': '<td style="background-color: rgba(255,87,29,0.3);">No</td>';
+                    $isDayOfWeek = $job->isDayOfWeek() === TRUE ? '<td style="rgba(100,255,29,0.3)">Yes</td>' : '<td style="background-color: rgba(255,87,29,0.3);">No</td>';
+                    $table .='<tr><td>'.$job->getJobName().'</td><td>'.$job->getExpression().'</td>'
+                            . ''.$isMinute.''.$isHour.''.$isDayOfMonth.''
+                            . ''.$isMonth.''.$isDayOfWeek.'</tr>';
+                }
+                $table .= '</table>';
+                Logger::requestCompleted();
+                die(''
+                . '<!DOCTYPE html>'
+                . '<html>'
+                . '<head>'
+                . '<title>Available CRON Tasks</title>'
+                . '</head>'
+                . '<body>'
+                . '<h1>Available CRON Tasks</h1>'
+                . '<hr>'
+                . '<p>Total Tasks: '.$totalTasks.'</p>'
+                . $table
+                . '</body>'
+                . '</html>');
+            }
+        };
+        Router::closure('/cron-jobs/list',$viewJobsFunc);
+        Router::closure('/cron-jobs/list/{password}',$viewJobsFunc);
     }
     private function _setLogEnabled($bool){
         $this->isLogEnabled = $bool === TRUE ? TRUE : FALSE;

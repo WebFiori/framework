@@ -544,11 +544,11 @@ class Cron {
                                 . '<th style="padding:5px">Is Day of Week</th></tr>';
                         $totalTasks = Cron::jobsQueue()->size();
                         while ($job = Cron::jobsQueue()->dequeue()){
-                            $isMinute = $job->isMinute() === TRUE ? '<td style="rgba(100,255,29,0.3)">Yes</td>' : '<td style="background-color: rgba(255,87,29,0.3);">No</td>';
-                            $isHour = $job->isHour() === TRUE ? '<td style="rgba(100,255,29,0.3)">Yes</td>' : '<td style="background-color: rgba(255,87,29,0.3);">No</td>';
-                            $isDayOfMonth = $job->isDayOfMonth() === TRUE ? '<td style="rgba(100,255,29,0.3)">Yes</td>' : '<td style="background-color: rgba(255,87,29,0.3);">No</td>';
-                            $isMonth = $job->isMonth() === TRUE ? '<td style="rgba(100,255,29,0.3)">Yes</td>' : '<td style="background-color: rgba(255,87,29,0.3);">No</td>';
-                            $isDayOfWeek = $job->isDayOfWeek() === TRUE ? '<td style="rgba(100,255,29,0.3)">Yes</td>' : '<td style="background-color: rgba(255,87,29,0.3);">No</td>';
+                            $isMinute = $job->isMinute() === TRUE ? '<td style="background-color:rgba(100,255,29,0.3)">Yes</td>' : '<td style="background-color: rgba(255,87,29,0.3);">No</td>';
+                            $isHour = $job->isHour() === TRUE ? '<td style="background-color:rgba(100,255,29,0.3)">Yes</td>' : '<td style="background-color: rgba(255,87,29,0.3);">No</td>';
+                            $isDayOfMonth = $job->isDayOfMonth() === TRUE ? '<td style="background-color:rgba(100,255,29,0.3)">Yes</td>' : '<td style="background-color: rgba(255,87,29,0.3);">No</td>';
+                            $isMonth = $job->isMonth() === TRUE ? '<td style="background-color:rgba(100,255,29,0.3)">Yes</td>' : '<td style="background-color: rgba(255,87,29,0.3);">No</td>';
+                            $isDayOfWeek = $job->isDayOfWeek() === TRUE ? '<td style="background-color:rgba(100,255,29,0.3)">Yes</td>' : '<td style="background-color: rgba(255,87,29,0.3);">No</td>';
                             $table .='<tr><td>'.$job->getJobName().'</td><td>'.$job->getExpression().'</td>'
                                     . ''.$isMinute.''.$isHour.''.$isDayOfMonth.''
                                     . ''.$isMonth.''.$isDayOfWeek.'</tr>';
@@ -621,11 +621,11 @@ class Cron {
                     . '<th style="padding:5px">Is Day of Week</th></tr>';
                 $totalTasks = Cron::jobsQueue()->size();
                 while ($job = Cron::jobsQueue()->dequeue()){
-                    $isMinute = $job->isMinute() === TRUE ? '<td style="rgba(100,255,29,0.3)">Yes</td>' : '<td style="background-color: rgba(255,87,29,0.3);">No</td>';
-                    $isHour = $job->isHour() === TRUE ? '<td style="rgba(100,255,29,0.3)">Yes</td>' : '<td style="background-color: rgba(255,87,29,0.3);">No</td>';
-                    $isDayOfMonth = $job->isDayOfMonth() === TRUE ? '<td style="rgba(100,255,29,0.3)">Yes</td>' : '<td style="background-color: rgba(255,87,29,0.3);">No</td>';
-                    $isMonth = $job->isMonth() === TRUE ? '<td style="rgba(100,255,29,0.3)">Yes</td>': '<td style="background-color: rgba(255,87,29,0.3);">No</td>';
-                    $isDayOfWeek = $job->isDayOfWeek() === TRUE ? '<td style="rgba(100,255,29,0.3)">Yes</td>' : '<td style="background-color: rgba(255,87,29,0.3);">No</td>';
+                    $isMinute = $job->isMinute() === TRUE ? '<td style="background-color:rgba(100,255,29,0.3)">Yes</td>' : '<td style="background-color: rgba(255,87,29,0.3);">No</td>';
+                    $isHour = $job->isHour() === TRUE ? '<td style="background-color:rgba(100,255,29,0.3)">Yes</td>' : '<td style="background-color: rgba(255,87,29,0.3);">No</td>';
+                    $isDayOfMonth = $job->isDayOfMonth() === TRUE ? '<td style="background-color:rgba(100,255,29,0.3)">Yes</td>' : '<td style="background-color: rgba(255,87,29,0.3);">No</td>';
+                    $isMonth = $job->isMonth() === TRUE ? '<td style="background-color:rgba(100,255,29,0.3)">Yes</td>': '<td style="background-color: rgba(255,87,29,0.3);">No</td>';
+                    $isDayOfWeek = $job->isDayOfWeek() === TRUE ? '<td style="background-color:rgba(100,255,29,0.3)">Yes</td>' : '<td style="background-color: rgba(255,87,29,0.3);">No</td>';
                     $table .='<tr><td>'.$job->getJobName().'</td><td>'.$job->getExpression().'</td>'
                             . ''.$isMinute.''.$isHour.''.$isDayOfMonth.''
                             . ''.$isMonth.''.$isDayOfWeek.'</tr>';

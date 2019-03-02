@@ -23,6 +23,7 @@
  * THE SOFTWARE.
  */
 namespace phpStructs\html;
+use phpStructs\html\HTMLNode;
 /**
  * A class that represents a paragraph element.
  *
@@ -141,7 +142,7 @@ class PNode extends HTMLNode{
      */
     public function addChild($node) {
         if($node instanceof HTMLNode){
-            if(in_array($node->getName(), PNode::ALLOWED_CHILDS) || $node->isTextNode()){
+            if(in_array($node->getNodeName(), PNode::ALLOWED_CHILDS) || $node->isTextNode()){
                 parent::addChild($node);
             }
         }

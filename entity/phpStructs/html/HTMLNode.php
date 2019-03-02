@@ -29,7 +29,7 @@ use phpStructs\Stack;
  * A class that represents HTML element.
  *
  * @author Ibrahim
- * @version 1.7.2
+ * @version 1.7.3
  */
 class HTMLNode {
     private $isFormated;
@@ -174,7 +174,7 @@ class HTMLNode {
      * @since 1.5
      */
     public function isComment() {
-        return $this->getName() == '#COMMENT';
+        return $this->getNodeName() == '#COMMENT';
     }
     /**
      * Returns the parent node.
@@ -232,7 +232,7 @@ class HTMLNode {
      * @since 1.0
      */
     public function isTextNode() {
-        return $this->getName() == '#TEXT';
+        return $this->getNodeName() == '#TEXT';
     }
     /**
      * Checks if a given node is a direct child of the instance.
@@ -289,7 +289,7 @@ class HTMLNode {
         }
         for($x = 0 ; $x < $chCount ; $x++){
             $child = $chList->get($x);
-            if($child->getName() == $val){
+            if($child->getNodeName() == $val){
                 $list->add($child);
             }
         }
@@ -389,7 +389,7 @@ class HTMLNode {
             }
         }
         else{
-            $lName = strtoupper($name);
+            $lName = strtolower($name);
             if(strlen($lName) != 0){
                 if($this->mustClose() && $reqClose !== TRUE){
                     if($this->childrenCount() == 0){
@@ -414,7 +414,7 @@ class HTMLNode {
      * method will return the value '#COMMENT'.
      * @since 1.0
      */
-    public function getName(){
+    public function getNodeName(){
         return $this->name;
     }
     /**
@@ -668,7 +668,7 @@ class HTMLNode {
     public function open() {
         $retVal = '';
         if(!$this->isTextNode() && !$this->isComment()){
-            $retVal .= '<'.$this->getName().'';
+            $retVal .= '<'.$this->getNodeName().'';
             foreach ($this->getAttributes() as $attr => $val){
                 $retVal .= ' '.$attr.'="'.$val.'"';
             }
@@ -684,15 +684,15 @@ class HTMLNode {
      */
     public function close() {
         if(!$this->isTextNode() && !$this->isComment()){
-            return '</'.$this->getName().'>';
+            return '</'.$this->getNodeName().'>';
         }
         return '';
     }
     /**
      * Returns HTML string that represents the node as a whole.
      * @param boolean $formatted Set to TRUE to return a well formatted 
-     * HTML document. Default is FALSE.
-     * @param int $initTab Initial tab count. Used in case of the document is 
+     * HTML document (has new lines and indentations). Default is FALSE.
+     * @param int $initTab Initial tab count (indentation). Used in case of the document is 
      * well formatted. This number represents the size of code indentation.
      * @return string HTML string that represents the node.
      * @since 1.0
@@ -725,9 +725,7 @@ class HTMLNode {
                     $this->tabSpace .= ' ';
                 }
             }
-            
         }
-        
         $this->htmlString = '';
         $this->nodesStack = new Stack();
         $this->_pushNode($this,$formatted);
@@ -765,7 +763,13 @@ class HTMLNode {
                 $this->htmlString .= $node->getText();
             }
             else{
-                $this->htmlString .= $this->_getTab().$node->getText().$this->nl;
+                $parentName = $node->getParent()->getNodeName();
+                if($parentName == 'code' || $parentName == 'pre' || $parentName == 'textarea'){
+                    $this->htmlString .= $node->getText();
+                }
+                else{
+                    $this->htmlString .= $this->_getTab().$node->getText().$this->nl;
+                }
             }
         }
         else if($node->isComment()){
@@ -784,7 +788,13 @@ class HTMLNode {
                     $this->htmlString .= $node->open();
                 }
                 else{
-                    $this->htmlString .= $this->_getTab().$node->open().$this->nl;
+                    $nodeType = $node->getNodeName();
+                    if($nodeType == 'pre' || $nodeType == 'textarea' || $nodeType == 'code'){
+                        $this->htmlString .= $this->_getTab().$node->open();
+                    }
+                    else{
+                        $this->htmlString .= $this->_getTab().$node->open().$this->nl;
+                    }
                 }
                 $this->_addTab();
                 for($x = 0 ; $x < $chCount ; $x++){
@@ -803,10 +813,16 @@ class HTMLNode {
         $node = &$this->nodesStack->pop();
         if($node != NULL){
             if($node->isFormatted() !== NULL && $node->isFormatted() === FALSE){
-                $this->htmlString .= '</'.$node->getName().'>';
+                $this->htmlString .= '</'.$node->getNodeName().'>';
             }
             else{
-                $this->htmlString .= $this->_getTab().'</'.$node->getName().'>'.$this->nl;
+                $nodeType = $node->getNodeName();
+                if($nodeType == 'pre' || $nodeType == 'textarea' || $nodeType == 'code'){
+                    $this->htmlString .= '</'.$node->getNodeName().'>'.$this->nl;
+                }
+                else{
+                    $this->htmlString .= $this->_getTab().'</'.$node->getNodeName().'>'.$this->nl;
+                }
             }
         }
     }
@@ -871,7 +887,7 @@ class HTMLNode {
                 $this->codeString = '<pre style="margin:0">'.$this->nl;
             }
         }
-        if($this->getName() == 'html'){
+        if($this->getNodeName() == 'html'){
             if($formattingOptionsV['with-colors']){
                 $this->codeString .= $this->_getTab().'<span style="color:'.$formattingOptionsV['colors']['lt-gt-color'].'">&lt;</span>'
                         . '<span style="color:'.$formattingOptionsV['colors']['node-name-color'].'">!DOCTYPE html</span>'
@@ -899,7 +915,7 @@ class HTMLNode {
         if($FO['with-colors'] === TRUE){
             if(!$this->isTextNode() && !$this->isComment()){
                 $retVal .= '<span style="color:'.$FO['colors']['lt-gt-color'].'">&lt;</span>'
-                        . '<span style="color:'.$FO['colors']['node-name-color'].'">'.$this->getName().'</span>';
+                        . '<span style="color:'.$FO['colors']['node-name-color'].'">'.$this->getNodeName().'</span>';
                 foreach ($this->getAttributes() as $attr => $val){
                     $retVal .= ' <span style="color:'.$FO['colors']['attribute-color'].'">'.$attr.'</span> '
                             . '<span style="color:'.$FO['colors']['operator-color'].'">=</span> '
@@ -910,7 +926,7 @@ class HTMLNode {
         }
         else{
             if(!$this->isTextNode() && !$this->isComment()){
-                $retVal .= '&lt;'.$this->getName();
+                $retVal .= '&lt;'.$this->getNodeName();
                 foreach ($this->getAttributes() as $attr => $val){
                     $retVal .= ' '.$attr.' = "'.$val.'"';
                 }
@@ -929,13 +945,13 @@ class HTMLNode {
         if($FO['with-colors'] === TRUE){
             if(!$this->isTextNode() && !$this->isComment()){
                 return '<span style="color:'.$FO['colors']['lt-gt-color'].'">&lt;/</span>'
-                . '<span style="color:'.$FO['colors']['node-name-color'].'">'.$this->getName().'</span>'
+                . '<span style="color:'.$FO['colors']['node-name-color'].'">'.$this->getNodeName().'</span>'
                         . '<span style="color:'.$FO['colors']['lt-gt-color'].'">&gt;</span>';
             }
         }
         else{
             if(!$this->isTextNode() && !$this->isComment()){
-                return '&lt;/'.$this->getName().'&gt;';
+                return '&lt;/'.$this->getNodeName().'&gt;';
             }
         }
         return '';
@@ -961,7 +977,13 @@ class HTMLNode {
             if($node->mustClose()){
                 $chCount = $node->children()->size();
                 $this->nodesStack->push($node);
-                $this->codeString .= $this->_getTab().$node->_openAsCode($FO).$this->nl;
+                $name = $node->getNodeName();
+                if($name  == 'pre' || $name == 'textarea' || $name == 'code'){
+                    $this->codeString .= $this->_getTab().$node->_openAsCode($FO);
+                }
+                else{
+                    $this->codeString .= $this->_getTab().$node->_openAsCode($FO).$this->nl;
+                }
                 $this->_addTab();
                 for($x = 0 ; $x < $chCount ; $x++){
                     $nodeAtx = &$node->children()->get($x);
@@ -983,7 +1005,13 @@ class HTMLNode {
     private function _popNodeAsCode($FO){
         $node = &$this->nodesStack->pop();
         if($node != NULL){
-            $this->codeString .= $this->_getTab().$node->_closeAsCode($FO).$this->nl;
+            $name = $node->getNodeName();
+            if($name == 'pre' || $name == 'textarea' || $name == 'code'){
+                $this->codeString .= $node->_closeAsCode($FO).$this->nl;
+            }
+            else{
+                $this->codeString .= $this->_getTab().$node->_closeAsCode($FO).$this->nl;
+            }
         }
     }
     /**
@@ -1067,7 +1095,7 @@ class HTMLNode {
      * @return HTMLNode|NULL The method will return an object of type HTMLNode 
      * if a node is found. Other than that, the method will return NULL. Note 
      * that if there are multiple children with the same attribute and value, 
-     * the first occurence is returned.
+     * the first occurrence is returned.
      * @since 1.2
      */
     public function &getChildByAttributeValue($attrName,$attrVal) {

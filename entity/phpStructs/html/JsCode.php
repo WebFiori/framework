@@ -2,7 +2,7 @@
 /*
  * The MIT License
  *
- * Copyright 2018 Ibrahim.
+ * Copyright (c) 2019 Ibrahim BinAlshikh, phpStructs.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,7 @@
  * THE SOFTWARE.
  */
 namespace phpStructs\html;
+use phpStructs\html\HTMLNode;
 /**
  * A node that represents in line JavaScript code that can be inserted on a 
  * head node.

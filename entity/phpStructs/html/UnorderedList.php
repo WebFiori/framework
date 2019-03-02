@@ -3,7 +3,7 @@
 /*
  * The MIT License
  *
- * Copyright 2018 Ibrahim.
+ * Copyright 2018 Ibrahim, phpStructs Library.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,11 +24,12 @@
  * THE SOFTWARE.
  */
 namespace phpStructs\html;
+use phpStructs\html\HTMLNode;
 /**
  * A class that represents Unordered List HTML element (ul)
  *
  * @author Ibrahim
- * @version 1.0
+ * @version 1.0.1
  */
 class UnorderedList extends HTMLNode{
     public function __construct() {
@@ -46,6 +47,19 @@ class UnorderedList extends HTMLNode{
         $this->addChild($li);
     }
     /**
+     * Adds multiple items at once to the list.
+     * @param array $arrOfItems An array that contains strings 
+     * that represents each list item.
+     * @since 1.0.1
+     */
+    public function addListItems($arrOfItems) {
+        if(gettype($arrOfItems) == 'array'){
+            foreach ($arrOfItems as $listItem){
+                $this->addListItem($listItem);
+            }
+        }
+    }
+    /**
      * Adds a sublist to the main list.
      * @param UnorderedList $ul An object of type UnorderedList.
      * @since 1.0
@@ -59,10 +73,7 @@ class UnorderedList extends HTMLNode{
      * @since 1.0
      */
     public function addChild($node) {
-        if($node instanceof ListItem){
-            parent::addChild($node);
-        }
-        else if($node instanceof UnorderedList){
+        if($node instanceof ListItem || $node instanceof UnorderedList){
             parent::addChild($node);
         }
     }

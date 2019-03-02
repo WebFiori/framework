@@ -23,6 +23,7 @@
  * THE SOFTWARE.
  */
 namespace phpStructs\html;
+use phpStructs\html\HTMLNode;
 /**
  * A class that represents the tag &lt;head&lt; of a HTML document.
  *
@@ -126,7 +127,7 @@ class HeadNode extends HTMLNode{
         $list = new LinkedList();
         for($x = 0 ; $x < $chCount ; $x++){
             $child = &$children->get($x);
-            $childName = $child->getName();
+            $childName = $child->getNodeName();
             if($childName == 'link'){
                 if($child->hasAttribut('rel') && $child->getAttributeValue('rel') == 'stylesheet'){
                     $list->add($child);
@@ -147,7 +148,7 @@ class HeadNode extends HTMLNode{
         $list = new LinkedList();
         for($x = 0 ; $x < $chCount ; $x++){
             $child = &$children->get($x);
-            $childName = $child->getName();
+            $childName = $child->getNodeName();
             if($childName == 'script'){
                 if($child->hasAttribut('type') && $child->getAttributeValue('type') == 'text/javascript'){
                     $list->add($child);
@@ -168,7 +169,7 @@ class HeadNode extends HTMLNode{
         $list = new LinkedList();
         for($x = 0 ; $x < $chCount ; $x++){
             $child = &$children->get($x);
-            $childName = $child->getName();
+            $childName = $child->getNodeName();
             if($childName == 'meta'){
                 $list->add($child);
             }
@@ -209,7 +210,7 @@ class HeadNode extends HTMLNode{
      */
     public function addChild($node) {
         if($node instanceof HTMLNode){
-            if($node->getName() == 'meta'){
+            if($node->getNodeName() == 'meta'){
                 if(!$this->hasMeta($node->getAttributeValue('name'))){
                     parent::addChild($node);
                 }
@@ -230,7 +231,7 @@ class HeadNode extends HTMLNode{
     public function &getMeta($name) {
         for($x = 0 ; $x < $this->childrenCount() ; $x++){
             $node = $this->children()->get($x);
-            if($node->getName() == 'meta'){
+            if($node->getNodeName() == 'meta'){
                 if($node->getAttributeValue('name') == $name){
                     return $node;
                 }
@@ -250,7 +251,7 @@ class HeadNode extends HTMLNode{
     public function hasMeta($name) {
         for($x = 0 ; $x < $this->childrenCount() ; $x++){
             $node = $this->children()->get($x);
-            if($node->getName() == 'meta'){
+            if($node->getNodeName() == 'meta'){
                 if($node->getAttributeValue('name') == $name){
                     return TRUE;
                 }
@@ -377,7 +378,7 @@ class HeadNode extends HTMLNode{
         $list = new LinkedList();
         for($x = 0 ; $x < $chCount ; $x++){
             $child = &$children->get($x);
-            $childName = $child->getName();
+            $childName = $child->getNodeName();
             if($childName == 'link'){
                 if($child->hasAttribut('rel') && $child->getAttributeValue('rel') == 'alternate'){
                     $list->add($child);

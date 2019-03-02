@@ -1,9 +1,8 @@
 <?php
-
 /*
  * The MIT License
  *
- * Copyright 2018 Ibrahim.
+ * Copyright (c) 2019 Ibrahim BinAlshikh, phpStructs.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,25 +23,77 @@
  * THE SOFTWARE.
  */
 namespace phpStructs\html;
+use phpStructs\html\HTMLNode;
 /**
- * A class that represents &lt;input&gt; tag;
+ * A class that represents any input element;
  *
  * @author Ibrahim
- * @version 1.0
+ * @version 1.0.1
  */
 class Input extends HTMLNode{
     /**
      * An array of supported input types.
+     * This array has the following values:
+     * <ul>
+     * <li>text</li>
+     * <li>date</li>
+     * <li>password</li>
+     * <li>submit</li>
+     * <li>checkbox</li>
+     * <li>email</li>
+     * <li>url</li>
+     * <li>tel</li>
+     * <li>color</li>
+     * <li>file</li>
+     * <li>range</li>
+     * <li>month</li>
+     * <li>number</li>
+     * <li>date-local</li>
+     * <li>hidden</li>
+     * <li>time</li>
+     * <li>week</li>
+     * <li>search</li>
+     * <li>select</li>
+     * <li>textarea</li>
+     * </ul>
+     * @since 1.0
      */
     const INPUT_TYPES = array('text','date','password','submit','checkbox','email','url','tel',
-        'color','file','range','month','number','date-local','hidden','time','week','search');
+        'color','file','range','month','number','date-local','hidden','time','week','search', 
+        'select','textarea');
     /**
      * An array of supported input modes.
+     * The array contains the following values:
+     * <ul>
+     * <li>none</li>
+     * <li>text</li>
+     * <li>decimal</li>
+     * <li>numeric</li>
+     * <li>tel</li>
+     * <li>search</li>
+     * <li>email</li>
+     * <li>url</li>
+     * </ul>
+     * @since 1.0
      */
     const INPUT_MODES = array('none','text','decimal','numeric','tel','search','email','url');
+    /**
+     * Creates new instance of the class.
+     * @param type $type The type of the input element. If the 
+     * given type is not in the array Input::INPUT_TYPES, 'text' 
+     * will be used by default.
+     * @since 1.0
+     */
     public function __construct($type='text') {
-        parent::__construct('input', FALSE);
-        $this->setType($type);
+        parent::__construct();
+        $lType = strtolower($type);
+        if($lType == 'select' || $lType == 'textarea'){
+            $this->setNodeName($lType, TRUE);
+        }
+        else{
+            $this->setNodeName('input', FALSE);
+            $this->setType($lType);
+        }
     }
     /**
      * Returns the value of the attribute 'type'.
@@ -54,7 +105,9 @@ class Input extends HTMLNode{
     }
     /**
      * Sets the value of the attribute 'type'.
-     * @param string $type The type of the input element.
+     * @param string $type The type of the input element. If the 
+     * given type is not in the array Input::INPUT_TYPES, 'text' 
+     * will be used by default.
      * It can be only a value from the array Input::INPUT_TYPES.
      * @since 1.0
      */
@@ -62,6 +115,9 @@ class Input extends HTMLNode{
         $l = strtolower($type);
         if(in_array($l, Input::INPUT_TYPES)){
             $this->setAttribute('type', $l);
+        }
+        else{
+            $this->setAttribute('type', 'text');
         }
     }
     /**
@@ -71,7 +127,7 @@ class Input extends HTMLNode{
      */
     public function setPlaceholder($text) {
         $iType = $this->getType();
-        if($iType == 'password' || $iType == 'text' || $iType == 'number'){
+        if($iType == 'password' || $iType == 'text' || $iType == 'number' || $this->getNodeName() == 'textarea'){
             $this->setAttribute('placeholder', $text);
         }
     }
@@ -149,6 +205,141 @@ class Input extends HTMLNode{
         $lMode = strtolower($mode);
         if(in_array($lMode, Input::INPUT_MODES)){
             $this->setAttribute('inputmode', $lMode);
+        }
+    }
+    /**
+     * Adds new child node.
+     * The node will be added only if the type of the node is 
+     * &lt;select&gt; and the given node is of type &lt;option&gt; or 
+     * &lt;optgroup&gt;.
+     * @param HTMLNode $node The node that will be added.
+     * @since 1.0.1
+     */
+    public function addChild($node) {
+        if($node instanceof HTMLNode){
+            if($this->getNodeName() == 'select' && ($node->getNodeName() == 'option' || 
+                    $node->getNodeName() == 'optgroup')){
+                parent::addChild($node);
+            }
+        }
+    }
+    /**
+     * Adds an option to the input element which has the type 'select'.
+     * @param array $options An associative array that contains select options. 
+     * The array must have at least the following indices:
+     * <ul>
+     * <li>label: A label that will be displayed to the user.</li>
+     * <li>value: The value that will be set for the attribute 'value'.</li>
+     * </ul>
+     * In addition to the two indices, the array can have additional index. 
+     * The index name is 'attributes'. This index can have an associative array 
+     * of attributes which will be set for the option. The key will act as the 
+     * attribute name and the value of the key will act as the value of the 
+     * attribute.
+     * @param string $label The label that will be displayed by the option.
+     * @since 1.0.1
+     */
+    public function addOption($options=array()) {
+        if($this->getNodeName() == 'select'){
+            if(gettype($options) == 'array' && isset($options['value']) && isset($options['label'])){
+                $option = new HTMLNode('option');
+                $option->setAttribute('value', $options['value']);
+                $option->addTextNode($options['label']);
+                if(isset($options['attributes'])){
+                    foreach ($options['attributes'] as $attr => $value) {
+                        $option->setAttribute($attr, $value);
+                    }
+                }
+                $this->addChild($option);
+            }
+        }
+    }
+    /**
+     * Adds multiple options at once to an input element of type 'select'.
+     * @param array $arrayOfOpt An associative array of options. 
+     * The key will act as the 'value' attribute and 
+     * the value of the key will act as the label for the option. Also, 
+     * it is possible that the value of the key is a sub-associative array that 
+     * contains only two indices: 
+     * <ul>
+     * <li>label: A label for the option.</li>
+     * <li>attributes: An optional associative array of attributes. 
+     * The key will act as the 
+     * attribute name and the value of the key will act as the value of the 
+     * attribute.</li>
+     * </ul>
+     * @since 1.0.1
+     */
+    public function addOptions($arrayOfOpt) {
+        if(gettype($arrayOfOpt) == 'array'){
+            foreach ($arrayOfOpt as $value => $lblOrOptions){
+                if(gettype($lblOrOptions) == 'array'){
+                    $attrs = isset($lblOrOptions['attributes']) ? $lblOrOptions['attributes'] : array();
+                    $this->addOption(array(
+                        'value'=>$value,
+                        'label'=>$lblOrOptions['label'],
+                        'attributes'=>$attrs
+                    ));
+                }
+                else{
+                    $this->addOption(array(
+                        'value'=>$value,
+                        'label'=>$lblOrOptions
+                    ));
+                }
+            }
+        }
+    }
+    /**
+     * Adds an 'optgroup' child element.
+     * @param array $optionsGroupArr An associative array that contains 
+     * group info. The array must have the following indices:
+     * <ul>
+     * <li>label: The label of the group.</li>
+     * <li>options: A sub associative array that contains group 
+     * options. The key will act as the 'value' attribute and 
+     * the value of the key will act as the label for the option. Also, 
+     * it is possible that the value of the key is a sub-associative array that 
+     * contains only two indices: 
+     * <ul>
+     * <li>label: A label for the option.</li>
+     * <li>attributes: An optional associative array of attributes. 
+     * The key will act as the 
+     * attribute name and the value of the key will act as the value of the 
+     * attribute.</li></li>
+     * </ul>
+     * @since 1.0.1
+     */
+    public function addOptionsGroup($optionsGroupArr) {
+        if($this->getNodeName() == 'select'){
+            if(gettype($optionsGroupArr) == 'array'){
+                if(isset($optionsGroupArr['label']) && isset($optionsGroupArr['options'])){
+                    $optGroup = new HTMLNode('optgroup');
+                    $optGroup->setAttribute('label', $optionsGroupArr['label']);
+                    foreach ($optionsGroupArr['options'] as $value => $labelOrOptions){
+                        if(gettype($labelOrOptions) == 'array'){
+                            if(isset($labelOrOptions['label'])){
+                                $o = new HTMLNode('option');
+                                $o->setAttribute('value', $value);
+                                $o->addTextNode($labelOrOptions['label']);
+                                if(isset($labelOrOptions['attributes'])){
+                                    foreach ($labelOrOptions['attributes'] as $attr => $v){
+                                        $o->setAttribute($attr, $v);
+                                    }
+                                }
+                                $optGroup->addChild($o);
+                            }
+                        }
+                        else{
+                            $o = new HTMLNode('option');
+                            $o->setAttribute('value', $value);
+                            $o->addTextNode($labelOrOptions);
+                            $optGroup->addChild($o);
+                        }
+                    }
+                    $this->addChild($optGroup);
+                }
+            }
         }
     }
 }

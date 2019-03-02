@@ -46,7 +46,7 @@ use phpStructs\html\PNode;
  * <li>code: The container that contains the code.</li>
  * </ul>
  * @author Ibrahim
- * @version 1.0
+ * @version 1.0.1
  */
 class CodeSnippet extends HTMLNode{
     /**
@@ -75,6 +75,12 @@ class CodeSnippet extends HTMLNode{
     private $code;
     /**
      *
+     * @var type 
+     * @since 1.0.1
+     */
+    private $codeStr;
+    /**
+     *
      * @var HTMLCode
      * @since 1.0 
      */
@@ -82,6 +88,7 @@ class CodeSnippet extends HTMLNode{
     private $currentLineNum;
     public function __construct() {
         parent::__construct();
+        $this->codeStr = '';
         $this->currentLineNum = 1;
         $this->codeDisplay = new HTMLNode();
         $this->codeDisplay->setClassName('code-display');
@@ -124,6 +131,7 @@ class CodeSnippet extends HTMLNode{
             )
         );
         $this->code = new HTMLNode('code');
+        $this->code->addTextNode('');
         $this->code->setClassName('code');
         $this->code->setIsFormatted(FALSE);
         $this->code->setStyle(
@@ -195,6 +203,25 @@ class CodeSnippet extends HTMLNode{
                 }
             }
         }
-        $this->code->addTextNode($code);
+        //$this->_addLine();
+        $this->codeStr = $xCode."\n";
+    }
+    public function toHTML($formatted = false, $initTab = 0) {
+        $this->code->children()->get(0)->setText($this->codeStr);
+        return parent::toHTML($formatted, $initTab);
+    }
+    public function asCode($formattingOptions = HTMLNode::DEFAULT_CODE_FORMAT) {
+        $this->code->children()->get(0)->setText($this->codeStr);
+        return parent::asCode($formattingOptions);
+    }
+    /**
+     * Adds new line of code to the code snippit.
+     * @param string $codeAsTxt The code line. It does not have to include "\n" 
+     * character as the method will append it automatically to the string.
+     * @since 1.0.1
+     */
+    public function addCodeLine($codeAsTxt) {
+        $this->_addLine();
+        $this->codeStr .= trim($codeAsTxt,"\n\r")."\n";
     }
 }

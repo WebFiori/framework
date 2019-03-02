@@ -1047,7 +1047,7 @@ class Page{
                 $count = $children->size();
                 for($x = 0 ; $x < $count ; $x++){
                     $node = $children->get($x);
-                    $nodeName = $node->getName();
+                    $nodeName = $node->getNodeName();
                     if($nodeName != 'base' && $nodeName != 'title'){
                         if($node->getAttributeValue('name') != 'description'){
                             $headNode->addChild($node);

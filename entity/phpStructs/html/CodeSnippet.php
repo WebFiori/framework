@@ -75,10 +75,10 @@ class CodeSnippet extends HTMLNode{
     private $code;
     /**
      *
-     * @var type 
+     * @var HTMLNode 
      * @since 1.0.1
      */
-    private $codeStr;
+    private $codeStrNode;
     /**
      *
      * @var HTMLCode
@@ -88,7 +88,7 @@ class CodeSnippet extends HTMLNode{
     private $currentLineNum;
     public function __construct() {
         parent::__construct();
-        $this->codeStr = '';
+        $this->codeStrNode = HTMLNode::createTextNode('');
         $this->currentLineNum = 1;
         $this->codeDisplay = new HTMLNode();
         $this->codeDisplay->setClassName('code-display');
@@ -131,7 +131,7 @@ class CodeSnippet extends HTMLNode{
             )
         );
         $this->code = new HTMLNode('code');
-        $this->code->addTextNode('');
+        $this->code->addChild($this->codeStrNode);
         $this->code->setClassName('code');
         $this->code->setIsFormatted(FALSE);
         $this->code->setStyle(
@@ -141,7 +141,6 @@ class CodeSnippet extends HTMLNode{
                 'float'=>'left'
             )    
         );
-        
         $this->setClassName('code-snippt');
         $this->setStyle(
             array(
@@ -204,15 +203,7 @@ class CodeSnippet extends HTMLNode{
             }
         }
         //$this->_addLine();
-        $this->codeStr = $xCode."\n";
-    }
-    public function toHTML($formatted = false, $initTab = 0) {
-        $this->code->children()->get(0)->setText($this->codeStr);
-        return parent::toHTML($formatted, $initTab);
-    }
-    public function asCode($formattingOptions = HTMLNode::DEFAULT_CODE_FORMAT) {
-        $this->code->children()->get(0)->setText($this->codeStr);
-        return parent::asCode($formattingOptions);
+        $this->codeStrNode->setText($xCode."\n");
     }
     /**
      * Adds new line of code to the code snippit.
@@ -222,6 +213,8 @@ class CodeSnippet extends HTMLNode{
      */
     public function addCodeLine($codeAsTxt) {
         $this->_addLine();
-        $this->codeStr .= trim($codeAsTxt,"\n\r")."\n";
+        $oldCode = $this->codeStrNode->getText();
+        $oldCode .= trim($codeAsTxt,"\n\r")."\n";
+        $this->codeStrNode->setText($oldCode);
     }
 }

@@ -180,15 +180,7 @@ abstract class WebAPI implements JsonI{
      * @since 1.0
      */
     public function databaseErr($info=''){
-        if($info instanceof JsonI){
-            $this->sendResponse('Database Error', TRUE, 404, '"err-info":'.$info->toJSON());
-        }
-        if($info instanceof JsonX){
-            $this->sendResponse('Database Error', TRUE, 404, '"err-info":'.$info);
-        }
-        else{
-            $this->sendResponse('Database Error', TRUE, 404, '"err-info":"'.JsonX::escapeJSONSpecialChars($info).'"');
-        }
+        $this->sendResponse('Database Error', 'error', 500, $info);
     }
     /**
      * Sends a response message to indicate that a user is not authorized to 
@@ -204,7 +196,7 @@ abstract class WebAPI implements JsonI{
      * @since 1.0
      */
     public function notAuth(){
-        $this->sendResponse('Not authorized', TRUE, 401);
+        $this->sendResponse('Not authorized', 'error', 401);
     }
     /**
      * Sends a response message to indicate that an action is not supported by the API.
@@ -219,7 +211,7 @@ abstract class WebAPI implements JsonI{
      * @since 1.0
      */
     public function actionNotSupported(){
-        $this->sendResponse('Action not supported', TRUE, 404);
+        $this->sendResponse('Action not supported', 'error', 404);
     }
     /**
      * Sends a response message to indicate that request content type is 
@@ -238,7 +230,7 @@ abstract class WebAPI implements JsonI{
      * @since 1.1
      */
     public function contentTypeNotSupported($cType=''){
-        $this->sendResponse('Content type not supported.', TRUE, 404,'"request-content-type":"'.$cType.'"');
+        $this->sendResponse('Content type not supported.', 'error', 404,'"request-content-type":"'.$cType.'"');
     }
     /**
      * Sends a response message to indicate that request method is not supported.
@@ -253,7 +245,7 @@ abstract class WebAPI implements JsonI{
      * @since 1.0
      */
     public function requestMethodNotAllowed(){
-        $this->sendResponse('Method Not Allowed.', TRUE, 405);
+        $this->sendResponse('Method Not Allowed.', 'error', 405);
     }
     /**
      * Sends a response message to indicate that an action is not implemented.
@@ -268,7 +260,7 @@ abstract class WebAPI implements JsonI{
      * @since 1.0
      */
     public function actionNotImpl(){
-        $this->sendResponse('Action not implemented.', TRUE, 404);
+        $this->sendResponse('Action not implemented.', 'error', 404);
     }
     /**
      * Sends a response message to indicate that a request parameter is missing.
@@ -284,7 +276,7 @@ abstract class WebAPI implements JsonI{
      * @since 1.0
      */
     public function missingParam($paramName){
-        $this->sendResponse('The parameter \''.$paramName.'\' is missing.', TRUE, 404);
+        $this->sendResponse('The parameter \''.$paramName.'\' is missing.', 'error', 404);
     }
     /**
      * Returns an array that contains the names of missing required API 
@@ -333,7 +325,7 @@ abstract class WebAPI implements JsonI{
             }
             $i++;
         }
-        $this->sendResponse('The following required parameter(s) where missing from the request body: '.$val.'.', TRUE, 404);
+        $this->sendResponse('The following required parameter(s) where missing from the request body: '.$val.'.', 'error', 404);
     }
     /**
      * Sends a response message to indicate that a request parameter(s) have invalid values.
@@ -361,7 +353,7 @@ abstract class WebAPI implements JsonI{
             }
             $i++;
         }
-        $this->sendResponse('The following parameter(s) has invalid values: '.$val.'.', TRUE, 404);
+        $this->sendResponse('The following parameter(s) has invalid values: '.$val.'.', 'error', 404);
     }
     /**
      * Returns the version number of the API.
@@ -649,7 +641,7 @@ abstract class WebAPI implements JsonI{
      * @since 1.3.1
      */
     public function missingAPIAction() {
-        $this->sendResponse('Action is not set.', TRUE, 404);
+        $this->sendResponse('Action is not set.', 'error', 404);
     }
     /**
      * Checks if a user is authorized to perform an action that require authorization.
@@ -749,23 +741,22 @@ abstract class WebAPI implements JsonI{
      * </p>
      * Where EXTRA_INFO can be a simple string or any JSON data.
      * @param string $message The message to send back.
-     * @param boolean $isErr TRUE if the message represents an error state. Default 
-     * is FALSE.
+     * @param string $type A string that tells the client what is the type of 
+     * the message. The developer can specify his own message types such as 
+     * 'debug', 'info' or any string. If it is empty string, it will be not 
+     * included in response payload.
      * @param int $code Response code (such as 404 or 200). Default is 200.
      * @param string|JsonX|JsonI $otherInfo Any other data to send back it can be a simple 
      * string, an object of type JsonX or JsonI. Default is empty string.
      * @since 1.0
      */
-    public function sendResponse($message,$isErr=false,$code=200,$otherInfo=''){
+    public function sendResponse($message,$type='',$code=200,$otherInfo=''){
         header('content-type:application/json');
         http_response_code($code);
-        if($isErr == TRUE){
-            $e = 'error';
+        $value =  '{"message":"'.$message.'"';
+        if(strlen($type) !== 0){
+            $value .= ',"type":"'.JsonX::escapeJSONSpecialChars($type).'"';
         }
-        else{
-            $e = 'info';
-        }
-        $value =  '{"message":"'.$message.'","type":"'.$e.'"';
         if($otherInfo instanceof JsonX){
             echo $value . ',"more-info":'.$otherInfo.'}';
         }
@@ -780,6 +771,7 @@ abstract class WebAPI implements JsonI{
                 echo $value .'}';
             }
         }
+        die();
     }
     /**
      * Sends Back a data using specific content type using HTTP code 200 - Ok.
@@ -789,6 +781,7 @@ abstract class WebAPI implements JsonI{
     public function send($conentType,$data){
         header('content-type:'.$conentType);
         echo $data;
+        die();
     }
     /**
      * Sends back multiple HTTP headers to the client.

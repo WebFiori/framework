@@ -90,7 +90,7 @@ class SystemFunctions extends Functions{
      */
     const INITIAL_CONFIG_VARS = array(
         'is-config'=>'FALSE',
-        'release-date'=>'2019-02-01',
+        'release-date'=>'2019-03-06',
         'version'=>'1.0.0',
         'version-type'=>'Stable',
         'config-file-version'=>'1.3.3',

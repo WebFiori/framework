@@ -625,12 +625,23 @@ class HTMLNode {
     }
     /**
      * Sets the value of the property $text.
+     * Note that the method will replace the characters '&lt;', '&gt;' and 
+     * '&amp' with the following HTML entities: '&amp;lt;', '&amp;gt;' and '&amp;amp;' 
+     * in the given text.
      * @param string $text The text to set. If the node is not a text node or 
      * a comment node, the value will never be set.
      * @since 1.0
      */
     public function setText($text) {
         if($this->isTextNode() || $this->isComment()){
+            $charsToReplace = array(
+                '&'=>'&amp;',
+                '<'=>'&lt;',
+                '>'=>'&gt;'
+            );
+            foreach ($charsToReplace as $ch => $rep){
+                $text = str_replace($ch, $rep, $text);
+            }
             $this->text = $text;
         }
     }
@@ -879,7 +890,8 @@ class HTMLNode {
         for($x = 0 ; $x < $spacesCount ; $x++){
             $this->tabSpace .= ' ';
         }
-        if($formattingOptions['use-pre'] === TRUE){
+        $usePre = isset($formattingOptions['use-pre']) ? $formattingOptions['use-pre'] === TRUE : FALSE;
+        if($usePre){
             if($formattingOptionsV['with-colors'] === TRUE){
                 $this->codeString = '<pre style="margin:0;background-color:'.$formattingOptionsV['colors']['bg-color'].'; color:'.$formattingOptionsV['colors']['text-color'].'">'.$this->nl;
             }
@@ -899,7 +911,7 @@ class HTMLNode {
         }
         $this->nodesStack = new Stack();
         $this->_pushNodeAsCode($this,$formattingOptionsV);
-        if($formattingOptions['use-pre'] === TRUE){
+        if($usePre){
             return $this->codeString.'</pre>';
         }
         return $this->codeString;
@@ -1127,7 +1139,7 @@ class HTMLNode {
     /**
      * Checks if the node has a given attribute or not.
      * @param type $attrName The name of the attribute.
-     * @return boolean <b>TRUE</b> if the attribute is set.
+     * @return boolean TRUE if the attribute is set.
      * @since 1.1
      */
     public function hasAttribute($attrName){
@@ -1137,7 +1149,7 @@ class HTMLNode {
         return FALSE;
     }
     /**
-     * Returns non-foratted HTML string that represents the node as a whole.
+     * Returns non-formatted HTML string that represents the node as a whole.
      * @return string HTML string that represents the node as a whole.
      */
     public function __toString() {

@@ -1,6 +1,4 @@
-# webfiori
-PHP framewrok. Built to help in creating websites and web APIs. 
-
+# WebFiori Framework
 What is WebFiori Framework?
 
 WebFiori Framework is new web framework which is built using PHP language. The framework is fully object oriented (OOP). It allows the use of the famous model-view-controller (MVC) model but it does not force it. The framework comes with many features which can help in making your website or web application up and running in no time. Some of the key features are:

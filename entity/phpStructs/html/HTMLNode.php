@@ -206,12 +206,16 @@ class HTMLNode {
      * Creates new text node.
      * @param string $nodeText The text that will be inserted in the body 
      * of the node.
+     * @param boolean $escHtmlEntities If set to TRUE, the method will 
+     * replace the characters '&lt;', '&gt;' and 
+     * '&amp' with the following HTML entities: '&amp;lt;', '&amp;gt;' and '&amp;amp;' 
+     * in the given text.
      * @return HTMLNode An object of type HTMLNode.
      * @since 1.5
      */
-    public static function &createTextNode($nodeText){
+    public static function &createTextNode($nodeText,$escHtmlEntities=true){
         $text = new HTMLNode('#TEXT');
-        $text->setText($nodeText);
+        $text->setText($nodeText,$escHtmlEntities);
         return $text;
     }
     /**
@@ -606,11 +610,15 @@ class HTMLNode {
     /**
      * Adds a text node as a child.
      * @param string $text The text that will be in the node.
+     * @param boolean $escHtmlEntities If set to TRUE, the method will 
+     * replace the characters '&lt;', '&gt;' and 
+     * '&amp' with the following HTML entities: '&amp;lt;', '&amp;gt;' and '&amp;amp;' 
+     * in the given text. Default is TRUE.
      * @since 1.6
      */
-    public function addTextNode($text) {
+    public function addTextNode($text,$escHtmlEntities=true) {
         if($this->mustClose()){
-            $this->addChild(self::createTextNode($text));
+            $this->addChild(self::createTextNode($text,$escHtmlEntities));
         }
     }
     /**
@@ -625,22 +633,25 @@ class HTMLNode {
     }
     /**
      * Sets the value of the property $text.
-     * Note that the method will replace the characters '&lt;', '&gt;' and 
-     * '&amp' with the following HTML entities: '&amp;lt;', '&amp;gt;' and '&amp;amp;' 
-     * in the given text.
      * @param string $text The text to set. If the node is not a text node or 
      * a comment node, the value will never be set.
+     * @param boolean $escHtmlEntities If set to TRUE, the method will 
+     * replace the characters '&lt;', '&gt;' and 
+     * '&amp' with the following HTML entities: '&amp;lt;', '&amp;gt;' and '&amp;amp;' 
+     * in the given text. Default is TRUE.
      * @since 1.0
      */
-    public function setText($text) {
+    public function setText($text,$escHtmlEntities=true) {
         if($this->isTextNode() || $this->isComment()){
-            $charsToReplace = array(
-                '&'=>'&amp;',
-                '<'=>'&lt;',
-                '>'=>'&gt;'
-            );
-            foreach ($charsToReplace as $ch => $rep){
-                $text = str_replace($ch, $rep, $text);
+            if($escHtmlEntities === TRUE){
+                $charsToReplace = array(
+                    '&'=>'&amp;',
+                    '<'=>'&lt;',
+                    '>'=>'&gt;'
+                );
+                foreach ($charsToReplace as $ch => $rep){
+                    $text = str_replace($ch, $rep, $text);
+                }
             }
             $this->text = $text;
         }

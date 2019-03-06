@@ -39,23 +39,31 @@ class UnorderedList extends HTMLNode{
      * Adds new item to the list.
      * @param string $listItemText The text that will be displayed by the 
      * list item.
+     * @param boolean $escHtmlEntities If set to TRUE, the method will 
+     * replace the characters '&lt;', '&gt;' and 
+     * '&amp' with the following HTML entities: '&amp;lt;', '&amp;gt;' and '&amp;amp;' 
+     * in the given text. Default is TRUE.
      * @since 1.0
      */
-    public function addListItem($listItemText) {
+    public function addListItem($listItemText,$escHtmlEntities=true) {
         $li = new ListItem();
-        $li->addTextNode($listItemText);
+        $li->addTextNode($listItemText,$escHtmlEntities);
         $this->addChild($li);
     }
     /**
      * Adds multiple items at once to the list.
      * @param array $arrOfItems An array that contains strings 
      * that represents each list item.
+     * @param boolean $escHtmlEntities If set to TRUE, the method will 
+     * replace the characters '&lt;', '&gt;' and 
+     * '&amp' with the following HTML entities: '&amp;lt;', '&amp;gt;' and '&amp;amp;' 
+     * in the given text. Default is TRUE.
      * @since 1.0.1
      */
-    public function addListItems($arrOfItems) {
+    public function addListItems($arrOfItems,$escHtmlEntities=true) {
         if(gettype($arrOfItems) == 'array'){
             foreach ($arrOfItems as $listItem){
-                $this->addListItem($listItem);
+                $this->addListItem($listItem,$escHtmlEntities);
             }
         }
     }

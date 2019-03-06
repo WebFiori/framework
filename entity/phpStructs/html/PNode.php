@@ -47,17 +47,19 @@ class PNode extends HTMLNode{
      * of text options. The supported options are:
      * <ul>
      * <li><b>bold:</b> Makes the text bold.</li>
+     * <li><b>esc-entities</b>: If set to TRUE, HTML entities will be escaped. Default is TRUE.</li>
      * <li><b>italic:</b> Makes the text italic.</li>
-     * <li><b>em:</b> Insert the text withen 'em' element.</li>
+     * <li><b>em:</b> Insert the text within 'em' element.</li>
      * <li><b>underline:</b> Adds a line underneath the text.</li>
      * <li><b>overline:</b> Adds a line on the top of the text.</li>
-     * <li><b>strikethrough:</b> Adds a line throgh the text.</li>
+     * <li><b>strikethrough:</b> Adds a line through the text.</li>
      * <li><b>color:</b> Sets the color of the text.</li>
      * <li><b>href:</b>Make the text as a link. The value of this key must be a link.</li>
+     * <li><b>new-line:</b> Insert line break after the text.</li>
      * <li><b>is-abbr:</b> NOT USED.</li>
      * <li><b>abbr-title:</b> NOT USED.</li>
      * <li><b>abbr-def:</b> NOT USED.</li>
-     * <li><b>new-line:</b> Insert line break after the text.</li>
+     * 
      * </ul>
      * @since 1.0
      */
@@ -76,8 +78,9 @@ class PNode extends HTMLNode{
         'new-line'=>false
     )) {
         if(strlen($text) != 0){
-            $textNode = self::createTextNode($text);
             if(gettype($options) == 'array'){
+                $escEnt = isset($options['esc-entities']) ? $options['esc-entities'] === TRUE : TRUE;
+                $textNode = self::createTextNode($text,$escEnt);
                 $css = '';
                 $emNode = NULL;
                 $linkNode = NULL;
@@ -125,6 +128,10 @@ class PNode extends HTMLNode{
                     $this->addLineBreak();
                 }
             }
+            else{
+                $textNode = self::createTextNode($text,TRUE);
+                $this->addChild($textNode);
+            }
         }
     }
     /**
@@ -137,7 +144,7 @@ class PNode extends HTMLNode{
     /**
      * Adds new child node.
      * @param HTMLNode $node The node that will be added. The paragraph element 
-     * can only accept the addition of inline HTML elements.
+     * can only accept the addition of in-line HTML elements.
      * @since 1.0
      */
     public function addChild($node) {

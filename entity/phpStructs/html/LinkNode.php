@@ -67,9 +67,13 @@ class LinkNode extends HTMLNode{
     /**
      * Sets the text that will be seen by the user.
      * @param string $text The text to set.
+     * @param boolean $escHtmlEntities If set to TRUE, the method will 
+     * replace the characters '&lt;', '&gt;' and 
+     * '&amp' with the following HTML entities: '&amp;lt;', '&amp;gt;' and '&amp;amp;' 
+     * in the given text. Default is TRUE.
      * @since 1.0
      */
-    public function setText($text){
-        $this->children()->get(0)->setText($text);
+    public function setText($text,$escHtmlEntities=true){
+        $this->children()->get(0)->setText($text,$escHtmlEntities);
     }
 }

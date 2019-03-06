@@ -97,8 +97,9 @@ class JsCode extends HTMLNode{
      * A method that does nothing.
      * @since 1.0
      * @param type $text
+     * @param type $esc Description
      */
-    public function setText($text) {
+    public function setText($text,$esc=true) {
         
     }
     /**

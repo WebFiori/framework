@@ -216,7 +216,7 @@ class EmailMessage {
      * @since 1.0
      */
     public static function write($text) {
-        self::createInstance()->_getDocument()->addChild(HTMLNode::createTextNode($text));
+        self::createInstance()->_getDocument()->addChild(HTMLNode::createTextNode($text,FALSE));
     }
     /**
      * Adds a child HTML node to the body of the message.

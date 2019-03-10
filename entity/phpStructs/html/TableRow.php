@@ -58,7 +58,7 @@ class TableRow extends HTMLNode{
      */
     public function addCell($cellText,$type='td') {
         $cell = new TabelCell($type);
-        $cell->addTextNode($cellText);
+        $cell->addTextNode($cellText,FALSE);
         $this->addChild($cell);
     }
 }

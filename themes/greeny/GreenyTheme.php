@@ -70,7 +70,7 @@ class GreenyTheme extends Theme{
         $div = new HTMLNode('div');
         $div->setAttribute('class', 'pa-ltr-col-twelve');
         $div->addTextNode('<b style="color:gray;font-size:8pt;">Powered By: <a href="https://github.com/usernane/webfiori" '
-                . 'target="_blank">WebFiori Framework</a> v'.Config::getVersion().' ('.Config::getVersionType().')');
+                . 'target="_blank">WebFiori Framework</a> v'.Config::getVersion().' ('.Config::getVersionType().')',FALSE);
         $fNode->addChild($div);
         return $node;
     }

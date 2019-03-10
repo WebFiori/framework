@@ -244,7 +244,7 @@ class Input extends HTMLNode{
             if(gettype($options) == 'array' && isset($options['value']) && isset($options['label'])){
                 $option = new HTMLNode('option');
                 $option->setAttribute('value', $options['value']);
-                $option->addTextNode($options['label']);
+                $option->addTextNode($options['label'],FALSE);
                 if(isset($options['attributes'])){
                     foreach ($options['attributes'] as $attr => $value) {
                         $option->setAttribute($attr, $value);
@@ -321,7 +321,7 @@ class Input extends HTMLNode{
                             if(isset($labelOrOptions['label'])){
                                 $o = new HTMLNode('option');
                                 $o->setAttribute('value', $value);
-                                $o->addTextNode($labelOrOptions['label']);
+                                $o->addTextNode($labelOrOptions['label'],FALSE);
                                 if(isset($labelOrOptions['attributes'])){
                                     foreach ($labelOrOptions['attributes'] as $attr => $v){
                                         $o->setAttribute($attr, $v);
@@ -333,7 +333,7 @@ class Input extends HTMLNode{
                         else{
                             $o = new HTMLNode('option');
                             $o->setAttribute('value', $value);
-                            $o->addTextNode($labelOrOptions);
+                            $o->addTextNode($labelOrOptions,FALSE);
                             $optGroup->addChild($o);
                         }
                     }

@@ -45,7 +45,7 @@ class JsCode extends HTMLNode{
      * @since 1.0
      */
     public function addCode($jsCode) {
-        parent::addChild(self::createTextNode($jsCode));
+        parent::addChild(self::createTextNode($jsCode,FALSE));
     }
     /**
      * A method that does nothing.

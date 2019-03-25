@@ -1,7 +1,7 @@
 <?php
 echo 'Root = \''.__DIR__.'\'.'."\n";
-print_r(scandir(__DIR__));
 $root = trim(__DIR__,'\\tests');
+print_r(scandir($root));
 require_once trim($root,'/\\').'/entity/AutoLoader.php';
 use webfiori\entity\AutoLoader;
 AutoLoader::get(array(

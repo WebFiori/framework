@@ -531,43 +531,9 @@ class Cron {
                 if($password != ''){
                     Logger::log('Checking if password is valid...');
                     if($password == Cron::password()){
-                        Logger::log('Valid password.');
-                        Logger::log('Preparing list of jobs...');
-                        $table = '<table style="border-collapse:collapse;margin-top:30px;" border="1">'
-                                . '<tr style="border-bottom:double;background-color:rgba(66,234,88,0.3);font-weight:bold;">'
-                                . '<th style="padding:5px">Job Name</th>'
-                                . '<th style="padding:5px">Cron Excepression</th>'
-                                . '<th style="padding:5px">Is Minute</th>'
-                                . '<th style="padding:5px">Is Hour</th>'
-                                . '<th style="padding:5px">Is Day of Month</th>'
-                                . '<th style="padding:5px" >Is Month</th>'
-                                . '<th style="padding:5px">Is Day of Week</th></tr>';
-                        $totalTasks = Cron::jobsQueue()->size();
-                        while ($job = Cron::jobsQueue()->dequeue()){
-                            $isMinute = $job->isMinute() === TRUE ? '<td style="background-color:rgba(100,255,29,0.3)">Yes</td>' : '<td style="background-color: rgba(255,87,29,0.3);">No</td>';
-                            $isHour = $job->isHour() === TRUE ? '<td style="background-color:rgba(100,255,29,0.3)">Yes</td>' : '<td style="background-color: rgba(255,87,29,0.3);">No</td>';
-                            $isDayOfMonth = $job->isDayOfMonth() === TRUE ? '<td style="background-color:rgba(100,255,29,0.3)">Yes</td>' : '<td style="background-color: rgba(255,87,29,0.3);">No</td>';
-                            $isMonth = $job->isMonth() === TRUE ? '<td style="background-color:rgba(100,255,29,0.3)">Yes</td>' : '<td style="background-color: rgba(255,87,29,0.3);">No</td>';
-                            $isDayOfWeek = $job->isDayOfWeek() === TRUE ? '<td style="background-color:rgba(100,255,29,0.3)">Yes</td>' : '<td style="background-color: rgba(255,87,29,0.3);">No</td>';
-                            $table .='<tr><td>'.$job->getJobName().'</td><td>'.$job->getExpression().'</td>'
-                                    . ''.$isMinute.''.$isHour.''.$isDayOfMonth.''
-                                    . ''.$isMonth.''.$isDayOfWeek.'</tr>';
-                        }
-                        $table .= '</table>';
+                        new CronTasksView();
                         Logger::requestCompleted();
-                        die(''
-                        . '<!DOCTYPE html>'
-                        . '<html>'
-                        . '<head>'
-                        . '<title>Available CRON Tasks</title>'
-                        . '</head>'
-                        . '<body>'
-                        . '<h1>Available CRON Tasks</h1>'
-                        . '<hr>'
-                        . '<p>Total Tasks: '.$totalTasks.'</p>'
-                        . $table
-                        . '</body>'
-                        . '</html>');
+                        die();
                     }
                     else{
                         Logger::log('Invalid password.', 'error');
@@ -608,43 +574,9 @@ class Cron {
                 }
             }
             else{
-                Logger::log('No password required.');
-                Logger::log('Preparing list of jobs...');
-                $table = '<table style="border-collapse:collapse;margin-top:30px;" border="1">'
-                    . '<tr style="border-bottom:double;background-color:rgba(66,234,88,0.3);font-weight:bold;">'
-                    . '<th style="padding:5px">Job Name</th>'
-                    . '<th style="padding:5px">Cron Excepression</th>'
-                    . '<th style="padding:5px">Is Minute</th>'
-                    . '<th style="padding:5px">Is Hour</th>'
-                    . '<th style="padding:5px">Is Day of Month</th>'
-                    . '<th style="padding:5px" >Is Month</th>'
-                    . '<th style="padding:5px">Is Day of Week</th></tr>';
-                $totalTasks = Cron::jobsQueue()->size();
-                while ($job = Cron::jobsQueue()->dequeue()){
-                    $isMinute = $job->isMinute() === TRUE ? '<td style="background-color:rgba(100,255,29,0.3)">Yes</td>' : '<td style="background-color: rgba(255,87,29,0.3);">No</td>';
-                    $isHour = $job->isHour() === TRUE ? '<td style="background-color:rgba(100,255,29,0.3)">Yes</td>' : '<td style="background-color: rgba(255,87,29,0.3);">No</td>';
-                    $isDayOfMonth = $job->isDayOfMonth() === TRUE ? '<td style="background-color:rgba(100,255,29,0.3)">Yes</td>' : '<td style="background-color: rgba(255,87,29,0.3);">No</td>';
-                    $isMonth = $job->isMonth() === TRUE ? '<td style="background-color:rgba(100,255,29,0.3)">Yes</td>': '<td style="background-color: rgba(255,87,29,0.3);">No</td>';
-                    $isDayOfWeek = $job->isDayOfWeek() === TRUE ? '<td style="background-color:rgba(100,255,29,0.3)">Yes</td>' : '<td style="background-color: rgba(255,87,29,0.3);">No</td>';
-                    $table .='<tr><td>'.$job->getJobName().'</td><td>'.$job->getExpression().'</td>'
-                            . ''.$isMinute.''.$isHour.''.$isDayOfMonth.''
-                            . ''.$isMonth.''.$isDayOfWeek.'</tr>';
-                }
-                $table .= '</table>';
+                new CronTasksView();
                 Logger::requestCompleted();
-                die(''
-                . '<!DOCTYPE html>'
-                . '<html>'
-                . '<head>'
-                . '<title>Available CRON Tasks</title>'
-                . '</head>'
-                . '<body>'
-                . '<h1>Available CRON Tasks</h1>'
-                . '<hr>'
-                . '<p>Total Tasks: '.$totalTasks.'</p>'
-                . $table
-                . '</body>'
-                . '</html>');
+                die('');
             }
         };
         Router::closure('/cron-jobs/list',$viewJobsFunc);
@@ -841,7 +773,7 @@ class Cron {
             $file = fopen($logFile, 'a+');
             if(is_resource($file)){
                 if($forced){
-                    fwrite($file, 'Job \''.$job->getJobName().'\' was forced to executed at '.date(DATE_RFC1123)."\n");
+                    fwrite($file, 'Job \''.$job->getJobName().'\' was forced to executed at '.date(DATE_RFC1123).". Request source IP: ".Util::getClientIP()."\n");
                 }
                 else{
                     fwrite($file, 'Job \''.$job->getJobName().'\' automatically executed at '.date(DATE_RFC1123)."\n");

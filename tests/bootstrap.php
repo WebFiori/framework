@@ -1,11 +1,12 @@
 <?php
-require_once '../entity/AutoLoader.php';
+$root = trim(__DIR__,'\\tests');
+require_once $root.'\\entity\\AutoLoader.php';
 use webfiori\entity\AutoLoader;
 AutoLoader::get(array(
     'search-folders'=>array(
         'tests\\entity\\router'
     ),
-    'root'=> trim(__DIR__,'\\tests')
+    'root'=> $root
 ));
 echo 'Autoloader Initialized.'."\n";
 echo 'Root Directory: \''.AutoLoader::get()->getRoot().'\'.'."\n";

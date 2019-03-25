@@ -102,7 +102,7 @@ class CronTasksView {
             $params = '?use-theme=yes&refresh=yes';
         }
         else{
-            $params = '';
+            $params = '?refresh=yes';
         }
         if(isset($_GET['refresh'])){
             $refStr = 'window.location.reload(true);';
@@ -123,14 +123,25 @@ class CronTasksView {
                 . '     window.isRefresh = '.$isRefresh.';'."\n"
                 . '     window.intervalId = window.setInterval(function(){'."\n"
                 . '         if(window.isRefresh){'."\n"
+                . '             disableExeButtons();'."\n"
                 . '             document.getElementById(\'refresh-checkbox\').setAttribute(\'disabled\',\'\');'."\n"
                 . '             document.getElementById(\'theme-checkbox\').setAttribute(\'disabled\',\'\');'."\n"
                 . '             document.getElementById(\'refresh-label\').innerHTML = \'<b>Refreshing...</b>\';'."\n"
                 . '             '.$refStr.';'."\n"
                 . '         }'."\n"
-                . '     },8000)'."\n"
+                . '     },60000)'."\n"
                 . ' };'."\n"
+                . 'function disableExeButtons(){'."\n"
+                . '    var buttons = document.getElementsByName(\'execute-button\');'."\n"
+                . '    for(var x = 0 ; x < buttons.length ; x++){'."\n"
+                . '        buttons[x].setAttribute(\'disabled\',\'\');'."\n"
+                . '    }'."\n"
+                . '}'."\n"
                 . 'function execJob(source,jobName){'."\n"
+                . '     var refresh = window.isRefresh;'."\n"
+                . '     window.isRefresh = false;'."\n"
+                . '     document.getElementById(\'refresh-checkbox\').setAttribute(\'disabled\',\'\');'."\n"
+                . '     document.getElementById(\'theme-checkbox\').setAttribute(\'disabled\',\'\');'."\n"
                 . '     source.setAttribute(\'disabled\',\'\');'."\n"
                 . '     source.innerHTML = \'Executing Job...\';'."\n"
                 . '     var xhr = new XMLHttpRequest();'."\n"
@@ -138,14 +149,23 @@ class CronTasksView {
                 . '     xhr.onreadystatechange = function(){'."\n"
                 . '         if(this.readyState === 4 && this.status === 200){'."\n"
                 . '             source.innerHTML = \'<b>Job Executed Successfully</b>\';'."\n"
+                . '             document.getElementById(\'refresh-checkbox\').removeAttribute(\'disabled\');'."\n"
+                . '             document.getElementById(\'theme-checkbox\').removeAttribute(\'disabled\');'."\n"
+                . '             window.isRefresh = refresh;'."\n"
                 . '         }'."\n"
                 . '         else if(this.readyState === 4 && this.status === 0){'."\n"
                 . '             source.innerHTML = \'<b>Connection Lost. Try Again.</b>\';'."\n"
                 . '             source.removeAttribute(\'disabled\');'."\n"
+                . '             document.getElementById(\'refresh-checkbox\').removeAttribute(\'disabled\');'."\n"
+                . '             document.getElementById(\'theme-checkbox\').removeAttribute(\'disabled\');'."\n"
+                . '             window.isRefresh = refresh;'."\n"
                 . '         }'."\n"
                 . '         else{'."\n"
                 . '             source.innerHTML = \'Something Went Wrong While Executing the Job. Try Again\';'."\n"
                 . '             source.removeAttribute(\'disabled\');'."\n"
+                . '             document.getElementById(\'refresh-checkbox\').removeAttribute(\'disabled\');'."\n"
+                . '             document.getElementById(\'theme-checkbox\').removeAttribute(\'disabled\');'."\n"
+                . '             window.isRefresh = refresh;'."\n"
                 . '         }'."\n"
                 . '     }'."\n"
                 . '     xhr.send();'."\n"
@@ -222,7 +242,8 @@ class CronTasksView {
         else{
             $params = '';
         }
-        $onclick = 'var isRef = window.isRefresh;'
+        $onclick = 'disableExeButtons();'
+                . 'var isRef = window.isRefresh;'
                     . 'window.isRefresh = false;'
                     . 'document.getElementById(\'refresh-checkbox\').setAttribute(\'disabled\',\'\');'
                 . 'document.getElementById(\'theme-checkbox\').setAttribute(\'disabled\',\'\');'
@@ -297,7 +318,7 @@ class CronTasksView {
         $tableHeader->addChild($this->_createTasksTableHeaderCell('Is Day of Month'));
         $tableHeader->addChild($this->_createTasksTableHeaderCell('Is Month'));
         $tableHeader->addChild($this->_createTasksTableHeaderCell('Is Day of Week'));
-        $tableHeader->addChild($this->_createTasksTableHeaderCell('--'));
+        $tableHeader->addChild($this->_createTasksTableHeaderCell('Execute'));
         $jobsQueue = Cron::jobsQueue();
         if($jobsQueue->size() == 0){
             $cell = new TabelCell();
@@ -328,7 +349,7 @@ class CronTasksView {
                 $row->addChild($this->_createTasksTableCell($job->isMonth()));
                 $row->addChild($this->_createTasksTableCell($job->isDayOfWeek()));
                 $forceCell = new TabelCell();
-                $forceCell->addTextNode('<button onclick="execJob(this,\''.$job->getJobName().'\')" class="force-execution-button">Force Execution</button>', FALSE);
+                $forceCell->addTextNode('<button name="execute-button" onclick="execJob(this,\''.$job->getJobName().'\')" class="force-execution-button">Force Execution</button>', FALSE);
                 $row->addChild($forceCell);
                 $tasksTable->addChild($row);
             }

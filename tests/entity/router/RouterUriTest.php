@@ -13,6 +13,8 @@ class RouterUriTest extends TestCase{
      * @test
      */
     public function test1(){
+        $uri = RouterUri::splitURI('');
+        print_r($uri);
         $this->assertEquals(true,TRUE);
     }
 }

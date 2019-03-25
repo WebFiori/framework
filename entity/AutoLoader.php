@@ -88,7 +88,7 @@ class AutoLoader{
                 }
             }
             $defineRoot = isset($options['define-root']) && $options['define-root'] === TRUE ? TRUE : FALSE;
-            $root = isset($options['define-root']) ? $options['define-root'] : '';
+            $root = isset($options['root']) ? $options['root'] : '';
             self::$loader = new AutoLoader($root, $frameworkSearchFoldres, $defineRoot);
         }
         //Logger::logFuncReturn(__METHOD__);

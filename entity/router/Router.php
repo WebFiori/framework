@@ -76,7 +76,7 @@ use jsonx\JsonX;
  * </pre> 
  * </p>
  * @author Ibrahim
- * @version 1.3.2
+ * @version 1.3.3
  */
 class Router {
     /**
@@ -186,9 +186,40 @@ class Router {
         return FALSE;
     }
     /**
+     * Returns an object of type 'RouterUri' that represents route URI.
+     * @param string $path The path part of the URI.
+     * @return RouterUri|NULL If a route was found which has the given path, 
+     * an object of type 'RouterUri' is returned. If no route is found, NULL 
+     * is returned.
+     * @since 1.3.3
+     */
+    private function &_getUriObj($path) {
+        $routeURI = new RouterUri($this->getBase().$this->fixPath($path), '');
+        foreach ($this->routes as $route){
+            if($routeURI->equals($route)){
+                return $route;
+            }
+        }
+        $null = NULL;
+        return $null;
+    }
+    /**
+     * Returns an object of type 'RouterUri' that represents route URI.
+     * @param string $path The path part of the URI.
+     * @return RouterUri|NULL If a route was found which has the given path, 
+     * an object of type 'RouterUri' is returned. If no route is found, NULL 
+     * is returned.
+     * @since 1.3.3
+     */
+    public static function getUriObj($path) {
+        $uri = self::get()->_getUriObj($path);
+        return $uri;
+    }
+    /**
      * Adds a route to a basic xml site map. 
      * If this method is called, a route in the form 'http://example.com/sitemam.xml' 
-     * will be added.
+     * The method will check all created RouterUri objects and check if they 
+     * should be included in the site map.
      * @since 1.3.2
      */
     public static function incSiteMapRoute(){

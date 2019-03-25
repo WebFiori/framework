@@ -1,6 +1,6 @@
 # WebFiori Framework
 <p align="center">
-  <a href="https://travis-ci.org/usernane/jsonx"><img src="https://travis-ci.org/usernane/webfiori.svg?branch=master"></a>
+  <a href="https://travis-ci.org/usernane/webfiori"><img src="https://travis-ci.org/usernane/webfiori.svg?branch=master"></a>
 </p>
 What is WebFiori Framework?
 

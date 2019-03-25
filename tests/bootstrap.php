@@ -1,6 +1,6 @@
 <?php
 $root = trim(__DIR__,'\\tests');
-require_once $root.'\\entity\\AutoLoader.php';
+require_once trim($root,'/\\').'/entity/AutoLoader.php';
 use webfiori\entity\AutoLoader;
 AutoLoader::get(array(
     'search-folders'=>array(

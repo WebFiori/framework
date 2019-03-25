@@ -464,7 +464,7 @@ class RouterUri {
         for($x = 3 ; $x < count($split4) ; $x++){
             $dirName = $split4[$x];
             if($dirName != ''){
-                $retVal['path'][] = $dirName;
+                $retVal['path'][] = utf8_decode(urldecode($dirName));
                 if($dirName[0] == '{' && $dirName[strlen($dirName) - 1] == '}'){
                     $retVal['uri-vars'][trim($split4[$x], '{}')] = NULL;
                 }

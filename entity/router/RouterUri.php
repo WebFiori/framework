@@ -403,7 +403,8 @@ class RouterUri {
     /**
      * Breaks a URI into its basic components.
      * @param string $uri The URI that will be broken.
-     * @return array The function will return an associative array that 
+     * @return array|boolean If the given URI is not valid, 
+     * the Method will return FALSE. Other than that, The function will return an associative array that 
      * contains the components of the URI. The array will have the 
      * following indices:
      * <ul>
@@ -421,6 +422,10 @@ class RouterUri {
      * @since 1.0
      */
     public static function splitURI($uri) {
+        $validate = filter_var($uri,FILTER_VALIDATE_URL);
+        if($validate === FALSE){
+            return FALSE;
+        }
         $retVal = array(
             'uri'=>$uri,
             'authority'=>'',
@@ -455,6 +460,7 @@ class RouterUri {
         //now, break the remaining using / as a delemiter
         //the authority will be located at index 2 if the URI
         //follows the standatd
+        \webfiori\entity\Util::print_r($split3);
         $split4 = explode('/', $split3[1]);
         $retVal['authority'] = '//'.$split4[2];
         

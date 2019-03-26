@@ -13,7 +13,7 @@ class RouterUriTest extends TestCase{
      * @test
      */
     public function test1(){
-        //$uri = new RouterUri('/hello', 'x.php');
+        $uri = new RouterUri('/hello', 'x.php');
         $this->assertEquals(true,TRUE);
     }
 }

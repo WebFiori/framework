@@ -28,9 +28,16 @@ use Exception;
  * An autoloader class to load classes as needed during runtime.
  *
  * @author Ibrahim
- * @version 1.1.2
+ * @version 1.1.3
  */
 class AutoLoader{
+    /**
+     * A string or callback that indicates what will happen if the loader 
+     * is unable to load a class.
+     * @var string|callable
+     * @since 1.1.3 
+     */
+    private $onFail;
     /**
      * An array of folders to search on.
      * @var array
@@ -60,7 +67,17 @@ class AutoLoader{
      * on. Default is an empty array.</li>
      * <li><b>define-root</b>: If set to TRUE, The autoloader will try to define 
      * the constant 'ROOT_DIR' based on the autoload folders. 
-     * Default is FALSE. Ignored if the constant ROOT_DIR is defined.</li>
+     * Default is FALSE. Ignored if the constant ROOT_DIR is defined.</li>,
+     * <li>
+     * <b>on-load-failure</b>: An attribute that will be used if the 
+     * loader is unable to load the class. Possible values are:
+     * <ul>
+     * <li>'do-nothing'</li>
+     * <li>'throw-exception'</li>
+     * <li>A callable that will be called when the class loader is unable 
+     * to load the class.</li>
+     * </ul>
+     * </li>
      * </ul>
      * @return AutoLoader
      * @throws Exception 
@@ -68,7 +85,8 @@ class AutoLoader{
     public static function &get($options=array(
         'define-root'=>false,
         'search-folders'=>array(),
-        'root'=>''
+        'root'=>'',
+        'on-load-failure'=>'do-nothing'
     )) {
         //Logger::logFuncCall(__METHOD__);
         if(self::$loader === NULL){
@@ -93,7 +111,8 @@ class AutoLoader{
                 //linux 
                 $root = DIRECTORY_SEPARATOR.$root;
             }
-            self::$loader = new AutoLoader($root, $frameworkSearchFoldres, $defineRoot);
+            $onFail = isset($options['on-load-failure']) ? $options['on-load-failure'] : 'throw-exception';
+            self::$loader = new AutoLoader($root, $frameworkSearchFoldres, $defineRoot,$onFail);
         }
         //Logger::logFuncReturn(__METHOD__);
         return self::$loader;
@@ -106,7 +125,7 @@ class AutoLoader{
      * @throws Exception
      * @since 1.0
      */
-    private function __construct($root='',$searchFolders=array(),$defineRoot=false) {
+    private function __construct($root='',$searchFolders=array(),$defineRoot=false,$onFail='throw-exception') {
         //Logger::logFuncCall(__METHOD__);
         //Logger::log('$root = \''.$root.'\'', 'debug');
         //Logger::log('$defineRoot = \''.$defineRoot.'\'', 'debug');
@@ -148,6 +167,20 @@ class AutoLoader{
         spl_autoload_register(function($className){
             AutoLoader::get()->loadClass($className);
         });
+        if(gettype($onFail) == 'string'){
+            $this->onFail = strtolower($onFail);
+            if($this->onFail != 'do-nothing'){
+                if($this->onFail != 'throw-exception'){
+                    $this->onFail = 'throw-exception';
+                }
+            }
+        }
+        else if(is_callable($onFail)){
+            $this->onFail = $onFail;
+        }
+        else{
+            $this->onFail = 'throw-exception';
+        }
     }
     /**
      * Adds new search directory to the array of search 
@@ -226,8 +259,16 @@ class AutoLoader{
             }
         }
         if(!$loaded){
-            throw new Exception('Class \''.$classPath.'\' not found in any include directory. '
+            if(is_callable($this->onFail)){
+                call_user_func($this->onFail);
+            }
+            else if($this->onFail == 'throw-exception'){
+                throw new Exception('Class \''.$classPath.'\' not found in any include directory. '
                     . 'Make sure that class path is included in auto-load directories.');
+            }
+            else if($this->onFail == 'do-nothing'){
+                //do nothing
+            }
         }
         //Logger::log('Class \''.$className.'\' was not found.', 'error');
         //Logger::logFuncReturn(__METHOD__);

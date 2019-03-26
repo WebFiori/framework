@@ -1,7 +1,7 @@
 <?php
+$root = trim(__DIR__,DIRECTORY_SEPARATOR.'tests');
 echo 'Root = \''.__DIR__.'\'.'."\n";
 echo 'Include Path: \''. get_include_path().'\''."\n";
-$root = trim(__DIR__,DIRECTORY_SEPARATOR.'tests');
 print_r(explode(DIRECTORY_SEPARATOR, $root));
 if(explode(DIRECTORY_SEPARATOR, $root)[0] == 'home'){
     //linux 

@@ -1,7 +1,15 @@
 <?php
 echo 'Root = \''.__DIR__.'\'.'."\n";
-$root = trim(__DIR__,'\\tests');
-require_once '/'.trim($root,'/\\').'/entity/AutoLoader.php';
+echo 'Include Path: \''. get_include_path().'\''."\n";
+$root = trim(__DIR__,DIRECTORY_SEPARATOR.'tests');
+print_r(explode(DIRECTORY_SEPARATOR, $root));
+if(explode(DIRECTORY_SEPARATOR, $root)[0] == 'home'){
+    //linux 
+    require_once '/'.trim($root,'/\\').DIRECTORY_SEPARATOR.'entity'.DIRECTORY_SEPARATOR.'AutoLoader.php';
+}
+else{
+    require_once trim($root,'/\\').DIRECTORY_SEPARATOR.'entity'.DIRECTORY_SEPARATOR.'AutoLoader.php';
+}
 use webfiori\entity\AutoLoader;
 AutoLoader::get(array(
     'search-folders'=>array(

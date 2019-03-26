@@ -84,11 +84,15 @@ class AutoLoader{
             );
             if(isset($options['search-folders'])){
                 foreach ($options['search-folders'] as $folder){
-                    $frameworkSearchFoldres[] = '/'.trim($folder,'/');
+                    $frameworkSearchFoldres[] = DIRECTORY_SEPARATOR.trim(str_replace('\\', DIRECTORY_SEPARATOR, str_replace('/', DIRECTORY_SEPARATOR, $folder)),'/\\');
                 }
             }
             $defineRoot = isset($options['define-root']) && $options['define-root'] === TRUE ? TRUE : FALSE;
-            $root = isset($options['root']) ? $options['root'] : '';
+            $root = isset($options['root']) ? trim($options['root'],'\\/') : '';
+            if(strlen($root) != 0 && explode(DIRECTORY_SEPARATOR, $root)[0] == 'home'){
+                //linux 
+                $root = DIRECTORY_SEPARATOR.$root;
+            }
             self::$loader = new AutoLoader($root, $frameworkSearchFoldres, $defineRoot);
         }
         //Logger::logFuncReturn(__METHOD__);
@@ -157,29 +161,27 @@ class AutoLoader{
         //Logger::log('Passed value = \''.$dir.'\'', 'debug');
         if(strlen($dir) != 0){
             //Logger::log('Folder added.');
-            $cleanDir = '/'. trim($dir, '/');
+            $cleanDir = DIRECTORY_SEPARATOR. trim(str_replace('\\', DIRECTORY_SEPARATOR, str_replace('/', DIRECTORY_SEPARATOR, $dir)), '\\/');
             if($incSubFolders){
                 $dirsStack = array();
                 $dirsStack[] = $cleanDir;
                 while($xDir = array_pop($dirsStack)){
-                    $fullPath = str_replace('/', '\\', $this->getRoot().$xDir);
+                    $fullPath =  $this->getRoot().$xDir;
                     if(is_dir($fullPath)){
                         $subDirs = scandir($fullPath);
                         foreach ($subDirs as $subDir){
                             if($subDir != '.' && $subDir != '..'){
-                                $dirsStack[] = $xDir.'\\'.$subDir;
+                                $dirsStack[] = $xDir.DIRECTORY_SEPARATOR.$subDir;
                             }
                         }
                         $this->searchFolders[] = $xDir;
                     }
                     else{
-                        $xDir = str_replace('\\', '/', $xDir);
-                        $fullPath = str_replace('\\', '/', $fullPath);
                         if(is_dir($fullPath)){
                             $subDirs = scandir($fullPath);
                             foreach ($subDirs as $subDir){
                                 if($subDir != '.' && $subDir != '..'){
-                                    $dirsStack[] = $xDir.'/'.$subDir;
+                                    $dirsStack[] = $xDir.DIRECTORY_SEPARATOR.$subDir;
                                 }
                             }
                             $this->searchFolders[] = $xDir;
@@ -212,7 +214,7 @@ class AutoLoader{
         $className = $cArr[count($cArr) - 1];
         $loaded = FALSE;
         foreach ($this->searchFolders as $value) {
-            $f = $this->getRoot().$value.'/'.$className.'.php';
+            $f = $this->getRoot().$value.DIRECTORY_SEPARATOR.$className.'.php';
             //Logger::log('Checking if file \''.$f.'\' exist...', 'debug');
             if(file_exists($f)){
                 //Logger::log('Class \''.$className.'\' found. Loading the class...');
@@ -244,6 +246,10 @@ class AutoLoader{
      * @since 1.1.1
      */
     public static function getFolders() {
-        return self::get()->searchFolders;
+        $folders = array();
+        foreach(self::get()->searchFolders as $f){
+            $folders[] = self::get()->getRoot().$f;
+        }
+        return $folders;
     }
 }

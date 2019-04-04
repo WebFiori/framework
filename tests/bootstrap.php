@@ -1,13 +1,14 @@
 <?php
 use webfiori\entity\AutoLoader;
-$root = trim(__DIR__,DIRECTORY_SEPARATOR.'tests');
+$DS = DIRECTORY_SEPARATOR;
+$root = trim(__DIR__,$DS.'tests');
 echo 'Include Path: \''. get_include_path().'\''."\n";
-if(explode(DIRECTORY_SEPARATOR, $root)[0] == 'home'){
+if(explode($DS, $root)[0] == 'home'){
     //linux 
-    require_once DIRECTORY_SEPARATOR.trim($root,'/\\').DIRECTORY_SEPARATOR.'entity'.DIRECTORY_SEPARATOR.'AutoLoader.php';
+    require_once $DS.trim($root,'/\\').$DS.'src'.$DS.'entity'.$DS.'AutoLoader.php';
 }
 else{
-    require_once trim($root,'/\\').DIRECTORY_SEPARATOR.'entity'.DIRECTORY_SEPARATOR.'AutoLoader.php';
+    require_once trim($root,'/\\').$DS.'src'.$DS.'entity'.$DS.'AutoLoader.php';
 }
 AutoLoader::get(array(
     'search-folders'=>array(

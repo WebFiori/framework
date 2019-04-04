@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit colors="true" bootstrap="tests/bootstrap.php">
+    <php>
+    </php>
+    <filter>
+        <whitelist addUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">./src</directory>
+        </whitelist>
+    </filter>
+    <logging>
+        <log type="coverage-clover" target="clover.xml"/>
+    </logging>
+    <testsuites>
+        <testsuite name="Router Tests">
+            <directory>./entity/router/</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>

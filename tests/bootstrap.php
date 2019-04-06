@@ -12,7 +12,8 @@ else{
 }
 AutoLoader::get(array(
     'search-folders'=>array(
-        'tests\\entity\\router'
+        'tests',
+        'src'
     ),
     'root'=> $root,
     'define-root'=>TRUE,
@@ -25,3 +26,4 @@ $dirs = AutoLoader::getFolders();
 foreach ($dirs as $dir){
     echo $dir."\n";
 }
+echo "Starting to run tests...\n";

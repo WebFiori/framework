@@ -68,7 +68,7 @@ class CronTasksView {
      * Creates new instance of the view.
      */
     public function __construct() {
-        $useTheme = isset($_GET['use-theme']) && $_GET['use-theme'] == 'yes' ? TRUE : FALSE;
+        $useTheme = isset($_GET['use-theme']) && $_GET['use-theme'] == 'yes' ? true : false;
         if($useTheme){
             Page::theme(WebFiori::getSiteConfig()->getBaseThemeName());    
         }
@@ -78,10 +78,10 @@ class CronTasksView {
         $h1 = new HTMLNode('h1');
         $h1->addTextNode('Scheduled CRON Tasks');
         Page::insert($h1);
-        $hr = new HTMLNode('hr',FALSE);
+        $hr = new HTMLNode('hr',false);
         Page::insert($hr);
         $parag = new PNode();
-        $parag->addText('<b>Total Scheduled Tasks:</b> '.$tasksCount.'.', array('esc-entities'=>FALSE));
+        $parag->addText('<b>Total Scheduled Tasks:</b> '.$tasksCount.'.', array('esc-entities'=>false));
         Page::insert($parag);
         $this->_createRefreshControls();
         $this->_createThemeControls();
@@ -123,48 +123,46 @@ class CronTasksView {
                 . '     window.isRefresh = '.$isRefresh.';'."\n"
                 . '     window.intervalId = window.setInterval(function(){'."\n"
                 . '         if(window.isRefresh){'."\n"
-                . '             disableExeButtons();'."\n"
-                . '             document.getElementById(\'refresh-checkbox\').setAttribute(\'disabled\',\'\');'."\n"
-                . '             document.getElementById(\'theme-checkbox\').setAttribute(\'disabled\',\'\');'."\n"
+                . '             disableOrEnableInputs();'."\n"
                 . '             document.getElementById(\'refresh-label\').innerHTML = \'<b>Refreshing...</b>\';'."\n"
                 . '             '.$refStr.';'."\n"
                 . '         }'."\n"
                 . '     },60000)'."\n"
                 . ' };'."\n"
-                . 'function disableExeButtons(){'."\n"
-                . '    var buttons = document.getElementsByName(\'execute-button\');'."\n"
-                . '    for(var x = 0 ; x < buttons.length ; x++){'."\n"
-                . '        buttons[x].setAttribute(\'disabled\',\'\');'."\n"
+                . 'function disableOrEnableInputs(disable=true){'."\n"
+                . '    var inputEls = document.getElementsByName(\'input-element\');'."\n"
+                . '    if(disable){'."\n"
+                . '        for(var x = 0 ; x < inputEls.length ; x++){'."\n"
+                . '            inputEls[x].setAttribute(\'disabled\',\'\');'."\n"
+                . '        }'."\n"
+                . '    }'."\n"
+                . '    else{'."\n"
+                . '        for(var x = 0 ; x < inputEls.length ; x++){'."\n"
+                . '            inputEls[x].removeAttribute(\'disabled\');'."\n"
+                . '        }'."\n"
                 . '    }'."\n"
                 . '}'."\n"
                 . 'function execJob(source,jobName){'."\n"
                 . '     var refresh = window.isRefresh;'."\n"
                 . '     window.isRefresh = false;'."\n"
-                . '     document.getElementById(\'refresh-checkbox\').setAttribute(\'disabled\',\'\');'."\n"
-                . '     document.getElementById(\'theme-checkbox\').setAttribute(\'disabled\',\'\');'."\n"
-                . '     source.setAttribute(\'disabled\',\'\');'."\n"
+                . '     disableOrEnableInputs();'
                 . '     source.innerHTML = \'Executing Job...\';'."\n"
                 . '     var xhr = new XMLHttpRequest();'."\n"
                 . '     xhr.open(\'get\',\''.$forceUrl.'\'+jobName);'."\n"
                 . '     xhr.onreadystatechange = function(){'."\n"
                 . '         if(this.readyState === 4 && this.status === 200){'."\n"
                 . '             source.innerHTML = \'<b>Job Executed Successfully</b>\';'."\n"
-                . '             document.getElementById(\'refresh-checkbox\').removeAttribute(\'disabled\');'."\n"
-                . '             document.getElementById(\'theme-checkbox\').removeAttribute(\'disabled\');'."\n"
+                . '             disableOrEnableInputs(false);'."\n"
                 . '             window.isRefresh = refresh;'."\n"
                 . '         }'."\n"
                 . '         else if(this.readyState === 4 && this.status === 0){'."\n"
                 . '             source.innerHTML = \'<b>Connection Lost. Try Again.</b>\';'."\n"
-                . '             source.removeAttribute(\'disabled\');'."\n"
-                . '             document.getElementById(\'refresh-checkbox\').removeAttribute(\'disabled\');'."\n"
-                . '             document.getElementById(\'theme-checkbox\').removeAttribute(\'disabled\');'."\n"
+                . '             disableOrEnableInputs(false);'."\n"
                 . '             window.isRefresh = refresh;'."\n"
                 . '         }'."\n"
                 . '         else{'."\n"
                 . '             source.innerHTML = \'Something Went Wrong While Executing the Job. Try Again\';'."\n"
-                . '             source.removeAttribute(\'disabled\');'."\n"
-                . '             document.getElementById(\'refresh-checkbox\').removeAttribute(\'disabled\');'."\n"
-                . '             document.getElementById(\'theme-checkbox\').removeAttribute(\'disabled\');'."\n"
+                . '             disableOrEnableInputs(false);'."\n"
                 . '             window.isRefresh = refresh;'."\n"
                 . '         }'."\n"
                 . '     }'."\n"
@@ -198,7 +196,7 @@ class CronTasksView {
             }
         } 
         else{
-            $pre->addTextNode('<b style="color:red">Log file not found.</b>',FALSE);
+            $pre->addTextNode('<b style="color:red">Log file not found.</b>',false);
         }
     }
     /**
@@ -208,7 +206,7 @@ class CronTasksView {
      * @return string
      */
     private function _getPageURL() {
-        if($this->pageUrl !== NULL){
+        if($this->pageUrl !== null){
             return $this->pageUrl;
         }
         $url = WebFiori::getSiteConfig()->getBaseURL().'cron-jobs/list';
@@ -227,6 +225,7 @@ class CronTasksView {
         $form = new HTMLNode('form');
         $form->setID('theme-controls-form');
         $themeCheckBox = new Input('checkbox');
+        $themeCheckBox->setName('input-element');
         $themeCheckBox->setID('theme-checkbox');
         if(isset($_GET['use-theme']) && $_GET['use-theme'] == 'yes'){
             $themeCheckBox->setAttribute('checked');
@@ -242,11 +241,9 @@ class CronTasksView {
         else{
             $params = '';
         }
-        $onclick = 'disableExeButtons();'
+        $onclick = 'disableOrEnableInputs();'
                 . 'var isRef = window.isRefresh;'
-                    . 'window.isRefresh = false;'
-                    . 'document.getElementById(\'refresh-checkbox\').setAttribute(\'disabled\',\'\');'
-                . 'document.getElementById(\'theme-checkbox\').setAttribute(\'disabled\',\'\');'
+                . 'window.isRefresh = false;'
                 . 'document.getElementById(\'change-theme-label\').innerHTML = \'<b>Updating Page...</b>\';';
         if(isset($_GET['use-theme']) && $_GET['use-theme'] = 'yes'){
             $onclick .= 
@@ -279,6 +276,7 @@ class CronTasksView {
         $form = new HTMLNode('form');
         $form->setID('refresh-controls-form');
         $refreshCheckBox = new Input('checkbox');
+        $refreshCheckBox->setName('input-element');
         $refreshCheckBox->setID('refresh-checkbox');
         $refreshCheckBox->setAttribute('onclick', 'window.isRefresh = this.checked;');
         if(isset($_GET['refresh']) && $_GET['refresh'] == 'yes'){
@@ -322,7 +320,7 @@ class CronTasksView {
         $jobsQueue = Cron::jobsQueue();
         if($jobsQueue->size() == 0){
             $cell = new TabelCell();
-            $cell->setColSpan(7);
+            $cell->setColSpan(8);
             $cell->addTextNode('No Jobs Has Been Scheduled.');
             $cell->setStyle(array(
                 'background-color'=>'lightgray',
@@ -349,7 +347,7 @@ class CronTasksView {
                 $row->addChild($this->_createTasksTableCell($job->isMonth()));
                 $row->addChild($this->_createTasksTableCell($job->isDayOfWeek()));
                 $forceCell = new TabelCell();
-                $forceCell->addTextNode('<button name="execute-button" onclick="execJob(this,\''.$job->getJobName().'\')" class="force-execution-button">Force Execution</button>', FALSE);
+                $forceCell->addTextNode('<button name="input-element" onclick="execJob(this,\''.$job->getJobName().'\')" class="force-execution-button">Force Execution</button>', false);
                 $row->addChild($forceCell);
                 $tasksTable->addChild($row);
             }

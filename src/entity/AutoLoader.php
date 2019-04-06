@@ -65,9 +65,9 @@ class AutoLoader{
      * Default is empty string. Ignored if the constant ROOT_DIR is defined.</li>
      * <li><b>search-folders</b>: An array which contains a set of folders to search 
      * on. Default is an empty array.</li>
-     * <li><b>define-root</b>: If set to TRUE, The autoloader will try to define 
+     * <li><b>define-root</b>: If set to true, The autoloader will try to define 
      * the constant 'ROOT_DIR' based on the autoload folders. 
-     * Default is FALSE. Ignored if the constant ROOT_DIR is defined.</li>,
+     * Default is false. Ignored if the constant ROOT_DIR is defined.</li>,
      * <li>
      * <b>on-load-failure</b>: An attribute that will be used if the 
      * loader is unable to load the class. Possible values are:
@@ -88,8 +88,7 @@ class AutoLoader{
         'root'=>'',
         'on-load-failure'=>'do-nothing'
     )) {
-        //Logger::logFuncCall(__METHOD__);
-        if(self::$loader === NULL){
+        if(self::$loader === null){
             $frameworkSearchFoldres = array(
                 '',
                 '/entity',
@@ -100,21 +99,21 @@ class AutoLoader{
                 '/ini',
                 '/conf'
             );
+            $DS = DIRECTORY_SEPARATOR;
             if(isset($options['search-folders'])){
                 foreach ($options['search-folders'] as $folder){
-                    $frameworkSearchFoldres[] = DIRECTORY_SEPARATOR.trim(str_replace('\\', DIRECTORY_SEPARATOR, str_replace('/', DIRECTORY_SEPARATOR, $folder)),'/\\');
+                    $frameworkSearchFoldres[] = $DS.trim(str_replace('\\', $DS, str_replace('/', $DS, $folder)),'/\\');
                 }
             }
-            $defineRoot = isset($options['define-root']) && $options['define-root'] === TRUE ? TRUE : FALSE;
+            $defineRoot = isset($options['define-root']) && $options['define-root'] === true ? true : false;
             $root = isset($options['root']) ? trim($options['root'],'\\/') : '';
-            if(strlen($root) != 0 && explode(DIRECTORY_SEPARATOR, $root)[0] == 'home'){
+            if(strlen($root) != 0 && explode($DS, $root)[0] == 'home'){
                 //linux 
-                $root = DIRECTORY_SEPARATOR.$root;
+                $root = $DS.$root;
             }
             $onFail = isset($options['on-load-failure']) ? $options['on-load-failure'] : 'throw-exception';
             self::$loader = new AutoLoader($root, $frameworkSearchFoldres, $defineRoot,$onFail);
         }
-        //Logger::logFuncReturn(__METHOD__);
         return self::$loader;
     }
     /**
@@ -126,39 +125,27 @@ class AutoLoader{
      * @since 1.0
      */
     private function __construct($root='',$searchFolders=array(),$defineRoot=false,$onFail='throw-exception') {
-        //Logger::logFuncCall(__METHOD__);
-        //Logger::log('$root = \''.$root.'\'', 'debug');
-        //Logger::log('$defineRoot = \''.$defineRoot.'\'', 'debug');
         if(defined('ROOT_DIR')){
-            //Logger::log('Setting root search directory to ROOT_DIR.');
             $this->rootDir = ROOT_DIR;
         }
         else{
-            //Logger::log('ROOT_DIR is not defined.', 'warning');
             if(strlen($root) != 0 && is_dir($root)){
                 $this->rootDir = $root;
-                if($defineRoot === TRUE){
-                    //Logger::log('Defining ROOT_DIR.');
+                if($defineRoot === true){
                     define('ROOT_DIR', $this->rootDir);
-                    //Logger::log('ROOT_DIR = \''.ROOT_DIR.'\'.','debug');
                 }
             }
-            else if($defineRoot === TRUE){
-                //Logger::log('ROOT_DIR is not defined.', 'warning');
-                //Logger::log('Defining ROOT_DIR.');
+            else if($defineRoot === true){
                 $this->rootDir = __DIR__;
                 foreach ($searchFolders as $folder){
                     $this->rootDir = str_replace($folder, '', $this->rootDir);
                 }
                 define('ROOT_DIR', $this->rootDir);
-                //Logger::log('ROOT_DIR = \''.ROOT_DIR.'\'.','debug');
             }
             else{
-                //Logger::log('Unable to set root search folder. An exception is thrown.','error');
                 throw new Exception('Unable to set root search folder.');
             }
         }
-        //Logger::log('Root search folder was set to \''.$this->rootDir.'\'.', 'debug');
         if(gettype($searchFolders) == 'array'){
             foreach ($searchFolders as $folder){
                 $this->addSearchDirectory($folder);
@@ -190,11 +177,9 @@ class AutoLoader{
      * @deprecated since version 1.1.2
      */
     public function addSearchDirectory($dir,$incSubFolders=true) {
-        //Logger::logFuncCall(__METHOD__);
-        //Logger::log('Passed value = \''.$dir.'\'', 'debug');
+        $DS = DIRECTORY_SEPARATOR;
         if(strlen($dir) != 0){
-            //Logger::log('Folder added.');
-            $cleanDir = DIRECTORY_SEPARATOR. trim(str_replace('\\', DIRECTORY_SEPARATOR, str_replace('/', DIRECTORY_SEPARATOR, $dir)), '\\/');
+            $cleanDir = $DS. trim(str_replace('\\', $DS, str_replace('/', $DS, $dir)), '\\/');
             if($incSubFolders){
                 $dirsStack = array();
                 $dirsStack[] = $cleanDir;
@@ -204,7 +189,7 @@ class AutoLoader{
                         $subDirs = scandir($fullPath);
                         foreach ($subDirs as $subDir){
                             if($subDir != '.' && $subDir != '..'){
-                                $dirsStack[] = $xDir.DIRECTORY_SEPARATOR.$subDir;
+                                $dirsStack[] = $xDir.$DS.$subDir;
                             }
                         }
                         $this->searchFolders[] = $xDir;
@@ -214,7 +199,7 @@ class AutoLoader{
                             $subDirs = scandir($fullPath);
                             foreach ($subDirs as $subDir){
                                 if($subDir != '.' && $subDir != '..'){
-                                    $dirsStack[] = $xDir.DIRECTORY_SEPARATOR.$subDir;
+                                    $dirsStack[] = $xDir.$DS.$subDir;
                                 }
                             }
                             $this->searchFolders[] = $xDir;
@@ -226,7 +211,6 @@ class AutoLoader{
                 $this->searchFolders[] = $cleanDir;
             }
         }
-        //Logger::logFuncReturn(__METHOD__);
     }
     /**
      * 
@@ -243,18 +227,22 @@ class AutoLoader{
      * @since 1.0
      */
     private function loadClass($classPath){
+        $DS = DIRECTORY_SEPARATOR;
         $cArr = explode('\\', $classPath);
         $className = $cArr[count($cArr) - 1];
-        $loaded = FALSE;
+        $loaded = false;
         foreach ($this->searchFolders as $value) {
-            $f = $this->getRoot().$value.DIRECTORY_SEPARATOR.$className.'.php';
-            //Logger::log('Checking if file \''.$f.'\' exist...', 'debug');
+            $f = $this->getRoot().$value.$DS.$className.'.php';
+            //lower case class name to support loading of old-style classes.
+            $f2 = $this->getRoot().$value.$DS. strtolower($className).'.php';
             if(file_exists($f)){
-                //Logger::log('Class \''.$className.'\' found. Loading the class...');
                 require_once $f;
-                $loaded = TRUE;
-                //Logger::log('Class \''.$className.'\' loaded.');
-                //Logger::logFuncReturn(__METHOD__);
+                $loaded = true;
+                break;
+            }
+            else if(file_exists($f2)){
+                require_once $f2;
+                $loaded = true;
                 break;
             }
         }
@@ -270,8 +258,6 @@ class AutoLoader{
                 //do nothing
             }
         }
-        //Logger::log('Class \''.$className.'\' was not found.', 'error');
-        //Logger::logFuncReturn(__METHOD__);
     }
     /**
      * Returns the root directory that is used to search inside.

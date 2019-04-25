@@ -84,7 +84,7 @@ class Config{
      * Initialize configuration.
      */
     private function __construct() {
-        $this->isConfigured = FALSE;
+        $this->isConfigured = false;
         $this->releaseDate = '2019-03-06';
         $this->version = '1.0.0';
         $this->versionType = 'Stable';
@@ -104,7 +104,7 @@ class Config{
      * @since 1.0
      */
     public static function &get(){
-        if(self::$cfg != NULL){
+        if(self::$cfg != null){
             return self::$cfg;
         }
         self::$cfg = new Config();
@@ -130,7 +130,7 @@ class Config{
      * Checks if the system is configured or not.
      * This method is helpful in case the developer would like to create some 
      * kind of a setup wizard for the web application.
-     * @return boolean TRUE if the system is configured.
+     * @return boolean true if the system is configured.
      * @since 1.0
      */
     public static function isConfig(){
@@ -188,9 +188,9 @@ class Config{
     /**
      * Returns database connection information given database name.
      * @param string $dbName The name of the database.
-     * @return DBConnectionInfo|NULL The method will return an object of type 
+     * @return DBConnectionInfo|null The method will return an object of type 
      * DBConnectionInfo if a connection info was found for the given database. 
-     * Other than that, the method will return NULL.
+     * Other than that, the method will return null.
      * @since 1.3.3
      */
     public static function getDBConnection($dbName){
@@ -198,6 +198,6 @@ class Config{
         if(isset($conns[$dbName])){
             return $conns[$dbName];
         }
-        return NULL;
+        return null;
     } 
 }

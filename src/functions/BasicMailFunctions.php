@@ -76,7 +76,7 @@ class BasicMailFunctions extends Functions{
      */
     public static function &get(){
         Logger::logFuncCall(__METHOD__);
-        if(self::$instance === NULL){
+        if(self::$instance === null){
             Logger::log('Initializing \'BasicMailFunctions\' instance...');
             self::$instance = new BasicMailFunctions();
             Logger::log('Initializing of \'BasicMailFunctions\' completed.');
@@ -113,7 +113,7 @@ class BasicMailFunctions extends Functions{
     private function writeMailConfig($emailAccountsArr){
         Logger::logFuncCall(__METHOD__);
         $fh = new FileHandler(ROOT_DIR.'/conf/MailConfig.php');
-        $fh->write('<?php', TRUE, TRUE);
+        $fh->write('<?php', true, true);
         $fh->write('/*
  * The MIT License
  *
@@ -139,7 +139,7 @@ class BasicMailFunctions extends Functions{
  */
  
 ');
-        $fh->write('namespace webfiori\conf;', TRUE, TRUE);
+        $fh->write('namespace webfiori\conf;', true, true);
         $fh->write('if(!defined(\'ROOT_DIR\')){
     header("HTTP/1.1 403 Forbidden");
     die(\'\'
@@ -156,16 +156,16 @@ class BasicMailFunctions extends Functions{
         . \'</p>\'
         . \'</body>\'
         . \'</html>\');
-}', TRUE, TRUE);
-        $fh->write('use webfiori\entity\mail\SMTPAccount;', TRUE, TRUE);
+}', true, true);
+        $fh->write('use webfiori\entity\mail\SMTPAccount;', true, true);
         $fh->write('/**
  * SMTP configuration class.
  * The developer can create multiple SMTP accounts and add 
  * Connection information inside the body of this class.
  * @author Ibrahim
  * @version 1.0
- */', TRUE, TRUE);
-        $fh->write('class MailConfig{', TRUE, TRUE);
+ */', true, true);
+        $fh->write('class MailConfig{', true, true);
         $fh->addTab();
         //stat here
         $fh->write('private $emailAccounts;
@@ -183,12 +183,12 @@ class BasicMailFunctions extends Functions{
      * @since 1.0
      */
     public static function &get(){
-        if(self::$inst === NULL){
+        if(self::$inst === null){
             self::$inst = new MailConfig();
         }
         return self::$inst;
-    }', TRUE, TRUE);
-        $fh->write('private function __construct() {', TRUE, TRUE);
+    }', true, true);
+        $fh->write('private function __construct() {', true, true);
         $fh->addTab();
         $fh->reduceTab();
         //adding email accounts
@@ -201,10 +201,10 @@ class BasicMailFunctions extends Functions{
         $acc'.$index.'->setPassword(\''.$emailAcc->getPassword().'\');
         $acc'.$index.'->setName(\''.$emailAcc->getName().'\');
         $acc'.$index.'->setPort('.$emailAcc->getPort().');
-        $this->addAccount($acc'.$index.', \'no-replay\');',TRUE,TRUE);
+        $this->addAccount($acc'.$index.', \'no-replay\');',true,true);
             $index++;
         }
-        $fh->write('}', TRUE, TRUE);
+        $fh->write('}', true, true);
         $fh->reduceTab();
         $fh->write('/**
      * Adds an email account.
@@ -221,17 +221,17 @@ class BasicMailFunctions extends Functions{
         if(isset($this->emailAccounts[$name])){
             return $this->emailAccounts[$name];
         }
-        $null = NULL;
+        $null = null;
         return $null;
     }
     /**
      * Returns an email account given its name.
      * The method will search for an account with the given name in the set 
-     * of added accounts. If no account was found, NULL is returned.
+     * of added accounts. If no account was found, null is returned.
      * @param string $name The name of the account.
      * @return EmailAccount|null If the account is found, The method 
      * will return an object of type EmailAccount. Else, the 
-     * method will return NULL.
+     * method will return null.
      * @since 1.0
      */
     public static function &getAccount($name){
@@ -249,8 +249,8 @@ class BasicMailFunctions extends Functions{
      */
     public static function getAccounts(){
         return self::get()->_getAccounts();
-    }', TRUE, TRUE);
-        $fh->write('}', TRUE, TRUE);
+    }', true, true);
+        $fh->write('}', true, true);
         $fh->close();
         Logger::logFuncReturn(__METHOD__);
     }
@@ -258,13 +258,13 @@ class BasicMailFunctions extends Functions{
      * Removes SMTP email account if it is exist.
      * @param string $accountName The name of the email account (such as 'no-replay').
      * @return boolean If the account is not exist or the class 'MailConfig' 
-     * does not exist, the method will return FALSE. If the account was removed, 
-     * The method will return TRUE.
+     * does not exist, the method will return false. If the account was removed, 
+     * The method will return true.
      * @since 1.3
      */
     public function removeAccount($accountName) {
         Logger::logFuncCall(__METHOD__);
-        $retVal = FALSE;
+        $retVal = false;
         if(class_exists('webfiori\conf\MailConfig')){
             $account = &MailConfig::getAccount($accountName);
             if($account instanceof SMTPAccount){
@@ -275,7 +275,7 @@ class BasicMailFunctions extends Functions{
                     $toSave[] = $account;
                 }
                 $this->writeMailConfig($toSave);
-                $retVal = TRUE;
+                $retVal = true;
             }
         }
         Logger::logReturnValue($retVal);
@@ -285,17 +285,17 @@ class BasicMailFunctions extends Functions{
     /**
      * Adds new SMTP account or Updates an existing one.
      * @param SMTPAccount $emailAccount An instance of 'EmailAccount'.
-     * @return boolean|string The method will return TRUE if the email 
+     * @return boolean|string The method will return true if the email 
      * account was updated or added. If the email account contains wrong server
      *  information, the method will return MailFunctions::INV_HOST_OR_PORT. 
      * If the given email account contains wrong login info, the method will 
      * return MailFunctions::INV_CREDENTIALS. Other than that, the method 
-     * will return FALSE.
+     * will return false.
      * @since 1.1
      */
     public function updateOrAddEmailAccount($emailAccount) {
         Logger::logFuncCall(__METHOD__);
-        $retVal = FALSE;
+        $retVal = false;
         if($emailAccount instanceof SMTPAccount){
             $sm = $this->getSocketMailer($emailAccount);
             if($sm instanceof SocketMailer){
@@ -312,7 +312,7 @@ class BasicMailFunctions extends Functions{
                     $arr = array($emailAccount);
                     $this->writeMailConfig($arr);
                 }
-                $retVal = TRUE;
+                $retVal = true;
             }
             $retVal = $sm;
         }
@@ -369,6 +369,6 @@ class BasicMailFunctions extends Functions{
         }
         Logger::log('The given parameter is not an instance of \'SMTPAccount\'.', 'warning');
         Logger::logFuncReturn(__METHOD__);
-        return FALSE;
+        return false;
     }
 }

@@ -16,7 +16,7 @@ AutoLoader::get(array(
         'src'
     ),
     'root'=> $root,
-    'define-root'=>TRUE,
+    'define-root'=>true,
     'on-load-failure'=>'do-nothing'
 ));
 echo 'Autoloader Initialized.'."\n";

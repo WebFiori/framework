@@ -52,12 +52,12 @@ class WebFiori{
     /**
      * An associative array that contains database connection error that might 
      * happen during initialization.
-     * @var array|NULL 
+     * @var array|null 
      * @since 1.3.3
      */
     private $dbErrDetails;
     /**
-     * A variable to store system status. The variable will be set to TRUE 
+     * A variable to store system status. The variable will be set to true 
      * if everything is Ok.
      * @var boolean|string 
      * @since 1.0
@@ -118,7 +118,7 @@ class WebFiori{
      * <li>Initializing privileges.</li>
      * <li>Setting a custom errors and exceptions handler.</li>
      * <li>Finally, routing if system configuration status is not 
-     * equal to FALSE. If it is FALSE, A message will be displayed to tell 
+     * equal to false. If it is false, A message will be displayed to tell 
      * the developer how do configure it.</li>
      * </ul>
      * @return WebFiori An instance of the class.
@@ -126,7 +126,7 @@ class WebFiori{
      */
     public static function &getAndStart(){
         if(self::$classStatus == 'NONE'){
-            if(self::$LC === NULL){
+            if(self::$LC === null){
                 self::$classStatus = 'INITIALIZING';
                 self::$LC = new WebFiori();
             }
@@ -155,6 +155,21 @@ class WebFiori{
      * @since 1.0
      */
     private function __construct() {
+        /*
+         * first, check for php streams if they are open or not.
+         */
+        if(!defined('STDIN')){
+            define('STDIN', fopen('php://stdin', 'r'));
+        }
+        if(!defined('STDOUT')){
+            define('STDOUT', fopen('php://stdout', 'w'));
+        }
+        if(!defined('STDERR')){
+            define('STDERR',fopen('php://stderr', 'w'));
+        }
+        /**
+         * Change encoding of mb_ functions to UTF-8
+         */
         if(function_exists('mb_internal_encoding')){
             mb_internal_encoding('UTF-8');
             mb_http_output('UTF-8');
@@ -162,11 +177,12 @@ class WebFiori{
             mb_regex_encoding('UTF-8');
         }
         /**
-         * Set memory limit to 2GB
+         * Set memory limit to 2GB per script
          */
         ini_set('memory_limit', '2048M');
         /**
-         * See http://php.net/manual/en/timezones.php for supported time zones
+         * See http://php.net/manual/en/timezones.php for supported time zones.
+         * Change this as needed.
          */
         date_default_timezone_set('Asia/Riyadh');
         /**
@@ -203,7 +219,7 @@ class WebFiori{
                 die($j);
             }
             //let php handle the error since it is not API call.
-            return FALSE;
+            return false;
         });
         Logger::log('Setting exceptions handler...');
         set_exception_handler(function($ex){
@@ -260,7 +276,7 @@ class WebFiori{
         //uncomment next line to show runtime errors and warnings
         //also enable logging for info, warnings and errors 
         Logger::logName('initialization-log');
-        Logger::enabled(TRUE);
+        Logger::enabled(true);
         Logger::clear();
         
         //display PHP warnings and errors
@@ -273,7 +289,7 @@ class WebFiori{
         $this->WF = WebsiteFunctions::get();
         $this->BMF = BasicMailFunctions::get();
         
-        $this->sysStatus = Util::checkSystemStatus(TRUE);
+        $this->sysStatus = Util::checkSystemStatus(true);
         
         $this->initRoutes();
         if($this->sysStatus == Util::MISSING_CONF_FILE || $this->sysStatus == Util::MISSING_SITE_CONF_FILE){
@@ -281,7 +297,7 @@ class WebFiori{
             $this->SF->createConfigFile();
             $this->WF->createSiteConfigFile();
             $this->BMF->createEmailConfigFile();
-            $this->sysStatus = Util::checkSystemStatus(TRUE);
+            $this->sysStatus = Util::checkSystemStatus(true);
         }
         if(gettype($this->sysStatus) == 'array'){
             $this->dbErrDetails = $this->sysStatus;
@@ -294,53 +310,82 @@ class WebFiori{
         $this->initPermissions();
         
         Logger::log('Initializing completed.');
-        
+        //After this step, the initialization is completed.
+        //check for system status and route user.
         self::$classStatus = 'INITIALIZED';
+        
+        define('INITIAL_SYS_STATUS', $this->_getSystemStatus());
+        Logger::log('INITIAL_SYS_STATUS = '.INITIAL_SYS_STATUS, 'debug');
+        if(INITIAL_SYS_STATUS === true){
+            //switch to the log file 'system-log.txt'.
+            Logger::logName('system-log');
+            Logger::section();
+        }
+        else if(INITIAL_SYS_STATUS == Util::DB_NEED_CONF){
+            Logger::log('Unable to connect to database.', 'warning');
+            $err = $this->dbErrDetails;
+            Logger::log('Database Error Code: '.$err['error-code']);
+            Logger::log('Database Error Message: '.$err['error-message']);
+            //switch to the log file 'system-log.txt'.
+            Logger::logName('system-log');
+            Logger::section();
+        }
+        else{
+            //you can modify this part to make 
+            //it do something else in case system 
+            //configuration is not equal to true
+
+            //change system config status to configured.
+            //WebFiori::getSysFunctions()->configured(true);
+
+            //show error message to tell the developer how to configure the system.
+            $this->_needConfigration();
+        }
     }
     /**
      * Returns an instance of the class 'Config'.
      * The class will contain some of framework settings in addition to 
      * database connection information.
-     * @return Config|NULL If class file is exist and the class is loaded, 
+     * @return Config|null If class file is exist and the class is loaded, 
      * an object of type 'Config' is returned. Other than that, the method 
-     * will return NULL.
+     * will return null.
      * @since 1.3.3
      */
     public static function &getConfig() {
         if(class_exists('webfiori\conf\Config')){
             return Config::get();
         }
-        $n = NULL;
+        $n = null;
         return $n;
     }
     /**
      * Returns an instance of the class 'SiteConfig'.
      * The class will contain website settings such as main language and theme.
-     * @return SiteConfig|NULL If class file is exist and the class is loaded, 
+     * @return SiteConfig|null If class file is exist and the class is loaded, 
      * an object of type 'SiteConfig' is returned. Other than that, the method 
-     * will return NULL.
+     * will return null.
      * @since 1.3.3
      */
     public static function &getSiteConfig() {
         if(class_exists('webfiori\conf\SiteConfig')){
             return SiteConfig::get();
         }
-        $n = NULL;
+        $n = null;
         return $n;
     }
     /**
      * Returns an instance of the class 'MailConfig'.
      * The class will contain SMTP accounts information.
-     * @return MailConfig|NULL If class file is exist and the class is loaded, 
+     * @return MailConfig|null If class file is exist and the class is loaded, 
      * an object of type 'MailConfig' is returned. Other than that, the method 
-     * will return NULL.
+     * will return null.
      * @since 1.3.3
      */
     public static function &getMailConfig() {
         if(class_exists('webfiori\conf\MailConfig')){
             return MailConfig::get();
         }
-        $n = NULL;
+        $n = null;
         return $n;
     }
     /**
@@ -349,8 +394,8 @@ class WebFiori{
      * If an error happens while connecting with the database at initialization 
      * stage, this method can be used to get error details. The array will 
      * have two indices: 'error-code' and 'error-message'.
-     * @return array|NULL An associative array that contains database connection error 
-     * information. If no errors, the method will return NULL.
+     * @return array|null An associative array that contains database connection error 
+     * information. If no errors, the method will return null.
      * @since 1.3.3
      */
     public static function getDBErrDetails(){
@@ -391,7 +436,7 @@ class WebFiori{
     /**
      * Returns the current status of the system.
      * @return boolean|string If the system is configured correctly, the method 
-     * will return TRUE. If the file 'Config.php' was not found, The method will return 
+     * will return true. If the file 'Config.php' was not found, The method will return 
      * 'Util::MISSING_CONF_FILE'. If the file 'SiteConfig.php' was not found, The method will return 
      * 'Util::MISSING_CONF_FILE'. If the system is not configured yet, the method 
      * will return 'Util::NEED_CONF'. If the system is unable to connect to 
@@ -404,7 +449,7 @@ class WebFiori{
         Logger::logFuncCall(__METHOD__);
         $retVal = self::$classStatus;
         if(self::getClassStatus() == 'INITIALIZED'){
-            $retVal = self::getAndStart()->_getSystemStatus(TRUE);
+            $retVal = self::getAndStart()->_getSystemStatus(true);
         }
         Logger::logReturnValue($retVal);
         Logger::logFuncReturn(__METHOD__);
@@ -419,7 +464,7 @@ class WebFiori{
     private function _getSystemStatus($refresh=true,$testDb=true) {
         Logger::logFuncCall(__METHOD__);
         Logger::log('Refresh status = '.$refresh, 'debug');
-        if($refresh === TRUE){
+        if($refresh === true){
             Logger::log('Updating system status.');
             $this->sysStatus = Util::checkSystemStatus($testDb);
             if(gettype($this->sysStatus) == 'array'){
@@ -511,11 +556,11 @@ class WebFiori{
             $j->add('message', '503 - Service Unavailable');
             $j->add('type', 'error');
             $j->add('description','This error means that the system is not configured yet. '
-                    . 'Make sure to make the method Config::isConfig() return TRUE. '
-                    . 'One way is to go to the file "conf/Config.php". Change attribute value at line 87 to TRUE. '
-                    . 'Or Use the method SystemFunctions::configured(TRUE). You must supply \'TRUE\' as an attribute. '
+                    . 'Make sure to make the method Config::isConfig() return true. '
+                    . 'One way is to go to the file "conf/Config.php". Change attribute value at line 87 to true. '
+                    . 'Or Use the method SystemFunctions::configured(true). You must supply \'true\' as an attribute. '
                     . 'If you want to make the system do something else if the return value of the '
-                    . 'given method is FALSE, go to the end of the file \'WebFiori.php\' and '
+                    . 'given method is false, go to the end of the file \'WebFiori.php\' and '
                     . 'change the code in the \'else\' code block.');
             $j->add('powered-by', 'WebFiori Framework v'.Config::getVersion().' ('.Config::getVersionType().')');
             die($j);
@@ -532,16 +577,16 @@ class WebFiori{
             . '<hr>'
             . '<p>'
             . 'This error means that the system is not configured yet. '
-            . 'Make sure to make the method Config::isConfig() return TRUE. There are two ways '
+            . 'Make sure to make the method Config::isConfig() return true. There are two ways '
             . 'to change return value of this method:'
             . '</p>'
             . '<ul>'
-            . '<li>Go to the file "conf/Config.php". Change attribute value at line 87 to TRUE.</li>'
-            . '<li>Use the method SystemFunctions::configured(TRUE). You must supply \'TRUE\' as an attribute.</li>'
+            . '<li>Go to the file "conf/Config.php". Change attribute value at line 87 to true.</li>'
+            . '<li>Use the method SystemFunctions::configured(true). You must supply \'true\' as an attribute.</li>'
             . '</ul>'
             . '<p>'
             . 'If you want to make the system do something else if the return value of the '
-            . 'given method is FALSE, go to the end of the file \'WebFiori.php\' and '
+            . 'given method is false, go to the end of the file \'WebFiori.php\' and '
             . 'change the code in the \'else\' code block.'
             . '</p>'
             . '<p>System Powerd By: <a href="https://github.com/usernane/webfiori" target="_blank"><b>'
@@ -560,36 +605,7 @@ class WebFiori{
         WebFiori::getAndStart()->_needConfigration();
     }
 }
-
 //start the system
 WebFiori::getAndStart();
-define('INITIAL_SYS_STATUS',WebFiori::sysStatus());
-Logger::log('INITIAL_SYS_STATUS = '.INITIAL_SYS_STATUS, 'debug');
-if(INITIAL_SYS_STATUS === TRUE){
-    //switch to the log file 'system-log.txt'.
-    Logger::logName('system-log');
-    Logger::section();
-    Router::route(Util::getRequestedURL());
-}
-else if(INITIAL_SYS_STATUS == Util::DB_NEED_CONF){
-    Logger::log('Unable to connect to database.', 'warning');
-    $err = WebFiori::getDBErrDetails();
-    Logger::log('Database Error Code: '.$err['error-code']);
-    Logger::log('Database Error Message: '.$err['error-message']);
-    //switch to the log file 'system-log.txt'.
-    Logger::logName('system-log');
-    Logger::section();
-    Router::route(Util::getRequestedURL());
-    Logger::requestCompleted();
-}
-else{
-    //you can modify this part to make 
-    //it do something else in case system 
-    //configuration is not equal to TRUE
-    
-    //change system config status to configured.
-    //WebFiori::getSysFunctions()->configured(TRUE);
-    
-    //show error message to tell the developer how to configure the system.
-    WebFiori::configErr();
-}
+//then route user request.
+Router::route(Util::getRequestedURL());

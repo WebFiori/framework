@@ -79,7 +79,7 @@ class SystemFunctions extends Functions{
      * An array that contains initial system configuration variables.
      * This array has the following indices and values:
      * <ul>
-     * <li>is-config = 'FALSE'</li>
+     * <li>is-config = 'false'</li>
      * <li>release-date = '01-01-2019 (DD-MM-YYYY)'</li>
      * <li>version = '1.0.1'</li>
      * <li>version-type = 'Stable'</li>
@@ -89,7 +89,7 @@ class SystemFunctions extends Functions{
      * @since 1.0
      */
     const INITIAL_CONFIG_VARS = array(
-        'is-config'=>'FALSE',
+        'is-config'=>'false',
         'release-date'=>'2019-03-06',
         'version'=>'1.0.0',
         'version-type'=>'Stable',
@@ -109,7 +109,7 @@ class SystemFunctions extends Functions{
      */
     public static function &get(){
         Logger::logFuncCall(__METHOD__);
-        if(self::$singleton === NULL){
+        if(self::$singleton === null){
             Logger::log('Initializing \'SystemFunctions\' instance...');
             self::$singleton = new SystemFunctions();
             Logger::log('Initializing of \'SystemFunctions\' completed.');
@@ -200,14 +200,14 @@ class SystemFunctions extends Functions{
      * This method is useful when the developer would like to create some 
      * kind of a setup wizard for his web application. This method is used 
      * to update the value which is returned by the method  Config::isConfig().
-     * @param boolean $isConfig TRUE to set system as configured. 
-     * FALSE to make it not configured.
+     * @param boolean $isConfig true to set system as configured. 
+     * false to make it not configured.
      * @since 1.3
      */
     public function configured($isConfig=true){
         Logger::logFuncCall(__METHOD__);
         $confVars = $this->getConfigVars();
-        $confVars['is-config'] = $isConfig === TRUE ? 'TRUE' : 'FALSE';
+        $confVars['is-config'] = $isConfig === true ? 'true' : 'false';
         Logger::log('Is Configured = '.$confVars['is-config'], 'debug');
         $this->writeConfig($confVars);
         Logger::logFuncReturn(__METHOD__);
@@ -217,7 +217,7 @@ class SystemFunctions extends Functions{
      * info.
      * The array that will be returned will have the following information: 
      * <ul>
-     * <li>is-config: A string. 'TRUE' or 'FALSE'</li>
+     * <li>is-config: A string. 'true' or 'false'</li>
      * <li>release-date: The release date of WebFiori Framework.</li>
      * <li>version: Version number of WebFiori Framework.</li>
      * <li>version-type: Type of WebFiori Framework version.</li>
@@ -233,7 +233,7 @@ class SystemFunctions extends Functions{
     public function getConfigVars(){
         $cfgArr = SystemFunctions::INITIAL_CONFIG_VARS;
         if(class_exists('webfiori\conf\Config')){
-            $cfgArr['is-config'] = Config::isConfig() === TRUE ? 'TRUE' : 'FALSE';
+            $cfgArr['is-config'] = Config::isConfig() === true ? 'true' : 'false';
             $cfgArr['databases'] = Config::getDBConnections();
         }
         return $cfgArr;
@@ -249,7 +249,7 @@ class SystemFunctions extends Functions{
         $configFileLoc = ROOT_DIR.'/conf/Config.php';
         Logger::log('Saving configuration variables to the file \''.$configFileLoc.'\'.');
         $fh = new FileHandler($configFileLoc);
-        $fh->write('<?php', TRUE, TRUE);
+        $fh->write('<?php', true, true);
         $fh->write('/*
  * The MIT License
  *
@@ -275,7 +275,7 @@ class SystemFunctions extends Functions{
  */
  
 ');
-        $fh->write('namespace webfiori\conf;', FALSE, TRUE);
+        $fh->write('namespace webfiori\conf;', false, true);
         $fh->write('if(!defined(\'ROOT_DIR\')){
     header("HTTP/1.1 403 Forbidden");
     die(\'\'
@@ -292,16 +292,16 @@ class SystemFunctions extends Functions{
         . \'</p>\'
         . \'</body>\'
         . \'</html>\');
-}', TRUE, TRUE);
-        $fh->write('use webfiori\entity\DBConnectionInfo;', TRUE, TRUE);
+}', true, true);
+        $fh->write('use webfiori\entity\DBConnectionInfo;', true, true);
         $fh->write('/**
  * Global configuration class. 
  * Used by the server part and the presentation part. It contains framework version 
  * information and database connection settings.
  * @author Ibrahim
  * @version 1.3.3
- */', TRUE, TRUE);
-        $fh->write('class Config{', TRUE, TRUE);
+ */', true, true);
+        $fh->write('class Config{', true, true);
         $fh->addTab();
         //stat here
         $fh->write('/**
@@ -333,7 +333,7 @@ class SystemFunctions extends Functions{
      * @var type 
      */
     private $dbConnections;
-    ',TRUE,TRUE);
+    ',true,true);
         $fh->write('/**
      * Initialize configuration.
      */
@@ -343,7 +343,7 @@ class SystemFunctions extends Functions{
         $this->version = \''.$configArr['version'].'\';
         $this->versionType = \''.$configArr['version-type'].'\';
         $this->configVision = \''.$configArr['config-file-version'].'\';
-        $this->dbConnections = array(', TRUE, TRUE);
+        $this->dbConnections = array(', true, true);
         $count = count($configArr['databases']);
         $i = 0;
         foreach ($configArr['databases'] as $dbName => $dbConn){
@@ -357,7 +357,7 @@ class SystemFunctions extends Functions{
                     .'\',\''
                     .$dbConn->getHost().'\','
                     . ''
-                    .$dbConn->getPort().')', TRUE, TRUE);
+                    .$dbConn->getPort().')', true, true);
             }
             else{
                 $fh->write('        \''.$dbName.'\'=> new DBConnectionInfo(\''
@@ -369,12 +369,12 @@ class SystemFunctions extends Functions{
                     .'\',\''
                     .$dbConn->getHost().'\','
                     . ''
-                    .$dbConn->getPort().'),', TRUE, TRUE);
+                    .$dbConn->getPort().'),', true, true);
             }
             $i++;
         }
-        $fh->write('    );', TRUE, TRUE);
-        $fh->write('}', TRUE, TRUE);
+        $fh->write('    );', true, true);
+        $fh->write('}', true, true);
         $fh->write('/**
      * An instance of Config.
      * @var Config 
@@ -387,7 +387,7 @@ class SystemFunctions extends Functions{
      * @since 1.0
      */
     public static function &get(){
-        if(self::$cfg != NULL){
+        if(self::$cfg != null){
             return self::$cfg;
         }
         self::$cfg = new Config();
@@ -413,7 +413,7 @@ class SystemFunctions extends Functions{
      * Checks if the system is configured or not.
      * This method is helpful in case the developer would like to create some 
      * kind of a setup wizard for the web application.
-     * @return boolean TRUE if the system is configured.
+     * @return boolean true if the system is configured.
      * @since 1.0
      */
     public static function isConfig(){
@@ -471,9 +471,9 @@ class SystemFunctions extends Functions{
     /**
      * Returns database connection information given database name.
      * @param string $dbName The name of the database.
-     * @return DBConnectionInfo|NULL The method will return an object of type 
+     * @return DBConnectionInfo|null The method will return an object of type 
      * DBConnectionInfo if a connection info was found for the given database. 
-     * Other than that, the method will return NULL.
+     * Other than that, the method will return null.
      * @since 1.3.3
      */
     public static function getDBConnection($dbName){
@@ -481,10 +481,10 @@ class SystemFunctions extends Functions{
         if(isset($conns[$dbName])){
             return $conns[$dbName];
         }
-        return NULL;
-    } ', TRUE, TRUE);
+        return null;
+    } ', true, true);
         $fh->reduceTab();
-        $fh->write('}', TRUE, TRUE);
+        $fh->write('}', true, true);
         $fh->close();
         Logger::logFuncReturn(__METHOD__);
     }
@@ -493,7 +493,7 @@ class SystemFunctions extends Functions{
      * Note that the method will throw an exception in case one of the 3 main 
      * configuration files is missing.
      * @return boolean If the system is configured, the method will return 
-     * TRUE. If it is not configured, It will return FALSE.
+     * true. If it is not configured, It will return false.
      * @throws Exception If one of configuration files is missing. The format 
      * of exception message will be 'XX.php is missing.' where XX is the name 
      * of the configuration file.

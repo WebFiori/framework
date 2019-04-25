@@ -1,15 +1,15 @@
 language: php
 php:
-  - 5.6
-  - 7.0
-  - 7.1
-  - 7.2
-  - 7.3
+    - 5.6
+    - 7.0
+    - 7.1
+    - 7.2
+    - 7.3
 before_install:
 before_script:
- - composer self-update
- - composer install --prefer-source --no-interaction --dev
+    - composer self-update
+    - composer install --prefer-source --no-interaction --dev
 script:
- - phpunit --configuration phpunit.xml
+    - phpunit --configuration phpunit.xml
 after_success:
- - bash <(curl -s https://codecov.io/bash)
+    - bash <(curl -s https://codecov.io/bash)

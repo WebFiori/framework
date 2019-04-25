@@ -121,7 +121,7 @@ class SiteConfig{
      * @since 1.0
      */
     public static function &get(){
-        if(self::$siteCfg != NULL){
+        if(self::$siteCfg != null){
             return self::$siteCfg;
         }
         self::$siteCfg = new SiteConfig();

@@ -41,7 +41,7 @@ if(!defined('ROOT_DIR')){
         . '</body>'
         . '</html>');
 }
-use webfiori\entity\mail\EmailAccount;
+use webfiori\entity\mail\SMTPAccount;
 /**
  * SMTP configuration class.
  * The developer can create multiple SMTP accounts and add 
@@ -65,7 +65,7 @@ class MailConfig{
      * @since 1.0
      */
     public static function &get(){
-        if(self::$inst === NULL){
+        if(self::$inst === null){
             self::$inst = new MailConfig();
         }
         return self::$inst;
@@ -87,17 +87,17 @@ class MailConfig{
         if(isset($this->emailAccounts[$name])){
             return $this->emailAccounts[$name];
         }
-        $null = NULL;
+        $null = null;
         return $null;
     }
     /**
      * Returns an email account given its name.
      * The method will search for an account with the given name in the set 
-     * of added accounts. If no account was found, NULL is returned.
+     * of added accounts. If no account was found, null is returned.
      * @param string $name The name of the account.
      * @return EmailAccount|null If the account is found, The method 
      * will return an object of type EmailAccount. Else, the 
-     * method will return NULL.
+     * method will return null.
      * @since 1.0
      */
     public static function &getAccount($name){

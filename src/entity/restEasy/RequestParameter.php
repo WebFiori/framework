@@ -29,11 +29,11 @@ use jsonx\JsonX;
 /**
  * A class that represents request parameter.
  * @author Ibrahim
- * @version 1.2.1
+ * @version 1.2.2
  */
 class RequestParameter implements JsonI{
     /**
-     * A boolean value that can be set to TRUE to allow empty strings.
+     * A boolean value that can be set to true to allow empty strings.
      * @var boolean 
      * @since 1.2.1
      */
@@ -52,7 +52,7 @@ class RequestParameter implements JsonI{
     private $name;
     /**
      * Indicates wither the attribute is optional or not.
-     * @var boolean TRUE if the parameter is optional.
+     * @var boolean true if the parameter is optional.
      * @since 1.0
      */
     private $isOptional;
@@ -101,12 +101,12 @@ class RequestParameter implements JsonI{
      * @since 1.1
      */
     public function setDescription($desc) {
-        $this->desc = $desc;
+        $this->desc = trim($desc);
     }
     /**
      * Returns the description of the parameter.
-     * @return string|NULL The description of the parameter. If the description is 
-     * not set, the method will return NULL.
+     * @return string|null The description of the parameter. If the description is 
+     * not set, the method will return null.
      * @since 1.1
      */
     public function getDescription() {
@@ -116,30 +116,55 @@ class RequestParameter implements JsonI{
      * Creates new instance of the class.
      * @param string $name The name of the parameter as it appears in the request body. 
      * It must be a valid name. If the given name is invalid, the parameter 
-     * name will be set to 'a-parameter'.
-     * @param string $type The type of the data that will be in the parameter (integer, 
-     * string, email etc...). It must be a value from the array APIFilter::TYPES. 
-     * Default is 'string'.
-     * @param boolean $isOptional Set to TRUE if the parameter is optional. Default 
-     * is FALSE.
+     * name will be set to 'a-parameter'. Valid name must comply with the following 
+     * rules:
+     * <ul>
+     * <li>It can contain the letters [A-Z] and [a-z].</li>
+     * <li>It can contain the numbers [0-9].</li>
+     * <li>It can have the character '-' and the character '_'.</li>
+     * </ul>
+     * @param string $type The type of the data that will be in the parameter stored 
+     * by the parameter. Supported types are:
+     * <ul>
+     * <li>string</li>
+     * <li>integer</li>
+     * <li>email</li>
+     * <li>float</li>
+     * <li>url</li>
+     * <li>boolean</li>
+     * <li>array</li>
+     * </ul> 
+     * If invalid type is given or no type is provided, 'string' will be used by 
+     * default.
+     * @param boolean $isOptional Set to true if the parameter is optional. Default 
+     * is false.
      */
     public function __construct($name,$type='string',$isOptional=false) {
         if(!$this->setName($name)){
             $this->setName('a-parameter');
         }
-        $this->isOptional = $isOptional;
+        $this->setIsOptional($isOptional);
         if(!$this->setType($type)){
             $this->type = 'string';
         }
-        $this->applyBasicFilter = FALSE;
-        $this->isEmptStrAllowed = FALSE;
+        $this->applyBasicFilter = true;
+        $this->isEmptStrAllowed = false;
+    }
+    /**
+     * Sets the value of the property 'is optional'.
+     * @param boolean $bool True to make the parameter optional. False to make 
+     * it mandatory.
+     * @since 1.2.2
+     */
+    public function setIsOptional($bool) {
+        $this->isOptional = $bool === true ? true : false;
     }
     /**
      * Returns the minimum numeric value the parameter can accept.
      * This method apply only to and integer type.
-     * @return int|NULL The minimum numeric value the parameter can accept. 
+     * @return int|null The minimum numeric value the parameter can accept. 
      * If the request parameter type is not numeric, the method will return 
-     * NULL.
+     * null.
      * @since 1.1
      */
     public function getMinVal() {
@@ -148,9 +173,9 @@ class RequestParameter implements JsonI{
     /**
      * Returns the maximum numeric value the parameter can accept.
      * This method apply only to integer type.
-     * @return int|NULL The maximum numeric value the parameter can accept. 
+     * @return int|null The maximum numeric value the parameter can accept. 
      * If the request parameter type is not numeric, the method will return 
-     * NULL.
+     * null.
      * @since 1.1
      */
     public function getMaxVal() {
@@ -161,30 +186,34 @@ class RequestParameter implements JsonI{
      * The value will be updated 
      * only if:
      * <ul>
-     * <li>The request parameter type is numeric ('integer').</li>
+     * <li>The request parameter type is numeric ('integer' or 'float').</li>
      * <li>The given value is less than RequestParameter::getMaxVal()</li>
      * </ul>
      * @param int $val The minimum value to set.
-     * @return boolean The method will return TRUE once the minimum value 
-     * is updated. FALSE if not.
+     * @return boolean The method will return true once the minimum value 
+     * is updated. false if not.
      * @since 1.1
      */
     public function setMinVal($val) {
         $type = $this->getType();
-        if($type == 'integer'){
+        $valType = gettype($val);
+        if(($type == 'integer' && $valType == 'integer') || 
+            ($type == 'float' && ($valType == 'double' || $valType == 'integer'))){
             $max = $this->getMaxVal();
-            if($max != NULL && $val < $max){
+            if($max !== null && $val < $max){
                 $this->minVal = $val;
-                return TRUE;
+                return true;
             }
         }
-        return FALSE;
+        return false;
     }
     /**
      * Checks if empty strings are allowed as values for the parameter.
-     * By default, The method will return FALSE.
-     * @return boolean TRUE if empty strings are allowed as values for the parameter. 
-     * FALSE if not.
+     * If the property value is not updated using the method 
+     * RequestParameter::setIsEmptyStringAllowed(), The method will return 
+     * default value which is false.
+     * @return boolean true if empty strings are allowed as values for the parameter. 
+     * false if not.
      * @since 1.2.1
      */
     public function isEmptyStringAllowed() {
@@ -194,58 +223,75 @@ class RequestParameter implements JsonI{
      * Allow or disallow empty strings as values for the parameter.
      * The value of the attribute will be updated only if the type of the 
      * parameter is set to 'string'.
-     * @param boolean $bool TRUE to allow empty strings and FALSE to disallow 
+     * @param boolean $bool true to allow empty strings and false to disallow 
      * empty strings.
+     * @return boolean The method will return true if the property is updated. 
+     * If datatype of the request parameter is not string, The method will 
+     * not update the property value and will return false.
      * @since 1.2.1
      */
     public function setIsEmptyStringAllowed($bool) {
         if($this->getType() == 'string'){
-            $this->isEmptStrAllowed = $bool === TRUE ? TRUE : FALSE;
+            $this->isEmptStrAllowed = $bool === true ? true : false;
+            return true;
         }
+        return false;
     }
     /**
      * Sets the maximum value.
      * The value will be updated 
      * only if:
      * <ul>
-     * <li>The request parameter type is numeric ('integer').</li>
+     * <li>The request parameter type is numeric ('integer' or 'float').</li>
      * <li>The given value is greater than RequestParameter::getMinVal()</li>
      * </ul>
      * @param int $val The maximum value to set.
-     * @return boolean The method will return TRUE once the maximum value 
-     * is updated. FALSE if not.
+     * @return boolean The method will return true once the maximum value 
+     * is updated. false if not.
      * @since 1.1
      */
     public function setMaxVal($val) {
         $type = $this->getType();
-        if($type == 'integer'){
+        $valType = gettype($val);
+        if(($type == 'integer' && $valType == 'integer') || 
+            ($type == 'float' && ($valType == 'double' || $valType == 'integer'))){
             $min = $this->getMinVal();
-            if($min != NULL && $val > $min){
+            if($min !== null && $val > $min){
                 $this->maxVal = $val;
-                return TRUE;
+                return true;
             }
         }
-        return FALSE;
+        return false;
     }
     
     /**
      * Sets a default value for the parameter to use if the parameter is 
-     * not provided.
+     * not provided Or when the filter fails.
      * This method can be used to include a default value for the parameter if 
-     * it is optional.
-     * @param mixed $val default value for the parameter to use if the parameter is 
-     * not provided.
+     * it is optional or in case the filter was not able to filter given value.
+     * @param mixed $val default value for the parameter to use.
+     * @return boolean If the default value is set, the method will return true. 
+     * If it is not set, the method will return false.
      * @since 1.1
      */
     public function setDefault($val) {
-        $this->default = $val;
+        $valType = gettype($val);
+        $RPType = $this->getType();
+        if($valType == $RPType || 
+          ($RPType == 'float' && $valType == 'double') || 
+          ($valType == 'string' && ($RPType == 'url' || $RPType == 'email')) || 
+          ($valType == 'integer' && $RPType == 'float')){
+            $this->default = $val;
+            return true;
+        }
+        return false;
     }
     /**
      * Returns the default value to use in case the parameter is 
      * not provided.
-     * @return mixed|NULL The default value to use in case the parameter is 
+     * @return mixed|null The default value to use in case the parameter is 
      * not provided. If no default value is provided, the method will 
-     * return NULL.
+     * return null.
      * @since 1.1
      */
     public function getDefault() {
@@ -255,25 +301,33 @@ class RequestParameter implements JsonI{
      * Sets the type of the parameter.
      * @param string $type The type of the parameter. It must be a value 
      * form the array APIFilter::TYPES.
-     * @return boolean TRUE is returned if the type is updated. FALSE 
+     * @return boolean true is returned if the type is updated. false 
      * if not.
      * @since 1.1
      */
     public function setType($type) {
-        $sType = strtolower($type);
+        $sType = strtolower(trim($type));
         if(in_array($sType, APIFilter::TYPES)){
-            $this->type = $type;
-            if($sType == 'integer'){
+            $this->type = $sType;
+            if($sType == 'integer' || ($sType == 'float' && PHP_MAJOR_VERSION <= 7 && PHP_MINOR_VERSION < 2)){
+                $this->minVal = defined('PHP_INT_MIN') ? PHP_INT_MIN : ~PHP_INT_MAX;
+                $this->maxVal = PHP_INT_MAX;
+            }
+            else if($sType == 'float' && PHP_MAJOR_VERSION >= 7 && PHP_MINOR_VERSION >= 2){
+                $this->maxVal = PHP_FLOAT_MAX;
+                $this->minVal = PHP_FLOAT_MIN;
+            }
+            else if($sType == 'integer' || $sType == 'float'){
                 $this->minVal = defined('PHP_INT_MIN') ? PHP_INT_MIN : ~PHP_INT_MAX;
                 $this->maxVal = PHP_INT_MAX;
             }
             else{
-                $this->maxVal = NULL;
-                $this->minVal = NULL;
+                $this->maxVal = null;
+                $this->minVal = null;
             }
-            return TRUE;
+            return true;
         }
-        return FALSE;
+        return false;
     }
     /**
      * Sets the name of the parameter.
@@ -286,29 +340,27 @@ class RequestParameter implements JsonI{
      * </ul>
      * @param string $name The name of the parameter. 
      * @return boolean If the given name is valid, the method will return 
-     * TRUE once the name is set. FALSE is returned if the given 
+     * true once the name is set. false is returned if the given 
      * name is invalid.
      * @since 1.0
      */
     public function setName($name){
-        $name .= '';
-        $len = strlen($name);
+        $nameTrimmed = trim($name);
+        $len = strlen($nameTrimmed);
         if($len != 0){
-            if(strpos($name, ' ') === FALSE){
-                for ($x = 0 ; $x < $len ; $x++){
-                    $ch = $name[$x];
-                    if($ch == '_' || $ch == '-' || ($ch >= 'a' && $ch <= 'z') || ($ch >= 'A' && $ch <= 'Z') || ($ch >= '0' && $ch <= '9')){
+            for ($x = 0 ; $x < $len ; $x++){
+                $ch = $nameTrimmed[$x];
+                if($ch == '_' || $ch == '-' || ($ch >= 'a' && $ch <= 'z') || ($ch >= 'A' && $ch <= 'Z') || ($ch >= '0' && $ch <= '9')){
 
-                    }
-                    else{
-                        return FALSE;
-                    }
                 }
-                $this->name = $name;
-                return TRUE;
+                else{
+                    return false;
+                }
             }
+            $this->name = $nameTrimmed;
+            return true;
         }
-        return FALSE;
+        return false;
     }
     /**
      * Returns the name of the parameter.
@@ -321,7 +373,7 @@ class RequestParameter implements JsonI{
     /**
      * Returns a boolean value that can be used to tell if the parameter is 
      * optional or not.
-     * @return boolean TRUE if the parameter is optional and FALSE 
+     * @return boolean true if the parameter is optional and false 
      * if not.
      * @since 1.0
      */
@@ -339,8 +391,20 @@ class RequestParameter implements JsonI{
     /**
      * Returns a JsonX object that represents the request parameter.
      * This method is used to help front-end developers in showing the 
-     * documentation of the request parameter.
-     * @return JsonX An object of type JsonX.
+     * documentation of the request parameter. The format of JSON string 
+     * will be as follows:
+     * <p>
+     * {<br/>
+     * &nbsp;&nbsp;"name":"a-param",<br/>
+     * &nbsp;&nbsp;"type":"string",<br/>
+     * &nbsp;&nbsp;"description":null,<br/>
+     * &nbsp;&nbsp;"is-optional":true,<br/>
+     * &nbsp;&nbsp;"default-value":null,<br/>
+     * &nbsp;&nbsp;"min-val":null,<br/>
+     * &nbsp;&nbsp;"max-val":null<br/>
+     * }
+     * </p>
+     * @return JsonX An object of type JsonX. 
      * @since 1.0
      */
     public function toJSON() {
@@ -349,53 +413,55 @@ class RequestParameter implements JsonI{
         $json->add('type', $this->getType());
         $json->add('description', $this->getDescription());
         $json->add('is-optional', $this->isOptional());
-        if($this->getDefault() !== NULL){
-            $json->add('default', $this->getDefault());
-        }
-        if($this->getMinVal() !== NULL){
-            $json->add('min-val', $this->getMinVal());
-        }
-        if($this->getMaxVal() !== NULL){
-            $json->add('max-val', $this->getMaxVal());
-        }
+        $json->add('default-value', $this->getDefault());
+        $json->add('min-val', $this->getMinVal());
+        $json->add('max-val', $this->getMaxVal());
         return $json;
     }
     /**
      * Sets a callback method to work as a filter for request parameter.
-     * The callback method 
-     * will have two parameters passed to it. The first one is an associative 
-     * array that contains the not-filtered value and the value filtered 
-     * using basic filter. The values are contained in two 
-     * indices: 
+     * The callback method will have two parameters passed to it:
+     * <ul>
+     * <li>An associative array.</li>
+     * <li>An object of type RequestParameter.</li>
+     * </ul> 
+     * The associative array will contain the not-filtered value and 
+     * the value filtered using basic filter. The values are contained in two 
+     * indices of the array: 
      * <ul>
      * <li>original-value</li>
      * <li>basic-filter-result</li>
      * </ul>
-     * If the parameter $applyBasicFilter is set to FALSE, the index 'basic-filter-result' 
-     * will have the value 'NOT_APLICABLE'.
-     * The second parameter is an object of type <b>RequestParameter</b> 
-     * which contains original information for the filter. The method 
-     * must be implemented in a way that makes it return FALSE if the 
+     * <p>If the parameter $applyBasicFilter is set to false, the index 'basic-filter-result' 
+     * will have the value 'NOT_APLICABLE'.</p>
+     * <p>The object of type <b>RequestParameter</b> 
+     * will contain original information for the filter.</p> The method 
+     * must be implemented in a way that makes it return false or null if the 
      * parameter has invalid value. If the parameter is filtered and 
      * was validated, the method must return the valid and filtered 
      * value.
      * @param callback $function A callback function. 
-     * @param boolean $applyBasicFilter If set to TRUE, 
+     * @param boolean $applyBasicFilter If set to true, 
      * the basic filter will be applied to the parameter. Default 
-     * is TRUE.
+     * is true.
+     * @return boolean If the callback is set, the method will return true. If 
+     * not set, the method will return false.
      * @since 1.2
      */
     public function setCustomFilterFunction($function,$applyBasicFilter=true) {
         if(is_callable($function)){
             $this->customFilterFunc = $function;
+            $this->applyBasicFilter = $applyBasicFilter === true ? true : false;
+            return true;
         }
-        $this->applyBasicFilter = $applyBasicFilter === TRUE ? TRUE : FALSE;
+        return false;
     }
     /**
      * Checks if we need to apply basic filter or not 
      * before applying custom filter callback.
-     * @return boolean The method will return TRUE 
-     * if the basic filter will be applied before applying custom filter.
+     * @return boolean The method will return true 
+     * if the basic filter will be applied before applying custom filter. If no custom 
+     * filter is set, the method will return true by default.
      * @since 1.2
      */
     public function applyBasicFilter() {
@@ -404,11 +470,44 @@ class RequestParameter implements JsonI{
     /**
      * Returns the function that is used as a custom filter 
      * for the parameter.
-     * @return callback|NULL The function that is used as a custom filter 
-     * for the parameter. If not set, the method will return NULL.
+     * @return callback|null The function that is used as a custom filter 
+     * for the parameter. If not set, the method will return null.
      * @since 1.2
      */
     public function getCustomFilterFunction() {
         return $this->customFilterFunc;
+    }
+    /**
+     * Returns a string that represents the object.
+     * @return string A string in the following format:
+     * <p>
+     * RequestParameter[<br/>
+     * &nbsp;&nbsp;&nbsp;&nbsp;Name => 'a_name'<br/>
+     * &nbsp;&nbsp;&nbsp;&nbsp;Type => 'a_type'<br/>
+     * &nbsp;&nbsp;&nbsp;&nbsp;Description => 'a_desc'<br/>
+     * &nbsp;&nbsp;&nbsp;&nbsp;Is Optional => 'true'<br/>
+     * &nbsp;&nbsp;&nbsp;&nbsp;Default => 'a_defalt'<br/>
+     * &nbsp;&nbsp;&nbsp;&nbsp;Minimum Value => 'a_number'<br/>
+     * &nbsp;&nbsp;&nbsp;&nbsp;Maximum Value => 'a_number'
+     * <br/>]
+     * </p>
+     * If any of the values is null, the value will be shown as 'null'.
+     * @since 1.2.2
+     */
+    public function __toString() {
+        $retVal = "RequestParameter[\n";
+        $retVal .= "    Name => '".$this->getName()."',\n";
+        $retVal .= "    Type => '". $this->getType()."',\n";
+        $descStr = $this->getDescription() === null ? 'null' : $this->getDescription();
+        $retVal .= "    Description => '$descStr',\n";
+        $isOptional = $this->isOptional() ? 'true' : 'false';
+        $retVal .= "    Is Optional => '$isOptional',\n";
+        $defaultStr = $this->getDefault() === null ? 'null' : $this->getDefault();
+        $retVal .= "    Default => '$defaultStr',\n";
+        $min = $this->getMinVal() === null ? 'null' : $this->getMinVal();
+        $retVal .= "    Minimum Value => '$min',\n";
+        $max = $this->getMaxVal() === null ? 'null' : $this->getMaxVal();
+        $retVal .= "    Maximum Value => '$max'\n]\n";
+        return $retVal;
     }
 }

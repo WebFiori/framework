@@ -102,7 +102,7 @@ class WebsiteFunctions extends Functions{
      */
     public static function &get(){
         Logger::logFuncCall(__METHOD__);
-        if(self::$singleton === NULL){
+        if(self::$singleton === null){
             Logger::log('Initializing \'WebsiteFunctions\' instance...');
             self::$singleton = new WebsiteFunctions();
             Logger::log('Initializing of \'WebsiteFunctions\' completed.');
@@ -233,7 +233,7 @@ class WebsiteFunctions extends Functions{
             }
         }
         $fh = new FileHandler(ROOT_DIR.'/conf/SiteConfig.php');
-        $fh->write('<?php', TRUE, TRUE);
+        $fh->write('<?php', true, true);
         $fh->write('/*
  * The MIT License
  *
@@ -259,7 +259,7 @@ class WebsiteFunctions extends Functions{
  */
  
 ');
-        $fh->write('namespace webfiori\conf;',TRUE,TRUE);
+        $fh->write('namespace webfiori\conf;',true,true);
         $fh->write('if(!defined(\'ROOT_DIR\')){
     header("HTTP/1.1 403 Forbidden");
     die(\'\'
@@ -276,8 +276,8 @@ class WebsiteFunctions extends Functions{
         . \'</p>\'
         . \'</body>\'
         . \'</html>\');
-}', TRUE, TRUE);
-        $fh->write('use webfiori\entity\Util;', TRUE, TRUE);
+}', true, true);
+        $fh->write('use webfiori\entity\Util;', true, true);
         $fh->write('/** 
  * Website configuration class.
  * This class is used to control the following settings:
@@ -291,8 +291,8 @@ class WebsiteFunctions extends Functions{
  * <li>Admin theme of the website (if uses one).</li>
  * <li>The home page of the website.</li>
  * </ul>
- */', TRUE, TRUE);
-        $fh->write('class SiteConfig{', TRUE, TRUE);
+ */', true, true);
+        $fh->write('class SiteConfig{', true, true);
         $fh->addTab();
         $fh->write('/**
      * An array which contains all website names in different languages.
@@ -358,12 +358,12 @@ class WebsiteFunctions extends Functions{
      * @since 1.0
      */
     public static function &get(){
-        if(self::$siteCfg != NULL){
+        if(self::$siteCfg != null){
             return self::$siteCfg;
         }
         self::$siteCfg = new SiteConfig();
         return self::$siteCfg;
-    }', TRUE, TRUE);
+    }', true, true);
         $names = 'array(';
         foreach ($configArr['website-names'] as $k => $v){
             $names .= '\''.$k.'\'=>\''.$v.'\',';
@@ -384,7 +384,7 @@ class WebsiteFunctions extends Functions{
         $this->adminThemeName = \''.$configArr['admin-theme-name'].'\';
         $this->homePage = Util::getBaseURL();
         $this->descriptions = '.$descriptions.';
-    }', TRUE, TRUE);
+    }', true, true);
         $fh->write('
     private function _getPrimaryLanguage(){
         return $this->primaryLang;
@@ -498,9 +498,9 @@ class WebsiteFunctions extends Functions{
     public static function getWebsiteNames(){
         return self::get()->_getWebsiteNames();
     }
-    ', TRUE, TRUE);
+    ', true, true);
         $fh->reduceTab();
-        $fh->write('}', TRUE, TRUE);
+        $fh->write('}', true, true);
         $fh->close();
         Logger::logFuncReturn(__METHOD__);
     }

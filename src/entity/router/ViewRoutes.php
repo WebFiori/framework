@@ -56,27 +56,4 @@ class ViewRoutes {
         Router::view('/', '/default.html');
         Router::view('/example', '/ExamplePage.php');
     }
-    /**
-     * A test for creating a site map from views URIs
-     * @return string An XML string.
-     * @since 1.0
-     */
-    public static function createSiteMap() {
-        $urlSet = new HTMLNode('urlset');
-        $urlSet->setAttribute('xmlns', 'http://www.sitemaps.org/schemas/sitemap/0.9');
-        $urlSet->setAttribute('xmlns:xhtml', 'http://www.w3.org/1999/xhtml');
-        $routes = Router::get()->getRoutes();
-        foreach ($routes as $route){
-            if($route->getType() == Router::VIEW_ROUTE){
-                $url = new HTMLNode('url');
-                $loc = new HTMLNode('loc');
-                $loc->addChild(HTMLNode::createTextNode($route->getUri()));
-                $url->addChild($loc);
-                $urlSet->addChild($url);
-            }
-        }
-        $retVal = '<?xml version="1.0" encoding="UTF-8"?>';
-        $retVal .= $urlSet->toHTML();
-        return $retVal;
-    }
 }

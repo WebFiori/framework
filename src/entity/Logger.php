@@ -99,7 +99,7 @@ class Logger {
             $this->_setDirectory('/logs');
         }
         $this->_setLogName('log');
-        $this->isEnabled = FALSE;
+        $this->isEnabled = false;
         $this->functionsStack = new Stack();
     }
     /**
@@ -108,7 +108,7 @@ class Logger {
      * @since 1.0
      */
     private static function _get(){
-        if(self::$logger === NULL){
+        if(self::$logger === null){
             self::$logger = new Logger();
         }
         return self::$logger;
@@ -133,7 +133,7 @@ class Logger {
      * Adds a log message to log function or method's return value (debug).
      * @param mixed $val The return value of a function.
      * @param type $logName The name of the log file. If it is not 
-     * NULL, the log will be written to the given file name.
+     * null, the log will be written to the given file name.
      * @param boolean $addDashes If set to true, a line of dashes will be inserted 
      * after the message. Used to organize log messages.
      * @since 1.1
@@ -150,13 +150,13 @@ class Logger {
      * Enable, disable or check if logging is enabled.
      * @param boolean $isEnabled If provided and set to true, logging will be 
      * enabled. If provided and not true, logging will be disabled.
-     * @return boolean The method will return TRUE if logging is enabled. 
+     * @return boolean The method will return true if logging is enabled. 
      * false otherwise. Default return value is false which means that the 
      * logger is disabled.
      * @since 1.0
      */
     public static function enabled($isEnabled=null) {
-        if($isEnabled !== NULL){
+        if($isEnabled !== null){
             self::_get()->_setEnabled($isEnabled);
         }
         return self::_get()->_isEnabled();
@@ -169,7 +169,7 @@ class Logger {
      * that the last type will be logged only if the constant 'DEBUG' is defined. 
      * The default value is 'info'.
      * @param string $logName The name of the log file. If it is not 
-     * NULL, the log will be written to the given file name.
+     * null, the log will be written to the given file name.
      * @param boolean $addDashes If set to true, a line of dashes will be inserted 
      * after the message. Used to organize log messages.
      * @since 1.0
@@ -218,7 +218,7 @@ class Logger {
      * It is recommended to always use '__METHOD__' as this constant will return 
      * class name with it if the method is inside a class.
      * @param string $logFileName The name of the log file. If it is not 
-     * NULL, the log will be written to the given file name.
+     * null, the log will be written to the given file name.
      * @param string $addDashes If set to true, a line of dashes will be inserted 
      * after the message. Used to organize log messages.
      * @since 1.1
@@ -237,7 +237,7 @@ class Logger {
      * class name with it if the function is inside a class.
      * @param string $funcName The name of the function or method. 
      * @param string $logFileName The name of the log file. If it is not 
-     * NULL, the log will be written to the given file name. Default is NULL.
+     * null, the log will be written to the given file name. Default is null.
      * @param string $addDashes If set to true, a line of dashes will be inserted 
      * after the message. Used to organize log messages.
      * @since 1.1
@@ -255,7 +255,7 @@ class Logger {
      * @since 1.1
      */
     public static function requestCompleted() {
-        Logger::log('Processing of client request is finished.', 'info', NULL, TRUE);
+        Logger::log('Processing of client request is finished.', 'info', null, true);
     }
     /**
      * Sets or returns the full directory of the log file.
@@ -267,8 +267,8 @@ class Logger {
      * @since 1.0
      */
     public static function directory($new=null) {
-        if($new !== NULL && strlen($new) != 0){
-            self::_get()->_setDirectory($new, TRUE);
+        if($new !== null && strlen($new) != 0){
+            self::_get()->_setDirectory($new, true);
         }
         return self::_get()->_getDirectory();
     }
@@ -285,7 +285,7 @@ class Logger {
      * @since 1.0
      */
     public static function logName($new=null) {
-        if($new !== NULL && strlen($new) != 0){
+        if($new !== null && strlen($new) != 0){
             self::_get()->_setLogName($new);
         }
         return self::_get()->_getLogName();
@@ -340,7 +340,7 @@ class Logger {
      * @since 1.0
      */
     private function _setEnabled($bool){
-        $this->isEnabled = $bool === TRUE ? TRUE : FALSE;
+        $this->isEnabled = $bool === true ? true : false;
     }
     /**
      * 
@@ -410,7 +410,7 @@ class Logger {
                     fwrite($this->handelr, $message);
                 }
                 fclose($this->handelr);
-                $addDashes === TRUE ? $this->_newSec() : NULL;
+                $addDashes === true ? $this->_newSec() : null;
             }
         }
     }

@@ -83,9 +83,9 @@ class Util{
     /**
      * Returns the instance of 'MySQLLink' which is used to check database 
      * connection using the method 'Util::checkDbConnection()'.
-     * @return MySQLLink|NULL The instance of 'MySQLLink' which is used to check database 
+     * @return MySQLLink|null The instance of 'MySQLLink' which is used to check database 
      * connection using the method 'Util::checkDbConnection()'. If no test was 
-     * performed, the method will return NULL.
+     * performed, the method will return null.
      * @since 1.2
      */
     public static function getDatabaseTestInstance(){
@@ -97,18 +97,18 @@ class Util{
      * @return int|float|boolean If the given string represents an integer, 
      * the value is returned as an integer. If the given string represents a float, 
      * the value is returned as a float. If the method is unable to convert 
-     * the string to its numerical value, it will return FALSE.
+     * the string to its numerical value, it will return false.
      * @since 1.3.5
      */
     public static function numericValue($str){
         $str = trim($str);
         $len = strlen($str);
-        $isFloat = FALSE;
-        $retVal = FALSE;
+        $isFloat = false;
+        $retVal = false;
         for($y = 0 ; $y < $len ; $y++){
             $char = $str[$y];
             if($char == '.' && !$isFloat){
-                $isFloat = TRUE;
+                $isFloat = true;
             }
             else if($char == '-' && $y == 0){
                 
@@ -134,7 +134,7 @@ class Util{
      * Returns the reverse of a string.
      * This method can be used to reverse the order of any string. 
      * For example, if the given string is '   Good Morning Buddy', the 
-     * method will return 'ydduB gninriM dooG   '. If NULL is given, the 
+     * method will return 'ydduB gninriM dooG   '. If null is given, the 
      * method will return empty string.
      * @param string $str The string that will be reversed.
      * @return string The string after reversing its order.
@@ -154,7 +154,7 @@ class Util{
      * @param int $intVal The number that will be converted.
      * @return boolean|string If the given value is an integer and it is greater 
      * than -1, a string of zeros and ones is returned. Other than that, 
-     * FALSE is returned.
+     * false is returned.
      * @since 1.3.8
      */
     public static function binaryString($intVal){
@@ -175,7 +175,7 @@ class Util{
             }
             return $retVal;
         }
-        return FALSE;
+        return false;
     }
     /**
      * Returns HTTP request headers.
@@ -274,7 +274,7 @@ class Util{
      * If the given parameter is not provided, the method will try to test 
      * database settings that where set in the class 'Config'.
      * @return boolean|string If the connection was established, the method will 
-     * return TRUE. If no connection was established, the method will 
+     * return true. If no connection was established, the method will 
      * return 'Util::DB_NEED_CONF'.
      * @since 1.3.2
      */
@@ -295,7 +295,7 @@ class Util{
             Logger::log('Connected to host. Setting database...');
             if(self::$dbTestInstance->setDB($dbName)){
                 Logger::log('Database set.');
-                $returnValue = TRUE;
+                $returnValue = true;
             }
             else{
                 Logger::log('Unable to set database.','warning');
@@ -317,10 +317,10 @@ class Util{
 
     /**
      * Check the overall status of the system.
-     * @param boolean $checkDb If set to TRUE, the method will also check 
+     * @param boolean $checkDb If set to true, the method will also check 
      * database connection status. The settings of the connection will 
-     * be taken from the class 'Config'. Default is FALSE.
-     * @return boolean|string The method will return TRUE in case everything 
+     * be taken from the class 'Config'. Default is false.
+     * @return boolean|string The method will return true in case everything 
      * was fine. If the file 'Config.php' was not found, The method will return 
      * 'Util::MISSING_CONF_FILE'. If the file 'SiteConfig.php' was not found, The method will return 
      * 'Util::MISSING_CONF_FILE'. If the system is not configured yet, the method 
@@ -336,8 +336,8 @@ class Util{
         $returnValue = '';
         if(class_exists('webfiori\conf\Config')){
             if(class_exists('webfiori\conf\SiteConfig')){
-                if(Config::isConfig() === TRUE || WebFiori::getClassStatus() == 'INITIALIZING'){
-                    if($checkDb === TRUE){
+                if(Config::isConfig() === true || WebFiori::getClassStatus() == 'INITIALIZING'){
+                    if($checkDb === true){
                         Logger::log('Checking database connection...');
                         Logger::log('Database to check = \''.$dbName.'\'.', 'debug');
                         $connInfo = Config::getDBConnection($dbName);
@@ -351,7 +351,7 @@ class Util{
                             ));
                             if(gettype($returnValue) == 'object'){
                                 Logger::log('Connected.');
-                                $returnValue = TRUE;
+                                $returnValue = true;
                             }
                             else{
                                 Logger::log('Unable to connect to database.','error');
@@ -365,11 +365,11 @@ class Util{
                     }
                     else{
                         Logger::log('No need to check database connection');
-                        $returnValue = TRUE;
+                        $returnValue = true;
                     }
                 }
                 else{
-                    Logger::log('The method \'Config::isConfig()\' returned FALSE or the core is still initializing.', 'warning');
+                    Logger::log('The method \'Config::isConfig()\' returned false or the core is still initializing.', 'warning');
                     $returnValue = Util::NEED_CONF;
                 }
             }
@@ -398,7 +398,7 @@ class Util{
      * year number. The string must be provided in the format 'YYYY-MM-DD'.
      * @return int|boolean ISO-8601 numeric representation of the day that 
      * represents the given date in the week. 1 for Monday and 7 for Sunday. 
-     * If the method fails, it will return FALSE.
+     * If the method fails, it will return false.
      * @since 1.3.4
      */
     public static function getGWeekday($date) {
@@ -413,7 +413,7 @@ class Util{
                 //$yearIndex = array_
             }
         }
-        return FALSE;
+        return false;
     }
     /**
      * Returns an array that contains the dates of current week's days in Gregorian calendar.
@@ -536,10 +536,10 @@ class Util{
     /**
      * Checks if a given directory exists or not.
      * @param string $dir A string in a form of directory (Such as 'root/home/res').
-     * @param boolean $createIfNot If set to TRUE and the given directory does 
+     * @param boolean $createIfNot If set to true and the given directory does 
      * not exists, The method will try to create the directory.
-     * @return boolean In general, the method will return FALSE if the 
-     * given directory does not exists. The method will return TRUE only 
+     * @return boolean In general, the method will return false if the 
+     * given directory does not exists. The method will return true only 
      * in two cases, If the directory exits or it does not exists but was created.
      * @since 0.1
      */
@@ -547,17 +547,17 @@ class Util{
         if($dir){
             $dir = str_replace('\\', '/', $dir);
             if(!is_dir($dir)){
-                if($createIfNot === TRUE){
+                if($createIfNot === true){
                     if(mkdir($dir, 0755 , true)){
-                        return TRUE;
+                        return true;
                     }
                 }
             }
             else{
-                return TRUE;
+                return true;
             }
         }
-        return FALSE;
+        return false;
     }
     /**
      * Returns the base URL of the framework.

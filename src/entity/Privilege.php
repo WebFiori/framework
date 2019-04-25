@@ -107,7 +107,7 @@ class Privilege implements JsonI{
      * is not empty. In addition, The ID of the privilege can only consist 
      * of the following characters: [A-Z], [a-z], [0-9] and underscore.
      * @return boolean If the ID of the privilege is updated, the method will return 
-     * TRUE. If not updated, it will return FALSE.
+     * true. If not updated, it will return false.
      * @since 1.0
      */
     public function setID($code) {
@@ -119,11 +119,11 @@ class Privilege implements JsonI{
 
             }
             else{
-                return FALSE;
+                return false;
             }
         }
         $this->code = $xid;
-        return TRUE;
+        return true;
     }
     /**
      * Returns an object of type JsonX that contains group info as JSON string.

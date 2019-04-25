@@ -59,7 +59,7 @@ class DatabaseSchema {
      * @since 1.0
      */
     public static function get() {
-        if(self::$schema != NULL){
+        if(self::$schema != null){
             return self::$schema;
         }
         self::$schema = new DatabaseSchema();
@@ -148,9 +148,9 @@ class DatabaseSchema {
      * make sure that the tables that are referenced by other tables put first. 
      * It must be a value greater than or equal to 20. If the given order is 
      * taken, the name will be added to the last position.
-     * @return boolean Once the name is added, the method will return TRUE. 
+     * @return boolean Once the name is added, the method will return true. 
      * If the given name is already added or it is invalid, the method will 
-     * return FALSE. The given name will be considered invalid only if 
+     * return false. The given name will be considered invalid only if 
      * no class was found which correspond to the given name.
      * @since 1.0
      */
@@ -158,7 +158,7 @@ class DatabaseSchema {
         if(class_exists($queryClassName)){
             foreach ($this->queries as $q){
                 if($q == $queryClassName){
-                    return FALSE;
+                    return false;
                 }
             }
             if(gettype($order) == 'integer'){
@@ -186,9 +186,9 @@ class DatabaseSchema {
                     $this->queries[20] = $queryClassName;
                 }
             }
-            return TRUE;
+            return true;
         }
-        return FALSE;
+        return false;
     }
     /**
      * Returns the array which contains the names of query builder classes.

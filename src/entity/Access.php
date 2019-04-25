@@ -72,7 +72,7 @@ class Access {
      * @since 1.0
      */
     private static function &get(){
-        if(self::$access != NULL){
+        if(self::$access != null){
             return self::$access;
         }
         self::$access = new Access();
@@ -81,9 +81,9 @@ class Access {
     /**
      * Returns an array which contains all privileges 
      * in a specific group.
-     * @param string|NULL $groupId The ID of the group which its 
-     * privileges will be returned. If NULL is given, all privileges will be 
-     * returned. Default is NULL.
+     * @param string|null $groupId The ID of the group which its 
+     * privileges will be returned. If null is given, all privileges will be 
+     * returned. Default is null.
      * @return array An array which contains an objects of type Privilege. If 
      * the given group ID does not exist, the returned array will be empty.
      * @since 1.0
@@ -123,8 +123,8 @@ class Access {
                         }
                         else{
                             $pirivelegeId = $prSplit[0];
-                            $userHasPr = $prSplit[1] == '1' ? TRUE : FALSE;
-                            if($userHasPr === TRUE){
+                            $userHasPr = $prSplit[1] == '1' ? true : false;
+                            if($userHasPr === true){
                                 $privilegesToHave[] = $pirivelegeId;
                             }
                             else{
@@ -233,10 +233,10 @@ class Access {
             $userPrivileges = $user->privileges();
             if(count($groupsBelongsTo) != 0){
                 foreach ($userPrivileges as $privilege){
-                    $privilegeHasGroup = FALSE;
+                    $privilegeHasGroup = false;
                     foreach ($groupsBelongsTo as $group){
                         if($group->hasPrivilege($privilege)){
-                            $privilegeHasGroup = TRUE;
+                            $privilegeHasGroup = true;
                             break;
                         }
                     }
@@ -290,7 +290,7 @@ class Access {
      * @param type $array
      */
     private function _privilegesHelper($group,&$array,$groupId=null) {
-        if($groupId === NULL){
+        if($groupId === null){
             foreach ($group->privileges() as $pr){
                 $array[] = $pr;
             }
@@ -331,7 +331,7 @@ class Access {
     /**
      * 
      * @param string $groupId
-     * @return PrivilegesGroup|NULL
+     * @return PrivilegesGroup|null
      * @since 1.0
      */
     private function &_getGroup($groupId) {
@@ -346,7 +346,7 @@ class Access {
                 }
             }
         }
-        $g = NULL;
+        $g = null;
         return $g;
     }
     /**
@@ -363,20 +363,20 @@ class Access {
                 return $g;
             }
         }
-        $null = NULL;
+        $null = null;
         return $null;
     }
 
     /**
      * Returns a privilege object given privilege ID. 
      * This method will search all created groups for a privilege which has the 
-     * given ID. If not found, the method will return NULL. This method also 
+     * given ID. If not found, the method will return null. This method also 
      * can be used to check if a privilege is exist or not. If the method 
-     * has returned NULL, this means the privilege does not exist.
+     * has returned null, this means the privilege does not exist.
      * @param string $id The ID of the privilege.
-     * @return Privilege|NULL If a privilege with the given ID was found in 
+     * @return Privilege|null If a privilege with the given ID was found in 
      * any user group, It will be returned. If not, the method will return 
-     * NULL.
+     * null.
      * @since 1.0
      */
     public static function &getPrivilege($id){
@@ -391,7 +391,7 @@ class Access {
     private function &_getPrivilege($privId) {
         foreach ($this->userGroups as $g){
             $p = $this->_getPrivilegeH($privId, $g);
-            if($p !== NULL){
+            if($p !== null){
                 return $p;
             }
         }
@@ -411,11 +411,11 @@ class Access {
         }
         foreach ($group->childGroups() as $g){
             $p = $this->_getPrivilegeH($privId, $g);
-            if($p !== NULL){
+            if($p !== null){
                 return $p;
             }
         }
-        $p = NULL;
+        $p = null;
         return $p;
     }
     /**
@@ -425,10 +425,10 @@ class Access {
      * @param string $id The ID of the privilege.
      * @param string $groupId If it is provided, the search for the privilege 
      * will be limited to the group which has the given ID.
-     * @param boolean $searchChildern If set to TRUE and group ID is specified, 
+     * @param boolean $searchChildern If set to true and group ID is specified, 
      * the search for the privilege will include child groups.
-     * @return boolean The method will return TRUE if a privilege 
-     * with the given ID was found. FALSE if not.
+     * @return boolean The method will return true if a privilege 
+     * with the given ID was found. false if not.
      * @since 1.0
      */
     public static function hasPrivilege($id,$groupId=null) {
@@ -436,10 +436,10 @@ class Access {
     }
     
     private function _hasPrivilege($privilegId,$groupId) {
-        $retVal = FALSE;
+        $retVal = false;
         foreach ($this->userGroups as $g){
             $retVal = $this->_hasPrivilegeHelper($privilegId, $groupId, $g);
-            if($retVal === TRUE){
+            if($retVal === true){
                 break;
             }
         }
@@ -453,42 +453,42 @@ class Access {
      * @param PrivilegesGroup $group
      */
     private function _hasPrivilegeHelper($prId,$groupId,$group) {
-        if($groupId !== NULL && $group->getID() == $groupId){
+        if($groupId !== null && $group->getID() == $groupId){
             foreach ($group->privileges() as $p){
                 if($p->getID() == $prId){
-                    return TRUE;
+                    return true;
                 }
             }
-            return FALSE;
+            return false;
         }
-        else if($groupId == NULL){
+        else if($groupId == null){
             foreach ($group->privileges() as $p){
                 if($p->getID() == $prId){
-                    return TRUE;
+                    return true;
                 }
             }
             foreach ($group->childGroups() as $g){
                 $b = $this->_hasPrivilegeHelper($prId, $groupId, $g);
-                if($b === TRUE){
-                    return TRUE;
+                if($b === true){
+                    return true;
                 }
             }
         }
         else{
             foreach ($group->childGroups() as $g){
                 $b = $this->_hasPrivilegeHelper($prId, $groupId, $g);
-                if($b === TRUE){
-                    return TRUE;
+                if($b === true){
+                    return true;
                 }
             }
         }
-        return FALSE;
+        return false;
     }
     /**
      * Checks if a users group does exist or not given its ID.
      * @param string $groupId The ID of the group.
-     * @return boolean The method will return TRUE if a users group 
-     * with the given ID was found. FALSE if not.
+     * @return boolean The method will return true if a users group 
+     * with the given ID was found. false if not.
      * @since 1.0
      */
     public static function hasGroup($groupId){
@@ -497,10 +497,10 @@ class Access {
     /**
      * Returns an object of type UsersGroup given its ID. 
      * This method can be used to check if a group is exist or not. If 
-     * the method has returned NULL, this means the group does not exist.
+     * the method has returned null, this means the group does not exist.
      * @param string $groupId The ID of the group.
-     * @return PrivilegesGroup|NULL If a users group with the given ID was found, 
-     * It will be returned. If not, the method will return NULL.
+     * @return PrivilegesGroup|null If a users group with the given ID was found, 
+     * It will be returned. If not, the method will return null.
      * @since 1.0
      */
     public static function &getGroup($groupId){
@@ -514,7 +514,7 @@ class Access {
      * @since 1.0
      */
     private function _hasGroup($groupId){
-        return self::getGroup($groupId) !== NULL;
+        return self::getGroup($groupId) !== null;
     }
     /**
      * Creates new users group using specific ID.
@@ -525,8 +525,8 @@ class Access {
      * @param string $groupId The ID of the group. The ID must not contain 
      * any of the following characters: ';','-' or a space. If the name contains 
      * any of the given characters, the group will not created.
-     * @return boolean If the group is created, the method will return TRUE. 
-     * If not, the method will return FALSE.
+     * @return boolean If the group is created, the method will return true. 
+     * If not, the method will return false.
      * @since 1.0
      */
     public static function newGroup($groupId,$parentGroupId=null) {
@@ -537,36 +537,36 @@ class Access {
         if($this->_validateId($groupId)){
             foreach ($this->userGroups as $g){
                 if($g->getID() == $groupId){
-                    return FALSE;
+                    return false;
                 }
             }
             $group = new PrivilegesGroup();
             $group->setID($groupId);
-            if($parentGroupID !== NULL){
+            if($parentGroupID !== null){
                 $parentG = &$this->getGroup($parentGroupID);
                 if($parentG instanceof PrivilegesGroup){
                     $group->setParentGroup($parentG);
-                    return TRUE;
+                    return true;
                 }
             }
             else{
                 $this->userGroups[] = $group;
-                return TRUE;
+                return true;
             }
         }
-        return FALSE;
+        return false;
     }
     
     private function _validateId($id){
         $len = strlen($id);
         if($len > 0){
-            $valid = TRUE;
+            $valid = true;
             for($x = 0 ; $x < $len ; $x++){
                 $valid = $valid && $id[$x] != ';' && $id[$x] != ' ' && $id[$x] != '-';
             }
             return $valid;
         }
-        return FALSE;
+        return false;
     }
     /**
      * Creates new privilege in a specific group given its ID.
@@ -577,7 +577,7 @@ class Access {
      * @param string $privilegeId The ID of the privilege. The ID must not contain 
      * any of the following characters, ';','-' or a space.
      * @return boolean If the privilege was created, the method will return 
-     * TRUE. Other than that, the method will return FALSE.
+     * true. Other than that, the method will return false.
      * @since 1.0
      */
     public static function newPrivilege($groupId,$privilegeId){
@@ -593,8 +593,8 @@ class Access {
      * @return array The method will return an associative array. 
      * The indices will be the IDs of the privileges and the values will be 
      * booleans. Each boolean corresponds to the status of each privilege in the array of 
-     * privileges. If the privilege is added, the value will be TRUE. If not, 
-     * it will be FALSE.
+     * privileges. If the privilege is added, the value will be true. If not, 
+     * it will be false.
      * @since 1.0.1 
      */
     public static function newPrivileges($groupId,$prNamesArr) {
@@ -615,18 +615,18 @@ class Access {
     private function _createPrivilege($groupId,$privilegeId){
         if($this->_validateId($privilegeId)){
             $pr = self::getPrivilege($privilegeId);
-            if($pr === NULL){
+            if($pr === null){
                 $g = &$this->_getGroup($groupId);
                 if(($g instanceof PrivilegesGroup) && $groupId == $g->getID()){
                     $p = new Privilege();
                     $p->setID($privilegeId);
                     if(!$g->hasPrivilege($p)){
                         $g->addPrivilage($p);
-                        return TRUE;
+                        return true;
                     }
                 }
             }
         }
-        return FALSE;
+        return false;
     }
 }

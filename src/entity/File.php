@@ -245,12 +245,12 @@ class File implements JsonI{
      * use forward slashes or backward slashes.
      * @param string $path The folder which will contain the file. It must 
      * be non-empty string in order to set.
-     * @return boolean The method will return TRUE if the path is set. Other 
-     * than that, the method will return FALSE.
+     * @return boolean The method will return true if the path is set. Other 
+     * than that, the method will return false.
      * @since 1.0
      */
     public function setPath($path){
-        $retVal = FALSE;
+        $retVal = false;
         $len = strlen($path);
         if($len > 0){
             while($path[$len - 1] == '/' || $path[$len - 1] == '\\'){
@@ -265,7 +265,7 @@ class File implements JsonI{
             if(strlen($path) > 0){
                 $path = str_replace('/', '\\', $path);
                 $this->path = !Util::isDirectory($path) ? '\\'.$path : $path;
-                $retVal = TRUE;
+                $retVal = true;
             }
         }
         return $retVal;
@@ -293,15 +293,15 @@ class File implements JsonI{
      * Returns MIME type of a file type.
      * The method will try to find MIME type based on its extension. If 
      * @param string $ext File extension without the suffix (such as 'jpg').
-     * @return string|NULL If the extension MIME type is found, it will be 
-     * returned. If not, the method will return NULL.
+     * @return string|null If the extension MIME type is found, it will be 
+     * returned. If not, the method will return null.
      * @since 1.1.1
      */
     public static function getMIMEType($ext){
         $lowerCase = strtolower($ext);
-        $retVal = NULL;
+        $retVal = null;
         $x = self::MIME_TYPES[$lowerCase];
-        if($x !== NULL){
+        if($x !== null){
             $retVal = $x;
         }
         return $retVal;
@@ -389,15 +389,15 @@ class File implements JsonI{
                 fclose($h);
                 $ext = pathinfo($this->getName(), PATHINFO_EXTENSION);
                 $mime = self::getMIMEType($ext);
-                $mimeSet = $mime === NULL ? 'application/octet-stream' : $mime;
+                $mimeSet = $mime === null ? 'application/octet-stream' : $mime;
                 $this->setMIMEType($mimeSet);
                 restore_error_handler();
-                return TRUE;
+                return true;
             }
             restore_error_handler();
             throw new Exception('Unable to open the file \''.$path.'\'.');
         }
-        return FALSE;
+        return false;
     }
     /**
      * Write raw binary data into a file.
@@ -419,7 +419,7 @@ class File implements JsonI{
      * @since 1.1.1
      */
     public function write($path=null) {
-        if($path === NULL){
+        if($path === null){
             $path = $this->getAbsolutePath();
             if($path != ''){
                 $this->_writeHelper($path);
@@ -440,7 +440,7 @@ class File implements JsonI{
         }
     }
     private function _writeHelper($path){
-        if($this->getRawData() === NULL){
+        if($this->getRawData() === null){
             $this->read();
         }
         $h = fopen($path, 'wb');
@@ -455,11 +455,11 @@ class File implements JsonI{
     }
     /**
      * Display the file. 
-     * If the raw data of the file is NULL, the method will 
+     * If the raw data of the file is null, the method will 
      * try to read the file that was specified by the name and its path. If 
      * the method is unable to read the file, an exception is thrown.
      * @param boolean $asAttachment If this parameter is set to 
-     * TRUE, the header 'content-disposition' will have the attribute 'attachment' 
+     * true, the header 'content-disposition' will have the attribute 'attachment' 
      * set instead of 'inline'. This will trigger 'save as' dialog to appear.
      * @throws Exception An exception with the message "MIME type of raw data is not set." 
      * If MIME type of the file is not set.
@@ -467,7 +467,7 @@ class File implements JsonI{
      */
     public function view($asAttachment=false){
         $raw = $this->getRawData();
-        if($raw !== NULL){
+        if($raw !== null){
             $this->_viewFileHelper($asAttachment);
         }
         else{
@@ -478,7 +478,7 @@ class File implements JsonI{
     private function _viewFileHelper($asAttachment){
         $contentType = $this->getFileMIMEType();
         Logger::logName('View-F-Log');
-        if($contentType != NULL){
+        if($contentType != null){
             Logger::log('Content-type: '.$contentType);
             header("Accept-Ranges: bytes");
             header('Content-Type:'.$contentType);
@@ -505,7 +505,7 @@ class File implements JsonI{
                 Logger::log('No Content Range header. New View.');
                 header('Content-Length: '.$this->getSize());
             }
-            if($asAttachment === TRUE){
+            if($asAttachment === true){
                 header('Content-Disposition: attachment; filename="'.$this->getName().'"');
             }
             else{
@@ -615,8 +615,8 @@ class File implements JsonI{
      * Returns the raw data of the file.
      * The raw data is simply a string. It can be binary string or any basic 
      * string.
-     * @return string|NULL Raw data of the file. If no data is set, the method 
-     * will return NULL.
+     * @return string|null Raw data of the file. If no data is set, the method 
+     * will return null.
      * @since 1.0
      */
     public function getRawData(){
@@ -671,15 +671,15 @@ class File implements JsonI{
      * Before calling this method, the name of the file and its path must 
      * be specified.
      * @return boolean If the file was removed, the method will return 
-     * TRUE. Other than that, the method will return FALSE.
+     * true. Other than that, the method will return false.
      * @since 1.1.2
      */
     public function remove() {
         if(file_exists($this->getAbsolutePath())){
             unlink($this->getAbsolutePath());
-            return TRUE;
+            return true;
         }
-        return FALSE;
+        return false;
     }
 }
 

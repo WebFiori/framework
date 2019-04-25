@@ -172,7 +172,7 @@ abstract class Theme implements JsonI{
      * @return string The base URL that will be used by the theme.
      */
     public function getBaseURL(){
-        if($this->baseUrl !== NULL){
+        if($this->baseUrl !== null){
             return $this->baseUrl;
         }
         else{
@@ -241,7 +241,7 @@ abstract class Theme implements JsonI{
     }
     /**
      * Loads a theme given its name.
-     * If the given name is NULL, the method will load the default theme as 
+     * If the given name is null, the method will load the default theme as 
      * specified by the method SiteConfig::getBaseThemeName().
      * @param string $themeName The name of the theme. 
      * @return Theme The method will return an object of type Theme once the 
@@ -254,11 +254,11 @@ abstract class Theme implements JsonI{
         Logger::logFuncCall(__METHOD__);
         Logger::log('Theme name = \''.$themeName.'\' ('. gettype($themeName).').', $themeName);
         Logger::log('Validating theme name...');
-        if($themeName === NULL){
+        if($themeName === null){
             $themeName = SiteConfig::getBaseThemeName();
-            Logger::log('Given name is NULL. Using the theme \''.$themeName.'\'.', 'warning');
+            Logger::log('Given name is null. Using the theme \''.$themeName.'\'.', 'warning');
         }
-        $themeToLoad = NULL;
+        $themeToLoad = null;
         Logger::log('Checking if theme is already loaded...');
         if(self::isThemeLoaded($themeName)){
             Logger::log('Theme is already loaded.');
@@ -377,13 +377,13 @@ abstract class Theme implements JsonI{
     /**
      * Checks if a theme is loaded or not given its name.
      * @param string $themeName The name of the theme.
-     * @return boolean The method will return TRUE if 
-     * the theme was found in the array of loaded themes. FALSE
+     * @return boolean The method will return true if 
+     * the theme was found in the array of loaded themes. false
      * if not.
      * @since 1.0
      */
     public static function isThemeLoaded($themeName) {
-        return isset(self::$loadedThemes[$themeName]) === TRUE;
+        return isset(self::$loadedThemes[$themeName]) === true;
     }
     /**
      * Returns an array that contains the meta data of all available themes. 
@@ -813,9 +813,9 @@ abstract class Theme implements JsonI{
      * main navigation icon, web site name and web site logo. More complex 
      * layout can include other things such as a search bar, notifications 
      * area and user profile picture. If the page does not have a header 
-     * section, the developer can make this method return NULL.
-     * @return HTMLNode|NULL An object of type HTMLNode. If the theme has no header 
-     * section, the method might return NULL.
+     * section, the developer can make this method return null.
+     * @return HTMLNode|null An object of type HTMLNode. If the theme has no header 
+     * section, the method might return null.
      * @since 1.2.2
      */
     public abstract function getHeadrNode();
@@ -827,7 +827,7 @@ abstract class Theme implements JsonI{
      * it might contain copyright notice and contact information. More complex 
      * layouts can have more items in the footer.
      * @return HTMLNode An object of type HTMLNode. If the theme has no footer 
-     * section, the method might return NULL.
+     * section, the method might return null.
      * @since 1.2.2
      */
     public abstract function getFooterNode();
@@ -838,7 +838,7 @@ abstract class Theme implements JsonI{
      * contains advertisements. Sometimes, it can contain aside menu for 
      * the web site or widgets.
      * @return HTMLNode An object of type HTMLNode. If the theme has no aside 
-     * section, the method might return NULL.
+     * section, the method might return null.
      * @since 1.2.2
      */
     public abstract function getAsideNode();

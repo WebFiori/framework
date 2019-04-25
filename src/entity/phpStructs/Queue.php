@@ -26,7 +26,8 @@
 namespace phpStructs;
 /**
  * A class that represents a queue data structure.
- *
+ * The queue is implemented in a way that the first element that comes in will 
+ * be the first element to come out (FIFO queue).
  * @author Ibrahim
  * @version 1.1
  */
@@ -70,9 +71,9 @@ class Queue{
      * @since 1.0
      */
     public function __construct($max=0) {
-        $this->head = NULL;
-        $this->tail = NULL;
-        $this->null = NULL;
+        $this->head = null;
+        $this->tail = null;
+        $this->null = null;
         $this->size = 0;
         if(gettype($max) == 'integer'){
             $this->max = $max;
@@ -83,41 +84,41 @@ class Queue{
     }
     /**
      * Adds new element to the bottom of the queue.
-     * @param mixed $el The element that will be added. If it is NULL, the 
+     * @param mixed $el The element that will be added. If it is null, the 
      * method will not add it.
-     * @return boolean The method will return TRUE if the element is added. 
-     * The method will return FALSE only in two cases, If the maximum 
+     * @return boolean The method will return true if the element is added. 
+     * The method will return false only in two cases, If the maximum 
      * number of elements is reached and trying to add new one or the given element 
-     * is NULL.
+     * is null.
      * @since 1.0
      */
-    public function enqueue(&$el){
+    public function enqueue($el){
         if($this->validateSize()){
-            if($el != NULL){
+            if($el !== null){
                 if($this->size() == 0){
                     $this->head = new Node($el);
                     $this->size++;
-                    return TRUE;
+                    return true;
                 }
                 else if($this->size() == 1){
                     $this->tail = new Node($el);
                     $this->head->setNext($this->tail);
                     $this->size++;
-                    return TRUE;
+                    return true;
                 }
                 else{
                     $node = $this->head;
-                    while ($node->next() != NULL){
+                    while ($node->next() !== null){
                         $node = $node->next();
                     }
                     $this->tail = new Node($el);
                     $node->setNext($this->tail);
                     $this->size++;
-                    return TRUE;
+                    return true;
                 }
             }
         }
-        return FALSE;
+        return false;
     }
     /**
      * Returns the number of maximum elements the queue can hold.
@@ -135,8 +136,9 @@ class Queue{
     }
     /**
      * Returns the element that exist on the top of the queue.
-     * @return mixed The element at the top. If the stack is empty, the method 
-     * will return NULL.
+     * This method will return the first element that was added to the queue.
+     * @return mixed The element at the top. If the queue is empty, the method 
+     * will return null.
      * @since 1.0
      */
     public function &peek(){
@@ -148,9 +150,9 @@ class Queue{
         }
     }
     /**
-     * Removes the top element from the stack.
+     * Removes the top element from the queue.
      * @return mixed The element after removal from the queue. If the queue is 
-     * empty, the method will return NULL.
+     * empty, the method will return null.
      * @since 1.0
      */
     public function &dequeue(){
@@ -162,8 +164,8 @@ class Queue{
         }
         else if($this->size == 1){
             $data = $this->head->data();
-            $this->head = NULL;
-            $this->tail = NULL;
+            $this->head = null;
+            $this->tail = null;
             $this->size--;
             return $data;
         }
@@ -181,36 +183,47 @@ class Queue{
     }
     /**
      * Checks if the queue can hold more elements or not.
-     * @return boolean TRUE if the queue can hold more elements.
+     * @return boolean true if the queue can hold more elements.
      * @since 1.0
      */
     private function validateSize(){
         $max = $this->max();
         if($max == -1){
-            return TRUE;
+            return true;
         }
         if($max > $this->size()){
-            return TRUE;
+            return true;
         }
-        return FALSE;
+        return false;
     }
     /**
      * Returns a string that represents the queue and its element.
-     * @return string A string that represents the queue and its element. The 
-     * string will be wrapped inside a 'pre' html element to make it well 
-     * formatted and viewable in the web browser.
+     * @return string A string that represents the queue and its element.
      */
     public function __toString() {
-        $retVal = 'Queue[';
+        $retVal = 'Queue['."\n";
         $node = $this->head;
-        while ($node != NULL){
+        $index = 0;
+        while ($node != null){
             $data = $node->data();
-            if($node->next() == NULL){
-                $retVal .= $data.'('. gettype($data).')';
+            $dataType = gettype($data);
+            if($node->next() == null){
+                if($dataType == 'object' || $dataType == 'array'){
+                    $retVal .= '    ['.$index.']=>('.$dataType.")\n";
+                }
+                else{
+                    $retVal .= '    ['.$index.']=>'.$data.'('.$dataType.")\n";
+                }
             }
             else{
-                $retVal .= $data.'('. gettype($data).'), ';
+                if($dataType == 'object' || $dataType == 'array'){
+                    $retVal .= '    ['.$index.']=>('.$dataType."),\n";
+                }
+                else{
+                    $retVal .= '    ['.$index.']=>'.$data.'('.$dataType."),\n";
+                }
             }
+            $index++;
             $node = $node->next();
         }
         $retVal .= ']';

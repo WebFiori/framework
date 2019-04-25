@@ -32,7 +32,7 @@ use phpStructs\html\HTMLNode;
  */
 class Br extends HTMLNode{
     public function __construct() {
-        parent::__construct('br', FALSE);
+        parent::__construct('br');
     }
     /**
      * A method that does nothing.

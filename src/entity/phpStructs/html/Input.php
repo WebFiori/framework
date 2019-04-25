@@ -28,7 +28,7 @@ use phpStructs\html\HTMLNode;
  * A class that represents any input element;
  *
  * @author Ibrahim
- * @version 1.0.1
+ * @version 1.0.2
  */
 class Input extends HTMLNode{
     /**
@@ -79,25 +79,36 @@ class Input extends HTMLNode{
     const INPUT_MODES = array('none','text','decimal','numeric','tel','search','email','url');
     /**
      * Creates new instance of the class.
-     * @param type $type The type of the input element. If the 
+     * @param string $type The type of the input element. If the 
      * given type is not in the array Input::INPUT_TYPES, 'text' 
      * will be used by default.
      * @since 1.0
      */
     public function __construct($type='text') {
         parent::__construct();
-        $lType = strtolower($type);
+        $lType = strtolower(trim($type));
         if($lType == 'select' || $lType == 'textarea'){
-            $this->setNodeName($lType, TRUE);
+            parent::setNodeName($lType);
         }
         else{
-            $this->setNodeName('input', FALSE);
-            $this->setType($lType);
+            parent::setNodeName('input');
+            if(!$this->setType($lType)){
+                $this->setType('text');
+            }
         }
     }
     /**
+     * A method that does nothing.
+     * @param string $name
+     * @return boolean The method will always return false.
+     * @since 1.0.2
+     */
+    public function setNodeName($name) {
+        return false;
+    }
+    /**
      * Returns the value of the attribute 'type'.
-     * @return string he value of the attribute 'type'.
+     * @return string|null The value of the attribute 'type'.
      * @since 1.0
      */
     public function getType() {
@@ -106,30 +117,38 @@ class Input extends HTMLNode{
     /**
      * Sets the value of the attribute 'type'.
      * @param string $type The type of the input element. If the 
-     * given type is not in the array Input::INPUT_TYPES, 'text' 
-     * will be used by default.
-     * It can be only a value from the array Input::INPUT_TYPES.
+     * given type is not in the array Input::INPUT_TYPES, The 
+     * method will not update the type.
+     * It can be only a value from the array Input::INPUT_TYPES. Also, if 
+     * the input type is 'textarea' or 'select', this attribute will never 
+     * be set using this method.
+     * @return boolean If input type is updated, the method will return true. 
+     * If input type is not updated, the method will return false.
      * @since 1.0
      */
     public function setType($type) {
-        $l = strtolower($type);
-        if(in_array($l, Input::INPUT_TYPES)){
-            $this->setAttribute('type', $l);
+        $nodeName = $this->getNodeName();
+        if($nodeName == 'input'){
+            $l = strtolower(trim($type));
+            if(in_array($l, Input::INPUT_TYPES) && $l != 'textarea' && $l != 'select'){
+                return $this->setAttribute('type', $l);
+            }
         }
-        else{
-            $this->setAttribute('type', 'text');
-        }
+        return false;
     }
     /**
      * Sets the value of the attribute 'placeholder'.
      * @param string $text The value to set. The attribute can be 
      * set only if the type of the input is text or password or number.
+     * @return boolean If placeholder is set, the method will return true. If 
+     * it is not set, the method will return false.
      */
     public function setPlaceholder($text) {
         $iType = $this->getType();
         if($iType == 'password' || $iType == 'text' || $iType == 'number' || $this->getNodeName() == 'textarea'){
-            $this->setAttribute('placeholder', $text);
+            return $this->setAttribute('placeholder', $text);
         }
+        return false;
     }
     /**
      * Sets the value of the attribute 'value'
@@ -143,7 +162,9 @@ class Input extends HTMLNode{
      * Sets the value of the attribute 'list'
      * @param string $listId The ID of the element that will be acting 
      * as pre-defined list of elements. It cannot be set for hidden, file, 
-     * checkbox and radio input types.
+     * checkbox, textarea, select and radio input types.
+     * @return boolean If datalist is set, the method will return true. If 
+     * it is not set, the method will return false.
      * @since 1.0
      */
     public function setList($listId){
@@ -151,9 +172,11 @@ class Input extends HTMLNode{
         if($iType != 'hidden' && 
                 $iType != 'file' && 
                 $iType != 'checkbox' && 
-                $iType != 'radio'){
+                $iType != 'radio' && ($this->getNodeName() != 'textarea' || $this->getNodeName() == 'select')){
             $this->setAttribute('list', $listId);
+            return true;
         }
+        return false;
     }
     /**
      * Sets the value of the attribute 'min'.
@@ -199,13 +222,16 @@ class Input extends HTMLNode{
      * Sets the value of the attribute 'inputmode'.
      * @param string $mode The value to set. It must be a value from the array 
      * Input::INPUT_MODES.
+     * @return boolean If the attribute value is set or updated, the method will 
+     * return true. False if not.
      * @since 1.0
      */
     public function setInputMode($mode) {
-        $lMode = strtolower($mode);
+        $lMode = strtolower(trim($mode));
         if(in_array($lMode, Input::INPUT_MODES)){
-            $this->setAttribute('inputmode', $lMode);
+            return $this->setAttribute('inputmode', $lMode);
         }
+        return false;
     }
     /**
      * Adds new child node.
@@ -244,7 +270,7 @@ class Input extends HTMLNode{
             if(gettype($options) == 'array' && isset($options['value']) && isset($options['label'])){
                 $option = new HTMLNode('option');
                 $option->setAttribute('value', $options['value']);
-                $option->addTextNode($options['label'],FALSE);
+                $option->addTextNode($options['label'],false);
                 if(isset($options['attributes'])){
                     foreach ($options['attributes'] as $attr => $value) {
                         $option->setAttribute($attr, $value);
@@ -263,7 +289,7 @@ class Input extends HTMLNode{
      * contains only two indices: 
      * <ul>
      * <li>label: A label for the option.</li>
-     * <li>attributes: An optional associative array of attributes. 
+     * <li>attributes: An optional associative array of attributes for the option. 
      * The key will act as the 
      * attribute name and the value of the key will act as the value of the 
      * attribute.</li>
@@ -296,6 +322,7 @@ class Input extends HTMLNode{
      * group info. The array must have the following indices:
      * <ul>
      * <li>label: The label of the group.</li>
+     * <li>attributes: An optional associative array that contains group attributes.</li>
      * <li>options: A sub associative array that contains group 
      * options. The key will act as the 'value' attribute and 
      * the value of the key will act as the label for the option. Also, 
@@ -316,12 +343,17 @@ class Input extends HTMLNode{
                 if(isset($optionsGroupArr['label']) && isset($optionsGroupArr['options'])){
                     $optGroup = new HTMLNode('optgroup');
                     $optGroup->setAttribute('label', $optionsGroupArr['label']);
+                    if(isset($optionsGroupArr['attributes']) && gettype($optionsGroupArr['attributes']) == 'array'){
+                        foreach ($optionsGroupArr['attributes'] as $k => $v){
+                            $optGroup->setAttribute($k, $v);
+                        }
+                    }
                     foreach ($optionsGroupArr['options'] as $value => $labelOrOptions){
                         if(gettype($labelOrOptions) == 'array'){
                             if(isset($labelOrOptions['label'])){
                                 $o = new HTMLNode('option');
                                 $o->setAttribute('value', $value);
-                                $o->addTextNode($labelOrOptions['label'],FALSE);
+                                $o->addTextNode($labelOrOptions['label'],false);
                                 if(isset($labelOrOptions['attributes'])){
                                     foreach ($labelOrOptions['attributes'] as $attr => $v){
                                         $o->setAttribute($attr, $v);
@@ -333,7 +365,7 @@ class Input extends HTMLNode{
                         else{
                             $o = new HTMLNode('option');
                             $o->setAttribute('value', $value);
-                            $o->addTextNode($labelOrOptions,FALSE);
+                            $o->addTextNode($labelOrOptions,false);
                             $optGroup->addChild($o);
                         }
                     }

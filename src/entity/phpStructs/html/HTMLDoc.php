@@ -25,6 +25,7 @@
  */
 namespace phpStructs\html;
 use phpStructs\html\HTMLNode;
+use phpStructs\LinkedList;
 /**
  * A class that represents HTML document. The created document is HTML 5 compatible (
  * DOCTYPE html). Also, the document will have the following features by default: 
@@ -74,23 +75,29 @@ class HTMLDoc {
      */
     const NL = "\n";
     /**
-     * Saves the document into a file.
-     * @param string $path The location where the content will be written to.
+     * Saves the document to .html file.
+     * @param string $path The location where the content will be written to 
+     * (e.g. 'C:\user\html\pages'). 
+     * must be non empty string.
+     * @param string $fileName The name of the file (such as 'index'). Must be non empty string.
      * @param boolean $wellFormatted If set to true, The generated file will be 
      * well formatted (readable by humans).
-     * @param string $fileType The type of the file that the document will be 
-     * stored to (such as 'txt' or 'html').
-     * @return boolean <b>TRUE</b> if the file is successfully created.
+     * @return boolean The method will return true if the file is successfully created. 
+     * False if not. Default is true.
      * @since 1.0
      */
-    public function saveToFile($path,$wellFormatted=true,$fileType='html'){
-        $f = fopen($path.'.'.$fileType, 'w+');
-        if($f != FALSE){
-            fwrite($f, $this->toHTML($wellFormatted));
-            fclose($f);
-            return TRUE;
+    public function saveToHTMLFile($path,$fileName,$wellFormatted=true){
+        $trimmedPath = trim($path);
+        $trimmedName = trim($fileName);
+        if(strlen($trimmedPath) != 0 && strlen($trimmedName) != 0){
+            $f = fopen($trimmedPath.DIRECTORY_SEPARATOR.$trimmedName.'.html', 'w+');
+            if($f != false){
+                fwrite($f, $this->toHTML($wellFormatted));
+                fclose($f);
+                return true;
+            }
         }
-        return FALSE;
+        return false;
     }
     /**
      * Returns a linked list that contains all children which has the given tag 
@@ -102,7 +109,10 @@ class HTMLDoc {
      */
     public function getChildrenByTag($val) {
         $list = new LinkedList();
-        $this->_getChildrenByTag($val, $list, $this->htmlNode);
+        $trimmedVal = strtolower(trim($val));
+        if(strlen($trimmedVal) != 0){
+            $this->_getChildrenByTag($trimmedVal, $list, $this->htmlNode);
+        }
         return $list;
     }
     /**
@@ -115,7 +125,7 @@ class HTMLDoc {
         if($child->getNodeName() == $val){
             $list->add($child);
         }
-        if(!$child->isTextNode() && !$child->isComment()){
+        if(!$child->isTextNode() && !$child->isComment() && !$child->isVoidNode()){
             $children = &$child->children();
             $chCount = $children->size();
             for($x = 0 ; $x < $chCount ; $x++){
@@ -127,8 +137,8 @@ class HTMLDoc {
     /**
      * Returns a child node given its ID.
      * @param string $id The ID of the child.
-     * @return NULL|HTMLNode The method returns an object of type HTMLNode. 
-     * if found. If no node has the given ID, the method will return NULL.
+     * @return null|HTMLNode The method returns an object of type HTMLNode. 
+     * if found. If no node has the given ID, the method will return null.
      * @since 1.2
      */
     public function &getChildByID($id) {
@@ -136,9 +146,24 @@ class HTMLDoc {
     }
     /**
      * Constructs a new HTML document.
+     * The document that will be generated will look like the following by 
+     * default:
+<pre>
+&lt;!DOCTYPE html>
+&lt;html>
+&nbsp;&nbsp;&lt;head>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;title>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Default
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/title>
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;/meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+&nbsp;&nbsp;&lt;/head>
+&nbsp;&nbsp;&lt;/body itemscope="" itemtype="http://schema.org/WebPage">
+&nbsp;&nbsp;&lt;/body>
+&lt;//html>
+</pre>
      */
     public function __construct() {
-        $this->body = new HTMLNode('body', TRUE, FALSE);
+        $this->body = new HTMLNode('body');
         $this->body->setAttribute('itemscope', '');
         $this->body->setAttribute('itemtype', 'http://schema.org/WebPage');
         $this->headNode = new HeadNode();
@@ -148,13 +173,25 @@ class HTMLDoc {
     }
     /**
      * Sets the language of the document.
-     * @param string $lang A two characters language code.
+     * @param string|null $lang A two characters language code. If the given string is 
+     * empty or its length does not equal to 2, language won't be set. If null 
+     * is given, then the attribute will be removed if it was set.
+     * @return boolean If the attribute 'lang' of the document is set, or 
+     * removed, the method will return true. Note that the method will always 
+     * return true if null is given. Other than that, it will return false.
      * @since 1.0
      */
     public function setLanguage($lang){
-        if(strlen($lang) == 2){
-            $this->htmlNode->setAttribute('lang', $lang);
+        if($lang === null){
+            $this->htmlNode->removeAttribute('lang');
+            return true;
         }
+        $trimmedLang = trim($lang);
+        if(strlen($trimmedLang) == 2){
+            $this->htmlNode->setAttribute('lang', $trimmedLang);
+            return true;
+        }
+        return false;
     }
     /**
      * Returns the language of the document.
@@ -171,25 +208,30 @@ class HTMLDoc {
     /**
      * Updates the head node that is used by the document.
      * @param HeadNode $node The node to set.
+     * @return boolean If head node is set, the method will return true. 
+     * if it is not set, the method will return false.
      * @since 1.0
      */
     public function setHeadNode(&$node){
         if($node instanceof HeadNode){
-            $this->htmlNode->replaceChild($this->headNode, $node);
-            $this->headNode = $node;
+            if($this->htmlNode->replaceChild($this->headNode, $node)){
+                $this->headNode = $node;
+                return true;
+            }
         }
+        return false;
     }
     /**
      * Returns a string of HTML code that represents the document.
      * @return string A string of HTML code that represents the document.
      */
     public function __toString() {
-        return $this->toHTML(FALSE);
+        return $this->toHTML(false);
     }
     /**
      * Returns HTML string that represents the document.
-     * @param boolean $formatted If set to TRUE, The generated HTML code will be 
-     * well formatted. Default is TRUE. Note that this attribute will take 
+     * @param boolean $formatted If set to true, The generated HTML code will be 
+     * well formatted. Default is true. Note that this attribute will take 
      * effect only if the formatting option is not set using the method 
      * HTMLNode::setIsFormatted().
      * @return string HTML string that represents the document.
@@ -212,7 +254,7 @@ class HTMLDoc {
      * an options for formatting the code. The available options are:
      * <ul>
      * <li><b>tab-spaces</b>: The number of spaces in a tab. Usually 4.</li>
-     * <li><b>with-colors</b>: A boolean value. If set to TRUE, the code will 
+     * <li><b>with-colors</b>: A boolean value. If set to true, the code will 
      * be highlighted with colors.</li>
      * <li><b>initial-tab</b>: Number of initial tabs</li>
      * <li><b>colors</b>: An associative array of highlight colors.</li>
@@ -238,15 +280,17 @@ class HTMLDoc {
      * Removes a child node from the document.
      * @param HTMLNode $node The node that will be removed. If the given 
      * node name is 'body' or 'head', The node will never be removed.
-     * @return HTMLNode|NULL The method will return the node if removed. 
-     * If not removed, the method will return NULL.
+     * @return HTMLNode|null The method will return the node if removed. 
+     * If not removed, the method will return null.
      * @since 1.4
      */
     public function removeChild(&$node) {
         if($node instanceof HTMLNode){
-            return $this->_removeChild($this->htmlNode, $node);
+            if($node !== $this->body && $node !== $this->headNode){
+                return $this->_removeChild($this->htmlNode, $node);
+            }
         }
-        $null = NULL;
+        $null = null;
         return $null;
     }
     /**
@@ -283,6 +327,8 @@ class HTMLDoc {
      * Appends new node to the body of the document.
      * @param HTMLNode $node The node that will be added. It will be added 
      * only if the name of the node is not 'html', 'head' or body.
+     * @return boolean If the child is added, the method will return true. False 
+     * if not added.
      * @since 1.0
      */
     public function addChild(&$node){
@@ -290,7 +336,9 @@ class HTMLDoc {
             $name = $node->getNodeName();
             if($name != 'body' && $name != 'head' && $name != 'html'){
                 $this->body->addChild($node);
+                return true;
             }
         }
+        return false;
     }
 }

@@ -33,7 +33,7 @@ use phpStructs\html\HTMLNode;
  */
 class UnorderedList extends HTMLNode{
     public function __construct() {
-        parent::__construct('ul', TRUE);
+        parent::__construct('ul');
     }
     /**
      * Adds new item to the list.

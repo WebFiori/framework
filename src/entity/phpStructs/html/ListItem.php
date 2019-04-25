@@ -36,6 +36,6 @@ class ListItem extends HTMLNode{
      * @since 1.0
      */
     public function __construct() {
-        parent::__construct('li', TRUE);
+        parent::__construct('li');
     }
 }

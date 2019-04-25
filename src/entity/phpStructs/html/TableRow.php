@@ -33,7 +33,7 @@ use phpStructs\html\HTMLNode;
  */
 class TableRow extends HTMLNode{
     public function __construct() {
-        parent::__construct('tr', TRUE);
+        parent::__construct('tr');
     }
     /**
      * Adds new child node to the row.

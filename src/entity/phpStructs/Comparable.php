@@ -34,8 +34,8 @@ interface Comparable {
      * Compare the given instance with another object.
      * The implementation of this method should be as follows. 
      * If the two objects are equal, the method should return 0. 
-     * If the current instance is greater, the method should return 1. 
-     * If the object at the parameter is greater, the method should return -1.
+     * If the current instance is greater, the method should return positive number. 
+     * If the object at the parameter is greater, the method should return a negative number.
      * @param mixed $other The other variable that will be compared 
      * with.
      * @since 1.0

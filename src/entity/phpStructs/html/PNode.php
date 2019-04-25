@@ -38,7 +38,7 @@ class PNode extends HTMLNode{
      * @since 1.0
      */
     public function __construct() {
-        parent::__construct('p', TRUE);
+        parent::__construct('p');
     }
     /**
      * Appends new text to the body of the paragraph.

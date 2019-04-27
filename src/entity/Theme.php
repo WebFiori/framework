@@ -389,7 +389,8 @@ abstract class Theme implements JsonI{
      * Returns an array that contains the meta data of all available themes. 
      * This method will return an associative array. The key is the theme 
      * name and the value is an object of type Theme that contains theme info.
-     * @return array An associative array that contains all themes information.
+     * @return array An associative array that contains all themes information. The name 
+     * of the theme will be the key and the value is an object of type 'Theme'.
      * @since 1.1 
      */
     public static function getAvailableThemes(){

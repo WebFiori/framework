@@ -25,6 +25,8 @@
 namespace webfiori\entity;
 use webfiori\WebFiori;
 use webfiori\entity\router\Router;
+use webfiori\entity\Theme;
+use webfiori\entity\Access;
 /**
  * Description of CLIInterface
  *
@@ -46,10 +48,45 @@ class CLI {
         CLI::showVersionInfo();
         echo "Options: \n";
         self::printCommandInfo('--h', "Show this help. Similar command: --help.");
-        self::printCommandInfo('--hello', "Show 'Hello world' Message.");
+        self::printCommandInfo('--hello', "Show 'Hello world!' Message.");
         self::printCommandInfo('--route <url>', "Test the result of a route.");
-        self::printCommandInfo('--show-routes', "Display all available routes.");
+        self::printCommandInfo('--view-conf', "Display system configuration settings.");
+        self::printCommandInfo('--view-cron <cron-password>', "Display a list of cron jobs. If cron password is set, it must be provided.");
+        self::printCommandInfo('--view-privileges', "Display all created privileges groups and all privileges inside each group.");
+        self::printCommandInfo('--view-routes', "Display all available routes.");
+        self::printCommandInfo('--view-themes', "Display a list of available themes.");
         exit(0);
+    }
+    /**
+     * 
+     */
+    private static function viewThmes() {
+        $themesArr = Theme::getAvailableThemes();
+        $spaceSize = 15;
+        $themsCount = count($themesArr);
+        fprintf(STDOUT, "Total Number of Themes: $themsCount .\n");
+        $index = 1;
+        foreach ($themesArr as $themeObj){
+            if($index < 10){
+                fprintf(STDOUT, "------------ Theme #0$index ------------\n");
+            }
+            else{
+                fprintf(STDOUT, "------------ Theme #$index ------------\n");
+            }
+            $len00 = $spaceSize - strlen('Theme Name');
+            $len01 = $spaceSize - strlen('Author');
+            $len02 = $spaceSize - strlen('Author URL');
+            $len03 = $spaceSize - strlen('License');
+            $len04 = $spaceSize - strlen('License URL');
+
+            fprintf(STDOUT, "Theme Name: %".$len00."s %s\n",':',$themeObj->getName());
+            fprintf(STDOUT, "Author: %".$len01."s %s\n",':',$themeObj->getAuthor());
+            fprintf(STDOUT, "Author URL: %".$len02."s %s\n",':',$themeObj->getAuthorUrl());
+            fprintf(STDOUT, "License: %".$len03."s %s\n",':',$themeObj->getLicenseName());
+            fprintf(STDOUT, "License URL: %".$len04."s %s\n",':',$themeObj->getLicenseUrl());
+            fprintf(STDOUT, "Theme Desription: \n%s\n",$themeObj->getDescription());
+            $index++;
+        }
     }
     /**
      * 
@@ -57,7 +94,7 @@ class CLI {
      * @param string $help
      */
     private static function printCommandInfo($command,$help){
-        $dist = 20 - strlen($command);
+        $dist = 30 - strlen($command);
         fprintf(STDOUT, "    %s %".$dist."s %s\n", $command,":",$help);
     }
 
@@ -114,6 +151,12 @@ class CLI {
             }
             else if($commands[1] == '--show-routes'){
                 self::displayRoutes();
+            }
+            else if($commands[1] == '--view-themes'){
+                self::viewThmes();
+            }
+            else{
+                fprintf(STDERR,"Error: Command not supported or not implemented.");
             }
             exit(0);
         }

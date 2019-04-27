@@ -41,6 +41,7 @@ use webfiori\entity\router\ClosureRoutes;
 use webfiori\entity\router\OtherRoutes;
 use webfiori\entity\router\Router;
 use jsonx\JsonX;
+use webfiori\entity\CLIInterface;
 use Exception;
 /**
  * The instance of this class is used to control basic settings of 
@@ -68,25 +69,25 @@ class WebFiori{
      * @var AutoLoader 
      * @since 1.0
      */
-    private $AU;
+    private static $AU;
     /**
      * An instance of system functions class.
      * @var SystemFunctions 
      * @since 1.0
      */
-    private $SF;
+    private static $SF;
     /**
      * An instance of web site functions class.
      * @var WebsiteFunctions 
      * @since 1.0
      */
-    private $WF;
+    private static $WF;
     /**
      * An instance of basic mail functions class.
      * @var BasicMailFunctions 
      * @since 1.0
      */
-    private $BMF;
+    private static $BMF;
     /**
      * A single instance of the class.
      * @var WebFiori
@@ -203,9 +204,24 @@ class WebFiori{
          * Initialize autoloader.
          */
         require_once ROOT_DIR.'/entity/AutoLoader.php';
-        $this->AU = AutoLoader::get();
-        $this->initAutoloadDirectories();
+        self::$AU = AutoLoader::get();
+        
+        //uncomment next line to show runtime errors and warnings
+        //also enable logging for info, warnings and errors 
+        Logger::logName('initialization-log');
+        Logger::enabled(true);
+        Logger::clear();
+        Logger::log('Autoloader initialized.');
+        //display PHP warnings and errors
+        Util::displayErrors();
+        Logger::log('Initializing user-defined autoload directories...');
+        InitAutoLoad::init();
+        Logger::log('Initializing user-defined autoload directories finished.');
+        Logger::log('Initializing CLI...');
+        CLIInterface::init();
+        Logger::log('CLI Initialized.');
         Logger::log('Setting Error Handler...');
+        
         set_error_handler(function($errno, $errstr, $errfile, $errline){
             header("HTTP/1.1 500 Server Error");
             if(defined('API_CALL')){
@@ -221,6 +237,7 @@ class WebFiori{
             //let php handle the error since it is not API call.
             return false;
         });
+        Logger::log('Setting Error Handler completed.');
         Logger::log('Setting exceptions handler...');
         set_exception_handler(function($ex){
             header("HTTP/1.1 500 Server Error");
@@ -273,52 +290,58 @@ class WebFiori{
                 . '</html>');
             }
         });
-        //uncomment next line to show runtime errors and warnings
-        //also enable logging for info, warnings and errors 
-        Logger::logName('initialization-log');
-        Logger::enabled(true);
-        Logger::clear();
+        Logger::log('Setting exceptions handler completed.');
         
-        //display PHP warnings and errors
-        Util::displayErrors();
-
         //enable logging of debug info.
         //define('DEBUG', '');
         
-        $this->SF = SystemFunctions::get();
-        $this->WF = WebsiteFunctions::get();
-        $this->BMF = BasicMailFunctions::get();
+        Logger::log('Initializing main logic classes...');
+        self::$SF = SystemFunctions::get();
+        self::$WF = WebsiteFunctions::get();
+        self::$BMF = BasicMailFunctions::get();
+        Logger::log('Initializing main logic classes completed.');
         
+        Logger::log('Checking system status...');
         $this->sysStatus = Util::checkSystemStatus(true);
-        
-        $this->initRoutes();
         if($this->sysStatus == Util::MISSING_CONF_FILE || $this->sysStatus == Util::MISSING_SITE_CONF_FILE){
             Logger::log('One or more configuration file is missing. Attempting to create all configuration files.', 'warning');
-            $this->SF->createConfigFile();
-            $this->WF->createSiteConfigFile();
-            $this->BMF->createEmailConfigFile();
+            self::$SF->createConfigFile();
+            self::$WF->createSiteConfigFile();
+            self::$BMF->createEmailConfigFile();
             $this->sysStatus = Util::checkSystemStatus(true);
         }
         if(gettype($this->sysStatus) == 'array'){
             $this->dbErrDetails = $this->sysStatus;
             $this->sysStatus = Util::DB_NEED_CONF;
         }
+        
+        Logger::log('Initializing routes...');
+        APIRoutes::create();
+        
+        ViewRoutes::create();
+        ClosureRoutes::create();
+        OtherRoutes::create();
+        Logger::log('Initializing routes completed.');
+        
         //initialize some settings...
         Logger::log('Initializing cron jobs...');
-        $this->initCron();
-        Logger::log('Initializing permissions...');
-        $this->initPermissions();
+        InitCron::init();
+        Logger::log('Initializing cron jobs completed.');
         
-        Logger::log('Initializing completed.');
-        //After this step, the initialization is completed.
-        //check for system status and route user.
+        Logger::log('Initializing permissions...');
+        InitPrivileges::init();
+        Logger::log('Initializing permissions completed.');
+        Logger::log('Initialization stage completed without errors.');
+        
         self::$classStatus = 'INITIALIZED';
         
         define('INITIAL_SYS_STATUS', $this->_getSystemStatus());
+        
         Logger::log('INITIAL_SYS_STATUS = '.INITIAL_SYS_STATUS, 'debug');
         if(INITIAL_SYS_STATUS === true){
             //switch to the log file 'system-log.txt'.
             Logger::logName('system-log');
+            Logger::clear();
             Logger::section();
         }
         else if(INITIAL_SYS_STATUS == Util::DB_NEED_CONF){
@@ -407,7 +430,7 @@ class WebFiori{
      * @since 1.2.1
      */
     public static function &getAutoloader() {
-        return self::getAndStart()->AU;
+        return self::$AU;
     }
     /**
      * Returns a reference to an instance of 'BasicMailFunctions'.
@@ -415,7 +438,7 @@ class WebFiori{
      * @since 1.2.1
      */
     public static function &getBasicMailFunctions() {
-        return self::getAndStart()->BMF;
+        return self::$BMF;
     }
     /**
      * Returns a reference to an instance of 'SystemFunctions'.
@@ -423,7 +446,7 @@ class WebFiori{
      * @since 1.2.1
      */
     public static function &getSysFunctions(){
-        return self::getAndStart()->SF;
+        return self::$SF;
     }
     /**
      * Returns a reference to an instance of 'WebsiteFunctions'.
@@ -431,7 +454,7 @@ class WebFiori{
      * @since 1.2.1
      */
     public static function &getWebsiteFunctions() {
-        return self::getAndStart()->WF;
+        return self::$WF;
     }
     /**
      * Returns the current status of the system.
@@ -475,71 +498,6 @@ class WebFiori{
         Logger::logReturnValue($this->sysStatus);
         Logger::logFuncReturn(__METHOD__);
         return $this->sysStatus;
-    }
-    /**
-     * Initialize routes.
-     * This method will call 4 methods in 4 classes:
-     * <ul>
-     * <li>APIRoutes::create()</li>
-     * <li>ViewRoutes::create()</li>
-     * <li>ClosureRoutes::create()</li>
-     * <li>OtherRoutes::create()</li>
-     * </ul>
-     * The developer can create routes inside the body of any of the 4 methods.
-     * @since 1.0
-     */
-    public function initRoutes(){
-        Logger::logFuncCall(__METHOD__);
-        if(self::getClassStatus() == 'INITIALIZING'){
-            Logger::log('Initializing routes...', 'info', 'initialization-log');
-            APIRoutes::create();
-            ViewRoutes::create();
-            ClosureRoutes::create();
-            OtherRoutes::create();
-            Logger::log('Routes initialization completed.', 'info', 'initialization-log');
-        }
-        Logger::logFuncReturn(__METHOD__);
-    }
-    /**
-     * Initialize the directories at which the framework will try to load 
-     * classes from. 
-     * If the user has created new folder inside the root framework directory, 
-     * this method will add the directories to include in search directories.
-     * @since 1.2.1
-     */
-    public function initAutoloadDirectories(){
-        Logger::logFuncCall(__METHOD__);
-        if(self::getClassStatus()== 'INITIALIZING'){
-            InitAutoLoad::init();
-            Logger::log('Autoload directories initialized.');
-        }
-        Logger::logFuncReturn(__METHOD__);
-    }
-    /**
-     * Initialize user groups and permissions.
-     * This method will call the method InitPermissions::init() to initialize  
-     * user groups and privileges.
-     * @since 1.3.1
-     */
-    public function initPermissions(){
-        Logger::logFuncCall(__METHOD__);
-        if(self::getClassStatus() == 'INITIALIZING'){
-            InitPrivileges::init();
-        }
-        Logger::logFuncReturn(__METHOD__);
-    }
-    /**
-     * Initialize cron jobs.
-     * This method will call the method InitCron::init() to initialize cron 
-     * Jobs.
-     * @since 1.3
-     */
-    public function initCron(){
-        Logger::logFuncCall(__METHOD__);
-        if(self::getClassStatus()== 'INITIALIZING'){
-            InitCron::init();
-        }
-        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * Show an error message that tells the user about system status and how to 
@@ -587,7 +545,7 @@ class WebFiori{
             . '<p>'
             . 'If you want to make the system do something else if the return value of the '
             . 'given method is false, go to the end of the file \'WebFiori.php\' and '
-            . 'change the code in the \'else\' code block.'
+            . 'change the code in the \'else\' code block at the end of the class constructor.'
             . '</p>'
             . '<p>System Powerd By: <a href="https://github.com/usernane/webfiori" target="_blank"><b>'
                     . 'WebFiori Framework v'.Config::getVersion().' ('.Config::getVersionType().')'
@@ -607,5 +565,10 @@ class WebFiori{
 }
 //start the system
 WebFiori::getAndStart();
-//then route user request.
-Router::route(Util::getRequestedURL());
+if(php_sapi_name() == 'cli'){
+    CLIInterface::runCLI();
+}
+else{
+    //route user request.
+    Router::route(Util::getRequestedURL());
+}

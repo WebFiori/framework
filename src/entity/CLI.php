@@ -27,6 +27,7 @@ use webfiori\WebFiori;
 use webfiori\entity\router\Router;
 use webfiori\entity\Theme;
 use webfiori\entity\Access;
+use webfiori\entity\cron\Cron;
 /**
  * Description of CLIInterface
  *
@@ -36,7 +37,7 @@ class CLI {
     /**
      * 
      */
-    public static function showVersionInfo() {
+    private static function showVersionInfo() {
         echo "WebFiori Framework (c) v"
         .WebFiori::getConfig()->getVersion()." ".WebFiori::getConfig()->getVersionType().
         ", All Rights Reserved.\n";
@@ -51,7 +52,7 @@ class CLI {
         self::printCommandInfo('--hello', "Show 'Hello world!' Message.");
         self::printCommandInfo('--route <url>', "Test the result of a route.");
         self::printCommandInfo('--view-conf', "Display system configuration settings.");
-        self::printCommandInfo('--view-cron <cron-password>', "Display a list of cron jobs. If cron password is set, it must be provided.");
+        self::printCommandInfo('--view-cron-jobs <cron-pass>', "Display a list of cron jobs. If cron password is set, it must be provided.");
         self::printCommandInfo('--view-privileges', "Display all created privileges groups and all privileges inside each group.");
         self::printCommandInfo('--view-routes', "Display all available routes.");
         self::printCommandInfo('--view-themes', "Display a list of available themes.");
@@ -97,7 +98,9 @@ class CLI {
         $dist = 30 - strlen($command);
         fprintf(STDOUT, "    %s %".$dist."s %s\n", $command,":",$help);
     }
-
+    /**
+     * Initialize CLI.
+     */
     public static function init() {
         $sapi = php_sapi_name();
         if($sapi == 'cli'){
@@ -105,7 +108,6 @@ class CLI {
             $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
             $_SERVER['DOCUMENT_ROOT'] = trim($_SERVER['argv'][0],'WebFiori.php');
             putenv('HTTP_HOST=127.0.0.1');
-            putenv('REQUEST_URI=example');
         }
     }
     /**
@@ -135,6 +137,22 @@ class CLI {
      * 
      */
     public static function runCLI() {
+        set_error_handler(function($errno, $errstr, $errfile, $errline){
+            fprintf(STDERR, "Error Number: $errno\n");
+            fprintf(STDERR, "Error String: $errstr\n");
+            fprintf(STDERR, "Error File: $errfile\n");
+            fprintf(STDERR, "Error Line: $errline\n");
+            exit(-1);
+        });
+        set_exception_handler(function($ex){
+            fprintf(STDERR, "Uncaught Exception.\n");
+            fprintf(STDERR, "Exception Message: %s\n",$ex->getMessage());
+            fprintf(STDERR, "Exception Code: %s\n",$ex->getCode());
+            fprintf(STDERR, "File: %s\n",$ex->getFile());
+            fprintf(STDERR, "Line: %s\n",$ex->getLine());
+            fprintf(STDERR, "Stack Trace:\n");
+            fprintf(STDERR, $ex->getTraceAsString());
+        });
         if($_SERVER['argc'] == 1){
             self::showHelp();
         }
@@ -155,11 +173,86 @@ class CLI {
             else if($commands[1] == '--view-themes'){
                 self::viewThmes();
             }
+            else if($commands[1] == '--view-conf'){
+                self::showConfig();
+            }
+            else if($commands[1] == '--view-cron-jobs'){
+                $pass = Cron::password();
+                if($pass == 'NO_PASSWORD'){
+                    self::listCron();
+                }
+                else{
+                    $cPass = isset($commands[2]) ? $commands[2] : null;
+                    if($cPass == $pass){
+                        self::listCron();
+                    }
+                    else if($cPass === null){
+                        fprintf(STDERR, "Error: Cron password is missing.\n");
+                    }
+                    else{
+                        fprintf(STDERR, "Error: Given password is incorrect.\n");
+                    }
+                }
+            }
             else{
                 fprintf(STDERR,"Error: Command not supported or not implemented.");
             }
             exit(0);
         }
+    }
+    /**
+     * 
+     */
+    private static function listCron(){
+        $jobs = Cron::jobsQueue();
+        $i = 1;
+        fprintf(STDOUT, "Number Of Jobs: ".$jobs->size()."\n");
+        while($job = $jobs->dequeue()){
+            if($i < 10){
+                fprintf(STDOUT, "--------- Job #0$i ---------\n");
+            }
+            else{
+                fprintf(STDOUT, "--------- Job #$i ---------\n");
+            }
+            fprintf(STDOUT, "Job Name %".(18 - strlen('Job Name'))."s %s\n",":",$job->getJobName());
+            fprintf(STDOUT, "Cron Expression %".(18 - strlen('Cron Expression'))."s %s\n",":",$job->getExpression());
+            $i++;
+        }
+    }
+
+    /**
+     * 
+     */
+    private static function showConfig() {
+        $spaces = 25;
+        $C = WebFiori::getConfig();
+        fprintf(STDOUT, "Config.php Settings:\n");
+        fprintf(STDOUT, "    Framework Version %".($spaces - strlen('Framework Version'))."s %s\n",':',$C->getVersion());
+        fprintf(STDOUT, "    Version Type %".($spaces - strlen('Version Type'))."s %s\n",':',$C->getVersionType());
+        fprintf(STDOUT, "    Release Date %".($spaces - strlen('Release Date'))."s %s\n",':',$C->getReleaseDate());
+        fprintf(STDOUT, "    Config Version %".($spaces - strlen('Config Version'))."s %s\n",':',$C->getConfigVersion());
+        $isConfigured = $C->isConfig() === true ? 'Yes' : 'No';
+        fprintf(STDOUT, "    Is System Configured %".($spaces - strlen('Is System Configured'))."s %s\n",':',$isConfigured);
+        fprintf(STDOUT, "SiteConfig.php Settings:\n");
+        $SC = WebFiori::getSiteConfig();
+        fprintf(STDOUT, "    Base URL %".($spaces - strlen('Base URL'))."s %s\n",':',$SC->getBaseURL());
+        fprintf(STDOUT, "    Admin Theme %".($spaces - strlen('Admin Theme'))."s %s\n",':',$SC->getAdminThemeName());
+        fprintf(STDOUT, "    Base Theme %".($spaces - strlen('Base Theme'))."s %s\n",':',$SC->getBaseThemeName());
+        fprintf(STDOUT, "    Title Separator %".($spaces - strlen('Title Separator'))."s %s\n",':',$SC->getTitleSep());
+        fprintf(STDOUT, "    Home Page %".($spaces - strlen('Home Page'))."s %s\n",':',$SC->getHomePage());
+        fprintf(STDOUT, "    Config Version %".($spaces - strlen('Config Version'))."s %s\n",':',$SC->getConfigVersion());
+        fprintf(STDOUT, "    Website Names:\n",':');
+        $names = $SC->getWebsiteNames();
+        foreach ($names as $langCode => $name){
+            fprintf(STDOUT,"        $langCode => $name\n");
+        }
+        fprintf(STDOUT, "    Website Descriptions:\n",':');
+        foreach ($SC->getDescriptions() as $langCode => $desc){
+            fprintf(STDOUT,"        $langCode => $desc\n");
+        }
+        
+        
+        
     }
     /**
      * 

@@ -61,14 +61,11 @@ class InitCron {
         Cron::password('123456');
         
         //enable job execution log
-        Cron::execLog(TRUE);
+        Cron::execLog(true);
         
         //add jobs
-        //$job = new CronJob('*/5,*/3 * * * *');
-        //$job->setOnExecution(function($params){
-        //    $file = fopen('cron.txt', 'a+');
-        //    fwrite($file, 'Job \''.$params[0]->getJobName().'\' executed at '.date(DATE_RFC1123)."\r\n");
-        //},array($job));
-        //Cron::scheduleJob($job);
+        //Cron::dailyJob("13:00", "Test Job", function (){
+        //
+        //});
     }
 }

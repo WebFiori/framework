@@ -44,7 +44,7 @@ if(!defined('ROOT_DIR')){
 /**
  * A class that is used to log messages to a file.
  *
- * @author Ibrahim <ibinshikh@hotmail.com>
+ * @author Ibrahim
  * @version 1.1.2
  */
 class Logger {

@@ -101,12 +101,15 @@ class Util{
      * @since 1.3.5
      */
     public static function numericValue($str){
-        $str = trim($str);
-        $len = strlen($str);
+        $strToConvert = trim($str);
+        $len = strlen($strToConvert);
+        if($len == 0 || gettype($str) != 'string'){
+            return false;
+        }
         $isFloat = false;
         $retVal = false;
         for($y = 0 ; $y < $len ; $y++){
-            $char = $str[$y];
+            $char = $strToConvert[$y];
             if($char == '.' && !$isFloat){
                 $isFloat = true;
             }
@@ -123,10 +126,10 @@ class Util{
             }
         }
         if($isFloat){
-            $retVal = floatval($str);
+            $retVal = floatval($strToConvert);
         }
         else{
-            $retVal = intval($str);
+            $retVal = intval($strToConvert);
         }
         return $retVal;
     }
@@ -135,7 +138,9 @@ class Util{
      * This method can be used to reverse the order of any string. 
      * For example, if the given string is '   Good Morning Buddy', the 
      * method will return 'ydduB gninriM dooG   '. If null is given, the 
-     * method will return empty string.
+     * method will return empty string. Note that if the given string is 
+     * a unicode string, then the method needs mb_ extension to be exist for 
+     * the output to be correct.
      * @param string $str The string that will be reversed.
      * @return string The string after reversing its order.
      * @since 1.3.7
@@ -143,9 +148,21 @@ class Util{
     public static function reverse($str) {
         $strToReverse = $str.'';
         $retV = '';
-        $strLen = strlen($strToReverse);
+        if(function_exists('mb_strlen')){
+            $strLen = mb_strlen($strToReverse);
+            $usemb = true;
+        }
+        else{
+            $strLen = strlen($strToReverse);
+            $usemb = false;
+        }
         for($x = $strLen - 1 ; $x >= 0 ; $x--){
-            $retV .= $strToReverse[$x];
+            if($usemb){
+                $retV .= mb_substr($strToReverse, $x, 1);;
+            }
+            else{
+                $retV .= $strToReverse[$x];
+            }
         }
         return $retV;
     }
@@ -219,20 +236,6 @@ class Util{
             }
         }
         return $retVal;
-    }
-    /**
-     * An alias for the method 'Util::getClientIP()'.
-     * @return string The IP address of the user who has initiated the request.
-     * @since 1.3
-     */
-    public static function getIpAddress() {
-        $ip = filter_var($_SERVER['REMOTE_ADDR'],FILTER_VALIDATE_IP);
-        if($ip == '::1'){
-            return '127.0.0.1';
-        }
-        else{
-            return $ip;
-        }
     }
     /**
      * Returns the IP address of the user who is connected to the server.
@@ -489,15 +492,20 @@ class Util{
     /**
      * Returns unicode code of a character.
      * Common values: 32 = space, 10 = new line, 13 = carriage return.
+     * Note that this method depends on mb_ functions.
      * @param type $u a character.
-     * @return int
+     * @return int|false The unicode code of a character. If mb_ library is not 
+     * loaded, the method will return false.
      * @since 0.2
      */
     public static function uniord($u) {
-        $k = mb_convert_encoding($u, 'UCS-2LE', 'UTF-8');
-        $k1 = ord(substr($k, 0, 1));
-        $k2 = ord(substr($k, 1, 1));
-        return $k2 * 256 + $k1;
+        if('mb_convert_encoding'){
+            $k = mb_convert_encoding($u, 'UCS-2LE', 'UTF-8');
+            $k1 = ord(substr($k, 0, 1));
+            $k2 = ord(substr($k, 1, 1));
+            return $k2 * 256 + $k1;
+        }
+        return false;
     }
     /**
      * Checks if a given character is an upper case letter or lower case letter.

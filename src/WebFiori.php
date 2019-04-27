@@ -338,31 +338,33 @@ class WebFiori{
         define('INITIAL_SYS_STATUS', $this->_getSystemStatus());
         
         Logger::log('INITIAL_SYS_STATUS = '.INITIAL_SYS_STATUS, 'debug');
-        if(INITIAL_SYS_STATUS === true){
-            //switch to the log file 'system-log.txt'.
-            Logger::logName('system-log');
-            Logger::clear();
-            Logger::section();
-        }
-        else if(INITIAL_SYS_STATUS == Util::DB_NEED_CONF){
-            Logger::log('Unable to connect to database.', 'warning');
-            $err = $this->dbErrDetails;
-            Logger::log('Database Error Code: '.$err['error-code']);
-            Logger::log('Database Error Message: '.$err['error-message']);
-            //switch to the log file 'system-log.txt'.
-            Logger::logName('system-log');
-            Logger::section();
-        }
-        else{
-            //you can modify this part to make 
-            //it do something else in case system 
-            //configuration is not equal to true
+        if(php_sapi_name() != 'cli'){
+            if(INITIAL_SYS_STATUS === true){
+                //switch to the log file 'system-log.txt'.
+                Logger::logName('system-log');
+                Logger::clear();
+                Logger::section();
+            }
+            else if(INITIAL_SYS_STATUS == Util::DB_NEED_CONF){
+                Logger::log('Unable to connect to database.', 'warning');
+                $err = $this->dbErrDetails;
+                Logger::log('Database Error Code: '.$err['error-code']);
+                Logger::log('Database Error Message: '.$err['error-message']);
+                //switch to the log file 'system-log.txt'.
+                Logger::logName('system-log');
+                Logger::section();
+            }
+            else{
+                //you can modify this part to make 
+                //it do something else in case system 
+                //configuration is not equal to true
 
-            //change system config status to configured.
-            //WebFiori::getSysFunctions()->configured(true);
+                //change system config status to configured.
+                //WebFiori::getSysFunctions()->configured(true);
 
-            //show error message to tell the developer how to configure the system.
-            $this->_needConfigration();
+                //show error message to tell the developer how to configure the system.
+                $this->_needConfigration();
+            }
         }
     }
     /**

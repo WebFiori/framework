@@ -30,7 +30,7 @@ use webfiori\entity\router\Router;
  *
  * @author Ibrahim
  */
-class CLIInterface {
+class CLI {
     /**
      * 
      */
@@ -43,7 +43,7 @@ class CLIInterface {
      * 
      */
     private static function showHelp() {
-        CLIInterface::showVersionInfo();
+        CLI::showVersionInfo();
         echo "Options: \n";
         self::printCommandInfo('--h', "Show this help. Similar command: --help.");
         self::printCommandInfo('--hello', "Show 'Hello world' Message.");

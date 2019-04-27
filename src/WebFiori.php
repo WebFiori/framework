@@ -41,7 +41,7 @@ use webfiori\entity\router\ClosureRoutes;
 use webfiori\entity\router\OtherRoutes;
 use webfiori\entity\router\Router;
 use jsonx\JsonX;
-use webfiori\entity\CLIInterface;
+use webfiori\entity\CLI;
 use Exception;
 /**
  * The instance of this class is used to control basic settings of 
@@ -218,7 +218,7 @@ class WebFiori{
         InitAutoLoad::init();
         Logger::log('Initializing user-defined autoload directories finished.');
         Logger::log('Initializing CLI...');
-        CLIInterface::init();
+        CLI::init();
         Logger::log('CLI Initialized.');
         Logger::log('Setting Error Handler...');
         
@@ -566,7 +566,7 @@ class WebFiori{
 //start the system
 WebFiori::getAndStart();
 if(php_sapi_name() == 'cli'){
-    CLIInterface::runCLI();
+    CLI::runCLI();
 }
 else{
     //route user request.

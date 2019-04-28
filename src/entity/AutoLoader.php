@@ -125,6 +125,7 @@ class AutoLoader{
      * @since 1.0
      */
     private function __construct($root='',$searchFolders=array(),$defineRoot=false,$onFail='throw-exception') {
+        $this->searchFolders = array();
         if(defined('ROOT_DIR')){
             $this->rootDir = ROOT_DIR;
         }

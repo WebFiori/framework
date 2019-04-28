@@ -7,9 +7,10 @@
         <whitelist addUncoveredFilesFromWhitelist="true">
             <directory suffix=".php">./src/conf</directory>
             <directory suffix=".php">./src/entity/cron</directory>
-            <directory suffix=".php">./src/entity/router</directory>
             <directory suffix=".php">./src/entity/mail</directory>
             <directory suffix=".php">./src/entity/functions</directory>
+            <file>./src/entity/router/Router.php</file>
+            <file>./src/entity/router/RouterUri.php</file>
             <file>./src/entity/langs/Language.php</file>
             <file>./src/entity/Access.php</file>
             <file>./src/entity/Autoloader.php</file>

@@ -11,16 +11,17 @@ if(explode($DS, $root)[0] == 'home'){
 else{
     require_once trim($root,'/\\').$DS.'src'.$DS.'entity'.$DS.'AutoLoader.php';
 }
-define('ROOT_DIR', $root);
 AutoLoader::get(array(
     'search-folders'=>array(
         'tests',
         'src'
     ),
+    'define-root'=>true,
+    'root'=>$root,
     'on-load-failure'=>'do-nothing'
 ));
 echo 'Autoloader Initialized.'."\n";
-echo 'Root Directory: \''.ROOT_DIR.'\'.'."\n";
+echo 'Root Directory: \''.$root.'\'.'."\n";
 echo 'Class Search Paths:'."\n";
 $dirs = AutoLoader::getFolders();
 foreach ($dirs as $dir){

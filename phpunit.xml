@@ -36,5 +36,11 @@
         <testsuite name="Router Tests">
             <directory>./tests/entity/router/</directory>
         </testsuite>
+        <testsuite name="Language Tests">
+            <directory>./tests/entity/langs/</directory>
+        </testsuite>
+        <testsuite name="Entity Tests">
+            <directory>./tests/entity/</directory>
+        </testsuite>
     </testsuites>
 </phpunit>

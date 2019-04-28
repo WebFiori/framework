@@ -124,132 +124,115 @@ if(!defined('ROOT_DIR')){
  */
 class LanguageAR extends Language{
     public function __construct() {
-        parent::__construct('rtl', 'AR', array(
-            'general/week-day',
-            'general/g-month',
-            'general/i-month',
-            'general/action',
-            'general/status',
-            'general/error',
-            'general/http-codes/200',
-            'general/http-codes/201',
-            'general/http-codes/400',
-            'general/http-codes/401',
-            'general/http-codes/403',
-            'general/http-codes/404',
-            'general/http-codes/405',
-            'general/http-codes/408',
-            'general/http-codes/415',
-            'general/http-codes/500',
-            'general/http-codes/501',
-            'general/http-codes/505',
-        ), TRUE);
-        $this->setMultiple('general/http-codes/200', array(
+        parent::__construct('rtl', 'AR', true);
+        $this->createAndSet('general/http-codes/200', array(
             'code'=>200,
             'type'=>'OK',
             'message'=>''
         ));
-        $this->setMultiple('general/http-codes/201', array(
+        $this->createAndSet('general/http-codes/201', array(
             'code'=>201,
-            'type'=>'Created',
+            'type'=>'تم الإنشاء',
             'message'=>''
         ));
-        $this->setMultiple('general/http-codes/400', array(
+        $this->createAndSet('general/http-codes/400', array(
             'code'=>400,
-            'type'=>'Bad Request',
-            'message'=>'Server could not understand the request due to invalid syntax.'
+            'type'=>'طلب سيء',
+            'message'=>'تعذر على الخادم فهم الطلب بسبب عدم صحة بناء الجملة.'
         ));
-        $this->setMultiple('general/http-codes/401', array(
+        $this->createAndSet('general/http-codes/401', array(
             'code'=>401,
-            'type'=>'Not Authorized',
-            'message'=>'You are not authorized to view the specified reasource.'
+            'type'=>'غير مخول',
+            'message'=>'غير مصرح لك بعرض المورد المحدد.'
         ));
-        $this->setMultiple('general/http-codes/403', array(
+        $this->createAndSet('general/http-codes/403', array(
             'code'=>403,
-            'type'=>'Forbidden',
-            'message'=>'You are not allowed to view the content of the requested resource.'
+            'type'=>'محظور',
+            'message'=>'غير مسموح لك بعرض محتوى المورد المطلوب.'
         ));
-        $this->setMultiple('general/http-codes/404', array(
+        $this->createAndSet('general/http-codes/404', array(
             'code'=>404,
-            'type'=>'Not Found',
-            'message'=>'The requested resource cannot be found.'
+            'type'=>'غير موجود',
+            'message'=>'لا يمكن العثور على المورد المطلوب.'
         ));
-        $this->setMultiple('general/http-codes/405', array(
+        $this->createAndSet('general/http-codes/405', array(
             'code'=>405,
-            'type'=>'Method Not Allowed',
-            'message'=>'The method that is used to get the resource is not allowed.'
+            'type'=>'الطريقة غير مسموحة',
+            'message'=>'الطريقة اللتي تم إستخدامها للحصول على المورد غير مسموحة.'
         ));
-        $this->setMultiple('general/http-codes/408', array(
+        $this->createAndSet('general/http-codes/408', array(
             'code'=>408,
-            'type'=>'Request Timeout',
+            'type'=>'إنتهت مهلة الطلب',
             'message'=>''
         ));
-        $this->setMultiple('general/http-codes/415', array(
+        $this->createAndSet('general/http-codes/415', array(
             'code'=>415,
-            'type'=>'Unsupported Media Type',
-            'message'=>'The payload format is not supported by the server.'
+            'type'=>'نوع الوسائط غير مدعوم',
+            'message'=>'تنسيق حمولة الطلب غير مدعوم من قِبل الخادم.'
         ));
-        $this->setMultiple('general/http-codes/500', array(
+        $this->createAndSet('general/http-codes/500', array(
             'code'=>500,
-            'type'=>'Server Error',
-            'message'=>'Internal server error.'
+            'type'=>'خطأ بالخادم',
+            'message'=>'خطأ داخلي بالخادم.'
         ));
-        $this->setMultiple('general/http-codes/501', array(
+        $this->createAndSet('general/http-codes/501', array(
             'code'=>501,
-            'type'=>'Not Implemented',
-            'message'=>'The request method is not supported.'
+            'type'=>'لم تُنفذ',
+            'message'=>'طريقة الطلب غير مدعومة.'
         ));
-        $this->setMultiple('general/http-codes/505', array(
+        $this->createAndSet('general/http-codes/505', array(
             'code'=>505,
-            'type'=>'HTTP Version Not Supported',
-            'message'=>'The HTTP version used in the request is not supported by the server.'
+            'type'=>'نسخة HTTP غير مدعومة',
+            'message'=>'نسخة HTTP المُستخدمة في الطلب غير مدعومة من قِبل الخادم.'
         ));
         
-        $this->set('general/action', 'cancel', 'إلغاء');
-        $this->set('general/action', 'back', 'رجوع');
+        $this->createAndSet('general/action', array(
+            'cancel'=>'إلغاء',
+            'back'=>'رجوع',
+            'save'=>'حفظ',
+            'remove'=>'إزالة',
+            'delete'=>'حذف',
+            'print'=>'طباعة',
+            'connect'=>'إتصال',
+            'next'=>'التالي',
+            'previous'=>'السابق',
+            'skip'=>'تخطي',
+            'finish'=>'إنهاء'
+        ));
         
-        $this->set('general/error', 'db-error', 'خطأ في قاعدة البيانات.');
-        $this->set('general/error', 'db-connect-err', 'غير قادر على الإتصال بقاعدة البيانات.');
+        $this->createAndSet('general/error', array(
+            'db-error'=>'خطأ في قاعدة البيانات.',
+            'db-connect-err'=>'غير قادر على الإتصال بقاعدة البيانات.'
+        ));
         
-        $this->set('general/status', 'wait', 'الرجاء الإنتظار للحظة...');
-        $this->set('general/status', 'loading', 'جاري التحميل...');
-        $this->set('general/status', 'checking', 'جاري التحقق...');
-        $this->set('general/status', 'validating', 'جاري التحقق من الصحة...');
-        $this->set('general/status', 'loaded', 'تم التحميل.');
+        $this->createAndSet('general/status', array(
+            'wait'=>'الرجاء الإنتظار للحظة...',
+            'loading'=>'جاري التحميل...',
+            'checking'=>'جاري التحقق...',
+            'validating'=>'جاري التحقق من الصحة...',
+            'loaded'=>'تم التحميل.',
+            'saving'=>'جاري الحفظ...',
+            'saved'=>'تم الحفظ.',
+            'removing'=>'جاري الإزالة...',
+            'removed'=>'تمت الإزالة.',
+            'deleting'=>'جاري الحذف...',
+            'deleted'=>'تم الحذف.',
+            'printing'=>'جاري الطباعة...',
+            'printed'=>'تمت الطباعة.',
+            'connecting'=>'جاري الإتصال...',
+            'connected'=>'تم الإتصال.',
+            'disconnected'=>'غير متصل.'
+        ));
+        
+        $this->createAndSet('general/error', array(
+            'save'=>'غير قادر على الحفظ!',
+            'remove'=>'غير قادر على الإزالة!',
+            'delete'=>'غير قادر على الحذف!',
+            'print'=>'غير قادر على الطباعة !',
+            'connect'=>'غير قادر على الإتصال!'
+        ));
 
-        $this->set('general/action', 'save', 'حفظ');
-        $this->set('general/status', 'saving', 'جاري الحفظ...');
-        $this->set('general/status', 'saved', 'تم الحفظ.');
-        $this->set('general/error', 'save', 'غير قادر على الحفظ!');
-
-        $this->set('general/action', 'remove', 'إزالة');
-        $this->set('general/status', 'removing', 'جاري الإزالة...');
-        $this->set('general/status', 'removed', 'تمت الإزالة.');
-        $this->set('general/error', 'remove', 'غير قادر على الإزالة!');
-
-        $this->set('general/action', 'delete', 'حذف');
-        $this->set('general/status', 'deleting', 'جاري الحذف...');
-        $this->set('general/status', 'deleted', 'تم الحذف.');
-        $this->set('general/error', 'delete', 'غير قادر على الحذف!');
-
-        $this->set('general/action', 'print', 'طباعة');
-        $this->set('general/status', 'printing', 'جاري الطباعة...');
-        $this->set('general/status', 'printed', 'تمت الطباعة.');
-        $this->set('general/error', 'print', 'غير قادر على الطباعة !');
-
-        $this->set('general/action', 'connect', 'إتصال');
-        $this->set('general/status', 'connecting', 'جاري الإتصال...');
-        $this->set('general/status', 'connected', 'تم الإتصال.');
-        $this->set('general/error', 'connect', 'غير قادر على الإتصال!');
-
-        $this->set('general/status', 'disconnected', 'غير متصل.');
-
-        $this->set('general/action', 'next', 'التالي');
-        $this->set('general/action', 'previous', 'السابق');
-        $this->set('general/action', 'skip', 'تخطي');
-        $this->set('general/action', 'finish', 'إنهاء');
-
-        $this->setMultiple('general/week-day', array(
+        $this->createAndSet('general/week-day', array(
             'd7'=>'الأحد',
             'd1'=>'الأثنين',
             'd2'=>'الثلاثاء',
@@ -259,7 +242,7 @@ class LanguageAR extends Language{
             'd6'=>'السبت',
         ));
 
-        $this->setMultiple('general/g-month', array(
+        $this->createAndSet('general/g-month', array(
             'm1'=>'يناير',
             'm2'=>'فبراير',
             'm3'=>'مارس',
@@ -274,7 +257,7 @@ class LanguageAR extends Language{
             'm12'=>'ديسمبر',
         ));
         
-        $this->setMultiple('general/i-month', array(
+        $this->createAndSet('general/i-month', array(
             'm1'=>'محرم',
             'm2'=>'صفر',
             'm3'=>'ربيع اول',

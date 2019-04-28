@@ -124,132 +124,115 @@ if(!defined('ROOT_DIR')){
  */
 class LanguageEN extends Language{
     public function __construct() {
-        parent::__construct('ltr', 'EN', array(
-            'general/week-day',
-            'general/g-month',
-            'general/i-month',
-            'general/action',
-            'general/status',
-            'general/error',
-            'general/http-codes/200',
-            'general/http-codes/201',
-            'general/http-codes/400',
-            'general/http-codes/401',
-            'general/http-codes/403',
-            'general/http-codes/404',
-            'general/http-codes/405',
-            'general/http-codes/408',
-            'general/http-codes/415',
-            'general/http-codes/500',
-            'general/http-codes/501',
-            'general/http-codes/505',
-        ), TRUE);
-        $this->setMultiple('general/http-codes/200', array(
+        parent::__construct('ltr', 'EN', true);
+        $this->createAndSet('general/http-codes/200', array(
             'code'=>200,
             'type'=>'OK',
             'message'=>''
         ));
-        $this->setMultiple('general/http-codes/201', array(
+        $this->createAndSet('general/http-codes/201', array(
             'code'=>201,
             'type'=>'Created',
             'message'=>''
         ));
-        $this->setMultiple('general/http-codes/400', array(
+        $this->createAndSet('general/http-codes/400', array(
             'code'=>400,
             'type'=>'Bad Request',
             'message'=>'Server could not understand the request due to invalid syntax.'
         ));
-        $this->setMultiple('general/http-codes/401', array(
+        $this->createAndSet('general/http-codes/401', array(
             'code'=>401,
             'type'=>'Not Authorized',
             'message'=>'You are not authorized to view the specified reasource.'
         ));
-        $this->setMultiple('general/http-codes/403', array(
+        $this->createAndSet('general/http-codes/403', array(
             'code'=>403,
             'type'=>'Forbidden',
             'message'=>'You are not allowed to view the content of the requested resource.'
         ));
-        $this->setMultiple('general/http-codes/404', array(
+        $this->createAndSet('general/http-codes/404', array(
             'code'=>404,
             'type'=>'Not Found',
             'message'=>'The requested resource cannot be found.'
         ));
-        $this->setMultiple('general/http-codes/405', array(
+        $this->createAndSet('general/http-codes/405', array(
             'code'=>405,
             'type'=>'Method Not Allowed',
             'message'=>'The method that is used to get the resource is not allowed.'
         ));
-        $this->setMultiple('general/http-codes/408', array(
+        $this->createAndSet('general/http-codes/408', array(
             'code'=>408,
             'type'=>'Request Timeout',
             'message'=>''
         ));
-        $this->setMultiple('general/http-codes/415', array(
+        $this->createAndSet('general/http-codes/415', array(
             'code'=>415,
             'type'=>'Unsupported Media Type',
             'message'=>'The payload format is not supported by the server.'
         ));
-        $this->setMultiple('general/http-codes/500', array(
+        $this->createAndSet('general/http-codes/500', array(
             'code'=>500,
             'type'=>'Server Error',
             'message'=>'Internal server error.'
         ));
-        $this->setMultiple('general/http-codes/501', array(
+        $this->createAndSet('general/http-codes/501', array(
             'code'=>501,
             'type'=>'Not Implemented',
             'message'=>'The request method is not supported.'
         ));
-        $this->setMultiple('general/http-codes/505', array(
+        $this->createAndSet('general/http-codes/505', array(
             'code'=>505,
             'type'=>'HTTP Version Not Supported',
             'message'=>'The HTTP version used in the request is not supported by the server.'
         ));
         
-        $this->set('general/action', 'cancel', 'Cancel');
-        $this->set('general/action', 'back', 'Back');
+        $this->createAndSet('general/action', array(
+            'cancel'=>'Cancel',
+            'back'=>'Back',
+            'save'=>'Save',
+            'remove'=>'Remove',
+            'delete'=>'Delete',
+            'print'=>'Print',
+            'connect'=>'Connect',
+            'next'=>'Next',
+            'previous'=>'Previous',
+            'skip'=>'Skip',
+            'finish'=>'Finish'
+        ));
         
-        $this->set('general/error', 'db-error', 'Database Error.');
-        $this->set('general/error', 'db-connect-err', 'Unable to connect to database.');
+        $this->createAndSet('general/error', array(
+            'db-error'=>'Database Error.',
+            'db-connect-err'=>'Unable to connect to database.'
+        ));
         
-        $this->set('general/status', 'wait', 'Please wait a moment...');
-        $this->set('general/status', 'loading', 'Loading...');
-        $this->set('general/status', 'checking', 'Checking...');
-        $this->set('general/status', 'validating', 'Validating...');
-        $this->set('general/status', 'loaded', 'Loaded.');
+        $this->createAndSet('general/status', array(
+            'wait'=>'Please wait a moment...',
+            'loading'=>'Loading...',
+            'checking'=>'Checking...',
+            'validating'=>'Validating...',
+            'loaded'=>'Loaded.',
+            'saving'=>'Saving...',
+            'saved'=>'Saved.',
+            'removing'=>'Removing...',
+            'removed'=>'Removed.',
+            'deleting'=>'Deleting...',
+            'deleted'=>'Deleted.',
+            'printing'=>'Printing...',
+            'printed'=>'Printed.',
+            'connecting'=>'Connecting...',
+            'connected'=>'Connected.',
+            'disconnected'=>'Disconnected.'
+        ));
+        
+        $this->createAndSet('general/error', array(
+            'save'=>'Unable to save!',
+            'remove'=>'Unable to remove!',
+            'delete'=>'Unable to delete!',
+            'print'=>'Unable to print!',
+            'connect'=>'Unable to connect!'
+        ));
 
-        $this->set('general/action', 'save', 'Save');
-        $this->set('general/status', 'saving', 'Saving...');
-        $this->set('general/status', 'saved', 'Saved');
-        $this->set('general/error', 'save', 'Unable to save.');
-
-        $this->set('general/action', 'remove', 'Remove');
-        $this->set('general/status', 'removing', 'Removing...');
-        $this->set('general/status', 'removed', 'Removed');
-        $this->set('general/error', 'remove', 'Unable to remove.');
-
-        $this->set('general/action', 'delete', 'Delete');
-        $this->set('general/status', 'deleting', 'Deleting...');
-        $this->set('general/status', 'deleted', 'Deleted');
-        $this->set('general/error', 'delete', 'Unabel to delete.');
-
-        $this->set('general/action', 'print', 'Print');
-        $this->set('general/status', 'printing', 'Printing...');
-        $this->set('general/status', 'printed', 'Printed.');
-        $this->set('general/error', 'print', 'Unable to print.');
-
-        $this->set('general/action', 'connect', 'Connect');
-        $this->set('general/status', 'connecting', 'Connecting...');
-        $this->set('general/status', 'connected', 'Connected');
-        $this->set('general/error', 'connect', 'Unable to connect.');
-
-        $this->set('general/status', 'disconnected', 'Disconnected');
-
-        $this->set('general/action', 'next', 'Next');
-        $this->set('general/action', 'previous', 'Previous');
-        $this->set('general/action', 'skip', 'Skip');
-        $this->set('general/action', 'finish', 'Finish');
-
-        $this->setMultiple('general/week-day', array(
+        $this->createAndSet('general/week-day', array(
             'd7'=>'Sunday',
             'd1'=>'Monday',
             'd2'=>'Tuesday',
@@ -259,7 +242,7 @@ class LanguageEN extends Language{
             'd6'=>'Saturday',
         ));
 
-        $this->setMultiple('general/g-month', array(
+        $this->createAndSet('general/g-month', array(
             'm1'=>'January',
             'm2'=>'February',
             'm3'=>'March',
@@ -274,7 +257,7 @@ class LanguageEN extends Language{
             'm12'=>'December',
         ));
         
-        $this->setMultiple('general/i-month', array(
+        $this->createAndSet('general/i-month', array(
             'm1'=>'Muḥarram',
             'm2'=>'Ṣafar',
             'm3'=>'Rabīʿ al-Awwal',

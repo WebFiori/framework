@@ -10,22 +10,22 @@
             <directory suffix=".php">./src/entity/router</directory>
             <directory suffix=".php">./src/entity/mail</directory>
             <directory suffix=".php">./src/entity/functions</directory>
-            <file>/src/entity/langs/Language/Access.php</file>
-            <file>/src/entity/Access.php</file>
-            <file>/src/entity/Autoloader.php</file>
-            <file>/src/entity/DBConnectionFactory.php</file>
-            <file>/src/entity/DBConnectionInfo.php</file>
-            <file>/src/entity/DatabaseSchema.php</file>
-            <file>/src/entity/ExtendedWebAPI.php</file>
-            <file>/src/entity/File.php</file>
-            <file>/src/entity/FileHandler.php</file>
-            <file>/src/entity/Page.php</file>
-            <file>/src/entity/Privilege.php</file>
-            <file>/src/entity/PrivilegesGroup.php</file>
-            <file>/src/entity/Theme.php</file>
-            <file>/src/entity/Uploader.php</file>
-            <file>/src/entity/User.php</file>
-            <file>/src/entity/Util.php</file>
+            <file>./src/entity/langs/Language.php</file>
+            <file>./src/entity/Access.php</file>
+            <file>./src/entity/Autoloader.php</file>
+            <file>./src/entity/DBConnectionFactory.php</file>
+            <file>./src/entity/DBConnectionInfo.php</file>
+            <file>./src/entity/DatabaseSchema.php</file>
+            <file>./src/entity/ExtendedWebAPI.php</file>
+            <file>./src/entity/File.php</file>
+            <file>./src/entity/FileHandler.php</file>
+            <file>./src/entity/Page.php</file>
+            <file>./src/entity/Privilege.php</file>
+            <file>./src/entity/PrivilegesGroup.php</file>
+            <file>./src/entity/Theme.php</file>
+            <file>./src/entity/Uploader.php</file>
+            <file>./src/entity/User.php</file>
+            <file>./src/entity/Util.php</file>
         </whitelist>
     </filter>
     <logging>

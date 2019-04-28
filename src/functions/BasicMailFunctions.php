@@ -25,20 +25,8 @@
 namespace webfiori\functions;
 if(!defined('ROOT_DIR')){
     header("HTTP/1.1 403 Forbidden");
-    die(''
-        . '<!DOCTYPE html>'
-        . '<html>'
-        . '<head>'
-        . '<title>Forbidden</title>'
-        . '</head>'
-        . '<body>'
-        . '<h1>403 - Forbidden</h1>'
-        . '<hr>'
-        . '<p>'
-        . 'Direct access not allowed.'
-        . '</p>'
-        . '</body>'
-        . '</html>');
+    die('<!DOCTYPE html><html><head><title>Forbidden</title></head><body>'
+    . '<h1>403 - Forbidden</h1><hr><p>Direct access not allowed.</p></body></html>');
 }
 use webfiori\entity\Logger;
 use webfiori\entity\FileHandler;

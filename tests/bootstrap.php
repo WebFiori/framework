@@ -1,8 +1,9 @@
 <?php
 use webfiori\entity\AutoLoader;
 $DS = DIRECTORY_SEPARATOR;
-$root = trim(__DIR__,$DS.'tests');
-echo php_sapi_name()."\n";
+//the name of tests directory. Update as needed.
+$testsDirName = 'tests';
+$root = substr(__DIR__, 0, strlen(__DIR__) - strlen($testsDirName));
 echo 'Include Path: \''. get_include_path().'\''."\n";
 if(explode($DS, $root)[0] == 'home'){
     //linux 

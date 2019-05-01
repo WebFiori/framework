@@ -88,25 +88,26 @@ class AutoLoader{
         'root'=>'',
         'on-load-failure'=>'do-nothing'
     )) {
+        $DS = DIRECTORY_SEPARATOR;
         if(self::$loader === null){
             $frameworkSearchFoldres = array(
                 '',
-                '/entity',
-                '/themes',
-                '/functions',
-                '/apis',
-                '/pages',
-                '/ini',
-                '/conf'
+                $DS.'entity',
+                $DS.'themes',
+                $DS.'functions',
+                $DS.'apis',
+                $DS.'pages',
+                $DS.'ini',
+                $DS.'conf'
             );
-            $DS = DIRECTORY_SEPARATOR;
+            
             if(isset($options['search-folders'])){
                 foreach ($options['search-folders'] as $folder){
                     $frameworkSearchFoldres[] = $DS.trim(str_replace('\\', $DS, str_replace('/', $DS, $folder)),'/\\');
                 }
             }
             $defineRoot = isset($options['define-root']) && $options['define-root'] === true ? true : false;
-            $root = isset($options['root']) ? trim($options['root'],'\\/') : '';
+            $root = isset($options['root']) ? trim($options['root'],'\\/') : trim(substr(__DIR__, 0, strlen(__DIR__) - strlen('\entity')),'\\/');
             if(strlen($root) != 0 && explode($DS, $root)[0] == 'home'){
                 //linux 
                 $root = $DS.$root;
@@ -135,13 +136,6 @@ class AutoLoader{
                 if($defineRoot === true){
                     define('ROOT_DIR', $this->rootDir);
                 }
-            }
-            else if($defineRoot === true){
-                $this->rootDir = __DIR__;
-                foreach ($searchFolders as $folder){
-                    $this->rootDir = str_replace($folder, '', $this->rootDir);
-                }
-                define('ROOT_DIR', $this->rootDir);
             }
             else{
                 throw new Exception('Unable to set root search folder.');

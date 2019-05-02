@@ -1,5 +1,4 @@
 <?php
-
 /*
  * The MIT License
  *
@@ -44,7 +43,7 @@ use Exception;
  * the system uses any. The developer can extend this class to add his own 
  * logic to the application that he is creating.
  * @author Ibrahim
- * @version 1.3.5
+ * @version 1.3.6
  */
 class Functions {
     /**
@@ -105,25 +104,34 @@ class Functions {
         'variables'=>array()
     );
     /**
+     * A constant that indicates a given database connection was 
+     * not found.
+     * @since 1.3.6
+     */
+    const NO_SUCH_CONNECTION = 'no_such_conn';
+    /**
      * A default database to connect to.
      * @var type 
      */
     private $defaultConn;
     /**
      * Sets a default connection information.
-     * @param string $dbName The name of the database.
-     * @throws Exception If no connection information was found in the class 
-     * 'Config' for the given database, an exception with the message 
-     * 'No connection information was found for the database 'db_name'.' will be thrown.
+     * @param string $connName The name of database connection. It 
+     * should be a key name taken from the array of database connections 
+     * which is stored in the class 'Config'.
+     * @return boolean|string If a connection was found which has the given 
+     * name, the method will return true. If If no connection information was found in the class 
+     * 'Config' for the given database, the method will return 
+     * Functions::NO_SUCH_CONNECTION.
      * @since 1.3.5
      */
-    public function setDefaultDB($dbName) {
-        $connInfo = Config::getDBConnection($dbName);
+    public function setConnection($connName) {
+        $connInfo = Config::getDBConnection($connName);
         if($connInfo instanceof DBConnectionInfo){
             $this->defaultConn = $connInfo;
-            return;
+            return true;
         }
-        throw new Exception('No connection information was found for the database \''.$dbName.'\'.');
+        return self::NO_SUCH_CONNECTION;
     }
     /**
      * Creates new instance of the class.
@@ -139,9 +147,10 @@ class Functions {
             Logger::log('Initializing sessions array...');
             self::$sessions = array();
         }
-        $this->connErrDetails = array();
-        $this->connErrDetails['error-code'] = '';
-        $this->connErrDetails['error-message'] = '';
+        $this->connErrDetails = array(
+            'error-code'=>0,
+            'error-message'=>'NO_ERR'
+        );
         Logger::logFuncReturn(__METHOD__);
     }
     /**
@@ -151,30 +160,37 @@ class Functions {
      * Another option is to set a default database name using the method Functions::setDefaultDB(). 
      * Note that the connection information of the database must exist in the 
      * class 'Config'.
-     * @param string $dbName The name of the database. The connection information 
+     * @param string $connName The name of database connection. The connection information 
      * will be taken from the class 'Config'.
-     * @return boolean If the connection is established, the method will 
-     * return true. If not, the method will return false.
+     * @return boolean|string If the connection is established, the method will 
+     * return true. If not, the method will return false. If a connection name 
+     * is given but its information is not found, the method will return 
+     * Functions::NO_SUCH_CONNECTION.
      * @since 1.1
      */
-    public function useDatabase($dbName=null) {
+    public function useDatabase($connName=null) {
         Logger::logFuncCall(__METHOD__);
-        Logger::log('Database name = \''.$dbName.'\'.', 'debug');
+        Logger::log('Connection name = \''.$connName.'\'.', 'debug');
         Logger::log('Checking if already connected to a database...');
         $retVal = false;
         $dbLink = &$this->getDBLink();
+        $dbConn = Config::getDBConnection($connName);
         if($dbLink instanceof MySQLLink){
             Logger::log('Already connected to database.');
             Logger::log('Checking if connected to same database...');
-            if($dbName !== null && $dbName != $dbLink->getDBName()){
+            if($dbConn !== null && $dbConn->getDBName() != $dbLink->getDBName()){
                 Logger::log('Different database. Trying to connect to the database...');
                 Logger::log('Getting database connection info...');
-                $conInfo = Config::getDBConnection($dbName);
-                if($conInfo instanceof DBConnectionInfo){
-                    $retVal = $this->_connect($conInfo);
+                if($dbConn instanceof DBConnectionInfo){
+                    $retVal = $this->_connect($dbConn);
                 }
                 else{
                     Logger::log('No connection info was found for a database with the given name.', 'warning');
+                    $this->connErrDetails = array(
+                        'error-code'=>-1,
+                        'error-message'=>'No database connection was found which has the name \''.$connName.'\'.'
+                    );
+                    $retVal = self::NO_SUCH_CONNECTION;
                 }
             }
             else{
@@ -185,14 +201,23 @@ class Functions {
         else{
             Logger::log('Not connected.');
             Logger::log('Getting database connection info...');
-            $conInfo = Config::getDBConnection($dbName);
+            $conInfo = Config::getDBConnection($connName);
             if($conInfo instanceof DBConnectionInfo){
                 $retVal = $this->_connect($conInfo);
             }
             else{
                 Logger::log('No connection info was found for a database with the given name.', 'warning');
                 Logger::log('Trying to use default connection info...');
-                $retVal = $this->_connect($this->defaultConn);
+                if($this->defaultConn !== null){
+                    $retVal = $this->_connect($this->defaultConn);
+                }
+                else{
+                    $this->connErrDetails = array(
+                        'error-code'=>-2,
+                        'error-message'=>'No database connection was set.'
+                    );
+                    $retVal = false;
+                }
             }
         }
         Logger::logReturnValue($retVal);
@@ -231,6 +256,7 @@ class Functions {
                 return false;
             }
         }
+        return false;
     }
     /**
      * Returns an associative array that contains database error info (if any)
@@ -238,9 +264,10 @@ class Functions {
      * indices: 
      * <ul>
      * <li><b>error-code</b>: Error code.</li>
-     * <li><b>error-code</b>: A message that tells more information about 
+     * <li><b>error-message</b>: A message that tells more information about 
      * the error.</li>
-     * If no errors, the indices will have empty strings.
+     * If no errors, the first index will have the value 0 and 
+     * the second index will have the value 'NO_ERR'.
      * @since 1.3.4
      */
     public function getDBErrDetails() {
@@ -256,30 +283,33 @@ class Functions {
      * @param MySQLQuery $qObj An object of type 'MySQLQuery'. Note that 
      * this method will call the method 'Functions::useDatabase()' by 
      * default.
-     * @param string $dbName An optional database. The query will be executed 
+     * @param string $connName An optional connection name. The query will be executed 
      * against it if provided.
      * @return boolean 'true' if no errors occur while executing the query.
-     * FAlSE in case of error.
+     * false in case of error.
      * @since 1.0
      */
-    public function excQ($qObj,$dbName=null){
+    public function excQ($qObj,$connName=null){
         Logger::logFuncCall(__METHOD__);
         $retVal = false;
         if($qObj instanceof MySQLQuery){
-            if($this->useDatabase($dbName)){
-                $dbLink = &$this->getDBLink();
-                Logger::log('Query = \''.$qObj->getQuery().'\'.', 'debug');
-                Logger::log('Executing database query...');
-                $result = $dbLink->executeQuery($qObj);
-                if($result !== true){
-                    Logger::log('An error has occured while executing the query.', 'error');
-                    Logger::log('Error Code: '.$dbLink->getErrorCode(), 'error');
-                    Logger::log('Error Message: '.$dbLink->getErrorMessage(), 'error');
+            if($connName !== null){
+                $connectResult = $this->useDatabase($connName);
+                if($connectResult == self::NO_SUCH_CONNECTION){
+                    return self::NO_SUCH_CONNECTION;
                 }
-                $retVal = $result;
+                else if($connectResult === false){
+                    return false;
+                }
+                else{
+                    $retVal = $this->_runQuery($qObj);
+                }
             }
             else{
-                Logger::log('Unable to use database connection.', 'warning');
+                $retVal = $this->useDatabase();
+                if($retVal === true){
+                    $retVal = $this->_runQuery($qObj);
+                }
             }
         }
         else{
@@ -293,6 +323,22 @@ class Functions {
         }
         Logger::logFuncReturn(__METHOD__);
         return $retVal;
+    }
+    /**
+     * 
+     * @param MySQLQuery $query
+     * @return type
+     */
+    private function _runQuery($query) {
+        $link = $this->getDBLink();
+        $result = $link->executeQuery($query);
+        if($result !== true){
+            $this->connErrDetails = array(
+                'error-code'=>$link->getErrorCode(),
+                'error-message'=>$link->getErrorMessage()
+            );
+        }
+        return $result;
     }
     /**
      * Checks if the current session user has a privilege or not given privilege 

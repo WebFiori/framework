@@ -165,7 +165,7 @@ class Config{
     }
     /**
      * Returns an associative array that contain the information of database connections.
-     * The keys of the array will be the names of databases and the value of 
+     * The keys of the array will be the name of database connection and the value of 
      * each key will be an object of type DBConnectionInfo.
      * @return array An associative array.
      * @since 1.3.3
@@ -174,17 +174,17 @@ class Config{
         return self::get()->dbConnections;
     }
     /**
-     * Returns database connection information given database name.
-     * @param string $dbName The name of the database.
+     * Returns database connection information given connection name.
+     * @param string $conName The name of the connection.
      * @return DBConnectionInfo|null The method will return an object of type 
-     * DBConnectionInfo if a connection info was found for the given database. 
+     * DBConnectionInfo if a connection info was found for the given connection name. 
      * Other than that, the method will return null.
      * @since 1.3.3
      */
-    public static function getDBConnection($dbName){
+    public static function getDBConnection($conName){
         $conns = self::getDBConnections();
-        if(isset($conns[$dbName])){
-            return $conns[$dbName];
+        if(isset($conns[$conName])){
+            return $conns[$conName];
         }
         return null;
     } 

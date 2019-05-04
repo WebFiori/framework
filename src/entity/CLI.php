@@ -200,9 +200,9 @@ class CLI {
                 }
             }
             else{
-                fprintf(STDERR,"Error: Command not supported or not implemented.");
+                fprintf(STDERR,"Error: The command '".$commands[0]."' is not supported or not implemented.");
             }
-            exit(0);
+            //exit(0);
         }
     }
     /**

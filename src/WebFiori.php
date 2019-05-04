@@ -189,7 +189,9 @@ class WebFiori{
         /**
          * The root directory that is used to load all other required system files.
          */
-        define('ROOT_DIR',__DIR__);
+        if(!defined('ROOT_DIR')){
+            define('ROOT_DIR',__DIR__);
+        }
 
         /**
          * Fallback for older php versions that does not
@@ -199,11 +201,12 @@ class WebFiori{
             define('PHP_INT_MIN', ~PHP_INT_MAX);
         }
 
-        
         /**
          * Initialize autoloader.
          */
-        require_once ROOT_DIR.'/entity/AutoLoader.php';
+        if(!class_exists('webfiori\entity\AutoLoader',false)){
+           require_once ROOT_DIR.'/entity/AutoLoader.php';
+        }
         self::$AU = AutoLoader::get();
         
         //uncomment next line to show runtime errors and warnings

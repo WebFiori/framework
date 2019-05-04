@@ -5,11 +5,18 @@ php:
     - 7.1
     - 7.2
     - 7.3
+services:
+    - mysql
 before_install:
+    - mysql -e 'create database if not exist testing_db;'
+    - sudo mysql -e "use mysql; update user set authentication_string=PASSWORD('123456') where User='root'; update user set plugin='mysql_native_password';FLUSH PRIVILEGES;"
+    - sudo mysql_upgrade -u root -pnew_password
+    - sudo service mysql restart
 before_script:
     - composer self-update
     - composer install --prefer-source --no-interaction --dev
 script:
     - phpunit --configuration phpunit.xml
 after_success:
+    - mysql -e 'drop database testing_db;'
     - bash <(curl -s https://codecov.io/bash)

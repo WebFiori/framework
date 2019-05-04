@@ -47,7 +47,7 @@ use webfiori\entity\mail\SMTPAccount;
  * The developer can create multiple SMTP accounts and add 
  * Connection information inside the body of this class.
  * @author Ibrahim
- * @version 1.0
+ * @version 1.0.1
  */
 class MailConfig{
     private $emailAccounts;
@@ -83,6 +83,21 @@ class MailConfig{
     private function addAccount($acc,$name){
         $this->emailAccounts[$name] = $acc;
     }
+    /**
+     * Adds new SMTP connection information or updates an existing one.
+     * @param string $accName The name of the account that will be added or updated.
+     * @param SMTPAccount $smtpConnInfo An object of type 'SMTPAccount' that 
+     * will contain SMTP account information.
+     * @since 1.0.1
+     */
+    public static function addSMTPAccount($accName,$smtpConnInfo){
+        if($smtpConnInfo instanceof SMTPAccount){
+            $trimmedName = trim($accName);
+            if(strlen($trimmedName) != 0){
+                self::get()->addAccount($smtpConnInfo,$trimmedName);
+            }
+        }
+    }
     private function &_getAccount($name){
         if(isset($this->emailAccounts[$name])){
             return $this->emailAccounts[$name];
@@ -95,8 +110,8 @@ class MailConfig{
      * The method will search for an account with the given name in the set 
      * of added accounts. If no account was found, null is returned.
      * @param string $name The name of the account.
-     * @return EmailAccount|null If the account is found, The method 
-     * will return an object of type EmailAccount. Else, the 
+     * @return SMTPAccount|null If the account is found, The method 
+     * will return an object of type SMTPAccount. Else, the 
      * method will return null.
      * @since 1.0
      */

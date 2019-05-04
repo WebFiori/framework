@@ -35,7 +35,7 @@ use webfiori\entity\DBConnectionInfo;
  * Used by the server part and the presentation part. It contains framework version 
  * information and database connection settings.
  * @author Ibrahim
- * @version 1.3.3
+ * @version 1.3.4
  */
 class Config{
     /**
@@ -76,7 +76,7 @@ class Config{
         $this->releaseDate = '2019-03-06';
         $this->version = '1.0.0';
         $this->versionType = 'Stable';
-        $this->configVision = '1.3.3';
+        $this->configVision = '1.3.4';
         $this->dbConnections = array(
         );
     }
@@ -97,6 +97,22 @@ class Config{
         }
         self::$cfg = new Config();
         return self::$cfg;
+    }
+    /**
+     * Adds new database connection or updates an existing one.
+     * @param string $connectionName The name of the connection that will be 
+     * added or updated. Must be non-empty string.
+     * @param DBConnectionInfo $connectionInfo an object of type 'DBConnectionInfo' 
+     * that will contain connection information.
+     * @since 1.3.4
+     */
+    public static function addDbConnection($connectionName,$connectionInfo){
+        if($connectionInfo instanceof DBConnectionInfo){
+            $trimmedName = trim($connectionName);
+            if(strlen($trimmedName) != 0){
+                self::get()->dbConnections[$trimmedName] = $connectionInfo;
+            }
+        }
     }
     private function _getConfigVersion(){
         return $this->configVision;

@@ -212,11 +212,20 @@ class Functions {
                     $retVal = $this->_connect($this->defaultConn);
                 }
                 else{
-                    $this->connErrDetails = array(
-                        'error-code'=>-2,
-                        'error-message'=>'No database connection was set.'
-                    );
-                    $retVal = false;
+                    if($connName !== null){
+                        $this->connErrDetails = array(
+                            'error-code'=>-1,
+                            'error-message'=>'No database connection was found which has the name \''.$connName.'\'.'
+                        );
+                        $retVal = self::NO_SUCH_CONNECTION;
+                    }
+                    else{
+                        $this->connErrDetails = array(
+                            'error-code'=>-2,
+                            'error-message'=>'No database connection was set.'
+                        );
+                        $retVal = false;
+                    }
                 }
             }
         }

@@ -52,4 +52,18 @@ class FunctionsTest extends TestCase{
         $this->assertEquals(1045,$errDetails['error-code']);
         $this->assertEquals("Access denied for user 'root'@'localhost' (using password: YES)",$errDetails['error-message']);
     }
+    /**
+     * @test
+     */
+    public function testUseDatabase02() {
+        $connection = new DBConnectionInfo('root', '12345', 'testing_db');
+        WebFiori::getConfig()->addDbConnection('test-connection', $connection);
+        $func = new Functions();
+        $this->assertTrue($func->setConnection('test-connection'));
+        $result = $func->useDatabase();
+        $this->assertFalse($result);
+        $errDetails = $func->getDBErrDetails();
+        $this->assertEquals(1045,$errDetails['error-code']);
+        $this->assertEquals("Access denied for user 'root'@'localhost' (using password: YES)",$errDetails['error-message']);
+    }
 }

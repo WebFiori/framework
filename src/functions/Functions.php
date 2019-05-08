@@ -35,7 +35,6 @@ use webfiori\entity\DBConnectionFactory;
 use webfiori\entity\DBConnectionInfo;
 use phMysql\MySQLQuery;
 use webfiori\conf\Config;
-use Exception;
 /**
  * The base class for creating application logic.
  * This class provides the basic utilities to connect to database and manage 
@@ -69,7 +68,13 @@ class Functions {
      * @var type 
      * @since 1.3.4
      */
-    private $connErrDetails;
+    private $dbErrDetails;
+    /**
+     * The default query object which is used to construct SQL queries.
+     * @var MySQLQuery
+     * @since 1.3.6
+     */
+    private $defaultQueryObj;
     /**
      * A constant that indicates a user is not authorized to perform specific 
      * actions.
@@ -110,6 +115,11 @@ class Functions {
      */
     const NO_SUCH_CONNECTION = 'no_such_conn';
     /**
+     * A constant that indicates no query object is set.
+     * @since 1.3.6
+     */
+    const NO_QUERY = 'no_query';
+    /**
      * A default database to connect to.
      * @var type 
      */
@@ -134,6 +144,30 @@ class Functions {
         return self::NO_SUCH_CONNECTION;
     }
     /**
+     * Returns the linked query object which is used to create MySQL quires.
+     * @return MySQLQuery|null If the query object is set, the method will 
+     * return an object of type 'MySQLQuery'. If not set, the method will return 
+     * null.
+     * @since 1.3.6
+     */
+    public function getQueryObject() {
+        return $this->defaultQueryObj;
+    }
+    /**
+     * Sets the linked query object which is used to create MySQL quires.
+     * @param MySQLQuery $qObj An instance of the class 'MySQLQuery'.
+     * @return boolean If the query object is set, the method will return 
+     * true. Other than that, it will return false.
+     * @since 1.3.6
+     */
+    public function setQueryObject($qObj) {
+        if($qObj instanceof MySQLQuery){
+            $this->defaultQueryObj = $qObj;
+            return true;
+        }
+        return false;
+    }
+    /**
      * Creates new instance of the class.
      * @param string $linkedSessionName The name of the session that will 
      * be linked with the class instance. The name can consist of any character 
@@ -147,10 +181,7 @@ class Functions {
             Logger::log('Initializing sessions array...');
             self::$sessions = array();
         }
-        $this->connErrDetails = array(
-            'error-code'=>0,
-            'error-message'=>'NO_ERR'
-        );
+        $this->_setDBErrDetails(0, 'NO_ERR');
         Logger::logFuncReturn(__METHOD__);
     }
     /**
@@ -186,10 +217,7 @@ class Functions {
                 }
                 else{
                     Logger::log('No connection info was found for a database with the given name.', 'warning');
-                    $this->connErrDetails = array(
-                        'error-code'=>-1,
-                        'error-message'=>'No database connection was found which has the name \''.$connName.'\'.'
-                    );
+                    $this->_setDBErrDetails(-1, 'No database connection was found which has the name \''.$connName.'\'.');
                     $retVal = self::NO_SUCH_CONNECTION;
                 }
             }
@@ -213,17 +241,11 @@ class Functions {
                 }
                 else{
                     if($connName !== null){
-                        $this->connErrDetails = array(
-                            'error-code'=>-1,
-                            'error-message'=>'No database connection was found which has the name \''.$connName.'\'.'
-                        );
+                        $this->_setDBErrDetails(-1, 'No database connection was found which has the name \''.$connName.'\'.');
                         $retVal = self::NO_SUCH_CONNECTION;
                     }
                     else{
-                        $this->connErrDetails = array(
-                            'error-code'=>-2,
-                            'error-message'=>'No database connection was set.'
-                        );
+                        $this->_setDBErrDetails(-2, 'No database connection was set.');
                         $retVal = false;
                     }
                 }
@@ -257,7 +279,7 @@ class Functions {
                 return true;
             }
             else{
-                $this->connErrDetails = $result;
+                $this->_setDBErrDetails($result['error-code'], $result['error-message']);
                 Logger::log('Unable to connect to the database while in setup mode.', 'warning');
                 Logger::log('Error Code: '.$result['error-code'], 'error');
                 Logger::log('Error Message: '.$result['error-message'], 'error');
@@ -282,25 +304,34 @@ class Functions {
     public function getDBErrDetails() {
         $dbLink = $this->getDBLink();
         if($dbLink !== null){
-            $this->connErrDetails['error-code'] = $dbLink->getErrorCode();
-            $this->connErrDetails['error-message'] = $dbLink->getErrorMessage();
+            $this->_setDBErrDetails($dbLink->getErrorCode(), $dbLink->getErrorMessage());
         }
-        return $this->connErrDetails;
+        return $this->dbErrDetails;
     }
     /**
      * Execute a database query.
-     * @param MySQLQuery $qObj An object of type 'MySQLQuery'. Note that 
-     * this method will call the method 'Functions::useDatabase()' by 
-     * default.
+     * The method will use the given query object and connection information 
+     * if provided. If not given, the method will attempt to use the database 
+     * connection which was set by the method Functions::setConnection() and 
+     * the query which was set by the method Functions::setQueryObject().
+     * @param MySQLQuery|null $qObj An optional object of type 'MySQLQuery'.
      * @param string $connName An optional connection name. The query will be executed 
      * against it if provided.
      * @return boolean 'true' if no errors occur while executing the query.
-     * false in case of error.
+     * false in case of error. To access database error information, the developer can 
+     * use the method Functions::getDBErrDetails().
      * @since 1.0
      */
-    public function excQ($qObj,$connName=null){
+    public function excQ($qObj=null,$connName=null){
         Logger::logFuncCall(__METHOD__);
         $retVal = false;
+        if(!($qObj instanceof MySQLQuery)){
+            $qObj = $this->getQueryObject();
+            if($qObj === null){
+                $this->_setDBErrDetails(self::NO_QUERY, 'No query object was set to execute.');
+                return false;
+            }
+        }
         if($qObj instanceof MySQLQuery){
             if($connName !== null){
                 $connectResult = $this->useDatabase($connName);
@@ -335,6 +366,18 @@ class Functions {
     }
     /**
      * 
+     * @param type $errCode
+     * @param type $errMessage
+     * @since 1.3.6
+     */
+    private function _setDBErrDetails($errCode,$errMessage) {
+        $this->dbErrDetails = array(
+            'error-message'=>$errMessage,
+            'error-code'=>$errCode
+        );
+    }
+    /**
+     * 
      * @param MySQLQuery $query
      * @return type
      */
@@ -342,10 +385,7 @@ class Functions {
         $link = $this->getDBLink();
         $result = $link->executeQuery($query);
         if($result !== true){
-            $this->connErrDetails = array(
-                'error-code'=>$link->getErrorCode(),
-                'error-message'=>$link->getErrorMessage()
-            );
+            $this->_setDBErrDetails($link->getErrorCode(),$link->getErrorMessage());
         }
         return $result;
     }
@@ -473,8 +513,6 @@ class Functions {
      * @since 1.2
      */
     public function &getDBLink() {
-        Logger::logFuncCall(__METHOD__);
-        Logger::logFuncReturn(__METHOD__);
         return $this->databaseLink;
     }
     /**

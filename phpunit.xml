@@ -8,7 +8,7 @@
             <directory suffix=".php">./src/conf</directory>
             <directory suffix=".php">./src/entity/cron</directory>
             <directory suffix=".php">./src/entity/mail</directory>
-            <directory suffix=".php">./src/entity/functions</directory>
+            <directory suffix=".php">./src/functions</directory>
             <file>./src/WebFiori.php</file>
             <file>./src/entity/router/Router.php</file>
             <file>./src/entity/router/RouterUri.php</file>

@@ -43,5 +43,8 @@
         <testsuite name="Entity Tests">
             <directory>./tests/entity/</directory>
         </testsuite>
+        <testsuite name="Functions Tests">
+            <directory>./tests/functions/</directory>
+        </testsuite>
     </testsuites>
 </phpunit>

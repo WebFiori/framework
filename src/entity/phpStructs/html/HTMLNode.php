@@ -31,7 +31,7 @@ use phpStructs\Queue;
  * A class that represents HTML element.
  *
  * @author Ibrahim
- * @version 1.7.4
+ * @version 1.7.5
  */
 class HTMLNode {
     /**
@@ -1162,6 +1162,31 @@ class HTMLNode {
     public function getText() {
         if($this->isComment() || $this->isTextNode()){
             return $this->text;
+        }
+        return '';
+    }
+    /**
+     * Returns the value of the text that this node represents.
+     * The method will return a string which has HTML entities unescaped.
+     * @return string If the node is a text node, 
+     * the method will return the text in the body of the node. If not, 
+     * the method will return empty string.
+     * @since 1.7.5
+     */
+    public function getTextUnescaped() {
+        if($this->isTextNode()){
+            $txt = $this->getText();
+            if(strlen($txt) > 0){
+                $charsToReplace = array(
+                    '&'=>'&amp;',
+                    '<'=>'&lt;',
+                    '>'=>'&gt;'
+                );
+                foreach ($charsToReplace as $ch => $replace){
+                    $txt = str_replace($replace, $ch, $txt);
+                }
+                return $txt;
+            }
         }
         return '';
     }

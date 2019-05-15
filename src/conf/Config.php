@@ -100,18 +100,13 @@ class Config{
     }
     /**
      * Adds new database connection or updates an existing one.
-     * @param string $connectionName The name of the connection that will be 
-     * added or updated. Must be non-empty string.
      * @param DBConnectionInfo $connectionInfo an object of type 'DBConnectionInfo' 
      * that will contain connection information.
      * @since 1.3.4
      */
-    public static function addDbConnection($connectionName,$connectionInfo){
+    public static function addDbConnection($connectionInfo){
         if($connectionInfo instanceof DBConnectionInfo){
-            $trimmedName = trim($connectionName);
-            if(strlen($trimmedName) != 0){
-                self::get()->dbConnections[$trimmedName] = $connectionInfo;
-            }
+            self::get()->dbConnections[$connectionInfo->getConnectionName()] = $connectionInfo;
         }
     }
     private function _getConfigVersion(){

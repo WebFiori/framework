@@ -40,7 +40,7 @@ if(!defined('ROOT_DIR')){
  * </ul>
  *
  * @author Ibrahim
- * @version 1.0
+ * @version 1.0.1
  */
 class DBConnectionInfo {
     private $port;
@@ -48,6 +48,8 @@ class DBConnectionInfo {
     private $uName;
     private $pass;
     private $dbName;
+    private $connectionName;
+    
     /**
      * Creates new instance of the class.
      * @param string $user The username of the user that will be used to access 
@@ -66,6 +68,26 @@ class DBConnectionInfo {
         $this->setDBName($dbname);
         $this->setHost($host);
         $this->setPort($port);
+        $this->setConnectionName('New_Connection');
+    }
+    /**
+     * Returns the name of the connection.
+     * @return string The name of the connection. Default return value is 'New_Connection'.
+     * @since 1.0.1
+     */
+    public function getConnectionName() {
+        return $this->connectionName;
+    }
+    /**
+     * Sets the name of the connection.
+     * @param string $newName The new name. Must be non-empty string.
+     * @since 1.0.1
+     */
+    public function setConnectionName($newName) {
+        $trimmed = trim($newName);
+        if(strlen($trimmed) != 0){
+            $this->connectionName = $trimmed;
+        }
     }
     /**
      * Returns the address of database host.

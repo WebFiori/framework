@@ -151,7 +151,7 @@ class SystemFunctions extends Functions{
                        strlen($con->getUsername()) > 0 && 
                        strlen($con->getPassword()) > 0 && 
                        strlen($con->getDBName()) > 0){  
-                        $confVars['databases'][$con->getDBName()] = $con;
+                        $confVars['databases'][$con->getConnectionName()] = $con;
                     }
                 }
             }
@@ -165,17 +165,17 @@ class SystemFunctions extends Functions{
      * This method will search for a connection which has the given database 
      * name. Once it found, it will remove the connection and save the updated 
      * information to the file 'Config.php'.
-     * @param array $dbNames An array that contains the names of databases.
+     * @param array $connectionsNames An array that contains the names of database connections.
      * @since 1.4.3
      */
-    public function removeDBConnections($dbNames){
+    public function removeDBConnections($connectionsNames){
         Logger::logFuncCall(__METHOD__);
         Logger::log('Checking if given parameter is an array...');
-        if(gettype($dbNames) == 'array'){
+        if(gettype($connectionsNames) == 'array'){
             Logger::log('An array is given.');
             Logger::log('Removing connections...');
             $confVars = $this->getConfigVars();
-            foreach ($dbNames as $dbName){  
+            foreach ($connectionsNames as $dbName){  
                 unset($confVars['databases'][$dbName]);
             }
             $this->writeConfig($confVars);
@@ -322,9 +322,9 @@ class SystemFunctions extends Functions{
         $this->dbConnections = array(', true, true);
         $count = count($configArr['databases']);
         $i = 0;
-        foreach ($configArr['databases'] as $dbName => $dbConn){
+        foreach ($configArr['databases'] as $dbConn){
             if($i + 1 == $count){
-                $fh->write('        \''.$dbName.'\'=> new DBConnectionInfo(\''
+                $fh->write('        \''.$dbConn->getConnectionName().'\'=> new DBConnectionInfo(\''
                     .$dbConn->getUsername()
                     .'\',\''
                     .$dbConn->getPassword()
@@ -336,7 +336,7 @@ class SystemFunctions extends Functions{
                     .$dbConn->getPort().')', true, true);
             }
             else{
-                $fh->write('        \''.$dbName.'\'=> new DBConnectionInfo(\''
+                $fh->write('        \''.$dbConn->getConnectionName().'\'=> new DBConnectionInfo(\''
                     .$dbConn->getUsername()
                     .'\',\''
                     .$dbConn->getPassword()
@@ -350,6 +350,9 @@ class SystemFunctions extends Functions{
             $i++;
         }
         $fh->write('    );', true, true);
+        foreach ($configArr['databases'] as $dbConn){
+            $fh->write('$this->dbConnections[\''.$dbConn->getConnectionName().'\']->setConnectionName(\''.$dbConn->getConnectionName().'\');', true, true);
+        }
         $fh->write('}', true, true);
         $fh->write('/**
      * An instance of Config.
@@ -371,18 +374,13 @@ class SystemFunctions extends Functions{
     }
     /**
      * Adds new database connection or updates an existing one.
-     * @param string $connectionName The name of the connection that will be 
-     * added or updated. Must be non-empty string.
      * @param DBConnectionInfo $connectionInfo an object of type \'DBConnectionInfo\' 
      * that will contain connection information.
      * @since 1.3.4
      */
-    public static function addDbConnection($connectionName,$connectionInfo){
+    public static function addDbConnection($connectionInfo){
         if($connectionInfo instanceof DBConnectionInfo){
-            $trimmedName = trim($connectionName);
-            if(strlen($trimmedName) != 0){
-                self::get()->dbConnections[$trimmedName] = $connectionInfo;
-            }
+            self::get()->dbConnections[$connectionInfo->getConnectionName()] = $connectionInfo;
         }
     }
     private function _getConfigVersion(){

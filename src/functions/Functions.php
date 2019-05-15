@@ -273,10 +273,15 @@ class Functions {
                 'port'=>$connParams->getPort()
             ));
             if($result instanceof MySQLLink){
-                Logger::log('Connected to database.');
+                Logger::log('Connected to database engine.');
                 $this->databaseLink = $result;
-                Logger::logFuncReturn(__METHOD__);
-                return true;
+                Logger::log('Checking if database is selected...');
+                if($result->getErrorCode() == 0){
+                    Logger::log('It is selected.');
+                    return true;
+                }
+                Logger::log('It is not selected.','warning');
+                return false;
             }
             else{
                 $this->_setDBErrDetails($result['error-code'], $result['error-message']);

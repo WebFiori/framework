@@ -32,7 +32,7 @@ if(!defined('ROOT_DIR')){
  * A class to create database schema.
  *
  * @author Ibrahim
- * @version 1.2
+ * @version 1.2.1
  */
 class DatabaseSchema {
     /**
@@ -185,5 +185,19 @@ class DatabaseSchema {
      */
     public function getClassNames() {
         return $this->queries;
+    }
+    /**
+     * Creates and returns a query that can be used to create MySQL database.
+     * The generated SQL query will have 'create database' statement in 
+     * addition to 'use' statement.
+     * @param string $schemaName The name of the database.
+     * @return string A string that can be used to create MySQL database.
+     * @since 1.2.1
+     */
+    public function getCreateDatabaseStatement($schemaName) {
+        $createStm = 'create database if not exists '.$schemaName.';'."\n";
+        $createStm .= 'use '.$schemaName.';'."\n";
+        $createStm .= $this->getSchema();
+        return $createStm;
     }
 }

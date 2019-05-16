@@ -29,9 +29,9 @@ use webfiori\entity\DBConnectionInfo;
 use webfiori\conf\Config;
 use Exception;
 if(!defined('ROOT_DIR')){
-    header("HTTP/1.1 403 Forbidden");
-    die('<!DOCTYPE html><html><head><title>Forbidden</title></head><body>'
-    . '<h1>403 - Forbidden</h1><hr><p>Direct access not allowed.</p></body></html>');
+    header("HTTP/1.1 404 Not Found");
+    die('<!DOCTYPE html><html><head><title>Not Found</title></head><body>'
+    . '<h1>404 - Not Found</h1><hr><p>The requested resource was not found on the server.</p></body></html>');
 }
 /**
  * A class that can be used to modify basic configuration settings of 
@@ -265,9 +265,9 @@ class SystemFunctions extends Functions{
 ');
         $fh->write('namespace webfiori\conf;', false, true);
         $fh->write('if(!defined(\'ROOT_DIR\')){
-    header("HTTP/1.1 403 Forbidden");
-    die(\'<!DOCTYPE html><html><head><title>Forbidden</title></head><body>\'
-    . \'<h1>403 - Forbidden</h1><hr><p>Direct access not allowed.</p></body></html>\');
+    header("HTTP/1.1 404 Not Found");
+    die(\'<!DOCTYPE html><html><head><title>Not Found</title></head><body>\'
+    . \'<h1>404 - Not Found</h1><hr><p>The requested resource was not found on the server.</p></body></html>\');
 }', true, true);
         $fh->write('use webfiori\entity\DBConnectionInfo;', true, true);
         $fh->write('/**

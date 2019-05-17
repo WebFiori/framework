@@ -34,6 +34,9 @@
         <log type="coverage-clover" target="clover.xml"/>
     </logging>
     <testsuites>
+        <testsuite name="Config Files Tests">
+            <directory>./tests/conf/</directory>
+        </testsuite>
         <testsuite name="Router Tests">
             <directory>./tests/entity/router/</directory>
         </testsuite>

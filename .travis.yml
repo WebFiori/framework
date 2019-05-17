@@ -8,7 +8,7 @@ php:
 services:
     - mysql
 before_install:
-    - mysql -e 'create database if not exists testing_db;'
+    - mysql -e 'create database if not exists test_db;'
     - sudo mysql -e "use mysql; update user set authentication_string=PASSWORD('123456') where User='root'; update user set plugin='mysql_native_password';FLUSH PRIVILEGES;"
     - sudo service mysql restart
 before_script:

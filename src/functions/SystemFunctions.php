@@ -468,8 +468,9 @@ class SystemFunctions extends Functions{
      */
     public static function getDBConnection($conName){
         $conns = self::getDBConnections();
-        if(isset($conns[$conName])){
-            return $conns[$conName];
+        $trimmed = trim($conName);
+        if(isset($conns[$trimmed])){
+            return $conns[$trimmed];
         }
         return null;
     } ', true, true);

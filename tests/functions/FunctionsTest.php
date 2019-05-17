@@ -24,7 +24,8 @@ class FunctionsTest extends TestCase{
      */
     public function testSetConnection01() {
         $connection = new DBConnectionInfo('root', '123456', 'testing_db');
-        WebFiori::getConfig()->addDbConnection('test-connection', $connection);
+        $connection->setConnectionName('test-connection');
+        WebFiori::getConfig()->addDbConnection($connection);
         $func = new Functions();
         $result = $func->setConnection('test-connection');
         $this->assertTrue($result);
@@ -45,7 +46,8 @@ class FunctionsTest extends TestCase{
      */
     public function testUseDatabase01() {
         $connection = new DBConnectionInfo('root', '12345', 'testing_db');
-        WebFiori::getConfig()->addDbConnection('test-connection', $connection);
+        $connection->setConnectionName('test-connection');
+        WebFiori::getConfig()->addDbConnection($connection);
         $func = new Functions();
         $result = $func->useDatabase('test-connection');
         $this->assertFalse($result);
@@ -57,8 +59,9 @@ class FunctionsTest extends TestCase{
      * @test
      */
     public function testUseDatabase02() {
-        $connection = new DBConnectionInfo('root', '123456', 'testing_db');
-        WebFiori::getConfig()->addDbConnection('test-connection', $connection);
+        $connection = new DBConnectionInfo('root', '123456', 'test_db');
+        $connection->setConnectionName('test-connection');
+        WebFiori::getConfig()->addDbConnection($connection);
         $func = new Functions();
         $this->assertTrue($func->setConnection('test-connection'));
         $result = $func->useDatabase();

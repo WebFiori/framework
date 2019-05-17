@@ -30,7 +30,6 @@ if(!defined('ROOT_DIR')){
 }
 use phMysql\MySQLLink;
 use webfiori\entity\SessionManager;
-use webfiori\entity\Logger;
 use webfiori\entity\DBConnectionFactory;
 use webfiori\entity\DBConnectionInfo;
 use phMysql\MySQLQuery;
@@ -176,13 +175,10 @@ class Functions {
      * @since 1.0
      */
     public function __construct() {
-        Logger::logFuncCall(__METHOD__);
         if(self::$sessions === null){
-            Logger::log('Initializing sessions array...');
             self::$sessions = array();
         }
         $this->_setDBErrDetails(0, 'NO_ERR');
-        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * Initiate database connection.
@@ -200,42 +196,29 @@ class Functions {
      * @since 1.1
      */
     public function useDatabase($connName=null) {
-        Logger::logFuncCall(__METHOD__);
-        Logger::log('Connection name = \''.$connName.'\'.', 'debug');
-        Logger::log('Checking if already connected to a database...');
         $retVal = false;
         $dbLink = &$this->getDBLink();
         $dbConn = Config::getDBConnection($connName);
         if($dbLink instanceof MySQLLink){
-            Logger::log('Already connected to database.');
-            Logger::log('Checking if connected to same database...');
             if($dbConn !== null && $dbConn->getDBName() != $dbLink->getDBName()){
-                Logger::log('Different database. Trying to connect to the database...');
-                Logger::log('Getting database connection info...');
                 if($dbConn instanceof DBConnectionInfo){
                     $retVal = $this->_connect($dbConn);
                 }
                 else{
-                    Logger::log('No connection info was found for a database with the given name.', 'warning');
                     $this->_setDBErrDetails(-1, 'No database connection was found which has the name \''.$connName.'\'.');
                     $retVal = self::NO_SUCH_CONNECTION;
                 }
             }
             else{
-                Logger::log('Same database or null is given.');
                 $retVal = true;
             }
         }
         else{
-            Logger::log('Not connected.');
-            Logger::log('Getting database connection info...');
             $conInfo = Config::getDBConnection($connName);
             if($conInfo instanceof DBConnectionInfo){
                 $retVal = $this->_connect($conInfo);
             }
             else{
-                Logger::log('No connection info was found for a database with the given name.', 'warning');
-                Logger::log('Trying to use default connection info...');
                 if($this->defaultConn !== null){
                     $retVal = $this->_connect($this->defaultConn);
                 }
@@ -251,8 +234,6 @@ class Functions {
                 }
             }
         }
-        Logger::logReturnValue($retVal);
-        Logger::logFuncReturn(__METHOD__);
         return $retVal;
     }
     /**
@@ -263,7 +244,6 @@ class Functions {
      * return true. If not, It will return false.
      */
     private function _connect($connParams){
-        Logger::logFuncCall(__METHOD__);
         if($connParams instanceof DBConnectionInfo){
             $result = DBConnectionFactory::mysqlLink(array(
                 'host'=>$connParams->getHost(),
@@ -273,22 +253,14 @@ class Functions {
                 'port'=>$connParams->getPort()
             ));
             if($result instanceof MySQLLink){
-                Logger::log('Connected to database engine.');
                 $this->databaseLink = $result;
-                Logger::log('Checking if database is selected...');
                 if($result->getErrorCode() == 0){
-                    Logger::log('It is selected.');
                     return true;
                 }
-                Logger::log('It is not selected.','warning');
                 return false;
             }
             else{
                 $this->_setDBErrDetails($result['error-code'], $result['error-message']);
-                Logger::log('Unable to connect to the database while in setup mode.', 'warning');
-                Logger::log('Error Code: '.$result['error-code'], 'error');
-                Logger::log('Error Message: '.$result['error-message'], 'error');
-                Logger::logFuncReturn(__METHOD__);
                 return false;
             }
         }
@@ -328,7 +300,6 @@ class Functions {
      * @since 1.0
      */
     public function excQ($qObj=null,$connName=null){
-        Logger::logFuncCall(__METHOD__);
         $retVal = false;
         if(!($qObj instanceof MySQLQuery)){
             $qObj = $this->getQueryObject();
@@ -357,16 +328,6 @@ class Functions {
                 }
             }
         }
-        else{
-            Logger::log('The given instance is not a sub-class of \'MySQLQuery\'.', 'warning');
-        }
-        if($retVal === true){
-            Logger::log('Query execited.');
-        }
-        else{
-            Logger::log('Query did not execute.', 'warning');
-        }
-        Logger::logFuncReturn(__METHOD__);
         return $retVal;
     }
     /**
@@ -404,16 +365,10 @@ class Functions {
      * @since 1.2
      */
     public function hasPrivilege($pId){
-        Logger::logFuncCall(__METHOD__);
-        Logger::log('Prevalege ID = \''.$pId.'\'.', 'debug');
         $retVal = false;
         if($this->getUserID() != -1){
             $retVal = $this->getSession()->getUser()->hasPrivilege($pId);
         }
-        else{
-            Logger::log('Invalid user in session variable.', 'warning');
-        }
-        Logger::logReturnValue($retVal);
         return $retVal;
     }
     /**
@@ -481,13 +436,10 @@ class Functions {
      * @since 1.3
      */
     public function &getSession() {
-        Logger::logFuncCall(__METHOD__);
-        Logger::log('Session name = \''.$this->sessionName.'\'.', 'debug');
         $retVal = null;
         if($this->sessionName !== null){
             $retVal = &self::$sessions[$this->sessionName];
         }
-        Logger::logFuncReturn(__METHOD__);
         return $retVal;
     }
     /**
@@ -501,13 +453,10 @@ class Functions {
      * @since 1.2
      */
     public final function getSessionLang($forceUpdate=true){
-        Logger::logFuncCall(__METHOD__);
-        Logger::log('Force Update = \''.$forceUpdate.'\'', 'debug');
         $session = $this->getSession();
         if($session !== null){
             return $session->getLang($forceUpdate);
         }
-        Logger::logFuncReturn(__METHOD__);
         return null;
     }
     /**
@@ -528,19 +477,11 @@ class Functions {
      * @since 1.0
      */
     public function rows(){
-        Logger::logFuncCall(__METHOD__);
         $retVal = -1;
-        Logger::log('Getting Database link...');
         $dbLink = &$this->getDBLink();
-        Logger::log('Checking if database link is not null...');
         if($dbLink !== null){
             $retVal = $dbLink->rows();
         }
-        else{
-            Logger::log('Database link is null.', 'warning');
-        }
-        Logger::logReturnValue($retVal);
-        Logger::logFuncReturn(__METHOD__);
         return $retVal;
     }
     /**
@@ -551,19 +492,11 @@ class Functions {
      * @since 1.3.2
      */
     public function getRows(){
-        Logger::logFuncCall(__METHOD__);
         $retVal = array();
-        Logger::log('Getting Database link...');
         $dbLink = &$this->getDBLink();
-        Logger::log('Checking if database link is not null...');
         if($dbLink !== null){
             $retVal = $dbLink->getRows();
         }
-        else{
-            Logger::log('Database link is null.', 'warning');
-        }
-        Logger::logReturnValue($retVal);
-        Logger::logFuncReturn(__METHOD__);
         return $retVal;
     }
    /**
@@ -574,19 +507,11 @@ class Functions {
      * @since 1.0
      */
     public function getRow(){
-        Logger::logFuncCall(__METHOD__);
         $retVal = null;
-        Logger::log('Getting Database link...');
         $dbLink = $this->getDBLink();
-        Logger::log('Checking if database link is not null...');
         if($dbLink !== null){
             $retVal = $dbLink->getRow();
         }
-        else{
-            Logger::log('Database link is null.', 'warning');
-        }
-        Logger::logReturnValue($retVal);
-        Logger::logFuncReturn(__METHOD__);
         return $retVal;
     }
     /**
@@ -598,19 +523,11 @@ class Functions {
      * @since 1.3.1
      */
     public function nextRow() {
-        Logger::logFuncCall(__METHOD__);
         $retVal = null;
-        Logger::log('Getting Database link...');
         $dbLink = &$this->getDBLink();
-        Logger::log('Checking if database link is not null...');
         if($dbLink !== null){
             $retVal = $dbLink->nextRow();
         }
-        else{
-            Logger::log('Database link is null.', 'warning');
-        }
-        Logger::logReturnValue($retVal);
-        Logger::logFuncReturn(__METHOD__);
         return $retVal;
     }
     /**
@@ -621,22 +538,14 @@ class Functions {
      * @since 1.0
      */
     public function getUserID(){
-        Logger::logFuncCall(__METHOD__);
         $retVal = -1;
-        Logger::log('Getting user from session manager...');
         $sesstion = $this->getSession();
         if($sesstion !== null){
             $user = &$this->getSession()->getUser();
-            Logger::log('Checking if session user is null or not...');
             if($user !== null){
                 $retVal = intval($user->getID());
             }
-            else{
-                Logger::log('Session user is null.', 'warning');
-            }
         }
-        Logger::logReturnValue($retVal);
-        Logger::logFuncReturn(__METHOD__);
         return $retVal;
     }
 }

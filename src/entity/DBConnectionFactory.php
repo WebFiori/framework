@@ -103,63 +103,48 @@ class DBConnectionFactory {
      * @since 1.0
      */
     public static function mysqlLink($connectionParams=array()){
-        Logger::logFuncCall(__METHOD__);
         $retVal = array(
             'error-code'=>'',
             'error-message'=>''
         );
-        Logger::log('Checking if session is active...');
         if(isset($connectionParams['host'])){
-            Logger::log('Database host = \''.$connectionParams['host'].'\'', 'debug');
             if(isset($connectionParams['port'])){
-                Logger::log('Port = \''.$connectionParams['port'].'\'', 'debug');
                 if(isset($connectionParams['user'])){
-                    Logger::log('Database username = \''.$connectionParams['user'].'\'', 'debug');
                     if(isset($connectionParams['pass'])){
-                        Logger::log('Database password = \''.$connectionParams['pass'].'\'', 'debug');
                         if(isset($connectionParams['db-name'])){
-                            Logger::log('Database name = \''.$connectionParams['db-name'].'\'', 'debug');
                             $link = new MySQLLink($connectionParams['host'],$connectionParams['user'],$connectionParams['pass'],$connectionParams['port']);
                             if($link->setDB($connectionParams['db-name'])){
-                                Logger::log('Connected.');
                                 $retVal = $link;
                             }
                             else{
-                                Logger::log('Unable to select database.', 'warning');
                                 $retVal['error-code'] = $link->getErrorCode();
                                 $retVal['error-message'] = $link->getErrorMessage();
                             }
                         }
                         else{
-                            Logger::log('The attribute \'db-name\' is missing from the array.', 'warning');
                             $retVal['error-code'] = self::MISSING_DB_NAME;
                             $retVal['error-message'] = 'The attribute \'db-name\' is missing from the array.';
                         }
                     }
                     else{
-                        Logger::log('The attribute \'pass\' is missing from the array.', 'warning');
                         $retVal['error-code'] = self::MISSING_DB_PASS;
                         $retVal['error-message'] = 'The attribute \'pass\' is missing from the array.';
                     }
                 }
                 else{
-                    Logger::log('The attribute \'user\' is missing from the array.', 'warning');
                     $retVal['error-code'] = self::MISSING_DB_USER;
                     $retVal['error-message'] = 'The attribute \'user\' is missing from the array.';
                 }
             }
             else{
-                Logger::log('The attribute \'port\' is missing from the array.', 'warning');
                 $retVal['error-code'] = self::MISSING_PORT;
                 $retVal['error-message'] = 'The attribute \'port\' is missing from the array.';
             }
         }
         else{
-            Logger::log('The attribute \'host\' is missing from the array.', 'warning');
             $retVal['error-code'] = self::MISSING_DB_HOST;
             $retVal['error-message'] = 'The attribute \'host\' is missing from the array.';
         }
-        Logger::logFuncReturn(__METHOD__);
         return $retVal;
     }
 }

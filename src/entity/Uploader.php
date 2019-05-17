@@ -31,7 +31,6 @@ if(!defined('ROOT_DIR')){
 use jsonx\JsonI;
 use jsonx\JsonX;
 use webfiori\entity\File;
-use webfiori\entity\Logger;
 use webfiori\entity\Util;
 /**
  * A helper class that is used to upload files to the server file system.
@@ -234,10 +233,8 @@ class Uploader implements JsonI{
      * @since 1.0
      */
     public function __construct() {
-        Logger::logFuncCall(__METHOD__);
         $this->uploadStatusMessage = 'NO ACTION';
         $this->files = array();
-        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * The directory at which the file (or files) will be uploaded to.
@@ -264,12 +261,9 @@ class Uploader implements JsonI{
      * @since 1.0
      */
     public function setUploadDir($dir){
-        Logger::logFuncCall(__METHOD__);
         $retVal = false;
         $len = strlen($dir);
-        Logger::log('Checking length...');
         if($len > 0){
-            Logger::log('Trimming forward and backward slashes...');
             while($dir[$len - 1] == '/' || $dir[$len - 1] == '\\'){
                 $tmpDir = trim($dir,'/');
                 $dir = trim($tmpDir,'\\');
@@ -279,23 +273,12 @@ class Uploader implements JsonI{
                 $tmpDir = trim($dir,'/');
                 $dir = trim($tmpDir,'\\');
             }
-            Logger::log('Finished.');
-            Logger::log('Validating trimming result...');
             if(strlen($dir) > 0){
                 $dir = str_replace('/', '\\', $dir);
                 $this->uploadDir = !Util::isDirectory($dir) ? '\\'.$dir : $dir;
-                Logger::log('New upload directory = \''.$this->uploadDir.'\'', 'debug');
                 $retVal = true;
             }
-            else{
-                Logger::log('Empty string after trimming.','warning');
-            }
         }
-        else{
-            Logger::log('Empty string is given.', 'warning');
-        }
-        Logger::logReturnValue($retVal);
-        Logger::logFuncReturn(__METHOD__);
         return $retVal;
     }
     /**
@@ -326,40 +309,27 @@ class Uploader implements JsonI{
      * @since 1.0
      */
     public function addExt($ext){
-        Logger::logFuncCall(__METHOD__);
-        Logger::log('$ext = \''.$ext.'\'','debug');
-        Logger::log('Removing the suffix if any.');
         $ext = str_replace('.', '', $ext);
         $len = strlen($ext);
         $retVal = true;
-        Logger::log('Checking length...');
         if($len != 0){
-            Logger::log('Validating  characters...');
             for($x = 0 ; $x < $len ; $x++){
                 $ch = $ext[$x];
                 if($ch == '_' || ($ch >= 'a' && $ch <= 'z') || ($ch >= 'A' && $ch <= 'Z') || ($ch >= '0' && $ch <= '9')){
                     
                 }
                 else{
-                    Logger::log('Invalid character found: \''.$ch.'\'.', 'warning');
                     $retVal = false;
                     break;
                 }
             }
             if($retVal === true){
                 $this->extentions[] = $ext;
-                Logger::log('Extention added.');
-            }
-            else{
-                Logger::log('Extention not added.','warning');
             }
         }
         else{
-            Logger::log('Empty string given.', 'warning');
             $retVal = false;
         }
-        Logger::logReturnValue($retVal);
-        Logger::logFuncReturn(__METHOD__);
         return $retVal;
     }
     /**
@@ -369,7 +339,6 @@ class Uploader implements JsonI{
      * @since 1.0
      */
     public function removeExt($ext){
-        Logger::logFuncCall(__METHOD__);
         $count = count($this->extentions);
         $retVal = false;
         for($x = 0 ; $x < $count ; $x++){
@@ -378,8 +347,6 @@ class Uploader implements JsonI{
                 $retVal = true;
             }
         }
-        Logger::logReturnValue($retVal);
-        Logger::logFuncReturn(__METHOD__);
         return $retVal;
     }
     /**
@@ -399,10 +366,7 @@ class Uploader implements JsonI{
      * @since 1.0
      */
     public function setAssociatedFileName($name){
-        Logger::logFuncCall(__METHOD__);
-        Logger::log('Passed value = \''.$name.'\'.', 'debug');
         $this->asscociatedName = $name;
-        Logger::logFuncCall(__METHOD__);
     }
     /**
      * Returns the array that contains all allowed file types.
@@ -421,19 +385,11 @@ class Uploader implements JsonI{
      * @deprecated since 1.2.1
      */
     public static function getMIMEType($ext){
-        Logger::logFuncCall(__METHOD__);
-        Logger::log('$ext = \''.$ext.'\'', 'debug');
         $retVal = null;
         $x = self::ALLOWED_FILE_TYPES[strtolower($ext)];
         if($x !== null){
-            Logger::log('MIME found.');
             $retVal = $x['mime'];
         }
-        else{
-            Logger::log('No MIME type was found for the given value.', 'warning');
-        }
-        Logger::logReturnValue($retVal);
-        Logger::logFuncReturn(__METHOD__);
         return $retVal;
     }
     /**
@@ -444,12 +400,8 @@ class Uploader implements JsonI{
      * @since 1.0
      */
     private function isValidExt($fileName){
-        Logger::logFuncCall(__METHOD__);
-        Logger::log('File name = \''.$fileName.'\'.', 'debug');
         $ext = pathinfo($fileName, PATHINFO_EXTENSION);
         $retVal = in_array($ext, $this->getExts(),true) || in_array(strtolower($ext), $this->getExts(),true);
-        Logger::logReturnValue($retVal);
-        Logger::logFuncCall(__METHOD__);
         return $retVal;
     }
     /**
@@ -510,24 +462,17 @@ class Uploader implements JsonI{
      * </ul>
      */
     public function upload($replaceIfExist = false){
-        Logger::logFuncCall(__METHOD__);
         $this->files = array();
-        Logger::log('Checking if request method is \'POST\'.');
         $reqMeth = $_SERVER['REQUEST_METHOD'];
-        Logger::log('Request method = \''.$reqMeth.'\'.', 'debug');
         if($reqMeth == 'POST'){
-            Logger::log('Checking if $_FILES[\''.$this->asscociatedName.'\'] is set...');
             $fileOrFiles = null;
             if(isset($_FILES[$this->asscociatedName])){
                 $fileOrFiles = $_FILES[$this->asscociatedName];
-                Logger::log('It is set.');
             }
             if($fileOrFiles !== null){
                 if(gettype($fileOrFiles['name']) == 'array'){
-                    Logger::log('Multiple files where found.');
                     //multi-upload
                     $filesCount = count($fileOrFiles['name']);
-                    Logger::log('Number of files: \''.$filesCount.'\'.', 'debug');
                     for($x = 0 ; $x < $filesCount ; $x++){
                         $fileInfoArr = array();
                         $fileInfoArr['name'] = $fileOrFiles['name'][$x];
@@ -602,7 +547,6 @@ class Uploader implements JsonI{
                     }
                 }
                 else{
-                    Logger::log('Single file upload.');
                     //single file upload
                     $fileInfoArr = array();
                     $fileInfoArr['name'] = $fileOrFiles['name'];
@@ -676,14 +620,7 @@ class Uploader implements JsonI{
                     array_push($this->files, $fileInfoArr);
                 }
             }
-            else{
-                Logger::log('The variable $_FILES[\''.$this->asscociatedName.'\'] is not set. No files uploaded.', 'warning');
-            }
         }
-        else{
-            Logger::log('Invalid request method. No file(s) were uploaded', 'warning');
-        }
-        Logger::logFuncReturn(__METHOD__);
         return $this->files;
     }
     public function getAssociatedName(){

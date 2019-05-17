@@ -28,7 +28,6 @@ if(!defined('ROOT_DIR')){
     die('<!DOCTYPE html><html><head><title>Not Found</title></head><body>'
     . '<h1>404 - Not Found</h1><hr><p>The requested resource was not found on the server.</p></body></html>');
 }
-use webfiori\entity\Logger;
 use webfiori\entity\FileHandler;
 use webfiori\conf\SiteConfig;
 /**
@@ -89,14 +88,9 @@ class WebsiteFunctions extends Functions{
      * @since 1.0
      */
     public static function &get(){
-        Logger::logFuncCall(__METHOD__);
         if(self::$singleton === null){
-            Logger::log('Initializing \'WebsiteFunctions\' instance...');
             self::$singleton = new WebsiteFunctions();
-            Logger::log('Initializing of \'WebsiteFunctions\' completed.');
         }
-        Logger::log('Returning \'WebsiteFunctions\' instance.');
-        Logger::logFuncReturn(__METHOD__);
         return self::$singleton;
     }
     /**
@@ -112,17 +106,10 @@ class WebsiteFunctions extends Functions{
      * @since 1.0
      */
     public function createSiteConfigFile() {
-        Logger::logFuncCall(__METHOD__);
         if(!class_exists('webfiori\conf\SiteConfig')){
-            Logger::log('Creating Configuration File \'SiteConfig.php\'');
             $initCfg = $this->getSiteConfigVars();
             $this->writeSiteConfig($initCfg);
-            Logger::log('Creatied.');
         }
-        else{
-            Logger::log('Configuration File \'SiteConfig.php\' Already Exist.');
-        }
-        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * Updates web site configuration based on some attributes.
@@ -152,7 +139,6 @@ class WebsiteFunctions extends Functions{
      * @since 1.0
      */
     public function updateSiteInfo($websiteInfoArr){
-        Logger::logFuncCall(__METHOD__);
         $confArr = $this->getSiteConfigVars();
         foreach ($confArr as $k=>$v){
             if(isset($websiteInfoArr[$k])){
@@ -160,7 +146,6 @@ class WebsiteFunctions extends Functions{
             }
         }
         $this->writeSiteConfig($confArr);
-        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * Returns an associative array that contains web site configuration 
@@ -209,17 +194,6 @@ class WebsiteFunctions extends Functions{
      * @since 1.0
      */
     private function writeSiteConfig($configArr){
-        Logger::logFuncCall(__METHOD__);
-        foreach ($configArr as $k => $v){
-            if(gettype($v) == 'array'){
-                foreach ($v as $lCode => $text){
-                    Logger::log($k.' => ['.$lCode.' => '.$text.']', 'debug');
-                }
-            }
-            else{
-                Logger::log($k.' => '.$v, 'debug');
-            }
-        }
         $fh = new FileHandler(ROOT_DIR.'/conf/SiteConfig.php');
         $fh->write('<?php', true, true);
         $fh->write('/*
@@ -478,6 +452,5 @@ class WebsiteFunctions extends Functions{
         $fh->reduceTab();
         $fh->write('}', true, true);
         $fh->close();
-        Logger::logFuncReturn(__METHOD__);
     }
 }

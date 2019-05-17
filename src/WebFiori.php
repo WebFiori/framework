@@ -33,7 +33,6 @@ use webfiori\functions\SystemFunctions;
 use webfiori\functions\WebsiteFunctions;
 use webfiori\functions\BasicMailFunctions;
 use webfiori\entity\AutoLoader;
-use webfiori\entity\Logger;
 use webfiori\entity\Util;
 use webfiori\entity\router\APIRoutes;
 use webfiori\entity\router\ViewRoutes;
@@ -146,9 +145,6 @@ class WebFiori{
      * @since 1.0
      */
     public static function getClassStatus() {
-        Logger::logFuncCall(__METHOD__);
-        Logger::logReturnValue(self::$classStatus);
-        Logger::logFuncReturn(__METHOD__);
         return self::$classStatus;
     }
     /**
@@ -208,22 +204,12 @@ class WebFiori{
            require_once ROOT_DIR.'/entity/AutoLoader.php';
         }
         self::$AU = AutoLoader::get();
-        
-        //uncomment next line to show runtime errors and warnings
-        //also enable logging for info, warnings and errors 
-        Logger::logName('initialization-log');
-        Logger::enabled(true);
-        Logger::clear();
-        Logger::log('Autoloader initialized.');
+
         //display PHP warnings and errors
         Util::displayErrors();
-        Logger::log('Initializing user-defined autoload directories...');
+        
         InitAutoLoad::init();
-        Logger::log('Initializing user-defined autoload directories finished.');
-        Logger::log('Initializing CLI...');
         CLI::init();
-        Logger::log('CLI Initialized.');
-        Logger::log('Setting Error Handler...');
         
         set_error_handler(function($errno, $errstr, $errfile, $errline){
             header("HTTP/1.1 500 Server Error");
@@ -240,8 +226,6 @@ class WebFiori{
             //let php handle the error since it is not API call.
             return false;
         });
-        Logger::log('Setting Error Handler completed.');
-        Logger::log('Setting exceptions handler...');
         set_exception_handler(function($ex){
             header("HTTP/1.1 500 Server Error");
             if(defined('API_CALL')){
@@ -293,21 +277,13 @@ class WebFiori{
                 . '</html>');
             }
         });
-        Logger::log('Setting exceptions handler completed.');
         
-        //enable logging of debug info.
-        //define('DEBUG', '');
-        
-        Logger::log('Initializing main logic classes...');
         self::$SF = SystemFunctions::get();
         self::$WF = WebsiteFunctions::get();
         self::$BMF = BasicMailFunctions::get();
-        Logger::log('Initializing main logic classes completed.');
         
-        Logger::log('Checking system status...');
         $this->sysStatus = Util::checkSystemStatus(true);
         if($this->sysStatus == Util::MISSING_CONF_FILE || $this->sysStatus == Util::MISSING_SITE_CONF_FILE){
-            Logger::log('One or more configuration file is missing. Attempting to create all configuration files.', 'warning');
             self::$SF->createConfigFile();
             self::$WF->createSiteConfigFile();
             self::$BMF->createEmailConfigFile();
@@ -318,44 +294,25 @@ class WebFiori{
             $this->sysStatus = Util::DB_NEED_CONF;
         }
         
-        Logger::log('Initializing routes...');
         APIRoutes::create();
         
         ViewRoutes::create();
         ClosureRoutes::create();
         OtherRoutes::create();
-        Logger::log('Initializing routes completed.');
         
         //initialize some settings...
-        Logger::log('Initializing cron jobs...');
         InitCron::init();
-        Logger::log('Initializing cron jobs completed.');
-        
-        Logger::log('Initializing permissions...');
         InitPrivileges::init();
-        Logger::log('Initializing permissions completed.');
-        Logger::log('Initialization stage completed without errors.');
         
         self::$classStatus = 'INITIALIZED';
         
         define('INITIAL_SYS_STATUS', $this->_getSystemStatus());
-        
-        Logger::log('INITIAL_SYS_STATUS = '.INITIAL_SYS_STATUS, 'debug');
         if(php_sapi_name() != 'cli'){
             if(INITIAL_SYS_STATUS === true){
-                //switch to the log file 'system-log.txt'.
-                Logger::logName('system-log');
-                Logger::clear();
-                Logger::section();
+                
             }
             else if(INITIAL_SYS_STATUS == Util::DB_NEED_CONF){
-                Logger::log('Unable to connect to database.', 'warning');
                 $err = $this->dbErrDetails;
-                Logger::log('Database Error Code: '.$err['error-code']);
-                Logger::log('Database Error Message: '.$err['error-message']);
-                //switch to the log file 'system-log.txt'.
-                Logger::logName('system-log');
-                Logger::section();
             }
             else{
                 //you can modify this part to make 
@@ -474,13 +431,10 @@ class WebFiori{
      * @since 1.0
      */
     public static function sysStatus(){
-        Logger::logFuncCall(__METHOD__);
         $retVal = self::$classStatus;
         if(self::getClassStatus() == 'INITIALIZED'){
             $retVal = self::getAndStart()->_getSystemStatus(true);
         }
-        Logger::logReturnValue($retVal);
-        Logger::logFuncReturn(__METHOD__);
         return $retVal;
     }
     /**
@@ -490,18 +444,13 @@ class WebFiori{
      * @since 1.0
      */
     private function _getSystemStatus($refresh=true,$testDb=true) {
-        Logger::logFuncCall(__METHOD__);
-        Logger::log('Refresh status = '.$refresh, 'debug');
         if($refresh === true){
-            Logger::log('Updating system status.');
             $this->sysStatus = Util::checkSystemStatus($testDb);
             if(gettype($this->sysStatus) == 'array'){
                 $this->dbErrDetails = $this->sysStatus;
                 $this->sysStatus = Util::DB_NEED_CONF;
             }
         }
-        Logger::logReturnValue($this->sysStatus);
-        Logger::logFuncReturn(__METHOD__);
         return $this->sysStatus;
     }
     /**
@@ -510,8 +459,6 @@ class WebFiori{
      * @since 1.0
      */
     private function _needConfigration(){
-        Logger::logFuncCall(__METHOD__, 'initialization-log');
-        Logger::requestCompleted();
         header('HTTP/1.1 503 Service Unavailable');
         if(defined('API_CALL')){
             header('content-type:application/json');

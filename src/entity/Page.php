@@ -190,7 +190,6 @@ class Page{
         Page::get()->_reset();
     }
     private function _reset(){
-        Logger::logFuncCall(__METHOD__);
         $this->document = new HTMLDoc();
         $this->setTitle('Default X');
         $this->setWebsiteName('My X Website');
@@ -226,7 +225,6 @@ class Page{
         $footerNode = new HTMLNode();
         $footerNode->setID('page-footer');
         $this->document->addChild($footerNode);
-        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * Sets or returns the name of page web site.
@@ -347,10 +345,7 @@ class Page{
      * @since 1.9
      */
     public static function insert($node,$parentNodeId='main-content-area'){
-        Logger::logFuncCall(__METHOD__);
         $retVal = Page::get()->insertNode($node, $parentNodeId);
-        Logger::logReturnValue($retVal);
-        Logger::logFuncReturn(__METHOD__);
         return $retVal;
     }
     /**
@@ -363,32 +358,16 @@ class Page{
      * @since 1.6
      */
     public function insertNode($node,$parentNodeId='') {
-        Logger::logFuncCall(__METHOD__);
-        Logger::log('Checking parent node ID...');
         $retVal = false;
         if(strlen($parentNodeId) != 0){
-            Logger::log('Checking if the given instance is of type \'HTMLNode\'...');
             if($node instanceof HTMLNode){
-                Logger::log('Checking if parent node exist...');
                 $parentNode = &$this->document->getChildByID($parentNodeId);
                 if($parentNode instanceof HTMLNode){
                     $parentNode->addChild($node);
-                    Logger::log('Node added.');
                     $retVal = true;
                 }
-                else{
-                    Logger::log('No node was found which has the ID \''.$parentNodeId.'\'.','warning');
-                }
-            }
-            else{
-                Logger::log('Given instance is not of type \'HTMLNode\'. No node was added.','warning');
             }
         }
-        else{
-            Logger::log('Invalid parent node ID. No node was added.','warning');
-        }
-        Logger::logReturnValue($retVal);
-        Logger::logFuncReturn(__METHOD__);
         return $retVal;
     }
     /**
@@ -660,31 +639,19 @@ class Page{
      * @see Theme::usingTheme()
      */
     public function usingTheme($themeName=null) {
-        Logger::logFuncCall(__METHOD__);
-        Logger::log('Checking if given theme name is null...');
         if($themeName === null){
-            Logger::log('Given value is null. Using theme name from configuration file.');
             $themeName = SiteConfig::getBaseThemeName();
         }
-        Logger::log('Theme name = \''.$themeName.'\'.', 'debug');
-        Logger::log('Loading theme...');
         $tmpTheme = Theme::usingTheme($themeName);
         $this->theme = $tmpTheme;
-        Logger::log('Theme loaded.');
-        Logger::log('Constructing page document...');
         $this->document = new HTMLDoc();
-        Logger::log('Initializing document head node...');
         $headNode = $this->_getHead(true);
-        Logger::log('Initializing document footer node...');
         $footerNode = $this->_getFooter(true);
-        Logger::log('Initializing document aside node...');
         $asideNode = $this->_getAside(true);
-        Logger::log('Initializing document header node...');
         $headerNode = $this->_getHeader(true);
         $this->document->setLanguage($this->getLang());
         $this->document->setHeadNode($headNode);
         $this->document->addChild($headerNode);
-        Logger::log('Creating document body...');
         $body = new HTMLNode();
         $body->setID('page-body');
         $body->addChild($asideNode);
@@ -693,11 +660,7 @@ class Page{
         $body->addChild($mainContentArea);
         $this->document->addChild($body);
         $this->document->addChild($footerNode);
-        Logger::log('Document building finished.');
-        Logger::log('Invoking after loaded function...');
         $this->theme->invokeAfterLoaded();
-        Logger::log('Theme initialization finished.');
-        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * Returns the directory at which CSS files of loaded theme exists.

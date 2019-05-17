@@ -23,7 +23,6 @@
  * THE SOFTWARE.
  */
 namespace webfiori\functions;
-use webfiori\entity\Logger;
 use webfiori\entity\FileHandler;
 use webfiori\entity\DBConnectionInfo;
 use webfiori\conf\Config;
@@ -96,14 +95,9 @@ class SystemFunctions extends Functions{
      * @since 1.0
      */
     public static function &get(){
-        Logger::logFuncCall(__METHOD__);
         if(self::$singleton === null){
-            Logger::log('Initializing \'SystemFunctions\' instance...');
             self::$singleton = new SystemFunctions();
-            Logger::log('Initializing of \'SystemFunctions\' completed.');
         }
-        Logger::log('Returning \'SystemFunctions\' instance.');
-        Logger::logFuncReturn(__METHOD__);
         return self::$singleton;
     }
     /**
@@ -111,17 +105,10 @@ class SystemFunctions extends Functions{
      * @since 1.0
      */
     public function createConfigFile() {
-        Logger::logFuncCall(__METHOD__);
         if(!class_exists('webfiori\conf\Config')){
-            Logger::log('Creating Configuration File \'Config.php\'');
             $cfg = $this->getConfigVars();
             $this->writeConfig($cfg);
-            Logger::log('Created.');
         }
-        else{
-            Logger::log('Configuration File \'Config.php\' Already Exist.');
-        }
-        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * Creates new instance of the class.
@@ -138,11 +125,7 @@ class SystemFunctions extends Functions{
      * @since 1.4.3
      */
     public function addOrUpdateDBConnections($dbConnectionsInfo){
-        Logger::logFuncCall(__METHOD__);
-        Logger::log('Checking if given parameter is an array...');
         if(gettype($dbConnectionsInfo) == 'array'){
-            Logger::log('An array is given.');
-            Logger::log('Adding connections...');
             $confVars = $this->getConfigVars();
             foreach ($dbConnectionsInfo as $con){
                 if($con instanceof DBConnectionInfo){
@@ -156,9 +139,7 @@ class SystemFunctions extends Functions{
                 }
             }
             $this->writeConfig($confVars);
-            Logger::log('Finished.');
         }
-        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * Removes a set of database connections.
@@ -169,19 +150,13 @@ class SystemFunctions extends Functions{
      * @since 1.4.3
      */
     public function removeDBConnections($connectionsNames){
-        Logger::logFuncCall(__METHOD__);
-        Logger::log('Checking if given parameter is an array...');
         if(gettype($connectionsNames) == 'array'){
-            Logger::log('An array is given.');
-            Logger::log('Removing connections...');
             $confVars = $this->getConfigVars();
             foreach ($connectionsNames as $dbName){  
                 unset($confVars['databases'][$dbName]);
             }
             $this->writeConfig($confVars);
-            Logger::log('Finished.');
         }
-        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * Updates system configuration status.
@@ -193,12 +168,9 @@ class SystemFunctions extends Functions{
      * @since 1.3
      */
     public function configured($isConfig=true){
-        Logger::logFuncCall(__METHOD__);
         $confVars = $this->getConfigVars();
         $confVars['is-config'] = $isConfig === true ? 'true' : 'false';
-        Logger::log('Is Configured = '.$confVars['is-config'], 'debug');
         $this->writeConfig($confVars);
-        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * Returns an associative array that contains system configuration 
@@ -233,9 +205,7 @@ class SystemFunctions extends Functions{
      * @since 1.0
      */
     private function writeConfig($configArr){
-        Logger::logFuncCall(__METHOD__);
         $configFileLoc = ROOT_DIR.'/conf/Config.php';
-        Logger::log('Saving configuration variables to the file \''.$configFileLoc.'\'.');
         $fh = new FileHandler($configFileLoc);
         $fh->write('<?php', true, true);
         $fh->write('/*
@@ -477,7 +447,6 @@ class SystemFunctions extends Functions{
         $fh->reduceTab();
         $fh->write('}', true, true);
         $fh->close();
-        Logger::logFuncReturn(__METHOD__);
     }
     /**
      * Checks if the application setup is completed or not.
@@ -491,25 +460,16 @@ class SystemFunctions extends Functions{
      * @since 1.0
      */
     public function isSetupFinished(){
-        Logger::logFuncCall(__METHOD__);
         if(class_exists('webfiori\conf\Config')){
             if(class_exists('webfiori\conf\MailConfig')){
                 if(class_exists('webfiori\conf\SiteConfig')){
                     $retVal = Config::isConfig();
-                    Logger::logReturnValue($retVal);
-                    Logger::logFuncReturn(__METHOD__);
                     return $retVal;
                 }
-                Logger::log('The file \'SiteConfig.php\' is missing. An exception is thrown.', 'error');
-                Logger::requestCompleted();
                 throw new Exception('SiteConfig.php is missing.');
             }
-            Logger::log('The file \'MailConfig.php\' is missing. An exception is thrown.', 'error');
-            Logger::requestCompleted();
             throw new Exception('MailConfig.php is missing.');
         }
-        Logger::log('The file \'Config.php\' is missing. An exception is thrown.', 'error');
-        Logger::requestCompleted();
         throw new Exception('Config.php is missing.');
     }
 }

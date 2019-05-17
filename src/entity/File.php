@@ -465,22 +465,14 @@ class File implements JsonI{
     }
     private function _viewFileHelper($asAttachment){
         $contentType = $this->getFileMIMEType();
-        Logger::logName('View-F-Log');
         if($contentType != null){
-            Logger::log('Content-type: '.$contentType);
             header("Accept-Ranges: bytes");
             header('Content-Type:'.$contentType);
-            Logger::log('Checking if range is set...');
             if(isset($_SERVER['HTTP_RANGE'])){
-                Logger::log('It is set.');
                 $range = filter_var($_SERVER['HTTP_RANGE']);
-                Logger::log('Range = \''.$range.'\'.');
                 $rangeArr = explode('=', $range);
                 $expl = explode('-', $rangeArr[1]);
                 if(strlen($expl[1]) == 0){
-                    Logger::log('Range end not specified.');
-                    Logger::log('Setting it to file size.');
-                    Logger::log('F Size: '.$this->getSize());
                     $expl[1] = $this->getSize(); 
                 }
                 $this->read($expl[0], $expl[1]);
@@ -490,7 +482,6 @@ class File implements JsonI{
             }
             else{
                 //header('Content-Range: bytes 0-'.$this->getSize().'/'.$this->getSize());
-                Logger::log('No Content Range header. New View.');
                 header('Content-Length: '.$this->getSize());
             }
             if($asAttachment === true){
@@ -500,7 +491,6 @@ class File implements JsonI{
                 header('Content-Disposition: inline; filename="'.$this->getName().'"');
             }
             echo $this->getRawData();
-            Logger::section();
         }
         else{
             throw new Exception('MIME type of raw data is not set.');

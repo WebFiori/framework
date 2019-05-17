@@ -270,39 +270,23 @@ class Util{
      * @since 1.3.2
      */
     public static function checkDbConnection($dbAttrs=array()){
-        Logger::logFuncCall(__METHOD__);
         $C = Config::get();
         $host = isset($dbAttrs['host']) ? $dbAttrs['host'] : $C->getDBHost();
         $user = isset($dbAttrs['user']) ? $dbAttrs['user'] : $C->getDBHost();
         $pass = isset($dbAttrs['pass']) ? $dbAttrs['pass'] : $C->getDBHost();
         $dbName = isset($dbAttrs['db-name']) ? $dbAttrs['db-name'] : $C->getDBHost();
-        Logger::log('Trying to connect to the database...');
-        Logger::log('DB Host: \''.$host.'\'.', 'debug');
-        Logger::log('DB User: \''.$user.'\'.', 'debug');
-        Logger::log('DB Pass: \''.$pass.'\'.', 'debug');
-        Logger::log('DB Name: \''.$dbName.'\'.', 'debug');
         self::$dbTestInstance = new DatabaseLink($host, $user, $pass);
         if(self::$dbTestInstance->isConnected()){
-            Logger::log('Connected to host. Setting database...');
             if(self::$dbTestInstance->setDB($dbName)){
-                Logger::log('Database set.');
                 $returnValue = true;
             }
             else{
-                Logger::log('Unable to set database.','warning');
-                Logger::log('Message: \''.self::$dbTestInstance->getErrorMessage().'\'.');
-                Logger::log('Code: \''.self::$dbTestInstance->getErrorCode().'\'.');
                 $returnValue = Util::DB_NEED_CONF;
             }
         }
         else{
-            Logger::log('Unable to connect.','warning');
-            Logger::log('Message: \''.self::$dbTestInstance->getErrorMessage().'\'.');
-            Logger::log('Code: \''.self::$dbTestInstance->getErrorCode().'\'.');
             $returnValue = Util::DB_NEED_CONF;
         }
-        Logger::logReturnValue($returnValue);
-        Logger::logFuncReturn(__METHOD__);
         return $returnValue;
     }
 
@@ -322,15 +306,11 @@ class Util{
      * @since 1.2
      */
     public static function checkSystemStatus($checkDb=false,$dbName=''){
-        Logger::logFuncCall(__METHOD__);
-        Logger::log('Checking system status...');
         $returnValue = '';
         if(class_exists('webfiori\conf\Config')){
             if(class_exists('webfiori\conf\SiteConfig')){
                 if(Config::isConfig() === true || WebFiori::getClassStatus() == 'INITIALIZING'){
                     if($checkDb === true){
-                        Logger::log('Checking database connection...');
-                        Logger::log('Database to check = \''.$dbName.'\'.', 'debug');
                         $connInfo = Config::getDBConnection($dbName);
                         if($connInfo instanceof DBConnectionInfo){
                             $returnValue = DBConnectionFactory::mysqlLink(array(
@@ -341,40 +321,31 @@ class Util{
                                 'db-name'=>$connInfo->getDBName()
                             ));
                             if(gettype($returnValue) == 'object'){
-                                Logger::log('Connected.');
                                 $returnValue = true;
                             }
                             else{
-                                Logger::log('Unable to connect to database.','error');
                                 $returnValue = self::DB_NEED_CONF;
                             }
                         }
                         else{
-                            Logger::log('No connection information was found for the given database.', 'warning');
                             $returnValue = self::DB_NEED_CONF;
                         }
                     }
                     else{
-                        Logger::log('No need to check database connection');
                         $returnValue = true;
                     }
                 }
                 else{
-                    Logger::log('The method \'Config::isConfig()\' returned false or the core is still initializing.', 'warning');
                     $returnValue = Util::NEED_CONF;
                 }
             }
             else{
-                Logger::log('The file \'SiteConfig.php\' is missing.', 'warning');
                 $returnValue = Util::MISSING_SITE_CONF_FILE;
             }
         }
         else{
-            Logger::log('The file \'Config.php\' is missing.', 'warning');
             $returnValue = Util::MISSING_CONF_FILE;
         }
-        Logger::logReturnValue($returnValue);
-        Logger::logFuncReturn(__METHOD__);
         return $returnValue;
     }
     /**

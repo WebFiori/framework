@@ -162,6 +162,9 @@ class CLI {
             self::showHelp();
         }
         else{
+            if(defined('__PHPUNIT_PHAR__')){
+                return;
+            }
             $commands = $_SERVER['argv'];
             if($commands[1] == "--hello"){
                 echo "Hello World!";

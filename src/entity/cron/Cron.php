@@ -25,7 +25,6 @@
 namespace webfiori\entity\cron;
 use phpStructs\Queue;
 use webfiori\entity\router\Router;
-use webfiori\entity\Logger;
 use webfiori\entity\Util;
 if(!defined('ROOT_DIR')){
     header("HTTP/1.1 404 Not Found");
@@ -159,23 +158,13 @@ class Cron {
         $this->cronJobsQueue = new Queue();
         $this->_setPassword('');
         $func = function(){
-            Logger::logFuncCall('CLOSURE_ROUTE');
-            Logger::log('Validating source IP address...');
             $clientIp = Util::getClientIP();
             $serverIp = Util::getClientIP();
-            Logger::log('Client IP = \''.$clientIp.'\'.', 'debug');
-            Logger::log('Server IP = \''.$serverIp.'\'.', 'debug');
             if($clientIp == $serverIp){
-                Logger::log('Checking if password is required to execute cron jobs...');
                 if(Cron::password() != 'NO_PASSWORD'){
-                    Logger::log('Password required. Checking if password is provided...');
                     $password = isset($_GET['password']) ? filter_var($_GET['password']) : '';
-                    Logger::log('Password = \''.$password.'\'.', 'debug');
                     if($password != ''){
-                        Logger::log('Checking if password is valid...');
                         if($password == Cron::password()){
-                            Logger::log('Valid password.');
-                            Logger::log('Starting the execution of tasks.');
                             $totalJobs = Cron::jobsQueue()->size();
                             $executedJobsCount = 0;
                             while ($job = Cron::jobsQueue()->dequeue()){
@@ -184,8 +173,6 @@ class Cron {
                                     $executedJobsCount++;
                                 }
                             }
-                            Logger::log('Jobs execution finished.');
-                            Logger::requestCompleted();
                             http_response_code(200);
                             die(''
                             . '<!DOCTYPE html>'
@@ -206,8 +193,6 @@ class Cron {
                             . '</html>');
                         }
                         else{
-                            Logger::log('Invalid password.', 'error');
-                            Logger::requestCompleted();
                             die(''
                             . '<!DOCTYPE html>'
                             . '<html>'
@@ -225,8 +210,6 @@ class Cron {
                         }
                     }
                     else{
-                        Logger::log('No password is provided.', 'error');
-                        Logger::requestCompleted();
                         die(''
                         . '<!DOCTYPE html>'
                         . '<html>'
@@ -244,7 +227,6 @@ class Cron {
                     }
                 }
                 else{
-                    Logger::log('No password required. Executing jobs...');
                     $totalJobs = Cron::jobsQueue()->size();
                     $executedJobsCount = 0;
                     while ($job = Cron::jobsQueue()->dequeue()){
@@ -253,8 +235,6 @@ class Cron {
                             $executedJobsCount++;
                         }
                     }
-                    Logger::log('Jobs execution finished.');
-                    Logger::requestCompleted();
                     http_response_code(200);
                     die(''
                     . '<!DOCTYPE html>'
@@ -276,8 +256,6 @@ class Cron {
                 }
             }
             else{
-                Logger::log('Client IP address is not the same as server IP. No jobs executed.', 'error');
-                Logger::requestCompleted();
                 http_response_code(403);
                 die(''
                 . '<!DOCTYPE html>'
@@ -299,32 +277,19 @@ class Cron {
         Router::closure('/cron-jobs/execute',$func);
         
         $forceFunc = function(){
-            Logger::logFuncCall('CLOSURE_ROUTE');
-            Logger::log('Validating source IP address...');
             $clientIp = Util::getClientIP();
             $serverIp = Util::getClientIP();
-            Logger::log('Client IP = \''.$clientIp.'\'.', 'debug');
-            Logger::log('Server IP = \''.$serverIp.'\'.', 'debug');
             if($clientIp == $serverIp){
-                Logger::log('Checking if password is required to execute cron jobs...');
                 if(Cron::password() != 'NO_PASSWORD'){
-                    Logger::log('Password required. Checking if password is provided...');
                     $password = isset($_GET['password']) ? filter_var($_GET['password']) : '';
-                    Logger::log('Password = \''.$password.'\'.', 'debug');
                     if($password != ''){
-                        Logger::log('Checking if password is valid...');
                         if($password == Cron::password()){
-                            Logger::log('Valid password.');
-                            Logger::log('Checking if job name is given...');
                             $jobName = isset($_GET['job-name']) ? filter_var($_GET['job-name']) : NULL;
-                            Logger::log('Job name = \''.$jobName.'\'.', 'debug');
                             if($jobName != NULL){
                                 while ($job = Cron::jobsQueue()->dequeue()){
                                     if($job->getJobName() == $jobName){
                                         $job->execute(TRUE);
-                                        Logger::log('Job executed.');
                                         $this->_logJobExecution($job,TRUE);
-                                        Logger::requestCompleted();
                                         http_response_code(200);
                                         die(''
                                         . '<!DOCTYPE html>'
@@ -342,8 +307,6 @@ class Cron {
                                         . '</html>');
                                     }
                                 }
-                                Logger::log('No job was found which has the given name.','warning');
-                                Logger::requestCompleted();
                                 http_response_code(404);
                                 die(''
                                 . '<!DOCTYPE html>'
@@ -361,8 +324,6 @@ class Cron {
                                 . '</html>');
                             }
                             else{
-                                Logger::log('No job name was given.','warning');
-                                Logger::requestCompleted();
                                 http_response_code(404);
                                 die(''
                                 . '<!DOCTYPE html>'
@@ -381,8 +342,6 @@ class Cron {
                             }
                         }
                         else{
-                            Logger::log('Invalid password.', 'error');
-                            Logger::requestCompleted();
                             die(''
                             . '<!DOCTYPE html>'
                             . '<html>'
@@ -400,8 +359,6 @@ class Cron {
                         }
                     }
                     else{
-                        Logger::log('No password is provided.', 'error');
-                        Logger::requestCompleted();
                         die(''
                         . '<!DOCTYPE html>'
                         . '<html>'
@@ -419,17 +376,12 @@ class Cron {
                     }
                 }
                 else{
-                    Logger::log('No password required. Executing jobs...');
-                    Logger::log('Checking if job name is given...');
                     $jobName = isset($_GET['job-name']) ? filter_var($_GET['job-name']) : NULL;
-                    Logger::log('Job name = \''.$jobName.'\'.', 'debug');
                     if($jobName != NULL){
                         while ($job = Cron::jobsQueue()->dequeue()){
                             if($job->getJobName() == $jobName){
                                 $job->execute(TRUE);
-                                Logger::log('Job executed.');
                                 $this->_logJobExecution($job,TRUE);
-                                Logger::requestCompleted();
                                 http_response_code(200);
                                 die(''
                                 . '<!DOCTYPE html>'
@@ -447,8 +399,6 @@ class Cron {
                                 . '</html>');
                             }
                         }
-                        Logger::log('No job was found which has the given name.','warning');
-                        Logger::requestCompleted();
                         http_response_code(404);
                         die(''
                         . '<!DOCTYPE html>'
@@ -466,8 +416,6 @@ class Cron {
                         . '</html>');
                     }
                     else{
-                        Logger::log('No job name was given.','warning');
-                        Logger::requestCompleted();
                         http_response_code(404);
                         die(''
                         . '<!DOCTYPE html>'
@@ -487,8 +435,6 @@ class Cron {
                 }
             }
             else{
-                Logger::log('Client IP address is not the same as server IP. No jobs executed.', 'error');
-                Logger::requestCompleted();
                 http_response_code(403);
                 die(''
                 . '<!DOCTYPE html>'
@@ -510,22 +456,14 @@ class Cron {
         Router::closure('/cron-jobs/execute/{password}/force/{job-name}',$forceFunc);
         
         $viewJobsFunc = function(){
-            Logger::logFuncCall('CLOSURE_ROUTE');
-            Logger::log('Checking if password is required to view cron jobs...');
             if(Cron::password() != 'NO_PASSWORD'){
-                Logger::log('Password required. Checking if password is provided...');
                 $password = isset($_GET['password']) ? filter_var($_GET['password']) : '';
-                Logger::log('Password = \''.$password.'\'.', 'debug');
                 if($password != ''){
-                    Logger::log('Checking if password is valid...');
                     if($password == Cron::password()){
                         new CronTasksView();
-                        Logger::requestCompleted();
                         die();
                     }
                     else{
-                        Logger::log('Invalid password.', 'error');
-                        Logger::requestCompleted();
                         die(''
                         . '<!DOCTYPE html>'
                         . '<html>'
@@ -543,8 +481,6 @@ class Cron {
                     }
                 }
                 else{
-                    Logger::log('No password is provided.', 'error');
-                    Logger::requestCompleted();
                     die(''
                     . '<!DOCTYPE html>'
                     . '<html>'
@@ -563,7 +499,6 @@ class Cron {
             }
             else{
                 new CronTasksView();
-                Logger::requestCompleted();
                 die('');
             }
         };

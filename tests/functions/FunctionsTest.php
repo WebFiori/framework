@@ -65,6 +65,9 @@ class FunctionsTest extends TestCase{
         $func = new Functions();
         $this->assertTrue($func->setConnection('test-connection'));
         $result = $func->useDatabase();
+        if($result === false){
+            \webfiori\entity\Util::print_r($func->getDBErrDetails());
+        }
         $this->assertTrue($result);
     }
     /**

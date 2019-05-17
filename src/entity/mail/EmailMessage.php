@@ -30,7 +30,6 @@ if(!defined('ROOT_DIR')){
 }
 use webfiori\conf\MailConfig;
 use webfiori\entity\File;
-use webfiori\entity\Logger;
 use webfiori\functions\BasicMailFunctions;
 use phpStructs\html\HTMLDoc;
 use phpStructs\html\HTMLNode;
@@ -70,14 +69,9 @@ class EmailMessage {
      * @since 1.0
      */
     public static function &createInstance($sendAccountName=''){
-        Logger::logFuncCall(__METHOD__);
-        Logger::log('Checking if an instance of the class is already active...');
         if(self::$em === NULL){
-            Logger::log('No instance is active. Creating new one...');
             self::$em = new EmailMessage($sendAccountName);
         }
-        Logger::log('Returning class intance.');
-        Logger::logFuncReturn(__METHOD__);
         return self::$em;
     }
     /**
@@ -88,39 +82,24 @@ class EmailMessage {
      * @since 1.0
      */
     private function __construct($sendAccountName='') {
-        Logger::logFuncCall(__METHOD__);
-        Logger::log('Creating new instance of \'EmailMessage\'.', 'info');
         if(class_exists('webfiori\conf\MailConfig')){
-            Logger::log('Checking the existance of the account \''.$sendAccountName.'\'.', 'debug');
             $acc = MailConfig::getAccount($sendAccountName);
             if($acc instanceof SMTPAccount){
-                Logger::log('SMTP Account retrieved.');
-                Logger::log('Getting socket mailer ready.');
                 $this->socketMailer = BasicMailFunctions::get()->getSocketMailer($acc);
                 if($this->socketMailer == BasicMailFunctions::INV_CREDENTIALS){
-                    Logger::log('Unable to login to the email server using provided parameters. An exception is thrown.', 'error');
-                    Logger::requestCompleted();
                     throw new Exception('The account "'.$sendAccountName.'" has inalid credintials.');
                 }
                 else if($this->socketMailer == BasicMailFunctions::INV_HOST_OR_PORT){
-                    Logger::log('Unable to connect to the email server. Incorrect port or server address. An exception is thrown.', 'error');
-                    Logger::requestCompleted();
                     throw new Exception('The account "'.$sendAccountName.'" has inalid host or port number. Port: '.$acc->getPort().', Host: '.$acc->getServerAddress().'.');
                 }
                 else{
-                    Logger::log('Instance created with no errors.');
-                    Logger::logFuncReturn(__METHOD__);
                     $this->asHtml = new HTMLDoc();
                     $this->asHtml->getHeadNode()->addMeta('charset', 'UTF-8');
                     return;
                 }
             }
-            Logger::log('No email account with the name \''.$sendAccountName.'\' was found. An exception is thrown.', 'error');
-            Logger::requestCompleted();
             throw new Exception('The account "'.$sendAccountName.'" does not exist.');
         }
-        Logger::log('Class \'MailConfig\' is missing. An exception is thrown.', 'error');
-        Logger::requestCompleted();
         throw new Exception('Class "MailConfig" not found.');
     }
     /**

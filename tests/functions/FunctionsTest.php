@@ -115,6 +115,26 @@ class FunctionsTest extends TestCase{
     /**
      * @test
      */
+    public function testUseDatabase07() {
+        $connection = new DBConnectionInfo('root', '123456', 'test_db');
+        $connection->setConnectionName('test-connection');
+        WebFiori::getConfig()->addDbConnection($connection);
+        $func = new Functions();
+        $this->assertTrue($func->setConnection('test-connection'));
+        $result = $func->useDatabase();
+        $this->assertTrue($result);
+        $connection = new DBConnectionInfo('root', '123456', '');
+        $connection->setConnectionName('test-connection');
+        WebFiori::getConfig()->addDbConnection($connection);
+        $result = $func->useDatabase('test-connection');
+        $this->assertFalse($result);
+        $errDetails = $func->getDBErrDetails();
+        $this->assertEquals(1046,$errDetails['error-code']);
+        $this->assertEquals("No database selected",$errDetails['error-message']);
+    }
+    /**
+     * @test
+     */
     public function testUseSession00() {
         $func = new Functions();
         $r = $func->useSession();
@@ -138,6 +158,19 @@ class FunctionsTest extends TestCase{
         $this->assertTrue($session->isNew());
         $this->assertFalse($session->isResumed());
         $this->assertTrue($session->isSessionActive());
+        $this->assertEquals('EN',$func->getSessionLang());
+        $this->assertEquals(-1,$func->getUserID());
+    }
+    /**
+     * @test
+     */
+    public function testExecuteQuery00() {
+        $f = new Functions();
+        $r = $f->excQ();
+        $this->assertFalse($r);
+        $errDetails = $f->getDBErrDetails();
+        $this->assertEquals(Functions::NO_QUERY,$errDetails['error-code']);
+        $this->assertEquals('No query object was set to execute.',$errDetails['error-message']);
     }
     /**
      * @test

@@ -212,8 +212,8 @@ class WebFiori{
         CLI::init();
         
         set_error_handler(function($errno, $errstr, $errfile, $errline){
-            header("HTTP/1.1 500 Server Error");
             if(defined('API_CALL')){
+                header("HTTP/1.1 500 Server Error");
                 $j = new JsonX();
                 $j->add('message',$errstr);
                 $j->add('type','error');

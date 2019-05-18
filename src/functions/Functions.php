@@ -200,17 +200,12 @@ class Functions {
         $dbLink = &$this->getDBLink();
         $dbConn = Config::getDBConnection($connName);
         if($dbLink instanceof MySQLLink){
-            if($dbConn !== null && $dbConn->getDBName() != $dbLink->getDBName()){
-                if($dbConn instanceof DBConnectionInfo){
-                    $retVal = $this->_connect($dbConn);
-                }
-                else{
-                    $this->_setDBErrDetails(-1, 'No database connection was found which has the name \''.$connName.'\'.');
-                    $retVal = self::NO_SUCH_CONNECTION;
-                }
+            if($dbConn instanceof DBConnectionInfo){
+                $retVal = $this->_connect($dbConn);
             }
             else{
-                $retVal = true;
+                $this->_setDBErrDetails(-1, 'No database connection was found which has the name \''.$connName.'\'.');
+                $retVal = self::NO_SUCH_CONNECTION;
             }
         }
         else{
@@ -257,6 +252,7 @@ class Functions {
                 if($result->getErrorCode() == 0){
                     return true;
                 }
+                $this->_setDBErrDetails($this->getDBLink()->getErrorCode(), $this->getDBLink()->getErrorMessage());
                 return false;
             }
             else{
@@ -279,10 +275,6 @@ class Functions {
      * @since 1.3.4
      */
     public function getDBErrDetails() {
-        $dbLink = $this->getDBLink();
-        if($dbLink !== null){
-            $this->_setDBErrDetails($dbLink->getErrorCode(), $dbLink->getErrorMessage());
-        }
         return $this->dbErrDetails;
     }
     /**
@@ -376,9 +368,10 @@ class Functions {
      * @param array $options An associative array of options. The available options 
      * are: 
      * <ul>
-     * <li>name: The name of the session that will be used or created.</li>
+     * <li>name: (Required) The name of the session that will be used or created.</li>
      * <li>create-new: If no session was found which has the given name and 
-     * this index is set to true, new session will be created.</li>
+     * this index is set to true, new session will be created. Ignored if 
+     * a session which has the given name is already created.</li>
      * <li>duration: The duration of the session in minutes (optional). Used only if 
      * the session is new.</li>
      * <li>refresh: An optional boolean variable. If set to true, the session timeout time 
@@ -394,33 +387,31 @@ class Functions {
     public function useSession($options=array()){
         if(gettype($options) == 'array'){
             if(isset($options['name'])){
-                $sessionName = $options['name'];
+                $sessionName = trim($options['name']);
                 if(isset(self::$sessions[$sessionName])){
                     $this->sessionName = $sessionName;
                     return true;
                 }
                 else{
-                    if(isset($options['create-new']) && $options['create-new'] === true){
-                        $mngr = new SessionManager($sessionName);
+                    $mngr = new SessionManager($sessionName);
                         
-                        $sTime = isset($options['duration']) ? $options['duration'] : self::DEFAULT_SESSTION_OPTIONS['duration'];
-                        $mngr->setLifetime($sTime);
-                        
-                        $isRef = isset($options['refresh']) ? $options['refresh'] : self::DEFAULT_SESSTION_OPTIONS['refresh'];
-                        $mngr->setIsRefresh($isRef);
-                        
-                        if($mngr->initSession($isRef)){
-                            $this->sessionName = $sessionName;
-                            $sUser = isset($options['user']) ? $options['user'] : self::DEFAULT_SESSTION_OPTIONS['user'];
-                            $mngr->setUser($sUser);
-                            self::$sessions[$mngr->getName()] = $mngr;
-                            if(isset($options['variables'])){
-                                foreach ($options['variables'] as $k => $v){
-                                    $mngr->setSessionVar($k,$v);
-                                }
+                    $sTime = isset($options['duration']) ? $options['duration'] : self::DEFAULT_SESSTION_OPTIONS['duration'];
+                    $mngr->setLifetime($sTime);
+
+                    $isRef = isset($options['refresh']) ? $options['refresh'] : self::DEFAULT_SESSTION_OPTIONS['refresh'];
+                    $mngr->setIsRefresh($isRef);
+
+                    if($mngr->initSession($isRef)){
+                        $this->sessionName = $sessionName;
+                        $sUser = isset($options['user']) ? $options['user'] : self::DEFAULT_SESSTION_OPTIONS['user'];
+                        $mngr->setUser($sUser);
+                        self::$sessions[$mngr->getName()] = $mngr;
+                        if(isset($options['variables'])){
+                            foreach ($options['variables'] as $k => $v){
+                                $mngr->setSessionVar($k,$v);
                             }
-                            return true;
                         }
+                        return true;
                     }
                 }
             }

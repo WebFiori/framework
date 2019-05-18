@@ -113,13 +113,8 @@ class DBConnectionFactory {
                     if(isset($connectionParams['pass'])){
                         if(isset($connectionParams['db-name'])){
                             $link = new MySQLLink($connectionParams['host'],$connectionParams['user'],$connectionParams['pass'],$connectionParams['port']);
-                            if($link->setDB($connectionParams['db-name'])){
-                                $retVal = $link;
-                            }
-                            else{
-                                $retVal['error-code'] = $link->getErrorCode();
-                                $retVal['error-message'] = $link->getErrorMessage();
-                            }
+                            $link->setDB($connectionParams['db-name']);
+                            $retVal = $link;
                         }
                         else{
                             $retVal['error-code'] = self::MISSING_DB_NAME;

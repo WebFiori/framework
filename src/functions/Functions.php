@@ -190,7 +190,10 @@ class Functions {
      * @param string $connName The name of database connection. The connection information 
      * will be taken from the class 'Config'.
      * @return boolean|string If the connection is established, the method will 
-     * return true. If not, the method will return false. If a connection name 
+     * return true. If not, the method will return false. Note that the method will return 
+     * false in case the connection was established but the database is not set. 
+     * In this case, error code will be 1046 for 'No database selected' or 1049 
+     * for 'Unknown database'. If a connection name 
      * is given but its information is not found, the method will return 
      * Functions::NO_SUCH_CONNECTION.
      * @since 1.1
@@ -236,31 +239,32 @@ class Functions {
      * @param DBConnectionInfo $connParams An object of type DBConnectionInfo 
      * that contains connection parameters.
      * @return boolean If the connection is established, the method will 
-     * return true. If not, It will return false.
+     * return true. If not, It will return false. Note that the method will return 
+     * false in case the connection was established but the database is not set. 
+     * In this case, error code will be 1046 for 'No database selected' or 1049 
+     * for 'Unknown database'.
      */
     private function _connect($connParams){
-        if($connParams instanceof DBConnectionInfo){
-            $result = DBConnectionFactory::mysqlLink(array(
-                'host'=>$connParams->getHost(),
-                'user'=>$connParams->getUsername(),
-                'pass'=>$connParams->getPassword(),
-                'db-name'=>$connParams->getDBName(),
-                'port'=>$connParams->getPort()
-            ));
-            if($result instanceof MySQLLink){
-                $this->databaseLink = $result;
-                if($result->getErrorCode() == 0){
-                    return true;
-                }
-                $this->_setDBErrDetails($this->getDBLink()->getErrorCode(), $this->getDBLink()->getErrorMessage());
-                return false;
+        $result = DBConnectionFactory::mysqlLink(array(
+            'host'=>$connParams->getHost(),
+            'user'=>$connParams->getUsername(),
+            'pass'=>$connParams->getPassword(),
+            'db-name'=>$connParams->getDBName(),
+            'port'=>$connParams->getPort()
+        ));
+        if($result instanceof MySQLLink){
+            $this->databaseLink = $result;
+            if($result->getErrorCode() == 0){
+                return true;
             }
-            else{
-                $this->_setDBErrDetails($result['error-code'], $result['error-message']);
-                return false;
-            }
+            //might be connected but database is not set.
+            $this->_setDBErrDetails($this->getDBLink()->getErrorCode(), $this->getDBLink()->getErrorMessage());
+            return false;
         }
-        return false;
+        else{
+            $this->_setDBErrDetails($result['error-code'], $result['error-message']);
+            return false;
+        }
     }
     /**
      * Returns an associative array that contains database error info (if any)
@@ -271,7 +275,9 @@ class Functions {
      * <li><b>error-message</b>: A message that tells more information about 
      * the error.</li>
      * If no errors, the first index will have the value 0 and 
-     * the second index will have the value 'NO_ERR'.
+     * the second index will have the value 'NO_ERR'. If the error was a result 
+     * of executing SQL query, there will be extra index which contains the 
+     * query. The index name will be 'query'.
      * @since 1.3.4
      */
     public function getDBErrDetails() {
@@ -344,6 +350,7 @@ class Functions {
         $result = $link->executeQuery($query);
         if($result !== true){
             $this->_setDBErrDetails($link->getErrorCode(),$link->getErrorMessage());
+            $this->dbErrDetails['query'] = $query->getQuery();
         }
         return $result;
     }

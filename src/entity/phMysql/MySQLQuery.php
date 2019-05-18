@@ -66,11 +66,6 @@ abstract class MySQLQuery{
      */
     const SELECT = 'select * from ';
     /**
-     * A constant that represents the ID column of a table.
-     * @since 1.0
-     */
-    const ID_COL = 'id';
-    /**
      * A constant for the query 'insert into'.
      * @since 1.0
      */
@@ -631,47 +626,6 @@ abstract class MySQLQuery{
         
     }
     /**
-     * Constructs a query that can be used to get table data based on a specific 
-     * column value.
-     * @param string $col The name of the column in the table.
-     * @param string $val The value that is used to filter data.
-     * @param string $cond The condition of select statement. It can be '=' or 
-     * '!='. If anything else is given, '=' will be used. Note that if 
-     * the parameter $val is equal to 'IS NULL' or 'IS NOT NULL', 
-     * This parameter is ignored. Default is '='.
-     * @param int $limit The value of the attribute 'limit' of the select statement. 
-     * If zero or a negative value is given, it will not be included in the generated 
-     * MySQL query. Default is -1.
-     * @param int $offset The value of the attribute 'offset' of the select statement. 
-     * If zero or a negative value is given, it will not be included in the generated 
-     * MySQL query. Default is -1.
-     * @since 1.0
-     * @deprecated since version 1.8.3 Use MySQLQuery::select() instead.
-     */
-    public function selectByColVal($col,$val,$cond='=',$limit=-1,$offset=-1){
-        if($limit > 0 && $offset > 0){
-            $lmit = 'limit '.$limit.' offset '.$offset;
-        }
-        else if($limit > 0 && $offset <= 0){
-            $lmit = 'limit '.$limit;
-        }
-        else{
-            $lmit = '';
-        }
-        $valUpper = strtoupper(trim($val));
-        if($valUpper == 'IS NOT NULL' || $valUpper == 'IS NULL'){
-            $this->setQuery(self::SELECT.$this->getStructureName().' where '.$col.' '.$val.' '.$lmit, 'select');
-        }
-        else{
-            if(trim($cond) == '!='){
-                $this->setQuery(self::SELECT.$this->getStructureName().' where '.$col.' != '.$val.' '.$lmit, 'select');
-            }
-            else{
-                $this->setQuery(self::SELECT.$this->getStructureName().' where '.$col.' = '.$val.' '.$lmit, 'select');
-            }
-        }
-    }
-    /**
      * Selects a values from a table given specific columns values.
      * @param array $cols An array that contains an objects of type 'Column'.
      * @param array $vals An array that contains values. 
@@ -734,15 +688,6 @@ abstract class MySQLQuery{
             $lmit = '';
         }
         $this->setQuery(self::SELECT.$this->getStructureName().' where '.$where.' '.$lmit.';', 'select');
-    }
-    /**
-     * Constructs a query that can be used to get table data by using ID column.
-     * @param string $id The value of the ID column.
-     * @since 1.0
-     * @deprecated since version 1.8.3
-     */
-    public function selectByID($id){
-        $this->setQuery(self::SELECT.$this->getStructureName().' where '.self::ID_COL.' = '.$id, 'select');
     }
     /**
      * Constructs a query that can be used to insert a new record.
@@ -832,6 +777,7 @@ abstract class MySQLQuery{
                                     if($fileContent !== FALSE){
                                         $data = '\''. addslashes($fileContent).'\'';
                                         $vals .= $data.$comma;
+                                        $this->setIsBlobInsertOrUpdate(TRUE);
                                     }
                                     else{
                                         $vals .= 'NULL'.$comma;
@@ -863,40 +809,12 @@ abstract class MySQLQuery{
         $this->setQuery(self::INSERT.$this->getStructureName().$cols.' values '.$vals.';', 'insert');
     }
     /**
-     * Constructs a query that can be used to insert data into a table.
-     * @param array $Arr An associative array of keys and values. The keys will 
-     * be acting as the columns names and the values will be acting as the values 
-     * that will be inserted.
-     * @since 1.0
-     * @deprecated since version 1.8.2 Use MySQLQuery::insertRecord() instead.
-     */
-    public function insert($Arr){
-        $cols = '';
-        $vals = '';
-        $count = count($Arr);
-        $index = 0;
-        foreach($Arr as $col => $val){
-            if($index + 1 == $count){
-                $cols .= $col;
-                $vals .= $val;
-            }
-            else{
-                $cols .= $col.', ';
-                $vals .= $val.', ';
-            }
-            $index++;
-        }
-        $cols = ' ('.$cols.')';
-        $vals = ' ('.$vals.')';
-        $this->setQuery(self::INSERT.$this->getStructureName().$cols.' values '.$vals, 'insert');
-    }
-    /**
      * Constructs a query that can be used to delete a row from a table using 
      * the ID column.
      * @param string $id The value of the ID on the row.
      * @since 1.0
      */
-    public function delete($id,$idColName=self::ID_COL){
+    public function delete($id,$idColName){
         $this->setQuery(self::DELETE.$this->getStructureName().' where '.$idColName.' = '.$id, 'delete');
     }
     /**
@@ -1047,30 +965,6 @@ abstract class MySQLQuery{
             $index++;
         }
         return $where;
-    }
-    /**
-     * Constructs a query that can be used to update the values of a table row.
-     * @param array $arr An associative array of keys and values. The keys will 
-     * be acting as the columns names and the values will be acting as the new 
-     * values for each field.
-     * @param string $id The value of the ID column.
-     * @since 1.0
-     * @deprecated since version 1.8.2 Use MySQLQuery::updateRecord() instead.
-     */
-    public function update($arr,$id,$idColName=self::ID_COL){
-        $colsStr = '';
-        $count = count($arr);
-        $index = 0;
-        foreach($arr as $colName => $newVal){
-            if($index + 1 == $count){
-                $colsStr .= $colName.' = '.$newVal;
-            }
-            else{
-                $colsStr .= $colName.' = '.$newVal.', ';
-            }
-            $index++;
-        }
-        $this->setQuery('update '.$this->getStructureName().' set '.$colsStr.' where '.$idColName.' = '.$id, 'update');
     }
     /**
      * Constructs a query that can be used to update a record.
@@ -1232,7 +1126,7 @@ abstract class MySQLQuery{
      * @param string $id  the ID of the record that will be updated.
      * @since 1.2
      */
-    public function updateBlobFromFile($arr,$id,$idColName=self::ID_COL){
+    public function updateBlobFromFile($arr,$id,$idColName){
         $cols = '';
         $count = count($arr);
         $index = 0;

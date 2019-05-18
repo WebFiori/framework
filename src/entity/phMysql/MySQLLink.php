@@ -192,11 +192,17 @@ class MySQLLink{
         if($this->link instanceof mysqli){
             $this->link = @mysqli_connect($this->host, $this->user, $this->pass,NULL , $this->portNum);
             if($this->link){
+                $test = true;
                 $this->link->set_charset("utf8");
                 mysqli_query($this->link, "set character_set_client='utf8'");
                 mysqli_query($this->link, "set character_set_results='utf8'");
                 if($this->db !== NULL){
                     $test = mysqli_select_db($this->link, $this->db);
+                    if($test === false){
+                        $this->lastErrorMessage = mysqli_error($this->link);
+                        $this->lastErrorNo = mysqli_errno($this->link);
+                        $test = true;
+                    }
                 }
                 else{
                     $test = TRUE;

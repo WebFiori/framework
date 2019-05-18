@@ -5,6 +5,7 @@ use webfiori\functions\Functions;
 use webfiori\entity\DBConnectionInfo;
 use webfiori\WebFiori;
 use webfiori\tests\entity\TestQuery_1;
+use webfiori\entity\SessionManager;
 /**
  * Description of FunctionsTest
  *
@@ -65,10 +66,78 @@ class FunctionsTest extends TestCase{
         $func = new Functions();
         $this->assertTrue($func->setConnection('test-connection'));
         $result = $func->useDatabase();
-        if($result === false){
-            \webfiori\entity\Util::print_r($func->getDBErrDetails());
-        }
         $this->assertTrue($result);
+        return $func;
+    }
+    /**
+     * @test
+     */
+    public function testUseDatabase03() {
+        $func = new Functions();
+        $result = $func->useDatabase();
+        $this->assertFalse($result);
+        $err = $func->getDBErrDetails();
+        $this->assertEquals(-2,$err['error-code']);
+        $this->assertEquals('No database connection was set.',$err['error-message']);
+    }
+    /**
+     * @depends testUseDatabase02
+     * @test
+     * @param Functions $func 
+     */
+    public function testUseDatabase04($func) {
+        $r = $func->useDatabase('test-connection');
+        $this->assertTrue($r);
+        return $func;
+    }
+    /**
+     * @depends testUseDatabase04
+     * @test
+     * @param Functions $func 
+     */
+    public function testUseDatabase05($func) {
+        $r = $func->useDatabase('test-connection-x');
+        $this->assertEquals(Functions::NO_SUCH_CONNECTION,$r);
+        $err = $func->getDBErrDetails();
+        $this->assertEquals(-1,$err['error-code']);
+        $this->assertEquals('No database connection was found which has the name \'test-connection-x\'.',$err['error-message']);
+        return $func;
+    }
+    /**
+     * @depends testUseDatabase05
+     * @test
+     * @param Functions $func 
+     */
+    public function testUseDatabase06($func) {
+        $r = $func->useDatabase('test-connection');
+        $this->assertTrue($r);
+    }
+    /**
+     * @test
+     */
+    public function testUseSession00() {
+        $func = new Functions();
+        $r = $func->useSession();
+        $this->assertFalse($r);
+    }
+    /**
+     * @test
+     */
+    public function testUseSession01() {
+        $func = new Functions();
+        $r = $func->useSession(
+            array(
+                'name'=>'test-session'
+            )
+        );
+        $this->assertTrue($r);
+        $session = $func->getSession();
+        $this->assertTrue($session instanceof SessionManager);
+        //$this->assertEquals(120,$session->getLifetime());
+        $this->assertTrue($session->isRefresh());
+        $this->assertTrue($session->isNew());
+        $this->assertFalse($session->isResumed());
+        $this->assertTrue($session->isSessionActive());
     }
     /**
      * @test

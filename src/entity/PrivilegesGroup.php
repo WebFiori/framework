@@ -29,11 +29,12 @@ if(!defined('ROOT_DIR')){
     . '<h1>404 - Not Found</h1><hr><p>The requested resource was not found on the server.</p></body></html>');
 }
 use jsonx\JsonI;
+use jsonx\JsonX;
 /**
  * A class that represents a set of privileges.
  * 
  * @author Ibrahim
- * @version 1.1
+ * @version 1.1.1
  */
 class PrivilegesGroup implements JsonI{
     /**
@@ -75,8 +76,12 @@ class PrivilegesGroup implements JsonI{
     public function __construct($gId='GROUP',$gName='G_NAME') {
         $this->privilegesArr = array();
         $this->childGroups = array();
-        $this->setID($gId);
-        $this->setName($gName);
+        if(!$this->setID($gId)){
+            $this->setID('GROUP');
+        }
+        if(!$this->setName($gName)){
+            $this->setName('G_NAME');
+        }
     }
     /**
      * Sets or unset parent privileges group.
@@ -142,13 +147,14 @@ class PrivilegesGroup implements JsonI{
      * @since 1.0
      */
     public function setName($name) {
-        if(strlen($name) > 0){
-            $this->groupName = $name;
+        $trimmed = trim($name);
+        if(strlen($trimmed) > 0){
+            $this->groupName = $trimmed;
         }
     }
     /**
      * Returns the ID of the group.
-     * @return string The ID of the group.
+     * @return string The ID of the group. Default value is 'GROUP'.
      * @since 1.0
      */
     public function getID() {
@@ -165,7 +171,7 @@ class PrivilegesGroup implements JsonI{
      * @since 1.0
      */
     public function setID($id) {
-        $xid = ''.$id;
+        $xid = trim($id);
         $len = strlen($xid);
         $parentG = $this->getParentGroup();
         if($parentG !== null){
@@ -192,7 +198,7 @@ class PrivilegesGroup implements JsonI{
                 return false;
             }
         }
-        $this->groupId = $id;
+        $this->groupId = $xid;
         return true;
     }
     /**
@@ -268,7 +274,7 @@ class PrivilegesGroup implements JsonI{
      * Returns the name of the group.
      * The name can be used to give a meaningful description of the group 
      * (like a label).
-     * @return string The name of the group.
+     * @return string The name of the group. Default value is 'G_NAME'.
      * @since 1.0
      */
     public function getName(){

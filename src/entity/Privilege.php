@@ -24,6 +24,7 @@
  */
 namespace webfiori\entity;
 use jsonx\JsonI;
+use jsonx\JsonX;
 if(!defined('ROOT_DIR')){
     header("HTTP/1.1 404 Not Found");
     die('<!DOCTYPE html><html><head><title>Not Found</title></head><body>'
@@ -33,7 +34,7 @@ if(!defined('ROOT_DIR')){
  * A class that represents a privilege.
  *
  * @author Ibrahim
- * @version 1.0
+ * @version 1.0.1
  */
 class Privilege implements JsonI{
     /**
@@ -53,23 +54,32 @@ class Privilege implements JsonI{
      * @param string $id The unique identifier of the privilege. Default is 
      * 'PR'.
      * @param string $name The name of the privilege. It is provided only 
-     * in case of displaying privilege in some UI view.
+     * in case of displaying privilege in some UI view. Default is empty string.
      * @since 1.0
      */
     public function __construct($id='PR',$name='') {
-        $this->setID($id);
-        $this->setName($name);
+        if(!$this->setID($id)){
+            $this->setID('PR');
+        }
+        if(!$this->setName($name)){
+            $this->setName('PR_NAME');
+        }
     }
     /**
      * Sets the name of the privilege.
      * @param string $name The name of the privilege. It is only set when 
      * the given string is not empty.
+     * @return boolean If the privilege name was set, the method will return 
+     * true. If not set, the method will return false.
      * @since 1.0
      */
     public function setName($name) {
-        if(strlen($name) > 0){
-            $this->name = $name.'';
+        $trimmed = trim($name);
+        if(strlen($trimmed) > 0){
+            $this->name = $trimmed;
+            return true;
         }
+        return false;
     }
     /**
      * Returns the name of the privilege.
@@ -99,7 +109,7 @@ class Privilege implements JsonI{
      * @since 1.0
      */
     public function setID($code) {
-        $xid = ''.$code;
+        $xid = trim($code);
         $len = strlen($xid);
         for ($x = 0 ; $x < $len ; $x++){
             $ch = $xid[$x];

@@ -11,6 +11,7 @@
             <directory suffix=".php">./src/functions</directory>
             <file>./src/WebFiori.php</file>
             <file>./src/entity/router/Router.php</file>
+            <file>./src/entity/router/SessionManager.php</file>
             <file>./src/entity/router/RouterUri.php</file>
             <file>./src/entity/langs/Language.php</file>
             <file>./src/entity/Access.php</file>

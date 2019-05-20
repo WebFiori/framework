@@ -144,13 +144,17 @@ class PrivilegesGroup implements JsonI{
      * The name is used just to give a meaning to the group.
      * @param string $name The name of the group. It must be non-empty string 
      * in order to update.
+     * @return boolean If group name is updated, the method will return true. 
+     * If not updated, the method will return false.
      * @since 1.0
      */
     public function setName($name) {
         $trimmed = trim($name);
         if(strlen($trimmed) > 0){
             $this->groupName = $trimmed;
+            return true;
         }
+        return false;
     }
     /**
      * Returns the ID of the group.

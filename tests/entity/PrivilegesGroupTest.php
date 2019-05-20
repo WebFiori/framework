@@ -23,7 +23,7 @@ class PrivilegesGroupTest extends TestCase{
     public function testConstructor01() {
         $group = new PrivilegesGroup('Invalid ID','Valid Name');
         $this->assertEquals('GROUP',$group->getID());
-        //$this->assertEquals('Valid Name',$group->getName());
+        $this->assertEquals('Valid Name',$group->getName());
     }
     /**
      * @test
@@ -31,7 +31,7 @@ class PrivilegesGroupTest extends TestCase{
     public function testConstructor02() {
         $group = new PrivilegesGroup(' valid_ID','Valid Name');
         $this->assertEquals('valid_ID',$group->getID());
-        //$this->assertEquals('Valid Name',$group->getName());
+        $this->assertEquals('Valid Name',$group->getName());
         return $group;
     }
     /**
@@ -40,7 +40,7 @@ class PrivilegesGroupTest extends TestCase{
     public function testConstructor03() {
         $group = new PrivilegesGroup(1,2);
         $this->assertSame('1',$group->getID());
-        //$this->assertSame('2',$group->getName());
+        $this->assertSame('2',$group->getName());
     }
     /**
      * 
@@ -48,7 +48,7 @@ class PrivilegesGroupTest extends TestCase{
      * @depends testConstructor02
      * @test
      */
-//    public function testToJson00($group) {
-//        $this->assertEquals('{"group-id":"valid_ID", "parent-group-id":null, "name":"Valid Name", "privileges":[], "child-groups":[]}',$group->toJSON().'');
-//    }
+    public function testToJson00($group) {
+        $this->assertEquals('{"group-id":"valid_ID", "parent-group-id":null, "name":"Valid Name", "privileges":[], "child-groups":[]}',$group->toJSON().'');
+    }
 }

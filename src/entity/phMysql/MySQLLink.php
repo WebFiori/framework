@@ -89,7 +89,7 @@ class MySQLLink{
     private $lastQuery;
     /**
      * An array which contains rows from executing MySQL query.
-     * @var array|NULL
+     * @var array|null
      * @since 1.2 
      */
     private $resultRows;
@@ -131,7 +131,7 @@ class MySQLLink{
      */
     public function __construct($host, $user, $password,$port=3306) {
         //set_error_handler(errorHandeler('Connection to database was refused!'));
-        $this->link = @mysqli_connect($host, $user, $password,NULL,$port);
+        $this->link = @mysqli_connect($host, $user, $password,null,$port);
         $this->user = $user;
         $this->pass = $password;
         $this->host = $host;
@@ -166,7 +166,7 @@ class MySQLLink{
     /**
      * Reconnect to MySQL server if a connection was established before.
      * @return boolean If the reconnect attempt was succeeded, the method 
-     * will return TRUE.
+     * will return true.
      * @since 1.3.1
      */
     public function reconnect() {
@@ -188,15 +188,15 @@ class MySQLLink{
      * @deprecated since version 1.3.1
      */
     public function isConnected(){
-        $test = FALSE;
+        $test = false;
         if($this->link instanceof mysqli){
-            $this->link = @mysqli_connect($this->host, $this->user, $this->pass,NULL , $this->portNum);
+            $this->link = @mysqli_connect($this->host, $this->user, $this->pass,null , $this->portNum);
             if($this->link){
                 $test = true;
                 $this->link->set_charset("utf8");
                 mysqli_query($this->link, "set character_set_client='utf8'");
                 mysqli_query($this->link, "set character_set_results='utf8'");
-                if($this->db !== NULL){
+                if($this->db !== null){
                     $test = mysqli_select_db($this->link, $this->db);
                     if($test === false){
                         $this->lastErrorMessage = mysqli_error($this->link);
@@ -205,7 +205,7 @@ class MySQLLink{
                     }
                 }
                 else{
-                    $test = TRUE;
+                    $test = true;
                 }
             }
             else{
@@ -230,10 +230,10 @@ class MySQLLink{
     }
     /**
      * Select a database instance.
-     * This method will always return FALSE if no connection has been 
+     * This method will always return false if no connection has been 
      * established with the database. 
      * @param string $dbName The name of the database instance.
-     * @return boolean TRUE if the instance is selected. FALSE
+     * @return boolean true if the instance is selected. false
      * otherwise.
      * @since 1.0
      */
@@ -243,8 +243,8 @@ class MySQLLink{
     }
     /**
      * Returns the result set in case of executing select query.
-     * The method will return NULL in case of none-select queries.
-     * @return mysqli_result|NULL
+     * The method will return null in case of none-select queries.
+     * @return mysqli_result|null
      * @since 1.0
      * @deprecated since version 1.3.1
      */
@@ -253,8 +253,8 @@ class MySQLLink{
     }
     /**
      * Returns the row which the class is pointing to in the result set.
-     * @return array|NULL an associative array that represents a table row.  
-     * If no results are fetched, the method will return NULL. 
+     * @return array|null an associative array that represents a table row.  
+     * If no results are fetched, the method will return null. 
      * @since 1.0
      */
     public function getRow(){
@@ -269,7 +269,7 @@ class MySQLLink{
         else{
             return $this->_getRow();
         }
-        return NULL;
+        return null;
     }
     /**
      * Helper method that is used to initialize the array of rows in case 
@@ -282,7 +282,7 @@ class MySQLLink{
             return $this->getRows()[0];
         }
         else if($retry == 1){
-            return NULL;
+            return null;
         }
         else{
             $this->getRows();
@@ -293,8 +293,8 @@ class MySQLLink{
     /**
      * Returns the next row that was resulted from executing a query that has 
      * results.
-     * @return array|NULL The next row in the result set. If no more rows are 
-     * in the set, the method will return NULL.
+     * @return array|null The next row in the result set. If no more rows are 
+     * in the set, the method will return null.
      * @since 1.3
      */
     public function nextRow() {
@@ -303,7 +303,7 @@ class MySQLLink{
         if(isset($rows[$this->currentRow])){
             return $rows[$this->currentRow];
         }
-        return NULL;
+        return null;
     }
     /**
      * Returns an array which contains all fetched results from the database.
@@ -313,16 +313,16 @@ class MySQLLink{
      * @since 1.2
      */
     public function getRows(){
-        if($this->resultRows != NULL){
+        if($this->resultRows != null){
             return $this->resultRows;
         }
         $result = $this->getResult();
         if(function_exists('mysqli_fetch_all')){
-            $rows = $result !== NULL ? mysqli_fetch_all($result, MYSQLI_ASSOC) : array();
+            $rows = $result !== null ? mysqli_fetch_all($result, MYSQLI_ASSOC) : array();
         }
         else{
             $rows = array();
-            if($result !== NULL){
+            if($result !== null){
                 while ($row = $result->fetch_assoc()){
                     $rows[] = $row;
                 }
@@ -370,7 +370,7 @@ class MySQLLink{
      */
     public function executeQuery($query){
         if($query instanceof MySQLQuery){
-            $this->resultRows = NULL;
+            $this->resultRows = null;
             $this->currentRow = -1;
             $this->lastQuery = $query;
             if($this->isConnected()){
@@ -384,11 +384,11 @@ class MySQLLink{
                         $x = mysqli_store_result($this->link);
                         mysqli_next_result($this->link);
                     }
-                    if($r !== TRUE){
+                    if($r !== true){
                         $this->lastErrorMessage = $this->link->error;
                         $this->lastErrorNo = $this->link->errno;
                     }
-                    $query->setIsBlobInsertOrUpdate(FALSE);
+                    $query->setIsBlobInsertOrUpdate(false);
                     return $r;
                 }
                 if($query->getType() == 'select' || $query->getType() == 'show'
@@ -403,26 +403,26 @@ class MySQLLink{
                     else{
                         $this->lastErrorMessage = $this->link->error;
                         $this->lastErrorNo = $this->link->errno;
-                        $this->result = NULL;
-                        $query->setIsBlobInsertOrUpdate(FALSE);
+                        $this->result = null;
+                        $query->setIsBlobInsertOrUpdate(false);
                         return false;
                     }
                 }
                 else{
-                    $this->result = NULL;
+                    $this->result = null;
                     $r = mysqli_query($this->link, $query->getQuery());
-                    if($r == FALSE){
+                    if($r == false){
                         $this->lastErrorMessage = $this->link->error;
                         $this->lastErrorNo = $this->link->errno;
-                        $this->result = NULL;
-                        $query->setIsBlobInsertOrUpdate(FALSE);
+                        $this->result = null;
+                        $query->setIsBlobInsertOrUpdate(false);
                         return false;
                     }
                     else{
                         $this->lastErrorMessage = 'NO ERRORS';
                         $this->lastErrorNo = 0;
-                        $this->result = NULL;
-                        $query->setIsBlobInsertOrUpdate(FALSE);
+                        $this->result = null;
+                        $query->setIsBlobInsertOrUpdate(false);
                         return true;
                     }
                 }

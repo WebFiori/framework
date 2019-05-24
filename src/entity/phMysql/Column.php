@@ -98,15 +98,15 @@ class Column{
         'int','varchar','timestamp','tinyblob','blob','mediumblob','longblob',
         'datetime','text','mediumtext'
     );
-
+    
     /**
-     * A boolean value. Set to TRUE if column is unique.
+     * A boolean value. Set to true if column is unique.
      * @var boolean
      * @since 1.0 
      */
     private $isUnique;
     /**
-     * A boolean value. Set to TRUE if column is primary and auto increment.
+     * A boolean value. Set to true if column is primary and auto increment.
      * @var boolean 
      * @since 1.0
      */
@@ -131,14 +131,14 @@ class Column{
      */
     private $type;
     /**
-     * A boolean value. Set to TRUE if column allow null values. Default 
-     * is FALSE.
+     * A boolean value. Set to true if column allow null values. Default 
+     * is false.
      * @var boolean 
      */
     private $isNull;
     /**
-     * A boolean value. Set to TRUE if the column is a primary key. Default 
-     * is FALSE.
+     * A boolean value. Set to true if the column is a primary key. Default 
+     * is false.
      * @var boolean 
      * @since 1.0
      */
@@ -174,7 +174,7 @@ class Column{
      */
     public function __construct($colName='col',$datatype='varchar',$size=1) {
         $this->mySqlVersion = '5.5';
-        if($this->setName($colName) !== TRUE){
+        if($this->setName($colName) !== true){
             $this->setName('col');
         }
         if(!$this->setType($datatype)){
@@ -188,8 +188,50 @@ class Column{
         if($datatype == 'varchar' && $size > 21845){
             $this->setType('mediumtext');
         }
-        $this->setIsNull(FALSE);
-        $this->setIsUnique(FALSE);
+        $this->setIsNull(false);
+        $this->setIsUnique(false);
+    }
+    private function _validateDateAndTime($date) {
+        $trimmed = trim($date);
+        if(strlen($trimmed) == 19){
+            $dateAndTime = explode(' ', $trimmed);
+            if(count($dateAndTime) == 2){
+                return $this->_validateDate($dateAndTime[0]) && $this->_validateTime($dateAndTime[1]);
+            }
+        }
+        return false;
+    }
+    /**
+     * 
+     * @param type $time
+     */
+    private function _validateTime($time) {
+        if(strlen($time) == 8){
+            $split = explode(':', $time);
+            if(count($split) == 3){
+                $hours = intval($split[0]);
+                $minutes = intval($split[1]);
+                $sec = intval($split[2]);
+                return $hours >= 0 && $hours <= 23 && $minutes >= 0 && $minutes < 60 && $sec >= 0 && $sec < 60;
+            }
+        }
+        return false;
+    }
+    /**
+     * 
+     * @param type $date
+     */
+    private function _validateDate($date) {
+        if(strlen($date) == 10){
+            $split = explode('-', $date);
+            if(count($split) == 3){
+                $year = intval($split[0]);
+                $month = intval($split[1]);
+                $day = intval($split[2]);
+                return $year > 1969 && $month > 0 && $month < 13 && $day > 0 && $day < 32;
+            }
+        }
+        return false;
     }
     /**
      * Sets version number of MySQL server.
@@ -225,7 +267,7 @@ class Column{
      * Sets or unset the owner table of the column.
      * Note that the developer should not call this method manually. It is 
      * used only if the column is added or removed from MySQLTable object.
-     * @param MySQLTable|NULL $table The owner of the column. If NULL is given, 
+     * @param MySQLTable|null $table The owner of the column. If null is given, 
      * The owner will be unset.
      * @since 1.5
      */
@@ -236,8 +278,8 @@ class Column{
             $this->columnIndex = $colsCount == 0 ? 0 : $colsCount;
             $this->setMySQLVersion($table->getMySQLVersion());
         }
-        else if($table === NULL){
-            $this->ownerTable = NULL;
+        else if($table === null){
+            $this->ownerTable = null;
             $this->columnIndex = -1;
         }
     }
@@ -252,8 +294,8 @@ class Column{
     }
     /**
      * Returns the table which owns this column.
-     * @return MySQLTable|NULL The owner table of the column. 
-     * If the column has no owner, the method will return NULL.
+     * @return MySQLTable|null The owner table of the column. 
+     * If the column has no owner, the method will return null.
      * @since 1.5
      */
     public function &getOwner() {
@@ -272,23 +314,23 @@ class Column{
     }
     /**
      * Sets the value of the property $isUnique.
-     * @param boolean $bool TRUE if the column value is unique. FALSE 
+     * @param boolean $bool true if the column value is unique. false 
      * if not.
-     * @return boolean TRUE if the value of the property is updated. The only case 
-     * at which the method will return FALSE is when the passed parameter is 
+     * @return boolean true if the value of the property is updated. The only case 
+     * at which the method will return false is when the passed parameter is 
      * not a boolean.
      * @since 1.0
      */
     public function setIsUnique($bool){
         if(gettype($bool) == 'boolean'){
             $this->isUnique = $bool;
-            return TRUE;
+            return true;
         }
-        return FALSE;
+        return false;
     }
     /**
      * Returns the value of the property $isUnique.
-     * @return boolean TRUE if the column value is unique. 
+     * @return boolean true if the column value is unique. 
      * @since 1.0
      */
     public function isUnique(){
@@ -300,27 +342,26 @@ class Column{
      * Also it must not contain any spaces or any characters other than A-Z, a-z and 
      * underscore.
      * @param string $name The name to set.
-     * @return boolean The method will return TRUE if the column name updated. 
-     * If the given value is NULL or invalid string, the method will return 
+     * @return boolean The method will return true if the column name updated. 
+     * If the given value is null or invalid string, the method will return 
      * Column::INV_COL_NAME.
      * @since 1.0
      */
     public function setName($name){
-        if(gettype($name) == 'string'){
-            if(strlen($name) != 0){
-                if(strpos($name, ' ') === FALSE){
-                    for ($x = 0 ; $x < strlen($name) ; $x++){
-                        $ch = $name[$x];
-                        if($ch == '_' || ($ch >= 'a' && $ch <= 'z') || ($ch >= 'A' && $ch <= 'Z') || ($ch >= '0' && $ch <= '9')){
-                            
-                        }
-                        else{
-                            return Column::INV_COL_NAME;
-                        }
+        $trimmed = trim($name);
+        if(strlen($trimmed) != 0){
+            if(strpos($trimmed, ' ') === false){
+                for ($x = 0 ; $x < strlen($trimmed) ; $x++){
+                    $ch = $trimmed[$x];
+                    if($ch == '_' || ($ch >= 'a' && $ch <= 'z') || ($ch >= 'A' && $ch <= 'Z') || ($ch >= '0' && $ch <= '9')){
+
                     }
-                    $this->name = $name;
-                    return TRUE;
+                    else{
+                        return Column::INV_COL_NAME;
+                    }
                 }
+                $this->name = $trimmed;
+                return true;
             }
         }
         return Column::INV_COL_NAME;
@@ -336,28 +377,28 @@ class Column{
     }
     /**
      * Updates the value of the property $isNull.
-     * This property can be set to TRUE if the column allow the insertion of 
+     * This property can be set to true if the column allow the insertion of 
      * null values. Note that if the column is set as a primary, the property 
      * will not be updated.
-     * @param boolean $bool TRUE if the column allow null values. FALSE 
+     * @param boolean $bool true if the column allow null values. false 
      * if not.
-     * @return boolean TRUE If the property value is updated. If the given 
-     * value is not a boolean, the method will return FALSE. Also if 
-     * the column represents a primary key, the method will always return FALSE.
+     * @return boolean true If the property value is updated. If the given 
+     * value is not a boolean, the method will return false. Also if 
+     * the column represents a primary key, the method will always return false.
      * @since 1.0
      */
     public function setIsNull($bool){
         if(gettype($bool) == 'boolean'){
             if(!$this->isPrimary()){
                 $this->isNull = $bool;
-                return TRUE;
+                return true;
             }
         }
-        return FALSE;
+        return false;
     }
     /**
      * Checks if the column allows null values.
-     * @return boolean TRUE if the column allows null values.
+     * @return boolean true if the column allows null values.
      * @since 1.0
      */
     public function isNull(){
@@ -366,27 +407,27 @@ class Column{
     /**
      * Updates the value of the property <b>$isPrimary</b>.
      * Note that once the column become primary, it becomes unique by default.
-     * @param boolean $bool <b>TRUE</b> if the column is primary key. FALSE 
+     * @param boolean $bool <b>true</b> if the column is primary key. false 
      * if not.
-     * @return boolean The method will return TRUE If the property value is 
+     * @return boolean The method will return true If the property value is 
      * updated. If the given value is not a boolean, the method will return 
-     * FALSE.
+     * false.
      * @since 1.0
      */
     public function setIsPrimary($bool){
         if(gettype($bool) == 'boolean'){
             $this->isPrimary = $bool;
-            if($bool === TRUE){
-                $this->setIsNull(FALSE);
-                $this->setIsUnique(TRUE);
+            if($bool === true){
+                $this->setIsNull(false);
+                $this->setIsUnique(true);
             }
-            return TRUE;
+            return true;
         }
-        return FALSE;
+        return false;
     }
     /**
      * Checks if the column is a primary key or not.
-     * @return boolean TRUE if the colum is primary.
+     * @return boolean true if the colum is primary.
      * @since 1.0
      */
     public function isPrimary(){
@@ -401,11 +442,11 @@ class Column{
      * size is invalid, 1 will be used.
      * @param mixed $default Default value for the column to set in case no value is 
      * given in case of insert.
-     * @return boolean TRUE if the data type is set. Column::INV_COL_DATATYPE otherwise.
+     * @return boolean true if the data type is set. Column::INV_COL_DATATYPE otherwise.
      * @since 1.0
      */
     public function setType($type,$size=1,$default=null){
-        $s_type = strtolower($type);
+        $s_type = strtolower(trim($type));
         if(in_array($s_type, self::DATATYPES)){
             $this->type = $type;
             if($type == 'varchar' || $type == 'int'){
@@ -413,17 +454,17 @@ class Column{
                     $this->setSize(1);
                 }
             }
-            $this->onColUpdate = NULL;
-            $this->default = NULL;
-            if($default != NULL){
+            $this->onColUpdate = null;
+            $this->default = null;
+            if($default != null){
                 if($s_type == 'varchar'){
-                    $this->setDefault($default.'');
+                    $this->setDefault($default);
                 }
                 else if($s_type == 'int'){
                     $this->setDefault($default);
                 }
             }
-            return TRUE;
+            return true;
         }
         return Column::INV_COL_DATATYPE;
     }
@@ -440,36 +481,54 @@ class Column{
      * Sets the default value for the column to use in case of insert.
      * For integer data type, the passed value must be an integer. For 'varchar', 
      * the passed value must be a string. If the datatype is 'timestamp', the 
-     * default will be 'current_timestamp' regardless of the passed value. If the 
-     * datatype is 'datetime', the default will be 'now()' regardless 
-     * of the passed value.
+     * default will be 'current_timestamp' if null is passed. If the passed 
+     * value is a date string in the format 'YYYY-MM-DD HH:MM:SS', then it 
+     * will be set to the given value. same applies to 'datetime' datatype except 
+     * that if null is passed, default will be 'now()'.
      * @param mixed $default The default value.
-     * @return boolean TRUE if the value is set. FALSE otherwise.
+     * @return boolean true if the value is set. false otherwise.
      * @since 1.0
      */
-    public function setDefault($default){
+    public function setDefault($default=null){
         $type = $this->getType();
+        $retVal = false;
         if($type == 'varchar' || $type == 'text' || $type == 'mediumtext'){
             if(gettype($default) == 'string'){
                 $this->default = MySQLQuery::escapeMySQLSpeciarChars($default);
-                return TRUE;
+                $retVal = true;
             }
         }
         else if($type == 'int'){
             if(gettype($default) == 'integer'){
                 $this->default = $default;
-                return TRUE;
+                $retVal = true;
             }
         }
         else if($type == 'timestamp'){
-            $this->default = 'current_timestamp';
-            return TRUE;
+            if($default === null){
+                $this->default = 'current_timestamp';
+                $retVal = true;
+            }
+            else{
+                if($this->_validateDateAndTime($default)){
+                    $this->default = $default;
+                    $retVal = true;
+                }
+            }
         }
         else if($type == 'datetime'){
-            $this->default = 'now()';
-            return TRUE;
+            if($default === null){
+                $this->default = 'now()';
+                $retVal = true;
+            }
+            else{
+                if($this->_validateDateAndTime($default)){
+                    $this->default = $default;
+                    $retVal = true;
+                }
+            }
         }
-        return FALSE;
+        return $retVal;
     }
     
     /**
@@ -486,7 +545,7 @@ class Column{
      * number greater than 11 is given, the value will be set to 11. The 
      * maximum size for the 'varchar' is not specified.
      * @param int $size The size to set.
-     * @return boolean TRUE if the size is set. The method will return 
+     * @return boolean true if the size is set. The method will return 
      * Column::INV_DATASIZE in case the size is invalid or datatype does not support 
      * size attribute. Also The method will return 
      * Column::SIZE_NOT_SUPPORTED in case the datatype of the column does not 
@@ -498,17 +557,17 @@ class Column{
         if($type == 'varchar' || $type == 'text'){
             if($size > 0){
                 $this->size = $size;
-                return TRUE;
+                return true;
             }
         }
         else if($type == 'int'){
             if($size > 0 && $size < 12){
                 $this->size = $size;
-                return TRUE;
+                return true;
             }
             else if($size > 11){
                 $this->size = 11;
-                return TRUE;
+                return true;
             }
         }
         else{
@@ -520,8 +579,8 @@ class Column{
      * Sets the value of the property <b>$isAutoInc</b>.
      * This attribute can be set only if the column is primary key and the 
      * datatype of the column is set to 'int'.
-     * @param boolean $bool TRUE or FALSE.
-     * @return boolean <b>TRUE</b> if the property value changed. FALSE 
+     * @param boolean $bool true or false.
+     * @return boolean <b>true</b> if the property value changed. false 
      * otherwise.
      * @since 1.0
      */
@@ -530,15 +589,15 @@ class Column{
             if(gettype($bool) == 'boolean'){
                 if($this->getType() == 'int'){
                     $this->isAutoInc = $bool;
-                    return TRUE;
+                    return true;
                 }
             }
         } 
-        return FALSE;
+        return false;
     }
     /**
      * Checks if the column is auto increment or not.
-     * @return boolean TRUE if the column is auto increment.
+     * @return boolean true if the column is auto increment.
      * @since 1.1
      */
     public function isAutoInc(){
@@ -587,7 +646,7 @@ class Column{
         }
         if($this->isPrimary()){
             $t = &$this->getOwner();
-            if($t != NULL){
+            if($t != null){
                 if($t->primaryKeyColsCount() == 1){
                     $retVal .= 'primary key ';
                     if($this->isAutoInc()){
@@ -609,7 +668,7 @@ class Column{
         if($type == 'varchar'){
             $retVal .= 'collate '.$this->getCollation().' ';
         }
-        if($default != NULL){
+        if($default != null){
             if($this->getType() == 'varchar'){
                 $retVal .= 'default \''.$default.'\' ';
             }

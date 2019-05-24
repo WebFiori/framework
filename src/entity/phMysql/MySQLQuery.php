@@ -32,7 +32,7 @@ use Exception;
  */
 abstract class MySQLQuery{
     /**
-     * An attribute that is set to TRUE if the query is un update or insert of 
+     * An attribute that is set to true if the query is un update or insert of 
      * blob datatype.
      * @var boolean 
      */
@@ -191,7 +191,7 @@ abstract class MySQLQuery{
     public function __construct() {
         $this->query = self::SELECT.' a_table';
         $this->queryType = 'select';
-        $this->setIsBlobInsertOrUpdate(FALSE);
+        $this->setIsBlobInsertOrUpdate(false);
     }
     /**
      * Constructs a query that can be used to alter the properties of a table
@@ -230,7 +230,7 @@ abstract class MySQLQuery{
     private function createTable($table,$inclComments=false){
         if($table instanceof MySQLTable){
             $query = '';
-            if($inclComments === TRUE){
+            if($inclComments === true){
                 $query .= '-- Structure of the table \''.$this->getStructureName().'\''.self::NL;
                 $query .= '-- Number of columns: \''.count($this->getStructure()->columns()).'\''.self::NL;
                 $query .= '-- Number of forign keys: \''.count($this->getStructure()->forignKeys()).'\''.self::NL;
@@ -254,20 +254,20 @@ abstract class MySQLQuery{
             
             $coutPk = $this->getStructure()->primaryKeyColsCount();
             if($coutPk > 1){
-                if($inclComments === TRUE){
+                if($inclComments === true){
                     $query .= '-- Primary key of the table '.self::NL;
                 }
                 $query .= $table->getCreatePrimaryKeyStatement().';'.self::NL;
             }
             //add forign keys
             $count2 = count($table->forignKeys());
-            if($inclComments === TRUE && $count2 != 0){
+            if($inclComments === true && $count2 != 0){
                 $query .= '-- Forign keys of the table '.self::NL;
             }
             for($x = 0 ; $x < $count2 ; $x++){
                 $query .= $table->forignKeys()[$x]->getAlterStatement().';'.self::NL;
             }
-            if($inclComments === TRUE){
+            if($inclComments === true){
                 $query .= '-- End of the Structure of the table \''.$this->getStructureName().'\''.self::NL;
             }
             $this->setQuery($query, 'create');
@@ -384,9 +384,9 @@ abstract class MySQLQuery{
      * <li><b>join-operators</b>: An array that contains a set of MySQL join operators 
      * like 'and' and 'or'. If not provided or has invalid value, 
      * an array of 'and's will be used.</li>
-     * <li><b>select-max</b>: A boolean value. Set to TRUE if you want to select maximum 
+     * <li><b>select-max</b>: A boolean value. Set to true if you want to select maximum 
      * value of a column. Ignored in case the option 'columns' is set.</li>
-     * <li><b>select-min</b>: A boolean value. Set to TRUE if you want to select minimum 
+     * <li><b>select-min</b>: A boolean value. Set to true if you want to select minimum 
      * value of a column. Ignored in case the option 'columns' or 'select-max' is set.</li>
      * <li><b>column</b>: The column which contains maximum or minimum value.</li>
      * <li><b>rename-to</b>: Rename the max or min column to the given name.</li>
@@ -407,7 +407,7 @@ abstract class MySQLQuery{
         'select-max'=>false,
         'column'=>'',
         'rename-to'=>'',
-        'order-by'=>NULL,
+        'order-by'=>null,
         'order-type'=>'A',
         'in'=>array()
         )) {
@@ -466,7 +466,7 @@ abstract class MySQLQuery{
                     $i++;
                 }
             }
-            else if(isset ($selectOptions['select-max']) && $selectOptions['select-max'] === TRUE){
+            else if(isset ($selectOptions['select-max']) && $selectOptions['select-max'] === true){
                 $renameTo = isset($selectOptions['rename-to']) ? $selectOptions['rename-to'] : '';
                 if(strlen($renameTo) != 0){
                     $renameTo = 'as '.$renameTo;
@@ -479,10 +479,10 @@ abstract class MySQLQuery{
                     $limitPart = '';
                 }
                 else{
-                    return FALSE;
+                    return false;
                 }
             }
-            else if(isset ($selectOptions['select-min']) && $selectOptions['select-min'] === TRUE){
+            else if(isset ($selectOptions['select-min']) && $selectOptions['select-min'] === true){
                 $renameTo = isset($selectOptions['rename-to']) ? $selectOptions['rename-to'] : '';
                 if(strlen($renameTo) != 0){
                     $renameTo = 'as '.$renameTo;
@@ -495,7 +495,7 @@ abstract class MySQLQuery{
                     $limitPart = '';
                 }
                 else{
-                    return FALSE;
+                    return false;
                 }
             }
             else{
@@ -527,9 +527,9 @@ abstract class MySQLQuery{
                 $where = '';
             }
             $this->setQuery($selectQuery.$where.$orderByPart.$limitPart.';', 'select');
-            return TRUE;
+            return true;
         }
-        return FALSE;
+        return false;
     }
     /**
      * Constructs a 'where' condition given a date.
@@ -631,7 +631,7 @@ abstract class MySQLQuery{
      * @param array $vals An array that contains values. 
      * @param array $valsConds An array that can contains two possible values: 
      * '=' or '!='. If anything else is given at specific index, '=' will be used. 
-     * Note that if the value at '$vals[$index]' is equal to 'IS NULL' or 'IS NOT NULL', 
+     * Note that if the value at '$vals[$index]' is equal to 'IS null' or 'IS NOT null', 
      * The value at '$valsConds[$index]' is ignored. 
      * @param array $jointOps An array of conditions (Such as 'or', 'and', 'xor').
      * @since 1.6
@@ -647,7 +647,7 @@ abstract class MySQLQuery{
             }
             if($col instanceof Column){
                 $valUpper = strtoupper(trim($vals[$index]));
-                if($valUpper == 'IS NULL' || $valUpper == 'IS NOT NULL'){
+                if($valUpper == 'IS null' || $valUpper == 'IS NOT null'){
                     if($index + 1 == $count){
                         $where .= $col->getName().' '.$vals[$index].'';
                     }
@@ -728,24 +728,24 @@ abstract class MySQLQuery{
                         if(file_exists($fixedPath)){
                             $file = fopen($fixedPath, 'r');
                             $data = '';
-                            if($file !== FALSE){
+                            if($file !== false){
                                 $fileContent = fread($file, filesize($fixedPath));
-                                if($fileContent !== FALSE){
+                                if($fileContent !== false){
                                     $data = '\''. addslashes($fileContent).'\'';
                                     $vals .= $data.$comma;
-                                    $this->setIsBlobInsertOrUpdate(TRUE);
+                                    $this->setIsBlobInsertOrUpdate(true);
                                 }
                                 else{
-                                    $vals .= 'NULL'.$comma;
+                                    $vals .= 'null'.$comma;
                                 }
                                 fclose($file);
                             }
                             else{
-                                $vals .= 'NULL'.$comma;
+                                $vals .= 'null'.$comma;
                             }
                         }
                         else{
-                            $vals .= 'NULL'.$comma;
+                            $vals .= 'null'.$comma;
                         }
                     }
                     else{
@@ -753,7 +753,7 @@ abstract class MySQLQuery{
                     }
                 }
                 else{
-                    $vals .= 'NULL'.$comma;
+                    $vals .= 'null'.$comma;
                 }
             }
             else{
@@ -772,24 +772,24 @@ abstract class MySQLQuery{
                             if(file_exists($fixedPath)){
                                 $file = fopen($fixedPath, 'r');
                                 $data = '';
-                                if($file !== FALSE){
+                                if($file !== false){
                                     $fileContent = fread($file, filesize($fixedPath));
-                                    if($fileContent !== FALSE){
+                                    if($fileContent !== false){
                                         $data = '\''. addslashes($fileContent).'\'';
                                         $vals .= $data.$comma;
-                                        $this->setIsBlobInsertOrUpdate(TRUE);
+                                        $this->setIsBlobInsertOrUpdate(true);
                                     }
                                     else{
-                                        $vals .= 'NULL'.$comma;
+                                        $vals .= 'null'.$comma;
                                     }
                                     fclose($file);
                                 }
                                 else{
-                                    $vals .= 'NULL'.$comma;
+                                    $vals .= 'null'.$comma;
                                 }
                             }
                             else{
-                                $vals .= 'NULL'.$comma;
+                                $vals .= 'null'.$comma;
                             }
                         }
                         else{
@@ -797,7 +797,7 @@ abstract class MySQLQuery{
                         }
                     }
                     else{
-                        $vals .= 'NULL'.$comma;
+                        $vals .= 'null'.$comma;
                     }
                 }
             }
@@ -891,7 +891,7 @@ abstract class MySQLQuery{
             }
             if($col instanceof Column){
                 $valUpper = gettype($vals[$index]) != 'array' ? strtoupper(trim($vals[$index])) : '';
-                if($valUpper == 'IS NULL' || $valUpper == 'IS NOT NULL'){
+                if($valUpper == 'IS null' || $valUpper == 'IS NOT null'){
                     if($index + 1 == $count){
                         $where .= $col->getName().' '.$valUpper.'';
                     }
@@ -1008,24 +1008,24 @@ abstract class MySQLQuery{
                         if(file_exists($fixedPath)){
                             $file = fopen($fixedPath, 'r');
                             $data = '';
-                            if($file !== FALSE){
+                            if($file !== false){
                                 $fileContent = fread($file, filesize($fixedPath));
-                                if($fileContent !== FALSE){
+                                if($fileContent !== false){
                                     $data = '\''. addslashes($fileContent).'\'';
                                     $colsStr .= $data.$comma;
-                                    $this->setIsBlobInsertOrUpdate(TRUE);
+                                    $this->setIsBlobInsertOrUpdate(true);
                                 }
                                 else{
-                                    $colsStr .= 'NULL'.$comma;
+                                    $colsStr .= 'null'.$comma;
                                 }
                                 fclose($file);
                             }
                             else{
-                                $colsStr .= 'NULL'.$comma;
+                                $colsStr .= 'null'.$comma;
                             }
                         }
                         else{
-                            $colsStr .= 'NULL'.$comma;
+                            $colsStr .= 'null'.$comma;
                         }
                     }
                     else{
@@ -1033,7 +1033,7 @@ abstract class MySQLQuery{
                     }
                 }
                 else{
-                    $colsStr .= ' '.$colObjOrNewVal->getName().' = NULL'.$comma;
+                    $colsStr .= ' '.$colObjOrNewVal->getName().' = null'.$comma;
                 }
             }
             else{
@@ -1050,24 +1050,24 @@ abstract class MySQLQuery{
                             if(file_exists($fixedPath)){
                                 $file = fopen($fixedPath, 'r');
                                 $data = '';
-                                if($file !== FALSE){
+                                if($file !== false){
                                     $fileContent = fread($file, filesize($fixedPath));
-                                    if($fileContent !== FALSE){
+                                    if($fileContent !== false){
                                         $data = '\''. addslashes($fileContent).'\'';
                                         $colsStr .= $data.$comma;
-                                        $this->setIsBlobInsertOrUpdate(TRUE);
+                                        $this->setIsBlobInsertOrUpdate(true);
                                     }
                                     else{
-                                        $colsStr .= 'NULL'.$comma;
+                                        $colsStr .= 'null'.$comma;
                                     }
                                     fclose($file);
                                 }
                                 else{
-                                    $colsStr .= 'NULL'.$comma;
+                                    $colsStr .= 'null'.$comma;
                                 }
                             }
                             else{
-                                $colsStr .= 'NULL'.$comma;
+                                $colsStr .= 'null'.$comma;
                             }
                         }
                         else{
@@ -1075,7 +1075,7 @@ abstract class MySQLQuery{
                         }
                     }
                     else{
-                        $colsStr .= ' '.$column->getName().' = NULL'.$comma;
+                        $colsStr .= ' '.$column->getName().' = null'.$comma;
                     }
                 }
             }
@@ -1099,8 +1099,8 @@ abstract class MySQLQuery{
      * Checks if the query represents a blob insert or update.
      * The aim of this method is to fix an issue with setting the collation 
      * of the connection while executing a query.
-     * @return boolean The Function will return TRUE if the query represents an 
-     * insert or un update of blob datatype. FALSE if not.
+     * @return boolean The Function will return true if the query represents an 
+     * insert or un update of blob datatype. false if not.
      * @since 1.8.5
      */
     public function isBlobInsertOrUpdate(){
@@ -1111,12 +1111,12 @@ abstract class MySQLQuery{
      * or an update of a blob datatype.
      * The attribute is used to fix an issue with setting the collation 
      * of the connection while executing a query.
-     * @param boolean $boolean TRUE if the query represents an insert or an update 
-     * of a blob datatype. FALSE if not.
+     * @param boolean $boolean true if the query represents an insert or an update 
+     * of a blob datatype. false if not.
      * @since 1.8.5
      */
     public function setIsBlobInsertOrUpdate($boolean) {
-        $this->isFileInsert = $boolean === TRUE ? TRUE : FALSE;
+        $this->isFileInsert = $boolean === true ? true : false;
     }
     /**
      * Updates a table columns that has a datatype of blob from source files.
@@ -1134,11 +1134,11 @@ abstract class MySQLQuery{
             $fixedPath = str_replace('\\', '/', $val);
             $file = fopen($fixedPath, 'r');
             $data = '\'\'';
-            if($file !== FALSE){
+            if($file !== false){
                 $fileContent = fread($file, filesize($fixedPath));
-                if($fileContent !== FALSE){
+                if($fileContent !== false){
                     $data = '\''. addslashes($fileContent).'\'';
-                    $this->setIsBlobInsertOrUpdate(TRUE);
+                    $this->setIsBlobInsertOrUpdate(true);
                 }
             }
             if($index + 1 == $count){
@@ -1163,7 +1163,7 @@ abstract class MySQLQuery{
     public function selectMax($col,$rename='max'){
         return $this->select(array(
             'column'=> $col,
-            'select-max'=>TRUE,
+            'select-max'=>true,
             'rename-to'=>$rename
         ));
     }
@@ -1179,17 +1179,17 @@ abstract class MySQLQuery{
     public function selectMin($col,$rename='min'){
         return $this->select(array(
             'column'=>$col,
-            'select-min'=>TRUE,
+            'select-min'=>true,
             'rename-to'=>$rename
         ));
     }
     /**
      * Constructs a query that can be used to create the table which is linked 
      * with the query class.
-     * @param boolean $inclComments If set to TRUE, the generated MySQL 
+     * @param boolean $inclComments If set to true, the generated MySQL 
      * query will have basic comments explaining the structure.
      * @return boolean Once the query is structured, the method will return 
-     * TRUE. If the query is not created, the method will return FALSE. 
+     * true. If the query is not created, the method will return false. 
      * The query will not constructed if the method 'MySQLQuery::getStructure()' 
      * did not return an object of type 'Table'.
      * @since 1.5
@@ -1198,9 +1198,9 @@ abstract class MySQLQuery{
         $t = $this->getStructure();
         if($t instanceof MySQLTable){
             $this->createTable($t,$inclComments);
-            return TRUE;
+            return true;
         }
-        return FALSE;
+        return false;
     }
     /**
      * Returns the name of the column from the table given its key.

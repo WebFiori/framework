@@ -101,7 +101,7 @@ class MySQLTable {
      * or not provided, 'table' will be used as default.
      */
     public function __construct($tName = 'table') {
-        if($this->setName($tName) !== TRUE){
+        if($this->setName($tName) !== true){
             $this->setName('table');
         }
         $this->mysqlVnum = '5.5';
@@ -148,17 +148,17 @@ class MySQLTable {
      * 2.
      * @param int $val The order of the table in the database.
      * @since 1.3 
-     * @return boolean TRUE if the value of the attribute is set. 
-     * FALSE if not.
+     * @return boolean true if the value of the attribute is set. 
+     * false if not.
      */
     public function setOrder($val){
         if(gettype($val) == 'integer'){
             if($val > -1){
                 $this->order = $val;
-                return TRUE;
+                return true;
             }
         }
-        return FALSE;
+        return false;
     }
     /**
      * Returns the order of the table in the database.
@@ -189,7 +189,7 @@ class MySQLTable {
      * has the same name as the given key.
      * @param ForeignKey $key an object of type 'ForeignKey'.
      * @since 1.1
-     * @return boolean TRUE if the key is added. FALSE otherwise.
+     * @return boolean true if the key is added. false otherwise.
      * @see ForeignKey
      * @since 1.0
      */
@@ -197,14 +197,14 @@ class MySQLTable {
         if($key instanceof ForeignKey){
             foreach ($this->forignKeys() as $val){
                 if($key->getKeyName() == $val->getKeyName()){
-                    return FALSE;
+                    return false;
                 }
             }
             $key->setSourceTable($this->getName());
             array_push($this->foreignKeys, $key);
-            return TRUE;
+            return true;
         }
-        return FALSE;
+        return false;
     }
     /**
      * Returns the name of table primary key.
@@ -297,7 +297,7 @@ class MySQLTable {
      * <li>no action</li>
      * </ul>
      * Default value is 'set null'.
-     * @return boolean TRUE if the key is added. FALSE otherwise.
+     * @return boolean true if the key is added. false otherwise.
      * @see ForeignKey
      * @since 1.0
      */
@@ -340,18 +340,18 @@ class MySQLTable {
         if($refTable instanceof MySQLTable){
             if(count($refColsArr) == count($targetColsArr)){
                 $fk = new ForeignKey();
-                if($fk->setKeyName($keyname) === TRUE){
-                    $hasAllCols = TRUE;
+                if($fk->setKeyName($keyname) === true){
+                    $hasAllCols = true;
                     foreach ($refColsArr as $col){
                         $hasAllCols = $hasAllCols && $refTable->hasColumn($col);
                     }
                     if($hasAllCols){
-                        $allAdded = TRUE;
+                        $allAdded = true;
                         foreach ($refColsArr as $col){
                             $allAdded = $allAdded && $fk->addReferenceCol($refTable->getCol($col)->getName());
                         }
                         if($allAdded){
-                            if($fk->setReferenceTable($refTable->getName()) === TRUE){
+                            if($fk->setReferenceTable($refTable->getName()) === true){
                                 foreach ($targetColsArr as $col){
                                     $hasAllCols = $hasAllCols && $this->hasColumn($col);
                                 }
@@ -371,7 +371,7 @@ class MySQLTable {
                 }
             }
         }
-        return FALSE;
+        return false;
     }
     /**
      * Returns the columns of the table which are a part of the primary key.
@@ -391,17 +391,17 @@ class MySQLTable {
     /**
      * Checks if a foreign key with the given name exist on the table or not.
      * @param string $keyName The name of the key.
-     * @return boolean TRUE if the table has a foreign key with the given name. 
-     * FALSE if not.
+     * @return boolean true if the table has a foreign key with the given name. 
+     * false if not.
      * @since 1.4
      */
     public function hasForeignKey($keyName){
         foreach ($this->forignKeys() as $val){
             if($keyName == $val->getKeyName()){
-                return TRUE;
+                return true;
             }
         }
-        return FALSE;
+        return false;
     }
     /**
      * Returns an array that contains all table foreign keys.
@@ -433,29 +433,29 @@ class MySQLTable {
      * @param string $param The name of the table (such as 'users'). It must be a 
      * string and its not empty. Also it must not contain any spaces or any 
      * characters other than A-Z, a-z and underscore.
-     * @return boolean TRUE if the name of the table is set. FALSE 
+     * @return boolean true if the name of the table is set. false 
      * in case the given name is invalid.
      * @since 1.0
      */
     public function setName($param) {
         if(gettype($param) == 'string'){
             if(strlen($param) != 0){
-                if(strpos($param, ' ') === FALSE){
+                if(strpos($param, ' ') === false){
                     for ($x = 0 ; $x < strlen($param) ; $x++){
                         $ch = $param[$x];
                         if($ch == '_' || ($ch >= 'a' && $ch <= 'z') || ($ch >= 'A' && $ch <= 'Z') || ($ch >= '0' && $ch <= '9')){
                             
                         }
                         else{
-                            return FALSE;
+                            return false;
                         }
                     }
                     $this->tableName = $param;
-                    return TRUE;
+                    return true;
                 }
             }
         }
-        return FALSE;
+        return false;
     }
     /**
      * Adds new column to the table.
@@ -463,7 +463,7 @@ class MySQLTable {
      * @param Column $col An object of type Column. Note that the column will 
      * be added only if no column was found in the table which has the same name 
      * as the given column.
-     * @return boolean TRUE if the column is added. FALSE otherwise.
+     * @return boolean true if the column is added. false otherwise.
      * @since 1.0
      */
     public function addColumn($key,$col) {
@@ -471,20 +471,20 @@ class MySQLTable {
             if($col instanceof Column){
                 foreach ($this->columns() as $val){
                     if($val->getName() == $col->getName()){
-                        return FALSE;
+                        return false;
                     }
                 }
                 $col->setOwner($this);
                 $this->colSet[$key] = $col;
-                return TRUE;
+                return true;
             }
         }
-        return FALSE;
+        return false;
     }
     /**
      * Checks if the table has a column or not.
      * @param string $colKey The index at which the column might be exist.
-     * @return boolean TRUE if the column exist. FALSE otherwise.
+     * @return boolean true if the column exist. false otherwise.
      * @since 1.4
      */
     public function hasColumn($colKey) {
@@ -493,21 +493,21 @@ class MySQLTable {
     /**
      * Returns the column object given the key that it was stored in.
      * @param string $key The name of the column key.
-     * @return Column|NULL A reference to an object of type Column if the given 
-     * column was found. NULL in case of no column was found.
+     * @return Column|null A reference to an object of type Column if the given 
+     * column was found. null in case of no column was found.
      * @since 1.0
      */
     public function &getCol($key){
         if(isset($this->colSet[$key])){
             return $this->colSet[$key];
         }
-        $null = NULL;
+        $null = null;
         return $null;
     }
     /**
      * Returns the index of a column given its key.
      * @param string $key The name of the column key.
-     * @return Column|NULL The index of the column if a column was 
+     * @return Column|null The index of the column if a column was 
      * found which has the given key. -1 in case of no column was found.
      * @since 1.6
      */
@@ -520,8 +520,8 @@ class MySQLTable {
     /**
      * Returns a column given its index.
      * @param int $index The index of the column.
-     * @return Column|NULL If a column was found which has the specified index, 
-     * it is returned. Other than that, The method will return NULL.
+     * @return Column|null If a column was found which has the specified index, 
+     * it is returned. Other than that, The method will return null.
      * @since 1.6
      */
     public function &getColByIndex($index){
@@ -530,7 +530,7 @@ class MySQLTable {
                 return $col;
             }
         }
-        $null = NULL;
+        $null = null;
         return $null;
     }
     /**

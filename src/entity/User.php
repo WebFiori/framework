@@ -257,7 +257,8 @@ class User implements JsonI{
     }
     /**
      * Returns the value of the property '$lastLogin'.
-     * @return string Last login date.
+     * @return string|null Last login date. If not set, the method will 
+     * return null.
      * @since 1.4
      */
     public function getLastLogin(){
@@ -265,7 +266,8 @@ class User implements JsonI{
     }
     /**
      * Returns the value of the property '$regDate'.
-     * @param string $date Registration date.
+     * @param string|null $date Registration date. If not set, the method will
+     * return null.
      * @since 1.4
      */
     public function getRegDate(){
@@ -292,7 +294,7 @@ class User implements JsonI{
      * Returns the number of times the user has requested that his password 
      * to be reseted.
      * @return int The number of times the user has requested that his password 
-     * to be reseted.
+     * to be reseted. Default value is 0.
      * @since 1.6
      */
     public function getResetCount() {
@@ -328,7 +330,8 @@ class User implements JsonI{
     }
     /**
      * Returns the display name of the user.
-     * @return string The display name of the user.
+     * @return string|null The display name of the user. Default value is 
+     * null.
      * @since 1.2
      */
     public function getDisplayName() {
@@ -409,7 +412,8 @@ class User implements JsonI{
     }
     /**
      * Returns the value of the property '$userName'.
-     * @return string The value of the property '$userName'.
+     * @return string The value of the property '$userName'. Default value is 
+     * empty string.
      * @since 1.0
      */
     function getUserName(){
@@ -417,7 +421,8 @@ class User implements JsonI{
     }
     /**
      * Returns the value of the property '$password'.
-     * @return string The value of the property '$password'.
+     * @return string The value of the property '$password'. Default value is 
+     * empty string.
      * @since 1.0
      */
     function getPassword(){
@@ -425,7 +430,8 @@ class User implements JsonI{
     }
     /**
      * Returns the value of the property '$email'.
-     * @return string The value of the property '$email'.
+     * @return string The value of the property '$email'. Default value is 
+     * empty string.
      * @since 1.0
      */
     function getEmail(){

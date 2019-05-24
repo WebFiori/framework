@@ -240,6 +240,7 @@ class File implements JsonI{
     public function setPath($path){
         $retVal = false;
         $len = strlen($path);
+        $DS = DIRECTORY_SEPARATOR;
         if($len > 0){
             while($path[$len - 1] == '/' || $path[$len - 1] == '\\'){
                 $tmpDir = trim($path,'/');
@@ -251,8 +252,8 @@ class File implements JsonI{
                 $path = trim($tmpDir,'\\');
             }
             if(strlen($path) > 0){
-                $path = str_replace('/', '\\', $path);
-                $this->path = !Util::isDirectory($path) ? '\\'.$path : $path;
+                $path = str_replace('/', $DS, str_replace('\\', $DS, $path));
+                $this->path = !Util::isDirectory($path) ? $DS.$path : $path;
                 $retVal = true;
             }
         }

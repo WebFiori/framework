@@ -70,5 +70,5 @@ fprintf(STDOUT, "Registering shutdown function...\n");
 register_shutdown_function(function(){
 });
 fprintf(STDOUT, "Registering shutdown function completed.\n");
-
+$_SERVER['REMOTE_ADDR'] = '127.0.0.1';
 fprintf(STDOUT,"Starting to run tests...\n");

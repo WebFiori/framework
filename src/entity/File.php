@@ -239,25 +239,30 @@ class File implements JsonI{
      */
     public function setPath($path){
         $retVal = false;
-        $len = strlen($path);
+        $pathV = self::_validatePath($path);
+        $len = strlen($pathV);
         $DS = DIRECTORY_SEPARATOR;
         if($len > 0){
-            while($path[$len - 1] == '/' || $path[$len - 1] == '\\'){
-                $tmpDir = trim($path,'/');
-                $path = trim($tmpDir,'\\');
-                $len = strlen($path);
-            }
-            while($path[0] == '/' || $path[0] == '\\'){
-                $tmpDir = trim($path,'/');
-                $path = trim($tmpDir,'\\');
-            }
-            if(strlen($path) > 0){
-                $path = str_replace('/', $DS, str_replace('\\', $DS, $path));
-                $this->path = !Util::isDirectory($path) ? $DS.$path : $path;
-                $retVal = true;
-            }
+            $this->path = !Util::isDirectory($pathV) ? $DS.$pathV : $pathV;
+            $retVal = true;
         }
         return $retVal;
+    }
+    private static function _validatePath($path) {
+        $trimmedPath = trim($path);
+        $len = strlen($trimmedPath);
+        if($len != 0){
+            while($trimmedPath[$len - 1] == '/' || $trimmedPath[$len - 1] == '\\'){
+                $tmpDir = trim($trimmedPath,'/');
+                $trimmedPath = trim($tmpDir,'\\');
+                $len = strlen($trimmedPath);
+            }
+            while($trimmedPath[0] == '/' || $trimmedPath[0] == '\\'){
+                $tmpDir = trim($trimmedPath,'/');
+                $trimmedPath = trim($tmpDir,'\\');
+            }
+        }
+        return str_replace('/', DIRECTORY_SEPARATOR, str_replace('\\', DIRECTORY_SEPARATOR, $trimmedPath));
     }
     /**
      * Returns the full path to the file.
@@ -274,7 +279,7 @@ class File implements JsonI{
         $path = $this->getPath();
         $name = $this->getName();
         if(strlen($path) != 0 && strlen($name)){
-            return $path.'\\'.$name;
+            return $path.DIRECTORY_SEPARATOR.$name;
         }
         return '';
     }
@@ -342,28 +347,6 @@ class File implements JsonI{
         }
         throw new Exception('File absolute path is invalid.');
     }
-    /**
-     * Returns memory limit of PHP.
-     * @return int A number that represents memory limit in 
-     * bytes.
-     * 
-     */
-    private function _getMemoryLimit() {
-        $memoryLimit = ini_get('memory_limit');
-        $len = strlen($memoryLimit);
-        $limit = '';
-        $unit = '';
-        for($x = 0 ; $x < $len ; $x++){
-            $ch = $memoryLimit[$x];
-            if($ch >= '0' && $ch <= '9'){
-                $limit .= $ch;
-            }
-            else{
-                $unit .= $ch;
-            }
-        }
-        return intval($limit)*1024*1024;
-    }
     private function _readHelper($path,$from,$to){
         if(file_exists($path)){
             $this->_setSize(filesize($path));
@@ -419,8 +402,10 @@ class File implements JsonI{
         else{
             $fName = $this->getName();
             if(strlen($fName) > 0){
-                if(strlen($path) > 0){
-                    $this->_writeHelper($path.'\\'.$fName);
+                $pathV = self::_validatePath($path);
+                if(strlen($pathV) > 0){
+                    $pathV2 = !Util::isDirectory($pathV) ? DIRECTORY_SEPARATOR.$pathV : $pathV;
+                    $this->_writeHelper($pathV2.DIRECTORY_SEPARATOR.$fName);
                     return;
                 }
                 throw new Exception('Path cannot be empty string.');

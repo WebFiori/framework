@@ -278,7 +278,7 @@ class File implements JsonI{
     public function getAbsolutePath() {
         $path = $this->getPath();
         $name = $this->getName();
-        if(strlen($path) != 0 && strlen($name)){
+        if(strlen($path) != 0 && strlen($name) != 0){
             return $path.DIRECTORY_SEPARATOR.$name;
         }
         return '';
@@ -451,7 +451,7 @@ class File implements JsonI{
     }
     private function _viewFileHelper($asAttachment){
         $contentType = $this->getFileMIMEType();
-        if($contentType != null){
+        if($contentType !== null){
             header("Accept-Ranges: bytes");
             header('Content-Type:'.$contentType);
             if(isset($_SERVER['HTTP_RANGE'])){

@@ -61,6 +61,7 @@ class FileTest extends TestCase{
         $this->assertEquals(ROOT_DIR.DIRECTORY_SEPARATOR.'tests'.DIRECTORY_SEPARATOR.'entity',$file->getPath());
         $file->read();
         $this->assertEquals('text/plain',$file->getFileMIMEType());
+        fprintf(STDERR, $file->getRawData());
         $this->assertEquals("Testing the class 'File'.\n",$file->getRawData());
     }
     /**
@@ -70,6 +71,16 @@ class FileTest extends TestCase{
      */
     public function testRead03() {
         $file = new File('text-file-2.txt','\\'.ROOT_DIR.DIRECTORY_SEPARATOR.'tests'.DIRECTORY_SEPARATOR.'entity\\');
+        $this->expectException(\Exception::class);
+        $file->read();
+    }
+    /**
+     * @test
+     * @depends test00
+     * @param File $file
+     */
+    public function testRead04() {
+        $file = new File('private.txt','\\'.ROOT_DIR.DIRECTORY_SEPARATOR.'tests'.DIRECTORY_SEPARATOR.'entity\\');
         $this->expectException(\Exception::class);
         $file->read();
     }

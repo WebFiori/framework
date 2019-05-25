@@ -32,4 +32,44 @@ class UserTest extends TestCase{
     public function toStringTest00($user) {
         $this->assertEquals('{"user-id":-1, "email":"", "display-name":null, "username":""}',$user.'');
     }
+    /**
+     * @test
+     */
+    public function testSetDisplayName() {
+        $u = new User();
+        $u->setDisplayName('');
+        $this->assertNull($u->getDisplayName());
+        $u->setDisplayName('Hello');
+        $this->assertEquals('Hello',$u->getDisplayName());
+        $u->setDisplayName("   Hello User   \n");
+        $this->assertEquals('Hello User',$u->getDisplayName());
+    }
+    /**
+     * @test
+     */
+    public function testSetResetCount() {
+        $u = new User();
+        $u->setResetCount('1');
+        $this->assertEquals(0,$u->getResetCount());
+        $u->setResetCount(-1);
+        $this->assertEquals(0,$u->getResetCount());
+        $u->setResetCount(32);
+        $this->assertEquals(32,$u->getResetCount());
+    }
+    /**
+     * @test
+     */
+    public function testSetLastLogin() {
+        $u = new User();
+        $u->setLastLogin('2018-09-09');
+        $this->assertEquals('2018-09-09',$u->getLastLogin());
+    }
+    /**
+     * @test
+     */
+    public function testSetRegDate() {
+        $u = new User();
+        $u->setRegDate('2018-09-09 07:09:44');
+        $this->assertEquals('2018-09-09 07:09:44',$u->getRegDate());
+    }
 }

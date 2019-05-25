@@ -107,7 +107,7 @@ class User implements JsonI{
         $this->password = $password;
         $this->userName = $username;
         $this->resetPassCounts = 0;
-        $this->id = -1;
+        $this->setID(-1);
         $this->userPrivileges = array();
     }
     /**
@@ -340,12 +340,14 @@ class User implements JsonI{
     /**
      * Sets the display name of the user.
      * @param string $name Display name. It will be set only if it was a string 
-     * with length that is greater than 0 (Not empty string).
+     * with length that is greater than 0 (Not empty string). Note that the method will 
+     * remove any extra spaces in the name.
      * @since 1.2
      */
     public function setDisplayName($name){
-        if(gettype($name) == 'string' && strlen($name) != 0){
-            $this->dispName = $name;
+        $trimmed = trim($name);
+        if(strlen($trimmed) != 0){
+            $this->dispName = $trimmed;
         }
     }
     /**

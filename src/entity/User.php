@@ -304,11 +304,11 @@ class User implements JsonI{
      * Sets the number of times the user has requested that his password 
      * to be reseted.
      * @param int $times The number of times the user has requested that his password 
-     * to be reseted.
+     * to be reseted. Must be an integer greater than -1.
      * @since 1.6
      */
     public function setResetCount($times) {
-        if(gettype($times) == 'integer'){
+        if(gettype($times) == 'integer' && $times >= 0){
             $this->resetPassCounts = $times;
         }
     }

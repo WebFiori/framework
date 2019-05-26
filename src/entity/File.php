@@ -29,6 +29,7 @@ if(!defined('ROOT_DIR')){
     . '<h1>404 - Not Found</h1><hr><p>The requested resource was not found on the server.</p></body></html>');
 }
 use jsonx\JsonI;
+use jsonx\JsonX;
 use Exception;
 /**
  * A class that represents a file.

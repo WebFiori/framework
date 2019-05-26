@@ -72,4 +72,18 @@ class UserTest extends TestCase{
         $u->setRegDate('2018-09-09 07:09:44');
         $this->assertEquals('2018-09-09 07:09:44',$u->getRegDate());
     }
+    /**
+     * @test
+     */
+    public function testInGroup00() {
+        $u = new User();
+        $this->assertFalse($u->inGroup('not-exist'));
+    }
+    /**
+     * @test
+     */
+    public function testHasPrivilege00() {
+        $u = new User();
+        $this->assertFalse($u->hasPrivilege('not-exist'));
+    }
 }

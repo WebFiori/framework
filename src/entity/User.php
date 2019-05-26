@@ -103,10 +103,10 @@ class User implements JsonI{
      * @since 1.0
      */
     function __construct($username='',$password='',$email=''){
-        $this->email = $email;
-        $this->password = $password;
-        $this->userName = $username;
-        $this->resetPassCounts = 0;
+        $this->setEmail($email);
+        $this->setPassword($password);
+        $this->setUserName($username);
+        $this->setResetCount(0);
         $this->setID(-1);
         $this->userPrivileges = array();
     }
@@ -390,11 +390,12 @@ class User implements JsonI{
     }
     /**
      * Sets the user name of a user.
-     * @param string $username The username to set.
+     * @param string $username The username to set. Note that the method will 
+     * use the method 'trim()' in order to trim passed value.
      * @since 1.0
      */
     function setUserName($username){
-        $this->userName = $username;
+        $this->userName = trim($username);
     }
     /**
      * Sets the password of a user.
@@ -406,11 +407,12 @@ class User implements JsonI{
     }
     /**
      * Sets the value of the property '$email'.
-     * @param string $email The email to set.
+     * @param string $email The email to set. Note that the method will 
+     * use the method 'trim()' in order to trim passed value.
      * @since 1.0
      */
     public function setEmail($email){
-        $this->email = $email;
+        $this->email = trim($email);
     }
     /**
      * Returns the value of the property '$userName'.

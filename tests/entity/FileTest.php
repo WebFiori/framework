@@ -146,4 +146,20 @@ class FileTest extends TestCase{
         $f2->read();
         $this->assertEquals('Hello World Again.',$f2->getRawData());
     }
+    /**
+     * @test
+     */
+    public function toStringTest00() {
+        $f = new File();
+        $this->assertEquals('{"id":-1, "mime":"application\/octet-stream", "name":"", "path":"", "size-in-bytes":0, "size-in-kbytes":0, "size-in-mbytes":0}',$f.'');
+    }
+    /**
+     * @test
+     */
+    public function toStringTest01() {
+        $f = new File('text-file.txt','\\'.ROOT_DIR.DIRECTORY_SEPARATOR.'tests'.DIRECTORY_SEPARATOR.'entity\\');
+        $f->read();
+        $this->assertEquals('{"id":-1, "mime":"text\/plain", "name":"text-file.txt", '
+                . '"path":"'.\jsonx\JsonX::escapeJSONSpecialChars($f->getPath()).'", "size-in-bytes":27, "size-in-kbytes":0.0263671875, "size-in-mbytes":2.5749206542969E-5}',$f.'');
+    }
 }

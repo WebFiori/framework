@@ -51,7 +51,7 @@ class FileTest extends TestCase{
     public function testRead01($file) {
         $file->read();
         $this->assertEquals('text/plain',$file->getFileMIMEType());
-        $this->assertEquals("Testing the class 'File'.\n",$file->getRawData());
+        $this->assertEquals("Testing the class 'File'.",$file->getRawData());
     }
     /**
      * @test
@@ -62,7 +62,7 @@ class FileTest extends TestCase{
         $file->read();
         $this->assertEquals('text/plain',$file->getFileMIMEType());
         fprintf(STDERR, $file->getRawData());
-        $this->assertEquals("Testing the class 'File'.\n",$file->getRawData());
+        $this->assertEquals("Testing the class 'File'.",$file->getRawData());
     }
     /**
      * @test
@@ -160,6 +160,6 @@ class FileTest extends TestCase{
         $f = new File('text-file.txt','\\'.ROOT_DIR.DIRECTORY_SEPARATOR.'tests'.DIRECTORY_SEPARATOR.'entity\\');
         $f->read();
         $this->assertEquals('{"id":-1, "mime":"text\/plain", "name":"text-file.txt", '
-                . '"path":"'.\jsonx\JsonX::escapeJSONSpecialChars($f->getPath()).'", "size-in-bytes":27, "size-in-kbytes":0.0263671875, "size-in-mbytes":2.5749206542969E-5}',$f.'');
+                . '"path":"'.\jsonx\JsonX::escapeJSONSpecialChars($f->getPath()).'", "size-in-bytes":25, "size-in-kbytes":0.0244140625, "size-in-mbytes":2.3841857910156E-5}',$f.'');
     }
 }

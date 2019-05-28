@@ -98,7 +98,7 @@ class EmailMessage {
                     return;
                 }
             }
-            throw new Exception('The account "'.$sendAccountName.'" does not exist.');
+            throw new Exception('No SMTP account was found which has the name "'.$sendAccountName.'".');
         }
         throw new Exception('Class "MailConfig" not found.');
     }

@@ -32,28 +32,46 @@ class EmailMessageTest extends TestCase{
     /**
      * @test
      */
-//    public function test02() {
-//        $smtp = new SMTPAccount();
-//        $smtp->setPassword('iz2)1Iimu#z');
-//        $smtp->setAddress('test@programmingacademia.com');
-//        $smtp->setUsername('test@programmingacademia.com');
-//        $smtp->setServerAddress('mail.programmingacademia.com ');
-//        $smtp->setPort(25);
-//        MailConfig::get()->addSMTPAccount('smtp-acc-00', $smtp);
-//        $message = EmailMessage::createInstance('smtp-acc-00');
-//    }
+    public function test02() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('The account "smtp-acc-00" has inalid host or port number. Port: 255, Host: mail.programmingacademia.com.');
+        $smtp = new SMTPAccount();
+        $smtp->setPassword('iz1Iimu#z');
+        $smtp->setAddress('test@programmingacademia.com');
+        $smtp->setUsername('test@programmingacademia.com');
+        $smtp->setServerAddress('mail.programmingacademia.com ');
+        $smtp->setPort(255);
+        MailConfig::get()->addSMTPAccount('smtp-acc-00', $smtp);
+        $message = EmailMessage::createInstance('smtp-acc-00');
+    }
     /**
      * @test
      */
-//    public function test03() {
-//        $smtp = new SMTPAccount();
-//        $smtp->setPassword('iz2)X1Iimu#z');
-//        $smtp->setAddress('test@programmingacademia.com');
-//        $smtp->setUsername('test@programmingacademia.com');
-//        $smtp->setServerAddress('mail.programmingacademia.com ');
-//        $smtp->setPort(25);
-//        MailConfig::get()->addSMTPAccount('smtp-acc-00', $smtp);
-//        $message = EmailMessage::createInstance('smtp-acc-00');
-//        $this->assertTrue($message instanceof EmailMessage);
-//    }
+    public function test03() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('The account "smtp-acc-00" has inalid credintials.');
+        $smtp = new SMTPAccount();
+        $smtp->setPassword('izimu#z');
+        $smtp->setAddress('test@programmingacademia.com');
+        $smtp->setUsername('test@programmingacademia.com');
+        $smtp->setServerAddress('mail.programmingacademia.com ');
+        $smtp->setPort(25);
+        MailConfig::get()->addSMTPAccount('smtp-acc-00', $smtp);
+        $message = EmailMessage::createInstance('smtp-acc-00');
+        $this->assertTrue($message instanceof EmailMessage);
+    }
+    /**
+     * @test
+     */
+    public function test04() {
+        $smtp = new SMTPAccount();
+        $smtp->setPassword('iz2)X1Iimu#z');
+        $smtp->setAddress('test@programmingacademia.com');
+        $smtp->setUsername('test@programmingacademia.com');
+        $smtp->setServerAddress('mail.programmingacademia.com ');
+        $smtp->setPort(25);
+        MailConfig::get()->addSMTPAccount('smtp-acc-00', $smtp);
+        $message = EmailMessage::createInstance('smtp-acc-00');
+        $this->assertTrue($message instanceof EmailMessage);
+    }
 }

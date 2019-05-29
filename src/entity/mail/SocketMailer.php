@@ -33,7 +33,7 @@ use webfiori\entity\File;
  * A class that can be used to send email messages using sockets.
  *
  * @author Ibrahim
- * @version 1.4.6
+ * @version 1.4.7
  */
 class SocketMailer {
     /**
@@ -75,16 +75,6 @@ class SocketMailer {
      * @var int 
      */
     private $port;
-    /**
-     * The username that is used to login to the mail server.
-     * @var string 
-     */
-    private $uName;
-    /**
-     * The password that is used in authentication.
-     * @var string 
-     */
-    private $pass;
     /**
      * Connection timeout (in minutes)
      * @var int 
@@ -147,17 +137,22 @@ class SocketMailer {
      */
     private $lastResponse;
     /**
-     * A boolean value that is set to TRUE if connection uses TLS.
+     * A boolean value that is set to true if connection uses TLS.
      * @var boolean
      * @since 1.4.1 
      */
     private $useTls;
     /**
-     * A boolean value that is set to TRUE if connection uses SSL.
+     * A boolean value that is set to true if connection uses SSL.
      * @var boolean
      * @since 1.4.1 
      */
     private $useSsl;
+    /**
+     * Last received code from server after sending some command.
+     * @var int 
+     */
+    private $lastResponseCode;
     /**
      * Creates new instance of the class.
      * @since 1.0
@@ -168,23 +163,58 @@ class SocketMailer {
         $this->cc = array();
         $this->bcc = array();
         $this->setSubject('EMAIL MESSAGE');
-        $this->writeMode = FALSE;
-        $this->isLoggedIn = FALSE;
+        $this->writeMode = false;
+        $this->isLoggedIn = false;
         $this->boundry = hash('sha256', date(DATE_ISO8601));
         $this->attachments = array();
         $this->lastResponse = '';
-        $this->useTls = FALSE;
+        $this->useTls = false;
         $this->setPriority(0);
+        $this->lastResponseCode = 0;
+    }
+    /**
+     * Sets the code that was the result of executing SMTP command.
+     * @param string $serverResponseMessage The last message which was sent by 
+     * the server after executing specific command.
+     * @since 1.4.7
+     */
+    private function _setLastResponseCode($serverResponseMessage) {
+        $firstNum = $serverResponseMessage[0];
+        $firstAsInt = intval($firstNum);
+        if($firstAsInt != 0){
+            $secNum = $serverResponseMessage[1];
+            $thirdNum = $serverResponseMessage[2];
+            $this->lastResponseCode = $firstNum+(intval($secNum*10))+(intval($thirdNum)*100);
+        }
+    }
+    /**
+     * Returns last response code that was sent by SMTP server after executing 
+     * specific command.
+     * @return int The last response code that was sent by SMTP server after executing 
+     * specific command. Default return value is 0.
+     * @since 1.4.7
+     */
+    public function getLastResponseCode() {
+        return $this->lastResponseCode;
     }
     /**
      * Sets the priority of the message.
      * @param int $priority The priority of the message. -1 for non-urgent, 0 
-     * for normal and 1 for urgent.
+     * for normal and 1 for urgent. If the passed value is greater than 1, 
+     * then 1 will be used. If the passed value is less than -1, then -1 is 
+     * used. Other than that, 0 will be used.
      * @since 1.4.3
      */
     public function setPriority($priority){
-        if($priority == -1 || $priority == 0 || $priority == 1){
-            $this->priority = $priority;
+        $asInt = intval($priority);
+        if($asInt <= -1){
+            $this->priority = -1;
+        }
+        else if($asInt >= 1){
+            $this->priority = 1;
+        }
+        else{
+            $this->priority = 0;
         }
     }
     /**
@@ -201,17 +231,17 @@ class SocketMailer {
      * @param File $attachment An object of type 'File' which contains all 
      * needed information about the file. It will be added only if the file 
      * exist in the path or the raw data of the file is set.
-     * @return boolean If the attachment is added, the method will return TRUE. 
-     * FALSE otherwise.
+     * @return boolean If the attachment is added, the method will return true. 
+     * false otherwise.
      * @since 1.3
      */
     public function addAttachment($attachment) {
-        $retVal = FALSE;
+        $retVal = false;
         if(class_exists('webfiori\entity\File')){
             if($attachment instanceof File){
-                if(file_exists($attachment->getAbsolutePath()) || file_exists(str_replace('\\', '/', $attachment->getAbsolutePath())) || $attachment->getRawData() !== NULL){
+                if(file_exists($attachment->getAbsolutePath()) || file_exists(str_replace('\\', '/', $attachment->getAbsolutePath())) || $attachment->getRawData() !== null){
                     $this->attachments[] = $attachment;
-                    $retVal = TRUE;
+                    $retVal = true;
                 }
             }
         }
@@ -219,46 +249,46 @@ class SocketMailer {
     }
     /**
      * Sets or gets the value of the property 'useTls'.
-     * @param boolean|NULL $bool TRUE if the connection to the server will use TLS. 
-     * FALSE if not. If NULL is given, the property will not updated. Default 
-     * is NULL.
-     * @return boolean $bool TRUE if the connection to the server will use TLS. 
-     * FALSE if not. Default return value is FALSE
+     * @param boolean|null $bool true if the connection to the server will use TLS. 
+     * false if not. If null is given, the property will not updated. Default 
+     * is null.
+     * @return boolean $bool true if the connection to the server will use TLS. 
+     * false if not. Default return value is false
      * @since 1.0.1
      * @deprecated since version 1.4.6
      */
     public function isTLS($bool=null){
-        if($bool !== NULL){
-            $this->useTls = $bool === TRUE ? TRUE : FALSE;
+        if($bool !== null){
+            $this->useTls = $bool === true ? true : false;
             if($this->useTls){
-                $this->useSsl = FALSE;
+                $this->useSsl = false;
             }
         }
         return $this->useTls;
     }
     /**
      * Sets or gets the value of the property 'useSsl'.
-     * @param boolean|NULL $bool TRUE if the connection to the server will use SSL. 
-     * FALSE if not. If NULL is given, the property will not updated. Default 
-     * is NULL.
-     * @return boolean $bool TRUE if the connection to the server will use SSL. 
-     * FALSE if not. Default return value is FALSE
+     * @param boolean|null $bool true if the connection to the server will use SSL. 
+     * false if not. If null is given, the property will not updated. Default 
+     * is null.
+     * @return boolean $bool true if the connection to the server will use SSL. 
+     * false if not. Default return value is false
      * @since 1.0.1
      * @deprecated since version 1.4.6
      */
     public function isSSL($bool=null){
-        if($bool !== NULL){
-            $this->useSsl = $bool === TRUE ? TRUE : FALSE;
+        if($bool !== null){
+            $this->useSsl = $bool === true ? true : false;
             if($this->useSsl){
-                $this->useTls = FALSE;
+                $this->useTls = false;
             }
         }
         return $this->useSsl;
     }
     /**
      * Checks if the user is logged in to mail server or not.
-     * @return boolean The method will return TRUE if the user is 
-     * logged in to the mail server. FALSE if not.
+     * @return boolean The method will return true if the user is 
+     * logged in to the mail server. false if not.
      * @since 1.2
      */
     public function isLoggedIn() {
@@ -277,8 +307,8 @@ class SocketMailer {
      * </ul>
      * @param string $username The email server username.
      * @param string $password The user password.
-     * @return boolean The method will return TRUE if the user is 
-     * logged in to the mail server. FALSE if not.
+     * @return boolean The method will return true if the user is 
+     * logged in to the mail server. false if not.
      * @since 1.2
      */
     public function login($username,$password) {
@@ -287,15 +317,17 @@ class SocketMailer {
                 $this->sendC('AUTH LOGIN');
                 $this->sendC(base64_encode($username));
                 $this->sendC(base64_encode($password));
-                
+                if($this->getLastLogMessage() == '535 Incorrect authentication data'){
+                    return false;
+                }
                 //a command to check if authentication is done
                 $this->sendC('MAIL FROM: <'.$this->getSenderAddress().'>');
 
                 if($this->getLastLogMessage() == '235 Authentication succeeded' || $this->getLastLogMessage() == '250 OK'){
-                    $this->isLoggedIn = TRUE;
+                    $this->isLoggedIn = true;
                 }
                 else{
-                    $this->isLoggedIn = FALSE;
+                    $this->isLoggedIn = false;
                 }
             }
         }
@@ -303,7 +335,8 @@ class SocketMailer {
     }
     /**
      * Returns the last logged message after executing some command.
-     * @return string The last logged message after executing some command.
+     * @return string The last logged message after executing some command. Default 
+     * value is empty string.
      * @since 1.2
      */
     public function getLastLogMessage(){
@@ -315,8 +348,9 @@ class SocketMailer {
      * @since 1.0
      */
     public function setSubject($subject){
-        if(gettype($subject) == 'string' && strlen($subject) > 0){
-            $this->subject = $subject;
+        $trimmed = trim($subject);
+        if(strlen($trimmed) > 0){
+            $this->subject = $trimmed;
         }
     }
     /**
@@ -330,45 +364,40 @@ class SocketMailer {
         $this->senderAddress = $address;
     }
     /**
-     * Sets the login username.
-     * @param string $u Username.
-     * @since 1.0
-     */
-    public function setUsername($u){
-        $this->uName = $u;
-    }
-    /**
-     * Sets user password.
-     * @param string $pass User password.
-     * @since 1.0
-     */
-    public function setPassword($pass){
-        $this->pass = $pass;
-    }
-    /**
-     * Adds new receiver.
-     * @param string $name The name of the email receiver (such as 'Ibrahim').
-     * @param string $address The email address of the receiver.
+     * Adds new receiver or updates an existing one.
+     * @param string $name The name of the email receiver (such as 'Ibrahim'). It 
+     * must be non-empty string.
+     * @param string $address The email address of the receiver. It must be 
+     * non-empty string.
      * @param boolean $isCC If set to true, the receiver will receive 
-     * a carbon copy of the message.
+     * a carbon copy (CC) of the message. Default is false.
      * @param boolean $isBcc If set to true, the receiver will receive 
-     * a blind carbon copy of the message.
+     * a blind carbon copy (BCC) of the message. This will override the option $isCC. Default 
+     * is false.
      * @since 1.0
      */
     public function addReceiver($name, $address, $isCC=false, $isBcc=false){
-        if($isBcc){
-            $this->bcc[$address] = $name;
+        $nameTrimmed = trim($name);
+        if(strlen($nameTrimmed) != 0){
+            $addressTrimmed = trim($address);
+            if(strlen($addressTrimmed) != 0){
+                if($isBcc){
+                    $this->bcc[$addressTrimmed] = $nameTrimmed;
+                }
+                else if($isCC){
+                    $this->cc[$addressTrimmed] = $nameTrimmed;
+                }
+                else{
+                    $this->receivers[$addressTrimmed] = $nameTrimmed;
+                }
+                return true;
+            }
         }
-        else if($isCC){
-            $this->cc[$address] = $name;
-        }
-        else{
-            $this->receivers[$address] = $name;
-        }
+        return false;
     }
     /**
      * Checks if the mailer is in message writing mode or not.
-     * @return boolean TRUE if the mailer is in writing mode. The 
+     * @return boolean true if the mailer is in writing mode. The 
      * mailer will only switch to writing mode after sending the command 'DATA'.
      * @since 1.1
      */
@@ -396,14 +425,14 @@ class SocketMailer {
      * Note that this method will trim the following character from the string 
      * if they are found in the message: '\t\n\r\0\x0B\0x1B\0x0C'.
      * @param string $msg The message to write. 
-     * @param boolean $sendMessage If set to TRUE, The connection will be closed and the 
+     * @param boolean $sendMessage If set to true, The connection will be closed and the 
      * message will be sent.
      * @since 1.0
      */
     public function write($msg,$sendMessage=false){
         if($this->isInWritingMode()){
             $this->sendC(trim($msg,"\t\n\r\0\x0B\0x1B\0x0C"));
-            if($sendMessage === TRUE){
+            if($sendMessage === true){
                 $this->_appendAttachments();
                 $this->sendC(self::NL.'.');
                 $this->sendC('QUIT');
@@ -446,7 +475,7 @@ class SocketMailer {
                 $this->sendC('--'.$this->boundry);
                 $this->sendC('Content-Type: text/html; charset="UTF-8"'.self::NL);
                 $this->sendC(trim($msg,"\t\n\r\0\x0B\0x1B\0x0C"));
-                if($sendMessage === TRUE){
+                if($sendMessage === true){
                     $this->_appendAttachments();
                     $this->sendC(self::NL.'.');
                     $this->sendC('QUIT');
@@ -461,7 +490,7 @@ class SocketMailer {
     private function _appendAttachments(){
         if(count($this->attachments) != 0){
             foreach ($this->attachments as $file){
-                if($file->getRawData() === NULL){
+                if($file->getRawData() === null){
                     $file->read();
                 }
                 $content = $file->getRawData();
@@ -557,7 +586,7 @@ class SocketMailer {
     }
     /**
      * Checks if the connection is still open or is it closed.
-     * @return boolean TRUE if the connection is open.
+     * @return boolean true if the connection is open.
      * @since 1.0
      */
     public function isConnected() {
@@ -589,13 +618,13 @@ class SocketMailer {
      * @since 1.0
      */
     public function setHost($host){
-        $this->host = $host;
+        $this->host = trim($host);
     }
     /**
      * Sends a command to the mail server.
      * @param string $command Any SMTP command.
-     * @return boolean The method will return always TRUE if the command was 
-     * sent. The only case that the method will return FALSE is when it is not 
+     * @return boolean The method will return always true if the command was 
+     * sent. The only case that the method will return false is when it is not 
      * connected to the server.
      * @since 1.0
      */
@@ -604,7 +633,7 @@ class SocketMailer {
             if($this->isInWritingMode()){
                 fwrite($this->conn, $command.self::NL);
                 if($command == self::NL.'.'){
-                    $this->writeMode = FALSE;
+                    $this->writeMode = false;
                 }
             }
             else{
@@ -612,13 +641,13 @@ class SocketMailer {
                 $response = trim($this->read());
                 $this->lastResponse = $response;
                 if($command == 'DATA'){
-                    $this->writeMode = TRUE;
+                    $this->writeMode = true;
                 }
             }
-            return TRUE;
+            return true;
         }
         else{
-            return FALSE;
+            return false;
         }
     }
     /**
@@ -635,19 +664,20 @@ class SocketMailer {
                 break;
             }
         }
+        $this->_setLastResponseCode($message);
         return $message;
     }
     /**
      * Connect to the mail server.
      * Before calling this method, the developer must make sure that he set 
      * connection information correctly (server address and port number).
-     * @return boolean TRUE if the connection established or already 
-     * connected. FALSE if not. Once the connection is established, the 
+     * @return boolean true if the connection established or already 
+     * connected. false if not. Once the connection is established, the 
      * method will send the command 'EHLO' to the server. 
      * @since 1.0
      */
     public function connect() {
-        $retVal = TRUE;
+        $retVal = true;
         if(!$this->isConnected()){
             set_error_handler(function(){});
 //            Logger::log('Checking if SSL or TLS will be used...');
@@ -664,9 +694,9 @@ class SocketMailer {
             if(function_exists('stream_socket_client')){
                 $context = stream_context_create (array(
                     'ssl'=>array(
-                        'verify_peer'=>FALSE,
-                        'verify_peer_name'=>FALSE,
-                        'allow_self_signed'=>TRUE
+                        'verify_peer'=>false,
+                        'verify_peer_name'=>false,
+                        'allow_self_signed'=>true
                     )
                 ));
                 $this->conn = stream_socket_client($this->host.':'.$port, $err, $errStr, $this->timeout*60, STREAM_CLIENT_CONNECT, $context);
@@ -674,16 +704,16 @@ class SocketMailer {
             else{
                 $this->conn = fsockopen($this->host, $port, $err, $errStr, $this->timeout*60);
             }
-            set_error_handler(NULL);
+            set_error_handler(null);
             if(is_resource($this->conn)){
                 $response = $this->read();
                 if($this->sendC('EHLO '.$this->host)){
-                    $retVal = TRUE;
+                    $retVal = true;
                     if($port == 587){
                         //Logger::log('Using TLS. Sending the command \'STARTTLS\'.');
 //                        if($this->sendC('STARTTLS')){
-//                            $retVal = stream_socket_enable_crypto($this->conn, TRUE, STREAM_CRYPTO_METHOD_ANY_CLIENT);
-//                            if($retVal === TRUE){
+//                            $retVal = stream_socket_enable_crypto($this->conn, true, STREAM_CRYPTO_METHOD_ANY_CLIENT);
+//                            if($retVal === true){
 //                                Logger::log('Secure connection enabled.');
 //                                $this->sendC('EHLO '.$this->host);
 //                            }
@@ -697,8 +727,8 @@ class SocketMailer {
                     }
                     else if($port == 465){
 //                        Logger::log('SSL will be used.');
-//                        $retVal = stream_socket_enable_crypto($this->conn, TRUE, STREAM_CRYPTO_METHOD_ANY_CLIENT);
-//                        if($retVal === TRUE){
+//                        $retVal = stream_socket_enable_crypto($this->conn, true, STREAM_CRYPTO_METHOD_ANY_CLIENT);
+//                        if($retVal === true){
 //                            Logger::log('Secure connection enabled.');
 //                            $this->sendC('EHLO '.$this->host);
 //                        }
@@ -708,13 +738,13 @@ class SocketMailer {
                     }
                     else{
                         //Logger::log('No secure connection will be used.');
-                        //$retVal = TRUE;
+                        //$retVal = true;
                     }
                 }
                 
             }
             else{
-                $retVal = FALSE;
+                $retVal = false;
             }
         }
         return $retVal;

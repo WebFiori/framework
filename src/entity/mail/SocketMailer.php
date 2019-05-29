@@ -368,7 +368,7 @@ class SocketMailer {
      * @param string $name The name of the email receiver (such as 'Ibrahim'). It 
      * must be non-empty string.
      * @param string $address The email address of the receiver. It must be 
-     * non-empty string.
+     * non-empty string. It will act as the identifier for the address.
      * @param boolean $isCC If set to true, the receiver will receive 
      * a carbon copy (CC) of the message. Default is false.
      * @param boolean $isBcc If set to true, the receiver will receive 
@@ -377,9 +377,9 @@ class SocketMailer {
      * @since 1.0
      */
     public function addReceiver($name, $address, $isCC=false, $isBcc=false){
-        $nameTrimmed = trim($name);
+        $nameTrimmed = trim(str_replace('<', '', str_replace('>', '', $name)));
         if(strlen($nameTrimmed) != 0){
-            $addressTrimmed = trim($address);
+            $addressTrimmed = trim(str_replace('<', '', str_replace('>', '', $address)));
             if(strlen($addressTrimmed) != 0){
                 if($isBcc){
                     $this->bcc[$addressTrimmed] = $nameTrimmed;

@@ -226,10 +226,11 @@ class AutoLoader{
         $cArr = explode('\\', $classPath);
         $className = $cArr[count($cArr) - 1];
         $loaded = false;
+        $root = $this->getRoot();
         foreach ($this->searchFolders as $value) {
-            $f = $this->getRoot().$value.$DS.$className.'.php';
+            $f = $root.$value.$DS.$className.'.php';
             //lower case class name to support loading of old-style classes.
-            $f2 = $this->getRoot().$value.$DS. strtolower($className).'.php';
+            $f2 = $root.$value.$DS. strtolower($className).'.php';
             if(file_exists($f)){
                 require_once $f;
                 $loaded = true;

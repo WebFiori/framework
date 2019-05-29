@@ -2,7 +2,7 @@
 <phpunit stderr="true" colors="true" bootstrap="bootstrap.php">
     <php>
         <server name="HTTP_HOST" value="localhost"/>
-        <sevrer name="REMOTE_ADDR" value="127.0.0.1"/>
+        <server name="REMOTE_ADDR" value="127.0.0.1"/>
     </php>
     <filter>
         <whitelist addUncoveredFilesFromWhitelist="true">

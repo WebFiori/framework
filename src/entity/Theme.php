@@ -171,8 +171,9 @@ abstract class Theme implements JsonI{
      * @param string $url The base URL that will be used by the theme.
      */
     public function setBaseURL($url) {
-        if(strlen(trim($url)) > 0){
-            $this->baseUrl = $url;
+        $trimmed = trim($url);
+        if(strlen($trimmed) > 0){
+            $this->baseUrl = $trimmed;
         }
     }
     /**
@@ -326,9 +327,9 @@ abstract class Theme implements JsonI{
      */
     public static function getAvailableThemes(){
         $themes = array();
-        $themesDirs = array_diff(scandir(ROOT_DIR.'/'. self::THEMES_DIR), array('..', '.'));
+        $themesDirs = array_diff(scandir(ROOT_DIR.DIRECTORY_SEPARATOR. self::THEMES_DIR), array('..', '.'));
         foreach ($themesDirs as $dir){
-            $pathToScan = ROOT_DIR.'/'.self::THEMES_DIR.'/'.$dir;
+            $pathToScan = ROOT_DIR.DIRECTORY_SEPARATOR.self::THEMES_DIR.DIRECTORY_SEPARATOR.$dir;
             $filesInDir = array_diff(scandir($pathToScan), array('..', '.'));
             foreach ($filesInDir as $fileName){
                 $fileExt = substr($fileName, -4);
@@ -354,7 +355,7 @@ abstract class Theme implements JsonI{
     public function setName($name) {
         $trimmed = trim($name);
         if(strlen($trimmed) != 0){
-            $this->themeMeta['name'] = $trimmed.'';
+            $this->themeMeta['name'] = $trimmed;
         }
     }
     /**
@@ -375,7 +376,7 @@ abstract class Theme implements JsonI{
     public function setUrl($url) {
         $trimmed = trim($url);
         if(strlen($trimmed) > 0){
-            $this->themeMeta['url'] = $trimmed.'';
+            $this->themeMeta['url'] = $trimmed;
         }
     }
     /**
@@ -386,7 +387,7 @@ abstract class Theme implements JsonI{
     public function setAuthor($author) {
         $trimmed = trim($author);
         if(strlen($trimmed) > 0){
-            $this->themeMeta['author'] = $trimmed.'';
+            $this->themeMeta['author'] = $trimmed;
         }
     }
     /**
@@ -397,7 +398,7 @@ abstract class Theme implements JsonI{
     public function setAuthorUrl($authorUrl) {
         $trimmed = trim($authorUrl);
         if(strlen($trimmed) > 0){
-            $this->themeMeta['author-url'] = $trimmed.'';
+            $this->themeMeta['author-url'] = $trimmed;
         }
     }
     /**
@@ -407,8 +408,9 @@ abstract class Theme implements JsonI{
      * @since 1.0
      */
     public function setVersion($vNum) {
-        if(strlen($vNum) != 0){
-            $this->themeMeta['version'] = $vNum.'';
+        $trimmed = trim($vNum);
+        if(strlen($trimmed) != 0){
+            $this->themeMeta['version'] = $trimmed;
         }
     }
     /**
@@ -417,8 +419,9 @@ abstract class Theme implements JsonI{
      * @since 1.0
      */
     public function setLicenseName($text) {
-        if(strlen($text) != 0){
-            $this->themeMeta['license'] = $text.'';
+        $trimmed = trim($text);
+        if(strlen($trimmed) != 0){
+            $this->themeMeta['license'] = $trimmed;
         }
     }
     /**
@@ -427,8 +430,9 @@ abstract class Theme implements JsonI{
      * @since 1.0
      */
     public function setLicenseUrl($url) {
-        if(strlen($url) > 0){
-            $this->themeMeta['license-url'] = $url.'';
+        $trimmed = trim($url);
+        if(strlen($trimmed) > 0){
+            $this->themeMeta['license-url'] = $trimmed;
         }
     }
     /**
@@ -438,8 +442,9 @@ abstract class Theme implements JsonI{
      * @since 1.0
      */
     public function setDescription($desc) {
-        if(strlen($desc) > 0){
-            $this->themeMeta['description'] = $desc.'';
+        $trimmed = trim($desc);
+        if(strlen($trimmed) > 0){
+            $this->themeMeta['description'] = $trimmed;
         }
     }
     /**
@@ -449,8 +454,9 @@ abstract class Theme implements JsonI{
      * @since 1.0
      */
     public function setDirectoryName($name) {
-        if(strlen($name) != 0){
-            $this->themeMeta['directory'] = $name.'';
+        $trimmed = trim($name);
+        if(strlen($trimmed) != 0){
+            $this->themeMeta['directory'] = $trimmed;
         }
     }
     /**
@@ -469,8 +475,9 @@ abstract class Theme implements JsonI{
      * @since 1.0
      */
     public function setImagesDirName($name) {
-        if(strlen($name) != 0){
-            $this->imagesDir = $name;
+        $trimmed = trim($name);
+        if(strlen($trimmed) != 0){
+            $this->imagesDir = $trimmed;
         }
     }
     /**
@@ -490,8 +497,9 @@ abstract class Theme implements JsonI{
      * @since 1.0
      */
     public function setJsDirName($name) {
-        if(strlen($name) != 0){
-            $this->jsDir = $name;
+        $trimmed = trim($name);
+        if(strlen($trimmed) != 0){
+            $this->jsDir = $trimmed;
         }
     }
     /**
@@ -511,8 +519,9 @@ abstract class Theme implements JsonI{
      * @since 1.0
      */
     public function setCssDirName($name) {
-        if(strlen($name) != 0){
-            $this->cssDir = $name;
+        $trimmed = trim($name);
+        if(strlen($trimmed) != 0){
+            $this->cssDir = $trimmed;
         }
     }
     /**

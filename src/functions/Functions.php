@@ -212,9 +212,8 @@ class Functions {
             }
         }
         else{
-            $conInfo = Config::getDBConnection($connName);
-            if($conInfo instanceof DBConnectionInfo){
-                $retVal = $this->_connect($conInfo);
+            if($dbConn instanceof DBConnectionInfo){
+                $retVal = $this->_connect($dbConn);
             }
             else{
                 if($this->defaultConn !== null){
@@ -309,20 +308,25 @@ class Functions {
         if($qObj instanceof MySQLQuery){
             if($connName !== null){
                 $connectResult = $this->useDatabase($connName);
-                if($connectResult == self::NO_SUCH_CONNECTION){
+                if($connectResult === true){
+                    $retVal = $this->_runQuery($qObj);
+                }
+                else if($connectResult == self::NO_SUCH_CONNECTION){
                     return self::NO_SUCH_CONNECTION;
                 }
-                else if($connectResult === false){
-                    return false;
-                }
                 else{
-                    $retVal = $this->_runQuery($qObj);
+                    return false;
                 }
             }
             else{
-                $retVal = $this->useDatabase();
-                if($retVal === true){
+                if($this->getDBLink() !== null){
                     $retVal = $this->_runQuery($qObj);
+                }
+                else{
+                    $retVal = $this->useDatabase();
+                    if($retVal === true){
+                        $retVal = $this->_runQuery($qObj);
+                    }
                 }
             }
         }

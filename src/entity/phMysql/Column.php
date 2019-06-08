@@ -668,7 +668,7 @@ class Column{
         if($type == 'varchar'){
             $retVal .= 'collate '.$this->getCollation().' ';
         }
-        if($default != null){
+        if($default !== null){
             if($this->getType() == 'varchar'){
                 $retVal .= 'default \''.$default.'\' ';
             }

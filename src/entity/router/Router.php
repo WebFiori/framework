@@ -64,7 +64,7 @@ use jsonx\JsonX;
  * </pre> 
  * </p>
  * @author Ibrahim
- * @version 1.3.4
+ * @version 1.3.5
  */
 class Router {
     /**
@@ -96,6 +96,13 @@ class Router {
      * @since 1.0
      */
     private $onNotFound;
+    /**
+     * An object of type 'RouterUri' which represents the route that the 
+     * user was sent to.
+     * @var RouterUri 
+     * @since 1.3.5
+     */
+    private $uriObj;
     /**
      * A single instance of the router.
      * @var Router
@@ -496,12 +503,24 @@ class Router {
         }
     }
     /**
+     * Returns an object of type 'RouterUri' which contains route information.
+     * When the method Router::route() is called and a route is found, an 
+     * object of type 'RouterUri' is created which has route information. 
+     * @return RouterUri|null An object which has route information. If the 
+     * method 'Router::route()' is not yet called or no route was found, 
+     * the method will return null.
+     * @since 1.3.5
+     */
+    public static function getRouteUri() {
+        return self::get()->uriObj;
+    }
+    /**
      * Route a given URI to its specified route.
      * If the router has no routes, the router will send back a '418 - I'm A 
      * Teapot' response. If the route is available but the file that the 
      * router is routing to does not exist, a '500 - Server Error' Response 
      * with the message 'The resource 'a_resource' was available but its route is not configured correctly.' is 
-     * sent back. If the route is not found,  The router will call the function 
+     * sent back. If the route is not found, The router will call the function 
      * that was set by the user in case a route is not found.
      * @param string $uri A URI such as 'http://www.example.com/hello/ibrahim'
      * @since 1.0
@@ -515,11 +534,13 @@ class Router {
                     if($route->getUri() == $routeUri->getUri()){
                         if(is_callable($route->getRouteTo())){
                             call_user_func($route->getRouteTo(),$route->getClosureParams());
+                            $this->uriObj = $route;
                             return;
                         }
                         else{
                             $file = $route->getRouteTo();
                             if(file_exists($file)){
+                                $this->uriObj = $route;
                                 require_once $file;
                             }
                             else{
@@ -579,6 +600,7 @@ class Router {
                     //if all variables are set, then we found our route.
                     if($route->isAllVarsSet()){
                         if(is_callable($route->getRouteTo())){
+                            $this->uriObj = $route;
                             call_user_func($route->getRouteTo(),$route->getClosureParams());
                             return;
                         }
@@ -586,6 +608,7 @@ class Router {
                             if($route->getType() == self::API_ROUTE){
                                 define('API_CALL', true);
                             }
+                            $this->uriObj = $route;
                             require_once $route->getRouteTo();
                             return;
                         }

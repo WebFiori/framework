@@ -28,6 +28,7 @@ if(!defined('ROOT_DIR')){
     die('<!DOCTYPE html><html><head><title>Not Found</title></head><body>'
     . '<h1>404 - Not Found</h1><hr><p>The requested resource was not found on the server.</p></body></html>');
 }
+use webfiori\entity\Util;
 /**
  * A class that is used to split URIs and get their parameters.
  * The main aim of this class is to extract URI parameters including:

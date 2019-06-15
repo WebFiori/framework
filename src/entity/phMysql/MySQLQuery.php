@@ -631,7 +631,7 @@ abstract class MySQLQuery{
      * @param array $vals An array that contains values. 
      * @param array $valsConds An array that can contains two possible values: 
      * '=' or '!='. If anything else is given at specific index, '=' will be used. 
-     * Note that if the value at '$vals[$index]' is equal to 'IS null' or 'IS NOT null', 
+     * Note that if the value at '$vals[$index]' is equal to 'IS NULL' or 'IS NOT NULL', 
      * The value at '$valsConds[$index]' is ignored. 
      * @param array $jointOps An array of conditions (Such as 'or', 'and', 'xor').
      * @since 1.6
@@ -647,7 +647,7 @@ abstract class MySQLQuery{
             }
             if($col instanceof Column){
                 $valUpper = strtoupper(trim($vals[$index]));
-                if($valUpper == 'IS null' || $valUpper == 'IS NOT null'){
+                if($valUpper == 'IS NULL' || $valUpper == 'IS NOT NULL'){
                     if($index + 1 == $count){
                         $where .= $col->getName().' '.$vals[$index].'';
                     }
@@ -891,7 +891,7 @@ abstract class MySQLQuery{
             }
             if($col instanceof Column){
                 $valUpper = gettype($vals[$index]) != 'array' ? strtoupper(trim($vals[$index])) : '';
-                if($valUpper == 'IS null' || $valUpper == 'IS NOT null'){
+                if($valUpper == 'IS NULL' || $valUpper == 'IS NOT NULL'){
                     if($index + 1 == $count){
                         $where .= $col->getName().' '.$valUpper.'';
                     }

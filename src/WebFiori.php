@@ -204,7 +204,6 @@ class WebFiori{
            require_once ROOT_DIR.'/entity/AutoLoader.php';
         }
         self::$AU = AutoLoader::get();
-
         //display PHP warnings and errors
         Util::displayErrors();
         
@@ -281,7 +280,13 @@ class WebFiori{
         self::$SF = SystemFunctions::get();
         self::$WF = WebsiteFunctions::get();
         self::$BMF = BasicMailFunctions::get();
-        
+        //initialize main session with name = 'wf-session'.
+        self::$WF->useSession([
+            'name'=>'wf-session',
+            'create-new'=>true,
+            'duration'=>60*24*7,
+            'refresh'=>true
+        ]);
         $this->sysStatus = Util::checkSystemStatus(true);
         if($this->sysStatus == Util::MISSING_CONF_FILE || $this->sysStatus == Util::MISSING_SITE_CONF_FILE){
             self::$SF->createConfigFile();

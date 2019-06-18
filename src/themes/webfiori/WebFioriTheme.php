@@ -24,17 +24,11 @@ class WebFioriTheme extends Theme{
         $this->setJsDirName('js');
         $this->setCssDirName('css');
         $this->addComponents(array(
-            'WebFioriGUI.php','LangExt.php'
+            'LangExt.php'
         ));
         $this->setBeforeLoaded(function(){
-            WebsiteFunctions::get()->useSession(array(
-                'name'=>'lang-session',
-                'create-new'=>true,
-                'duration'=>60*24*7,
-                'refresh'=>TRUE
-            ));
             $session = WebsiteFunctions::get()->getSession();
-            $lang = $session->getLang(TRUE);
+            $lang = $session->getLang(true);
             Page::lang($lang);
             if($lang == 'AR'){
                 Page::dir('rtl');
@@ -45,7 +39,7 @@ class WebFioriTheme extends Theme{
         });
         $this->setAfterLoaded(function(){
             $session = WebsiteFunctions::get()->getSession();
-            Page::lang($session->getLang(TRUE));
+            Page::lang($session->getLang(true));
             Page::document()->getChildByID('main-content-area')->setClassName('pa-'.Page::dir().'-col-10');
             Page::document()->getChildByID('side-content-area')->setClassName('pa-'.Page::dir().'-col-2');
             Page::document()->getChildByID('page-body')->setClassName('pa-row');
@@ -89,7 +83,7 @@ class WebFioriTheme extends Theme{
         $socialMedia->setID('social-media-container');
         $socialMedia->setWritingDir($page->getWritingDir());
 
-        $facebookIcon = new HTMLNode('img', FALSE);
+        $facebookIcon = new HTMLNode('img', false);
         $facebookIcon->setAttribute('src', $page->getThemeImagesDir().'/facebook.png');
         $facebookIcon->setClassName('social-media-icon');
         $facebookLink = new HTMLNode('a');
@@ -98,7 +92,7 @@ class WebFioriTheme extends Theme{
         $facebookLink->addChild($facebookIcon);
         $socialMedia->addChild($facebookLink);
 
-        $twtrIcon = new HTMLNode('img', FALSE);
+        $twtrIcon = new HTMLNode('img', false);
         $twtrIcon->setAttribute('src', $page->getThemeImagesDir().'/tweeter.png');
         $twtrIcon->setClassName('social-media-icon');
         $twtrLink = new HTMLNode('a');
@@ -107,7 +101,7 @@ class WebFioriTheme extends Theme{
         $twtrLink->addChild($twtrIcon);
         $socialMedia->addChild($twtrLink);
 
-        $linkedinIcon = new HTMLNode('img', FALSE);
+        $linkedinIcon = new HTMLNode('img', false);
         $linkedinIcon->setAttribute('src', $page->getThemeImagesDir().'/linkedin.png');
         $linkedinIcon->setClassName('social-media-icon');
         $linkedinLink = new HTMLNode('a');
@@ -116,7 +110,7 @@ class WebFioriTheme extends Theme{
         $linkedinLink->addChild($linkedinIcon);
         $socialMedia->addChild($linkedinLink);
 
-        $snapIcon = new HTMLNode('img', FALSE);
+        $snapIcon = new HTMLNode('img', false);
         $snapIcon->setAttribute('src', $page->getThemeImagesDir().'/snapchat.png');
         $snapIcon->setClassName('social-media-icon');
         $snapLink = new HTMLNode('a');
@@ -129,15 +123,15 @@ class WebFioriTheme extends Theme{
         $contactInfo = new HTMLNode();
         $contactInfo->setClassName('pa-'.Page::dir().'-col-12');
         $p = new PNode();
-        $p->addText('013 xxx xxxx', array('new-line'=>TRUE));
-        $p->addText('youremail@example.com',array('new-line'=>TRUE));
+        $p->addText('013 xxx xxxx', array('new-line'=>true));
+        $p->addText('youremail@example.com',array('new-line'=>true));
         $contactInfo->addChild($p);
         $node->addChild($contactInfo);
         $p->addText('Your Copyright Notice © 2018');
         $div = new HTMLNode('div');
         $div->setAttribute('class', 'pa-ltr-col-twelve');
         $div->addTextNode('<b style="color:gray;font-size:8pt;">Powered By: <a href="https://github.com/usernane/webfiori" '
-                . 'target="_blank">WebFiori Framework</a> v'.Config::getVersion().' ('.Config::getVersionType().')</b>');
+                . 'target="_blank">WebFiori Framework</a> v'.Config::getVersion().' ('.Config::getVersionType().')</b>',false);
         $node->addChild($div);
         return $node;
     }
@@ -158,7 +152,7 @@ class WebFioriTheme extends Theme{
         $logoContainer = new HTMLNode();
         $logoContainer->setID('inner-header');
         $logoContainer->setClassName('pa-'.Page::dir().'-col-11-nm-np');
-        $img = new HTMLNode('img', FALSE);
+        $img = new HTMLNode('img', false);
         $img->setAttribute('src',Page::imagesDir().'/WebsiteIcon_1024x1024.png');
         $img->setClassName('pa-'.Page::dir().'-col-1-np-nm');
         $img->setID('logo');
@@ -166,18 +160,18 @@ class WebFioriTheme extends Theme{
         $link = new LinkNode(SiteConfig::getHomePage(), '');
         $link->addChild($img);
         $headerSec->addChild($link);
-        $langCode = WebsiteFunctions::get()->getSession()->getLang(TRUE);
+        $langCode = WebsiteFunctions::get()->getSession()->getLang(true);
         $p = new PNode();
         $siteNames = SiteConfig::getWebsiteNames();
         if(isset($siteNames[$langCode])){
-            $p->addText($siteNames[$langCode], array('bold'=>TRUE));
+            $p->addText($siteNames[$langCode], array('bold'=>true));
         }
         else{
             if(isset($_GET['language']) && isset($siteNames[$_GET['language']])){
-                $p->addText($siteNames[$_GET['language']], array('bold'=>TRUE));
+                $p->addText($siteNames[$_GET['language']], array('bold'=>true));
             }
             else{
-                $p->addText('<SITE NAME>', array('bold'=>TRUE));
+                $p->addText('<SITE NAME>', array('bold'=>true));
             }
         }
         $logoContainer->addChild($p);
@@ -195,11 +189,58 @@ class WebFioriTheme extends Theme{
         $logoContainer->addChild($menu);
         return $headerSec;
     }
-
+    /**
+     * 
+     * @param array $options An associative array of options. Available 
+     * options are:
+     * <ul>
+     * <li>type: The type of the node that will be created. Supported 
+     * types are: 
+     * <ul>
+     * <li>div (default)</li>
+     * <li>wf-row</li>
+     * <li>wf-col</li>
+     * </ul>
+     * </li>
+     * </ul>
+     * @return HTMLNode
+     */
     public function createHTMLNode($options = array()) {
-        $node = new HTMLNode();
-        return $node;
+        $nodeType = isset($options['type']) ? $options['type'] : 'div';
+        $withPadding = isset($options['with-padding']) ? $options['with-padding'] === true : true;
+        $withMargin = isset($options['with-margin']) ? $options['with-margin'] === true : true;
+        if($nodeType == 'div'){
+            $node = new HTMLNode();
+            return $node;
+        }
+        else if($nodeType == 'wf-row'){
+            $wp = $withPadding === true ? '' : '-np';
+            $wm = $withMargin === true ? '' : '-nm';
+            $node = new HTMLNode();
+            $node->setClassName('pa-row'.$wm.$wp);
+            return $node;
+        }
+        else if($nodeType == 'wf-col'){
+            $colSize = isset($options['size']) ? $options['size'] : 12;
+            if($colSize > 12 || $colSize < 1){
+                $colSize = 12;
+            }
+            $wp = $withPadding === true ? '' : '-np';
+            $wm = $withMargin === true ? '' : '-nm';
+            $node = new HTMLNode();
+            $node->setClassName('pa-'.Page::get()->getWritingDir().'-col-'.$colSize.$wm.$wp);
+            return $node;
+        }
+        else if($nodeType == 'page-title'){
+            $titleRow = $this->createHTMLNode([
+                'type'=>'wf-row'
+            ]);
+            $title = isset($options['title']) ? $options['title'] : Page::title();
+            $h1 = new HTMLNode('h2');
+            $h1->addTextNode($title);
+            $h1->setClassName('pa-'.Page::dir().'-col-10-nm-np');
+            $titleRow->addChild($h1);
+        }
     }
-
 }
 

@@ -65,6 +65,20 @@ THE SOFTWARE.
         display: none;
     }
 }
+#page-header{
+    position: fixed;
+    top: 0;
+    margin-top: 0;
+}
+#page-body{
+    top: 100px;
+    position: relative;
+    z-index: -1;
+}
+#page-footer{
+    position: relative;
+    top: 100px;
+}
 *{
     font-family: Tahoma, Arial, sans-serif
 }

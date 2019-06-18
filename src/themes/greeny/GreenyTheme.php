@@ -41,12 +41,7 @@ class GreenyTheme extends Theme{
             Page::document()->getChildByID('main-content-area')->addTextNode('Main Content Area.');
         });
         $this->setBeforeLoaded(function(){
-            WebsiteFunctions::get()->useSession(array(
-                'name'=>'lang-session',
-                'create-new'=>true,
-                'duration'=>60*24*7,
-                'refresh'=>TRUE
-            ));
+            
         });
     }
     public function getAsideNode() {

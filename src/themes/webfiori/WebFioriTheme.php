@@ -50,7 +50,7 @@ class WebFioriTheme extends Theme{
             LangExt::extLang();
             $translation = &Page::translation();
             //adding menu items 
-            $mainMenu = &Page::document()->getChildByID('main-menu');
+            $mainMenu = &Page::document()->getChildByID('menu-items-container');
 
             $item1 = new ListItem();
             $link1 = new LinkNode(SiteConfig::getBaseURL(), $translation->get('menus/main-menu/menu-item-1'));
@@ -179,11 +179,11 @@ class WebFioriTheme extends Theme{
         //end of logo UI
         //starting of main menu items
         $menu = new HTMLNode('nav');
-        $menu->setID('main-nav');
-        $menu->setClassName('pa-'.Page::dir().'-col-9');
+        $menu->setID('main-navigation-menu');
+        $menu->setClassName('pa-'.Page::dir().'-col-9-np');
         $ul = new UnorderedList();
-        $ul->setID('main-menu');
-        $ul->setClassName('pa-row');
+        $ul->setID('menu-items-container');
+        $ul->setClassName('pa-row-nm-np');
         $ul->setAttribute('dir', Page::dir());
         $menu->addChild($ul);
         $logoContainer->addChild($menu);

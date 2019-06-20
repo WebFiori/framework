@@ -36,18 +36,6 @@ THE SOFTWARE.
         border-bottom-width: 0 !important;
         border-top-width: 0 !important;
     }
-    #mobile-menu{
-        left: 0;
-        right: 0;
-        top: 0;
-    }
-    ul#main-menu > li{
-        width: 100%;
-        margin: 0 !important;
-        padding: 5px;
-        border-top: 1px solid;
-        display: none;
-    }
     #logo{
         width: 15% !important;
     }
@@ -63,6 +51,9 @@ THE SOFTWARE.
     #inner-header p{
         text-align: center;
         display: none;
+    }
+    ul#menu-items-container li{
+        float: none !important;
     }
 }
 #page-header{
@@ -99,26 +90,10 @@ THE SOFTWARE.
 #page-footer{
     font-size: 8pt;
 }
-ul#main-menu > li:hover{
-    background-color: #61e290;
-}
 .social-media-icon{
     width: 25px;
     height: 25px;
     margin: 5px;
-}
-#main-nav ul{
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-#main-nav ul li{
-    margin-left: 25px;
-    margin-right: 25px;
-    float: left;
-}
-#main-nav ul[dir=rtl] li{
-    float: right;
 }
 h1#page-title{
     font-weight: bold;
@@ -154,4 +129,43 @@ h2#post-title{
 }
 #pa-side-nav[dir=rtl]{
     border-right-width: 10px;
+}
+#logo{
+    max-width: 100px;
+}
+ul#menu-items-container li{
+    list-style: none;
+    list-style-type: none;
+    margin-left: 20px;
+    margin-right: 20px;
+}
+ul#menu-items-container[dir=ltr] li{
+    float: left;
+}
+ul#menu-items-container[dir=rtl] li{
+    float: right;
+}
+ul#menu-items-container li:hover{
+    background-color: #61e290;
+}
+ul#menu-items-container li{
+    transition: 0.5s;
+}
+#main-navigation-menu li:hover > .sub-menu{
+    display: block;
+}
+ul#menu-items-container .sub-menu{
+    display: none;
+    padding: 0;
+    background-color: #333;
+    position: fixed;
+}
+ul#menu-items-container .sub-menu li{
+    float: none;
+}
+#main-navigation-menu{
+    background-color: black;
+    top: 0;
+    left: 0.5%;
+    margin: 0;
 }

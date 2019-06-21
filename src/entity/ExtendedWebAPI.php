@@ -28,6 +28,7 @@ if(!defined('ROOT_DIR')){
     die('<!DOCTYPE html><html><head><title>Not Found</title></head><body>'
     . '<h1>404 - Not Found</h1><hr><p>The requested resource was not found on the server.</p></body></html>');
 }
+use webfiori\WebFiori;
 use restEasy\WebAPI;
 use webfiori\entity\langs\Language;
 use webfiori\conf\SiteConfig;
@@ -80,13 +81,13 @@ abstract class ExtendedWebAPI extends WebAPI{
     private function _setTranslation() {
         $reqMeth = $this->getRequestMethod();
         if($reqMeth == 'GET' || $reqMeth == 'DELETE'){
-            $langCode = isset($_GET['lang']) ? filter_var($_GET['lang']) : SiteConfig::getPrimaryLanguage();
+            $langCode = isset($_GET['lang']) ? filter_var($_GET['lang']) : WebFiori::getWebsiteFunctions()->getSessionLang();
         }
         else if($reqMeth == 'POST' || $reqMeth == 'PUT'){
-            $langCode = isset($_POST['lang']) ? filter_var($_POST['lang']) : SiteConfig::getPrimaryLanguage();
+            $langCode = isset($_POST['lang']) ? filter_var($_POST['lang']) : WebFiori::getWebsiteFunctions()->getSessionLang();
         }
         else{
-            $langCode = SiteConfig::getPrimaryLanguage();
+            $langCode = WebFiori::getWebsiteFunctions()->getSessionLang();
         }
         $this->translation = &Language::loadTranslation($langCode);
     }

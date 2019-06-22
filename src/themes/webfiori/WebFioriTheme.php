@@ -235,11 +235,13 @@ class WebFioriTheme extends Theme{
             $titleRow = $this->createHTMLNode([
                 'type'=>'wf-row'
             ]);
+            $titleRow->setID('page-title');
             $title = isset($options['title']) ? $options['title'] : Page::title();
             $h1 = new HTMLNode('h2');
             $h1->addTextNode($title);
             $h1->setClassName('pa-'.Page::dir().'-col-10-nm-np');
             $titleRow->addChild($h1);
+            return $titleRow;
         }
     }
 }

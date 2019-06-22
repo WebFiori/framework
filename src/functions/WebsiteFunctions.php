@@ -35,7 +35,7 @@ use webfiori\conf\SiteConfig;
  * save them to the file 'SiteConfig.php'
  *
  * @author Ibrahim
- * @version 1.0
+ * @version 1.0.1
  */
 class WebsiteFunctions extends Functions{
     /**
@@ -100,6 +100,30 @@ class WebsiteFunctions extends Functions{
      */
     public function __construct() {
         parent::__construct();
+        $this->useSession([
+            'name'=>'wf-session',
+            'create-new'=>true,
+            'duration'=>60*24*7,
+            'refresh'=>true
+        ]);
+    }
+    /**
+     * Initialize new session or use an existing one.
+     * Note that the name of the session must be 'wf-session' in 
+     * order to initialize it.
+     * @param array $options An array of session options. See 
+     * Functions::useSettion() for more information about available options.
+     * @return boolean If session is created or resumed, the method will 
+     * return true. False otherwise.
+     * @since 1.0.1
+     */
+    public function useSession($options=[]) {
+        if(gettype($options) == 'array' && isset($options['name'])){
+            if($options['name'] == 'wf-session'){
+                return parent::useSession($options);
+            }
+        }
+        return false;
     }
     /**
      * Creates the file 'SiteConfig.php' if it does not exist.

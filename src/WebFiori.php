@@ -281,12 +281,6 @@ class WebFiori{
         self::$WF = WebsiteFunctions::get();
         self::$BMF = BasicMailFunctions::get();
         //initialize main session with name = 'wf-session'.
-        self::$WF->useSession([
-            'name'=>'wf-session',
-            'create-new'=>true,
-            'duration'=>60*24*7,
-            'refresh'=>true
-        ]);
         $this->sysStatus = Util::checkSystemStatus(true);
         if($this->sysStatus == Util::MISSING_CONF_FILE || $this->sysStatus == Util::MISSING_SITE_CONF_FILE){
             self::$SF->createConfigFile();

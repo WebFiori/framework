@@ -74,3 +74,9 @@ button:hover, input[type=submit]:hover{
     background-color:rgb(55, 155, 119);
     cursor: pointer;
 }
+#page-title{
+    background-color: rgba(0,155,0,0.1);
+    border-bottom-style: double;
+    margin: 0;
+    margin-bottom: 25px;
+}

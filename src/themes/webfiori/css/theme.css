@@ -52,13 +52,25 @@ THE SOFTWARE.
         text-align: center;
         display: none;
     }
+    ul#menu-items-container{
+        display: none
+    }
     ul#menu-items-container li{
         float: none !important;
         margin-top: 10px;
-        display: none
+        border-bottom-style: double;
+        border-color: whitesmoke;
     }
-    #main-navigation-menu ul#menu-items-container:hover li{
+    li.sub-menu{
+        display: none;
+    }
+    #main-navigation-menu:hover ul, ul#menu-items-container.sub-menu{
         display: block;
+    }
+    #main-navigation-menu::before{
+        content: "\2630";
+        font-size: 18pt;
+        color: white;
     }
 }
 #page-header{
@@ -155,8 +167,6 @@ ul#menu-items-container li:hover{
 }
 ul#menu-items-container li{
     transition: 0.5s;
-    border-bottom-style: double;
-    border-color: whitesmoke;
 }
 #main-navigation-menu li:hover > .sub-menu{
     display: block;
@@ -170,13 +180,7 @@ ul#menu-items-container .sub-menu{
 ul#menu-items-container .sub-menu li{
     float: none;
 }
-#main-navigation-menu::before{
-    content: "\2630";
-    font-size: 18pt;
-    color: white;
-}
 #main-navigation-menu{
-    background-color: black;
     top: 0;
     left: 0.5%;
     margin: 0;

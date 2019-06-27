@@ -41,7 +41,7 @@ use webfiori\conf\Config;
  * the system uses any. The developer can extend this class to add his own 
  * logic to the application that he is creating.
  * @author Ibrahim
- * @version 1.3.6
+ * @version 1.3.7
  */
 class Functions {
     /**
@@ -92,18 +92,20 @@ class Functions {
      * session options where provided while initiating a new session.
      * The array have the following values:
      * <ul>
-     * <li>duration: 120 </li>
+     * <li>duration: 10080 (one week) </li>
      * <li>refresh: true </li>
-     * <li>name: '' </li>
+     * <li>name: 'wf-session' </li>
+     * <li>create-new: true</li>
      * <li>user: null </li>
      * <li>variables: empty array. </li>
      * </ul>
      * @since 1.3.4
      */
     const DEFAULT_SESSTION_OPTIONS = array(
-        'duration'=>120,
+        'duration'=>10080,
         'refresh'=>true,
-        'name'=>'',
+        'name'=>'wf-session',
+        'create-new'=>true,
         'user'=>null,
         'variables'=>array()
     );
@@ -168,6 +170,8 @@ class Functions {
     }
     /**
      * Creates new instance of the class.
+     * When a new instance of the class is created, a session with name 'wf-sesstion' 
+     * will be linked with it by default.
      * @param string $linkedSessionName The name of the session that will 
      * be linked with the class instance. The name can consist of any character 
      * other than space, comma, semi-colon and equal sign. If the name has one 
@@ -179,6 +183,7 @@ class Functions {
             self::$sessions = array();
         }
         $this->_setDBErrDetails(0, 'NO_ERR');
+        $this->useSession(self::DEFAULT_SESSTION_OPTIONS);
     }
     /**
      * Initiate database connection.
@@ -375,7 +380,7 @@ class Functions {
         return $retVal;
     }
     /**
-     * Initiate new session or use a session which is already initiated.
+     * Initiate new session or use a session which is already initialized.
      * @param array $options An associative array of options. The available options 
      * are: 
      * <ul>
@@ -443,6 +448,39 @@ class Functions {
             $retVal = &self::$sessions[$this->sessionName];
         }
         return $retVal;
+    }
+    /**
+     * Returns session variable given its name.
+     * @param string $varName The name of session variable.
+     * @return mixed If the session is running and the variable is set, its 
+     * value is returned. If no session is running or the variable is not set, 
+     * the method will return null.
+     * @since 1.3.7
+     */
+    public function getSessionVar($varName) {
+        $session = $this->getSession();
+        if($session !== null){
+            return $session->getSessionVar($varName);
+        }
+    }
+    /**
+     * Adds or updates the value of a session variable.
+     * @param string $varName The name of session variable. Must be non-empty 
+     * string.
+     * @param mixed $varVal The value of session variable.
+     * @return boolean If the variable is set, the method will return true. 
+     * Other than that, the method will return false.
+     * @since 1.3.7
+     */
+    public function setSessionVar($varName,$varVal) {
+        $trimmedName = trim($varName);
+        if(strlen($trimmedName) != 0){
+            $sesstion = &$this->getSession();
+            if($sesstion !== null){
+                return $sesstion->setSessionVar($trimmedName, $varVal);
+            }
+        }
+        return false;
     }
     /**
      * Returns language code from the currently used session manager.

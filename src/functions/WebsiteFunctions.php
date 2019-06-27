@@ -100,12 +100,6 @@ class WebsiteFunctions extends Functions{
      */
     public function __construct() {
         parent::__construct();
-        $this->useSession([
-            'name'=>'wf-session',
-            'create-new'=>true,
-            'duration'=>60*24*7,
-            'refresh'=>true
-        ]);
     }
     /**
      * Initialize new session or use an existing one.

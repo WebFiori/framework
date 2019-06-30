@@ -46,7 +46,7 @@ use phpStructs\html\PNode;
  * <li>code: The container that contains the code.</li>
  * </ul>
  * @author Ibrahim
- * @version 1.0.1
+ * @version 1.0.2
  */
 class CodeSnippet extends HTMLNode{
     /**
@@ -86,8 +86,15 @@ class CodeSnippet extends HTMLNode{
      */
     private $codeDisplay;
     private $currentLineNum;
+    /**
+     * The original code text.
+     * @var string
+     * @since 1.0.2
+     */
+    private $originalCode;
     public function __construct() {
         parent::__construct();
+        $this->originalCode = '';
         $this->codeStrNode = HTMLNode::createTextNode('');
         $this->currentLineNum = 1;
         $this->codeDisplay = new HTMLNode();
@@ -188,11 +195,30 @@ class CodeSnippet extends HTMLNode{
         $this->titleNode->addText($title);
     }
     /**
+     * Returns the original code title as supplied for the method CodeSnippit::setTitle().
+     * @return string The original code title as supplied for the method 
+     * CodeSnippit::setTitle().
+     * @since 1.0.2
+     */
+    public function getOriginalTitle() {
+        return $this->titleNode->getOriginalText();
+    }
+    /**
+     * Returns the title of the code snippit.
+     * @return string The title of the code snippit. Note that The title which 
+     * will be returned by this method will have HTML special characters escaped.
+     * @since 1.0.2
+     */
+    public function getTitle() {
+        return $this->titleNode->getText();
+    }
+    /**
      * Sets the code that will be displayed by the snippit block.
      * @param string $code The code.
      * @since 1.0
      */
     public function setCode($code) {
+        $this->originalCode = $code;
         $xCode = trim($code);
         $len = strlen($xCode);
         if($len !== 0){
@@ -206,12 +232,21 @@ class CodeSnippet extends HTMLNode{
         $this->codeStrNode->setText($xCode."\n");
     }
     /**
+     * Returns the original text which represents the code.
+     * @return string The original text that represents the code.
+     * @since 1.0.2
+     */
+    public function getOriginalCode() {
+        return $this->originalCode;
+    }
+    /**
      * Adds new line of code to the code snippit.
      * @param string $codeAsTxt The code line. It does not have to include "\n" 
      * character as the method will append it automatically to the string.
      * @since 1.0.1
      */
     public function addCodeLine($codeAsTxt) {
+        $this->originalCode .= $codeAsTxt;
         $this->_addLine();
         $oldCode = $this->codeStrNode->getText();
         $oldCode .= trim($codeAsTxt,"\n\r")."\n";

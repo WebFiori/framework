@@ -31,7 +31,7 @@ use phpStructs\Queue;
  * A class that represents HTML element.
  *
  * @author Ibrahim
- * @version 1.7.5
+ * @version 1.7.6
  */
 class HTMLNode {
     /**
@@ -163,6 +163,19 @@ class HTMLNode {
      */
     private $text;
     /**
+     * The original text of a text node.
+     * @var string 
+     * @since 1.7.6
+     */
+    private $originalText;
+    /**
+     * A boolean value which is set to true in case of using original 
+     * text in the body of the node.
+     * @var boolan
+     * @since 1.7.6 
+     */
+    private $useOriginalTxt;
+    /**
      * Constructs a new instance of the class.
      * @param string $name The name of the node (such as 'div').  If 
      * we want to create a comment node, the name should be '#comment'. If 
@@ -196,6 +209,7 @@ class HTMLNode {
             }
             $this->attributes = array();
         }
+        $this->useOriginalTxt = false;
     }
     /**
      * Validates the name of the node.
@@ -1136,6 +1150,7 @@ class HTMLNode {
      */
     public function setText($text,$escHtmlEntities=true) {
         if($this->isTextNode() || $this->isComment()){
+            $this->originalText = $text;
             if($this->isComment()){
                 $text = str_replace('<!--', ' --', str_replace('-->', '-- ', $text));
             }
@@ -1164,6 +1179,13 @@ class HTMLNode {
             return $this->text;
         }
         return '';
+    }
+    /**
+     * 
+     * @return type
+     */
+    public function getOriginalText() {
+        return $this->originalText;
     }
     /**
      * Returns the value of the text that this node represents.
@@ -1201,6 +1223,37 @@ class HTMLNode {
             return '<!--'.$this->getText().'-->';
         }
         return '';
+    }
+    /**
+     * Sets the value of the property $useOriginalTxt.
+     * The property is used when parsing text nodes. If it is set to true, 
+     * the text that will be in the body of the node will be the exact text 
+     * which was set using the method HTMLNode::setText() (The value which will be 
+     * returned by the method HTMLNode::getOriginalText()). If it is set to 
+     * false, then the text which is in the body of the node will be the 
+     * value which is returned by the method HTMLNode::getText().
+     * @param boolean $boolean True or false.
+     * @since 1.7.6
+     */
+    public function setUseOriginal($boolean) {
+        if($this->isTextNode()){
+            $this->useOriginalTxt = $boolean === true;
+        }
+    }
+    /**
+     * Returns the value of the property $useOriginalTxt.
+     * The property is used when parsing text nodes. If it is set to true, 
+     * the text that will be in the body of the node will be the exact text 
+     * which was set using the method HTMLNode::setText() (The value which will be 
+     * returned by the method HTMLNode::getOriginalText()). If it is set to 
+     * false, then the text which is in the body of the node will be the 
+     * value which is returned by the method HTMLNode::getText().
+     * @return boolean True if original text will be used in the body of the 
+     * text node. False if not. Default is false.
+     * @since 1.7.6
+     */
+    public function isUseOriginalText() {
+        return $this->useOriginalTxt;
     }
     /**
      * Returns a string that represents the opening part of the node.
@@ -1296,7 +1349,12 @@ class HTMLNode {
     private function _pushNode(&$node) {
         if($node->isTextNode()){
             if($node->isFormatted() !== null && $node->isFormatted() === false){
-                $this->htmlString .= $node->getText();
+                if($node->isUseOriginalText()){
+                    $this->htmlString .= $node->getOriginalText();
+                }
+                else{
+                    $this->htmlString .= $node->getText();
+                }
             }
             else{
                 $parent = $node->getParent();
@@ -1506,7 +1564,12 @@ class HTMLNode {
      */
     private function _pushNodeAsCode(&$node,$FO) {
         if($node->isTextNode()){
-            $this->codeString .= $this->_getTab().$node->getText().$this->nl;
+            if($node->isUseOriginalText()){
+                $this->codeString .= $this->_getTab().$node->getOriginalText().$this->nl;
+            }
+            else{
+                $this->codeString .= $this->_getTab().$node->getText().$this->nl;
+            }
         }
         else if($node->isComment()){
             if($FO['with-colors'] === true){

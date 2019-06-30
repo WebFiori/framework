@@ -35,7 +35,7 @@ use phpStructs\LinkedList;
  * </ul>
  *
  * @author Ibrahim
- * @version 1.4
+ * @version 1.4.1
  */
 class HTMLDoc {
     /**
@@ -111,7 +111,7 @@ class HTMLDoc {
         $list = new LinkedList();
         $trimmedVal = strtolower(trim($val));
         if(strlen($trimmedVal) != 0){
-            $this->_getChildrenByTag($trimmedVal, $list, $this->htmlNode);
+            $this->_getChildrenByTag($trimmedVal, $list, $this->getDocumentRoot());
         }
         return $list;
     }
@@ -142,7 +142,7 @@ class HTMLDoc {
      * @since 1.2
      */
     public function &getChildByID($id) {
-        return $this->htmlNode->getChildByID($id);
+        return $this->getDocumentRoot()->getChildByID($id);
     }
     /**
      * Constructs a new HTML document.
@@ -168,8 +168,17 @@ class HTMLDoc {
         $this->body->setAttribute('itemtype', 'http://schema.org/WebPage');
         $this->headNode = new HeadNode();
         $this->htmlNode = new HTMLNode('html');
-        $this->htmlNode->addChild($this->headNode);
-        $this->htmlNode->addChild($this->body);
+        $this->getDocumentRoot()->addChild($this->headNode);
+        $this->getDocumentRoot()->addChild($this->body);
+    }
+    /**
+     * Returns the node that represents the root of the document.
+     * The root node of the document is the node which has the name 'html'.
+     * @return HTMLNode an object of type HTMLNode.
+     * @since 1.4.1
+     */
+    public function &getDocumentRoot() {
+        return $this->htmlNode;
     }
     /**
      * Sets the language of the document.
@@ -183,12 +192,12 @@ class HTMLDoc {
      */
     public function setLanguage($lang){
         if($lang === null){
-            $this->htmlNode->removeAttribute('lang');
+            $this->getDocumentRoot()->removeAttribute('lang');
             return true;
         }
         $trimmedLang = trim($lang);
         if(strlen($trimmedLang) == 2){
-            $this->htmlNode->setAttribute('lang', $trimmedLang);
+            $this->getDocumentRoot()->setAttribute('lang', $trimmedLang);
             return true;
         }
         return false;
@@ -200,8 +209,8 @@ class HTMLDoc {
      * @since 1.0
      */
     public function getLanguage(){
-        if($this->htmlNode->hasAttribute('lang')){
-            return $this->htmlNode->getAttributeValue('lang');
+        if($this->getDocumentRoot()->hasAttribute('lang')){
+            return $this->getDocumentRoot()->getAttributeValue('lang');
         }
         return '';
     }
@@ -214,7 +223,7 @@ class HTMLDoc {
      */
     public function setHeadNode(&$node){
         if($node instanceof HeadNode){
-            if($this->htmlNode->replaceChild($this->headNode, $node)){
+            if($this->getDocumentRoot()->replaceChild($this->headNode, $node)){
                 $this->headNode = $node;
                 return true;
             }
@@ -245,7 +254,7 @@ class HTMLDoc {
             $this->nl = self::NL;
         }
         $this->document = '<!DOCTYPE html>'.$this->nl;
-        $this->document .= $this->htmlNode->toHTML($formatted);
+        $this->document .= $this->getDocumentRoot()->toHTML($formatted);
         return $this->document;
     }
     /**
@@ -274,7 +283,7 @@ class HTMLDoc {
      * @since 1.4
      */
     public function asCode($formattingOptions=HTMLNode::DEFAULT_CODE_FORMAT) {
-        return $this->htmlNode->asCode($formattingOptions);
+        return $this->getDocumentRoot()->asCode($formattingOptions);
     }
     /**
      * Removes a child node from the document.
@@ -287,7 +296,7 @@ class HTMLDoc {
     public function removeChild(&$node) {
         if($node instanceof HTMLNode){
             if($node !== $this->body && $node !== $this->headNode){
-                return $this->_removeChild($this->htmlNode, $node);
+                return $this->_removeChild($this->getDocumentRoot(), $node);
             }
         }
         $null = null;

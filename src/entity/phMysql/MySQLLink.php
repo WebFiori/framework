@@ -379,15 +379,25 @@ class MySQLLink{
                     mysqli_query($this->link, 'set collation_connection =\''.$query->getStructure()->getCollation().'\'');
                 }
                 if(count($eploded) != 1){
-                    $r = mysqli_multi_query($this->link, $query->getQuery());
-                    while(mysqli_more_results($this->link)){
-                        $x = mysqli_store_result($this->link);
-                        mysqli_next_result($this->link);
+                    foreach ($eploded as $xQuery){
+                        if(strlen(trim($xQuery)) != 0){
+                            $r = mysqli_query($this->link, $xQuery);
+                            if($r === false){
+                                $this->lastErrorMessage = $this->link->error;
+                                $this->lastErrorNo = $this->link->errno;
+                                break;
+                            }
+                        }
                     }
-                    if($r !== true){
-                        $this->lastErrorMessage = $this->link->error;
-                        $this->lastErrorNo = $this->link->errno;
-                    }
+//                    $r = mysqli_multi_query($this->link, $query->getQuery());
+//                    while(mysqli_more_results($this->link)){
+//                        $x = mysqli_store_result($this->link);
+//                        mysqli_next_result($this->link);
+//                    }
+//                    if($r !== true){
+//                        $this->lastErrorMessage = $this->link->error;
+//                        $this->lastErrorNo = $this->link->errno;
+//                    }
                     $query->setIsBlobInsertOrUpdate(false);
                     return $r;
                 }

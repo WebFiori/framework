@@ -382,6 +382,14 @@ class JsonX {
                     $arr .= $valueAtKey->toJSON().$comma;
                 }
             }
+            else if($valueAtKey instanceof JsonX){
+                if($asObject === true){
+                    $arr .= '"'.$keys[$x].'":'.$valueAtKey.$comma;
+                }
+                else{
+                    $arr .= $valueAtKey.$comma;
+                }
+            }
             else{
                 if($keyType == 'integer'){
                     if($valueType == 'integer' || $valueType == 'double'){

@@ -506,7 +506,7 @@ abstract class WebAPI implements JsonI{
     public final function getContentType(){
         $c = isset($_SERVER['CONTENT_TYPE']) ? filter_var($_SERVER['CONTENT_TYPE']) : null;
         if($c != null && $c != false){
-            return $c;
+            return trim(explode(';', $c)[0]);
         }
         return null;
     }

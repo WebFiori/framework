@@ -153,7 +153,7 @@ class CronTasksView {
                 . '     disableOrEnableInputs();'
                 . '     source.innerHTML = \'Executing Job...\';'."\n"
                 . '     var xhr = new XMLHttpRequest();'."\n"
-                . '     xhr.open(\'get\',\''.$forceUrl.'\'+jobName);'."\n"
+                . '     xhr.open(\'get\',\''.$forceUrl.'\'+encodeURIComponent(jobName));'."\n"
                 . '     xhr.onreadystatechange = function(){'."\n"
                 . '         if(this.readyState === 4 && this.status === 200){'."\n"
                 . '             source.innerHTML = \'<b>Job Executed Successfully</b>\';'."\n"

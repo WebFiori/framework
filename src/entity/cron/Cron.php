@@ -40,7 +40,7 @@ if(!defined('ROOT_DIR')){
  * Where {BASE_URL} is the web site's base URL and {password} is the password 
  * that was set by the developer to protect the jobs from unauthorized access.
  * @author Ibrahim
- * @version 1.0.2
+ * @version 1.0.3
  */
 class Cron {
     /**
@@ -55,7 +55,7 @@ class Cron {
      */
     private $accessPass;
     /**
-     * A variable that is set to TRUE if job execution log 
+     * A variable that is set to true if job execution log 
      * is enabled.
      * @var boolean
      * @since 1.0.1 
@@ -79,7 +79,7 @@ class Cron {
      * @since 1.0
      */
     private static function &_get(){
-        if(self::$executer === NULL){
+        if(self::$executer === null){
             self::$executer = new Cron();
         }
         return self::$executer;
@@ -154,7 +154,7 @@ class Cron {
             'hour'=>intval(date('H')),
             'minute'=>intval(date('i'))
         );
-        $this->isLogEnabled = FALSE;
+        $this->isLogEnabled = false;
         $this->cronJobsQueue = new Queue();
         $this->_setPassword('');
         $func = function(){
@@ -284,12 +284,12 @@ class Cron {
                     $password = isset($_GET['password']) ? filter_var($_GET['password']) : '';
                     if($password != ''){
                         if($password == Cron::password()){
-                            $jobName = isset($_GET['job-name']) ? filter_var($_GET['job-name']) : NULL;
-                            if($jobName != NULL){
+                            $jobName = isset($_GET['job-name']) ? filter_var($_GET['job-name']) : null;
+                            if($jobName != null){
                                 while ($job = Cron::jobsQueue()->dequeue()){
                                     if($job->getJobName() == $jobName){
-                                        $job->execute(TRUE);
-                                        $this->_logJobExecution($job,TRUE);
+                                        $job->execute(true);
+                                        $this->_logJobExecution($job,true);
                                         http_response_code(200);
                                         die(''
                                         . '<!DOCTYPE html>'
@@ -376,12 +376,12 @@ class Cron {
                     }
                 }
                 else{
-                    $jobName = isset($_GET['job-name']) ? filter_var($_GET['job-name']) : NULL;
-                    if($jobName != NULL){
+                    $jobName = isset($_GET['job-name']) ? filter_var($_GET['job-name']) : null;
+                    if($jobName != null){
                         while ($job = Cron::jobsQueue()->dequeue()){
                             if($job->getJobName() == $jobName){
-                                $job->execute(TRUE);
-                                $this->_logJobExecution($job,TRUE);
+                                $job->execute(true);
+                                $this->_logJobExecution($job,true);
                                 http_response_code(200);
                                 die(''
                                 . '<!DOCTYPE html>'
@@ -506,7 +506,7 @@ class Cron {
         Router::closure('/cron-jobs/list/{password}',$viewJobsFunc);
     }
     private function _setLogEnabled($bool){
-        $this->isLogEnabled = $bool === TRUE ? TRUE : FALSE;
+        $this->isLogEnabled = $bool === true ? true : false;
     }
     private function _isLogEnabled() {
         return $this->isLogEnabled;
@@ -514,14 +514,14 @@ class Cron {
     /**
      * Enable or disable logging for jobs execution. 
      * This method is also used to check if logging is enabled or not.
-     * @param boolean $bool If set to TRUE, a log file that contains the details 
+     * @param boolean $bool If set to true, a log file that contains the details 
      * of the executed jobs will be created in 'logs' folder. Default value 
-     * is NULL.
-     * @return boolean If logging is enabled, the method will return TRUE.
+     * is null.
+     * @return boolean If logging is enabled, the method will return true.
      * @since 1.0.1
      */
     public static function execLog($bool=null) {
-        if($bool !== NULL){
+        if($bool !== null){
             self::_get()->_setLogEnabled($bool);
         }
         return self::_get()->_isLogEnabled();
@@ -540,7 +540,7 @@ class Cron {
      * @param array $funcParams An array of parameters that can be passed to the 
      * function. 
      * @return boolean If the job was created and scheduled, the method will 
-     * return TRUE. Other than that, the method will return FALSE.
+     * return true. Other than that, the method will return false.
      * @since 1.0
      */
     public static function createJob($when='*/5 * * * *',$jobName='',$function='',$funcParams=array()){
@@ -553,20 +553,20 @@ class Cron {
             return self::scheduleJob($job);
         } 
         catch (Exception $ex) {
-            return FALSE;
+            return false;
         }
     }
     /**
      * Creates a daily job to execute every day at specific hour and minute.
      * @param string $time A time in the form 'hh:mm'. hh can have any value 
      * between 0 and 23 inclusive. mm can have any value between 0 and 59 inclusive.
-     * @param string $name An optional name for the job. Can be NULL.
+     * @param string $name An optional name for the job. Can be null.
      * @param callable $func A function that will be executed once it is the 
      * time to run the job.
      * @param array $funcParams An optional array of parameters which will be passed to 
      * the callback that will be executed when its time to execute the job.
      * @return boolean If the job was created and scheduled, the method will 
-     * return TRUE. Other than that, the method will return FALSE.
+     * return true. Other than that, the method will return false.
      * @since 1.0
      */
     public static function dailyJob($time,$name,$func,$funcParams=array()){
@@ -581,7 +581,40 @@ class Cron {
                 }
             }
         }
-        return FALSE;
+        return false;
+    }
+    /**
+     * Create a job that will be executed once every month.
+     * @param int $dayNumber The day of the month at which the job will be 
+     * executed on. It can have any value between 1 and 31 inclusive.
+     * @param string $time A string that represents the time of the day that 
+     * the job will execute on. The format of the time must be 'HH:MM'. where 
+     * HH can have any value from '00' up to '23' and 'MM' can have any value 
+     * from '00' up to '59'.
+     * @param string $name The name of cron job.
+     * @param callable $func A function that will be executed when its time to 
+     * run the job.
+     * @param array $funcParams An optional array of parameters which will be 
+     * passed to job function.
+     * @return boolean If the job was scheduled, the method will return true. 
+     * If not, the method will return false.
+     * @since 1.0.3
+     */
+    public static function monthlyJob($dayNumber,$time,$name,$func,$funcParams=[]) {
+        if($dayNumber > 0 && $dayNumber < 32){
+            $split = explode(':', $time);
+            if(count($split) == 2){
+                if(is_callable($func)){
+                    $job = new CronJob();
+                    $job->setJobName($name);
+                    if($job->everyMonthOn($dayNumber, $time)){
+                        $job->setOnExecution($func, $funcParams);
+                        return self::scheduleJob($job);
+                    }
+                }
+            }
+        }
+        return false;
     }
     /**
      * Creates a job that will be executed on specific time weekly.
@@ -590,13 +623,13 @@ class Cron {
      * for Sunday and 6 is for Saturday.
      * 'hh' can have any value between 0 and 23 inclusive. mm can have any value 
      * between 0 and 59 inclusive.
-     * @param string $name An optional name for the job. Can be NULL
-     * @param callable|NULL $func A function that will be executed once it is the 
+     * @param string $name An optional name for the job. Can be null
+     * @param callable|null $func A function that will be executed once it is the 
      * time to run the job.
      * @param array $funcParams An optional array of parameters which will be passed to 
      * the function.
      * @return boolean If the job was created and scheduled, the method will 
-     * return TRUE. Other than that, the method will return FALSE.
+     * return true. Other than that, the method will return false.
      * @since 1.0
      */
     public static function weeklyJob($time,$name,$func,$funcParams=array()){
@@ -609,19 +642,19 @@ class Cron {
                 return self::scheduleJob($job);
             }
         }
-        return FALSE;
+        return false;
     }
     /**
      * Sets or gets the password that is used to protect the cron instance.
      * The password is used to prevent unauthorized access to execute jobs.
-     * @param string $pass If not NULL, the password will be updated to the 
+     * @param string $pass If not null, the password will be updated to the 
      * given one.
      * @return string If the password is set, the method will return it. 
      * If not set, the method will return the string 'NO_PASSWORD'.
      * @since 1.0
      */
     public static function password($pass=null) {
-        if($pass !== NULL){
+        if($pass !== null){
             self::_get()->_setPassword($pass);
         }
         return self::_get()->_getPassword();
@@ -638,7 +671,7 @@ class Cron {
     /**
      * Adds new job to jobs queue.
      * @param CronJob $job An instance of the class 'CronJob'.
-     * @return boolean If the job is added, the method will return TRUE.
+     * @return boolean If the job is added, the method will return true.
      * @since 1.0
      */
     public static function scheduleJob($job){
@@ -651,7 +684,7 @@ class Cron {
      * @since 1.0
      */
     private function _addJob($job){
-        $retVal = FALSE;
+        $retVal = false;
         if($job instanceof CronJob){
             if($job->getJobName() == 'CRON-JOB'){
                 $job->setJobName('job-'.$this->jobsQueue()->size());

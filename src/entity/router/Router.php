@@ -586,10 +586,10 @@ class Router {
                                 $varName = trim($routePathArray[$x], '{}');
                                 $route->setUriVar($varName, $pathArray[$x]);
                                 if($requestMethod == 'POST' || $requestMethod == 'PUT'){
-                                    $_POST[$varName] = $pathArray[$x];
+                                    $_POST[$varName] = urldecode($pathArray[$x]);
                                 }
                                 else if($requestMethod == 'GET' || $requestMethod == 'DELETE'){
-                                    $_GET[$varName] = $pathArray[$x];
+                                    $_GET[$varName] = urldecode($pathArray[$x]);
                                 }
                             }
                             else if($routePathArray[$x] != $pathArray[$x]){

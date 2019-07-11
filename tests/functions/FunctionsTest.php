@@ -60,7 +60,7 @@ class FunctionsTest extends TestCase{
      * @test
      */
     public function testUseDatabase02() {
-        $connection = new DBConnectionInfo('root', '123456', 'test_db');
+        $connection = new DBConnectionInfo('root', '123456', 'testing_db');
         $connection->setConnectionName('test-connection');
         WebFiori::getConfig()->addDbConnection($connection);
         $func = new Functions();
@@ -116,7 +116,7 @@ class FunctionsTest extends TestCase{
      * @test
      */
     public function testUseDatabase07() {
-        $connection = new DBConnectionInfo('root', '123456', 'test_db');
+        $connection = new DBConnectionInfo('root', '123456', 'testing_db');
         $connection->setConnectionName('test-connection');
         WebFiori::getConfig()->addDbConnection($connection);
         $func = new Functions();

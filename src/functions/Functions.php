@@ -401,33 +401,38 @@ class Functions {
      * return true. Other than that, the method will return false.
      */
     public function useSession($options=array()){
-        if(gettype($options) == 'array'){
-            if(isset($options['name'])){
-                $sessionName = trim($options['name']);
-                if(isset(self::$sessions[$sessionName])){
-                    $this->sessionName = $sessionName;
-                    return true;
-                }
-                else{
-                    $mngr = new SessionManager($sessionName);
-                        
-                    $sTime = isset($options['duration']) ? $options['duration'] : self::DEFAULT_SESSTION_OPTIONS['duration'];
-                    $mngr->setLifetime($sTime);
-
-                    $isRef = isset($options['refresh']) ? $options['refresh'] : self::DEFAULT_SESSTION_OPTIONS['refresh'];
-                    $mngr->setIsRefresh($isRef);
-
-                    if($mngr->initSession($isRef)){
+        if(php_sapi_name() == 'cli'){
+            return false;
+        }
+        else{
+            if(gettype($options) == 'array'){
+                if(isset($options['name'])){
+                    $sessionName = trim($options['name']);
+                    if(isset(self::$sessions[$sessionName])){
                         $this->sessionName = $sessionName;
-                        $sUser = isset($options['user']) ? $options['user'] : self::DEFAULT_SESSTION_OPTIONS['user'];
-                        $mngr->setUser($sUser);
-                        self::$sessions[$mngr->getName()] = $mngr;
-                        if(isset($options['variables'])){
-                            foreach ($options['variables'] as $k => $v){
-                                $mngr->setSessionVar($k,$v);
-                            }
-                        }
                         return true;
+                    }
+                    else{
+                        $mngr = new SessionManager($sessionName);
+
+                        $sTime = isset($options['duration']) ? $options['duration'] : self::DEFAULT_SESSTION_OPTIONS['duration'];
+                        $mngr->setLifetime($sTime);
+
+                        $isRef = isset($options['refresh']) ? $options['refresh'] : self::DEFAULT_SESSTION_OPTIONS['refresh'];
+                        $mngr->setIsRefresh($isRef);
+
+                        if($mngr->initSession($isRef)){
+                            $this->sessionName = $sessionName;
+                            $sUser = isset($options['user']) ? $options['user'] : self::DEFAULT_SESSTION_OPTIONS['user'];
+                            $mngr->setUser($sUser);
+                            self::$sessions[$mngr->getName()] = $mngr;
+                            if(isset($options['variables'])){
+                                foreach ($options['variables'] as $k => $v){
+                                    $mngr->setSessionVar($k,$v);
+                                }
+                            }
+                            return true;
+                        }
                     }
                 }
             }

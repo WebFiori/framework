@@ -307,7 +307,7 @@ class Access {
         }
     }
     /**
-     * Returns an array which contains all user groups. 
+     * Returns an array which contains all top-level user groups. 
      * The array will be empty if no user groups has been created.
      * @return array An array that contains an objects of type UsersGroup.
      * @since 1.0

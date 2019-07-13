@@ -401,10 +401,10 @@ class Functions {
      * return true. Other than that, the method will return false.
      */
     public function useSession($options=array()){
-        if(php_sapi_name() == 'cli'){
-            return false;
-        }
-        else{
+//        if(php_sapi_name() == 'cli'){
+//            return false;
+//        }
+//        else{
             if(gettype($options) == 'array'){
                 if(isset($options['name'])){
                     $sessionName = trim($options['name']);
@@ -436,7 +436,7 @@ class Functions {
                     }
                 }
             }
-        }
+        //}
         return false;
     }
     /**

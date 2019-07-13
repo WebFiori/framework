@@ -69,7 +69,7 @@ class EmailMessage {
      * @since 1.0
      */
     public static function &createInstance($sendAccountName=''){
-        if(self::$em === NULL){
+        if(self::$em === null){
             self::$em = new EmailMessage($sendAccountName);
         }
         return self::$em;
@@ -90,7 +90,7 @@ class EmailMessage {
                     throw new Exception('The account "'.$sendAccountName.'" has inalid credintials.');
                 }
                 else if($this->socketMailer == BasicMailFunctions::INV_HOST_OR_PORT){
-                    throw new Exception('The account "'.$sendAccountName.'" has inalid host or port number. Port: '.$acc->getPort().', Host: '.$acc->getServerAddress().'.');
+                    throw new Exception('The account "'.$sendAccountName.'" has invalid host or port number. Port: '.$acc->getPort().', Host: '.$acc->getServerAddress().'.');
                 }
                 else{
                     $this->asHtml = new HTMLDoc();
@@ -183,7 +183,7 @@ class EmailMessage {
      * @since 1.0
      */
     public static function write($text) {
-        self::createInstance()->_getDocument()->addChild(HTMLNode::createTextNode($text,FALSE));
+        self::createInstance()->_getDocument()->addChild(HTMLNode::createTextNode($text,false));
     }
     /**
      * Adds a child HTML node to the body of the message.
@@ -201,7 +201,7 @@ class EmailMessage {
      * @since 1.0.1
      */
     public static function importance($imp=null) {
-        if($imp !== NULL){
+        if($imp !== null){
             self::createInstance()->_getSocketMailer()->setPriority($imp);
         }
         return self::createInstance()->_getSocketMailer()->getPriority();
@@ -209,13 +209,13 @@ class EmailMessage {
     /**
      * Sets or returns the HTML document that is associated with the email 
      * message.
-     * @param HTMLDoc $new If it is not NULL, the HTML document 
+     * @param HTMLDoc $new If it is not null, the HTML document 
      * that is associated with the message will be set to the given one.
      * @return HTMLDoc The document that is associated with the email message.
      * @since 1.0
      */
     public static function document($new=null){
-        if($new != NULL){
+        if($new != null){
             self::createInstance()->_setDocument($new);
         }
         return self::createInstance()->_getDocument();
@@ -224,9 +224,9 @@ class EmailMessage {
      * Adds new receiver address to the list of message receivers.
      * @param string $name The name of the email receiver (such as 'Ibrahim').
      * @param string $email The email address of the receiver (such as 'example@example.com').
-     * @param boolean $isCC If set to TRUE, the receiver will receive 
+     * @param boolean $isCC If set to true, the receiver will receive 
      * a carbon copy of the message (CC).
-     * @param boolean $isBcc If set to TRUE, the receiver will receive 
+     * @param boolean $isBcc If set to true, the receiver will receive 
      * a blind carbon copy of the message (Bcc).
      * @since 1.0
      */
@@ -242,18 +242,18 @@ class EmailMessage {
         self::createInstance()->_getSocketMailer()->setSubject($subject);
     }
     /**
-     * Sends the message and set message instance to NULL.
+     * Sends the message and set message instance to null.
      * @since 1.0
      */
     public static function send(){
         self::createInstance()->_sendMessage();
-        self::$em = NULL;
+        self::$em = null;
     }
     /**
      * @since 1.0
      */
     private function _sendMessage() {
-        $this->socketMailer->write($this->asHtml->toHTML(), TRUE);
+        $this->socketMailer->write($this->asHtml->toHTML(), true);
     }
     /**
      * 

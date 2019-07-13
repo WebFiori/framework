@@ -26,7 +26,7 @@ class EmailMessageTest extends TestCase{
         //$smtp->setServerAddress('mail.invalid.com');
         MailConfig::get()->addSMTPAccount('smtp-acc-00', $smtp);
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('The account "smtp-acc-00" has inalid host or port number. Port: 465, Host: .');
+        $this->expectExceptionMessage('The account "smtp-acc-00" has invalid host or port number. Port: 465, Host: .');
         $message = EmailMessage::createInstance('smtp-acc-00');
     }
     /**
@@ -34,7 +34,7 @@ class EmailMessageTest extends TestCase{
      */
     public function test02() {
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('The account "smtp-acc-00" has inalid host or port number. Port: 255, Host: mail.programmingacademia.com.');
+        $this->expectExceptionMessage('The account "smtp-acc-00" has invalid host or port number. Port: 255, Host: mail.programmingacademia.com.');
         $smtp = new SMTPAccount();
         $smtp->setPassword('iz1Iimu#z');
         $smtp->setAddress('test@programmingacademia.com');
@@ -49,7 +49,7 @@ class EmailMessageTest extends TestCase{
      */
     public function test03() {
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('The account "smtp-acc-00" has inalid credintials.');
+        $this->expectExceptionMessage('The account "smtp-acc-00" has invalid host or port number. Port: 25, Host: mail.programmingacademia.com.');
         $smtp = new SMTPAccount();
         $smtp->setPassword('izimu#z');
         $smtp->setAddress('test@programmingacademia.com');

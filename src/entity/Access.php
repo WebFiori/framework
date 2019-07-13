@@ -32,7 +32,7 @@ if(!defined('ROOT_DIR')){
  * A class to manage user groups and privileges.
  *
  * @author Ibrahim
- * @version 1.0.3
+ * @version 1.0.4
  */
 class Access {
     /**
@@ -53,6 +53,13 @@ class Access {
      */
     private function __construct() {
         $this->userGroups = array();
+    }
+    /**
+     * Removes all created user groups and privileges.
+     * @since 1.0.4
+     */
+    public static function clear() {
+        self::get()->userGroups = [];
     }
     /**
      * Returns a single instance of the class.
@@ -511,7 +518,7 @@ class Access {
      * only if the name of the group contains invalid characters or it is already 
      * created.
      * @param string $groupId The ID of the group. The ID must not contain 
-     * any of the following characters: ';','-' or a space. If the name contains 
+     * any of the following characters: ';','-',',' or a space. If the name contains 
      * any of the given characters, the group will not created.
      * @return boolean If the group is created, the method will return true. 
      * If not, the method will return false.
@@ -550,7 +557,7 @@ class Access {
         if($len > 0){
             $valid = true;
             for($x = 0 ; $x < $len ; $x++){
-                $valid = $valid && $id[$x] != ';' && $id[$x] != ' ' && $id[$x] != '-';
+                $valid = $valid && $id[$x] != ';' && $id[$x] != ' ' && $id[$x] != '-' && $id[$x] != ',';
             }
             return $valid;
         }
@@ -563,7 +570,7 @@ class Access {
      * @param string $groupId The ID of the group that the privilege will be 
      * added to. It must be a group in the groups array of the access class.
      * @param string $privilegeId The ID of the privilege. The ID must not contain 
-     * any of the following characters, ';','-' or a space.
+     * any of the following characters, ';','-',',' or a space.
      * @return boolean If the privilege was created, the method will return 
      * true. Other than that, the method will return false.
      * @since 1.0

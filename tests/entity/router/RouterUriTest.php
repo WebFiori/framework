@@ -2,6 +2,7 @@
 namespace webfiori\tests\entity\router;
 use PHPUnit\Framework\TestCase;
 use webfiori\entity\router\RouterUri;
+use webfiori\entity\router\Router;
 /**
  * Description of TestRouterUri
  *
@@ -14,7 +15,9 @@ class RouterUriTest extends TestCase{
     public function testSplitURI_01(){
         $uri = 'https://www3.programmingacademia.com:80/{some-var}/hell/{other-var}/?do=dnt&y=#xyz';
         $uriObj = new RouterUri($uri, '');
+        $this->assertEquals(Router::CUSTOMIZED.$uriObj->getType());
         $this->assertEquals('https',$uriObj->getScheme());
+        $this->assertFalse($uriObj->isInSiteMap());
     }
     /**
      * @test
@@ -55,5 +58,7 @@ class RouterUriTest extends TestCase{
         $uri = 'https://www3.programmingacademia.com:80/{some-var}/hell/{other-var}/?do=dnt&y=#xyz';
         $uriObj = new RouterUri($uri, '');
         $this->assertEquals('/{some-var}/hell/{other-var}',$uriObj->getPath());
+        $uriObj->setIsInSiteMap(true);
+        $this->assertTrue($uriObj->isInSiteMap());
     }
 }

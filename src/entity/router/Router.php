@@ -121,7 +121,7 @@ class Router {
      * @since 1.0
      */
     public static function get(){
-        if(self::$router != NULL){
+        if(self::$router != null){
             return self::$router;
         }
         self::$router = new Router();
@@ -183,8 +183,8 @@ class Router {
     /**
      * Returns an object of type 'RouterUri' that represents route URI.
      * @param string $path The path part of the URI.
-     * @return RouterUri|NULL If a route was found which has the given path, 
-     * an object of type 'RouterUri' is returned. If no route is found, NULL 
+     * @return RouterUri|null If a route was found which has the given path, 
+     * an object of type 'RouterUri' is returned. If no route is found, null 
      * is returned.
      * @since 1.3.3
      */
@@ -195,14 +195,14 @@ class Router {
                 return $route;
             }
         }
-        $null = NULL;
+        $null = null;
         return $null;
     }
     /**
      * Returns an object of type 'RouterUri' that represents route URI.
      * @param string $path The path part of the URI.
-     * @return RouterUri|NULL If a route was found which has the given path, 
-     * an object of type 'RouterUri' is returned. If no route is found, NULL 
+     * @return RouterUri|null If a route was found which has the given path, 
+     * an object of type 'RouterUri' is returned. If no route is found, null 
      * is returned.
      * @since 1.3.3
      */

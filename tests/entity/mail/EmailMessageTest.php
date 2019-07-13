@@ -63,15 +63,15 @@ class EmailMessageTest extends TestCase{
     /**
      * @test
      */
-    public function test04() {
-        $smtp = new SMTPAccount();
-        $smtp->setPassword('iz2)X1Iimu#z');
-        $smtp->setAddress('test@programmingacademia.com');
-        $smtp->setUsername('test@programmingacademia.com');
-        $smtp->setServerAddress('mail.programmingacademia.com  ');
-        $smtp->setPort(25);
-        MailConfig::get()->addSMTPAccount('smtp-acc-00', $smtp);
-        $message = EmailMessage::createInstance('smtp-acc-00');
-        $this->assertTrue($message instanceof EmailMessage);
-    }
+//    public function test04() {
+//        $smtp = new SMTPAccount();
+//        $smtp->setPassword('iz2)X1Iimu#z');
+//        $smtp->setAddress('test@programmingacademia.com');
+//        $smtp->setUsername('test@programmingacademia.com');
+//        $smtp->setServerAddress('mail.programmingacademia.com  ');
+//        $smtp->setPort(25);
+//        MailConfig::get()->addSMTPAccount('smtp-acc-00', $smtp);
+//        $message = EmailMessage::createInstance('smtp-acc-00');
+//        $this->assertTrue($message instanceof EmailMessage);
+//    }
 }

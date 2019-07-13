@@ -59,11 +59,11 @@ AutoLoader::get(array(
 ));
 fprintf(STDOUT,'Autoloader Initialized.'."\n");
 fprintf(STDOUT,'Root Directory: \''.AutoLoader::get()->getRoot().'\'.'."\n");
-fprintf(STDOUT,'Class Search Paths:'."\n");
-$dirs = AutoLoader::getFolders();
-foreach ($dirs as $dir){
-    fprintf(STDOUT, $dir."\n");
-}
+//fprintf(STDOUT,'Class Search Paths:'."\n");
+//$dirs = AutoLoader::getFolders();
+//foreach ($dirs as $dir){
+//    fprintf(STDOUT, $dir."\n");
+//}
 fprintf(STDOUT, "Registering shutdown function...\n");
 
 //run sum code after tests completion.

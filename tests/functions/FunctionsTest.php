@@ -150,16 +150,7 @@ class FunctionsTest extends TestCase{
                 'name'=>'test-session'
             )
         );
-        $this->assertTrue($r);
-        $session = $func->getSession();
-        $this->assertTrue($session instanceof SessionManager);
-        //$this->assertEquals(120,$session->getLifetime());
-        $this->assertTrue($session->isRefresh());
-        $this->assertTrue($session->isNew());
-        $this->assertFalse($session->isResumed());
-        $this->assertTrue($session->isSessionActive());
-        $this->assertEquals('EN',$func->getSessionLang());
-        $this->assertEquals(-1,$func->getUserID());
+        $this->assertFalse($r);
     }
     /**
      * @test

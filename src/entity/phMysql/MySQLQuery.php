@@ -372,11 +372,10 @@ abstract class MySQLQuery{
      * <li><b>offset</b>: The 'offset' attribute of the query. Ignored if the 
      * option 'limit' is not set.</li>
      * <li><b>condition-cols-and-vals</b>: An associative array. The indices can 
-     * be values the value at each index is an objects of type 'Column'. 
-     * Or the indices can be column indices taken from MySQLTable object and 
+     * be values and the value at each index is an objects of type 'Column'. 
+     * Or the indices can be column indices or columns names taken from MySQLTable object and 
      * the values are set for each index. The second way is recommended as one 
-     * table might have two columns with the same values.
-     * will be selected based on.</li>
+     * table might have two columns with the same values.</li>
      * <li><b>conditions</b>: An array that can contains two possible values: 
      * '=' or '!='. If anything else is given at specific index, '=' will be used. In 
      * addition, If not provided or has invalid value, an array of '=' conditions 
@@ -390,9 +389,20 @@ abstract class MySQLQuery{
      * value of a column. Ignored in case the option 'columns' or 'select-max' is set.</li>
      * <li><b>column</b>: The column which contains maximum or minimum value.</li>
      * <li><b>rename-to</b>: Rename the max or min column to the given name.</li>
-     * <li><b>order-by</b>: An object of type column at which the rows will be ordered by.</li>
-     * <li><b>order-type</b>: A one character string. 'A' for ascending and 'D' 
-     * for descending. Default is 'A'. Used only if 'order-by' is set. </li>
+     * <li><b>group-by</b>: An indexed array that contains 
+     * sub associative arrays which has 'group by' columns info. The sub associative 
+     * arrays can have the following indices:
+     * <ul>
+     * <li>col: The name of the column.</li>
+     * </ul></li>
+     * <li><b>order-by</b>: An indexed array that contains 
+     * sub associative arrays which has columns 'order by' info. The sub associative 
+     * arrays can have the following indices:
+     * <ul>
+     * <li><b>col<b>: The name of the column.</li>
+     * <li>order-type: An optional string to represent the order. It can 
+     * be 'A' for ascending or 'D' for descending</li>
+     * </ul></li>
      * </ul>
      * @since 1.8.3
      */
@@ -408,8 +418,7 @@ abstract class MySQLQuery{
         'column'=>'',
         'rename-to'=>'',
         'order-by'=>null,
-        'order-type'=>'A',
-        'in'=>array()
+        'group-by'=>null
         )) {
         $table = $this->getStructure();
         if($table instanceof MySQLTable){
@@ -430,15 +439,13 @@ abstract class MySQLQuery{
             else{
                 $limitPart = '';
             }
+            $groupByPart = '';
+            if(isset($selectOptions['group-by']) && gettype($selectOptions['group-by']) == 'array'){
+                $groupByPart = $this->_buildGroupByCondition($selectOptions['group-by']);
+            }
             $orderByPart = '';
-            if(isset($selectOptions['order-by']) && ($selectOptions['order-by'] instanceof Column)){
-                $orderType = isset($selectOptions['order-type']) ? strtoupper($selectOptions['order-type']) : 'A';
-                if($orderType == 'D'){
-                    $orderByPart = ' order by '.$selectOptions['order-by']->getName().' desc ';
-                }
-                else{
-                    $orderByPart = ' order by '.$selectOptions['order-by']->getName().' asc ';
-                }
+            if(isset($selectOptions['order-by']) && gettype($selectOptions['order-by']) == 'array'){
+                $orderByPart = $this->_buildOrderByCondition($selectOptions['order-by']);
             }
             if(isset($selectOptions['columns']) && count($selectOptions['columns']) != 0){
                 $count = count($selectOptions['columns']);
@@ -514,7 +521,13 @@ abstract class MySQLQuery{
                         $vals[] = $valOrColIndex;
                     }
                     else{
-                        $cols[] = $this->getStructure()->getColByIndex($valOrColIndex);
+                        if(gettype($valOrColIndex) == 'integer'){
+                            $testCol = $this->getStructure()->getColByIndex($valOrColIndex);
+                        }
+                        else{
+                            $testCol = $this->getStructure()->getCol($valOrColIndex);
+                        }
+                        $cols[] = $testCol;
                         $vals[] = $colOrVal;
                     }
                 }
@@ -526,11 +539,95 @@ abstract class MySQLQuery{
             if(trim($where) == 'where'){
                 $where = '';
             }
-            $this->setQuery($selectQuery.$where.$orderByPart.$limitPart.';', 'select');
+            $this->setQuery($selectQuery.$where.$groupByPart.$orderByPart.$limitPart.';', 'select');
             return true;
         }
         return false;
     }
+    /**
+     * Constructs the 'order by' part of a query.
+     * @param array $orderByArr An indexed array that contains 
+     * sub associative arrays which has columns 'order by' info. The sub associative 
+     * arrays can have the following indices:
+     * <ul>
+     * <li>col: The name of the column.</li>
+     * <li>order-type: An optional string to represent the order. It can 
+     * be 'A' for ascending or 'D' for descending</li>
+     * </ul>
+     * @return string The string that represents order by part.
+     */
+    private function _buildOrderByCondition($orderByArr){
+        $colsCount = count($orderByArr);
+        $orderByStr = 'order by ';
+        $actualColsArr = [];
+        for($x = 0 ; $x < $colsCount ; $x++){
+            $colName = isset($orderByArr[$x]['col']) ? $orderByArr[$x]['col'] : null;
+            $colObj = $this->getCol($colName);
+            if($colObj instanceof Column){
+                $orderType = isset($orderByArr[$x]['order-type']) ? strtoupper($orderByArr[$x]['order-type']) : null;
+                $actualColsArr[] = [
+                    'object'=>$colObj,
+                    'order-type'=>$orderType
+                ];
+            }
+        }
+        $actualCount = count($actualColsArr);
+        for($x = 0 ; $x < $actualCount ; $x++){
+            $colObj = $actualColsArr[$x]['object'];
+            $orderByStr .= $colObj->getName();
+            $orderType = $actualColsArr[$x]['order-type'];
+            if($orderType == 'A'){
+                $orderByStr .= ' asc';
+            }
+            else if($orderType == 'D'){
+                $orderByStr .= ' desc';
+            }
+            if($x + 1 != $actualCount){
+                $orderByStr .= ', ';
+            }
+        }
+        if($orderByStr == 'order by '){
+            return '';
+        }
+        return ' '.trim($orderByStr);
+    }
+    /**
+     * Constructs the 'group by' part of a query.
+     * @param array $groupByArr An indexed array that contains 
+     * sub associative arrays which has 'group by' columns info. The sub associative 
+     * arrays can have the following indices:
+     * <ul>
+     * <li>col: The name of the column.</li>
+     * </ul>
+     * @return string The string that represents order by part.
+     */
+    private function _buildGroupByCondition($groupByArr){
+        $colsCount = count($groupByArr);
+        $groupByStr = 'group by ';
+        $actualColsArr = [];
+        for($x = 0 ; $x < $colsCount ; $x++){
+            $colName = isset($groupByArr[$x]['col']) ? $groupByArr[$x]['col'] : null;
+            $colObj = $this->getCol($colName);
+            if($colObj !== null){
+                $actualColsArr[] = [
+                    'object'=>$colObj
+                ];
+            }
+        }
+        $actualCount = count($actualColsArr);
+        for($x = 0 ; $x < $actualCount ; $x++){
+            $colObj = $actualColsArr[$x]['object'];
+            $groupByStr .= $colObj->getName();
+            if($x + 1 != $actualCount){
+                $groupByStr .= ', ';
+            }
+        }
+        if($groupByStr == 'group by '){
+            return '';
+        }
+        return ' '.trim($groupByStr);
+    }
+
     /**
      * Constructs a 'where' condition given a date.
      * @param string $date A date or timestamp.
@@ -867,7 +964,7 @@ abstract class MySQLQuery{
         $valsCount = count($vals);
         $condsCount = count($valsConds);
         $joinOpsCount = count($jointOps);
-        if($colsCount == 0 || $valsCount == 0 || $condsCount == 0){
+        if($colsCount == 0 || $valsCount == 0){
             return '';
         }
         while ($colsCount != $condsCount){

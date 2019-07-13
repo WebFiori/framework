@@ -91,6 +91,7 @@ class RouterUri {
         $this->uriBroken = self::splitURI($requestedUri);
         $this->setClosureParams($closureParams);
         $this->incInSiteMap = false;
+        $this->setType(Router::CUSTOMIZED);
     }
     /**
      * Checks if the URI will be included in auto-generated site map or not.
@@ -119,7 +120,8 @@ class RouterUri {
      * <li>Router::CLOSURE_ROUTE</li>
      * <li>Router::CUSTOMIZED</li>
      * </ul>
-     * @return string The type of element that the URI will route to.
+     * @return string The type of element that the URI will route to. Default 
+     * return value is Router::CUSTOMIZED.
      * @since 1.1
      */
     public function getType() {
@@ -134,11 +136,15 @@ class RouterUri {
      * <li>Router::CLOSURE_ROUTE</li>
      * <li>Router::CUSTOMIZED</li>
      * </ul>
+     * If any thing else is given, it won't update.
      * @param string $type The type of element that the URI will route to.
      * @since 1.1
      */
     public function setType($type) {
-        $this->type = $type;
+        if($type == Router::API_ROUTE || $type == Router::CLOSURE_ROUTE || 
+                $type == Router::CUSTOMIZED || $type == Router::VIEW_ROUTE){
+            $this->type = $type;
+        }
     }
     /**
      * Sets the array of closure parameters.
@@ -283,7 +289,7 @@ class RouterUri {
      * @return string The host name such as 'www.programmingacademia.com'.
      * @since 1.0
      */
-    public function geHost() {
+    public function getHost() {
         return $this->uriBroken['host'];
     }
     /**

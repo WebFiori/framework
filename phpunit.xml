@@ -7,10 +7,10 @@
     <filter>
         <whitelist addUncoveredFilesFromWhitelist="true">
             <directory suffix=".php">./src/conf</directory>
-            <directory suffix=".php">./src/entity/cron</directory>
             <directory suffix=".php">./src/entity/mail</directory>
-            <directory suffix=".php">./src/functions</directory>
             <file>./src/WebFiori.php</file>
+            <file>./src/functions/Functions.php</file>
+            <file>./src/entity/cron/CronJob.php</file>
             <file>./src/entity/router/Router.php</file>
             <file>./src/entity/router/SessionManager.php</file>
             <file>./src/entity/router/RouterUri.php</file>
@@ -19,21 +19,16 @@
             <file>./src/entity/Autoloader.php</file>
             <file>./src/entity/DBConnectionFactory.php</file>
             <file>./src/entity/DBConnectionInfo.php</file>
-            <file>./src/entity/DatabaseSchema.php</file>
             <file>./src/entity/ExtendedWebAPI.php</file>
             <file>./src/entity/File.php</file>
-            <file>./src/entity/FileHandler.php</file>
-            <file>./src/entity/Page.php</file>
             <file>./src/entity/Privilege.php</file>
             <file>./src/entity/PrivilegesGroup.php</file>
-            <file>./src/entity/Theme.php</file>
-            <file>./src/entity/Uploader.php</file>
             <file>./src/entity/User.php</file>
             <file>./src/entity/Util.php</file>
         </whitelist>
     </filter>
     <logging>
-        <log type="coverage-clover" target="clover.xml"/>
+        
     </logging>
     <testsuites>
         <testsuite name="Config Files Tests">

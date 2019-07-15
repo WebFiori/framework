@@ -34,8 +34,7 @@ if(!defined('ROOT_DIR')){
  * A class thar represents a cron job.
  *
  * @author Ibrahim
- * @author Ibrahim <ibinshikh@hotmail.com>
- * @version 1.0.2
+ * @version 1.0.3
  */
 class CronJob {
     /**
@@ -128,8 +127,8 @@ class CronJob {
                 'params'=>array()
             )
         );
-        if($when !== NULL){
-            if($this->cron($when) === FALSE){
+        if($when !== null){
+            if($this->cron($when) === false){
                 throw new Exception('Invalid cron expression.');
             }
         }
@@ -180,8 +179,8 @@ class CronJob {
      * 12:00 AM and 23 means at 11:00 PM. Default is 0.
      * @param int $minute A number between 0 and 59 inclusive. Represents the 
      * minute part of an hour. Default is 0.
-     * @return boolean If job time is set, the method will return TRUE. If 
-     * not set, the method will return FALSE. It will not set only if the 
+     * @return boolean If job time is set, the method will return true. If 
+     * not set, the method will return false. It will not set only if the 
      * given time is not correct.
      * @since 1.0
      */
@@ -191,7 +190,7 @@ class CronJob {
                 return $this->cron($minute.' '.$hour.' * * *');
             }
         }
-        return FALSE;
+        return false;
     }
     /**
      * Schedules a cron job to run every hour.
@@ -208,7 +207,7 @@ class CronJob {
      * between 0 and 23 inclusive. mm can have any value between 0 and 59 inclusive. 
      * default is '00:00'.
      * @return boolean If the time for the cron job is set, the method will 
-     * return TRUE. If not, it will return FALSE.
+     * return true. If not, it will return false.
      * @since 1.0
      */
     public function weeklyOn($dayNameOrNum=0,$time='00:00'){
@@ -221,7 +220,7 @@ class CronJob {
                 return $this->_weeklyOn($dayNameOrNum, $time);
             }
         }
-        return FALSE;
+        return false;
     }
     /**
      * Schedules a job to run at specific day and time in a specific month.
@@ -233,7 +232,7 @@ class CronJob {
      * between 0 and 23 inclusive. mm can have any value btween 0 and 59 inclusive. 
      * default is '00:00'.
      * @return boolean If the time for the cron job is set, the method will 
-     * return TRUE. If not, it will return FALSE.
+     * return true. If not, it will return false.
      * @since 1.0
      */
     public function onMonth($monthNameOrNum='jan',$dayNum=1,$time='00:00'){
@@ -256,7 +255,7 @@ class CronJob {
                 }
             }
         }
-        return FALSE;
+        return false;
     }
     /**
      * Schedules a cron job to run every month on specific day and time.
@@ -264,7 +263,7 @@ class CronJob {
      * 1 and 31 inclusive.
      * @param string $time A day time string in the form 'hh:mm' in 24 hours mode.
      * @return boolean If the time for the cron job is set, the method will 
-     * return TRUE. If not, it will return FALSE.
+     * return true. If not, it will return false.
      * @since 1.0.1
      */
     public function everyMonthOn($dayNum=1,$time='00:00'){
@@ -278,7 +277,7 @@ class CronJob {
                 }
             }
         }
-        return FALSE;
+        return false;
     }
     private function _weeklyOn($day,$time){
         $timeSplit = explode(':', $time);
@@ -289,7 +288,7 @@ class CronJob {
                 return $this->cron($minute.' '.$hour.' * * '.$day);
             }
         }
-        return FALSE;
+        return false;
     }
     /**
      * Schedules a job using specific cron expression.
@@ -301,11 +300,11 @@ class CronJob {
      * is '* * * * *' which means run the job every minute.
      * @return boolean If the given cron expression is valid, the method will 
      * set the time of cron job as specified by the expression and return 
-     * TRUE. If the expression is invalid, the method will return FALSE.
+     * true. If the expression is invalid, the method will return false.
      * @since 1.0
      */
     public function cron($when='* * * * *'){
-        $retVal = FALSE;
+        $retVal = false;
         $trimmed = trim($when);
         $split = explode(' ', $trimmed);
         $count = count($split);
@@ -315,11 +314,11 @@ class CronJob {
             $daysOfMonthValidity = $this->_dayOfMonth($split[2]);
             $monthValidity = $this->_checkMonth($split[3]);
             $daysOfWeekValidity = $this->_checkDayOfWeek($split[4]);
-            if($minutesValidity === FALSE || 
-               $hoursValidity === FALSE || 
-               $daysOfMonthValidity === FALSE ||
-               $monthValidity === FALSE || 
-               $daysOfWeekValidity === FALSE){
+            if($minutesValidity === false || 
+               $hoursValidity === false || 
+               $daysOfMonthValidity === false ||
+               $monthValidity === false || 
+               $daysOfWeekValidity === false){
             }
             else{
                 $this->jobDetails = array(
@@ -329,7 +328,7 @@ class CronJob {
                     'months'=>$monthValidity,
                     'days-of-week'=>$daysOfWeekValidity
                 );
-                $retVal = TRUE;
+                $retVal = true;
                 $this->cronExpr = $when;
             }
         }
@@ -385,10 +384,10 @@ class CronJob {
      * @since 1.0
      */
     private function _checkMinutes($minutesField){
-        $isValidExpr = TRUE;
+        $isValidExpr = true;
         $split = explode(',', $minutesField);
         $minuteAttrs = array(
-            'every-minute'=>FALSE,
+            'every-minute'=>false,
             'every-x-minutes'=>array(),
             'at-every-x-minute'=>array(),
             'at-range'=>array()
@@ -396,10 +395,10 @@ class CronJob {
         foreach ($split as $subExpr){
             $exprType = $this->_getSubExprType($subExpr);
             if($exprType == self::ANY_VAL){
-                $minuteAttrs['every-minute'] = TRUE;
+                $minuteAttrs['every-minute'] = true;
             }
             else if($exprType == self::INV_VAL){
-                $isValidExpr = FALSE;
+                $isValidExpr = false;
                 break;
             }
             else if($exprType == self::RANGE_VAL){
@@ -412,17 +411,17 @@ class CronJob {
                             $minuteAttrs['at-range'][] = array($start,$end);
                         }
                         else{
-                            $isValidExpr = FALSE;
+                            $isValidExpr = false;
                             break;
                         }
                     }
                     else{
-                        $isValidExpr = FALSE;
+                        $isValidExpr = false;
                         break;
                     }
                 }
                 else{
-                    $isValidExpr = FALSE;
+                    $isValidExpr = false;
                     break;
                 }
             }
@@ -432,7 +431,7 @@ class CronJob {
                     $minuteAttrs['every-x-minutes'][] = $stepVal;
                 }
                 else{
-                    $isValidExpr = FALSE;
+                    $isValidExpr = false;
                     break;
                 }
             }
@@ -442,13 +441,13 @@ class CronJob {
                     $minuteAttrs['at-every-x-minute'][] = $value;
                 }
                 else{
-                    $isValidExpr = FALSE;
+                    $isValidExpr = false;
                     break;
                 }
             }
         }
-        if($isValidExpr !== TRUE){
-            $minuteAttrs = FALSE;
+        if($isValidExpr !== true){
+            $minuteAttrs = false;
         }
         return $minuteAttrs;
     }
@@ -459,10 +458,10 @@ class CronJob {
      * @since 1.0
      */
     private function _checkHours($hoursField){
-        $isValidExpr = TRUE;
+        $isValidExpr = true;
         $split = explode(',', $hoursField);
         $hoursAttrs = array(
-            'every-hour'=>FALSE,
+            'every-hour'=>false,
             'every-x-hours'=>array(),
             'at-every-x-hour'=>array(),
             'at-range'=>array()
@@ -470,10 +469,10 @@ class CronJob {
         foreach ($split as $subExpr){
             $exprType = $this->_getSubExprType($subExpr);
             if($exprType == self::ANY_VAL){
-                $hoursAttrs['every-hour'] = TRUE;
+                $hoursAttrs['every-hour'] = true;
             }
             else if($exprType == self::INV_VAL){
-                $isValidExpr = FALSE;
+                $isValidExpr = false;
                 break;
             }
             else if($exprType == self::RANGE_VAL){
@@ -486,17 +485,17 @@ class CronJob {
                             $hoursAttrs['at-range'][] = array($start,$end);
                         }
                         else{
-                            $isValidExpr = FALSE;
+                            $isValidExpr = false;
                             break;
                         }
                     }
                     else{
-                        $isValidExpr = FALSE;
+                        $isValidExpr = false;
                         break;
                     }
                 }
                 else{
-                    $isValidExpr = FALSE;
+                    $isValidExpr = false;
                     break;
                 }
             }
@@ -506,7 +505,7 @@ class CronJob {
                     $hoursAttrs['every-x-hours'][] = $stepVal;
                 }
                 else{
-                    $isValidExpr = FALSE;
+                    $isValidExpr = false;
                     break;
                 }
             }
@@ -516,13 +515,13 @@ class CronJob {
                     $hoursAttrs['at-every-x-hour'][] = $value;
                 }
                 else{
-                    $isValidExpr = FALSE;
+                    $isValidExpr = false;
                     break;
                 }
             }
         }
-        if($isValidExpr !== TRUE){
-            $hoursAttrs = FALSE;
+        if($isValidExpr !== true){
+            $hoursAttrs = false;
         }
         return $hoursAttrs;
     }
@@ -533,20 +532,20 @@ class CronJob {
      * @since 1.0
      */
     private function _dayOfMonth($dayOfMonthField){
-        $isValidExpr = TRUE;
+        $isValidExpr = true;
         $split = explode(',', $dayOfMonthField);
         $monthDaysAttrs = array(
-            'every-day'=>FALSE,
+            'every-day'=>false,
             'at-every-x-day'=>array(),
             'at-range'=>array()
         );
         foreach ($split as $subExpr){
             $exprType = $this->_getSubExprType($subExpr);
             if($exprType == self::ANY_VAL){
-                $monthDaysAttrs['every-day'] = TRUE;
+                $monthDaysAttrs['every-day'] = true;
             }
             else if($exprType == self::INV_VAL){
-                $isValidExpr = FALSE;
+                $isValidExpr = false;
                 break;
             }
             else if($exprType == self::RANGE_VAL){
@@ -559,22 +558,22 @@ class CronJob {
                             $monthDaysAttrs['at-range'][] = array($start,$end);
                         }
                         else{
-                            $isValidExpr = FALSE;
+                            $isValidExpr = false;
                             break;
                         }
                     }
                     else{
-                        $isValidExpr = FALSE;
+                        $isValidExpr = false;
                         break;
                     }
                 }
                 else{
-                    $isValidExpr = FALSE;
+                    $isValidExpr = false;
                     break;
                 }
             }
             else if($exprType == self::STEP_VAL){
-                $isValidExpr = FALSE;
+                $isValidExpr = false;
                 break;
             }
             else if($exprType == self::SPECIFIC_VAL){
@@ -583,13 +582,13 @@ class CronJob {
                     $monthDaysAttrs['at-every-x-day'][] = $value;
                 }
                 else{
-                    $isValidExpr = FALSE;
+                    $isValidExpr = false;
                     break;
                 }
             }
         }
-        if($isValidExpr !== TRUE){
-            $monthDaysAttrs = FALSE;
+        if($isValidExpr !== true){
+            $monthDaysAttrs = false;
         }
         return $monthDaysAttrs;
     }
@@ -600,20 +599,20 @@ class CronJob {
      * @since 1.0
      */
     private function _checkMonth($monthField){
-        $isValidExpr = TRUE;
+        $isValidExpr = true;
         $split = explode(',', $monthField);
         $monthAttrs = array(
-            'every-month'=>FALSE,
+            'every-month'=>false,
             'at-x-month'=>array(),
             'at-range'=>array()
         );
         foreach ($split as $subExpr){
             $exprType = $this->_getSubExprType($subExpr);
             if($exprType == self::ANY_VAL){
-                $monthAttrs['every-month'] = TRUE;
+                $monthAttrs['every-month'] = true;
             }
             else if($exprType == self::INV_VAL){
-                $isValidExpr = FALSE;
+                $isValidExpr = false;
                 break;
             }
             else if($exprType == self::RANGE_VAL){
@@ -626,22 +625,22 @@ class CronJob {
                             $monthAttrs['at-range'][] = array($start,$end);
                         }
                         else{
-                            $isValidExpr = FALSE;
+                            $isValidExpr = false;
                             break;
                         }
                     }
                     else{
-                        $isValidExpr = FALSE;
+                        $isValidExpr = false;
                         break;
                     }
                 }
                 else{
-                    $isValidExpr = FALSE;
+                    $isValidExpr = false;
                     break;
                 }
             }
             else if($exprType == self::STEP_VAL){
-                $isValidExpr = FALSE;
+                $isValidExpr = false;
             }
             else if($exprType == self::SPECIFIC_VAL){
                 $subExpr = strtoupper($subExpr);
@@ -650,39 +649,39 @@ class CronJob {
                     $monthAttrs['at-x-month'][] = $value;
                 }
                 else{
-                    $isValidExpr = FALSE;
+                    $isValidExpr = false;
                     break;
                 }
             }
         }
-        if($isValidExpr !== TRUE){
-            $monthAttrs = FALSE;
+        if($isValidExpr !== true){
+            $monthAttrs = false;
         }
         return $monthAttrs;
     }
     /**
      * Checks if current day of month in time is a day at which the job must be 
      * executed.
-     * @return boolean The method will return TRUE if the current day of month in 
+     * @return boolean The method will return true if the current day of month in 
      * time is a day at which the job must be executed.
      * @since 1.0
      */
     public function isDayOfMonth() {
         $monthDaysArr = $this->jobDetails['days-of-month'];
-        if($monthDaysArr['every-day'] === TRUE){
-            $retVal = TRUE;
+        if($monthDaysArr['every-day'] === true){
+            $retVal = true;
         }
         else{
-            $retVal = FALSE;
+            $retVal = false;
             $current = Cron::dayOfMonth();
             $ranges = $monthDaysArr['at-range'];
             foreach ($ranges as $range){
                 if($current >= $range[0] && $current <= $range[1]){
-                    $retVal = TRUE;
+                    $retVal = true;
                     break;
                 }
             }
-            if($retVal === FALSE){
+            if($retVal === false){
                 $days = $monthDaysArr['at-every-x-day'];
                 $retVal = in_array($current, $days);
             }
@@ -692,26 +691,26 @@ class CronJob {
     /**
      * Checks if current day of week in time is a day at which the job must be 
      * executed.
-     * @return boolean The method will return TRUE if the current day of week in 
+     * @return boolean The method will return true if the current day of week in 
      * time is a day at which the job must be executed.
      * @since 1.0
      */
     public function isDayOfWeek() {
         $daysArr = $this->jobDetails['days-of-week'];
-        if($daysArr['every-day'] === TRUE){
-            $retVal = TRUE;
+        if($daysArr['every-day'] === true){
+            $retVal = true;
         }
         else{
-            $retVal = FALSE;
+            $retVal = false;
             $current = Cron::dayOfWeek();
             $ranges = $daysArr['at-range'];
             foreach ($ranges as $range){
                 if($current >= $range[0] && $current <= $range[1]){
-                    $retVal = TRUE;
+                    $retVal = true;
                     break;
                 }
             }
-            if($retVal === FALSE){
+            if($retVal === false){
                 $days = $daysArr['at-x-day'];
                 $retVal = in_array($current, $days);
             }
@@ -721,26 +720,26 @@ class CronJob {
     /**
      * Checks if current month in time is a month at which the job must be 
      * executed.
-     * @return boolean The method will return TRUE if the current month in 
+     * @return boolean The method will return true if the current month in 
      * time is a month at which the job must be executed.
      * @since 1.0
      */
     public function isMonth(){
         $monthsArr = $this->jobDetails['months'];
-        if($monthsArr['every-month'] === TRUE){
-            $retVal = TRUE;
+        if($monthsArr['every-month'] === true){
+            $retVal = true;
         }
         else{
-            $retVal = FALSE;
+            $retVal = false;
             $current = intval(date('m'));
             $ranges = $monthsArr['at-range'];
             foreach ($ranges as $range){
                 if($current >= $range[0] && $current <= $range[1]){
-                    $retVal = TRUE;
+                    $retVal = true;
                     break;
                 }
             }
-            if($retVal === FALSE){
+            if($retVal === false){
                 $months = $monthsArr['at-x-month'];
                 $retVal = in_array($current, $months);
             }
@@ -750,33 +749,33 @@ class CronJob {
     /**
      * Checks if current hour in time is an hour at which the job must be 
      * executed.
-     * @return boolean The method will return TRUE if the current hour in 
+     * @return boolean The method will return true if the current hour in 
      * time is an hour at which the job must be executed.
      * @since 1.0
      */
     public function isHour(){
         $hoursArr = $this->jobDetails['hours'];
-        if($hoursArr['every-hour'] === TRUE){
-            $retVal = TRUE;
+        if($hoursArr['every-hour'] === true){
+            $retVal = true;
         }
         else{
-            $retVal = FALSE;
+            $retVal = false;
             $current = Cron::hour();
             $ranges = $hoursArr['at-range'];
             foreach ($ranges as $range){
                 if($current >= $range[0] && $current <= $range[1]){
-                    $retVal = TRUE;
+                    $retVal = true;
                     break;
                 }
             }
-            if($retVal === FALSE){
+            if($retVal === false){
                 $hours = $hoursArr['at-every-x-hour'];
                 $retVal = in_array($current, $hours);
-                if($retVal === FALSE){
+                if($retVal === false){
                     $hours = $hoursArr['every-x-hours'];
                     foreach ($hours as $hour){
                         if($current % $hour == 0){
-                            $retVal = TRUE;
+                            $retVal = true;
                             break;
                         }
                     }
@@ -788,33 +787,33 @@ class CronJob {
     /**
      * Checks if current minute in time is a minute at which the job must be 
      * executed.
-     * @return boolean The method will return TRUE if the current minute in 
+     * @return boolean The method will return true if the current minute in 
      * time is a minute at which the job must be executed.
      * @since 1.0
      */
     public function isMinute(){
         $minuteArr = $this->jobDetails['minutes'];
-        if($minuteArr['every-minute'] === TRUE){
-            $retVal = TRUE;
+        if($minuteArr['every-minute'] === true){
+            $retVal = true;
         }
         else{
-            $retVal = FALSE;
+            $retVal = false;
             $current = Cron::minute();
             $ranges = $minuteArr['at-range'];
             foreach ($ranges as $range){
                 if($current >= $range[0] && $current <= $range[1]){
-                    $retVal = TRUE;
+                    $retVal = true;
                     break;
                 }
             }
-            if($retVal === FALSE){
+            if($retVal === false){
                 $minutes = $minuteArr['at-every-x-minute'];
                 $retVal = in_array($current, $minutes);
-                if($retVal === FALSE){
+                if($retVal === false){
                     $minutes = $minuteArr['every-x-minutes'];
                     foreach ($minutes as $min){
                         if($current % $min == 0){
-                            $retVal = TRUE;
+                            $retVal = true;
                             break;
                         }
                     }
@@ -830,20 +829,20 @@ class CronJob {
      * @since 1.0
      */
     private function _checkDayOfWeek($dayOfWeekField){
-        $isValidExpr = TRUE;
+        $isValidExpr = true;
         $split = explode(',', $dayOfWeekField);
         $dayAttrs = array(
-            'every-day'=>FALSE,
+            'every-day'=>false,
             'at-x-day'=>array(),
             'at-range'=>array()
         );
         foreach ($split as $subExpr){
             $exprType = $this->_getSubExprType($subExpr);
             if($exprType == self::ANY_VAL){
-                $dayAttrs['every-day'] = TRUE;
+                $dayAttrs['every-day'] = true;
             }
             else if($exprType == self::INV_VAL){
-                $isValidExpr = FALSE;
+                $isValidExpr = false;
                 break;
             }
             else if($exprType == self::RANGE_VAL){
@@ -856,22 +855,22 @@ class CronJob {
                             $dayAttrs['at-range'][] = array($start,$end);
                         }
                         else{
-                            $isValidExpr = FALSE;
+                            $isValidExpr = false;
                             break;
                         }
                     }
                     else{
-                        $isValidExpr = FALSE;
+                        $isValidExpr = false;
                         break;
                     }
                 }
                 else{
-                    $isValidExpr = FALSE;
+                    $isValidExpr = false;
                     break;
                 }
             }
             else if($exprType == self::STEP_VAL){
-                $isValidExpr = FALSE;
+                $isValidExpr = false;
             }
             else if($exprType == self::SPECIFIC_VAL){
                 $subExpr = strtoupper($subExpr);
@@ -880,13 +879,13 @@ class CronJob {
                     $dayAttrs['at-x-day'][] = $value;
                 }
                 else{
-                    $isValidExpr = FALSE;
+                    $isValidExpr = false;
                     break;
                 }
             }
         }
-        if($isValidExpr !== TRUE){
-            $dayAttrs = FALSE;
+        if($isValidExpr !== true){
+            $dayAttrs = false;
         }
         return $dayAttrs;
     }
@@ -928,25 +927,35 @@ class CronJob {
         }
     }
     /**
+     * Returns a callable which represents the code that will be 
+     * executed when its time to run the job.
+     * @return Callable A callable which represents the code that will be 
+     * executed when its time to run the job.
+     * @since 1.0.3
+     */
+    public function getOnExecution() {
+        return $this->events['on']['func'];
+    }
+    /**
      * Execute the event which should run when it is time to execute the job. 
      * This method will be called automatically when cron URL is accessed. The 
      * method will check if it is time to execute the associated event or 
      * not. If it is the time, The event will be executed. If 
      * the job is forced to execute, the event that is associated with the 
      * job will be executed even if it is not the time to execute the job.
-     * @param boolean $force If set to TRUE, the job will be forced to execute 
-     * even if it is not job time. Default is FALSE.
+     * @param boolean $force If set to true, the job will be forced to execute 
+     * even if it is not job time. Default is false.
      * @return boolean If the event that is associated with the job is executed, 
-     * the method will return TRUE. If it is not executed, the method 
-     * will return FALSE.
+     * the method will return true. If it is not executed, the method 
+     * will return false.
      * @since 1.0
      */
     public function execute($force=false){
-        $retVal = FALSE;
-        if($force === TRUE || ($this->isMinute() && $this->isHour() && $this->isDayOfMonth() && 
+        $retVal = false;
+        if($force === true || ($this->isMinute() && $this->isHour() && $this->isDayOfMonth() && 
         $this->isMonth() && $this->isDayOfWeek())){
             call_user_func($this->events['on']['func'], $this->events['on']['params']);
-            $retVal = TRUE;
+            $retVal = true;
         }
         return $retVal;
     }

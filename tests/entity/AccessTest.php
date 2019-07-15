@@ -172,4 +172,57 @@ class AccessTest extends TestCase{
         $str = Access::createPermissionsStr($user);
         $this->assertEquals('G-EMPLOYER',$str);
     }
+    /**
+     * @test
+     * @depends test08
+     */
+    public function testCreatePrivilegesStr02() {
+        $user = new User();
+        $user->addToGroup('EMPLOYER');
+        $user->addPrivilege('REVERSE_INVOICE');
+        $str = Access::createPermissionsStr($user);
+        $this->assertEquals('G-EMPLOYER;REVERSE_INVOICE-1',$str);
+    }
+    /**
+     * @test
+     * @depends test08
+     */
+    public function testCreatePrivilegesStr03() {
+        $user = new User();
+        $user->addToGroup('EMPLOYER');
+        $user->addToGroup('ADMINS');
+        $user->addPrivilege('REVERSE_INVOICE');
+        $user->addPrivilege('RESET_PASSWORD_SELF');
+        $str = Access::createPermissionsStr($user);
+        $this->assertEquals('G-ADMINS;G-EMPLOYER;REVERSE_INVOICE-1;RESET_PASSWORD_SELF-1',$str);
+        return $str;
+    }
+    /**
+     * @depends testCreatePrivilegesStr03
+     * @param type $str
+     */
+    public function testResolvePrivilegesStr($str){
+        $user = new User();
+        Access::resolvePriviliges($str, $user);
+        $this->assertTrue($user->hasPrivilege('REVERSE_INVOICE'));
+        $this->assertTrue($user->hasPrivilege('RESET_PASSWORD_SELF'));
+        $this->assertTrue($user->inGroup('ADMINS'));
+        $this->assertFalse($user->hasPrivilege('VIEW_SALES_REPORT'));
+        $this->assertTrue($user->inGroup('EMPLOYER'));
+        $this->assertFalse($user->inGroup('HR'));
+    }
+    /**
+     * @test
+     * @depends test08
+     */
+    public function testAsArray00() {
+        $asArr = Access::asArray();
+        $this->assertEquals(2,count($asArr));
+        $this->assertEquals('ADMINS',$asArr[0]['group-id']);
+        $this->assertEquals(1,count($asArr[0]['privileges']));
+        $this->assertEquals(1,count($asArr[0]['child-groups']));
+        $this->assertEquals('USERS_MANAGERS',$asArr[0]['child-groups'][0]['group-id']);
+        $this->assertEquals(4,count($asArr[0]['child-groups'][0]['privileges']));
+        $this->assertEquals('SYS_USER',$asArr[1]['group-id']);
+    }
 }

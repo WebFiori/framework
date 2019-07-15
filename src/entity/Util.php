@@ -473,7 +473,12 @@ class Util{
      * @since 0.1
      */
     public static function isUpper($char) {
-        return mb_strtolower($char, "UTF-8") != $char;
+        if(function_exists('mb_strtolower')){
+            return mb_strtolower($char, "UTF-8") != $char;
+        }
+        else{
+            return strtolower($char) != $char;
+        }
     }
     /**
      * Call this method to display errors and warnings.
@@ -497,6 +502,7 @@ class Util{
     public static function filterScripts($input){
         $retVal = str_replace('<script>', '&lt;script&gt;', $input);
         $retVal = str_replace('</script>', '&lt;/script&gt;', $retVal);
+        $retVal = str_replace('<?', '&lt;?', $retVal);
         $retVal = str_replace('<?php', '&lt;?php', $retVal);
         return $retVal;
     }

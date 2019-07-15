@@ -515,8 +515,9 @@ class Access {
      * Creates new users group using specific ID.
      * The group is the base for user privileges. After creating it, the developer 
      * can add a set of privileges to the group. Note that the group will not created 
-     * only if the name of the group contains invalid characters or it is already 
-     * created.
+     * if the name of the group contains invalid characters or it is already 
+     * created. In addition, If a parent group has the given new group name, 
+     * it will not be created.
      * @param string $groupId The ID of the group. The ID must not contain 
      * any of the following characters: ';','-',',' or a space. If the name contains 
      * any of the given characters, the group will not created.

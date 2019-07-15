@@ -67,7 +67,7 @@ class Access {
      * @since 1.0
      */
     private static function &get(){
-        if(self::$access != null){
+        if(self::$access !== null){
             return self::$access;
         }
         self::$access = new Access();

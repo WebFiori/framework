@@ -15,7 +15,7 @@ class RouterUriTest extends TestCase{
     public function testSplitURI_01(){
         $uri = 'https://www3.programmingacademia.com:80/{some-var}/hell/{other-var}/?do=dnt&y=#xyz';
         $uriObj = new RouterUri($uri, '');
-        $this->assertEquals(Router::CUSTOMIZED.$uriObj->getType());
+        $this->assertEquals(Router::CUSTOMIZED,$uriObj->getType());
         $this->assertEquals('https',$uriObj->getScheme());
         $this->assertFalse($uriObj->isInSiteMap());
     }

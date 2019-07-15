@@ -60,7 +60,11 @@ class TemplateTheme extends Theme{
         $headerSec->addChild($headerBody);
         return $headerSec;
     }
-
+    /**
+     * Create your custom HTML nodes here.
+     * @param type $options
+     * @return HTMLNode
+     */
     public function createHTMLNode($options = array()) {
         $node = new HTMLNode();
         return $node;

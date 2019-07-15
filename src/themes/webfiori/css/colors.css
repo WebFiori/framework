@@ -31,10 +31,10 @@ THE SOFTWARE.
 html{
    background: linear-gradient(-90deg, #71b280, #267871);
 }
-.pa-container{
+.wf-container{
     background-color: #006E51;
 }
-.pa-row{
+.wf-row{
     background-color: transparent;
 }
 [class*='col']{
@@ -56,7 +56,7 @@ html{
 #page-header{
     background-color: #71b280;
 }
-#pa-side-nav{
+#wf-side-nav{
     background-color: white;
 }
 a{

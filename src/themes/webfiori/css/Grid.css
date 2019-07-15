@@ -40,29 +40,29 @@ THE SOFTWARE.
     box-sizing: border-box;
 }
 
-.pa-container, 
-.pa-row, 
-.pa-row-nm, 
-.pa-row-np, 
-.pa-row-nm-np, 
-.pa-row-np-nm{
+.wf-container, 
+.wf-row, 
+.wf-row-nm, 
+.wf-row-np, 
+.wf-row-nm-np, 
+.wf-row-np-nm{
     float: left;
 }
-.pa-container{
+.wf-container{
     width: 100%;
     margin: 0;
 }
-.pa-row-nm, .pa-row-np{
+.wf-row-nm, .wf-row-np{
     width: 100%;
 }
-.pa-row-np{
+.wf-row-np{
     margin: 0.5%;
     width: 99%
 }
-.pa-row-nm-np,.pa-row-np-nm{
+.wf-row-nm-np,.wf-row-np-nm{
     width: 100%;
 }
-.pa-row{
+.wf-row{
     padding: 0.5%;
     margin: 0.5%;
     width: 99%;
@@ -73,7 +73,7 @@ THE SOFTWARE.
 [class*='-nm']{
     margin: 0 !important;
 }
-.pa-container > .pa-row{
+.wf-container > .wf-row{
     margin-bottom: 0;
     margin-top: 0;
 }
@@ -83,11 +83,11 @@ THE SOFTWARE.
     float: left;
 }
 
-[class*="pa-ltr-"]{
+[class*="wf-ltr-"]{
     float: left;
     direction: ltr;
 }
-[class*="pa-rtl-"]{
+[class*="wf-rtl-"]{
     float: right;
     direction: rtl;
 }

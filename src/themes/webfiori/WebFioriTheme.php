@@ -40,11 +40,11 @@ class WebFioriTheme extends Theme{
         $this->setAfterLoaded(function(){
             $session = WebsiteFunctions::get()->getSession();
             Page::lang($session->getLang(true));
-            Page::document()->getChildByID('main-content-area')->setClassName('pa-'.Page::dir().'-col-10');
-            Page::document()->getChildByID('side-content-area')->setClassName('pa-'.Page::dir().'-col-2');
-            Page::document()->getChildByID('page-body')->setClassName('pa-row');
-            Page::document()->getChildByID('page-header')->setClassName('pa-row-np');
-            Page::document()->getChildByID('page-footer')->setClassName('pa-row');
+            Page::document()->getChildByID('main-content-area')->setClassName('wf-'.Page::dir().'-col-10');
+            Page::document()->getChildByID('side-content-area')->setClassName('wf-'.Page::dir().'-col-2');
+            Page::document()->getChildByID('page-body')->setClassName('wf-row');
+            Page::document()->getChildByID('page-header')->setClassName('wf-row-np');
+            Page::document()->getChildByID('page-footer')->setClassName('wf-row');
             //WebFioriGUI::createTitleNode();
 
             LangExt::extLang();
@@ -79,7 +79,7 @@ class WebFioriTheme extends Theme{
         $page = Page::get();
         $node = new HTMLNode('div');
         $socialMedia = new HTMLNode();
-        $socialMedia->setClassName('pa-row');
+        $socialMedia->setClassName('wf-row');
         $socialMedia->setID('social-media-container');
         $socialMedia->setWritingDir($page->getWritingDir());
 
@@ -121,7 +121,7 @@ class WebFioriTheme extends Theme{
 
         $node->addChild($socialMedia);
         $contactInfo = new HTMLNode();
-        $contactInfo->setClassName('pa-'.Page::dir().'-col-12');
+        $contactInfo->setClassName('wf-'.Page::dir().'-col-12');
         $p = new PNode();
         $p->addText('013 xxx xxxx', array('new-line'=>true));
         $p->addText('youremail@example.com',array('new-line'=>true));
@@ -129,7 +129,7 @@ class WebFioriTheme extends Theme{
         $node->addChild($contactInfo);
         $p->addText('Your Copyright Notice © 2018');
         $div = new HTMLNode('div');
-        $div->setAttribute('class', 'pa-ltr-col-twelve');
+        $div->setAttribute('class', 'wf-ltr-col-12');
         $div->addTextNode('<b style="color:gray;font-size:8pt;">Powered By: <a href="https://github.com/usernane/webfiori" '
                 . 'target="_blank">WebFiori Framework</a> v'.Config::getVersion().' ('.Config::getVersionType().')</b>',false);
         $node->addChild($div);
@@ -151,10 +151,10 @@ class WebFioriTheme extends Theme{
         $headerSec = new HTMLNode();
         $logoContainer = new HTMLNode();
         $logoContainer->setID('inner-header');
-        $logoContainer->setClassName('pa-'.Page::dir().'-col-11-nm-np');
+        $logoContainer->setClassName('wf-'.Page::dir().'-col-11-nm-np');
         $img = new HTMLNode('img', false);
         $img->setAttribute('src',Page::imagesDir().'/WebsiteIcon_1024x1024.png');
-        $img->setClassName('pa-'.Page::dir().'-col-1-np-nm');
+        $img->setClassName('wf-'.Page::dir().'-col-1-np-nm');
         $img->setID('logo');
         $img->setWritingDir(Page::dir());
         $link = new LinkNode(SiteConfig::getHomePage(), '');
@@ -180,10 +180,10 @@ class WebFioriTheme extends Theme{
         //starting of main menu items
         $menu = new HTMLNode('nav');
         $menu->setID('main-navigation-menu');
-        $menu->setClassName('pa-'.Page::dir().'-col-9-np');
+        $menu->setClassName('wf-'.Page::dir().'-col-9-np');
         $ul = new UnorderedList();
         $ul->setID('menu-items-container');
-        $ul->setClassName('pa-row-nm-np');
+        $ul->setClassName('wf-row-nm-np');
         $ul->setAttribute('dir', Page::dir());
         $menu->addChild($ul);
         $logoContainer->addChild($menu);
@@ -217,7 +217,7 @@ class WebFioriTheme extends Theme{
             $wp = $withPadding === true ? '' : '-np';
             $wm = $withMargin === true ? '' : '-nm';
             $node = new HTMLNode();
-            $node->setClassName('pa-row'.$wm.$wp);
+            $node->setClassName('wf-row'.$wm.$wp);
             return $node;
         }
         else if($nodeType == 'wf-col'){
@@ -228,7 +228,7 @@ class WebFioriTheme extends Theme{
             $wp = $withPadding === true ? '' : '-np';
             $wm = $withMargin === true ? '' : '-nm';
             $node = new HTMLNode();
-            $node->setClassName('pa-'.Page::get()->getWritingDir().'-col-'.$colSize.$wm.$wp);
+            $node->setClassName('wf-'.Page::get()->getWritingDir().'-col-'.$colSize.$wm.$wp);
             return $node;
         }
         else if($nodeType == 'page-title'){
@@ -239,7 +239,7 @@ class WebFioriTheme extends Theme{
             $title = isset($options['title']) ? $options['title'] : Page::title();
             $h1 = new HTMLNode('h2');
             $h1->addTextNode($title);
-            $h1->setClassName('pa-'.Page::dir().'-col-10-nm-np');
+            $h1->setClassName('wf-'.Page::dir().'-col-10-nm-np');
             $titleRow->addChild($h1);
             return $titleRow;
         }

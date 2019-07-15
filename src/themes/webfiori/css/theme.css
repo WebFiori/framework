@@ -26,7 +26,7 @@ THE SOFTWARE.
     Author     : Ibrahim
 */
 @media screen and (max-width: 768px){
-    #pa-side-nav {
+    #wf-side-nav {
 	position: fixed;
 	overflow: auto;
 	width: 85% !important;
@@ -136,15 +136,15 @@ h2#post-title{
 .show-border[dir=rtl]{
     border-right: 3px solid black;
 }
-#pa-side-nav{
+#wf-side-nav{
     border: solid 1px black;
     padding: 0;
     font-weight: bold;
 }
-#pa-side-nav[dir=ltr]{
+#wf-side-nav[dir=ltr]{
     border-left-width: 10px;
 }
-#pa-side-nav[dir=rtl]{
+#wf-side-nav[dir=rtl]{
     border-right-width: 10px;
 }
 #logo{

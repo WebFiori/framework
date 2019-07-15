@@ -219,7 +219,6 @@ class User implements JsonI{
             foreach ($group->privileges() as $groupPrivilege){
                 $inGroup = $inGroup && $this->hasPrivilege($groupPrivilege->getID());
             }
-            return $inGroup;
         }
         else{
             $inGroup = false;

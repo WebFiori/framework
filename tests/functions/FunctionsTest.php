@@ -182,4 +182,64 @@ class FunctionsTest extends TestCase{
         $this->assertTrue($func->setQueryObject($q));
         $this->assertTrue($func->getQueryObject() instanceof TestQuery_1);
     }
+    /**
+     * @test
+     */
+    public function testGetSession00() {
+        $func = new Functions();
+        $this->assertNull($func->getSession());
+    }
+    /**
+     * @test
+     */
+    public function testGetSessionLang00() {
+        $func = new Functions();
+        $this->assertNull($func->getSessionLang());
+    }
+    /**
+     * @test
+     */
+    public function testSetSessionVar00() {
+        $func = new Functions();
+        $this->assertFalse($func->setSessionVar(' ',null));
+        $this->assertFalse($func->setSessionVar('hello',null));
+    }
+    /**
+     * @test
+     */
+    public function testGetSessionVar00() {
+        $func = new Functions();
+        $this->assertNull($func->getSessionVar(''));
+    }
+    /**
+     * @test
+     */
+    public function testGetSessionVar01() {
+        $func = new Functions();
+        $this->assertNull($func->getSessionVar('random'));
+    }
+    /**
+     * @test
+     */
+    public function testGetRows00() {
+        $func = new Functions();
+        $this->assertEquals(-1,$func->rows());
+        $this->assertEmpty($func->getRows());
+        $this->assertNull($func->getRow());
+        $this->assertNull($func->nextRow());
+    }
+    /**
+     * @test
+     */
+    public function testGetUserID00() {
+        $func = new Functions();
+        $this->assertEquals(-1,$func->getUserID());
+    }
+    /**
+     * @test
+     */
+    public function testHasPrivilege00() {
+        $func = new Functions();
+        $this->assertFalse($func->hasPrivilege('HELLO'));
+    }
 }

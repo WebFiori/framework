@@ -93,4 +93,93 @@ class ClassUtilTest extends TestCase{
             $this->assertEquals('ًالهأ', Util::reverse('أهلاً'));
         }
     }
+    /**
+     * @test
+     */
+    public function testToBinaryString00() {
+        $this->assertFalse(Util::binaryString(''));
+    }
+    /**
+     * @test
+     */
+    public function testToBinaryString01() {
+        $this->assertFalse(Util::binaryString('1'));
+    }
+    /**
+     * @test
+     */
+    public function testToBinaryString02() {
+        $this->assertFalse(Util::binaryString(-1));
+    }
+    /**
+     * @test
+     */
+    public function testToBinaryString03() {
+        $this->assertEquals('0',Util::binaryString(0));
+    }
+    /**
+     * @test
+     */
+    public function testToBinaryString04() {
+        $this->assertEquals('1',Util::binaryString(1));
+    }
+    /**
+     * @test
+     */
+    public function testToBinaryString05() {
+        $this->assertEquals('10',Util::binaryString(2));
+    }
+    /**
+     * @test
+     */
+    public function testToBinaryString06() {
+        $this->assertEquals('11',Util::binaryString(3));
+    }
+    /**
+     * @test
+     */
+    public function testToBinaryString07() {
+        $this->assertEquals('1000',Util::binaryString(8));
+    }
+    /**
+     * @test
+     */
+    public function testToBinaryString08() {
+        $this->assertEquals('10000',Util::binaryString(16));
+    }
+    /**
+     * @test
+     */
+    public function testToBinaryString09() {
+        $this->assertEquals('11110',Util::binaryString(30));
+    }
+    /**
+     * @test
+     */
+    public function testIsUpper() {
+        $this->assertTrue(Util::isUpper('A'));
+        $this->assertFalse(Util::isUpper('a'));
+        $this->assertFalse(Util::isUpper('أ'));
+    }
+    /**
+     * @test
+     */
+    public function testFilterScript00() {
+        $text = '<? echo "Hello World!"';
+        $this->assertEquals('&lt;? echo "Hello World!"', Util::filterScripts($text));
+    }
+    /**
+     * @test
+     */
+    public function testFilterScript01() {
+        $text = '<?php echo "Hello World!"';
+        $this->assertEquals('&lt;?php echo "Hello World!"', Util::filterScripts($text));
+    }
+    /**
+     * @test
+     */
+    public function testFilterScript02() {
+        $text = '<script>alert("hello world!")</script>';
+        $this->assertEquals('&lt;script&gt;alert("hello world!")&lt;/script&gt;', Util::filterScripts($text));
+    }
 }

@@ -205,7 +205,6 @@ class WebFiori{
         }
         self::$AU = AutoLoader::get();
         //display PHP warnings and errors
-        Util::displayErrors();
         
         InitAutoLoad::init();
         CLI::init();
@@ -262,7 +261,57 @@ class WebFiori{
      * Sets new error and exception handler.
      */
     private function _setHandlers(){
+        register_shutdown_function(function(){
+            $error = error_get_last();
+            if($error !== null) {
+                $errNo = $error['type'];
+                if($errNo == E_WARNING || 
+                   $errNo == E_NOTICE || 
+                   $errNo == E_USER_ERROR || 
+                   $errNo == E_USER_NOTICE){
+                    return;
+                }
+                header("HTTP/1.1 500 Server Error");
+                if(defined('API_CALL')){
+                    $j = new JsonX();
+                    $j->add('message',$error["message"]);
+                    $j->add('type','error');
+                    $j->add('error-number',$error["type"]);
+                    $j->add('file',$error["file"]);
+                    $j->add('line',$error["line"]);
+                    die($j);
+                }
+                else{
+                    die(''
+                    . '<!DOCTYPE html>'
+                    . '<html>'
+                    . '<head>'
+                    . '<style>'
+                    . '.nice-red{'
+                    . 'color:#ff6666;'
+                    . '}'
+                    . '.mono{'
+                    . 'font-family:monospace;'
+                    . '}'
+                    . '</style>'
+                    . '<title>Server Error - 500</title>'
+                    . '</head>'
+                    . '<body style="color:white;background-color:#1a000d;">'
+                    . '<h1 style="color:#ff4d4d">500 - Server Error</h1>'
+                    . '<hr>'
+                    . '<p>'
+                    .'<b class="nice-red mono">Error Number:</b> <span class="mono">'.$error["type"]."</span><br/>"
+                    .'<b class="nice-red mono">File:</b> <span class="mono">'.$error["file"]."</span><br/>"
+                    .'<b class="nice-red mono">Line:</b> <span class="mono">'.$error["line"]."</span><br/>"
+                    .'<b class="nice-red mono">Message:</b> <span class="mono">'.$error["message"]."</span><br>"
+                    . '</p>'
+                    . '</body>'
+                    . '</html>');
+                }
+            }
+        });
         set_error_handler(function($errno, $errstr, $errfile, $errline){
+            Util::displayErrors();
             if(defined('API_CALL')){
                 header("HTTP/1.1 500 Server Error");
                 $j = new JsonX();

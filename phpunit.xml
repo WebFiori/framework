@@ -6,20 +6,14 @@
     </php>
     <filter>
         <whitelist addUncoveredFilesFromWhitelist="true">
-            <directory suffix=".php">./src/conf</directory>
             <directory suffix=".php">./src/entity/mail</directory>
             <file>./src/WebFiori.php</file>
             <file>./src/functions/Functions.php</file>
             <file>./src/entity/cron/CronJob.php</file>
-            <file>./src/entity/router/Router.php</file>
-            <file>./src/entity/router/SessionManager.php</file>
             <file>./src/entity/router/RouterUri.php</file>
             <file>./src/entity/langs/Language.php</file>
             <file>./src/entity/Access.php</file>
-            <file>./src/entity/Autoloader.php</file>
-            <file>./src/entity/DBConnectionFactory.php</file>
             <file>./src/entity/DBConnectionInfo.php</file>
-            <file>./src/entity/ExtendedWebAPI.php</file>
             <file>./src/entity/File.php</file>
             <file>./src/entity/Privilege.php</file>
             <file>./src/entity/PrivilegesGroup.php</file>

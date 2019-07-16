@@ -1,5 +1,4 @@
 <?php
-namespace webfiori\theme;
 use webfiori\entity\Page;
 use webfiori\entity\langs\Language;
 /**

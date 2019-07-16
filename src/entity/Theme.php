@@ -327,16 +327,20 @@ abstract class Theme implements JsonI{
      */
     public static function getAvailableThemes(){
         $themes = array();
-        $themesDirs = array_diff(scandir(ROOT_DIR.DIRECTORY_SEPARATOR. self::THEMES_DIR), array('..', '.'));
+        $DS = DIRECTORY_SEPARATOR;
+        $themesDirs = array_diff(scandir(ROOT_DIR.$DS.self::THEMES_DIR), array('..', '.'));
         foreach ($themesDirs as $dir){
-            $pathToScan = ROOT_DIR.DIRECTORY_SEPARATOR.self::THEMES_DIR.DIRECTORY_SEPARATOR.$dir;
+            $pathToScan = ROOT_DIR.$DS.self::THEMES_DIR.$DS.$dir;
             $filesInDir = array_diff(scandir($pathToScan), array('..', '.'));
             foreach ($filesInDir as $fileName){
                 $fileExt = substr($fileName, -4);
                 if($fileExt == '.php'){
                     $cName = str_replace('.php', '', $fileName);
-                    if(class_exists($cName)){
-                        $instance = new $cName();
+                    $ns = require_once $pathToScan.$DS.$fileName;
+                    $aNs = $ns != 1 ? $ns.'\\' : '';
+                    $aCName = $aNs.$cName;
+                    if(class_exists($aCName)){
+                        $instance = new $aCName();
                         if($instance instanceof Theme){
                             $themes[$instance->getName()] = $instance;
                         }

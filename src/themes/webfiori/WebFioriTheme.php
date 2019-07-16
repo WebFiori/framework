@@ -248,6 +248,17 @@ class WebFioriTheme extends Theme{
             $node = new HTMLNode();
             return $node;
         }
+        else if($nodeType == 'section'){
+            $node = new HTMLNode('section');
+            if(isset($options['h-level']) && $options['h-level'] > 0 && $options['h-level'] < 7){
+                $h = new HTMLNode('h'.$options['h-level']);
+            }
+            else{
+                $h = new HTMLNode('h1');
+            }
+            $h->addTextNode($options['title']);
+            $node->addChild($h);
+        }
         else if($nodeType == 'wf-row'){
             $wp = $withPadding === true ? '' : '-np';
             $wm = $withMargin === true ? '' : '-nm';
@@ -321,4 +332,4 @@ class WebFioriTheme extends Theme{
             return $row;
         }
     }
-}
+}return __NAMESPACE__;

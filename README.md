@@ -6,6 +6,9 @@
   <a href="https://codecov.io/gh/usernane/webfiori">
     <img src="https://codecov.io/gh/usernane/webfiori/branch/master/graph/badge.svg" />
   </a>
+  <a href="https://github.com/usernane/webfiori/releases">
+      <img src="https://img.shields.io/github/release/usernane/webfiori.svg?label=latest" />
+  </a>
   <a href="https://paypal.me/IbrahimBinAlshikh">
     <img src="https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fprogrammingacademia.com%2Fwebfiori%2Fapis%2Fshields-get-dontate-badget">
   </a>
@@ -29,6 +32,12 @@ WebFiori Framework is a web framework which is built using PHP language. The fra
 * Well-defined file upload and file handling sub-system.
 * Building and manipulating the DOM of a web page using PHP language.
 * Basic support for running the framework throgh CLI.
+
+## Getting Started
+To learn the basics of how to use the framework, please head on to https://programmingacademia.com/webfiori/learn.
+
+## API Docs
+To read API docs of the framework, please head on to https://programmingacademia.com/webfiori/docs/webfiori.
 
 ## Setup
 ### Local Development Environment

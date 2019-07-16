@@ -12,7 +12,7 @@
 </p>
 What is WebFiori Framework?
 
-WebFiori Framework is new web framework which is built using PHP language. The framework is fully object oriented (OOP). It allows the use of the famous model-view-controller (MVC) model but it does not force it. The framework comes with many features which can help in making your website or web application up and running in no time.
+WebFiori Framework is a web framework which is built using PHP language. The framework is fully object oriented (OOP). It allows the use of the famous model-view-controller (MVC) model but it does not force it. The framework comes with many features which can help in making your website or web application up and running in no time.
 
 ## Key Features
 * Theming and the ability to create multiple UIs for the same web page using any CSS or JavaScript framework.
@@ -25,12 +25,13 @@ WebFiori Framework is new web framework which is built using PHP language. The f
 * Support for creating and sending nice-looking emails in a simple way by using SMTP protocol.
 * Autoloading of user defined classes.
 * The ability to create automatic tasks and let them run in specific time using CRON.
-* Support for logging of system events.
+* Basic support for logging.
 * Well-defined file upload and file handling sub-system.
 * Building and manipulating the DOM of a web page using PHP language.
+* Basic support for running the framework throgh CLI.
 
 ## Setup
-
+### Local Development Environment
 If you plan to test the framework on your local machine, you have to download AMP (Apache, MySQL and PHP) stack first. 
 We suggest to use the ones that are offered by Bitnami. You can go to https://bitnami.com/stacks/infrastructure to check 
 the available options.
@@ -38,3 +39,5 @@ the available options.
 Once downloaded and installed, download the latest release of the framework from https://programmingacademia.com/webfiori/download. 
 After downloading, extract all files inside the folder '/htdocs'. The folder will be inside the place where you installed AMP
 stack.
+### Hosting on the Web
+If you plan to use the framework for all of your domain, then simply upload all framework files to the root folder of your website (usually has the name "public_html"). If you plan to use it in specific part of your website, then upload framework files to the folder that the part of your website will point to.

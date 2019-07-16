@@ -1,6 +1,4 @@
 <?php
-namespace webfiori\theme;
-
 use webfiori\entity\Theme;
 use webfiori\WebFiori;
 use webfiori\entity\Page;

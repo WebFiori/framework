@@ -35,6 +35,7 @@ if(!defined('ROOT_DIR')){
 use webfiori\entity\Page;
 use phpStructs\html\PNode;
 use phpStructs\html\HTMLNode;
+use phpStructs\html\UnorderedList;
 class ExamplePage{
     public function __construct() {
         //load UI template components (JS, CSS and others)
@@ -60,20 +61,35 @@ class ExamplePage{
         $sec = new HTMLNode('section');
         Page::insert($sec);
         $secH = new HTMLNode('h1');
-        $secH->addTextNode('Datagram');
+        $secH->addTextNode('What is WebFiori Framework? ');
         $sec->addChild($secH);
         $p2 = new PNode();
-        $p2->addText('A datagram is a basic transfer unit associated with a packet-switched network. Datagrams are typically structured in header and payload sections. Datagrams provide a connectionless communication service across a packet-switched network. The delivery, arrival time, and order of arrival of datagrams need not be guaranteed by the network. ');
+        $p2->addText('WebFiori Framework is a web framework which is built using PHP language. The framework is fully object oriented (OOP). It allows the use of the famous model-view-controller (MVC) model but it does not force it. The framework comes with many features which can help in making your website or web application up and running in no time.');
         $sec->addChild($p2);
         
         $sec = new HTMLNode('section');
         Page::insert($sec);
         $secH = new HTMLNode('h1');
-        $secH->addTextNode('History');
+        $secH->addTextNode('Key Features');
         $sec->addChild($secH);
-        $p2 = new PNode();
-        $p2->addText('The term datagram appeared first within the project CYCLADES, a packet-switched network created in the early 1970s, and was coined by Louis Pouzin[1] by combining the words data and telegram. CYCLADES was the first network to make the hosts responsible for the reliable delivery of data, rather than the network itself, using unreliable datagrams and associated end-to-end principle.');
-        $sec->addChild($p2);
+        $ul = new UnorderedList();
+        $ul->addListItems([
+            'Theming and the ability to create multiple UIs for the same web page using any CSS or JavaScript framework.',
+            'Support for routing that makes the ability of creating search-engine-friendly links an easy task.',
+            'Creation of web APIs that supports JSON, data filtering and validation.',
+            'Basic support for MySQL schema and query building.',
+            'Lightweight. The total size of framework core files is less than 3 megabytes.',
+            'Access management by assigning system user a set of privileges.',
+            'The ability to create and manage multiple sessions at once.',
+            'Support for creating and sending nice-looking emails in a simple way by using SMTP protocol.',
+            'Autoloading of user defined classes.',
+            'The ability to create automatic tasks and let them run in specific time using CRON.',
+            'Basic support for logging.',
+            'Well-defined file upload and file handling sub-system.',
+            'Building and manipulating the DOM of a web page using PHP language.',
+            'Basic support for running the framework throgh CLI.'
+        ]);
+        $sec->addChild($ul);
         Page::render();
     }
 }

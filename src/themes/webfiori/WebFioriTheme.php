@@ -332,4 +332,5 @@ class WebFioriTheme extends Theme{
             return $row;
         }
     }
-}return __NAMESPACE__;
+}
+return __NAMESPACE__;

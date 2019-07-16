@@ -1,4 +1,6 @@
 <?php
+namespace webfiori\theme;
+
 use webfiori\entity\Theme;
 use webfiori\WebFiori;
 use webfiori\entity\Page;
@@ -7,6 +9,8 @@ use phpStructs\html\ListItem;
 use phpStructs\html\LinkNode;
 use phpStructs\html\HeadNode;
 use phpStructs\html\HTMLNode;
+use phpStructs\html\Input;
+use phpStructs\html\Label;
 use phpStructs\html\PNode;
 use phpStructs\html\UnorderedList;
 use webfiori\conf\SiteConfig;
@@ -17,7 +21,7 @@ class WebFioriTheme extends Theme{
         parent::__construct();
         $this->setAuthor('Ibrahim Ali');
         $this->setName('WebFiori Theme');
-        $this->setVersion('1.0');
+        $this->setVersion('1.0.1');
         $this->setDescription('The main theme for WebFiori Framework.');
         $this->setDirectoryName('webfiori');
         $this->setImagesDirName('images');
@@ -197,9 +201,41 @@ class WebFioriTheme extends Theme{
      * <li>type: The type of the node that will be created. Supported 
      * types are: 
      * <ul>
-     * <li>div (default)</li>
-     * <li>wf-row</li>
-     * <li>wf-col</li>
+     * <li>"div" (default).</li>
+     * <li>"wf-row". This type has the following options: 
+     * <ul>
+     * <li>"with-padding", a boolean. If set to true, the row will have padding. Default is true.</li>
+     * <li>"with-margin", a boolean. If set to true, the row will have margins. Default is true.</li>
+     * </ul>
+     * </li>
+     * <li>"wf-col". This type has the following options: 
+     * <ul>
+     * <li>"size". Size of the column. A number from 1 up to 12. Default is 12.</li>
+     * <li>"with-padding", a boolean. If set to true, the column will have padding. Default is true.</li>
+     * <li>"with-margin", a boolean. If set to true, the column will have margins. Default is true.</li>
+     * </ul>
+     * </li>
+     * <li>"input-element". A row which represents input element alongside its components. 
+     * This type has the following options:
+     * <ul>
+     * <li>"input-type". The type of input element. Default is "text"</li>
+     * <li>"label". The label which will be used for the input element. 
+     * If not provided, the value 'Input_label' is used.</li>
+     * <li>"input-id". The ID of input element. If not provided, the 
+     * value 'input-el' is used.</li>
+     * <li>"placeholder" A text to show as a placeholder.</li>
+     * <li>"on-input". A String that represents JavaScript code which 
+     * will be executed when input element value changes.</li>
+     * <li>"select-data". An array of sub-associative arrays that has an options which are 
+     * used if input element type is "select". Each sub array can have the following indices:
+     * <ul>
+     * <li>"label". A label to show for the select option.</li>
+     * <li>"value". The value of the attribute "value" of the select.</li>
+     * <li>"selected". A boolean. If set to true, the attribute "selected" will be set for the option.</li>
+     * <li>"disabled". A boolean. If set to true, the attribute "disabled" will be set for the option.</li>
+     * </ul>
+     * </ul>
+     * </li>
      * </ul>
      * </li>
      * </ul>
@@ -242,6 +278,48 @@ class WebFioriTheme extends Theme{
             $h1->setClassName('wf-'.Page::dir().'-col-10-nm-np');
             $titleRow->addChild($h1);
             return $titleRow;
+        }
+        else if($nodeType == 'input-element'){
+            $row = $this->createHTMLNode(['type'=>'wf-row']);
+            $label = isset($options['label']) ? $options['label'] : 'Input_label';
+            $labelNode = new Label($label);
+            $inputId = isset($options['input-id']) ? $options['input-id'] : 'input-el';
+            $labelNode->setAttribute('for', $inputId);
+            $row->addChild($labelNode);
+            $inputType = isset($options['input-type']) ? $options['input-type'] : 'text';
+            if($inputType == 'select'){
+                $inputEl = new HTMLNode('select');
+                $inputEl->setID($inputId);
+                if(isset($options['select-data'])){
+                    foreach ($options['select-data'] as $data){
+                        $label = isset($data['label']) ? $data['label'] : 'Lbl';
+                        $val = isset($data['value']) ? $data['value']:null;
+                        $isDisabled = isset($data['disabled']) ? $data['disabled'] === true : false;
+                        if($val !== null){
+                            $o = new HTMLNode('option');
+                            $o->addTextNode($label);
+                            $o->setAttribute('value', $val);
+                            if(isset($data['selected']) && $data['selected'] === true){
+                                $o->setAttribute('selected', '');
+                            }
+                            if($isDisabled){
+                                $o->setAttribute('disabled', '');
+                            }
+                            $inputEl->addChild($o);
+                        }
+                    }
+                }
+            }
+            else{
+                $inputEl = new Input($inputType);
+                $inputEl->setID($inputId);
+                $placeholder = isset($options['placeholder']) ? $options['placeholder'] : '';
+                $inputEl->setAttribute('placeholder', $placeholder);
+                $onInput = isset($options['on-input']) ? $options['on-input'] : "console.log(this.id+' has changed value.');";
+                $inputEl->setAttribute('oninput', $onInput);
+            }
+            $row->addChild($inputEl);
+            return $row;
         }
     }
 }

@@ -209,7 +209,59 @@ class WebFiori{
         
         InitAutoLoad::init();
         CLI::init();
+        $this->_setHandlers();
+        self::$SF = SystemFunctions::get();
+        self::$WF = WebsiteFunctions::get();
+        self::$BMF = BasicMailFunctions::get();
+        //initialize main session with name = 'wf-session'.
+        $this->sysStatus = Util::checkSystemStatus(true);
+        if($this->sysStatus == Util::MISSING_CONF_FILE || $this->sysStatus == Util::MISSING_SITE_CONF_FILE){
+            self::$SF->createConfigFile();
+            self::$WF->createSiteConfigFile();
+            self::$BMF->createEmailConfigFile();
+            $this->sysStatus = Util::checkSystemStatus(true);
+        }
+        if(gettype($this->sysStatus) == 'array'){
+            $this->dbErrDetails = $this->sysStatus;
+            $this->sysStatus = Util::DB_NEED_CONF;
+        }
         
+        APIRoutes::create();
+        ViewRoutes::create();
+        ClosureRoutes::create();
+        OtherRoutes::create();
+        
+        //initialize some settings...
+        InitCron::init();
+        InitPrivileges::init();
+        
+        self::$classStatus = 'INITIALIZED';
+        
+        define('INITIAL_SYS_STATUS', $this->_getSystemStatus());
+        if(php_sapi_name() != 'cli'){
+            if(INITIAL_SYS_STATUS === true){
+                
+            }
+            else if(INITIAL_SYS_STATUS == Util::DB_NEED_CONF){
+                //??
+            }
+            else{
+                //you can modify this part to make 
+                //it do something else in case system 
+                //configuration is not equal to true
+
+                //change system config status to configured.
+                //WebFiori::getSysFunctions()->configured(true);
+
+                //show error message to tell the developer how to configure the system.
+                $this->_needConfigration();
+            }
+        }
+    }
+    /**
+     * Sets new error and exception handler.
+     */
+    private function _setHandlers(){
         set_error_handler(function($errno, $errstr, $errfile, $errline){
             if(defined('API_CALL')){
                 header("HTTP/1.1 500 Server Error");
@@ -276,56 +328,8 @@ class WebFiori{
                 . '</html>');
             }
         });
-        
-        self::$SF = SystemFunctions::get();
-        self::$WF = WebsiteFunctions::get();
-        self::$BMF = BasicMailFunctions::get();
-        //initialize main session with name = 'wf-session'.
-        $this->sysStatus = Util::checkSystemStatus(true);
-        if($this->sysStatus == Util::MISSING_CONF_FILE || $this->sysStatus == Util::MISSING_SITE_CONF_FILE){
-            self::$SF->createConfigFile();
-            self::$WF->createSiteConfigFile();
-            self::$BMF->createEmailConfigFile();
-            $this->sysStatus = Util::checkSystemStatus(true);
-        }
-        if(gettype($this->sysStatus) == 'array'){
-            $this->dbErrDetails = $this->sysStatus;
-            $this->sysStatus = Util::DB_NEED_CONF;
-        }
-        
-        APIRoutes::create();
-        
-        ViewRoutes::create();
-        ClosureRoutes::create();
-        OtherRoutes::create();
-        
-        //initialize some settings...
-        InitCron::init();
-        InitPrivileges::init();
-        
-        self::$classStatus = 'INITIALIZED';
-        
-        define('INITIAL_SYS_STATUS', $this->_getSystemStatus());
-        if(php_sapi_name() != 'cli'){
-            if(INITIAL_SYS_STATUS === true){
-                
-            }
-            else if(INITIAL_SYS_STATUS == Util::DB_NEED_CONF){
-                $err = $this->dbErrDetails;
-            }
-            else{
-                //you can modify this part to make 
-                //it do something else in case system 
-                //configuration is not equal to true
-
-                //change system config status to configured.
-                //WebFiori::getSysFunctions()->configured(true);
-
-                //show error message to tell the developer how to configure the system.
-                $this->_needConfigration();
-            }
-        }
     }
+
     /**
      * Returns an instance of the class 'Config'.
      * The class will contain some of framework settings in addition to 
@@ -470,7 +474,7 @@ class WebFiori{
                     . 'Or Use the method SystemFunctions::configured(true). You must supply \'true\' as an attribute. '
                     . 'If you want to make the system do something else if the return value of the '
                     . 'given method is false, go to the end of the file \'WebFiori.php\' and '
-                    . 'change the code in the \'else\' code block.');
+                    . 'change the code in the \'else\' code block. (Inside the "if" block).');
             $j->add('powered-by', 'WebFiori Framework v'.Config::getVersion().' ('.Config::getVersionType().')');
             die($j);
         }
@@ -492,11 +496,12 @@ class WebFiori{
             . '<ul>'
             . '<li>Go to the file "conf/Config.php". Change attribute value at line 75 to true.</li>'
             . '<li>Use the method SystemFunctions::configured(true). You must supply \'true\' as an attribute.</li>'
+            . '<li>After that, reload the page and the system will work.</li>'
             . '</ul>'
             . '<p>'
             . 'If you want to make the system do something else if the return value of the '
             . 'given method is false, go to the end of the file \'WebFiori.php\' and '
-            . 'change the code in the \'else\' code block at the end of the class constructor.'
+            . 'change the code in the \'else\' code block at the end of the class constructor (Inside the "if" block).'
             . '</p>'
             . '<p>System Powerd By: <a href="https://github.com/usernane/webfiori" target="_blank"><b>'
                     . 'WebFiori Framework v'.Config::getVersion().' ('.Config::getVersionType().')'

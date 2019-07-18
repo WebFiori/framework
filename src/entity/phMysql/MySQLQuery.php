@@ -855,8 +855,12 @@ abstract class MySQLQuery{
             }
             else{
                 //an index with a value
-                
-                $column = $this->getStructure()->getColByIndex($valOrColIndex);
+                if(gettype($valOrColIndex) == 'integer'){
+                    $column = $this->getStructure()->getColByIndex($valOrColIndex);
+                }
+                else{
+                    $column = $this->getStructure()->getCol($valOrColIndex);
+                }
                 if($column instanceof Column){
                     $cols .= $column->getName().$comma;
                     if($colObjOrVal !== 'null'){
@@ -937,7 +941,13 @@ abstract class MySQLQuery{
                 $vals[] = $valOrIndex;
             }
             else{
-                $cols[] = $this->getStructure()->getColByIndex($valOrIndex);
+                if(gettype($valOrIndex) == 'integer'){
+                    $testCol = $this->getStructure()->getColByIndex($valOrIndex);
+                }
+                else{
+                    $testCol = $this->getStructure()->getCol($valOrIndex);
+                }
+                $cols[] = $testCol;
                 $vals[] = $colObjOrVal;
             }
         }
@@ -1135,6 +1145,12 @@ abstract class MySQLQuery{
             }
             else{
                 $column = $this->getStructure()->getColByIndex($newValOrIndex);
+                if(gettype($newValOrIndex) == 'integer'){
+                    $column = $this->getStructure()->getColByIndex($newValOrIndex);
+                }
+                else{
+                    $column = $this->getStructure()->getCol($newValOrIndex);
+                }
                 if($column instanceof Column){
                     $newValLower = strtolower($colObjOrNewVal);
                     if(trim($newValLower) !== 'null'){
@@ -1181,12 +1197,18 @@ abstract class MySQLQuery{
         $colsArr = array();
         $valsArr = array();
         foreach ($colsAndVals as $valueOrIndex=>$colObjOrVal){
-            if($colObjOrNewVal instanceof Column){
+            if($colObjOrVal instanceof Column){
                 $colsArr[] = $colObjOrVal;
                 $valsArr[] = $valueOrIndex;
             }
             else{
-                $colsArr[] = $this->getStructure()->getColByIndex($valueOrIndex);
+                if(gettype($valueOrIndex) == 'integer'){
+                    $testCol = $this->getStructure()->getColByIndex($valueOrIndex);
+                }
+                else{
+                    $testCol = $this->getStructure()->getCol($valueOrIndex);
+                }
+                $colsArr[] = $testCol;
                 $valsArr[] = $colObjOrVal;
             }
         }

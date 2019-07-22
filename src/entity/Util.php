@@ -35,7 +35,7 @@ use webfiori\WebFiori;
 /**
  * Framework utility class.
  * @author Ibrahim
- * @version 1.3.8
+ * @version 1.3.9
  */
 class Util{
     /**
@@ -62,6 +62,80 @@ class Util{
      * @since 1.2
      */
     const DB_NEED_CONF = 'db_conf_err';
+    /**
+     * A constant array that contains all PHP error codes in 
+     * addition to a description for each error.
+     * It is possible to access error information by simply using error 
+     * number as an index. For example, to access E_ERROR info, do the following:<br/>
+     * <code>
+     * $errInf = ERR_TYPES[E_ERROR];<br/>
+     * echo $errInf['type'];<br/>
+     * echo $errInf['description'];<br/>
+     * </code>
+     * @since 1.3.9
+     */
+    const ERR_TYPES = [
+        E_ERROR=>[
+            'type'=>'E_ERROR',
+            'description'=>'Fatal run-time error.'
+        ],
+        E_WARNING=>[
+            'type'=>'E_WARNING',
+            'description'=>'Run-time warning.'
+        ],
+        E_PARSE=>[
+            'type'=>'E_PARSE',
+            'description'=>'Compile-time parse error.'
+        ],
+        E_NOTICE=>[
+            'type'=>'E_NOTICE',
+            'description'=>'Run-time notice.'
+        ],
+        E_CORE_ERROR=>[
+            'type'=>'E_CORE_ERROR',
+            'description'=>'Fatal error during initialization.'
+        ],
+        E_CORE_WARNING=>[
+            'type'=>'E_CORE_WARNING',
+            'description'=>'Warning during initialization.'
+        ],
+        E_COMPILE_ERROR=>[
+            'type'=>'E_COMPILE_ERROR',
+            'description'=>'Fatal compile-time error.'
+        ],
+        E_COMPILE_WARNING=>[
+            'type'=>'E_COMPILE_WARNING',
+            'description'=>'Compile-time warning.'
+        ],
+        E_USER_ERROR=>[
+            'type'=>'E_USER_ERROR',
+            'description'=>'User-generated error message.'
+        ],
+        E_USER_WARNING=>[
+            'type'=>'E_USER_WARNING',
+            'description'=>'User-generated warning message.'
+        ],
+        E_USER_NOTICE=>[
+            'type'=>'E_USER_NOTICE',
+            'description'=>'User-generated notice message.'
+        ],
+        E_STRICT=>[
+            'type'=>'E_STRICT',
+            'description'=>'PHP suggest a change.'
+        ],
+        E_RECOVERABLE_ERROR=>[
+            'type'=>'E_RECOVERABLE_ERROR',
+            'description'=>'Catchable fatal error.'
+        ],
+        E_DEPRECATED=>[
+            'type'=>'E_DEPRECATED',
+            'description'=>'Run-time notice.'
+        ],
+        E_USER_DEPRECATED=>[
+            'type'=>'E_USER_DEPRECATED',
+            'description'=>'User-generated warning message.'
+        ],
+    ];
     /**
      *
      * @var DatabaseLink 

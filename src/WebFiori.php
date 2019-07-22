@@ -46,7 +46,7 @@ use Exception;
  * The instance of this class is used to control basic settings of 
  * the framework. Also, it is the entry point of any request.
  * @author Ibrahim
- * @version 1.3.3
+ * @version 1.3.4
  */
 class WebFiori{
     /**
@@ -93,6 +93,12 @@ class WebFiori{
      * @since 1.0 
      */
     private static $LC;
+    /**
+     * Used to format errors and warnings messages.
+     * @var int 
+     * @since 1.3.4
+     */
+    private static $NoticeAndWarningCount;
     /**
      * A mutex lock to disallow class access during initialization state.
      * @var int
@@ -208,6 +214,7 @@ class WebFiori{
         
         InitAutoLoad::init();
         CLI::init();
+        self::$NoticeAndWarningCount = 0;
         $this->_setHandlers();
         self::$SF = SystemFunctions::get();
         self::$WF = WebsiteFunctions::get();
@@ -278,13 +285,16 @@ class WebFiori{
             }
             else{
                 echo 
-                '<p><b class="nice-red mono">Error: </b> <span class="mono">'.Util::ERR_TYPES[$errno]['type']."</span><br/>"
-                .'<b class="nice-red mono">Description:</b> <span class="mono">'.Util::ERR_TYPES[$errno]['description']."</span><br/>"
-                .'<b class="nice-red mono">Message:</b> <span class="mono">'.$errstr."</span><br/>"
-                .'<b class="nice-red mono">File:</b> <span class="mono">'.$errfile."</span><br/>"
-                .'<b class="nice-red mono">Line:</b> <span class="mono">'.$errline."</span><br></p>"
-                .'<hr>';
+                '<p class="err-container" style="'
+                . 'overflow-y:scroll;overflow-x:auto;top:'.(WebFiori::$NoticeAndWarningCount*130).'px;width:75%;'
+                        . 'border-bottom: 1px double white;height:130px;margin:0;z-index:100;position:fixed;background-color: rgba(0,0,0,0.7);color:white;">'
+                . '<b style="color:#ff6666;font-family:monospace">Error: </b> <span style="font-family:monospace">'.Util::ERR_TYPES[$errno]['type']."</span><br/>"
+                .'<b style="color:#ff6666;font-family:monospace">Description:</b> <span style="font-family:monospace">'.Util::ERR_TYPES[$errno]['description']."</span><br/>"
+                .'<b style="color:#ff6666;font-family:monospace">Message:</b> <span style="font-family:monospace">'.$errstr."</span><br/>"
+                .'<b style="color:#ff6666;font-family:monospace">File:</b> <span style="font-family:monospace">'.$errfile."</span><br/>"
+                .'<b style="color:#ff6666;font-family:monospace">Line:</b> <span style="font-family:monospace">'.$errline."</span><br></p>";
             }
+            WebFiori::$NoticeAndWarningCount++;
             return true;
         });
         set_exception_handler(function($ex){

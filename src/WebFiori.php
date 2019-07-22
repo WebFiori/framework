@@ -261,70 +261,31 @@ class WebFiori{
      * Sets new error and exception handler.
      */
     private function _setHandlers(){
-        register_shutdown_function(function(){
-            $error = error_get_last();
-            if($error !== null) {
-                $errNo = $error['type'];
-                if($errNo == E_WARNING || 
-                   $errNo == E_NOTICE || 
-                   $errNo == E_USER_ERROR || 
-                   $errNo == E_USER_NOTICE){
-                    return;
-                }
-                header("HTTP/1.1 500 Server Error");
-                if(defined('API_CALL')){
-                    $j = new JsonX();
-                    $j->add('message',$error["message"]);
-                    $j->add('type','error');
-                    $j->add('error-number',$error["type"]);
-                    $j->add('file',$error["file"]);
-                    $j->add('line',$error["line"]);
-                    die($j);
-                }
-                else{
-                    die(''
-                    . '<!DOCTYPE html>'
-                    . '<html>'
-                    . '<head>'
-                    . '<style>'
-                    . '.nice-red{'
-                    . 'color:#ff6666;'
-                    . '}'
-                    . '.mono{'
-                    . 'font-family:monospace;'
-                    . '}'
-                    . '</style>'
-                    . '<title>Server Error - 500</title>'
-                    . '</head>'
-                    . '<body style="color:white;background-color:#1a000d;">'
-                    . '<h1 style="color:#ff4d4d">500 - Server Error</h1>'
-                    . '<hr>'
-                    . '<p>'
-                    .'<b class="nice-red mono">Error Number:</b> <span class="mono">'.$error["type"]."</span><br/>"
-                    .'<b class="nice-red mono">File:</b> <span class="mono">'.$error["file"]."</span><br/>"
-                    .'<b class="nice-red mono">Line:</b> <span class="mono">'.$error["line"]."</span><br/>"
-                    .'<b class="nice-red mono">Message:</b> <span class="mono">'.$error["message"]."</span><br>"
-                    . '</p>'
-                    . '</body>'
-                    . '</html>');
-                }
-            }
-        });
+        error_reporting(E_ALL & ~E_ERROR & ~E_COMPILE_ERROR & ~E_CORE_ERROR & ~E_RECOVERABLE_ERROR);
         set_error_handler(function($errno, $errstr, $errfile, $errline){
-            Util::displayErrors();
+            //Util::displayErrors();
             if(defined('API_CALL')){
                 header("HTTP/1.1 500 Server Error");
                 $j = new JsonX();
                 $j->add('message',$errstr);
-                $j->add('type','error');
+                $j->add('type',Util::ERR_TYPES[$errno]['type']);
+                $j->add('description', Util::ERR_TYPES[$errno]['description']);
                 $j->add('error-number',$errno);
                 $j->add('file',$errfile);
                 $j->add('line',$errline);
                 header('content-type: application/json');
                 die($j);
             }
-            //let php handle the error since it is not API call.
-            return false;
+            else{
+                echo 
+                '<p><b class="nice-red mono">Error: </b> <span class="mono">'.Util::ERR_TYPES[$errno]['type']."</span><br/>"
+                .'<b class="nice-red mono">Description:</b> <span class="mono">'.Util::ERR_TYPES[$errno]['description']."</span><br/>"
+                .'<b class="nice-red mono">Message:</b> <span class="mono">'.$errstr."</span><br/>"
+                .'<b class="nice-red mono">File:</b> <span class="mono">'.$errfile."</span><br/>"
+                .'<b class="nice-red mono">Line:</b> <span class="mono">'.$errline."</span><br></p>"
+                .'<hr>';
+            }
+            return true;
         });
         set_exception_handler(function($ex){
             header("HTTP/1.1 500 Server Error");
@@ -377,6 +338,57 @@ class WebFiori{
                 . '</html>');
             }
         });
+        register_shutdown_function(function(){
+            $error = error_get_last();
+            if($error !== null) {
+                $errNo = $error['type'];
+                if($errNo == E_WARNING || 
+                   $errNo == E_NOTICE || 
+                   $errNo == E_USER_ERROR || 
+                   $errNo == E_USER_NOTICE){
+                    return;
+                }
+                header("HTTP/1.1 500 Server Error");
+                if(defined('API_CALL')){
+                    $j = new JsonX();
+                    $j->add('message',$error["message"]);
+                    $j->add('type','error');
+                    $j->add('error-number',$error["type"]);
+                    $j->add('file',$error["file"]);
+                    $j->add('line',$error["line"]);
+                    die($j);
+                }
+                else{
+                    die(''
+                    . '<!DOCTYPE html>'
+                    . '<html>'
+                    . '<head>'
+                    . '<style>'
+                    . '.nice-red{'
+                    . 'color:#ff6666;'
+                    . '}'
+                    . '.mono{'
+                    . 'font-family:monospace;'
+                    . '}'
+                    . '</style>'
+                    . '<title>Server Error - 500</title>'
+                    . '</head>'
+                    . '<body style="color:white;background-color:#1a000d;">'
+                    . '<h1 style="color:#ff4d4d">500 - Server Error</h1>'
+                    . '<hr>'
+                    . '<p>'
+                    .'<b class="nice-red mono">Type:</b> <span class="mono">'.Util::ERR_TYPES[$error["type"]]['type']."</span><br/>"
+                    .'<b class="nice-red mono">Description:</b> <span class="mono">'.Util::ERR_TYPES[$error["type"]]['description']."</span><br/>"
+                    .'<b class="nice-red mono">Message:</b> <span class="mono">'.$error["message"]."</span><br>"
+                    .'<b class="nice-red mono">File:</b> <span class="mono">'.$error["file"]."</span><br/>"
+                    .'<b class="nice-red mono">Line:</b> <span class="mono">'.$error["line"]."</span><br/>" 
+                    . '</p>'
+                    . '</body>'
+                    . '</html>');
+                }
+            }
+        });
+        
     }
 
     /**

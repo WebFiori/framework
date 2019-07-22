@@ -65,14 +65,21 @@ a{
     font-weight: bold;
     cursor: pointer;
 }
-button, input[type=submit]{
+button, input[type=submit], .button{
     background-color:rgb(0, 155, 119);
     color: white;
     border: 1px solid white;
+    height: 25px;
+    font-weight: bold;
 }
-button:hover, input[type=submit]:hover{
-    background-color:rgb(55, 155, 119);
+button:hover, input[type=submit]:hover, .button{
+    background-color:rgb(55, 195, 119);
     cursor: pointer;
+}
+button[disabled],input[type=submit][disabled], .button[disabled] {
+    background-color: rgb(170,170,170);
+    color: #ddd;
+    cursor: not-allowed;
 }
 #page-title{
     background-color: rgba(0,155,0,0.1);

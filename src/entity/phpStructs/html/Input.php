@@ -55,12 +55,13 @@ class Input extends HTMLNode{
      * <li>search</li>
      * <li>select</li>
      * <li>textarea</li>
+     * <li>radio</li>
      * </ul>
      * @since 1.0
      */
     const INPUT_TYPES = array('text','date','password','submit','checkbox','email','url','tel',
         'color','file','range','month','number','date-local','hidden','time','week','search', 
-        'select','textarea');
+        'select','textarea','radio');
     /**
      * An array of supported input modes.
      * The array contains the following values:

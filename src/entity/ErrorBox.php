@@ -36,7 +36,7 @@ class ErrorBox extends HTMLNode{
      * @var int 
      * @since 1.3.4
      */
-    private static $NoticeAndWarningCount;
+    private static $NoticeAndWarningCount = 0;
     /**
      *
      * @var HTMLNode 
@@ -71,12 +71,12 @@ class ErrorBox extends HTMLNode{
         parent::__construct();
         $this->labelStyle = 'style="color:#ff6666;font-family:monospace"';
         $this->setClassName('error-message-box');
-        $this->setAttribute('draggable', '');
+        $this->setAttribute('data-err-message-number', self::getWarningsAndNoticesCount());
         $this->setStyle([
             'width'=>'75%',
             'border'=>'1px double white',
             'height'=>'130px',
-            'margin'=>'0',
+            'margin'=>'0px',
             'z-index'=>'100',
             'position'=>'fixed',
             'background-color'=>'rgba(0,0,0,0.7)',
@@ -109,6 +109,7 @@ class ErrorBox extends HTMLNode{
         ]);
         $this->addChild($detailsContainer);
         $this->errNode = new HTMLNode('p');
+        $this->errNode->setClassName('message-line');
         $this->errNode->setStyle([
             'margin'=>0,
             'font-family'=>'monospace'
@@ -116,6 +117,7 @@ class ErrorBox extends HTMLNode{
         $detailsContainer->addChild($this->errNode);
         $this->errNode->addTextNode('<b '.$this->labelStyle.'>Error: </b>', false);
         $this->descNode  = new HTMLNode('p');
+        $this->descNode->setClassName('message-line');
         $this->descNode->setStyle([
             'margin'=>0,
             'font-family'=>'monospace'
@@ -123,6 +125,7 @@ class ErrorBox extends HTMLNode{
         $detailsContainer->addChild($this->descNode);
         $this->descNode->addTextNode('<b '.$this->labelStyle.'>Description: </b>', false);
         $this->messageNode = new HTMLNode('p');
+        $this->descNode->setClassName('message-line');
         $this->messageNode->setStyle([
             'margin'=>0,
             'font-family'=>'monospace'
@@ -130,6 +133,7 @@ class ErrorBox extends HTMLNode{
         $detailsContainer->addChild($this->messageNode);
         $this->messageNode->addTextNode('<b '.$this->labelStyle.'>Message: </b>', false);
         $this->fileNode = new HTMLNode('p');
+        $this->fileNode->setClassName('message-line');
         $this->fileNode->setStyle([
             'margin'=>0,
             'font-family'=>'monospace'
@@ -137,13 +141,56 @@ class ErrorBox extends HTMLNode{
         $detailsContainer->addChild($this->fileNode);
         $this->fileNode->addTextNode('<b '.$this->labelStyle.'>File: </b>', false);
         $this->lineNode  = new HTMLNode('p');
+        $this->lineNode->setClassName('message-line');
         $this->lineNode->setStyle([
             'margin'=>0,
             'font-family'=>'monospace'
         ]);
         $detailsContainer->addChild($this->lineNode);
         $this->lineNode->addTextNode('<b '.$this->labelStyle.'>Line: </b>', false);
+        if(self::getWarningsAndNoticesCount() == 0){
+            $js = new HTMLNode('script');
+            $js->setAttribute('type', 'text/javascript');
+            $js->addTextNode(""
+                    . "function addDragSupport(source){"
+                    . "source.setAttribute(\"dg\",true);"
+                    . "var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;"
+                    . "var boxNum = source.getAttribute(\"data-err-message-number\");"
+                    . "if (boxNum === null) {"
+                    . "source.onmousedown = mouseDown;"
+                    . "}"
+                    . "else{"
+                    . "source.children[0].onmousedown = mouseDown"
+                    . "}"
+                    . ""
+                    . "function mouseDown(e) {"
+                    . "e = e || window.event;"
+                    . "e.preventDefault();"
+                    . "pos3 = e.clientX;"
+                    . "pos4 = e.clientY;"
+                    . "document.onmouseup = dragStopped;"
+                    . "document.onmousemove = dragStarted;"
+                    . "};"
+                    . "function dragStarted(e) {"
+                    . "e = e || window.event;"
+                    . " e.preventDefault();"
+                    . "pos1 = pos3 - e.clientX;"
+                    . "pos2 = pos4 - e.clientY;"
+                    . "pos3 = e.clientX;"
+                    . "pos4 = e.clientY;"
+                    . "source.style.top = (source.offsetTop - pos2) + \"px\";"
+                    . "source.style.left = (source.offsetLeft - pos1) + \"px\";"
+                    . "};"
+                    . "function dragStopped(){"
+                    . "document.onmouseup = null;"
+                    . "document.onmousemove = null;"
+                    . "};"
+                    . "};", false);
+            $this->addChild($js);
+        }
+        $this->setAttribute('onmouseover', "if(this.getAttribute('dg') === null){addDragSupport(this)}");
         self::$NoticeAndWarningCount++;
+        $closeContainer->addTextNode('<b style="margin-left:10px;font-family:monospace;">Message ('.self::getWarningsAndNoticesCount().')</b>',false);
     }
     /**
      * Sets error based on error number.

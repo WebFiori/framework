@@ -34,6 +34,7 @@ use webfiori\functions\WebsiteFunctions;
 use webfiori\functions\BasicMailFunctions;
 use webfiori\entity\AutoLoader;
 use webfiori\entity\Util;
+use webfiori\entity\ErrorBox;
 use webfiori\entity\router\APIRoutes;
 use webfiori\entity\router\ViewRoutes;
 use webfiori\entity\router\ClosureRoutes;
@@ -284,15 +285,22 @@ class WebFiori{
                 die($j);
             }
             else{
-                echo 
-                '<p class="err-container" style="'
-                . 'overflow-y:scroll;overflow-x:auto;top:'.(WebFiori::$NoticeAndWarningCount*130).'px;width:75%;'
-                        . 'border-bottom: 1px double white;height:130px;margin:0;z-index:100;position:fixed;background-color: rgba(0,0,0,0.7);color:white;">'
-                . '<b style="color:#ff6666;font-family:monospace">Error: </b> <span style="font-family:monospace">'.Util::ERR_TYPES[$errno]['type']."</span><br/>"
-                .'<b style="color:#ff6666;font-family:monospace">Description:</b> <span style="font-family:monospace">'.Util::ERR_TYPES[$errno]['description']."</span><br/>"
-                .'<b style="color:#ff6666;font-family:monospace">Message:</b> <span style="font-family:monospace">'.$errstr."</span><br/>"
-                .'<b style="color:#ff6666;font-family:monospace">File:</b> <span style="font-family:monospace">'.$errfile."</span><br/>"
-                .'<b style="color:#ff6666;font-family:monospace">Line:</b> <span style="font-family:monospace">'.$errline."</span><br></p>";
+                $errBox = new ErrorBox();
+                $errBox->setError($errno);
+                $errBox->setDescription($errno);
+                $errBox->setFile($errfile);
+                $errBox->setMessage($errstr);
+                $errBox->setLine($errline);
+                echo $errBox;
+//                echo 
+//                '<p class="err-container" style="'
+//                . 'overflow-y:scroll;overflow-x:auto;top:'.(WebFiori::$NoticeAndWarningCount*130).'px;width:75%;'
+//                        . 'border-bottom: 1px double white;height:130px;margin:0;z-index:100;position:fixed;background-color: rgba(0,0,0,0.7);color:white;">'
+//                . '<b style="color:#ff6666;font-family:monospace">Error: </b> <span style="font-family:monospace">'.Util::ERR_TYPES[$errno]['type']."</span><br/>"
+//                .'<b style="color:#ff6666;font-family:monospace">Description:</b> <span style="font-family:monospace">'.Util::ERR_TYPES[$errno]['description']."</span><br/>"
+//                .'<b style="color:#ff6666;font-family:monospace">Message:</b> <span style="font-family:monospace">'.$errstr."</span><br/>"
+//                .'<b style="color:#ff6666;font-family:monospace">File:</b> <span style="font-family:monospace">'.$errfile."</span><br/>"
+//                .'<b style="color:#ff6666;font-family:monospace">Line:</b> <span style="font-family:monospace">'.$errline."</span><br></p>";
             }
             WebFiori::$NoticeAndWarningCount++;
             return true;
@@ -597,5 +605,8 @@ if(php_sapi_name() == 'cli'){
 }
 else{
     //route user request.
+    $x = $y;
+    $n = $t;
+    $h = $er;
     Router::route(Util::getRequestedURL());
 }

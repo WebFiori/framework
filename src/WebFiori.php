@@ -540,7 +540,14 @@ class WebFiori{
      */
     private function _needConfigration(){
         header('HTTP/1.1 503 Service Unavailable');
-        if(defined('API_CALL')){
+        $routeUri = Router::getUriObjByURL(Util::getRequestedURL());
+        if($routeUri !== null){
+            $routeType = $routeUri->getType();
+        }
+        else{
+            $routeType = Router::VIEW_ROUTE;
+        }
+        if($routeType == Router::API_ROUTE){
             header('content-type:application/json');
             $j = new JsonX();
             $j->add('message', '503 - Service Unavailable');

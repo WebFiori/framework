@@ -28,7 +28,7 @@ use Exception;
  * An autoloader class to load classes as needed during runtime.
  *
  * @author Ibrahim
- * @version 1.1.3
+ * @version 1.1.4
  */
 class AutoLoader{
     /**
@@ -50,6 +50,12 @@ class AutoLoader{
      * @since 1.0 
      */
     private $rootDir;
+    /**
+     * An array that contains the names of all loaded class.
+     * @var array
+     * @since 1.1.4
+     */
+    private $loadedClasses;
     /**
      * A single instance of the class 'AutoLoader'.
      * @var AutoLoader
@@ -126,7 +132,8 @@ class AutoLoader{
      * @since 1.0
      */
     private function __construct($root='',$searchFolders=array(),$defineRoot=false,$onFail='throw-exception') {
-        $this->searchFolders = array();
+        $this->searchFolders = [];
+        $this->loadedClasses = [];
         if(defined('ROOT_DIR')){
             $this->rootDir = ROOT_DIR;
         }
@@ -208,9 +215,12 @@ class AutoLoader{
         }
     }
     /**
-     * 
-     * @param type $dir
-     * @param type $incSubFolders
+     * Adds new folder to the set folder at which the autoloader will try to search 
+     * on for classes.
+     * @param string $dir A string that represents a dirictory. The directory 
+     * must be inside the scope of the framework.
+     * @param boolean $incSubFolders If set to true, even sub-directories which 
+     * are inside the given directory will be included in the search.
      * @since 1.1.2
      */
     public static function newSearchFolder($dir,$incSubFolders=true){
@@ -218,28 +228,34 @@ class AutoLoader{
     }
     /**
      * Tries to load a class given its name.
-     * @param string $classPath The name of the class.
+     * @param string $classPath The name of the class alongside its namespace.
      * @since 1.0
      */
     private function loadClass($classPath){
+        if(isset(self::getLoadedClasses()[$classPath])){
+            return;
+        }
         $DS = DIRECTORY_SEPARATOR;
         $cArr = explode('\\', $classPath);
         $className = $cArr[count($cArr) - 1];
         $loaded = false;
         $root = $this->getRoot();
+        $allPaths = self::getClassPath($className);
         foreach ($this->searchFolders as $value) {
             $f = $root.$value.$DS.$className.'.php';
-            //lower case class name to support loading of old-style classes.
-            $f2 = $root.$value.$DS. strtolower($className).'.php';
-            if(file_exists($f)){
+            if(file_exists($f) && !in_array($f, $allPaths)){
                 require_once $f;
                 $loaded = true;
                 break;
             }
-            else if(file_exists($f2)){
-                require_once $f2;
-                $loaded = true;
-                break;
+            else{
+                //lower case class name to support loading of old-style classes.
+                $f = $root.$value.$DS. strtolower($className).'.php';
+                if(file_exists($f) && !in_array($f, $allPaths)){
+                    require_once $f;
+                    $loaded = true;
+                    break;
+                }
             }
         }
         if(!$loaded){
@@ -248,12 +264,69 @@ class AutoLoader{
             }
             else if($this->onFail == 'throw-exception'){
                 throw new Exception('Class \''.$classPath.'\' not found in any include directory. '
-                    . 'Make sure that class path is included in auto-load directories.');
+                    . 'Make sure that class path is included in auto-load directories and its namespace is correct.');
             }
             else if($this->onFail == 'do-nothing'){
                 //do nothing
             }
         }
+        else{
+            $this->loadedClasses[$classPath] = [
+                'class-name'=>$className,
+                'namespace'=> substr($classPath, 0, strlen($classPath) - strlen($className) - 1),
+                'path'=>$f
+            ];
+        }
+    }
+    /**
+     * Returns an array that contains the paths to all files which has a class 
+     * with the given name.
+     * @param string $className The name of the class.
+     * @param string|null $namespace If specified, the search will only be specific 
+     * to the given namespace. This means the array will have one path most 
+     * probably. Default is null.
+     * @param boolean $load If the class is not loaded and this parameter is set 
+     * to true, the method will attempt to load the class. Default is false.
+     * @return array An array that contains all paths to the files which have 
+     * a definition for the given class.
+     */
+    public static function getClassPath($className,$namespace=null,$load=false) {
+        $retVal = [];
+        if($load === true){
+            try {
+                self::get()->loadClass($namespace.'\\'.$className);
+            } catch (Exception $ex) {
+                
+            }
+        }
+        $loadedClasses = self::getLoadedClasses();
+        foreach ($loadedClasses as $classArr){
+            if($namespace !== null){
+                if($classArr['namespace'] == $namespace && $classArr['class-name'] == $className){
+                    $retVal[] = $classArr['path'];
+                }
+            }
+            else if($classArr['class-name'] == $className){
+                $retVal[] = $classArr['path'];
+            }
+        }
+        return $retVal;
+    }
+    /**
+     * Returns an associative array of all loaded classes.
+     * The keys of the array will be the names of the classes including the namespace 
+     * and the value will be a sub associative array that has more info about 
+     * the class. The indices of each sub array are:
+     * <ul>
+     * <li><b>class-name</b>: The actual name of the class.</li>
+     * <li><b>namespace</b>: The namespace at which the class belongs to.</li>
+     * <li><b>path</b>: The location of the file that represents the class.</li>
+     * </ul>
+     * @return array An associative array that contains loaded classes info.
+     * @since 1.1.4
+     */
+    public static function getLoadedClasses() {
+        return self::get()->loadedClasses;
     }
     /**
      * Returns the root directory that is used to search inside.

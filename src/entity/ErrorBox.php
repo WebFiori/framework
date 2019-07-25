@@ -105,7 +105,8 @@ class ErrorBox extends HTMLNode{
             'overflow-y'=>'scroll',
             'overflow-x'=>'auto',
             'width'=>'100%',
-            'height'=>'100px'
+            'height'=>'100px',
+            'padding'=>'10px'
         ]);
         $this->addChild($detailsContainer);
         $this->errNode = new HTMLNode('p');

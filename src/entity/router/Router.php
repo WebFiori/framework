@@ -655,11 +655,10 @@ class Router {
     }
     /**
      * Remove all routes which has been added to the array of routes.
-     * This method is similar to calling the method Router::clear()
      * @since 1.3.4
      */
     public static function removeAll() {
-        self::get()->clear();
+        self::get()->routes = [];
     }
     /**
      * Checks if a directory name is a variable or not.

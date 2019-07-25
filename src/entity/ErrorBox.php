@@ -98,7 +98,7 @@ class ErrorBox extends HTMLNode{
         $closeButton->setClassName('error-close-button');
         $closeButton->addTextNode('X');
         $closeContainer->addChild($closeButton);
-        $closeButton->setAttribute('onclick', "this.parentElement.parentElement.style['display'] = 'none'");
+        $closeButton->setAttribute('onclick', "this.setAttribute('disabled','');smoothHide(this.parentElement.parentElement);");
         
         $detailsContainer = new HTMLNode();
         $detailsContainer->setStyle([
@@ -152,6 +152,19 @@ class ErrorBox extends HTMLNode{
             $js = new HTMLNode('script');
             $js->setAttribute('type', 'text/javascript');
             $js->addTextNode(""
+                    . "function smoothHide(el){"
+                    . "var o = 1;"
+                    . "var intrvalId = setInterval(function(){"
+                    . "if(o > 0){"
+                    . "o = o - 0.02;"
+                    . "el.style['opacity'] = o;"
+                    . "}"
+                    . "else{"
+                    . "clearInterval(intrvalId);"
+                    . "el.style['display'] = 'none';"
+                    . "}"
+                    . "},15);"
+                    . "};"
                     . "function addDragSupport(source){"
                     . "source.setAttribute(\"dg\",true);"
                     . "var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;"

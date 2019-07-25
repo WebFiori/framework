@@ -298,7 +298,14 @@ class WebFiori{
         });
         set_exception_handler(function($ex){
             header("HTTP/1.1 500 Server Error");
-            if(defined('API_CALL')){
+            $routeUri = Router::getUriObjByURL(Util::getRequestedURL());
+            if($routeUri !== null){
+                $routeType = $routeUri->getType();
+            }
+            else{
+                $routeType = Router::VIEW_ROUTE;
+            }
+            if($routeType == Router::API_ROUTE){
                 $j = new JsonX();
                 $j->add('message','500 - Server Error: Uncaught Exception.');
                 $j->add('type','error');

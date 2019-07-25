@@ -64,7 +64,7 @@ use jsonx\JsonX;
  * </pre> 
  * </p>
  * @author Ibrahim
- * @version 1.3.5
+ * @version 1.3.6
  */
 class Router {
     /**
@@ -244,7 +244,7 @@ class Router {
      * @since 1.2
      */
     public static function route($uri) {
-        Router::get()->sendToRoute($uri);
+        Router::get()->resolveUrl($uri);
     }
     /**
      * Returns the value of the base URL which is appended to the path.
@@ -515,7 +515,7 @@ class Router {
         return self::get()->uriObj;
     }
     /**
-     * Route a given URI to its specified route.
+     * Route a given URI to its specified resource.
      * If the router has no routes, the router will send back a '418 - I'm A 
      * Teapot' response. If the route is available but the file that the 
      * router is routing to does not exist, a '500 - Server Error' Response 
@@ -523,9 +523,12 @@ class Router {
      * sent back. If the route is not found, The router will call the function 
      * that was set by the user in case a route is not found.
      * @param string $uri A URI such as 'http://www.example.com/hello/ibrahim'
+     * @param boolean $loadResource If set to true, the resource that represents the 
+     * route will be loaded. If false, the route will be only resulved. Default 
+     * is true.
      * @since 1.0
      */
-    public function sendToRoute($uri) {
+    private function resolveUrl($uri,$loadResource=true) {
         if(count($this->routes) != 0){
             $routeUri = new RouterUri($uri, '');
             //first, search for the URI wuthout checking variables
@@ -533,39 +536,45 @@ class Router {
                 if(!$route->hasVars()){
                     if($route->getUri() == $routeUri->getUri()){
                         if(is_callable($route->getRouteTo())){
-                            call_user_func($route->getRouteTo(),$route->getClosureParams());
                             $this->uriObj = $route;
+                            if($loadResource === true){
+                                call_user_func($route->getRouteTo(),$route->getClosureParams());
+                            }
                             return;
                         }
                         else{
                             $file = $route->getRouteTo();
                             if(file_exists($file)){
                                 $this->uriObj = $route;
-                                require_once $file;
+                                if($loadResource === true){
+                                    require_once $file;
+                                }
                             }
                             else{
-                                header("HTTP/1.1 500 Server Error");
-                                if($route->getType() == self::API_ROUTE){
-                                    $j = new JsonX();
-                                    $j->add('message', 'The resource \''.Util::getRequestedURL().'\' was availble but its route is not configured correctly.');
-                                    $j->add('type', 'error');
-                                    die($j.'');
-                                }
-                                else{
-                                    die(''
-                                    . '<!DOCTYPE html>'
-                                    . '<html>'
-                                    . '<head>'
-                                    . '<title>Server Error</title>'
-                                    . '</head>'
-                                    . '<body>'
-                                    . '<h1>500 - Server Error</h1>'
-                                    . '<hr>'
-                                    . '<p>'
-                                    . 'The resource <b>'.Util::getRequestedURL().'</b> was availble. but its route is not configured correctly.'
-                                    . '</p>'
-                                    . '</body>'
-                                    . '</html>');
+                                if($loadResource === true){
+                                    header("HTTP/1.1 500 Server Error");
+                                    if($route->getType() == self::API_ROUTE){
+                                        $j = new JsonX();
+                                        $j->add('message', 'The resource \''.Util::getRequestedURL().'\' was availble but its route is not configured correctly.');
+                                        $j->add('type', 'error');
+                                        die($j.'');
+                                    }
+                                    else{
+                                        die(''
+                                        . '<!DOCTYPE html>'
+                                        . '<html>'
+                                        . '<head>'
+                                        . '<title>Server Error</title>'
+                                        . '</head>'
+                                        . '<body>'
+                                        . '<h1>500 - Server Error</h1>'
+                                        . '<hr>'
+                                        . '<p>'
+                                        . 'The resource <b>'.Util::getRequestedURL().'</b> was availble. but its route is not configured correctly.'
+                                        . '</p>'
+                                        . '</body>'
+                                        . '</html>');
+                                    }
                                 }
                             }
                             return;
@@ -601,7 +610,9 @@ class Router {
                     if($route->isAllVarsSet()){
                         if(is_callable($route->getRouteTo())){
                             $this->uriObj = $route;
-                            call_user_func($route->getRouteTo(),$route->getClosureParams());
+                            if($loadResource === true){
+                                call_user_func($route->getRouteTo(),$route->getClosureParams());
+                            }
                             return;
                         }
                         else{
@@ -609,16 +620,21 @@ class Router {
                                 define('API_CALL', true);
                             }
                             $this->uriObj = $route;
-                            require_once $route->getRouteTo();
+                            if($loadResource === true){
+                                require_once $route->getRouteTo();
+                            }
                             return;
                         }
                     }
                 }
             }
             //if we reach this part, this means the route was not found
-            call_user_func($this->onNotFound);
+            if($loadResource === true){
+                call_user_func($this->onNotFound);
+            }
         }
         else{
+            if($loadResource === true){
             header("HTTP/1.1 418 I'm a teapot");
             die(''
                     . '<!DOCTYPE html>'
@@ -634,6 +650,7 @@ class Router {
                     . '</p>'
                     . '</body>'
                     . '</html>');
+            }
         }
     }
     /**
@@ -654,13 +671,14 @@ class Router {
         return $dir[0] == '{' && $dir[strlen($dir) - 1] == '}';
     }
     /**
-     * Removes all added routes.
-     * This method will simply re-initialize the array that contains all 
-     * routes.
-     * @since 1.0
-     * @deprecated since version 1.3.4
+     * Returns an object of type 'RouterUri' which contains URL route information.
+     * @param string $url A string that represents a URL (such as 'https://example.com/my-resource').
+     * @return RouterUri|null If a resource was found which has the given route, an 
+     * object of type RouterUri is returned. Other than that, null is returned.
+     * @since 1.3.6
      */
-    public function clear() {
-        $this->routes = array();
+    public static function getUriObjByURL($url) {
+        self::get()->resolveUrl($url, false);
+        return self::getRouteUri();
     }
 }

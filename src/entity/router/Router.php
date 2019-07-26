@@ -617,7 +617,9 @@ class Router {
                         }
                         else{
                             if($route->getType() == self::API_ROUTE){
-                                define('API_CALL', true);
+                                if(!defined('API_CALL')){
+                                    define('API_CALL', true);
+                                }
                             }
                             $this->uriObj = $route;
                             if($loadResource === true){

@@ -73,6 +73,9 @@ THE SOFTWARE.
         color: white;
     }
 }
+*[disabled]{
+    cursor: not-allowed !important;
+}
 #page-header{
     position: fixed;
     top: 0;
@@ -116,6 +119,9 @@ h1#page-title{
     font-weight: bold;
     background-color: rgb(95, 158, 160);
     box-shadow: 2px 0px 4px 1px rgba(0,88,188,0.4);
+    border-bottom-style: double;
+    margin: 0;
+    margin-bottom: 25px;
 }
 h1#page-title[dir=ltr]{
     border-left: 5px solid rgb(15, 87, 51);
@@ -184,4 +190,35 @@ ul#menu-items-container .sub-menu li{
     top: 0;
     left: 0.5%;
     margin: 0;
+}
+.status-message{
+    margin: 0;
+    font-size: 12px;
+    font-weight: bold;
+}
+.success {
+    margin: 0;
+    font-size: 12px;
+    font-weight: bold;
+}
+.error {
+    margin: 0;
+    font-size: 12px;
+    font-weight: bold;
+}
+a{
+    text-decoration: none;
+    font-weight: bold;
+    cursor: pointer;
+}
+button, input[type=submit], .button{
+    border: 1px solid white;
+    height: 25px;
+    font-weight: bold;
+}
+button:hover, input[type=submit]:hover, .button{
+    cursor: pointer;
+}
+button[disabled],input[type=submit][disabled], .button[disabled] {
+    cursor: not-allowed;
 }

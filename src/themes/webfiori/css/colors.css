@@ -25,9 +25,6 @@ THE SOFTWARE.
     Created on : Jun 4, 2018, 7:50:42 AM
     Author     : Ibrahim
 */
-*[disabled]{
-    cursor: not-allowed !important;
-}
 html{
    background: linear-gradient(-90deg, #71b280, #267871);
 }
@@ -61,29 +58,23 @@ html{
 }
 a{
     color: #378e80;
-    text-decoration: none;
-    font-weight: bold;
-    cursor: pointer;
 }
 button, input[type=submit], .button{
     background-color:rgb(0, 155, 119);
     color: white;
-    border: 1px solid white;
-    height: 25px;
-    font-weight: bold;
 }
 button:hover, input[type=submit]:hover, .button{
     background-color:rgb(55, 195, 119);
-    cursor: pointer;
 }
 button[disabled],input[type=submit][disabled], .button[disabled] {
     background-color: rgb(170,170,170);
-    color: #ddd;
-    cursor: not-allowed;
 }
 #page-title{
     background-color: rgba(0,155,0,0.1);
-    border-bottom-style: double;
-    margin: 0;
-    margin-bottom: 25px;
+}
+.success {
+    color: #057a15;
+}
+.error {
+    color: #a51a15;
 }

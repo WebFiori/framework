@@ -64,7 +64,7 @@ use jsonx\JsonX;
  * </pre> 
  * </p>
  * @author Ibrahim
- * @version 1.3.6
+ * @version 1.3.7
  */
 class Router {
     /**
@@ -72,13 +72,13 @@ class Router {
      * pages should be created.
      * @since 1.0
      */
-    const VIEW_ROUTE = '/pages';
+    const VIEW_ROUTE = DIRECTORY_SEPARATOR.'pages';
     /**
      * A constant for the route of APIs. It is simply the root directory where APIs 
      * should be created.
      * @since 1.0
      */
-    const API_ROUTE = '/apis';
+    const API_ROUTE = DIRECTORY_SEPARATOR.'apis';
     /**
      * A constant for the case when the route is a function call.
      * @since 1.0
@@ -88,7 +88,7 @@ class Router {
      * A constant for custom directory route.
      * @since 1.0
      */
-    const CUSTOMIZED = '/';
+    const CUSTOMIZED = DIRECTORY_SEPARATOR;
     /**
      * A callback function to call in case if a rout is 
      * not found.
@@ -189,7 +189,7 @@ class Router {
      * @since 1.3.3
      */
     private function &_getUriObj($path) {
-        $routeURI = new RouterUri($this->getBase().$this->fixPath($path), '');
+        $routeURI = new RouterUri($this->getBase().$this->_fixPath($path), '');
         foreach ($this->routes as $route){
             if($routeURI->equals($route)){
                 return $route;
@@ -290,8 +290,8 @@ class Router {
                 $routeType == self::CUSTOMIZED || 
                 $routeType == self::CLOSURE_ROUTE){
                 if($routeType != self::CLOSURE_ROUTE){
-                    $path = $this->fixPath($path);
-                    $routeTo = ROOT_DIR.$this->fixPath($routeType.$routeTo);
+                    $path = $this->_fixPath($path);
+                    $routeTo = ROOT_DIR.$routeType.DIRECTORY_SEPARATOR.$this->_fixPath($routeTo);
                 }
                 else{
                     if(!is_callable($routeTo)){
@@ -311,6 +311,21 @@ class Router {
                     return true;
                 }
             }
+        }
+        return false;
+    }
+    /**
+     * Removes a route given its path.
+     * @param string $path The path part of route URI.
+     * @return boolean If the route is removed, the method will return 
+     * true. If not, The method will return false.
+     * @since 1.3.7
+     */
+    public static function removeRoute($path) {
+        $pathFix = self::base().self::get()->_fixPath($path);
+        if(isset(self::get()->routes[$pathFix])){
+            unset(self::get()->routes[$pathFix]);
+            return true;
         }
         return false;
     }
@@ -462,8 +477,8 @@ class Router {
      * @return string A string in the format '/nice/work/boy'.
      * @since 1.1
      */
-    private function fixPath($path) {
-        if($path != '/'){
+    private function _fixPath($path) {
+        if(strlen($path) != 0 && $path != '/'){
             if($path[strlen($path) - 1] == '/' || $path[0] == '/'){
                 while($path[0] == '/' || $path[strlen($path) - 1] == '/'){
                     $path = trim($path, '/');
@@ -473,6 +488,9 @@ class Router {
             if($path[0] != '/'){
                 $path = '/'.$path;
             }
+        }
+        else{
+            $path = '/';
         }
         return $path;
     }
@@ -485,7 +503,7 @@ class Router {
      */
     public function hasRoute($path) {
         $hasRoute = false;
-        $routeURI = new RouterUri($this->getBase().$this->fixPath($path), '');
+        $routeURI = new RouterUri($this->getBase().$this->_fixPath($path), '');
         foreach ($this->routes as $route){
             $hasRoute = $hasRoute || $routeURI->equals($route);
         }

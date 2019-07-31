@@ -346,6 +346,16 @@ class Router {
         return $routesArr;
     }
     /**
+     * Returns an associative array that contains all routes.
+     * The indices of the array will be URLs that represents the route and 
+     * the value at each index will be an object of type 'RouterUri'. 
+     * @return array An associative array that contains all routes.
+     * @since 1.3.7
+     */
+    public static function routesAsRouterUri() {
+        return self::get()->routes;
+    }
+    /**
      * Returns an array which contains all routes as RouteURI object.
      * @return array An array which contains all routes as RouteURI object.
      * @since 1.2

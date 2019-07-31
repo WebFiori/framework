@@ -323,9 +323,12 @@ class Router {
      */
     public static function removeRoute($path) {
         $pathFix = self::base().self::get()->_fixPath($path);
-        if(isset(self::get()->routes[$pathFix])){
-            unset(self::get()->routes[$pathFix]);
-            return true;
+        for($x = 0 ; $x < count(self::get()->routes) ; $x++){
+            $routeObj = self::get()->routes[$x];
+            if($routeObj->getUri() == $pathFix){
+                unset(self::get()->routes[$x]);
+                return true;
+            }
         }
         return false;
     }

@@ -32,6 +32,7 @@ use webfiori\conf\Config;
 use webfiori\entity\DBConnectionFactory;
 use webfiori\entity\DBConnectionInfo;
 use webfiori\WebFiori;
+use webfiori\entity\MessageBox;
 /**
  * Framework utility class.
  * @author Ibrahim
@@ -510,7 +511,8 @@ class Util{
         return $datesArr;
     }
     /**
-     * Call the method 'print_r' and insert 'pre' around it.
+     * Call the method 'print_r' and insert 'pre' around it and display 
+     * it inside a floating message box.
      * The method is used to make the output well formatted and user 
      * readable.
      * @param mixed $expr Any variable or value that can be passed to the 
@@ -520,7 +522,11 @@ class Util{
     public static function print_r($expr){
         $expr1 = str_replace('<', '&lt;', $expr);
         $expr2 = str_replace('>', '&gt;', $expr1);
-        ?><pre><?php print_r($expr2)?></pre><?php
+        $val = '<pre>'. print_r($expr2, true).'</pre>';
+        $height = substr_count($val, "\n");
+        $messageBox = new MessageBox();
+        $messageBox->getBody()->addTextNode($val,false);
+        echo $messageBox;
     }
     /**
      * Returns unicode code of a character.

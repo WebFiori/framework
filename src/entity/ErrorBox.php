@@ -30,7 +30,7 @@ use phpStructs\html\HTMLNode;
  * @author Ibrahim
  * @version 1.0
  */
-class ErrorBox extends HTMLNode{
+class ErrorBox extends MessageBox{
     /**
      * Used to format errors and warnings messages.
      * @var int 
@@ -71,7 +71,6 @@ class ErrorBox extends HTMLNode{
         parent::__construct();
         $this->labelStyle = 'style="color:#ff6666;font-family:monospace"';
         $this->setClassName('error-message-box');
-        $this->setAttribute('data-err-message-number', self::getWarningsAndNoticesCount());
         $this->setStyle([
             'width'=>'75%',
             'border'=>'1px double white',
@@ -82,25 +81,15 @@ class ErrorBox extends HTMLNode{
             'background-color'=>'rgba(0,0,0,0.7)',
             'color'=>'white',
             'height'=>'auto',
-            'top'=> (self::getWarningsAndNoticesCount()*10).'px',
-            'left'=> (self::getWarningsAndNoticesCount()*10).'px'
+            'top'=> (self::getCount()*10).'px',
+            'left'=> (self::getCount()*10).'px'
         ]);
-        $this->setAttribute('','');
-        $closeContainer = new HTMLNode();
-        $closeContainer->setClassName('error-message-header');
-        $closeContainer->setStyle([
+        $this->getHeader()->setStyle([
             'width'=>'100%',
             'cursor'=>'move',
             'background-color'=>'crimson'
         ]);
-        $this->addChild($closeContainer);
-        $closeButton = new HTMLNode('button');
-        $closeButton->setClassName('error-close-button');
-        $closeButton->addTextNode('X');
-        $closeContainer->addChild($closeButton);
-        $closeButton->setAttribute('onclick', "this.setAttribute('disabled','');smoothHide(this.parentElement.parentElement);");
-        
-        $detailsContainer = new HTMLNode();
+        $detailsContainer = &$this->getBody();
         $detailsContainer->setStyle([
             'overflow-y'=>'scroll',
             'overflow-x'=>'auto',
@@ -108,7 +97,6 @@ class ErrorBox extends HTMLNode{
             'height'=>'100px',
             'padding'=>'10px'
         ]);
-        $this->addChild($detailsContainer);
         $this->errNode = new HTMLNode('p');
         $this->errNode->setClassName('message-line');
         $this->errNode->setStyle([
@@ -149,62 +137,9 @@ class ErrorBox extends HTMLNode{
         ]);
         $detailsContainer->addChild($this->lineNode);
         $this->lineNode->addTextNode('<b '.$this->labelStyle.'>Line: </b>', false);
-        if(self::getWarningsAndNoticesCount() == 0){
-            $js = new HTMLNode('script');
-            $js->setAttribute('type', 'text/javascript');
-            $js->addTextNode(""
-                    . "function smoothHide(el){"
-                    . "var o = 1;"
-                    . "var intrvalId = setInterval(function(){"
-                    . "if(o > 0){"
-                    . "o = o - 0.02;"
-                    . "el.style['opacity'] = o;"
-                    . "}"
-                    . "else{"
-                    . "clearInterval(intrvalId);"
-                    . "el.style['display'] = 'none';"
-                    . "}"
-                    . "},15);"
-                    . "};"
-                    . "function addDragSupport(source){"
-                    . "source.setAttribute(\"dg\",true);"
-                    . "var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;"
-                    . "var boxNum = source.getAttribute(\"data-err-message-number\");"
-                    . "if (boxNum === null) {"
-                    . "source.onmousedown = mouseDown;"
-                    . "}"
-                    . "else{"
-                    . "source.children[0].onmousedown = mouseDown"
-                    . "}"
-                    . ""
-                    . "function mouseDown(e) {"
-                    . "e = e || window.event;"
-                    . "e.preventDefault();"
-                    . "pos3 = e.clientX;"
-                    . "pos4 = e.clientY;"
-                    . "document.onmouseup = dragStopped;"
-                    . "document.onmousemove = dragStarted;"
-                    . "};"
-                    . "function dragStarted(e) {"
-                    . "e = e || window.event;"
-                    . " e.preventDefault();"
-                    . "pos1 = pos3 - e.clientX;"
-                    . "pos2 = pos4 - e.clientY;"
-                    . "pos3 = e.clientX;"
-                    . "pos4 = e.clientY;"
-                    . "source.style.top = (source.offsetTop - pos2) + \"px\";"
-                    . "source.style.left = (source.offsetLeft - pos1) + \"px\";"
-                    . "};"
-                    . "function dragStopped(){"
-                    . "document.onmouseup = null;"
-                    . "document.onmousemove = null;"
-                    . "};"
-                    . "};", false);
-            $this->addChild($js);
-        }
+        
         $this->setAttribute('onmouseover', "if(this.getAttribute('dg') === null){addDragSupport(this)}");
-        self::$NoticeAndWarningCount++;
-        $closeContainer->addTextNode('<b style="margin-left:10px;font-family:monospace;">Message ('.self::getWarningsAndNoticesCount().')</b>',false);
+        $this->getHeader()->addTextNode('<b style="margin-left:10px;font-family:monospace;">Message ('.self::getCount().')</b>',false);
     }
     /**
      * Sets error based on error number.
@@ -250,16 +185,5 @@ class ErrorBox extends HTMLNode{
     public function setLine($line) {
         $this->lineNode->removeAllChildNodes();
         $this->lineNode->addTextNode('<b '.$this->labelStyle.'>Line: </b>'.$line, false);
-    }
-    /**
-     * Returns the number of warning messages and notices which was generated.
-     * The count will manly depends on the number of instances that was created 
-     * from the class ErrorBox. Every instance will increment the value by 1.
-     * @return int Number of warning messages and notices which was generated. by 
-     * PHP.
-     * @since 1.0
-     */
-    public static function getWarningsAndNoticesCount() {
-        return self::$NoticeAndWarningCount;
     }
 }

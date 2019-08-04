@@ -520,10 +520,11 @@ class Util{
      * @since 1.0
      */
     public static function print_r($expr){
-        $expr1 = str_replace('<', '&lt;', $expr);
-        $expr2 = str_replace('>', '&gt;', $expr1);
-        $val = '<pre>'. print_r($expr2, true).'</pre>';
-        $height = substr_count($val, "\n");
+        if(gettype($expr) == 'string'){
+            $expr1 = str_replace('<', '&lt;', $expr);
+            $expr = str_replace('>', '&gt;', $expr1);
+        }
+        $val = '<pre>'. print_r($expr, true).'</pre>';
         $messageBox = new MessageBox();
         $messageBox->getBody()->addTextNode($val,false);
         echo $messageBox;

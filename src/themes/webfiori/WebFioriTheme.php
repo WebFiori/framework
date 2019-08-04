@@ -333,6 +333,8 @@ class WebFioriTheme extends Theme{
                         }
                     }
                 }
+                $onInput = isset($options['on-input']) ? $options['on-input'] : "console.log(this.id+' has changed value.');";
+                $inputEl->setAttribute('onchange', $onInput);
             }
             else{
                 $inputEl = new Input($inputType);

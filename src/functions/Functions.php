@@ -578,7 +578,7 @@ class Functions {
     }
     /**
      * Returns the ID of the user from session manager.
-     * @return int The ID of the user taken from session manager. The 
+     * @return string|int The ID of the user taken from session manager. The 
      * method will return -1 in case no user is set in session manager or in 
      * case no session is active.
      * @since 1.0
@@ -589,7 +589,7 @@ class Functions {
         if($sesstion !== null){
             $user = &$this->getSession()->getUser();
             if($user !== null){
-                $retVal = intval($user->getID());
+                $retVal = $user->getID().'';
             }
         }
         return $retVal;

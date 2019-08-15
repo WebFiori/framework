@@ -24,13 +24,20 @@
  */
 namespace phpStructs;
 use Countable;
+use Iterator;
 /**
  * A class that represents a linked list.
  *
  * @author Ibrahim 
- * @version 1.4.2
+ * @version 1.4.3
  */
-class LinkedList implements Countable{
+class LinkedList implements Countable, Iterator{
+    /**
+     * A node which is used for iterator related methods.
+     * @var Node
+     * @since 1.4.3 
+     */
+    private $iteratorEl;
     /**
      * The maximum number of elements the list can have.
      * @var int 
@@ -605,4 +612,69 @@ class LinkedList implements Countable{
         $retVal .= ']';
         return $retVal;
     }
+    /**
+     * Returns the element that the iterator is currently is pointing to.
+     * This method is only used if the list is used in a 'foreach' loop. 
+     * The developer should not call it manually unless he knows what he 
+     * is doing.
+     * @return mixed The element that the iterator is currently is pointing to.
+     * @since 1.4.3 
+     */
+    public function current() {
+        if($this->iteratorEl !== null){
+            return $this->iteratorEl->data();
+        }
+        return null;
+    }
+    /**
+     * Returns the current node in the iterator.
+     * This method is only used if the list is used in a 'foreach' loop. 
+     * The developer should not call it manually unless he knows what he 
+     * is doing.
+     * @return Node|null An object of type 'Node' or null if the list is empty or 
+     * the iterator is finished.
+     * @since 1.4.3 
+     */
+    public function key() {
+        return $this->iteratorEl;
+    }
+    /**
+     * Returns the next element in the iterator.
+     * This method is only used if the list is used in a 'foreach' loop. 
+     * The developer should not call it manually unless he knows what he 
+     * is doing.
+     * @return mixed|null The next element in the iterator. If the iterator is 
+     * finished or the list is empty, the method will return null.
+     * @since 1.4.3 
+     */
+    public function next() {
+        $this->iteratorEl = $this->iteratorEl->next();
+        if($this->iteratorEl !== null){
+            return $this->iteratorEl->data();
+        }
+        return null;
+    }
+    /**
+     * Return iterator pointer to the first element in the list.
+     * This method is only used if the list is used in a 'foreach' loop. 
+     * The developer should not call it manually unless he knows what he 
+     * is doing.
+     * @since 1.4.3 
+     */
+    public function rewind() {
+        $this->iteratorEl = $this->head;
+    }
+    /**
+     * Checks if the iterator has more elements or not.
+     * This method is only used if the list is used in a 'foreach' loop. 
+     * The developer should not call it manually unless he knows what he 
+     * is doing.
+     * @return boolean If there is a next element, the method 
+     * will return true. False otherwise.
+     * @since 1.4.3 
+     */
+    public function valid() {
+        return $this->iteratorEl !== null;
+    }
+
 }

@@ -23,7 +23,7 @@
  * THE SOFTWARE.
  */
 namespace phpStructs\html;
-use phpStructs\html\TabelCell;
+use phpStructs\html\TableCell;
 use phpStructs\html\HTMLNode;
 /**
  * A class that represents &lt;tr&gt; node.
@@ -39,26 +39,29 @@ class TableRow extends HTMLNode{
      * Adds new child node to the row.
      * The node will be added only if its an instance of the class 
      * 'TableCell'.
-     * @param TabelCell $node New table cell.
+     * @param TableCell $node New table cell.
      * @since 1.0
      */
     public function addChild($node) {
-        if($node instanceof TabelCell){
+        if($node instanceof TableCell){
             parent::addChild($node);
         }
     }
     /**
      * Adds new cell to the row with a text in its body.
-     * @param string $cellText The text of cell body.
+     * @param string $cellText The text of cell body. It can have HTML.
      * @param string $type The type of the cell. This attribute 
      * can have only one of two values, 'td' or 'th'. 'td' If the cell is 
      * in the body of the table and 'th' if the cell is in the header. If 
      * none of the two is given, 'td' will be used by default.
+     * @param boolean $escEntities If set to true, the method will replace the 
+     * characters '<', '>' and '&' with the following HTML 
+     * entities: '&lt;', '&gt;' and '&amp;' in the given text. Default is false.
      * @since 1.0
      */
-    public function addCell($cellText,$type='td') {
-        $cell = new TabelCell($type);
-        $cell->addTextNode($cellText,FALSE);
+    public function addCell($cellText,$type='td',$escEntities=false) {
+        $cell = new TableCell($type);
+        $cell->addTextNode($cellText,$escEntities);
         $this->addChild($cell);
     }
 }

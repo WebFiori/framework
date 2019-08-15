@@ -31,7 +31,7 @@ use phpStructs\html\HTMLNode;
  * @author Ibrahim
  * @version 1.0
  */
-class TabelCell extends HTMLNode{
+class TableCell extends HTMLNode{
     /**
      * Creates new instance of the class.
      * @param string $cellType The type of the cell. This attribute 

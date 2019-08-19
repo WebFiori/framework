@@ -29,6 +29,7 @@ if(!defined('ROOT_DIR')){
     . '<h1>404 - Not Found</h1><hr><p>The requested resource was not found on the server.</p></body></html>');
 }
 use phMysql\MySQLLink;
+use phpStructs\Stack;
 use webfiori\entity\SessionManager;
 use webfiori\entity\DBConnectionFactory;
 use webfiori\entity\DBConnectionInfo;
@@ -41,9 +42,15 @@ use webfiori\conf\Config;
  * the system uses any. The developer can extend this class to add his own 
  * logic to the application that he is creating.
  * @author Ibrahim
- * @version 1.3.7
+ * @version 1.3.8
  */
 class Functions {
+    /**
+     * A stack that contains all executed and non-executed query objects.
+     * @var Stack 
+     * @since 1.3.8
+     */
+    private static $QueryStack;
     /**
      *
      * @var MySQLLink
@@ -180,7 +187,8 @@ class Functions {
      */
     public function __construct() {
         if(self::$sessions === null){
-            self::$sessions = array();
+            self::$sessions = [];
+            self::$QueryStack = new Stack();
         }
         $this->_setDBErrDetails(0, 'NO_ERR');
         $this->useSession(self::DEFAULT_SESSTION_OPTIONS);
@@ -356,12 +364,22 @@ class Functions {
      */
     private function _runQuery($query) {
         $link = $this->getDBLink();
+        self::$QueryStack->push($query);
         $result = $link->executeQuery($query);
         if($result !== true){
             $this->_setDBErrDetails($link->getErrorCode(),$link->getErrorMessage());
             $this->dbErrDetails['query'] = $query->getQuery();
         }
         return $result;
+    }
+    /**
+     * Returns a stack that contains all executed queries for current request.
+     * @return Stack An object of type 'Stack' that contains an objects of 
+     * type 'MySQLQuery'.
+     * @since 1.3.8
+     */
+    public static function getQueriesStack() {
+        return self::$QueryStack;
     }
     /**
      * Checks if the current session user has a privilege or not given privilege 

@@ -475,7 +475,8 @@ abstract class Theme implements JsonI{
     /**
      * Sets the name of the directory where theme images are kept.
      * @param string $name The name of the directory where theme images are kept. 
-     * Note that it will be set only if the given name is not an empty string.
+     * Note that it will be set only if the given name is not an empty string. In 
+     * addition, directory name must not include theme directory name.
      * @since 1.0
      */
     public function setImagesDirName($name) {
@@ -497,7 +498,8 @@ abstract class Theme implements JsonI{
     /**
      * Sets the name of the directory where theme JavaScript files are kept.
      * @param string $name The name of the directory where theme JavaScript files are kept. 
-     * Note that it will be set only if the given name is not an empty string.
+     * Note that it will be set only if the given name is not an empty string. In 
+     * addition, directory name must not include theme directory name.
      * @since 1.0
      */
     public function setJsDirName($name) {
@@ -519,7 +521,8 @@ abstract class Theme implements JsonI{
     /**
      * Sets the name of the directory where theme CSS files are kept.
      * @param string $name The name of the directory where theme CSS files are kept. 
-     * Note that it will be set only if the given name is not an empty string.
+     * Note that it will be set only if the given name is not an empty string. In 
+     * addition, directory name must not include theme directory name.
      * @since 1.0
      */
     public function setCssDirName($name) {

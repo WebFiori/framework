@@ -134,11 +134,10 @@ class WebsiteFunctions extends Functions{
      * @param array $websiteInfoArr an associative array. The array can 
      * have the following indices: 
      * <ul>
+     * <li><b>primary-language</b>: The main display language of the website.
      * <li><b>website-names</b>: A sub associative array. The index of the 
      * array should be language code (such as 'EN') and the value 
      * should be the name of the web site in the given language.</li>
-     * <li><b>base-url</b>: The URL at which system pages will be served from. 
-     * usually, this URL is used in the tag 'base' of the web page.</li>
      * <li><b>title-separator</b>: A character or a string that is used 
      * to separate web site name from web page title. Two common 
      * values are '-' and '|'.</li>
@@ -180,6 +179,7 @@ class WebsiteFunctions extends Functions{
      * <li><b>home-page</b>: The URL of the home page of the web site.</li>
      * <li><b>theme-name</b>: The name of the theme that will be used to style 
      * web site UI.</li>
+     * <li><b>primary-language</b>: Primary language of the website.
      * <li><b>admin-theme-name</b>: The name of the theme that is used to style 
      * admin web pages.</li>
      * <li><b>site-descriptions</b>: A sub associative array. The index of the 

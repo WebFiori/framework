@@ -442,18 +442,18 @@ class HeadNode extends HTMLNode{
     }
     /**
      * Adds new CSS source file.
-     * For every CSS file added, a string in the form '?cv=xxxxxxxxxx' will 
-     * be appended to the 'href' attribute value. It is used to prevent caching. 
-     * 'cv' = CSS Version.
      * @param string $href The link to the file. Must be non empty string.
      * @param $otherAttrs An array that can contain additional 
      * attributes to set for the link tag.
+     * @param boolean $preventCaching If set to true, a string in the form '?cv=xxxxxxxxxx' will 
+     * be appended to the 'href' attribute value. It is used to prevent caching. 
+     * Default is true. 'cv' = CSS Version.
      * @return boolean If a link tag which has the given CSS file is created, the 
      * method will return true. If no node is added, the method will return 
      * false.
      * @since 1.0
      */
-    public function addCSS($href, $otherAttrs=array()){
+    public function addCSS($href, $otherAttrs=[], $preventCaching=true){
         $trimmedHref = trim($href);
         if(strlen($trimmedHref) != 0){
             $tag = new HTMLNode('link');
@@ -466,9 +466,14 @@ class HeadNode extends HTMLNode{
                     }
                 }
             }
-            //used to prevent caching 
-            $version = substr(hash('sha256', time()+rand(0, 10000)), rand(0,10),10);
-            $tag->setAttribute('href', $trimmedHref.'?cv='.$version);
+            if($preventCaching === true){
+                //used to prevent caching 
+                $version = substr(hash('sha256', time()+rand(0, 10000)), rand(0,10),10);
+                $tag->setAttribute('href', $trimmedHref.'?cv='.$version);
+            }
+            else{
+                $tag->setAttribute('href', $trimmedHref);
+            }
             $this->addChild($tag);
             return true;
         }
@@ -476,18 +481,19 @@ class HeadNode extends HTMLNode{
     }
     /**
      * Adds new JavsScript source file.
-     * For every CSS file added, a string in the form '?jv=xxxxxxxxxx' will 
-     * be appended to the 'href' attribute value. It is used to prevent caching. 
-     * 'jv' = JavaScript Version.
      * @param string $loc The location of the file. Must be non-empty string.
      * @param $otherAttrs An array that can contain additional 
      * attributes to set for the script tag (such as 'async').
+     * @param boolean $preventCaching If set to true, a string in the form '?jv=xxxxxxxxxx' will 
+     * be appended to the 'href' attribute value. It is used to prevent caching. 
+     * 'jv' = JavaScript Version.
+     * Default is true.
      * @return boolean If a script node which has the given JS file is added, the 
      * method will return true. If no node is added, the method will return 
      * false.
      * @since 1.0
      */
-    public function addJs($loc, $otherAttrs=array()){
+    public function addJs($loc, $otherAttrs=[],$preventCaching=true){
         $trimmedLoc = trim($loc);
         if(strlen($trimmedLoc) != 0){
             $tag = new HTMLNode('script');
@@ -500,9 +506,14 @@ class HeadNode extends HTMLNode{
                     }
                 }
             }
-            //used to prevent caching 
-            $version = substr(hash('sha256', time()+rand(0, 10000)), rand(0,10),10);
-            $tag->setAttribute('src', $trimmedLoc.'?jv='.$version);
+            if($preventCaching === true){
+                //used to prevent caching 
+                $version = substr(hash('sha256', time()+rand(0, 10000)), rand(0,10),10);
+                $tag->setAttribute('src', $trimmedLoc.'?jv='.$version);
+            }
+            else{
+                $tag->setAttribute('src', $trimmedLoc);
+            }
             $this->addChild($tag);
             return true;
         }
@@ -568,7 +579,7 @@ class HeadNode extends HTMLNode{
      * return true. If not added, the method will return false.
      * @since 1.0
      */
-    public function addAlternate($url,$lang,$otherAttrs=array()){
+    public function addAlternate($url,$lang,$otherAttrs=[]){
         $trimmedUrl = trim($url);
         $trimmedLang = trim($lang);
         if(strlen($trimmedUrl) != 0 && strlen($trimmedLang) != 0){
@@ -602,7 +613,7 @@ class HeadNode extends HTMLNode{
      * if not.
      * @since 1.1
      */
-    public function addLink($rel,$href,$otherAttrs=array()){
+    public function addLink($rel,$href,$otherAttrs=[]){
         $trimmedRel = trim(strtolower($rel));
         $trimmedHref = trim($href);
         if(strlen($trimmedRel) != 0 && strlen($trimmedHref) != 0){

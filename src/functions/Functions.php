@@ -58,6 +58,11 @@ class Functions {
      */
     private $dataStack;
     /**
+     * An array that contains current active data set info.
+     * @var array 
+     */
+    private $currentDataset;
+    /**
      *
      * @var MySQLLink
      * @since 1.3.3 
@@ -197,6 +202,7 @@ class Functions {
             self::$QueryStack = new Stack();
         }
         $this->dataStack = new Stack();
+        $this->currentDataset = null;
         $this->_setDBErrDetails(0, 'NO_ERR');
         $this->useSession(self::DEFAULT_SESSTION_OPTIONS);
     }
@@ -207,6 +213,14 @@ class Functions {
      */
     private function getDataStack() {
         return $this->dataStack;
+    }
+    /**
+     * 
+     * @return array
+     * @since 1.3.8
+     */
+    private function &getCurrentDataset() {
+        return $this->currentDataset;
     }
     /**
      * Initiate database connection.
@@ -386,7 +400,17 @@ class Functions {
             $this->dbErrDetails['query'] = $query->getQuery();
         }
         if($result === true && $query->getType() == 'select'){
-            $this->getDataStack()->push($link->getRows());
+            $current = $this->getCurrentDataset();
+            if($current !== null){
+                $this->getDataStack()->push($current);
+            }
+            else{
+                $this->currentDataset = [
+                    'rows'=>$link->rows(),
+                    'current-position'=>0,
+                    'data'=>$link->getRows()
+                ];
+            }
         }
         return $result;
     }
@@ -592,17 +616,25 @@ class Functions {
         return $retVal;
     }
    /**
-     * Returns the first that is resulted from executing a query.
-     * @return array|null An array that contains row info. The 
-     * method will return null in case no connection was established to 
-     * the database.
-     * @since 1.0
-     */
+    * Returns the first row that is resulted from executing a query.
+    * If the current active data set is empty or it has been traversed, 
+    * the method will switch to previously fetched data set.
+    * @return array|null An array that contains row info. The 
+    * method will return null in case no connection was established to 
+    * the database.
+    * @since 1.0
+    */
     public function getRow(){
         $retVal = null;
-        $dbLink = $this->getDBLink();
-        if($dbLink !== null){
-            $retVal = $dbLink->getRow();
+        $current = &$this->getCurrentDataset();
+        if($current !== null){
+            while ($current !== null && ($current['rows'] == 0 || $current['rows'] == $current['current-index'])){
+                $this->currentDataset = &$this->getDataStack()->pop();
+            }
+            $current = &$this->getCurrentDataset();
+            if($current !== null){
+                $retVal = $current['data'][$current['current-index']];
+            }
         }
         return $retVal;
     }
@@ -615,10 +647,10 @@ class Functions {
      * @since 1.3.1
      */
     public function nextRow() {
-        $retVal = null;
-        $dbLink = &$this->getDBLink();
-        if($dbLink !== null){
-            $retVal = $dbLink->nextRow();
+        $retVal = $this->getRow();
+        if($retVal !== null){
+            $dataset = &$this->getCurrentDataset();
+            $dataset['current-index'] = $dataset['current-index'] + 1;
         }
         return $retVal;
     }

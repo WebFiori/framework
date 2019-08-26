@@ -52,6 +52,12 @@ class Functions {
      */
     private static $QueryStack;
     /**
+     * A stack that contains multiple data sets which was fetched from executing 
+     * database queries.
+     * @var Stack 
+     */
+    private $dataStack;
+    /**
      *
      * @var MySQLLink
      * @since 1.3.3 
@@ -190,8 +196,17 @@ class Functions {
             self::$sessions = [];
             self::$QueryStack = new Stack();
         }
+        $this->dataStack = new Stack();
         $this->_setDBErrDetails(0, 'NO_ERR');
         $this->useSession(self::DEFAULT_SESSTION_OPTIONS);
+    }
+    /**
+     * 
+     * @return Stack
+     * @since 1.3.8
+     */
+    private function getDataStack() {
+        return $this->dataStack;
     }
     /**
      * Initiate database connection.
@@ -370,6 +385,9 @@ class Functions {
             $this->_setDBErrDetails($link->getErrorCode(),$link->getErrorMessage());
             $this->dbErrDetails['query'] = $query->getQuery();
         }
+        if($result === true && $query->getType() == 'select'){
+            $this->getDataStack()->push($link->getRows());
+        }
         return $result;
     }
     /**
@@ -380,6 +398,16 @@ class Functions {
      */
     public static function getQueriesStack() {
         return self::$QueryStack;
+    }
+    /**
+     * Returns the last executed query object.
+     * @return MySQLQuery|null The method will return an object of type 
+     * 'MySQLQuery' that contains query info. If no query was executed, the 
+     * method will return null.
+     * @since 1.3.8
+     */
+    public function getLastQuery() {
+        return $this->getQueriesStack()->peek();
     }
     /**
      * Checks if the current session user has a privilege or not given privilege 

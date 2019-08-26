@@ -31,6 +31,7 @@ if(!defined('ROOT_DIR')){
 use webfiori\entity\FileHandler;
 use webfiori\entity\mail\SMTPAccount;
 use webfiori\entity\mail\SocketMailer;
+use webfiori\conf\MailConfig;
 /**
  * A class for the methods that is related to mailing.
  *

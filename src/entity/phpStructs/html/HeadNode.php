@@ -29,7 +29,7 @@ use phpStructs\LinkedList;
  * A class that represents the tag &lt;head&lt; of a HTML document.
  *
  * @author Ibrahim
- * @version 1.1.4
+ * @version 1.1.5
  */
 class HeadNode extends HTMLNode{
     /**
@@ -415,6 +415,71 @@ class HeadNode extends HTMLNode{
         return $null;
     }
     /**
+     * Checks if a CSS node with specific 'href' does exist or not.
+     * Note that the method will not check for query string in the passed 
+     * value. It will simply ignore it.
+     * @param string $loc The value of the attribute 'href' of 
+     * the CSS node.
+     * @return boolean If a link node with the given 'href' value does 
+     * exist, the method will return true. Other than that, the method 
+     * will return false.
+     * 1.1.5
+     */
+    public function hasCss($loc) {
+        $trimmedLoc = trim($loc);
+        $splitted = explode('?', $trimmedLoc);
+        if(count($splitted) == 2){
+            $trimmedLoc = trim($splitted[0]);
+            $queryString = trim($splitted[1]);
+        }
+        else{
+            $queryString = '';
+        }
+        $cssNodes = $this->getCSSNodes();
+        foreach ($cssNodes as $node){
+            if($node->hasAttribute('href')){
+                $hrefExpl = explode('?', $node->getAttribute('href'));
+                $href = $hrefExpl[0];
+                if($href == $trimmedLoc){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    /**
+     * Checks if a JavaScript node with specific 'src' value does exist or not.
+     * Note that the method will not check for query string in the passed 
+     * value. It will simply ignore it.
+     * @param string $src The value of the attribute 'src' of 
+     * the script node.
+     * @return boolean If a JavaScript node with the given 'src' value does 
+     * exist, the method will return true. Other than that, the method 
+     * will return false.
+     * 1.1.5
+     */
+    public function hasJs($src) {
+        $trimmedLoc = trim($src);
+        $splitted = explode('?', $trimmedLoc);
+        if(count($splitted) == 2){
+            $trimmedLoc = trim($splitted[0]);
+            $queryString = trim($splitted[1]);
+        }
+        else{
+            $queryString = '';
+        }
+        $jsNodes = $this->getJSNodes();
+        foreach ($jsNodes as $node){
+            if($node->hasAttribute('src')){
+                $srcV = explode('?', $node->getAttribute('src'))[0];
+                if($srcV == $trimmedLoc){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    /**
      * Checks if a meta tag which has the given name exist or not.
      * @param string $name The value of the attribute 'name' of the meta 
      * tag. If the developer would like to check for the existence of the 
@@ -455,6 +520,17 @@ class HeadNode extends HTMLNode{
      */
     public function addCSS($href, $otherAttrs=[], $preventCaching=true){
         $trimmedHref = trim($href);
+        $splitted = explode('?', $trimmedHref);
+        if(count($splitted) == 2){
+            $trimmedHref = trim($splitted[0]);
+            $queryString = trim($splitted[1]);
+        }
+        else if(count($splitted) > 2){
+            return false;
+        }
+        else{
+            $queryString = '';
+        }
         if(strlen($trimmedHref) != 0){
             $tag = new HTMLNode('link');
             $tag->setAttribute('rel','stylesheet');
@@ -469,10 +545,20 @@ class HeadNode extends HTMLNode{
             if($preventCaching === true){
                 //used to prevent caching 
                 $version = substr(hash('sha256', time()+rand(0, 10000)), rand(0,10),10);
-                $tag->setAttribute('href', $trimmedHref.'?cv='.$version);
+                if(strlen($queryString) != 0){
+                    $tag->setAttribute('href', $trimmedHref.'?'.$queryString.'&cv='.$version);
+                }
+                else{
+                    $tag->setAttribute('href', $trimmedHref.'?cv='.$version);
+                }
             }
             else{
-                $tag->setAttribute('href', $trimmedHref);
+                if(strlen($queryString) != 0){
+                    $tag->setAttribute('href', $trimmedHref.'?'.$queryString);
+                }
+                else{
+                    $tag->setAttribute('href', $trimmedHref);
+                }
             }
             $this->addChild($tag);
             return true;
@@ -495,6 +581,17 @@ class HeadNode extends HTMLNode{
      */
     public function addJs($loc, $otherAttrs=[],$preventCaching=true){
         $trimmedLoc = trim($loc);
+        $splitted = explode('?', $trimmedLoc);
+        if(count($splitted) == 2){
+            $trimmedLoc = trim($splitted[0]);
+            $queryString = trim($splitted[1]);
+        }
+        else if(count($splitted) > 2){
+            return false;
+        }
+        else{
+            $queryString = '';
+        }
         if(strlen($trimmedLoc) != 0){
             $tag = new HTMLNode('script');
             $tag->setAttribute('type','text/javascript');
@@ -509,10 +606,20 @@ class HeadNode extends HTMLNode{
             if($preventCaching === true){
                 //used to prevent caching 
                 $version = substr(hash('sha256', time()+rand(0, 10000)), rand(0,10),10);
-                $tag->setAttribute('src', $trimmedLoc.'?jv='.$version);
+                if(strlen($queryString) == 0){
+                    $tag->setAttribute('src', $trimmedLoc.'?jv='.$version);
+                }
+                else{
+                    $tag->setAttribute('src', $trimmedLoc.'?'.$queryString.'&jv='.$version);
+                }
             }
             else{
-                $tag->setAttribute('src', $trimmedLoc);
+                if(strlen($queryString) == 0){
+                    $tag->setAttribute('src', $trimmedLoc);
+                }
+                else{
+                    $tag->setAttribute('src', $trimmedLoc.'?'.$queryString);
+                }
             }
             $this->addChild($tag);
             return true;

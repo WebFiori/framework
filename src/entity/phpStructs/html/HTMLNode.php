@@ -31,7 +31,7 @@ use phpStructs\Queue;
  * A class that represents HTML element.
  *
  * @author Ibrahim
- * @version 1.7.6
+ * @version 1.7.7
  */
 class HTMLNode {
     /**
@@ -68,7 +68,35 @@ class HTMLNode {
      */
     private $null;
     /**
-     * Default formatting for the code.
+     * An associative array of default formatting options for the code.
+     * It is used when displaying the actual generated HTML code. The array has 
+     * the following indices and values:
+     * <ul>
+     * <li><b>tab-spaces</b>: Number of spaces in a tab. The value is 4.</li>
+     * <li><b>initial-tab</b>: Initial number of tabs. The value is 0.</li>
+     * <li><b>with-colors</b>: A boolean. The value is true.</li>
+     * <li><b>use-pre</b>: Use 'pre' or 'span' to add colors. The value is true. </li>
+     * <li><b>colors</b>: A sub-associative array of colors. The array has 
+     * the following indices and values:
+     * <ul>
+     * <li><b>bg-color</b>: Background color of code block. The value is 'rgb(21, 18, 33)'</li>
+     * <li><b>text-color</b>: Color of any text that appears inside any node. 
+     * The value is 'gray'.</li>
+     * <li><b>attribute-color</b>: The color of attribute name. The value is 
+     * 'rgb(0,124,0)'.</li>
+     * <li><b>attribute-value-color</b>: The color of attribute value. The value 
+     * is 'rgb(170,85,137)'.</li>
+     * <li><b>node-name-color</b>: Color of HTML node name. The value is 
+     * 'rgb(204,225,70)'.</li>
+     * <li><b>lt-gt-color</b>: The color of '&lt;' and '&gt;' signs (around node name). The 
+     * value is 'rgb(204,225,70)'.</li>
+     * <li><b>comment-color</b>: The color of any HTML comment. The value 
+     * is 'rgb(0,189,36)'.</li>
+     * <li><b>operator-color</b>: The color of equal operator for attribute 
+     * value. The value is 'gray'.</li>
+     * </ul>
+     * </li>
+     * <ul>
      * @var array
      * @since 1.5
      */
@@ -179,9 +207,18 @@ class HTMLNode {
      * Constructs a new instance of the class.
      * @param string $name The name of the node (such as 'div').  If 
      * we want to create a comment node, the name should be '#comment'. If 
-     * we want to create a text node, the name should be '#text'. If empty string is 
-     * given, default value will be used. The Default value is 'div'.
-     * 
+     * we want to create a text node, the name should be '#text'. If this parameter is 
+     * not given, default value will be used. The Default value is 'div'. A valid 
+     * node name must follow the following rules:
+     * <ul>
+     * <li>Must not be an empty string.</li>
+     * <li>Must not start with a number.</li>
+     * <li>Must not start with '-'.</li>
+     * <li>Can only have the following characters in its name: [A-Z], [a-z], 
+     * [0-9] and '='.</li>
+     * <ul>
+     * @throws Exception The method will throw an exception if given node 
+     * name is not valid.
      */
     public function __construct($name='div') {
         $this->null = null;
@@ -192,7 +229,7 @@ class HTMLNode {
         }
         else{
             $this->name = strtolower($name);
-            if(!$this->_validateNodeName($this->getNodeName())){
+            if(!$this->_validateName($this->getNodeName())){
                 throw new Exception('Invalid node name: \''.$name.'\'.');
             }
         }
@@ -215,14 +252,27 @@ class HTMLNode {
      * Validates the name of the node.
      * @param string $name The name of the node in lower case.
      * @return boolean If the name is valid, the method will return true. If 
-     * it is not valid, it will return false.
+     * it is not valid, it will return false. Valid values must follow the 
+     * following rules:
+     * <ul>
+     * <li>Must not be an empty string.</li>
+     * <li>Must not start with a number.</li>
+     * <li>Must not start with '-'.</li>
+     * <li>Can only have the following characters in its name: [A-Z], [a-z], 
+     * [0-9] and '='.</li>
+     * <ul>
      * @since 1.7.4
      */
-    private function _validateNodeName($name){
+    private function _validateName($name){
         $len = strlen($name);
         if($len > 0){
             for($x = 0 ; $x < $len ; $x++){
                 $char = $name[$x];
+                if($x == 0){
+                    if(($char >= '0' && $char <= '9') || $char == '-'){
+                        return false;
+                    }
+                }
                 if(($char <= 'z' && $char >= 'a') || ($char >= '0' && $char <= '9') || $char=='-'){
                     
                 }
@@ -887,7 +937,7 @@ class HTMLNode {
         }
         else{
             $lName = strtolower($name);
-            if($this->_validateNodeName($lName)){
+            if($this->_validateName($lName)){
                 $reqClose = !in_array($lName, self::VOID_TAGS);
                 if($this->mustClose() && $reqClose !== true){
                     if($this->childrenCount() == 0){
@@ -940,19 +990,48 @@ class HTMLNode {
         $trimmedName = trim($name);
         if(!$this->isTextNode() && !$this->isComment() && strlen($trimmedName) != 0){
             $lower = strtolower($trimmedName);
-            if($lower == 'dir'){
-                $lowerVal = strtolower($val);
-                if($lowerVal == 'ltr' || $lowerVal == 'rtl'){
-                    $this->attributes[$lower] = $lowerVal;
+            $isValid = $this->_validateName($lower);
+            if($isValid){
+                if($lower == 'dir'){
+                    $lowerVal = strtolower($val);
+                    if($lowerVal == 'ltr' || $lowerVal == 'rtl'){
+                        $this->attributes[$lower] = $lowerVal;
+                        return true;
+                    }
+                }
+                else if($trimmedName == 'style'){
+                    $styleArr = $this->_styleArray($val);
+                    return $this->setStyle($styleArr);
+                }
+                else{
+                    $this->attributes[$lower] = $val;
                     return true;
                 }
             }
-            else{
-                $this->attributes[$lower] = $val;
-                return true;
-            }
         }
         return false;
+    }
+    /**
+     * A helper method which is used to validate the attribute 'style' 
+     * when its value is given as a string.
+     * @param string $style
+     * @return array
+     * @since 1.7.7
+     */
+    private function _styleArray($style){
+        $vals = explode(';', $style);
+        $retVal = [];
+        foreach ($vals as $str){
+            $attrAndVal = explode(':', $str);
+            if(count($attrAndVal) == 2){
+                $attr = trim($attrAndVal[0]);
+                $val = trim($attrAndVal[1]);
+                if(strlen($attr) != 0 && strlen($val) != 0){
+                    $retVal[$attr] = $val;
+                }
+            }
+        }
+        return $retVal;
     }
     /**
      * Sets the value of the attribute 'id' of the node.
@@ -1022,14 +1101,24 @@ class HTMLNode {
      * @param array $cssStyles An associative array of CSS declarations. The keys of the array should 
      * be the names of CSS Properties and the values should be the values of 
      * the attributes (e.g. 'color'=>'white').
+     * @return boolean If style attribute is updated, then the method will return 
+     * true. If not, it will return false.
      * @since 1.7.1
      */
     public function setStyle($cssStyles=array()) {
         $styleStr = '';
         foreach ($cssStyles as $key => $val){
-            $styleStr .= $key.':'.$val.';';
+            $trimmedKey = trim($key);
+            $trimmedVal = trim($val);
+            if($this->_validateName($trimmedKey) && strlen($trimmedVal) != 0){
+                $styleStr .= $trimmedKey.':'.$trimmedVal.';';
+            }
         }
-        $this->setAttribute('style', $styleStr);
+        if(strlen($styleStr) != 0){
+            $this->attributes['style'] = $styleStr;
+            return true;
+        }
+        return false;
     }
     /**
      * Returns an array that contains in-line CSS declarations.
@@ -1042,7 +1131,7 @@ class HTMLNode {
     public function getStyle() {
         $styleStr = $this->getAttributeValue('style');
         if($styleStr !== null){
-            $retVal = array();
+            $retVal = [];
             $arr1 = explode(';', trim($styleStr,';'));
             foreach ($arr1 as $val){
                 $exp = explode(':', $val);
@@ -1050,7 +1139,7 @@ class HTMLNode {
             }
             return $retVal;
         }
-        return array();
+        return [];
     }
     /**
      * Removes an attribute from the node given its name.
@@ -1718,6 +1807,20 @@ class HTMLNode {
             }
         }
         return $this->null;
+    }
+    /**
+     * Returns the value of an attribute.
+     * Calling this method is similar to calling HTMLNode::getAttributeValue().
+     * @param string $attrName The name of the attribute.
+     * @return string|null The method will return the value of the attribute 
+     * if found. If no such attribute, the method will return null.
+     * @since 1.7.7
+     */
+    public function getAttribute($attrName) {
+        if($this->hasAttribute($attrName)){
+            return $this->attributes[$attrName];
+        }
+        return null;
     }
     /**
      * Returns the value of an attribute.

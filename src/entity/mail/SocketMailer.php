@@ -184,7 +184,7 @@ class SocketMailer {
         if($firstAsInt != 0){
             $secNum = $serverResponseMessage[1];
             $thirdNum = $serverResponseMessage[2];
-            $this->lastResponseCode = $firstNum+(intval($secNum*10))+(intval($thirdNum)*100);
+            $this->lastResponseCode = intval($firstNum)*100+(intval($secNum*10))+(intval($thirdNum));
         }
     }
     /**
@@ -322,8 +322,8 @@ class SocketMailer {
                 }
                 //a command to check if authentication is done
                 $this->sendC('MAIL FROM: <'.$this->getSenderAddress().'>');
-
-                if($this->getLastLogMessage() == '235 Authentication succeeded' || $this->getLastLogMessage() == '250 OK'){
+                if($this->getLastResponseCode() == 235 || 
+                $this->getLastResponseCode() == 250){
                     $this->isLoggedIn = true;
                 }
                 else{
@@ -682,12 +682,15 @@ class SocketMailer {
             set_error_handler(function(){});
 //            Logger::log('Checking if SSL or TLS will be used...');
             $port = $this->port;
-//            if($port == 465){
-//                Logger::log('SSL will be used.');
-//            }
-//            else if($port == 587){
-//                Logger::log('TLS will be used.');
-//            }
+            $protocol = '';
+            if($port == 465){
+                $protocol = "ssl://";
+                //Logger::log('SSL will be used.');
+            }
+            else if($port == 587){
+                //Logger::log('TLS will be used.');
+                $protocol = "tls://";
+            }
             $err = 0;
             $errStr = '';
             //$protocol = $port == 465 ? "ssl://" : '';
@@ -699,10 +702,10 @@ class SocketMailer {
                         'allow_self_signed'=>true
                     )
                 ));
-                $this->conn = stream_socket_client($this->host.':'.$port, $err, $errStr, $this->timeout*60, STREAM_CLIENT_CONNECT, $context);
+                $this->conn = stream_socket_client($protocol.$this->host.':'.$port, $err, $errStr, $this->timeout*60, STREAM_CLIENT_CONNECT, $context);
             }
             else{
-                $this->conn = fsockopen($this->host, $port, $err, $errStr, $this->timeout*60);
+                $this->conn = fsockopen($protocol.$this->host, $port, $err, $errStr, $this->timeout*60);
             }
             set_error_handler(null);
             if(is_resource($this->conn)){

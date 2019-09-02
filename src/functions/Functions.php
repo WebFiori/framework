@@ -602,8 +602,8 @@ class Functions {
     /**
      * Returns an array which contains all fetched rows from executing a database 
      * query.
-     * Note that the method can be used only once to get a dataset. The 
-     * method might return different dataset on next call or it might return 
+     * Note that the method can be used only once to get a data set. The 
+     * method might return different data set on next call or it might return 
      * an empty array.
      * @return array An array which contains all fetched rows from executing a 
      * database query.

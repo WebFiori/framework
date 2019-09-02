@@ -404,13 +404,11 @@ class Functions {
             if($current !== null){
                 $this->getDataStack()->push($current);
             }
-            else{
-                $this->currentDataset = [
-                    'rows'=>$link->rows(),
-                    'current-position'=>0,
-                    'data'=>$link->getRows()
-                ];
-            }
+            $this->currentDataset = [
+                'rows-count'=>$link->rows(),
+                'current-position'=>0,
+                'data'=>$link->getRows()
+            ];
         }
         return $result;
     }
@@ -582,57 +580,56 @@ class Functions {
      * null.
      * @since 1.2
      */
-    public function &getDBLink() {
+    private function &getDBLink() {
         return $this->databaseLink;
     }
     /**
      * Returns the number of rows resulted from executing a query.
+     * The method will return the number of rows for current active dataset.
      * @return int Number of rows resulted from executing a query. The 
      * method will return <b>-1</b> in case no connection was established to 
-     * the database.
+     * the database or in case no dataset was fetched.
      * @since 1.0
      */
     public function rows(){
         $retVal = -1;
-        $dbLink = &$this->getDBLink();
-        if($dbLink !== null){
-            $retVal = $dbLink->rows();
+        $dataset = $this->getCurrentDataset();
+        if($dataset !== null){
+            $retVal = $dataset['rows-count'];
         }
         return $retVal;
     }
     /**
      * Returns an array which contains all fetched rows from executing a database 
      * query.
+     * Note that the method can be used only once to get a dataset. The 
+     * method might return different dataset on next call or it might return 
+     * an empty array.
      * @return array An array which contains all fetched rows from executing a 
      * database query.
      * @since 1.3.2
      */
     public function getRows(){
-        $retVal = array();
-        $dbLink = &$this->getDBLink();
-        if($dbLink !== null){
-            $retVal = $dbLink->getRows();
+        $retVal = [];
+        $dataset = $this->getCurrentDataset();
+        if($dataset !== null){
+            $this->currentDataset = $this->dataStack->pop();
+            $retVal = $dataset;
         }
         return $retVal;
     }
    /**
     * Returns the first row that is resulted from executing a query.
-    * If the current active data set is empty or it has been traversed, 
-    * the method will switch to previously fetched data set.
-    * @return array|null An array that contains row info. The 
+    * @return array|null An associative array that contains row info. The 
     * method will return null in case no connection was established to 
-    * the database.
+    * the database or there is no active data set.
     * @since 1.0
     */
     public function getRow(){
         $retVal = null;
         $current = &$this->getCurrentDataset();
         if($current !== null){
-            while ($current !== null && ($current['rows'] == 0 || $current['rows'] == $current['current-index'])){
-                $this->currentDataset = &$this->getDataStack()->pop();
-            }
-            $current = &$this->getCurrentDataset();
-            if($current !== null){
+            if($current['rows-count'] !== 0){
                 $retVal = $current['data'][$current['current-index']];
             }
         }
@@ -641,9 +638,13 @@ class Functions {
     /**
      * Returns the next row in the result set that was generated from executing 
      * a query.
+     * Note that if current active data set has been traversed, the method 
+     * will return null. In addition, If there are other data sets which was resulted from 
+     * executing other select queries, The method will switch to the last 
+     * data set.
      * @return array|null An associative array that represents the row. If 
      * there was no result set generated from executing the query or the 
-     * result has no rows, the method will return null.
+     * result has no rows or the current data set has been traversed, the method will return null.
      * @since 1.3.1
      */
     public function nextRow() {
@@ -651,6 +652,9 @@ class Functions {
         if($retVal !== null){
             $dataset = &$this->getCurrentDataset();
             $dataset['current-index'] = $dataset['current-index'] + 1;
+        }
+        else{
+            $this->currentDataset = $this->dataStack->pop();
         }
         return $retVal;
     }

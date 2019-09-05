@@ -40,9 +40,15 @@ if(!defined('ROOT_DIR')){
  * Where {BASE_URL} is the web site's base URL and {password} is the password 
  * that was set by the developer to protect the jobs from unauthorized access.
  * @author Ibrahim
- * @version 1.0.3
+ * @version 1.0.4
  */
 class Cron {
+    /**
+     * The job which is currently executing.
+     * @var CronJob|null
+     * @since 1.0.4 
+     */
+    private $activeJob;
     /**
      * An array that contains current timestamp. 
      * @var array 
@@ -83,6 +89,24 @@ class Cron {
             self::$executer = new Cron();
         }
         return self::$executer;
+    }
+    /**
+     * 
+     * @param CronJob|null $job
+     * @since 1.0.4
+     */
+    private function _setActiveJob($job) {
+        $this->activeJob = $job;
+    }
+    /**
+     * Returns an object that represents the job which is currently being executed.
+     * @return CronJob|null If there is a job which is being executed, the 
+     * method will return an object of type 'CronJob' that represent it. If 
+     * no job is being executed, the method will return null.
+     * @since 1.0.4
+     */
+    public static function &activeJob() {
+        return self::_get()->activeJob;
     }
     /**
      * Returns the number of current month as integer.
@@ -168,10 +192,14 @@ class Cron {
                             $totalJobs = Cron::jobsQueue()->size();
                             $executedJobsCount = 0;
                             while ($job = Cron::jobsQueue()->dequeue()){
+                                if($job->isTime()){
+                                    $this->_setActiveJob($job);
+                                }
                                 if($job->execute()){
                                     $this->_logJobExecution($job);
                                     $executedJobsCount++;
                                 }
+                                $this->_setActiveJob(null);
                             }
                             http_response_code(200);
                             die(''
@@ -230,10 +258,14 @@ class Cron {
                     $totalJobs = Cron::jobsQueue()->size();
                     $executedJobsCount = 0;
                     while ($job = Cron::jobsQueue()->dequeue()){
+                        if($job->isTime()){
+                            $this->_setActiveJob($job);
+                        }
                         if($job->execute()){
                             $this->_logJobExecution($job);
                             $executedJobsCount++;
                         }
+                        $this->_setActiveJob(null);
                     }
                     http_response_code(200);
                     die(''
@@ -288,6 +320,9 @@ class Cron {
                             if($jobName != null){
                                 while ($job = Cron::jobsQueue()->dequeue()){
                                     if($job->getJobName() == $jobName){
+                                        if($job->isTime()){
+                                            $this->_setActiveJob($job);
+                                        }
                                         $job->execute(true);
                                         $this->_logJobExecution($job,true);
                                         http_response_code(200);
@@ -380,6 +415,9 @@ class Cron {
                     if($jobName != null){
                         while ($job = Cron::jobsQueue()->dequeue()){
                             if($job->getJobName() == $jobName){
+                                if($job->isTime()){
+                                    $this->_setActiveJob($job);
+                                }
                                 $job->execute(true);
                                 $this->_logJobExecution($job,true);
                                 http_response_code(200);

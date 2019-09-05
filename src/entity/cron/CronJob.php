@@ -34,7 +34,7 @@ if(!defined('ROOT_DIR')){
  * A class thar represents a cron job.
  *
  * @author Ibrahim
- * @version 1.0.3
+ * @version 1.0.4
  */
 class CronJob {
     /**
@@ -952,11 +952,19 @@ class CronJob {
      */
     public function execute($force=false){
         $retVal = false;
-        if($force === true || ($this->isMinute() && $this->isHour() && $this->isDayOfMonth() && 
-        $this->isMonth() && $this->isDayOfWeek())){
+        if($force === true || $this->isTime()){
             call_user_func($this->events['on']['func'], $this->events['on']['params']);
             $retVal = true;
         }
         return $retVal;
+    }
+    /**
+     * Checks if its time to execute the job or not.
+     * @return boolean If its time to execute the job, the method will return true. 
+     * If not, it will return false.
+     * @since 1.0.4
+     */
+    public function isTime() {
+        return $this->isMinute() && $this->isHour() && $this->isDayOfMonth() && $this->isMonth() && $this->isDayOfWeek();
     }
 }

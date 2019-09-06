@@ -24,13 +24,20 @@
  */
 namespace phMysql;
 use Exception;
+use phMysql\MySQLTable;
 /**
  * A base class that is used to construct MySQL queries. It can be used as a base 
  * class for constructing other MySQL queries.
  * @author Ibrahim
- * @version 1.8.6
+ * @version 1.8.8
  */
 abstract class MySQLQuery{
+    /**
+     * The name of database schema that the query will be executed on.
+     * @var string 
+     * @since 1.8.7
+     */
+    private $schemaName;
     /**
      * An attribute that is set to true if the query is un update or insert of 
      * blob datatype.
@@ -175,6 +182,26 @@ abstract class MySQLQuery{
         $this->queryType = 'select';
     }
     /**
+     * Sets the name of database that the query will be executed on.
+     * @param string $name Database schema name. It must be non-empty string.
+     * @since 1.8.7
+     */
+    public function setSchemaName($name) {
+        $nameT = trim($name);
+        if(strlen($nameT) != 0){
+            $this->schemaName = $nameT;
+        }
+    }
+    /**
+     * Returns database schema name that the query will be executed on.
+     * @return string Database schema name. If not set, the method will 
+     * return null.
+     * @since 1.8.7
+     */
+    public function getSchemaName() {
+        return $this->schemaName;
+    }
+    /**
      * Constructs a query that can be used to get the names of all views in a 
      * schema given its name.
      * The result of executing the query is a table with one colum. The name 
@@ -200,7 +227,8 @@ abstract class MySQLQuery{
      * @since 1.4
      */
     public function alter($alterOps){
-        $q = 'alter table '.$this->getStructureName().self::NL;
+        $schema = $this->getSchemaName() === null ? '' : $this->getSchemaName().'.';
+        $q = 'alter table '.$schema.''.$this->getStructureName().self::NL;
         $count = count($alterOps);
         for($x = 0 ; $x < $count ; $x++){
             if($x + 1 == $count){
@@ -213,28 +241,103 @@ abstract class MySQLQuery{
         $this->setQuery($q, 'alter');
     }
     /**
+     * Constructs a query that can be used to add a primary key to a table.
+     * @param MySQLTable $table The table that will have the primary key.
+     * @since 1.8.8
+     */
+    public function addPrimaryKey($table) {
+        if($table instanceof MySQLTable){
+            $primaryCount = $table->primaryKeyColsCount();
+            if($primaryCount != 0){
+                $stm = 'alter table '.$table->getName().' add constraint '.$table->getPrimaryKeyName().' primary key (';
+                $index = 0;
+                $alterStm = '';
+                foreach ($table->getColumns() as $col){
+                    if($col->isPrimary()){
+                        if($index + 1 == $primaryCount){
+                            $stm .= $col->getName().')';
+                        }
+                        else{
+                            $stm .= $col->getName().',';
+                        }
+                        if($col->isAutoInc()){
+                            $alterStm .= 'alter table '.$table->getName().' modify '.$col.' auto_increment;';
+                        }
+                        $index++;
+                    }
+                }
+                if(strlen($stm) !== 0){
+                    $stm .= ';'.MySQLQuery::NL.$alterStm;
+                    $this->setQuery($stm, 'alter');
+                    return;
+                }
+                $this->setQuery('', 'alter');
+            }
+        }
+    }
+    /**
      * Constructs a query that can be used to alter a table and add a 
      * foreign key to it.
      * @param ForeignKey $key An object of type <b>ForeignKey</b>.
      * @since 1.4
      */
-    public function foreignKey($key){
-        $this->setQuery($key->getAlterStatement(), 'alter');
+    public function addForeignKey($key){
+        $ownerTable = $key->getOwner();
+        $sourceTable = $key->getSource();
+        if($sourceTable !== null && $ownerTable !== null){
+            $query = 'alter table '.$ownerTable->getName()
+                    . ' add constraint '.$key->getKeyName().' foreign key (';
+            $ownerCols = $key->getOwnerCols();
+            $ownerCount = count($ownerCols);
+            $i0 = 0;
+            foreach ($ownerCols as $col){
+                if($i0 + 1 == $ownerCount){
+                    $query .= $col->getName().') ';
+                }
+                else{
+                    $query .= $col->getName().', ';
+                }
+                $i0++;
+            }
+            $query .= 'references '.$key->getSourceName().'(';
+            $sourceCols = $key->getSourceCols();
+            $refCount = count($sourceCols);
+            $i1 = 0;
+            foreach ($sourceCols as $col){
+                if($i1 + 1 == $refCount){
+                    $query .= $col->getName().') ';
+                }
+                else{
+                    $query .= $col->getName().', ';
+                }
+                $i1++;
+            }
+            $onDelete = $key->getOnDelete();
+            if($onDelete !== null){
+                $query .= 'on delete '.$onDelete.' ';
+            }
+            $onUpdate = $key->getOnUpdate();
+            if($onUpdate !== null){
+                $query .= 'on update '.$onUpdate;
+            }
+        }
+        $this->setQuery($query, 'alter');
     }
     /**
      * Constructs a query that can be used to create a new table.
-     * @param MySQLTable $table an instance of <b>Table</b>.
-     * @param boolean $inclComments Description
+     * @param MySQLTable $table an instance of <b>MySQLTable</b>.
+     * @param boolean $inclSqlComments If set to true, a set of comment will appear 
+     * in the generated SQL which description what is happening in every SQL Statement.
      * @since 1.4
      */
-    private function createTable($table,$inclComments=false){
+    private function createTable($table,$inclSqlComments=false){
         if($table instanceof MySQLTable){
             $query = '';
-            if($inclComments === true){
+            if($inclSqlComments === true){
                 $query .= '-- Structure of the table \''.$this->getStructureName().'\''.self::NL;
                 $query .= '-- Number of columns: \''.count($this->getStructure()->columns()).'\''.self::NL;
-                $query .= '-- Number of forign keys: \''.count($this->getStructure()->forignKeys()).'\''.self::NL;
-                $query .= '-- Number of primary key columns: \''.$this->getStructure()->primaryKeyColsCount().'\''.self::NL;
+                $query .= '-- Number of forign keys count: \''.count($this->getStructure()->forignKeys()).'\''.self::NL;
+                $query .= '-- Number of primary key columns count: \''.$this->getStructure()->primaryKeyColsCount().'\''.self::NL;
             }
             $query .= 'create table if not exists '.$table->getName().'('.self::NL;
             $keys = $table->colsKeys();
@@ -248,26 +351,34 @@ abstract class MySQLQuery{
                 }
             }
             $query .= ')'.self::NL;
+            $comment = $table->getComment();
+            if($comment !== null){
+                $query .= 'comment \''.$comment.'\''.self::NL;
+            }
             $query .= 'ENGINE = '.$table->getEngine().self::NL;
             $query .= 'DEFAULT CHARSET = '.$table->getCharSet().self::NL;
             $query .= 'collate = '.$table->getCollation().';'.self::NL;
-            
             $coutPk = $this->getStructure()->primaryKeyColsCount();
             if($coutPk > 1){
-                if($inclComments === true){
-                    $query .= '-- Primary key of the table '.self::NL;
+                if($inclSqlComments === true){
+                    $query .= '-- Add Primary key to the table.'.self::NL;
                 }
-                $query .= $table->getCreatePrimaryKeyStatement().';'.self::NL;
+                $this->addPrimaryKey($table);
+                $q = $this->getQuery();
+                if(strlen($q) != 0){
+                    $query .= $q.';'.self::NL;
+                }
             }
             //add forign keys
             $count2 = count($table->forignKeys());
-            if($inclComments === true && $count2 != 0){
-                $query .= '-- Forign keys of the table '.self::NL;
+            if($inclSqlComments === true && $count2 != 0){
+                $query .= '-- Add Forign keys to the table.'.self::NL;
             }
             for($x = 0 ; $x < $count2 ; $x++){
-                $query .= $table->forignKeys()[$x]->getAlterStatement().';'.self::NL;
+                $this->addForeignKey($table->forignKeys()[$x]);
+                $query .= $this->getQuery().';'.self::NL;
             }
-            if($inclComments === true){
+            if($inclSqlComments === true){
                 $query .= '-- End of the Structure of the table \''.$this->getStructureName().'\''.self::NL;
             }
             $this->setQuery($query, 'create');
@@ -302,12 +413,28 @@ abstract class MySQLQuery{
         return $escapedQuery;
     }
     /**
+     * Constructs a query that can be used to show database table engines.
+     * The result of executing the query will be a table with the following 
+     * columns:
+     * <ul>
+     * <li>Engine</li>
+     * <li>Support</li>
+     * <li>Comment</li>
+     * <li>Transactions</li>
+     * <li>Savepoints</li>
+     * </ul>
+     * @since 1.8.7
+     */
+    public function showEngines() {
+        $this->show('engines');
+    }
+    /**
      * Constructs a query that can be used to show some information about something.
      * @param string $toShow The thing that will be shown.
      * @since 1.4
      */
     public function show($toShow){
-        $this->setQuery('show '.$toShow, 'show');
+        $this->setQuery('show '.$toShow.';', 'show');
     }
     /**
      * Returns the value of the property $query.
@@ -376,6 +503,7 @@ abstract class MySQLQuery{
      * Or the indices can be column indices or columns names taken from MySQLTable object and 
      * the values are set for each index. The second way is recommended as one 
      * table might have two columns with the same values.</li>
+     * <li><b>where</b>: Similar to 'condition-cols-and-vals'.</li>
      * <li><b>conditions</b>: An array that can contains two possible values: 
      * '=' or '!='. If anything else is given at specific index, '=' will be used. In 
      * addition, If not provided or has invalid value, an array of '=' conditions 
@@ -507,6 +635,9 @@ abstract class MySQLQuery{
             }
             else{
                 $selectQuery .= '* from '.$this->getStructureName();
+            }
+            if(!isset($selectOptions['condition-cols-and-vals'])){
+                $selectOptions['condition-cols-and-vals'] = isset($selectOptions['where']) ? $selectOptions['where'] : [];
             }
             $selectOptions['join-operators'] = isset($selectOptions['join-operators']) && 
                     gettype($selectOptions['join-operators']) == 'array' ? $selectOptions['join-operators'] : array();
@@ -820,6 +951,9 @@ abstract class MySQLQuery{
                     if($type == 'varchar' || $type == 'datetime' || $type == 'timestamp' || $type == 'text' || $type == 'mediumtext'){
                         $vals .= '\''.self::escapeMySQLSpeciarChars($valOrColIndex).'\''.$comma;
                     }
+                    else if($type == 'decimal' || $type == 'double' || $type == 'float'){
+                        $vals .= '\''.$valOrColIndex.'\''.$comma;
+                    }
                     else if($type == 'tinyblob' || $type == 'mediumblob' || $type == 'longblob'){
                         $fixedPath = str_replace('\\', '/', $valOrColIndex);
                         if(file_exists($fixedPath)){
@@ -868,6 +1002,9 @@ abstract class MySQLQuery{
                         if($type == 'varchar' || $type == 'datetime' || $type == 'timestamp' || $type == 'text' || $type == 'mediumtext'){
                             $vals .= '\''.self::escapeMySQLSpeciarChars($colObjOrVal).'\''.$comma;
                         }
+                        else if($type == 'decimal' || $type == 'double' || $type == 'float'){
+                            $vals .= '\''.$valOrColIndex.'\''.$comma;
+                        }
                         else if($type == 'tinyblob' || $type == 'mediumblob' || $type == 'longblob'){
                             $fixedPath = str_replace('\\', '/', $colObjOrVal);
                             if(file_exists($fixedPath)){
@@ -910,15 +1047,6 @@ abstract class MySQLQuery{
         $this->setQuery(self::INSERT.$this->getStructureName().$cols.' values '.$vals.';', 'insert');
     }
     /**
-     * Constructs a query that can be used to delete a row from a table using 
-     * the ID column.
-     * @param string $id The value of the ID on the row.
-     * @since 1.0
-     */
-    public function delete($id,$idColName){
-        $this->setQuery(self::DELETE.$this->getStructureName().' where '.$idColName.' = '.$id, 'delete');
-    }
-    /**
      * Removes a record from the table.
      * @param array $columnsAndVals An associative array. The indices of the array 
      * should be the values of the columns and the value at each index is 
@@ -932,9 +1060,9 @@ abstract class MySQLQuery{
      * is only one condition.
      * @since 1.8.2
      */
-    public function deleteRecord($columnsAndVals,$valsConds,$jointOps=array()) {
-        $cols = array();
-        $vals = array();
+    public function deleteRecord($columnsAndVals,$valsConds,$jointOps=[]) {
+        $cols = [];
+        $vals = [];
         foreach ($columnsAndVals as $valOrIndex => $colObjOrVal){
             if($colObjOrVal instanceof Column){
                 $cols[] = $colObjOrVal;
@@ -991,12 +1119,16 @@ abstract class MySQLQuery{
         $index = 0;
         $count = count($cols);
         $where = ' where ';
+        $supportedConds = ['=','!=','<','<=','>','>='];
         foreach ($cols as $col){
+            //first, check given condition
             $equalityCond = trim($valsConds[$index]);
-            if($equalityCond != '!=' && $equalityCond != '='){
+            if(!in_array($equalityCond, $supportedConds)){
                 $equalityCond = '=';
             }
+            //then check if column object is given
             if($col instanceof Column){
+                //then check value
                 $valUpper = gettype($vals[$index]) != 'array' ? strtoupper(trim($vals[$index])) : '';
                 if($valUpper == 'IS NULL' || $valUpper == 'IS NOT NULL'){
                     if($index + 1 == $count){
@@ -1011,6 +1143,10 @@ abstract class MySQLQuery{
                         if($col->getType() == 'varchar' || $col->getType() == 'text' || $col->getType() == 'mediumtext'){
                             $where .= $col->getName().' '.$equalityCond.' ';
                             $where .= '\''.self::escapeMySQLSpeciarChars($vals[$index]).'\'' ;
+                        }
+                        else if($col->getType() == 'decimal' || $col->getType() == 'float' || $col->getType() == 'double'){
+                            $where .= $col->getName().' '.$equalityCond.' ';
+                            $where .= '\''.$vals[$index].'\'' ;
                         }
                         else if($col->getType() == 'datetime' || $col->getType() == 'timestamp'){
                             if(gettype($vals[$index]) == 'array'){
@@ -1028,7 +1164,7 @@ abstract class MySQLQuery{
                                 }
                             }
                             else{
-                                $where .= $col->getName().' '.$equalityCond.' ';
+                                $where .= 'date('.$col->getName().') '.$equalityCond.' ';
                                 $where .= '\''.self::escapeMySQLSpeciarChars($vals[$index]).'\' ';
                             }
                         }
@@ -1041,6 +1177,10 @@ abstract class MySQLQuery{
                         if($col->getType() == 'varchar' || $col->getType() == 'text' || $col->getType() == 'mediumtext'){
                             $where .= $col->getName().' '.$equalityCond.' ';
                             $where .= '\''.self::escapeMySQLSpeciarChars($vals[$index]).'\' '.$jointOps[$index].' ' ;
+                        }
+                        else if($col->getType() == 'decimal' || $col->getType() == 'float' || $col->getType() == 'double'){
+                            $where .= $col->getName().' '.$equalityCond.' ';
+                            $where .= '\''.$vals[$index].'\'' ;
                         }
                         else if($col->getType() == 'datetime' || $col->getType() == 'timestamp'){
                             if(gettype($vals[$index]) == 'array'){
@@ -1058,7 +1198,7 @@ abstract class MySQLQuery{
                                 }
                             }
                             else{
-                                $where .= $col->getName().' '.$equalityCond.' ';
+                                $where .= 'date('.$col->getName().') '.$equalityCond.' ';
                                 $where .= '\''.self::escapeMySQLSpeciarChars($vals[$index]).'\' ';
                             }
                         }
@@ -1073,6 +1213,7 @@ abstract class MySQLQuery{
         }
         return $where;
     }
+    
     /**
      * Constructs a query that can be used to update a record.
      * @param array $colsAndNewVals An associative array. The key must be the 
@@ -1109,6 +1250,9 @@ abstract class MySQLQuery{
                     $type = $colObjOrNewVal->getType();
                     if($type == 'varchar' || $type == 'datetime' || $type == 'timestamp' || $type == 'text' || $type == 'mediumtext'){
                         $colsStr .= ' '.$colObjOrNewVal->getName().' = \''.self::escapeMySQLSpeciarChars($newValOrIndex).'\''.$comma ;
+                    }
+                    else if($type == 'decimal' || $type == 'float' || $type == 'double'){
+                        $colsStr .= '\''.$newValOrIndex.'\''.$comma;
                     }
                     else if($type == 'tinyblob' || $type == 'mediumblob' || $type == 'longblob'){
                         $fixedPath = str_replace('\\', '/', $newValOrIndex);
@@ -1157,6 +1301,9 @@ abstract class MySQLQuery{
                         $type = $column->getType();
                         if($type == 'varchar' || $type == 'datetime' || $type == 'timestamp' || $type == 'text' || $type == 'mediumtext'){
                             $colsStr .= ' '.$column->getName().' = \''.self::escapeMySQLSpeciarChars($colObjOrNewVal).'\''.$comma ;
+                        }
+                        else if($type == 'decimal' || $type == 'float' || $type == 'double'){
+                            $colsStr .= '\''.$newValOrIndex.'\''.$comma;
                         }
                         else if($type == 'tinyblob' || $type == 'mediumblob' || $type == 'longblob'){
                             $fixedPath = str_replace('\\', '/', $colObjOrNewVal);

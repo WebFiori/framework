@@ -26,9 +26,15 @@ namespace phMysql;
 /**
  * A class that represents a column in MySQL table.
  * @author Ibrahim
- * @version 1.6.1
+ * @version 1.6.3
  */
 class Column{
+    /**
+     * A comment to add to the column.
+     * @var string|null 
+     * @since 1.6.3
+     */
+    private $comment;
     /**
      * Version number of MySQL server.
      * @var string 
@@ -90,13 +96,16 @@ class Column{
      * <li><b>blob</b> Used to store up to 16 kilobytes of raw binary data.</li>
      * <li><b>mediumblob</b> Used to store up to 16 megabytes of raw binary data.</li>
      * <li><b>longblob</b> Used to store up to 4 gigabytes of raw binary data.</li>
+     * <li><b>decimal</b> Used to store exact numeric values.</li>
+     * <li><b>float</b> Used to store numbers in a single precision notation (approximate values).</li>
+     * <li><b>double</b> Used to store numbers in a double precision notation (approximate values).</li>
      * </ul>
      * @var array 
      * @since 1.0
      */
     const DATATYPES = array(
         'int','varchar','timestamp','tinyblob','blob','mediumblob','longblob',
-        'datetime','text','mediumtext'
+        'datetime','text','mediumtext','decimal','double','float'
     );
     
     /**
@@ -156,6 +165,12 @@ class Column{
      */
     private $onColUpdate;
     /**
+     * The number of numbers that will appear after the decimal point.
+     * @var int 
+     * @since 1.6.2
+     */
+    private $scale;
+    /**
      * Creates new instance of the class.
      * This method is used to initialize basic attributes of the column. 
      * First of all, it sets MySQL version number to 5.5. Then it validates the 
@@ -180,16 +195,78 @@ class Column{
         if(!$this->setType($datatype)){
             $this->setType('varchar');
         }
-        if($this->getType() == 'varchar' || $this->getType() == 'int' || $this->getType() == 'text'){
+        $realDatatype = $this->getType();
+        if($realDatatype == 'varchar' || $realDatatype == 'int' || $realDatatype == 'text'){
             if(!$this->setSize($size)){
                 $this->setSize(1);
             }
         }
-        if($datatype == 'varchar' && $size > 21845){
-            $this->setType('mediumtext');
+        if($realDatatype == 'decimal' || $realDatatype == 'float' || $realDatatype == 'double'){
+            $this->setScale(0);
+            $this->setSize(0);
         }
+        
         $this->setIsNull(false);
         $this->setIsUnique(false);
+    }
+    /**
+     * Sets a comment which will appear with the column.
+     * @param string|null $comment Comment text. It must be non-empty string 
+     * in order to set. If null is passed, the comment will be removed.
+     * @since 1.6.3
+     */
+    public function setComment($comment) {
+        if($comment == null || strlen($comment) != 0){
+            $this->comment = $comment;
+        }
+    }
+    /**
+     * Returns a string that represents a comment which was added with the column.
+     * @return string|null Comment text. If it is not set, the method will return 
+     * null.
+     * @since 1.6.3
+     */
+    public function getComment() {
+        return $this->comment;
+    }
+    /**
+     * Sets the value of Scale.
+     * Scale is simply the number of digits that will appear to the right of 
+     * decimal point. Only applicable if the datatype of the column is decimal, 
+     * float and double.
+     * @param int $val Number of numbers after the decimal point. It must be a 
+     * positive number.
+     * @return boolean If scale value is set, the method will return true. 
+     * false otherwise. The method will not set the scale in the following cases:
+     * <ul>
+     * <li>Datatype of the column is not decimal, float or double.</li>
+     * <li>Size of the column is 0.</li>
+     * <li>Given scale value is greater than the size of the column.</li>
+     * </ul>
+     * @since 1.6.2
+     */
+    public function setScale($val) {
+        $type = $this->getType();
+        if($type == 'decimal' || $type == 'float' || $type == 'double'){
+            $size = $this->getSize();
+            if($size != 0 && $val >= 0 && ($size - $val > 0)){
+                $this->scale = $val;
+                return true;
+            }
+        }
+        return false;
+    }
+    /**
+     * Returns the value of scale.
+     * Scale is simply the number of digits that will appear to the right of 
+     * decimal point. Only applicable if the datatype of the column is decimal, 
+     * float and double.
+     * @return int The number of numbers after the decimal point. Default return 
+     * value is 0.
+     * @since 1.6.2
+     */
+    public function getScale() {
+        return $this->scale;
     }
     private function _validateDateAndTime($date) {
         $trimmed = trim($date);
@@ -314,19 +391,12 @@ class Column{
     }
     /**
      * Sets the value of the property $isUnique.
-     * @param boolean $bool true if the column value is unique. false 
+     * @param boolean $bool True if the column value is unique. false 
      * if not.
-     * @return boolean true if the value of the property is updated. The only case 
-     * at which the method will return false is when the passed parameter is 
-     * not a boolean.
      * @since 1.0
      */
     public function setIsUnique($bool){
-        if(gettype($bool) == 'boolean'){
-            $this->isUnique = $bool;
-            return true;
-        }
-        return false;
+        $this->isUnique = $bool === true;
     }
     /**
      * Returns the value of the property $isUnique.
@@ -344,7 +414,7 @@ class Column{
      * @param string $name The name to set.
      * @return boolean The method will return true if the column name updated. 
      * If the given value is null or invalid string, the method will return 
-     * Column::INV_COL_NAME.
+     * false.
      * @since 1.0
      */
     public function setName($name){
@@ -353,26 +423,35 @@ class Column{
             if(strpos($trimmed, ' ') === false){
                 for ($x = 0 ; $x < strlen($trimmed) ; $x++){
                     $ch = $trimmed[$x];
+                    if($x == 0 && ($ch >= '0' && $ch <= '9')){
+                        return false;
+                    }
                     if($ch == '_' || ($ch >= 'a' && $ch <= 'z') || ($ch >= 'A' && $ch <= 'Z') || ($ch >= '0' && $ch <= '9')){
 
                     }
                     else{
-                        return Column::INV_COL_NAME;
+                        return false;
                     }
                 }
                 $this->name = $trimmed;
                 return true;
             }
         }
-        return Column::INV_COL_NAME;
+        return false;
     }
     /**
      * Returns the name of the column.
+     * @param boolean $tablePrefix If this parameter is set to true and the column 
+     * has an owner table, the name of the column will be prefixed with the owner 
+     * table name. Default value is false.
      * @return string The name of the column. If the name is not set, the method 
      * will return the value 'col'.
      * @since 1.0
      */
-    public function getName(){
+    public function getName($tablePrefix=false){
+        if($tablePrefix === true && $this->getOwner() !== null){
+            return $this->getOwner().'.'.$this->name;
+        }
         return $this->name;
     }
     /**
@@ -409,21 +488,14 @@ class Column{
      * Note that once the column become primary, it becomes unique by default.
      * @param boolean $bool <b>true</b> if the column is primary key. false 
      * if not.
-     * @return boolean The method will return true If the property value is 
-     * updated. If the given value is not a boolean, the method will return 
-     * false.
      * @since 1.0
      */
     public function setIsPrimary($bool){
-        if(gettype($bool) == 'boolean'){
-            $this->isPrimary = $bool;
-            if($bool === true){
-                $this->setIsNull(false);
-                $this->setIsUnique(true);
-            }
-            return true;
+        $this->isPrimary = $bool === true;
+        if($this->isPrimary() === true){
+            $this->setIsNull(false);
+            $this->setIsUnique(true);
         }
-        return false;
     }
     /**
      * Checks if the column is a primary key or not.
@@ -442,14 +514,17 @@ class Column{
      * size is invalid, 1 will be used.
      * @param mixed $default Default value for the column to set in case no value is 
      * given in case of insert.
-     * @return boolean true if the data type is set. Column::INV_COL_DATATYPE otherwise.
+     * @return boolean true if the data type is set. False otherwise.
      * @since 1.0
      */
     public function setType($type,$size=1,$default=null){
         $s_type = strtolower(trim($type));
         if(in_array($s_type, self::DATATYPES)){
-            $this->type = $type;
-            if($type == 'varchar' || $type == 'int'){
+            if($s_type != 'int'){
+                $this->setIsAutoInc(false);
+            }
+            $this->type = $s_type;
+            if($s_type == 'varchar' || $s_type == 'int'){
                 if(!$this->setSize($size)){
                     $this->setSize(1);
                 }
@@ -466,7 +541,7 @@ class Column{
             }
             return true;
         }
-        return Column::INV_COL_DATATYPE;
+        return false;
     }
     /**
      * Returns the type of column data (such as 'varchar').
@@ -500,6 +575,12 @@ class Column{
         }
         else if($type == 'int'){
             if(gettype($default) == 'integer'){
+                $this->default = $default;
+                $retVal = true;
+            }
+        }
+        else if($type == 'float' || $type == 'decimal' || $type == 'double'){
+            if(gettype($default) == 'double' || gettype($default) == 'integer'){
                 $this->default = $default;
                 $retVal = true;
             }
@@ -543,12 +624,16 @@ class Column{
      * Sets the size of data (for 'int' and 'varchar' only). 
      * If the data type of the column is 'int', the maximum size is 11. If a 
      * number greater than 11 is given, the value will be set to 11. The 
-     * maximum size for the 'varchar' is not specified.
+     * maximum size for the 'varchar' is 21845. If a value greater that that is given, 
+     * the datatype of the column will be changed to 'mediumtext'.
+     * For decimal, double and float data types, the value will represent 
+     * the  precision. If zero is given, then no specific value for precision 
+     * and scale will be used.
      * @param int $size The size to set.
      * @return boolean true if the size is set. The method will return 
-     * Column::INV_DATASIZE in case the size is invalid or datatype does not support 
+     * false in case the size is invalid or datatype does not support 
      * size attribute. Also The method will return 
-     * Column::SIZE_NOT_SUPPORTED in case the datatype of the column does not 
+     * false in case the datatype of the column does not 
      * support size.
      * @since 1.0
      */
@@ -557,6 +642,9 @@ class Column{
         if($type == 'varchar' || $type == 'text'){
             if($size > 0){
                 $this->size = $size;
+                if($type == 'varchar' && $size > 21845){
+                    $this->setType('mediumtext');
+                }
                 return true;
             }
         }
@@ -570,10 +658,16 @@ class Column{
                 return true;
             }
         }
-        else{
-            return Column::SIZE_NOT_SUPPORTED;
+        else if($type == 'decimal' || $type == 'float' || $type == 'double'){
+            if($size >= 0){
+                $this->size = $size;
+                return true;
+            }
         }
-        return Column::INV_DATASIZE;
+        else{
+            return false;
+        }
+        return false;
     }
     /**
      * Sets the value of the property <b>$isAutoInc</b>.
@@ -605,7 +699,11 @@ class Column{
     }
     /**
      * Returns the size of the column.
-     * @return int The size of the column. Apply only to 'varchar' and 'int'.
+     * @return int The size of the column. If column data type is int, decimal, double 
+     * or float, the value will represents the overall number of digits in the 
+     * number (Precision) (e.g: size of 54.323 is 5). If the datatype is varchar, then the 
+     * number will represents number of characters. Default value is 1 for 
+     * 'varchar' and 'int'. Zero for decimal, float and double.
      * @since 1.0
      */
     public function getSize(){
@@ -635,6 +733,14 @@ class Column{
         if($type == 'int' || $type == 'varchar' || $type == 'text'){
             $retVal .= $type.'('.$this->getSize().') ';
         }
+        else if($type == 'decimal' || $type == 'float' || $type == 'double'){
+            if($this->getSize() != 0){
+                $retVal .= $type.'('.$this->getSize().','.$this->getScale().') ';
+            }
+            else{
+                $retVal .= $type.' ';
+            }
+        }
         else{
             $retVal .= $type.' ';
         }
@@ -644,32 +750,38 @@ class Column{
         else{
             $retVal .= 'null ';
         }
-        if($this->isPrimary()){
-            $t = &$this->getOwner();
-            if($t != null){
-                if($t->primaryKeyColsCount() == 1){
-                    $retVal .= 'primary key ';
-                    if($this->isAutoInc()){
-                        $retVal .= 'auto_increment ';
-                    }
-                }
-            }
-            else{
-                $retVal .= 'primary key ';
-                if($this->isAutoInc()){
-                    $retVal .= 'auto_increment ';
-                }
-            }
-        }
+//        if($this->isPrimary()){
+//            $t = &$this->getOwner();
+//            if($t != null){
+//                if($t->primaryKeyColsCount() == 1){
+//                    $retVal .= 'primary key ';
+//                    if($this->isAutoInc()){
+//                        $retVal .= 'auto_increment ';
+//                    }
+//                }
+//            }
+//            else{
+//                $retVal .= 'primary key ';
+//                if($this->isAutoInc()){
+//                    $retVal .= 'auto_increment ';
+//                }
+//            }
+//        }
         if($this->isUnique()){
             $retVal .= 'unique ';
         }
         $default = $this->getDefault();
-        if($type == 'varchar'){
+        if($type == 'varchar' || $type == 'text' || $type == 'mediumtext'){
             $retVal .= 'collate '.$this->getCollation().' ';
         }
         if($default !== null){
-            if($this->getType() == 'varchar'){
+            
+            if($type == 'varchar' || 
+                    $type == 'decimal' || 
+                    $type == 'float' || 
+                    $type == 'double' || 
+                    $type == 'mediumtext' || 
+                    $type == 'text'){
                 $retVal .= 'default \''.$default.'\' ';
             }
             else if($this->getType() == 'timestamp' || $this->getType() == 'datetime'){
@@ -685,6 +797,10 @@ class Column{
                 $retVal .= 'default '.$default.' ';
             }
         }
-        return $retVal;
+        $comment = $this->getComment();
+        if($comment !== null){
+            $retVal .= 'comment \''.$comment.'\'';
+        }
+        return trim($retVal);
     }
 }

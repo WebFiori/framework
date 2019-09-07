@@ -28,6 +28,8 @@ if(!defined('ROOT_DIR')){
     die('<!DOCTYPE html><html><head><title>Not Found</title></head><body>'
     . '<h1>404 - Not Found</h1><hr><p>The requested resource was not found on the server.</p></body></html>');
 }
+use webfiori\entity\mail\EmailMessage;
+use webfiori\entity\mail\SMTPAccount;
 /**
  * A class that only has one method to initiate some of system routes.
  * The class is meant to only initiate the routes which uses the method 
@@ -42,9 +44,13 @@ class ClosureRoutes {
      */
     public static function create() {
         $arrayOfParams = array('WebFiori Framework');
-        Router::closure('/closure', function($params){
-            echo 'This is a closure route.';
-            Util::print_r($params);
-        }, $arrayOfParams);
+        Router::closure([
+            'path'=>'/closure',
+            'closure-params'=>$arrayOfParams,
+            'route-to'=>function($params){
+                echo 'This is a closure route.';
+                Util::print_r($params);
+            }
+        ]);
     }
 }

@@ -668,7 +668,7 @@ class Router {
             //first, search for the URI wuthout checking variables
             foreach ($this->routes as $route){
                 if(!$route->hasVars()){
-                    if($route->isCaseSensitive()){
+                    if(!$route->isCaseSensitive()){
                         $isEqual = strtolower($route->getUri()) == 
                         strtolower($routeUri->getUri());
                     }

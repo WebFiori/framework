@@ -47,7 +47,8 @@ class ViewRoutes {
         ]);
         Router::view([
             'path'=>'/example', 
-            'route-to'=>'/ExamplePage.php'
+            'route-to'=>'/ExamplePage.php',
+            'case-sensitive'=>false
         ]);
     }
 }

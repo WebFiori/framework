@@ -145,8 +145,9 @@ class CronJob {
      * @since 1.0
      */
     public function setJobName($name){
-        if(strlen($name) > 0){
-            $this->jobName = $name;
+        $trimmed = trim($name);
+        if(strlen($trimmed) > 0){
+            $this->jobName = $trimmed;
         }
     }
     /**
@@ -194,6 +195,7 @@ class CronJob {
     }
     /**
      * Schedules a cron job to run every hour.
+     * The job will run at the start of the hour.
      * @since 1.0.2
      */
     public function everyHour(){

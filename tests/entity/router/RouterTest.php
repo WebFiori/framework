@@ -19,17 +19,29 @@ class RouterTest extends TestCase{
      * @test
      */
     public function testAddViewRoute00() {
-        $this->assertTrue(Router::view('/view-something', '/my-view.php'));
-        $this->assertFalse(Router::view('/view-something', '/my-other-view.php'));
-        $this->assertTrue(Router::view('/view-something-2', '/my-view.php'));
+        $this->assertTrue(Router::view([
+            'path'=>'/view-something',
+            'route-to'=>'my-view.php']));
+        $this->assertFalse(Router::view([
+            'path'=>'/view-something', 
+            'route-to'=>'/my-other-view.php']));
+        $this->assertTrue(Router::view([
+            'path'=>'/view-something-2', 
+            'route-to'=>'/my-view.php']));
     }
     /**
      * @test
      */
     public function testAddAPIRoute00() {
-        $this->assertTrue(Router::api('/call-api-00', '/my-api.php'));
-        $this->assertFalse(Router::view('/call-api-00', '/my-other-api.php'));
-        $this->assertTrue(Router::view('/call-api-01', '/my-api.php'));
+        $this->assertTrue(Router::api([
+            'path'=>'/call-api-00', 
+            'route-to'=>'/my-api.php']));
+        $this->assertFalse(Router::view([
+            'path'=>'/call-api-00', 
+            'route-to'=>'/my-other-api.php']));
+        $this->assertTrue(Router::view([
+            'path'=>'/call-api-01', 
+            'route-to'=>'/my-api.php']));
     }
     /**
      * @test
@@ -41,9 +53,21 @@ class RouterTest extends TestCase{
         $c2 = function(){
             
         };
-        $this->assertTrue(Router::closure('/call', $c1));
-        $this->assertFalse(Router::closure('/call', $c2));
-        $this->assertTrue(Router::closure('/call-2', $c1));
-        $this->assertFalse(Router::closure('/call', 'Not Func'));
+        $this->assertTrue(Router::closure([
+            'path'=>'/call', 
+            'route-to'=>$c1
+        ]));
+        $this->assertFalse(Router::closure([
+            'path'=>'/call', 
+            'route-to'=>$c2
+        ]));
+        $this->assertTrue(Router::closure([
+            'path'=>'/call-2', 
+            'route-to'=>$c1
+        ]));
+        $this->assertFalse(Router::closure([
+            'path'=>'/call', 
+            'route-to'=>'Not Func'
+        ]));
     }
 }

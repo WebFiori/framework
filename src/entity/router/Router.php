@@ -64,7 +64,7 @@ use jsonx\JsonX;
  * </pre> 
  * </p>
  * @author Ibrahim
- * @version 1.3.7
+ * @version 1.3.8
  */
 class Router {
     /**
@@ -173,7 +173,7 @@ class Router {
      */
     public static function uriObj($routerUri){
         if($routerUri instanceof RouterUri){
-            if(!self::get()->hasRoute($routerUri->getPath())){
+            if(!self::get()->_hasRoute($routerUri->getPath())){
                 self::get()->routes[] = $routerUri;
                 return true;
             }
@@ -218,25 +218,28 @@ class Router {
      * @since 1.3.2
      */
     public static function incSiteMapRoute(){
-        self::closure('/sitemap.xml', function(){
-            $urlSet = new HTMLNode('urlset');
-            $urlSet->setAttribute('xmlns', 'http://www.sitemaps.org/schemas/sitemap/0.9');
-            $urlSet->setAttribute('xmlns:xhtml', 'http://www.w3.org/1999/xhtml');
-            $routes = Router::get()->getRoutes();
-            foreach ($routes as $route){
-                if($route->isInSiteMap()){
-                    $url = new HTMLNode('url');
-                    $loc = new HTMLNode('loc');
-                    $loc->addChild(HTMLNode::createTextNode($route->getUri()));
-                    $url->addChild($loc);
-                    $urlSet->addChild($url);
+        self::closure([
+            'path'=>'/sitemap.xml', 
+            'route-to'=>function(){
+                $urlSet = new HTMLNode('urlset');
+                $urlSet->setAttribute('xmlns', 'http://www.sitemaps.org/schemas/sitemap/0.9');
+                $urlSet->setAttribute('xmlns:xhtml', 'http://www.w3.org/1999/xhtml');
+                $routes = Router::get()->_getRoutes();
+                foreach ($routes as $route){
+                    if($route->isInSiteMap()){
+                        $url = new HTMLNode('url');
+                        $loc = new HTMLNode('loc');
+                        $loc->addChild(HTMLNode::createTextNode($route->getUri()));
+                        $url->addChild($loc);
+                        $urlSet->addChild($url);
+                    }
                 }
+                $retVal = '<?xml version="1.0" encoding="UTF-8"?>';
+                $retVal .= $urlSet->toHTML();
+                header('content-type:text/xml');
+                echo $retVal;
             }
-            $retVal = '<?xml version="1.0" encoding="UTF-8"?>';
-            $retVal .= $urlSet->toHTML();
-            header('content-type:text/xml');
-            echo $retVal;
-        });
+        ]);
     }
     /**
      * Redirect a URI to its route.
@@ -244,23 +247,34 @@ class Router {
      * @since 1.2
      */
     public static function route($uri) {
-        Router::get()->resolveUrl($uri);
+        Router::get()->_resolveUrl($uri);
     }
     /**
      * Returns the value of the base URL which is appended to the path.
      * @return string
      * @since 1.0
      */
-    public function getBase() {
-        return $this->baseUrl;
+    public static function getBase() {
+        return self::get()->baseUrl;
     }
     /**
      * Adds new route to the router.
-     * @param string $path The path part of the URI (e.g. '/en/one/two').
-     * @param string|callable $routeTo The location where the URI is going 
-     * to route to. It can be either a callable or a string which represents 
-     * the path to a PHP file.
-     * @param string $routeType The type of the route. It can have one of 4 
+     * @param array $options An associative array of route options. The 
+     * array can have the following indices:
+     * <ul>
+     * <li><b>path</b>: The path part of the URI (e.g. '/en/one/two'). If not 
+     * given, the route will represents home page of the website. Its possible 
+     * to add variables to the path using this syntax: '/en/{var-one}/two/{var-two}'. 
+     * The value of the variable can be accessed later through the 
+     * array $_GET or the array $_POST.</li>
+     * <li><b>case-sensitive</b>: Make the URL case sensitive or not. 
+     * If this one is set to false, then if a request is made to the URL 'https://example.com/one/two',
+     * It will be the same as requesting the URL 'https://example.com/OnE/tWO'. Default 
+     * is true.</li>
+     * <li><b>route-to</b>:  The location where the URI is going 
+     * to route to (The resource). It can be either a callable or a string which represents 
+     * the path to a PHP file.</li>
+     * <li><b>type</b>: The type of the route. It can have one of 4 
      * values:
      * <ul>
      * <li><b>Router::VIEW_ROUTE</b>: If the PHP file is inside the folder 
@@ -270,20 +284,35 @@ class Router {
      * <li><b>Router::CUSTOMIZED</b> : If the PHP file is inside the root folder or in 
      * other sub-directory under the root.</li>
      * <li><b>Router::CLOSURE_ROUTE</b> If the route is a closure.</li>
-     * </ul>
-     * @param array $closureParams If the route type is closure route, 
-     * it is possible to pass values to it using this array.
-     * @param boolean $incInSiteMap If set to true, the given route will be added to 
-     * the basic site map which can be generated by the router class.
-     * @param boolean $asApi If this parameter is set to true, the route will be 
+     * </ul></li>
+     * <li><b>is-api</b>: If this parameter is set to true, the route will be 
      * treated as if it was an API route. This means that the constant 'API_ROUTE' 
-     * will be initiated when a request is made to the route. Default is false.
+     * will be initiated when a request is made to the route. Default is false.</li>
+     * <li><b>in-sitemap</b>: If set to true, the given route will be added to 
+     * the basic site map which can be generated by the router class.</li>
+     * <li><b>closure-params</b>:If the route type is closure route, 
+     * it is possible to pass values to it using this array. 
+     * </li>
+     * </ul>
      * @return boolean If the route is added, the method will return true. 
      * The method one return false only in two cases, either the route type 
      * is not correct or a similar route was already added.
      * @since 1.0
      */
-    public function addRoute($path,$routeTo,$routeType,$closureParams=array(),$incInSiteMap=false,$asApi=false) {
+    private function _addRoute($options) {
+        $caseSensitive = isset($options['case-sensitive']) ? $options['case-sensitive'] === true : true;
+        $routeType = isset($options['type']) ? $options['type'] : Router::CUSTOMIZED;
+        $incInSiteMap = isset($options['in-sitemap']) ? $options['in-sitemap'] === true : false;
+        $asApi = isset($options['as-api']) ? $options['as-api'] === true : false;
+        $closureParams = isset($options['closure-params']) && gettype($options['closure-params']) == 'array' ? 
+                $options['closure-params'] : [];
+        $path = isset($options['path']) ? $options['path'] : '';
+        if(!isset($options['route-to'])){
+            return false;
+        }
+        else{
+            $routeTo = $options['route-to'];
+        }
         if(strlen($this->getBase()) != 0){
             if($routeType == self::API_ROUTE || 
                 $routeType == self::VIEW_ROUTE || 
@@ -298,8 +327,8 @@ class Router {
                         return false;
                     }
                 }
-                if(!$this->hasRoute($path)){
-                    $routeUri = new RouterUri($this->getBase().$path, $routeTo, $closureParams);
+                if(!$this->_hasRoute($path)){
+                    $routeUri = new RouterUri($this->getBase().$path, $routeTo,$caseSensitive, $closureParams);
                     if($asApi === true){
                         $routeUri->setType(self::API_ROUTE);
                     }
@@ -340,7 +369,7 @@ class Router {
      */
     public static function routes() {
         $routesArr = array();
-        foreach (Router::get()->getRoutes() as $routeUri){
+        foreach (Router::get()->_getRoutes() as $routeUri){
             $routesArr[$routeUri->getUri()] = $routeUri->getRouteTo();
         }
         return $routesArr;
@@ -360,13 +389,16 @@ class Router {
      * @return array An array which contains all routes as RouteURI object.
      * @since 1.2
      */
-    public function getRoutes() {
+    private function _getRoutes() {
         return $this->routes;
     }
     /**
      * Adds new route to a view file.
      * A view file can be any file that is added inside the folder '/pages'.
-     * @param string $path The path part of the URI. For example, if the 
+     * @param array $options An associative array that contains route 
+     * options. Available options are:
+     * <ul>
+     * <li><b>path</b>: The path part of the URI. For example, if the 
      * requested URI is 'http://www.example.com/user/ibrahim', the path 
      * part of the URI is '/user/ibrahim'. It is possible to include variables 
      * in the path. To include a variable in the path, its name must be enclosed 
@@ -374,23 +406,37 @@ class Router {
      * $_GET or $_POST after the requested URI is resolved. If we use the same 
      * example above to get any user profile, We would add the following as 
      * a path: 'user/{username}'. In this case, username will be available in 
-     * $_GET['username']. 
-     * @param string $viewFile The path to the view file. The root folder for 
+     * $_GET['username']. </li>
+     * <li><b>route-to</b>: The path to the view file. The root folder for 
      * all views is '/pages'. If the view name is 'view-user.php', then the 
      * value of this parameter must be '/view-user.php'. If the view is in a 
      * sub-directory inside the views directory, then the name of the 
-     * directory must be included.
+     * directory must be included.</li>
+     * <li><b>case-sensitive</b>: Make the URL case sensitive or not. 
+     * If this one is set to false, then if a request is made to the URL 'https://example.com/one/two',
+     * It will be the same as requesting the URL 'https://example.com/OnE/tWO'. Default 
+     * is true.</li>
+     * </ul>
+     * @param string $path 
+     * @param string $viewFile 
      * @return boolean The method will return true if the route was created. 
      * If a route for the given path was already created, the method will return 
      * false.
      * @since 1.2
      */
-    public static function view($path,$viewFile) {
-        return Router::get()->addRoute($path, $viewFile, Router::VIEW_ROUTE);
+    public static function view($options) {
+        if(gettype($options) == 'array'){
+            $options['type'] = Router::VIEW_ROUTE;
+            return Router::get()->_addRoute($options);
+        }
+        return false;
     }
     /**
      * Adds new route to an API file.
-     * @param string $path The path part of the URI. For example, if the 
+     * @param array $options An associative array that contains route 
+     * options. Available options are:
+     * <ul>
+     * <li><b>path</b>: The path part of the URI. For example, if the 
      * requested URI is 'http://www.example.com/user/ibrahim', the path 
      * part of the URI is '/user/ibrahim'. It is possible to include variables 
      * in the path. To include a variable in the path, its name must be enclosed 
@@ -398,20 +444,29 @@ class Router {
      * $_GET or $_POST after the requested URI is resolved. If we use the same 
      * example above to get any user profile, We would add the following as 
      * a path: 'user/{username}'. In this case, username will be available in 
-     * $_GET['username']. 
-     * @param string $apiFile The path to the API file. The root folder for 
+     * $_GET['username']. </li>
+     * <li><b>route-to</b>: The path to the API file. The root folder for 
      * all APIs is '/apis'. If the API name is 'get-user-profile.php', then the 
      * value of this parameter must be '/get-user-profile.php'. If the API is in a 
      * sub-directory inside the APIs directory, then the name of the 
-     * directory must be included.
+     * directory must be included.</li>
+     * <li><b>case-sensitive</b>: Make the URL case sensitive or not. 
+     * If this one is set to false, then if a request is made to the URL 'https://example.com/one/two',
+     * It will be the same as requesting the URL 'https://example.com/OnE/tWO'. Default 
+     * is true.</li>
+     * </ul>
      * @return boolean The method will return true if the route was created. 
      * If a route for the given path was already created, the method will return 
      * false. Also if the given view file was not found, the method will not 
      * create any route and return false.
      * @since 1.2
      */
-    public static function api($path,$apiFile) {
-        return Router::get()->addRoute($path, $apiFile, Router::API_ROUTE);
+    public static function api($options) {
+        if(gettype($options) == 'array'){
+            $options['type'] = Router::API_ROUTE;
+            return Router::get()->_addRoute($options);
+        }
+        return false;
     }
     /**
      * Returns the base URL which is used to create routes.
@@ -426,7 +481,10 @@ class Router {
 
     /**
      * Adds new closure route.
-     * @param string $path The path part of the URI. For example, if the 
+     * @param array $options An associative array that contains route 
+     * options. Available options are:
+     * <ul>
+     * <li><b>path</b>: The path part of the URI. For example, if the 
      * requested URI is 'http://www.example.com/user/ibrahim', the path 
      * part of the URI is '/user/ibrahim'. It is possible to include variables 
      * in the path. To include a variable in the path, its name must be enclosed 
@@ -434,25 +492,38 @@ class Router {
      * $_GET or $_POST after the requested URI is resolved. If we use the same 
      * example above to get any user profile, We would add the following as 
      * a path: 'user/{username}'. In this case, username will be available in 
-     * $_GET['username']. 
-     * @param callable $closure A closure.
+     * $_GET['username']. </li>
+     * <li><b>route-to</b>: A closure (A PHP function). </li>
+     * <li><b>closure-params</b>: An array that contains values which 
+     * can be passed to the closure.</li>
+     * <li><b>as-api</b>: If this parameter is set to true, the route will be 
+     * treated as if it was an API route. This means that the constant 'API_ROUTE' 
+     * will be initiated when a request is made to the route. Default is false.</li>
+     * <li><b>case-sensitive</b>: Make the URL case sensitive or not. 
+     * If this one is set to false, then if a request is made to the URL 'https://example.com/one/two',
+     * It will be the same as requesting the URL 'https://example.com/OnE/tWO'. Default 
+     * is true.</li>
+     * </ul>
      * @return boolean The method will return true if the route was created. 
      * If a route for the given path was already created, the method will return 
      * false. Also if the given view file was not found, the method will not 
      * create any route and return false.
-     * @param array $closureParams If the route type is closure route, 
-     * it is possible to pass values to it using this array.
-     * @param boolean $asApi If this parameter is set to true, the route will be 
-     * treated as if it was an API route. This means that the constant 'API_ROUTE' 
-     * will be initiated when a request is made to the route. Default is false.
+     * @param array $closureParams 
      * @since 1.2
      */
-    public static function closure($path,$closure,$closureParams=array(),$asApi=false) {
-        return Router::get()->addRoute($path, $closure, Router::CLOSURE_ROUTE,$closureParams,false,$asApi);
+    public static function closure($options) {
+        if(gettype($options) == 'array'){
+            $options['type'] = Router::CLOSURE_ROUTE;
+            return Router::get()->_addRoute($options);
+        }
+        return false;
     }
     /**
      * Adds new route to a file inside the root folder.
-     * @param string $path The path part of the URI. For example, if the 
+     * @param array $options An associative array of options. Available options 
+     * are: 
+     * <ul>
+     * <li><b>path</b>: The path part of the URI. For example, if the 
      * requested URI is 'http://www.example.com/user/ibrahim', the path 
      * part of the URI is '/user/ibrahim'. It is possible to include variables 
      * in the path. To include a variable in the path, its name must be enclosed 
@@ -460,29 +531,42 @@ class Router {
      * $_GET or $_POST after the requested URI is resolved. If we use the same 
      * example above to get any user profile, We would add the following as 
      * a path: 'user/{username}'. In this case, username will be available in 
-     * $_GET['username']. 
-     * @param string $route The path to the file. It can be any file in the scope 
-     * of the variable ROOT_DIR.
-     * @param boolean $asApi If this parameter is set to true, the route will be 
+     * $_GET['username']. </li>
+     * <li><b>route-to</b>: The path to the file that the route will point to. 
+     * It can be any file in the scope of the variable ROOT_DIR.</li>
+     * <li><b>as-api</b>: If this parameter is set to true, the route will be 
      * treated as if it was an API route. This means that the constant 'API_ROUTE' 
-     * will be initiated when a request is made to the route. Default is false.
+     * will be initiated when a request is made to the route. Default is false.</li>
+     * <li><b>case-sensitive</b>: Make the URL case sensitive or not. 
+     * If this one is set to false, then if a request is made to the URL 'https://example.com/one/two',
+     * It will be the same as requesting the URL 'https://example.com/OnE/tWO'. Default 
+     * is true.</li>
+     * </ul>
      * @return boolean The method will return true if the route was created. 
      * If a route for the given path was already created, the method will return 
-     * false. Also if the given view file was not found, the method will not 
+     * false. Also if the given route file was not found, the method will not 
      * create any route and return false.
      * @since 1.2
      */
-    public static function other($path,$route, $asApi=false) {
-        return Router::get()->addRoute($path, $route, Router::CUSTOMIZED,null,false,$asApi);
+    public static function other($options) {
+        $options['type'] = Router::CUSTOMIZED;
+        return Router::get()->_addRoute($options);
     }
     /**
      * Display all routes details.
      * @since 1.1
      */
-    public function printRoutes() {
+    private function _printRoutes() {
         foreach ($this->routes as $route){
             $route->printUri();
         }
+    }
+    /**
+     * Display all routes details.
+     * @since 1.3.8
+     */
+    public static function printRoutes() {
+        self::get()->_printRoutes();
     }
     /**
      * Removes any extra forward slash in the beginning or the end.
@@ -514,7 +598,7 @@ class Router {
      * has a route.
      * @since 1.1
      */
-    public function hasRoute($path) {
+    private function _hasRoute($path) {
         $hasRoute = false;
         $routeURI = new RouterUri($this->getBase().$this->_fixPath($path), '');
         foreach ($this->routes as $route){
@@ -523,15 +607,34 @@ class Router {
         return $hasRoute;
     }
     /**
+     * Checks if a given path has a route or not.
+     * @param string $path The path which will be checked (such as '/path1/path2')
+     * @return boolean The method will return true if the given path 
+     * has a route.
+     * @since 1.3.8
+     */
+    public static function hasRoute($path) {
+        return self::get()->_hasRoute($path);
+    }
+    /**
      * Sets a callback to call in case a given rout is not found.
      * @param callable $function The function which will be called if 
      * the rout is not found.
      * @since 1.0
      */
-    public function setOnNotFound($function) {
+    private function _setOnNotFound($function) {
         if(is_callable($function)){
             $this->onNotFound = $function;
         }
+    }
+    /**
+     * Sets a callback to call in case a given rout is not found.
+     * @param callable $func The function which will be called if 
+     * the rout is not found.
+     * @since 1.3.8
+     */
+    public static function setOnNotFound($func) {
+        self::get()->_setOnNotFound($func);
     }
     /**
      * Returns an object of type 'RouterUri' which contains route information.
@@ -559,13 +662,20 @@ class Router {
      * is true.
      * @since 1.0
      */
-    private function resolveUrl($uri,$loadResource=true) {
+    private function _resolveUrl($uri,$loadResource=true) {
         if(count($this->routes) != 0){
             $routeUri = new RouterUri($uri, '');
             //first, search for the URI wuthout checking variables
             foreach ($this->routes as $route){
                 if(!$route->hasVars()){
-                    if($route->getUri() == $routeUri->getUri()){
+                    if($route->isCaseSensitive()){
+                        $isEqual = strtolower($route->getUri()) == 
+                        strtolower($routeUri->getUri());
+                    }
+                    else{
+                        $isEqual = $route->getUri() == $routeUri->getUri();
+                    }
+                    if($isEqual){
                         if(is_callable($route->getRouteTo())){
                             $this->uriObj = $route;
                             if($loadResource === true){
@@ -621,8 +731,9 @@ class Router {
                 if($route->hasVars()){
                     $routePathArray = $route->getPathArray();
                     if(count($routePathArray) == count($pathArray)){
-                        for($x = 0 ; $x < count($routePathArray) ; $x++){
-                            if($this->isDirectoryAVar($routePathArray[$x])){
+                        $pathVarsCount = count($routePathArray);
+                        for($x = 0 ; $x < $pathVarsCount ; $x++){
+                            if($this->_isDirectoryAVar($routePathArray[$x])){
                                 $varName = trim($routePathArray[$x], '{}');
                                 $route->setUriVar($varName, $pathArray[$x]);
                                 if($requestMethod == 'POST' || $requestMethod == 'PUT'){
@@ -632,8 +743,17 @@ class Router {
                                     $_GET[$varName] = urldecode($pathArray[$x]);
                                 }
                             }
-                            else if($routePathArray[$x] != $pathArray[$x]){
-                                break;
+                            else{
+                                if(!$route->isCaseSensitive()){
+                                    if(strtolower($routePathArray[$x]) != strtolower($pathArray[$x])){
+                                        break;
+                                    }
+                                }
+                                else{
+                                    if($routePathArray[$x] != $pathArray[$x]){
+                                        break;
+                                    }
+                                }
                             }
                         }
                     }
@@ -699,7 +819,7 @@ class Router {
      * @return boolean
      * @since 1.1
      */
-    private function isDirectoryAVar($dir){
+    private function _isDirectoryAVar($dir){
         return $dir[0] == '{' && $dir[strlen($dir) - 1] == '}';
     }
     /**
@@ -710,7 +830,7 @@ class Router {
      * @since 1.3.6
      */
     public static function getUriObjByURL($url) {
-        self::get()->resolveUrl($url, false);
+        self::get()->_resolveUrl($url, false);
         return self::getRouteUri();
     }
 }

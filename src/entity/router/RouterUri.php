@@ -44,9 +44,15 @@ use webfiori\entity\Util;
  * The class is also used for routing.
  * For more information on URI structure, visit <a target="_blank" href="https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#Examples">Wikipedia</a>.
  * @author Ibrahim
- * @version 1.3
+ * @version 1.3.1
  */
 class RouterUri {
+    /**
+     * A boolean which is set to true if URI is case sensitive.
+     * @var boolean 
+     * @since 1.3.1
+     */
+    private $isCS;
     /**
      * The route which this URI will be routing to.
      * @var mixed This route can be a file or a function.
@@ -83,15 +89,27 @@ class RouterUri {
      * Creates new instance.
      * @param string $requestedUri The URI such as 'https://www3.programmingacademia.com:80/{some-var}/hell/{other-var}/?do=dnt&y=#xyz'
      * @param string $routeTo The file that the route will take the user to ar a closure.
+     * @param boolean $caseSensitive A boolean. If the URI is case sensitive, 
+     * then this value must be set to true. False if not. Default is true.
      * @param array $closureParams If the closure needs to use parameters, 
      * it is possible to supply them using this array.
      */
-    public function __construct($requestedUri,$routeTo,$closureParams=array()) {
+    public function __construct($requestedUri,$routeTo,$caseSensitive=true,$closureParams=array()) {
         $this->setRoute($routeTo);
+        $this->isCS = $caseSensitive === true;
         $this->uriBroken = self::splitURI($requestedUri);
         $this->setClosureParams($closureParams);
         $this->incInSiteMap = false;
         $this->setType(Router::CUSTOMIZED);
+    }
+    /**
+     * Returns the value of the property that tells if the URI is case sensitive 
+     * or not.
+     * @return boolean  True if URI case sensitive. False if not. Default is false.
+     * @since 1.3.1
+     */
+    public function isCaseSensitive() {
+        return $this->isCS;
     }
     /**
      * Checks if the URI will be included in auto-generated site map or not.

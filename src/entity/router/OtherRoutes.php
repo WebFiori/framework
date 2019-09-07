@@ -41,6 +41,9 @@ class OtherRoutes {
      * @since 1.0
      */
     public static function create(){
-        //Router::other('my-custom/view-something', 'my-folder/file.php');
+        //Router::other([
+        //    'path'=>'my-custom/view-something', 
+        //    'route-to'=>'my-folder/file.php'
+        //]);
     }
 }

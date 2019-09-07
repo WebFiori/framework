@@ -172,4 +172,23 @@ class CronJobTest extends TestCase{
         $this->assertTrue($job->onMonth());
         $this->assertEquals('0 0 1 1 *',$job->getExpression());
     }
+    public function testSetJobName00() {
+        $job = new CronJob();
+        $job->setJobName('Hello Job');
+        $this->assertEquals('Hello Job',$job->getJobName());
+        $job->setJobName('  Hello Job  ');
+        $this->assertEquals('Hello Job',$job->getJobName());
+        $job->setJobName('   ');
+        $this->assertEquals('Hello Job',$job->getJobName());
+    }
+    public function testEveryHoure() {
+        $job = new CronJob();
+        $job->everyHour();
+        $this->assertEquals('0 * * * *',$job->getExpression());
+    }
+    public function testWeeklyOn00() {
+        $job = new CronJob();
+        $this->assertTrue($job->weeklyOn());
+        $this->assertEquals('0 0 * * 0',$job->getExpression());
+    }
 }

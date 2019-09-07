@@ -305,8 +305,14 @@ class Cron {
                 . '</html>');
             }
         };
-        Router::closure('/cron-jobs/execute/{password}',$func);
-        Router::closure('/cron-jobs/execute',$func);
+        Router::closure([
+            'path'=>'/cron-jobs/execute/{password}',
+            'route-to'=>$func
+        ]);
+        Router::closure([
+            'path'=>'/cron-jobs/execute',
+            'route-to'=>$func
+        ]);
         
         $forceFunc = function(){
             $clientIp = Util::getClientIP();
@@ -490,8 +496,14 @@ class Cron {
                 . '</html>');
             }
         };
-        Router::closure('/cron-jobs/execute/force/{job-name}',$forceFunc);
-        Router::closure('/cron-jobs/execute/{password}/force/{job-name}',$forceFunc);
+        Router::closure([
+            'path'=>'/cron-jobs/execute/force/{job-name}',
+            'route-to'=>$forceFunc
+        ]);
+        Router::closure([
+            'path'=>'/cron-jobs/execute/{password}/force/{job-name}',
+            'route-to'=>$forceFunc
+        ]);
         
         $viewJobsFunc = function(){
             if(Cron::password() != 'NO_PASSWORD'){
@@ -540,8 +552,14 @@ class Cron {
                 die('');
             }
         };
-        Router::closure('/cron-jobs/list',$viewJobsFunc);
-        Router::closure('/cron-jobs/list/{password}',$viewJobsFunc);
+        Router::closure([
+            'path'=>'/cron-jobs/list',
+            'route-to'=>$viewJobsFunc
+        ]);
+        Router::closure([
+            'path'=>'/cron-jobs/list/{password}',
+            'route-to'=>$viewJobsFunc
+        ]);
     }
     private function _setLogEnabled($bool){
         $this->isLogEnabled = $bool === true ? true : false;

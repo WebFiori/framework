@@ -41,7 +41,13 @@ class ViewRoutes {
      * @since 1.0
      */
     public static function create(){
-        Router::view('/', '/default.html');
-        Router::view('/example', '/ExamplePage.php');
+        Router::view([
+            'path'=>'/', 
+            'route-to'=>'/default.html'
+        ]);
+        Router::view([
+            'path'=>'/example', 
+            'route-to'=>'/ExamplePage.php'
+        ]);
     }
 }

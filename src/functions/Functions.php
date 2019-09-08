@@ -399,7 +399,8 @@ class Functions {
             $this->_setDBErrDetails($link->getErrorCode(),$link->getErrorMessage());
             $this->dbErrDetails['query'] = $query->getQuery();
         }
-        if($result === true && $query->getType() == 'select'){
+        $qType = $query->getType();
+        if($result === true && ($qType == 'select' || $qType == 'show')){
             $current = $this->getCurrentDataset();
             if($current !== null){
                 $this->getDataStack()->push($current);
@@ -620,6 +621,10 @@ class Functions {
     }
    /**
     * Returns the first row that is resulted from executing a query.
+    * Note that if the number of fetched rows is 1, the method can be only 
+    * used once to get that row. In addition, If there are other data sets which was resulted from 
+     * executing other select queries, The method will switch to the last 
+     * data set.
     * @return array|null An associative array that contains row info. The 
     * method will return null in case no connection was established to 
     * the database or there is no active data set.
@@ -629,8 +634,13 @@ class Functions {
         $retVal = null;
         $current = &$this->getCurrentDataset();
         if($current !== null){
-            if($current['rows-count'] !== 0){
-                $retVal = $current['data'][$current['current-index']];
+            if($current['rows-count'] != 0){
+                if(isset($current['data'][$current['current-position']])){
+                    $retVal = $current['data'][$current['current-position']];
+                }
+            }
+            if($current['rows-count'] == 1){
+                $this->currentDataset = $this->dataStack->pop();
             }
         }
         return $retVal;
@@ -648,13 +658,16 @@ class Functions {
      * @since 1.3.1
      */
     public function nextRow() {
-        $retVal = $this->getRow();
-        if($retVal !== null){
-            $dataset = &$this->getCurrentDataset();
-            $dataset['current-index'] = $dataset['current-index'] + 1;
-        }
-        else{
-            $this->currentDataset = $this->dataStack->pop();
+        $retVal = null;
+        $dataset = &$this->getCurrentDataset();
+        if($dataset !== null){
+            if(isset($dataset['data'][$dataset['current-position']])){
+                $retVal = $dataset['data'][$dataset['current-position']];
+                $dataset['current-position'] = $dataset['current-position'] + 1;
+            }
+            else{
+                $this->currentDataset = $this->dataStack->pop();
+            }
         }
         return $retVal;
     }

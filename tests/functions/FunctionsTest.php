@@ -6,6 +6,7 @@ use webfiori\entity\DBConnectionInfo;
 use webfiori\WebFiori;
 use webfiori\tests\entity\TestQuery_1;
 use webfiori\entity\SessionManager;
+use SimpleController;
 /**
  * Description of FunctionsTest
  *
@@ -45,17 +46,17 @@ class FunctionsTest extends TestCase{
     /**
      * @test
      */
-//    public function testUseDatabase01() {
-//        $connection = new DBConnectionInfo('root', '12345', 'testing_db');
-//        $connection->setConnectionName('test-connection');
-//        WebFiori::getConfig()->addDbConnection($connection);
-//        $func = new Functions();
-//        $result = $func->useDatabase('test-connection');
-//        $this->assertFalse($result);
-//        $errDetails = $func->getDBErrDetails();
-//        $this->assertEquals(1045,$errDetails['error-code']);
-//        $this->assertEquals("Access denied for user 'root'@'localhost' (using password: YES)",$errDetails['error-message']);
-//    }
+    public function testUseDatabase01() {
+        $connection = new DBConnectionInfo('root', '12345', 'testing_db');
+        $connection->setConnectionName('test-connection');
+        WebFiori::getConfig()->addDbConnection($connection);
+        $func = new Functions();
+        $result = $func->useDatabase('test-connection');
+        $this->assertFalse($result);
+        $errDetails = $func->getDBErrDetails();
+        $this->assertEquals(1045,$errDetails['error-code']);
+        $this->assertEquals("Access denied for user 'root'@'localhost' (using password: YES)",$errDetails['error-message']);
+    }
     /**
      * @test
      */
@@ -241,5 +242,20 @@ class FunctionsTest extends TestCase{
     public function testHasPrivilege00() {
         $func = new Functions();
         $this->assertFalse($func->hasPrivilege('HELLO'));
+    }
+    /**
+     * @test
+     * @depends testUseDatabase02
+     */
+    public function testSimpleController00() {
+        $c = new SimpleController();
+        $users = $c->getUsers();
+        $this->assertEquals('array', gettype($users));
+        $this->assertEquals(3,count($users));
+        for($x = 0 ; $x < count($users) ; $x++){
+            $this->assertEquals('user-0'.$x,$users[$x]->getUserName());
+            $this->assertEquals('pass-0'.$x,$users[$x]->getPassword());
+        }
+        $this->assertEquals(4,count($users[2]->getContactInfo()));
     }
 }

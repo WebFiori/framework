@@ -34,7 +34,7 @@ use webfiori\entity\File;
 use webfiori\entity\Util;
 /**
  * A helper class that is used to upload files to the server file system.
- * @author Ibrahim <ibinshikh@hotmail.com>
+ * @author Ibrahim
  * @version 1.2.1
  */
 class Uploader implements JsonI{

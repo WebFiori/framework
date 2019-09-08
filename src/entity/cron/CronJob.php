@@ -385,6 +385,24 @@ class CronJob {
         return $retVal;
     }
     /**
+     * Checks if a given string represents a number or not.
+     * @param string $str
+     * @return boolean
+     */
+    private function _isNumber($str){
+        $len = strlen($str);
+        if($len != 0){
+            for($x = 0 ; $x < $len ; $x++){
+                $ch = $str[$x];
+                if(!($ch >= '0' && $ch <= '9')){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
      * 
      * @param type $minutesField
      * @return boolean|array
@@ -443,7 +461,13 @@ class CronJob {
                 }
             }
             else if($exprType == self::SPECIFIC_VAL){
-                $value = intval($subExpr);
+                if($this->_isNumber($subExpr)){
+                    $value = intval($subExpr);
+                }
+                else{
+                    $isValidExpr = false;
+                    break;
+                }
                 if($value >= 0 && $value <= 59){
                     $minuteAttrs['at-every-x-minute'][] = $value;
                 }
@@ -517,7 +541,13 @@ class CronJob {
                 }
             }
             else if($exprType == self::SPECIFIC_VAL){
-                $value = intval($subExpr);
+                if($this->_isNumber($subExpr)){
+                    $value = intval($subExpr);
+                }
+                else{
+                    $isValidExpr = false;
+                    break;
+                }
                 if($value >= 0 && $value <= 23){
                     $hoursAttrs['at-every-x-hour'][] = $value;
                 }

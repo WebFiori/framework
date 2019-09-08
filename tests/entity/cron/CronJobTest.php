@@ -109,6 +109,150 @@ class CronJobTest extends TestCase{
     /**
      * @test
      */
+    public function testConstructor11() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Invalid cron expression: \'5,a * * * *\'');
+        $cron = new CronJob('5,a * * * *');
+    }
+    /**
+     * @test
+     */
+    public function testConstructor12() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Invalid cron expression: \'5, * * * *\'.');
+        $cron = new CronJob('5, * * * *');
+    }
+    /**
+     * @test
+     */
+    public function testConstructor13() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Invalid cron expression: \'5-0 * * * *\'.');
+        $cron = new CronJob('5-0 * * * *');
+    }
+    /**
+     * @test
+     */
+    public function testConstructor14() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Invalid cron expression: \'60-60 * * * *\'.');
+        $cron = new CronJob('60-60 * * * *');
+    }
+    /**
+     * @test
+     */
+    public function testConstructor15() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Invalid cron expression: \'5-60 * * * *\'.');
+        $cron = new CronJob('5-60 * * * *');
+    }
+    /**
+     * @test
+     */
+    public function testConstructor28() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Invalid cron expression: \'5-a * * * *\'.');
+        $cron = new CronJob('5-a * * * *');
+    }
+    /**
+     * @test
+     */
+    public function testConstructor16() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Invalid cron expression: \'* 15,a * * *\'');
+        $cron = new CronJob('* 15,a * * *');
+    }
+    /**
+     * @test
+     */
+    public function testConstructor17() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Invalid cron expression: \'* 7, * * *\'.');
+        $cron = new CronJob('* 7, * * *');
+    }
+    /**
+     * @test
+     */
+    public function testConstructor18() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Invalid cron expression: \'* 23-9 * * *\'.');
+        $cron = new CronJob('* 23-9 * * *');
+    }
+    /**
+     * @test
+     */
+    public function testConstructor19() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Invalid cron expression: \'24-24 * * * *\'.');
+        $cron = new CronJob('24-24 * * * *');
+    }
+    /**
+     * @test
+     */
+    public function testConstructor20() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Invalid cron expression: \'* 5-24 * * *\'.');
+        $cron = new CronJob('* 5-24 * * *');
+    }
+    /**
+     * @test
+     */
+    public function testConstructor27() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Invalid cron expression: \'* 5-c * * *\'.');
+        $cron = new CronJob('* 5-c * * *');
+    }
+    /**
+     * @test
+     */
+    public function testConstructor21() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Invalid cron expression: \'* * 1-32 * *\'.');
+        $cron = new CronJob('* * 1-32 * *');
+    }
+    /**
+     * @test
+     */
+    public function testConstructor22() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Invalid cron expression: \'* * 0-30 * *\'.');
+        $cron = new CronJob('* * 0-30 * *');
+    }
+    /**
+     * @test
+     */
+    public function testConstructor23() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Invalid cron expression: \'* * 30-30 * *\'.');
+        $cron = new CronJob('* * 30-30 * *');
+    }
+    /**
+     * @test
+     */
+    public function testConstructor24() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Invalid cron expression: \'* * 20-10 * *\'.');
+        $cron = new CronJob('* * 20-10 * *');
+    }
+    /**
+     * @test
+     */
+    public function testConstructor25() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Invalid cron expression: \'* * 20, * *\'.');
+        $cron = new CronJob('* * 20, * *');
+    }
+    /**
+     * @test
+     */
+    public function testConstructor26() {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Invalid cron expression: \'* * 20,a * *\'.');
+        $cron = new CronJob('* * 20,a * *');
+    }
+    /**
+     * @test
+     */
     public function testDailyAt00() {
         $job = new CronJob();
         $this->assertTrue($job->dailyAt());

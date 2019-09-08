@@ -750,23 +750,6 @@ class Column{
         else{
             $retVal .= 'null ';
         }
-//        if($this->isPrimary()){
-//            $t = &$this->getOwner();
-//            if($t != null){
-//                if($t->primaryKeyColsCount() == 1){
-//                    $retVal .= 'primary key ';
-//                    if($this->isAutoInc()){
-//                        $retVal .= 'auto_increment ';
-//                    }
-//                }
-//            }
-//            else{
-//                $retVal .= 'primary key ';
-//                if($this->isAutoInc()){
-//                    $retVal .= 'auto_increment ';
-//                }
-//            }
-//        }
         if($this->isUnique()){
             $retVal .= 'unique ';
         }
@@ -775,7 +758,6 @@ class Column{
             $retVal .= 'collate '.$this->getCollation().' ';
         }
         if($default !== null){
-            
             if($type == 'varchar' || 
                     $type == 'decimal' || 
                     $type == 'float' || 
@@ -791,11 +773,13 @@ class Column{
                 else{
                     $retVal .= 'default \''.$default.'\' ';
                 }
-                $retVal .= $this->onColUpdate;
             }
             else{
                 $retVal .= 'default '.$default.' ';
             }
+        }
+        if($this->getType() == 'timestamp' || $this->getType() == 'datetime'){
+            $retVal .= $this->onColUpdate;
         }
         $comment = $this->getComment();
         if($comment !== null){

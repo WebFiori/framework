@@ -383,8 +383,10 @@ class MySQLLink{
                 //this part has a bug. The bug can happen if query body 
                 //contain other ';'. Example: insert into articles (id,articte_text) 
                 // values (99, 'This is An example; ;; Can Cause a bug;;')
+                // most queries who have this type of syntax fall under 
+                // insert and update.
                 $qType = $query->getType();
-                if($qType != 'insert'){
+                if($qType != 'insert' && $qType != 'update'){
                     $eploded = explode(';', trim($query->getQuery(), ';'));
                     if(count($eploded) != 1){
                         foreach ($eploded as $xQuery){

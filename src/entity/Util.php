@@ -278,23 +278,25 @@ class Util{
             }
         }
         else{
-            foreach ($_SERVER as $k => $v){
-                $split = explode('_', $k);
-                if($split[0] == 'HTTP'){
-                    $headerName = '';
-                    $count = count($split);
-                    for($x = 0 ; $x < $count ; $x++){
-                        if($x + 1 == $count && $split[$x] != 'HTTP'){
-                            $headerName = $headerName.$split[$x];
+            if(isset($_SERVER)){
+                foreach ($_SERVER as $k => $v){
+                    $split = explode('_', $k);
+                    if($split[0] == 'HTTP'){
+                        $headerName = '';
+                        $count = count($split);
+                        for($x = 0 ; $x < $count ; $x++){
+                            if($x + 1 == $count && $split[$x] != 'HTTP'){
+                                $headerName = $headerName.$split[$x];
+                            }
+                            else if($x == 1 && $split[$x] != 'HTTP'){
+                                $headerName = $split[$x].'-';
+                            }
+                            else if($split[$x] != 'HTTP'){
+                                $headerName = $headerName.$split[$x].'-';
+                            }
                         }
-                        else if($x == 1 && $split[$x] != 'HTTP'){
-                            $headerName = $split[$x].'-';
-                        }
-                        else if($split[$x] != 'HTTP'){
-                            $headerName = $headerName.$split[$x].'-';
-                        }
+                        $retVal[strtolower($headerName)] = $v;
                     }
-                    $retVal[strtolower($headerName)] = $v;
                 }
             }
         }

@@ -60,7 +60,10 @@ use jsonx\JsonX;
  * 'my-files' and inside it, he might add 'my-view.html'. Then he can add a route 
  * to it as follows:
  * <pre>
- * Router::other('/test-custom','/my-files/my-view.html');
+ * Router::other([
+ *     'path'=>'/custom-route',
+ *     'route-to'=>'/my-files/my-view.html'
+ * ]);
  * </pre> 
  * </p>
  * @author Ibrahim
@@ -417,8 +420,6 @@ class Router {
      * It will be the same as requesting the URL 'https://example.com/OnE/tWO'. Default 
      * is true.</li>
      * </ul>
-     * @param string $path 
-     * @param string $viewFile 
      * @return boolean The method will return true if the route was created. 
      * If a route for the given path was already created, the method will return 
      * false.
@@ -508,7 +509,6 @@ class Router {
      * If a route for the given path was already created, the method will return 
      * false. Also if the given view file was not found, the method will not 
      * create any route and return false.
-     * @param array $closureParams 
      * @since 1.2
      */
     public static function closure($options) {

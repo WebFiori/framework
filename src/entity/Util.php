@@ -513,23 +513,30 @@ class Util{
         return $datesArr;
     }
     /**
-     * Call the method 'print_r' and insert 'pre' around it and display 
-     * it inside a floating message box.
+     * Call the method 'print_r' and insert 'pre' around it.
      * The method is used to make the output well formatted and user 
      * readable.
      * @param mixed $expr Any variable or value that can be passed to the 
      * function 'print_r'.
+     * @param boolean $asMessageBox If this attribute is set to true, the output
+     * will be shown in a floating message box which can be moved around inside 
+     * the web page. Default is true.
      * @since 1.0
      */
-    public static function print_r($expr){
+    public static function print_r($expr,$asMessageBox=true){
         if(gettype($expr) == 'string'){
             $expr1 = str_replace('<', '&lt;', $expr);
             $expr = str_replace('>', '&gt;', $expr1);
         }
         $val = '<pre>'. print_r($expr, true).'</pre>';
-        $messageBox = new MessageBox();
-        $messageBox->getBody()->addTextNode($val,false);
-        echo $messageBox;
+        if($asMessageBox === true){
+            $messageBox = new MessageBox();
+            $messageBox->getBody()->addTextNode($val,false);
+            echo $messageBox;
+        }
+        else{
+            echo $val;
+        }
     }
     /**
      * Returns unicode code of a character.

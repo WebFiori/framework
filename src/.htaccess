@@ -1,21 +1,16 @@
 Options -Indexes
 RewriteEngine on
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteCond %{REQUEST_FILENAME}\.php -f
-RewriteRule ^(.*)$ $1.php
+
+#send all trafic to the root framework file
 RewriteCond %{REQUEST_FILENAME} !-f
 ReWriteRule ^(.*)$ WebFiori.php [L,QSA]
-#append authorization header 
+
+#append authorization header if not exist
 RewriteCond %{HTTP:Authorization} ^(.*)
 RewriteRule .* - [e=HTTP_AUTHORIZATION:%1]
-RedirectMatch 403 ^/.+\.(tkns)$
-DirectoryIndex WebFiori.php
+
 #disable opcache
 #php_flag opcache.enable Off
-
-#used for ssl redirect
-#RewriteCond %{SERVER_PORT} 80
-#RewriteRule ^(.*)$ https://www.programmingacademia.com/$1 [R=301,L]
 
 #allow CORS
 <IfModule mod_headers.c>

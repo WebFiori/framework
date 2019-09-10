@@ -321,6 +321,11 @@ class File implements JsonI{
      * will try to set MIME type of the file. If MIME type was not detected, 
      * it will set to 'application/octet-stream'. If the method is unable to 
      * read the file, it will throw an exception.
+     * @param int $from The byte at which the method will start reading from. If -1 
+     * is given, then the method will start reading from byte 0.
+     * @param int $to The byte at which the method will read data to. If -1 
+     * is given, then the method will read till last byte. Default is 
+     * -1.
      * @throws Exception The method will throw an exception with the message 
      * "File absolute path is invalid." if absolute path is empty string. Also, 
      * an exception with the message "Unable to open the file 'f_path'." if 
@@ -337,9 +342,6 @@ class File implements JsonI{
                 $path = str_replace('\\', '/', $this->getAbsolutePath());
                 if(!$this->_readHelper($path,$from,$to)){
                     throw new Exception('File not found: \''.$path.'\'.');
-                }
-                else{
-                    return;
                 }
             }
             else{

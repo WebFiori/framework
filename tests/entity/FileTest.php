@@ -145,6 +145,27 @@ class FileTest extends TestCase{
         $f2 = new File('write-test-2.txt',ROOT_DIR);
         $f2->read();
         $this->assertEquals('Hello World Again.',$f2->getRawData());
+        return $f2;
+    }
+    /**
+     * @test
+     */
+    public function testSetID() {
+        $f = new File();
+        $f->setID('xyz');
+        $this->assertSame('xyz',$f->getID());
+        $f->setID(66);
+        $this->assertSame(66,$f->getID());
+    }
+    
+    /**
+     * @test 
+     * @depends testWrite05
+     * @param File $f Description
+     */
+    public function testRemove01($f) {
+        $this->assertTrue($f->remove());
+        $this->assertFalse(file_exists($f->getAbsolutePath()));
     }
     /**
      * @test
@@ -161,5 +182,12 @@ class FileTest extends TestCase{
         $f->read();
         $this->assertEquals('{"id":-1, "mime":"text\/plain", "name":"text-file.txt", '
                 . '"path":"'.\jsonx\JsonX::escapeJSONSpecialChars($f->getPath()).'", "size-in-bytes":25, "size-in-kbytes":0.0244140625, "size-in-mbytes":2.3841857910156E-5}',$f.'');
+    }
+    /**
+     * @test
+     */
+    public function testRemove00() {
+        $f = new File('text-file-not-exist.txt','\\'.ROOT_DIR.DIRECTORY_SEPARATOR.'tests'.DIRECTORY_SEPARATOR.'entity\\');
+        $this->assertFalse($f->remove());
     }
 }

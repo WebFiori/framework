@@ -602,6 +602,23 @@ class Access {
         return $retVal;
     }
     /**
+     * Checks if privilege or group ID is equal to another group.
+     * @param type $id
+     * @param type $group
+     * @return boolean If a group was found which have the given 
+     * ID, the method will return true.
+     */
+    private function _checkID($id,$group){
+        if($group->getID() == $id){
+            return true;
+        }
+        $bool = false;
+        foreach ($group->childGroups() as $g){
+            $bool = $bool || $this->_checkID($id, $g);
+        }
+        return $bool;
+    }
+    /**
      * 
      * @param type $groupId
      * @param type $privilegeId
@@ -614,6 +631,11 @@ class Access {
             if($pr === null){
                 $g = &$this->_getGroup($groupId);
                 if(($g instanceof PrivilegesGroup) && $groupId == $g->getID()){
+                    foreach (Access::groups() as $xG){
+                        if($this->_checkID($privilegeId, $xG)){
+                            return false;
+                        }
+                    }
                     $p = new Privilege();
                     $p->setID($privilegeId);
                     if(!$g->hasPrivilege($p)){

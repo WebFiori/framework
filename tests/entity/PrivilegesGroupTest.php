@@ -2,6 +2,7 @@
 namespace webfiori\tests\entity;
 use PHPUnit\Framework\TestCase;
 use webfiori\entity\PrivilegesGroup;
+use webfiori\entity\Privilege;
 
 /**
  * A test class for testing the class 'webfiori\entity\File'.
@@ -16,6 +17,26 @@ class PrivilegesGroupTest extends TestCase{
         $group = new PrivilegesGroup();
         $this->assertEquals('GROUP',$group->getID());
         $this->assertEquals('G_NAME',$group->getName());
+    }
+    /**
+     * @test
+     */
+    public function testAddPrivilege00() {
+        $g = new PrivilegesGroup();
+        $pr = null;
+        $this->assertFalse($g->addPrivilage($pr));
+        $pr2 = '';
+        $this->assertFalse($g->addPrivilage($pr2));
+    }
+    /**
+     * @test
+     */
+    public function testAddPrivilege01() {
+        $g = new PrivilegesGroup();
+        $pr = new Privilege();
+        $this->assertTrue($g->addPrivilage($pr));
+        $pr1 = new Privilege();
+        $this->assertFalse($g->addPrivilage($pr1));
     }
     /**
      * @test
@@ -61,6 +82,51 @@ class PrivilegesGroupTest extends TestCase{
         $this->assertSame($parentGroup,$child->getParentGroup());
         $this->assertEquals(1,count($child->getParentGroup()->childGroups()));
         $this->assertSame($child,$parentGroup->childGroups()[0]);
+        return [
+            'child'=>$child,
+            'parent'=>$parentGroup
+        ];
+    }
+    /**
+     * @test
+     * @depends testSetParentGroup00
+     * @param $gArr Description
+     */
+    public function testRemoveParentGroup00($gArr) {
+        $this->assertTrue($gArr['child']->setParentGroup());
+        $this->assertEquals(0,count($gArr['parent']->childGroups()));
+        $this->assertNull($gArr['child']->getParentGroup());
+    }
+    /**
+     * @test
+     */
+    public function testRemoveParentGroup01() {
+        $child = new PrivilegesGroup('CH_GROUP_1', 'Child Group #1');
+        $this->assertFalse($child->setParentGroup());
+    }
+    /**
+     * @test
+     */
+    public function testHasPrivilege00() {
+        $parent = new PrivilegesGroup('Parent');
+        $child = new PrivilegesGroup('Child');
+        $pr = new Privilege('Child_pr');
+        $child->addPrivilage($pr);
+        $child->setParentGroup($parent);
+        $this->assertTrue($parent->hasPrivilege($pr));
+        $this->assertFalse($parent->hasPrivilege($pr,false));
+    }
+    /**
+     * @test
+     */
+    public function testSetID00() {
+        $parent = new PrivilegesGroup('Parent');
+        $child = new PrivilegesGroup('Child');
+        $pr = new Privilege('Child_pr');
+        $child->addPrivilage($pr);
+        $child->setParentGroup($parent);
+        $this->assertFalse($child->setID('Parent'));
+        $this->assertEquals('Child',$child->getID());
     }
     /**
      * 

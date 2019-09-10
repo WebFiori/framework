@@ -107,6 +107,17 @@ class AccessTest extends TestCase{
     /**
      * @test
      */
+    public function test09() {
+        Access::newGroup('SUPER');
+        Access::newGroup('SUB_SUPER', 'SUPER');
+        Access::newGroup('SUB_SUB_SUPER', 'SUB_SUPER');
+        $this->assertFalse(Access::newGroup('SUPER', 'SUB_SUB_SUPER'));
+        $this->assertFalse(Access::newPrivilege('SUB_SUB_SUPER', 'SUPER'));
+        Access::clear();
+    }
+    /**
+     * @test
+     */
     public function test08() {
         $this->assertTrue(Access::newGroup('ADMINS'));
         $r = Access::newPrivileges('ADMINS', [

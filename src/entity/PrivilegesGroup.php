@@ -87,8 +87,8 @@ class PrivilegesGroup implements JsonI{
      * Sets or unset parent privileges group.
      * @param PrivilegesGroup|null $group If the given parameter is an object of 
      * type 'PrivilegesGroup', the parent group will be set if it has different 
-     * ID other than 'this' group. If null is passed, the parent group will be 
-     * unset.
+     * ID other than 'this' group. If null reference is passed, the parent group will be 
+     * unset. Default value is null.
      * @return boolean If the class attribute value was updated, the method will 
      * return true. Other than that, the method will return false.
      * @since 1.1
@@ -104,9 +104,9 @@ class PrivilegesGroup implements JsonI{
         else if($group === null){
             if($this->parentGroup !== null){
                 $this->parentGroup->_removeChildGroup($this->getID());
+                $this->parentGroup = null;
+                return true;
             }
-            $this->parentGroup = null;
-            return true;
         }
         return false;
     }
@@ -179,10 +179,14 @@ class PrivilegesGroup implements JsonI{
         $len = strlen($xid);
         $parentG = $this->getParentGroup();
         if($parentG !== null){
+            $testInst = $parentG;
             while ($parentG !== null){
                 $parentG = $parentG->getParentGroup();
+                if($parentG !== null){
+                    $testInst = $parentG;
+                }
             }
-            $taken = $this->_checkID($id, $parentG);
+            $taken = $this->_checkID($id, $testInst);
             if($taken === true){
                 return false;
             }

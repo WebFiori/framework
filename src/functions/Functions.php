@@ -615,7 +615,7 @@ class Functions {
         $dataset = $this->getCurrentDataset();
         if($dataset !== null){
             $this->currentDataset = $this->dataStack->pop();
-            $retVal = $dataset;
+            $retVal = $dataset['data'];
         }
         return $retVal;
     }

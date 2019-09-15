@@ -31,7 +31,7 @@ if(!defined('ROOT_DIR')){
 use webfiori\entity\Page;
 use phpStructs\html\JsCode;
 use phpStructs\html\TableRow;
-use phpStructs\html\TabelCell;
+use phpStructs\html\TableCell;
 use phpStructs\html\Input;
 use phpStructs\html\HTMLNode;
 use phpStructs\html\PNode;
@@ -324,7 +324,7 @@ class CronTasksView {
         $tableHeader->addChild($this->_createTasksTableHeaderCell('Execute'));
         $jobsQueue = Cron::jobsQueue();
         if($jobsQueue->size() == 0){
-            $cell = new TabelCell();
+            $cell = new TableCell();
             $cell->setColSpan(8);
             $cell->addTextNode('No Jobs Has Been Scheduled.');
             $cell->setStyle(array(
@@ -338,11 +338,11 @@ class CronTasksView {
             while ($job = $jobsQueue->dequeue()){
                 $row = new TableRow();
                 $row->setClassName('tasks-table-row');
-                $jobNameCell = new TabelCell();
+                $jobNameCell = new TableCell();
                 $jobNameCell->setClassName('tasks-table-cell');
                 $jobNameCell->addTextNode($job->getJobName());
                 $row->addChild($jobNameCell);
-                $exprCell = new TabelCell();
+                $exprCell = new TableCell();
                 $jobNameCell->setClassName('tasks-table-cell');
                 $exprCell->addTextNode($job->getExpression());
                 $row->addChild($exprCell);
@@ -351,7 +351,7 @@ class CronTasksView {
                 $row->addChild($this->_createTasksTableCell($job->isDayOfMonth()));
                 $row->addChild($this->_createTasksTableCell($job->isMonth()));
                 $row->addChild($this->_createTasksTableCell($job->isDayOfWeek()));
-                $forceCell = new TabelCell();
+                $forceCell = new TableCell();
                 $forceCell->addTextNode('<button name="input-element" onclick="execJob(this,\''.$job->getJobName().'\')" class="force-execution-button">Force Execution</button>', false);
                 $row->addChild($forceCell);
                 $tasksTable->addChild($row);
@@ -363,10 +363,10 @@ class CronTasksView {
      * header.
      * @param string $cellText The text that will be displayed in the body of the 
      * cell.
-     * @return TabelCell
+     * @return TableCell
      */
     private function _createTasksTableHeaderCell($cellText) {
-        $headerCell = new TabelCell('th');
+        $headerCell = new TableCell('th');
         $headerCell->setClassName('tasks-table-header-cell');
         $headerCell->setStyle(array(
             'padding'=>'10px'
@@ -380,10 +380,10 @@ class CronTasksView {
      * @param boolean $isTime If true is passed, the cell body will have a 'Yes' 
      * in the body and its background color will be green. If false is passed, 
      * the cell body will have a 'No' in the body and its background color will be red.
-     * @return TabelCell
+     * @return TableCell
      */
     private function _createTasksTableCell($isTime){
-        $cell = new TabelCell();
+        $cell = new TableCell();
         $cell->setClassName('tasks-table-cell');
         if($isTime){
             $cell->setStyle(array(

@@ -576,8 +576,8 @@ class WebFiori{
                     . 'One way is to go to the file "conf/Config.php". Change attribute value at line 75 to true. '
                     . 'Or Use the method SystemFunctions::configured(true). You must supply \'true\' as an attribute. '
                     . 'If you want to make the system do something else if the return value of the '
-                    . 'given method is false, go to the end of the file \'WebFiori.php\' and '
-                    . 'change the code in the \'else\' code block. (Inside the "if" block).');
+                    . 'given method is false, then open the file \'WebFiori.php\' and '
+                    . 'change the code in the \'else\' code block at the end of class constructor. (Inside the "if" block).');
             $j->add('powered-by', 'WebFiori Framework v'.Config::getVersion().' ('.Config::getVersionType().')');
             die($j);
         }
@@ -603,8 +603,8 @@ class WebFiori{
             . '</ul>'
             . '<p>'
             . 'If you want to make the system do something else if the return value of the '
-            . 'given method is false, go to the end of the file \'WebFiori.php\' and '
-            . 'change the code in the \'else\' code block at the end of the class constructor (Inside the "if" block).'
+            . 'given method is false, then open the file \'WebFiori.php\' and '
+            . 'change the code in the \'else\' code block at the end of class constructor (Inside the "if" block).'
             . '</p>'
             . '<p>System Powerd By: <a href="https://github.com/usernane/webfiori" target="_blank"><b>'
                     . 'WebFiori Framework v'.Config::getVersion().' ('.Config::getVersionType().')'

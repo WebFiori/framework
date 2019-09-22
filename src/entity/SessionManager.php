@@ -974,8 +974,8 @@ class SessionManager implements JsonI{
                         $sessionTime = $sessionTime == -1 ? $this->getLifetime()*60 : $sessionTime*60;
                         
                         $_SESSION['session-vars']['lifetime'] = $sessionTime;
-                        ini_set('session.gc_maxlifetime', $sessionTime);
-                        ini_set('session.cookie_lifetime', $sessionTime);
+                        //ini_set('session.gc_maxlifetime', $sessionTime);
+                        //ini_set('session.cookie_lifetime', $sessionTime);
                         $this->resumed = true;
                         $this->new = false;
                         if($this->isRefresh()){

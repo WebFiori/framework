@@ -40,7 +40,7 @@ if(!defined('ROOT_DIR')){
  * Where {BASE_URL} is the web site's base URL and {password} is the password 
  * that was set by the developer to protect the jobs from unauthorized access.
  * @author Ibrahim
- * @version 1.0.4
+ * @version 1.0.5
  */
 class Cron {
     /**
@@ -107,6 +107,31 @@ class Cron {
      */
     public static function &activeJob() {
         return self::_get()->activeJob;
+    }
+    /**
+     * Returns a job given its name.
+     * @param string $jobName The name of the job.
+     * @return CronJob|null If a job which has the given name was found, 
+     * the method will return an object of type 'CronJob' that represents 
+     * the job. Other than that, the method will return null.
+     * @since 1.0.5
+     */
+    public static function &getJob($jobName) {
+        $trimmed = trim($jobName);
+        $retVal = null;
+        if(strlen($trimmed) != 0){
+            $tempQ = new Queue();
+            while ($job = &self::jobsQueue()->dequeue()){
+                $tempQ->enqueue($job);
+                if($job->getJobName() == $trimmed){
+                    $retVal = $job;
+                }
+            }
+            while ($job = &$tempQ->dequeue()){
+                self::scheduleJob($job);
+            }
+        }
+        return $retVal;
     }
     /**
      * Returns the number of current month as integer.

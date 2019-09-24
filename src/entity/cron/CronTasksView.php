@@ -335,12 +335,18 @@ class CronTasksView {
             $tasksTable->addChild($cell);
         }
         else{
+            $pass = Cron::password();
             while ($job = $jobsQueue->dequeue()){
                 $row = new TableRow();
                 $row->setClassName('tasks-table-row');
                 $jobNameCell = new TableCell();
                 $jobNameCell->setClassName('tasks-table-cell');
-                $jobNameCell->addTextNode($job->getJobName());
+                if($pass != 'NO_PASSWORD'){
+                    $jobNameCell->addTextNode('<a href="'.WebFiori::getSiteConfig()->getBaseURL().'cron-jobs/job-details/'.$job->getJobName().'/'.$pass.'">'.$job->getJobName().'</a>',false);
+                }
+                else{
+                    $jobNameCell->addTextNode('<a href="'.WebFiori::getSiteConfig()->getBaseURL().'cron-jobs/job-details/'.$job->getJobName().'">'.$job->getJobName().'</a>',false);
+                }
                 $row->addChild($jobNameCell);
                 $exprCell = new TableCell();
                 $jobNameCell->setClassName('tasks-table-cell');

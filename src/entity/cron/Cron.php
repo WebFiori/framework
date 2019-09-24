@@ -539,6 +539,7 @@ class Cron {
                         die();
                     }
                     else{
+                        http_response_code(401);
                         die(''
                         . '<!DOCTYPE html>'
                         . '<html>'
@@ -556,6 +557,7 @@ class Cron {
                     }
                 }
                 else{
+                    http_response_code(401);
                     die(''
                     . '<!DOCTYPE html>'
                     . '<html>'
@@ -584,6 +586,63 @@ class Cron {
         Router::closure([
             'path'=>'/cron-jobs/list/{password}',
             'route-to'=>$viewJobsFunc
+        ]);
+        $viewJobFunc = function(){
+            if(Cron::password() != 'NO_PASSWORD'){
+                $password = isset($_GET['password']) ? filter_var($_GET['password']) : '';
+                if($password != ''){
+                    if($password == Cron::password()){
+                        new CronTaskView();
+                        die();
+                    }
+                    else{
+                        http_response_code(401);
+                        die(''
+                        . '<!DOCTYPE html>'
+                        . '<html>'
+                        . '<head>'
+                        . '<title>Not Authorized</title>'
+                        . '</head>'
+                        . '<body>'
+                        . '<h1>401 - Not Authorized</h1>'
+                        . '<hr>'
+                        . '<p>'
+                        . 'Invalid password.'
+                        . '</p>'
+                        . '</body>'
+                        . '</html>');
+                    }
+                }
+                else{
+                    http_response_code(401);
+                    die(''
+                    . '<!DOCTYPE html>'
+                    . '<html>'
+                    . '<head>'
+                    . '<title>Not Authorized</title>'
+                    . '</head>'
+                    . '<body>'
+                    . '<h1>401 - Not Authorized</h1>'
+                    . '<hr>'
+                    . '<p>'
+                    . 'Password is missing.'
+                    . '</p>'
+                    . '</body>'
+                    . '</html>');
+                }
+            }
+            else{
+                new CronTaskView();
+                die('');
+            }
+        };
+        Router::closure([
+            'path'=>'/cron-jobs/job-details/{job-name}/{password}',
+            'route-to'=>$viewJobFunc
+        ]);
+        Router::closure([
+            'path'=>'/cron-jobs/job-details/{job-name}',
+            'route-to'=>$viewJobFunc
         ]);
     }
     private function _setLogEnabled($bool){

@@ -90,8 +90,8 @@ class DBConnectionFactory {
      * <li><b>'pass'</b>: Database user's password.</li>
      * <li><b>'db-name'</b>: The name of the database (Schema name).</li>
      * </ul>
-     * @return array|DatabaseLink If the connection to the database was 
-     * established, the method will return an instance of 'DatabaseLink'. 
+     * @return array|MySQLLink If the connection to the database was 
+     * established, the method will return an instance of 'MySQLLink'. 
      * If something went wrong while attempting to connect, an associative 
      * array is returned which contains error details. The array has two 
      * indices: 
@@ -113,8 +113,15 @@ class DBConnectionFactory {
                     if(isset($connectionParams['pass'])){
                         if(isset($connectionParams['db-name'])){
                             $link = new MySQLLink($connectionParams['host'],$connectionParams['user'],$connectionParams['pass'],$connectionParams['port']);
-                            $link->setDB($connectionParams['db-name']);
-                            $retVal = $link;
+                            if($link->setDB($connectionParams['db-name'])){
+                                $retVal = $link;
+                            }
+                            else{
+                                $retVal = array(
+                                    'error-code'=>$link->getErrorCode(),
+                                    'error-message'=>$link->getErrorMessage()
+                                );
+                            }
                         }
                         else{
                             $retVal['error-code'] = self::MISSING_DB_NAME;

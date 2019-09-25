@@ -674,9 +674,8 @@ class SessionManager implements JsonI{
         $secure = isset($params['secure']) ? $params['secure'] : false;
         $httponly = isset($params['httponly']) ? $params['httponly'] : false;
         $path = isset($params['path']) ? $params['path'] : '/';
-        session_set_cookie_params(0, $path, $params['domain'], $secure, $httponly);
-        
         session_destroy();
+        session_set_cookie_params(0, $path, $params['domain'], $secure, $httponly);
         $this->sessionStatus = self::KILLED;
     }
     /**

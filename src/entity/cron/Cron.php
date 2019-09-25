@@ -865,16 +865,24 @@ class Cron {
     
     private function _logJobExecution($job,$forced=false){
         if($this->isLogEnabled){
-            $logFile = ROOT_DIR.'/logs/cron.txt';
-            $file = fopen($logFile, 'a+');
-            if(is_resource($file)){
-                if($forced){
-                    fwrite($file, 'Job \''.$job->getJobName().'\' was forced to executed at '.date(DATE_RFC1123).". Request source IP: ".Util::getClientIP()."\n");
+            $ds = DIRECTORY_SEPARATOR;
+            $logFile = ROOT_DIR.$ds.'logs'.$ds.'cron.txt';
+            if(Util::isDirectory(ROOT_DIR.$ds.'logs', true)){
+                if(!file_exists($logFile)){
+                    $file = fopen($logFile, 'w');
                 }
                 else{
-                    fwrite($file, 'Job \''.$job->getJobName().'\' automatically executed at '.date(DATE_RFC1123)."\n");
+                    $file = fopen($logFile, 'a+');
                 }
-                fclose($file);
+                if(is_resource($file)){
+                    if($forced){
+                        fwrite($file, 'Job \''.$job->getJobName().'\' was forced to executed at '.date(DATE_RFC1123).". Request source IP: ".Util::getClientIP()."\n");
+                    }
+                    else{
+                        fwrite($file, 'Job \''.$job->getJobName().'\' automatically executed at '.date(DATE_RFC1123)."\n");
+                    }
+                    fclose($file);
+                }
             }
         }
     }

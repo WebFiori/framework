@@ -130,8 +130,9 @@ class MySQLLink{
      * database host. Default is 3306.
      */
     public function __construct($host, $user, $password,$port=3306) {
-        //set_error_handler(errorHandeler('Connection to database was refused!'));
+        set_error_handler(function(){});
         $this->link = @mysqli_connect($host, $user, $password,null,$port);
+        restore_error_handler();
         $this->user = $user;
         $this->pass = $password;
         $this->host = $host;
@@ -190,7 +191,9 @@ class MySQLLink{
     public function isConnected(){
         $test = false;
         if($this->link instanceof mysqli){
+            set_error_handler(function(){});
             $this->link = @mysqli_connect($this->host, $this->user, $this->pass,null , $this->portNum);
+            restore_error_handler();
             if($this->link){
                 $test = true;
                 $this->link->set_charset("utf8");

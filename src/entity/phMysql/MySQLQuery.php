@@ -29,7 +29,7 @@ use phMysql\MySQLTable;
  * A base class that is used to construct MySQL queries. It can be used as a base 
  * class for constructing other MySQL queries.
  * @author Ibrahim
- * @version 1.8.8
+ * @version 1.8.9
  */
 abstract class MySQLQuery{
     /**
@@ -261,7 +261,7 @@ abstract class MySQLQuery{
                             $stm .= $col->getName().',';
                         }
                         if($col->isAutoInc()){
-                            $alterStm .= 'alter table '.$table->getName().' modify '.$col.' auto_increment;';
+                            $alterStm .= 'alter table '.$table->getName().' modify '.$col.' auto_increment;'.self::NL;
                         }
                         $index++;
                     }
@@ -366,7 +366,8 @@ abstract class MySQLQuery{
                 $this->addPrimaryKey($table);
                 $q = $this->getQuery();
                 if(strlen($q) != 0){
-                    $query .= $q.';'.self::NL;
+                    //no need to append ';\n' as it was added before.
+                    $query .= $q;
                 }
             }
             //add forign keys
@@ -489,6 +490,74 @@ abstract class MySQLQuery{
         ));
     }
     /**
+     * Constructs a select query which is used to count number of rows on a 
+     * table.
+     * @param array $options An associative array of options to customize the 
+     * select query. Available options are:
+     * <ul>
+     * <li><b>as</b>: A name for the column that will contain 
+     * count result. If not provided, the value 'count' is used as 
+     * default value.</li>
+     * <li><b>where</b>: An associative array. The indices can 
+     * be values and the value at each index is an objects of type 'Column'. 
+     * Or the indices can be column indices or columns names taken from MySQLTable object and 
+     * the values are set for each index. The second way is recommended as one 
+     * table might have two columns with the same values.</li>
+     * <li><b>conditions</b>: An array that can contains conditions (=, !=, &lt;, 
+     * &lt;=, &gt; or &gt;=). If anything else is given at specific index, '=' will be used. In 
+     * addition, If not provided or has invalid value, an array of '=' conditions 
+     * is used.</li>
+     * <li><b>join-operators</b>: An array that contains a set of MySQL join operators 
+     * like 'and' and 'or'. If not provided or has invalid value, 
+     * an array of 'and's will be used.</li>
+     * </ul>
+     * @since 1.8.9
+     */
+    public function selectCount($options=[]) {
+        $asPart = ' as count';
+        $where = '';
+        if(gettype($options) == 'array'){
+            if(isset($options['as'])){
+                $trimmedAs = trim($options['as']);
+                if(strlen($trimmedAs) != 0){
+                    $asPart = ' as '. str_replace(' ', '_', $trimmedAs);
+                }
+            }
+            $options['join-operators'] = isset($options['join-operators']) && 
+                    gettype($options['join-operators']) == 'array' ? $options['join-operators'] : [];
+            $options['conditions'] = isset($options['conditions']) && 
+                    gettype($options['conditions']) == 'array' ? $options['conditions'] : [];
+            if(isset($options['where']) && isset($options['conditions'])){
+                $cols = [];
+                $vals = [];
+                foreach($options['where'] as $valOrColIndex => $colOrVal){
+                    if($colOrVal instanceof Column){
+                        $cols[] = $colOrVal;
+                        $vals[] = $valOrColIndex;
+                    }
+                    else{
+                        if(gettype($valOrColIndex) == 'integer'){
+                            $testCol = $this->getStructure()->getColByIndex($valOrColIndex);
+                        }
+                        else{
+                            $testCol = $this->getStructure()->getCol($valOrColIndex);
+                        }
+                        $cols[] = $testCol;
+                        $vals[] = $colOrVal;
+                    }
+                }
+                $where = $this->createWhereConditions($cols, $vals, $options['conditions'], $options['join-operators']);
+            }
+            else{
+                $where = '';
+            }
+            if(trim($where) == 'where'){
+                $where = '';
+            }
+        }
+        $this->setQuery('select count(*)'.$asPart.' from '.$this->getStructureName().$where.';', 'select');
+    }
+    /**
      * Constructs a 'select' query.
      * @param array $selectOptions An associative array which contains 
      * options to construct different select queries. The available options are: 
@@ -504,8 +573,8 @@ abstract class MySQLQuery{
      * the values are set for each index. The second way is recommended as one 
      * table might have two columns with the same values.</li>
      * <li><b>where</b>: Similar to 'condition-cols-and-vals'.</li>
-     * <li><b>conditions</b>: An array that can contains two possible values: 
-     * '=' or '!='. If anything else is given at specific index, '=' will be used. In 
+     * <li><b>conditions</b>: An array that can contains conditions (=, !=, &lt;, 
+     * &lt;=, &gt; or &gt;=). If anything else is given at specific index, '=' will be used. In 
      * addition, If not provided or has invalid value, an array of '=' conditions 
      * is used.</li>
      * <li><b>join-operators</b>: An array that contains a set of MySQL join operators 
@@ -1211,7 +1280,7 @@ abstract class MySQLQuery{
             }
             $index++;
         }
-        return $where;
+        return ' '.trim($where);
     }
     
     /**

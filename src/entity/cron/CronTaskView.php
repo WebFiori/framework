@@ -117,10 +117,25 @@ class CronTaskView {
             $forceNode->addTextNode('<button name="input-element" onclick="execJob(this,\''.$job->getJobName().'\')" class="force-execution-button">Force Execution</button>', false);
             Page::insert($forceNode);
             $this->_createCustomParamsContainer();
+            $custAttrsNames = $job->getExecutionAttributes();
+            $custAtrrsAsJsonArr = '[';
+            for($x = 0 ; $x < count($custAttrsNames) ; $x++){
+                if($x == 0){
+                    $custAtrrsAsJsonArr .= '"'.$custAttrsNames[$x].'"';
+                }
+                else{
+                    $custAtrrsAsJsonArr .= ',"'.$custAttrsNames[$x].'"';
+                }
+            }
+            $custAtrrsAsJsonArr .= ']';
             $jsCode = new JsCode();
             $jsCode->addCode(''
                     . 'window.onload = function(){'."\n"
                     . '     window.customAttrs = [];'."\n"
+                    . '     window.custAttrsNames = '.$custAtrrsAsJsonArr.';'
+                    . '     for(var x = 0 ; x < window.custAttrsNames.length ; x++){'."\n"
+                    . '         addAttribute(window.custAttrsNames[x]);'."\n"
+                    . '     }'."\n"
                     . '     window.isRefresh = '.$isRefresh.';'."\n"
                     . '     window.intervalId = window.setInterval(function(){'."\n"
                     . '         if(window.isRefresh){'."\n"
@@ -143,7 +158,7 @@ class CronTaskView {
                     . '        }'."\n"
                     . '    }'."\n"
                     . '}'."\n"
-                    . 'function addAttribute(){'."\n"
+                    . 'function addAttribute(name=undefined){'."\n"
                     . '    var attrsCount = 0;'."\n"
                     . '    for(var x = 0 ; x < window.customAttrs.length ; x++){'."\n"
                     . '        if(window.customAttrs[x].use === true){'."\n"
@@ -160,7 +175,12 @@ class CronTaskView {
                     . '        attrsTable.removeChild(window.noAttrsNode);'."\n"
                     . '    }'."\n"
                     . '    var inputsIndex = window.customAttrs.length;'."\n"
-                    . '    var attrNameInput = "<input type=\'text\'  oninput=\'attributeNameChanged(this,"+inputsIndex+")\'>";'."\n"
+                    . '    if(name !== undefined){'."\n"
+                    . '        var attrNameInput = "<input type=\'text\' value=\'"+name+"\' oninput=\'attributeNameChanged(this,"+inputsIndex+")\'>";'."\n"
+                    . '    }'
+                    . '    else{'."\n"
+                    . '        var attrNameInput = "<input type=\'text\'  oninput=\'attributeNameChanged(this,"+inputsIndex+")\'>";'."\n"
+                    . '    }'."\n"
                     . '    var attrValInput = "<input type=\'text\'  oninput=\'attributeValueChanged(this,"+inputsIndex+")\'>";'."\n"
                     . '    var newRow = document.createElement("tr");'."\n"
                     . '    newRow.id = "attribute-"+window.customAttrs.length+"-row";'."\n"
@@ -342,9 +362,36 @@ class CronTaskView {
             'margin-top'=>'30px'
         ));
         $headerRow = new TableRow();
-        $headerRow->addCell(' Attribute Name ', 'th');
-        $headerRow->addCell(' Attribute Value ', 'th');
-        $headerRow->addCell('Remove', 'th');
+        $headerRow->setStyle([
+            'border-bottom'=>'double',
+            'background-color'=>'rgba(66,234,88,0.3)',
+            'font-weight'=>'bold'
+        ]);
+        $headerRow->setClassName('tasks-table-header-row');
+        $nameCell = new TableCell();
+        $nameCell->setClassName('tasks-table-header-cell');
+        $nameCell->setStyle([
+            'padding'=>'10px'
+        ]);
+        $nameCell->addTextNode('Attribute Name');
+        $headerRow->addChild($nameCell);
+        
+        $valueCell = new TableCell();
+        $valueCell->setClassName('tasks-table-header-cell');
+        $valueCell->setStyle([
+            'padding'=>'10px'
+        ]);
+        $valueCell->addTextNode('Attribute Value');
+        $headerRow->addChild($valueCell);
+        
+        $removeCell = new TableCell();
+        $removeCell->setClassName('tasks-table-header-cell');
+        $removeCell->setStyle([
+            'padding'=>'10px'
+        ]);
+        $removeCell->addTextNode('Remove');
+        $headerRow->addChild($removeCell);
+        
         $table->addChild($headerRow);
         $noDataRow = new TableRow();
         $noDataRow->setID('no-attributes-row');

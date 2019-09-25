@@ -85,6 +85,13 @@ class CronJob {
      */
     private $jobDetails;
     /**
+     * An array that contains custom attributes which can be provided on 
+     * job execution.
+     * @var array 
+     * @since 1.0.5
+     */
+    private $customAttrs;
+    /**
      * An array which contains the events that will be executed if it is the time 
      * to execute the job.
      * @var array
@@ -120,6 +127,7 @@ class CronJob {
      */
     public function __construct($when='* * * * *') {
         $this->jobName = 'CRON-JOB';
+        $this->customAttrs = [];
         $this->isSuccess = false;
         $this->jobDetails = array(
             'minutes'=>array(),
@@ -146,6 +154,28 @@ class CronJob {
         else{
             $this->cron();
         }
+    }
+    /**
+     * Adds new execution attribute.
+     * The attribute can be supplied to the job in case of forced execution. This 
+     * method is used to prevent any typo in case of entering attribute name 
+     * in force execution view.
+     * @param string $name The name of the attribute.
+     * @since 1.0.5
+     */
+    public function addExecutionAttribute($name) {
+        $trimmed = trim($name);
+        if(strlen($trimmed) > 0 && !in_array($trimmed, $this->customAttrs)){
+            $this->customAttrs[] = $trimmed;
+        }
+    }
+    /**
+     * Returns an array that contains the names of custom execution attributes.
+     * @return array An array that contains the names of custom execution attributes.
+     * @since 1.0.5
+     */
+    public function getExecutionAttributes() {
+        return $this->customAttrs;
     }
     /**
      * Returns true if the job was executed successfully.

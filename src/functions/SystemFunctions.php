@@ -77,8 +77,8 @@ class SystemFunctions extends Functions{
      */
     const INITIAL_CONFIG_VARS = array(
         'is-config'=>'false',
-        'release-date'=>'2019-09-15',
-        'version'=>'1.0.3',
+        'release-date'=>'2019-09-26',
+        'version'=>'1.0.4',
         'version-type'=>'Stable',
         'config-file-version'=>'1.3.4',
         'databases'=>array()

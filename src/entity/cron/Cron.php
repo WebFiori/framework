@@ -216,6 +216,8 @@ class Cron {
                         if($password == Cron::password()){
                             $totalJobs = Cron::jobsQueue()->size();
                             $executedJobsCount = 0;
+                            $successExeJobsCount = 0;
+                            $failExeJobsCount = 0;
                             while ($job = Cron::jobsQueue()->dequeue()){
                                 if($job->isTime()){
                                     $this->_setActiveJob($job);
@@ -223,6 +225,12 @@ class Cron {
                                 if($job->execute()){
                                     $this->_logJobExecution($job);
                                     $executedJobsCount++;
+                                }
+                                if($job->isSuccess()){
+                                    $successExeJobsCount++;
+                                }
+                                else{
+                                    $failExeJobsCount++;
                                 }
                                 $this->_setActiveJob(null);
                             }
@@ -241,6 +249,12 @@ class Cron {
                             . '</p>'
                             . '<p>'
                             . 'Number of jobs executed: '.$executedJobsCount
+                            . '</p>'
+                            . '<p>'
+                            . 'Number of successfully finished jobs: '.$successExeJobsCount
+                            . '</p>'
+                            . '<p>'
+                            . 'Number of failed jobs: '.$failExeJobsCount
                             . '</p>'
                             . '</body>'
                             . '</html>');
@@ -282,6 +296,8 @@ class Cron {
                 else{
                     $totalJobs = Cron::jobsQueue()->size();
                     $executedJobsCount = 0;
+                    $successExeJobsCount = 0;
+                    $failExeJobsCount = 0;
                     while ($job = Cron::jobsQueue()->dequeue()){
                         if($job->isTime()){
                             $this->_setActiveJob($job);
@@ -289,6 +305,12 @@ class Cron {
                         if($job->execute()){
                             $this->_logJobExecution($job);
                             $executedJobsCount++;
+                        }
+                        if($job->isSuccess()){
+                            $successExeJobsCount++;
+                        }
+                        else{
+                            $failExeJobsCount++;
                         }
                         $this->_setActiveJob(null);
                     }
@@ -307,6 +329,12 @@ class Cron {
                     . '</p>'
                     . '<p>'
                     . 'Number of jobs executed: '.$executedJobsCount
+                    . '</p>'
+                    . '<p>'
+                    . 'Number of successfully finished jobs: '.$successExeJobsCount
+                    . '</p>'
+                    . '<p>'
+                    . 'Number of failed jobs: '.$failExeJobsCount
                     . '</p>'
                     . '</body>'
                     . '</html>');
@@ -351,26 +379,43 @@ class Cron {
                             if($jobName != null){
                                 while ($job = Cron::jobsQueue()->dequeue()){
                                     if($job->getJobName() == $jobName){
-                                        if($job->isTime()){
-                                            $this->_setActiveJob($job);
-                                        }
+                                        $this->_setActiveJob($job);
                                         $job->execute(true);
                                         $this->_logJobExecution($job,true);
-                                        http_response_code(200);
-                                        die(''
-                                        . '<!DOCTYPE html>'
-                                        . '<html>'
-                                        . '<head>'
-                                        . '<title>Job Executed</title>'
-                                        . '</head>'
-                                        . '<body>'
-                                        . '<h1>200 - Ok</h1>'
-                                        . '<hr>'
-                                        . '<p>'
-                                        . 'The given job was forced to execute.'
-                                        . '</p>'
-                                        . '</body>'
-                                        . '</html>');
+                                        if($job->isSuccess()){
+                                            http_response_code(200);
+                                            die(''
+                                            . '<!DOCTYPE html>'
+                                            . '<html>'
+                                            . '<head>'
+                                            . '<title>Job Executed</title>'
+                                            . '</head>'
+                                            . '<body>'
+                                            . '<h1>200 - Ok</h1>'
+                                            . '<hr>'
+                                            . '<p>'
+                                            . 'The given job was forced to execute and successfully completed.'
+                                            . '</p>'
+                                            . '</body>'
+                                            . '</html>');
+                                        }
+                                        else{
+                                            http_response_code(500);
+                                            die(''
+                                            . '<!DOCTYPE html>'
+                                            . '<html>'
+                                            . '<head>'
+                                            . '<title>Job Executed</title>'
+                                            . '</head>'
+                                            . '<body>'
+                                            . '<h1>500 - Server Error</h1>'
+                                            . '<hr>'
+                                            . '<p>'
+                                            . 'The given job was forced to execute but did not complete successfuly.'
+                                            . '</p>'
+                                            . '</body>'
+                                            . '</html>');
+                                        }
                                     }
                                 }
                                 http_response_code(404);
@@ -446,26 +491,43 @@ class Cron {
                     if($jobName != null){
                         while ($job = Cron::jobsQueue()->dequeue()){
                             if($job->getJobName() == $jobName){
-                                if($job->isTime()){
-                                    $this->_setActiveJob($job);
-                                }
+                                $this->_setActiveJob($job);
                                 $job->execute(true);
                                 $this->_logJobExecution($job,true);
-                                http_response_code(200);
-                                die(''
-                                . '<!DOCTYPE html>'
-                                . '<html>'
-                                . '<head>'
-                                . '<title>Job Executed</title>'
-                                . '</head>'
-                                . '<body>'
-                                . '<h1>200 - Ok</h1>'
-                                . '<hr>'
-                                . '<p>'
-                                . 'The given job was forced to execute.'
-                                . '</p>'
-                                . '</body>'
-                                . '</html>');
+                                if($job->isSuccess()){
+                                    http_response_code(200);
+                                    die(''
+                                    . '<!DOCTYPE html>'
+                                    . '<html>'
+                                    . '<head>'
+                                    . '<title>Job Executed</title>'
+                                    . '</head>'
+                                    . '<body>'
+                                    . '<h1>200 - Ok</h1>'
+                                    . '<hr>'
+                                    . '<p>'
+                                    . 'The given job was forced to execute and successfully completed.'
+                                    . '</p>'
+                                    . '</body>'
+                                    . '</html>');
+                                }
+                                else{
+                                    http_response_code(500);
+                                    die(''
+                                    . '<!DOCTYPE html>'
+                                    . '<html>'
+                                    . '<head>'
+                                    . '<title>Job Executed</title>'
+                                    . '</head>'
+                                    . '<body>'
+                                    . '<h1>500 - Server Error</h1>'
+                                    . '<hr>'
+                                    . '<p>'
+                                    . 'The given job was forced to execute but did not complete successfuly.'
+                                    . '</p>'
+                                    . '</body>'
+                                    . '</html>');
+                                }
                             }
                         }
                         http_response_code(404);
@@ -877,9 +939,21 @@ class Cron {
                 if(is_resource($file)){
                     if($forced){
                         fwrite($file, 'Job \''.$job->getJobName().'\' was forced to executed at '.date(DATE_RFC1123).". Request source IP: ".Util::getClientIP()."\n");
+                        if($job->isSuccess()){
+                            fwrite($file, 'Execution status: Successfully completed.'."\n");
+                        }
+                        else{
+                            fwrite($file, 'Execution status: Failed to completed.'."\n");
+                        }
                     }
                     else{
                         fwrite($file, 'Job \''.$job->getJobName().'\' automatically executed at '.date(DATE_RFC1123)."\n");
+                        if($job->isSuccess()){
+                            fwrite($file, 'Execution status: Successfully completed.'."\n");
+                        }
+                        else{
+                            fwrite($file, 'Execution status: Failed to completed.'."\n");
+                        }
                     }
                     fclose($file);
                 }

@@ -515,11 +515,11 @@ class Page{
     */
     public function usingLanguage(){
         if($this->getLang() != null){
-            if($this->getLanguage() === null){
+            //if($this->getLanguage() === null){
                 Language::loadTranslation($this->getLang());
                 $pageLang = $this->getLanguage();
                 $this->setWritingDir($pageLang->getWritingDir());
-            }
+            //}
         }
         else{
             throw new Exception('Unable to load transulation. Page language is not set.');

@@ -643,8 +643,9 @@ class Util{
             $secureHost = '';
         }
         $protocol = 'http://';
-        if(strlen($secureHost) != 0){
-            $protocol = 'https://';
+        $useHttp = defined('USE_HTTP') && USE_HTTP === true;
+        if((strlen($secureHost) != 0 && !$useHttp)){
+            $protocol = "https://";
         }
         $docRoot = filter_var($_SERVER['DOCUMENT_ROOT']);
         $len = strlen($docRoot);
@@ -667,7 +668,8 @@ class Util{
             $secureHost = '';
         }
         $protocol = "http://";
-        if(strlen($secureHost) != 0){
+        $useHttp = defined('USE_HTTP') && USE_HTTP === true;
+        if(strlen($secureHost) != 0 && !$useHttp){
             $protocol = "https://";
         }
         $server = filter_var(getenv('HTTP_HOST'));

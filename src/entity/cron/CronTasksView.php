@@ -70,6 +70,11 @@ class CronTasksView {
      */
     private $pageUrl;
     /**
+     * A top container that contains all task related controls.
+     * @var HTMLNode 
+     */
+    private $controlsContainer;
+    /**
      * Creates new instance of the view.
      */
     public function __construct() {
@@ -79,15 +84,26 @@ class CronTasksView {
         }
         Page::title('Scheduled CRON Tasks');
         Page::description('A list of available CRON jobs.');
+        $defaltSiteLang = WebFiori::getSiteConfig()->getPrimaryLanguage();
+        $siteNames = WebFiori::getSiteConfig()->getWebsiteNames();
+        $siteName = isset($siteNames[$defaltSiteLang]) ? $siteNames[$defaltSiteLang] : null;
+        if($siteName !== null){
+            Page::siteName($siteName);
+        }
+        $this->controlsContainer = new HTMLNode();
+        $this->controlsContainer->setWritingDir('ltr');
+        $this->controlsContainer->setStyle([
+            'direction'=>'ltr'
+        ]);
         $tasksCount = Cron::jobsQueue()->size();
         $h1 = new HTMLNode('h1');
         $h1->addTextNode('Scheduled CRON Tasks');
-        Page::insert($h1);
+        $this->controlsContainer->addChild($h1);
         $hr = new HTMLNode('hr',false);
-        Page::insert($hr);
+        $this->controlsContainer->addChild($hr);
         $parag = new PNode();
         $parag->addText('<b>Total Scheduled Tasks:</b> '.$tasksCount.'.', array('esc-entities'=>false));
-        Page::insert($parag);
+        $this->controlsContainer->addChild($parag);
         $this->_createRefreshControls();
         $this->_createThemeControls();
         $this->_createTasksTable();
@@ -175,6 +191,7 @@ class CronTasksView {
                 . '};'."\n"
                 . '');
         Page::document()->getHeadNode()->addChild($jsCode);
+        Page::insert($this->controlsContainer);
         Page::render();
     }
     /**
@@ -189,7 +206,7 @@ class CronTasksView {
         $h->addTextNode('Jobs Execution Log:');
         $sec->addChild($h);
         $sec->addChild($pre);
-        Page::insert($sec);
+        $this->controlsContainer->addChild($sec);
         if(file_exists(ROOT_DIR.DIRECTORY_SEPARATOR.'logs'.DIRECTORY_SEPARATOR.'cron.txt')){
             $file = new File('cron.txt', ROOT_DIR.DIRECTORY_SEPARATOR.'logs');
             $file->read();
@@ -237,6 +254,9 @@ class CronTasksView {
         }
         $form->addChild($themeCheckBox);
         $label = new Label('Use Website Theme to Display This Page.');
+        $label->setStyle([
+            'display'=>'inline-block'
+        ]);
         $label->setAttribute('for', 'theme-checkbox');
         $label->setID('change-theme-label');
         $form->addChild($label);
@@ -271,7 +291,7 @@ class CronTasksView {
             $themeCheckBox->setAttribute('onclick', $onclick);
         }
         
-        Page::insert($form);
+        $this->controlsContainer->addChild($form);
     }
     /**
      * Creates a form which contains the controls that allow the user to 
@@ -289,10 +309,13 @@ class CronTasksView {
         }
         $form->addChild($refreshCheckBox);
         $label = new Label('Refresh The Page Every 1 Minute.');
+        $label->setStyle([
+            'display'=>'inline-block'
+        ]);
         $label->setAttribute('for', 'refresh-checkbox');
         $label->setID('refresh-label');
         $form->addChild($label);
-        Page::insert($form);
+        $this->controlsContainer->addChild($form);
     }
     /**
      * Creates the table that is used to display cron jobs information.
@@ -300,7 +323,7 @@ class CronTasksView {
     private function _createTasksTable() {
         $tasksTable = new HTMLNode('table');
         $tasksTable->setID('tasks-table');
-        Page::insert($tasksTable);
+        $this->controlsContainer->addChild($tasksTable);
         $tasksTable->setAttribute('border', 1);
         $tasksTable->setStyle(array(
             'border-collapse'=>'collapse',

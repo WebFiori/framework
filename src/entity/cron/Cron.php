@@ -848,7 +848,9 @@ class Cron {
     }
     /**
      * Sets or gets the password that is used to protect the cron instance.
-     * The password is used to prevent unauthorized access to execute jobs.
+     * The password is used to prevent unauthorized access to execute jobs. 
+     * The provided password must be 'sha256' hashed string. It is recommended 
+     * to hash the password externally then use the hash inside your code.
      * @param string $pass If not null, the password will be updated to the 
      * given one.
      * @return string If the password is set, the method will return it. 
@@ -923,6 +925,40 @@ class Cron {
         if(gettype($pass) == 'string'){
             $this->accessPass = $pass;
         }
+    }
+    /**
+     * 
+     * @param type $pass
+     */
+    public function run($pass='') {
+        if(Cron::password() != 'NO_PASSWORD'){
+            if(hash('sha256',$pass) != Cron::password()){
+                return 'INV_PASS';
+            }
+        }
+        $retVal = [
+            'totlal-jobs'=>Cron::jobsQueue()->size(),
+            'executed-count'=>0,
+            'successfuly-completed'=>[],
+            'failed'=>[]
+        ];
+        while ($job = Cron::jobsQueue()->dequeue()){
+            if($job->isTime()){
+                $this->_setActiveJob($job);
+            }
+            if($job->execute()){
+                $this->_logJobExecution($job);
+                $retVal['executed-count']++;
+            }
+            if($job->isSuccess()){
+                $retVal['successfuly-completed'] = $job->getJobName();
+            }
+            else{
+                $retVal['failed'] = $job->getJobName();
+            }
+            $this->_setActiveJob(null);
+        }
+        return $retVal;
     }
     
     private function _logJobExecution($job,$forced=false){

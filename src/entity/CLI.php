@@ -35,7 +35,8 @@ use webfiori\entity\Access;
 use webfiori\entity\cron\CronJob;
 use webfiori\entity\cron\Cron;
 /**
- * Description of CLIInterface
+ * A class which adds basic support for running the framework through 
+ * command line interface (CLI).
  *
  * @author Ibrahim
  */
@@ -58,9 +59,9 @@ class CLI {
         self::printCommandInfo('--hello', "Show 'Hello world!' Message.");
         self::printCommandInfo('--route <url>', "Test the result of a route.");
         self::printCommandInfo('--view-conf', "Display system configuration settings.");
-        self::printCommandInfo('--view-cron-jobs <cron-pass>', "Display a list of cron jobs. If cron password is set, it must be provided.");
-        self::printCommandInfo('--run-cron-jobs <cron-pass>', "Execute a command to check all jobs and execute them if its time to run the job.");
-        self::printCommandInfo('--view-privileges', "Display all created privileges groups and all privileges inside each group.");
+        self::printCommandInfo('--list-cron-jobs <cron-pass>', "Display a list of cron jobs. If cron password is set, it must be provided.");
+        self::printCommandInfo('--check-cron <cron-pass>', "Execute a command to check all jobs and execute them if its time to run the job.");
+        //self::printCommandInfo('--view-privileges', "Display all created privileges groups and all privileges inside each group.");
         self::printCommandInfo('--list-routes', "Display all available routes.");
         self::printCommandInfo('--list-themes', "Display a list of available themes.");
         exit(0);
@@ -177,23 +178,27 @@ class CLI {
             else if($commands[1] == "--h" || $commands[1] == "--help"){
                 self::showHelp();
             }
-            else if($commands[1] == '--show-routes'){
+            else if($commands[1] == '--list-routes'){
                 self::displayRoutes();
             }
-            else if($commands[1] == '--view-themes'){
+            else if($commands[1] == '--list-themes'){
                 self::viewThmes();
             }
             else if($commands[1] == '--view-conf'){
                 self::showConfig();
             }
-            else if($commands[1] == '--view-cron-jobs'){
+            else if($commands[1] == '--check-cron'){
+                $cPass = isset($commands[2]) ? $commands[2] : null;
+                self::checkCron($cPass);
+            }
+            else if($commands[1] == '--list-cron-jobs'){
                 $pass = Cron::password();
                 if($pass == 'NO_PASSWORD'){
                     self::listCron();
                 }
                 else{
                     $cPass = isset($commands[2]) ? $commands[2] : null;
-                    if($cPass == $pass){
+                    if(hash('sha256',$cPass) == $pass){
                         self::listCron();
                     }
                     else if($cPass === null){
@@ -205,18 +210,39 @@ class CLI {
                 }
             }
             else{
-                fprintf(STDERR,"Error: The command '".$commands[0]."' is not supported or not implemented.");
+                fprintf(STDERR,"Error: The command '".$commands[1]."' is not supported or not implemented.");
             }
             //exit(0);
         }
     }
     private static function checkCron($pass=''){
-        $cronPass = Cron::password();
-        if($pass == 'NO_PASSWORD'){
-            
+        $result = Cron::run($pass);
+        if($result == 'INV_PASS'){
+            fprintf(STDERR,"Error: Provided password is incorrect.");
         }
         else{
-            
+            fprintf(STDOUT,"Total number of jobs: ".$result['total-jobs']."\n");
+            fprintf(STDOUT,"Executed Jobs: ".$result['executed-count']."\n");
+            fprintf(STDOUT,"Successfully finished jobs:\n");
+            $sJobs = $result['successfuly-completed'];
+            if(count($sJobs) == 0){
+                fprintf(STDOUT,"    <NONE>\n");
+            }
+            else{
+                foreach ($sJobs as $jobName){
+                    fprintf(STDOUT,"    ".$jobName."\n");
+                }
+            }
+            fprintf(STDOUT,"Failed jobs:\n");
+            $fJobs = $result['failed'];
+            if(count($fJobs) == 0){
+                fprintf(STDOUT,"    <NONE>\n");
+            }
+            else{
+                foreach ($fJobs as $jobName){
+                    fprintf(STDOUT,"    ".$jobName."\n");
+                }
+            }
         }
     }
     /**

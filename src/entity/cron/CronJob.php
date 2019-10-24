@@ -1062,10 +1062,20 @@ class CronJob {
     public function execute($force=false){
         $retVal = false;
         if($force === true || $this->isTime()){
-            $isSuccess = call_user_func($this->events['on']['func'], $this->events['on']['params']);
-            $this->isSuccess = $isSuccess === true || $isSuccess === null;
+            try{
+                $isSuccess = call_user_func($this->events['on']['func'], $this->events['on']['params']);
+                $this->isSuccess = $isSuccess === true || $isSuccess === null;
+            } 
+            catch (Exception $ex) {
+                $this->isSuccess = false;
+            }
             if(!$this->isSuccess()){
-                call_user_func($this->events['on-failure']['func'], $this->events['on']['params']);
+                try{
+                    call_user_func($this->events['on-failure']['func'], $this->events['on']['params']);
+                } 
+                catch (Exception $ex) {
+                    
+                }
             }
             $retVal = true;
         }

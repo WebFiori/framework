@@ -32,6 +32,7 @@ use webfiori\WebFiori;
 use webfiori\entity\router\Router;
 use webfiori\entity\Theme;
 use webfiori\entity\Access;
+use webfiori\entity\cron\CronJob;
 use webfiori\entity\cron\Cron;
 /**
  * Description of CLIInterface
@@ -58,9 +59,10 @@ class CLI {
         self::printCommandInfo('--route <url>', "Test the result of a route.");
         self::printCommandInfo('--view-conf', "Display system configuration settings.");
         self::printCommandInfo('--view-cron-jobs <cron-pass>', "Display a list of cron jobs. If cron password is set, it must be provided.");
+        self::printCommandInfo('--run-cron-jobs <cron-pass>', "Execute a command to check all jobs and execute them if its time to run the job.");
         self::printCommandInfo('--view-privileges', "Display all created privileges groups and all privileges inside each group.");
-        self::printCommandInfo('--view-routes', "Display all available routes.");
-        self::printCommandInfo('--view-themes', "Display a list of available themes.");
+        self::printCommandInfo('--list-routes', "Display all available routes.");
+        self::printCommandInfo('--list-themes', "Display a list of available themes.");
         exit(0);
     }
     /**
@@ -208,6 +210,15 @@ class CLI {
             //exit(0);
         }
     }
+    private static function checkCron($pass=''){
+        $cronPass = Cron::password();
+        if($pass == 'NO_PASSWORD'){
+            
+        }
+        else{
+            
+        }
+    }
     /**
      * 
      */
@@ -227,7 +238,7 @@ class CLI {
             $i++;
         }
     }
-
+    
     /**
      * 
      */

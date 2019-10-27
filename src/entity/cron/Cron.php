@@ -24,6 +24,7 @@
  */
 namespace webfiori\entity\cron;
 use phpStructs\Queue;
+use webfiori\WebFiori;
 use webfiori\entity\router\Router;
 use webfiori\entity\Util;
 if(!defined('ROOT_DIR')){
@@ -215,10 +216,20 @@ class Cron {
             'route-to'=>'/entity/cron/CronAPIs.php',
             'as-api'=>true
         ]);
+        Router::other([
+            'path'=>'/cron',
+            'route-to'=>'/entity/cron/CronLoginView.php'
+        ]);
         Router::closure([
             'path'=>'/cron/jobs',
             'route-to'=>function(){
                 new CronTasksView();
+            }
+        ]);
+        Router::closure([
+            'path'=>'/cron/jobs/{job-name}',
+            'route-to'=>function(){
+                new CronTaskView();
             }
         ]);
     }
@@ -468,7 +479,7 @@ class Cron {
      * @since 1.0.6
      */
     public static function run($pass='',$jobName=null,$force=false) {
-        if(Cron::password() != 'NO_PASSWORD'){
+        if(Cron::password() != 'NO_PASSWORD' && WebFiori::getWebsiteFunctions()->getSessionVar('cron-login-status') !== true){
             if(hash('sha256',$pass) != Cron::password()){
                 return 'INV_PASS';
             }
@@ -487,7 +498,7 @@ class Cron {
                     self::_get()->_setActiveJob($job);
                 }
                 if($job->execute($xForce)){
-                    self::_get()->_logJobExecution($job);
+                    self::_get()->_logJobExecution($job,$xForce);
                     $retVal['executed-count']++;
                     if($job->isSuccess() === true){
                         $retVal['successfuly-completed'][] = $job->getJobName();
@@ -508,7 +519,7 @@ class Cron {
                     self::_get()->_setActiveJob($job);
                 }
                 if($job->execute()){
-                    self::_get()->_logJobExecution($job);
+                    self::_get()->_logJobExecution($job,$xForce);
                     $retVal['executed-count']++;
                     if($job->isSuccess() === true){
                         $retVal['successfuly-completed'][] = $job->getJobName();

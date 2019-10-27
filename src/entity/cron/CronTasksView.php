@@ -78,9 +78,8 @@ class CronTasksView {
      * Creates new instance of the view.
      */
     public function __construct() {
-        $useTheme = isset($_GET['use-theme']) && $_GET['use-theme'] == 'yes' ? true : false;
-        if($useTheme){
-            Page::theme(WebFiori::getSiteConfig()->getBaseThemeName());    
+        if(WebFiori::getWebsiteFunctions()->getSessionVar('cron-login-status') !== true){
+            header('location: '.WebFiori::getSiteConfig()->getBaseURL().'cron/login');
         }
         Page::title('Scheduled CRON Tasks');
         Page::description('A list of available CRON jobs.');
@@ -101,52 +100,29 @@ class CronTasksView {
         $this->controlsContainer->addChild($h1);
         $hr = new HTMLNode('hr',false);
         $this->controlsContainer->addChild($hr);
+        if(Cron::password() != 'NO_PASSWORD'){
+            $this->controlsContainer->addTextNode('<button onclick="logout()"><b>Logout</b></button>', false);
+        }
         $parag = new PNode();
         $parag->addText('<b>Total Scheduled Tasks:</b> '.$tasksCount.'.', array('esc-entities'=>false));
         $this->controlsContainer->addChild($parag);
         $this->_createRefreshControls();
-        $this->_createThemeControls();
         $this->_createTasksTable();
         $this->_displayExecLog();
         $jsCode = new JsCode();
         $isRefresh = 'false';
-        
-        if(isset($_GET['use-theme']) && 
-          $_GET['use-theme'] == 'yes' && 
-            isset($_GET['refresh']) && 
-            $_GET['refresh'] == 'yes'){
-            $params = '?use-theme=yes&refresh=yes';
-            $isRefresh = 'true';
-        }
-        else if(isset($_GET['use-theme']) && 
-          $_GET['use-theme'] == 'yes'){
-            $params = '?use-theme=yes&refresh=yes';
-        }
-        else{
-            $params = '?refresh=yes';
-        }
         if(isset($_GET['refresh'])){
-            $refStr = 'window.location.reload(true);';
             $isRefresh = 'true';
-        }
-        else{
-            $refStr = 'window.location.href = \''.$this->_getPageURL().$params.'\'';
-        }
-        $password = Cron::password();
-        if($password != 'NO_PASSWORD'){
-            $forceUrl = WebFiori::getSiteConfig()->getBaseURL().'cron-jobs/execute/'.$password.'/force/';
-        }
-        else{
-            $forceUrl = WebFiori::getSiteConfig()->getBaseURL().'cron-jobs/execute/force/';
         }
         $jsCode->addCode(''
                 . 'window.onload = function(){'."\n"
                 . '     window.isRefresh = '.$isRefresh.';'."\n"
+                . "     "
                 . '     window.intervalId = window.setInterval(function(){'."\n"
                 . '         if(window.isRefresh){'."\n"
                 . '             disableOrEnableInputs();'."\n"
                 . '             document.getElementById(\'refresh-label\').innerHTML = \'<b>Refreshing...</b>\';'."\n"
-                . '             '.$refStr.';'."\n"
+                . '             window.location.href = \'cron/jobs?refresh=yes\';'."\n"
                 . '         }'."\n"
                 . '     },60000)'."\n"
                 . ' };'."\n"
@@ -169,7 +145,7 @@ class CronTasksView {
                 . '     disableOrEnableInputs();'
                 . '     source.innerHTML = \'Executing Job...\';'."\n"
                 . '     var xhr = new XMLHttpRequest();'."\n"
-                . '     xhr.open(\'get\',\''.$forceUrl.'\'+encodeURIComponent(jobName));'."\n"
+                . '     xhr.open(\'post\',\'cron/apis/force-execution\');'."\n"
                 . '     xhr.onreadystatechange = function(){'."\n"
                 . '         if(this.readyState === 4 && this.status === 200){'."\n"
                 . '             source.innerHTML = \'<b>Job Executed Successfully</b>\';'."\n"
@@ -187,7 +163,19 @@ class CronTasksView {
                 . '             window.isRefresh = refresh;'."\n"
                 . '         }'."\n"
                 . '     }'."\n"
-                . '     xhr.send();'."\n"
+                . "     xhr.setRequestHeader('content-type','application/x-www-form-urlencoded');"
+                . "     xhr.send('job-name='+encodeURIComponent(jobName));"."\n"
+                . '};'."\n"
+                . 'function logout(){'."\n"
+                . '     var xhr = new XMLHttpRequest();'."\n"
+                . '     xhr.open(\'post\',\'cron/apis/logout\');'."\n"
+                . '     xhr.onreadystatechange = function(){'."\n"
+                . '         if(this.readyState === 4){'."\n"
+                . '             window.location.href = \'cron\';'
+                . '         }'."\n"
+                . '     }'."\n"
+                . "     xhr.setRequestHeader('content-type','application/x-www-form-urlencoded');"
+                . "     xhr.send();"."\n"
                 . '};'."\n"
                 . '');
         Page::document()->getHeadNode()->addChild($jsCode);
@@ -222,78 +210,6 @@ class CronTasksView {
         }
     }
     /**
-     * Constructs and returns the URL of the page.
-     * This method will include the password that is used to protect 
-     * Cron jobs if it was set.
-     * @return string
-     */
-    private function _getPageURL() {
-        if($this->pageUrl !== null){
-            return $this->pageUrl;
-        }
-        $url = WebFiori::getSiteConfig()->getBaseURL().'cron-jobs/list';
-        $pass = Cron::password();
-        if($pass != 'NO_PASSWORD'){
-            $url .= '/'.$pass.'';
-        }
-        $this->pageUrl = $url;
-        return $url;
-    }
-    /**
-     * Creates a form that contains the controls which is used to enable the 
-     * use of website theme while displaying the view.
-     */
-    private function _createThemeControls(){
-        $form = new HTMLNode('form');
-        $form->setID('theme-controls-form');
-        $themeCheckBox = new Input('checkbox');
-        $themeCheckBox->setName('input-element');
-        $themeCheckBox->setID('theme-checkbox');
-        if(isset($_GET['use-theme']) && $_GET['use-theme'] == 'yes'){
-            $themeCheckBox->setAttribute('checked');
-        }
-        $form->addChild($themeCheckBox);
-        $label = new Label('Use Website Theme to Display This Page.');
-        $label->setStyle([
-            'display'=>'inline-block'
-        ]);
-        $label->setAttribute('for', 'theme-checkbox');
-        $label->setID('change-theme-label');
-        $form->addChild($label);
-        if(isset($_GET['refresh']) && $_GET['refresh'] == 'yes'){
-            $params = '?refresh=yes';
-        }
-        else{
-            $params = '';
-        }
-        $onclick = 'disableOrEnableInputs();'
-                . 'var isRef = window.isRefresh;'
-                . 'window.isRefresh = false;'
-                . 'document.getElementById(\'change-theme-label\').innerHTML = \'<b>Updating Page...</b>\';';
-        if(isset($_GET['use-theme']) && $_GET['use-theme'] = 'yes'){
-            $onclick .= 
-                'if(this.checked === false && isRef){'
-                . 'window.location.href = \''.$this->_getPageURL().$params.'\';'
-                . '}'
-                . 'else if(this.checked === false && !isRef){'
-                . 'window.location.href = \''.$this->_getPageURL().'\';'
-                . '}';
-            $themeCheckBox->setAttribute('onclick', $onclick);
-        }
-        else{
-            $onclick .= 
-                'if(this.checked && isRef){'
-                . 'window.location.href = \''.$this->_getPageURL().$params.'&use-theme=yes\';'
-                . '}'
-                . 'else{'
-                . 'window.location.href = \''.$this->_getPageURL().'?use-theme=yes\';'
-                . '}';
-            $themeCheckBox->setAttribute('onclick', $onclick);
-        }
-        
-        $this->controlsContainer->addChild($form);
-    }
-    /**
      * Creates a form which contains the controls that allow the user to 
      * enable refresh functionality.
      */
@@ -308,7 +224,7 @@ class CronTasksView {
             $refreshCheckBox->setAttribute('checked');
         }
         $form->addChild($refreshCheckBox);
-        $label = new Label('Refresh The Page Every 1 Minute.');
+        $label = new Label('Refresh The Page Every <input style="width:50px" disabled value="60" id="refresh-time-input" min="5" type="number"> Second(s).');
         $label->setStyle([
             'display'=>'inline-block'
         ]);
@@ -358,18 +274,12 @@ class CronTasksView {
             $tasksTable->addChild($cell);
         }
         else{
-            $pass = Cron::password();
             while ($job = $jobsQueue->dequeue()){
                 $row = new TableRow();
                 $row->setClassName('tasks-table-row');
                 $jobNameCell = new TableCell();
                 $jobNameCell->setClassName('tasks-table-cell');
-                if($pass != 'NO_PASSWORD'){
-                    $jobNameCell->addTextNode('<a href="'.WebFiori::getSiteConfig()->getBaseURL().'cron-jobs/job-details/'.$job->getJobName().'/'.$pass.'">'.$job->getJobName().'</a>',false);
-                }
-                else{
-                    $jobNameCell->addTextNode('<a href="'.WebFiori::getSiteConfig()->getBaseURL().'cron-jobs/job-details/'.$job->getJobName().'">'.$job->getJobName().'</a>',false);
-                }
+                $jobNameCell->addTextNode('<a href="'.WebFiori::getSiteConfig()->getBaseURL().'cron/jobs/'.$job->getJobName().'">'.$job->getJobName().'</a>',false);
                 $row->addChild($jobNameCell);
                 $exprCell = new TableCell();
                 $jobNameCell->setClassName('tasks-table-cell');

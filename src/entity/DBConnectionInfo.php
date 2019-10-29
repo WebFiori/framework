@@ -23,11 +23,6 @@
  * THE SOFTWARE.
  */
 namespace webfiori\entity;
-if(!defined('ROOT_DIR')){
-    header("HTTP/1.1 404 Not Found");
-    die('<!DOCTYPE html><html><head><title>Not Found</title></head><body>'
-    . '<h1>404 - Not Found</h1><hr><p>The requested resource was not found on the server.</p></body></html>');
-}
 /**
  * An entity that can be used to store database connection information. 
  * The information that can be stored includes:

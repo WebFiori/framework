@@ -27,19 +27,16 @@ use phpStructs\Queue;
 use webfiori\WebFiori;
 use webfiori\entity\router\Router;
 use webfiori\entity\Util;
-if(!defined('ROOT_DIR')){
-    header("HTTP/1.1 404 Not Found");
-    die('<!DOCTYPE html><html><head><title>Not Found</title></head><body>'
-    . '<h1>404 - Not Found</h1><hr><p>The requested resource was not found on the server.</p></body></html>');
-}
 /**
  * A class that is used to manage cron jobs.
  * It is used to create jobs, schedule them and execute them. In order to run 
  * the jobs automatically, the developer must add an entry in the following 
  * formate in crontab:
- * <p>* * * * *  /usr/bin/curl {BASE_URL}/cron-jobs/execute/{password}</p>
- * Where {BASE_URL} is the web site's base URL and {password} is the password 
+ * <p>* * * * *  /usr/bin/php path/to/WebFiori.php --check-cron &lt;cron-pass&gt;</p>
+ * Where &lt;cron-pass&gt; is the password 
  * that was set by the developer to protect the jobs from unauthorized access.
+ * Note that the path to PHP executable might differ from "/usr/bin/php". 
+ * It depends on where the executable has been installed.
  * @author Ibrahim
  * @version 1.0.6
  */
@@ -85,7 +82,7 @@ class Cron {
      * @return Cron
      * @since 1.0
      */
-    private static function &_get(){
+    private static function _get(){
         if(self::$executer === null){
             self::$executer = new Cron();
         }

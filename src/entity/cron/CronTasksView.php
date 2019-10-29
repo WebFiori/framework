@@ -23,11 +23,6 @@
  * THE SOFTWARE.
  */
 namespace webfiori\entity\cron;
-if(!defined('ROOT_DIR')){
-    header("HTTP/1.1 404 Not Found");
-    die('<!DOCTYPE html><html><head><title>Not Found</title></head><body>'
-    . '<h1>404 - Not Found</h1><hr><p>The requested resource was not found on the server.</p></body></html>');
-}
 use webfiori\entity\Page;
 use phpStructs\html\JsCode;
 use phpStructs\html\TableRow;
@@ -63,12 +58,6 @@ use webfiori\WebFiori;
  * @version 1.0
  */
 class CronTasksView {
-    /**
-     * The URL of this view which is constructed when the method _getPageURL() is 
-     * called.
-     * @var string 
-     */
-    private $pageUrl;
     /**
      * A top container that contains all task related controls.
      * @var HTMLNode 

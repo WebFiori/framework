@@ -88,19 +88,19 @@ class AutoLoader{
      * @return AutoLoader
      * @throws Exception 
      */
-    public static function &get($options=array(
+    public static function get($options=[
         'define-root'=>false,
         'search-folders'=>array(),
         'root'=>'',
         'on-load-failure'=>'do-nothing'
-    )) {
+    ]) {
         $DS = DIRECTORY_SEPARATOR;
         if(self::$loader === null){
             $frameworkSearchFoldres = array(
                 '',
                 $DS.'entity',
                 $DS.'themes',
-                $DS.'functions',
+                $DS.'logic',
                 $DS.'apis',
                 $DS.'pages',
                 $DS.'ini',
@@ -131,7 +131,7 @@ class AutoLoader{
      * @throws Exception
      * @since 1.0
      */
-    private function __construct($root='',$searchFolders=array(),$defineRoot=false,$onFail='throw-exception') {
+    private function __construct($root='',$searchFolders=[],$defineRoot=false,$onFail='throw-exception') {
         $this->searchFolders = [];
         $this->loadedClasses = [];
         if(defined('ROOT_DIR')){

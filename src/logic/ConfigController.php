@@ -36,7 +36,7 @@ use Exception;
  * @author Ibrahim
  * @version 1.4.4
  */
-class SystemFunctions extends Controller{
+class ConfigController extends Controller{
     /**
      * A constant that indicates the selected database schema has tables.
      * @since 1.1
@@ -80,18 +80,18 @@ class SystemFunctions extends Controller{
     );
     /**
      * An instance of SystemFunctions
-     * @var SystemFunctions
+     * @var ConfigController
      * @since 1.0 
      */
     private static $singleton;
     /**
      * Returns a single instance of the class.
-     * @return SystemFunctions
+     * @return ConfigController
      * @since 1.0
      */
     public static function &get(){
         if(self::$singleton === null){
-            self::$singleton = new SystemFunctions();
+            self::$singleton = new ConfigController();
         }
         return self::$singleton;
     }
@@ -118,7 +118,7 @@ class SystemFunctions extends Controller{
      * Note that the name of the session must be 'wf-session' in 
      * order to initialize it.
      * @param array $options An array of session options. See 
-     * Functions::useSettion() for more information about available options.
+     * Controller::useSettion() for more information about available options.
      * @return boolean If session is created or resumed, the method will 
      * return true. False otherwise.
      * @since 1.4.4
@@ -204,7 +204,7 @@ class SystemFunctions extends Controller{
      * @since 1.0
      */
     public function getConfigVars(){
-        $cfgArr = SystemFunctions::INITIAL_CONFIG_VARS;
+        $cfgArr = ConfigController::INITIAL_CONFIG_VARS;
         if(class_exists('webfiori\conf\Config')){
             $cfgArr['is-config'] = Config::isConfig() === true ? 'true' : 'false';
             $cfgArr['databases'] = Config::getDBConnections();
@@ -221,37 +221,7 @@ class SystemFunctions extends Controller{
         $configFileLoc = ROOT_DIR.'/conf/Config.php';
         $fh = new FileHandler($configFileLoc);
         $fh->write('<?php', true, true);
-        $fh->write('/*
- * The MIT License
- *
- * Copyright 2019 Ibrahim, WebFiori Framework.
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
- 
-');
         $fh->write('namespace webfiori\conf;', false, true);
-        $fh->write('if(!defined(\'ROOT_DIR\')){
-    header("HTTP/1.1 404 Not Found");
-    die(\'<!DOCTYPE html><html><head><title>Not Found</title></head><body>\'
-    . \'<h1>404 - Not Found</h1><hr><p>The requested resource was not found on the server.</p></body></html>\');
-}', true, true);
         $fh->write('use webfiori\entity\DBConnectionInfo;', true, true);
         $fh->write('/**
  * Global configuration class. 

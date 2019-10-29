@@ -3,7 +3,7 @@ namespace webfiori\theme;
 use webfiori\entity\Theme;
 use webfiori\WebFiori;
 use webfiori\entity\Page;
-use webfiori\logic\WebsiteFunctions;
+use webfiori\logic\WebsiteController;
 use phpStructs\html\ListItem;
 use phpStructs\html\LinkNode;
 use phpStructs\html\HeadNode;
@@ -30,7 +30,7 @@ class WebFioriTheme extends Theme{
             'LangExt.php'
         ));
         $this->setBeforeLoaded(function(){
-            $session = WebsiteFunctions::get()->getSession();
+            $session = WebsiteController::get()->getSession();
             $lang = $session->getLang(true);
             Page::lang($lang);
             if($lang == 'AR'){
@@ -41,7 +41,7 @@ class WebFioriTheme extends Theme{
             }
         });
         $this->setAfterLoaded(function(){
-            $session = WebsiteFunctions::get()->getSession();
+            $session = WebsiteController::get()->getSession();
             Page::lang($session->getLang(true));
             Page::document()->getChildByID('main-content-area')->setClassName('wf-'.Page::dir().'-col-10');
             Page::document()->getChildByID('side-content-area')->setClassName('wf-'.Page::dir().'-col-2');
@@ -163,7 +163,7 @@ class WebFioriTheme extends Theme{
         $link = new LinkNode(SiteConfig::getHomePage(), '');
         $link->addChild($img);
         $headerSec->addChild($link);
-        $langCode = WebsiteFunctions::get()->getSession()->getLang(true);
+        $langCode = WebsiteController::get()->getSession()->getLang(true);
         $p = new PNode();
         $siteNames = SiteConfig::getWebsiteNames();
         if(isset($siteNames[$langCode])){

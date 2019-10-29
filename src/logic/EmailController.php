@@ -33,7 +33,7 @@ use webfiori\conf\MailConfig;
  * @author Ibrahim
  * @version 1.3.1
  */
-class BasicMailFunctions extends Controller{
+class EmailController extends Controller{
     /**
      * A constant that indicates a mail server address or its port 
      * is invalid.
@@ -48,18 +48,18 @@ class BasicMailFunctions extends Controller{
     const INV_CREDENTIALS = 'inv_username_or_pass';
     /**
      *
-     * @var MailFunctions 
+     * @var EmailController 
      * @since 1.0
      */
     private static $instance;
     /**
      * Returns a singleton of the class.
-     * @return BasicMailFunctions
+     * @return EmailController
      * @since 1.0
      */
     public static function &get(){
         if(self::$instance === null){
-            self::$instance = new BasicMailFunctions();
+            self::$instance = new EmailController();
         }
         return self::$instance;
     }
@@ -71,7 +71,7 @@ class BasicMailFunctions extends Controller{
      * Note that the name of the session must be 'wf-session' in 
      * order to initialize it.
      * @param array $options An array of session options. See 
-     * Functions::useSettion() for more information about available options.
+     * Controller::useSettion() for more information about available options.
      * @return boolean If session is created or resumed, the method will 
      * return true. False otherwise.
      * @since 1.3.1
@@ -318,7 +318,7 @@ class BasicMailFunctions extends Controller{
      */
     public function getSocketMailer($emailAcc){
         if($emailAcc instanceof SMTPAccount){
-            $retVal = BasicMailFunctions::INV_HOST_OR_PORT;
+            $retVal = EmailController::INV_HOST_OR_PORT;
 //            Logger::log('Using TLS = \''.$emailAcc->isTLS().'\'.','debug');
 //            Logger::log('Using SSL = \''.$emailAcc->isSSL().'\'.','debug');
             $m = new SocketMailer();
@@ -332,7 +332,7 @@ class BasicMailFunctions extends Controller{
                     $retVal = $m;
                 }
                 else{
-                    $retVal = BasicMailFunctions::INV_CREDENTIALS;
+                    $retVal = EmailController::INV_CREDENTIALS;
                 }
             }
             return $retVal;

@@ -29,9 +29,9 @@ use webfiori\conf\MailConfig;
 use webfiori\ini\InitPrivileges;
 use webfiori\ini\InitAutoLoad;
 use webfiori\ini\InitCron;
-use webfiori\logic\SystemFunctions;
-use webfiori\logic\WebsiteFunctions;
-use webfiori\logic\BasicMailFunctions;
+use webfiori\logic\ConfigController;
+use webfiori\logic\WebsiteController;
+use webfiori\logic\EmailController;
 use webfiori\entity\AutoLoader;
 use webfiori\entity\Util;
 use webfiori\entity\ErrorBox;
@@ -72,19 +72,19 @@ class WebFiori{
     private static $AU;
     /**
      * An instance of system functions class.
-     * @var SystemFunctions 
+     * @var ConfigController 
      * @since 1.0
      */
     private static $SF;
     /**
      * An instance of web site functions class.
-     * @var WebsiteFunctions 
+     * @var WebsiteController 
      * @since 1.0
      */
     private static $WF;
     /**
      * An instance of basic mail functions class.
-     * @var BasicMailFunctions 
+     * @var EmailController 
      * @since 1.0
      */
     private static $BMF;
@@ -217,9 +217,9 @@ class WebFiori{
         CLI::init();
         self::$NoticeAndWarningCount = 0;
         $this->_setHandlers();
-        self::$SF = SystemFunctions::get();
-        self::$WF = WebsiteFunctions::get();
-        self::$BMF = BasicMailFunctions::get();
+        self::$SF = ConfigController::get();
+        self::$WF = WebsiteController::get();
+        self::$BMF = EmailController::get();
         //initialize main session with name = 'wf-session'.
         $this->sysStatus = Util::checkSystemStatus(true);
         if($this->sysStatus == Util::MISSING_CONF_FILE || $this->sysStatus == Util::MISSING_SITE_CONF_FILE){
@@ -495,7 +495,7 @@ class WebFiori{
     }
     /**
      * Returns a reference to an instance of 'BasicMailFunctions'.
-     * @return BasicMailFunctions A reference to an instance of 'BasicMailFunctions'.
+     * @return EmailController A reference to an instance of 'BasicMailFunctions'.
      * @since 1.2.1
      */
     public static function &getBasicMailFunctions() {
@@ -503,7 +503,7 @@ class WebFiori{
     }
     /**
      * Returns a reference to an instance of 'SystemFunctions'.
-     * @return SystemFunctions A reference to an instance of 'SystemFunctions'.
+     * @return ConfigController A reference to an instance of 'SystemFunctions'.
      * @since 1.2.1
      */
     public static function &getSysFunctions(){
@@ -511,7 +511,7 @@ class WebFiori{
     }
     /**
      * Returns a reference to an instance of 'WebsiteFunctions'.
-     * @return WebsiteFunctions A reference to an instance of 'WebsiteFunctions'.
+     * @return WebsiteController A reference to an instance of 'WebsiteFunctions'.
      * @since 1.2.1
      */
     public static function &getWebsiteFunctions() {

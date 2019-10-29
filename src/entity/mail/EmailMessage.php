@@ -30,7 +30,7 @@ if(!defined('ROOT_DIR')){
 }
 use webfiori\conf\MailConfig;
 use webfiori\entity\File;
-use webfiori\logic\BasicMailFunctions;
+use webfiori\logic\EmailController;
 use phpStructs\html\HTMLDoc;
 use phpStructs\html\HTMLNode;
 use Exception;
@@ -85,11 +85,11 @@ class EmailMessage {
         if(class_exists('webfiori\conf\MailConfig')){
             $acc = MailConfig::getAccount($sendAccountName);
             if($acc instanceof SMTPAccount){
-                $this->socketMailer = BasicMailFunctions::get()->getSocketMailer($acc);
-                if($this->socketMailer == BasicMailFunctions::INV_CREDENTIALS){
+                $this->socketMailer = EmailController::get()->getSocketMailer($acc);
+                if($this->socketMailer == EmailController::INV_CREDENTIALS){
                     throw new Exception('The account "'.$sendAccountName.'" has inalid credintials.');
                 }
-                else if($this->socketMailer == BasicMailFunctions::INV_HOST_OR_PORT){
+                else if($this->socketMailer == EmailController::INV_HOST_OR_PORT){
                     throw new Exception('The account "'.$sendAccountName.'" has invalid host or port number. Port: '.$acc->getPort().', Host: '.$acc->getServerAddress().'.');
                 }
                 else{

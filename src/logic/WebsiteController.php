@@ -32,7 +32,7 @@ use webfiori\conf\SiteConfig;
  * @author Ibrahim
  * @version 1.0.1
  */
-class WebsiteFunctions extends Controller{
+class WebsiteController extends Controller{
     /**
      * An associative array that contains initial system configuration variables.
      * The array has the following values:
@@ -45,8 +45,8 @@ class WebsiteFunctions extends Controller{
      * <li>primary-language = 'EN'</li>
      * <li>title-separator = ' | '</li>
      * <li>home-page = 'index'</li>
-     * <li>admin-theme-name = 'Greeny By Ibrahim Ali'</li>
-     * <li>theme-name = 'Greeny By Ibrahim Ali'</li>
+     * <li>admin-theme-name = 'WebFiori Theme'</li>
+     * <li>theme-name = 'WebFiori Theme'</li>
      * <li>site-descriptions = array(<ul>
      * <li>EN = ''</li>
      * <li>AR = ''</li>
@@ -55,36 +55,36 @@ class WebsiteFunctions extends Controller{
      * </ul>
      * @since 1.0
      */
-    const INITIAL_WEBSITE_CONFIG_VARS = array(
-        'website-names'=>array(
+    const INITIAL_WEBSITE_CONFIG_VARS = [
+        'website-names'=>[
             'EN'=>'WebFiori',
             'AR'=>'ويب فيوري'
-        ),
+        ],
         'base-url'=>'',
         'primary-language'=>'EN',
         'title-separator'=>' | ',
         'home-page'=>'index',
-        'admin-theme-name'=>'Greeny By Ibrahim Ali',
-        'theme-name'=>'Greeny By Ibrahim Ali',
+        'admin-theme-name'=>'WebFiori Theme',
+        'theme-name'=>'WebFiori Theme',
         'site-descriptions'=>array(
             'EN'=>'',
             'AR'=>''
         ),
         'config-file-version'=>'1.2.1',
-    );
+    ];
     /**
      *
-     * @var WebsiteFunctions 
+     * @var WebsiteController 
      */
     private static $singleton;
     /**
      * Returns a singleton instance of the class.
-     * @return WebsiteFunctions
+     * @return WebsiteController
      * @since 1.0
      */
     public static function &get(){
         if(self::$singleton === null){
-            self::$singleton = new WebsiteFunctions();
+            self::$singleton = new WebsiteController();
         }
         return self::$singleton;
     }
@@ -101,7 +101,7 @@ class WebsiteFunctions extends Controller{
      * Note that the name of the session must be 'wf-session' in 
      * order to initialize it.
      * @param array $options An array of session options. See 
-     * Functions::useSettion() for more information about available options.
+     * Controller::useSettion() for more information about available options.
      * @return boolean If session is created or resumed, the method will 
      * return true. False otherwise.
      * @since 1.0.1
@@ -186,7 +186,7 @@ class WebsiteFunctions extends Controller{
      * @since 1.0
      */
     public function getSiteConfigVars(){
-        $cfgArr = WebsiteFunctions::INITIAL_WEBSITE_CONFIG_VARS;
+        $cfgArr = WebsiteController::INITIAL_WEBSITE_CONFIG_VARS;
         if(class_exists('webfiori\conf\SiteConfig')){
             $SC = SiteConfig::get();
             $cfgArr['website-names'] = $SC->getWebsiteNames();

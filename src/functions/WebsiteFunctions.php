@@ -22,12 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-namespace webfiori\functions;
-if(!defined('ROOT_DIR')){
-    header("HTTP/1.1 404 Not Found");
-    die('<!DOCTYPE html><html><head><title>Not Found</title></head><body>'
-    . '<h1>404 - Not Found</h1><hr><p>The requested resource was not found on the server.</p></body></html>');
-}
+namespace webfiori\logic;
 use webfiori\entity\FileHandler;
 use webfiori\conf\SiteConfig;
 /**

@@ -3,7 +3,7 @@ namespace webfiori\theme;
 use webfiori\entity\Theme;
 use webfiori\WebFiori;
 use webfiori\entity\Page;
-use webfiori\functions\WebsiteFunctions;
+use webfiori\logic\WebsiteFunctions;
 use phpStructs\html\ListItem;
 use phpStructs\html\LinkNode;
 use phpStructs\html\HeadNode;

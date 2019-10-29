@@ -30,7 +30,7 @@ if(!defined('ROOT_DIR')){
 }
 use webfiori\conf\MailConfig;
 use webfiori\entity\File;
-use webfiori\functions\BasicMailFunctions;
+use webfiori\logic\BasicMailFunctions;
 use phpStructs\html\HTMLDoc;
 use phpStructs\html\HTMLNode;
 use Exception;

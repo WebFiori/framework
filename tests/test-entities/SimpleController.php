@@ -1,5 +1,5 @@
 <?php
-use webfiori\functions\Controller;
+use webfiori\logic\Controller;
 Use webfiori\tests\database\UsersQuery;
 use webfiori\tests\testEntity\UserWithContact;
 use webfiori\tests\database\UserContactInfo;

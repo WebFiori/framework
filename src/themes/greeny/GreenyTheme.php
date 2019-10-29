@@ -3,7 +3,7 @@ use webfiori\entity\Theme;
 use webfiori\entity\Page;
 use phpStructs\html\HTMLNode;
 use phpStructs\html\HeadNode;
-use webfiori\functions\WebsiteFunctions;
+use webfiori\logic\WebsiteFunctions;
 use webfiori\conf\SiteConfig;
 use webfiori\conf\Config;
 class GreenyTheme extends Theme{

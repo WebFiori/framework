@@ -1,7 +1,7 @@
 <?php
 namespace webfiori\tests\functions;
 use PHPUnit\Framework\TestCase;
-use webfiori\functions\Controller;
+use webfiori\logic\Controller;
 use webfiori\entity\DBConnectionInfo;
 use webfiori\WebFiori;
 use webfiori\tests\entity\TestQuery_1;

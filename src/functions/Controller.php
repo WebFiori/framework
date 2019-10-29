@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-namespace webfiori\functions;
+namespace webfiori\logic;
 use phMysql\MySQLLink;
 use phpStructs\Stack;
 use webfiori\entity\SessionManager;
@@ -120,7 +120,7 @@ class Controller {
         'name'=>'wf-session',
         'create-new'=>true,
         'user'=>null,
-        'variables'=>array()
+        'variables'=>[]
     );
     /**
      * A constant that indicates a given database connection was 
@@ -445,7 +445,7 @@ class Controller {
     }
     /**
      * Initiate new session or use a session which is already initialized.
-     * Note that sessions cannot be used when running the framework through CLI.
+     * Note that sessions cannot be used when running the framework through CLI. 
      * @param array $options An associative array of options. The available options 
      * are: 
      * <ul>

@@ -23,13 +23,6 @@
  * THE SOFTWARE.
  */
 namespace webfiori\entity\router;
-if(!defined('ROOT_DIR')){
-    header("HTTP/1.1 404 Not Found");
-    die('<!DOCTYPE html><html><head><title>Not Found</title></head><body>'
-    . '<h1>404 - Not Found</h1><hr><p>The requested resource was not found on the server.</p></body></html>');
-}
-use webfiori\entity\mail\EmailMessage;
-use webfiori\entity\mail\SMTPAccount;
 /**
  * A class that only has one method to initiate some of system routes.
  * The class is meant to only initiate the routes which uses the method 

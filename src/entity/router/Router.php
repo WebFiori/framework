@@ -23,11 +23,7 @@
  * THE SOFTWARE.
  */
 namespace webfiori\entity\router;
-if(!defined('ROOT_DIR')){
-    header("HTTP/1.1 404 Not Found");
-    die('<!DOCTYPE html><html><head><title>Not Found</title></head><body>'
-    . '<h1>404 - Not Found</h1><hr><p>The requested resource was not found on the server.</p></body></html>');
-}
+use restEasy\WebAPI;
 use webfiori\conf\SiteConfig;
 use webfiori\entity\Util;
 use phpStructs\html\HTMLNode;
@@ -193,7 +189,7 @@ class Router {
      * @since 1.3.3
      */
     private function &_getUriObj($path) {
-        $routeURI = new RouterUri($this->getBase().$this->_fixPath($path), '');
+        $routeURI = new RouterUri($this->getBase().$this->_fixUriPath($path), '');
         foreach ($this->routes as $route){
             if($routeURI->equals($route)){
                 return $route;
@@ -322,9 +318,14 @@ class Router {
                 $routeType == self::VIEW_ROUTE || 
                 $routeType == self::CUSTOMIZED || 
                 $routeType == self::CLOSURE_ROUTE){
+                $path = $this->_fixUriPath($path);
                 if($routeType != self::CLOSURE_ROUTE){
-                    $path = $this->_fixPath($path);
-                    $routeTo = ROOT_DIR.$routeType.DIRECTORY_SEPARATOR.$this->_fixPath($routeTo);
+                    if($routeType != self::CUSTOMIZED){
+                        $routeTo = ROOT_DIR.$routeType.$this->_fixFilePath($routeTo);
+                    }
+                    else{
+                        $routeTo = ROOT_DIR.$this->_fixFilePath($routeTo);
+                    }
                 }
                 else{
                     if(!is_callable($routeTo)){
@@ -355,7 +356,7 @@ class Router {
      * @since 1.3.7
      */
     public static function removeRoute($path) {
-        $pathFix = self::base().self::get()->_fixPath($path);
+        $pathFix = self::base().self::get()->_fixUriPath($path);
         for($x = 0 ; $x < count(self::get()->routes) ; $x++){
             $routeObj = self::get()->routes[$x];
             if($routeObj->getUri() == $pathFix){
@@ -569,13 +570,33 @@ class Router {
     public static function printRoutes() {
         self::get()->_printRoutes();
     }
+    private function _fixFilePath($path) {
+        if(strlen($path) != 0 && $path != '/'){
+            $path00 = str_replace('/', DIRECTORY_SEPARATOR, $path);
+            $path01 = str_replace('\\', DIRECTORY_SEPARATOR, $path00);
+            if($path01[strlen($path01) - 1] == DIRECTORY_SEPARATOR || $path01[0] == DIRECTORY_SEPARATOR){
+                while($path01[0] == DIRECTORY_SEPARATOR || $path01[strlen($path01) - 1] == DIRECTORY_SEPARATOR){
+                    $path01 = trim($path01, DIRECTORY_SEPARATOR);
+                }
+                $path01 = DIRECTORY_SEPARATOR.$path01;
+            }
+            if($path01[0] != DIRECTORY_SEPARATOR){
+                $path01 = DIRECTORY_SEPARATOR.$path01;
+            }
+            $path = $path01;
+        }
+        else{
+            $path = DIRECTORY_SEPARATOR;
+        }
+        return $path;
+    }
     /**
      * Removes any extra forward slash in the beginning or the end.
      * @param string $path Any string that represents the path part of a URI.
      * @return string A string in the format '/nice/work/boy'.
      * @since 1.1
      */
-    private function _fixPath($path) {
+    private function _fixUriPath($path) {
         if(strlen($path) != 0 && $path != '/'){
             if($path[strlen($path) - 1] == '/' || $path[0] == '/'){
                 while($path[0] == '/' || $path[strlen($path) - 1] == '/'){
@@ -601,7 +622,7 @@ class Router {
      */
     private function _hasRoute($path) {
         $hasRoute = false;
-        $routeURI = new RouterUri($this->getBase().$this->_fixPath($path), '');
+        $routeURI = new RouterUri($this->getBase().$this->_fixUriPath($path), '');
         foreach ($this->routes as $route){
             $hasRoute = $hasRoute || $routeURI->equals($route);
         }
@@ -659,7 +680,7 @@ class Router {
      * that was set by the user in case a route is not found.
      * @param string $uri A URI such as 'http://www.example.com/hello/ibrahim'
      * @param boolean $loadResource If set to true, the resource that represents the 
-     * route will be loaded. If false, the route will be only resulved. Default 
+     * route will be loaded. If false, the route will be only resolved. Default 
      * is true.
      * @since 1.0
      */
@@ -689,7 +710,21 @@ class Router {
                             if(file_exists($file)){
                                 $this->uriObj = $route;
                                 if($loadResource === true){
-                                    require_once $file;
+                                    $classNamespace = require_once $file;
+                                    if(gettype($classNamespace) == 'string'){
+                                        if(strlen($classNamespace) == 0){
+                                            $constructor = '\\'.$route->getClassName();
+                                        }
+                                        else{
+                                            $constructor = '\\'.$classNamespace.'\\'.$route->getClassName();
+                                        }
+                                        if(class_exists($constructor)){
+                                            $instance = new $constructor();
+                                            if($instance instanceof WebAPI){
+                                                $instance->process();
+                                            }
+                                        }
+                                    }
                                 }
                             }
                             else{
@@ -697,7 +732,8 @@ class Router {
                                     header("HTTP/1.1 500 Server Error");
                                     if($route->getType() == self::API_ROUTE){
                                         $j = new JsonX();
-                                        $j->add('message', 'The resource \''.Util::getRequestedURL().'\' was availble but its route is not configured correctly.');
+                                        $j->add('message', 'The resource \''.Util::getRequestedURL().'\' was availble but its route is not configured correctly. '
+                                                . 'The file which the route is pointing to was not found.');
                                         $j->add('type', 'error');
                                         die($j.'');
                                     }
@@ -712,7 +748,8 @@ class Router {
                                         . '<h1>500 - Server Error</h1>'
                                         . '<hr>'
                                         . '<p>'
-                                        . 'The resource <b>'.Util::getRequestedURL().'</b> was availble. but its route is not configured correctly.'
+                                        . 'The resource <b>'.Util::getRequestedURL().'</b> was availble. but its route is not configured correctly. '
+                                        . 'The file which the route is pointing to was not found.'
                                         . '</p>'
                                         . '</body>'
                                         . '</html>');
@@ -738,10 +775,10 @@ class Router {
                                 $varName = trim($routePathArray[$x], '{}');
                                 $route->setUriVar($varName, $pathArray[$x]);
                                 if($requestMethod == 'POST' || $requestMethod == 'PUT'){
-                                    $_POST[$varName] = urldecode($pathArray[$x]);
+                                    $_POST[$varName] = filter_var(urldecode($pathArray[$x]),FILTER_SANITIZE_STRING);
                                 }
                                 else if($requestMethod == 'GET' || $requestMethod == 'DELETE'){
-                                    $_GET[$varName] = urldecode($pathArray[$x]);
+                                    $_GET[$varName] = filter_var(urldecode($pathArray[$x]),FILTER_SANITIZE_STRING);
                                 }
                             }
                             else{
@@ -773,9 +810,55 @@ class Router {
                                     define('API_CALL', true);
                                 }
                             }
-                            $this->uriObj = $route;
-                            if($loadResource === true){
-                                require_once $route->getRouteTo();
+                            $file = $route->getRouteTo();
+                            if(file_exists($file)){
+                                $this->uriObj = $route;
+                                if($loadResource === true){
+                                    $classNamespace = require_once $file;
+                                    if(gettype($classNamespace) == 'string'){
+                                        if(strlen($classNamespace) == 0){
+                                            $constructor = '\\'.$route->getClassName();
+                                        }
+                                        else{
+                                            $constructor = '\\'.$classNamespace.'\\'.$route->getClassName();
+                                        }
+                                        if(class_exists($constructor)){
+                                            $instance = new $constructor();
+                                            if($instance instanceof WebAPI){
+                                                $instance->process();
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            else{
+                                if($loadResource === true){
+                                    header("HTTP/1.1 500 Server Error");
+                                    if($route->getType() == self::API_ROUTE){
+                                        $j = new JsonX();
+                                        $j->add('message', 'The resource \''.Util::getRequestedURL().'\' was availble but its route is not configured correctly. '
+                                                . 'The file which the route is pointing to was not found.');
+                                        $j->add('type', 'error');
+                                        die($j.'');
+                                    }
+                                    else{
+                                        die(''
+                                        . '<!DOCTYPE html>'
+                                        . '<html>'
+                                        . '<head>'
+                                        . '<title>Server Error</title>'
+                                        . '</head>'
+                                        . '<body>'
+                                        . '<h1>500 - Server Error</h1>'
+                                        . '<hr>'
+                                        . '<p>'
+                                        . 'The resource <b>'.Util::getRequestedURL().'</b> was availble. but its route is not configured correctly. '
+                                        . 'The file which the route is pointing to was not found.'
+                                        . '</p>'
+                                        . '</body>'
+                                        . '</html>');
+                                    }
+                                }
                             }
                             return;
                         }

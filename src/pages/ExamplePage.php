@@ -23,15 +23,6 @@
  * THE SOFTWARE.
  */
 namespace webfiori\examples\views;
-/*
- * The next block of code can be added to every view or .php 
- * file to prevent direct access.
- */
-if(!defined('ROOT_DIR')){
-    header("HTTP/1.1 404 Not Found");
-    die('<!DOCTYPE html><html><head><title>Not Found</title></head><body>'
-    . '<h1>404 - Not Found</h1><hr><p>The requested resource was not found on the server.</p></body></html>');
-}
 use webfiori\entity\Page;
 use phpStructs\html\PNode;
 use phpStructs\html\HTMLNode;
@@ -93,4 +84,4 @@ class ExamplePage{
         Page::render();
     }
 }
-new ExamplePage();
+return __NAMESPACE__;

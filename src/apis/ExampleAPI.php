@@ -24,11 +24,6 @@
  * THE SOFTWARE.
  */
 namespace webfiori\examples\webApis;
-if(!defined('ROOT_DIR')){
-    header("HTTP/1.1 404 Not Found");
-    die('<!DOCTYPE html><html><head><title>Not Found</title></head><body>'
-    . '<h1>404 - Not Found</h1><hr><p>The requested resource was not found on the server.</p></body></html>');
-}
 use webfiori\entity\ExtendedWebAPI;
 use restEasy\APIAction;
 
@@ -70,12 +65,4 @@ class ExampleAPI extends ExtendedWebAPI{
         }
     }
 }
-//if the constant is defined, then we are 
-//coming throgh a route and not autoloading
-if(defined('API_CALL') && API_CALL === TRUE){
-    //create an instance of the API
-    $api = new ExampleAPI();
-    //call the function process() 
-    // to process user request.
-    $api->process();
-}
+return __NAMESPACE__;

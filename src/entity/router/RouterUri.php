@@ -23,11 +23,6 @@
  * THE SOFTWARE.
  */
 namespace webfiori\entity\router;
-if(!defined('ROOT_DIR')){
-    header("HTTP/1.1 404 Not Found");
-    die('<!DOCTYPE html><html><head><title>Not Found</title></head><body>'
-    . '<h1>404 - Not Found</h1><hr><p>The requested resource was not found on the server.</p></body></html>');
-}
 use webfiori\entity\Util;
 /**
  * A class that is used to split URIs and get their parameters.
@@ -44,7 +39,7 @@ use webfiori\entity\Util;
  * The class is also used for routing.
  * For more information on URI structure, visit <a target="_blank" href="https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#Examples">Wikipedia</a>.
  * @author Ibrahim
- * @version 1.3.1
+ * @version 1.3.2
  */
 class RouterUri {
     /**
@@ -77,7 +72,7 @@ class RouterUri {
      * @var type 
      * @since 1.2
      */
-    private $closureParams = array();
+    private $closureParams = [];
     /**
      * A boolean value that is set to true if the URI will be included in 
      * generated site map.
@@ -94,7 +89,7 @@ class RouterUri {
      * @param array $closureParams If the closure needs to use parameters, 
      * it is possible to supply them using this array.
      */
-    public function __construct($requestedUri,$routeTo,$caseSensitive=true,$closureParams=array()) {
+    public function __construct($requestedUri,$routeTo,$caseSensitive=true,$closureParams=[]) {
         $this->setRoute($routeTo);
         $this->isCS = $caseSensitive === true;
         $this->uriBroken = self::splitURI($requestedUri);
@@ -535,5 +530,23 @@ class RouterUri {
             }
         }
         return false;
+    }
+    /**
+     * Returns class name based on the file which the route will point to.
+     * The method will try to extract class name from the file which the 
+     * route is pointing to.
+     * This only applies to routes of type API, view and other only.
+     * @return string Class name taken from file name. If route type is not 
+     * API o not view, the method will return empty string.
+     * @since 1.3.2
+     */
+    public function getClassName() {
+        if($this->getType() != Router::CLOSURE_ROUTE){
+            $path = $this->getRouteTo();
+            $pathExpl = explode(DIRECTORY_SEPARATOR, $path);
+            $className = explode('.', $pathExpl[count($pathExpl) - 1])[0];
+            return $className;
+        }
+        return '';
     }
 }

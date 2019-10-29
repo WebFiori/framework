@@ -37,7 +37,7 @@ use webfiori\conf\SiteConfig;
  * @author Ibrahim
  * @version 1.0.1
  */
-class WebsiteFunctions extends Functions{
+class WebsiteFunctions extends Controller{
     /**
      * An associative array that contains initial system configuration variables.
      * The array has the following values:

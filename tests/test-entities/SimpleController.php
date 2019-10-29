@@ -1,5 +1,5 @@
 <?php
-use webfiori\functions\Functions;
+use webfiori\functions\Controller;
 Use webfiori\tests\database\UsersQuery;
 use webfiori\tests\testEntity\UserWithContact;
 use webfiori\tests\database\UserContactInfo;
@@ -10,7 +10,7 @@ use webfiori\WebFiori;
  *
  * @author Ibrahim
  */
-class SimpleController extends Functions{
+class SimpleController extends Controller{
     public function __destruct() {
         $this->cleanDb();
     }

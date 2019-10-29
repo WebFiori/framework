@@ -23,11 +23,6 @@
  * THE SOFTWARE.
  */
 namespace webfiori\functions;
-if(!defined('ROOT_DIR')){
-    header("HTTP/1.1 404 Not Found");
-    die('<!DOCTYPE html><html><head><title>Not Found</title></head><body>'
-    . '<h1>404 - Not Found</h1><hr><p>The requested resource was not found on the server.</p></body></html>');
-}
 use phMysql\MySQLLink;
 use phpStructs\Stack;
 use webfiori\entity\SessionManager;
@@ -44,7 +39,7 @@ use webfiori\conf\Config;
  * @author Ibrahim
  * @version 1.3.8
  */
-class Functions {
+class Controller {
     /**
      * A stack that contains all executed and non-executed query objects.
      * @var Stack 

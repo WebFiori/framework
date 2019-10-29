@@ -41,7 +41,7 @@ if(!defined('ROOT_DIR')){
  * @author Ibrahim
  * @version 1.4.4
  */
-class SystemFunctions extends Functions{
+class SystemFunctions extends Controller{
     /**
      * A constant that indicates the selected database schema has tables.
      * @since 1.1

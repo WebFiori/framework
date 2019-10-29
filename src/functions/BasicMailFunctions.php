@@ -38,7 +38,7 @@ use webfiori\conf\MailConfig;
  * @author Ibrahim
  * @version 1.3.1
  */
-class BasicMailFunctions extends Functions{
+class BasicMailFunctions extends Controller{
     /**
      * A constant that indicates a mail server address or its port 
      * is invalid.

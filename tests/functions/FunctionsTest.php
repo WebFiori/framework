@@ -1,7 +1,7 @@
 <?php
 namespace webfiori\tests\functions;
 use PHPUnit\Framework\TestCase;
-use webfiori\functions\Functions;
+use webfiori\functions\Controller;
 use webfiori\entity\DBConnectionInfo;
 use webfiori\WebFiori;
 use webfiori\tests\entity\TestQuery_1;
@@ -17,9 +17,9 @@ class FunctionsTest extends TestCase{
      * @test
      */
     public function testSetConnection00() {
-        $func = new Functions();
+        $func = new Controller();
         $result = $func->setConnection('not_exist');
-        $this->assertEquals(Functions::NO_SUCH_CONNECTION,$result);
+        $this->assertEquals(Controller::NO_SUCH_CONNECTION,$result);
     }
     /**
      * @test
@@ -28,7 +28,7 @@ class FunctionsTest extends TestCase{
         $connection = new DBConnectionInfo('root', '123456', 'testing_db');
         $connection->setConnectionName('test-connection');
         WebFiori::getConfig()->addDbConnection($connection);
-        $func = new Functions();
+        $func = new Controller();
         $result = $func->setConnection('test-connection');
         $this->assertTrue($result);
     }
@@ -36,9 +36,9 @@ class FunctionsTest extends TestCase{
      * @test
      */
     public function testUseDatabase00() {
-        $func = new Functions();
+        $func = new Controller();
         $result = $func->useDatabase('not-exist');
-        $this->assertEquals(Functions::NO_SUCH_CONNECTION,$result);
+        $this->assertEquals(Controller::NO_SUCH_CONNECTION,$result);
         $errDetails = $func->getDBErrDetails();
         $this->assertEquals(-1,$errDetails['error-code']);
         $this->assertEquals('No database connection was found which has the name \'not-exist\'.',$errDetails['error-message']);
@@ -64,7 +64,7 @@ class FunctionsTest extends TestCase{
         $connection = new DBConnectionInfo('root', '123456', 'testing_db');
         $connection->setConnectionName('test-connection');
         WebFiori::getConfig()->addDbConnection($connection);
-        $func = new Functions();
+        $func = new Controller();
         $this->assertTrue($func->setConnection('test-connection'));
         $result = $func->useDatabase();
         $this->assertTrue($result);
@@ -74,7 +74,7 @@ class FunctionsTest extends TestCase{
      * @test
      */
     public function testUseDatabase03() {
-        $func = new Functions();
+        $func = new Controller();
         $result = $func->useDatabase();
         $this->assertFalse($result);
         $err = $func->getDBErrDetails();
@@ -84,7 +84,7 @@ class FunctionsTest extends TestCase{
     /**
      * @depends testUseDatabase02
      * @test
-     * @param Functions $func 
+     * @param Controller $func 
      */
     public function testUseDatabase04($func) {
         $r = $func->useDatabase('test-connection');
@@ -94,11 +94,11 @@ class FunctionsTest extends TestCase{
     /**
      * @depends testUseDatabase04
      * @test
-     * @param Functions $func 
+     * @param Controller $func 
      */
     public function testUseDatabase05($func) {
         $r = $func->useDatabase('test-connection-x');
-        $this->assertEquals(Functions::NO_SUCH_CONNECTION,$r);
+        $this->assertEquals(Controller::NO_SUCH_CONNECTION,$r);
         $err = $func->getDBErrDetails();
         $this->assertEquals(-1,$err['error-code']);
         $this->assertEquals('No database connection was found which has the name \'test-connection-x\'.',$err['error-message']);
@@ -107,7 +107,7 @@ class FunctionsTest extends TestCase{
     /**
      * @depends testUseDatabase05
      * @test
-     * @param Functions $func 
+     * @param Controller $func 
      */
     public function testUseDatabase06($func) {
         $r = $func->useDatabase('test-connection');
@@ -120,7 +120,7 @@ class FunctionsTest extends TestCase{
         $connection = new DBConnectionInfo('root', '123456', 'testing_db');
         $connection->setConnectionName('test-connection');
         WebFiori::getConfig()->addDbConnection($connection);
-        $func = new Functions();
+        $func = new Controller();
         $this->assertTrue($func->setConnection('test-connection'));
         $result = $func->useDatabase();
         $this->assertTrue($result);
@@ -137,7 +137,7 @@ class FunctionsTest extends TestCase{
      * @test
      */
     public function testUseSession00() {
-        $func = new Functions();
+        $func = new Controller();
         $r = $func->useSession();
         $this->assertFalse($r);
     }
@@ -145,7 +145,7 @@ class FunctionsTest extends TestCase{
      * @test
      */
     public function testUseSession01() {
-        $func = new Functions();
+        $func = new Controller();
         $r = $func->useSession(
             array(
                 'name'=>'test-session'
@@ -157,18 +157,18 @@ class FunctionsTest extends TestCase{
      * @test
      */
     public function testExecuteQuery00() {
-        $f = new Functions();
+        $f = new Controller();
         $r = $f->excQ();
         $this->assertFalse($r);
         $errDetails = $f->getDBErrDetails();
-        $this->assertEquals(Functions::NO_QUERY,$errDetails['error-code']);
+        $this->assertEquals(Controller::NO_QUERY,$errDetails['error-code']);
         $this->assertEquals('No query object was set to execute.',$errDetails['error-message']);
     }
     /**
      * @test
      */
     public function testSetQuery00() {
-        $func = new Functions();
+        $func = new Controller();
         $this->assertFalse($func->setQueryObject(null));
         $this->assertFalse($func->setQueryObject(44));
         $this->assertFalse($func->setQueryObject($func));
@@ -178,7 +178,7 @@ class FunctionsTest extends TestCase{
      * @test
      */
     public function testSetQuery01() {
-        $func = new Functions();
+        $func = new Controller();
         $q = new TestQuery_1();
         $this->assertTrue($func->setQueryObject($q));
         $this->assertTrue($func->getQueryObject() instanceof TestQuery_1);
@@ -187,21 +187,21 @@ class FunctionsTest extends TestCase{
      * @test
      */
     public function testGetSession00() {
-        $func = new Functions();
+        $func = new Controller();
         $this->assertNull($func->getSession());
     }
     /**
      * @test
      */
     public function testGetSessionLang00() {
-        $func = new Functions();
+        $func = new Controller();
         $this->assertNull($func->getSessionLang());
     }
     /**
      * @test
      */
     public function testSetSessionVar00() {
-        $func = new Functions();
+        $func = new Controller();
         $this->assertFalse($func->setSessionVar(' ',null));
         $this->assertFalse($func->setSessionVar('hello',null));
     }
@@ -209,21 +209,21 @@ class FunctionsTest extends TestCase{
      * @test
      */
     public function testGetSessionVar00() {
-        $func = new Functions();
+        $func = new Controller();
         $this->assertNull($func->getSessionVar(''));
     }
     /**
      * @test
      */
     public function testGetSessionVar01() {
-        $func = new Functions();
+        $func = new Controller();
         $this->assertNull($func->getSessionVar('random'));
     }
     /**
      * @test
      */
     public function testGetRows00() {
-        $func = new Functions();
+        $func = new Controller();
         $this->assertEquals(-1,$func->rows());
         $this->assertEmpty($func->getRows());
         $this->assertNull($func->getRow());
@@ -233,14 +233,14 @@ class FunctionsTest extends TestCase{
      * @test
      */
     public function testGetUserID00() {
-        $func = new Functions();
+        $func = new Controller();
         $this->assertEquals(-1,$func->getUserID());
     }
     /**
      * @test
      */
     public function testHasPrivilege00() {
-        $func = new Functions();
+        $func = new Controller();
         $this->assertFalse($func->hasPrivilege('HELLO'));
     }
     /**

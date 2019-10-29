@@ -43,11 +43,13 @@ class HeadNode extends HTMLNode{
      * <li>script</li>
      * <li>noscript</li>
      * <li>#COMMENT</li>
+     * <li>style</li>
      * </ul>
      * @since 1.1.4
      */
     const ALLOWED_CHILDREN = array(
-        'base','title','meta','link','script','noscript','#COMMENT'
+        'base','title','meta','link','script','noscript','#COMMENT', 
+        'style'
     );
     /**
      * A node that represents the tag 'base'.

@@ -89,7 +89,7 @@ class ConfigController extends Controller{
      * @return ConfigController
      * @since 1.0
      */
-    public static function &get(){
+    public static function get(){
         if(self::$singleton === null){
             self::$singleton = new ConfigController();
         }

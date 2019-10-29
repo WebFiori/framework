@@ -82,7 +82,7 @@ class WebsiteController extends Controller{
      * @return WebsiteController
      * @since 1.0
      */
-    public static function &get(){
+    public static function get(){
         if(self::$singleton === null){
             self::$singleton = new WebsiteController();
         }

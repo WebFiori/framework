@@ -68,7 +68,7 @@ class EmailMessage {
      * @return EmailMessage
      * @since 1.0
      */
-    public static function &createInstance($sendAccountName=''){
+    public static function createInstance($sendAccountName=''){
         if(self::$em === null){
             self::$em = new EmailMessage($sendAccountName);
         }

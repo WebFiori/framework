@@ -23,13 +23,9 @@
  * THE SOFTWARE.
  */
 namespace webfiori\ini;
-if(!defined('ROOT_DIR')){
-    header("HTTP/1.1 404 Not Found");
-    die('<!DOCTYPE html><html><head><title>Not Found</title></head><body>'
-    . '<h1>404 - Not Found</h1><hr><p>The requested resource was not found on the server.</p></body></html>');
-}
 use webfiori\entity\cron\Cron;
 use webfiori\entity\cron\CronJob;
+use Exception;
 
 /**
  * A class that has one method to initialize cron jobs.

@@ -26,8 +26,17 @@ namespace jsonx;
 use jsonx\JsonI;
 use jsonx\JsonX;
 /**
- * An a class that can be used to create well formatted JSON strings. 
+ * A class that can be used to create well formatted JSON strings. 
  * The class follows the specifications found at https://www.json.org/index.html.
+ * 
+ * The process of creating JSON strings using this class is as follows:
+ * <ul>
+ * <li>Create new instance of the class.</li>
+ * <li>Add the data that will be decoded to JSON format using 
+ * the proper method.</li>
+ * <li>To see the generated JSON, simply use the command 'echo' 
+ * against the created instance.</li>
+ * </ul>
  * @author Ibrahim
  * @since 1.2.1
  */
@@ -65,19 +74,19 @@ class JsonX {
      * @var array JSON special characters.
      * @since 1.0
      */
-    const SPECIAL_CHARS = array(
+    const SPECIAL_CHARS = [
         //order of characters maters
         //first we must escape / and \
         '\\',"/",'"',"\t","\r","\n","\f"
-    );
+    ];
     /**
      * An array that contains escaped JSON special characters.
      * @var array escaped JSON special characters.
      * @since 1.0
      */
-    const SPECIAL_CHARS_ESC = array(
+    const SPECIAL_CHARS_ESC = [
         "\\\\","\/",'\"',"\\t","\\r","\\n","\\f"
-    );
+    ];
     /**
      * An array that contains JSON data.
      * This array will store the keys as indices and every value will be at 
@@ -85,7 +94,7 @@ class JsonX {
      * @var array 
      * @since 1.0
      */
-    private $attributes = array();
+    private $attributes = [];
     /**
      * Adds a new value to the JSON string.
      * This method can be used to add an integer, a double, 
@@ -120,10 +129,10 @@ class JsonX {
      * If the given value or key is invalid, the method will return false.
      * @since 1.1
      */
-    public function add($key, $value, $options=array(
+    public function add($key, $value, $options=[
         'string-as-boolean'=>false,
         'array-as-object'=>false
-    )){
+    ]){
         if($value !== null){
             if(isset($options['string-as-boolean'])){
                 $strAsbool = $options['string-as-boolean'] === true ? true : false;
@@ -160,9 +169,9 @@ class JsonX {
      * interface JsonI or it is not of type JsonX, 
      * The method will try to extract object information based on its "getXxxxx()" public 
      * methods. In that case, the generated JSON will be on the formate 
-     * <b>{"prop-0":"prop-1","prop-n":"","":""}</b>.
+     * <b>{"prop-0":"prop-1","prop-n":""}</b>.
      * @param string $key The key value.
-     * @param JsonI|JsonX|Object $val The object that will be added.
+     * @param JsonI|JsonX|object $val The object that will be added.
      * @return boolean The method will return true if the object is added. 
      * If the key value is invalid string, the method will return false.
      * @since 1.0
@@ -201,16 +210,16 @@ class JsonX {
         return false;
     }
     /**
-     * Checks if the current JsonX instance has the given key or not.
-     * @param string $key The value of the key.
+     * Checks if JsonX instance has the given key or not.
+     * @param string $key The name of the key.
      * @return boolean The method will return true if the 
      * key exists. false if not.
      * @since 1.2
      */
     public function hasKey($key) {
-        $key = trim($key);
-        if(strlen($key) != 0){
-            if(isset($this->attributes[$key])){
+        $keyTrimmed = trim($key);
+        if(strlen($keyTrimmed) != 0){
+            if(isset($this->attributes[$keyTrimmed])){
                 return true;
             }
         }
@@ -225,9 +234,9 @@ class JsonX {
      * @since 1.2
      */
     public function get($key) {
-        $key = trim($key);
-        if($this->hasKey($key)){
-            return $this->attributes[$key];
+        $keyTrimmed = trim($key);
+        if($this->hasKey($keyTrimmed)){
+            return $this->attributes[$keyTrimmed];
         }
         return null;
     }

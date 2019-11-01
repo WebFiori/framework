@@ -26,14 +26,13 @@ namespace webfiori\entity;
 use webfiori\WebFiori;
 use webfiori\entity\router\Router;
 use webfiori\entity\Theme;
-use webfiori\entity\Access;
-use webfiori\entity\cron\CronJob;
 use webfiori\entity\cron\Cron;
 /**
  * A class which adds basic support for running the framework through 
  * command line interface (CLI).
  *
  * @author Ibrahim
+ * @version 1.0
  */
 class CLI {
     /**

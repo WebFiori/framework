@@ -1,5 +1,5 @@
 <?php
-namespace webfiori\tests\functions;
+namespace webfiori\tests\logic;
 use PHPUnit\Framework\TestCase;
 use webfiori\logic\Controller;
 use webfiori\entity\DBConnectionInfo;
@@ -12,7 +12,7 @@ use SimpleController;
  *
  * @author Ibrahim
  */
-class FunctionsTest extends TestCase{
+class ControllerTest extends TestCase{
     /**
      * @test
      */

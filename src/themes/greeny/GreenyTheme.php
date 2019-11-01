@@ -1,4 +1,5 @@
 <?php
+namespace webfiori\theme;
 use webfiori\entity\Theme;
 use webfiori\entity\Page;
 use phpStructs\html\HTMLNode;

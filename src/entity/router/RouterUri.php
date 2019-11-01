@@ -520,7 +520,6 @@ class RouterUri {
 //                }
 //            }
         }
-        var_dump($retVal);
         return $retVal;
     }
     /**

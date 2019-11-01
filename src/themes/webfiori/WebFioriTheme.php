@@ -1,7 +1,7 @@
 <?php
 namespace webfiori\theme;
-use webfiori\entity\Theme;
 use webfiori\WebFiori;
+use webfiori\entity\Theme;
 use webfiori\entity\Page;
 use webfiori\logic\WebsiteController;
 use phpStructs\html\ListItem;

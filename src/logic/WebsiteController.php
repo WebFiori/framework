@@ -290,7 +290,7 @@ class WebsiteController extends Controller{
      * @return SiteConfig
      * @since 1.0
      */
-    public static function &get(){
+    public static function get(){
         if(self::$siteCfg != null){
             return self::$siteCfg;
         }

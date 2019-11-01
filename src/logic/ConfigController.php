@@ -318,7 +318,7 @@ class ConfigController extends Controller{
      * @return Config An object of type Config.
      * @since 1.0
      */
-    public static function &get(){
+    public static function get(){
         if(self::$cfg != null){
             return self::$cfg;
         }

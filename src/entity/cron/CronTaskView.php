@@ -53,7 +53,7 @@ class CronTaskView {
      * @since 1.0
      */
     public function __construct() {
-        if(WebFiori::getWebsiteFunctions()->getSessionVar('cron-login-status') !== true){
+        if(WebFiori::getWebsiteController()->getSessionVar('cron-login-status') !== true){
             header('location: '.WebFiori::getSiteConfig()->getBaseURL().'cron/login');
         }
         $jobName = $_GET['job-name'];

@@ -67,7 +67,7 @@ class CronTasksView {
      * Creates new instance of the view.
      */
     public function __construct() {
-        if(WebFiori::getWebsiteFunctions()->getSessionVar('cron-login-status') !== true){
+        if(WebFiori::getWebsiteController()->getSessionVar('cron-login-status') !== true){
             header('location: '.WebFiori::getSiteConfig()->getBaseURL().'cron/login');
         }
         Page::title('Scheduled CRON Tasks');

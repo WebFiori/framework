@@ -75,13 +75,13 @@ abstract class ExtendedWebAPI extends WebAPI{
     private function _setTranslation() {
         $reqMeth = $this->getRequestMethod();
         if($reqMeth == 'GET' || $reqMeth == 'DELETE'){
-            $langCode = isset($_GET['lang']) ? filter_var($_GET['lang']) : WebFiori::getWebsiteFunctions()->getSessionLang();
+            $langCode = isset($_GET['lang']) ? filter_var($_GET['lang']) : WebFiori::getWebsiteController()->getSessionLang();
         }
         else if($reqMeth == 'POST' || $reqMeth == 'PUT'){
-            $langCode = isset($_POST['lang']) ? filter_var($_POST['lang']) : WebFiori::getWebsiteFunctions()->getSessionLang();
+            $langCode = isset($_POST['lang']) ? filter_var($_POST['lang']) : WebFiori::getWebsiteController()->getSessionLang();
         }
         else{
-            $langCode = WebFiori::getWebsiteFunctions()->getSessionLang();
+            $langCode = WebFiori::getWebsiteController()->getSessionLang();
         }
         $this->translation = &Language::loadTranslation($langCode);
     }

@@ -476,7 +476,7 @@ class Cron {
      * @since 1.0.6
      */
     public static function run($pass='',$jobName=null,$force=false) {
-        if(Cron::password() != 'NO_PASSWORD' && WebFiori::getWebsiteFunctions()->getSessionVar('cron-login-status') !== true){
+        if(Cron::password() != 'NO_PASSWORD' && WebFiori::getWebsiteController()->getSessionVar('cron-login-status') !== true){
             if(hash('sha256',$pass) != Cron::password()){
                 return 'INV_PASS';
             }

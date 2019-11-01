@@ -54,7 +54,7 @@ class CronAPIs extends ExtendedWebAPI{
         $this->addAction($a02);
     }
     public function isAuthorized(){
-        return WebFiori::getWebsiteFunctions()->getSessionVar('cron-login-status') === true;
+        return WebFiori::getWebsiteController()->getSessionVar('cron-login-status') === true;
     }
 
     public function processRequest() {
@@ -63,7 +63,7 @@ class CronAPIs extends ExtendedWebAPI{
             $this->_login();
         }
         else if($a == 'logout'){
-            WebFiori::getWebsiteFunctions()->setSessionVar('cron-login-status',false);
+            WebFiori::getWebsiteController()->setSessionVar('cron-login-status',false);
             $this->sendResponse('Logged out.', 'info');
         }
         else if($a == 'force-execution'){
@@ -86,7 +86,7 @@ class CronAPIs extends ExtendedWebAPI{
         $cronPass = Cron::password();
         if($cronPass != 'NO_PASSWORD'){
             if(hash('sha256', $this->getInputs()['password'])){
-                WebFiori::getWebsiteFunctions()->setSessionVar('cron-login-status', true);
+                WebFiori::getWebsiteController()->setSessionVar('cron-login-status', true);
                 $this->sendResponse('Success', 'info', 200);
             }
             else{

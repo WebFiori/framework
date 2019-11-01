@@ -37,10 +37,10 @@ use phpStructs\html\Input;
 class CronLoginView {
     public function __construct() {
         if(Cron::password() == 'NO_PASSWORD'){
-            WebFiori::getWebsiteFunctions()->setSessionVar('cron-login-status', true);
+            WebFiori::getWebsiteController()->setSessionVar('cron-login-status', true);
             header('location: '.WebFiori::getSiteConfig()->getBaseURL().'cron/jobs');
         }
-        if(WebFiori::getWebsiteFunctions()->getSessionVar('cron-login-status') == true){
+        if(WebFiori::getWebsiteController()->getSessionVar('cron-login-status') == true){
             header('location: '.WebFiori::getSiteConfig()->getBaseURL().'cron/jobs');
         }
         Page::title('CRON Login');

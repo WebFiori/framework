@@ -60,5 +60,14 @@ class RouterUriTest extends TestCase{
         $this->assertEquals('/{some-var}/hell/{other-var}',$uriObj->getPath());
         $uriObj->setIsInSiteMap(true);
         $this->assertTrue($uriObj->isInSiteMap());
+        $queryStrVars = $uriObj->getQueryStringVars();
+        $this->assertEquals(2,count($queryStrVars));
+        $this->assertEquals('dnt',$queryStrVars['do']);
+        $this->assertEquals('',$queryStrVars['y']);
+        $this->assertEquals('www3.programmingacademia.com',$uriObj->getHost());
+        $this->assertEquals('https://www3.programmingacademia.com:80/{some-var}/hell/{other-var}',$uriObj->getUri());
+        $this->assertEquals('https://www3.programmingacademia.com:80/{some-var}/hell/{other-var}?do=dnt&y=',$uriObj->getUri(true));
+        $this->assertEquals('https://www3.programmingacademia.com:80/{some-var}/hell/{other-var}#xyz',$uriObj->getUri(false,true));
+        $this->assertEquals('https://www3.programmingacademia.com:80/{some-var}/hell/{other-var}?do=dnt&y=#xyz',$uriObj->getUri(true,true));
     }
 }

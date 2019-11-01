@@ -95,12 +95,6 @@ class WebFiori{
      */
     private static $LC;
     /**
-     * Used to format errors and warnings messages.
-     * @var int 
-     * @since 1.3.4
-     */
-    private static $NoticeAndWarningCount;
-    /**
      * A mutex lock to disallow class access during initialization state.
      * @var int
      * @since 1.0 
@@ -208,14 +202,11 @@ class WebFiori{
          * Initialize autoloader.
          */
         if(!class_exists('webfiori\entity\AutoLoader',false)){
-           require_once ROOT_DIR.'/entity/AutoLoader.php';
+           require_once ROOT_DIR.DIRECTORY_SEPARATOR.'entity'.DIRECTORY_SEPARATOR.'AutoLoader.php';
         }
         self::$AU = AutoLoader::get();
-        //display PHP warnings and errors
-        
         InitAutoLoad::init();
         CLI::init();
-        self::$NoticeAndWarningCount = 0;
         $this->_setHandlers();
         self::$SF = ConfigController::get();
         self::$WF = WebsiteController::get();
@@ -238,10 +229,11 @@ class WebFiori{
         ClosureRoutes::create();
         OtherRoutes::create();
         
-        //initialize some settings...
+        //initialize cron and privileges...
         InitCron::init();
         InitPrivileges::init();
         
+        //class is now initialized
         self::$classStatus = 'INITIALIZED';
         
         define('INITIAL_SYS_STATUS', $this->_getSystemStatus());
@@ -302,7 +294,6 @@ class WebFiori{
                     echo $errBox;
                 }
             }
-            WebFiori::$NoticeAndWarningCount++;
             return true;
         });
         set_exception_handler(function($ex){
@@ -435,7 +426,7 @@ class WebFiori{
      * will return null.
      * @since 1.3.3
      */
-    public static function &getConfig() {
+    public static function getConfig() {
         if(class_exists('webfiori\conf\Config')){
             return Config::get();
         }
@@ -450,7 +441,7 @@ class WebFiori{
      * will return null.
      * @since 1.3.3
      */
-    public static function &getSiteConfig() {
+    public static function getSiteConfig() {
         if(class_exists('webfiori\conf\SiteConfig')){
             return SiteConfig::get();
         }
@@ -465,7 +456,7 @@ class WebFiori{
      * will return null.
      * @since 1.3.3
      */
-    public static function &getMailConfig() {
+    public static function getMailConfig() {
         if(class_exists('webfiori\conf\MailConfig')){
             return MailConfig::get();
         }
@@ -490,7 +481,7 @@ class WebFiori{
      * @return AutoLoader A reference to an instance of 'AutoLoader'.
      * @since 1.2.1
      */
-    public static function &getAutoloader() {
+    public static function getAutoloader() {
         return self::$AU;
     }
     /**
@@ -498,7 +489,7 @@ class WebFiori{
      * @return EmailController A reference to an instance of 'BasicMailFunctions'.
      * @since 1.2.1
      */
-    public static function &getBasicMailFunctions() {
+    public static function getEmailController() {
         return self::$BMF;
     }
     /**
@@ -506,7 +497,7 @@ class WebFiori{
      * @return ConfigController A reference to an instance of 'SystemFunctions'.
      * @since 1.2.1
      */
-    public static function &getSysFunctions(){
+    public static function getSysController(){
         return self::$SF;
     }
     /**
@@ -514,7 +505,7 @@ class WebFiori{
      * @return WebsiteController A reference to an instance of 'WebsiteFunctions'.
      * @since 1.2.1
      */
-    public static function &getWebsiteFunctions() {
+    public static function getWebsiteController() {
         return self::$WF;
     }
     /**

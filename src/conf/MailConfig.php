@@ -23,7 +23,7 @@ class MailConfig{
      * @return MailConfig
      * @since 1.0
      */
-    public static function &get(){
+    public static function get(){
         if(self::$inst === null){
             self::$inst = new MailConfig();
         }

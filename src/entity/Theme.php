@@ -28,7 +28,13 @@ use webfiori\conf\SiteConfig;
 use Exception;
 /**
  * A base class that is used to construct web site UI.
- * 
+ * A theme is a way to change the look and feel of all pages in 
+ * a website. It can be used to unify all UI components and 
+ * change them later using themes. The developer can extend this 
+ * class and implement its abstract methods to create header section, 
+ * a footer section and aside section. In addition, 
+ * the developer can include custom head tags (like CSS files or 
+ * JS files) by implementing one of the abstract methods.
  * @author Ibrahim
  * @version 1.2.3
  */

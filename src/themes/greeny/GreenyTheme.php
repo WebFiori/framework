@@ -23,9 +23,6 @@ class GreenyTheme extends Theme{
         $this->setImagesDirName('images');
         $this->setJsDirName('js');
         $this->setCssDirName('css');
-        $this->addComponents(array(
-            'UIFunctions.php'
-        ));
         $this->setAfterLoaded(function(){
             $session = WebsiteController::get()->getSession();
             Page::lang($session->getLang(TRUE));
@@ -105,6 +102,6 @@ class GreenyTheme extends Theme{
         $node = new HTMLNode();
         return $node;
     }
-
 }
+return __NAMESPACE__;
 

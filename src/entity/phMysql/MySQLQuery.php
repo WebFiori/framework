@@ -396,10 +396,10 @@ abstract class MySQLQuery{
         $query = ''.$query;
         if($query){
             $mysqlSpecial = array(
-                "\\","'"
+                "\\","'","\0","\b","\n"
             );
             $mysqlSpecialEsc = array(
-                "\\\\","\'"
+                "\\\\","\'","\\0","\\b","\\n"
             );
             $count = count($mysqlSpecial);
             for($i = 0 ; $i < $count ; $i++){
@@ -1186,7 +1186,6 @@ abstract class MySQLQuery{
             return '';
         }
         $index = 0;
-        $count = count($cols);
         $where = ' where ';
         $supportedConds = ['=','!=','<','<=','>','>='];
         foreach ($cols as $col){
@@ -1200,7 +1199,7 @@ abstract class MySQLQuery{
                 //then check value
                 $valUpper = gettype($vals[$index]) != 'array' ? strtoupper(trim($vals[$index])) : '';
                 if($valUpper == 'IS NULL' || $valUpper == 'IS NOT NULL'){
-                    if($index + 1 == $count){
+                    if($index + 1 == $colsCount){
                         $where .= $col->getName().' '.$valUpper.'';
                     }
                     else{
@@ -1208,7 +1207,7 @@ abstract class MySQLQuery{
                     }
                 }
                 else{
-                    if($index + 1 == $count){
+                    if($index + 1 == $colsCount){
                         if($col->getType() == 'varchar' || $col->getType() == 'text' || $col->getType() == 'mediumtext'){
                             $where .= $col->getName().' '.$equalityCond.' ';
                             $where .= '\''.self::escapeMySQLSpeciarChars($vals[$index]).'\'' ;
@@ -1268,7 +1267,7 @@ abstract class MySQLQuery{
                             }
                             else{
                                 $where .= 'date('.$col->getName().') '.$equalityCond.' ';
-                                $where .= '\''.self::escapeMySQLSpeciarChars($vals[$index]).'\' ';
+                                $where .= '\''.self::escapeMySQLSpeciarChars($vals[$index]).'\' '.$jointOps[$index].' ';
                             }
                         }
                         else{

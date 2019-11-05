@@ -46,26 +46,47 @@ class CronLoginView {
         Page::title('CRON Login');
         $jsCode = new JsCode();
         $jsCode->addCode(''
-                . 'function login(source){'
-                . "    source.innerHTML = 'Please wait...';"
-                . "    source.setAttribute('disabled','');"
-                . "    var pass = document.getElementById('password-input').value;"
-                . '    var xhr = new XMLHttpRequest();'
-                . "    xhr.open('post','cron/apis/login');"
-                . '    xhr.onreadystatechange = function(){'
-                . '        if(this.readyState === 4){'
-                . "            source.removeAttribute('disabled');"
-                . '            if(this.status === 200){'
-                . "                window.location.href = 'cron/jobs';"
-                . '            }'
-                . '            else{'
-                . "                source.innerHTML = 'Check your password';"
-                . "                source.style['color'] = 'red';"
-                . '            }'
-                . '        }'
-                . '    };'
-                . "    xhr.setRequestHeader('content-type','application/x-www-form-urlencoded');"
-                . "    xhr.send('password='+pass);"
+                . 'function login(source){'."\n"
+                . "    source.innerHTML = 'Please wait...';"."\n"
+                . "    source.setAttribute('disabled','');"."\n"
+                . "    source.style['color'] = 'black';"."\n"
+                . "    var pass = document.getElementById('password-input').value;"."\n"
+                . '    var xhr = new XMLHttpRequest();'."\n"
+                . "    xhr.open('post','cron/apis/login');"."\n"
+                . '    xhr.onreadystatechange = function(){'."\n"
+                . '        if(this.readyState === 4 && this.status === 200){'."\n"
+                . "            try{"."\n"
+                . "                var json = JSON.parse(this.response);"."\n"
+                . "                source.innerHTML = json['message'];"."\n"
+                . "                source.style['color'] = 'green';"."\n"
+                . "                window.location.href = 'cron/jobs';"."\n"
+                . "            }"."\n"
+                . "            catch(e){"."\n"
+                . "                source.innerHTML = 'Something went wrong on the server.';"."\n"
+                . "                source.style['color'] = 'red';"."\n"
+                . "                source.removeAttribute('disabled');"."\n"
+                . "            }"."\n"
+                . '        }'."\n"
+                . '        else if(this.readyState === 4 && this.status === 0){'."\n"
+                . "                source.removeAttribute('disabled');"."\n"
+                . "                source.innerHTML = 'Connection Lost. Check your internet connection.';"."\n"
+                . "                source.style['color'] = 'red';"."\n"
+                . '        }'."\n"
+                . '        else if(this.readyState === 4){'."\n"
+                . "            source.removeAttribute('disabled');"."\n"
+                . "            try{"."\n"
+                . "                var json = JSON.parse(this.response);"."\n"
+                . "                source.innerHTML = json['message'];"."\n"
+                . "                source.style['color'] = 'red';"."\n"
+                . "            }"."\n"
+                . "            catch(e){"."\n"
+                . "                source.innerHTML = 'Something went wrong on the server.';"."\n"
+                . "                source.style['color'] = 'red';"."\n"
+                . "            }"."\n"
+                . '        }'."\n"
+                . '    };'."\n"
+                . "    xhr.setRequestHeader('content-type','application/x-www-form-urlencoded');"."\n"
+                . "    xhr.send('password='+pass);"."\n"
                 . '}');
         Page::document()->getHeadNode()->addChild($jsCode);
         $form = new HTMLNode('form');
@@ -84,6 +105,7 @@ class CronLoginView {
             'width'=>'200px'
         ]);
         $form->addChild($passInput);
+        $form->addTextNode('<br/><br/>', false);
         $submit = new HTMLNode('button');
         $submit->addTextNode('Login');
         $submit->setAttribute('onclick', 'login(this);return false;');
@@ -93,4 +115,4 @@ class CronLoginView {
         Page::render();
     }
 }
-new CronLoginView();
+return __NAMESPACE__;

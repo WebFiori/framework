@@ -85,12 +85,13 @@ class CronAPIs extends ExtendedWebAPI{
     private function _login(){
         $cronPass = Cron::password();
         if($cronPass != 'NO_PASSWORD'){
-            if(hash('sha256', $this->getInputs()['password'])){
+            $inputHash = hash('sha256', $this->getInputs()['password']);
+            if($inputHash == $cronPass){
                 WebFiori::getWebsiteController()->setSessionVar('cron-login-status', true);
                 $this->sendResponse('Success', 'info', 200);
             }
             else{
-                $this->sendResponse('Failed', 'error', 404);
+                $this->sendResponse('Incorrect password', 'error', 404);
             }
         }
         else{
@@ -99,5 +100,4 @@ class CronAPIs extends ExtendedWebAPI{
     }
 
 }
-$service = new CronAPIs();
-$service->process();
+return __NAMESPACE__;

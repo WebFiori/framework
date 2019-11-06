@@ -90,7 +90,7 @@ class CronTasksView {
         $hr = new HTMLNode('hr',false);
         $this->controlsContainer->addChild($hr);
         if(Cron::password() != 'NO_PASSWORD'){
-            $this->controlsContainer->addTextNode('<button onclick="logout()"><b>Logout</b></button>', false);
+            $this->controlsContainer->addTextNode('<button name="input-element" onclick="logout()"><b>Logout</b></button><br/>', false);
         }
         $parag = new PNode();
         $parag->addText('<b>Total Scheduled Tasks:</b> '.$tasksCount.'.', array('esc-entities'=>false));

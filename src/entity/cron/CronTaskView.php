@@ -88,7 +88,7 @@ class CronTaskView {
             
             $this->controlsContainer->addChild($hr);
             if(Cron::password() != 'NO_PASSWORD'){
-                $this->controlsContainer->addTextNode('<button onclick="logout()"><b>Logout</b></button><br/>', false);
+                $this->controlsContainer->addTextNode('<button name="input-element" onclick="logout()"><b>Logout</b></button><br/>', false);
             }
             $backButton = new HTMLNode('button');
             $backButton->addTextNode('Back to Jobs List');
@@ -96,6 +96,7 @@ class CronTaskView {
             $backButton->setStyle([
                 'float'=>'left'
             ]);
+            $backButton->setName('input-element');
             $this->controlsContainer->addChild($backButton);
             $this->controlsContainer->addTextNode('<br/>', false);
             $this->_createInfoTable($job);
@@ -281,6 +282,9 @@ class CronTaskView {
                     . 'button.cancel:hover{'
                     . 'background-color: rgba(200,0,0,0.5);'
                     . '}'
+                    . 'button[disabled]{'
+                    . 'cursor:not-allowed'
+                    . '}'
                     . 'button.cancel{'
                     . 'width: 100px;'
                     . 'margin: 0;'
@@ -372,7 +376,7 @@ class CronTaskView {
         $addButtonCell = new TableCell();
         $addButtonCell->setColSpan(3);
         $addButtonCell->setID('add-attr-button-cell');
-        $addButtonCell->addTextNode('<button class="ok" style="width:100%" onclick="addAttribute()">Add Attribute</button>', false);
+        $addButtonCell->addTextNode('<button name="input-element" class="ok" style="width:100%" onclick="addAttribute()">Add Attribute</button>', false);
         $addRow->addChild($addButtonCell);
         $table->addChild($addRow);
         $this->controlsContainer->addChild($table);

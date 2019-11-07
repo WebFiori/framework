@@ -29,7 +29,7 @@ use phMysql\MySQLLink;
  * DBMSs connections.
  * Currently, the class only supports MySQL database. More will be added in the 
  * future.
- * @author Ibrahim <ibinshikh@hotmail.com>
+ * @author Ibrahim
  * @version 1.0
  */
 class DBConnectionFactory {

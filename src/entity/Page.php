@@ -51,7 +51,7 @@ use Exception;
  * of the page including page language, title, description, writing direction 
  * and canonical URL. Also, this class can be used to load a specific theme 
  * and use it to change the look and feel of the web site.
- * @author Ibrahim <ibinshikh@hotmail.com>
+ * @author Ibrahim
  * @version 1.9
  */
 class Page{
@@ -181,6 +181,9 @@ class Page{
     private function __construct() {
         $this->_reset();
     }
+    /**
+     * Reset the page to its defaults.
+     */
     public static function reset() {
         Page::get()->_reset();
     }
@@ -376,8 +379,8 @@ class Page{
      * @return Page an instance of 'Page'.
      * @since 1.0
      */
-    public static function &get(){
-        if(self::$instance != null){
+    public static function get(){
+        if(self::$instance !== null){
             return self::$instance;
         }
         self::$instance = new Page();

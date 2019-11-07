@@ -485,24 +485,24 @@ class WebFiori{
         return self::$AU;
     }
     /**
-     * Returns a reference to an instance of 'BasicMailFunctions'.
-     * @return EmailController A reference to an instance of 'BasicMailFunctions'.
+     * Returns a reference to an instance of 'EmailController'.
+     * @return EmailController A reference to an instance of 'EmailController'.
      * @since 1.2.1
      */
     public static function getEmailController() {
         return self::$BMF;
     }
     /**
-     * Returns a reference to an instance of 'SystemFunctions'.
-     * @return ConfigController A reference to an instance of 'SystemFunctions'.
+     * Returns a reference to an instance of 'ConfigController'.
+     * @return ConfigController A reference to an instance of 'ConfigController'.
      * @since 1.2.1
      */
     public static function getSysController(){
         return self::$SF;
     }
     /**
-     * Returns a reference to an instance of 'WebsiteFunctions'.
-     * @return WebsiteController A reference to an instance of 'WebsiteFunctions'.
+     * Returns a reference to an instance of 'WebsiteController'.
+     * @return WebsiteController A reference to an instance of 'WebsiteController'.
      * @since 1.2.1
      */
     public static function getWebsiteController() {

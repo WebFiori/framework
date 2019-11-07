@@ -29,10 +29,7 @@ use phpStructs\html\HTMLNode;
 use phpStructs\html\UnorderedList;
 class ExamplePage{
     public function __construct() {
-        //load UI template components (JS, CSS and others)
-        //it is optional. to use a theme but recomended
-        Page::theme($themeName='WebFiori Theme');
-
+        
         //sets the title of the page
         $lang = Page::lang();
         if($lang == 'AR'){
@@ -49,6 +46,9 @@ class ExamplePage{
             $p->addText('Hello from "WebFiori Framework"!');
             Page::insert($p);
         }
+        //load UI template components (JS, CSS and others)
+        //it is optional. to use a theme but recomended
+        Page::theme($themeName='WebFiori Theme');
         $sec = new HTMLNode('section');
         Page::insert($sec);
         $secH = new HTMLNode('h1');

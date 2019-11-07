@@ -47,10 +47,10 @@ class HeadNode extends HTMLNode{
      * </ul>
      * @since 1.1.4
      */
-    const ALLOWED_CHILDREN = array(
+    const ALLOWED_CHILDREN = [
         'base','title','meta','link','script','noscript','#COMMENT', 
         'style'
-    );
+    ];
     /**
      * A node that represents the tag 'base'.
      * @var HTMLNode
@@ -509,7 +509,8 @@ class HeadNode extends HTMLNode{
     }
     /**
      * Adds new CSS source file.
-     * @param string $href The link to the file. Must be non empty string.
+     * @param string $href The link to the file. Must be non empty string. It is 
+     * possible to append query string to the end of the link.
      * @param $otherAttrs An array that can contain additional 
      * attributes to set for the link tag.
      * @param boolean $preventCaching If set to true, a string in the form '?cv=xxxxxxxxxx' will 
@@ -536,14 +537,6 @@ class HeadNode extends HTMLNode{
         if(strlen($trimmedHref) != 0){
             $tag = new HTMLNode('link');
             $tag->setAttribute('rel','stylesheet');
-            if(gettype($otherAttrs) == 'array'){
-                foreach ($otherAttrs as $attr=>$val){
-                    $trimmedAttr = trim(strtolower($attr));
-                    if($trimmedAttr != 'rel' && $trimmedAttr != 'href'){
-                        $tag->setAttribute($trimmedAttr, $val);
-                    }
-                }
-            }
             if($preventCaching === true){
                 //used to prevent caching 
                 $version = substr(hash('sha256', time()+rand(0, 10000)), rand(0,10),10);
@@ -562,6 +555,14 @@ class HeadNode extends HTMLNode{
                     $tag->setAttribute('href', $trimmedHref);
                 }
             }
+            if(gettype($otherAttrs) == 'array'){
+                foreach ($otherAttrs as $attr=>$val){
+                    $trimmedAttr = trim(strtolower($attr));
+                    if($trimmedAttr != 'rel' && $trimmedAttr != 'href'){
+                        $tag->setAttribute($trimmedAttr, $val);
+                    }
+                }
+            }
             $this->addChild($tag);
             return true;
         }
@@ -569,7 +570,8 @@ class HeadNode extends HTMLNode{
     }
     /**
      * Adds new JavsScript source file.
-     * @param string $loc The location of the file. Must be non-empty string.
+     * @param string $loc The location of the file. Must be non-empty string. It 
+     * can have query string at the end.
      * @param $otherAttrs An array that can contain additional 
      * attributes to set for the script tag (such as 'async').
      * @param boolean $preventCaching If set to true, a string in the form '?jv=xxxxxxxxxx' will 
@@ -597,14 +599,6 @@ class HeadNode extends HTMLNode{
         if(strlen($trimmedLoc) != 0){
             $tag = new HTMLNode('script');
             $tag->setAttribute('type','text/javascript');
-            if(gettype($otherAttrs) == 'array'){
-                foreach ($otherAttrs as $attr=>$val){
-                    $trimmedAttr = trim(strtolower($attr));
-                    if($trimmedAttr != 'type' && $trimmedAttr != 'src'){
-                        $tag->setAttribute($trimmedAttr, $val);
-                    }
-                }
-            }
             if($preventCaching === true){
                 //used to prevent caching 
                 $version = substr(hash('sha256', time()+rand(0, 10000)), rand(0,10),10);
@@ -621,6 +615,14 @@ class HeadNode extends HTMLNode{
                 }
                 else{
                     $tag->setAttribute('src', $trimmedLoc.'?'.$queryString);
+                }
+            }
+            if(gettype($otherAttrs) == 'array'){
+                foreach ($otherAttrs as $attr=>$val){
+                    $trimmedAttr = trim(strtolower($attr));
+                    if($trimmedAttr != 'type' && $trimmedAttr != 'src'){
+                        $tag->setAttribute($trimmedAttr, $val);
+                    }
                 }
             }
             $this->addChild($tag);

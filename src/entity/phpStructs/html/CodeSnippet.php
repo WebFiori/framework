@@ -100,63 +100,63 @@ class CodeSnippet extends HTMLNode{
         $this->codeDisplay = new HTMLNode();
         $this->codeDisplay->setClassName('code-display');
         $this->codeDisplay->setStyle(
-            array(
+            [
                 'border-top'=>'1px dotted white',
                 'overflow-x'=>'scroll',
                 'direction'=>'ltr'
-            )
+            ]
         );
         $this->lineNumsNode = new HTMLNode();
         $this->lineNumsNode->setClassName('line-numbers');
         $this->lineNumsNode->setStyle(
-            array(
+            [
                 'float'=>'left',
                 'margin-top'=>'1px',
                 'line-height'=>'18px !important;',
                 'border'=>'1px dotted black;'
-            )
+            ]
         );
         $this->titleNode = new PNode();
         $this->titleNode->addText('Code');
         $this->titleNode->setClassName('snippit-title');
         $this->titleNode->setStyle(
-            array(
+            [
                 'padding'=>'0',
                 'padding-left'=>'10px',
                 'padding-right'=>'10px',
                 'margin'=>'0',
                 'border'=>'1px dotted'
-            )
+            ]
         );
         $this->pre = new HTMLNode('pre');
         $this->pre->setIsFormatted(FALSE);
         $this->pre->setStyle(
-            array(
+            [
                 'margin'=>'0',
                 'float'=>'left',
                 'border'=>'1px dotted black'
-            )
+            ]
         );
         $this->code = new HTMLNode('code');
         $this->code->addChild($this->codeStrNode);
         $this->code->setClassName('code');
         $this->code->setIsFormatted(FALSE);
         $this->code->setStyle(
-            array(
+            [
                 'line-height'=>'18px !important;',
                 'display'=>'block',
                 'float'=>'left'
-            )    
+            ]   
         );
         $this->setClassName('code-snippt');
         $this->setStyle(
-            array(
+            [
                 'padding-bottom'=>'16px',
                 'border'=>'1px dotted black',
                 'width'=>'100%;',
                 'margin-bottom'=>'25px',
                 'float'=>'left'
-            )
+            ]
         );
         
         $this->addChild($this->titleNode);

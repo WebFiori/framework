@@ -25,7 +25,7 @@
 namespace phpStructs\html;
 use phpStructs\html\HTMLNode;
 /**
- * A class that represents any input element;
+ * A class that represents any input element.
  *
  * @author Ibrahim
  * @version 1.0.2
@@ -59,9 +59,9 @@ class Input extends HTMLNode{
      * </ul>
      * @since 1.0
      */
-    const INPUT_TYPES = array('text','date','password','submit','checkbox','email','url','tel',
+    const INPUT_TYPES = ['text','date','password','submit','checkbox','email','url','tel',
         'color','file','range','month','number','date-local','hidden','time','week','search', 
-        'select','textarea','radio');
+        'select','textarea','radio'];
     /**
      * An array of supported input modes.
      * The array contains the following values:
@@ -77,7 +77,7 @@ class Input extends HTMLNode{
      * </ul>
      * @since 1.0
      */
-    const INPUT_MODES = array('none','text','decimal','numeric','tel','search','email','url');
+    const INPUT_MODES = ['none','text','decimal','numeric','tel','search','email','url'];
     /**
      * Creates new instance of the class.
      * @param string $type The type of the input element. If the 
@@ -109,7 +109,8 @@ class Input extends HTMLNode{
     }
     /**
      * Returns the value of the attribute 'type'.
-     * @return string|null The value of the attribute 'type'.
+     * @return string|null The value of the attribute 'type'. For 'textarea' and 
+     * select, this method will return null.
      * @since 1.0
      */
     public function getType() {
@@ -150,7 +151,8 @@ class Input extends HTMLNode{
      * <li>url</li>
      * </ul>
      * @param string|null $text The value to set. The attribute can be 
-     * set only if the type of the input is text or password or number.
+     * set only if the type of the input is text or password or number. If null 
+     * is given, the attribute will be unset If it was set.
      * @return boolean If placeholder is set, the method will return true. If 
      * it is not set, the method will return false.
      */
@@ -281,16 +283,17 @@ class Input extends HTMLNode{
      * <ul>
      * <li>label: A label that will be displayed to the user.</li>
      * <li>value: The value that will be set for the attribute 'value'.</li>
+     * <li>attributes: An associative array of attributes which can be set 
+     * for the option.</li>
      * </ul>
      * In addition to the two indices, the array can have additional index. 
      * The index name is 'attributes'. This index can have an associative array 
      * of attributes which will be set for the option. The key will act as the 
      * attribute name and the value of the key will act as the value of the 
      * attribute.
-     * @param string $label The label that will be displayed by the option.
      * @since 1.0.1
      */
-    public function addOption($options=array()) {
+    public function addOption($options=[]) {
         if($this->getNodeName() == 'select'){
             if(gettype($options) == 'array' && isset($options['value']) && isset($options['label'])){
                 $option = new HTMLNode('option');
@@ -326,17 +329,17 @@ class Input extends HTMLNode{
             foreach ($arrayOfOpt as $value => $lblOrOptions){
                 if(gettype($lblOrOptions) == 'array'){
                     $attrs = isset($lblOrOptions['attributes']) ? $lblOrOptions['attributes'] : array();
-                    $this->addOption(array(
+                    $this->addOption([
                         'value'=>$value,
                         'label'=>$lblOrOptions['label'],
                         'attributes'=>$attrs
-                    ));
+                    ]);
                 }
                 else{
-                    $this->addOption(array(
+                    $this->addOption([
                         'value'=>$value,
                         'label'=>$lblOrOptions
-                    ));
+                    ]);
                 }
             }
         }

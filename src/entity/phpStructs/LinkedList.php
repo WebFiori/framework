@@ -255,7 +255,7 @@ class LinkedList implements Countable, Iterator{
      * @since 1.3
      */
     public function toArray() {
-        $array = array();
+        $array = [];
         if($this->size() == 1){
             array_push($array, $this->head->data());
         }

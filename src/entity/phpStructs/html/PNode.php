@@ -63,7 +63,7 @@ class PNode extends HTMLNode{
      * </ul>
      * @since 1.0
      */
-    public function addText($text,$options = array(
+    public function addText($text,$options = [
         'bold'=>false,
         'italic'=>false,
         'em'=>false,
@@ -76,7 +76,7 @@ class PNode extends HTMLNode{
         'abbr-title'=>'',
         'abbr-def'=>'',
         'new-line'=>false
-    )) {
+    ]) {
         if(strlen($text) != 0){
             if(gettype($options) == 'array'){
                 $escEnt = isset($options['esc-entities']) ? $options['esc-entities'] === TRUE : TRUE;

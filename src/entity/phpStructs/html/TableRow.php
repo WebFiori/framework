@@ -29,7 +29,7 @@ use phpStructs\html\HTMLNode;
  * A class that represents &lt;tr&gt; node.
  *
  * @author Ibrahim
- * @version 1.0
+ * @version 1.0.1
  */
 class TableRow extends HTMLNode{
     public function __construct() {
@@ -48,20 +48,40 @@ class TableRow extends HTMLNode{
         }
     }
     /**
-     * Adds new cell to the row with a text in its body.
-     * @param string $cellText The text of cell body. It can have HTML.
+     * Adds new cell to the row.
+     * @param string|TableCell $cellText The text of cell body. It can have HTML. 
+     * Also, it can be an object of type 'TableCell'.
      * @param string $type The type of the cell. This attribute 
      * can have only one of two values, 'td' or 'th'. 'td' If the cell is 
      * in the body of the table and 'th' if the cell is in the header. If 
      * none of the two is given, 'td' will be used by default.
      * @param boolean $escEntities If set to true, the method will replace the 
-     * characters '<', '>' and '&' with the following HTML 
+     * characters '&lt;', '&gt;' and '&' with the following HTML 
      * entities: '&lt;', '&gt;' and '&amp;' in the given text. Default is false.
      * @since 1.0
      */
     public function addCell($cellText,$type='td',$escEntities=false) {
-        $cell = new TableCell($type);
-        $cell->addTextNode($cellText,$escEntities);
-        $this->addChild($cell);
+        if($cellText instanceof TableCell){
+            $this->addChild($cellText);
+        }
+        else{
+            $cell = new TableCell($type);
+            $cell->addTextNode($cellText,$escEntities);
+            $this->addChild($cell);
+        }
+    }
+    /**
+     * Returns a table cell given its index.
+     * @param int $index Cell index starting from 0.
+     * @return TableCell|null If the cell does exist, the method will return 
+     * an object of type 'TableCell'. If cell does not exist, the method 
+     * will return null.
+     * @version 1.0.1
+     */
+    public function getCell($index) {
+        $child = $this->children()->get($index);
+        if($child instanceof TableCell){
+            return $child;
+        }
     }
 }

@@ -507,15 +507,17 @@ class Controller {
     /**
      * Returns the instance of 'SessionManager' that is used by the class.
      * Before trying to get a session manager, the name of the session must 
-     * be supplied to the method Functions::useSession().
+     * be supplied to the method Functions::useSession(). Note that it is not possible 
+     * to use session in command line interface. If the framework is running through 
+     * CLI, This method will always return null.
      * @return SessionManager|null An instance of 'SessionManager'. If no 
-     * session is running, the method will return null.
+     * session is running or the method is called in CLI, the method will return null.
      * @since 1.3
      */
-    public function &getSession() {
+    public function getSession() {
         $retVal = null;
         if($this->sessionName !== null){
-            $retVal = &self::$sessions[$this->sessionName];
+            $retVal = self::$sessions[$this->sessionName];
         }
         return $retVal;
     }
@@ -576,7 +578,7 @@ class Controller {
      * null.
      * @since 1.2
      */
-    private function &getDBLink() {
+    private function getDBLink() {
         return $this->databaseLink;
     }
     /**

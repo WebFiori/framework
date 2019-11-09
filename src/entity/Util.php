@@ -510,27 +510,35 @@ class Util{
     /**
      * Call the method 'print_r' and insert 'pre' around it.
      * The method is used to make the output well formatted and user 
-     * readable.
+     * readable. Note that if the framework is running through command line 
+     * interface, the output will be sent to STDOUTE.
      * @param mixed $expr Any variable or value that can be passed to the 
      * function 'print_r'.
      * @param boolean $asMessageBox If this attribute is set to true, the output
      * will be shown in a floating message box which can be moved around inside 
-     * the web page. Default is true.
+     * the web page. Default is true. It has no effect in case the framework 
+     * is running through CLI.
      * @since 1.0
      */
     public static function print_r($expr,$asMessageBox=true){
-        if(gettype($expr) == 'string'){
-            $expr1 = str_replace('<', '&lt;', $expr);
-            $expr = str_replace('>', '&gt;', $expr1);
-        }
-        $val = '<pre>'. print_r($expr, true).'</pre>';
-        if($asMessageBox === true){
-            $messageBox = new MessageBox();
-            $messageBox->getBody()->addTextNode($val,false);
-            echo $messageBox;
+        if(CLI::isCLI()){
+            $val = print_r($expr, true);
+            fprintf(STDOUT, "%s\n",$val);
         }
         else{
-            echo $val;
+            if(gettype($expr) == 'string'){
+                $expr1 = str_replace('<', '&lt;', $expr);
+                $expr = str_replace('>', '&gt;', $expr1);
+            }
+            $val = '<pre>'. print_r($expr, true).'</pre>';
+            if($asMessageBox === true){
+                $messageBox = new MessageBox();
+                $messageBox->getBody()->addTextNode($val,false);
+                echo $messageBox;
+            }
+            else{
+                echo $val;
+            }
         }
     }
     /**

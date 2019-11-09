@@ -101,15 +101,40 @@ class CLI {
         fprintf(STDOUT, "    %s %".$dist."s %s\n", $command,":",$help);
     }
     /**
+     * Checks if the framework is running through command line interface (CLI) or 
+     * through a web server.
+     * @return boolean If the framework is running through a command line, 
+     * the method will return true. False if not.
+     */
+    public static function isCLI() {
+        //best way to check if app is runing through CLi
+        // or in a web server.
+        // Did a lot of reaseach on that.
+        $isCli = http_response_code() === false;
+        return $isCli;
+    }
+    /**
      * Initialize CLI.
      */
     public static function init() {
-        $sapi = php_sapi_name();
-        if($sapi == 'cli'){
-            $_SERVER['HTTP_HOST'] = '127.0.0.1';
-            $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
+        $isCli = self::isCLI();
+        if($isCli === true){
+            if(defined('CLI_HTTP_HOST')){
+                $host = CLI_HTTP_HOST;
+            }
+            else{
+                $host = '127.0.0.1';
+            }
+            $_SERVER['HTTP_HOST'] = $host;
+            $_SERVER['REMOTE_ADDR'] = $host;
             $_SERVER['DOCUMENT_ROOT'] = trim($_SERVER['argv'][0],'WebFiori.php');
-            putenv('HTTP_HOST=127.0.0.1');
+            if(defined('USE_HTTP') && USE_HTTP === true){
+                
+            }
+            else{
+                $_SERVER['HTTPS'] = 'yes';
+            }
+            putenv('HTTP_HOST='.$host);
         }
     }
     /**

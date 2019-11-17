@@ -160,7 +160,7 @@ class APIAction implements JsonI{
     /**
      * Sets version number or name at which the action was added to the API.
      * This method is called automatically when an action is added to any object of 
-     * type WebAPI. The developer does not have to use this method.
+     * type WebServices. The developer does not have to use this method.
      * @param string The version number at which the action was added to the API.
      * @since 1.2
      */
@@ -170,7 +170,7 @@ class APIAction implements JsonI{
     /**
      * Returns version number or name at which the action was added to the API.
      * Version number is set based on the version number which was set in the 
-     * class WebAPI.
+     * class WebServices.
      * @return string The version number at which the action was added to the API.
      * @since 1.2
      */

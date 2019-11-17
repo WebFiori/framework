@@ -24,19 +24,19 @@
  */
 namespace webfiori\entity;
 use webfiori\WebFiori;
-use restEasy\WebAPI;
+use restEasy\WebServices;
 use webfiori\entity\langs\Language;
 use jsonx\JsonI;
 use jsonx\JsonX;
 /**
- * An extension for the class 'WebAPI' that adds support for multi-language 
+ * An extension for the class 'Services' that adds support for multi-language 
  * response messages.
  * The language can be set by sending a GET or POST request that has the 
  * parameter 'lang'.
  * @author Ibrahim
  * @version 1.0.1
  */
-abstract class ExtendedWebAPI extends WebAPI{
+abstract class ExtendedWebServices extends WebServices{
     private $translation;
     /**
      * Creates new instance of 'API'.

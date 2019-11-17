@@ -58,15 +58,23 @@ class TableRow extends HTMLNode{
      * @param boolean $escEntities If set to true, the method will replace the 
      * characters '&lt;', '&gt;' and '&' with the following HTML 
      * entities: '&lt;', '&gt;' and '&amp;' in the given text. Default is false.
+     * @param array $attrs An associative array of attributes which will be 
+     * set for the added list. Applicable only if the first attribute of the 
+     * method is a string.
      * @since 1.0
      */
-    public function addCell($cellText,$type='td',$escEntities=false) {
+    public function addCell($cellText,$type='td',$escEntities=false,$attrs=[]) {
         if($cellText instanceof TableCell){
             $this->addChild($cellText);
         }
         else{
             $cell = new TableCell($type);
             $cell->addTextNode($cellText,$escEntities);
+            if(gettype($attrs) == 'array'){
+                foreach ($attrs as $a=>$v){
+                    $cell->setAttribute($a, $v);
+                }
+            }
             $this->addChild($cell);
         }
     }
@@ -79,9 +87,6 @@ class TableRow extends HTMLNode{
      * @version 1.0.1
      */
     public function getCell($index) {
-        $child = $this->children()->get($index);
-        if($child instanceof TableCell){
-            return $child;
-        }
+        return $this->children()->get($index);
     }
 }

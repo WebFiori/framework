@@ -39,7 +39,7 @@ class Label extends HTMLNode{
      */
     public function __construct($text='') {
         parent::__construct('label');
-        parent::addChild(self::createTextNode($text,FALSE));
+        parent::addChild(self::createTextNode($text,false));
     }
     /**
      * Sets the text that will be displayed by the label.

@@ -1,5 +1,4 @@
 <?php
-
 /*
  * The MIT License
  *
@@ -24,20 +23,20 @@
  * THE SOFTWARE.
  */
 namespace phpStructs\html;
-use phpStructs\html\HTMLNode;
+
 /**
- * A class that represents Unordered List HTML element (ul)
+ * A class that represents ordered list (ol).
  *
  * @author Ibrahim
- * @version 1.0.2
+ * @version 1.0
  */
-class UnorderedList extends HTMLNode{
+class OrderedList extends HTMLNode{
     /**
      * Creates new instance of the class.
      * @since 1.0
      */
     public function __construct() {
-        parent::__construct('ul');
+        parent::__construct('ol');
     }
     /**
      * Adds new item to the list.

@@ -274,6 +274,9 @@ class Input extends HTMLNode{
                     $node->getNodeName() == 'optgroup')){
                 parent::addChild($node);
             }
+            else if($this->getNodeName() == 'textarea' && $node->getNodeName() == '#TEXT'){
+                parent::addChild($node);
+            }
         }
     }
     /**

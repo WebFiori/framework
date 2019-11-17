@@ -28,6 +28,9 @@ use jsonx\JsonI;
 use jsonx\JsonX;
 /**
  * A class that represents request parameter.
+ * Request parameter can be part of query string in case of 
+ * GET and DELETE calls and in request body in case of 
+ * PUT or POST requests
  * @author Ibrahim
  * @version 1.2.2
  */

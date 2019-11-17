@@ -47,9 +47,9 @@ class APIFilter{
      * @var array 
      * @since 1.0
      */
-    const TYPES = array(
+    const TYPES = [
         'string','integer','email','float','url','boolean','array'
-    );
+    ];
     /**
      * A constant that indicates a given value is invalid.
      * @var string A string that indicates a given value is invalid.
@@ -61,19 +61,19 @@ class APIFilter{
      * @var array
      * @since 1.0 
      */
-    private $inputs = array();
+    private $inputs = [];
     /**
      * An array that contains non-filtered data (original).
      * @var array
      * @since 1.2 
      */
-    private $nonFilteredInputs = array();
+    private $nonFilteredInputs = [];
     /**
      * Array that contains filter definitions.
      * @var array
      * @since 1.0 
      */
-    private $paramDefs = array();
+    private $paramDefs = [];
     /**
      * Adds a new request parameter to the filter.
      * @param RequestParameter $reqParam The request parameter that will be added.
@@ -81,11 +81,11 @@ class APIFilter{
      */
     public function addRequestParameter($reqParam) {
         if($reqParam instanceof RequestParameter){
-            $attribute = array(
+            $attribute = [
                 'parameter'=>$reqParam,
-                'filters'=>array(),
-                'options'=>array('options'=>array())
-            );
+                'filters'=>[],
+                'options'=>['options'=>[]]
+            ];
             if($reqParam->getDefault() !== null){
                 $attribute['options']['options']['default'] = $reqParam->getDefault();
             }
@@ -140,7 +140,7 @@ class APIFilter{
      */
     private static function _filterBoolean($boolean) {
         $booleanLwr = strtolower($boolean);
-        $boolTypes = array(
+        $boolTypes = [
             't'=>true,
             'f'=>false,
             'yes'=>true,
@@ -154,7 +154,7 @@ class APIFilter{
             'off'=>false,
             'y'=>true,
             'n'=>false,
-            'ok'=>true);
+            'ok'=>true];
         if(isset($boolTypes[$booleanLwr])){
             return $boolTypes[$booleanLwr];
         }
@@ -171,7 +171,7 @@ class APIFilter{
     private static function _filterArray($array) {
         $len = strlen($array);
         $retVal = self::INVALID;
-        $arrayValues = array();
+        $arrayValues = [];
         if($len >= 2){
             if($array[0] == '[' && $array[$len - 1] == ']'){
                 $tmpArrValue = '';
@@ -309,11 +309,11 @@ class APIFilter{
      * @since 1.2.1
      */
     private static function _parseStringFromArray($arr,$start,$len,$stringEndChar){
-        $retVal = array(
+        $retVal = [
             'end'=>0,
             'string'=>'',
             'parsed'=>false
-        );
+        ];
         $str = "";
         for($x = $start ; $x < $len ; $x++){
             $ch = $arr[$x];
@@ -395,8 +395,8 @@ class APIFilter{
      */
     public static function filter($apiFilter,$arr) {
         $retVal = [
-            'filtered'=>array(),
-            'non-filtered'=>array()
+            'filtered'=>[],
+            'non-filtered'=>[]
         ];
         if($apiFilter instanceof APIFilter && gettype($arr) == 'array'){
             $filterDef = $apiFilter->getFilterDef();
@@ -409,9 +409,9 @@ class APIFilter{
                     $retVal['non-filtered'][$name] = $arr[$name];
                     if(isset($def['options']['filter-func'])){
                         $filteredValue = '';
-                        $arrToPass = array(
+                        $arrToPass = [
                             'original-value'=>$toBeFiltered,
-                        );
+                        ];
                         if($def['parameter']->applyBasicFilter() === true){
                             $toBeFiltered = strip_tags($toBeFiltered);
                             if($paramType == 'boolean'){
@@ -536,7 +536,7 @@ class APIFilter{
      * @since 1.1
      */
     public function clearParametersDef() {
-        $this->paramDefs = array();
+        $this->paramDefs = [];
     }
     /**
      * Clears the arrays that are used to store filtered and not-filtered variables.

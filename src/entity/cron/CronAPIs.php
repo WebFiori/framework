@@ -26,7 +26,7 @@ namespace webfiori\entity\cron;
 use restEasy\APIAction;
 use restEasy\RequestParameter;
 use webfiori\WebFiori;
-use webfiori\entity\ExtendedWebAPI;
+use webfiori\entity\ExtendedWebServices;
 use webfiori\entity\cron\Cron;
 use jsonx\JsonX;
 /**
@@ -35,7 +35,7 @@ use jsonx\JsonX;
  *
  * @author Ibrahim
  */
-class CronAPIs extends ExtendedWebAPI{
+class CronAPIs extends ExtendedWebServices{
     public function __construct() {
         parent::__construct();
         $a00 = new APIAction('login');

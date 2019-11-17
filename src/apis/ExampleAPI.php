@@ -24,11 +24,11 @@
  * THE SOFTWARE.
  */
 namespace webfiori\examples\webApis;
-use webfiori\entity\ExtendedWebAPI;
+use webfiori\entity\ExtendedWebServices;
 use restEasy\APIAction;
 
 //create class and extend the base class API
-class ExampleAPI extends ExtendedWebAPI{
+class ExampleAPI extends ExtendedWebServices{
     
     public function __construct() {
         parent::__construct();

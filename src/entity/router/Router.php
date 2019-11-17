@@ -23,7 +23,7 @@
  * THE SOFTWARE.
  */
 namespace webfiori\entity\router;
-use restEasy\WebAPI;
+use restEasy\WebServices;
 use webfiori\conf\SiteConfig;
 use webfiori\entity\Util;
 use phpStructs\html\HTMLNode;
@@ -45,7 +45,7 @@ use jsonx\JsonX;
  * </p>
  * <p>An API route is a route that points to a file which exist inside the 
  * directory '/apis'. This folder usually contains PHP files which extends 
- * the class 'ExtendedWebAPI' or the class 'WebAPI'.
+ * the class 'ExtendedWebServices' or the class 'WebServices'.
  * </p>
  * <b>
  * A closure route is simply a function that will be executed when the 
@@ -720,7 +720,7 @@ class Router {
                                         }
                                         if(class_exists($constructor)){
                                             $instance = new $constructor();
-                                            if($instance instanceof WebAPI){
+                                            if($instance instanceof WebServices){
                                                 $instance->process();
                                             }
                                         }
@@ -824,7 +824,7 @@ class Router {
                                         }
                                         if(class_exists($constructor)){
                                             $instance = new $constructor();
-                                            if($instance instanceof WebAPI){
+                                            if($instance instanceof WebServices){
                                                 $instance->process();
                                             }
                                         }

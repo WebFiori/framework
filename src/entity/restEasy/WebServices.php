@@ -26,22 +26,22 @@ namespace restEasy;
 use jsonx\JsonI;
 use jsonx\JsonX;
 /**
- * A class that represents a set of REST APIs.
+ * A class that represents a set of web services.
  * This class is used to create web services.
  * In order to create a simple web service, the developer must 
  * follow the following steps:
  * <ul>
  * <li>Extend this class.</li>
  * <li>Create API actions using the class APIAction. Each action will 
- * represent one end point.</li>
- * <li>Implement the abstract method <a href="#isAuthorized">WebAPI::isAuthorized()</a> 
- * and the method <a href="#processRequest">WebAPI::processRequest()</a></li>
+ * represent one service (end point).</li>
+ * <li>Implement the abstract method <a href="#isAuthorized">WebServices::isAuthorized()</a> 
+ * and the method <a href="#processRequest">WebServices::processRequest()</a></li>
  * </li>
  * When a request is made to the API, An instance of the child class must be created 
- * and the method WebAPI::process() must be called.
+ * and the method <a href="#process">WebServices::process()</a> must be called.
  * @version 1.4.3
  */
-abstract class WebAPI implements JsonI{
+abstract class WebServices implements JsonI{
     /**
      * An array that contains the supported 'POST' request content types.
      * This array has the following values:
@@ -125,8 +125,8 @@ abstract class WebAPI implements JsonI{
         if(!in_array($this->requestMethod, APIAction::METHODS)){
             $this->requestMethod = 'GET';
         }
-        $this->actions = array();
-        $this->authActions = array();
+        $this->actions = [];
+        $this->authActions = [];
         $this->filter = new APIFilter();
         $action = new APIAction('api-info');
         $action->setDescription('Returns a JSON string that contains all needed information about all end points in the given API.');
@@ -136,8 +136,8 @@ abstract class WebAPI implements JsonI{
                 . 'If set, the information that will be returned will be specific '
                 . 'to the given version number.');
         $this->addAction($action,true);
-        $this->invParamsArr = array();
-        $this->missingParamsArr = array();
+        $this->invParamsArr = [];
+        $this->missingParamsArr = [];
     }
     /**
      * Sets the description of the API.
@@ -375,7 +375,7 @@ abstract class WebAPI implements JsonI{
      * null.
      * @since 1.3
      */
-    public function &getActionByName($actionName) {
+    public function getActionByName($actionName) {
         $trimmed = trim($actionName);
         if(strlen($trimmed) != 0){
             foreach ($this->getActions() as $action){
@@ -393,7 +393,7 @@ abstract class WebAPI implements JsonI{
         return $null;
     }
     /**
-     * Returns an array of supported API actions.
+     * Returns an array that contains all added actions.
      * @return array An array that contains an objects of type APIAction. 
      * The actions on the returned array does not require authentication.
      * @since 1.0
@@ -402,7 +402,7 @@ abstract class WebAPI implements JsonI{
         return $this->actions;
     }
     /**
-     * Returns an array of supported API actions.
+     * Returns an array that contains all added actions.
      * @return array An array that contains an objects of type APIAction. 
      * The array will contains the actions 
      * that require authentication.
@@ -419,7 +419,7 @@ abstract class WebAPI implements JsonI{
      * @return boolean true if the action is added. FAlSE otherwise.
      * @since 1.0
      */
-    public function addAction(&$action,$reqPermissions=false){
+    public function addAction($action,$reqPermissions=false){
         if($action instanceof APIAction){
             if(!in_array($action, $this->getActions()) && !in_array($action, $this->getAuthActions())){
                 $action->setSince($this->getVersion());
@@ -458,13 +458,13 @@ abstract class WebAPI implements JsonI{
             $json->add('auth-actions', $this->getAuthActions());
         }
         else{
-            $actions = array();
+            $actions = [];
             foreach ($this->getActions() as $a){
                 if($a->getSince() == $vNum){
                     array_push($actions, $a);
                 }
             }
-            $authActions = array();
+            $authActions = [];
             foreach ($this->getAuthActions() as $a){
                 if($a->getSince() == $vNum){
                     array_push($authActions, $a);
@@ -473,8 +473,6 @@ abstract class WebAPI implements JsonI{
             $json->add('actions', $actions);
             $json->add('auth-actions', $authActions);
         }
-        
-        
         return $json;
     }
     /**
@@ -640,8 +638,8 @@ abstract class WebAPI implements JsonI{
      * @since 1.0
      */
     public final function process(){
-        $this->invParamsArr = array();
-        $this->missingParamsArr = array();
+        $this->invParamsArr = [];
+        $this->missingParamsArr = [];
         if($this->isContentTypeSupported()){
             if($this->_checkAction()){
                 $actionObj = $this->getActionByName($this->getAction());

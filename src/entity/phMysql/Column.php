@@ -26,9 +26,14 @@ namespace phMysql;
 /**
  * A class that represents a column in MySQL table.
  * @author Ibrahim
- * @version 1.6.3
+ * @version 1.6.5
  */
 class Column{
+    /**
+     * A boolean which can be set to true in order to update column timestamp.
+     * @var boolean 
+     */
+    private $autoUpdate;
     /**
      * A comment to add to the column.
      * @var string|null 
@@ -103,10 +108,10 @@ class Column{
      * @var array 
      * @since 1.0
      */
-    const DATATYPES = array(
+    const DATATYPES = [
         'int','varchar','timestamp','tinyblob','blob','mediumblob','longblob',
         'datetime','text','mediumtext','decimal','double','float'
-    );
+    ];
     
     /**
      * A boolean value. Set to true if column is unique.
@@ -159,12 +164,6 @@ class Column{
      */
     private $default;
     /**
-     * This value is used in case of the datatype is 'datetime' or 'timestamp'.
-     * @var string
-     * @since 1.1 
-     */
-    private $onColUpdate;
-    /**
      * The number of numbers that will appear after the decimal point.
      * @var int 
      * @since 1.6.2
@@ -189,6 +188,7 @@ class Column{
      */
     public function __construct($colName='col',$datatype='varchar',$size=1) {
         $this->mySqlVersion = '5.5';
+        $this->autoUpdate = false;
         if($this->setName($colName) !== true){
             $this->setName('col');
         }
@@ -208,6 +208,63 @@ class Column{
         
         $this->setIsNull(false);
         $this->setIsUnique(false);
+    }
+    /**
+     * 
+     * @param string|int|double|null $val
+     * @param boolean $dateEndOfDay Description
+     * @return int|string|null The return type of the method will depend on 
+     * the type of the column as follows:
+     * <ul>
+     * <li>If no default is set or type does not support default values, null is returned.</li>
+     * <li><b>int</b>: The method will return an integer.</li>
+     * <li><b>decimal, float and double</b>: A quoted string (such as '1.06')</li>
+     * <li><b>varchar, text and mediumtext</b>: A quoted string (such as 'It is fun'). 
+     * Note that any single quot inside the string will be escaped.</li>
+     * <li><b>datetime and timestamp</b>: A quoted string (such as '2019-11-09 00:00:00')</li>
+     * </ul>
+     * @since 1.6.4
+     */
+    public function cleanValue($val,$dateEndOfDay=false) {
+        $type = $this->getType();
+        if($val === null){
+            return null;
+        }
+        else if($type == 'int'){
+            return intval($val);
+        }
+        else if($type == 'decimal' || $type == 'float' || $type == 'double'){
+            return '\''.floatval($val).'\'';
+        }
+        else if($type == 'varchar' || $type == 'text' || $type == 'mediumtext'){
+            return '\''.str_replace("'", "\'", $val).'\'';
+        }
+        else if($type == 'datetime' || $type == 'timestamp'){
+            $trimmed = strtolower(trim($val));
+            if($trimmed == 'current_timestamp'){
+                return 'current_timestamp';
+            }
+            else if($trimmed == 'now()'){
+                return 'now()';
+            }
+            else if($this->_validateDateAndTime($trimmed)){
+                return '\''.$trimmed.'\'';
+            }
+            else if($this->_validateDate($trimmed)){
+                if($dateEndOfDay === true){
+                    return '\''.$trimmed.' 23:59:59\'';
+                }
+                else{
+                    return '\''.$trimmed.' 00:00:00\'';
+                }
+            }
+            else{
+                return '';
+            }
+        }
+        else{
+            return '';
+        }
     }
     /**
      * Sets a comment which will appear with the column.
@@ -379,15 +436,28 @@ class Column{
         return $this->ownerTable;
     }
     /**
-     * Adds the statement "on update now()" in column creation string.
+     * Sets the value of the property 'autoUpdate'.
      * It is used in case the user want to update the date of a column 
-     * that has the type 'datetime' or 'timestamp' automatically if a record is updated.
+     * that has the type 'datetime' or 'timestamp' automatically if a record is updated. 
+     * This method has no effect for other datatypes.
+     * @param boolean $bool If true is passed, then the value of the column will 
+     * be updated in case an update query is constructed. 
      * @since 1.1
      */
-    public function autoUpdate(){
+    public function setAutoUpdate($bool){
         if($this->getType() == 'datetime' || $this->getType() == 'timestamp'){
-            $this->onColUpdate = 'on update now()';
+            $this->autoUpdate = $bool === true;
         }
+    }
+    /**
+     * Returns the value of the property 'autoUpdate'.
+     * @return boolean If the column type is 'datetime' or 'timestamp' and the 
+     * column is set to auto update in case of update query, the method will 
+     * return true. Default return value is valse.
+     * @since 1.6.5
+     */
+    public function isAutoUpdate() {
+        return $this->autoUpdate;
     }
     /**
      * Sets the value of the property $isUnique.
@@ -529,7 +599,6 @@ class Column{
                     $this->setSize(1);
                 }
             }
-            $this->onColUpdate = null;
             $this->default = null;
             if($default != null){
                 if($s_type == 'varchar'){
@@ -554,62 +623,30 @@ class Column{
     }
     /**
      * Sets the default value for the column to use in case of insert.
-     * For integer data type, the passed value must be an integer. For 'varchar', 
-     * the passed value must be a string. If the datatype is 'timestamp', the 
-     * default will be 'current_timestamp' if null is passed. If the passed 
+     * For integer data type, the passed value must be an integer. For string types such as 
+     * 'varchar' or 'text', the passed value must be a string. If the datatype 
+     * is 'timestamp', the default will be set to current time and date 
+     * if non-null value is passed (the value which is returned by the 
+     * function date('Y-m-d H:i:s). If the passed 
      * value is a date string in the format 'YYYY-MM-DD HH:MM:SS', then it 
-     * will be set to the given value. same applies to 'datetime' datatype except 
-     * that if null is passed, default will be 'now()'.
-     * @param mixed $default The default value.
-     * @return boolean true if the value is set. false otherwise.
+     * will be set to the given value. If the passed 
+     * value is a date string in the format 'YYYY-MM-DD', then the default 
+     * will be set to 'YYYY-MM-DD 00:00:00'. same applies to 'datetime' datatype. If 
+     * null is passed, it implies that no default value will be used.
+     * @param mixed $default The default value which will be set.
      * @since 1.0
      */
     public function setDefault($default=null){
+        $this->default = $this->cleanValue($default);
         $type = $this->getType();
-        $retVal = false;
-        if($type == 'varchar' || $type == 'text' || $type == 'mediumtext'){
-            if(gettype($default) == 'string'){
-                $this->default = MySQLQuery::escapeMySQLSpeciarChars($default);
-                $retVal = true;
+        if($type == 'datetime' || $type == 'timestamp'){
+            if($this->default == 'now()' || $default == 'current_timestamp'){
+                $this->default = '\''.date('Y-m-d H:i:s').'\'';
+            }
+            else if(strlen($this->default) == 0 && $this->default !== null){
+                $this->default = null;
             }
         }
-        else if($type == 'int'){
-            if(gettype($default) == 'integer'){
-                $this->default = $default;
-                $retVal = true;
-            }
-        }
-        else if($type == 'float' || $type == 'decimal' || $type == 'double'){
-            if(gettype($default) == 'double' || gettype($default) == 'integer'){
-                $this->default = $default;
-                $retVal = true;
-            }
-        }
-        else if($type == 'timestamp'){
-            if($default === null){
-                $this->default = 'current_timestamp';
-                $retVal = true;
-            }
-            else{
-                if($this->_validateDateAndTime($default)){
-                    $this->default = $default;
-                    $retVal = true;
-                }
-            }
-        }
-        else if($type == 'datetime'){
-            if($default === null){
-                $this->default = 'now()';
-                $retVal = true;
-            }
-            else{
-                if($this->_validateDateAndTime($default)){
-                    $this->default = $default;
-                    $retVal = true;
-                }
-            }
-        }
-        return $retVal;
     }
     
     /**
@@ -618,6 +655,24 @@ class Column{
      * @since 1.0
      */
     public function getDefault(){
+        $defaultVal = $this->default;
+        if($defaultVal !== null){
+            $dt = $this->getType();
+            if($dt == 'varchar' || $dt == 'text' || $dt == 'mediumtext' || 
+                    $dt == 'timestamp' || $dt == 'datetime' || 
+                    $dt == 'tinyblob' || $dt == 'blob' || $dt == 'mediumblob' || 
+                    $dt == 'longblob' || $dt == 'decimal' || $dt == 'float' || $dt == 'double'
+                    ){
+                $retVal = substr($defaultVal, 1, strlen($defaultVal) - 2);
+                if($dt == 'decimal' || $dt == 'float' || $dt == 'double'){
+                    return floatval($retVal);
+                }
+                return $retVal;
+            }
+            else if($dt == 'int'){
+                return intval($defaultVal);
+            }
+        }
         return $this->default;
     }
     /**
@@ -753,33 +808,12 @@ class Column{
         if($this->isUnique()){
             $retVal .= 'unique ';
         }
-        $default = $this->getDefault();
+        $default = $this->default;
+        if($default !== null){
+            $retVal .= 'default '.$default.' ';
+        }
         if($type == 'varchar' || $type == 'text' || $type == 'mediumtext'){
             $retVal .= 'collate '.$this->getCollation().' ';
-        }
-        if($default !== null){
-            if($type == 'varchar' || 
-                    $type == 'decimal' || 
-                    $type == 'float' || 
-                    $type == 'double' || 
-                    $type == 'mediumtext' || 
-                    $type == 'text'){
-                $retVal .= 'default \''.$default.'\' ';
-            }
-            else if($this->getType() == 'timestamp' || $this->getType() == 'datetime'){
-                if($default == 'current_timestamp' || $default == 'now()'){
-                    $retVal .= 'default '.$default.' ';
-                }
-                else{
-                    $retVal .= 'default \''.$default.'\' ';
-                }
-            }
-            else{
-                $retVal .= 'default '.$default.' ';
-            }
-        }
-        if($this->getType() == 'timestamp' || $this->getType() == 'datetime'){
-            $retVal .= $this->onColUpdate;
         }
         $comment = $this->getComment();
         if($comment !== null){

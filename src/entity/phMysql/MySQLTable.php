@@ -28,7 +28,7 @@ use phMysql\MySQLQuery;
  * A class that represents MySQL table.
  *
  * @author Ibrahim
- * @version 1.6.1
+ * @version 1.6.3
  */
 class MySQLTable {
     /**
@@ -78,7 +78,7 @@ class MySQLTable {
      * @var array 
      * @since 1.0
      */
-    private $foreignKeys = array();
+    private $foreignKeys = [];
     /**
      * The name of the table.
      * @var string
@@ -107,7 +107,7 @@ class MySQLTable {
      * An array of booleans which indicates which default columns has been added
      * @var array 
      */
-    private $hasDefaults;
+    private $defaultColsKeys;
     /**
      * Creates a new instance of the class.
      * This method will initialize the basic settings of the table. It will 
@@ -126,10 +126,10 @@ class MySQLTable {
         $this->engin = 'InnoDB';
         $this->charSet = 'utf8mb4';
         $this->order = 0;
-        $this->hasDefaults = [
-            'id'=>false,
-            'created-on'=>false,
-            'last-updated'=>false
+        $this->defaultColsKeys = [
+            'id'=>null,
+            'created-on'=>null,
+            'last-updated'=>null
         ];
         $this->schema = null;
     }
@@ -237,7 +237,7 @@ class MySQLTable {
         'last-updated'=>[]
     ]) {
         if(gettype($options) == 'array'){
-            if(isset($options['id']) && !$this->hasDefaults['id']){
+            if(isset($options['id']) && $this->defaultColsKeys['id'] === null){
                 $id = $options['id'];
                 $key = isset($id['key-name']) ? trim($id['key-name']) : 'id';
                 if(!$this->_isKeyNameValid($key)){
@@ -251,10 +251,10 @@ class MySQLTable {
                     $colObj->setName('id');
                 }
                 if($this->addColumn($key, $colObj)){
-                    $this->hasDefaults['id'] = true;
+                    $this->defaultColsKeys['id'] = $key;
                 }
             }
-            if(isset($options['created-on']) && !$this->hasDefaults['created-on']){
+            if(isset($options['created-on']) && $this->defaultColsKeys['created-on'] === null){
                 $createdOn = $options['created-on'];
                 $key = isset($createdOn['key-name']) ? trim($createdOn['key-name']) : 'created-on';
                 if(!$this->_isKeyNameValid($key)){
@@ -265,12 +265,12 @@ class MySQLTable {
                 if(!($colObj->getName() == $inDbName)){
                     $colObj->setName('created_on');
                 }
-                $colObj->setDefault();
+                $colObj->setDefault('current_timestamp');
                 if($this->addColumn($key, $colObj)){
-                    $this->hasDefaults['created-on'] = true;
+                    $this->defaultColsKeys['created-on'] = $key;
                 }
             }
-            if(isset($options['last-updated']) && !$this->hasDefaults['last-updated']){
+            if(isset($options['last-updated']) && $this->defaultColsKeys['last-updated'] === null){
                 $lastUpdated = $options['last-updated'];
                 $key = isset($lastUpdated['key-name']) ? trim($lastUpdated['key-name']) : 'last-updated';
                 if(!$this->_isKeyNameValid($key)){
@@ -281,13 +281,28 @@ class MySQLTable {
                 if(!($colObj->getName() == $inDbName)){
                     $colObj->setName('last_update');
                 }
-                $colObj->autoUpdate();
+                $colObj->setAutoUpdate(true);
                 $colObj->setIsNull(true);
                 if($this->addColumn($key, $colObj)){
-                    $this->hasDefaults['last-updated'] = true;
+                    $this->defaultColsKeys['last-updated'] = $key;
                 }
             }
         }
+    }
+    /**
+     * Returns an associative array that contains default columns keys.
+     * @return array An associative array which has the following indices: 
+     * <ul>
+     * <li>id</li>
+     * <li>created-on</li>
+     * <li>last-updated</li>
+     * </ul>
+     * If the table does not have the specified column, the value of the index 
+     * will beset to null.
+     * @since 1.6.3
+     */
+    public function getDefaultColsKeys() {
+        return $this->defaultColsKeys;
     }
     /**
      * Returns version number of MySQL server.
@@ -297,6 +312,21 @@ class MySQLTable {
      */
     public function getMySQLVersion() {
         return $this->mysqlVnum;
+    }
+    /**
+     * Returns an array that contains all columns names as they will appear in 
+     * the database.
+     * @return array An array that contains all columns names as they will appear in 
+     * the database.
+     * @since 1.6.2
+     */
+    public function getColsNames() {
+        $columns = $this->getColumns();
+        $retVal = [];
+        foreach ($columns as $colObj){
+            $retVal[] = $colObj->getName();
+        }
+        return $retVal;
     }
     /**
      * Sets the order of the table in the database.
@@ -410,17 +440,6 @@ class MySQLTable {
         return $this->colSet;
     }
     /**
-     * Returns a string that can be used to alter the table and add primary 
-     * key constraint to it.
-     * @return string A string that can be used to alter the table and add primary 
-     * key constraint to it. If the table has no primary keys or has only one, 
-     * the returned string will be empty.
-     * @since 1.5
-     */
-    public function getCreatePrimaryKeyStatement() {
-        
-    }
-    /**
      * Sets a comment which will appear with the table.
      * @param string|null $comment Comment text. It must be non-empty string 
      * in order to set. If null is passed, the comment will be removed.
@@ -442,13 +461,15 @@ class MySQLTable {
     }
     /**
      * Adds a foreign key to the table.
-     * @param MySQLTable|string $refTable The referenced table. It is the table that 
+     * @param MySQLTable|MySQLQuery|string $refTable The referenced table. It is the table that 
      * will contain original values. This value can be an object of type 
-     * 'MySQLTable' or the namespace of a class which is a sub-class of 
+     * 'MySQLTable', an object of type 'MySQLQuery' or the namespace of a class which is a sub-class of 
      * the class 'MySQLQuery'.
      * @param array $cols An associative array that contains key columns. 
      * The indices must be names of columns which exist in 'this' table and 
-     * the values must be columns from regerenced table. 
+     * the values must be columns from referenced table. It is possible to 
+     * provide an indexed array. If an indexed array is given, the method will 
+     * assume that the two tables have same column key. 
      * @param string $keyname The name of the key.
      * @param string $onupdate The 'on update' condition for the key. it can be one 
      * of the following: 
@@ -475,10 +496,15 @@ class MySQLTable {
      */
     public function addReference($refTable,$cols,$keyname,$onupdate='set null',$ondelete='set null') {
         if(!($refTable instanceof MySQLTable)){
-            if(class_exists($refTable)){
-                $q = new $refTable();
-                if($q instanceof MySQLQuery){
-                    $refTable = $q->getStructure();
+            if($refTable instanceof MySQLQuery){
+                $refTable = $refTable->getStructure();
+            }
+            else{
+                if(class_exists($refTable)){
+                    $q = new $refTable();
+                    if($q instanceof MySQLQuery){
+                        $refTable = $q->getStructure();
+                    }
                 }
             }
         }
@@ -488,7 +514,13 @@ class MySQLTable {
             $fk->setSource($refTable);
             if($fk->setKeyName($keyname) === true){
                 foreach ($cols as $target => $source){
-                    $fk->addReference($target, $source);
+                    if(gettype($target) == 'integer'){
+                        //indexed array
+                        $fk->addReference($source, $source);
+                    }
+                    else{
+                        $fk->addReference($target, $source);
+                    }
                 }
                 if(count($fk->getSourceCols()) != 0){
                     $fk->setOnUpdate($onupdate);
@@ -691,7 +723,7 @@ class MySQLTable {
      * column was found. null in case of no column was found.
      * @since 1.0
      */
-    public function &getCol($key){
+    public function getCol($key){
         $trimmed = trim($key);
         if(isset($this->colSet[$trimmed])){
             return $this->colSet[$trimmed];

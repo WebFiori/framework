@@ -148,9 +148,6 @@ abstract class MySQLQuery{
                 $updatedSize = $new < $max && $new > 0 ? $new : $max;
                 break;
             }
-            default:{
-                $updatedSize = $max;
-            }
         }
         $this->query = 'set global max_allowed_packet = '.$updatedSize.';';
     }
@@ -389,6 +386,7 @@ abstract class MySQLQuery{
      * Escape any MySQL special characters from a string.
      * @param string $query The string that the characters will be escaped from.
      * @return string A string with escaped MySQL characters.
+     * @deprecated since version 1.8.9
      * @since 1.4
      */
     public static function escapeMySQLSpeciarChars($query){
@@ -923,80 +921,20 @@ abstract class MySQLQuery{
         
     }
     /**
-     * Selects a values from a table given specific columns values.
-     * @param array $cols An array that contains an objects of type 'Column'.
-     * @param array $vals An array that contains values. 
-     * @param array $valsConds An array that can contains two possible values: 
-     * '=' or '!='. If anything else is given at specific index, '=' will be used. 
-     * Note that if the value at '$vals[$index]' is equal to 'IS NULL' or 'IS NOT NULL', 
-     * The value at '$valsConds[$index]' is ignored. 
-     * @param array $jointOps An array of conditions (Such as 'or', 'and', 'xor').
-     * @since 1.6
-     */
-    public function selectByColsVals($cols,$vals,$valsConds,$jointOps,$limit=-1,$offset=-1){
-        $where = '';
-        $count = count($cols);
-        $index = 0;
-        foreach($cols as $col){
-            $equalityCond = trim($valsConds[$index]);
-            if($equalityCond != '!=' && $equalityCond != '='){
-                $equalityCond = '=';
-            }
-            if($col instanceof Column){
-                $valUpper = strtoupper(trim($vals[$index]));
-                if($valUpper == 'IS NULL' || $valUpper == 'IS NOT NULL'){
-                    if($index + 1 == $count){
-                        $where .= $col->getName().' '.$vals[$index].'';
-                    }
-                    else{
-                        $where .= $col->getName().' '.$vals[$index].' '.$jointOps[$index].' ';
-                    }
-                }
-                else{
-                    if($index + 1 == $count){
-                        $where .= $col->getName().' '.$equalityCond.' ';
-                        if($col->getType() == 'varchar' || $col->getType() == 'datetime' || $col->getType() == 'timestamp' || $col->getType() == 'text' || $col->getType() == 'mediumtext'){
-                            $where .= '\''.$vals[$index].'\'' ;
-                        }
-                        else{
-                            $where .= $vals[$index];
-                        }
-                    }
-                    else{
-                        $where .= $col->getName().' '.$equalityCond.' ';
-                        if($col->getType() == 'varchar' || $col->getType() == 'datetime' || $col->getType() == 'timestamp' || $col->getType() == 'text' || $col->getType() == 'mediumtext'){
-                            $where .= '\''.$vals[$index].'\' '.$jointOps[$index].' ' ;
-                        }
-                        else{
-                            $where .= $vals[$index].' '.$jointOps[$index].' ';
-                        }
-                    }
-                }
-            }
-            $index++;
-        }
-        if($limit > 0 && $offset > 0){
-            $lmit = 'limit '.$limit.' offset '.$offset;
-        }
-        else if($limit > 0 && $offset <= 0){
-            $lmit = 'limit '.$limit;
-        }
-        else{
-            $lmit = '';
-        }
-        $this->setQuery(self::SELECT.$this->getStructureName().' where '.$where.' '.$lmit.';', 'select');
-    }
-    /**
      * Constructs a query that can be used to insert a new record.
-     * @param array $colsAndVals An associative array. The array can have two 
-     * possible structures:
-     * <ul>
-     * <li>A column index taken from MySQLTable object as an index with a 
-     * value as the value of the column (Recommended).</li>
-     * <li>A value as an index with an object of type 'Column' as it is value.</li>
-     * </ul>
-     * The second way is not recommended as it may cause some issues if two columns 
-     * have the same value.
+     * @param array $colsAndVals An associative array. The indices must be 
+     * columns names taken from the linked table. For example, if we have 
+     * a table which has two columns with names 'student-id' and 'registered-course', 
+     * then the array would look like the following:
+     * <p>
+     * <code>[<br/>
+     * &nbsp;&nbsp;'student-id'=>55<br/>
+     * &nbsp;&nbsp;'registered-course'=>542<br/>]</code>
+     * </p>
+     * Note that it is possible for the index to be a numeric value such as 0 
+     * or 1. The numeric value will represents column position in the table.
+     * Another thing to note is that if a column does not have a value, either  
+     * the default value of the column will be used or 'null' will be used.
      * @since 1.8.2
      */
     public function insertRecord($colsAndVals) {
@@ -1005,77 +943,46 @@ abstract class MySQLQuery{
         $count = count($colsAndVals);
         $index = 0;
         $comma = '';
-        foreach($colsAndVals as $valOrColIndex=>$colObjOrVal){
+        $columnsWithVals = [];
+        $defaultCols = $this->getStructure()->getDefaultColsKeys();
+        $createdOnKey = $defaultCols['created-on'];
+        if($createdOnKey !== null){
+            $createdOnColObj = $this->getCol($createdOnKey);
+        }
+        else{
+            $createdOnColObj = null;
+        }
+        foreach($colsAndVals as $colIndex=>$val){
             if($index + 1 == $count){
                 $comma = '';
             }
             else{
                 $comma = ',';
             }
-            if($colObjOrVal instanceof Column){
-                //a value as an index with an object of type Column
-                $cols .= $colObjOrVal->getName().$comma;
-                if($valOrColIndex !== 'null'){
-                    $type = $colObjOrVal->getType();
-                    if($type == 'varchar' || $type == 'datetime' || $type == 'timestamp' || $type == 'text' || $type == 'mediumtext'){
-                        $vals .= '\''.self::escapeMySQLSpeciarChars($valOrColIndex).'\''.$comma;
-                    }
-                    else if($type == 'decimal' || $type == 'double' || $type == 'float'){
-                        $vals .= '\''.$valOrColIndex.'\''.$comma;
-                    }
-                    else if($type == 'tinyblob' || $type == 'mediumblob' || $type == 'longblob'){
-                        $fixedPath = str_replace('\\', '/', $valOrColIndex);
-                        if(file_exists($fixedPath)){
-                            $file = fopen($fixedPath, 'r');
-                            $data = '';
-                            if($file !== false){
-                                $fileContent = fread($file, filesize($fixedPath));
-                                if($fileContent !== false){
-                                    $data = '\''. addslashes($fileContent).'\'';
-                                    $vals .= $data.$comma;
-                                    $this->setIsBlobInsertOrUpdate(true);
-                                }
-                                else{
-                                    $vals .= 'null'.$comma;
-                                }
-                                fclose($file);
-                            }
-                            else{
-                                $vals .= 'null'.$comma;
-                            }
+            if(gettype($colIndex) == 'integer'){
+                $column = $this->getStructure()->getColByIndex($colIndex);
+            }
+            else{
+                $column = $this->getStructure()->getCol($colIndex);
+            }
+            if($column instanceof Column){
+                $columnsWithVals[] = $colIndex;
+                $cols .= $column->getName().$comma;
+                $type = $column->getType();
+                if($val !== 'null'){
+                    $cleanedVal = $column->cleanValue($val);
+                    if($cleanedVal === null){
+                        if($createdOnColObj !== null && $createdOnColObj->getIndex() == $column->getIndex()){
+                            $vals .= $column->cleanValue($column->getDefault()).$comma;
+                            $createdOnColObj = null;
                         }
                         else{
                             $vals .= 'null'.$comma;
                         }
                     }
                     else{
-                         $vals .= $valOrColIndex.$comma;
-                    }
-                }
-                else{
-                    $vals .= 'null'.$comma;
-                }
-            }
-            else{
-                //an index with a value
-                if(gettype($valOrColIndex) == 'integer'){
-                    $column = $this->getStructure()->getColByIndex($valOrColIndex);
-                }
-                else{
-                    $column = $this->getStructure()->getCol($valOrColIndex);
-                }
-                if($column instanceof Column){
-                    $cols .= $column->getName().$comma;
-                    if($colObjOrVal !== 'null'){
-                        $type = $column->getType();
-                        if($type == 'varchar' || $type == 'datetime' || $type == 'timestamp' || $type == 'text' || $type == 'mediumtext'){
-                            $vals .= '\''.self::escapeMySQLSpeciarChars($colObjOrVal).'\''.$comma;
-                        }
-                        else if($type == 'decimal' || $type == 'double' || $type == 'float'){
-                            $vals .= '\''.$colObjOrVal.'\''.$comma;
-                        }
-                        else if($type == 'tinyblob' || $type == 'mediumblob' || $type == 'longblob'){
-                            $fixedPath = str_replace('\\', '/', $colObjOrVal);
+                        if($type == 'tinyblob' || $type == 'mediumblob' || $type == 'longblob'){
+                            $fixedPath = str_replace('\\', '/', $colIndex);
                             if(file_exists($fixedPath)){
                                 $file = fopen($fixedPath, 'r');
                                 $data = '';
@@ -1100,36 +1007,58 @@ abstract class MySQLQuery{
                             }
                         }
                         else{
-                            $vals .= $colObjOrVal.$comma;
+                            if($createdOnColObj !== null && $createdOnColObj->getIndex() == $column->getIndex()){
+                                $vals .= $cleanedVal.$comma;
+                                $createdOnColObj = null;
+                            }
+                            else{
+                                $vals .= $cleanedVal.$comma;
+                            }
                         }
                     }
-                    else{
-                        $vals .= 'null'.$comma;
-                    }
+                }
+                else{
+                    $vals .= 'null'.$comma;
                 }
             }
             $index++;
         }
+        if($createdOnColObj !== null){
+            $cols .= ','.$createdOnColObj->getName();
+            $vals .= ','.$createdOnColObj->cleanValue($createdOnColObj->getDefault());
+        }
         
         $cols = ' ('.$cols.')';
         $vals = ' ('.$vals.')';
-        $this->setQuery(self::INSERT.$this->getStructureName().$cols.' values '.$vals.';', 'insert');
+        $this->setQuery(self::INSERT.$this->getStructureName().$cols.' values'.$vals.';', 'insert');
     }
     /**
      * Removes a record from the table.
      * @param array $columnsAndVals An associative array. The indices of the array 
      * should be the values of the columns and the value at each index is 
      * an object of type 'Column'.
-     * @param array $valsConds An array that can have only two possible values, 
-     * '=' and '!='. The number of elements in this array must match number of 
-     * elements in the array $cols.
+     * @param array $valsConds An array that can have one of the following 
+     * values: '=','!=','&lt;','&lt;=','&gt;' and '&gt;='. The number of elements 
+     * in this array must match number of 
+     * elements in the array $cols. If not provided, '=' is used. Default is empty array.
      * @param array $jointOps An array which contains conditional operators 
      * to join conditions. The operators can be logical or bitwise. Possible 
-     * values include: &&, ||, and, or, |, &, xor. It is optional in case there 
-     * is only one condition.
+     * values include: &amp;&amp;, ||, and, or, |, &amp;, xor. If not provided, 
+     * 'and' is used for all values.
      * @since 1.8.2
      */
-    public function deleteRecord($columnsAndVals,$valsConds,$jointOps=[]) {
+    public function deleteRecord($columnsAndVals,$valsConds=[],$jointOps=[]) {
+        $colsCount = count($columnsAndVals);
+        $condsCount = count($valsConds);
+        $joinOpsCount = count($jointOps);
+        while ($colsCount > $condsCount){
+            $valsConds[] = '=';
+            $condsCount = count($valsConds);
+        }
+        while (($colsCount - 1) > $joinOpsCount){
+            $jointOps[] = 'and';
+            $joinOpsCount = count($jointOps);
+        }
         $cols = [];
         $vals = [];
         foreach ($columnsAndVals as $valOrIndex => $colObjOrVal){
@@ -1174,11 +1103,11 @@ abstract class MySQLQuery{
         if($colsCount == 0 || $valsCount == 0){
             return '';
         }
-        while ($colsCount != $condsCount){
+        while ($colsCount > $condsCount){
             $valsConds[] = '=';
             $condsCount = count($valsConds);
         }
-        while (($colsCount - 1) != $joinOpsCount){
+        while (($colsCount - 1) > $joinOpsCount){
             $jointOps[] = 'and';
             $joinOpsCount = count($jointOps);
         }
@@ -1197,84 +1126,53 @@ abstract class MySQLQuery{
             //then check if column object is given
             if($col instanceof Column){
                 //then check value
-                $valUpper = gettype($vals[$index]) != 'array' ? strtoupper(trim($vals[$index])) : '';
-                if($valUpper == 'IS NULL' || $valUpper == 'IS NOT NULL'){
-                    if($index + 1 == $colsCount){
-                        $where .= $col->getName().' '.$valUpper.'';
+                $cleanVal = $col->cleanValue($vals[$index]);
+                $valLower = gettype($vals[$index]) != 'array' ? strtolower(trim($vals[$index])) : '';
+                if($valLower == 'is null' || $valLower == 'is not null'){
+                    $where .= $col->getName().' '.$valLower.' ';
+                }
+                else if($cleanVal === null){
+                    if($equalityCond == '='){
+                        $where .= $col->getName().' is null ';
                     }
                     else{
-                        $where .= $col->getName().' '.$valUpper.' '.$jointOps[$index].' ';
+                        $where .= $col->getName().' is not null ';
                     }
                 }
                 else{
-                    if($index + 1 == $colsCount){
-                        if($col->getType() == 'varchar' || $col->getType() == 'text' || $col->getType() == 'mediumtext'){
-                            $where .= $col->getName().' '.$equalityCond.' ';
-                            $where .= '\''.self::escapeMySQLSpeciarChars($vals[$index]).'\'' ;
+                    if($col->getType() == 'datetime' || $col->getType() == 'timestamp'){
+                        if($equalityCond == '='){
+                            $where .= $col->getName().' >= '.$cleanVal.' ';
+                            $cleanVal = $col->cleanValue($vals[$index],true);
+                            $where .= 'and '.$col->getName().' <= '.$cleanVal.' ';
                         }
-                        else if($col->getType() == 'decimal' || $col->getType() == 'float' || $col->getType() == 'double'){
-                            $where .= $col->getName().' '.$equalityCond.' ';
-                            $where .= '\''.$vals[$index].'\'' ;
+                        else if($equalityCond == '!='){
+                            $where .= $col->getName().' < '.$cleanVal.' ';
+                            $cleanVal = $col->cleanValue($vals[$index],true);
+                            $where .= 'and '.$col->getName().' > '.$cleanVal.' ';
                         }
-                        else if($col->getType() == 'datetime' || $col->getType() == 'timestamp'){
-                            if(gettype($vals[$index]) == 'array'){
-                                $value = $vals[$index];
-                                if(isset($value['value'])){
-                                    if(isset($value['format'])){
-                                        $str = $this->createDateCondition($value['value'], $col->getName(), $value['format']);
-                                    }
-                                    else{
-                                        $str = $this->createDateCondition($value['value'], $col->getName());
-                                    }
-                                    if(strlen($str) !== 0){
-                                        $where .= '('.$str.') ';
-                                    }
-                                }
-                            }
-                            else{
-                                $where .= 'date('.$col->getName().') '.$equalityCond.' ';
-                                $where .= '\''.self::escapeMySQLSpeciarChars($vals[$index]).'\' ';
-                            }
+                        else if($equalityCond == '>='){
+                            $where .= $col->getName().' >= '.$cleanVal.' ';
+                            $cleanVal = $col->cleanValue($vals[$index],true);
                         }
-                        else{
-                            $where .= $col->getName().' '.$equalityCond.' ';
-                            $where .= $vals[$index];
+                        else if($equalityCond == '<='){
+                            $cleanVal = $col->cleanValue($vals[$index],true);
+                            $where .= $col->getName().' <= '.$cleanVal.' ';
+                        }
+                        else if($equalityCond == '>'){
+                            $cleanVal = $col->cleanValue($vals[$index],true);
+                            $where .= $col->getName().' > '.$cleanVal.' ';
+                        }
+                        else if($equalityCond == '<'){
+                            $where .= $col->getName().' < '.$cleanVal.' ';
                         }
                     }
                     else{
-                        if($col->getType() == 'varchar' || $col->getType() == 'text' || $col->getType() == 'mediumtext'){
-                            $where .= $col->getName().' '.$equalityCond.' ';
-                            $where .= '\''.self::escapeMySQLSpeciarChars($vals[$index]).'\' '.$jointOps[$index].' ' ;
-                        }
-                        else if($col->getType() == 'decimal' || $col->getType() == 'float' || $col->getType() == 'double'){
-                            $where .= $col->getName().' '.$equalityCond.' ';
-                            $where .= '\''.$vals[$index].'\'' ;
-                        }
-                        else if($col->getType() == 'datetime' || $col->getType() == 'timestamp'){
-                            if(gettype($vals[$index]) == 'array'){
-                                $value = $vals[$index];
-                                if(isset($value['value'])){
-                                    if(isset($value['format'])){
-                                        $str = $this->createDateCondition($value['value'], $col->getName(), $value['format']);
-                                    }
-                                    else{
-                                        $str = $this->createDateCondition($value['value'], $col->getName());
-                                    }
-                                    if(strlen($str) !== 0){
-                                        $where .= '('.$str.') '.$jointOps[$index].' ';
-                                    }
-                                }
-                            }
-                            else{
-                                $where .= 'date('.$col->getName().') '.$equalityCond.' ';
-                                $where .= '\''.self::escapeMySQLSpeciarChars($vals[$index]).'\' '.$jointOps[$index].' ';
-                            }
-                        }
-                        else{
-                            $where .= $col->getName().' '.$equalityCond.' ';
-                            $where .= $vals[$index].' '.$jointOps[$index].' ';
-                        }
+                        $where .= $col->getName().' '.$equalityCond.' '.$cleanVal.' ';
                     }
+                }
+                if($index + 1 != $colsCount){
+                    $where .= $jointOps[$index].' ';
                 }
             }
             $index++;
@@ -1285,96 +1183,80 @@ abstract class MySQLQuery{
     /**
      * Constructs a query that can be used to update a record.
      * @param array $colsAndNewVals An associative array. The key must be the 
-     * new value and the value of the index is an object of type 'Column'.
-     * @param array $colsAndVals An associative array that contains columns and 
-     * values for the 'where' clause. The indices should be the values and the 
-     * value at each index should be an object of type 'Column'. 
+     * new value and the value of the index is an object of type 'Column'. Also, the key 
+     * can be column name or its index in the table that it belongs to and 
+     * the value of the index is the condition value. 
+     * @param array $conditionColsAndVals An associative array that contains columns and 
+     * values for the 'where' clause. The indices can be the values and the 
+     * value at each index can be an object of type 'Column'. Also, the key 
+     * can be column name or its index in the table that it belongs to and 
+     * the value of the index is the condition value. 
      * The number of elements in this array must match number of elements 
      * in the array $colsAndNewVals.
-     * @param array $valsConds An array that can have only two possible values, 
-     * '=' and '!='. The number of elements in this array must match number of 
-     * elements in the array $colsAndNewVals.
+     * @param array $valsConds An array that can have only the following 
+     * values: '=','!=','&gt;','&gt;=','&lt;' and '&lt;='. The number of elements in this array must match number of 
+     * elements in the array $conditionColsAndVals. If not provided, '=' is used by 
+     * default. Default is empty array.
      * @param array $jointOps An array which contains conditional operators 
      * to join conditions. The operators can be logical or bitwise. Possible 
      * values include: &&, ||, and, or, |, &, xor. It is optional in case there 
-     * is only one condition.
+     * is only one condition. If not provided, 'and' is used. Default is empty array.
      * @since 1.8.2
      */
-    public function updateRecord($colsAndNewVals,$colsAndVals,$valsConds,$jointOps=array()) {
+    public function updateRecord($colsAndNewVals,$conditionColsAndVals,$valsConds=[],$jointOps=[]) {
+        $condColsCount = count($conditionColsAndVals);
+        $condsCount = count($valsConds);
+        $joinOpsCount = count($jointOps);
+        while ($condColsCount > $condsCount){
+            $valsConds[] = '=';
+            $condsCount = count($valsConds);
+        }
+        while (($condColsCount - 1) > $joinOpsCount){
+            $jointOps[] = 'and';
+            $joinOpsCount = count($jointOps);
+        }
+        $defaultCols = $this->getStructure()->getDefaultColsKeys();
+        $lastUpdatedKey = $defaultCols['last-updated'];
+        if($lastUpdatedKey !== null){
+            $lastUpdatedColObj = $this->getCol($lastUpdatedKey);
+        }
+        else{
+            $lastUpdatedColObj = null;
+        }
         $colsStr = '';
         $comma = '';
         $index = 0;
         $count = count($colsAndNewVals);
-        foreach($colsAndNewVals as $newValOrIndex => $colObjOrNewVal){
+        foreach($colsAndNewVals as $colIndex=>$val){
             if($index + 1 == $count){
                 $comma = '';
             }
             else{
                 $comma = ',';
             }
-            if($colObjOrNewVal instanceof Column){
-                $newValLower = strtolower($newValOrIndex);
-                if(trim($newValLower) !== 'null'){
-                    $type = $colObjOrNewVal->getType();
-                    if($type == 'varchar' || $type == 'datetime' || $type == 'timestamp' || $type == 'text' || $type == 'mediumtext'){
-                        $colsStr .= ' '.$colObjOrNewVal->getName().' = \''.self::escapeMySQLSpeciarChars($newValOrIndex).'\''.$comma ;
-                    }
-                    else if($type == 'decimal' || $type == 'float' || $type == 'double'){
-                        $colsStr .= '\''.$newValOrIndex.'\''.$comma;
-                    }
-                    else if($type == 'tinyblob' || $type == 'mediumblob' || $type == 'longblob'){
-                        $fixedPath = str_replace('\\', '/', $newValOrIndex);
-                        if(file_exists($fixedPath)){
-                            $file = fopen($fixedPath, 'r');
-                            $data = '';
-                            if($file !== false){
-                                $fileContent = fread($file, filesize($fixedPath));
-                                if($fileContent !== false){
-                                    $data = '\''. addslashes($fileContent).'\'';
-                                    $colsStr .= $data.$comma;
-                                    $this->setIsBlobInsertOrUpdate(true);
-                                }
-                                else{
-                                    $colsStr .= 'null'.$comma;
-                                }
-                                fclose($file);
-                            }
-                            else{
-                                $colsStr .= 'null'.$comma;
-                            }
+            if(gettype($colIndex) == 'integer'){
+                $column = $this->getStructure()->getColByIndex($colIndex);
+            }
+            else{
+                $column = $this->getStructure()->getCol($colIndex);
+            }
+            if($column instanceof Column){
+                $colsStr .= $column->getName().' = ';
+                $type = $column->getType();
+                if($val !== 'null'){
+                    $cleanedVal = $column->cleanValue($val);
+                    if($cleanedVal === null){
+                        if($lastUpdatedColObj !== null && $lastUpdatedColObj->getIndex() == $column->getIndex()){
+                            $colsStr .= $column->cleanValue($column->getDefault()).$comma;
+                            $lastUpdatedColObj = null;
                         }
                         else{
                             $colsStr .= 'null'.$comma;
                         }
                     }
                     else{
-                        $colsStr .= ' '.$colObjOrNewVal->getName().' = '.$newValOrIndex.$comma;
-                    }
-                }
-                else{
-                    $colsStr .= ' '.$colObjOrNewVal->getName().' = null'.$comma;
-                }
-            }
-            else{
-                $column = $this->getStructure()->getColByIndex($newValOrIndex);
-                if(gettype($newValOrIndex) == 'integer'){
-                    $column = $this->getStructure()->getColByIndex($newValOrIndex);
-                }
-                else{
-                    $column = $this->getStructure()->getCol($newValOrIndex);
-                }
-                if($column instanceof Column){
-                    $newValLower = strtolower($colObjOrNewVal);
-                    if(trim($newValLower) !== 'null'){
-                        $type = $column->getType();
-                        if($type == 'varchar' || $type == 'datetime' || $type == 'timestamp' || $type == 'text' || $type == 'mediumtext'){
-                            $colsStr .= ' '.$column->getName().' = \''.self::escapeMySQLSpeciarChars($colObjOrNewVal).'\''.$comma ;
-                        }
-                        else if($type == 'decimal' || $type == 'float' || $type == 'double'){
-                            $colsStr .= '\''.$newValOrIndex.'\''.$comma;
-                        }
-                        else if($type == 'tinyblob' || $type == 'mediumblob' || $type == 'longblob'){
-                            $fixedPath = str_replace('\\', '/', $colObjOrNewVal);
+                        if($type == 'tinyblob' || $type == 'mediumblob' || $type == 'longblob'){
+                            $fixedPath = str_replace('\\', '/', $colIndex);
                             if(file_exists($fixedPath)){
                                 $file = fopen($fixedPath, 'r');
                                 $data = '';
@@ -1399,19 +1281,29 @@ abstract class MySQLQuery{
                             }
                         }
                         else{
-                            $colsStr .= ' '.$column->getName().' = '.$colObjOrNewVal.$comma;
+                            if($lastUpdatedColObj !== null && $lastUpdatedColObj->getIndex() == $column->getIndex()){
+                                $colsStr .= $cleanedVal.$comma;
+                                $lastUpdatedColObj = null;
+                            }
+                            else{
+                                $colsStr .= $cleanedVal.$comma;
+                            }
                         }
                     }
-                    else{
-                        $colsStr .= ' '.$column->getName().' = null'.$comma;
-                    }
+                }
+                else{
+                    $colsStr .= 'null'.$comma;
                 }
             }
             $index++;
         }
-        $colsArr = array();
-        $valsArr = array();
-        foreach ($colsAndVals as $valueOrIndex=>$colObjOrVal){
+        if($lastUpdatedColObj !== null){
+            $colsStr .= ','.$lastUpdatedColObj->getName().' = '
+                    .$lastUpdatedColObj->cleanValue(date('Y-m-d H:i:s'));
+        }
+        $colsArr = [];
+        $valsArr = [];
+        foreach ($conditionColsAndVals as $valueOrIndex=>$colObjOrVal){
             if($colObjOrVal instanceof Column){
                 $colsArr[] = $colObjOrVal;
                 $valsArr[] = $valueOrIndex;

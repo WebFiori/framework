@@ -38,7 +38,7 @@ use webfiori\entity\Util;
  * Note that the path to PHP executable might differ from "/usr/bin/php". 
  * It depends on where the executable has been installed.
  * @author Ibrahim
- * @version 1.0.6
+ * @version 1.0.7
  */
 class Cron {
     /**
@@ -87,6 +87,37 @@ class Cron {
             self::$executer = new Cron();
         }
         return self::$executer;
+    }
+    /**
+     * Returns the time at which jobs check was initialized.
+     * @return string The method will return a time string in the format 
+     * 'YY-DD HH:MM' where: 
+     * <ul>
+     * <li>'YY' is month number.</li>
+     * <li>'MM' is day number in the current month.</li>
+     * <li>'HH' is the hour.</li>
+     * <li>'MM' is the minute.</li>
+     * </ul> 
+     * @since 1.0.7
+     */
+    public static function timestamp() {
+        $month = self::month();
+        if($month < 10){
+            $month = '0'.$month;
+        }
+        $day = self::dayOfMonth();
+        if($day < 10){
+            $day = '0'.$day;
+        }
+        $hour = self::hour();
+        if($hour < 10){
+            $hour = '0'.$hour;
+        }
+        $minute = self::minute();
+        if($minute < 10){
+            $minute = '0'.$minute;
+        }
+        return $month.'-'.$day.' '.$hour.':'.$minute;
     }
     /**
      * 

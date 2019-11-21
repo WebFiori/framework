@@ -237,7 +237,7 @@ class Controller {
      */
     public function useDatabase($connName=null) {
         $retVal = false;
-        $dbLink = &$this->getDBLink();
+        $dbLink = $this->getDBLink();
         $dbConn = Config::getDBConnection($connName);
         if($dbLink instanceof MySQLLink){
             if($dbConn instanceof DBConnectionInfo){
@@ -547,7 +547,7 @@ class Controller {
     public function setSessionVar($varName,$varVal) {
         $trimmedName = trim($varName);
         if(strlen($trimmedName) != 0){
-            $sesstion = &$this->getSession();
+            $sesstion = $this->getSession();
             if($sesstion !== null){
                 return $sesstion->setSessionVar($trimmedName, $varVal);
             }
@@ -679,7 +679,7 @@ class Controller {
         $retVal = -1;
         $sesstion = $this->getSession();
         if($sesstion !== null){
-            $user = &$this->getSession()->getUser();
+            $user = $this->getSession()->getUser();
             if($user !== null){
                 $retVal = $user->getID().'';
             }

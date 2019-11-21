@@ -233,7 +233,18 @@ class CronTaskView {
                     . '     xhr.open(\'post\',\'cron/apis/force-execution\');'."\n"
                     . '     xhr.onreadystatechange = function(){'."\n"
                     . '         if(this.readyState === 4 && this.status === 200){'."\n"
-                    . '             source.innerHTML = \'<b>Job Executed Successfully</b>\';'."\n"
+                    . '             try{'
+                    . '                 var asJson = JSON.parse(this.responseText);'
+                    . '                 if(asJson[\'more-info\'][\'failed\'].length != 0){'
+                    . '                     source.innerHTML = \'<b>The job was executed but did not finish successfully.</b>\';'."\n"
+                    . '                 }'
+                    . '                 else{'
+                    . '                     source.innerHTML = \'<b>Job executed and finished successfully</b>\';'."\n"
+                    . '                 }'
+                    . '             }'
+                    . '             catch(e){'
+                    . '                 source.innerHTML = \'Something Went Wrong While Executing the Job. Try Again\';'."\n"
+                    . '             }'
                     . '             disableOrEnableInputs(false);'."\n"
                     . '             window.isRefresh = refresh;'."\n"
                     . '         }'."\n"
@@ -297,7 +308,7 @@ class CronTaskView {
                     . '');
             Page::document()->getHeadNode()->addChild($inlineStyle);
             $forceNode = new HTMLNode();
-            $forceNode->addTextNode('<button name="input-element" onclick="execJob(this,\''.$job->getJobName().'\')" class="force-execution-button">Force Execution</button>', false);
+            $forceNode->addTextNode('<button style="margin-top:30px" name="input-element" onclick="execJob(this,\''.$job->getJobName().'\')" class="force-execution-button">Force Execution</button>', false);
             $this->controlsContainer->addChild($forceNode);
             Page::insert($this->controlsContainer);
             Page::render();

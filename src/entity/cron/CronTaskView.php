@@ -233,18 +233,18 @@ class CronTaskView {
                     . '     xhr.open(\'post\',\'cron/apis/force-execution\');'."\n"
                     . '     xhr.onreadystatechange = function(){'."\n"
                     . '         if(this.readyState === 4 && this.status === 200){'."\n"
-                    . '             try{'
-                    . '                 var asJson = JSON.parse(this.responseText);'
-                    . '                 if(asJson[\'more-info\'][\'failed\'].length != 0){'
+                    . '             try{'."\n"
+                    . '                 var asJson = JSON.parse(this.responseText);'."\n"
+                    . '                 if(asJson[\'more-info\'][\'failed\'].length != 0){'."\n"
                     . '                     source.innerHTML = \'<b>The job was executed but did not finish successfully.</b>\';'."\n"
-                    . '                 }'
-                    . '                 else{'
+                    . '                 }'."\n"
+                    . '                 else{'."\n"
                     . '                     source.innerHTML = \'<b>Job executed and finished successfully</b>\';'."\n"
-                    . '                 }'
-                    . '             }'
-                    . '             catch(e){'
+                    . '                 }'."\n"
+                    . '             }'."\n"
+                    . '             catch(e){'."\n"
                     . '                 source.innerHTML = \'Something Went Wrong While Executing the Job. Try Again\';'."\n"
-                    . '             }'
+                    . '             }'."\n"
                     . '             disableOrEnableInputs(false);'."\n"
                     . '             window.isRefresh = refresh;'."\n"
                     . '         }'."\n"

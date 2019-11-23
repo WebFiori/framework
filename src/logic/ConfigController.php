@@ -66,18 +66,18 @@ class ConfigController extends Controller{
      * <li>version = '1.0.1'</li>
      * <li>version-type = 'Stable'</li>
      * <li>config-file-version => '1.3.2'</li>
-     * <li>databases = array()</li>
+     * <li>databases = []</li>
      * </ul>
      * @since 1.0
      */
-    const INITIAL_CONFIG_VARS = array(
+    const INITIAL_CONFIG_VARS = [
         'is-config'=>'false',
-        'release-date'=>'2019-11-07',
+        'release-date'=>'2019-11-23',
         'version'=>'1.0.6',
         'version-type'=>'Stable',
         'config-file-version'=>'1.3.4',
-        'databases'=>array()
-    );
+        'databases'=>[]
+    ];
     /**
      * An instance of SystemFunctions
      * @var ConfigController
@@ -272,7 +272,7 @@ class ConfigController extends Controller{
         $this->version = \''.$configArr['version'].'\';
         $this->versionType = \''.$configArr['version-type'].'\';
         $this->configVision = \''.$configArr['config-file-version'].'\';
-        $this->dbConnections = array(', true, true);
+        $this->dbConnections = [', true, true);
         $count = count($configArr['databases']);
         $i = 0;
         foreach ($configArr['databases'] as $dbConn){
@@ -302,7 +302,7 @@ class ConfigController extends Controller{
             }
             $i++;
         }
-        $fh->write('    );', true, true);
+        $fh->write('    ];', true, true);
         foreach ($configArr['databases'] as $dbConn){
             $fh->write('$this->dbConnections[\''.$dbConn->getConnectionName().'\']->setConnectionName(\''.$dbConn->getConnectionName().'\');', true, true);
         }

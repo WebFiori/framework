@@ -172,7 +172,7 @@ class Page{
      * @since 1.9
      */
     public static function canonical($new=null){
-        $p = &Page::get();
+        $p = Page::get();
         if($new != null && strlen($new) != 0){
             $p->setCanonical($new);
         }
@@ -232,7 +232,7 @@ class Page{
      * @since 1.9
      */
     public static function siteName($new=null) {
-        $p = &Page::get();
+        $p = Page::get();
         if($new != null && strlen($new) != 0){
             $p->setWebsiteName($new);
         }
@@ -277,7 +277,7 @@ class Page{
      * @since 1.9
      */
     public static function separator($new=null){
-        $p = &Page::get();
+        $p = Page::get();
         if($new != null && strlen($new) != 0){
             $p->setTitleSep($new);
         }
@@ -359,7 +359,7 @@ class Page{
         $retVal = false;
         if(strlen($parentNodeId) != 0){
             if($node instanceof HTMLNode){
-                $parentNode = &$this->document->getChildByID($parentNodeId);
+                $parentNode = $this->document->getChildByID($parentNodeId);
                 if($parentNode instanceof HTMLNode){
                     $parentNode->addChild($node);
                     $retVal = true;
@@ -398,7 +398,7 @@ class Page{
      * @return string The title of the page.
      */
     public static function title($new=null) {
-        $p = &Page::get();
+        $p = Page::get();
         if($new != null && strlen($new) != 0){
             $p->setTitle($new);
         }
@@ -426,7 +426,7 @@ class Page{
      * @return HTMLDoc The document that is linked with the page.
      * @since 1.9
      */
-    public static function &document() {
+    public static function document() {
         return Page::get()->getDocument();
     }
     /**
@@ -435,7 +435,7 @@ class Page{
      * @throws Exception If page theme is not loaded.
      * @since 1.1
      */
-    public function &getDocument(){
+    public function getDocument(){
         return $this->document;
     }
     /**
@@ -462,7 +462,7 @@ class Page{
      * @return string The description of the page.
      */
     public static function description($new=null) {
-        $p = &Page::get();
+        $p = Page::get();
         if($new != null && strlen($new) != 0){
             $p->setDescription($new);
         }
@@ -478,10 +478,10 @@ class Page{
         if($val != null){
             $this->description = $val;
             if($this->document !== null ){
-                $headCh = &$this->document->getHeadNode()->children();
+                $headCh = $this->document->getHeadNode()->children();
                 $headChCount = $headCh->size();
                 for($x = 0 ; $x < $headChCount ; $x++){
-                    $node = &$headCh->get($x);
+                    $node = $headCh->get($x);
                     if($node->getAttributeValue('name') == 'description'){
                         $node->setAttribute('content',$val);
                         return;
@@ -534,7 +534,7 @@ class Page{
      * @since 1.9
      */
     public static function lang($new=null){
-        $p = &Page::get();
+        $p = Page::get();
         if($new != null && strlen($new) == 2){
             $p->setLang($new);
         }
@@ -579,8 +579,8 @@ class Page{
      * null.
      * @since 1.9
      */
-    public static function &translation(){
-        $p = &Page::get();
+    public static function translation(){
+        $p = Page::get();
         if($p->getLang() != null){
             $p->usingLanguage();
             return $p->getLanguage();
@@ -596,8 +596,8 @@ class Page{
      * order for the method to return non-null value.
      * @since 1.6
      */
-    public function &getLanguage() {
-        $loadedLangs = &Language::getLoadedLangs();
+    public function getLanguage() {
+        $loadedLangs = Language::getLoadedLangs();
         if(isset($loadedLangs[$this->getLang()])){
             return $loadedLangs[$this->getLang()];
         }
@@ -615,7 +615,7 @@ class Page{
      * @since 1.9
      */
     public static function theme($name=null){
-        $p = &Page::get();
+        $p = Page::get();
         if($name != null && strlen($name) != 0){
             $p->usingTheme($name);
         }
@@ -749,7 +749,7 @@ class Page{
      * @since 1.9
      */
     public static function dir($new=null) {
-        $p = &Page::get();
+        $p = Page::get();
         $lNew = strtolower($new);
         if($lNew == 'ltr' || $lNew == 'rtl'){
             $p->setWritingDir($new);
@@ -858,7 +858,7 @@ class Page{
      * aside area.
      */
     public static function aside($bool=null) {
-        $p = &Page::get();
+        $p = Page::get();
         if($bool !== null){
             $p->setHasAside($bool);
         }
@@ -873,7 +873,7 @@ class Page{
      * footer area.
      */
     public static function footer($bool=null) {
-        $p = &Page::get();
+        $p = Page::get();
         if($bool !== null){
             $p->setHasFooter($bool);
         }
@@ -888,7 +888,7 @@ class Page{
      * header area.
      */
     public static function header($bool=null) {
-        $p = &Page::get();
+        $p = Page::get();
         if($bool !== null){
             $p->setHasHeader($bool);
         }

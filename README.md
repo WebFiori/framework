@@ -28,7 +28,6 @@ WebFiori Framework is a web framework which is built using PHP language. The fra
 * Support for creating and sending nice-looking emails in a simple way by using SMTP protocol.
 * Autoloading of user defined classes.
 * The ability to create automatic tasks and let them run in specific time using CRON.
-* Basic support for logging.
 * Well-defined file upload and file handling sub-system.
 * Building and manipulating the DOM of a web page using PHP language.
 * Basic support for running the framework throgh CLI.

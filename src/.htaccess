@@ -12,9 +12,9 @@ RewriteRule .* - [e=HTTP_AUTHORIZATION:%1]
 #disable opcache
 #php_flag opcache.enable Off
 
-#allow CORS
+#allow CORS. Be careful here.
 <IfModule mod_headers.c>
-    Header set Access-Control-Allow-Origin "*"
+    #Header set Access-Control-Allow-Origin "*"
 </IfModule>
   
 <IfModule mod_deflate.c>

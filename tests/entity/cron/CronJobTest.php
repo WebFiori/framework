@@ -11,6 +11,97 @@ class CronJobTest extends TestCase{
     /**
      * @test
      */
+    public function testExecute00() {
+        $job = new CronJob();
+        $job->setOnExecution(function(){
+            //do nothing
+        });
+        $isExe = $job->execute();
+        $this->assertTrue($isExe);
+        $this->assertTrue($job->isSuccess());
+    }
+    /**
+     * @test
+     */
+    public function testExecute01() {
+        $job = new CronJob();
+        $job->setOnExecution(function(){
+            return false;
+        });
+        $isExe = $job->execute();
+        $this->assertTrue($isExe);
+        $this->assertFalse($job->isSuccess());
+    }
+    /**
+     * @test
+     */
+    public function testExecute02() {
+        $job = new CronJob();
+        $job->setOnExecution(function(){
+            return true;
+        });
+        $isExe = $job->execute();
+        $this->assertTrue($isExe);
+        $this->assertTrue($job->isSuccess());
+    }
+    /**
+     * @test
+     */
+    public function testExecute03() {
+        $job = new CronJob();
+        $job->setOnExecution(function(){
+            throw new \Exception();
+        });
+        $job->execute();
+        $this->assertFalse($job->isSuccess());
+    }
+    /**
+     * @test
+     */
+    public function testExecute04() {
+        $job = new CronJob();
+        $job->dailyAt(23);
+        $job->setOnExecution(function(){
+            
+        });
+        $r = $job->execute();
+        $this->assertFalse($r);
+        $this->assertFalse($job->isSuccess());
+        $r2 = $job->execute(true);
+        $this->assertTrue($r2);
+        $this->assertTrue($job->isSuccess());
+    }
+    /**
+     * @test
+     */
+    public function testAttributes00() {
+        $job = new CronJob();
+        $job->addExecutionAttribute('');
+        $this->assertEquals(0,count($job->getExecutionAttributes()));
+        $job->addExecutionAttribute('Hello&world');
+        $this->assertEquals(0,count($job->getExecutionAttributes()));
+        $job->addExecutionAttribute('hello#world');
+        $this->assertEquals(0,count($job->getExecutionAttributes()));
+        $job->addExecutionAttribute('hello=x');
+        $this->assertEquals(0,count($job->getExecutionAttributes()));
+        $job->addExecutionAttribute('?hello World');
+        $this->assertEquals(0,count($job->getExecutionAttributes()));
+        $job->addExecutionAttribute('    ');
+        $this->assertEquals(0,count($job->getExecutionAttributes()));
+    }
+    /**
+     * @test
+     */
+    public function testAttributes01() {
+        $job = new CronJob();
+        $job->addExecutionAttribute('hello');
+        $this->assertEquals(1,count($job->getExecutionAttributes()));
+        $job->addExecutionAttribute('Hello');
+        $this->assertEquals(2,count($job->getExecutionAttributes()));
+    }
+    /**
+     * @test
+     */
     public function testConstructor00() {
         $job = new CronJob();
         $this->assertEquals('* * * * *',$job->getExpression());

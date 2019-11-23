@@ -61,18 +61,18 @@ class CronJob {
      * months.
      * @since 1.0
      */
-    const MONTHS_NAMES = array(
+    const MONTHS_NAMES = [
         'JAN'=>1,'FEB'=>2,'MAR'=>3,'APR'=>4,'MAY'=>5,'JUN'=>6,
         'JUL'=>7,'AUG'=>8,'SEP'=>9,'OCT'=>10,'NOV'=>11,'DEC'=>12
-    );
+    ];
     /**
      * An associative array which holds the names and the numbers of week 
      * days.
      * @since 1.0
      */
-    const WEEK_DAYS = array(
+    const WEEK_DAYS = [
         'SAT'=>6,'SUN'=>0,'MON'=>1,'TUE'=>2,'WED'=>3,'THU'=>4,'FRI'=>5
-    );
+    ];
     /**
      * An array which contains all job details after parsing cron expression.
      * @var array 
@@ -124,23 +124,23 @@ class CronJob {
         $this->jobName = 'CRON-JOB';
         $this->customAttrs = [];
         $this->isSuccess = false;
-        $this->jobDetails = array(
-            'minutes'=>array(),
-            'hours'=>array(),
-            'days-of-month'=>array(),
-            'months'=>array(),
-            'days-of-week'=>array()
-        );
-        $this->events = array(
-            'on'=>array(
+        $this->jobDetails = [
+            'minutes'=>[],
+            'hours'=>[],
+            'days-of-month'=>[],
+            'months'=>[],
+            'days-of-week'=>[]
+        ];
+        $this->events = [
+            'on'=>[
                 'func'=>function(){},
-                'params'=>array()
-            ),
+                'params'=>[]
+            ],
             'on-failure'=>[
                 'func'=>function(){},
                 'params'=>[]
             ]
-        );
+        ];
         if($when !== null){
             if($this->cron($when) === false){
                 throw new Exception('Invalid cron expression: \''.$when.'\'.');
@@ -154,15 +154,39 @@ class CronJob {
      * Adds new execution attribute.
      * The attribute can be supplied to the job in case of forced execution. This 
      * method is used to prevent any typo in case of entering attribute name 
-     * in force execution view.
+     * in force execution view. The attribute name must follow the following 
+     * rules:
+     * <ul>
+     * <li>Must be non-empty string.</li>
+     * <li>Must not contain '#', '?', '&' or '='.</li>
+     * </ul>
      * @param string $name The name of the attribute.
      * @since 1.0.5
      */
     public function addExecutionAttribute($name) {
         $trimmed = trim($name);
-        if(strlen($trimmed) > 0 && !in_array($trimmed, $this->customAttrs)){
+        $isValid = $this->_validateAttrName($trimmed);
+        if($isValid && !in_array($trimmed, $this->customAttrs)){
             $this->customAttrs[] = $trimmed;
         }
+    }
+    /**
+     * 
+     * @param type $val
+     * @return boolean
+     */
+    private function _validateAttrName($val) {
+        $len = strlen($val);
+        if($len > 0){
+            for($x = 0 ; $x < $len ; $x++){
+                $char = $val[$x];
+                if($char == '=' || $char == '&' || $char == '#' || $char == '?'){
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
     }
     /**
      * Returns an array that contains the names of custom execution attributes.
@@ -393,13 +417,13 @@ class CronJob {
                $daysOfWeekValidity === false){
             }
             else{
-                $this->jobDetails = array(
+                $this->jobDetails = [
                     'minutes'=>$minutesValidity,
                     'hours'=>$hoursValidity,
                     'days-of-month'=>$daysOfMonthValidity,
                     'months'=>$monthValidity,
                     'days-of-week'=>$daysOfWeekValidity
-                );
+                ];
                 $retVal = true;
                 $this->cronExpr = $when;
             }
@@ -476,12 +500,12 @@ class CronJob {
     private function _checkMinutes($minutesField){
         $isValidExpr = true;
         $split = explode(',', $minutesField);
-        $minuteAttrs = array(
+        $minuteAttrs = [
             'every-minute'=>false,
-            'every-x-minutes'=>array(),
-            'at-every-x-minute'=>array(),
-            'at-range'=>array()
-        );
+            'every-x-minutes'=>[],
+            'at-every-x-minute'=>[],
+            'at-range'=>[]
+        ];
         foreach ($split as $subExpr){
             $exprType = $this->_getSubExprType($subExpr);
             if($exprType == self::ANY_VAL){
@@ -498,7 +522,7 @@ class CronJob {
                 if($start < $end){
                     if($start >= 0 && $start <= 59){
                         if($end >= 0 && $end <= 59){
-                            $minuteAttrs['at-range'][] = array($start,$end);
+                            $minuteAttrs['at-range'][] = [$start,$end];
                         }
                         else{
                             $isValidExpr = false;
@@ -556,12 +580,12 @@ class CronJob {
     private function _checkHours($hoursField){
         $isValidExpr = true;
         $split = explode(',', $hoursField);
-        $hoursAttrs = array(
+        $hoursAttrs = [
             'every-hour'=>false,
-            'every-x-hours'=>array(),
-            'at-every-x-hour'=>array(),
-            'at-range'=>array()
-        );
+            'every-x-hours'=>[],
+            'at-every-x-hour'=>[],
+            'at-range'=>[]
+        ];
         foreach ($split as $subExpr){
             $exprType = $this->_getSubExprType($subExpr);
             if($exprType == self::ANY_VAL){
@@ -578,7 +602,7 @@ class CronJob {
                 if($start < $end){
                     if($start >= 0 && $start < 24){
                         if($end >= 0 && $end < 24){
-                            $hoursAttrs['at-range'][] = array($start,$end);
+                            $hoursAttrs['at-range'][] = [$start,$end];
                         }
                         else{
                             $isValidExpr = false;
@@ -636,11 +660,11 @@ class CronJob {
     private function _dayOfMonth($dayOfMonthField){
         $isValidExpr = true;
         $split = explode(',', $dayOfMonthField);
-        $monthDaysAttrs = array(
+        $monthDaysAttrs = [
             'every-day'=>false,
-            'at-every-x-day'=>array(),
-            'at-range'=>array()
-        );
+            'at-every-x-day'=>[],
+            'at-range'=>[]
+        ];
         foreach ($split as $subExpr){
             $exprType = $this->_getSubExprType($subExpr);
             if($exprType == self::ANY_VAL){
@@ -657,7 +681,7 @@ class CronJob {
                 if($start < $end){
                     if($start >= 1 && $start < 32){
                         if($end >= 1 && $end < 32){
-                            $monthDaysAttrs['at-range'][] = array($start,$end);
+                            $monthDaysAttrs['at-range'][] = [$start,$end];
                         }
                         else{
                             $isValidExpr = false;
@@ -703,11 +727,11 @@ class CronJob {
     private function _checkMonth($monthField){
         $isValidExpr = true;
         $split = explode(',', $monthField);
-        $monthAttrs = array(
+        $monthAttrs = [
             'every-month'=>false,
-            'at-x-month'=>array(),
-            'at-range'=>array()
-        );
+            'at-x-month'=>[],
+            'at-range'=>[]
+        ];
         foreach ($split as $subExpr){
             $exprType = $this->_getSubExprType($subExpr);
             if($exprType == self::ANY_VAL){
@@ -724,7 +748,7 @@ class CronJob {
                 if($start < $end){
                     if($start >= 1 && $start < 13){
                         if($end >= 1 && $end < 13){
-                            $monthAttrs['at-range'][] = array($start,$end);
+                            $monthAttrs['at-range'][] = [$start,$end];
                         }
                         else{
                             $isValidExpr = false;
@@ -933,11 +957,11 @@ class CronJob {
     private function _checkDayOfWeek($dayOfWeekField){
         $isValidExpr = true;
         $split = explode(',', $dayOfWeekField);
-        $dayAttrs = array(
+        $dayAttrs = [
             'every-day'=>false,
-            'at-x-day'=>array(),
-            'at-range'=>array()
-        );
+            'at-x-day'=>[],
+            'at-range'=>[]
+        ];
         foreach ($split as $subExpr){
             $exprType = $this->_getSubExprType($subExpr);
             if($exprType == self::ANY_VAL){
@@ -954,7 +978,7 @@ class CronJob {
                 if($start < $end){
                     if($start >= 0 && $start < 6){
                         if($end >= 0 && $end <= 6){
-                            $dayAttrs['at-range'][] = array($start,$end);
+                            $dayAttrs['at-range'][] = [$start,$end];
                         }
                         else{
                             $isValidExpr = false;
@@ -1022,7 +1046,7 @@ class CronJob {
      * can be passed to the function.
      * @since 1.0
      */
-    public function setOnExecution($func,$funcParams=array()){
+    public function setOnExecution($func,$funcParams=[]){
         if(is_callable($func)){
             $this->events['on']['func'] = $func;
             if(gettype($funcParams) == 'array'){

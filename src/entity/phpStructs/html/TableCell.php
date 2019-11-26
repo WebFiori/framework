@@ -86,7 +86,7 @@ class TableCell extends HTMLNode{
      */
     public function getColSpan(){
         $colSpn = $this->getAttributeValue('colspan');
-        $retVal = $colSpn === NULL ? 1 : $colSpn;
+        $retVal = $colSpn === null ? 1 : $colSpn;
         return $retVal;
     }
     /**
@@ -98,7 +98,7 @@ class TableCell extends HTMLNode{
      */
     public function getRowSpan(){
         $colSpn = $this->getAttributeValue('rowspan');
-        $retVal = $colSpn === NULL ? 1 : $colSpn;
+        $retVal = $colSpn === null ? 1 : $colSpn;
         return $retVal;
     }
 }

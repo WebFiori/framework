@@ -26,7 +26,7 @@ namespace phpStructs;
 use Countable;
 use Iterator;
 /**
- * A class that represents a linked list.
+ * A class that represents a linked list data structure.
  *
  * @author Ibrahim 
  * @version 1.4.3
@@ -448,6 +448,12 @@ class LinkedList implements Countable, Iterator{
             if($this->head->data() === $val){
                 $el = &$this->head->data();
                 if($this->removeFirst() != null){
+                    return $el;
+                }
+            }
+            else if($this->tail->data() === $val){
+                $el = &$this->tail->data();
+                if($this->removeLast() !== null){
                     return $el;
                 }
             }

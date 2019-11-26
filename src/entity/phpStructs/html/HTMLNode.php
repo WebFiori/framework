@@ -410,7 +410,7 @@ class HTMLNode {
      * @param string $val
      * @since 1.7.4
      */
-    private static function _parseAttributesHelper(&$queue,$isEqualFound,&$val){
+    private static function _parseAttributesHelper($queue,$isEqualFound,&$val){
         if($isEqualFound){
             $equalSign = '=';
             $queue->enqueue($equalSign);
@@ -712,7 +712,7 @@ class HTMLNode {
      * has a parent. If the node has no parent, the method will return null.
      * @since 1.2
      */
-    public function &getParent() {
+    public function getParent() {
         return $this->parentNode;
     }
     /**
@@ -720,7 +720,7 @@ class HTMLNode {
      * @param HTMLNode $node
      * @since 1.2
      */
-    private function _setParent(&$node){
+    private function _setParent($node){
         $this->parentNode = $node;
     }
     /**
@@ -729,7 +729,7 @@ class HTMLNode {
      * given node is a text node, the method will return null.
      * @since 1.0
      */
-    public function &children(){
+    public function children(){
         return $this->childrenList;
     }
     /**
@@ -743,7 +743,7 @@ class HTMLNode {
      * @return HTMLNode An object of type HTMLNode.
      * @since 1.5
      */
-    public static function &createTextNode($nodeText,$escHtmlEntities=true){
+    public static function createTextNode($nodeText,$escHtmlEntities=true){
         $text = new HTMLNode('#TEXT');
         $text->setText($nodeText,$escHtmlEntities);
         return $text;
@@ -755,7 +755,7 @@ class HTMLNode {
      * @return HTMLNode An object of type HTMLNode.
      * @since 1.5
      */
-    public static function &createComment($text) {
+    public static function createComment($text) {
         $comment = new HTMLNode('#COMMENT');
         $comment->setText($text);
         return $comment;
@@ -776,7 +776,7 @@ class HTMLNode {
      * text node or a comment node, the function will always return false.
      * @since 1.2
      */
-    public function hasChild(&$node) {
+    public function hasChild($node) {
         if(!$this->isTextNode() && !$this->isComment()){
             if($node instanceof HTMLNode){
                 return $this->children()->indexOf($node) != -1;
@@ -791,7 +791,7 @@ class HTMLNode {
      * @return boolean true is returned if the node replaced. false if not.
      * @since 1.2
      */
-    public function replaceChild(&$oldNode,&$replacement) {
+    public function replaceChild($oldNode,$replacement) {
         if(!$this->isTextNode() && !$this->isComment()){
             if($oldNode instanceof HTMLNode){
                 if($this->hasChild($oldNode)){
@@ -856,19 +856,19 @@ class HTMLNode {
      * @param LinkedList $chNodes
      * @return null|HTMLNode Description
      */
-    private function &_getChildByID($val,&$chNodes){
+    private function _getChildByID($val,$chNodes){
         $chCount = $chNodes !== null ? $chNodes->size() : 0;
         for($x = 0 ; $x < $chCount ; $x++){
-            $child = &$chNodes->get($x);
+            $child = $chNodes->get($x);
             if(!$child->isVoidNode()){
-                $tmpCh = &$child->_getChildByID($val,$child->children());
+                $tmpCh = $child->_getChildByID($val,$child->children());
                 if($tmpCh instanceof HTMLNode){
                     return $tmpCh;
                 }
             }
         }
         for($x = 0 ; $x < $chCount ; $x++){
-            $child = &$chNodes->get($x);
+            $child = $chNodes->get($x);
             if($child->hasAttribute('id')){
                 $attrVal = $child->getAttributeValue('id');
                 if($attrVal == $val){
@@ -885,10 +885,10 @@ class HTMLNode {
      * if found. If no node has the given ID, the method will return null.
      * @since 1.2
      */
-    public function &getChildByID($val){
+    public function getChildByID($val){
         if(!$this->isTextNode() && !$this->isComment() && $this->mustClose()){
             if(strlen($val) != 0){
-                $ch = &$this->_getChildByID($val, $this->children());
+                $ch = $this->_getChildByID($val, $this->children());
                 return $ch;
             }
         }
@@ -1173,10 +1173,10 @@ class HTMLNode {
      * If not removed, the method will return null.
      * @since 1.2
      */
-    public function &removeChild(&$node) {
+    public function removeChild($node) {
         if($this->mustClose()){
             if($node instanceof HTMLNode){
-                $child = &$this->children()->removeElement($node);
+                $child = $this->children()->removeElement($node);
                 if($child instanceof HTMLNode){
                     $child->_setParent($this->null);
                     return $child;
@@ -1439,7 +1439,7 @@ class HTMLNode {
      * 
      * @param HTMLNode $node
      */
-    private function _pushNode(&$node) {
+    private function _pushNode($node) {
         if($node->isTextNode()){
             if($node->isFormatted() !== null && $node->isFormatted() === false){
                 if($node->isUseOriginalText()){
@@ -1491,7 +1491,7 @@ class HTMLNode {
                 }
                 $this->_addTab();
                 for($x = 0 ; $x < $chCount ; $x++){
-                    $nodeAtx = &$node->children()->get($x);
+                    $nodeAtx = $node->children()->get($x);
                     $this->_pushNode($nodeAtx);
                 }
                 $this->_reduceTab();
@@ -1503,7 +1503,7 @@ class HTMLNode {
         }
     }
     private function _popNode(){
-        $node = &$this->nodesStack->pop();
+        $node = $this->nodesStack->pop();
         if($node != null){
             if($node->isFormatted() !== null && $node->isFormatted() === false){
                 $this->htmlString .= $node->close();
@@ -1655,7 +1655,7 @@ class HTMLNode {
      * @param array $FO Formatting options.
      * @since 1.5
      */
-    private function _pushNodeAsCode(&$node,$FO) {
+    private function _pushNodeAsCode($node,$FO) {
         if($node->isTextNode()){
             if($node->isUseOriginalText()){
                 $this->codeString .= $this->_getTab().$node->getOriginalText().$this->nl;
@@ -1685,7 +1685,7 @@ class HTMLNode {
                 }
                 $this->_addTab();
                 for($x = 0 ; $x < $chCount ; $x++){
-                    $nodeAtx = &$node->children()->get($x);
+                    $nodeAtx = $node->children()->get($x);
                     $this->_pushNodeAsCode($nodeAtx,$FO);
                 }
                 $this->_reduceTab();
@@ -1702,7 +1702,7 @@ class HTMLNode {
      * @since 1.5
      */
     private function _popNodeAsCode($FO){
-        $node = &$this->nodesStack->pop();
+        $node = $this->nodesStack->pop();
         if($node != null){
             $name = $node->getNodeName();
             if($name == 'pre' || $name == 'textarea' || $name == 'code'){
@@ -1804,7 +1804,8 @@ class HTMLNode {
     }
     /**
      * Returns a node based on its attribute value (Direct child).
-     * @param string $attrName The name of the attribute.
+     * @param string $attrName The name of the attribute. Supplying lower case 
+     * name or upper case name is the same.
      * @param string $attrVal The value of the attribute.
      * @return HTMLNode|null The method will return an object of type HTMLNode 
      * if a node is found. Other than that, the method will return null. Note 
@@ -1812,7 +1813,7 @@ class HTMLNode {
      * the first occurrence is returned.
      * @since 1.2
      */
-    public function &getChildByAttributeValue($attrName,$attrVal) {
+    public function getChildByAttributeValue($attrName,$attrVal) {
         if(!$this->isTextNode() && !$this->isComment()){
             for($x = 0 ; $x < $this->children()->size() ; $x++){
                 $ch = $this->children()->get($x);
@@ -1828,7 +1829,8 @@ class HTMLNode {
     /**
      * Returns the value of an attribute.
      * Calling this method is similar to calling HTMLNode::getAttributeValue().
-     * @param string $attrName The name of the attribute.
+     * @param string $attrName The name of the attribute. Upper case name and 
+     * lower case name is treated same way. Which means 'ID' is like 'id'.
      * @return string|null The method will return the value of the attribute 
      * if found. If no such attribute, the method will return null.
      * @since 1.7.7
@@ -1841,7 +1843,8 @@ class HTMLNode {
     }
     /**
      * Returns the value of an attribute.
-     * @param string $attrName The name of the attribute.
+     * @param string $attrName The name of the attribute. It can be in upper 
+     * or lower case.
      * @return string|null The method will return the value of the attribute 
      * if found. If no such attribute, the method will return null.
      * @since 1.1
@@ -1854,7 +1857,8 @@ class HTMLNode {
     }
     /**
      * Checks if the node has a given attribute or not.
-     * @param string $attrName The name of the attribute.
+     * @param string $attrName The name of the attribute. It can be in upper case 
+     * or lower case.
      * @return boolean true if the attribute is set.
      * @since 1.1
      */

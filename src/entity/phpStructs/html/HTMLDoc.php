@@ -121,15 +121,15 @@ class HTMLDoc {
      * @param LinkedList $list
      * @param HTMLNode $child
      */
-    private function _getChildrenByTag($val,$list,&$child){
+    private function _getChildrenByTag($val,$list,$child){
         if($child->getNodeName() == $val){
             $list->add($child);
         }
         if(!$child->isTextNode() && !$child->isComment() && !$child->isVoidNode()){
-            $children = &$child->children();
+            $children = $child->children();
             $chCount = $children->size();
             for($x = 0 ; $x < $chCount ; $x++){
-                $ch = &$children->get($x);
+                $ch = $children->get($x);
                 $this->_getChildrenByTag($val, $list, $ch);
             }
         }
@@ -141,7 +141,7 @@ class HTMLDoc {
      * if found. If no node has the given ID, the method will return null.
      * @since 1.2
      */
-    public function &getChildByID($id) {
+    public function getChildByID($id) {
         return $this->getDocumentRoot()->getChildByID($id);
     }
     /**
@@ -177,7 +177,7 @@ class HTMLDoc {
      * @return HTMLNode an object of type HTMLNode.
      * @since 1.4.1
      */
-    public function &getDocumentRoot() {
+    public function getDocumentRoot() {
         return $this->htmlNode;
     }
     /**
@@ -221,7 +221,7 @@ class HTMLDoc {
      * if it is not set, the method will return false.
      * @since 1.0
      */
-    public function setHeadNode(&$node){
+    public function setHeadNode($node){
         if($node instanceof HeadNode){
             if($this->getDocumentRoot()->replaceChild($this->headNode, $node)){
                 $this->headNode = $node;
@@ -293,7 +293,7 @@ class HTMLDoc {
      * If not removed, the method will return null.
      * @since 1.4
      */
-    public function removeChild(&$node) {
+    public function removeChild($node) {
         if($node instanceof HTMLNode){
             if($node !== $this->body && $node !== $this->headNode){
                 return $this->_removeChild($this->getDocumentRoot(), $node);
@@ -305,15 +305,16 @@ class HTMLDoc {
     /**
      * 
      * @param HTMLNode $ch
+     * @param HTMLNode $nodeToRemove Description
      */
-    private function _removeChild(&$ch,&$nodeToRemove){
+    private function _removeChild($ch,$nodeToRemove){
         for($x = 0 ; $x < $ch->childrenCount() ; $x++){
             $removed = $this->_removeChild($ch->children()->get($x),$nodeToRemove);
             if($removed instanceof HTMLNode){
                 return $removed;
             }
         }
-        $removed = &$ch->removeChild($nodeToRemove);
+        $removed = $ch->removeChild($nodeToRemove);
         return $removed;
     }
     /**
@@ -321,7 +322,7 @@ class HTMLDoc {
      * @return HeadNode The node that represents the 'head' node.
      * @since 1.2
      */
-    public function &getHeadNode() {
+    public function getHeadNode() {
         return $this->headNode;
     }
     /**
@@ -329,7 +330,7 @@ class HTMLDoc {
      * @return HTMLNode The node that represents the body.
      * @since 1.2
      */
-    public function &getBody() {
+    public function getBody() {
         return $this->body;
     }
     /**
@@ -340,7 +341,7 @@ class HTMLDoc {
      * if not added.
      * @since 1.0
      */
-    public function addChild(&$node){
+    public function addChild($node){
         if($node instanceof HTMLNode){
             $name = $node->getNodeName();
             if($name != 'body' && $name != 'head' && $name != 'html'){

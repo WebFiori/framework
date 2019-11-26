@@ -38,6 +38,7 @@ interface Comparable {
      * If the object at the parameter is greater, the method should return a negative number.
      * @param mixed $other The other variable that will be compared 
      * with.
+     * @return int Negative value, 0 or positive value.
      * @since 1.0
      */
     public function compare($other);

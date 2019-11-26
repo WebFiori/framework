@@ -28,7 +28,7 @@ use phpStructs\html\HTMLNode;
  * A class that represents &lt;label&gt; tag.
  *
  * @author Ibrahim
- * @version 1.0
+ * @version 1.0.1
  */
 class Label extends HTMLNode{
     /**
@@ -52,5 +52,25 @@ class Label extends HTMLNode{
      */
     public function setText($text,$escEntities=true) {
         $this->children()->get(0)->setText($text,$escEntities);
+    }
+    /**
+     * Sets the value of the attribute 'for'.
+     * @param string|Input $elIdOrInput It can be the value of the 'id' attribute 
+     * of an input element or it can be an instance of the class 'Input'. Note 
+     * that if the provided value is an instance of 'Input', then the attribute 
+     * 'id' must be set first.
+     * @since 1.0.1
+     */
+    public function setFor($elIdOrInput) {
+        if($elIdOrInput instanceof Input){
+            $id = $elIdOrInput->getAttributeValue('id');
+            if($id !== null){
+                $this->setAttribute('for', $id);
+            }
+        }
+        else{
+            $trimmed = trim($elIdOrInput);
+            $this->setAttribute('for', $trimmed);
+        }
     }
 }

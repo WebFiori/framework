@@ -2,6 +2,7 @@
 namespace phpStructs;
 /**
  * A singly linked node that can be used to construct different data structures.
+ * It is somehow the core class of this library.
  * @author Ibrahim
  * @version 1.1
  */

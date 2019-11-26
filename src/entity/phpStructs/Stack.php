@@ -24,13 +24,14 @@
  * THE SOFTWARE.
  */
 namespace phpStructs;
+use Countable;
 /**
  * A class that represents a stack data structure.
  *
  * @author Ibrahim
- * @version 1.1
+ * @version 1.1.1
  */
-class Stack{
+class Stack implements Countable{
     /**
      * A null guard for the methods that return null reference.
      * @since 1.1
@@ -235,5 +236,14 @@ class Stack{
         }
         $retVal .= ']';
         return $retVal;
+    }
+    /**
+     * Returns the number of elements in the stack.
+     * This one is similar to calling the method "Queue::<a href="#size">size()</a>".
+     * @return int Number of elements in the stack.
+     * @since 1.1.1
+     */
+    public function count() {
+        return $this->size();
     }
 }

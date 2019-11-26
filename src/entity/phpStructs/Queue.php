@@ -24,14 +24,15 @@
  * THE SOFTWARE.
  */
 namespace phpStructs;
+use Countable;
 /**
  * A class that represents a queue data structure.
  * The queue is implemented in a way that the first element that comes in will 
  * be the first element to come out (FIFO queue).
  * @author Ibrahim
- * @version 1.1
+ * @version 1.1.1
  */
-class Queue{
+class Queue implements Countable{
     /**
      * A null guard for the methods that return null reference.
      * @since 1.1
@@ -229,4 +230,14 @@ class Queue{
         $retVal .= ']';
         return $retVal;
     }
+    /**
+     * Returns the number of elements in the queue.
+     * This one is similar to calling the method "Queue::<a href="#size">size()</a>".
+     * @return int Number of elements in the queue.
+     * @since 1.1.1
+     */
+    public function count() {
+        return $this->size();
+    }
+
 }

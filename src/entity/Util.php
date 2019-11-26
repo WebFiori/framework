@@ -521,6 +521,15 @@ class Util{
      * @since 1.0
      */
     public static function print_r($expr,$asMessageBox=true){
+        if($expr === null){
+            $expr = 'null';
+        }
+        else if($expr === true){
+            $expr = 'true';
+        }
+        else if($expr === false){
+            $expr = 'false';
+        }
         if(CLI::isCLI()){
             $val = print_r($expr, true);
             fprintf(STDOUT, "%s\n",$val);

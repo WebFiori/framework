@@ -128,13 +128,16 @@ class CLI {
             $_SERVER['HTTP_HOST'] = $host;
             $_SERVER['REMOTE_ADDR'] = $host;
             $_SERVER['DOCUMENT_ROOT'] = trim($_SERVER['argv'][0],'WebFiori.php');
+            $_SERVER['REQUEST_URI'] = '/';
+            putenv('HTTP_HOST='.$host);
+            putenv('REQUEST_URI=/');
+            var_dump($_SERVER);
             if(defined('USE_HTTP') && USE_HTTP === true){
                 
             }
             else{
                 $_SERVER['HTTPS'] = 'yes';
             }
-            putenv('HTTP_HOST='.$host);
         }
     }
     /**

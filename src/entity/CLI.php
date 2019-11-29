@@ -131,7 +131,6 @@ class CLI {
             $_SERVER['REQUEST_URI'] = '/';
             putenv('HTTP_HOST='.$host);
             putenv('REQUEST_URI=/');
-            var_dump($_SERVER);
             if(defined('USE_HTTP') && USE_HTTP === true){
                 
             }

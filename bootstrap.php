@@ -1,6 +1,6 @@
 <?php
 use webfiori\entity\AutoLoader;
-
+use webfiori\entity\CLI;
 $DS = DIRECTORY_SEPARATOR;
 //the name of tests directory. Update as needed.
 define('TESTS_DIRECTORY', 'tests');
@@ -58,6 +58,7 @@ AutoLoader::get(array(
     'on-load-failure'=>'do-nothing'
 ));
 fprintf(STDOUT,'Autoloader Initialized.'."\n");
+CLI::init();
 fprintf(STDOUT,'Root Directory: \''.AutoLoader::get()->getRoot().'\'.'."\n");
 //fprintf(STDOUT,'Class Search Paths:'."\n");
 //$dirs = AutoLoader::getFolders();

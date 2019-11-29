@@ -227,6 +227,10 @@ abstract class Theme implements JsonI{
      * @since 1.0
      */
     public static function usingTheme($themeName=null) {
+        if(!defined('THEMES_PATH')){
+            $themesPath = trim(__DIR__,DIRECTORY_SEPARATOR.'entity').DIRECTORY_SEPARATOR.self::THEMES_DIR;
+            define('THEMES_PATH', $themesPath);
+        }
         if($themeName === null){
             $themeName = SiteConfig::getBaseThemeName();
         }
@@ -246,10 +250,11 @@ abstract class Theme implements JsonI{
         }
         if(isset($themeToLoad)){
             $themeToLoad->invokeBeforeLoaded();
-            $themeDir = ROOT_DIR.'/'.self::THEMES_DIR.'/'.$themeToLoad->getDirectoryName();
+            $ds = DIRECTORY_SEPARATOR;
+            $themeDir = THEMES_PATH.$ds.$themeToLoad->getDirectoryName();
             foreach ($themeToLoad->getComponents() as $component){
-                if(file_exists($themeDir.'/'.$component)){
-                    require_once $themeDir.'/'.$component;
+                if(file_exists($themeDir.$ds.$component)){
+                    require_once $themeDir.$ds.$component;
                 }
                 else{
                     throw new Exception('Component \''.$component.'\' of the theme not found. Eather define it or remove it from the array of theme components.');
@@ -328,11 +333,15 @@ abstract class Theme implements JsonI{
      * @since 1.1 
      */
     public static function getAvailableThemes(){
-        $themes = array();
+        if(!defined('THEMES_PATH')){
+            $themesPath = trim(__DIR__,DIRECTORY_SEPARATOR.'entity').DIRECTORY_SEPARATOR.self::THEMES_DIR;
+            define('THEMES_PATH', $themesPath);
+        }
+        $themes = [];
         $DS = DIRECTORY_SEPARATOR;
-        $themesDirs = array_diff(scandir(ROOT_DIR.$DS.self::THEMES_DIR), ['..', '.']);
+        $themesDirs = array_diff(scandir(THEMES_PATH), ['..', '.']);
         foreach ($themesDirs as $dir){
-            $pathToScan = ROOT_DIR.$DS.self::THEMES_DIR.$DS.$dir;
+            $pathToScan = THEMES_PATH.$DS.$dir;
             $filesInDir = array_diff(scandir($pathToScan), ['..', '.']);
             foreach ($filesInDir as $fileName){
                 $fileExt = substr($fileName, -4);

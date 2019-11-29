@@ -25,6 +25,7 @@ if(explode($DS, __DIR__)[0] == 'home'){
         if(file_exists($file)){
             require_once $file;
             $isAutoloaderLoaded = true;
+            break;
         }
     }
 }
@@ -37,16 +38,18 @@ else{
         if(file_exists($file)){
             require_once $file;
             $isAutoloaderLoaded = true;
+            break;
         }
     }
 }
 if($isAutoloaderLoaded === false){
-    fprintf(STDOUT, "Error: Unable to find the class 'AutoLoader'.\n");
+    fprintf(STDERR, "Error: Unable to find the class 'AutoLoader'.\n");
     exit(-1);
 }
 else{
     fprintf(STDOUT,"Class 'AutoLoader' successfully loaded.\n");
 }
+fprintf(STDOUT,"Class 'Initializing autoload directories...\n");
 AutoLoader::get(array(
     'search-folders'=>array(
         'tests',
@@ -58,7 +61,9 @@ AutoLoader::get(array(
     'on-load-failure'=>'do-nothing'
 ));
 fprintf(STDOUT,'Autoloader Initialized.'."\n");
+fprintf(STDOUT,'Initializing CLI of the Framework...'."\n");
 CLI::init();
+fprintf(STDOUT,'Done.'."\n");
 fprintf(STDOUT,'Root Directory: \''.AutoLoader::get()->getRoot().'\'.'."\n");
 //fprintf(STDOUT,'Class Search Paths:'."\n");
 //$dirs = AutoLoader::getFolders();

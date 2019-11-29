@@ -34,7 +34,8 @@ use Exception;
  * class and implement its abstract methods to create header section, 
  * a footer section and aside section. In addition, 
  * the developer can include custom head tags (like CSS files or 
- * JS files) by implementing one of the abstract methods.
+ * JS files) by implementing one of the abstract methods. Themes must exist in 
+ * the folder '/themes' of the framework.
  * @author Ibrahim
  * @version 1.2.3
  */
@@ -56,7 +57,7 @@ abstract class Theme implements JsonI{
      * @var array
      * @since 1.0 
      */
-    private static $loadedThemes = array();
+    private static $loadedThemes = [];
     /**
      * An associative array that contains theme meta info.
      * @var array
@@ -144,11 +145,11 @@ abstract class Theme implements JsonI{
         $this->setCssDirName('css');
         $this->setJsDirName('js');
         $this->setImagesDirName('images');
-        $this->themeComponents = array();
+        $this->themeComponents = [];
         $this->afterLoaded = function(){};
-        $this->afterLoadedParams = array();
+        $this->afterLoadedParams = [];
         $this->beforeLoaded = function(){};
-        $this->beforeLoadedParams = array();
+        $this->beforeLoadedParams = [];
     }
     /**
      * Returns the base URL that will be used by the theme.
@@ -265,7 +266,7 @@ abstract class Theme implements JsonI{
      * callback.
      * @since 1.0
      */
-    public function setAfterLoaded($function,$params=array()) {
+    public function setAfterLoaded($function,$params=[]) {
         if(is_callable($function)){
             $this->afterLoaded = $function;
             if(gettype($params) == 'array'){
@@ -280,7 +281,7 @@ abstract class Theme implements JsonI{
      * callback.
      * @since 1.2.1
      */
-    public function setBeforeLoaded($function,$params=array()){
+    public function setBeforeLoaded($function,$params=[]){
         if(is_callable($function)){
             $this->beforeLoaded = $function;
             if(gettype($params) == 'array'){
@@ -329,10 +330,10 @@ abstract class Theme implements JsonI{
     public static function getAvailableThemes(){
         $themes = array();
         $DS = DIRECTORY_SEPARATOR;
-        $themesDirs = array_diff(scandir(ROOT_DIR.$DS.self::THEMES_DIR), array('..', '.'));
+        $themesDirs = array_diff(scandir(ROOT_DIR.$DS.self::THEMES_DIR), ['..', '.']);
         foreach ($themesDirs as $dir){
             $pathToScan = ROOT_DIR.$DS.self::THEMES_DIR.$DS.$dir;
-            $filesInDir = array_diff(scandir($pathToScan), array('..', '.'));
+            $filesInDir = array_diff(scandir($pathToScan), ['..', '.']);
             foreach ($filesInDir as $fileName){
                 $fileExt = substr($fileName, -4);
                 if($fileExt == '.php'){
@@ -353,8 +354,10 @@ abstract class Theme implements JsonI{
     }
     /**
      * Sets the name of the theme.
-     * @param string $name The name of the theme. Note that the name of the theme 
-     * acts as the unique identifier for the theme.
+     * @param string $name The name of the theme. It must be non-empty string 
+     * in order to set. Note that the name of the theme 
+     * acts as the unique identifier for the theme. It can be used to load the 
+     * theme later.
      * @since 1.0
      */
     public function setName($name) {
@@ -420,7 +423,8 @@ abstract class Theme implements JsonI{
     }
     /**
      * Sets the name of theme license.
-     * @param string $text The name of theme license.
+     * @param string $text The name of theme license. It must be non-empty 
+     * string in order to set.
      * @since 1.0
      */
     public function setLicenseName($text) {
@@ -443,7 +447,7 @@ abstract class Theme implements JsonI{
     /**
      * Sets the description of the theme.
      * @param string $desc Theme description. Usually a short paragraph of two 
-     * or 3 sentences.
+     * or 3 sentences. It must be non-empty string in order to set.
      * @since 1.0
      */
     public function setDescription($desc) {
@@ -454,8 +458,10 @@ abstract class Theme implements JsonI{
     }
     /**
      * Sets the name of the directory where all theme files are kept.
-     * Each theme must have a unique directory to prevent collision.
-     * @param string $name The name of the directory.
+     * Each theme must have a unique directory to prevent collision. The 
+     * directory of the theme must be a folder which exist inside the directory 
+     * '/themes'.
+     * @param string $name The name of theme directory.
      * @since 1.0
      */
     public function setDirectoryName($name) {
@@ -466,6 +472,8 @@ abstract class Theme implements JsonI{
     }
     /**
      * Returns the name of the directory where all theme files are kept.
+     * The directory of a theme is a folder which exist inside the directory 
+     * '/themes'.
      * @return string The name of the directory where all theme files are kept. 
      * If it is not set, the method will return empty string.
      * @since 1.0
@@ -475,9 +483,11 @@ abstract class Theme implements JsonI{
     }
     /**
      * Sets the name of the directory where theme images are kept.
-     * @param string $name The name of the directory where theme images are kept. 
      * Note that it will be set only if the given name is not an empty string. In 
-     * addition, directory name must not include theme directory name.
+     * addition, directory name must not include theme directory name. For example, 
+     * if your theme images exist in the directory '/themes/super-theme/images', 
+     * the value that must be supplied to this method is 'images'.
+     * @param string $name The name of the directory where theme images are kept. 
      * @since 1.0
      */
     public function setImagesDirName($name) {
@@ -498,9 +508,11 @@ abstract class Theme implements JsonI{
     }
     /**
      * Sets the name of the directory where theme JavaScript files are kept.
-     * @param string $name The name of the directory where theme JavaScript files are kept. 
      * Note that it will be set only if the given name is not an empty string. In 
-     * addition, directory name must not include theme directory name.
+     * addition, directory name must not include theme directory name. For example, 
+     * if your theme JavaScript files exist in the directory '/themes/super-theme/js', 
+     * the value that must be supplied to this method is 'js'.
+     * @param string $name The name of the directory where theme JavaScript files are kept. 
      * @since 1.0
      */
     public function setJsDirName($name) {
@@ -521,9 +533,11 @@ abstract class Theme implements JsonI{
     }
     /**
      * Sets the name of the directory where theme CSS files are kept.
-     * @param string $name The name of the directory where theme CSS files are kept. 
      * Note that it will be set only if the given name is not an empty string. In 
-     * addition, directory name must not include theme directory name.
+     * addition, directory name must not include theme directory name. For example, 
+     * if your theme CSS files exist in the directory '/themes/super-theme/css', 
+     * the value that must be supplied to this method is 'css'.
+     * @param string $name The name of the directory where theme CSS files are kept.
      * @since 1.0
      */
     public function setCssDirName($name) {
@@ -544,7 +558,9 @@ abstract class Theme implements JsonI{
     }
     /**
      * Returns an array which contains all loaded themes.
-     * @return array An array which contains all loaded themes.
+     * @return array An associative array which contains all loaded themes. 
+     * The index will be theme name and the value is an object of type 'Theme' 
+     * which contains theme info.
      * @since 1.0
      */
     public static function getLoadedThemes(){
@@ -648,9 +664,9 @@ abstract class Theme implements JsonI{
      * Returns an object of type HeadNode that represents HTML &lt;head&gt; node. 
      * The developer must implement this method such that it returns an 
      * object of type HeadNode. The developer can use this method to include 
-     * any JavaScript or CSS files that the page needs. Also, it can be used to 
+     * any JavaScript or CSS files that website pages needs. Also, it can be used to 
      * add custom meta tags to &lt;head&gt; node or any tag that can be added 
-     * to the node.
+     * to the &lt;head&gt; HTML element.
      * @return HeadNode An object of type HeadNode.
      * @since 1.2.2
      */
@@ -658,35 +674,35 @@ abstract class Theme implements JsonI{
     /**
      * Returns an object of type HTMLNode that represents header section of the page. 
      * The developer must implement this method such that it returns an 
-     * object of type HTMLNode. Header section of the page usually include a 
-     * main navigation icon, web site name and web site logo. More complex 
+     * object of type 'HTMLNode'. Header section of the page usually include a 
+     * main navigation menu, web site name and web site logo. More complex 
      * layout can include other things such as a search bar, notifications 
      * area and user profile picture. If the page does not have a header 
      * section, the developer can make this method return null.
-     * @return HTMLNode|null An object of type HTMLNode. If the theme has no header 
+     * @return HTMLNode|null An object of type 'HTMLNode'. If the theme has no header 
      * section, the method might return null.
      * @since 1.2.2
      */
     public abstract function getHeadrNode();
     /**
-     * Returns an object of type HTMLNode that represents footer section of the page. 
+     * Returns an object of type 'HTMLNode' that represents footer section of the page. 
      * The developer must implement this method such that it returns an 
-     * object of type HTMLNode. Footer section of the page usually include links 
+     * object of type 'HTMLNode'. Footer section of the page usually include links 
      * to social media profiles, about us page and site map. In addition, 
      * it might contain copyright notice and contact information. More complex 
      * layouts can have more items in the footer.
-     * @return HTMLNode An object of type HTMLNode. If the theme has no footer 
+     * @return HTMLNode An object of type 'HTMLNode'. If the theme has no footer 
      * section, the method might return null.
      * @since 1.2.2
      */
     public abstract function getFooterNode();
     /**
-     * Returns an object of type HTMLNode that represents aside section of the page. 
+     * Returns an object of type 'HTMLNode' that represents aside section of the page. 
      * The developer must implement this method such that it returns an 
-     * object of type HTMLNode. Aside section of the page most of the time 
-     * contains advertisements. Sometimes, it can contain aside menu for 
+     * object of type 'HTMLNode'. Aside section of the page will 
+     * contain advertisements most of the time. Sometimes, it can contain aside menu for 
      * the web site or widgets.
-     * @return HTMLNode An object of type HTMLNode. If the theme has no aside 
+     * @return HTMLNode An object of type 'HTMLNode'. If the theme has no aside 
      * section, the method might return null.
      * @since 1.2.2
      */

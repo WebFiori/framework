@@ -46,17 +46,17 @@ class ControllerTest extends TestCase{
     /**
      * @test
      */
-//    public function testUseDatabase01() {
-//        $connection = new DBConnectionInfo('root', '12345', 'testing_db');
-//        $connection->setConnectionName('test-connection');
-//        WebFiori::getConfig()->addDbConnection($connection);
-//        $func = new Functions();
-//        $result = $func->useDatabase('test-connection');
-//        $this->assertFalse($result);
-//        $errDetails = $func->getDBErrDetails();
-//        $this->assertEquals(1045,$errDetails['error-code']);
-//        $this->assertEquals("Access denied for user 'root'@'localhost' (using password: YES)",$errDetails['error-message']);
-//    }
+    public function testUseDatabase01() {
+        $connection = new DBConnectionInfo('root', '12345', 'testing_db');
+        $connection->setConnectionName('test-connection');
+        WebFiori::getConfig()->addDbConnection($connection);
+        $func = new Controller();
+        $result = $func->useDatabase('test-connection');
+        $this->assertFalse($result);
+        $errDetails = $func->getDBErrDetails();
+        $this->assertEquals(1045,$errDetails['error-code']);
+        $this->assertEquals("Access denied for user 'root'@'localhost' (using password: YES)",$errDetails['error-message']);
+    }
     /**
      * @test
      */
@@ -258,4 +258,5 @@ class ControllerTest extends TestCase{
         }
         $this->assertEquals(4,count($users[2]->getContactInfo()));
     }
+    
 }

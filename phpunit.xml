@@ -17,6 +17,8 @@
             <file>./src/entity/Privilege.php</file>
             <file>./src/entity/PrivilegesGroup.php</file>
             <file>./src/entity/User.php</file>
+            <file>./src/entity/Page.php</file>
+            <file>./src/entity/Theme.php</file>
         </whitelist>
     </filter>
     <logging>

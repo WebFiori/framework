@@ -11,20 +11,59 @@ class PageTest extends TestCase{
     /**
      * @test
      */
-    public function test00() {
-        $page = Page::get();
-        $page2 = Page::get();
-        $this->assertSame($page,$page2);
-        $this->assertTrue($page === $page2);
-        $this->assertSame(Page::document(),$page->document());
+    public function testDefaults00() {
+        $this->assertNull(Page::lang());
+        $this->assertNull(Page::description());
+        $this->assertEquals('Hello World',Page::title());
+        $this->assertEquals('Hello Website',Page::siteName());
+        $this->assertEquals(' | ',Page::separator());
+        $this->assertTrue(Page::header());
+        $this->assertTrue(Page::footer());
+        $this->assertTrue(Page::aside());
+        $this->assertNull(Page::theme());
+        $this->assertEquals('ltr',Page::dir());
+        $this->assertNull(Page::translation());
+        $this->assertEquals('https://127.0.0.1/',Page::canonical());
     }
     /**
      * @test
      */
-    public function test01() {
-        $page = Page::get();
-        $page2 = Page::get();
-        $page->title('Hello World');
-        $this->assertEquals('Hello World',$page2->title());
+    public function testReset00() {
+        Page::theme('Webfiori Theme');
+        Page::lang('ar');
+        Page::description('This is a test page.');
+        Page::title('Login');
+        Page::siteName('Small ERP');
+        Page::separator('-');
+        Page::header(false);
+        Page::footer(false);
+        Page::aside(false);
+        Page::translation();
+        
+        $this->assertEquals('AR',Page::lang());
+        $this->assertEquals('This is a test page.',Page::description());
+        $this->assertEquals('Login',Page::title());
+        $this->assertEquals('Small ERP',Page::siteName());
+        $this->assertEquals(' - ',Page::separator());
+        $this->assertFalse(Page::header());
+        $this->assertFalse(Page::footer());
+        $this->assertFalse(Page::aside());
+        $this->assertNotNull(Page::theme());
+        $this->assertEquals('rtl',Page::dir());
+        $this->assertNotNull(Page::translation());
+        
+        Page::reset();
+        $this->assertNull(Page::lang());
+        $this->assertNull(Page::description());
+        $this->assertEquals('Hello World',Page::title());
+        $this->assertEquals('Hello Website',Page::siteName());
+        $this->assertEquals(' | ',Page::separator());
+        $this->assertTrue(Page::header());
+        $this->assertTrue(Page::footer());
+        $this->assertTrue(Page::aside());
+        $this->assertNull(Page::theme());
+        $this->assertEquals('ltr',Page::dir());
+        $this->assertNull(Page::translation());
+        $this->assertEquals('https://127.0.0.1/',Page::canonical());
     }
 }

@@ -227,10 +227,7 @@ abstract class Theme implements JsonI{
      * @since 1.0
      */
     public static function usingTheme($themeName=null) {
-        if(!defined('THEMES_PATH')){
-            $themesPath = trim(__DIR__,DIRECTORY_SEPARATOR.'entity').DIRECTORY_SEPARATOR.self::THEMES_DIR;
-            define('THEMES_PATH', $themesPath);
-        }
+        self::defineThemesDir();
         if($themeName === null){
             $themeName = SiteConfig::getBaseThemeName();
         }
@@ -324,6 +321,13 @@ abstract class Theme implements JsonI{
     public static function isThemeLoaded($themeName) {
         return isset(self::$loadedThemes[$themeName]) === true;
     }
+    private static function defineThemesDir(){
+        if(!defined('THEMES_PATH')){
+            var_dump(__DIR__);
+            $themesPath = trim(__DIR__,DIRECTORY_SEPARATOR.'entity').DIRECTORY_SEPARATOR.self::THEMES_DIR;
+            define('THEMES_PATH', $themesPath);
+        }
+    }
     /**
      * Returns an array that contains the meta data of all available themes. 
      * This method will return an associative array. The key is the theme 
@@ -333,11 +337,7 @@ abstract class Theme implements JsonI{
      * @since 1.1 
      */
     public static function getAvailableThemes(){
-        if(!defined('THEMES_PATH')){
-            var_dump(__DIR__);
-            $themesPath = trim(__DIR__,DIRECTORY_SEPARATOR.'entity').DIRECTORY_SEPARATOR.self::THEMES_DIR;
-            define('THEMES_PATH', $themesPath);
-        }
+        self::defineThemesDir();
         $themes = [];
         $DS = DIRECTORY_SEPARATOR;
         $themesDirs = array_diff(scandir(THEMES_PATH), ['..', '.']);

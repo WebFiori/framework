@@ -325,6 +325,7 @@ abstract class Theme implements JsonI{
         if(!defined('THEMES_PATH')){
             var_dump(__DIR__);
             $themesPath = trim(__DIR__,DIRECTORY_SEPARATOR.'entity').DIRECTORY_SEPARATOR.self::THEMES_DIR;
+            var_dump($themesPath);
             define('THEMES_PATH', $themesPath);
         }
     }

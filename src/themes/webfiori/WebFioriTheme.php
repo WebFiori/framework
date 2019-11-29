@@ -31,18 +31,25 @@ class WebFioriTheme extends Theme{
         ));
         $this->setBeforeLoaded(function(){
             $session = WebsiteController::get()->getSession();
-            $lang = $session->getLang(true);
-            Page::lang($lang);
-            if($lang == 'AR'){
-                Page::dir('rtl');
-            }
-            else{
-                Page::dir('ltr');
+            if($session !== null){
+                $lang = $session->getLang(true);
+                Page::lang($lang);
+                if($lang == 'AR'){
+                    Page::dir('rtl');
+                }
+                else{
+                    Page::dir('ltr');
+                }
             }
         });
         $this->setAfterLoaded(function(){
             $session = WebsiteController::get()->getSession();
-            Page::lang($session->getLang(true));
+            if($session !== null){
+                Page::lang($session->getLang(true));
+            }
+            else{
+                Page::lang('en');
+            }
             Page::document()->getChildByID('main-content-area')->setClassName('wf-'.Page::dir().'-col-10');
             Page::document()->getChildByID('side-content-area')->setClassName('wf-'.Page::dir().'-col-2');
             Page::document()->getChildByID('page-body')->setClassName('wf-row');
@@ -50,9 +57,9 @@ class WebFioriTheme extends Theme{
             Page::document()->getChildByID('page-footer')->setClassName('wf-row');
             Page::siteName(WebFiori::getSiteConfig()->getWebsiteNames()[Page::lang()]);
             LangExt::extLang();
-            $translation = &Page::translation();
+            $translation = Page::translation();
             //adding menu items 
-            $mainMenu = &Page::document()->getChildByID('menu-items-container');
+            $mainMenu = Page::document()->getChildByID('menu-items-container');
 
             $item1 = new ListItem();
             $link1 = new LinkNode(SiteConfig::getBaseURL(), $translation->get('menus/main-menu/menu-item-1'));

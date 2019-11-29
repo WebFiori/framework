@@ -42,7 +42,7 @@ class Language {
      * 'Language'.
      * @since 1.1 
      */
-    private static $loadedLangs = array();
+    private static $loadedLangs = [];
     /**
      * An attribute that will be set to 'true' if the language 
      * is added to the set of loaded languages.
@@ -89,7 +89,7 @@ class Language {
      * the language was loaded.
      * @since 1.1
      */
-    public static function &loadTranslation($langCode){
+    public static function loadTranslation($langCode){
         $uLangCode = strtoupper(trim($langCode));
         if(isset(self::$loadedLangs[$uLangCode])){
             return self::$loadedLangs[$uLangCode];
@@ -104,7 +104,7 @@ class Language {
                     }
                     else{
                         throw new Exception('The translation file was found. But no object of type \'Language\' is stored. Make sure that the parameter '
-                                . '$addtoLoadedAfterCreate is set to true when creating the object.');
+                                . '$addtoLoadedAfterCreate is set to true when creating the language object.');
                     }
                 }
                 else{
@@ -217,7 +217,7 @@ class Language {
                     $this->_create($subSplit, $this->languageVars[$subSplit[0]],1);
                 }
                 else{
-                    $this->languageVars[$subSplit[0]] = array();
+                    $this->languageVars[$subSplit[0]] = [];
                     $this->_create($subSplit, $this->languageVars[$subSplit[0]],1);
                 }
             }
@@ -256,7 +256,7 @@ class Language {
      * name and the value of the key will act as the variable value.
      * @since 1.0
      */
-    public function setMultiple($dir,$arr=array()) {
+    public function setMultiple($dir,$arr=[]) {
         foreach ($arr as $k => $v){
             $this->set($dir, $k, $v);
         }

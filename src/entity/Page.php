@@ -146,7 +146,7 @@ class Page{
      * @since 1.2
      * @param string $url The canonical URL of the page.
      */
-    public function setCanonical($url){
+    private function setCanonical($url){
         if(strlen($url) != 0){
             $this->canonical = $url;
             if($this->document !== null){
@@ -160,15 +160,16 @@ class Page{
      * if set. If not, the method will return null.
      * @since 1.2
      */
-    public function getCanonical() {
+    private function getCanonical() {
         return $this->canonical;
     }
     /**
      * Sets or gets the canonical URL of the page.
-     * @param string|null $new The new canonical URL. If null is given, the 
+     * Note that it will be set automatically but the developer can change 
+     * it if he would like to.
+     * @param string $new The new canonical URL. If null is given, the 
      * method will not update the canonical URL.
-     * @return string|null The canonical URL of the page. If the canonical 
-     * is not set, the method will return null.
+     * @return string The canonical URL of the page. 
      * @since 1.9
      */
     public static function canonical($new=null){
@@ -189,8 +190,8 @@ class Page{
     }
     private function _reset(){
         $this->document = new HTMLDoc();
-        $this->setTitle('Default X');
-        $this->setWebsiteName('My X Website');
+        $this->setTitle('Hello World');
+        $this->setWebsiteName('Hello Website');
         $this->setTitleSep('|');
         $this->contentDir = null;
         $this->description = null;
@@ -226,9 +227,9 @@ class Page{
     }
     /**
      * Sets or returns the name of page web site.
-     * @param string $new The new name to set. It must be not-empty 
+     * @param string $new The new name to set. It must be non-empty 
      * string in order to update.
-     * @return string The name of page web site. Default is 'My X Website'.
+     * @return string The name of page web site. Default is 'Hello Website'.
      * @since 1.9
      */
     public static function siteName($new=null) {
@@ -245,7 +246,7 @@ class Page{
      * be 'My X Website'.
      * @since 1.8
      */
-    public function getWebsiteName() {
+    private function getWebsiteName() {
         return $this->websiteName;
     }
     /**
@@ -262,7 +263,7 @@ class Page{
      * the page. 
      * @since 1.8
      */
-    public function setWebsiteName($name) {
+    private function setWebsiteName($name) {
         if(strlen($name) != 0){
             $this->websiteName = $name;
             $this->setTitle($this->getTitle());
@@ -273,7 +274,9 @@ class Page{
      * the title of the page.
      * @param string $new The new title separator.
      * @return string The string that is used to separate web site name from 
-     * the title of the page.
+     * the title of the page. Note that a space will be appended to the start 
+     * and to the end of the returned value. For example, if separator is set 
+     * to the character '|', then the method will return the string ' | '.
      * @since 1.9
      */
     public static function separator($new=null){
@@ -292,7 +295,7 @@ class Page{
      * be ' | '.
      * @since 1.8
      */
-    public function getTitleSep() {
+    private function getTitleSep() {
         return $this->titleSep;
     }
     /**
@@ -309,7 +312,7 @@ class Page{
      * separate page title and web site name.
      * @since 1.8
      */
-    public function setTitleSep($str) {
+    private function setTitleSep($str) {
         $trimmed = trim($str);
         if(strlen($trimmed) != 0){
             $this->titleSep = ' '.$trimmed.' ';
@@ -321,7 +324,7 @@ class Page{
      * @return string The name of the requested page.
      * @since 1.6
      */
-    public function getPageName() {
+    private function getPageName() {
         return $this->name;
     }
     /**
@@ -330,7 +333,7 @@ class Page{
      * type is dynamic. Otherwise, the method will return false.
      * @since 1.6
      */
-    public function isDynamicDoc() {
+    private function isDynamicDoc() {
         return $this->isDynamic;
     }
     /**
@@ -355,7 +358,7 @@ class Page{
      * was inserted. If it is not, the method will return false.
      * @since 1.6
      */
-    public function insertNode($node,$parentNodeId='') {
+    private function insertNode($node,$parentNodeId='') {
         $retVal = false;
         if(strlen($parentNodeId) != 0){
             if($node instanceof HTMLNode){
@@ -379,7 +382,7 @@ class Page{
      * @return Page an instance of 'Page'.
      * @since 1.0
      */
-    public static function get(){
+    private static function get(){
         if(self::$instance !== null){
             return self::$instance;
         }
@@ -388,14 +391,14 @@ class Page{
     }
     /**
      * Sets or gets the title of the page.
-     * @param string $new The title of the page. Note that if page document was created, 
-     * calling this method will set the value of the &lt;titlt&gt; node. 
      * The format of the title is <b>PAGE_NAME TITLE_SEP WEBSITE_NAME</b>. 
      * for example, if the page name is 'Home' and title separator is 
      * '|' and the name of the website is 'Programming Academia'. The title 
-     * of the page will be 'Home | Programming Academia'.
+     * of the page will be 'Home | Programming Academia'. In this case, the value 
+     * that must be supplied to this method is 'Home'.
+     * @param string $new The title of the page. 
      * @since 1.9
-     * @return string The title of the page.
+     * @return string The title of the page. Default return value is 'Hello World'.
      */
     public static function title($new=null) {
         $p = Page::get();
@@ -415,7 +418,7 @@ class Page{
      * of the page will be 'Home | Programming Academia'.
      * @since 1.0
      */
-    public function setTitle($val){
+    private function setTitle($val){
         if($val != null){
             $this->title = $val;
             $this->document->getHeadNode()->setTitle($this->getTitle().$this->getTitleSep().$this->getWebsiteName());
@@ -432,34 +435,34 @@ class Page{
     /**
      * Returns the document that is associated with the page.
      * @return HTMLDoc An object of type 'HTMLDoc'.
-     * @throws Exception If page theme is not loaded.
      * @since 1.1
      */
-    public function getDocument(){
+    private function getDocument(){
         return $this->document;
     }
     /**
      * Returns the title of the page.
-     * @return string|null The title of the page. If the title is not set, 
-     * the method will return null.
+     * @return string|null The title of the page. Default return value is 
+     * 'Default X'.
      * @since 1.0
      */
-    public function getTitle(){
+    private function getTitle(){
         return $this->title;
     }
     /**
-     * Checks if the selected theme is loaded or not.
+     * Checks if a theme is loaded or not.
      * @return boolean true if loaded. false if not loaded.
      * @since 1.1
      */
-    public function isThemeLoaded(){
+    private function isThemeLoaded(){
         return $this->theme instanceof Theme;
     }
     /**
      * Sets or gets the description of the page.
      * @param string $new The description of the page.
      * @since 1.9
-     * @return string The description of the page.
+     * @return string The description of the page. If it is not set, the method 
+     * will return null.
      */
     public static function description($new=null) {
         $p = Page::get();
@@ -470,48 +473,51 @@ class Page{
     }
     /**
      * Sets the description of the page.
-     * @param string $val The description of the page. If <b>null</b> is given, 
-     * description will not change.
+     * @param string $val The description of the page. If <b>null</b> is given or 
+     * empty string, description will not change.
      * @since 1.0
      */
-    public function setDescription($val){
-        if($val != null){
-            $this->description = $val;
-            if($this->document !== null ){
-                $headCh = $this->document->getHeadNode()->children();
-                $headChCount = $headCh->size();
-                for($x = 0 ; $x < $headChCount ; $x++){
-                    $node = $headCh->get($x);
-                    if($node->getAttributeValue('name') == 'description'){
-                        $node->setAttribute('content',$val);
-                        return;
+    private function setDescription($val){
+        if($val !== null){
+            $desc = trim($val);
+            if(strlen($desc) !== 0){
+                $this->description = $desc;
+                if($this->document !== null ){
+                    $headCh = $this->document->getHeadNode()->children();
+                    $headChCount = $headCh->size();
+                    for($x = 0 ; $x < $headChCount ; $x++){
+                        $node = $headCh->get($x);
+                        if($node->getAttributeValue('name') == 'description'){
+                            $node->setAttribute('content',$val);
+                            return;
+                        }
                     }
+                    $descNode = new HTMLNode('meta', false);
+                    $descNode->setAttribute('name', 'description');
+                    $descNode->setAttribute('content', $val);
+                    $this->document->getHeadNode()->addChild($descNode);
                 }
-                $descNode = new HTMLNode('meta', false);
-                $descNode->setAttribute('name', 'description');
-                $descNode->setAttribute('content', $val);
-                $this->document->getHeadNode()->addChild($descNode);
             }
         }
     }
     /**
      * Returns the description of the page.
-     * @return string|null The title of the page. If the description is not set, 
-     * the method will return null
+     * @return string|null The description of the page. If the description is not set, 
+     * the method will return null.
      * @since 1.0
      */
-    public function getDescription(){
+    private function getDescription(){
         return $this->description;
     }
    /**
     * Load the translation file based on the language code. The method uses 
     * two checks to load the translation. If the page language is set using 
-    * the method Page::setLang(), then the language that will be loaded 
-    * will be based on the value returned by the method Page::getLang(). If 
-    * the language is not set, The method will throw an exception.
+    * the method Page::lang(), then the language that will be loaded 
+    * will be based on the value returned by the method Page::lang(). If 
+    * the language of the page is not set, The method will throw an exception.
     * @since 1.0
     */
-    public function usingLanguage(){
+    private function usingLanguage(){
         if($this->getLang() != null){
             //if($this->getLanguage() === null){
                 Language::loadTranslation($this->getLang());
@@ -526,11 +532,8 @@ class Page{
     /**
      * Sets or gets language code of the page.
      * @param string $new A two digit language code such as AR or EN. 
-     * An exception will be thrown if the given language is not supported.
      * @return string|null Two digit language code. In case language is not set, the 
      * method will return null
-     * @see Page::setLang()
-     * @throws Exception
      * @since 1.9
      */
     public static function lang($new=null){
@@ -541,12 +544,12 @@ class Page{
         return $p->getLang();
     }
     /**
-     * Returns the language.
+     * Returns the language code of the page.
      * @return string|null Two digit language code. In case language is not set, the 
      * method will return null
      * @since 1.0
      */
-    public function getLang(){
+    private function getLang(){
         return $this->contentLang;
     }
     /**
@@ -556,7 +559,7 @@ class Page{
      * @param string $lang a two digit language code such as AR or EN.
      * @since 1.0
      */
-    public function setLang($lang='EN'){
+    private function setLang($lang='EN'){
         $langU = strtoupper(trim($lang));
         if(strlen($lang) == 2){
             $this->contentLang = $langU;
@@ -574,6 +577,9 @@ class Page{
     }
     /**
      * Loads and returns translation based on page language code.
+     * Note that page language must be set before calling this method in 
+     * order to load a translation file. Translations can be found in 
+     * the folder '/entity/lang'.
      * @return Language|null An object of type Language is returned 
      * if the language is loaded. Other than that, the method will return 
      * null.
@@ -596,7 +602,7 @@ class Page{
      * order for the method to return non-null value.
      * @since 1.6
      */
-    public function getLanguage() {
+    private function getLanguage() {
         $loadedLangs = Language::getLoadedLangs();
         if(isset($loadedLangs[$this->getLang()])){
             return $loadedLangs[$this->getLang()];
@@ -636,7 +642,7 @@ class Page{
      * @since 1.4
      * @see Theme::usingTheme()
      */
-    public function usingTheme($themeName=null) {
+    private function usingTheme($themeName=null) {
         if($themeName === null){
             $themeName = SiteConfig::getBaseThemeName();
         }
@@ -677,7 +683,7 @@ class Page{
      * If the theme is not loaded, the method will return empty string.
      * @since 1.6
      */
-    public function getThemeCSSDir() {
+    private function getThemeCSSDir() {
         if($this->isThemeLoaded()){
             $theme = $this->getTheme();
             return Theme::THEMES_DIR.'/'.$theme->getDirectoryName().'/'.$theme->getCssDirName();
@@ -701,7 +707,7 @@ class Page{
      * If the theme is not loaded, the method will return empty string.
      * @since 1.6
      */
-    public function getThemeImagesDir() {
+    private function getThemeImagesDir() {
         if($this->isThemeLoaded()){
             $theme = $this->getTheme();
             return Theme::THEMES_DIR.'/'.$theme->getDirectoryName().'/'.$theme->getImagesDirName();
@@ -725,7 +731,7 @@ class Page{
      * If the theme is not loaded, the method will return empty string.
      * @since 1.6
      */
-    public function getThemeJSDir() {
+    private function getThemeJSDir() {
         if($this->isThemeLoaded()){
             $theme = $this->getTheme();
             return Theme::THEMES_DIR.'/'.$theme->getDirectoryName().'/'.$theme->getJsDirName();
@@ -738,14 +744,15 @@ class Page{
      * is not loaded, the method will return null.
      * @since 1.6
      */
-    public function getTheme() {
+    private function getTheme() {
         return $this->theme;
     }
     /**
      * Sets or gets page writing direction.
+     * Note that the writing direction of the page might change depending 
+     * on loaded translation file.
      * @param string $new 'ltr' or 'rtl'.
-     * @return string|null If the writing direction was set, 
-     * the method will return it. If not, the method will return null.
+     * @return string ltr' or 'rtl'. Default return value is 'ltr'.
      * @since 1.9
      */
     public static function dir($new=null) {
@@ -762,7 +769,7 @@ class Page{
      * the method will return null.
      * @since 1.0
      */
-    public function getWritingDir(){
+    private function getWritingDir(){
         return $this->contentDir;
     }
     /**
@@ -773,7 +780,7 @@ class Page{
      * @throws Exception If the writing direction is not Page::DIR_LTR or Page::DIR_RTL.
      * @since 1.0
      */
-    public function setWritingDir($dir='ltr'){
+    private function setWritingDir($dir='ltr'){
         $dirL = strtolower($dir);
         if($dirL == Language::DIR_LTR || $dirL == Language::DIR_RTL){
             $this->contentDir = $dirL;
@@ -789,7 +796,7 @@ class Page{
      * not.
      * @since 1.2
      */
-    public function setHasHeader($bool){
+    private function setHasHeader($bool){
         if(gettype($bool) == 'boolean'){
             if($this->incHeader == false && $bool == true){
                 $children = $this->document->getBody()->children();
@@ -814,7 +821,7 @@ class Page{
      * not.
      * @since 1.2
      */
-    public function setHasAside($bool){
+    private function setHasAside($bool){
         if(gettype($bool) == 'boolean'){
             if($this->incAside == false && $bool == true){
                 
@@ -835,7 +842,7 @@ class Page{
      * not.
      * @since 1.2
      */
-    public function setHasFooter($bool){
+    private function setHasFooter($bool){
         if(gettype($bool) == 'boolean'){
             if($this->incFooter == false && $bool == true){
                 $this->document->addChild($this->_getFooter());
@@ -899,7 +906,7 @@ class Page{
      * @return boolean true if the page has a footer section.
      * @since 1.2
      */
-    public function hasFooter(){
+    private function hasFooter(){
         return $this->incFooter;
     }
     /**
@@ -907,7 +914,7 @@ class Page{
      * @return boolean true if the page has a header section.
      * @since 1.2
      */
-    public function hasHeader(){
+    private function hasHeader(){
         return $this->incHeader;
     }
     /**
@@ -915,7 +922,7 @@ class Page{
      * @return boolean true if the page has an aside section.
      * @since 1.6
      */
-    public function hasAside() {
+    private function hasAside() {
         return $this->incAside;
     }
     

@@ -26,7 +26,7 @@ class UtilTest extends TestCase{
      */
     public function testGetRequestHeaders00() {
         $this->assertEquals([
-            'host'=>'localhost'
+            'host'=>'127.0.0.1'
         ], Util::getRequestHeaders());
     }
 }

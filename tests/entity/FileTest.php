@@ -61,7 +61,6 @@ class FileTest extends TestCase{
         $this->assertEquals(ROOT_DIR.DIRECTORY_SEPARATOR.'tests'.DIRECTORY_SEPARATOR.'entity',$file->getPath());
         $file->read();
         $this->assertEquals('text/plain',$file->getFileMIMEType());
-        fprintf(STDERR, $file->getRawData());
         $this->assertEquals("Testing the class 'File'.",$file->getRawData());
     }
     /**

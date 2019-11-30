@@ -323,9 +323,7 @@ abstract class Theme implements JsonI{
     }
     private static function defineThemesDir(){
         if(!defined('THEMES_PATH')){
-            var_dump(__DIR__);
-            $themesPath = trim(__DIR__,DIRECTORY_SEPARATOR.'entity').DIRECTORY_SEPARATOR.self::THEMES_DIR;
-            var_dump($themesPath);
+            $themesPath = substr(__DIR__, 0, strlen(__DIR__) - strlen('/entity')).DIRECTORY_SEPARATOR.self::THEMES_DIR;
             define('THEMES_PATH', $themesPath);
         }
     }

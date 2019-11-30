@@ -24,6 +24,7 @@
  */
 namespace webfiori\entity;
 use jsonx\JsonI;
+use jsonx\JsonX;
 use webfiori\conf\SiteConfig;
 use Exception;
 /**
@@ -37,9 +38,14 @@ use Exception;
  * JS files) by implementing one of the abstract methods. Themes must exist in 
  * the folder '/themes' of the framework.
  * @author Ibrahim
- * @version 1.2.3
+ * @version 1.2.4
  */
 abstract class Theme implements JsonI{
+    /**
+     * An array that contains all available themes.
+     * @var array 
+     */
+    private static $AvailableThemes;
     /**
      * An optional base URL.
      * This URL is used by the tag 'base' to fetch page resources.
@@ -336,30 +342,32 @@ abstract class Theme implements JsonI{
      * @since 1.1 
      */
     public static function getAvailableThemes(){
-        self::defineThemesDir();
-        $themes = [];
-        $DS = DIRECTORY_SEPARATOR;
-        $themesDirs = array_diff(scandir(THEMES_PATH), ['..', '.']);
-        foreach ($themesDirs as $dir){
-            $pathToScan = THEMES_PATH.$DS.$dir;
-            $filesInDir = array_diff(scandir($pathToScan), ['..', '.']);
-            foreach ($filesInDir as $fileName){
-                $fileExt = substr($fileName, -4);
-                if($fileExt == '.php'){
-                    $cName = str_replace('.php', '', $fileName);
-                    $ns = require_once $pathToScan.$DS.$fileName;
-                    $aNs = $ns != 1 ? $ns.'\\' : '';
-                    $aCName = $aNs.$cName;
-                    if(class_exists($aCName)){
-                        $instance = new $aCName();
-                        if($instance instanceof Theme){
-                            $themes[$instance->getName()] = $instance;
+        if(self::$AvailableThemes === null){
+            self::defineThemesDir();
+            self::$AvailableThemes = [];
+            $DS = DIRECTORY_SEPARATOR;
+            $themesDirs = array_diff(scandir(THEMES_PATH), ['..', '.']);
+            foreach ($themesDirs as $dir){
+                $pathToScan = THEMES_PATH.$DS.$dir;
+                $filesInDir = array_diff(scandir($pathToScan), ['..', '.']);
+                foreach ($filesInDir as $fileName){
+                    $fileExt = substr($fileName, -4);
+                    if($fileExt == '.php'){
+                        $cName = str_replace('.php', '', $fileName);
+                        $ns = require_once $pathToScan.$DS.$fileName;
+                        $aNs = $ns != 1 ? $ns.'\\' : '';
+                        $aCName = $aNs.$cName;
+                        if(class_exists($aCName)){
+                            $instance = new $aCName();
+                            if($instance instanceof Theme){
+                                self::$AvailableThemes[$instance->getName()] = $instance;
+                            }
                         }
                     }
                 }
             }
         }
-        return $themes;
+        return self::$AvailableThemes;
     }
     /**
      * Sets the name of the theme.
@@ -645,6 +653,7 @@ abstract class Theme implements JsonI{
      * the following information:
      * <p>
      * {<br/>
+     * &nbsp;&nbsp;"themes-path":""<br/>
      * &nbsp;&nbsp;"name":""<br/>
      * &nbsp;&nbsp;"version":""<br/>
      * &nbsp;&nbsp;"author":""<br/>
@@ -658,7 +667,9 @@ abstract class Theme implements JsonI{
      * @return JsonX An object of type JsonX.
      */
     public function toJSON() {
+        self::defineThemesDir();
         $j = new JsonX();
+        $j->add('themes-path', THEMES_PATH);
         $j->add('name', $this->getName());
         $j->add('version', $this->getVersion());
         $j->add('author', $this->getAuthor());

@@ -199,6 +199,7 @@ class Page{
         $this->incFooter = true;
         $this->incHeader = true;
         $this->isDynamic = true;
+        $this->theme = null;
         $this->incAside = true;
         $this->setWritingDir();
         $this->setCanonical(Util::getRequestedURL());

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit stderr="true" colors="true" bootstrap="bootstrap.php">
     <php>
-        <server name="HTTP_HOST" value="localhost"/>
+        <server name="HTTP_HOST" value="127.0.0.1"/>
         <server name="REMOTE_ADDR" value="127.0.0.1"/>
     </php>
     <filter>
@@ -25,18 +25,19 @@
         <log type="coverage-clover" target="clover.xml"/>
     </logging>
     <testsuites>
-        <testsuite name="Config Files Tests">
-            <directory>./tests/conf/</directory>
-        </testsuite>
-        <testsuite name="Router Tests">
-            <directory>./tests/entity/router/</directory>
-        </testsuite>
         <testsuite name="Language Tests">
             <directory>./tests/entity/langs/</directory>
         </testsuite>
         <testsuite name="Entity Tests">
             <directory>./tests/entity/</directory>
         </testsuite>
+        <testsuite name="Config Files Tests">
+            <directory>./tests/conf/</directory>
+        </testsuite>
+        <testsuite name="Router Tests">
+            <directory>./tests/entity/router/</directory>
+        </testsuite>
+        
         <testsuite name="Functions Tests">
             <directory>./tests/functions/</directory>
         </testsuite>

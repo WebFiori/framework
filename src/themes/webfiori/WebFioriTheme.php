@@ -85,15 +85,15 @@ class WebFioriTheme extends Theme{
     }
 
     public function getFooterNode() {
-        $page = Page::get();
+        
         $node = new HTMLNode('div');
         $socialMedia = new HTMLNode();
         $socialMedia->setClassName('wf-row');
         $socialMedia->setID('social-media-container');
-        $socialMedia->setWritingDir($page->getWritingDir());
+        $socialMedia->setWritingDir(Page::dir());
 
         $facebookIcon = new HTMLNode('img', false);
-        $facebookIcon->setAttribute('src', $page->getThemeImagesDir().'/facebook.png');
+        $facebookIcon->setAttribute('src', Page::imagesDir().'/facebook.png');
         $facebookIcon->setClassName('social-media-icon');
         $facebookLink = new HTMLNode('a');
         $facebookLink->setAttribute('href', '');
@@ -102,7 +102,7 @@ class WebFioriTheme extends Theme{
         $socialMedia->addChild($facebookLink);
 
         $twtrIcon = new HTMLNode('img', false);
-        $twtrIcon->setAttribute('src', $page->getThemeImagesDir().'/tweeter.png');
+        $twtrIcon->setAttribute('src', Page::imagesDir().'/tweeter.png');
         $twtrIcon->setClassName('social-media-icon');
         $twtrLink = new HTMLNode('a');
         $twtrLink->setAttribute('href', '');
@@ -111,7 +111,7 @@ class WebFioriTheme extends Theme{
         $socialMedia->addChild($twtrLink);
 
         $linkedinIcon = new HTMLNode('img', false);
-        $linkedinIcon->setAttribute('src', $page->getThemeImagesDir().'/linkedin.png');
+        $linkedinIcon->setAttribute('src', Page::imagesDir().'/linkedin.png');
         $linkedinIcon->setClassName('social-media-icon');
         $linkedinLink = new HTMLNode('a');
         $linkedinLink->setAttribute('href', '');
@@ -120,7 +120,7 @@ class WebFioriTheme extends Theme{
         $socialMedia->addChild($linkedinLink);
 
         $snapIcon = new HTMLNode('img', false);
-        $snapIcon->setAttribute('src', $page->getThemeImagesDir().'/snapchat.png');
+        $snapIcon->setAttribute('src', Page::imagesDir().'/snapchat.png');
         $snapIcon->setClassName('social-media-icon');
         $snapLink = new HTMLNode('a');
         $snapLink->setAttribute('href', '');
@@ -170,7 +170,13 @@ class WebFioriTheme extends Theme{
         $link = new LinkNode(SiteConfig::getHomePage(), '');
         $link->addChild($img);
         $headerSec->addChild($link);
-        $langCode = WebsiteController::get()->getSession()->getLang(true);
+        $session = WebsiteController::get()->getSession();
+        if($session !== null){
+            $langCode = WebsiteController::get()->getSession()->getLang(true);
+        }
+        else{
+            $langCode = 'EN';
+        }
         $p = new PNode();
         $siteNames = SiteConfig::getWebsiteNames();
         if(isset($siteNames[$langCode])){

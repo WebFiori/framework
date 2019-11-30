@@ -29,7 +29,7 @@ class PageTest extends TestCase{
      * @test
      */
     public function testReset00() {
-        Page::theme('Webfiori Theme');
+        Page::theme('WebFiori Theme');
         Page::lang('ar');
         Page::description('This is a test page.');
         Page::title('Login');

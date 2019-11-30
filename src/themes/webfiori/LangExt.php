@@ -10,7 +10,7 @@ use webfiori\entity\langs\Language;
 class LangExt {
     public static function extLang(&$trans=null){
         if(!($trans instanceof Language)){
-            $trans = &Page::translation();
+            $trans = Page::translation();
         }
         $trans->createDirectory('menus/main-menu');
         $langCode = $trans->getCode();

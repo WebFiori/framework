@@ -118,7 +118,7 @@ class LanguageTest extends TestCase{
     public function testLoadTranslation03() {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('The translation file was found. But no object of type \'Language\' is stored. Make sure that the parameter '
-                                . '$addtoLoadedAfterCreate is set to true when creating the object.');
+                                . '$addtoLoadedAfterCreate is set to true when creating the language object.');
         Language::loadTranslation('Jp');
     }
     /**

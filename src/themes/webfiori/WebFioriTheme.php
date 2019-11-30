@@ -20,6 +20,9 @@ class WebFioriTheme extends Theme{
         parent::__construct();
         $this->setAuthor('Ibrahim Ali');
         $this->setName('WebFiori Theme');
+        $this->setUrl('https://ibrahim-2017.blogspot.com/');
+        $this->setLicenseName('MIT License');
+        $this->setLicenseUrl('https://opensource.org/licenses/MIT');
         $this->setVersion('1.0.1');
         $this->setDescription('The main theme for WebFiori Framework.');
         $this->setDirectoryName('webfiori');

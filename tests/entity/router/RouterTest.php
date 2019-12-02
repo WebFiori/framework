@@ -2,12 +2,53 @@
 namespace webfiori\tests\entity\router;
 use webfiori\entity\router\Router;
 use PHPUnit\Framework\TestCase;
+use webfiori\entity\Util;
+use webfiori\entity\router\RouterUri;
 /**
  * Description of RouterTest
  *
  * @author Eng.Ibrahim
  */
 class RouterTest extends TestCase{
+    /**
+     * @test
+     */
+    public function testRoute00() {
+        Router::removeAll();
+        Router::setOnNotFound(function(){});
+        Router::closure([
+            'path'=>'{var-1}/{var-2}',
+            'route-to'=>function(){
+            
+            }
+        ]);
+        $obj = Router::getRouteUri();
+        $this->assertNull($obj);
+        Router::route(Util::getBaseURL().'hello/world');
+        $obj = Router::getRouteUri();
+        $this->assertTrue($obj instanceof RouterUri);
+        $this->assertEquals('hello',$obj->getUriVar('var-1'));
+        $this->assertEquals('world',$obj->getUriVar('var-2'));
+        $this->assertTrue(Router::getVarValue('var-2') == $obj->getUriVar('var-2'));
+    }
+    /**
+     * @test
+     */
+    public function testRoute01() {
+        Router::removeAll();
+        Router::setOnNotFound(function(){});
+        Router::closure([
+            'path'=>'{var-1}/{var-2}/{var-1}',
+            'route-to'=>function(){
+            
+            }
+        ]);
+        Router::route(Util::getBaseURL().'hello/world/boy');
+        $obj = Router::getRouteUri();
+        $this->assertTrue($obj instanceof RouterUri);
+        $this->assertEquals('boy',$obj->getUriVar('var-1'));
+        $this->assertEquals('world',$obj->getUriVar('var-2'));
+    }
     /**
      * @test
      */

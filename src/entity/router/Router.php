@@ -64,7 +64,7 @@ use jsonx\JsonX;
  * </pre> 
  * </p>
  * @author Ibrahim
- * @version 1.3.8
+ * @version 1.3.9
  */
 class Router {
     /**
@@ -197,6 +197,23 @@ class Router {
         }
         $null = null;
         return $null;
+    }
+    /**
+     * Returns the value of a variable which exist in the path part of the 
+     * URI.
+     * @param string $varName The name of the variable. Note that it must 
+     * not include braces.
+     * @return string|null The method will return the value of the 
+     * variable if it was set. If it is not set or routing is still not yet 
+     * happend, the method will return null.
+     * @since 1.3.9
+     */
+    public static function getVarValue($varName) {
+        $routeUri = self::getRouteUri();
+        if($routeUri instanceof RouterUri){
+            return $routeUri->getUriVar($varName);
+        }
+        return null;
     }
     /**
      * Returns an object of type 'RouterUri' that represents route URI.
@@ -685,6 +702,7 @@ class Router {
      * @since 1.0
      */
     private function _resolveUrl($uri,$loadResource=true) {
+        $this->uriObj = null;
         if(count($this->routes) != 0){
             $routeUri = new RouterUri($uri, '');
             //first, search for the URI wuthout checking variables
@@ -778,6 +796,11 @@ class Router {
                                     $_POST[$varName] = filter_var(urldecode($pathArray[$x]),FILTER_SANITIZE_STRING);
                                 }
                                 else if($requestMethod == 'GET' || $requestMethod == 'DELETE'){
+                                    $_GET[$varName] = filter_var(urldecode($pathArray[$x]),FILTER_SANITIZE_STRING);
+                                }
+                                else{
+                                    //usually, in CLI there is no request method. 
+                                    //but we store result in $_GET.
                                     $_GET[$varName] = filter_var(urldecode($pathArray[$x]),FILTER_SANITIZE_STRING);
                                 }
                             }
@@ -895,6 +918,7 @@ class Router {
      * @since 1.3.4
      */
     public static function removeAll() {
+        self::get()->uriObj = null;
         self::get()->routes = [];
     }
     /**

@@ -2,6 +2,7 @@
 namespace webfiori\tests\entity;
 use PHPUnit\Framework\TestCase;
 use webfiori\entity\User;
+use webfiori\entity\Access;
 /**
  * A test class for testing the class 'webfiori\entity\User'.
  *
@@ -23,6 +24,31 @@ class UserTest extends TestCase{
         $this->assertNull($u->getDisplayName());
         $this->assertEquals(0,$u->getResetCount());
         return $u;
+    }
+    private function initPrivileges() {
+        Access::newGroup('TOP_GROUP');
+        Access::newGroup('LOW_GROUP');
+        Access::newPrivilege('TOP_GROUP', 'TOP_PR_1');
+    }
+    /**
+     * @test
+     */
+    public function testAddPrivilege00() {
+        $this->initPrivileges();
+        $u = new User();
+        $this->assertTrue($u->addPrivilege('TOP_PR_1'));
+        $this->assertFalse($u->addPrivilege('TOP_PR_1'));
+        return $u;
+    }
+    /**
+     * 
+     * @param User $u
+     * @test
+     * @depends testAddPrivilege00
+     */
+    public function testRemovePrivilege00($u) {
+        $this->assertTrue($u->removePrivilege('TOP_PR_1'));
+        $this->assertFalse($u->hasPrivilege('TOP_PR_1'));
     }
     /**
      * @test

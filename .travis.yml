@@ -13,10 +13,16 @@ addons:
       - mysql-server
       - mysql-client
 before_install:
+    #update packages in quite mode.
+    - sudo apt-get update
+    #install postfix mail server
+    - sudo apt-get install postfix
+    #create a test database
     - mysql -e 'create database if not exists testing_db;'
     - sudo mysql -e "use mysql; update user set authentication_string=PASSWORD('123456') where User='root'; update user set plugin='mysql_native_password';FLUSH PRIVILEGES;"
     - sudo mysql_upgrade -u root -p123456
     - sudo service mysql restart
+    
 before_script:
     - composer self-update
     - composer install --prefer-source --no-interaction --dev

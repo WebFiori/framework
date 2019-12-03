@@ -284,6 +284,18 @@ class AccessTest extends TestCase{
         $this->assertEquals('G-SUB_OF_SUB;SUB_PR_3-1;TOP_PR_2-1',$privilegesStr);
     }
     /**
+     * 
+     * @depends testResolvePrivilegesStr01
+     */
+    public function testCreatePrivilegesStr06() {
+        $user = new User();
+        $user->addPrivilege('SUB_PR_3');
+        $user->addPrivilege('SUB_PR_2');
+        $user->addPrivilege('SUB_OF_PR_2');
+        $privilegesStr = Access::createPermissionsStr($user);
+        $this->assertEquals('SUB_PR_3-1;SUB_PR_2-1;SUB_OF_PR_2-1',$privilegesStr);
+    }
+    /**
      * @test
      */
     public function testCreatePrivilegesStr05() {

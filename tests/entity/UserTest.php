@@ -26,6 +26,7 @@ class UserTest extends TestCase{
         return $u;
     }
     private function initPrivileges() {
+        Access::clear();
         Access::newGroup('TOP_GROUP');
         Access::newGroup('LOW_GROUP','TOP_GROUP');
         Access::newGroup('EMPTY_GROUP');

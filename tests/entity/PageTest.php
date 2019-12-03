@@ -289,15 +289,15 @@ class PageTest extends TestCase{
      * @test
      * @depends testHeader01
      */
-    public function testHeader02() {
-        $this->assertFalse(Page::header());
-        $node = Page::document()->getChildByID('page-header');
-        $this->assertNull($node);
-        $this->assertEquals(2,Page::document()->getBody()->childrenCount());
-        $this->assertTrue(Page::header(true));
-        $node2 = Page::document()->getChildByID('page-header');
-        $this->assertTrue($node2 instanceof HTMLNode);
-        $this->assertEquals(3,Page::document()->getBody()->childrenCount());
-        $this->assertEquals('page-header',Page::document()->getBody()->getChild(0)->getAttribute('id'));
-    }
+//    public function testHeader02() {
+//        $this->assertFalse(Page::header());
+//        $node = Page::document()->getChildByID('page-header');
+//        $this->assertNull($node);
+//        $this->assertEquals(2,Page::document()->getBody()->childrenCount());
+//        $this->assertTrue(Page::header(true));
+//        $node2 = Page::document()->getChildByID('page-header');
+//        $this->assertTrue($node2 instanceof HTMLNode);
+//        $this->assertEquals(3,Page::document()->getBody()->childrenCount());
+//        $this->assertEquals('page-header',Page::document()->getBody()->getChild(0)->getAttribute('id'));
+//    }
 }

@@ -370,4 +370,27 @@ class PageTest extends TestCase{
         $this->assertEquals(2,Page::document()->getChildByID('page-body')->childrenCount());
         $this->assertEquals('side-content-area',Page::document()->getChildByID('page-body')->getChild(0)->getAttribute('id'));
     }
+    /**
+     * @test
+     */
+    public function testHead00() {
+        Page::reset();
+        $head00 = Page::document()->getHeadNode();
+        Page::theme();
+        $head01 = Page::document()->getHeadNode();
+        $this->assertFalse($head00 === $head01);
+    }
+    /**
+     * @test
+     */
+    public function testHead01() {
+        Page::reset();
+        Page::description('This is for testing.');
+        $head00 = Page::document()->getHeadNode();
+        Page::theme();
+        $head01 = Page::document()->getHeadNode();
+        $this->assertFalse($head00 === $head01);
+        $this->assertEquals($head00->getMeta('description')->getAttribute('content'),
+                $head01->getMeta('description')->getAttribute('content'));
+    }
 }

@@ -181,7 +181,7 @@ class Page{
         $this->setTitle('Hello World');
         $this->setWebsiteName('Hello Website');
         $this->setTitleSep('|');
-        $this->contentDir = null;
+        $this->contentDir = 'ltr';
         $this->description = null;
         $this->contentLang = null;
         $this->incFooter = true;
@@ -430,22 +430,23 @@ class Page{
     }
     /**
      * Sets or gets the description of the page.
-     * @param string $new The description of the page.
+     * @param string $new The description of the page. If <b>empty string</b> is given, 
+     * the description meta tag will be removed from the &lt;head&gt; element. If 
+     * null is given, nothing will change. Default value is null.
      * @since 1.9
      * @return string The description of the page. If it is not set, the method 
      * will return null.
      */
     public static function description($new=null) {
         $p = Page::get();
-        if($new != null && strlen($new) != 0){
-            $p->setDescription($new);
-        }
+        $p->setDescription($new);
         return $p->getDescription();
     }
     /**
      * Sets the description of the page.
-     * @param string $val The description of the page. If <b>null</b> is given or 
-     * empty string, description will not change.
+     * @param string $val The description of the page. If <b>null</b> is given, 
+     * the description meta tag will be removed from the &lt;head&gt; node. If 
+     * empty string is given, nothing will change.
      * @since 1.0
      */
     private function setDescription($val){
@@ -453,21 +454,12 @@ class Page{
             $desc = trim($val);
             if(strlen($desc) !== 0){
                 $this->description = $desc;
-                if($this->document !== null ){
-                    $headCh = $this->document->getHeadNode()->children();
-                    $headChCount = $headCh->size();
-                    for($x = 0 ; $x < $headChCount ; $x++){
-                        $node = $headCh->get($x);
-                        if($node->getAttributeValue('name') == 'description'){
-                            $node->setAttribute('content',$val);
-                            return;
-                        }
-                    }
-                    $descNode = new HTMLNode('meta', false);
-                    $descNode->setAttribute('name', 'description');
-                    $descNode->setAttribute('content', $val);
-                    $this->document->getHeadNode()->addChild($descNode);
-                }
+                $this->document->getHeadNode()->addMeta('description', $desc, true);
+            }
+            else{
+                $descNode = $this->document->getHeadNode()->getMeta('description');
+                $this->document->getHeadNode()->removeChild($descNode);
+                $this->description = null;
             }
         }
     }
@@ -596,18 +588,18 @@ class Page{
     /**
      * Loads or returns page theme.
      * @param string $name The name of the theme which will be 
-     * loaded. If null is given, nothing will be loaded.
-     * @return Theme|null If a theme is already loaded, the method will 
-     * return the loaded theme contained in an object of type Theme. If no 
+     * loaded. If null is given, the method will get theme name from the 
+     * class 'SiteConfig' and try to load it. If empty string is given, 
+     * nothing will be loaded.
+     * @return Theme If a theme is loaded, the method will 
+     * return it contained in an object of type 'Theme'. If no 
      * theme is loaded, the method will return null.
      * @see Page::usingTheme()
      * @since 1.9
      */
     public static function theme($name=null){
         $p = Page::get();
-        if($name != null && strlen($name) != 0){
-            $p->usingTheme($name);
-        }
+        $p->usingTheme($name);
         return $p->getTheme();
     }
     /**
@@ -629,13 +621,29 @@ class Page{
         if($themeName === null){
             $themeName = SiteConfig::getBaseThemeName();
         }
-        $tmpTheme = Theme::usingTheme($themeName);
+        else{
+            $themeName = trim($themeName);
+            if(strlen($themeName) == 0){
+                return;
+            }
+        }
+        if($this->theme !== null){
+            if($themeName != $this->theme->getName()){
+                $tmpTheme = Theme::usingTheme($themeName);
+            }
+            else{
+                return;
+            }
+        }
+        else{
+            $tmpTheme = Theme::usingTheme($themeName);
+        }
         $this->theme = $tmpTheme;
         $this->document = new HTMLDoc();
         $headNode = $this->_getHead(true);
         $footerNode = $this->_getFooter(true);
         $asideNode = $this->_getAside(true);
-        $headerNode = $this->_getHeader(true);
+        $headerNode = $this->_getHeader();
         $this->document->setLanguage($this->getLang());
         $this->document->setHeadNode($headNode);
         $this->document->addChild($headerNode);
@@ -652,7 +660,7 @@ class Page{
     /**
      * Returns the directory at which CSS files of loaded theme exists.
      * @return string The directory at which CSS files of the theme exists 
-     * (e.g. 'publish/my-theme/css' ). 
+     * (e.g. 'themes/my-theme/css' ). 
      * If the theme is not loaded, the method will return empty string.
      * @since 1.9
      */
@@ -676,7 +684,7 @@ class Page{
     /**
      * Returns the directory at which image files of loaded theme exists.
      * @return string The directory at which image files of the theme exists 
-     * (e.g. 'publish/my-theme/images' ). 
+     * (e.g. 'themes/my-theme/images' ). 
      * If the theme is not loaded, the method will return empty string.
      * @since 1.9
      */
@@ -700,7 +708,7 @@ class Page{
     /**
      * Returns the directory at which JavaScript files of the theme exists.
      * @return string The directory at which JavaScript files of the theme exists 
-     * (e.g. 'publish/my-theme/js' ). 
+     * (e.g. 'themes/my-theme/js' ). 
      * If the theme is not loaded, the method will return empty string.
      * @since 1.9
      */
@@ -734,16 +742,14 @@ class Page{
      * Sets or gets page writing direction.
      * Note that the writing direction of the page might change depending 
      * on loaded translation file.
-     * @param string $new 'ltr' or 'rtl'.
-     * @return string ltr' or 'rtl'. Default return value is 'ltr'.
+     * @param string $new 'ltr' or 'rtl'. If something else is given, nothing 
+     * will change.
+     * @return string ltr' or 'rtl'. Default return value is null
      * @since 1.9
      */
     public static function dir($new=null) {
         $p = Page::get();
-        $lNew = strtolower($new);
-        if($lNew == 'ltr' || $lNew == 'rtl'){
-            $p->setWritingDir($new);
-        }
+        $p->setWritingDir($new);
         return $p->getWritingDir();
     }
     /**
@@ -767,10 +773,6 @@ class Page{
         $dirL = strtolower($dir);
         if($dirL == Language::DIR_LTR || $dirL == Language::DIR_RTL){
             $this->contentDir = $dirL;
-            return true;
-        }
-        else{
-            throw new Exception('Unknown writing direction: '.$dir);
         }
     }
     /**
@@ -781,7 +783,8 @@ class Page{
      */
     private function setHasHeader($bool){
         if(gettype($bool) == 'boolean'){
-            if($this->incHeader == false && $bool == true){
+            if($this->incHeader == false && $bool === true){
+                //add the header
                 $children = $this->document->getBody()->children();
                 $this->document->getBody()->removeAllChildNodes();
                 $this->document->addChild($this->_getHeader());
@@ -789,13 +792,14 @@ class Page{
                     $this->document->addChild($children->get($x));
                 }
             }
-            else if($this->incHeader == true && $bool == false){
+            else if($this->incHeader == true && $bool === false){
+                //remove header
                 $header = $this->document->getChildByID('page-header');
                 if($header instanceof HTMLNode){
                     $this->document->removeChild($header);
                 }
             }
-            $this->incHeader = $bool;
+            $this->incHeader = $bool === true;
         }
     }
     /**
@@ -926,21 +930,20 @@ class Page{
         }
     }
     
-    private function _getHeader($new=false){
-        if($this->hasHeader()){
-            if($new === true){
-                $h = $this->getTheme()->getHeadrNode();
-                if($h instanceof HTMLNode){
-                    $h->setID('page-header');
-                }
-                else{
-                    $h = new HTMLNode();
-                    $h->setID('page-header');
-                }
-                return $h;
-            }
-            return $this->document->getChildByID('page-header');
+    private function _getHeader(){
+        $theme = $this->getTheme();
+        $h = null;
+        if($theme !== null){
+            $h = $this->getTheme()->getHeadrNode();
         }
+        if($h instanceof HTMLNode){
+            $h->setID('page-header');
+        }
+        else{
+            $h = new HTMLNode();
+            $h->setID('page-header');
+        }
+        return $h;
     }
     
     private function _getFooter($new=false){
@@ -978,10 +981,7 @@ class Page{
                     $headNode->setBase($tmpHead->getBase()->getAttributeValue('href'));
                 }
                 $headNode->setCanonical($this->getCanonical());
-                $descNode = new HTMLNode('meta', false);
-                $descNode->setAttribute('name', 'description');
-                $descNode->setAttribute('content', $this->getDescription());
-                $headNode->addChild($descNode);
+                $headNode->addMeta('description', $this->getDescription(), true);
                 $children = $tmpHead->children();
                 $count = $children->size();
                 for($x = 0 ; $x < $count ; $x++){
@@ -995,10 +995,7 @@ class Page{
                 }
             }
             else {
-                $descNode = new HTMLNode('meta', false);
-                $descNode->setAttribute('name', 'description');
-                $descNode->setAttribute('content', $this->getDescription());
-                $headNode->addChild($descNode);
+                $headNode->addMeta('description', $this->getDescription(), true);
             }
             return $headNode;
         }

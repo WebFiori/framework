@@ -325,12 +325,13 @@ class Access {
      * @since 1.0
      */
     private function _getGroup($groupId) {
+        $trimmedId = trim($groupId);
         foreach ($this->userGroups as $g){
-            if($g->getID() == $groupId){
+            if($g->getID() == $trimmedId){
                 return $g;
             }
             else{
-                $g = $this->_getGroupHelper($g, $groupId);
+                $g = $this->_getGroupHelper($g, $trimmedId);
                 if($g instanceof PrivilegesGroup){
                     return $g;
                 }
@@ -525,14 +526,15 @@ class Access {
     }
     
     private function _createGroup($groupId,$parentGroupID=null){
-        if($this->_validateId($groupId)){
+        $trimmedId = trim($groupId);
+        if($this->_validateId($trimmedId)){
             foreach ($this->userGroups as $g){
-                if($g->getID() == $groupId){
+                if($g->getID() == $trimmedId){
                     return false;
                 }
             }
             $group = new PrivilegesGroup();
-            $group->setID($groupId);
+            $group->setID($trimmedId);
             if($parentGroupID !== null){
                 $parentG = $this->getGroup($parentGroupID);
                 if($parentG instanceof PrivilegesGroup){

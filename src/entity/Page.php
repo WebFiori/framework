@@ -56,12 +56,6 @@ use Exception;
  */
 class Page{
     /**
-     *
-     * @var type 
-     * @since 1.6
-     */
-    private $isDynamic;
-    /**
      * The document that represents the page.
      * @var HTMLDoc 
      * @since 1.4
@@ -136,12 +130,6 @@ class Page{
      */
     private $theme;
     /**
-     * The name of request page.
-     * @var string
-     * @since 1.6 
-     */
-    private $name;
-    /**
      * Sets the canonical URL of the page.
      * @since 1.2
      * @param string $url The canonical URL of the page.
@@ -198,7 +186,6 @@ class Page{
         $this->contentLang = null;
         $this->incFooter = true;
         $this->incHeader = true;
-        $this->isDynamic = true;
         $this->theme = null;
         $this->incAside = true;
         $this->setWritingDir();
@@ -319,23 +306,6 @@ class Page{
             $this->titleSep = ' '.$trimmed.' ';
             $this->setTitle($this->getTitle());
         }
-    }
-    /**
-     * Returns the name of requested page.
-     * @return string The name of the requested page.
-     * @since 1.6
-     */
-    private function getPageName() {
-        return $this->name;
-    }
-    /**
-     * Checks if the type of page will be dynamic or static.
-     * @return boolean The method will return true if document 
-     * type is dynamic. Otherwise, the method will return false.
-     * @since 1.6
-     */
-    private function isDynamicDoc() {
-        return $this->isDynamic;
     }
     /**
      * Adds a child node inside the body of a node given its ID.
@@ -526,9 +496,6 @@ class Page{
                 $this->setWritingDir($pageLang->getWritingDir());
             //}
         }
-        else{
-            throw new Exception('Unable to load transulation. Page language is not set.');
-        }
     }
     /**
      * Sets or gets language code of the page.
@@ -570,20 +537,37 @@ class Page{
         }
     }
     /**
-     * Display the page in the web browser.
+     * Display the page in the web browser or gets the rendered document as string.
+     * @param boolean $returnResult If this parameter is set to true, the method 
+     * will return the rendered HTML document as string. Default value is 
+     * false.
+     * @param boolean $formatted If this parameter is set to true, the rendered 
+     * HTML document will be well formatted and readable. Note that by adding 
+     * formatting to the page, the size of rendered HTML document 
+     * will increase. Default is false.
+     * @return null|string If the parameter <b>$returnResult</b> is set to true, 
+     * the method will return a string that represents the rendered page. Other 
+     * than that, it will return null.
      * @since 1.9
      */
-    public static function render() {
-        echo Page::get()->getDocument()->toHTML(true);
+    public static function render($returnResult=false,$formatted=false) {
+        if($returnResult){
+            return Page::get()->getDocument()->toHTML($formatted);
+        }
+        else{
+            echo Page::get()->getDocument()->toHTML($formatted);
+        }
     }
     /**
      * Loads and returns translation based on page language code.
      * Note that page language must be set before calling this method in 
      * order to load a translation file. Translations can be found in 
-     * the folder '/entity/lang'.
+     * the folder '/entity/lang'. Also, the method will throw an exception 
+     * in case language file is not found or not initialized correctly.
      * @return Language|null An object of type Language is returned 
      * if the language is loaded. Other than that, the method will return 
      * null.
+     * @throws Exception
      * @since 1.9
      */
     public static function translation(){
@@ -608,8 +592,6 @@ class Page{
         if(isset($loadedLangs[$this->getLang()])){
             return $loadedLangs[$this->getLang()];
         }
-        $null = null;
-        return $null;
     }
     /**
      * Loads or returns page theme.

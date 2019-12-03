@@ -191,11 +191,7 @@ class Page{
         $this->setWritingDir();
         $this->setCanonical(Util::getRequestedURL());
         $this->document->setLanguage($this->getLang());
-        $headNode = new HeadNode(
-            $this->getTitle().$this->getTitleSep().$this->getWebsiteName(),
-            $this->getCanonical(),
-            SiteConfig::getBaseURL()
-        );
+        $headNode = $this->_getHead();
         $this->document->setHeadNode($headNode);
         $headerNode = new HTMLNode();
         $headerNode->setID('page-header');
@@ -973,43 +969,26 @@ class Page{
         return $node;
     }
     
-    private function _getHead($new=false){
-        if($new === true){
+    private function _getHead(){
+        $theme = $this->getTheme();
+        if($theme === null){
             $headNode = new HeadNode(
                 $this->getTitle().$this->getTitleSep().$this->getWebsiteName(),
                 $this->getCanonical(),
                 SiteConfig::getBaseURL()
             );
-            $metaCharset = new HTMLNode('meta', false);
-            $metaCharset->setAttribute('charset', 'UTF-8');
-            $headNode->addChild($metaCharset);
-            $tmpHead = $this->getTheme()->getHeadNode();
-            if($tmpHead instanceof HTMLNode){
-                $headNode->setTitle($this->getTitle().$this->getTitleSep().$this->getWebsiteName());
-                $baseNode = $tmpHead->getBase();
-                if($baseNode !== null){
-                    $headNode->setBase($tmpHead->getBase()->getAttributeValue('href'));
-                }
-                $headNode->setCanonical($this->getCanonical());
-                $headNode->addMeta('description', $this->getDescription(), true);
-                $children = $tmpHead->children();
-                $count = $children->size();
-                for($x = 0 ; $x < $count ; $x++){
-                    $node = $children->get($x);
-                    $nodeName = $node->getNodeName();
-                    if($nodeName != 'base' && $nodeName != 'title'){
-                        if($node->getAttributeValue('name') != 'description'){
-                            $headNode->addChild($node);
-                        }
-                    }
-                }
-            }
-            else {
-                $headNode->addMeta('description', $this->getDescription(), true);
-            }
-            return $headNode;
         }
-        return $this->document->getHeadNode();
+        else{
+            $headNode = $theme->getHeadNode();
+        }
+        $headNode->addMeta('charset','UTF-8',true);
+        $headNode->setTitle($this->getTitle().$this->getTitleSep().$this->getWebsiteName());
+        $headNode->setBase(SiteConfig::getBaseURL());
+        $headNode->setCanonical($this->getCanonical());
+        if($this->getDescription() != null){
+            $headNode->addMeta('description', $this->getDescription(), true);
+        }
+        return $headNode;
     }
 }
 

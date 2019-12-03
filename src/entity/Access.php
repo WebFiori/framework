@@ -47,7 +47,7 @@ class Access {
      * @since 1.0
      */
     private function __construct() {
-        $this->userGroups = array();
+        $this->userGroups = [];
     }
     /**
      * Removes all created user groups and privileges.
@@ -102,9 +102,9 @@ class Access {
         if(strlen($str) > 0){
             if($user instanceof User){
                 $privilegesSplit = explode(';', $str);
-                $privilegesToHave = array();
-                $privilegesToNotHave = array();
-                $groupsBelongsTo = array();
+                $privilegesToHave = [];
+                $privilegesToNotHave = [];
+                $groupsBelongsTo = [];
                 foreach ($privilegesSplit as $privilegeStr){
                     $prSplit = explode('-', $privilegeStr);
                     if(count($prSplit) == 2){
@@ -161,7 +161,7 @@ class Access {
         return self::get()->_asArray();
     }
     private function _asArray() {
-        $retVal = array();
+        $retVal = [];
         foreach ($this->userGroups as $group){
             $retVal[] = $this->_asArrayHelper($group);
         }
@@ -172,20 +172,20 @@ class Access {
      * @param PrivilegesGroup $group
      */
     private function _asArrayHelper($group) {
-        $retVal = array(
+        $retVal = [
             'group-id'=>$group->getID(),
             'given-title'=>$group->getName(),
-            'child-groups'=>array(),
-            'privileges'=>array()
-        );
+            'child-groups'=>[],
+            'privileges'=>[]
+        ];
         foreach ($group->childGroups() as $groupX){
             $retVal['child-groups'][] = $this->_asArrayHelper($groupX);
         }
         foreach ($group->privileges() as $pr){
-            $retVal['privileges'][] = array(
+            $retVal['privileges'][] = [
                 'privilege-id'=>$pr->getID(),
                 'given-title'=>$pr->getName()
-            );
+            ];
         }
         return $retVal;
     }
@@ -216,7 +216,7 @@ class Access {
     private function _createPermissionsStr($user) {
         if($user instanceof User){
             $str = '';
-            $groupsBelongsTo = array();
+            $groupsBelongsTo = [];
             foreach ($this->userGroups as $group){
                 $this->__createPermissionsStrHelper($user, $group, $groupsBelongsTo, $str);
             }
@@ -268,7 +268,7 @@ class Access {
     }
 
     private function _privileges($groupId=null){
-        $prArr = array();
+        $prArr = [];
         foreach ($this->userGroups as $group){
             $this->_privilegesHelper($group, $prArr, $groupId);
         }
@@ -591,7 +591,7 @@ class Access {
      * @since 1.0.1 
      */
     public static function newPrivileges($groupId,$prNamesArr) {
-        $retVal = array();
+        $retVal = [];
         $count = count($prNamesArr);
         for($x = 0 ; $x < $count ; $x++){
             $retVal[$prNamesArr[$x]] = self::newPrivilege($groupId, $prNamesArr[$x]);

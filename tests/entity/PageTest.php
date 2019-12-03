@@ -289,15 +289,85 @@ class PageTest extends TestCase{
      * @test
      * @depends testHeader01
      */
-//    public function testHeader02() {
-//        $this->assertFalse(Page::header());
-//        $node = Page::document()->getChildByID('page-header');
-//        $this->assertNull($node);
-//        $this->assertEquals(2,Page::document()->getBody()->childrenCount());
-//        $this->assertTrue(Page::header(true));
-//        $node2 = Page::document()->getChildByID('page-header');
-//        $this->assertTrue($node2 instanceof HTMLNode);
-//        $this->assertEquals(3,Page::document()->getBody()->childrenCount());
-//        $this->assertEquals('page-header',Page::document()->getBody()->getChild(0)->getAttribute('id'));
-//    }
+    public function testHeader02() {
+        $this->assertFalse(Page::header());
+        $node = Page::document()->getChildByID('page-header');
+        $this->assertNull($node);
+        $this->assertEquals(2,Page::document()->getBody()->childrenCount());
+        $this->assertTrue(Page::header(true));
+        $node2 = Page::document()->getChildByID('page-header');
+        $this->assertTrue($node2 instanceof HTMLNode);
+        $this->assertEquals(3,Page::document()->getBody()->childrenCount());
+        $this->assertEquals('page-header',Page::document()->getBody()->getChild(0)->getAttribute('id'));
+    }
+    /**
+     * @test
+     */
+    public function testFooter00() {
+        Page::reset();
+        $this->assertTrue(Page::footer());
+        $node = Page::document()->getChildByID('page-footer');
+        $this->assertTrue($node instanceof HTMLNode);
+        $this->assertEquals(3,Page::document()->getBody()->childrenCount());
+    }
+    /**
+     * @test
+     */
+    public function testFooter01() {
+        Page::reset();
+        $this->assertFalse(Page::footer(false));
+        $node = Page::document()->getChildByID('page-footer');
+        $this->assertNull($node);
+        $this->assertEquals(2,Page::document()->getBody()->childrenCount());
+    }
+    /**
+     * @test
+     * @depends testFooter01
+     */
+    public function testFooter02() {
+        $this->assertFalse(Page::footer());
+        $node = Page::document()->getChildByID('page-footer');
+        $this->assertNull($node);
+        $this->assertEquals(2,Page::document()->getBody()->childrenCount());
+        $this->assertTrue(Page::footer(true));
+        $node2 = Page::document()->getChildByID('page-footer');
+        $this->assertTrue($node2 instanceof HTMLNode);
+        $this->assertEquals(3,Page::document()->getBody()->childrenCount());
+        $this->assertEquals('page-footer',Page::document()->getBody()->getChild(2)->getAttribute('id'));
+    }
+    /**
+     * @test
+     */
+    public function testAside00() {
+        Page::reset();
+        $this->assertTrue(Page::aside());
+        $node = Page::document()->getChildByID('side-content-area');
+        $this->assertTrue($node instanceof HTMLNode);
+        $this->assertEquals(2,Page::document()->getChildByID('page-body')->childrenCount());
+    }
+    /**
+     * @test
+     */
+    public function testAside01() {
+        Page::reset();
+        $this->assertFalse(Page::aside(false));
+        $node = Page::document()->getChildByID('side-content-area');
+        $this->assertNull($node);
+        $this->assertEquals(1,Page::document()->getChildByID('page-body')->childrenCount());
+    }
+    /**
+     * @test
+     * @depends testFooter01
+     */
+    public function testAside02() {
+        $this->assertFalse(Page::aside());
+        $node = Page::document()->getChildByID('side-content-area');
+        $this->assertNull($node);
+        $this->assertEquals(1,Page::document()->getChildByID('page-body')->childrenCount());
+        $this->assertTrue(Page::aside(true));
+        $node2 = Page::document()->getChildByID('side-content-area');
+        $this->assertTrue($node2 instanceof HTMLNode);
+        $this->assertEquals(2,Page::document()->getChildByID('page-body')->childrenCount());
+        $this->assertEquals('side-content-area',Page::document()->getChildByID('page-body')->getChild(0)->getAttribute('id'));
+    }
 }

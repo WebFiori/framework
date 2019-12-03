@@ -85,6 +85,15 @@ class FileTest extends TestCase{
     }
     /**
      * @test
+     * @param File $file
+     */
+    public function testRead05() {
+        $file = new File('ok.txt','\\'.ROOT_DIR.DIRECTORY_SEPARATOR.'tests'.DIRECTORY_SEPARATOR.'entity\\');
+        $this->expectException(\Exception::class);
+        $file->read();
+    }
+    /**
+     * @test
      */
     public function testWrite00() {
         $f = new File();

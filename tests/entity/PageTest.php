@@ -5,6 +5,7 @@ use webfiori\entity\Page;
 use phpStructs\html\HTMLNode;
 use webfiori\entity\Theme;
 use webfiori\entity\langs\Language;
+use webfiori\conf\SiteConfig;
 /**
  * Description of PageTest
  *
@@ -23,7 +24,6 @@ class PageTest extends TestCase{
         $this->assertTrue(Page::header());
         $this->assertTrue(Page::footer());
         $this->assertTrue(Page::aside());
-        $this->assertNull(Page::theme());
         $this->assertEquals('ltr',Page::dir());
         $this->assertNull(Page::translation());
         $this->assertEquals('https://127.0.0.1/',Page::canonical());
@@ -32,6 +32,7 @@ class PageTest extends TestCase{
      * @test
      */
     public function testRender00() {
+        Page::reset();
         $doc = Page::render(true);
         $this->assertEquals('<!DOCTYPE html>'
                 . '<html>'
@@ -51,6 +52,52 @@ class PageTest extends TestCase{
                 . '</div>'
                 . '</body>'
                 . '</html>',$doc);
+    }
+    /**
+     * @test
+     */
+    public function testRender01() {
+        Page::reset();
+        $doc = Page::render(true);
+        $this->assertEquals('<!DOCTYPE html>'
+                . '<html>'
+                . '<head>'
+                . '<base href="https://127.0.0.1/">'
+                . '<title>Hello World | Hello Website</title>'
+                . '<link rel="canonical" href="https://127.0.0.1/">'
+                . '<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">'
+                . '</head>'
+                . '<body itemscope="" itemtype="http://schema.org/WebPage">'
+                . '<div id="page-header">'
+                . '</div>'
+                . '<div id="page-body">'
+                . '<div id="side-content-area"></div>'
+                . '<div id="main-content-area"></div>'
+                . '</div><div id="page-footer">'
+                . '</div>'
+                . '</body>'
+                . '</html>',$doc);
+    }
+    /**
+     * @test
+     */
+    public function testSetDescription00() {
+        Page::reset();
+        $this->assertFalse(Page::document()->getHeadNode()->hasMeta('description'));
+        Page::description('Hello World Page.');
+        $this->assertTrue(Page::document()->getHeadNode()->hasMeta('description'));
+        $this->assertEquals('Hello World Page.',Page::description());
+    }
+    /**
+     * @test
+     * @depends testSetDescription00
+     */
+    public function testSetDescription01() {
+        Page::description();
+        $this->assertEquals('Hello World Page.',Page::description());
+        Page::description('');
+        $this->assertNull(Page::description());
+        $this->assertFalse(Page::document()->getHeadNode()->hasMeta('description'));
     }
     /**
      * @test
@@ -88,7 +135,6 @@ class PageTest extends TestCase{
         $this->assertTrue(Page::header());
         $this->assertTrue(Page::footer());
         $this->assertTrue(Page::aside());
-        $this->assertNull(Page::theme());
         $this->assertEquals('ltr',Page::dir());
         $this->assertNull(Page::translation());
         $this->assertEquals('https://127.0.0.1/',Page::canonical());
@@ -100,6 +146,56 @@ class PageTest extends TestCase{
         $c = Page::canonical('https://example.com/home');
         $this->assertEquals('https://example.com/home',$c);
         $this->assertEquals('https://example.com/home',Page::document()->getHeadNode()->getCanonical());
+    }
+    /**
+     * @test
+     */
+    public function testDirs00() {
+        Page::reset();
+        $this->assertEquals('',Page::cssDir());
+        $this->assertEquals('',Page::imagesDir());
+        $this->assertEquals('',Page::jsDir());
+    }
+    /**
+     * @test
+     * @depends testDirs00
+     */
+    public function testDirs01() {
+        Page::theme();
+        $this->assertEquals('themes/webfiori/css',Page::cssDir());
+        $this->assertEquals('themes/webfiori/images',Page::imagesDir());
+        $this->assertEquals('themes/webfiori/js',Page::jsDir());
+    }
+    /**
+     * @test
+     */
+    public function testTheme00() {
+        Page::reset();
+        $theme = Page::theme();
+        $this->assertTrue($theme instanceof Theme);
+        $this->assertEquals(SiteConfig::getBaseThemeName(),$theme->getName());
+        $theme2 = Page::theme();
+        $this->assertTrue($theme2 === $theme);
+        $theme3 = Page::theme('Template Theme');
+        $this->assertFalse($theme3 === $theme2);
+        $theme4 = Page::theme('Template Theme');
+        $this->assertTrue($theme3 === $theme4);
+    }
+    /**
+     * @test
+     */
+    public function testTheme01() {
+        Page::reset();
+        $this->assertNull(Page::theme(''));
+        $this->assertNull(Page::theme('    '));
+    }
+    /**
+     * @test
+     */
+    public function testTheme02() {
+        Page::reset();
+        $theme3 = Page::theme('      Template Theme      ');
+        $this->assertTrue($theme3 instanceof Theme);
     }
     /**
      * @test
@@ -169,5 +265,39 @@ class PageTest extends TestCase{
         Page::lang('jp');
         Page::translation();
     }
-    
+    /**
+     * @test
+     */
+    public function testHeader00() {
+        Page::reset();
+        $this->assertTrue(Page::header());
+        $node = Page::document()->getChildByID('page-header');
+        $this->assertTrue($node instanceof HTMLNode);
+        $this->assertEquals(3,Page::document()->getBody()->childrenCount());
+    }
+    /**
+     * @test
+     */
+    public function testHeader01() {
+        Page::reset();
+        $this->assertFalse(Page::header(false));
+        $node = Page::document()->getChildByID('page-header');
+        $this->assertNull($node);
+        $this->assertEquals(2,Page::document()->getBody()->childrenCount());
+    }
+    /**
+     * @test
+     * @depends testHeader01
+     */
+    public function testHeader02() {
+        $this->assertFalse(Page::header());
+        $node = Page::document()->getChildByID('page-header');
+        $this->assertNull($node);
+        $this->assertEquals(2,Page::document()->getBody()->childrenCount());
+        $this->assertTrue(Page::header(true));
+        $node2 = Page::document()->getChildByID('page-header');
+        $this->assertTrue($node2 instanceof HTMLNode);
+        $this->assertEquals(3,Page::document()->getBody()->childrenCount());
+        $this->assertEquals('page-header',Page::document()->getBody()->getChild(0)->getAttribute('id'));
+    }
 }

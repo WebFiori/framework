@@ -103,7 +103,8 @@ class User implements JsonI{
         $this->setUserName($username);
         $this->setResetCount(0);
         $this->setID(-1);
-        $this->userPrivileges = array();
+        $this->userPrivileges = [];
+        $this->setLastPasswordResetDate('1999-09-09 09:09:09');
     }
     /**
      * Adds a user to a privileges group given group ID.
@@ -182,7 +183,7 @@ class User implements JsonI{
      * @since 1.7
      */
     public function removeAllPrivileges() {
-        $this->userPrivileges = array();
+        $this->userPrivileges = [];
     }
     /**
      * Checks if the user belongs to a privileges group given its ID.
@@ -269,8 +270,8 @@ class User implements JsonI{
     }
     /**
      * Returns the date at which user password was reseted.
-     * @return string|null the date at which user password was reseted. 
-     * If not set, the method will return null.
+     * @return string the date at which user password was reseted. 
+     * IDefault return value is '1999-09-09 09:09:09'.
      * @since 1.6
      */
     public function getLastPasswordResetDate() {

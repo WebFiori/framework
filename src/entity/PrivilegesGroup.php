@@ -88,11 +88,11 @@ class PrivilegesGroup implements JsonI{
      * return true. Other than that, the method will return false.
      * @since 1.1
      */
-    public function setParentGroup(&$group=null) {
+    public function setParentGroup($group=null) {
         if($group instanceof PrivilegesGroup){
             if($group !== $this && $group->getID() != $this->getID()){
                 $this->parentGroup = $group;
-                $this->parentGroup->childGroups[] = &$this;
+                $this->parentGroup->childGroups[] = $this;
                 return true;
             }
         }
@@ -123,7 +123,7 @@ class PrivilegesGroup implements JsonI{
      * return it. If it is not set, the method will return null.
      * @since 1.1
      */
-    public function &getParentGroup() {
+    public function getParentGroup() {
         return $this->parentGroup;
     }
     /**
@@ -302,7 +302,7 @@ class PrivilegesGroup implements JsonI{
      * added. false otherwise.
      * @since 1.0
      */
-    public function addPrivilage(&$pr) {
+    public function addPrivilage($pr) {
         if($pr instanceof Privilege){
             foreach ($this->privilegesArr as $prev){
                 if($prev->getID() == $pr->getID()){

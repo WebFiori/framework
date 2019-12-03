@@ -85,6 +85,15 @@ class UserTest extends TestCase{
      * 
      * @test
      */
+    public function testRemovePrivilege02() {
+        $u = new User();
+        $u->addToGroup('TOP_GROUP');
+        $this->assertFalse($u->removePrivilege('NOT_EXIST'));
+    }
+    /**
+     * 
+     * @test
+     */
     public function testRemoveAllPrivilege00() {
         $u = new User();
         $u->addToGroup('TOP_GROUP');

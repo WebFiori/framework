@@ -354,10 +354,9 @@ class Page{
      * @since 1.0
      */
     private static function get(){
-        if(self::$instance !== null){
-            return self::$instance;
+        if(self::$instance === null){
+            self::$instance = new Page();
         }
-        self::$instance = new Page();
         return self::$instance;
     }
     /**
@@ -640,9 +639,9 @@ class Page{
         }
         $this->theme = $tmpTheme;
         $this->document = new HTMLDoc();
-        $headNode = $this->_getHead(true);
-        $footerNode = $this->_getFooter(true);
-        $asideNode = $this->_getAside(true);
+        $headNode = $this->_getHead();
+        $footerNode = $this->_getFooter();
+        $asideNode = $this->_getAside();
         $headerNode = $this->_getHeader();
         $this->document->setLanguage($this->getLang());
         $this->document->setHeadNode($headNode);
@@ -786,9 +785,10 @@ class Page{
             if($this->incHeader == false && $bool === true){
                 //add the header
                 $children = $this->document->getBody()->children();
+                $currentChCount = $children->size();
                 $this->document->getBody()->removeAllChildNodes();
                 $this->document->addChild($this->_getHeader());
-                for($x = 0 ; $x < $children->size() ; $x++){
+                for($x = 0 ; $x < $currentChCount ; $x++){
                     $this->document->addChild($children->get($x));
                 }
             }
@@ -811,15 +811,27 @@ class Page{
     private function setHasAside($bool){
         if(gettype($bool) == 'boolean'){
             if($this->incAside == false && $bool == true){
-                
+                //add aside
+                $mainContentArea = $this->document->getChildByID('page-body');
+                if($mainContentArea instanceof HTMLNode){
+                    $children = $mainContentArea->children();
+                    $currentChCount = $children->size();
+                    $mainContentArea->removeAllChildNodes();
+                    $mainContentArea->addChild($this->_getAside());
+                    $this->incAside = true;
+                    for($x = 0 ; $x < $currentChCount ; $x++){
+                        $mainContentArea->addChild($children->get($x));
+                    }
+                }
             }
             else if($this->incAside == true && $bool == false){
+                //remove aside
                 $aside = $this->document->getChildByID('side-content-area');
                 if($aside instanceof HTMLNode){
                     $this->document->removeChild($aside);
+                    $this->incAside = false;
                 }
             }
-            $this->incAside = $bool;
         }
     }
 
@@ -913,54 +925,52 @@ class Page{
         return $this->incAside;
     }
     
-    private function _getAside($new=false) {
-        if($this->hasAside()){
-            if($new === true){
-                $a = $this->getTheme()->getAsideNode();
-                if($a instanceof HTMLNode){
-                    $a->setID('side-content-area');
-                }
-                else{
-                    $a = new HTMLNode();
-                    $a->setID('side-content-area');
-                }
-                return $a;
-            }
-            return $this->document->getChildByID('side-content-area');
+    private function _getAside() {
+        $theme = $this->getTheme();
+        $node = null;
+        if($theme !== null){
+            $node = $theme->getHeadrNode();
         }
+        if($node instanceof HTMLNode){
+            $node->setID('side-content-area');
+        }
+        else{
+            $node = new HTMLNode();
+            $node->setID('side-content-area');
+        }
+        return $node;
     }
     
     private function _getHeader(){
         $theme = $this->getTheme();
-        $h = null;
+        $node = null;
         if($theme !== null){
-            $h = $this->getTheme()->getHeadrNode();
+            $node = $theme->getHeadrNode();
         }
-        if($h instanceof HTMLNode){
-            $h->setID('page-header');
+        if($node instanceof HTMLNode){
+            $node->setID('page-header');
         }
         else{
-            $h = new HTMLNode();
-            $h->setID('page-header');
+            $node = new HTMLNode();
+            $node->setID('page-header');
         }
-        return $h;
+        return $node;
     }
     
-    private function _getFooter($new=false){
-        if($this->hasFooter()){
-            if($new === true){
-                $f = $this->getTheme()->getFooterNode();
-                if($f instanceof HTMLNode){
-                    $f->setID('page-footer');
-                }
-                else{
-                    $f = new HTMLNode();
-                    $f->setID('page-footer');
-                }
-                return $f;
-            }
-            return $this->document->getChildByID('page-footer');
+    private function _getFooter(){
+        $theme = $this->getTheme();
+        $node = null;
+        if($theme !== null){
+            $node = $theme->getHeadrNode();
         }
+        if($node instanceof HTMLNode){
+            $node->setID('page-footer');
+        }
+        else{
+            $node = new HTMLNode();
+            $node->setID('page-footer');
+        }
+        return $node;
     }
     
     private function _getHead($new=false){

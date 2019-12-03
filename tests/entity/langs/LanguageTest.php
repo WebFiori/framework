@@ -209,6 +209,15 @@ class LanguageTest extends TestCase{
         $this->assertFalse($lang->set('general/xcderf', 'a-var', 'mmm'));
     }
     /**
+     * @test
+     */
+    public function testSet03() {
+        $lang = Language::loadTranslation('en');
+        $this->assertEquals('array', gettype($lang->get('general')));
+        $this->assertTrue($lang->set('general', 'a-var', 'mmm'));
+        $this->assertEquals('mmm',$lang->get('general/a-var'));
+    }
+    /**
      * Testing the method Language::get() with non-exiting language variable.
      * @test
      */

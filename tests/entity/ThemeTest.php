@@ -18,6 +18,7 @@ class ThemeTest extends TestCase{
      */
     public function testUseTheme00() {
         $themeName = 'WebFiori Theme';
+        Theme::resetLoaded();
         //$this->assertFalse(Theme::isThemeLoaded($themeName));
         $theme = Theme::usingTheme($themeName);
         $this->assertTrue($theme instanceof Theme);

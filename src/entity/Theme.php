@@ -38,7 +38,7 @@ use Exception;
  * JS files) by implementing one of the abstract methods. Themes must exist in 
  * the folder '/themes' of the framework.
  * @author Ibrahim
- * @version 1.2.4
+ * @version 1.2.5
  */
 abstract class Theme implements JsonI{
     /**
@@ -156,6 +156,14 @@ abstract class Theme implements JsonI{
         $this->afterLoadedParams = [];
         $this->beforeLoaded = function(){};
         $this->beforeLoadedParams = [];
+    }
+    /**
+     * Reset the array which contains all loaded themes.
+     * By calling this method, all loaded themes will be unloaded.
+     * @since 1.2.5
+     */
+    public static function resetLoaded(){
+        self::$loadedThemes = [];
     }
     /**
      * Returns the base URL that will be used by the theme.

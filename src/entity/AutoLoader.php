@@ -293,6 +293,7 @@ class AutoLoader{
                     'path'=>$f
                 ];
                 $loaded = true;
+                break;
             }
             else{
                 //lower case class name to support loading of old-style classes.
@@ -305,6 +306,7 @@ class AutoLoader{
                         'path'=>$f
                     ];
                     $loaded = true;
+                    break;
                 }
             }
         }

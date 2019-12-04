@@ -90,13 +90,13 @@ class AutoLoader{
      */
     public static function get($options=[
         'define-root'=>false,
-        'search-folders'=>array(),
+        'search-folders'=>[],
         'root'=>'',
         'on-load-failure'=>'do-nothing'
     ]) {
         $DS = DIRECTORY_SEPARATOR;
         if(self::$loader === null){
-            $frameworkSearchFoldres = array(
+            $frameworkSearchFoldres = [
                 '',
                 $DS.'entity',
                 $DS.'themes',
@@ -105,7 +105,7 @@ class AutoLoader{
                 $DS.'pages',
                 $DS.'ini',
                 $DS.'conf'
-            );
+            ];
             
             if(isset($options['search-folders'])){
                 foreach ($options['search-folders'] as $folder){
@@ -178,7 +178,7 @@ class AutoLoader{
      * @since 1.0
      * @deprecated since version 1.1.2
      */
-    public function addSearchDirectory($dir,$incSubFolders=true) {
+    private function addSearchDirectory($dir,$incSubFolders=true) {
         $DS = DIRECTORY_SEPARATOR;
         if(strlen($dir) != 0){
             $cleanDir = $DS. trim(str_replace('\\', $DS, str_replace('/', $DS, $dir)), '\\/');
@@ -245,16 +245,24 @@ class AutoLoader{
             $f = $root.$value.$DS.$className.'.php';
             if(file_exists($f) && !in_array($f, $allPaths)){
                 require_once $f;
+                $this->loadedClasses[$classPath] = [
+                    'class-name'=>$className,
+                    'namespace'=> substr($classPath, 0, strlen($classPath) - strlen($className) - 1),
+                    'path'=>$f
+                ];
                 $loaded = true;
-                break;
             }
             else{
                 //lower case class name to support loading of old-style classes.
                 $f = $root.$value.$DS. strtolower($className).'.php';
                 if(file_exists($f) && !in_array($f, $allPaths)){
                     require_once $f;
+                    $this->loadedClasses[$classPath] = [
+                        'class-name'=>$className,
+                        'namespace'=> substr($classPath, 0, strlen($classPath) - strlen($className) - 1),
+                        'path'=>$f
+                    ];
                     $loaded = true;
-                    break;
                 }
             }
         }
@@ -269,13 +277,6 @@ class AutoLoader{
             else if($this->onFail == 'do-nothing'){
                 //do nothing
             }
-        }
-        else{
-            $this->loadedClasses[$classPath] = [
-                'class-name'=>$className,
-                'namespace'=> substr($classPath, 0, strlen($classPath) - strlen($className) - 1),
-                'path'=>$f
-            ];
         }
     }
     /**
@@ -333,8 +334,16 @@ class AutoLoader{
      * @return string The root directory that is used to search inside.
      * @since 1.0
      */
-    public function getRoot(){
+    private function getRoot(){
         return $this->rootDir;
+    }
+    /**
+     * Returns the root directory that is used to search inside.
+     * @return string The root directory that is used to search inside.
+     * @since 1.0
+     */
+    public static function root() {
+        return self::get()->getRoot();
     }
     /**
      * Returns an array of all added search folders.

@@ -283,9 +283,15 @@ class AutoLoader{
         $loaded = false;
         $root = $this->getRoot();
         $allPaths = self::getClassPath($className);
+        if($className == 'Util'){
+            Util::print_r($allPaths);
+        }
         foreach ($this->searchFolders as $value) {
             $f = $root.$value.$DS.$className.'.php';
             if(file_exists($f) && !in_array($f, $allPaths)){
+                if($className == 'Util'){
+                    Util::print_r($f);
+                }
                 require_once $f;
                 $this->loadedClasses[] = [
                     'class-name'=>$className,

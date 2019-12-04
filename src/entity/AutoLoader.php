@@ -28,7 +28,7 @@ use Exception;
  * An autoloader class to load classes as needed during runtime.
  *
  * @author Ibrahim
- * @version 1.1.4
+ * @version 1.1.5
  */
 class AutoLoader{
     /**
@@ -227,12 +227,28 @@ class AutoLoader{
         self::get()->addSearchDirectory($dir,$incSubFolders);
     }
     /**
+     * Checks if a class is loaded or not.
+     * @param string $class The name of the class. Note that it must have 
+     * the namespace.
+     * @return boolean If the class was already loaded, the method will return true. 
+     * Else, it will return false.
+     * @since 1.1.5
+     */
+    public  static function isLoaded($class) {
+        foreach (self::getLoadedClasses() as $classArr){
+            if($class == $classArr['namespace']){
+                return true;
+            }
+        }
+        return false;
+    }
+    /**
      * Tries to load a class given its name.
      * @param string $classPath The name of the class alongside its namespace.
      * @since 1.0
      */
     private function loadClass($classPath){
-        if(isset(self::getLoadedClasses()[$classPath])){
+        if(self::isLoaded($classPath)){
             return;
         }
         $DS = DIRECTORY_SEPARATOR;
@@ -245,7 +261,7 @@ class AutoLoader{
             $f = $root.$value.$DS.$className.'.php';
             if(file_exists($f) && !in_array($f, $allPaths)){
                 require_once $f;
-                $this->loadedClasses[$classPath] = [
+                $this->loadedClasses[] = [
                     'class-name'=>$className,
                     'namespace'=> substr($classPath, 0, strlen($classPath) - strlen($className) - 1),
                     'path'=>$f
@@ -257,7 +273,7 @@ class AutoLoader{
                 $f = $root.$value.$DS. strtolower($className).'.php';
                 if(file_exists($f) && !in_array($f, $allPaths)){
                     require_once $f;
-                    $this->loadedClasses[$classPath] = [
+                    $this->loadedClasses[] = [
                         'class-name'=>$className,
                         'namespace'=> substr($classPath, 0, strlen($classPath) - strlen($className) - 1),
                         'path'=>$f
@@ -314,10 +330,9 @@ class AutoLoader{
         return $retVal;
     }
     /**
-     * Returns an associative array of all loaded classes.
-     * The keys of the array will be the names of the classes including the namespace 
-     * and the value will be a sub associative array that has more info about 
-     * the class. The indices of each sub array are:
+     * Returns an indexed array of all loaded classes.
+     * At each index, there will be an associative array. 
+     * Each sub array will have the following indices:
      * <ul>
      * <li><b>class-name</b>: The actual name of the class.</li>
      * <li><b>namespace</b>: The namespace at which the class belongs to.</li>
@@ -340,7 +355,7 @@ class AutoLoader{
     /**
      * Returns the root directory that is used to search inside.
      * @return string The root directory that is used to search inside.
-     * @since 1.0
+     * @since 1.1.5
      */
     public static function root() {
         return self::get()->getRoot();

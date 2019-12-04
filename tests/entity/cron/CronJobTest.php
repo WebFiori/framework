@@ -643,6 +643,7 @@ class CronJobTest extends TestCase{
      */
     public function testCron12() {
         $cron = new CronJob('* * * * 0-6');
+        $this->assertEquals('* * * * 0-6',$cron->getExpression());
     }
     /**
      * @test

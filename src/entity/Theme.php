@@ -273,7 +273,6 @@ abstract class Theme implements JsonI{
             }
             return $themeToLoad;
         }
-        throw new Exception('No such theme: \''.$themeName.'\'.');
     }
     /**
      * Sets the value of the callback which will be called after theme is loaded.
@@ -679,8 +678,12 @@ abstract class Theme implements JsonI{
         $j = new JsonX();
         $j->add('themes-path', THEMES_PATH);
         $j->add('name', $this->getName());
+        $j->add('url', $this->getUrl());
+        $j->add('license', $this->getLicenseName());
+        $j->add('license-url', $this->getLicenseUrl());
         $j->add('version', $this->getVersion());
         $j->add('author', $this->getAuthor());
+        $j->add('author-url', $this->getAuthorUrl());
         $j->add('images-dir-name', $this->getImagesDirName());
         $j->add('theme-dir-name', $this->getDirectoryName());
         $j->add('css-dir-name', $this->getCssDirName());

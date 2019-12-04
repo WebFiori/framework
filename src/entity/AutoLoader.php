@@ -170,6 +170,32 @@ class AutoLoader{
         else{
             $this->onFail = 'throw-exception';
         }
+        $this->loadedClasses[] = [
+            'class-name'=>'AutoLoader',
+            'namespace'=>'webfiori\\entity',
+            'path'=>__DIR__
+        ];
+    }
+    /**
+     * Sets what will happen in case a class was failed to load.
+     * @param Closure|string $onFail It can be a PHP function or one of 
+     * the following values:
+     * <ul>
+     * <li>do-nothing</li>
+     * <li>throw-exception</li>
+     * </ul>
+     * @since 1.1.5
+     */
+    public static function setOnFail($onFail) {
+        if(is_callable($onFail)){
+            self::get()->onFail = $onFail;
+        }
+        else{
+            $lower = strtolower(trim($onFail));
+            if($lower == 'throw-exception' || $lower == 'do-nothing'){
+                self::get()->onFail = $lower;
+            }
+        }
     }
     /**
      * Adds new search directory to the array of search 
@@ -183,7 +209,7 @@ class AutoLoader{
         if(strlen($dir) != 0){
             $cleanDir = $DS. trim(str_replace('\\', $DS, str_replace('/', $DS, $dir)), '\\/');
             if($incSubFolders){
-                $dirsStack = array();
+                $dirsStack = [];
                 $dirsStack[] = $cleanDir;
                 while($xDir = array_pop($dirsStack)){
                     $fullPath =  $this->getRoot().$xDir;
@@ -236,7 +262,7 @@ class AutoLoader{
      */
     public  static function isLoaded($class) {
         foreach (self::getLoadedClasses() as $classArr){
-            if($class == $classArr['namespace']){
+            if($class == $classArr['namespace'].'\\'.$classArr['class-name']){
                 return true;
             }
         }

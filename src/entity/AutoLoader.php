@@ -293,8 +293,7 @@ class AutoLoader{
                     'path'=>$f
                 ];
                 $loaded = true;
-                break;
-                if(PHP_MAJOR_VERSION <= 7 && PHP_MINOR_VERSION <= 2){
+                if(PHP_MAJOR_VERSION < 7 || (PHP_MAJOR_VERSION == 7 && PHP_MINOR_VERSION < 3)){
                     //in php 7.2 and lower, if same class is loaded 
                     //from two namespaces with same name, it will 
                     //rise a fatal error with message 
@@ -313,8 +312,7 @@ class AutoLoader{
                         'path'=>$f
                     ];
                     $loaded = true;
-                    break;
-                    if(PHP_MAJOR_VERSION <= 7 && PHP_MINOR_VERSION <= 2){
+                    if(PHP_MAJOR_VERSION < 7 || (PHP_MAJOR_VERSION == 7 && PHP_MINOR_VERSION < 3)){
                         break;
                     }
                 }

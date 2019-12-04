@@ -14,6 +14,7 @@ class CronJobTest extends TestCase{
     public function testSetOnExc00() {
         $job = new CronJob();
         $job->setOnFailure(function(){}, ['1',2]);
+        $this->assertTrue(true);
     }
     /**
      * @test

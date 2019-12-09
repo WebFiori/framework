@@ -925,7 +925,7 @@ class Page{
         $theme = $this->getTheme();
         $node = null;
         if($theme !== null){
-            $node = $theme->getHeadrNode();
+            $node = $theme->getAsideNode();
         }
         if($node instanceof HTMLNode){
             $node->setID('side-content-area');
@@ -957,7 +957,7 @@ class Page{
         $theme = $this->getTheme();
         $node = null;
         if($theme !== null){
-            $node = $theme->getHeadrNode();
+            $node = $theme->getFooterNode();
         }
         if($node instanceof HTMLNode){
             $node->setID('page-footer');

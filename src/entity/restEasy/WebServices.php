@@ -773,7 +773,8 @@ abstract class WebServices implements JsonI{
      * The indices of the array will represent request parameters and the 
      * values of each index will represent the value which was set in 
      * request body. The values will be filtered and might not be exactly the same as 
-     * the values passed in request body.
+     * the values passed in request body. Note that if a parameter is optional and not 
+     * provided in request body, its value will be set to 'null'.
      * @return array An array of filtered request inputs.
      * @since 1.0
      */
@@ -785,7 +786,8 @@ abstract class WebServices implements JsonI{
      * The indices of the array will represent request parameters and the 
      * values of each index will represent the value which was set in 
      * request body. The values will be exactly the same as 
-     * the values passed in request body.
+     * the values passed in request body. Note that if a parameter is optional and not 
+     * provided in request body, its value will be set to 'null'.
      * @return array An array of request parameters.
      * @since 1.4.3
      */
@@ -804,15 +806,14 @@ abstract class WebServices implements JsonI{
     public function getAction(){
         $reqMeth = $this->getRequestMethod();
         if($reqMeth == 'GET' || 
-           $reqMeth == 'DELETE' || 
-           $reqMeth == 'PUT' || 
+           $reqMeth == 'DELETE' ||  
            $reqMeth == 'OPTIONS' || 
            $reqMeth == 'PATCH'){
             if(isset($_GET['action'])){
                 return filter_var($_GET['action']);
             }
         }
-        else if($reqMeth == 'POST'){
+        else if($reqMeth == 'POST' || $reqMeth == 'PUT'){
             if(isset($_POST['action'])){
                 return filter_var($_POST['action']);
             }

@@ -1,5 +1,8 @@
 # WebFiori Framework
 <p align="center">
+<img src="https://programmingacademia.com/webfiori/themes/webfiori-api/images/favicon.png">
+</p>
+<p align="center">
   <a href="https://travis-ci.org/usernane/webfiori">
     <img src="https://travis-ci.org/usernane/webfiori.svg?branch=master">
   </a>

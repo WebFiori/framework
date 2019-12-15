@@ -35,7 +35,7 @@ WebFiori Framework is a web framework which is built using PHP language. The fra
 * Building and manipulating the DOM of a web page using PHP language.
 * Basic support for running the framework throgh CLI.
 
-## Getting Started
+## Getting Started 
 To learn the basics of how to use the framework, please head on to https://programmingacademia.com/webfiori/learn. Also, you can head on to the following playlist in YouTube which contains a good set of videos which can help: https://www.youtube.com/playlist?list=PLeU-QhqUhxjkACpXiPTRM9fH_zw1KF1UD.
 
 ## API Docs

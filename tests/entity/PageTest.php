@@ -200,6 +200,23 @@ class PageTest extends TestCase{
     /**
      * @test
      */
+    public function testTheme03() {
+        $firstThemeName = 'Template Theme';
+        $secondThemeName = 'WebFiori Theme';
+        Page::reset();
+        $theme3 = Page::theme($firstThemeName);
+        $fTheme = Page::theme();
+        $this->assertTrue($theme3 === $fTheme);
+        $this->assertEquals($firstThemeName,$fTheme->getName());
+        $sTheme = Page::theme($secondThemeName);
+        $this->assertTrue($sTheme === Page::theme());
+        $this->assertEquals($secondThemeName,$sTheme->getName());
+        $f2Theme = Page::theme($firstThemeName);
+        $this->assertTrue($f2Theme === $fTheme);
+    }
+    /**
+     * @test
+     */
     public function testInsert00() {
         Page::reset();
         $node = new HTMLNode();

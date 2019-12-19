@@ -31,7 +31,7 @@ use phpStructs\Queue;
  * A class that represents HTML element.
  *
  * @author Ibrahim
- * @version 1.7.8
+ * @version 1.7.9
  */
 class HTMLNode {
     /**
@@ -247,6 +247,84 @@ class HTMLNode {
             $this->attributes = [];
         }
         $this->useOriginalTxt = false;
+    }
+    /**
+     * Sets multiple attributes at once.
+     * @param array $attrsArr An associative array that has attributes names 
+     * and values.. The indices will represents 
+     * attributes names and the value of each index represents the values of 
+     * the attributes.
+     * @return boolean|array If the given value does not represents an array, 
+     * the method will return false. Other than that, the method will return 
+     * an associative array. The indices of the array will be the names of the 
+     * attributes and the values will be booleans. If an attribute is set, the 
+     * value of the index will be set to true. If not set, the index will be 
+     * set to false.
+     * @since 1.7.9
+     */
+    public function setAttributes($attrsArr) {
+        if(gettype($attrsArr) == 'array'){
+            $retVal=[];
+            foreach ($attrsArr as $attr => $val){
+                $retVal[$attr] = $this->setAttribute($attr, $val);
+            }
+            return $retVal;
+        }
+        return false;
+    }
+    /**
+     * Returns the value of the attribute 'id' of the element.
+     * @return string|null If the attribute 'id' is set, the method will return 
+     * its value. If not set, the method will return null.
+     * @since 1.7.9
+     */
+    public function getID() {
+        return $this->getAttribute('id');
+    }
+    /**
+     * Returns the value of the attribute 'class' of the element.
+     * @return string|null If the attribute 'class' is set, the method will return 
+     * its value. If not set, the method will return null.
+     * @since 1.7.9
+     */
+    public function getClassName() {
+        return $this->getAttribute('class');
+    }
+    /**
+     * Returns the value of the attribute 'title' of the element.
+     * @return string|null If the attribute 'title' is set, the method will return 
+     * its value. If not set, the method will return null.
+     * @since 1.7.9
+     */
+    public function getTitle() {
+        return $this->getAttribute('title');
+    }
+    /**
+     * Returns the value of the attribute 'tabindex' of the element.
+     * @return string|null If the attribute 'tabindex' is set, the method will return 
+     * its value. If not set, the method will return null.
+     * @since 1.7.9
+     */
+    public function getTabIndex() {
+        return $this->getAttribute('tabindex');
+    }
+    /**
+     * Returns the value of the attribute 'dir' of the element.
+     * @return string|null If the attribute 'dir' is set, the method will return 
+     * its value. If not set, the method will return null.
+     * @since 1.7.9
+     */
+    public function getWritingDir() {
+        return $this->getAttribute('dir');
+    }
+    /**
+     * Returns the value of the attribute 'name' of the element.
+     * @return string|null If the attribute 'name' is set, the method will return 
+     * its value. If not set, the method will return null.
+     * @since 1.7.9
+     */
+    public function getName() {
+        return $this->getAttribute('name');
     }
     /**
      * Validates the name of the node.
@@ -620,7 +698,7 @@ class HTMLNode {
                         }
                         if($isBaseSet){
                             foreach ($chNode['attributes'] as $attr => $val){
-                                $htmlNode->getBase()->setAttribute($attr, $val);
+                                $htmlNode->getBaseNode()->setAttribute($attr, $val);
                             }
                         }
                     }
@@ -966,7 +1044,7 @@ class HTMLNode {
         return $this->name;
     }
     /**
-     * Returns an array of all node attributes with the values
+     * Returns an associative array of all node attributes alongside the values.
      * @return array|null an associative array. The keys will act as the attribute 
      * name and the value will act as the value of the attribute. If the node 
      * is a text node, the method will return null.
@@ -979,9 +1057,9 @@ class HTMLNode {
      * Sets a value for an attribute.
      * @param string $name The name of the attribute. If the attribute does not 
      * exist, it will be created. If already exists, its value will be updated. 
-     * Note that if the node type is text node, 
-     * the attribute will never be created.
-     * @param string $val The value of the attribute. Default is empty string.
+     * Note that if the node type is text node, the attribute will never be created.
+     * @param string $val The value of the attribute. Default is empty string. Note 
+     * that if the value has any extra spaces, they will be trimmed.
      * @return boolean If the attribute is set, the method will return true. The 
      * method will return false only if the given name is empty string 
      * or the name of the attribute is 'dir' and the value is not 'ltr' or 'rtl'.
@@ -989,23 +1067,24 @@ class HTMLNode {
      */
     public function setAttribute($name,$val=''){
         $trimmedName = trim($name);
+        $trimmedVal = trim($val);
         if(!$this->isTextNode() && !$this->isComment() && strlen($trimmedName) != 0){
             $lower = strtolower($trimmedName);
             $isValid = $this->_validateName($lower);
             if($isValid){
                 if($lower == 'dir'){
-                    $lowerVal = strtolower($val);
+                    $lowerVal = strtolower($trimmedVal);
                     if($lowerVal == 'ltr' || $lowerVal == 'rtl'){
                         $this->attributes[$lower] = $lowerVal;
                         return true;
                     }
                 }
                 else if($trimmedName == 'style'){
-                    $styleArr = $this->_styleArray($val);
+                    $styleArr = $this->_styleArray($trimmedVal);
                     return $this->setStyle($styleArr);
                 }
                 else{
-                    $this->attributes[$lower] = $val;
+                    $this->attributes[$lower] = $trimmedVal;
                     return true;
                 }
             }
@@ -1083,11 +1162,20 @@ class HTMLNode {
     }
     /**
      * Sets the value of the attribute 'class' of the node.
-     * @param string $val The value to set.
+     * @param string $val The name of the class.
+     * @param boolean $override If this parameter is set to false and the node 
+     * has a class already set, the given class name will be appended to the 
+     * existing one. Default is true which means the attribute will be set as 
+     * new.
      * @since 1.2
      */
-    public function setClassName($val){
-        $this->setAttribute('class',$val);
+    public function setClassName($val,$override=true){
+        if($override === true){
+            $this->setAttribute('class',$val);
+        }
+        else{
+            $this->setAttribute('class', $this->getClassName().' '.$val);
+        }
     }
     /**
      * Sets the value of the attribute 'name' of the node.
@@ -1186,10 +1274,44 @@ class HTMLNode {
         return $this->null;
     }
     /**
+     * Insert new HTML element at specific position.
+     * @param HTMLNode $el The new element that will be inserted. It is possible 
+     * to insert child elements to the element if the following conditions are 
+     * met:
+     * <ul>
+     * <li>If the node is not a text node.</li>
+     * <li>The node is not a comment node.</li>
+     * <li>The note is not a void node.</li>
+     * <li>The note is not it self. (making a node as a child of it self)</li>
+     * </ul>
+     * @param int $position The position at which the element will be added. 
+     * it must be a value between 0 and <code>HTMLNode::childrenCount()</code> inclusive.
+     * @return boolean If the element is inserted, the method will return true. 
+     * Other than that, it will return false.
+     * @since 1.7.9
+     */
+    public function insert($el,$position) {
+        $retVal = false;
+        if(!$this->isTextNode() && !$this->isComment() && $this->mustClose()){
+            if(($el instanceof HTMLNode) && $el !== $this){
+                $retVal = $this->childrenList->insert($el, $position);
+                if($retVal === true){
+                    $el->_setParent($this);
+                }
+            }
+        }
+        return $retVal;
+    }
+    /**
      * Adds new child node.
      * @param HTMLNode $node The node that will be added. The node can have 
-     * child nodes only if 3 conditions are met. If the node is not a text node 
-     * , the node is not a comment node and the node must have ending tag.
+     * child nodes only if 4 conditions are met:
+     * <ul>
+     * <li>If the node is not a text node.</li>
+     * <li>The node is not a comment node.</li>
+     * <li>The note is not a void node.</li>
+     * <li>The note is not it self. (making a node as a child of it self)</li>
+     * </ul>
      * @since 1.0
      */
     public function addChild($node) {
@@ -1263,7 +1385,9 @@ class HTMLNode {
      * Returns the value of the text that this node represents.
      * @return string If the node is a text node or a comment node, 
      * the method will return the text in the body of the node. If not, 
-     * the method will return empty string.
+     * the method will return empty string. Note that if the node represents 
+     * a text node and HTML entities where escaped while setting its text, the 
+     * returned value will have HTML entities escaped.
      * @since 1.0
      */
     public function getText() {
@@ -1273,8 +1397,9 @@ class HTMLNode {
         return '';
     }
     /**
-     * 
-     * @return type
+     * Returns the original text which was set in the body of the node.
+     * This only applies to text nodes and comment nodes.
+     * @return string The original text without any modifications.
      */
     public function getOriginalText() {
         return $this->originalText;

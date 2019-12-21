@@ -199,7 +199,7 @@ class RouterUri {
      * @since 1.0
      */
     public function printUri() {
-        Util::print_r($this->uriBroken);
+        Util::print_r($this->uriBroken,false);
     }
     /**
      * Returns the location where the URI will route to.

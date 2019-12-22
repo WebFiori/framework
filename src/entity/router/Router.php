@@ -269,7 +269,7 @@ class Router {
     }
     /**
      * Returns the value of the base URI which is appended to the path.
-     * This method is similar to calling the method <b>Router::<a href="#base">base()</a>.
+     * This method is similar to calling the method <b>Router::<a href="#base">base()</a></b>.
      * @return string
      * @since 1.0
      */

@@ -154,14 +154,14 @@ class SocketMailer {
      */
     public function __construct() {
         $this->setTimeout(5);
-        $this->receivers = array();
-        $this->cc = array();
-        $this->bcc = array();
-        $this->setSubject('EMAIL MESSAGE');
+        $this->receivers = [];
+        $this->cc = [];
+        $this->bcc = [];
+        $this->setSubject('Hello From WebFiori Framework');
         $this->writeMode = false;
         $this->isLoggedIn = false;
         $this->boundry = hash('sha256', date(DATE_ISO8601));
-        $this->attachments = array();
+        $this->attachments = [];
         $this->lastResponse = '';
         $this->useTls = false;
         $this->setPriority(0);

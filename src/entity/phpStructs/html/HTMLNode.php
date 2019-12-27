@@ -428,8 +428,8 @@ class HTMLNode {
                     }
                     unset($nodesNames[$nodesNamesIndex][1]);
                     $nodeName = '';
-                    $count = strlen($nodesNames[$nodesNamesIndex][0]);
-                    for($y = 0 ; $y < $count ; $y++){
+                    $nodeSignatureLen = strlen($nodesNames[$nodesNamesIndex][0]);
+                    for($y = 0 ; $y < $nodeSignatureLen ; $y++){
                         $char = $nodesNames[$nodesNamesIndex][0][$y];
                         if($char == ' '){
                             break;
@@ -441,6 +441,8 @@ class HTMLNode {
                     if((isset($nodeName[0]) && $nodeName[0] == '!') && (
                             isset($nodeName[1]) && $nodeName[1] == '-') && 
                             ( isset($nodeName[2]) && $nodeName[2] == '-')){
+                        //if we have '!' or '-' at the start of the name, then 
+                        //it must be a comment.
                         $nodesNames[$nodesNamesIndex]['tag-name'] = '#COMMENT';
                         $nodesNames[$nodesNamesIndex]['body-text'] = trim($nodesNames[$nodesNamesIndex][0],"!--");
                     }
@@ -464,8 +466,8 @@ class HTMLNode {
                                 $nodesNames[$nodesNamesIndex]['is-void-tag'] = false;
                             }
                         }
-                        $len = strlen($nodesNames[$nodesNamesIndex][0]);
-                        if($len != 0){
+                        $attributesStrLen = strlen($nodesNames[$nodesNamesIndex][0]);
+                        if($attributesStrLen != 0){
                             $nodesNames[$nodesNamesIndex]['attributes'] = self::_parseAttributes($nodesNames[$nodesNamesIndex][0]);
                         }
                         else{
@@ -473,6 +475,14 @@ class HTMLNode {
                         }
                     }
                     unset($nodesNames[$nodesNamesIndex][0]);
+                    if(isset($nodesNames[$nodesNamesIndex]['is-void-tag']) && 
+                            $nodesNames[$nodesNamesIndex]['is-void-tag'] === true && 
+                            isset($nodesNames[$nodesNamesIndex]['body-text']) && 
+                            strlen(trim($nodesNames[$nodesNamesIndex]['body-text'])) != 0){
+                        $nodesNamesIndex++;
+                        $nodesNames[$nodesNamesIndex]['tag-name'] = '#TEXT';
+                        $nodesNames[$nodesNamesIndex]['body-text'] = trim($nodesNames[$nodesNamesIndex-1]['body-text']);
+                    }
                     $nodesNamesIndex++;
                 }
             }
@@ -582,6 +592,9 @@ class HTMLNode {
                 unset($node['is-closing-tag']);
                 $retVal[] = $node;
             }
+            else if($node['tag-name'] == '#TEXT'){
+                $retVal[] = $node;
+            }
             else if($isVoid){
                 unset($node['is-closing-tag']);
                 unset($node['body-text']);
@@ -675,6 +688,9 @@ class HTMLNode {
     private static function _fromHTMLTextHelper_00($nodeArr) {
         if($nodeArr['tag-name'] == '#COMMENT'){
             return self::createComment($nodeArr['body-text']);
+        }
+        else if($nodeArr['tag-name'] == '#TEXT'){
+            return self::createTextNode($nodeArr['body-text']);
         }
         else{
             if($nodeArr['tag-name'] == 'head'){

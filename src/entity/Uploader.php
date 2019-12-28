@@ -230,6 +230,7 @@ class Uploader implements JsonI{
     public function __construct() {
         $this->uploadStatusMessage = 'NO ACTION';
         $this->files = array();
+        $this->setAssociatedFileName('files');
     }
     /**
      * The directory at which the file (or files) will be uploaded to.
@@ -282,12 +283,14 @@ class Uploader implements JsonI{
      * that holds uploaded file information. Each array will have the following 
      * indices:
      * <ul>
-     * <li><b>name</b>: The name of the file.</li>
-     * <li><b>size</b>: Size of the file in bytes.</li>
-     * <li><b>upload-path</b>: The name of the file.</li>
-     * <li><b>name</b>: The name of the file.</li>
-     * <li><b>name</b>: The name of the file.</li>
-     * <li><b>name</b>: The name of the file.</li>
+     * <li><b>file-name</b>: The name of the uploaded file.</li>
+     * <li><b>size</b>: The size of the uploaded file in bytes.</li>
+     * <li><b>upload-path</b>: The location at which the file was uploaded to in the server.</li>
+     * <li><b>upload-error</b>: Any error which has happend during upload.</li>
+     * <li><b>is-exist</b>: A boolean. Set to true if the file does exist in the server.</li>
+     * <li><b>is-replace</b>: A boolean. Set to true if the file was already uploaded and replaced.</li>
+     * <li><b>mime</b>: MIME type of the file.</li>
+     * <li><b>uploaded</b>: A boolean. Set to true if the file was uploaded.</li>
      * </ul>
      * @return array
      * @since 1.0
@@ -618,6 +621,11 @@ class Uploader implements JsonI{
         }
         return $this->files;
     }
+    /**
+     * Returns the name of the index at which the uploaded files will exist on in the array $_FILES.
+     * @return string the name of the index at which the uploaded files will exist on in the array $_FILES.
+     * Default value is 'files'.
+     */
     public function getAssociatedName(){
         return $this->asscociatedName;
     }
@@ -629,9 +637,24 @@ class Uploader implements JsonI{
     public function toJSON(){
         $j = new JsonX();
         $j->add('upload-directory', $this->getUploadDir());
+        $j->add('associated-file-name', $this->getAssociatedName());
         $j->add('allowed-types', $this->getExts());
+        $j->add('files', $this->getFiles());
         return $j;
     }
+    /**
+     * Returns a JSON string that represents the object.
+     * The string will be something the the following:
+<pre>
+{
+&nbsp&nbsp"upload-directory":"",
+&nbsp&nbsp"allowed-types":[],
+&nbsp&nbsp"files":[],
+&nbsp&nbsp"associated-file-name":""
+}
+</pre>
+     * @return string A JSON string.
+     */
     public function __toString() {
         return $this->toJSON().'';
     }

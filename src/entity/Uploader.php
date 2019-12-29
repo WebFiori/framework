@@ -340,8 +340,8 @@ class Uploader implements JsonI{
     }
     /**
      * Adds new extension to the array of allowed files types.
-     * @param string $ext File extension. The extension should be 
-     * included without suffix.(e.g. jpg, png, pdf)
+     * @param string $ext File extension (e.g. jpg, png, pdf).
+     * @return boolean If the extension is added, the method will return true.
      * @since 1.0
      */
     public function addExt($ext){
@@ -370,8 +370,7 @@ class Uploader implements JsonI{
     }
     /**
      * Removes an extension from the array of allowed files types.
-     * @param string $ext File extension. The extension should be included 
-     * without suffix.(e.g. jpg, png, pdf)
+     * @param string $ext File extension= (e.g. jpg, png, pdf,...).
      * @return boolean If the extension was removed, the method will return true.
      * @since 1.0
      */
@@ -397,11 +396,9 @@ class Uploader implements JsonI{
     }
     /**
      * Sets The name of the index at which the file is stored in the array $_FILES.
-     * This value is the value of the attribute 'name' in case of HTML 
+     * @param string $name The name of the index at which the file is stored in the array $_FILES. 
+     * This value is the value of the attribute 'name' in case of HTML file
      * input element.
-     * @param string $name The name of the index at which the file is stored in the array $_FILES.
-     * The value of this property is usually equals to the HTML element that is used in 
-     * the upload form.
      * @since 1.0
      */
     public function setAssociatedFileName($name){
@@ -514,12 +511,12 @@ class Uploader implements JsonI{
                     //multi-upload
                     $filesCount = count($fileOrFiles['name']);
                     for($x = 0 ; $x < $filesCount ; $x++){
-                        $fileInfoArr = array();
+                        $fileInfoArr = [];
                         $fileInfoArr['name'] = $fileOrFiles['name'][$x];
                         $fileInfoArr['size'] = $fileOrFiles['size'][$x];
                         $fileInfoArr['upload-path'] = $this->getUploadDir();
                         $fileInfoArr['upload-error'] = 0;
-                        $fileInfoArr['url'] = 'N/A';
+                        //$fileInfoArr['url'] = 'N/A';
                         if(!$this->isError($fileOrFiles['error'][$x])){
                             if($this->isValidExt($fileInfoArr['name'])){
                                 if(Util::isDirectory($this->getUploadDir()) == true){
@@ -588,12 +585,12 @@ class Uploader implements JsonI{
                 }
                 else{
                     //single file upload
-                    $fileInfoArr = array();
+                    $fileInfoArr = [];
                     $fileInfoArr['name'] = $fileOrFiles['name'];
                     $fileInfoArr['size'] = $fileOrFiles['size'];
                     $fileInfoArr['upload-path'] = $this->getUploadDir();
                     $fileInfoArr['upload-error'] = 0;
-                    $fileInfoArr['url'] = 'N/A';
+                    //$fileInfoArr['url'] = 'N/A';
                     $fileInfoArr['mime'] = 'N/A';
                     if(!$this->isError($fileOrFiles['error'])){
                         if($this->isValidExt($fileInfoArr['name'])){

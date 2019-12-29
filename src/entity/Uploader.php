@@ -47,9 +47,8 @@ use webfiori\entity\Util;
     //the value of the attribute 'name' of file input
     $uploader->setAssociatedFileName('user-files');
     //upload files
-    $uploader->upload();
+    $files = $uploader->upload();
     //now we can check upload status of each file.
-    $files = $uploader->getFiles();
     foreach($files as $fileArr){
         //...
     }
@@ -487,7 +486,7 @@ class Uploader implements JsonI{
     /**
      * Upload the file to the server.
      * @param bolean $replaceIfExist If a file with the given name found 
-     * and this attribute is set to true, the file will be replaced.
+     * and this parameter is set to true, the file will be replaced.
      * @return array An array which contains uploaded files info. Each index 
      * will contain an associative array which has the following info:
      * <ul>

@@ -28,7 +28,32 @@ use jsonx\JsonX;
 use webfiori\entity\File;
 use webfiori\entity\Util;
 /**
- * A helper class that is used to upload files to the server file system.
+ * A helper class that is used to upload most types of files to the server's file system.
+ * The main aim of this class is to allow the developer to upload files 
+ * without having to deal directly with the array $_FILES. It can be used to 
+ * perform the following tasks:
+ * <ul>
+ * <li>Upload one or multiple files.</li>
+ * <li>Restrict the types of files which can be uploaded.</li>
+ * <li>Store the uploaded file(s) to a specific location on the server.</li>
+ * <li>View upload status of each file.</li>
+ * </ul>
+ * A basic example on how to use this class:
+<pre>
+    $uploader = new Uploader();
+    //allow png only
+    $uploader->addExt('png');
+    $uploader->setUploadDir('\home\my-site\uploads');
+    //the value of the attribute 'name' of file input
+    $uploader->setAssociatedFileName('user-files');
+    //upload files
+    $uploader->upload();
+    //now we can check upload status of each file.
+    $files = $uploader->getFiles();
+    foreach($files as $fileArr){
+        //...
+    }
+</pre>
  * @author Ibrahim
  * @version 1.2.2
  */
@@ -641,10 +666,12 @@ class Uploader implements JsonI{
     }
     /**
      * Returns the name of the index at which the uploaded files will exist on in the array $_FILES.
+     * This value represents the value of the attribute 'name' of the files input 
+     * in case of HTML forms.
      * @return string the name of the index at which the uploaded files will exist on in the array $_FILES.
      * Default value is 'files'.
      */
-    public function getAssociatedName(){
+    public function getAssociatedFileName(){
         return $this->asscociatedName;
     }
     /**
@@ -655,7 +682,7 @@ class Uploader implements JsonI{
     public function toJSON(){
         $j = new JsonX();
         $j->add('upload-directory', $this->getUploadDir());
-        $j->add('associated-file-name', $this->getAssociatedName());
+        $j->add('associated-file-name', $this->getAssociatedFileName());
         $j->add('allowed-types', $this->getExts());
         $fsArr = [];
         foreach ($this->getFiles() as $fArr){

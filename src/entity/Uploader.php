@@ -30,7 +30,7 @@ use webfiori\entity\Util;
 /**
  * A helper class that is used to upload files to the server file system.
  * @author Ibrahim
- * @version 1.2.1
+ * @version 1.2.2
  */
 class Uploader implements JsonI{
     /**
@@ -299,7 +299,21 @@ class Uploader implements JsonI{
     public function getFiles() {
         return $this->files;
     }
-
+    /**
+     * Adds multiple extensions at once to the set of allowed files types.
+     * @param array $arr An array of strings. Each string represents a file type.
+     * @return array The method will return an associative array of booleans. 
+     * The key value will be the extension name and the value represents the status 
+     * of the addition. If added, it well be set to true.
+     * @since 1.2.2
+     */
+    public function addExts($arr) {
+        $retVal = [];
+        foreach ($arr as $ext){
+            $retVal[] = $this->addExt($ext);
+        }
+        return $retVal;
+    }
     /**
      * Adds new extension to the array of allowed files types.
      * @param string $ext File extension. The extension should be 
@@ -359,6 +373,8 @@ class Uploader implements JsonI{
     }
     /**
      * Sets The name of the index at which the file is stored in the array $_FILES.
+     * This value is the value of the attribute 'name' in case of HTML 
+     * input element.
      * @param string $name The name of the index at which the file is stored in the array $_FILES.
      * The value of this property is usually equals to the HTML element that is used in 
      * the upload form.

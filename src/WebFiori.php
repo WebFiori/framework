@@ -125,7 +125,7 @@ class WebFiori{
      * @return WebFiori An instance of the class.
      * @since 1.0
      */
-    public static function &getAndStart(){
+    public static function getAndStart(){
         if(self::$classStatus == 'NONE'){
             if(self::$LC === null){
                 self::$classStatus = 'INITIALIZING';
@@ -615,7 +615,7 @@ class WebFiori{
 }
 //start the system
 WebFiori::getAndStart();
-if(php_sapi_name() == 'cli'){
+if(CLI::isCLI() === true){
     CLI::runCLI();
 }
 else{

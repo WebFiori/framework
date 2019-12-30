@@ -37,6 +37,7 @@ use webfiori\entity\Util;
  * <li>Restrict the types of files which can be uploaded.</li>
  * <li>Store the uploaded file(s) to a specific location on the server.</li>
  * <li>View upload status of each file.</li>
+ * <li>The ability to get MIME type of most file types using file extension only.<li>
  * </ul>
  * A basic example on how to use this class:
 <pre>

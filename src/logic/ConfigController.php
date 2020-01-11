@@ -62,18 +62,18 @@ class ConfigController extends Controller{
      * This array has the following indices and values:
      * <ul>
      * <li>is-config = 'false'</li>
-     * <li>release-date = '01-01-2019 (DD-MM-YYYY)'</li>
-     * <li>version = '1.0.1'</li>
-     * <li>version-type = 'Stable'</li>
-     * <li>config-file-version => '1.3.2'</li>
-     * <li>databases = []</li>
+     * <li>release-date</li>
+     * <li>version</li>
+     * <li>version-type</li>
+     * <li>config-file-version</li>
+     * <li>databases</li>
      * </ul>
      * @since 1.0
      */
     const INITIAL_CONFIG_VARS = [
         'is-config'=>'false',
-        'release-date'=>'2019-12-05',
-        'version'=>'1.0.7',
+        'release-date'=>'2020-01-10',
+        'version'=>'1.0.8',
         'version-type'=>'Stable',
         'config-file-version'=>'1.3.4',
         'databases'=>[]

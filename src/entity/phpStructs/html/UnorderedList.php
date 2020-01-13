@@ -36,9 +36,11 @@ class UnorderedList extends HTMLNode{
      * Creates new instance of the class.
      * @since 1.0
      */
-    public function __construct() {
+    public function __construct($arrOfItems = [], $escHtmlEntities = true) {
         parent::__construct('ul');
+        $this->addListItems($arrOfItems, $escHtmlEntities);
     }
+
     /**
      * Adds new item to the list.
      * @param string|ListItem $listItemText The text that will be displayed by the 

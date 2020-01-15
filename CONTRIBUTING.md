@@ -17,3 +17,7 @@ Overall, the framework follows the same convention as Java Programming Language.
 * Always place one class per file.
 * The name of your .php file should be the same as your class name.
 * Use 'camelCase' in your methods names.
+
+## Other rules to follow:
+* Make sure that you add 'PHPDoc' to your code.
+* Always create tests for new features you add before submitting.

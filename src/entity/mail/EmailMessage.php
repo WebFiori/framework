@@ -82,7 +82,7 @@ class EmailMessage {
             if($acc instanceof SMTPAccount){
                 $this->socketMailer = EmailController::get()->getSocketMailer($acc);
                 if($this->socketMailer == EmailController::INV_CREDENTIALS){
-                    throw new Exception('The account "'.$sendAccountName.'" has inalid credintials.');
+                    throw new Exception('The account "'.$sendAccountName.'" has invalid credintials.');
                 }
                 else if($this->socketMailer == EmailController::INV_HOST_OR_PORT){
                     throw new Exception('The account "'.$sendAccountName.'" has invalid host or port number. Port: '.$acc->getPort().', Host: '.$acc->getServerAddress().'.');

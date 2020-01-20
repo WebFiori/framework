@@ -4,6 +4,25 @@ php:
     - 7.2
     - 7.3
     - 7.4
+arch:
+    - amd64
+    - ppc64le
+    - s390x
+    - arm64
+jobs:
+    exclude:
+        - php: 5.6
+          arch: s390x
+        - php: 5.6
+          arch: arm64
+    allow_failures:
+        - arch: ppc64le
+        - arch: s390x
+        - arch: arm64
+os:
+    - linux
+    # - osx # Services are not supported on osx
+    # - windows # The language 'php' is currently unsupported on the Windows Build Environment. 
 services:
     - mysql
 addons:

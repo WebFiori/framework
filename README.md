@@ -48,6 +48,30 @@ One of the things that any developer cares about any software project is the pro
 ## Getting Started 
 To learn the basics of how to use the framework, please head on to https://programmingacademia.com/webfiori/learn. Also, you can head on to the following playlist in YouTube which contains a good set of videos which can help: https://www.youtube.com/playlist?list=PLeU-QhqUhxjkACpXiPTRM9fH_zw1KF1UD.
 
+## Supported Environments 
+| PHP | AMD64 (Targeted)   | ppc64le              | s390x                | arm64                |
+| --- | -------------------- | -------------------- | -------------------- | -------------------- |
+| 5.6 | [![Build01][01]][0]  | [![Build02][05]][0]  | Not Applicable       | Not Applicable       |
+| 7.2 | [![Build05][02]][0]  | [![Build06][06]][0]  | [![Build07][07]][0]  | [![Build08][08]][0]  |
+| 7.3 | [![Build09][03]][0]  | [![Build10][09]][0]  | [![Build11][10]][0]  | [![Build12][11]][0]  |
+| 7.4 | [![Build13][04]][0]  | [![Build14][12]][0]  | [![Build15][13]][0]  | [![Build16][14]][0]  |
+
+[0]: https://travis-ci.org/usernane/webfiori
+[01]: https://travis-matrix-badges.herokuapp.com/repos/usernane/webfiori/branches/master/1
+[02]: https://travis-matrix-badges.herokuapp.com/repos/usernane/webfiori/branches/master/2
+[03]: https://travis-matrix-badges.herokuapp.com/repos/usernane/webfiori/branches/master/3
+[04]: https://travis-matrix-badges.herokuapp.com/repos/usernane/webfiori/branches/master/4
+[05]: https://travis-matrix-badges.herokuapp.com/repos/usernane/webfiori/branches/master/5
+[06]: https://travis-matrix-badges.herokuapp.com/repos/usernane/webfiori/branches/master/6
+[07]: https://travis-matrix-badges.herokuapp.com/repos/usernane/webfiori/branches/master/7
+[08]: https://travis-matrix-badges.herokuapp.com/repos/usernane/webfiori/branches/master/8
+[09]: https://travis-matrix-badges.herokuapp.com/repos/usernane/webfiori/branches/master/9
+[10]: https://travis-matrix-badges.herokuapp.com/repos/usernane/webfiori/branches/master/10
+[11]: https://travis-matrix-badges.herokuapp.com/repos/usernane/webfiori/branches/master/11
+[12]: https://travis-matrix-badges.herokuapp.com/repos/usernane/webfiori/branches/master/12
+[13]: https://travis-matrix-badges.herokuapp.com/repos/usernane/webfiori/branches/master/13
+[14]: https://travis-matrix-badges.herokuapp.com/repos/usernane/webfiori/branches/master/14
+
 ## API Docs
 To read API docs of the framework, please head on to https://programmingacademia.com/webfiori/docs/webfiori.
 

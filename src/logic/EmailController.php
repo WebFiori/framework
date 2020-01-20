@@ -57,7 +57,7 @@ class EmailController extends Controller{
      * @return EmailController
      * @since 1.0
      */
-    public static function &get(){
+    public static function get(){
         if(self::$instance === null){
             self::$instance = new EmailController();
         }
@@ -178,7 +178,7 @@ class EmailController extends Controller{
             }
         }
     }
-    private function &_getAccount($name){
+    private function _getAccount($name){
         if(isset($this->emailAccounts[$name])){
             return $this->emailAccounts[$name];
         }
@@ -195,7 +195,7 @@ class EmailController extends Controller{
      * method will return null.
      * @since 1.0
      */
-    public static function &getAccount($name){
+    public static function getAccount($name){
         return self::get()->_getAccount($name);
     }
     private function _getAccounts(){
@@ -225,7 +225,7 @@ class EmailController extends Controller{
     public function removeAccount($accountName) {
         $retVal = false;
         if(class_exists('webfiori\conf\MailConfig')){
-            $account = &MailConfig::getAccount($accountName);
+            $account = MailConfig::getAccount($accountName);
             if($account instanceof SMTPAccount){
                 $accountsArr = MailConfig::getAccounts();
                 unset($accountsArr[$accountName]);

@@ -982,7 +982,7 @@ abstract class MySQLQuery{
                     }
                     else{
                         if($type == 'tinyblob' || $type == 'mediumblob' || $type == 'longblob'){
-                            $fixedPath = str_replace('\\', '/', $colIndex);
+                            $fixedPath = str_replace('\\', '/', $val);
                             if(file_exists($fixedPath)){
                                 $file = fopen($fixedPath, 'r');
                                 $data = '';

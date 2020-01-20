@@ -106,13 +106,13 @@ class WebFiori{
      * The stages for initializing the framework are as follows:
      * <ul>
      * <li>Setting the encoding to UTF-8 for the 'mb' functions.</li>
-     * <li>Setting memory limit to 2GB. Developer can change this if he wants.</li>
+     * <li>Setting memory limit to 2GB per script. Developer can change this if he wants.</li>
      * <li>Setting time zone. Default is set to 'Asia/Riyadh' For supported 
      * time zones, see <a target="_blank" href="http://php.net/manual/en/timezones.php">http://php.net/manual/en/timezones.php</a>.</li>
      * <li>Creating the constant ROOT_DIR.</li>
-     * <li>Loading the auto loder class.</li>
+     * <li>Loading the auto loader class.</li>
      * <li>Initializing user-defined autoload directories.</li>
-     * <li>Creating an instance of SystemFunctions, WebsiteFunctions and BasicMailFunctions.</li>
+     * <li>Creating an instance of ConfigController, WebsiteController and EmailController.</li>
      * <li>Initializing routes.</li>
      * <li>Checking system status (database connection and configuration status)</li>
      * <li>Initializing CRON jobs.</li>
@@ -125,7 +125,7 @@ class WebFiori{
      * @return WebFiori An instance of the class.
      * @since 1.0
      */
-    public static function &getAndStart(){
+    public static function getAndStart(){
         if(self::$classStatus == 'NONE'){
             if(self::$LC === null){
                 self::$classStatus = 'INITIALIZING';
@@ -211,7 +211,7 @@ class WebFiori{
         self::$SF = ConfigController::get();
         self::$WF = WebsiteController::get();
         self::$BMF = EmailController::get();
-        //initialize main session with name = 'wf-session'.
+        
         $this->sysStatus = Util::checkSystemStatus(true);
         if($this->sysStatus == Util::MISSING_CONF_FILE || $this->sysStatus == Util::MISSING_SITE_CONF_FILE){
             self::$SF->createConfigFile();
@@ -224,6 +224,7 @@ class WebFiori{
             $this->sysStatus = Util::DB_NEED_CONF;
         }
         
+        //Initialize routes.
         APIRoutes::create();
         ViewRoutes::create();
         ClosureRoutes::create();
@@ -250,7 +251,7 @@ class WebFiori{
                 //configuration is not equal to true
 
                 //change system config status to configured.
-                //WebFiori::getSysFunctions()->configured(true);
+                //WebFiori::getSysController()->configured(true);
 
                 //show error message to tell the developer how to configure the system.
                 $this->_needConfigration();
@@ -565,7 +566,7 @@ class WebFiori{
             $j->add('description','This error means that the system is not configured yet. '
                     . 'Make sure to make the method Config::isConfig() return true. '
                     . 'One way is to go to the file "conf/Config.php". Change attribute "isConfigured" value to true. '
-                    . 'Or Use the method SystemFunctions::configured(true). You must supply \'true\' as an attribute. '
+                    . 'Or Use the method ConfigController::configured(true). You must supply \'true\' as an attribute. '
                     . 'If you want to make the system do something else if the return value of the '
                     . 'given method is false, then open the file \'WebFiori.php\' and '
                     . 'change the code in the \'else\' code block at the end of class constructor. (Inside the "if" block).');
@@ -584,12 +585,12 @@ class WebFiori{
             . '<hr>'
             . '<p>'
             . 'This error means that the system is not configured yet. '
-            . 'Make sure to make the method Config::isConfig() return true. There are two ways '
+            . 'Make sure to make the method <a target="_blank" href="https://programmingacademia.com/webfiori/docs/webfiori/conf/Config#isConfig">Config::isConfig()</a> return true. There are two ways '
             . 'to change return value of this method:'
             . '</p>'
             . '<ul>'
             . '<li>Go to the file "conf/Config.php". Change attribute "isConfigured" value to true.</li>'
-            . '<li>Use the method SystemFunctions::configured(true). You must supply \'true\' as an attribute.</li>'
+            . '<li>Use the method <a target="_blank" href="https://programmingacademia.com/webfiori/docs/webfiori/logic/ConfigController#configured">ConfigController::configured</a>(true). You must supply \'true\' as an attribute.</li>'
             . '<li>After that, reload the page and the system will work.</li>'
             . '</ul>'
             . '<p>'
@@ -615,7 +616,7 @@ class WebFiori{
 }
 //start the system
 WebFiori::getAndStart();
-if(php_sapi_name() == 'cli'){
+if(CLI::isCLI() === true){
     CLI::runCLI();
 }
 else{

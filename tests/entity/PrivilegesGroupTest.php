@@ -119,6 +119,20 @@ class PrivilegesGroupTest extends TestCase{
     /**
      * @test
      */
+    public function testHasPrivilege01() {
+        $parent = new PrivilegesGroup('Parent');
+        $child = new PrivilegesGroup('Child');
+        $childOfChild = new PrivilegesGroup('Child_of_child');
+        $pr = new Privilege('Child_pr');
+        $childOfChild->addPrivilage($pr);
+        $child->setParentGroup($parent);
+        $childOfChild->setParentGroup($child);
+        $this->assertTrue($parent->hasPrivilege($pr));
+        $this->assertFalse($parent->hasPrivilege($pr,false));
+    }
+    /**
+     * @test
+     */
     public function testSetID00() {
         $parent = new PrivilegesGroup('Parent');
         $child = new PrivilegesGroup('Child');
@@ -127,6 +141,23 @@ class PrivilegesGroupTest extends TestCase{
         $child->setParentGroup($parent);
         $this->assertFalse($child->setID('Parent'));
         $this->assertEquals('Child',$child->getID());
+    }
+    /**
+     * @test
+     */
+    public function testSetID01() {
+        $parent = new PrivilegesGroup('Parent');
+        $child = new PrivilegesGroup('Child');
+        $childOfChild = new PrivilegesGroup('Child_of_child');
+        $pr = new Privilege('Child_pr');
+        $child->addPrivilage($pr);
+        $child->setParentGroup($parent);
+        $childOfChild->setParentGroup($child);
+        $this->assertFalse($child->setID('Parent'));
+        $this->assertEquals('Child',$child->getID());
+        $this->assertFalse($childOfChild->setID('Parent'));
+        $this->assertFalse($childOfChild->setID('Child'));
+        $this->assertFalse($parent->setID('Child_of_child'));
     }
     /**
      * 

@@ -186,6 +186,38 @@ class LanguageTest extends TestCase{
         $this->assertTrue(Language::unloadTranslation('zk'));
     }
     /**
+     * @test
+     */
+    public function testSet00() {
+        $lang = Language::loadTranslation('en');
+        $this->assertEquals('Please wait a moment...',$lang->get('general/status/wait'));
+        $this->assertTrue($lang->set('general/status', 'wait', 'Wait a sec...'));
+        $this->assertEquals('Wait a sec...',$lang->get('general/status/wait'));
+    }
+    /**
+     * @test
+     */
+    public function testSet01() {
+        $lang = Language::loadTranslation('en');
+        $this->assertFalse($lang->set('', '', ''));
+    }
+    /**
+     * @test
+     */
+    public function testSet02() {
+        $lang = Language::loadTranslation('en');
+        $this->assertFalse($lang->set('general/xcderf', 'a-var', 'mmm'));
+    }
+    /**
+     * @test
+     */
+    public function testSet03() {
+        $lang = Language::loadTranslation('en');
+        $this->assertEquals('array', gettype($lang->get('general')));
+        $this->assertTrue($lang->set('general', 'a-var', 'mmm'));
+        $this->assertEquals('mmm',$lang->get('general/a-var'));
+    }
+    /**
      * Testing the method Language::get() with non-exiting language variable.
      * @test
      */

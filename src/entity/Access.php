@@ -47,7 +47,7 @@ class Access {
      * @since 1.0
      */
     private function __construct() {
-        $this->userGroups = array();
+        $this->userGroups = [];
     }
     /**
      * Removes all created user groups and privileges.
@@ -61,7 +61,7 @@ class Access {
      * @return Access
      * @since 1.0
      */
-    private static function &get(){
+    private static function get(){
         if(self::$access !== null){
             return self::$access;
         }
@@ -98,13 +98,13 @@ class Access {
      * @param User $user The user which the permissions will be added to
      * @since 1.0
      */
-    public static function resolvePriviliges($str,&$user) {
+    public static function resolvePriviliges($str,$user) {
         if(strlen($str) > 0){
             if($user instanceof User){
                 $privilegesSplit = explode(';', $str);
-                $privilegesToHave = array();
-                $privilegesToNotHave = array();
-                $groupsBelongsTo = array();
+                $privilegesToHave = [];
+                $privilegesToNotHave = [];
+                $groupsBelongsTo = [];
                 foreach ($privilegesSplit as $privilegeStr){
                     $prSplit = explode('-', $privilegeStr);
                     if(count($prSplit) == 2){
@@ -161,7 +161,7 @@ class Access {
         return self::get()->_asArray();
     }
     private function _asArray() {
-        $retVal = array();
+        $retVal = [];
         foreach ($this->userGroups as $group){
             $retVal[] = $this->_asArrayHelper($group);
         }
@@ -172,20 +172,20 @@ class Access {
      * @param PrivilegesGroup $group
      */
     private function _asArrayHelper($group) {
-        $retVal = array(
+        $retVal = [
             'group-id'=>$group->getID(),
             'given-title'=>$group->getName(),
-            'child-groups'=>array(),
-            'privileges'=>array()
-        );
+            'child-groups'=>[],
+            'privileges'=>[]
+        ];
         foreach ($group->childGroups() as $groupX){
             $retVal['child-groups'][] = $this->_asArrayHelper($groupX);
         }
         foreach ($group->privileges() as $pr){
-            $retVal['privileges'][] = array(
+            $retVal['privileges'][] = [
                 'privilege-id'=>$pr->getID(),
                 'given-title'=>$pr->getName()
-            );
+            ];
         }
         return $retVal;
     }
@@ -216,7 +216,7 @@ class Access {
     private function _createPermissionsStr($user) {
         if($user instanceof User){
             $str = '';
-            $groupsBelongsTo = array();
+            $groupsBelongsTo = [];
             foreach ($this->userGroups as $group){
                 $this->__createPermissionsStrHelper($user, $group, $groupsBelongsTo, $str);
             }
@@ -268,7 +268,7 @@ class Access {
     }
 
     private function _privileges($groupId=null){
-        $prArr = array();
+        $prArr = [];
         foreach ($this->userGroups as $group){
             $this->_privilegesHelper($group, $prArr, $groupId);
         }
@@ -324,13 +324,14 @@ class Access {
      * @return PrivilegesGroup|null
      * @since 1.0
      */
-    private function &_getGroup($groupId) {
+    private function _getGroup($groupId) {
+        $trimmedId = trim($groupId);
         foreach ($this->userGroups as $g){
-            if($g->getID() == $groupId){
+            if($g->getID() == $trimmedId){
                 return $g;
             }
             else{
-                $g = $this->_getGroupHelper($g, $groupId);
+                $g = $this->_getGroupHelper($g, $trimmedId);
                 if($g instanceof PrivilegesGroup){
                     return $g;
                 }
@@ -343,7 +344,7 @@ class Access {
      * 
      * @param PrivilegesGroup $group
      */
-    private function &_getGroupHelper(&$group,$groupId){
+    private function _getGroupHelper($group,$groupId){
         if($groupId == $group->getID()){
             return $group;
         }
@@ -369,8 +370,8 @@ class Access {
      * null.
      * @since 1.0
      */
-    public static function &getPrivilege($id){
-        $pr = &Access::get()->_getPrivilege($id);
+    public static function getPrivilege($id){
+        $pr = Access::get()->_getPrivilege($id);
         return $pr;
     }
     /**
@@ -378,7 +379,7 @@ class Access {
      * @param type $privId
      * @return type
      */
-    private function &_getPrivilege($privId) {
+    private function _getPrivilege($privId) {
         foreach ($this->userGroups as $g){
             $p = $this->_getPrivilegeH($privId, $g);
             if($p !== null){
@@ -393,7 +394,7 @@ class Access {
      * @param PrivilegesGroup $group
      * @return type
      */
-    private function &_getPrivilegeH($privId,$group){
+    private function _getPrivilegeH($privId,$group){
         foreach ($group->privileges() as $p){
             if($p->getID() == $privId){
                 return $p;
@@ -493,8 +494,8 @@ class Access {
      * It will be returned. If not, the method will return null.
      * @since 1.0
      */
-    public static function &getGroup($groupId){
-        $g = &Access::get()->_getGroup($groupId);
+    public static function getGroup($groupId){
+        $g = Access::get()->_getGroup($groupId);
         return $g;
     }
     /**
@@ -525,16 +526,17 @@ class Access {
     }
     
     private function _createGroup($groupId,$parentGroupID=null){
-        if($this->_validateId($groupId)){
+        $trimmedId = trim($groupId);
+        if($this->_validateId($trimmedId)){
             foreach ($this->userGroups as $g){
-                if($g->getID() == $groupId){
+                if($g->getID() == $trimmedId){
                     return false;
                 }
             }
             $group = new PrivilegesGroup();
-            $group->setID($groupId);
+            $group->setID($trimmedId);
             if($parentGroupID !== null){
-                $parentG = &$this->getGroup($parentGroupID);
+                $parentG = $this->getGroup($parentGroupID);
                 if($parentG instanceof PrivilegesGroup){
                     $group->setParentGroup($parentG);
                     return true;
@@ -589,7 +591,7 @@ class Access {
      * @since 1.0.1 
      */
     public static function newPrivileges($groupId,$prNamesArr) {
-        $retVal = array();
+        $retVal = [];
         $count = count($prNamesArr);
         for($x = 0 ; $x < $count ; $x++){
             $retVal[$prNamesArr[$x]] = self::newPrivilege($groupId, $prNamesArr[$x]);
@@ -624,7 +626,7 @@ class Access {
         if($this->_validateId($privilegeId)){
             $pr = self::getPrivilege($privilegeId);
             if($pr === null){
-                $g = &$this->_getGroup($groupId);
+                $g = $this->_getGroup($groupId);
                 if(($g instanceof PrivilegesGroup) && $groupId == $g->getID()){
                     foreach (Access::groups() as $xG){
                         if($this->_checkID($privilegeId, $xG)){

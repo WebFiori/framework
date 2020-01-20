@@ -74,7 +74,7 @@ class JsCode extends HTMLNode{
      * @since 1.0
      * @param type $val
      */
-    public function setClassName($val) {
+    public function setClassName($val,$val2=true) {
         
     }
     /**

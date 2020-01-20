@@ -27,13 +27,15 @@ use Exception;
 use phpStructs\LinkedList;
 use phpStructs\Stack;
 use phpStructs\Queue;
+use Countable;
+use Iterator;
 /**
  * A class that represents HTML element.
  *
  * @author Ibrahim
- * @version 1.7.8
+ * @version 1.7.9
  */
-class HTMLNode {
+class HTMLNode implements Countable, Iterator{
     /**
      * An array that contains all unpaired (or void) HTML tags.
      * An unpaired tag is a tag that does tot require closing tag. Its 
@@ -249,6 +251,98 @@ class HTMLNode {
         $this->useOriginalTxt = false;
     }
     /**
+     * Sets multiple attributes at once.
+     * @param array $attrsArr An associative array that has attributes names 
+     * and values.. The indices will represents 
+     * attributes names and the value of each index represents the values of 
+     * the attributes.
+     * @return boolean|array If the given value does not represents an array, 
+     * the method will return false. Other than that, the method will return 
+     * an associative array. The indices of the array will be the names of the 
+     * attributes and the values will be booleans. If an attribute is set, the 
+     * value of the index will be set to true. If not set, the index will be 
+     * set to false.
+     * @since 1.7.9
+     */
+    public function setAttributes($attrsArr) {
+        if(gettype($attrsArr) == 'array'){
+            $retVal=[];
+            foreach ($attrsArr as $attr => $val){
+                $retVal[$attr] = $this->setAttribute($attr, $val);
+            }
+            return $retVal;
+        }
+        return false;
+    }
+    /**
+     * Returns the value of the attribute 'id' of the element.
+     * @return string|null If the attribute 'id' is set, the method will return 
+     * its value. If not set, the method will return null.
+     * @since 1.7.9
+     */
+    public function getID() {
+        return $this->getAttribute('id');
+    }
+    /**
+     * Returns the value of the attribute 'class' of the element.
+     * @return string|null If the attribute 'class' is set, the method will return 
+     * its value. If not set, the method will return null.
+     * @since 1.7.9
+     */
+    public function getClassName() {
+        return $this->getAttribute('class');
+    }
+    /**
+     * Returns the value of the attribute 'title' of the element.
+     * @return string|null If the attribute 'title' is set, the method will return 
+     * its value. If not set, the method will return null.
+     * @since 1.7.9
+     */
+    public function getTitle() {
+        return $this->getAttribute('title');
+    }
+    /**
+     * Returns the value of the attribute 'tabindex' of the element.
+     * @return string|null If the attribute 'tabindex' is set, the method will return 
+     * its value. If not set, the method will return null.
+     * @since 1.7.9
+     */
+    public function getTabIndex() {
+        return $this->getAttribute('tabindex');
+    }
+    /**
+     * Returns the value of the attribute 'dir' of the element.
+     * @return string|null If the attribute 'dir' is set, the method will return 
+     * its value. If not set, the method will return null.
+     * @since 1.7.9
+     */
+    public function getWritingDir() {
+        return $this->getAttribute('dir');
+    }
+    /**
+     * Returns the value of the attribute 'name' of the element.
+     * @return string|null If the attribute 'name' is set, the method will return 
+     * its value. If not set, the method will return null.
+     * @since 1.7.9
+     */
+    public function getName() {
+        return $this->getAttribute('name');
+    }
+    /**
+     * Sets the attribute 'class' for all child nodes.
+     * @param string $cName The value of the attribute.
+     * @param boolean $override If set to true and the child has already this 
+     * attribute set, the given value will override the existing value. If set to 
+     * false, the new value will be appended to the existing one. Default is 
+     * true.
+     * @since 1.7.9
+     */
+    public function applyClass($cName,$override=true) {
+        foreach ($this as $child){
+            $child->setClassName($cName,$override);
+        }
+    }
+    /**
      * Validates the name of the node.
      * @param string $name The name of the node in lower case.
      * @return boolean If the name is valid, the method will return true. If 
@@ -344,14 +438,14 @@ class HTMLNode {
                 $node = $array[$x];
                 if(strlen(trim($node)) != 0){
                     $nodesNames[$nodesNamesIndex] = explode('>', $node);
-                    $nodesNames[$nodesNamesIndex]['body-text'] = $nodesNames[$nodesNamesIndex][1];
+                    $nodesNames[$nodesNamesIndex]['body-text'] = trim($nodesNames[$nodesNamesIndex][1]);
                     if(strlen($nodesNames[$nodesNamesIndex]['body-text']) == 0){
                         unset($nodesNames[$nodesNamesIndex]['body-text']);
                     }
                     unset($nodesNames[$nodesNamesIndex][1]);
                     $nodeName = '';
-                    $count = strlen($nodesNames[$nodesNamesIndex][0]);
-                    for($y = 0 ; $y < $count ; $y++){
+                    $nodeSignatureLen = strlen($nodesNames[$nodesNamesIndex][0]);
+                    for($y = 0 ; $y < $nodeSignatureLen ; $y++){
                         $char = $nodesNames[$nodesNamesIndex][0][$y];
                         if($char == ' '){
                             break;
@@ -363,8 +457,17 @@ class HTMLNode {
                     if((isset($nodeName[0]) && $nodeName[0] == '!') && (
                             isset($nodeName[1]) && $nodeName[1] == '-') && 
                             ( isset($nodeName[2]) && $nodeName[2] == '-')){
+                        //if we have '!' or '-' at the start of the name, then 
+                        //it must be a comment.
                         $nodesNames[$nodesNamesIndex]['tag-name'] = '#COMMENT';
-                        $nodesNames[$nodesNamesIndex]['body-text'] = trim($nodesNames[$nodesNamesIndex][0],"!--");
+                        if(isset($nodesNames[$nodesNamesIndex]['body-text'])){
+                            //a text node after a comment node.
+                            $nodesNames[$nodesNamesIndex+1] = [
+                                'body-text'=>$nodesNames[$nodesNamesIndex]['body-text'],
+                                'tag-name'=>'#TEXT'
+                            ];
+                        }
+                        $nodesNames[$nodesNamesIndex]['body-text'] = trim(trim($nodesNames[$nodesNamesIndex][0],"!--"));
                     }
                     else{
                         $nodeName = strtolower($nodeName);
@@ -386,8 +489,8 @@ class HTMLNode {
                                 $nodesNames[$nodesNamesIndex]['is-void-tag'] = false;
                             }
                         }
-                        $len = strlen($nodesNames[$nodesNamesIndex][0]);
-                        if($len != 0){
+                        $attributesStrLen = strlen($nodesNames[$nodesNamesIndex][0]);
+                        if($attributesStrLen != 0){
                             $nodesNames[$nodesNamesIndex]['attributes'] = self::_parseAttributes($nodesNames[$nodesNamesIndex][0]);
                         }
                         else{
@@ -395,7 +498,19 @@ class HTMLNode {
                         }
                     }
                     unset($nodesNames[$nodesNamesIndex][0]);
+                    if(isset($nodesNames[$nodesNamesIndex]['body-text']) && 
+                            strlen(trim($nodesNames[$nodesNamesIndex]['body-text'])) != 0 && 
+                            $nodesNames[$nodesNamesIndex]['tag-name'] != '#COMMENT'){
+                        $nodesNamesIndex++;
+                        $nodesNames[$nodesNamesIndex]['tag-name'] = '#TEXT';
+                        $nodesNames[$nodesNamesIndex]['body-text'] = trim($nodesNames[$nodesNamesIndex-1]['body-text']);
+                        unset($nodesNames[$nodesNamesIndex-1]['body-text']);
+                    }
                     $nodesNamesIndex++;
+                    if(isset($nodesNames[$nodesNamesIndex])){
+                        //skip a text node which is added after a comment node
+                        $nodesNamesIndex++;
+                    }
                 }
             }
             $x = 0;
@@ -504,6 +619,9 @@ class HTMLNode {
                 unset($node['is-closing-tag']);
                 $retVal[] = $node;
             }
+            else if($node['tag-name'] == '#TEXT'){
+                $retVal[] = $node;
+            }
             else if($isVoid){
                 unset($node['is-closing-tag']);
                 unset($node['body-text']);
@@ -598,6 +716,9 @@ class HTMLNode {
         if($nodeArr['tag-name'] == '#COMMENT'){
             return self::createComment($nodeArr['body-text']);
         }
+        else if($nodeArr['tag-name'] == '#TEXT'){
+            return self::createTextNode($nodeArr['body-text']);
+        }
         else{
             if($nodeArr['tag-name'] == 'head'){
                 $htmlNode = new HeadNode();
@@ -605,7 +726,9 @@ class HTMLNode {
                 for($x = 0 ; $x < count($nodeArr['children']) ; $x++){
                     $chNode = $nodeArr['children'][$x];
                     if($chNode['tag-name'] == 'title'){
-                        $htmlNode->setTitle($chNode['body-text']);
+                        if(count($chNode['children']) == 1 && $chNode['children'][0]['tag-name'] == '#TEXT'){
+                            $htmlNode->setTitle($chNode['children'][0]['body-text']);
+                        }
                         foreach ($chNode['attributes'] as $attr => $val){
                             $htmlNode->getTitleNode()->setAttribute($attr, $val);
                         }
@@ -620,7 +743,7 @@ class HTMLNode {
                         }
                         if($isBaseSet){
                             foreach ($chNode['attributes'] as $attr => $val){
-                                $htmlNode->getBase()->setAttribute($attr, $val);
+                                $htmlNode->getBaseNode()->setAttribute($attr, $val);
                             }
                         }
                     }
@@ -966,7 +1089,7 @@ class HTMLNode {
         return $this->name;
     }
     /**
-     * Returns an array of all node attributes with the values
+     * Returns an associative array of all node attributes alongside the values.
      * @return array|null an associative array. The keys will act as the attribute 
      * name and the value will act as the value of the attribute. If the node 
      * is a text node, the method will return null.
@@ -979,9 +1102,9 @@ class HTMLNode {
      * Sets a value for an attribute.
      * @param string $name The name of the attribute. If the attribute does not 
      * exist, it will be created. If already exists, its value will be updated. 
-     * Note that if the node type is text node, 
-     * the attribute will never be created.
-     * @param string $val The value of the attribute. Default is empty string.
+     * Note that if the node type is text node, the attribute will never be created.
+     * @param string $val The value of the attribute. Default is empty string. Note 
+     * that if the value has any extra spaces, they will be trimmed.
      * @return boolean If the attribute is set, the method will return true. The 
      * method will return false only if the given name is empty string 
      * or the name of the attribute is 'dir' and the value is not 'ltr' or 'rtl'.
@@ -989,23 +1112,24 @@ class HTMLNode {
      */
     public function setAttribute($name,$val=''){
         $trimmedName = trim($name);
+        $trimmedVal = trim($val);
         if(!$this->isTextNode() && !$this->isComment() && strlen($trimmedName) != 0){
             $lower = strtolower($trimmedName);
             $isValid = $this->_validateName($lower);
             if($isValid){
                 if($lower == 'dir'){
-                    $lowerVal = strtolower($val);
+                    $lowerVal = strtolower($trimmedVal);
                     if($lowerVal == 'ltr' || $lowerVal == 'rtl'){
                         $this->attributes[$lower] = $lowerVal;
                         return true;
                     }
                 }
                 else if($trimmedName == 'style'){
-                    $styleArr = $this->_styleArray($val);
+                    $styleArr = $this->_styleArray($trimmedVal);
                     return $this->setStyle($styleArr);
                 }
                 else{
-                    $this->attributes[$lower] = $val;
+                    $this->attributes[$lower] = $trimmedVal;
                     return true;
                 }
             }
@@ -1083,11 +1207,20 @@ class HTMLNode {
     }
     /**
      * Sets the value of the attribute 'class' of the node.
-     * @param string $val The value to set.
+     * @param string $val The name of the class.
+     * @param boolean $override If this parameter is set to false and the node 
+     * has a class already set, the given class name will be appended to the 
+     * existing one. Default is true which means the attribute will be set as 
+     * new.
      * @since 1.2
      */
-    public function setClassName($val){
-        $this->setAttribute('class',$val);
+    public function setClassName($val,$override=true){
+        if($override === true){
+            $this->setAttribute('class',$val);
+        }
+        else{
+            $this->setAttribute('class', $this->getClassName().' '.$val);
+        }
     }
     /**
      * Sets the value of the attribute 'name' of the node.
@@ -1186,10 +1319,44 @@ class HTMLNode {
         return $this->null;
     }
     /**
+     * Insert new HTML element at specific position.
+     * @param HTMLNode $el The new element that will be inserted. It is possible 
+     * to insert child elements to the element if the following conditions are 
+     * met:
+     * <ul>
+     * <li>If the node is not a text node.</li>
+     * <li>The node is not a comment node.</li>
+     * <li>The note is not a void node.</li>
+     * <li>The note is not it self. (making a node as a child of it self)</li>
+     * </ul>
+     * @param int $position The position at which the element will be added. 
+     * it must be a value between 0 and <code>HTMLNode::childrenCount()</code> inclusive.
+     * @return boolean If the element is inserted, the method will return true. 
+     * Other than that, it will return false.
+     * @since 1.7.9
+     */
+    public function insert($el,$position) {
+        $retVal = false;
+        if(!$this->isTextNode() && !$this->isComment() && $this->mustClose()){
+            if(($el instanceof HTMLNode) && $el !== $this){
+                $retVal = $this->childrenList->insert($el, $position);
+                if($retVal === true){
+                    $el->_setParent($this);
+                }
+            }
+        }
+        return $retVal;
+    }
+    /**
      * Adds new child node.
      * @param HTMLNode $node The node that will be added. The node can have 
-     * child nodes only if 3 conditions are met. If the node is not a text node 
-     * , the node is not a comment node and the node must have ending tag.
+     * child nodes only if 4 conditions are met:
+     * <ul>
+     * <li>If the node is not a text node.</li>
+     * <li>The node is not a comment node.</li>
+     * <li>The note is not a void node.</li>
+     * <li>The note is not it self. (making a node as a child of it self)</li>
+     * </ul>
      * @since 1.0
      */
     public function addChild($node) {
@@ -1263,7 +1430,9 @@ class HTMLNode {
      * Returns the value of the text that this node represents.
      * @return string If the node is a text node or a comment node, 
      * the method will return the text in the body of the node. If not, 
-     * the method will return empty string.
+     * the method will return empty string. Note that if the node represents 
+     * a text node and HTML entities where escaped while setting its text, the 
+     * returned value will have HTML entities escaped.
      * @since 1.0
      */
     public function getText() {
@@ -1273,8 +1442,9 @@ class HTMLNode {
         return '';
     }
     /**
-     * 
-     * @return type
+     * Returns the original text which was set in the body of the node.
+     * This only applies to text nodes and comment nodes.
+     * @return string The original text without any modifications.
      */
     public function getOriginalText() {
         return $this->originalText;
@@ -1876,4 +2046,72 @@ class HTMLNode {
     public function __toString() {
         return $this->toHTML(false);
     }
+    /**
+     * Returns the number of child nodes attached to the node.
+     * If the node is a text node, a comment node or a void node, 
+     * the method will return 0.
+     * @return int The number of child nodes attached to the node.
+     * @since 1.7.9
+     */
+    public function count() {
+        return $this->childrenCount();
+    }
+    /**
+     * Returns the element that the iterator is currently is pointing to.
+     * This method is only used if the list is used in a 'foreach' loop. 
+     * The developer should not call it manually unless he knows what he 
+     * is doing.
+     * @return HTMLNode The element that the iterator is currently is pointing to.
+     * @since 1.7.9
+     */
+    public function current() {
+        return $this->childrenList->current();
+    }
+    /**
+     * Returns the current node in the iterator.
+     * This method is only used if the list is used in a 'foreach' loop. 
+     * The developer should not call it manually unless he knows what he 
+     * is doing.
+     * @return HTMLNode An object of type 'HTMLNode' or null if the node 
+     * has no children is empty or the iterator is finished.
+     * @since 1.4.3 
+     */
+    public function key() {
+        $this->childrenList->key()->data();
+    }
+    /**
+     * Returns the next element in the iterator.
+     * This method is only used if the list is used in a 'foreach' loop. 
+     * The developer should not call it manually unless he knows what he 
+     * is doing.
+     * @return HTMLNode The next element in the iterator. If the iterator is 
+     * finished or the list is empty, the method will return null.
+     * @since 1.4.3 
+     */
+    public function next() {
+        $this->childrenList->next();
+    }
+    /**
+     * Return iterator pointer to the first element in the list.
+     * This method is only used if the list is used in a 'foreach' loop. 
+     * The developer should not call it manually unless he knows what he 
+     * is doing.
+     * @since 1.4.3 
+     */
+    public function rewind() {
+        $this->childrenList->rewind();
+    }
+    /**
+     * Checks if the iterator has more elements or not.
+     * This method is only used if the list is used in a 'foreach' loop. 
+     * The developer should not call it manually unless he knows what he 
+     * is doing.
+     * @return boolean If there is a next element, the method 
+     * will return true. False otherwise.
+     * @since 1.7.9
+     */
+    public function valid() {
+        return $this->childrenList->valid();
+    }
+
 }

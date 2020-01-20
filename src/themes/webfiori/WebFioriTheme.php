@@ -155,7 +155,6 @@ class WebFioriTheme extends Theme{
         $headTag->addCSS(Page::cssDir().'/Grid.css');
         $headTag->addCSS(Page::cssDir().'/colors.css');
         $headTag->addCSS(Page::cssDir().'/theme.css');
-        $headTag->addJs('sys-files/res/js/webfiori.js');
         $headTag->addMeta('robots', 'index, follow');
         return $headTag;
     }
@@ -166,7 +165,7 @@ class WebFioriTheme extends Theme{
         $logoContainer->setID('inner-header');
         $logoContainer->setClassName('wf-'.Page::dir().'-col-11-nm-np');
         $img = new HTMLNode('img', false);
-        $img->setAttribute('src',Page::imagesDir().'/WebsiteIcon_1024x1024.png');
+        $img->setAttribute('src',Page::imagesDir().'/favicon.png');
         $img->setClassName('wf-'.Page::dir().'-col-1-np-nm');
         $img->setID('logo');
         $img->setWritingDir(Page::dir());

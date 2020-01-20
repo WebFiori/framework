@@ -248,7 +248,7 @@ class CodeSnippet extends HTMLNode{
     public function addCodeLine($codeAsTxt) {
         $this->originalCode .= $codeAsTxt;
         $this->_addLine();
-        $oldCode = $this->codeStrNode->getText();
+        $oldCode = $this->codeStrNode->getTextUnescaped();
         $oldCode .= trim($codeAsTxt,"\n\r")."\n";
         $this->codeStrNode->setText($oldCode);
     }

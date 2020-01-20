@@ -38,7 +38,7 @@ use Exception;
  * JS files) by implementing one of the abstract methods. Themes must exist in 
  * the folder '/themes' of the framework.
  * @author Ibrahim
- * @version 1.2.4
+ * @version 1.2.5
  */
 abstract class Theme implements JsonI{
     /**
@@ -158,6 +158,14 @@ abstract class Theme implements JsonI{
         $this->beforeLoadedParams = [];
     }
     /**
+     * Reset the array which contains all loaded themes.
+     * By calling this method, all loaded themes will be unloaded.
+     * @since 1.2.5
+     */
+    public static function resetLoaded(){
+        self::$loadedThemes = [];
+    }
+    /**
      * Returns the base URL that will be used by the theme.
      * The URL is used by the HTML tag 'base' to fetch page resources. 
      * If the URL is not set by the developer, the method will return the 
@@ -265,7 +273,6 @@ abstract class Theme implements JsonI{
             }
             return $themeToLoad;
         }
-        throw new Exception('No such theme: \''.$themeName.'\'.');
     }
     /**
      * Sets the value of the callback which will be called after theme is loaded.
@@ -671,8 +678,12 @@ abstract class Theme implements JsonI{
         $j = new JsonX();
         $j->add('themes-path', THEMES_PATH);
         $j->add('name', $this->getName());
+        $j->add('url', $this->getUrl());
+        $j->add('license', $this->getLicenseName());
+        $j->add('license-url', $this->getLicenseUrl());
         $j->add('version', $this->getVersion());
         $j->add('author', $this->getAuthor());
+        $j->add('author-url', $this->getAuthorUrl());
         $j->add('images-dir-name', $this->getImagesDirName());
         $j->add('theme-dir-name', $this->getDirectoryName());
         $j->add('css-dir-name', $this->getCssDirName());

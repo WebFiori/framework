@@ -57,7 +57,7 @@ class MailConfig{
             }
         }
     }
-    private function &_getAccount($name){
+    private function _getAccount($name){
         if(isset($this->emailAccounts[$name])){
             return $this->emailAccounts[$name];
         }
@@ -74,7 +74,7 @@ class MailConfig{
      * method will return null.
      * @since 1.0
      */
-    public static function &getAccount($name){
+    public static function getAccount($name){
         return self::get()->_getAccount($name);
     }
     private function _getAccounts(){

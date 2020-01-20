@@ -28,7 +28,7 @@ use Exception;
  * An autoloader class to load classes as needed during runtime.
  *
  * @author Ibrahim
- * @version 1.1.4
+ * @version 1.1.5
  */
 class AutoLoader{
     /**
@@ -90,13 +90,13 @@ class AutoLoader{
      */
     public static function get($options=[
         'define-root'=>false,
-        'search-folders'=>array(),
+        'search-folders'=>[],
         'root'=>'',
         'on-load-failure'=>'do-nothing'
     ]) {
         $DS = DIRECTORY_SEPARATOR;
         if(self::$loader === null){
-            $frameworkSearchFoldres = array(
+            $frameworkSearchFoldres = [
                 '',
                 $DS.'entity',
                 $DS.'themes',
@@ -105,7 +105,7 @@ class AutoLoader{
                 $DS.'pages',
                 $DS.'ini',
                 $DS.'conf'
-            );
+            ];
             
             if(isset($options['search-folders'])){
                 foreach ($options['search-folders'] as $folder){
@@ -170,6 +170,32 @@ class AutoLoader{
         else{
             $this->onFail = 'throw-exception';
         }
+        $this->loadedClasses[] = [
+            'class-name'=>'AutoLoader',
+            'namespace'=>'webfiori\\entity',
+            'path'=>__DIR__
+        ];
+    }
+    /**
+     * Sets what will happen in case a class was failed to load.
+     * @param Closure|string $onFail It can be a PHP function or one of 
+     * the following values:
+     * <ul>
+     * <li>do-nothing</li>
+     * <li>throw-exception</li>
+     * </ul>
+     * @since 1.1.5
+     */
+    public static function setOnFail($onFail) {
+        if(is_callable($onFail)){
+            self::get()->onFail = $onFail;
+        }
+        else{
+            $lower = strtolower(trim($onFail));
+            if($lower == 'throw-exception' || $lower == 'do-nothing'){
+                self::get()->onFail = $lower;
+            }
+        }
     }
     /**
      * Adds new search directory to the array of search 
@@ -178,12 +204,12 @@ class AutoLoader{
      * @since 1.0
      * @deprecated since version 1.1.2
      */
-    public function addSearchDirectory($dir,$incSubFolders=true) {
+    private function addSearchDirectory($dir,$incSubFolders=true) {
         $DS = DIRECTORY_SEPARATOR;
         if(strlen($dir) != 0){
             $cleanDir = $DS. trim(str_replace('\\', $DS, str_replace('/', $DS, $dir)), '\\/');
             if($incSubFolders){
-                $dirsStack = array();
+                $dirsStack = [];
                 $dirsStack[] = $cleanDir;
                 while($xDir = array_pop($dirsStack)){
                     $fullPath =  $this->getRoot().$xDir;
@@ -227,12 +253,28 @@ class AutoLoader{
         self::get()->addSearchDirectory($dir,$incSubFolders);
     }
     /**
+     * Checks if a class is loaded or not.
+     * @param string $class The name of the class. Note that it must have 
+     * the namespace.
+     * @return boolean If the class was already loaded, the method will return true. 
+     * Else, it will return false.
+     * @since 1.1.5
+     */
+    public  static function isLoaded($class) {
+        foreach (self::getLoadedClasses() as $classArr){
+            if($class == $classArr['namespace'].'\\'.$classArr['class-name']){
+                return true;
+            }
+        }
+        return false;
+    }
+    /**
      * Tries to load a class given its name.
      * @param string $classPath The name of the class alongside its namespace.
      * @since 1.0
      */
     private function loadClass($classPath){
-        if(isset(self::getLoadedClasses()[$classPath])){
+        if(self::isLoaded($classPath)){
             return;
         }
         $DS = DIRECTORY_SEPARATOR;
@@ -245,16 +287,34 @@ class AutoLoader{
             $f = $root.$value.$DS.$className.'.php';
             if(file_exists($f) && !in_array($f, $allPaths)){
                 require_once $f;
+                $this->loadedClasses[] = [
+                    'class-name'=>$className,
+                    'namespace'=> substr($classPath, 0, strlen($classPath) - strlen($className) - 1),
+                    'path'=>$f
+                ];
                 $loaded = true;
-                break;
+                if(PHP_MAJOR_VERSION < 7 || (PHP_MAJOR_VERSION == 7 && PHP_MINOR_VERSION < 3)){
+                    //in php 7.2 and lower, if same class is loaded 
+                    //from two namespaces with same name, it will 
+                    //rise a fatal error with message 
+                    // 'Cannot redeclare class'
+                    break;
+                }
             }
             else{
                 //lower case class name to support loading of old-style classes.
                 $f = $root.$value.$DS. strtolower($className).'.php';
                 if(file_exists($f) && !in_array($f, $allPaths)){
                     require_once $f;
+                    $this->loadedClasses[] = [
+                        'class-name'=>$className,
+                        'namespace'=> substr($classPath, 0, strlen($classPath) - strlen($className) - 1),
+                        'path'=>$f
+                    ];
                     $loaded = true;
-                    break;
+                    if(PHP_MAJOR_VERSION < 7 || (PHP_MAJOR_VERSION == 7 && PHP_MINOR_VERSION < 3)){
+                        break;
+                    }
                 }
             }
         }
@@ -269,13 +329,6 @@ class AutoLoader{
             else if($this->onFail == 'do-nothing'){
                 //do nothing
             }
-        }
-        else{
-            $this->loadedClasses[$classPath] = [
-                'class-name'=>$className,
-                'namespace'=> substr($classPath, 0, strlen($classPath) - strlen($className) - 1),
-                'path'=>$f
-            ];
         }
     }
     /**
@@ -313,10 +366,9 @@ class AutoLoader{
         return $retVal;
     }
     /**
-     * Returns an associative array of all loaded classes.
-     * The keys of the array will be the names of the classes including the namespace 
-     * and the value will be a sub associative array that has more info about 
-     * the class. The indices of each sub array are:
+     * Returns an indexed array of all loaded classes.
+     * At each index, there will be an associative array. 
+     * Each sub array will have the following indices:
      * <ul>
      * <li><b>class-name</b>: The actual name of the class.</li>
      * <li><b>namespace</b>: The namespace at which the class belongs to.</li>
@@ -333,8 +385,16 @@ class AutoLoader{
      * @return string The root directory that is used to search inside.
      * @since 1.0
      */
-    public function getRoot(){
+    private function getRoot(){
         return $this->rootDir;
+    }
+    /**
+     * Returns the root directory that is used to search inside.
+     * @return string The root directory that is used to search inside.
+     * @since 1.1.5
+     */
+    public static function root() {
+        return self::get()->getRoot();
     }
     /**
      * Returns an array of all added search folders.

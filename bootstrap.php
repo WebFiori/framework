@@ -2,15 +2,17 @@
 use webfiori\entity\AutoLoader;
 use webfiori\entity\CLI;
 $DS = DIRECTORY_SEPARATOR;
+
 //the name of tests directory. Update as needed.
 define('TESTS_DIRECTORY', 'tests');
+
 //an array that contains possible locations at which 
 //WebFiori Framework might exist.
 //Add and remove directories as needed.
-$WebFioriFrameworkDirs = array(
+$WebFioriFrameworkDirs = [
     __DIR__.$DS.'src',
     __DIR__.$DS.'vendor'.$DS.'webfiori'.$DS.'framework'
-);
+];
 fprintf(STDOUT, "Bootstrap Path: '".__DIR__."'\n");
 fprintf(STDOUT,"Tests Directory: '".TESTS_DIRECTORY."'.\n");
 fprintf(STDOUT,'Include Path: \''. get_include_path().'\''."\n");
@@ -51,11 +53,11 @@ else{
 }
 fprintf(STDOUT,"Class 'Initializing autoload directories...\n");
 AutoLoader::get(array(
-    'search-folders'=>array(
+    'search-folders'=>[
         'tests',
         'src',
         'vendor'
-    ),
+    ],
     'define-root'=>true,
     'root'=>__DIR__,
     'on-load-failure'=>'do-nothing'
@@ -64,17 +66,16 @@ fprintf(STDOUT,'Autoloader Initialized.'."\n");
 fprintf(STDOUT,'Initializing CLI of the Framework...'."\n");
 CLI::init();
 fprintf(STDOUT,'Done.'."\n");
-fprintf(STDOUT,'Root Directory: \''.AutoLoader::get()->getRoot().'\'.'."\n");
+fprintf(STDOUT,'Root Directory: \''.AutoLoader::get()->root().'\'.'."\n");
 //fprintf(STDOUT,'Class Search Paths:'."\n");
 //$dirs = AutoLoader::getFolders();
 //foreach ($dirs as $dir){
 //    fprintf(STDOUT, $dir."\n");
 //}
 fprintf(STDOUT, "Registering shutdown function...\n");
-
 //run sum code after tests completion.
 register_shutdown_function(function(){
+    
 });
 fprintf(STDOUT, "Registering shutdown function completed.\n");
-$_SERVER['REMOTE_ADDR'] = '127.0.0.1';
 fprintf(STDOUT,"Starting to run tests...\n");

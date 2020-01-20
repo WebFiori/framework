@@ -115,7 +115,6 @@ class SimpleController extends Controller{
                 $this->userInfoQuery->getUserContactInfo($user->getID());
                 if($this->excQ($this->userInfoQuery)){
                     while ($row2 = $this->nextRow()){
-                        var_dump($row2);
                         $user->addContactInfo($row2['contact_type'], $row2['contact_info']);
                     }
                 }

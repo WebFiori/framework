@@ -1,0 +1,57 @@
+#main-logo{
+    height: 40px;
+}
+#page-header nav{
+    box-shadow: 0 2px 4px -1px rgba(0,0,0,.2),0 4px 5px 0 rgba(0,0,0,.14),0 1px 10px 0 rgba(0,0,0,.12);
+}
+.page-title{
+    width: 90%;
+}
+.block-title {
+    font-size: 14pt;
+    background-color: #eee;
+    margin-top: 25px;
+    margin-bottom: 5px;
+    font-weight: bold;
+
+}
+#page-footer{
+    background-color: #eef;
+    text-align: center;
+    font-size: 0.8rem;
+    height: 140px;
+}
+#page-footer a{
+    font-weight: bold;
+}
+#side-content-area{
+    background-color: #c1ec9b;
+}
+.block:first-child,
+.method-signator,
+.attribute-name{
+    font-weight: bold;
+    background-color: #eee;
+}
+.summary-box-title,
+.details-box-title{
+    font-weight: bold;
+    margin: 10px;
+    border-bottom: 1px solid #eee;
+}
+.summary-box,
+.details-box{
+    
+}
+li.active{
+    background-color: #eee;
+}
+@media screen and (max-width: 992px) {
+  #side-content-area,#main-content-area {
+    width: 100%;
+    height: auto;
+    position: relative;
+    flex:0 0 100%;
+    max-width: 100%;
+  }
+}

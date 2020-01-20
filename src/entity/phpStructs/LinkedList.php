@@ -176,6 +176,86 @@ class LinkedList implements Countable, Iterator{
         }
     }
     /**
+     * Insert new element in the middle of the list.
+     * The method will try to insert new element at the given position. If the 
+     * position is index 0, the element will be inserted at the start of the 
+     * list. If the position equals to the number of elements in the list, then the 
+     * element will be inserted at the end of the list. If position is between 
+     * 0 and LinkedList::size(), then the element will be inserted in the 
+     * middle. The element will be not inserted in only two cases:
+     * <ul>
+     * <li>Position is not between 0 and LinkedList::size() inclusive.</li>
+     * <li>The list accepts only a specific number of elements and its full.</li>
+     * </ul>
+     * Note that the element at the specified index will be moved to the 
+     * next position and the new element will replace it.
+     * @param mixed $el The new element that will be inserted.
+     * @param int $position The index at which the element will be inserted in.
+     * @return boolean If the element is inserted, the method will return true. 
+     * If not, the method will return false.
+     */
+    public function insert(&$el,$position) {
+        if($this->validateSize()){
+            $size = $this->size();
+            if($size == 0 && $position == 0){
+                //empty list and insert at start.
+                return $this->add($el);
+            }
+            else if($size == 1 && $position == 0){
+                //list size is 1 and position = 0. inser at the start.
+                $newNode = new Node($el, $this->head);
+                $this->head = $newNode;
+                $this->tail = $this->head->next();
+                $this->size++;
+                return true;
+            }
+            else if($size == 1 && $position == 1){
+                //list size is 1 and position = 1. inser at the end.
+                $newNode = new Node($el);
+                $this->tail = $newNode;
+                $this->head->setNext($this->tail);
+                $this->size++;
+                return true;
+            }
+            else if($position == $size){
+                //insert at the end.
+                return $this->add($el);
+            }
+            else{
+                if($position < $size){
+                    //insert in the middle or at the start
+                    if($position == 0){
+                        //inser at the start.
+                        $newNode = new Node($el, $this->head);
+                        $this->head = $newNode;
+                        $this->size++;
+                        return true;
+                    }
+                    else{
+                        //insert in the middle.
+                        $pointer = 1;
+                        $currentNode = $this->head;
+                        $nextToCurrent = $currentNode->next();
+                        while ($currentNode != null){
+                            if($pointer == $position){
+                                $newNode = new Node($el,$nextToCurrent);
+                                $currentNode->setNext($newNode);
+                                $this->size++;
+                                return true;
+                            }
+                            else{
+                                $currentNode = $nextToCurrent;
+                                $nextToCurrent = $nextToCurrent->next();
+                            }
+                            $pointer++;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+    /**
      * Returns the first element that was added to the list.
      * @return mixed The first element that was added to the list. If the list 
      * is empty, The method will return null.

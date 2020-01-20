@@ -265,7 +265,9 @@ class Language {
      * Sets or updates a language variable.
      * @param string $dir A string that looks like a 
      * directory. 
-     * @param string $varName The name of the variable.
+     * @param string $varName The name of the variable. Note that if the name 
+     * of the variable is set and it was an array, it will become a string 
+     * which has the given name and value.
      * @param string $varValue The value of the variable.
      * @return boolean The function will return <b>true</b> if the variable is set. 
      * Other than that, the function will return <b>false</b>.

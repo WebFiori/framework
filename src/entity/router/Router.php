@@ -47,40 +47,41 @@ use jsonx\JsonX;
  * directory '/apis'. This folder usually contains PHP files which extends 
  * the class 'ExtendedWebServices' or the class 'WebServices'.
  * </p>
- * <b>
+ * <p>
  * A closure route is simply a function that will be executed when the 
  * user visits the URL.
- * </b>
+ * </p>
  * <p>
  * A customized route is a route that can point to any file which exist inside 
  * the framework scope. For example, The developer might create a folder 
  * 'my-files' and inside it, he might add 'my-view.html'. Then he can add a route 
  * to it as follows:
  * <pre>
- * Router::other([
- *     'path'=>'/custom-route',
- *     'route-to'=>'/my-files/my-view.html'
- * ]);
- * </pre> 
+Router::other([
+    'path'=>'/custom-route',
+    'route-to'=>'/my-files/my-view.html'
+]);
+</pre> 
  * </p>
  * @author Ibrahim
- * @version 1.3.8
+ * @version 1.3.9
  */
 class Router {
     /**
-     * A constant for the route of views. It is simply the root directory where web 
+     * A constant that represents view route. It is simply the root directory where web 
      * pages should be created.
      * @since 1.0
      */
     const VIEW_ROUTE = DIRECTORY_SEPARATOR.'pages';
     /**
-     * A constant for the route of APIs. It is simply the root directory where APIs 
+     * A constant that represents API route. It is simply the root directory where APIs 
      * should be created.
      * @since 1.0
      */
     const API_ROUTE = DIRECTORY_SEPARATOR.'apis';
     /**
-     * A constant for the case when the route is a function call.
+     * A constant that represents closure route. The value of the 
+     * constant is 'func'.
      * @since 1.0
      */
     const CLOSURE_ROUTE = 'func';
@@ -120,7 +121,7 @@ class Router {
      * @return Router
      * @since 1.0
      */
-    public static function get(){
+    private static function get(){
         if(self::$router != null){
             return self::$router;
         }
@@ -199,6 +200,23 @@ class Router {
         return $null;
     }
     /**
+     * Returns the value of a variable which exist in the path part of the 
+     * URI.
+     * @param string $varName The name of the variable. Note that it must 
+     * not include braces.
+     * @return string|null The method will return the value of the 
+     * variable if it was set. If it is not set or routing is still not yet 
+     * happend, the method will return null.
+     * @since 1.3.9
+     */
+    public static function getVarValue($varName) {
+        $routeUri = self::getRouteUri();
+        if($routeUri instanceof RouterUri){
+            return $routeUri->getUriVar($varName);
+        }
+        return null;
+    }
+    /**
      * Returns an object of type 'RouterUri' that represents route URI.
      * @param string $path The path part of the URI.
      * @return RouterUri|null If a route was found which has the given path, 
@@ -250,7 +268,8 @@ class Router {
         Router::get()->_resolveUrl($uri);
     }
     /**
-     * Returns the value of the base URL which is appended to the path.
+     * Returns the value of the base URI which is appended to the path.
+     * This method is similar to calling the method <b>Router::<a href="#base">base()</a></b>.
      * @return string
      * @since 1.0
      */
@@ -447,7 +466,8 @@ class Router {
      * $_GET or $_POST after the requested URI is resolved. If we use the same 
      * example above to get any user profile, We would add the following as 
      * a path: 'user/{username}'. In this case, username will be available in 
-     * $_GET['username']. </li>
+     * $_GET['username']. Note that its possible to get the value of the 
+     * variable using the method <b>Router::<a href="#getVarValue">getVarValue()</a></b></li>
      * <li><b>route-to</b>: The path to the API file. The root folder for 
      * all APIs is '/apis'. If the API name is 'get-user-profile.php', then the 
      * value of this parameter must be '/get-user-profile.php'. If the API is in a 
@@ -460,8 +480,7 @@ class Router {
      * </ul>
      * @return boolean The method will return true if the route was created. 
      * If a route for the given path was already created, the method will return 
-     * false. Also if the given view file was not found, the method will not 
-     * create any route and return false.
+     * false.
      * @since 1.2
      */
     public static function api($options) {
@@ -472,7 +491,7 @@ class Router {
         return false;
     }
     /**
-     * Returns the base URL which is used to create routes.
+     * Returns the base URI which is used to create routes.
      * @return string The base URL which is used to create routes. The returned 
      * value is based on one of two values. Either the value that is returned 
      * by the method 'Util::getBaseURL()' or the method 'SiteConfig::getBaseURL()'.
@@ -495,7 +514,8 @@ class Router {
      * $_GET or $_POST after the requested URI is resolved. If we use the same 
      * example above to get any user profile, We would add the following as 
      * a path: 'user/{username}'. In this case, username will be available in 
-     * $_GET['username']. </li>
+     * $_GET['username']. Note that its possible to get the value of the 
+     * variable using the method <b>Router::<a href="#getVarValue">getVarValue()</a></b></li>
      * <li><b>route-to</b>: A closure (A PHP function). </li>
      * <li><b>closure-params</b>: An array that contains values which 
      * can be passed to the closure.</li>
@@ -509,8 +529,7 @@ class Router {
      * </ul>
      * @return boolean The method will return true if the route was created. 
      * If a route for the given path was already created, the method will return 
-     * false. Also if the given view file was not found, the method will not 
-     * create any route and return false.
+     * false. Also, if <b>'route-to'</b> is not a function, the method will return false.
      * @since 1.2
      */
     public static function closure($options) {
@@ -533,7 +552,8 @@ class Router {
      * $_GET or $_POST after the requested URI is resolved. If we use the same 
      * example above to get any user profile, We would add the following as 
      * a path: 'user/{username}'. In this case, username will be available in 
-     * $_GET['username']. </li>
+     * $_GET['username']. Note that its possible to get the value of the 
+     * variable using the method <b>Router::<a href="#getVarValue">getVarValue()</a></b></li>
      * <li><b>route-to</b>: The path to the file that the route will point to. 
      * It can be any file in the scope of the variable ROOT_DIR.</li>
      * <li><b>as-api</b>: If this parameter is set to true, the route will be 
@@ -546,8 +566,7 @@ class Router {
      * </ul>
      * @return boolean The method will return true if the route was created. 
      * If a route for the given path was already created, the method will return 
-     * false. Also if the given route file was not found, the method will not 
-     * create any route and return false.
+     * false.
      * @since 1.2
      */
     public static function other($options) {
@@ -685,6 +704,7 @@ class Router {
      * @since 1.0
      */
     private function _resolveUrl($uri,$loadResource=true) {
+        $this->uriObj = null;
         if(count($this->routes) != 0){
             $routeUri = new RouterUri($uri, '');
             //first, search for the URI wuthout checking variables
@@ -778,6 +798,11 @@ class Router {
                                     $_POST[$varName] = filter_var(urldecode($pathArray[$x]),FILTER_SANITIZE_STRING);
                                 }
                                 else if($requestMethod == 'GET' || $requestMethod == 'DELETE'){
+                                    $_GET[$varName] = filter_var(urldecode($pathArray[$x]),FILTER_SANITIZE_STRING);
+                                }
+                                else{
+                                    //usually, in CLI there is no request method. 
+                                    //but we store result in $_GET.
                                     $_GET[$varName] = filter_var(urldecode($pathArray[$x]),FILTER_SANITIZE_STRING);
                                 }
                             }
@@ -895,6 +920,7 @@ class Router {
      * @since 1.3.4
      */
     public static function removeAll() {
+        self::get()->uriObj = null;
         self::get()->routes = [];
     }
     /**

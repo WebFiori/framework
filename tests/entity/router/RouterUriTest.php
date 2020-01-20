@@ -12,6 +12,22 @@ class RouterUriTest extends TestCase{
     /**
      * @test
      */
+    public function testCaseSensitive00() {
+        $uri = 'https://www3.programmingacademia.com:80/{some-var}/hell/{other-var}/?do=dnt&y=#xyz';
+        $uriObj = new RouterUri($uri, '',false);
+        $this->assertFalse($uriObj->isCaseSensitive());
+    }
+    /**
+     * @test
+     */
+    public function testCaseSensitive01() {
+        $uri = 'https://www3.programmingacademia.com:80/{some-var}/hell/{other-var}/?do=dnt&y=#xyz';
+        $uriObj = new RouterUri($uri, '',true);
+        $this->assertTrue($uriObj->isCaseSensitive());
+    }
+    /**
+     * @test
+     */
     public function testSplitURI_01(){
         $uri = 'https://www3.programmingacademia.com:80/{some-var}/hell/{other-var}/?do=dnt&y=#xyz';
         $uriObj = new RouterUri($uri, '');
@@ -69,5 +85,14 @@ class RouterUriTest extends TestCase{
         $this->assertEquals('https://www3.programmingacademia.com:80/{some-var}/hell/{other-var}?do=dnt&y=',$uriObj->getUri(true));
         $this->assertEquals('https://www3.programmingacademia.com:80/{some-var}/hell/{other-var}#xyz',$uriObj->getUri(false,true));
         $this->assertEquals('https://www3.programmingacademia.com:80/{some-var}/hell/{other-var}?do=dnt&y=#xyz',$uriObj->getUri(true,true));
+    }
+    /**
+     * @test
+     */
+    public function testSplitURI_07(){
+        $uri = 'https://www3.programmingacademia.com:80/{some-var}/{x}/{some-var}';
+        $uriObj = new RouterUri($uri, '');
+        $this->assertEquals('/{some-var}/{x}/{some-var}',$uriObj->getPath());
+        $this->assertEquals(2,count($uriObj->getUriVars()));
     }
 }

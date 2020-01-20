@@ -52,8 +52,8 @@ class GreenyTheme extends Theme{
         $node = new HTMLNode('div');
         $node->setAttribute('class', 'pa-row');
         $fNode = new HTMLNode('footer');
-        $fNode->setAttribute('dir', Page::get()->getWritingDir());
-        $fNode->setAttribute('class','pa-'.Page::get()->getWritingDir().'-col-12 show-border');
+        $fNode->setAttribute('dir', Page::dir());
+        $fNode->setAttribute('class','pa-'.Page::dir().'-col-12 show-border');
         $fNode->setAttribute('itemtype','http://schema.org/WPFooter');
         $fNav = new HTMLNode('nav');
         $fNavUl = new HTMLNode('ul');
@@ -69,30 +69,28 @@ class GreenyTheme extends Theme{
     }
 
     public function getHeadNode() {
-        $page = Page::get();
         $lang = WebsiteController::get()->getSession()->getLang(TRUE);
-        $page->setLang($lang);
+        Page::lang($lang);
         $headTag = new HeadNode();
         $headTag->setBase(SiteConfig::getBaseURL());
-        $headTag->addLink('icon', $page->getThemeImagesDir().'/favicon.png');
-        $headTag->setCanonical(SiteConfig::getBaseURL().$page->getCanonical());
+        $headTag->addLink('icon', Page::imagesDir().'/favicon.png');
+        $headTag->setCanonical(SiteConfig::getBaseURL().Page::canonical());
         if(isset(SiteConfig::getWebsiteNames()[$lang])){
-            $page->setWebsiteName(SiteConfig::getWebsiteNames()[$lang]);
+            Page::siteName(SiteConfig::getWebsiteNames()[$lang]);
         }
-        $headTag->addCSS($page->getThemeCSSDir().'/Grid.css');
-        $headTag->addCSS($page->getThemeCSSDir().'/colors.css');
-        $headTag->addCSS($page->getThemeCSSDir().'/theme-specific.css');
+        $headTag->addCSS(Page::cssDir().'/Grid.css');
+        $headTag->addCSS(Page::cssDir().'/colors.css');
+        $headTag->addCSS(Page::cssDir().'/theme-specific.css');
         $headTag->addMeta('robots', 'index, follow');
         return $headTag;
     }
 
     public function getHeadrNode() {
-        $page = Page::get();
         $headerSec = new HTMLNode();
         $headerSec->setClassName('pa-row');
         $headerBody = new HTMLNode();
-        $headerBody->setClassName('pa-'.$page->getWritingDir().'-col-12 show-border');
-        $headerBody->setWritingDir($page->getWritingDir());
+        $headerBody->setClassName('pa-'.Page::dir().'-col-12 show-border');
+        $headerBody->setWritingDir(Page::dir());
         $headerBody->addTextNode('Header Sec');
         $headerSec->addChild($headerBody);
         return $headerSec;

@@ -82,7 +82,7 @@ class EmailMessage {
             if($acc instanceof SMTPAccount){
                 $this->socketMailer = EmailController::get()->getSocketMailer($acc);
                 if($this->socketMailer == EmailController::INV_CREDENTIALS){
-                    throw new Exception('The account "'.$sendAccountName.'" has inalid credintials.');
+                    throw new Exception('The account "'.$sendAccountName.'" has invalid credintials.');
                 }
                 else if($this->socketMailer == EmailController::INV_HOST_OR_PORT){
                     throw new Exception('The account "'.$sendAccountName.'" has invalid host or port number. Port: '.$acc->getPort().', Host: '.$acc->getServerAddress().'.');
@@ -224,9 +224,23 @@ class EmailMessage {
      * @param boolean $isBcc If set to true, the receiver will receive 
      * a blind carbon copy of the message (Bcc).
      * @since 1.0
+     * @deprecated since version 1.0.4
      */
     public static function addReciver($name,$email,$isCC=false,$isBcc=false){
         self::createInstance()->_getSocketMailer()->addReceiver($name, $email, $isCC, $isBcc);
+    }
+    /**
+     * Adds new receiver address to the list of message receivers.
+     * @param string $name The name of the email receiver (such as 'Ibrahim').
+     * @param string $email The email address of the receiver (such as 'example@example.com').
+     * @param boolean $isCC If set to true, the receiver will receive 
+     * a carbon copy of the message (CC).
+     * @param boolean $isBcc If set to true, the receiver will receive 
+     * a blind carbon copy of the message (Bcc).
+     * @since 1.0.4
+     */
+    public function addReceiver($name,$email,$isCC=false,$isBcc=false) {
+        self::addReciver($name, $email, $isCC, $isBcc);
     }
     /**
      * Sets the subject of the email message.

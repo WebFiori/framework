@@ -199,7 +199,7 @@ class RouterUri {
      * @since 1.0
      */
     public function printUri() {
-        Util::print_r($this->uriBroken);
+        Util::print_r($this->uriBroken,false);
     }
     /**
      * Returns the location where the URI will route to.
@@ -373,7 +373,8 @@ class RouterUri {
      * Returns the value of URI variable given its name.
      * A variable is a string which is defined while creating the route. 
      * it is name is included between '{}'.
-     * @param string $varName The name of the variable.
+     * @param string $varName The name of the variable. Note that this value 
+     * must not include braces.
      * @return string|null The method will return the value of the 
      * variable if found. If the variable is not set or the variable 
      * does not exist, the method will return null.

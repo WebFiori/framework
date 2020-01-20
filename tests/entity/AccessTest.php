@@ -21,6 +21,8 @@ class AccessTest extends TestCase{
      */
     public function test01() {
         $this->assertFalse(Access::newGroup('ADMINS Group'));
+        $this->assertFalse(Access::newGroup(''));
+        $this->assertFalse(Access::newGroup('  '));
     }
     /**
      * @test
@@ -212,7 +214,7 @@ class AccessTest extends TestCase{
      * @depends testCreatePrivilegesStr03
      * @param type $str
      */
-    public function testResolvePrivilegesStr($str){
+    public function testResolvePrivilegesStr00($str){
         $user = new User();
         Access::resolvePriviliges($str, $user);
         $this->assertTrue($user->hasPrivilege('REVERSE_INVOICE'));
@@ -235,5 +237,69 @@ class AccessTest extends TestCase{
         $this->assertEquals('USERS_MANAGERS',$asArr[0]['child-groups'][0]['group-id']);
         $this->assertEquals(4,count($asArr[0]['child-groups'][0]['privileges']));
         $this->assertEquals('SYS_USER',$asArr[1]['group-id']);
+    }
+    /**
+     * @test
+     */
+    public function testResolvePrivilegesStr01() {
+        Access::newGroup('TOP_GROUP');
+        Access::newGroup('SUB_GROUP', 'TOP_GROUP');
+        Access::newGroup('SUB_OF_SUB', 'SUB_GROUP');
+        Access::newPrivileges('TOP_GROUP', [
+            'TOP_PR_1','TOP_PR_2','TOP_PR_3'
+        ]);
+        Access::newPrivileges('SUB_GROUP', [
+            'SUB_PR_1','SUB_PR_2','SUB_PR_3'
+        ]);
+        Access::newPrivileges('SUB_OF_SUB', [
+            'SUB_OF_PR_1','SUB_OF_PR_2','SUB_OF_PR_3'
+        ]);
+        $user = new User();
+        Access::resolvePriviliges('G-SUB_OF_SUB;SUB_PR_1-0;SUB_PR_3-1;TOP_PR_2-1', $user);
+
+        $this->assertTrue($user->hasPrivilege('SUB_OF_PR_1'));
+        $this->assertTrue($user->hasPrivilege('SUB_OF_PR_2'));
+        $this->assertTrue($user->hasPrivilege('SUB_OF_PR_3'));
+        $this->assertTrue($user->inGroup('SUB_OF_SUB'));
+        
+        $this->assertFalse($user->hasPrivilege('SUB_PR_1'));
+        $this->assertFalse($user->hasPrivilege('SUB_PR_2'));
+        $this->assertTrue($user->hasPrivilege('SUB_PR_3'));
+        $this->assertFalse($user->inGroup('SUB_GROUP'));
+        
+        $this->assertFalse($user->hasPrivilege('TOP_PR_1'));
+        $this->assertTrue($user->hasPrivilege('TOP_PR_2'));
+        $this->assertFalse($user->hasPrivilege('TOP_PR_3'));
+        $this->assertFalse($user->inGroup('TOP_GROUP'));
+        
+        return $user;
+    }
+    /**
+     * 
+     * @param User $user
+     * @depends testResolvePrivilegesStr01
+     */
+    public function testCreatePrivilegesStr04($user) {
+        $privilegesStr = Access::createPermissionsStr($user);
+        $this->assertEquals('G-SUB_OF_SUB;SUB_PR_3-1;TOP_PR_2-1',$privilegesStr);
+    }
+    /**
+     * 
+     * @depends testResolvePrivilegesStr01
+     */
+    public function testCreatePrivilegesStr06() {
+        $user = new User();
+        $user->addPrivilege('SUB_PR_3');
+        $user->addPrivilege('SUB_PR_2');
+        $user->addPrivilege('SUB_OF_PR_2');
+        $privilegesStr = Access::createPermissionsStr($user);
+        $this->assertEquals('SUB_PR_3-1;SUB_PR_2-1;SUB_OF_PR_2-1',$privilegesStr);
+    }
+    /**
+     * @test
+     */
+    public function testCreatePrivilegesStr05() {
+        $privilegesStr = Access::createPermissionsStr('');
+        $this->assertEquals('',$privilegesStr);
     }
 }

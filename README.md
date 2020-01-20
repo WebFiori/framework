@@ -1,5 +1,8 @@
 # WebFiori Framework
 <p align="center">
+<img width="90px" hight="90px" src="https://programmingacademia.com/webfiori/themes/webfiori/images/favicon.png">
+</p>
+<p align="center">
   <a href="https://travis-ci.org/usernane/webfiori">
     <img src="https://travis-ci.org/usernane/webfiori.svg?branch=master">
   </a>
@@ -32,7 +35,17 @@ WebFiori Framework is a web framework which is built using PHP language. The fra
 * Building and manipulating the DOM of a web page using PHP language.
 * Basic support for running the framework throgh CLI.
 
-## Getting Started
+## Problems Solved
+One of the things that any developer cares about any software project is the problem or problems it solves. As for WebFiori framework, It can help in solving the following problems:
+* It helps in making any one with Java background to write PHP code.
+* The ability to create a customized links to web pages as needed using routing.
+* No need for touching HTML to play with the DOM. Only use PHP.
+* Run PHP code as a CRON task through HTTP protocol or through CLI.
+* Changing whole user interface by changing one line of code.
+* Ability to move the source code of the web application without having to do a lot of re-configuration.
+* Sending HTML email messages with attachments without having to write a lot of code.
+
+## Getting Started 
 To learn the basics of how to use the framework, please head on to https://programmingacademia.com/webfiori/learn. Also, you can head on to the following playlist in YouTube which contains a good set of videos which can help: https://www.youtube.com/playlist?list=PLeU-QhqUhxjkACpXiPTRM9fH_zw1KF1UD.
 
 ## API Docs

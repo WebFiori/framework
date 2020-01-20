@@ -56,12 +56,6 @@ use Exception;
  */
 class Page{
     /**
-     *
-     * @var type 
-     * @since 1.6
-     */
-    private $isDynamic;
-    /**
      * The document that represents the page.
      * @var HTMLDoc 
      * @since 1.4
@@ -136,12 +130,6 @@ class Page{
      */
     private $theme;
     /**
-     * The name of request page.
-     * @var string
-     * @since 1.6 
-     */
-    private $name;
-    /**
      * Sets the canonical URL of the page.
      * @since 1.2
      * @param string $url The canonical URL of the page.
@@ -193,22 +181,17 @@ class Page{
         $this->setTitle('Hello World');
         $this->setWebsiteName('Hello Website');
         $this->setTitleSep('|');
-        $this->contentDir = null;
+        $this->contentDir = 'ltr';
         $this->description = null;
         $this->contentLang = null;
         $this->incFooter = true;
         $this->incHeader = true;
-        $this->isDynamic = true;
         $this->theme = null;
         $this->incAside = true;
         $this->setWritingDir();
         $this->setCanonical(Util::getRequestedURL());
         $this->document->setLanguage($this->getLang());
-        $headNode = new HeadNode(
-            $this->getTitle().$this->getTitleSep().$this->getWebsiteName(),
-            $this->getCanonical(),
-            SiteConfig::getBaseURL()
-        );
+        $headNode = $this->_getHead();
         $this->document->setHeadNode($headNode);
         $headerNode = new HTMLNode();
         $headerNode->setID('page-header');
@@ -321,23 +304,6 @@ class Page{
         }
     }
     /**
-     * Returns the name of requested page.
-     * @return string The name of the requested page.
-     * @since 1.6
-     */
-    private function getPageName() {
-        return $this->name;
-    }
-    /**
-     * Checks if the type of page will be dynamic or static.
-     * @return boolean The method will return true if document 
-     * type is dynamic. Otherwise, the method will return false.
-     * @since 1.6
-     */
-    private function isDynamicDoc() {
-        return $this->isDynamic;
-    }
-    /**
      * Adds a child node inside the body of a node given its ID.
      * @param HTMLNode $node The node that will be inserted.
      * @param string $parentNodeId The ID of the node that the given node 
@@ -384,10 +350,9 @@ class Page{
      * @since 1.0
      */
     private static function get(){
-        if(self::$instance !== null){
-            return self::$instance;
+        if(self::$instance === null){
+            self::$instance = new Page();
         }
-        self::$instance = new Page();
         return self::$instance;
     }
     /**
@@ -460,22 +425,23 @@ class Page{
     }
     /**
      * Sets or gets the description of the page.
-     * @param string $new The description of the page.
+     * @param string $new The description of the page. If <b>empty string</b> is given, 
+     * the description meta tag will be removed from the &lt;head&gt; element. If 
+     * null is given, nothing will change. Default value is null.
      * @since 1.9
      * @return string The description of the page. If it is not set, the method 
      * will return null.
      */
     public static function description($new=null) {
         $p = Page::get();
-        if($new != null && strlen($new) != 0){
-            $p->setDescription($new);
-        }
+        $p->setDescription($new);
         return $p->getDescription();
     }
     /**
      * Sets the description of the page.
-     * @param string $val The description of the page. If <b>null</b> is given or 
-     * empty string, description will not change.
+     * @param string $val The description of the page. If <b>null</b> is given, 
+     * the description meta tag will be removed from the &lt;head&gt; node. If 
+     * empty string is given, nothing will change.
      * @since 1.0
      */
     private function setDescription($val){
@@ -483,21 +449,12 @@ class Page{
             $desc = trim($val);
             if(strlen($desc) !== 0){
                 $this->description = $desc;
-                if($this->document !== null ){
-                    $headCh = $this->document->getHeadNode()->children();
-                    $headChCount = $headCh->size();
-                    for($x = 0 ; $x < $headChCount ; $x++){
-                        $node = $headCh->get($x);
-                        if($node->getAttributeValue('name') == 'description'){
-                            $node->setAttribute('content',$val);
-                            return;
-                        }
-                    }
-                    $descNode = new HTMLNode('meta', false);
-                    $descNode->setAttribute('name', 'description');
-                    $descNode->setAttribute('content', $val);
-                    $this->document->getHeadNode()->addChild($descNode);
-                }
+                $this->document->getHeadNode()->addMeta('description', $desc, true);
+            }
+            else{
+                $descNode = $this->document->getHeadNode()->getMeta('description');
+                $this->document->getHeadNode()->removeChild($descNode);
+                $this->description = null;
             }
         }
     }
@@ -525,9 +482,6 @@ class Page{
                 $pageLang = $this->getLanguage();
                 $this->setWritingDir($pageLang->getWritingDir());
             //}
-        }
-        else{
-            throw new Exception('Unable to load transulation. Page language is not set.');
         }
     }
     /**
@@ -570,20 +524,37 @@ class Page{
         }
     }
     /**
-     * Display the page in the web browser.
+     * Display the page in the web browser or gets the rendered document as string.
+     * @param boolean $returnResult If this parameter is set to true, the method 
+     * will return the rendered HTML document as string. Default value is 
+     * false.
+     * @param boolean $formatted If this parameter is set to true, the rendered 
+     * HTML document will be well formatted and readable. Note that by adding 
+     * formatting to the page, the size of rendered HTML document 
+     * will increase. Default is false.
+     * @return null|string If the parameter <b>$returnResult</b> is set to true, 
+     * the method will return a string that represents the rendered page. Other 
+     * than that, it will return null.
      * @since 1.9
      */
-    public static function render() {
-        echo Page::get()->getDocument()->toHTML(true);
+    public static function render($returnResult=false,$formatted=false) {
+        if($returnResult){
+            return Page::get()->getDocument()->toHTML($formatted);
+        }
+        else{
+            echo Page::get()->getDocument()->toHTML($formatted);
+        }
     }
     /**
      * Loads and returns translation based on page language code.
      * Note that page language must be set before calling this method in 
      * order to load a translation file. Translations can be found in 
-     * the folder '/entity/lang'.
+     * the folder '/entity/lang'. Also, the method will throw an exception 
+     * in case language file is not found or not initialized correctly.
      * @return Language|null An object of type Language is returned 
      * if the language is loaded. Other than that, the method will return 
      * null.
+     * @throws Exception
      * @since 1.9
      */
     public static function translation(){
@@ -608,24 +579,22 @@ class Page{
         if(isset($loadedLangs[$this->getLang()])){
             return $loadedLangs[$this->getLang()];
         }
-        $null = null;
-        return $null;
     }
     /**
      * Loads or returns page theme.
      * @param string $name The name of the theme which will be 
-     * loaded. If null is given, nothing will be loaded.
-     * @return Theme|null If a theme is already loaded, the method will 
-     * return the loaded theme contained in an object of type Theme. If no 
+     * loaded. If null is given, the method will get theme name from the 
+     * class 'SiteConfig' and try to load it. If empty string is given, 
+     * nothing will be loaded.
+     * @return Theme If a theme is loaded, the method will 
+     * return it contained in an object of type 'Theme'. If no 
      * theme is loaded, the method will return null.
      * @see Page::usingTheme()
      * @since 1.9
      */
     public static function theme($name=null){
         $p = Page::get();
-        if($name != null && strlen($name) != 0){
-            $p->usingTheme($name);
-        }
+        $p->usingTheme($name);
         return $p->getTheme();
     }
     /**
@@ -644,16 +613,32 @@ class Page{
      * @see Theme::usingTheme()
      */
     private function usingTheme($themeName=null) {
-        if($themeName === null){
+        if($themeName === null && $this->theme === null){
             $themeName = SiteConfig::getBaseThemeName();
         }
-        $tmpTheme = Theme::usingTheme($themeName);
+        else{
+            $themeName = trim($themeName);
+            if(strlen($themeName) == 0){
+                return;
+            }
+        }
+        if($this->theme !== null){
+            if($themeName != $this->theme->getName()){
+                $tmpTheme = Theme::usingTheme($themeName);
+            }
+            else{
+                return;
+            }
+        }
+        else{
+            $tmpTheme = Theme::usingTheme($themeName);
+        }
         $this->theme = $tmpTheme;
         $this->document = new HTMLDoc();
-        $headNode = $this->_getHead(true);
-        $footerNode = $this->_getFooter(true);
-        $asideNode = $this->_getAside(true);
-        $headerNode = $this->_getHeader(true);
+        $headNode = $this->_getHead();
+        $footerNode = $this->_getFooter();
+        $asideNode = $this->_getAside();
+        $headerNode = $this->_getHeader();
         $this->document->setLanguage($this->getLang());
         $this->document->setHeadNode($headNode);
         $this->document->addChild($headerNode);
@@ -670,7 +655,7 @@ class Page{
     /**
      * Returns the directory at which CSS files of loaded theme exists.
      * @return string The directory at which CSS files of the theme exists 
-     * (e.g. 'publish/my-theme/css' ). 
+     * (e.g. 'themes/my-theme/css' ). 
      * If the theme is not loaded, the method will return empty string.
      * @since 1.9
      */
@@ -694,7 +679,7 @@ class Page{
     /**
      * Returns the directory at which image files of loaded theme exists.
      * @return string The directory at which image files of the theme exists 
-     * (e.g. 'publish/my-theme/images' ). 
+     * (e.g. 'themes/my-theme/images' ). 
      * If the theme is not loaded, the method will return empty string.
      * @since 1.9
      */
@@ -718,7 +703,7 @@ class Page{
     /**
      * Returns the directory at which JavaScript files of the theme exists.
      * @return string The directory at which JavaScript files of the theme exists 
-     * (e.g. 'publish/my-theme/js' ). 
+     * (e.g. 'themes/my-theme/js' ). 
      * If the theme is not loaded, the method will return empty string.
      * @since 1.9
      */
@@ -752,16 +737,14 @@ class Page{
      * Sets or gets page writing direction.
      * Note that the writing direction of the page might change depending 
      * on loaded translation file.
-     * @param string $new 'ltr' or 'rtl'.
-     * @return string ltr' or 'rtl'. Default return value is 'ltr'.
+     * @param string $new 'ltr' or 'rtl'. If something else is given, nothing 
+     * will change.
+     * @return string ltr' or 'rtl'. Default return value is null
      * @since 1.9
      */
     public static function dir($new=null) {
         $p = Page::get();
-        $lNew = strtolower($new);
-        if($lNew == 'ltr' || $lNew == 'rtl'){
-            $p->setWritingDir($new);
-        }
+        $p->setWritingDir($new);
         return $p->getWritingDir();
     }
     /**
@@ -785,10 +768,6 @@ class Page{
         $dirL = strtolower($dir);
         if($dirL == Language::DIR_LTR || $dirL == Language::DIR_RTL){
             $this->contentDir = $dirL;
-            return true;
-        }
-        else{
-            throw new Exception('Unknown writing direction: '.$dir);
         }
     }
     /**
@@ -799,21 +778,24 @@ class Page{
      */
     private function setHasHeader($bool){
         if(gettype($bool) == 'boolean'){
-            if($this->incHeader == false && $bool == true){
+            if($this->incHeader == false && $bool === true){
+                //add the header
                 $children = $this->document->getBody()->children();
+                $currentChCount = $children->size();
                 $this->document->getBody()->removeAllChildNodes();
                 $this->document->addChild($this->_getHeader());
-                for($x = 0 ; $x < $children->size() ; $x++){
+                for($x = 0 ; $x < $currentChCount ; $x++){
                     $this->document->addChild($children->get($x));
                 }
             }
-            else if($this->incHeader == true && $bool == false){
+            else if($this->incHeader == true && $bool === false){
+                //remove header
                 $header = $this->document->getChildByID('page-header');
                 if($header instanceof HTMLNode){
                     $this->document->removeChild($header);
                 }
             }
-            $this->incHeader = $bool;
+            $this->incHeader = $bool === true;
         }
     }
     /**
@@ -825,15 +807,27 @@ class Page{
     private function setHasAside($bool){
         if(gettype($bool) == 'boolean'){
             if($this->incAside == false && $bool == true){
-                
+                //add aside
+                $mainContentArea = $this->document->getChildByID('page-body');
+                if($mainContentArea instanceof HTMLNode){
+                    $children = $mainContentArea->children();
+                    $currentChCount = $children->size();
+                    $mainContentArea->removeAllChildNodes();
+                    $mainContentArea->addChild($this->_getAside());
+                    $this->incAside = true;
+                    for($x = 0 ; $x < $currentChCount ; $x++){
+                        $mainContentArea->addChild($children->get($x));
+                    }
+                }
             }
             else if($this->incAside == true && $bool == false){
+                //remove aside
                 $aside = $this->document->getChildByID('side-content-area');
                 if($aside instanceof HTMLNode){
                     $this->document->removeChild($aside);
+                    $this->incAside = false;
                 }
             }
-            $this->incAside = $bool;
         }
     }
 
@@ -927,100 +921,73 @@ class Page{
         return $this->incAside;
     }
     
-    private function _getAside($new=false) {
-        if($this->hasAside()){
-            if($new === true){
-                $a = $this->getTheme()->getAsideNode();
-                if($a instanceof HTMLNode){
-                    $a->setID('side-content-area');
-                }
-                else{
-                    $a = new HTMLNode();
-                    $a->setID('side-content-area');
-                }
-                return $a;
-            }
-            return $this->document->getChildByID('side-content-area');
+    private function _getAside() {
+        $theme = $this->getTheme();
+        $node = null;
+        if($theme !== null){
+            $node = $theme->getAsideNode();
         }
+        if($node instanceof HTMLNode){
+            $node->setID('side-content-area');
+        }
+        else{
+            $node = new HTMLNode();
+            $node->setID('side-content-area');
+        }
+        return $node;
     }
     
-    private function _getHeader($new=false){
-        if($this->hasHeader()){
-            if($new === true){
-                $h = $this->getTheme()->getHeadrNode();
-                if($h instanceof HTMLNode){
-                    $h->setID('page-header');
-                }
-                else{
-                    $h = new HTMLNode();
-                    $h->setID('page-header');
-                }
-                return $h;
-            }
-            return $this->document->getChildByID('page-header');
+    private function _getHeader(){
+        $theme = $this->getTheme();
+        $node = null;
+        if($theme !== null){
+            $node = $theme->getHeadrNode();
         }
+        if($node instanceof HTMLNode){
+            $node->setID('page-header');
+        }
+        else{
+            $node = new HTMLNode();
+            $node->setID('page-header');
+        }
+        return $node;
     }
     
-    private function _getFooter($new=false){
-        if($this->hasFooter()){
-            if($new === true){
-                $f = $this->getTheme()->getFooterNode();
-                if($f instanceof HTMLNode){
-                    $f->setID('page-footer');
-                }
-                else{
-                    $f = new HTMLNode();
-                    $f->setID('page-footer');
-                }
-                return $f;
-            }
-            return $this->document->getChildByID('page-footer');
+    private function _getFooter(){
+        $theme = $this->getTheme();
+        $node = null;
+        if($theme !== null){
+            $node = $theme->getFooterNode();
         }
+        if($node instanceof HTMLNode){
+            $node->setID('page-footer');
+        }
+        else{
+            $node = new HTMLNode();
+            $node->setID('page-footer');
+        }
+        return $node;
     }
     
-    private function _getHead($new=false){
-        if($new === true){
+    private function _getHead(){
+        $theme = $this->getTheme();
+        if($theme === null){
             $headNode = new HeadNode(
                 $this->getTitle().$this->getTitleSep().$this->getWebsiteName(),
                 $this->getCanonical(),
                 SiteConfig::getBaseURL()
             );
-            $metaCharset = new HTMLNode('meta', false);
-            $metaCharset->setAttribute('charset', 'UTF-8');
-            $headNode->addChild($metaCharset);
-            $tmpHead = $this->getTheme()->getHeadNode();
-            if($tmpHead instanceof HTMLNode){
-                $headNode->setTitle($this->getTitle().$this->getTitleSep().$this->getWebsiteName());
-                $baseNode = $tmpHead->getBase();
-                if($baseNode !== null){
-                    $headNode->setBase($tmpHead->getBase()->getAttributeValue('href'));
-                }
-                $headNode->setCanonical($this->getCanonical());
-                $descNode = new HTMLNode('meta', false);
-                $descNode->setAttribute('name', 'description');
-                $descNode->setAttribute('content', $this->getDescription());
-                $headNode->addChild($descNode);
-                $children = $tmpHead->children();
-                $count = $children->size();
-                for($x = 0 ; $x < $count ; $x++){
-                    $node = $children->get($x);
-                    $nodeName = $node->getNodeName();
-                    if($nodeName != 'base' && $nodeName != 'title'){
-                        if($node->getAttributeValue('name') != 'description'){
-                            $headNode->addChild($node);
-                        }
-                    }
-                }
-            }
-            else {
-                $descNode = new HTMLNode('meta', false);
-                $descNode->setAttribute('name', 'description');
-                $descNode->setAttribute('content', $this->getDescription());
-                $headNode->addChild($descNode);
-            }
-            return $headNode;
         }
-        return $this->document->getHeadNode();
+        else{
+            $headNode = $theme->getHeadNode();
+        }
+        $headNode->addMeta('charset','UTF-8',true);
+        $headNode->setTitle($this->getTitle().$this->getTitleSep().$this->getWebsiteName());
+        $headNode->setBase(SiteConfig::getBaseURL());
+        $headNode->setCanonical($this->getCanonical());
+        if($this->getDescription() != null){
+            $headNode->addMeta('description', $this->getDescription(), true);
+        }
+        return $headNode;
     }
 }
-

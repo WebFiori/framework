@@ -77,8 +77,12 @@ class HeadNode extends HTMLNode{
     private $canonical;
     /**
      * Creates new HTML node that represents head tag of HTML document.
-     * Note that by default, the node will have a meta tag with "name"="viewport" 
-     * and "content"="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+     * Note that by default, the node will have the following nodes in 
+     * its body:
+     * <ul>
+     * <li>A meta tag with "name"="viewport" and "content"="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"</li>
+     * <li>A title tag.</li>
+     * </ul>
      * @param string $title The value to set for the node 'title'. Default 
      * is 'Default'. 
      * @param string $canonical The value to set for the link node 
@@ -125,7 +129,7 @@ class HeadNode extends HTMLNode{
                 $this->baseNode = new HTMLNode('base');
             }
             if(!$this->hasChild($this->baseNode)){
-                parent::addChild($this->baseNode);
+                parent::insert($this->baseNode,0);
             }
             $this->baseNode->setAttribute('href',$trimmedUrl);
             return true;
@@ -145,10 +149,12 @@ class HeadNode extends HTMLNode{
     /**
      * Returns an object of type HTMLNode that represents the meta tag which 
      * has the attribute 'charset'.
+     * Note that the node that represents charset of the will always have a 
+     * position between 0 and 2 in the body of the head node.
      * @return HTMLNode An object of type HTMLNode.
      * @since 1.1.4
      */
-    public function &getCharsetNode() {
+    public function getCharsetNode() {
         return $this->metaCharset;
     }
     /**
@@ -169,7 +175,14 @@ class HeadNode extends HTMLNode{
         $trimmedCharset = trim($charset);
         if(strlen($charset) > 0){
             if(!$this->hasChild($this->metaCharset)){
-                parent::addChild($this->metaCharset);
+                $position = 2;
+                if(!$this->hasChild($this->baseNode)){
+                    $position--;
+                }
+                if(!$this->hasChild($this->titleNode)){
+                    $position--;
+                }
+                parent::insert($this->metaCharset,$position);
             }
             $this->metaCharset->setAttribute('charset', $trimmedCharset);
             return true;
@@ -178,10 +191,11 @@ class HeadNode extends HTMLNode{
     }
     /**
      * Returns a node that represents the tag 'base'.
+     * Note that the base note has a fixed position in the head node which is 0.
      * @return HTMLNode A node that represents the tag 'base'.
      * @since 1.0
      */
-    public function &getBase(){
+    public function getBaseNode(){
         return $this->baseNode;
     }
     /**
@@ -215,7 +229,11 @@ class HeadNode extends HTMLNode{
                 $this->titleNode->addChild(self::createTextNode($trimmedTitle));
             }
             if(!$this->hasChild($this->titleNode)){
-                parent::addChild($this->titleNode);
+                $position = 1;
+                if(!$this->hasChild($this->baseNode)){
+                    $position--;
+                }
+                parent::insert($this->titleNode,$position);
             }
             $this->titleNode->children()->get(0)->setText($trimmedTitle);
             return true;
@@ -224,11 +242,13 @@ class HeadNode extends HTMLNode{
     }
     /**
      * Returns an object of type HTMLNode that represents the title node.
+     * Note that the title node will be always in position 0 or 1 in the 
+     * body of the head node.
      * @return HTMLNode The method will return 
      * an object of type HTMLNode that represents title node.
      * @since 1.1.3
      */
-    public function &getTitleNode() {
+    public function getTitleNode() {
         return $this->titleNode;
     }
     /**
@@ -251,7 +271,7 @@ class HeadNode extends HTMLNode{
         $chCount = $children->size();
         $list = new LinkedList();
         for($x = 0 ; $x < $chCount ; $x++){
-            $child = &$children->get($x);
+            $child = $children->get($x);
             $childName = $child->getNodeName();
             if($childName == 'link'){
                 if($child->hasAttribute('rel') && $child->getAttributeValue('rel') == 'stylesheet'){
@@ -272,7 +292,7 @@ class HeadNode extends HTMLNode{
         $chCount = $children->size();
         $list = new LinkedList();
         for($x = 0 ; $x < $chCount ; $x++){
-            $child = &$children->get($x);
+            $child = $children->get($x);
             $childName = $child->getNodeName();
             if($childName == 'script'){
                 if($child->hasAttribute('type') && $child->getAttributeValue('type') == 'text/javascript'){
@@ -293,7 +313,7 @@ class HeadNode extends HTMLNode{
         $chCount = $children->size();
         $list = new LinkedList();
         for($x = 0 ; $x < $chCount ; $x++){
-            $child = &$children->get($x);
+            $child = $children->get($x);
             $childName = $child->getNodeName();
             if($childName == 'meta'){
                 $list->add($child);
@@ -316,7 +336,7 @@ class HeadNode extends HTMLNode{
     public function addMeta($name,$content,$override=false){
         $trimmedName = trim(strtolower($name.''));
         if(strlen($trimmedName) != 0){
-            $meta = &$this->getMeta($trimmedName);
+            $meta = $this->getMeta($trimmedName);
             if($meta !== null && $override === true){
                 $meta->setAttribute('content', $content);
                 return true;
@@ -325,7 +345,19 @@ class HeadNode extends HTMLNode{
                 $meta = new HTMLNode('meta');
                 $meta->setAttribute('name', $trimmedName);
                 $meta->setAttribute('content', $content);
-                $this->addChild($meta);
+                $insertPosition = -1;
+                for($x = 0 ; $x < $this->childrenCount() ; $x++){
+                    $chNode = $this->getChild($x);
+                    if($chNode->getNodeName() == 'meta'){
+                        $insertPosition = $x;
+                    }
+                }
+                if($insertPosition != -1){
+                    $this->insert($meta,$insertPosition+1);
+                }
+                else{
+                    $this->addChild($meta);
+                }
                 return true;
             }
         }
@@ -398,7 +430,7 @@ class HeadNode extends HTMLNode{
      * It will be returned. If no meta node was found, null is returned.
      * @since 1.1.2
      */
-    public function &getMeta($name) {
+    public function getMeta($name) {
         $lName = strtolower(trim($name));
         if($lName == 'charset'){
             return $this->getCharsetNode();
@@ -563,7 +595,19 @@ class HeadNode extends HTMLNode{
                     }
                 }
             }
-            $this->addChild($tag);
+            $insertPosition = -1;
+            for($x = 0 ; $x < $this->childrenCount() ; $x++){
+                $chNode = $this->getChild($x);
+                if($chNode->getNodeName() == 'link' && $chNode->getAttribute('rel') == 'stylesheet'){
+                    $insertPosition = $x;
+                }
+            }
+            if($insertPosition != -1){
+                $this->insert($tag,$insertPosition+1);
+            }
+            else{
+                $this->addChild($tag);
+            }
             return true;
         }
         return false;
@@ -625,7 +669,19 @@ class HeadNode extends HTMLNode{
                     }
                 }
             }
-            $this->addChild($tag);
+            $insertPosition = -1;
+            for($x = 0 ; $x < $this->childrenCount() ; $x++){
+                $chNode = $this->getChild($x);
+                if($chNode->getNodeName() == 'script' && $chNode->getAttribute('type') == 'text/javascript'){
+                    $insertPosition = $x;
+                }
+            }
+            if($insertPosition != -1){
+                $this->insert($tag,$insertPosition+1);
+            }
+            else{
+                $this->addChild($tag);
+            }
             return true;
         }
         return false;
@@ -633,7 +689,8 @@ class HeadNode extends HTMLNode{
     /**
      * Sets the canonical URL.
      * Note that the canonical URL will be set only if the given string is not 
-     * empty.
+     * empty. Also, the node will always have a 
+     * position between 0 and 3 in the body of the head node.
      * @param string|null $link The URL to set. If null is given, the link node 
      * which represents the canonical URL will be removed from the body of the 
      * head tag.
@@ -654,7 +711,17 @@ class HeadNode extends HTMLNode{
                 $this->canonical->setAttribute('rel', 'canonical');
             }
             if(!$this->hasChild($this->canonical)){
-                parent::addChild($this->canonical);
+                $position = 3;
+                if(!$this->hasChild($this->baseNode)){
+                    $position--;
+                }
+                if(!$this->hasChild($this->titleNode)){
+                    $position--;
+                }
+                if(!$this->hasChild($this->metaCharset)){
+                    $position--;
+                }
+                parent::insert($this->canonical,$position);
             }
             $this->canonical->setAttribute('href', $trimmedLink);
             return true;
@@ -667,7 +734,7 @@ class HeadNode extends HTMLNode{
      * an object of type HTMLNode. If not set, the method will return null.
      * @since 1.1.3
      */
-    public function &getCanonicalNode() {
+    public function getCanonicalNode() {
         return $this->canonical;
     }
     /**
@@ -706,14 +773,26 @@ class HeadNode extends HTMLNode{
                     }
                 }
             }
-            $this->addChild($node);
+            $insertPosition = -1;
+            for($x = 0 ; $x < $this->childrenCount() ; $x++){
+                $chNode = $this->getChild($x);
+                if($chNode->getNodeName() == 'link' && $chNode->getAttribute('rel') == 'alternate'){
+                    $insertPosition = $x;
+                }
+            }
+            if($insertPosition != -1){
+                $this->insert($node,$insertPosition+1);
+            }
+            else{
+                $this->addChild($node);
+            }
             return true;
         }
         return false;
     }
     /**
      * Adds new 'link' node.
-     * Note that if the 'rel' attribute value is 'canonical', no node will be 
+     * Note that if the 'rel' attribute value is 'canonical' or 'alternate', no node will be 
      * created.
      * @param string $rel The value of the attribute 'rel'.
      * @param string $href The value of the attribute 'href'.
@@ -728,19 +807,37 @@ class HeadNode extends HTMLNode{
         $trimmedRel = trim(strtolower($rel));
         $trimmedHref = trim($href);
         if(strlen($trimmedRel) != 0 && strlen($trimmedHref) != 0){
-            if($trimmedRel != 'canonical'){
-                $node = new HTMLNode('link');
-                $node->setAttribute('rel',$trimmedRel);
-                $node->setAttribute('href', $trimmedHref);
-                if(gettype($otherAttrs) == 'array'){
-                    foreach ($otherAttrs as $attr=>$val){
-                        $trimmedAttr = trim(strtolower($attr));
-                        if($trimmedAttr != 'rel' && $trimmedAttr != 'href'){
-                            $node->setAttribute($trimmedAttr, $val);
+            if($trimmedRel != 'canonical' && $trimmedRel != 'alternate'){
+                if($rel == 'stylesheet'){
+                    return $this->addCSS($href, $otherAttrs);
+                }
+                else{
+                    $node = new HTMLNode('link');
+                    $node->setAttribute('rel',$trimmedRel);
+                    $node->setAttribute('href', $trimmedHref);
+                    if(gettype($otherAttrs) == 'array'){
+                        foreach ($otherAttrs as $attr=>$val){
+                            $trimmedAttr = trim(strtolower($attr));
+                            if($trimmedAttr != 'rel' && $trimmedAttr != 'href'){
+                                $node->setAttribute($trimmedAttr, $val);
+                            }
                         }
                     }
+                    $insertPosition = -1;
+                    for($x = 0 ; $x < $this->childrenCount() ; $x++){
+                        $chNode = $this->getChild($x);
+                        if($chNode->getNodeName() == 'link' && $chNode->getAttribute('rel') == $trimmedRel){
+                            $insertPosition = $x;
+                        }
+                    }
+                    if($insertPosition != -1){
+                        $this->insert($node,$insertPosition+1);
+                    }
+                    else{
+                        $this->addChild($node);
+                    }
+                    return true;
                 }
-                return $this->addChild($node);
             }
         }
         return false;
@@ -755,7 +852,7 @@ class HeadNode extends HTMLNode{
         $chCount = $children->size();
         $list = new LinkedList();
         for($x = 0 ; $x < $chCount ; $x++){
-            $child = &$children->get($x);
+            $child = $children->get($x);
             $childName = $child->getNodeName();
             if($childName == 'link'){
                 if($child->hasAttribute('rel') && $child->getAttributeValue('rel') == 'alternate'){

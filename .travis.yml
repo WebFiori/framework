@@ -15,6 +15,10 @@ jobs:
           arch: s390x
         - php: 5.6
           arch: arm64
+    allow_failures:
+        - arch: ppc64le
+        - arch: s390x
+        - arch: arm64
 os:
     - linux
     # - osx # Services are not supported on osx

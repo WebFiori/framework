@@ -327,7 +327,12 @@ class WebFiori{
                     $index = 0;
                     $trace = $ex->getTrace();
                     foreach ($trace as $arr){
-                        $stackTrace->add('#'.$index,$arr['file'].' (Line '.$arr['line'].')');
+                        if(isset($arr['file'])){
+                            $stackTrace->add('#'.$index,$arr['file'].' (Line '.$arr['line'].')');
+                        }
+                        else if(isset ($arr['function'])){
+                            $stackTrace->add('#'.$index,$arr['function']);
+                        }
                         $index++;
                     }
                     $j->add('stack-trace',$stackTrace);

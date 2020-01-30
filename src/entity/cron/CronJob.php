@@ -28,7 +28,7 @@ use Exception;
  * A class thar represents a cron job.
  *
  * @author Ibrahim
- * @version 1.0.5
+ * @version 1.0.6
  */
 class CronJob {
     /**
@@ -307,8 +307,11 @@ class CronJob {
             return $this->_weeklyOn(self::WEEK_DAYS[$uDayName], $time);
         }
         else{
-            if(gettype($dayNameOrNum) == 'integer' && $dayNameOrNum >= 0 && $dayNameOrNum <= 6){
-                return $this->_weeklyOn($dayNameOrNum, $time);
+            if(gettype($dayNameOrNum) == 'string'){
+                $dayNum = intval($dayNameOrNum);
+                if($dayNum >= 0 && $dayNum <= 6){
+                   return $this->_weeklyOn($dayNum, $time);
+               }   
             }
         }
         return false;

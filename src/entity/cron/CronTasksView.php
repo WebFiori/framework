@@ -31,6 +31,7 @@ use phpStructs\html\Input;
 use phpStructs\html\HTMLNode;
 use phpStructs\html\PNode;
 use phpStructs\html\Label;
+use phpStructs\html\CodeSnippet;
 use webfiori\entity\File;
 use webfiori\WebFiori;
 /**
@@ -81,14 +82,16 @@ class CronTasksView {
         $this->controlsContainer = new HTMLNode();
         $this->controlsContainer->setWritingDir('ltr');
         $this->controlsContainer->setStyle([
-            'direction'=>'ltr'
+            'direction'=>'ltr',
+            'width'=>'100%',
+            'float'=>'left'
         ]);
         $tasksCount = Cron::jobsQueue()->size();
         $h1 = new HTMLNode('h1');
         $h1->addTextNode('Scheduled CRON Tasks');
-        $this->controlsContainer->addChild($h1);
+        Page::insert($h1);
         $hr = new HTMLNode('hr',false);
-        $this->controlsContainer->addChild($hr);
+        Page::insert($hr);
         if(Cron::password() != 'NO_PASSWORD'){
             $this->controlsContainer->addTextNode('<button name="input-element" onclick="logout()"><b>Logout</b></button><br/>', false);
         }
@@ -97,7 +100,6 @@ class CronTasksView {
         $this->controlsContainer->addChild($parag);
         $this->_createRefreshControls();
         $this->_createTasksTable();
-        $this->_displayExecLog();
         $jsCode = new JsCode();
         $isRefresh = 'false';
         if(isset($_GET['refresh'])){
@@ -135,29 +137,39 @@ class CronTasksView {
                 . '     source.innerHTML = \'Executing Job...\';'."\n"
                 . '     var xhr = new XMLHttpRequest();'."\n"
                 . '     xhr.open(\'post\',\'cron/apis/force-execution\');'."\n"
+                . '     var outputWindow = document.getElementById(\'output-area\');'."\n"
+                . '         outputWindow.innerHTML = \'<b>Forcing job "\'+jobName+\'" to execute...</b>\n\';'."\n"
                 . '     xhr.onreadystatechange = function(){'."\n"
+                . '         outputWindow.innerHTML += \'Ready State: \'+this.readyState+\'\n\';'."\n"
                 . '         if(this.readyState === 4 && this.status === 200){'."\n"
                 . '             try{'."\n"
                 . '                 var asJson = JSON.parse(this.responseText);'."\n"
                 . '                 if(asJson[\'more-info\'][\'failed\'].length != 0){'."\n"
+                . '                     outputWindow.innerHTML += \'<b style=\"color:red;font-weight:bold\">Job executed but did not finish successfully.</b> \n\';'."\n"
                 . '                     source.innerHTML = \'<b>The job was executed but did not finish successfully.</b>\';'."\n"
                 . '                 }'."\n"
                 . '                 else{'."\n"
+                . '                     outputWindow.innerHTML += \'<b style=\"color:green;font-weight:bold\">Job executed and finished successfully.</b> \n\';'."\n"
                 . '                     source.innerHTML = \'<b>Job executed and finished successfully</b>\';'."\n"
                 . '                 }'."\n"
                 . '             }'."\n"
                 . '             catch(e){'."\n"
+                . '                 outputWindow.innerHTML += \'<b style=\"color:red;font-weight:bold\">Job did not execute successfully due to server error.</b> \n\';'."\n"
                 . '                 source.innerHTML = \'Something Went Wrong While Executing the Job. Try Again\';'."\n"
                 . '             }'."\n"
+                . '             outputWindow.innerHTML += \'Raw server response:\n\'+this.responseText;'."\n"
                 . '             disableOrEnableInputs(false);'."\n"
                 . '             window.isRefresh = refresh;'."\n"
                 . '         }'."\n"
                 . '         else if(this.readyState === 4 && this.status === 0){'."\n"
+                . '             outputWindow.innerHTML += \'<b style=\"color:red;font-weight:bold\">Connection to the server was lost!</b> \n\';'."\n"
                 . '             source.innerHTML = \'<b>Connection Lost. Try Again.</b>\';'."\n"
                 . '             disableOrEnableInputs(false);'."\n"
                 . '             window.isRefresh = refresh;'."\n"
                 . '         }'."\n"
-                . '         else{'."\n"
+                . '         else if(this.readyState === 4){'."\n"
+                . '             outputWindow.innerHTML += \'<b style=\"color:red;font-weight:bold\">Unknown error prevented job execution!</b> \n\';'."\n"
+                . '             outputWindow.innerHTML += \'Raw server response:\n\'+this.responseText;'."\n"
                 . '             source.innerHTML = \'Something Went Wrong While Executing the Job. Try Again\';'."\n"
                 . '             disableOrEnableInputs(false);'."\n"
                 . '             window.isRefresh = refresh;'."\n"
@@ -180,6 +192,20 @@ class CronTasksView {
                 . '');
         Page::document()->getHeadNode()->addChild($jsCode);
         Page::insert($this->controlsContainer);
+        
+        $outputWindow = new HTMLNode();
+        $outputWindow->setID('output-window');
+        $outputWindow->addTextNode('<p style="border:1px dotted;font-weight:bold">Output Window</p><pre'
+                . ' style="font-family:monospace" id="output-area"></pre>', false);
+        $outputWindow->setStyle([
+            'width'=>'100%',
+            'float'=>'right',
+            'border'=>'1px dotted',
+            'overflow-y'=>'scroll',
+            'height'=>'300px'
+        ]);
+        Page::insert($outputWindow);
+        $this->_displayExecLog();
         Page::render();
     }
     /**
@@ -194,7 +220,7 @@ class CronTasksView {
         $h->addTextNode('Jobs Execution Log:');
         $sec->addChild($h);
         $sec->addChild($pre);
-        $this->controlsContainer->addChild($sec);
+        Page::insert($sec);
         if(file_exists(ROOT_DIR.DIRECTORY_SEPARATOR.'logs'.DIRECTORY_SEPARATOR.'cron.txt')){
             $file = new File('cron.txt', ROOT_DIR.DIRECTORY_SEPARATOR.'logs');
             $file->read();

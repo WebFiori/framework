@@ -229,31 +229,41 @@ class CronTaskView {
                     . '     window.isRefresh = false;'."\n"
                     . '     disableOrEnableInputs();'
                     . '     source.innerHTML = \'Executing Job...\';'."\n"
+                    . '     var outputWindow = document.getElementById(\'output-area\');'."\n"
+                    . '     outputWindow.innerHTML = \'<b>Forcing job "\'+jobName+\'" to execute...</b>\n\';'."\n"
                     . '     var xhr = new XMLHttpRequest();'."\n"
                     . '     xhr.open(\'post\',\'cron/apis/force-execution\');'."\n"
                     . '     xhr.onreadystatechange = function(){'."\n"
+                    . '         outputWindow.innerHTML += \'Ready State: \'+this.readyState+\'\n\';'."\n"
                     . '         if(this.readyState === 4 && this.status === 200){'."\n"
                     . '             try{'."\n"
                     . '                 var asJson = JSON.parse(this.responseText);'."\n"
                     . '                 if(asJson[\'more-info\'][\'failed\'].length != 0){'."\n"
+                    . '                     outputWindow.innerHTML += \'<b style=\"color:red;font-weight:bold\">Job executed but did not finish successfully.</b> \n\';'."\n"
                     . '                     source.innerHTML = \'<b>The job was executed but did not finish successfully.</b>\';'."\n"
                     . '                 }'."\n"
                     . '                 else{'."\n"
+                    . '                     outputWindow.innerHTML += \'<b style=\"color:green;font-weight:bold\">Job executed and finished successfully.</b> \n\';'."\n"
                     . '                     source.innerHTML = \'<b>Job executed and finished successfully</b>\';'."\n"
                     . '                 }'."\n"
                     . '             }'."\n"
                     . '             catch(e){'."\n"
+                    . '                 outputWindow.innerHTML += \'<b style=\"color:red;font-weight:bold\">Job did not execute successfully due to server error.</b> \n\';'."\n"
                     . '                 source.innerHTML = \'Something Went Wrong While Executing the Job. Try Again\';'."\n"
                     . '             }'."\n"
+                    . '             outputWindow.innerHTML += \'Raw server response:\n\'+this.responseText;'."\n"
                     . '             disableOrEnableInputs(false);'."\n"
                     . '             window.isRefresh = refresh;'."\n"
                     . '         }'."\n"
                     . '         else if(this.readyState === 4 && this.status === 0){'."\n"
+                    . '             outputWindow.innerHTML += \'<b style=\"color:red;font-weight:bold\">Connection to the server was lost!</b> \n\';'."\n"
                     . '             source.innerHTML = \'<b>Connection Lost. Try Again.</b>\';'."\n"
                     . '             disableOrEnableInputs(false);'."\n"
                     . '             window.isRefresh = refresh;'."\n"
                     . '         }'."\n"
-                    . '         else{'."\n"
+                    . '         else if(this.readyState === 4){'."\n"
+                    . '             outputWindow.innerHTML += \'<b style=\"color:red;font-weight:bold\">Unknown error prevented job execution!</b> \n\';'."\n"
+                    . '             outputWindow.innerHTML += \'Raw server response:\n\'+this.responseText;'."\n"
                     . '             source.innerHTML = \'Something Went Wrong While Executing the Job. Try Again\';'."\n"
                     . '             disableOrEnableInputs(false);'."\n"
                     . '             window.isRefresh = refresh;'."\n"
@@ -311,6 +321,18 @@ class CronTaskView {
             $forceNode->addTextNode('<button style="margin-top:30px" name="input-element" onclick="execJob(this,\''.$job->getJobName().'\')" class="force-execution-button">Force Execution</button>', false);
             $this->controlsContainer->addChild($forceNode);
             Page::insert($this->controlsContainer);
+            $outputWindow = new HTMLNode();
+            $outputWindow->setID('output-window');
+            $outputWindow->addTextNode('<p style="border:1px dotted;font-weight:bold">Output Window</p><pre'
+                    . ' style="font-family:monospace" id="output-area"></pre>', false);
+            $outputWindow->setStyle([
+                'width'=>'100%',
+                'float'=>'right',
+                'border'=>'1px dotted',
+                'overflow-y'=>'scroll',
+                'height'=>'300px'
+            ]);
+            Page::insert($outputWindow);
             Page::render();
         }
         else{

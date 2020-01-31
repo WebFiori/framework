@@ -32,7 +32,7 @@ use webfiori\entity\Util;
  * It is used to create jobs, schedule them and execute them. In order to run 
  * the jobs automatically, the developer must add an entry in the following 
  * formate in crontab:
- * <p>* * * * *  /usr/bin/php path/to/WebFiori.php --check-cron &lt;cron-pass&gt;</p>
+ * <p><code>* * * * *  /usr/bin/php path/to/WebFiori.php --check-cron &lt;cron-pass&gt;<code></p>
  * Where &lt;cron-pass&gt; is the password 
  * that was set by the developer to protect the jobs from unauthorized access.
  * Note that the path to PHP executable might differ from "/usr/bin/php". 

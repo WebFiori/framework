@@ -83,7 +83,7 @@ abstract class ExtendedWebServices extends WebServices{
         else{
             $langCode = WebFiori::getWebsiteController()->getSessionLang();
         }
-        $this->translation = &Language::loadTranslation($langCode);
+        $this->translation = Language::loadTranslation($langCode);
     }
     /**
      * Returns an associative array that contains HTTP authorization header 
@@ -118,7 +118,7 @@ abstract class ExtendedWebServices extends WebServices{
      * @return Language an instance of the class 'Language'.
      * @since 1.0
      */
-    public function &getTranslation() {
+    public function getTranslation() {
         return $this->translation;
     }
     /**

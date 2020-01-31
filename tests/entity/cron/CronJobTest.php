@@ -545,6 +545,16 @@ class CronJobTest extends TestCase{
     /**
      * @test
      */
+    public function testOnMonth03() {
+        $job = new CronJob();
+        $this->assertTrue($job->onMonth('2', 23, '23:00'));
+        $this->assertEquals('0 23 23 2 *',$job->getExpression());
+        $this->assertTrue($job->onMonth(2, '20', '10:00'));
+        $this->assertEquals('0 10 20 2 *',$job->getExpression());
+    }
+    /**
+     * @test
+     */
     public function testCron00() {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Invalid cron expression: \'\'.');
@@ -713,5 +723,32 @@ class CronJobTest extends TestCase{
         $this->assertEquals('5 1 * * 1',$job->getExpression());
         $this->assertFalse($job->weeklyOn('Monday','1:05'));
         $this->assertEquals('5 1 * * 1',$job->getExpression());
+    }
+    /**
+     * @test
+     */
+    public function testWeeklyOn03() {
+        $job = new CronJob();
+        $this->assertTrue($job->weeklyOn('3','23:00'));
+        $this->assertEquals('0 23 * * 3',$job->getExpression());
+        $this->assertTrue($job->weeklyOn('6','23:00'));
+        $this->assertEquals('0 23 * * 6',$job->getExpression());
+    }
+    /**
+     * @test
+     */
+    public function testWeeklyOn04() {
+        $job = new CronJob();
+        $this->assertFalse($job->weeklyOn('7','23:00'));
+        $this->assertFalse($job->weeklyOn(7,'23:00'));
+    }
+    /**
+     * @test
+     */
+    public function testWeeklyOn05() {
+        $job = new CronJob();
+        $this->assertFalse($job->weeklyOn('0','23:60'));
+        $this->assertFalse($job->weeklyOn('0','24:00'));
+        $this->assertTrue($job->weeklyOn('0','00:00'));
     }
 }

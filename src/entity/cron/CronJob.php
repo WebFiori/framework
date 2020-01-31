@@ -307,7 +307,16 @@ class CronJob {
             return $this->_weeklyOn(self::WEEK_DAYS[$uDayName], $time);
         }
         else{
-            if(gettype($dayNameOrNum) == 'integer' && $dayNameOrNum >= 0 && $dayNameOrNum <= 6){
+            if(gettype($dayNameOrNum) == 'string'){
+                $trimmed = trim($dayNameOrNum);
+                if(in_array($trimmed, ['0','1','2','3','4','5','6'])){
+                    $dayNameOrNum = intval($trimmed);
+                }
+                else{
+                    return false;
+                }
+            }
+            if($dayNameOrNum >= 0 && $dayNameOrNum <= 6){
                 return $this->_weeklyOn($dayNameOrNum, $time);
             }
         }
@@ -327,7 +336,18 @@ class CronJob {
      * @since 1.0
      */
     public function onMonth($monthNameOrNum='jan',$dayNum=1,$time='00:00'){
-        if(gettype($dayNum) == 'integer' && $dayNum >= 1 && $dayNum <= 31){
+        if(gettype($dayNum) == 'string'){
+            $trimmed = trim($dayNum);
+            if(in_array($trimmed, ['0','1','2','3','4','5','6','7','8','9',
+                '10','11','12','13','14','15','16','17','18','19',
+                '20','21','22','23','24','25','26','27','28','29','30','31'])){
+                $dayNum = intval($trimmed);
+            }
+            else{
+                return false;
+            }
+        }
+        if($dayNum >= 1 && $dayNum <= 31){
             $timeSplit = explode(':', $time);
             if(count($timeSplit) == 2){
                 $hour = intval($timeSplit[0]);
@@ -339,7 +359,14 @@ class CronJob {
                         return $this->cron($minute.' '.$hour.' '.$dayNum.' '.$monthNum.' *');
                     }
                     else{
-                        if(gettype($monthNameOrNum) == 'integer' && $monthNameOrNum >= 1 && $monthNameOrNum <= 12){
+                        $trimmed = trim($monthNameOrNum);
+                        if(in_array($trimmed, ['12','1','2','3','4','5','6','7','8','9','10','11'])){
+                            $monthNameOrNum = intval($trimmed);
+                        }
+                        else{
+                            return false;
+                        }
+                        if($monthNameOrNum >= 1 && $monthNameOrNum <= 12){
                             return $this->cron($minute.' '.$hour.' '.$dayNum.' '.$monthNameOrNum.' *');
                         }
                     }

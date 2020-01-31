@@ -25,4 +25,11 @@ class CronTest extends TestCase{
         $job = Cron::getJob('Job 3');
         $this->assertEquals('16 * * * *',$job->getExpression());
     }
+    public function testWeeklyJob00() {
+        Cron::weeklyJob('6-23:00', 'Job X', function(){
+            
+        });
+        $job = Cron::getJob('Job X');
+        $this->assertNotNull($job);
+    }
 }

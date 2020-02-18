@@ -1113,14 +1113,23 @@ class CronJob {
                 $this->isSuccess = $isSuccess === true || $isSuccess === null;
             } 
             catch (Exception $ex) {
+                Cron::log('Job failed to complete due to an exception.');
+                Cron::log('Exception message: "'.$ex->getMessage().'"');
+                Cron::log('Thrown in file: "'.$ex->getFile().'"');
+                Cron::log('Line: "'.$ex->getLine().'"');
                 $this->isSuccess = false;
             }
             if(!$this->isSuccess()){
                 try{
+                    Cron::log('Execiting on fail callback...');
                     call_user_func($this->events['on-failure']['func'], $this->events['on']['params']);
+                    Cron::log('Finished.');
                 } 
                 catch (Exception $ex) {
-                    
+                    Cron::log('An exception is thrown by the on-fail callback.');
+                    Cron::log('Exception message: "'.$ex->getMessage().'"');
+                    Cron::log('Thrown in file: "'.$ex->getFile().'"');
+                    Cron::log('Line: "'.$ex->getLine().'"');
                 }
             }
             $retVal = true;

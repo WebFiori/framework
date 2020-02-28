@@ -23,6 +23,7 @@ class TestQuery_1 extends MySQLQuery{
         $this->table->addColumn('username', new Column('username', 'varchar',20));
         $this->table->addColumn('password', new Column('password', 'varchar',20));
         $this->table->addColumn('email', new Column('email', 'varchar',120));
+        $this->setTable($this->table);
     }
     /**
      * 

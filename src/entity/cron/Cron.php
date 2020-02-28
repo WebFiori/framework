@@ -38,9 +38,15 @@ use webfiori\entity\Util;
  * Note that the path to PHP executable might differ from "/usr/bin/php". 
  * It depends on where the executable has been installed.
  * @author Ibrahim
- * @version 1.0.7
+ * @version 1.0.8
  */
 class Cron {
+    /**
+     * An array that contains strings which acts as log messages.
+     * @var array
+     * @since 1.0.8 
+     */
+    private $logsArray;
     /**
      * The job which is currently executing.
      * @var CronJob|null
@@ -126,6 +132,9 @@ class Cron {
      */
     private function _setActiveJob($job) {
         $this->activeJob = $job;
+        if($job !== null){
+            self::log('Active job: "'.$job->getJobName().'" ...');
+        }
     }
     /**
      * Returns an object that represents the job which is currently being executed.
@@ -134,7 +143,7 @@ class Cron {
      * no job is being executed, the method will return null.
      * @since 1.0.4
      */
-    public static function &activeJob() {
+    public static function activeJob() {
         return self::_get()->activeJob;
     }
     /**
@@ -145,7 +154,7 @@ class Cron {
      * the job. Other than that, the method will return null.
      * @since 1.0.5
      */
-    public static function &getJob($jobName) {
+    public static function getJob($jobName) {
         $trimmed = trim($jobName);
         $retVal = null;
         if(strlen($trimmed) != 0){
@@ -225,13 +234,14 @@ class Cron {
      * @since 1.0
      */
     private function __construct() {
-        $this->timestamp = array(
+        $this->timestamp = [
             'month'=>intval(date('m')),
             'month-day'=>intval(date('d')),
             'week-day'=>intval(date('w')),
             'hour'=>intval(date('H')),
             'minute'=>intval(date('i'))
-        );
+        ];
+        $this->logsArray = [];
         $this->isLogEnabled = false;
         $this->cronJobsQueue = new Queue();
         $this->_setPassword('');
@@ -260,6 +270,27 @@ class Cron {
                 new CronTaskView();
             }
         ]);
+    }
+    /**
+     * Appends a message to the array that contains logged messages.
+     * The main aim of the log is to help developers identify the issues which 
+     * might cause a job to fail.
+     * @param string $message A string that act as a log message. It will be 
+     * appended as passed without any changes.
+     * @since 1.0.8
+     */
+    public static function log($message) {
+        self::_get()->logsArray[] = $message;
+    }
+    /**
+     * Returns the array that contains logged messages.
+     * The array will contain the messages which where logged using the method 
+     * <code>Cron::log()</code>
+     * @return array An array of strings.
+     * @since 1.0.8
+     */
+    public static function getLogArray() {
+        return self::_get()->logsArray;
     }
     private function _setLogEnabled($bool){
         $this->isLogEnabled = $bool === true ? true : false;
@@ -507,6 +538,7 @@ class Cron {
      * @since 1.0.6
      */
     public static function run($pass='',$jobName=null,$force=false) {
+        self::log('Running job(s) check...');
         if(Cron::password() != 'NO_PASSWORD' && WebFiori::getWebsiteController()->getSessionVar('cron-login-status') !== true){
             if(hash('sha256',$pass) != Cron::password()){
                 return 'INV_PASS';
@@ -559,6 +591,7 @@ class Cron {
                 self::_get()->_setActiveJob(null);
             }
         }
+        self::log('Check finished.');
         return $retVal;
     }
     

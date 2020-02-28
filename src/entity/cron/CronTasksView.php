@@ -138,7 +138,7 @@ class CronTasksView {
                 . '     var xhr = new XMLHttpRequest();'."\n"
                 . '     xhr.open(\'post\',\'cron/apis/force-execution\');'."\n"
                 . '     var outputWindow = document.getElementById(\'output-area\');'."\n"
-                . '         outputWindow.innerHTML = \'<b>Forcing job "\'+jobName+\'" to execute...</b>\n\';'."\n"
+                . '     outputWindow.innerHTML = \'<b>Forcing job "\'+jobName+\'" to execute...</b>\n\';'."\n"
                 . '     xhr.onreadystatechange = function(){'."\n"
                 . '         outputWindow.innerHTML += \'Ready State: \'+this.readyState+\'\n\';'."\n"
                 . '         if(this.readyState === 4 && this.status === 200){'."\n"

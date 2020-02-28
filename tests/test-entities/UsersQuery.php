@@ -2,7 +2,7 @@
 namespace webfiori\tests\database;
 use phMysql\MySQLQuery;
 use phMysql\MySQLTable;
-use phMysql\Column;
+use phMysql\MySQLColumn;
 use webfiori\entity\User;
 /**
  * Description of UsersQuery
@@ -27,8 +27,8 @@ class UsersQuery extends MySQLQuery{
             'created-on'=>[],
             'last-updated'=>[]
         ]);
-        $this->table->addColumn('username', new Column('username', 'varchar', 125));
-        $this->table->addColumn('password', new Column('pass', 'varchar', 125));
+        $this->table->addColumn('username', new MySQLColumn('username', 'varchar', 125));
+        $this->table->addColumn('password', new MySQLColumn('pass', 'varchar', 125));
     }
     /**
      * @return MySQLTable Description

@@ -26,9 +26,15 @@ namespace phMysql;
 /**
  * A class that represents a column in MySQL table.
  * @author Ibrahim
- * @version 1.6.5
+ * @version 1.6.6
  */
-class Column{
+class MySQLColumn{
+    /**
+     *
+     * @var type 
+     * @since 1.6.6
+     */
+    private $alias;
     /**
      * A boolean which can be set to true in order to update column timestamp.
      * @var boolean 
@@ -182,13 +188,16 @@ class Column{
      * array Column::DATATYPES. If the given datatype is invalid, 'varchar' 
      * will be used as default type for the column.
      * @param int $size The size of the column. Used only in case of 
-     * 'varachar' and 'int'. If the given size is invalid, 1 will be used as default 
-     * value.
+     * 'varachar', 'int' or decimal. If the given size is invalid, 1 will be used as default 
+     * value. Note that in case of decimal, if this value is 1, scale is set to 
+     * 0. If this value is 2, scale is set to 1. If this value is greater than 
+     * or equal to 3, scale is set to 2 by default.
      * @since 1.0
      */
     public function __construct($colName='col',$datatype='varchar',$size=1) {
         $this->mySqlVersion = '5.5';
         $this->autoUpdate = false;
+        $this->isPrimary = false;
         if($this->setName($colName) !== true){
             $this->setName('col');
         }
@@ -202,8 +211,22 @@ class Column{
             }
         }
         if($realDatatype == 'decimal' || $realDatatype == 'float' || $realDatatype == 'double'){
-            $this->setScale(0);
-            $this->setSize(0);
+            if(!$this->setSize($size)){
+                $this->setSize(10);
+                $this->setScale(2);
+            }
+            else{
+                $size = $this->getSize();
+                if($size == 0 || $size == 1){
+                    $this->setScale(0);
+                }
+                else if($size == 2){
+                    $this->setScale(1);
+                }
+                else{
+                    $this->setScale(2);
+                }
+            }
         }
         
         $this->setIsNull(false);
@@ -211,8 +234,45 @@ class Column{
     }
     /**
      * 
-     * @param string|int|double|null $val
-     * @param boolean $dateEndOfDay Description
+     * @return type
+     * @since 1.6.6
+     */
+    public function getAlias($tablePrefix=false){
+        if($tablePrefix === true && $this->getOwner() !== null){
+            return $this->getOwner()->getName().'.'.$this->alias;
+        }
+        return $this->alias;
+    }
+    /**
+     * Sets an optional alias name for the column.
+     * @param string|null $name A string that represents the alias. If null 
+     * is given, it means the alias will be unset.
+     * @return boolean If the property value is updated, the method will return 
+     * true. Other than that, the method will return false.
+     * @since 1.6.6
+     */
+    public function setAlias($name) {
+        if($name === null){
+            $this->alias = null;
+            return true;
+        }
+        $trimmed = trim($name);
+        if(strlen($trimmed) != 0){
+            if($this->_validateName($trimmed)){
+                $this->alias = $trimmed;
+                return true;
+            }
+        }
+        return false;
+    }
+    /**
+     * Clean and validates a value against the datatype of the column.
+     * @param mixed $val The value that will be cleaned. It can be a single value or 
+     * an array of values.
+     * @param boolean $dateEndOfDay If the datatype of the column is 'datetime' 
+     * or 'timestamp' and time is not specified in the passed value and this 
+     * attribute is set to true, The time will be set to '23:59:59'. Default is 
+     * false.
      * @return int|string|null The return type of the method will depend on 
      * the type of the column as follows:
      * <ul>
@@ -226,20 +286,33 @@ class Column{
      * @since 1.6.4
      */
     public function cleanValue($val,$dateEndOfDay=false) {
-        $type = $this->getType();
+        $valType = gettype($val);
+        if($valType == 'array'){
+            $retVal = [];
+            foreach ($val as $arrVal){
+                $retVal[] = $this->_cleanValueHelper($arrVal, $dateEndOfDay);
+            }
+            return $retVal;
+        }
+        else{
+            return $this->_cleanValueHelper($val, $dateEndOfDay);
+        }
+    }
+    private function _cleanValueHelper($val,$dateEndOfDay=false){
+        $colDatatype = $this->getType();
         if($val === null){
             return null;
         }
-        else if($type == 'int'){
+        else if($colDatatype == 'int'){
             return intval($val);
         }
-        else if($type == 'decimal' || $type == 'float' || $type == 'double'){
+        else if($colDatatype == 'decimal' || $colDatatype == 'float' || $colDatatype == 'double'){
             return '\''.floatval($val).'\'';
         }
-        else if($type == 'varchar' || $type == 'text' || $type == 'mediumtext'){
+        else if($colDatatype == 'varchar' || $colDatatype == 'text' || $colDatatype == 'mediumtext'){
             return '\''.str_replace("'", "\'", $val).'\'';
         }
-        else if($type == 'datetime' || $type == 'timestamp'){
+        else if($colDatatype == 'datetime' || $colDatatype == 'timestamp'){
             $trimmed = strtolower(trim($val));
             if($trimmed == 'current_timestamp'){
                 return 'current_timestamp';
@@ -318,13 +391,22 @@ class Column{
      * Scale is simply the number of digits that will appear to the right of 
      * decimal point. Only applicable if the datatype of the column is decimal, 
      * float and double.
-     * @return int The number of numbers after the decimal point. Default return 
-     * value is 0.
+     * @return int The number of numbers after the decimal point. Note that 
+     * if the size of datatype of the column is 1, scale is set to 
+     * 0 by default. If if the size of datatype of the column is 2, scale is 
+     * set to 1. If if the size of datatype of the column is greater than 
+     * or equal to 3, scale is set to 2 by default.
      * @since 1.6.2
      */
     public function getScale() {
         return $this->scale;
     }
+    /**
+     * Checks if a date-time string is valid or not.
+     * @param string $date A date string in the format 'YYYY-MM-DD HH:MM:SS'.
+     * @return boolean If the string represents correct date and time, the 
+     * method will return true. False if it is not valid.
+     */
     private function _validateDateAndTime($date) {
         $trimmed = trim($date);
         if(strlen($trimmed) == 19){
@@ -405,7 +487,7 @@ class Column{
      * The owner will be unset.
      * @since 1.5
      */
-    public function setOwner(&$table) {
+    public function setOwner($table) {
         if($table instanceof MySQLTable){
             $this->ownerTable = $table;
             $colsCount = count($table->columns());
@@ -432,7 +514,7 @@ class Column{
      * If the column has no owner, the method will return null.
      * @since 1.5
      */
-    public function &getOwner() {
+    public function getOwner() {
         return $this->ownerTable;
     }
     /**
@@ -481,7 +563,7 @@ class Column{
      * The name of the column must be a string and its not empty. 
      * Also it must not contain any spaces or any characters other than A-Z, a-z and 
      * underscore.
-     * @param string $name The name to set.
+     * @param string $name The name of the table as it appears in the database.
      * @return boolean The method will return true if the column name updated. 
      * If the given value is null or invalid string, the method will return 
      * false.
@@ -490,22 +572,34 @@ class Column{
     public function setName($name){
         $trimmed = trim($name);
         if(strlen($trimmed) != 0){
-            if(strpos($trimmed, ' ') === false){
-                for ($x = 0 ; $x < strlen($trimmed) ; $x++){
-                    $ch = $trimmed[$x];
-                    if($x == 0 && ($ch >= '0' && $ch <= '9')){
-                        return false;
-                    }
-                    if($ch == '_' || ($ch >= 'a' && $ch <= 'z') || ($ch >= 'A' && $ch <= 'Z') || ($ch >= '0' && $ch <= '9')){
-
-                    }
-                    else{
-                        return false;
-                    }
-                }
+            if($this->_validateName($trimmed)){
                 $this->name = $trimmed;
                 return true;
             }
+        }
+        return false;
+    }
+    /**
+     * 
+     * @param type $name
+     * @return boolean
+     * @since 1.6.6
+     */
+    private function _validateName($name) {
+        if(strpos($name, ' ') === false){
+            for ($x = 0 ; $x < strlen($name) ; $x++){
+                $ch = $name[$x];
+                if($x == 0 && ($ch >= '0' && $ch <= '9')){
+                    return false;
+                }
+                if($ch == '_' || ($ch >= 'a' && $ch <= 'z') || ($ch >= 'A' && $ch <= 'Z') || ($ch >= '0' && $ch <= '9')){
+
+                }
+                else{
+                    return false;
+                }
+            }
+            return true;
         }
         return false;
     }
@@ -520,7 +614,7 @@ class Column{
      */
     public function getName($tablePrefix=false){
         if($tablePrefix === true && $this->getOwner() !== null){
-            return $this->getOwner().'.'.$this->name;
+            return $this->getOwner()->getName().'.'.$this->name;
         }
         return $this->name;
     }
@@ -569,7 +663,7 @@ class Column{
     }
     /**
      * Checks if the column is a primary key or not.
-     * @return boolean true if the colum is primary.
+     * @return boolean true if the column is primary.
      * @since 1.0
      */
     public function isPrimary(){
@@ -580,11 +674,11 @@ class Column{
      * The datatype must be a value from the array <b>Column::DATATYPES</b>. It 
      * can be in lower case or upper case.
      * @param string $type The type of column data.
-     * @param int $size Size of column data (for 'int' and 'varchar'). If the passed 
-     * size is invalid, 1 will be used.
+     * @param int $size Size of column data (for 'int', 'varchar', 'float', 'double' and 
+     * 'decimal'). If the passed size is invalid, 1 will be used as a default value.
      * @param mixed $default Default value for the column to set in case no value is 
      * given in case of insert.
-     * @return boolean true if the data type is set. False otherwise.
+     * @return boolean The method will return true if the data type is set. False otherwise.
      * @since 1.0
      */
     public function setType($type,$size=1,$default=null){
@@ -594,19 +688,18 @@ class Column{
                 $this->setIsAutoInc(false);
             }
             $this->type = $s_type;
-            if($s_type == 'varchar' || $s_type == 'int'){
+            if($s_type == 'varchar' || $s_type == 'int' || 
+               $s_type == 'double' || $s_type == 'float' || $s_type == 'decimal'){
                 if(!$this->setSize($size)){
                     $this->setSize(1);
                 }
             }
+            else{
+                $this->setSize(1);
+            }
             $this->default = null;
-            if($default != null){
-                if($s_type == 'varchar'){
-                    $this->setDefault($default);
-                }
-                else if($s_type == 'int'){
-                    $this->setDefault($default);
-                }
+            if($default !== null){
+                $this->setDefault($default);
             }
             return true;
         }
@@ -641,7 +734,7 @@ class Column{
         $type = $this->getType();
         if($type == 'datetime' || $type == 'timestamp'){
             if($this->default == 'now()' || $default == 'current_timestamp'){
-                $this->default = '\''.date('Y-m-d H:i:s').'\'';
+                //$this->default = '\''.date('Y-m-d H:i:s').'\'';
             }
             else if(strlen($this->default) == 0 && $this->default !== null){
                 $this->default = null;
@@ -659,7 +752,7 @@ class Column{
         if($defaultVal !== null){
             $dt = $this->getType();
             if($dt == 'varchar' || $dt == 'text' || $dt == 'mediumtext' || 
-                    $dt == 'timestamp' || $dt == 'datetime' || 
+                    //$dt == 'timestamp' || $dt == 'datetime' || 
                     $dt == 'tinyblob' || $dt == 'blob' || $dt == 'mediumblob' || 
                     $dt == 'longblob' || $dt == 'decimal' || $dt == 'float' || $dt == 'double'
                     ){
@@ -668,6 +761,13 @@ class Column{
                     return floatval($retVal);
                 }
                 return $retVal;
+            }
+            else if(($this->default == 'now()' || $this->default == 'current_timestamp') &&
+                    ($dt == 'datetime' || $dt == 'timestamp')){
+                return date('Y-m-d H:i:s');
+            }
+            else if($dt == 'timestamp' || $dt == 'datetime'){
+                return substr($defaultVal, 1, strlen($defaultVal) - 2);
             }
             else if($dt == 'int'){
                 return intval($defaultVal);
@@ -758,7 +858,7 @@ class Column{
      * or float, the value will represents the overall number of digits in the 
      * number (Precision) (e.g: size of 54.323 is 5). If the datatype is varchar, then the 
      * number will represents number of characters. Default value is 1 for 
-     * 'varchar' and 'int'. Zero for decimal, float and double.
+     * all types including datetime and timestamp.
      * @since 1.0
      */
     public function getSize(){

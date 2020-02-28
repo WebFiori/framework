@@ -29,9 +29,21 @@ use phMysql\MySQLTable;
  * A base class that is used to construct MySQL queries. It can be used as a base 
  * class for constructing other MySQL queries.
  * @author Ibrahim
- * @version 1.8.9
+ * @version 1.9.0
  */
-abstract class MySQLQuery{
+class MySQLQuery{
+    /**
+     * The name of the entity class at which a select 
+     * statement result will be mapped to.
+     * @var string|null
+     * @since 1.9.0
+     */
+    private $resultMap;
+    /**
+     * The linked database table.
+     * @var MySQLTable 
+     */
+    private $table;
     /**
      * The name of database schema that the query will be executed on.
      * @var string 
@@ -39,7 +51,7 @@ abstract class MySQLQuery{
      */
     private $schemaName;
     /**
-     * An attribute that is set to true if the query is un update or insert of 
+     * An attribute that is set to true if the query is an update or insert of 
      * blob datatype.
      * @var boolean 
      */
@@ -68,7 +80,7 @@ abstract class MySQLQuery{
         'select','update','delete','insert','show','create','alter','drop'
     );
     /**
-     * A constant for the query 'select * from'.
+     * A constant for the query 'select * from '.
      * @since 1.0
      */
     const SELECT = 'select * from ';
@@ -88,6 +100,7 @@ abstract class MySQLQuery{
      * @since 1.0
      */
     private $query;
+    private $origColsNames;
     /**
      * A string that represents the type of the query such as 'select' or 'update'.
      * @var string 
@@ -108,6 +121,16 @@ abstract class MySQLQuery{
     public function schemaTablesCount($schemaName){
         $this->query = 'select count(*) as tables_count from information_schema.tables where TABLE_TYPE = \'BASE TABLE\' and TABLE_SCHEMA = \''.$schemaName.'\';';
         $this->queryType = 'select';
+    }
+    /**
+     * Returns the name of the entity class at which a select result will 
+     * be mapped to.
+     * @return string|null If the entity name is set, the method will return 
+     * it as string. If not set, the method will return null.
+     * @since 1.9.0
+     */
+    public function getMappedEntity() {
+        return $this->resultMap;
     }
     /**
      * Constructs a query which can be used to update the server's global 
@@ -179,18 +202,51 @@ abstract class MySQLQuery{
         $this->queryType = 'select';
     }
     /**
-     * Sets the name of database that the query will be executed on.
-     * @param string $name Database schema name. It must be non-empty string.
+     * Sets the name of database (Schema) that the query will be executed on.
+     * A schema is a collection of tables. On the other hand, a database 
+     * is a collection of schema. In MySQL, the two terms usually refer to the 
+     * same thing.
+     * @param string $name Database schema name. A valid name 
+     * must have the following conditions:
+     * <ul>
+     * <li>Must not be an empty string.</li>
+     * <li>Cannot start with a number.</li>
+     * <li>Can have numbers in the middle.</li>
+     * <li>Consist of the following characters: [A-Z][a-z] and underscore only.</li>
+     * </ul>
+     * @return boolean If the name of the schema is set, the method will return 
+     * true. Other than that, the method will return false.
      * @since 1.8.7
      */
     public function setSchemaName($name) {
         $nameT = trim($name);
         if(strlen($nameT) != 0){
-            $this->schemaName = $nameT;
+            $len = strlen($nameT);
+            if($len > 0){
+                for ($x = 0 ; $x < $len ; $x++){
+                    $ch = $nameT[$x];
+                    if($x == 0 && ($ch >= '0' && $ch <= '9')){
+                        return false;
+                    }
+                    if($ch == '_' || ($ch >= 'a' && $ch <= 'z') || ($ch >= 'A' && $ch <= 'Z') || ($ch >= '0' && $ch <= '9')){
+
+                    }
+                    else{
+                        return false;
+                    }
+                }
+                $this->schemaName = $nameT;
+                $this->getTable()->setSchemaName($nameT);
+                return true;
+            }
         }
+        return false;
     }
     /**
      * Returns database schema name that the query will be executed on.
+     * A schema is a collection of tables. On the other hand, a database 
+     * is a collection of schema. In MySQL, the two terms usually refer to the 
+     * same thing.
      * @return string Database schema name. If not set, the method will 
      * return null.
      * @since 1.8.7
@@ -201,7 +257,7 @@ abstract class MySQLQuery{
     /**
      * Constructs a query that can be used to get the names of all views in a 
      * schema given its name.
-     * The result of executing the query is a table with one colum. The name 
+     * The result of executing the query is a table with one column. The name 
      * of the column is 'TABLE_NAME'. The column will simply contain all the 
      * names of the views in the schema. If the given schema does not exist 
      * or has no views, The result will be an empty table.
@@ -212,10 +268,28 @@ abstract class MySQLQuery{
         $this->query = 'select TABLE_NAME from information_schema.tables where TABLE_TYPE = \'VIEW\' and TABLE_SCHEMA = \''.$schemaName.'\'';
         $this->queryType = 'select';
     }
-    public function __construct() {
-        $this->query = self::SELECT.' a_table';
+    /**
+     * Creates new instance of the class.
+     * @param string $tableName The name of the table that will be associated 
+     * with the queries that will be created.
+     */
+    public function __construct($tableName=null) {
+        $this->table = new MySQLTable($tableName);
+        $this->query = self::SELECT.$this->getTableName();
         $this->queryType = 'select';
         $this->setIsBlobInsertOrUpdate(false);
+        $this->origColsNames = [];
+    }
+    /**
+     * Links a table to the query.
+     * @param MySQLTable $tableObj The table that will be linked.
+     * @since 1.9.0
+     */
+    public function setTable($tableObj) {
+        if($tableObj instanceof MySQLTable){
+            $this->table = $tableObj;
+            $this->table->setOwnerQuery($this);
+        }
     }
     /**
      * Constructs a query that can be used to alter the properties of a table
@@ -327,7 +401,7 @@ abstract class MySQLQuery{
      * in the generated SQL which description what is happening in every SQL Statement.
      * @since 1.4
      */
-    private function createTable($table,$inclSqlComments=false){
+    private function _createTable($table,$inclSqlComments=false){
         if($table instanceof MySQLTable){
             $query = '';
             if($inclSqlComments === true){
@@ -436,6 +510,14 @@ abstract class MySQLQuery{
         $this->setQuery('show '.$toShow.';', 'show');
     }
     /**
+     * Constructs a query that can be used to delete the table from the 
+     * database.
+     * @since 1.9.0
+     */
+    public function dropTable() {
+        $this->setQuery('drop table '.$this->getTableName().';', 'delete');
+    }
+    /**
      * Returns the value of the property $query.
      * It is simply the query that was constructed by calling any method 
      * of the class.
@@ -529,7 +611,7 @@ abstract class MySQLQuery{
                 $cols = [];
                 $vals = [];
                 foreach($options['where'] as $valOrColIndex => $colOrVal){
-                    if($colOrVal instanceof Column){
+                    if($colOrVal instanceof MySQLColumn){
                         $cols[] = $colOrVal;
                         $vals[] = $valOrColIndex;
                     }
@@ -556,12 +638,75 @@ abstract class MySQLQuery{
         $this->setQuery('select count(*)'.$asPart.' from '.$this->getStructureName().$where.';', 'select');
     }
     /**
+     * Creates an object of the class which represents a join between two tables.
+     * For every join, there is a left table, a right table and a join 
+     * condition. The table which 
+     * will be on the left side of the join will be the table which is 
+     * linked with current instance and the right table is the one which is 
+     * supplied as a parameter to the method.
+     * @param $options array An associative array that contains join information. 
+     * The available options are:
+     * <ul>
+     * <li><b>right-table</b>: This index must be set. It represents the right 
+     * table of the join. It can be an object of type 'MySQLQuery' or an object 
+     * of type 'MySQLTable'.</li>
+     * <li><b>join-cols</b>: An associative array of columns. The indices should be 
+     * the names of columns keys taken from left table and the values should be 
+     * columns keys taken from right table.</li>
+     * <li><b>join-conditions</b>: An optional array of join conditions. It can have 
+     * values like '=' or '!='.</li>
+     * <li><b>join-type</b>: A string that represents the type of the join. 
+     * It can have a value such as 'left', 'right' or 'cross'. Default is 'join'.</li>
+     * <li><b>alias</b>: An optional name for the table that will be created 
+     * by the join. Default is null which means a name will be generated 
+     * automatically.</li>
+     * <li><b>keys-map</b>: An optional array that can have two associative 
+     * arrays. One with key 'left' and the other is with key 'right'. Each one 
+     * of the two arrays can have new names for table columns keys. The indices 
+     * in each array are the original keys names taken from joined tables and 
+     * the values are the new keys which will exist in the joined table. It is 
+     * simply used to map joined keys with new keys which will exist in the new 
+     * joined table.</li>
+     * </ul>
+
+     * @return MySQLQuery|null If the join is a success, the method will return 
+     * an object of type 'MySQLQuery' that can be used to get info from joined 
+     * tables. If no join is formed, the method will return null.
+     */
+    public function join($options) {
+        $right = isset($options['right-table']) ? $options['right-table'] : null;
+        $joinCols = isset($options['join-cols']) && 
+                gettype($options['join-cols']) == 'array' ? $options['join-cols'] : [];
+        $joinType = isset($options['join-type']) ? $options['join-type'] : 'join';
+        $conds = isset($options['join-conditions']) && 
+                gettype($options['join-conditions']) == 'array' ? $options['join-conditions'] : [];
+        $joinOps = [];
+        $alias = isset($options['alias']) ? $options['alias'] : null;
+        $keysAliases = isset($options['keys-map']) && 
+                gettype($options['keys-map']) == 'array' ? $options['keys-map'] : [];
+        if($right instanceof MySQLQuery || $right instanceof MySQLTable){
+            $joinQuery = new MySQLQuery();
+            $joinTable = new JoinTable($this, $right, $alias, $keysAliases);
+            $joinTable->setJoinType($joinType);
+            $joinTable->setJoinCondition($joinCols, $conds, $joinOps);
+            $joinQuery->setTable($joinTable);
+            return $joinQuery;
+        }
+    }
+    /**
      * Constructs a 'select' query.
      * @param array $selectOptions An associative array which contains 
      * options to construct different select queries. The available options are: 
      * <ul>
-     * <li><b>colums</b>: An optional array which can have the keys of columns that 
-     * will be select.</li>
+     * <li><b>map-result-to</b>: A string that represents the name 
+     * of the entity class at which query result will be mapped to. If the 
+     * entity class is in a namespace, then this value must have the name of the 
+     * namespace.</li>
+     * <li><b>columns</b>: An optional array which can have the keys of columns that 
+     * will be select. Also, this array can be an associative array. The indices are columns 
+     * keys and the values are aliases for the columns. In case of joins, the array can have 
+     * two sub arrays for selecting columns from left or right table. the first 
+     * can exist in the index 'left' and the second one in the index 'right'.</li>
      * <li><b>limit</b>: The 'limit' attribute of the query.</li>
      * <li><b>offset</b>: The 'offset' attribute of the query. Ignored if the 
      * option 'limit' is not set.</li>
@@ -569,7 +714,16 @@ abstract class MySQLQuery{
      * be values and the value at each index is an objects of type 'Column'. 
      * Or the indices can be column indices or columns names taken from MySQLTable object and 
      * the values are set for each index. The second way is recommended as one 
-     * table might have two columns with the same values.</li>
+     * table might have two columns with the same values. For multiple values select, 
+     * the value of the indices must be a sub array that can have the following indices: 
+     * 
+     * <ul>
+     * <li><b>values</b>: The values that the column can have.</li>
+     * <li><b>conditions</b>: An array of conditions such as '=' or a string. The 
+     * string can only have one of two values: 'in' or 'not in'</li>
+     * <li><b>join-conditions</b>: An array of conditions which are used to join the 
+     * values. The array can have one of two values: 'and' or 'or'.<li>
+     * </ul></li>
      * <li><b>where</b>: Similar to 'condition-cols-and-vals'.</li>
      * <li><b>conditions</b>: An array that can contains conditions (=, !=, &lt;, 
      * &lt;=, &gt; or &gt;=). If anything else is given at specific index, '=' will be used. In 
@@ -594,7 +748,7 @@ abstract class MySQLQuery{
      * sub associative arrays which has columns 'order by' info. The sub associative 
      * arrays can have the following indices:
      * <ul>
-     * <li><b>col<b>: The name of the column.</li>
+     * <li><b>col</b>: The name of the column.</li>
      * <li>order-type: An optional string to represent the order. It can 
      * be 'A' for ascending or 'D' for descending</li>
      * </ul></li>
@@ -602,10 +756,10 @@ abstract class MySQLQuery{
      * @since 1.8.3
      */
     public function select($selectOptions=array(
-        'colums'=>array(),
-        'condition-cols-and-vals'=>array(),
-        'conditions'=>array(),
-        'join-operators'=>array(),
+        'columns'=>[],
+        'condition-cols-and-vals'=>[],
+        'conditions'=>[],
+        'join-operators'=>[],
         'limit'=>-1,
         'offset'=>-1,
         'select-min'=>false,
@@ -613,9 +767,10 @@ abstract class MySQLQuery{
         'column'=>'',
         'rename-to'=>'',
         'order-by'=>null,
-        'group-by'=>null
+        'group-by'=>null,
+        'without-select'=>false
         )) {
-        $table = $this->getStructure();
+        $table = $this->getTable();
         if($table instanceof MySQLTable){
             $vNum = $table->getMySQLVersion();
             $vSplit = explode('.', $vNum);
@@ -642,30 +797,22 @@ abstract class MySQLQuery{
             if(isset($selectOptions['order-by']) && gettype($selectOptions['order-by']) == 'array'){
                 $orderByPart = $this->_buildOrderByCondition($selectOptions['order-by']);
             }
-            if(isset($selectOptions['columns']) && count($selectOptions['columns']) != 0){
-                $count = count($selectOptions['columns']);
-                $i = 0;
-                $colsFound = 0;
-                foreach ($selectOptions['columns'] as $column){
-                    if($table->hasColumn($column)){
-                        $colsFound++;
-                        if($i + 1 == $count){
-                            $selectQuery .= $this->getColName($column).' from '.$this->getStructureName();
-                        }
-                        else{
-                            $selectQuery .= $this->getColName($column).',';
-                        }
+            if(isset($selectOptions['columns']) && gettype($selectOptions['columns']) == 'array'){
+                $withTablePrefix = isset($selectOptions['table-prefix']) ? $selectOptions['table-prefix'] === true : false;
+                if($table instanceof JoinTable){
+                    if($table->getJoinType() == 'join'){
+                        $joinStm = 'join';
                     }
                     else{
-                        if($i + 1 == $count && $colsFound != 0){
-                            $selectQuery = trim($selectQuery, ',');
-                            $selectQuery .= ' from '.$this->getStructureName();
-                        }
-                        else if($i + 1 == $count && $colsFound == 0){
-                            $selectQuery .= '* from '.$this->getStructureName();
-                        }
+                        $joinStm = $table->getJoinType().' join';
                     }
-                    $i++;
+                    $completeJoin = $this->_getJoinStm($table, $joinStm);
+                    $columnsStr = $this->createColsToSelect($selectOptions['columns'], $withTablePrefix);
+                    $selectQuery .= trim($columnsStr,' ').'from '.$completeJoin;
+                }
+                else{
+                    $columnsStr = $this->createColsToSelect($selectOptions['columns'], $withTablePrefix);
+                    $selectQuery .= trim($columnsStr).' from '.$this->getTableName();
                 }
             }
             else if(isset ($selectOptions['select-max']) && $selectOptions['select-max'] === true){
@@ -701,7 +848,19 @@ abstract class MySQLQuery{
                 }
             }
             else{
-                $selectQuery .= '* from '.$this->getStructureName();
+                if($table instanceof JoinTable){
+                    $colsToSelect = $this->createColsToSelect([], true);
+                    if($table->getJoinType() == 'join'){
+                        $joinStm = 'join';
+                    }
+                    else{
+                        $joinStm = $table->getJoinType().' join';
+                    }
+                    $selectQuery .= trim($colsToSelect,' ')."from ".$this->_getJoinStm($table, $joinStm);
+                }
+                else{
+                    $selectQuery .= '* from '.$this->getTableName();
+                }
             }
             if(!isset($selectOptions['condition-cols-and-vals'])){
                 $selectOptions['condition-cols-and-vals'] = isset($selectOptions['where']) ? $selectOptions['where'] : [];
@@ -711,25 +870,32 @@ abstract class MySQLQuery{
             $selectOptions['conditions'] = isset($selectOptions['conditions']) && 
                     gettype($selectOptions['conditions']) == 'array' ? $selectOptions['conditions'] : array();
             if(isset($selectOptions['condition-cols-and-vals']) && isset($selectOptions['conditions'])){
-                $cols = array();
-                $vals = array();
+                $cols = [];
+                $vals = [];
                 foreach($selectOptions['condition-cols-and-vals'] as $valOrColIndex => $colOrVal){
-                    if($colOrVal instanceof Column){
+                    if($colOrVal instanceof MySQLColumn){
                         $cols[] = $colOrVal;
                         $vals[] = $valOrColIndex;
                     }
                     else{
                         if(gettype($valOrColIndex) == 'integer'){
-                            $testCol = $this->getStructure()->getColByIndex($valOrColIndex);
+                            $testCol = $table->getColByIndex($valOrColIndex);
                         }
                         else{
-                            $testCol = $this->getStructure()->getCol($valOrColIndex);
+//                            if($table instanceof JoinTable){
+//                                $testCol = $table->getJoinCol($valOrColIndex);
+//                            }
+//                            else{
+                                $testCol = $table->getCol($valOrColIndex);
+                            //}
                         }
                         $cols[] = $testCol;
                         $vals[] = $colOrVal;
                     }
                 }
-                $where = $this->createWhereConditions($cols, $vals, $selectOptions['conditions'], $selectOptions['join-operators']);
+                $where = $table instanceof JoinTable ? 
+                        $this->createWhereConditions($cols, $vals, $selectOptions['conditions'], $selectOptions['join-operators'],$table->getName()) :
+                        $this->createWhereConditions($cols, $vals, $selectOptions['conditions'], $selectOptions['join-operators']);
             }
             else{
                 $where = '';
@@ -737,10 +903,262 @@ abstract class MySQLQuery{
             if(trim($where) == 'where'){
                 $where = '';
             }
-            $this->setQuery($selectQuery.$where.$groupByPart.$orderByPart.$limitPart.';', 'select');
+            if($table instanceof JoinTable){
+                if(isset($selectOptions['without-select']) && $selectOptions['without-select'] === true){
+                    $this->setQuery($selectQuery.$where.$groupByPart.$orderByPart.$limitPart, 'select');
+                }
+                else{
+                    $this->setQuery('select * from ('.$selectQuery.")\nas ".$table->getName().$where.$groupByPart.$orderByPart.$limitPart.';', 'select');
+                }
+            }
+            else{
+                $this->setQuery($selectQuery.$where.$groupByPart.$orderByPart.$limitPart.';', 'select');
+            }
+            $asView = isset($selectOptions['as-view']) ? $selectOptions['as-view'] === true : false;
+            if($asView === true){
+                $viewName = $this->getTableName();
+                if(isset($selectOptions['view-name'])){
+                    $trimmed = trim($selectOptions['view-name']);
+                    if(strlen($trimmed) != 0){
+                        $viewName = $trimmed;
+                    }
+                }
+                $this->setQuery('create view '.$viewName.' as ('.trim($this->getQuery(),';').');', 'create');
+            }
+            if(isset($selectOptions['map-result-to'])){
+                if(class_exists($selectOptions['map-result-to'])){
+                    $this->resultMap = $selectOptions['map-result-to'];
+                }
+                else{
+                    $this->resultMap = null;
+                }
+            }
+            else{
+                $this->resultMap = null;
+            }
+            foreach ($this->origColsNames as $key => $origName){
+                $this->getCol($key)->setName($origName);
+            }
             return true;
         }
         return false;
+    }
+    /**
+     * Constructs a string which contains columns names that will be selected.
+     * @param array $colsArr It can be an indexed array which contains columns 
+     * names as specified while creating the linked table. Or it can be an 
+     * associative array. The key should be the name of the column and the value 
+     * is an alias to the column. For example, If the following array is given:
+     * <p>
+     * <code>[
+     * 'name','id'=>'user_id','email'
+     * ]</code>
+     * </p>
+     * And assuming that the column names are the same as given values, 
+     * Then the output will be the following string:
+     * <p>
+     * <code>name, id as user_id, email</code>
+     * </p>
+     * @param boolean $withTablePrefix If set to true, then column name will be 
+     * prefixed with table name.
+     * @return string
+     * @since 1.9.0
+     */
+    public function createColsToSelect($colsArr,$withTablePrefix){
+        $retVal = '';
+        $table = $this->getTable();
+        if($table instanceof JoinTable && $table->hasCommon()){
+            if(count($colsArr) == 0){
+                $comma = " \n";
+                foreach ($table->getLeftTable()->getColumns() as $colObj){
+                    if($table->isCommon($colObj->getName())){
+                        $alias = 'left_'.$colObj->getName();
+                        $colObj->setAlias($alias);
+                        $asPart = $comma.$colObj->getName(true).' as '.$alias;
+                    }
+                    else{
+                        $asPart = $comma.$colObj->getName(true);
+                    }
+                    $retVal .= $asPart;
+                    $comma = ",\n";
+                }
+                foreach ($table->getRightTable()->getColumns() as $colObj){
+                    if($table->isCommon($colObj->getName())){
+                        $alias = 'right_'.$colObj->getName();
+                        $colObj->setAlias($alias);
+                        $asPart = $comma.$colObj->getName(true).' as '.$alias;
+                    }
+                    else{
+                        $asPart = $comma.$colObj->getName(true);
+                    }
+                    $retVal .= $asPart;
+                }
+            }
+            else{
+                $comma = " \n";
+                if(isset($colsArr['left']) && gettype($colsArr['left']) == 'array'){
+                    $retVal .= $this->_createColToSelechH1($colsArr['left'], $comma, 'left');
+                }
+                if(isset($colsArr['right']) && gettype($colsArr['right']) == 'array'){
+                    $retVal .= $this->_createColToSelechH1($colsArr['right'], $comma, 'right');
+                }
+                $retVal .= $this->_createColToSelechH1($colsArr, $comma);
+            }
+        }
+        else{
+            if(count($colsArr) == 0){
+                $retVal = '*';
+            }
+            else{
+                $comma = " \n";
+                foreach ($colsArr as $index => $colName){
+                    if(gettype($index) == 'string'){
+                        $colObj = $this->getCol($index);
+                        $colObj->setAlias($colName);
+                        $asPart = ' as '.$colName;
+                    }
+                    else{
+                        $colObj = $this->getCol($colName);
+                        $asPart = '';
+                    }
+                    if($colObj instanceof MySQLColumn){
+                        $retVal .= $comma.$colObj->getName($withTablePrefix).$asPart;
+                        $comma = ",\n";
+                    }
+                }
+            }
+        }
+        return $retVal."\n";
+    }
+    private function _createColToSelechH1($colsArr,&$comma,$leftOrRightOrBoth='both') {
+        $retVal = '';
+        foreach ($colsArr as $index => $colName){
+            $colPart = null;
+            if(gettype($index) == 'string'){
+                $colPart = $this->_createColToSelectH2($index, $colName, $leftOrRightOrBoth);
+            }
+            else{
+                $colPart = $this->_createColToSelectH2($colName, null, $leftOrRightOrBoth);
+            }
+            if($colPart !== null){
+                $retVal .= $comma.$colPart;
+                $comma = ",\n";
+            }
+        }
+        return $retVal;
+    }
+    /**
+     * 
+     * @param type $colKey
+     * @param type $alias
+     * @param type $leftOrRight
+     * @return type
+     */
+    private function _createColToSelectH2($colKey,$alias=null,$leftOrRight='both') {
+        $table = $this->getTable();
+        $left = true;
+        $asPart = null;
+        $updateName = false;
+        $leftTable = $table->getLeftTable();
+        $rightTable = $table->getRightTable();
+        if($leftOrRight == 'left'){
+            $colObj = $leftTable->getCol($colKey);
+            if(!($colObj instanceof MySQLColumn)){
+                $colObj = $table->getCol($colKey);
+            }
+        }
+        else if($leftOrRight == 'right'){
+            $left = false;
+            $colObj = $rightTable->getCol($colKey);
+            if(!($colObj instanceof MySQLColumn)){
+                $colObj = $table->getCol($colKey);
+            }
+        }
+        else{
+            $colObj = $leftTable->getCol($colKey);
+            if(!($colObj instanceof MySQLColumn)){
+                $left = false;
+                $colObj = $rightTable->getCol($colKey);
+                if(!($colObj instanceof MySQLColumn) /*&& $alias !== null*/){
+                    $colObj = $table->getCol($colKey);
+                    if($colObj instanceof MySQLColumn && $colObj->getOwner()->getName() == $leftTable->getName()){
+                        $left = true;
+                    }
+                    $updateName = true;
+                }
+            }
+        }
+        if($colObj instanceof MySQLColumn){
+            if($alias !== null){
+//                if($colObj->getAlias() !== null){
+//                    $asPart = $colObj->getAlias(true).' as '.$alias;
+//                    $colObj->setName($colObj->getAlias());
+//                    $colObj->setAlias($alias);
+//                }
+//                else{
+                    $asPart = $colObj->getName(true).' as '.$alias;
+                    $colObj->setAlias($alias);
+                //}
+                if($updateName){
+                    $this->origColsNames[$colKey] = $colObj->getName();
+                    $colObj->setName($alias);
+                }
+            }
+            else{
+                if($this->getTable()->isCommon($colObj->getName())){
+                    if($left === true){
+                        $alias = 'left_'.$colObj->getName();
+                        $colObj->setAlias($alias);
+                        $asPart = $colObj->getName(true).' as '.$alias;
+                    }
+                    else{
+                        $alias = 'right_'.$colObj->getName();
+                        $colObj->setAlias($alias);
+                        $asPart = $colObj->getName(true).' as '.$alias;
+                    }
+                }
+                else{
+                    $asPart = $colObj->getName(true);
+                }
+            }
+        }
+        else{
+            $asPart = null;
+        }
+        return $asPart;
+    }
+    /**
+     * 
+     * @param JoinTable $table
+     * @param string $joinStm
+     * @return string
+     * @since 1.9.0
+     */
+    private function _getJoinStm($table,$joinStm){
+        $selectQuery = '';
+        $lt = $table->getLeftTable();
+        $rt = $table->getRightTable();
+        $joinCond = $table->getJoinCondition();
+        if($lt instanceof JoinTable){
+            if($rt instanceof JoinTable){
+                
+            }
+            else{
+                $tempQuery = new MySQLQuery();
+                $tempQuery->setTable($lt);
+                $tempQuery->select([
+                    'without-select'=>true
+                ]);
+                $selectQuery = '('.$tempQuery->getQuery().') as '.$lt->getName().' '.$joinStm.' '.$rt->getName()."\n".$joinCond;
+            }
+        }
+        else if($rt instanceof JoinTable){
+        
+        }
+        else{
+            $selectQuery = $lt->getName().' '.$joinStm.' '.$rt->getName()."\n".$joinCond;
+        }
+        return $selectQuery;
     }
     /**
      * Constructs the 'order by' part of a query.
@@ -761,7 +1179,7 @@ abstract class MySQLQuery{
         for($x = 0 ; $x < $colsCount ; $x++){
             $colName = isset($orderByArr[$x]['col']) ? $orderByArr[$x]['col'] : null;
             $colObj = $this->getCol($colName);
-            if($colObj instanceof Column){
+            if($colObj instanceof MySQLColumn){
                 $orderType = isset($orderByArr[$x]['order-type']) ? strtoupper($orderByArr[$x]['order-type']) : null;
                 $actualColsArr[] = [
                     'object'=>$colObj,
@@ -944,7 +1362,7 @@ abstract class MySQLQuery{
         $index = 0;
         $comma = '';
         $columnsWithVals = [];
-        $defaultCols = $this->getStructure()->getDefaultColsKeys();
+        $defaultCols = $this->getTable()->getDefaultColsKeys();
         $createdOnKey = $defaultCols['created-on'];
         if($createdOnKey !== null){
             $createdOnColObj = $this->getCol($createdOnKey);
@@ -960,12 +1378,12 @@ abstract class MySQLQuery{
                 $comma = ',';
             }
             if(gettype($colIndex) == 'integer'){
-                $column = $this->getStructure()->getColByIndex($colIndex);
+                $column = $this->getTable()->getColByIndex($colIndex);
             }
             else{
-                $column = $this->getStructure()->getCol($colIndex);
+                $column = $this->getTable()->getCol($colIndex);
             }
-            if($column instanceof Column){
+            if($column instanceof MySQLColumn){
                 $columnsWithVals[] = $colIndex;
                 $cols .= $column->getName().$comma;
                 $type = $column->getType();
@@ -1025,12 +1443,17 @@ abstract class MySQLQuery{
         }
         if($createdOnColObj !== null){
             $cols .= ','.$createdOnColObj->getName();
-            $vals .= ','.$createdOnColObj->cleanValue($createdOnColObj->getDefault());
+            if($createdOnColObj->getDefault() == 'now()' || $createdOnColObj->getDefault() == 'current_timestamp'){
+                $vals .= ",'".date('Y-m-d H:i:s')."'";
+            }
+            else{
+                $vals .= ','.$createdOnColObj->cleanValue($createdOnColObj->getDefault());
+            }
         }
         
         $cols = ' ('.$cols.')';
         $vals = ' ('.$vals.')';
-        $this->setQuery(self::INSERT.$this->getStructureName().$cols.' values'.$vals.';', 'insert');
+        $this->setQuery(self::INSERT.$this->getTableName().$cols.' values'.$vals.';', 'insert');
     }
     /**
      * Removes a record from the table.
@@ -1062,22 +1485,22 @@ abstract class MySQLQuery{
         $cols = [];
         $vals = [];
         foreach ($columnsAndVals as $valOrIndex => $colObjOrVal){
-            if($colObjOrVal instanceof Column){
+            if($colObjOrVal instanceof MySQLColumn){
                 $cols[] = $colObjOrVal;
                 $vals[] = $valOrIndex;
             }
             else{
                 if(gettype($valOrIndex) == 'integer'){
-                    $testCol = $this->getStructure()->getColByIndex($valOrIndex);
+                    $testCol = $this->getTable()->getColByIndex($valOrIndex);
                 }
                 else{
-                    $testCol = $this->getStructure()->getCol($valOrIndex);
+                    $testCol = $this->getTable()->getCol($valOrIndex);
                 }
                 $cols[] = $testCol;
                 $vals[] = $colObjOrVal;
             }
         }
-        $query = 'delete from '.$this->getStructureName();
+        $query = 'delete from '.$this->getTableName();
         $this->setQuery($query.$this->createWhereConditions($cols, $vals, $valsConds, $jointOps).';', 'delete');
     }
     /**
@@ -1092,10 +1515,14 @@ abstract class MySQLQuery{
      * @param array $jointOps An array which contains conditional operators 
      * to join conditions. The operators can be logical or bitwise. Possible 
      * values include: &&, ||, and, or, |, &, xor.
+     * @param string $tablePrefix An optional string that represents table prefix.
      * @return string A string that represents the 'where' part of the query.
      * @since 1.8.2
      */
-    private function createWhereConditions($cols,$vals,$valsConds,$jointOps){
+    private function createWhereConditions($cols,$vals,$valsConds,$jointOps,$tablePrefix=null){
+        if($tablePrefix !== null){
+            $tablePrefix = trim($tablePrefix).'.';
+        }
         $colsCount = count($cols);
         $valsCount = count($vals);
         $condsCount = count($valsConds);
@@ -1124,51 +1551,123 @@ abstract class MySQLQuery{
                 $equalityCond = '=';
             }
             //then check if column object is given
-            if($col instanceof Column){
+            if($col instanceof MySQLColumn){
                 //then check value
-                $cleanVal = $col->cleanValue($vals[$index]);
-                $valLower = gettype($vals[$index]) != 'array' ? strtolower(trim($vals[$index])) : '';
+                if(gettype($vals[$index]) != 'array'){
+                    $cleanVal = $col->cleanValue($vals[$index]);
+                    $valLower = strtolower(trim($vals[$index]));
+                }
+                else{
+                    $val = isset($vals[$index]['values']) ? $vals[$index]['values'] : null;
+                    if(gettype($val) == 'array'){
+                        $cleanVal = $col->cleanValue($val);
+                        $valLower = gettype($vals[$index]) != 'array' ? strtolower(trim($vals[$index])) : '';
+                    }
+                    else{
+                        continue;
+                    }
+                }
+                if($col->getAlias() != null){
+                    $colName = $tablePrefix.$col->getAlias();
+                }
+                else{
+                    $colName = $tablePrefix.$col->getName();
+                }
                 if($valLower == 'is null' || $valLower == 'is not null'){
-                    $where .= $col->getName().' '.$valLower.' ';
+                    $where .= $colName.' '.$valLower.' ';
                 }
                 else if($cleanVal === null){
                     if($equalityCond == '='){
-                        $where .= $col->getName().' is null ';
+                        $where .= $colName.' is null ';
                     }
                     else{
-                        $where .= $col->getName().' is not null ';
+                        $where .= $colName.' is not null ';
                     }
                 }
                 else{
                     if($col->getType() == 'datetime' || $col->getType() == 'timestamp'){
                         if($equalityCond == '='){
-                            $where .= $col->getName().' >= '.$cleanVal.' ';
+                            $where .= $colName.' >= '.$cleanVal.' ';
                             $cleanVal = $col->cleanValue($vals[$index],true);
-                            $where .= 'and '.$col->getName().' <= '.$cleanVal.' ';
+                            $where .= 'and '.$colName.' <= '.$cleanVal.' ';
                         }
                         else if($equalityCond == '!='){
-                            $where .= $col->getName().' < '.$cleanVal.' ';
+                            $where .= $colName.' < '.$cleanVal.' ';
                             $cleanVal = $col->cleanValue($vals[$index],true);
-                            $where .= 'and '.$col->getName().' > '.$cleanVal.' ';
+                            $where .= 'and '.$colName.' > '.$cleanVal.' ';
                         }
                         else if($equalityCond == '>='){
-                            $where .= $col->getName().' >= '.$cleanVal.' ';
+                            $where .= $colName.' >= '.$cleanVal.' ';
                             $cleanVal = $col->cleanValue($vals[$index],true);
                         }
                         else if($equalityCond == '<='){
                             $cleanVal = $col->cleanValue($vals[$index],true);
-                            $where .= $col->getName().' <= '.$cleanVal.' ';
+                            $where .= $colName.' <= '.$cleanVal.' ';
                         }
                         else if($equalityCond == '>'){
                             $cleanVal = $col->cleanValue($vals[$index],true);
-                            $where .= $col->getName().' > '.$cleanVal.' ';
+                            $where .= $colName.' > '.$cleanVal.' ';
                         }
                         else if($equalityCond == '<'){
-                            $where .= $col->getName().' < '.$cleanVal.' ';
+                            $where .= $colName.' < '.$cleanVal.' ';
                         }
                     }
+                    else if(gettype($vals[$index]) == 'array'){
+                        $conditions = isset($vals[$index]['conditions']) ? $vals[$index]['conditions'] : [];
+                        $joinConditions = isset($vals[$index]['join-operators']) ? $vals[$index]['join-operators'] : [];
+                        $where .= '(';
+                        if(gettype($conditions) == 'array'){
+                            $condIndex = 0;
+                            while(count($conditions) < count($cleanVal)){
+                                $conditions[] = '=';
+                            }
+                            while(count($joinConditions) < count($cleanVal)){
+                                $joinConditions[] = 'and';
+                            }
+                            foreach ($cleanVal as $singleVal){
+                                $cond = $conditions[$condIndex];
+                                if(!in_array($cond, $supportedConds)){
+                                    $cond = '=';
+                                }
+                                if($condIndex > 0){
+                                    $joinCond = $joinConditions[$condIndex - 1];
+                                    if($joinCond == 'and' || $joinCond == 'or'){
+                                        
+                                    }
+                                    else{
+                                        $joinCond = 'and';
+                                    }
+                                    $where .= $joinCond.' '.$colName.' '.$cond.' '.$singleVal.' ';
+                                }
+                                else{
+                                    $where .= $colName.' '.$cond.' '.$singleVal.' ';
+                                }
+                                $condIndex++;
+                            }
+                            
+                        }
+                        else{
+                            $lCond = strtolower(trim($conditions));
+                            if($lCond == 'in' || $lCond == 'not in'){
+                                $inCond = $lCond.'(';
+                                for($x = 0 ; $x < count($cleanVal) ; $x++){
+                                    if($x + 1 == count($cleanVal)){
+                                        $inCond .= $cleanVal[$x];
+                                    }
+                                    else{
+                                        $inCond .= $cleanVal[$x].',';
+                                    }
+                                }
+                                $where .= $colName.' '.$inCond.')';
+                            }
+                            else{
+                                
+                            }
+                        }
+                        $where = trim($where).')';
+                    }
                     else{
-                        $where .= $col->getName().' '.$equalityCond.' '.$cleanVal.' ';
+                        $where .= $colName.' '.$equalityCond.' '.$cleanVal.' ';
                     }
                 }
                 if($index + 1 != $colsCount){
@@ -1215,7 +1714,7 @@ abstract class MySQLQuery{
             $jointOps[] = 'and';
             $joinOpsCount = count($jointOps);
         }
-        $defaultCols = $this->getStructure()->getDefaultColsKeys();
+        $defaultCols = $this->getTable()->getDefaultColsKeys();
         $lastUpdatedKey = $defaultCols['last-updated'];
         if($lastUpdatedKey !== null){
             $lastUpdatedColObj = $this->getCol($lastUpdatedKey);
@@ -1235,12 +1734,12 @@ abstract class MySQLQuery{
                 $comma = ',';
             }
             if(gettype($colIndex) == 'integer'){
-                $column = $this->getStructure()->getColByIndex($colIndex);
+                $column = $this->getTable()->getColByIndex($colIndex);
             }
             else{
-                $column = $this->getStructure()->getCol($colIndex);
+                $column = $this->getTable()->getCol($colIndex);
             }
-            if($column instanceof Column){
+            if($column instanceof MySQLColumn){
                 $colsStr .= $column->getName().' = ';
                 $type = $column->getType();
                 if($val !== 'null'){
@@ -1304,22 +1803,22 @@ abstract class MySQLQuery{
         $colsArr = [];
         $valsArr = [];
         foreach ($conditionColsAndVals as $valueOrIndex=>$colObjOrVal){
-            if($colObjOrVal instanceof Column){
+            if($colObjOrVal instanceof MySQLColumn){
                 $colsArr[] = $colObjOrVal;
                 $valsArr[] = $valueOrIndex;
             }
             else{
                 if(gettype($valueOrIndex) == 'integer'){
-                    $testCol = $this->getStructure()->getColByIndex($valueOrIndex);
+                    $testCol = $this->getTable()->getColByIndex($valueOrIndex);
                 }
                 else{
-                    $testCol = $this->getStructure()->getCol($valueOrIndex);
+                    $testCol = $this->getTable()->getCol($valueOrIndex);
                 }
                 $colsArr[] = $testCol;
                 $valsArr[] = $colObjOrVal;
             }
         }
-        $this->setQuery('update '.$this->getStructureName().' set '.$colsStr.$this->createWhereConditions($colsArr, $valsArr, $valsConds, $jointOps).';', 'update');
+        $this->setQuery('update '.$this->getTableName().' set '.$colsStr.$this->createWhereConditions($colsArr, $valsArr, $valsConds, $jointOps).';', 'update');
     }
     /**
      * Checks if the query represents a blob insert or update.
@@ -1375,7 +1874,7 @@ abstract class MySQLQuery{
             }
             $index++;
         }
-        $this->setQuery('update '.$this->getStructureName().' set '.$cols.' where '.$idColName.' = '.$id, 'update');
+        $this->setQuery('update '.$this->getTableName().' set '.$cols.' where '.$idColName.' = '.$id, 'update');
     }
     /**
      * Constructs a query that can be used to select maximum value of a table column.
@@ -1415,18 +1914,27 @@ abstract class MySQLQuery{
      * @param boolean $inclComments If set to true, the generated MySQL 
      * query will have basic comments explaining the structure.
      * @return boolean Once the query is structured, the method will return 
-     * true. If the query is not created, the method will return false. 
-     * The query will not constructed if the method 'MySQLQuery::getStructure()' 
-     * did not return an object of type 'Table'.
+     * true. If the query is not created, the method will return false.
+     * @deprecated since version 1.9.0
      * @since 1.5
      */
     public function createStructure($inclComments=false){
-        $t = $this->getStructure();
+        $t = $this->getTable();
         if($t instanceof MySQLTable){
-            $this->createTable($t,$inclComments);
+            $this->_createTable($t,$inclComments);
             return true;
         }
         return false;
+    }
+    /**
+     * Constructs a query that can be used to create the table which is linked 
+     * with the query class.
+     * @param boolean $withComments If set to true, the generated MySQL 
+     * query will have basic comments explaining the structure.
+     * @since 1.9.0
+     */
+    public function createTable($withComments=false) {
+        $this->createStructure($withComments);
     }
     /**
      * Returns the name of the column from the table given its key.
@@ -1439,7 +1947,7 @@ abstract class MySQLQuery{
      */
     public function getColName($colKey){
         $col = $this->getCol($colKey);
-        if($col instanceof Column){
+        if($col instanceof MySQLColumn){
             return $col->getName();
         }
         return $col;
@@ -1447,18 +1955,18 @@ abstract class MySQLQuery{
     /**
      * Returns a column from the table given its key.
      * @param string $colKey The name of the column key.
-     * @return string|Column The the column in the table. If no column was 
+     * @return string|MySQLColumn The the column in the table. If no column was 
      * found, the method will return the string 'MySQLTable::NO_SUCH_COL'. If there is 
      * no table linked with the query object, the method will return the 
      * string MySQLQuery::NO_STRUCTURE.
      * @since 1.6
      */
-    public function &getCol($colKey){
+    public function getCol($colKey){
         $structure = $this->getStructure();
         $retVal = self::NO_STRUCTURE;
         if($structure instanceof MySQLTable){
             $col = $structure->getCol($colKey);
-            if($col instanceof Column){
+            if($col instanceof MySQLColumn){
                 return $col;
             }
             $retVal = MySQLTable::NO_SUCH_COL;
@@ -1474,20 +1982,24 @@ abstract class MySQLQuery{
      */
     public function getColIndex($colKey){
         $col = $this->getCol($colKey);
-        $index = $col instanceof Column ? $col->getIndex() : -1;
+        $index = $col instanceof MySQLColumn ? $col->getIndex() : -1;
         return $index;
     }
     /**
      * Returns the table that is used for constructing queries.
      * @return MySQLTable The table that is used for constructing queries.
      * @since 1.5
+     * @deprecated since version 1.9.0 Use MySQLQuery::getTable() instead.
      */
-    public abstract function getStructure();
+    public function getStructure(){
+        return $this->table;
+    }
     /**
      * Returns the name of the table that is used to construct queries.
      * @return string The name of the table that is used to construct queries. 
      * if no table is linked, the method will return the string MySQLQuery::NO_STRUCTURE.
      * @since 1.5
+     * @deprecated since version 1.9.0 Use MySQLQuery::getTableName() instead.
      */
     public function getStructureName(){
         $s = $this->getStructure();
@@ -1496,8 +2008,25 @@ abstract class MySQLQuery{
         }
         return self::NO_STRUCTURE;
     }
-    
+    /**
+     * Returns the name of the table which is used to constructs the queries.
+     * @param boolean $dbPrefix If database prefix is set and this parameter is 
+     * set to true, the name of the table will include database prefix.
+     * @return string The name of the table which is used to constructs the queries.
+     * @since 1.9.0
+     */
+    public function getTableName($dbPrefix=true) {
+        return $this->getTable()->getName($dbPrefix);
+    }
+    /**
+     * Returns the table which is associated with the query.
+     * @return MySQLTable The table which is used to constructs queries for.
+     * @since 1.9.0
+     */
+    public function getTable() {
+        return $this->table;
+    }
     public function __toString() {
-        return 'Query: '.$this->getQuery().'<br/>'.'Query Type: '.$this->getType().'<br/>';
+        return $this->getQuery();
     }
 }

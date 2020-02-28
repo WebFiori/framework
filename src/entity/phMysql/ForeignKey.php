@@ -24,7 +24,7 @@
  */
 namespace phMysql;
 use phMysql\MySQLTable;
-use phMysql\Column;
+use phMysql\MySQLColumn;
 /**
  * A class that represents a foreign key.
  * A foreign key must have an owner table and a source table. The 
@@ -193,18 +193,31 @@ class ForeignKey {
             $sourceTbl = $this->getSource();
             if($sourceTbl !== null){
                 $ownerCol = $ownerTbl->getCol($ownerColName);
-                if($ownerCol instanceof Column){
+                if($ownerCol instanceof MySQLColumn){
                     $sourceColName = $sourceColName === null ? $ownerColName : trim($sourceColName);
                     $sourceCol = $sourceTbl->getCol($sourceColName);
-                    if($sourceCol instanceof Column){
+                    if($sourceCol instanceof MySQLColumn){
                         if($sourceCol->getType() == $ownerCol->getType()){
                             $this->ownerCols[$ownerColName] = $ownerCol;
                             $this->sourceCols[$sourceColName] = $sourceCol;
                             return true;
                         }
+                        else{
+                            trigger_error('Source['.$sourceColName.'] and target['.$ownerCol.'] columns have incompatible datatypes. '
+                                    . 'Source type: \''.$sourceCol->getType().'\'. Target type: \''.$ownerCol->getType().'\'.');
+                        }
                     }
                 }
+                else{
+                    trigger_error('No column which has the name \''.$ownerColName.'\' was found in the table \''.$ownerTbl->getName().'\'.');
+                }
             }
+            else{
+                trigger_error('Source table is not set.');
+            }
+        }
+        else{
+            trigger_error('Owner table is not set.');
         }
         return false;
     }

@@ -1,7 +1,7 @@
 <?php
 namespace webfiori\tests\entity;
 use phMysql\MySQLQuery;
-use phMysql\Column;
+use phMysql\MySQLColumn;
 use phMysql\MySQLTable;
 /**
  * Description of TestQuery
@@ -17,12 +17,12 @@ class TestQuery_1 extends MySQLQuery{
     public function __construct() {
         parent::__construct();
         $this->table = new MySQLTable('users_table');
-        $this->table->addColumn('user-id', new Column('user_id', 'int', 3));
+        $this->table->addColumn('user-id', new MySQLColumn('user_id', 'int', 3));
         $this->getCol('user-id')->setIsPrimary(true);
         $this->getCol('user-id')->setIsAutoInc(true);
-        $this->table->addColumn('username', new Column('username', 'varchar',20));
-        $this->table->addColumn('password', new Column('password', 'varchar',20));
-        $this->table->addColumn('email', new Column('email', 'varchar',120));
+        $this->table->addColumn('username', new MySQLColumn('username', 'varchar',20));
+        $this->table->addColumn('password', new MySQLColumn('password', 'varchar',20));
+        $this->table->addColumn('email', new MySQLColumn('email', 'varchar',120));
         $this->setTable($this->table);
     }
     /**

@@ -2,7 +2,7 @@
 namespace webfiori\tests\database;
 use phMysql\MySQLQuery;
 use phMysql\MySQLTable;
-use phMysql\Column;
+use phMysql\MySQLColumn;
 use webfiori\tests\testEntity\UserWithContact;
 /**
  * Description of UserContactInfo
@@ -26,10 +26,10 @@ class UserContactInfo extends MySQLQuery{
             ]
         ]);
         $this->getCol('user-id')->setIsUnique(false);
-        $this->table->addColumn('contact-type', new Column('contact_type', 'varchar',100));
+        $this->table->addColumn('contact-type', new MySQLColumn('contact_type', 'varchar',100));
         $this->getCol('contact-type')->setIsUnique(false);
         $this->getCol('contact-type')->setIsPrimary(true);
-        $this->table->addColumn('contact-info', new Column('contact_info', 'varchar',320));
+        $this->table->addColumn('contact-info', new MySQLColumn('contact_info', 'varchar',320));
         $this->table->addReference('webfiori\tests\database\UsersQuery', [
             'user-id'=>'user-id'
         ], 'user_contact_info_fk', 'cadcade', 'cascade');

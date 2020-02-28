@@ -33,6 +33,7 @@ class UserContactInfo extends MySQLQuery{
         $this->table->addReference('webfiori\tests\database\UsersQuery', [
             'user-id'=>'user-id'
         ], 'user_contact_info_fk', 'cadcade', 'cascade');
+        $this->setTable($this->table);
     }
     /**
      * @return MySQLTable Description

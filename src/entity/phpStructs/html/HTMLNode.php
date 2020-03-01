@@ -33,7 +33,7 @@ use Iterator;
  * A class that represents HTML element.
  *
  * @author Ibrahim
- * @version 1.7.9
+ * @version 1.8.0
  */
 class HTMLNode implements Countable, Iterator{
     /**
@@ -1103,14 +1103,15 @@ class HTMLNode implements Countable, Iterator{
      * @param string $name The name of the attribute. If the attribute does not 
      * exist, it will be created. If already exists, its value will be updated. 
      * Note that if the node type is text node, the attribute will never be created.
-     * @param string $val The value of the attribute. Default is empty string. Note 
-     * that if the value has any extra spaces, they will be trimmed.
+     * @param string|null $val The value of the attribute. Default is null. Note 
+     * that if the value has any extra spaces, they will be trimmed. Also, if 
+     * the given value is null, the attribute will be set with no value.
      * @return boolean If the attribute is set, the method will return true. The 
      * method will return false only if the given name is empty string 
      * or the name of the attribute is 'dir' and the value is not 'ltr' or 'rtl'.
      * @since 1.0
      */
-    public function setAttribute($name,$val=''){
+    public function setAttribute($name,$val=null){
         $trimmedName = trim($name);
         $trimmedVal = trim($val);
         if(!$this->isTextNode() && !$this->isComment() && strlen($trimmedName) != 0){
@@ -1129,7 +1130,12 @@ class HTMLNode implements Countable, Iterator{
                     return $this->setStyle($styleArr);
                 }
                 else{
-                    $this->attributes[$lower] = $trimmedVal;
+                    if($val === null){
+                        $this->attributes[$lower] = null;
+                    }
+                    else{
+                        $this->attributes[$lower] = $trimmedVal;
+                    }
                     return true;
                 }
             }
@@ -1528,7 +1534,12 @@ class HTMLNode implements Countable, Iterator{
         if(!$this->isTextNode() && !$this->isComment()){
             $retVal .= '<'.$this->getNodeName().'';
             foreach ($this->getAttributes() as $attr => $val){
-                $retVal .= ' '.$attr.'="'.$val.'"';
+                if($val === null){
+                    $retVal .= ' '.$attr;
+                }
+                else{
+                    $retVal .= ' '.$attr.'="'.$val.'"';
+                }
             }
             $retVal .= '>';
         }
@@ -2002,7 +2013,8 @@ class HTMLNode implements Countable, Iterator{
      * @param string $attrName The name of the attribute. Upper case name and 
      * lower case name is treated same way. Which means 'ID' is like 'id'.
      * @return string|null The method will return the value of the attribute 
-     * if found. If no such attribute, the method will return null.
+     * if found. If no such attribute or the value of the attribute is set 
+     * to null, the method will return null.
      * @since 1.7.7
      */
     public function getAttribute($attrName) {
@@ -2016,7 +2028,8 @@ class HTMLNode implements Countable, Iterator{
      * @param string $attrName The name of the attribute. It can be in upper 
      * or lower case.
      * @return string|null The method will return the value of the attribute 
-     * if found. If no such attribute, the method will return null.
+     * if found. If no such attribute or the value of the attribute is set 
+     * to null, the method will return null.
      * @since 1.1
      */
     public function getAttributeValue($attrName) {
@@ -2027,6 +2040,8 @@ class HTMLNode implements Countable, Iterator{
     }
     /**
      * Checks if the node has a given attribute or not.
+     * Note that if the node is a text node or a comment node, it will 
+     * always return false.
      * @param string $attrName The name of the attribute. It can be in upper case 
      * or lower case.
      * @return boolean true if the attribute is set.

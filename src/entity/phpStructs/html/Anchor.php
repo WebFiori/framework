@@ -29,7 +29,7 @@ use phpStructs\html\HTMLNode;
  * @author Ibrahim
  * @version 1.0
  */
-class LinkNode extends HTMLNode{
+class Anchor extends HTMLNode{
     /**
      * Constructs a new instance of the class
      * @param string $href The link.
@@ -46,7 +46,7 @@ class LinkNode extends HTMLNode{
         else{
             $this->setAttribute('target', '_blank');
         }
-        parent::addChild(self::createTextNode($label,FALSE));
+        parent::addChild(self::createTextNode($label,false));
     }
     /**
      * Sets the value of the property 'href' of the link tag.

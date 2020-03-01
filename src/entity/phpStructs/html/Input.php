@@ -264,7 +264,8 @@ class Input extends HTMLNode{
      * Adds new child node.
      * The node will be added only if the type of the node is 
      * &lt;select&gt; and the given node is of type &lt;option&gt; or 
-     * &lt;optgroup&gt;.
+     * &lt;optgroup&gt;. Also, if the input type is &lt;textarea&gt; and 
+     * the given node is a text node, it will be added.
      * @param HTMLNode $node The node that will be added.
      * @since 1.0.1
      */

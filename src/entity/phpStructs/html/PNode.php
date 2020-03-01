@@ -94,7 +94,7 @@ class PNode extends HTMLNode{
                     $css .= 'font-style:italic;';
                 }
                 if(isset($options['href']) && gettype('href') == 'string'){
-                    $linkNode = new LinkNode($options['href'], $textNode->getText(), '_blank');
+                    $linkNode = new Anchor($options['href'], $textNode->getText(), '_blank');
                 }
                 if(isset($options['em']) && $options['em'] == TRUE){
                     $emNode = new HTMLNode('em');

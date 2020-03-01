@@ -543,8 +543,10 @@ class HeadNode extends HTMLNode{
      * Adds new CSS source file.
      * @param string $href The link to the file. Must be non empty string. It is 
      * possible to append query string to the end of the link.
-     * @param $otherAttrs An array that can contain additional 
-     * attributes to set for the link tag.
+     * @param $otherAttrs An associative array of additional attributes 
+     * to set for the node. The indices are the names of attributes and the value 
+     * of each index is the value of the attribute. Also, the array can only 
+     * have attribute name if its empty attribute. Default is empty array.
      * @param boolean $preventCaching If set to true, a string in the form '?cv=xxxxxxxxxx' will 
      * be appended to the 'href' attribute value. It is used to prevent caching. 
      * Default is true. 'cv' = CSS Version.
@@ -589,9 +591,17 @@ class HeadNode extends HTMLNode{
             }
             if(gettype($otherAttrs) == 'array'){
                 foreach ($otherAttrs as $attr=>$val){
-                    $trimmedAttr = trim(strtolower($attr));
-                    if($trimmedAttr != 'rel' && $trimmedAttr != 'href'){
-                        $tag->setAttribute($trimmedAttr, $val);
+                    if(gettype($attr) == 'integer'){
+                        $trimmedAttr = trim(strtolower($val));
+                        if($trimmedAttr != 'rel' && $trimmedAttr != 'href'){
+                            $tag->setAttribute($val);
+                        }
+                    }
+                    else{
+                        $trimmedAttr = trim(strtolower($attr));
+                        if($trimmedAttr != 'rel' && $trimmedAttr != 'href'){
+                            $tag->setAttribute($trimmedAttr, $val);
+                        }
                     }
                 }
             }
@@ -616,8 +626,10 @@ class HeadNode extends HTMLNode{
      * Adds new JavsScript source file.
      * @param string $loc The location of the file. Must be non-empty string. It 
      * can have query string at the end.
-     * @param $otherAttrs An array that can contain additional 
-     * attributes to set for the script tag (such as 'async').
+     * @param $otherAttrs An associative array of additional attributes 
+     * to set for the node. The indices are the names of attributes and the value 
+     * of each index is the value of the attribute. Also, the array can only 
+     * have attribute name if its empty attribute. Default is empty array.
      * @param boolean $preventCaching If set to true, a string in the form '?jv=xxxxxxxxxx' will 
      * be appended to the 'href' attribute value. It is used to prevent caching. 
      * 'jv' = JavaScript Version.
@@ -662,10 +674,18 @@ class HeadNode extends HTMLNode{
                 }
             }
             if(gettype($otherAttrs) == 'array'){
-                foreach ($otherAttrs as $attr=>$val){
-                    $trimmedAttr = trim(strtolower($attr));
-                    if($trimmedAttr != 'type' && $trimmedAttr != 'src'){
-                        $tag->setAttribute($trimmedAttr, $val);
+                foreach ($otherAttrs as $indexOrAttrName=>$attrOrVal){
+                    if(gettype($indexOrAttrName) == 'integer'){
+                        $trimmedAttr = trim(strtolower($attrOrVal));
+                        if($trimmedAttr != 'type' && $trimmedAttr != 'src'){
+                            $tag->setAttribute($trimmedAttr);
+                        }
+                    }
+                    else{
+                        $trimmedAttr = trim(strtolower($indexOrAttrName));
+                        if($trimmedAttr != 'type' && $trimmedAttr != 'src'){
+                            $tag->setAttribute($trimmedAttr, $attrOrVal);
+                        }
                     }
                 }
             }
@@ -752,7 +772,8 @@ class HeadNode extends HTMLNode{
      * @param string $lang The language of the page. Must be non-empty string.
      * @param array $otherAttrs An associative array of additional attributes 
      * to set for the node. The indices are the names of attributes and the value 
-     * of each index is the value of the attribute. Default is empty array.
+     * of each index is the value of the attribute. Also, the array can only 
+     * have attribute name if its empty attribute. Default is empty array.
      * @return boolean If a link element is created and added, the method will 
      * return true. If not added, the method will return false.
      * @since 1.0
@@ -767,9 +788,17 @@ class HeadNode extends HTMLNode{
             $node->setAttribute('href', $trimmedUrl);
             if(gettype($otherAttrs) == 'array'){
                 foreach ($otherAttrs as $attr=>$val){
-                    $trimmedAttr = trim(strtolower($attr));
-                    if($trimmedAttr != 'rel' && $trimmedAttr != 'hreflang' && $trimmedAttr != 'href'){
-                        $node->setAttribute($trimmedAttr, $val);
+                    if(gettype($attr) == 'integer'){
+                        $trimmedAttr = trim(strtolower($val));
+                        if($trimmedAttr != 'rel' && $trimmedAttr != 'hreflang' && $trimmedAttr != 'href'){
+                            $node->setAttribute($trimmedAttr);
+                        }
+                    }
+                    else{
+                        $trimmedAttr = trim(strtolower($attr));
+                        if($trimmedAttr != 'rel' && $trimmedAttr != 'hreflang' && $trimmedAttr != 'href'){
+                            $node->setAttribute($trimmedAttr, $val);
+                        }
                     }
                 }
             }
@@ -817,9 +846,17 @@ class HeadNode extends HTMLNode{
                     $node->setAttribute('href', $trimmedHref);
                     if(gettype($otherAttrs) == 'array'){
                         foreach ($otherAttrs as $attr=>$val){
-                            $trimmedAttr = trim(strtolower($attr));
-                            if($trimmedAttr != 'rel' && $trimmedAttr != 'href'){
-                                $node->setAttribute($trimmedAttr, $val);
+                            if(gettype($attr) == 'integer'){
+                                $trimmedAttr = trim(strtolower($val));
+                                if($trimmedAttr != 'rel' && $trimmedAttr != 'href'){
+                                    $node->setAttribute($val);
+                                }
+                            }
+                            else{
+                                $trimmedAttr = trim(strtolower($attr));
+                                if($trimmedAttr != 'rel' && $trimmedAttr != 'href'){
+                                    $node->setAttribute($trimmedAttr, $val);
+                                }
                             }
                         }
                     }

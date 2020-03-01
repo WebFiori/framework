@@ -5,7 +5,7 @@ use webfiori\entity\Theme;
 use webfiori\entity\Page;
 use webfiori\logic\WebsiteController;
 use phpStructs\html\ListItem;
-use phpStructs\html\LinkNode;
+use phpStructs\html\Anchor;
 use phpStructs\html\HeadNode;
 use phpStructs\html\HTMLNode;
 use phpStructs\html\Input;
@@ -65,17 +65,17 @@ class WebFioriTheme extends Theme{
             $mainMenu = Page::document()->getChildByID('menu-items-container');
 
             $item1 = new ListItem();
-            $link1 = new LinkNode(SiteConfig::getBaseURL(), $translation->get('menus/main-menu/menu-item-1'));
+            $link1 = new Anchor(SiteConfig::getBaseURL(), $translation->get('menus/main-menu/menu-item-1'));
             $item1->addChild($link1);
             $mainMenu->addChild($item1);
 
             $item2 = new ListItem();
-            $link2 = new LinkNode(SiteConfig::getBaseURL(), $translation->get('menus/main-menu/menu-item-2'));
+            $link2 = new Anchor(SiteConfig::getBaseURL(), $translation->get('menus/main-menu/menu-item-2'));
             $item2->addChild($link2);
             $mainMenu->addChild($item2);
 
             $item3 = new ListItem();
-            $link3 = new LinkNode(SiteConfig::getBaseURL(), $translation->get('menus/main-menu/menu-item-3'));
+            $link3 = new Anchor(SiteConfig::getBaseURL(), $translation->get('menus/main-menu/menu-item-3'));
             $item3->addChild($link3);
             $mainMenu->addChild($item3);
 
@@ -169,7 +169,7 @@ class WebFioriTheme extends Theme{
         $img->setClassName('wf-'.Page::dir().'-col-1-np-nm');
         $img->setID('logo');
         $img->setWritingDir(Page::dir());
-        $link = new LinkNode(SiteConfig::getHomePage(), '');
+        $link = new Anchor(SiteConfig::getHomePage(), '');
         $link->addChild($img);
         $headerSec->addChild($link);
         $session = WebsiteController::get()->getSession();

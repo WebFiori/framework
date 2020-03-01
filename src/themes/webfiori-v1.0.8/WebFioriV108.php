@@ -4,7 +4,7 @@ use webfiori\WebFiori;
 use webfiori\entity\Theme;
 use phpStructs\html\HTMLNode;
 use phpStructs\html\HeadNode;
-use phpStructs\html\LinkNode;
+use phpStructs\html\Anchor;
 use phpStructs\html\ListItem;
 use phpStructs\html\UnorderedList;
 use webfiori\entity\Page;
@@ -148,7 +148,7 @@ class WebFioriV108 extends Theme{
                     $linkLabel = isset($listItem['label']) ? $listItem['label'] : 'Item_Lbl';
                     $itemLink = isset($listItem['link']) ? $listItem['link'] : '#';
                     $isActive = isset($listItem['is-active']) && $listItem['is-active'] === true ? true : false;
-                    $linkNode = new LinkNode($itemLink, $linkLabel);
+                    $linkNode = new Anchor($itemLink, $linkLabel);
                     $linkNode->setClassName('dropdown-item');
                     $subItemsContainer->addChild($linkNode);
                     if($isActive === true){
@@ -250,7 +250,7 @@ class WebFioriV108 extends Theme{
         $logo->setID('main-logo');
         $logo->setAttribute('src', Page::imagesDir().'/favicon.png');
         $logo->setAttribute('alt', 'logo');
-        $logoLink = new LinkNode(WebFiori::getSiteConfig()->getHomePage(), $logo->toHTML());
+        $logoLink = new Anchor(WebFiori::getSiteConfig()->getHomePage(), $logo->toHTML());
         $logoLink->setClassName('navbar-brand ml-3');
         $mainNav->addChild($logoLink);
         

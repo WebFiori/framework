@@ -44,11 +44,13 @@ class SimpleController extends Controller{
                 return true;
             }
             else{
-                fprintf(STDERR, "DB Err: <%s> \n", $this->getDBErrDetails()['error-message']);
+                fprintf(STDERR, "DB Err: \n<%s> \n", $this->getDBErrDetails()['error-message']);
+                fprintf(STDERR, "Query: \n<%s> \n", $this->getLastQuery()->getQuery());
             }
         }
         else{
-            fprintf(STDERR, "DB Err: <%s> \n", $this->getDBErrDetails()['error-message']);
+            fprintf(STDERR, "DB Err: \n<%s> \n", $this->getDBErrDetails()['error-message']);
+            fprintf(STDERR, "Query: \n<%s> \n", $this->getLastQuery()->getQuery());
         }
         return false;
     }
@@ -62,11 +64,13 @@ class SimpleController extends Controller{
                 return true;
             }
             else{
-                fprintf(STDERR, "DB Err: <%s> \n", $this->getDBErrDetails()['error-message']);
+                fprintf(STDERR, "DB Err: \n<%s> \n", $this->getDBErrDetails()['error-message']);
+                fprintf(STDERR, "Query: \n<%s> \n", $this->getLastQuery()->getQuery());
             }
         }
         else{
-            fprintf(STDERR, "DB Err: <%s> \n", $this->getDBErrDetails()['error-message']);
+            fprintf(STDERR, "DB Err: \n<%s> \n", $this->getDBErrDetails()['error-message']);
+            fprintf(STDERR, "Query: \n<%s> \n", $this->getLastQuery()->getQuery());
         }
         return false;
     }
@@ -99,7 +103,8 @@ class SimpleController extends Controller{
                 $this->addContactInfo($user);
             }
             else{
-                fprintf(STDERR, "DB Err: <%s> \n", $this->getDBErrDetails()['error-message']);
+                fprintf(STDERR, "DB Err: \n<%s> \n", $this->getDBErrDetails()['error-message']);
+                fprintf(STDERR, "Query: \n<%s> \n", $this->getLastQuery()->getQuery());
             }
         }
     }
@@ -119,14 +124,16 @@ class SimpleController extends Controller{
                     }
                 }
                 else{
-                    fprintf(STDERR, "DB Err: <%s> \n", $this->getDBErrDetails()['error-message']);
+                    fprintf(STDERR, "DB Err: \n<%s> \n", $this->getDBErrDetails()['error-message']);
+                    fprintf(STDERR, "Query: \n<%s> \n", $this->getLastQuery()->getQuery());
                 }
                 $retVal[] = $user;
             }
             return $retVal;
         }
         else{
-            fprintf(STDERR, "DB Err: <%s> \n", $this->getDBErrDetails()['error-message']);
+            fprintf(STDERR, "DB Err: \n<%s> \n", $this->getDBErrDetails()['error-message']);
+            fprintf(STDERR, "Query: \n<%s> \n", $this->getLastQuery()->getQuery());
         }
     }
     public function addContactInfo($user) {
@@ -134,7 +141,8 @@ class SimpleController extends Controller{
             foreach ($user->getContactInfo()as $k => $v){
                 $this->userInfoQuery->addInfo($user->getID(), $k, $v);
                 if(!$this->excQ($this->userInfoQuery)){
-                    fprintf(STDERR, "DB Err: <%s> \n", $this->getDBErrDetails()['error-message']);
+                    fprintf(STDERR, "DB Err: \n<%s> \n", $this->getDBErrDetails()['error-message']);
+                    fprintf(STDERR, "Query: \n<%s> \n", $this->getLastQuery()->getQuery());
                 }
             }
         }
@@ -146,11 +154,13 @@ class SimpleController extends Controller{
                 return intval($this->getRow()['max']);
             }
             else{
-                fprintf(STDERR, "DB Err: <%s> \n", $this->getDBErrDetails()['error-message']);
+                fprintf(STDERR, "DB Err: \n<%s> \n", $this->getDBErrDetails()['error-message']);
+                fprintf(STDERR, "Query: \n<%s> \n", $this->getLastQuery()->getQuery());
             }
         }
         else{
-            fprintf(STDERR, "DB Err: <%s> \n", $this->getDBErrDetails()['error-message']);
+            fprintf(STDERR, "DB Err: \n<%s> \n", $this->getDBErrDetails()['error-message']);
+            fprintf(STDERR, "Query: \n<%s> \n", $this->getLastQuery()->getQuery());
         }
         return 1;
     }

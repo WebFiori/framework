@@ -28,15 +28,9 @@ use Exception;
  * A class thar represents a cron job.
  *
  * @author Ibrahim
- * @version 1.0.6
+ * @version 1.0.5
  */
 class CronJob {
-    /**
-     * A boolean which is set to true if the job is forced to execute.
-     * @var boolean 
-     * @since 1.0.6
-     */
-    private $isForced;
     /**
      * A constant that indicates a sub cron expression is of type 'range'.
      * @since 1.0
@@ -155,25 +149,6 @@ class CronJob {
         else{
             $this->cron();
         }
-        $this->setIsForced(false);
-    }
-    /**
-     * Sets the value of the property which is used to check if the job is 
-     * forced to execute or not.
-     * @param boolean $bool True or false.
-     * @since 1.0.6
-     */
-    public function setIsForced($bool) {
-        $this->isForced = $bool === true;
-    }
-    /**
-     * Checks if the job is forced to execute or not.
-     * @return boolean If the job was forced to execute, the method will return 
-     * true. Other than that, it will return false.
-     * @since 1.0.6
-     */
-    public function isForced() {
-        return $this->isForced;
     }
     /**
      * Adds new execution attribute.

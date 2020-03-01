@@ -530,7 +530,7 @@ class Cron {
      * <ul>
      * <li><b>total-jobs</b>: Total number of scheduled jobs.</li>
      * <li><b>executed-count</b>: Number of executed jobs.</li>
-     * <li><b>successfully-completed</b>: Number of successfully 
+     * <li><b>successfuly-completed</b>: Number of successfully 
      * completed jobs.</li>
      * <li><b>failed</b>: Number of jobs which did not 
      * finish successfully.</li>
@@ -548,21 +548,20 @@ class Cron {
         $retVal = [
             'total-jobs'=>Cron::jobsQueue()->size(),
             'executed-count'=>0,
-            'successfully-completed'=>[],
+            'successfuly-completed'=>[],
             'failed'=>[]
         ];
         if($jobName !== null){
             $job = self::getJob(trim($jobName));
             if($job instanceof CronJob){
                 if($job->isTime() || $xForce){
-                    $job->setIsForced($xForce);
                     self::_get()->_setActiveJob($job);
                 }
                 if($job->execute($xForce)){
                     self::_get()->_logJobExecution($job,$xForce);
                     $retVal['executed-count']++;
                     if($job->isSuccess() === true){
-                        $retVal['successfully-completed'][] = $job->getJobName();
+                        $retVal['successfuly-completed'][] = $job->getJobName();
                     }
                     else if($job->isSuccess() === false){
                         $retVal['failed'][] = $job->getJobName();
@@ -583,7 +582,7 @@ class Cron {
                     self::_get()->_logJobExecution($job,$xForce);
                     $retVal['executed-count']++;
                     if($job->isSuccess() === true){
-                        $retVal['successfully-completed'][] = $job->getJobName();
+                        $retVal['successfuly-completed'][] = $job->getJobName();
                     }
                     else if($job->isSuccess() === false){
                         $retVal['failed'][] = $job->getJobName();

@@ -29,6 +29,7 @@ class UsersQuery extends MySQLQuery{
         ]);
         $this->table->addColumn('username', new MySQLColumn('username', 'varchar', 125));
         $this->table->addColumn('password', new MySQLColumn('pass', 'varchar', 125));
+        $this->setTable($this->table);
     }
     /**
      * @return MySQLTable Description

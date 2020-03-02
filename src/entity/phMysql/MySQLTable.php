@@ -573,6 +573,7 @@ class MySQLTable {
                     for($x = 0 ; $x < $attrsCount ; $x++){
                         $colName = $colsNames[$x];
                         $setterName = $settersGettersMap['setters'][$x];
+                        $attrName = $entityAttrs[$x];
                         fwrite($file, "    /**\n"
                                     . "     * Sets the value of the attribute '".$attrName."'.\n"
                                     . "     * The value of the attribute is mapped to the column which has\n"

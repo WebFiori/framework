@@ -367,7 +367,7 @@ class HTMLNode implements Countable, Iterator{
                         return false;
                     }
                 }
-                if(($char <= 'z' && $char >= 'a') || ($char >= '0' && $char <= '9') || $char=='-'){
+                if(( $char <= 'z' && $char >= 'a') || ($char >= '0' && $char <= '9') || $char=='-' || $char == ':'){
                     
                 }
                 else{
@@ -1538,7 +1538,7 @@ class HTMLNode implements Countable, Iterator{
                     $retVal .= ' '.$attr;
                 }
                 else{
-                    $retVal .= ' '.$attr.'="'.$val.'"';
+                    $retVal .= ' '.$attr.'="'. str_replace('"', '\"', $val).'"';
                 }
             }
             $retVal .= '>';

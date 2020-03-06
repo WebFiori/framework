@@ -49,17 +49,62 @@ class CLI {
     private static function showHelp() {
         CLI::showVersionInfo();
         echo "Options: \n";
-        self::printCommandInfo('--h', "Show this help. Similar command: --help.");
+        self::printCommandInfo('-h', "Show this help. Similar command: --help.");
         self::printCommandInfo('--hello', "Show 'Hello world!' Message.");
         self::printCommandInfo('--route <url>', "Test the result of a route.");
         self::printCommandInfo('--view-conf', "Display system configuration settings.");
         self::printCommandInfo('--list-cron-jobs <cron-pass>', "Display a list of cron jobs. If cron password is set, it must be provided.");
+        self::printCommandInfo('--force-cron <job-name> <cron-pass>', "Force a CRON job to run.");
         self::printCommandInfo('--check-cron <cron-pass>', "Execute a command to check all jobs and execute them if its time to run the job.");
         //self::printCommandInfo('--view-privileges', "Display all created privileges groups and all privileges inside each group.");
         self::printCommandInfo('--list-routes', "Display all available routes.");
         self::printCommandInfo('--list-themes', "Display a list of available themes.");
         exit(0);
     }
+    private static function forceCronJob($jobName,$cPass) {
+        if($jobName === null){
+            fprintf(STDERR,"Error: Job name is missing.");
+        }
+        else{
+            if($cPass === null && Cron::password() != 'NO_PASSWORD'){
+                fprintf(STDERR,"Error: CRON password is missing.");
+            }
+            else{
+                $result = Cron::run($cPass,$jobName.'',true);
+                if($result == 'INV_PASS'){
+                    fprintf(STDERR,"Error: Provided password is incorrect.");
+                }
+                else if($result == 'JOB_NOT_FOUND'){
+                    fprintf(STDERR,"Error: No job was found which has the name '".$jobName."'");
+                }
+                else{
+                    fprintf(STDOUT,"Total number of jobs: ".$result['total-jobs']."\n");
+                    fprintf(STDOUT,"Executed Jobs: ".$result['executed-count']."\n");
+                    fprintf(STDOUT,"Successfully finished jobs:\n");
+                    $sJobs = $result['successfully-completed'];
+                    if(count($sJobs) == 0){
+                        fprintf(STDOUT,"    <NONE>\n");
+                    }
+                    else{
+                        foreach ($sJobs as $jobName){
+                            fprintf(STDOUT,"    ".$jobName."\n");
+                        }
+                    }
+                    fprintf(STDOUT,"Failed jobs:\n");
+                    $fJobs = $result['failed'];
+                    if(count($fJobs) == 0){
+                        fprintf(STDOUT,"    <NONE>\n");
+                    }
+                    else{
+                        foreach ($fJobs as $jobName){
+                            fprintf(STDOUT,"    ".$jobName."\n");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     /**
      * 
      */
@@ -196,7 +241,7 @@ class CLI {
             else if($commands[1] == "--route"){
                 self::routeCommand();
             }
-            else if($commands[1] == "--h" || $commands[1] == "--help"){
+            else if($commands[1] == "-h" || $commands[1] == "--help"){
                 self::showHelp();
             }
             else if($commands[1] == '--list-routes'){
@@ -211,6 +256,11 @@ class CLI {
             else if($commands[1] == '--check-cron'){
                 $cPass = isset($commands[2]) ? $commands[2] : null;
                 self::checkCron($cPass);
+            }
+            else if($commands[1] == '--force-cron'){
+                $jobName = isset($commands[2]) ? $commands[2] : null;
+                $cPass = isset($commands[3]) ? $commands[3] : null;
+                self::forceCronJob($jobName,$cPass);
             }
             else if($commands[1] == '--list-cron-jobs'){
                 $pass = Cron::password();
@@ -245,7 +295,7 @@ class CLI {
             fprintf(STDOUT,"Total number of jobs: ".$result['total-jobs']."\n");
             fprintf(STDOUT,"Executed Jobs: ".$result['executed-count']."\n");
             fprintf(STDOUT,"Successfully finished jobs:\n");
-            $sJobs = $result['successfuly-completed'];
+            $sJobs = $result['successfully-completed'];
             if(count($sJobs) == 0){
                 fprintf(STDOUT,"    <NONE>\n");
             }

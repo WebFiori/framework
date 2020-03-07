@@ -15,6 +15,18 @@ class PageTest extends TestCase{
     /**
      * @test
      */
+    public function testBeforeRender00() {
+        $this->assertNull(Page::beforeRender());
+        Page::beforeRender('random');
+        $this->assertNull(Page::beforeRender());
+        Page::beforeRender(function(){});
+        $this->assertTrue(is_callable(Page::beforeRender()));
+        Page::reset();
+        $this->assertNull(Page::beforeRender());
+    }
+    /**
+     * @test
+     */
     public function testDefaults00() {
         $this->assertNull(Page::lang());
         $this->assertNull(Page::description());

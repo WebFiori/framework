@@ -52,9 +52,14 @@ use Exception;
  * and canonical URL. Also, this class can be used to load a specific theme 
  * and use it to change the look and feel of the web site.
  * @author Ibrahim
- * @version 1.9
+ * @version 1.9.1
  */
 class Page{
+    /**
+     * A closure which will be called before the page is fully sent back.
+     * @var callable|null 
+     */
+    private $beforeRender;
     /**
      * The document that represents the page.
      * @var HTMLDoc 
@@ -171,6 +176,29 @@ class Page{
         $this->_reset();
     }
     /**
+     * Sets or gets a function which will be executed before the page is rendered.
+     * The function will be executed when the method 'Page::render()' is called. 
+     * One possible use is to do some modifications to the DOM before the 
+     * page is displayed.
+     * @param callback $callable A PHP function that will be get executed. If 
+     * null is passed, the callable will be unset. If anything else is passed, 
+     * it will be ignored.
+     * Returns the function that will be get executed before the view is completely 
+     * rendered.
+     * @return callable|null If the callable is set, the method will return 
+     * it. Other than that, the method will return null.
+     * @since 1.9.1
+     */
+    public static function beforeRender($callable='') {
+        if(is_callable($callable)){
+            self::get()->beforeRender = $callable;
+        }
+        else if($callable === null){
+            self::get()->beforeRender = null;
+        }
+        return self::get()->beforeRender;
+    }
+    /**
      * Reset the page to its defaults.
      */
     public static function reset() {
@@ -178,6 +206,7 @@ class Page{
     }
     private function _reset(){
         $this->document = new HTMLDoc();
+        $this->beforeRender = null;
         $this->setTitle('Hello World');
         $this->setWebsiteName('Hello Website');
         $this->setTitleSep('|');
@@ -538,6 +567,9 @@ class Page{
      * @since 1.9
      */
     public static function render($returnResult=false,$formatted=false) {
+        if(Page::get()->beforeRender !== null){
+            call_user_func(Page::get()->beforeRender);
+        }
         if($returnResult){
             return Page::get()->getDocument()->toHTML($formatted);
         }

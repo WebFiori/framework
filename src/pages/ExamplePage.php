@@ -46,13 +46,16 @@ class ExamplePage{
             $p->addText('Hello from "WebFiori Framework"!');
             Page::insert($p);
         }
+        
         //load UI template components (JS, CSS and others)
         //it is optional. to use a theme but recomended
-        Page::theme('WebFiori V108');
+        Page::theme('Vuetify Theme');
+        //Page::theme('WebFiori V108');
         //Page::theme('Bootstrap Theme');
         //Page::theme('Greeny By Ibrahim Ali');
         //Page::theme('Template Theme');
         //Page::theme('WebFiori Theme');
+        
         $sec = new HTMLNode('section');
         Page::insert($sec);
         $secH = new HTMLNode('h1');

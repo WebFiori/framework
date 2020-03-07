@@ -584,9 +584,6 @@ class Util{
     }
     /**
      * Call this method to display errors and warnings.
-     * Used for debugging. Also, enable logging for info, warning and error 
-     * messages. To enable logging for debug info, define the constant 
-     * 'DEBUG'.
      * @since 0.2
      */
     public static function displayErrors(){

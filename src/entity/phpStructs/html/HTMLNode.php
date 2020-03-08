@@ -268,7 +268,12 @@ class HTMLNode implements Countable, Iterator{
         if(gettype($attrsArr) == 'array'){
             $retVal=[];
             foreach ($attrsArr as $attr => $val){
-                $retVal[$attr] = $this->setAttribute($attr, $val);
+                if(gettype($attr) == 'integer'){
+                    $retVal[$attr] = $this->setAttribute($val);
+                }
+                else{
+                    $retVal[$attr] = $this->setAttribute($attr, $val);
+                }
             }
             return $retVal;
         }

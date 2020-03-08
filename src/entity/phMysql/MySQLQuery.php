@@ -100,7 +100,7 @@ class MySQLQuery{
      * @since 1.0
      */
     private $query;
-    private $origColsNames;
+    private $origColsNames = [];
     /**
      * A string that represents the type of the query such as 'select' or 'update'.
      * @var string 

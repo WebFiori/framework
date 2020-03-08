@@ -62,8 +62,36 @@ class VuetifyTheme extends Theme{
     
     public function getFooterNode(){
         $node = new HTMLNode();
-        $app = new HTMLNode();
+        $app = new HTMLNode('v-footer');
+        $app->setAttribute('app');
+        $app->setAttributes(['dark','padless']);
         $node->addChild($app);
+        
+        $vCard = new HTMLNode('v-card');
+        $app->addChild($vCard);
+        $vCard->setAttributes([
+            'class'=>'flex',
+            'flat','tile'
+        ]);
+        $vCardTitle = new HTMLNode('v-card-title');
+        $vCard->addChild($vCardTitle);
+        $vCardTitle->addTextNode('
+          <strong class="subheading">Get connected with us on social networks!</strong>
+          <v-spacer></v-spacer>
+          <v-btn
+            v-for="icon in icons"
+            :key="icon"
+            class="mx-4"
+            dark
+            icon
+          >
+            <v-icon size="24px">{{ icon }}</v-icon>
+          </v-btn>', false);
+        $vCardText = new HTMLNode('v-card-text');
+        $vCardText->setClassName('py-2 white--text text-center');
+        $vCardText->addTextNode('{{ new Date().getFullYear() }} — <strong>Vuetify</strong>', false);
+        $vCard->addChild($vCardText);
+        
         return $node;
     }
 
@@ -81,8 +109,9 @@ class VuetifyTheme extends Theme{
 
     public function getHeadrNode() {
         $node = new HTMLNode();
-        $app = new HTMLNode();
-        $node->addChild($app);
+        $appBar = new HTMLNode('v-app-bar');
+        $appBar->setAttribute('color', 'red');
+        $node->addChild($appBar);
         return $node;
     }
 

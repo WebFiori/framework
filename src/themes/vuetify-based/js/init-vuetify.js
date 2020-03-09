@@ -1,4 +1,7 @@
 window.onload = () => {
+    //the 'window.data' object can be defined 
+    //in PHP before the page is rendered.
+    //same applies to 'window.locale'
     if(window.data === undefined){
         console.warn('window.data is undefined. Default is used.');
         window.data = {};
@@ -17,8 +20,8 @@ window.onload = () => {
         'mdi-google-plus',
         'mdi-linkedin',
         'mdi-instagram'
-    ]
-    window.data.drawer = false
+    ];
+    window.data.drawer = false;
     window.vue = new Vue({
         el: '#app',
         vuetify: new Vuetify({
@@ -56,6 +59,9 @@ window.onload = () => {
             return window.data;
         },
         computed:{
+            //this can be accessed in PHP and binde it to vutify component 
+            // as follows: 
+            // :label="languageVars.general.something"
             languageVars(){
                 return window.locale;
             }

@@ -55,6 +55,12 @@ class LangExt {
                 'get-connected'=>'تواصل معنا عن طريق شبكات التواصل الإجتماعية!',
                 'copyright-notice'=>'جميع الحقوق محفوظة © '. date('Y')
             ]);
+            $translation->createAndSet('side-menu', [
+                'home'=>'الرئيسة',
+                'account'=>'حسابي',
+                'search'=>'بحث',
+                'something-else'=>'شيء آخر'
+            ]);
         }
         else{
             $translation->createAndSet('vuetify', [
@@ -97,6 +103,12 @@ class LangExt {
             $translation->createAndSet('example/footer', [
                 'get-connected'=>'Stay in touch with us through social media!',
                 'copyright-notice'=>'All Rights Reserved © '. date('Y')
+            ]);
+            $translation->createAndSet('side-menu', [
+                'home'=>'Home',
+                'account'=>'My Account',
+                'search'=>'Search',
+                'something-else'=>'Something Else'
             ]);
         }
     }

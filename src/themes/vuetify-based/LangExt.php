@@ -12,7 +12,7 @@ class LangExt {
      * 
      * @param Language $translation
      */
-    public function extendLang($translation) {
+    public static function extendLang($translation) {
         if($translation->getCode() == 'AR'){
             $translation->createAndSet('vuetify', [
                 'noDataText'=>'لا توجد بيانات للعرض.',
@@ -50,6 +50,10 @@ class LangExt {
             ]);
             $translation->createAndSet('vuetify/calendar', [
                'moreEvents'=>'{0} اكثر'
+            ]);
+            $translation->createAndSet('example/footer', [
+                'get-connected'=>'تواصل معنا عن طريق شبكات التواصل الإجتماعية!',
+                'copyright-notice'=>'جميع الحقوق محفوظة © '. date('Y')
             ]);
         }
         else{
@@ -89,6 +93,10 @@ class LangExt {
             ]);
             $translation->createAndSet('vuetify/calendar', [
                'moreEvents'=>'{0} more'
+            ]);
+            $translation->createAndSet('example/footer', [
+                'get-connected'=>'Stay in touch with us through social media!',
+                'copyright-notice'=>'All Rights Reserved © '. date('Y')
             ]);
         }
     }

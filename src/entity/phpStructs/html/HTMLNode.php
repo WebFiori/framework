@@ -372,7 +372,8 @@ class HTMLNode implements Countable, Iterator{
                         return false;
                     }
                 }
-                if(( $char <= 'z' && $char >= 'a') || ($char >= '0' && $char <= '9') || $char=='-' || $char == ':'){
+                if(( $char <= 'z' && $char >= 'a') || ($char >= '0' && $char <= '9') 
+                        || $char=='-' || $char == ':' || $char == '@'){
                     
                 }
                 else{

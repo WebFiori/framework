@@ -44,6 +44,7 @@ class VuetifyTheme extends Theme{
             $topDiv->addChild($footerSec);
             Page::document()->getBody()->addChild($topDiv);
             Page::document()->getChildByID('main-content-area')->setNodeName('v-content');
+            Page::document()->getChildByID('main-content-area')->setAttribute('app');
             Page::beforeRender(function(){
                 $jsNode = new HTMLNode('script');
                 $jsNode->setAttribute('src', Page::jsDir().'/init-vuetify.js');
@@ -68,7 +69,7 @@ class VuetifyTheme extends Theme{
         $node = new HTMLNode('v-navigation-drawer');
         $node->setAttributes([
             'v-model'=>'drawer',
-            'absolute',
+            'absolute',':right'=>'$vuetify.rtl',
             'temporary']);
         $node->addTextNode('<v-list
           nav
@@ -156,6 +157,7 @@ class VuetifyTheme extends Theme{
     public function getHeadrNode() {
         $node = new HTMLNode();
         $appBar = new HTMLNode('v-app-bar');
+        //$appBar->setAttribute('app');
         $appBar->addTextNode('<template v-slot:img="{ props }">
           <v-img
             v-bind="props"
@@ -168,7 +170,8 @@ class VuetifyTheme extends Theme{
         $appBar->setAttributes([
             'color'=>'red',
             'src'=>'https://picsum.photos/1920/1080?random',
-            'absolute'
+            //'absolute'
+            'hide-on-scroll'
             ]);
         $titleNode = new HTMLNode('v-toolbar-title');
         $titleNode->addTextNode(Page::siteName());

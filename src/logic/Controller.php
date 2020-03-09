@@ -604,7 +604,9 @@ class Controller {
      * method might return different data set on next call or it might return 
      * an empty array.
      * @return array An array which contains all fetched rows from executing a 
-     * database query.
+     * database query. The array can have sub associative arrays or it can 
+     * have objects if the result of the executed query was mapped to an entity 
+     * class.
      * @since 1.3.2
      */
     public function getRows(){
@@ -620,11 +622,13 @@ class Controller {
     * Returns the first row that is resulted from executing a query.
     * Note that if the number of fetched rows is 1, the method can be only 
     * used once to get that row. In addition, If there are other data sets which was resulted from 
-     * executing other select queries, The method will switch to the last 
-     * data set.
-    * @return array|null An associative array that contains row info. The 
+    * executing other select queries, The method will switch to the last 
+    * data set.
+    * @return array|null|object An associative array that contains row info. The 
     * method will return null in case no connection was established to 
-    * the database or there is no active data set.
+    * the database or there is no active data set. Also, if the result of the 
+    * select query was mapped to an entity class, the method will return an 
+    * instance of the mapped class.
     * @since 1.0
     */
     public function getRow(){
@@ -649,9 +653,12 @@ class Controller {
      * will return null. In addition, If there are other data sets which was resulted from 
      * executing other select queries, The method will switch to the last 
      * data set.
-     * @return array|null An associative array that represents the row. If 
+     * @return array|null|object An associative array that represents the row. If 
      * there was no result set generated from executing the query or the 
-     * result has no rows or the current data set has been traversed, the method will return null.
+     * result has no rows or the current data set has been traversed, the 
+     * method will return null. Also, if the result of the 
+     * select query was mapped to an entity class, the method will return an 
+     * instance of the mapped class.
      * @since 1.3.1
      */
     public function nextRow() {

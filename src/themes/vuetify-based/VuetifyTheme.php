@@ -19,7 +19,10 @@ class VuetifyTheme extends Theme{
     public function __construct() {
         parent::__construct();
         $this->setVersion('1.0');
+        $this->setVersion('1.0');
         $this->setAuthor('Ibrahim');
+        $this->setLicenseName('MIT License');
+        $this->setLicenseUrl('https://opensource.org/licenses/MIT');
         $this->setName('Vuetify Theme');
         $this->setDirectoryName('vuetify-based');
         $this->setJsDirName('js');
@@ -234,6 +237,13 @@ class VuetifyTheme extends Theme{
             'elevate-on-scroll',
             'fixed','app'
         ]);
+        $logo = new HTMLNode('v-img');
+        $logo->setAttributes([
+            'src'=>Page::imagesDir().'/favicon.png',
+            'max-height'=>45,
+            'max-width'=>45
+        ]);
+        //$appBar->addChild($logo);
         $appBar->addTextNode('<template v-slot:img="{ props }">
           <v-img
             v-bind="props"

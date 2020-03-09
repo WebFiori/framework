@@ -29,6 +29,14 @@ use phpStructs\html\HTMLNode;
 use phpStructs\html\UnorderedList;
 class ExamplePage{
     public function __construct() {
+        //load UI template components (JS, CSS and others)
+        //it is optional. to use a theme but recomended
+        Page::theme('Vuetify Theme');
+        //Page::theme('WebFiori V108');
+        //Page::theme('Bootstrap Theme');
+        //Page::theme('Greeny By Ibrahim Ali');
+        //Page::theme('Template Theme');
+        //Page::theme('WebFiori Theme');
         
         //sets the title of the page
         $lang = Page::lang();
@@ -46,26 +54,45 @@ class ExamplePage{
             $p->addText('Hello from "WebFiori Framework"!');
             Page::insert($p);
         }
-        //load UI template components (JS, CSS and others)
-        //it is optional. to use a theme but recomended
-        Page::theme('WebFiori V108');
-        //Page::theme('Bootstrap Theme');
-        //Page::theme('Greeny By Ibrahim Ali');
-        //Page::theme('Template Theme');
-        //Page::theme('WebFiori Theme');
+        
         $sec = new HTMLNode('section');
         Page::insert($sec);
         $secH = new HTMLNode('h1');
-        $secH->addTextNode('What is WebFiori Framework? ');
+        if(Page::lang() == 'AR'){
+            $secH->addTextNode('ما هو إطار برمجة ويب فيوري؟');
+        }
+        else{
+            $secH->addTextNode('What is WebFiori Framework? ');
+        }
         $sec->addChild($secH);
         $p2 = new PNode();
-        $p2->addText('WebFiori Framework is a web framework which is built using PHP language. The framework is fully object oriented (OOP). It allows the use of the famous model-view-controller (MVC) model but it does not force it. The framework comes with many features which can help in making your website or web application up and running in no time.');
+        if(Page::lang() == 'AR'){
+             $p2->addText('إطار برمجة ويب فيوري هو اطار برمجة يستخدم في بناء '
+                     . 'تطبيقات الشبكة بإستخدام لغة برمجة بي إتش بي .'
+                     . 'الإطار بالكامل كائني التوجه و يسمح بإستخدام هيكلة ال MVC '
+                     . 'لكنه لا يجبر المطور على استخدامها. الإطار يأتي مع العديد من الميزات '
+                     . 'اللتي تُساعد مطور الشبكة على بناء المواقع الإلكترونية او '
+                     . 'طبيقات الشبكة بشكل سريع.');
+        }
+        else{
+             $p2->addText('WebFiori Framework is a web framework which is built '
+                . 'using PHP language. The framework is fully object oriented '
+                . '(OOP). It allows the use of the famous model-view-controller '
+                . '(MVC) model but it does not force it. The framework comes '
+                . 'with many features which can help in making your website '
+                . 'or web application up and running in no time.');
+        }
         $sec->addChild($p2);
         
         $sec = new HTMLNode('section');
         Page::insert($sec);
         $secH = new HTMLNode('h1');
-        $secH->addTextNode('Key Features');
+        if(Page::lang() == 'AR'){
+            $secH->addTextNode('الميزات الأساسية');
+        }
+        else{
+            $secH->addTextNode('Key Features');
+        }
         $sec->addChild($secH);
         $ul = new UnorderedList();
         $ul->addListItems([

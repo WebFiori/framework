@@ -11,7 +11,7 @@ use webfiori\conf\SiteConfig;
 class ThemeTest extends TestCase{
     public function testAvailableThemes00() {
         $themes = Theme::getAvailableThemes();
-        $this->assertEquals(5,count($themes));
+        $this->assertEquals(6,count($themes));
     }
     /**
      * @test

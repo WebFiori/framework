@@ -1,6 +1,12 @@
 {
     "name": "webfiori/framework",
-    "description": "WebFiori framework.",
+    "description": "WebFiori framework. Made to make the web bloom.",
+    "authors": [
+        {
+            "name": "Ibrahim BinAlshikh",
+            "email": "ibrahim@webfiori.com"
+        }
+    ],
     "require": {
         "php": ">=5.6",
         "ext-mbstring":"*"

@@ -121,6 +121,10 @@ class AutoLoader{
             $onFail = isset($options['on-load-failure']) ? $options['on-load-failure'] : 'throw-exception';
             self::$loader = new AutoLoader($root, $frameworkSearchFoldres, $defineRoot,$onFail);
         }
+        if(defined('LOAD_COMPOSER_PACKAGES') && LOAD_COMPOSER_PACKAGES === true){
+            $composerVendor = self::_getComposerVendorDir();
+            self::$loader->addSearchDirectory($composerVendor, true, false);
+        }
         return self::$loader;
     }
     /**
@@ -198,21 +202,57 @@ class AutoLoader{
         }
     }
     /**
+     * Returns a string that represents the directory of 'vendor' folder of 
+     * composer.
+     * @return string
+     * @since 1.1.6
+     */
+    private static function _getComposerVendorDir(){
+        $vendorLevel = 2;
+        $DS = DIRECTORY_SEPARATOR;
+        $split = explode($DS, ROOT_DIR);
+        $vendorPath = '';
+        $lastLevel = count($split) - $vendorLevel - 1;
+        for($x = 0 ; $x < $lastLevel; $x++){
+            if($x + 1 == $lastLevel){
+                $vendorPath .= $split[$x];
+            }
+            else{
+                $vendorPath .= $split[$x].$DS;
+            }
+        }
+        return $vendorPath;
+    }
+    /**
      * Adds new search directory to the array of search 
      * folders.
      * @param string $dir A new directory (such as '/entity/html-php-structs-1.6/html').
+     * @param  string $incSubFolders If set to true, even sub-folders will 
+     * be included in the search.
+     * @param string $appendRoot If set to true, Root directory of the search will 
+     * be added as a prefix to the path.
      * @since 1.0
      * @deprecated since version 1.1.2
      */
-    private function addSearchDirectory($dir,$incSubFolders=true) {
+    private function addSearchDirectory($dir,$incSubFolders=true,$appendRoot=true) {
         $DS = DIRECTORY_SEPARATOR;
         if(strlen($dir) != 0){
-            $cleanDir = $DS. trim(str_replace('\\', $DS, str_replace('/', $DS, $dir)), '\\/');
+            if($appendRoot === true){
+                $cleanDir = $DS. trim(str_replace('\\', $DS, str_replace('/', $DS, $dir)), '\\/');
+            }
+            else{
+                $cleanDir = $dir;
+            }
             if($incSubFolders){
                 $dirsStack = [];
                 $dirsStack[] = $cleanDir;
                 while($xDir = array_pop($dirsStack)){
-                    $fullPath =  $this->getRoot().$xDir;
+                    if($appendRoot === true){
+                        $fullPath = $this->getRoot().$xDir;
+                    }
+                    else{
+                        $fullPath = $xDir;
+                    }
                     if(is_dir($fullPath)){
                         $subDirs = scandir($fullPath);
                         foreach ($subDirs as $subDir){
@@ -220,7 +260,7 @@ class AutoLoader{
                                 $dirsStack[] = $xDir.$DS.$subDir;
                             }
                         }
-                        $this->searchFolders[] = $xDir;
+                        $this->searchFolders[$xDir] = $appendRoot;
                     }
                     else{
                         if(is_dir($fullPath)){
@@ -230,20 +270,20 @@ class AutoLoader{
                                     $dirsStack[] = $xDir.$DS.$subDir;
                                 }
                             }
-                            $this->searchFolders[] = $xDir;
+                            $this->searchFolders[$xDir] = $appendRoot;
                         }
                     }
                 }
             }
             else{
-                $this->searchFolders[] = $cleanDir;
+                $this->searchFolders[$cleanDir] = $appendRoot;
             }
         }
     }
     /**
      * Adds new folder to the set folder at which the autoloader will try to search 
      * on for classes.
-     * @param string $dir A string that represents a dirictory. The directory 
+     * @param string $dir A string that represents a directory. The directory 
      * must be inside the scope of the framework.
      * @param boolean $incSubFolders If set to true, even sub-directories which 
      * are inside the given directory will be included in the search.
@@ -283,8 +323,13 @@ class AutoLoader{
         $loaded = false;
         $root = $this->getRoot();
         $allPaths = self::getClassPath($className);
-        foreach ($this->searchFolders as $value) {
-            $f = $root.$value.$DS.$className.'.php';
+        foreach ($this->searchFolders as $value => $appendRoot) {
+            if($appendRoot === true){
+                $f = $root.$value.$DS.$className.'.php';
+            }
+            else{
+                $f = $value.$DS.$className.'.php';
+            }
             if(file_exists($f) && !in_array($f, $allPaths)){
                 require_once $f;
                 $this->loadedClasses[] = [
@@ -303,7 +348,12 @@ class AutoLoader{
             }
             else{
                 //lower case class name to support loading of old-style classes.
-                $f = $root.$value.$DS. strtolower($className).'.php';
+                if($appendRoot === true){
+                    $f = $root.$value.$DS. strtolower($className).'.php';
+                }
+                else{
+                    $f = $value.$DS. strtolower($className).'.php';
+                }
                 if(file_exists($f) && !in_array($f, $allPaths)){
                     require_once $f;
                     $this->loadedClasses[] = [
@@ -403,8 +453,13 @@ class AutoLoader{
      */
     public static function getFolders() {
         $folders = array();
-        foreach(self::get()->searchFolders as $f){
-            $folders[] = self::get()->getRoot().$f;
+        foreach(self::get()->searchFolders as $f => $appendRoot){
+            if($appendRoot === true){
+                $folders[] = self::get()->getRoot().$f;
+            }
+            else{
+                $folders[] = $f;
+            }
         }
         return $folders;
     }

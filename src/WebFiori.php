@@ -45,8 +45,15 @@ use webfiori\entity\CLI;
 use Exception;
 /**
  * The time at which the framework was booted in microseconds as a float.
+ * @since 1.1.0
  */
 define('MICRO_START', microtime(true));
+/**
+ * This constant is used to tell the core if the application uses composer 
+ * packages or not. If set to true, then composer packages will be loaded.
+ * @since 1.1.0
+ */
+define('LOAD_COMPOSER_PACKAGES', true);
 /**
  * The instance of this class is used to control basic settings of 
  * the framework. Also, it is the entry point of any request.
@@ -623,7 +630,10 @@ class WebFiori{
         WebFiori::getAndStart()->_needConfigration();
     }
 }
-//start the system
+/**
+ * This where magic will start.
+ * Planting the application into the ground and make your work bloom.
+ */
 WebFiori::getAndStart();
 if(CLI::isCLI() === true){
     CLI::runCLI();

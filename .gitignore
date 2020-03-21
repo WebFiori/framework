@@ -3,3 +3,4 @@
 test.*
 /tmp
 /clover.xml
+/vendor

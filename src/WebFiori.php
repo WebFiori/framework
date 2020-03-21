@@ -632,7 +632,7 @@ class WebFiori{
 }
 /**
  * This where magic will start.
- * Planting the application into the ground and make your work bloom.
+ * Planting application seed into the ground and make your work bloom.
  */
 WebFiori::getAndStart();
 if(CLI::isCLI() === true){

@@ -123,7 +123,9 @@ class AutoLoader{
         }
         if(defined('LOAD_COMPOSER_PACKAGES') && LOAD_COMPOSER_PACKAGES === true){
             $composerVendor = self::_getComposerVendorDir();
-            self::$loader->addSearchDirectory($composerVendor, true, false);
+            if(strlen($composerVendor) != 0){
+                self::$loader->addSearchDirectory($composerVendor, true, false);
+            }
         }
         return self::$loader;
     }
@@ -208,17 +210,30 @@ class AutoLoader{
      * @since 1.1.6
      */
     private static function _getComposerVendorDir(){
-        $vendorLevel = 2;
         $DS = DIRECTORY_SEPARATOR;
         $split = explode($DS, ROOT_DIR);
         $vendorPath = '';
-        $lastLevel = count($split) - $vendorLevel - 1;
-        for($x = 0 ; $x < $lastLevel; $x++){
-            if($x + 1 == $lastLevel){
+        $pathsCount = count($split);
+        $vendorFound = false;
+        for($x = 0 ; $x < $pathsCount; $x++){
+            if(is_dir($vendorPath.$DS.'vendor')){
+                $vendorPath = $vendorPath.$DS.'vendor';
+                $vendorFound = true;
+                break;
+            }
+            if($x + 1 == $pathsCount){
                 $vendorPath .= $split[$x];
             }
             else{
                 $vendorPath .= $split[$x].$DS;
+            }
+        }
+        if(!$vendorFound){
+            if(is_dir($vendorPath.$DS.'vendor')){
+                $vendorPath = $vendorPath.$DS.'vendor';
+            }
+            else{
+                $vendorPath = '';
             }
         }
         return $vendorPath;

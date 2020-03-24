@@ -55,7 +55,7 @@ class EmailMessageTest extends TestCase{
         $smtp->setAddress('test@programmingacademia.com');
         $smtp->setUsername('test@programmingacademia.com');
         $smtp->setServerAddress('mail.programmingacademia.com ');
-        $smtp->setPort(25);
+        $smtp->setPort(765765);
         MailConfig::get()->addSMTPAccount('smtp-acc-00', $smtp);
         $message = EmailMessage::createInstance('smtp-acc-00');
         $this->assertTrue($message instanceof EmailMessage);

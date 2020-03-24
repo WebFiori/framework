@@ -436,13 +436,13 @@ class AutoLoader{
                     'path'=>$f
                 ];
                 $loaded = true;
-//                if(PHP_MAJOR_VERSION < 7 || (PHP_MAJOR_VERSION == 7 && PHP_MINOR_VERSION < 3)){
-//                    //in php 7.2 and lower, if same class is loaded 
-//                    //from two namespaces with same name, it will 
-//                    //rise a fatal error with message 
-//                    // 'Cannot redeclare class'
-//                    break;
-//                }
+                if(PHP_MAJOR_VERSION < 7 || (PHP_MAJOR_VERSION == 7 && PHP_MINOR_VERSION < 3)){
+                    //in php 7.2 and lower, if same class is loaded 
+                    //from two namespaces with same name, it will 
+                    //rise a fatal error with message 
+                    // 'Cannot redeclare class'
+                    break;
+                }
             }
             else{
                 //lower case class name to support loading of old-style classes.
@@ -460,9 +460,9 @@ class AutoLoader{
                         'path'=>$f
                     ];
                     $loaded = true;
-//                    if(PHP_MAJOR_VERSION < 7 || (PHP_MAJOR_VERSION == 7 && PHP_MINOR_VERSION < 3)){
-//                        break;
-//                    }
+                    if(PHP_MAJOR_VERSION < 7 || (PHP_MAJOR_VERSION == 7 && PHP_MINOR_VERSION < 3)){
+                        break;
+                    }
                 }
             }
         }

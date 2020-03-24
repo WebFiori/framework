@@ -382,7 +382,7 @@ class AutoLoader{
      */
     private function _updateCache() {
         $autoloadCache = ROOT_DIR.DIRECTORY_SEPARATOR.'entity'.DIRECTORY_SEPARATOR.self::CACHE_NAME;
-        $h = fopen($autoloadCache, 'w+');
+        $h = fopen($autoloadCache, 'w');
         foreach ($this->loadedClasses as $classArr){
             fwrite($h, $classArr['path'].'=>'.$classArr['namespace'].'\\'.$classArr['class-name']."\n");
         }

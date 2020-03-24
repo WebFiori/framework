@@ -26,11 +26,31 @@ namespace webfiori\entity;
 use Exception;
 /**
  * An autoloader class to load classes as needed during runtime.
- *
+ * The class aims to provide all needed utilities to autoload any classes 
+ * which are within the scope of the framework. In addition, the developer 
+ * can add his own custom folders to the autoloader. More to that, the autoloder 
+ * will load any class which exist in the folder 'vendor' if composer 
+ * is used to collect the dependencies. To activate this feature, the constant 
+ * 'LOAD_COMPOSER_PACKAGES' must be defined and set to true. The class can be used independent of 
+ * any other component to load classes.
  * @author Ibrahim
- * @version 1.1.5
+ * @version 1.1.6
  */
 class AutoLoader{
+    /**
+     * The name of the file that represents autoloder's cache.
+     * @var string 
+     * @since 1.1.6
+     */
+    const CACHE_NAME = 'autoload.cache';
+    /**
+     * An associative array that contains the info which was taken 
+     * from autoloader's cache file.
+     * This one is used to fasten the process of loading classes.
+     * @var array 
+     * @since 1.1.6
+     */
+    private $casheArr;
     /**
      * A string or callback that indicates what will happen if the loader 
      * is unable to load a class.
@@ -120,6 +140,12 @@ class AutoLoader{
             }
             $onFail = isset($options['on-load-failure']) ? $options['on-load-failure'] : 'throw-exception';
             self::$loader = new AutoLoader($root, $frameworkSearchFoldres, $defineRoot,$onFail);
+            if(defined('LOAD_COMPOSER_PACKAGES') && LOAD_COMPOSER_PACKAGES === true){
+                $composerVendor = self::_getComposerVendorDir();
+                if(strlen($composerVendor) != 0){
+                    self::$loader->addSearchDirectory($composerVendor, true, false);
+                }
+            }
         }
         return self::$loader;
     }
@@ -133,6 +159,8 @@ class AutoLoader{
      */
     private function __construct($root='',$searchFolders=[],$defineRoot=false,$onFail='throw-exception') {
         $this->searchFolders = [];
+        $this->casheArr = [];
+        $this->_readCache();
         $this->loadedClasses = [];
         if(defined('ROOT_DIR')){
             $this->rootDir = ROOT_DIR;
@@ -198,21 +226,70 @@ class AutoLoader{
         }
     }
     /**
+     * Returns a string that represents the directory of 'vendor' folder of 
+     * composer.
+     * @return string
+     * @since 1.1.6
+     */
+    private static function _getComposerVendorDir(){
+        $DS = DIRECTORY_SEPARATOR;
+        $split = explode($DS, ROOT_DIR);
+        $vendorPath = '';
+        $pathsCount = count($split);
+        $vendorFound = false;
+        for($x = 0 ; $x < $pathsCount; $x++){
+            if(is_dir($vendorPath.'vendor')){
+                $vendorPath = $vendorPath.'vendor';
+                $vendorFound = true;
+                break;
+            }
+            if($x + 1 == $pathsCount){
+                $vendorPath .= $split[$x];
+            }
+            else{
+                $vendorPath .= $split[$x].$DS;
+            }
+        }
+        if(!$vendorFound){
+            if(is_dir($vendorPath.'vendor')){
+                $vendorPath = $vendorPath.'vendor';
+            }
+            else{
+                $vendorPath = '';
+            }
+        }
+        return $vendorPath;
+    }
+    /**
      * Adds new search directory to the array of search 
      * folders.
      * @param string $dir A new directory (such as '/entity/html-php-structs-1.6/html').
+     * @param  string $incSubFolders If set to true, even sub-folders will 
+     * be included in the search.
+     * @param string $appendRoot If set to true, Root directory of the search will 
+     * be added as a prefix to the path.
      * @since 1.0
      * @deprecated since version 1.1.2
      */
-    private function addSearchDirectory($dir,$incSubFolders=true) {
+    private function addSearchDirectory($dir,$incSubFolders=true,$appendRoot=true) {
         $DS = DIRECTORY_SEPARATOR;
         if(strlen($dir) != 0){
-            $cleanDir = $DS. trim(str_replace('\\', $DS, str_replace('/', $DS, $dir)), '\\/');
+            if($appendRoot === true){
+                $cleanDir = $DS. trim(str_replace('\\', $DS, str_replace('/', $DS, $dir)), '\\/');
+            }
+            else{
+                $cleanDir = $dir;
+            }
             if($incSubFolders){
                 $dirsStack = [];
                 $dirsStack[] = $cleanDir;
                 while($xDir = array_pop($dirsStack)){
-                    $fullPath =  $this->getRoot().$xDir;
+                    if($appendRoot === true){
+                        $fullPath = $this->getRoot().$xDir;
+                    }
+                    else{
+                        $fullPath = $xDir;
+                    }
                     if(is_dir($fullPath)){
                         $subDirs = scandir($fullPath);
                         foreach ($subDirs as $subDir){
@@ -220,7 +297,7 @@ class AutoLoader{
                                 $dirsStack[] = $xDir.$DS.$subDir;
                             }
                         }
-                        $this->searchFolders[] = $xDir;
+                        $this->searchFolders[$xDir] = $appendRoot;
                     }
                     else{
                         if(is_dir($fullPath)){
@@ -230,20 +307,20 @@ class AutoLoader{
                                     $dirsStack[] = $xDir.$DS.$subDir;
                                 }
                             }
-                            $this->searchFolders[] = $xDir;
+                            $this->searchFolders[$xDir] = $appendRoot;
                         }
                     }
                 }
             }
             else{
-                $this->searchFolders[] = $cleanDir;
+                $this->searchFolders[$cleanDir] = $appendRoot;
             }
         }
     }
     /**
      * Adds new folder to the set folder at which the autoloader will try to search 
      * on for classes.
-     * @param string $dir A string that represents a dirictory. The directory 
+     * @param string $dir A string that represents a directory. The directory 
      * must be inside the scope of the framework.
      * @param boolean $incSubFolders If set to true, even sub-directories which 
      * are inside the given directory will be included in the search.
@@ -269,6 +346,49 @@ class AutoLoader{
         return false;
     }
     /**
+     * Read the file which contains autoloader cached content.
+     * @since 1.1.6
+     */
+    private function _readCache() {
+        $autoloadCache = $this->getRoot().DIRECTORY_SEPARATOR.self::CACHE_NAME;
+        
+        //For first run, the cache file might not exist.
+        if(file_exists($autoloadCache)){
+            $h = fopen($autoloadCache, 'r');
+
+            //the +1 used to prevent the error: 
+            //" fread(): Length parameter must be greater than 0"
+            $casheStr = fread($h, filesize($autoloadCache) + 1);
+
+            fclose($h);
+            $cacheArr = explode("\n", $casheStr);
+            foreach ($cacheArr as $ca){
+                $exploded = explode('=>', $ca);
+                if(isset($this->casheArr[$exploded[1]])){
+                    $this->casheArr[$exploded[1]][] = $exploded[0];
+                }
+                else{
+                    $this->casheArr[$exploded[1]] = [
+                        $exploded[0]
+                    ];
+                }
+            }
+        }
+    }
+    /**
+     * Updates autoloder's cache file content.
+     * This method is called every time a new class is loaded to update the cache.
+     * @since 1.1.6
+     */
+    private function _updateCache() {
+        $autoloadCache = $this->getRoot().DIRECTORY_SEPARATOR.self::CACHE_NAME;
+        $h = fopen($autoloadCache, 'w');
+        foreach ($this->loadedClasses as $classArr){
+            fwrite($h, $classArr['path'].'=>'.$classArr['namespace'].'\\'.$classArr['class-name']."\n");
+        }
+        fclose($h);
+    }
+    /**
      * Tries to load a class given its name.
      * @param string $classPath The name of the class alongside its namespace.
      * @since 1.0
@@ -281,10 +401,33 @@ class AutoLoader{
         $cArr = explode('\\', $classPath);
         $className = $cArr[count($cArr) - 1];
         $loaded = false;
+        
+        //checks if the class is cached or not.
+        if(isset($this->casheArr[$classPath])){
+            foreach ($this->casheArr[$classPath] as $location){
+                if(file_exists($location)){
+                    require_once $location;
+                    $this->loadedClasses[] = [
+                        'class-name'=>$className,
+                        'namespace'=> substr($classPath, 0, strlen($classPath) - strlen($className) - 1),
+                        'path'=>$location
+                    ];
+                    $loaded = true;
+                }
+            }
+            if($loaded === true){
+                return;
+            }
+        }
         $root = $this->getRoot();
         $allPaths = self::getClassPath($className);
-        foreach ($this->searchFolders as $value) {
-            $f = $root.$value.$DS.$className.'.php';
+        foreach ($this->searchFolders as $value => $appendRoot) {
+            if($appendRoot === true){
+                $f = $root.$value.$DS.$className.'.php';
+            }
+            else{
+                $f = $value.$DS.$className.'.php';
+            }
             if(file_exists($f) && !in_array($f, $allPaths)){
                 require_once $f;
                 $this->loadedClasses[] = [
@@ -303,7 +446,12 @@ class AutoLoader{
             }
             else{
                 //lower case class name to support loading of old-style classes.
-                $f = $root.$value.$DS. strtolower($className).'.php';
+                if($appendRoot === true){
+                    $f = $root.$value.$DS. strtolower($className).'.php';
+                }
+                else{
+                    $f = $value.$DS. strtolower($className).'.php';
+                }
                 if(file_exists($f) && !in_array($f, $allPaths)){
                     require_once $f;
                     $this->loadedClasses[] = [
@@ -330,6 +478,9 @@ class AutoLoader{
                 //do nothing
             }
         }
+        else{
+            $this->_updateCache();
+        }
     }
     /**
      * Returns an array that contains the paths to all files which has a class 
@@ -342,6 +493,7 @@ class AutoLoader{
      * to true, the method will attempt to load the class. Default is false.
      * @return array An array that contains all paths to the files which have 
      * a definition for the given class.
+     * @since 1.0
      */
     public static function getClassPath($className,$namespace=null,$load=false) {
         $retVal = [];
@@ -403,8 +555,13 @@ class AutoLoader{
      */
     public static function getFolders() {
         $folders = array();
-        foreach(self::get()->searchFolders as $f){
-            $folders[] = self::get()->getRoot().$f;
+        foreach(self::get()->searchFolders as $f => $appendRoot){
+            if($appendRoot === true){
+                $folders[] = self::get()->getRoot().$f;
+            }
+            else{
+                $folders[] = $f;
+            }
         }
         return $folders;
     }

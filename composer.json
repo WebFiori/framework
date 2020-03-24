@@ -1,9 +1,19 @@
 {
     "name": "webfiori/framework",
-    "description": "WebFiori framework.",
+    "description": "WebFiori framework. Made to make the web bloom.",
+    "authors": [
+        {
+            "name": "Ibrahim BinAlshikh",
+            "email": "ibrahim@webfiori.com"
+        }
+    ],
     "require": {
         "php": ">=5.6",
-        "ext-mbstring":"*"
+        "ext-mbstring":"*",
+        "webfiori/jsonx":"1.4.4",
+        "webfiori/rest-easy":"1.4.7",
+        "webfiori/ph-mysql":"1.3.9.1",
+        "webfiori/php-structs":"1.9.0"
     },
     "keywords": [
         "framework",

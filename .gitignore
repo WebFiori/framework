@@ -3,3 +3,6 @@
 test.*
 /tmp
 /clover.xml
+/vendor
+composer.lock
+*.cache

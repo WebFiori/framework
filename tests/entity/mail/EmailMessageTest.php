@@ -49,7 +49,7 @@ class EmailMessageTest extends TestCase{
      */
     public function test03() {
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('The account "smtp-acc-00" has invalid host or port number. Port: 25, Host: mail.programmingacademia.com.');
+        $this->expectExceptionMessage('The account "smtp-acc-00" has invalid host or port number. Port: 765765, Host: mail.programmingacademia.com.');
         $smtp = new SMTPAccount();
         $smtp->setPassword('izimu#z');
         $smtp->setAddress('test@programmingacademia.com');

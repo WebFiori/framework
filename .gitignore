@@ -5,3 +5,4 @@ test.*
 /clover.xml
 /vendor
 composer.lock
+*.cache

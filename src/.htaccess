@@ -1,16 +1,20 @@
 Options -Indexes
-RewriteEngine on
+<IfModule mod_rewrite.c>
+    RewriteEngine on
 
-#send all trafic to the root framework file
-RewriteCond %{REQUEST_FILENAME} !-f
-ReWriteRule ^(.*)$ WebFiori.php [L,QSA]
+    #send all trafic to framework seed
+    RewriteCond %{REQUEST_FILENAME} !-f
+    ReWriteRule ^(.*)$ WebFiori.php [L,QSA]
 
-#append authorization header if not exist
-RewriteCond %{HTTP:Authorization} ^(.*)
-RewriteRule .* - [e=HTTP_AUTHORIZATION:%1]
+    #append authorization header if not exist
+    RewriteCond %{HTTP:Authorization} ^(.*)
+    RewriteRule .* - [e=HTTP_AUTHORIZATION:%1]
+</IfModule>
 
-#disable opcache
-#php_flag opcache.enable Off
+<IfModule lsapi_module>
+    #disable opcache. This might reduce load speed if disabled.
+    php_flag opcache.enable Off
+</IfModule>
 
 #allow CORS. Be careful here.
 <IfModule mod_headers.c>

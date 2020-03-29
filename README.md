@@ -12,6 +12,7 @@
   <a href="https://github.com/usernane/webfiori/releases">
       <img src="https://img.shields.io/github/release/usernane/webfiori.svg?label=latest" />
   </a>
+  <img alt="GitHub All Releases" src="https://img.shields.io/github/downloads/usernane/webfiori/total?color=light-green">
   <a href="https://paypal.me/IbrahimBinAlshikh">
     <img src="https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fprogrammingacademia.com%2Fwebfiori%2Fapis%2Fshields-get-dontate-badget">
   </a>

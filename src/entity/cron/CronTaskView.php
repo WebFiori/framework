@@ -37,7 +37,7 @@ use phpStructs\html\PNode;
  * @author Ibrahim
  * @version 1.0
  */
-class CronTaskView {
+class CronTaskView extends CronView{
     /**
      * The job that the view will display its info.
      * @var CronJob 
@@ -45,51 +45,15 @@ class CronTaskView {
      */
     private $job;
     /**
-     * A top container that contains all task related controls.
-     * @var HTMLNode 
-     */
-    private $controlsContainer;
-    /**
      * @since 1.0
      */
     public function __construct() {
-        if(WebFiori::getWebsiteController()->getSessionVar('cron-login-status') !== true){
-            header('location: '.WebFiori::getSiteConfig()->getBaseURL().'cron/login');
-        }
+        parent::__construct('View Task', 'Display task info.');
         $jobName = $_GET['job-name'];
-        $password = Cron::password();
         $job = Cron::getJob($jobName);
+        $this->job = $job;
         if($job instanceof CronJob){
-            $this->controlsContainer = new HTMLNode();
-            $this->controlsContainer->setWritingDir('ltr');
-            $this->controlsContainer->setStyle([
-                'direction'=>'ltr'
-            ]);
-            $this->job = $job;
             
-            Page::title('View Task');
-            Page::description('Display task info.');
-            
-            $defaltSiteLang = WebFiori::getSiteConfig()->getPrimaryLanguage();
-            $siteNames = WebFiori::getSiteConfig()->getWebsiteNames();
-            $siteName = isset($siteNames[$defaltSiteLang]) ? $siteNames[$defaltSiteLang] : null;
-            if($siteName !== null){
-                Page::siteName($siteName);
-            }
-            
-            $h1 = new HTMLNode('h1');
-            $h1->addTextNode('View Task Details');
-            $h1->setStyle([
-                'direction'=>'ltr'
-            ]);
-            $this->controlsContainer->addChild($h1);
-            
-            $hr = new HTMLNode('hr',false);
-            
-            $this->controlsContainer->addChild($hr);
-            if(Cron::password() != 'NO_PASSWORD'){
-                $this->controlsContainer->addTextNode('<button name="input-element" onclick="logout()"><b>Logout</b></button><br/>', false);
-            }
             $backButton = new HTMLNode('button');
             $backButton->addTextNode('Back to Jobs List');
             $backButton->setAttribute('onclick',"window.location.href = 'cron/jobs';");
@@ -97,8 +61,8 @@ class CronTaskView {
                 'float'=>'left'
             ]);
             $backButton->setName('input-element');
-            $this->controlsContainer->addChild($backButton);
-            $this->controlsContainer->addTextNode('<br/>', false);
+            $this->getControlsContainer()->addChild($backButton);
+            $this->getControlsContainer()->addTextNode('<br/>', false);
             $this->_createInfoTable($job);
             $this->_createCustomParamsContainer();
             $custAttrsNames = $job->getExecutionAttributes();
@@ -134,156 +98,7 @@ class CronTaskView {
                     . '         }'."\n"
                     . '     },60000)'."\n"
                     . ' };'."\n"
-                    . 'function disableOrEnableInputs(disable=true){'."\n"
-                    . '    var inputEls = document.getElementsByName(\'input-element\');'."\n"
-                    . '    if(disable){'."\n"
-                    . '        for(var x = 0 ; x < inputEls.length ; x++){'."\n"
-                    . '            inputEls[x].setAttribute(\'disabled\',\'\');'."\n"
-                    . '        }'."\n"
-                    . '    }'."\n"
-                    . '    else{'."\n"
-                    . '        for(var x = 0 ; x < inputEls.length ; x++){'."\n"
-                    . '            inputEls[x].removeAttribute(\'disabled\');'."\n"
-                    . '        }'."\n"
-                    . '    }'."\n"
-                    . '}'."\n"
-                    . 'function addAttribute(name=undefined){'."\n"
-                    . '    var attrsCount = 0;'."\n"
-                    . '    for(var x = 0 ; x < window.customAttrs.length ; x++){'."\n"
-                    . '        if(window.customAttrs[x].use === true){'."\n"
-                    . '            attrsCount++'."\n"
-                    . '        }'."\n"
-                    . '    }'."\n"
-                    . '    var attrsTable = document.getElementById(\'custom-params-table\').children[0];'."\n"
-                    . '    var addBtnRow = attrsTable.children[attrsTable.children.length - 1];'."\n"
-                    . '    attrsTable.removeChild(addBtnRow);'."\n"
-                    . '    if(attrsCount === 0){'."\n"
-                    . '        window.noAttrsNode = attrsTable.children[attrsTable.children.length - 1];'."\n"
-                    . '        attrsTable.removeChild(window.noAttrsNode);'."\n"
-                    . '    }'."\n"
-                    . '    var inputsIndex = window.customAttrs.length;'."\n"
-                    . '    if(name !== undefined){'."\n"
-                    . '        var attrNameInput = "<input style=\'border:0px\' name=\'input-element\' type=\'text\' value=\'"+name+"\' oninput=\'attributeNameChanged(this,"+inputsIndex+")\'>";'."\n"
-                    . '    }'
-                    . '    else{'."\n"
-                    . '        var attrNameInput = "<input style=\'border:0px\' name=\'input-element\' type=\'text\'  oninput=\'attributeNameChanged(this,"+inputsIndex+")\'>";'."\n"
-                    . '    }'."\n"
-                    . '    var attrValInput = "<input style=\'border:0px\' type=\'text\' name=\'input-element\' oninput=\'attributeValueChanged(this,"+inputsIndex+")\'>";'."\n"
-                    . '    var newRow = document.createElement("tr");'."\n"
-                    . '    newRow.id = "attribute-"+window.customAttrs.length+"-row";'."\n"
-                    . '    newRow.className = "attribute-row";'."\n"
-                    . '    newRow.innerHTML = "<td>"+attrNameInput+"</td><td>"+attrValInput+"</td><td style=\'padding:0px\'>"'."\n"
-                    . '    +"<button name=\'input-element\' class=\'remove-attribute-button cancel\' onclick=\'removeAttr("+window.customAttrs.length+")\'>X</button></td>";'."\n"
-                    . '    attrsTable.appendChild(newRow);'."\n"
-                    . '    attrsTable.appendChild(addBtnRow);'."\n"
-                    . '    window.customAttrs.push({name:name,value:"",use:true});'."\n"
-                    . '    '."\n"
-                    . '    '."\n"
-                    . '}'."\n"
-                    . 'function removeAttr(num){'."\n"
-                    . '    window.customAttrs[num]["use"] = false;'."\n"
-                    . '    var row = document.getElementById("attribute-"+num+"-row");'."\n"
-                    . '    var table = document.getElementById(\'custom-params-table\').children[0];'."\n"
-                    . '    table.removeChild(row);'."\n"
-                    . '    var attrsCount = 0;'."\n"
-                    . '    for(var x = 0 ; x < window.customAttrs.length ; x++){'."\n"
-                    . '        if(window.customAttrs[x].use === true){'."\n"
-                    . '            attrsCount++'."\n"
-                    . '        }'."\n"
-                    . '    }'."\n"
-                    . '    if(attrsCount === 0){'."\n"
-                    . '        var addBtnRow = table.children[table.children.length - 1];'."\n"
-                    . '        table.removeChild(addBtnRow);'."\n"
-                    . '        table.appendChild(window.noAttrsNode);'."\n"
-                    . '        table.appendChild(addBtnRow);'."\n"
-                    . '    }'."\n"
-                    . '}'."\n"
-                    . 'function attributeValueChanged(source,num){'."\n"
-                    . '    window.customAttrs[num].value = source.value;'."\n"
-                    . '};'."\n"
-                    . 'function attributeNameChanged(source,num){'."\n"
-                    . '    window.customAttrs[num].name = source.value;'."\n"
-                    . '};'."\n"
-                    . 'function extractCustomParams(){'."\n"
-                    . '    var retVal = "";'."\n"
-                    . '    for(var x = 0 ; x < window.customAttrs.length ; x++){'."\n"
-                    . '        var attr = window.customAttrs[x];'."\n"
-                    . '        if(attr.value.length !== 0){'."\n"
-                    . '            if(attr.use === true){'."\n"
-                    . '                if(retVal.length === 0){'."\n"
-                    . '                    retVal += attr.name+"="+encodeURIComponent(attr.value.trim());'."\n"
-                    . '                }'."\n"
-                    . '                else{'."\n"
-                    . '                    retVal += "&"+attr.name+"="+encodeURIComponent(attr.value.trim());'."\n"
-                    . '                }'."\n"
-                    . '            }'."\n"
-                    . '        }'."\n"
-                    . '    }'."\n"
-                    . '    if(retVal.length === 0){'."\n"
-                    . '        return "";'."\n"
-                    . '    }'."\n"
-                    . '    return "&"+retVal;'."\n"
-                    . '};'."\n"
-                    . 'function execJob(source,jobName){'."\n"
-                    . '     var refresh = window.isRefresh;'."\n"
-                    . '     window.isRefresh = false;'."\n"
-                    . '     disableOrEnableInputs();'
-                    . '     source.innerHTML = \'Executing Job...\';'."\n"
-                    . '     var outputWindow = document.getElementById(\'output-area\');'."\n"
-                    . '     outputWindow.innerHTML = \'<b>Forcing job "\'+jobName+\'" to execute...</b>\n\';'."\n"
-                    . '     var xhr = new XMLHttpRequest();'."\n"
-                    . '     xhr.open(\'post\',\'cron/apis/force-execution\');'."\n"
-                    . '     xhr.onreadystatechange = function(){'."\n"
-                    . '         outputWindow.innerHTML += \'Ready State: \'+this.readyState+\'\n\';'."\n"
-                    . '         if(this.readyState === 4 && this.status === 200){'."\n"
-                    . '             try{'."\n"
-                    . '                 var asJson = JSON.parse(this.responseText);'."\n"
-                    . '                 if(asJson[\'more-info\'][\'failed\'].length != 0){'."\n"
-                    . '                     outputWindow.innerHTML += \'<b style=\"color:red;font-weight:bold\">Job executed but did not finish successfully.</b> \n\';'."\n"
-                    . '                     source.innerHTML = \'<b>The job was executed but did not finish successfully.</b>\';'."\n"
-                    . '                 }'."\n"
-                    . '                 else{'."\n"
-                    . '                     outputWindow.innerHTML += \'<b style=\"color:green;font-weight:bold\">Job executed and finished successfully.</b> \n\';'."\n"
-                    . '                     source.innerHTML = \'<b>Job executed and finished successfully</b>\';'."\n"
-                    . '                 }'."\n"
-                    . '             }'."\n"
-                    . '             catch(e){'."\n"
-                    . '                 outputWindow.innerHTML += \'<b style=\"color:red;font-weight:bold\">Job did not execute successfully due to server error.</b> \n\';'."\n"
-                    . '                 source.innerHTML = \'Something Went Wrong While Executing the Job. Try Again\';'."\n"
-                    . '             }'."\n"
-                    . '             outputWindow.innerHTML += \'Raw server response:\n\'+this.responseText;'."\n"
-                    . '             disableOrEnableInputs(false);'."\n"
-                    . '             window.isRefresh = refresh;'."\n"
-                    . '         }'."\n"
-                    . '         else if(this.readyState === 4 && this.status === 0){'."\n"
-                    . '             outputWindow.innerHTML += \'<b style=\"color:red;font-weight:bold\">Connection to the server was lost!</b> \n\';'."\n"
-                    . '             source.innerHTML = \'<b>Connection Lost. Try Again.</b>\';'."\n"
-                    . '             disableOrEnableInputs(false);'."\n"
-                    . '             window.isRefresh = refresh;'."\n"
-                    . '         }'."\n"
-                    . '         else if(this.readyState === 4){'."\n"
-                    . '             outputWindow.innerHTML += \'<b style=\"color:red;font-weight:bold\">Unknown error prevented job execution!</b> \n\';'."\n"
-                    . '             outputWindow.innerHTML += \'Raw server response:\n\'+this.responseText;'."\n"
-                    . '             source.innerHTML = \'Something Went Wrong While Executing the Job. Try Again\';'."\n"
-                    . '             disableOrEnableInputs(false);'."\n"
-                    . '             window.isRefresh = refresh;'."\n"
-                    . '         }'."\n"
-                    . '     }'."\n"
-                    . "     xhr.setRequestHeader('content-type','application/x-www-form-urlencoded');"
-                    . "     xhr.send('job-name='+encodeURIComponent(jobName)+extractCustomParams());"."\n"
-                    . '};'."\n"
-                    . 'function logout(){'."\n"
-                    . '     var xhr = new XMLHttpRequest();'."\n"
-                    . '     xhr.open(\'post\',\'cron/apis/logout\');'."\n"
-                    . '     xhr.onreadystatechange = function(){'."\n"
-                    . '         if(this.readyState === 4){'."\n"
-                    . '             window.location.href = \'cron\';'
-                    . '         }'."\n"
-                    . '     }'."\n"
-                    . "     xhr.setRequestHeader('content-type','application/x-www-form-urlencoded');"
-                    . "     xhr.send();"."\n"
-                    . '};'."\n"
-                    . '');
+                    );
             Page::document()->getHeadNode()->addChild($jsCode);
             $inlineStyle = new HTMLNode('style');
             $inlineStyle->addTextNode(''
@@ -319,8 +134,7 @@ class CronTaskView {
             Page::document()->getHeadNode()->addChild($inlineStyle);
             $forceNode = new HTMLNode();
             $forceNode->addTextNode('<button style="margin-top:30px" name="input-element" onclick="execJob(this,\''.$job->getJobName().'\')" class="force-execution-button">Force Execution</button>', false);
-            $this->controlsContainer->addChild($forceNode);
-            Page::insert($this->controlsContainer);
+            $this->getControlsContainer()->addChild($forceNode);
             $outputWindow = new HTMLNode();
             $outputWindow->setID('output-window');
             $outputWindow->addTextNode('<p style="border:1px dotted;font-weight:bold">Output Window</p><pre'
@@ -348,11 +162,11 @@ class CronTaskView {
     private function _createCustomParamsContainer(){
         $h2 = new HTMLNode('h2');
         $h2->addTextNode('Custom Execution Parameters');
-        $this->controlsContainer->addChild($h2);
+        $this->getControlsContainer()->addChild($h2);
         $p = new PNode();
         $p->addText('Here you can add extra parameters which will be sent with '
                 . 'force execute command.');
-        $this->controlsContainer->addChild($p);
+        $this->getControlsContainer()->addChild($p);
         $table = new HTMLNode('table');
         $table->setID('custom-params-table');
         $table->setAttribute('border', 1);
@@ -412,7 +226,7 @@ class CronTaskView {
         $addButtonCell->addTextNode('<button name="input-element" class="ok" style="width:100%" onclick="addAttribute()">Add Attribute</button>', false);
         $addRow->addChild($addButtonCell);
         $table->addChild($addRow);
-        $this->controlsContainer->addChild($table);
+        $this->getControlsContainer()->addChild($table);
     }
 
     /**
@@ -422,7 +236,7 @@ class CronTaskView {
     private function _createInfoTable($job){
         $taskTable = new HTMLNode('table');
         $taskTable->setID('tasks-table');
-        $this->controlsContainer->addChild($taskTable);
+        $this->getControlsContainer()->addChild($taskTable);
         $taskTable->setAttribute('border', 1);
         $taskTable->setStyle(array(
             'border-collapse'=>'collapse',

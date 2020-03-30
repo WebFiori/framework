@@ -58,140 +58,19 @@ use webfiori\WebFiori;
  * of cron jobs.
  * @version 1.0
  */
-class CronTasksView {
-    /**
-     * A top container that contains all task related controls.
-     * @var HTMLNode 
-     */
-    private $controlsContainer;
+class CronTasksView extends CronView{
+    
     /**
      * Creates new instance of the view.
      */
     public function __construct() {
-        if(WebFiori::getWebsiteController()->getSessionVar('cron-login-status') !== true){
-            header('location: '.WebFiori::getSiteConfig()->getBaseURL().'cron/login');
-        }
-        Page::title('Scheduled CRON Tasks');
-        Page::description('A list of available CRON jobs.');
-        $defaltSiteLang = WebFiori::getSiteConfig()->getPrimaryLanguage();
-        $siteNames = WebFiori::getSiteConfig()->getWebsiteNames();
-        $siteName = isset($siteNames[$defaltSiteLang]) ? $siteNames[$defaltSiteLang] : null;
-        if($siteName !== null){
-            Page::siteName($siteName);
-        }
-        $this->controlsContainer = new HTMLNode();
-        $this->controlsContainer->setWritingDir('ltr');
-        $this->controlsContainer->setStyle([
-            'direction'=>'ltr',
-            'width'=>'100%',
-            'float'=>'left'
-        ]);
-        $tasksCount = Cron::jobsQueue()->size();
-        $h1 = new HTMLNode('h1');
-        $h1->addTextNode('Scheduled CRON Tasks');
-        Page::insert($h1);
-        $hr = new HTMLNode('hr',false);
-        Page::insert($hr);
-        if(Cron::password() != 'NO_PASSWORD'){
-            $this->controlsContainer->addTextNode('<button name="input-element" onclick="logout()"><b>Logout</b></button><br/>', false);
-        }
+        parent::__construct('Scheduled CRON Tasks', 'A list of available CRON jobs.');
         $parag = new PNode();
+        $tasksCount = Cron::jobsQueue()->size();
         $parag->addText('<b>Total Scheduled Tasks:</b> '.$tasksCount.'.', array('esc-entities'=>false));
-        $this->controlsContainer->addChild($parag);
+        $this->getControlsContainer()->addChild($parag);
         $this->_createRefreshControls();
         $this->_createTasksTable();
-        $jsCode = new JsCode();
-        $isRefresh = 'false';
-        if(isset($_GET['refresh'])){
-            $isRefresh = 'true';
-        }
-        $jsCode->addCode(''
-                . 'window.onload = function(){'."\n"
-                . '     window.isRefresh = '.$isRefresh.';'."\n"
-                . "     "
-                . '     window.intervalId = window.setInterval(function(){'."\n"
-                . '         if(window.isRefresh){'."\n"
-                . '             disableOrEnableInputs();'."\n"
-                . '             document.getElementById(\'refresh-label\').innerHTML = \'<b>Refreshing...</b>\';'."\n"
-                . '             window.location.href = \'cron/jobs?refresh=yes\';'."\n"
-                . '         }'."\n"
-                . '     },60000)'."\n"
-                . ' };'."\n"
-                . 'function disableOrEnableInputs(disable=true){'."\n"
-                . '    var inputEls = document.getElementsByName(\'input-element\');'."\n"
-                . '    if(disable){'."\n"
-                . '        for(var x = 0 ; x < inputEls.length ; x++){'."\n"
-                . '            inputEls[x].setAttribute(\'disabled\',\'\');'."\n"
-                . '        }'."\n"
-                . '    }'."\n"
-                . '    else{'."\n"
-                . '        for(var x = 0 ; x < inputEls.length ; x++){'."\n"
-                . '            inputEls[x].removeAttribute(\'disabled\');'."\n"
-                . '        }'."\n"
-                . '    }'."\n"
-                . '}'."\n"
-                . 'function execJob(source,jobName){'."\n"
-                . '     var refresh = window.isRefresh;'."\n"
-                . '     window.isRefresh = false;'."\n"
-                . '     disableOrEnableInputs();'
-                . '     source.innerHTML = \'Executing Job...\';'."\n"
-                . '     var xhr = new XMLHttpRequest();'."\n"
-                . '     xhr.open(\'post\',\'cron/apis/force-execution\');'."\n"
-                . '     var outputWindow = document.getElementById(\'output-area\');'."\n"
-                . '     outputWindow.innerHTML = \'<b>Forcing job "\'+jobName+\'" to execute...</b>\n\';'."\n"
-                . '     xhr.onreadystatechange = function(){'."\n"
-                . '         outputWindow.innerHTML += \'Ready State: \'+this.readyState+\'\n\';'."\n"
-                . '         if(this.readyState === 4 && this.status === 200){'."\n"
-                . '             try{'."\n"
-                . '                 var asJson = JSON.parse(this.responseText);'."\n"
-                . '                 if(asJson[\'more-info\'][\'failed\'].length != 0){'."\n"
-                . '                     outputWindow.innerHTML += \'<b style=\"color:red;font-weight:bold\">Job executed but did not finish successfully.</b> \n\';'."\n"
-                . '                     source.innerHTML = \'<b>The job was executed but did not finish successfully.</b>\';'."\n"
-                . '                 }'."\n"
-                . '                 else{'."\n"
-                . '                     outputWindow.innerHTML += \'<b style=\"color:green;font-weight:bold\">Job executed and finished successfully.</b> \n\';'."\n"
-                . '                     source.innerHTML = \'<b>Job executed and finished successfully</b>\';'."\n"
-                . '                 }'."\n"
-                . '             }'."\n"
-                . '             catch(e){'."\n"
-                . '                 outputWindow.innerHTML += \'<b style=\"color:red;font-weight:bold\">Job did not execute successfully due to server error.</b> \n\';'."\n"
-                . '                 source.innerHTML = \'Something Went Wrong While Executing the Job. Try Again\';'."\n"
-                . '             }'."\n"
-                . '             outputWindow.innerHTML += \'Raw server response:\n\'+this.responseText;'."\n"
-                . '             disableOrEnableInputs(false);'."\n"
-                . '             window.isRefresh = refresh;'."\n"
-                . '         }'."\n"
-                . '         else if(this.readyState === 4 && this.status === 0){'."\n"
-                . '             outputWindow.innerHTML += \'<b style=\"color:red;font-weight:bold\">Connection to the server was lost!</b> \n\';'."\n"
-                . '             source.innerHTML = \'<b>Connection Lost. Try Again.</b>\';'."\n"
-                . '             disableOrEnableInputs(false);'."\n"
-                . '             window.isRefresh = refresh;'."\n"
-                . '         }'."\n"
-                . '         else if(this.readyState === 4){'."\n"
-                . '             outputWindow.innerHTML += \'<b style=\"color:red;font-weight:bold\">Unknown error prevented job execution!</b> \n\';'."\n"
-                . '             outputWindow.innerHTML += \'Raw server response:\n\'+this.responseText;'."\n"
-                . '             source.innerHTML = \'Something Went Wrong While Executing the Job. Try Again\';'."\n"
-                . '             disableOrEnableInputs(false);'."\n"
-                . '             window.isRefresh = refresh;'."\n"
-                . '         }'."\n"
-                . '     }'."\n"
-                . "     xhr.setRequestHeader('content-type','application/x-www-form-urlencoded');"
-                . "     xhr.send('job-name='+encodeURIComponent(jobName));"."\n"
-                . '};'."\n"
-                . 'function logout(){'."\n"
-                . '     var xhr = new XMLHttpRequest();'."\n"
-                . '     xhr.open(\'post\',\'cron/apis/logout\');'."\n"
-                . '     xhr.onreadystatechange = function(){'."\n"
-                . '         if(this.readyState === 4){'."\n"
-                . '             window.location.href = \'cron\';'
-                . '         }'."\n"
-                . '     }'."\n"
-                . "     xhr.setRequestHeader('content-type','application/x-www-form-urlencoded');"
-                . "     xhr.send();"."\n"
-                . '};'."\n"
-                . '');
-        Page::document()->getHeadNode()->addChild($jsCode);
-        Page::insert($this->controlsContainer);
         
         $outputWindow = new HTMLNode();
         $outputWindow->setID('output-window');
@@ -257,7 +136,7 @@ class CronTasksView {
         $label->setAttribute('for', 'refresh-checkbox');
         $label->setID('refresh-label');
         $form->addChild($label);
-        $this->controlsContainer->addChild($form);
+        $this->getControlsContainer()->addChild($form);
     }
     /**
      * Creates the table that is used to display cron jobs information.
@@ -265,7 +144,7 @@ class CronTasksView {
     private function _createTasksTable() {
         $tasksTable = new HTMLNode('table');
         $tasksTable->setID('tasks-table');
-        $this->controlsContainer->addChild($tasksTable);
+        $this->getControlsContainer()->addChild($tasksTable);
         $tasksTable->setAttribute('border', 1);
         $tasksTable->setStyle(array(
             'border-collapse'=>'collapse',

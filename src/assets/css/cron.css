@@ -1,0 +1,28 @@
+button{
+    cursor: pointer
+}
+button.ok{
+    width: 100%;
+    border: 0px;
+    background-color: #229000;
+    margin: 0;
+    color: white;
+    font-weight: bold;
+    height: 25px;
+}
+button.ok:hover{
+    background-color: #22B000;
+}
+button.cancel:hover{
+    background-color: rgba(200,0,0,0.5);
+}
+button[disabled]{
+    cursor:not-allowed
+}
+button.cancel{
+    width: 100px;margin: 0;
+    background-color: rgba(200,0,0,0.7);
+    color: white;
+    font-weight: bold;border: 0px;
+    height:25px;
+}

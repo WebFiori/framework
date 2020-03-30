@@ -74,10 +74,10 @@ class CronAPIs extends ExtendedWebServices{
         $jobName = $this->getInputs()['job-name'];
         $result = Cron::run('', $jobName, true);
         if(gettype($result) == 'array'){
-            $infoJ = new JsonX();
+            $infoJ = new JsonX([],true);
             $infoJ->add('jobs-count', $result['total-jobs']);
             $infoJ->add('executed-count', $result['executed-count']);
-            $infoJ->add('successfuly-completed', $result['successfuly-completed']);
+            $infoJ->add('successfully-completed', $result['successfully-completed']);
             $infoJ->add('failed', $result['failed']);
             $infoJ->addArray('log', Cron::getLogArray());
             $this->sendResponse('Job Successfully Executed.', 'info', 200, $infoJ);

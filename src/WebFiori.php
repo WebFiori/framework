@@ -180,10 +180,11 @@ class WebFiori{
          * Change encoding of mb_ functions to UTF-8
          */
         if(function_exists('mb_internal_encoding')){
-            mb_internal_encoding('UTF-8');
-            mb_http_output('UTF-8');
-            mb_http_input('UTF-8');
-            mb_regex_encoding('UTF-8');
+            $encoding = 'UTF-8';
+            mb_internal_encoding($encoding);
+            mb_http_output($encoding);
+            mb_http_input($encoding);
+            mb_regex_encoding($encoding);
         }
         /**
          * Set memory limit to 2GB per script
@@ -249,24 +250,13 @@ class WebFiori{
         self::$classStatus = 'INITIALIZED';
         
         define('INITIAL_SYS_STATUS', $this->_getSystemStatus());
-        if(php_sapi_name() != 'cli'){
-            if(INITIAL_SYS_STATUS === true){
-                
-            }
-            else if(INITIAL_SYS_STATUS == Util::DB_NEED_CONF){
-                //??
-            }
-            else{
-                //you can modify this part to make 
-                //it do something else in case system 
-                //configuration is not equal to true
+        if(!CLI::isCLI() && INITIAL_SYS_STATUS !== true){
+            //you can modify this part to make 
+            //it do something else in case system 
+            //configuration is not equal to true
 
-                //change system config status to configured.
-                //WebFiori::getSysController()->configured(true);
-
-                //show error message to tell the developer how to configure the system.
-                $this->_needConfigration();
-            }
+            //show error message to tell the developer how to configure the system.
+            $this->_needConfigration();
         }
     }
     /**
@@ -275,7 +265,8 @@ class WebFiori{
     private function _setHandlers(){
         error_reporting(E_ALL & ~E_ERROR & ~E_COMPILE_ERROR & ~E_CORE_ERROR & ~E_RECOVERABLE_ERROR);
         set_error_handler(function($errno, $errstr, $errfile, $errline){
-            if(php_sapi_name() == 'cli'){
+            $isCli = class_exists('webfiori\entity\CLI') ? CLI::isCLI() : php_sapi_name() == 'cli';
+            if($isCli){
                 fprintf(STDERR, "\n<%s>\n",Util::ERR_TYPES[$errno]['type']);
                 fprintf(STDERR, "Error Message    %5s %s\n",":",$errstr);
                 fprintf(STDERR, "Error Number     %5s %s\n",":",$errno);
@@ -309,7 +300,8 @@ class WebFiori{
             return true;
         });
         set_exception_handler(function($ex){
-            if(php_sapi_name() == 'cli'){
+            $isCli = class_exists('webfiori\entity\CLI') ? CLI::isCLI() : php_sapi_name() == 'cli';
+            if($isCli){
                 fprintf(STDERR, "\n<%s>\n","Uncaught Exception.");
                 fprintf(STDERR, "Exception Message %5s %s\n",":",$ex->getMessage());
                 fprintf(STDERR, "Exception Code    %5s %s\n",":",$ex->getMessage());

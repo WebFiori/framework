@@ -439,8 +439,7 @@ class WebFiori{
         if(class_exists('webfiori\conf\Config')){
             return Config::get();
         }
-        $n = null;
-        return $n;
+        return null;
     }
     /**
      * Returns an instance of the class 'SiteConfig'.
@@ -454,8 +453,7 @@ class WebFiori{
         if(class_exists('webfiori\conf\SiteConfig')){
             return SiteConfig::get();
         }
-        $n = null;
-        return $n;
+        return null;
     }
     /**
      * Returns an instance of the class 'MailConfig'.
@@ -469,8 +467,7 @@ class WebFiori{
         if(class_exists('webfiori\conf\MailConfig')){
             return MailConfig::get();
         }
-        $n = null;
-        return $n;
+        return null;
     }
     /**
      * Returns an associative array that contains database connection error 

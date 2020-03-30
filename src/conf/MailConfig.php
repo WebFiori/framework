@@ -61,8 +61,7 @@ class MailConfig{
         if(isset($this->emailAccounts[$name])){
             return $this->emailAccounts[$name];
         }
-        $null = null;
-        return $null;
+        return null;
     }
     /**
      * Returns an email account given its name.

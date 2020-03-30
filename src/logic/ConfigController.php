@@ -362,9 +362,6 @@ class ConfigController extends Controller{
     public static function isConfig(){
         return self::get()->_isConfig();
     }
-    private function _getDBName(){
-        return $this->dbName;
-    }
     
     private function _getVersion(){
         return $this->version;

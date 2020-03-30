@@ -99,39 +99,37 @@ class Access {
      * @since 1.0
      */
     public static function resolvePriviliges($str,$user) {
-        if(strlen($str) > 0){
-            if($user instanceof User){
-                $privilegesSplit = explode(';', $str);
-                $privilegesToHave = [];
-                $privilegesToNotHave = [];
-                $groupsBelongsTo = [];
-                foreach ($privilegesSplit as $privilegeStr){
-                    $prSplit = explode('-', $privilegeStr);
-                    if(count($prSplit) == 2){
-                        if($prSplit[0] == 'G'){
-                            $groupsBelongsTo[] = $prSplit[1];
+        if(strlen($str) > 0 && $user instanceof User){
+            $privilegesSplit = explode(';', $str);
+            $privilegesToHave = [];
+            $privilegesToNotHave = [];
+            $groupsBelongsTo = [];
+            foreach ($privilegesSplit as $privilegeStr){
+                $prSplit = explode('-', $privilegeStr);
+                if(count($prSplit) == 2){
+                    if($prSplit[0] == 'G'){
+                        $groupsBelongsTo[] = $prSplit[1];
+                    }
+                    else{
+                        $pirivelegeId = $prSplit[0];
+                        if($prSplit[1] == '1'){
+                            //It means the user has the privilege.
+                            $privilegesToHave[] = $pirivelegeId;
                         }
                         else{
-                            $pirivelegeId = $prSplit[0];
-                            $userHasPr = $prSplit[1] == '1' ? true : false;
-                            if($userHasPr === true){
-                                $privilegesToHave[] = $pirivelegeId;
-                            }
-                            else{
-                                $privilegesToNotHave[] = $pirivelegeId;
-                            }
+                            $privilegesToNotHave[] = $pirivelegeId;
                         }
                     }
                 }
-                foreach ($groupsBelongsTo as $groupId){
-                    $user->addToGroup($groupId);
-                }
-                foreach ($privilegesToHave as $privilegeId){
-                    $user->addPrivilege($privilegeId);
-                }
-                foreach ($privilegesToNotHave as $privilegeId){
-                    $user->removePrivilege($privilegeId);
-                }
+            }
+            foreach ($groupsBelongsTo as $groupId){
+                $user->addToGroup($groupId);
+            }
+            foreach ($privilegesToHave as $privilegeId){
+                $user->addPrivilege($privilegeId);
+            }
+            foreach ($privilegesToNotHave as $privilegeId){
+                $user->removePrivilege($privilegeId);
             }
         }
     }
@@ -337,8 +335,7 @@ class Access {
                 }
             }
         }
-        $g = null;
-        return $g;
+        return null;
     }
     /**
      * 
@@ -354,8 +351,7 @@ class Access {
                 return $g;
             }
         }
-        $null = null;
-        return $null;
+        return null;
     }
 
     /**
@@ -371,8 +367,7 @@ class Access {
      * @since 1.0
      */
     public static function getPrivilege($id){
-        $pr = Access::get()->_getPrivilege($id);
-        return $pr;
+        return Access::get()->_getPrivilege($id);
     }
     /**
      * 
@@ -406,8 +401,7 @@ class Access {
                 return $p;
             }
         }
-        $p = null;
-        return $p;
+        return null;
     }
     /**
      * Checks if a privilege does exist or not given its ID. 
@@ -495,8 +489,7 @@ class Access {
      * @since 1.0
      */
     public static function getGroup($groupId){
-        $g = Access::get()->_getGroup($groupId);
-        return $g;
+        return Access::get()->_getGroup($groupId);
     }
     /**
      * 

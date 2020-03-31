@@ -526,7 +526,8 @@ class Uploader implements JsonI{
                                     if(!file_exists($targetDir)){
                                         $fileInfoArr['is-exist'] = false;
                                         $fileInfoArr['is-replace'] = false;
-                                        if(move_uploaded_file($fileOrFiles["tmp_name"][$x], $targetDir)){
+                                        $sanitizedName = filter_input(FILTER_SANITIZE_STRING, $fileOrFiles["tmp_name"][$x]);
+                                        if(move_uploaded_file($sanitizedName, $targetDir)){
                                             if(function_exists('mime_content_type')){
                                                 $fPath = str_replace('\\','/',$fileInfoArr['upload-path'].'/'.$fileInfoArr['name']);
                                                 $fileInfoArr['mime'] = mime_content_type($fPath);
@@ -555,7 +556,8 @@ class Uploader implements JsonI{
                                             $fileInfoArr['is-replace'] = true;
                                             
                                             unlink($targetDir);
-                                            if(move_uploaded_file($fileOrFiles["tmp_name"][$x], $targetDir)){
+                                            $sanitizedName = filter_input(FILTER_SANITIZE_STRING, $fileOrFiles["tmp_name"][$x]);
+                                            if(move_uploaded_file($sanitizedName, $targetDir)){
                                                 $fileInfoArr['uploaded'] = true;
                                             }
                                             else{
@@ -601,7 +603,8 @@ class Uploader implements JsonI{
                                 if(!file_exists($targetDir)){
                                     $fileInfoArr['is-exist'] = true;
                                     $fileInfoArr['is-replace'] = true;
-                                    if(move_uploaded_file($fileOrFiles["tmp_name"], $targetDir)){
+                                    $sanitizedName = filter_input(FILTER_SANITIZE_STRING, $fileOrFiles["tmp_name"]);
+                                    if(move_uploaded_file($sanitizedName, $targetDir)){
                                         $fileInfoArr['uploaded'] = true;
                                         if(function_exists('mime_content_type')){
                                             $fPath = str_replace('\\','/',$fileInfoArr['upload-path'].'/'.$fileInfoArr['name']);
@@ -629,7 +632,8 @@ class Uploader implements JsonI{
                                     if($replaceIfExist){
                                         $fileInfoArr['is-replace'] = true;
                                         unlink($targetDir);
-                                        if(move_uploaded_file($fileOrFiles["tmp_name"], $targetDir)){
+                                        $sanitizedName = filter_input(FILTER_SANITIZE_STRING, $fileOrFiles["tmp_name"]);
+                                        if(move_uploaded_file($sanitizedName, $targetDir)){
                                             $fileInfoArr['uploaded'] = true;
                                         }
                                         else{

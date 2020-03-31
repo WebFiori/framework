@@ -9,6 +9,9 @@
   <a href="https://codecov.io/gh/usernane/webfiori">
     <img src="https://codecov.io/gh/usernane/webfiori/branch/master/graph/badge.svg" />
   </a>
+  <a href="https://sonarcloud.io/dashboard?id=usernane_webfiori">
+      <img src="https://sonarcloud.io/api/project_badges/measure?project=usernane_webfiori&metric=alert_status" />
+  </a>
   <a href="https://github.com/usernane/webfiori/releases">
       <img src="https://img.shields.io/github/release/usernane/webfiori.svg?label=latest" />
   </a>

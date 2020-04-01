@@ -26,6 +26,7 @@ namespace webfiori;
 use webfiori\conf\Config;
 use webfiori\conf\SiteConfig;
 use webfiori\conf\MailConfig;
+use webfiori\entity\exceptions\InitializationException;
 use webfiori\ini\InitPrivileges;
 use webfiori\ini\InitAutoLoad;
 use webfiori\ini\InitCron;
@@ -40,6 +41,7 @@ use webfiori\entity\router\ViewRoutes;
 use webfiori\entity\router\ClosureRoutes;
 use webfiori\entity\router\OtherRoutes;
 use webfiori\entity\router\Router;
+use webfiori\entity\ui\ServerErrView;
 use jsonx\JsonX;
 use webfiori\entity\CLI;
 use Exception;
@@ -144,7 +146,7 @@ class WebFiori{
             }
         }
         else if(self::$classStatus == 'INITIALIZING'){
-            throw new Exception('Using the core class while it is not fully initialized.');
+            throw new InitializationException('Using the core class while it is not fully initialized.');
         }
         return self::$LC;
     }
@@ -224,12 +226,12 @@ class WebFiori{
         self::$WF = WebsiteController::get();
         self::$BMF = EmailController::get();
         
-        $this->sysStatus = Util::checkSystemStatus(true);
+        $this->sysStatus = Util::checkSystemStatus();
         if($this->sysStatus == Util::MISSING_CONF_FILE || $this->sysStatus == Util::MISSING_SITE_CONF_FILE){
             self::$SF->createConfigFile();
             self::$WF->createSiteConfigFile();
             self::$BMF->createEmailConfigFile();
-            $this->sysStatus = Util::checkSystemStatus(true);
+            $this->sysStatus = Util::checkSystemStatus();
         }
         if(gettype($this->sysStatus) == 'array'){
             $this->dbErrDetails = $this->sysStatus;
@@ -254,7 +256,7 @@ class WebFiori{
             //you can modify this part to make 
             //it do something else in case system 
             //configuration is not equal to true
-
+            //
             //show error message to tell the developer how to configure the system.
             $this->_needConfigration();
         }
@@ -343,33 +345,8 @@ class WebFiori{
                     die($j);
                 }
                 else{
-                    die(''
-                    . '<!DOCTYPE html>'
-                    . '<html>'
-                    . '<head>'
-                    . '<style>'
-                    . '.nice-red{'
-                    . 'color:#ff6666;'
-                    . '}'
-                    . '.mono{'
-                    . 'font-family:monospace;'
-                    . '}'
-                    . '</style>'
-                    . '<title>Uncaught Exception</title>'
-                    . '</head>'
-                    . '<body style="color:white;background-color:#1a000d;">'
-                    . '<h1 style="color:#ff4d4d">500 - Server Error: Uncaught Exception.</h1>'
-                    . '<hr>'
-                    . '<p>'
-                    .'<b class="nice-red mono">Exception Message:</b> <span class="mono">'.$ex->getMessage()."</span><br/>"
-                    .'<b class="nice-red mono">Exception Code:</b> <span class="mono">'.$ex->getCode()."</span><br/>"
-                    .'<b class="nice-red mono">File:</b> <span class="mono">'.$ex->getFile()."</span><br/>"
-                    .'<b class="nice-red mono">Line:</b> <span class="mono">'.$ex->getLine()."</span><br>"
-                    .'<b class="nice-red mono">Stack Trace:</b> '."<br/>"
-                    . '</p>'
-                    . '<pre>'.$ex->getTraceAsString().'</pre>'
-                    . '</body>'
-                    . '</html>');
+                    $exceptionView = new ServerErrView($ex);
+                    $exceptionView->display();
                 }
             }
         });
@@ -394,32 +371,8 @@ class WebFiori{
                     die($j);
                 }
                 else{
-                    die(''
-                    . '<!DOCTYPE html>'
-                    . '<html>'
-                    . '<head>'
-                    . '<style>'
-                    . '.nice-red{'
-                    . 'color:#ff6666;'
-                    . '}'
-                    . '.mono{'
-                    . 'font-family:monospace;'
-                    . '}'
-                    . '</style>'
-                    . '<title>Server Error - 500</title>'
-                    . '</head>'
-                    . '<body style="color:white;background-color:#1a000d;">'
-                    . '<h1 style="color:#ff4d4d">500 - Server Error</h1>'
-                    . '<hr>'
-                    . '<p>'
-                    .'<b class="nice-red mono">Type:</b> <span class="mono">'.Util::ERR_TYPES[$error["type"]]['type']."</span><br/>"
-                    .'<b class="nice-red mono">Description:</b> <span class="mono">'.Util::ERR_TYPES[$error["type"]]['description']."</span><br/>"
-                    .'<b class="nice-red mono">Message:</b> <span class="mono">'.$error["message"]."</span><br>"
-                    .'<b class="nice-red mono">File:</b> <span class="mono">'.$error["file"]."</span><br/>"
-                    .'<b class="nice-red mono">Line:</b> <span class="mono">'.$error["line"]."</span><br/>" 
-                    . '</p>'
-                    . '</body>'
-                    . '</html>');
+                    $errPage = new ServerErrView($error);
+                    $errPage->display();
                 }
             }
         });
@@ -539,7 +492,7 @@ class WebFiori{
      * @return boolean|string
      * @since 1.0
      */
-    private function _getSystemStatus($refresh=true,$testDb=true) {
+    private function _getSystemStatus($refresh=true,$testDb=false) {
         if($refresh === true){
             $this->sysStatus = Util::checkSystemStatus($testDb);
             if(gettype($this->sysStatus) == 'array'){

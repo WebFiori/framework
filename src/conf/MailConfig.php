@@ -1,5 +1,6 @@
 <?php
 namespace webfiori\conf;
+
 use webfiori\entity\mail\SMTPAccount;
 /**
  * SMTP configuration class.
@@ -8,7 +9,7 @@ use webfiori\entity\mail\SMTPAccount;
  * @author Ibrahim
  * @version 1.0.1
  */
-class MailConfig{
+class MailConfig {
     private $emailAccounts;
     /**
      *
@@ -16,31 +17,7 @@ class MailConfig{
      * @since 1.0
      */
     private static $inst;
-    /**
-     * Return a single instance of the class.
-     * Calling this method multiple times will result in returning 
-     * the same instance every time.
-     * @return MailConfig
-     * @since 1.0
-     */
-    public static function get(){
-        if(self::$inst === null){
-            self::$inst = new MailConfig();
-        }
-        return self::$inst;
-    }
     private function __construct() {
-    }
-/**
-     * Adds an email account.
-     * The developer can use this method to add new account during runtime. 
-     * The account will be removed once the program finishes.
-     * @param EmailAccount $acc an object of type EmailAccount.
-     * @param string $name A name to associate with the email account.
-     * @since 1.0
-     */
-    private function addAccount($acc,$name){
-        $this->emailAccounts[$name] = $acc;
     }
     /**
      * Adds new SMTP connection information or updates an existing one.
@@ -49,19 +26,28 @@ class MailConfig{
      * will contain SMTP account information.
      * @since 1.0.1
      */
-    public static function addSMTPAccount($accName,$smtpConnInfo){
-        if($smtpConnInfo instanceof SMTPAccount){
+    public static function addSMTPAccount($accName,$smtpConnInfo) {
+        if ($smtpConnInfo instanceof SMTPAccount) {
             $trimmedName = trim($accName);
-            if(strlen($trimmedName) != 0){
+
+            if (strlen($trimmedName) != 0) {
                 self::get()->addAccount($smtpConnInfo,$trimmedName);
             }
         }
     }
-    private function _getAccount($name){
-        if(isset($this->emailAccounts[$name])){
-            return $this->emailAccounts[$name];
+    /**
+     * Return a single instance of the class.
+     * Calling this method multiple times will result in returning 
+     * the same instance every time.
+     * @return MailConfig
+     * @since 1.0
+     */
+    public static function get() {
+        if (self::$inst === null) {
+            self::$inst = new MailConfig();
         }
-        return null;
+
+        return self::$inst;
     }
     /**
      * Returns an email account given its name.
@@ -73,11 +59,8 @@ class MailConfig{
      * method will return null.
      * @since 1.0
      */
-    public static function getAccount($name){
+    public static function getAccount($name) {
         return self::get()->_getAccount($name);
-    }
-    private function _getAccounts(){
-        return $this->emailAccounts;
     }
     /**
      * Returns an associative array that contains all email accounts.
@@ -86,7 +69,28 @@ class MailConfig{
      * @return array An associative array that contains all email accounts.
      * @since 1.0
      */
-    public static function getAccounts(){
+    public static function getAccounts() {
         return self::get()->_getAccounts();
+    }
+    private function _getAccount($name) {
+        if (isset($this->emailAccounts[$name])) {
+            return $this->emailAccounts[$name];
+        }
+
+        return null;
+    }
+    private function _getAccounts() {
+        return $this->emailAccounts;
+    }
+    /**
+     * Adds an email account.
+     * The developer can use this method to add new account during runtime. 
+     * The account will be removed once the program finishes.
+     * @param EmailAccount $acc an object of type EmailAccount.
+     * @param string $name A name to associate with the email account.
+     * @since 1.0
+     */
+    private function addAccount($acc,$name) {
+        $this->emailAccounts[$name] = $acc;
     }
 }

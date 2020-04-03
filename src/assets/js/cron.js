@@ -24,51 +24,51 @@ function disableOrEnableInputs(disable=true){
  * @returns {undefined}
  */
 function execJob(source,jobName){
-     var refresh = window.isRefresh;
-     window.isRefresh = false;
-     disableOrEnableInputs();     
-     source.innerHTML = 'Executing Job...';
-     var xhr = new XMLHttpRequest();
-     xhr.open('post','cron/apis/force-execution');
-     var outputWindow = document.getElementById('output-area');
-     outputWindow.innerHTML = '<b>Forcing job "'+jobName+'" to execute...</b>\n';
-     xhr.onreadystatechange = function(){
-         outputWindow.innerHTML += 'Ready State: '+this.readyState+'\n';
-         if(this.readyState === 4 && this.status === 200){
-             try{
-                 var asJson = JSON.parse(this.responseText);
-                 if(asJson['more-info']['failed'].length !== 0){
-                     outputWindow.innerHTML += '<b style=\"color:red;font-weight:bold\">Job executed but did not finish successfully.</b> \n';
-                     source.innerHTML = '<b>The job was executed but did not finish successfully.</b>';
-                 }
-                 else{
-                     outputWindow.innerHTML += '<b style=\"color:green;font-weight:bold\">Job executed and finished successfully.</b> \n';
-                     source.innerHTML = '<b>Job executed and finished successfully</b>';
-                 }
-             }
-             catch(e){
-                 outputWindow.innerHTML += '<b style=\"color:red;font-weight:bold\">Job did not execute successfully due to server error.</b> \n';
-                 source.innerHTML = 'Something Went Wrong While Executing the Job. Try Again';
-             }
-             outputWindow.innerHTML += 'Raw server response:\n'+this.responseText;
-             disableOrEnableInputs(false);
-             window.isRefresh = refresh;
-         }
-         else if(this.readyState === 4 && this.status === 0){
-             outputWindow.innerHTML += '<b style=\"color:red;font-weight:bold\">Connection to the server was lost!</b> \n';
-             source.innerHTML = '<b>Connection Lost. Try Again.</b>';
-             disableOrEnableInputs(false);
-             window.isRefresh = refresh;
-         }
-         else if(this.readyState === 4){
-             outputWindow.innerHTML += '<b style=\"color:red;font-weight:bold\">Unknown error prevented job execution!</b> \n';
-             outputWindow.innerHTML += 'Raw server response:\n'+this.responseText;
-             source.innerHTML = 'Something Went Wrong While Executing the Job. Try Again';
-             disableOrEnableInputs(false);
-             window.isRefresh = refresh;
-         }
-     };
-     xhr.setRequestHeader('content-type','application/x-www-form-urlencoded');     xhr.send('job-name='+encodeURIComponent(jobName));
+    var refresh = window.isRefresh;
+    window.isRefresh = false;
+    disableOrEnableInputs();     
+    source.innerHTML = 'Executing Job...';
+    var ajax = new AJAX({
+        method:'post',
+        url:'cron/apis/force-execution'
+    });
+    var params = extractCustomParams();
+    params['job-name'] = jobName;
+    ajax.setParams(params);
+    var outputWindow = document.getElementById('output-area');
+    outputWindow.innerHTML = '<b>Forcing job "'+jobName+'" to execute...</b>\n';
+    ajax.setOnSuccess(function(){
+        if(this.jsonResponse !== null){
+            if(this.jsonResponse['more-info']['failed'].length !== 0){
+                outputWindow.innerHTML += '<b style=\"color:red;font-weight:bold\">Job executed but did not finish successfully.</b> \n';
+                source.innerHTML = '<b>The job was executed but did not finish successfully.</b>';
+            }
+            else{
+                outputWindow.innerHTML += '<b style=\"color:green;font-weight:bold\">Job executed and finished successfully.</b> \n';
+                source.innerHTML = '<b>Job executed and finished successfully</b>';
+            }
+        }
+        else{
+            outputWindow.innerHTML += '<b style=\"color:red;font-weight:bold\">Something Went Wrong While Executing the Job. Try Again</b> \n';
+            source.innerHTML = 'Execution Error. Try Again';
+        }
+    });
+    ajax.setOnClientError(function(){
+        outputWindow.innerHTML += '<b style=\"color:red;font-weight:bold\">Server Sent a '+this.status+' error code.</b> \n';
+    });
+    ajax.setOnServerError(function(){
+        outputWindow.innerHTML += '<b style=\"color:red;font-weight:bold\">Server Sent a '+this.status+' error code.</b> \n';
+    });
+    ajax.setOnDisconnected(function(){
+        outputWindow.innerHTML += '<b style=\"color:red;font-weight:bold\">Connection to the server was lost!</b> \n';
+        source.innerHTML = '<b>Connection Lost. Try Again.</b>';
+    });
+    ajax.setAfterAjax(function(){
+        outputWindow.innerHTML += 'Raw server response:\n'+this.response;
+        disableOrEnableInputs(false);
+        window.isRefresh = refresh;
+    });
+    ajax.send();
 };
 /**
  * Logout of CRON control panel.
@@ -151,23 +151,22 @@ function attributeValueChanged(source,num){
 function attributeNameChanged(source,num){
     window.customAttrs[num].name = source.value;
 };
+/**
+ * Creates an object that contains all custom execution parameters taken from 
+ * the user interface.
+ * @returns {Object}
+ */
 function extractCustomParams(){
-    var retVal = "";
-    for(var x = 0 ; x < window.customAttrs.length ; x++){
-        var attr = window.customAttrs[x];
-        if(attr.value.length !== 0){
-            if(attr.use === true){
-                if(retVal.length === 0){
-                    retVal += attr.name+"="+encodeURIComponent(attr.value.trim());
-                }
-                else{
-                    retVal += "&"+attr.name+"="+encodeURIComponent(attr.value.trim());
+    var retVal = {};
+    if(window.customAttrs){
+        for(var x = 0 ; x < window.customAttrs.length ; x++){
+            var attr = window.customAttrs[x];
+            if(attr.value.length !== 0){
+                if(attr.use === true){
+                    retVal[encodeURIComponent(attr.name)] = encodeURIComponent(attr.value.trim());
                 }
             }
         }
     }
-    if(retVal.length === 0){
-        return "";
-    }
-    return "&"+retVal;
+    return retVal;
 };

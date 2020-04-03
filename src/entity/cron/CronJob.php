@@ -24,11 +24,12 @@
  */
 namespace webfiori\entity\cron;
 use Exception;
+use Error;
 /**
  * A class thar represents a cron job.
  *
  * @author Ibrahim
- * @version 1.0.6
+ * @version 1.0.7
  */
 class CronJob {
     /**
@@ -212,14 +213,6 @@ class CronJob {
             return true;
         }
         return false;
-    }
-    /**
-     * Returns an array that contains the names of custom execution attributes.
-     * @return array An array that contains the names of custom execution attributes.
-     * @since 1.0.5
-     */
-    public function getExecutionAttributes() {
-        return $this->customAttrs;
     }
     /**
      * Returns true if the job was executed successfully.
@@ -1137,7 +1130,7 @@ class CronJob {
                 $isSuccess = call_user_func($this->events['on']['func'], $this->events['on']['params']);
                 $this->isSuccess = $isSuccess === true || $isSuccess === null;
             } 
-            catch (Exception $ex) {
+            catch (Exception|Error $ex) {
                 Cron::log('Job failed to complete due to an exception.');
                 Cron::log('Exception message: "'.$ex->getMessage().'"');
                 Cron::log('Thrown in file: "'.$ex->getFile().'"');
@@ -1150,7 +1143,7 @@ class CronJob {
                     call_user_func($this->events['on-failure']['func'], $this->events['on']['params']);
                     Cron::log('Finished.');
                 } 
-                catch (Exception $ex) {
+                catch (Exception|Error $ex) {
                     Cron::log('An exception is thrown by the on-fail callback.');
                     Cron::log('Exception message: "'.$ex->getMessage().'"');
                     Cron::log('Thrown in file: "'.$ex->getFile().'"');
@@ -1169,5 +1162,21 @@ class CronJob {
      */
     public function isTime() {
         return $this->isMinute() && $this->isHour() && $this->isDayOfMonth() && $this->isMonth() && $this->isDayOfWeek();
+    }
+    /**
+     * Returns an associative array that contains the values of 
+     * custom execution parameters.
+     * Note that the method will filter the values using the filter FILTER_SANITIZE_STRING.
+     * @return array An associative array. The keys are attributes values and 
+     * the values are the values which are given as input. If a value 
+     * is not provided, it will be set to null.
+     * @since 1.0.7
+     */
+    public function getExecutionAttributes() {
+        $retVal = [];
+        foreach ($this->customAttrs as $attrName){
+            $retVal[$attrName] = filter_input(INPUT_POST, trim($attrName), FILTER_SANITIZE_STRING);
+        }
+        return $retVal;
     }
 }

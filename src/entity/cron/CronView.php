@@ -88,6 +88,7 @@ class CronView {
                 . '     },60000)'."\n"
                 . ' };'."\n"
                 );
+        Page::document()->getHeadNode()->addJs('https://cdn.jsdelivr.net/gh/usernane/ajax@1.0.2/AJAX.js', [], false);
         Page::document()->getHeadNode()->addJs('assets/js/cron.js');
         Page::document()->getHeadNode()->addCSS('assets/css/cron.css');
         Page::document()->getHeadNode()->addChild($jsCode);
@@ -99,5 +100,24 @@ class CronView {
      */
     public function getControlsContainer() {
         return $this->controlsContainer;
+    }
+    /**
+     * Adds an area which is used to show server output.
+     */
+    public function createOutputWindow() {
+        $outputWindow = new HTMLNode();
+        $outputWindow->setID('output-window');
+        $outputWindow->addTextNode('<p style="border:1px dotted;font-weight:bold">Output Window</p><pre'
+                . ' style="font-family:monospace" id="output-area"></pre>', false);
+        $outputWindow->setStyle([
+            'width'=>'100%',
+            'float'=>'right',
+            'border'=>'1px dotted',
+            'overflow-y'=>'scroll',
+            'height'=>'300px',
+            'color'=>'white',
+            'background-color'=>'black'
+        ]);
+        Page::insert($outputWindow);
     }
 }

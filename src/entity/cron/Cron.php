@@ -27,6 +27,7 @@ use phpStructs\Queue;
 use webfiori\WebFiori;
 use webfiori\entity\router\Router;
 use webfiori\entity\Util;
+use Exception;
 /**
  * A class that is used to manage cron jobs.
  * It is used to create jobs, schedule them and execute them. In order to run 

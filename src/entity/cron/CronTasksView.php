@@ -23,15 +23,14 @@
  * THE SOFTWARE.
  */
 namespace webfiori\entity\cron;
+
 use webfiori\entity\Page;
-use phpStructs\html\JsCode;
 use phpStructs\html\TableRow;
 use phpStructs\html\TableCell;
 use phpStructs\html\Input;
 use phpStructs\html\HTMLNode;
 use phpStructs\html\PNode;
 use phpStructs\html\Label;
-use phpStructs\html\CodeSnippet;
 use webfiori\entity\File;
 use webfiori\WebFiori;
 /**
@@ -72,18 +71,7 @@ class CronTasksView extends CronView{
         $this->_createRefreshControls();
         $this->_createTasksTable();
         
-        $outputWindow = new HTMLNode();
-        $outputWindow->setID('output-window');
-        $outputWindow->addTextNode('<p style="border:1px dotted;font-weight:bold">Output Window</p><pre'
-                . ' style="font-family:monospace" id="output-area"></pre>', false);
-        $outputWindow->setStyle([
-            'width'=>'100%',
-            'float'=>'right',
-            'border'=>'1px dotted',
-            'overflow-y'=>'scroll',
-            'height'=>'300px'
-        ]);
-        Page::insert($outputWindow);
+        $this->createOutputWindow();
         $this->_displayExecLog();
         Page::render();
     }

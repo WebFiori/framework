@@ -53,7 +53,6 @@ class CronTaskView extends CronView{
         $job = Cron::getJob($jobName);
         $this->job = $job;
         if($job instanceof CronJob){
-            
             $backButton = new HTMLNode('button');
             $backButton->addTextNode('Back to Jobs List');
             $backButton->setAttribute('onclick',"window.location.href = 'cron/jobs';");
@@ -100,62 +99,14 @@ class CronTaskView extends CronView{
                     . ' };'."\n"
                     );
             Page::document()->getHeadNode()->addChild($jsCode);
-            $inlineStyle = new HTMLNode('style');
-            $inlineStyle->addTextNode(''
-                    . 'button{'
-                    . 'cursor: pointer'
-                    . '}'
-                    . 'button.ok{'
-                    . 'width: 100%;border: 0px;'
-                    . 'background-color: #229000;'
-                    . 'margin: 0;color: white;'
-                    . 'font-weight: bold;'
-                    . 'height: 25px;'
-                    . '}'
-                    . 'button.ok:hover{'
-                    . 'background-color: #22B000;'
-                    . '}'
-                    . 'button.cancel:hover{'
-                    . 'background-color: rgba(200,0,0,0.5);'
-                    . '}'
-                    . 'button[disabled]{'
-                    . 'cursor:not-allowed'
-                    . '}'
-                    . 'button.cancel{'
-                    . 'width: 100px;'
-                    . 'margin: 0;'
-                    . 'background-color: rgba(200,0,0,0.7);'
-                    . 'color: white;'
-                    . 'font-weight: bold;'
-                    . 'border: 0px;'
-                    . 'height:25px;'
-                    . '}'
-                    . '');
-            Page::document()->getHeadNode()->addChild($inlineStyle);
             $forceNode = new HTMLNode();
             $forceNode->addTextNode('<button style="margin-top:30px" name="input-element" onclick="execJob(this,\''.$job->getJobName().'\')" class="force-execution-button">Force Execution</button>', false);
             $this->getControlsContainer()->addChild($forceNode);
-            $outputWindow = new HTMLNode();
-            $outputWindow->setID('output-window');
-            $outputWindow->addTextNode('<p style="border:1px dotted;font-weight:bold">Output Window</p><pre'
-                    . ' style="font-family:monospace" id="output-area"></pre>', false);
-            $outputWindow->setStyle([
-                'width'=>'100%',
-                'float'=>'right',
-                'border'=>'1px dotted',
-                'overflow-y'=>'scroll',
-                'height'=>'300px'
-            ]);
-            Page::insert($outputWindow);
+            $this->createOutputWindow();
             Page::render();
         }
         else{
-            if($password != 'NO_PASSWORD'){
-                header('location: '.WebFiori::getSiteConfig()->getBaseURL().'cron-jobs/list/'.$password);
-            }
-            else{
-                header('location: '.WebFiori::getSiteConfig()->getBaseURL().'cron-jobs/list');
-            }
+            header('location: '.WebFiori::getSiteConfig()->getBaseURL().'cron-jobs/list');
         }
     }
     

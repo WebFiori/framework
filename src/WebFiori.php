@@ -279,13 +279,14 @@ class WebFiori{
             else{
                 if(defined('API_CALL')){
                     header("HTTP/1.1 500 Server Error");
-                    $j = new JsonX();
-                    $j->add('message',$errstr);
-                    $j->add('type',Util::ERR_TYPES[$errno]['type']);
-                    $j->add('description', Util::ERR_TYPES[$errno]['description']);
-                    $j->add('error-number',$errno);
-                    $j->add('file',$errfile);
-                    $j->add('line',$errline);
+                    $j = new JsonX([
+                        'message'=>$errstr,
+                        'type'=>Util::ERR_TYPES[$errno]['type'],
+                        'description'=>Util::ERR_TYPES[$errno]['description'],
+                        'error-number'=>$errno,
+                        'file'=>$errfile,
+                        'line'=>$errline
+                    ], true);
                     header('content-type: application/json');
                     die($j);
                 }
@@ -321,14 +322,16 @@ class WebFiori{
                     $routeType = Router::VIEW_ROUTE;
                 }
                 if($routeType == Router::API_ROUTE){
-                    $j = new JsonX();
-                    $j->add('message','500 - Server Error: Uncaught Exception.');
-                    $j->add('type','error');
-                    $j->add('exception-message',$ex->getMessage());
-                    $j->add('exception-code',$ex->getMessage());
-                    $j->add('file',$ex->getFile());
-                    $j->add('line',$ex->getLine());
-                    $stackTrace = new JsonX();
+                    $j = new JsonX([
+                        'message'=>'500 - Server Error: Uncaught Exception.',
+                        'type'=>'error',
+                        'exception-class'=> get_class($ex),
+                        'exception-message'=>$ex->getMessage(),
+                        'exception-code'=>$ex->getMessage(),
+                        'file'=>$ex->getFile(),
+                        'line'=>$ex->getLine()
+                    ], true);
+                    $stackTrace = new JsonX([], true);
                     $index = 0;
                     $trace = $ex->getTrace();
                     foreach ($trace as $arr){
@@ -362,12 +365,13 @@ class WebFiori{
                 }
                 header("HTTP/1.1 500 Server Error");
                 if(defined('API_CALL')){
-                    $j = new JsonX();
-                    $j->add('message',$error["message"]);
-                    $j->add('type','error');
-                    $j->add('error-number',$error["type"]);
-                    $j->add('file',$error["file"]);
-                    $j->add('line',$error["line"]);
+                    $j = new JsonX([
+                        'message'=>$error["message"],
+                        'type'=>'error',
+                        'error-number'=>$error["type"],
+                        'file'=>$error["file"],
+                        'line'=>$error["line"]
+                    ], true);
                     die($j);
                 }
                 else{
@@ -518,7 +522,7 @@ class WebFiori{
         }
         if($routeType == Router::API_ROUTE){
             header('content-type:application/json');
-            $j = new JsonX();
+            $j = new JsonX([], true);
             $j->add('message', '503 - Service Unavailable');
             $j->add('type', 'error');
             $j->add('description','This error means that the system is not configured yet. '

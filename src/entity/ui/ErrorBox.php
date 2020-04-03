@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-namespace webfiori\entity;
+namespace webfiori\entity\ui;
 use phpStructs\html\HTMLNode;
 /**
  * A fixed box which is used to show PHP warnings and notices.

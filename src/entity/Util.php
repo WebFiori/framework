@@ -27,7 +27,7 @@ use webfiori\conf\Config;
 use webfiori\entity\DBConnectionFactory;
 use webfiori\entity\DBConnectionInfo;
 use webfiori\WebFiori;
-use webfiori\entity\MessageBox;
+use webfiori\entity\ui\MessageBox;
 /**
  * Framework utility class.
  * @author Ibrahim

@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-namespace webfiori\entity;
+namespace webfiori\entity\ui;
 use phpStructs\html\HTMLNode;
 /**
  * A generic class for showing a floating box in web pages that can have any content 

@@ -35,7 +35,7 @@ use webfiori\logic\WebsiteController;
 use webfiori\logic\EmailController;
 use webfiori\entity\AutoLoader;
 use webfiori\entity\Util;
-use webfiori\entity\ErrorBox;
+use webfiori\entity\ui\ErrorBox;
 use webfiori\entity\router\APIRoutes;
 use webfiori\entity\router\ViewRoutes;
 use webfiori\entity\router\ClosureRoutes;

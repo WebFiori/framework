@@ -23,100 +23,27 @@
  * THE SOFTWARE.
  */
 namespace webfiori\entity;
+
+use Exception;
 use jsonx\JsonI;
 use jsonx\JsonX;
 use webfiori\conf\SiteConfig;
-use Exception;
 /**
  * A helper class to manage system sessions.
  * @author Ibrahim 
  * @version 1.8.5
  */
-class SessionManager implements JsonI{
-    /**
-     * The maximum value at which a session can stay alive without activity (in 
-     * minutes). 
-     * @var int The maximum value at which a session can stay alive without activity. 
-     * The value of the constant is around 5 years (2,629,746 minutes exactly).
-     * @since 1.8.5
-     */
-    const MAX_LIFETIME = 2629746;
+class SessionManager implements JsonI {
     /**
      * The default lifetime for any new session (in minutes).
      * @version 1.8.4
      */
     const DEFAULT_SESSION_DURATION = 120;
     /**
-     * The ID of the session.
-     * @var string
-     * @since 1.8.2 
-     */
-    private $sId;
-    /**
-     * A variable is set to true if the session is resumed and set to false if new.
-     * @var boolean
-     * @since 1.5 
-     */
-    private $resumed;
-    /**
-     * A variable is set to true if the session is new and set to false if resumed.
-     * @var boolean
-     * @since 1.8 
-     */
-    private $new;
-    /**
-     * A string that stores session status.
-     * @var string
-     * @since 1.5
-     */
-    private $sessionStatus;
-    /**
-     * The name of the session.
-     * @var string
-     * @since 1.5 
-     */
-    private $sessionName;
-    /**
-     * The lifetime of the session (in minutes).
-     * @var int lifetime of the session (in minutes). The default is 10.
-     * @since 1.4 
-     */
-    private $lifeTime;
-    /**
-     * An array of supported languages.
-     * @var array An array of supported languages.
-     * @since 1.2
-     * @deprecated since version 1.8.5
-     */
-    const SUPPORTED_LANGS = array(
-        'EN','AR'
-    );
-    /**
-     * A constant that indicates the session is not started yet.
-     * @since 1.7
-     */
-    const NOT_RUNNING = 'status_not_running';
-    /**
      * A constant that indicates the session has timed out.
      * @since 1.7
      */
     const EXPIRED = 'status_session_timeout';
-    /**
-     * A constant that indicates the session has just started.
-     * @since 1.7
-     */
-    const NEW_SESSION = 'status_new_session';
-    /**
-     * A constant that indicates the session is resumed.
-     * @since 1.7
-     */
-    const RESUMED = 'status_session_resumed';
-    /**
-     * A constant that indicates the session has invalid state (Usually one 
-     * missing session variable).
-     * @since 1.7
-     */
-    const INV_STATE = 'status_invalid_state';
     /**
      * A constant that indicates the session has invalid cookie.
      * @since 1.7
@@ -129,11 +56,139 @@ class SessionManager implements JsonI{
      */
     const INV_IP_ADDRESS = 'status_inv_ip_address';
     /**
+     * A constant that indicates the session has invalid state (Usually one 
+     * missing session variable).
+     * @since 1.7
+     */
+    const INV_STATE = 'status_invalid_state';
+    /**
      * A constant that indicates the session has been killed by calling the 
      * method 'SessionManager::kill()'.
      * @since 1.7
      */
     const KILLED = 'status_session_killed';
+    /**
+     * The maximum value at which a session can stay alive without activity (in 
+     * minutes). 
+     * @var int The maximum value at which a session can stay alive without activity. 
+     * The value of the constant is around 5 years (2,629,746 minutes exactly).
+     * @since 1.8.5
+     */
+    const MAX_LIFETIME = 2629746;
+    /**
+     * A constant that indicates the session has just started.
+     * @since 1.7
+     */
+    const NEW_SESSION = 'status_new_session';
+    /**
+     * A constant that indicates the session is not started yet.
+     * @since 1.7
+     */
+    const NOT_RUNNING = 'status_not_running';
+    /**
+     * A constant that indicates the session is resumed.
+     * @since 1.7
+     */
+    const RESUMED = 'status_session_resumed';
+    /**
+     * An array of supported languages.
+     * @var array An array of supported languages.
+     * @since 1.2
+     * @deprecated since version 1.8.5
+     */
+    const SUPPORTED_LANGS = [
+        'EN','AR'
+    ];
+    /**
+     * The lifetime of the session (in minutes).
+     * @var int lifetime of the session (in minutes). The default is 10.
+     * @since 1.4 
+     */
+    private $lifeTime;
+    /**
+     * A variable is set to true if the session is new and set to false if resumed.
+     * @var boolean
+     * @since 1.8 
+     */
+    private $new;
+    /**
+     * A variable is set to true if the session is resumed and set to false if new.
+     * @var boolean
+     * @since 1.5 
+     */
+    private $resumed;
+    /**
+     * The name of the session.
+     * @var string
+     * @since 1.5 
+     */
+    private $sessionName;
+    /**
+     * A string that stores session status.
+     * @var string
+     * @since 1.5
+     */
+    private $sessionStatus;
+    /**
+     * The ID of the session.
+     * @var string
+     * @since 1.8.2 
+     */
+    private $sId;
+    /**
+     * Creates new session manager.
+     * @param string $session_name The name of the session. The name 
+     * can consist of any character other than space, comma, semi-colon and 
+     * equal sign. If the name has one of the given characters, the session 
+     * will have new randomly generated name.
+     * @since 1.0
+     */
+    public function __construct($session_name = 'pa-seesion') {
+        if ($this->_validateName($session_name) === true) {
+            $this->sessionName = $session_name;
+        } else {
+            $this->sessionName = $this->_generateRandSessionName();
+        }
+
+        if (session_status() == PHP_SESSION_ACTIVE) {
+            //if the session is active, we might need to switch
+            //to new session
+            session_write_close();
+        }
+
+        //-1 is used to check if a 
+        //call to the function 'setLifetime()' 
+        //was made
+        $this->lifeTime = -1;
+
+        $this->sessionStatus = self::NOT_RUNNING;
+        $this->resumed = false;
+        $this->new = false;
+        $this->sId = $this->_generateSessionID();
+
+        //$sesionSavePath = 'sessions';
+        //if(Util::isDirectory($sesionSavePath, true)){
+            //session_save_path(ROOT_DIR.'/'.$sesionSavePath);
+        //}
+    }
+    /**
+     * Returns the user who is logged in.
+     * @return User|null an object of type User. If the session is not started, 
+     * the method will return null.
+     * @since 1.0
+     */
+    public function &getUser() {
+        $retVal = null;
+        $isActive = $this->isSessionActive() === true ? true : $this->_switchToSession();
+
+        if ($isActive) {
+            if (isset($_SESSION['session-vars']['user'])) {
+                $retVal = $_SESSION['session-vars']['user'];
+            }
+        }
+
+        return $retVal;
+    }
     /**
      * Returns a JSON string that represents the session.
      * @return string
@@ -143,282 +198,35 @@ class SessionManager implements JsonI{
         return $this->toJSON().'';
     }
     /**
-     * Creates new session manager.
-     * @param string $session_name The name of the session. The name 
-     * can consist of any character other than space, comma, semi-colon and 
-     * equal sign. If the name has one of the given characters, the session 
-     * will have new randomly generated name.
-     * @since 1.0
-     */
-    public function __construct($session_name='pa-seesion') {
-        if($this->_validateName($session_name) === true){
-            $this->sessionName = $session_name;
-        }
-        else{
-            $this->sessionName = $this->_generateRandSessionName();
-        }
-        if(session_status() == PHP_SESSION_ACTIVE){
-            //if the session is active, we might need to switch
-            //to new session
-            session_write_close();
-        }
-        
-        //-1 is used to check if a 
-        //call to the function 'setLifetime()' 
-        //was made
-        $this->lifeTime = -1;
-        
-        $this->sessionStatus = self::NOT_RUNNING;
-        $this->resumed = false;
-        $this->new = false;
-        $this->sId = $this->_generateSessionID();
-        
-        //$sesionSavePath = 'sessions';
-        //if(Util::isDirectory($sesionSavePath, true)){
-            //session_save_path(ROOT_DIR.'/'.$sesionSavePath);
-        //}
-    }
-    /**
-     * Switch between sessions. 
-     * The method first checks if a session is active. 
-     * If a session is active, the method checks if the name that is stored 
-     * in the instance is equal to the name stored in the $_SESSION. if the 
-     * two are different, the method will stop the first session and activate 
-     * the second one.
-     * @return boolean If the session was switched, the method will return true.
-     * @since 1.8
-     */
-    private function _switchToSession() {
-        $retVal = false;
-        if(session_status() == PHP_SESSION_ACTIVE){
-            if($this->_validateAttrs() === true){
-                $sName = $_SESSION['session-vars']['session-name'];
-                $iName = $this->getName();
-                if($sName == $iName){
-                    $retVal = true;
-                }
-                else{
-                    session_write_close();
-                    session_name($iName);
-                    session_id($this->sId);
-                    session_start();
-                    if($this->_validateAttrs() === true){
-                        $retVal = true;
-                    }
-                    else{
-                        session_write_close();
-                    }
-                }
-            }
-            else{
-                $this->kill();
-            }
-        }
-        else{
-            if(strlen($this->sId) != 0){
-                session_name($this->getName());
-                session_id($this->sId);
-                session_start();
-                if($this->_validateAttrs() === true){
-                    $retVal = true;
-                }
-                else{
-                    session_write_close();
-                }
-            }
-        }
-        return $retVal;
-    }
-    /**
      * Generate a random session name.
      * @return string A random session name in the formate 'session-xxxxxxxx'.
      * @since 1.8
      */
-    public static function _generateRandSessionName(){
+    public static function _generateRandSessionName() {
         $retVal = 'session-';
-        for($x = 0 ; $x < 8 ; $x++){
+
+        for ($x = 0 ; $x < 8 ; $x++) {
             $hash = hash('sha256', rand(0, 100).$retVal);
             $retVal .= $hash[$x + rand(0, 40)];
         }
+
         return $retVal;
     }
     /**
-     * Validate the name of the session.
-     * @param string $name The name of the session. The following characters are 
-     * invalid in session name: space, comma, semi-colon and equal sign.
-     * @return boolean The method will return true if the name of the session 
-     * is valid.
-     * @since 1.8
-     */
-    private function _validateName($name) {
-        $len = strlen($name);
-        $retVal = true;
-        if($len != 0){
-            for($x = 0 ; $x < $len ; $x++){
-                $char = $name[$x];
-                if($char == ' ' || $char == ',' || $char == ';' || $char == '='){
-                    $retVal = false;
-                    break;
-                }
-            }
-        }
-        return $retVal;
-    }
-    /**
-     * Generate a random session ID.
-     * @return string A new random session ID.
-     * @since 1.6
-     */
-    private function _generateSessionID() {
-        $date = date(DATE_ISO8601);
-        $hash = hash('sha256', $date);
-        $time = time() + rand(0, 1000);
-        $hash2 = hash('sha256',$hash.$time);
-        $id = substr($hash2, 0, 27);
-        return $id;
-    }
-    /**
-     * Sets the lifetime of the session.
-     * @param int $time Session lifetime (in minutes). it will be set only if 
-     * the given value is greater than 0 and less than SessionManager::MAX_LIFETIME. 
-     * If the given value is greater than SessionManager::MAX_LIFETIME, the 
-     * value of the constant is used.
-     * @return boolean true if time is updated. false otherwise.
-     * @since 1.4
-     */
-    public function setLifetime($time){
-        $retVal = false;
-        if($time > self::MAX_LIFETIME){
-            $time = self::MAX_LIFETIME;
-        }
-        if($time > 0){
-            if($this->isSessionActive()){
-                $this->lifeTime = $time;
-                $_SESSION['session-vars']['lifetime'] = $time*60;
-                
-                $params = session_get_cookie_params();
-                $secure = isset($params['secure']) ? $params['secure'] : false;
-                $httponly = isset($params['httponly']) ? $params['httponly'] : false;
-                $path = isset($params['path']) ? $params['path'] : '/';
-                session_set_cookie_params(time()+$this->getLifetime() * 60, $path, $params['domain'], $secure, $httponly);
-                
-                $retVal = true;
-                if($this->isTimeout()){
-                    $this->kill();
-                }
-            }
-            else{
-                if($this->_switchToSession()){
-                    $this->lifeTime = $time;
-                    $_SESSION['session-vars']['lifetime'] = $time*60;
-                    
-                    $params = session_get_cookie_params();
-                    $secure = isset($params['secure']) ? $params['secure'] : false;
-                    $httponly = isset($params['httponly']) ? $params['httponly'] : false;
-                    $path = isset($params['path']) ? $params['path'] : '/';
-                    session_set_cookie_params(time()+$this->getLifetime() * 60, $path, $params['domain'], $secure, $httponly);
-                    
-                    $retVal = true;
-                    if($this->isTimeout()){
-                        $this->kill();
-                    }
-                }
-                else{
-                    $this->lifeTime = $time;
-                }
-            }
-        }
-        return $retVal;
-    }
-    /**
-     * Returns the lifetime of the session (in minutes). 
-     * @return int the lifetime of the session (in minutes). If the 
-     * session is new and the time was not set, the method will return -1.
-     * @since 1.4
-     */
-    public function getLifetime(){
-        $retVal = $this->lifeTime;
-        if(session_status() == PHP_SESSION_ACTIVE && $this->_switchToSession()){
-            if(isset($_SESSION['session-vars']['lifetime'])){
-                $retVal = $_SESSION['session-vars']['lifetime']/60;
-            }
-        }
-        return $retVal;
-    }
-    /**
-     * Sets if the session timeout will be refreshed with every request 
-     * or not.
-     * @param boolean $bool If set to true, timeout time will be refreshed. 
-     * Note that the property will be updated only if the session is running.
+     * Returns the ID of the session.
+     * @return string The ID of the session. If the session is not active, 
+     * the method will return -1.
      * @since 1.5
      */
-    public function setIsRefresh($bool){
-        if($this->_switchToSession()){
-            $_SESSION['session-vars']['refresh'] = $bool === true ? true : false;
+    public function getID() {
+        $retVal = -1;
+        $isActive = $this->isSessionActive() === true ? true : $this->_switchToSession();
+
+        if ($isActive) {
+            $retVal = session_id();
         }
-    }
-    /**
-     * Initialize session language. The initialization depends on the attribute 
-     * 'lang'. It can be send via 'get' request, 'post' request or a cookie. 
-     * The provided language must be in the array 'SessionManager::SUPOORTED_LANGS'. 
-     * If the given language code is not in the given array, 
-     * The used value will depend on the existence of the class 'SiteConfig'. 
-     * If it is exist, The value that is returned by SiteConfig::getPrimaryLanguage()' .
-     * If not, 'EN' is used by default.
-     * Also if the language is set before, it will not be updated unless the parameter '$forceUpdate' is set to true.
-     * @param boolean $forceUpdate Set to true if the language is set and want to 
-     * reset it.
-     * @param boolean $useDefault If set to true, the method will 
-     * use default language if no language attribute is found in request body.
-     * @return boolean The method will return true if the language is set or 
-     * updated. Other than that, the method will return false.
-     * @since 1.2
-     */
-    private function _initLang($forceUpdate=false,$useDefault=true){
-        if(isset($_SESSION['session-vars']['lang']) && !$forceUpdate){
-            return false;
-        }
-        //the value of default language.
-        //used in case no language found 
-        //in $_GET['lang']
-        $defaultLang = class_exists('webfiori\conf\SiteConfig') ? SiteConfig::getPrimaryLanguage() : 'EN';
-        $lang = null;
-        if(isset($_GET['lang'])){
-            $lang = filter_var($_GET['lang'],FILTER_SANITIZE_STRING);
-        }
-        if($lang == false || $lang == null){
-            if(isset($_POST['lang'])){
-                $lang = filter_var($_POST['lang'],FILTER_SANITIZE_STRING);
-            }
-            if($lang == false || $lang == null){
-                $lang = filter_input(INPUT_COOKIE, 'lang');
-                if($lang == false || $lang == null){
-                    $lang = null;
-                }
-            }
-        }
-        $retVal = false;
-        if(isset($_SESSION['session-vars']['lang']) && $lang == null){
-            $retVal = false;
-        }
-        else if($lang == null && $useDefault === true){
-            $lang = $defaultLang;
-        }
-        else if($lang == null && $useDefault !== true){
-            $retVal = false;
-        }
-        $langU = strtoupper($lang);
-        if(strlen($langU) == 2){
-            $_SESSION['session-vars']['lang'] = $langU;
-            $retVal = true;
-        }
-        if($useDefault === true && $retVal == false && !isset($_SESSION['session-vars']['lang'])){
-            $_SESSION['session-vars']['lang'] = $defaultLang;
-            $retVal = true;
-        }
-        else{
-            $retVal = false;
-        }
+
+        return $retVal;
     }
     /**
      * Returns session language code.
@@ -433,273 +241,85 @@ class SessionManager implements JsonI{
      * language code is not in the given array and the parameter '$forceUpdate' is set 
      * to true, 'EN' will be used.
      */
-    public function getLang($forceUpdate=false){
+    public function getLang($forceUpdate = false) {
         $retVal = null;
         $isActive = $this->isSessionActive() === true ? true : $this->_switchToSession();
-        if($isActive){
-            if($forceUpdate === true){
+
+        if ($isActive) {
+            if ($forceUpdate === true) {
                 $this->_initLang($forceUpdate);
                 $retVal = $_SESSION['session-vars']['lang'];
             }
-            if(isset($_SESSION['session-vars']['lang'])){
+
+            if (isset($_SESSION['session-vars']['lang'])) {
                 $retVal = $_SESSION['session-vars']['lang'];
             }
         }
+
         return $retVal;
     }
     /**
-     * Sets the user who is using the system. It is used in case of log in.
-     * @param User $user an object of type User.
-     * @return boolean true in case the user is set. false if not.
-     * @since 1.0
+     * Returns the lifetime of the session (in minutes). 
+     * @return int the lifetime of the session (in minutes). If the 
+     * session is new and the time was not set, the method will return -1.
+     * @since 1.4
      */
-    public function setUser($user){
-        $retVal = false;
-        $isActive = $this->isSessionActive() === true ? true : $this->_switchToSession();
-        if($isActive){
-            if($user instanceof User){
-                $_SESSION['session-vars']['user'] = $user;
-                $retVal = true;
+    public function getLifetime() {
+        $retVal = $this->lifeTime;
+
+        if (session_status() == PHP_SESSION_ACTIVE && $this->_switchToSession()) {
+            if (isset($_SESSION['session-vars']['lifetime'])) {
+                $retVal = $_SESSION['session-vars']['lifetime'] / 60;
             }
         }
+
         return $retVal;
     }
     /**
-     * Returns the user who is logged in.
-     * @return User|null an object of type User. If the session is not started, 
-     * the method will return null.
-     * @since 1.0
-     */
-    public function &getUser(){
-        $retVal = null;
-        $isActive = $this->isSessionActive() === true ? true : $this->_switchToSession();
-        if($isActive){
-            if(isset($_SESSION['session-vars']['user'])){
-                $retVal = $_SESSION['session-vars']['user'];
-            }
-        }
-        return $retVal;
-    }
-    /**
-     * Initialize the session.
-     * @since 1.0
-     * @param boolean $refresh If set to true, The due time of the session will 
-     * be refreshed in every request if the session is not timed out. Default is false. 
-     * @param boolean $useDefaultLang If the session is new and 
-     * there was no language parameter was found in the request and this parameter 
-     * is set to true, default language will be used (EN). 
-     * @return boolean true if the initialization was successful. false 
-     * in case of error.
-     */
-    public function initSession($refresh=false,$useDefaultLang=true){
-        $retVal = false;
-        if(!$this->_switchToSession()){
-            if(!$this->resume()){
-                $lifeTime = $this->getLifetime();
-                if($lifeTime == -1){
-                    //set default time to two hours.
-                    $this->setLifetime(self::DEFAULT_SESSION_DURATION);
-                    $lifeTime = self::DEFAULT_SESSION_DURATION*60;
-                } 
-                $retVal = $this->_start($refresh, $lifeTime,$useDefaultLang);
-            }
-            else{
-                $retVal = true;
-            }
-        }
-        else{
-            $this->setIsRefresh($refresh);
-            $this->_initLang(false, $useDefaultLang);
-            $retVal = true;
-        }
-        return $retVal;
-    }
-    /**
-     * Checks if the current session instance is the active one or not.
-     * @return boolean If session is running and the stored session name is the same 
-     * as the session name in the instance, the method will return true. Other than that, 
-     * the method will return false.
-     * @since 1.8
-     */
-    public function isSessionActive(){
-        $retVal = false;
-        if(session_status() == PHP_SESSION_ACTIVE){
-            $retVal = isset($_SESSION['session-vars']['session-name']) && $_SESSION['session-vars']['session-name'] == $this->getName();
-        }
-        return $retVal;
-    }
-    /**
-     * Checks if session timeout time will be refreshed with every request or not. 
-     * This method must be called only after calling the method 'SessionManager::initSession()'. 
-     * or it will throw an exception.
-     * @return boolean true If session timeout time will be refreshed with every request. 
-     * false if not.
-     * @throws Exception If the session is not running. 
+     * Returns the name of the session.
+     * @return string The name of the session.
      * @since 1.5
      */
-    public function isRefresh(){
-        $isActive = $this->isSessionActive() === true ? true : $this->_switchToSession();
-        if($isActive){
-            if(isset($_SESSION['session-vars']['refresh'])){
-                return $_SESSION['session-vars']['refresh'];
-            }
-        }
-        throw new Exception('Session is not running.');
+    public function getName() {
+        return $this->sessionName;
     }
     /**
-     * The core method of the class. 
-     * @param type $refresh
-     * @param type $lifeTime
-     * @param type $useDefaultLang
-     * @return type
-     * @since 1.0
-     */
-    private function _start($refresh,$lifeTime,$useDefaultLang=false){
-        $this->sessionStatus = self::NEW_SESSION;
-        ini_set('session.gc_maxlifetime', $lifeTime);
-        ini_set('session.cookie_lifetime', $lifeTime);
-        ini_set('session.use_cookies', 1);
-        session_name($this->getName());
-        session_id($this->sId);
-        session_set_cookie_params($lifeTime,"/");
-        $started = session_start();
-        if($started){
-            $this->resumed = false;
-            $this->new = true;
-            $_SESSION['session-vars'] = array();
-            $_SESSION['session-vars']['session-name'] = $this->getName();
-            $_SESSION['session-vars']['started-at'] = time();
-            $_SESSION['session-vars']['resumed-at'] = time();
-            $_SESSION['session-vars']['lifetime'] = $lifeTime;
-            $_SESSION['session-vars']['user'] = new User();
-            $ip = filter_var($_SERVER['REMOTE_ADDR'],FILTER_VALIDATE_IP);
-            if($ip == '::1'){
-                $ip = '127.0.0.1';
-            }
-            $_SESSION['session-vars']['ip-address'] = $ip;
-            $_SESSION['session-vars']['refresh'] = $refresh === true ? true : false;
-            $this->_initLang(true,$useDefaultLang);
-        }
-        return $started;
-    }
-    /**
-     * Validate session variables. Must be called after session is started.
-     * @return boolean  If the variables 'started-at', 'resumed-at', 'lifetime', 
-     * 'refresh', 'session-name' and 'ip-address' are 
-     * set, The method will return true. Other than that, it will return 
-     * false.
-     */
-    private function _validateAttrs(){
-        $retVal = false;
-        if(isset($_SESSION['session-vars']['started-at'])){
-            if(isset($_SESSION['session-vars']['resumed-at'])){
-                if(isset($_SESSION['session-vars']['lifetime'])){
-                    if(isset($_SESSION['session-vars']['refresh'])){
-                        if(isset($_SESSION['session-vars']['ip-address'])){
-                            if(isset($_SESSION['session-vars']['session-name'])){
-                                $retVal = true;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return $retVal;
-    }
-    /**
-     * Stops the session and delete all stored session variables.
-     * @return boolean true if the session stopped. false if not.
-     * @since 1.0
-     */
-    public function kill(){
-        $retVal = false;
-        $isActive = session_status() == PHP_SESSION_ACTIVE;
-        if($isActive){
-            if($this->_validateAttrs()){
-                $sName = $_SESSION['session-vars']['session-name'];
-                $iName = $this->getName();
-                if($_SESSION['session-vars']['session-name'] == $this->getName()){
-                    $this->_kill();
-                    $retVal = true;
-                }
-                else{
-                    session_write_close();
-                    session_name($this->getName());
-                    session_start();
-                    if($this->_validateAttrs()){
-                        $this->_kill();
-                        $retVal = true;
-                    }
-                    else{
-                        $this->_invAttrKill();
-                        $retVal = true;
-                    }
-                }
-            }
-            else{
-                $this->_kill();
-                $retVal = true;
-            }
-        }
-        else{
-            session_name($this->getName());
-            session_start();
-            if($this->_validateAttrs()){
-                $this->_kill();
-                $retVal = true;
-            }
-            else{
-                $this->_invAttrKill();
-                $retVal = true;
-            }
-        }
-        return $retVal;
-    }
-    /**
-     * @since 1.8.1
-     */
-    private function _invAttrKill(){
-        $this->_kill(); 
-    }
-    /**
-     * @since 1.8.1
-     */
-    private function _kill(){
-        $params = session_get_cookie_params();
-        $secure = isset($params['secure']) ? $params['secure'] : false;
-        $httponly = isset($params['httponly']) ? $params['httponly'] : false;
-        $path = isset($params['path']) ? $params['path'] : '/';
-        session_destroy();
-        session_set_cookie_params(0, $path, $params['domain'], $secure, $httponly);
-        $this->sessionStatus = self::KILLED;
-    }
-    /**
-     * Returns the ID of the session.
-     * @return string The ID of the session. If the session is not active, 
-     * the method will return -1.
+     * Returns the number of seconds that has been passed since session started.
+     * @return int The number of seconds that has been passed since session started. If no 
+     * session is active, the method will return 0. 
+     * If sessions are disabled, the method will return 0.
      * @since 1.5
      */
-    public function getID(){
-        $retVal = -1;
+    public function getPassedTime() {
+        $retVal = 0;
         $isActive = $this->isSessionActive() === true ? true : $this->_switchToSession();
-        if($isActive){
-            $retVal = session_id();
+
+        if ($isActive) {
+            $retVal = time() - $_SESSION['session-vars']['started-at'];
         }
+
         return $retVal;
     }
     /**
-     * Checks if the given session name has a cookie or not.
-     * @return boolean true if a cookie with the name of 
-     * the session is fount. false otherwise.
+     * Returns the remaining time till the session dies (in seconds).
+     * @return int The remaining time till the session dies (in seconds).
      * @since 1.5
+     * 
      */
-    public function hasCookie(){
-        $retVal = false;
-        $sid = filter_input(INPUT_COOKIE, $this->getName());
-        if($sid !== null && $sid !== false){
-            $retVal = true;
+    public function getRemainingTime() {
+        $isActive = $this->isSessionActive() === true ? true : $this->_switchToSession();
+
+        if ($isActive && $this->isRefresh()) {
+            return $this->getLifetime() * 60;
+        } else {
+            $lifetime = $this->getLifetime();
+
+            if ($lifetime == -1) {
+                $lifetime = self::DEFAULT_SESSION_DURATION;
+            }
+
+            return $lifetime * 60 - $this->getPassedTime();
         }
-        return $retVal;
     }
     /**
      * Returns the time at which the session was resumed in (in seconds).
@@ -709,12 +329,77 @@ class SessionManager implements JsonI{
      * If sessions are disabled, the method will return the constant 'PHP_SESSION_DISABLED'.
      * @since 1.5
      */
-    public function getResumTime(){
+    public function getResumTime() {
         $isActive = $this->isSessionActive() === true ? true : $this->_switchToSession();
-        if($isActive){
+
+        if ($isActive) {
             return $_SESSION['session-vars']['resumed-at'];
         }
+
         return session_status();
+    }
+    /**
+     * Returns the ID of a session from a cookie given its name.
+     * @param string $sessionName The name of the session.
+     * @return boolean|string If the ID is found, the method will return it. 
+     * If the session cookie was not found, the method will return false.
+     * @since 1.6
+     */
+    public static function getSessionIDFromCookie($sessionName) {
+        $sid = filter_input(INPUT_COOKIE, $sessionName);
+
+        if ($sid !== null && $sid !== false) {
+            return $sid;
+        }
+
+        return false;
+    }
+    /**
+     * Return session ID from session cookie, get or post parameter.
+     * @return string|boolean If session ID is found, the method will 
+     * return it. Note that if it is in a cookie, the name of the cookie must 
+     * be the name of the session in order to take the ID from it. If it is 
+     * in GET or POST request, it must be in a parameter with the name 
+     * 'session-id'.
+     * @since 1.8.3
+     */
+    public function getSessionIDFromRequest() {
+        $sid = self::getSessionIDFromCookie($this->getName());
+
+        if ($sid === false) {
+            $sid = filter_var($_POST['session-id'],FILTER_SANITIZE_STRING);
+
+            if ($sid === null || $sid === false) {
+                $sid = filter_var($_GET['lang'],FILTER_SANITIZE_STRING);
+            }
+        }
+
+        return $sid;
+    }
+    /**
+     * Returns the status of the session that the manager is currently manages.
+     * @return string The status of the session that the manager is currently manages.
+     * @since 1.5
+     */
+    public function getSessionStatus() {
+        return $this->sessionStatus;
+    }
+    /**
+     * Returns the value of a session variable given its name.
+     * @param string $varName The name of the variable.
+     * @return mixed If the session is active and the value of the given variable 
+     * is set, its value will be returned. If the session is not active or 
+     * the variable is not set, the method will return null.
+     * @since 1.8.5
+     */
+    public function getSessionVar($varName) {
+        $isActive = $this->isSessionActive() === true ? true : $this->_switchToSession();
+
+        if ($isActive) {
+            return isset($_SESSION[$varName]) ? $_SESSION[$varName] : null;
+        }
+
+        return null;
     }
     /**
      * Returns an associative array that contains all session variables. 
@@ -739,12 +424,29 @@ class SessionManager implements JsonI{
      * used to manage the session.
      * @since 1.8.5
      */
-    public function getSessionVars(){
+    public function getSessionVars() {
         $isActive = $this->isSessionActive() === true ? true : $this->_switchToSession();
-        if($isActive){
+
+        if ($isActive) {
             return $_SESSION['session-vars'];
         }
-        return array();
+
+        return [];
+    }
+    /**
+     * Returns the array $_SESSTION of the session at which the session manager is managing.
+     * @return array|null If the session is active, the array $_SESSION is returned. 
+     * If the session is not active, the method will return null.
+     * @since 1.8.5
+     */
+    public function getSesstionArray() {
+        $isActive = $this->isSessionActive() === true ? true : $this->_switchToSession();
+
+        if ($isActive) {
+            return $_SESSION;
+        }
+
+        return null;
     }
     /**
      * Returns the IP address at which the session was started running from.
@@ -753,12 +455,350 @@ class SessionManager implements JsonI{
      * If sessions are disabled, the method will return the constant 'PHP_SESSION_DISABLED'.
      * @since 1.7
      */
-    public function getStartIpAddress(){
+    public function getStartIpAddress() {
         $isActive = $this->isSessionActive() === true ? true : $this->_switchToSession();
-        if($isActive){
+
+        if ($isActive) {
             return $_SESSION['session-vars']['ip-address'];
         }
+
         return session_status();
+    }
+    /**
+     * Returns the time at which the session was started in (in seconds).
+     * @return int The time at which the session was started in. If no 
+     * session is active, the method will return the constant 'PHP_SESSION_NONE'. 
+     * If sessions are disabled, the method will return the constant 'PHP_SESSION_DISABLED'.
+     * @since 1.5
+     */
+    public function getStartTime() {
+        $isActive = $this->isSessionActive() === true ? true : $this->_switchToSession();
+
+        if ($isActive) {
+            return $_SESSION['session-vars']['started-at'];
+        }
+
+        return session_status();
+    }
+    /**
+     * Checks if the given session name has a cookie or not.
+     * @return boolean true if a cookie with the name of 
+     * the session is fount. false otherwise.
+     * @since 1.5
+     */
+    public function hasCookie() {
+        $retVal = false;
+        $sid = filter_input(INPUT_COOKIE, $this->getName());
+
+        if ($sid !== null && $sid !== false) {
+            $retVal = true;
+        }
+
+        return $retVal;
+    }
+    /**
+     * Initialize the session.
+     * @since 1.0
+     * @param boolean $refresh If set to true, The due time of the session will 
+     * be refreshed in every request if the session is not timed out. Default is false. 
+     * @param boolean $useDefaultLang If the session is new and 
+     * there was no language parameter was found in the request and this parameter 
+     * is set to true, default language will be used (EN). 
+     * @return boolean true if the initialization was successful. false 
+     * in case of error.
+     */
+    public function initSession($refresh = false,$useDefaultLang = true) {
+        $retVal = false;
+
+        if (!$this->_switchToSession()) {
+            if (!$this->resume()) {
+                $lifeTime = $this->getLifetime();
+
+                if ($lifeTime == -1) {
+                    //set default time to two hours.
+                    $this->setLifetime(self::DEFAULT_SESSION_DURATION);
+                    $lifeTime = self::DEFAULT_SESSION_DURATION * 60;
+                } 
+                $retVal = $this->_start($refresh, $lifeTime,$useDefaultLang);
+            } else {
+                $retVal = true;
+            }
+        } else {
+            $this->setIsRefresh($refresh);
+            $this->_initLang(false, $useDefaultLang);
+            $retVal = true;
+        }
+
+        return $retVal;
+    }
+    /**
+     * Checks if the session is resumed or not.
+     * @return boolean true if the session is new. If the session is 
+     * not new, or not running, the method will return false.
+     * @since 1.8
+     */
+    public function isNew() {
+        return $this->new;
+    }
+    /**
+     * Checks if session timeout time will be refreshed with every request or not. 
+     * This method must be called only after calling the method 'SessionManager::initSession()'. 
+     * or it will throw an exception.
+     * @return boolean true If session timeout time will be refreshed with every request. 
+     * false if not.
+     * @throws Exception If the session is not running. 
+     * @since 1.5
+     */
+    public function isRefresh() {
+        $isActive = $this->isSessionActive() === true ? true : $this->_switchToSession();
+
+        if ($isActive) {
+            if (isset($_SESSION['session-vars']['refresh'])) {
+                return $_SESSION['session-vars']['refresh'];
+            }
+        }
+        throw new Exception('Session is not running.');
+    }
+    /**
+     * Checks if the session is resumed or not.
+     * @return boolean true if the session is resumed. If the session is 
+     * not resumed, or not running, the method will return false.
+     * @since 1.5
+     */
+    public function isResumed() {
+        return $this->resumed;
+    }
+    /**
+     * Checks if the current session instance is the active one or not.
+     * @return boolean If session is running and the stored session name is the same 
+     * as the session name in the instance, the method will return true. Other than that, 
+     * the method will return false.
+     * @since 1.8
+     */
+    public function isSessionActive() {
+        $retVal = false;
+
+        if (session_status() == PHP_SESSION_ACTIVE) {
+            $retVal = isset($_SESSION['session-vars']['session-name']) && $_SESSION['session-vars']['session-name'] == $this->getName();
+        }
+
+        return $retVal;
+    }
+    /**
+     * Checks if the session has timed out or not.
+     * @return boolean|int true if the session has timed out. false if not. If no 
+     * session is active, the method will return the constant 'PHP_SESSION_NONE'. 
+     * If sessions are disabled, the method will return the constant 'PHP_SESSION_DISABLED'.
+     * @since 1.5
+     */
+    public function isTimeout() {
+        $retVal = false;
+        $isActive = $this->isSessionActive() === true ? true : $this->_switchToSession();
+
+        if ($isActive) {
+            $remTime = $this->getRemainingTime();
+            $retVal = $remTime < 0;
+        } else {
+            $retVal = session_status();
+        }
+
+        return $retVal;
+    }
+    /**
+     * Stops the session and delete all stored session variables.
+     * @return boolean true if the session stopped. false if not.
+     * @since 1.0
+     */
+    public function kill() {
+        $retVal = false;
+        $isActive = session_status() == PHP_SESSION_ACTIVE;
+
+        if ($isActive) {
+            if ($this->_validateAttrs()) {
+                $sName = $_SESSION['session-vars']['session-name'];
+                $iName = $this->getName();
+
+                if ($_SESSION['session-vars']['session-name'] == $this->getName()) {
+                    $this->_kill();
+                    $retVal = true;
+                } else {
+                    session_write_close();
+                    session_name($this->getName());
+                    session_start();
+
+                    if ($this->_validateAttrs()) {
+                        $this->_kill();
+                        $retVal = true;
+                    } else {
+                        $this->_invAttrKill();
+                        $retVal = true;
+                    }
+                }
+            } else {
+                $this->_kill();
+                $retVal = true;
+            }
+        } else {
+            session_name($this->getName());
+            session_start();
+
+            if ($this->_validateAttrs()) {
+                $this->_kill();
+                $retVal = true;
+            } else {
+                $this->_invAttrKill();
+                $retVal = true;
+            }
+        }
+
+        return $retVal;
+    }
+    /**
+     * Checks if there exist a session with the given session name or not. If there 
+     * is a one and it is not timed out, the method will resume it.
+     * @return boolean true if there is a session with the given name 
+     * and it is resumed. false= otherwise. If the session is timed out, the 
+     * method will kill it.
+     * @since 1.0
+     */
+    public function resume() {
+        $retVal = false;
+
+        if ($this->hasCookie()) {
+            session_name($this->getName());
+            ini_set('session.use_cookies', 1);
+            $sid = $this->getSessionIDFromRequest();
+
+            if ($sid !== false) {
+                $tmpId = $sid;
+                session_id($tmpId);
+            } else {
+                session_id($this->sId);
+            }
+            //get time before resuming to check if updated.
+            //if not updated, this value will be -1.
+            $sessionTime = $this->getLifetime();
+            session_start();
+
+            if ($this->_validateAttrs()) {
+                if (!$this->isTimeout()) {
+                    $ip = filter_var($_SERVER['REMOTE_ADDR'],FILTER_VALIDATE_IP);
+
+                    if ($ip == '::1') {
+                        $ip = '127.0.0.1';
+                    }
+
+                    if ($this->getStartIpAddress() == $ip) {
+                        $this->sId = $tmpId;
+                        $this->resumed = true;
+                        $this->sessionStatus = self::RESUMED;
+                        //update resume time
+                        $_SESSION['session-vars']['resumed-at'] = time();
+                        $_SESSION['session-vars']['session-name'] = $this->getName();
+
+                        //if time is -1, then get stored one.
+                        //else, update session time.
+                        $sessionTime = $sessionTime == -1 ? $this->getLifetime() * 60 : $sessionTime * 60;
+
+                        $_SESSION['session-vars']['lifetime'] = $sessionTime;
+                        //ini_set('session.gc_maxlifetime', $sessionTime);
+                        //ini_set('session.cookie_lifetime', $sessionTime);
+                        $this->resumed = true;
+                        $this->new = false;
+
+                        if ($this->isRefresh()) {
+                            //refresh time till session cookie is dead
+                            $params = session_get_cookie_params();
+                            setcookie($this->getName(), $this->getID(),time() + $sessionTime, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
+                            $this->setUser($this->getUser());
+                        }
+                        $retVal = true;
+                    } else {
+                        $this->kill();
+                        $this->sessionStatus = self::INV_IP_ADDRESS;
+                    }
+                } else {
+                    $this->kill();
+                    $this->sessionStatus = self::EXPIRED;
+                }
+            } else {
+                $this->kill();
+                $this->sessionStatus = self::INV_STATE;
+            }
+        } else {
+            $this->kill();
+            $this->sessionStatus = self::INV_COOKIE;
+        }
+
+        return $retVal;
+    }
+    /**
+     * Sets if the session timeout will be refreshed with every request 
+     * or not.
+     * @param boolean $bool If set to true, timeout time will be refreshed. 
+     * Note that the property will be updated only if the session is running.
+     * @since 1.5
+     */
+    public function setIsRefresh($bool) {
+        if ($this->_switchToSession()) {
+            $_SESSION['session-vars']['refresh'] = $bool === true ? true : false;
+        }
+    }
+    /**
+     * Sets the lifetime of the session.
+     * @param int $time Session lifetime (in minutes). it will be set only if 
+     * the given value is greater than 0 and less than SessionManager::MAX_LIFETIME. 
+     * If the given value is greater than SessionManager::MAX_LIFETIME, the 
+     * value of the constant is used.
+     * @return boolean true if time is updated. false otherwise.
+     * @since 1.4
+     */
+    public function setLifetime($time) {
+        $retVal = false;
+
+        if ($time > self::MAX_LIFETIME) {
+            $time = self::MAX_LIFETIME;
+        }
+
+        if ($time > 0) {
+            if ($this->isSessionActive()) {
+                $this->lifeTime = $time;
+                $_SESSION['session-vars']['lifetime'] = $time * 60;
+
+                $params = session_get_cookie_params();
+                $secure = isset($params['secure']) ? $params['secure'] : false;
+                $httponly = isset($params['httponly']) ? $params['httponly'] : false;
+                $path = isset($params['path']) ? $params['path'] : '/';
+                session_set_cookie_params(time() + $this->getLifetime() * 60, $path, $params['domain'], $secure, $httponly);
+
+                $retVal = true;
+
+                if ($this->isTimeout()) {
+                    $this->kill();
+                }
+            } else {
+                if ($this->_switchToSession()) {
+                    $this->lifeTime = $time;
+                    $_SESSION['session-vars']['lifetime'] = $time * 60;
+
+                    $params = session_get_cookie_params();
+                    $secure = isset($params['secure']) ? $params['secure'] : false;
+                    $httponly = isset($params['httponly']) ? $params['httponly'] : false;
+                    $path = isset($params['path']) ? $params['path'] : '/';
+                    session_set_cookie_params(time() + $this->getLifetime() * 60, $path, $params['domain'], $secure, $httponly);
+
+                    $retVal = true;
+
+                    if ($this->isTimeout()) {
+                        $this->kill();
+                    }
+                } else {
+                    $this->lifeTime = $time;
+                }
+            }
+        }
+
+        return $retVal;
     }
     /**
      * Adds new variable to the array $_SESSION of the current instance.
@@ -772,250 +812,33 @@ class SessionManager implements JsonI{
      */
     public function setSessionVar($name,$value) {
         $isActive = $this->isSessionActive() === true ? true : $this->_switchToSession();
-        if($isActive){
+
+        if ($isActive) {
             $_SESSION[$name] = $value;
+
             return true;
         }
+
         return false;
     }
     /**
-     * Returns the value of a session variable given its name.
-     * @param string $varName The name of the variable.
-     * @return mixed If the session is active and the value of the given variable 
-     * is set, its value will be returned. If the session is not active or 
-     * the variable is not set, the method will return null.
-     * @since 1.8.5
-     */
-    public function getSessionVar($varName) {
-        $isActive = $this->isSessionActive() === true ? true : $this->_switchToSession();
-        if($isActive){
-            return isset($_SESSION[$varName]) ? $_SESSION[$varName] : null;
-        }
-        return null;
-    }
-    /**
-     * Returns the array $_SESSTION of the session at which the session manager is managing.
-     * @return array|null If the session is active, the array $_SESSION is returned. 
-     * If the session is not active, the method will return null.
-     * @since 1.8.5
-     */
-    public function getSesstionArray() {
-        $isActive = $this->isSessionActive() === true ? true : $this->_switchToSession();
-        if($isActive){
-            return $_SESSION;
-        }
-        return null;
-    }
-    /**
-     * Returns the time at which the session was started in (in seconds).
-     * @return int The time at which the session was started in. If no 
-     * session is active, the method will return the constant 'PHP_SESSION_NONE'. 
-     * If sessions are disabled, the method will return the constant 'PHP_SESSION_DISABLED'.
-     * @since 1.5
-     */
-    public function getStartTime(){
-        $isActive = $this->isSessionActive() === true ? true : $this->_switchToSession();
-        if($isActive){
-            return $_SESSION['session-vars']['started-at'];
-        }
-        return session_status();
-    }
-    /**
-     * Returns the remaining time till the session dies (in seconds).
-     * @return int The remaining time till the session dies (in seconds).
-     * @since 1.5
-     * 
-     */
-    public function getRemainingTime() {
-        $isActive = $this->isSessionActive() === true ? true : $this->_switchToSession();
-        if($isActive && $this->isRefresh()){
-            return $this->getLifetime()*60; 
-        }
-        else{
-            $lifetime = $this->getLifetime();
-            if($lifetime == -1){
-                $lifetime = self::DEFAULT_SESSION_DURATION;
-            }
-            return $lifetime*60 - $this->getPassedTime();
-        }
-    }
-    /**
-     * Returns the number of seconds that has been passed since session started.
-     * @return int The number of seconds that has been passed since session started. If no 
-     * session is active, the method will return 0. 
-     * If sessions are disabled, the method will return 0.
-     * @since 1.5
-     */
-    public function getPassedTime() {
-        $retVal = 0;
-        $isActive = $this->isSessionActive() === true ? true : $this->_switchToSession();
-        if($isActive){
-            $retVal = time() - $_SESSION['session-vars']['started-at'];
-        }
-        return $retVal;
-    }
-    /**
-     * Checks if the session has timed out or not.
-     * @return boolean|int true if the session has timed out. false if not. If no 
-     * session is active, the method will return the constant 'PHP_SESSION_NONE'. 
-     * If sessions are disabled, the method will return the constant 'PHP_SESSION_DISABLED'.
-     * @since 1.5
-     */
-    public function isTimeout(){
-        $retVal = false;
-        $isActive = $this->isSessionActive() === true ? true : $this->_switchToSession();
-        if($isActive){
-            $remTime = $this->getRemainingTime();
-            $retVal = $remTime < 0;
-        }
-        else{
-            $retVal = session_status();
-        }
-        return $retVal;
-    }
-    /**
-     * Checks if the session is resumed or not.
-     * @return boolean true if the session is resumed. If the session is 
-     * not resumed, or not running, the method will return false.
-     * @since 1.5
-     */
-    public function isResumed(){
-        return $this->resumed;
-    }
-    /**
-     * Checks if the session is resumed or not.
-     * @return boolean true if the session is new. If the session is 
-     * not new, or not running, the method will return false.
-     * @since 1.8
-     */
-    public function isNew() {
-        return $this->new;
-    }
-    /**
-     * Returns the ID of a session from a cookie given its name.
-     * @param string $sessionName The name of the session.
-     * @return boolean|string If the ID is found, the method will return it. 
-     * If the session cookie was not found, the method will return false.
-     * @since 1.6
-     */
-    public static function getSessionIDFromCookie($sessionName) {
-        $sid = filter_input(INPUT_COOKIE, $sessionName);
-        if($sid !== null && $sid !== false){
-            return $sid;
-        }
-        return false;
-    }
-    /**
-     * Return session ID from session cookie, get or post parameter.
-     * @return string|boolean If session ID is found, the method will 
-     * return it. Note that if it is in a cookie, the name of the cookie must 
-     * be the name of the session in order to take the ID from it. If it is 
-     * in GET or POST request, it must be in a parameter with the name 
-     * 'session-id'.
-     * @since 1.8.3
-     */
-    public function getSessionIDFromRequest(){
-        $sid = self::getSessionIDFromCookie($this->getName());
-        if($sid === false){
-            $sid = filter_var($_POST['session-id'],FILTER_SANITIZE_STRING);
-            if($sid === null || $sid === false){
-                $sid = filter_var($_GET['lang'],FILTER_SANITIZE_STRING);
-            }
-        }
-        return $sid;
-    }
-    /**
-     * Checks if there exist a session with the given session name or not. If there 
-     * is a one and it is not timed out, the method will resume it.
-     * @return boolean true if there is a session with the given name 
-     * and it is resumed. false= otherwise. If the session is timed out, the 
-     * method will kill it.
+     * Sets the user who is using the system. It is used in case of log in.
+     * @param User $user an object of type User.
+     * @return boolean true in case the user is set. false if not.
      * @since 1.0
      */
-    public function resume(){
+    public function setUser($user) {
         $retVal = false;
-        if($this->hasCookie()){
-            session_name($this->getName());
-            ini_set('session.use_cookies', 1);
-            $sid = $this->getSessionIDFromRequest();
-            if($sid !== false){
-                $tmpId = $sid;
-                session_id($tmpId);
-            }
-            else{
-                session_id($this->sId);
-            }
-            //get time before resuming to check if updated.
-            //if not updated, this value will be -1.
-            $sessionTime = $this->getLifetime();
-            session_start();
-            if($this->_validateAttrs()){
-                if(!$this->isTimeout()){
-                    $ip = filter_var($_SERVER['REMOTE_ADDR'],FILTER_VALIDATE_IP);
-                    if($ip == '::1'){
-                        $ip = '127.0.0.1';
-                    }
-                    if($this->getStartIpAddress() == $ip){
-                        $this->sId = $tmpId;
-                        $this->resumed = true;
-                        $this->sessionStatus = self::RESUMED;
-                        //update resume time
-                        $_SESSION['session-vars']['resumed-at'] = time();
-                        $_SESSION['session-vars']['session-name'] = $this->getName();
-                        
-                        //if time is -1, then get stored one.
-                        //else, update session time.
-                        $sessionTime = $sessionTime == -1 ? $this->getLifetime()*60 : $sessionTime*60;
-                        
-                        $_SESSION['session-vars']['lifetime'] = $sessionTime;
-                        //ini_set('session.gc_maxlifetime', $sessionTime);
-                        //ini_set('session.cookie_lifetime', $sessionTime);
-                        $this->resumed = true;
-                        $this->new = false;
-                        if($this->isRefresh()){
-                            //refresh time till session cookie is dead
-                            $params = session_get_cookie_params();
-                            setcookie($this->getName(), $this->getID(),time()+$sessionTime, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
-                            $this->setUser($this->getUser());
-                        }
-                        $retVal = true;
-                    }
-                    else{
-                        $this->kill();
-                        $this->sessionStatus = self::INV_IP_ADDRESS;
-                    }
-                }
-                else{
-                    $this->kill();
-                    $this->sessionStatus = self::EXPIRED;
-                }
-            }
-            else{
-                $this->kill();
-                $this->sessionStatus = self::INV_STATE;
+        $isActive = $this->isSessionActive() === true ? true : $this->_switchToSession();
+
+        if ($isActive) {
+            if ($user instanceof User) {
+                $_SESSION['session-vars']['user'] = $user;
+                $retVal = true;
             }
         }
-        else{
-            $this->kill();
-            $this->sessionStatus = self::INV_COOKIE;
-        }
+
         return $retVal;
-    }
-    /**
-     * Returns the status of the session that the manager is currently manages.
-     * @return string The status of the session that the manager is currently manages.
-     * @since 1.5
-     */
-    public function getSessionStatus(){
-        return $this->sessionStatus;
-    }
-    /**
-     * Returns the name of the session.
-     * @return string The name of the session.
-     * @since 1.5
-     */
-    public function getName() {
-        return $this->sessionName;
     }
     /**
      * Returns a 'JsonX' object that represents the manager.
@@ -1026,32 +849,277 @@ class SessionManager implements JsonI{
         $j = new JsonX();
         $j->add('name', $this->getName());
         $lifetime = $this->getLifetime();
-        if($lifetime == -1){
+
+        if ($lifetime == -1) {
             $lifetime = self::DEFAULT_SESSION_DURATION;
         }
-        $j->add('duration', $lifetime*60);
+        $j->add('duration', $lifetime * 60);
         $j->add('has-cookie', $this->hasCookie());
         $j->add('session-id', $this->getID());
         $j->add('language', $this->getLang());
-        try{
+        try {
             $j->add('refresh', $this->isRefresh());
         } catch (Exception $ex) {
-
         }
         $j->add('passed-time', $this->getPassedTime());
         $j->add('timeout-after', $this->getRemainingTime());
         $stTm = $this->getStartTime();
-        if($stTm != PHP_SESSION_NONE && $stTm != PHP_SESSION_ACTIVE && $stTm != PHP_SESSION_DISABLED){
+
+        if ($stTm != PHP_SESSION_NONE && $stTm != PHP_SESSION_ACTIVE && $stTm != PHP_SESSION_DISABLED) {
             $j->add('started-at', date('Y-m-d H:i:s',$this->getStartTime()));
         }
         $rsTm = $this->getStartTime();
-        if($rsTm != PHP_SESSION_NONE && $rsTm != PHP_SESSION_ACTIVE && $rsTm != PHP_SESSION_DISABLED){
+
+        if ($rsTm != PHP_SESSION_NONE && $rsTm != PHP_SESSION_ACTIVE && $rsTm != PHP_SESSION_DISABLED) {
             $j->add('resumed-at', date('Y-m-d H:i:s',$this->getResumTime()));
         }
         $j->add('status', $this->sessionStatus);
         $j->add('user', $this->getUser());
+
         return $j;
     }
+    /**
+     * Generate a random session ID.
+     * @return string A new random session ID.
+     * @since 1.6
+     */
+    private function _generateSessionID() {
+        $date = date(DATE_ISO8601);
+        $hash = hash('sha256', $date);
+        $time = time() + rand(0, 1000);
+        $hash2 = hash('sha256',$hash.$time);
+        $id = substr($hash2, 0, 27);
 
+        return $id;
+    }
+    /**
+     * Initialize session language. The initialization depends on the attribute 
+     * 'lang'. It can be send via 'get' request, 'post' request or a cookie. 
+     * The provided language must be in the array 'SessionManager::SUPOORTED_LANGS'. 
+     * If the given language code is not in the given array, 
+     * The used value will depend on the existence of the class 'SiteConfig'. 
+     * If it is exist, The value that is returned by SiteConfig::getPrimaryLanguage()' .
+     * If not, 'EN' is used by default.
+     * Also if the language is set before, it will not be updated unless the parameter '$forceUpdate' is set to true.
+     * @param boolean $forceUpdate Set to true if the language is set and want to 
+     * reset it.
+     * @param boolean $useDefault If set to true, the method will 
+     * use default language if no language attribute is found in request body.
+     * @return boolean The method will return true if the language is set or 
+     * updated. Other than that, the method will return false.
+     * @since 1.2
+     */
+    private function _initLang($forceUpdate = false,$useDefault = true) {
+        if (isset($_SESSION['session-vars']['lang']) && !$forceUpdate) {
+            return false;
+        }
+        //the value of default language.
+        //used in case no language found 
+        //in $_GET['lang']
+        $defaultLang = class_exists('webfiori\conf\SiteConfig') ? SiteConfig::getPrimaryLanguage() : 'EN';
+        $lang = null;
+
+        if (isset($_GET['lang'])) {
+            $lang = filter_var($_GET['lang'],FILTER_SANITIZE_STRING);
+        }
+
+        if ($lang == false || $lang == null) {
+            if (isset($_POST['lang'])) {
+                $lang = filter_var($_POST['lang'],FILTER_SANITIZE_STRING);
+            }
+
+            if ($lang == false || $lang == null) {
+                $lang = filter_input(INPUT_COOKIE, 'lang');
+
+                if ($lang == false || $lang == null) {
+                    $lang = null;
+                }
+            }
+        }
+        $retVal = false;
+
+        if (isset($_SESSION['session-vars']['lang']) && $lang == null) {
+            $retVal = false;
+        } else {
+            if ($lang == null && $useDefault === true) {
+                $lang = $defaultLang;
+            } else {
+                if ($lang == null && $useDefault !== true) {
+                    $retVal = false;
+                }
+            }
+        }
+        $langU = strtoupper($lang);
+
+        if (strlen($langU) == 2) {
+            $_SESSION['session-vars']['lang'] = $langU;
+            $retVal = true;
+        }
+
+        if ($useDefault === true && $retVal == false && !isset($_SESSION['session-vars']['lang'])) {
+            $_SESSION['session-vars']['lang'] = $defaultLang;
+            $retVal = true;
+        } else {
+            $retVal = false;
+        }
+    }
+    /**
+     * @since 1.8.1
+     */
+    private function _invAttrKill() {
+        $this->_kill();
+    }
+    /**
+     * @since 1.8.1
+     */
+    private function _kill() {
+        $params = session_get_cookie_params();
+        $secure = isset($params['secure']) ? $params['secure'] : false;
+        $httponly = isset($params['httponly']) ? $params['httponly'] : false;
+        $path = isset($params['path']) ? $params['path'] : '/';
+        session_destroy();
+        session_set_cookie_params(0, $path, $params['domain'], $secure, $httponly);
+        $this->sessionStatus = self::KILLED;
+    }
+    /**
+     * The core method of the class. 
+     * @param type $refresh
+     * @param type $lifeTime
+     * @param type $useDefaultLang
+     * @return type
+     * @since 1.0
+     */
+    private function _start($refresh,$lifeTime,$useDefaultLang = false) {
+        $this->sessionStatus = self::NEW_SESSION;
+        ini_set('session.gc_maxlifetime', $lifeTime);
+        ini_set('session.cookie_lifetime', $lifeTime);
+        ini_set('session.use_cookies', 1);
+        session_name($this->getName());
+        session_id($this->sId);
+        session_set_cookie_params($lifeTime,"/");
+        $started = session_start();
+
+        if ($started) {
+            $this->resumed = false;
+            $this->new = true;
+            $_SESSION['session-vars'] = [];
+            $_SESSION['session-vars']['session-name'] = $this->getName();
+            $_SESSION['session-vars']['started-at'] = time();
+            $_SESSION['session-vars']['resumed-at'] = time();
+            $_SESSION['session-vars']['lifetime'] = $lifeTime;
+            $_SESSION['session-vars']['user'] = new User();
+            $ip = filter_var($_SERVER['REMOTE_ADDR'],FILTER_VALIDATE_IP);
+
+            if ($ip == '::1') {
+                $ip = '127.0.0.1';
+            }
+            $_SESSION['session-vars']['ip-address'] = $ip;
+            $_SESSION['session-vars']['refresh'] = $refresh === true ? true : false;
+            $this->_initLang(true,$useDefaultLang);
+        }
+
+        return $started;
+    }
+    /**
+     * Switch between sessions. 
+     * The method first checks if a session is active. 
+     * If a session is active, the method checks if the name that is stored 
+     * in the instance is equal to the name stored in the $_SESSION. if the 
+     * two are different, the method will stop the first session and activate 
+     * the second one.
+     * @return boolean If the session was switched, the method will return true.
+     * @since 1.8
+     */
+    private function _switchToSession() {
+        $retVal = false;
+
+        if (session_status() == PHP_SESSION_ACTIVE) {
+            if ($this->_validateAttrs() === true) {
+                $sName = $_SESSION['session-vars']['session-name'];
+                $iName = $this->getName();
+
+                if ($sName == $iName) {
+                    $retVal = true;
+                } else {
+                    session_write_close();
+                    session_name($iName);
+                    session_id($this->sId);
+                    session_start();
+
+                    if ($this->_validateAttrs() === true) {
+                        $retVal = true;
+                    } else {
+                        session_write_close();
+                    }
+                }
+            } else {
+                $this->kill();
+            }
+        } else {
+            if (strlen($this->sId) != 0) {
+                session_name($this->getName());
+                session_id($this->sId);
+                session_start();
+
+                if ($this->_validateAttrs() === true) {
+                    $retVal = true;
+                } else {
+                    session_write_close();
+                }
+            }
+        }
+
+        return $retVal;
+    }
+    /**
+     * Validate session variables. Must be called after session is started.
+     * @return boolean  If the variables 'started-at', 'resumed-at', 'lifetime', 
+     * 'refresh', 'session-name' and 'ip-address' are 
+     * set, The method will return true. Other than that, it will return 
+     * false.
+     */
+    private function _validateAttrs() {
+        $retVal = false;
+
+        if (isset($_SESSION['session-vars']['started-at'])) {
+            if (isset($_SESSION['session-vars']['resumed-at'])) {
+                if (isset($_SESSION['session-vars']['lifetime'])) {
+                    if (isset($_SESSION['session-vars']['refresh'])) {
+                        if (isset($_SESSION['session-vars']['ip-address'])) {
+                            if (isset($_SESSION['session-vars']['session-name'])) {
+                                $retVal = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return $retVal;
+    }
+    /**
+     * Validate the name of the session.
+     * @param string $name The name of the session. The following characters are 
+     * invalid in session name: space, comma, semi-colon and equal sign.
+     * @return boolean The method will return true if the name of the session 
+     * is valid.
+     * @since 1.8
+     */
+    private function _validateName($name) {
+        $len = strlen($name);
+        $retVal = true;
+
+        if ($len != 0) {
+            for ($x = 0 ; $x < $len ; $x++) {
+                $char = $name[$x];
+
+                if ($char == ' ' || $char == ',' || $char == ';' || $char == '=') {
+                    $retVal = false;
+                    break;
+                }
+            }
+        }
+
+        return $retVal;
+    }
 }
-

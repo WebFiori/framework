@@ -23,23 +23,18 @@
  * THE SOFTWARE.
  */
 namespace webfiori\logic;
+
+use webfiori\conf\MailConfig;
 use webfiori\entity\FileHandler;
 use webfiori\entity\mail\SMTPAccount;
 use webfiori\entity\mail\SocketMailer;
-use webfiori\conf\MailConfig;
 /**
  * A class for the methods that is related to mailing.
  *
  * @author Ibrahim
  * @version 1.3.1
  */
-class EmailController extends Controller{
-    /**
-     * A constant that indicates a mail server address or its port 
-     * is invalid.
-     * @since 1.1
-     */
-    const INV_HOST_OR_PORT = 'inv_mail_host_or_port';
+class EmailController extends Controller {
     /**
      * A constant that indicates the given username or password  
      * is invalid.
@@ -47,24 +42,145 @@ class EmailController extends Controller{
      */
     const INV_CREDENTIALS = 'inv_username_or_pass';
     /**
+     * A constant that indicates a mail server address or its port 
+     * is invalid.
+     * @since 1.1
+     */
+    const INV_HOST_OR_PORT = 'inv_mail_host_or_port';
+    /**
      *
      * @var EmailController 
      * @since 1.0
      */
     private static $instance;
+    public function __construct() {
+        parent::__construct();
+    }
+    /**
+     * Creates the file 'MailConfig.php' if it does not exist.
+     * @since 1.0
+     */
+    public function createEmailConfigFile() {
+        if (!class_exists('webfiori\conf\MailConfig')) {
+            $this->writeMailConfig([]);
+        }
+    }
     /**
      * Returns a singleton of the class.
      * @return EmailController
      * @since 1.0
      */
-    public static function get(){
-        if(self::$instance === null){
+    public static function get() {
+        if (self::$instance === null) {
             self::$instance = new EmailController();
         }
+
         return self::$instance;
     }
-    public function __construct() {
-        parent::__construct();
+    /**
+     * Returns a new instance of the class SocketMailer.
+     * The method will try to establish a connection to SMTP server using 
+     * the given SMTP account.
+     * @param SMTPAccount $emailAcc An account that is used to initiate 
+     * socket mailer.
+     * @return SocketMailer|string The method will return an instance of SocketMailer
+     * on successful connection. If no connection is established, the method will 
+     * return MailFunctions::INV_HOST_OR_PORT. If user authentication fails, 
+     * the method will return 'MailFunctions::INV_CREDENTIALS'.
+     * @since 1.0
+     */
+    public function getSocketMailer($emailAcc) {
+        if ($emailAcc instanceof SMTPAccount) {
+            $retVal = EmailController::INV_HOST_OR_PORT;
+//            Logger::log('Using TLS = \''.$emailAcc->isTLS().'\'.','debug');
+//            Logger::log('Using SSL = \''.$emailAcc->isSSL().'\'.','debug');
+            $m = new SocketMailer();
+            //$m->isSSL($emailAcc->isSSL());
+            //$m->isTLS($emailAcc->isTLS());
+            $m->setHost($emailAcc->getServerAddress());
+            $m->setPort($emailAcc->getPort());
+
+            if ($m->connect()) {
+                $m->setSender($emailAcc->getName(), $emailAcc->getAddress());
+
+                if ($m->login($emailAcc->getUsername(), $emailAcc->getPassword())) {
+                    $retVal = $m;
+                } else {
+                    $retVal = EmailController::INV_CREDENTIALS;
+                }
+            }
+
+            return $retVal;
+        }
+
+        return false;
+    }
+    /**
+     * Removes SMTP email account if it is exist.
+     * @param string $accountName The name of the email account (such as 'no-replay').
+     * @return boolean If the account is not exist or the class 'MailConfig' 
+     * does not exist, the method will return false. If the account was removed, 
+     * The method will return true.
+     * @since 1.3
+     */
+    public function removeAccount($accountName) {
+        $retVal = false;
+
+        if (class_exists('webfiori\conf\MailConfig')) {
+            $account = MailConfig::getAccount($accountName);
+
+            if ($account instanceof SMTPAccount) {
+                $accountsArr = MailConfig::getAccounts();
+                unset($accountsArr[$accountName]);
+                $toSave = [];
+
+                foreach ($accountsArr as $account) {
+                    $toSave[] = $account;
+                }
+                $this->writeMailConfig($toSave);
+                $retVal = true;
+            }
+        }
+
+        return $retVal;
+    }
+    /**
+     * Adds new SMTP account or Updates an existing one.
+     * @param SMTPAccount $emailAccount An instance of 'EmailAccount'.
+     * @return boolean|string The method will return true if the email 
+     * account was updated or added. If the email account contains wrong server
+     *  information, the method will return MailFunctions::INV_HOST_OR_PORT. 
+     * If the given email account contains wrong login info, the method will 
+     * return MailFunctions::INV_CREDENTIALS. Other than that, the method 
+     * will return false.
+     * @since 1.1
+     */
+    public function updateOrAddEmailAccount($emailAccount) {
+        $retVal = false;
+
+        if ($emailAccount instanceof SMTPAccount) {
+            $sm = $this->getSocketMailer($emailAccount);
+
+            if ($sm instanceof SocketMailer) {
+                if (class_exists('webfiori\conf\MailConfig')) {
+                    $accountsArr = MailConfig::getAccounts();
+                    $accountsArr[$emailAccount->getName()] = $emailAccount;
+                    $toSave = [];
+
+                    foreach ($accountsArr as $account) {
+                        $toSave[] = $account;
+                    }
+                    $this->writeMailConfig($toSave);
+                } else {
+                    $arr = [$emailAccount];
+                    $this->writeMailConfig($arr);
+                }
+                $retVal = true;
+            }
+            $retVal = $sm;
+        }
+
+        return $retVal;
     }
     /**
      * Initialize new session or use an existing one.
@@ -76,22 +192,14 @@ class EmailController extends Controller{
      * return true. False otherwise.
      * @since 1.3.1
      */
-    public function useSession($options=[]) {
-        if(gettype($options) == 'array' && isset($options['name'])){
-            if($options['name'] == 'wf-session'){
+    public function useSession($options = []) {
+        if (gettype($options) == 'array' && isset($options['name'])) {
+            if ($options['name'] == 'wf-session') {
                 return parent::useSession($options);
             }
         }
+
         return false;
-    }
-    /**
-     * Creates the file 'MailConfig.php' if it does not exist.
-     * @since 1.0
-     */
-    public function createEmailConfigFile(){
-        if(!class_exists('webfiori\conf\MailConfig')){
-            $this->writeMailConfig(array());
-        }
     }
     /**
      * A method to save changes to mail configuration file.
@@ -99,7 +207,7 @@ class EmailController extends Controller{
      * type 'EmailAccount'. 
      * @since 1.1
      */
-    private function writeMailConfig($emailAccountsArr){
+    private function writeMailConfig($emailAccountsArr) {
         $fh = new FileHandler(ROOT_DIR.'/conf/MailConfig.php');
         $fh->write('<?php', true, true);
         $fh->write('namespace webfiori\conf;', true, true);
@@ -138,8 +246,9 @@ class EmailController extends Controller{
         $fh->addTab();
         $fh->reduceTab();
         //adding email accounts
-        $index=0;
-        foreach ($emailAccountsArr as $emailAcc){
+        $index = 0;
+
+        foreach ($emailAccountsArr as $emailAcc) {
             $fh->write('$acc'.$index.' = new SMTPAccount();
         $acc'.$index.'->setServerAddress(\''.$emailAcc->getServerAddress().'\');
         $acc'.$index.'->setAddress(\''.$emailAcc->getAddress().'\');
@@ -182,8 +291,7 @@ class EmailController extends Controller{
         if(isset($this->emailAccounts[$name])){
             return $this->emailAccounts[$name];
         }
-        $null = null;
-        return $null;
+        return null;
     }
     /**
      * Returns an email account given its name.
@@ -213,100 +321,5 @@ class EmailController extends Controller{
     }', true, true);
         $fh->write('}', true, true);
         $fh->close();
-    }
-    /**
-     * Removes SMTP email account if it is exist.
-     * @param string $accountName The name of the email account (such as 'no-replay').
-     * @return boolean If the account is not exist or the class 'MailConfig' 
-     * does not exist, the method will return false. If the account was removed, 
-     * The method will return true.
-     * @since 1.3
-     */
-    public function removeAccount($accountName) {
-        $retVal = false;
-        if(class_exists('webfiori\conf\MailConfig')){
-            $account = MailConfig::getAccount($accountName);
-            if($account instanceof SMTPAccount){
-                $accountsArr = MailConfig::getAccounts();
-                unset($accountsArr[$accountName]);
-                $toSave = array();
-                foreach ($accountsArr as $account){
-                    $toSave[] = $account;
-                }
-                $this->writeMailConfig($toSave);
-                $retVal = true;
-            }
-        }
-        return $retVal;
-    }
-    /**
-     * Adds new SMTP account or Updates an existing one.
-     * @param SMTPAccount $emailAccount An instance of 'EmailAccount'.
-     * @return boolean|string The method will return true if the email 
-     * account was updated or added. If the email account contains wrong server
-     *  information, the method will return MailFunctions::INV_HOST_OR_PORT. 
-     * If the given email account contains wrong login info, the method will 
-     * return MailFunctions::INV_CREDENTIALS. Other than that, the method 
-     * will return false.
-     * @since 1.1
-     */
-    public function updateOrAddEmailAccount($emailAccount) {
-        $retVal = false;
-        if($emailAccount instanceof SMTPAccount){
-            $sm = $this->getSocketMailer($emailAccount);
-            if($sm instanceof SocketMailer){
-                if(class_exists('webfiori\conf\MailConfig')){
-                    $accountsArr = MailConfig::getAccounts();
-                    $accountsArr[$emailAccount->getName()] = $emailAccount;
-                    $toSave = array();
-                    foreach ($accountsArr as $account){
-                        $toSave[] = $account;
-                    }
-                    $this->writeMailConfig($toSave);
-                }
-                else{
-                    $arr = array($emailAccount);
-                    $this->writeMailConfig($arr);
-                }
-                $retVal = true;
-            }
-            $retVal = $sm;
-        }
-        return $retVal;
-    }
-    /**
-     * Returns a new instance of the class SocketMailer.
-     * The method will try to establish a connection to SMTP server using 
-     * the given SMTP account.
-     * @param SMTPAccount $emailAcc An account that is used to initiate 
-     * socket mailer.
-     * @return SocketMailer|string The method will return an instance of SocketMailer
-     * on successful connection. If no connection is established, the method will 
-     * return MailFunctions::INV_HOST_OR_PORT. If user authentication fails, 
-     * the method will return 'MailFunctions::INV_CREDENTIALS'.
-     * @since 1.0
-     */
-    public function getSocketMailer($emailAcc){
-        if($emailAcc instanceof SMTPAccount){
-            $retVal = EmailController::INV_HOST_OR_PORT;
-//            Logger::log('Using TLS = \''.$emailAcc->isTLS().'\'.','debug');
-//            Logger::log('Using SSL = \''.$emailAcc->isSSL().'\'.','debug');
-            $m = new SocketMailer();
-            //$m->isSSL($emailAcc->isSSL());
-            //$m->isTLS($emailAcc->isTLS());
-            $m->setHost($emailAcc->getServerAddress());
-            $m->setPort($emailAcc->getPort());
-            if($m->connect()){
-                $m->setSender($emailAcc->getName(), $emailAcc->getAddress());
-                if($m->login($emailAcc->getUsername(), $emailAcc->getPassword())){
-                    $retVal = $m;
-                }
-                else{
-                    $retVal = EmailController::INV_CREDENTIALS;
-                }
-            }
-            return $retVal;
-        }
-        return false;
     }
 }

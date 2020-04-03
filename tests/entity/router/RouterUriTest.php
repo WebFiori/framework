@@ -1,14 +1,15 @@
 <?php
 namespace webfiori\tests\entity\router;
+
 use PHPUnit\Framework\TestCase;
-use webfiori\entity\router\RouterUri;
 use webfiori\entity\router\Router;
+use webfiori\entity\router\RouterUri;
 /**
  * Description of TestRouterUri
  *
  * @author Eng.Ibrahim
  */
-class RouterUriTest extends TestCase{
+class RouterUriTest extends TestCase {
     /**
      * @test
      */
@@ -28,7 +29,7 @@ class RouterUriTest extends TestCase{
     /**
      * @test
      */
-    public function testSplitURI_01(){
+    public function testSplitURI_01() {
         $uri = 'https://www3.programmingacademia.com:80/{some-var}/hell/{other-var}/?do=dnt&y=#xyz';
         $uriObj = new RouterUri($uri, '');
         $this->assertEquals(Router::CUSTOMIZED,$uriObj->getType());
@@ -38,7 +39,7 @@ class RouterUriTest extends TestCase{
     /**
      * @test
      */
-    public function testSplitURI_02(){
+    public function testSplitURI_02() {
         $uri = 'https://www3.programmingacademia.com:80/{some-var}/hell/{other-var}/?do=dnt&y=#xyz';
         $uriObj = new RouterUri($uri, '');
         $this->assertEquals('80',$uriObj->getPort());
@@ -46,7 +47,7 @@ class RouterUriTest extends TestCase{
     /**
      * @test
      */
-    public function testSplitURI_03(){
+    public function testSplitURI_03() {
         $uri = 'https://www3.programmingacademia.com:80/{some-var}/hell/{other-var}/?do=dnt&y=#xyz';
         $uriObj = new RouterUri($uri, '');
         $this->assertEquals('xyz',$uriObj->getFragment());
@@ -54,7 +55,7 @@ class RouterUriTest extends TestCase{
     /**
      * @test
      */
-    public function testSplitURI_04(){
+    public function testSplitURI_04() {
         $uri = 'https://www3.programmingacademia.com:80/{some-var}/hell/{other-var}/?do=dnt&y=#xyz';
         $uriObj = new RouterUri($uri, '');
         $this->assertEquals('do=dnt&y=',$uriObj->getQueryString());
@@ -62,7 +63,7 @@ class RouterUriTest extends TestCase{
     /**
      * @test
      */
-    public function testSplitURI_05(){
+    public function testSplitURI_05() {
         $uri = 'https://www3.programmingacademia.com:80/{some-var}/hell/{other-var}/?do=dnt&y=#xyz';
         $uriObj = new RouterUri($uri, '');
         $this->assertEquals('https',$uriObj->getScheme());
@@ -70,7 +71,7 @@ class RouterUriTest extends TestCase{
     /**
      * @test
      */
-    public function testSplitURI_06(){
+    public function testSplitURI_06() {
         $uri = 'https://www3.programmingacademia.com:80/{some-var}/hell/{other-var}/?do=dnt&y=#xyz';
         $uriObj = new RouterUri($uri, '');
         $this->assertEquals('/{some-var}/hell/{other-var}',$uriObj->getPath());
@@ -89,7 +90,7 @@ class RouterUriTest extends TestCase{
     /**
      * @test
      */
-    public function testSplitURI_07(){
+    public function testSplitURI_07() {
         $uri = 'https://www3.programmingacademia.com:80/{some-var}/{x}/{some-var}';
         $uriObj = new RouterUri($uri, '');
         $this->assertEquals('/{some-var}/{x}/{some-var}',$uriObj->getPath());

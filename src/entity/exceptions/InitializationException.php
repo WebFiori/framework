@@ -2,7 +2,7 @@
 /*
  * The MIT License
  *
- * Copyright 2019 Ibrahim, JsonX library.
+ * Copyright 2020 Ibrahim, WebFiori Framework.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,21 +22,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-namespace jsonx;
+namespace webfiori\entity\exceptions;
+
+use Exception;
 /**
- * An interface for the objects that can be added to an instance of JsonX.
- * @author Ibrahim 
+ * An exception that might be thrown during initialization stage.
+ *
+ * @author Ibrahim
  * @version 1.0
- * @see JsonX
  */
-interface JsonI {
+class InitializationException extends Exception {
     /**
-     * Returns an object of type JsonX.
-     * This method can be implemented by any class that will be added  
-     * to any JsonX instance. It is used to customize the generated 
-     * JSON string.
-     * @return JsonX An instance of JsonX.
-     * @since 1.0
+     * Creates new instance of the class.
+     * @param string $message Exception message.
+     * @param string $code Error code of the exception.
      */
-    public function toJSON();
+    public function __construct($message = "", $code = 0) {
+        parent::__construct($message, $code);
+    }
 }

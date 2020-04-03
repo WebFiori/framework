@@ -1,15 +1,14 @@
 <?php
 namespace webfiori\tests\entity;
+
 use PHPUnit\Framework\TestCase;
 use webfiori\entity\DatabaseSchema;
-use webfiori\tests\entity\TestQuery_1;
-use webfiori\tests\entity\TestQuery_2;
 /**
  * A test class for testing the class 'webfiori\entity\DatabaseSchema'.
  *
  * @author Ibrahim
  */
-class DatabaseSchemaTest extends TestCase{
+class DatabaseSchemaTest extends TestCase {
     /**
      * @test
      */
@@ -17,6 +16,6 @@ class DatabaseSchemaTest extends TestCase{
         $schema = DatabaseSchema::get();
         //$schema->add('webfiori\tests\entity\TestQuery_1', 20);
         $this->assertEquals("create database if not exists hello_world;\n"
-                . "use hello_world;\n",$schema->getCreateDatabaseStatement('hello_world'));
+                ."use hello_world;\n",$schema->getCreateDatabaseStatement('hello_world'));
     }
 }

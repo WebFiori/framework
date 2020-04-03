@@ -1,15 +1,16 @@
 <?php
 namespace webfiori\tests\entity\mail;
+
 use PHPUnit\Framework\TestCase;
+use webfiori\conf\MailConfig;
 use webfiori\entity\mail\EmailMessage;
 use webfiori\entity\mail\SMTPAccount;
-use webfiori\conf\MailConfig;
 /**
  * A test class for testing the class 'webfiori\entity\mail\EmailMessage'.
  *
  * @author Ibrahim
  */
-class EmailMessageTest extends TestCase{
+class EmailMessageTest extends TestCase {
     /**
      * @test
      */
@@ -49,13 +50,13 @@ class EmailMessageTest extends TestCase{
      */
     public function test03() {
         $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('The account "smtp-acc-00" has invalid host or port number. Port: 25, Host: mail.programmingacademia.com.');
+        $this->expectExceptionMessage('The account "smtp-acc-00" has invalid host or port number. Port: 765765, Host: mail.programmingacademia.com.');
         $smtp = new SMTPAccount();
         $smtp->setPassword('izimu#z');
         $smtp->setAddress('test@programmingacademia.com');
         $smtp->setUsername('test@programmingacademia.com');
         $smtp->setServerAddress('mail.programmingacademia.com ');
-        $smtp->setPort(25);
+        $smtp->setPort(765765);
         MailConfig::get()->addSMTPAccount('smtp-acc-00', $smtp);
         $message = EmailMessage::createInstance('smtp-acc-00');
         $this->assertTrue($message instanceof EmailMessage);

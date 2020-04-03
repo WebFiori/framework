@@ -23,6 +23,7 @@
  * THE SOFTWARE.
  */
 namespace webfiori\entity;
+
 use jsonx\JsonI;
 use jsonx\JsonX;
 /**
@@ -31,7 +32,7 @@ use jsonx\JsonX;
  * @author Ibrahim
  * @version 1.0.1
  */
-class Privilege implements JsonI{
+class Privilege implements JsonI {
     /**
      * The ID of the privilege.
      * @var string
@@ -52,38 +53,14 @@ class Privilege implements JsonI{
      * in case of displaying privilege in some UI view. Default is empty string.
      * @since 1.0
      */
-    public function __construct($id='PR',$name='') {
-        if(!$this->setID($id)){
+    public function __construct($id = 'PR',$name = '') {
+        if (!$this->setID($id)) {
             $this->setID('PR');
         }
-        if(!$this->setName($name)){
+
+        if (!$this->setName($name)) {
             $this->setName('PR_NAME');
         }
-    }
-    /**
-     * Sets the name of the privilege.
-     * @param string $name The name of the privilege. It is only set when 
-     * the given string is not empty.
-     * @return boolean If the privilege name was set, the method will return 
-     * true. If not set, the method will return false.
-     * @since 1.0
-     */
-    public function setName($name) {
-        $trimmed = trim($name);
-        if(strlen($trimmed) > 0){
-            $this->name = $trimmed;
-            return true;
-        }
-        return false;
-    }
-    /**
-     * Returns the name of the privilege.
-     * @return string The name of the privilege. If the name was not updated, 
-     * the method will return 'PR_NAME'.
-     * @since 1.0
-     */
-    public function getName() {
-        return $this->name;
     }
     /**
      * Returns the ID of the privilege.
@@ -93,6 +70,15 @@ class Privilege implements JsonI{
      */
     public function getID() {
         return $this->code;
+    }
+    /**
+     * Returns the name of the privilege.
+     * @return string The name of the privilege. If the name was not updated, 
+     * the method will return 'PR_NAME'.
+     * @since 1.0
+     */
+    public function getName() {
+        return $this->name;
     }
     /**
      * Sets the ID of the privilege
@@ -106,17 +92,37 @@ class Privilege implements JsonI{
     public function setID($code) {
         $xid = trim($code);
         $len = strlen($xid);
-        for ($x = 0 ; $x < $len ; $x++){
-            $ch = $xid[$x];
-            if($ch == '_' || ($ch >= 'a' && $ch <= 'z') || ($ch >= 'A' && $ch <= 'Z') || ($ch >= '0' && $ch <= '9')){
 
-            }
-            else{
+        for ($x = 0 ; $x < $len ; $x++) {
+            $ch = $xid[$x];
+
+            if ($ch == '_' || ($ch >= 'a' && $ch <= 'z') || ($ch >= 'A' && $ch <= 'Z') || ($ch >= '0' && $ch <= '9')) {
+            } else {
                 return false;
             }
         }
         $this->code = $xid;
+
         return true;
+    }
+    /**
+     * Sets the name of the privilege.
+     * @param string $name The name of the privilege. It is only set when 
+     * the given string is not empty.
+     * @return boolean If the privilege name was set, the method will return 
+     * true. If not set, the method will return false.
+     * @since 1.0
+     */
+    public function setName($name) {
+        $trimmed = trim($name);
+
+        if (strlen($trimmed) > 0) {
+            $this->name = $trimmed;
+
+            return true;
+        }
+
+        return false;
     }
     /**
      * Returns an object of type JsonX that contains group info as JSON string.
@@ -132,7 +138,7 @@ class Privilege implements JsonI{
         $j = new JsonX();
         $j->add('privilege-id', $this->getID());
         $j->add('name', $this->getName());
+
         return $j;
     }
-
 }

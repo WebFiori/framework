@@ -1,5 +1,6 @@
 <?php
 namespace webfiori\tests\entity;
+
 use PHPUnit\Framework\TestCase;
 use webfiori\entity\Privilege;
 /**
@@ -7,7 +8,7 @@ use webfiori\entity\Privilege;
  *
  * @author Ibrahim
  */
-class PrivilegeTest extends TestCase{
+class PrivilegeTest extends TestCase {
     /**
      * @test
      */
@@ -31,6 +32,7 @@ class PrivilegeTest extends TestCase{
         $pr = new Privilege('  Valid_ID_55  ','Valid Name');
         $this->assertEquals('Valid_ID_55',$pr->getID());
         $this->assertEquals('Valid Name',$pr->getName());
+
         return $pr;
     }
     /**
@@ -40,6 +42,7 @@ class PrivilegeTest extends TestCase{
         $pr = new Privilege(1,2);
         $this->assertSame('1',$pr->getID());
         $this->assertSame('2',$pr->getName());
+
         return $pr;
     }
     /**

@@ -23,11 +23,12 @@
  * THE SOFTWARE.
  */
 namespace webfiori\examples\views;
-use webfiori\entity\Page;
-use phpStructs\html\PNode;
+
 use phpStructs\html\HTMLNode;
+use phpStructs\html\PNode;
 use phpStructs\html\UnorderedList;
-class ExamplePage{
+use webfiori\entity\Page;
+class ExamplePage {
     public function __construct() {
         //load UI template components (JS, CSS and others)
         //it is optional. to use a theme but recomended
@@ -37,60 +38,60 @@ class ExamplePage{
         //Page::theme('Greeny By Ibrahim Ali');
         //Page::theme('Template Theme');
         //Page::theme('WebFiori Theme');
-        
+
         //sets the title of the page
         $lang = Page::lang();
-        if($lang == 'AR'){
+
+        if ($lang == 'AR') {
             Page::title('مثال على صفحة');
             //adds a paragraph to the body of the page.
             $p = new PNode();
             $p->addText('أهلا و سهلا من إطار "ويب فيوري"!');
             Page::insert($p);
-        }
-        else{
+        } else {
             Page::title('Example Page');
             //adds a paragraph to the body of the page.
             $p = new PNode();
             $p->addText('Hello from "WebFiori Framework"!');
             Page::insert($p);
         }
-        
+
         $sec = new HTMLNode('section');
         Page::insert($sec);
         $secH = new HTMLNode('h1');
-        if(Page::lang() == 'AR'){
+
+        if (Page::lang() == 'AR') {
             $secH->addTextNode('ما هو إطار برمجة ويب فيوري؟');
-        }
-        else{
+        } else {
             $secH->addTextNode('What is WebFiori Framework? ');
         }
         $sec->addChild($secH);
         $p2 = new PNode();
-        if(Page::lang() == 'AR'){
-             $p2->addText('إطار برمجة ويب فيوري هو اطار برمجة يستخدم في بناء '
-                     . 'تطبيقات الشبكة بإستخدام لغة برمجة بي إتش بي .'
-                     . 'الإطار بالكامل كائني التوجه و يسمح بإستخدام هيكلة ال MVC '
-                     . 'لكنه لا يجبر المطور على استخدامها. الإطار يأتي مع العديد من الميزات '
-                     . 'اللتي تُساعد مطور الشبكة على بناء المواقع الإلكترونية او '
-                     . 'طبيقات الشبكة بشكل سريع.');
-        }
-        else{
-             $p2->addText('WebFiori Framework is a web framework which is built '
-                . 'using PHP language. The framework is fully object oriented '
-                . '(OOP). It allows the use of the famous model-view-controller '
-                . '(MVC) model but it does not force it. The framework comes '
-                . 'with many features which can help in making your website '
-                . 'or web application up and running in no time.');
+
+        if (Page::lang() == 'AR') {
+            $p2->addText('إطار برمجة ويب فيوري هو اطار برمجة يستخدم في بناء '
+                     .'تطبيقات الشبكة بإستخدام لغة برمجة بي إتش بي .'
+                     .'الإطار بالكامل كائني التوجه و يسمح بإستخدام هيكلة ال MVC '
+                     .'لكنه لا يجبر المطور على استخدامها. الإطار يأتي مع العديد من الميزات '
+                     .'اللتي تُساعد مطور الشبكة على بناء المواقع الإلكترونية او '
+                     .'طبيقات الشبكة بشكل سريع.');
+        } else {
+            $p2->addText('WebFiori Framework is a web framework which is built '
+                .'using PHP language. The framework is fully object oriented '
+                .'(OOP). It allows the use of the famous model-view-controller '
+                .'(MVC) model but it does not force it. The framework comes '
+                .'with many features which can help in making your website '
+                .'or web application up and running in no time.');
         }
         $sec->addChild($p2);
-        
+
         $sec = new HTMLNode('section');
         Page::insert($sec);
         $secH = new HTMLNode('h1');
-        if(Page::lang() == 'AR'){
+
+        if (Page::lang() == 'AR') {
             $secH->addTextNode('الميزات الأساسية');
-        }
-        else{
+        } else {
             $secH->addTextNode('Key Features');
         }
         $sec->addChild($secH);
@@ -115,4 +116,5 @@ class ExamplePage{
         Page::render();
     }
 }
+
 return __NAMESPACE__;

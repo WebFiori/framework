@@ -23,6 +23,7 @@
  * THE SOFTWARE.
  */
 namespace webfiori\entity\langs;
+
 use Exception;
 /**
  * A class that is can be used to make the application ready for 
@@ -35,21 +36,6 @@ use Exception;
  * @version 1.2.1
  */
 class Language {
-    /**
-     * An associative array that contains loaded languages.
-     * @var array The key of the array represents two 
-     * characters language code. The index will contain an object of type <b>Language</b>.
-     * 'Language'.
-     * @since 1.1 
-     */
-    private static $loadedLangs = [];
-    /**
-     * An attribute that will be set to 'true' if the language 
-     * is added to the set of loaded languages.
-     * @var boolean
-     * @since 1.2 
-     */
-    private $loadLang;
     /**
      * A constant for left to right writing direction.
      * @var string 
@@ -68,69 +54,20 @@ class Language {
      */
     private $languageVars;
     /**
-     * Returns a reference to an associative array that contains an objects of 
-     * type 'Language'.
-     * @return array The key of the array represents two 
-     * characters language code. The index will contain an object of type 'Language'.
-     * @since 1.1
+     * An associative array that contains loaded languages.
+     * @var array The key of the array represents two 
+     * characters language code. The index will contain an object of type <b>Language</b>.
+     * 'Language'.
+     * @since 1.1 
      */
-    public static function &getLoadedLangs(){
-        return self::$loadedLangs;
-    }
+    private static $loadedLangs = [];
     /**
-     * Loads a language file based on language code.
-     * @param string $langCode A two digits language code (such as 'ar').
-     * @throws Exception An exception will be thrown if no language file 
-     * was found that matches the given language code. Language files must 
-     * have the name 'LanguageXX.php' where 'XX' is language code. Also the function 
-     * will throw an exception when the translation file is loaded but no object 
-     * of type 'Language' was stored in the set of loaded translations.
-     * @return Language an object of type 'Language' is returned if 
-     * the language was loaded.
-     * @since 1.1
-     */
-    public static function loadTranslation($langCode){
-        $uLangCode = strtoupper(trim($langCode));
-        if(isset(self::$loadedLangs[$uLangCode])){
-            return self::$loadedLangs[$uLangCode];
-        }
-        else{
-            $langClassName = 'webfiori\entity\langs\Language'.$uLangCode;
-            if(class_exists($langClassName)){
-                $class = new $langClassName();
-                if($class instanceof Language){
-                    if(isset(self::$loadedLangs[$uLangCode])){
-                        return self::$loadedLangs[$uLangCode];
-                    }
-                    else{
-                        throw new Exception('The translation file was found. But no object of type \'Language\' is stored. Make sure that the parameter '
-                                . '$addtoLoadedAfterCreate is set to true when creating the language object.');
-                    }
-                }
-                else{
-                    throw new Exception('A language class for the language \''.$uLangCode.'\' was found. But it is not a sub class of \'Language\'.');
-                }
-            }
-            else{
-                throw new Exception('No language class was found for the language \''.$uLangCode.'\'.');
-            }
-        }
-    }
-    /**
-     * Unload translation based on its language code.
-     * @param string $langCode A two digits language code (such as 'ar').
-     * @return boolean If the translation file was unloaded, the method will 
-     * return true. If not, the method will return false.
+     * An attribute that will be set to 'true' if the language 
+     * is added to the set of loaded languages.
+     * @var boolean
      * @since 1.2 
      */
-    public static function unloadTranslation($langCode){
-        $uLangCode = strtoupper(trim($langCode));
-        if(isset(self::$loadedLangs[$uLangCode])){
-            unset(self::$loadedLangs[$uLangCode]);
-            return true;
-        }
-        return false;
-    }
+    private $loadLang;
     /**
      * Creates new instance of the class.
      * @param string $dir 'ltr' or 'rtl'. Default is 'ltr'.
@@ -140,88 +77,27 @@ class Language {
      * will be created will be added to the set of loaded languages. Default is true.
      * @since 1.0
      */
-    public function __construct($dir='ltr',$code='XX',$addtoLoadedAfterCreate=true) {
-        $this->languageVars = array();
+    public function __construct($dir = 'ltr',$code = 'XX',$addtoLoadedAfterCreate = true) {
+        $this->languageVars = [];
         $this->loadLang = $addtoLoadedAfterCreate === true ? true : false;
-        if(!$this->setCode($code)){
+
+        if (!$this->setCode($code)) {
             $this->setCode('XX');
         }
-        if(!$this->setWritingDir($dir)){
+
+        if (!$this->setWritingDir($dir)) {
             $this->setWritingDir('ltr');
         }
     }
     /**
-     * Checks if the language is added to the set of loaded languages or not.
-     * @return boolean The function will return true if the language is added to 
-     * the set of loaded languages.
-     * @since 1.2
-     */
-    public function isLoaded() {
-        return $this->loadLang;
-    }
-    /**
-     * Sets the code of the language.
-     * @param string $code Language code (such as 'AR').
-     * @return boolean The function will return true if the language 
-     * code is set. If not set, the function will return false.
+     * Returns a reference to an associative array that contains an objects of 
+     * type 'Language'.
+     * @return array The key of the array represents two 
+     * characters language code. The index will contain an object of type 'Language'.
      * @since 1.1
      */
-    public function setCode($code) {
-        $trimmedCode = strtoupper(trim($code));
-        if(strlen($trimmedCode) == 2){
-            if($trimmedCode[0] >= 'A' && $trimmedCode[0] <= 'Z' && $trimmedCode[1] >= 'A' && $trimmedCode[1] <= 'Z'){
-                $oldCode = $this->getCode();
-                if($this->isLoaded()){
-                    if(isset(self::$loadedLangs[$oldCode])){
-                        unset(self::$loadedLangs[$oldCode]);
-                    }
-                }
-                $this->languageVars['code'] = $trimmedCode;
-                if($this->isLoaded()){
-                    self::$loadedLangs[$trimmedCode] = &$this;
-                }
-                return true;
-            }
-        }
-        return false;
-    }
-    /**
-     * Returns the language code that the object represents.
-     * @return string Language code in upper case (such as 'AR'). If language 
-     * code is not set, default is returned which is 'XX'.
-     * @since 1.1
-     */
-    public function getCode() {
-        if(isset($this->languageVars['code'])){
-            return $this->languageVars['code'];
-        }
-        return 'XX';
-    }
-    /**
-     * Creates a sub array to define language variables.
-     * @param string $param A string that looks like a 
-     * directory. For example, if the given string is 'general', 
-     * an array with key name 'general' will be created. Another example is 
-     * if the given string is 'pages/login', two arrays will be created. The 
-     * top one will have the key value 'pages' and another one inside 
-     * the pages array with key value 'login'.
-     * @since 1.0
-     */
-    public function createDirectory($param) {
-        $trim00 = trim($param);
-        $trim01 = trim($trim00,'/');
-        if(strlen($trim01) != 0){
-            $subSplit = explode('/', $trim01);
-            if(count($subSplit) != 0){
-                if(isset($this->languageVars[$subSplit[0]])){
-                    $this->_create($subSplit, $this->languageVars[$subSplit[0]],1);
-                }
-                else{
-                    $this->languageVars[$subSplit[0]] = [];
-                    $this->_create($subSplit, $this->languageVars[$subSplit[0]],1);
-                }
-            }
-        }
+    public static function &getLoadedLangs() {
+        return self::$loadedLangs;
     }
     /**
      * Creates a sub-array for defining language variables given initial set 
@@ -236,29 +112,138 @@ class Language {
         $this->createDirectory($dir);
         $this->setMultiple($dir, $labels);
     }
-    private function _create($subs,&$top,$index){
-        $count = count($subs);
-        if($index < $count){
-            if(isset($top[$subs[$index]])){
-                return $this->_create($subs, $top[$subs[$index]],++$index);
-            }
-            else{
-                $top[$subs[$index]] = array();
-                return $this->_create($subs, $top[$subs[$index]],++$index);
+    /**
+     * Creates a sub array to define language variables.
+     * @param string $param A string that looks like a 
+     * directory. For example, if the given string is 'general', 
+     * an array with key name 'general' will be created. Another example is 
+     * if the given string is 'pages/login', two arrays will be created. The 
+     * top one will have the key value 'pages' and another one inside 
+     * the pages array with key value 'login'.
+     * @since 1.0
+     */
+    public function createDirectory($param) {
+        $trim00 = trim($param);
+        $trim01 = trim($trim00,'/');
+
+        if (strlen($trim01) != 0) {
+            $subSplit = explode('/', $trim01);
+
+            if (count($subSplit) != 0) {
+                if (isset($this->languageVars[$subSplit[0]])) {
+                    $this->_create($subSplit, $this->languageVars[$subSplit[0]],1);
+                } else {
+                    $this->languageVars[$subSplit[0]] = [];
+                    $this->_create($subSplit, $this->languageVars[$subSplit[0]],1);
+                }
             }
         }
     }
     /**
-     * Sets multiple language variables.
-     * @param string $dir A string that looks like a 
-     * directory. 
-     * @param array $arr An associative array. The key will act as the variable 
-     * name and the value of the key will act as the variable value.
+     * Returns the value of a language variable.
+     * @param string $name A directory to the language variable (such as 'pages/login/login-label').
+     * @return string|array If the given directory represents a label, the 
+     * function will return its value. If it represents an array, the array will 
+     * be returned. If nothing was found, the returned value will be the passed 
+     * value to the function. 
      * @since 1.0
      */
-    public function setMultiple($dir,$arr=[]) {
-        foreach ($arr as $k => $v){
-            $this->set($dir, $k, $v);
+    public function get($name) {
+        $trimmed = trim($name);
+        $toReturn = trim($trimmed, '/');
+        $trim = $toReturn;
+        $subSplit = explode('/', $trim);
+
+        if (count($subSplit) == 1) {
+            if (isset($this->languageVars[$subSplit[0]])) {
+                $toReturn = $this->languageVars[$subSplit[0]];
+            }
+        } else {
+            if (isset($this->languageVars[$subSplit[0]])) {
+                $val = $this->_get($subSplit, $this->languageVars[$subSplit[0]], 1);
+
+                if ($val !== null) {
+                    $toReturn = $val;
+                }
+            }
+        }
+
+        return $toReturn;
+    }
+    /**
+     * Returns the language code that the object represents.
+     * @return string Language code in upper case (such as 'AR'). If language 
+     * code is not set, default is returned which is 'XX'.
+     * @since 1.1
+     */
+    public function getCode() {
+        if (isset($this->languageVars['code'])) {
+            return $this->languageVars['code'];
+        }
+
+        return 'XX';
+    }
+    /**
+     * Returns an associative array that contains language variables definition.
+     * @return array An associative array that contains language variables definition. 
+     * @since 1.0
+     */
+    public function getLanguageVars() {
+        return $this->languageVars;
+    }
+    /**
+     * Returns language writing direction.
+     * @return string 'ltr' or 'rtl'.
+     * @since 1.0
+     */
+    public function getWritingDir() {
+        return $this->languageVars['dir'];
+    }
+    /**
+     * Checks if the language is added to the set of loaded languages or not.
+     * @return boolean The function will return true if the language is added to 
+     * the set of loaded languages.
+     * @since 1.2
+     */
+    public function isLoaded() {
+        return $this->loadLang;
+    }
+    /**
+     * Loads a language file based on language code.
+     * @param string $langCode A two digits language code (such as 'ar').
+     * @throws Exception An exception will be thrown if no language file 
+     * was found that matches the given language code. Language files must 
+     * have the name 'LanguageXX.php' where 'XX' is language code. Also the function 
+     * will throw an exception when the translation file is loaded but no object 
+     * of type 'Language' was stored in the set of loaded translations.
+     * @return Language an object of type 'Language' is returned if 
+     * the language was loaded.
+     * @since 1.1
+     */
+    public static function loadTranslation($langCode) {
+        $uLangCode = strtoupper(trim($langCode));
+
+        if (isset(self::$loadedLangs[$uLangCode])) {
+            return self::$loadedLangs[$uLangCode];
+        } else {
+            $langClassName = 'webfiori\entity\langs\Language'.$uLangCode;
+
+            if (class_exists($langClassName)) {
+                $class = new $langClassName();
+
+                if ($class instanceof Language) {
+                    if (isset(self::$loadedLangs[$uLangCode])) {
+                        return self::$loadedLangs[$uLangCode];
+                    } else {
+                        throw new Exception('The translation file was found. But no object of type \'Language\' is stored. Make sure that the parameter '
+                                .'$addtoLoadedAfterCreate is set to true when creating the language object.');
+                    }
+                } else {
+                    throw new Exception('A language class for the language \''.$uLangCode.'\' was found. But it is not a sub class of \'Language\'.');
+                }
+            } else {
+                throw new Exception('No language class was found for the language \''.$uLangCode.'\'.');
+            }
         }
     }
     /**
@@ -276,83 +261,71 @@ class Language {
     public function set($dir,$varName,$varValue) {
         $dirTrimmed = trim($dir);
         $varTrimmed = trim($varName);
-        if(strlen($dirTrimmed) != 0){
-            if(strlen($varTrimmed) != 0){
+
+        if (strlen($dirTrimmed) != 0) {
+            if (strlen($varTrimmed) != 0) {
                 $trim = trim($dirTrimmed, '/');
                 $subSplit = explode('/', $trim);
-                if(count($subSplit) == 1){
-                    if(isset($this->languageVars[$subSplit[0]])){
+
+                if (count($subSplit) == 1) {
+                    if (isset($this->languageVars[$subSplit[0]])) {
                         $this->languageVars[$subSplit[0]][$varTrimmed] = $varValue;
+
                         return true;
                     }
-                }
-                else{
-                    if(isset($this->languageVars[$subSplit[0]])){
+                } else {
+                    if (isset($this->languageVars[$subSplit[0]])) {
                         return $this->_set($subSplit, $this->languageVars[$subSplit[0]],$varTrimmed,$varValue, 1);
                     }
                 }
             }
         }
-        return false;
-    }
-    
-    private function _set($subs,&$top,$var,$val,$index) {
-        $count = count($subs);
-        if($index + 1 == $count){
-            if(isset($top[$subs[$index]])){
-                $top[$subs[$index]][$var] = $val;
-                return true;
-            }
-        }
-        else{
-            if(isset($top[$subs[$index]])){
-                return $this->_set($subs,$top[$subs[$index]],$var,$val, ++$index);
-            }
-        }
+
         return false;
     }
     /**
-     * Returns the value of a language variable.
-     * @param string $name A directory to the language variable (such as 'pages/login/login-label').
-     * @return string|array If the given directory represents a label, the 
-     * function will return its value. If it represents an array, the array will 
-     * be returned. If nothing was found, the returned value will be the passed 
-     * value to the function. 
+     * Sets the code of the language.
+     * @param string $code Language code (such as 'AR').
+     * @return boolean The function will return true if the language 
+     * code is set. If not set, the function will return false.
+     * @since 1.1
+     */
+    public function setCode($code) {
+        $trimmedCode = strtoupper(trim($code));
+
+        if (strlen($trimmedCode) == 2) {
+            if ($trimmedCode[0] >= 'A' && $trimmedCode[0] <= 'Z' && $trimmedCode[1] >= 'A' && $trimmedCode[1] <= 'Z') {
+                $oldCode = $this->getCode();
+
+                if ($this->isLoaded()) {
+                    if (isset(self::$loadedLangs[$oldCode])) {
+                        unset(self::$loadedLangs[$oldCode]);
+                    }
+                }
+                $this->languageVars['code'] = $trimmedCode;
+
+                if ($this->isLoaded()) {
+                    self::$loadedLangs[$trimmedCode] = &$this;
+                }
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+    /**
+     * Sets multiple language variables.
+     * @param string $dir A string that looks like a 
+     * directory. 
+     * @param array $arr An associative array. The key will act as the variable 
+     * name and the value of the key will act as the variable value.
      * @since 1.0
      */
-    public function get($name) {
-        $trimmed = trim($name);
-        $toReturn = trim($trimmed, '/');
-        $trim = $toReturn;
-        $subSplit = explode('/', $trim);
-        if(count($subSplit) == 1){
-            if(isset($this->languageVars[$subSplit[0]])){
-                $toReturn = $this->languageVars[$subSplit[0]];
-            }
+    public function setMultiple($dir,$arr = []) {
+        foreach ($arr as $k => $v) {
+            $this->set($dir, $k, $v);
         }
-        else{
-            if(isset($this->languageVars[$subSplit[0]])){
-                $val = $this->_get($subSplit, $this->languageVars[$subSplit[0]], 1);
-                if($val !== null){
-                    $toReturn = $val;
-                }
-            }
-        }
-        return $toReturn;
-    }
-    private function _get(&$subs,&$top,$index){
-        $count = count($subs);
-        if($index + 1 == $count){
-            if(isset($top[$subs[$index]])){
-                return $top[$subs[$index]];
-            }
-        }
-        else{
-            if(isset($top[$subs[$index]])){
-                return $this->_get($subs, $top[$subs[$index]], ++$index);
-            }
-        }
-        return null;
     }
     /**
      * Sets language writing direction.
@@ -365,26 +338,77 @@ class Language {
      */
     public function setWritingDir($dir) {
         $lDir = strtolower(trim($dir));
-        if($lDir == self::DIR_LTR || $lDir == self::DIR_RTL){
+
+        if ($lDir == self::DIR_LTR || $lDir == self::DIR_RTL) {
             $this->languageVars['dir'] = $lDir;
+
             return true;
         }
+
         return false;
     }
     /**
-     * Returns language writing direction.
-     * @return string 'ltr' or 'rtl'.
-     * @since 1.0
+     * Unload translation based on its language code.
+     * @param string $langCode A two digits language code (such as 'ar').
+     * @return boolean If the translation file was unloaded, the method will 
+     * return true. If not, the method will return false.
+     * @since 1.2 
      */
-    public function getWritingDir() {
-        return $this->languageVars['dir'];
+    public static function unloadTranslation($langCode) {
+        $uLangCode = strtoupper(trim($langCode));
+
+        if (isset(self::$loadedLangs[$uLangCode])) {
+            unset(self::$loadedLangs[$uLangCode]);
+
+            return true;
+        }
+
+        return false;
     }
-    /**
-     * Returns an associative array that contains language variables definition.
-     * @return array An associative array that contains language variables definition. 
-     * @since 1.0
-     */
-    public function getLanguageVars() {
-        return $this->languageVars;
+    private function _create($subs,&$top,$index) {
+        $count = count($subs);
+
+        if ($index < $count) {
+            if (isset($top[$subs[$index]])) {
+                return $this->_create($subs, $top[$subs[$index]],++$index);
+            } else {
+                $top[$subs[$index]] = [];
+
+                return $this->_create($subs, $top[$subs[$index]],++$index);
+            }
+        }
+    }
+    private function _get(&$subs,&$top,$index) {
+        $count = count($subs);
+
+        if ($index + 1 == $count) {
+            if (isset($top[$subs[$index]])) {
+                return $top[$subs[$index]];
+            }
+        } else {
+            if (isset($top[$subs[$index]])) {
+                return $this->_get($subs, $top[$subs[$index]], ++$index);
+            }
+        }
+
+        return null;
+    }
+
+    private function _set($subs,&$top,$var,$val,$index) {
+        $count = count($subs);
+
+        if ($index + 1 == $count) {
+            if (isset($top[$subs[$index]])) {
+                $top[$subs[$index]][$var] = $val;
+
+                return true;
+            }
+        } else {
+            if (isset($top[$subs[$index]])) {
+                return $this->_set($subs,$top[$subs[$index]],$var,$val, ++$index);
+            }
+        }
+
+        return false;
     }
 }

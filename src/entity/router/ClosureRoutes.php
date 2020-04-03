@@ -23,6 +23,7 @@
  * THE SOFTWARE.
  */
 namespace webfiori\entity\router;
+
 /**
  * A class that only has one method to initiate some of system routes.
  * The class is meant to only initiate the routes which uses the method 
@@ -36,11 +37,12 @@ class ClosureRoutes {
      * @since 1.0
      */
     public static function create() {
-        $arrayOfParams = array('WebFiori Framework');
+        $arrayOfParams = ['WebFiori Framework'];
         Router::closure([
-            'path'=>'/closure',
-            'closure-params'=>$arrayOfParams,
-            'route-to'=>function($params){
+            'path' => '/closure',
+            'closure-params' => $arrayOfParams,
+            'route-to' => function($params)
+            {
                 echo 'This is a closure route.';
                 Util::print_r($params);
             }

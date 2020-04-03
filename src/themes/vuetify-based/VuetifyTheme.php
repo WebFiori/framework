@@ -1,18 +1,18 @@
 <?php
 namespace webfiori\theme\vutifyTheme;
-use webfiori\WebFiori;
-use webfiori\entity\Theme;
-use webfiori\entity\Page;
-use phpStructs\html\HTMLNode;
-use phpStructs\html\HeadNode;
-use phpStructs\html\JsCode;
+
 use jsonx\JsonX;
-use webfiori\theme\vutifyTheme\LangExt;
+use phpStructs\html\HeadNode;
+use phpStructs\html\HTMLNode;
+use phpStructs\html\JsCode;
+use webfiori\entity\Page;
+use webfiori\entity\Theme;
+use webfiori\WebFiori;
 /**
  * A basic theme which is based on Vuetify framework.
  * @author Ibrahim
  */
-class VuetifyTheme extends Theme{
+class VuetifyTheme extends Theme {
     /**
      * Creates new instance of the class.
      */
@@ -27,12 +27,14 @@ class VuetifyTheme extends Theme{
         $this->setDirectoryName('vuetify-based');
         $this->setJsDirName('js');
         $this->setImagesDirName('img');
-        $this->setBeforeLoaded(function(){
+        $this->setBeforeLoaded(function()
+        {
             Page::lang(WebFiori::getWebsiteController()->getSessionLang());
             LangExt::extendLang(Page::translation());
             Page::siteName(WebFiori::getSiteConfig()->getWebsiteNames()[Page::lang()]);
         });
-        $this->setAfterLoaded(function(){
+        $this->setAfterLoaded(function()
+        {
             $topDiv = new HTMLNode('v-app');
             $topDiv->setID('app');
             $headerSec = Page::document()->getChildByID('page-header');
@@ -47,11 +49,12 @@ class VuetifyTheme extends Theme{
             Page::document()->getBody()->addChild($topDiv);
             Page::document()->getChildByID('main-content-area')->setNodeName('v-content');
             Page::document()->getChildByID('main-content-area')->setAttribute('app');
-            
+
             //initialize vue before the page is rendered.
             //the initialization process is performed by the file 
             //'themes/vuetify-based/init-vuetify.js'
-            Page::beforeRender(function(){
+            Page::beforeRender(function()
+            {
                 $jsNode = new HTMLNode('script');
                 $jsNode->setAttribute('src', Page::jsDir().'/init-vuetify.js');
                 Page::document()->getBody()->addChild($jsNode);
@@ -65,65 +68,72 @@ class VuetifyTheme extends Theme{
      * @param array $options An associative array that contains options.
      * @return HTMLNode
      */
-    public function createHTMLNode($options = array()){
+    public function createHTMLNode($options = []) {
         $type = isset($options['type']) ? $options['type'] : 'div';
-        if($type == 'v-list-item'){
+
+        if ($type == 'v-list-item') {
             $node = new HTMLNode('v-list-item');
             $icon = isset($options['icon']) ? $options['icon'] : null;
-            if($icon !== null){
+
+            if ($icon !== null) {
                 $iconNode = new HTMLNode('v-list-item-icon');
                 $iconNode->addTextNode('<v-icon>'.$icon.'</v-icon>', false);
                 $node->addChild($iconNode);
             }
             $title = isset($options['title']) ? $options['title'] : null;
-            if($title !== null){
+
+            if ($title !== null) {
                 $titleNode = new HTMLNode('v-list-item-title');
                 $titleNode->addTextNode($title, false);
                 $node->addChild($titleNode);
             }
+
             return $node;
+        } else {
+            if ($type == 'icon-button') {
+                $btn = new HTMLNode('v-btn');
+                $btn->setAttribute('icon');
+                $vIcon = new HTMLNode('v-icon');
+                $btn->addChild($vIcon);
+                $icon = isset($options['icon']) ? $options['icon'] : 'mdi-information';
+                $vIcon->addTextNode($icon);
+
+                return $btn;
+            }
         }
-        else if($type == 'icon-button'){
-            $btn = new HTMLNode('v-btn');
-            $btn->setAttribute('icon');
-            $vIcon = new HTMLNode('v-icon');
-            $btn->addChild($vIcon);
-            $icon = isset($options['icon']) ? $options['icon'] : 'mdi-information';
-            $vIcon->addTextNode($icon);
-            return $btn;
-        }
+
         return new HTMLNode();
     }
     /**
      * Creates the drawer which appears when menu button is clicked.
      * @return HTMLNode
      */
-    public function getAsideNode(){
+    public function getAsideNode() {
         $node = new HTMLNode('v-navigation-drawer');
         $node->setAttributes([
-            'v-model'=>'drawer',
-            'absolute',':right'=>'$vuetify.rtl',
+            'v-model' => 'drawer',
+            'absolute',':right' => '$vuetify.rtl',
             'temporary','fixed']);
-        
+
         //add an image with some text on it.
         $bigImg = new HTMLNode('v-img');
         $bigImg->setAttributes([
-            'src'=>Page::imagesDir().'/side-nav.PNG',
-            ':aspect-ratio'=>"16/9"
+            'src' => Page::imagesDir().'/side-nav.PNG',
+            ':aspect-ratio' => "16/9"
         ]);
         $node->addChild($bigImg);
         $bigImgContentRow = new HTMLNode('v-row');
         $bigImgContentRow->setAttributes([
-            'class'=>'lightbox white--text pa-2 fill-height',
-            'align'=>'end'
+            'class' => 'lightbox white--text pa-2 fill-height',
+            'align' => 'end'
         ]);
         $bigImg->addChild($bigImgContentRow);
         $bigImgContentCol = new HTMLNode('v-col');
         $bigImgContentRow->addChild($bigImgContentCol);
         $bigImgContentCol->addTextNode(''
-                . '<div class="subheading">Programming Academia</div>'
-                . '',false);
-        
+                .'<div class="subheading">Programming Academia</div>'
+                .'',false);
+
         //create the side nav menu
         $list = new HTMLNode('v-list');
         $node->addChild($list);
@@ -135,42 +145,43 @@ class VuetifyTheme extends Theme{
         $list->addChild($listGroup);
         $listGroup->setAttribute('active-class','deep-purple--text text--accent-4');
         $listGroup->addChild($this->createHTMLNode([
-            'type'=>'v-list-item',
-            'title'=>Page::translation()->get('side-menu/home'),
-            'icon'=>'mdi-home'
+            'type' => 'v-list-item',
+            'title' => Page::translation()->get('side-menu/home'),
+            'icon' => 'mdi-home'
         ]));
         $listGroup->addChild($this->createHTMLNode([
-            'type'=>'v-list-item',
-            'title'=>Page::translation()->get('side-menu/search'),
-            'icon'=>'mdi-magnify'
+            'type' => 'v-list-item',
+            'title' => Page::translation()->get('side-menu/search'),
+            'icon' => 'mdi-magnify'
         ]));
         $listGroup->addChild($this->createHTMLNode([
-            'type'=>'v-list-item',
-            'title'=>Page::translation()->get('side-menu/account'),
-            'icon'=>'mdi-heart'
+            'type' => 'v-list-item',
+            'title' => Page::translation()->get('side-menu/account'),
+            'icon' => 'mdi-heart'
         ]));
         $listGroup->addChild($this->createHTMLNode([
-            'type'=>'v-list-item',
-            'title'=>Page::translation()->get('side-menu/something-else'),
-            'icon'=>'mdi-information'
+            'type' => 'v-list-item',
+            'title' => Page::translation()->get('side-menu/something-else'),
+            'icon' => 'mdi-information'
         ]));
+
         return $node;
     }
     /**
      * Creates the footer of the page.
      * @return HTMLNode
      */
-    public function getFooterNode(){
+    public function getFooterNode() {
         $node = new HTMLNode();
         $app = new HTMLNode('v-footer');
         $app->setAttribute('app');
         $app->setAttributes(['dark','padless']);
         $node->addChild($app);
-        
+
         $vCard = new HTMLNode('v-card');
         $app->addChild($vCard);
         $vCard->setAttributes([
-            'class'=>'flex',
+            'class' => 'flex',
             'flat','tile'
         ]);
         $vCardTitle = new HTMLNode('v-card-title');
@@ -192,10 +203,10 @@ class VuetifyTheme extends Theme{
         $vCardText->setClassName('py-2 white--text text-center');
         $vCardText->addTextNode('<strong>'.Page::translation()->get('example/footer/copyright-notice').'</strong>', false);
         $vCardText->addTextNode('<p style="font-size:9pt;color:lightgray">Powered By: <a href="https://programmingacademia.com/webfiori" '
-                . 'target="_blank">WebFiori Framework</a><br/>'
-                . 'Theme Designed Using <a href="https://vuetifyjs.com" target="_blank">Vuetify</a></p>', false);
+                .'target="_blank">WebFiori Framework</a><br/>'
+                .'Theme Designed Using <a href="https://vuetifyjs.com" target="_blank">Vuetify</a></p>', false);
         $vCard->addChild($vCardText);
-        
+
         return $node;
     }
     /**
@@ -203,13 +214,14 @@ class VuetifyTheme extends Theme{
      * It simply loads all needed JavaScript, CSS and any other resources.
      * @return HeadNode
      */
-    public function getHeadNode(){
+    public function getHeadNode() {
         $node = new HeadNode();
         $lang = Page::translation();
         $json = new JsonX();
         $langVars = $lang->getLanguageVars();
-        foreach ($langVars as $key => $val){
-            $json->add($key, $val,['array-as-object'=>true]);
+
+        foreach ($langVars as $key => $val) {
+            $json->add($key, $val,['array-as-object' => true]);
         }
         $js = new JsCode();
         $js->setID('data-model');
@@ -221,6 +233,7 @@ class VuetifyTheme extends Theme{
         $node->addCSS('https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css', [], false);
         $node->addJs('https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js', [], false);
         $node->addJs('https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js', [], false);
+
         return $node;
     }
     /**
@@ -231,17 +244,17 @@ class VuetifyTheme extends Theme{
         $node = new HTMLNode();
         $appBar = new HTMLNode('v-app-bar');
         $appBar->setAttributes([
-            'color'=>'red',
-            'src'=>'https://picsum.photos/1920/1080?random',
+            'color' => 'red',
+            'src' => 'https://picsum.photos/1920/1080?random',
             'hide-on-scroll',
             'elevate-on-scroll',
             'fixed','app'
         ]);
         $logo = new HTMLNode('v-img');
         $logo->setAttributes([
-            'src'=>Page::imagesDir().'/favicon.png',
-            'max-height'=>45,
-            'max-width'=>45
+            'src' => Page::imagesDir().'/favicon.png',
+            'max-height' => 45,
+            'max-width' => 45
         ]);
         //$appBar->addChild($logo);
         $appBar->addTextNode('<template v-slot:img="{ props }">
@@ -258,19 +271,20 @@ class VuetifyTheme extends Theme{
         $appBar->addChild($titleNode);
         $appBar->addTextNode('<v-spacer></v-spacer>', false);
         $appBar->addChild($this->createHTMLNode([
-            'type'=>'icon-button',
-            'icon'=>'mdi-magnify'
+            'type' => 'icon-button',
+            'icon' => 'mdi-magnify'
         ]));
         $appBar->addChild($this->createHTMLNode([
-            'type'=>'icon-button'
+            'type' => 'icon-button'
         ]));
         $appBar->addChild($this->createHTMLNode([
-            'type'=>'icon-button',
-            'icon'=>'mdi-heart'
+            'type' => 'icon-button',
+            'icon' => 'mdi-heart'
         ]));
         $node->addChild($appBar);
+
         return $node;
     }
-
 }
+
 return __NAMESPACE__;

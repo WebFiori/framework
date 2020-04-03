@@ -23,6 +23,7 @@
  * THE SOFTWARE.
  */
 namespace webfiori\entity\router;
+
 /**
  * A class that only has one method to initiate some of system routes.
  * The class is meant to only initiate the routes which uses the method 
@@ -37,8 +38,8 @@ class APIRoutes {
      */
     public static function create() {
         Router::api([
-            'path'=>'/ExampleAPI/{action}', 
-            'route-to'=>'/ExampleAPI.php'
+            'path' => '/ExampleAPI/{action}', 
+            'route-to' => '/ExampleAPI.php'
         ]);
     }
 }

@@ -24,45 +24,47 @@
  * THE SOFTWARE.
  */
 namespace webfiori\examples\webApis;
-use webfiori\entity\ExtendedWebServices;
+
 use restEasy\APIAction;
+use webfiori\entity\ExtendedWebServices;
 
 //create class and extend the base class API
-class ExampleAPI extends ExtendedWebServices{
-    
+class ExampleAPI extends ExtendedWebServices {
     public function __construct() {
         parent::__construct();
-        
+
         //create API action
         $a1 = new APIAction('say-hello');
-        
+
         //set action request method
         $a1->addRequestMethod('get');
-        
+
         //add the action to the API
         $this->addAction($a1);
     }
-    
+
     public function isAuthorized() {
         //check if the user 
         //is authorized to perform specific action.
-        return TRUE;
+        return true;
     }
 
     public function processRequest() {
         //get the action,
         //and perform it
         $a = $this->getAction();
-        if($a == 'say-hello'){
+
+        if ($a == 'say-hello') {
             //say hello by sending html document
             $lang = $this->getTranslation()->getCode();
-            if($lang == 'AR'){
+
+            if ($lang == 'AR') {
                 $this->send('text/html', '<html><head><title>قُل مرحباً</title></head><body><p dir="rtl">مرحباً بالعالم!</p></body></html>');
-            }
-            else{
+            } else {
                 $this->send('text/html', '<html><head><title>Say Hello</title></head><body><p>hello world!</p></body></html>');
             }
         }
     }
 }
+
 return __NAMESPACE__;

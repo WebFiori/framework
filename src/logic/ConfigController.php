@@ -23,10 +23,11 @@
  * THE SOFTWARE.
  */
 namespace webfiori\logic;
-use webfiori\entity\FileHandler;
-use webfiori\entity\DBConnectionInfo;
-use webfiori\conf\Config;
+
 use Exception;
+use webfiori\conf\Config;
+use webfiori\entity\DBConnectionInfo;
+use webfiori\entity\FileHandler;
 /**
  * A class that can be used to modify basic configuration settings of 
  * the web application. 
@@ -36,27 +37,12 @@ use Exception;
  * @author Ibrahim
  * @version 1.4.4
  */
-class ConfigController extends Controller{
+class ConfigController extends Controller {
     /**
      * A constant that indicates the selected database schema has tables.
      * @since 1.1
      */
     const DB_NOT_EMPTY = 'db_has_tables';
-    /**
-     * A constant that indicates the file Config.php was not found.
-     * @since 1.2
-     */
-    const SYS_CONFIG_MISSING = 'config_file_missing';
-    /**
-     * A constant that indicates the file SiteConfig.php was not found.
-     * @since 1.2
-     */
-    const SITE_CONFIG_MISSING = 'site_config_file_missing';
-    /**
-     * A constant that indicates the file MailConfig.php was not found.
-     * @since 1.2
-     */
-    const MAIL_CONFIG_MISSING = 'mail_config_file_missing';
     /**
      * An array that contains initial system configuration variables.
      * This array has the following indices and values:
@@ -71,40 +57,34 @@ class ConfigController extends Controller{
      * @since 1.0
      */
     const INITIAL_CONFIG_VARS = [
-        'is-config'=>'false',
-        'release-date'=>'2020-03-10',
-        'version'=>'1.0.9',
-        'version-type'=>'Stable',
-        'config-file-version'=>'1.3.4',
-        'databases'=>[]
+        'is-config' => 'false',
+        'release-date' => '2020-03-10',
+        'version' => '1.0.9',
+        'version-type' => 'Stable',
+        'config-file-version' => '1.3.4',
+        'databases' => []
     ];
+    /**
+     * A constant that indicates the file MailConfig.php was not found.
+     * @since 1.2
+     */
+    const MAIL_CONFIG_MISSING = 'mail_config_file_missing';
+    /**
+     * A constant that indicates the file SiteConfig.php was not found.
+     * @since 1.2
+     */
+    const SITE_CONFIG_MISSING = 'site_config_file_missing';
+    /**
+     * A constant that indicates the file Config.php was not found.
+     * @since 1.2
+     */
+    const SYS_CONFIG_MISSING = 'config_file_missing';
     /**
      * An instance of SystemFunctions
      * @var ConfigController
      * @since 1.0 
      */
     private static $singleton;
-    /**
-     * Returns a single instance of the class.
-     * @return ConfigController
-     * @since 1.0
-     */
-    public static function get(){
-        if(self::$singleton === null){
-            self::$singleton = new ConfigController();
-        }
-        return self::$singleton;
-    }
-    /**
-     * Creates the file 'Config.php' if it does not exist.
-     * @since 1.0
-     */
-    public function createConfigFile() {
-        if(!class_exists('webfiori\conf\Config')){
-            $cfg = $this->getConfigVars();
-            $this->writeConfig($cfg);
-        }
-    }
     /**
      * Creates new instance of the class.
      * It is not recommended to use this method. Instead, 
@@ -114,59 +94,25 @@ class ConfigController extends Controller{
         parent::__construct();
     }
     /**
-     * Initialize new session or use an existing one.
-     * Note that the name of the session must be 'wf-session' in 
-     * order to initialize it.
-     * @param array $options An array of session options. See 
-     * Controller::useSettion() for more information about available options.
-     * @return boolean If session is created or resumed, the method will 
-     * return true. False otherwise.
-     * @since 1.4.4
-     */
-    public function useSession($options=[]) {
-        if(gettype($options) == 'array' && isset($options['name'])){
-            if($options['name'] == 'wf-session'){
-                return parent::useSession($options);
-            }
-        }
-        return false;
-    }
-    /**
      * Adds new database connections information or update existing connections.
      * The information of the connections will be stored in the file 'Config.php'.
      * @param array $dbConnectionsInfo An array that contains objects of type DBConnectionInfo. 
      * @since 1.4.3
      */
-    public function addOrUpdateDBConnections($dbConnectionsInfo){
-        if(gettype($dbConnectionsInfo) == 'array'){
+    public function addOrUpdateDBConnections($dbConnectionsInfo) {
+        if (gettype($dbConnectionsInfo) == 'array') {
             $confVars = $this->getConfigVars();
-            foreach ($dbConnectionsInfo as $con){
-                if($con instanceof DBConnectionInfo){
-                    if(strlen($con->getHost()) > 0 && 
+
+            foreach ($dbConnectionsInfo as $con) {
+                if ($con instanceof DBConnectionInfo) {
+                    if (strlen($con->getHost()) > 0 && 
                        strlen($con->getPort()) > 0 &&
                        strlen($con->getUsername()) > 0 && 
                        strlen($con->getPassword()) > 0 && 
-                       strlen($con->getDBName()) > 0){  
+                       strlen($con->getDBName()) > 0) {
                         $confVars['databases'][$con->getConnectionName()] = $con;
                     }
                 }
-            }
-            $this->writeConfig($confVars);
-        }
-    }
-    /**
-     * Removes a set of database connections.
-     * This method will search for a connection which has the given database 
-     * name. Once it found, it will remove the connection and save the updated 
-     * information to the file 'Config.php'.
-     * @param array $connectionsNames An array that contains the names of database connections.
-     * @since 1.4.3
-     */
-    public function removeDBConnections($connectionsNames){
-        if(gettype($connectionsNames) == 'array'){
-            $confVars = $this->getConfigVars();
-            foreach ($connectionsNames as $dbName){  
-                unset($confVars['databases'][$dbName]);
             }
             $this->writeConfig($confVars);
         }
@@ -180,10 +126,32 @@ class ConfigController extends Controller{
      * false to make it not configured.
      * @since 1.3
      */
-    public function configured($isConfig=true){
+    public function configured($isConfig = true) {
         $confVars = $this->getConfigVars();
         $confVars['is-config'] = $isConfig === true ? 'true' : 'false';
         $this->writeConfig($confVars);
+    }
+    /**
+     * Creates the file 'Config.php' if it does not exist.
+     * @since 1.0
+     */
+    public function createConfigFile() {
+        if (!class_exists('webfiori\conf\Config')) {
+            $cfg = $this->getConfigVars();
+            $this->writeConfig($cfg);
+        }
+    }
+    /**
+     * Returns a single instance of the class.
+     * @return ConfigController
+     * @since 1.0
+     */
+    public static function get() {
+        if (self::$singleton === null) {
+            self::$singleton = new ConfigController();
+        }
+
+        return self::$singleton;
     }
     /**
      * Returns an associative array that contains system configuration 
@@ -203,13 +171,77 @@ class ConfigController extends Controller{
      * info.
      * @since 1.0
      */
-    public function getConfigVars(){
+    public function getConfigVars() {
         $cfgArr = ConfigController::INITIAL_CONFIG_VARS;
-        if(class_exists('webfiori\conf\Config')){
+
+        if (class_exists('webfiori\conf\Config')) {
             $cfgArr['is-config'] = Config::isConfig() === true ? 'true' : 'false';
             $cfgArr['databases'] = Config::getDBConnections();
         }
+
         return $cfgArr;
+    }
+    /**
+     * Checks if the application setup is completed or not.
+     * Note that the method will throw an exception in case one of the 3 main 
+     * configuration files is missing.
+     * @return boolean If the system is configured, the method will return 
+     * true. If it is not configured, It will return false.
+     * @throws Exception If one of configuration files is missing. The format 
+     * of exception message will be 'XX.php is missing.' where XX is the name 
+     * of the configuration file.
+     * @since 1.0
+     */
+    public function isSetupFinished() {
+        if (class_exists('webfiori\conf\Config')) {
+            if (class_exists('webfiori\conf\MailConfig')) {
+                if (class_exists('webfiori\conf\SiteConfig')) {
+                    $retVal = Config::isConfig();
+
+                    return $retVal;
+                }
+                throw new Exception('SiteConfig.php is missing.');
+            }
+            throw new Exception('MailConfig.php is missing.');
+        }
+        throw new Exception('Config.php is missing.');
+    }
+    /**
+     * Removes a set of database connections.
+     * This method will search for a connection which has the given database 
+     * name. Once it found, it will remove the connection and save the updated 
+     * information to the file 'Config.php'.
+     * @param array $connectionsNames An array that contains the names of database connections.
+     * @since 1.4.3
+     */
+    public function removeDBConnections($connectionsNames) {
+        if (gettype($connectionsNames) == 'array') {
+            $confVars = $this->getConfigVars();
+
+            foreach ($connectionsNames as $dbName) {
+                unset($confVars['databases'][$dbName]);
+            }
+            $this->writeConfig($confVars);
+        }
+    }
+    /**
+     * Initialize new session or use an existing one.
+     * Note that the name of the session must be 'wf-session' in 
+     * order to initialize it.
+     * @param array $options An array of session options. See 
+     * Controller::useSettion() for more information about available options.
+     * @return boolean If session is created or resumed, the method will 
+     * return true. False otherwise.
+     * @since 1.4.4
+     */
+    public function useSession($options = []) {
+        if (gettype($options) == 'array' && isset($options['name'])) {
+            if ($options['name'] == 'wf-session') {
+                return parent::useSession($options);
+            }
+        }
+
+        return false;
     }
     /**
      * A method to save changes to configuration file.
@@ -217,7 +249,7 @@ class ConfigController extends Controller{
      * variables.
      * @since 1.0
      */
-    private function writeConfig($configArr){
+    private function writeConfig($configArr) {
         $configFileLoc = ROOT_DIR.'/conf/Config.php';
         $fh = new FileHandler($configFileLoc);
         $fh->write('<?php', true, true);
@@ -275,8 +307,9 @@ class ConfigController extends Controller{
         $this->dbConnections = [', true, true);
         $count = count($configArr['databases']);
         $i = 0;
-        foreach ($configArr['databases'] as $dbConn){
-            if($i + 1 == $count){
+
+        foreach ($configArr['databases'] as $dbConn) {
+            if ($i + 1 == $count) {
                 $fh->write('        \''.$dbConn->getConnectionName().'\'=> new DBConnectionInfo(\''
                     .$dbConn->getUsername()
                     .'\',\''
@@ -285,10 +318,9 @@ class ConfigController extends Controller{
                     .$dbConn->getDBName()
                     .'\',\''
                     .$dbConn->getHost().'\','
-                    . ''
+                    .''
                     .$dbConn->getPort().')', true, true);
-            }
-            else{
+            } else {
                 $fh->write('        \''.$dbConn->getConnectionName().'\'=> new DBConnectionInfo(\''
                     .$dbConn->getUsername()
                     .'\',\''
@@ -297,13 +329,14 @@ class ConfigController extends Controller{
                     .$dbConn->getDBName()
                     .'\',\''
                     .$dbConn->getHost().'\','
-                    . ''
+                    .''
                     .$dbConn->getPort().'),', true, true);
             }
             $i++;
         }
         $fh->write('    ];', true, true);
-        foreach ($configArr['databases'] as $dbConn){
+
+        foreach ($configArr['databases'] as $dbConn) {
             $fh->write('$this->dbConnections[\''.$dbConn->getConnectionName().'\']->setConnectionName(\''.$dbConn->getConnectionName().'\');', true, true);
         }
         $fh->write('}', true, true);
@@ -361,9 +394,6 @@ class ConfigController extends Controller{
      */
     public static function isConfig(){
         return self::get()->_isConfig();
-    }
-    private function _getDBName(){
-        return $this->dbName;
     }
     
     private function _getVersion(){
@@ -430,29 +460,5 @@ class ConfigController extends Controller{
         $fh->reduceTab();
         $fh->write('}', true, true);
         $fh->close();
-    }
-    /**
-     * Checks if the application setup is completed or not.
-     * Note that the method will throw an exception in case one of the 3 main 
-     * configuration files is missing.
-     * @return boolean If the system is configured, the method will return 
-     * true. If it is not configured, It will return false.
-     * @throws Exception If one of configuration files is missing. The format 
-     * of exception message will be 'XX.php is missing.' where XX is the name 
-     * of the configuration file.
-     * @since 1.0
-     */
-    public function isSetupFinished(){
-        if(class_exists('webfiori\conf\Config')){
-            if(class_exists('webfiori\conf\MailConfig')){
-                if(class_exists('webfiori\conf\SiteConfig')){
-                    $retVal = Config::isConfig();
-                    return $retVal;
-                }
-                throw new Exception('SiteConfig.php is missing.');
-            }
-            throw new Exception('MailConfig.php is missing.');
-        }
-        throw new Exception('Config.php is missing.');
     }
 }

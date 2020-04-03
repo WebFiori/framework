@@ -1,5 +1,6 @@
 <?php
 namespace webfiori\tests\entity;
+
 use PHPUnit\Framework\TestCase;
 use webfiori\entity\AutoLoader;
 /**
@@ -7,7 +8,7 @@ use webfiori\entity\AutoLoader;
  *
  * @author Ibrahim
  */
-class TestAutoLoader extends TestCase{
+class TestAutoLoader extends TestCase {
     /**
      * @test
      */

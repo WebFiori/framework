@@ -1,14 +1,15 @@
 <?php
 namespace webfiori\tests\entity;
-use phMysql\MySQLQuery;
+
 use phMysql\Column;
+use phMysql\MySQLQuery;
 use phMysql\MySQLTable;
 /**
  * Description of TestQuery
  *
  * @author Eng.Ibrahim
  */
-class TestQuery_2 extends MySQLQuery{
+class TestQuery_2 extends MySQLQuery {
     /**
      *
      * @var MySQLTable 
@@ -27,9 +28,7 @@ class TestQuery_2 extends MySQLQuery{
      * 
      * @return type
      */
-    public function getStructure(){
+    public function getStructure() {
         return $this->table;
     }
-    
-    
 }

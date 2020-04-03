@@ -1,5 +1,6 @@
 <?php
 namespace webfiori\tests\testEntity;
+
 use webfiori\entity\User;
 
 /**
@@ -7,7 +8,7 @@ use webfiori\entity\User;
  *
  * @author Ibrahim
  */
-class UserWithContact extends User{
+class UserWithContact extends User {
     private $contactInfoArr;
     public function __construct() {
         parent::__construct();

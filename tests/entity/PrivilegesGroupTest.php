@@ -1,23 +1,16 @@
 <?php
 namespace webfiori\tests\entity;
+
 use PHPUnit\Framework\TestCase;
-use webfiori\entity\PrivilegesGroup;
 use webfiori\entity\Privilege;
+use webfiori\entity\PrivilegesGroup;
 
 /**
  * A test class for testing the class 'webfiori\entity\File'.
  *
  * @author Ibrahim
  */
-class PrivilegesGroupTest extends TestCase{
-    /**
-     * @test
-     */
-    public function testConstructor00() {
-        $group = new PrivilegesGroup();
-        $this->assertEquals('GROUP',$group->getID());
-        $this->assertEquals('G_NAME',$group->getName());
-    }
+class PrivilegesGroupTest extends TestCase {
     /**
      * @test
      */
@@ -41,6 +34,14 @@ class PrivilegesGroupTest extends TestCase{
     /**
      * @test
      */
+    public function testConstructor00() {
+        $group = new PrivilegesGroup();
+        $this->assertEquals('GROUP',$group->getID());
+        $this->assertEquals('G_NAME',$group->getName());
+    }
+    /**
+     * @test
+     */
     public function testConstructor01() {
         $group = new PrivilegesGroup('Invalid ID','Valid Name');
         $this->assertEquals('GROUP',$group->getID());
@@ -53,6 +54,7 @@ class PrivilegesGroupTest extends TestCase{
         $group = new PrivilegesGroup(' valid_ID','Valid Name');
         $this->assertEquals('valid_ID',$group->getID());
         $this->assertEquals('Valid Name',$group->getName());
+
         return $group;
     }
     /**
@@ -70,39 +72,6 @@ class PrivilegesGroupTest extends TestCase{
         $group = new PrivilegesGroup('','');
         $this->assertEquals('GROUP',$group->getID());
         $this->assertEquals('G_NAME',$group->getName());
-    }
-    /**
-     * @test
-     */
-    public function testSetParentGroup00() {
-        $child = new PrivilegesGroup('CH_GROUP_1', 'Child Group #1');
-        $parentGroup = new PrivilegesGroup('PARENT_1', 'Parent Group #1');
-        $this->assertFalse($child->setParentGroup($child));
-        $this->assertTrue($child->setParentGroup($parentGroup));
-        $this->assertSame($parentGroup,$child->getParentGroup());
-        $this->assertEquals(1,count($child->getParentGroup()->childGroups()));
-        $this->assertSame($child,$parentGroup->childGroups()[0]);
-        return [
-            'child'=>$child,
-            'parent'=>$parentGroup
-        ];
-    }
-    /**
-     * @test
-     * @depends testSetParentGroup00
-     * @param $gArr Description
-     */
-    public function testRemoveParentGroup00($gArr) {
-        $this->assertTrue($gArr['child']->setParentGroup());
-        $this->assertEquals(0,count($gArr['parent']->childGroups()));
-        $this->assertNull($gArr['child']->getParentGroup());
-    }
-    /**
-     * @test
-     */
-    public function testRemoveParentGroup01() {
-        $child = new PrivilegesGroup('CH_GROUP_1', 'Child Group #1');
-        $this->assertFalse($child->setParentGroup());
     }
     /**
      * @test
@@ -132,6 +101,23 @@ class PrivilegesGroupTest extends TestCase{
     }
     /**
      * @test
+     * @depends testSetParentGroup00
+     * @param $gArr Description
+     */
+    public function testRemoveParentGroup00($gArr) {
+        $this->assertTrue($gArr['child']->setParentGroup());
+        $this->assertEquals(0,count($gArr['parent']->childGroups()));
+        $this->assertNull($gArr['child']->getParentGroup());
+    }
+    /**
+     * @test
+     */
+    public function testRemoveParentGroup01() {
+        $child = new PrivilegesGroup('CH_GROUP_1', 'Child Group #1');
+        $this->assertFalse($child->setParentGroup());
+    }
+    /**
+     * @test
      */
     public function testSetID00() {
         $parent = new PrivilegesGroup('Parent');
@@ -158,6 +144,23 @@ class PrivilegesGroupTest extends TestCase{
         $this->assertFalse($childOfChild->setID('Parent'));
         $this->assertFalse($childOfChild->setID('Child'));
         $this->assertFalse($parent->setID('Child_of_child'));
+    }
+    /**
+     * @test
+     */
+    public function testSetParentGroup00() {
+        $child = new PrivilegesGroup('CH_GROUP_1', 'Child Group #1');
+        $parentGroup = new PrivilegesGroup('PARENT_1', 'Parent Group #1');
+        $this->assertFalse($child->setParentGroup($child));
+        $this->assertTrue($child->setParentGroup($parentGroup));
+        $this->assertSame($parentGroup,$child->getParentGroup());
+        $this->assertEquals(1,count($child->getParentGroup()->childGroups()));
+        $this->assertSame($child,$parentGroup->childGroups()[0]);
+
+        return [
+            'child' => $child,
+            'parent' => $parentGroup
+        ];
     }
     /**
      * 

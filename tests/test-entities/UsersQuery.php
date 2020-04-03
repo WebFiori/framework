@@ -1,16 +1,16 @@
 <?php
 namespace webfiori\tests\database;
+
+use phMysql\MySQLColumn;
 use phMysql\MySQLQuery;
 use phMysql\MySQLTable;
-use phMysql\MySQLColumn;
 use webfiori\entity\User;
 /**
  * Description of UsersQuery
  *
  * @author Ibrahim
  */
-class UsersQuery extends MySQLQuery{
-    
+class UsersQuery extends MySQLQuery {
     /**
      *
      * @var MySQLTable 
@@ -20,22 +20,16 @@ class UsersQuery extends MySQLQuery{
         parent::__construct();
         $this->table = new MySQLTable('user_meta');
         $this->table->addDefaultCols([
-            'id'=>[
-                'key-name'=>'user-id',
-                'db-name'=>'id'
+            'id' => [
+                'key-name' => 'user-id',
+                'db-name' => 'id'
             ],
-            'created-on'=>[],
-            'last-updated'=>[]
+            'created-on' => [],
+            'last-updated' => []
         ]);
         $this->table->addColumn('username', new MySQLColumn('username', 'varchar', 125));
         $this->table->addColumn('password', new MySQLColumn('pass', 'varchar', 125));
         $this->setTable($this->table);
-    }
-    /**
-     * @return MySQLTable Description
-     */
-    public function getStructure() {
-        return $this->table;
     }
     /**
      * 
@@ -43,8 +37,14 @@ class UsersQuery extends MySQLQuery{
      */
     public function addUser($user) {
         $this->insertRecord([
-            'username'=>$user->getUserName(),
-            'password'=>$user->getPassword()
+            'username' => $user->getUserName(),
+            'password' => $user->getPassword()
         ]);
+    }
+    /**
+     * @return MySQLTable Description
+     */
+    public function getStructure() {
+        return $this->table;
     }
 }

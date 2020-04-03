@@ -23,10 +23,9 @@
  * THE SOFTWARE.
  */
 namespace webfiori\entity;
+
 use jsonx\JsonI;
 use jsonx\JsonX;
-use webfiori\entity\File;
-use webfiori\entity\Util;
 /**
  * A helper class that is used to upload most types of files to the server's file system.
  * The main aim of this class is to allow the developer to upload files 
@@ -40,24 +39,170 @@ use webfiori\entity\Util;
  * <li>The ability to get MIME type of most file types using file extension only.<li>
  * </ul>
  * A basic example on how to use this class:
-<pre>
-    $uploader = new Uploader();
-    //allow png only
-    $uploader->addExt('png');
-    $uploader->setUploadDir('\home\my-site\uploads');
-    //the value of the attribute 'name' of file input
-    $uploader->setAssociatedFileName('user-files');
-    //upload files
-    $files = $uploader->upload();
-    //now we can check upload status of each file.
-    foreach($files as $fileArr){
-        //...
-    }
-</pre>
+ * <pre>
+ * $uploader = new Uploader();
+ * //allow png only
+ * $uploader->addExt('png');
+ * $uploader->setUploadDir('\home\my-site\uploads');
+ * //the value of the attribute 'name' of file input
+ * $uploader->setAssociatedFileName('user-files');
+ * //upload files
+ * $files = $uploader->upload();
+ * //now we can check upload status of each file.
+ * foreach($files as $fileArr){
+ * //...
+ * }
+ * </pre>
  * @author Ibrahim
  * @version 1.2.2
  */
-class Uploader implements JsonI{
+class Uploader implements JsonI {
+    /**
+     * An array of supported file types and their MIME types.
+     * @var array 
+     * @since 1.1
+     * @deprecated since 1.2.1
+     */
+    const ALLOWED_FILE_TYPES = [
+        //audio and video
+        'avi' => [
+            'mime' => 'video/avi',
+            'ext' => 'avi'
+        ],
+        'mp3' => [
+            'mime' => 'audio/mpeg',
+            'ext' => 'mp3'
+        ],
+        '3gp' => [
+            'mime' => 'video/3gpp',
+            'ext' => '3gp'
+        ],
+        'mp4' => [
+            'mime' => 'video/mp4',
+            'ext' => 'mp4'
+        ],
+        'mov' => [
+            'mime' => 'video/quicktime',
+            'ext' => 'mov'
+        ],
+        'wmv' => [
+            'mime' => 'video/x-ms-wmv',
+            'ext' => 'wmv'
+        ],
+        'mov' => [
+            'mime' => 'video/quicktime',
+            'ext' => 'mov'
+        ],
+        'flv' => [
+            'mime' => 'video/x-flv',
+            'ext' => 'flv'
+        ],
+        'midi' => [
+            'mime' => 'audio/midi',
+            'ext' => 'midi'
+        ],
+        //images 
+        'jpeg' => [
+            'mime' => 'image/jpeg',
+            'ext' => 'jpeg'
+        ],
+        'jpg' => [
+            'mime' => 'image/jpeg',
+            'ext' => 'jpg'
+        ],
+        'png' => [
+            'mime' => 'image/png',
+            'ext' => 'png'
+        ],
+        'bmp' => [
+            'mime' => 'image/bmp',
+            'ext' => 'bmp'
+        ],
+        'ico' => [
+            'mime' => 'image/x-icon',
+            'ext' => 'ico'
+        ],
+        //pdf 
+        'pdf' => [
+            'mime' => 'application/pdf',
+            'ext' => 'pdf'
+        ],
+        //MS office documents
+        'doc' => [
+            'mime' => 'application/msword',
+            'ext' => 'doc'
+        ],
+        'docx' => [
+            'mime' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            'ext' => 'docx'
+        ],
+        'xls' => [
+            'mime' => 'application/vnd.ms-excel',
+            'ext' => 'xls'
+        ],
+        'ppt' => [
+            'mime' => 'application/vnd.ms-powerpoint',
+            'ext' => 'ppt'
+        ],
+        'pptx' => [
+            'mime' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+            'ext' => 'pptx'
+        ],
+        'xlsx' => [
+            'mime' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'ext' => 'xlsx'
+        ],
+        //other text based files
+        'txt' => [
+            'mime' => 'text/plain',
+            'ext' => 'txt'
+        ],
+        'php' => [
+            'mime' => 'text/plain',
+            'ext' => 'php'
+        ],
+        'css' => [
+            'mime' => 'text/css',
+            'ext' => 'css'
+        ],
+        'js' => [
+            'mime' => 'text/javascribt',
+            'ext' => 'js'
+        ],
+        'asm' => [
+            'mime' => 'text/x-asm',
+            'ext' => 'asm'
+        ],
+        'java' => [
+            'mime' => 'text/x-java-source',
+            'ext' => 'java'
+        ],
+        'log' => [
+            'mime' => 'text/plain',
+            'ext' => 'log'
+        ],
+        'asp' => [
+            'mime' => 'text/asp',
+            'ext' => 'asp'
+        ],
+        //other files
+        'zip' => [
+            'mime' => 'application/zip',
+            'ext' => 'zip'
+        ],
+        'exe' => [
+            'mime' => 'application/vnd.microsoft.portable-executable',
+            'ext' => 'exe'
+        ],
+        'psd' => [
+            'mime' => 'application/octet-stream',
+            'ext' => 'psd'
+        ],
+        'ai' => [
+            'mime' => 'application/postscript',
+            'ext' => 'ai'
+        ]
+    ];
     /**
      * A constant that is used to indicates upload directory does not exists.
      * It usually returned by some methods as error code.
@@ -65,167 +210,15 @@ class Uploader implements JsonI{
      */
     const NO_SUCH_DIR = 'no_such_dir';
     /**
-     * A constant that is used to indicates uploaded file type is not allowed.
-     * @since 1.0
-     */
-    const NOT_ALLOWED = 'not_allowed_type';
-    /**
      * A constant that is used to indicates that a file does not exists.
      * @since 1.0
      */
     const NO_SUCH_FILE = 'no_such_file';
     /**
-     * An array of supported file types and their MIME types.
-     * @var array 
-     * @since 1.1
-     * @deprecated since 1.2.1
+     * A constant that is used to indicates uploaded file type is not allowed.
+     * @since 1.0
      */
-    const ALLOWED_FILE_TYPES = array(
-        //audio and video
-        'avi'=>array(
-            'mime'=>'video/avi',
-            'ext'=>'avi'
-        ),
-        'mp3'=>array(
-            'mime'=>'audio/mpeg',
-            'ext'=>'mp3'
-        ),
-        '3gp'=>array(
-            'mime'=>'video/3gpp',
-            'ext'=>'3gp'
-        ),
-        'mp4'=>array(
-            'mime'=>'video/mp4',
-            'ext'=>'mp4'
-        ),
-        'mov'=>array(
-            'mime'=>'video/quicktime',
-            'ext'=>'mov'
-        ),
-        'wmv'=>array(
-            'mime'=>'video/x-ms-wmv',
-            'ext'=>'wmv'
-        ),
-        'mov'=>array(
-            'mime'=>'video/quicktime',
-            'ext'=>'mov'
-        ),
-        'flv'=>array(
-            'mime'=>'video/x-flv',
-            'ext'=>'flv'
-        ),
-        'midi'=>array(
-            'mime'=>'audio/midi',
-            'ext'=>'midi'
-        ),
-        //images 
-        'jpeg'=>array(
-            'mime'=>'image/jpeg',
-            'ext'=>'jpeg'
-        ),
-        'jpg'=>array(
-            'mime'=>'image/jpeg',
-            'ext'=>'jpg'
-        ),
-        'png'=>array(
-            'mime'=>'image/png',
-            'ext'=>'png'
-        ),
-        'bmp'=>array(
-            'mime'=>'image/bmp',
-            'ext'=>'bmp'
-        ),
-        'ico'=>array(
-            'mime'=>'image/x-icon',
-            'ext'=>'ico'
-        ),
-        //pdf 
-        'pdf'=>array(
-            'mime'=>'application/pdf',
-            'ext'=>'pdf'
-        ),
-        //MS office documents
-        'doc'=>array(
-            'mime'=>'application/msword',
-            'ext'=>'doc'
-        ),
-        'docx'=>array(
-            'mime'=>'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            'ext'=>'docx'
-        ),
-        'xls'=>array(
-            'mime'=>'application/vnd.ms-excel',
-            'ext'=>'xls'
-        ),
-        'ppt'=>array(
-            'mime'=>'application/vnd.ms-powerpoint',
-            'ext'=>'ppt'
-        ),
-        'pptx'=>array(
-            'mime'=>'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-            'ext'=>'pptx'
-        ),
-        'xlsx'=>array(
-            'mime'=>'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            'ext'=>'xlsx'
-        ),
-        //other text based files
-        'txt'=>array(
-            'mime'=>'text/plain',
-            'ext'=>'txt'
-        ),
-        'php'=>array(
-            'mime'=>'text/plain',
-            'ext'=>'php'
-        ),
-        'css'=>array(
-            'mime'=>'text/css',
-            'ext'=>'css'
-        ),
-        'js'=>array(
-            'mime'=>'text/javascribt',
-            'ext'=>'js'
-        ),
-        'asm'=>array(
-            'mime'=>'text/x-asm',
-            'ext'=>'asm'
-        ),
-        'java'=>array(
-            'mime'=>'text/x-java-source',
-            'ext'=>'java'
-        ),
-        'log'=>array(
-            'mime'=>'text/plain',
-            'ext'=>'log'
-        ),
-        'asp'=>array(
-            'mime'=>'text/asp',
-            'ext'=>'asp'
-        ),
-        //other files
-        'zip'=>array(
-            'mime'=>'application/zip',
-            'ext'=>'zip'
-        ),
-        'exe'=>array(
-            'mime'=>'application/vnd.microsoft.portable-executable',
-            'ext'=>'exe'
-        ),
-        'psd'=>array(
-            'mime'=>'application/octet-stream',
-            'ext'=>'psd'
-        ),
-        'ai'=>array(
-            'mime'=>'application/postscript',
-            'ext'=>'ai'
-        )
-    );
-    /**
-     * An array which contains uploaded files.
-     * @var array
-     * @since 1.0 
-     */
-    private $files;
+    const NOT_ALLOWED = 'not_allowed_type';
     /**
      * A constant to indicate that a file type is not allowed to be uploaded.
      * @since 1.1
@@ -243,6 +236,24 @@ class Uploader implements JsonI{
      */
     private $asscociatedName;
     /**
+     * An array that contains all the allowed file types.
+     * @var array An array of strings. 
+     * @since 1.0
+     */
+    private $extentions = [];
+    /**
+     * An array which contains uploaded files.
+     * @var array
+     * @since 1.0 
+     */
+    private $files;
+    /**
+     * The directory at which the file (or files) will be uploaded to.
+     * @var string A directory. 
+     * @since 1.0
+     */
+    private $uploadDir;
+    /**
      * Upload status message.
      * @var string
      * @since 1.0 
@@ -254,53 +265,90 @@ class Uploader implements JsonI{
      */
     public function __construct() {
         $this->uploadStatusMessage = 'NO ACTION';
-        $this->files = array();
+        $this->files = [];
         $this->setAssociatedFileName('files');
     }
     /**
-     * The directory at which the file (or files) will be uploaded to.
-     * @var string A directory. 
-     * @since 1.0
+     * Returns a JSON string that represents the object.
+     * The string will be something the the following:
+     * <pre>
+     * {
+     * &nbsp&nbsp"upload-directory":"",
+     * &nbsp&nbsp"allowed-types":[],
+     * &nbsp&nbsp"files":[],
+     * &nbsp&nbsp"associated-file-name":""
+     * }
+     * </pre>
+     * @return string A JSON string.
      */
-    private $uploadDir;
+    public function __toString() {
+        return $this->toJSON().'';
+    }
     /**
-     * An array that contains all the allowed file types.
-     * @var array An array of strings. 
+     * Adds new extension to the array of allowed files types.
+     * @param string $ext File extension (e.g. jpg, png, pdf).
+     * @return boolean If the extension is added, the method will return true.
      * @since 1.0
      */
-    private $extentions = [];
-    /**
-     * Sets the directory at which the file will be uploaded to.
-     * This method does not check whether the directory is exist or not. It 
-     * just validate that the structure of the path is valid by replacing 
-     * forward slashes with backward slashes. The directory will never update 
-     * if the given string is empty.
-     * @param string $dir Upload Directory (such as '/files/uploads' or 
-     * 'C:/Server/uploads'). 
-     * @return boolean If upload directory was updated, the method will 
-     * return true. If not updated, the method will return false.
-     * @since 1.0
-     */
-    public function setUploadDir($dir){
-        $retVal = false;
-        $len = strlen($dir);
-        if($len > 0){
-            while($dir[$len - 1] == '/' || $dir[$len - 1] == '\\'){
-                $tmpDir = trim($dir,'/');
-                $dir = trim($tmpDir,'\\');
-                $len = strlen($dir);
+    public function addExt($ext) {
+        $ext = str_replace('.', '', $ext);
+        $len = strlen($ext);
+        $retVal = true;
+
+        if ($len != 0) {
+            for ($x = 0 ; $x < $len ; $x++) {
+                $ch = $ext[$x];
+
+                if ($ch == '_' || ($ch >= 'a' && $ch <= 'z') || ($ch >= 'A' && $ch <= 'Z') || ($ch >= '0' && $ch <= '9')) {
+                } else {
+                    $retVal = false;
+                    break;
+                }
             }
-            while($dir[0] == '/' || $dir[0] == '\\'){
-                $tmpDir = trim($dir,'/');
-                $dir = trim($tmpDir,'\\');
+
+            if ($retVal === true) {
+                $this->extentions[] = $ext;
             }
-            if(strlen($dir) > 0){
-                $dir = str_replace('/', '\\', $dir);
-                $this->uploadDir = !Util::isDirectory($dir) ? '\\'.$dir : $dir;
-                $retVal = true;
-            }
+        } else {
+            $retVal = false;
         }
+
         return $retVal;
+    }
+    /**
+     * Adds multiple extensions at once to the set of allowed files types.
+     * @param array $arr An array of strings. Each string represents a file type.
+     * @return array The method will return an associative array of booleans. 
+     * The key value will be the extension name and the value represents the status 
+     * of the addition. If added, it well be set to true.
+     * @since 1.2.2
+     */
+    public function addExts($arr) {
+        $retVal = [];
+
+        foreach ($arr as $ext) {
+            $retVal[] = $this->addExt($ext);
+        }
+
+        return $retVal;
+    }
+    /**
+     * Returns the name of the index at which the uploaded files will exist on in the array $_FILES.
+     * This value represents the value of the attribute 'name' of the files input 
+     * in case of HTML forms.
+     * @return string the name of the index at which the uploaded files will exist on in the array $_FILES.
+     * Default value is 'files'.
+     */
+    public function getAssociatedFileName() {
+        return $this->asscociatedName;
+    }
+    /**
+     * Returns the array that contains all allowed file types.
+     * @return array
+     * @since 1.0
+     */
+    public function getExts() {
+        return $this->extentions;
     }
     /**
      * Returns an array which contains all information about the uploaded files.
@@ -325,65 +373,21 @@ class Uploader implements JsonI{
         return $this->files;
     }
     /**
-     * Adds multiple extensions at once to the set of allowed files types.
-     * @param array $arr An array of strings. Each string represents a file type.
-     * @return array The method will return an associative array of booleans. 
-     * The key value will be the extension name and the value represents the status 
-     * of the addition. If added, it well be set to true.
-     * @since 1.2.2
-     */
-    public function addExts($arr) {
-        $retVal = [];
-        foreach ($arr as $ext){
-            $retVal[] = $this->addExt($ext);
-        }
-        return $retVal;
-    }
-    /**
-     * Adds new extension to the array of allowed files types.
-     * @param string $ext File extension (e.g. jpg, png, pdf).
-     * @return boolean If the extension is added, the method will return true.
+     * Returns MIME type of a file extension.
+     * @param string $ext File extension without the suffix (such as 'jpg').
+     * @return string|null If the extension MIME type is found, it will be 
+     * returned. If not, the method will return null.
      * @since 1.0
+     * @deprecated since 1.2.1
      */
-    public function addExt($ext){
-        $ext = str_replace('.', '', $ext);
-        $len = strlen($ext);
-        $retVal = true;
-        if($len != 0){
-            for($x = 0 ; $x < $len ; $x++){
-                $ch = $ext[$x];
-                if($ch == '_' || ($ch >= 'a' && $ch <= 'z') || ($ch >= 'A' && $ch <= 'Z') || ($ch >= '0' && $ch <= '9')){
-                    
-                }
-                else{
-                    $retVal = false;
-                    break;
-                }
-            }
-            if($retVal === true){
-                $this->extentions[] = $ext;
-            }
+    public static function getMIMEType($ext) {
+        $retVal = null;
+        $x = self::ALLOWED_FILE_TYPES[strtolower($ext)];
+
+        if ($x !== null) {
+            $retVal = $x['mime'];
         }
-        else{
-            $retVal = false;
-        }
-        return $retVal;
-    }
-    /**
-     * Removes an extension from the array of allowed files types.
-     * @param string $ext File extension= (e.g. jpg, png, pdf,...).
-     * @return boolean If the extension was removed, the method will return true.
-     * @since 1.0
-     */
-    public function removeExt($ext){
-        $count = count($this->extentions);
-        $retVal = false;
-        for($x = 0 ; $x < $count ; $x++){
-            if($this->extentions[$x] == $ext){
-                unset($this->extentions[$x]);
-                $retVal = true;
-            }
-        }
+
         return $retVal;
     }
     /**
@@ -392,8 +396,27 @@ class Uploader implements JsonI{
      * @since 1.0
      * 
      */
-    public function getUploadDir(){
+    public function getUploadDir() {
         return $this->uploadDir;
+    }
+    /**
+     * Removes an extension from the array of allowed files types.
+     * @param string $ext File extension= (e.g. jpg, png, pdf,...).
+     * @return boolean If the extension was removed, the method will return true.
+     * @since 1.0
+     */
+    public function removeExt($ext) {
+        $count = count($this->extentions);
+        $retVal = false;
+
+        for ($x = 0 ; $x < $count ; $x++) {
+            if ($this->extentions[$x] == $ext) {
+                unset($this->extentions[$x]);
+                $retVal = true;
+            }
+        }
+
+        return $retVal;
     }
     /**
      * Sets The name of the index at which the file is stored in the array $_FILES.
@@ -402,84 +425,75 @@ class Uploader implements JsonI{
      * input element.
      * @since 1.0
      */
-    public function setAssociatedFileName($name){
+    public function setAssociatedFileName($name) {
         $this->asscociatedName = $name;
     }
     /**
-     * Returns the array that contains all allowed file types.
-     * @return array
+     * Sets the directory at which the file will be uploaded to.
+     * This method does not check whether the directory is exist or not. It 
+     * just validate that the structure of the path is valid by replacing 
+     * forward slashes with backward slashes. The directory will never update 
+     * if the given string is empty.
+     * @param string $dir Upload Directory (such as '/files/uploads' or 
+     * 'C:/Server/uploads'). 
+     * @return boolean If upload directory was updated, the method will 
+     * return true. If not updated, the method will return false.
      * @since 1.0
      */
-    public function getExts(){
-        return $this->extentions;
-    }
-    /**
-     * Returns MIME type of a file extension.
-     * @param string $ext File extension without the suffix (such as 'jpg').
-     * @return string|null If the extension MIME type is found, it will be 
-     * returned. If not, the method will return null.
-     * @since 1.0
-     * @deprecated since 1.2.1
-     */
-    public static function getMIMEType($ext){
-        $retVal = null;
-        $x = self::ALLOWED_FILE_TYPES[strtolower($ext)];
-        if($x !== null){
-            $retVal = $x['mime'];
+    public function setUploadDir($dir) {
+        $retVal = false;
+        $len = strlen($dir);
+
+        if ($len > 0) {
+            while ($dir[$len - 1] == '/' || $dir[$len - 1] == '\\') {
+                $tmpDir = trim($dir,'/');
+                $dir = trim($tmpDir,'\\');
+                $len = strlen($dir);
+            }
+
+            while ($dir[0] == '/' || $dir[0] == '\\') {
+                $tmpDir = trim($dir,'/');
+                $dir = trim($tmpDir,'\\');
+            }
+
+            if (strlen($dir) > 0) {
+                $dir = str_replace('/', '\\', $dir);
+                $this->uploadDir = !Util::isDirectory($dir) ? '\\'.$dir : $dir;
+                $retVal = true;
+            }
         }
+
         return $retVal;
     }
     /**
-     * Checks if uploaded file is allowed or not.
-     * @param string $fileName The name of the file (such as 'image.png')
-     * @return boolean If file extension is in the array of allowed types, 
-     * the method will return true.
+     * Returns a JSON representation of the object.
+     * @return JsonX an object of type <b>JsonX</b>
      * @since 1.0
      */
-    private function isValidExt($fileName){
-        $ext = pathinfo($fileName, PATHINFO_EXTENSION);
-        $retVal = in_array($ext, $this->getExts(),true) || in_array(strtolower($ext), $this->getExts(),true);
-        return $retVal;
-    }
-    /**
-     * Checks if PHP upload code is error or not.
-     * @param int $code PHP upload code.
-     * @return boolean If the given code does not equal to UPLOAD_ERR_OK, the 
-     * method will return true.
-     * @since 1.0
-     */
-    private function isError($code){
-        switch($code){
-            case UPLOAD_ERR_OK:{
-                $this->uploadStatusMessage = 'File Uploaded';
-                return false;
-            }
-            case UPLOAD_ERR_INI_SIZE:{
-                $this->uploadStatusMessage = 'File Size is Larger Than '. (ini_get('upload_max_filesize')/1000).'KB. Found in php.ini.';
-                break;
-            }
-            case UPLOAD_ERR_FORM_SIZE:{
-                $this->uploadStatusMessage = 'File Size is Larger Than '.($this->getLimit()/1000).'KB';
-                break;
-            }
-            case UPLOAD_ERR_PARTIAL:{
-                $this->uploadStatusMessage = 'File Uploaded Partially';
-                break;
-            }
-            case UPLOAD_ERR_NO_FILE:{
-                $this->uploadStatusMessage = 'No File was Uploaded';
-                break;
-            }
-            case UPLOAD_ERR_NO_TMP_DIR:{
-                $this->uploadStatusMessage = 'Temporary Folder is Missing';
-                break;
-            }
-            case UPLOAD_ERR_CANT_WRITE:{
-                $this->uploadStatusMessage = 'Faild to Write File to Disk';
-                break;
-            }
+    public function toJSON() {
+        $j = new JsonX();
+        $j->add('upload-directory', $this->getUploadDir());
+        $j->add('associated-file-name', $this->getAssociatedFileName());
+        $j->add('allowed-types', $this->getExts());
+        $fsArr = [];
+
+        foreach ($this->getFiles() as $fArr) {
+            $fileJson = new JsonX();
+            $fileJson->add('file-name', $fArr['name']);
+            $fileJson->add('size', $fArr['size']);
+            $fileJson->add('upload-path', $fArr['upload-path']);
+            $fileJson->add('upload-error', $fArr['upload-error']);
+            $mime = isset($fArr['mime']) ? $fArr['mime'] : null;
+            $fileJson->add('mime', $mime);
+            $isExist = isset($fArr['is-exist']) ? $fArr['is-exist'] === true : false;
+            $fileJson->add('is-exist', $isExist);
+            $isReplace = isset($fArr['is-replace']) ? $fArr['is-replace'] === true : false;
+            $fileJson->add('is-replace',$isReplace);
+            $fsArr[] = $fileJson;
         }
-        return true;
+        $j->add('files', $fsArr);
+
+        return $j;
     }
     /**
      * Upload the file to the server.
@@ -499,94 +513,92 @@ class Uploader implements JsonI{
      * <li><b>uploaded</b>: A boolean. Set to true if the file was uploaded.</li>
      * </ul>
      */
-    public function upload($replaceIfExist = false){
+    public function upload($replaceIfExist = false) {
         $this->files = [];
         $reqMeth = filter_var($_SERVER['REQUEST_METHOD'],FILTER_SANITIZE_STRING);
-        if($reqMeth == 'POST'){
+
+        if ($reqMeth == 'POST') {
             $fileOrFiles = null;
-            if(isset($_FILES[$this->asscociatedName])){
+
+            if (isset($_FILES[$this->asscociatedName])) {
                 $fileOrFiles = $_FILES[$this->asscociatedName];
             }
-            if($fileOrFiles !== null){
-                if(gettype($fileOrFiles['name']) == 'array'){
+
+            if ($fileOrFiles !== null) {
+                if (gettype($fileOrFiles['name']) == 'array') {
                     //multi-upload
                     $filesCount = count($fileOrFiles['name']);
-                    for($x = 0 ; $x < $filesCount ; $x++){
+
+                    for ($x = 0 ; $x < $filesCount ; $x++) {
                         $fileInfoArr = [];
                         $fileInfoArr['name'] = $fileOrFiles['name'][$x];
                         $fileInfoArr['size'] = $fileOrFiles['size'][$x];
                         $fileInfoArr['upload-path'] = $this->getUploadDir();
                         $fileInfoArr['upload-error'] = 0;
                         //$fileInfoArr['url'] = 'N/A';
-                        if(!$this->isError($fileOrFiles['error'][$x])){
-                            if($this->isValidExt($fileInfoArr['name'])){
-                                if(Util::isDirectory($this->getUploadDir()) == true){
+                        if (!$this->isError($fileOrFiles['error'][$x])) {
+                            if ($this->isValidExt($fileInfoArr['name'])) {
+                                if (Util::isDirectory($this->getUploadDir()) == true) {
                                     $targetDir = $this->getUploadDir().'\\'.$fileInfoArr['name'];
                                     $targetDir = str_replace('\\', '/', $targetDir);
-                                    if(!file_exists($targetDir)){
+
+                                    if (!file_exists($targetDir)) {
                                         $fileInfoArr['is-exist'] = false;
                                         $fileInfoArr['is-replace'] = false;
                                         $sanitizedName = filter_input(FILTER_SANITIZE_STRING, $fileOrFiles["tmp_name"][$x]);
-                                        if(move_uploaded_file($sanitizedName, $targetDir)){
-                                            if(function_exists('mime_content_type')){
+
+                                        if (move_uploaded_file($sanitizedName, $targetDir)) {
+                                            if (function_exists('mime_content_type')) {
                                                 $fPath = str_replace('\\','/',$fileInfoArr['upload-path'].'/'.$fileInfoArr['name']);
                                                 $fileInfoArr['mime'] = mime_content_type($fPath);
-                                            }
-                                            else{
+                                            } else {
                                                 $ext = pathinfo($fileInfoArr['name'], PATHINFO_EXTENSION);
                                                 $fileInfoArr['mime'] = File::getMIMEType($ext);
                                             }
                                             $fileInfoArr['uploaded'] = true;
-                                        }
-                                        else{
+                                        } else {
                                             $fileInfoArr['uploaded'] = false;
                                         }
-                                    }
-                                    else{
-                                        if(function_exists('mime_content_type')){
+                                    } else {
+                                        if (function_exists('mime_content_type')) {
                                             $fPath = str_replace('\\','/',$fileInfoArr['upload-path'].'/'.$fileInfoArr['name']);
                                             $fileInfoArr['mime'] = mime_content_type($fPath);
-                                        }
-                                        else{
+                                        } else {
                                             $ext = pathinfo($fileInfoArr['name'], PATHINFO_EXTENSION);
                                             $fileInfoArr['mime'] = File::getMIMEType($ext);
                                         }
                                         $fileInfoArr['is-exist'] = true;
-                                        if($replaceIfExist){
+
+                                        if ($replaceIfExist) {
                                             $fileInfoArr['is-replace'] = true;
-                                            
+
                                             unlink($targetDir);
                                             $sanitizedName = filter_input(FILTER_SANITIZE_STRING, $fileOrFiles["tmp_name"][$x]);
-                                            if(move_uploaded_file($sanitizedName, $targetDir)){
+
+                                            if (move_uploaded_file($sanitizedName, $targetDir)) {
                                                 $fileInfoArr['uploaded'] = true;
-                                            }
-                                            else{
+                                            } else {
                                                 $fileInfoArr['uploaded'] = false;
                                             }
-                                        }
-                                        else{
+                                        } else {
                                             $fileInfoArr['is-replace'] = false;
                                         }
                                     }
-                                }
-                                else{
+                                } else {
                                     $fileInfoArr['upload-error'] = self::NO_SUCH_DIR;
                                     $fileInfoArr['uploaded'] = false;
                                 }
-                            }
-                            else{
+                            } else {
                                 $fileInfoArr['uploaded'] = false;
                                 $fileInfoArr['upload-error'] = self::NOT_ALLOWED;
                             }
-                        }
-                        else{
+                        } else {
                             $fileInfoArr['uploaded'] = false;
                             $fileInfoArr['upload-error'] = $fileOrFiles['error'][$x];
                         }
                         array_push($this->files, $fileInfoArr);
                     }
-                }
-                else{
+                } else {
                     //single file upload
                     $fileInfoArr = [];
                     $fileInfoArr['name'] = $fileOrFiles['name'];
@@ -595,67 +607,65 @@ class Uploader implements JsonI{
                     $fileInfoArr['upload-error'] = 0;
                     //$fileInfoArr['url'] = 'N/A';
                     $fileInfoArr['mime'] = 'N/A';
-                    if(!$this->isError($fileOrFiles['error'])){
-                        if($this->isValidExt($fileInfoArr['name'])){
-                            if(Util::isDirectory($this->getUploadDir()) == true){
+
+                    if (!$this->isError($fileOrFiles['error'])) {
+                        if ($this->isValidExt($fileInfoArr['name'])) {
+                            if (Util::isDirectory($this->getUploadDir()) == true) {
                                 $targetDir = $this->getUploadDir().'\\'.$fileInfoArr['name'];
                                 $targetDir = str_replace('\\', '/', $targetDir);
-                                if(!file_exists($targetDir)){
+
+                                if (!file_exists($targetDir)) {
                                     $fileInfoArr['is-exist'] = true;
                                     $fileInfoArr['is-replace'] = true;
                                     $sanitizedName = filter_input(FILTER_SANITIZE_STRING, $fileOrFiles["tmp_name"]);
-                                    if(move_uploaded_file($sanitizedName, $targetDir)){
+
+                                    if (move_uploaded_file($sanitizedName, $targetDir)) {
                                         $fileInfoArr['uploaded'] = true;
-                                        if(function_exists('mime_content_type')){
+
+                                        if (function_exists('mime_content_type')) {
                                             $fPath = str_replace('\\','/',$fileInfoArr['upload-path'].'/'.$fileInfoArr['name']);
                                             $fileInfoArr['mime'] = mime_content_type($fPath);
-                                        }
-                                        else{
+                                        } else {
                                             $ext = pathinfo($fileInfoArr['name'], PATHINFO_EXTENSION);
                                             $fileInfoArr['mime'] = File::getMIMEType($ext);
                                         }
-                                    }
-                                    else{
+                                    } else {
                                         $fileInfoArr['uploaded'] = false;
                                     }
-                                }
-                                else{
+                                } else {
                                     $fileInfoArr['is-exist'] = true;
-                                    if(function_exists('mime_content_type')){
+
+                                    if (function_exists('mime_content_type')) {
                                         $fPath = str_replace('\\','/',$fileInfoArr['upload-path'].'/'.$fileInfoArr['name']);
                                         $fileInfoArr['mime'] = mime_content_type($fPath);
-                                    }
-                                    else{
+                                    } else {
                                         $ext = pathinfo($fileInfoArr['name'], PATHINFO_EXTENSION);
                                         $fileInfoArr['mime'] = File::getMIMEType($ext);
                                     }
-                                    if($replaceIfExist){
+
+                                    if ($replaceIfExist) {
                                         $fileInfoArr['is-replace'] = true;
                                         unlink($targetDir);
                                         $sanitizedName = filter_input(FILTER_SANITIZE_STRING, $fileOrFiles["tmp_name"]);
-                                        if(move_uploaded_file($sanitizedName, $targetDir)){
+
+                                        if (move_uploaded_file($sanitizedName, $targetDir)) {
                                             $fileInfoArr['uploaded'] = true;
-                                        }
-                                        else{
+                                        } else {
                                             $fileInfoArr['uploaded'] = false;
                                         }
-                                    }
-                                    else{
+                                    } else {
                                         $fileInfoArr['is-replace'] = false;
                                     }
                                 }
-                            }
-                            else{
+                            } else {
                                 $fileInfoArr['upload-error'] = self::NO_SUCH_DIR;
                                 $fileInfoArr['uploaded'] = false;
                             }
-                        }
-                        else{
+                        } else {
                             $fileInfoArr['uploaded'] = false;
                             $fileInfoArr['upload-error'] = self::NOT_ALLOWED;
                         }
-                    }
-                    else{
+                    } else {
                         $fileInfoArr['uploaded'] = false;
                         $fileInfoArr['upload-error'] = $fileOrFiles['error'];
                     }
@@ -663,61 +673,62 @@ class Uploader implements JsonI{
                 }
             }
         }
+
         return $this->files;
     }
     /**
-     * Returns the name of the index at which the uploaded files will exist on in the array $_FILES.
-     * This value represents the value of the attribute 'name' of the files input 
-     * in case of HTML forms.
-     * @return string the name of the index at which the uploaded files will exist on in the array $_FILES.
-     * Default value is 'files'.
-     */
-    public function getAssociatedFileName(){
-        return $this->asscociatedName;
-    }
-    /**
-     * Returns a JSON representation of the object.
-     * @return JsonX an object of type <b>JsonX</b>
+     * Checks if PHP upload code is error or not.
+     * @param int $code PHP upload code.
+     * @return boolean If the given code does not equal to UPLOAD_ERR_OK, the 
+     * method will return true.
      * @since 1.0
      */
-    public function toJSON(){
-        $j = new JsonX();
-        $j->add('upload-directory', $this->getUploadDir());
-        $j->add('associated-file-name', $this->getAssociatedFileName());
-        $j->add('allowed-types', $this->getExts());
-        $fsArr = [];
-        foreach ($this->getFiles() as $fArr){
-            $fileJson = new JsonX();
-            $fileJson->add('file-name', $fArr['name']);
-            $fileJson->add('size', $fArr['size']);
-            $fileJson->add('upload-path', $fArr['upload-path']);
-            $fileJson->add('upload-error', $fArr['upload-error']);
-            $mime = isset($fArr['mime']) ? $fArr['mime'] : null;
-            $fileJson->add('mime', $mime);
-            $isExist = isset($fArr['is-exist']) ? $fArr['is-exist'] === true : false;
-            $fileJson->add('is-exist', $isExist);
-            $isReplace = isset($fArr['is-replace']) ? $fArr['is-replace'] === true : false;
-            $fileJson->add('is-replace',$isReplace );
-            $fsArr[] = $fileJson;
+    private function isError($code) {
+        switch ($code) {
+            case UPLOAD_ERR_OK:{
+                $this->uploadStatusMessage = 'File Uploaded';
+
+                return false;
+            }
+            case UPLOAD_ERR_INI_SIZE:{
+                $this->uploadStatusMessage = 'File Size is Larger Than '.(ini_get('upload_max_filesize') / 1000).'KB. Found in php.ini.';
+                break;
+            }
+            case UPLOAD_ERR_FORM_SIZE:{
+                $this->uploadStatusMessage = 'File Size is Larger Than '.($this->getLimit() / 1000).'KB';
+                break;
+            }
+            case UPLOAD_ERR_PARTIAL:{
+                $this->uploadStatusMessage = 'File Uploaded Partially';
+                break;
+            }
+            case UPLOAD_ERR_NO_FILE:{
+                $this->uploadStatusMessage = 'No File was Uploaded';
+                break;
+            }
+            case UPLOAD_ERR_NO_TMP_DIR:{
+                $this->uploadStatusMessage = 'Temporary Folder is Missing';
+                break;
+            }
+            case UPLOAD_ERR_CANT_WRITE:{
+                $this->uploadStatusMessage = 'Faild to Write File to Disk';
+                break;
+            }
         }
-        $j->add('files', $fsArr);
-        return $j;
+
+        return true;
     }
     /**
-     * Returns a JSON string that represents the object.
-     * The string will be something the the following:
-<pre>
-{
-&nbsp&nbsp"upload-directory":"",
-&nbsp&nbsp"allowed-types":[],
-&nbsp&nbsp"files":[],
-&nbsp&nbsp"associated-file-name":""
-}
-</pre>
-     * @return string A JSON string.
+     * Checks if uploaded file is allowed or not.
+     * @param string $fileName The name of the file (such as 'image.png')
+     * @return boolean If file extension is in the array of allowed types, 
+     * the method will return true.
+     * @since 1.0
      */
-    public function __toString() {
-        return $this->toJSON().'';
+    private function isValidExt($fileName) {
+        $ext = pathinfo($fileName, PATHINFO_EXTENSION);
+        $retVal = in_array($ext, $this->getExts(),true) || in_array(strtolower($ext), $this->getExts(),true);
+
+        return $retVal;
     }
 }
-

@@ -23,10 +23,11 @@
  * THE SOFTWARE.
  */
 namespace webfiori\entity\ui;
+
+use phpStructs\html\HTMLNode;
 use Throwable;
 use webfiori\entity\Page;
 use webfiori\entity\Util;
-use phpStructs\html\HTMLNode;
 /**
  * A page which is used to display exception information when it is thrown or 
  * any other errors.
@@ -46,25 +47,25 @@ class ServerErrView {
         Page::reset();
         Page::title('Uncaught Exception');
         Page::document()->getBody()->setStyle([
-            'color'=>'white',
-            'background-color'=>'#1a000d;'
+            'color' => 'white',
+            'background-color' => '#1a000d;'
         ]);
         $styles = new HTMLNode('style');
         $styles->addTextNode('.nice-red{'
-                    . 'color:#ff6666;'
-                    . '}'
-                    . '.mono{'
-                    . 'font-family:monospace;'
-                    . '}');
+                    .'color:#ff6666;'
+                    .'}'
+                    .'.mono{'
+                    .'font-family:monospace;'
+                    .'}');
         Page::document()->getHeadNode()->addChild($styles);
         $hNode = new HTMLNode('h1');
         $hNode->setStyle([
-            'color'=>'#ff4d4d'
+            'color' => '#ff4d4d'
         ]);
-        if($throwableOrErr instanceof Throwable){
-            
+
+        if ($throwableOrErr instanceof Throwable) {
             $hNode->addTextNode('500 - Server Error: Uncaught Exception.');
-            
+
             Page::insert($hNode);
             Page::insert($this->_createMessageLine('Exception Class:', get_class($throwableOrErr)));
             Page::insert($this->_createMessageLine('Exception Message:', $throwableOrErr->getMessage()));
@@ -75,8 +76,7 @@ class ServerErrView {
             $stackTrace = new HTMLNode('pre');
             $stackTrace->addTextNode($throwableOrErr->getTraceAsString());
             Page::insert($stackTrace);
-        }
-        else{
+        } else {
             $hNode->addTextNode('500 - Server Error');
             Page::insert($this->_createMessageLine('Type:', Util::ERR_TYPES[$throwableOrErr["type"]]['type']));
             Page::insert($this->_createMessageLine('Description:', Util::ERR_TYPES[$throwableOrErr["type"]]['description']));
@@ -84,6 +84,15 @@ class ServerErrView {
             Page::insert($this->_createMessageLine('File: ', $throwableOrErr["file"]));
             Page::insert($this->_createMessageLine('Line: ', $throwableOrErr["line"]));
         }
+    }
+    /**
+     * Show the view.
+     * Note that the method will also send a 500 - Server Error response code.
+     * @since 1.0
+     */
+    public function display() {
+        http_response_code(500);
+        Page::render();
     }
     /**
      * 
@@ -102,15 +111,7 @@ class ServerErrView {
         $infoNode->setClassName('mono');
         $infoNode->addTextNode($info);
         $node->addChild($infoNode);
+
         return $node;
-    }
-    /**
-     * Show the view.
-     * Note that the method will also send a 500 - Server Error response code.
-     * @since 1.0
-     */
-    public function display() {
-        http_response_code(500);
-        Page::render();
     }
 }

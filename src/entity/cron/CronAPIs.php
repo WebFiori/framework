@@ -23,57 +23,61 @@
  * THE SOFTWARE.
  */
 namespace webfiori\entity\cron;
+
+use jsonx\JsonX;
 use restEasy\APIAction;
 use restEasy\RequestParameter;
-use webfiori\WebFiori;
 use webfiori\entity\ExtendedWebServices;
-use webfiori\entity\cron\Cron;
-use jsonx\JsonX;
+use webfiori\WebFiori;
 /**
  * A set of web services which is used to control basic 
  * cron functions.
  *
  * @author Ibrahim
  */
-class CronAPIs extends ExtendedWebServices{
+class CronAPIs extends ExtendedWebServices {
     public function __construct() {
         parent::__construct();
         $a00 = new APIAction('login');
         $a00->addRequestMethod('post');
         $a00->addParameter(new RequestParameter('password'));
         $this->addAction($a00);
-        
+
         $a01 = new APIAction('force-execution');
         $a01->addRequestMethod('post');
         $a01->addParameter(new RequestParameter('job-name'));
         $this->addAction($a01,true);
-        
+
         $a02 = new APIAction('logout');
         $a02->addRequestMethod('post');
         $a02->addRequestMethod('get');
         $this->addAction($a02);
     }
-    public function isAuthorized(){
+    public function isAuthorized() {
         return WebFiori::getWebsiteController()->getSessionVar('cron-login-status') === true;
     }
 
     public function processRequest() {
         $a = $this->getAction();
-        if($a == 'login'){
+
+        if ($a == 'login') {
             $this->_login();
-        }
-        else if($a == 'logout'){
-            WebFiori::getWebsiteController()->setSessionVar('cron-login-status',false);
-            $this->sendResponse('Logged out.', 'info');
-        }
-        else if($a == 'force-execution'){
-            $this->_forceExecution();
+        } else {
+            if ($a == 'logout') {
+                WebFiori::getWebsiteController()->setSessionVar('cron-login-status',false);
+                $this->sendResponse('Logged out.', 'info');
+            } else {
+                if ($a == 'force-execution') {
+                    $this->_forceExecution();
+                }
+            }
         }
     }
     private function _forceExecution() {
         $jobName = $this->getInputs()['job-name'];
         $result = Cron::run('', $jobName, true);
-        if(gettype($result) == 'array'){
+
+        if (gettype($result) == 'array') {
             $infoJ = new JsonX([],true);
             $infoJ->add('jobs-count', $result['total-jobs']);
             $infoJ->add('executed-count', $result['executed-count']);
@@ -81,27 +85,26 @@ class CronAPIs extends ExtendedWebServices{
             $infoJ->add('failed', $result['failed']);
             $infoJ->addArray('log', Cron::getLogArray());
             $this->sendResponse('Job Successfully Executed.', 'info', 200, $infoJ);
-        }
-        else{
+        } else {
             $this->sendResponse($result, 'info', 404);
         }
     }
-    private function _login(){
+    private function _login() {
         $cronPass = Cron::password();
-        if($cronPass != 'NO_PASSWORD'){
+
+        if ($cronPass != 'NO_PASSWORD') {
             $inputHash = hash('sha256', $this->getInputs()['password']);
-            if($inputHash == $cronPass){
+
+            if ($inputHash == $cronPass) {
                 WebFiori::getWebsiteController()->setSessionVar('cron-login-status', true);
                 $this->sendResponse('Success', 'info', 200);
-            }
-            else{
+            } else {
                 $this->sendResponse('Incorrect password', 'error', 404);
             }
-        }
-        else{
+        } else {
             $this->sendResponse('Success', 'info', 200);
         }
     }
-
 }
+
 return __NAMESPACE__;

@@ -2,6 +2,5 @@
 
 class LanguageCA {
     public function __construct() {
-        
     }
 }

@@ -23,6 +23,7 @@
  * THE SOFTWARE.
  */
 namespace webfiori\entity\mail;
+
 /**
  * A class that represents an email account which is used to send or receive messages.
  *
@@ -36,17 +37,11 @@ class SMTPAccount {
      */
     private $address;
     /**
-     * The user name that is used to login.
+     * Server address of the email account.
      * @var string
      * @since 1.0 
      */
-    private $userName;
-    /**
-     * The password of the user account.
-     * @var string
-     * @since 1.0 
-     */
-    private $password;
+    private $emailServerAddress;
     /**
      * The name of the email account.
      * @var string
@@ -54,11 +49,11 @@ class SMTPAccount {
      */
     private $name;
     /**
-     * Server address of the email account.
+     * The password of the user account.
      * @var string
      * @since 1.0 
      */
-    private $emailServerAddress;
+    private $password;
     /**
      * The port number that is used to access the email server.
      * @var int
@@ -66,17 +61,23 @@ class SMTPAccount {
      */
     private $port;
     /**
-     * A boolean value that is set to TRUE if connection uses TLS.
-     * @var boolean
-     * @since 1.0.1 
+     * The user name that is used to login.
+     * @var string
+     * @since 1.0 
      */
-    private $useTls;
+    private $userName;
     /**
      * A boolean value that is set to TRUE if connection uses SSL.
      * @var boolean
      * @since 1.0.1 
      */
     private $useSsl;
+    /**
+     * A boolean value that is set to TRUE if connection uses TLS.
+     * @var boolean
+     * @since 1.0.1 
+     */
+    private $useTls;
     /**
      * Creates new instance of the class.
      * @since 1.0.1
@@ -92,11 +93,101 @@ class SMTPAccount {
         $this->setAddress('');
     }
     /**
+     * Returns the email address.
+     * @return string The email address which will be used in the header 
+     * 'FROM' when sending an email. Default is empty string.
+     * @since 1.0
+     */
+    public function getAddress() {
+        return $this->address;
+    }
+    /**
+     * Returns the name of the email account.
+     * @return string The name of the email account. The name will be used in the header 
+     * 'FROM' when sending an email. Default is empty string.
+     * @since 1.0
+     */
+    public function getName() {
+        return $this->name;
+    }
+    /**
+     * Returns the password of the user account that is used to access email server.
+     * @return string The password of the user account that is used to access email server. 
+     * default is empty string.
+     * @since 1.0
+     */
+    public function getPassword() {
+        return $this->password;
+    }
+    /**
+     * Returns the port number of email server.
+     * @return int The port number of email server. Default is 465.
+     * @since 1.0
+     */
+    public function getPort() {
+        return $this->port;
+    }
+    /**
+     * Returns The address of the email server.
+     * @return string The address of the email server (such as 'mail.example.com'). 
+     * Default is empty string.
+     * @since 1.0
+     */
+    public function getServerAddress() {
+        return $this->emailServerAddress;
+    }
+    /**
+     * Returns the username that is used to access email server.
+     * @return string The username that is used to access email server. Default 
+     * is empty string.
+     * @since 1.0
+     */
+    public function getUsername() {
+        return $this->userName;
+    }
+    /**
+     * Sets the email address.
+     * @param string $address An email address.
+     */
+    public function setAddress($address) {
+        $this->address = trim($address);
+    }
+    /**
+     * Sets the name of the email account.
+     * @param string $name The name of the account (such as 'Programming Team'). 
+     * The name is used when sending an email message using the given SMTP account. 
+     * The name will be used in the header 
+     * 'FROM' when sending an email
+     * @since 1.0
+     */
+    public function setName($name) {
+        $this->name = trim($name);
+    }
+    /**
+     * Sets the password of the user account that is used to access email server.
+     * @param string $pass The password of the user account that is used to access email server.
+     * @since 1.0
+     */
+    public function setPassword($pass) {
+        $this->password = $pass;
+    }
+    /**
+     * Sets the port number of email server.
+     * @param int $port The port number of email server such as 25. It will 
+     * be only set if the given value is an integer and it is greater than 0.
+     * @since 1.0
+     */
+    public function setPort($port) {
+        if (gettype($port) == 'integer' && $port > 0) {
+            $this->port = $port;
+        }
+    }
+    /**
      * Sets the address of the email server.
      * @param string $addr The address of the email server (such as 'mail.example.com').
      * @since 1.0
      */
-    public function setServerAddress($addr){
+    public function setServerAddress($addr) {
         $this->emailServerAddress = trim($addr);
     }
     /**
@@ -140,97 +231,7 @@ class SMTPAccount {
      * @param string $u The username that is used to access email server.
      * @since 1.0
      */
-    public function setUsername($u){
+    public function setUsername($u) {
         $this->userName = trim($u);
-    }
-    /**
-     * Sets the password of the user account that is used to access email server.
-     * @param string $pass The password of the user account that is used to access email server.
-     * @since 1.0
-     */
-    public function setPassword($pass) {
-        $this->password = $pass;
-    }
-    /**
-     * Sets the email address.
-     * @param string $address An email address.
-     */
-    public function setAddress($address) {
-        $this->address = trim($address);
-    }
-    /**
-     * Sets the name of the email account.
-     * @param string $name The name of the account (such as 'Programming Team'). 
-     * The name is used when sending an email message using the given SMTP account. 
-     * The name will be used in the header 
-     * 'FROM' when sending an email
-     * @since 1.0
-     */
-    public function setName($name) {
-        $this->name = trim($name);
-    }
-    /**
-     * Returns the username that is used to access email server.
-     * @return string The username that is used to access email server. Default 
-     * is empty string.
-     * @since 1.0
-     */
-    public function getUsername(){
-        return $this->userName;
-    }
-    /**
-     * Returns the password of the user account that is used to access email server.
-     * @return string The password of the user account that is used to access email server. 
-     * default is empty string.
-     * @since 1.0
-     */
-    public function getPassword() {
-        return $this->password;
-    }
-    /**
-     * Returns the email address.
-     * @return string The email address which will be used in the header 
-     * 'FROM' when sending an email. Default is empty string.
-     * @since 1.0
-     */
-    public function getAddress() {
-        return $this->address;
-    }
-    /**
-     * Returns the name of the email account.
-     * @return string The name of the email account. The name will be used in the header 
-     * 'FROM' when sending an email. Default is empty string.
-     * @since 1.0
-     */
-    public function getName() {
-        return $this->name;
-    }
-    /**
-     * Returns The address of the email server.
-     * @return string The address of the email server (such as 'mail.example.com'). 
-     * Default is empty string.
-     * @since 1.0
-     */
-    public function getServerAddress() {
-        return $this->emailServerAddress;
-    }
-    /**
-     * Returns the port number of email server.
-     * @return int The port number of email server. Default is 465.
-     * @since 1.0
-     */
-    public function getPort() {
-        return $this->port;
-    }
-    /**
-     * Sets the port number of email server.
-     * @param int $port The port number of email server such as 25. It will 
-     * be only set if the given value is an integer and it is greater than 0.
-     * @since 1.0
-     */
-    public function setPort($port){
-        if(gettype($port) == 'integer' && $port > 0){
-            $this->port = $port;
-        }
     }
 }

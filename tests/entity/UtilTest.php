@@ -1,13 +1,14 @@
 <?php
 namespace webfiori\tests\entity;
-use webfiori\entity\Util;
+
 use PHPUnit\Framework\TestCase;
+use webfiori\entity\Util;
 /**
  * A test class for testing the class 'webfiori\entity\Util'.
  *
  * @author Ibrahim
  */
-class UtilTest extends TestCase{
+class UtilTest extends TestCase {
     /**
      * @test
      */
@@ -17,16 +18,16 @@ class UtilTest extends TestCase{
     /**
      * @test
      */
-    public function testGetWeekDayNum00() {
-        $this->assertEquals(7, Util::getGWeekday('2019-09-08'));
-        $this->assertEquals(1, Util::getGWeekday('2019-09-09'));
+    public function testGetRequestHeaders00() {
+        $this->assertEquals([
+            'host' => '127.0.0.1'
+        ], Util::getRequestHeaders());
     }
     /**
      * @test
      */
-    public function testGetRequestHeaders00() {
-        $this->assertEquals([
-            'host'=>'127.0.0.1'
-        ], Util::getRequestHeaders());
+    public function testGetWeekDayNum00() {
+        $this->assertEquals(7, Util::getGWeekday('2019-09-08'));
+        $this->assertEquals(1, Util::getGWeekday('2019-09-09'));
     }
 }

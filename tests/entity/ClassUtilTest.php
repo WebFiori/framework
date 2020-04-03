@@ -1,5 +1,6 @@
 <?php
 namespace webfiori\tests\entity;
+
 use PHPUnit\Framework\TestCase;
 use webfiori\entity\Util as U;
 /**
@@ -7,7 +8,36 @@ use webfiori\entity\Util as U;
  *
  * @author Ibrahim
  */
-class ClassUtilTest extends TestCase{
+class ClassUtilTest extends TestCase {
+    /**
+     * @test
+     */
+    public function testFilterScript00() {
+        $text = '<? echo "Hello World!"';
+        $this->assertEquals('&lt;? echo "Hello World!"', U::filterScripts($text));
+    }
+    /**
+     * @test
+     */
+    public function testFilterScript01() {
+        $text = '<?php echo "Hello World!"';
+        $this->assertEquals('&lt;?php echo "Hello World!"', U::filterScripts($text));
+    }
+    /**
+     * @test
+     */
+    public function testFilterScript02() {
+        $text = '<script>alert("hello world!")</script>';
+        $this->assertEquals('&lt;script&gt;alert("hello world!")&lt;/script&gt;', U::filterScripts($text));
+    }
+    /**
+     * @test
+     */
+    public function testIsUpper() {
+        $this->assertTrue(U::isUpper('A'));
+        $this->assertFalse(U::isUpper('a'));
+        $this->assertFalse(U::isUpper('أ'));
+    }
     /**
      * Testing the method Util::numericValue() with valid inputs.
      * @test
@@ -16,31 +46,31 @@ class ClassUtilTest extends TestCase{
         $num00 = U::numericValue('0');
         $this->assertEquals('integer', gettype($num00));
         $this->assertEquals(0, $num00);
-        
+
         $num01 = U::numericValue('1');
         $this->assertEquals('integer', gettype($num01));
         $this->assertEquals(1, $num01);
-        
+
         $num02 = U::numericValue('-1  ');
         $this->assertEquals('integer', gettype($num02));
         $this->assertEquals(-1, $num02);
-        
+
         $num03 = U::numericValue('  1.77654');
         $this->assertEquals('double', gettype($num03));
         $this->assertEquals(1.77654, $num03);
-        
+
         $num04 = U::numericValue('-31.77654  ');
         $this->assertEquals('double', gettype($num04));
         $this->assertEquals(-31.77654, $num04);
-        
+
         $num05 = U::numericValue('   7522467.75424789   ');
         $this->assertEquals('double', gettype($num05));
         $this->assertEquals(7522467.75424789, $num05);
-        
+
         $num06 = U::numericValue('6564323   ');
         $this->assertEquals('integer', gettype($num06));
         $this->assertEquals(6564323, $num06);
-        
+
         $num07 = U::numericValue('-6564323   ');
         $this->assertEquals('integer', gettype($num07));
         $this->assertEquals(-6564323, $num07);
@@ -52,22 +82,22 @@ class ClassUtilTest extends TestCase{
     public function testNumericValue01() {
         $num00 = U::numericValue('A');
         $this->assertFalse($num00);
-        
+
         $num01 = U::numericValue('');
         $this->assertFalse($num01);
-        
+
         $num02 = U::numericValue('--4');
         $this->assertFalse($num02);
-        
+
         $num03 = U::numericValue('1.88.4');
         $this->assertFalse($num03);
-        
+
         $num04 = U::numericValue(null);
         $this->assertFalse($num04);
-        
+
         $num05 = U::numericValue(true);
         $this->assertFalse($num05);
-        
+
         $num06 = U::numericValue(new \Exception());
         $this->assertFalse($num06);
     }
@@ -89,7 +119,7 @@ class ClassUtilTest extends TestCase{
      * @test
      */
     public function testReverse01() {
-        if(function_exists('mb_strlen')){
+        if (function_exists('mb_strlen')) {
             $this->assertEquals('ًالهأ', U::reverse('أهلاً'));
         }
     }
@@ -152,34 +182,5 @@ class ClassUtilTest extends TestCase{
      */
     public function testToBinaryString09() {
         $this->assertEquals('11110',U::binaryString(30));
-    }
-    /**
-     * @test
-     */
-    public function testIsUpper() {
-        $this->assertTrue(U::isUpper('A'));
-        $this->assertFalse(U::isUpper('a'));
-        $this->assertFalse(U::isUpper('أ'));
-    }
-    /**
-     * @test
-     */
-    public function testFilterScript00() {
-        $text = '<? echo "Hello World!"';
-        $this->assertEquals('&lt;? echo "Hello World!"', U::filterScripts($text));
-    }
-    /**
-     * @test
-     */
-    public function testFilterScript01() {
-        $text = '<?php echo "Hello World!"';
-        $this->assertEquals('&lt;?php echo "Hello World!"', U::filterScripts($text));
-    }
-    /**
-     * @test
-     */
-    public function testFilterScript02() {
-        $text = '<script>alert("hello world!")</script>';
-        $this->assertEquals('&lt;script&gt;alert("hello world!")&lt;/script&gt;', U::filterScripts($text));
     }
 }

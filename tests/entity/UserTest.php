@@ -1,14 +1,15 @@
 <?php
 namespace webfiori\tests\entity;
+
 use PHPUnit\Framework\TestCase;
-use webfiori\entity\User;
 use webfiori\entity\Access;
+use webfiori\entity\User;
 /**
  * A test class for testing the class 'webfiori\entity\User'.
  *
  * @author Ibrahim
  */
-class UserTest extends TestCase{
+class UserTest extends TestCase {
     /**
      * @test
      */
@@ -23,19 +24,8 @@ class UserTest extends TestCase{
         $this->assertNull($u->getRegDate());
         $this->assertNull($u->getDisplayName());
         $this->assertEquals(0,$u->getResetCount());
+
         return $u;
-    }
-    private function initPrivileges() {
-        Access::clear();
-        Access::newGroup('TOP_GROUP');
-        Access::newGroup('LOW_GROUP','TOP_GROUP');
-        Access::newGroup('EMPTY_GROUP');
-        Access::newPrivilege('TOP_GROUP', 'TOP_PR_1');
-        Access::newPrivilege('TOP_GROUP', 'TOP_PR_2');
-        Access::newPrivilege('TOP_GROUP', 'TOP_PR_3');
-        Access::newPrivilege('LOW_GROUP', 'LOW_PR_1');
-        Access::newPrivilege('LOW_GROUP', 'LOW_PR_2');
-        Access::newPrivilege('LOW_GROUP', 'LOW_PR_3');
     }
     /**
      * @test
@@ -45,6 +35,7 @@ class UserTest extends TestCase{
         $u = new User();
         $this->assertTrue($u->addPrivilege('TOP_PR_1'));
         $this->assertFalse($u->addPrivilege('TOP_PR_1'));
+
         return $u;
     }
     /**
@@ -54,6 +45,48 @@ class UserTest extends TestCase{
         $this->initPrivileges();
         $u = new User();
         $this->assertFalse($u->addPrivilege('NOT_EXIST'));
+    }
+    /**
+     * @test
+     */
+    public function testHasPrivilege00() {
+        $u = new User();
+        $this->assertFalse($u->hasPrivilege('not-exist'));
+    }
+    /**
+     * @test
+     */
+    public function testInGroup00() {
+        $u = new User();
+        $this->assertFalse($u->inGroup('not-exist'));
+    }
+    /**
+     * @test
+     */
+    public function testInGroup01() {
+        $u = new User();
+        $this->assertFalse($u->inGroup('EMPTY_GROUP'));
+    }
+    /**
+     * @test
+     */
+    public function testInGroup02() {
+        $u = new User();
+        $u->addToGroup('LOW_GROUP');
+        $this->assertTrue($u->inGroup('LOW_GROUP'));
+        $u->removePrivilege('LOW_PR_2');
+        $this->assertFalse($u->inGroup('LOW_GROUP'));
+    }
+    /**
+     * 
+     * @test
+     */
+    public function testRemoveAllPrivilege00() {
+        $u = new User();
+        $u->addToGroup('TOP_GROUP');
+        $this->assertEquals(6,count($u->privileges()));
+        $u->removeAllPrivileges();
+        $this->assertEquals(0,count($u->privileges()));
     }
     /**
      * 
@@ -92,25 +125,6 @@ class UserTest extends TestCase{
         $this->assertFalse($u->removePrivilege('NOT_EXIST'));
     }
     /**
-     * 
-     * @test
-     */
-    public function testRemoveAllPrivilege00() {
-        $u = new User();
-        $u->addToGroup('TOP_GROUP');
-        $this->assertEquals(6,count($u->privileges()));
-        $u->removeAllPrivileges();
-        $this->assertEquals(0,count($u->privileges()));
-    }
-    /**
-     * @test
-     * @param User $user
-     * @depends test00
-     */
-    public function toStringTest00($user) {
-        $this->assertEquals('{"user-id":-1, "email":"", "display-name":null, "username":""}',$user.'');
-    }
-    /**
      * @test
      */
     public function testSetDisplayName() {
@@ -121,18 +135,6 @@ class UserTest extends TestCase{
         $this->assertEquals('Hello',$u->getDisplayName());
         $u->setDisplayName("   Hello User   \n");
         $this->assertEquals('Hello User',$u->getDisplayName());
-    }
-    /**
-     * @test
-     */
-    public function testSetResetCount() {
-        $u = new User();
-        $u->setResetCount('1');
-        $this->assertEquals(0,$u->getResetCount());
-        $u->setResetCount(-1);
-        $this->assertEquals(0,$u->getResetCount());
-        $u->setResetCount(32);
-        $this->assertEquals(32,$u->getResetCount());
     }
     /**
      * @test
@@ -153,32 +155,33 @@ class UserTest extends TestCase{
     /**
      * @test
      */
-    public function testInGroup00() {
+    public function testSetResetCount() {
         $u = new User();
-        $this->assertFalse($u->inGroup('not-exist'));
+        $u->setResetCount('1');
+        $this->assertEquals(0,$u->getResetCount());
+        $u->setResetCount(-1);
+        $this->assertEquals(0,$u->getResetCount());
+        $u->setResetCount(32);
+        $this->assertEquals(32,$u->getResetCount());
     }
     /**
      * @test
+     * @param User $user
+     * @depends test00
      */
-    public function testInGroup01() {
-        $u = new User();
-        $this->assertFalse($u->inGroup('EMPTY_GROUP'));
+    public function toStringTest00($user) {
+        $this->assertEquals('{"user-id":-1, "email":"", "display-name":null, "username":""}',$user.'');
     }
-    /**
-     * @test
-     */
-    public function testInGroup02() {
-        $u = new User();
-        $u->addToGroup('LOW_GROUP');
-        $this->assertTrue($u->inGroup('LOW_GROUP'));
-        $u->removePrivilege('LOW_PR_2');
-        $this->assertFalse($u->inGroup('LOW_GROUP'));
-    }
-    /**
-     * @test
-     */
-    public function testHasPrivilege00() {
-        $u = new User();
-        $this->assertFalse($u->hasPrivilege('not-exist'));
+    private function initPrivileges() {
+        Access::clear();
+        Access::newGroup('TOP_GROUP');
+        Access::newGroup('LOW_GROUP','TOP_GROUP');
+        Access::newGroup('EMPTY_GROUP');
+        Access::newPrivilege('TOP_GROUP', 'TOP_PR_1');
+        Access::newPrivilege('TOP_GROUP', 'TOP_PR_2');
+        Access::newPrivilege('TOP_GROUP', 'TOP_PR_3');
+        Access::newPrivilege('LOW_GROUP', 'LOW_PR_1');
+        Access::newPrivilege('LOW_GROUP', 'LOW_PR_2');
+        Access::newPrivilege('LOW_GROUP', 'LOW_PR_3');
     }
 }

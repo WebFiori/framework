@@ -23,6 +23,7 @@
  * THE SOFTWARE.
  */
 namespace webfiori\entity;
+
 /**
  * An entity that can be used to store database connection information. 
  * The information that can be stored includes:
@@ -38,13 +39,13 @@ namespace webfiori\entity;
  * @version 1.0.1
  */
 class DBConnectionInfo {
-    private $port;
-    private $host;
-    private $uName;
-    private $pass;
-    private $dbName;
     private $connectionName;
-    
+    private $dbName;
+    private $host;
+    private $pass;
+    private $port;
+    private $uName;
+
     /**
      * Creates new instance of the class.
      * @param string $user The username of the user that will be used to access 
@@ -57,7 +58,7 @@ class DBConnectionInfo {
      * Default is 3306.
      * @since 1.0
      */
-    public function __construct($user,$pass,$dbname,$host='localhost',$port=3306) {
+    public function __construct($user,$pass,$dbname,$host = 'localhost',$port = 3306) {
         $this->setUsername($user);
         $this->setPassword($pass);
         $this->setDBName($dbname);
@@ -74,15 +75,12 @@ class DBConnectionInfo {
         return $this->connectionName;
     }
     /**
-     * Sets the name of the connection.
-     * @param string $newName The new name. Must be non-empty string.
-     * @since 1.0.1
+     * Returns the name of the database.
+     * @return string A string that represents the name of the database.
+     * @since 1.0
      */
-    public function setConnectionName($newName) {
-        $trimmed = trim($newName);
-        if(strlen($trimmed) != 0){
-            $this->connectionName = $trimmed;
-        }
+    public function getDBName() {
+        return $this->dbName;
     }
     /**
      * Returns the address of database host.
@@ -97,47 +95,12 @@ class DBConnectionInfo {
         return $this->host;
     }
     /**
-     * Sets the address of database host.
-     * The host address can be a URL, an IP address or 'localhost' if 
-     * the database is hosted in the same server that the framework is 
-     * installed in.
-     * @param string $hostAddr The address of database host.
-     * @since 1.0
-     */
-    public function setHost($hostAddr) {
-        $this->host = $hostAddr;
-    }
-    /**
      * Returns the password of the user that will be used to access the database.
      * @return string A string that represents the password of the user.
      * @since 1.0
      */
     public function getPassword() {
         return $this->pass;
-    }
-    /**
-     * Sets the password of the user that will be used to access the database.
-     * @param string $password A string that represents the password of the user.
-     * @since 1.0
-     */
-    public function setPassword($password) {
-        $this->pass = $password;
-    }
-    /**
-     * Returns username of the user that will be used to access the database.
-     * @return string A string that represents the username.
-     * @since 1.0
-     */
-    public function getUsername() {
-        return $this->uName;
-    }
-    /**
-     * Sets the username of the user that will be used to access the database.
-     * @param string $user A string that represents the username.
-     * @since 1.0
-     */
-    public function setUsername($user) {
-        $this->uName = $user;
     }
     /**
      * Returns database server port number.
@@ -149,23 +112,24 @@ class DBConnectionInfo {
         return $this->port;
     }
     /**
-     * Sets database server port number.
-     * @param int $portNum Server port number. It will be set only if the 
-     * given value is greater than 0.
+     * Returns username of the user that will be used to access the database.
+     * @return string A string that represents the username.
      * @since 1.0
      */
-    public function setPort($portNum) {
-        if($portNum > 0){
-            $this->port = $portNum;
-        }
+    public function getUsername() {
+        return $this->uName;
     }
     /**
-     * Returns the name of the database.
-     * @return string A string that represents the name of the database.
-     * @since 1.0
+     * Sets the name of the connection.
+     * @param string $newName The new name. Must be non-empty string.
+     * @since 1.0.1
      */
-    public function getDBName() {
-        return $this->dbName;
+    public function setConnectionName($newName) {
+        $trimmed = trim($newName);
+
+        if (strlen($trimmed) != 0) {
+            $this->connectionName = $trimmed;
+        }
     }
     /**
      * Sets the name of the database.
@@ -174,5 +138,43 @@ class DBConnectionInfo {
      */
     public function setDBName($name) {
         $this->dbName = $name;
+    }
+    /**
+     * Sets the address of database host.
+     * The host address can be a URL, an IP address or 'localhost' if 
+     * the database is hosted in the same server that the framework is 
+     * installed in.
+     * @param string $hostAddr The address of database host.
+     * @since 1.0
+     */
+    public function setHost($hostAddr) {
+        $this->host = $hostAddr;
+    }
+    /**
+     * Sets the password of the user that will be used to access the database.
+     * @param string $password A string that represents the password of the user.
+     * @since 1.0
+     */
+    public function setPassword($password) {
+        $this->pass = $password;
+    }
+    /**
+     * Sets database server port number.
+     * @param int $portNum Server port number. It will be set only if the 
+     * given value is greater than 0.
+     * @since 1.0
+     */
+    public function setPort($portNum) {
+        if ($portNum > 0) {
+            $this->port = $portNum;
+        }
+    }
+    /**
+     * Sets the username of the user that will be used to access the database.
+     * @param string $user A string that represents the username.
+     * @since 1.0
+     */
+    public function setUsername($user) {
+        $this->uName = $user;
     }
 }

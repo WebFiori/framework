@@ -23,10 +23,11 @@
  * THE SOFTWARE.
  */
 namespace webfiori\entity;
+
+use Exception;
 use jsonx\JsonI;
 use jsonx\JsonX;
 use webfiori\conf\SiteConfig;
-use Exception;
 /**
  * A base class that is used to construct web site UI.
  * A theme is a way to change the look and feel of all pages in 
@@ -40,60 +41,12 @@ use Exception;
  * @author Ibrahim
  * @version 1.2.5
  */
-abstract class Theme implements JsonI{
-    /**
-     * An array that contains all available themes.
-     * @var array 
-     */
-    private static $AvailableThemes;
-    /**
-     * An optional base URL.
-     * This URL is used by the tag 'base' to fetch page resources.
-     * @var string
-     * @since 1.2.2 
-     */
-    private $baseUrl;
+abstract class Theme implements JsonI {
     /**
      * The directory where themes are located in.
      * @since 1.0
      */
     const THEMES_DIR = 'themes';
-    /**
-     * An array that contains all loaded themes.
-     * @var array
-     * @since 1.0 
-     */
-    private static $loadedThemes = [];
-    /**
-     * An associative array that contains theme meta info.
-     * @var array
-     * @since 1.0 
-     */
-    private $themeMeta;
-    /**
-     * An array that contains the names of theme component files.
-     * @var array
-     * @since 1.0 
-     */
-    private $themeComponents;
-    /**
-     * The name of theme CSS files directory. 
-     * @var string 
-     * @since 1.0
-     */
-    private $cssDir;
-    /**
-     * The name of theme JavaScript files directory. 
-     * @var string 
-     * @since 1.0
-     */
-    private $jsDir;
-    /**
-     * The directory where theme images are stored.
-     * @var string
-     * @since 1.0 
-     */
-    private $imagesDir;
     /**
      * A callback function to call after the theme is loaded.
      * @var Function
@@ -107,6 +60,18 @@ abstract class Theme implements JsonI{
      */
     private $afterLoadedParams;
     /**
+     * An array that contains all available themes.
+     * @var array 
+     */
+    private static $AvailableThemes;
+    /**
+     * An optional base URL.
+     * This URL is used by the tag 'base' to fetch page resources.
+     * @var string
+     * @since 1.2.2 
+     */
+    private $baseUrl;
+    /**
      * A callback function to call after the theme is loaded.
      * @var Function
      * @since 1.2.1
@@ -118,6 +83,42 @@ abstract class Theme implements JsonI{
      * @since 1.2.1
      */
     private $beforeLoadedParams;
+    /**
+     * The name of theme CSS files directory. 
+     * @var string 
+     * @since 1.0
+     */
+    private $cssDir;
+    /**
+     * The directory where theme images are stored.
+     * @var string
+     * @since 1.0 
+     */
+    private $imagesDir;
+    /**
+     * The name of theme JavaScript files directory. 
+     * @var string 
+     * @since 1.0
+     */
+    private $jsDir;
+    /**
+     * An array that contains all loaded themes.
+     * @var array
+     * @since 1.0 
+     */
+    private static $loadedThemes = [];
+    /**
+     * An array that contains the names of theme component files.
+     * @var array
+     * @since 1.0 
+     */
+    private $themeComponents;
+    /**
+     * An associative array that contains theme meta info.
+     * @var array
+     * @since 1.0 
+     */
+    private $themeMeta;
     /**
      * Creates new instance of the class using default values.
      * The default values will be set as follows:
@@ -137,59 +138,42 @@ abstract class Theme implements JsonI{
      * </ul>
      */
     public function __construct() {
-        $this->themeMeta = array(
-            'name'=>'',
-            'url'=>'',
-            'author'=>'',
-            'author-url'=>'',
-            'version'=>'1.0.0',
-            'license'=>'',
-            'license-url'=>'',
-            'description'=>'',
-            'directory'=>''
-        );
+        $this->themeMeta = [
+            'name' => '',
+            'url' => '',
+            'author' => '',
+            'author-url' => '',
+            'version' => '1.0.0',
+            'license' => '',
+            'license-url' => '',
+            'description' => '',
+            'directory' => ''
+        ];
         $this->setCssDirName('css');
         $this->setJsDirName('js');
         $this->setImagesDirName('images');
         $this->themeComponents = [];
-        $this->afterLoaded = function(){};
+        $this->afterLoaded = function()
+        {
+        };
         $this->afterLoadedParams = [];
-        $this->beforeLoaded = function(){};
+        $this->beforeLoaded = function()
+        {
+        };
         $this->beforeLoadedParams = [];
     }
     /**
-     * Reset the array which contains all loaded themes.
-     * By calling this method, all loaded themes will be unloaded.
-     * @since 1.2.5
+     * Adds a single component to the set of theme components.
+     * Theme components are a set of PHP files that must exist inside theme 
+     * directory.
+     * @param string $componentName The name of the component file (such as 'head.php')
+     * @since 1.0
      */
-    public static function resetLoaded(){
-        self::$loadedThemes = [];
-    }
-    /**
-     * Returns the base URL that will be used by the theme.
-     * The URL is used by the HTML tag 'base' to fetch page resources. 
-     * If the URL is not set by the developer, the method will return the 
-     * URL that is returned by the method SiteConfig::getBaseURL().
-     * @return string The base URL that will be used by the theme.
-     */
-    public function getBaseURL(){
-        if($this->baseUrl !== null){
-            return $this->baseUrl;
-        }
-        else{
-            return SiteConfig::getBaseURL();
-        }
-    }
-    /**
-     * Sets The base URL that will be used by the theme.
-     * This URL is used by the HTML tag 'base' to fetch page resources. The 
-     * given string must be non-empty string in order to set.
-     * @param string $url The base URL that will be used by the theme.
-     */
-    public function setBaseURL($url) {
-        $trimmed = trim($url);
-        if(strlen($trimmed) > 0){
-            $this->baseUrl = $trimmed;
+    public function addComponent($componentName) {
+        $trimmed = trim($componentName);
+
+        if (strlen($trimmed) != 0 && !in_array($trimmed, $this->themeComponents)) {
+            $this->themeComponents[] = $trimmed;
         }
     }
     /**
@@ -202,8 +186,110 @@ abstract class Theme implements JsonI{
      * @since 1.0
      */
     public function addComponents($arr) {
-        foreach ($arr as $component){
+        foreach ($arr as $component) {
             $this->addComponent($component);
+        }
+    }
+    /**
+     * Creates an instance of 'HTMLNode' given an array of options.
+     * This method is used to allow the creation of multiple HTML elements 
+     * depending on the way the developer will implement it. The method might 
+     * only return a single instance of the class 'HTMLNode' for every call or 
+     * the developer can make it customizable by supporting options. The options 
+     * can be passed as an array. A use case for this method would be as 
+     * follows, the developer would like to create different type of input 
+     * elements. One possible option in the passed array would be 'input-type'. 
+     * By checking this option in the body of the method, the developer can return 
+     * different types of input elements.
+     * @param array $options An array of options that developer can specify.
+     * @return HTMLNode The developer must implement this method in away that 
+     * makes it return an instance of the class 'HTMLNode'. 
+     * @since 1.2.3
+     */
+    public abstract function createHTMLNode($options = []);
+    /**
+     * Returns an object of type 'HTMLNode' that represents aside section of the page. 
+     * The developer must implement this method such that it returns an 
+     * object of type 'HTMLNode'. Aside section of the page will 
+     * contain advertisements most of the time. Sometimes, it can contain aside menu for 
+     * the web site or widgets.
+     * @return HTMLNode An object of type 'HTMLNode'. If the theme has no aside 
+     * section, the method might return null.
+     * @since 1.2.2
+     */
+    public abstract function getAsideNode();
+    /**
+     * Returns the name of theme author.
+     * @return string The name of theme author. If author name is not set, the 
+     * method will return empty string.
+     * @since 1.1
+     */
+    public function getAuthor() {
+        return $this->themeMeta['author'];
+    }
+    /**
+     * Returns the URL which takes the users to author's web site.
+     * @return string The URL which takes users to author's web site. 
+     * If author URL is not set, the method will return empty string.
+     * @since 1.1
+     */
+    public function getAuthorUrl() {
+        return $this->themeMeta['author-url'];
+    }
+    /**
+     * Returns an array that contains the meta data of all available themes. 
+     * This method will return an associative array. The key is the theme 
+     * name and the value is an object of type Theme that contains theme info.
+     * @return array An associative array that contains all themes information. The name 
+     * of the theme will be the key and the value is an object of type 'Theme'.
+     * @since 1.1 
+     */
+    public static function getAvailableThemes() {
+        if (self::$AvailableThemes === null) {
+            self::defineThemesDir();
+            self::$AvailableThemes = [];
+            $DS = DIRECTORY_SEPARATOR;
+            $themesDirs = array_diff(scandir(THEMES_PATH), ['..', '.']);
+
+            foreach ($themesDirs as $dir) {
+                $pathToScan = THEMES_PATH.$DS.$dir;
+                $filesInDir = array_diff(scandir($pathToScan), ['..', '.']);
+
+                foreach ($filesInDir as $fileName) {
+                    $fileExt = substr($fileName, -4);
+
+                    if ($fileExt == '.php') {
+                        $cName = str_replace('.php', '', $fileName);
+                        $ns = require_once $pathToScan.$DS.$fileName;
+                        $aNs = $ns != 1 ? $ns.'\\' : '';
+                        $aCName = $aNs.$cName;
+
+                        if (class_exists($aCName)) {
+                            $instance = new $aCName();
+
+                            if ($instance instanceof Theme) {
+                                self::$AvailableThemes[$instance->getName()] = $instance;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return self::$AvailableThemes;
+    }
+    /**
+     * Returns the base URL that will be used by the theme.
+     * The URL is used by the HTML tag 'base' to fetch page resources. 
+     * If the URL is not set by the developer, the method will return the 
+     * URL that is returned by the method SiteConfig::getBaseURL().
+     * @return string The base URL that will be used by the theme.
+     */
+    public function getBaseURL() {
+        if ($this->baseUrl !== null) {
+            return $this->baseUrl;
+        } else {
+            return SiteConfig::getBaseURL();
         }
     }
     /**
@@ -217,282 +303,23 @@ abstract class Theme implements JsonI{
         return $this->themeComponents;
     }
     /**
-     * Adds a single component to the set of theme components.
-     * Theme components are a set of PHP files that must exist inside theme 
-     * directory.
-     * @param string $componentName The name of the component file (such as 'head.php')
+     * Returns the name of the directory where CSS files are kept.
+     * @return string The name of the directory where theme CSS files kept. If 
+     * the name of the directory was not set by the method Theme::setCssDirName(), 
+     * then the returned value will be 'css'.
      * @since 1.0
      */
-    public function addComponent($componentName) {
-        $trimmed = trim($componentName);
-        if(strlen($trimmed) != 0 && !in_array($trimmed, $this->themeComponents)){
-            $this->themeComponents[] = $trimmed;
-        }
+    public function getCssDirName() {
+        return $this->cssDir;
     }
     /**
-     * Loads a theme given its name.
-     * If the given name is null, the method will load the default theme as 
-     * specified by the method SiteConfig::getBaseThemeName().
-     * @param string $themeName The name of the theme. 
-     * @return Theme The method will return an object of type Theme once the 
-     * theme is loaded. The object will contain all theme information.
-     * @throws Exception The method will throw 
-     * an exception if no theme was found which has the given name.
-     * @since 1.0
+     * Returns the description of the theme.
+     * @return string The description of the theme. If the description is not 
+     * set, the method will return empty string.
+     * @since 1.1
      */
-    public static function usingTheme($themeName=null) {
-        self::defineThemesDir();
-        if($themeName === null){
-            $themeName = SiteConfig::getBaseThemeName();
-        }
-        $themeToLoad = null;
-        if(self::isThemeLoaded($themeName)){
-            $themeToLoad = self::$loadedThemes[$themeName];
-        }
-        else{
-            $themes = self::getAvailableThemes();
-            if(isset($themes[$themeName])){
-                $themeToLoad = $themes[$themeName];
-                self::$loadedThemes[$themeName] = $themeToLoad;
-            }
-            else{
-                throw new Exception('No such theme: \''.$themeName.'\'.');
-            }
-        }
-        if(isset($themeToLoad)){
-            $themeToLoad->invokeBeforeLoaded();
-            $ds = DIRECTORY_SEPARATOR;
-            $themeDir = THEMES_PATH.$ds.$themeToLoad->getDirectoryName();
-            foreach ($themeToLoad->getComponents() as $component){
-                if(file_exists($themeDir.$ds.$component)){
-                    require_once $themeDir.$ds.$component;
-                }
-                else{
-                    throw new Exception('Component \''.$component.'\' of the theme not found. Eather define it or remove it from the array of theme components.');
-                }
-            }
-            return $themeToLoad;
-        }
-    }
-    /**
-     * Sets the value of the callback which will be called after theme is loaded.
-     * @param callable $function The callback.
-     * @param array $params An array of parameters which can be passed to the 
-     * callback.
-     * @since 1.0
-     */
-    public function setAfterLoaded($function,$params=[]) {
-        if(is_callable($function)){
-            $this->afterLoaded = $function;
-            if(gettype($params) == 'array'){
-                $this->afterLoadedParams = $params;
-            }
-        }
-    }
-    /**
-     * Sets the value of the callback which will be called before theme is loaded.
-     * @param callback $function The callback.
-     * @param array $params An array of parameters which can be passed to the 
-     * callback.
-     * @since 1.2.1
-     */
-    public function setBeforeLoaded($function,$params=[]){
-        if(is_callable($function)){
-            $this->beforeLoaded = $function;
-            if(gettype($params) == 'array'){
-                $this->beforeLoadedParams = $params;
-            }
-        }
-    }
-    /**
-     * Fire the callback function which should be called before loading the theme.
-     * This method must not be used by the developers. It is called automatically 
-     * when the theme is being loaded.
-     * @since 1.2.1
-     */
-    public function invokeBeforeLoaded(){
-        call_user_func($this->beforeLoaded, $this->beforeLoadedParams);
-    }
-    /**
-     * Fire the callback function which should be called after loading the theme.
-     * This method must not be used by the developers. It is called automatically 
-     * when the theme is loaded.
-     * @since 1.0
-     */
-    public function invokeAfterLoaded(){
-        call_user_func($this->afterLoaded, $this->afterLoadedParams);
-    }
-
-    /**
-     * Checks if a theme is loaded or not given its name.
-     * @param string $themeName The name of the theme.
-     * @return boolean The method will return true if 
-     * the theme was found in the array of loaded themes. false
-     * if not.
-     * @since 1.0
-     */
-    public static function isThemeLoaded($themeName) {
-        return isset(self::$loadedThemes[$themeName]) === true;
-    }
-    private static function defineThemesDir(){
-        if(!defined('THEMES_PATH')){
-            $themesPath = substr(__DIR__, 0, strlen(__DIR__) - strlen('/entity')).DIRECTORY_SEPARATOR.self::THEMES_DIR;
-            define('THEMES_PATH', $themesPath);
-        }
-    }
-    /**
-     * Returns an array that contains the meta data of all available themes. 
-     * This method will return an associative array. The key is the theme 
-     * name and the value is an object of type Theme that contains theme info.
-     * @return array An associative array that contains all themes information. The name 
-     * of the theme will be the key and the value is an object of type 'Theme'.
-     * @since 1.1 
-     */
-    public static function getAvailableThemes(){
-        if(self::$AvailableThemes === null){
-            self::defineThemesDir();
-            self::$AvailableThemes = [];
-            $DS = DIRECTORY_SEPARATOR;
-            $themesDirs = array_diff(scandir(THEMES_PATH), ['..', '.']);
-            foreach ($themesDirs as $dir){
-                $pathToScan = THEMES_PATH.$DS.$dir;
-                $filesInDir = array_diff(scandir($pathToScan), ['..', '.']);
-                foreach ($filesInDir as $fileName){
-                    $fileExt = substr($fileName, -4);
-                    if($fileExt == '.php'){
-                        $cName = str_replace('.php', '', $fileName);
-                        $ns = require_once $pathToScan.$DS.$fileName;
-                        $aNs = $ns != 1 ? $ns.'\\' : '';
-                        $aCName = $aNs.$cName;
-                        if(class_exists($aCName)){
-                            $instance = new $aCName();
-                            if($instance instanceof Theme){
-                                self::$AvailableThemes[$instance->getName()] = $instance;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return self::$AvailableThemes;
-    }
-    /**
-     * Sets the name of the theme.
-     * @param string $name The name of the theme. It must be non-empty string 
-     * in order to set. Note that the name of the theme 
-     * acts as the unique identifier for the theme. It can be used to load the 
-     * theme later.
-     * @since 1.0
-     */
-    public function setName($name) {
-        $trimmed = trim($name);
-        if(strlen($trimmed) != 0){
-            $this->themeMeta['name'] = $trimmed;
-        }
-    }
-    /**
-     * Returns the name of the theme.
-     * If the name is not set, the method will return empty string.
-     * @return string The name of the theme.
-     * @since 1.0
-     */
-    public function getName() {
-        return $this->themeMeta['name'];
-    }
-    /**
-     * Sets the URL of theme designer web site. 
-     * Theme URL can be the same as author URL.
-     * @param string $url The URL to theme designer web site.
-     * @since 1.0
-     */
-    public function setUrl($url) {
-        $trimmed = trim($url);
-        if(strlen($trimmed) > 0){
-            $this->themeMeta['url'] = $trimmed;
-        }
-    }
-    /**
-     * Sets the name of theme author.
-     * @param string $author The name of theme author (such as 'Ibrahim BinAlshikh')
-     * @since 1.0
-     */
-    public function setAuthor($author) {
-        $trimmed = trim($author);
-        if(strlen($trimmed) > 0){
-            $this->themeMeta['author'] = $trimmed;
-        }
-    }
-    /**
-     * Sets the URL to the theme author. It can be the same as Theme URL.
-     * @param string $authorUrl The URL to the author's web site.
-     * @since 1.0
-     */
-    public function setAuthorUrl($authorUrl) {
-        $trimmed = trim($authorUrl);
-        if(strlen($trimmed) > 0){
-            $this->themeMeta['author-url'] = $trimmed;
-        }
-    }
-    /**
-     * Sets the version number of the theme.
-     * @param string $vNum Version number. The format of version number is 
-     * usually like 'X.X.X' where the 'X' can be any number.
-     * @since 1.0
-     */
-    public function setVersion($vNum) {
-        $trimmed = trim($vNum);
-        if(strlen($trimmed) != 0){
-            $this->themeMeta['version'] = $trimmed;
-        }
-    }
-    /**
-     * Sets the name of theme license.
-     * @param string $text The name of theme license. It must be non-empty 
-     * string in order to set.
-     * @since 1.0
-     */
-    public function setLicenseName($text) {
-        $trimmed = trim($text);
-        if(strlen($trimmed) != 0){
-            $this->themeMeta['license'] = $trimmed;
-        }
-    }
-    /**
-     * Sets a URL to the license where people can find more details about it.
-     * @param string $url A URL to the license.
-     * @since 1.0
-     */
-    public function setLicenseUrl($url) {
-        $trimmed = trim($url);
-        if(strlen($trimmed) > 0){
-            $this->themeMeta['license-url'] = $trimmed;
-        }
-    }
-    /**
-     * Sets the description of the theme.
-     * @param string $desc Theme description. Usually a short paragraph of two 
-     * or 3 sentences. It must be non-empty string in order to set.
-     * @since 1.0
-     */
-    public function setDescription($desc) {
-        $trimmed = trim($desc);
-        if(strlen($trimmed) > 0){
-            $this->themeMeta['description'] = $trimmed;
-        }
-    }
-    /**
-     * Sets the name of the directory where all theme files are kept.
-     * Each theme must have a unique directory to prevent collision. The 
-     * directory of the theme must be a folder which exist inside the directory 
-     * '/themes'.
-     * @param string $name The name of theme directory.
-     * @since 1.0
-     */
-    public function setDirectoryName($name) {
-        $trimmed = trim($name);
-        if(strlen($trimmed) != 0){
-            $this->themeMeta['directory'] = $trimmed;
-        }
+    public function getDescription() {
+        return $this->themeMeta['description'];
     }
     /**
      * Returns the name of the directory where all theme files are kept.
@@ -506,20 +333,41 @@ abstract class Theme implements JsonI{
         return $this->themeMeta['directory'];
     }
     /**
-     * Sets the name of the directory where theme images are kept.
-     * Note that it will be set only if the given name is not an empty string. In 
-     * addition, directory name must not include theme directory name. For example, 
-     * if your theme images exist in the directory '/themes/super-theme/images', 
-     * the value that must be supplied to this method is 'images'.
-     * @param string $name The name of the directory where theme images are kept. 
-     * @since 1.0
+     * Returns an object of type 'HTMLNode' that represents footer section of the page. 
+     * The developer must implement this method such that it returns an 
+     * object of type 'HTMLNode'. Footer section of the page usually include links 
+     * to social media profiles, about us page and site map. In addition, 
+     * it might contain copyright notice and contact information. More complex 
+     * layouts can have more items in the footer.
+     * @return HTMLNode An object of type 'HTMLNode'. If the theme has no footer 
+     * section, the method might return null.
+     * @since 1.2.2
      */
-    public function setImagesDirName($name) {
-        $trimmed = trim($name);
-        if(strlen($trimmed) != 0){
-            $this->imagesDir = $trimmed;
-        }
-    }
+    public abstract function getFooterNode();
+    /**
+     * Returns an object of type HeadNode that represents HTML &lt;head&gt; node. 
+     * The developer must implement this method such that it returns an 
+     * object of type HeadNode. The developer can use this method to include 
+     * any JavaScript or CSS files that website pages needs. Also, it can be used to 
+     * add custom meta tags to &lt;head&gt; node or any tag that can be added 
+     * to the &lt;head&gt; HTML element.
+     * @return HeadNode An object of type HeadNode.
+     * @since 1.2.2
+     */
+    public abstract function getHeadNode();
+    /**
+     * Returns an object of type HTMLNode that represents header section of the page. 
+     * The developer must implement this method such that it returns an 
+     * object of type 'HTMLNode'. Header section of the page usually include a 
+     * main navigation menu, web site name and web site logo. More complex 
+     * layout can include other things such as a search bar, notifications 
+     * area and user profile picture. If the page does not have a header 
+     * section, the developer can make this method return null.
+     * @return HTMLNode|null An object of type 'HTMLNode'. If the theme has no header 
+     * section, the method might return null.
+     * @since 1.2.2
+     */
+    public abstract function getHeadrNode();
     /**
      * Returns the name of the directory where theme images are kept.
      * @return string The name of the directory where theme images are kept. If 
@@ -531,21 +379,6 @@ abstract class Theme implements JsonI{
         return $this->imagesDir;
     }
     /**
-     * Sets the name of the directory where theme JavaScript files are kept.
-     * Note that it will be set only if the given name is not an empty string. In 
-     * addition, directory name must not include theme directory name. For example, 
-     * if your theme JavaScript files exist in the directory '/themes/super-theme/js', 
-     * the value that must be supplied to this method is 'js'.
-     * @param string $name The name of the directory where theme JavaScript files are kept. 
-     * @since 1.0
-     */
-    public function setJsDirName($name) {
-        $trimmed = trim($name);
-        if(strlen($trimmed) != 0){
-            $this->jsDir = $trimmed;
-        }
-    }
-    /**
      * Returns the name of the directory where JavaScript files are kept.
      * @return string The name of the directory where theme JavaScript files kept. If 
      * the name of the directory was not set by the method Theme::setJsDirName(), 
@@ -554,60 +387,6 @@ abstract class Theme implements JsonI{
      */
     public function getJsDirName() {
         return $this->jsDir;
-    }
-    /**
-     * Sets the name of the directory where theme CSS files are kept.
-     * Note that it will be set only if the given name is not an empty string. In 
-     * addition, directory name must not include theme directory name. For example, 
-     * if your theme CSS files exist in the directory '/themes/super-theme/css', 
-     * the value that must be supplied to this method is 'css'.
-     * @param string $name The name of the directory where theme CSS files are kept.
-     * @since 1.0
-     */
-    public function setCssDirName($name) {
-        $trimmed = trim($name);
-        if(strlen($trimmed) != 0){
-            $this->cssDir = $trimmed;
-        }
-    }
-    /**
-     * Returns the name of the directory where CSS files are kept.
-     * @return string The name of the directory where theme CSS files kept. If 
-     * the name of the directory was not set by the method Theme::setCssDirName(), 
-     * then the returned value will be 'css'.
-     * @since 1.0
-     */
-    public function getCssDirName() {
-        return $this->cssDir;
-    }
-    /**
-     * Returns an array which contains all loaded themes.
-     * @return array An associative array which contains all loaded themes. 
-     * The index will be theme name and the value is an object of type 'Theme' 
-     * which contains theme info.
-     * @since 1.0
-     */
-    public static function getLoadedThemes(){
-        return self::$loadedThemes;
-    }
-    /**
-     * Returns theme version number.
-     * @return string theme version number. The format if the version number 
-     * is 'x.x.x' where 'x' can be any number. If it is not set, the 
-     * method will return '1.0.0'
-     * @since 1.1
-     */
-    public function getVersion() {
-        return $this->themeMeta['version'];
-    }
-    /**
-     * Returns the name of theme author.
-     * @return string The name of theme author. If author name is not set, the 
-     * method will return empty string.
-     * @since 1.1
-     */
-    public function getAuthor() {
-        return $this->themeMeta['author'];
     }
     /**
      * Returns the name of theme license.
@@ -623,17 +402,27 @@ abstract class Theme implements JsonI{
      * If it is not set, the method will return empty string.
      * @since 1.1
      */
-    public function getLicenseUrl(){
+    public function getLicenseUrl() {
         return $this->themeMeta['license-url'];
     }
     /**
-     * Returns the URL which takes the users to author's web site.
-     * @return string The URL which takes users to author's web site. 
-     * If author URL is not set, the method will return empty string.
-     * @since 1.1
+     * Returns an array which contains all loaded themes.
+     * @return array An associative array which contains all loaded themes. 
+     * The index will be theme name and the value is an object of type 'Theme' 
+     * which contains theme info.
+     * @since 1.0
      */
-    public function getAuthorUrl() {
-        return $this->themeMeta['author-url'];
+    public static function getLoadedThemes() {
+        return self::$loadedThemes;
+    }
+    /**
+     * Returns the name of the theme.
+     * If the name is not set, the method will return empty string.
+     * @return string The name of the theme.
+     * @since 1.0
+     */
+    public function getName() {
+        return $this->themeMeta['name'];
     }
     /**
      * Returns A URL which should point to theme web site.
@@ -646,13 +435,263 @@ abstract class Theme implements JsonI{
         return $this->themeMeta['url'];
     }
     /**
-     * Returns the description of the theme.
-     * @return string The description of the theme. If the description is not 
-     * set, the method will return empty string.
+     * Returns theme version number.
+     * @return string theme version number. The format if the version number 
+     * is 'x.x.x' where 'x' can be any number. If it is not set, the 
+     * method will return '1.0.0'
      * @since 1.1
      */
-    public function getDescription() {
-        return $this->themeMeta['description'];
+    public function getVersion() {
+        return $this->themeMeta['version'];
+    }
+    /**
+     * Fire the callback function which should be called after loading the theme.
+     * This method must not be used by the developers. It is called automatically 
+     * when the theme is loaded.
+     * @since 1.0
+     */
+    public function invokeAfterLoaded() {
+        call_user_func($this->afterLoaded, $this->afterLoadedParams);
+    }
+    /**
+     * Fire the callback function which should be called before loading the theme.
+     * This method must not be used by the developers. It is called automatically 
+     * when the theme is being loaded.
+     * @since 1.2.1
+     */
+    public function invokeBeforeLoaded() {
+        call_user_func($this->beforeLoaded, $this->beforeLoadedParams);
+    }
+
+    /**
+     * Checks if a theme is loaded or not given its name.
+     * @param string $themeName The name of the theme.
+     * @return boolean The method will return true if 
+     * the theme was found in the array of loaded themes. false
+     * if not.
+     * @since 1.0
+     */
+    public static function isThemeLoaded($themeName) {
+        return isset(self::$loadedThemes[$themeName]) === true;
+    }
+    /**
+     * Reset the array which contains all loaded themes.
+     * By calling this method, all loaded themes will be unloaded.
+     * @since 1.2.5
+     */
+    public static function resetLoaded() {
+        self::$loadedThemes = [];
+    }
+    /**
+     * Sets the value of the callback which will be called after theme is loaded.
+     * @param callable $function The callback.
+     * @param array $params An array of parameters which can be passed to the 
+     * callback.
+     * @since 1.0
+     */
+    public function setAfterLoaded($function,$params = []) {
+        if (is_callable($function)) {
+            $this->afterLoaded = $function;
+
+            if (gettype($params) == 'array') {
+                $this->afterLoadedParams = $params;
+            }
+        }
+    }
+    /**
+     * Sets the name of theme author.
+     * @param string $author The name of theme author (such as 'Ibrahim BinAlshikh')
+     * @since 1.0
+     */
+    public function setAuthor($author) {
+        $trimmed = trim($author);
+
+        if (strlen($trimmed) > 0) {
+            $this->themeMeta['author'] = $trimmed;
+        }
+    }
+    /**
+     * Sets the URL to the theme author. It can be the same as Theme URL.
+     * @param string $authorUrl The URL to the author's web site.
+     * @since 1.0
+     */
+    public function setAuthorUrl($authorUrl) {
+        $trimmed = trim($authorUrl);
+
+        if (strlen($trimmed) > 0) {
+            $this->themeMeta['author-url'] = $trimmed;
+        }
+    }
+    /**
+     * Sets The base URL that will be used by the theme.
+     * This URL is used by the HTML tag 'base' to fetch page resources. The 
+     * given string must be non-empty string in order to set.
+     * @param string $url The base URL that will be used by the theme.
+     */
+    public function setBaseURL($url) {
+        $trimmed = trim($url);
+
+        if (strlen($trimmed) > 0) {
+            $this->baseUrl = $trimmed;
+        }
+    }
+    /**
+     * Sets the value of the callback which will be called before theme is loaded.
+     * @param callback $function The callback.
+     * @param array $params An array of parameters which can be passed to the 
+     * callback.
+     * @since 1.2.1
+     */
+    public function setBeforeLoaded($function,$params = []) {
+        if (is_callable($function)) {
+            $this->beforeLoaded = $function;
+
+            if (gettype($params) == 'array') {
+                $this->beforeLoadedParams = $params;
+            }
+        }
+    }
+    /**
+     * Sets the name of the directory where theme CSS files are kept.
+     * Note that it will be set only if the given name is not an empty string. In 
+     * addition, directory name must not include theme directory name. For example, 
+     * if your theme CSS files exist in the directory '/themes/super-theme/css', 
+     * the value that must be supplied to this method is 'css'.
+     * @param string $name The name of the directory where theme CSS files are kept.
+     * @since 1.0
+     */
+    public function setCssDirName($name) {
+        $trimmed = trim($name);
+
+        if (strlen($trimmed) != 0) {
+            $this->cssDir = $trimmed;
+        }
+    }
+    /**
+     * Sets the description of the theme.
+     * @param string $desc Theme description. Usually a short paragraph of two 
+     * or 3 sentences. It must be non-empty string in order to set.
+     * @since 1.0
+     */
+    public function setDescription($desc) {
+        $trimmed = trim($desc);
+
+        if (strlen($trimmed) > 0) {
+            $this->themeMeta['description'] = $trimmed;
+        }
+    }
+    /**
+     * Sets the name of the directory where all theme files are kept.
+     * Each theme must have a unique directory to prevent collision. The 
+     * directory of the theme must be a folder which exist inside the directory 
+     * '/themes'.
+     * @param string $name The name of theme directory.
+     * @since 1.0
+     */
+    public function setDirectoryName($name) {
+        $trimmed = trim($name);
+
+        if (strlen($trimmed) != 0) {
+            $this->themeMeta['directory'] = $trimmed;
+        }
+    }
+    /**
+     * Sets the name of the directory where theme images are kept.
+     * Note that it will be set only if the given name is not an empty string. In 
+     * addition, directory name must not include theme directory name. For example, 
+     * if your theme images exist in the directory '/themes/super-theme/images', 
+     * the value that must be supplied to this method is 'images'.
+     * @param string $name The name of the directory where theme images are kept. 
+     * @since 1.0
+     */
+    public function setImagesDirName($name) {
+        $trimmed = trim($name);
+
+        if (strlen($trimmed) != 0) {
+            $this->imagesDir = $trimmed;
+        }
+    }
+    /**
+     * Sets the name of the directory where theme JavaScript files are kept.
+     * Note that it will be set only if the given name is not an empty string. In 
+     * addition, directory name must not include theme directory name. For example, 
+     * if your theme JavaScript files exist in the directory '/themes/super-theme/js', 
+     * the value that must be supplied to this method is 'js'.
+     * @param string $name The name of the directory where theme JavaScript files are kept. 
+     * @since 1.0
+     */
+    public function setJsDirName($name) {
+        $trimmed = trim($name);
+
+        if (strlen($trimmed) != 0) {
+            $this->jsDir = $trimmed;
+        }
+    }
+    /**
+     * Sets the name of theme license.
+     * @param string $text The name of theme license. It must be non-empty 
+     * string in order to set.
+     * @since 1.0
+     */
+    public function setLicenseName($text) {
+        $trimmed = trim($text);
+
+        if (strlen($trimmed) != 0) {
+            $this->themeMeta['license'] = $trimmed;
+        }
+    }
+    /**
+     * Sets a URL to the license where people can find more details about it.
+     * @param string $url A URL to the license.
+     * @since 1.0
+     */
+    public function setLicenseUrl($url) {
+        $trimmed = trim($url);
+
+        if (strlen($trimmed) > 0) {
+            $this->themeMeta['license-url'] = $trimmed;
+        }
+    }
+    /**
+     * Sets the name of the theme.
+     * @param string $name The name of the theme. It must be non-empty string 
+     * in order to set. Note that the name of the theme 
+     * acts as the unique identifier for the theme. It can be used to load the 
+     * theme later.
+     * @since 1.0
+     */
+    public function setName($name) {
+        $trimmed = trim($name);
+
+        if (strlen($trimmed) != 0) {
+            $this->themeMeta['name'] = $trimmed;
+        }
+    }
+    /**
+     * Sets the URL of theme designer web site. 
+     * Theme URL can be the same as author URL.
+     * @param string $url The URL to theme designer web site.
+     * @since 1.0
+     */
+    public function setUrl($url) {
+        $trimmed = trim($url);
+
+        if (strlen($trimmed) > 0) {
+            $this->themeMeta['url'] = $trimmed;
+        }
+    }
+    /**
+     * Sets the version number of the theme.
+     * @param string $vNum Version number. The format of version number is 
+     * usually like 'X.X.X' where the 'X' can be any number.
+     * @since 1.0
+     */
+    public function setVersion($vNum) {
+        $trimmed = trim($vNum);
+
+        if (strlen($trimmed) != 0) {
+            $this->themeMeta['version'] = $trimmed;
+        }
     }
     /**
      * Returns an object of type JsonX that represents the theme.
@@ -689,70 +728,61 @@ abstract class Theme implements JsonI{
         $j->add('css-dir-name', $this->getCssDirName());
         $j->add('js-dir-name', $this->getJsDirName());
         $j->add('components', $this->getComponents());
+
         return $j;
     }
     /**
-     * Returns an object of type HeadNode that represents HTML &lt;head&gt; node. 
-     * The developer must implement this method such that it returns an 
-     * object of type HeadNode. The developer can use this method to include 
-     * any JavaScript or CSS files that website pages needs. Also, it can be used to 
-     * add custom meta tags to &lt;head&gt; node or any tag that can be added 
-     * to the &lt;head&gt; HTML element.
-     * @return HeadNode An object of type HeadNode.
-     * @since 1.2.2
+     * Loads a theme given its name.
+     * If the given name is null, the method will load the default theme as 
+     * specified by the method SiteConfig::getBaseThemeName().
+     * @param string $themeName The name of the theme. 
+     * @return Theme The method will return an object of type Theme once the 
+     * theme is loaded. The object will contain all theme information.
+     * @throws Exception The method will throw 
+     * an exception if no theme was found which has the given name.
+     * @since 1.0
      */
-    public abstract function getHeadNode();
-    /**
-     * Returns an object of type HTMLNode that represents header section of the page. 
-     * The developer must implement this method such that it returns an 
-     * object of type 'HTMLNode'. Header section of the page usually include a 
-     * main navigation menu, web site name and web site logo. More complex 
-     * layout can include other things such as a search bar, notifications 
-     * area and user profile picture. If the page does not have a header 
-     * section, the developer can make this method return null.
-     * @return HTMLNode|null An object of type 'HTMLNode'. If the theme has no header 
-     * section, the method might return null.
-     * @since 1.2.2
-     */
-    public abstract function getHeadrNode();
-    /**
-     * Returns an object of type 'HTMLNode' that represents footer section of the page. 
-     * The developer must implement this method such that it returns an 
-     * object of type 'HTMLNode'. Footer section of the page usually include links 
-     * to social media profiles, about us page and site map. In addition, 
-     * it might contain copyright notice and contact information. More complex 
-     * layouts can have more items in the footer.
-     * @return HTMLNode An object of type 'HTMLNode'. If the theme has no footer 
-     * section, the method might return null.
-     * @since 1.2.2
-     */
-    public abstract function getFooterNode();
-    /**
-     * Returns an object of type 'HTMLNode' that represents aside section of the page. 
-     * The developer must implement this method such that it returns an 
-     * object of type 'HTMLNode'. Aside section of the page will 
-     * contain advertisements most of the time. Sometimes, it can contain aside menu for 
-     * the web site or widgets.
-     * @return HTMLNode An object of type 'HTMLNode'. If the theme has no aside 
-     * section, the method might return null.
-     * @since 1.2.2
-     */
-    public abstract function getAsideNode();
-    /**
-     * Creates an instance of 'HTMLNode' given an array of options.
-     * This method is used to allow the creation of multiple HTML elements 
-     * depending on the way the developer will implement it. The method might 
-     * only return a single instance of the class 'HTMLNode' for every call or 
-     * the developer can make it customizable by supporting options. The options 
-     * can be passed as an array. A use case for this method would be as 
-     * follows, the developer would like to create different type of input 
-     * elements. One possible option in the passed array would be 'input-type'. 
-     * By checking this option in the body of the method, the developer can return 
-     * different types of input elements.
-     * @param array $options An array of options that developer can specify.
-     * @return HTMLNode The developer must implement this method in away that 
-     * makes it return an instance of the class 'HTMLNode'. 
-     * @since 1.2.3
-     */
-    public abstract function createHTMLNode($options=array());
+    public static function usingTheme($themeName = null) {
+        self::defineThemesDir();
+
+        if ($themeName === null) {
+            $themeName = SiteConfig::getBaseThemeName();
+        }
+        $themeToLoad = null;
+
+        if (self::isThemeLoaded($themeName)) {
+            $themeToLoad = self::$loadedThemes[$themeName];
+        } else {
+            $themes = self::getAvailableThemes();
+
+            if (isset($themes[$themeName])) {
+                $themeToLoad = $themes[$themeName];
+                self::$loadedThemes[$themeName] = $themeToLoad;
+            } else {
+                throw new Exception('No such theme: \''.$themeName.'\'.');
+            }
+        }
+
+        if (isset($themeToLoad)) {
+            $themeToLoad->invokeBeforeLoaded();
+            $ds = DIRECTORY_SEPARATOR;
+            $themeDir = THEMES_PATH.$ds.$themeToLoad->getDirectoryName();
+
+            foreach ($themeToLoad->getComponents() as $component) {
+                if (file_exists($themeDir.$ds.$component)) {
+                    require_once $themeDir.$ds.$component;
+                } else {
+                    throw new Exception('Component \''.$component.'\' of the theme not found. Eather define it or remove it from the array of theme components.');
+                }
+            }
+
+            return $themeToLoad;
+        }
+    }
+    private static function defineThemesDir() {
+        if (!defined('THEMES_PATH')) {
+            $themesPath = substr(__DIR__, 0, strlen(__DIR__) - strlen('/entity')).DIRECTORY_SEPARATOR.self::THEMES_DIR;
+            define('THEMES_PATH', $themesPath);
+        }
+    }
 }

@@ -23,6 +23,7 @@
  * THE SOFTWARE.
  */
 namespace webfiori\entity;
+
 use phMysql\MySQLLink;
 /**
  * A factory class that is used to create connections to different types of 
@@ -34,11 +35,12 @@ use phMysql\MySQLLink;
  */
 class DBConnectionFactory {
     /**
-     * A constant that indicates the port number of the host is missing.
-     * @var string Constant that indicates the port number of the host is missing.
+     * A constant that indicates a database connection error has occur.
+     * @var string Constant that indicates a database connection error has occur.
      * @since 1.0
+     * @see 
      */
-    const MISSING_PORT = 'missing_port';
+    const DB_CONNECTION_ERR = 'unable_to_connect_to_db';
     /**
      * A constant that indicates the name of database host is missing.
      * @var string Constant that indicates the name of database host is missing.
@@ -52,13 +54,6 @@ class DBConnectionFactory {
      */
     const MISSING_DB_NAME = 'missing_db_name';
     /**
-     * A constant that indicates username of the database is missing.
-     * @var string Constant that indicates username of the database is missing.
-     * @since 1.0
-     * @see 
-     */
-    const MISSING_DB_USER = 'missing_db_user';
-    /**
      * A constant that indicates the user password of the database is missing.
      * @var string Constant that indicates the user password of the database is missing.
      * @since 1.0
@@ -66,12 +61,18 @@ class DBConnectionFactory {
      */
     const MISSING_DB_PASS = 'missing_db_password';
     /**
-     * A constant that indicates a database connection error has occur.
-     * @var string Constant that indicates a database connection error has occur.
+     * A constant that indicates username of the database is missing.
+     * @var string Constant that indicates username of the database is missing.
      * @since 1.0
      * @see 
      */
-    const DB_CONNECTION_ERR = 'unable_to_connect_to_db';
+    const MISSING_DB_USER = 'missing_db_user';
+    /**
+     * A constant that indicates the port number of the host is missing.
+     * @var string Constant that indicates the port number of the host is missing.
+     * @since 1.0
+     */
+    const MISSING_PORT = 'missing_port';
     /**
      * Create a link to MySQL database.
      * This method uses the class DatabaseLink which in turns uses mysqli. 
@@ -97,51 +98,48 @@ class DBConnectionFactory {
      * </ul>
      * @since 1.0
      */
-    public static function mysqlLink($connectionParams=array()){
-        $retVal = array(
-            'error-code'=>'',
-            'error-message'=>''
-        );
-        if(isset($connectionParams['host'])){
-            if(isset($connectionParams['port'])){
-                if(isset($connectionParams['user'])){
-                    if(isset($connectionParams['pass'])){
-                        if(isset($connectionParams['db-name'])){
+    public static function mysqlLink($connectionParams = []) {
+        $retVal = [
+            'error-code' => '',
+            'error-message' => ''
+        ];
+
+        if (isset($connectionParams['host'])) {
+            if (isset($connectionParams['port'])) {
+                if (isset($connectionParams['user'])) {
+                    if (isset($connectionParams['pass'])) {
+                        if (isset($connectionParams['db-name'])) {
                             $link = new MySQLLink($connectionParams['host'],$connectionParams['user'],$connectionParams['pass'],$connectionParams['port']);
-                            if($link->setDB($connectionParams['db-name'])){
+
+                            if ($link->setDB($connectionParams['db-name'])) {
                                 $retVal = $link;
+                            } else {
+                                $retVal = [
+                                    'error-code' => $link->getErrorCode(),
+                                    'error-message' => $link->getErrorMessage()
+                                ];
                             }
-                            else{
-                                $retVal = array(
-                                    'error-code'=>$link->getErrorCode(),
-                                    'error-message'=>$link->getErrorMessage()
-                                );
-                            }
-                        }
-                        else{
+                        } else {
                             $retVal['error-code'] = self::MISSING_DB_NAME;
                             $retVal['error-message'] = 'The attribute \'db-name\' is missing from the array.';
                         }
-                    }
-                    else{
+                    } else {
                         $retVal['error-code'] = self::MISSING_DB_PASS;
                         $retVal['error-message'] = 'The attribute \'pass\' is missing from the array.';
                     }
-                }
-                else{
+                } else {
                     $retVal['error-code'] = self::MISSING_DB_USER;
                     $retVal['error-message'] = 'The attribute \'user\' is missing from the array.';
                 }
-            }
-            else{
+            } else {
                 $retVal['error-code'] = self::MISSING_PORT;
                 $retVal['error-message'] = 'The attribute \'port\' is missing from the array.';
             }
-        }
-        else{
+        } else {
             $retVal['error-code'] = self::MISSING_DB_HOST;
             $retVal['error-message'] = 'The attribute \'host\' is missing from the array.';
         }
+
         return $retVal;
     }
 }

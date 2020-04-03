@@ -23,8 +23,9 @@
  * THE SOFTWARE.
  */
 namespace webfiori\logic;
-use webfiori\entity\FileHandler;
+
 use webfiori\conf\SiteConfig;
+use webfiori\entity\FileHandler;
 /**
  * A class that can be used to modify basic settings of the web site and 
  * save them to the file 'SiteConfig.php'
@@ -32,7 +33,7 @@ use webfiori\conf\SiteConfig;
  * @author Ibrahim
  * @version 1.0.1
  */
-class WebsiteController extends Controller{
+class WebsiteController extends Controller {
     /**
      * An associative array that contains initial system configuration variables.
      * The array has the following values:
@@ -56,38 +57,27 @@ class WebsiteController extends Controller{
      * @since 1.0
      */
     const INITIAL_WEBSITE_CONFIG_VARS = [
-        'website-names'=>[
-            'EN'=>'WebFiori',
-            'AR'=>'ويب فيوري'
+        'website-names' => [
+            'EN' => 'WebFiori',
+            'AR' => 'ويب فيوري'
         ],
-        'base-url'=>'',
-        'primary-language'=>'EN',
-        'title-separator'=>' | ',
-        'home-page'=>'index',
-        'admin-theme-name'=>'WebFiori Theme',
-        'theme-name'=>'WebFiori Theme',
-        'site-descriptions'=>array(
-            'EN'=>'',
-            'AR'=>''
-        ),
-        'config-file-version'=>'1.2.1',
+        'base-url' => '',
+        'primary-language' => 'EN',
+        'title-separator' => ' | ',
+        'home-page' => 'index',
+        'admin-theme-name' => 'WebFiori Theme',
+        'theme-name' => 'WebFiori Theme',
+        'site-descriptions' => [
+            'EN' => '',
+            'AR' => ''
+        ],
+        'config-file-version' => '1.2.1',
     ];
     /**
      *
      * @var WebsiteController 
      */
     private static $singleton;
-    /**
-     * Returns a singleton instance of the class.
-     * @return WebsiteController
-     * @since 1.0
-     */
-    public static function get(){
-        if(self::$singleton === null){
-            self::$singleton = new WebsiteController();
-        }
-        return self::$singleton;
-    }
     /**
      * Creates new instance of the class.
      * It is not recommended to use this method. Instead, 
@@ -97,67 +87,26 @@ class WebsiteController extends Controller{
         parent::__construct();
     }
     /**
-     * Initialize new session or use an existing one.
-     * Note that the name of the session must be 'wf-session' in 
-     * order to initialize it.
-     * @param array $options An array of session options. See 
-     * Controller::useSettion() for more information about available options.
-     * @return boolean If session is created or resumed, the method will 
-     * return true. False otherwise.
-     * @since 1.0.1
-     */
-    public function useSession($options=[]) {
-        if(gettype($options) == 'array' && isset($options['name'])){
-            if($options['name'] == 'wf-session'){
-                return parent::useSession($options);
-            }
-        }
-        return false;
-    }
-    /**
      * Creates the file 'SiteConfig.php' if it does not exist.
      * @since 1.0
      */
     public function createSiteConfigFile() {
-        if(!class_exists('webfiori\conf\SiteConfig')){
+        if (!class_exists('webfiori\conf\SiteConfig')) {
             $initCfg = $this->getSiteConfigVars();
             $this->writeSiteConfig($initCfg);
         }
     }
     /**
-     * Updates web site configuration based on some attributes.
-     * @param array $websiteInfoArr an associative array. The array can 
-     * have the following indices: 
-     * <ul>
-     * <li><b>primary-language</b>: The main display language of the website.
-     * <li><b>website-names</b>: A sub associative array. The index of the 
-     * array should be language code (such as 'EN') and the value 
-     * should be the name of the web site in the given language.</li>
-     * <li><b>title-separator</b>: A character or a string that is used 
-     * to separate web site name from web page title. Two common 
-     * values are '-' and '|'.</li>
-     * <li><b>home-page</b>: The URL of the home page of the web site. For example, 
-     * If root URL of the web site is 'https://www.example.com', This page is served 
-     * when the user visits this URL.</li>
-     * <li><b>theme-name</b>: The name of the theme that will be used to style 
-     * web site UI.</li>
-     * <li><b>admin-theme-name</b>: If the web site has two UIs (One for normal 
-     * users and another for admins), this one 
-     * can be used to serve the UI for web site admins.</li>
-     * <li><b>site-descriptions</b>: A sub associative array. The index of the 
-     * array should be language code (such as 'EN') and the value 
-     * should be the general web site description in the given language.</li></li>
-     * </ul> 
+     * Returns a singleton instance of the class.
+     * @return WebsiteController
      * @since 1.0
      */
-    public function updateSiteInfo($websiteInfoArr){
-        $confArr = $this->getSiteConfigVars();
-        foreach ($confArr as $k=>$v){
-            if(isset($websiteInfoArr[$k])){
-                $confArr[$k] = $websiteInfoArr[$k];
-            }
+    public static function get() {
+        if (self::$singleton === null) {
+            self::$singleton = new WebsiteController();
         }
-        $this->writeSiteConfig($confArr);
+
+        return self::$singleton;
     }
     /**
      * Returns an associative array that contains web site configuration 
@@ -185,9 +134,10 @@ class WebsiteController extends Controller{
      * info.
      * @since 1.0
      */
-    public function getSiteConfigVars(){
+    public function getSiteConfigVars() {
         $cfgArr = WebsiteController::INITIAL_WEBSITE_CONFIG_VARS;
-        if(class_exists('webfiori\conf\SiteConfig')){
+
+        if (class_exists('webfiori\conf\SiteConfig')) {
             $SC = SiteConfig::get();
             $cfgArr['website-names'] = $SC->getWebsiteNames();
             $cfgArr['base-url'] = $SC->getBaseURL();
@@ -198,7 +148,63 @@ class WebsiteController extends Controller{
             $cfgArr['theme-name'] = $SC->getBaseThemeName();
             $cfgArr['admin-theme-name'] = $SC->getAdminThemeName();
         }
+
         return $cfgArr;
+    }
+    /**
+     * Updates web site configuration based on some attributes.
+     * @param array $websiteInfoArr an associative array. The array can 
+     * have the following indices: 
+     * <ul>
+     * <li><b>primary-language</b>: The main display language of the website.
+     * <li><b>website-names</b>: A sub associative array. The index of the 
+     * array should be language code (such as 'EN') and the value 
+     * should be the name of the web site in the given language.</li>
+     * <li><b>title-separator</b>: A character or a string that is used 
+     * to separate web site name from web page title. Two common 
+     * values are '-' and '|'.</li>
+     * <li><b>home-page</b>: The URL of the home page of the web site. For example, 
+     * If root URL of the web site is 'https://www.example.com', This page is served 
+     * when the user visits this URL.</li>
+     * <li><b>theme-name</b>: The name of the theme that will be used to style 
+     * web site UI.</li>
+     * <li><b>admin-theme-name</b>: If the web site has two UIs (One for normal 
+     * users and another for admins), this one 
+     * can be used to serve the UI for web site admins.</li>
+     * <li><b>site-descriptions</b>: A sub associative array. The index of the 
+     * array should be language code (such as 'EN') and the value 
+     * should be the general web site description in the given language.</li></li>
+     * </ul> 
+     * @since 1.0
+     */
+    public function updateSiteInfo($websiteInfoArr) {
+        $confArr = $this->getSiteConfigVars();
+
+        foreach ($confArr as $k => $v) {
+            if (isset($websiteInfoArr[$k])) {
+                $confArr[$k] = $websiteInfoArr[$k];
+            }
+        }
+        $this->writeSiteConfig($confArr);
+    }
+    /**
+     * Initialize new session or use an existing one.
+     * Note that the name of the session must be 'wf-session' in 
+     * order to initialize it.
+     * @param array $options An array of session options. See 
+     * Controller::useSettion() for more information about available options.
+     * @return boolean If session is created or resumed, the method will 
+     * return true. False otherwise.
+     * @since 1.0.1
+     */
+    public function useSession($options = []) {
+        if (gettype($options) == 'array' && isset($options['name'])) {
+            if ($options['name'] == 'wf-session') {
+                return parent::useSession($options);
+            }
+        }
+
+        return false;
     }
     /**
      * A method to save changes to web site configuration file.
@@ -206,7 +212,7 @@ class WebsiteController extends Controller{
      * variables.
      * @since 1.0
      */
-    private function writeSiteConfig($configArr){
+    private function writeSiteConfig($configArr) {
         $fh = new FileHandler(ROOT_DIR.'/conf/SiteConfig.php');
         $fh->write('<?php', true, true);
         $fh->write('namespace webfiori\conf;',true,true);
@@ -298,12 +304,14 @@ class WebsiteController extends Controller{
         return self::$siteCfg;
     }', true, true);
         $names = 'array(';
-        foreach ($configArr['website-names'] as $k => $v){
+
+        foreach ($configArr['website-names'] as $k => $v) {
             $names .= '\''.$k.'\'=>\''.$v.'\',';
         }
         $names .= ')';
         $descriptions = 'array(';
-        foreach ($configArr['site-descriptions'] as $k => $v){
+
+        foreach ($configArr['site-descriptions'] as $k => $v) {
             $descriptions .= '\''.$k.'\'=>\''.$v.'\',';
         }
         $descriptions .= ')';
@@ -311,8 +319,8 @@ class WebsiteController extends Controller{
         $this->configVision = \''.$configArr['config-file-version'].'\';
         $this->webSiteNames = '.$names.';
         $this->baseUrl = Util::getBaseURL();
-        $this->titleSep = \' '. trim($configArr['title-separator']).' \';
-        $this->primaryLang = \''. trim($configArr['primary-language']).'\';
+        $this->titleSep = \' '.trim($configArr['title-separator']).' \';
+        $this->primaryLang = \''.trim($configArr['primary-language']).'\';
         $this->baseThemeName = \''.$configArr['theme-name'].'\';
         $this->adminThemeName = \''.$configArr['admin-theme-name'].'\';
         $this->homePage = Util::getBaseURL();

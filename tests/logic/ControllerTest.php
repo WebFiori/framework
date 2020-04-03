@@ -1,18 +1,81 @@
 <?php
 namespace webfiori\tests\logic;
+
 use PHPUnit\Framework\TestCase;
-use webfiori\logic\Controller;
-use webfiori\entity\DBConnectionInfo;
-use webfiori\WebFiori;
-use webfiori\tests\entity\TestQuery_1;
-use webfiori\entity\SessionManager;
 use SimpleController;
+use webfiori\entity\DBConnectionInfo;
+use webfiori\logic\Controller;
+use webfiori\tests\entity\TestQuery_1;
+use webfiori\WebFiori;
 /**
  * Description of FunctionsTest
  *
  * @author Ibrahim
  */
-class ControllerTest extends TestCase{
+class ControllerTest extends TestCase {
+    /**
+     * @test
+     */
+    public function testExecuteQuery00() {
+        $f = new Controller();
+        $r = $f->excQ();
+        $this->assertFalse($r);
+        $errDetails = $f->getDBErrDetails();
+        $this->assertEquals(Controller::NO_QUERY,$errDetails['error-code']);
+        $this->assertEquals('No query object was set to execute.',$errDetails['error-message']);
+    }
+    /**
+     * @test
+     */
+    public function testGetRows00() {
+        $func = new Controller();
+        $this->assertEquals(-1,$func->rows());
+        $this->assertEmpty($func->getRows());
+        $this->assertNull($func->getRow());
+        $this->assertNull($func->nextRow());
+    }
+    /**
+     * @test
+     */
+    public function testGetSession00() {
+        $func = new Controller();
+        $this->assertNull($func->getSession());
+    }
+    /**
+     * @test
+     */
+    public function testGetSessionLang00() {
+        $func = new Controller();
+        $this->assertNull($func->getSessionLang());
+    }
+    /**
+     * @test
+     */
+    public function testGetSessionVar00() {
+        $func = new Controller();
+        $this->assertNull($func->getSessionVar(''));
+    }
+    /**
+     * @test
+     */
+    public function testGetSessionVar01() {
+        $func = new Controller();
+        $this->assertNull($func->getSessionVar('random'));
+    }
+    /**
+     * @test
+     */
+    public function testGetUserID00() {
+        $func = new Controller();
+        $this->assertEquals(-1,$func->getUserID());
+    }
+    /**
+     * @test
+     */
+    public function testHasPrivilege00() {
+        $func = new Controller();
+        $this->assertFalse($func->hasPrivilege('HELLO'));
+    }
     /**
      * @test
      */
@@ -31,6 +94,49 @@ class ControllerTest extends TestCase{
         $func = new Controller();
         $result = $func->setConnection('test-connection');
         $this->assertTrue($result);
+    }
+    /**
+     * @test
+     */
+    public function testSetQuery00() {
+        $func = new Controller();
+        $this->assertFalse($func->setQueryObject(null));
+        $this->assertFalse($func->setQueryObject(44));
+        $this->assertFalse($func->setQueryObject($func));
+        $this->assertNull($func->getQueryObject());
+    }
+    /**
+     * @test
+     */
+    public function testSetQuery01() {
+        $func = new Controller();
+        $q = new TestQuery_1();
+        $this->assertTrue($func->setQueryObject($q));
+        $this->assertTrue($func->getQueryObject() instanceof TestQuery_1);
+    }
+    /**
+     * @test
+     */
+    public function testSetSessionVar00() {
+        $func = new Controller();
+        $this->assertFalse($func->setSessionVar(' ',null));
+        $this->assertFalse($func->setSessionVar('hello',null));
+    }
+    /**
+     * @test
+     * @depends testUseDatabase02
+     */
+    public function testSimpleController00() {
+        $c = new SimpleController();
+        $users = $c->getUsers();
+        $this->assertEquals('array', gettype($users));
+        $this->assertEquals(3,count($users));
+
+        for ($x = 0 ; $x < count($users) ; $x++) {
+            $this->assertEquals('user-0'.$x,$users[$x]->getUserName());
+            $this->assertEquals('pass-0'.$x,$users[$x]->getPassword());
+        }
+        $this->assertEquals(4,count($users[2]->getContactInfo()));
     }
     /**
      * @test
@@ -68,6 +174,7 @@ class ControllerTest extends TestCase{
         $this->assertTrue($func->setConnection('test-connection'));
         $result = $func->useDatabase();
         $this->assertTrue($result);
+
         return $func;
     }
     /**
@@ -89,6 +196,7 @@ class ControllerTest extends TestCase{
     public function testUseDatabase04($func) {
         $r = $func->useDatabase('test-connection');
         $this->assertTrue($r);
+
         return $func;
     }
     /**
@@ -102,6 +210,7 @@ class ControllerTest extends TestCase{
         $err = $func->getDBErrDetails();
         $this->assertEquals(-1,$err['error-code']);
         $this->assertEquals('No database connection was found which has the name \'test-connection-x\'.',$err['error-message']);
+
         return $func;
     }
     /**
@@ -147,116 +256,10 @@ class ControllerTest extends TestCase{
     public function testUseSession01() {
         $func = new Controller();
         $r = $func->useSession(
-            array(
-                'name'=>'test-session'
-            )
+            [
+                'name' => 'test-session'
+            ]
         );
         $this->assertFalse($r);
     }
-    /**
-     * @test
-     */
-    public function testExecuteQuery00() {
-        $f = new Controller();
-        $r = $f->excQ();
-        $this->assertFalse($r);
-        $errDetails = $f->getDBErrDetails();
-        $this->assertEquals(Controller::NO_QUERY,$errDetails['error-code']);
-        $this->assertEquals('No query object was set to execute.',$errDetails['error-message']);
-    }
-    /**
-     * @test
-     */
-    public function testSetQuery00() {
-        $func = new Controller();
-        $this->assertFalse($func->setQueryObject(null));
-        $this->assertFalse($func->setQueryObject(44));
-        $this->assertFalse($func->setQueryObject($func));
-        $this->assertNull($func->getQueryObject());
-    }
-    /**
-     * @test
-     */
-    public function testSetQuery01() {
-        $func = new Controller();
-        $q = new TestQuery_1();
-        $this->assertTrue($func->setQueryObject($q));
-        $this->assertTrue($func->getQueryObject() instanceof TestQuery_1);
-    }
-    /**
-     * @test
-     */
-    public function testGetSession00() {
-        $func = new Controller();
-        $this->assertNull($func->getSession());
-    }
-    /**
-     * @test
-     */
-    public function testGetSessionLang00() {
-        $func = new Controller();
-        $this->assertNull($func->getSessionLang());
-    }
-    /**
-     * @test
-     */
-    public function testSetSessionVar00() {
-        $func = new Controller();
-        $this->assertFalse($func->setSessionVar(' ',null));
-        $this->assertFalse($func->setSessionVar('hello',null));
-    }
-    /**
-     * @test
-     */
-    public function testGetSessionVar00() {
-        $func = new Controller();
-        $this->assertNull($func->getSessionVar(''));
-    }
-    /**
-     * @test
-     */
-    public function testGetSessionVar01() {
-        $func = new Controller();
-        $this->assertNull($func->getSessionVar('random'));
-    }
-    /**
-     * @test
-     */
-    public function testGetRows00() {
-        $func = new Controller();
-        $this->assertEquals(-1,$func->rows());
-        $this->assertEmpty($func->getRows());
-        $this->assertNull($func->getRow());
-        $this->assertNull($func->nextRow());
-    }
-    /**
-     * @test
-     */
-    public function testGetUserID00() {
-        $func = new Controller();
-        $this->assertEquals(-1,$func->getUserID());
-    }
-    /**
-     * @test
-     */
-    public function testHasPrivilege00() {
-        $func = new Controller();
-        $this->assertFalse($func->hasPrivilege('HELLO'));
-    }
-    /**
-     * @test
-     * @depends testUseDatabase02
-     */
-    public function testSimpleController00() {
-        $c = new SimpleController();
-        $users = $c->getUsers();
-        $this->assertEquals('array', gettype($users));
-        $this->assertEquals(3,count($users));
-        for($x = 0 ; $x < count($users) ; $x++){
-            $this->assertEquals('user-0'.$x,$users[$x]->getUserName());
-            $this->assertEquals('pass-0'.$x,$users[$x]->getPassword());
-        }
-        $this->assertEquals(4,count($users[2]->getContactInfo()));
-    }
-    
 }

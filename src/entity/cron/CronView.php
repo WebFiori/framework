@@ -24,10 +24,10 @@
  */
 namespace webfiori\entity\cron;
 
-use webfiori\entity\Page;
-use webfiori\WebFiori;
 use phpStructs\html\HTMLNode;
 use phpStructs\html\JsCode;
+use webfiori\entity\Page;
+use webfiori\WebFiori;
 /**
  * A generic view for cron related operations. 
  * 
@@ -42,8 +42,8 @@ class CronView {
      * @var HTMLNode 
      */
     private $controlsContainer;
-    public function __construct($title,$description='') {
-        if(WebFiori::getWebsiteController()->getSessionVar('cron-login-status') !== true){
+    public function __construct($title,$description = '') {
+        if (WebFiori::getWebsiteController()->getSessionVar('cron-login-status') !== true) {
             header('location: '.WebFiori::getSiteConfig()->getBaseURL().'cron/login');
         }
         Page::title($title);
@@ -51,42 +51,45 @@ class CronView {
         $defaltSiteLang = WebFiori::getSiteConfig()->getPrimaryLanguage();
         $siteNames = WebFiori::getSiteConfig()->getWebsiteNames();
         $siteName = isset($siteNames[$defaltSiteLang]) ? $siteNames[$defaltSiteLang] : null;
-        if($siteName !== null){
+
+        if ($siteName !== null) {
             Page::siteName($siteName);
         }
         $this->controlsContainer = new HTMLNode();
         $this->controlsContainer->setWritingDir('ltr');
         $this->controlsContainer->setStyle([
-            'direction'=>'ltr',
-            'width'=>'100%',
-            'float'=>'left'
+            'direction' => 'ltr',
+            'width' => '100%',
+            'float' => 'left'
         ]);
-        
+
         $h1 = new HTMLNode('h1');
         $h1->addTextNode($title);
         Page::insert($h1);
         $hr = new HTMLNode('hr',false);
         Page::insert($hr);
-        if(Cron::password() != 'NO_PASSWORD'){
+
+        if (Cron::password() != 'NO_PASSWORD') {
             $this->controlsContainer->addTextNode('<button name="input-element" onclick="logout()"><b>Logout</b></button><br/>', false);
         }
         $jsCode = new JsCode();
         $isRefresh = 'false';
-        if(isset($_GET['refresh'])){
+
+        if (isset($_GET['refresh'])) {
             $isRefresh = 'true';
         }
         $jsCode->addCode(''
-                . 'window.onload = function(){'."\n"
-                . '     window.isRefresh = '.$isRefresh.';'."\n"
-                . "     "
-                . '     window.intervalId = window.setInterval(function(){'."\n"
-                . '         if(window.isRefresh){'."\n"
-                . '             disableOrEnableInputs();'."\n"
-                . '             document.getElementById(\'refresh-label\').innerHTML = \'<b>Refreshing...</b>\';'."\n"
-                . '             window.location.href = \'cron/jobs?refresh=yes\';'."\n"
-                . '         }'."\n"
-                . '     },60000)'."\n"
-                . ' };'."\n"
+                .'window.onload = function(){'."\n"
+                .'     window.isRefresh = '.$isRefresh.';'."\n"
+                ."     "
+                .'     window.intervalId = window.setInterval(function(){'."\n"
+                .'         if(window.isRefresh){'."\n"
+                .'             disableOrEnableInputs();'."\n"
+                .'             document.getElementById(\'refresh-label\').innerHTML = \'<b>Refreshing...</b>\';'."\n"
+                .'             window.location.href = \'cron/jobs?refresh=yes\';'."\n"
+                .'         }'."\n"
+                .'     },60000)'."\n"
+                .' };'."\n"
                 );
         Page::document()->getHeadNode()->addJs('https://cdn.jsdelivr.net/gh/usernane/ajax@1.0.2/AJAX.js', [], false);
         Page::document()->getHeadNode()->addJs('assets/js/cron.js');
@@ -95,29 +98,29 @@ class CronView {
         Page::insert($this->controlsContainer);
     }
     /**
-     * 
-     * @return HTMLNode
-     */
-    public function getControlsContainer() {
-        return $this->controlsContainer;
-    }
-    /**
      * Adds an area which is used to show server output.
      */
     public function createOutputWindow() {
         $outputWindow = new HTMLNode();
         $outputWindow->setID('output-window');
         $outputWindow->addTextNode('<p style="border:1px dotted;font-weight:bold">Output Window</p><pre'
-                . ' style="font-family:monospace" id="output-area"></pre>', false);
+                .' style="font-family:monospace" id="output-area"></pre>', false);
         $outputWindow->setStyle([
-            'width'=>'100%',
-            'float'=>'right',
-            'border'=>'1px dotted',
-            'overflow-y'=>'scroll',
-            'height'=>'300px',
-            'color'=>'white',
-            'background-color'=>'black'
+            'width' => '100%',
+            'float' => 'right',
+            'border' => '1px dotted',
+            'overflow-y' => 'scroll',
+            'height' => '300px',
+            'color' => 'white',
+            'background-color' => 'black'
         ]);
         Page::insert($outputWindow);
+    }
+    /**
+     * 
+     * @return HTMLNode
+     */
+    public function getControlsContainer() {
+        return $this->controlsContainer;
     }
 }

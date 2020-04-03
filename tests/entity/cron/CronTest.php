@@ -1,5 +1,6 @@
 <?php
 namespace webfiori\tests\entity\cron;
+
 use PHPUnit\Framework\TestCase;
 use webfiori\entity\cron\Cron;
 /**
@@ -7,7 +8,7 @@ use webfiori\entity\cron\Cron;
  *
  * @author Ibrahim
  */
-class CronTest extends TestCase{
+class CronTest extends TestCase {
     /**
      * @test
      */
@@ -26,8 +27,8 @@ class CronTest extends TestCase{
         $this->assertEquals('16 * * * *',$job->getExpression());
     }
     public function testWeeklyJob00() {
-        Cron::weeklyJob('6-23:00', 'Job X', function(){
-            
+        Cron::weeklyJob('6-23:00', 'Job X', function()
+        {
         });
         $job = Cron::getJob('Job X');
         $this->assertNotNull($job);

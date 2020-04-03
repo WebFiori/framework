@@ -23,9 +23,10 @@
  * THE SOFTWARE.
  */
 namespace webfiori\entity;
+
+use Exception;
 use jsonx\JsonI;
 use jsonx\JsonX;
-use Exception;
 /**
  * A class that represents a file.
  * This class can be used to read and write files in binary. In addition to that, 
@@ -33,7 +34,7 @@ use Exception;
  * @author Ibrahim
  * @version 1.1.3
  */
-class File implements JsonI{
+class File implements JsonI {
     /**
      * An associative array that contains MIME types of common files.
      * As of version 1.1.2 of the class, the array contains the 
@@ -117,87 +118,76 @@ class File implements JsonI{
      * </ul>
      * @since 1.1.1
      */
-    const MIME_TYPES = array(
+    const MIME_TYPES = [
         //audio and video
-        'avi'=>'video/avi',
-        '3gp'=>'video/3gpp',
-        'mp4'=>'video/mp4',
-        'mov'=>'video/quicktime',
-        'wmv'=>'video/x-ms-wmv',
-        'flv'=>'video/x-flv',
-        'ogv'=>'video/ogg',
-        'mpeg'=>'video/mpeg',
-        'midi'=>'audio/midi',
-        'mid'=>'audio/midi',
-        'acc'=>'audio/aac',
-        'mp3'=>'audio/mpeg',
-        'wav'=>'audio/wav',
-        'oga'=>'audio/ogg',
+        'avi' => 'video/avi',
+        '3gp' => 'video/3gpp',
+        'mp4' => 'video/mp4',
+        'mov' => 'video/quicktime',
+        'wmv' => 'video/x-ms-wmv',
+        'flv' => 'video/x-flv',
+        'ogv' => 'video/ogg',
+        'mpeg' => 'video/mpeg',
+        'midi' => 'audio/midi',
+        'mid' => 'audio/midi',
+        'acc' => 'audio/aac',
+        'mp3' => 'audio/mpeg',
+        'wav' => 'audio/wav',
+        'oga' => 'audio/ogg',
         //images 
-        'jpeg'=>'image/jpeg',
-        'jpg'=>'image/jpeg',
-        'png'=>'image/png',
-        'bmp'=>'image/bmp',
-        'ico'=>'image/x-icon',
-        'tiff'=>'image/tiff',
-        'svg'=>'image/svg+xml',
-        'psd'=>'image/vnd.adobe.photoshop',
-        'gif'=>'image/gif',
+        'jpeg' => 'image/jpeg',
+        'jpg' => 'image/jpeg',
+        'png' => 'image/png',
+        'bmp' => 'image/bmp',
+        'ico' => 'image/x-icon',
+        'tiff' => 'image/tiff',
+        'svg' => 'image/svg+xml',
+        'psd' => 'image/vnd.adobe.photoshop',
+        'gif' => 'image/gif',
         //pdf 
-        'pdf'=>'application/pdf',
+        'pdf' => 'application/pdf',
         //rich text format
-        'rtf'=>'application/rtf',
+        'rtf' => 'application/rtf',
         //MS office documents
-        'doc'=>'application/msword',
-        'docx'=>'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        'xls'=>'application/vnd.ms-excel',
-        'ppt'=>'application/vnd.ms-powerpoint',
-        'pptx'=>'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-        'xlsx'=>'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'doc' => 'application/msword',
+        'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'xls' => 'application/vnd.ms-excel',
+        'ppt' => 'application/vnd.ms-powerpoint',
+        'pptx' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+        'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         //other text based files
-        'txt'=>'text/plain',
-        'php'=>'text/plain',
-        'log'=>'text/plain',
-        'ini'=>'text/plain',
-        'css'=>'text/css',
-        'js'=>'application/javascript',
-        'asm'=>'text/x-asm',
-        'java'=>'text/x-java-source',
-        'htaccess'=>'application/x-extension-htaccess',
-        'asp'=>'text/asp',
-        'c'=>'text/x-c',
-        'cpp'=>'text/x-c',
-        'csv'=>'text/csv',
-        'htm'=>'text/html',
-        'html'=>'text/html',
+        'txt' => 'text/plain',
+        'php' => 'text/plain',
+        'log' => 'text/plain',
+        'ini' => 'text/plain',
+        'css' => 'text/css',
+        'js' => 'application/javascript',
+        'asm' => 'text/x-asm',
+        'java' => 'text/x-java-source',
+        'htaccess' => 'application/x-extension-htaccess',
+        'asp' => 'text/asp',
+        'c' => 'text/x-c',
+        'cpp' => 'text/x-c',
+        'csv' => 'text/csv',
+        'htm' => 'text/html',
+        'html' => 'text/html',
         //other files
-        'sql'=>'application/sql',
-        'jar'=>'application/java-archive',
-        'zip'=>'application/zip',
-        'rar'=>'application/x-rar-compressed',
-        'tar'=>'application/x-tar',
-        '7z'=>'application/x-7z-compressed',
-        'exe'=>'application/vnd.microsoft.portable-executable',
-        'bin'=>'application/octet-stream',
-        'woff'=>'font/woff',
-        'woff2'=>'font/woff2',
-        'otf'=>'font/otf',
-        'ttf'=>'font/ttf',
-        'ai'=>'application/postscript',
-        'swf'=>'application/x-shockwave-flash',
-        'ogx'=>'application/ogg'
-    );
-    /**
-     * The size of the file in bytes.
-     * @var int
-     * @since 1.1 
-     */
-    private $fSize;
-    /**
-     * The full path to the file.
-     * @var string 
-     */
-    private $path;
+        'sql' => 'application/sql',
+        'jar' => 'application/java-archive',
+        'zip' => 'application/zip',
+        'rar' => 'application/x-rar-compressed',
+        'tar' => 'application/x-tar',
+        '7z' => 'application/x-7z-compressed',
+        'exe' => 'application/vnd.microsoft.portable-executable',
+        'bin' => 'application/octet-stream',
+        'woff' => 'font/woff',
+        'woff2' => 'font/woff2',
+        'otf' => 'font/otf',
+        'ttf' => 'font/ttf',
+        'ai' => 'application/postscript',
+        'swf' => 'application/x-shockwave-flash',
+        'ogx' => 'application/ogg'
+    ];
     /**
      * The name of the attachment.
      * @var string 
@@ -205,11 +195,11 @@ class File implements JsonI{
      */
     private $fileName;
     /**
-     * MIME type of the attachment (such as 'image/png')
-     * @var string 
-     * @since 1.0
+     * The size of the file in bytes.
+     * @var int
+     * @since 1.1 
      */
-    private $mimeType;
+    private $fSize;
     /**
      * A unique ID for the file.
      * @var string
@@ -217,48 +207,47 @@ class File implements JsonI{
      */
     private $id;
     /**
+     * MIME type of the attachment (such as 'image/png')
+     * @var string 
+     * @since 1.0
+     */
+    private $mimeType;
+    /**
+     * The full path to the file.
+     * @var string 
+     */
+    private $path;
+    /**
      * Raw data of the file in binary.
      * @var type 
      * @since 1.0
      */
     private $rawData;
     /**
-     * Sets the path of the file.
-     * The path is simply the folder that contains the file. For example, 
-     * the path can be something like "C:/Users/Me/Documents". The path can 
-     * use forward slashes or backward slashes.
-     * @param string $path The folder which will contain the file. It must 
-     * be non-empty string in order to set.
-     * @return boolean The method will return true if the path is set. Other 
-     * than that, the method will return false.
+     * Creates new instance of the class.
+     * This method will set the path and name to empty string. Also, it will 
+     * set the size to 0 and ID to -1. Finally, it will set MIME type to 
+     * "application/octet-stream"
+     * @param string $fName The name of the file such as 'my-file.png'.
+     * @param string $fPath The path of the file such as 'C:/Images/Test'.
      * @since 1.0
      */
-    public function setPath($path){
-        $retVal = false;
-        $pathV = self::_validatePath($path);
-        $len = strlen($pathV);
-        $DS = DIRECTORY_SEPARATOR;
-        if($len > 0){
-            $this->path = !Util::isDirectory($pathV) ? $DS.$pathV : $pathV;
-            $retVal = true;
+    public function __construct($fName = '',$fPath = '') {
+        $this->mimeType = 'application/octet-stream';
+
+        if (!$this->setPath($fPath)) {
+            $this->path = '';
         }
-        return $retVal;
+        $this->setName($fName);
+        $this->id = -1;
+        $this->fSize = 0;
     }
-    private static function _validatePath($path) {
-        $trimmedPath = trim($path);
-        $len = strlen($trimmedPath);
-        if($len != 0){
-            while($trimmedPath[$len - 1] == '/' || $trimmedPath[$len - 1] == '\\'){
-                $tmpDir = trim($trimmedPath,'/');
-                $trimmedPath = trim($tmpDir,'\\');
-                $len = strlen($trimmedPath);
-            }
-            while($trimmedPath[0] == '/' || $trimmedPath[0] == '\\'){
-                $tmpDir = trim($trimmedPath,'/');
-                $trimmedPath = trim($tmpDir,'\\');
-            }
-        }
-        return str_replace('/', DIRECTORY_SEPARATOR, str_replace('\\', DIRECTORY_SEPARATOR, $trimmedPath));
+    /**
+     * Returns JSON string that represents basic file info.
+     * @return string
+     */
+    public function __toString() {
+        return $this->toJSON().'';
     }
     /**
      * Returns the full path to the file.
@@ -274,10 +263,34 @@ class File implements JsonI{
     public function getAbsolutePath() {
         $path = $this->getPath();
         $name = $this->getName();
-        if(strlen($path) != 0 && strlen($name) != 0){
+
+        if (strlen($path) != 0 && strlen($name) != 0) {
             return $path.DIRECTORY_SEPARATOR.$name;
         }
+
         return '';
+    }
+    /**
+     * Returns MIME type of the file.
+     * Note that if the file is specified by its path and name, the method 
+     * File::read() must be called before calling this method to update its 
+     * MIME type.
+     * @return string MIME type of the file. If MIME type of the file is not set 
+     * or not detected, the method will return 'application/octet-stream'.
+     * @since 1.0
+     */
+    public function getFileMIMEType() {
+        return $this->mimeType;
+    }
+    /**
+     * Returns the ID of the file.
+     * This method is helpful in case the file is stored in database.
+     * @return string The ID of the file. If the ID is not set, the method 
+     * will return -1.
+     * @since 1.0
+     */
+    public function getID() {
+        return $this->id;
     }
     /**
      * Returns MIME type of a file type.
@@ -287,14 +300,27 @@ class File implements JsonI{
      * returned. If not, the method will return null.
      * @since 1.1.1
      */
-    public static function getMIMEType($ext){
+    public static function getMIMEType($ext) {
         $lowerCase = strtolower($ext);
         $retVal = null;
         $x = self::MIME_TYPES[$lowerCase];
-        if($x !== null){
+
+        if ($x !== null) {
             $retVal = $x;
         }
+
         return $retVal;
+    }
+    /**
+     * Returns the name of the file.
+     * * The name is used to construct the absolute path of the file in addition 
+     * to its path.
+     * @return string The name of the file. If the name is not set, the method 
+     * will return empty string.
+     * @since 1.0
+     */
+    public function getName() {
+        return $this->fileName;
     }
     /**
      * Returns the path of the file.
@@ -305,8 +331,29 @@ class File implements JsonI{
      * the path is not set, the method will return empty string.
      * @since 1.0
      */
-    public function getPath(){
+    public function getPath() {
         return $this->path;
+    }
+    /**
+     * Returns the raw data of the file.
+     * The raw data is simply a string. It can be binary string or any basic 
+     * string.
+     * @return string|null Raw data of the file. If no data is set, the method 
+     * will return null.
+     * @since 1.0
+     */
+    public function getRawData() {
+        return $this->rawData;
+    }
+    /**
+     * Returns the size of the file in bytes.
+     * Note that if the file is specified by its path and name, the method 
+     * File::read() must be called before calling this method to update its 
+     * size.
+     * @return int Size of the file in bytes.
+     */
+    public function getSize() {
+        return $this->fSize;
     }
     /**
      * Reads the file in binary mode.
@@ -330,44 +377,149 @@ class File implements JsonI{
      * absolute path of the file.
      * @since 1.1.1
      */
-    public function read($from=-1,$to=-1) {
+    public function read($from = -1,$to = -1) {
         $path = $this->getAbsolutePath();
-        if($path != ''){
-            if(!$this->_readHelper($path,$from,$to)){
+
+        if ($path != '') {
+            if (!$this->_readHelper($path,$from,$to)) {
                 $path = str_replace('\\', '/', $this->getAbsolutePath());
-                if(!$this->_readHelper($path,$from,$to)){
+
+                if (!$this->_readHelper($path,$from,$to)) {
                     throw new Exception('File not found: \''.$path.'\'.');
                 }
-            }
-            else{
+            } else {
                 return;
             }
         }
         throw new Exception('File absolute path is invalid.');
     }
-    private function _readHelper($path,$from,$to){
-        if(file_exists($path)){
-            $this->_setSize(filesize($path));
-            set_error_handler(function(){});
-            $h = fopen($path, 'rb');
-            $bytesToRead = $to - $from > 0 ? $to - $from : $this->getSize();
-            if(is_resource($h)){
-                if($bytesToRead > 0){
-                    fseek($h, $from);
-                }
-                $this->rawData = fread($h, $bytesToRead);
-                fclose($h);
-                $ext = pathinfo($this->getName(), PATHINFO_EXTENSION);
-                $mime = self::getMIMEType($ext);
-                $mimeSet = $mime === null ? 'application/octet-stream' : $mime;
-                $this->setMIMEType($mimeSet);
-                restore_error_handler();
-                return true;
-            }
-            restore_error_handler();
-            throw new Exception('Unable to open the file \''.$path.'\'.');
+    /**
+     * Removes a file given its name and path.
+     * Before calling this method, the name of the file and its path must 
+     * be specified.
+     * @return boolean If the file was removed, the method will return 
+     * true. Other than that, the method will return false.
+     * @since 1.1.2
+     */
+    public function remove() {
+        if (file_exists($this->getAbsolutePath())) {
+            unlink($this->getAbsolutePath());
+
+            return true;
         }
+
         return false;
+    }
+    /**
+     * Sets the ID of the file.
+     * This method is helpful in case the file is stored in database.
+     * @param string $id The unique ID of the file.
+     * @since 1.0
+     */
+    public function setID($id) {
+        $this->id = $id;
+    }
+    /**
+     * Sets the MIME type of the file.
+     * It is not recommended to update MIME type of the file manually. Only 
+     * use this method for custom file types. MIME type will be set only 
+     * if its non-empty string.
+     * @param string $type MIME type (such as 'application/pdf')
+     * @since 1.0
+     */
+    public function setMIMEType($type) {
+        if (strlen($type) != 0) {
+            $this->mimeType = $type;
+        }
+    }
+    /**
+     * Sets the name of the file (such as 'my-image.png')
+     * The name is used to construct the absolute path of the file in addition 
+     * to its path. The name of the file must include its extension (or suffix).
+     * @param string $name The name of the file.
+     * @since 1.0
+     */
+    public function setName($name) {
+        $this->fileName = $name;
+    }
+    /**
+     * Sets the path of the file.
+     * The path is simply the folder that contains the file. For example, 
+     * the path can be something like "C:/Users/Me/Documents". The path can 
+     * use forward slashes or backward slashes.
+     * @param string $path The folder which will contain the file. It must 
+     * be non-empty string in order to set.
+     * @return boolean The method will return true if the path is set. Other 
+     * than that, the method will return false.
+     * @since 1.0
+     */
+    public function setPath($path) {
+        $retVal = false;
+        $pathV = self::_validatePath($path);
+        $len = strlen($pathV);
+        $DS = DIRECTORY_SEPARATOR;
+
+        if ($len > 0) {
+            $this->path = !Util::isDirectory($pathV) ? $DS.$pathV : $pathV;
+            $retVal = true;
+        }
+
+        return $retVal;
+    }
+    /**
+     * Sets the binary representation of the file.
+     * The raw data is simply a string. It can be binary string or any basic 
+     * string. Also, it can be a blob which was retrieved from a database.
+     * @param string $raw Binary raw data of the file.
+     * @since 1.0
+     */
+    public function setRawData($raw) {
+        if (strlen($raw) > 0) {
+            $this->rawData = $raw;
+            $this->_setSize(strlen($raw));
+        }
+    }
+    /**
+     * Returns a JSON string that represents the file.
+     * @return string A JSON string on the following format:<br/>
+     * <b>{<br/>&nbsp;&nbsp;"id":"",<br/>&nbsp;&nbsp;"mime":"",<br/>&nbsp;&nbsp;"name":""<br/>
+     * &nbsp;&nbsp;"path":""<br/>&nbsp;&nbsp;"size-in-bytes":""<br/>&nbsp;&nbsp;"size-in-kbytes":""<br/>
+     * &nbsp;&nbsp;"size-in-mbytes":""<br/>}</b>
+     * @since 1.0
+     */
+    public function toJSON() {
+        $jsonX = new JsonX();
+        $jsonX->add('id', $this->getID());
+        $jsonX->add('mime', $this->getFileMIMEType());
+        $jsonX->add('name', $this->getName());
+        $jsonX->add('path', $this->getPath());
+        $jsonX->add('size-in-bytes', $this->getSize());
+        $jsonX->add('size-in-kbytes', $this->getSize() / 1024);
+        $jsonX->add('size-in-mbytes', ($this->getSize() / 1024) / 1024);
+
+        return $jsonX;
+    }
+    /**
+     * Display the file. 
+     * If the raw data of the file is null, the method will 
+     * try to read the file that was specified by the name and its path. If 
+     * the method is unable to read the file, an exception is thrown.
+     * @param boolean $asAttachment If this parameter is set to 
+     * true, the header 'content-disposition' will have the attribute 'attachment' 
+     * set instead of 'inline'. This will trigger 'save as' dialog to appear.
+     * @throws Exception An exception with the message "MIME type of raw data is not set." 
+     * If MIME type of the file is not set.
+     * @since 1.1.1
+     */
+    public function view($asAttachment = false) {
+        $raw = $this->getRawData();
+
+        if ($raw !== null) {
+            $this->_viewFileHelper($asAttachment);
+        } else {
+            $this->read();
+            $this->_viewFileHelper($asAttachment);
+        }
     }
     /**
      * Write raw binary data into a file.
@@ -388,22 +540,26 @@ class File implements JsonI{
      * unable to create the resource which is used to write data.
      * @since 1.1.1
      */
-    public function write($path=null) {
-        if($path === null){
+    public function write($path = null) {
+        if ($path === null) {
             $path = $this->getAbsolutePath();
-            if($path != ''){
+
+            if ($path != '') {
                 $this->_writeHelper($path);
+
                 return;
             }
             throw new Exception('File absolute path is invalid.');
-        }
-        else{
+        } else {
             $fName = $this->getName();
-            if(strlen($fName) > 0){
+
+            if (strlen($fName) > 0) {
                 $pathV = self::_validatePath($path);
-                if(strlen($pathV) > 0){
+
+                if (strlen($pathV) > 0) {
                     $pathV2 = !Util::isDirectory($pathV) ? DIRECTORY_SEPARATOR.$pathV : $pathV;
                     $this->_writeHelper($pathV2.DIRECTORY_SEPARATOR.$fName);
+
                     return;
                 }
                 throw new Exception('Path cannot be empty string.');
@@ -411,237 +567,107 @@ class File implements JsonI{
             throw new Exception('File name cannot be empty string.');
         }
     }
-    private function _writeHelper($path){
-        if($this->getRawData() === null){
-            $this->read();
-        }
-        $h = fopen($path, 'wb');
-        if(is_resource($h)){
-            fwrite($h, $this->getRawData());
-            fclose($h);
+    private function _readHelper($path,$from,$to) {
+        if (file_exists($path)) {
+            $this->_setSize(filesize($path));
+            set_error_handler(function()
+            {
+            });
+            $h = fopen($path, 'rb');
+            $bytesToRead = $to - $from > 0 ? $to - $from : $this->getSize();
+
+            if (is_resource($h)) {
+                if ($bytesToRead > 0) {
+                    fseek($h, $from);
+                }
+                $this->rawData = fread($h, $bytesToRead);
+                fclose($h);
+                $ext = pathinfo($this->getName(), PATHINFO_EXTENSION);
+                $mime = self::getMIMEType($ext);
+                $mimeSet = $mime === null ? 'application/octet-stream' : $mime;
+                $this->setMIMEType($mimeSet);
+                restore_error_handler();
+
+                return true;
+            }
             restore_error_handler();
-            return;
+            throw new Exception('Unable to open the file \''.$path.'\'.');
         }
-        restore_error_handler();
-        throw new Exception('Unable to open the file at \''.$path.'\'.');
+
+        return false;
     }
-    /**
-     * Display the file. 
-     * If the raw data of the file is null, the method will 
-     * try to read the file that was specified by the name and its path. If 
-     * the method is unable to read the file, an exception is thrown.
-     * @param boolean $asAttachment If this parameter is set to 
-     * true, the header 'content-disposition' will have the attribute 'attachment' 
-     * set instead of 'inline'. This will trigger 'save as' dialog to appear.
-     * @throws Exception An exception with the message "MIME type of raw data is not set." 
-     * If MIME type of the file is not set.
-     * @since 1.1.1
-     */
-    public function view($asAttachment=false){
-        $raw = $this->getRawData();
-        if($raw !== null){
-            $this->_viewFileHelper($asAttachment);
-        }
-        else{
-            $this->read();
-            $this->_viewFileHelper($asAttachment);
+    private function _setSize($size) {
+        if ($size >= 0) {
+            $this->fSize = $size;
         }
     }
-    private function _viewFileHelper($asAttachment){
+    private static function _validatePath($path) {
+        $trimmedPath = trim($path);
+        $len = strlen($trimmedPath);
+
+        if ($len != 0) {
+            while ($trimmedPath[$len - 1] == '/' || $trimmedPath[$len - 1] == '\\') {
+                $tmpDir = trim($trimmedPath,'/');
+                $trimmedPath = trim($tmpDir,'\\');
+                $len = strlen($trimmedPath);
+            }
+
+            while ($trimmedPath[0] == '/' || $trimmedPath[0] == '\\') {
+                $tmpDir = trim($trimmedPath,'/');
+                $trimmedPath = trim($tmpDir,'\\');
+            }
+        }
+
+        return str_replace('/', DIRECTORY_SEPARATOR, str_replace('\\', DIRECTORY_SEPARATOR, $trimmedPath));
+    }
+    private function _viewFileHelper($asAttachment) {
         $contentType = $this->getFileMIMEType();
-        if($contentType !== null){
+
+        if ($contentType !== null) {
             header("Accept-Ranges: bytes");
             header('Content-Type:'.$contentType);
-            if(isset($_SERVER['HTTP_RANGE'])){
+
+            if (isset($_SERVER['HTTP_RANGE'])) {
                 $range = filter_var($_SERVER['HTTP_RANGE']);
                 $rangeArr = explode('=', $range);
                 $expl = explode('-', $rangeArr[1]);
-                if(strlen($expl[1]) == 0){
-                    $expl[1] = $this->getSize(); 
+
+                if (strlen($expl[1]) == 0) {
+                    $expl[1] = $this->getSize();
                 }
                 $this->read($expl[0], $expl[1]);
                 header('HTTP/1.1 206 Partial Content');
                 header('Content-Range: bytes '.$expl[0].'-'.$expl[1].'/'.$this->getSize());
                 header('Content-Length: '.($expl[1] - $expl[0]));
-            }
-            else{
+            } else {
                 //header('Content-Range: bytes 0-'.$this->getSize().'/'.$this->getSize());
                 header('Content-Length: '.$this->getSize());
             }
-            if($asAttachment === true){
+
+            if ($asAttachment === true) {
                 header('Content-Disposition: attachment; filename="'.$this->getName().'"');
-            }
-            else{
+            } else {
                 header('Content-Disposition: inline; filename="'.$this->getName().'"');
             }
             echo $this->getRawData();
-        }
-        else{
+        } else {
             throw new Exception('MIME type of raw data is not set.');
         }
     }
-    private function _setSize($size){
-        if($size >= 0){
-            $this->fSize = $size;
+    private function _writeHelper($path) {
+        if ($this->getRawData() === null) {
+            $this->read();
         }
-    }
-    /**
-     * Returns the size of the file in bytes.
-     * Note that if the file is specified by its path and name, the method 
-     * File::read() must be called before calling this method to update its 
-     * size.
-     * @return int Size of the file in bytes.
-     */
-    public function getSize() {
-        return $this->fSize;
-    }
-    /**
-     * Sets the name of the file (such as 'my-image.png')
-     * The name is used to construct the absolute path of the file in addition 
-     * to its path. The name of the file must include its extension (or suffix).
-     * @param string $name The name of the file.
-     * @since 1.0
-     */
-    public function setName($name){
-        $this->fileName = $name;
-    }
-    /**
-     * Returns the name of the file.
-     * * The name is used to construct the absolute path of the file in addition 
-     * to its path.
-     * @return string The name of the file. If the name is not set, the method 
-     * will return empty string.
-     * @since 1.0
-     */
-    public function getName(){
-        return $this->fileName;
-    }
-    /**
-     * Sets the MIME type of the file.
-     * It is not recommended to update MIME type of the file manually. Only 
-     * use this method for custom file types. MIME type will be set only 
-     * if its non-empty string.
-     * @param string $type MIME type (such as 'application/pdf')
-     * @since 1.0
-     */
-    public function setMIMEType($type){
-        if(strlen($type) != 0){
-            $this->mimeType = $type;
+        $h = fopen($path, 'wb');
+
+        if (is_resource($h)) {
+            fwrite($h, $this->getRawData());
+            fclose($h);
+            restore_error_handler();
+
+            return;
         }
-    }
-    /**
-     * Returns MIME type of the file.
-     * Note that if the file is specified by its path and name, the method 
-     * File::read() must be called before calling this method to update its 
-     * MIME type.
-     * @return string MIME type of the file. If MIME type of the file is not set 
-     * or not detected, the method will return 'application/octet-stream'.
-     * @since 1.0
-     */
-    public function getFileMIMEType(){
-        return $this->mimeType;
-    }
-    /**
-     * Sets the ID of the file.
-     * This method is helpful in case the file is stored in database.
-     * @param string $id The unique ID of the file.
-     * @since 1.0
-     */
-    public function setID($id){
-        $this->id = $id;
-    }
-    /**
-     * Returns the ID of the file.
-     * This method is helpful in case the file is stored in database.
-     * @return string The ID of the file. If the ID is not set, the method 
-     * will return -1.
-     * @since 1.0
-     */
-    public function getID(){
-        return $this->id;
-    }
-    /**
-     * Sets the binary representation of the file.
-     * The raw data is simply a string. It can be binary string or any basic 
-     * string. Also, it can be a blob which was retrieved from a database.
-     * @param string $raw Binary raw data of the file.
-     * @since 1.0
-     */
-    public function setRawData($raw){
-        if(strlen($raw) > 0){
-            $this->rawData = $raw;
-            $this->_setSize(strlen($raw));
-        }
-    }
-    /**
-     * Returns the raw data of the file.
-     * The raw data is simply a string. It can be binary string or any basic 
-     * string.
-     * @return string|null Raw data of the file. If no data is set, the method 
-     * will return null.
-     * @since 1.0
-     */
-    public function getRawData(){
-        return $this->rawData;
-    }
-    /**
-     * Returns a JSON string that represents the file.
-     * @return string A JSON string on the following format:<br/>
-     * <b>{<br/>&nbsp;&nbsp;"id":"",<br/>&nbsp;&nbsp;"mime":"",<br/>&nbsp;&nbsp;"name":""<br/>
-     * &nbsp;&nbsp;"path":""<br/>&nbsp;&nbsp;"size-in-bytes":""<br/>&nbsp;&nbsp;"size-in-kbytes":""<br/>
-     * &nbsp;&nbsp;"size-in-mbytes":""<br/>}</b>
-     * @since 1.0
-     */
-    public function toJSON(){
-        $jsonX = new JsonX();
-        $jsonX->add('id', $this->getID());
-        $jsonX->add('mime', $this->getFileMIMEType());
-        $jsonX->add('name', $this->getName());
-        $jsonX->add('path', $this->getPath());
-        $jsonX->add('size-in-bytes', $this->getSize());
-        $jsonX->add('size-in-kbytes', $this->getSize()/1024);
-        $jsonX->add('size-in-mbytes', ($this->getSize()/1024)/1024);
-        return $jsonX;
-    }
-    /**
-     * Returns JSON string that represents basic file info.
-     * @return string
-     */
-    public function __toString() {
-        return $this->toJSON().'';
-    }
-    /**
-     * Creates new instance of the class.
-     * This method will set the path and name to empty string. Also, it will 
-     * set the size to 0 and ID to -1. Finally, it will set MIME type to 
-     * "application/octet-stream"
-     * @param string $fName The name of the file such as 'my-file.png'.
-     * @param string $fPath The path of the file such as 'C:/Images/Test'.
-     * @since 1.0
-     */
-    public function __construct($fName='',$fPath='') {
-        $this->mimeType = 'application/octet-stream';
-        if(!$this->setPath($fPath)){
-            $this->path = '';
-        }
-        $this->setName($fName);
-        $this->id = -1;
-        $this->fSize = 0;
-    }
-    /**
-     * Removes a file given its name and path.
-     * Before calling this method, the name of the file and its path must 
-     * be specified.
-     * @return boolean If the file was removed, the method will return 
-     * true. Other than that, the method will return false.
-     * @since 1.1.2
-     */
-    public function remove() {
-        if(file_exists($this->getAbsolutePath())){
-            unlink($this->getAbsolutePath());
-            return true;
-        }
-        return false;
+        restore_error_handler();
+        throw new Exception('Unable to open the file at \''.$path.'\'.');
     }
 }
-

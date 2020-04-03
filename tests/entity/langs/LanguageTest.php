@@ -1,14 +1,15 @@
 <?php
 namespace webfiori\tests\entity;
-use webfiori\entity\langs\Language;
+
 use PHPUnit\Framework\TestCase;
 use webfiori\entity\File;
+use webfiori\entity\langs\Language;
 /**
  * Description of LanguageTest
  *
  * @author Eng.Ibrahim
  */
-class LanguageTest extends TestCase{
+class LanguageTest extends TestCase {
     /**
      * Testing the constructor of the class 'Language' without using any parameters.
      * @test
@@ -20,10 +21,10 @@ class LanguageTest extends TestCase{
         $this->assertEquals('XX',$lang->getCode());
         $this->assertEquals('ltr',$lang->getWritingDir());
         $this->assertTrue($lang->isLoaded());
-        $this->assertEquals(array(
-            'code'=>'XX',
-            'dir'=>'ltr'
-        ),$lang->getLanguageVars());
+        $this->assertEquals([
+            'code' => 'XX',
+            'dir' => 'ltr'
+        ],$lang->getLanguageVars());
         $this->assertTrue(Language::unloadTranslation('XX'));
     }
     /**
@@ -38,10 +39,10 @@ class LanguageTest extends TestCase{
         $this->assertEquals('XX',$lang->getCode());
         $this->assertEquals('ltr',$lang->getWritingDir());
         $this->assertFalse($lang->isLoaded());
-        $this->assertEquals(array(
-            'code'=>'XX',
-            'dir'=>'ltr'
-        ),$lang->getLanguageVars());
+        $this->assertEquals([
+            'code' => 'XX',
+            'dir' => 'ltr'
+        ],$lang->getLanguageVars());
         $this->assertFalse(Language::unloadTranslation('XX'));
     }
     /**
@@ -56,10 +57,10 @@ class LanguageTest extends TestCase{
         $this->assertEquals('XX',$lang->getCode());
         $this->assertEquals('rtl',$lang->getWritingDir());
         $this->assertFalse($lang->isLoaded());
-        $this->assertEquals(array(
-            'code'=>'XX',
-            'dir'=>'rtl'
-        ),$lang->getLanguageVars());
+        $this->assertEquals([
+            'code' => 'XX',
+            'dir' => 'rtl'
+        ],$lang->getLanguageVars());
         $this->assertFalse(Language::unloadTranslation('ENU'));
     }
     /**
@@ -74,11 +75,42 @@ class LanguageTest extends TestCase{
         $this->assertEquals('FR',$lang->getCode());
         $this->assertEquals('ltr',$lang->getWritingDir());
         $this->assertFalse($lang->isLoaded());
-        $this->assertEquals(array(
-            'code'=>'FR',
-            'dir'=>'ltr'
-        ),$lang->getLanguageVars());
+        $this->assertEquals([
+            'code' => 'FR',
+            'dir' => 'ltr'
+        ],$lang->getLanguageVars());
         $this->assertFalse(Language::unloadTranslation('FR'));
+    }
+    /**
+     * @test
+     */
+    public function testCreateAndSet00() {
+        $lang = Language::loadTranslation('en');
+        $lang->createAndSet(' general/sub/sub2/all-new/', [
+            'Nice','Work','hello' => 'Hello World!','ok' => 'Okay'
+        ]);
+        $vars = $lang->get('general/sub/sub2/all-new');
+        $this->assertEquals([
+            '0' => 'Nice',
+            '1' => 'Work',
+            'hello' => 'Hello World!',
+            'ok' => 'Okay'
+        ],$vars);
+        $this->assertEquals('Hello World!',$lang->get('general/sub/sub2/all-new/hello'));
+        $this->assertEquals('Nice',$lang->get('general/sub/sub2/all-new/0'));
+    }
+    /**
+     * Testing the method Language::get() with non-exiting language variable.
+     * @test
+     */
+    public function testGet00() {
+        $lang = Language::loadTranslation('ar');
+        $var = $lang->get('   this/does/not/exist/');
+        $this->assertEquals('this/does/not/exist',$var);
+        $var2 = $lang->get('general/not-exist');
+        $this->assertEquals('general/not-exist',$var2);
+        $var3 = $lang->get('general');
+        $this->assertEquals('array', gettype($var3));
     }
     /**
      * Try to load a language which does not have a translation file.
@@ -118,7 +150,7 @@ class LanguageTest extends TestCase{
     public function testLoadTranslation03() {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('The translation file was found. But no object of type \'Language\' is stored. Make sure that the parameter '
-                                . '$addtoLoadedAfterCreate is set to true when creating the language object.');
+                                .'$addtoLoadedAfterCreate is set to true when creating the language object.');
         Language::loadTranslation('Jp');
     }
     /**
@@ -131,59 +163,16 @@ class LanguageTest extends TestCase{
         $this->assertEquals('AR',$lang->getCode());
         $this->assertEquals('rtl',$lang->getWritingDir());
         $this->assertEquals(1,count(Language::getLoadedLangs()));
-        
+
         $lang2 = Language::loadTranslation('en');
         $this->assertTrue($lang2 instanceof Language);
         $this->assertEquals('EN',$lang2->getCode());
         $this->assertEquals('ltr',$lang2->getWritingDir());
         $this->assertEquals(2,count(Language::getLoadedLangs()));
-        
+
         $lang3 = Language::loadTranslation('en  ');
         $this->assertEquals(2,count(Language::getLoadedLangs()));
         $this->assertTrue($lang3 === $lang2);
-    }
-    /**
-     * Testing the method Language::unloadTransaltion()
-     * @test
-     * @depends testLoadTranslation04
-     */
-    public function testUnloadTranslation00() {
-        $this->assertFalse(Language::unloadTranslation('arx'));
-        $this->assertEquals(2,count(Language::getLoadedLangs()));
-        $this->assertTrue(Language::unloadTranslation('ar '));
-        $this->assertEquals(1,count(Language::getLoadedLangs()));
-        $this->assertFalse(Language::unloadTranslation('AR'));
-        $this->assertTrue(Language::unloadTranslation(' En'));
-        $this->assertEquals(0,count(Language::getLoadedLangs()));
-    }
-    /**
-     * Testing the method 'Language::setCode()' for new instance which is 
-     * not loaded.
-     * @test
-     */
-    public function testSetCode00() {
-        $lang = new Language('','',false);
-        $this->assertFalse($lang->setCode(''));
-        $this->assertFalse($lang->setCode('z'));
-        $this->assertTrue($lang->setCode('zk'));
-        $this->assertFalse($lang->setCode('zkf'));
-        $this->assertEquals('ZK',$lang->getCode());
-        $this->assertFalse($lang->setCode('1F'));
-    }
-    /**
-     * Testing the method 'Language::setCode()' for a loaded translation.
-     * @test
-     */
-    public function testSetCode01() {
-        $lang = Language::loadTranslation('AR');
-        $this->assertFalse($lang->setCode(''));
-        $this->assertFalse($lang->setCode('z'));
-        $this->assertTrue($lang->setCode('zk'));
-        $this->assertFalse($lang->setCode('zkf'));
-        $this->assertEquals('ZK',$lang->getCode());
-        $this->assertFalse($lang->setCode('1F'));
-        $this->assertFalse(Language::unloadTranslation('AR'));
-        $this->assertTrue(Language::unloadTranslation('zk'));
     }
     /**
      * @test
@@ -218,40 +207,46 @@ class LanguageTest extends TestCase{
         $this->assertEquals('mmm',$lang->get('general/a-var'));
     }
     /**
-     * Testing the method Language::get() with non-exiting language variable.
+     * Testing the method 'Language::setCode()' for new instance which is 
+     * not loaded.
      * @test
      */
-    public function testGet00() {
-        $lang = Language::loadTranslation('ar');
-        $var = $lang->get('   this/does/not/exist/');
-        $this->assertEquals('this/does/not/exist',$var);
-        $var2 = $lang->get('general/not-exist');
-        $this->assertEquals('general/not-exist',$var2);
-        $var3 = $lang->get('general');
-        $this->assertEquals('array', gettype($var3));
+    public function testSetCode00() {
+        $lang = new Language('','',false);
+        $this->assertFalse($lang->setCode(''));
+        $this->assertFalse($lang->setCode('z'));
+        $this->assertTrue($lang->setCode('zk'));
+        $this->assertFalse($lang->setCode('zkf'));
+        $this->assertEquals('ZK',$lang->getCode());
+        $this->assertFalse($lang->setCode('1F'));
     }
     /**
+     * Testing the method 'Language::setCode()' for a loaded translation.
      * @test
      */
-    public function testCreateAndSet00() {
-        $lang = Language::loadTranslation('en');
-        $lang->createAndSet(' general/sub/sub2/all-new/', array(
-            'Nice','Work','hello'=>'Hello World!','ok'=>'Okay'
-        ));
-        $vars = $lang->get('general/sub/sub2/all-new');
-        $this->assertEquals(array(
-            '0'=>'Nice',
-            '1'=>'Work',
-            'hello'=>'Hello World!',
-            'ok'=>'Okay'
-        ),$vars);
-        $this->assertEquals('Hello World!',$lang->get('general/sub/sub2/all-new/hello'));
-        $this->assertEquals('Nice',$lang->get('general/sub/sub2/all-new/0'));
+    public function testSetCode01() {
+        $lang = Language::loadTranslation('AR');
+        $this->assertFalse($lang->setCode(''));
+        $this->assertFalse($lang->setCode('z'));
+        $this->assertTrue($lang->setCode('zk'));
+        $this->assertFalse($lang->setCode('zkf'));
+        $this->assertEquals('ZK',$lang->getCode());
+        $this->assertFalse($lang->setCode('1F'));
+        $this->assertFalse(Language::unloadTranslation('AR'));
+        $this->assertTrue(Language::unloadTranslation('zk'));
+    }
+    /**
+     * Testing the method Language::unloadTransaltion()
+     * @test
+     * @depends testLoadTranslation04
+     */
+    public function testUnloadTranslation00() {
+        $this->assertFalse(Language::unloadTranslation('arx'));
+        $this->assertEquals(2,count(Language::getLoadedLangs()));
+        $this->assertTrue(Language::unloadTranslation('ar '));
+        $this->assertEquals(1,count(Language::getLoadedLangs()));
+        $this->assertFalse(Language::unloadTranslation('AR'));
+        $this->assertTrue(Language::unloadTranslation(' En'));
+        $this->assertEquals(0,count(Language::getLoadedLangs()));
     }
 }
-
-
-
-
-
-

@@ -23,21 +23,21 @@
  * THE SOFTWARE.
  */
 namespace webfiori\entity\cron;
-use webfiori\WebFiori;
-use webfiori\entity\Page;
-use webfiori\entity\cron\CronJob;
-use phpStructs\html\JsCode;
-use phpStructs\html\TableRow;
-use phpStructs\html\TableCell;
+
 use phpStructs\html\HTMLNode;
+use phpStructs\html\JsCode;
 use phpStructs\html\PNode;
+use phpStructs\html\TableCell;
+use phpStructs\html\TableRow;
+use webfiori\entity\Page;
+use webfiori\WebFiori;
 /**
  * A view to show details of a specific CRON task.
  *
  * @author Ibrahim
  * @version 1.0
  */
-class CronTaskView extends CronView{
+class CronTaskView extends CronView {
     /**
      * The job that the view will display its info.
      * @var CronJob 
@@ -52,12 +52,13 @@ class CronTaskView extends CronView{
         $jobName = $_GET['job-name'];
         $job = Cron::getJob($jobName);
         $this->job = $job;
-        if($job instanceof CronJob){
+
+        if ($job instanceof CronJob) {
             $backButton = new HTMLNode('button');
             $backButton->addTextNode('Back to Jobs List');
             $backButton->setAttribute('onclick',"window.location.href = 'cron/jobs';");
             $backButton->setStyle([
-                'float'=>'left'
+                'float' => 'left'
             ]);
             $backButton->setName('input-element');
             $this->getControlsContainer()->addChild($backButton);
@@ -66,37 +67,38 @@ class CronTaskView extends CronView{
             $this->_createCustomParamsContainer();
             $custAttrsNames = $job->getExecutionAttributes();
             $custAtrrsAsJsonArr = '[';
-            for($x = 0 ; $x < count($custAttrsNames) ; $x++){
-                if($x == 0){
+
+            for ($x = 0 ; $x < count($custAttrsNames) ; $x++) {
+                if ($x == 0) {
                     $custAtrrsAsJsonArr .= '"'.$custAttrsNames[$x].'"';
-                }
-                else{
+                } else {
                     $custAtrrsAsJsonArr .= ',"'.$custAttrsNames[$x].'"';
                 }
             }
             $custAtrrsAsJsonArr .= ']';
             $isRefresh = 'false';
-            if(isset($_GET['refresh'])){
+
+            if (isset($_GET['refresh'])) {
                 $isRefresh = 'true';
             }
             $jsCode = new JsCode();
             $jsCode->addCode(''
-                    . 'window.onload = function(){'."\n"
-                    . '     window.isRefresh = '.$isRefresh.';'
-                    . '     window.customAttrsArr = '.$custAtrrsAsJsonArr.';'
-                    . '     window.customAttrs = [];'
-                    . '     for(var x = 0 ; x < window.customAttrsArr.length ; x++){'
-                    . '         addAttribute(window.customAttrsArr[x]);'
-                    . '     }'."\n"
-                    . "     "
-                    . '     window.intervalId = window.setInterval(function(){'."\n"
-                    . '         if(window.isRefresh){'."\n"
-                    . '             disableOrEnableInputs();'."\n"
-                    . '             document.getElementById(\'refresh-label\').innerHTML = \'<b>Refreshing...</b>\';'."\n"
-                    . '             window.location.href = \'cron/jobs?refresh=yes\';'."\n"
-                    . '         }'."\n"
-                    . '     },60000)'."\n"
-                    . ' };'."\n"
+                    .'window.onload = function(){'."\n"
+                    .'     window.isRefresh = '.$isRefresh.';'
+                    .'     window.customAttrsArr = '.$custAtrrsAsJsonArr.';'
+                    .'     window.customAttrs = [];'
+                    .'     for(var x = 0 ; x < window.customAttrsArr.length ; x++){'
+                    .'         addAttribute(window.customAttrsArr[x]);'
+                    .'     }'."\n"
+                    ."     "
+                    .'     window.intervalId = window.setInterval(function(){'."\n"
+                    .'         if(window.isRefresh){'."\n"
+                    .'             disableOrEnableInputs();'."\n"
+                    .'             document.getElementById(\'refresh-label\').innerHTML = \'<b>Refreshing...</b>\';'."\n"
+                    .'             window.location.href = \'cron/jobs?refresh=yes\';'."\n"
+                    .'         }'."\n"
+                    .'     },60000)'."\n"
+                    .' };'."\n"
                     );
             Page::document()->getHeadNode()->addChild($jsCode);
             $forceNode = new HTMLNode();
@@ -104,67 +106,66 @@ class CronTaskView extends CronView{
             $this->getControlsContainer()->addChild($forceNode);
             $this->createOutputWindow();
             Page::render();
-        }
-        else{
+        } else {
             header('location: '.WebFiori::getSiteConfig()->getBaseURL().'cron-jobs/list');
         }
     }
-    
-    private function _createCustomParamsContainer(){
+
+    private function _createCustomParamsContainer() {
         $h2 = new HTMLNode('h2');
         $h2->addTextNode('Custom Execution Parameters');
         $this->getControlsContainer()->addChild($h2);
         $p = new PNode();
         $p->addText('Here you can add extra parameters which will be sent with '
-                . 'force execute command.');
+                .'force execute command.');
         $this->getControlsContainer()->addChild($p);
         $table = new HTMLNode('table');
         $table->setID('custom-params-table');
         $table->setAttribute('border', 1);
-        $table->setStyle(array(
-            'border-collapse'=>'collapse',
-            'margin-top'=>'30px'
-        ));
+        $table->setStyle([
+            'border-collapse' => 'collapse',
+            'margin-top' => '30px'
+        ]);
         $headerRow = new TableRow();
         $headerRow->setStyle([
-            'border-bottom'=>'double',
-            'background-color'=>'rgba(66,234,88,0.3)',
-            'font-weight'=>'bold'
+            'border-bottom' => 'double',
+            'background-color' => 'rgba(66,234,88,0.3)',
+            'font-weight' => 'bold'
         ]);
         $headerRow->setClassName('tasks-table-header-row');
         $nameCell = new TableCell();
         $nameCell->setClassName('tasks-table-header-cell');
         $nameCell->setStyle([
-            'padding'=>'10px'
+            'padding' => '10px'
         ]);
         $nameCell->addTextNode('Attribute Name');
         $headerRow->addChild($nameCell);
-        
+
         $valueCell = new TableCell();
         $valueCell->setClassName('tasks-table-header-cell');
         $valueCell->setStyle([
-            'padding'=>'10px'
+            'padding' => '10px'
         ]);
         $valueCell->addTextNode('Attribute Value');
         $headerRow->addChild($valueCell);
-        
+
         $removeCell = new TableCell();
         $removeCell->setClassName('tasks-table-header-cell');
         $removeCell->setStyle([
-            'padding'=>'10px'
+            'padding' => '10px'
         ]);
         $removeCell->addTextNode('Remove');
         $headerRow->addChild($removeCell);
-        
+
         $table->addChild($headerRow);
         $noDataRow = new TableRow();
         $noDataRow->setID('no-attributes-row');
         $noDataCell = new TableCell();
-        $noDataCell->setStyle(array(
-            'background-color'=>'lightgray',
-            'text-align'=>'center',
-            'font-weight'=>'bold'
-        ));
+        $noDataCell->setStyle([
+            'background-color' => 'lightgray',
+            'text-align' => 'center',
+            'font-weight' => 'bold'
+        ]);
         $noDataCell->setColSpan(3);
         $noDataCell->addTextNode('No Attributes');
         $noDataRow->addChild($noDataCell);
@@ -184,66 +185,66 @@ class CronTaskView extends CronView{
      * 
      * @param CronJob $job
      */
-    private function _createInfoTable($job){
+    private function _createInfoTable($job) {
         $taskTable = new HTMLNode('table');
         $taskTable->setID('tasks-table');
         $this->getControlsContainer()->addChild($taskTable);
         $taskTable->setAttribute('border', 1);
-        $taskTable->setStyle(array(
-            'border-collapse'=>'collapse',
-            'margin-top'=>'30px'
-        ));
+        $taskTable->setStyle([
+            'border-collapse' => 'collapse',
+            'margin-top' => '30px'
+        ]);
         $row1 = new TableRow();
         $row1->addCell('<b>Task Name:</b>','td',false);
         $row1->addCell($job->getJobName());
         $taskTable->addChild($row1);
-        
+
         $row2 = new TableRow();
         $row2->addCell('<b>CRON Expression:</b>','td',false);
         $row2->addCell($job->getExpression());
         $taskTable->addChild($row2);
-        
+
         $row3 = new TableRow();
         $row3->addCell('<b>Is Minute:</b>','td',false);
         $row3->addChild($this->_createTasksTableCell($job->isMinute()));
         $taskTable->addChild($row3);
-                
+
         $row4 = new TableRow();
         $row4->addCell('<b>Is Houre:</b>','td',false);
         $row4->addChild($this->_createTasksTableCell($job->isHour()));
         $taskTable->addChild($row4);
-        
+
         $row5 = new TableRow();
         $row5->addCell('<b>Is Day of Month:</b>','td',false);
         $row5->addChild($this->_createTasksTableCell($job->isDayOfMonth()));
         $taskTable->addChild($row5);
-        
+
         $row6 = new TableRow();
         $row6->addCell('<b>Is Month:</b>','td',false);
         $row6->addChild($this->_createTasksTableCell($job->isMonth()));
         $taskTable->addChild($row6);
-                
+
         $row7 = new TableRow();
         $row7->addCell('<b>Is Day of Week:</b>','td',false);
         $row7->addChild($this->_createTasksTableCell($job->isDayOfWeek()));
         $taskTable->addChild($row7);
-                
     }
-    private function _createTasksTableCell($isTime){
+    private function _createTasksTableCell($isTime) {
         $cell = new TableCell();
         $cell->setClassName('tasks-table-cell');
-        if($isTime){
-            $cell->setStyle(array(
-                    'background-color'=>'rgba(100,255,29,0.3)'
-                ));
+
+        if ($isTime) {
+            $cell->setStyle([
+                    'background-color' => 'rgba(100,255,29,0.3)'
+                ]);
             $cell->addTextNode('Yes');
-        }
-        else{
-            $cell->setStyle(array(
-                'background-color'=>'rgba(255,87,29,0.3)'
-            ));
+        } else {
+            $cell->setStyle([
+                'background-color' => 'rgba(255,87,29,0.3)'
+            ]);
             $cell->addTextNode('No');
         }
+
         return $cell;
     }
 }

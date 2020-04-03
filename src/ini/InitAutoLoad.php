@@ -23,6 +23,7 @@
  * THE SOFTWARE.
  */
 namespace webfiori\ini;
+
 use webfiori\entity\AutoLoader;
 /**
  * A class that has one method to initialize user-defined autoload directories.

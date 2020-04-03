@@ -1,4 +1,5 @@
 <?php
+
 use webfiori\entity\AutoLoader;
 use webfiori\entity\CLI;
 $DS = DIRECTORY_SEPARATOR;
@@ -15,53 +16,57 @@ $WebFioriFrameworkDirs = [
 ];
 fprintf(STDOUT, "Bootstrap Path: '".__DIR__."'\n");
 fprintf(STDOUT,"Tests Directory: '".TESTS_DIRECTORY."'.\n");
-fprintf(STDOUT,'Include Path: \''. get_include_path().'\''."\n");
+fprintf(STDOUT,'Include Path: \''.get_include_path().'\''."\n");
 fprintf(STDOUT,"Tryning to load the class 'AutoLoader'...\n");
 $isAutoloaderLoaded = false;
-if(explode($DS, __DIR__)[0] == 'home'){
+
+if (explode($DS, __DIR__)[0] == 'home') {
     fprintf(STDOUT,"Run Environment: Linux.\n");
-    foreach ($WebFioriFrameworkDirs as $dir){
+
+    foreach ($WebFioriFrameworkDirs as $dir) {
         //linux 
         $file = $DS.$dir.'entity'.$DS.'AutoLoader.php';
         fprintf(STDOUT,"Checking if file '$file' is exist...\n");
-        if(file_exists($file)){
+
+        if (file_exists($file)) {
             require_once $file;
             $isAutoloaderLoaded = true;
             break;
         }
     }
-}
-else{
+} else {
     fprintf(STDOUT,"Run Environment: Other.\n");
-    foreach ($WebFioriFrameworkDirs as $dir){
+
+    foreach ($WebFioriFrameworkDirs as $dir) {
         //other
         $file = $dir.$DS.'entity'.$DS.'AutoLoader.php';
         fprintf(STDOUT,"Checking if file '$file' is exist...\n");
-        if(file_exists($file)){
+
+        if (file_exists($file)) {
             require_once $file;
             $isAutoloaderLoaded = true;
             break;
         }
     }
 }
-if($isAutoloaderLoaded === false){
+
+if ($isAutoloaderLoaded === false) {
     fprintf(STDERR, "Error: Unable to find the class 'AutoLoader'.\n");
     exit(-1);
-}
-else{
+} else {
     fprintf(STDOUT,"Class 'AutoLoader' successfully loaded.\n");
 }
 fprintf(STDOUT,"Class 'Initializing autoload directories...\n");
-AutoLoader::get(array(
-    'search-folders'=>[
+AutoLoader::get([
+    'search-folders' => [
         'tests',
         'src',
         'vendor'
     ],
-    'define-root'=>true,
-    'root'=>__DIR__,
-    'on-load-failure'=>'do-nothing'
-));
+    'define-root' => true,
+    'root' => __DIR__,
+    'on-load-failure' => 'do-nothing'
+]);
 fprintf(STDOUT,'Autoloader Initialized.'."\n");
 fprintf(STDOUT,'Initializing CLI of the Framework...'."\n");
 CLI::init();
@@ -74,8 +79,8 @@ fprintf(STDOUT,'Root Directory: \''.AutoLoader::get()->root().'\'.'."\n");
 //}
 fprintf(STDOUT, "Registering shutdown function...\n");
 //run sum code after tests completion.
-register_shutdown_function(function(){
-    
+register_shutdown_function(function()
+{
 });
 fprintf(STDOUT, "Registering shutdown function completed.\n");
 fprintf(STDOUT,"Starting to run tests...\n");

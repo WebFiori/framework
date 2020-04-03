@@ -1,15 +1,16 @@
 <?php
 namespace webfiori\tests\entity\mail;
+
 use PHPUnit\Framework\TestCase;
+use webfiori\conf\MailConfig;
 use webfiori\entity\mail\EmailMessage;
 use webfiori\entity\mail\SMTPAccount;
-use webfiori\conf\MailConfig;
 /**
  * A test class for testing the class 'webfiori\entity\mail\EmailMessage'.
  *
  * @author Ibrahim
  */
-class EmailMessageTest extends TestCase{
+class EmailMessageTest extends TestCase {
     /**
      * @test
      */

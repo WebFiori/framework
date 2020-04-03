@@ -23,28 +23,29 @@
  * THE SOFTWARE.
  */
 namespace webfiori;
+
+use Exception;
+use jsonx\JsonX;
 use webfiori\conf\Config;
-use webfiori\conf\SiteConfig;
 use webfiori\conf\MailConfig;
-use webfiori\entity\exceptions\InitializationException;
-use webfiori\ini\InitPrivileges;
-use webfiori\ini\InitAutoLoad;
-use webfiori\ini\InitCron;
-use webfiori\logic\ConfigController;
-use webfiori\logic\WebsiteController;
-use webfiori\logic\EmailController;
+use webfiori\conf\SiteConfig;
 use webfiori\entity\AutoLoader;
-use webfiori\entity\Util;
-use webfiori\entity\ui\ErrorBox;
+use webfiori\entity\CLI;
+use webfiori\entity\exceptions\InitializationException;
 use webfiori\entity\router\APIRoutes;
-use webfiori\entity\router\ViewRoutes;
 use webfiori\entity\router\ClosureRoutes;
 use webfiori\entity\router\OtherRoutes;
 use webfiori\entity\router\Router;
+use webfiori\entity\router\ViewRoutes;
+use webfiori\entity\ui\ErrorBox;
 use webfiori\entity\ui\ServerErrView;
-use jsonx\JsonX;
-use webfiori\entity\CLI;
-use Exception;
+use webfiori\entity\Util;
+use webfiori\ini\InitAutoLoad;
+use webfiori\ini\InitCron;
+use webfiori\ini\InitPrivileges;
+use webfiori\logic\ConfigController;
+use webfiori\logic\EmailController;
+use webfiori\logic\WebsiteController;
 /**
  * The time at which the framework was booted in microseconds as a float.
  * @since 1.1.0
@@ -62,7 +63,25 @@ define('LOAD_COMPOSER_PACKAGES', true);
  * @author Ibrahim
  * @version 1.3.4
  */
-class WebFiori{
+class WebFiori {
+    /**
+     * An instance of autoloader class.
+     * @var AutoLoader 
+     * @since 1.0
+     */
+    private static $AU;
+    /**
+     * An instance of basic mail functions class.
+     * @var EmailController 
+     * @since 1.0
+     */
+    private static $BMF;
+    /**
+     * A mutex lock to disallow class access during initialization state.
+     * @var int
+     * @since 1.0 
+     */
+    private static $classStatus = 'NONE';
     /**
      * An associative array that contains database connection error that might 
      * happen during initialization.
@@ -71,18 +90,11 @@ class WebFiori{
      */
     private $dbErrDetails;
     /**
-     * A variable to store system status. The variable will be set to true 
-     * if everything is Ok.
-     * @var boolean|string 
-     * @since 1.0
+     * A single instance of the class.
+     * @var WebFiori
+     * @since 1.0 
      */
-    private $sysStatus;
-    /**
-     * An instance of autoloader class.
-     * @var AutoLoader 
-     * @since 1.0
-     */
-    private static $AU;
+    private static $LC;
     /**
      * An instance of system functions class.
      * @var ConfigController 
@@ -90,29 +102,131 @@ class WebFiori{
      */
     private static $SF;
     /**
+     * A variable to store system status. The variable will be set to true 
+     * if everything is Ok.
+     * @var boolean|string 
+     * @since 1.0
+     */
+    private $sysStatus;
+    /**
      * An instance of web site functions class.
      * @var WebsiteController 
      * @since 1.0
      */
     private static $WF;
     /**
-     * An instance of basic mail functions class.
-     * @var EmailController 
+     * The entry point for initiating the system.
      * @since 1.0
      */
-    private static $BMF;
+    private function __construct() {
+        /*
+         * first, check for php streams if they are open or not.
+         */
+        if (!defined('STDIN')) {
+            define('STDIN', fopen('php://stdin', 'r'));
+        }
+
+        if (!defined('STDOUT')) {
+            define('STDOUT', fopen('php://stdout', 'w'));
+        }
+
+        if (!defined('STDERR')) {
+            define('STDERR',fopen('php://stderr', 'w'));
+        }
+        /**
+         * Change encoding of mb_ functions to UTF-8
+         */
+        if (function_exists('mb_internal_encoding')) {
+            $encoding = 'UTF-8';
+            mb_internal_encoding($encoding);
+            mb_http_output($encoding);
+            mb_http_input($encoding);
+            mb_regex_encoding($encoding);
+        }
+        /**
+         * Set memory limit to 2GB per script
+         */
+        ini_set('memory_limit', '2048M');
+        /**
+         * See http://php.net/manual/en/timezones.php for supported time zones.
+         * Change this as needed.
+         */
+        date_default_timezone_set('Asia/Riyadh');
+        /**
+         * The root directory that is used to load all other required system files.
+         */
+        if (!defined('ROOT_DIR')) {
+            define('ROOT_DIR',__DIR__);
+        }
+
+        /**
+         * Fallback for older php versions that does not
+         * support the constant PHP_INT_MIN
+         */
+        if (!defined('PHP_INT_MIN')) {
+            define('PHP_INT_MIN', ~PHP_INT_MAX);
+        }
+
+        /**
+         * Initialize autoloader.
+         */
+        if (!class_exists('webfiori\entity\AutoLoader',false)) {
+            require_once ROOT_DIR.DIRECTORY_SEPARATOR.'entity'.DIRECTORY_SEPARATOR.'AutoLoader.php';
+        }
+        self::$AU = AutoLoader::get();
+        InitAutoLoad::init();
+        CLI::init();
+        $this->_setHandlers();
+        self::$SF = ConfigController::get();
+        self::$WF = WebsiteController::get();
+        self::$BMF = EmailController::get();
+
+        $this->sysStatus = Util::checkSystemStatus();
+
+        if ($this->sysStatus == Util::MISSING_CONF_FILE || $this->sysStatus == Util::MISSING_SITE_CONF_FILE) {
+            self::$SF->createConfigFile();
+            self::$WF->createSiteConfigFile();
+            self::$BMF->createEmailConfigFile();
+            $this->sysStatus = Util::checkSystemStatus();
+        }
+
+        if (gettype($this->sysStatus) == 'array') {
+            $this->dbErrDetails = $this->sysStatus;
+            $this->sysStatus = Util::DB_NEED_CONF;
+        }
+
+        //Initialize routes.
+        APIRoutes::create();
+        ViewRoutes::create();
+        ClosureRoutes::create();
+        OtherRoutes::create();
+
+        //initialize cron and privileges...
+        InitCron::init();
+        InitPrivileges::init();
+
+        //class is now initialized
+        self::$classStatus = 'INITIALIZED';
+
+        define('INITIAL_SYS_STATUS', $this->_getSystemStatus());
+
+        if (!CLI::isCLI() && INITIAL_SYS_STATUS !== true) {
+            //you can modify this part to make 
+            //it do something else in case system 
+            //configuration is not equal to true
+            //
+            //show error message to tell the developer how to configure the system.
+            $this->_needConfigration();
+        }
+    }
     /**
-     * A single instance of the class.
-     * @var WebFiori
-     * @since 1.0 
+     * Show an error message that tells the user about system status and how to 
+     * configure it.
+     * @since 1.0
      */
-    private static $LC;
-    /**
-     * A mutex lock to disallow class access during initialization state.
-     * @var int
-     * @since 1.0 
-     */
-    private static $classStatus = 'NONE';
+    public static function configErr() {
+        WebFiori::getAndStart()->_needConfigration();
+    }
     /**
      * Initiate the framework and return a single instance of the class that can 
      * be used to update some settings.
@@ -138,17 +252,27 @@ class WebFiori{
      * @return WebFiori An instance of the class.
      * @since 1.0
      */
-    public static function getAndStart(){
-        if(self::$classStatus == 'NONE'){
-            if(self::$LC === null){
+    public static function getAndStart() {
+        if (self::$classStatus == 'NONE') {
+            if (self::$LC === null) {
                 self::$classStatus = 'INITIALIZING';
                 self::$LC = new WebFiori();
             }
+        } else {
+            if (self::$classStatus == 'INITIALIZING') {
+                throw new InitializationException('Using the core class while it is not fully initialized.');
+            }
         }
-        else if(self::$classStatus == 'INITIALIZING'){
-            throw new InitializationException('Using the core class while it is not fully initialized.');
-        }
+
         return self::$LC;
+    }
+    /**
+     * Returns a reference to an instance of 'AutoLoader'.
+     * @return AutoLoader A reference to an instance of 'AutoLoader'.
+     * @since 1.2.1
+     */
+    public static function getAutoloader() {
+        return self::$AU;
     }
     /**
      * Returns the status of the class.
@@ -161,227 +285,6 @@ class WebFiori{
     public static function getClassStatus() {
         return self::$classStatus;
     }
-    /**
-     * The entry point for initiating the system.
-     * @since 1.0
-     */
-    private function __construct() {
-        /*
-         * first, check for php streams if they are open or not.
-         */
-        if(!defined('STDIN')){
-            define('STDIN', fopen('php://stdin', 'r'));
-        }
-        if(!defined('STDOUT')){
-            define('STDOUT', fopen('php://stdout', 'w'));
-        }
-        if(!defined('STDERR')){
-            define('STDERR',fopen('php://stderr', 'w'));
-        }
-        /**
-         * Change encoding of mb_ functions to UTF-8
-         */
-        if(function_exists('mb_internal_encoding')){
-            $encoding = 'UTF-8';
-            mb_internal_encoding($encoding);
-            mb_http_output($encoding);
-            mb_http_input($encoding);
-            mb_regex_encoding($encoding);
-        }
-        /**
-         * Set memory limit to 2GB per script
-         */
-        ini_set('memory_limit', '2048M');
-        /**
-         * See http://php.net/manual/en/timezones.php for supported time zones.
-         * Change this as needed.
-         */
-        date_default_timezone_set('Asia/Riyadh');
-        /**
-         * The root directory that is used to load all other required system files.
-         */
-        if(!defined('ROOT_DIR')){
-            define('ROOT_DIR',__DIR__);
-        }
-
-        /**
-         * Fallback for older php versions that does not
-         * support the constant PHP_INT_MIN
-         */
-        if(!defined('PHP_INT_MIN')){
-            define('PHP_INT_MIN', ~PHP_INT_MAX);
-        }
-
-        /**
-         * Initialize autoloader.
-         */
-        if(!class_exists('webfiori\entity\AutoLoader',false)){
-           require_once ROOT_DIR.DIRECTORY_SEPARATOR.'entity'.DIRECTORY_SEPARATOR.'AutoLoader.php';
-        }
-        self::$AU = AutoLoader::get();
-        InitAutoLoad::init();
-        CLI::init();
-        $this->_setHandlers();
-        self::$SF = ConfigController::get();
-        self::$WF = WebsiteController::get();
-        self::$BMF = EmailController::get();
-        
-        $this->sysStatus = Util::checkSystemStatus();
-        if($this->sysStatus == Util::MISSING_CONF_FILE || $this->sysStatus == Util::MISSING_SITE_CONF_FILE){
-            self::$SF->createConfigFile();
-            self::$WF->createSiteConfigFile();
-            self::$BMF->createEmailConfigFile();
-            $this->sysStatus = Util::checkSystemStatus();
-        }
-        if(gettype($this->sysStatus) == 'array'){
-            $this->dbErrDetails = $this->sysStatus;
-            $this->sysStatus = Util::DB_NEED_CONF;
-        }
-        
-        //Initialize routes.
-        APIRoutes::create();
-        ViewRoutes::create();
-        ClosureRoutes::create();
-        OtherRoutes::create();
-        
-        //initialize cron and privileges...
-        InitCron::init();
-        InitPrivileges::init();
-        
-        //class is now initialized
-        self::$classStatus = 'INITIALIZED';
-        
-        define('INITIAL_SYS_STATUS', $this->_getSystemStatus());
-        if(!CLI::isCLI() && INITIAL_SYS_STATUS !== true){
-            //you can modify this part to make 
-            //it do something else in case system 
-            //configuration is not equal to true
-            //
-            //show error message to tell the developer how to configure the system.
-            $this->_needConfigration();
-        }
-    }
-    /**
-     * Sets new error and exception handler.
-     */
-    private function _setHandlers(){
-        error_reporting(E_ALL & ~E_ERROR & ~E_COMPILE_ERROR & ~E_CORE_ERROR & ~E_RECOVERABLE_ERROR);
-        set_error_handler(function($errno, $errstr, $errfile, $errline){
-            $isCli = class_exists('webfiori\entity\CLI') ? CLI::isCLI() : php_sapi_name() == 'cli';
-            if($isCli){
-                fprintf(STDERR, "\n<%s>\n",Util::ERR_TYPES[$errno]['type']);
-                fprintf(STDERR, "Error Message    %5s %s\n",":",$errstr);
-                fprintf(STDERR, "Error Number     %5s %s\n",":",$errno);
-                fprintf(STDERR, "Error Description%5s %s\n",":",Util::ERR_TYPES[$errno]['description']);
-                fprintf(STDERR, "Error File       %5s %s\n",":",$errfile);
-                fprintf(STDERR, "Error Line:      %5s %s\n",":",$errline);
-            }
-            else{
-                if(defined('API_CALL')){
-                    header("HTTP/1.1 500 Server Error");
-                    $j = new JsonX([
-                        'message'=>$errstr,
-                        'type'=>Util::ERR_TYPES[$errno]['type'],
-                        'description'=>Util::ERR_TYPES[$errno]['description'],
-                        'error-number'=>$errno,
-                        'file'=>$errfile,
-                        'line'=>$errline
-                    ], true);
-                    header('content-type: application/json');
-                    die($j);
-                }
-                else{
-                    $errBox = new ErrorBox();
-                    $errBox->setError($errno);
-                    $errBox->setDescription($errno);
-                    $errBox->setFile($errfile);
-                    $errBox->setMessage($errstr);
-                    $errBox->setLine($errline);
-                    echo $errBox;
-                }
-            }
-            return true;
-        });
-        set_exception_handler(function($ex){
-            $isCli = class_exists('webfiori\entity\CLI') ? CLI::isCLI() : php_sapi_name() == 'cli';
-            if($isCli){
-                fprintf(STDERR, "\n<%s>\n","Uncaught Exception.");
-                fprintf(STDERR, "Exception Message %5s %s\n",":",$ex->getMessage());
-                fprintf(STDERR, "Exception Code    %5s %s\n",":",$ex->getMessage());
-                fprintf(STDERR, "File              %5s %s\n",":",$ex->getFile());
-                fprintf(STDERR, "Line              %5s %s\n",":",$ex->getLine());
-                fprintf(STDERR, "Stack Trace:\n%s",$ex->getTraceAsString());
-            }
-            else{
-                header("HTTP/1.1 500 Server Error");
-                $routeUri = Router::getUriObjByURL(Util::getRequestedURL());
-                if($routeUri !== null){
-                    $routeType = $routeUri->getType();
-                }
-                else{
-                    $routeType = Router::VIEW_ROUTE;
-                }
-                if($routeType == Router::API_ROUTE){
-                    $j = new JsonX([
-                        'message'=>'500 - Server Error: Uncaught Exception.',
-                        'type'=>'error',
-                        'exception-class'=> get_class($ex),
-                        'exception-message'=>$ex->getMessage(),
-                        'exception-code'=>$ex->getMessage(),
-                        'file'=>$ex->getFile(),
-                        'line'=>$ex->getLine()
-                    ], true);
-                    $stackTrace = new JsonX([], true);
-                    $index = 0;
-                    $trace = $ex->getTrace();
-                    foreach ($trace as $arr){
-                        if(isset($arr['file'])){
-                            $stackTrace->add('#'.$index,$arr['file'].' (Line '.$arr['line'].')');
-                        }
-                        else if(isset ($arr['function'])){
-                            $stackTrace->add('#'.$index,$arr['function']);
-                        }
-                        $index++;
-                    }
-                    $j->add('stack-trace',$stackTrace);
-                    header('content-type: application/json');
-                    die($j);
-                }
-                else{
-                    $exceptionView = new ServerErrView($ex);
-                    $exceptionView->display();
-                }
-            }
-        });
-        register_shutdown_function(function(){
-            $error = error_get_last();
-            if($error !== null) {
-                $errNo = $error['type'];
-                if($errNo == E_WARNING || 
-                   $errNo == E_NOTICE || 
-                   $errNo == E_USER_ERROR || 
-                   $errNo == E_USER_NOTICE){
-                    return;
-                }
-                header("HTTP/1.1 500 Server Error");
-                if(defined('API_CALL')){
-                    $j = new JsonX([
-                        'message'=>$error["message"],
-                        'type'=>'error',
-                        'error-number'=>$error["type"],
-                        'file'=>$error["file"],
-                        'line'=>$error["line"]
-                    ], true);
-                    die($j);
-                }
-                else{
-                    $errPage = new ServerErrView($error);
-                    $errPage->display();
-                }
-            }
-        });
-        
-    }
 
     /**
      * Returns an instance of the class 'Config'.
@@ -393,37 +296,10 @@ class WebFiori{
      * @since 1.3.3
      */
     public static function getConfig() {
-        if(class_exists('webfiori\conf\Config')){
+        if (class_exists('webfiori\conf\Config')) {
             return Config::get();
         }
-        return null;
-    }
-    /**
-     * Returns an instance of the class 'SiteConfig'.
-     * The class will contain website settings such as main language and theme.
-     * @return SiteConfig|null If class file is exist and the class is loaded, 
-     * an object of type 'SiteConfig' is returned. Other than that, the method 
-     * will return null.
-     * @since 1.3.3
-     */
-    public static function getSiteConfig() {
-        if(class_exists('webfiori\conf\SiteConfig')){
-            return SiteConfig::get();
-        }
-        return null;
-    }
-    /**
-     * Returns an instance of the class 'MailConfig'.
-     * The class will contain SMTP accounts information.
-     * @return MailConfig|null If class file is exist and the class is loaded, 
-     * an object of type 'MailConfig' is returned. Other than that, the method 
-     * will return null.
-     * @since 1.3.3
-     */
-    public static function getMailConfig() {
-        if(class_exists('webfiori\conf\MailConfig')){
-            return MailConfig::get();
-        }
+
         return null;
     }
     /**
@@ -436,16 +312,8 @@ class WebFiori{
      * information. If no errors, the method will return null.
      * @since 1.3.3
      */
-    public static function getDBErrDetails(){
+    public static function getDBErrDetails() {
         return self::getAndStart()->dbErrDetails;
-    }
-    /**
-     * Returns a reference to an instance of 'AutoLoader'.
-     * @return AutoLoader A reference to an instance of 'AutoLoader'.
-     * @since 1.2.1
-     */
-    public static function getAutoloader() {
-        return self::$AU;
     }
     /**
      * Returns a reference to an instance of 'EmailController'.
@@ -456,11 +324,41 @@ class WebFiori{
         return self::$BMF;
     }
     /**
+     * Returns an instance of the class 'MailConfig'.
+     * The class will contain SMTP accounts information.
+     * @return MailConfig|null If class file is exist and the class is loaded, 
+     * an object of type 'MailConfig' is returned. Other than that, the method 
+     * will return null.
+     * @since 1.3.3
+     */
+    public static function getMailConfig() {
+        if (class_exists('webfiori\conf\MailConfig')) {
+            return MailConfig::get();
+        }
+
+        return null;
+    }
+    /**
+     * Returns an instance of the class 'SiteConfig'.
+     * The class will contain website settings such as main language and theme.
+     * @return SiteConfig|null If class file is exist and the class is loaded, 
+     * an object of type 'SiteConfig' is returned. Other than that, the method 
+     * will return null.
+     * @since 1.3.3
+     */
+    public static function getSiteConfig() {
+        if (class_exists('webfiori\conf\SiteConfig')) {
+            return SiteConfig::get();
+        }
+
+        return null;
+    }
+    /**
      * Returns a reference to an instance of 'ConfigController'.
      * @return ConfigController A reference to an instance of 'ConfigController'.
      * @since 1.2.1
      */
-    public static function getSysController(){
+    public static function getSysController() {
         return self::$SF;
     }
     /**
@@ -483,11 +381,13 @@ class WebFiori{
      * 'error-code' and the second one is 'error-message'.
      * @since 1.0
      */
-    public static function sysStatus(){
+    public static function sysStatus() {
         $retVal = self::$classStatus;
-        if(self::getClassStatus() == 'INITIALIZED'){
+
+        if (self::getClassStatus() == 'INITIALIZED') {
             $retVal = self::getAndStart()->_getSystemStatus(true);
         }
+
         return $retVal;
     }
     /**
@@ -496,14 +396,16 @@ class WebFiori{
      * @return boolean|string
      * @since 1.0
      */
-    private function _getSystemStatus($refresh=true,$testDb=false) {
-        if($refresh === true){
+    private function _getSystemStatus($refresh = true,$testDb = false) {
+        if ($refresh === true) {
             $this->sysStatus = Util::checkSystemStatus($testDb);
-            if(gettype($this->sysStatus) == 'array'){
+
+            if (gettype($this->sysStatus) == 'array') {
                 $this->dbErrDetails = $this->sysStatus;
                 $this->sysStatus = Util::DB_NEED_CONF;
             }
         }
+
         return $this->sysStatus;
     }
     /**
@@ -511,69 +413,188 @@ class WebFiori{
      * configure it.
      * @since 1.0
      */
-    private function _needConfigration(){
+    private function _needConfigration() {
         header('HTTP/1.1 503 Service Unavailable');
         $routeUri = Router::getUriObjByURL(Util::getRequestedURL());
-        if($routeUri !== null){
+
+        if ($routeUri !== null) {
             $routeType = $routeUri->getType();
-        }
-        else{
+        } else {
             $routeType = Router::VIEW_ROUTE;
         }
-        if($routeType == Router::API_ROUTE){
+
+        if ($routeType == Router::API_ROUTE) {
             header('content-type:application/json');
             $j = new JsonX([], true);
             $j->add('message', '503 - Service Unavailable');
             $j->add('type', 'error');
             $j->add('description','This error means that the system is not configured yet. '
-                    . 'Make sure to make the method Config::isConfig() return true. '
-                    . 'One way is to go to the file "conf/Config.php". Change attribute "isConfigured" value to true. '
-                    . 'Or Use the method ConfigController::configured(true). You must supply \'true\' as an attribute. '
-                    . 'If you want to make the system do something else if the return value of the '
-                    . 'given method is false, then open the file \'WebFiori.php\' and '
-                    . 'change the code in the \'else\' code block at the end of class constructor. (Inside the "if" block).');
+                    .'Make sure to make the method Config::isConfig() return true. '
+                    .'One way is to go to the file "conf/Config.php". Change attribute "isConfigured" value to true. '
+                    .'Or Use the method ConfigController::configured(true). You must supply \'true\' as an attribute. '
+                    .'If you want to make the system do something else if the return value of the '
+                    .'given method is false, then open the file \'WebFiori.php\' and '
+                    .'change the code in the \'else\' code block at the end of class constructor. (Inside the "if" block).');
             $j->add('powered-by', 'WebFiori Framework v'.Config::getVersion().' ('.Config::getVersionType().')');
             die($j);
-        }
-        else{
+        } else {
             die(''
-            . '<!DOCTYPE html>'
-            . '<html>'
-            . '<head>'
-            . '<title>Service Unavailable</title>'
-            . '</head>'
-            . '<body>'
-            . '<h1>503 - Service Unavailable</h1>'
-            . '<hr>'
-            . '<p>'
-            . 'This error means that the system is not configured yet. '
-            . 'Make sure to make the method <a target="_blank" href="https://programmingacademia.com/webfiori/docs/webfiori/conf/Config#isConfig">Config::isConfig()</a> return true. There are two ways '
-            . 'to change return value of this method:'
-            . '</p>'
-            . '<ul>'
-            . '<li>Go to the file "conf/Config.php". Change attribute "isConfigured" value to true.</li>'
-            . '<li>Use the method <a target="_blank" href="https://programmingacademia.com/webfiori/docs/webfiori/logic/ConfigController#configured">ConfigController::configured</a>(true). You must supply \'true\' as an attribute.</li>'
-            . '<li>After that, reload the page and the system will work.</li>'
-            . '</ul>'
-            . '<p>'
-            . 'If you want to make the system do something else if the return value of the '
-            . 'given method is false, then open the file \'WebFiori.php\' and '
-            . 'change the code in the \'else\' code block at the end of class constructor (Inside the "if" block).'
-            . '</p>'
-            . '<p>System Powerd By: <a href="https://github.com/usernane/webfiori" target="_blank"><b>'
-                    . 'WebFiori Framework v'.Config::getVersion().' ('.Config::getVersionType().')'
-                    . '</b></a></p>'
-            . '</body>'
-            . '</html>');
+            .'<!DOCTYPE html>'
+            .'<html>'
+            .'<head>'
+            .'<title>Service Unavailable</title>'
+            .'</head>'
+            .'<body>'
+            .'<h1>503 - Service Unavailable</h1>'
+            .'<hr>'
+            .'<p>'
+            .'This error means that the system is not configured yet. '
+            .'Make sure to make the method <a target="_blank" href="https://programmingacademia.com/webfiori/docs/webfiori/conf/Config#isConfig">Config::isConfig()</a> return true. There are two ways '
+            .'to change return value of this method:'
+            .'</p>'
+            .'<ul>'
+            .'<li>Go to the file "conf/Config.php". Change attribute "isConfigured" value to true.</li>'
+            .'<li>Use the method <a target="_blank" href="https://programmingacademia.com/webfiori/docs/webfiori/logic/ConfigController#configured">ConfigController::configured</a>(true). You must supply \'true\' as an attribute.</li>'
+            .'<li>After that, reload the page and the system will work.</li>'
+            .'</ul>'
+            .'<p>'
+            .'If you want to make the system do something else if the return value of the '
+            .'given method is false, then open the file \'WebFiori.php\' and '
+            .'change the code in the \'else\' code block at the end of class constructor (Inside the "if" block).'
+            .'</p>'
+            .'<p>System Powerd By: <a href="https://github.com/usernane/webfiori" target="_blank"><b>'
+                    .'WebFiori Framework v'.Config::getVersion().' ('.Config::getVersionType().')'
+                    .'</b></a></p>'
+            .'</body>'
+            .'</html>');
         }
     }
     /**
-     * Show an error message that tells the user about system status and how to 
-     * configure it.
-     * @since 1.0
+     * Sets new error and exception handler.
      */
-    public static function configErr() {
-        WebFiori::getAndStart()->_needConfigration();
+    private function _setHandlers() {
+        error_reporting(E_ALL & ~E_ERROR & ~E_COMPILE_ERROR & ~E_CORE_ERROR & ~E_RECOVERABLE_ERROR);
+        set_error_handler(function($errno, $errstr, $errfile, $errline)
+        {
+            $isCli = class_exists('webfiori\entity\CLI') ? CLI::isCLI() : php_sapi_name() == 'cli';
+
+            if ($isCli) {
+                fprintf(STDERR, "\n<%s>\n",Util::ERR_TYPES[$errno]['type']);
+                fprintf(STDERR, "Error Message    %5s %s\n",":",$errstr);
+                fprintf(STDERR, "Error Number     %5s %s\n",":",$errno);
+                fprintf(STDERR, "Error Description%5s %s\n",":",Util::ERR_TYPES[$errno]['description']);
+                fprintf(STDERR, "Error File       %5s %s\n",":",$errfile);
+                fprintf(STDERR, "Error Line:      %5s %s\n",":",$errline);
+            } else {
+                if (defined('API_CALL')) {
+                    header("HTTP/1.1 500 Server Error");
+                    $j = new JsonX([
+                        'message' => $errstr,
+                        'type' => Util::ERR_TYPES[$errno]['type'],
+                        'description' => Util::ERR_TYPES[$errno]['description'],
+                        'error-number' => $errno,
+                        'file' => $errfile,
+                        'line' => $errline
+                    ], true);
+                    header('content-type: application/json');
+                    die($j);
+                } else {
+                    $errBox = new ErrorBox();
+                    $errBox->setError($errno);
+                    $errBox->setDescription($errno);
+                    $errBox->setFile($errfile);
+                    $errBox->setMessage($errstr);
+                    $errBox->setLine($errline);
+                    echo $errBox;
+                }
+            }
+
+            return true;
+        });
+        set_exception_handler(function($ex)
+        {
+            $isCli = class_exists('webfiori\entity\CLI') ? CLI::isCLI() : php_sapi_name() == 'cli';
+
+            if ($isCli) {
+                fprintf(STDERR, "\n<%s>\n","Uncaught Exception.");
+                fprintf(STDERR, "Exception Message %5s %s\n",":",$ex->getMessage());
+                fprintf(STDERR, "Exception Code    %5s %s\n",":",$ex->getMessage());
+                fprintf(STDERR, "File              %5s %s\n",":",$ex->getFile());
+                fprintf(STDERR, "Line              %5s %s\n",":",$ex->getLine());
+                fprintf(STDERR, "Stack Trace:\n%s",$ex->getTraceAsString());
+            } else {
+                header("HTTP/1.1 500 Server Error");
+                $routeUri = Router::getUriObjByURL(Util::getRequestedURL());
+
+                if ($routeUri !== null) {
+                    $routeType = $routeUri->getType();
+                } else {
+                    $routeType = Router::VIEW_ROUTE;
+                }
+
+                if ($routeType == Router::API_ROUTE) {
+                    $j = new JsonX([
+                        'message' => '500 - Server Error: Uncaught Exception.',
+                        'type' => 'error',
+                        'exception-class' => get_class($ex),
+                        'exception-message' => $ex->getMessage(),
+                        'exception-code' => $ex->getMessage(),
+                        'file' => $ex->getFile(),
+                        'line' => $ex->getLine()
+                    ], true);
+                    $stackTrace = new JsonX([], true);
+                    $index = 0;
+                    $trace = $ex->getTrace();
+
+                    foreach ($trace as $arr) {
+                        if (isset($arr['file'])) {
+                            $stackTrace->add('#'.$index,$arr['file'].' (Line '.$arr['line'].')');
+                        } else {
+                            if (isset($arr['function'])) {
+                                $stackTrace->add('#'.$index,$arr['function']);
+                            }
+                        }
+                        $index++;
+                    }
+                    $j->add('stack-trace',$stackTrace);
+                    header('content-type: application/json');
+                    die($j);
+                } else {
+                    $exceptionView = new ServerErrView($ex);
+                    $exceptionView->display();
+                }
+            }
+        });
+        register_shutdown_function(function()
+        {
+            $error = error_get_last();
+
+            if ($error !== null) {
+                $errNo = $error['type'];
+
+                if ($errNo == E_WARNING || 
+                   $errNo == E_NOTICE || 
+                   $errNo == E_USER_ERROR || 
+                   $errNo == E_USER_NOTICE) {
+                    return;
+                }
+                header("HTTP/1.1 500 Server Error");
+
+                if (defined('API_CALL')) {
+                    $j = new JsonX([
+                        'message' => $error["message"],
+                        'type' => 'error',
+                        'error-number' => $error["type"],
+                        'file' => $error["file"],
+                        'line' => $error["line"]
+                    ], true);
+                    die($j);
+                } else {
+                    $errPage = new ServerErrView($error);
+                    $errPage->display();
+                }
+            }
+        });
     }
 }
 /**
@@ -581,10 +602,10 @@ class WebFiori{
  * Planting application seed into the ground and make your work bloom.
  */
 WebFiori::getAndStart();
-if(CLI::isCLI() === true){
+
+if (CLI::isCLI() === true) {
     CLI::runCLI();
-}
-else{
+} else {
     //route user request.
     Router::route(Util::getRequestedURL());
 }

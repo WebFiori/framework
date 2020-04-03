@@ -1,14 +1,15 @@
 <?php
 namespace webfiori\tests\entity;
-use phMysql\MySQLQuery;
+
 use phMysql\MySQLColumn;
+use phMysql\MySQLQuery;
 use phMysql\MySQLTable;
 /**
  * Description of TestQuery
  *
  * @author Eng.Ibrahim
  */
-class TestQuery_1 extends MySQLQuery{
+class TestQuery_1 extends MySQLQuery {
     /**
      *
      * @var MySQLTable 
@@ -25,25 +26,24 @@ class TestQuery_1 extends MySQLQuery{
         $this->table->addColumn('email', new MySQLColumn('email', 'varchar',120));
         $this->setTable($this->table);
     }
+
+    public function addUser($username,$password,$email) {
+        $this->insertRecord([
+            $this->getColIndex('username') => $username,
+            $this->getColIndex('password') => $password,
+            $this->getColIndex('email') => $email
+        ]);
+    }
     /**
      * 
      * @return type
      */
-    public function getStructure(){
+    public function getStructure() {
         return $this->table;
     }
-    
-    public function addUser($username,$password,$email) {
-        $this->insertRecord(array(
-            $this->getColIndex('username')=>$username,
-            $this->getColIndex('password')=>$password,
-            $this->getColIndex('email')=>$email
-        ));
-    }
     public function removeUser($userId) {
-        $this->deleteRecord(array(
-            $this->getColIndex('user-id')=>$userId
-        ), array('='));
+        $this->deleteRecord([
+            $this->getColIndex('user-id') => $userId
+        ], ['=']);
     }
-    
 }

@@ -31,7 +31,7 @@ use Exception;
  * @author Ibrahim
  * @version 1.0
  */
-class InitializationException extends Exception{
+class InitializationException extends Exception {
     /**
      * Creates new instance of the class.
      * @param string $message Exception message.

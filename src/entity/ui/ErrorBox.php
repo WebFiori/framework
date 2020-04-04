@@ -62,12 +62,6 @@ class ErrorBox extends MessageBox {
      * @var HTMLNode 
      */
     private $messageNode;
-    /**
-     * Used to format errors and warnings messages.
-     * @var int 
-     * @since 1.3.4
-     */
-    private static $NoticeAndWarningCount = 0;
     public function __construct() {
         parent::__construct();
         $this->labelStyle = 'style="color:#ff6666;font-family:monospace"';

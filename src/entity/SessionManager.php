@@ -24,14 +24,14 @@
  */
 namespace webfiori\entity;
 
-use Exception;
+use webfiori\entity\exceptions\SessionException;
 use jsonx\JsonI;
 use jsonx\JsonX;
 use webfiori\conf\SiteConfig;
 /**
  * A helper class to manage system sessions.
  * @author Ibrahim 
- * @version 1.8.5
+ * @version 1.8.6
  */
 class SessionManager implements JsonI {
     /**
@@ -91,6 +91,33 @@ class SessionManager implements JsonI {
      */
     const RESUMED = 'status_session_resumed';
     /**
+     * An array that contains the names of main session variables.
+     * The array has the following values:
+     * <ul>
+     * <li>lifetime</li>
+     * <li>started-at</li>
+     * <li>resumed-at</li>
+     * <li>refresh</li>
+     * <li>session-name</li>
+     * <li>ip-address</li>
+     * <li>user</li>
+     * <li>lang</li>
+     * <li></li>
+     * <ul>
+     * @since 1.8.6
+     * @var array 
+     */
+    const MAIN_VARS = [
+        'lifetime',
+        'started-at',
+        'resumed-at',
+        'refresh',
+        'session-name',
+        'ip-address',
+        'user',
+        'lang'
+    ];
+    /**
      * An array of supported languages.
      * @var array An array of supported languages.
      * @since 1.2
@@ -105,6 +132,12 @@ class SessionManager implements JsonI {
      * @since 1.4 
      */
     private $lifeTime;
+    /**
+     * The name of the index that contains session vara.
+     * @var string
+     * @since 1.8.6 
+     */
+    private static $SV = 'session-vars';
     /**
      * A variable is set to true if the session is new and set to false if resumed.
      * @var boolean
@@ -177,14 +210,12 @@ class SessionManager implements JsonI {
      * the method will return null.
      * @since 1.0
      */
-    public function &getUser() {
+    public function getUser() {
         $retVal = null;
         $isActive = $this->isSessionActive() === true ? true : $this->_switchToSession();
 
-        if ($isActive) {
-            if (isset($_SESSION['session-vars']['user'])) {
-                $retVal = $_SESSION['session-vars']['user'];
-            }
+        if ($isActive && isset($_SESSION[self::$SV][self::MAIN_VARS[6]])) {
+            $retVal = $_SESSION[self::$SV][self::MAIN_VARS[6]];
         }
 
         return $retVal;
@@ -248,11 +279,11 @@ class SessionManager implements JsonI {
         if ($isActive) {
             if ($forceUpdate === true) {
                 $this->_initLang($forceUpdate);
-                $retVal = $_SESSION['session-vars']['lang'];
+                $retVal = $_SESSION[self::$SV][self::MAIN_VARS[7]];
             }
 
-            if (isset($_SESSION['session-vars']['lang'])) {
-                $retVal = $_SESSION['session-vars']['lang'];
+            if (isset($_SESSION[self::$SV][self::MAIN_VARS[7]])) {
+                $retVal = $_SESSION[self::$SV][self::MAIN_VARS[7]];
             }
         }
 
@@ -267,10 +298,9 @@ class SessionManager implements JsonI {
     public function getLifetime() {
         $retVal = $this->lifeTime;
 
-        if (session_status() == PHP_SESSION_ACTIVE && $this->_switchToSession()) {
-            if (isset($_SESSION['session-vars']['lifetime'])) {
-                $retVal = $_SESSION['session-vars']['lifetime'] / 60;
-            }
+        if (session_status() == PHP_SESSION_ACTIVE && $this->_switchToSession() 
+                && isset($_SESSION[self::$SV][self::MAIN_VARS[0]])) {
+                $retVal = $_SESSION[self::$SV][self::MAIN_VARS[0]] / 60;
         }
 
         return $retVal;
@@ -295,7 +325,7 @@ class SessionManager implements JsonI {
         $isActive = $this->isSessionActive() === true ? true : $this->_switchToSession();
 
         if ($isActive) {
-            $retVal = time() - $_SESSION['session-vars']['started-at'];
+            $retVal = time() - $_SESSION[self::$SV][self::MAIN_VARS[1]];
         }
 
         return $retVal;
@@ -333,7 +363,7 @@ class SessionManager implements JsonI {
         $isActive = $this->isSessionActive() === true ? true : $this->_switchToSession();
 
         if ($isActive) {
-            return $_SESSION['session-vars']['resumed-at'];
+            return $_SESSION[self::$SV][self::MAIN_VARS[2]];
         }
 
         return session_status();
@@ -370,7 +400,7 @@ class SessionManager implements JsonI {
             $sid = filter_var($_POST['session-id'],FILTER_SANITIZE_STRING);
 
             if ($sid === null || $sid === false) {
-                $sid = filter_var($_GET['lang'],FILTER_SANITIZE_STRING);
+                $sid = filter_var($_GET[self::MAIN_VARS[7]],FILTER_SANITIZE_STRING);
             }
         }
 
@@ -428,7 +458,7 @@ class SessionManager implements JsonI {
         $isActive = $this->isSessionActive() === true ? true : $this->_switchToSession();
 
         if ($isActive) {
-            return $_SESSION['session-vars'];
+            return $_SESSION[self::$SV];
         }
 
         return [];
@@ -459,7 +489,7 @@ class SessionManager implements JsonI {
         $isActive = $this->isSessionActive() === true ? true : $this->_switchToSession();
 
         if ($isActive) {
-            return $_SESSION['session-vars']['ip-address'];
+            return $_SESSION[self::$SV][self::MAIN_VARS[5]];
         }
 
         return session_status();
@@ -475,7 +505,7 @@ class SessionManager implements JsonI {
         $isActive = $this->isSessionActive() === true ? true : $this->_switchToSession();
 
         if ($isActive) {
-            return $_SESSION['session-vars']['started-at'];
+            return $_SESSION[self::$SV][self::MAIN_VARS[1]];
         }
 
         return session_status();
@@ -546,18 +576,16 @@ class SessionManager implements JsonI {
      * or it will throw an exception.
      * @return boolean true If session timeout time will be refreshed with every request. 
      * false if not.
-     * @throws Exception If the session is not running. 
+     * @throws SessionException If the session is not running. 
      * @since 1.5
      */
     public function isRefresh() {
         $isActive = $this->isSessionActive() === true ? true : $this->_switchToSession();
 
-        if ($isActive) {
-            if (isset($_SESSION['session-vars']['refresh'])) {
-                return $_SESSION['session-vars']['refresh'];
-            }
+        if ($isActive && isset($_SESSION[self::$SV][self::MAIN_VARS[3]])) {
+            return $_SESSION[self::$SV][self::MAIN_VARS[3]];
         }
-        throw new Exception('Session is not running.');
+        throw new SessionException('Session is not running.');
     }
     /**
      * Checks if the session is resumed or not.
@@ -579,7 +607,7 @@ class SessionManager implements JsonI {
         $retVal = false;
 
         if (session_status() == PHP_SESSION_ACTIVE) {
-            $retVal = isset($_SESSION['session-vars']['session-name']) && $_SESSION['session-vars']['session-name'] == $this->getName();
+            $retVal = isset($_SESSION[self::$SV][self::MAIN_VARS[4]]) && $_SESSION[self::$SV][self::MAIN_VARS[4]] == $this->getName();
         }
 
         return $retVal;
@@ -615,10 +643,8 @@ class SessionManager implements JsonI {
 
         if ($isActive) {
             if ($this->_validateAttrs()) {
-                $sName = $_SESSION['session-vars']['session-name'];
-                $iName = $this->getName();
-
-                if ($_SESSION['session-vars']['session-name'] == $this->getName()) {
+                
+                if ($_SESSION[self::$SV][self::MAIN_VARS[4]] == $this->getName()) {
                     $this->_kill();
                     $retVal = true;
                 } else {
@@ -693,14 +719,14 @@ class SessionManager implements JsonI {
                         $this->resumed = true;
                         $this->sessionStatus = self::RESUMED;
                         //update resume time
-                        $_SESSION['session-vars']['resumed-at'] = time();
-                        $_SESSION['session-vars']['session-name'] = $this->getName();
+                        $_SESSION[self::$SV][self::MAIN_VARS[2]] = time();
+                        $_SESSION[self::$SV][self::MAIN_VARS[4]] = $this->getName();
 
                         //if time is -1, then get stored one.
                         //else, update session time.
                         $sessionTime = $sessionTime == -1 ? $this->getLifetime() * 60 : $sessionTime * 60;
 
-                        $_SESSION['session-vars']['lifetime'] = $sessionTime;
+                        $_SESSION[self::$SV][self::MAIN_VARS[0]] = $sessionTime;
                         //ini_set('session.gc_maxlifetime', $sessionTime);
                         //ini_set('session.cookie_lifetime', $sessionTime);
                         $this->resumed = true;
@@ -741,7 +767,7 @@ class SessionManager implements JsonI {
      */
     public function setIsRefresh($bool) {
         if ($this->_switchToSession()) {
-            $_SESSION['session-vars']['refresh'] = $bool === true ? true : false;
+            $_SESSION[self::$SV][self::MAIN_VARS[3]] = $bool === true ? true : false;
         }
     }
     /**
@@ -763,7 +789,7 @@ class SessionManager implements JsonI {
         if ($time > 0) {
             if ($this->isSessionActive()) {
                 $this->lifeTime = $time;
-                $_SESSION['session-vars']['lifetime'] = $time * 60;
+                $_SESSION[self::$SV][self::MAIN_VARS[0]] = $time * 60;
 
                 $params = session_get_cookie_params();
                 $secure = isset($params['secure']) ? $params['secure'] : false;
@@ -779,7 +805,7 @@ class SessionManager implements JsonI {
             } else {
                 if ($this->_switchToSession()) {
                     $this->lifeTime = $time;
-                    $_SESSION['session-vars']['lifetime'] = $time * 60;
+                    $_SESSION[self::$SV][self::MAIN_VARS[0]] = $time * 60;
 
                     $params = session_get_cookie_params();
                     $secure = isset($params['secure']) ? $params['secure'] : false;
@@ -833,7 +859,7 @@ class SessionManager implements JsonI {
 
         if ($isActive) {
             if ($user instanceof User) {
-                $_SESSION['session-vars']['user'] = $user;
+                $_SESSION[self::$SV][self::MAIN_VARS[6]] = $user;
                 $retVal = true;
             }
         }
@@ -858,7 +884,7 @@ class SessionManager implements JsonI {
         $j->add('session-id', $this->getID());
         $j->add('language', $this->getLang());
         try {
-            $j->add('refresh', $this->isRefresh());
+            $j->add(self::MAIN_VARS[3], $this->isRefresh());
         } catch (Exception $ex) {
         }
         $j->add('passed-time', $this->getPassedTime());
@@ -866,15 +892,15 @@ class SessionManager implements JsonI {
         $stTm = $this->getStartTime();
 
         if ($stTm != PHP_SESSION_NONE && $stTm != PHP_SESSION_ACTIVE && $stTm != PHP_SESSION_DISABLED) {
-            $j->add('started-at', date('Y-m-d H:i:s',$this->getStartTime()));
+            $j->add(self::MAIN_VARS[1], date('Y-m-d H:i:s',$this->getStartTime()));
         }
         $rsTm = $this->getStartTime();
 
         if ($rsTm != PHP_SESSION_NONE && $rsTm != PHP_SESSION_ACTIVE && $rsTm != PHP_SESSION_DISABLED) {
-            $j->add('resumed-at', date('Y-m-d H:i:s',$this->getResumTime()));
+            $j->add(self::MAIN_VARS[2], date('Y-m-d H:i:s',$this->getResumTime()));
         }
         $j->add('status', $this->sessionStatus);
-        $j->add('user', $this->getUser());
+        $j->add(self::MAIN_VARS[6], $this->getUser());
 
         return $j;
     }
@@ -910,7 +936,7 @@ class SessionManager implements JsonI {
      * @since 1.2
      */
     private function _initLang($forceUpdate = false,$useDefault = true) {
-        if (isset($_SESSION['session-vars']['lang']) && !$forceUpdate) {
+        if (isset($_SESSION[self::$SV][self::MAIN_VARS[7]]) && !$forceUpdate) {
             return false;
         }
         //the value of default language.
@@ -919,17 +945,17 @@ class SessionManager implements JsonI {
         $defaultLang = class_exists('webfiori\conf\SiteConfig') ? SiteConfig::getPrimaryLanguage() : 'EN';
         $lang = null;
 
-        if (isset($_GET['lang'])) {
-            $lang = filter_var($_GET['lang'],FILTER_SANITIZE_STRING);
+        if (isset($_GET[self::MAIN_VARS[7]])) {
+            $lang = filter_var($_GET[self::MAIN_VARS[7]],FILTER_SANITIZE_STRING);
         }
 
         if ($lang == false || $lang == null) {
-            if (isset($_POST['lang'])) {
-                $lang = filter_var($_POST['lang'],FILTER_SANITIZE_STRING);
+            if (isset($_POST[self::MAIN_VARS[7]])) {
+                $lang = filter_var($_POST[self::MAIN_VARS[7]],FILTER_SANITIZE_STRING);
             }
 
             if ($lang == false || $lang == null) {
-                $lang = filter_input(INPUT_COOKIE, 'lang');
+                $lang = filter_input(INPUT_COOKIE, self::MAIN_VARS[7]);
 
                 if ($lang == false || $lang == null) {
                     $lang = null;
@@ -938,7 +964,7 @@ class SessionManager implements JsonI {
         }
         $retVal = false;
 
-        if (isset($_SESSION['session-vars']['lang']) && $lang == null) {
+        if (isset($_SESSION[self::$SV][self::MAIN_VARS[7]]) && $lang == null) {
             $retVal = false;
         } else {
             if ($lang == null && $useDefault === true) {
@@ -952,12 +978,12 @@ class SessionManager implements JsonI {
         $langU = strtoupper($lang);
 
         if (strlen($langU) == 2) {
-            $_SESSION['session-vars']['lang'] = $langU;
+            $_SESSION[self::$SV][self::MAIN_VARS[7]] = $langU;
             $retVal = true;
         }
 
-        if ($useDefault === true && $retVal == false && !isset($_SESSION['session-vars']['lang'])) {
-            $_SESSION['session-vars']['lang'] = $defaultLang;
+        if ($useDefault && !$retVal && !isset($_SESSION[self::$SV][self::MAIN_VARS[7]])) {
+            $_SESSION[self::$SV][self::MAIN_VARS[7]] = $defaultLang;
             $retVal = true;
         } else {
             $retVal = false;
@@ -1002,19 +1028,19 @@ class SessionManager implements JsonI {
         if ($started) {
             $this->resumed = false;
             $this->new = true;
-            $_SESSION['session-vars'] = [];
-            $_SESSION['session-vars']['session-name'] = $this->getName();
-            $_SESSION['session-vars']['started-at'] = time();
-            $_SESSION['session-vars']['resumed-at'] = time();
-            $_SESSION['session-vars']['lifetime'] = $lifeTime;
-            $_SESSION['session-vars']['user'] = new User();
+            $_SESSION[self::$SV] = [];
+            $_SESSION[self::$SV][self::MAIN_VARS[4]] = $this->getName();
+            $_SESSION[self::$SV][self::MAIN_VARS[1]] = time();
+            $_SESSION[self::$SV][self::MAIN_VARS[2]] = time();
+            $_SESSION[self::$SV][self::MAIN_VARS[0]] = $lifeTime;
+            $_SESSION[self::$SV][self::MAIN_VARS[6]] = new User();
             $ip = filter_var($_SERVER['REMOTE_ADDR'],FILTER_VALIDATE_IP);
 
             if ($ip == '::1') {
                 $ip = '127.0.0.1';
             }
-            $_SESSION['session-vars']['ip-address'] = $ip;
-            $_SESSION['session-vars']['refresh'] = $refresh === true ? true : false;
+            $_SESSION[self::$SV][self::MAIN_VARS[5]] = $ip;
+            $_SESSION[self::$SV][self::MAIN_VARS[3]] = $refresh === true ? true : false;
             $this->_initLang(true,$useDefaultLang);
         }
 
@@ -1035,7 +1061,7 @@ class SessionManager implements JsonI {
 
         if (session_status() == PHP_SESSION_ACTIVE) {
             if ($this->_validateAttrs() === true) {
-                $sName = $_SESSION['session-vars']['session-name'];
+                $sName = $_SESSION[self::$SV][self::MAIN_VARS[4]];
                 $iName = $this->getName();
 
                 if ($sName == $iName) {
@@ -1081,18 +1107,13 @@ class SessionManager implements JsonI {
     private function _validateAttrs() {
         $retVal = false;
 
-        if (isset($_SESSION['session-vars']['started-at'])) {
-            if (isset($_SESSION['session-vars']['resumed-at'])) {
-                if (isset($_SESSION['session-vars']['lifetime'])) {
-                    if (isset($_SESSION['session-vars']['refresh'])) {
-                        if (isset($_SESSION['session-vars']['ip-address'])) {
-                            if (isset($_SESSION['session-vars']['session-name'])) {
-                                $retVal = true;
-                            }
-                        }
-                    }
-                }
-            }
+        if (isset($_SESSION[self::$SV][self::MAIN_VARS[1]]) 
+         && isset($_SESSION[self::$SV][self::MAIN_VARS[2]])
+         && isset($_SESSION[self::$SV][self::MAIN_VARS[0]])
+         && isset($_SESSION[self::$SV][self::MAIN_VARS[3]])
+         && isset($_SESSION[self::$SV][self::MAIN_VARS[5]])
+         && isset($_SESSION[self::$SV][self::MAIN_VARS[4]])) {
+            $retVal = true;
         }
 
         return $retVal;

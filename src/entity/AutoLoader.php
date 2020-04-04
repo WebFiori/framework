@@ -45,6 +45,20 @@ class AutoLoader {
      */
     const CACHE_NAME = 'autoload.cache';
     /**
+     * An array that contains the possible things that can be performed 
+     * if a class has failed to load.
+     * The array has the following values:
+     * <ul>
+     * <li>throw-exception</li>,
+     * <li>do-nothing</li>
+     * </ul>
+     * @since 1.1.6
+     */
+    const ON_FAIL_ACTIONS = [
+        'throw-exception',
+        'do-nothing'
+    ];
+    /**
      * An associative array that contains the info which was taken 
      * from autoloader's cache file.
      * This one is used to fasten the process of loading classes.
@@ -91,7 +105,7 @@ class AutoLoader {
      * @throws Exception
      * @since 1.0
      */
-    private function __construct($root = '',$searchFolders = [],$defineRoot = false,$onFail = 'throw-exception') {
+    private function __construct($root = '',$searchFolders = [],$defineRoot = false,$onFail = self::ON_FAIL_ACTIONS[0]) {
         $this->searchFolders = [];
         $this->casheArr = [];
         $this->_readCache();
@@ -120,21 +134,15 @@ class AutoLoader {
         {
             AutoLoader::get()->loadClass($className);
         });
-
         if (gettype($onFail) == 'string') {
             $this->onFail = strtolower($onFail);
-
-            if ($this->onFail != 'do-nothing') {
-                if ($this->onFail != 'throw-exception') {
-                    $this->onFail = 'throw-exception';
-                }
+            if ($this->onFail != self::ON_FAIL_ACTIONS[1] && $this->onFail != self::ON_FAIL_ACTIONS[0]) {
+                $this->onFail = self::ON_FAIL_ACTIONS[0];
             }
+        } else if (is_callable($onFail)) {
+            $this->onFail = $onFail;
         } else {
-            if (is_callable($onFail)) {
-                $this->onFail = $onFail;
-            } else {
-                $this->onFail = 'throw-exception';
-            }
+            $this->onFail = self::ON_FAIL_ACTIONS[0];
         }
         $this->loadedClasses[] = [
             'class-name' => 'AutoLoader',
@@ -172,7 +180,7 @@ class AutoLoader {
         'define-root' => false,
         'search-folders' => [],
         'root' => '',
-        'on-load-failure' => 'do-nothing'
+        'on-load-failure' => self::ON_FAIL_ACTIONS[1]
     ]) {
         $DS = DIRECTORY_SEPARATOR;
 
@@ -200,7 +208,7 @@ class AutoLoader {
                 //linux 
                 $root = $DS.$root;
             }
-            $onFail = isset($options['on-load-failure']) ? $options['on-load-failure'] : 'throw-exception';
+            $onFail = isset($options['on-load-failure']) ? $options['on-load-failure'] : self::ON_FAIL_ACTIONS[0];
             self::$loader = new AutoLoader($root, $frameworkSearchFoldres, $defineRoot,$onFail);
 
             if (defined('LOAD_COMPOSER_PACKAGES') && LOAD_COMPOSER_PACKAGES === true) {
@@ -338,7 +346,7 @@ class AutoLoader {
         } else {
             $lower = strtolower(trim($onFail));
 
-            if ($lower == 'throw-exception' || $lower == 'do-nothing') {
+            if ($lower == self::ON_FAIL_ACTIONS[0] || self::ON_FAIL_ACTIONS[1]) {
                 self::get()->onFail = $lower;
             }
         }
@@ -355,10 +363,10 @@ class AutoLoader {
         $vendorPath = '';
         $pathsCount = count($split);
         $vendorFound = false;
-
+        $vendorFolderName = 'vendor';
         for ($x = 0 ; $x < $pathsCount; $x++) {
-            if (is_dir($vendorPath.'vendor')) {
-                $vendorPath = $vendorPath.'vendor';
+            if (is_dir($vendorPath.$vendorFolderName)) {
+                $vendorPath = $vendorPath.$vendorFolderName;
                 $vendorFound = true;
                 break;
             }
@@ -371,8 +379,8 @@ class AutoLoader {
         }
 
         if (!$vendorFound) {
-            if (is_dir($vendorPath.'vendor')) {
-                $vendorPath = $vendorPath.'vendor';
+            if (is_dir($vendorPath.$vendorFolderName)) {
+                $vendorPath = $vendorPath.$vendorFolderName;
             } else {
                 $vendorPath = '';
             }
@@ -447,42 +455,36 @@ class AutoLoader {
             }
 
             if ($incSubFolders) {
-                $dirsStack = [];
-                $dirsStack[] = $cleanDir;
-
-                while ($xDir = array_pop($dirsStack)) {
-                    if ($appendRoot === true) {
-                        $fullPath = $this->getRoot().$xDir;
-                    } else {
-                        $fullPath = $xDir;
-                    }
-
-                    if (is_dir($fullPath)) {
-                        $subDirs = scandir($fullPath);
-
-                        foreach ($subDirs as $subDir) {
-                            if ($subDir != '.' && $subDir != '..') {
-                                $dirsStack[] = $xDir.$DS.$subDir;
-                            }
-                        }
-                        $this->searchFolders[$xDir] = $appendRoot;
-                    } else {
-                        if (is_dir($fullPath)) {
-                            $subDirs = scandir($fullPath);
-
-                            foreach ($subDirs as $subDir) {
-                                if ($subDir != '.' && $subDir != '..') {
-                                    $dirsStack[] = $xDir.$DS.$subDir;
-                                }
-                            }
-                            $this->searchFolders[$xDir] = $appendRoot;
-                        }
-                    }
-                }
+                $this->_addSearchDirectoryHelper($cleanDir, $appendRoot);
             } else {
                 $this->searchFolders[$cleanDir] = $appendRoot;
             }
         }
+    }
+    private function _addSearchDirectoryHelper($cleanDir, $appendRoot) {
+        $dirsStack = [$cleanDir];
+        while ($xDir = array_pop($dirsStack)) {
+            if ($appendRoot === true) {
+                $fullPath = $this->getRoot().$xDir;
+            } else {
+                $fullPath = $xDir;
+            }
+
+            if (is_dir($fullPath)) {
+                $dirsStack = $this->_addSrachDirectoryHelper2($xDir, $fullPath, $dirsStack, $appendRoot);
+            }
+        }
+    }
+    private function _addSrachDirectoryHelper2($xDir, $fullPath, $dirsStack, $appendRoot) {
+        $subDirs = scandir($fullPath);
+
+        foreach ($subDirs as $subDir) {
+            if ($subDir != '.' && $subDir != '..') {
+                $dirsStack[] = $xDir.DIRECTORY_SEPARATOR.$subDir;
+            }
+        }
+        $this->searchFolders[$xDir] = $appendRoot;
+        return $dirsStack;
     }
     /**
      * Returns the root directory that is used to search inside.
@@ -578,13 +580,9 @@ class AutoLoader {
             if (is_callable($this->onFail)) {
                 call_user_func($this->onFail);
             } else {
-                if ($this->onFail == 'throw-exception') {
+                if ($this->onFail == self::ON_FAIL_ACTIONS[0]) {
                     throw new Exception('Class \''.$classPath.'\' not found in any include directory. '
                     .'Make sure that class path is included in auto-load directories and its namespace is correct.');
-                } else {
-                    if ($this->onFail == 'do-nothing') {
-                        //do nothing
-                    }
                 }
             }
         } else {

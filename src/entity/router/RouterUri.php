@@ -40,7 +40,7 @@ use webfiori\entity\Util;
  * The class is also used for routing.
  * For more information on URI structure, visit <a target="_blank" href="https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#Examples">Wikipedia</a>.
  * @author Ibrahim
- * @version 1.3.2
+ * @version 1.3.3
  */
 class RouterUri {
     /**
@@ -81,6 +81,10 @@ class RouterUri {
      * @since 1.0
      */
     private $uriBroken;
+    /**
+     * @since 1.3.3
+     */
+    private static $UV = 'uri-vars';
     /**
      * Creates new instance.
      * @param string $requestedUri The URI such as 'https://www3.programmingacademia.com:80/{some-var}/hell/{other-var}/?do=dnt&y=#xyz'
@@ -310,7 +314,7 @@ class RouterUri {
     public function getUri($incQueryStr = false,$incFragment = false) {
         $retVal = $this->getScheme().':'.$this->getAuthority().$this->getPath();
 
-        if ($incQueryStr === true && $incFragment == true) {
+        if ($incQueryStr && $incFragment) {
             $queryStr = $this->getQueryString();
 
             if (strlen($queryStr) != 0) {
@@ -322,14 +326,14 @@ class RouterUri {
                 $retVal .= '#'.$fragment;
             }
         } else {
-            if ($incQueryStr === true && $incFragment == false) {
+            if ($incQueryStr && !$incFragment) {
                 $queryStr = $this->getQueryString();
 
                 if (strlen($queryStr) != 0) {
                     $retVal .= '?'.$queryStr;
                 }
             } else {
-                if ($incQueryStr === false && $incFragment === true) {
+                if (!$incQueryStr && $incFragment) {
                     $fragment = $this->getFragment();
 
                     if (strlen($fragment) != 0) {
@@ -354,7 +358,7 @@ class RouterUri {
      */
     public function getUriVar($varName) {
         if ($this->hasUriVar($varName)) {
-            return $this->uriBroken['uri-vars'][$varName];
+            return $this->uriBroken[self::$UV][$varName];
         }
 
         return null;
@@ -367,7 +371,7 @@ class RouterUri {
      * @since 1.0
      */
     public function getUriVars() {
-        return $this->uriBroken['uri-vars'];
+        return $this->uriBroken[self::$UV];
     }
     /**
      * Checks if the URI has a variable or not given its name.
@@ -379,7 +383,7 @@ class RouterUri {
      * @since 1.0
      */
     public function hasUriVar($varName) {
-        return array_key_exists($varName, $this->uriBroken['uri-vars']);
+        return array_key_exists($varName, $this->uriBroken[self::$UV]);
     }
     /**
      * Checks if the URI has any variables or not.
@@ -494,7 +498,7 @@ class RouterUri {
      */
     public function setUriVar($varName,$value) {
         if ($this->hasUriVar($varName)) {
-            $this->uriBroken['uri-vars'][$varName] = $value;
+            $this->uriBroken[self::$UV][$varName] = $value;
 
             return true;
         }
@@ -540,7 +544,7 @@ class RouterUri {
             'query-string-vars' => [
 
             ],
-            'uri-vars' => [
+            self::$UV => [
 
             ],
         ];
@@ -576,7 +580,7 @@ class RouterUri {
                 $retVal['path'][] = utf8_decode(urldecode($dirName));
 
                 if ($dirName[0] == '{' && $dirName[strlen($dirName) - 1] == '}') {
-                    $retVal['uri-vars'][trim($split4[$x], '{}')] = null;
+                    $retVal[self::$UV][trim($split4[$x], '{}')] = null;
                 }
             }
         }
@@ -591,12 +595,6 @@ class RouterUri {
         foreach ($split6 as $param) {
             $split7 = explode('=', $param);
             $retVal['query-string-vars'][$split7[0]] = isset($split7[1]) ? $split7[1] : '';
-//            $var = $retVal['query-string-vars'][$split7[0]];
-//            if(strlen($var) > 0){
-//                if($var[0] == '{' && $var[strlen($var) - 1] == '}'){
-//                    $retVal['uri-vars'][trim($var, '{}')] = null;
-//                }
-//            }
         }
 
         return $retVal;

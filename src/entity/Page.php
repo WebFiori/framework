@@ -53,9 +53,28 @@ use webfiori\entity\langs\Language;
  * and canonical URL. Also, this class can be used to load a specific theme 
  * and use it to change the look and feel of the web site.
  * @author Ibrahim
- * @version 1.9.1
+ * @version 1.9.2
  */
 class Page {
+    /**
+     * An array that contains the IDs of the 3 main page elements.
+     * The array has the following values:
+     * <ul>
+     * <li>page-body</li>
+     * <li>page-header</li>
+     * <li>main-content-area</li>
+     * <li>side-content-area</li>
+     * <li>page-footer</li>
+     * </ul>
+     * @since 1.9.2
+     */
+    const MAIN_ELEMENTS = [
+        'page-body',
+        'page-header',
+        'main-content-area',
+        'side-content-area',
+        'page-footer'
+    ];
     /**
      * A closure which will be called before the page is fully sent back.
      * @var callable|null 
@@ -305,7 +324,7 @@ class Page {
      * was inserted. If it is not, the method will return false.
      * @since 1.9
      */
-    public static function insert($node,$parentNodeId = 'main-content-area') {
+    public static function insert($node,$parentNodeId = self::MAIN_ELEMENTS[2]) {
         $retVal = Page::get()->insertNode($node, $parentNodeId);
 
         return $retVal;
@@ -330,7 +349,7 @@ class Page {
     public static function lang($new = null) {
         $p = Page::get();
 
-        if ($new != null && strlen($new) == 2) {
+        if ($new !== null && strlen($new) == 2) {
             $p->setLang($new);
         }
 
@@ -474,10 +493,10 @@ class Page {
         }
 
         if ($node instanceof HTMLNode) {
-            $node->setID('side-content-area');
+            $node->setID(self::MAIN_ELEMENTS[3]);
         } else {
             $node = new HTMLNode();
-            $node->setID('side-content-area');
+            $node->setID(self::MAIN_ELEMENTS[3]);
         }
 
         return $node;
@@ -492,10 +511,10 @@ class Page {
         }
 
         if ($node instanceof HTMLNode) {
-            $node->setID('page-footer');
+            $node->setID(self::MAIN_ELEMENTS[4]);
         } else {
             $node = new HTMLNode();
-            $node->setID('page-footer');
+            $node->setID(self::MAIN_ELEMENTS[4]);
         }
 
         return $node;
@@ -534,10 +553,10 @@ class Page {
         }
 
         if ($node instanceof HTMLNode) {
-            $node->setID('page-header');
+            $node->setID(self::MAIN_ELEMENTS[1]);
         } else {
             $node = new HTMLNode();
-            $node->setID('page-header');
+            $node->setID(self::MAIN_ELEMENTS[1]);
         }
 
         return $node;
@@ -561,19 +580,19 @@ class Page {
         $headNode = $this->_getHead();
         $this->document->setHeadNode($headNode);
         $headerNode = new HTMLNode();
-        $headerNode->setID('page-header');
+        $headerNode->setID(self::MAIN_ELEMENTS[1]);
         $this->document->addChild($headerNode);
         $body = new HTMLNode();
-        $body->setID('page-body');
+        $body->setID(self::MAIN_ELEMENTS[0]);
         $asideNode = new HTMLNode();
-        $asideNode->setID('side-content-area');
+        $asideNode->setID(self::MAIN_ELEMENTS[3]);
         $body->addChild($asideNode);
         $contentArea = new HTMLNode();
-        $contentArea->setID('main-content-area');
+        $contentArea->setID(self::MAIN_ELEMENTS[2]);
         $body->addChild($contentArea);
         $this->document->addChild($body);
         $footerNode = new HTMLNode();
-        $footerNode->setID('page-footer');
+        $footerNode->setID(self::MAIN_ELEMENTS[4]);
         $this->document->addChild($footerNode);
     }
     /**
@@ -835,9 +854,9 @@ class Page {
      */
     private function setHasAside($bool) {
         if (gettype($bool) == 'boolean') {
-            if ($this->incAside == false && $bool == true) {
+            if (!$this->incAside && $bool) {
                 //add aside
-                $mainContentArea = $this->document->getChildByID('page-body');
+                $mainContentArea = $this->document->getChildByID(self::MAIN_ELEMENTS[0]);
 
                 if ($mainContentArea instanceof HTMLNode) {
                     $children = $mainContentArea->children();
@@ -851,9 +870,9 @@ class Page {
                     }
                 }
             } else {
-                if ($this->incAside == true && $bool == false) {
+                if ($this->incAside && !$bool) {
                     //remove aside
-                    $aside = $this->document->getChildByID('side-content-area');
+                    $aside = $this->document->getChildByID(self::MAIN_ELEMENTS[3]);
 
                     if ($aside instanceof HTMLNode) {
                         $this->document->removeChild($aside);
@@ -872,11 +891,11 @@ class Page {
      */
     private function setHasFooter($bool) {
         if (gettype($bool) == 'boolean') {
-            if ($this->incFooter == false && $bool == true) {
+            if (!$this->incFooter && $bool) {
                 $this->document->addChild($this->_getFooter());
             } else {
-                if ($this->incFooter == true && $bool == false) {
-                    $footer = $this->document->getChildByID('page-footer');
+                if ($this->incFooter && !$bool) {
+                    $footer = $this->document->getChildByID(self::MAIN_ELEMENTS[4]);
 
                     if ($footer instanceof HTMLNode) {
                         $this->document->removeChild($footer);
@@ -894,7 +913,7 @@ class Page {
      */
     private function setHasHeader($bool) {
         if (gettype($bool) == 'boolean') {
-            if ($this->incHeader == false && $bool === true) {
+            if (!$this->incHeader && $bool) {
                 //add the header
                 $children = $this->document->getBody()->children();
                 $currentChCount = $children->size();
@@ -905,16 +924,16 @@ class Page {
                     $this->document->addChild($children->get($x));
                 }
             } else {
-                if ($this->incHeader == true && $bool === false) {
+                if ($this->incHeader && !$bool) {
                     //remove header
-                    $header = $this->document->getChildByID('page-header');
+                    $header = $this->document->getChildByID(self::MAIN_ELEMENTS[1]);
 
                     if ($header instanceof HTMLNode) {
                         $this->document->removeChild($header);
                     }
                 }
             }
-            $this->incHeader = $bool === true;
+            $this->incHeader = $bool;
         }
     }
     /**
@@ -1019,11 +1038,9 @@ class Page {
      */
     private function usingLanguage() {
         if ($this->getLang() != null) {
-            //if($this->getLanguage() === null){
             Language::loadTranslation($this->getLang());
             $pageLang = $this->getLanguage();
             $this->setWritingDir($pageLang->getWritingDir());
-            //}
         }
     }
     /**
@@ -1071,10 +1088,10 @@ class Page {
         $this->document->setHeadNode($headNode);
         $this->document->addChild($headerNode);
         $body = new HTMLNode();
-        $body->setID('page-body');
+        $body->setID(self::MAIN_ELEMENTS[0]);
         $body->addChild($asideNode);
         $mainContentArea = new HTMLNode();
-        $mainContentArea->setID('main-content-area');
+        $mainContentArea->setID(self::MAIN_ELEMENTS[2]);
         $body->addChild($mainContentArea);
         $this->document->addChild($body);
         $this->document->addChild($footerNode);

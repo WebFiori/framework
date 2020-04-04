@@ -26,11 +26,12 @@ namespace webfiori\entity\exceptions;
 
 use Exception;
 /**
- * An exception that might be thrown during initialization stage.
+ * An exception which is thrown by the sessions manager to indicate 
+ * that something went wrong during sessions management.
  *
  * @author Ibrahim
  * @version 1.0
  */
-class InitializationException extends Exception {
+class SessionException extends Exception {
 
 }

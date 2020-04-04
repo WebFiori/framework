@@ -26,11 +26,12 @@ namespace webfiori\entity\exceptions;
 
 use Exception;
 /**
- * An exception that might be thrown during initialization stage.
+ * An exception which is thrown to indicate that a theme was 
+ * not found when trying to load it.
  *
  * @author Ibrahim
  * @version 1.0
  */
-class InitializationException extends Exception {
+class NoSuchThemeException extends Exception {
 
 }

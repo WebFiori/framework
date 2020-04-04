@@ -278,38 +278,6 @@ class SocketMailer {
 
                 if ($this->sendC('EHLO '.$this->host)) {
                     $retVal = true;
-
-                    if ($port == 587) {
-                        //Logger::log('Using TLS. Sending the command \'STARTTLS\'.');
-//                        if($this->sendC('STARTTLS')){
-//                            $retVal = stream_socket_enable_crypto($this->conn, true, STREAM_CRYPTO_METHOD_ANY_CLIENT);
-//                            if($retVal === true){
-//                                Logger::log('Secure connection enabled.');
-//                                $this->sendC('EHLO '.$this->host);
-//                            }
-//                            else{
-//                                Logger::log('Unable to make secure connection.','error');
-//                            }
-//                        }
-//                        else{
-//                            Logger::log('Error while sending the command \'STARTTLS\'.','error');
-//                        }
-                    } else {
-                        if ($port == 465) {
-//                        Logger::log('SSL will be used.');
-//                        $retVal = stream_socket_enable_crypto($this->conn, true, STREAM_CRYPTO_METHOD_ANY_CLIENT);
-//                        if($retVal === true){
-//                            Logger::log('Secure connection enabled.');
-//                            $this->sendC('EHLO '.$this->host);
-//                        }
-//                        else{
-//                            Logger::log('Unable to make secure connection.','error');
-//                        }
-                        } else {
-                            //Logger::log('No secure connection will be used.');
-                        //$retVal = true;
-                        }
-                    }
                 }
             } else {
                 $retVal = false;

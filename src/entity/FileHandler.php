@@ -24,7 +24,7 @@
  */
 namespace webfiori\entity;
 
-use Exception;
+use webfiori\entity\exceptions\FileException;
 /**
  * This class is used to write HTML or PHP files.
  * @author Ibrahim
@@ -40,8 +40,8 @@ class FileHandler {
         $ffName = str_replace('\\', '/', $fName);
         $this->file = fopen($ffName, $mode);
 
-        if ($this->file === false) {
-            throw new Exception('Unable to open the file \''.$fName.'\' using the mode \''.$mode.'\'.');
+        if (!$this->file) {
+            throw new FileException('Unable to open the file \''.$fName.'\' using the mode \''.$mode.'\'.');
         }
     }
 
@@ -106,15 +106,15 @@ class FileHandler {
      * @param type $incNewLine if true, the cursor will move to the next line.
      */
     public function write($content, $incTab = false, $incNewLine = false) {
-        if ($incTab == true && $incNewLine == true) {
+        if ($incTab && $incNewLine) {
             fwrite($this->file, $this->_getTab().$content);
             $this->newLine();
         } else {
-            if ($incTab == false && $incNewLine == true) {
+            if (!$incTab && $incNewLine) {
                 fwrite($this->file, $content);
                 $this->newLine();
             } else {
-                if ($incTab == true && $incNewLine == false) {
+                if ($incTab && !$incNewLine) {
                     fwrite($this->file, $this->_getTab().$content);
                 } else {
                     fwrite($this->file, $content);

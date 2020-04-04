@@ -325,9 +325,7 @@ class Page {
      * @since 1.9
      */
     public static function insert($node,$parentNodeId = self::MAIN_ELEMENTS[2]) {
-        $retVal = Page::get()->insertNode($node, $parentNodeId);
-
-        return $retVal;
+        return Page::get()->insertNode($node, $parentNodeId);
     }
     /**
      * Returns the directory at which JavaScript files of the theme exists.
@@ -479,17 +477,16 @@ class Page {
 
             return $p->getLanguage();
         }
-        $null = null;
-
-        return $null;
+        
+        return null;
     }
 
     private function _getAside() {
-        $theme = $this->getTheme();
+        $loadedTheme = $this->getTheme();
         $node = null;
 
-        if ($theme !== null) {
-            $node = $theme->getAsideNode();
+        if ($loadedTheme !== null) {
+            $node = $loadedTheme->getAsideNode();
         }
 
         if ($node instanceof HTMLNode) {
@@ -503,11 +500,11 @@ class Page {
     }
 
     private function _getFooter() {
-        $theme = $this->getTheme();
+        $loadedTheme = $this->getTheme();
         $node = null;
 
-        if ($theme !== null) {
-            $node = $theme->getFooterNode();
+        if ($loadedTheme !== null) {
+            $node = $loadedTheme->getFooterNode();
         }
 
         if ($node instanceof HTMLNode) {
@@ -521,16 +518,16 @@ class Page {
     }
 
     private function _getHead() {
-        $theme = $this->getTheme();
+        $loadedTheme = $this->getTheme();
 
-        if ($theme === null) {
+        if ($loadedTheme === null) {
             $headNode = new HeadNode(
                 $this->getTitle().$this->getTitleSep().$this->getWebsiteName(),
                 $this->getCanonical(),
                 SiteConfig::getBaseURL()
             );
         } else {
-            $headNode = $theme->getHeadNode();
+            $headNode = $loadedTheme->getHeadNode();
         }
         $headNode->addMeta('charset','UTF-8',true);
         $headNode->setTitle($this->getTitle().$this->getTitleSep().$this->getWebsiteName());
@@ -545,11 +542,11 @@ class Page {
     }
 
     private function _getHeader() {
-        $theme = $this->getTheme();
+        $loadedTheme = $this->getTheme();
         $node = null;
 
-        if ($theme !== null) {
-            $node = $theme->getHeadrNode();
+        if ($loadedTheme !== null) {
+            $node = $loadedTheme->getHeadrNode();
         }
 
         if ($node instanceof HTMLNode) {
@@ -675,9 +672,9 @@ class Page {
      */
     private function getThemeCSSDir() {
         if ($this->isThemeLoaded()) {
-            $theme = $this->getTheme();
+            $loadedTheme = $this->getTheme();
 
-            return Theme::THEMES_DIR.'/'.$theme->getDirectoryName().'/'.$theme->getCssDirName();
+            return Theme::THEMES_DIR.'/'.$loadedTheme->getDirectoryName().'/'.$loadedTheme->getCssDirName();
         }
 
         return '';
@@ -691,9 +688,9 @@ class Page {
      */
     private function getThemeImagesDir() {
         if ($this->isThemeLoaded()) {
-            $theme = $this->getTheme();
+            $loadedTheme = $this->getTheme();
 
-            return Theme::THEMES_DIR.'/'.$theme->getDirectoryName().'/'.$theme->getImagesDirName();
+            return Theme::THEMES_DIR.'/'.$loadedTheme->getDirectoryName().'/'.$loadedTheme->getImagesDirName();
         }
 
         return '';
@@ -707,9 +704,9 @@ class Page {
      */
     private function getThemeJSDir() {
         if ($this->isThemeLoaded()) {
-            $theme = $this->getTheme();
+            $loadedTheme = $this->getTheme();
 
-            return Theme::THEMES_DIR.'/'.$theme->getDirectoryName().'/'.$theme->getJsDirName();
+            return Theme::THEMES_DIR.'/'.$loadedTheme->getDirectoryName().'/'.$loadedTheme->getJsDirName();
         }
 
         return '';

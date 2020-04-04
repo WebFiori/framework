@@ -43,8 +43,13 @@ class CronView {
      */
     private $controlsContainer;
     public function __construct($title,$description = '') {
-        if (WebFiori::getWebsiteController()->getSessionVar('cron-login-status') !== true) {
+        if(Cron::password() != 'NO_PASSWORD' 
+                && $title != 'CRON Login' 
+                && WebFiori::getWebsiteController()->getSessionVar('cron-login-status') !== true){
             header('location: '.WebFiori::getSiteConfig()->getBaseURL().'cron/login');
+        }
+        else if($title == 'CRON Login' && Cron::password() == 'NO_PASSWORD'){
+            header('location: '.WebFiori::getSiteConfig()->getBaseURL().'cron/jobs');
         }
         Page::title($title);
         Page::description($description);
@@ -69,7 +74,7 @@ class CronView {
         $hr = new HTMLNode('hr',false);
         Page::insert($hr);
 
-        if (Cron::password() != 'NO_PASSWORD') {
+        if (Cron::password() != 'NO_PASSWORD' && $title != 'CRON Login') {
             $this->controlsContainer->addTextNode('<button name="input-element" onclick="logout()"><b>Logout</b></button><br/>', false);
         }
         $jsCode = new JsCode();

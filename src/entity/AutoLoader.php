@@ -25,6 +25,7 @@
 namespace webfiori\entity;
 
 use Exception;
+use webfiori\entity\exceptions\ClassLoaderException;
 /**
  * An autoloader class to load classes as needed during runtime.
  * The class aims to provide all needed utilities to autoload any classes 
@@ -97,6 +98,11 @@ class AutoLoader {
      * @since 1.0 
      */
     private $searchFolders;
+    private const CLASS_INDICES = [
+        'class-name',
+        'namespace',
+        'path'
+    ];
     /**
      * 
      * @param type $root
@@ -110,7 +116,7 @@ class AutoLoader {
         $this->casheArr = [];
         $this->_readCache();
         $this->loadedClasses = [];
-
+        require_once 'exceptions'.DIRECTORY_SEPARATOR.'ClassLoaderException.php';
         if (defined('ROOT_DIR')) {
             $this->rootDir = ROOT_DIR;
         } else {
@@ -121,7 +127,7 @@ class AutoLoader {
                     define('ROOT_DIR', $this->rootDir);
                 }
             } else {
-                throw new Exception('Unable to set root search folder.');
+                throw new ClassLoaderException('Unable to set root search folder.');
             }
         }
 
@@ -145,9 +151,9 @@ class AutoLoader {
             $this->onFail = self::ON_FAIL_ACTIONS[0];
         }
         $this->loadedClasses[] = [
-            'class-name' => 'AutoLoader',
-            'namespace' => 'webfiori\\entity',
-            'path' => __DIR__
+            self::CLASS_INDICES[0] => 'AutoLoader',
+            self::CLASS_INDICES[1] => 'webfiori\\entity',
+            self::CLASS_INDICES[2] => __DIR__
         ];
     }
     /**
@@ -248,12 +254,12 @@ class AutoLoader {
 
         foreach ($loadedClasses as $classArr) {
             if ($namespace !== null) {
-                if ($classArr['namespace'] == $namespace && $classArr['class-name'] == $className) {
-                    $retVal[] = $classArr['path'];
+                if ($classArr[self::CLASS_INDICES[1]] == $namespace && $classArr[self::CLASS_INDICES[0]] == $className) {
+                    $retVal[] = $classArr[self::CLASS_INDICES[2]];
                 }
             } else {
-                if ($classArr['class-name'] == $className) {
-                    $retVal[] = $classArr['path'];
+                if ($classArr[self::CLASS_INDICES[0]] == $className) {
+                    $retVal[] = $classArr[self::CLASS_INDICES[2]];
                 }
             }
         }
@@ -303,7 +309,7 @@ class AutoLoader {
      */
     public  static function isLoaded($class) {
         foreach (self::getLoadedClasses() as $classArr) {
-            if ($class == $classArr['namespace'].'\\'.$classArr['class-name']) {
+            if ($class == $classArr[self::CLASS_INDICES[1]].'\\'.$classArr[self::CLASS_INDICES[0]]) {
                 return true;
             }
         }
@@ -429,7 +435,7 @@ class AutoLoader {
         $h = fopen($autoloadCache, 'w');
 
         foreach ($this->loadedClasses as $classArr) {
-            fwrite($h, $classArr['path'].'=>'.$classArr['namespace'].'\\'.$classArr['class-name']."\n");
+            fwrite($h, $classArr[self::CLASS_INDICES[2]].'=>'.$classArr[self::CLASS_INDICES[1]].'\\'.$classArr[self::CLASS_INDICES[0]]."\n");
         }
         fclose($h);
     }
@@ -494,6 +500,44 @@ class AutoLoader {
     private function getRoot() {
         return $this->rootDir;
     }
+    private function _loadFromCache($classPath, $className) {
+        $loaded = false;
+        if (isset($this->casheArr[$classPath])) {
+            foreach ($this->casheArr[$classPath] as $location) {
+                if (file_exists($location)) {
+                    require_once $location;
+                    $this->loadedClasses[] = [
+                        self::CLASS_INDICES[0] => $className,
+                        self::CLASS_INDICES[1] => substr($classPath, 0, strlen($classPath) - strlen($className) - 1),
+                        self::CLASS_INDICES[2] => $location
+                    ];
+                    $loaded = true;
+                }
+            }
+        }
+        return $loaded;
+    }
+    private function _loadClassHelper($className, $classPath, $value, $appendRoot, $allPaths) {
+        $loaded = false;
+        $DS = DIRECTORY_SEPARATOR;
+        $root = $this->getRoot();
+        if ($appendRoot === true) {
+            $f = $root.$value.$DS.$className.'.php';
+        } else {
+            $f = $value.$DS.$className.'.php';
+        }
+
+        if (file_exists($f) && !in_array($f, $allPaths)) {
+            require_once $f;
+            $this->loadedClasses[] = [
+                self::CLASS_INDICES[0] => $className,
+                self::CLASS_INDICES[1] => substr($classPath, 0, strlen($classPath) - strlen($className) - 1),
+                self::CLASS_INDICES[2] => $f
+            ];
+            $loaded = true;
+        }
+        return $loaded;
+    }
     /**
      * Tries to load a class given its name.
      * @param string $classPath The name of the class alongside its namespace.
@@ -503,76 +547,27 @@ class AutoLoader {
         if (self::isLoaded($classPath)) {
             return;
         }
-        $DS = DIRECTORY_SEPARATOR;
         $cArr = explode('\\', $classPath);
         $className = $cArr[count($cArr) - 1];
         $loaded = false;
-
         //checks if the class is cached or not.
-        if (isset($this->casheArr[$classPath])) {
-            foreach ($this->casheArr[$classPath] as $location) {
-                if (file_exists($location)) {
-                    require_once $location;
-                    $this->loadedClasses[] = [
-                        'class-name' => $className,
-                        'namespace' => substr($classPath, 0, strlen($classPath) - strlen($className) - 1),
-                        'path' => $location
-                    ];
-                    $loaded = true;
-                }
-            }
-
-            if ($loaded === true) {
-                return;
-            }
+        if($this->_loadFromCache($classPath, $className)){
+            return;
         }
-        $root = $this->getRoot();
+        
         $allPaths = self::getClassPath($className);
 
         foreach ($this->searchFolders as $value => $appendRoot) {
-            if ($appendRoot === true) {
-                $f = $root.$value.$DS.$className.'.php';
-            } else {
-                $f = $value.$DS.$className.'.php';
+            $loaded = $this->_loadClassHelper($className, $classPath, $value, $appendRoot, $allPaths);
+            if(!$loaded){
+                $loaded = $this->_loadClassHelper(strtolower($className), $classPath, $value, $appendRoot, $allPaths);
             }
-
-            if (file_exists($f) && !in_array($f, $allPaths)) {
-                require_once $f;
-                $this->loadedClasses[] = [
-                    'class-name' => $className,
-                    'namespace' => substr($classPath, 0, strlen($classPath) - strlen($className) - 1),
-                    'path' => $f
-                ];
-                $loaded = true;
-
-                if (PHP_MAJOR_VERSION < 7 || (PHP_MAJOR_VERSION == 7 && PHP_MINOR_VERSION < 3)) {
-                    //in php 7.2 and lower, if same class is loaded 
-                    //from two namespaces with same name, it will 
-                    //rise a fatal error with message 
-                    // 'Cannot redeclare class'
-                    break;
-                }
-            } else {
-                //lower case class name to support loading of old-style classes.
-                if ($appendRoot === true) {
-                    $f = $root.$value.$DS.strtolower($className).'.php';
-                } else {
-                    $f = $value.$DS.strtolower($className).'.php';
-                }
-
-                if (file_exists($f) && !in_array($f, $allPaths)) {
-                    require_once $f;
-                    $this->loadedClasses[] = [
-                        'class-name' => $className,
-                        'namespace' => substr($classPath, 0, strlen($classPath) - strlen($className) - 1),
-                        'path' => $f
-                    ];
-                    $loaded = true;
-
-                    if (PHP_MAJOR_VERSION < 7 || (PHP_MAJOR_VERSION == 7 && PHP_MINOR_VERSION < 3)) {
-                        break;
-                    }
-                }
+            if($loaded && (PHP_MAJOR_VERSION < 7 || (PHP_MAJOR_VERSION == 7 && PHP_MINOR_VERSION < 3))){
+                //in php 7.2 and lower, if same class is loaded 
+                //from two namespaces with same name, it will 
+                //rise a fatal error with message 
+                // 'Cannot redeclare class'
+                break;
             }
         }
 
@@ -581,7 +576,7 @@ class AutoLoader {
                 call_user_func($this->onFail);
             } else {
                 if ($this->onFail == self::ON_FAIL_ACTIONS[0]) {
-                    throw new Exception('Class \''.$classPath.'\' not found in any include directory. '
+                    throw new ClassLoaderException('Class \''.$classPath.'\' not found in any include directory. '
                     .'Make sure that class path is included in auto-load directories and its namespace is correct.');
                 }
             }

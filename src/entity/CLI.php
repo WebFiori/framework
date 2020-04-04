@@ -55,6 +55,7 @@ class CLI {
             putenv('REQUEST_URI=/');
 
             if (defined('USE_HTTP') && USE_HTTP === true) {
+                $_SERVER['HTTPS'] = 'no';
             } else {
                 $_SERVER['HTTPS'] = 'yes';
             }
@@ -70,9 +71,7 @@ class CLI {
         //best way to check if app is runing through CLi
         // or in a web server.
         // Did a lot of reaseach on that.
-        $isCli = http_response_code() === false;
-
-        return $isCli;
+        return http_response_code() === false;
     }
 
     public static function runCLI() {
@@ -159,7 +158,6 @@ class CLI {
                     }
                 }
             }
-            //exit(0);
         }
     }
     private static function checkCron($pass = '') {
@@ -339,7 +337,6 @@ class CLI {
         self::printCommandInfo('--list-cron-jobs <cron-pass>', "Display a list of cron jobs. If cron password is set, it must be provided.");
         self::printCommandInfo('--force-cron <job-name> <cron-pass>', "Force a CRON job to run.");
         self::printCommandInfo('--check-cron <cron-pass>', "Execute a command to check all jobs and execute them if its time to run the job.");
-        //self::printCommandInfo('--view-privileges', "Display all created privileges groups and all privileges inside each group.");
         self::printCommandInfo('--list-routes', "Display all available routes.");
         self::printCommandInfo('--list-themes', "Display a list of available themes.");
         exit(0);

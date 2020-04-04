@@ -105,10 +105,10 @@ class CronTaskView extends CronView {
             $forceNode->addTextNode('<button style="margin-top:30px" name="input-element" onclick="execJob(this,\''.$job->getJobName().'\')" class="force-execution-button">Force Execution</button>', false);
             $this->getControlsContainer()->addChild($forceNode);
             $this->createOutputWindow();
-            Page::render();
         } else {
             header('location: '.WebFiori::getSiteConfig()->getBaseURL().'cron-jobs/list');
         }
+        Page::render();
     }
 
     private function _createCustomParamsContainer() {
@@ -248,3 +248,4 @@ class CronTaskView extends CronView {
         return $cell;
     }
 }
+return __NAMESPACE__;

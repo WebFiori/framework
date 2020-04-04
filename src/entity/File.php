@@ -24,7 +24,7 @@
  */
 namespace webfiori\entity;
 
-use Exception;
+use webfiori\entity\exceptions\FileException;
 use jsonx\JsonI;
 use jsonx\JsonX;
 /**
@@ -261,11 +261,11 @@ class File implements JsonI {
      * @since 1.1.1
      */
     public function getAbsolutePath() {
-        $path = $this->getPath();
+        $fPath = $this->getPath();
         $name = $this->getName();
 
-        if (strlen($path) != 0 && strlen($name) != 0) {
-            return $path.DIRECTORY_SEPARATOR.$name;
+        if (strlen($fPath) != 0 && strlen($name) != 0) {
+            return $fPath.DIRECTORY_SEPARATOR.$name;
         }
 
         return '';
@@ -368,7 +368,7 @@ class File implements JsonI {
      * @param int $to The byte at which the method will read data to. If -1 
      * is given, then the method will read till last byte. Default is 
      * -1.
-     * @throws Exception The method will throw an exception with the message 
+     * @throws FileException The method will throw an exception with the message 
      * "File absolute path is invalid." if absolute path is empty string. Also, 
      * an exception with the message "Unable to open the file 'f_path'." if 
      * the method was unable to create the resource which is used to read 
@@ -378,20 +378,20 @@ class File implements JsonI {
      * @since 1.1.1
      */
     public function read($from = -1,$to = -1) {
-        $path = $this->getAbsolutePath();
+        $fPath = $this->getAbsolutePath();
 
-        if ($path != '') {
-            if (!$this->_readHelper($path,$from,$to)) {
-                $path = str_replace('\\', '/', $this->getAbsolutePath());
+        if ($fPath != '') {
+            if (!$this->_readHelper($fPath,$from,$to)) {
+                $fPath = str_replace('\\', '/', $this->getAbsolutePath());
 
-                if (!$this->_readHelper($path,$from,$to)) {
-                    throw new Exception('File not found: \''.$path.'\'.');
+                if (!$this->_readHelper($fPath,$from,$to)) {
+                    throw new FileException('File not found: \''.$fPath.'\'.');
                 }
             } else {
                 return;
             }
         }
-        throw new Exception('File absolute path is invalid.');
+        throw new FileException('File absolute path is invalid.');
     }
     /**
      * Removes a file given its name and path.
@@ -447,15 +447,15 @@ class File implements JsonI {
      * The path is simply the folder that contains the file. For example, 
      * the path can be something like "C:/Users/Me/Documents". The path can 
      * use forward slashes or backward slashes.
-     * @param string $path The folder which will contain the file. It must 
+     * @param string $fPath The folder which will contain the file. It must 
      * be non-empty string in order to set.
      * @return boolean The method will return true if the path is set. Other 
      * than that, the method will return false.
      * @since 1.0
      */
-    public function setPath($path) {
+    public function setPath($fPath) {
         $retVal = false;
-        $pathV = self::_validatePath($path);
+        $pathV = self::_validatePath($fPath);
         $len = strlen($pathV);
         $DS = DIRECTORY_SEPARATOR;
 
@@ -507,7 +507,7 @@ class File implements JsonI {
      * @param boolean $asAttachment If this parameter is set to 
      * true, the header 'content-disposition' will have the attribute 'attachment' 
      * set instead of 'inline'. This will trigger 'save as' dialog to appear.
-     * @throws Exception An exception with the message "MIME type of raw data is not set." 
+     * @throws FileException An exception with the message "MIME type of raw data is not set." 
      * If MIME type of the file is not set.
      * @since 1.1.1
      */
@@ -527,10 +527,10 @@ class File implements JsonI {
      * This means that if the file does not exist, the method will try to 
      * created it. If it fails, It will throw an exception. Note that if an 
      * optional path is provided, the name of the file must be set first.
-     * @param string $path An optional file path such as "C:\Users\Me\Documents". 
+     * @param string $fPath An optional file path such as "C:\Users\Me\Documents". 
      * The path should not include the name of the file. If not provided, 
      * the path that is returned by File::getPath() will be used.
-     * @throws Exception The method will throw an exception with the message 
+     * @throws FileException The method will throw an exception with the message 
      * "File absolute path is invalid." if file absolute path is invalid. Also, 
      * The method will throw an exception with the message "Path cannot be empty string." 
      * if provided file path is empty string. Also, an exception with the message 
@@ -540,21 +540,21 @@ class File implements JsonI {
      * unable to create the resource which is used to write data.
      * @since 1.1.1
      */
-    public function write($path = null) {
-        if ($path === null) {
-            $path = $this->getAbsolutePath();
+    public function write($fPath = null) {
+        if ($fPath === null) {
+            $fPath = $this->getAbsolutePath();
 
-            if ($path != '') {
-                $this->_writeHelper($path);
+            if ($fPath != '') {
+                $this->_writeHelper($fPath);
 
                 return;
             }
-            throw new Exception('File absolute path is invalid.');
+            throw new FileException('File absolute path is invalid.');
         } else {
             $fName = $this->getName();
 
             if (strlen($fName) > 0) {
-                $pathV = self::_validatePath($path);
+                $pathV = self::_validatePath($fPath);
 
                 if (strlen($pathV) > 0) {
                     $pathV2 = !Util::isDirectory($pathV) ? DIRECTORY_SEPARATOR.$pathV : $pathV;
@@ -562,18 +562,18 @@ class File implements JsonI {
 
                     return;
                 }
-                throw new Exception('Path cannot be empty string.');
+                throw new FileException('Path cannot be empty string.');
             }
-            throw new Exception('File name cannot be empty string.');
+            throw new FileException('File name cannot be empty string.');
         }
     }
-    private function _readHelper($path,$from,$to) {
-        if (file_exists($path)) {
-            $this->_setSize(filesize($path));
+    private function _readHelper($fPath,$from,$to) {
+        if (file_exists($fPath)) {
+            $this->_setSize(filesize($fPath));
             set_error_handler(function()
             {
             });
-            $h = fopen($path, 'rb');
+            $h = fopen($fPath, 'rb');
             $bytesToRead = $to - $from > 0 ? $to - $from : $this->getSize();
 
             if (is_resource($h)) {
@@ -591,7 +591,7 @@ class File implements JsonI {
                 return true;
             }
             restore_error_handler();
-            throw new Exception('Unable to open the file \''.$path.'\'.');
+            throw new FileException('Unable to open the file \''.$fPath.'\'.');
         }
 
         return false;
@@ -601,8 +601,8 @@ class File implements JsonI {
             $this->fSize = $size;
         }
     }
-    private static function _validatePath($path) {
-        $trimmedPath = trim($path);
+    private static function _validatePath($fPath) {
+        $trimmedPath = trim($fPath);
         $len = strlen($trimmedPath);
 
         if ($len != 0) {
@@ -640,7 +640,6 @@ class File implements JsonI {
                 header('Content-Range: bytes '.$expl[0].'-'.$expl[1].'/'.$this->getSize());
                 header('Content-Length: '.($expl[1] - $expl[0]));
             } else {
-                //header('Content-Range: bytes 0-'.$this->getSize().'/'.$this->getSize());
                 header('Content-Length: '.$this->getSize());
             }
 
@@ -651,14 +650,14 @@ class File implements JsonI {
             }
             echo $this->getRawData();
         } else {
-            throw new Exception('MIME type of raw data is not set.');
+            throw new FileException('MIME type of raw data is not set.');
         }
     }
-    private function _writeHelper($path) {
+    private function _writeHelper($fPath) {
         if ($this->getRawData() === null) {
             $this->read();
         }
-        $h = fopen($path, 'wb');
+        $h = fopen($fPath, 'wb');
 
         if (is_resource($h)) {
             fwrite($h, $this->getRawData());
@@ -668,6 +667,6 @@ class File implements JsonI {
             return;
         }
         restore_error_handler();
-        throw new Exception('Unable to open the file at \''.$path.'\'.');
+        throw new FileException('Unable to open the file at \''.$fPath.'\'.');
     }
 }

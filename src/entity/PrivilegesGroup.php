@@ -254,8 +254,8 @@ class PrivilegesGroup implements JsonI {
         for ($x = 0 ; $x < $len ; $x++) {
             $ch = $xid[$x];
 
-            if ($ch == '_' || ($ch >= 'a' && $ch <= 'z') || ($ch >= 'A' && $ch <= 'Z') || ($ch >= '0' && $ch <= '9')) {
-            } else {
+            if (!($ch == '_' || ($ch >= 'a' && $ch <= 'z') || ($ch >= 'A' && $ch <= 'Z') || ($ch >= '0' && $ch <= '9'))) {
+            
                 return false;
             }
         }
@@ -302,13 +302,11 @@ class PrivilegesGroup implements JsonI {
                 return true;
             }
         } else {
-            if ($group === null) {
-                if ($this->parentGroup !== null) {
-                    $this->parentGroup->_removeChildGroup($this->getID());
-                    $this->parentGroup = null;
+            if ($group === null && $this->parentGroup !== null) {
+                $this->parentGroup->_removeChildGroup($this->getID());
+                $this->parentGroup = null;
 
-                    return true;
-                }
+                return true;
             }
         }
 

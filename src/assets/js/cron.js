@@ -172,3 +172,46 @@ function extractCustomParams(){
     }
     return retVal;
 }
+
+function login(source){
+    source.innerHTML = 'Please wait...';
+    source.setAttribute('disabled','');
+    source.style['color'] = 'black';
+    var pass = document.getElementById('password-input').value;
+    var xhr = new XMLHttpRequest();
+    xhr.open('post','cron/apis/login');
+    xhr.onreadystatechange = function(){
+        if(this.readyState === 4 && this.status === 200){
+            try{
+                var json = JSON.parse(this.response);
+                source.innerHTML = json['message'];
+                source.style['color'] = 'green';
+                window.location.href = 'cron/jobs';
+            }
+            catch(e){
+                source.innerHTML = 'Something went wrong on the server.';
+                source.style['color'] = 'red';
+                source.removeAttribute('disabled');
+            }
+        }
+        else if(this.readyState === 4 && this.status === 0){
+                source.removeAttribute('disabled');
+                source.innerHTML = 'Connection Lost. Check your internet connection.';
+                source.style['color'] = 'red';
+        }
+        else if(this.readyState === 4){
+            source.removeAttribute('disabled');
+            try{
+                var json = JSON.parse(this.response);
+                source.innerHTML = json['message'];
+                source.style['color'] = 'red';
+            }
+            catch(e){
+                source.innerHTML = 'Something went wrong on the server.';
+                source.style['color'] = 'red';
+            }
+        }
+    };
+    xhr.setRequestHeader('content-type','application/x-www-form-urlencoded');
+    xhr.send('password='+encodeURIComponent(pass));
+}

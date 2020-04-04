@@ -114,19 +114,13 @@ class Cron {
             'path' => '/cron',
             'route-to' => '/entity/cron/CronLoginView.php'
         ]);
-        Router::closure([
+        Router::other([
             'path' => '/cron/jobs',
-            'route-to' => function()
-            {
-                new CronTasksView();
-            }
+            'route-to' => '/entity/cron/CronTasksView.php'
         ]);
-        Router::closure([
+        Router::other([
             'path' => '/cron/jobs/{job-name}',
-            'route-to' => function()
-            {
-                new CronTaskView();
-            }
+            'route-to' => '/entity/cron/CronTaskView.php'
         ]);
     }
     /**

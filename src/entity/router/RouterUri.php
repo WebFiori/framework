@@ -358,7 +358,7 @@ class RouterUri {
      */
     public function getUriVar($varName) {
         if ($this->hasUriVar($varName)) {
-            return $this->uriBroken[self::UV][$varName];
+            return $this->uriBroken[self::$UV][$varName];
         }
 
         return null;
@@ -371,7 +371,7 @@ class RouterUri {
      * @since 1.0
      */
     public function getUriVars() {
-        return $this->uriBroken[self::UV];
+        return $this->uriBroken[self::$UV];
     }
     /**
      * Checks if the URI has a variable or not given its name.
@@ -383,7 +383,7 @@ class RouterUri {
      * @since 1.0
      */
     public function hasUriVar($varName) {
-        return array_key_exists($varName, $this->uriBroken[self::UV]);
+        return array_key_exists($varName, $this->uriBroken[self::$UV]);
     }
     /**
      * Checks if the URI has any variables or not.
@@ -498,7 +498,7 @@ class RouterUri {
      */
     public function setUriVar($varName,$value) {
         if ($this->hasUriVar($varName)) {
-            $this->uriBroken[self::UV][$varName] = $value;
+            $this->uriBroken[self::$UV][$varName] = $value;
 
             return true;
         }
@@ -544,7 +544,7 @@ class RouterUri {
             'query-string-vars' => [
 
             ],
-            self::UV => [
+            self::$UV => [
 
             ],
         ];
@@ -580,7 +580,7 @@ class RouterUri {
                 $retVal['path'][] = utf8_decode(urldecode($dirName));
 
                 if ($dirName[0] == '{' && $dirName[strlen($dirName) - 1] == '}') {
-                    $retVal[self::UV][trim($split4[$x], '{}')] = null;
+                    $retVal[self::$UV][trim($split4[$x], '{}')] = null;
                 }
             }
         }

@@ -850,12 +850,8 @@ class Router {
                                     //but we store result in $_GET.
                                     $_GET[$varName] = filter_var(urldecode($pathArray[$x]),FILTER_SANITIZE_STRING);
                                 }
-                            } else {
-                                if (!$route->isCaseSensitive() && (strtolower($routePathArray[$x]) != strtolower($pathArray[$x]))) {
-                                    break;
-                                } else if ($routePathArray[$x] != $pathArray[$x]) {
-                                    break;
-                                }
+                            } else if ((!$route->isCaseSensitive() && (strtolower($routePathArray[$x]) != strtolower($pathArray[$x]))) || $routePathArray[$x] != $pathArray[$x]) {
+                                break;
                             }
                         }
                     }

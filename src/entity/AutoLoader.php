@@ -136,18 +136,13 @@ class AutoLoader {
         });
         if (gettype($onFail) == 'string') {
             $this->onFail = strtolower($onFail);
-
-            if ($this->onFail != self::ON_FAIL_ACTIONS[1]) {
-                if ($this->onFail != self::ON_FAIL_ACTIONS[0]) {
-                    $this->onFail = self::ON_FAIL_ACTIONS[0];
-                }
-            }
-        } else {
-            if (is_callable($onFail)) {
-                $this->onFail = $onFail;
-            } else {
+            if ($this->onFail != self::ON_FAIL_ACTIONS[1] && $this->onFail != self::ON_FAIL_ACTIONS[0]) {
                 $this->onFail = self::ON_FAIL_ACTIONS[0];
             }
+        } else if (is_callable($onFail)) {
+            $this->onFail = $onFail;
+        } else {
+            $this->onFail = self::ON_FAIL_ACTIONS[0];
         }
         $this->loadedClasses[] = [
             'class-name' => 'AutoLoader',

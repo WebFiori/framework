@@ -69,7 +69,7 @@ function execJob(source,jobName){
         window.isRefresh = refresh;
     });
     ajax.send();
-};
+}
 /**
  * Logout of CRON control panel.
  * @returns {undefined}
@@ -83,7 +83,7 @@ function logout(){
          }
      };
      xhr.setRequestHeader('content-type','application/x-www-form-urlencoded');     xhr.send();
-};
+}
 /**
  * This function is called when adding new execution parameter to the job.
  * @param {type} name The name of the new parameter.
@@ -104,10 +104,12 @@ function addAttribute(name=undefined){
         attrsTable.removeChild(window.noAttrsNode);
     }
     var inputsIndex = window.customAttrs.length;
+    var attrNameInput = '';
     if(name !== undefined){
-        var attrNameInput = "<input style='border:0px' name='input-element' type='text' value='"+name+"' oninput='attributeNameChanged(this,"+inputsIndex+")'>";
-    }    else{
-        var attrNameInput = "<input style='border:0px' name='input-element' type='text'  oninput='attributeNameChanged(this,"+inputsIndex+")'>";
+        attrNameInput = "<input style='border:0px' name='input-element' type='text' value='"+name+"' oninput='attributeNameChanged(this,"+inputsIndex+")'>";
+    }
+    else{
+        attrNameInput = "<input style='border:0px' name='input-element' type='text'  oninput='attributeNameChanged(this,"+inputsIndex+")'>";
     }
     var attrValInput = "<input style='border:0px' type='text' name='input-element' oninput='attributeValueChanged(this,"+inputsIndex+")'>";
     var newRow = document.createElement("tr");
@@ -147,10 +149,10 @@ function removeAttr(num){
 }
 function attributeValueChanged(source,num){
     window.customAttrs[num].value = source.value;
-};
+}
 function attributeNameChanged(source,num){
     window.customAttrs[num].name = source.value;
-};
+}
 /**
  * Creates an object that contains all custom execution parameters taken from 
  * the user interface.
@@ -169,4 +171,4 @@ function extractCustomParams(){
         }
     }
     return retVal;
-};
+}

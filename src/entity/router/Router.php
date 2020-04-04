@@ -29,6 +29,7 @@ use phpStructs\html\HTMLNode;
 use restEasy\WebServices;
 use webfiori\conf\SiteConfig;
 use webfiori\entity\Util;
+use webfiori\entity\CLI;
 /**
  * The basic class that is used to route user requests to the correct 
  * location.
@@ -844,24 +845,16 @@ class Router {
 
                                 if ($requestMethod == 'POST' || $requestMethod == 'PUT') {
                                     $_POST[$varName] = filter_var(urldecode($pathArray[$x]),FILTER_SANITIZE_STRING);
-                                } else {
-                                    if ($requestMethod == 'GET' || $requestMethod == 'DELETE') {
-                                        $_GET[$varName] = filter_var(urldecode($pathArray[$x]),FILTER_SANITIZE_STRING);
-                                    } else {
-                                        //usually, in CLI there is no request method. 
-                                        //but we store result in $_GET.
-                                        $_GET[$varName] = filter_var(urldecode($pathArray[$x]),FILTER_SANITIZE_STRING);
-                                    }
+                                } else if ($requestMethod == 'GET' || $requestMethod == 'DELETE' || CLI::isCLI()) {
+                                    //usually, in CLI there is no request method. 
+                                    //but we store result in $_GET.
+                                    $_GET[$varName] = filter_var(urldecode($pathArray[$x]),FILTER_SANITIZE_STRING);
                                 }
                             } else {
-                                if (!$route->isCaseSensitive()) {
-                                    if (strtolower($routePathArray[$x]) != strtolower($pathArray[$x])) {
-                                        break;
-                                    }
-                                } else {
-                                    if ($routePathArray[$x] != $pathArray[$x]) {
-                                        break;
-                                    }
+                                if (!$route->isCaseSensitive() && (strtolower($routePathArray[$x]) != strtolower($pathArray[$x]))) {
+                                    break;
+                                } else if ($routePathArray[$x] != $pathArray[$x]) {
+                                    break;
                                 }
                             }
                         }

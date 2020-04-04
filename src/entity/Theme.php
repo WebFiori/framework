@@ -24,10 +24,10 @@
  */
 namespace webfiori\entity;
 
-use Exception;
 use jsonx\JsonI;
 use jsonx\JsonX;
 use webfiori\conf\SiteConfig;
+use webfiori\entity\exceptions\NoSuchThemeException;
 /**
  * A base class that is used to construct web site UI.
  * A theme is a way to change the look and feel of all pages in 
@@ -738,7 +738,7 @@ abstract class Theme implements JsonI {
      * @param string $themeName The name of the theme. 
      * @return Theme The method will return an object of type Theme once the 
      * theme is loaded. The object will contain all theme information.
-     * @throws Exception The method will throw 
+     * @throws NoSuchThemeException The method will throw 
      * an exception if no theme was found which has the given name.
      * @since 1.0
      */
@@ -759,7 +759,7 @@ abstract class Theme implements JsonI {
                 $themeToLoad = $themes[$themeName];
                 self::$loadedThemes[$themeName] = $themeToLoad;
             } else {
-                throw new Exception('No such theme: \''.$themeName.'\'.');
+                throw new NoSuchThemeException('No such theme: \''.$themeName.'\'.');
             }
         }
 
@@ -771,8 +771,6 @@ abstract class Theme implements JsonI {
             foreach ($themeToLoad->getComponents() as $component) {
                 if (file_exists($themeDir.$ds.$component)) {
                     require_once $themeDir.$ds.$component;
-                } else {
-                    throw new Exception('Component \''.$component.'\' of the theme not found. Eather define it or remove it from the array of theme components.');
                 }
             }
 

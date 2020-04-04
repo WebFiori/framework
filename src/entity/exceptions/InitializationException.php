@@ -35,9 +35,8 @@ class InitializationException extends Exception {
     /**
      * Creates new instance of the class.
      * @param string $message Exception message.
-     * @param string $code Error code of the exception.
      */
-    public function __construct($message = "", $code = 0) {
-        parent::__construct($message, $code);
+    public function __construct($message = "") {
+        parent::__construct($message);
     }
 }

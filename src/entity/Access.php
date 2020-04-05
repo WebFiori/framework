@@ -523,7 +523,7 @@ class Access {
             }
         }
 
-        return $p;
+        return null;
     }
     /**
      * 

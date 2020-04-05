@@ -98,7 +98,7 @@ class AutoLoader {
      * @since 1.0 
      */
     private $searchFolders;
-    private const CLASS_INDICES = [
+    private static $CLASS_INDICES = [
         'class-name',
         'namespace',
         'path'
@@ -151,9 +151,9 @@ class AutoLoader {
             $this->onFail = self::ON_FAIL_ACTIONS[0];
         }
         $this->loadedClasses[] = [
-            self::CLASS_INDICES[0] => 'AutoLoader',
-            self::CLASS_INDICES[1] => 'webfiori\\entity',
-            self::CLASS_INDICES[2] => __DIR__
+            self::$CLASS_INDICES[0] => 'AutoLoader',
+            self::$CLASS_INDICES[1] => 'webfiori\\entity',
+            self::$CLASS_INDICES[2] => __DIR__
         ];
     }
     /**
@@ -254,12 +254,12 @@ class AutoLoader {
 
         foreach ($loadedClasses as $classArr) {
             if ($namespace !== null) {
-                if ($classArr[self::CLASS_INDICES[1]] == $namespace && $classArr[self::CLASS_INDICES[0]] == $className) {
-                    $retVal[] = $classArr[self::CLASS_INDICES[2]];
+                if ($classArr[self::$CLASS_INDICES[1]] == $namespace && $classArr[self::$CLASS_INDICES[0]] == $className) {
+                    $retVal[] = $classArr[self::$CLASS_INDICES[2]];
                 }
             } else {
-                if ($classArr[self::CLASS_INDICES[0]] == $className) {
-                    $retVal[] = $classArr[self::CLASS_INDICES[2]];
+                if ($classArr[self::$CLASS_INDICES[0]] == $className) {
+                    $retVal[] = $classArr[self::$CLASS_INDICES[2]];
                 }
             }
         }
@@ -309,7 +309,7 @@ class AutoLoader {
      */
     public  static function isLoaded($class) {
         foreach (self::getLoadedClasses() as $classArr) {
-            if ($class == $classArr[self::CLASS_INDICES[1]].'\\'.$classArr[self::CLASS_INDICES[0]]) {
+            if ($class == $classArr[self::$CLASS_INDICES[1]].'\\'.$classArr[self::$CLASS_INDICES[0]]) {
                 return true;
             }
         }
@@ -435,7 +435,7 @@ class AutoLoader {
         $h = fopen($autoloadCache, 'w');
 
         foreach ($this->loadedClasses as $classArr) {
-            fwrite($h, $classArr[self::CLASS_INDICES[2]].'=>'.$classArr[self::CLASS_INDICES[1]].'\\'.$classArr[self::CLASS_INDICES[0]]."\n");
+            fwrite($h, $classArr[self::$CLASS_INDICES[2]].'=>'.$classArr[self::$CLASS_INDICES[1]].'\\'.$classArr[self::$CLASS_INDICES[0]]."\n");
         }
         fclose($h);
     }
@@ -507,9 +507,9 @@ class AutoLoader {
                 if (file_exists($location)) {
                     require_once $location;
                     $this->loadedClasses[] = [
-                        self::CLASS_INDICES[0] => $className,
-                        self::CLASS_INDICES[1] => substr($classPath, 0, strlen($classPath) - strlen($className) - 1),
-                        self::CLASS_INDICES[2] => $location
+                        self::$CLASS_INDICES[0] => $className,
+                        self::$CLASS_INDICES[1] => substr($classPath, 0, strlen($classPath) - strlen($className) - 1),
+                        self::$CLASS_INDICES[2] => $location
                     ];
                     $loaded = true;
                 }
@@ -530,9 +530,9 @@ class AutoLoader {
         if (file_exists($f) && !in_array($f, $allPaths)) {
             require_once $f;
             $this->loadedClasses[] = [
-                self::CLASS_INDICES[0] => $className,
-                self::CLASS_INDICES[1] => substr($classPath, 0, strlen($classPath) - strlen($className) - 1),
-                self::CLASS_INDICES[2] => $f
+                self::$CLASS_INDICES[0] => $className,
+                self::$CLASS_INDICES[1] => substr($classPath, 0, strlen($classPath) - strlen($className) - 1),
+                self::$CLASS_INDICES[2] => $f
             ];
             $loaded = true;
         }

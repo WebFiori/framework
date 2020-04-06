@@ -33,7 +33,7 @@ use Exception;
  * of language file must be 'LanguageXX.php' where 'XX' are two characters that 
  * represents language code.
  * @author Ibrahim
- * @version 1.2.1
+ * @version 1.2.2
  */
 class Language {
     /**
@@ -98,6 +98,13 @@ class Language {
      */
     public static function &getLoadedLangs() {
         return self::$loadedLangs;
+    }
+    /**
+     * Removes all loaded languages.
+     * @since 1.2.2
+     */
+    public static function reset() {
+        self::$loadedLangs = [];
     }
     /**
      * Creates a sub-array for defining language variables given initial set 

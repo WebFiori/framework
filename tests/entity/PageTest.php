@@ -38,6 +38,7 @@ class PageTest extends TestCase {
      * @depends testFooter01
      */
     public function testAside02() {
+        Page::reset();
         $this->assertFalse(Page::aside());
         $node = Page::document()->getChildByID('side-content-area');
         $this->assertNull($node);
@@ -52,6 +53,7 @@ class PageTest extends TestCase {
      * @test
      */
     public function testBeforeRender00() {
+        Page::reset();
         $this->assertNull(Page::beforeRender());
         Page::beforeRender('random');
         $this->assertNull(Page::beforeRender());
@@ -66,6 +68,7 @@ class PageTest extends TestCase {
      * @test
      */
     public function testCanonical() {
+        Page::reset();
         $c = Page::canonical('https://example.com/home');
         $this->assertEquals('https://example.com/home',$c);
         $this->assertEquals('https://example.com/home',Page::document()->getHeadNode()->getCanonical());
@@ -74,6 +77,7 @@ class PageTest extends TestCase {
      * @test
      */
     public function testDefaults00() {
+        Page::reset();
         $this->assertNull(Page::lang());
         $this->assertNull(Page::description());
         $this->assertEquals('Hello World',Page::title());

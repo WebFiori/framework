@@ -54,8 +54,7 @@ before_script:
     - composer install --prefer-source --no-interaction
 script:
     - phpunit --configuration phpunit.xml
+    - sonar-scanner
 after_success:
     - mysql -e 'drop database testing_db;'
     - bash <(curl -s https://codecov.io/bash)
-    - script: 
-      - /home/travis/.sonarscanner/sonar-scanner-3.0.3.778/bin/sonar-scanner

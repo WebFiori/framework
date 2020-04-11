@@ -101,62 +101,46 @@ class CLI {
                 return;
             }
             $commands = $_SERVER['argv'];
-
+            
             if ($commands[1] == "--hello") {
                 echo "Hello World!";
-            } else {
-                if ($commands[1] == "--route") {
-                    self::routeCommand();
+            } else if ($commands[1] == "--route") {
+                self::routeCommand();
+            } else if ($commands[1] == "-h" || $commands[1] == "--help") {
+                self::showHelp();
+            } else if ($commands[1] == '--list-routes') {
+                self::displayRoutes();
+            } else if ($commands[1] == '--list-themes') {
+                self::viewThmes();
+            } else if ($commands[1] == '--view-conf') {
+                self::showConfig();
+            } else if ($commands[1] == '--check-cron') {
+                $cPass = isset($commands[2]) ? $commands[2] : null;
+                self::checkCron($cPass);
+            } else if ($commands[1] == '--force-cron') {
+                $jobName = isset($commands[2]) ? $commands[2] : null;
+                $cPass = isset($commands[3]) ? $commands[3] : null;
+                self::forceCronJob($jobName,$cPass);
+            } else if ($commands[1] == '--list-cron-jobs') {
+                $pass = Cron::password();
+
+                if ($pass == 'NO_PASSWORD') {
+                    self::listCron();
                 } else {
-                    if ($commands[1] == "-h" || $commands[1] == "--help") {
-                        self::showHelp();
+                    $cPass = isset($commands[2]) ? $commands[2] : null;
+
+                    if (hash('sha256',$cPass) == $pass) {
+                        self::listCron();
                     } else {
-                        if ($commands[1] == '--list-routes') {
-                            self::displayRoutes();
+                        if ($cPass === null) {
+                            fprintf(STDERR, "Error: Cron password is missing.\n");
                         } else {
-                            if ($commands[1] == '--list-themes') {
-                                self::viewThmes();
-                            } else {
-                                if ($commands[1] == '--view-conf') {
-                                    self::showConfig();
-                                } else {
-                                    if ($commands[1] == '--check-cron') {
-                                        $cPass = isset($commands[2]) ? $commands[2] : null;
-                                        self::checkCron($cPass);
-                                    } else {
-                                        if ($commands[1] == '--force-cron') {
-                                            $jobName = isset($commands[2]) ? $commands[2] : null;
-                                            $cPass = isset($commands[3]) ? $commands[3] : null;
-                                            self::forceCronJob($jobName,$cPass);
-                                        } else {
-                                            if ($commands[1] == '--list-cron-jobs') {
-                                                $pass = Cron::password();
-
-                                                if ($pass == 'NO_PASSWORD') {
-                                                    self::listCron();
-                                                } else {
-                                                    $cPass = isset($commands[2]) ? $commands[2] : null;
-
-                                                    if (hash('sha256',$cPass) == $pass) {
-                                                        self::listCron();
-                                                    } else {
-                                                        if ($cPass === null) {
-                                                            fprintf(STDERR, "Error: Cron password is missing.\n");
-                                                        } else {
-                                                            fprintf(STDERR, "Error: Given password is incorrect.\n");
-                                                        }
-                                                    }
-                                                }
-                                            } else {
-                                                fprintf(STDERR,"Error: The command '".$commands[1]."' is not supported or not implemented.");
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                            fprintf(STDERR, "Error: Given password is incorrect.\n");
                         }
                     }
                 }
+            } else {
+                fprintf(STDERR,"Error: The command '".$commands[1]."' is not supported or not implemented.");
             }
         }
     }
@@ -166,28 +150,7 @@ class CLI {
         if ($result == 'INV_PASS') {
             fprintf(STDERR,"Error: Provided password is incorrect.");
         } else {
-            fprintf(STDOUT,"Total number of jobs: ".$result['total-jobs']."\n");
-            fprintf(STDOUT,"Executed Jobs: ".$result['executed-count']."\n");
-            fprintf(STDOUT,"Successfully finished jobs:\n");
-            $sJobs = $result['successfully-completed'];
-
-            if (count($sJobs) == 0) {
-                fprintf(STDOUT,"    <NONE>\n");
-            } else {
-                foreach ($sJobs as $jobName) {
-                    fprintf(STDOUT,"    ".$jobName."\n");
-                }
-            }
-            fprintf(STDOUT,"Failed jobs:\n");
-            $fJobs = $result['failed'];
-
-            if (count($fJobs) == 0) {
-                fprintf(STDOUT,"    <NONE>\n");
-            } else {
-                foreach ($fJobs as $jobName) {
-                    fprintf(STDOUT,"    ".$jobName."\n");
-                }
-            }
+            $this->_cronExecResult($result);
         }
     }
 
@@ -217,42 +180,41 @@ class CLI {
     private static function forceCronJob($jobName,$cPass) {
         if ($jobName === null) {
             fprintf(STDERR,"Error: Job name is missing.");
+        } else if ($cPass === null && Cron::password() != 'NO_PASSWORD') {
+            fprintf(STDERR,"Error: CRON password is missing.");
         } else {
-            if ($cPass === null && Cron::password() != 'NO_PASSWORD') {
-                fprintf(STDERR,"Error: CRON password is missing.");
+            $result = Cron::run($cPass,$jobName.'',true);
+
+            if ($result == 'INV_PASS') {
+                fprintf(STDERR,"Error: Provided password is incorrect.");
+            } else if ($result == 'JOB_NOT_FOUND') {
+                fprintf(STDERR,"Error: No job was found which has the name '".$jobName."'");
             } else {
-                $result = Cron::run($cPass,$jobName.'',true);
+                $this->_cronExecResult($result);
+            }
+        }
+    }
+    private function _cronExecResult($result) {
+        fprintf(STDOUT,"Total number of jobs: ".$result['total-jobs']."\n");
+        fprintf(STDOUT,"Executed Jobs: ".$result['executed-count']."\n");
+        fprintf(STDOUT,"Successfully finished jobs:\n");
+        $sJobs = $result['successfully-completed'];
 
-                if ($result == 'INV_PASS') {
-                    fprintf(STDERR,"Error: Provided password is incorrect.");
-                } else {
-                    if ($result == 'JOB_NOT_FOUND') {
-                        fprintf(STDERR,"Error: No job was found which has the name '".$jobName."'");
-                    } else {
-                        fprintf(STDOUT,"Total number of jobs: ".$result['total-jobs']."\n");
-                        fprintf(STDOUT,"Executed Jobs: ".$result['executed-count']."\n");
-                        fprintf(STDOUT,"Successfully finished jobs:\n");
-                        $sJobs = $result['successfully-completed'];
+        if (count($sJobs) == 0) {
+            fprintf(STDOUT,"    <NONE>\n");
+        } else {
+            foreach ($sJobs as $jobName) {
+                fprintf(STDOUT,"    ".$jobName."\n");
+            }
+        }
+        fprintf(STDOUT,"Failed jobs:\n");
+        $fJobs = $result['failed'];
 
-                        if (count($sJobs) == 0) {
-                            fprintf(STDOUT,"    <NONE>\n");
-                        } else {
-                            foreach ($sJobs as $jobName) {
-                                fprintf(STDOUT,"    ".$jobName."\n");
-                            }
-                        }
-                        fprintf(STDOUT,"Failed jobs:\n");
-                        $fJobs = $result['failed'];
-
-                        if (count($fJobs) == 0) {
-                            fprintf(STDOUT,"    <NONE>\n");
-                        } else {
-                            foreach ($fJobs as $jobName) {
-                                fprintf(STDOUT,"    ".$jobName."\n");
-                            }
-                        }
-                    }
-                }
+        if (count($fJobs) == 0) {
+            fprintf(STDOUT,"    <NONE>\n");
+        } else {
+            foreach ($fJobs as $jobName) {
+                fprintf(STDOUT,"    ".$jobName."\n");
             }
         }
     }

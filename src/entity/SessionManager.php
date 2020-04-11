@@ -542,14 +542,14 @@ class SessionManager implements JsonI {
 
         if (!$this->_switchToSession()) {
             if (!$this->resume()) {
-                $lifeTime = $this->getLifetime();
+                $mlifeTime = $this->getLifetime();
 
-                if ($lifeTime == -1) {
+                if ($mlifeTime == -1) {
                     //set default time to two hours.
                     $this->setLifetime(self::DEFAULT_SESSION_DURATION);
-                    $lifeTime = self::DEFAULT_SESSION_DURATION * 60;
+                    $mlifeTime = self::DEFAULT_SESSION_DURATION * 60;
                 } 
-                $retVal = $this->_start($refresh, $lifeTime,$useDefaultLang);
+                $retVal = $this->_start($refresh, $mlifeTime,$useDefaultLang);
             } else {
                 $retVal = true;
             }
@@ -768,6 +768,23 @@ class SessionManager implements JsonI {
             $_SESSION[self::$SV][self::MAIN_VARS[3]] = $bool === true ? true : false;
         }
     }
+    private function _setLifetimeHelper($time) {
+        $this->lifeTime = $time;
+        $_SESSION[self::$SV][self::MAIN_VARS[0]] = $time * 60;
+
+        $params = session_get_cookie_params();
+        $secure = isset($params['secure']) ? $params['secure'] : false;
+        $httponly = isset($params['httponly']) ? $params['httponly'] : false;
+        $path = isset($params['path']) ? $params['path'] : '/';
+        session_set_cookie_params(time() + $this->getLifetime() * 60, $path, $params['domain'], $secure, $httponly);
+
+        $retVal = true;
+
+        if ($this->isTimeout()) {
+            $this->kill();
+        }
+        return $retVal;
+    }
     /**
      * Sets the lifetime of the session.
      * @param int $time Session lifetime (in minutes). it will be set only if 
@@ -784,42 +801,10 @@ class SessionManager implements JsonI {
             $time = self::MAX_LIFETIME;
         }
 
-        if ($time > 0) {
-            if ($this->isSessionActive()) {
-                $this->lifeTime = $time;
-                $_SESSION[self::$SV][self::MAIN_VARS[0]] = $time * 60;
-
-                $params = session_get_cookie_params();
-                $secure = isset($params['secure']) ? $params['secure'] : false;
-                $httponly = isset($params['httponly']) ? $params['httponly'] : false;
-                $path = isset($params['path']) ? $params['path'] : '/';
-                session_set_cookie_params(time() + $this->getLifetime() * 60, $path, $params['domain'], $secure, $httponly);
-
-                $retVal = true;
-
-                if ($this->isTimeout()) {
-                    $this->kill();
-                }
-            } else {
-                if ($this->_switchToSession()) {
-                    $this->lifeTime = $time;
-                    $_SESSION[self::$SV][self::MAIN_VARS[0]] = $time * 60;
-
-                    $params = session_get_cookie_params();
-                    $secure = isset($params['secure']) ? $params['secure'] : false;
-                    $httponly = isset($params['httponly']) ? $params['httponly'] : false;
-                    $path = isset($params['path']) ? $params['path'] : '/';
-                    session_set_cookie_params(time() + $this->getLifetime() * 60, $path, $params['domain'], $secure, $httponly);
-
-                    $retVal = true;
-
-                    if ($this->isTimeout()) {
-                        $this->kill();
-                    }
-                } else {
-                    $this->lifeTime = $time;
-                }
-            }
+        if ($time > 0 && ($this->isSessionActive() || $this->_switchToSession())) {
+            $retVal = $this->_setLifetimeHelper($time);
+        } else {
+            $this->lifeTime = $time;
         }
 
         return $retVal;
@@ -912,9 +897,8 @@ class SessionManager implements JsonI {
         $hash = hash('sha256', $date);
         $time = time() + rand(0, 1000);
         $hash2 = hash('sha256',$hash.$time);
-        $id = substr($hash2, 0, 27);
-
-        return $id;
+        
+        return substr($hash2, 0, 27);
     }
     /**
      * Initialize session language. The initialization depends on the attribute 

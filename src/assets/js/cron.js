@@ -179,11 +179,12 @@ function login(source){
     source.style['color'] = 'black';
     var pass = document.getElementById('password-input').value;
     var xhr = new XMLHttpRequest();
+    var json = {};
     xhr.open('post','cron/apis/login');
     xhr.onreadystatechange = function(){
         if(this.readyState === 4 && this.status === 200){
             try{
-                var json = JSON.parse(this.response);
+                json = JSON.parse(this.response);
                 source.innerHTML = json['message'];
                 source.style['color'] = 'green';
                 window.location.href = 'cron/jobs';
@@ -202,7 +203,7 @@ function login(source){
         else if(this.readyState === 4){
             source.removeAttribute('disabled');
             try{
-                var json = JSON.parse(this.response);
+                json = JSON.parse(this.response);
                 source.innerHTML = json['message'];
                 source.style['color'] = 'red';
             }

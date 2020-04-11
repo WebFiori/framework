@@ -134,11 +134,9 @@ class DatabaseSchema {
      * @since 1.2.1
      */
     public function getCreateDatabaseStatement($schemaName) {
-        $createStm = 'create database if not exists '.$schemaName.';'."\n";
-        $createStm .= 'use '.$schemaName.';'."\n";
-        $createStm .= $this->getSchema();
-
-        return $createStm;
+        return 'create database if not exists '.$schemaName.';'."\n"
+             . 'use '.$schemaName.';'."\n"
+             . $this->getSchema();
     }
     /**
      * Returns the order of the last query builder class name.
@@ -195,17 +193,17 @@ class DatabaseSchema {
      * @since 1.0
      */
     public function getSchema() {
-        $schema = '';
+        $schemaStr = '';
         $lastSchemaIndex = $this->getLastOrder();
 
         for ($x = 0 ;$x <= $lastSchemaIndex ; $x++) {
             if (isset($this->queries[$x])) {
                 $queryObj = new $this->queries[$x]();
                 $queryObj->createStructure();
-                $schema .= $queryObj->getQuery();
+                $schemaStr .= $queryObj->getQuery();
             }
         }
 
-        return $schema;
+        return $schemaStr;
     }
 }

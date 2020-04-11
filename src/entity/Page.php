@@ -53,9 +53,15 @@ use webfiori\entity\langs\Language;
  * and canonical URL. Also, this class can be used to load a specific theme 
  * and use it to change the look and feel of the web site.
  * @author Ibrahim
- * @version 1.9.2
+ * @version 1.9.3
  */
 class Page {
+    /**
+     *
+     * @var string
+     * @since 1.9.3 
+     */
+    private static $BoolType = 'boolean';
     /**
      * An array that contains the IDs of the 3 main page elements.
      * The array has the following values:
@@ -787,14 +793,12 @@ class Page {
     private function insertNode($node,$parentNodeId = '') {
         $retVal = false;
 
-        if (strlen($parentNodeId) != 0) {
-            if ($node instanceof HTMLNode) {
-                $parentNode = $this->document->getChildByID($parentNodeId);
+        if (strlen($parentNodeId) != 0 && $node instanceof HTMLNode) {
+            $parentNode = $this->document->getChildByID($parentNodeId);
 
-                if ($parentNode instanceof HTMLNode) {
-                    $parentNode->addChild($node);
-                    $retVal = true;
-                }
+            if ($parentNode instanceof HTMLNode) {
+                $parentNode->addChild($node);
+                $retVal = true;
             }
         }
 
@@ -850,7 +854,7 @@ class Page {
      * @since 1.2
      */
     private function setHasAside($bool) {
-        if (gettype($bool) == 'boolean') {
+        if (gettype($bool) == self::$BoolType) {
             if (!$this->incAside && $bool) {
                 //add aside
                 $mainContentArea = $this->document->getChildByID(self::MAIN_ELEMENTS[0]);
@@ -887,7 +891,7 @@ class Page {
      * @since 1.2
      */
     private function setHasFooter($bool) {
-        if (gettype($bool) == 'boolean') {
+        if (gettype($bool) == self::$BoolType) {
             if (!$this->incFooter && $bool) {
                 $this->document->addChild($this->_getFooter());
             } else {
@@ -909,7 +913,7 @@ class Page {
      * @since 1.2
      */
     private function setHasHeader($bool) {
-        if (gettype($bool) == 'boolean') {
+        if (gettype($bool) == self::$BoolType) {
             if (!$this->incHeader && $bool) {
                 //add the header
                 $children = $this->document->getBody()->children();

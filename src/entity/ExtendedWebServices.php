@@ -35,9 +35,14 @@ use webfiori\WebFiori;
  * The language can be set by sending a GET or POST request that has the 
  * parameter 'lang'.
  * @author Ibrahim
- * @version 1.0.1
+ * @version 1.0.2
  */
 abstract class ExtendedWebServices extends WebServices {
+    /**
+     * A constant that represents error message type.
+     * @since 1.0.2
+     */
+    private static $E = 'error';
     private $translation;
     /**
      * Creates new instance of 'API'.
@@ -48,10 +53,11 @@ abstract class ExtendedWebServices extends WebServices {
         parent::__construct($version);
         $this->_setTranslation();
         $langCode = $this->getTranslation()->getCode();
-        $this->createLangDir('general');
+        $generalDir = 'general';
+        $this->createLangDir($generalDir);
 
         if ($langCode == 'AR') {
-            $this->setLangVars('general', [
+            $this->setLangVars($generalDir, [
                 'action-not-supported' => 'العملية غير مدعومة.',
                 'content-not-supported' => 'نوع المحتوى غير مدعوم.',
                 'action-not-impl' => 'لم يتم تنفيذ العملية.',
@@ -60,7 +66,7 @@ abstract class ExtendedWebServices extends WebServices {
                 'db-error' => 'خطأ في قاعدة البيانات.'
             ]);
         } else {
-            $this->setLangVars('general', [
+            $this->setLangVars($generalDir, [
                 'action-not-supported' => 'Action is not supported by the API.',
                 'content-not-supported' => 'Content type not supported.',
                 'action-not-impl' => 'API action is not implemented yet.',
@@ -88,7 +94,7 @@ abstract class ExtendedWebServices extends WebServices {
      */
     public function actionNotImpl() {
         $message = $this->get('general/action-not-impl');
-        $this->sendResponse($message, 'error', 404);
+        $this->sendResponse($message, self::$E, 404);
     }
     /**
      * Sends a response message to indicate that an action is not supported by the API.
@@ -108,7 +114,7 @@ abstract class ExtendedWebServices extends WebServices {
      */
     public function actionNotSupported() {
         $message = $this->get('general/action-not-supported');
-        $this->sendResponse($message, 'error', 404);
+        $this->sendResponse($message, self::$E, 404);
     }
     /**
      * Sends a response message to indicate that request content type is 
@@ -130,7 +136,7 @@ abstract class ExtendedWebServices extends WebServices {
      */
     public function contentTypeNotSupported($cType = '') {
         $message = $this->get('general/content-not-supported');
-        $this->sendResponse($message, 'error', 404,'"request-content-type":"'.$cType.'"');
+        $this->sendResponse($message, self::$E, 404,'"request-content-type":"'.$cType.'"');
     }
     /**
      * Creates a sub array to define language variables.
@@ -167,7 +173,7 @@ abstract class ExtendedWebServices extends WebServices {
      */
     public function databaseErr($info = '') {
         $message = $this->get('general/db-error');
-        $this->sendResponse($message, 'error', 404, $info);
+        $this->sendResponse($message, self::$E, 404, $info);
     }
     /**
      * Returns the value of a language variable.
@@ -254,7 +260,7 @@ abstract class ExtendedWebServices extends WebServices {
             }
         }
         $message = $this->get('general/inv-params');
-        $this->sendResponse($message.$val.'.', 'error', 404);
+        $this->sendResponse($message.$val.'.', self::$E, 404);
     }
     /**
      * Sends a response message to indicate that a request parameter or parameters are missing.
@@ -290,7 +296,7 @@ abstract class ExtendedWebServices extends WebServices {
             }
         }
         $message = $this->get('general/missing-params');
-        $this->sendResponse($message.$val.'.', 'error', 404);
+        $this->sendResponse($message.$val.'.', self::$E, 404);
     }
     /**
      * Sends a response message to indicate that a user is not authorized to 
@@ -311,7 +317,7 @@ abstract class ExtendedWebServices extends WebServices {
      */
     public function notAuth() {
         $message = $this->get('general/http-codes/401/message');
-        $this->sendResponse($message, 'error', 401);
+        $this->sendResponse($message, self::$E, 401);
     }
     /**
      * Sends a response message to indicate that request method is not supported.
@@ -331,7 +337,7 @@ abstract class ExtendedWebServices extends WebServices {
      */
     public function requestMethodNotAllowed() {
         $message = $this->get('general/http-codes/405/message');
-        $this->sendResponse($message, 'error', 405);
+        $this->sendResponse($message, self::$E, 405);
     }
     /**
      * Sets multiple language variables.

@@ -150,7 +150,7 @@ class CLI {
         if ($result == 'INV_PASS') {
             fprintf(STDERR,"Error: Provided password is incorrect.");
         } else {
-            $this->_cronExecResult($result);
+            self::_cronExecResult($result);
         }
     }
 
@@ -190,11 +190,11 @@ class CLI {
             } else if ($result == 'JOB_NOT_FOUND') {
                 fprintf(STDERR,"Error: No job was found which has the name '".$jobName."'");
             } else {
-                $this->_cronExecResult($result);
+                self::_cronExecResult($result);
             }
         }
     }
-    private function _cronExecResult($result) {
+    private static function _cronExecResult($result) {
         fprintf(STDOUT,"Total number of jobs: ".$result['total-jobs']."\n");
         fprintf(STDOUT,"Executed Jobs: ".$result['executed-count']."\n");
         fprintf(STDOUT,"Successfully finished jobs:\n");

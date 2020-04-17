@@ -13,7 +13,7 @@
         "webfiori/jsonx":"1.4.4",
         "webfiori/rest-easy":"1.4.7",
         "webfiori/ph-mysql":"1.3.9.1",
-        "webfiori/php-structs":"1.9.0"
+        "webfiori/php-structs":"1.9.1"
     },
     "keywords": [
         "framework",

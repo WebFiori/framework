@@ -24,6 +24,7 @@
  */
 namespace webfiori\entity;
 
+use webfiori\entity\User;
 /**
  * A class to manage user groups and privileges.
  *
@@ -587,19 +588,22 @@ class Access {
      * @param PrivilegesGroup $group
      */
     private function _hasPrivilegeHelper($prId,$groupId,$group) {
+        $retVal = false;
         if ($groupId !== null && $group->getID() == $groupId) {
             foreach ($group->privileges() as $p) {
                 if ($p->getID() == $prId) {
-                    return true;
+                    $retVal = true;
+                    break;
                 }
             }
 
-            return false;
+            return $retVal;
         } else {
             if ($groupId == null) {
                 foreach ($group->privileges() as $p) {
                     if ($p->getID() == $prId) {
-                        return true;
+                        $retVal = true;
+                        break;
                     }
                 }
 
@@ -607,21 +611,24 @@ class Access {
                     $b = $this->_hasPrivilegeHelper($prId, $groupId, $g);
 
                     if ($b === true) {
-                        return true;
+                        $retVal = true;
+                        break;
                     }
                 }
+                return $retVal;
             } else {
                 foreach ($group->childGroups() as $g) {
                     $b = $this->_hasPrivilegeHelper($prId, $groupId, $g);
 
                     if ($b === true) {
-                        return true;
+                        $retVal = true;
+                        break;
                     }
                 }
             }
         }
 
-        return false;
+        return $retVal;
     }
 
     private function _privileges($groupId = null) {

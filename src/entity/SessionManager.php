@@ -31,9 +31,15 @@ use webfiori\conf\SiteConfig;
 /**
  * A helper class to manage system sessions.
  * @author Ibrahim 
- * @version 1.8.6
+ * @version 1.8.7
  */
 class SessionManager implements JsonI {
+    /**
+     * The name of random function which is used in session ID generation.
+     * @var string
+     * @since 1.8.7 
+     */
+    private $randFunc;
     /**
      * The default lifetime for any new session (in minutes).
      * @version 1.8.4
@@ -177,6 +183,10 @@ class SessionManager implements JsonI {
      * @since 1.0
      */
     public function __construct($session_name = 'pa-seesion') {
+        
+        //used to support older PHP versions which does not have 'random_int'.
+        $this->randFunc = is_callable('random_int') ? 'random_int' : 'rand';
+        
         if ($this->_validateName($session_name) === true) {
             $this->sessionName = $session_name;
         } else {
@@ -237,8 +247,8 @@ class SessionManager implements JsonI {
         $retVal = 'session-';
 
         for ($x = 0 ; $x < 8 ; $x++) {
-            $hash = hash('sha256', rand(0, 100).$retVal);
-            $retVal .= $hash[$x + rand(0, 40)];
+            $hash = hash('sha256', $this->randFunc(0, 100).$retVal);
+            $retVal .= $hash[$x + $this->randFunc(0, 40)];
         }
 
         return $retVal;
@@ -895,7 +905,7 @@ class SessionManager implements JsonI {
     private function _generateSessionID() {
         $date = date(DATE_ISO8601);
         $hash = hash('sha256', $date);
-        $time = time() + rand(0, 1000);
+        $time = time() + $this->randFunc(0, 1000);
         $hash2 = hash('sha256',$hash.$time);
         
         return substr($hash2, 0, 27);

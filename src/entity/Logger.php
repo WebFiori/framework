@@ -29,9 +29,16 @@ use phpStructs\Stack;
  * A class that is used to log messages to a file.
  *
  * @author Ibrahim
- * @version 1.1.2
+ * @version 1.1.3
  */
 class Logger {
+    /**
+     * An array that contains all log messages and in which log file 
+     * the message will be stored. 
+     * @var array
+     * @since 1.0 
+     */
+    private $logMessagesArr;
     /**
      * An array which contains a key that describes the meaning of a log message.
      * @since 1.1
@@ -81,9 +88,36 @@ class Logger {
         } else {
             $this->_setDirectory('/logs');
         }
+        $this->logMessagesArr = [];
         $this->_setLogName('log');
         $this->isEnabled = false;
         $this->functionsStack = new Stack();
+    }
+    public static function storeLogs() {
+        $logsArr = self::get()->logMessagesArr;
+        foreach ($logsArr as $logContent){
+            $storePath = $logContent['path'];
+            $logStr = '';
+            foreach ($logContent as $contentArr){
+                if(gettype($contentArr) == 'array'){
+                    if ($contentArr['function'] !== null) {
+                        $logStr .= '['.$contentArr['timestamp'].'] '.self::get()->addSpaces($contentArr['type']).': ['.$contentArr['function'].'] '.$contentArr['message']."\r\n";
+                    } else {
+                        $logStr .= '['.$contentArr['timestamp'].'] '.self::get()->addSpaces($contentArr['type']).': '.$contentArr['message']."\r\n";
+                    }
+                }
+            }
+            $handle = fopen($storePath, 'a+');
+            fwrite($handle, $logStr);
+            fclose($handle);
+        }
+    }
+    private function addSpaces($bType) {
+        for ($x = strlen($bType) ; $x < 10 ; $x++) {
+            $bType = ' '.$bType;
+        }
+
+        return $bType;
     }
     /**
      * Returns a stack which contains all the called functions and methods.
@@ -274,10 +308,10 @@ class Logger {
      * @since 1.0
      */
     private function _clearLog() {
-        $this->handelr = fopen($this->_getDirectory().'/'.$this->_getLogName().'.txt', 'w+');
-        $time = date('Y-m-d H:i:s T');
-        fwrite($this->handelr, '---------------Log Cleared At '.$time.'---------------'."\r\n");
-        fclose($this->handelr);
+        $this->logMessagesArr[$this->_getLogName()] = [
+            'path' => $this->getAbsolutePath()
+        ];
+        $this->log('---------------Log Cleared At '.$time.'---------------'."\r\n");
     }
     /**
      * Generates a readable string which represents an array.
@@ -310,7 +344,7 @@ class Logger {
      * @since 1.1.1
      */
     private function _displayLog() {
-        $logDir = $this->_getDirectory().'/'.$this->_getLogName().'.txt';
+        $logDir = $this->getAbsolutePath();
 
         if (file_exists($logDir)) {
             $this->handelr = fopen($logDir, 'r');
@@ -377,9 +411,7 @@ class Logger {
      */
     private function _newSec() {
         if (self::enabled()) {
-            $this->handelr = fopen($this->_getDirectory().'/'.$this->_getLogName().'.txt', 'a+');
-            fwrite($this->handelr, '-+-*******************************************************-+-'."\r\n");
-            fclose($this->handelr);
+            $this->log('-+-*******************************************************-+-');
         }
     }
     /**
@@ -407,7 +439,15 @@ class Logger {
      * @since 1.0
      */
     private function _setLogName($name) {
-        $this->logFileName = $name;
+        $trimmed = trim($name);
+        if(strlen($trimmed) != 0){
+            $this->logFileName = $trimmed;
+            if(!isset($this->logMessagesArr[$trimmed])){
+                $this->logMessagesArr[$trimmed] = [
+                    'path'=> $this->_getAbsolutePath()
+                ];
+            }
+        } 
     }
     /**
      * 
@@ -419,35 +459,41 @@ class Logger {
         if ($this->_isEnabled()) {
             $upperType = strtoupper($type);
             $bType = in_array($upperType, self::MESSSAGE_TYPES) ? $upperType : 'INFO';
-
-            if ($bType == 'DEBUG' && !(defined('DEBUG'))) {
-            } else {
-                $this->handelr = fopen($this->_getDirectory().'/'.$this->_getLogName().'.txt', 'a+');
-                $time = date('Y-m-d H:i:s T');
-
-                if ($this->functionsStack->size() != 0) {
-                    $message = '['.$time.'] '.$this->addSpaces($bType).': ['.$this->functionsStack->peek().'] '.$content."\r\n";
-                    fwrite($this->handelr, $message);
-                } else {
-                    $message = '['.$time.'] '.$this->addSpaces($bType).': '.$content."\r\n";
-                    fwrite($this->handelr, $message);
-                }
-                fclose($this->handelr);
+            
+            if (!($bType == 'DEBUG' && !(defined('DEBUG')))){
+                $this->logMessagesArr[$this->_getLogName()][] = [
+                    'timestamp' => date('Y-m-d H:i:s T'),
+                    'type' => $bType,
+                    'function' => $this->functionsStack->peek(),
+                    'message' => $content
+                ];
                 $addDashes === true ? $this->_newSec() : null;
             }
         }
     }
     /**
-     * A function that is used to add spaces before message type name to make 
-     * messages well formatted in the log.
-     * @param string $bType
-     * @return string
+     * Returns a string that represents the absolute path to the log file location.
+     * @return string A string that represents the absolute path to the log file location. 
+     * Note that the extension '.log' will be appended to the end of the string.
+     * @since 1.1.3
      */
-    private function addSpaces($bType) {
-        for ($x = strlen($bType) ; $x < 10 ; $x++) {
-            $bType = ' '.$bType;
+    public static function getAbsolutePath() {
+        return self::get()->_getAbsolutePath();
+    }
+    private function _getAbsolutePath() {
+        return $this->directory.DIRECTORY_SEPARATOR.$this->logFileName.'.log';
+    }
+    /**
+     * Returns an array that contains all log messages.
+     * @param string $logName An optional log name. If provided, only log messages 
+     * of the given log will be returned.
+     * @return array The array that will be returned will be associative. The 
+     * keys will be logs names and the values are logged messages.
+     */
+    public static function getLogsArray($logName = null) {
+        if(isset(self::get()->logMessagesArr[$logName])){
+            return self::get()->logMessagesArr[$logName];
         }
-
-        return $bType;
+        return self::get()->logMessagesArr;
     }
 }

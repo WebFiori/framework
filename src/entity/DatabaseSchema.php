@@ -80,29 +80,26 @@ class DatabaseSchema {
                     if (!isset($this->queries[$order])) {
                         $this->queries[$order] = $queryClassName;
                     } else {
-                        $lstOrder = $this->getLastOrder();
-
-                        if ($lstOrder != -1) {
-                            $this->queries[$lstOrder] = $queryClassName;
-                        } else {
-                            $this->queries[0] = $queryClassName;
-                        }
+                        $this->_orderCheck($queryClassName);
                     }
                 }
             } else {
-                $lstOrder = $this->getLastOrder();
-
-                if ($lstOrder != -1) {
-                    $this->queries[$lstOrder] = $queryClassName;
-                } else {
-                    $this->queries[20] = $queryClassName;
-                }
+                $this->_orderCheck($queryClassName);
             }
 
             return true;
         }
 
         return false;
+    }
+    private function _orderCheck($queryClassName) {
+        $lstOrder = $this->getLastOrder();
+
+        if ($lstOrder != -1) {
+            $this->queries[$lstOrder] = $queryClassName;
+        } else {
+            $this->queries[20] = $queryClassName;
+        }
     }
     /**
      * Returns a singleton of the class DatabaseSchema.

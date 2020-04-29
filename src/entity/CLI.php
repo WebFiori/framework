@@ -26,19 +26,47 @@ namespace webfiori\entity;
 
 use webfiori\entity\cron\Cron;
 use webfiori\entity\router\Router;
+use webfiori\entity\cli\CLICommand;
+use webfiori\entity\cli\HelpCommand;
+use webfiori\entity\cli\SettingsCommand;
+use webfiori\entity\cli\ListThemesCommand;
+use webfiori\entity\cli\ListCronCommand;
+use webfiori\entity\cli\ListRoutesCommand;
+use webfiori\entity\cli\CronCommand;
+use webfiori\entity\cli\TestRouteCommand;
+
 use webfiori\WebFiori;
 /**
  * A class which adds basic support for running the framework through 
  * command line interface (CLI).
  *
  * @author Ibrahim
- * @version 1.0
+ * @version 1.0.2
  */
 class CLI {
     /**
-     * Initialize CLI.
+     *
+     * @var An associative array that contains supported commands. 
+     * @since 1.0.2
      */
-    public static function init() {
+    private $commands;
+    /**
+     *
+     * @var CLI 
+     */
+    private static $inst;
+    /**
+     * 
+     * @return CLI
+     */
+    private static function get() {
+        if(self::$inst == null){
+            self::$inst = new CLI();
+        }
+        return self::$inst;
+    }
+    private function __construct() {
+        $this->commands = [];
         $isCli = self::isCLI();
 
         if ($isCli === true) {
@@ -49,7 +77,7 @@ class CLI {
             }
             $_SERVER['HTTP_HOST'] = $host;
             $_SERVER['REMOTE_ADDR'] = $host;
-            $_SERVER['DOCUMENT_ROOT'] = trim($_SERVER['argv'][0],'WebFiori.php');
+            $_SERVER['DOCUMENT_ROOT'] = trim(filter_var($_SERVER['argv'][0], FILTER_SANITIZE_STRING),'WebFiori.php');
             $_SERVER['REQUEST_URI'] = '/';
             putenv('HTTP_HOST='.$host);
             putenv('REQUEST_URI=/');
@@ -59,6 +87,60 @@ class CLI {
             } else {
                 $_SERVER['HTTPS'] = 'yes';
             }
+            set_error_handler(function($errno, $errstr, $errfile, $errline)
+            {
+                fprintf(STDERR, "Error Number: $errno\n");
+                fprintf(STDERR, "Error String: $errstr\n");
+                fprintf(STDERR, "Error File: $errfile\n");
+                fprintf(STDERR, "Error Line: $errline\n");
+                exit(-1);
+            });
+            set_exception_handler(function($ex)
+            {
+                fprintf(STDERR, "Uncaught Exception.\n");
+                fprintf(STDERR, "Exception Message: %s\n",$ex->getMessage());
+                fprintf(STDERR, "Exception Code: %s\n",$ex->getCode());
+                fprintf(STDERR, "File: %s\n",$ex->getFile());
+                fprintf(STDERR, "Line: %s\n",$ex->getLine());
+                fprintf(STDERR, "Stack Trace:\n");
+                fprintf(STDERR, $ex->getTraceAsString());
+            });
+            $this->_regCommand(new HelpCommand());
+            $this->_regCommand(new SettingsCommand());
+            $this->_regCommand(new ListThemesCommand());
+            $this->_regCommand(new ListCronCommand());
+            $this->_regCommand(new ListRoutesCommand());
+            $this->_regCommand(new CronCommand());
+            $this->_regCommand(new TestRouteCommand());
+        }
+    }
+    /**
+     * Returns an associative array of registered commands.
+     * @return array The method will return an associative array. The keys of 
+     * the array are the names of the commands and the value of the key is 
+     * an object of type 'CLICommand'.
+     * @since 1.0.2
+     */
+    public static function getRegisteredCommands() {
+        return self::get()->commands;
+    }
+    /**
+     * Initialize CLI.
+     */
+    public static function init() {
+        self::get();
+    }
+    private function _regCommand($command) {
+        $this->commands[$command->getName()] = $command;
+    }
+    /**
+     * Register new command.
+     * @param CLICommand $cliCommand The command that will be registered.
+     * @since 1.0.2
+     */
+    public static function register($cliCommand) {
+        if($cliCommand instanceof CLICommand){
+            self::get()->_regCommand($cliCommand);
         }
     }
     /**
@@ -66,6 +148,7 @@ class CLI {
      * through a web server.
      * @return boolean If the framework is running through a command line, 
      * the method will return true. False if not.
+     * @since 1.0
      */
     public static function isCLI() {
         //best way to check if app is runing through CLi
@@ -73,270 +156,27 @@ class CLI {
         // Did a lot of reaseach on that.
         return http_response_code() === false;
     }
-
-    public static function runCLI() {
-        set_error_handler(function($errno, $errstr, $errfile, $errline)
-        {
-            fprintf(STDERR, "Error Number: $errno\n");
-            fprintf(STDERR, "Error String: $errstr\n");
-            fprintf(STDERR, "Error File: $errfile\n");
-            fprintf(STDERR, "Error Line: $errline\n");
-            exit(-1);
-        });
-        set_exception_handler(function($ex)
-        {
-            fprintf(STDERR, "Uncaught Exception.\n");
-            fprintf(STDERR, "Exception Message: %s\n",$ex->getMessage());
-            fprintf(STDERR, "Exception Code: %s\n",$ex->getCode());
-            fprintf(STDERR, "File: %s\n",$ex->getFile());
-            fprintf(STDERR, "Line: %s\n",$ex->getLine());
-            fprintf(STDERR, "Stack Trace:\n");
-            fprintf(STDERR, $ex->getTraceAsString());
-        });
-
-        if ($_SERVER['argc'] == 1) {
-            self::showHelp();
-        } else {
-            if (defined('__PHPUNIT_PHAR__')) {
-                return;
-            }
-            $commands = $_SERVER['argv'];
-            
-            if ($commands[1] == "--hello") {
-                echo "Hello World!";
-            } else if ($commands[1] == "--route") {
-                self::routeCommand();
-            } else if ($commands[1] == "-h" || $commands[1] == "--help") {
-                self::showHelp();
-            } else if ($commands[1] == '--list-routes') {
-                self::displayRoutes();
-            } else if ($commands[1] == '--list-themes') {
-                self::viewThmes();
-            } else if ($commands[1] == '--view-conf') {
-                self::showConfig();
-            } else if ($commands[1] == '--check-cron') {
-                $cPass = isset($commands[2]) ? $commands[2] : null;
-                self::checkCron($cPass);
-            } else if ($commands[1] == '--force-cron') {
-                $jobName = isset($commands[2]) ? $commands[2] : null;
-                $cPass = isset($commands[3]) ? $commands[3] : null;
-                self::forceCronJob($jobName,$cPass);
-            } else if ($commands[1] == '--list-cron-jobs') {
-                $pass = Cron::password();
-
-                if ($pass == 'NO_PASSWORD') {
-                    self::listCron();
-                } else {
-                    $cPass = isset($commands[2]) ? $commands[2] : null;
-
-                    if (hash('sha256',$cPass) == $pass) {
-                        self::listCron();
-                    } else {
-                        if ($cPass === null) {
-                            fprintf(STDERR, "Error: Cron password is missing.\n");
-                        } else {
-                            fprintf(STDERR, "Error: Given password is incorrect.\n");
-                        }
-                    }
-                }
-            } else {
-                fprintf(STDERR,"Error: The command '".$commands[1]."' is not supported or not implemented.");
-            }
-        }
-    }
-    private static function checkCron($pass = '') {
-        $result = Cron::run($pass);
-
-        if ($result == 'INV_PASS') {
-            fprintf(STDERR,"Error: Provided password is incorrect.");
-        } else {
-            self::_cronExecResult($result);
-        }
-    }
-
-    private static function displayRoutes() {
-        $routesArr = Router::routes();
-        $maxRouteLen = 0;
-
-        foreach ($routesArr as $requestedUrl => $routeTo) {
-            $len = strlen($requestedUrl);
-
-            if ($len > $maxRouteLen) {
-                $maxRouteLen = $len;
-            }
-        }
-        $maxRouteLen += 4;
-
-        foreach ($routesArr as $requestedUrl => $routeTo) {
-            $location = $maxRouteLen - strlen($requestedUrl);
-
-            if (gettype($routeTo) == 'object') {
-                fprintf(STDOUT, "$requestedUrl %".$location."s <object>\n", " => ");
-            } else {
-                fprintf(STDOUT, "$requestedUrl %".$location."s $routeTo\n"," => ");
-            }
-        }
-    }
-    private static function forceCronJob($jobName,$cPass) {
-        if ($jobName === null) {
-            fprintf(STDERR,"Error: Job name is missing.");
-        } else if ($cPass === null && Cron::password() != 'NO_PASSWORD') {
-            fprintf(STDERR,"Error: CRON password is missing.");
-        } else {
-            $result = Cron::run($cPass,$jobName.'',true);
-
-            if ($result == 'INV_PASS') {
-                fprintf(STDERR,"Error: Provided password is incorrect.");
-            } else if ($result == 'JOB_NOT_FOUND') {
-                fprintf(STDERR,"Error: No job was found which has the name '".$jobName."'");
-            } else {
-                self::_cronExecResult($result);
-            }
-        }
-    }
-    private static function _cronExecResult($result) {
-        fprintf(STDOUT,"Total number of jobs: ".$result['total-jobs']."\n");
-        fprintf(STDOUT,"Executed Jobs: ".$result['executed-count']."\n");
-        fprintf(STDOUT,"Successfully finished jobs:\n");
-        $sJobs = $result['successfully-completed'];
-
-        if (count($sJobs) == 0) {
-            fprintf(STDOUT,"    <NONE>\n");
-        } else {
-            foreach ($sJobs as $jobName) {
-                fprintf(STDOUT,"    ".$jobName."\n");
-            }
-        }
-        fprintf(STDOUT,"Failed jobs:\n");
-        $fJobs = $result['failed'];
-
-        if (count($fJobs) == 0) {
-            fprintf(STDOUT,"    <NONE>\n");
-        } else {
-            foreach ($fJobs as $jobName) {
-                fprintf(STDOUT,"    ".$jobName."\n");
-            }
-        }
-    }
-
-    private static function listCron() {
-        $jobs = Cron::jobsQueue();
-        $i = 1;
-        fprintf(STDOUT, "Number Of Jobs: ".$jobs->size()."\n");
-
-        while ($job = $jobs->dequeue()) {
-            if ($i < 10) {
-                fprintf(STDOUT, "--------- Job #0$i ---------\n");
-            } else {
-                fprintf(STDOUT, "--------- Job #$i ---------\n");
-            }
-            fprintf(STDOUT, "Job Name %".(18 - strlen('Job Name'))."s %s\n",":",$job->getJobName());
-            fprintf(STDOUT, "Cron Expression %".(18 - strlen('Cron Expression'))."s %s\n",":",$job->getExpression());
-            $i++;
-        }
-    }
     /**
-     * 
-     * @param string $command
-     * @param string $help
+     * Run the provided CLI command.
+     * @return int If the CLI is completed without any errors, the method will 
+     * return 0. 
      */
-    private static function printCommandInfo($command,$help) {
-        $dist = 30 - strlen($command);
-        fprintf(STDOUT, "    %s %".$dist."s %s\n", $command,":",$help);
+    public static function runCLI() {
+        if ($_SERVER['argc'] == 1) {
+            return self::get()->commands['--help']->excCommand();
+        } else if (defined('__PHPUNIT_PHAR__')) {
+            return 0;
+        }
+        return self::get()->_runCommand();
     }
-
-    private static function routeCommand() {
+    private function _runCommand() {
         $commands = $_SERVER['argv'];
-
-        if (isset($commands[2])) {
-            $url = $commands[2];
-            fwrite(STDOUT, "Trying to route to \"".$url."\"...\n");
-            Router::route($url);
+        $commandName = filter_var($commands[1], FILTER_SANITIZE_STRING);
+        if(isset($this->commands[$commandName])){
+            return $this->commands[$commandName]->excCommand();
         } else {
-            fwrite(STDERR, "Error: The argument <url> is missing.\n");
-        }
-    }
-
-
-    private static function showConfig() {
-        $spaces = 25;
-        $C = WebFiori::getConfig();
-        fprintf(STDOUT, "Config.php Settings:\n");
-        fprintf(STDOUT, "    Framework Version %".($spaces - strlen('Framework Version'))."s %s\n",':',$C->getVersion());
-        fprintf(STDOUT, "    Version Type %".($spaces - strlen('Version Type'))."s %s\n",':',$C->getVersionType());
-        fprintf(STDOUT, "    Release Date %".($spaces - strlen('Release Date'))."s %s\n",':',$C->getReleaseDate());
-        fprintf(STDOUT, "    Config Version %".($spaces - strlen('Config Version'))."s %s\n",':',$C->getConfigVersion());
-        $isConfigured = $C->isConfig() === true ? 'Yes' : 'No';
-        fprintf(STDOUT, "    Is System Configured %".($spaces - strlen('Is System Configured'))."s %s\n",':',$isConfigured);
-        fprintf(STDOUT, "SiteConfig.php Settings:\n");
-        $SC = WebFiori::getSiteConfig();
-        fprintf(STDOUT, "    Base URL %".($spaces - strlen('Base URL'))."s %s\n",':',$SC->getBaseURL());
-        fprintf(STDOUT, "    Admin Theme %".($spaces - strlen('Admin Theme'))."s %s\n",':',$SC->getAdminThemeName());
-        fprintf(STDOUT, "    Base Theme %".($spaces - strlen('Base Theme'))."s %s\n",':',$SC->getBaseThemeName());
-        fprintf(STDOUT, "    Title Separator %".($spaces - strlen('Title Separator'))."s %s\n",':',$SC->getTitleSep());
-        fprintf(STDOUT, "    Home Page %".($spaces - strlen('Home Page'))."s %s\n",':',$SC->getHomePage());
-        fprintf(STDOUT, "    Config Version %".($spaces - strlen('Config Version'))."s %s\n",':',$SC->getConfigVersion());
-        fprintf(STDOUT, "    Website Names:\n",':');
-        $names = $SC->getWebsiteNames();
-
-        foreach ($names as $langCode => $name) {
-            fprintf(STDOUT,"        $langCode => $name\n");
-        }
-        fprintf(STDOUT, "    Website Descriptions:\n",':');
-
-        foreach ($SC->getDescriptions() as $langCode => $desc) {
-            fprintf(STDOUT,"        $langCode => $desc\n");
-        }
-    }
-
-    private static function showHelp() {
-        CLI::showVersionInfo();
-        echo "Options: \n";
-        self::printCommandInfo('-h', "Show this help. Similar command: --help.");
-        self::printCommandInfo('--hello', "Show 'Hello world!' Message.");
-        self::printCommandInfo('--route <url>', "Test the result of a route.");
-        self::printCommandInfo('--view-conf', "Display system configuration settings.");
-        self::printCommandInfo('--list-cron-jobs <cron-pass>', "Display a list of cron jobs. If cron password is set, it must be provided.");
-        self::printCommandInfo('--force-cron <job-name> <cron-pass>', "Force a CRON job to run.");
-        self::printCommandInfo('--check-cron <cron-pass>', "Execute a command to check all jobs and execute them if its time to run the job.");
-        self::printCommandInfo('--list-routes', "Display all available routes.");
-        self::printCommandInfo('--list-themes', "Display a list of available themes.");
-        exit(0);
-    }
-
-    private static function showVersionInfo() {
-        echo "WebFiori Framework (c) v"
-        .WebFiori::getConfig()->getVersion()." ".WebFiori::getConfig()->getVersionType().
-        ", All Rights Reserved.\n";
-    }
-
-
-    private static function viewThmes() {
-        $themesArr = Theme::getAvailableThemes();
-        $spaceSize = 15;
-        $themsCount = count($themesArr);
-        fprintf(STDOUT, "Total Number of Themes: $themsCount .\n");
-        $index = 1;
-
-        foreach ($themesArr as $themeObj) {
-            if ($index < 10) {
-                fprintf(STDOUT, "------------ Theme #0$index ------------\n");
-            } else {
-                fprintf(STDOUT, "------------ Theme #$index ------------\n");
-            }
-            $len00 = $spaceSize - strlen('Theme Name');
-            $len01 = $spaceSize - strlen('Author');
-            $len02 = $spaceSize - strlen('Author URL');
-            $len03 = $spaceSize - strlen('License');
-            $len04 = $spaceSize - strlen('License URL');
-
-            fprintf(STDOUT, "Theme Name: %".$len00."s %s\n",':',$themeObj->getName());
-            fprintf(STDOUT, "Author: %".$len01."s %s\n",':',$themeObj->getAuthor());
-            fprintf(STDOUT, "Author URL: %".$len02."s %s\n",':',$themeObj->getAuthorUrl());
-            fprintf(STDOUT, "License: %".$len03."s %s\n",':',$themeObj->getLicenseName());
-            fprintf(STDOUT, "License URL: %".$len04."s %s\n",':',$themeObj->getLicenseUrl());
-            fprintf(STDOUT, "Theme Desription: \n%s\n",$themeObj->getDescription());
-            $index++;
+             fprintf(STDERR,"Error: The command '".$commands[1]."' is not supported.");
+             return -1;
         }
     }
 }

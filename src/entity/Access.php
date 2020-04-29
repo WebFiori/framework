@@ -254,7 +254,7 @@ class Access {
      */
     public static function resolvePriviliges($str,$user) {
         if (strlen($str) > 0 && $user instanceof User) {
-            $prInfo = $this->_getPrivilegesInfo($str);
+            $prInfo = self::_getPrivilegesInfo($str);
             foreach ($prInfo['groups-belongs-to'] as $groupId) {
                 $user->addToGroup($groupId);
             }
@@ -268,7 +268,7 @@ class Access {
             }
         }
     }
-    private function _getPrivilegesInfo($privilegesStr) {
+    private static function _getPrivilegesInfo($privilegesStr) {
         $privilegesToHave = [];
         $privilegesToNotHave = [];
         $groupsBelongsTo = [];

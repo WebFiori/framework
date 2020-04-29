@@ -469,11 +469,7 @@ class WebFiori {
             .'</html>');
         }
     }
-    /**
-     * Sets new error and exception handler.
-     */
-    private function _setHandlers() {
-        error_reporting(E_ALL & ~E_ERROR & ~E_COMPILE_ERROR & ~E_CORE_ERROR & ~E_RECOVERABLE_ERROR);
+    private function _setErrHandler(){
         set_error_handler(function($errno, $errstr, $errfile, $errline)
         {
             $isCli = class_exists('webfiori\entity\CLI') ? CLI::isCLI() : php_sapi_name() == 'cli';
@@ -511,6 +507,8 @@ class WebFiori {
 
             return true;
         });
+    }
+    private function _setExceptionHandler() {
         set_exception_handler(function($ex)
         {
             $isCli = class_exists('webfiori\entity\CLI') ? CLI::isCLI() : php_sapi_name() == 'cli';
@@ -549,10 +547,8 @@ class WebFiori {
                     foreach ($trace as $arr) {
                         if (isset($arr['file'])) {
                             $stackTrace->add('#'.$index,$arr['file'].' (Line '.$arr['line'].')');
-                        } else {
-                            if (isset($arr['function'])) {
-                                $stackTrace->add('#'.$index,$arr['function']);
-                            }
+                        } else if (isset($arr['function'])) {
+                            $stackTrace->add('#'.$index,$arr['function']);
                         }
                         $index++;
                     }
@@ -565,6 +561,14 @@ class WebFiori {
                 }
             }
         });
+    }
+    /**
+     * Sets new error and exception handler.
+     */
+    private function _setHandlers() {
+        error_reporting(E_ALL & ~E_ERROR & ~E_COMPILE_ERROR & ~E_CORE_ERROR & ~E_RECOVERABLE_ERROR);
+        $this->_setErrHandler();
+        $this->_setExceptionHandler();
         register_shutdown_function(function()
         {
             $error = error_get_last();

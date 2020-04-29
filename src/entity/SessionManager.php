@@ -244,11 +244,14 @@ class SessionManager implements JsonI {
      * @since 1.8
      */
     public static function _generateRandSessionName() {
+        if(self::$randFunc === null){
+            self::$randFunc = is_callable('random_int') ? 'random_int' : 'rand';
+        }
         $retVal = 'session-';
 
         for ($x = 0 ; $x < 8 ; $x++) {
-            $hash = hash('sha256', self::$randFunc(0, 100).$retVal);
-            $retVal .= $hash[$x + self::$randFunc(0, 40)];
+            $hash = hash('sha256', call_user_func(self::$randFunc,0, 100).$retVal);
+            $retVal .= $hash[$x + call_user_func(self::$randFunc,0, 40)];
         }
 
         return $retVal;
@@ -905,7 +908,7 @@ class SessionManager implements JsonI {
     private function _generateSessionID() {
         $date = date(DATE_ISO8601);
         $hash = hash('sha256', $date);
-        $time = time() + self::$randFunc(0, 1000);
+        $time = time() + call_user_func(self::$randFunc, 0, 100);
         $hash2 = hash('sha256',$hash.$time);
         
         return substr($hash2, 0, 27);

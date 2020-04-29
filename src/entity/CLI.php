@@ -105,13 +105,6 @@ class CLI {
                 fprintf(STDERR, "Stack Trace:\n");
                 fprintf(STDERR, $ex->getTraceAsString());
             });
-            $this->_regCommand(new HelpCommand());
-            $this->_regCommand(new SettingsCommand());
-            $this->_regCommand(new ListThemesCommand());
-            $this->_regCommand(new ListCronCommand());
-            $this->_regCommand(new ListRoutesCommand());
-            $this->_regCommand(new CronCommand());
-            $this->_regCommand(new TestRouteCommand());
         }
     }
     /**
@@ -126,9 +119,18 @@ class CLI {
     }
     /**
      * Initialize CLI.
+     * @since 1.0
      */
     public static function init() {
         self::get();
+        //Register default framework cli commands.
+        self::register(new HelpCommand());
+        self::register(new SettingsCommand());
+        self::register(new ListThemesCommand());
+        self::register(new ListCronCommand());
+        self::register(new ListRoutesCommand());
+        self::register(new CronCommand());
+        self::register(new TestRouteCommand());
     }
     private function _regCommand($command) {
         $this->commands[$command->getName()] = $command;
@@ -170,12 +172,12 @@ class CLI {
         return self::get()->_runCommand();
     }
     private function _runCommand() {
-        $commands = $_SERVER['argv'];
-        $commandName = filter_var($commands[1], FILTER_SANITIZE_STRING);
+        $args = $_SERVER['argv'];
+        $commandName = filter_var($args[1], FILTER_SANITIZE_STRING);
         if(isset($this->commands[$commandName])){
             return $this->commands[$commandName]->excCommand();
         } else {
-             fprintf(STDERR,"Error: The command '".$commands[1]."' is not supported.");
+             fprintf(STDERR,"Error: The command '".$commandName."' is not supported.");
              return -1;
         }
     }

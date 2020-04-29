@@ -588,50 +588,45 @@ class Access {
 
         return $retVal;
     }
+    private function _groupHasPrivilege($prId, $group) {
+        $retVal = false;
+        foreach ($group->privileges() as $p) {
+            if ($p->getID() == $prId) {
+                $retVal = true;
+                break;
+            }
+        }
+        return $retVal;
+    }
+    private function _childGroupHasPrivilege($prId, $groupId, $group) {
+        $retVal = false;
+        foreach ($group->childGroups() as $g) {
+            $b = $this->_hasPrivilegeHelper($prId, $groupId, $g);
+
+            if ($b === true) {
+                $retVal = true;
+                break;
+            }
+        }
+        return $retVal;
+    }
     /**
      * 
      * @param type $prId
      * @param type $groupId
-     * @param type $searchCh
      * @param PrivilegesGroup $group
      */
     private function _hasPrivilegeHelper($prId,$groupId,$group) {
         $retVal = false;
         if ($groupId !== null && $group->getID() == $groupId) {
-            foreach ($group->privileges() as $p) {
-                if ($p->getID() == $prId) {
-                    $retVal = true;
-                    break;
-                }
-            }
-
-            return $retVal;
+            return $this->_groupHasPrivilege($prId, $group);
         } else if ($groupId == null) {
-            foreach ($group->privileges() as $p) {
-                if ($p->getID() == $prId) {
-                    $retVal = true;
-                    break;
-                }
-            }
+            $retVal = $this->_groupHasPrivilege($prId, $group) 
+                    || $this->_childGroupHasPrivilege($prId, $groupId, $group);
 
-            foreach ($group->childGroups() as $g) {
-                $b = $this->_hasPrivilegeHelper($prId, $groupId, $g);
-
-                if ($b === true) {
-                    $retVal = true;
-                    break;
-                }
-            }
             return $retVal;
         } else {
-            foreach ($group->childGroups() as $g) {
-                $b = $this->_hasPrivilegeHelper($prId, $groupId, $g);
-
-                if ($b === true) {
-                    $retVal = true;
-                    break;
-                }
-            }
+            $retVal = $this->_childGroupHasPrivilege($prId, $groupId, $group);
         }
 
         return $retVal;

@@ -25,7 +25,7 @@
 namespace webfiori\entity\cron;
 
 use Error;
-use Exception;
+use webfiori\entity\exceptions\InvalidCRONExprException;
 /**
  * A class thar represents a cron job.
  *
@@ -156,7 +156,7 @@ class CronJob {
 
         if ($when !== null) {
             if ($this->cron($when) === false) {
-                throw new Exception('Invalid cron expression: \''.$when.'\'.');
+                throw new InvalidCRONExprException('Invalid cron expression: \''.$when.'\'.');
             }
         } else {
             $this->cron();
@@ -215,12 +215,11 @@ class CronJob {
             $monthValidity = $this->_checkMonth($split[3]);
             $daysOfWeekValidity = $this->_checkDayOfWeek($split[4]);
 
-            if ($minutesValidity === false || 
+            if (!($minutesValidity === false || 
                $hoursValidity === false || 
                $daysOfMonthValidity === false ||
                $monthValidity === false || 
-               $daysOfWeekValidity === false) {
-            } else {
+               $daysOfWeekValidity === false)) {
                 $this->jobDetails = [
                     'minutes' => $minutesValidity,
                     'hours' => $hoursValidity,
@@ -251,10 +250,8 @@ class CronJob {
      * @since 1.0
      */
     public function dailyAt($hour = 0,$minute = 0) {
-        if ($hour >= 0 && $hour <= 23) {
-            if ($minute >= 0 && $minute <= 59) {
-                return $this->cron($minute.' '.$hour.' * * *');
-            }
+        if ($hour >= 0 && $hour <= 23 && $minute >= 0 && $minute <= 59) {
+            return $this->cron($minute.' '.$hour.' * * *');
         }
 
         return false;
@@ -324,8 +321,8 @@ class CronJob {
 
         if ($force === true || $this->isTime()) {
             try {
-                $isSuccess = call_user_func($this->events['on']['func'], $this->events['on']['params']);
-                $this->isSuccess = $isSuccess === true || $isSuccess === null;
+                $isSuccessRun = call_user_func($this->events['on']['func'], $this->events['on']['params']);
+                $this->isSuccess = $isSuccessRun === true || $isSuccessRun === null;
             } catch (Exception $ex) {
                 $this->_logExeException($ex);
             } catch (Error $ex) {

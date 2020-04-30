@@ -24,7 +24,7 @@
  */
 namespace webfiori\entity\mail;
 
-use Exception;
+use webfiori\entity\exceptions\SMTPException;
 use phpStructs\html\HTMLDoc;
 use phpStructs\html\HTMLNode;
 use webfiori\conf\MailConfig;
@@ -59,7 +59,7 @@ class EmailMessage {
      * Creates new instance of the class.
      * @param type $sendAccountName
      * @return type
-     * @throws Exception
+     * @throws SMTPException
      * @since 1.0
      */
     private function __construct($sendAccountName = '') {
@@ -70,21 +70,19 @@ class EmailMessage {
                 $this->socketMailer = EmailController::get()->getSocketMailer($acc);
 
                 if ($this->socketMailer == EmailController::INV_CREDENTIALS) {
-                    throw new Exception('The account "'.$sendAccountName.'" has invalid credintials.');
+                    throw new SMTPException('The account "'.$sendAccountName.'" has invalid credintials.');
+                } else if ($this->socketMailer == EmailController::INV_HOST_OR_PORT) {
+                    throw new SMTPException('The account "'.$sendAccountName.'" has invalid host or port number. Port: '.$acc->getPort().', Host: '.$acc->getServerAddress().'.');
                 } else {
-                    if ($this->socketMailer == EmailController::INV_HOST_OR_PORT) {
-                        throw new Exception('The account "'.$sendAccountName.'" has invalid host or port number. Port: '.$acc->getPort().', Host: '.$acc->getServerAddress().'.');
-                    } else {
-                        $this->asHtml = new HTMLDoc();
-                        $this->asHtml->getHeadNode()->addMeta('charset', 'UTF-8');
+                    $this->asHtml = new HTMLDoc();
+                    $this->asHtml->getHeadNode()->addMeta('charset', 'UTF-8');
 
-                        return;
-                    }
+                    return;
                 }
             }
-            throw new Exception('No SMTP account was found which has the name "'.$sendAccountName.'".');
+            throw new SMTPException('No SMTP account was found which has the name "'.$sendAccountName.'".');
         }
-        throw new Exception('Class "MailConfig" not found.');
+        throw new SMTPException('Class "MailConfig" not found.');
     }
     /**
      * Adds new receiver address to the list of message receivers.

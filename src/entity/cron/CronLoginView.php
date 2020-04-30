@@ -38,7 +38,7 @@ use webfiori\WebFiori;
 class CronLoginView extends CronView{
     public function __construct() {
         parent::__construct('CRON Login', 'Login to CRON Control panel.');
-        if (WebFiori::getWebsiteController()->getSessionVar('cron-login-status') == true) {
+        if (WebFiori::getWebsiteController()->getSessionVar('cron-login-status')) {
             header('location: '.WebFiori::getSiteConfig()->getBaseURL().'cron/jobs');
         }
         $form = new HTMLNode('form');

@@ -180,16 +180,14 @@ class Cron {
     public static function dailyJob($time,$name,$func,$funcParams = []) {
         $split = explode(':', $time);
 
-        if (count($split) == 2) {
-            if (is_callable($func)) {
-                $job = new CronJob();
-                $job->setJobName($name);
+        if (count($split) == 2 && is_callable($func)) {
+            $job = new CronJob();
+            $job->setJobName($name);
 
-                if ($job->dailyAt($split[0], $split[1])) {
-                    $job->setOnExecution($func, $funcParams);
+            if ($job->dailyAt($split[0], $split[1])) {
+                $job->setOnExecution($func, $funcParams);
 
-                    return self::scheduleJob($job);
-                }
+                return self::scheduleJob($job);
             }
         }
 
@@ -349,16 +347,14 @@ class Cron {
         if ($dayNumber > 0 && $dayNumber < 32) {
             $split = explode(':', $time);
 
-            if (count($split) == 2) {
-                if (is_callable($func)) {
-                    $job = new CronJob();
-                    $job->setJobName($name);
+            if (count($split) == 2 && is_callable($func)) {
+                $job = new CronJob();
+                $job->setJobName($name);
 
-                    if ($job->everyMonthOn($dayNumber, $time)) {
-                        $job->setOnExecution($func, $funcParams);
+                if ($job->everyMonthOn($dayNumber, $time)) {
+                    $job->setOnExecution($func, $funcParams);
 
-                        return self::scheduleJob($job);
-                    }
+                    return self::scheduleJob($job);
                 }
             }
         }
@@ -412,10 +408,8 @@ class Cron {
     public static function run($pass = '',$jobName = null,$force = false) {
         self::log('Running job(s) check...');
 
-        if (Cron::password() != 'NO_PASSWORD' && WebFiori::getWebsiteController()->getSessionVar('cron-login-status') !== true) {
-            if (hash('sha256',$pass) != Cron::password()) {
-                return 'INV_PASS';
-            }
+        if (Cron::password() != 'NO_PASSWORD' && WebFiori::getWebsiteController()->getSessionVar('cron-login-status') !== true && hash('sha256',$pass) != Cron::password()) {
+            return 'INV_PASS';
         }
         $xForce = $force === true;
         $retVal = [
@@ -429,51 +423,36 @@ class Cron {
             $job = self::getJob(trim($jobName));
 
             if ($job instanceof CronJob) {
-                if ($job->isTime() || $xForce) {
-                    $job->setIsForced($xForce);
-                    self::_get()->_setActiveJob($job);
-                }
-
-                if ($job->execute($xForce)) {
-                    self::_get()->_logJobExecution($job,$xForce);
-                    $retVal['executed-count']++;
-
-                    if ($job->isSuccess() === true) {
-                        $retVal['successfully-completed'][] = $job->getJobName();
-                    } else {
-                        if ($job->isSuccess() === false) {
-                            $retVal['failed'][] = $job->getJobName();
-                        }
-                    }
-                }
-                self::_get()->_setActiveJob(null);
+                $this->_runJob($retVal, $job, $xForce);
             } else {
                 return 'JOB_NOT_FOUND';
             }
         } else {
             while ($job = Cron::jobsQueue()->dequeue()) {
-                if ($job->isTime()) {
-                    self::_get()->_setActiveJob($job);
-                }
-
-                if ($job->execute()) {
-                    self::_get()->_logJobExecution($job,$xForce);
-                    $retVal['executed-count']++;
-
-                    if ($job->isSuccess() === true) {
-                        $retVal['successfully-completed'][] = $job->getJobName();
-                    } else {
-                        if ($job->isSuccess() === false) {
-                            $retVal['failed'][] = $job->getJobName();
-                        }
-                    }
-                }
-                self::_get()->_setActiveJob(null);
+                $this->_runJob($retVal, $job, $xForce);
             }
         }
         self::log('Check finished.');
 
         return $retVal;
+    }
+    private function _runJob(&$retVal, $job, $xForce) {
+        if ($job->isTime() || $xForce) {
+            $job->setIsForced($xForce);
+            self::_get()->_setActiveJob($job);
+        }
+
+        if ($job->execute($xForce)) {
+            self::_get()->_logJobExecution($job,$xForce);
+            $retVal['executed-count']++;
+
+            if ($job->isSuccess() === true) {
+                $retVal['successfully-completed'][] = $job->getJobName();
+            } else if ($job->isSuccess() === false) {
+                $retVal['failed'][] = $job->getJobName();
+            }
+        }
+        self::_get()->_setActiveJob(null);
     }
 
     /**
@@ -655,7 +634,7 @@ class Cron {
         }
     }
     private function _setLogEnabled($bool) {
-        $this->isLogEnabled = $bool === true ? true : false;
+        $this->isLogEnabled = $bool === true;
     }
     /**
      * 

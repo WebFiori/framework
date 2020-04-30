@@ -524,12 +524,10 @@ class Util {
      * @since 0.1
      */
     public static function isDirectory($dir,$createIfNot = false) {
-        if ($dir) {
-            $dir = str_replace('\\', '/', $dir);
+        $dirFix = str_replace('\\', '/', $dir);
 
-            if (!is_dir($dir) && $createIfNot === true && mkdir($dir, 0755 , true)) {
-                return true;
-            } else {
+        if (!is_dir($dirFix)) {
+            if($createIfNot === true && mkdir($dir, 0755 , true)){
                 return true;
             }
         }

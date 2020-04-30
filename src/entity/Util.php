@@ -157,8 +157,6 @@ class Util {
             if ($intVal == 0) {
                 $retVal = '0';
             } else {
-                $q = 100;
-                $bit = $intVal % 2;
 
                 while ($intVal > 0) {
                     $q = floor($intVal / 2);
@@ -289,9 +287,7 @@ class Util {
         $retVal = str_replace('<script>', '&lt;script&gt;', $input);
         $retVal = str_replace('</script>', '&lt;/script&gt;', $retVal);
         $retVal = str_replace('<?', '&lt;?', $retVal);
-        $retVal = str_replace('<?php', '&lt;?php', $retVal);
-
-        return $retVal;
+        return str_replace('<?php', '&lt;?php', $retVal);
     }
     /**
      * Returns the base URL of the framework.
@@ -316,7 +312,7 @@ class Util {
         $protocol = 'http://';
         $useHttp = defined('USE_HTTP') && USE_HTTP === true;
 
-        if ((strlen($secureHost) != 0 && !$useHttp)) {
+        if (strlen($secureHost) != 0 && !$useHttp) {
             $protocol = "https://";
         }
         $docRoot = filter_var($_SERVER['DOCUMENT_ROOT']);
@@ -363,7 +359,6 @@ class Util {
      * @since 1.3.4
      */
     public static function getGWeekDates() {
-        $datesArr = [];
         $startDay = '';
         $startYear = '';
         $startMonth = '';
@@ -371,7 +366,7 @@ class Util {
         $todayNumberInMonth = intval(date('d'));
 
         $weekStartDayNum = 7;
-        $todayNumberInWeek = date('N') ;//== $weekStartDayNum ? $weekStartDayNum : date('N') + (7 - $weekStartDayNum);
+        $todayNumberInWeek = date('N') ;
         $thisMonth = intval(date('m'));
         $thisYear = date('Y');
 
@@ -398,7 +393,11 @@ class Util {
             $daysInMonth = cal_days_in_month(CAL_GREGORIAN,$prevMonthNum,$startYear);
             $startDay = $daysInMonth - (-1) * $backInTime;
         }
-
+        
+        return self::_buildGdatesArr($startDay, $daysInMonth, $startMonth);
+    }
+    private static function _buildGdatesArr($startDay, $daysInMonth, $startMonth) {
+        $datesArr = [];
         for ($x = 0 ; $x < 7 ; $x++) {
             if ($startDay > $daysInMonth) {
                 $startDay = 1;
@@ -411,7 +410,6 @@ class Util {
             $datesArr[] = $startYear.'-'.$startMonth.'-'.$startDay;
             $startDay += 1;
         }
-
         return $datesArr;
     }
     /**
@@ -446,9 +444,7 @@ class Util {
      */
     public static function getHostIP() {
         $host = gethostname();
-        $ip = gethostbyname($host);
-
-        return $ip;
+        return gethostbyname($host);
     }
     /**
      * Returns the URI of the requested resource.
@@ -493,30 +489,24 @@ class Util {
             foreach ($headers as $k => $v) {
                 $retVal[strtolower($k)] = $v;
             }
-        } else {
-            if (isset($_SERVER)) {
-                foreach ($_SERVER as $k => $v) {
-                    $split = explode('_', $k);
+        } else if (isset($_SERVER)) {
+            foreach ($_SERVER as $k => $v) {
+                $split = explode('_', $k);
 
-                    if ($split[0] == 'HTTP') {
-                        $headerName = '';
-                        $count = count($split);
+                if ($split[0] == 'HTTP') {
+                    $headerName = '';
+                    $count = count($split);
 
-                        for ($x = 0 ; $x < $count ; $x++) {
-                            if ($x + 1 == $count && $split[$x] != 'HTTP') {
-                                $headerName = $headerName.$split[$x];
-                            } else {
-                                if ($x == 1 && $split[$x] != 'HTTP') {
-                                    $headerName = $split[$x].'-';
-                                } else {
-                                    if ($split[$x] != 'HTTP') {
-                                        $headerName = $headerName.$split[$x].'-';
-                                    }
-                                }
-                            }
+                    for ($x = 0 ; $x < $count ; $x++) {
+                        if ($x + 1 == $count && $split[$x] != 'HTTP') {
+                            $headerName = $headerName.$split[$x];
+                        } else if ($x == 1 && $split[$x] != 'HTTP') {
+                            $headerName = $split[$x].'-';
+                        } else if ($split[$x] != 'HTTP') {
+                            $headerName = $headerName.$split[$x].'-';
                         }
-                        $retVal[strtolower($headerName)] = $v;
                     }
+                    $retVal[strtolower($headerName)] = $v;
                 }
             }
         }
@@ -537,12 +527,8 @@ class Util {
         if ($dir) {
             $dir = str_replace('\\', '/', $dir);
 
-            if (!is_dir($dir)) {
-                if ($createIfNot === true) {
-                    if (mkdir($dir, 0755 , true)) {
-                        return true;
-                    }
-                }
+            if (!is_dir($dir) && $createIfNot === true && mkdir($dir, 0755 , true)) {
+                return true;
             } else {
                 return true;
             }
@@ -587,17 +573,11 @@ class Util {
 
             if ($char == '.' && !$isFloat) {
                 $isFloat = true;
-            } else {
-                if ($char == '-' && $y == 0) {
-                } else {
-                    if ($char == '.' && $isFloat) {
-                        return $retVal;
-                    } else {
-                        if (!($char <= '9' && $char >= '0')) {
-                            return $retVal;
-                        }
-                    }
-                }
+            } else if ($char == '-' && $y == 0) {
+            } else if ($char == '.' && $isFloat) {
+                return $retVal;
+            } else if (!($char <= '9' && $char >= '0')) {
+                return $retVal;
             }
         }
 

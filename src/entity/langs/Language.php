@@ -24,7 +24,7 @@
  */
 namespace webfiori\entity\langs;
 
-use Exception;
+use webfiori\entity\exceptions\MissingLangException;
 /**
  * A class that is can be used to make the application ready for 
  * Internationalization.
@@ -79,7 +79,7 @@ class Language {
      */
     public function __construct($dir = 'ltr',$code = 'XX',$addtoLoadedAfterCreate = true) {
         $this->languageVars = [];
-        $this->loadLang = $addtoLoadedAfterCreate === true ? true : false;
+        $this->loadLang = $addtoLoadedAfterCreate === true;
 
         if (!$this->setCode($code)) {
             $this->setCode('XX');
@@ -218,7 +218,7 @@ class Language {
     /**
      * Loads a language file based on language code.
      * @param string $langCode A two digits language code (such as 'ar').
-     * @throws Exception An exception will be thrown if no language file 
+     * @throws MissingLangException An exception will be thrown if no language file 
      * was found that matches the given language code. Language files must 
      * have the name 'LanguageXX.php' where 'XX' is language code. Also the function 
      * will throw an exception when the translation file is loaded but no object 
@@ -242,14 +242,14 @@ class Language {
                     if (isset(self::$loadedLangs[$uLangCode])) {
                         return self::$loadedLangs[$uLangCode];
                     } else {
-                        throw new Exception('The translation file was found. But no object of type \'Language\' is stored. Make sure that the parameter '
+                        throw new MissingLangException('The translation file was found. But no object of type \'Language\' is stored. Make sure that the parameter '
                                 .'$addtoLoadedAfterCreate is set to true when creating the language object.');
                     }
                 } else {
-                    throw new Exception('A language class for the language \''.$uLangCode.'\' was found. But it is not a sub class of \'Language\'.');
+                    throw new MissingLangException('A language class for the language \''.$uLangCode.'\' was found. But it is not a sub class of \'Language\'.');
                 }
             } else {
-                throw new Exception('No language class was found for the language \''.$uLangCode.'\'.');
+                throw new MissingLangException('No language class was found for the language \''.$uLangCode.'\'.');
             }
         }
     }
@@ -269,22 +269,18 @@ class Language {
         $dirTrimmed = trim($dir);
         $varTrimmed = trim($varName);
 
-        if (strlen($dirTrimmed) != 0) {
-            if (strlen($varTrimmed) != 0) {
-                $trim = trim($dirTrimmed, '/');
-                $subSplit = explode('/', $trim);
+        if (strlen($dirTrimmed) != 0 && strlen($varTrimmed) != 0) {
+            $trim = trim($dirTrimmed, '/');
+            $subSplit = explode('/', $trim);
 
-                if (count($subSplit) == 1) {
-                    if (isset($this->languageVars[$subSplit[0]])) {
-                        $this->languageVars[$subSplit[0]][$varTrimmed] = $varValue;
+            if (count($subSplit) == 1) {
+                if (isset($this->languageVars[$subSplit[0]])) {
+                    $this->languageVars[$subSplit[0]][$varTrimmed] = $varValue;
 
-                        return true;
-                    }
-                } else {
-                    if (isset($this->languageVars[$subSplit[0]])) {
-                        return $this->_set($subSplit, $this->languageVars[$subSplit[0]],$varTrimmed,$varValue, 1);
-                    }
+                    return true;
                 }
+            } else if (isset($this->languageVars[$subSplit[0]])) {
+                return $this->_set($subSplit, $this->languageVars[$subSplit[0]],$varTrimmed,$varValue, 1);
             }
         }
 
@@ -300,23 +296,19 @@ class Language {
     public function setCode($code) {
         $trimmedCode = strtoupper(trim($code));
 
-        if (strlen($trimmedCode) == 2) {
-            if ($trimmedCode[0] >= 'A' && $trimmedCode[0] <= 'Z' && $trimmedCode[1] >= 'A' && $trimmedCode[1] <= 'Z') {
-                $oldCode = $this->getCode();
+        if (strlen($trimmedCode) == 2 && $trimmedCode[0] >= 'A' && $trimmedCode[0] <= 'Z' && $trimmedCode[1] >= 'A' && $trimmedCode[1] <= 'Z') {
+            $oldCode = $this->getCode();
 
-                if ($this->isLoaded()) {
-                    if (isset(self::$loadedLangs[$oldCode])) {
-                        unset(self::$loadedLangs[$oldCode]);
-                    }
-                }
-                $this->languageVars['code'] = $trimmedCode;
-
-                if ($this->isLoaded()) {
-                    self::$loadedLangs[$trimmedCode] = &$this;
-                }
-
-                return true;
+            if ($this->isLoaded() && isset(self::$loadedLangs[$oldCode])) {
+                unset(self::$loadedLangs[$oldCode]);
             }
+            $this->languageVars['code'] = $trimmedCode;
+
+            if ($this->isLoaded()) {
+                self::$loadedLangs[$trimmedCode] = &$this;
+            }
+
+            return true;
         }
 
         return false;

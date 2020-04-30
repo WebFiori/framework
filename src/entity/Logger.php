@@ -311,7 +311,7 @@ class Logger {
         $this->logMessagesArr[$this->_getLogName()] = [
             'path' => $this->getAbsolutePath()
         ];
-        $this->log('---------------Log Cleared At '.$time.'---------------'."\r\n");
+        $this->log('---------------Log Cleared At '.date('Y-m-d H:i:s (T)').'---------------'."\r\n");
     }
     /**
      * Generates a readable string which represents an array.

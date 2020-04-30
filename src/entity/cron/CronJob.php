@@ -24,6 +24,7 @@
  */
 namespace webfiori\entity\cron;
 
+use Exception;
 use Error;
 use webfiori\entity\exceptions\InvalidCRONExprException;
 /**

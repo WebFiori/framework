@@ -208,11 +208,6 @@ class SessionManager implements JsonI {
         $this->resumed = false;
         $this->new = false;
         $this->sId = $this->_generateSessionID();
-
-        //$sesionSavePath = 'sessions';
-        //if(Util::isDirectory($sesionSavePath, true)){
-            //session_save_path(ROOT_DIR.'/'.$sesionSavePath);
-        //}
     }
     /**
      * Returns the user who is logged in.
@@ -222,7 +217,7 @@ class SessionManager implements JsonI {
      */
     public function getUser() {
         $retVal = null;
-        $isActive = $this->isSessionActive() === true ? true : $this->_switchToSession();
+        $isActive = $this->_isActive();
 
         if ($isActive && isset($_SESSION[self::$SV][self::MAIN_VARS[6]])) {
             $retVal = $_SESSION[self::$SV][self::MAIN_VARS[6]];
@@ -264,7 +259,7 @@ class SessionManager implements JsonI {
      */
     public function getID() {
         $retVal = -1;
-        $isActive = $this->isSessionActive() === true ? true : $this->_switchToSession();
+        $isActive = $this->_isActive();
 
         if ($isActive) {
             $retVal = session_id();
@@ -287,7 +282,7 @@ class SessionManager implements JsonI {
      */
     public function getLang($forceUpdate = false) {
         $retVal = null;
-        $isActive = $this->isSessionActive() === true ? true : $this->_switchToSession();
+        $isActive = $this->_isActive();
 
         if ($isActive) {
             if ($forceUpdate === true) {
@@ -301,6 +296,14 @@ class SessionManager implements JsonI {
         }
 
         return $retVal;
+    }
+    private function _isActive() {
+        if($this->isSessionActive()){
+            $isActive = true;
+        } else {
+            $isActive = $this->_switchToSession();
+        }
+        return $isActive;
     }
     /**
      * Returns the lifetime of the session (in minutes). 
@@ -335,7 +338,7 @@ class SessionManager implements JsonI {
      */
     public function getPassedTime() {
         $retVal = 0;
-        $isActive = $this->isSessionActive() === true ? true : $this->_switchToSession();
+        $isActive = $this->_isActive();
 
         if ($isActive) {
             $retVal = time() - $_SESSION[self::$SV][self::MAIN_VARS[1]];
@@ -350,7 +353,7 @@ class SessionManager implements JsonI {
      * 
      */
     public function getRemainingTime() {
-        $isActive = $this->isSessionActive() === true ? true : $this->_switchToSession();
+        $isActive = $this->_isActive();
 
         if ($isActive && $this->isRefresh()) {
             return $this->getLifetime() * 60;
@@ -373,7 +376,7 @@ class SessionManager implements JsonI {
      * @since 1.5
      */
     public function getResumTime() {
-        $isActive = $this->isSessionActive() === true ? true : $this->_switchToSession();
+        $isActive = $this->_isActive();
 
         if ($isActive) {
             return $_SESSION[self::$SV][self::MAIN_VARS[2]];
@@ -436,7 +439,7 @@ class SessionManager implements JsonI {
      * @since 1.8.5
      */
     public function getSessionVar($varName) {
-        $isActive = $this->isSessionActive() === true ? true : $this->_switchToSession();
+        $isActive = $this->_isActive();
 
         if ($isActive) {
             return isset($_SESSION[$varName]) ? $_SESSION[$varName] : null;
@@ -468,7 +471,7 @@ class SessionManager implements JsonI {
      * @since 1.8.5
      */
     public function getSessionVars() {
-        $isActive = $this->isSessionActive() === true ? true : $this->_switchToSession();
+        $isActive = $this->_isActive();
 
         if ($isActive) {
             return $_SESSION[self::$SV];
@@ -483,7 +486,7 @@ class SessionManager implements JsonI {
      * @since 1.8.5
      */
     public function getSesstionArray() {
-        $isActive = $this->isSessionActive() === true ? true : $this->_switchToSession();
+        $isActive = $this->_isActive();
 
         if ($isActive) {
             return $_SESSION;
@@ -499,7 +502,7 @@ class SessionManager implements JsonI {
      * @since 1.7
      */
     public function getStartIpAddress() {
-        $isActive = $this->isSessionActive() === true ? true : $this->_switchToSession();
+        $isActive = $this->_isActive();
 
         if ($isActive) {
             return $_SESSION[self::$SV][self::MAIN_VARS[5]];
@@ -515,7 +518,7 @@ class SessionManager implements JsonI {
      * @since 1.5
      */
     public function getStartTime() {
-        $isActive = $this->isSessionActive() === true ? true : $this->_switchToSession();
+        $isActive = $this->_isActive();
 
         if ($isActive) {
             return $_SESSION[self::$SV][self::MAIN_VARS[1]];
@@ -593,7 +596,7 @@ class SessionManager implements JsonI {
      * @since 1.5
      */
     public function isRefresh() {
-        $isActive = $this->isSessionActive() === true ? true : $this->_switchToSession();
+        $isActive = $this->_isActive();
 
         if ($isActive && isset($_SESSION[self::$SV][self::MAIN_VARS[3]])) {
             return $_SESSION[self::$SV][self::MAIN_VARS[3]];
@@ -634,7 +637,7 @@ class SessionManager implements JsonI {
      */
     public function isTimeout() {
         $retVal = false;
-        $isActive = $this->isSessionActive() === true ? true : $this->_switchToSession();
+        $isActive = $this->_isActive();
 
         if ($isActive) {
             $remTime = $this->getRemainingTime();
@@ -833,7 +836,7 @@ class SessionManager implements JsonI {
      * @since 1.8.5
      */
     public function setSessionVar($name,$value) {
-        $isActive = $this->isSessionActive() === true ? true : $this->_switchToSession();
+        $isActive = $this->_isActive();
 
         if ($isActive) {
             $_SESSION[$name] = $value;
@@ -851,13 +854,11 @@ class SessionManager implements JsonI {
      */
     public function setUser($user) {
         $retVal = false;
-        $isActive = $this->isSessionActive() === true ? true : $this->_switchToSession();
+        $isActive = $this->_isActive();
 
-        if ($isActive) {
-            if ($user instanceof User) {
-                $_SESSION[self::$SV][self::MAIN_VARS[6]] = $user;
-                $retVal = true;
-            }
+        if ($isActive && $user instanceof User) {
+            $_SESSION[self::$SV][self::MAIN_VARS[6]] = $user;
+            $retVal = true;
         }
 
         return $retVal;
@@ -882,6 +883,7 @@ class SessionManager implements JsonI {
         try {
             $j->add(self::MAIN_VARS[3], $this->isRefresh());
         } catch (Exception $ex) {
+            $j->add(self::MAIN_VARS[3], 'EXCEPTION');
         }
         $j->add('passed-time', $this->getPassedTime());
         $j->add('timeout-after', $this->getRemainingTime());

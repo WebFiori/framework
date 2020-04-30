@@ -423,20 +423,20 @@ class Cron {
             $job = self::getJob(trim($jobName));
 
             if ($job instanceof CronJob) {
-                $this->_runJob($retVal, $job, $xForce);
+                self::_runJob($retVal, $job, $xForce);
             } else {
                 return 'JOB_NOT_FOUND';
             }
         } else {
             while ($job = Cron::jobsQueue()->dequeue()) {
-                $this->_runJob($retVal, $job, $xForce);
+                self::_runJob($retVal, $job, $xForce);
             }
         }
         self::log('Check finished.');
 
         return $retVal;
     }
-    private function _runJob(&$retVal, $job, $xForce) {
+    private static function _runJob(&$retVal, $job, $xForce) {
         if ($job->isTime() || $xForce) {
             $job->setIsForced($xForce);
             self::_get()->_setActiveJob($job);

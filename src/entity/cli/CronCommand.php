@@ -85,6 +85,7 @@ class CronCommand extends CLICommand{
                 fprintf(STDERR, $message."\n");
             }
         }
+        return $retVal;
     }
     private function _force() {
         $jobName = $this->getArgValue('job-name');

@@ -384,7 +384,6 @@ class Util {
             //in the same month.
             $startDay = $backInTime;
             $startMonth = $thisMonth < 10 ? '0'.$thisMonth : $thisMonth;
-            $startYear = $thisYear;
         } else {
             //we need to go back to prevuse month. 
             $prevMonthNum = $thisMonth - 1 != 0 ? $thisMonth - 1 : 12;

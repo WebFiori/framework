@@ -781,7 +781,7 @@ class SessionManager implements JsonI {
      */
     public function setIsRefresh($bool) {
         if ($this->_switchToSession()) {
-            $_SESSION[self::$SV][self::MAIN_VARS[3]] = $bool === true ? true : false;
+            $_SESSION[self::$SV][self::MAIN_VARS[3]] = $bool === true;
         }
     }
     private function _setLifetimeHelper($time) {
@@ -789,8 +789,16 @@ class SessionManager implements JsonI {
         $_SESSION[self::$SV][self::MAIN_VARS[0]] = $time * 60;
 
         $params = session_get_cookie_params();
-        $secure = isset($params['secure']) ? $params['secure'] : false;
-        $httponly = isset($params['httponly']) ? $params['httponly'] : false;
+        if(isset($params['secure'])){
+            $secure =  $params['secure'];
+        } else {
+            $secure = false;
+        }
+        if(isset($params['httponly'])){
+            $httponly = $params['httponly'];
+        } else {
+            $httponly = false;
+        }
         $path = isset($params['path']) ? $params['path'] : '/';
         session_set_cookie_params(time() + $this->getLifetime() * 60, $path, $params['domain'], $secure, $httponly);
 
@@ -997,8 +1005,16 @@ class SessionManager implements JsonI {
      */
     private function _kill() {
         $params = session_get_cookie_params();
-        $secure = isset($params['secure']) ? $params['secure'] : false;
-        $httponly = isset($params['httponly']) ? $params['httponly'] : false;
+        if(isset($params['secure'])){
+            $secure = $params['secure'];
+        } else {
+            $secure = false;
+        }
+        if(isset($params['httponly'])){
+            $httponly = $params['httponly'];
+        } else {
+            $httponly = false;
+        }
         $path = isset($params['path']) ? $params['path'] : '/';
         session_destroy();
         session_set_cookie_params(0, $path, $params['domain'], $secure, $httponly);
@@ -1037,7 +1053,7 @@ class SessionManager implements JsonI {
                 $ip = '127.0.0.1';
             }
             $_SESSION[self::$SV][self::MAIN_VARS[5]] = $ip;
-            $_SESSION[self::$SV][self::MAIN_VARS[3]] = $refresh === true ? true : false;
+            $_SESSION[self::$SV][self::MAIN_VARS[3]] = $refresh === true;
             $this->_initLang(true,$useDefaultLang);
         }
 

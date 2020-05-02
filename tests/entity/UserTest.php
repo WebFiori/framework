@@ -170,7 +170,7 @@ class UserTest extends TestCase {
      * @depends test00
      */
     public function toStringTest00($user) {
-        $this->assertEquals('{"user-id":-1, "email":"", "display-name":null, "username":""}',$user.'');
+        $this->assertEquals('{"userId":-1, "email":"", "displayName":null, "username":""}',$user.'');
     }
     private function initPrivileges() {
         Access::clear();

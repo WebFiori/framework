@@ -368,14 +368,12 @@ class File implements JsonI {
      * @param int $to The byte at which the method will read data to. If -1 
      * is given, then the method will read till last byte. Default is 
      * -1.
-     * @throws FileException The method will throw an exception with the message 
-     * "File absolute path is invalid." if absolute path is empty string. Also, 
-     * an exception with the message "Unable to open the file 'f_path'." if 
-     * the method was unable to create the resource which is used to read 
-     * the file. An exception with the message "File not found: 'f_path'." 
-     * if no file was found which has the given path and name. "f_path" is the 
-     * absolute path of the file.
-     * @since 1.1.1
+     * @throws FileException The method will throw an exception in 3 cases: 
+     * <ul>
+     * <li>If file name is not set.</li>
+     * <li>If file path is not set.</li>
+     * <li>If the file does not exist.</li>
+     * </ul>
      */
     public function read($from = -1,$to = -1) {
         $fPath = $this->_checkNameAndPath();
@@ -545,21 +543,17 @@ class File implements JsonI {
      * @param boolean $create If the file does not exist and this attribute is set 
      * to true, the method will attempt to create the file. Default is false.
      * 
-     * @throws FileException The method will throw an exception with the message 
-     * "File absolute path is invalid." if file absolute path is invalid. Also, 
-     * The method will throw an exception with the message "Path cannot be empty string." 
-     * if provided file path is empty string. Also, an exception with the message 
-     * "Path cannot be empty string." is thrown if the optional path is provided 
-     * but file name is not set. Finally, an exception with the message 
-     * "Unable to open the file at 'f_path'." is thrown in case the method was 
-     * unable to create the resource which is used to write data.
+     * @throws FileException The method will throw an exception in 3 cases: 
+     * <ul>
+     * <li>If file name is not set.</li>
+     * <li>If file path is not set.</li>
+     * <li>If the file does not exist and the parameter $create is set to false.</li>
+     * </ul>
      * @since 1.1.1
      */
     public function write($append = true, $create = false) {
         $pathV = $this->_checkNameAndPath();
-        if(!$this->_writeHelper($pathV, $append === true, $create === true)){
-            throw new FileException("File absolute path is invalid: '".$pathV."'.");
-        }
+        $this->_writeHelper($pathV, $append === true, $create === true);
     }
     private function _readHelper($fPath,$from,$to) {
         if (file_exists($fPath)) {

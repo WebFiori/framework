@@ -4,6 +4,7 @@ namespace webfiori\tests\entity;
 use PHPUnit\Framework\TestCase;
 use webfiori\entity\File;
 use webfiori\entity\exceptions\FileException;
+use jsonx\JsonX;
 /**
  * A test class for testing the class 'webfiori\entity\File'.
  *
@@ -107,16 +108,35 @@ class FileTest extends TestCase {
         $this->assertEquals('World.', $file->getRawData());
         $file->setRawData('Hello.');
         $file->write();
-        $this->assertEquals('World.Hello', $file->getRawData());
+        $file->read();
+        $this->assertEquals('World.Hello.', $file->getRawData());
         return $file;
     }
     /**
      * @test
+     * @param File $file
      * @depends testWrite01
+     */
+    public function toJson00($file) {
+        $this->assertEquals('{'
+                . '"id":-1, '
+                . '"mime":"text\/plain", '
+                . '"name":"'.$file->getName().'", '
+                . '"path":"'.JsonX::escapeJSONSpecialChars($file->getPath()).'", '
+                . '"sizeInBytes":12, '
+                . '"sizeInKBytes":0.01171875, '
+                . '"sizeInMBytes":1.1444091796875E-5'
+                . '}',$file->toJSON().'');
+        return $file;
+    }
+    /**
+     * @test
+     * @depends toJson00
      * @param File $file
      */
     public function testRemove00($file) {
         $this->assertTrue($file->remove());
         $this->assertFalse(file_exists($file->getAbsolutePath()));
     }
+    
 }

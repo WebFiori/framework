@@ -233,25 +233,7 @@ class Util {
             if (class_exists('webfiori\conf\SiteConfig')) {
                 if (Config::isConfig() === true || WebFiori::getClassStatus() == 'INITIALIZING') {
                     if ($checkDb === true) {
-                        $connInfo = Config::getDBConnection($dbName);
-
-                        if ($connInfo instanceof DBConnectionInfo) {
-                            $returnValue = DBConnectionFactory::mysqlLink([
-                                'host' => $connInfo->getHost(),
-                                'port' => $connInfo->getPort(),
-                                'user' => $connInfo->getUsername(),
-                                'pass' => $connInfo->getPassword(),
-                                'db-name' => $connInfo->getDBName()
-                            ]);
-
-                            if (gettype($returnValue) == 'object') {
-                                $returnValue = true;
-                            } else {
-                                $returnValue = self::DB_NEED_CONF;
-                            }
-                        } else {
-                            $returnValue = self::DB_NEED_CONF;
-                        }
+                        $returnValue = $this->_checkDbStatus($dbName);
                     } else {
                         $returnValue = true;
                     }
@@ -265,6 +247,28 @@ class Util {
             $returnValue = Util::MISSING_CONF_FILE;
         }
 
+        return $returnValue;
+    }
+    private static function _checkDbStatus($dbName) {
+        $connInfo = Config::getDBConnection($dbName);
+        $returnValue = false;
+        if ($connInfo instanceof DBConnectionInfo) {
+            $returnValue = DBConnectionFactory::mysqlLink([
+                'host' => $connInfo->getHost(),
+                'port' => $connInfo->getPort(),
+                'user' => $connInfo->getUsername(),
+                'pass' => $connInfo->getPassword(),
+                'db-name' => $connInfo->getDBName()
+            ]);
+
+            if (gettype($returnValue) == 'object') {
+                $returnValue = true;
+            } else {
+                $returnValue = self::DB_NEED_CONF;
+            }
+        } else {
+            $returnValue = self::DB_NEED_CONF;
+        }
         return $returnValue;
     }
     /**
@@ -486,30 +490,39 @@ class Util {
             $headers = apache_request_headers();
 
             foreach ($headers as $k => $v) {
-                $retVal[strtolower($k)] = $v;
+                $retVal[strtolower($k)] = filter_var($v, FILTER_SANITIZE_STRING);
             }
         } else if (isset($_SERVER)) {
-            foreach ($_SERVER as $k => $v) {
-                $split = explode('_', $k);
-
-                if ($split[0] == 'HTTP') {
-                    $headerName = '';
-                    $count = count($split);
-
-                    for ($x = 0 ; $x < $count ; $x++) {
-                        if ($x + 1 == $count && $split[$x] != 'HTTP') {
-                            $headerName = $headerName.$split[$x];
-                        } else if ($x == 1 && $split[$x] != 'HTTP') {
-                            $headerName = $split[$x].'-';
-                        } else if ($split[$x] != 'HTTP') {
-                            $headerName = $headerName.$split[$x].'-';
-                        }
-                    }
-                    $retVal[strtolower($headerName)] = $v;
-                }
-            }
+            $retVal = $this->_getRequestHeadersFromServer();
         }
 
+        return $retVal;
+    }
+    /**
+     * Collect request headers from the array $_SERVER.
+     * @return array
+     */
+    private function _getRequestHeadersFromServer() {
+        $retVal = [];
+        foreach ($_SERVER as $k => $v) {
+            $split = explode('_', $k);
+
+            if ($split[0] == 'HTTP') {
+                $headerName = '';
+                $count = count($split);
+
+                for ($x = 0 ; $x < $count ; $x++) {
+                    if ($x + 1 == $count && $split[$x] != 'HTTP') {
+                        $headerName = $headerName.$split[$x];
+                    } else if ($x == 1 && $split[$x] != 'HTTP') {
+                        $headerName = $split[$x].'-';
+                    } else if ($split[$x] != 'HTTP') {
+                        $headerName = $headerName.$split[$x].'-';
+                    }
+                }
+                $retVal[strtolower($headerName)] = filter_var($v, FILTER_SANITIZE_STRING);
+            }
+        }
         return $retVal;
     }
     /**

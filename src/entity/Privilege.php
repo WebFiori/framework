@@ -129,14 +129,14 @@ class Privilege implements JsonI {
      * The generated JSON string will have the following format:
      * <p>
      * {<br/>
-     * &nbsp;&nbsp;"privilege-id":"",<br/>
+     * &nbsp;&nbsp;"privilegeId":"",<br/>
      * &nbsp;&nbsp;"name":"",<br/>
      * }
      * </p> 
      */
     public function toJSON() {
         $j = new JsonX();
-        $j->add('privilege-id', $this->getID());
+        $j->add('privilegeId', $this->getID());
         $j->add('name', $this->getName());
 
         return $j;

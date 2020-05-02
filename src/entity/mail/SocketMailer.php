@@ -180,13 +180,10 @@ class SocketMailer {
     public function addAttachment($attachment) {
         $retVal = false;
 
-        if (class_exists('webfiori\entity\File')) {
-            if ($attachment instanceof File) {
-                if (file_exists($attachment->getAbsolutePath()) || file_exists(str_replace('\\', '/', $attachment->getAbsolutePath())) || $attachment->getRawData() !== null) {
-                    $this->attachments[] = $attachment;
-                    $retVal = true;
-                }
-            }
+        if (class_exists('webfiori\entity\File') && $attachment instanceof File 
+            && (file_exists($attachment->getAbsolutePath()) || file_exists(str_replace('\\', '/', $attachment->getAbsolutePath())) || $attachment->getRawData() !== null)) {
+            $this->attachments[] = $attachment;
+            $retVal = true;
         }
 
         return $retVal;
@@ -243,22 +240,16 @@ class SocketMailer {
             set_error_handler(function()
             {
             });
-//            Logger::log('Checking if SSL or TLS will be used...');
-            $port = $this->port;
+            $portNum = $this->port;
             $protocol = '';
 
-            if ($port == 465) {
+            if ($portNum == 465) {
                 $protocol = "ssl://";
-            //Logger::log('SSL will be used.');
-            } else {
-                if ($port == 587) {
-                    //Logger::log('TLS will be used.');
-                    $protocol = "tls://";
-                }
+            } else if ($portNum == 587) {
+                $protocol = "tls://";
             }
             $err = 0;
             $errStr = '';
-            //$protocol = $port == 465 ? "ssl://" : '';
             if (function_exists('stream_socket_client')) {
                 $context = stream_context_create([
                     'ssl' => [
@@ -267,14 +258,14 @@ class SocketMailer {
                         'allow_self_signed' => true
                     ]
                 ]);
-                $this->conn = stream_socket_client($protocol.$this->host.':'.$port, $err, $errStr, $this->timeout * 60, STREAM_CLIENT_CONNECT, $context);
+                $this->conn = stream_socket_client($protocol.$this->host.':'.$portNum, $err, $errStr, $this->timeout * 60, STREAM_CLIENT_CONNECT, $context);
             } else {
-                $this->conn = fsockopen($protocol.$this->host, $port, $err, $errStr, $this->timeout * 60);
+                $this->conn = fsockopen($protocol.$this->host, $portNum, $err, $errStr, $this->timeout * 60);
             }
             set_error_handler(null);
 
             if (is_resource($this->conn)) {
-                $response = $this->read();
+                $this->read();
 
                 if ($this->sendC('EHLO '.$this->host)) {
                     $retVal = true;
@@ -463,7 +454,7 @@ class SocketMailer {
      */
     public function isSSL($bool = null) {
         if ($bool !== null) {
-            $this->useSsl = $bool === true ? true : false;
+            $this->useSsl = $bool === true;
 
             if ($this->useSsl) {
                 $this->useTls = false;
@@ -484,7 +475,7 @@ class SocketMailer {
      */
     public function isTLS($bool = null) {
         if ($bool !== null) {
-            $this->useTls = $bool === true ? true : false;
+            $this->useTls = $bool === true;
 
             if ($this->useTls) {
                 $this->useSsl = false;
@@ -511,24 +502,22 @@ class SocketMailer {
      * @since 1.2
      */
     public function login($username,$password) {
-        if ($this->isConnected()) {
-            if (strlen($this->getSenderAddress()) != 0) {
-                $this->sendC('AUTH LOGIN');
-                $this->sendC(base64_encode($username));
-                $this->sendC(base64_encode($password));
+        if ($this->isConnected() && strlen($this->getSenderAddress()) != 0) {
+            $this->sendC('AUTH LOGIN');
+            $this->sendC(base64_encode($username));
+            $this->sendC(base64_encode($password));
 
-                if ($this->getLastLogMessage() == '535 Incorrect authentication data') {
-                    return false;
-                }
-                //a command to check if authentication is done
-                $this->sendC('MAIL FROM: <'.$this->getSenderAddress().'>');
+            if ($this->getLastLogMessage() == '535 Incorrect authentication data') {
+                return false;
+            }
+            //a command to check if authentication is done
+            $this->sendC('MAIL FROM: <'.$this->getSenderAddress().'>');
 
-                if ($this->getLastResponseCode() == 235 || 
-                $this->getLastResponseCode() == 250) {
-                    $this->isLoggedIn = true;
-                } else {
-                    $this->isLoggedIn = false;
-                }
+            if ($this->getLastResponseCode() == 235 || 
+            $this->getLastResponseCode() == 250) {
+                $this->isLoggedIn = true;
+            } else {
+                $this->isLoggedIn = false;
             }
         }
 
@@ -546,7 +535,7 @@ class SocketMailer {
             $str = fgets($this->conn);
             $message .= $str;
 
-            if (!isset($str[3]) or (isset($str[3]) and $str[3] == ' ')) {
+            if (!isset($str[3]) || (isset($str[3]) && $str[3] == ' ')) {
                 break;
             }
         }
@@ -676,53 +665,56 @@ class SocketMailer {
                 $this->sendC(self::NL.'.');
                 $this->sendC('QUIT');
             }
-        } else {
-            if (strlen($this->getSenderAddress()) != 0) {
-                foreach ($this->receivers as $address => $name) {
-                    $this->sendC('RCPT TO: <'.$address.'>');
-                }
+        } else if (strlen($this->getSenderAddress()) != 0) {
+            $this->_receiversCommand();
+            $this->sendC('DATA');
+            $importanceHeaderVal = $this->_priorityCommand();
+            
+            $this->sendC('Content-Transfer-Encoding: quoted-printable');
+            $this->sendC('Importance: '.$importanceHeaderVal);
+            $this->sendC('From: "'.$this->getSenderName().'" <'.$this->getSenderAddress().'>');
+            $this->sendC('To: '.$this->getReceiversStr());
+            $this->sendC('CC: '.$this->getCCStr());
+            $this->sendC('BCC: '.$this->getBCCStr());
+            $this->sendC('Date:'.date('r (T)'));
+            $this->sendC('Subject:'.$this->subject);
+            $this->sendC('MIME-Version: 1.0');
+            $this->sendC('Content-Type: multipart/mixed; boundary="'.$this->boundry.'"'.self::NL);
+            $this->sendC('--'.$this->boundry);
+            $this->sendC('Content-Type: text/html; charset="UTF-8"'.self::NL);
+            $this->sendC(trim($msg,"\t\n\r\0\x0B\0x1B\0x0C"));
 
-                foreach ($this->cc as $address => $name) {
-                    $this->sendC('RCPT TO: <'.$address.'>');
-                }
-
-                foreach ($this->bcc as $address => $name) {
-                    $this->sendC('RCPT TO: <'.$address.'>');
-                }
-                $this->sendC('DATA');
-                $priorityAsInt = $this->getPriority();
-                $priorityHeaderVal = self::PRIORITIES[$priorityAsInt];
-
-                if ($priorityAsInt == -1) {
-                    $importanceHeaderVal = 'low';
-                } else {
-                    if ($priorityAsInt == 1) {
-                        $importanceHeaderVal = 'High';
-                    } else {
-                        $importanceHeaderVal = 'normal';
-                    }
-                }
-                $this->sendC('Priority: '.$priorityHeaderVal);
-                $this->sendC('Content-Transfer-Encoding: quoted-printable');
-                $this->sendC('Importance: '.$importanceHeaderVal);
-                $this->sendC('From: "'.$this->getSenderName().'" <'.$this->getSenderAddress().'>');
-                $this->sendC('To: '.$this->getReceiversStr());
-                $this->sendC('CC: '.$this->getCCStr());
-                $this->sendC('BCC: '.$this->getBCCStr());
-                $this->sendC('Date:'.date('r (T)'));
-                $this->sendC('Subject:'.$this->subject);
-                $this->sendC('MIME-Version: 1.0');
-                $this->sendC('Content-Type: multipart/mixed; boundary="'.$this->boundry.'"'.self::NL);
-                $this->sendC('--'.$this->boundry);
-                $this->sendC('Content-Type: text/html; charset="UTF-8"'.self::NL);
-                $this->sendC(trim($msg,"\t\n\r\0\x0B\0x1B\0x0C"));
-
-                if ($sendMessage === true) {
-                    $this->_appendAttachments();
-                    $this->sendC(self::NL.'.');
-                    $this->sendC('QUIT');
-                }
+            if ($sendMessage === true) {
+                $this->_appendAttachments();
+                $this->sendC(self::NL.'.');
+                $this->sendC('QUIT');
             }
+        }
+    }
+    private function _priorityCommand() {
+        $priorityAsInt = $this->getPriority();
+        $priorityHeaderVal = self::PRIORITIES[$priorityAsInt];
+        if ($priorityAsInt == -1) {
+            $importanceHeaderVal = 'low';
+        } else if ($priorityAsInt == 1) {
+            $importanceHeaderVal = 'High';
+        } else {
+            $importanceHeaderVal = 'normal';
+        }
+        $this->sendC('Priority: '.$priorityHeaderVal);
+        return $importanceHeaderVal;
+    }
+    private function _receiversCommand() {
+        foreach ($this->receivers as $address => $name) {
+            $this->sendC('RCPT TO: <'.$address.'>');
+        }
+
+        foreach ($this->cc as $address => $name) {
+            $this->sendC('RCPT TO: <'.$address.'>');
+        }
+
+        foreach ($this->bcc as $address => $name) {
+            $this->sendC('RCPT TO: <'.$address.'>');
         }
     }
     /**

@@ -24,12 +24,13 @@
  */
 namespace webfiori\entity\router;
 
-use jsonx\JsonX;
-use phpStructs\html\HTMLNode;
-use restEasy\WebServices;
 use webfiori\conf\SiteConfig;
 use webfiori\entity\Util;
 use webfiori\entity\CLI;
+use webfiori\entity\ui\NotFoundView;
+use jsonx\JsonX;
+use phpStructs\html\HTMLNode;
+use restEasy\WebServices;
 /**
  * The basic class that is used to route user requests to the correct 
  * location.
@@ -132,21 +133,17 @@ class Router {
         $this->routes = [];
         $this->onNotFound = function ()
         {
-            header("HTTP/1.1 404 Not found");
-            die(''
-                    .'<!DOCTYPE html>'
-                    .'<html>'
-                    .'<head>'
-                    .'<title>Not Found</title>'
-                    .'</head>'
-                    .'<body>'
-                    .'<h1>404 - Not Found</h1>'
-                    .'<hr>'
-                    .'<p>'
-                    .'The resource <b>'.Util::getRequestedURL().'</b> was not found on the server.'
-                    .'</p>'
-                    .'</body>'
-                    .'</html>');
+            if(!defined('API_CALL')){
+                $notFoundView = new NotFoundView();
+                $notFoundView->display();
+            } else {
+                $json = new JsonX([
+                    'message' => 'Requested resource was not found.',
+                    'type' => 'error'
+                ]);
+                http_response_code(404);
+                echo $json;
+            }
         };
 
         if (class_exists('webfiori\conf\SiteConfig')) {

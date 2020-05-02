@@ -216,17 +216,19 @@ class AutoLoader {
             }
             $onFail = isset($options['on-load-failure']) ? $options['on-load-failure'] : self::ON_FAIL_ACTIONS[0];
             self::$loader = new AutoLoader($root, $frameworkSearchFoldres, $defineRoot,$onFail);
-
-            if (defined('LOAD_COMPOSER_PACKAGES') && LOAD_COMPOSER_PACKAGES === true) {
-                $composerVendor = self::_getComposerVendorDir();
-
-                if (strlen($composerVendor) != 0) {
-                    self::$loader->addSearchDirectory($composerVendor, true, false);
-                }
-            }
+            self::_checkComposer();
         }
 
         return self::$loader;
+    }
+    private static function _checkComposer() {
+        if (defined('LOAD_COMPOSER_PACKAGES') && LOAD_COMPOSER_PACKAGES === true) {
+            $composerVendor = self::_getComposerVendorDir();
+
+            if (strlen($composerVendor) != 0) {
+                self::$loader->addSearchDirectory($composerVendor, true, false);
+            }
+        }
     }
     /**
      * Returns an array that contains the paths to all files which has a class 

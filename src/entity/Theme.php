@@ -153,13 +153,9 @@ abstract class Theme implements JsonI {
         $this->setJsDirName('js');
         $this->setImagesDirName('images');
         $this->themeComponents = [];
-        $this->afterLoaded = function()
-        {
-        };
+        $this->afterLoaded = null;
         $this->afterLoadedParams = [];
-        $this->beforeLoaded = function()
-        {
-        };
+        $this->beforeLoaded = null;
         $this->beforeLoadedParams = [];
     }
     /**
@@ -254,29 +250,31 @@ abstract class Theme implements JsonI {
             foreach ($themesDirs as $dir) {
                 $pathToScan = THEMES_PATH.$DS.$dir;
                 $filesInDir = array_diff(scandir($pathToScan), ['..', '.']);
-
-                foreach ($filesInDir as $fileName) {
-                    $fileExt = substr($fileName, -4);
-
-                    if ($fileExt == '.php') {
-                        $cName = str_replace('.php', '', $fileName);
-                        $ns = require_once $pathToScan.$DS.$fileName;
-                        $aNs = $ns != 1 ? $ns.'\\' : '';
-                        $aCName = $aNs.$cName;
-
-                        if (class_exists($aCName)) {
-                            $instance = new $aCName();
-
-                            if ($instance instanceof Theme) {
-                                self::$AvailableThemes[$instance->getName()] = $instance;
-                            }
-                        }
-                    }
-                }
+                self::_scanDir($filesInDir, $pathToScan);
             }
         }
 
         return self::$AvailableThemes;
+    }
+    private static function _scanDir($filesInDir, $pathToScan) {
+        foreach ($filesInDir as $fileName) {
+            $fileExt = substr($fileName, -4);
+
+            if ($fileExt == '.php') {
+                $cName = str_replace('.php', '', $fileName);
+                $ns = require_once $pathToScan.DIRECTORY_SEPARATOR.$fileName;
+                $aNs = $ns != 1 ? $ns.'\\' : '';
+                $aCName = $aNs.$cName;
+
+                if (class_exists($aCName)) {
+                    $instance = new $aCName();
+
+                    if ($instance instanceof Theme) {
+                        self::$AvailableThemes[$instance->getName()] = $instance;
+                    }
+                }
+            }
+        }
     }
     /**
      * Returns the base URL that will be used by the theme.
@@ -451,7 +449,9 @@ abstract class Theme implements JsonI {
      * @since 1.0
      */
     public function invokeAfterLoaded() {
-        call_user_func($this->afterLoaded, $this->afterLoadedParams);
+        if(is_callable($this->afterLoaded)){
+            call_user_func($this->afterLoaded, $this->afterLoadedParams);
+        }
     }
     /**
      * Fire the callback function which should be called before loading the theme.
@@ -460,7 +460,9 @@ abstract class Theme implements JsonI {
      * @since 1.2.1
      */
     public function invokeBeforeLoaded() {
-        call_user_func($this->beforeLoaded, $this->beforeLoadedParams);
+        if(is_callable($this->beforeLoaded)){
+            call_user_func($this->beforeLoaded, $this->beforeLoadedParams);
+        }
     }
 
     /**
@@ -699,14 +701,14 @@ abstract class Theme implements JsonI {
      * the following information:
      * <p>
      * {<br/>
-     * &nbsp;&nbsp;"themes-path":""<br/>
+     * &nbsp;&nbsp;"themesPath":""<br/>
      * &nbsp;&nbsp;"name":""<br/>
      * &nbsp;&nbsp;"version":""<br/>
      * &nbsp;&nbsp;"author":""<br/>
-     * &nbsp;&nbsp;"images-dir-name":""<br/>
-     * &nbsp;&nbsp;"theme-dir-name":""<br/>
-     * &nbsp;&nbsp;"css-dir-name":""<br/>
-     * &nbsp;&nbsp;"js-dir-name":""<br/>
+     * &nbsp;&nbsp;"imagesDirName":""<br/>
+     * &nbsp;&nbsp;"themeDirName":""<br/>
+     * &nbsp;&nbsp;"cssDirName":""<br/>
+     * &nbsp;&nbsp;"jsDirName":""<br/>
      * &nbsp;&nbsp;"components":[]<br/>
      * }
      * </p>
@@ -715,18 +717,18 @@ abstract class Theme implements JsonI {
     public function toJSON() {
         self::defineThemesDir();
         $j = new JsonX();
-        $j->add('themes-path', THEMES_PATH);
+        $j->add('themesPath', THEMES_PATH);
         $j->add('name', $this->getName());
         $j->add('url', $this->getUrl());
         $j->add('license', $this->getLicenseName());
-        $j->add('license-url', $this->getLicenseUrl());
+        $j->add('licenseUrl', $this->getLicenseUrl());
         $j->add('version', $this->getVersion());
         $j->add('author', $this->getAuthor());
-        $j->add('author-url', $this->getAuthorUrl());
-        $j->add('images-dir-name', $this->getImagesDirName());
-        $j->add('theme-dir-name', $this->getDirectoryName());
-        $j->add('css-dir-name', $this->getCssDirName());
-        $j->add('js-dir-name', $this->getJsDirName());
+        $j->add('authorUrl', $this->getAuthorUrl());
+        $j->add('imagesDirName', $this->getImagesDirName());
+        $j->add('themeDirName', $this->getDirectoryName());
+        $j->add('cssDirName', $this->getCssDirName());
+        $j->add('jsDirName', $this->getJsDirName());
         $j->add('components', $this->getComponents());
 
         return $j;

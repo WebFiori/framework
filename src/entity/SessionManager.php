@@ -696,6 +696,47 @@ class SessionManager implements JsonI {
         return $retVal;
     }
     /**
+     * 
+     * @return boolean
+     */
+    private function _setSessionParams($tmpId, $sessionTime) {
+        $retVal = false;
+        $ip = filter_var($_SERVER['REMOTE_ADDR'],FILTER_VALIDATE_IP);
+
+        if ($ip == '::1') {
+            $ip = '127.0.0.1';
+        }
+
+        if ($this->getStartIpAddress() == $ip) {
+            $this->sId = $tmpId;
+            $this->resumed = true;
+            $this->sessionStatus = self::RESUMED;
+            //update resume time
+            $_SESSION[self::$SV][self::MAIN_VARS[2]] = time();
+            $_SESSION[self::$SV][self::MAIN_VARS[4]] = $this->getName();
+
+            //if time is -1, then get stored one.
+            //else, update session time.
+            $sessionTime = $sessionTime == -1 ? $this->getLifetime() * 60 : $sessionTime * 60;
+
+            $_SESSION[self::$SV][self::MAIN_VARS[0]] = $sessionTime;
+            $this->resumed = true;
+            $this->new = false;
+
+            if ($this->isRefresh()) {
+                //refresh time till session cookie is dead
+                $params = session_get_cookie_params();
+                setcookie($this->getName(), $this->getID(),time() + $sessionTime, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
+                $this->setUser($this->getUser());
+            }
+            $retVal = true;
+        } else {
+            $this->kill();
+            $this->sessionStatus = self::INV_IP_ADDRESS;
+        }
+        return $retVal;
+    }
+    /**
      * Checks if there exist a session with the given session name or not. If there 
      * is a one and it is not timed out, the method will resume it.
      * @return boolean true if there is a session with the given name 
@@ -724,39 +765,7 @@ class SessionManager implements JsonI {
 
             if ($this->_validateAttrs()) {
                 if (!$this->isTimeout()) {
-                    $ip = filter_var($_SERVER['REMOTE_ADDR'],FILTER_VALIDATE_IP);
-
-                    if ($ip == '::1') {
-                        $ip = '127.0.0.1';
-                    }
-
-                    if ($this->getStartIpAddress() == $ip) {
-                        $this->sId = $tmpId;
-                        $this->resumed = true;
-                        $this->sessionStatus = self::RESUMED;
-                        //update resume time
-                        $_SESSION[self::$SV][self::MAIN_VARS[2]] = time();
-                        $_SESSION[self::$SV][self::MAIN_VARS[4]] = $this->getName();
-
-                        //if time is -1, then get stored one.
-                        //else, update session time.
-                        $sessionTime = $sessionTime == -1 ? $this->getLifetime() * 60 : $sessionTime * 60;
-
-                        $_SESSION[self::$SV][self::MAIN_VARS[0]] = $sessionTime;
-                        $this->resumed = true;
-                        $this->new = false;
-
-                        if ($this->isRefresh()) {
-                            //refresh time till session cookie is dead
-                            $params = session_get_cookie_params();
-                            setcookie($this->getName(), $this->getID(),time() + $sessionTime, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
-                            $this->setUser($this->getUser());
-                        }
-                        $retVal = true;
-                    } else {
-                        $this->kill();
-                        $this->sessionStatus = self::INV_IP_ADDRESS;
-                    }
+                    $this->_setSessionParams($tmpId, $sessionTime);
                 } else {
                     $this->kill();
                     $this->sessionStatus = self::EXPIRED;
@@ -885,16 +894,16 @@ class SessionManager implements JsonI {
             $lifetime = self::DEFAULT_SESSION_DURATION;
         }
         $j->add('duration', $lifetime * 60);
-        $j->add('has-cookie', $this->hasCookie());
-        $j->add('session-id', $this->getID());
+        $j->add('hasCookie', $this->hasCookie());
+        $j->add('sessionId', $this->getID());
         $j->add('language', $this->getLang());
         try {
             $j->add(self::MAIN_VARS[3], $this->isRefresh());
         } catch (Exception $ex) {
             $j->add(self::MAIN_VARS[3], 'EXCEPTION');
         }
-        $j->add('passed-time', $this->getPassedTime());
-        $j->add('timeout-after', $this->getRemainingTime());
+        $j->add('passedTime', $this->getPassedTime());
+        $j->add('timeoutAfter', $this->getRemainingTime());
         $stTm = $this->getStartTime();
 
         if ($stTm != PHP_SESSION_NONE && $stTm != PHP_SESSION_ACTIVE && $stTm != PHP_SESSION_DISABLED) {
@@ -948,39 +957,17 @@ class SessionManager implements JsonI {
         //used in case no language found 
         //in $_GET['lang']
         $defaultLang = class_exists('webfiori\conf\SiteConfig') ? SiteConfig::getPrimaryLanguage() : 'EN';
-        $lang = null;
-
-        if (isset($_GET[self::MAIN_VARS[7]])) {
-            $lang = filter_var($_GET[self::MAIN_VARS[7]],FILTER_SANITIZE_STRING);
-        }
-
-        if ($lang == false || $lang == null) {
-            if (isset($_POST[self::MAIN_VARS[7]])) {
-                $lang = filter_var($_POST[self::MAIN_VARS[7]],FILTER_SANITIZE_STRING);
-            }
-
-            if ($lang == false || $lang == null) {
-                $lang = filter_input(INPUT_COOKIE, self::MAIN_VARS[7]);
-
-                if ($lang == false || $lang == null) {
-                    $lang = null;
-                }
-            }
-        }
+        $langCode = $this->_getLangFromRequest();
         $retVal = false;
 
-        if (isset($_SESSION[self::$SV][self::MAIN_VARS[7]]) && $lang == null) {
+        if (isset($_SESSION[self::$SV][self::MAIN_VARS[7]]) && $langCode == null) {
             $retVal = false;
-        } else {
-            if ($lang == null && $useDefault === true) {
-                $lang = $defaultLang;
-            } else {
-                if ($lang == null && $useDefault !== true) {
-                    $retVal = false;
-                }
-            }
+        } else if ($langCode == null && $useDefault === true) {
+            $langCode = $defaultLang;
+        } else if ($langCode == null && $useDefault !== true) {
+            $retVal = false;
         }
-        $langU = strtoupper($lang);
+        $langU = strtoupper($langCode);
 
         if (strlen($langU) == 2) {
             $_SESSION[self::$SV][self::MAIN_VARS[7]] = $langU;
@@ -993,6 +980,34 @@ class SessionManager implements JsonI {
         } else {
             $retVal = false;
         }
+    }
+    /**
+     * 
+     * @return string|null
+     */
+    private function _getLangFromRequest() {
+        $lang = null;
+        //get language code from $_GET
+        if (isset($_GET[self::MAIN_VARS[7]])) {
+            $lang = filter_var($_GET[self::MAIN_VARS[7]],FILTER_SANITIZE_STRING);
+        }
+        
+        if (!$lang || $lang == null) {
+            //if not in $_GET, check $_POST
+            if (isset($_POST[self::MAIN_VARS[7]])) {
+                $lang = filter_var($_POST[self::MAIN_VARS[7]],FILTER_SANITIZE_STRING);
+            }
+            
+            //If not in $_POST, check cookie.
+            if (!$lang || $lang == null) {
+                $lang = filter_input(INPUT_COOKIE, self::MAIN_VARS[7]);
+
+                if (!$lang || $lang == null) {
+                    $lang = null;
+                }
+            }
+        }
+        return $lang;
     }
     /**
      * @since 1.8.1

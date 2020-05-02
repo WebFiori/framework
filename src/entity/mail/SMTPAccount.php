@@ -67,24 +67,10 @@ class SMTPAccount {
      */
     private $userName;
     /**
-     * A boolean value that is set to TRUE if connection uses SSL.
-     * @var boolean
-     * @since 1.0.1 
-     */
-    private $useSsl;
-    /**
-     * A boolean value that is set to TRUE if connection uses TLS.
-     * @var boolean
-     * @since 1.0.1 
-     */
-    private $useTls;
-    /**
      * Creates new instance of the class.
      * @since 1.0.1
      */
     public function __construct() {
-        //$this->isSSL(FALSE);
-        //$this->isTLS(FALSE);
         $this->setPort(465);
         $this->setUsername('');
         $this->setPassword('');
@@ -190,42 +176,6 @@ class SMTPAccount {
     public function setServerAddress($addr) {
         $this->emailServerAddress = trim($addr);
     }
-    /**
-     * Sets or gets the value of the property 'useTls'.
-     * @param boolean|NULL $bool TRUE if the connection to the server will use TLS. 
-     * FALSE if not. If NULL is given, the property will not updated. Default 
-     * is NULL.
-     * @return boolean $bool TRUE if the connection to the server will use TLS. 
-     * FALSE if not. Default return value is FALSE
-     * @since 1.0.1
-     */
-//    public function isTLS($bool=null){
-//        if($bool !== NULL){
-//            $this->useTls = $bool === TRUE ? TRUE : FALSE;
-//            if($this->useTls){
-//                $this->useSsl = FALSE;
-//            }
-//        }
-//        return $this->useTls;
-//    }
-    /**
-     * Sets or gets the value of the property 'useSsl'.
-     * @param boolean|NULL $bool [Optional] TRUE if the connection to the server will use SSL. 
-     * FALSE if not. If NULL is given, the property will not updated. Default 
-     * is NULL.
-     * @return boolean $bool TRUE if the connection to the server will use SSL. 
-     * FALSE if not. Default return value is FALSE
-     * @since 1.0.1
-     */
-//    public function isSSL($bool=null){
-//        if($bool !== NULL){
-//            $this->useSsl = $bool === TRUE ? TRUE : FALSE;
-//            if($this->useSsl){
-//                $this->useTls = FALSE;
-//            }
-//        }
-//        return $this->useSsl;
-//    }
     /**
      * Sets the username that is used to access email server.
      * @param string $u The username that is used to access email server.

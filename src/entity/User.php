@@ -416,9 +416,9 @@ class User implements JsonI {
      * The JsonX object will create a JSON string which has the following 
      * format:
      * <p>{<br/>
-     * &nbsp;&nbsp;"use-id":-1<br/>
+     * &nbsp;&nbsp;"useId":-1<br/>
      * &nbsp;&nbsp;"email":""<br/>
-     * &nbsp;&nbsp;"display-name":""<br/>
+     * &nbsp;&nbsp;"displayName":""<br/>
      * &nbsp;&nbsp;"username":""<br/>
      * }</p>
      * @return JsonX An object of type JsonX.
@@ -426,9 +426,9 @@ class User implements JsonI {
      */
     public function toJSON() {
         $json = new JsonX();
-        $json->add('user-id', $this->getID());
+        $json->add('userId', $this->getID());
         $json->add('email', $this->getEmail());
-        $json->add('display-name', $this->getDisplayName());
+        $json->add('displayName', $this->getDisplayName());
         $json->add('username', $this->getUserName());
 
         return $json;

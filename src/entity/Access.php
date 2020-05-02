@@ -621,10 +621,8 @@ class Access {
         if ($groupId !== null && $group->getID() == $groupId) {
             return $this->_groupHasPrivilege($prId, $group);
         } else if ($groupId == null) {
-            $retVal = $this->_groupHasPrivilege($prId, $group) 
+            return $this->_groupHasPrivilege($prId, $group) 
                     || $this->_childGroupHasPrivilege($prId, $groupId, $group);
-
-            return $retVal;
         } else {
             $retVal = $this->_childGroupHasPrivilege($prId, $groupId, $group);
         }

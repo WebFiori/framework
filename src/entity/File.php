@@ -384,8 +384,6 @@ class File implements JsonI {
             if (!$this->_readHelper($fPath,$from,$to)) {
                 throw new FileException('File not found: \''.$fPath.'\'.');
             }
-        } else {
-        return;
         }
     }
     /**
@@ -582,8 +580,6 @@ class File implements JsonI {
         } else {
             throw new FileException('File not found: \''.$fPath.'\'.');
         }
-
-        return false;
     }
     private function _setSize($size) {
         if ($size >= 0) {

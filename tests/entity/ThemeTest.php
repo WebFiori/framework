@@ -19,7 +19,7 @@ class ThemeTest extends TestCase {
      */
     public function testToJson00() {
         $theme = Theme::usingTheme();
-        $this->assertEquals('{"themes-path":"'.\jsonx\JsonX::escapeJSONSpecialChars(THEMES_PATH).'", "name":"WebFiori Theme", "url":"https:\/\/ibrahim-2017.blogspot.com\/", "license":"MIT License", "license-url":"https:\/\/opensource.org\/licenses\/MIT", "version":"1.0.1", "author":"Ibrahim Ali", "author-url":"", "images-dir-name":"images", "theme-dir-name":"webfiori", "css-dir-name":"css", "js-dir-name":"js", "components":["LangExt.php"]}',$theme->toJSON().'');
+        $this->assertEquals('{"themesPath":"'.\jsonx\JsonX::escapeJSONSpecialChars(THEMES_PATH).'", "name":"WebFiori Theme", "url":"https:\/\/ibrahim-2017.blogspot.com\/", "license":"MIT License", "licenseUrl":"https:\/\/opensource.org\/licenses\/MIT", "version":"1.0.1", "author":"Ibrahim Ali", "authorUrl":"", "imagesDirName":"images", "themeDirName":"webfiori", "cssDirName":"css", "jsDirName":"js", "components":["LangExt.php"]}',$theme->toJSON().'');
     }
     /**
      * @test

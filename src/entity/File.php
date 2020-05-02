@@ -32,7 +32,7 @@ use jsonx\JsonX;
  * This class can be used to read and write files in binary. In addition to that, 
  * it can be used to view files in web browsers.
  * @author Ibrahim
- * @version 1.1.3
+ * @version 1.1.4
  */
 class File implements JsonI {
     /**
@@ -378,20 +378,33 @@ class File implements JsonI {
      * @since 1.1.1
      */
     public function read($from = -1,$to = -1) {
-        $fPath = $this->getAbsolutePath();
+        $fPath = $this->_checkNameAndPath();
 
-        if ($fPath != '') {
+        if (!$this->_readHelper($fPath,$from,$to)) {
+            $fPath = str_replace('\\', '/', $this->getAbsolutePath());
+
             if (!$this->_readHelper($fPath,$from,$to)) {
-                $fPath = str_replace('\\', '/', $this->getAbsolutePath());
-
-                if (!$this->_readHelper($fPath,$from,$to)) {
-                    throw new FileException('File not found: \''.$fPath.'\'.');
-                }
-            } else {
-                return;
+                throw new FileException('File not found: \''.$fPath.'\'.');
             }
+        } else {
+        return;
         }
-        throw new FileException('File absolute path is invalid.');
+    }
+    /**
+     * 
+     * @return string
+     * @throws FileException
+     */
+    private function _checkNameAndPath() {
+        $fName = $this->getName();
+        if(strlen($fName) != 0){
+            $fPath = $this->getPath();
+            if(strlen($fPath) != 0){
+                return $this->getAbsolutePath();
+            }
+            throw new FileException('Path cannot be empty string.');
+        }
+        throw new FileException('File name cannot be empty string.');
     }
     /**
      * Removes a file given its name and path.
@@ -483,8 +496,8 @@ class File implements JsonI {
      * Returns a JSON string that represents the file.
      * @return string A JSON string on the following format:<br/>
      * <b>{<br/>&nbsp;&nbsp;"id":"",<br/>&nbsp;&nbsp;"mime":"",<br/>&nbsp;&nbsp;"name":""<br/>
-     * &nbsp;&nbsp;"path":""<br/>&nbsp;&nbsp;"size-in-bytes":""<br/>&nbsp;&nbsp;"size-in-kbytes":""<br/>
-     * &nbsp;&nbsp;"size-in-mbytes":""<br/>}</b>
+     * &nbsp;&nbsp;"path":""<br/>&nbsp;&nbsp;"sizeInBytes":""<br/>&nbsp;&nbsp;"sizeInKBytes":""<br/>
+     * &nbsp;&nbsp;"sizeInMBytes":""<br/>}</b>
      * @since 1.0
      */
     public function toJSON() {
@@ -493,9 +506,9 @@ class File implements JsonI {
         $jsonX->add('mime', $this->getFileMIMEType());
         $jsonX->add('name', $this->getName());
         $jsonX->add('path', $this->getPath());
-        $jsonX->add('size-in-bytes', $this->getSize());
-        $jsonX->add('size-in-kbytes', $this->getSize() / 1024);
-        $jsonX->add('size-in-mbytes', ($this->getSize() / 1024) / 1024);
+        $jsonX->add('sizeInBytes', $this->getSize());
+        $jsonX->add('sizeInKBytes', $this->getSize() / 1024);
+        $jsonX->add('sizeInMBytes', ($this->getSize() / 1024) / 1024);
 
         return $jsonX;
     }
@@ -523,13 +536,14 @@ class File implements JsonI {
     }
     /**
      * Write raw binary data into a file.
-     * The method will write the data using the binary write mode 'wb' mode. 
-     * This means that if the file does not exist, the method will try to 
-     * created it. If it fails, It will throw an exception. Note that if an 
-     * optional path is provided, the name of the file must be set first.
-     * @param string $fPath An optional file path such as "C:\Users\Me\Documents". 
-     * The path should not include the name of the file. If not provided, 
-     * the path that is returned by File::getPath() will be used.
+     * The method will write the data using the binary write mode. 
+     * If it fails, It will throw an exception.
+     * @param boolean $append If the file already exist in the file system and 
+     * this attribute is set to true, the new raw data will be appended to the 
+     * file. Default is true.
+     * @param boolean $create If the file does not exist and this attribute is set 
+     * to true, the method will attempt to create the file. Default is false.
+     * 
      * @throws FileException The method will throw an exception with the message 
      * "File absolute path is invalid." if file absolute path is invalid. Also, 
      * The method will throw an exception with the message "Path cannot be empty string." 
@@ -540,58 +554,38 @@ class File implements JsonI {
      * unable to create the resource which is used to write data.
      * @since 1.1.1
      */
-    public function write($fPath = null) {
-        if ($fPath === null) {
-            $fPath = $this->getAbsolutePath();
-
-            if ($fPath != '') {
-                $this->_writeHelper($fPath);
-
-                return;
-            }
-            throw new FileException('File absolute path is invalid.');
-        } else {
-            $fName = $this->getName();
-
-            if (strlen($fName) > 0) {
-                $pathV = self::_validatePath($fPath);
-
-                if (strlen($pathV) > 0) {
-                    $pathV2 = !Util::isDirectory($pathV) ? DIRECTORY_SEPARATOR.$pathV : $pathV;
-                    $this->_writeHelper($pathV2.DIRECTORY_SEPARATOR.$fName);
-
-                    return;
-                }
-                throw new FileException('Path cannot be empty string.');
-            }
-            throw new FileException('File name cannot be empty string.');
+    public function write($append = true, $create = false) {
+        $pathV = $this->_checkNameAndPath();
+        if(!$this->_writeHelper($pathV, $append === true, $create === true)){
+            throw new FileException("File absolute path is invalid: '".$pathV."'.");
         }
     }
     private function _readHelper($fPath,$from,$to) {
         if (file_exists($fPath)) {
-            $this->_setSize(filesize($fPath));
-            set_error_handler(function()
-            {
-            });
-            $h = fopen($fPath, 'rb');
+            $fSize = filesize($fPath);
+            $this->_setSize($fSize);
             $bytesToRead = $to - $from > 0 ? $to - $from : $this->getSize();
-
-            if (is_resource($h)) {
+            $resource = $this->_createResource('rb', $fPath);
+            if (is_resource($resource)) {
                 if ($bytesToRead > 0) {
-                    fseek($h, $from);
+                    fseek($resource, $from);
                 }
-                $this->rawData = fread($h, $bytesToRead);
-                fclose($h);
+                if($bytesToRead > 0){
+                    $this->rawData = fread($resource, $bytesToRead);
+                } else {
+                    $this->rawData = '';
+                }
+                fclose($resource);
                 $ext = pathinfo($this->getName(), PATHINFO_EXTENSION);
                 $mime = self::getMIMEType($ext);
                 $mimeSet = $mime === null ? 'application/octet-stream' : $mime;
                 $this->setMIMEType($mimeSet);
-                restore_error_handler();
 
                 return true;
             }
-            restore_error_handler();
             throw new FileException('Unable to open the file \''.$fPath.'\'.');
+        } else {
+            throw new FileException('File not found: \''.$fPath.'\'.');
         }
 
         return false;
@@ -653,20 +647,43 @@ class File implements JsonI {
             throw new FileException('MIME type of raw data is not set.');
         }
     }
-    private function _writeHelper($fPath) {
-        if ($this->getRawData() === null) {
-            $this->read();
+    /**
+     * 
+     * @param string $fPath
+     * @param boolean $append
+     * @param boolean $createIfNotExist
+     * @return boolean
+     * @throws FileException
+     */
+    private function _writeHelper($fPath, $append = true, $createIfNotExist = false) {
+        if(!file_exists($fPath)){
+            if($createIfNotExist){
+                $resource = $this->_createResource('wb', $fPath);
+            } else {
+                throw new FileException("File not found: '$fPath'.");
+            }
+        } else if ($append){
+            $resource = $this->_createResource('ab', $fPath);
+        } else {
+            $resource = $this->_createResource('rb+', $fPath);
         }
-        $h = fopen($fPath, 'wb');
-
-        if (is_resource($h)) {
-            fwrite($h, $this->getRawData());
-            fclose($h);
-            restore_error_handler();
-
-            return;
+        if(!is_resource($resource)){
+            throw new FileException('Unable to open the file at \''.$fPath.'\'.');
+        } else {
+            fwrite($resource, $this->getRawData());
+            fclose($resource);
+            return true;
         }
+    }
+    private function _createResource($mode, $path) {
+        set_error_handler(function()
+        {
+        });
+        $resource = fopen($path, $mode);
         restore_error_handler();
-        throw new FileException('Unable to open the file at \''.$fPath.'\'.');
+        if (is_resource($resource)) {
+            return $resource;
+        }
+        return false;
     }
 }

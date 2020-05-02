@@ -61,7 +61,7 @@ class FileTest extends TestCase {
     public function test04() {
         $file = new File('hello.txt', ROOT_DIR);
         $this->expectException(FileException::class);
-        $this->expectExceptionMessage("File not found: 'C:\Server\apache2\htdocs\webfiori\hello.txt");
+        $this->expectExceptionMessage("File not found: '".$file->getAbsolutePath()."'");
         $file->read();
     }
     /**
@@ -88,7 +88,7 @@ class FileTest extends TestCase {
     public function test07() {
         $file = new File('hello.txt', ROOT_DIR);
         $this->expectException(FileException::class);
-        $this->expectExceptionMessage("File not found: 'C:\Server\apache2\htdocs\webfiori\hello.txt");
+        $this->expectExceptionMessage("File not found: '".$file->getAbsolutePath()."'");
         $file->write();
     }
     /**

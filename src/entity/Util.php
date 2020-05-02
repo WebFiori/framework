@@ -493,7 +493,7 @@ class Util {
                 $retVal[strtolower($k)] = filter_var($v, FILTER_SANITIZE_STRING);
             }
         } else if (isset($_SERVER)) {
-            $retVal = $this->_getRequestHeadersFromServer();
+            $retVal = self::_getRequestHeadersFromServer();
         }
 
         return $retVal;
@@ -502,7 +502,7 @@ class Util {
      * Collect request headers from the array $_SERVER.
      * @return array
      */
-    private function _getRequestHeadersFromServer() {
+    private static function _getRequestHeadersFromServer() {
         $retVal = [];
         foreach ($_SERVER as $k => $v) {
             $split = explode('_', $k);

@@ -233,7 +233,7 @@ class Util {
             if (class_exists('webfiori\conf\SiteConfig')) {
                 if (Config::isConfig() === true || WebFiori::getClassStatus() == 'INITIALIZING') {
                     if ($checkDb === true) {
-                        $returnValue = $this->_checkDbStatus($dbName);
+                        $returnValue = self::_checkDbStatus($dbName);
                     } else {
                         $returnValue = true;
                     }

@@ -542,9 +542,10 @@ class Util {
             if($createIfNot === true && mkdir($dir, 0755 , true)){
                 return true;
             }
-        }
+            return false;
+        } 
 
-        return false;
+        return true;
     }
     /**
      * Checks if a given character is an upper case letter or lower case letter.

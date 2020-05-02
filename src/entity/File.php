@@ -396,6 +396,7 @@ class File implements JsonI {
      * @throws FileException
      */
     private function _checkNameAndPath() {
+        clearstatcache();
         $fName = $this->getName();
         if(strlen($fName) != 0){
             $fPath = $this->getPath();

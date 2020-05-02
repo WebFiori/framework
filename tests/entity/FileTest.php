@@ -3,7 +3,7 @@ namespace webfiori\tests\entity;
 
 use PHPUnit\Framework\TestCase;
 use webfiori\entity\File;
-
+use webfiori\entity\exceptions\FileException;
 /**
  * A test class for testing the class 'webfiori\entity\File'.
  *
@@ -38,168 +38,85 @@ class FileTest extends TestCase {
     }
     /**
      * @test
-     * @depends test00
-     * @param File $file
      */
-    public function testRead00($file) {
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('File absolute path is invalid.');
-        $file->read();
-    }
-    /**
-     * @test
-     * @depends test01
-     * @param File $file
-     */
-    public function testRead01($file) {
-        $file->read();
-        $this->assertEquals('text/plain',$file->getFileMIMEType());
-        $this->assertEquals("Testing the class 'File'.",$file->getRawData());
-    }
-    /**
-     * @test
-     */
-    public function testRead02() {
-        $file = new File('text-file.txt','\\'.ROOT_DIR.DIRECTORY_SEPARATOR.'tests'.DIRECTORY_SEPARATOR.'entity\\');
-        $this->assertEquals(ROOT_DIR.DIRECTORY_SEPARATOR.'tests'.DIRECTORY_SEPARATOR.'entity',$file->getPath());
-        $file->read();
-        $this->assertEquals('text/plain',$file->getFileMIMEType());
-        $this->assertEquals("Testing the class 'File'.",$file->getRawData());
-    }
-    /**
-     * @test
-     * @depends test00
-     * @param File $file
-     */
-    public function testRead03() {
-        $file = new File('text-file-2.txt','\\'.ROOT_DIR.DIRECTORY_SEPARATOR.'tests'.DIRECTORY_SEPARATOR.'entity\\');
-        $this->expectException(\Exception::class);
-        $file->read();
-    }
-    /**
-     * @test
-     * @depends test00
-     * @param File $file
-     */
-    public function testRead04() {
-        $file = new File('private.txt','\\'.ROOT_DIR.DIRECTORY_SEPARATOR.'tests'.DIRECTORY_SEPARATOR.'entity\\');
-        $this->expectException(\Exception::class);
-        $file->read();
-    }
-    /**
-     * @test
-     * @param File $file
-     */
-    public function testRead05() {
-        $file = new File('ok.txt','\\'.ROOT_DIR.DIRECTORY_SEPARATOR.'tests'.DIRECTORY_SEPARATOR.'entity\\');
-        $this->expectException(\Exception::class);
+    public function test02() {
+        $file = new File();
+        $this->expectException(FileException::class);
+        $this->expectExceptionMessage('File name cannot be empty string.');
         $file->read();
     }
     /**
      * @test
      */
-    public function testRemove00() {
-        $f = new File('text-file-not-exist.txt','\\'.ROOT_DIR.DIRECTORY_SEPARATOR.'tests'.DIRECTORY_SEPARATOR.'entity\\');
-        $this->assertFalse($f->remove());
-    }
-
-    /**
-     * @test 
-     * @depends testWrite05
-     * @param File $f Description
-     */
-    public function testRemove01($f) {
-        $this->assertTrue($f->remove());
-        $this->assertFalse(file_exists($f->getAbsolutePath()));
+    public function test03() {
+        $file = new File('hello.txt');
+        $this->expectException(FileException::class);
+        $this->expectExceptionMessage('Path cannot be empty string.');
+        $file->read();
     }
     /**
      * @test
      */
-    public function testSetID() {
-        $f = new File();
-        $f->setID('xyz');
-        $this->assertSame('xyz',$f->getID());
-        $f->setID(66);
-        $this->assertSame(66,$f->getID());
+    public function test04() {
+        $file = new File('hello.txt', ROOT_DIR);
+        $this->expectException(FileException::class);
+        $this->expectExceptionMessage("File not found: 'C:\Server\apache2\htdocs\webfiori\hello.txt");
+        $file->read();
     }
     /**
      * @test
      */
-    public function testWrite00() {
-        $f = new File();
-        $f->setRawData('Hello World!');
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('File absolute path is invalid.');
-        $f->write();
+    public function test05() {
+        $file = new File();
+        $this->expectException(FileException::class);
+        $this->expectExceptionMessage('File name cannot be empty string.');
+        $file->write();
     }
     /**
      * @test
+     */
+    public function test06() {
+        $file = new File('hello.txt');
+        $this->expectException(FileException::class);
+        $this->expectExceptionMessage('Path cannot be empty string.');
+        $file->write();
+    }
+    /**
+     * @test
+     */
+    public function test07() {
+        $file = new File('hello.txt', ROOT_DIR);
+        $this->expectException(FileException::class);
+        $this->expectExceptionMessage("File not found: 'C:\Server\apache2\htdocs\webfiori\hello.txt");
+        $file->write();
+    }
+    /**
+     * @depends test07
      */
     public function testWrite01() {
-        $f = new File('write-test.txt');
-        $f->setRawData('Hello World!');
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('File absolute path is invalid.');
-        $f->write();
+        $file = new File('hello.txt', ROOT_DIR);
+        $file->write(true, true);
+        $file->read();
+        $this->assertEquals('', $file->getRawData());
+        $file->setRawData('Hello.');
+        $file->write();
+        $file->read();
+        $this->assertEquals('Hello.', $file->getRawData());
+        $file->setRawData('World.');
+        $file->write(false);
+        $this->assertEquals('World.', $file->getRawData());
+        $file->setRawData('Hello.');
+        $file->write();
+        $this->assertEquals('World.Hello', $file->getRawData());
+        return $file;
     }
     /**
      * @test
+     * @depends testWrite01
+     * @param File $file
      */
-    public function testWrite02() {
-        $f = new File('write-test.txt',ROOT_DIR);
-        $f->setRawData('Hello World!');
-        $f->write();
-        $f2 = new File('write-test.txt',ROOT_DIR);
-        $f2->read();
-        $this->assertEquals('Hello World!',$f2->getRawData());
-    }
-    /**
-     * @test
-     */
-    public function testWrite03() {
-        $f = new File();
-        $f->setRawData('Hello World Again.');
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('File name cannot be empty string.');
-        $f->write('');
-    }
-    /**
-     * @test
-     */
-    public function testWrite04() {
-        $f = new File('write-test-2.txt');
-        $f->setRawData('Hello World Again.');
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Path cannot be empty string.');
-        $f->write('');
-    }
-    /**
-     * @test
-     */
-    public function testWrite05() {
-        $f = new File('write-test-2.txt');
-        $f->setRawData('Hello World Again.');
-        $f->write(ROOT_DIR);
-        $f2 = new File('write-test-2.txt',ROOT_DIR);
-        $f2->read();
-        $this->assertEquals('Hello World Again.',$f2->getRawData());
-
-        return $f2;
-    }
-    /**
-     * @test
-     */
-    public function toStringTest00() {
-        $f = new File();
-        $this->assertEquals('{"id":-1, "mime":"application\/octet-stream", "name":"", "path":"", "size-in-bytes":0, "size-in-kbytes":0, "size-in-mbytes":0}',$f.'');
-    }
-    /**
-     * @test
-     */
-    public function toStringTest01() {
-        $f = new File('text-file.txt','\\'.ROOT_DIR.DIRECTORY_SEPARATOR.'tests'.DIRECTORY_SEPARATOR.'entity\\');
-        $f->read();
-        $this->assertEquals('{"id":-1, "mime":"text\/plain", "name":"text-file.txt", '
-                .'"path":"'.\jsonx\JsonX::escapeJSONSpecialChars($f->getPath()).'", "size-in-bytes":25, "size-in-kbytes":0.0244140625, "size-in-mbytes":2.3841857910156E-5}',$f.'');
+    public function testRemove00($file) {
+        $this->assertTrue($file->remove());
+        $this->assertFalse(file_exists($file->getAbsolutePath()));
     }
 }

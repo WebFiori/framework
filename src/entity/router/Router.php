@@ -272,9 +272,7 @@ class Router {
      * @since 1.3.3
      */
     public static function getUriObj($path) {
-        $uri = self::get()->_getUriObj($path);
-
-        return $uri;
+        return self::get()->_getUriObj($path);
     }
     /**
      * Returns an object of type 'RouterUri' which contains URL route information.
@@ -473,12 +471,10 @@ class Router {
      * @since 1.3.2
      */
     public static function uriObj($routerUri) {
-        if ($routerUri instanceof RouterUri) {
-            if (!self::get()->_hasRoute($routerUri->getPath())) {
-                self::get()->routes[] = $routerUri;
+        if ($routerUri instanceof RouterUri && !self::get()->_hasRoute($routerUri->getPath())) {
+            self::get()->routes[] = $routerUri;
 
-                return true;
-            }
+            return true;
         }
 
         return false;
@@ -530,7 +526,7 @@ class Router {
      * is returned.
      * @since 1.3.3
      */
-    private function &_getUriObj($path) {
+    private function _getUriObj($path) {
         $routeURI = new RouterUri($this->getBase().$this->_fixUriPath($path), '');
 
         foreach ($this->routes as $route) {
@@ -538,9 +534,8 @@ class Router {
                 return $route;
             }
         }
-        $null = null;
 
-        return $null;
+        return null;
     }
     /**
      * Adds new route to the router.
@@ -612,10 +607,8 @@ class Router {
                     } else {
                         $routeTo = ROOT_DIR.$this->_fixFilePath($routeTo);
                     }
-                } else {
-                    if (!is_callable($routeTo)) {
-                        return false;
-                    }
+                } else if (!is_callable($routeTo)) {
+                    return false;
                 }
 
                 if (!$this->_hasRoute($path)) {

@@ -199,7 +199,7 @@ class File implements JsonI {
      * @var int
      * @since 1.1 
      */
-    private $fSize;
+    private $fileSize;
     /**
      * A unique ID for the file.
      * @var string
@@ -240,7 +240,7 @@ class File implements JsonI {
         }
         $this->setName($fName);
         $this->id = -1;
-        $this->fSize = 0;
+        $this->fileSize = 0;
     }
     /**
      * Returns JSON string that represents basic file info.
@@ -353,7 +353,7 @@ class File implements JsonI {
      * @return int Size of the file in bytes.
      */
     public function getSize() {
-        return $this->fSize;
+        return $this->fileSize;
     }
     /**
      * Reads the file in binary mode.
@@ -583,7 +583,7 @@ class File implements JsonI {
     }
     private function _setSize($size) {
         if ($size >= 0) {
-            $this->fSize = $size;
+            $this->fileSize = $size;
         }
     }
     private static function _validatePath($fPath) {

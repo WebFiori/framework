@@ -320,7 +320,7 @@ class Controller {
     /**
      * Returns the instance of 'SessionManager' that is used by the class.
      * Before trying to get a session manager, the name of the session must 
-     * be supplied to the method Functions::useSession(). Note that it is not possible 
+     * be supplied to the method Controller::useSession(). Note that it is not possible 
      * to use session in command line interface. If the framework is running through 
      * CLI, This method will always return null.
      * @return SessionManager|null An instance of 'SessionManager'. If no 
@@ -586,41 +586,43 @@ class Controller {
     public function useSession($options = []) {
         if (CLI::isCLI()) {
             return false;
-        } else if (gettype($options) == 'array') {
-            if (isset($options['name'])) {
-                $givenSessionName = trim($options['name']);
+        } else if (gettype($options) == 'array' && isset($options['name'])) {
+            $givenSessionName = trim($options['name']);
 
-                if (isset(self::$sessions[$givenSessionName])) {
-                    $this->sessionName = $givenSessionName;
+            if (isset(self::$sessions[$givenSessionName])) {
+                $this->sessionName = $givenSessionName;
 
-                    return true;
-                } else {
-                    $mngr = new SessionManager($givenSessionName);
-
-                    $sTime = isset($options['duration']) ? $options['duration'] : self::DEFAULT_SESSTION_OPTIONS['duration'];
-                    $mngr->setLifetime($sTime);
-
-                    $isRef = isset($options['refresh']) ? $options['refresh'] : self::DEFAULT_SESSTION_OPTIONS['refresh'];
-                    $mngr->setIsRefresh($isRef);
-
-                    if ($mngr->initSession($isRef)) {
-                        $this->sessionName = $givenSessionName;
-                        $sUser = isset($options['user']) ? $options['user'] : self::DEFAULT_SESSTION_OPTIONS['user'];
-                        $mngr->setUser($sUser);
-                        self::$sessions[$mngr->getName()] = $mngr;
-
-                        if (isset($options['variables'])) {
-                            foreach ($options['variables'] as $k => $v) {
-                                $mngr->setSessionVar($k,$v);
-                            }
-                        }
-
-                        return true;
-                    }
-                }
+                return true;
+            } else {
+                return $this->_createSessionManager($givenSessionName, $options);
             }
         }
 
+        return false;
+    }
+    private function _createSessionManager($givenSessionName, $options) {
+        $mngr = new SessionManager($givenSessionName);
+
+        $sTime = isset($options['duration']) ? $options['duration'] : self::DEFAULT_SESSTION_OPTIONS['duration'];
+        $mngr->setLifetime($sTime);
+
+        $isRef = isset($options['refresh']) ? $options['refresh'] : self::DEFAULT_SESSTION_OPTIONS['refresh'];
+        $mngr->setIsRefresh($isRef);
+
+        if ($mngr->initSession($isRef)) {
+            $this->sessionName = $givenSessionName;
+            $sUser = isset($options['user']) ? $options['user'] : self::DEFAULT_SESSTION_OPTIONS['user'];
+            $mngr->setUser($sUser);
+            self::$sessions[$mngr->getName()] = $mngr;
+
+            if (isset($options['variables'])) {
+                foreach ($options['variables'] as $k => $v) {
+                    $mngr->setSessionVar($k,$v);
+                }
+            }
+
+            return true;
+        }
         return false;
     }
     /**

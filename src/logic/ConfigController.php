@@ -28,6 +28,7 @@ use Exception;
 use webfiori\conf\Config;
 use webfiori\entity\DBConnectionInfo;
 use webfiori\entity\FileHandler;
+use webfiori\entity\exceptions\InitializationException;
 /**
  * A class that can be used to modify basic configuration settings of 
  * the web application. 
@@ -86,14 +87,6 @@ class ConfigController extends Controller {
      */
     private static $singleton;
     /**
-     * Creates new instance of the class.
-     * It is not recommended to use this method. Instead, 
-     * use SystemFunctions::get().
-     */
-    public function __construct() {
-        parent::__construct();
-    }
-    /**
      * Adds new database connections information or update existing connections.
      * The information of the connections will be stored in the file 'Config.php'.
      * @param array $dbConnectionsInfo An array that contains objects of type DBConnectionInfo. 
@@ -104,14 +97,12 @@ class ConfigController extends Controller {
             $confVars = $this->getConfigVars();
 
             foreach ($dbConnectionsInfo as $con) {
-                if ($con instanceof DBConnectionInfo) {
-                    if (strlen($con->getHost()) > 0 && 
-                       strlen($con->getPort()) > 0 &&
-                       strlen($con->getUsername()) > 0 && 
-                       strlen($con->getPassword()) > 0 && 
-                       strlen($con->getDBName()) > 0) {
-                        $confVars['databases'][$con->getConnectionName()] = $con;
-                    }
+                if ($con instanceof DBConnectionInfo && strlen($con->getHost()) > 0 && 
+                    strlen($con->getPort()) > 0 &&
+                    strlen($con->getUsername()) > 0 && 
+                    strlen($con->getPassword()) > 0 && 
+                    strlen($con->getDBName()) > 0) {
+                     $confVars['databases'][$con->getConnectionName()] = $con;
                 }
             }
             $this->writeConfig($confVars);
@@ -187,7 +178,7 @@ class ConfigController extends Controller {
      * configuration files is missing.
      * @return boolean If the system is configured, the method will return 
      * true. If it is not configured, It will return false.
-     * @throws Exception If one of configuration files is missing. The format 
+     * @throws InitializationException If one of configuration files is missing. The format 
      * of exception message will be 'XX.php is missing.' where XX is the name 
      * of the configuration file.
      * @since 1.0
@@ -196,15 +187,13 @@ class ConfigController extends Controller {
         if (class_exists('webfiori\conf\Config')) {
             if (class_exists('webfiori\conf\MailConfig')) {
                 if (class_exists('webfiori\conf\SiteConfig')) {
-                    $retVal = Config::isConfig();
-
-                    return $retVal;
+                    return Config::isConfig();
                 }
-                throw new Exception('SiteConfig.php is missing.');
+                throw new InitializationException('SiteConfig.php is missing.');
             }
-            throw new Exception('MailConfig.php is missing.');
+            throw new InitializationException('MailConfig.php is missing.');
         }
-        throw new Exception('Config.php is missing.');
+        throw new InitializationException('Config.php is missing.');
     }
     /**
      * Removes a set of database connections.
@@ -235,10 +224,8 @@ class ConfigController extends Controller {
      * @since 1.4.4
      */
     public function useSession($options = []) {
-        if (gettype($options) == 'array' && isset($options['name'])) {
-            if ($options['name'] == 'wf-session') {
-                return parent::useSession($options);
-            }
+        if (gettype($options) == 'array' && isset($options['name']) && $options['name'] == 'wf-session') {
+            return parent::useSession($options);
         }
 
         return false;

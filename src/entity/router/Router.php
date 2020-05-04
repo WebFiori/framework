@@ -781,43 +781,20 @@ class Router {
         if (count($this->routes) != 0) {
             $routeUri = new RouterUri($uri, '');
             //first, search for the URI wuthout checking variables
-            foreach ($this->routes as $route) {
-                if (!$route->hasVars()) {
-                    if (!$route->isCaseSensitive()) {
-                        $isEqual = strtolower($route->getUri()) == 
-                        strtolower($routeUri->getUri());
-                    } else {
-                        $isEqual = $route->getUri() == $routeUri->getUri();
-                    }
-
-                    if ($isEqual) {
-                        $route->setRequestedUri($uri);
-                        $this->_routeFound($route, $loadResource);
-                        return;
-                    }
-                }
-            }
-            
-            //if no route found, try to replace variables with values 
-            //note that query string vars are optional.
-            $pathArray = $routeUri->getPathArray();
-            $requestMethod = filter_var(getenv('REQUEST_METHOD'));
-
-            foreach ($this->routes as $route) {
-                if ($route->hasVars()) {
-                    $this->_setUriVars($route, $pathArray, $requestMethod);
-                    //if all variables are set, then we found our route.
-                    if ($route->isAllVarsSet() && $route->setRequestedUri($uri)) {
-                        $this->_routeFound($route, $loadResource);
-                        return;
-                    }
-                }
-            }
-            //if we reach this part, this means the route was not found
-            if ($loadResource === true) {
-                call_user_func($this->onNotFound);
+            if($this->_searchRoute($routeUri, $uri, $loadResource)){
                 return;
             }
+            //if no route found, try to replace variables with values 
+            //note that query string vars are optional.
+            if($this->_searchRoute($routeUri, $uri, $loadResource, true)){
+                return;
+            }
+            
+            //if we reach this part, this means the route was not found
+            if ($loadResource) {
+                call_user_func($this->onNotFound);
+            }
+            
         } else if ($loadResource === true) {
             header("HTTP/1.1 418 I'm a teapot");
             die(''
@@ -835,6 +812,34 @@ class Router {
                 .'</body>'
                 .'</html>');
         }
+    }
+    public function _searchRoute($routeUri, $uri, $loadResource, $withVars = false) {
+        $pathArray = $routeUri->getPathArray();
+        $requestMethod = filter_var(getenv('REQUEST_METHOD'));
+        foreach ($this->routes as $route) {
+            if (!$withVars && !$route->hasVars()) {
+                if (!$route->isCaseSensitive()) {
+                    $isEqual = strtolower($route->getUri()) == 
+                    strtolower($routeUri->getUri());
+                } else {
+                    $isEqual = $route->getUri() == $routeUri->getUri();
+                }
+
+                if ($isEqual) {
+                    $route->setRequestedUri($uri);
+                    $this->_routeFound($route, $loadResource);
+                    return true;
+                }
+            } else if ($withVars && $route->hasVars()) {
+                $this->_setUriVars($route, $pathArray, $requestMethod);
+                //if all variables are set, then we found our route.
+                if ($route->isAllVarsSet() && $route->setRequestedUri($uri)) {
+                    $this->_routeFound($route, $loadResource);
+                    return true;
+                }
+            }
+        }
+        return false;
     }
     private function _routeFound($route, $loadResource) {
         if (is_callable($route->getRouteTo())) {

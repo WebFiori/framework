@@ -481,25 +481,29 @@ class RouterUri {
         if($requestedArr !== null){
             $originalPath = $this->getPathArray();
             $requestedPath = $requestedArr['path'];
-            $count = count($originalPath);
-            if($count == count($requestedPath)){
-                for($x = 0 ; $x < $count ; $x++){
-                    $original = $originalPath[$x];
-                    if(!($original[0] == '{' && $original[strlen($original) - 1] == '}')){
-                        $requested = $requestedPath[$x];
-                        if(!$this->isCaseSensitive()){
-                            $requested = strtolower($requested);
-                            $original = strtolower($original);
-                        }
-                        if($requested != $original){
-                            return false;
-                        }
-                    }
-                }
-                return true;
+            
+            if(count($originalPath) == count($requestedPath)){
+                return $this->_comparePathHelper($originalPath, $requestedPath);
             }
         }
         return false;
+    }
+    private function _comparePathHelper($originalPath, $requestedPath){
+        $count = count($originalPath);
+        for($x = 0 ; $x < $count ; $x++){
+            $original = $originalPath[$x];
+            if(!($original[0] == '{' && $original[strlen($original) - 1] == '}')){
+                $requested = $requestedPath[$x];
+                if(!$this->isCaseSensitive()){
+                    $requested = strtolower($requested);
+                    $original = strtolower($original);
+                }
+                if($requested != $original){
+                    return false;
+                }
+            }
+        }
+        return true;
     }
     /**
      * Sets the array of closure parameters.

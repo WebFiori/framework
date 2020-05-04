@@ -5,6 +5,7 @@ use jsonx\JsonX;
 use phpStructs\html\HeadNode;
 use phpStructs\html\HTMLNode;
 use phpStructs\html\JsCode;
+use phpStructs\html\Anchor;
 use webfiori\entity\Page;
 use webfiori\entity\Theme;
 use webfiori\WebFiori;
@@ -18,7 +19,6 @@ class VuetifyTheme extends Theme {
      */
     public function __construct() {
         parent::__construct();
-        $this->setVersion('1.0');
         $this->setVersion('1.0');
         $this->setAuthor('Ibrahim');
         $this->setLicenseName('MIT License');
@@ -185,10 +185,9 @@ class VuetifyTheme extends Theme {
             'flat','tile'
         ]);
         $vCardTitle = new HTMLNode('v-card-title');
-        $vCardTitle->setClassName('teal');
+        $vCardTitle->setClassName('teal social-media');
         $vCard->addChild($vCardTitle);
         $vCardTitle->addTextNode('
-          <strong class="subheading" >'.Page::translation()->get('example/footer/get-connected').'</strong>
           <v-spacer></v-spacer>
           <v-btn
             v-for="icon in icons"
@@ -201,10 +200,25 @@ class VuetifyTheme extends Theme {
           </v-btn>', false);
         $vCardText = new HTMLNode('v-card-text');
         $vCardText->setClassName('py-2 white--text text-center');
-        $vCardText->addTextNode('<strong>'.Page::translation()->get('example/footer/copyright-notice').'</strong>', false);
-        $vCardText->addTextNode('<p style="font-size:9pt;color:lightgray">Powered By: <a href="https://programmingacademia.com/webfiori" '
-                .'target="_blank">WebFiori Framework</a><br/>'
-                .'Theme Designed Using <a href="https://vuetifyjs.com" target="_blank">Vuetify</a></p>', false);
+        
+        $copywriteNoticeNode = new HTMLNode('strong');
+        $copywriteNoticeNode->addTextNode(Page::translation()->get('example/footer/copyright-notice'));
+        $vCardText->addChild($copywriteNoticeNode);
+        
+        $poweredByNode = new HTMLNode('p');
+        $poweredByNode->setClassName('footer-notice');
+        $poweredByNode->addTextNode('Powered By: ');
+        $frameworkLink = new Anchor('https://webfiori.com', 'WebFiori Framework', '_blank');
+        $poweredByNode->addChild($frameworkLink);
+        $vCardText->addChild($poweredByNode);
+        
+        $vuetifyNode = new HTMLNode('p');
+        $vuetifyNode->setClassName('footer-notice');
+        $vuetifyNode->addTextNode('Theme Designed Using ');
+        $vuetifyLink = new Anchor('https://vuetifyjs.com', 'Vuetify', '_blank');
+        $vuetifyNode->addChild($vuetifyLink);
+        $vCardText->addChild($vuetifyNode);
+        
         $vCard->addChild($vCardText);
 
         return $node;
@@ -226,14 +240,13 @@ class VuetifyTheme extends Theme {
         $js = new JsCode();
         $js->setID('data-model');
         $js->addCode('window.locale = '.$json.';');
-        $js->addCode('window.data = {};');
         $node->addChild($js);
+        $node->addCSS(Page::cssDir().'/theme.css');
         $node->addCSS('https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900',[], false);
         $node->addCSS('https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css', [], false);
         $node->addCSS('https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css', [], false);
         $node->addJs('https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js', [], false);
-        $node->addJs('https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js', [], false);
-
+        $node->addJs('https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js', [], false); 
         return $node;
     }
     /**
@@ -250,26 +263,38 @@ class VuetifyTheme extends Theme {
             'elevate-on-scroll',
             'fixed','app'
         ]);
+        
+        //Adds a small logo in the bar
         $logo = new HTMLNode('v-img');
         $logo->setAttributes([
             'src' => Page::imagesDir().'/favicon.png',
             'max-height' => 45,
             'max-width' => 45
         ]);
-        //$appBar->addChild($logo);
+        $appBar->addChild($logo);
+        
+        //Adds a gradiant
         $appBar->addTextNode('<template v-slot:img="{ props }">
           <v-img
             v-bind="props"
             gradient="to top right, rgba(19,84,122,.5), rgba(128,208,199,.8)"
           ></v-img>
         </template>', false);
+        
+        //An icon to show and hide aside menu.
         $drawerIcon = new HTMLNode('v-app-bar-nav-icon');
         $appBar->addChild($drawerIcon);
         $drawerIcon->setAttribute('@click', 'drawer = true');
+        
+        //Adds a text to the bar that represents website name
         $titleNode = new HTMLNode('v-toolbar-title');
         $titleNode->addTextNode(Page::siteName());
         $appBar->addChild($titleNode);
+        
+        
         $appBar->addTextNode('<v-spacer></v-spacer>', false);
+        
+        //Add extra actions to the bar such as search
         $appBar->addChild($this->createHTMLNode([
             'type' => 'icon-button',
             'icon' => 'mdi-magnify'

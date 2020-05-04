@@ -1,16 +1,30 @@
+/* global vueLoaded */
+
 window.onload = () => {
     //the 'window.data' object can be defined 
     //in PHP before the page is rendered.
     //same applies to 'window.locale'
-    if(window.data === undefined){
-        console.warn('window.data is undefined. Default is used.');
+    if(typeof window.computed !== 'object'){
+        console.warn('window.computed is set to an empty object.');
+        window.computed = {};
+    }
+    if(typeof window.methods !== 'object'){
+        console.warn('window.methods is set to an empty object.');
+        window.methods = {};
+    }
+    if(typeof window.data !== 'object'){
+        console.warn('window.data is set to an empty object.');
         window.data = {};
     }
-    if(window.locale === undefined){
-        console.warn('window.locale is undefined. Default is used.');
+    if(typeof window.watch !== 'object'){
+        console.warn('window.watch is set to an empty object.');
+        window.watch = {};
+    }
+    if(typeof window.locale !== 'object'){
+        console.warn('window.locale is not defined. Default is used.');
         window.locale = {
-            dir:'ltr',
-            code:'en'
+            dir:'rtl',
+            'vuetify-defaults':{}
         };
     }
     var rtl = window.locale.dir === 'rtl';
@@ -58,13 +72,25 @@ window.onload = () => {
         data() {
             return window.data;
         },
-        computed:{
-            //this can be accessed in PHP and binde it to vutify component 
-            // as follows: 
-            // :label="languageVars.general.something"
-            languageVars(){
-                return window.locale;
-            }
-        }
+        computed:window.computed,
+        methods:window.methods,
+        watch: window.watch
     });
 };
+/**
+ * This function is used to show a snackbar which shows a text about something 
+ * for the user.
+ * @param {String} statusTxt The text that will be shown to the user.
+ * @param {String} color the background color of the snackbar.
+ * @returns {undefined}
+ */
+function setStatusText(statusTxt,color=""){
+    if(window.vue.$data.snackbar){
+        window.vue.$data.snackbar = false;
+    }
+    window.setTimeout(function(){
+        window.vue.$data.snackbar = true;
+    },200);
+    window.vue.$data.statusText = statusTxt;
+    window.vue.$data.statusColor = color;
+}

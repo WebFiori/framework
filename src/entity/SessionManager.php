@@ -746,7 +746,6 @@ class SessionManager implements JsonI {
      */
     public function resume() {
         $retVal = false;
-
         if ($this->hasCookie()) {
             session_name($this->getName());
             ini_set('session.use_cookies', 1);
@@ -766,6 +765,7 @@ class SessionManager implements JsonI {
             if ($this->_validateAttrs()) {
                 if (!$this->isTimeout()) {
                     $this->_setSessionParams($tmpId, $sessionTime);
+                    $retVal = true;
                 } else {
                     $this->kill();
                     $this->sessionStatus = self::EXPIRED;
@@ -1109,17 +1109,15 @@ class SessionManager implements JsonI {
             } else {
                 $this->kill();
             }
-        } else {
-            if (strlen($this->sId) != 0) {
-                session_name($this->getName());
-                session_id($this->sId);
-                session_start();
+        } else if (strlen($this->sId) != 0) {
+            session_name($this->getName());
+            session_id($this->sId);
+            session_start();
 
-                if ($this->_validateAttrs() === true) {
-                    $retVal = true;
-                } else {
-                    session_write_close();
-                }
+            if ($this->_validateAttrs() === true) {
+                $retVal = true;
+            } else {
+                session_write_close();
             }
         }
 

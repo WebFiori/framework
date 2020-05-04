@@ -580,53 +580,95 @@ class Router {
      * @since 1.0
      */
     private function _addRoute($options) {
-        $caseSensitive = isset($options['case-sensitive']) ? $options['case-sensitive'] === true : true;
-        $routeType = isset($options['type']) ? $options['type'] : Router::CUSTOMIZED;
-        $incInSiteMap = isset($options['in-sitemap']) ? $options['in-sitemap'] === true : false;
-        $asApi = isset($options['as-api']) ? $options['as-api'] === true : false;
-        $closureParams = isset($options['closure-params']) && gettype($options['closure-params']) == 'array' ? 
-                $options['closure-params'] : [];
-        $path = isset($options['path']) ? $options['path'] : '';
+        
 
         if (!isset($options['route-to'])) {
             return false;
         } else {
-            $routeTo = $options['route-to'];
+            $options = $this->_checkOptionsArr($options);
+            $routeType = $options['type'];
         }
 
-        if (strlen($this->getBase()) != 0) {
-            if ($routeType == self::API_ROUTE || 
-                $routeType == self::VIEW_ROUTE || 
-                $routeType == self::CUSTOMIZED || 
-                $routeType == self::CLOSURE_ROUTE) {
-                $path = $this->_fixUriPath($path);
+        if (strlen($this->getBase()) != 0 && ($routeType == self::API_ROUTE || 
+            $routeType == self::VIEW_ROUTE || 
+            $routeType == self::CUSTOMIZED || 
+            $routeType == self::CLOSURE_ROUTE)) {
 
-                if ($routeType != self::CLOSURE_ROUTE) {
-                    if ($routeType != self::CUSTOMIZED) {
-                        $routeTo = ROOT_DIR.$routeType.$this->_fixFilePath($routeTo);
-                    } else {
-                        $routeTo = ROOT_DIR.$this->_fixFilePath($routeTo);
-                    }
-                } else if (!is_callable($routeTo)) {
-                    return false;
-                }
+            return $this->_addRouteHelper($options);
+        }
 
-                if (!$this->_hasRoute($path)) {
-                    $routeUri = new RouterUri($this->getBase().$path, $routeTo,$caseSensitive, $closureParams);
-
-                    if ($asApi === true) {
-                        $routeUri->setType(self::API_ROUTE);
-                    } else {
-                        $routeUri->setType($routeType);
-                    }
-                    $routeUri->setIsInSiteMap($incInSiteMap);
-                    $this->routes[] = $routeUri;
-
-                    return true;
-                }
+        return false;
+    }
+    /**
+     * Checks for provided options and set defaults for the ones which are 
+     * not provided.
+     * @param array $options
+     * @return array
+     */
+    private function _checkOptionsArr($options) {
+        $routeTo = $options['route-to'];
+        if(isset($options['case-sensitive'])){
+            $caseSensitive = $options['case-sensitive'] === true;
+        } else {
+            $caseSensitive = true;
+        }
+        
+        $routeType = isset($options['type']) ? $options['type'] : Router::CUSTOMIZED;
+        if(isset($options['in-sitemap'])){
+            $incInSiteMap = $options['in-sitemap']; 
+        } else {
+            $incInSiteMap = false;
+        }
+        if(isset($options['as-api'])){
+            $asApi = $options['as-api'] === true;
+        } else {
+            $asApi = false;
+        }
+        $closureParams = isset($options['closure-params']) && gettype($options['closure-params']) == 'array' ? 
+                $options['closure-params'] : [];
+        $path = isset($options['path']) ? $this->_fixUriPath($options['path']) : '';
+        return [
+            'case-sensitive'=>$caseSensitive,
+            'type'=>$routeType,
+            'in-sitemap'=>$incInSiteMap,
+            'as-api'=>$asApi,
+            'path' => $path,
+            'route-to'=>$routeTo,
+            'closure-params'=>$closureParams
+        ];
+    }
+    private function _addRouteHelper($options) {
+        $routeTo = $options['route-to'];
+        $caseSensitive = $options['case-sensitive'];
+        $routeType = $options['type'];
+        $incInSiteMap = $options['in-sitemap'];
+        $asApi = $options['as-api'];
+        $closureParams = $options['closure-params'] ;
+        $path = $options['path'];
+        
+        if ($routeType != self::CLOSURE_ROUTE) {
+            if ($routeType != self::CUSTOMIZED) {
+                $routeTo = ROOT_DIR.$routeType.$this->_fixFilePath($routeTo);
+            } else {
+                $routeTo = ROOT_DIR.$this->_fixFilePath($routeTo);
             }
+        } else if (!is_callable($routeTo)) {
+            return false;
         }
 
+        if (!$this->_hasRoute($path)) {
+            $routeUri = new RouterUri($this->getBase().$path, $routeTo,$caseSensitive, $closureParams);
+
+            if ($asApi === true) {
+                $routeUri->setType(self::API_ROUTE);
+            } else {
+                $routeUri->setType($routeType);
+            }
+            $routeUri->setIsInSiteMap($incInSiteMap);
+            $this->routes[] = $routeUri;
+
+            return true;
+        }
         return false;
     }
     private function _fixFilePath($path) {

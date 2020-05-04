@@ -28,6 +28,7 @@ use webfiori\conf\SiteConfig;
 use webfiori\entity\Util;
 use webfiori\entity\CLI;
 use webfiori\entity\ui\NotFoundView;
+use webfiori\entity\exceptions\RoutingException;
 use jsonx\JsonX;
 use phpStructs\html\HTMLNode;
 use restEasy\WebServices;
@@ -823,34 +824,10 @@ class Router {
                                         }
                                     }
                                 }
-                            } else {
-                                if ($loadResource === true) {
-                                    header("HTTP/1.1 500 Server Error");
-
-                                    if ($route->getType() == self::API_ROUTE) {
-                                        $j = new JsonX();
-                                        $j->add('message', 'The resource \''.Util::getRequestedURL().'\' was availble but its route is not configured correctly. '
-                                                .'The file which the route is pointing to was not found.');
-                                        $j->add('type', 'error');
-                                        die($j.'');
-                                    } else {
-                                        die(''
-                                        .'<!DOCTYPE html>'
-                                        .'<html>'
-                                        .'<head>'
-                                        .'<title>Server Error</title>'
-                                        .'</head>'
-                                        .'<body>'
-                                        .'<h1>500 - Server Error</h1>'
-                                        .'<hr>'
-                                        .'<p>'
-                                        .'The resource <b>'.Util::getRequestedURL().'</b> was availble. but its route is not configured correctly. '
-                                        .'The file which the route is pointing to was not found.'
-                                        .'</p>'
-                                        .'</body>'
-                                        .'</html>');
-                                    }
-                                }
+                            } else if ($loadResource === true) {
+                                throw new RoutingException('The resource "'.Util::getRequestedURL().'" was availble. '
+                                        . 'but its route is not configured correctly. '
+                                        .'The resource which the route is pointing to was not found.');
                             }
 
                             return;
@@ -927,34 +904,10 @@ class Router {
                                         }
                                     }
                                 }
-                            } else {
-                                if ($loadResource === true) {
-                                    header("HTTP/1.1 500 Server Error");
-
-                                    if ($route->getType() == self::API_ROUTE) {
-                                        $j = new JsonX();
-                                        $j->add('message', 'The resource \''.Util::getRequestedURL().'\' was availble but its route is not configured correctly. '
-                                                .'The file which the route is pointing to was not found.');
-                                        $j->add('type', 'error');
-                                        die($j.'');
-                                    } else {
-                                        die(''
-                                        .'<!DOCTYPE html>'
-                                        .'<html>'
-                                        .'<head>'
-                                        .'<title>Server Error</title>'
-                                        .'</head>'
-                                        .'<body>'
-                                        .'<h1>500 - Server Error</h1>'
-                                        .'<hr>'
-                                        .'<p>'
-                                        .'The resource <b>'.Util::getRequestedURL().'</b> was availble. but its route is not configured correctly. '
-                                        .'The file which the route is pointing to was not found.'
-                                        .'</p>'
-                                        .'</body>'
-                                        .'</html>');
-                                    }
-                                }
+                            } else if ($loadResource === true) {
+                                throw new RoutingException('The resource "'.Util::getRequestedURL().'" was availble. '
+                                        . 'but its route is not configured correctly. '
+                                        .'The resource which the route is pointing to was not found.');
                             }
 
                             return;

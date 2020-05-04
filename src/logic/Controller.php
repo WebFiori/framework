@@ -31,6 +31,7 @@ use webfiori\conf\Config;
 use webfiori\entity\DBConnectionFactory;
 use webfiori\entity\DBConnectionInfo;
 use webfiori\entity\SessionManager;
+use webfiori\entity\CLI;
 /**
  * The base class for creating application logic.
  * This class provides the basic utilities to connect to database and manage 
@@ -176,43 +177,46 @@ class Controller {
     public function excQ($qObj = null,$connName = null) {
         $retVal = false;
 
+        $queryObj = $this->_checkQueryObj($qObj);
+        if ($queryObj instanceof MySQLQuery) {
+            return $this->_connectAndExecute($queryObj, $connName);
+        }
+
+        return $retVal;
+    }
+    private function _connectAndExecute($queryObj, $connName) {
+        $retVal = false;
+        if ($connName !== null) {
+            $connectResult = $this->useDatabase($connName);
+
+            if ($connectResult === true) {
+                $retVal = $this->_runQuery($queryObj);
+            } else if ($connectResult == self::NO_SUCH_CONNECTION) {
+                return self::NO_SUCH_CONNECTION;
+            } else {
+                return false;
+            }
+        } else if ($this->getDBLink() !== null) {
+            $retVal = $this->_runQuery($queryObj);
+        } else {
+            $retVal = $this->useDatabase();
+
+            if ($retVal === true) {
+                $retVal = $this->_runQuery($queryObj);
+            }
+        }
+        return $retVal;
+    }
+    private function _checkQueryObj($qObj) {
         if (!($qObj instanceof MySQLQuery)) {
             $qObj = $this->getQueryObject();
 
             if ($qObj === null) {
                 $this->_setDBErrDetails(self::NO_QUERY, 'No query object was set to execute.');
 
-                return false;
             }
         }
-
-        if ($qObj instanceof MySQLQuery) {
-            if ($connName !== null) {
-                $connectResult = $this->useDatabase($connName);
-
-                if ($connectResult === true) {
-                    $retVal = $this->_runQuery($qObj);
-                } else {
-                    if ($connectResult == self::NO_SUCH_CONNECTION) {
-                        return self::NO_SUCH_CONNECTION;
-                    } else {
-                        return false;
-                    }
-                }
-            } else {
-                if ($this->getDBLink() !== null) {
-                    $retVal = $this->_runQuery($qObj);
-                } else {
-                    $retVal = $this->useDatabase();
-
-                    if ($retVal === true) {
-                        $retVal = $this->_runQuery($qObj);
-                    }
-                }
-            }
-        }
-
-        return $retVal;
+        return $qObj;
     }
     /**
      * Returns an associative array that contains database error info (if any)
@@ -277,11 +281,10 @@ class Controller {
         $retVal = null;
         $current = &$this->getCurrentDataset();
 
-        if ($current !== null) {
-            if ($current['rows-count'] != 0) {
-                if (isset($current['data'][$current['current-position']])) {
-                    $retVal = $current['data'][$current['current-position']];
-                }
+        if ($current !== null && $current['rows-count'] != 0) {
+            if (isset($current['data'][$current['current-position']])) {
+                $retVal = $current['data'][$current['current-position']];
+                
             }
 
             if ($current['rows-count'] == 1) {
@@ -544,22 +547,16 @@ class Controller {
                 $this->_setDBErrDetails(-1, 'No database connection was found which has the name \''.$connName.'\'.');
                 $retVal = self::NO_SUCH_CONNECTION;
             }
+        } else if ($dbConn instanceof DBConnectionInfo) {
+            $retVal = $this->_connect($dbConn);
+        } else if ($this->defaultConn !== null) {
+            $retVal = $this->_connect($this->defaultConn);
+        } else if ($connName !== null) {
+            $this->_setDBErrDetails(-1, 'No database connection was found which has the name \''.$connName.'\'.');
+            $retVal = self::NO_SUCH_CONNECTION;
         } else {
-            if ($dbConn instanceof DBConnectionInfo) {
-                $retVal = $this->_connect($dbConn);
-            } else {
-                if ($this->defaultConn !== null) {
-                    $retVal = $this->_connect($this->defaultConn);
-                } else {
-                    if ($connName !== null) {
-                        $this->_setDBErrDetails(-1, 'No database connection was found which has the name \''.$connName.'\'.');
-                        $retVal = self::NO_SUCH_CONNECTION;
-                    } else {
-                        $this->_setDBErrDetails(-2, 'No database connection was set.');
-                        $retVal = false;
-                    }
-                }
-            }
+            $this->_setDBErrDetails(-2, 'No database connection was set.');
+            $retVal = false;
         }
 
         return $retVal;
@@ -587,40 +584,38 @@ class Controller {
      * return true. Other than that, the method will return false.
      */
     public function useSession($options = []) {
-        if (php_sapi_name() == 'cli') {
+        if (CLI::isCLI()) {
             return false;
-        } else {
-            if (gettype($options) == 'array') {
-                if (isset($options['name'])) {
-                    $sessionName = trim($options['name']);
+        } else if (gettype($options) == 'array') {
+            if (isset($options['name'])) {
+                $givenSessionName = trim($options['name']);
 
-                    if (isset(self::$sessions[$sessionName])) {
-                        $this->sessionName = $sessionName;
+                if (isset(self::$sessions[$givenSessionName])) {
+                    $this->sessionName = $givenSessionName;
+
+                    return true;
+                } else {
+                    $mngr = new SessionManager($givenSessionName);
+
+                    $sTime = isset($options['duration']) ? $options['duration'] : self::DEFAULT_SESSTION_OPTIONS['duration'];
+                    $mngr->setLifetime($sTime);
+
+                    $isRef = isset($options['refresh']) ? $options['refresh'] : self::DEFAULT_SESSTION_OPTIONS['refresh'];
+                    $mngr->setIsRefresh($isRef);
+
+                    if ($mngr->initSession($isRef)) {
+                        $this->sessionName = $givenSessionName;
+                        $sUser = isset($options['user']) ? $options['user'] : self::DEFAULT_SESSTION_OPTIONS['user'];
+                        $mngr->setUser($sUser);
+                        self::$sessions[$mngr->getName()] = $mngr;
+
+                        if (isset($options['variables'])) {
+                            foreach ($options['variables'] as $k => $v) {
+                                $mngr->setSessionVar($k,$v);
+                            }
+                        }
 
                         return true;
-                    } else {
-                        $mngr = new SessionManager($sessionName);
-
-                        $sTime = isset($options['duration']) ? $options['duration'] : self::DEFAULT_SESSTION_OPTIONS['duration'];
-                        $mngr->setLifetime($sTime);
-
-                        $isRef = isset($options['refresh']) ? $options['refresh'] : self::DEFAULT_SESSTION_OPTIONS['refresh'];
-                        $mngr->setIsRefresh($isRef);
-
-                        if ($mngr->initSession($isRef)) {
-                            $this->sessionName = $sessionName;
-                            $sUser = isset($options['user']) ? $options['user'] : self::DEFAULT_SESSTION_OPTIONS['user'];
-                            $mngr->setUser($sUser);
-                            self::$sessions[$mngr->getName()] = $mngr;
-
-                            if (isset($options['variables'])) {
-                                foreach ($options['variables'] as $k => $v) {
-                                    $mngr->setSessionVar($k,$v);
-                                }
-                            }
-
-                            return true;
-                        }
                     }
                 }
             }

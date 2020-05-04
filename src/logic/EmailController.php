@@ -53,9 +53,6 @@ class EmailController extends Controller {
      * @since 1.0
      */
     private static $instance;
-    public function __construct() {
-        parent::__construct();
-    }
     /**
      * Creates the file 'MailConfig.php' if it does not exist.
      * @since 1.0
@@ -92,11 +89,8 @@ class EmailController extends Controller {
     public function getSocketMailer($emailAcc) {
         if ($emailAcc instanceof SMTPAccount) {
             $retVal = EmailController::INV_HOST_OR_PORT;
-//            Logger::log('Using TLS = \''.$emailAcc->isTLS().'\'.','debug');
-//            Logger::log('Using SSL = \''.$emailAcc->isSSL().'\'.','debug');
             $m = new SocketMailer();
-            //$m->isSSL($emailAcc->isSSL());
-            //$m->isTLS($emailAcc->isTLS());
+
             $m->setHost($emailAcc->getServerAddress());
             $m->setPort($emailAcc->getPort());
 
@@ -193,10 +187,8 @@ class EmailController extends Controller {
      * @since 1.3.1
      */
     public function useSession($options = []) {
-        if (gettype($options) == 'array' && isset($options['name'])) {
-            if ($options['name'] == 'wf-session') {
-                return parent::useSession($options);
-            }
+        if (gettype($options) == 'array' && isset($options['name']) && $options['name'] == 'wf-session') {
+            return parent::useSession($options);
         }
 
         return false;

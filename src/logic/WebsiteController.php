@@ -79,14 +79,6 @@ class WebsiteController extends Controller {
      */
     private static $singleton;
     /**
-     * Creates new instance of the class.
-     * It is not recommended to use this method. Instead, 
-     * use WebsiteFunctions::get().
-     */
-    public function __construct() {
-        parent::__construct();
-    }
-    /**
      * Creates the file 'SiteConfig.php' if it does not exist.
      * @since 1.0
      */
@@ -198,10 +190,8 @@ class WebsiteController extends Controller {
      * @since 1.0.1
      */
     public function useSession($options = []) {
-        if (gettype($options) == 'array' && isset($options['name'])) {
-            if ($options['name'] == 'wf-session') {
-                return parent::useSession($options);
-            }
+        if (gettype($options) == 'array' && isset($options['name']) && $options['name'] == 'wf-session') {
+            return parent::useSession($options);
         }
 
         return false;

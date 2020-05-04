@@ -40,7 +40,7 @@ use webfiori\entity\Util;
  * The class is also used for routing.
  * For more information on URI structure, visit <a target="_blank" href="https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#Examples">Wikipedia</a>.
  * @author Ibrahim
- * @version 1.3.3
+ * @version 1.3.4
  */
 class RouterUri {
     /**
@@ -160,9 +160,7 @@ class RouterUri {
         if ($this->getType() != Router::CLOSURE_ROUTE) {
             $path = $this->getRouteTo();
             $pathExpl = explode(DIRECTORY_SEPARATOR, $path);
-            $className = explode('.', $pathExpl[count($pathExpl) - 1])[0];
-
-            return $className;
+            return explode('.', $pathExpl[count($pathExpl) - 1])[0];
         }
 
         return '';
@@ -197,6 +195,44 @@ class RouterUri {
      */
     public function getComponents() {
         return $this->uriBroken;
+    }
+    /**
+     * Returns an array that contains requested URI information.
+     * @return array The method will return an associative array that 
+     * contains the components of the URI. The array will have the 
+     * following indices:
+     * <ul>
+     * <li><b>uri</b>: The original URI.</li>
+     * <li><b>port</b>: The port number taken from the authority part.</li>
+     * <li><b>host</b>: Will be always empty string.</li>
+     * <li><b>authority</b>: Authority part of the URI.</li>
+     * <li><b>scheme</b>: Scheme part of the URI (e.g. http or https).</li>
+     * <li><b>query-string</b>: Query string if the URI has any.</li>
+     * <li><b>fragment</b>: Any string that comes after the character '#' in the URI.</li>
+     * <li><b>path</b>: An array that contains the names of path directories</li>
+     * <li><b>query-string-vars</b>: An array that contains query string parameter and values.</li>
+     * <li><b>uri-vars</b>: An array that contains URI path variable and values.</li>
+     * </ul>
+     * @since 1.3.4
+     */
+    public function getRequestedUri() {
+        return isset($this->uriBroken['requested-uri']) ? $this->uriBroken['requested-uri'] : null;
+    }
+    /**
+     * Sets the requested URI.
+     * @param string $uri A string that represents requested URI.
+     * @return boolean If the requested URI is a match with the original URI which 
+     * is stored in the object, it will be set and the method will return true. 
+     * Other than that, the method will return false.
+     * @since 1.3.4 
+     */
+    public function setRequestedUri($uri) {
+        $this->uriBroken['requested-uri'] = self::splitURI($uri);
+        if(!$this->_comparePath()){
+            unset($this->uriBroken['requested-uri']);
+            return false;
+        }
+        return true;
     }
     /**
      * Returns fragment part of the URI.
@@ -242,7 +278,8 @@ class RouterUri {
     /**
      * Returns port number of the authority part of the URI.
      * @return string Port number of the authority part of the URI. If 
-     * port number was not specified, the method will return empty string.
+     * port number was not specified, the method will return empty string. If 
+     * path part is a variable, it will be enclosed between '{}'.
      * @since 1.0
      */
     public function getPort() {
@@ -325,21 +362,17 @@ class RouterUri {
             if (strlen($fragment) != 0) {
                 $retVal .= '#'.$fragment;
             }
-        } else {
-            if ($incQueryStr && !$incFragment) {
-                $queryStr = $this->getQueryString();
+        } else if ($incQueryStr && !$incFragment) {
+            $queryStr = $this->getQueryString();
 
-                if (strlen($queryStr) != 0) {
-                    $retVal .= '?'.$queryStr;
-                }
-            } else {
-                if (!$incQueryStr && $incFragment) {
-                    $fragment = $this->getFragment();
+            if (strlen($queryStr) != 0) {
+                $retVal .= '?'.$queryStr;
+            }
+        } else if (!$incQueryStr && $incFragment) {
+            $fragment = $this->getFragment();
 
-                    if (strlen($fragment) != 0) {
-                        $retVal .= '#'.$fragment;
-                    }
-                }
+            if (strlen($fragment) != 0) {
+                $retVal .= '#'.$fragment;
             }
         }
 
@@ -405,8 +438,8 @@ class RouterUri {
     public function isAllVarsSet() {
         $canRoute = true;
 
-        foreach ($this->getUriVars() as $key => $val) {
-            $canRoute = $canRoute && $val != null;
+        foreach ($this->getUriVars() as  $val) {
+            $canRoute = $canRoute && $val !== null;
         }
 
         return $canRoute;
@@ -439,6 +472,36 @@ class RouterUri {
         Util::print_r($this->uriBroken,false);
     }
     /**
+     * Validate the path part of original URI and the requested one.
+     * @return boolean
+     * @since 1.3.4
+     */
+    private function _comparePath() {
+        $requestedArr = $this->getRequestedUri();
+        if($requestedArr !== null){
+            $originalPath = $this->getPathArray();
+            $requestedPath = $requestedArr['path'];
+            $count = count($originalPath);
+            if($count == count($requestedPath)){
+                for($x = 0 ; $x < $count ; $x++){
+                    $original = $originalPath[$x];
+                    if(!($original[0] == '{' && $original[strlen($original) - 1] == '}')){
+                        $requested = $requestedPath[$x];
+                        if(!$this->isCaseSensitive()){
+                            $requested = strtolower($requested);
+                            $original = strtolower($original);
+                        }
+                        if($requested != $original){
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+    /**
      * Sets the array of closure parameters.
      * @param array $arr An array that contains all the values that will be 
      * passed to the closure.
@@ -456,7 +519,7 @@ class RouterUri {
      * @since 1.3
      */
     public function setIsInSiteMap($bool) {
-        $this->incInSiteMap = $bool === true ? true : false;
+        $this->incInSiteMap = $bool === true;
     }
     /**
      * Sets the route which the URI will take to.

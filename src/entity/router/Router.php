@@ -791,50 +791,13 @@ class Router {
                     }
 
                     if ($isEqual) {
-                        if (is_callable($route->getRouteTo())) {
-                            $this->uriObj = $route;
-
-                            if ($loadResource === true) {
-                                call_user_func($route->getRouteTo(),$route->getClosureParams());
-                            }
-
-                            return;
-                        } else {
-                            $file = $route->getRouteTo();
-
-                            if (file_exists($file)) {
-                                $this->uriObj = $route;
-
-                                if ($loadResource === true) {
-                                    $classNamespace = require_once $file;
-
-                                    if (gettype($classNamespace) == 'string') {
-                                        if (strlen($classNamespace) == 0) {
-                                            $constructor = '\\'.$route->getClassName();
-                                        } else {
-                                            $constructor = '\\'.$classNamespace.'\\'.$route->getClassName();
-                                        }
-
-                                        if (class_exists($constructor)) {
-                                            $instance = new $constructor();
-
-                                            if ($instance instanceof WebServices) {
-                                                $instance->process();
-                                            }
-                                        }
-                                    }
-                                }
-                            } else if ($loadResource === true) {
-                                throw new RoutingException('The resource "'.Util::getRequestedURL().'" was availble. '
-                                        . 'but its route is not configured correctly. '
-                                        .'The resource which the route is pointing to was not found.');
-                            }
-
-                            return;
-                        }
+                        $route->setRequestedUri($uri);
+                        $this->_routeFound($route, $loadResource);
+                        return;
                     }
                 }
             }
+            
             //if no route found, try to replace variables with values 
             //note that query string vars are optional.
             $pathArray = $routeUri->getPathArray();
@@ -842,100 +805,117 @@ class Router {
 
             foreach ($this->routes as $route) {
                 if ($route->hasVars()) {
-                    $routePathArray = $route->getPathArray();
-
-                    if (count($routePathArray) == count($pathArray)) {
-                        $pathVarsCount = count($routePathArray);
-
-                        for ($x = 0 ; $x < $pathVarsCount ; $x++) {
-                            if ($this->_isDirectoryAVar($routePathArray[$x])) {
-                                $varName = trim($routePathArray[$x], '{}');
-                                $route->setUriVar($varName, $pathArray[$x]);
-
-                                if ($requestMethod == 'POST' || $requestMethod == 'PUT') {
-                                    $_POST[$varName] = filter_var(urldecode($pathArray[$x]),FILTER_SANITIZE_STRING);
-                                } else if ($requestMethod == 'GET' || $requestMethod == 'DELETE' || CLI::isCLI()) {
-                                    //usually, in CLI there is no request method. 
-                                    //but we store result in $_GET.
-                                    $_GET[$varName] = filter_var(urldecode($pathArray[$x]),FILTER_SANITIZE_STRING);
-                                }
-                            } else if ((!$route->isCaseSensitive() && (strtolower($routePathArray[$x]) != strtolower($pathArray[$x]))) || $routePathArray[$x] != $pathArray[$x]) {
-                                break;
-                            }
-                        }
-                    }
+                    $this->_setUriVars($route, $pathArray, $requestMethod);
                     //if all variables are set, then we found our route.
-                    if ($route->isAllVarsSet()) {
-                        if (is_callable($route->getRouteTo())) {
-                            $this->uriObj = $route;
-
-                            if ($loadResource === true) {
-                                call_user_func($route->getRouteTo(),$route->getClosureParams());
-                            }
-
-                            return;
-                        } else {
-                            if ($route->getType() == self::API_ROUTE) {
-                                if (!defined('API_CALL')) {
-                                    define('API_CALL', true);
-                                }
-                            }
-                            $file = $route->getRouteTo();
-
-                            if (file_exists($file)) {
-                                $this->uriObj = $route;
-
-                                if ($loadResource === true) {
-                                    $classNamespace = require_once $file;
-
-                                    if (gettype($classNamespace) == 'string') {
-                                        if (strlen($classNamespace) == 0) {
-                                            $constructor = '\\'.$route->getClassName();
-                                        } else {
-                                            $constructor = '\\'.$classNamespace.'\\'.$route->getClassName();
-                                        }
-
-                                        if (class_exists($constructor)) {
-                                            $instance = new $constructor();
-
-                                            if ($instance instanceof WebServices) {
-                                                $instance->process();
-                                            }
-                                        }
-                                    }
-                                }
-                            } else if ($loadResource === true) {
-                                throw new RoutingException('The resource "'.Util::getRequestedURL().'" was availble. '
-                                        . 'but its route is not configured correctly. '
-                                        .'The resource which the route is pointing to was not found.');
-                            }
-
-                            return;
-                        }
+                    if ($route->isAllVarsSet() && $route->setRequestedUri($uri)) {
+                        $this->_routeFound($route, $loadResource);
+                        return;
                     }
                 }
             }
             //if we reach this part, this means the route was not found
             if ($loadResource === true) {
                 call_user_func($this->onNotFound);
+                return;
             }
-        } else {
+        } else if ($loadResource === true) {
+            header("HTTP/1.1 418 I'm a teapot");
+            die(''
+                .'<!DOCTYPE html>'
+                .'<html>'
+                .'<head>'
+                .'<title>I\'m a teapot</title>'
+                .'</head>'
+                .'<body>'
+                .'<h1>418 - I\'m a teabot</h1>'
+                .'<hr>'
+                .'<p>'
+                .'Acctually, I\'m an empty teapot since I don\'t have routes yet.'
+                .'</p>'
+                .'</body>'
+                .'</html>');
+        }
+    }
+    private function _routeFound($route, $loadResource) {
+        if (is_callable($route->getRouteTo())) {
+            $this->uriObj = $route;
+
             if ($loadResource === true) {
-                header("HTTP/1.1 418 I'm a teapot");
-                die(''
-                    .'<!DOCTYPE html>'
-                    .'<html>'
-                    .'<head>'
-                    .'<title>I\'m a teapot</title>'
-                    .'</head>'
-                    .'<body>'
-                    .'<h1>418 - I\'m a teabot</h1>'
-                    .'<hr>'
-                    .'<p>'
-                    .'Acctually, I\'m an empty teapot since I don\'t have routes yet.'
-                    .'</p>'
-                    .'</body>'
-                    .'</html>');
+                call_user_func($route->getRouteTo(),$route->getClosureParams());
+            }
+
+            return;
+        } else {
+            if ($route->getType() == self::API_ROUTE && !defined('API_CALL')) {
+                define('API_CALL', true);
+            }
+            $file = $route->getRouteTo();
+
+            if (file_exists($file)) {
+                $this->uriObj = $route;
+
+                if ($loadResource === true) {
+                    $this->_loadResource($route);
+                }
+            } else if ($loadResource === true) {
+                throw new RoutingException('The resource "'.Util::getRequestedURL().'" was availble. '
+                        . 'but its route is not configured correctly. '
+                        .'The resource which the route is pointing to was not found.');
+            }
+
+        }
+    }
+    /**
+     * 
+     * @param RouterUri $route
+     */
+    private function _loadResource($route) {
+        $file = $route->getRouteTo();
+        $classNamespace = require_once $file;
+
+        if (gettype($classNamespace) == 'string') {
+            if (strlen($classNamespace) == 0) {
+                $constructor = '\\'.$route->getClassName();
+            } else {
+                $constructor = '\\'.$classNamespace.'\\'.$route->getClassName();
+            }
+
+            if (class_exists($constructor)) {
+                $instance = new $constructor();
+
+                if ($instance instanceof WebServices) {
+                    $instance->process();
+                }
+            }
+        }
+    }
+    /**
+     * 
+     * @param RouterUri $uriRouteObj One URI object taken from stored routes.
+     * @param array $requestedPathArr An array that contains requested URI path 
+     * part.
+     * @param string $requestMethod
+     */
+    private function _setUriVars($uriRouteObj, $requestedPathArr, $requestMethod){
+        $routePathArray = $uriRouteObj->getPathArray();
+        if (count($routePathArray) == count($requestedPathArr)) {
+            $pathVarsCount = count($routePathArray);
+
+            for ($x = 0 ; $x < $pathVarsCount ; $x++) {
+                if ($this->_isDirectoryAVar($routePathArray[$x])) {
+                    $varName = trim($routePathArray[$x], '{}');
+                    $uriRouteObj->setUriVar($varName, $requestedPathArr[$x]);
+
+                    if ($requestMethod == 'POST' || $requestMethod == 'PUT') {
+                        $_POST[$varName] = filter_var(urldecode($requestedPathArr[$x]),FILTER_SANITIZE_STRING);
+                    } else if ($requestMethod == 'GET' || $requestMethod == 'DELETE' || CLI::isCLI()) {
+                        //usually, in CLI there is no request method. 
+                        //but we store result in $_GET.
+                        $_GET[$varName] = filter_var(urldecode($requestedPathArr[$x]),FILTER_SANITIZE_STRING);
+                    }
+                } else if ((!$uriRouteObj->isCaseSensitive() && (strtolower($routePathArray[$x]) != strtolower($requestedPathArr[$x]))) || $routePathArray[$x] != $requestedPathArr[$x]) {
+                    break;
+                }
             }
         }
     }

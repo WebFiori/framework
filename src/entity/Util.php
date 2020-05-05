@@ -558,10 +558,10 @@ class Util {
         } else if ($expr === false) {
             $expr = 'false';
         }
-
         if (CLI::isCLI()) {
             $val = print_r($expr, true);
             fprintf(STDOUT, "%s\n",$val);
+            return;
         } else if (gettype($expr) == 'string') {
             $expr1 = str_replace('<', '&lt;', $expr);
             $expr = str_replace('>', '&gt;', $expr1);

@@ -65,7 +65,7 @@ class CronTaskView extends CronView {
             $this->getControlsContainer()->addTextNode('<br/>', false);
             $this->_createInfoTable($job);
             $this->_createCustomParamsContainer();
-            $custAttrsNames = $job->getExecutionAttributes();
+            $custAttrsNames = $job->getExecArgs();
             $custAtrrsAsJsonArr = '[';
 
             for ($x = 0 ; $x < count($custAttrsNames) ; $x++) {

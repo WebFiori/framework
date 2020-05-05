@@ -85,8 +85,20 @@ If you plan to test the framework on your local machine, you have to download AM
 We suggest to use the ones that are offered by Bitnami. You can go to https://bitnami.com/stacks/infrastructure to check 
 the available options.
 
-Once downloaded and installed, download the latest release of the framework from https://programmingacademia.com/webfiori/download. 
+Once downloaded and installed, download the latest release of the framework from https://webfiori.com/download. 
 After downloading, extract all files inside the folder '/htdocs'. The folder will be inside the place where you installed AMP
 stack.
+
+Another option is to use composer to install the framework. Simply, add following entry in your `composer.json` to download the framework and the packages that it depends on:
+``` json
+"require": {
+    "webfiori/framework":"*"
+}
+```
+Once added, run composer and it should install everything.
+
 ### Hosting on the Web
 If you plan to use the framework for all of your domain, then simply upload all framework files to the root folder of your website (usually has the name "public_html"). If you plan to use it in specific part of your website, then upload framework files to the folder that the part of your website will point to.
+
+## License
+The project is licensed under MIT license.

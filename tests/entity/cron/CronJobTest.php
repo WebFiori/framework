@@ -44,7 +44,7 @@ class CronJobTest extends TestCase {
         $job = new CronJob();
         $this->assertEquals('* * * * *',$job->getExpression());
         $this->assertEquals('CRON-JOB',$job->getJobName());
-        $this->assertTrue(is_callable($job->getOnExecution()));
+        $this->assertTrue(!is_callable($job->getOnExecution()));
         $this->assertTrue($job->isMinute());
         $this->assertTrue($job->isHour());
         $this->assertTrue($job->isDayOfWeek());
@@ -59,7 +59,7 @@ class CronJobTest extends TestCase {
         $job = new CronJob(null);
         $this->assertEquals('* * * * *',$job->getExpression());
         $this->assertEquals('CRON-JOB',$job->getJobName());
-        $this->assertTrue(is_callable($job->getOnExecution()));
+        $this->assertTrue(!is_callable($job->getOnExecution()));
         $this->assertTrue($job->isMinute());
         $this->assertTrue($job->isHour());
         $this->assertTrue($job->isDayOfWeek());
@@ -527,7 +527,7 @@ class CronJobTest extends TestCase {
         {
             //do nothing
         });
-        $isExe = $job->execute();
+        $isExe = $job->exec();
         $this->assertTrue($isExe);
         $this->assertTrue($job->isSuccess());
     }
@@ -540,7 +540,7 @@ class CronJobTest extends TestCase {
         {
             return false;
         });
-        $isExe = $job->execute();
+        $isExe = $job->exec();
         $this->assertTrue($isExe);
         $this->assertFalse($job->isSuccess());
     }
@@ -553,7 +553,7 @@ class CronJobTest extends TestCase {
         {
             return true;
         });
-        $isExe = $job->execute();
+        $isExe = $job->exec();
         $this->assertTrue($isExe);
         $this->assertTrue($job->isSuccess());
     }
@@ -566,7 +566,7 @@ class CronJobTest extends TestCase {
         {
             throw new \Exception();
         });
-        $job->execute();
+        $job->exec();
         $this->assertFalse($job->isSuccess());
     }
     /**
@@ -578,10 +578,10 @@ class CronJobTest extends TestCase {
         $job->setOnExecution(function()
         {
         });
-        $r = $job->execute();
+        $r = $job->exec();
         $this->assertFalse($r);
         $this->assertFalse($job->isSuccess());
-        $r2 = $job->execute(true);
+        $r2 = $job->exec(true);
         $this->assertTrue($r2);
         $this->assertTrue($job->isSuccess());
     }
@@ -599,10 +599,10 @@ class CronJobTest extends TestCase {
         {
             throw new \Exception();
         });
-        $r = $job->execute();
+        $r = $job->exec();
         $this->assertFalse($r);
         $this->assertFalse($job->isSuccess());
-        $r2 = $job->execute(true);
+        $r2 = $job->exec(true);
         $this->assertTrue($r2);
         $this->assertFalse($job->isSuccess());
     }

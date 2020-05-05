@@ -92,15 +92,6 @@ class DatabaseSchema {
 
         return false;
     }
-    private function _orderCheck($queryClassName) {
-        $lstOrder = $this->getLastOrder();
-
-        if ($lstOrder != -1) {
-            $this->queries[$lstOrder] = $queryClassName;
-        } else {
-            $this->queries[20] = $queryClassName;
-        }
-    }
     /**
      * Returns a singleton of the class DatabaseSchema.
      * @return DatabaseSchema
@@ -132,8 +123,8 @@ class DatabaseSchema {
      */
     public function getCreateDatabaseStatement($schemaName) {
         return 'create database if not exists '.$schemaName.';'."\n"
-             . 'use '.$schemaName.';'."\n"
-             . $this->getSchema();
+             .'use '.$schemaName.';'."\n"
+             .$this->getSchema();
     }
     /**
      * Returns the order of the last query builder class name.
@@ -202,5 +193,14 @@ class DatabaseSchema {
         }
 
         return $schemaStr;
+    }
+    private function _orderCheck($queryClassName) {
+        $lstOrder = $this->getLastOrder();
+
+        if ($lstOrder != -1) {
+            $this->queries[$lstOrder] = $queryClassName;
+        } else {
+            $this->queries[20] = $queryClassName;
+        }
     }
 }

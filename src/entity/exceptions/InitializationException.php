@@ -32,5 +32,4 @@ use Exception;
  * @version 1.0
  */
 class InitializationException extends Exception {
-
 }

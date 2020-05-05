@@ -24,14 +24,14 @@
  */
 namespace webfiori\entity\router;
 
-use webfiori\conf\SiteConfig;
-use webfiori\entity\Util;
-use webfiori\entity\CLI;
-use webfiori\entity\ui\NotFoundView;
-use webfiori\entity\exceptions\RoutingException;
 use jsonx\JsonX;
 use phpStructs\html\HTMLNode;
 use restEasy\WebServices;
+use webfiori\conf\SiteConfig;
+use webfiori\entity\CLI;
+use webfiori\entity\exceptions\RoutingException;
+use webfiori\entity\ui\NotFoundView;
+use webfiori\entity\Util;
 /**
  * The basic class that is used to route user requests to the correct 
  * location.
@@ -134,7 +134,7 @@ class Router {
         $this->routes = [];
         $this->onNotFound = function ()
         {
-            if(!defined('API_CALL')){
+            if (!defined('API_CALL')) {
                 $notFoundView = new NotFoundView();
                 $notFoundView->display();
             } else {
@@ -152,6 +152,38 @@ class Router {
         } else {
             $this->baseUrl = trim(Util::getBaseURL(), '/');
         }
+    }
+    public function _searchRoute($routeUri, $uri, $loadResource, $withVars = false) {
+        $pathArray = $routeUri->getPathArray();
+        $requestMethod = filter_var(getenv('REQUEST_METHOD'));
+
+        foreach ($this->routes as $route) {
+            if (!$withVars && !$route->hasVars()) {
+                if (!$route->isCaseSensitive()) {
+                    $isEqual = strtolower($route->getUri()) == 
+                    strtolower($routeUri->getUri());
+                } else {
+                    $isEqual = $route->getUri() == $routeUri->getUri();
+                }
+
+                if ($isEqual) {
+                    $route->setRequestedUri($uri);
+                    $this->_routeFound($route, $loadResource);
+
+                    return true;
+                }
+            } else if ($withVars && $route->hasVars()) {
+                $this->_setUriVars($route, $pathArray, $requestMethod);
+                //if all variables are set, then we found our route.
+                if ($route->isAllVarsSet() && $route->setRequestedUri($uri)) {
+                    $this->_routeFound($route, $loadResource);
+
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
     /**
      * Adds new route to an API file.
@@ -520,25 +552,6 @@ class Router {
         return false;
     }
     /**
-     * Returns an object of type 'RouterUri' that represents route URI.
-     * @param string $path The path part of the URI.
-     * @return RouterUri|null If a route was found which has the given path, 
-     * an object of type 'RouterUri' is returned. If no route is found, null 
-     * is returned.
-     * @since 1.3.3
-     */
-    private function _getUriObj($path) {
-        $routeURI = new RouterUri($this->getBase().$this->_fixUriPath($path), '');
-
-        foreach ($this->routes as $route) {
-            if ($routeURI->equals($route)) {
-                return $route;
-            }
-        }
-
-        return null;
-    }
-    /**
      * Adds new route to the router.
      * @param array $options An associative array of route options. The 
      * array can have the following indices:
@@ -581,8 +594,6 @@ class Router {
      * @since 1.0
      */
     private function _addRoute($options) {
-        
-
         if (!isset($options['route-to'])) {
             return false;
         } else {
@@ -594,49 +605,10 @@ class Router {
             $routeType == self::VIEW_ROUTE || 
             $routeType == self::CUSTOMIZED || 
             $routeType == self::CLOSURE_ROUTE)) {
-
             return $this->_addRouteHelper($options);
         }
 
         return false;
-    }
-    /**
-     * Checks for provided options and set defaults for the ones which are 
-     * not provided.
-     * @param array $options
-     * @return array
-     */
-    private function _checkOptionsArr($options) {
-        $routeTo = $options['route-to'];
-        if(isset($options['case-sensitive'])){
-            $caseSensitive = $options['case-sensitive'] === true;
-        } else {
-            $caseSensitive = true;
-        }
-        
-        $routeType = isset($options['type']) ? $options['type'] : Router::CUSTOMIZED;
-        if(isset($options['in-sitemap'])){
-            $incInSiteMap = $options['in-sitemap']; 
-        } else {
-            $incInSiteMap = false;
-        }
-        if(isset($options['as-api'])){
-            $asApi = $options['as-api'] === true;
-        } else {
-            $asApi = false;
-        }
-        $closureParams = isset($options['closure-params']) && gettype($options['closure-params']) == 'array' ? 
-                $options['closure-params'] : [];
-        $path = isset($options['path']) ? $this->_fixUriPath($options['path']) : '';
-        return [
-            'case-sensitive'=>$caseSensitive,
-            'type'=>$routeType,
-            'in-sitemap'=>$incInSiteMap,
-            'as-api'=>$asApi,
-            'path' => $path,
-            'route-to'=>$routeTo,
-            'closure-params'=>$closureParams
-        ];
     }
     private function _addRouteHelper($options) {
         $routeTo = $options['route-to'];
@@ -646,7 +618,7 @@ class Router {
         $asApi = $options['as-api'];
         $closureParams = $options['closure-params'] ;
         $path = $options['path'];
-        
+
         if ($routeType != self::CLOSURE_ROUTE) {
             if ($routeType != self::CUSTOMIZED) {
                 $routeTo = ROOT_DIR.$routeType.$this->_fixFilePath($routeTo);
@@ -670,7 +642,50 @@ class Router {
 
             return true;
         }
+
         return false;
+    }
+    /**
+     * Checks for provided options and set defaults for the ones which are 
+     * not provided.
+     * @param array $options
+     * @return array
+     */
+    private function _checkOptionsArr($options) {
+        $routeTo = $options['route-to'];
+
+        if (isset($options['case-sensitive'])) {
+            $caseSensitive = $options['case-sensitive'] === true;
+        } else {
+            $caseSensitive = true;
+        }
+
+        $routeType = isset($options['type']) ? $options['type'] : Router::CUSTOMIZED;
+
+        if (isset($options['in-sitemap'])) {
+            $incInSiteMap = $options['in-sitemap'];
+        } else {
+            $incInSiteMap = false;
+        }
+
+        if (isset($options['as-api'])) {
+            $asApi = $options['as-api'] === true;
+        } else {
+            $asApi = false;
+        }
+        $closureParams = isset($options['closure-params']) && gettype($options['closure-params']) == 'array' ? 
+                $options['closure-params'] : [];
+        $path = isset($options['path']) ? $this->_fixUriPath($options['path']) : '';
+
+        return [
+            'case-sensitive' => $caseSensitive,
+            'type' => $routeType,
+            'in-sitemap' => $incInSiteMap,
+            'as-api' => $asApi,
+            'path' => $path,
+            'route-to' => $routeTo,
+            'closure-params' => $closureParams
+        ];
     }
     private function _fixFilePath($path) {
         if (strlen($path) != 0 && $path != '/') {
@@ -727,6 +742,25 @@ class Router {
         return $this->routes;
     }
     /**
+     * Returns an object of type 'RouterUri' that represents route URI.
+     * @param string $path The path part of the URI.
+     * @return RouterUri|null If a route was found which has the given path, 
+     * an object of type 'RouterUri' is returned. If no route is found, null 
+     * is returned.
+     * @since 1.3.3
+     */
+    private function _getUriObj($path) {
+        $routeURI = new RouterUri($this->getBase().$this->_fixUriPath($path), '');
+
+        foreach ($this->routes as $route) {
+            if ($routeURI->equals($route)) {
+                return $route;
+            }
+        }
+
+        return null;
+    }
+    /**
      * Checks if a given path has a route or not.
      * @param string $path The path which will be checked (such as '/path1/path2')
      * @return boolean The method will return true if the given path 
@@ -751,6 +785,30 @@ class Router {
      */
     private function _isDirectoryAVar($dir) {
         return $dir[0] == '{' && $dir[strlen($dir) - 1] == '}';
+    }
+    /**
+     * 
+     * @param RouterUri $route
+     */
+    private function _loadResource($route) {
+        $file = $route->getRouteTo();
+        $classNamespace = require_once $file;
+
+        if (gettype($classNamespace) == 'string') {
+            if (strlen($classNamespace) == 0) {
+                $constructor = '\\'.$route->getClassName();
+            } else {
+                $constructor = '\\'.$classNamespace.'\\'.$route->getClassName();
+            }
+
+            if (class_exists($constructor)) {
+                $instance = new $constructor();
+
+                if ($instance instanceof WebServices) {
+                    $instance->process();
+                }
+            }
+        }
     }
     /**
      * Display all routes details.
@@ -781,65 +839,36 @@ class Router {
         if (count($this->routes) != 0) {
             $routeUri = new RouterUri($uri, '');
             //first, search for the URI wuthout checking variables
-            if($this->_searchRoute($routeUri, $uri, $loadResource)){
+            if ($this->_searchRoute($routeUri, $uri, $loadResource)) {
                 return;
             }
             //if no route found, try to replace variables with values 
             //note that query string vars are optional.
-            if($this->_searchRoute($routeUri, $uri, $loadResource, true)){
+            if ($this->_searchRoute($routeUri, $uri, $loadResource, true)) {
                 return;
             }
-            
+
             //if we reach this part, this means the route was not found
             if ($loadResource) {
                 call_user_func($this->onNotFound);
             }
-            
         } else if ($loadResource === true) {
             header("HTTP/1.1 418 I'm a teapot");
             die(''
-                .'<!DOCTYPE html>'
-                .'<html>'
-                .'<head>'
-                .'<title>I\'m a teapot</title>'
-                .'</head>'
-                .'<body>'
-                .'<h1>418 - I\'m a teabot</h1>'
-                .'<hr>'
-                .'<p>'
-                .'Acctually, I\'m an empty teapot since I don\'t have routes yet.'
-                .'</p>'
-                .'</body>'
-                .'</html>');
+            .'<!DOCTYPE html>'
+            .'<html>'
+            .'<head>'
+            .'<title>I\'m a teapot</title>'
+            .'</head>'
+            .'<body>'
+            .'<h1>418 - I\'m a teabot</h1>'
+            .'<hr>'
+            .'<p>'
+            .'Acctually, I\'m an empty teapot since I don\'t have routes yet.'
+            .'</p>'
+            .'</body>'
+            .'</html>');
         }
-    }
-    public function _searchRoute($routeUri, $uri, $loadResource, $withVars = false) {
-        $pathArray = $routeUri->getPathArray();
-        $requestMethod = filter_var(getenv('REQUEST_METHOD'));
-        foreach ($this->routes as $route) {
-            if (!$withVars && !$route->hasVars()) {
-                if (!$route->isCaseSensitive()) {
-                    $isEqual = strtolower($route->getUri()) == 
-                    strtolower($routeUri->getUri());
-                } else {
-                    $isEqual = $route->getUri() == $routeUri->getUri();
-                }
-
-                if ($isEqual) {
-                    $route->setRequestedUri($uri);
-                    $this->_routeFound($route, $loadResource);
-                    return true;
-                }
-            } else if ($withVars && $route->hasVars()) {
-                $this->_setUriVars($route, $pathArray, $requestMethod);
-                //if all variables are set, then we found our route.
-                if ($route->isAllVarsSet() && $route->setRequestedUri($uri)) {
-                    $this->_routeFound($route, $loadResource);
-                    return true;
-                }
-            }
-        }
-        return false;
     }
     private function _routeFound($route, $loadResource) {
         if (is_callable($route->getRouteTo())) {
@@ -848,49 +877,32 @@ class Router {
             if ($loadResource === true) {
                 call_user_func($route->getRouteTo(),$route->getClosureParams());
             }
+        } else if ($route->getType() == self::API_ROUTE && !defined('API_CALL')) {
+            define('API_CALL', true);
+        }
+        $file = $route->getRouteTo();
 
-        } else {
-            if ($route->getType() == self::API_ROUTE && !defined('API_CALL')) {
-                define('API_CALL', true);
+        if (file_exists($file)) {
+            $this->uriObj = $route;
+
+            if ($loadResource === true) {
+                $this->_loadResource($route);
             }
-            $file = $route->getRouteTo();
-
-            if (file_exists($file)) {
-                $this->uriObj = $route;
-
-                if ($loadResource === true) {
-                    $this->_loadResource($route);
-                }
-            } else if ($loadResource === true) {
-                throw new RoutingException('The resource "'.Util::getRequestedURL().'" was availble. '
-                        . 'but its route is not configured correctly. '
-                        .'The resource which the route is pointing to was not found.');
-            }
-
+        } else if ($loadResource === true) {
+            throw new RoutingException('The resource "'.Util::getRequestedURL().'" was availble. '
+                .'but its route is not configured correctly. '
+                .'The resource which the route is pointing to was not found.');
         }
     }
     /**
-     * 
-     * @param RouterUri $route
+     * Sets a callback to call in case a given rout is not found.
+     * @param callable $function The function which will be called if 
+     * the rout is not found.
+     * @since 1.0
      */
-    private function _loadResource($route) {
-        $file = $route->getRouteTo();
-        $classNamespace = require_once $file;
-
-        if (gettype($classNamespace) == 'string') {
-            if (strlen($classNamespace) == 0) {
-                $constructor = '\\'.$route->getClassName();
-            } else {
-                $constructor = '\\'.$classNamespace.'\\'.$route->getClassName();
-            }
-
-            if (class_exists($constructor)) {
-                $instance = new $constructor();
-
-                if ($instance instanceof WebServices) {
-                    $instance->process();
-                }
-            }
+    private function _setOnNotFound($function) {
+        if (is_callable($function)) {
+            $this->onNotFound = $function;
         }
     }
     /**
@@ -900,8 +912,9 @@ class Router {
      * part.
      * @param string $requestMethod
      */
-    private function _setUriVars($uriRouteObj, $requestedPathArr, $requestMethod){
+    private function _setUriVars($uriRouteObj, $requestedPathArr, $requestMethod) {
         $routePathArray = $uriRouteObj->getPathArray();
+
         if (count($routePathArray) == count($requestedPathArr)) {
             $pathVarsCount = count($routePathArray);
 
@@ -921,17 +934,6 @@ class Router {
                     break;
                 }
             }
-        }
-    }
-    /**
-     * Sets a callback to call in case a given rout is not found.
-     * @param callable $function The function which will be called if 
-     * the rout is not found.
-     * @since 1.0
-     */
-    private function _setOnNotFound($function) {
-        if (is_callable($function)) {
-            $this->onNotFound = $function;
         }
     }
     /**

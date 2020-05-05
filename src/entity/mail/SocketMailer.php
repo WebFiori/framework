@@ -24,8 +24,8 @@
  */
 namespace webfiori\entity\mail;
 
-use webfiori\entity\File;
 use webfiori\entity\exceptions\SMTPException;
+use webfiori\entity\File;
 /**
  * A class that can be used to send email messages using sockets.
  *
@@ -114,6 +114,12 @@ class SocketMailer {
      */
     private $receivers;
     /**
+     *
+     * @var array
+     * @since 1.4.8 
+     */
+    private $responseLog;
+    /**
      * The email address of the sender.
      * @var string 
      */
@@ -151,12 +157,6 @@ class SocketMailer {
      */
     private $writeMode;
     /**
-     *
-     * @var array
-     * @since 1.4.8 
-     */
-    private $responseLog;
-    /**
      * Creates new instance of the class.
      * @since 1.0
      */
@@ -174,21 +174,6 @@ class SocketMailer {
         $this->useTls = false;
         $this->setPriority(0);
         $this->lastResponseCode = 0;
-    }
-    /**
-     * Returns an array that contains log messages for any SMTP command 
-     * which was sent,
-     * @return array The array will be indexed. In every index, there 
-     * will be a sub-associative array with the following indices:
-     * <ul>
-     * <li>command</li>
-     * <li>response-code</li>
-     * <li>response-message</li>
-     * </ul>
-     * @since 1.4.8
-     */
-    public function getResponsesLog() {
-        return $this->responseLog;
     }
     /**
      * Adds new attachment to the message.
@@ -232,12 +217,10 @@ class SocketMailer {
             if (strlen($addressTrimmed) != 0) {
                 if ($isBcc) {
                     $this->bcc[$addressTrimmed] = $nameTrimmed;
+                } else if ($isCC) {
+                    $this->cc[$addressTrimmed] = $nameTrimmed;
                 } else {
-                    if ($isCC) {
-                        $this->cc[$addressTrimmed] = $nameTrimmed;
-                    } else {
-                        $this->receivers[$addressTrimmed] = $nameTrimmed;
-                    }
+                    $this->receivers[$addressTrimmed] = $nameTrimmed;
                 }
 
                 return true;
@@ -267,11 +250,12 @@ class SocketMailer {
 
             if ($portNum == 465) {
                 $protocol = "ssl://";
-            } else if ($portNum == 587) {
+            } else  if ($portNum == 587) {
                 $protocol = "tls://";
             }
             $err = 0;
             $errStr = '';
+
             if (function_exists('stream_socket_client')) {
                 $context = stream_context_create([
                     'ssl' => [
@@ -412,6 +396,21 @@ class SocketMailer {
         }
 
         return implode(',', $arr);
+    }
+    /**
+     * Returns an array that contains log messages for any SMTP command 
+     * which was sent,
+     * @return array The array will be indexed. In every index, there 
+     * will be a sub-associative array with the following indices:
+     * <ul>
+     * <li>command</li>
+     * <li>response-code</li>
+     * <li>response-message</li>
+     * </ul>
+     * @since 1.4.8
+     */
+    public function getResponsesLog() {
+        return $this->responseLog;
     }
     /**
      * Returns the email address of the sender.
@@ -579,11 +578,13 @@ class SocketMailer {
             'response-code' => 0,
             'response-message' => ''
         ];
-        if($this->lastResponseCode >= 400){
+
+        if ($this->lastResponseCode >= 400) {
             throw new SMTPException('Unable to send SMTP commend "'.$command.'" due to '
-                    . 'error code '.$this->lastResponseCode.' caused by last command. '
-                    . 'Error message: "'.$this->lastResponse.'".');
+                    .'error code '.$this->lastResponseCode.' caused by last command. '
+                    .'Error message: "'.$this->lastResponse.'".');
         }
+
         if ($this->isConnected()) {
             if ($this->isInWritingMode()) {
                 fwrite($this->conn, $command.self::NL);
@@ -597,15 +598,17 @@ class SocketMailer {
                 $this->lastResponse = $response;
                 $logEntry['response-message'] = $response;
                 $logEntry['response-code'] = $this->getLastResponseCode();
-                
+
                 if ($command == 'DATA') {
                     $this->writeMode = true;
                 }
             }
             $this->responseLog[] = $logEntry;
+
             return true;
         } else {
             $this->responseLog[] = $logEntry;
+
             return false;
         }
     }
@@ -641,12 +644,10 @@ class SocketMailer {
 
         if ($asInt <= -1) {
             $this->priority = -1;
+        } else if ($asInt >= 1) {
+            $this->priority = 1;
         } else {
-            if ($asInt >= 1) {
-                $this->priority = 1;
-            } else {
-                $this->priority = 0;
-            }
+            $this->priority = 0;
         }
     }
     /**
@@ -700,11 +701,11 @@ class SocketMailer {
                 $this->sendC(self::NL.'.');
                 $this->sendC('QUIT');
             }
-        } else if (strlen($this->getSenderAddress()) != 0) {
+        } else  if (strlen($this->getSenderAddress()) != 0) {
             $this->_receiversCommand();
             $this->sendC('DATA');
             $importanceHeaderVal = $this->_priorityCommand();
-            
+
             $this->sendC('Content-Transfer-Encoding: quoted-printable');
             $this->sendC('Importance: '.$importanceHeaderVal);
             $this->sendC('From: "'.$this->getSenderName().'" <'.$this->getSenderAddress().'>');
@@ -726,32 +727,6 @@ class SocketMailer {
             }
         }
     }
-    private function _priorityCommand() {
-        $priorityAsInt = $this->getPriority();
-        $priorityHeaderVal = self::PRIORITIES[$priorityAsInt];
-        if ($priorityAsInt == -1) {
-            $importanceHeaderVal = 'low';
-        } else if ($priorityAsInt == 1) {
-            $importanceHeaderVal = 'High';
-        } else {
-            $importanceHeaderVal = 'normal';
-        }
-        $this->sendC('Priority: '.$priorityHeaderVal);
-        return $importanceHeaderVal;
-    }
-    private function _receiversCommand() {
-        foreach ($this->receivers as $address => $name) {
-            $this->sendC('RCPT TO: <'.$address.'>');
-        }
-
-        foreach ($this->cc as $address => $name) {
-            $this->sendC('RCPT TO: <'.$address.'>');
-        }
-
-        foreach ($this->bcc as $address => $name) {
-            $this->sendC('RCPT TO: <'.$address.'>');
-        }
-    }
     /**
      * A method that is used to include email attachments.
      * @since 1.3
@@ -771,6 +746,34 @@ class SocketMailer {
                 $this->sendC($contentChunk);
             }
             $this->sendC('--'.$this->boundry.'--');
+        }
+    }
+    private function _priorityCommand() {
+        $priorityAsInt = $this->getPriority();
+        $priorityHeaderVal = self::PRIORITIES[$priorityAsInt];
+
+        if ($priorityAsInt == -1) {
+            $importanceHeaderVal = 'low';
+        } else if ($priorityAsInt == 1) {
+            $importanceHeaderVal = 'High';
+        } else {
+            $importanceHeaderVal = 'normal';
+        }
+        $this->sendC('Priority: '.$priorityHeaderVal);
+
+        return $importanceHeaderVal;
+    }
+    private function _receiversCommand() {
+        foreach ($this->receivers as $address => $name) {
+            $this->sendC('RCPT TO: <'.$address.'>');
+        }
+
+        foreach ($this->cc as $address => $name) {
+            $this->sendC('RCPT TO: <'.$address.'>');
+        }
+
+        foreach ($this->bcc as $address => $name) {
+            $this->sendC('RCPT TO: <'.$address.'>');
         }
     }
     /**

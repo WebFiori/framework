@@ -31,5 +31,5 @@ use Exception;
  *
  * @author Ibrahim
  */
-class MissingLangException extends Exception{
+class MissingLangException extends Exception {
 }

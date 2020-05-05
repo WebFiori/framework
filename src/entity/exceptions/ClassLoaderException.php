@@ -32,6 +32,5 @@ use Exception;
  * @author Ibrahim
  * @version 1.0
  */
-class ClassLoaderException extends Exception{
-    
+class ClassLoaderException extends Exception {
 }

@@ -24,58 +24,60 @@
  */
 namespace webfiori\entity\cli;
 
-use webfiori\entity\cli\CLICommand;
 use webfiori\entity\cron\Cron;
 /**
  * Description of CronCommand
  *
  * @author Ibrahim
  */
-class CronCommand extends CLICommand{
+class CronCommand extends CLICommand {
     public function __construct() {
         parent::__construct('--cron', [
-            'p'=>[
-                'optional'=>true,
-                'description'=>'CRON password. If it is set in CRON, then it must be '
-                . 'provided here.'
+            'p' => [
+                'optional' => true,
+                'description' => 'CRON password. If it is set in CRON, then it must be '
+                .'provided here.'
             ],
-            'check'=>[
-                'optional'=>true,
+            'check' => [
+                'optional' => true,
                 'description' => 'Run a check aginst all jobs to check if '
-                . 'it is time to execute them or not.'
+                .'it is time to execute them or not.'
             ],
-            'force'=>[
-                'optional'=>true,
+            'force' => [
+                'optional' => true,
                 'description' => 'Force a specific job to execute.'
             ],
-            'job-name'=>[
-                'optional'=>true,
+            'job-name' => [
+                'optional' => true,
                 'description' => 'The name of the job that will be forced to '
-                . 'execute.'
+                .'execute.'
             ],
-            'show-job-args'=>[
-                'optional'=>true,
+            'show-job-args' => [
+                'optional' => true,
                 'description' => 'If this one is provided with job name and a '
-                . 'job has custom execution args, they will be shown.'
+                .'job has custom execution args, they will be shown.'
             ],
-            'show-log'=>[
-                'optional'=>true,
-                'description'=>'If set, execution log will be shown after '
-                . 'execution is completed.'
+            'show-log' => [
+                'optional' => true,
+                'description' => 'If set, execution log will be shown after '
+                .'execution is completed.'
             ]
         ], 'Run CRON Scheduler');
-        if(Cron::password() != 'NO_PASSWORD'){
+
+        if (Cron::password() != 'NO_PASSWORD') {
             $this->addArg('password', [
-                'optional'=>false,
-                'description'=>'CRON password.'
+                'optional' => false,
+                'description' => 'CRON password.'
             ]);
         }
     }
     public function exec() {
         $retVal = -1;
-        if($this->isArgProvided('check')){
+
+        if ($this->isArgProvided('check')) {
             $pass = $this->getArgValue('p');
-            if($pass !== null){
+
+            if ($pass !== null) {
                 $result = Cron::run($pass, null, false, $this);
 
                 if ($result == 'INV_PASS') {
@@ -88,49 +90,21 @@ class CronCommand extends CLICommand{
             } else {
                 fprintf(STDERR,"Error: The argument 'p' is missing. It must be provided if cron password is set.\n");
             }
-        } else if ($this->isArgProvided('force')){
+        } else if ($this->isArgProvided('force')) {
             $retVal = $this->_force();
-        }  else if ($this->isArgProvided('show-job-args')) {
+        } else if ($this->isArgProvided('show-job-args')) {
             $this->_showJobArgs();
         } else {
             fprintf(STDOUT,"Info: At least one of the options 'check', 'force' or 'show-job-args' must be provided.\n");
         }
-        
+
         return $retVal;
-    }
-    private function _showJobArgs() {
-        $jobName = $this->getArgValue('job-name');
-        if($jobName !== null){
-            $job = Cron::getJob($jobName);
-            if($job !== null){
-                fprintf(STDOUT,"Job Args:\n");
-                $customArgs = $job->getExecArgsNames();
-                if(count($customArgs) != 0){
-                    foreach ($customArgs as $argName){
-                        fprintf(STDOUT,"$argName\n");
-                    }
-                } else {
-                    fprintf(STDOUT,"<NO ARGS>");
-                }
-            } else {
-                fprintf(STDERR,"Error: No job which has the given name was found.\n");
-            }
-        } else {
-            fprintf(STDERR,"Error: The argument 'job-name' is missing.\n");
-        }
-    }
-    private function _showLog() {
-        if($this->isArgProvided('show-log')){
-            fprintf(STDERR, "Execution Log: \n");
-            foreach (Cron::getLogArray() as $message){
-                fprintf(STDERR, $message."\n");
-            }
-        }
     }
     private function _force() {
         $jobName = $this->getArgValue('job-name');
         $cPass = $this->getArgValue('p');
         $retVal = -1;
+
         if ($jobName === null) {
             fprintf(STDERR,"Error: Job name is missing.\n");
         } else if ($cPass === null && Cron::password() != 'NO_PASSWORD') {
@@ -148,6 +122,7 @@ class CronCommand extends CLICommand{
                 $retVal = 0;
             }
         }
+
         return $retVal;
     }
     private function _printExcResult($result) {
@@ -171,6 +146,39 @@ class CronCommand extends CLICommand{
         } else {
             foreach ($fJobs as $jobName) {
                 fprintf(STDOUT,"    ".$jobName."\n");
+            }
+        }
+    }
+    private function _showJobArgs() {
+        $jobName = $this->getArgValue('job-name');
+
+        if ($jobName !== null) {
+            $job = Cron::getJob($jobName);
+
+            if ($job !== null) {
+                fprintf(STDOUT,"Job Args:\n");
+                $customArgs = $job->getExecArgsNames();
+
+                if (count($customArgs) != 0) {
+                    foreach ($customArgs as $argName) {
+                        fprintf(STDOUT,"$argName\n");
+                    }
+                } else {
+                    fprintf(STDOUT,"<NO ARGS>");
+                }
+            } else {
+                fprintf(STDERR,"Error: No job which has the given name was found.\n");
+            }
+        } else {
+            fprintf(STDERR,"Error: The argument 'job-name' is missing.\n");
+        }
+    }
+    private function _showLog() {
+        if ($this->isArgProvided('show-log')) {
+            fprintf(STDERR, "Execution Log: \n");
+
+            foreach (Cron::getLogArray() as $message) {
+                fprintf(STDERR, $message."\n");
             }
         }
     }

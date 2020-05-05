@@ -24,9 +24,9 @@
  */
 namespace webfiori\entity;
 
-use webfiori\entity\exceptions\FileException;
 use jsonx\JsonI;
 use jsonx\JsonX;
+use webfiori\entity\exceptions\FileException;
 /**
  * A class that represents a file.
  * This class can be used to read and write files in binary. In addition to that, 
@@ -387,23 +387,6 @@ class File implements JsonI {
         }
     }
     /**
-     * 
-     * @return string
-     * @throws FileException
-     */
-    private function _checkNameAndPath() {
-        clearstatcache();
-        $fName = $this->getName();
-        if(strlen($fName) != 0){
-            $fPath = $this->getPath();
-            if(strlen($fPath) != 0){
-                return $this->getAbsolutePath();
-            }
-            throw new FileException('Path cannot be empty string.');
-        }
-        throw new FileException('File name cannot be empty string.');
-    }
-    /**
      * Removes a file given its name and path.
      * Before calling this method, the name of the file and its path must 
      * be specified.
@@ -553,17 +536,51 @@ class File implements JsonI {
         $pathV = $this->_checkNameAndPath();
         $this->_writeHelper($pathV, $append === true, $create === true);
     }
+    /**
+     * 
+     * @return string
+     * @throws FileException
+     */
+    private function _checkNameAndPath() {
+        clearstatcache();
+        $fName = $this->getName();
+
+        if (strlen($fName) != 0) {
+            $fPath = $this->getPath();
+
+            if (strlen($fPath) != 0) {
+                return $this->getAbsolutePath();
+            }
+            throw new FileException('Path cannot be empty string.');
+        }
+        throw new FileException('File name cannot be empty string.');
+    }
+    private function _createResource($mode, $path) {
+        set_error_handler(function()
+        {
+        });
+        $resource = fopen($path, $mode);
+        restore_error_handler();
+
+        if (is_resource($resource)) {
+            return $resource;
+        }
+
+        return false;
+    }
     private function _readHelper($fPath,$from,$to) {
         if (file_exists($fPath)) {
             $fSize = filesize($fPath);
             $this->_setSize($fSize);
             $bytesToRead = $to - $from > 0 ? $to - $from : $this->getSize();
             $resource = $this->_createResource('rb', $fPath);
+
             if (is_resource($resource)) {
                 if ($bytesToRead > 0) {
                     fseek($resource, $from);
                 }
-                if($bytesToRead > 0){
+
+                if ($bytesToRead > 0) {
                     $this->rawData = fread($resource, $bytesToRead);
                 } else {
                     $this->rawData = '';
@@ -647,34 +664,27 @@ class File implements JsonI {
      * @throws FileException
      */
     private function _writeHelper($fPath, $append = true, $createIfNotExist = false) {
-        if(!file_exists($fPath)){
-            if($createIfNotExist){
+        if (!file_exists($fPath)) {
+            if ($createIfNotExist) {
                 $resource = $this->_createResource('wb', $fPath);
             } else {
                 throw new FileException("File not found: '$fPath'.");
             }
-        } else if ($append){
-            $resource = $this->_createResource('ab', $fPath);
         } else {
-            $resource = $this->_createResource('rb+', $fPath);
+            if ($append) {
+                $resource = $this->_createResource('ab', $fPath);
+            } else {
+                $resource = $this->_createResource('rb+', $fPath);
+            }
         }
-        if(!is_resource($resource)){
+
+        if (!is_resource($resource)) {
             throw new FileException('Unable to open the file at \''.$fPath.'\'.');
         } else {
             fwrite($resource, $this->getRawData());
             fclose($resource);
+
             return true;
         }
-    }
-    private function _createResource($mode, $path) {
-        set_error_handler(function()
-        {
-        });
-        $resource = fopen($path, $mode);
-        restore_error_handler();
-        if (is_resource($resource)) {
-            return $resource;
-        }
-        return false;
     }
 }

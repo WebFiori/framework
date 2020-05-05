@@ -24,10 +24,10 @@
  */
 namespace webfiori\entity\mail;
 
-use webfiori\entity\exceptions\SMTPException;
 use phpStructs\html\HTMLDoc;
 use phpStructs\html\HTMLNode;
 use webfiori\conf\MailConfig;
+use webfiori\entity\exceptions\SMTPException;
 use webfiori\entity\File;
 use webfiori\logic\EmailController;
 /**
@@ -64,6 +64,7 @@ class EmailMessage {
      */
     private function __construct($sendAccountName = '') {
         $this->log = [];
+
         if (class_exists('webfiori\conf\MailConfig')) {
             $acc = MailConfig::getAccount($sendAccountName);
 
@@ -72,13 +73,15 @@ class EmailMessage {
 
                 if ($this->socketMailer == EmailController::INV_CREDENTIALS) {
                     throw new SMTPException('The account "'.$sendAccountName.'" has invalid credintials.');
-                } else if ($this->socketMailer == EmailController::INV_HOST_OR_PORT) {
-                    throw new SMTPException('The account "'.$sendAccountName.'" has invalid host or port number. Port: '.$acc->getPort().', Host: '.$acc->getServerAddress().'.');
                 } else {
-                    $this->asHtml = new HTMLDoc();
-                    $this->asHtml->getHeadNode()->addMeta('charset', 'UTF-8');
+                    if ($this->socketMailer == EmailController::INV_HOST_OR_PORT) {
+                        throw new SMTPException('The account "'.$sendAccountName.'" has invalid host or port number. Port: '.$acc->getPort().', Host: '.$acc->getServerAddress().'.');
+                    } else {
+                        $this->asHtml = new HTMLDoc();
+                        $this->asHtml->getHeadNode()->addMeta('charset', 'UTF-8');
 
-                    return;
+                        return;
+                    }
                 }
             }
             throw new SMTPException('No SMTP account was found which has the name "'.$sendAccountName.'".');
@@ -111,35 +114,6 @@ class EmailMessage {
      */
     public static function addReciver($name,$email,$isCC = false,$isBcc = false) {
         self::createInstance()->_getSocketMailer()->addReceiver($name, $email, $isCC, $isBcc);
-    }
-    /**
-     * Returns the associated socket mailer object.
-     * @return SocketMailer|null The method will return an 
-     * object of type 'SocketMailer' if initialized and message 
-     * is not yet sent. If the mailer is not initialized or the 
-     * message is sent, the method will return null.
-     * @since 1.0.4
-     */
-    public static function getSocketMailer() {
-        return self::$em;
-    }
-    /**
-     * Returns an array that contains log messages which are generated 
-     * from sending SMTP commands.
-     * @return array The array will be indexed. In every index, there 
-     * will be a sub-associative array with the following indices:
-     * <ul>
-     * <li>command</li>
-     * <li>response-code</li>
-     * <li>response-message</li>
-     * </ul>
-     * @since 1.0.4
-     */
-    public static function getLog() {
-        if(self::$em !== null){
-            return self::$em->getLog();
-        }
-        return [];
     }
     /**
      * Adds a file to the email message as an attachment.
@@ -226,6 +200,25 @@ class EmailMessage {
         return self::createInstance()->_getSocketMailer()->getCCStr();
     }
     /**
+     * Returns an array that contains log messages which are generated 
+     * from sending SMTP commands.
+     * @return array The array will be indexed. In every index, there 
+     * will be a sub-associative array with the following indices:
+     * <ul>
+     * <li>command</li>
+     * <li>response-code</li>
+     * <li>response-message</li>
+     * </ul>
+     * @since 1.0.4
+     */
+    public static function getLog() {
+        if (self::$em !== null) {
+            return self::$em->getLog();
+        }
+
+        return [];
+    }
+    /**
      * Returns an associative array that contains the names and the addresses 
      * of people who will receive an original copy of the message.
      * The indices of the array will act as the addresses of the receivers and 
@@ -246,6 +239,17 @@ class EmailMessage {
      */
     public static function getReceiversStr() {
         return self::createInstance()->_getSocketMailer()->getReceiversStr();
+    }
+    /**
+     * Returns the associated socket mailer object.
+     * @return SocketMailer|null The method will return an 
+     * object of type 'SocketMailer' if initialized and message 
+     * is not yet sent. If the mailer is not initialized or the 
+     * message is sent, the method will return null.
+     * @since 1.0.4
+     */
+    public static function getSocketMailer() {
+        return self::$em;
     }
     /**
      * Sets or gets the importance level of email message.

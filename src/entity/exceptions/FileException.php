@@ -32,6 +32,5 @@ use Exception;
  * @author Ibrahim
  * @version 1.0
  */
-class FileException extends Exception{
-    
+class FileException extends Exception {
 }

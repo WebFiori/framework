@@ -24,8 +24,8 @@
  */
 namespace webfiori\entity\cron;
 
-use Exception;
 use Error;
+use Exception;
 use webfiori\entity\exceptions\InvalidCRONExprException;
 /**
  * A class thar represents a cron job.
@@ -290,19 +290,6 @@ class CronJob {
 
         return false;
     }
-    private function _logExeException($ex) {
-        Cron::log('Job failed to complete due to an exception.');
-        Cron::log('Exception message: "'.$ex->getMessage().'"');
-        Cron::log('Thrown in file: "'.$ex->getFile().'"');
-        Cron::log('Line: "'.$ex->getLine().'"');
-        $this->isSuccess = false;
-    }
-    private function _logOnFailException($ex) {
-        Cron::log('An exception is thrown by the on-fail callback.');
-        Cron::log('Exception message: "'.$ex->getMessage().'"');
-        Cron::log('Thrown in file: "'.$ex->getFile().'"');
-        Cron::log('Line: "'.$ex->getLine().'"');
-    }
     /**
      * Execute the event which should run when it is time to execute the job. 
      * This method will be called automatically when cron URL is accessed. The 
@@ -347,6 +334,24 @@ class CronJob {
         return $retVal;
     }
     /**
+     * Returns the value of a custom execution argument.
+     * @param string $name the name of execution argument.
+     * @return string|null If the argument does exist on the job and its value 
+     * is provided, the method will return its value. If it is not provided or 
+     * it does not exist on the job, the method will return null.
+     * @since 1.0.8
+     */
+    public function getArgValue($name) {
+        $trimmed = trim($name);
+        $args = $this->getExecArgs();
+
+        if (isset($args[$trimmed])) {
+            return $args[$trimmed];
+        }
+
+        return null;
+    }
+    /**
      * Returns an associative array that contains the values of 
      * custom execution parameters.
      * Note that the method will filter the values using the filter FILTER_SANITIZE_STRING.
@@ -359,9 +364,10 @@ class CronJob {
         $retVal = [];
 
         foreach ($this->customAttrs as $attrName) {
-            if(isset($_POST[$attrName])){
+            if (isset($_POST[$attrName])) {
                 $filtered = filter_var($_POST[$attrName], FILTER_SANITIZE_STRING);
-                if($filtered !== false){
+
+                if ($filtered !== false) {
                     $retVal[$attrName] = $filtered;
                 } else {
                     $retVal[$attrName] = null;
@@ -372,22 +378,6 @@ class CronJob {
         }
 
         return $retVal;
-    }
-    /**
-     * Returns the value of a custom execution argument.
-     * @param string $name the name of execution argument.
-     * @return string|null If the argument does exist on the job and its value 
-     * is provided, the method will return its value. If it is not provided or 
-     * it does not exist on the job, the method will return null.
-     * @since 1.0.8
-     */
-    public function getArgValue($name) {
-        $trimmed = trim($name);
-        $args = $this->getExecArgs();
-        if(isset($args[$trimmed])){
-            return $args[$trimmed];
-        }
-        return null;
     }
     /**
      * Returns an array that contains the names of added custom 
@@ -1267,6 +1257,19 @@ class CronJob {
         }
 
         return true;
+    }
+    private function _logExeException($ex) {
+        Cron::log('Job failed to complete due to an exception.');
+        Cron::log('Exception message: "'.$ex->getMessage().'"');
+        Cron::log('Thrown in file: "'.$ex->getFile().'"');
+        Cron::log('Line: "'.$ex->getLine().'"');
+        $this->isSuccess = false;
+    }
+    private function _logOnFailException($ex) {
+        Cron::log('An exception is thrown by the on-fail callback.');
+        Cron::log('Exception message: "'.$ex->getMessage().'"');
+        Cron::log('Thrown in file: "'.$ex->getFile().'"');
+        Cron::log('Line: "'.$ex->getLine().'"');
     }
     /**
      * 

@@ -100,13 +100,6 @@ class Language {
         return self::$loadedLangs;
     }
     /**
-     * Removes all loaded languages.
-     * @since 1.2.2
-     */
-    public static function reset() {
-        self::$loadedLangs = [];
-    }
-    /**
      * Creates a sub-array for defining language variables given initial set 
      * of variables.
      * @param string $dir A string that looks like a 
@@ -252,6 +245,13 @@ class Language {
                 throw new MissingLangException('No language class was found for the language \''.$uLangCode.'\'.');
             }
         }
+    }
+    /**
+     * Removes all loaded languages.
+     * @since 1.2.2
+     */
+    public static function reset() {
+        self::$loadedLangs = [];
     }
     /**
      * Sets or updates a language variable.

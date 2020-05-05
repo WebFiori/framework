@@ -33,5 +33,4 @@ use Exception;
  * @version 1.0
  */
 class SessionException extends Exception {
-
 }

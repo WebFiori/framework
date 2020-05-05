@@ -25,17 +25,16 @@
 namespace webfiori\entity\cli;
 
 use webfiori\entity\cron\Cron;
-use webfiori\entity\cli\CLICommand;
 /**
  * A CLI command which is used to list all scheduled cron jobs.
  *
  * @author Ibrahim
  */
-class ListCronCommand extends CLICommand{
+class ListCronCommand extends CLICommand {
     public function __construct() {
         parent::__construct('--list-jobs', [], 'List all scheduled CRON jobs.');
     }
-    
+
     public function exec() {
         $jobs = Cron::jobsQueue();
         $i = 1;
@@ -52,5 +51,4 @@ class ListCronCommand extends CLICommand{
             $i++;
         }
     }
-
 }

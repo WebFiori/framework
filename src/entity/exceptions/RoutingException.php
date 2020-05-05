@@ -32,5 +32,5 @@ use Exception;
  *
  * @author Ibrahim
  */
-class RoutingException extends Exception{
+class RoutingException extends Exception {
 }

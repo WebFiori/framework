@@ -22,12 +22,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 namespace webfiori\entity\ui;
 
-use webfiori\WebFiori;
-use webfiori\entity\Page;
 use phpStructs\html\HTMLNode;
+use webfiori\entity\Page;
+use webfiori\WebFiori;
 
 /**
  * A basic view which is used to display 404 HTTP error code and 

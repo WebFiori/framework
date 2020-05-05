@@ -256,26 +256,6 @@ abstract class Theme implements JsonI {
 
         return self::$AvailableThemes;
     }
-    private static function _scanDir($filesInDir, $pathToScan) {
-        foreach ($filesInDir as $fileName) {
-            $fileExt = substr($fileName, -4);
-
-            if ($fileExt == '.php') {
-                $cName = str_replace('.php', '', $fileName);
-                $ns = require_once $pathToScan.DIRECTORY_SEPARATOR.$fileName;
-                $aNs = $ns != 1 ? $ns.'\\' : '';
-                $aCName = $aNs.$cName;
-
-                if (class_exists($aCName)) {
-                    $instance = new $aCName();
-
-                    if ($instance instanceof Theme) {
-                        self::$AvailableThemes[$instance->getName()] = $instance;
-                    }
-                }
-            }
-        }
-    }
     /**
      * Returns the base URL that will be used by the theme.
      * The URL is used by the HTML tag 'base' to fetch page resources. 
@@ -449,7 +429,7 @@ abstract class Theme implements JsonI {
      * @since 1.0
      */
     public function invokeAfterLoaded() {
-        if(is_callable($this->afterLoaded)){
+        if (is_callable($this->afterLoaded)) {
             call_user_func($this->afterLoaded, $this->afterLoadedParams);
         }
     }
@@ -460,7 +440,7 @@ abstract class Theme implements JsonI {
      * @since 1.2.1
      */
     public function invokeBeforeLoaded() {
-        if(is_callable($this->beforeLoaded)){
+        if (is_callable($this->beforeLoaded)) {
             call_user_func($this->beforeLoaded, $this->beforeLoadedParams);
         }
     }
@@ -777,6 +757,26 @@ abstract class Theme implements JsonI {
             }
 
             return $themeToLoad;
+        }
+    }
+    private static function _scanDir($filesInDir, $pathToScan) {
+        foreach ($filesInDir as $fileName) {
+            $fileExt = substr($fileName, -4);
+
+            if ($fileExt == '.php') {
+                $cName = str_replace('.php', '', $fileName);
+                $ns = require_once $pathToScan.DIRECTORY_SEPARATOR.$fileName;
+                $aNs = $ns != 1 ? $ns.'\\' : '';
+                $aCName = $aNs.$cName;
+
+                if (class_exists($aCName)) {
+                    $instance = new $aCName();
+
+                    if ($instance instanceof Theme) {
+                        self::$AvailableThemes[$instance->getName()] = $instance;
+                    }
+                }
+            }
         }
     }
     private static function defineThemesDir() {

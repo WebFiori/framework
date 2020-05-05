@@ -24,31 +24,25 @@
  */
 namespace webfiori\entity\cli;
 
-use webfiori\WebFiori;
 use webfiori\entity\CLI;
-use webfiori\entity\cli\CLICommand;
 use webfiori\entity\Util;
+use webfiori\WebFiori;
 /**
  * A class that represents help command of framework's CLI.
  *
  * @author Ibrahim
  * @version 1.0
  */
-class HelpCommand extends CLICommand{
+class HelpCommand extends CLICommand {
     public function __construct() {
         parent::__construct('--help', [
             'command-name' => [
                 'optional' => true,
                 'description' => 'An optional command name. If provided, help '
-                . 'will be specific to the given command only.'
+                .'will be specific to the given command only.'
             ]
         ], 'Display CLI Help. To display help for specific command, use the argument '
-                . '"command-name" with this command.');
-    }
-    private function showVersionInfo() {
-        Util::print_r("WebFiori Framework (c) v"
-        .WebFiori::getConfig()->getVersion()." ".WebFiori::getConfig()->getVersionType().
-        ", All Rights Reserved.\n");
+                .'"command-name" with this command.');
     }
     /**
      * Execute the help command.
@@ -57,20 +51,22 @@ class HelpCommand extends CLICommand{
         $this->showVersionInfo();
         $regCommands = CLI::getRegisteredCommands();
         $commandName = $this->getArgValue('command-name');
-        if($commandName !== null){
-            if(isset($regCommands[$commandName])){
+
+        if ($commandName !== null) {
+            if (isset($regCommands[$commandName])) {
                 $this->printCommandInfo($regCommands[$commandName], true);
             } else {
                 fprintf(STDOUT, "Error: Command '$commandName' is not supported.\n");
             }
         } else {
             Util::print_r("Options:");
-            foreach ($regCommands as $commandObj){
+
+            foreach ($regCommands as $commandObj) {
                 $this->printCommandInfo($commandObj);
             }
         }
     }
-    
+
     /**
      * 
      * @param CLICommand $cliCommand
@@ -78,16 +74,21 @@ class HelpCommand extends CLICommand{
     private function printCommandInfo($cliCommand, $withArgs = false) {
         fprintf(STDOUT, "    %s\n", $cliCommand->getName());
         fprintf(STDOUT, "        %25s\n", $cliCommand->getDescription());
-        if($withArgs){
+
+        if ($withArgs) {
             $args = $cliCommand->getArgs();
-            if(count($args) != 0){
+
+            if (count($args) != 0) {
                 fprintf(STDOUT, "    Supported Arguments:\n");
-                foreach ($args as $argName => $options){
+
+                foreach ($args as $argName => $options) {
                     fprintf(STDOUT, "    %20s: ", $argName);
-                    if($options['optional']) {
+
+                    if ($options['optional']) {
                         fprintf(STDOUT, "[Optional]");
                     }
-                    if(isset($options['default'])){
+
+                    if (isset($options['default'])) {
                         $default = $options['default'];
                         fprintf(STDOUT, "[Default = '$default']");
                     }
@@ -95,5 +96,10 @@ class HelpCommand extends CLICommand{
                 }
             }
         }
+    }
+    private function showVersionInfo() {
+        Util::print_r("WebFiori Framework (c) v"
+        .WebFiori::getConfig()->getVersion()." ".WebFiori::getConfig()->getVersionType().
+        ", All Rights Reserved.\n");
     }
 }

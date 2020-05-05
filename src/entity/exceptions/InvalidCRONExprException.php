@@ -31,6 +31,5 @@ use Exception;
  *
  * @author Ibrahim
  */
-class InvalidCRONExprException extends Exception{
-    
+class InvalidCRONExprException extends Exception {
 }

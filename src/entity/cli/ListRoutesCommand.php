@@ -24,14 +24,13 @@
  */
 namespace webfiori\entity\cli;
 
-use webfiori\entity\cli\CLICommand;
 use webfiori\entity\router\Router;
 /**
  * A CLI command which is used to show a list of all added routes.
  *
  * @author Ibrahim
  */
-class ListRoutesCommand extends CLICommand{
+class ListRoutesCommand extends CLICommand {
     public function __construct() {
         parent::__construct('--list-routes', [], 'List all created routes and which resource they point to.');
     }
@@ -58,5 +57,4 @@ class ListRoutesCommand extends CLICommand{
             }
         }
     }
-
 }

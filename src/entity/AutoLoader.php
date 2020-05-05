@@ -67,6 +67,11 @@ class AutoLoader {
      * @since 1.1.6
      */
     private $casheArr;
+    private static $CLASS_INDICES = [
+        'class-name',
+        'namespace',
+        'path'
+    ];
     /**
      * An array that contains the names of all loaded class.
      * @var array
@@ -98,11 +103,6 @@ class AutoLoader {
      * @since 1.0 
      */
     private $searchFolders;
-    private static $CLASS_INDICES = [
-        'class-name',
-        'namespace',
-        'path'
-    ];
     /**
      * 
      * @param type $root
@@ -117,6 +117,7 @@ class AutoLoader {
         $this->_readCache();
         $this->loadedClasses = [];
         require_once 'exceptions'.DIRECTORY_SEPARATOR.'ClassLoaderException.php';
+
         if (defined('ROOT_DIR')) {
             $this->rootDir = ROOT_DIR;
         } else {
@@ -140,8 +141,10 @@ class AutoLoader {
         {
             AutoLoader::get()->loadClass($className);
         });
+
         if (gettype($onFail) == 'string') {
             $this->onFail = strtolower($onFail);
+
             if ($this->onFail != self::ON_FAIL_ACTIONS[1] && $this->onFail != self::ON_FAIL_ACTIONS[0]) {
                 $this->onFail = self::ON_FAIL_ACTIONS[0];
             }
@@ -220,15 +223,6 @@ class AutoLoader {
         }
 
         return self::$loader;
-    }
-    private static function _checkComposer() {
-        if (defined('LOAD_COMPOSER_PACKAGES') && LOAD_COMPOSER_PACKAGES === true) {
-            $composerVendor = self::_getComposerVendorDir();
-
-            if (strlen($composerVendor) != 0) {
-                self::$loader->addSearchDirectory($composerVendor, true, false);
-            }
-        }
     }
     /**
      * Returns an array that contains the paths to all files which has a class 
@@ -359,6 +353,42 @@ class AutoLoader {
             }
         }
     }
+    private function _addSearchDirectoryHelper($cleanDir, $appendRoot) {
+        $dirsStack = [$cleanDir];
+
+        while ($xDir = array_pop($dirsStack)) {
+            if ($appendRoot === true) {
+                $fullPath = $this->getRoot().$xDir;
+            } else {
+                $fullPath = $xDir;
+            }
+
+            if (is_dir($fullPath)) {
+                $dirsStack = $this->_addSrachDirectoryHelper2($xDir, $fullPath, $dirsStack, $appendRoot);
+            }
+        }
+    }
+    private function _addSrachDirectoryHelper2($xDir, $fullPath, $dirsStack, $appendRoot) {
+        $subDirs = scandir($fullPath);
+
+        foreach ($subDirs as $subDir) {
+            if ($subDir != '.' && $subDir != '..') {
+                $dirsStack[] = $xDir.DIRECTORY_SEPARATOR.$subDir;
+            }
+        }
+        $this->searchFolders[$xDir] = $appendRoot;
+
+        return $dirsStack;
+    }
+    private static function _checkComposer() {
+        if (defined('LOAD_COMPOSER_PACKAGES') && LOAD_COMPOSER_PACKAGES === true) {
+            $composerVendor = self::_getComposerVendorDir();
+
+            if (strlen($composerVendor) != 0) {
+                self::$loader->addSearchDirectory($composerVendor, true, false);
+            }
+        }
+    }
     /**
      * Returns a string that represents the directory of 'vendor' folder of 
      * composer.
@@ -372,6 +402,7 @@ class AutoLoader {
         $pathsCount = count($split);
         $vendorFound = false;
         $vendorFolderName = 'vendor';
+
         for ($x = 0 ; $x < $pathsCount; $x++) {
             if (is_dir($vendorPath.$vendorFolderName)) {
                 $vendorPath = $vendorPath.$vendorFolderName;
@@ -395,6 +426,48 @@ class AutoLoader {
         }
 
         return $vendorPath;
+    }
+    private function _loadClassHelper($className, $classPath, $value, $appendRoot, $allPaths) {
+        $loaded = false;
+        $DS = DIRECTORY_SEPARATOR;
+        $root = $this->getRoot();
+
+        if ($appendRoot === true) {
+            $f = $root.$value.$DS.$className.'.php';
+        } else {
+            $f = $value.$DS.$className.'.php';
+        }
+
+        if (file_exists($f) && !in_array($f, $allPaths)) {
+            require_once $f;
+            $this->loadedClasses[] = [
+                self::$CLASS_INDICES[0] => $className,
+                self::$CLASS_INDICES[1] => substr($classPath, 0, strlen($classPath) - strlen($className) - 1),
+                self::$CLASS_INDICES[2] => $f
+            ];
+            $loaded = true;
+        }
+
+        return $loaded;
+    }
+    private function _loadFromCache($classPath, $className) {
+        $loaded = false;
+
+        if (isset($this->casheArr[$classPath])) {
+            foreach ($this->casheArr[$classPath] as $location) {
+                if (file_exists($location)) {
+                    require_once $location;
+                    $this->loadedClasses[] = [
+                        self::$CLASS_INDICES[0] => $className,
+                        self::$CLASS_INDICES[1] => substr($classPath, 0, strlen($classPath) - strlen($className) - 1),
+                        self::$CLASS_INDICES[2] => $location
+                    ];
+                    $loaded = true;
+                }
+            }
+        }
+
+        return $loaded;
     }
     /**
      * Read the file which contains autoloader cached content.
@@ -469,31 +542,6 @@ class AutoLoader {
             }
         }
     }
-    private function _addSearchDirectoryHelper($cleanDir, $appendRoot) {
-        $dirsStack = [$cleanDir];
-        while ($xDir = array_pop($dirsStack)) {
-            if ($appendRoot === true) {
-                $fullPath = $this->getRoot().$xDir;
-            } else {
-                $fullPath = $xDir;
-            }
-
-            if (is_dir($fullPath)) {
-                $dirsStack = $this->_addSrachDirectoryHelper2($xDir, $fullPath, $dirsStack, $appendRoot);
-            }
-        }
-    }
-    private function _addSrachDirectoryHelper2($xDir, $fullPath, $dirsStack, $appendRoot) {
-        $subDirs = scandir($fullPath);
-
-        foreach ($subDirs as $subDir) {
-            if ($subDir != '.' && $subDir != '..') {
-                $dirsStack[] = $xDir.DIRECTORY_SEPARATOR.$subDir;
-            }
-        }
-        $this->searchFolders[$xDir] = $appendRoot;
-        return $dirsStack;
-    }
     /**
      * Returns the root directory that is used to search inside.
      * @return string The root directory that is used to search inside.
@@ -501,44 +549,6 @@ class AutoLoader {
      */
     private function getRoot() {
         return $this->rootDir;
-    }
-    private function _loadFromCache($classPath, $className) {
-        $loaded = false;
-        if (isset($this->casheArr[$classPath])) {
-            foreach ($this->casheArr[$classPath] as $location) {
-                if (file_exists($location)) {
-                    require_once $location;
-                    $this->loadedClasses[] = [
-                        self::$CLASS_INDICES[0] => $className,
-                        self::$CLASS_INDICES[1] => substr($classPath, 0, strlen($classPath) - strlen($className) - 1),
-                        self::$CLASS_INDICES[2] => $location
-                    ];
-                    $loaded = true;
-                }
-            }
-        }
-        return $loaded;
-    }
-    private function _loadClassHelper($className, $classPath, $value, $appendRoot, $allPaths) {
-        $loaded = false;
-        $DS = DIRECTORY_SEPARATOR;
-        $root = $this->getRoot();
-        if ($appendRoot === true) {
-            $f = $root.$value.$DS.$className.'.php';
-        } else {
-            $f = $value.$DS.$className.'.php';
-        }
-
-        if (file_exists($f) && !in_array($f, $allPaths)) {
-            require_once $f;
-            $this->loadedClasses[] = [
-                self::$CLASS_INDICES[0] => $className,
-                self::$CLASS_INDICES[1] => substr($classPath, 0, strlen($classPath) - strlen($className) - 1),
-                self::$CLASS_INDICES[2] => $f
-            ];
-            $loaded = true;
-        }
-        return $loaded;
     }
     /**
      * Tries to load a class given its name.
@@ -553,18 +563,20 @@ class AutoLoader {
         $className = $cArr[count($cArr) - 1];
         $loaded = false;
         //checks if the class is cached or not.
-        if($this->_loadFromCache($classPath, $className)){
+        if ($this->_loadFromCache($classPath, $className)) {
             return;
         }
-        
+
         $allPaths = self::getClassPath($className);
 
         foreach ($this->searchFolders as $value => $appendRoot) {
             $loaded = $this->_loadClassHelper($className, $classPath, $value, $appendRoot, $allPaths);
-            if(!$loaded){
+
+            if (!$loaded) {
                 $loaded = $this->_loadClassHelper(strtolower($className), $classPath, $value, $appendRoot, $allPaths);
             }
-            if($loaded && (PHP_MAJOR_VERSION < 7 || (PHP_MAJOR_VERSION == 7 && PHP_MINOR_VERSION < 3))){
+
+            if ($loaded && (PHP_MAJOR_VERSION < 7 || (PHP_MAJOR_VERSION == 7 && PHP_MINOR_VERSION < 3))) {
                 //in php 7.2 and lower, if same class is loaded 
                 //from two namespaces with same name, it will 
                 //rise a fatal error with message 

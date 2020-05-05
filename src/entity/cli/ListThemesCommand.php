@@ -25,39 +25,41 @@
 namespace webfiori\entity\cli;
 
 use webfiori\entity\Theme;
-use webfiori\entity\cli\CLICommand;
 
 /**
  * A CLI command which is used to list all registered themes.
  *
  * @author Ibrahim
  */
-class ListThemesCommand extends CLICommand{
+class ListThemesCommand extends CLICommand {
     public function __construct() {
         parent::__construct('--list-themes', [
-            'theme-name'=>[
+            'theme-name' => [
                 'optional' => true,
                 'description' => 'An optional theme name. If provided, only given '
-                . 'theme information will be shown.'
+                .'theme information will be shown.'
             ]
         ], 'List all registered themes.');
     }
     public function exec() {
         $themesArr = Theme::getAvailableThemes();
-        
+
         $themsCount = count($themesArr);
         $themeName = $this->getArgValue('theme-name');
-        
+
         $index = 1;
-        if($themeName !== null){
-            if(isset($themesArr[$themeName])){
+
+        if ($themeName !== null) {
+            if (isset($themesArr[$themeName])) {
                 $this->_printThemeObj($themesArr[$themeName]);
             } else {
                 fprintf(STDERR, "Error: No theme was registered which has the name '$themeName'.\n");
+
                 return -1;
             }
         }
         fprintf(STDOUT, "Total Number of Themes: $themsCount .\n");
+
         foreach ($themesArr as $themeObj) {
             if ($index < 10) {
                 fprintf(STDOUT, "------------ Theme #0$index ------------\n");
@@ -68,7 +70,7 @@ class ListThemesCommand extends CLICommand{
             $index++;
         }
     }
-    
+
     private function _printThemeObj($themeObj) {
         $spaceSize = 15;
         $len00 = $spaceSize - strlen('Theme Name');

@@ -40,7 +40,7 @@ class InitAutoLoad {
      */
     public static function init() {
         $AU = AutoLoader::get();
-        
+
         //this is a sample code that shows how to add folders.
         $AU->newSearchFolder('my-system');
         $AU->newSearchFolder('my-entities', false);

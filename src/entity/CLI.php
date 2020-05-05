@@ -24,18 +24,15 @@
  */
 namespace webfiori\entity;
 
-use webfiori\entity\cron\Cron;
-use webfiori\entity\router\Router;
 use webfiori\entity\cli\CLICommand;
+use webfiori\entity\cli\CronCommand;
 use webfiori\entity\cli\HelpCommand;
-use webfiori\entity\cli\SettingsCommand;
-use webfiori\entity\cli\ListThemesCommand;
 use webfiori\entity\cli\ListCronCommand;
 use webfiori\entity\cli\ListRoutesCommand;
-use webfiori\entity\cli\CronCommand;
+use webfiori\entity\cli\ListThemesCommand;
+use webfiori\entity\cli\SettingsCommand;
 use webfiori\entity\cli\TestRouteCommand;
 
-use webfiori\WebFiori;
 /**
  * A class which adds basic support for running the framework through 
  * command line interface (CLI).
@@ -55,16 +52,6 @@ class CLI {
      * @var CLI 
      */
     private static $inst;
-    /**
-     * 
-     * @return CLI
-     */
-    private static function get() {
-        if(self::$inst == null){
-            self::$inst = new CLI();
-        }
-        return self::$inst;
-    }
     private function __construct() {
         $this->commands = [];
         $isCli = self::isCLI();
@@ -132,19 +119,6 @@ class CLI {
         self::register(new CronCommand());
         self::register(new TestRouteCommand());
     }
-    private function _regCommand($command) {
-        $this->commands[$command->getName()] = $command;
-    }
-    /**
-     * Register new command.
-     * @param CLICommand $cliCommand The command that will be registered.
-     * @since 1.0.2
-     */
-    public static function register($cliCommand) {
-        if($cliCommand instanceof CLICommand){
-            self::get()->_regCommand($cliCommand);
-        }
-    }
     /**
      * Checks if the framework is running through command line interface (CLI) or 
      * through a web server.
@@ -159,6 +133,16 @@ class CLI {
         return http_response_code() === false;
     }
     /**
+     * Register new command.
+     * @param CLICommand $cliCommand The command that will be registered.
+     * @since 1.0.2
+     */
+    public static function register($cliCommand) {
+        if ($cliCommand instanceof CLICommand) {
+            self::get()->_regCommand($cliCommand);
+        }
+    }
+    /**
      * Run the provided CLI command.
      * @return int If the CLI is completed without any errors, the method will 
      * return 0. 
@@ -169,16 +153,33 @@ class CLI {
         } else if (defined('__PHPUNIT_PHAR__')) {
             return 0;
         }
+
         return self::get()->_runCommand();
+    }
+    private function _regCommand($command) {
+        $this->commands[$command->getName()] = $command;
     }
     private function _runCommand() {
         $args = $_SERVER['argv'];
         $commandName = filter_var($args[1], FILTER_SANITIZE_STRING);
-        if(isset($this->commands[$commandName])){
+
+        if (isset($this->commands[$commandName])) {
             return $this->commands[$commandName]->excCommand();
         } else {
-             fprintf(STDERR,"Error: The command '".$commandName."' is not supported.");
-             return -1;
+            fprintf(STDERR,"Error: The command '".$commandName."' is not supported.");
+
+            return -1;
         }
+    }
+    /**
+     * 
+     * @return CLI
+     */
+    private static function get() {
+        if (self::$inst == null) {
+            self::$inst = new CLI();
+        }
+
+        return self::$inst;
     }
 }

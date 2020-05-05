@@ -157,7 +157,6 @@ class Util {
             if ($intVal == 0) {
                 $retVal = '0';
             } else {
-
                 while ($intVal > 0) {
                     $q = floor($intVal / 2);
                     $bit = $intVal % 2;
@@ -249,28 +248,6 @@ class Util {
 
         return $returnValue;
     }
-    private static function _checkDbStatus($dbName) {
-        $connInfo = Config::getDBConnection($dbName);
-        $returnValue = false;
-        if ($connInfo instanceof DBConnectionInfo) {
-            $returnValue = DBConnectionFactory::mysqlLink([
-                'host' => $connInfo->getHost(),
-                'port' => $connInfo->getPort(),
-                'user' => $connInfo->getUsername(),
-                'pass' => $connInfo->getPassword(),
-                'db-name' => $connInfo->getDBName()
-            ]);
-
-            if (gettype($returnValue) == 'object') {
-                $returnValue = true;
-            } else {
-                $returnValue = self::DB_NEED_CONF;
-            }
-        } else {
-            $returnValue = self::DB_NEED_CONF;
-        }
-        return $returnValue;
-    }
     /**
      * Call this method to display errors and warnings.
      * @since 0.2
@@ -291,6 +268,7 @@ class Util {
         $retVal = str_replace('<script>', '&lt;script&gt;', $input);
         $retVal = str_replace('</script>', '&lt;/script&gt;', $retVal);
         $retVal = str_replace('<?', '&lt;?', $retVal);
+
         return str_replace('<?php', '&lt;?php', $retVal);
     }
     /**
@@ -396,24 +374,8 @@ class Util {
             $daysInMonth = cal_days_in_month(CAL_GREGORIAN,$prevMonthNum,$startYear);
             $startDay = $daysInMonth - (-1) * $backInTime;
         }
-        
+
         return self::_buildGdatesArr($startDay, $daysInMonth, $startMonth);
-    }
-    private static function _buildGdatesArr($startDay, $daysInMonth, $startMonth) {
-        $datesArr = [];
-        for ($x = 0 ; $x < 7 ; $x++) {
-            if ($startDay > $daysInMonth) {
-                $startDay = 1;
-                $startMonth += 1;
-                $startMonth = $startMonth > 12 ? 1 : $startMonth;
-                $startMonth = $startMonth < 10 ? '0'.$startMonth : $startMonth;
-                $startYear = $startMonth == 1 ? $startYear + 1 : $startYear;
-            }
-            $startDay = $startDay < 10 ? '0'.$startDay : $startDay;
-            $datesArr[] = $startYear.'-'.$startMonth.'-'.$startDay;
-            $startDay += 1;
-        }
-        return $datesArr;
     }
     /**
      * Returns the number of a day in the week given a date.
@@ -447,6 +409,7 @@ class Util {
      */
     public static function getHostIP() {
         $host = gethostname();
+
         return gethostbyname($host);
     }
     /**
@@ -499,33 +462,6 @@ class Util {
         return $retVal;
     }
     /**
-     * Collect request headers from the array $_SERVER.
-     * @return array
-     */
-    private static function _getRequestHeadersFromServer() {
-        $retVal = [];
-        foreach ($_SERVER as $k => $v) {
-            $split = explode('_', $k);
-
-            if ($split[0] == 'HTTP') {
-                $headerName = '';
-                $count = count($split);
-
-                for ($x = 0 ; $x < $count ; $x++) {
-                    if ($x + 1 == $count && $split[$x] != 'HTTP') {
-                        $headerName = $headerName.$split[$x];
-                    } else if ($x == 1 && $split[$x] != 'HTTP') {
-                        $headerName = $split[$x].'-';
-                    } else if ($split[$x] != 'HTTP') {
-                        $headerName = $headerName.$split[$x].'-';
-                    }
-                }
-                $retVal[strtolower($headerName)] = filter_var($v, FILTER_SANITIZE_STRING);
-            }
-        }
-        return $retVal;
-    }
-    /**
      * Checks if a given directory exists or not.
      * @param string $dir A string in a form of directory (Such as 'root/home/res').
      * @param boolean $createIfNot If set to true and the given directory does 
@@ -539,9 +475,10 @@ class Util {
         $dirFix = str_replace('\\', '/', $dir);
 
         if (!is_dir($dirFix)) {
-            if($createIfNot === true && mkdir($dir, 0755 , true)){
+            if ($createIfNot === true && mkdir($dir, 0755 , true)) {
                 return true;
             }
+
             return false;
         } 
 
@@ -616,33 +553,27 @@ class Util {
     public static function print_r($expr,$asMessageBox = true) {
         if ($expr === null) {
             $expr = 'null';
-        } else {
-            if ($expr === true) {
-                $expr = 'true';
-            } else {
-                if ($expr === false) {
-                    $expr = 'false';
-                }
-            }
+        } else if ($expr === true) {
+            $expr = 'true';
+        } else if ($expr === false) {
+            $expr = 'false';
         }
 
         if (CLI::isCLI()) {
             $val = print_r($expr, true);
             fprintf(STDOUT, "%s\n",$val);
-        } else {
-            if (gettype($expr) == 'string') {
-                $expr1 = str_replace('<', '&lt;', $expr);
-                $expr = str_replace('>', '&gt;', $expr1);
-            }
-            $val = '<pre>'.print_r($expr, true).'</pre>';
+        } else if (gettype($expr) == 'string') {
+            $expr1 = str_replace('<', '&lt;', $expr);
+            $expr = str_replace('>', '&gt;', $expr1);
+        }
+        $val = '<pre>'.print_r($expr, true).'</pre>';
 
-            if ($asMessageBox === true) {
-                $messageBox = new MessageBox();
-                $messageBox->getBody()->addTextNode($val,false);
-                echo $messageBox;
-            } else {
-                echo $val;
-            }
+        if ($asMessageBox === true) {
+            $messageBox = new MessageBox();
+            $messageBox->getBody()->addTextNode($val,false);
+            echo $messageBox;
+        } else {
+            echo $val;
         }
     }
     /**
@@ -698,5 +629,76 @@ class Util {
         }
 
         return false;
+    }
+    private static function _buildGdatesArr($startDay, $daysInMonth, $startMonth) {
+        $datesArr = [];
+
+        for ($x = 0 ; $x < 7 ; $x++) {
+            if ($startDay > $daysInMonth) {
+                $startDay = 1;
+                $startMonth += 1;
+                $startMonth = $startMonth > 12 ? 1 : $startMonth;
+                $startMonth = $startMonth < 10 ? '0'.$startMonth : $startMonth;
+                $startYear = $startMonth == 1 ? $startYear + 1 : $startYear;
+            }
+            $startDay = $startDay < 10 ? '0'.$startDay : $startDay;
+            $datesArr[] = $startYear.'-'.$startMonth.'-'.$startDay;
+            $startDay += 1;
+        }
+
+        return $datesArr;
+    }
+    private static function _checkDbStatus($dbName) {
+        $connInfo = Config::getDBConnection($dbName);
+        $returnValue = false;
+
+        if ($connInfo instanceof DBConnectionInfo) {
+            $returnValue = DBConnectionFactory::mysqlLink([
+                'host' => $connInfo->getHost(),
+                'port' => $connInfo->getPort(),
+                'user' => $connInfo->getUsername(),
+                'pass' => $connInfo->getPassword(),
+                'db-name' => $connInfo->getDBName()
+            ]);
+
+            if (gettype($returnValue) == 'object') {
+                $returnValue = true;
+            } else {
+                $returnValue = self::DB_NEED_CONF;
+            }
+        } else {
+            $returnValue = self::DB_NEED_CONF;
+        }
+
+        return $returnValue;
+    }
+    /**
+     * Collect request headers from the array $_SERVER.
+     * @return array
+     */
+    private static function _getRequestHeadersFromServer() {
+        $retVal = [];
+
+        foreach ($_SERVER as $k => $v) {
+            $split = explode('_', $k);
+
+            if ($split[0] == 'HTTP') {
+                $headerName = '';
+                $count = count($split);
+
+                for ($x = 0 ; $x < $count ; $x++) {
+                    if ($x + 1 == $count && $split[$x] != 'HTTP') {
+                        $headerName = $headerName.$split[$x];
+                    } else if ($x == 1 && $split[$x] != 'HTTP') {
+                        $headerName = $split[$x].'-';
+                    } else if ($split[$x] != 'HTTP') {
+                        $headerName = $headerName.$split[$x].'-';
+                    }
+                }
+                $retVal[strtolower($headerName)] = filter_var($v, FILTER_SANITIZE_STRING);
+            }
+        }
+
+        return $retVal;
     }
 }

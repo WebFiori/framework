@@ -2,10 +2,10 @@
 namespace webfiori\theme\vutifyTheme;
 
 use jsonx\JsonX;
+use phpStructs\html\Anchor;
 use phpStructs\html\HeadNode;
 use phpStructs\html\HTMLNode;
 use phpStructs\html\JsCode;
-use phpStructs\html\Anchor;
 use webfiori\entity\Page;
 use webfiori\entity\Theme;
 use webfiori\WebFiori;
@@ -200,25 +200,25 @@ class VuetifyTheme extends Theme {
           </v-btn>', false);
         $vCardText = new HTMLNode('v-card-text');
         $vCardText->setClassName('py-2 white--text text-center');
-        
+
         $copywriteNoticeNode = new HTMLNode('strong');
         $copywriteNoticeNode->addTextNode(Page::translation()->get('example/footer/copyright-notice'));
         $vCardText->addChild($copywriteNoticeNode);
-        
+
         $poweredByNode = new HTMLNode('p');
         $poweredByNode->setClassName('footer-notice');
         $poweredByNode->addTextNode('Powered By: ');
         $frameworkLink = new Anchor('https://webfiori.com', 'WebFiori Framework', '_blank');
         $poweredByNode->addChild($frameworkLink);
         $vCardText->addChild($poweredByNode);
-        
+
         $vuetifyNode = new HTMLNode('p');
         $vuetifyNode->setClassName('footer-notice');
         $vuetifyNode->addTextNode('Theme Designed Using ');
         $vuetifyLink = new Anchor('https://vuetifyjs.com', 'Vuetify', '_blank');
         $vuetifyNode->addChild($vuetifyLink);
         $vCardText->addChild($vuetifyNode);
-        
+
         $vCard->addChild($vCardText);
 
         return $node;
@@ -246,7 +246,8 @@ class VuetifyTheme extends Theme {
         $node->addCSS('https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css', [], false);
         $node->addCSS('https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css', [], false);
         $node->addJs('https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js', [], false);
-        $node->addJs('https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js', [], false); 
+        $node->addJs('https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js', [], false);
+ 
         return $node;
     }
     /**
@@ -263,7 +264,7 @@ class VuetifyTheme extends Theme {
             'elevate-on-scroll',
             'fixed','app'
         ]);
-        
+
         //Adds a small logo in the bar
         $logo = new HTMLNode('v-img');
         $logo->setAttributes([
@@ -272,7 +273,7 @@ class VuetifyTheme extends Theme {
             'max-width' => 45
         ]);
         $appBar->addChild($logo);
-        
+
         //Adds a gradiant
         $appBar->addTextNode('<template v-slot:img="{ props }">
           <v-img
@@ -280,20 +281,20 @@ class VuetifyTheme extends Theme {
             gradient="to top right, rgba(19,84,122,.5), rgba(128,208,199,.8)"
           ></v-img>
         </template>', false);
-        
+
         //An icon to show and hide aside menu.
         $drawerIcon = new HTMLNode('v-app-bar-nav-icon');
         $appBar->addChild($drawerIcon);
         $drawerIcon->setAttribute('@click', 'drawer = true');
-        
+
         //Adds a text to the bar that represents website name
         $titleNode = new HTMLNode('v-toolbar-title');
         $titleNode->addTextNode(Page::siteName());
         $appBar->addChild($titleNode);
-        
-        
+
+
         $appBar->addTextNode('<v-spacer></v-spacer>', false);
-        
+
         //Add extra actions to the bar such as search
         $appBar->addChild($this->createHTMLNode([
             'type' => 'icon-button',

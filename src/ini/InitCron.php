@@ -47,7 +47,8 @@ class InitCron {
         Cron::execLog(true);
 
         //add jobs
-        Cron::dailyJob("13:00", "Test Job", function (){
+        Cron::dailyJob("13:00", "Test Job", function ()
+        {
             echo "I'm Running in Background.\n";
         });
     }

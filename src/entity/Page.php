@@ -57,12 +57,6 @@ use webfiori\entity\langs\Language;
  */
 class Page {
     /**
-     *
-     * @var string
-     * @since 1.9.3 
-     */
-    private static $BoolType = 'boolean';
-    /**
      * An array that contains the IDs of the 3 main page elements.
      * The array has the following values:
      * <ul>
@@ -86,6 +80,12 @@ class Page {
      * @var callable|null 
      */
     private $beforeRender;
+    /**
+     *
+     * @var string
+     * @since 1.9.3 
+     */
+    private static $BoolType = 'boolean';
     /**
      * The canonical page URL.
      * @var type 
@@ -483,7 +483,7 @@ class Page {
 
             return $p->getLanguage();
         }
-        
+
         return null;
     }
 

@@ -24,7 +24,6 @@
  */
 namespace webfiori\entity\cli;
 
-use webfiori\entity\cli\CLICommand;
 use webfiori\entity\router\Router;
 /**
  * A CLI Command which is used to test the result of routing to a specific 
@@ -32,21 +31,20 @@ use webfiori\entity\router\Router;
  *
  * @author Ibrahim
  */
-class TestRouteCommand extends CLICommand{
+class TestRouteCommand extends CLICommand {
     public function __construct() {
         parent::__construct('--route', [
-            'url'=>[
+            'url' => [
                 'optional' => false,
                 'description' => 'The URL that will be tested if it has a '
-                . 'route or not.'
+                .'route or not.'
             ]
         ], 'Test the result of routing to a URL');
     }
-    
+
     public function exec() {
         $url = $this->getArgValue('url');
         fwrite(STDOUT, "Trying to route to \"".$url."\"...\n");
         Router::route($url);
     }
-
 }

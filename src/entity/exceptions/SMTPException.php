@@ -32,5 +32,5 @@ use Exception;
  *
  * @author Ibrahim
  */
-class SMTPException extends Exception{
+class SMTPException extends Exception {
 }

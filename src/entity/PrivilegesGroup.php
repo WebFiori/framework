@@ -255,7 +255,6 @@ class PrivilegesGroup implements JsonI {
             $ch = $xid[$x];
 
             if (!($ch == '_' || ($ch >= 'a' && $ch <= 'z') || ($ch >= 'A' && $ch <= 'Z') || ($ch >= '0' && $ch <= '9'))) {
-            
                 return false;
             }
         }

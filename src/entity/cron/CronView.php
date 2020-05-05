@@ -43,12 +43,11 @@ class CronView {
      */
     private $controlsContainer;
     public function __construct($title,$description = '') {
-        if(Cron::password() != 'NO_PASSWORD' 
+        if (Cron::password() != 'NO_PASSWORD' 
                 && $title != 'CRON Login' 
-                && WebFiori::getWebsiteController()->getSessionVar('cron-login-status') !== true){
+                && WebFiori::getWebsiteController()->getSessionVar('cron-login-status') !== true) {
             header('location: '.WebFiori::getSiteConfig()->getBaseURL().'cron/login');
-        }
-        else if($title == 'CRON Login' && Cron::password() == 'NO_PASSWORD'){
+        } else if ($title == 'CRON Login' && Cron::password() == 'NO_PASSWORD') {
             header('location: '.WebFiori::getSiteConfig()->getBaseURL().'cron/jobs');
         }
         Page::title($title);

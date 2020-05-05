@@ -28,10 +28,10 @@ use phMysql\MySQLLink;
 use phMysql\MySQLQuery;
 use phpStructs\Stack;
 use webfiori\conf\Config;
+use webfiori\entity\CLI;
 use webfiori\entity\DBConnectionFactory;
 use webfiori\entity\DBConnectionInfo;
 use webfiori\entity\SessionManager;
-use webfiori\entity\CLI;
 /**
  * The base class for creating application logic.
  * This class provides the basic utilities to connect to database and manage 
@@ -178,45 +178,12 @@ class Controller {
         $retVal = false;
 
         $queryObj = $this->_checkQueryObj($qObj);
+
         if ($queryObj instanceof MySQLQuery) {
             return $this->_connectAndExecute($queryObj, $connName);
         }
 
         return $retVal;
-    }
-    private function _connectAndExecute($queryObj, $connName) {
-        $retVal = false;
-        if ($connName !== null) {
-            $connectResult = $this->useDatabase($connName);
-
-            if ($connectResult === true) {
-                $retVal = $this->_runQuery($queryObj);
-            } else if ($connectResult == self::NO_SUCH_CONNECTION) {
-                return self::NO_SUCH_CONNECTION;
-            } else {
-                return false;
-            }
-        } else if ($this->getDBLink() !== null) {
-            $retVal = $this->_runQuery($queryObj);
-        } else {
-            $retVal = $this->useDatabase();
-
-            if ($retVal === true) {
-                $retVal = $this->_runQuery($queryObj);
-            }
-        }
-        return $retVal;
-    }
-    private function _checkQueryObj($qObj) {
-        if (!($qObj instanceof MySQLQuery)) {
-            $qObj = $this->getQueryObject();
-
-            if ($qObj === null) {
-                $this->_setDBErrDetails(self::NO_QUERY, 'No query object was set to execute.');
-
-            }
-        }
-        return $qObj;
     }
     /**
      * Returns an associative array that contains database error info (if any)
@@ -284,7 +251,6 @@ class Controller {
         if ($current !== null && $current['rows-count'] != 0) {
             if (isset($current['data'][$current['current-position']])) {
                 $retVal = $current['data'][$current['current-position']];
-                
             }
 
             if ($current['rows-count'] == 1) {
@@ -600,31 +566,6 @@ class Controller {
 
         return false;
     }
-    private function _createSessionManager($givenSessionName, $options) {
-        $mngr = new SessionManager($givenSessionName);
-
-        $sTime = isset($options['duration']) ? $options['duration'] : self::DEFAULT_SESSTION_OPTIONS['duration'];
-        $mngr->setLifetime($sTime);
-
-        $isRef = isset($options['refresh']) ? $options['refresh'] : self::DEFAULT_SESSTION_OPTIONS['refresh'];
-        $mngr->setIsRefresh($isRef);
-
-        if ($mngr->initSession($isRef)) {
-            $this->sessionName = $givenSessionName;
-            $sUser = isset($options['user']) ? $options['user'] : self::DEFAULT_SESSTION_OPTIONS['user'];
-            $mngr->setUser($sUser);
-            self::$sessions[$mngr->getName()] = $mngr;
-
-            if (isset($options['variables'])) {
-                foreach ($options['variables'] as $k => $v) {
-                    $mngr->setSessionVar($k,$v);
-                }
-            }
-
-            return true;
-        }
-        return false;
-    }
     /**
      * 
      * @return array
@@ -632,6 +573,17 @@ class Controller {
      */
     private function &getCurrentDataset() {
         return $this->currentDataset;
+    }
+    private function _checkQueryObj($qObj) {
+        if (!($qObj instanceof MySQLQuery)) {
+            $qObj = $this->getQueryObject();
+
+            if ($qObj === null) {
+                $this->_setDBErrDetails(self::NO_QUERY, 'No query object was set to execute.');
+            }
+        }
+
+        return $qObj;
     }
     /**
      * Try to connect to database.
@@ -667,6 +619,57 @@ class Controller {
 
             return false;
         }
+    }
+    private function _connectAndExecute($queryObj, $connName) {
+        $retVal = false;
+
+        if ($connName !== null) {
+            $connectResult = $this->useDatabase($connName);
+
+            if ($connectResult === true) {
+                $retVal = $this->_runQuery($queryObj);
+            } else if ($connectResult == self::NO_SUCH_CONNECTION) {
+                return self::NO_SUCH_CONNECTION;
+            } else {
+                return false;
+            }
+        } else if ($this->getDBLink() !== null) {
+            $retVal = $this->_runQuery($queryObj);
+        } else {
+            $retVal = $this->useDatabase();
+
+            if ($retVal === true) {
+                $retVal = $this->_runQuery($queryObj);
+            }
+        }
+
+        return $retVal;
+    }
+    private function _createSessionManager($givenSessionName, $options) {
+        $mngr = new SessionManager($givenSessionName);
+
+        $sTime = isset($options['duration']) ? $options['duration'] : self::DEFAULT_SESSTION_OPTIONS['duration'];
+        $mngr->setLifetime($sTime);
+
+        $isRef = isset($options['refresh']) ? $options['refresh'] : self::DEFAULT_SESSTION_OPTIONS['refresh'];
+        $mngr->setIsRefresh($isRef);
+
+        if ($mngr->initSession($isRef)) {
+            $this->sessionName = $givenSessionName;
+            $sUser = isset($options['user']) ? $options['user'] : self::DEFAULT_SESSTION_OPTIONS['user'];
+            $mngr->setUser($sUser);
+            self::$sessions[$mngr->getName()] = $mngr;
+
+            if (isset($options['variables'])) {
+                foreach ($options['variables'] as $k => $v) {
+                    $mngr->setSessionVar($k,$v);
+                }
+            }
+
+            return true;
+        }
+
+        return false;
     }
     /**
      * 

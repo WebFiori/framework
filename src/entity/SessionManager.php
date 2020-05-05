@@ -24,22 +24,16 @@
  */
 namespace webfiori\entity;
 
-use webfiori\entity\exceptions\SessionException;
 use jsonx\JsonI;
 use jsonx\JsonX;
 use webfiori\conf\SiteConfig;
+use webfiori\entity\exceptions\SessionException;
 /**
  * A helper class to manage system sessions.
  * @author Ibrahim 
  * @version 1.8.7
  */
 class SessionManager implements JsonI {
-    /**
-     * The name of random function which is used in session ID generation.
-     * @var string
-     * @since 1.8.7 
-     */
-    private static $randFunc;
     /**
      * The default lifetime for any new session (in minutes).
      * @version 1.8.4
@@ -74,29 +68,6 @@ class SessionManager implements JsonI {
      */
     const KILLED = 'status_session_killed';
     /**
-     * The maximum value at which a session can stay alive without activity (in 
-     * minutes). 
-     * @var int The maximum value at which a session can stay alive without activity. 
-     * The value of the constant is around 5 years (2,629,746 minutes exactly).
-     * @since 1.8.5
-     */
-    const MAX_LIFETIME = 2629746;
-    /**
-     * A constant that indicates the session has just started.
-     * @since 1.7
-     */
-    const NEW_SESSION = 'status_new_session';
-    /**
-     * A constant that indicates the session is not started yet.
-     * @since 1.7
-     */
-    const NOT_RUNNING = 'status_not_running';
-    /**
-     * A constant that indicates the session is resumed.
-     * @since 1.7
-     */
-    const RESUMED = 'status_session_resumed';
-    /**
      * An array that contains the names of main session variables.
      * The array has the following values:
      * <ul>
@@ -124,6 +95,29 @@ class SessionManager implements JsonI {
         'lang'
     ];
     /**
+     * The maximum value at which a session can stay alive without activity (in 
+     * minutes). 
+     * @var int The maximum value at which a session can stay alive without activity. 
+     * The value of the constant is around 5 years (2,629,746 minutes exactly).
+     * @since 1.8.5
+     */
+    const MAX_LIFETIME = 2629746;
+    /**
+     * A constant that indicates the session has just started.
+     * @since 1.7
+     */
+    const NEW_SESSION = 'status_new_session';
+    /**
+     * A constant that indicates the session is not started yet.
+     * @since 1.7
+     */
+    const NOT_RUNNING = 'status_not_running';
+    /**
+     * A constant that indicates the session is resumed.
+     * @since 1.7
+     */
+    const RESUMED = 'status_session_resumed';
+    /**
      * An array of supported languages.
      * @var array An array of supported languages.
      * @since 1.2
@@ -139,17 +133,17 @@ class SessionManager implements JsonI {
      */
     private $lifeTime;
     /**
-     * The name of the index that contains session vara.
-     * @var string
-     * @since 1.8.6 
-     */
-    private static $SV = 'session-vars';
-    /**
      * A variable is set to true if the session is new and set to false if resumed.
      * @var boolean
      * @since 1.8 
      */
     private $new;
+    /**
+     * The name of random function which is used in session ID generation.
+     * @var string
+     * @since 1.8.7 
+     */
+    private static $randFunc;
     /**
      * A variable is set to true if the session is resumed and set to false if new.
      * @var boolean
@@ -175,6 +169,12 @@ class SessionManager implements JsonI {
      */
     private $sId;
     /**
+     * The name of the index that contains session vara.
+     * @var string
+     * @since 1.8.6 
+     */
+    private static $SV = 'session-vars';
+    /**
      * Creates new session manager.
      * @param string $session_name The name of the session. The name 
      * can consist of any character other than space, comma, semi-colon and 
@@ -183,10 +183,10 @@ class SessionManager implements JsonI {
      * @since 1.0
      */
     public function __construct($session_name = 'pa-seesion') {
-        
+
         //used to support older PHP versions which does not have 'random_int'.
         self::$randFunc = is_callable('random_int') ? 'random_int' : 'rand';
-        
+
         if ($this->_validateName($session_name) === true) {
             $this->sessionName = $session_name;
         } else {
@@ -210,22 +210,6 @@ class SessionManager implements JsonI {
         $this->sId = $this->_generateSessionID();
     }
     /**
-     * Returns the user who is logged in.
-     * @return User|null an object of type User. If the session is not started, 
-     * the method will return null.
-     * @since 1.0
-     */
-    public function getUser() {
-        $retVal = null;
-        $isActive = $this->_isActive();
-
-        if ($isActive && isset($_SESSION[self::$SV][self::MAIN_VARS[6]])) {
-            $retVal = $_SESSION[self::$SV][self::MAIN_VARS[6]];
-        }
-
-        return $retVal;
-    }
-    /**
      * Returns a JSON string that represents the session.
      * @return string
      * @since 1.0
@@ -239,7 +223,7 @@ class SessionManager implements JsonI {
      * @since 1.8
      */
     public static function _generateRandSessionName() {
-        if(self::$randFunc === null){
+        if (self::$randFunc === null) {
             self::$randFunc = is_callable('random_int') ? 'random_int' : 'rand';
         }
         $retVal = 'session-';
@@ -297,14 +281,6 @@ class SessionManager implements JsonI {
 
         return $retVal;
     }
-    private function _isActive() {
-        if($this->isSessionActive()){
-            $isActive = true;
-        } else {
-            $isActive = $this->_switchToSession();
-        }
-        return $isActive;
-    }
     /**
      * Returns the lifetime of the session (in minutes). 
      * @return int the lifetime of the session (in minutes). If the 
@@ -316,7 +292,7 @@ class SessionManager implements JsonI {
 
         if (session_status() == PHP_SESSION_ACTIVE && $this->_switchToSession() 
                 && isset($_SESSION[self::$SV][self::MAIN_VARS[0]])) {
-                $retVal = $_SESSION[self::$SV][self::MAIN_VARS[0]] / 60;
+            $retVal = $_SESSION[self::$SV][self::MAIN_VARS[0]] / 60;
         }
 
         return $retVal;
@@ -527,6 +503,22 @@ class SessionManager implements JsonI {
         return session_status();
     }
     /**
+     * Returns the user who is logged in.
+     * @return User|null an object of type User. If the session is not started, 
+     * the method will return null.
+     * @since 1.0
+     */
+    public function getUser() {
+        $retVal = null;
+        $isActive = $this->_isActive();
+
+        if ($isActive && isset($_SESSION[self::$SV][self::MAIN_VARS[6]])) {
+            $retVal = $_SESSION[self::$SV][self::MAIN_VARS[6]];
+        }
+
+        return $retVal;
+    }
+    /**
      * Checks if the given session name has a cookie or not.
      * @return boolean true if a cookie with the name of 
      * the session is fount. false otherwise.
@@ -659,7 +651,6 @@ class SessionManager implements JsonI {
 
         if ($isActive) {
             if ($this->_validateAttrs()) {
-                
                 if ($_SESSION[self::$SV][self::MAIN_VARS[4]] == $this->getName()) {
                     $this->_kill();
                     $retVal = true;
@@ -696,47 +687,6 @@ class SessionManager implements JsonI {
         return $retVal;
     }
     /**
-     * 
-     * @return boolean
-     */
-    private function _setSessionParams($tmpId, $sessionTime) {
-        $retVal = false;
-        $ip = filter_var($_SERVER['REMOTE_ADDR'],FILTER_VALIDATE_IP);
-
-        if ($ip == '::1') {
-            $ip = '127.0.0.1';
-        }
-
-        if ($this->getStartIpAddress() == $ip) {
-            $this->sId = $tmpId;
-            $this->resumed = true;
-            $this->sessionStatus = self::RESUMED;
-            //update resume time
-            $_SESSION[self::$SV][self::MAIN_VARS[2]] = time();
-            $_SESSION[self::$SV][self::MAIN_VARS[4]] = $this->getName();
-
-            //if time is -1, then get stored one.
-            //else, update session time.
-            $sessionTime = $sessionTime == -1 ? $this->getLifetime() * 60 : $sessionTime * 60;
-
-            $_SESSION[self::$SV][self::MAIN_VARS[0]] = $sessionTime;
-            $this->resumed = true;
-            $this->new = false;
-
-            if ($this->isRefresh()) {
-                //refresh time till session cookie is dead
-                $params = session_get_cookie_params();
-                setcookie($this->getName(), $this->getID(),time() + $sessionTime, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
-                $this->setUser($this->getUser());
-            }
-            $retVal = true;
-        } else {
-            $this->kill();
-            $this->sessionStatus = self::INV_IP_ADDRESS;
-        }
-        return $retVal;
-    }
-    /**
      * Checks if there exist a session with the given session name or not. If there 
      * is a one and it is not timed out, the method will resume it.
      * @return boolean true if there is a session with the given name 
@@ -746,6 +696,7 @@ class SessionManager implements JsonI {
      */
     public function resume() {
         $retVal = false;
+
         if ($this->hasCookie()) {
             session_name($this->getName());
             ini_set('session.use_cookies', 1);
@@ -792,31 +743,6 @@ class SessionManager implements JsonI {
         if ($this->_switchToSession()) {
             $_SESSION[self::$SV][self::MAIN_VARS[3]] = $bool === true;
         }
-    }
-    private function _setLifetimeHelper($time) {
-        $this->lifeTime = $time;
-        $_SESSION[self::$SV][self::MAIN_VARS[0]] = $time * 60;
-
-        $params = session_get_cookie_params();
-        if(isset($params['secure'])){
-            $secure =  $params['secure'];
-        } else {
-            $secure = false;
-        }
-        if(isset($params['httponly'])){
-            $httponly = $params['httponly'];
-        } else {
-            $httponly = false;
-        }
-        $path = isset($params['path']) ? $params['path'] : '/';
-        session_set_cookie_params(time() + $this->getLifetime() * 60, $path, $params['domain'], $secure, $httponly);
-
-        $retVal = true;
-
-        if ($this->isTimeout()) {
-            $this->kill();
-        }
-        return $retVal;
     }
     /**
      * Sets the lifetime of the session.
@@ -929,8 +855,37 @@ class SessionManager implements JsonI {
         $hash = hash('sha256', $date);
         $time = time() + call_user_func(self::$randFunc, 0, 100);
         $hash2 = hash('sha256',$hash.$time);
-        
+
         return substr($hash2, 0, 27);
+    }
+    /**
+     * 
+     * @return string|null
+     */
+    private function _getLangFromRequest() {
+        $lang = null;
+        //get language code from $_GET
+        if (isset($_GET[self::MAIN_VARS[7]])) {
+            $lang = filter_var($_GET[self::MAIN_VARS[7]],FILTER_SANITIZE_STRING);
+        }
+
+        if (!$lang || $lang == null) {
+            //if not in $_GET, check $_POST
+            if (isset($_POST[self::MAIN_VARS[7]])) {
+                $lang = filter_var($_POST[self::MAIN_VARS[7]],FILTER_SANITIZE_STRING);
+            }
+
+            //If not in $_POST, check cookie.
+            if (!$lang || $lang == null) {
+                $lang = filter_input(INPUT_COOKIE, self::MAIN_VARS[7]);
+
+                if (!$lang || $lang == null) {
+                    $lang = null;
+                }
+            }
+        }
+
+        return $lang;
     }
     /**
      * Initialize session language. The initialization depends on the attribute 
@@ -982,50 +937,33 @@ class SessionManager implements JsonI {
         }
     }
     /**
-     * 
-     * @return string|null
-     */
-    private function _getLangFromRequest() {
-        $lang = null;
-        //get language code from $_GET
-        if (isset($_GET[self::MAIN_VARS[7]])) {
-            $lang = filter_var($_GET[self::MAIN_VARS[7]],FILTER_SANITIZE_STRING);
-        }
-        
-        if (!$lang || $lang == null) {
-            //if not in $_GET, check $_POST
-            if (isset($_POST[self::MAIN_VARS[7]])) {
-                $lang = filter_var($_POST[self::MAIN_VARS[7]],FILTER_SANITIZE_STRING);
-            }
-            
-            //If not in $_POST, check cookie.
-            if (!$lang || $lang == null) {
-                $lang = filter_input(INPUT_COOKIE, self::MAIN_VARS[7]);
-
-                if (!$lang || $lang == null) {
-                    $lang = null;
-                }
-            }
-        }
-        return $lang;
-    }
-    /**
      * @since 1.8.1
      */
     private function _invAttrKill() {
         $this->_kill();
+    }
+    private function _isActive() {
+        if ($this->isSessionActive()) {
+            $isActive = true;
+        } else {
+            $isActive = $this->_switchToSession();
+        }
+
+        return $isActive;
     }
     /**
      * @since 1.8.1
      */
     private function _kill() {
         $params = session_get_cookie_params();
-        if(isset($params['secure'])){
+
+        if (isset($params['secure'])) {
             $secure = $params['secure'];
         } else {
             $secure = false;
         }
-        if(isset($params['httponly'])){
+
+        if (isset($params['httponly'])) {
             $httponly = $params['httponly'];
         } else {
             $httponly = false;
@@ -1034,6 +972,76 @@ class SessionManager implements JsonI {
         session_destroy();
         session_set_cookie_params(0, $path, $params['domain'], $secure, $httponly);
         $this->sessionStatus = self::KILLED;
+    }
+    private function _setLifetimeHelper($time) {
+        $this->lifeTime = $time;
+        $_SESSION[self::$SV][self::MAIN_VARS[0]] = $time * 60;
+
+        $params = session_get_cookie_params();
+
+        if (isset($params['secure'])) {
+            $secure = $params['secure'];
+        } else {
+            $secure = false;
+        }
+
+        if (isset($params['httponly'])) {
+            $httponly = $params['httponly'];
+        } else {
+            $httponly = false;
+        }
+        $path = isset($params['path']) ? $params['path'] : '/';
+        session_set_cookie_params(time() + $this->getLifetime() * 60, $path, $params['domain'], $secure, $httponly);
+
+        $retVal = true;
+
+        if ($this->isTimeout()) {
+            $this->kill();
+        }
+
+        return $retVal;
+    }
+    /**
+     * 
+     * @return boolean
+     */
+    private function _setSessionParams($tmpId, $sessionTime) {
+        $retVal = false;
+        $ip = filter_var($_SERVER['REMOTE_ADDR'],FILTER_VALIDATE_IP);
+
+        if ($ip == '::1') {
+            $ip = '127.0.0.1';
+        }
+
+        if ($this->getStartIpAddress() == $ip) {
+            $this->sId = $tmpId;
+            $this->resumed = true;
+            $this->sessionStatus = self::RESUMED;
+            //update resume time
+            $_SESSION[self::$SV][self::MAIN_VARS[2]] = time();
+            $_SESSION[self::$SV][self::MAIN_VARS[4]] = $this->getName();
+
+            //if time is -1, then get stored one.
+            //else, update session time.
+            $sessionTime = $sessionTime == -1 ? $this->getLifetime() * 60 : $sessionTime * 60;
+
+            $_SESSION[self::$SV][self::MAIN_VARS[0]] = $sessionTime;
+            $this->resumed = true;
+            $this->new = false;
+
+            if ($this->isRefresh()) {
+                //refresh time till session cookie is dead
+                $params = session_get_cookie_params();
+                setcookie($this->getName(), $this->getID(),time() + $sessionTime, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
+                $this->setUser($this->getUser());
+            }
+            $retVal = true;
+        } else {
+            $this->kill();
+            $this->sessionStatus = self::INV_IP_ADDRESS;
+        }
+
+        return $retVal;
     }
     /**
      * The core method of the class. 

@@ -38,8 +38,8 @@ class OtherRoutes {
      */
     public static function create() {
         Router::other([
-            'path'=>'my-custom/view-something', 
-            'route-to'=>'my-folder/file.php'
+            'path' => 'my-custom/view-something', 
+            'route-to' => 'my-folder/file.php'
         ]);
     }
 }

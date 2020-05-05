@@ -27,8 +27,8 @@ namespace webfiori\logic;
 use Exception;
 use webfiori\conf\Config;
 use webfiori\entity\DBConnectionInfo;
-use webfiori\entity\FileHandler;
 use webfiori\entity\exceptions\InitializationException;
+use webfiori\entity\FileHandler;
 /**
  * A class that can be used to modify basic configuration settings of 
  * the web application. 
@@ -102,7 +102,7 @@ class ConfigController extends Controller {
                     strlen($con->getUsername()) > 0 && 
                     strlen($con->getPassword()) > 0 && 
                     strlen($con->getDBName()) > 0) {
-                     $confVars['databases'][$con->getConnectionName()] = $con;
+                    $confVars['databases'][$con->getConnectionName()] = $con;
                 }
             }
             $this->writeConfig($confVars);

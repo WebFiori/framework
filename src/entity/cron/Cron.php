@@ -407,12 +407,13 @@ class Cron {
      * </ul>
      * @since 1.0.6
      */
-    public static function run($pass = '',$jobName = null,$force = false, $command=null) {
+    public static function run($pass = '',$jobName = null,$force = false, $command = null) {
         self::log('Running job(s) check...');
 
         if (Cron::password() != 'NO_PASSWORD' && WebFiori::getWebsiteController()->getSessionVar('cron-login-status') !== true && hash('sha256',$pass) != Cron::password()) {
             self::log('Error: Given password is incorrect.');
             self::log('Check finished.');
+
             return 'INV_PASS';
         }
         $xForce = $force === true;
@@ -424,14 +425,15 @@ class Cron {
         ];
 
         if ($jobName !== null) {
-            self::log("Forceing job '$jobName' to execute..." );
+            self::log("Forceing job '$jobName' to execute...");
             $job = self::getJob(trim($jobName));
 
             if ($job instanceof CronJob) {
                 self::_runJob($retVal, $job, $xForce, $command);
             } else {
-                self::log("Error: No job which has the name '$jobName' is found." );
+                self::log("Error: No job which has the name '$jobName' is found.");
                 self::log('Check finished.');
+
                 return 'JOB_NOT_FOUND';
             }
         } else {
@@ -442,39 +444,6 @@ class Cron {
         self::log('Check finished.');
 
         return $retVal;
-    }
-    /**
-     * 
-     * @param type $retVal
-     * @param CronJob $job
-     * @param type $xForce
-     */
-    private static function _runJob(&$retVal, $job, $xForce, $command=null) {
-        if ($job->isTime() || $xForce) {
-            $job->setIsForced($xForce);
-            if($command !== null){
-                foreach ($job->getExecArgsNames() as $attr){
-                    $command->addArg($attr);
-                    $val = $command->getArgValue($attr);
-                    if($val !== null){
-                        $_POST[$attr] = $val;
-                    }
-                }
-            }
-            self::_get()->_setActiveJob($job);
-        }
-
-        if ($job->execute($xForce)) {
-            self::_get()->_logJobExecution($job,$xForce);
-            $retVal['executed-count']++;
-
-            if ($job->isSuccess() === true) {
-                $retVal['successfully-completed'][] = $job->getJobName();
-            } else if ($job->isSuccess() === false) {
-                $retVal['failed'][] = $job->getJobName();
-            }
-        }
-        self::_get()->_setActiveJob(null);
     }
 
     /**
@@ -642,6 +611,41 @@ class Cron {
                 }
             }
         }
+    }
+    /**
+     * 
+     * @param type $retVal
+     * @param CronJob $job
+     * @param type $xForce
+     */
+    private static function _runJob(&$retVal, $job, $xForce, $command = null) {
+        if ($job->isTime() || $xForce) {
+            $job->setIsForced($xForce);
+
+            if ($command !== null) {
+                foreach ($job->getExecArgsNames() as $attr) {
+                    $command->addArg($attr);
+                    $val = $command->getArgValue($attr);
+
+                    if ($val !== null) {
+                        $_POST[$attr] = $val;
+                    }
+                }
+            }
+            self::_get()->_setActiveJob($job);
+        }
+
+        if ($job->execute($xForce)) {
+            self::_get()->_logJobExecution($job,$xForce);
+            $retVal['executed-count']++;
+
+            if ($job->isSuccess() === true) {
+                $retVal['successfully-completed'][] = $job->getJobName();
+            } else if ($job->isSuccess() === false) {
+                $retVal['failed'][] = $job->getJobName();
+            }
+        }
+        self::_get()->_setActiveJob(null);
     }
     /**
      * 

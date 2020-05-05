@@ -25,13 +25,12 @@
 namespace webfiori\entity\cli;
 
 use webfiori\WebFiori;
-use webfiori\entity\cli\CLICommand;
 /**
  * A CLI command which is used to show framework configuration.
  *
  * @author Ibrahim
  */
-class SettingsCommand extends CLICommand{
+class SettingsCommand extends CLICommand {
     public function __construct() {
         parent::__construct('--show-config', [], 'Display framework configuration.');
     }
@@ -65,5 +64,4 @@ class SettingsCommand extends CLICommand{
             fprintf(STDOUT,"        $langCode => $desc\n");
         }
     }
-
 }

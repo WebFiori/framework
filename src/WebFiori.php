@@ -469,7 +469,7 @@ class WebFiori {
             .'</html>');
         }
     }
-    private function _setErrHandler(){
+    private function _setErrHandler() {
         set_error_handler(function($errno, $errstr, $errfile, $errline)
         {
             $isCli = class_exists('webfiori\entity\CLI') ? CLI::isCLI() : php_sapi_name() == 'cli';

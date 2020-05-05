@@ -331,13 +331,15 @@ class Uploader implements JsonI {
             $fileJson->add('upload-error', $fArr['upload-error']);
             $mime = isset($fArr['mime']) ? $fArr['mime'] : null;
             $fileJson->add('mime', $mime);
-            if(isset($fArr['is-exist'])){
+
+            if (isset($fArr['is-exist'])) {
                 $isExist = $fArr['is-exist'] === true;
             } else {
                 $isExist = false;
             }
             $fileJson->add('is-exist', $isExist);
-            if(isset($fArr['is-replace'])){
+
+            if (isset($fArr['is-replace'])) {
                 $isReplace = $fArr['is-replace'] === true;
             } else {
                 $isReplace = false;
@@ -349,6 +351,59 @@ class Uploader implements JsonI {
         $j->add('files', $fsArr);
 
         return $j;
+    }
+    /**
+     * Upload the file to the server.
+     * @param bolean $replaceIfExist If a file with the given name found 
+     * and this parameter is set to true, the file will be replaced.
+     * @return array An array which contains uploaded files info. Each index 
+     * will contain an associative array which has the following info:
+     * <ul>
+     * <li><b>name</b>: The name of uploaded file.</li>
+     * <li><b>size</b>: The size of uploaded file in bytes.</li>
+     * <li><b>upload-path</b>: The location at which the file was uploaded to in the server.</li>
+     * <li><b>upload-error</b>: A string that represents upload error.</li>
+     * <li><b>is-exist</b>: A boolean. Set to true if the file was found in the 
+     * server.</li>
+     * <li><b>is-replace</b>: A boolean. Set to true if the file was exist and replaced.</li>
+     * <li><b>mime</b>: MIME type of the file.</li>
+     * <li><b>uploaded</b>: A boolean. Set to true if the file was uploaded.</li>
+     * </ul>
+     */
+    public function upload($replaceIfExist = false) {
+        $this->files = [];
+        $reqMeth = filter_var($_SERVER['REQUEST_METHOD'],FILTER_SANITIZE_STRING);
+
+        if ($reqMeth == 'POST') {
+            $fileOrFiles = null;
+            $associatedInputName = filter_input(INPUT_POST, 'file-input-name');
+
+            if ($associatedInputName !== null) {
+                $this->asscociatedName = $associatedInputName;
+            }
+
+            if (isset($_FILES[$this->asscociatedName])) {
+                $fileOrFiles = $_FILES[$this->asscociatedName];
+            }
+
+            if ($fileOrFiles !== null) {
+                if (gettype($fileOrFiles['name']) == 'array') {
+                    //multi-upload
+                    $filesCount = count($fileOrFiles['name']);
+
+                    for ($x = 0 ; $x < $filesCount ; $x++) {
+                        $fileInfoArr = $this->_getFileArr($fileOrFiles, $replaceIfExist, $x);
+                        array_push($this->files, $fileInfoArr);
+                    }
+                } else {
+                    //single file upload
+                    $fileInfoArr = $this->_getFileArr($fileOrFiles, $replaceIfExist);
+                    array_push($this->files, $fileInfoArr);
+                }
+            }
+        }
+
+        return $this->files;
     }
     private function _getFileArr($fileOrFiles,$replaceIfExist, $idx = null) {
         $mimeFunc = 'mime_content_type';
@@ -370,18 +425,21 @@ class Uploader implements JsonI {
         $fileInfoArr[$indices[2]] = $this->getUploadDir();
         $fileInfoArr[$indices[3]] = 0;
         $fileInfoArr[$indices[6]] = 'N/A';
-        
+
         $isErr = $idx === null ? $this->isError($fileOrFiles[$errIdx]) : $this->isError($fileOrFiles[$errIdx][$idx]);
+
         if (!$isErr) {
             if ($this->isValidExt($fileInfoArr[$indices[0]])) {
                 if (Util::isDirectory($this->getUploadDir())) {
                     $filePath = $this->getUploadDir().'\\'.$fileInfoArr[$indices[0]];
                     $filePath = str_replace('\\', '/', $filePath);
+
                     if (!file_exists($filePath)) {
                         $fileInfoArr[$indices[4]] = false;
                         $fileInfoArr[$indices[5]] = false;
                         $name = $idx === null ? $fileOrFiles[$tempIdx] : $fileOrFiles[$tempIdx][$idx];
                         $sanitizedName = filter_var($name,FILTER_SANITIZE_STRING);
+
                         if (move_uploaded_file($sanitizedName, $filePath)) {
                             $fileInfoArr[$indices[7]] = true;
 
@@ -405,6 +463,7 @@ class Uploader implements JsonI {
                             $ext = pathinfo($fileInfoArr[$indices[0]], PATHINFO_EXTENSION);
                             $fileInfoArr[$indices[6]] = File::getMIMEType($ext);
                         }
+
                         if ($replaceIfExist) {
                             $fileInfoArr[$indices[5]] = true;
                             unlink($filePath);
@@ -433,56 +492,8 @@ class Uploader implements JsonI {
             $fileInfoArr[$indices[7]] = false;
             $fileInfoArr[$indices[3]] = $idx === null ? $fileOrFiles[$errIdx] : $fileOrFiles[$errIdx][$idx];
         }
+
         return $fileInfoArr;
-    }
-    /**
-     * Upload the file to the server.
-     * @param bolean $replaceIfExist If a file with the given name found 
-     * and this parameter is set to true, the file will be replaced.
-     * @return array An array which contains uploaded files info. Each index 
-     * will contain an associative array which has the following info:
-     * <ul>
-     * <li><b>name</b>: The name of uploaded file.</li>
-     * <li><b>size</b>: The size of uploaded file in bytes.</li>
-     * <li><b>upload-path</b>: The location at which the file was uploaded to in the server.</li>
-     * <li><b>upload-error</b>: A string that represents upload error.</li>
-     * <li><b>is-exist</b>: A boolean. Set to true if the file was found in the 
-     * server.</li>
-     * <li><b>is-replace</b>: A boolean. Set to true if the file was exist and replaced.</li>
-     * <li><b>mime</b>: MIME type of the file.</li>
-     * <li><b>uploaded</b>: A boolean. Set to true if the file was uploaded.</li>
-     * </ul>
-     */
-    public function upload($replaceIfExist = false) {
-        $this->files = [];
-        $reqMeth = filter_var($_SERVER['REQUEST_METHOD'],FILTER_SANITIZE_STRING);
-        if ($reqMeth == 'POST') {
-            $fileOrFiles = null;
-            $associatedInputName = filter_input(INPUT_POST, 'file-input-name');
-            if($associatedInputName !== null){
-                $this->asscociatedName = $associatedInputName;
-            }
-            if (isset($_FILES[$this->asscociatedName])) {
-                $fileOrFiles = $_FILES[$this->asscociatedName];
-            }
-            if ($fileOrFiles !== null) {
-                if (gettype($fileOrFiles['name']) == 'array') {
-                    //multi-upload
-                    $filesCount = count($fileOrFiles['name']);
-
-                    for ($x = 0 ; $x < $filesCount ; $x++) {
-                        $fileInfoArr = $this->_getFileArr($fileOrFiles, $replaceIfExist, $x);
-                        array_push($this->files, $fileInfoArr);
-                    }
-                } else {
-                    //single file upload
-                    $fileInfoArr = $this->_getFileArr($fileOrFiles, $replaceIfExist);
-                    array_push($this->files, $fileInfoArr);
-                }
-            }
-        }
-
-        return $this->files;
     }
     /**
      * Checks if PHP upload code is error or not.
@@ -538,7 +549,7 @@ class Uploader implements JsonI {
      */
     private function isValidExt($fileName) {
         $ext = pathinfo($fileName, PATHINFO_EXTENSION);
-        
+
         return in_array($ext, $this->getExts(),true) || in_array(strtolower($ext), $this->getExts(),true);
     }
 }

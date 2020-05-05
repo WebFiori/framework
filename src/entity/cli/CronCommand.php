@@ -34,9 +34,10 @@ use webfiori\entity\cron\Cron;
 class CronCommand extends CLICommand{
     public function __construct() {
         parent::__construct('--cron', [
-            'password'=>[
+            'p'=>[
                 'optional'=>true,
-                'description'=>'CRON password.'
+                'description'=>'CRON password. If it is set in CRON, then it must be '
+                . 'provided here.'
             ],
             'check'=>[
                 'optional'=>true,
@@ -68,42 +69,54 @@ class CronCommand extends CLICommand{
     public function exec() {
         $retVal = -1;
         if($this->isArgProvided('check')){
-            $result = Cron::run($this->getArgValue('password'));
+            $pass = $this->getArgValue('p');
+            if($pass !== null){
+                $result = Cron::run($pass, null, false, $this);
 
-            if ($result == 'INV_PASS') {
-                fprintf(STDERR,"Error: Provided password is incorrect.");
+                if ($result == 'INV_PASS') {
+                    fprintf(STDERR,"Error: Provided password is incorrect.\n");
+                } else {
+                    $this->_printExcResult($result);
+                    $this->_showLog();
+                    $retVal = 0;
+                }
             } else {
-                $this->_printExcResult($result);
-                $retVal = 0;
+                fprintf(STDERR,"Error: The argument 'p' is missing. It must be provided if cron password is set.\n");
             }
         } else if ($this->isArgProvided('force')){
             $retVal = $this->_force();
+        } else {
+            fprintf(STDOUT,"Info: At least the option 'check' or 'force' must be provided.\n");
         }
+        
+        return $retVal;
+    }
+    private function _showLog() {
         if($this->isArgProvided('show-log')){
             fprintf(STDERR, "Execution Log: \n");
             foreach (Cron::getLogArray() as $message){
                 fprintf(STDERR, $message."\n");
             }
         }
-        return $retVal;
     }
     private function _force() {
         $jobName = $this->getArgValue('job-name');
-        $cPass = $this->getArgValue('password');
+        $cPass = $this->getArgValue('p');
         $retVal = -1;
         if ($jobName === null) {
-            fprintf(STDERR,"Error: Job name is missing.");
+            fprintf(STDERR,"Error: Job name is missing.\n");
         } else if ($cPass === null && Cron::password() != 'NO_PASSWORD') {
-            fprintf(STDERR,"Error: CRON password is missing.");
+            fprintf(STDERR,"Error: The argument 'p' is missing. It must be provided if cron password is set.\n");
         } else {
-            $result = Cron::run($cPass,$jobName.'',true);
+            $result = Cron::run($cPass,$jobName.'',true, $this);
 
             if ($result == 'INV_PASS') {
-                fprintf(STDERR,"Error: Provided password is incorrect.");
+                fprintf(STDERR,"Error: Provided password is incorrect.\n");
             } else if ($result == 'JOB_NOT_FOUND') {
-                fprintf(STDERR,"Error: No job was found which has the name '".$jobName."'");
+                fprintf(STDERR,"Error: No job was found which has the name '".$jobName."'\n");
             } else {
                 $this->_printExcResult($result);
+                $this->_showLog();
                 $retVal = 0;
             }
         }

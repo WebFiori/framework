@@ -31,7 +31,7 @@ use webfiori\entity\exceptions\InvalidCRONExprException;
  * A class thar represents a cron job.
  *
  * @author Ibrahim
- * @version 1.0.7
+ * @version 1.0.8
  */
 class CronJob {
     /**
@@ -177,7 +177,7 @@ class CronJob {
      * @param string $name The name of the attribute.
      * @since 1.0.5
      */
-    public function addExecutionAttribute($name) {
+    public function addExecutionArg($name) {
         $trimmed = trim($name);
         $isValid = $this->_validateAttrName($trimmed);
 
@@ -355,14 +355,49 @@ class CronJob {
      * is not provided, it will be set to null.
      * @since 1.0.7
      */
-    public function getExecutionAttributes() {
+    public function getExecArgs() {
         $retVal = [];
 
         foreach ($this->customAttrs as $attrName) {
-            $retVal[$attrName] = filter_input(INPUT_POST, trim($attrName), FILTER_SANITIZE_STRING);
+            if(isset($_POST[$attrName])){
+                $filtered = filter_var($_POST[$attrName], FILTER_SANITIZE_STRING);
+                if($filtered !== false){
+                    $retVal[$attrName] = $filtered;
+                } else {
+                    $retVal[$attrName] = null;
+                }
+            } else {
+                $retVal[$attrName] = null;
+            }
         }
 
         return $retVal;
+    }
+    /**
+     * Returns the value of a custom execution argument.
+     * @param string $name the name of execution argument.
+     * @return string|null If the argument does exist on the job and its value 
+     * is provided, the method will return its value. If it is not provided or 
+     * it does not exist on the job, the method will return null.
+     * @since 1.0.8
+     */
+    public function getArgValue($name) {
+        $trimmed = trim($name);
+        $args = $this->getExecArgs();
+        if(isset($args[$trimmed])){
+            return $args[$trimmed];
+        }
+        return null;
+    }
+    /**
+     * Returns an array that contains the names of added custom 
+     * execution attributes.
+     * @return array An indexed array that contains all added 
+     * custom execution attributes values.
+     * @since 1.0.8
+     */
+    public function getExecArgsNames() {
+        return $this->customAttrs;
     }
     /**
      * Returns the cron expression which is associated with the job.

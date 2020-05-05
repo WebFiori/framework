@@ -25,11 +25,12 @@
 namespace webfiori\entity\mail;
 
 use webfiori\entity\File;
+use webfiori\entity\exceptions\SMTPException;
 /**
  * A class that can be used to send email messages using sockets.
  *
  * @author Ibrahim
- * @version 1.4.7
+ * @version 1.4.8
  */
 class SocketMailer {
     const NL = "\r\n";
@@ -150,6 +151,12 @@ class SocketMailer {
      */
     private $writeMode;
     /**
+     *
+     * @var array
+     * @since 1.4.8 
+     */
+    private $responseLog;
+    /**
      * Creates new instance of the class.
      * @since 1.0
      */
@@ -167,6 +174,21 @@ class SocketMailer {
         $this->useTls = false;
         $this->setPriority(0);
         $this->lastResponseCode = 0;
+    }
+    /**
+     * Returns an array that contains log messages for any SMTP command 
+     * which was sent,
+     * @return array The array will be indexed. In every index, there 
+     * will be a sub-associative array with the following indices:
+     * <ul>
+     * <li>command</li>
+     * <li>response-code</li>
+     * <li>response-message</li>
+     * </ul>
+     * @since 1.4.8
+     */
+    public function getResponsesLog() {
+        return $this->responseLog;
     }
     /**
      * Adds new attachment to the message.
@@ -552,6 +574,16 @@ class SocketMailer {
      * @since 1.0
      */
     public function sendC($command) {
+        $logEntry = [
+            'command' => $command,
+            'response-code' => 0,
+            'response-message' => ''
+        ];
+        if($this->lastResponseCode >= 400){
+            throw new SMTPException('Unable to send SMTP commend "'.$command.'" due to '
+                    . 'error code '.$this->lastResponseCode.' caused by last command. '
+                    . 'Error message: "'.$this->lastResponse.'".');
+        }
         if ($this->isConnected()) {
             if ($this->isInWritingMode()) {
                 fwrite($this->conn, $command.self::NL);
@@ -563,14 +595,17 @@ class SocketMailer {
                 fwrite($this->conn, $command.self::NL);
                 $response = trim($this->read());
                 $this->lastResponse = $response;
-
+                $logEntry['response-message'] = $response;
+                $logEntry['response-code'] = $this->getLastResponseCode();
+                
                 if ($command == 'DATA') {
                     $this->writeMode = true;
                 }
             }
-
+            $this->responseLog[] = $logEntry;
             return true;
         } else {
+            $this->responseLog[] = $logEntry;
             return false;
         }
     }

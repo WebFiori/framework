@@ -14,28 +14,28 @@ class CronJobTest extends TestCase {
      */
     public function testAttributes00() {
         $job = new CronJob();
-        $job->addExecutionAttribute('');
-        $this->assertEquals(0,count($job->getExecutionAttributes()));
-        $job->addExecutionAttribute('Hello&world');
-        $this->assertEquals(0,count($job->getExecutionAttributes()));
-        $job->addExecutionAttribute('hello#world');
-        $this->assertEquals(0,count($job->getExecutionAttributes()));
-        $job->addExecutionAttribute('hello=x');
-        $this->assertEquals(0,count($job->getExecutionAttributes()));
-        $job->addExecutionAttribute('?hello World');
-        $this->assertEquals(0,count($job->getExecutionAttributes()));
-        $job->addExecutionAttribute('    ');
-        $this->assertEquals(0,count($job->getExecutionAttributes()));
+        $job->addExecutionArg('');
+        $this->assertEquals(0,count($job->getExecArgs()));
+        $job->addExecutionArg('Hello&world');
+        $this->assertEquals(0,count($job->getExecArgs()));
+        $job->addExecutionArg('hello#world');
+        $this->assertEquals(0,count($job->getExecArgs()));
+        $job->addExecutionArg('hello=x');
+        $this->assertEquals(0,count($job->getExecArgs()));
+        $job->addExecutionArg('?hello World');
+        $this->assertEquals(0,count($job->getExecArgs()));
+        $job->addExecutionArg('    ');
+        $this->assertEquals(0,count($job->getExecArgs()));
     }
     /**
      * @test
      */
     public function testAttributes01() {
         $job = new CronJob();
-        $job->addExecutionAttribute('hello');
-        $this->assertEquals(1,count($job->getExecutionAttributes()));
-        $job->addExecutionAttribute('Hello');
-        $this->assertEquals(2,count($job->getExecutionAttributes()));
+        $job->addExecutionArg('hello');
+        $this->assertEquals(1,count($job->getExecArgs()));
+        $job->addExecutionArg('Hello');
+        $this->assertEquals(2,count($job->getExecArgs()));
     }
     /**
      * @test

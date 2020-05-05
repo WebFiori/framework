@@ -876,6 +876,8 @@ class Router {
 
             if ($loadResource === true) {
                 call_user_func($route->getRouteTo(),$route->getClosureParams());
+                
+                return;
             }
         } else if ($route->getType() == self::API_ROUTE && !defined('API_CALL')) {
             define('API_CALL', true);

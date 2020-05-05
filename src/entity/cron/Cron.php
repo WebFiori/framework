@@ -218,7 +218,9 @@ class Cron {
     }
     /**
      * Enable or disable logging for jobs execution. 
-     * This method is also used to check if logging is enabled or not.
+     * This method is also used to check if logging is enabled or not. If 
+     * execution log is enabled, a log file with the name 'cron.log' will be 
+     * created in the folder '/logs'.
      * @param boolean $bool If set to true, a log file that contains the details 
      * of the executed jobs will be created in 'logs' folder. Default value 
      * is null.
@@ -580,7 +582,7 @@ class Cron {
     private function _logJobExecution($job,$forced = false) {
         if ($this->isLogEnabled) {
             $ds = DIRECTORY_SEPARATOR;
-            $logFile = ROOT_DIR.$ds.'logs'.$ds.'cron.txt';
+            $logFile = ROOT_DIR.$ds.'logs'.$ds.'cron.log';
 
             if (Util::isDirectory(ROOT_DIR.$ds.'logs', true)) {
                 if (!file_exists($logFile)) {

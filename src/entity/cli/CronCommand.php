@@ -53,6 +53,11 @@ class CronCommand extends CLICommand{
                 'description' => 'The name of the job that will be forced to '
                 . 'execute.'
             ],
+            'show-job-args'=>[
+                'optional'=>true,
+                'description' => 'If this one is provided with job name and a '
+                . 'job has custom execution args, they will be shown.'
+            ],
             'show-log'=>[
                 'optional'=>true,
                 'description'=>'If set, execution log will be shown after '
@@ -85,11 +90,34 @@ class CronCommand extends CLICommand{
             }
         } else if ($this->isArgProvided('force')){
             $retVal = $this->_force();
+        }  else if ($this->isArgProvided('show-job-args')) {
+            $this->_showJobArgs();
         } else {
-            fprintf(STDOUT,"Info: At least the option 'check' or 'force' must be provided.\n");
+            fprintf(STDOUT,"Info: At least one of the options 'check', 'force' or 'show-job-args' must be provided.\n");
         }
         
         return $retVal;
+    }
+    private function _showJobArgs() {
+        $jobName = $this->getArgValue('job-name');
+        if($jobName !== null){
+            $job = Cron::getJob($jobName);
+            if($job !== null){
+                fprintf(STDOUT,"Job Args:\n");
+                $customArgs = $job->getExecArgsNames();
+                if(count($customArgs) != 0){
+                    foreach ($customArgs as $argName){
+                        fprintf(STDOUT,"$argName\n");
+                    }
+                } else {
+                    fprintf(STDOUT,"<NO ARGS>");
+                }
+            } else {
+                fprintf(STDERR,"Error: No job which has the given name was found.\n");
+            }
+        } else {
+            fprintf(STDERR,"Error: The argument 'job-name' is missing.\n");
+        }
     }
     private function _showLog() {
         if($this->isArgProvided('show-log')){

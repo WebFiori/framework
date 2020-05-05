@@ -34,7 +34,7 @@ use webfiori\logic\EmailController;
  * A class that can be used to write HTML formatted Email messages.
  *
  * @author Ibrahim
- * @version 1.0.3
+ * @version 1.0.4
  */
 class EmailMessage {
     /**
@@ -63,6 +63,7 @@ class EmailMessage {
      * @since 1.0
      */
     private function __construct($sendAccountName = '') {
+        $this->log = [];
         if (class_exists('webfiori\conf\MailConfig')) {
             $acc = MailConfig::getAccount($sendAccountName);
 
@@ -94,7 +95,7 @@ class EmailMessage {
      * a blind carbon copy of the message (Bcc).
      * @since 1.0.4
      */
-    public function addReceiver($name,$email,$isCC = false,$isBcc = false) {
+    public static function addReceiver($name,$email,$isCC = false,$isBcc = false) {
         self::addReciver($name, $email, $isCC, $isBcc);
     }
     /**
@@ -110,6 +111,35 @@ class EmailMessage {
      */
     public static function addReciver($name,$email,$isCC = false,$isBcc = false) {
         self::createInstance()->_getSocketMailer()->addReceiver($name, $email, $isCC, $isBcc);
+    }
+    /**
+     * Returns the associated socket mailer object.
+     * @return SocketMailer|null The method will return an 
+     * object of type 'SocketMailer' if initialized and message 
+     * is not yet sent. If the mailer is not initialized or the 
+     * message is sent, the method will return null.
+     * @since 1.0.4
+     */
+    public static function getSocketMailer() {
+        return self::$em;
+    }
+    /**
+     * Returns an array that contains log messages which are generated 
+     * from sending SMTP commands.
+     * @return array The array will be indexed. In every index, there 
+     * will be a sub-associative array with the following indices:
+     * <ul>
+     * <li>command</li>
+     * <li>response-code</li>
+     * <li>response-message</li>
+     * </ul>
+     * @since 1.0.4
+     */
+    public static function getLog() {
+        if(self::$em !== null){
+            return self::$em->getLog();
+        }
+        return [];
     }
     /**
      * Adds a file to the email message as an attachment.

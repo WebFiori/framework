@@ -428,7 +428,7 @@ class Cron {
             self::log("Forceing job '$jobName' to execute...");
             $job = self::getJob(trim($jobName));
 
-            if ($job instanceof CronJob) {
+            if ($job instanceof AbstractJob) {
                 self::_runJob($retVal, $job, $xForce, $command);
             } else {
                 self::log("Error: No job which has the name '$jobName' is found.");
@@ -448,7 +448,7 @@ class Cron {
 
     /**
      * Adds new job to jobs queue.
-     * @param CronJob $job An instance of the class 'CronJob'.
+     * @param AbstractJob $job An instance of the class 'AbstractJob'.
      * @return boolean If the job is added, the method will return true.
      * @since 1.0
      */
@@ -525,14 +525,14 @@ class Cron {
     }
     /**
      * 
-     * @param CronJob $job
+     * @param AbstractJob $job
      * @return type
      * @since 1.0
      */
     private function _addJob($job) {
         $retVal = false;
 
-        if ($job instanceof CronJob) {
+        if ($job instanceof AbstractJob) {
             if ($job->getJobName() == 'CRON-JOB') {
                 $job->setJobName('job-'.$this->jobsQueue()->size());
             }
@@ -615,12 +615,11 @@ class Cron {
     /**
      * 
      * @param type $retVal
-     * @param CronJob $job
+     * @param AbstractJob $job
      * @param type $xForce
      */
     private static function _runJob(&$retVal, $job, $xForce, $command = null) {
         if ($job->isTime() || $xForce) {
-            $job->setIsForced($xForce);
 
             if ($command !== null) {
                 foreach ($job->getExecArgsNames() as $attr) {
@@ -635,7 +634,7 @@ class Cron {
             self::_get()->_setActiveJob($job);
         }
 
-        if ($job->execute($xForce)) {
+        if ($job->exec($xForce)) {
             self::_get()->_logJobExecution($job,$xForce);
             $retVal['executed-count']++;
 
@@ -649,7 +648,7 @@ class Cron {
     }
     /**
      * 
-     * @param CronJob|null $job
+     * @param AbstractJob|null $job
      * @since 1.0.4
      */
     private function _setActiveJob($job) {

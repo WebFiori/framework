@@ -28,7 +28,7 @@ use phMysql\MySQLLink;
 use phMysql\MySQLQuery;
 use phpStructs\Stack;
 use webfiori\conf\Config;
-use webfiori\entity\CLI;
+use webfiori\entity\cli\CLI;
 use webfiori\entity\DBConnectionFactory;
 use webfiori\entity\DBConnectionInfo;
 use webfiori\entity\SessionManager;

@@ -28,7 +28,7 @@ use jsonx\JsonX;
 use phpStructs\html\HTMLNode;
 use restEasy\WebServices;
 use webfiori\conf\SiteConfig;
-use webfiori\entity\CLI;
+use webfiori\entity\cli\CLI;
 use webfiori\entity\exceptions\RoutingException;
 use webfiori\entity\ui\NotFoundView;
 use webfiori\entity\Util;

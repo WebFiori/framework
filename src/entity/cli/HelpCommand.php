@@ -24,7 +24,7 @@
  */
 namespace webfiori\entity\cli;
 
-use webfiori\entity\CLI;
+use webfiori\entity\cli\CLI;
 use webfiori\entity\Util;
 use webfiori\WebFiori;
 /**

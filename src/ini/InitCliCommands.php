@@ -24,7 +24,7 @@
  */
 namespace webfiori\ini;
 
-use webfiori\entity\CLI;
+use webfiori\entity\cli\CLI;
 /**
  * A class that contains one method for registering custom CLI 
  * commands.

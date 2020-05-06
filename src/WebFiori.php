@@ -30,7 +30,7 @@ use webfiori\conf\Config;
 use webfiori\conf\MailConfig;
 use webfiori\conf\SiteConfig;
 use webfiori\entity\AutoLoader;
-use webfiori\entity\CLI;
+use webfiori\entity\cli\CLI;
 use webfiori\entity\exceptions\InitializationException;
 use webfiori\entity\router\APIRoutes;
 use webfiori\entity\router\ClosureRoutes;

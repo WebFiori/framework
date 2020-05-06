@@ -24,6 +24,7 @@
  */
 namespace webfiori\entity;
 
+use webfiori\ini\InitCliCommands;
 use webfiori\entity\cli\CLICommand;
 use webfiori\entity\cli\CronCommand;
 use webfiori\entity\cli\HelpCommand;
@@ -118,6 +119,9 @@ class CLI {
         self::register(new ListRoutesCommand());
         self::register(new CronCommand());
         self::register(new TestRouteCommand());
+        
+        //Call this method to register any user-defined commands.
+        InitCliCommands::init();
     }
     /**
      * Checks if the framework is running through command line interface (CLI) or 

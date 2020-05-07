@@ -46,22 +46,8 @@ class ServerErrView {
     public function __construct($throwableOrErr) {
         Page::reset();
         Page::title('Uncaught Exception');
-        Page::document()->getBody()->setStyle([
-            'color' => 'white',
-            'background-color' => '#1a000d;'
-        ]);
-        $styles = new HTMLNode('style');
-        $styles->addTextNode('.nice-red{'
-                    .'color:#ff6666;'
-                    .'}'
-                    .'.mono{'
-                    .'font-family:monospace;'
-                    .'}');
-        Page::document()->getHeadNode()->addChild($styles);
+        Page::document()->getHeadNode()->addCSS('assets/css/server-err.css',[],false);
         $hNode = new HTMLNode('h1');
-        $hNode->setStyle([
-            'color' => '#ff4d4d'
-        ]);
 
         if ($throwableOrErr instanceof Throwable) {
             $hNode->addTextNode('500 - Server Error: Uncaught Exception.');

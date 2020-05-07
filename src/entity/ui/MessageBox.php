@@ -60,15 +60,6 @@ class MessageBox extends HTMLNode {
         $this->setClassName('floating-message-box');
         $this->setAttribute('data-box-number', self::getCount());
         $this->setStyle([
-            'width' => '75%',
-            'border' => '1px double white',
-            'height' => '130px',
-            'margin' => '0px',
-            'z-index' => '100',
-            'position' => 'fixed',
-            'background-color' => 'rgba(0,0,0,0.7)',
-            'color' => 'white',
-            'height' => 'auto',
             'top' => (self::getCount() * 10).'px',
             'left' => (self::getCount() * 10).'px'
         ]);
@@ -77,7 +68,18 @@ class MessageBox extends HTMLNode {
         $this->setAttribute('onmouseover', "if(this.getAttribute('dg') === null){addDragSupport(this)}");
 
         if (self::getCount() == 0) {
-            $this->_initJS();
+            $css = new HTMLNode('link');
+            $css->setAttributes([
+                'rel' => 'stylesheet',
+                'href' => 'assets/css/message-box.css'
+            ]);
+            $this->addChild($css);
+            $js = new HTMLNode('script');
+            $js->setAttributes([
+                'type' => 'text/javascript',
+                'src' => 'assets/js/message-box.js'
+            ]);
+            $this->addChild($js);
         }
         self::$Count++;
     }
@@ -117,13 +119,6 @@ class MessageBox extends HTMLNode {
     private function _createBody() {
         $this->messageBody = new HTMLNode();
         $this->messageBody->setClassName('message-box-body');
-        $this->messageBody->setStyle([
-            'overflow-y' => 'scroll',
-            'overflow-x' => 'auto',
-            'width' => '100%',
-            'height' => '100px',
-            'padding' => '10px'
-        ]);
         $this->addChild($this->messageBody);
     }
     /**
@@ -132,77 +127,11 @@ class MessageBox extends HTMLNode {
     private function _createHeader() {
         $this->messageHeader = new HTMLNode();
         $this->messageHeader->setClassName('message-box-header');
-        $this->messageHeader->setStyle([
-            'width' => '100%',
-            'cursor' => 'move',
-            'background-color' => 'burlywood'
-        ]);
         $this->addChild($this->messageHeader);
         $closeButton = new HTMLNode('button');
         $closeButton->setClassName('box-close-button');
-        $closeButton->setStyle([
-            'border' => '0px',
-            'cursor' => 'pointer'
-        ]);
         $closeButton->addTextNode('X');
         $this->messageHeader->addChild($closeButton);
         $closeButton->setAttribute('onclick', "this.setAttribute('disabled','');smoothHide(this.parentElement.parentElement);");
-    }
-    /**
-     * Initialize JavaScript code which is used to add logic to the box.
-     * @since 1.0
-     */
-    private function _initJS() {
-        $js = new HTMLNode('script');
-        $js->setAttribute('type', 'text/javascript');
-        $js->addTextNode(""
-                    ."function smoothHide(el){"
-                    ."var o = 1;"
-                    ."var intrvalId = setInterval(function(){"
-                    ."if(o > 0){"
-                    ."o = o - 0.02;"
-                    ."el.style['opacity'] = o;"
-                    ."}"
-                    ."else{"
-                    ."clearInterval(intrvalId);"
-                    ."el.style['display'] = 'none';"
-                    ."}"
-                    ."},15);"
-                    ."};"
-                    ."function addDragSupport(source){"
-                    ."source.setAttribute(\"dg\",true);"
-                    ."var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;"
-                    ."var boxNum = source.getAttribute(\"data-box-number\");"
-                    ."if (boxNum === null) {"
-                    ."source.onmousedown = mouseDown;"
-                    ."}"
-                    ."else{"
-                    ."source.children[0].onmousedown = mouseDown"
-                    ."}"
-                    .""
-                    ."function mouseDown(e) {"
-                    ."e = e || window.event;"
-                    ."e.preventDefault();"
-                    ."pos3 = e.clientX;"
-                    ."pos4 = e.clientY;"
-                    ."document.onmouseup = dragStopped;"
-                    ."document.onmousemove = dragStarted;"
-                    ."};"
-                    ."function dragStarted(e) {"
-                    ."e = e || window.event;"
-                    ." e.preventDefault();"
-                    ."pos1 = pos3 - e.clientX;"
-                    ."pos2 = pos4 - e.clientY;"
-                    ."pos3 = e.clientX;"
-                    ."pos4 = e.clientY;"
-                    ."source.style.top = (source.offsetTop - pos2) + \"px\";"
-                    ."source.style.left = (source.offsetLeft - pos1) + \"px\";"
-                    ."};"
-                    ."function dragStopped(){"
-                    ."document.onmouseup = null;"
-                    ."document.onmousemove = null;"
-                    ."};"
-                    ."};", false);
-        $this->addChild($js);
     }
 }

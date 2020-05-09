@@ -1260,7 +1260,7 @@ abstract class AbstractJob {
      * @param \Exception $ex
      */
     private function _logExeException($ex) {
-        Cron::log('Warning: An exception was thrown while performing the operation. '
+        Cron::log('WARNING: An exception was thrown while performing the operation. '
                 . 'The output of the job might be not as expected.');
         Cron::log('Exception class: "'. get_class($ex).'"');
         Cron::log('Exception message: "'.$ex->getMessage().'"');

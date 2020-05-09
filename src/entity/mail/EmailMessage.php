@@ -55,6 +55,7 @@ class EmailMessage {
      * @since 1.0 
      */
     private $socketMailer;
+    private static $log;
     /**
      * Creates new instance of the class.
      * @param type $sendAccountName
@@ -63,7 +64,7 @@ class EmailMessage {
      * @since 1.0
      */
     private function __construct($sendAccountName = '') {
-        $this->log = [];
+        self::$log = [];
 
         if (class_exists('webfiori\conf\MailConfig')) {
             $acc = MailConfig::getAccount($sendAccountName);
@@ -213,10 +214,10 @@ class EmailMessage {
      */
     public static function getLog() {
         if (self::$em !== null) {
-            return self::$em->getLog();
+            return self::$em->getSocketMailer()->getResponsesLog();
         }
 
-        return [];
+        return self::$log;
     }
     /**
      * Returns an associative array that contains the names and the addresses 
@@ -318,6 +319,7 @@ class EmailMessage {
      */
     private function _sendMessage() {
         $this->socketMailer->write($this->asHtml->toHTML(), true);
+        self::$log = $this->socketMailer->getResponsesLog();
     }
     /**
      * 

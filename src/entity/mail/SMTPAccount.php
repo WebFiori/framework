@@ -68,15 +68,57 @@ class SMTPAccount {
     private $userName;
     /**
      * Creates new instance of the class.
+     * @param array $options An optional array that contains connection info. The array 
+     * can have the following indices:
+     * <ul>
+     * <li><b>port</b>: SMTP server port address. usually 25 or 465.</li>
+     * <li><b>server-address</b>: SMTP server address.</li>
+     * <li><b>user</b>: The username at which it is used to login to SMTP server.</li>
+     * <li><b>pass</b>: The password of the user</li>
+     * <li><b>sender-name</b>: The name of the sender that will appear when the 
+     * message is sent.</li>
+     * <li><b>sender-address</b>: The address that will appear when the 
+     * message is sent.</li>
+     * </ul>
      * @since 1.0.1
      */
-    public function __construct() {
-        $this->setPort(465);
-        $this->setUsername('');
-        $this->setPassword('');
-        $this->setServerAddress('');
-        $this->setName('');
-        $this->setAddress('');
+    public function __construct($options = []) {
+        
+        if (isset($options['port'])) {
+            $this->setPort($options['port']);
+        } else {
+            $this->setPort(465);
+        }
+        
+        if (isset($options['user'])) {
+            $this->setUsername($options['user']);
+        } else {
+            $this->setUsername('');
+        }
+        
+        if (isset($options['pass'])){
+            $this->setPassword($options['pass']);
+        } else {
+            $this->setPassword('');
+        }
+        
+        if (isset($options['server-address'])) {
+            $this->setServerAddress($options['server-address']);
+        } else {
+            $this->setServerAddress('');
+        }
+        
+        if(isset($options['sender-name'])) {
+            $this->setName($options['sender-name']);
+        } else {
+            $this->setName('');
+        }
+        
+        if (isset($options['sender-address'])) {
+            $this->setAddress($options['sender-address']);
+        } else {
+            $this->setAddress('');
+        }
     }
     /**
      * Returns the email address.

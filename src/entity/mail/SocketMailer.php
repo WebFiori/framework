@@ -222,7 +222,6 @@ class SocketMailer {
                 } else {
                     $this->receivers[$addressTrimmed] = $nameTrimmed;
                 }
-
                 return true;
             }
         }
@@ -701,7 +700,7 @@ class SocketMailer {
                 $this->sendC(self::NL.'.');
                 $this->sendC('QUIT');
             }
-        } else  if (strlen($this->getSenderAddress()) != 0) {
+        } else if (strlen($this->getSenderAddress()) != 0) {
             $this->_receiversCommand();
             $this->sendC('DATA');
             $importanceHeaderVal = $this->_priorityCommand();

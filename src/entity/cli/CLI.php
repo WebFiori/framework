@@ -111,6 +111,17 @@ class CLI {
      */
     public static function init() {
         self::get();
+    }
+    /**
+     * Register CLI commands.
+     * This method will register the commands which are bundled with the 
+     * framework first. Once it is finished, it will register any commands which 
+     * are created by the developer using the method InitCliCommands::init(). This 
+     * method should be only used during initialization stage. Calling it again 
+     * will have no effect.
+     * @since 1.0
+     */
+    public static function registerCommands() {
         //Register default framework cli commands.
         self::register(new HelpCommand());
         self::register(new SettingsCommand());
@@ -119,7 +130,6 @@ class CLI {
         self::register(new ListRoutesCommand());
         self::register(new CronCommand());
         self::register(new TestRouteCommand());
-        
         //Call this method to register any user-defined commands.
         InitCliCommands::init();
     }

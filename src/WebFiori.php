@@ -176,7 +176,6 @@ class WebFiori {
         }
         self::$AU = AutoLoader::get();
         InitAutoLoad::init();
-        CLI::init();
         $this->_setHandlers();
         self::$SF = ConfigController::get();
         self::$WF = WebsiteController::get();
@@ -195,7 +194,9 @@ class WebFiori {
             $this->dbErrDetails = $this->sysStatus;
             $this->sysStatus = Util::DB_NEED_CONF;
         }
-
+        //Initialize CLI
+        CLI::init();
+        
         //Initialize routes.
         APIRoutes::create();
         ViewRoutes::create();
@@ -205,7 +206,8 @@ class WebFiori {
         //initialize cron and privileges...
         InitCron::init();
         InitPrivileges::init();
-
+        
+        CLI::registerCommands();
         //class is now initialized
         self::$classStatus = 'INITIALIZED';
 

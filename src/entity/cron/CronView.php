@@ -107,17 +107,8 @@ class CronView {
     public function createOutputWindow() {
         $outputWindow = new HTMLNode();
         $outputWindow->setID('output-window');
-        $outputWindow->addTextNode('<p style="border:1px dotted;font-weight:bold">Output Window</p><pre'
-                .' style="font-family:monospace" id="output-area"></pre>', false);
-        $outputWindow->setStyle([
-            'width' => '100%',
-            'float' => 'right',
-            'border' => '1px dotted',
-            'overflow-y' => 'scroll',
-            'height' => '300px',
-            'color' => 'white',
-            'background-color' => 'black'
-        ]);
+        $outputWindow->addTextNode('<p class="output-window-title">Output Window</p><pre'
+                .' id="output-area"></pre>', false);
         Page::insert($outputWindow);
     }
     /**

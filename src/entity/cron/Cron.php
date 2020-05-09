@@ -30,13 +30,14 @@ use webfiori\entity\router\Router;
 use webfiori\entity\Util;
 use webfiori\WebFiori;
 /**
- * A class that is used to manage cron jobs.
+ * A class that is used to manage scheduled background jobs.
  * It is used to create jobs, schedule them and execute them. In order to run 
  * the jobs automatically, the developer must add an entry in the following 
  * formate in crontab:
- * <p><code>* * * * *  /usr/bin/php path/to/WebFiori.php --check-cron &lt;cron-pass&gt;<code></p>
- * Where &lt;cron-pass&gt; is the password 
- * that was set by the developer to protect the jobs from unauthorized access.
+ * <p><code>* * * * *  /usr/bin/php path/to/webfiori --cron check p=&lt;password&gt;<code></p>
+ * Where &lt;password&gt; is the password 
+ * that was set by the developer to protect the jobs from unauthorized access. 
+ * If no password is set, then it can be removed from the command.
  * Note that the path to PHP executable might differ from "/usr/bin/php". 
  * It depends on where the executable has been installed.
  * @author Ibrahim

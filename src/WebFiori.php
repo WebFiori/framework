@@ -39,6 +39,7 @@ use webfiori\entity\router\Router;
 use webfiori\entity\router\ViewRoutes;
 use webfiori\entity\ui\ErrorBox;
 use webfiori\entity\ui\ServerErrView;
+use webfiori\entity\ui\ServiceUnavailableView;
 use webfiori\entity\Util;
 use webfiori\ini\InitAutoLoad;
 use webfiori\ini\InitCron;
@@ -438,42 +439,16 @@ class WebFiori {
             $j->add('powered-by', 'WebFiori Framework v'.Config::getVersion().' ('.Config::getVersionType().')');
             die($j);
         } else {
-            die(''
-            .'<!DOCTYPE html>'
-            .'<html>'
-            .'<head>'
-            .'<title>Service Unavailable</title>'
-            .'</head>'
-            .'<body>'
-            .'<h1>503 - Service Unavailable</h1>'
-            .'<hr>'
-            .'<p>'
-            .'This error means that the system is not configured yet. '
-            .'Make sure to make the method <a target="_blank" href="https://programmingacademia.com/webfiori/docs/webfiori/conf/Config#isConfig">Config::isConfig()</a> return true. There are two ways '
-            .'to change return value of this method:'
-            .'</p>'
-            .'<ul>'
-            .'<li>Go to the file "conf/Config.php". Change attribute "isConfigured" value to true.</li>'
-            .'<li>Use the method <a target="_blank" href="https://programmingacademia.com/webfiori/docs/webfiori/logic/ConfigController#configured">ConfigController::configured</a>(true). You must supply \'true\' as an attribute.</li>'
-            .'<li>After that, reload the page and the system will work.</li>'
-            .'</ul>'
-            .'<p>'
-            .'If you want to make the system do something else if the return value of the '
-            .'given method is false, then open the file \'WebFiori.php\' and '
-            .'change the code in the \'else\' code block at the end of class constructor (Inside the "if" block).'
-            .'</p>'
-            .'<p>System Powerd By: <a href="https://github.com/usernane/webfiori" target="_blank"><b>'
-                    .'WebFiori Framework v'.Config::getVersion().' ('.Config::getVersionType().')'
-                    .'</b></a></p>'
-            .'</body>'
-            .'</html>');
+            $serviceUnavailable = new ServiceUnavailableView();
+            $serviceUnavailable->show(503);
         }
     }
     private function _setErrHandler() {
         set_error_handler(function($errno, $errstr, $errfile, $errline)
         {
-            $isCli = class_exists('webfiori\entity\CLI') ? CLI::isCLI() : php_sapi_name() == 'cli';
-
+            $isCli = class_exists('webfiori\entity\cli\CLI') ? CLI::isCLI() : php_sapi_name() == 'cli';
+            var_dump($isCli);
+            die();
             if ($isCli) {
                 fprintf(STDERR, "\n<%s>\n",Util::ERR_TYPES[$errno]['type']);
                 fprintf(STDERR, "Error Message    %5s %s\n",":",$errstr);
@@ -481,28 +456,26 @@ class WebFiori {
                 fprintf(STDERR, "Error Description%5s %s\n",":",Util::ERR_TYPES[$errno]['description']);
                 fprintf(STDERR, "Error File       %5s %s\n",":",$errfile);
                 fprintf(STDERR, "Error Line:      %5s %s\n",":",$errline);
+            } else if (defined('API_CALL')) {
+                header("HTTP/1.1 500 Server Error");
+                $j = new JsonX([
+                    'message' => $errstr,
+                    'type' => Util::ERR_TYPES[$errno]['type'],
+                    'description' => Util::ERR_TYPES[$errno]['description'],
+                    'error-number' => $errno,
+                    'file' => $errfile,
+                    'line' => $errline
+                ], true);
+                header('content-type: application/json');
+                die($j);
             } else {
-                if (defined('API_CALL')) {
-                    header("HTTP/1.1 500 Server Error");
-                    $j = new JsonX([
-                        'message' => $errstr,
-                        'type' => Util::ERR_TYPES[$errno]['type'],
-                        'description' => Util::ERR_TYPES[$errno]['description'],
-                        'error-number' => $errno,
-                        'file' => $errfile,
-                        'line' => $errline
-                    ], true);
-                    header('content-type: application/json');
-                    die($j);
-                } else {
-                    $errBox = new ErrorBox();
-                    $errBox->setError($errno);
-                    $errBox->setDescription($errno);
-                    $errBox->setFile($errfile);
-                    $errBox->setMessage($errstr);
-                    $errBox->setLine($errline);
-                    echo $errBox;
-                }
+                $errBox = new ErrorBox();
+                $errBox->setError($errno);
+                $errBox->setDescription($errno);
+                $errBox->setFile($errfile);
+                $errBox->setMessage($errstr);
+                $errBox->setLine($errline);
+                echo $errBox;
             }
 
             return true;
@@ -511,10 +484,10 @@ class WebFiori {
     private function _setExceptionHandler() {
         set_exception_handler(function($ex)
         {
-            $isCli = class_exists('webfiori\entity\CLI') ? CLI::isCLI() : php_sapi_name() == 'cli';
-
+            $isCli = class_exists('webfiori\entity\cli\CLI') ? CLI::isCLI() : php_sapi_name() == 'cli';
             if ($isCli) {
                 fprintf(STDERR, "\n<%s>\n","Uncaught Exception.");
+                fprintf(STDERR, "Exception Class %5s %s\n",":", get_class($ex));
                 fprintf(STDERR, "Exception Message %5s %s\n",":",$ex->getMessage());
                 fprintf(STDERR, "Exception Code    %5s %s\n",":",$ex->getMessage());
                 fprintf(STDERR, "File              %5s %s\n",":",$ex->getFile());
@@ -557,7 +530,7 @@ class WebFiori {
                     die($j);
                 } else {
                     $exceptionView = new ServerErrView($ex);
-                    $exceptionView->display();
+                    $exceptionView->show(500);
                 }
             }
         });
@@ -571,8 +544,8 @@ class WebFiori {
         $this->_setExceptionHandler();
         register_shutdown_function(function()
         {
+            $isCli = class_exists('webfiori\entity\cli\CLI') ? CLI::isCLI() : php_sapi_name() == 'cli';
             $error = error_get_last();
-
             if ($error !== null) {
                 $errNo = $error['type'];
 
@@ -583,7 +556,6 @@ class WebFiori {
                     return;
                 }
                 header("HTTP/1.1 500 Server Error");
-
                 if (defined('API_CALL')) {
                     $j = new JsonX([
                         'message' => $error["message"],
@@ -593,9 +565,16 @@ class WebFiori {
                         'line' => $error["line"]
                     ], true);
                     die($j);
+                } else if ($isCli) {
+                    fprintf(STDERR, "\n<%s>\n",Util::ERR_TYPES[$error['type']]['type']);
+                    fprintf(STDERR, "Error Message    %5s %s\n",":",$error['message']);
+                    fprintf(STDERR, "Error Number     %5s %s\n",":",$error['type']);
+                    fprintf(STDERR, "Error Description%5s %s\n",":",Util::ERR_TYPES[$error['type']]['description']);
+                    fprintf(STDERR, "Error File       %5s %s\n",":",$error['file']);
+                    fprintf(STDERR, "Error Line:      %5s %s\n",":",$error['line']);
                 } else {
                     $errPage = new ServerErrView($error);
-                    $errPage->display();
+                    $errPage->show(500);
                 }
             }
         });

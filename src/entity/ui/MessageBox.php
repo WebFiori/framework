@@ -24,6 +24,7 @@
  */
 namespace webfiori\entity\ui;
 
+use webfiori\WebFiori;
 use phpStructs\html\HTMLNode;
 /**
  * A generic class for showing a floating box in web pages that can have any content 
@@ -68,16 +69,17 @@ class MessageBox extends HTMLNode {
         $this->setAttribute('onmouseover', "if(this.getAttribute('dg') === null){addDragSupport(this)}");
 
         if (self::getCount() == 0) {
+            $base = WebFiori::getSiteConfig()->getBaseURL();
             $css = new HTMLNode('link');
             $css->setAttributes([
                 'rel' => 'stylesheet',
-                'href' => 'assets/css/message-box.css'
+                'href' => $base.'assets/css/message-box.css'
             ]);
             $this->addChild($css);
             $js = new HTMLNode('script');
             $js->setAttributes([
                 'type' => 'text/javascript',
-                'src' => 'assets/js/message-box.js'
+                'src' => $base.'assets/js/message-box.js'
             ]);
             $this->addChild($js);
         }

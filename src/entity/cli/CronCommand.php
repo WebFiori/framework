@@ -26,11 +26,16 @@ namespace webfiori\entity\cli;
 
 use webfiori\entity\cron\Cron;
 /**
- * Description of CronCommand
+ * A CLI command which is related to executing 
+ * background jobs or performing operations on them..
  *
  * @author Ibrahim
+ * @version 1.0
  */
 class CronCommand extends CLICommand {
+    /**
+     * Creates new instance of the class.
+     */
     public function __construct() {
         parent::__construct('--cron', [
             'p' => [
@@ -71,6 +76,12 @@ class CronCommand extends CLICommand {
             ]);
         }
     }
+    /**
+     * Execute the command.
+     * @return int If the command executed without any errors, the 
+     * method will return 0. Other than that, it will return false.
+     * @since 1.0
+     */
     public function exec() {
         $retVal = -1;
 
@@ -177,11 +188,13 @@ class CronCommand extends CLICommand {
     }
     private function _showLog() {
         if ($this->isArgProvided('show-log')) {
-            fprintf(STDERR, "\n------+-Execution Log-+------\n");
+            fprintf(STDOUT, "\n------+-Execution Log-+------\n");
 
             foreach (Cron::getLogArray() as $message) {
-                fprintf(STDERR, $message."\n");
+                fprintf(STDOUT, $message."\n");
             }
+        } else {
+            fprintf(STDOUT, "TIP: Supply the argument 'show-log' to show execution log.\n");
         }
     }
     private function _checkPass() {

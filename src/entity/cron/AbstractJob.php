@@ -390,7 +390,7 @@ abstract class AbstractJob {
 
         foreach ($this->customAttrs as $attrName) {
             if (isset($_POST[$attrName])) {
-                $filtered = filter_var($_POST[$attrName], FILTER_SANITIZE_STRING);
+                $filtered = filter_var(urldecode($_POST[$attrName]), FILTER_SANITIZE_STRING);
 
                 if ($filtered !== false) {
                     $retVal[$attrName] = $filtered;
@@ -1316,14 +1316,6 @@ abstract class AbstractJob {
      * @since 1.0
      */
     public abstract function execute();
-    /**
-     * Run some routines before the job is executed.
-     * The developer can implement this method to perform some actions before the 
-     * job is executed. It is optional to implement that method. The developer can 
-     * leave the body of the method empty.
-     * @since 1.0 
-     */
-    public abstract function beforeExec();
     /**
      * Run some routines after the job is executed.
      * The developer can implement this method to perform some actions after the 

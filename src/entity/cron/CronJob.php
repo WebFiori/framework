@@ -25,7 +25,7 @@
 namespace webfiori\entity\cron;
 
 /**
- * A class thar represents a cron job.
+ * A class that represents a cron job.
  * This class used to provide basic implementation for the class 'AbstractJob'. 
  * It is recommended to not use this class in creating custom jobs. The recommended 
  * option is to extend the class 'AbstractJob'. 
@@ -118,12 +118,6 @@ class CronJob extends AbstractJob{
      * A method that does nothing.
      */
     public function afterExec() {
-        
-    }
-    /**
-     * A method that does nothing.
-     */
-    public function beforeExec() {
         
     }
     /**

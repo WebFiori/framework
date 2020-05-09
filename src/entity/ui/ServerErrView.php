@@ -35,7 +35,7 @@ use webfiori\entity\Util;
  * @author Ibrahim
  * @version 1.0
  */
-class ServerErrView {
+class ServerErrView extends View{
     /**
      * Creates a new instance of the class.
      * @param Throwable|array $throwableOrErr This can be an instance of the 
@@ -70,15 +70,6 @@ class ServerErrView {
             Page::insert($this->_createMessageLine('File: ', $throwableOrErr["file"]));
             Page::insert($this->_createMessageLine('Line: ', $throwableOrErr["line"]));
         }
-    }
-    /**
-     * Show the view.
-     * Note that the method will also send a 500 - Server Error response code.
-     * @since 1.0
-     */
-    public function display() {
-        http_response_code(500);
-        Page::render();
     }
     /**
      * 

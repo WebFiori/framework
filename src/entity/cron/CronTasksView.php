@@ -69,7 +69,6 @@ class CronTasksView extends CronView {
         $this->getControlsContainer()->addChild($parag);
         $this->_createRefreshControls();
         $this->_createTasksTable();
-
         $this->createOutputWindow();
         $this->_displayExecLog();
         Page::render();
@@ -107,18 +106,9 @@ class CronTasksView extends CronView {
         $tasksTable->setID('tasks-table');
         $this->getControlsContainer()->addChild($tasksTable);
         $tasksTable->setAttribute('border', 1);
-        $tasksTable->setStyle([
-            'border-collapse' => 'collapse',
-            'margin-top' => '30px'
-        ]);
         $tableHeader = new TableRow();
         $tableHeader->setID('tasks-table-header-row');
         $tasksTable->addChild($tableHeader);
-        $tableHeader->setStyle([
-            'border-bottom' => 'double',
-            'background-color' => 'rgba(66,234,88,0.3)',
-            'font-weight' => 'bold'
-        ]);
         $tableHeader->addChild($this->_createTasksTableHeaderCell('Job Name'));
         $tableHeader->addChild($this->_createTasksTableHeaderCell('Cron Excepression'));
         $tableHeader->addChild($this->_createTasksTableHeaderCell('Is Minute'));
@@ -133,11 +123,7 @@ class CronTasksView extends CronView {
             $cell = new TableCell();
             $cell->setColSpan(8);
             $cell->addTextNode('No Jobs Has Been Scheduled.');
-            $cell->setStyle([
-                'background-color' => 'lightgray',
-                'text-align' => 'center',
-                'font-weight' => 'bold'
-            ]);
+            $cell->setClassName('empty-cell');
             $tasksTable->addChild($cell);
         } else {
             while ($job = $jobsQueue->dequeue()) {
@@ -176,14 +162,10 @@ class CronTasksView extends CronView {
         $cell->setClassName('tasks-table-cell');
 
         if ($isTime) {
-            $cell->setStyle([
-                    'background-color' => 'rgba(100,255,29,0.3)'
-                ]);
+            $cell->setClassName('yes-cell');
             $cell->addTextNode('Yes');
         } else {
-            $cell->setStyle([
-                'background-color' => 'rgba(255,87,29,0.3)'
-            ]);
+            $cell->setClassName('no-cell');
             $cell->addTextNode('No');
         }
 

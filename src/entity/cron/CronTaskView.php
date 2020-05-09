@@ -30,6 +30,7 @@ use phpStructs\html\PNode;
 use phpStructs\html\TableCell;
 use phpStructs\html\TableRow;
 use webfiori\entity\Page;
+use webfiori\entity\router\Router;
 use webfiori\WebFiori;
 /**
  * A view to show details of a specific CRON task.
@@ -49,7 +50,7 @@ class CronTaskView extends CronView {
      */
     public function __construct() {
         parent::__construct('View Task', 'Display task info.');
-        $jobName = $_GET['job-name'];
+        $jobName = Router::getVarValue('job-name');
         $job = Cron::getJob($jobName);
         $this->job = $job;
 
@@ -65,7 +66,7 @@ class CronTaskView extends CronView {
             $this->getControlsContainer()->addTextNode('<br/>', false);
             $this->_createInfoTable($job);
             $this->_createCustomParamsContainer();
-            $custAttrsNames = $job->getExecArgs();
+            $custAttrsNames = $job->getExecArgsNames();
             $custAtrrsAsJsonArr = '[';
 
             for ($x = 0 ; $x < count($custAttrsNames) ; $x++) {
@@ -161,11 +162,6 @@ class CronTaskView extends CronView {
         $noDataRow = new TableRow();
         $noDataRow->setID('no-attributes-row');
         $noDataCell = new TableCell();
-        $noDataCell->setStyle([
-            'background-color' => 'lightgray',
-            'text-align' => 'center',
-            'font-weight' => 'bold'
-        ]);
         $noDataCell->setColSpan(3);
         $noDataCell->addTextNode('No Attributes');
         $noDataRow->addChild($noDataCell);
@@ -190,10 +186,6 @@ class CronTaskView extends CronView {
         $taskTable->setID('tasks-table');
         $this->getControlsContainer()->addChild($taskTable);
         $taskTable->setAttribute('border', 1);
-        $taskTable->setStyle([
-            'border-collapse' => 'collapse',
-            'margin-top' => '30px'
-        ]);
         $row1 = new TableRow();
         $row1->addCell('<b>Task Name:</b>','td',false);
         $row1->addCell($job->getJobName());
@@ -234,14 +226,10 @@ class CronTaskView extends CronView {
         $cell->setClassName('tasks-table-cell');
 
         if ($isTime) {
-            $cell->setStyle([
-                    'background-color' => 'rgba(100,255,29,0.3)'
-                ]);
+            $cell->setClassName('yes-cell');
             $cell->addTextNode('Yes');
         } else {
-            $cell->setStyle([
-                'background-color' => 'rgba(255,87,29,0.3)'
-            ]);
+            $cell->setClassName('no-cell');
             $cell->addTextNode('No');
         }
 

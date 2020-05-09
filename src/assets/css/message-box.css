@@ -39,6 +39,10 @@
     color:white;
     height:auto;
 }
+.err-label{
+    color:#ff6666;
+    font-family:monospace
+}
 .message-line{
     margin:0;
     font-family:monospace;

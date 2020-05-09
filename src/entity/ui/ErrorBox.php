@@ -50,11 +50,6 @@ class ErrorBox extends MessageBox {
     private $fileNode;
     /**
      *
-     * @var string 
-     */
-    private $labelStyle;
-    /**
-     *
      * @var HTMLNode 
      */
     private $lineNode;
@@ -65,7 +60,6 @@ class ErrorBox extends MessageBox {
     private $messageNode;
     public function __construct() {
         parent::__construct();
-        $this->labelStyle = 'style="color:#ff6666;font-family:monospace"';
         $this->setClassName('error-message-box');
         $this->setStyle([
             'top' => (self::getCount() * 10).'px',
@@ -76,23 +70,23 @@ class ErrorBox extends MessageBox {
         $this->errNode = new HTMLNode('p');
         $this->errNode->setClassName('message-line');
         $detailsContainer->addChild($this->errNode);
-        $this->errNode->addTextNode('<b '.$this->labelStyle.'>Error: </b>', false);
+        $this->errNode->addTextNode('<b class="err-label">Error: </b>', false);
         $this->descNode = new HTMLNode('p');
         $this->descNode->setClassName('message-line');
         $detailsContainer->addChild($this->descNode);
-        $this->descNode->addTextNode('<b '.$this->labelStyle.'>Description: </b>', false);
+        $this->descNode->addTextNode('<b class="err-label">Description: </b>', false);
         $this->messageNode = new HTMLNode('p');
         $this->messageNode->setClassName('message-line');
         $detailsContainer->addChild($this->messageNode);
-        $this->messageNode->addTextNode('<b '.$this->labelStyle.'>Message: </b>', false);
+        $this->messageNode->addTextNode('<b class="err-label">Message: </b>', false);
         $this->fileNode = new HTMLNode('p');
         $this->fileNode->setClassName('message-line');
         $detailsContainer->addChild($this->fileNode);
-        $this->fileNode->addTextNode('<b '.$this->labelStyle.'>File: </b>', false);
+        $this->fileNode->addTextNode('<b class="err-label">File: </b>', false);
         $this->lineNode = new HTMLNode('p');
         $this->lineNode->setClassName('message-line');
         $detailsContainer->addChild($this->lineNode);
-        $this->lineNode->addTextNode('<b '.$this->labelStyle.'>Line: </b>', false);
+        $this->lineNode->addTextNode('<b class="err-label">Line: </b>', false);
 
         $this->setAttribute('onmouseover', "if(this.getAttribute('dg') === null){addDragSupport(this)}");
         $this->getHeader()->addTextNode('<b style="margin-left:10px;font-family:monospace;">Message ('.self::getCount().')</b>',false);
@@ -104,7 +98,7 @@ class ErrorBox extends MessageBox {
      */
     public function setDescription($errno) {
         $this->descNode->removeAllChildNodes();
-        $this->descNode->addTextNode('<b '.$this->labelStyle.'>Description: </b>'.Util::ERR_TYPES[$errno]['description'], false);
+        $this->descNode->addTextNode('<b class="err-label">Description: </b>'.Util::ERR_TYPES[$errno]['description'], false);
     }
     /**
      * Sets error based on error number.
@@ -113,7 +107,7 @@ class ErrorBox extends MessageBox {
      */
     public function setError($errno) {
         $this->errNode->removeAllChildNodes();
-        $this->errNode->addTextNode('<b '.$this->labelStyle.'>Error: </b>'.Util::ERR_TYPES[$errno]['type'], false);
+        $this->errNode->addTextNode('<b class="err-label">Error: </b>'.Util::ERR_TYPES[$errno]['type'], false);
     }
     /**
      * Sets the file that caused the error.
@@ -122,7 +116,7 @@ class ErrorBox extends MessageBox {
      */
     public function setFile($file) {
         $this->fileNode->removeAllChildNodes();
-        $this->fileNode->addTextNode('<b '.$this->labelStyle.'>File: </b>'.$file, false);
+        $this->fileNode->addTextNode('<b class="err-label">File: </b>'.$file, false);
     }
     /**
      * Sets error line number.
@@ -131,7 +125,7 @@ class ErrorBox extends MessageBox {
      */
     public function setLine($line) {
         $this->lineNode->removeAllChildNodes();
-        $this->lineNode->addTextNode('<b '.$this->labelStyle.'>Line: </b>'.$line, false);
+        $this->lineNode->addTextNode('<b class="err-label">Line: </b>'.$line, false);
     }
     /**
      * Sets error message.
@@ -140,6 +134,6 @@ class ErrorBox extends MessageBox {
      */
     public function setMessage($msg) {
         $this->messageNode->removeAllChildNodes();
-        $this->messageNode->addTextNode('<b '.$this->labelStyle.'>Message: </b>'.$msg, false);
+        $this->messageNode->addTextNode('<b class="err-label">Message: </b>'.$msg, false);
     }
 }

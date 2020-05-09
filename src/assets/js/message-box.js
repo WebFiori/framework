@@ -1,3 +1,8 @@
+/**
+ * This function is used to hide any HTML element smoothly.
+ * @param {Node} el The element that will be hidden.
+ * @returns {undefined}
+ */
 function smoothHide(el){
     var o = 1;
     var intrvalId = setInterval(function(){
@@ -10,6 +15,11 @@ function smoothHide(el){
         }
     },15);
 };
+/**
+ * Add drag support for HTML message box.
+ * @param {Node} source The message box.
+ * @returns {undefined}
+ */
 function addDragSupport(source){
     source.setAttribute("dg",true);
     var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;

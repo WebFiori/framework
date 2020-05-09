@@ -321,7 +321,6 @@ abstract class AbstractJob {
         $retVal = false;
         $this->setIsForced($xForce);
         if ($xForce || $this->isTime()) {
-            $this->_callMethod('beforeExec');
             $isSuccessRun = $this->_callMethod('execute');
             $this->isSuccess = $isSuccessRun === true || $isSuccessRun === null;
 

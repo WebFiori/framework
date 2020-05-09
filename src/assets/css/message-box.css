@@ -7,7 +7,6 @@
     position:fixed;
     background-color:rgba(0,0,0,0.7);
     color:white;
-    height:auto;
 }
 .message-box-header{
     width:100%;
@@ -37,7 +36,6 @@
     position:fixed;
     background-color:rgba(0,0,0,0.7);
     color:white;
-    height:auto;
 }
 .err-label{
     color:#ff6666;

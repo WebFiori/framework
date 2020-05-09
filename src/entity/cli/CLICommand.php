@@ -50,7 +50,27 @@ abstract class CLICommand {
      * @since 1.0 
      */
     private $description;
-    public function __construct($commandName, $args, $description = '') {
+    /**
+     * Creates new instance of the class.
+     * @param string $commandName A string that represents the name of the 
+     * command such as '-v' or '--help'. If not provided, the 
+     * value '--new-command' is used.
+     * @param array $args An indexed array of sub-associative arrays of arguments which can 
+     * be supplied to the command when running it. Each 
+     * sub-array can have the following indices:
+     * <ul>
+     * <li><b>optional</b>: A boolean. if set to true, it means that the argument 
+     * is optional and can be ignored when running the command.</li>
+     * <li><b>default</b>: An optional default value for the argument 
+     * to use if it is not provided and is optional.</li>
+     * <li><b>description</b>: A description of the argument which 
+     * will be shown if the command '--help' is executed.</li>
+     * </ul>
+     * @param string $description A string that describes what does the job 
+     * do. The description will appear when the command '--help' is executed.
+     * @since 1.0
+     */
+    public function __construct($commandName, $args = [], $description = '') {
         if (!$this->setName($commandName)) {
             $this->setName('--new-command');
         }
@@ -101,6 +121,19 @@ abstract class CLICommand {
 
         return false;
     }
+    /**
+     * Adds multiple arguments to the command
+     * @param array $arr An indexed array of sub associative arrays. Each 
+     * sub-array can have the following indices:
+     * <ul>
+     * <li><b>optional</b>: A boolean. if set to true, it means that the argument 
+     * is optional and can be ignored when running the command.</li>
+     * <li><b>default</b>: An optional default value for the argument 
+     * to use if it is not provided and is optional.</li>
+     * <li><b>description</b>: A description of the argument which 
+     * will be shown if the command '--help' is executed.</li>
+     * </ul>
+     */
     public function addArgs($arr) {
         $this->commandArgs = [];
 

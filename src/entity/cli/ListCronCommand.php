@@ -31,10 +31,20 @@ use webfiori\entity\cron\Cron;
  * @author Ibrahim
  */
 class ListCronCommand extends CLICommand {
+    /**
+     * Creates new instance of the class.
+     * The command will have name '--list-jobs'. The command is used to list 
+     * all registered background jobs.
+     */
     public function __construct() {
         parent::__construct('--list-jobs', [], 'List all scheduled CRON jobs.');
     }
-
+    /**
+     * Execute the command.
+     * @return int If the command executed without any errors, the 
+     * method will return 0. Other than that, it will return false.
+     * @since 1.0
+     */
     public function exec() {
         $jobs = Cron::jobsQueue();
         $i = 1;
@@ -50,5 +60,7 @@ class ListCronCommand extends CLICommand {
             fprintf(STDOUT, "Cron Expression %".(18 - strlen('Cron Expression'))."s %s\n",":",$job->getExpression());
             $i++;
         }
+        return 0;
     }
+    
 }

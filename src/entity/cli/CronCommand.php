@@ -35,6 +35,18 @@ use webfiori\entity\cron\Cron;
 class CronCommand extends CLICommand {
     /**
      * Creates new instance of the class.
+     * The command will have name '--cron'. This command is used to 
+     * perform operations on background jobs. In addition to that, 
+     * it will have the following arguments:
+     * <ul>
+     * <li><b>p</b>: Cron password.</li>
+     * <li><b>check</b>: Run check if it is time to execute a job.</li>
+     * <li><b>force</b>: Force execution of a job given its name.</li>
+     * <li><b>job-name</b>: The job that will be forced to execute or 
+     * its arguments will be shown.</li>
+     * <li><b>show-job-args</b>: Show arguments of a job.</li>
+     * <li><b>show-log</b>: Display execution log after execution is finished.</li>
+     * </ul>
      */
     public function __construct() {
         parent::__construct('--cron', [

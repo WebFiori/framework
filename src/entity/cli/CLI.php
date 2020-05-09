@@ -37,7 +37,9 @@ use webfiori\entity\cli\TestRouteCommand;
 /**
  * A class which adds basic support for running the framework through 
  * command line interface (CLI).
- *
+ * In addition to adding support for CLI, this class is used to register any 
+ * custom commands which are created by developers. Also, it initialize some of 
+ * the attributes of the framework in order to use it in CLI environment.
  * @author Ibrahim
  * @version 1.0.2
  */

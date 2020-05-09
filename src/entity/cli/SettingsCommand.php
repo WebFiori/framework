@@ -31,9 +31,20 @@ use webfiori\WebFiori;
  * @author Ibrahim
  */
 class SettingsCommand extends CLICommand {
+    /**
+     * Creates new instance of the class.
+     * The command will have name '--show-config'. This command is used to display 
+     * the configuration of the framework.
+     */
     public function __construct() {
         parent::__construct('--show-config', [], 'Display framework configuration.');
     }
+    /**
+     * Execute the command.
+     * @return int If the command executed without any errors, the 
+     * method will return 0. Other than that, it will return false.
+     * @since 1.0
+     */
     public function exec() {
         $spaces = 25;
         $C = WebFiori::getConfig();
@@ -63,5 +74,6 @@ class SettingsCommand extends CLICommand {
         foreach ($SC->getDescriptions() as $langCode => $desc) {
             fprintf(STDOUT,"        $langCode => $desc\n");
         }
+        return 0;
     }
 }

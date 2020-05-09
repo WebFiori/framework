@@ -32,6 +32,15 @@ use webfiori\entity\Theme;
  * @author Ibrahim
  */
 class ListThemesCommand extends CLICommand {
+    /**
+     * Creates new instance of the class.
+     * The command will have name '--list-themes'. In addition to that, 
+     * it will have the following arguments:
+     * <ul>
+     * <li><b>theme-name</b>: If specified, only information about given theme 
+     * will be shown.</li>
+     * </ul>
+     */
     public function __construct() {
         parent::__construct('--list-themes', [
             'theme-name' => [
@@ -41,6 +50,12 @@ class ListThemesCommand extends CLICommand {
             ]
         ], 'List all registered themes.');
     }
+    /**
+     * Execute the command.
+     * @return int If the command executed without any errors, the 
+     * method will return 0. Other than that, it will return false.
+     * @since 1.0
+     */
     public function exec() {
         $themesArr = Theme::getAvailableThemes();
 
@@ -69,6 +84,7 @@ class ListThemesCommand extends CLICommand {
             $this->_printThemeObj($themeObj);
             $index++;
         }
+        return 0;
     }
 
     private function _printThemeObj($themeObj) {

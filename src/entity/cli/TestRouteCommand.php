@@ -32,6 +32,14 @@ use webfiori\entity\router\Router;
  * @author Ibrahim
  */
 class TestRouteCommand extends CLICommand {
+    /**
+     * Creates new instance of the class.
+     * The command will have name '--route'. In addition to that, 
+     * it will have the following arguments:
+     * <ul>
+     * <li><b>url</b>: The URL at which its route will be tested.</li>
+     * </ul>
+     */
     public function __construct() {
         parent::__construct('--route', [
             'url' => [
@@ -41,10 +49,16 @@ class TestRouteCommand extends CLICommand {
             ]
         ], 'Test the result of routing to a URL');
     }
-
+    /**
+     * Execute the command.
+     * @return int If the command executed without any errors, the 
+     * method will return 0. Other than that, it will return false.
+     * @since 1.0
+     */
     public function exec() {
         $url = $this->getArgValue('url');
         fwrite(STDOUT, "Trying to route to \"".$url."\"...\n");
         Router::route($url);
+        return 0;
     }
 }

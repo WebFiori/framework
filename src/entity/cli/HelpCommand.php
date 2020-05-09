@@ -34,6 +34,13 @@ use webfiori\WebFiori;
  * @version 1.0
  */
 class HelpCommand extends CLICommand {
+    /**
+     * Creates new instance of the class.
+     * The command will have name '--help'. This command 
+     * is used to display help information for the registered commands.
+     * The command have one extra argument which is 'command-name'. If 
+     * provided, the shown help will be specific to the selected command.
+     */
     public function __construct() {
         parent::__construct('--help', [
             'command-name' => [
@@ -45,7 +52,10 @@ class HelpCommand extends CLICommand {
                 .'"command-name" with this command.');
     }
     /**
-     * Execute the help command.
+     * Execute the command.
+     * @return int If the command executed without any errors, the 
+     * method will return 0. Other than that, it will return false.
+     * @since 1.0
      */
     public function exec() {
         $this->showVersionInfo();
@@ -65,6 +75,7 @@ class HelpCommand extends CLICommand {
                 $this->printCommandInfo($commandObj);
             }
         }
+        return 0;
     }
 
     /**

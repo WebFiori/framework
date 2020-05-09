@@ -31,9 +31,21 @@ use webfiori\entity\router\Router;
  * @author Ibrahim
  */
 class ListRoutesCommand extends CLICommand {
+    /**
+     * Creates new instance of the class.
+     * The command will have name '--list-routes'. This command 
+     * is used to list all registered routes and at which resource they 
+     * point to.
+     */
     public function __construct() {
         parent::__construct('--list-routes', [], 'List all created routes and which resource they point to.');
     }
+    /**
+     * Execute the command.
+     * @return int If the command executed without any errors, the 
+     * method will return 0. Other than that, it will return false.
+     * @since 1.0
+     */
     public function exec() {
         $routesArr = Router::routes();
         $maxRouteLen = 0;
@@ -56,5 +68,6 @@ class ListRoutesCommand extends CLICommand {
                 fprintf(STDOUT, "$requestedUrl %".$location."s $routeTo\n"," => ");
             }
         }
+        return 0;
     }
 }

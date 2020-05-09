@@ -38,39 +38,35 @@ use webfiori\WebFiori;
 class CronAPIs extends ExtendedWebServices {
     public function __construct() {
         parent::__construct();
-        $a00 = new APIAction('login');
-        $a00->addRequestMethod('post');
-        $a00->addParameter(new RequestParameter('password'));
-        $this->addAction($a00);
+        $loginService = new APIAction('login');
+        $loginService->addRequestMethod('post');
+        $loginService->addParameter(new RequestParameter('password'));
+        $this->addAction($loginService);
 
-        $a01 = new APIAction('force-execution');
-        $a01->addRequestMethod('post');
-        $a01->addParameter(new RequestParameter('job-name'));
-        $this->addAction($a01,true);
+        $forceExecService = new APIAction('force-execution');
+        $forceExecService->addRequestMethod('post');
+        $forceExecService->addParameter(new RequestParameter('job-name'));
+        $this->addAction($forceExecService,true);
 
-        $a02 = new APIAction('logout');
-        $a02->addRequestMethod('post');
-        $a02->addRequestMethod('get');
-        $this->addAction($a02);
+        $logoutService = new APIAction('logout');
+        $logoutService->addRequestMethod('post');
+        $logoutService->addRequestMethod('get');
+        $this->addAction($logoutService);
     }
     public function isAuthorized() {
         return WebFiori::getWebsiteController()->getSessionVar('cron-login-status') === true;
     }
 
     public function processRequest() {
-        $a = $this->getAction();
+        $calledServiceName = $this->getAction();
 
-        if ($a == 'login') {
+        if ($calledServiceName == 'login') {
             $this->_login();
-        } else {
-            if ($a == 'logout') {
-                WebFiori::getWebsiteController()->setSessionVar('cron-login-status',false);
-                $this->sendResponse('Logged out.', 'info');
-            } else {
-                if ($a == 'force-execution') {
-                    $this->_forceExecution();
-                }
-            }
+        } else if ($calledServiceName == 'logout') {
+            WebFiori::getWebsiteController()->setSessionVar('cron-login-status',false);
+            $this->sendResponse('Logged out.', 'info');
+        } else if ($calledServiceName == 'force-execution') {
+            $this->_forceExecution();
         }
     }
     private function _forceExecution() {

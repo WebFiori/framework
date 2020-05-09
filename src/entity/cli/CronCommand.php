@@ -65,7 +65,7 @@ class CronCommand extends CLICommand {
         ], 'Run CRON Scheduler');
 
         if (Cron::password() != 'NO_PASSWORD') {
-            $this->addArg('password', [
+            $this->addArg('p', [
                 'optional' => false,
                 'description' => 'CRON password.'
             ]);
@@ -152,34 +152,53 @@ class CronCommand extends CLICommand {
     private function _showJobArgs() {
         $jobName = $this->getArgValue('job-name');
 
-        if ($jobName !== null) {
-            $job = Cron::getJob($jobName);
+        if ($this->_checkPass()) {
+            if ($jobName !== null) {
+                $job = Cron::getJob($jobName);
 
-            if ($job !== null) {
-                fprintf(STDOUT,"Job Args:\n");
-                $customArgs = $job->getExecArgsNames();
+                if ($job !== null) {
+                    fprintf(STDOUT,"Job Args:\n");
+                    $customArgs = $job->getExecArgsNames();
 
-                if (count($customArgs) != 0) {
-                    foreach ($customArgs as $argName) {
-                        fprintf(STDOUT,"$argName\n");
+                    if (count($customArgs) != 0) {
+                        foreach ($customArgs as $argName) {
+                            fprintf(STDOUT,"$argName\n");
+                        }
+                    } else {
+                        fprintf(STDOUT,"<NO ARGS>\n");
                     }
                 } else {
-                    fprintf(STDOUT,"<NO ARGS>");
+                    fprintf(STDERR,"Error: No job which has the given name was found.\n");
                 }
             } else {
-                fprintf(STDERR,"Error: No job which has the given name was found.\n");
+                fprintf(STDERR,"Error: The argument 'job-name' is missing.\n");
             }
-        } else {
-            fprintf(STDERR,"Error: The argument 'job-name' is missing.\n");
         }
     }
     private function _showLog() {
         if ($this->isArgProvided('show-log')) {
-            fprintf(STDERR, "Execution Log: \n");
+            fprintf(STDERR, "\n------+-Execution Log-+------\n");
 
             foreach (Cron::getLogArray() as $message) {
                 fprintf(STDERR, $message."\n");
             }
         }
+    }
+    private function _checkPass() {
+        $cronPass = Cron::password();
+        if($cronPass == 'NO_PASSWORD'){
+            return true;
+        }
+        $givenPass = $this->getArgValue('p');
+        if ($givenPass === null) {
+            fprintf(STDERR,"Error: Password is missing. It must be provided as argument 'p=PASS'.\n");
+            return false;
+        }
+        $hash = hash('sha256', $givenPass);
+        $same = $hash == $cronPass;
+        if (!$same) {
+            fprintf(STDERR,"Error: Provided password is incorrect.\n");
+        }
+        return $same;
     }
 }

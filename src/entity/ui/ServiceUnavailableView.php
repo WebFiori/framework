@@ -36,7 +36,7 @@ use phpStructs\html\UnorderedList;
  * yet.
  * @author Ibrahim
  */
-class ServiceUnavailableView extends View{
+class ServiceUnavailableView {
     /**
      * Creates new instance of the class.
      */
@@ -67,5 +67,16 @@ class ServiceUnavailableView extends View{
                     .'WebFiori Framework v'.Config::getVersion().' ('.Config::getVersionType().')'
                     .'</b></a>', false);
         Page::insert($poweredByParag);
+    }
+    /**
+     * Show the view.
+     * @param int $responseCode A response code to send before showing the view. 
+     * default is 200 - Ok.
+     * @since 1.0
+     */
+    public function show($responseCode = 200) {
+        http_response_code($responseCode);
+        Page::render();
+        die();
     }
 }

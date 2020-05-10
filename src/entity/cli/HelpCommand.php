@@ -66,10 +66,13 @@ class HelpCommand extends CLICommand {
             if (isset($regCommands[$commandName])) {
                 $this->printCommandInfo($regCommands[$commandName], true);
             } else {
-                fprintf(STDOUT, "Error: Command '$commandName' is not supported.\n");
+                $this->error("Command '$commandName' is not supported.\n");
             }
         } else {
-            Util::print_r("Options:");
+            fprintf(STDOUT, $this->formatOutput("Options:\n", [
+                'bold' => true,
+                'color' => 'light-green'
+            ]));
 
             foreach ($regCommands as $commandObj) {
                 $this->printCommandInfo($commandObj);
@@ -83,17 +86,26 @@ class HelpCommand extends CLICommand {
      * @param CLICommand $cliCommand
      */
     private function printCommandInfo($cliCommand, $withArgs = false) {
-        fprintf(STDOUT, "    %s\n", $cliCommand->getName());
+        fprintf(STDOUT, "    %s\n", $this->formatOutput($cliCommand->getName(), [
+            'color' => 'yellow',
+            'bold' => true
+        ]));
         fprintf(STDOUT, "        %25s\n", $cliCommand->getDescription());
 
         if ($withArgs) {
             $args = $cliCommand->getArgs();
 
             if (count($args) != 0) {
-                fprintf(STDOUT, "    Supported Arguments:\n");
+                fprintf(STDOUT, $this->formatOutput("    Supported Arguments:\n", [
+                    'bold' => true,
+                    'color' => 'light'
+                ]));
 
                 foreach ($args as $argName => $options) {
-                    fprintf(STDOUT, "    %20s: ", $argName);
+                    fprintf(STDOUT, "    %25s: ", $this->formatOutput($argName, [
+                        'bold' => true,
+                        'color' => 'yellow'
+                    ]));
 
                     if ($options['optional']) {
                         fprintf(STDOUT, "[Optional]");

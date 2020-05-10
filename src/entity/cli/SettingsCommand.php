@@ -48,14 +48,20 @@ class SettingsCommand extends CLICommand {
     public function exec() {
         $spaces = 25;
         $C = WebFiori::getConfig();
-        fprintf(STDOUT, "Config.php Settings:\n");
+        fprintf(STDOUT, $this->formatOutput("Config.php Settings:\n", [
+            'color' => 'yellow',
+            'bold' => true
+        ]));
         fprintf(STDOUT, "    Framework Version %".($spaces - strlen('Framework Version'))."s %s\n",':',$C->getVersion());
         fprintf(STDOUT, "    Version Type %".($spaces - strlen('Version Type'))."s %s\n",':',$C->getVersionType());
         fprintf(STDOUT, "    Release Date %".($spaces - strlen('Release Date'))."s %s\n",':',$C->getReleaseDate());
         fprintf(STDOUT, "    Config Version %".($spaces - strlen('Config Version'))."s %s\n",':',$C->getConfigVersion());
         $isConfigured = $C->isConfig() === true ? 'Yes' : 'No';
         fprintf(STDOUT, "    Is System Configured %".($spaces - strlen('Is System Configured'))."s %s\n",':',$isConfigured);
-        fprintf(STDOUT, "SiteConfig.php Settings:\n");
+        fprintf(STDOUT, $this->formatOutput("SiteConfig.php Settings:\n", [
+            'color' => 'yellow',
+            'bold' => true
+        ]));
         $SC = WebFiori::getSiteConfig();
         fprintf(STDOUT, "    Base URL %".($spaces - strlen('Base URL'))."s %s\n",':',$SC->getBaseURL());
         fprintf(STDOUT, "    Admin Theme %".($spaces - strlen('Admin Theme'))."s %s\n",':',$SC->getAdminThemeName());

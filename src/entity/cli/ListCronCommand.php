@@ -52,9 +52,15 @@ class ListCronCommand extends CLICommand {
 
         while ($job = $jobs->dequeue()) {
             if ($i < 10) {
-                fprintf(STDOUT, "--------- Job #0$i ---------\n");
+                fprintf(STDOUT, $this->formatOutput("--------- Job #0$i ---------\n", [
+                    'color' => 'light-blue',
+                    'bold' => true
+                ]));
             } else {
-                fprintf(STDOUT, "--------- Job #$i ---------\n");
+                fprintf(STDOUT, $this->formatOutput("--------- Job #$i ---------\n", [
+                    'color' => 'light-blue',
+                    'bold' => true
+                ]));
             }
             fprintf(STDOUT, "Job Name %".(18 - strlen('Job Name'))."s %s\n",":",$job->getJobName());
             fprintf(STDOUT, "Cron Expression %".(18 - strlen('Cron Expression'))."s %s\n",":",$job->getExpression());

@@ -104,21 +104,23 @@ class CronCommand extends CLICommand {
                 $result = Cron::run($pass, null, false, $this);
 
                 if ($result == 'INV_PASS') {
-                    fprintf(STDERR,"Error: Provided password is incorrect.\n");
+                    $this->error("Provided password is incorrect.\n");
                 } else {
                     $this->_printExcResult($result);
                     $this->_showLog();
                     $retVal = 0;
                 }
             } else {
-                fprintf(STDERR,"Error: The argument 'p' is missing. It must be provided if cron password is set.\n");
+                $this->error("The argument 'p' is missing. It must be provided if cron password is set.\n");
             }
         } else if ($this->isArgProvided('force')) {
             $retVal = $this->_force();
         } else if ($this->isArgProvided('show-job-args')) {
             $this->_showJobArgs();
         } else {
-            fprintf(STDOUT,"Info: At least one of the options 'check', 'force' or 'show-job-args' must be provided.\n");
+            fprintf(STDOUT, $this->formatOutput("Info:", [
+                'color' => 'blue'
+            ])." At least one of the options 'check', 'force' or 'show-job-args' must be provided.\n");
         }
 
         return $retVal;
@@ -129,16 +131,16 @@ class CronCommand extends CLICommand {
         $retVal = -1;
 
         if ($jobName === null) {
-            fprintf(STDERR,"Error: Job name is missing.\n");
+            $this->error("Job name is missing.\n");
         } else if ($cPass === null && Cron::password() != 'NO_PASSWORD') {
-            fprintf(STDERR,"Error: The argument 'p' is missing. It must be provided if cron password is set.\n");
+            $this->error("The argument 'p' is missing. It must be provided if cron password is set.\n");
         } else {
             $result = Cron::run($cPass,$jobName.'',true, $this);
 
             if ($result == 'INV_PASS') {
-                fprintf(STDERR,"Error: Provided password is incorrect.\n");
+                $this->error(STDERR,"Provided password is incorrect.\n");
             } else if ($result == 'JOB_NOT_FOUND') {
-                fprintf(STDERR,"Error: No job was found which has the name '".$jobName."'\n");
+                $this->error(STDERR,"No job was found which has the name '".$jobName."'\n");
             } else {
                 $this->_printExcResult($result);
                 $this->_showLog();
@@ -191,10 +193,10 @@ class CronCommand extends CLICommand {
                         fprintf(STDOUT,"<NO ARGS>\n");
                     }
                 } else {
-                    fprintf(STDERR,"Error: No job which has the given name was found.\n");
+                    $this->error("No job which has the given name was found.\n");
                 }
             } else {
-                fprintf(STDERR,"Error: The argument 'job-name' is missing.\n");
+                $this->error("The argument 'job-name' is missing.\n");
             }
         }
     }
@@ -206,7 +208,9 @@ class CronCommand extends CLICommand {
                 fprintf(STDOUT, $message."\n");
             }
         } else {
-            fprintf(STDOUT, "TIP: Supply the argument 'show-log' to show execution log.\n");
+            fprintf(STDOUT, $this->formatOutput("TIP:", [
+                'color' => 'yellow'
+            ])." Supply the argument 'show-log' to show execution log.\n");
         }
     }
     private function _checkPass() {
@@ -216,13 +220,13 @@ class CronCommand extends CLICommand {
         }
         $givenPass = $this->getArgValue('p');
         if ($givenPass === null) {
-            fprintf(STDERR,"Error: Password is missing. It must be provided as argument 'p=PASS'.\n");
+            $this->error("Password is missing. It must be provided as argument 'p=PASS'.\n");
             return false;
         }
         $hash = hash('sha256', $givenPass);
         $same = $hash == $cronPass;
         if (!$same) {
-            fprintf(STDERR,"Error: Provided password is incorrect.\n");
+            $this->error("Provided password is incorrect.\n");
         }
         return $same;
     }

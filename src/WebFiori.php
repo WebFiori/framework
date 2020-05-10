@@ -456,6 +456,7 @@ class WebFiori {
                 fprintf(STDERR, "Error Description%5s %s\n",":",Util::ERR_TYPES[$errno]['description']);
                 fprintf(STDERR, "Error File       %5s %s\n",":",$errfile);
                 fprintf(STDERR, "Error Line:      %5s %s\n",":",$errline);
+                exit(-1);
             } else if (defined('API_CALL')) {
                 header("HTTP/1.1 500 Server Error");
                 $j = new JsonX([

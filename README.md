@@ -17,7 +17,7 @@
   </a>
   <img src="https://img.shields.io/packagist/dt/webfiori/framework?color=light-green">
   <a href="https://paypal.me/IbrahimBinAlshikh">
-    <img src="https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fprogrammingacademia.com%2Fwebfiori%2Fapis%2Fshields-get-dontate-badget">
+    <img src="https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fwebfiori.com%2Fapis%2Fshields-get-dontate-badget">
   </a>
 </p>
 What is WebFiori Framework?
@@ -51,7 +51,7 @@ One of the things that any developer cares about any software project is the pro
 * Sending HTML email messages with attachments without having to write a lot of code.
 
 ## Getting Started 
-To learn the basics of how to use the framework, please head on to https://programmingacademia.com/webfiori/learn. Also, you can head on to the following playlist in YouTube which contains a good set of videos which can help: https://www.youtube.com/playlist?list=PLeU-QhqUhxjkACpXiPTRM9fH_zw1KF1UD.
+To learn the basics of how to use the framework, please head on to https://webfiori.com/learn. Also, you can head on to the following playlist in YouTube which contains a good set of videos which can help: https://www.youtube.com/playlist?list=PLeU-QhqUhxjkACpXiPTRM9fH_zw1KF1UD.
 
 ## Supported Environments 
 | PHP | AMD64 (Targeted)     | ppc64le              | s390x                | arm64                |

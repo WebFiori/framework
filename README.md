@@ -27,17 +27,18 @@ WebFiori Framework is a web framework which is built using PHP language. The fra
 ## Key Features
 * Theming and the ability to create multiple UIs for the same web page using any CSS or JavaScript framework.
 * Support for routing that makes the ability of creating search-engine-friendly links an easy task.
-* Creation of web APIs that supports JSON, data filtering and validation.
+* Creation of web services (or APIs) that supports JSON, data filtering and validation.
 * Basic support for MySQL schema and query building.
 * Lightweight. The total size of framework core files is less than 3 megabytes.
 * Access management by assigning system user a set of privileges.
 * The ability to create and manage multiple sessions at once.
-* Support for creating and sending nice-looking emails in a simple way by using SMTP protocol.
+* Support for creating and sending nice-looking HTML emails in a simple way by using SMTP protocol.
 * Autoloading of user defined classes.
-* The ability to create automatic tasks and let them run in specific time using CRON.
+* The ability to create background tasks and let them run in specific time using CRON.
 * Well-defined file upload and file handling sub-system.
 * Building and manipulating the DOM of a web page using PHP language.
 * Basic support for running the framework throgh CLI.
+* Ability to implement custom CLI commands.
 
 ## Problems Solved
 One of the things that any developer cares about any software project is the problem or problems it solves. As for WebFiori framework, It can help in solving the following problems:
@@ -77,7 +78,7 @@ To learn the basics of how to use the framework, please head on to https://progr
 [14]: https://travis-matrix-badges.herokuapp.com/repos/usernane/webfiori/branches/master/14
 
 ## API Docs
-To read API docs of the framework, please head on to https://programmingacademia.com/webfiori/docs/webfiori.
+To read API docs of the framework, please head on to https://webfiori.com/docs/webfiori.
 
 ## Setup
 ### Local Development Environment
@@ -99,6 +100,11 @@ Once added, run composer and it should install everything.
 
 ### Hosting on the Web
 If you plan to use the framework for all of your domain, then simply upload all framework files to the root folder of your website (usually has the name "public_html"). If you plan to use it in specific part of your website, then upload framework files to the folder that the part of your website will point to.
+
+## Notes
+* This project is a hoppy project. 
+* The project is reletivly new and for sure has issues.
+* If you think that there is a better way of doing things or wants new feature, feel free to drop an issue.
 
 ## License
 The project is licensed under MIT license.

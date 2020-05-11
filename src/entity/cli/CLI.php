@@ -24,6 +24,7 @@
  */
 namespace webfiori\entity\cli;
 
+use webfiori\entity\Util;
 use webfiori\ini\InitCliCommands;
 use webfiori\entity\cli\CLICommand;
 use webfiori\entity\cli\CronCommand;

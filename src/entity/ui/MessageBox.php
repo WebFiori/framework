@@ -24,8 +24,8 @@
  */
 namespace webfiori\entity\ui;
 
-use webfiori\WebFiori;
 use phpStructs\html\HTMLNode;
+use webfiori\WebFiori;
 /**
  * A generic class for showing a floating box in web pages that can have any content 
  * in its body.

@@ -32,8 +32,7 @@ namespace webfiori\entity\cron;
  * @author Ibrahim
  * @version 1.0.9
  */
-class CronJob extends AbstractJob{
-
+class CronJob extends AbstractJob {
     /**
      * An array which contains the events that will be executed if it is the time 
      * to execute the job.
@@ -65,7 +64,28 @@ class CronJob extends AbstractJob{
                 'params' => []
             ]
         ];
-        
+    }
+    /**
+     * A method that does nothing.
+     */
+    public function afterExec() {
+    }
+    /**
+     * Execute the job.
+     * @return null|boolean The return value of the method will depend on the 
+     * closure which is set to execute. If no closure is set, the method will 
+     * return null. If it is set, the return value of the closure will be returned 
+     * by this method.
+     * @since 1.0
+     */
+    public function execute() {
+        $result = null;
+
+        if ($this->getOnExecution() !== null) {
+            $result = call_user_func($this->getOnExecution(), $this->events['on']['params']);
+        }
+
+        return $result ;
     }
 
     /**
@@ -77,6 +97,19 @@ class CronJob extends AbstractJob{
      */
     public function getOnExecution() {
         return $this->events['on']['func'];
+    }
+    /**
+     * Run the closure which is set to execute if the job is failed.
+     */
+    public function onFail() {
+        if (is_callable($this->events['on-failure']['func'])) {
+            call_user_func($this->events['on-failure']['func'], $this->events['on-failure']['params']);
+        }
+    }
+    /**
+     * A method that does nothing.
+     */
+    public function onSuccess() {
     }
 
     /**
@@ -114,40 +147,4 @@ class CronJob extends AbstractJob{
             }
         }
     }
-    /**
-     * A method that does nothing.
-     */
-    public function afterExec() {
-        
-    }
-    /**
-     * Execute the job.
-     * @return null|boolean The return value of the method will depend on the 
-     * closure which is set to execute. If no closure is set, the method will 
-     * return null. If it is set, the return value of the closure will be returned 
-     * by this method.
-     * @since 1.0
-     */
-    public function execute() {
-        $result = null;
-        if($this->getOnExecution() !== null){
-            $result = call_user_func($this->getOnExecution(), $this->events['on']['params']);
-        }
-        return $result ;
-    }
-    /**
-     * Run the closure which is set to execute if the job is failed.
-     */
-    public function onFail() {
-        if(is_callable($this->events['on-failure']['func'])){
-            call_user_func($this->events['on-failure']['func'], $this->events['on-failure']['params']);
-        }
-    }
-    /**
-     * A method that does nothing.
-     */
-    public function onSuccess() {
-        
-    }
-
 }

@@ -196,7 +196,7 @@ class WebFiori {
         }
         //Initialize CLI
         CLI::init();
-        
+
         //Initialize routes.
         APIRoutes::create();
         ViewRoutes::create();
@@ -206,7 +206,7 @@ class WebFiori {
         //initialize cron and privileges...
         InitCron::init();
         InitPrivileges::init();
-        
+
         CLI::registerCommands();
         //class is now initialized
         self::$classStatus = 'INITIALIZED';
@@ -449,6 +449,7 @@ class WebFiori {
         set_error_handler(function($errno, $errstr, $errfile, $errline)
         {
             $isCli = class_exists('webfiori\entity\cli\CLI') ? CLI::isCLI() : php_sapi_name() == 'cli';
+
             if ($isCli) {
                 fprintf(STDERR, "\n<%s>\n",Util::ERR_TYPES[$errno]['type']);
                 fprintf(STDERR, "Error Message    %5s %s\n",":",$errstr);

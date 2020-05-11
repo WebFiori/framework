@@ -49,13 +49,13 @@ class EmailMessage {
      * @since 1.0
      */
     private static $em;
+    private static $log;
     /**
      *
      * @var SocketMailer
      * @since 1.0 
      */
     private $socketMailer;
-    private static $log;
     /**
      * Creates new instance of the class.
      * @param type $sendAccountName

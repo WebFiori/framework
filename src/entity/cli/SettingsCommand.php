@@ -80,6 +80,7 @@ class SettingsCommand extends CLICommand {
         foreach ($SC->getDescriptions() as $langCode => $desc) {
             fprintf(STDOUT,"        $langCode => $desc\n");
         }
+
         return 0;
     }
 }

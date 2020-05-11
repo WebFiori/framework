@@ -23,13 +23,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 namespace webfiori\entity\ui;
 
-use webfiori\conf\Config;
-use webfiori\entity\Page;
 use phpStructs\html\HTMLNode;
 use phpStructs\html\UnorderedList;
+use webfiori\conf\Config;
+use webfiori\entity\Page;
 
 /**
  * A view which is show to tell the user that the framework isn't configured 

@@ -45,129 +45,10 @@ abstract class CLICommand {
         'yellow' => 33,
         'light-yellow' => 93,
         'white' => 97,
-        'gray'=> 37,
+        'gray' => 37,
         'blue' => 34,
         'light-blue' => 94
     ];
-    /**
-     * Formats an output string.
-     * This method is used to add colors to the output string or 
-     * make it bold or underlined. The returned value of this 
-     * method can be sent to STDOUT using the method 'fprintf()'. 
-     * Note that the support for colors 
-     * and formatting will depend on the terminal configuration.
-     * @param string $string The string that will be formatted.
-     * @param array $formatOptions An associative array of formatting 
-     * options. Supported options are:
-     * <ul>
-     * <li><b>color</b>: The foreground color of the output text. Supported colors 
-     * are: 
-     * <ul>
-     * <li>white</li>
-     * <li>black</li>
-     * <li>red</li>
-     * <li>light-red</li>
-     * <li>green</li>
-     * <li>light-green</li>
-     * <li>yellow</li>
-     * <li>light-yellow</li>
-     * <li>gray</li>
-     * <li>blue</li>
-     * <li>light-blue</li>
-     * </ul>
-     * </li>
-     * <li><b>bg-color</b>: The background color of the output text. Supported colors 
-     * are the same as the supported colors by the 'color' option.</li>
-     * <li><b>bold</b>: A boolean. If set to true, the text will 
-     * be bold.</li>
-     * <li><b>underline</b>: A boolean. If set to true, the text will 
-     * be underlined.</li>
-     * <li><b>reverse</b>: A boolean. If set to true, the foreground 
-     * color and background color will be reversed (invert the foreground and background colors).</li>
-     * <li><b>blink</b>: A boolean. If set to true, the text will 
-     * blink.</li>
-     * </ul>
-     * @return string The string after applying the formatting to it.
-     * @since 1.0
-     */
-    public function formatOutput($string, $formatOptions) {
-        $validatedOptions = $this->_validateOutputOptions($formatOptions);
-        return $this->_getFormattedOutput($string, $validatedOptions);
-    }
-    private function _getFormattedOutput($outputString, $formatOptions) {
-        $outputString .= "\e";
-        $outputManner = $this->getCharsManner($formatOptions);
-        if (strlen($outputManner) != 0) {
-            return "\e[".$outputManner."m$outputString \e[0m";
-        }
-        return $outputString;
-    }
-    /**
-     * Display a message that represents an error.
-     * The message will be prefixed with the string 'Error:' in 
-     * red. The output will be sent to STDERR.
-     * @param string $message The message that will be shown.
-     * @since 1.0
-     */
-    public function error($message) {
-        fprintf(STDERR, $this->formatOutput('Error:', [
-            'color' => 'light-red'
-        ]).' '.$message);
-    }
-    private function getCharsManner($options) {
-        $mannerStr = '';
-        if ($options['bold']) {
-            $mannerStr = $this->addManner($mannerStr, 1);
-        } 
-        if ($options['underline']) {
-            $mannerStr = $this->addManner($mannerStr, 4);
-        }
-        if ($options['blink']) {
-            $mannerStr = $this->addManner($mannerStr, 5);
-        }
-        if ($options['reverse']) {
-            $mannerStr = $this->addManner($mannerStr, 7);
-        }
-        $mannerStr2 = $this->addManner($mannerStr, self::COLORS[$options['color']]);
-        return $this->addManner($mannerStr2, self::COLORS[$options['bg-color']] + 10);
-    }
-    private function addManner($str, $code) {
-        if(strlen($str) > 0){
-            return $str.';'.$code;
-        }
-        return $str.$code;
-    }
-    private function _validateOutputOptions($formatArr) {
-        if (gettype($formatArr) == 'array' && count($formatArr) !== 0) {
-            if (!isset($formatArr['bold'])) {
-                $formatArr['bold'] = false;
-            }
-            if (!isset($formatArr['underline'])) {
-                $formatArr['underline'] = false;
-            }
-            if (!isset($formatArr['blink'])) {
-                $formatArr['blink'] = false;
-            }
-            if (!isset($formatArr['reverse'])) {
-                $formatArr['reverse'] = false;
-            }
-            if (!isset($formatArr['color'])) {
-                $formatArr['color'] = 'white';
-            }
-            if (!isset($formatArr['bg-color'])) {
-                $formatArr['bg-color'] = 'black';
-            }
-            return $formatArr;
-        }
-        return [
-            'bold' => false,
-            'underline' => false,
-            'reverse' => false,
-            'blink' => false,
-            'color' => 'white', 
-            'bg-color' => 'black'
-        ];
-    }
     /**
      * An associative array that contains extra options that can be added to 
      * the command.
@@ -281,6 +162,18 @@ abstract class CLICommand {
         }
     }
     /**
+     * Display a message that represents an error.
+     * The message will be prefixed with the string 'Error:' in 
+     * red. The output will be sent to STDERR.
+     * @param string $message The message that will be shown.
+     * @since 1.0
+     */
+    public function error($message) {
+        fprintf(STDERR, $this->formatOutput('Error:', [
+            'color' => 'light-red'
+        ]).' '.$message);
+    }
+    /**
      * Execute the command.
      * This method should not be called manually by the developer.
      * @return int If the command is executed, the method will return 0. Other 
@@ -313,6 +206,52 @@ abstract class CLICommand {
      * @since 1.0
      */
     public abstract function exec();
+    /**
+     * Formats an output string.
+     * This method is used to add colors to the output string or 
+     * make it bold or underlined. The returned value of this 
+     * method can be sent to STDOUT using the method 'fprintf()'. 
+     * Note that the support for colors 
+     * and formatting will depend on the terminal configuration.
+     * @param string $string The string that will be formatted.
+     * @param array $formatOptions An associative array of formatting 
+     * options. Supported options are:
+     * <ul>
+     * <li><b>color</b>: The foreground color of the output text. Supported colors 
+     * are: 
+     * <ul>
+     * <li>white</li>
+     * <li>black</li>
+     * <li>red</li>
+     * <li>light-red</li>
+     * <li>green</li>
+     * <li>light-green</li>
+     * <li>yellow</li>
+     * <li>light-yellow</li>
+     * <li>gray</li>
+     * <li>blue</li>
+     * <li>light-blue</li>
+     * </ul>
+     * </li>
+     * <li><b>bg-color</b>: The background color of the output text. Supported colors 
+     * are the same as the supported colors by the 'color' option.</li>
+     * <li><b>bold</b>: A boolean. If set to true, the text will 
+     * be bold.</li>
+     * <li><b>underline</b>: A boolean. If set to true, the text will 
+     * be underlined.</li>
+     * <li><b>reverse</b>: A boolean. If set to true, the foreground 
+     * color and background color will be reversed (invert the foreground and background colors).</li>
+     * <li><b>blink</b>: A boolean. If set to true, the text will 
+     * blink.</li>
+     * </ul>
+     * @return string The string after applying the formatting to it.
+     * @since 1.0
+     */
+    public function formatOutput($string, $formatOptions) {
+        $validatedOptions = $this->_validateOutputOptions($formatOptions);
+
+        return $this->_getFormattedOutput($string, $validatedOptions);
+    }
     /**
      * Returns an associative array that contains command args.
      * @return array An associative array. The indices of the array are 
@@ -509,11 +448,88 @@ abstract class CLICommand {
 
         return true;
     }
+    private function _getFormattedOutput($outputString, $formatOptions) {
+        $outputString .= "\e";
+        $outputManner = $this->getCharsManner($formatOptions);
+
+        if (strlen($outputManner) != 0) {
+            return "\e[".$outputManner."m$outputString \e[0m";
+        }
+
+        return $outputString;
+    }
     private function _parseArgs() {
         $options = array_keys($this->commandArgs);
 
         foreach ($options as $optName) {
             $this->commandArgs[$optName]['val'] = $this->getArgValue($optName);
         }
+    }
+    private function _validateOutputOptions($formatArr) {
+        if (gettype($formatArr) == 'array' && count($formatArr) !== 0) {
+            if (!isset($formatArr['bold'])) {
+                $formatArr['bold'] = false;
+            }
+
+            if (!isset($formatArr['underline'])) {
+                $formatArr['underline'] = false;
+            }
+
+            if (!isset($formatArr['blink'])) {
+                $formatArr['blink'] = false;
+            }
+
+            if (!isset($formatArr['reverse'])) {
+                $formatArr['reverse'] = false;
+            }
+
+            if (!isset($formatArr['color'])) {
+                $formatArr['color'] = 'white';
+            }
+
+            if (!isset($formatArr['bg-color'])) {
+                $formatArr['bg-color'] = 'black';
+            }
+
+            return $formatArr;
+        }
+
+        return [
+            'bold' => false,
+            'underline' => false,
+            'reverse' => false,
+            'blink' => false,
+            'color' => 'white', 
+            'bg-color' => 'black'
+        ];
+    }
+    private function addManner($str, $code) {
+        if (strlen($str) > 0) {
+            return $str.';'.$code;
+        }
+
+        return $str.$code;
+    }
+    private function getCharsManner($options) {
+        $mannerStr = '';
+
+        if ($options['bold']) {
+            $mannerStr = $this->addManner($mannerStr, 1);
+        }
+ 
+        if ($options['underline']) {
+            $mannerStr = $this->addManner($mannerStr, 4);
+        }
+
+        if ($options['blink']) {
+            $mannerStr = $this->addManner($mannerStr, 5);
+        }
+
+        if ($options['reverse']) {
+            $mannerStr = $this->addManner($mannerStr, 7);
+        }
+        $mannerStr2 = $this->addManner($mannerStr, self::COLORS[$options['color']]);
+
+        return $this->addManner($mannerStr2, self::COLORS[$options['bg-color']] + 10);
     }
 }

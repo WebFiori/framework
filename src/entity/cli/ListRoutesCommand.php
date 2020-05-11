@@ -68,6 +68,7 @@ class ListRoutesCommand extends CLICommand {
                 fprintf(STDOUT, "$requestedUrl %".$location."s $routeTo\n"," => ");
             }
         }
+
         return 0;
     }
 }

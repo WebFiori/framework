@@ -66,7 +66,7 @@ class ListCronCommand extends CLICommand {
             fprintf(STDOUT, "Cron Expression %".(18 - strlen('Cron Expression'))."s %s\n",":",$job->getExpression());
             $i++;
         }
+
         return 0;
     }
-    
 }

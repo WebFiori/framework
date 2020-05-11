@@ -26,14 +26,6 @@ namespace webfiori\entity\cli;
 
 use webfiori\entity\Util;
 use webfiori\ini\InitCliCommands;
-use webfiori\entity\cli\CLICommand;
-use webfiori\entity\cli\CronCommand;
-use webfiori\entity\cli\HelpCommand;
-use webfiori\entity\cli\ListCronCommand;
-use webfiori\entity\cli\ListRoutesCommand;
-use webfiori\entity\cli\ListThemesCommand;
-use webfiori\entity\cli\SettingsCommand;
-use webfiori\entity\cli\TestRouteCommand;
 
 /**
  * A class which adds basic support for running the framework through 
@@ -118,27 +110,6 @@ class CLI {
         self::get();
     }
     /**
-     * Register CLI commands.
-     * This method will register the commands which are bundled with the 
-     * framework first. Once it is finished, it will register any commands which 
-     * are created by the developer using the method InitCliCommands::init(). This 
-     * method should be only used during initialization stage. Calling it again 
-     * will have no effect.
-     * @since 1.0
-     */
-    public static function registerCommands() {
-        //Register default framework cli commands.
-        self::register(new HelpCommand());
-        self::register(new SettingsCommand());
-        self::register(new ListThemesCommand());
-        self::register(new ListCronCommand());
-        self::register(new ListRoutesCommand());
-        self::register(new CronCommand());
-        self::register(new TestRouteCommand());
-        //Call this method to register any user-defined commands.
-        InitCliCommands::init();
-    }
-    /**
      * Checks if the framework is running through command line interface (CLI) or 
      * through a web server.
      * @return boolean If the framework is running through a command line, 
@@ -160,6 +131,27 @@ class CLI {
         if ($cliCommand instanceof CLICommand) {
             self::get()->_regCommand($cliCommand);
         }
+    }
+    /**
+     * Register CLI commands.
+     * This method will register the commands which are bundled with the 
+     * framework first. Once it is finished, it will register any commands which 
+     * are created by the developer using the method InitCliCommands::init(). This 
+     * method should be only used during initialization stage. Calling it again 
+     * will have no effect.
+     * @since 1.0
+     */
+    public static function registerCommands() {
+        //Register default framework cli commands.
+        self::register(new HelpCommand());
+        self::register(new SettingsCommand());
+        self::register(new ListThemesCommand());
+        self::register(new ListCronCommand());
+        self::register(new ListRoutesCommand());
+        self::register(new CronCommand());
+        self::register(new TestRouteCommand());
+        //Call this method to register any user-defined commands.
+        InitCliCommands::init();
     }
     /**
      * Run the provided CLI command.

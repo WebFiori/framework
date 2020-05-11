@@ -623,7 +623,6 @@ class Cron {
      */
     private static function _runJob(&$retVal, $job, $xForce, $command = null) {
         if ($job->isTime() || $xForce) {
-
             if ($command !== null) {
                 foreach ($job->getExecArgsNames() as $attr) {
                     $command->addArg($attr);

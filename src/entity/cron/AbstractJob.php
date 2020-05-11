@@ -26,8 +26,8 @@ namespace webfiori\entity\cron;
 
 use Error;
 use Exception;
-use webfiori\entity\exceptions\InvalidCRONExprException;
 use phpStructs\Queue;
+use webfiori\entity\exceptions\InvalidCRONExprException;
 /**
  * An abstract class that contains basic functionality for implementing cron 
  * jobs.
@@ -191,12 +191,21 @@ abstract class AbstractJob {
      * @since 1.0
      */
     public function addExecutionArgs($argsArr) {
-        if(gettype($argsArr) == 'array'){
-            foreach ($argsArr as $argName){
+        if (gettype($argsArr) == 'array') {
+            foreach ($argsArr as $argName) {
                 $this->addExecutionArg($argName);
             }
         }
     }
+    /**
+     * Run some routines after the job is executed.
+     * The developer can implement this method to perform some actions after the 
+     * job is executed. Note that the method will get executed if the job is failed 
+     * or successfully completed. It is optional to implement that method. The developer can 
+     * leave the body of the method empty.
+     * @since 1.0 
+     */
+    public abstract function afterExec();
     /**
      * Schedules a job using specific cron expression.
      * For more information on cron expressions, go to 
@@ -320,6 +329,7 @@ abstract class AbstractJob {
         $xForce = $force === true;
         $retVal = false;
         $this->setIsForced($xForce);
+
         if ($xForce || $this->isTime()) {
             $isSuccessRun = $this->_callMethod('execute');
             $this->isSuccess = $isSuccessRun === true || $isSuccessRun === null;
@@ -336,24 +346,17 @@ abstract class AbstractJob {
         return $retVal;
     }
     /**
-     * Calls one of the abstract methods of the class.
-     * This method is only used by the method AbstractJob::exec().
-     * @param string $fName The name of the method.
-     * @return null|boolean
+     * Execute the job.
+     * The code that will be in the body of that method is the code that will be 
+     * get executed if it is time to run the job or the job is forced to 
+     * executed. The developer must implement this method in a way it returns null or true 
+     * if the job is executed successfully. If the implementation of the method 
+     * throws an exception, the job will be considered as failed.
+     * @return boolean|null If the job successfully completed, the method should 
+     * return null or true. If the job failed, the method should return false.
+     * @since 1.0
      */
-    private function _callMethod($fName) {
-        Cron::log('Calling the method '.__CLASS__."::$fName()");
-        try {
-            return $this->$fName();
-        } catch (Exception $ex) {
-            $this->_logExeException($ex);
-            return false;
-        } catch (Error $ex) {
-            $this->_logExeException($ex);
-            return false;
-        }
-        return null;
-    }
+    public abstract function execute();
     /**
      * Returns the value of a custom execution argument.'
      * The value of the argument can be supplied through the table that will 
@@ -670,6 +673,17 @@ abstract class AbstractJob {
         return $this->isMinute() && $this->isHour() && $this->isDayOfMonth() && $this->isMonth() && $this->isDayOfWeek();
     }
     /**
+     * Run some routines if the job is executed and failed to completed successfully.
+     * The status of failure or success depends on the implementation of the method 
+     * AbstractJob::execute().
+     * The developer can implement this method to take actions after the 
+     * job is executed and failed to completed. 
+     * It is optional to implement that method. The developer can 
+     * leave the body of the method empty.
+     * @since 1.0 
+     */
+    public abstract function onFail();
+    /**
      * Schedules a job to run at specific day and time in a specific month.
      * @param int|string $monthNameOrNum Month number from 1 to 12 inclusive 
      * or 3 letters month name. Default is 'jan'.
@@ -729,14 +743,16 @@ abstract class AbstractJob {
         return false;
     }
     /**
-     * Sets the value of the property which is used to check if the job is 
-     * forced to execute or not.
-     * @param boolean $bool True or false.
-     * @since 1.0
+     * Run some routines if the job is executed and completed successfully.
+     * The status of failure or success depends on the implementation of the method 
+     * AbstractJob::execute().
+     * The developer can implement this method to perform actions after the 
+     * job is executed and failed to completed. 
+     * It is optional to implement that method. The developer can 
+     * leave the body of the method empty.
+     * @since 1.0 
      */
-    private function setIsForced($bool) {
-        $this->isForced = $bool === true;
-    }
+    public abstract function onSuccess();
     /**
      * Sets an optional name for the job.
      * The name is used to make different jobs unique. Each job must 
@@ -748,19 +764,23 @@ abstract class AbstractJob {
     public function setJobName($name) {
         $trimmed = trim($name);
         $this->getJobName();
+
         if (strlen($trimmed) > 0) {
             $tempJobsQueue = new Queue();
             $nameTaken = false;
-            while ($job = Cron::jobsQueue()->dequeue()){
-                if($job->getJobName() == $trimmed){
+
+            while ($job = Cron::jobsQueue()->dequeue()) {
+                if ($job->getJobName() == $trimmed) {
                     $nameTaken = true;
                 }
                 $tempJobsQueue->enqueue($job);
             }
-            while ($job = $tempJobsQueue->dequeue()){
+
+            while ($job = $tempJobsQueue->dequeue()) {
                 Cron::scheduleJob($job);
             }
-            if(!$nameTaken){
+
+            if (!$nameTaken) {
                 $this->jobName = $trimmed;
             } else {
                 $randF = is_callable('') ? 'random_int' : 'rand';
@@ -801,6 +821,28 @@ abstract class AbstractJob {
         }
 
         return false;
+    }
+    /**
+     * Calls one of the abstract methods of the class.
+     * This method is only used by the method AbstractJob::exec().
+     * @param string $fName The name of the method.
+     * @return null|boolean
+     */
+    private function _callMethod($fName) {
+        Cron::log('Calling the method '.__CLASS__."::$fName()");
+        try {
+            return $this->$fName();
+        } catch (Exception $ex) {
+            $this->_logExeException($ex);
+
+            return false;
+        } catch (Error $ex) {
+            $this->_logExeException($ex);
+
+            return false;
+        }
+
+        return null;
     }
     /**
      * 
@@ -1260,8 +1302,8 @@ abstract class AbstractJob {
      */
     private function _logExeException($ex) {
         Cron::log('WARNING: An exception was thrown while performing the operation. '
-                . 'The output of the job might be not as expected.');
-        Cron::log('Exception class: "'. get_class($ex).'"');
+                .'The output of the job might be not as expected.');
+        Cron::log('Exception class: "'.get_class($ex).'"');
         Cron::log('Exception message: "'.$ex->getMessage().'"');
         Cron::log('Thrown in file: "'.$ex->getFile().'"');
         Cron::log('Line: "'.$ex->getLine().'"');
@@ -1304,46 +1346,12 @@ abstract class AbstractJob {
         return false;
     }
     /**
-     * Execute the job.
-     * The code that will be in the body of that method is the code that will be 
-     * get executed if it is time to run the job or the job is forced to 
-     * executed. The developer must implement this method in a way it returns null or true 
-     * if the job is executed successfully. If the implementation of the method 
-     * throws an exception, the job will be considered as failed.
-     * @return boolean|null If the job successfully completed, the method should 
-     * return null or true. If the job failed, the method should return false.
+     * Sets the value of the property which is used to check if the job is 
+     * forced to execute or not.
+     * @param boolean $bool True or false.
      * @since 1.0
      */
-    public abstract function execute();
-    /**
-     * Run some routines after the job is executed.
-     * The developer can implement this method to perform some actions after the 
-     * job is executed. Note that the method will get executed if the job is failed 
-     * or successfully completed. It is optional to implement that method. The developer can 
-     * leave the body of the method empty.
-     * @since 1.0 
-     */
-    public abstract function afterExec();
-    /**
-     * Run some routines if the job is executed and failed to completed successfully.
-     * The status of failure or success depends on the implementation of the method 
-     * AbstractJob::execute().
-     * The developer can implement this method to take actions after the 
-     * job is executed and failed to completed. 
-     * It is optional to implement that method. The developer can 
-     * leave the body of the method empty.
-     * @since 1.0 
-     */
-    public abstract function onFail();
-    /**
-     * Run some routines if the job is executed and completed successfully.
-     * The status of failure or success depends on the implementation of the method 
-     * AbstractJob::execute().
-     * The developer can implement this method to perform actions after the 
-     * job is executed and failed to completed. 
-     * It is optional to implement that method. The developer can 
-     * leave the body of the method empty.
-     * @since 1.0 
-     */
-    public abstract function onSuccess();
+    private function setIsForced($bool) {
+        $this->isForced = $bool === true;
+    }
 }

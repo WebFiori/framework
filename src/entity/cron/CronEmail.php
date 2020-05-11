@@ -22,16 +22,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 namespace webfiori\entity\cron;
 
-use webfiori\WebFiori;
-use webfiori\entity\cron\Cron;
-use webfiori\entity\cron\AbstractJob;
-use webfiori\entity\mail\EmailMessage;
-use webfiori\entity\File;
 use phpStructs\html\HTMLNode;
 use phpStructs\html\TableRow;
+use webfiori\entity\File;
+use webfiori\entity\mail\EmailMessage;
+use webfiori\WebFiori;
 /**
  * A class which can be used to send an email regarding the status of 
  * background job execution.
@@ -58,14 +55,16 @@ class CronEmail {
      */
     public function __construct($sendAccName, $receivers = []) {
         $activeJob = Cron::activeJob();
+
         if ($activeJob !== null) {
-        EmailMessage::createInstance($sendAccName);
-        if (gettype($receivers) == 'array' && count($receivers) != 0){
+            EmailMessage::createInstance($sendAccName);
+
+            if (gettype($receivers) == 'array' && count($receivers) != 0) {
                 foreach ($receivers as $addr => $name) {
                     EmailMessage::addReceiver($name, $addr);
                 }
             }
-            
+
             EmailMessage::subject('Background Task Status: Task \''.$activeJob->getJobName().'\'');
             EmailMessage::importance(1);
             EmailMessage::document()->getBody()->setStyle([
@@ -78,23 +77,25 @@ class CronEmail {
             $paragraph->setStyle([
                 'text-align' => 'justify'
             ]);
+
             if ($activeJob->isSuccess()) {
                 $text = 'This automatic system email is sent to notify you that the background job '
-                        . '\''.$activeJob->getJobName().'\' was <b style="color:green">successfully completed '
-                        . 'without any issues</b>. For more details about execution process, '
-                        . 'please check the attached execution log file.</p>';
+                        .'\''.$activeJob->getJobName().'\' was <b style="color:green">successfully completed '
+                        .'without any issues</b>. For more details about execution process, '
+                        .'please check the attached execution log file.</p>';
             } else {
                 $text = 'This automatic email is sent to notify you that the background job '
-                        . '\''.$activeJob->getJobName().'\' <b style="color:red">did not successfully complet due some error(s)'
-                        . '</b>. To investigate the cause of failure, '
-                        . 'please check the attached execution log file. It may lead you to '
-                        . 'the cause of the issue.';
+                        .'\''.$activeJob->getJobName().'\' <b style="color:red">did not successfully complet due some error(s)'
+                        .'</b>. To investigate the cause of failure, '
+                        .'please check the attached execution log file. It may lead you to '
+                        .'the cause of the issue.';
             }
             $paragraph->addTextNode($text, false);
             EmailMessage::insertNode($paragraph);
             EmailMessage::write('<p>Technical Info:</p>');
             EmailMessage::insertNode($this->_createJobInfoTable($activeJob));
             $logTxt = '';
+
             foreach (Cron::getLogArray() as $logEntry) {
                 $logTxt .= $logEntry."\r\n";
             }
@@ -112,7 +113,7 @@ class CronEmail {
     private function _createJobInfoTable($job) {
         $jobTable = new HTMLNode('table');
         $jobTable->setStyle([
-            'border-collapse'=>'collapse'
+            'border-collapse' => 'collapse'
         ]);
         $jobTable->setAttribute('border', 1);
         $jobTable->addChild($this->_createTableRow('Job Name:', $job->getJobName()));
@@ -122,17 +123,20 @@ class CronEmail {
         $jobTable->addChild($this->_createTableRow('PHP Version:', PHP_VERSION));
         $jobTable->addChild($this->_createTableRow('Framework Version:', WebFiori::getConfig()->getVersion()));
         $jobTable->addChild($this->_createTableRow('Root Directory:', ROOT_DIR));
+
         if ($job->isSuccess()) {
             $jobTable->addChild($this->_createTableRow('Exit Status:', '<b style="color:green">Success</b>'));
         } else {
             $jobTable->addChild($this->_createTableRow('Exit Status:', '<b style="color:red">Failed</b>'));
         }
+
         return $jobTable;
     }
-    private function _createTableRow($label, $info){
+    private function _createTableRow($label, $info) {
         $row = new TableRow();
         $row->addCell('<b>'.$label.'</b>');
         $row->addCell($info);
+
         return $row;
     }
 }

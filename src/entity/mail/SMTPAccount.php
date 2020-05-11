@@ -83,37 +83,36 @@ class SMTPAccount {
      * @since 1.0.1
      */
     public function __construct($options = []) {
-        
         if (isset($options['port'])) {
             $this->setPort($options['port']);
         } else {
             $this->setPort(465);
         }
-        
+
         if (isset($options['user'])) {
             $this->setUsername($options['user']);
         } else {
             $this->setUsername('');
         }
-        
-        if (isset($options['pass'])){
+
+        if (isset($options['pass'])) {
             $this->setPassword($options['pass']);
         } else {
             $this->setPassword('');
         }
-        
+
         if (isset($options['server-address'])) {
             $this->setServerAddress($options['server-address']);
         } else {
             $this->setServerAddress('');
         }
-        
-        if(isset($options['sender-name'])) {
+
+        if (isset($options['sender-name'])) {
             $this->setName($options['sender-name']);
         } else {
             $this->setName('');
         }
-        
+
         if (isset($options['sender-address'])) {
             $this->setAddress($options['sender-address']);
         } else {

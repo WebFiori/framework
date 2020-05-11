@@ -90,6 +90,7 @@ class ListThemesCommand extends CLICommand {
             $this->_printThemeObj($themeObj);
             $index++;
         }
+
         return 0;
     }
 

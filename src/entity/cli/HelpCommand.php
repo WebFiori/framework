@@ -24,7 +24,6 @@
  */
 namespace webfiori\entity\cli;
 
-use webfiori\entity\cli\CLI;
 use webfiori\entity\Util;
 use webfiori\WebFiori;
 /**
@@ -78,6 +77,7 @@ class HelpCommand extends CLICommand {
                 $this->printCommandInfo($commandObj);
             }
         }
+
         return 0;
     }
 

@@ -125,6 +125,28 @@ class CronCommand extends CLICommand {
 
         return $retVal;
     }
+    private function _checkPass() {
+        $cronPass = Cron::password();
+
+        if ($cronPass == 'NO_PASSWORD') {
+            return true;
+        }
+        $givenPass = $this->getArgValue('p');
+
+        if ($givenPass === null) {
+            $this->error("Password is missing. It must be provided as argument 'p=PASS'.\n");
+
+            return false;
+        }
+        $hash = hash('sha256', $givenPass);
+        $same = $hash == $cronPass;
+
+        if (!$same) {
+            $this->error("Provided password is incorrect.\n");
+        }
+
+        return $same;
+    }
     private function _force() {
         $jobName = $this->getArgValue('job-name');
         $cPass = $this->getArgValue('p');
@@ -212,22 +234,5 @@ class CronCommand extends CLICommand {
                 'color' => 'yellow'
             ])." Supply the argument 'show-log' to show execution log.\n");
         }
-    }
-    private function _checkPass() {
-        $cronPass = Cron::password();
-        if($cronPass == 'NO_PASSWORD'){
-            return true;
-        }
-        $givenPass = $this->getArgValue('p');
-        if ($givenPass === null) {
-            $this->error("Password is missing. It must be provided as argument 'p=PASS'.\n");
-            return false;
-        }
-        $hash = hash('sha256', $givenPass);
-        $same = $hash == $cronPass;
-        if (!$same) {
-            $this->error("Provided password is incorrect.\n");
-        }
-        return $same;
     }
 }

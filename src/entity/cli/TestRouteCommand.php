@@ -59,6 +59,7 @@ class TestRouteCommand extends CLICommand {
         $url = $this->getArgValue('url');
         fwrite(STDOUT, "Trying to route to \"".$url."\"...\n");
         Router::route($url);
+
         return 0;
     }
 }

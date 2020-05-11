@@ -43,6 +43,5 @@ class InitCliCommands {
      * </code>
      */
     public static function init() {
-        
     }
 }

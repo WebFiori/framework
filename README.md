@@ -78,7 +78,7 @@ To learn the basics of how to use the framework, please head on to https://webfi
 [14]: https://travis-matrix-badges.herokuapp.com/repos/usernane/webfiori/branches/master/14
 
 ## API Docs
-To read API docs of the framework, please head on to https://webfiori.com/docs/webfiori.
+To read API docs of the framework, please head on to https://webfiori.com/docs.
 
 ## Setup
 ### Local Development Environment

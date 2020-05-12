@@ -250,7 +250,7 @@ abstract class CLICommand {
     public function formatOutput($string, $formatOptions) {
         $os = php_uname('r');
         $notSupported = [
-            '6.0','6.1','6.2','6.3'
+            '6.0','6.1','6.2','6.3','10.0'
         ];
         
         if (in_array($os, $notSupported)) {

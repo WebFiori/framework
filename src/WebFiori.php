@@ -62,7 +62,7 @@ define('LOAD_COMPOSER_PACKAGES', true);
  * The instance of this class is used to control basic settings of 
  * the framework. Also, it is the entry point of any request.
  * @author Ibrahim
- * @version 1.3.4
+ * @version 1.3.5
  */
 class WebFiori {
     /**
@@ -177,6 +177,8 @@ class WebFiori {
         self::$AU = AutoLoader::get();
         InitAutoLoad::init();
         $this->_setHandlers();
+        $this->_checkStandardLibs();
+        
         self::$SF = ConfigController::get();
         self::$WF = WebsiteController::get();
         self::$BMF = EmailController::get();
@@ -536,6 +538,26 @@ class WebFiori {
                 }
             }
         });
+    }
+    /**
+     * Checks if framework standard libraries are loaded or not.
+     * If a library is missing, the method will throw an exception that tell 
+     * which library is missing.
+     * @since 1.3.5
+     */
+    private function _checkStandardLibs(){
+        if(!class_exists('phpStructs\Node')){
+            throw new InitializationException("The standard library 'webfiori/php-structs' is missing.");
+        }
+        if(!class_exists('jsonx\JsonX')){
+            throw new InitializationException("The standard library 'webfiori/jsonx' is missing.");
+        }
+        if(!class_exists('phMysql\MySQLLink')){
+            throw new InitializationException("The standard library 'webfiori/ph-mysql' is missing.");
+        }
+        if(!class_exists('restEasy\WebServices')){
+            throw new InitializationException("The standard library 'webfiori/rest-easy' is missing.");
+        }
     }
     /**
      * Sets new error and exception handler.

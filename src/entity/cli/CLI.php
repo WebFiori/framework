@@ -72,8 +72,12 @@ class CLI {
             }
             set_error_handler(function($errno, $errstr, $errfile, $errline)
             {
-                fprintf(STDERR, "\n\e[91m<%s>\e[0m\n",Util::ERR_TYPES[$errno]['type']);
-                fprintf(STDERR, "\e[93mError Message    %5s\e[45m %s\n\e[0m",":",$errstr);
+                fprintf(STDERR, CLICommand::formatOutput("<".Util::ERR_TYPES[$errno]['type'].">\n", [
+                    'color' => 'red',
+                    'bold' => true,
+                    'blink' => true
+                ]));
+                fprintf(STDERR, "Error Message    %5s %s\n",":",$errstr);
                 fprintf(STDERR, "Error Number     %5s %s\n",":",$errno);
                 fprintf(STDERR, "Error Description%5s %s\n",":",Util::ERR_TYPES[$errno]['description']);
                 fprintf(STDERR, "Error File       %5s %s\n",":",$errfile);
@@ -82,8 +86,17 @@ class CLI {
             });
             set_exception_handler(function($ex)
             {
-                fprintf(STDERR, "\e[91mUncaught Exception.\n\e[0m");
-                fprintf(STDERR, "\e[93mException Message:\e[45m %s\n",$ex->getMessage()."\e[0m");
+                fprintf(STDERR, CLICommand::formatOutput("Uncaught Exception.", [
+                    'color' => 'red',
+                    'bold' => true,
+                    'blink' => true
+                ]));
+                fprintf(STDERR, CLICommand::formatOutput('Exception Message:', [
+                    'color' => 'yellow',
+                    'bold' => true,
+                ]));
+                fprintf(STDERR, $ex->getMessage()."\n");
+                fprintf(STDERR, "Exception Class: %s\n", get_class($ex));
                 fprintf(STDERR, "Exception Code: %s\n",$ex->getCode());
                 fprintf(STDERR, "File: %s\n",$ex->getFile());
                 fprintf(STDERR, "Line: %s\n",$ex->getLine());

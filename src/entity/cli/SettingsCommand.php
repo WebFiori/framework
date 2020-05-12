@@ -48,7 +48,7 @@ class SettingsCommand extends CLICommand {
     public function exec() {
         $spaces = 25;
         $C = WebFiori::getConfig();
-        fprintf(STDOUT, $this->formatOutput("Config.php Settings:\n", [
+        fprintf(STDOUT, self::formatOutput("Config.php Settings:\n", [
             'color' => 'yellow',
             'bold' => true
         ]));
@@ -58,7 +58,7 @@ class SettingsCommand extends CLICommand {
         fprintf(STDOUT, "    Config Version %".($spaces - strlen('Config Version'))."s %s\n",':',$C->getConfigVersion());
         $isConfigured = $C->isConfig() === true ? 'Yes' : 'No';
         fprintf(STDOUT, "    Is System Configured %".($spaces - strlen('Is System Configured'))."s %s\n",':',$isConfigured);
-        fprintf(STDOUT, $this->formatOutput("SiteConfig.php Settings:\n", [
+        fprintf(STDOUT, self::formatOutput("SiteConfig.php Settings:\n", [
             'color' => 'yellow',
             'bold' => true
         ]));

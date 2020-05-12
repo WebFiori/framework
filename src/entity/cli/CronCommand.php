@@ -118,7 +118,7 @@ class CronCommand extends CLICommand {
         } else if ($this->isArgProvided('show-job-args')) {
             $this->_showJobArgs();
         } else {
-            fprintf(STDOUT, $this->formatOutput("Info:", [
+            fprintf(STDOUT, self::formatOutput("Info:", [
                 'color' => 'blue'
             ])." At least one of the options 'check', 'force' or 'show-job-args' must be provided.\n");
         }
@@ -230,7 +230,7 @@ class CronCommand extends CLICommand {
                 fprintf(STDOUT, $message."\n");
             }
         } else {
-            fprintf(STDOUT, $this->formatOutput("TIP:", [
+            fprintf(STDOUT, self::formatOutput("TIP:", [
                 'color' => 'yellow'
             ])." Supply the argument 'show-log' to show execution log.\n");
         }

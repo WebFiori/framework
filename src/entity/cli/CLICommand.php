@@ -169,7 +169,7 @@ abstract class CLICommand {
      * @since 1.0
      */
     public function error($message) {
-        fprintf(STDERR, $this->formatOutput('Error:', [
+        fprintf(STDERR, self::formatOutput('Error:', [
             'color' => 'light-red'
         ]).' '.$message);
     }
@@ -247,7 +247,7 @@ abstract class CLICommand {
      * @return string The string after applying the formatting to it.
      * @since 1.0
      */
-    public function formatOutput($string, $formatOptions) {
+    public static function formatOutput($string, $formatOptions) {
         $os = php_uname('r');
         $notSupported = [
             '6.0','6.1','6.2','6.3'
@@ -257,9 +257,9 @@ abstract class CLICommand {
             
             return $string;
         }
-        $validatedOptions = $this->_validateOutputOptions($formatOptions);
+        $validatedOptions = self::_validateOutputOptions($formatOptions);
 
-        return $this->_getFormattedOutput($string, $validatedOptions);
+        return self::_getFormattedOutput($string, $validatedOptions);
     }
     /**
      * Returns an associative array that contains command args.
@@ -457,9 +457,9 @@ abstract class CLICommand {
 
         return true;
     }
-    private function _getFormattedOutput($outputString, $formatOptions) {
+    private static function _getFormattedOutput($outputString, $formatOptions) {
         $outputString .= "\e";
-        $outputManner = $this->getCharsManner($formatOptions);
+        $outputManner = self::getCharsManner($formatOptions);
 
         if (strlen($outputManner) != 0) {
             return "\e[".$outputManner."m$outputString \e[0m";
@@ -474,7 +474,7 @@ abstract class CLICommand {
             $this->commandArgs[$optName]['val'] = $this->getArgValue($optName);
         }
     }
-    private function _validateOutputOptions($formatArr) {
+    private static function _validateOutputOptions($formatArr) {
         if (gettype($formatArr) == 'array' && count($formatArr) !== 0) {
             if (!isset($formatArr['bold'])) {
                 $formatArr['bold'] = false;
@@ -512,33 +512,33 @@ abstract class CLICommand {
             'bg-color' => 'black'
         ];
     }
-    private function addManner($str, $code) {
+    private static function addManner($str, $code) {
         if (strlen($str) > 0) {
             return $str.';'.$code;
         }
 
         return $str.$code;
     }
-    private function getCharsManner($options) {
+    private static function getCharsManner($options) {
         $mannerStr = '';
 
         if ($options['bold']) {
-            $mannerStr = $this->addManner($mannerStr, 1);
+            $mannerStr = self::addManner($mannerStr, 1);
         }
  
         if ($options['underline']) {
-            $mannerStr = $this->addManner($mannerStr, 4);
+            $mannerStr = self::addManner($mannerStr, 4);
         }
 
         if ($options['blink']) {
-            $mannerStr = $this->addManner($mannerStr, 5);
+            $mannerStr = self::addManner($mannerStr, 5);
         }
 
         if ($options['reverse']) {
-            $mannerStr = $this->addManner($mannerStr, 7);
+            $mannerStr = self::addManner($mannerStr, 7);
         }
-        $mannerStr2 = $this->addManner($mannerStr, self::COLORS[$options['color']]);
+        $mannerStr2 = self::addManner($mannerStr, self::COLORS[$options['color']]);
 
-        return $this->addManner($mannerStr2, self::COLORS[$options['bg-color']] + 10);
+        return self::addManner($mannerStr2, self::COLORS[$options['bg-color']] + 10);
     }
 }

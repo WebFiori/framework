@@ -77,12 +77,12 @@ class ListThemesCommand extends CLICommand {
 
         foreach ($themesArr as $themeObj) {
             if ($index < 10) {
-                fprintf(STDOUT, $this->formatOutput("--------- Job #0$index ---------\n", [
+                fprintf(STDOUT, self::formatOutput("--------- Job #0$index ---------\n", [
                     'color' => 'light-blue',
                     'bold' => true
                 ]));
             } else {
-                fprintf(STDOUT, $this->formatOutput("--------- Theme #0$index ---------\n", [
+                fprintf(STDOUT, self::formatOutput("--------- Theme #0$index ---------\n", [
                     'color' => 'light-blue',
                     'bold' => true
                 ]));

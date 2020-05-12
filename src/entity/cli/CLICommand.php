@@ -248,9 +248,9 @@ abstract class CLICommand {
      * @since 1.0
      */
     public function formatOutput($string, $formatOptions) {
-        $os = php_uname('r');
+        $os = php_uname('s');
         $notSupported = [
-            '6.0','6.1','6.2','6.3','10.0'
+            'Windows NT'
         ];
         
         if (in_array($os, $notSupported)) {

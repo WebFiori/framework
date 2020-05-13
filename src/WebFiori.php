@@ -23,8 +23,6 @@
  * THE SOFTWARE.
  */
 namespace webfiori;
-
-use Exception;
 use jsonx\JsonX;
 use webfiori\conf\Config;
 use webfiori\conf\MailConfig;
@@ -58,6 +56,17 @@ define('MICRO_START', microtime(true));
  * @since 1.1.0
  */
 define('LOAD_COMPOSER_PACKAGES', true);
+/**
+ * This constant is used to tell the framework if more information should 
+ * be displayed if an exception is thrown or an error happens. The main aim 
+ * of this constant is to hide some sensitive information from users if the 
+ * system is in production environment. Note that the constant will have effect 
+ * only if the framework is accessed through HTTP protocol. If used in CLI 
+ * environment, everything will appear. Default value of the constant is 
+ * false.
+ * @since 1.1.0
+ */
+define('VERBOSE', false);
 /**
  * The instance of this class is used to control basic settings of 
  * the framework. Also, it is the entry point of any request.
@@ -466,10 +475,13 @@ class WebFiori {
                     'message' => $errstr,
                     'type' => Util::ERR_TYPES[$errno]['type'],
                     'description' => Util::ERR_TYPES[$errno]['description'],
-                    'error-number' => $errno,
-                    'file' => $errfile,
-                    'line' => $errline
+                    'error-number' => $errno
                 ], true);
+                
+                if (defined('VERBOSE') && VERBOSE) {
+                    $j->add('file',$errfile);
+                    $j->add('line',$errline);
+                }
                 header('content-type: application/json');
                 die($j);
             } else {
@@ -490,13 +502,7 @@ class WebFiori {
         {
             $isCli = class_exists('webfiori\entity\cli\CLI') ? CLI::isCLI() : php_sapi_name() == 'cli';
             if ($isCli) {
-                fprintf(STDERR, "\n<%s>\n","Uncaught Exception.");
-                fprintf(STDERR, "Exception Class %5s %s\n",":", get_class($ex));
-                fprintf(STDERR, "Exception Message %5s %s\n",":",$ex->getMessage());
-                fprintf(STDERR, "Exception Code    %5s %s\n",":",$ex->getMessage());
-                fprintf(STDERR, "File              %5s %s\n",":",$ex->getFile());
-                fprintf(STDERR, "Line              %5s %s\n",":",$ex->getLine());
-                fprintf(STDERR, "Stack Trace:\n%s",$ex->getTraceAsString());
+                CLI::displayException($ex);
             } else {
                 header("HTTP/1.1 500 Server Error");
                 $routeUri = Router::getUriObjByURL(Util::getRequestedURL());
@@ -513,23 +519,26 @@ class WebFiori {
                         'type' => 'error',
                         'exception-class' => get_class($ex),
                         'exception-message' => $ex->getMessage(),
-                        'exception-code' => $ex->getMessage(),
-                        'file' => $ex->getFile(),
-                        'line' => $ex->getLine()
+                        'exception-code' => $ex->getMessage()
                     ], true);
-                    $stackTrace = new JsonX([], true);
-                    $index = 0;
-                    $trace = $ex->getTrace();
+                    
+                    if (defined('VERBOSE') && VERBOSE) {
+                        $j->add('file', $ex->getFile());
+                        $j->add('line', $ex->getLine());
+                        $stackTrace = new JsonX([], true);
+                        $index = 0;
+                        $trace = $ex->getTrace();
 
-                    foreach ($trace as $arr) {
-                        if (isset($arr['file'])) {
-                            $stackTrace->add('#'.$index,$arr['file'].' (Line '.$arr['line'].')');
-                        } else if (isset($arr['function'])) {
-                            $stackTrace->add('#'.$index,$arr['function']);
+                        foreach ($trace as $arr) {
+                            if (isset($arr['file'])) {
+                                $stackTrace->add('#'.$index,$arr['file'].' (Line '.$arr['line'].')');
+                            } else if (isset($arr['function'])) {
+                                $stackTrace->add('#'.$index,$arr['function']);
+                            }
+                            $index++;
                         }
-                        $index++;
+                        $j->add('stack-trace',$stackTrace);
                     }
-                    $j->add('stack-trace',$stackTrace);
                     header('content-type: application/json');
                     die($j);
                 } else {
@@ -590,12 +599,7 @@ class WebFiori {
                     ], true);
                     die($j);
                 } else if ($isCli) {
-                    fprintf(STDERR, "\n<%s>\n",Util::ERR_TYPES[$error['type']]['type']);
-                    fprintf(STDERR, "Error Message    %5s %s\n",":",$error['message']);
-                    fprintf(STDERR, "Error Number     %5s %s\n",":",$error['type']);
-                    fprintf(STDERR, "Error Description%5s %s\n",":",Util::ERR_TYPES[$error['type']]['description']);
-                    fprintf(STDERR, "Error File       %5s %s\n",":",$error['file']);
-                    fprintf(STDERR, "Error Line:      %5s %s\n",":",$error['line']);
+                    CLI::displayErr($errno, $errstr, $errfile, $errline);
                 } else {
                     $errPage = new ServerErrView($error);
                     $errPage->show(500);
@@ -614,5 +618,7 @@ if (CLI::isCLI() === true) {
     CLI::runCLI();
 } else {
     //route user request.
+    $x = $y;
+    throw new \Exception('Test');
     Router::route(Util::getRequestedURL());
 }

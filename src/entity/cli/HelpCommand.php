@@ -57,7 +57,6 @@ class HelpCommand extends CLICommand {
      * @since 1.0
      */
     public function exec() {
-        $this->showVersionInfo();
         $regCommands = CLI::getRegisteredCommands();
         $commandName = $this->getArgValue('command-name');
 
@@ -68,9 +67,16 @@ class HelpCommand extends CLICommand {
                 $this->error("Command '$commandName' is not supported.\n");
             }
         } else {
-            fprintf(STDOUT, self::formatOutput("Options:\n", [
+            $vCommand = new VersionCommand();
+            $vCommand->exec();
+            fprintf(STDOUT, self::formatOutput("Usage:\n",[
                 'bold' => true,
-                'color' => 'light-green'
+                'color' => 'light-yellow'
+            ]));
+            fprintf(STDOUT, "    command [arg1 arg2=\"val\" arg3...]\n\n");
+            fprintf(STDOUT, self::formatOutput("Available Commands:\n", [
+                'bold' => true,
+                'color' => 'light-yellow'
             ]));
 
             foreach ($regCommands as $commandObj) {
@@ -98,7 +104,7 @@ class HelpCommand extends CLICommand {
             if (count($args) != 0) {
                 fprintf(STDOUT, self::formatOutput("    Supported Arguments:\n", [
                     'bold' => true,
-                    'color' => 'light'
+                    'color' => 'light-blue'
                 ]));
 
                 foreach ($args as $argName => $options) {
@@ -119,10 +125,5 @@ class HelpCommand extends CLICommand {
                 }
             }
         }
-    }
-    private function showVersionInfo() {
-        Util::print_r("WebFiori Framework (c) v"
-        .WebFiori::getConfig()->getVersion()." ".WebFiori::getConfig()->getVersionType().
-        ", All Rights Reserved.\n");
     }
 }

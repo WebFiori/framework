@@ -30,9 +30,14 @@ use webfiori\entity\Util;
  * A fixed box which is used to show PHP warnings and notices.
  *
  * @author Ibrahim
- * @version 1.0
+ * @version 1.0.1
  */
 class ErrorBox extends MessageBox {
+    /**
+     *
+     * @var HTMLNode 
+     */
+    private $tipNode;
     /**
      *
      * @var HTMLNode 
@@ -70,24 +75,29 @@ class ErrorBox extends MessageBox {
         $this->errNode = new HTMLNode('p');
         $this->errNode->setClassName('message-line');
         $detailsContainer->addChild($this->errNode);
-        $this->errNode->addTextNode('<b class="err-label">Error: </b>', false);
         $this->descNode = new HTMLNode('p');
         $this->descNode->setClassName('message-line');
         $detailsContainer->addChild($this->descNode);
-        $this->descNode->addTextNode('<b class="err-label">Description: </b>', false);
         $this->messageNode = new HTMLNode('p');
         $this->messageNode->setClassName('message-line');
         $detailsContainer->addChild($this->messageNode);
-        $this->messageNode->addTextNode('<b class="err-label">Message: </b>', false);
         $this->fileNode = new HTMLNode('p');
         $this->fileNode->setClassName('message-line');
         $detailsContainer->addChild($this->fileNode);
-        $this->fileNode->addTextNode('<b class="err-label">File: </b>', false);
         $this->lineNode = new HTMLNode('p');
         $this->lineNode->setClassName('message-line');
         $detailsContainer->addChild($this->lineNode);
-        $this->lineNode->addTextNode('<b class="err-label">Line: </b>', false);
-
+        
+        if (!defined('VERBOSE') || !VERBOSE) {
+            $this->tipNode = new HTMLNode('p');
+            $this->tipNode->setClassName('message-line');
+            $detailsContainer->addChild($this->tipNode);
+            $this->tipNode->addTextNode('<b style="color:yellow">Tip</b>: To'
+                . ' display more details about the error, '
+                . 'define the constant "VERBOSE" and set its value to "true" in '
+                . 'the top of the file "WebFiori.php".', false);
+        }
+ 
         $this->setAttribute('onmouseover', "if(this.getAttribute('dg') === null){addDragSupport(this)}");
         $this->getHeader()->addTextNode('<b style="margin-left:10px;font-family:monospace;">Message ('.self::getCount().')</b>',false);
     }
@@ -111,21 +121,31 @@ class ErrorBox extends MessageBox {
     }
     /**
      * Sets the file that caused the error.
+     * Note that if the constant 'VERBOSE' is not defined or set to 'false', 
+     * the method will have no effect.
      * @param string $file The absolute path of the file that has the error.
      * @since 1.0
      */
     public function setFile($file) {
         $this->fileNode->removeAllChildNodes();
-        $this->fileNode->addTextNode('<b class="err-label">File: </b>'.$file, false);
+        
+        if (defined('VERBOSE') && VERBOSE) {
+            $this->fileNode->addTextNode('<b class="err-label">File: </b>'.$file, false);
+        }
     }
     /**
      * Sets error line number.
+     * Note that if the constant 'VERBOSE' is not defined or set to 'false', 
+     * the method will have no effect.
      * @param string $line The line that caused the error.
      * @since 1.0
      */
     public function setLine($line) {
         $this->lineNode->removeAllChildNodes();
-        $this->lineNode->addTextNode('<b class="err-label">Line: </b>'.$line, false);
+        
+        if (defined('VERBOSE') && VERBOSE) {
+            $this->lineNode->addTextNode('<b class="err-label">Line: </b>'.$line, false);
+        }
     }
     /**
      * Sets error message.

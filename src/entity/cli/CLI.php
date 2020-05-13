@@ -44,6 +44,12 @@ class CLI {
      */
     private $commands;
     /**
+     * The command that will be executed now.
+     * @var CLICommand|null
+     * @since 1.0.2 
+     */
+    private $activeCommand;
+    /**
      *
      * @var CLI 
      */
@@ -70,40 +76,52 @@ class CLI {
             } else {
                 $_SERVER['HTTPS'] = 'yes';
             }
-            set_error_handler(function($errno, $errstr, $errfile, $errline)
-            {
-                fprintf(STDERR, CLICommand::formatOutput("<".Util::ERR_TYPES[$errno]['type'].">\n", [
-                    'color' => 'red',
-                    'bold' => true,
-                    'blink' => true
-                ]));
-                fprintf(STDERR, "Error Message    %5s %s\n",":",$errstr);
-                fprintf(STDERR, "Error Number     %5s %s\n",":",$errno);
-                fprintf(STDERR, "Error Description%5s %s\n",":",Util::ERR_TYPES[$errno]['description']);
-                fprintf(STDERR, "Error File       %5s %s\n",":",$errfile);
-                fprintf(STDERR, "Error Line:      %5s %s\n",":",$errline);
-                exit(-1);
-            });
-            set_exception_handler(function($ex)
-            {
-                fprintf(STDERR, CLICommand::formatOutput("Uncaught Exception.", [
-                    'color' => 'red',
-                    'bold' => true,
-                    'blink' => true
-                ]));
-                fprintf(STDERR, CLICommand::formatOutput('Exception Message:', [
-                    'color' => 'yellow',
-                    'bold' => true,
-                ]));
-                fprintf(STDERR, $ex->getMessage()."\n");
-                fprintf(STDERR, "Exception Class: %s\n", get_class($ex));
-                fprintf(STDERR, "Exception Code: %s\n",$ex->getCode());
-                fprintf(STDERR, "File: %s\n",$ex->getFile());
-                fprintf(STDERR, "Line: %s\n",$ex->getLine());
-                fprintf(STDERR, "Stack Trace:\n");
-                fprintf(STDERR, $ex->getTraceAsString());
-            });
         }
+    }
+    /**
+     * Display PHP error information in CLI.
+     * @param int $errno Error number
+     * @param string $errstr The error as string.
+     * @param string $errfile The file at which the error has accrued in.
+     * @param int $errline Line number at which the error has accrued in.
+     * @since 1.0.2
+     */
+    public static function displayErr($errno, $errstr, $errfile, $errline) {
+        fprintf(STDERR, CLICommand::formatOutput("<".Util::ERR_TYPES[$errno]['type'].">\n", [
+            'color' => 'red',
+            'bold' => true,
+            'blink' => true
+        ]));
+        fprintf(STDERR, "Error Message    %5s %s\n",":",$errstr);
+        fprintf(STDERR, "Error Number     %5s %s\n",":",$errno);
+        fprintf(STDERR, "Error Description%5s %s\n",":",Util::ERR_TYPES[$errno]['description']);
+        fprintf(STDERR, "Error File       %5s %s\n",":",$errfile);
+        fprintf(STDERR, "Error Line:      %5s %s\n",":",$errline);
+        exit(-1);
+    }
+    /**
+     * Display exception information in terminal.
+     * @param Exception $ex An exception which is thrown any time during 
+     * program execution.
+     * @since 1.0.2
+     */
+    public static function displayException($ex) {
+        fprintf(STDERR, CLICommand::formatOutput("Uncaught Exception\n", [
+            'color' => 'red',
+            'bold' => true,
+            'blink' => true
+        ]));
+        fprintf(STDERR, CLICommand::formatOutput('Exception Message: ', [
+            'color' => 'yellow',
+            'bold' => true,
+        ]));
+        fprintf(STDERR, $ex->getMessage()."\n");
+        fprintf(STDERR, "Exception Class: %s\n", get_class($ex));
+        fprintf(STDERR, "Exception Code: %s\n",$ex->getCode());
+        fprintf(STDERR, "File: %s\n",$ex->getFile());
+        fprintf(STDERR, "Line: %s\n",$ex->getLine());
+        fprintf(STDERR, "Stack Trace:\n");
+        fprintf(STDERR, $ex->getTraceAsString());
     }
     /**
      * Returns an associative array of registered commands.
@@ -157,6 +175,7 @@ class CLI {
     public static function registerCommands() {
         //Register default framework cli commands.
         self::register(new HelpCommand());
+        self::register(new VersionCommand());
         self::register(new SettingsCommand());
         self::register(new ListThemesCommand());
         self::register(new ListCronCommand());
@@ -173,7 +192,9 @@ class CLI {
      */
     public static function runCLI() {
         if ($_SERVER['argc'] == 1) {
-            return self::get()->commands['--help']->excCommand();
+            $command = self::get()->commands['--help'];
+            self::get()->activeCommand = $command;
+            return $command->excCommand();
         } else if (defined('__PHPUNIT_PHAR__')) {
             return 0;
         }
@@ -188,12 +209,21 @@ class CLI {
         $commandName = filter_var($args[1], FILTER_SANITIZE_STRING);
 
         if (isset($this->commands[$commandName])) {
-            return $this->commands[$commandName]->excCommand();
+            $command = self::get()->commands[$commandName];
+            $this->activeCommand = $command;
+            return $command->excCommand();
         } else {
             fprintf(STDERR,"Error: The command '".$commandName."' is not supported.");
 
             return -1;
         }
+    }
+    /**
+     * 
+     * @return CLICommand|null
+     */
+    public static function getActiveCommand() {
+        return self::get()->activeCommand;
     }
     /**
      * 

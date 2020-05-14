@@ -559,22 +559,21 @@ class Util {
         } else if ($expr === false) {
             $expr = 'false';
         }
+        $readable = print_r($expr, true);
         if (CLI::isCLI()) {
-            $val = print_r($expr, true);
-            fprintf(STDOUT, "%s\n",$val);
+            fprintf(STDOUT, "%s\n",$readable);
             return;
-        } else if (gettype($expr) == 'string') {
-            $expr1 = str_replace('<', '&lt;', $expr);
-            $expr = str_replace('>', '&gt;', $expr1);
-        }
-        $val = '<pre>'.print_r($expr, true).'</pre>';
-
-        if ($asMessageBox === true) {
-            $messageBox = new MessageBox();
-            $messageBox->getBody()->addTextNode($val,false);
-            echo $messageBox;
         } else {
-            echo $val;
+            $readable = print_r($expr, true);
+            $htmlEntityAdded = str_replace('<', '&lt;', str_replace('>', '&gt;', $readable));
+            $toOutput = '<pre>'. $htmlEntityAdded .'</pre>';
+            if ($asMessageBox === true) {
+                $messageBox = new MessageBox();
+                $messageBox->getBody()->addTextNode($toOutput,false);
+                echo $messageBox;
+            } else {
+                echo $toOutput;
+            }
         }
     }
     /**

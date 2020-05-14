@@ -618,7 +618,5 @@ if (CLI::isCLI() === true) {
     CLI::runCLI();
 } else {
     //route user request.
-    $x = $y;
-    throw new \Exception('Test');
     Router::route(Util::getRequestedURL());
 }

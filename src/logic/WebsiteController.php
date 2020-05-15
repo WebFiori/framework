@@ -27,7 +27,7 @@ namespace webfiori\logic;
 use webfiori\conf\SiteConfig;
 use webfiori\entity\FileHandler;
 /**
- * A class that can be used to modify basic settings of the web site and 
+ * A class that can be used to control basic settings of the web site and 
  * save them to the file 'SiteConfig.php'
  *
  * @author Ibrahim

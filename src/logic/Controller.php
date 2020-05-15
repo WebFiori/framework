@@ -34,6 +34,9 @@ use webfiori\entity\DBConnectionInfo;
 use webfiori\entity\SessionManager;
 /**
  * The base class for creating application logic.
+ * Controllers manly used for controlling two things, the first is database 
+ * access and the second is sessions. It is possible to make the controller 
+ * do other things.
  * This class provides the basic utilities to connect to database and manage 
  * the connection. In addition, it can be used to manage system sessions if 
  * the system uses any. The developer can extend this class to add his own 

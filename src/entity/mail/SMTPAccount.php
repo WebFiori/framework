@@ -108,9 +108,9 @@ class SMTPAccount {
         }
 
         if (isset($options['sender-name'])) {
-            $this->setName($options['sender-name']);
+            $this->setSenderName($options['sender-name']);
         } else {
-            $this->setName('');
+            $this->setSenderName('');
         }
 
         if (isset($options['sender-address'])) {
@@ -129,8 +129,8 @@ class SMTPAccount {
         return $this->address;
     }
     /**
-     * Returns the name of the email account.
-     * @return string The name of the email account. The name will be used in the header 
+     * Returns the name of sender.
+     * @return string The name of the email sender. The name will be used in the header 
      * 'FROM' when sending an email. Default is empty string.
      * @since 1.0
      */
@@ -187,7 +187,7 @@ class SMTPAccount {
      * 'FROM' when sending an email
      * @since 1.0
      */
-    public function setName($name) {
+    public function setSenderName($name) {
         $this->name = trim($name);
     }
     /**

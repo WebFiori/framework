@@ -134,7 +134,7 @@ class SMTPAccount {
      * 'FROM' when sending an email. Default is empty string.
      * @since 1.0
      */
-    public function getName() {
+    public function getSenderName() {
         return $this->name;
     }
     /**

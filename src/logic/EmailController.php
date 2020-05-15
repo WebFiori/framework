@@ -100,7 +100,7 @@ class EmailController extends Controller {
             $m->setPort($emailAcc->getPort());
 
             if ($m->connect()) {
-                $m->setSender($emailAcc->getName(), $emailAcc->getAddress());
+                $m->setSender($emailAcc->getSenderName(), $emailAcc->getAddress());
 
                 if ($m->login($emailAcc->getUsername(), $emailAcc->getPassword())) {
                     $retVal = $m;
@@ -163,7 +163,7 @@ class EmailController extends Controller {
             if ($sm instanceof SocketMailer) {
                 if (class_exists('webfiori\conf\MailConfig')) {
                     $accountsArr = MailConfig::getAccounts();
-                    $accountsArr[$emailAccount->getName()] = $emailAccount;
+                    $accountsArr[$emailAccount->getSenderName()] = $emailAccount;
                     $toSave = [];
 
                     foreach ($accountsArr as $account) {

@@ -16,7 +16,7 @@ class SMTPAccountTest extends TestCase {
         $acc = new SMTPAccount();
         $this->assertSame(465,$acc->getPort());
         $this->assertEquals('',$acc->getAddress());
-        $this->assertEquals('',$acc->getName());
+        $this->assertEquals('',$acc->getSenderName());
         $this->assertEquals('',$acc->getPassword());
         $this->assertEquals('',$acc->getServerAddress());
         $this->assertEquals('',$acc->getUsername());

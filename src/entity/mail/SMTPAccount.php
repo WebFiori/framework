@@ -78,7 +78,7 @@ class SMTPAccount {
      * <li><b>sender-name</b>: The name of the sender that will appear when the 
      * message is sent.</li>
      * <li><b>sender-address</b>: The address that will appear when the 
-     * message is sent.</li>
+     * message is sent. Usually, it is the same as the username.</li>
      * </ul>
      * @since 1.0.1
      */

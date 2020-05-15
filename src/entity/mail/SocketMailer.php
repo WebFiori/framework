@@ -209,10 +209,10 @@ class SocketMailer {
      * @since 1.0
      */
     public function addReceiver($name, $address, $isCC = false, $isBcc = false) {
-        $nameTrimmed = trim(str_replace('<', '', str_replace('>', '', $name)));
+        $nameTrimmed = $this->_trimControlChars(str_replace('<', '', str_replace('>', '', $name)));
 
         if (strlen($nameTrimmed) != 0) {
-            $addressTrimmed = trim(str_replace('<', '', str_replace('>', '', $address)));
+            $addressTrimmed = $this->_trimControlChars(str_replace('<', '', str_replace('>', '', $address)));
 
             if (strlen($addressTrimmed) != 0) {
                 if ($isBcc) {
@@ -656,8 +656,8 @@ class SocketMailer {
      * @since 1.0
      */
     public function setSender($name, $address) {
-        $this->senderName = $name;
-        $this->senderAddress = $address;
+        $this->senderName = $this->_trimControlChars($name);
+        $this->senderAddress = $this->_trimControlChars($address);
     }
     /**
      * Sets the subject of the message.
@@ -665,7 +665,7 @@ class SocketMailer {
      * @since 1.0
      */
     public function setSubject($subject) {
-        $trimmed = trim($subject);
+        $trimmed = $this->_trimControlChars($subject);
 
         if (strlen($trimmed) > 0) {
             $this->subject = $trimmed;
@@ -683,6 +683,15 @@ class SocketMailer {
         }
     }
     /**
+     * Removes control characters from the start and end of string in addition 
+     * to white spaces.
+     * @param string $str The string that will be trimmed
+     * @return string The string after its control characters trimmed.
+     */
+    private function _trimControlChars($str) {
+        return trim($str, "\x00..\x20");
+    }
+    /**
      * Write a message to the buffer.
      * Note that this method will trim the following character from the string 
      * if they are found in the message: '\t\n\r\0\x0B\0x1B\0x0C'.
@@ -693,7 +702,7 @@ class SocketMailer {
      */
     public function write($msg,$sendMessage = false) {
         if ($this->isInWritingMode()) {
-            $this->sendC(trim($msg,"\t\n\r\0\x0B\0x1B\0x0C"));
+            $this->sendC($this->_trimControlChars($msg));
 
             if ($sendMessage === true) {
                 $this->_appendAttachments();
@@ -712,12 +721,12 @@ class SocketMailer {
             $this->sendC('CC: '.$this->getCCStr());
             $this->sendC('BCC: '.$this->getBCCStr());
             $this->sendC('Date:'.date('r (T)'));
-            $this->sendC('Subject:'.$this->subject);
+            $this->sendC('Subject:'.'=?UTF-8?B?'.base64_encode($this->subject).'?=');
             $this->sendC('MIME-Version: 1.0');
             $this->sendC('Content-Type: multipart/mixed; boundary="'.$this->boundry.'"'.self::NL);
             $this->sendC('--'.$this->boundry);
             $this->sendC('Content-Type: text/html; charset="UTF-8"'.self::NL);
-            $this->sendC(trim($msg,"\t\n\r\0\x0B\0x1B\0x0C"));
+            $this->sendC($this->_trimControlChars($msg));
 
             if ($sendMessage === true) {
                 $this->_appendAttachments();

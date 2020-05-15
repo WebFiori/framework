@@ -29,6 +29,7 @@ use webfiori\entity\exceptions\FileException;
  * This class is used to write HTML or PHP files.
  * @author Ibrahim
  * @version 1.0
+ * @deprecated since version 1.1.0
  */
 class FileHandler {
     private $file;

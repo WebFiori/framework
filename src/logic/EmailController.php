@@ -28,9 +28,14 @@ use webfiori\conf\MailConfig;
 use webfiori\entity\FileHandler;
 use webfiori\entity\mail\SMTPAccount;
 use webfiori\entity\mail\SocketMailer;
+use webfiori\entity\File;
 /**
  * A class for the methods that is related to mailing.
- *
+ * The controller is responsible for controlling the following operations:
+ * <ul>
+ * <li>Adding, removing and updating SMTP connections in the class 'MailConfig' programmatically.</li>
+ * <li>Creating the class 'MailConfig' if it does not exist.</li>
+ * </ul>  
  * @author Ibrahim
  * @version 1.3.1
  */
@@ -195,123 +200,131 @@ class EmailController extends Controller {
     }
     /**
      * A method to save changes to mail configuration file.
-     * @param type $emailAccountsArr An array that contains an objects of 
-     * type 'EmailAccount'. 
+     * @param array $emailAccountsArr An associative array that contains an objects of 
+     * type 'SMTPAccount'. The indices of the array are the names of the accounts.
      * @since 1.1
      */
     private function writeMailConfig($emailAccountsArr) {
-        $fh = new FileHandler(ROOT_DIR.'/conf/MailConfig.php');
-        $fh->write('<?php', true, true);
-        $fh->write('namespace webfiori\conf;', true, true);
-        $fh->write('use webfiori\entity\mail\SMTPAccount;', true, true);
-        $fh->write('/**
- * SMTP configuration class.
- * The developer can create multiple SMTP accounts and add 
- * Connection information inside the body of this class.
- * @author Ibrahim
- * @version 1.0.1
- */', true, true);
-        $fh->write('class MailConfig{', true, true);
-        $fh->addTab();
-        //stat here
-        $fh->write('private $emailAccounts;
-    /**
-     *
-     * @var MailConfig 
-     * @since 1.0
-     */
-    private static $inst;
-    /**
-     * Return a single instance of the class.
-     * Calling this method multiple times will result in returning 
-     * the same instance every time.
-     * @return MailConfig
-     * @since 1.0
-     */
-    public static function get(){
-        if(self::$inst === null){
-            self::$inst = new MailConfig();
-        }
-        return self::$inst;
-    }', true, true);
-        $fh->write('private function __construct() {', true, true);
-        $fh->addTab();
-        $fh->reduceTab();
-        //adding email accounts
+        $mailConfigFile = new File('MailConfig.php', ROOT_DIR.DIRECTORY_SEPARATOR.'conf');
+        $fileData = ""
+                . "<?php\n"
+                . "namespace webfiori\\conf;\n"
+                . "\n"
+                . "use webfiori\\entity\\mail\\SMTPAccount;\n"
+                . "/**\n"
+                . " * SMTP configuration class.\n"
+                . " * The developer can create multiple SMTP accounts and add\n"
+                . " * Connection information inside the body of this class.\n"
+                . " * @author Ibrahim\n"
+                . " * @version 1.0.1\n"
+                . " */\n"
+                . "class MailConfig {\n"
+                . "    private \$emailAccounts;\n"
+                . "    /**\n"
+                . "     *\n"
+                . "     * @var MailConfig\n"
+                . "     * @since 1.0\n"
+                . "     */\n"
+                . "    private static \$inst;\n"
+                . "    private function __construct() {\n";
         $index = 0;
-
         foreach ($emailAccountsArr as $emailAcc) {
-            $fh->write('$acc'.$index.' = new SMTPAccount();
-        $acc'.$index.'->setServerAddress(\''.$emailAcc->getServerAddress().'\');
-        $acc'.$index.'->setAddress(\''.$emailAcc->getAddress().'\');
-        $acc'.$index.'->setUsername(\''.$emailAcc->getUsername().'\');
-        $acc'.$index.'->setPassword(\''.$emailAcc->getPassword().'\');
-        $acc'.$index.'->setName(\''.$emailAcc->getName().'\');
-        $acc'.$index.'->setPort('.$emailAcc->getPort().');
-        $this->addAccount($acc'.$index.', \'no-replay\');',true,true);
+            $fileData .= ""
+                    . "        \$acc$index = new SMTPAccount([\n"
+                    . "            'server-address' => '".$emailAcc->getServerAddress()."',\n"
+                    . "            'port' => ".$emailAcc->getPort().",\n"
+                    . "            'user' => '".$emailAcc->getUsername()."',\n"
+                    . "            'pass' => '".$emailAcc->getPassword()."',\n"
+                    . "            'sender-name' => '".$emailAcc->getSenderName()."',\n"
+                    . "            'sender-address' => '".$emailAcc->getAddress()."'\n"
+                    . "        ]);\n"
+                    . "        \$this->addAccount(\$acc$index, '$accName');\n"
+                    . "        \n";
             $index++;
         }
-        $fh->write('}', true, true);
-        $fh->reduceTab();
-        $fh->write('/**
-     * Adds an email account.
-     * The developer can use this method to add new account during runtime. 
-     * The account will be removed once the program finishes.
-     * @param EmailAccount $acc an object of type EmailAccount.
-     * @param string $name A name to associate with the email account.
-     * @since 1.0
-     */
-    private function addAccount($acc,$name){
-        $this->emailAccounts[$name] = $acc;
-    }
-    /**
-     * Adds new SMTP connection information or updates an existing one.
-     * @param string $accName The name of the account that will be added or updated.
-     * @param SMTPAccount $smtpConnInfo An object of type \'SMTPAccount\' that 
-     * will contain SMTP account information.
-     * @since 1.0.1
-     */
-    public static function addSMTPAccount($accName,$smtpConnInfo){
-        if($smtpConnInfo instanceof SMTPAccount){
-            $trimmedName = trim($accName);
-            if(strlen($trimmedName) != 0){
-                self::get()->addAccount($smtpConnInfo,$trimmedName);
-            }
-        }
-    }
-    private function _getAccount($name){
-        if(isset($this->emailAccounts[$name])){
-            return $this->emailAccounts[$name];
-        }
-        return null;
-    }
-    /**
-     * Returns an email account given its name.
-     * The method will search for an account with the given name in the set 
-     * of added accounts. If no account was found, null is returned.
-     * @param string $name The name of the account.
-     * @return SMTPAccount|null If the account is found, The method 
-     * will return an object of type SMTPAccount. Else, the 
-     * method will return null.
-     * @since 1.0
-     */
-    public static function getAccount($name){
-        return self::get()->_getAccount($name);
-    }
-    private function _getAccounts(){
-        return $this->emailAccounts;
-    }
-    /**
-     * Returns an associative array that contains all email accounts.
-     * The indices of the array will act as the names of the accounts. 
-     * The value of the index will be an object of type EmailAccount.
-     * @return array An associative array that contains all email accounts.
-     * @since 1.0
-     */
-    public static function getAccounts(){
-        return self::get()->_getAccounts();
-    }', true, true);
-        $fh->write('}', true, true);
-        $fh->close();
+        $fileData .= "    }\n"
+                . "    /**\n"
+                . "     * Adds new SMTP connection information or updates an existing one.\n"
+                . "     * @param string \$accName The name of the account that will be added or updated.\n"
+                . "     * @param SMTPAccount \$smtpConnInfo An object of type 'SMTPAccount' that\n"
+                . "     * will contain SMTP account information.\n"
+                . "     * @since 1.0.1\n"
+                . "     */\n"
+                . "    public static function addSMTPAccount(\$accName, \$smtpConnInfo) {\n"
+                . "        if (\$smtpConnInfo instanceof SMTPAccount) {\n"
+                . "            \$trimmedName = trim(\$accName);\n"
+                . "            \n"
+                . "            if (strlen(\$trimmedName) != 0) {\n"
+                . "                self::get()->addAccount(\$smtpConnInfo, \$trimmedName);\n"
+                . "            }\n"
+                . "        }\n"
+                . "    }\n";
+        $fileData .= ""
+                . "    /**\n"
+                . "     * Return a single instance of the class.\n"
+                . "     * Calling this method multiple times will result in returning\n"
+                . "     * the same instance every time.\n"
+                . "     * @return MailConfig\n"
+                . "     * @since 1.0\n"
+                . "     */\n"
+                . "    public static function get() {\n"
+                . "        \n"
+                . "        if (self::\$inst === null) {\n"
+                . "            self::\$inst = new MailConfig();\n"
+                . "        }\n"
+                . "        \n"
+                . "        return self::\$inst;\n"
+                . "    }\n";
+        $fileData .= ""
+                . "    /**\n"
+                . "     * Returns an email account given its name.\n"
+                . "     * The method will search for an account with the given name in the set\n"
+                . "     * of added accounts. If no account was found, null is returned.v"
+                . "     * @param string \$name The name of the account.\n"
+                . "     * @return SMTPAccount|null If the account is found, The method\n"
+                . "     * will return an object of type SMTPAccount. Else, the\n"
+                . "     * method will return null.\n"
+                . "     * @since 1.0\n"
+                . "     */\n"
+                . "    public static function getAccount(\$name) {\n"
+                . "        return self::get()->_getAccount(\$name);\n"
+                . "    }\n";
+        $fileData .= ""
+                . "    /**\n"
+                . "     * Returns an associative array that contains all email accounts.\n"
+                . "     * The indices of the array will act as the names of the accounts.\n"
+                . "     * The value of the index will be an object of type EmailAccount.\n"
+                . "     * @return array An associative array that contains all email accounts.\n"
+                . "     * @since 1.0\n"
+                . "     */\n"
+                . "    public static function getAccounts() {\n"
+                . "        return self::get()->_getAccounts();\n"
+                . "    }\n"
+                . "    private function _getAccount(\$name) {\n"
+                . "        if (isset(\$this->emailAccounts[\$name])) {\n"
+                . "            return \$this->emailAccounts[\$name];\n"
+                . "        }\n"
+                . "        \n"
+                . "        return null;\n"
+                . "    }\n"
+                . "    private function _getAccounts() {\n"
+                . "        return \$this->emailAccounts;\n"
+                . "    }\n";
+        $fileData .= ""
+                . "    /**\n"
+                . "     * Adds an email account.\n"
+                . "     * The developer can use this method to add new account during runtime.\n"
+                . "     * The account will be removed once the program finishes.\n"
+                . "     * @param SMTPAccount \$acc an object of type SMTPAccount.\n"
+                . "     * @param string \$name A name to associate with the email account.\n"
+                . "     * @since 1.0\n"
+                . "     */\n"
+                . "    private function addAccount(\$acc,\$name) {\n"
+                . "        \$this->emailAccounts[\$name] = \$acc;\n"
+                . "    }\n";
+        //End of class
+        $fileData .= "}\n";
+        $mailConfigFile->setRawData($fileData);
+        $mailConfigFile->write(false, true);
     }
 }

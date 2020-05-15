@@ -28,9 +28,15 @@ namespace webfiori\entity\mail;
  * A class that represents an email account which is used to send or receive messages.
  *
  * @author Ibrahim
- * @version 1.0.1
+ * @version 1.0.2
  */
 class SMTPAccount {
+    /**
+     * The name of SMTP account.
+     * @var string 
+     * @since 1.0.2
+     */
+    private $accName;
     /**
      * Email address.
      * @var string 
@@ -79,6 +85,8 @@ class SMTPAccount {
      * message is sent.</li>
      * <li><b>sender-address</b>: The address that will appear when the 
      * message is sent. Usually, it is the same as the username.</li>
+     * <li><b>account-name</b>: A unique name for the account. Used when creating 
+     * new email message. If not provided, 'sender-name' is used.</li>
      * </ul>
      * @since 1.0.1
      */
@@ -117,6 +125,12 @@ class SMTPAccount {
             $this->setAddress($options['sender-address']);
         } else {
             $this->setAddress('');
+        }
+        
+        if (isset($options['account-name'])) {
+            $this->setAccountName($options['account-name']);
+        } else {
+            $this->setAccountName($this->getSenderName());
         }
     }
     /**
@@ -189,6 +203,27 @@ class SMTPAccount {
      */
     public function setSenderName($name) {
         $this->name = trim($name);
+    }
+    /**
+     * Sets the name of the account.
+     * The name of the account is used by the class 'EmailMessage' when creating 
+     * new instance of the class. Also, the name is used when storing the account 
+     * programatically.
+     * @param string $name The name of the account.
+     * @since 1.0.2
+     */
+    public function setAccountName($name) {
+        $this->accName = $name;
+    }
+    /**
+     * Returns the name of the account.
+     * The name of the account is used by the class 'EmailMessage' when creating 
+     * new instance of the class. Also, the name is used when storing the account 
+     * programatically.
+     * @return string A string that represents the name of the account.
+     */
+    public function getAccountName() {
+        return $this->accName;
     }
     /**
      * Sets the password of the user account that is used to access email server.

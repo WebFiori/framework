@@ -236,9 +236,10 @@ class EmailController extends Controller {
                     . "            'user' => '".$emailAcc->getUsername()."',\n"
                     . "            'pass' => '".$emailAcc->getPassword()."',\n"
                     . "            'sender-name' => '".$emailAcc->getSenderName()."',\n"
-                    . "            'sender-address' => '".$emailAcc->getAddress()."'\n"
+                    . "            'sender-address' => '".$emailAcc->getAddress()."',\n"
+                    . "            'account-name' => '".$emailAcc->getAccountName()."'\n"
                     . "        ]);\n"
-                    . "        \$this->addAccount(\$acc$index, '$accName');\n"
+                    . "        \$this->addAccount(\$acc$index, '".$emailAcc->getAccountName()."');\n"
                     . "        \n";
             $index++;
         }

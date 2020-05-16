@@ -24,6 +24,7 @@
  */
 namespace webfiori\entity\router;
 
+use webfiori\entity\Util;
 /**
  * A class that only has one method to initiate some of system routes.
  * The class is meant to only initiate the routes which uses the method 
@@ -44,7 +45,7 @@ class ClosureRoutes {
             'route-to' => function($params)
             {
                 echo 'This is a closure route.';
-                Util::print_r($params);
+                Util::print_r($params, false);
             }
         ]);
     }

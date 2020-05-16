@@ -218,7 +218,6 @@ class WebFiori {
         InitCron::init();
         InitPrivileges::init();
 
-        CLI::registerCommands();
         //class is now initialized
         self::$classStatus = 'INITIALIZED';
 
@@ -599,7 +598,7 @@ class WebFiori {
                     ], true);
                     die($j);
                 } else if ($isCli) {
-                    CLI::displayErr($errno, $errstr, $errfile, $errline);
+                    CLI::displayErr($error['type'], $error["message"], $error["file"], $error["line"]);
                 } else {
                     $errPage = new ServerErrView($error);
                     $errPage->show(500);
@@ -615,6 +614,7 @@ class WebFiori {
 WebFiori::getAndStart();
 
 if (CLI::isCLI() === true) {
+    CLI::registerCommands();
     CLI::runCLI();
 } else {
     //route user request.

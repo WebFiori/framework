@@ -145,7 +145,9 @@ class EmailController extends Controller {
     }
     /**
      * Adds new SMTP account or Updates an existing one.
-     * @param SMTPAccount $emailAccount An instance of 'EmailAccount'.
+     * Note that the connection will be added or updated only if it 
+     * has correct information.
+     * @param SMTPAccount $emailAccount An instance of 'SMTPAccount'.
      * @return boolean|string The method will return true if the email 
      * account was updated or added. If the email account contains wrong server
      *  information, the method will return MailFunctions::INV_HOST_OR_PORT. 
@@ -205,7 +207,6 @@ class EmailController extends Controller {
      * @since 1.1
      */
     private function writeMailConfig($emailAccountsArr) {
-        $mailConfigFile = new File('MailConfig.php', ROOT_DIR.DIRECTORY_SEPARATOR.'conf');
         $fileData = ""
                 . "<?php\n"
                 . "namespace webfiori\\conf;\n"
@@ -325,6 +326,8 @@ class EmailController extends Controller {
                 . "    }\n";
         //End of class
         $fileData .= "}\n";
+        $mailConfigFile = new File('MailConfig.php', ROOT_DIR.DIRECTORY_SEPARATOR.'conf');
+        $mailConfigFile->remove();
         $mailConfigFile->setRawData($fileData);
         $mailConfigFile->write(false, true);
     }

@@ -1,24 +1,34 @@
 Options -Indexes
 <IfModule mod_rewrite.c>
     RewriteEngine on
+    
+    # Deny direct access to some folders.
+    # Ones which are not here are public.
+    # Add your own here.
+    RewriteRule ^(vendor|apis|conf|entity|ini|logic|logs|pages) - [F,L]
 
-    #send all trafic to framework seed
+    # Send all trafic to framework seed and make your work bloom.
     RewriteCond %{REQUEST_FILENAME} !-f
     ReWriteRule ^(.*)$ WebFiori.php [L,QSA]
 
-    #append authorization header if not exist
+    # Append authorization header if not exist.
     RewriteCond %{HTTP:Authorization} ^(.*)
     RewriteRule .* - [e=HTTP_AUTHORIZATION:%1]
 </IfModule>
-
+<FilesMatch "\.(?:log|cache|config)$">
+    # Deny access to any file with given extension.
+    # Include your own at the top.
+    Order allow,deny
+    Deny from all
+</FilesMatch>
 <IfModule lsapi_module>
-    #disable opcache. This might reduce load speed if disabled.
-    php_flag opcache.enable Off
+    # Disable opcache. This might reduce load speed if disabled.
+    # php_flag opcache.enable Off
 </IfModule>
 
-#allow CORS. Be careful here.
+# Allow CORS. Be careful here.
 <IfModule mod_headers.c>
-    #Header set Access-Control-Allow-Origin "*"
+    # Header set Access-Control-Allow-Origin "*"
 </IfModule>
   
 <IfModule mod_deflate.c>
@@ -45,7 +55,6 @@ Options -Indexes
     AddOutputFilterByType DEFLATE text/plain
     AddOutputFilterByType DEFLATE text/xml
 
-    # Remove browser bugs (only needed for old browsers)
     BrowserMatch ^Mozilla/4 gzip-only-text/html
     BrowserMatch ^Mozilla/4\.0[678] no-gzip
     BrowserMatch \bMSIE !no-gzip !gzip-only-text/html

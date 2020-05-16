@@ -40,6 +40,7 @@ class NotFoundView {
      */
     public function __construct() {
         Page::theme(WebFiori::getSiteConfig()->getBaseThemeName());
+        Page::lang(WebFiori::getSysController()->getSessionLang());
         $labels = Page::translation()->get('general/http-codes/404');
         Page::title($labels['code'].' - '.$labels['type']);
         http_response_code($labels['code']);

@@ -118,7 +118,7 @@ class ServerErrView {
     private function _phpStructsExist($throwableOrErr) {
         Page::reset();
         Page::title('Uncaught Exception');
-        Page::document()->getHeadNode()->addCSS('assets/css/server-err.css',[],false);
+        Page::document()->getHeadNode()->addCSS(Util::getBaseURL().'assets/css/server-err.css',[],false);
         $hNode = new HTMLNode('h1');
 
         if ($throwableOrErr instanceof Throwable) {

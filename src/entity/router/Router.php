@@ -134,6 +134,7 @@ class Router {
         $this->routes = [];
         $this->onNotFound = function ()
         {
+            http_response_code(404);
             if (!defined('API_CALL')) {
                 $notFoundView = new NotFoundView();
                 $notFoundView->display();
@@ -142,7 +143,6 @@ class Router {
                     'message' => 'Requested resource was not found.',
                     'type' => 'error'
                 ]);
-                http_response_code(404);
                 echo $json;
             }
         };

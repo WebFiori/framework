@@ -205,18 +205,21 @@ class WebFiori {
             $this->dbErrDetails = $this->sysStatus;
             $this->sysStatus = Util::DB_NEED_CONF;
         }
+        
+        //Initialize privileges
+        InitPrivileges::init();
+        
         //Initialize CLI
         CLI::init();
-
+        
         //Initialize routes.
         APIRoutes::create();
         ViewRoutes::create();
         ClosureRoutes::create();
         OtherRoutes::create();
 
-        //initialize cron and privileges...
+        //initialize cron jobs
         InitCron::init();
-        InitPrivileges::init();
 
         //class is now initialized
         self::$classStatus = 'INITIALIZED';

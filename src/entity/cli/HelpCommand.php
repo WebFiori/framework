@@ -67,8 +67,10 @@ class HelpCommand extends CLICommand {
                 $this->error("Command '$commandName' is not supported.\n");
             }
         } else {
-            $vCommand = new VersionCommand();
-            $vCommand->exec();
+            if($_SERVER['argc'] == 1) {
+                $vCommand = new VersionCommand();
+                $vCommand->exec();
+            }
             fprintf(STDOUT, self::formatOutput("Usage:\n",[
                 'bold' => true,
                 'color' => 'light-yellow'

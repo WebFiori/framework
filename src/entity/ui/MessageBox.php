@@ -58,32 +58,42 @@ class MessageBox extends HTMLNode {
      */
     public function __construct() {
         parent::__construct();
-        $this->setClassName('floating-message-box');
-        $this->setAttribute('data-box-number', self::getCount());
-        $this->setStyle([
-            'top' => (self::getCount() * 10).'px',
-            'left' => (self::getCount() * 10).'px'
-        ]);
-        $this->_createHeader();
-        $this->_createBody();
-        $this->setAttribute('onmouseover', "if(this.getAttribute('dg') === null){addDragSupport(this)}");
-
-        if (self::getCount() == 0) {
-            $base = WebFiori::getSiteConfig()->getBaseURL();
-            $css = new HTMLNode('link');
-            $css->setAttributes([
-                'rel' => 'stylesheet',
-                'href' => $base.'assets/css/message-box.css'
-            ]);
-            $this->addChild($css);
-            $js = new HTMLNode('script');
-            $js->setAttributes([
-                'type' => 'text/javascript',
-                'src' => $base.'assets/js/message-box.js'
-            ]);
-            $this->addChild($js);
+        if (!defined('MAX_MESSAGES')) {
+            /**
+            * The maximum number of message boxes to show in one page.
+            * Default value is 15. The developer can change the value as needed.
+            * @since 1.0.1
+            */
+           define('MAX_MESSAGES', 15);
         }
-        self::$Count++;
+        if (self::getCount() < MAX_MESSAGES) {
+            $this->setClassName('floating-message-box');
+            $this->setAttribute('data-box-number', self::getCount());
+            $this->setStyle([
+                'top' => (self::getCount() * 10).'px',
+                'left' => (self::getCount() * 10).'px'
+            ]);
+            $this->_createHeader();
+            $this->_createBody();
+            $this->setAttribute('onmouseover', "if(this.getAttribute('dg') === null){addDragSupport(this)}");
+
+            if (self::getCount() == 0) {
+                $base = WebFiori::getSiteConfig()->getBaseURL();
+                $css = new HTMLNode('link');
+                $css->setAttributes([
+                    'rel' => 'stylesheet',
+                    'href' => $base.'assets/css/message-box.css'
+                ]);
+                $this->addChild($css);
+                $js = new HTMLNode('script');
+                $js->setAttributes([
+                    'type' => 'text/javascript',
+                    'src' => $base.'assets/js/message-box.js'
+                ]);
+                $this->addChild($js);
+            }
+            self::$Count++;
+        }
     }
     /**
      * Returns the node that represents the header of the message.

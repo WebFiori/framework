@@ -109,8 +109,10 @@ class ErrorBox extends MessageBox {
      * @since 1.0
      */
     public function setDescription($errno) {
-        $this->descNode->removeAllChildNodes();
-        $this->descNode->addTextNode('<b class="err-label">Description: </b>'.Util::ERR_TYPES[$errno]['description'], false);
+        if ($this->descNode !== null) {
+            $this->descNode->removeAllChildNodes();
+            $this->descNode->addTextNode('<b class="err-label">Description: </b>'.Util::ERR_TYPES[$errno]['description'], false);
+        }
     }
     /**
      * Sets error based on error number.
@@ -118,8 +120,10 @@ class ErrorBox extends MessageBox {
      * @since 1.0
      */
     public function setError($errno) {
-        $this->errNode->removeAllChildNodes();
-        $this->errNode->addTextNode('<b class="err-label">Error: </b>'.Util::ERR_TYPES[$errno]['type'], false);
+        if ($this->errNode !== null) {
+            $this->errNode->removeAllChildNodes();
+            $this->errNode->addTextNode('<b class="err-label">Error: </b>'.Util::ERR_TYPES[$errno]['type'], false);
+        }
     }
     /**
      * Sets the file that caused the error.
@@ -129,10 +133,12 @@ class ErrorBox extends MessageBox {
      * @since 1.0
      */
     public function setFile($file) {
-        $this->fileNode->removeAllChildNodes();
-        
-        if (defined('VERBOSE') && VERBOSE) {
-            $this->fileNode->addTextNode('<b class="err-label">File: </b>'.$file, false);
+        if ($this->fileNode !== null) {
+            $this->fileNode->removeAllChildNodes();
+
+            if (defined('VERBOSE') && VERBOSE) {
+                $this->fileNode->addTextNode('<b class="err-label">File: </b>'.$file, false);
+            }
         }
     }
     /**
@@ -143,10 +149,12 @@ class ErrorBox extends MessageBox {
      * @since 1.0
      */
     public function setLine($line) {
-        $this->lineNode->removeAllChildNodes();
+        if ($this->lineNode !== null) {
+            $this->lineNode->removeAllChildNodes();
         
-        if (defined('VERBOSE') && VERBOSE) {
-            $this->lineNode->addTextNode('<b class="err-label">Line: </b>'.$line, false);
+            if (defined('VERBOSE') && VERBOSE) {
+                $this->lineNode->addTextNode('<b class="err-label">Line: </b>'.$line, false);
+            }
         }
     }
     /**
@@ -155,7 +163,9 @@ class ErrorBox extends MessageBox {
      * @since 1.0
      */
     public function setMessage($msg) {
-        $this->messageNode->removeAllChildNodes();
-        $this->messageNode->addTextNode('<b class="err-label">Message: </b>'.$msg, false);
+        if ($this->messageNode !== null) {
+            $this->messageNode->removeAllChildNodes();
+            $this->messageNode->addTextNode('<b class="err-label">Message: </b>'.$msg, false);
+        }
     }
 }

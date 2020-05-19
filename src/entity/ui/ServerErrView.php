@@ -140,9 +140,10 @@ class ServerErrView {
             }
         } else {
             $hNode->addTextNode('500 - Server Error');
+            Page::insert($hNode);
             Page::insert($this->_createMessageLine('Type:', Util::ERR_TYPES[$throwableOrErr["type"]]['type']));
             Page::insert($this->_createMessageLine('Description:', Util::ERR_TYPES[$throwableOrErr["type"]]['description']));
-            Page::insert($this->_createMessageLine('Message: ', $throwableOrErr["message"]));
+            Page::insert($this->_createMessageLine('Message: ', '<pre>'.$throwableOrErr["message"].'</pre>'));
             if (defined('VERBOSE') && VERBOSE) {
                 Page::insert($this->_createMessageLine('File: ', $throwableOrErr["file"]));
                 Page::insert($this->_createMessageLine('Line: ', $throwableOrErr["line"]));
@@ -177,7 +178,7 @@ class ServerErrView {
         $node->addChild($labelNode);
         $infoNode = new HTMLNode('span');
         $infoNode->setClassName('mono');
-        $infoNode->addTextNode($info);
+        $infoNode->addTextNode($info, false);
         $node->addChild($infoNode);
 
         return $node;

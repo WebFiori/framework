@@ -162,6 +162,53 @@ abstract class CLICommand {
         }
     }
     /**
+     * Clears the output before or after cursor position.
+     * This method will replace the visible characters with spaces.
+     * @param int $numberOfCols Number of columns to clear. The columns that 
+     * will be cleared are before and after cursor position. They don't include 
+     * the character at which the cursor is currently pointing to.
+     * @param boolean $beforeCursor If set to true, the characters which 
+     * are before the cursor will be cleared. Default is true.
+     * @since 1.0
+     */
+    public function clear($numberOfCols = 1, $beforeCursor = true) {
+        $asInt = intval($numberOfCols);
+
+        if ($asInt >= 1) {
+            if ($beforeCursor) {
+                for ($x = 0 ; $x < $numberOfCols ; $x++) {
+                    $this->moveCursorLeft();
+                    fprintf(STDOUT, " ");
+                    $this->moveCursorLeft();
+                }
+                $this->moveCursorRight($asInt);
+            } else {
+                $this->moveCursorRight();
+
+                for ($x = 0 ; $x < $numberOfCols ; $x++) {
+                    fprintf(STDOUT, " ");
+                }
+                $this->moveCursorLeft($asInt + 1);
+            }
+        }
+    }
+    /**
+     * Clears the whole content of the console.
+     * @since 1.0
+     */
+    public function clearConsole() {
+        fprintf(STDOUT, "\ec");
+    }
+    /**
+     * Clears the line at which the cursor is in and move it back to the start 
+     * of the line.
+     * @since 1.0
+     */
+    public function clearLine() {
+        fprintf(STDOUT, "\e[2K");
+        fprintf(STDOUT, "\r");
+    }
+    /**
      * Display a message that represents an error.
      * The message will be prefixed with the string 'Error:' in 
      * red. The output will be sent to STDERR.
@@ -212,7 +259,9 @@ abstract class CLICommand {
      * make it bold or underlined. The returned value of this 
      * method can be sent to STDOUT using the method 'fprintf()'. 
      * Note that the support for colors 
-     * and formatting will depend on the terminal configuration.
+     * and formatting will depend on the terminal configuration. In addition, 
+     * if the constant NO_COLOR is defined or is set in the environment, the 
+     * returned string will be returned as is.
      * @param string $string The string that will be formatted.
      * @param array $formatOptions An associative array of formatting 
      * options. Supported options are:
@@ -248,13 +297,13 @@ abstract class CLICommand {
      * @since 1.0
      */
     public static function formatOutput($string, $formatOptions) {
+        
         $os = php_uname('s');
         $notSupported = [
             'Windows NT'
         ];
-        
+
         if (in_array($os, $notSupported)) {
-            
             return $string;
         }
         $validatedOptions = self::_validateOutputOptions($formatOptions);
@@ -360,6 +409,76 @@ abstract class CLICommand {
         }
 
         return false;
+    }
+    /**
+     * Moves the cursor down by specific number of lines.
+     * @param int $lines The number of lines the cursor will be moved. Default 
+     * value is 1.
+     * @since 1.0
+     */
+    public function moveCursorDown($lines = 1) {
+        $asInt = intval($lines);
+
+        if ($asInt >= 1) {
+            fprintf(STDOUT, "\e[".$asInt."B");
+        }
+    }
+    /**
+     * Moves the cursor to the left by specific number of columns.
+     * @param int $numberOfCols The number of columns the cursor will be moved. Default 
+     * value is 1.
+     * @since 1.0
+     */
+    public function moveCursorLeft($numberOfCols = 1) {
+        $asInt = intval($numberOfCols);
+
+        if ($asInt >= 1) {
+            fprintf(STDOUT, "\e[".$asInt."D");
+        }
+    }
+    /**
+     * Moves the cursor to the right by specific number of columns.
+     * @param int $numberOfCols The number of columns the cursor will be moved. Default 
+     * value is 1.
+     * @since 1.0
+     */
+    public function moveCursorRight($numberOfCols = 1) {
+        $asInt = intval($numberOfCols);
+
+        if ($asInt >= 1) {
+            fprintf(STDOUT, "\e[".$asInt."C");
+        }
+    }
+    /**
+     * Moves the cursor to specific position in the terminal.
+     * If no arguments are supplied to the method, it will move the cursor 
+     * to the upper-left corner of the screen (line 0, column 0).
+     * @param int $line The number of line at which the cursor will be moved 
+     * to. If not specified, 0 is used.
+     * @param int $col The number of column at which the cursor will be moved 
+     * to. If not specified, 0 is used.
+     * @since 1.0
+     */
+    public function moveCursorTo($line = 0, $col = 0) {
+        $lineAsInt = intval($line);
+        $colAsInt = intval($col);
+
+        if ($lineAsInt > -1 && $colAsInt > -1) {
+            fprintf(STDOUT, "\e[".$lineAsInt.";".$colAsInt."H");
+        }
+    }
+    /**
+     * Moves the cursor up by specific number of lines.
+     * @param int $lines The number of lines the cursor will be moved. Default 
+     * value is 1.
+     * @since 1.0
+     */
+    public function moveCursorUp($lines = 1) {
+        $asInt = intval($lines);
+
+        if ($asInt >= 1) {
+            fprintf(STDOUT, "\e[".$asInt."A");
+        }
     }
     /**
      * Sets the description of the command.
@@ -491,7 +610,7 @@ abstract class CLICommand {
             if (!isset($formatArr['reverse'])) {
                 $formatArr['reverse'] = false;
             }
-
+            
             if (!isset($formatArr['color'])) {
                 $formatArr['color'] = 'white';
             }
@@ -525,7 +644,7 @@ abstract class CLICommand {
         if ($options['bold']) {
             $mannerStr = self::addManner($mannerStr, 1);
         }
- 
+
         if ($options['underline']) {
             $mannerStr = self::addManner($mannerStr, 4);
         }
@@ -536,6 +655,10 @@ abstract class CLICommand {
 
         if ($options['reverse']) {
             $mannerStr = self::addManner($mannerStr, 7);
+        }
+        if (defined('NO_COLOR') || isset($_SERVER['NO_COLOR']) || is_callable('getenv') !== false) {
+            //See https://no-color.org/ for more info.
+            return $mannerStr;
         }
         $mannerStr2 = self::addManner($mannerStr, self::COLORS[$options['color']]);
 

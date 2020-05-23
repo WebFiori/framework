@@ -38,17 +38,17 @@ use webfiori\ini\InitCliCommands;
  */
 class CLI {
     /**
-     *
-     * @var An associative array that contains supported commands. 
-     * @since 1.0.2
-     */
-    private $commands;
-    /**
      * The command that will be executed now.
      * @var CLICommand|null
      * @since 1.0.2 
      */
     private $activeCommand;
+    /**
+     *
+     * @var An associative array that contains supported commands. 
+     * @since 1.0.2
+     */
+    private $commands;
     /**
      *
      * @var CLI 
@@ -122,6 +122,13 @@ class CLI {
         fprintf(STDERR, "Line: %s\n",$ex->getLine());
         fprintf(STDERR, "Stack Trace:\n");
         fprintf(STDERR, $ex->getTraceAsString());
+    }
+    /**
+     * 
+     * @return CLICommand|null
+     */
+    public static function getActiveCommand() {
+        return self::get()->activeCommand;
     }
     /**
      * Returns an associative array of registered commands.
@@ -217,13 +224,6 @@ class CLI {
 
             return -1;
         }
-    }
-    /**
-     * 
-     * @return CLICommand|null
-     */
-    public static function getActiveCommand() {
-        return self::get()->activeCommand;
     }
     /**
      * 

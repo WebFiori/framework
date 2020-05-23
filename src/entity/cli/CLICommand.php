@@ -73,8 +73,9 @@ abstract class CLICommand {
      * @param string $commandName A string that represents the name of the 
      * command such as '-v' or '--help'. If not provided, the 
      * value '--new-command' is used.
-     * @param array $args An indexed array of sub-associative arrays of arguments which can 
-     * be supplied to the command when running it. Each 
+     * @param array $args An indexed array of sub-associative arrays of arguments (or options) which can 
+     * be supplied to the command when running it. The 
+     * key of each sub array is argument name. Each 
      * sub-array can have the following indices:
      * <ul>
      * <li><b>optional</b>: A boolean. if set to true, it means that the argument 
@@ -83,6 +84,11 @@ abstract class CLICommand {
      * to use if it is not provided and is optional.</li>
      * <li><b>description</b>: A description of the argument which 
      * will be shown if the command '--help' is executed.</li>
+     * <li><b>values</b>: A set of values that the argument can have. If provided, 
+     * only the values on the list will be allowed. Note that if null or empty string 
+     * is in the array, it will be ignored. Also, if boolean values are 
+     * provided, true will be converted to the string 'y' and false will 
+     * be converted to the string 'n'.</li>
      * </ul>
      * @param string $description A string that describes what does the job 
      * do. The description will appear when the command '--help' is executed.
@@ -103,7 +109,8 @@ abstract class CLICommand {
      * An argument is a string that comes after the name of the command. The value 
      * of an argument can be set using equal sign. For example, if command name 
      * is '--do-it' and one argument has the name 'what-to-do', then the full 
-     * CLI command would be "--do-it what-to-do=say-hi". 
+     * CLI command would be "--do-it what-to-do=say-hi". An argument can be 
+     * also treated as an option.
      * @param string $name The name of the argument. It must be non-empty string 
      * and does not contain spaces. Note that if the argument is already added and 
      * the developer is trying to add it again, the new options array will override 
@@ -116,6 +123,11 @@ abstract class CLICommand {
      * to use if it is not provided and is optional.</li>
      * <li><b>description</b>: A description of the argument which 
      * will be shown if the command '--help' is executed.</li>
+     * <li><b>values</b>: A set of values that the argument can have. If provided, 
+     * only the values on the list will be allowed. Note that if null or empty string 
+     * is in the array, it will be ignored. Also, if boolean values are 
+     * provided, true will be converted to the string 'y' and false will 
+     * be converted to the string 'n'.</li>
      * </ul>
      * @return boolean If the argument is added, the method will return true. 
      * Other than that, the method will return false.
@@ -130,7 +142,8 @@ abstract class CLICommand {
             } else {
                 $this->commandArgs[$trimmed] = [
                     'optional' => false,
-                    'description' => '<NO DESCRIPTION>'
+                    'description' => '<NO DESCRIPTION>',
+                    'values' => []
                 ];
             }
 
@@ -141,7 +154,8 @@ abstract class CLICommand {
     }
     /**
      * Adds multiple arguments to the command
-     * @param array $arr An indexed array of sub associative arrays. Each 
+     * @param array $arr An associative array of sub associative arrays. The 
+     * key of each sub array is argument name. Each 
      * sub-array can have the following indices:
      * <ul>
      * <li><b>optional</b>: A boolean. if set to true, it means that the argument 
@@ -150,6 +164,11 @@ abstract class CLICommand {
      * to use if it is not provided and is optional.</li>
      * <li><b>description</b>: A description of the argument which 
      * will be shown if the command '--help' is executed.</li>
+     * <li><b>values</b>: A set of values that the argument can have. If provided, 
+     * only the values on the list will be allowed. Note that if null or empty string 
+     * is in the array, it will be ignored. Also, if boolean values are 
+     * provided, true will be converted to the string 'y' and false will 
+     * be converted to the string 'n'.</li>
      * </ul>
      */
     public function addArgs($arr) {
@@ -164,6 +183,8 @@ abstract class CLICommand {
     /**
      * Clears the output before or after cursor position.
      * This method will replace the visible characters with spaces.
+     * Note that support for this operation depends on terminal support for 
+     * ANSI escape codes.
      * @param int $numberOfCols Number of columns to clear. The columns that 
      * will be cleared are before and after cursor position. They don't include 
      * the character at which the cursor is currently pointing to.
@@ -194,6 +215,8 @@ abstract class CLICommand {
     }
     /**
      * Clears the whole content of the console.
+     * Note that support for this operation depends on terminal support for 
+     * ANSI escape codes.
      * @since 1.0
      */
     public function clearConsole() {
@@ -202,6 +225,8 @@ abstract class CLICommand {
     /**
      * Clears the line at which the cursor is in and move it back to the start 
      * of the line.
+     * Note that support for this operation depends on terminal support for 
+     * ANSI escape codes.
      * @since 1.0
      */
     public function clearLine() {
@@ -217,7 +242,8 @@ abstract class CLICommand {
      */
     public function error($message) {
         fprintf(STDERR, self::formatOutput('Error:', [
-            'color' => 'light-red'
+            'color' => 'light-red',
+            'force-styling' => $this->isArgProvided('force-styling')
         ]).' '.$message);
     }
     /**
@@ -231,7 +257,7 @@ abstract class CLICommand {
     public function excCommand() {
         $this->_parseArgs();
 
-        if ($this->_checkIsArgsSet()) {
+        if ($this->_checkIsArgsSet() && $this->_checkAllowedArgValues()) {
             $execResult = $this->exec();
 
             if ($execResult === null) {
@@ -297,15 +323,6 @@ abstract class CLICommand {
      * @since 1.0
      */
     public static function formatOutput($string, $formatOptions) {
-        
-        $os = php_uname('s');
-        $notSupported = [
-            'Windows NT'
-        ];
-
-        if (in_array($os, $notSupported)) {
-            return $string;
-        }
         $validatedOptions = self::_validateOutputOptions($formatOptions);
 
         return self::_getFormattedOutput($string, $validatedOptions);
@@ -412,6 +429,8 @@ abstract class CLICommand {
     }
     /**
      * Moves the cursor down by specific number of lines.
+     * Note that support for this operation depends on terminal support for 
+     * ANSI escape codes.
      * @param int $lines The number of lines the cursor will be moved. Default 
      * value is 1.
      * @since 1.0
@@ -425,6 +444,8 @@ abstract class CLICommand {
     }
     /**
      * Moves the cursor to the left by specific number of columns.
+     * Note that support for this operation depends on terminal support for 
+     * ANSI escape codes.
      * @param int $numberOfCols The number of columns the cursor will be moved. Default 
      * value is 1.
      * @since 1.0
@@ -438,6 +459,8 @@ abstract class CLICommand {
     }
     /**
      * Moves the cursor to the right by specific number of columns.
+     * Note that support for this operation depends on terminal support for 
+     * ANSI escape codes.
      * @param int $numberOfCols The number of columns the cursor will be moved. Default 
      * value is 1.
      * @since 1.0
@@ -453,6 +476,8 @@ abstract class CLICommand {
      * Moves the cursor to specific position in the terminal.
      * If no arguments are supplied to the method, it will move the cursor 
      * to the upper-left corner of the screen (line 0, column 0).
+     * Note that support for this operation depends on terminal support for 
+     * ANSI escape codes.
      * @param int $line The number of line at which the cursor will be moved 
      * to. If not specified, 0 is used.
      * @param int $col The number of column at which the cursor will be moved 
@@ -469,6 +494,8 @@ abstract class CLICommand {
     }
     /**
      * Moves the cursor up by specific number of lines.
+     * Note that support for this operation depends on terminal support for 
+     * ANSI escape codes.
      * @param int $lines The number of lines the cursor will be moved. Default 
      * value is 1.
      * @since 1.0
@@ -541,12 +568,68 @@ abstract class CLICommand {
         } else {
             $optinsArr['description'] = '<NO DESCRIPTION>';
         }
-
+        
+        if (isset($options['values']) && gettype($options['values']) == 'array') {
+            $vals = [];
+            foreach ($options['values'] as $val) {
+                $type = gettype($val);
+                if ($type == 'boolean') {
+                    if ($val === true) {
+                        $vals[] = 'y';
+                    } else {
+                        $vals[] = 'n';
+                    }
+                } else {
+                    if ($type != 'object' && $val !== null && strlen($val) != 0) {
+                        $vals[] = $val.'';
+                    }
+                }
+            }
+            $optinsArr['values'] = $vals;
+        } else {
+            $optinsArr['values'] = [];
+        }
+        
         if (isset($options['default']) && gettype($options['default']) == 'string') {
             $optinsArr['default'] = $options['default'];
         }
-
+        
         return $optinsArr;
+    }
+    private function _checkAllowedArgValues() {
+        $invalidArgsVals = [];
+        
+        foreach ($this->commandArgs as $argName => $argArray) {
+            if ($this->isArgProvided($argName) && count($argArray['values']) != 0) {
+                $argValue = $argArray['val'];
+                if (!in_array($argValue, $argArray['values'])) {
+                    $invalidArgsVals[] = $argName;
+                }
+            }
+        }
+        
+        if (count($invalidArgsVals) != 0) {
+            $invalidStr = 'The following required argument(s) have invalid values: ';
+            $comma = '';
+
+            foreach ($invalidArgsVals as $argName) {
+                $invalidStr .= $comma.'"'.$argName.'"';
+                $comma = ', ';
+            }
+            $this->error($invalidStr."\n");
+            foreach ($invalidArgsVals as $argName) {
+                fprintf(STDOUT, $this->formatOutput('Info:', [
+                    'color' => 'light-yellow',
+                    'force-styling' => $this->isArgProvided('force-styling')
+                ]). " Allowed values for the argument '$argName':\n");
+                foreach ($this->commandArgs[$argName]['values'] as $val) {
+                    fprintf(STDOUT, "$val\n");
+                }
+            }
+            return false;
+        }
+
+        return true;
     }
     private function _checkIsArgsSet() {
         $missingMandatury = [];
@@ -577,7 +660,6 @@ abstract class CLICommand {
         return true;
     }
     private static function _getFormattedOutput($outputString, $formatOptions) {
-        $outputString .= "\e";
         $outputManner = self::getCharsManner($formatOptions);
 
         if (strlen($outputManner) != 0) {
@@ -587,6 +669,11 @@ abstract class CLICommand {
         return $outputString;
     }
     private function _parseArgs() {
+        $this->addArg('force-styling', [
+            'optional' => true,
+            'description' => 'If this argument is set, output will be forced to '
+            . 'appear with colors and styles using ANSI escape sequences.'
+        ]);
         $options = array_keys($this->commandArgs);
 
         foreach ($options as $optName) {
@@ -640,7 +727,20 @@ abstract class CLICommand {
     }
     private static function getCharsManner($options) {
         $mannerStr = '';
-
+        if (isset($options['force-styling'])) {
+            $forceStyling = $options['force-styling'] === true;
+        } else {
+            $forceStyling = false;
+        }
+        if (!$forceStyling) {
+            $os = php_uname('s');
+            $notSupported = [
+                'Windows NT'
+            ];
+            if (in_array($os, $notSupported)) {
+                return $mannerStr;
+            }
+        }
         if ($options['bold']) {
             $mannerStr = self::addManner($mannerStr, 1);
         }
@@ -656,7 +756,7 @@ abstract class CLICommand {
         if ($options['reverse']) {
             $mannerStr = self::addManner($mannerStr, 7);
         }
-        if (defined('NO_COLOR') || isset($_SERVER['NO_COLOR']) || is_callable('getenv') !== false) {
+        if (defined('NO_COLOR') || isset($_SERVER['NO_COLOR']) || getenv('NO_COLOR') !== false || !$forceStyling) {
             //See https://no-color.org/ for more info.
             return $mannerStr;
         }

@@ -77,7 +77,7 @@ class ListThemesCommand extends CLICommand {
 
         foreach ($themesArr as $themeObj) {
             if ($index < 10) {
-                $this->println("--------- Job #0$index ---------\n", [
+                $this->println("--------- Theme #0$index ---------\n", [
                     'color' => 'light-blue',
                     'bold' => true
                 ]);
@@ -107,6 +107,6 @@ class ListThemesCommand extends CLICommand {
         $this->println("Author URL: %".$len02."s %s",':',$themeObj->getAuthorUrl());
         $this->println("License: %".$len03."s %s",':',$themeObj->getLicenseName());
         $this->println("License URL: %".$len04."s %s",':',$themeObj->getLicenseUrl());
-        $this->println("Theme Desription: \n%s",$themeObj->getDescription());
+        $this->println("Theme Desription: %s",$themeObj->getDescription());
     }
 }

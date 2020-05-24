@@ -112,6 +112,7 @@ class HelpCommand extends CLICommand {
                         'bold' => true,
                         'color' => 'yellow'
                     ]);
+
                     if ($options['optional']) {
                         $this->print("[Optional]");
                     }

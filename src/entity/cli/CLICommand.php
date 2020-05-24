@@ -241,10 +241,11 @@ abstract class CLICommand {
      * @since 1.0
      */
     public function error($message) {
-        fprintf(STDERR, self::formatOutput('Error:', [
+        $this->print('Error:', [
             'color' => 'light-red',
-            'force-styling' => $this->isArgProvided('force-styling')
-        ]).' '.$message);
+            'bold' => true
+        ]);
+        $this->println($message);
     }
     /**
      * Execute the command.
@@ -508,6 +509,67 @@ abstract class CLICommand {
         }
     }
     /**
+     * Print out a string.
+     * This method works exactly like the function 'fprintf()'. The only 
+     * difference is that the method will print out the output to STDOUT and 
+     * the method accepts formatting options as last argument to format the output. 
+     * Note that support for output formatting depends on terminal support for 
+     * ANSI escape codes.
+     * @param string $str The string that will be printed to STDOUT.
+     * @param mixed $_ One or more extra arguments that can be supplied to the 
+     * method. The last argument can be an array that contains text formatting options. 
+     * for available options, check the method CLICommand::formatOutput().
+     * @since 1.0
+     */
+    public function print($str, ...$_) {
+        $argCount = count($_);
+        $formattingOptions = [];
+
+        if ($argCount != 0) {
+            if (gettype($_[$argCount - 1]) == 'array') {
+                $formattingOptions = $_[$argCount - 1];
+            }
+        }
+
+        $formattingOptions['force-styling'] = $this->isArgProvided('force-styling');
+        $arrayToPass = [
+            STDOUT,
+            $this->formatOutput($str, $formattingOptions)
+        ];
+
+        foreach ($_ as $val) {
+            $type = gettype($val);
+
+            if ($type != 'array') {
+                $arrayToPass[] = $val;
+            }
+        }
+        call_user_func_array('fprintf', $arrayToPass);
+    }
+    /**
+     * Print out a string and terminates the current line by writing the 
+     * line separator string.
+     * This method will work like the function fprintf(). The difference is that 
+     * it will print out directly to STDOUT and the text can have formatting 
+     * options. Note that support for output formatting depends on terminal support for 
+     * ANSI escape codes.
+     * @param string $str The string that will be printed to STDOUT.
+     * @param mixed $_ One or more extra arguments that can be supplied to the 
+     * method. The last argument can be an array that contains text formatting options. 
+     * for available options, check the method CLICommand::formatOutput().
+     * @since 1.0
+     */
+    public function println($str = '', ...$_) {
+        $toPass = [
+            $str.PHP_EOL
+        ];
+
+        foreach ($_ as $val) {
+            $toPass[] = $val;
+        }
+        call_user_func_array([$this, 'print'], $toPass);
+    }
+    /**
      * Sets the description of the command.
      * The description of the command is a string that describes what does the 
      * command do and it will appear in CLI if the command '--help' is executed.
@@ -548,6 +610,45 @@ abstract class CLICommand {
 
         return false;
     }
+    private function _checkAllowedArgValues() {
+        $invalidArgsVals = [];
+
+        foreach ($this->commandArgs as $argName => $argArray) {
+            if ($this->isArgProvided($argName) && count($argArray['values']) != 0) {
+                $argValue = $argArray['val'];
+
+                if (!in_array($argValue, $argArray['values'])) {
+                    $invalidArgsVals[] = $argName;
+                }
+            }
+        }
+
+        if (count($invalidArgsVals) != 0) {
+            $invalidStr = 'The following required argument(s) have invalid values: ';
+            $comma = '';
+
+            foreach ($invalidArgsVals as $argName) {
+                $invalidStr .= $comma.'"'.$argName.'"';
+                $comma = ', ';
+            }
+            $this->error($invalidStr);
+
+            foreach ($invalidArgsVals as $argName) {
+                fprintf(STDOUT, $this->formatOutput('Info:', [
+                    'color' => 'light-yellow',
+                    'force-styling' => $this->isArgProvided('force-styling')
+                ])." Allowed values for the argument '$argName':\n");
+
+                foreach ($this->commandArgs[$argName]['values'] as $val) {
+                    fprintf(STDOUT, "$val\n");
+                }
+            }
+
+            return false;
+        }
+
+        return true;
+    }
     private function _checkArgOptions($options) {
         $optinsArr = [];
 
@@ -568,11 +669,13 @@ abstract class CLICommand {
         } else {
             $optinsArr['description'] = '<NO DESCRIPTION>';
         }
-        
+
         if (isset($options['values']) && gettype($options['values']) == 'array') {
             $vals = [];
+
             foreach ($options['values'] as $val) {
                 $type = gettype($val);
+
                 if ($type == 'boolean') {
                     if ($val === true) {
                         $vals[] = 'y';
@@ -589,47 +692,12 @@ abstract class CLICommand {
         } else {
             $optinsArr['values'] = [];
         }
-        
+
         if (isset($options['default']) && gettype($options['default']) == 'string') {
             $optinsArr['default'] = $options['default'];
         }
-        
+
         return $optinsArr;
-    }
-    private function _checkAllowedArgValues() {
-        $invalidArgsVals = [];
-        
-        foreach ($this->commandArgs as $argName => $argArray) {
-            if ($this->isArgProvided($argName) && count($argArray['values']) != 0) {
-                $argValue = $argArray['val'];
-                if (!in_array($argValue, $argArray['values'])) {
-                    $invalidArgsVals[] = $argName;
-                }
-            }
-        }
-        
-        if (count($invalidArgsVals) != 0) {
-            $invalidStr = 'The following required argument(s) have invalid values: ';
-            $comma = '';
-
-            foreach ($invalidArgsVals as $argName) {
-                $invalidStr .= $comma.'"'.$argName.'"';
-                $comma = ', ';
-            }
-            $this->error($invalidStr."\n");
-            foreach ($invalidArgsVals as $argName) {
-                fprintf(STDOUT, $this->formatOutput('Info:', [
-                    'color' => 'light-yellow',
-                    'force-styling' => $this->isArgProvided('force-styling')
-                ]). " Allowed values for the argument '$argName':\n");
-                foreach ($this->commandArgs[$argName]['values'] as $val) {
-                    fprintf(STDOUT, "$val\n");
-                }
-            }
-            return false;
-        }
-
-        return true;
     }
     private function _checkIsArgsSet() {
         $missingMandatury = [];
@@ -652,7 +720,7 @@ abstract class CLICommand {
                 $missingStr .= $comma.'"'.$opt.'"';
                 $comma = ', ';
             }
-            $this->error($missingStr."\n");
+            $this->error($missingStr);
 
             return false;
         }
@@ -672,7 +740,7 @@ abstract class CLICommand {
         $this->addArg('force-styling', [
             'optional' => true,
             'description' => 'If this argument is set, output will be forced to '
-            . 'appear with colors and styles using ANSI escape sequences.'
+            .'appear with colors and styles using ANSI escape sequences.'
         ]);
         $options = array_keys($this->commandArgs);
 
@@ -697,7 +765,7 @@ abstract class CLICommand {
             if (!isset($formatArr['reverse'])) {
                 $formatArr['reverse'] = false;
             }
-            
+
             if (!isset($formatArr['color'])) {
                 $formatArr['color'] = 'white';
             }
@@ -727,20 +795,24 @@ abstract class CLICommand {
     }
     private static function getCharsManner($options) {
         $mannerStr = '';
+
         if (isset($options['force-styling'])) {
             $forceStyling = $options['force-styling'] === true;
         } else {
             $forceStyling = false;
         }
+
         if (!$forceStyling) {
             $os = php_uname('s');
             $notSupported = [
                 'Windows NT'
             ];
+
             if (in_array($os, $notSupported)) {
                 return $mannerStr;
             }
         }
+
         if ($options['bold']) {
             $mannerStr = self::addManner($mannerStr, 1);
         }
@@ -756,6 +828,7 @@ abstract class CLICommand {
         if ($options['reverse']) {
             $mannerStr = self::addManner($mannerStr, 7);
         }
+
         if (defined('NO_COLOR') || isset($_SERVER['NO_COLOR']) || getenv('NO_COLOR') !== false || !$forceStyling) {
             //See https://no-color.org/ for more info.
             return $mannerStr;

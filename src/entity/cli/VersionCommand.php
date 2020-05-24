@@ -67,7 +67,7 @@ class VersionCommand extends CLICommand {
                 ."     \/  /\  \/ /  /                  |    \n"
                 ."      \ /  \ / /  /                   |    \n"
                 ."       ______ /__/                    |    \n");
-            
+
             $this->print('WebFiori Framework ', [
                 'color' => 'light-green',
                 'bold' => true

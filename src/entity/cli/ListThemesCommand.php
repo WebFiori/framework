@@ -82,7 +82,7 @@ class ListThemesCommand extends CLICommand {
                     'bold' => true
                 ]);
             } else {
-                $this->println("--------- Theme #0$index ---------\n", [
+                $this->println("--------- Theme #$index ---------\n", [
                     'color' => 'light-blue',
                     'bold' => true
                 ]);

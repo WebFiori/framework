@@ -236,7 +236,7 @@ class CronCommand extends CLICommand {
             $this->println("\n------+-Execution Log-+------");
 
             foreach (Cron::getLogArray() as $message) {
-                $this->println(STDOUT, $message);
+                $this->println($message);
             }
         } else {
             $this->print("TIP: ", [

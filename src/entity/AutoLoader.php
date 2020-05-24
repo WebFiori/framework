@@ -134,7 +134,7 @@ class AutoLoader {
 
         if (gettype($searchFolders) == 'array') {
             foreach ($searchFolders as $folder) {
-                $this->addSearchDirectory($folder);
+                $this->addSearchDirectory($folder, true);
             }
         }
         spl_autoload_register(function($className)

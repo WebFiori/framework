@@ -48,37 +48,37 @@ class SettingsCommand extends CLICommand {
     public function exec() {
         $spaces = 25;
         $C = WebFiori::getConfig();
-        fprintf(STDOUT, self::formatOutput("Config.php Settings:\n", [
+        $this->println("Config.php Settings:", [
             'color' => 'yellow',
             'bold' => true
-        ]));
-        fprintf(STDOUT, "    Framework Version %".($spaces - strlen('Framework Version'))."s %s\n",':',$C->getVersion());
-        fprintf(STDOUT, "    Version Type %".($spaces - strlen('Version Type'))."s %s\n",':',$C->getVersionType());
-        fprintf(STDOUT, "    Release Date %".($spaces - strlen('Release Date'))."s %s\n",':',$C->getReleaseDate());
-        fprintf(STDOUT, "    Config Version %".($spaces - strlen('Config Version'))."s %s\n",':',$C->getConfigVersion());
+        ]);
+        $this->println( "    Framework Version %".($spaces - strlen('Framework Version'))."s %s",':',$C->getVersion());
+        $this->println( "    Version Type %".($spaces - strlen('Version Type'))."s %s",':',$C->getVersionType());
+        $this->println( "    Release Date %".($spaces - strlen('Release Date'))."s %s",':',$C->getReleaseDate());
+        $this->println( "    Config Version %".($spaces - strlen('Config Version'))."s %s",':',$C->getConfigVersion());
         $isConfigured = $C->isConfig() === true ? 'Yes' : 'No';
-        fprintf(STDOUT, "    Is System Configured %".($spaces - strlen('Is System Configured'))."s %s\n",':',$isConfigured);
-        fprintf(STDOUT, self::formatOutput("SiteConfig.php Settings:\n", [
+        $this->println( "    Is System Configured %".($spaces - strlen('Is System Configured'))."s %s",':',$isConfigured);
+        $this->println("SiteConfig.php Settings:", [
             'color' => 'yellow',
             'bold' => true
-        ]));
+        ]);
         $SC = WebFiori::getSiteConfig();
-        fprintf(STDOUT, "    Base URL %".($spaces - strlen('Base URL'))."s %s\n",':',$SC->getBaseURL());
-        fprintf(STDOUT, "    Admin Theme %".($spaces - strlen('Admin Theme'))."s %s\n",':',$SC->getAdminThemeName());
-        fprintf(STDOUT, "    Base Theme %".($spaces - strlen('Base Theme'))."s %s\n",':',$SC->getBaseThemeName());
-        fprintf(STDOUT, "    Title Separator %".($spaces - strlen('Title Separator'))."s %s\n",':',$SC->getTitleSep());
-        fprintf(STDOUT, "    Home Page %".($spaces - strlen('Home Page'))."s %s\n",':',$SC->getHomePage());
-        fprintf(STDOUT, "    Config Version %".($spaces - strlen('Config Version'))."s %s\n",':',$SC->getConfigVersion());
-        fprintf(STDOUT, "    Website Names:\n",':');
+        $this->println( "    Base URL %".($spaces - strlen('Base URL'))."s %s",':',$SC->getBaseURL());
+        $this->println( "    Admin Theme %".($spaces - strlen('Admin Theme'))."s %s",':',$SC->getAdminThemeName());
+        $this->println( "    Base Theme %".($spaces - strlen('Base Theme'))."s %s",':',$SC->getBaseThemeName());
+        $this->println( "    Title Separator %".($spaces - strlen('Title Separator'))."s %s",':',$SC->getTitleSep());
+        $this->println( "    Home Page %".($spaces - strlen('Home Page'))."s %s",':',$SC->getHomePage());
+        $this->println( "    Config Version %".($spaces - strlen('Config Version'))."s %s",':',$SC->getConfigVersion());
+        $this->println( "    Website Names:",':');
         $names = $SC->getWebsiteNames();
 
         foreach ($names as $langCode => $name) {
-            fprintf(STDOUT,"        $langCode => $name\n");
+            $this->println("        $langCode => $name");
         }
-        fprintf(STDOUT, "    Website Descriptions:\n",':');
+        $this->println( "    Website Descriptions:",':');
 
         foreach ($SC->getDescriptions() as $langCode => $desc) {
-            fprintf(STDOUT,"        $langCode => $desc\n");
+            $this->println("        $langCode => $desc");
         }
 
         return 0;

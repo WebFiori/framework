@@ -63,9 +63,9 @@ class ListRoutesCommand extends CLICommand {
             $location = $maxRouteLen - strlen($requestedUrl);
 
             if (gettype($routeTo) == 'object') {
-                fprintf(STDOUT, "$requestedUrl %".$location."s <object>\n", " => ");
+                $this->println("$requestedUrl %".$location."s <object>", " => ");
             } else {
-                fprintf(STDOUT, "$requestedUrl %".$location."s $routeTo\n"," => ");
+                $this->println(STDOUT, "$requestedUrl %".$location."s $routeTo"," => ");
             }
         }
 

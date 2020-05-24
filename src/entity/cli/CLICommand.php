@@ -199,7 +199,7 @@ abstract class CLICommand {
             if ($beforeCursor) {
                 for ($x = 0 ; $x < $numberOfCols ; $x++) {
                     $this->moveCursorLeft();
-                    fprintf(STDOUT, " ");
+                    $this->print(" ");
                     $this->moveCursorLeft();
                 }
                 $this->moveCursorRight($asInt);
@@ -207,7 +207,7 @@ abstract class CLICommand {
                 $this->moveCursorRight();
 
                 for ($x = 0 ; $x < $numberOfCols ; $x++) {
-                    fprintf(STDOUT, " ");
+                    $this->print(" ");
                 }
                 $this->moveCursorLeft($asInt + 1);
             }
@@ -220,7 +220,7 @@ abstract class CLICommand {
      * @since 1.0
      */
     public function clearConsole() {
-        fprintf(STDOUT, "\ec");
+        $this->print("\ec");
     }
     /**
      * Clears the line at which the cursor is in and move it back to the start 
@@ -230,8 +230,8 @@ abstract class CLICommand {
      * @since 1.0
      */
     public function clearLine() {
-        fprintf(STDOUT, "\e[2K");
-        fprintf(STDOUT, "\r");
+        $this->print(STDOUT, "\e[2K");
+        $this->print(STDOUT, "\r");
     }
     /**
      * Display a message that represents an error.
@@ -440,7 +440,7 @@ abstract class CLICommand {
         $asInt = intval($lines);
 
         if ($asInt >= 1) {
-            fprintf(STDOUT, "\e[".$asInt."B");
+            $this->print("\e[".$asInt."B");
         }
     }
     /**
@@ -455,7 +455,7 @@ abstract class CLICommand {
         $asInt = intval($numberOfCols);
 
         if ($asInt >= 1) {
-            fprintf(STDOUT, "\e[".$asInt."D");
+            $this->print("\e[".$asInt."D");
         }
     }
     /**
@@ -470,7 +470,7 @@ abstract class CLICommand {
         $asInt = intval($numberOfCols);
 
         if ($asInt >= 1) {
-            fprintf(STDOUT, "\e[".$asInt."C");
+            $this->print("\e[".$asInt."C");
         }
     }
     /**
@@ -490,7 +490,7 @@ abstract class CLICommand {
         $colAsInt = intval($col);
 
         if ($lineAsInt > -1 && $colAsInt > -1) {
-            fprintf(STDOUT, "\e[".$lineAsInt.";".$colAsInt."H");
+            $this->print("\e[".$lineAsInt.";".$colAsInt."H");
         }
     }
     /**
@@ -505,7 +505,7 @@ abstract class CLICommand {
         $asInt = intval($lines);
 
         if ($asInt >= 1) {
-            fprintf(STDOUT, "\e[".$asInt."A");
+            $this->print("\e[".$asInt."A");
         }
     }
     /**
@@ -634,13 +634,14 @@ abstract class CLICommand {
             $this->error($invalidStr);
 
             foreach ($invalidArgsVals as $argName) {
-                fprintf(STDOUT, $this->formatOutput('Info:', [
+                $this->print('Info:', [
                     'color' => 'light-yellow',
                     'force-styling' => $this->isArgProvided('force-styling')
-                ])." Allowed values for the argument '$argName':\n");
-
+                ]);
+                $this->println("Allowed values for the argument '$argName':");
+                
                 foreach ($this->commandArgs[$argName]['values'] as $val) {
-                    fprintf(STDOUT, "$val\n");
+                    $this->println($val);
                 }
             }
 

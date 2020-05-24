@@ -68,24 +68,24 @@ class ListThemesCommand extends CLICommand {
             if (isset($themesArr[$themeName])) {
                 $this->_printThemeObj($themesArr[$themeName]);
             } else {
-                fprintf(STDERR, "Error: No theme was registered which has the name '$themeName'.\n");
+                $this->error("No theme was registered which has the name '$themeName'.");
 
                 return -1;
             }
         }
-        fprintf(STDOUT, "Total Number of Themes: $themsCount .\n");
+        $this->println("Total Number of Themes: $themsCount .");
 
         foreach ($themesArr as $themeObj) {
             if ($index < 10) {
-                fprintf(STDOUT, self::formatOutput("--------- Job #0$index ---------\n", [
+                $this->println("--------- Job #0$index ---------\n", [
                     'color' => 'light-blue',
                     'bold' => true
-                ]));
+                ]);
             } else {
-                fprintf(STDOUT, self::formatOutput("--------- Theme #0$index ---------\n", [
+                $this->println("--------- Theme #0$index ---------\n", [
                     'color' => 'light-blue',
                     'bold' => true
-                ]));
+                ]);
             }
             $this->_printThemeObj($themeObj);
             $index++;
@@ -102,11 +102,11 @@ class ListThemesCommand extends CLICommand {
         $len03 = $spaceSize - strlen('License');
         $len04 = $spaceSize - strlen('License URL');
 
-        fprintf(STDOUT, "Theme Name: %".$len00."s %s\n",':',$themeObj->getName());
-        fprintf(STDOUT, "Author: %".$len01."s %s\n",':',$themeObj->getAuthor());
-        fprintf(STDOUT, "Author URL: %".$len02."s %s\n",':',$themeObj->getAuthorUrl());
-        fprintf(STDOUT, "License: %".$len03."s %s\n",':',$themeObj->getLicenseName());
-        fprintf(STDOUT, "License URL: %".$len04."s %s\n",':',$themeObj->getLicenseUrl());
-        fprintf(STDOUT, "Theme Desription: \n%s\n",$themeObj->getDescription());
+        $this->println("Theme Name: %".$len00."s %s",':',$themeObj->getName());
+        $this->println("Author: %".$len01."s %s",':',$themeObj->getAuthor());
+        $this->println("Author URL: %".$len02."s %s",':',$themeObj->getAuthorUrl());
+        $this->println("License: %".$len03."s %s",':',$themeObj->getLicenseName());
+        $this->println("License URL: %".$len04."s %s",':',$themeObj->getLicenseUrl());
+        $this->println("Theme Desription: \n%s",$themeObj->getDescription());
     }
 }

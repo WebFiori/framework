@@ -65,7 +65,7 @@ class ListRoutesCommand extends CLICommand {
             if (gettype($routeTo) == 'object') {
                 $this->println("$requestedUrl %".$location."s <object>", " => ");
             } else {
-                $this->println(STDOUT, "$requestedUrl %".$location."s $routeTo"," => ");
+                $this->println("$requestedUrl %".$location."s $routeTo"," => ");
             }
         }
 

@@ -23,12 +23,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 namespace webfiori\entity\cli;
 
 use webfiori\WebFiori;
-use webfiori\entity\Util;
-use webfiori\entity\cli\CLICommand;
 /**
  * Description of VersionCommand
  *
@@ -42,45 +39,44 @@ class VersionCommand extends CLICommand {
      * Execute the command
      */
     public function exec() {
-        
         if (CLI::getActiveCommand()->getName() == $this->getName()) {
-            fprintf(STDOUT, $this->formatOutput("\nFramework Version: ", [
+            $this->print("Framework Version: ", [
                 'color' => 'light-blue',
                 'bold' => true
-            ]));
-            fprintf(STDOUT, WebFiori::getConfig()->getVersion()."\n");
-            fprintf(STDOUT, $this->formatOutput("Release Date: ", [
+            ]);
+            $this->println(WebFiori::getConfig()->getVersion());
+            $this->print("Release Date: ", [
                 'color' => 'light-blue',
                 'bold' => true
-            ]));
-            fprintf(STDOUT, WebFiori::getConfig()->getReleaseDate()."\n");
-            fprintf(STDOUT, $this->formatOutput("Version Type: ", [
+            ]);
+            $this->println(WebFiori::getConfig()->getReleaseDate());
+            $this->print("Version Type: ", [
                 'color' => 'light-blue',
                 'bold' => true
-            ]));
-            fprintf(STDOUT, WebFiori::getConfig()->getVersionType()."\n");
+            ]);
+            $this->println(WebFiori::getConfig()->getVersionType());
         } else {
-            fprintf(STDOUT, ""
-                . "|\                /|                          \n"
-                . "| \      /\      / |              |  / \  |\n"
-                . "\  \    /  \    /  / __________   |\/   \/|\n"
-                . " \  \  /    \  /  / /  /______ /  | \/ \/ |\n"
-                . "  \  \/  /\  \/  / /  /           |  \ /  |\n"
-                . "   \    /  \    / /  /______      |\  |  /|\n"
-                . "    \  /    \  / /  /______ /       \ | /  \n"
-                . "     \/  /\  \/ /  /                  |    \n"
-                . "      \ /  \ / /  /                   |    \n"
-                . "       ______ /__/                    |    \n");
-            fprintf(STDOUT, $this->formatOutput('WebFiori Framework', [
+            $this->println(
+                 "|\                /|                          \n"
+                ."| \      /\      / |              |  / \  |\n"
+                ."\  \    /  \    /  / __________   |\/   \/|\n"
+                ." \  \  /    \  /  / /  /______ /  | \/ \/ |\n"
+                ."  \  \/  /\  \/  / /  /           |  \ /  |\n"
+                ."   \    /  \    / /  /______      |\  |  /|\n"
+                ."    \  /    \  / /  /______ /       \ | /  \n"
+                ."     \/  /\  \/ /  /                  |    \n"
+                ."      \ /  \ / /  /                   |    \n"
+                ."       ______ /__/                    |    \n");
+            
+            $this->print('WebFiori Framework ', [
                 'color' => 'light-green',
                 'bold' => true
-            ]));
-            fprintf(STDOUT, ' (c) Version ');
-            fprintf(STDOUT, $this->formatOutput(WebFiori::getConfig()->getVersion()." ".WebFiori::getConfig()->getVersionType()."\n\n", [
+            ]);
+            $this->print(' (c) Version ');
+            $this->println(WebFiori::getConfig()->getVersion()." ".WebFiori::getConfig()->getVersionType()."\n\n", [
                 'color' => 'light-yellow',
                 'bold' => true
-            ]));
-        } 
+            ]);
+        }
     }
-
 }

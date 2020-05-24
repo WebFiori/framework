@@ -52,30 +52,30 @@ class SettingsCommand extends CLICommand {
             'color' => 'yellow',
             'bold' => true
         ]);
-        $this->println( "    Framework Version %".($spaces - strlen('Framework Version'))."s %s",':',$C->getVersion());
-        $this->println( "    Version Type %".($spaces - strlen('Version Type'))."s %s",':',$C->getVersionType());
-        $this->println( "    Release Date %".($spaces - strlen('Release Date'))."s %s",':',$C->getReleaseDate());
-        $this->println( "    Config Version %".($spaces - strlen('Config Version'))."s %s",':',$C->getConfigVersion());
+        $this->println("    Framework Version %".($spaces - strlen('Framework Version'))."s %s",':',$C->getVersion());
+        $this->println("    Version Type %".($spaces - strlen('Version Type'))."s %s",':',$C->getVersionType());
+        $this->println("    Release Date %".($spaces - strlen('Release Date'))."s %s",':',$C->getReleaseDate());
+        $this->println("    Config Version %".($spaces - strlen('Config Version'))."s %s",':',$C->getConfigVersion());
         $isConfigured = $C->isConfig() === true ? 'Yes' : 'No';
-        $this->println( "    Is System Configured %".($spaces - strlen('Is System Configured'))."s %s",':',$isConfigured);
+        $this->println("    Is System Configured %".($spaces - strlen('Is System Configured'))."s %s",':',$isConfigured);
         $this->println("SiteConfig.php Settings:", [
             'color' => 'yellow',
             'bold' => true
         ]);
         $SC = WebFiori::getSiteConfig();
-        $this->println( "    Base URL %".($spaces - strlen('Base URL'))."s %s",':',$SC->getBaseURL());
-        $this->println( "    Admin Theme %".($spaces - strlen('Admin Theme'))."s %s",':',$SC->getAdminThemeName());
-        $this->println( "    Base Theme %".($spaces - strlen('Base Theme'))."s %s",':',$SC->getBaseThemeName());
-        $this->println( "    Title Separator %".($spaces - strlen('Title Separator'))."s %s",':',$SC->getTitleSep());
-        $this->println( "    Home Page %".($spaces - strlen('Home Page'))."s %s",':',$SC->getHomePage());
-        $this->println( "    Config Version %".($spaces - strlen('Config Version'))."s %s",':',$SC->getConfigVersion());
-        $this->println( "    Website Names:",':');
+        $this->println("    Base URL %".($spaces - strlen('Base URL'))."s %s",':',$SC->getBaseURL());
+        $this->println("    Admin Theme %".($spaces - strlen('Admin Theme'))."s %s",':',$SC->getAdminThemeName());
+        $this->println("    Base Theme %".($spaces - strlen('Base Theme'))."s %s",':',$SC->getBaseThemeName());
+        $this->println("    Title Separator %".($spaces - strlen('Title Separator'))."s %s",':',$SC->getTitleSep());
+        $this->println("    Home Page %".($spaces - strlen('Home Page'))."s %s",':',$SC->getHomePage());
+        $this->println("    Config Version %".($spaces - strlen('Config Version'))."s %s",':',$SC->getConfigVersion());
+        $this->println("    Website Names:",':');
         $names = $SC->getWebsiteNames();
 
         foreach ($names as $langCode => $name) {
             $this->println("        $langCode => $name");
         }
-        $this->println( "    Website Descriptions:",':');
+        $this->println("    Website Descriptions:",':');
 
         foreach ($SC->getDescriptions() as $langCode => $desc) {
             $this->println("        $langCode => $desc");

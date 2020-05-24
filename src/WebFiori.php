@@ -407,6 +407,29 @@ class WebFiori {
         return $retVal;
     }
     /**
+     * Checks if framework standard libraries are loaded or not.
+     * If a library is missing, the method will throw an exception that tell 
+     * which library is missing.
+     * @since 1.3.5
+     */
+    private function _checkStandardLibs() {
+        if (!class_exists('phpStructs\Node')) {
+            throw new InitializationException("The standard library 'webfiori/php-structs' is missing.");
+        }
+
+        if (!class_exists('jsonx\JsonX')) {
+            throw new InitializationException("The standard library 'webfiori/jsonx' is missing.");
+        }
+
+        if (!class_exists('phMysql\MySQLLink')) {
+            throw new InitializationException("The standard library 'webfiori/ph-mysql' is missing.");
+        }
+
+        if (!class_exists('restEasy\WebServices')) {
+            throw new InitializationException("The standard library 'webfiori/rest-easy' is missing.");
+        }
+    }
+    /**
      * 
      * @param type $refresh
      * @return boolean|string
@@ -551,26 +574,6 @@ class WebFiori {
         });
     }
     /**
-     * Checks if framework standard libraries are loaded or not.
-     * If a library is missing, the method will throw an exception that tell 
-     * which library is missing.
-     * @since 1.3.5
-     */
-    private function _checkStandardLibs(){
-        if(!class_exists('phpStructs\Node')){
-            throw new InitializationException("The standard library 'webfiori/php-structs' is missing.");
-        }
-        if(!class_exists('jsonx\JsonX')){
-            throw new InitializationException("The standard library 'webfiori/jsonx' is missing.");
-        }
-        if(!class_exists('phMysql\MySQLLink')){
-            throw new InitializationException("The standard library 'webfiori/ph-mysql' is missing.");
-        }
-        if(!class_exists('restEasy\WebServices')){
-            throw new InitializationException("The standard library 'webfiori/rest-easy' is missing.");
-        }
-    }
-    /**
      * Sets new error and exception handler.
      */
     private function _setHandlers() {
@@ -590,7 +593,11 @@ class WebFiori {
                    $errNo == E_USER_NOTICE) {
                     return;
                 }
-                header("HTTP/1.1 500 Server Error");
+
+                if (!$isCli) {
+                    header("HTTP/1.1 500 Server Error");
+                }
+
                 if (defined('API_CALL')) {
                     $j = new JsonX([
                         'message' => $error["message"],
@@ -600,11 +607,13 @@ class WebFiori {
                         'line' => $error["line"]
                     ], true);
                     die($j);
-                } else if ($isCli) {
-                    CLI::displayErr($error['type'], $error["message"], $error["file"], $error["line"]);
                 } else {
-                    $errPage = new ServerErrView($error);
-                    $errPage->show(500);
+                    if ($isCli) {
+                        CLI::displayErr($error['type'], $error["message"], $error["file"], $error["line"]);
+                    } else {
+                        $errPage = new ServerErrView($error);
+                        $errPage->show(500);
+                    }
                 }
             }
         });

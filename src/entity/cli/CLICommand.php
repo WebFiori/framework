@@ -234,6 +234,63 @@ abstract class CLICommand {
         $this->print(STDOUT, "\r");
     }
     /**
+     * Asks the user to conform something.
+     * This method will display the question and wait for the user to confirm the 
+     * action by entering 'y' or 'n' in the terminal. If the user give something 
+     * other than 'Y' or 'n', it will shows an error and ask him to confirm 
+     * again.
+     * @param string $confirmTxt The text of the question which will be asked. 
+     * @return boolean If the user choose 'y', the method will return true. If 
+     * he choose 'n', the method will return false. 
+     * @param boolean|null $default Default answer to use if empty input is given. 
+     * It can be true for 'y' and false for 'n'. Default value is null which 
+     * means no default will be used.
+     * @since 1.0
+     * 
+     */
+    public function confirm($confirmTxt, $default = null) {
+        $answer = null;
+
+        do {
+            $this->print($confirmTxt, [
+                'color' => 'gray',
+                'bold' => true
+            ]);
+            $this->println('(y/n)', [
+                'color' => 'light-blue'
+            ]);
+
+            if ($default === true) {
+                $this->println('Enter = "y"', [
+                    'color' => 'light-blue'
+                ]);
+            } else {
+                if ($default === false) {
+                    $this->println('Enter = "n"', [
+                    'color' => 'light-blue'
+                ]);
+                }
+            }
+            $input = $this->read();
+
+            if ($input == 'n') {
+                $answer = false;
+            } else {
+                if ($input == 'y') {
+                    $answer = true;
+                } else {
+                    if (strlen($input) == 0 && $default !== null) {
+                        return $default === true;
+                    } else {
+                        $this->error('Invalid answer. Choose \'y\' or \'n\'.');
+                    }
+                }
+            }
+        } while ($answer === null);
+
+        return $answer;
+    }
+    /**
      * Display a message that represents an error.
      * The message will be prefixed with the string 'Error:' in 
      * red. The output will be sent to STDERR.
@@ -570,6 +627,66 @@ abstract class CLICommand {
         call_user_func_array([$this, 'print'], $toPass);
     }
     /**
+     * Reads a string from STDIN stream.
+     * This method is limit to read 1024 bytes at once from STDIN.
+     * @return string The method will return the string which was given as input 
+     * in STDIN.
+     * @since 1.0
+     */
+    public function read() {
+        return trim(fread(STDIN, 1024));
+    }
+    /**
+     * Ask the user to select one of multiple answers.
+     * This method will display the prompt and wait for the user to select 
+     * the an answer. If the user give something other than the answers 
+     * specified, it will shows an error and ask him to select again again.
+     * @param string $prompt The text that will be shown for the user.
+     * @param array $choices An indexed array of options to select from.
+     * @param int $defaultIndex The index of the default answer in case no answer 
+     * is selected and the user hit enter.
+     * @return string The method will return the answer which is selected by 
+     * the user.
+     * @since 1.0
+     */
+    public function select($prompt, $choices, $defaultIndex = null) {
+        if (gettype($choices) == 'array' && count($choices) != 0) {
+            do {
+                $this->print($prompt, [
+                    'color' => 'gray',
+                    'bold' => true
+                ]);
+                $default = null;
+
+                if ($defaultIndex !== null && gettype($defaultIndex) == 'integer') {
+                    $default = isset($choices[$defaultIndex]) ? $choices[$defaultIndex] : null;
+
+                    if ($default !== null) {
+                        $this->print('Enter = "'.$default.'"',[
+                            'color' => 'light-blue'
+                        ]);
+                    }
+                } 
+                $this->println();
+
+                foreach ($choices as $choice) {
+                    $this->println($choice);
+                }
+                $input = $this->read();
+
+                if (in_array($input, $choices)) {
+                    return $input;
+                } else {
+                    if (strlen($input) == 0 && $default !== null) {
+                        return $default;
+                    } else {
+                        $this->error('Invalid answer.');
+                    }
+                }
+            } while (true);
+        }
+    }
+    /**
      * Sets the description of the command.
      * The description of the command is a string that describes what does the 
      * command do and it will appear in CLI if the command '--help' is executed.
@@ -610,6 +727,31 @@ abstract class CLICommand {
 
         return false;
     }
+    /**
+     * Display a message that represents a success status.
+     * @param string $message The message that will be displayed.
+     * @since 1.0
+     */
+    public function success($message) {
+        $this->println($message, [
+            'color' => 'light-green',
+            'bold' => true
+        ]);
+    }
+    /**
+     * Display a message that represents a warning.
+     * The message will be prefixed with the string 'Warning:' in 
+     * red. The output will be sent to STDERR.
+     * @param string $message The message that will be shown.
+     * @since 1.0
+     */
+    public function warning($message) {
+        $this->print('Warning:', [
+            'color' => 'light-yellow',
+            'bold' => true
+        ]);
+        $this->println($message);
+    }
     private function _checkAllowedArgValues() {
         $invalidArgsVals = [];
 
@@ -639,7 +781,7 @@ abstract class CLICommand {
                     'force-styling' => $this->isArgProvided('force-styling')
                 ]);
                 $this->println("Allowed values for the argument '$argName':");
-                
+
                 foreach ($this->commandArgs[$argName]['values'] as $val) {
                     $this->println($val);
                 }

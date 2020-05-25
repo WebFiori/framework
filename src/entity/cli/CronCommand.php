@@ -123,54 +123,29 @@ class CronCommand extends CLICommand {
             
         return $retVal;
     }
-    private function _checkPass() {
-        $cronPass = Cron::password();
-
-        if ($cronPass == 'NO_PASSWORD') {
-            return true;
-        }
-        $givenPass = $this->getArgValue('p');
-
-        if ($givenPass === null) {
-            $this->error("Password is missing. It must be provided as argument 'p=PASS'.");
-
-            return false;
-        }
-        $hash = hash('sha256', $givenPass);
-        $same = $hash == $cronPass;
-
-        if (!$same) {
-            $this->error("Provided password is incorrect.");
-        }
-
-        return $same;
-    }
     private function _force() {
         $jobName = $this->getArgValue('--job-name');
         $cPass = $this->getArgValue('p');
         $retVal = -1;
-
+        
         if ($jobName === null) {
-            $this->error("Job name is missing.");
-        } else {
-            if ($cPass === null && Cron::password() != 'NO_PASSWORD') {
-                $this->error("The argument 'p' is missing. It must be provided if cron password is set.");
-            } else {
-                $result = Cron::run($cPass,$jobName.'',true, $this);
+            $jobName = $this->select('Select one of the scheduled jobs to force:', Cron::getJobsNames());
+        } 
+        
+        $result = Cron::run($cPass,$jobName.'',true, $this);
 
-                if ($result == 'INV_PASS') {
-                    $this->error("Provided password is incorrect.");
-                } else {
-                    if ($result == 'JOB_NOT_FOUND') {
-                        $this->error("No job was found which has the name '".$jobName."'");
-                    } else {
-                        $this->_printExcResult($result);
-                        $this->_showLog();
-                        $retVal = 0;
-                    }
-                }
+        if ($result == 'INV_PASS') {
+            $this->error("Provided password is incorrect.");
+        } else {
+            if ($result == 'JOB_NOT_FOUND') {
+                $this->error("No job was found which has the name '".$jobName."'");
+            } else {
+                $this->_printExcResult($result);
+                $this->_showLog();
+                $retVal = 0;
             }
         }
+        
 
         return $retVal;
     }
@@ -200,28 +175,20 @@ class CronCommand extends CLICommand {
     }
     private function _showJobArgs() {
         $jobName = $this->getArgValue('--job-name');
+        if ($jobName === null) {
+            $jobName = $this->select('Select one of the scheduled jobs to show supported args:', Cron::getJobsNames());
+        } 
+        $job = Cron::getJob($jobName);
 
-        if ($this->_checkPass()) {
-            if ($jobName !== null) {
-                $job = Cron::getJob($jobName);
+        $this->println("Job Args:");
+        $customArgs = $job->getExecArgsNames();
 
-                if ($job !== null) {
-                    $this->println("Job Args:");
-                    $customArgs = $job->getExecArgsNames();
-
-                    if (count($customArgs) != 0) {
-                        foreach ($customArgs as $argName) {
-                            $this->println("$argName");
-                        }
-                    } else {
-                        $this->println("<NO ARGS>");
-                    }
-                } else {
-                    $this->error("No job which has the given name was found.");
-                }
-            } else {
-                $this->error("The argument '--job-name' is missing.");
+        if (count($customArgs) != 0) {
+            foreach ($customArgs as $argName) {
+                $this->println("$argName");
             }
+        } else {
+            $this->println("<NO ARGS>");
         }
     }
     private function _showLog() {

@@ -39,8 +39,8 @@ class HelpCommand extends CLICommand {
      * provided, the shown help will be specific to the selected command.
      */
     public function __construct() {
-        parent::__construct('--help', [
-            'command-name' => [
+        parent::__construct('help', [
+            '--command-name' => [
                 'optional' => true,
                 'description' => 'An optional command name. If provided, help '
                 .'will be specific to the given command only.'
@@ -56,7 +56,7 @@ class HelpCommand extends CLICommand {
      */
     public function exec() {
         $regCommands = CLI::getRegisteredCommands();
-        $commandName = $this->getArgValue('command-name');
+        $commandName = $this->getArgValue('--command-name');
 
         if ($commandName !== null) {
             if (isset($regCommands[$commandName])) {

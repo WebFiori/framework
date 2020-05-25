@@ -41,9 +41,15 @@ use webfiori\WebFiori;
  * Note that the path to PHP executable might differ from "/usr/bin/php". 
  * It depends on where the executable has been installed.
  * @author Ibrahim
- * @version 1.0.8
+ * @version 1.0.9
  */
 class Cron {
+    /**
+     *
+     * @var type 
+     * @since 1.0.9
+     */
+    private $jobsNamesArr;
     /**
      * The password that is used to access and execute jobs.
      * @var string
@@ -98,6 +104,7 @@ class Cron {
             'hour' => intval(date('H')),
             'minute' => intval(date('i'))
         ];
+        $this->jobsNamesArr = [];
         $this->logsArray = [];
         $this->isLogEnabled = false;
         $this->cronJobsQueue = new Queue();
@@ -133,6 +140,14 @@ class Cron {
      */
     public static function activeJob() {
         return self::_get()->activeJob;
+    }
+    /**
+     * Returns an array that contains the names of scheduled jobs.
+     * @return array An array that contains the names of scheduled jobs.
+     * @since 1.0.9
+     */
+    public static function getJobsNames() {
+        return self::_get()->jobsNamesArr;
     }
     /**
      * Creates new job using cron expression.
@@ -540,6 +555,9 @@ class Cron {
                 $job->setJobName('job-'.$this->jobsQueue()->size());
             }
             $retVal = $this->cronJobsQueue->enqueue($job);
+            if ($retVal === true) {
+                $this->jobsNamesArr[] = $job->getJobName();
+            }
         }
 
         return $retVal;

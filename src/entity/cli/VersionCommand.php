@@ -33,7 +33,7 @@ use webfiori\WebFiori;
  */
 class VersionCommand extends CLICommand {
     public function __construct() {
-        parent::__construct('-v', [], 'Display framework version info.');
+        parent::__construct('v', [], 'Display framework version info.');
     }
     /**
      * Execute the command

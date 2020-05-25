@@ -305,6 +305,53 @@ abstract class CLICommand {
         $this->println($message);
     }
     /**
+     * Take an input value from the user.
+     * This method will read the input from STDIN.
+     * @param string $prompt The string that will be shown to the user. The 
+     * string must be non-empty.
+     * @param string $default An optional default value to use in case the user 
+     * hit "Enter" without entering any value.
+     * @param callable $validator A callback that can be used to validate user 
+     * input. The callback accepts one parameter which is the value that 
+     * the user has given. If the value is valid, the callback must return true. 
+     * If the callback returns anything else, it means the value which is given 
+     * by the user is invalid and this method will ask the user to enter the 
+     * value again.
+     * @return string The method will return the value which was taken from the 
+     * user.
+     * @since 1.0
+     */
+    public function input($prompt, $default = null, $validator = null) {
+        $trimidPrompt = trim($prompt);
+        if (strlen($prompt) > 0) {
+            do {
+                $this->print($prompt, [
+                    'color' => 'gray',
+                    'bold' => true
+                ]);
+                if ($default !== null) {
+                    $this->print(' Enter = "'.$default.'"', [
+                        'color' => 'light-blue'
+                    ]);
+                }
+                $this->println();
+                $input = $this->read();
+                if (strlen($input) == 0 && $default !== null) {
+                    return $default;
+                } else if (is_callable($validator)) {
+                    $validateResult = call_user_func_array($validator, [$input]);
+                    if ($validateResult === true) {
+                        return $input;
+                    } else {
+                        $this->error('Invalid input is given. Try again.');
+                    }
+                } else {
+                    return $input;
+                }
+            } while (true);
+        }
+    }
+    /**
      * Execute the command.
      * This method should not be called manually by the developer.
      * @return int If the command is executed, the method will return 0. Other 
@@ -641,7 +688,9 @@ abstract class CLICommand {
      * Ask the user to select one of multiple answers.
      * This method will display the prompt and wait for the user to select 
      * the an answer. If the user give something other than the answers 
-     * specified, it will shows an error and ask him to select again again.
+     * specified, it will shows an error and ask him to select again again. The 
+     * user can select an answer by typing its text or its number which will appear 
+     * in the terminal.
      * @param string $prompt The text that will be shown for the user.
      * @param array $choices An indexed array of options to select from.
      * @param int $defaultIndex The index of the default answer in case no answer 
@@ -670,19 +719,19 @@ abstract class CLICommand {
                 } 
                 $this->println();
 
-                foreach ($choices as $choice) {
-                    $this->println($choice);
+                foreach ($choices as $choiceIndex => $choiceTxt) {
+                    $this->println($choiceIndex.": ".$choiceTxt);
                 }
-                $input = $this->read();
+                $input = trim($this->read());
 
                 if (in_array($input, $choices)) {
                     return $input;
+                } else if (isset ($choices[$input])) {
+                    return $choices[$input];
+                } else if (strlen($input) == 0 && $default !== null) {
+                    return $default;
                 } else {
-                    if (strlen($input) == 0 && $default !== null) {
-                        return $default;
-                    } else {
-                        $this->error('Invalid answer.');
-                    }
+                    $this->error('Invalid answer.');
                 }
             } while (true);
         }

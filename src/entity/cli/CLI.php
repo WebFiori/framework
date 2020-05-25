@@ -199,7 +199,7 @@ class CLI {
      */
     public static function runCLI() {
         if ($_SERVER['argc'] == 1) {
-            $command = self::get()->commands['--help'];
+            $command = self::get()->commands['help'];
             self::get()->activeCommand = $command;
             return $command->excCommand();
         } else if (defined('__PHPUNIT_PHAR__')) {

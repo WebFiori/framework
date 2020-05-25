@@ -42,8 +42,8 @@ class ListThemesCommand extends CLICommand {
      * </ul>
      */
     public function __construct() {
-        parent::__construct('--list-themes', [
-            'theme-name' => [
+        parent::__construct('list-themes', [
+            '--theme-name' => [
                 'optional' => true,
                 'description' => 'An optional theme name. If provided, only given '
                 .'theme information will be shown.'
@@ -60,7 +60,7 @@ class ListThemesCommand extends CLICommand {
         $themesArr = Theme::getAvailableThemes();
 
         $themsCount = count($themesArr);
-        $themeName = $this->getArgValue('theme-name');
+        $themeName = $this->getArgValue('--theme-name');
 
         $index = 1;
 

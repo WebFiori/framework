@@ -293,12 +293,12 @@ abstract class CLICommand {
     /**
      * Display a message that represents an error.
      * The message will be prefixed with the string 'Error:' in 
-     * red. The output will be sent to STDERR.
+     * red. The output will be sent to STDOUT.
      * @param string $message The message that will be shown.
      * @since 1.0
      */
     public function error($message) {
-        $this->print('Error:', [
+        $this->print('Error: ', [
             'color' => 'light-red',
             'bold' => true
         ]);
@@ -589,6 +589,7 @@ abstract class CLICommand {
         }
 
         $formattingOptions['force-styling'] = $this->isArgProvided('force-styling');
+        $formattingOptions['no-ansi'] = $this->isArgProvided('--no-ansi');
         $arrayToPass = [
             STDOUT,
             $this->formatOutput($str, $formattingOptions)
@@ -618,7 +619,7 @@ abstract class CLICommand {
      */
     public function println($str = '', ...$_) {
         $toPass = [
-            $str.PHP_EOL
+            $str."\n"
         ];
 
         foreach ($_ as $val) {
@@ -739,14 +740,28 @@ abstract class CLICommand {
         ]);
     }
     /**
+     * Display a message that represents extra information.
+     * The message will be prefixed with the string 'Info:' in 
+     * blue. The output will be sent to STDOUT.
+     * @param string $message The message that will be shown.
+     * @since 1.0
+     */
+    public function info($message) {
+        $this->print('Info: ', [
+            'color' => 'blue',
+            'bold' => true
+        ]);
+        $this->println($message);
+    }
+    /**
      * Display a message that represents a warning.
      * The message will be prefixed with the string 'Warning:' in 
-     * red. The output will be sent to STDERR.
+     * red. The output will be sent to STDOUT.
      * @param string $message The message that will be shown.
      * @since 1.0
      */
     public function warning($message) {
-        $this->print('Warning:', [
+        $this->print('Warning: ', [
             'color' => 'light-yellow',
             'bold' => true
         ]);
@@ -874,16 +889,19 @@ abstract class CLICommand {
         $outputManner = self::getCharsManner($formatOptions);
 
         if (strlen($outputManner) != 0) {
-            return "\e[".$outputManner."m$outputString \e[0m";
+            return "\e[".$outputManner."m$outputString\e[0m";
         }
 
         return $outputString;
     }
     private function _parseArgs() {
-        $this->addArg('force-styling', [
+        $this->addArg('--ansi', [
             'optional' => true,
-            'description' => 'If this argument is set, output will be forced to '
-            .'appear with colors and styles using ANSI escape sequences.'
+            'description' => 'Force the use of ANSI output.'
+        ]);
+        $this->addArg('--no-ansi', [
+            'optional' => true,
+            'description' => 'Force the output to not use ANSI.'
         ]);
         $options = array_keys($this->commandArgs);
 
@@ -944,7 +962,9 @@ abstract class CLICommand {
         } else {
             $forceStyling = false;
         }
-
+        if (isset($options['no-ansi']) && $options['no-ansi'] === true) {
+            return $mannerStr; 
+        }
         if (!$forceStyling) {
             $os = php_uname('s');
             $notSupported = [

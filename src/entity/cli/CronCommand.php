@@ -49,32 +49,32 @@ class CronCommand extends CLICommand {
      * </ul>
      */
     public function __construct() {
-        parent::__construct('--cron', [
+        parent::__construct('cron', [
             'p' => [
                 'optional' => true,
                 'description' => 'CRON password. If it is set in CRON, then it must be '
                 .'provided here.'
             ],
-            'check' => [
+            '--check' => [
                 'optional' => true,
                 'description' => 'Run a check aginst all jobs to check if '
                 .'it is time to execute them or not.'
             ],
-            'force' => [
+            '--force' => [
                 'optional' => true,
                 'description' => 'Force a specific job to execute.'
             ],
-            'job-name' => [
+            '--job-name' => [
                 'optional' => true,
                 'description' => 'The name of the job that will be forced to '
                 .'execute.'
             ],
-            'show-job-args' => [
+            '--show-job-args' => [
                 'optional' => true,
                 'description' => 'If this one is provided with job name and a '
                 .'job has custom execution args, they will be shown.'
             ],
-            'show-log' => [
+            '--show-log' => [
                 'optional' => true,
                 'description' => 'If set, execution log will be shown after '
                 .'execution is completed.'
@@ -97,7 +97,7 @@ class CronCommand extends CLICommand {
     public function exec() {
         $retVal = -1;
 
-        if ($this->isArgProvided('check')) {
+        if ($this->isArgProvided('--check')) {
             $pass = $this->getArgValue('p');
 
             if ($pass !== null) {
@@ -113,21 +113,14 @@ class CronCommand extends CLICommand {
             } else {
                 $this->error("The argument 'p' is missing. It must be provided if cron password is set.");
             }
+        } else if ($this->isArgProvided('--force')) {
+            $retVal = $this->_force();
+        } else if ($this->isArgProvided('--show-job-args')) {
+            $this->_showJobArgs();
         } else {
-            if ($this->isArgProvided('force')) {
-                $retVal = $this->_force();
-            } else {
-                if ($this->isArgProvided('show-job-args')) {
-                    $this->_showJobArgs();
-                } else {
-                    $this->print("Info: ", [
-                        'color' => 'blue'
-                    ]);
-                    $this->println("At least one of the options 'check', 'force' or 'show-job-args' must be provided.");
-                }
-            }
+            $this->info("At least one of the options '--check', '--force' or '--show-job-args' must be provided.");
         }
-
+            
         return $retVal;
     }
     private function _checkPass() {
@@ -153,7 +146,7 @@ class CronCommand extends CLICommand {
         return $same;
     }
     private function _force() {
-        $jobName = $this->getArgValue('job-name');
+        $jobName = $this->getArgValue('--job-name');
         $cPass = $this->getArgValue('p');
         $retVal = -1;
 
@@ -206,7 +199,7 @@ class CronCommand extends CLICommand {
         }
     }
     private function _showJobArgs() {
-        $jobName = $this->getArgValue('job-name');
+        $jobName = $this->getArgValue('--job-name');
 
         if ($this->_checkPass()) {
             if ($jobName !== null) {
@@ -227,12 +220,12 @@ class CronCommand extends CLICommand {
                     $this->error("No job which has the given name was found.");
                 }
             } else {
-                $this->error("The argument 'job-name' is missing.");
+                $this->error("The argument '--job-name' is missing.");
             }
         }
     }
     private function _showLog() {
-        if ($this->isArgProvided('show-log')) {
+        if ($this->isArgProvided('--show-log')) {
             $this->println("\n------+-Execution Log-+------");
 
             foreach (Cron::getLogArray() as $message) {
@@ -242,7 +235,7 @@ class CronCommand extends CLICommand {
             $this->print("TIP: ", [
                 'color' => 'yellow'
             ]);
-            $this->println("Supply the argument 'show-log' to show execution log.");
+            $this->println("Supply the argument '--show-log' to show execution log.");
         }
     }
 }

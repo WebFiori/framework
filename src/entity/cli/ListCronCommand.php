@@ -37,7 +37,7 @@ class ListCronCommand extends CLICommand {
      * all registered background jobs.
      */
     public function __construct() {
-        parent::__construct('--list-jobs', [], 'List all scheduled CRON jobs.');
+        parent::__construct('list-jobs', [], 'List all scheduled CRON jobs.');
     }
     /**
      * Execute the command.

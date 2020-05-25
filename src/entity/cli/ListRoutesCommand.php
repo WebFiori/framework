@@ -38,7 +38,7 @@ class ListRoutesCommand extends CLICommand {
      * point to.
      */
     public function __construct() {
-        parent::__construct('--list-routes', [], 'List all created routes and which resource they point to.');
+        parent::__construct('list-routes', [], 'List all created routes and which resource they point to.');
     }
     /**
      * Execute the command.

@@ -972,7 +972,7 @@ abstract class CLICommand {
             $mannerStr = self::addManner($mannerStr, 7);
         }
 
-        if (defined('NO_COLOR') || isset($_SERVER['NO_COLOR']) || getenv('NO_COLOR') !== false || !$forceStyling) {
+        if (defined('NO_COLOR') || isset($_SERVER['NO_COLOR']) || getenv('NO_COLOR') !== false) {
             //See https://no-color.org/ for more info.
             return $mannerStr;
         }

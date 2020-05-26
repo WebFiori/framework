@@ -321,7 +321,7 @@ abstract class CLICommand {
      * user.
      * @since 1.0
      */
-    public function input($prompt, $default = null, $validator = null) {
+    public function getInput($prompt, $default = null, $validator = null) {
         $trimidPrompt = trim($prompt);
         if (strlen($prompt) > 0) {
             do {

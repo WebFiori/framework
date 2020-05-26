@@ -149,10 +149,10 @@ class AutoLoader {
                 $this->onFail = self::ON_FAIL_ACTIONS[0];
             }
         } else if (is_callable($onFail)) {
-            $this->onFail = $onFail;
-        } else {
-            $this->onFail = self::ON_FAIL_ACTIONS[0];
-        }
+                $this->onFail = $onFail;
+            } else {
+                $this->onFail = self::ON_FAIL_ACTIONS[0];
+            }
         $this->loadedClasses[] = [
             self::$CLASS_INDICES[0] => 'AutoLoader',
             self::$CLASS_INDICES[1] => 'webfiori\\entity',
@@ -196,6 +196,8 @@ class AutoLoader {
         if (self::$loader === null) {
             $frameworkSearchFoldres = [
                 '',
+                $DS.'entity'.$DS.'exceptions',
+                $DS.'entity'.$DS.'cli',
                 $DS.'entity',
                 $DS.'themes',
                 $DS.'logic',

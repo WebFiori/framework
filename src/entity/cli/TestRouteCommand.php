@@ -41,7 +41,7 @@ class TestRouteCommand extends CLICommand {
      * </ul>
      */
     public function __construct() {
-        parent::__construct('--route', [
+        parent::__construct('route', [
             'url' => [
                 'optional' => false,
                 'description' => 'The URL that will be tested if it has a '
@@ -56,8 +56,8 @@ class TestRouteCommand extends CLICommand {
      * @since 1.0
      */
     public function exec() {
-        $url = $this->getArgValue('url');
-        fwrite(STDOUT, "Trying to route to \"".$url."\"...\n");
+        $url = $this->getArgValue('--url');
+        $this->println("Trying to route to \"".$url."\"...");
         Router::route($url);
 
         return 0;

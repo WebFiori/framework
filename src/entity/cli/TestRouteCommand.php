@@ -42,7 +42,7 @@ class TestRouteCommand extends CLICommand {
      */
     public function __construct() {
         parent::__construct('route', [
-            'url' => [
+            '--url' => [
                 'optional' => false,
                 'description' => 'The URL that will be tested if it has a '
                 .'route or not.'

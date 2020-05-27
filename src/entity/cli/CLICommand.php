@@ -57,7 +57,7 @@ abstract class CLICommand {
      */
     private $commandArgs;
     /**
-     * The name of the command such as '--help'.
+     * The name of the command such as 'help'.
      * @var string 
      * @since 1.0
      */
@@ -71,8 +71,8 @@ abstract class CLICommand {
     /**
      * Creates new instance of the class.
      * @param string $commandName A string that represents the name of the 
-     * command such as '-v' or '--help'. If not provided, the 
-     * value '--new-command' is used.
+     * command such as '-v' or 'help'. If not provided, the 
+     * value 'new-command' is used.
      * @param array $args An indexed array of sub-associative arrays of arguments (or options) which can 
      * be supplied to the command when running it. The 
      * key of each sub array is argument name. Each 
@@ -83,7 +83,7 @@ abstract class CLICommand {
      * <li><b>default</b>: An optional default value for the argument 
      * to use if it is not provided and is optional.</li>
      * <li><b>description</b>: A description of the argument which 
-     * will be shown if the command '--help' is executed.</li>
+     * will be shown if the command 'help' is executed.</li>
      * <li><b>values</b>: A set of values that the argument can have. If provided, 
      * only the values on the list will be allowed. Note that if null or empty string 
      * is in the array, it will be ignored. Also, if boolean values are 
@@ -91,12 +91,12 @@ abstract class CLICommand {
      * be converted to the string 'n'.</li>
      * </ul>
      * @param string $description A string that describes what does the job 
-     * do. The description will appear when the command '--help' is executed.
+     * do. The description will appear when the command 'help' is executed.
      * @since 1.0
      */
     public function __construct($commandName, $args = [], $description = '') {
         if (!$this->setName($commandName)) {
-            $this->setName('--new-command');
+            $this->setName('new-command');
         }
         $this->addArgs($args);
 
@@ -108,8 +108,8 @@ abstract class CLICommand {
      * Add command argument.
      * An argument is a string that comes after the name of the command. The value 
      * of an argument can be set using equal sign. For example, if command name 
-     * is '--do-it' and one argument has the name 'what-to-do', then the full 
-     * CLI command would be "--do-it what-to-do=say-hi". An argument can be 
+     * is 'do-it' and one argument has the name 'what-to-do', then the full 
+     * CLI command would be "do-it what-to-do=say-hi". An argument can be 
      * also treated as an option.
      * @param string $name The name of the argument. It must be non-empty string 
      * and does not contain spaces. Note that if the argument is already added and 
@@ -122,7 +122,7 @@ abstract class CLICommand {
      * <li><b>default</b>: An optional default value for the argument 
      * to use if it is not provided and is optional.</li>
      * <li><b>description</b>: A description of the argument which 
-     * will be shown if the command '--help' is executed.</li>
+     * will be shown if the command 'help' is executed.</li>
      * <li><b>values</b>: A set of values that the argument can have. If provided, 
      * only the values on the list will be allowed. Note that if null or empty string 
      * is in the array, it will be ignored. Also, if boolean values are 
@@ -163,7 +163,7 @@ abstract class CLICommand {
      * <li><b>default</b>: An optional default value for the argument 
      * to use if it is not provided and is optional.</li>
      * <li><b>description</b>: A description of the argument which 
-     * will be shown if the command '--help' is executed.</li>
+     * will be shown if the command 'help' is executed.</li>
      * <li><b>values</b>: A set of values that the argument can have. If provided, 
      * only the values on the list will be allowed. Note that if null or empty string 
      * is in the array, it will be ignored. Also, if boolean values are 
@@ -483,7 +483,7 @@ abstract class CLICommand {
     /**
      * Returns the description of the command.
      * The description of the command is a string that describes what does the 
-     * command do and it will appear in CLI if the command '--help' is executed.
+     * command do and it will appear in CLI if the command 'help' is executed.
      * @return string The description of the command. Default return value 
      * is '&lt;NO DESCRIPTION&gt;'
      * @since 1.0
@@ -495,8 +495,8 @@ abstract class CLICommand {
      * Returns the name of the command.
      * The name of the command is a string which is used to call the command 
      * from CLI.
-     * @return string The name of the command (such as '-v' or '--help'). Default 
-     * return value is '--new-command'.
+     * @return string The name of the command (such as 'v' or 'help'). Default 
+     * return value is 'new-command'.
      * @since 1.0
      */
     public function getName() {
@@ -739,7 +739,7 @@ abstract class CLICommand {
     /**
      * Sets the description of the command.
      * The description of the command is a string that describes what does the 
-     * command do and it will appear in CLI if the command '--help' is executed.
+     * command do and it will appear in CLI if the command 'help' is executed.
      * @param string $str A string that describes the command. It must be non-empty 
      * string.
      * @return boolean If the description of the command is set, the method will return 
@@ -760,7 +760,7 @@ abstract class CLICommand {
      * Sets the name of the command.
      * The name of the command is a string which is used to call the command 
      * from CLI.
-     * @param string $name The name of the command (such as '-v' or '--help'). 
+     * @param string $name The name of the command (such as 'v' or 'help'). 
      * It must be non-empty string and does not contain spaces.
      * @return boolean If the name of the command is set, the method will return 
      * true. Other than that, the method will return false.

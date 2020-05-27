@@ -198,6 +198,7 @@ class AutoLoader {
                 '',
                 $DS.'entity'.$DS.'exceptions',
                 $DS.'entity'.$DS.'cli',
+                $DS.'entity'.$DS.'ui',
                 $DS.'entity',
                 $DS.'themes',
                 $DS.'logic',

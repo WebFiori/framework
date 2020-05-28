@@ -17,23 +17,24 @@
   </a>
   <img src="https://img.shields.io/packagist/dt/webfiori/framework?color=light-green">
   <a href="https://paypal.me/IbrahimBinAlshikh">
-    <img src="https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fwebfiori.com%2Fapis%2Fshields-get-dontate-badget">
+    <img src="https://img.shields.io/endpoint.svg?url=https://webfiori.com/x/apis/shields-get-dontate-badget">
   </a>
 </p>
 What is WebFiori Framework?
 
-WebFiori Framework is a web framework which is built using PHP language. The framework is fully object oriented (OOP). It allows the use of the famous model-view-controller (MVC) model but it does not force it. The framework comes with many features which can help in making your website or web application up and running in no time.
+WebFiori Framework is a mini web development framework which is built using PHP language. The framework is fully object oriented (OOP). It allows the use of the famous model-view-controller (MVC) model but it does not force it. The framework comes with many features which can help in making your website or web application up and running in no time.
 
 ## Key Features
+* Provide minimum utilities to setup a small web application.
 * Theming and the ability to create multiple UIs for the same web page using any CSS or JavaScript framework.
-* Support for routing that makes the ability of creating search-engine-friendly links an easy task.
-* Creation of web services (or APIs) that supports JSON, data filtering and validation.
+* Fast routing system that makes the ability of creating search-engine-friendly links an easy task.
+* Creation of web services (or APIs) that supports JSON with data filtering and validation.
 * Basic support for MySQL schema and query building.
 * Lightweight. The total size of framework core files is less than 3 megabytes.
 * Access management by assigning system user a set of privileges.
 * The ability to create and manage multiple sessions at once.
 * Support for creating and sending nice-looking HTML emails in a simple way by using SMTP protocol.
-* Autoloading of user defined classes.
+* Autoloading of user defined classes (loading composer packages also supported).
 * The ability to create background tasks and let them run in specific time using CRON.
 * Well-defined file upload and file handling sub-system.
 * Building and manipulating the DOM of a web page using PHP language.
@@ -45,7 +46,7 @@ One of the things that any developer cares about any software project is the pro
 * It helps in making any one with Java background to write PHP code.
 * The ability to create a customized links to web pages as needed using routing.
 * No need for touching HTML to play with the DOM. Only use PHP.
-* Run PHP code as a CRON task through HTTP protocol or through CLI.
+* Run PHP code as a CRON task through HTTP protocol or through terminal.
 * Changing whole user interface by changing one line of code.
 * Ability to move the source code of the web application without having to do a lot of re-configuration.
 * Sending HTML email messages with attachments without having to write a lot of code.
@@ -98,11 +99,9 @@ Another option is to use composer to install the framework. Simply, add followin
 ```
 Once added, run composer and it should install everything.
 
-### Hosting on the Web
-If you plan to use the framework for all of your domain, then simply upload all framework files to the root folder of your website (usually has the name "public_html"). If you plan to use it in specific part of your website, then upload framework files to the folder that the part of your website will point to.
-
 ## Notes
 * This project is a hoppy project. 
+* The main aim of this project is learning.
 * The project is reletivly new and for sure has issues.
 * If you think that there is a better way of doing things or wants new feature, feel free to drop an issue.
 

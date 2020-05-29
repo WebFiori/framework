@@ -959,6 +959,7 @@ abstract class CLICommand {
         }
     }
     private static function _validateOutputOptions($formatArr) {
+        $noColor = 'NO_COLOR';
         if (gettype($formatArr) == 'array' && count($formatArr) !== 0) {
             if (!isset($formatArr['bold'])) {
                 $formatArr['bold'] = false;
@@ -977,11 +978,11 @@ abstract class CLICommand {
             }
 
             if (!isset($formatArr['color'])) {
-                $formatArr['color'] = 'white';
+                $formatArr['color'] = $noColor;
             }
 
             if (!isset($formatArr['bg-color'])) {
-                $formatArr['bg-color'] = 'black';
+                $formatArr['bg-color'] = $noColor;
             }
 
             return $formatArr;
@@ -992,8 +993,8 @@ abstract class CLICommand {
             'underline' => false,
             'reverse' => false,
             'blink' => false,
-            'color' => 'white', 
-            'bg-color' => 'black'
+            'color' => $noColor, 
+            'bg-color' => $noColor
         ];
     }
     private static function addManner($str, $code) {
@@ -1045,8 +1046,15 @@ abstract class CLICommand {
             //See https://no-color.org/ for more info.
             return $mannerStr;
         }
-        $mannerStr2 = self::addManner($mannerStr, self::COLORS[$options['color']]);
+        
+        if ($options['color'] != 'NO_COLOR') {
+            $mannerStr = self::addManner($mannerStr, self::COLORS[$options['color']]);
+        }
+        
+        if ($options['bg-color'] != 'NO_COLOR') {
+           $mannerStr = self::addManner($mannerStr, self::COLORS[$options['bg-color']] + 10);
+        }
 
-        return self::addManner($mannerStr2, self::COLORS[$options['bg-color']] + 10);
+        return $mannerStr;
     }
 }

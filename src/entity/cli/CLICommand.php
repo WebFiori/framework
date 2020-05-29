@@ -666,7 +666,7 @@ abstract class CLICommand {
      */
     public function println($str = '', ...$_) {
         $toPass = [
-            $str."\n"
+            $str."\e[0m\e[k\n"
         ];
 
         foreach ($_ as $val) {

@@ -27,7 +27,8 @@ namespace webfiori\entity\cli;
 /**
  * An abstract class that can be used to create new CLI command.
  * The developer can extend this class and use it to create a custom CLI 
- * command.
+ * command. The class can be used to display output to terminal and also read 
+ * user input. In addition, the output can be formatted using ANSI escape sequences.
  * @author Ibrahim
  * @version 1.0
  */
@@ -779,14 +780,17 @@ abstract class CLICommand {
     }
     /**
      * Display a message that represents a success status.
+     * The message will be prefixed with the string "Success:" in green. 
+     * The output will be sent to STDOUT.
      * @param string $message The message that will be displayed.
      * @since 1.0
      */
     public function success($message) {
-        $this->println($message, [
+        $this->print("Success: ", [
             'color' => 'light-green',
             'bold' => true
         ]);
+        $this->println($message);
     }
     /**
      * Display a message that represents extra information.

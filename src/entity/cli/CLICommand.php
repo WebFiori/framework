@@ -200,7 +200,7 @@ abstract class CLICommand {
             if ($beforeCursor) {
                 for ($x = 0 ; $x < $numberOfCols ; $x++) {
                     $this->moveCursorLeft();
-                    $this->print(" ");
+                    $this->prints(" ");
                     $this->moveCursorLeft();
                 }
                 $this->moveCursorRight($asInt);
@@ -208,7 +208,7 @@ abstract class CLICommand {
                 $this->moveCursorRight();
 
                 for ($x = 0 ; $x < $numberOfCols ; $x++) {
-                    $this->print(" ");
+                    $this->prints(" ");
                 }
                 $this->moveCursorLeft($asInt + 1);
             }
@@ -221,7 +221,7 @@ abstract class CLICommand {
      * @since 1.0
      */
     public function clearConsole() {
-        $this->print("\ec");
+        $this->prints("\ec");
     }
     /**
      * Clears the line at which the cursor is in and move it back to the start 
@@ -231,8 +231,8 @@ abstract class CLICommand {
      * @since 1.0
      */
     public function clearLine() {
-        $this->print(STDOUT, "\e[2K");
-        $this->print(STDOUT, "\r");
+        $this->prints(STDOUT, "\e[2K");
+        $this->prints(STDOUT, "\r");
     }
     /**
      * Asks the user to conform something.
@@ -253,7 +253,7 @@ abstract class CLICommand {
         $answer = null;
 
         do {
-            $this->print($confirmTxt, [
+            $this->prints($confirmTxt, [
                 'color' => 'gray',
                 'bold' => true
             ]);
@@ -299,7 +299,7 @@ abstract class CLICommand {
      * @since 1.0
      */
     public function error($message) {
-        $this->print('Error: ', [
+        $this->prints('Error: ', [
             'color' => 'light-red',
             'bold' => true
         ]);
@@ -326,12 +326,12 @@ abstract class CLICommand {
         $trimidPrompt = trim($prompt);
         if (strlen($prompt) > 0) {
             do {
-                $this->print($prompt, [
+                $this->prints($prompt, [
                     'color' => 'gray',
                     'bold' => true
                 ]);
                 if ($default !== null) {
-                    $this->print(' Enter = "'.$default.'"', [
+                    $this->prints(' Enter = "'.$default.'"', [
                         'color' => 'light-blue'
                     ]);
                 }
@@ -545,7 +545,7 @@ abstract class CLICommand {
         $asInt = intval($lines);
 
         if ($asInt >= 1) {
-            $this->print("\e[".$asInt."B");
+            $this->prints("\e[".$asInt."B");
         }
     }
     /**
@@ -560,7 +560,7 @@ abstract class CLICommand {
         $asInt = intval($numberOfCols);
 
         if ($asInt >= 1) {
-            $this->print("\e[".$asInt."D");
+            $this->prints("\e[".$asInt."D");
         }
     }
     /**
@@ -575,7 +575,7 @@ abstract class CLICommand {
         $asInt = intval($numberOfCols);
 
         if ($asInt >= 1) {
-            $this->print("\e[".$asInt."C");
+            $this->prints("\e[".$asInt."C");
         }
     }
     /**
@@ -595,7 +595,7 @@ abstract class CLICommand {
         $colAsInt = intval($col);
 
         if ($lineAsInt > -1 && $colAsInt > -1) {
-            $this->print("\e[".$lineAsInt.";".$colAsInt."H");
+            $this->prints("\e[".$lineAsInt.";".$colAsInt."H");
         }
     }
     /**
@@ -610,7 +610,7 @@ abstract class CLICommand {
         $asInt = intval($lines);
 
         if ($asInt >= 1) {
-            $this->print("\e[".$asInt."A");
+            $this->prints("\e[".$asInt."A");
         }
     }
     /**
@@ -626,7 +626,7 @@ abstract class CLICommand {
      * for available options, check the method CLICommand::formatOutput().
      * @since 1.0
      */
-    public function print($str, ...$_) {
+    public function prints($str, ...$_) {
         $argCount = count($_);
         $formattingOptions = [];
 
@@ -673,7 +673,7 @@ abstract class CLICommand {
         foreach ($_ as $val) {
             $toPass[] = $val;
         }
-        call_user_func_array([$this, 'print'], $toPass);
+        call_user_func_array([$this, 'prints'], $toPass);
     }
     /**
      * Reads a string from STDIN stream.
@@ -703,7 +703,7 @@ abstract class CLICommand {
     public function select($prompt, $choices, $defaultIndex = null) {
         if (gettype($choices) == 'array' && count($choices) != 0) {
             do {
-                $this->print($prompt, [
+                $this->prints($prompt, [
                     'color' => 'gray',
                     'bold' => true
                 ]);
@@ -713,7 +713,7 @@ abstract class CLICommand {
                     $default = isset($choices[$defaultIndex]) ? $choices[$defaultIndex] : null;
 
                     if ($default !== null) {
-                        $this->print('Enter = "'.$default.'"',[
+                        $this->prints('Enter = "'.$default.'"',[
                             'color' => 'light-blue'
                         ]);
                     }
@@ -786,7 +786,7 @@ abstract class CLICommand {
      * @since 1.0
      */
     public function success($message) {
-        $this->print("Success: ", [
+        $this->prints("Success: ", [
             'color' => 'light-green',
             'bold' => true
         ]);
@@ -800,7 +800,7 @@ abstract class CLICommand {
      * @since 1.0
      */
     public function info($message) {
-        $this->print('Info: ', [
+        $this->prints('Info: ', [
             'color' => 'blue',
             'bold' => true
         ]);
@@ -814,7 +814,7 @@ abstract class CLICommand {
      * @since 1.0
      */
     public function warning($message) {
-        $this->print('Warning: ', [
+        $this->prints('Warning: ', [
             'color' => 'light-yellow',
             'bold' => true
         ]);
@@ -844,7 +844,7 @@ abstract class CLICommand {
             $this->error($invalidStr);
 
             foreach ($invalidArgsVals as $argName) {
-                $this->print('Info:', [
+                $this->prints('Info:', [
                     'color' => 'light-yellow',
                     'force-styling' => $this->isArgProvided('force-styling')
                 ]);

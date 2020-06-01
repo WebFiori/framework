@@ -113,7 +113,7 @@ class Controller {
      * @var type 
      * @since 1.3.4
      */
-    private $dbErrDetails;
+    private static $dbErrDetails;
     /**
      * A default database to connect to.
      * @var type 
@@ -196,14 +196,16 @@ class Controller {
      * <li><b>error-code</b>: Error code.</li>
      * <li><b>error-message</b>: A message that tells more information about 
      * the error.</li>
+     * <li><b>query</b>: This index will not be always available. If the error was a result 
+     * of executing SQL query, it will be set and it will contain the query that 
+     * caused the error.</li>
+     * <li><b>controller</b>: The controller class at which the database error happened.</li>
      * If no errors, the first index will have the value 0 and 
-     * the second index will have the value 'NO_ERR'. If the error was a result 
-     * of executing SQL query, there will be extra index which contains the 
-     * query. The index name will be 'query'.
+     * the second index will have the value 'NO_ERR'.
      * @since 1.3.4
      */
     public function getDBErrDetails() {
-        return $this->dbErrDetails;
+        return self::$dbErrDetails;
     }
     /**
      * Returns the last executed query object.
@@ -686,7 +688,7 @@ class Controller {
 
         if ($result !== true) {
             $this->_setDBErrDetails($link->getErrorCode(),$link->getErrorMessage());
-            $this->dbErrDetails['query'] = $query->getQuery();
+            self::$dbErrDetails['query'] = $query->getQuery();
         }
         $qType = $query->getType();
 
@@ -712,9 +714,10 @@ class Controller {
      * @since 1.3.6
      */
     private function _setDBErrDetails($errCode,$errMessage) {
-        $this->dbErrDetails = [
+        self::$dbErrDetails = [
             'error-message' => $errMessage,
-            'error-code' => $errCode
+            'error-code' => $errCode,
+            'controller' => get_class($this)
         ];
     }
     /**

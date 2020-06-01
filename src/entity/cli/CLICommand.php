@@ -703,7 +703,8 @@ abstract class CLICommand {
     public function select($prompt, $choices, $defaultIndex = null) {
         if (gettype($choices) == 'array' && count($choices) != 0) {
             do {
-                $this->prints($prompt, [
+
+                $this->println($prompt, [
                     'color' => 'gray',
                     'bold' => true
                 ]);
@@ -711,17 +712,16 @@ abstract class CLICommand {
 
                 if ($defaultIndex !== null && gettype($defaultIndex) == 'integer') {
                     $default = isset($choices[$defaultIndex]) ? $choices[$defaultIndex] : null;
-
-                    if ($default !== null) {
-                        $this->prints('Enter = "'.$default.'"',[
-                            'color' => 'light-blue'
-                        ]);
-                    }
-                } 
-                $this->println();
-
+                }
                 foreach ($choices as $choiceIndex => $choiceTxt) {
-                    $this->println($choiceIndex.": ".$choiceTxt);
+                    if ($choiceTxt == $default) {
+                        $this->println($choiceIndex.": ".$choiceTxt, [
+                            'color' => 'light-blue',
+                            'bold' => 'true'
+                        ]);
+                    } else {
+                        $this->println($choiceIndex.": ".$choiceTxt);
+                    }
                 }
                 $input = trim($this->read());
 

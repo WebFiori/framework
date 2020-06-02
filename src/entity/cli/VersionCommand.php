@@ -40,17 +40,17 @@ class VersionCommand extends CLICommand {
      */
     public function exec() {
         if (CLI::getActiveCommand()->getName() == $this->getName()) {
-            $this->print("Framework Version: ", [
+            $this->prints("Framework Version: ", [
                 'color' => 'light-blue',
                 'bold' => true
             ]);
             $this->println(WebFiori::getConfig()->getVersion());
-            $this->print("Release Date: ", [
+            $this->prints("Release Date: ", [
                 'color' => 'light-blue',
                 'bold' => true
             ]);
             $this->println(WebFiori::getConfig()->getReleaseDate());
-            $this->print("Version Type: ", [
+            $this->prints("Version Type: ", [
                 'color' => 'light-blue',
                 'bold' => true
             ]);
@@ -68,11 +68,11 @@ class VersionCommand extends CLICommand {
                 ."      \ /  \ / /  /                   |    \n"
                 ."       ______ /__/                    |    \n");
 
-            $this->print('WebFiori Framework ', [
+            $this->prints('WebFiori Framework ', [
                 'color' => 'light-green',
                 'bold' => true
             ]);
-            $this->print(' (c) Version ');
+            $this->prints(' (c) Version ');
             $this->println(WebFiori::getConfig()->getVersion()." ".WebFiori::getConfig()->getVersionType()."\n\n", [
                 'color' => 'light-yellow',
                 'bold' => true

@@ -199,7 +199,7 @@ class CronCommand extends CLICommand {
                 $this->println($message);
             }
         } else {
-            $this->print("TIP: ", [
+            $this->prints("TIP: ", [
                 'color' => 'yellow'
             ]);
             $this->println("Supply the argument '--show-log' to show execution log.");

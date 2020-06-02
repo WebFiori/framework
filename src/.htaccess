@@ -8,8 +8,8 @@ Options -Indexes
     RewriteRule ^(vendor|apis|conf|entity|ini|logic|logs|pages) - [F,L]
     
     # Uncomment next two lines to redirect http to https
-    #RewriteCond %{HTTPS} Off
-    #RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+    #RewriteCond %{SERVER_PORT} 80
+    #RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [R,L]  
 
     # Send all trafic to framework seed and make your work bloom.
     RewriteCond %{REQUEST_FILENAME} !-f

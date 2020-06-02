@@ -108,18 +108,18 @@ class HelpCommand extends CLICommand {
                 ]);
 
                 foreach ($args as $argName => $options) {
-                    $this->print("    %25s: ", $argName, [
+                    $this->prints("    %25s: ", $argName, [
                         'bold' => true,
                         'color' => 'yellow'
                     ]);
 
                     if ($options['optional']) {
-                        $this->print("[Optional]");
+                        $this->prints("[Optional]");
                     }
 
                     if (isset($options['default'])) {
                         $default = $options['default'];
-                        $this->print("[Default = '$default']");
+                        $this->prints("[Default = '$default']");
                     }
                     $this->println(" %s", $options['description']);
                 }

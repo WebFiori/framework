@@ -239,7 +239,9 @@ abstract class CLICommand {
      * This method will display the question and wait for the user to confirm the 
      * action by entering 'y' or 'n' in the terminal. If the user give something 
      * other than 'Y' or 'n', it will shows an error and ask him to confirm 
-     * again.
+     * again. If a default answer is provided, it will appear in upper case in the 
+     * terminal. For example, if default is set to true, at the end of the prompt, 
+     * the string that shows the options would be like '(Y/n)'.
      * @param string $confirmTxt The text of the question which will be asked. 
      * @return boolean If the user choose 'y', the method will return true. If 
      * he choose 'n', the method will return false. 
@@ -253,26 +255,22 @@ abstract class CLICommand {
         $answer = null;
 
         do {
+            if ($default === true) {
+                $optionsStr = '(Y/n)';
+            } else if ($default === false) {
+                $optionsStr = '(y/N)';
+            } else {
+                $optionsStr = '(y/n)';
+            }
             $this->prints($confirmTxt, [
                 'color' => 'gray',
                 'bold' => true
             ]);
-            $this->println('(y/n)', [
+            $this->println($optionsStr, [
                 'color' => 'light-blue'
             ]);
 
-            if ($default === true) {
-                $this->println('Enter = "y"', [
-                    'color' => 'light-blue'
-                ]);
-            } else {
-                if ($default === false) {
-                    $this->println('Enter = "n"', [
-                    'color' => 'light-blue'
-                ]);
-                }
-            }
-            $input = $this->read();
+            $input = strtolower(trim($this->read()));
 
             if ($input == 'n') {
                 $answer = false;

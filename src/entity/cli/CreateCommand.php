@@ -1,6 +1,7 @@
 <?php
 namespace webfiori\entity\cli;
-
+use webfiori\entity\Util;
+use webfiori\entity\AutoLoader;
 /**
  * A command which is used to automate some of the common tasks such as 
  * creating query classes or controllers.
@@ -26,7 +27,7 @@ class CreateCommand extends CLICommand {
         }
         
     }
-    public function _createQueryClass() {
+    public function getClassInfo() {
         $classExist = true;
         do {
             $className = $this->_getClassName();
@@ -37,7 +38,28 @@ class CreateCommand extends CLICommand {
                 $this->error('A class in the given namespace which has the given name was found.');
             }
         } while ($classExist);
-        
+        $isFileExist = true;
+        do {
+            $path = $this->_getClassPath();
+            if (file_exists($path.DIRECTORY_SEPARATOR.$className.'.php')) {
+                $this->warning('A file which has the same as the class name was found.');
+                $isReplace = $this->confirm('Would you like to override the file?', false);
+                if ($isReplace) {
+                    $isFileExist = false;
+                }
+            } else {
+                $isFileExist = false;
+            }
+        } while ($isFileExist);
+        return [
+            'name' => $className,
+            'namespace' => $ns,
+            'path' => $path
+        ];
+    }
+    public function _createQueryClass() {
+        $classInfo = $this->getClassInfo();
+        Util::print_r($classInfo);
         return 0;
     }
     private function _getNamespace() {
@@ -50,6 +72,24 @@ class CreateCommand extends CLICommand {
             }
         } while (!$isNameValid);
         return trim($ns,'\\');
+    }
+    private function _getClassPath() {
+        $validPath = false;
+        do {
+            $path = $this->getInput("Where would you like to store the class? (must be a directory inside '".ROOT_DIR."')");
+            $fixedPath = ROOT_DIR.DIRECTORY_SEPARATOR.trim(trim($path,'/'),'\\');
+            if (Util::isDirectory($fixedPath)) {
+                if (!in_array($fixedPath, AutoLoader::getFolders())) {
+                    $this->error('Provoded directory is not part of autoload directories.');
+                } else {
+                    $validPath = true;
+                }
+            } else {
+                $this->error('Provided direcory is not a directory or it does not exist.');
+            }
+            
+        } while (!$validPath);
+        return $fixedPath;
     }
     private function _validateNamespace($ns) {
         if ($ns == '\\') {

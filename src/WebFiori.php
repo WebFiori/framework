@@ -57,6 +57,14 @@ define('MICRO_START', microtime(true));
  */
 define('LOAD_COMPOSER_PACKAGES', true);
 /**
+ * A constant which is used to enable or disable HTTP access to cron.
+ * If the constant value is set to true, the framework will add routes to the 
+ * components which is used to allow access to cron control panel. The control 
+ * panel is used to execute jobs and check execution status. Default value is false.
+ * @since 1.1.0
+ */
+define('CRON_THROUGH_HTTP', false);
+/**
  * This constant is used to tell the framework if more information should 
  * be displayed if an exception is thrown or an error happens. The main aim 
  * of this constant is to hide some sensitive information from users if the 

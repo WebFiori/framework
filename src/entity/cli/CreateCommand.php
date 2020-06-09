@@ -3,6 +3,7 @@ namespace webfiori\entity\cli;
 use webfiori\entity\Util;
 use webfiori\entity\AutoLoader;
 use phMysql\MySQLQuery;
+use phMysql\MySQLColumn;
 /**
  * A command which is used to automate some of the common tasks such as 
  * creating query classes or controllers.
@@ -17,8 +18,8 @@ class CreateCommand extends CLICommand {
     }
     public function exec(): int {
         $options = [
-            'Entity class from query.',
             'Query class.',
+            'Entity class from query.',
             'Quit.'
         ];
         $answer = $this->select('What would you like to create?', $options, count($options) - 1);
@@ -32,7 +33,35 @@ class CreateCommand extends CLICommand {
         
     }
     public function _createEntityFromQuery() {
+        $queryClassNameValidity = false;
+        do {
+            $queryClassName = $this->getInput('Enter query class name (include namespace):');
+            if (!class_exists($queryClassName)) {
+                $this->error('Class not found.');
+                continue;
+            }
+            $queryObj = new $queryClassName();
+            if (!$queryObj instanceof MySQLQuery) {
+                $this->error('The given class is not a child of the class "MySQLQuery".');
+                continue;
+            }
+            $queryClassNameValidity = true;
+        } while (!$queryClassNameValidity);
+        $this->println('We need from you to give us entity class information.');
         $classInfo = $this->getClassInfo();
+        $implJsonI = $this->confirm('Would you like from your class to implement the interface JsonI?', true);
+        $this->println('Generating your entity...');
+        if (strlen($classInfo['namespace']) == 0){
+            $this->warning('The entity class will be added to the namespace "phMysql\entity".');
+        }
+        $queryObj->getTable()->createEntityClass([
+            'store-path' => $classInfo['path'],
+            'namespace' => $classInfo['namespace'],
+            'class-name' => $classInfo['name'],
+            'implement-jsoni' => $implJsonI
+        ]);
+        $this->success('Entity class created.');
+        return 0;
     }
     /**
      * Prompts the user to enter class information such as it is name.

@@ -2,6 +2,7 @@
 namespace webfiori\entity\cli;
 use webfiori\entity\Util;
 use webfiori\entity\AutoLoader;
+use phMysql\MySQLQuery;
 /**
  * A command which is used to automate some of the common tasks such as 
  * creating query classes or controllers.
@@ -16,6 +17,7 @@ class CreateCommand extends CLICommand {
     }
     public function exec(): int {
         $options = [
+            'Entity class from query.',
             'Query class.',
             'Quit.'
         ];
@@ -24,10 +26,27 @@ class CreateCommand extends CLICommand {
             return 0;
         } else if ($answer == 'Query class.') {
             return $this->_createQueryClass();
+        } else if ($answer == 'Entity class from query.') {
+            return $this->_createEntityFromQuery();
         }
         
     }
-    public function getClassInfo() {
+    public function _createEntityFromQuery() {
+        $classInfo = $this->getClassInfo();
+    }
+    /**
+     * Prompts the user to enter class information such as it is name.
+     * This method is useful in case we would like to create a class.
+     * @return array The method will return an array that contains 3 indices: 
+     * <ul>
+     * <li><b>name</b>: The name of the class.</li>
+     * <li><b>namespace</b>: The namespace of the class. It will be empty string if no 
+     * namespace is entered.</li>
+     * <li><b>path</b>: The location at which the class will be created.</li>
+     * </ul>
+     * @since 1.0
+     */
+    public function getClassInfo($options = []) {
         $classExist = true;
         do {
             $className = $this->_getClassName();

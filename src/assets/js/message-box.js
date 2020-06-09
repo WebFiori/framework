@@ -14,7 +14,7 @@ function smoothHide(el){
             el.style['display'] = 'none';
         }
     },15);
-};
+}
 /**
  * Add drag support for HTML message box.
  * @param {Node} source The message box.
@@ -36,7 +36,7 @@ function addDragSupport(source){
         pos4 = e.clientY;
         document.onmouseup = dragStopped;
         document.onmousemove = dragStarted;
-    };
+    }
     function dragStarted(e) {
         e = e || window.event;
         e.preventDefault();
@@ -46,9 +46,9 @@ function addDragSupport(source){
         pos4 = e.clientY;
         source.style.top = (source.offsetTop - pos2) + "px";
         source.style.left = (source.offsetLeft - pos1) + "px";
-    };
+    }
     function dragStopped(){
         document.onmouseup = null;
         document.onmousemove = null;
-    };
-};
+    }
+}

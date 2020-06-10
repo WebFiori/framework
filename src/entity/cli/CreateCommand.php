@@ -117,7 +117,7 @@ class CreateCommand extends CLICommand {
                 $this->error('The given name is invalid.');
             }
         } while ($invalidTableName);
-        $addDefaultCols = $this->confirm('Would you like to include default columns? Default columns include "id", "created-on" and "last-updated".');
+        $addDefaultCols = $this->confirm('Would you like to include default columns? Default columns include "id", "created-on" and "last-updated".', false);
         if ($addDefaultCols) {
             $tempQuery->getTable()->addDefaultCols();
         }
@@ -131,21 +131,54 @@ class CreateCommand extends CLICommand {
             if (!$isAdded) {
                 $this->warning('The column was not added. Mostly, key name is invalid. Try again.');
             } else {
-                $dataSize = $this->getInput('Enter column size:');
-                $isPrimary = $this->confirm('Is this column primary?', false);
-                $isUnique = $this->confirm('Is this column unique?', false);
-                $isNull = $this->confirm('Can this column have null values?', false);
-                if ($this->confirm('Would you like to include default value for the column?', false)) {
-                    $defaultVal = $this->getInput('Enter default value:');
+                $colObj = $tempQuery->getCol($colKey);
+                $this->_setSize($colObj);
+                $colObj->setIsPrimary($this->confirm('Is this column primary?', false));
+                
+                if (!$colObj->isPrimary()) {
+                    $colObj->setIsUnique($this->confirm('Is this column unique?', false));
+                } else if ($colObj->getType() == 'int') {
+                    $colObj->setIsAutoInc($this->confirm('Is this column auto increment?', false));
                 }
-                if ($this->confirm('Would you like to add your own comment about the column?', false)) {
-                    $defaultVal = $this->getInput('Enter your comment:');
-                }
-                $this->success('Column added.');
+//                $isNull = $this->confirm('Can this column have null values?', false);
+//                if ($this->confirm('Would you like to include default value for the column?', false)) {
+//                    $defaultVal = $this->getInput('Enter default value:');
+//                }
+//                if ($this->confirm('Would you like to add your own comment about the column?', false)) {
+//                    $defaultVal = $this->getInput('Enter your comment:');
+//                }
+//                $this->success('Column added.');
             }
             $addMoreCols = $this->confirm('Would you like to add another column?');
         } while ($addMoreCols);
         return 0;
+    }
+    /**
+     * 
+     * @param MySQLColumn $colObj
+     */
+    private function _setSize($colObj) {
+        $supportSize = $colObj->setSize(5);
+        if ($supportSize) {
+            $valid = false;
+            do {
+                $dataSize = $this->getInput('Enter column size:');
+                if ($colObj->getType() == 'varchar' && $dataSize > 21845) {
+                    $this->warning('The data type "varchar" has a maximum size of 21845. The '
+                            . 'data type of the column will be changed to "mediumtext" if you continue.');
+                    if (!$this->confirm('Would you like to change data type?', false)) {
+                        continue;
+                    }
+                }
+                if ($colObj->getType() == 'int' && $dataSize > 11) {
+                    $this->warning('Size is set to 11 since this is the maximum size for "int" type.');
+                }
+                $valid = $colObj->setSize($dataSize);
+                if (!$valid) {
+                    $this->error('Invalid size is given.');
+                }
+            } while (!$valid);
+        }
     }
     private function _getNamespace() {
         $isNameValid = false;

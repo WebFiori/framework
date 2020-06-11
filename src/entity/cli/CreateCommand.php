@@ -139,18 +139,30 @@ class CreateCommand extends CLICommand {
                     $colObj->setIsUnique($this->confirm('Is this column unique?', false));
                 } else if ($colObj->getType() == 'int') {
                     $colObj->setIsAutoInc($this->confirm('Is this column auto increment?', false));
+                    $colObj->setIsNull($this->confirm('Can this column have null values?', false));
+                    if ($this->confirm('Would you like to include default value for the column?', false)) {
+                        $defaultVal = trim($this->getInput('Enter default value:'));
+                        if (strlen($defaultVal) != 0) {
+                            $colObj->setDefault($defaultVal);
+                        }
+                    }
                 }
-//                $isNull = $this->confirm('Can this column have null values?', false);
-//                if ($this->confirm('Would you like to include default value for the column?', false)) {
-//                    $defaultVal = $this->getInput('Enter default value:');
-//                }
-//                if ($this->confirm('Would you like to add your own comment about the column?', false)) {
-//                    $defaultVal = $this->getInput('Enter your comment:');
-//                }
-//                $this->success('Column added.');
+                if ($this->confirm('Would you like to add your own comment about the column?', false)) {
+                    $comment = $this->getInput('Enter your comment:');
+                    if (strlen($comment) != 0) {
+                        $colObj->setComment($comment);
+                    }
+                }
+                $this->success('Column added.');
             }
             $addMoreCols = $this->confirm('Would you like to add another column?');
         } while ($addMoreCols);
+        $tempQuery->createTable();
+        
+        $this->println($tempQuery->getQuery());
+        $writer = new QueryClassCreator($tempQuery, $classInfo);
+        $writer->writeClass();
+        $this->success('New class created.');
         return 0;
     }
     /**
@@ -162,6 +174,7 @@ class CreateCommand extends CLICommand {
         if ($supportSize) {
             $valid = false;
             do {
+                $colDataType = $colObj->getType();
                 $dataSize = $this->getInput('Enter column size:');
                 if ($colObj->getType() == 'varchar' && $dataSize > 21845) {
                     $this->warning('The data type "varchar" has a maximum size of 21845. The '
@@ -170,14 +183,29 @@ class CreateCommand extends CLICommand {
                         continue;
                     }
                 }
-                if ($colObj->getType() == 'int' && $dataSize > 11) {
+                if ($colDataType == 'int' && $dataSize > 11) {
                     $this->warning('Size is set to 11 since this is the maximum size for "int" type.');
                 }
                 $valid = $colObj->setSize($dataSize);
                 if (!$valid) {
                     $this->error('Invalid size is given.');
+                } else {
+                    $this->_setScale($colObj);
                 }
             } while (!$valid);
+        }
+    }
+    private function _setScale($colObj) {
+        $colDataType = $colObj->getType();
+        if ($colDataType == 'decimal' || $colDataType == 'float' || $colDataType == 'double') {
+            $validScale = false;
+            do {
+                $scale = $this->getInput('Enter the scale (number of numbers to the right of decimal point):');
+                $validScale = $colObj->setScale($scale);
+                if (!$validScale) {
+                    $this->error('Invalid scale value.');
+                }
+            } while (!$validScale);
         }
     }
     private function _getNamespace() {

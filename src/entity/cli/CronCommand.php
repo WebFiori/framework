@@ -127,17 +127,21 @@ class CronCommand extends CLICommand {
         $jobName = $this->getArgValue('--job-name');
         $cPass = $this->getArgValue('p');
         $retVal = -1;
+        $jobsNamesArr = Cron::getJobsNames();
+        $jobsNamesArr[] = 'Cancel';
         
         if ($jobName === null) {
-            $jobName = $this->select('Select one of the scheduled jobs to force:', Cron::getJobsNames());
+            $jobName = $this->select('Select one of the scheduled jobs to force:', $jobsNamesArr, count($jobsNamesArr) - 1);
         } 
         
-        $result = Cron::run($cPass,$jobName.'',true, $this);
-
-        if ($result == 'INV_PASS') {
-            $this->error("Provided password is incorrect.");
+        if ($jobName == 'Cancel') {
+            $retVal = 0;
         } else {
-            if ($result == 'JOB_NOT_FOUND') {
+            $result = Cron::run($cPass,$jobName.'',true, $this);
+
+            if ($result == 'INV_PASS') {
+                $this->error("Provided password is incorrect.");
+            } else if ($result == 'JOB_NOT_FOUND') {
                 $this->error("No job was found which has the name '".$jobName."'");
             } else {
                 $this->_printExcResult($result);
@@ -146,7 +150,6 @@ class CronCommand extends CLICommand {
             }
         }
         
-
         return $retVal;
     }
     private function _printExcResult($result) {

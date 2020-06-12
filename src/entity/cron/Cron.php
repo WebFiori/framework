@@ -558,7 +558,7 @@ class Cron {
                 $job->setJobName('job-'.$this->jobsQueue()->size());
             }
             $retVal = $this->cronJobsQueue->enqueue($job);
-            if ($retVal === true) {
+            if ($retVal === true && !in_array($job->getJobName(), $this->jobsNamesArr)) {
                 $this->jobsNamesArr[] = $job->getJobName();
             }
         }

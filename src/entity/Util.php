@@ -562,7 +562,6 @@ class Util {
         $readable = print_r($expr, true);
         if (CLI::isCLI()) {
             fprintf(STDOUT, "%s\n",$readable);
-            return;
         } else {
             $readable = print_r($expr, true);
             $htmlEntityAdded = str_replace('<', '&lt;', str_replace('>', '&gt;', $readable));

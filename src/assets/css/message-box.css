@@ -45,10 +45,3 @@
     margin:0;
     font-family:monospace;
 }
-.message-box-body{
-    overflow-y:scroll;
-    overflow-x:auto;
-    width:100%;
-    height:100px;
-    padding:10px;
-}

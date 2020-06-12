@@ -117,6 +117,13 @@ class CreateCommand extends CLICommand {
                 $this->error('The given name is invalid.');
             }
         } while ($invalidTableName);
+        $incComment = $this->confirm('Would you like to add your comment about the table?');
+        if ($incComment) {
+            $tableComment = $this->getInput('Enter your comment:');
+            if (strlen($tableComment) != 0) {
+                $tempQuery->getTable()->setComment($tableComment);
+            }
+        }
         $addDefaultCols = $this->confirm('Would you like to include default columns? Default columns include "id", "created-on" and "last-updated".', false);
         if ($addDefaultCols) {
             $tempQuery->getTable()->addDefaultCols();
@@ -160,9 +167,15 @@ class CreateCommand extends CLICommand {
         $tempQuery->createTable();
         
         $this->println($tempQuery->getQuery());
+        if ($this->confirm('Would you like to create an entity class that maps to the database table?')) {
+            $entityInfo = $this->getClassInfo();
+            $entityInfo['implement-jsoni'] = $this->confirm('Would you like from your class to implement the interface JsonI?', true);
+            $classInfo['entity-info'] = $entityInfo;
+        }
         $writer = new QueryClassCreator($tempQuery, $classInfo);
         $writer->writeClass();
         $this->success('New class created.');
+        
         return 0;
     }
     /**

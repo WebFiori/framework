@@ -215,6 +215,24 @@ abstract class CLICommand {
         }
     }
     /**
+     * Prints an array as a list of items.
+     * This method is useful if the developer would like to print out a list 
+     * of multiple items. Each item will be prefixed with a number that represents 
+     * its index in the array.
+     * @param array $array The array that will be printed.
+     * @since 1.0
+     */
+    public function printList($array) {
+        if (gettype($array) == 'array') {
+            for($x = 0 ; $x < count($array) ; $x++) {
+                $this->prints("- ", [
+                    'color' => 'green'
+                ]);
+                $this->println($array[$x]);
+            }
+        }
+    }
+    /**
      * Clears the whole content of the console.
      * Note that support for this operation depends on terminal support for 
      * ANSI escape codes.

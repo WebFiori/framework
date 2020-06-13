@@ -24,23 +24,38 @@ class QueryClassCreator {
      */
     private $entityMapper;
     /**
-     * An array that contains associated entity class information.
-     * The array will have the following indices:
-     * <ul>
-     * <li><b>name</b>: The name of the entity class.</li>
-     * <li><b>namespace</b>: The namespace that the entity class belongs to.</li>
-     * <li><b>path</b>: The location at which the entity class will be created in.</li>
-     * <li><b>implement-jsoni</b>: A boolean. Set to true if the entity class will 
-     * implement the interface 'JsonI'.</li>
-     * </ul>
-     * @var array|null
-     */
-    private $entityInfo;
-    /**
      *
      * @var MySQLQuery 
      */
     private $queryObj;
+    /**
+     * Creates new instance of the class.
+     * @param MySQLQuery $queryObj An object of type 'MySQLQuery' which contains the 
+     * information of the query class that will be created.
+     * @param array $classInfoArr An associative array that contains the information 
+     * of the class that will be created. The array must have the following indices: 
+     * <ul>
+     * <li><b>name</b>: The name of the class that will be created. If not provided, the 
+     * string 'NewQuery' is used.</li>
+     * <li><b>namespace</b>: The namespace that the class will belong to. If not provided, 
+     * the namespace 'phMysql\query' is used.</li>
+     * <li><b>path</b>: The location at which the query will be created on. If not 
+     * provided, the constant ROOT_DIR is used. </li>
+     * <li><b>entity-info</b>: A sub associative array that contains information about the entity 
+     * at which the class is mapped to (if any). The array must have the following indices:
+     * <ul>
+     * <li><b>name</b>: The name of the entity class that will be created.</li>
+     * <li><b>path</b>: The location at which the entity class will be created on.</li>
+     * <li><b>namespace</b>: The namespace at which the entity belongs to.</li>
+     * <li><b>implement-jsoni</b>: A bollean which is set to true if the entity 
+     * class will implement the interface 'JsonI'.</li>
+     * </ul>
+     * </li>
+     * </ul>
+     * @throws InvalidArgumentException If the first parameter is not an object of 
+     * type 'MySQLQuery'.
+     * @since 1.0
+     */
     public function __construct($queryObj, $classInfoArr) {
         if (!$queryObj instanceof MySQLQuery) {
             throw new InvalidArgumentException('The given object is not an instance of the class \'MySQLQuery\'');
@@ -48,8 +63,6 @@ class QueryClassCreator {
         $this->classAsStr = '';
         $this->queryObj = $queryObj;
         if (isset($classInfoArr['entity-info'])) {
-            
-            $this->entityInfo = $classInfoArr['entity-info'];
             $this->entityMapper = new EntityMapper($this->queryObj->getTable(), 
                     $classInfoArr['entity-info']['name'], 
                     $classInfoArr['entity-info']['path'], 
@@ -59,7 +72,7 @@ class QueryClassCreator {
         if (strlen($classInfoArr['namespace']) != 0) {
             $this->ns = $classInfoArr['namespace'];
         } else {
-            $this->ns = 'phMySql\\entity';
+            $this->ns = 'phMySql\\query';
         }
         if (isset($classInfoArr['path'])) {
             $this->path = $classInfoArr['path'];
@@ -127,7 +140,17 @@ class QueryClassCreator {
         $this->a('}', 1);
     }
     private function _addFks() {
-        
+        $fks = $this->queryObj->getTable()->getForeignKeys();
+        foreach ($fks as $fkObj) {
+            if ($fkObj instanceof \phMysql\ForeignKey);
+            $this->a('$this->getTable()->addReference($this, [');
+            $ownerCols = array_keys($fkObj->getOwnerCols());
+            $sourceCols = array_keys($fkObj->getOwnerCols());
+            for($x = 0 ; $x < count($ownerCols) ; $x ++) {
+                $this->a("'$ownerCols[$x]' => '$sourceCols[$x]',");
+            }
+            $this->a("], '".$fkObj->getKeyName()."', '".$fkObj->getOnUpdate()."', '".$fkObj->getOnDelete()."');");
+        }
     }
     private function _addCols() {
         $defaultColsKeys = $this->queryObj->getTable()->getDefaultColsKeys();
@@ -212,7 +235,7 @@ class QueryClassCreator {
         $this->a('class '.$this->className.' extends MySQLQuery {');
     }
     private function _addQueries() {
-        $colsKeys = array_keys($this->queryObj->getTable()->getColumns());
+        $colsKeys = $this->queryObj->getTable()->colsKeys();
         $defaultColsKeys = $this->queryObj->getTable()->getDefaultColsKeys();
         \webfiori\entity\Util::print_r($defaultColsKeys);
         if ($this->entityMapper !== null) {
@@ -222,18 +245,20 @@ class QueryClassCreator {
             $this->a(' */', 1);
             $this->a('public function add($entity) {', 1);
             $this->a('$this->insertRecord([', 2);
-            $getMethodsNames = $this->entityMapper->getEntityMethods()['getters'];
             $index = 0;
             foreach ($colsKeys as $colKey) {
                 if (!(isset($defaultColsKeys[$colKey]) && $defaultColsKeys[$colKey] !== null)) {
-                    $this->a("'$colKey' => \$entity->".$getMethodsNames[$index].'(),', 3);
+                    $this->a("'$colKey' => \$entity->".$this->entityMapper->mapToMethodName($colKey).'(),', 3);
                 }
                 $index++;
             }
             $this->a(']);', 2);
             $this->a('}', 1);
             
-            $primaryKeys = $this->queryObj->getTable()->getPrimaryKeyCols();
+            $primaryKeys = $this->queryObj->getTable()->getPrimaryColsKeys();
+            if (count($primaryKeys) == 0) {
+                $primaryKeys = $this->queryObj->getTable()->getUniqueColsKeys();
+            }
             if (count($primaryKeys) !== 0) {
                 $this->a('/**', 1);
                 $this->a(' * Constructs a query that can be used to update a record.', 1);
@@ -241,14 +266,30 @@ class QueryClassCreator {
                 $this->a(' */', 1);
                 $this->a("public function update(\$entity) {", 1);
                 $this->a('$this->updateRecord([', 2);
+                foreach ($colsKeys as $colKey) {
+                    if (!in_array($colKey, $primaryKeys)) {
+                        $this->a("'$colKey' => \$entity->".$this->entityMapper->mapToMethodName($colKey, 'g').'(),', 3);
+                    }
+                }
+                $this->a('], [', 2);
+                foreach ($colsKeys as $colKey) {
+                    if (in_array($colKey, $primaryKeys)) {
+                        $this->a("'$colKey' => \$entity->".$this->entityMapper->mapToMethodName($colKey, 'g').'(),', 3);
+                    }
+                }
                 $this->a(']);', 2);
                 $this->a('}', 1);
                 $this->a('/**', 2);
-                $this->a(' * Constructs a query that can be used to remove a record.', 2);
-                $this->a(' * @param '.$this->getEntityName().' $entity An instance of the class "'.$this->getEntityName().'" that contains record information.', 2);
-                $this->a(' */', 2);
+                $this->a(' * Constructs a query that can be used to remove a record.', 1);
+                $this->a(' * @param '.$this->getEntityName().' $entity An instance of the class "'.$this->getEntityName().'" that contains record information.', 1);
+                $this->a(' */', 1);
                 $this->a("public function delete(\$entity) {",1);
                 $this->a('$this->deleteRecord([', 2);
+                foreach ($colsKeys as $colKey) {
+                    if (in_array($colKey, $primaryKeys)) {
+                        $this->a("'$colKey' => \$entity->".$this->entityMapper->mapToMethodName($colKey, 'g').'(),', 3);
+                    }
+                }
                 $this->a(']);', 2);
                 $this->a('}',1);
             }
@@ -260,13 +301,11 @@ class QueryClassCreator {
         $this->a(" */", 1);
         $this->a('public function selectAll($limit = -1, $offset = -1) {', 1);
         $this->a('$this->select([', 2);
-        $this->a("'limit' => \$limit,",3);
-        $this->a("'offset' => \$offset", 3);
-        $this->a("]);",2);
+        $this->a("'limit' => \$limit,", 3);
+        $this->a("'offset' => \$offset,", 3);
+        $this->a("'map-result-to' => '".$this->getEntityNamespace().'\\'.$this->getEntityName()."',", 3);
+        $this->a("]);", 2);
         $this->a('}', 1);
-        
-    }
-    private function _($param) {
         
     }
     /**
@@ -281,15 +320,8 @@ class QueryClassCreator {
         $queryFile->remove();
         $queryFile->setRawData($this->classAsStr);
         $queryFile->write(false, true);
-        if ($this->entityInfo !== null) {
-            $constructor = $this->ns.'\\'.$this->className;
-            $queryClass = new $constructor();
-            $queryClass->getTable()->createEntityClass([
-                'store-path' => $this->getEntityPath(),
-                'class-name' => $this->getEntityName(),
-                'namespace' => $this->getEntityNamespace(),
-                'implement-jsoni' => $this->entityInfo['implement-jsoni']
-            ]);
+        if ($this->entityMapper !== null) {
+            $this->entityMapper->create();
         }
     }
     /**

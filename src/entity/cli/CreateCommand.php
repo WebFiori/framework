@@ -4,6 +4,8 @@ use webfiori\entity\Util;
 use webfiori\entity\AutoLoader;
 use phMysql\MySQLQuery;
 use phMysql\MySQLColumn;
+use Exception;
+use Error;
 /**
  * A command which is used to automate some of the common tasks such as 
  * creating query classes or controllers.
@@ -16,14 +18,14 @@ class CreateCommand extends CLICommand {
     public function __construct() {
         parent::__construct('create', [], 'Creates a query class, entity, API or a controller');
     }
-    public function exec(): int {
+    public function exec() {
         $options = [
             'Query class.',
             'Entity class from query.',
             'Quit.'
         ];
         $answer = $this->select('What would you like to create?', $options, count($options) - 1);
-        if ($answer == 'Nothing.') {
+        if ($answer == 'Quit.') {
             return 0;
         } else if ($answer == 'Query class.') {
             return $this->_createQueryClass();
@@ -75,7 +77,7 @@ class CreateCommand extends CLICommand {
      * </ul>
      * @since 1.0
      */
-    public function getClassInfo($options = []) {
+    public function getClassInfo() {
         $classExist = true;
         do {
             $className = $this->_getClassName();
@@ -105,10 +107,7 @@ class CreateCommand extends CLICommand {
             'path' => $path
         ];
     }
-    public function _createQueryClass() {
-        $classInfo = $this->getClassInfo();
-        $tempQuery = new MySQLQuery();
-        $addMoreCols = true;
+    private function _setTableName($tempQuery) {
         $invalidTableName = true;
         do {
             $tableName = $this->getInput('Enter database table name:');
@@ -117,13 +116,72 @@ class CreateCommand extends CLICommand {
                 $this->error('The given name is invalid.');
             }
         } while ($invalidTableName);
-        $incComment = $this->confirm('Would you like to add your comment about the table?');
-        if ($incComment) {
-            $tableComment = $this->getInput('Enter your comment:');
-            if (strlen($tableComment) != 0) {
-                $tempQuery->getTable()->setComment($tableComment);
+    }
+    /**
+     * 
+     * @param MySQLQuery $query
+     */
+    public function _addFks($query) {
+        $addMoreFks = true;
+        do {
+            $refQuery = null;
+            $refQueryName = $this->getInput('Enter the name of the referenced query class (with namespace):');
+            try {
+                $refQuery = new $refQueryName();
+            } catch (Error $ex) {
+                $this->error($ex->getMessage());
+                continue;
             }
-        }
+            if ($refQuery instanceof MySQLQuery) {
+                $fkName = $this->getInput('Enter a name for the foreign key:');
+                $fkCols = $this->_getFkCols($query);
+                $fkArr = [];
+                foreach ($fkCols as $colKey) {
+                    $fkArr[$colKey] = $this->select('Select the column that will be referenced by the column \''.$colKey.'\':', $refQuery->getTable()->colsKeys());
+                }
+                $onUpdate = $this->select('Choose on update condition:', [
+                    'cascade', 'restrict', 'set null', 'set default', 'no action'
+                ], 1);
+                $onDelete = $this->select('Choose on delete condition:', [
+                    'cascade', 'restrict', 'set null', 'set default', 'no action'
+                ], 1);
+                $added = $query->getTable()->addReference($refQuery, $fkArr, $fkName, $onUpdate, $onDelete);
+                if ($added) {
+                    $this->success('Foreign key added.');
+                } else {
+                    $this->success('Unable to add the key.');
+                }
+            } else {
+                $this->error('The given class is not an instance of the class \'MySQLQuery\'.');
+            }
+            
+            $addMoreFks = $this->confirm ('Would you like to add another foreign key?');
+        } while ($addMoreFks);
+    }
+    private function _getFkCols($query) {
+        $moreCols = true;
+        $colNumber = 1;
+        $keys = $query->getTable()->colsKeys();
+        $fkCols = [];
+        do {
+            $colKey = $this->select('Select column #'.$colNumber.':', $keys);
+            if (!in_array($colKey, $fkCols)) {
+                $fkCols[] = $colKey;
+                $colNumber++;
+            } else {
+                $this->error('The column is already added.');
+            }
+            $moreCols = $this->confirm('Would you like to add another column to the foreign key?');
+        } while ($moreCols);
+        return $fkCols;
+    }
+    private function _createQueryClass() {
+        $classInfo = $this->getClassInfo();
+        
+        $tempQuery = new MySQLQuery();
+        $addMoreCols = true;
+        $this->_setTableName($tempQuery);
+        $this->_setTableComment($tempQuery);
         $addDefaultCols = $this->confirm('Would you like to include default columns? Default columns include "id", "created-on" and "last-updated".', false);
         if ($addDefaultCols) {
             $tempQuery->getTable()->addDefaultCols();
@@ -140,37 +198,27 @@ class CreateCommand extends CLICommand {
             } else {
                 $colObj = $tempQuery->getCol($colKey);
                 $this->_setSize($colObj);
-                $colObj->setIsPrimary($this->confirm('Is this column primary?', false));
-                
-                if (!$colObj->isPrimary()) {
-                    $colObj->setIsUnique($this->confirm('Is this column unique?', false));
-                } else if ($colObj->getType() == 'int') {
-                    $colObj->setIsAutoInc($this->confirm('Is this column auto increment?', false));
-                    $colObj->setIsNull($this->confirm('Can this column have null values?', false));
-                    if ($this->confirm('Would you like to include default value for the column?', false)) {
-                        $defaultVal = trim($this->getInput('Enter default value:'));
-                        if (strlen($defaultVal) != 0) {
-                            $colObj->setDefault($defaultVal);
-                        }
-                    }
-                }
-                if ($this->confirm('Would you like to add your own comment about the column?', false)) {
-                    $comment = $this->getInput('Enter your comment:');
-                    if (strlen($comment) != 0) {
-                        $colObj->setComment($comment);
-                    }
-                }
-                $this->success('Column added.');
+                $this->_isPrimaryCheck($colObj);
+                $this->_addColComment($colObj);
             }
             $addMoreCols = $this->confirm('Would you like to add another column?');
         } while ($addMoreCols);
         $tempQuery->createTable();
         
         $this->println($tempQuery->getQuery());
+        if ($this->confirm('Would you like to add foreign keys to the table?', false)) {
+            $this->_addFks($tempQuery);
+        }
         if ($this->confirm('Would you like to create an entity class that maps to the database table?')) {
             $entityInfo = $this->getClassInfo();
             $entityInfo['implement-jsoni'] = $this->confirm('Would you like from your class to implement the interface JsonI?', true);
             $classInfo['entity-info'] = $entityInfo;
+        }
+        if (strlen($classInfo['namespace']) == 0){
+            $this->warning('The query class will be added to the namespace "phMysql\query" since no namespace was provided.');
+        }
+        if (isset($classInfo['entity-info'])  && strlen($classInfo['entity-info']['namespace']) == 0){
+            $this->warning('The entity class will be added to the namespace "phMysql\entity" since no namespace was provided.');
         }
         $writer = new QueryClassCreator($tempQuery, $classInfo);
         $writer->writeClass();
@@ -182,8 +230,76 @@ class CreateCommand extends CLICommand {
      * 
      * @param MySQLColumn $colObj
      */
+    private function _isPrimaryCheck($colObj) {
+        $colObj->setIsPrimary($this->confirm('Is this column primary?', false));
+                
+        if (!$colObj->isPrimary()) {
+            $colObj->setIsUnique($this->confirm('Is this column unique?', false));
+        } else if ($colObj->getType() == 'int') {
+            $colObj->setIsAutoInc($this->confirm('Is this column auto increment?', false));
+            $colObj->setIsNull($this->confirm('Can this column have null values?', false));
+            $this->_setDefaultValue($colObj);
+        }
+    }
+    /**
+     * 
+     * @param MySQLColumn $colObj
+     */
+    private function _setDefaultValue($colObj) {
+        if ($this->confirm('Would you like to include default value for the column?', false)) {
+            if ($colObj->getType() == 'bool' || $colObj->getType() == 'boolean') {
+                $defaultVal = trim($this->getInput('Enter default value (true or false):'));
+                if ($defaultVal == 'true') {
+                    $colObj->setDefault(true);
+                } else if ($defaultVal == 'false') {
+                    $colObj->setDefault(false);
+                }
+            } else {
+                $defaultVal = trim($this->getInput('Enter default value:'));
+                if (strlen($defaultVal) != 0) {
+                    $colObj->setDefault($defaultVal);
+                }
+            }
+        }
+    }
+    /**
+     * 
+     * @param MySQLColumn $colObj
+     */
+    private function _addColComment($colObj) {
+        if ($this->confirm('Would you like to add your own comment about the column?', false)) {
+            $comment = $this->getInput('Enter your comment:');
+            if (strlen($comment) != 0) {
+                $colObj->setComment($comment);
+            }
+        }
+        $this->success('Column added.');
+    }
+    /**
+     * 
+     * @param MySQLQuery $tempQuery
+     */
+    private function _setTableComment($tempQuery) {
+        $incComment = $this->confirm('Would you like to add your comment about the table?', false);
+        if ($incComment) {
+            $tableComment = $this->getInput('Enter your comment:');
+            if (strlen($tableComment) != 0) {
+                $tempQuery->getTable()->setComment($tableComment);
+            }
+        }
+    }
+    /**
+     * 
+     * @param MySQLColumn $colObj
+     */
     private function _setSize($colObj) {
-        $supportSize = $colObj->setSize(5);
+        $type = $colObj->getType();
+        $supportSize = $type == 'int' 
+                || $type == 'varchar'
+                || $type == 'decimal' 
+                || $type == 'float'
+                || $type == 'double' 
+                || $type == 'text';
         if ($supportSize) {
             $valid = false;
             do {

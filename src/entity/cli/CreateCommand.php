@@ -1,9 +1,34 @@
 <?php
+/**
+ * MIT License
+ *
+ * Copyright (c) 2020 Ibrahim BinAlshikh, phMysql library.
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 namespace webfiori\entity\cli;
+
 use webfiori\entity\Util;
 use webfiori\entity\AutoLoader;
 use phMysql\MySQLQuery;
 use phMysql\MySQLColumn;
+use webfiori\WebFiori;
 use Exception;
 use Error;
 /**
@@ -22,6 +47,8 @@ class CreateCommand extends CLICommand {
         $options = [
             'Query class.',
             'Entity class from query.',
+            'Controller class.',
+            'Web services set.',
             'Quit.'
         ];
         $answer = $this->select('What would you like to create?', $options, count($options) - 1);
@@ -31,8 +58,49 @@ class CreateCommand extends CLICommand {
             return $this->_createQueryClass();
         } else if ($answer == 'Entity class from query.') {
             return $this->_createEntityFromQuery();
+        } else if ($answer == 'Controller class.') {
+            return $this->_createController();
+        } else if ($answer == 'Web services set.') {
+            return $this->_createWebServices();
         }
         
+    }
+    public function _createWebServices() {
+        return 0;
+    }
+    private function _createController() {
+        $classInfo = $this->getClassInfo();
+        if ($this->confirm('Would you like to associate the controller with query class?', false)) {
+            $classInfo['linked-query'] = $this->_getControllerQuery();
+        }
+        $dbConnections = array_keys(WebFiori::getConfig()->getDBConnections());
+        if (count($dbConnections) != 0) {
+            $classInfo['db-connection'] = $this->select('Select database connection:', $dbConnections);
+        } else {
+            $this->warning('No database connections available. You must specify the connection manually later.');
+        }
+        $writer = new ControllerClassWriter($classInfo);
+        $writer->writeClass();
+        $this->success('Class created.');
+        return 0;
+    }
+    private function _getControllerQuery() {
+        $validQuery = false;
+        $queryName = '';
+        do {
+            $queryName = $this->getInput('Enter query class name (include namespace):');
+            try {
+                $queryObj = new $queryName();
+                if (!($queryObj instanceof MySQLQuery)) {
+                    $this->error('Given object is not an instance of the class MySQLQuery.');
+                } else {
+                    $validQuery = true;
+                }
+            } catch (Error $ex) {
+                $this->error($ex->getMessage());
+            }
+        } while (!$validQuery);
+        return $queryName;
     }
     public function _createEntityFromQuery() {
         $queryClassNameValidity = false;
@@ -204,8 +272,6 @@ class CreateCommand extends CLICommand {
             $addMoreCols = $this->confirm('Would you like to add another column?');
         } while ($addMoreCols);
         $tempQuery->createTable();
-        
-        $this->println($tempQuery->getQuery());
         if ($this->confirm('Would you like to add foreign keys to the table?', false)) {
             $this->_addFks($tempQuery);
         }
@@ -220,7 +286,7 @@ class CreateCommand extends CLICommand {
         if (isset($classInfo['entity-info'])  && strlen($classInfo['entity-info']['namespace']) == 0){
             $this->warning('The entity class will be added to the namespace "phMysql\entity" since no namespace was provided.');
         }
-        $writer = new QueryClassCreator($tempQuery, $classInfo);
+        $writer = new QueryClassWriter($tempQuery, $classInfo);
         $writer->writeClass();
         $this->success('New class created.');
         
@@ -232,13 +298,15 @@ class CreateCommand extends CLICommand {
      */
     private function _isPrimaryCheck($colObj) {
         $colObj->setIsPrimary($this->confirm('Is this column primary?', false));
-                
+        $type = $colObj->getType();
         if (!$colObj->isPrimary()) {
-            $colObj->setIsUnique($this->confirm('Is this column unique?', false));
+            if (!($type == 'bool' || $type == 'boolean')) {
+                $colObj->setIsUnique($this->confirm('Is this column unique?', false));
+            }
+            $this->_setDefaultValue($colObj);
+            $colObj->setIsNull($this->confirm('Can this column have null values?', false));
         } else if ($colObj->getType() == 'int') {
             $colObj->setIsAutoInc($this->confirm('Is this column auto increment?', false));
-            $colObj->setIsNull($this->confirm('Can this column have null values?', false));
-            $this->_setDefaultValue($colObj);
         }
     }
     /**

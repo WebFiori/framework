@@ -65,7 +65,6 @@ class ClassWriter {
      * the namespace 'webfiori' is used.</li>
      * <li><b>path</b>: The location at which the query will be created on. If not 
      * provided, the constant ROOT_DIR is used. </li>
-     * </li>
      * </ul>
      */
     public function __construct($classInfoArr) {

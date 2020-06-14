@@ -98,7 +98,28 @@ class WebServicesWriter extends ClassWriter {
      * @param APIAction $service
      */
     private function _appendService($service) {
-        
+        $this->append('$this->addAction(APIAction::createService([', 2);
+        $this->append("'name' => '".$service->getName()."',", 3);
+        $this->append("'request-methods' => [", 3);
+        foreach ($service->getRequestMethods() as $method) {
+            $this->append("'$method',", 4);
+        }
+        if (count($service->getParameters()) != 0) {
+            $this->append("'parameters' => [", 3);
+            foreach ($service->getParameters() as $param) {
+                $this->_appendParam($param);
+            }
+            $this->append("],", 3);
+        }
+        $this->append("],", 3);
+        if (count($service->getResponsesDescriptions()) != 0) {
+            $this->append("'responses' => [", 3);
+            foreach ($service->getResponsesDescriptions() as $desc) {
+                $this->append("'". str_replace('\'', '\\\'', $desc)."',");
+            }
+            $this->append("],", 3);
+        }
+        $this->append(']);', 2);
     }
     /**
      * 

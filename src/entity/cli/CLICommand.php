@@ -340,9 +340,9 @@ abstract class CLICommand {
      */
     public function getInput($prompt, $default = null, $validator = null) {
         $trimidPrompt = trim($prompt);
-        if (strlen($prompt) > 0) {
+        if (strlen($trimidPrompt) > 0) {
             do {
-                $this->prints($prompt, [
+                $this->prints($trimidPrompt, [
                     'color' => 'gray',
                     'bold' => true
                 ]);
@@ -646,10 +646,8 @@ abstract class CLICommand {
         $argCount = count($_);
         $formattingOptions = [];
 
-        if ($argCount != 0) {
-            if (gettype($_[$argCount - 1]) == 'array') {
-                $formattingOptions = $_[$argCount - 1];
-            }
+        if ($argCount != 0 && gettype($_[$argCount - 1]) == 'array') {
+            $formattingOptions = $_[$argCount - 1];
         }
 
         $formattingOptions['force-styling'] = $this->isArgProvided('force-styling');
@@ -702,17 +700,17 @@ abstract class CLICommand {
         return trim(fread(STDIN, 1024));
     }
     /**
-     * Ask the user to select one of multiple answers.
-     * This method will display the prompt and wait for the user to select 
-     * the an answer. If the user give something other than the answers 
-     * specified, it will shows an error and ask him to select again again. The 
+     * Ask the user to select one of multiple values.
+     * This method will display a prompt and wait for the user to select 
+     * the a value from a set of values. If the user give something other than the listed values, 
+     * it will shows an error and ask him to select again again. The 
      * user can select an answer by typing its text or its number which will appear 
      * in the terminal.
      * @param string $prompt The text that will be shown for the user.
-     * @param array $choices An indexed array of options to select from.
-     * @param int $defaultIndex The index of the default answer in case no answer 
+     * @param array $choices An indexed array of values to select from.
+     * @param int $defaultIndex The index of the default value in case no value 
      * is selected and the user hit enter.
-     * @return string The method will return the answer which is selected by 
+     * @return string The method will return the value which is selected by 
      * the user.
      * @since 1.0
      */
@@ -729,28 +727,38 @@ abstract class CLICommand {
                 if ($defaultIndex !== null && gettype($defaultIndex) == 'integer') {
                     $default = isset($choices[$defaultIndex]) ? $choices[$defaultIndex] : null;
                 }
-                foreach ($choices as $choiceIndex => $choiceTxt) {
-                    if ($choiceTxt == $default) {
-                        $this->println($choiceIndex.": ".$choiceTxt, [
-                            'color' => 'light-blue',
-                            'bold' => 'true'
-                        ]);
-                    } else {
-                        $this->println($choiceIndex.": ".$choiceTxt);
-                    }
-                }
+                $this->_printChoices($choices, $default);
                 $input = trim($this->read());
-
-                if (in_array($input, $choices)) {
-                    return $input;
-                } else if (isset ($choices[$input])) {
-                    return $choices[$input];
-                } else if (strlen($input) == 0 && $default !== null) {
-                    return $default;
-                } else {
-                    $this->error('Invalid answer.');
+                
+                $check = $this->_checkSelectedChoice($choices, $default, $input);
+                
+                if ($check !== null) {
+                    return $check;
                 }
             } while (true);
+        }
+    }
+    private function _checkSelectedChoice($choices, $default, $input) {
+        if (in_array($input, $choices)) {
+            return $input;
+        } else if (isset ($choices[$input])) {
+            return $choices[$input];
+        } else if (strlen($input) == 0 && $default !== null) {
+            return $default;
+        } else {
+            $this->error('Invalid answer.');
+        }
+    }
+    private function _printChoices($choices, $default) {
+        foreach ($choices as $choiceIndex => $choiceTxt) {
+            if ($choiceTxt == $default) {
+                $this->println($choiceIndex.": ".$choiceTxt, [
+                    'color' => 'light-blue',
+                    'bold' => 'true'
+                ]);
+            } else {
+                $this->println($choiceIndex.": ".$choiceTxt);
+            }
         }
     }
     /**
@@ -876,15 +884,7 @@ abstract class CLICommand {
 
         return true;
     }
-    private function _checkArgOptions($options) {
-        $optinsArr = [];
-
-        if (isset($options['optional'])) {
-            $optinsArr['optional'] = $options['optional'] === true;
-        } else {
-            $optinsArr['optional'] = false;
-        }
-
+    private function _checkDescIndex(&$options) {
         if (isset($options['description'])) {
             $trimmedDesc = trim($options['description']);
 
@@ -896,7 +896,8 @@ abstract class CLICommand {
         } else {
             $optinsArr['description'] = '<NO DESCRIPTION>';
         }
-
+    }
+    private function _checkValuesIndex(&$options) {
         if (isset($options['values']) && gettype($options['values']) == 'array') {
             $vals = [];
 
@@ -919,6 +920,19 @@ abstract class CLICommand {
         } else {
             $optinsArr['values'] = [];
         }
+    }
+    private function _checkArgOptions($options) {
+        $optinsArr = [];
+
+        if (isset($options['optional'])) {
+            $optinsArr['optional'] = $options['optional'] === true;
+        } else {
+            $optinsArr['optional'] = false;
+        }
+
+        $this->_checkDescIndex($options);
+        $this->_checkValuesIndex($options);
+        
 
         if (isset($options['default']) && gettype($options['default']) == 'string') {
             $optinsArr['default'] = $options['default'];

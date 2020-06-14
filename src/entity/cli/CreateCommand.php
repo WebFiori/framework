@@ -29,19 +29,24 @@ use webfiori\entity\AutoLoader;
 use phMysql\MySQLQuery;
 use phMysql\MySQLColumn;
 use webfiori\WebFiori;
+use webfiori\entity\ExtendedWebServices;
+use restEasy\APIAction;
+use restEasy\RequestParameter;
+use restEasy\APIFilter;
 use Exception;
 use Error;
 /**
  * A command which is used to automate some of the common tasks such as 
  * creating query classes or controllers.
- *
+ * Note that this feature is Experimental and might have issues. Also, it 
+ * might be removed in the future.
  * @author Ibrahim
  * @version 1.0
  */
 class CreateCommand extends CLICommand {
     
     public function __construct() {
-        parent::__construct('create', [], 'Creates a query class, entity, API or a controller');
+        parent::__construct('create', [], 'Creates a query class, entity, API or a controller (Experimental).');
     }
     public function exec() {
         $options = [
@@ -66,7 +71,73 @@ class CreateCommand extends CLICommand {
         
     }
     public function _createWebServices() {
-        return 0;
+        $classInfo = $this->getClassInfo();
+        $addServices = true;
+        $servicesObj = new ServicesHolder();
+        do {
+            $serviceObj = new APIAction('');
+            $this->_setServiceName($serviceObj);
+            $serviceObj->addRequestMethod($this->select('Request method:', APIAction::METHODS, 0));
+            $servicesObj->addAction($serviceObj, $this->confirm('Does the service require authorization?', false));
+            if ($this->confirm('Would you like to add request parameters to the service?', false)) {
+                $this->_addParamsToService($serviceObj);
+            }
+            
+            $addServices = $this->confirm('Would you like to add another web service?');
+        } while ($addServices);
+        
+        
+        $this->println('Creating the class...');
+        $servicesCreator = new WebServicesWriter($servicesObj, $classInfo);
+        $servicesCreator->writeClass();
+        $this->println('Class created.');
+    }
+    /**
+     * 
+     * @param APIAction $serviceObj
+     */
+    private function _addParamsToService($serviceObj) {
+        $addMore = true;
+        do {
+            $paramObj = new RequestParameter('h');
+            $paramObj->setType($this->select('Choose parameter type:', APIFilter::TYPES, 0));
+            $this->_setParamName($paramObj);
+            $added = $serviceObj->addParameter($paramObj); 
+            if ($added) {
+                $this->success('New parameter added to the service \''.$serviceObj->getName().'\'.');
+            } else {
+                $this->warning('The parameter was not added.');
+            }
+            $addMore = $this->confirm('Would you like to add another parameter?');
+        } while ($addMore);
+    }
+    /**
+     * 
+     * @param RequestParameter $paramObj
+     */
+    private function _setParamName($paramObj) {
+        $validName = false;
+        do {
+            $paramName = $this->getInput('Enter a name for the request parameter:');
+            $validName = $paramObj->setName($paramName);
+            if (!$validName) {
+                $this->error('Given name is invalid.');
+            }
+        } while (!$validName);
+    }
+    /**
+     * 
+     * @param APIAction $serviceObj
+     */
+    private function _setServiceName($serviceObj) {
+        $validName = false;
+        do {
+            $serviceName = $this->getInput('Enter a name for the new web service:');
+            $validName = $serviceObj->setName($serviceName);
+            if (!$validName) {
+                $this->error('Given name is invalid.');
+            }
+        } while (!$validName);
     }
     private function _createController() {
         $classInfo = $this->getClassInfo();

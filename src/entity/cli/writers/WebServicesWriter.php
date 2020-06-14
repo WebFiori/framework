@@ -43,9 +43,19 @@ class WebServicesWriter extends ClassWriter {
      */
     private $servicesObj;
     /**
-     * 
-     * @param WebServices $webServicesObj
-     * @param array $classInfoArr
+     * Creates new instance of the class.
+     * @param WebServices $webServicesObj The object that will be written to the 
+     * class.
+     * @param array $classInfoArr An associative array that contains the information 
+     * of the class that will be created. The array must have the following indices: 
+     * <ul>
+     * <li><b>name</b>: The name of the class that will be created. If not provided, the 
+     * string 'NewClass' is used.</li>
+     * <li><b>namespace</b>: The namespace that the class will belong to. If not provided, 
+     * the namespace 'webfiori' is used.</li>
+     * <li><b>path</b>: The location at which the query will be created on. If not 
+     * provided, the constant ROOT_DIR is used. </li>
+     * </ul>
      */
     public function __construct($webServicesObj, $classInfoArr) {
         parent::__construct($classInfoArr);
@@ -54,11 +64,16 @@ class WebServicesWriter extends ClassWriter {
         }
         $this->servicesObj = $webServicesObj;
         $this->_writeHeaderSec();
+        $this->_writeConstructor();
+        $this->_implementMethods();
+        $this->append('}');
+        $this->append('return __NAMESPACE__;');
     }
     private function _writeHeaderSec() {
         $this->append("<?php\n");
         $this->append('namespace '.$this->getNamespace().";\n");
-        $this->append("use webfiori\entity\ExtendedWebServices;");
+        $this->append("use webfiori\\entity\\ExtendedWebServices;");
+        $this->append("use restEasy\\APIAction;");
         $this->append('');
         $this->append("/**\n"
                 . " * A class that contains a set of web services.\n"
@@ -67,15 +82,15 @@ class WebServicesWriter extends ClassWriter {
                 );
         foreach ($this->servicesObj->getActions() as $service){
             if (count($service->getParameters()) != 0) {
-                $this->append(" * <li><b>".$service->getName()."</b>: This service has the following parameters:", 1);
-                $this->append(' * <ul>', 1);
+                $this->append(" * <li><b>".$service->getName()."</b>: This service has the following parameters:");
+                $this->append(' * <ul>');
                 foreach ($service->getParameters() as $param) {
-                    $this->append(' * <li><b>'.$param->getName().'</b>: Data type: '.$param->getType().'.', 1);
+                    $this->append(' * <li><b>'.$param->getName().'</b>: Data type: '.$param->getType().'.');
                 }
-                $this->append(' * </ul>', 1);
-                $this->append(' * </li>', 1);
+                $this->append(' * </ul>');
+                $this->append(' * </li>');
             } else {
-                $this->append(" * <li><b>".$service->getName()."</b>", 1);
+                $this->append(" * <li><b>".$service->getName()."</b></li>");
             }
         }
         $this->append(" * </ul>\n */");
@@ -86,24 +101,30 @@ class WebServicesWriter extends ClassWriter {
         $this->append(" * Creates new instance of the class.", 1);
         $this->append(" */", 1);
         $this->append('public function __construct(){', 1);
-        $this->append('parent::__construct(\'1.0.0\')', 2);
-        
+        $this->append('parent::__construct(\'1.0.0\');', 2);
+        $this->_addServices();
         $this->append('}', 1);
     }
     private function _addServices() {
-        
+        foreach ($this->servicesObj->getActions() as $action) {
+            $this->_appendService($action);
+        }
+        foreach ($this->servicesObj->getAuthActions() as $action) {
+            $this->_appendService($action, true);
+        }
     }
     /**
      * 
      * @param APIAction $service
      */
-    private function _appendService($service) {
+    private function _appendService($service, $requireAuth = false) {
         $this->append('$this->addAction(APIAction::createService([', 2);
         $this->append("'name' => '".$service->getName()."',", 3);
         $this->append("'request-methods' => [", 3);
         foreach ($service->getRequestMethods() as $method) {
             $this->append("'$method',", 4);
         }
+        $this->append("],", 3);
         if (count($service->getParameters()) != 0) {
             $this->append("'parameters' => [", 3);
             foreach ($service->getParameters() as $param) {
@@ -111,7 +132,6 @@ class WebServicesWriter extends ClassWriter {
             }
             $this->append("],", 3);
         }
-        $this->append("],", 3);
         if (count($service->getResponsesDescriptions()) != 0) {
             $this->append("'responses' => [", 3);
             foreach ($service->getResponsesDescriptions() as $desc) {
@@ -119,31 +139,86 @@ class WebServicesWriter extends ClassWriter {
             }
             $this->append("],", 3);
         }
-        $this->append(']);', 2);
+        if ($requireAuth) {
+            $this->append('], true));', 2);
+        } else {
+            $this->append('], false));', 2);
+        }
     }
     /**
      * 
      * @param RequestParameter $param
      */
     private function _appendParam($param) {
-        
+        $this->append('[', 4);
+        $this->append("'name' => '".$param->getName()."',", 5);
+        $this->append("'type' => '".$param->getType()."',", 5);
+        if ($param->isOptional()) {
+            $this->append("'optional' => true,", 5);
+        }
+        if ($param->getDefault() !== null) {
+            $param->setDefault($param);
+            if (($param->getType() == 'string' || $param->getType() == 'url' || $param->getType() == 'email') && strlen($param->getDefault()) > 0) {
+                $this->append("'default' => '".$param->getDefault()."',", 5);
+            } else if ($param->getType() == 'boolean') {
+                if ($param->getDefault() === true) {
+                    $this->append("'default' => true,", 5);
+                } else {
+                    $this->append("'default' => false,", 5);
+                }
+            } else {
+                $this->append("'default' => ".$param->getDefault().",", 5);
+            }
+        } 
+        if (($param->getType() == 'string' || $param->getType() == 'url' || $param->getType() == 'email') && $param->isEmptyStringAllowed()) {
+            $this->append("'allow-empty' => '".$param->getDefault()."',", 5);
+        }
+        if ($param->getDescription() !== null) {
+            $this->append("'description' => '". str_replace('\'', '\\\'', $param->getDefault())."',", 5);
+        }
+        $this->append('],', 4);
     }
     private function _implementMethods() {
+        $this->append("/**", 1);
+        $this->append(" * Checks if the client is authorized to call a service or not.", 1);
+        $this->append(" * @return boolean If the client is authorized, the method will return true.", 1);
+        $this->append(" */", 1);
         $this->append("public function isAuthorized() {", 1);
-        $this->append('//TODO: Check if client is allowed to use the service or not.', 3);
+        $this->append('$calledServiceName = $this->getAction();', 2);
+        
+        $authActionIndex = 0;
+        $authCount = count($this->servicesObj->getAuthActions());
+        foreach ($this->servicesObj->getAuthActions() as $service) {
+            if ($authActionIndex == 0) {
+                $this->append('if ($calledServiceName == \''.$service->getName().'\') {', 2);
+                $this->append('// TODO: Check if the client is authorized to call the service \''.$service->getName().'\'.', 3);
+            } else {
+                $this->append('} else if ($calledServiceName == \''.$service->getName().'\') {', 2);
+                $this->append('// TODO: Check if the client is authorized to call the service \''.$service->getName().'\'.', 3);
+            }
+            if ($authActionIndex + 1 == $authCount) {
+                $this->append('}', 2);
+            }
+            $authActionIndex++;
+        }
+        
+        $this->append('return false;', 2);
         $this->append('}', 1);
         
+        $this->append("/**", 1);
+        $this->append(" * Process the request.", 1);
+        $this->append(" */", 1);
         $this->append("public function processRequest() {", 1);
-        $this->append('$calledServiceName = $this->getAction();', 3);
-        $totalActions = count($this->servicesObj->getActions()) + count($this->servicesObj->getAuthActions());
+        $this->append('$calledServiceName = $this->getAction();', 2);
+        
+        
+        $totalActions = count($this->servicesObj->getActions()) + $authCount;
+        
         $actionIndex = 0;
         foreach ($this->servicesObj->getActions() as $service) {
-            if ($service instanceof APIAction);
             if ($actionIndex == 0) {
                 $this->append('if ($calledServiceName == \''.$service->getName().'\') {', 2);
                 $this->append('// TODO: process the request for the service \''.$service->getName().'\'.', 3);
-                $actionIndex++;
-                continue;
             } else {
                 $this->append('} else if ($calledServiceName == \''.$service->getName().'\') {', 2);
                 $this->append('// TODO: process the request for the service \''.$service->getName().'\'.', 3);
@@ -157,8 +232,6 @@ class WebServicesWriter extends ClassWriter {
             if ($actionIndex == 0) {
                 $this->append('if ($calledServiceName == \''.$service->getName().'\') {', 2);
                 $this->append('// TODO: process the request for the service \''.$service->getName().'\'.', 3);
-                $actionIndex++;
-                continue;
             } else {
                 $this->append('} else if ($calledServiceName == \''.$service->getName().'\') {', 2);
                 $this->append('// TODO: process the request for the service \''.$service->getName().'\'.', 3);
@@ -168,7 +241,6 @@ class WebServicesWriter extends ClassWriter {
             }
             $actionIndex++;
         }
-        $this->append('//TODO: Check if client is allowed to use the service or not.', 3);
         $this->append('}', 1);
     }
 }

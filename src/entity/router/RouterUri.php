@@ -241,8 +241,7 @@ class RouterUri {
     /**
      * Returns port number of the authority part of the URI.
      * @return string Port number of the authority part of the URI. If 
-     * port number was not specified, the method will return empty string. If 
-     * path part is a variable, it will be enclosed between '{}'.
+     * port number was not specified, the method will return empty string.
      * @since 1.0
      */
     public function getPort() {
@@ -415,6 +414,18 @@ class RouterUri {
      */
     public function hasVars() {
         return count($this->getUriVars()) != 0;
+    }
+    /**
+     * Checks if the URI has WWW in the host part or not.
+     * @return boolean If the URI has WWW in the host, the method will return 
+     * true. Other than that, it will return false.
+     * @since 1.3.4
+     */
+    public function hasWWW() {
+        $host = $this->getHost();
+        $www = substr($host, 0, 3);
+
+        return $www == 'www';
     }
     /**
      * Checks if all URI variables has values or not.

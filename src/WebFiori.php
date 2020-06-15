@@ -23,6 +23,7 @@
  * THE SOFTWARE.
  */
 namespace webfiori;
+
 use jsonx\JsonX;
 use webfiori\conf\Config;
 use webfiori\conf\MailConfig;
@@ -39,6 +40,7 @@ use webfiori\entity\ui\ErrorBox;
 use webfiori\entity\ui\ServerErrView;
 use webfiori\entity\ui\ServiceUnavailableView;
 use webfiori\entity\Util;
+use webfiori\ini\GlobalConstants;
 use webfiori\ini\InitAutoLoad;
 use webfiori\ini\InitCron;
 use webfiori\ini\InitPrivileges;
@@ -56,6 +58,14 @@ define('MICRO_START', microtime(true));
  * @since 1.1.0
  */
 define('LOAD_COMPOSER_PACKAGES', true);
+/**
+ * A constant which is used to enable or disable HTTP access to cron.
+ * If the constant value is set to true, the framework will add routes to the 
+ * components which is used to allow access to cron control panel. The control 
+ * panel is used to execute jobs and check execution status. Default value is false.
+ * @since 1.1.0
+ */
+define('CRON_THROUGH_HTTP', false);
 /**
  * This constant is used to tell the framework if more information should 
  * be displayed if an exception is thrown or an error happens. The main aim 
@@ -187,7 +197,7 @@ class WebFiori {
         InitAutoLoad::init();
         $this->_setHandlers();
         $this->_checkStandardLibs();
-        
+
         self::$SF = ConfigController::get();
         self::$WF = WebsiteController::get();
         self::$BMF = EmailController::get();
@@ -205,13 +215,13 @@ class WebFiori {
             $this->dbErrDetails = $this->sysStatus;
             $this->sysStatus = Util::DB_NEED_CONF;
         }
-        
+
         //Initialize privileges
         InitPrivileges::init();
-        
+
         //Initialize CLI
         CLI::init();
-        
+
         //Initialize routes.
         APIRoutes::create();
         ViewRoutes::create();
@@ -526,6 +536,7 @@ class WebFiori {
         set_exception_handler(function($ex)
         {
             $isCli = class_exists('webfiori\entity\cli\CLI') ? CLI::isCLI() : php_sapi_name() == 'cli';
+
             if ($isCli) {
                 CLI::displayException($ex);
             } else {
@@ -546,7 +557,7 @@ class WebFiori {
                         'exception-message' => $ex->getMessage(),
                         'exception-code' => $ex->getMessage()
                     ], true);
-                    
+
                     if (defined('VERBOSE') && VERBOSE) {
                         $j->add('file', $ex->getFile());
                         $j->add('line', $ex->getLine());
@@ -584,6 +595,7 @@ class WebFiori {
         {
             $isCli = class_exists('webfiori\entity\cli\CLI') ? CLI::isCLI() : php_sapi_name() == 'cli';
             $error = error_get_last();
+
             if ($error !== null) {
                 $errNo = $error['type'];
 

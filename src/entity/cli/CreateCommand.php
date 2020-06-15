@@ -346,7 +346,7 @@ class CreateCommand extends CLICommand {
         if ($this->confirm('Would you like to add foreign keys to the table?', false)) {
             $this->_addFks($tempQuery);
         }
-        if ($this->confirm('Would you like to create an entity class that maps to the database table?')) {
+        if ($this->confirm('Would you like to create an entity class that maps to the database table?', false)) {
             $entityInfo = $this->getClassInfo();
             $entityInfo['implement-jsoni'] = $this->confirm('Would you like from your class to implement the interface JsonI?', true);
             $classInfo['entity-info'] = $entityInfo;

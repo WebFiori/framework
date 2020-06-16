@@ -1,6 +1,7 @@
 <?php
 
 use webfiori\entity\AutoLoader;
+use webfiori\ini\GlobalConstants;
 use webfiori\entity\cli\CLI;
 $DS = DIRECTORY_SEPARATOR;
 
@@ -68,10 +69,13 @@ AutoLoader::get([
     'on-load-failure' => 'do-nothing'
 ]);
 fprintf(STDOUT,'Autoloader Initialized.'."\n");
+fprintf(STDOUT,"Defining global constants...\n");
+GlobalConstants::defineConstants();
 fprintf(STDOUT,'Initializing CLI of the Framework...'."\n");
 CLI::init();
 fprintf(STDOUT,'Done.'."\n");
 fprintf(STDOUT,'Root Directory: \''.AutoLoader::get()->root().'\'.'."\n");
+
 //fprintf(STDOUT,'Class Search Paths:'."\n");
 //$dirs = AutoLoader::getFolders();
 //foreach ($dirs as $dir){

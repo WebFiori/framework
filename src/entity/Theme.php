@@ -149,6 +149,8 @@ abstract class Theme implements JsonI {
             'description' => '',
             'directory' => ''
         ];
+        $dirExpl = explode(DIRECTORY_SEPARATOR, __DIR__);
+        $this->themeMeta['directory'] = $dirExpl[count($dirExpl) - 1];
         $this->setCssDirName('css');
         $this->setJsDirName('js');
         $this->setImagesDirName('images');
@@ -231,30 +233,6 @@ abstract class Theme implements JsonI {
      */
     public function getAuthorUrl() {
         return $this->themeMeta['author-url'];
-    }
-    /**
-     * Returns an array that contains the meta data of all available themes. 
-     * This method will return an associative array. The key is the theme 
-     * name and the value is an object of type Theme that contains theme info.
-     * @return array An associative array that contains all themes information. The name 
-     * of the theme will be the key and the value is an object of type 'Theme'.
-     * @since 1.1 
-     */
-    public static function getAvailableThemes() {
-        if (self::$AvailableThemes === null) {
-            self::defineThemesDir();
-            self::$AvailableThemes = [];
-            $DS = DIRECTORY_SEPARATOR;
-            $themesDirs = array_diff(scandir(THEMES_PATH), ['..', '.']);
-
-            foreach ($themesDirs as $dir) {
-                $pathToScan = THEMES_PATH.$DS.$dir;
-                $filesInDir = array_diff(scandir($pathToScan), ['..', '.']);
-                self::_scanDir($filesInDir, $pathToScan);
-            }
-        }
-
-        return self::$AvailableThemes;
     }
     /**
      * Returns the base URL that will be used by the theme.
@@ -384,16 +362,6 @@ abstract class Theme implements JsonI {
         return $this->themeMeta['license-url'];
     }
     /**
-     * Returns an array which contains all loaded themes.
-     * @return array An associative array which contains all loaded themes. 
-     * The index will be theme name and the value is an object of type 'Theme' 
-     * which contains theme info.
-     * @since 1.0
-     */
-    public static function getLoadedThemes() {
-        return self::$loadedThemes;
-    }
-    /**
      * Returns the name of the theme.
      * If the name is not set, the method will return empty string.
      * @return string The name of the theme.
@@ -443,26 +411,6 @@ abstract class Theme implements JsonI {
         if (is_callable($this->beforeLoaded)) {
             call_user_func($this->beforeLoaded, $this->beforeLoadedParams);
         }
-    }
-
-    /**
-     * Checks if a theme is loaded or not given its name.
-     * @param string $themeName The name of the theme.
-     * @return boolean The method will return true if 
-     * the theme was found in the array of loaded themes. false
-     * if not.
-     * @since 1.0
-     */
-    public static function isThemeLoaded($themeName) {
-        return isset(self::$loadedThemes[$themeName]) === true;
-    }
-    /**
-     * Reset the array which contains all loaded themes.
-     * By calling this method, all loaded themes will be unloaded.
-     * @since 1.2.5
-     */
-    public static function resetLoaded() {
-        self::$loadedThemes = [];
     }
     /**
      * Sets the value of the callback which will be called after theme is loaded.
@@ -560,21 +508,6 @@ abstract class Theme implements JsonI {
 
         if (strlen($trimmed) > 0) {
             $this->themeMeta['description'] = $trimmed;
-        }
-    }
-    /**
-     * Sets the name of the directory where all theme files are kept.
-     * Each theme must have a unique directory to prevent collision. The 
-     * directory of the theme must be a folder which exist inside the directory 
-     * '/themes'.
-     * @param string $name The name of theme directory.
-     * @since 1.0
-     */
-    public function setDirectoryName($name) {
-        $trimmed = trim($name);
-
-        if (strlen($trimmed) != 0) {
-            $this->themeMeta['directory'] = $trimmed;
         }
     }
     /**
@@ -695,7 +628,6 @@ abstract class Theme implements JsonI {
      * @return JsonX An object of type JsonX.
      */
     public function toJSON() {
-        self::defineThemesDir();
         $j = new JsonX();
         $j->add('themesPath', THEMES_PATH);
         $j->add('name', $this->getName());
@@ -712,77 +644,5 @@ abstract class Theme implements JsonI {
         $j->add('components', $this->getComponents());
 
         return $j;
-    }
-    /**
-     * Loads a theme given its name.
-     * If the given name is null, the method will load the default theme as 
-     * specified by the method SiteConfig::getBaseThemeName().
-     * @param string $themeName The name of the theme. 
-     * @return Theme The method will return an object of type Theme once the 
-     * theme is loaded. The object will contain all theme information.
-     * @throws NoSuchThemeException The method will throw 
-     * an exception if no theme was found which has the given name.
-     * @since 1.0
-     */
-    public static function usingTheme($themeName = null) {
-        self::defineThemesDir();
-
-        if ($themeName === null) {
-            $themeName = SiteConfig::getBaseThemeName();
-        }
-        $themeToLoad = null;
-
-        if (self::isThemeLoaded($themeName)) {
-            $themeToLoad = self::$loadedThemes[$themeName];
-        } else {
-            $themes = self::getAvailableThemes();
-
-            if (isset($themes[$themeName])) {
-                $themeToLoad = $themes[$themeName];
-                self::$loadedThemes[$themeName] = $themeToLoad;
-            } else {
-                throw new NoSuchThemeException('No such theme: \''.$themeName.'\'.');
-            }
-        }
-
-        if (isset($themeToLoad)) {
-            $themeToLoad->invokeBeforeLoaded();
-            $ds = DIRECTORY_SEPARATOR;
-            $themeDir = THEMES_PATH.$ds.$themeToLoad->getDirectoryName();
-
-            foreach ($themeToLoad->getComponents() as $component) {
-                if (file_exists($themeDir.$ds.$component)) {
-                    require_once $themeDir.$ds.$component;
-                }
-            }
-
-            return $themeToLoad;
-        }
-    }
-    private static function _scanDir($filesInDir, $pathToScan) {
-        foreach ($filesInDir as $fileName) {
-            $fileExt = substr($fileName, -4);
-
-            if ($fileExt == '.php') {
-                $cName = str_replace('.php', '', $fileName);
-                $ns = require_once $pathToScan.DIRECTORY_SEPARATOR.$fileName;
-                $aNs = $ns != 1 ? $ns.'\\' : '';
-                $aCName = $aNs.$cName;
-
-                if (class_exists($aCName)) {
-                    $instance = new $aCName();
-
-                    if ($instance instanceof Theme) {
-                        self::$AvailableThemes[$instance->getName()] = $instance;
-                    }
-                }
-            }
-        }
-    }
-    private static function defineThemesDir() {
-        if (!defined('THEMES_PATH')) {
-            $themesPath = substr(__DIR__, 0, strlen(__DIR__) - strlen('/entity')).DIRECTORY_SEPARATOR.self::THEMES_DIR;
-            define('THEMES_PATH', $themesPath);
-        }
     }
 }

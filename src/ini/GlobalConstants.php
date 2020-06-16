@@ -53,52 +53,56 @@ class GlobalConstants {
         if (!defined('PHP_INT_MIN')) {
             define('PHP_INT_MIN', ~PHP_INT_MAX);
         }
+
         if (!defined('LOAD_COMPOSER_PACKAGES')) {
             /**
-            * This constant is used to tell the core if the application uses composer 
-            * packages or not. If set to true, then composer packages will be loaded.
-            * @since 1.0
-            */
-           define('LOAD_COMPOSER_PACKAGES', true);
+             * This constant is used to tell the core if the application uses composer 
+             * packages or not. If set to true, then composer packages will be loaded.
+             * @since 1.0
+             */
+            define('LOAD_COMPOSER_PACKAGES', true);
         }
+
         if (!defined('CRON_THROUGH_HTTP')) {
             /**
-            * A constant which is used to enable or disable HTTP access to cron.
-            * If the constant value is set to true, the framework will add routes to the 
-            * components which is used to allow access to cron control panel. The control 
-            * panel is used to execute jobs and check execution status. Default value is false.
-            * @since 1.0
-            */
-           define('CRON_THROUGH_HTTP', false);
+             * A constant which is used to enable or disable HTTP access to cron.
+             * If the constant value is set to true, the framework will add routes to the 
+             * components which is used to allow access to cron control panel. The control 
+             * panel is used to execute jobs and check execution status. Default value is false.
+             * @since 1.0
+             */
+            define('CRON_THROUGH_HTTP', false);
         }
+
         if (!defined('VERBOSE')) {
             /**
-            * This constant is used to tell the framework if more information should 
-            * be displayed if an exception is thrown or an error happens. The main aim 
-            * of this constant is to hide some sensitive information from users if the 
-            * system is in production environment. Note that the constant will have effect 
-            * only if the framework is accessed through HTTP protocol. If used in CLI 
-            * environment, everything will appear. Default value of the constant is 
-            * false.
-            * @since 1.0
-            */
-           define('VERBOSE', false);
+             * This constant is used to tell the framework if more information should 
+             * be displayed if an exception is thrown or an error happens. The main aim 
+             * of this constant is to hide some sensitive information from users if the 
+             * system is in production environment. Note that the constant will have effect 
+             * only if the framework is accessed through HTTP protocol. If used in CLI 
+             * environment, everything will appear. Default value of the constant is 
+             * false.
+             * @since 1.0
+             */
+            define('VERBOSE', false);
         }
+
         if (!defined('NO_WWW')) {
             /**
-            * This constant is used to redirect a URI with www to non-www.
-            * If this constant is defined and is set to true and a user tried to 
-            * access a resource using a URI that contains www in the host part,
-            * the router will send a 301 - permanent redirect HTTP response code and 
-            * send the user to non-www host. For example, if a request is sent to 
-            * 'https://www.example.com/my-page', it will be redirected to 
-            * 'https://example.com/my-page'. Default value of the constant is false which 
-            * means no redirection will be performed.
-            * @since 1.0
-            */
-           define('NO_WWW', false);
+             * This constant is used to redirect a URI with www to non-www.
+             * If this constant is defined and is set to true and a user tried to 
+             * access a resource using a URI that contains www in the host part,
+             * the router will send a 301 - permanent redirect HTTP response code and 
+             * send the user to non-www host. For example, if a request is sent to 
+             * 'https://www.example.com/my-page', it will be redirected to 
+             * 'https://example.com/my-page'. Default value of the constant is false which 
+             * means no redirection will be performed.
+             * @since 1.0
+             */
+            define('NO_WWW', false);
         }
-        
+
         if (!defined('THEMES_PATH')) {
             $themesDirName = 'themes';
             $themesPath = substr(__DIR__, 0, strlen(__DIR__) - strlen('/ini')).DIRECTORY_SEPARATOR.$themesDirName;

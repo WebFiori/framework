@@ -73,26 +73,18 @@ class ClassWriter {
         } else {
             $this->ns = 'webfiori';
         }
+
         if (isset($classInfoArr['path'])) {
             $this->path = $classInfoArr['path'];
         } else {
             $this->path = ROOT_DIR;
         }
+
         if (isset($classInfoArr['name'])) {
             $this->className = $classInfoArr['name'];
         } else {
             $this->className = 'NewClass';
         }
-    }
-    /**
-     * Write the new class to a .php file.
-     * @since 1.0
-     */
-    public function writeClass() {
-        $queryFile = new File($this->className.'.php', $this->path);
-        $queryFile->remove();
-        $queryFile->setRawData($this->classAsStr);
-        $queryFile->write(false, true);
     }
     /**
      * Appends a string to the string that represents the query class.
@@ -105,18 +97,19 @@ class ClassWriter {
     public function append($str, $tapsCount = 0) {
         $tabSpaces = '    ';
         $tabStr = '';
+
         for ($x = 0 ; $x < $tapsCount ; $x++) {
             $tabStr .= $tabSpaces;
         }
         $this->classAsStr .= $tabStr.$str."\n";
     }
     /**
-     * Returns the location at which the query class will be created on.
-     * @return string The location at which the query class will be created on.
+     * Returns the name of the class that will be created.
+     * @return string The name of the class that will be created.
      * @since 1.0
      */
-    public function getPath() {
-        return $this->path;
+    public function getName() {
+        return $this->className;
     }
     /**
      * Returns the namespace at which the generated query class will be added to.
@@ -127,11 +120,21 @@ class ClassWriter {
         return $this->ns;
     }
     /**
-     * Returns the name of the class that will be created.
-     * @return string The name of the class that will be created.
+     * Returns the location at which the query class will be created on.
+     * @return string The location at which the query class will be created on.
      * @since 1.0
      */
-    public function getName() {
-        return $this->className;
+    public function getPath() {
+        return $this->path;
+    }
+    /**
+     * Write the new class to a .php file.
+     * @since 1.0
+     */
+    public function writeClass() {
+        $queryFile = new File($this->className.'.php', $this->path);
+        $queryFile->remove();
+        $queryFile->setRawData($this->classAsStr);
+        $queryFile->write(false, true);
     }
 }

@@ -26,8 +26,8 @@ namespace webfiori\entity;
 
 use jsonx\JsonI;
 use jsonx\JsonX;
-use webfiori\conf\SiteConfig;
 use ReflectionClass;
+use webfiori\conf\SiteConfig;
 /**
  * A base class that is used to construct web site UI.
  * A theme is a way to change the look and feel of all pages in 
@@ -144,11 +144,11 @@ abstract class Theme implements JsonI {
             'description' => '',
             'directory' => ''
         ];
-        
+
         $reflection = new ReflectionClass($this);
         $dirExpl = explode(DIRECTORY_SEPARATOR, dirname($reflection->getFileName()));       
         $this->themeMeta['directory'] = $dirExpl[count($dirExpl) - 1];
-        
+
         $this->setCssDirName('css');
         $this->setJsDirName('js');
         $this->setImagesDirName('images');

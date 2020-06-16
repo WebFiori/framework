@@ -29,7 +29,7 @@ class MailConfig {
     public static function addSMTPAccount($accName, $smtpConnInfo) {
         if ($smtpConnInfo instanceof SMTPAccount) {
             $trimmedName = trim($accName);
-            
+
             if (strlen($trimmedName) != 0) {
                 self::get()->addAccount($smtpConnInfo, $trimmedName);
             }
@@ -43,11 +43,10 @@ class MailConfig {
      * @since 1.0
      */
     public static function get() {
-        
         if (self::$inst === null) {
             self::$inst = new MailConfig();
         }
-        
+
         return self::$inst;
     }
     /**
@@ -76,7 +75,7 @@ class MailConfig {
         if (isset($this->emailAccounts[$name])) {
             return $this->emailAccounts[$name];
         }
-        
+
         return null;
     }
     private function _getAccounts() {

@@ -683,15 +683,6 @@ class SocketMailer {
         }
     }
     /**
-     * Removes control characters from the start and end of string in addition 
-     * to white spaces.
-     * @param string $str The string that will be trimmed
-     * @return string The string after its control characters trimmed.
-     */
-    private function _trimControlChars($str) {
-        return trim($str, "\x00..\x20");
-    }
-    /**
      * Write a message to the buffer.
      * Note that this method will trim the following character from the string 
      * if they are found in the message: '\t\n\r\0\x0B\0x1B\0x0C'.
@@ -799,5 +790,14 @@ class SocketMailer {
             $thirdNum = $serverResponseMessage[2];
             $this->lastResponseCode = intval($firstNum) * 100 + (intval($secNum * 10)) + (intval($thirdNum));
         }
+    }
+    /**
+     * Removes control characters from the start and end of string in addition 
+     * to white spaces.
+     * @param string $str The string that will be trimmed
+     * @return string The string after its control characters trimmed.
+     */
+    private function _trimControlChars($str) {
+        return trim($str, "\x00..\x20");
     }
 }

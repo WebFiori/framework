@@ -33,7 +33,7 @@ use restEasy\WebServices;
  * @author Ibrahim
  * @version 1.0
  */
-class ServicesHolder extends WebServices{
+class ServicesHolder extends WebServices {
     public function __construct() {
         parent::__construct();
         $this->removeServices();
@@ -49,7 +49,5 @@ class ServicesHolder extends WebServices{
      * Process the request.
      */
     public function processRequest() {
-        
     }
-
 }

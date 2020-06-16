@@ -202,6 +202,7 @@ class CLI {
         if ($_SERVER['argc'] == 1) {
             $command = self::get()->commands['help'];
             self::get()->activeCommand = $command;
+
             return $command->excCommand();
         } else if (defined('__PHPUNIT_PHAR__')) {
             return 0;
@@ -219,6 +220,7 @@ class CLI {
         if (isset($this->commands[$commandName])) {
             $command = self::get()->commands[$commandName];
             $this->activeCommand = $command;
+
             return $command->excCommand();
         } else {
             fprintf(STDERR,"Error: The command '".$commandName."' is not supported.");

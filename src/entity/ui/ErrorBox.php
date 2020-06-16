@@ -37,11 +37,6 @@ class ErrorBox extends MessageBox {
      *
      * @var HTMLNode 
      */
-    private $tipNode;
-    /**
-     *
-     * @var HTMLNode 
-     */
     private $descNode;
     /**
      *
@@ -63,8 +58,14 @@ class ErrorBox extends MessageBox {
      * @var HTMLNode 
      */
     private $messageNode;
+    /**
+     *
+     * @var HTMLNode 
+     */
+    private $tipNode;
     public function __construct() {
         parent::__construct();
+
         if (self::getCount() < MAX_MESSAGES) {
             $this->setClassName('error-message-box');
             $this->setStyle([
@@ -151,7 +152,7 @@ class ErrorBox extends MessageBox {
     public function setLine($line) {
         if ($this->lineNode !== null) {
             $this->lineNode->removeAllChildNodes();
-        
+
             if (defined('VERBOSE') && VERBOSE) {
                 $this->lineNode->addTextNode('<b class="err-label">Line: </b>'.$line, false);
             }

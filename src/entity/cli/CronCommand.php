@@ -129,11 +129,11 @@ class CronCommand extends CLICommand {
         $retVal = -1;
         $jobsNamesArr = Cron::getJobsNames();
         $jobsNamesArr[] = 'Cancel';
-        
+
         if ($jobName === null) {
             $jobName = $this->select('Select one of the scheduled jobs to force:', $jobsNamesArr, count($jobsNamesArr) - 1);
         } 
-        
+
         if ($jobName == 'Cancel') {
             $retVal = 0;
         } else {
@@ -149,7 +149,7 @@ class CronCommand extends CLICommand {
                 $retVal = 0;
             }
         }
-        
+
         return $retVal;
     }
     private function _printExcResult($result) {
@@ -178,6 +178,7 @@ class CronCommand extends CLICommand {
     }
     private function _showJobArgs() {
         $jobName = $this->getArgValue('--job-name');
+
         if ($jobName === null) {
             $jobName = $this->select('Select one of the scheduled jobs to show supported args:', Cron::getJobsNames());
         } 

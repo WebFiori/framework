@@ -5,7 +5,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 namespace webfiori\entity\cli;
 
 /**
@@ -14,10 +13,10 @@ namespace webfiori\entity\cli;
  * @author Ibrahim
  * @version 1.0
  */
-class ControllerClassWriter extends ClassWriter{
+class ControllerClassWriter extends ClassWriter {
     private $associatedQuery;
-    private $dbConnection;
     private $associatedQueryName;
+    private $dbConnection;
     /**
      * Creates new instance of the class.
      * @param array $classInfo An associative array that contains the information 
@@ -39,6 +38,7 @@ class ControllerClassWriter extends ClassWriter{
         parent::__construct($classInfo);
         $this->associatedQuery = isset($classInfo['linked-query']) ? $classInfo['linked-query'] : null;
         $this->dbConnection = isset($classInfo['db-connection']) ? $classInfo['db-connection'] : null;
+
         if ($this->associatedQuery !== null) {
             $exp = explode("\\", $this->associatedQuery);
             $this->associatedQueryName = $exp[count($exp) - 1];
@@ -49,13 +49,14 @@ class ControllerClassWriter extends ClassWriter{
         $this->append("<?php\n");
         $this->append('namespace '.$this->getNamespace().";\n");
         $this->append("use webfiori\logic\Controller;");
+
         if ($this->associatedQuery !== null) {
             $this->append('use '.$this->associatedQuery.';');
         }
         $this->append('');
         $this->append("/**\n"
-                . " * An auto-generated controller.\n"
-                . " */");
+                ." * An auto-generated controller.\n"
+                ." */");
         $this->append('class '.$this->getName().' extends Controller {');
         $this->append('/**', 1);
         $this->append(' * An instance of the class.', 1);
@@ -75,12 +76,14 @@ class ControllerClassWriter extends ClassWriter{
         $this->append('}', 1);
         $this->append('public function __construct(){ ', 1);
         $this->append('parent::__construct();', 2);
+
         if ($this->associatedQueryName !== null) {
             $this->append('$this->setQueryObject(new '.$this->associatedQueryName.'());', 2);
         } else {
             $this->append('//TODO: Associate query object with the controller.', 2);
             $this->append('//$this->setQueryObject(new MySQLQuery());', 2);
         }
+
         if ($this->dbConnection !== null) {
             $this->append('$this->setConnection(\''.$this->dbConnection.'\');', 2);
         } else {
@@ -120,6 +123,7 @@ class ControllerClassWriter extends ClassWriter{
         $this->append('public function delete($entity){ ', 1);
         $this->append('//TODO: Implement remove record.', 2);
         $this->append('}', 1);
+
         if ($this->associatedQueryName !== null) {
             $this->append("/**", 1);
             $this->append(' * Returns the linked query object which is used to create MySQL quires.', 1);

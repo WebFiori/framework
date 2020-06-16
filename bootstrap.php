@@ -1,8 +1,8 @@
 <?php
 
 use webfiori\entity\AutoLoader;
-use webfiori\ini\GlobalConstants;
 use webfiori\entity\cli\CLI;
+use webfiori\ini\GlobalConstants;
 $DS = DIRECTORY_SEPARATOR;
 
 //the name of tests directory. Update as needed.

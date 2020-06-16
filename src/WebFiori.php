@@ -156,7 +156,7 @@ class WebFiori {
 
         require_once __DIR__.DIRECTORY_SEPARATOR.'ini'.DIRECTORY_SEPARATOR.'GlobalConstants.php';
         GlobalConstants::defineConstants();
-        
+
         /**
          * Initialize autoloader.
          */

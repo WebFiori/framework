@@ -30,7 +30,6 @@ use phpStructs\html\HTMLDoc;
 use phpStructs\html\HTMLNode;
 use webfiori\conf\SiteConfig;
 use webfiori\entity\langs\Language;
-use webfiori\entity\ThemeLoader;
 /**
  * A class used to initialize view components.
  * This class is one of the core components for creating web pages. It is simply 

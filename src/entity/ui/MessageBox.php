@@ -58,14 +58,16 @@ class MessageBox extends HTMLNode {
      */
     public function __construct() {
         parent::__construct();
+
         if (!defined('MAX_MESSAGES')) {
             /**
-            * The maximum number of message boxes to show in one page.
-            * Default value is 15. The developer can change the value as needed.
-            * @since 1.0.1
-            */
-           define('MAX_MESSAGES', 15);
+             * The maximum number of message boxes to show in one page.
+             * Default value is 15. The developer can change the value as needed.
+             * @since 1.0.1
+             */
+            define('MAX_MESSAGES', 15);
         }
+
         if (self::getCount() < MAX_MESSAGES) {
             $this->setClassName('floating-message-box');
             $this->setAttribute('data-box-number', self::getCount());

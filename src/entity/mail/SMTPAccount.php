@@ -126,12 +126,22 @@ class SMTPAccount {
         } else {
             $this->setAddress('');
         }
-        
+
         if (isset($options['account-name'])) {
             $this->setAccountName($options['account-name']);
         } else {
             $this->setAccountName($this->getSenderName());
         }
+    }
+    /**
+     * Returns the name of the account.
+     * The name of the account is used by the class 'EmailMessage' when creating 
+     * new instance of the class. Also, the name is used when storing the account 
+     * programatically.
+     * @return string A string that represents the name of the account.
+     */
+    public function getAccountName() {
+        return $this->accName;
     }
     /**
      * Returns the email address.
@@ -141,15 +151,6 @@ class SMTPAccount {
      */
     public function getAddress() {
         return $this->address;
-    }
-    /**
-     * Returns the name of sender.
-     * @return string The name of the email sender. The name will be used in the header 
-     * 'FROM' when sending an email. Default is empty string.
-     * @since 1.0
-     */
-    public function getSenderName() {
-        return $this->name;
     }
     /**
      * Returns the password of the user account that is used to access email server.
@@ -167,6 +168,15 @@ class SMTPAccount {
      */
     public function getPort() {
         return $this->port;
+    }
+    /**
+     * Returns the name of sender.
+     * @return string The name of the email sender. The name will be used in the header 
+     * 'FROM' when sending an email. Default is empty string.
+     * @since 1.0
+     */
+    public function getSenderName() {
+        return $this->name;
     }
     /**
      * Returns The address of the email server.
@@ -187,24 +197,6 @@ class SMTPAccount {
         return $this->userName;
     }
     /**
-     * Sets the email address.
-     * @param string $address An email address.
-     */
-    public function setAddress($address) {
-        $this->address = trim($address);
-    }
-    /**
-     * Sets the name of the email account.
-     * @param string $name The name of the account (such as 'Programming Team'). 
-     * The name is used when sending an email message using the given SMTP account. 
-     * The name will be used in the header 
-     * 'FROM' when sending an email
-     * @since 1.0
-     */
-    public function setSenderName($name) {
-        $this->name = trim($name);
-    }
-    /**
      * Sets the name of the account.
      * The name of the account is used by the class 'EmailMessage' when creating 
      * new instance of the class. Also, the name is used when storing the account 
@@ -216,14 +208,11 @@ class SMTPAccount {
         $this->accName = $name;
     }
     /**
-     * Returns the name of the account.
-     * The name of the account is used by the class 'EmailMessage' when creating 
-     * new instance of the class. Also, the name is used when storing the account 
-     * programatically.
-     * @return string A string that represents the name of the account.
+     * Sets the email address.
+     * @param string $address An email address.
      */
-    public function getAccountName() {
-        return $this->accName;
+    public function setAddress($address) {
+        $this->address = trim($address);
     }
     /**
      * Sets the password of the user account that is used to access email server.
@@ -243,6 +232,17 @@ class SMTPAccount {
         if (gettype($port) == 'integer' && $port > 0) {
             $this->port = $port;
         }
+    }
+    /**
+     * Sets the name of the email account.
+     * @param string $name The name of the account (such as 'Programming Team'). 
+     * The name is used when sending an email message using the given SMTP account. 
+     * The name will be used in the header 
+     * 'FROM' when sending an email
+     * @since 1.0
+     */
+    public function setSenderName($name) {
+        $this->name = trim($name);
     }
     /**
      * Sets the address of the email server.

@@ -22,12 +22,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 namespace webfiori\entity;
 
-use webfiori\WebFiori;
-use webfiori\entity\Theme;
 use webfiori\entity\exceptions\NoSuchThemeException;
+use webfiori\WebFiori;
 
 /**
  * A class which has utility methods which are related to themes loading.
@@ -54,27 +52,6 @@ class ThemeLoader {
      */
     private static $loadedThemes = [];
     private function __construct() {
-        
-    }
-    private static function _scanDir($filesInDir, $pathToScan) {
-        foreach ($filesInDir as $fileName) {
-            $fileExt = substr($fileName, -4);
-
-            if ($fileExt == '.php') {
-                $cName = str_replace('.php', '', $fileName);
-                $ns = require_once $pathToScan.DIRECTORY_SEPARATOR.$fileName;
-                $aNs = $ns != 1 ? $ns.'\\' : '';
-                $aCName = $aNs.$cName;
-
-                if (class_exists($aCName)) {
-                    $instance = new $aCName();
-
-                    if ($instance instanceof Theme) {
-                        self::$AvailableThemes[$instance->getName()] = $instance;
-                    }
-                }
-            }
-        }
     }
     /**
      * Returns an array that contains the meta data of all available themes. 
@@ -140,7 +117,6 @@ class ThemeLoader {
      * @since 1.0
      */
     public static function usingTheme($themeName = null) {
-
         if ($themeName === null) {
             $themeName = WebFiori::getSiteConfig()->getBaseThemeName();
         }
@@ -171,6 +147,26 @@ class ThemeLoader {
             }
 
             return $themeToLoad;
+        }
+    }
+    private static function _scanDir($filesInDir, $pathToScan) {
+        foreach ($filesInDir as $fileName) {
+            $fileExt = substr($fileName, -4);
+
+            if ($fileExt == '.php') {
+                $cName = str_replace('.php', '', $fileName);
+                $ns = require_once $pathToScan.DIRECTORY_SEPARATOR.$fileName;
+                $aNs = $ns != 1 ? $ns.'\\' : '';
+                $aCName = $aNs.$cName;
+
+                if (class_exists($aCName)) {
+                    $instance = new $aCName();
+
+                    if ($instance instanceof Theme) {
+                        self::$AvailableThemes[$instance->getName()] = $instance;
+                    }
+                }
+            }
         }
     }
 }

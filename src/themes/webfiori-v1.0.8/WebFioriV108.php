@@ -151,7 +151,7 @@ class WebFioriV108 extends Theme {
                     'style' => 'position: absolute; transform: translate3d(159px, 0px, 0px); top: 0px; left: 0px; will-change: transform;',
                 ]);
                         $index = 0;
- 
+
                         foreach ($subListItems as $listItem) {
                             $linkLabel = isset($listItem['label']) ? $listItem['label'] : 'Item_Lbl';
                             $itemLink = isset($listItem['link']) ? $listItem['link'] : '#';

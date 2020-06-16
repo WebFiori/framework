@@ -53,31 +53,6 @@ use webfiori\logic\WebsiteController;
  */
 define('MICRO_START', microtime(true));
 /**
- * This constant is used to tell the core if the application uses composer 
- * packages or not. If set to true, then composer packages will be loaded.
- * @since 1.1.0
- */
-define('LOAD_COMPOSER_PACKAGES', true);
-/**
- * A constant which is used to enable or disable HTTP access to cron.
- * If the constant value is set to true, the framework will add routes to the 
- * components which is used to allow access to cron control panel. The control 
- * panel is used to execute jobs and check execution status. Default value is false.
- * @since 1.1.0
- */
-define('CRON_THROUGH_HTTP', false);
-/**
- * This constant is used to tell the framework if more information should 
- * be displayed if an exception is thrown or an error happens. The main aim 
- * of this constant is to hide some sensitive information from users if the 
- * system is in production environment. Note that the constant will have effect 
- * only if the framework is accessed through HTTP protocol. If used in CLI 
- * environment, everything will appear. Default value of the constant is 
- * false.
- * @since 1.1.0
- */
-define('VERBOSE', false);
-/**
  * The instance of this class is used to control basic settings of 
  * the framework. Also, it is the entry point of any request.
  * @author Ibrahim
@@ -191,6 +166,8 @@ class WebFiori {
          * Initialize autoloader.
          */
         if (!class_exists('webfiori\entity\AutoLoader',false)) {
+            require_once ROOT_DIR.DIRECTORY_SEPARATOR.'entity'.DIRECTORY_SEPARATOR.'GlobalConstants.php';
+            GlobalConstants::defineConstants();
             require_once ROOT_DIR.DIRECTORY_SEPARATOR.'entity'.DIRECTORY_SEPARATOR.'AutoLoader.php';
         }
         self::$AU = AutoLoader::get();

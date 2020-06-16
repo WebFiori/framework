@@ -88,5 +88,8 @@ class GlobalConstants {
          * @since 1.0
          */
         define('NO_WWW', false);
+        
+        $themesPath = substr(__DIR__, 0, strlen(__DIR__) - strlen('/ini')).DIRECTORY_SEPARATOR.self::THEMES_DIR;
+        define('THEMES_PATH', $themesPath);
     }
 }

@@ -27,7 +27,7 @@ namespace webfiori\entity;
 use jsonx\JsonI;
 use jsonx\JsonX;
 use webfiori\conf\SiteConfig;
-use webfiori\entity\exceptions\NoSuchThemeException;
+use ReflectionClass;
 /**
  * A base class that is used to construct web site UI.
  * A theme is a way to change the look and feel of all pages in 
@@ -42,11 +42,6 @@ use webfiori\entity\exceptions\NoSuchThemeException;
  * @version 1.2.5
  */
 abstract class Theme implements JsonI {
-    /**
-     * The directory where themes are located in.
-     * @since 1.0
-     */
-    const THEMES_DIR = 'themes';
     /**
      * A callback function to call after the theme is loaded.
      * @var Function
@@ -149,8 +144,11 @@ abstract class Theme implements JsonI {
             'description' => '',
             'directory' => ''
         ];
-        $dirExpl = explode(DIRECTORY_SEPARATOR, __DIR__);
+        
+        $reflection = new ReflectionClass($this);
+        $dirExpl = explode(DIRECTORY_SEPARATOR, dirname($reflection->getFileName()));       
         $this->themeMeta['directory'] = $dirExpl[count($dirExpl) - 1];
+        
         $this->setCssDirName('css');
         $this->setJsDirName('js');
         $this->setImagesDirName('images');

@@ -154,20 +154,13 @@ class WebFiori {
             define('ROOT_DIR',__DIR__);
         }
 
-        /**
-         * Fallback for older php versions that does not
-         * support the constant PHP_INT_MIN
-         */
-        if (!defined('PHP_INT_MIN')) {
-            define('PHP_INT_MIN', ~PHP_INT_MAX);
-        }
-
+        require_once __DIR__.DIRECTORY_SEPARATOR.'ini'.DIRECTORY_SEPARATOR.'GlobalConstants.php';
+        GlobalConstants::defineConstants();
+        
         /**
          * Initialize autoloader.
          */
         if (!class_exists('webfiori\entity\AutoLoader',false)) {
-            require_once ROOT_DIR.DIRECTORY_SEPARATOR.'entity'.DIRECTORY_SEPARATOR.'GlobalConstants.php';
-            GlobalConstants::defineConstants();
             require_once ROOT_DIR.DIRECTORY_SEPARATOR.'entity'.DIRECTORY_SEPARATOR.'AutoLoader.php';
         }
         self::$AU = AutoLoader::get();

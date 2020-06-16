@@ -24,7 +24,6 @@ class VuetifyTheme extends Theme {
         $this->setLicenseName('MIT License');
         $this->setLicenseUrl('https://opensource.org/licenses/MIT');
         $this->setName('Vuetify Theme');
-        $this->setDirectoryName('vuetify-based');
         $this->setJsDirName('js');
         $this->setImagesDirName('img');
         $this->setBeforeLoaded(function()

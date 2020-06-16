@@ -14,7 +14,6 @@ class TemplateTheme extends Theme {
         $this->setName('Template Theme');
         $this->setVersion('1.0');
         $this->setDescription('Generic Theme Template.');
-        $this->setDirectoryName('template');
         $this->setImagesDirName('images');
         $this->setJsDirName('js');
         $this->setCssDirName('css');

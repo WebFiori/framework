@@ -26,7 +26,6 @@ class WebFioriTheme extends Theme {
         $this->setLicenseUrl('https://opensource.org/licenses/MIT');
         $this->setVersion('1.0.1');
         $this->setDescription('The main theme for WebFiori Framework.');
-        $this->setDirectoryName('webfiori');
         $this->setImagesDirName('images');
         $this->setJsDirName('js');
         $this->setCssDirName('css');

@@ -20,7 +20,6 @@ class GreenyTheme extends Theme {
         $this->setDescription('First theme ever made. A nice green colored elements That '
                 .'makes you thing about the nature. Use it as a template and a guide for creating '
                 .'new themes.');
-        $this->setDirectoryName('greeny');
         $this->setImagesDirName('images');
         $this->setJsDirName('js');
         $this->setCssDirName('css');

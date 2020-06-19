@@ -177,13 +177,13 @@ class ServerErrView {
             $paragraph->addTextNode('<b style="color:yellow">Tip</b>: To'
                 .' display more details about the error, '
                 .'define the constant "VERBOSE" and set its value to "true" in '
-                .'the top of the class "WebFiori".', false);
+                .'the class "GlobalConstants"', false);
             Page::insert($paragraph);
         } else {
             echo '<p class="mono"><b style="color:yellow">Tip</b>: To'
                 .' display more details about the error, '
                 .'define the constant "VERBOSE" and set its value to "true" in '
-                .'the top of the file "WebFiori.php".</p>';
+                .'the class "GlobalConstants".</p>';
         }
     }
 }

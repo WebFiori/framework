@@ -54,7 +54,7 @@ class CronTaskView extends CronView {
         $job = Cron::getJob($jobName);
         $this->job = $job;
 
-        if ($job instanceof CronJob) {
+        if ($job instanceof AbstractJob) {
             $backButton = new HTMLNode('button');
             $backButton->addTextNode('Back to Jobs List');
             $backButton->setAttribute('onclick',"window.location.href = 'cron/jobs';");
@@ -107,7 +107,7 @@ class CronTaskView extends CronView {
             $this->getControlsContainer()->addChild($forceNode);
             $this->createOutputWindow();
         } else {
-            header('location: '.WebFiori::getSiteConfig()->getBaseURL().'cron-jobs/list');
+            header('location: '.WebFiori::getSiteConfig()->getBaseURL().'cron/jobs');
         }
         Page::render();
     }

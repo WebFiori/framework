@@ -877,8 +877,8 @@ abstract class CLICommand {
             $optinsArr['optional'] = false;
         }
 
-        $this->_checkDescIndex($options);
-        $this->_checkValuesIndex($options);
+        $this->_checkDescIndex($optinsArr);
+        $this->_checkValuesIndex($optinsArr);
 
 
         if (isset($options['default']) && gettype($options['default']) == 'string') {
@@ -931,16 +931,12 @@ abstract class CLICommand {
     private function _checkSelectedChoice($choices, $default, $input) {
         if (in_array($input, $choices)) {
             return $input;
+        } else if (isset($choices[$input])) {
+            return $choices[$input];
+        } else if (strlen($input) == 0 && $default !== null) {
+            return $default;
         } else {
-            if (isset($choices[$input])) {
-                return $choices[$input];
-            } else {
-                if (strlen($input) == 0 && $default !== null) {
-                    return $default;
-                } else {
-                    $this->error('Invalid answer.');
-                }
-            }
+            $this->error('Invalid answer.');
         }
     }
     private function _checkValuesIndex(&$options) {

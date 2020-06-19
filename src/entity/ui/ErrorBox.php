@@ -97,7 +97,7 @@ class ErrorBox extends MessageBox {
                 $this->tipNode->addTextNode('<b style="color:yellow">Tip</b>: To'
                     . ' display more details about the error, '
                     . 'define the constant "VERBOSE" and set its value to "true" in '
-                    . 'the top of the file "WebFiori.php".', false);
+                    . 'the class "GlobalConstants".', false);
             }
 
             $this->setAttribute('onmouseover', "if(this.getAttribute('dg') === null){addDragSupport(this)}");

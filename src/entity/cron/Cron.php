@@ -34,7 +34,7 @@ use webfiori\WebFiori;
  * It is used to create jobs, schedule them and execute them. In order to run 
  * the jobs automatically, the developer must add an entry in the following 
  * formate in crontab:
- * <p><code>* * * * *  /usr/bin/php path/to/webfiori --cron check p=&lt;password&gt;<code></p>
+ * <p><code>* * * * *  /usr/bin/php path/to/webfiori --cron check p=&lt;password&gt;</code></p>
  * Where &lt;password&gt; is the password 
  * that was set by the developer to protect the jobs from unauthorized access. 
  * If no password is set, then it can be removed from the command.

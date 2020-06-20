@@ -403,6 +403,31 @@ abstract class CLICommand {
         return $this->commandArgs;
     }
     /**
+     * Returns an associative array that contains one argument information.
+     * @param string $argName The name of the argument.
+     * @return array If the argument exist, the method will return an associative 
+     * array. The returned array will possibly have the following indices:
+     * <ul>
+     * <li><b>optional</b>: A booleean which is set to true if the argument is optional.</li>
+     * <li><b>description</b>: The description of the argument. Appears when help command 
+     * is executed.</li>
+     * <li><b>default</b>: A default value for the argument. It will be not set if no default 
+     * value for the argument is provided.</li>
+     * <li><b>values</b>: A set of values at which the argument can have.</li>
+     * <li><b>provided</b>: Set to true if the argument is provided in command line 
+     * interface.</li>
+     * <li><b>val</b>: The value of the argument taken from the command line interface.</li>
+     * </ul>
+     * If the argument does not exist, the returned array will be empty.
+     * @since 1.0
+     */
+    public function getArgInfo($argName) {
+        if ($this->hasArg($argName)) {
+            return $this->commandArgs[$argName];
+        }
+        return [];
+    }
+    /**
      * Returns the value of command option from CLI given its name.
      * @param string $optionName The name of the option.
      * @return string|null If the value of the option is set, the method will 

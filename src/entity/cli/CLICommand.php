@@ -950,12 +950,12 @@ abstract class CLICommand {
             $trimmedDesc = trim($options['description']);
 
             if (strlen($trimmedDesc) > 0) {
-                $optinsArr['description'] = $trimmedDesc;
+                $options['description'] = $trimmedDesc;
             } else {
-                $optinsArr['description'] = '<NO DESCRIPTION>';
+                $options['description'] = '<NO DESCRIPTION>';
             }
         } else {
-            $optinsArr['description'] = '<NO DESCRIPTION>';
+            $options['description'] = '<NO DESCRIPTION>';
         }
     }
     private function _checkIsArgsSet() {
@@ -1016,9 +1016,9 @@ abstract class CLICommand {
                     }
                 }
             }
-            $optinsArr['values'] = $vals;
+            $options['values'] = $vals;
         } else {
-            $optinsArr['values'] = [];
+            $options['values'] = [];
         }
     }
     private static function _getFormattedOutput($outputString, $formatOptions) {

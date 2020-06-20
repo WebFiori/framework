@@ -137,6 +137,7 @@ class CronCommand extends CLICommand {
         if ($jobName == 'Cancel') {
             $retVal = 0;
         } else {
+            $this->_checkJobArgs($jobName);
             $result = Cron::run($cPass,$jobName.'',true, $this);
 
             if ($result == 'INV_PASS') {
@@ -151,6 +152,31 @@ class CronCommand extends CLICommand {
         }
 
         return $retVal;
+    }
+    private function _checkJobArgs($jobName) {
+        $job = Cron::getJob($jobName);
+        $args = $job->getExecArgsNames();
+        if (count($args) != 0) {
+            if ($this->confirm('Would you like to supply custom execution arguments?')) {
+                $this->_setArgs($args);
+            }
+        }
+        return;
+    }
+    private function _setArgs($argsArr) {
+        $setArg = true;
+        $index = 0;
+        $count = count($argsArr);
+        do {
+            $val = $this->getInput('Enter a value for the argument "'.$argsArr[$index].'":', '');
+            if (strlen($val) != 0) {
+                $_POST[$argsArr[$index]] = $val;
+            }
+            if ($index + 1 == $count) {
+                $setArg = false;
+            }
+            $index++;
+        } while ($setArg);
     }
     private function _printExcResult($result) {
         $this->println("Total number of jobs: ".$result['total-jobs']);

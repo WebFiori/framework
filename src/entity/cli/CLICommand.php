@@ -1007,13 +1007,13 @@ abstract class CLICommand {
                 if ($type == 'boolean') {
                     if ($val === true) {
                         $vals[] = 'y';
+                        $vals[] = 'Y';
                     } else {
                         $vals[] = 'n';
+                        $vals[] = 'N';
                     }
-                } else {
-                    if ($type != 'object' && $val !== null && strlen($val) != 0) {
-                        $vals[] = $val.'';
-                    }
+                } else if ($type != 'object' && $val !== null && strlen($val) != 0) {
+                    $vals[] = $val.'';
                 }
             }
             $options['values'] = $vals;

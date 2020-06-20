@@ -855,7 +855,7 @@ abstract class CLICommand {
     }
     private function _checkAllowedArgValues() {
         $invalidArgsVals = [];
-
+        \webfiori\entity\Util::print_r($this->commandArgs);
         foreach ($this->commandArgs as $argName => $argArray) {
             if ($this->isArgProvided($argName) && count($argArray['values']) != 0) {
                 $argValue = $argArray['val'];
@@ -893,7 +893,7 @@ abstract class CLICommand {
 
         return true;
     }
-    private function _checkArgOptions($options) {
+    private function _checkArgOptions(&$options) {
         $optinsArr = [];
 
         if (isset($options['optional'])) {

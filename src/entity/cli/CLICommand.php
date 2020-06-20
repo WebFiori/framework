@@ -785,6 +785,40 @@ abstract class CLICommand {
         }
     }
     /**
+     * Sets the value of an argument.
+     * This method is useful in writing test cases for the commands.
+     * @param string $argName The name of the argument.
+     * @param string $argValue The value to set.
+     * @return boolean If the value of the argument is set, the method will return 
+     * true. If not set, the method will return false. The value of the attribute 
+     * will be not set in the following cases:
+     * <ul>
+     * <li>If the argument can have a specific set of values and the given 
+     * value is not one of them.</li>
+     * <li>The given value is empty string or null.</li>
+     * </u>
+     * @since 1.0
+     */
+    public function setArgValue($argName, $argValue) {
+        $trimmedArgName = trim($argName);
+        $trimmedArgVal = trim($argValue);
+        $retVal = false;
+        if (isset($this->commandArgs[$trimmedArgName]) && strlen($trimmedArgVal) != 0) {
+            $allowedVals = $this->commandArgs[$trimmedArgName]['values'];
+            if (count($allowedVals) != 0) {
+                if (in_array($argValue, $allowedVals)) {
+                    $retVal = true;
+                }
+            } else {
+                $retVal = true;
+            }
+        }
+        if ($retVal) {
+            $this->commandArgs[$trimmedArgName]['val'] = $argValue;
+        }
+        return $retVal;
+    }
+    /**
      * Sets the description of the command.
      * The description of the command is a string that describes what does the 
      * command do and it will appear in CLI if the command 'help' is executed.
@@ -855,7 +889,6 @@ abstract class CLICommand {
     }
     private function _checkAllowedArgValues() {
         $invalidArgsVals = [];
-        \webfiori\entity\Util::print_r($this->commandArgs);
         foreach ($this->commandArgs as $argName => $argArray) {
             if ($this->isArgProvided($argName) && count($argArray['values']) != 0) {
                 $argValue = $argArray['val'];

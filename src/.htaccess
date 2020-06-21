@@ -19,7 +19,7 @@ Options -Indexes
     RewriteCond %{HTTP:Authorization} ^(.*)
     RewriteRule .* - [e=HTTP_AUTHORIZATION:%1]
 </IfModule>
-<FilesMatch "\.(?:log|cache|config)$">
+<FilesMatch "\.(?:log|cache|config|sh|bat)$">
     # Deny access to any file with given extension.
     # Include your own at the top.
     Order allow,deny

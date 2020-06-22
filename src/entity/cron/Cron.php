@@ -316,7 +316,8 @@ class Cron {
     /**
      * Appends a message to the array that contains logged messages.
      * The main aim of the log is to help developers identify the issues which 
-     * might cause a job to fail.
+     * might cause a job to fail. This method can be called in any place to 
+     * log a message while the code is executing.
      * @param string $message A string that act as a log message. It will be 
      * appended as passed without any changes.
      * @since 1.0.8

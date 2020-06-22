@@ -112,5 +112,20 @@ class GlobalConstants {
              */
             define('THEMES_PATH', $themesPath);
         }
+        
+        if (!defined('MAX_BOX_MESSAGES')) {
+            /**
+             * The maximum number of message boxes to show in one page.
+             * A message box is a box which will be shown in a web page that 
+             * contains some information. The 
+             * box can be created manually by using the method 'Util::print_r()' or 
+             * it can be as a result of an error during execution.
+             * Default value is 15. The developer can change the value as needed. Note 
+             * that if the constant is not defined, the number of boxes will 
+             * be almost unlimited.
+             * @since 1.0
+             */
+            define('MAX_BOX_MESSAGES', 15);
+        }
     }
 }

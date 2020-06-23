@@ -51,9 +51,9 @@ class Config {
      */
     private function __construct() {
         $this->isConfigured = false;
-        $this->releaseDate = '2020-03-10';
-        $this->version = '1.0.9';
-        $this->versionType = 'Stable';
+        $this->releaseDate = '2020-06-23';
+        $this->version = '1.1.0';
+        $this->versionType = 'Beta 1';
         $this->configVision = '1.3.4';
         $this->dbConnections = [
         ];

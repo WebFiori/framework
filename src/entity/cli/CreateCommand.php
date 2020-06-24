@@ -33,6 +33,7 @@ use restEasy\RequestParameter;
 use webfiori\entity\AutoLoader;
 use webfiori\entity\Util;
 use webfiori\WebFiori;
+use webfiori\logic\Controller;
 /**
  * A command which is used to automate some of the common tasks such as 
  * creating query classes or controllers.
@@ -156,28 +157,71 @@ class CreateCommand extends CLICommand {
             'Entity class from query.',
             'Controller class.',
             'Web services set.',
+            'Database table from query class.',
             'Quit.'
         ];
         $answer = $this->select('What would you like to create?', $options, count($options) - 1);
 
         if ($answer == 'Quit.') {
             return 0;
-        } else {
-            if ($answer == 'Query class.') {
-                return $this->_createQueryClass();
-            } else {
-                if ($answer == 'Entity class from query.') {
-                    return $this->_createEntityFromQuery();
+        } else if ($answer == 'Query class.') {
+            return $this->_createQueryClass();
+        } else if ($answer == 'Entity class from query.') {
+            return $this->_createEntityFromQuery();
+        } else if ($answer == 'Controller class.') {
+            return $this->_createController();
+        } else if ($answer == 'Web services set.') {
+            return $this->_createWebServices();
+        } else if ($answer = 'Database table from query class.') {
+            $this->_createDbTable();
+        }
+    }
+    private function _createDbTable() {
+        $dbConnections = array_keys(WebFiori::getConfig()->getDBConnections());
+
+        if (count($dbConnections) != 0) {
+            $dbConn = $this->select('Select database connection:', $dbConnections);
+            $queryClassNameValidity = false;
+            
+            do {
+                $queryClassName = $this->getInput('Enter query class name (include namespace):');
+
+                if (!class_exists($queryClassName)) {
+                    $this->error('Class not found.');
+                    continue;
+                }
+                $queryObj = new $queryClassName();
+
+                if (!$queryObj instanceof MySQLQuery) {
+                    $this->error('The given class is not a child of the class "MySQLQuery".');
+                    continue;
+                }
+                $queryClassNameValidity = true;
+            } while (!$queryClassNameValidity);
+            
+            $tempController = new Controller();
+            $tempController->setConnection($dbConn);
+            $queryObj->createTable();
+            $conn = WebFiori::getConfig()->getDBConnection($dbConn);
+            $this->prints('The following query will be executed on the database ');
+            $this->println($conn->getDBName(),[
+                'color' => 'yellow'
+            ]);
+            $this->println($queryObj->getQuery(), [
+                'color' => 'lightblue'
+            ]);
+            if ($this->confirm('Continue?', true)) {
+                if ($tempController->excQ($queryObj)) {
+                    $this->success('Database table created.');
                 } else {
-                    if ($answer == 'Controller class.') {
-                        return $this->_createController();
-                    } else {
-                        if ($answer == 'Web services set.') {
-                            return $this->_createWebServices();
-                        }
-                    }
+                    $this->error('Unable to create database table.');
+                    $err = $tempController->getDBErrDetails();
+                    $this->println("Error Code: %s\nError Message: %s", $err['error-code'], $err['error-message']);
                 }
             }
+            
+        } else {
+            $this->error('No database connections available. You must specify the connection manually later.');
         }
     }
     /**

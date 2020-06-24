@@ -304,7 +304,10 @@ class File implements JsonI {
         $lowerCase = strtolower($ext);
         $retVal = null;
         
-        if (isset(self::MIME_TYPES[$lowerCase])) {
+        //Fix for php 5.6: Cannot use isset() on the result of an expression
+        $types = self::MIME_TYPES;
+        
+        if (isset($types[$lowerCase])) {
             $retVal = self::MIME_TYPES[$lowerCase];
         }
 

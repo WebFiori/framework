@@ -51,7 +51,7 @@ class Config {
      */
     private function __construct() {
         $this->isConfigured = false;
-        $this->releaseDate = '2020-06-23';
+        $this->releaseDate = '2020-06-24';
         $this->version = '1.1.0';
         $this->versionType = 'Beta 1';
         $this->configVision = '1.3.4';

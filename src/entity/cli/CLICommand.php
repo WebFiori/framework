@@ -499,23 +499,32 @@ abstract class CLICommand {
                 $this->println();
                 $input = $this->readln();
                 
-                return $this->getInputHelper($input, $validator, $default);
+                $check = $this->getInputHelper($input, $validator, $default);
+                if ($check['valid']) {
+                    return $check['value'];
+                }
             } while (true);
         }
     }
     private function getInputHelper($input, $validator, $default) {
+        $retVal = [
+            'valid' => true,
+            'value' => $input
+        ];
         if (strlen($input) == 0 && $default !== null) {
-            return $default;
+            $retVal['value'] = $default;
+            return $retVal;
         } else if (is_callable($validator)) {
-            $validateResult = call_user_func_array($validator, [$input]);
+            $retVal['value'] = $input;
+            $retVal['valid'] = call_user_func_array($validator, [$input]);
 
-            if ($validateResult === true) {
+            if ($retVal['valid'] === true) {
                 return $input;
             } else {
                 $this->error('Invalid input is given. Try again.');
             }
         } else {
-            return $input;
+            return $retVal;
         }
     }
     /**

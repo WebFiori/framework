@@ -303,10 +303,9 @@ class File implements JsonI {
     public static function getMIMEType($ext) {
         $lowerCase = strtolower($ext);
         $retVal = null;
-        $x = self::MIME_TYPES[$lowerCase];
-
-        if ($x !== null) {
-            $retVal = $x;
+        
+        if (isset(self::MIME_TYPES[$lowerCase])) {
+            $retVal = self::MIME_TYPES[$lowerCase];
         }
 
         return $retVal;

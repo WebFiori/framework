@@ -270,7 +270,7 @@ abstract class CLICommand {
                 'color' => 'light-blue'
             ]);
 
-            $input = strtolower(trim($this->read()));
+            $input = strtolower($this->readln());
 
             if ($input == 'n') {
                 $answer = false;
@@ -497,24 +497,25 @@ abstract class CLICommand {
                     ]);
                 }
                 $this->println();
-                $input = $this->read();
-
-                if (strlen($input) == 0 && $default !== null) {
-                    return $default;
-                } else {
-                    if (is_callable($validator)) {
-                        $validateResult = call_user_func_array($validator, [$input]);
-
-                        if ($validateResult === true) {
-                            return $input;
-                        } else {
-                            $this->error('Invalid input is given. Try again.');
-                        }
-                    } else {
-                        return $input;
-                    }
-                }
+                $input = $this->readln();
+                
+                return $this->getInputHelper($input, $validator, $default);
             } while (true);
+        }
+    }
+    private function getInputHelper($input, $validator, $default) {
+        if (strlen($input) == 0 && $default !== null) {
+            return $default;
+        } else if (is_callable($validator)) {
+            $validateResult = call_user_func_array($validator, [$input]);
+
+            if ($validateResult === true) {
+                return $input;
+            } else {
+                $this->error('Invalid input is given. Try again.');
+            }
+        } else {
+            return $input;
         }
     }
     /**
@@ -741,6 +742,23 @@ abstract class CLICommand {
         return trim(fread(STDIN, 1024));
     }
     /**
+     * Reads one line from STDIN.
+     * The method will continue to read from STDIN till it finds end of 
+     * line character "\n".
+     * @return string The method will return the string which was taken from 
+     * STDIN without the end of line character.
+     * @since 1.0
+     */
+    public function readln() {
+        $retVal = '';
+        $char = '';
+        while ($char != "\n") {
+            $char = fread(STDIN, 1);
+            $retVal .= $char;
+        }
+        return trim($retVal);
+    }
+    /**
      * Ask the user to select one of multiple values.
      * This method will display a prompt and wait for the user to select 
      * the a value from a set of values. If the user give something other than the listed values, 
@@ -768,7 +786,7 @@ abstract class CLICommand {
                     $default = isset($choices[$defaultIndex]) ? $choices[$defaultIndex] : null;
                 }
                 $this->_printChoices($choices, $default);
-                $input = trim($this->read());
+                $input = trim($this->readln());
 
                 $check = $this->_checkSelectedChoice($choices, $default, $input);
 

@@ -555,22 +555,26 @@ abstract class AbstractJob {
             }
 
             if ($retVal === false) {
-                $hours = $hoursArr['at-every-x-hour'];
-                $retVal = in_array($current, $hours);
-
-                if ($retVal === false) {
-                    $hours = $hoursArr['every-x-hours'];
-
-                    foreach ($hours as $hour) {
-                        if ($current % $hour == 0) {
-                            $retVal = true;
-                            break;
-                        }
-                    }
-                }
+                $retVal = $this->isHourHelper($hoursArr, $current);
             }
         }
 
+        return $retVal;
+    }
+    private function isHourHelper($hoursArr, $current) {
+        $hours = $hoursArr['at-every-x-hour'];
+        $retVal = in_array($current, $hours);
+
+        if ($retVal === false) {
+            $hours = $hoursArr['every-x-hours'];
+
+            foreach ($hours as $hour) {
+                if ($current % $hour == 0) {
+                    $retVal = true;
+                    break;
+                }
+            }
+        }
         return $retVal;
     }
     /**
@@ -598,22 +602,26 @@ abstract class AbstractJob {
             }
 
             if ($retVal === false) {
-                $minutes = $minuteArr['at-every-x-minute'];
-                $retVal = in_array($current, $minutes);
-
-                if ($retVal === false) {
-                    $minutes = $minuteArr['every-x-minutes'];
-
-                    foreach ($minutes as $min) {
-                        if ($current % $min == 0) {
-                            $retVal = true;
-                            break;
-                        }
-                    }
-                }
+                $retVal = $this->isMinuteHelper($minuteArr, $current);
             }
         }
 
+        return $retVal;
+    }
+    private function isMinuteHelper($minuteArr, $current) {
+        $minutes = $minuteArr['at-every-x-minute'];
+        $retVal = in_array($current, $minutes);
+
+        if ($retVal === false) {
+            $minutes = $minuteArr['every-x-minutes'];
+
+            foreach ($minutes as $min) {
+                if ($current % $min == 0) {
+                    $retVal = true;
+                    break;
+                }
+            }
+        }
         return $retVal;
     }
     /**

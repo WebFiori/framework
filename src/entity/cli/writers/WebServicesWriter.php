@@ -197,35 +197,27 @@ class WebServicesWriter extends ClassWriter {
         $actionIndex = 0;
 
         foreach ($this->servicesObj->getActions() as $service) {
-            if ($actionIndex == 0) {
-                $this->append('if ($calledServiceName == \''.$service->getName().'\') {', 2);
-                $this->append('// TODO: process the request for the service \''.$service->getName().'\'.', 3);
-            } else {
-                $this->append('} else if ($calledServiceName == \''.$service->getName().'\') {', 2);
-                $this->append('// TODO: process the request for the service \''.$service->getName().'\'.', 3);
-            }
-
-            if ($actionIndex + 1 == $totalActions) {
-                $this->append('}', 2);
-            }
-            $actionIndex++;
+            $this->_serviceWrite($service, $actionIndex, $totalActions);
         }
 
         foreach ($this->servicesObj->getAuthActions() as $service) {
-            if ($actionIndex == 0) {
-                $this->append('if ($calledServiceName == \''.$service->getName().'\') {', 2);
-                $this->append('// TODO: process the request for the service \''.$service->getName().'\'.', 3);
-            } else {
-                $this->append('} else if ($calledServiceName == \''.$service->getName().'\') {', 2);
-                $this->append('// TODO: process the request for the service \''.$service->getName().'\'.', 3);
-            }
-
-            if ($actionIndex + 1 == $totalActions) {
-                $this->append('}', 2);
-            }
-            $actionIndex++;
+            $this->_serviceWrite($service, $actionIndex, $totalActions);
         }
         $this->append('}', 1);
+    }
+    private function _serviceWrite($service, &$actionIndex, $totalActions) {
+        if ($actionIndex == 0) {
+            $this->append('if ($calledServiceName == \''.$service->getName().'\') {', 2);
+            $this->append('// TODO: process the request for the service \''.$service->getName().'\'.', 3);
+        } else {
+            $this->append('} else if ($calledServiceName == \''.$service->getName().'\') {', 2);
+            $this->append('// TODO: process the request for the service \''.$service->getName().'\'.', 3);
+        }
+
+        if ($actionIndex + 1 == $totalActions) {
+            $this->append('}', 2);
+        }
+        $actionIndex++;
     }
     private function _writeConstructor() {
         $this->append("/**", 1);

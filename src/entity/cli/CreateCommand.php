@@ -172,7 +172,7 @@ class CreateCommand extends CLICommand {
             return $this->_createController();
         } else if ($answer == 'Web services set.') {
             return $this->_createWebServices();
-        } else if ($answer = 'Database table from query class.') {
+        } else if ($answer == 'Database table from query class.') {
             $this->_createDbTable();
         }
     }
@@ -640,7 +640,7 @@ class CreateCommand extends CLICommand {
             for ($x = 0 ; $x < $len ; $x++) {
                 $char = $name[$x];
 
-                if ($x == 0 && (($char >= '0' && $char <= '9'))) {
+                if ($x == 0 && $char >= '0' && $char <= '9') {
                     return false;
                 }
 
@@ -666,7 +666,7 @@ class CreateCommand extends CLICommand {
             for ($x = 0 ; $x < $len ; $x++) {
                 $char = $subNs[$x];
 
-                if ($x == 0 && (($char >= '0' && $char <= '9'))) {
+                if ($x == 0 && $char >= '0' && $char <= '9') {
                     return false;
                 }
 

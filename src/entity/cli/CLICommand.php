@@ -257,12 +257,10 @@ abstract class CLICommand {
         do {
             if ($default === true) {
                 $optionsStr = '(Y/n)';
+            } else if ($default === false) {
+                $optionsStr = '(y/N)';
             } else {
-                if ($default === false) {
-                    $optionsStr = '(y/N)';
-                } else {
-                    $optionsStr = '(y/n)';
-                }
+                $optionsStr = '(y/n)';
             }
             $this->prints($confirmTxt, [
                 'color' => 'gray',
@@ -276,16 +274,12 @@ abstract class CLICommand {
 
             if ($input == 'n') {
                 $answer = false;
+            } else if ($input == 'y') {
+                $answer = true;
+            } else if (strlen($input) == 0 && $default !== null) {
+                return $default === true;
             } else {
-                if ($input == 'y') {
-                    $answer = true;
-                } else {
-                    if (strlen($input) == 0 && $default !== null) {
-                        return $default === true;
-                    } else {
-                        $this->error('Invalid answer. Choose \'y\' or \'n\'.');
-                    }
-                }
+                $this->error('Invalid answer. Choose \'y\' or \'n\'.');
             }
         } while ($answer === null);
 

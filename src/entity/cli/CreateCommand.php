@@ -27,7 +27,7 @@ namespace webfiori\entity\cli;
 use Error;
 use phMysql\MySQLColumn;
 use phMysql\MySQLQuery;
-use restEasy\APIAction;
+use restEasy\WebService;
 use restEasy\APIFilter;
 use restEasy\RequestParameter;
 use webfiori\entity\AutoLoader;
@@ -133,9 +133,9 @@ class CreateCommand extends CLICommand {
         $servicesObj = new ServicesHolder();
 
         do {
-            $serviceObj = new APIAction('');
+            $serviceObj = new WebService('');
             $this->_setServiceName($serviceObj);
-            $serviceObj->addRequestMethod($this->select('Request method:', APIAction::METHODS, 0));
+            $serviceObj->addRequestMethod($this->select('Request method:', WebService::METHODS, 0));
             $servicesObj->addAction($serviceObj, $this->confirm('Does the service require authorization?', false));
 
             if ($this->confirm('Would you like to add request parameters to the service?', false)) {
@@ -288,7 +288,7 @@ class CreateCommand extends CLICommand {
     }
     /**
      * 
-     * @param APIAction $serviceObj
+     * @param WebService $serviceObj
      */
     private function _addParamsToService($serviceObj) {
         $addMore = true;
@@ -550,7 +550,7 @@ class CreateCommand extends CLICommand {
     }
     /**
      * 
-     * @param APIAction $serviceObj
+     * @param WebService $serviceObj
      */
     private function _setServiceName($serviceObj) {
         $validName = false;

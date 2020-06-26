@@ -732,22 +732,27 @@ abstract class AbstractJob {
 
                         return $this->cron($minute.' '.$hour.' '.$dayNum.' '.$monthNum.' *');
                     } else {
-                        $trimmed = trim($monthNameOrNum);
-
-                        if (in_array($trimmed, ['12','1','2','3','4','5','6','7','8','9','10','11'])) {
-                            $monthNameOrNum = intval($trimmed);
-                        } else {
-                            return false;
-                        }
-
-                        if ($monthNameOrNum >= 1 && $monthNameOrNum <= 12) {
-                            return $this->cron($minute.' '.$hour.' '.$dayNum.' '.$monthNameOrNum.' *');
-                        }
+                        return $this->onMonthHelper($monthNameOrNum, $minute, $hour, $dayNum);
                     }
                 }
             }
         }
 
+        return false;
+    }
+    private function onMonthHelper($monthNameOrNum, $minute, $hour, $dayNum) {
+        $trimmed = trim($monthNameOrNum);
+
+        if (in_array($trimmed, ['12','1','2','3','4','5','6','7','8','9','10','11'])) {
+            $monthNameOrNum = intval($trimmed);
+        } else {
+            return false;
+        }
+
+        if ($monthNameOrNum >= 1 && $monthNameOrNum <= 12) {
+            return $this->cron($minute.' '.$hour.' '.$dayNum.' '.$monthNameOrNum.' *');
+        }
+        
         return false;
     }
     /**

@@ -233,10 +233,11 @@ class ControllerTest extends TestCase {
         $this->assertTrue($func->setConnection('test-connection'));
         $result = $func->useDatabase();
         $this->assertTrue($result);
+        
         $connection = new DBConnectionInfo('root', '123456', '');
-        $connection->setConnectionName('test-connection');
+        $connection->setConnectionName('test-connection-2');
         WebFiori::getConfig()->addDbConnection($connection);
-        $result = $func->useDatabase('test-connection');
+        $result = $func->useDatabase('test-connection-2');
         $this->assertFalse($result);
         $errDetails = $func->getDBErrDetails();
         $this->assertEquals(1046,$errDetails['error-code']);

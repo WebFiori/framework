@@ -635,6 +635,7 @@ class Controller {
             }
         } else {
             $this->activeDatabaseLink = self::$DbConnectionsPool[$connParams->getConnectionName()];
+            return true;
         }
     }
     private function _connectAndExecute($queryObj, $connName) {

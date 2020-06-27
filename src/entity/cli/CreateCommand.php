@@ -357,7 +357,7 @@ class CreateCommand extends CLICommand {
                 $this->_isPrimaryCheck($colObj);
                 $this->_addColComment($colObj);
             }
-            $addMoreCols = $this->confirm('Would you like to add another column?');
+            $addMoreCols = $this->confirm('Would you like to add another column?', false);
         } while ($addMoreCols);
         $tempQuery->createTable();
 
@@ -367,16 +367,18 @@ class CreateCommand extends CLICommand {
 
         if ($this->confirm('Would you like to create an entity class that maps to the database table?', false)) {
             $entityInfo = $this->getClassInfo();
-            $entityInfo['implement-jsoni'] = $this->confirm('Would you like from your class to implement the interface JsonI?', true);
+            $entityInfo['implement-jsoni'] = $this->confirm('Would you like from your entity class to implement the interface JsonI?', true);
             $classInfo['entity-info'] = $entityInfo;
         }
 
         if (strlen($classInfo['namespace']) == 0) {
-            $this->warning('The query class will be added to the namespace "phMysql\query" since no namespace was provided.');
+            $classInfo['namespace'] = 'phMysql\query';
+            $this->warning('The query class will be added to the namespace "'.$classInfo['namespace'].'" since no namespace was provided.');
         }
 
         if (isset($classInfo['entity-info']) && strlen($classInfo['entity-info']['namespace']) == 0) {
-            $this->warning('The entity class will be added to the namespace "phMysql\entity" since no namespace was provided.');
+            $classInfo['entity-info']['namespace'] = 'phMysql\entity';
+            $this->warning('The entity class will be added to the namespace "'.$classInfo['entity-info']['namespace'].'" since no namespace was provided.');
         }
         $writer = new QueryClassWriter($tempQuery, $classInfo);
         $writer->writeClass();

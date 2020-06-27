@@ -26,7 +26,7 @@ namespace webfiori\entity;
 
 use jsonx\JsonI;
 use jsonx\JsonX;
-use restEasy\WebServices;
+use restEasy\WebServicesSet;
 use webfiori\entity\langs\Language;
 use webfiori\WebFiori;
 /**

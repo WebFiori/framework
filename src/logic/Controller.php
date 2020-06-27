@@ -42,7 +42,7 @@ use webfiori\entity\SessionManager;
  * the system uses any. The developer can extend this class to add his own 
  * logic to the application that he is creating.
  * @author Ibrahim
- * @version 1.3.8
+ * @version 1.3.9
  */
 class Controller {
     /**
@@ -101,7 +101,13 @@ class Controller {
      * @var MySQLLink
      * @since 1.3.3 
      */
-    private $databaseLink;
+    private $activeDatabaseLink;
+    /**
+     * An array that contains a set of active database connections as objects 
+     * of type 'MySQLLink'.
+     * @var array 
+     */
+    private static $DbConnectionsPool;
     /**
      * A stack that contains multiple data sets which was fetched from executing 
      * database queries.
@@ -142,7 +148,7 @@ class Controller {
      * @var array
      * @since 1.3 
      */
-    private static $sessions;
+    private static $Sessions;
     /**
      * Creates new instance of the class.
      * When a new instance of the class is created, a session with name 'wf-sesstion' 
@@ -154,9 +160,10 @@ class Controller {
      * @since 1.0
      */
     public function __construct() {
-        if (self::$sessions === null) {
-            self::$sessions = [];
+        if (self::$Sessions === null) {
+            self::$Sessions = [];
             self::$QueryStack = new Stack();
+            self::$DbConnectionsPool = [];
         }
         $this->dataStack = new Stack();
         $this->currentDataset = null;
@@ -302,7 +309,7 @@ class Controller {
         $retVal = null;
 
         if ($this->sessionName !== null) {
-            $retVal = self::$sessions[$this->sessionName];
+            $retVal = self::$Sessions[$this->sessionName];
         }
 
         return $retVal;
@@ -560,7 +567,7 @@ class Controller {
         } else if (gettype($options) == 'array' && isset($options['name'])) {
             $givenSessionName = trim($options['name']);
 
-            if (isset(self::$sessions[$givenSessionName])) {
+            if (isset(self::$Sessions[$givenSessionName])) {
                 $this->sessionName = $givenSessionName;
 
                 return true;
@@ -601,28 +608,33 @@ class Controller {
      * for 'Unknown database'.
      */
     private function _connect($connParams) {
-        $result = DBConnectionFactory::mysqlLink([
-            'host' => $connParams->getHost(),
-            'user' => $connParams->getUsername(),
-            'pass' => $connParams->getPassword(),
-            'db-name' => $connParams->getDBName(),
-            'port' => $connParams->getPort()
-        ]);
+        if (!isset(self::$DbConnectionsPool[$connParams->getConnectionName()])) {
+                $result = DBConnectionFactory::mysqlLink([
+                'host' => $connParams->getHost(),
+                'user' => $connParams->getUsername(),
+                'pass' => $connParams->getPassword(),
+                'db-name' => $connParams->getDBName(),
+                'port' => $connParams->getPort()
+            ]);
 
-        if ($result instanceof MySQLLink) {
-            $this->databaseLink = $result;
+            if ($result instanceof MySQLLink) {
+                $this->activeDatabaseLink = $result;
 
-            if ($result->getErrorCode() == 0) {
-                return true;
+                if ($result->getErrorCode() == 0) {
+                    self::$DbConnectionsPool[$connParams->getConnectionName()] = $result;
+                    return true;
+                }
+                //might be connected but database is not set.
+                $this->_setDBErrDetails($this->getDBLink()->getErrorCode(), $this->getDBLink()->getErrorMessage());
+
+                return false;
+            } else {
+                $this->_setDBErrDetails($result['error-code'], $result['error-message']);
+
+                return false;
             }
-            //might be connected but database is not set.
-            $this->_setDBErrDetails($this->getDBLink()->getErrorCode(), $this->getDBLink()->getErrorMessage());
-
-            return false;
         } else {
-            $this->_setDBErrDetails($result['error-code'], $result['error-message']);
-
-            return false;
+            $this->activeDatabaseLink = self::$DbConnectionsPool[$connParams->getConnectionName()];
         }
     }
     private function _connectAndExecute($queryObj, $connName) {
@@ -663,7 +675,7 @@ class Controller {
             $this->sessionName = $givenSessionName;
             $sUser = isset($options['user']) ? $options['user'] : self::DEFAULT_SESSTION_OPTIONS['user'];
             $mngr->setUser($sUser);
-            self::$sessions[$mngr->getName()] = $mngr;
+            self::$Sessions[$mngr->getName()] = $mngr;
 
             if (isset($options['variables'])) {
                 foreach ($options['variables'] as $k => $v) {
@@ -730,12 +742,14 @@ class Controller {
     }
     /**
      * Returns the link that is used to connect to the database.
+     * Note that the method will return the connection which is currently in 
+     * use by the controller.
      * @return MySQLLink|null The link that is used to connect to the database. 
      * If no link is established with the database, the method will return 
      * null.
      * @since 1.2
      */
     private function getDBLink() {
-        return $this->databaseLink;
+        return $this->activeDatabaseLink;
     }
 }

@@ -38,7 +38,7 @@ class APIRoutes {
      */
     public static function create() {
         Router::api([
-            'path' => '/ExampleAPI/{action}', 
+            'path' => '/ExampleAPI/{service-name}', 
             'route-to' => '/ExampleAPI.php'
         ]);
     }

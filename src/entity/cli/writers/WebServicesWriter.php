@@ -25,7 +25,7 @@
 namespace webfiori\entity\cli;
 
 use InvalidArgumentException;
-use restEasy\APIAction;
+use restEasy\WebService;
 use restEasy\RequestParameter;
 use restEasy\WebServicesSet;
 
@@ -120,7 +120,7 @@ class WebServicesWriter extends ClassWriter {
     }
     /**
      * 
-     * @param APIAction $service
+     * @param WebService $service
      */
     private function _appendService($service, $requireAuth = false) {
         $this->append('$this->addService(WebService::createService([', 2);
@@ -153,7 +153,7 @@ class WebServicesWriter extends ClassWriter {
         if ($requireAuth) {
             $this->append('], true));', 2);
         } else {
-            $this->append('], false));', 2);
+            $this->append(']), false);', 2);
         }
     }
     private function _implementMethods() {

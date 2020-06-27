@@ -616,25 +616,28 @@ class Cron {
                 }
 
                 if (is_resource($file)) {
-                    if ($forced) {
-                        fwrite($file, 'Job \''.$job->getJobName().'\' was forced to executed at '.date(DATE_RFC1123).". Request source IP: ".Util::getClientIP()."\n");
-
-                        if ($job->isSuccess()) {
-                            fwrite($file, 'Execution status: Successfully completed.'."\n");
-                        } else {
-                            fwrite($file, 'Execution status: Failed to completed.'."\n");
-                        }
-                    } else {
-                        fwrite($file, 'Job \''.$job->getJobName().'\' automatically executed at '.date(DATE_RFC1123)."\n");
-
-                        if ($job->isSuccess()) {
-                            fwrite($file, 'Execution status: Successfully completed.'."\n");
-                        } else {
-                            fwrite($file, 'Execution status: Failed to completed.'."\n");
-                        }
-                    }
+                    $this->_logExecHelper($forced, $job, $file);
                     fclose($file);
                 }
+            }
+        }
+    }
+    private function _logExecHelper($forced, $job, $file) {
+        if ($forced) {
+            fwrite($file, 'Job \''.$job->getJobName().'\' was forced to executed at '.date(DATE_RFC1123).". Request source IP: ".Util::getClientIP()."\n");
+
+            if ($job->isSuccess()) {
+                fwrite($file, 'Execution status: Successfully completed.'."\n");
+            } else {
+                fwrite($file, 'Execution status: Failed to completed.'."\n");
+            }
+        } else {
+            fwrite($file, 'Job \''.$job->getJobName().'\' automatically executed at '.date(DATE_RFC1123)."\n");
+
+            if ($job->isSuccess()) {
+                fwrite($file, 'Execution status: Successfully completed.'."\n");
+            } else {
+                fwrite($file, 'Execution status: Failed to completed.'."\n");
             }
         }
     }

@@ -26,7 +26,7 @@ namespace webfiori\entity\router;
 
 use jsonx\JsonX;
 use phpStructs\html\HTMLNode;
-use restEasy\WebServices;
+use restEasy\WebServicesSet;
 use webfiori\conf\SiteConfig;
 use webfiori\entity\cli\CLI;
 use webfiori\entity\exceptions\RoutingException;
@@ -49,7 +49,7 @@ use webfiori\entity\Util;
  * </p>
  * <p>An API route is a route that points to a file which exist inside the 
  * directory '/apis'. This folder usually contains PHP files which extends 
- * the class 'ExtendedWebServices' or the class 'WebServices'.
+ * the class 'ExtendedWebServices' or the class 'WebServicesSet'.
  * </p>
  * <p>
  * A closure route is simply a function that will be executed when the 
@@ -187,7 +187,7 @@ class Router {
         return false;
     }
     /**
-     * Adds new route to an API file.
+     * Adds new route to a web services set.
      * @param array $options An associative array that contains route 
      * options. Available options are:
      * <ul>
@@ -200,7 +200,9 @@ class Router {
      * example above to get any user profile, We would add the following as 
      * a path: 'user/{username}'. In this case, username will be available in 
      * $_GET['username']. Note that its possible to get the value of the 
-     * variable using the method <b>Router::<a href="#getVarValue">getVarValue()</a></b></li>
+     * variable using the method <b>Router::<a href="#getVarValue">getVarValue()</a></b>. 
+     * Note that for any route that points to a web services set, a variable which 
+     * has the name 'service-name' must be added.</li>
      * <li><b>route-to</b>: The path to the API file. The root folder for 
      * all APIs is '/apis'. If the API name is 'get-user-profile.php', then the 
      * value of this parameter must be '/get-user-profile.php'. If the API is in a 
@@ -805,7 +807,7 @@ class Router {
             if (class_exists($constructor)) {
                 $instance = new $constructor();
 
-                if ($instance instanceof WebServices) {
+                if ($instance instanceof WebServicesSet) {
                     $instance->process();
                 }
             }

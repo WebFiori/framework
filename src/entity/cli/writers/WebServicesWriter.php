@@ -241,34 +241,26 @@ class WebServicesWriter extends ClassWriter {
                 );
 
         foreach ($this->servicesObj->getActions() as $service) {
-            if (count($service->getParameters()) != 0) {
-                $this->append(" * <li><b>".$service->getName()."</b>: This service has the following parameters:");
-                $this->append(' * <ul>');
-
-                foreach ($service->getParameters() as $param) {
-                    $this->append(' * <li><b>'.$param->getName().'</b>: Data type: '.$param->getType().'.');
-                }
-                $this->append(' * </ul>');
-                $this->append(' * </li>');
-            } else {
-                $this->append(" * <li><b>".$service->getName()."</b></li>");
-            }
+            $this->_writeServiceDoc($service);
         }
         foreach ($this->servicesObj->getAuthActions() as $service) {
-            if (count($service->getParameters()) != 0) {
-                $this->append(" * <li><b>".$service->getName()."</b>: This service has the following parameters:");
-                $this->append(' * <ul>');
-
-                foreach ($service->getParameters() as $param) {
-                    $this->append(' * <li><b>'.$param->getName().'</b>: Data type: '.$param->getType().'.');
-                }
-                $this->append(' * </ul>');
-                $this->append(' * </li>');
-            } else {
-                $this->append(" * <li><b>".$service->getName()."</b></li>");
-            }
+            $this->_writeServiceDoc($service);
         }
         $this->append(" * </ul>\n */");
         $this->append('class '.$this->getName().' extends ExtendedWebServices {');
+    }
+    private function _writeServiceDoc($service) {
+        if (count($service->getParameters()) != 0) {
+            $this->append(" * <li><b>".$service->getName()."</b>: This service has the following parameters:");
+            $this->append(' * <ul>');
+
+            foreach ($service->getParameters() as $param) {
+                $this->append(' * <li><b>'.$param->getName().'</b>: Data type: '.$param->getType().'.');
+            }
+            $this->append(' * </ul>');
+            $this->append(' * </li>');
+        } else {
+            $this->append(" * <li><b>".$service->getName()."</b></li>");
+        }
     }
 }

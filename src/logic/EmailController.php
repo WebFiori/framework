@@ -260,8 +260,8 @@ class EmailController extends Controller {
                 . "                self::get()->addAccount(\$smtpConnInfo, \$trimmedName);\n"
                 . "            }\n"
                 . "        }\n"
-                . "    }\n";
-        $fileData .= ""
+                . "    }\n"
+                . ""
                 . "    /**\n"
                 . "     * Return a single instance of the class.\n"
                 . "     * Calling this method multiple times will result in returning\n"
@@ -276,8 +276,8 @@ class EmailController extends Controller {
                 . "        }\n"
                 . "        \n"
                 . "        return self::\$inst;\n"
-                . "    }\n";
-        $fileData .= ""
+                . "    }\n"
+                . ""
                 . "    /**\n"
                 . "     * Returns an email account given its name.\n"
                 . "     * The method will search for an account with the given name in the set\n"
@@ -290,8 +290,8 @@ class EmailController extends Controller {
                 . "     */\n"
                 . "    public static function getAccount(\$name) {\n"
                 . "        return self::get()->_getAccount(\$name);\n"
-                . "    }\n";
-        $fileData .= ""
+                . "    }\n"
+                . ""
                 . "    /**\n"
                 . "     * Returns an associative array that contains all email accounts.\n"
                 . "     * The indices of the array will act as the names of the accounts.\n"
@@ -311,8 +311,8 @@ class EmailController extends Controller {
                 . "    }\n"
                 . "    private function _getAccounts() {\n"
                 . "        return \$this->emailAccounts;\n"
-                . "    }\n";
-        $fileData .= ""
+                . "    }\n"
+                . ""
                 . "    /**\n"
                 . "     * Adds an email account.\n"
                 . "     * The developer can use this method to add new account during runtime.\n"

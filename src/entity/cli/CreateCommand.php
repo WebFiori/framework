@@ -142,14 +142,16 @@ class CreateCommand extends CLICommand {
                 $this->_addParamsToService($serviceObj);
             }
 
-            $addServices = $this->confirm('Would you like to add another web service?');
+            $addServices = $this->confirm('Would you like to add another web service?', false);
         } while ($addServices);
 
 
         $this->println('Creating the class...');
         $servicesCreator = new WebServicesWriter($servicesObj, $classInfo);
         $servicesCreator->writeClass();
-        $this->println('Class created.');
+        $this->success('Class created.');
+        $this->info('Don\'t forget to add a route to the new service in the class \'APIRoutes\'.');
+        return 0;
     }
     public function exec() {
         $options = [
@@ -221,7 +223,7 @@ class CreateCommand extends CLICommand {
             }
             
         } else {
-            $this->error('No database connections available. You must specify the connection manually later.');
+            $this->error('No database connections available. Add connections inside the class \'Config\'.');
         }
     }
     /**
@@ -304,7 +306,7 @@ class CreateCommand extends CLICommand {
             } else {
                 $this->warning('The parameter was not added.');
             }
-            $addMore = $this->confirm('Would you like to add another parameter?');
+            $addMore = $this->confirm('Would you like to add another parameter?', false);
         } while ($addMore);
     }
     private function _createController() {

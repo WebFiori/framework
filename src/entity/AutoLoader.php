@@ -205,7 +205,8 @@ class AutoLoader {
                 $DS.'apis',
                 $DS.'pages',
                 $DS.'ini',
-                $DS.'conf'
+                $DS.'conf',
+                $DS.'app'
             ];
 
             if (isset($options['search-folders'])) {

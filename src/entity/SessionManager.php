@@ -978,7 +978,8 @@ class SessionManager implements JsonI {
         $_SESSION[self::$SV][self::MAIN_VARS[0]] = $time * 60;
 
         $params = session_get_cookie_params();
-
+        session_write_close();
+        
         if (isset($params['secure'])) {
             $secure = $params['secure'];
         } else {
@@ -992,7 +993,8 @@ class SessionManager implements JsonI {
         }
         $path = isset($params['path']) ? $params['path'] : '/';
         session_set_cookie_params(time() + $this->getLifetime() * 60, $path, $params['domain'], $secure, $httponly);
-
+        $this->_switchToSession();
+        
         $retVal = true;
 
         if ($this->isTimeout()) {

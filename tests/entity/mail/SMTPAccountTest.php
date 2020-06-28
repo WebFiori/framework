@@ -24,6 +24,27 @@ class SMTPAccountTest extends TestCase {
     /**
      * @test
      */
+    public function test01() {
+        $acc = new SMTPAccount([
+            'user' => 'my-mail@example.com',
+            'pass' => '123456',
+            'port' => 25,
+            'server-address' => 'mail.examplex.com',
+            'sender-name' => 'Example Sender',
+            'sender-address' => 'no-reply@example.com',
+            'account-name' => 'no-reply'
+        ]);
+        $this->assertSame(25,$acc->getPort());
+        $this->assertEquals('no-reply@example.com',$acc->getAddress());
+        $this->assertEquals('Example Sender',$acc->getSenderName());
+        $this->assertEquals('123456',$acc->getPassword());
+        $this->assertEquals('mail.examplex.com',$acc->getServerAddress());
+        $this->assertEquals('my-mail@example.com',$acc->getUsername());
+        $this->assertEquals('no-reply',$acc->getAccountName());
+    }
+    /**
+     * @test
+     */
     public function testSetAddress() {
         $acc = new SMTPAccount();
         $acc->setAddress('ix@hhh.com');

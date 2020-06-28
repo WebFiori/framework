@@ -25,9 +25,9 @@
 namespace webfiori\entity\cli;
 
 use InvalidArgumentException;
-use restEasy\APIAction;
+use restEasy\WebService;
 use restEasy\RequestParameter;
-use restEasy\WebServices;
+use restEasy\WebServicesSet;
 
 /**
  * A writer class which is used to create new web services class.
@@ -38,12 +38,12 @@ use restEasy\WebServices;
 class WebServicesWriter extends ClassWriter {
     /**
      *
-     * @var WebServices 
+     * @var WebServicesSet
      */
     private $servicesObj;
     /**
      * Creates new instance of the class.
-     * @param WebServices $webServicesObj The object that will be written to the 
+     * @param WebServicesSet $webServicesObj The object that will be written to the 
      * class.
      * @param array $classInfoArr An associative array that contains the information 
      * of the class that will be created. The array must have the following indices: 
@@ -59,8 +59,8 @@ class WebServicesWriter extends ClassWriter {
     public function __construct($webServicesObj, $classInfoArr) {
         parent::__construct($classInfoArr);
 
-        if (!$webServicesObj instanceof WebServices) {
-            throw new InvalidArgumentException('Given parameter is not an instance of \'WebServices\'');
+        if (!$webServicesObj instanceof WebServicesSet) {
+            throw new InvalidArgumentException('Given parameter is not an instance of \'WebServicesSet\'');
         }
         $this->servicesObj = $webServicesObj;
         $this->_writeHeaderSec();
@@ -120,10 +120,10 @@ class WebServicesWriter extends ClassWriter {
     }
     /**
      * 
-     * @param APIAction $service
+     * @param WebService $service
      */
     private function _appendService($service, $requireAuth = false) {
-        $this->append('$this->addAction(APIAction::createService([', 2);
+        $this->append('$this->addService(WebService::createService([', 2);
         $this->append("'name' => '".$service->getName()."',", 3);
         $this->append("'request-methods' => [", 3);
 
@@ -153,7 +153,7 @@ class WebServicesWriter extends ClassWriter {
         if ($requireAuth) {
             $this->append('], true));', 2);
         } else {
-            $this->append('], false));', 2);
+            $this->append(']), false);', 2);
         }
     }
     private function _implementMethods() {
@@ -162,7 +162,7 @@ class WebServicesWriter extends ClassWriter {
         $this->append(" * @return boolean If the client is authorized, the method will return true.", 1);
         $this->append(" */", 1);
         $this->append("public function isAuthorized() {", 1);
-        $this->append('$calledServiceName = $this->getAction();', 2);
+        $this->append('$calledServiceName = $this->getCalledServiceName();', 2);
 
         $authActionIndex = 0;
         $authCount = count($this->servicesObj->getAuthActions());
@@ -189,7 +189,7 @@ class WebServicesWriter extends ClassWriter {
         $this->append(" * Process the request.", 1);
         $this->append(" */", 1);
         $this->append("public function processRequest() {", 1);
-        $this->append('$calledServiceName = $this->getAction();', 2);
+        $this->append('$calledServiceName = $this->getCalledServiceName();', 2);
 
 
         $totalActions = count($this->servicesObj->getActions()) + $authCount;
@@ -197,35 +197,27 @@ class WebServicesWriter extends ClassWriter {
         $actionIndex = 0;
 
         foreach ($this->servicesObj->getActions() as $service) {
-            if ($actionIndex == 0) {
-                $this->append('if ($calledServiceName == \''.$service->getName().'\') {', 2);
-                $this->append('// TODO: process the request for the service \''.$service->getName().'\'.', 3);
-            } else {
-                $this->append('} else if ($calledServiceName == \''.$service->getName().'\') {', 2);
-                $this->append('// TODO: process the request for the service \''.$service->getName().'\'.', 3);
-            }
-
-            if ($actionIndex + 1 == $totalActions) {
-                $this->append('}', 2);
-            }
-            $actionIndex++;
+            $this->_serviceWrite($service, $actionIndex, $totalActions);
         }
 
         foreach ($this->servicesObj->getAuthActions() as $service) {
-            if ($actionIndex == 0) {
-                $this->append('if ($calledServiceName == \''.$service->getName().'\') {', 2);
-                $this->append('// TODO: process the request for the service \''.$service->getName().'\'.', 3);
-            } else {
-                $this->append('} else if ($calledServiceName == \''.$service->getName().'\') {', 2);
-                $this->append('// TODO: process the request for the service \''.$service->getName().'\'.', 3);
-            }
-
-            if ($actionIndex + 1 == $totalActions) {
-                $this->append('}', 2);
-            }
-            $actionIndex++;
+            $this->_serviceWrite($service, $actionIndex, $totalActions);
         }
         $this->append('}', 1);
+    }
+    private function _serviceWrite($service, &$actionIndex, $totalActions) {
+        if ($actionIndex == 0) {
+            $this->append('if ($calledServiceName == \''.$service->getName().'\') {', 2);
+            $this->append('// TODO: process the request for the service \''.$service->getName().'\'.', 3);
+        } else {
+            $this->append('} else if ($calledServiceName == \''.$service->getName().'\') {', 2);
+            $this->append('// TODO: process the request for the service \''.$service->getName().'\'.', 3);
+        }
+
+        if ($actionIndex + 1 == $totalActions) {
+            $this->append('}', 2);
+        }
+        $actionIndex++;
     }
     private function _writeConstructor() {
         $this->append("/**", 1);
@@ -240,7 +232,7 @@ class WebServicesWriter extends ClassWriter {
         $this->append("<?php\n");
         $this->append('namespace '.$this->getNamespace().";\n");
         $this->append("use webfiori\\entity\\ExtendedWebServices;");
-        $this->append("use restEasy\\APIAction;");
+        $this->append("use restEasy\\WebService;");
         $this->append('');
         $this->append("/**\n"
                 ." * A class that contains a set of web services.\n"
@@ -249,20 +241,26 @@ class WebServicesWriter extends ClassWriter {
                 );
 
         foreach ($this->servicesObj->getActions() as $service) {
-            if (count($service->getParameters()) != 0) {
-                $this->append(" * <li><b>".$service->getName()."</b>: This service has the following parameters:");
-                $this->append(' * <ul>');
-
-                foreach ($service->getParameters() as $param) {
-                    $this->append(' * <li><b>'.$param->getName().'</b>: Data type: '.$param->getType().'.');
-                }
-                $this->append(' * </ul>');
-                $this->append(' * </li>');
-            } else {
-                $this->append(" * <li><b>".$service->getName()."</b></li>");
-            }
+            $this->_writeServiceDoc($service);
+        }
+        foreach ($this->servicesObj->getAuthActions() as $service) {
+            $this->_writeServiceDoc($service);
         }
         $this->append(" * </ul>\n */");
         $this->append('class '.$this->getName().' extends ExtendedWebServices {');
+    }
+    private function _writeServiceDoc($service) {
+        if (count($service->getParameters()) != 0) {
+            $this->append(" * <li><b>".$service->getName()."</b>: This service has the following parameters:");
+            $this->append(' * <ul>');
+
+            foreach ($service->getParameters() as $param) {
+                $this->append(' * <li><b>'.$param->getName().'</b>: Data type: '.$param->getType().'.');
+            }
+            $this->append(' * </ul>');
+            $this->append(' * </li>');
+        } else {
+            $this->append(" * <li><b>".$service->getName()."</b></li>");
+        }
     }
 }

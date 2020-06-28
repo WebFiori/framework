@@ -385,32 +385,32 @@ class AutoLoader {
     }
     private static function _checkComposer() {
         if (defined('LOAD_COMPOSER_PACKAGES') && LOAD_COMPOSER_PACKAGES === true) {
-            $composerVendor = self::_getComposerVendorDir();
-
-            if (strlen($composerVendor) != 0) {
-                self::$loader->addSearchDirectory($composerVendor, true, false);
+            $composerVendors = self::_getComposerVendorDirs();
+            
+            foreach ($composerVendors as $vendorFolder) {
+                self::$loader->addSearchDirectory($vendorFolder, true, false);
             }
         }
     }
     /**
-     * Returns a string that represents the directory of 'vendor' folder of 
-     * composer.
-     * @return string
+     * Returns an array string that contains all possible paths for the folder 
+     * 'vendor'.
+     * @return array
      * @since 1.1.6
      */
-    private static function _getComposerVendorDir() {
+    private static function _getComposerVendorDirs() {
         $DS = DIRECTORY_SEPARATOR;
         $split = explode($DS, ROOT_DIR);
         $vendorPath = '';
         $pathsCount = count($split);
         $vendorFound = false;
         $vendorFolderName = 'vendor';
-
+        $vendorDirs = [];
+        
         for ($x = 0 ; $x < $pathsCount; $x++) {
             if (is_dir($vendorPath.$vendorFolderName)) {
-                $vendorPath = $vendorPath.$vendorFolderName;
                 $vendorFound = true;
-                break;
+                $vendorDirs[] = $vendorPath.$vendorFolderName;
             }
 
             if ($x + 1 == $pathsCount) {
@@ -420,15 +420,11 @@ class AutoLoader {
             }
         }
 
-        if (!$vendorFound) {
-            if (is_dir($vendorPath.$vendorFolderName)) {
-                $vendorPath = $vendorPath.$vendorFolderName;
-            } else {
-                $vendorPath = '';
-            }
+        if (!$vendorFound && is_dir($vendorPath.$vendorFolderName)) {
+            $vendorDirs[] = $vendorPath.$vendorFolderName;
         }
 
-        return $vendorPath;
+        return $vendorDirs;
     }
     private function _loadClassHelper($className, $classPath, $value, $appendRoot, $allPaths) {
         $loaded = false;

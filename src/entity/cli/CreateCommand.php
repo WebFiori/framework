@@ -27,7 +27,7 @@ namespace webfiori\entity\cli;
 use Error;
 use phMysql\MySQLColumn;
 use phMysql\MySQLQuery;
-use restEasy\APIAction;
+use restEasy\WebService;
 use restEasy\APIFilter;
 use restEasy\RequestParameter;
 use webfiori\entity\AutoLoader;
@@ -133,23 +133,25 @@ class CreateCommand extends CLICommand {
         $servicesObj = new ServicesHolder();
 
         do {
-            $serviceObj = new APIAction('');
+            $serviceObj = new WebService('');
             $this->_setServiceName($serviceObj);
-            $serviceObj->addRequestMethod($this->select('Request method:', APIAction::METHODS, 0));
+            $serviceObj->addRequestMethod($this->select('Request method:', WebService::METHODS, 0));
             $servicesObj->addAction($serviceObj, $this->confirm('Does the service require authorization?', false));
 
             if ($this->confirm('Would you like to add request parameters to the service?', false)) {
                 $this->_addParamsToService($serviceObj);
             }
 
-            $addServices = $this->confirm('Would you like to add another web service?');
+            $addServices = $this->confirm('Would you like to add another web service?', false);
         } while ($addServices);
 
 
         $this->println('Creating the class...');
         $servicesCreator = new WebServicesWriter($servicesObj, $classInfo);
         $servicesCreator->writeClass();
-        $this->println('Class created.');
+        $this->success('Class created.');
+        $this->info('Don\'t forget to add a route to the new service in the class \'APIRoutes\'.');
+        return 0;
     }
     public function exec() {
         $options = [
@@ -172,7 +174,7 @@ class CreateCommand extends CLICommand {
             return $this->_createController();
         } else if ($answer == 'Web services set.') {
             return $this->_createWebServices();
-        } else if ($answer = 'Database table from query class.') {
+        } else if ($answer == 'Database table from query class.') {
             $this->_createDbTable();
         }
     }
@@ -221,7 +223,7 @@ class CreateCommand extends CLICommand {
             }
             
         } else {
-            $this->error('No database connections available. You must specify the connection manually later.');
+            $this->error('No database connections available. Add connections inside the class \'Config\'.');
         }
     }
     /**
@@ -288,7 +290,7 @@ class CreateCommand extends CLICommand {
     }
     /**
      * 
-     * @param APIAction $serviceObj
+     * @param WebService $serviceObj
      */
     private function _addParamsToService($serviceObj) {
         $addMore = true;
@@ -304,7 +306,7 @@ class CreateCommand extends CLICommand {
             } else {
                 $this->warning('The parameter was not added.');
             }
-            $addMore = $this->confirm('Would you like to add another parameter?');
+            $addMore = $this->confirm('Would you like to add another parameter?', false);
         } while ($addMore);
     }
     private function _createController() {
@@ -355,7 +357,7 @@ class CreateCommand extends CLICommand {
                 $this->_isPrimaryCheck($colObj);
                 $this->_addColComment($colObj);
             }
-            $addMoreCols = $this->confirm('Would you like to add another column?');
+            $addMoreCols = $this->confirm('Would you like to add another column?', false);
         } while ($addMoreCols);
         $tempQuery->createTable();
 
@@ -365,16 +367,18 @@ class CreateCommand extends CLICommand {
 
         if ($this->confirm('Would you like to create an entity class that maps to the database table?', false)) {
             $entityInfo = $this->getClassInfo();
-            $entityInfo['implement-jsoni'] = $this->confirm('Would you like from your class to implement the interface JsonI?', true);
+            $entityInfo['implement-jsoni'] = $this->confirm('Would you like from your entity class to implement the interface JsonI?', true);
             $classInfo['entity-info'] = $entityInfo;
         }
 
         if (strlen($classInfo['namespace']) == 0) {
-            $this->warning('The query class will be added to the namespace "phMysql\query" since no namespace was provided.');
+            $classInfo['namespace'] = 'phMysql\query';
+            $this->warning('The query class will be added to the namespace "'.$classInfo['namespace'].'" since no namespace was provided.');
         }
 
         if (isset($classInfo['entity-info']) && strlen($classInfo['entity-info']['namespace']) == 0) {
-            $this->warning('The entity class will be added to the namespace "phMysql\entity" since no namespace was provided.');
+            $classInfo['entity-info']['namespace'] = 'phMysql\entity';
+            $this->warning('The entity class will be added to the namespace "'.$classInfo['entity-info']['namespace'].'" since no namespace was provided.');
         }
         $writer = new QueryClassWriter($tempQuery, $classInfo);
         $writer->writeClass();
@@ -550,7 +554,7 @@ class CreateCommand extends CLICommand {
     }
     /**
      * 
-     * @param APIAction $serviceObj
+     * @param WebService $serviceObj
      */
     private function _setServiceName($serviceObj) {
         $validName = false;
@@ -640,7 +644,7 @@ class CreateCommand extends CLICommand {
             for ($x = 0 ; $x < $len ; $x++) {
                 $char = $name[$x];
 
-                if ($x == 0 && (($char >= '0' && $char <= '9'))) {
+                if ($x == 0 && $char >= '0' && $char <= '9') {
                     return false;
                 }
 
@@ -666,7 +670,7 @@ class CreateCommand extends CLICommand {
             for ($x = 0 ; $x < $len ; $x++) {
                 $char = $subNs[$x];
 
-                if ($x == 0 && (($char >= '0' && $char <= '9'))) {
+                if ($x == 0 && $char >= '0' && $char <= '9') {
                     return false;
                 }
 

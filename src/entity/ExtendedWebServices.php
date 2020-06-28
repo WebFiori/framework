@@ -26,18 +26,18 @@ namespace webfiori\entity;
 
 use jsonx\JsonI;
 use jsonx\JsonX;
-use restEasy\WebServices;
+use restEasy\WebServicesSet;
 use webfiori\entity\langs\Language;
 use webfiori\WebFiori;
 /**
- * An extension for the class 'Services' that adds support for multi-language 
+ * An extension for the class 'WebServicesSet' that adds support for multi-language 
  * response messages.
  * The language can be set by sending a GET or POST request that has the 
  * parameter 'lang'.
  * @author Ibrahim
  * @version 1.0.2
  */
-abstract class ExtendedWebServices extends WebServices {
+abstract class ExtendedWebServices extends WebServicesSet {
     /**
      * A constant that represents error message type.
      * @since 1.0.2

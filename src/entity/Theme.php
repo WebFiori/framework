@@ -55,11 +55,6 @@ abstract class Theme implements JsonI {
      */
     private $afterLoadedParams;
     /**
-     * An array that contains all available themes.
-     * @var array 
-     */
-    private static $AvailableThemes;
-    /**
      * An optional base URL.
      * This URL is used by the tag 'base' to fetch page resources.
      * @var string
@@ -96,12 +91,6 @@ abstract class Theme implements JsonI {
      * @since 1.0
      */
     private $jsDir;
-    /**
-     * An array that contains all loaded themes.
-     * @var array
-     * @since 1.0 
-     */
-    private static $loadedThemes = [];
     /**
      * An array that contains the names of theme component files.
      * @var array

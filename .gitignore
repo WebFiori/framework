@@ -6,3 +6,4 @@ test.*
 /vendor
 composer.lock
 *.cache
+cs-fixer.phar

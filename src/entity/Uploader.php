@@ -443,7 +443,7 @@ class Uploader implements JsonI {
         $errIdx = 'error';
         $tempIdx = 'tmp_name';
         $fileInfoArr = [];
-        $fileInfoArr[$indices[0]] = $idx === null ? $fileOrFiles[$indices[0]] : $fileOrFiles[$indices[0]][$idx];
+        $fileInfoArr[$indices[0]] = $idx === null ? filter_var($fileOrFiles[$indices[0]], FILTER_SANITIZE_STRING) : filter_var($fileOrFiles[$indices[0]][$idx], FILTER_SANITIZE_STRING);
         $fileInfoArr[$indices[1]] = $idx === null ? $fileOrFiles[$indices[1]] : $fileOrFiles[$indices[1]][$idx];
         $fileInfoArr[$indices[2]] = $this->getUploadDir();
         $fileInfoArr[$indices[3]] = 0;

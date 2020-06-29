@@ -32,7 +32,7 @@ use webfiori\entity\exceptions\FileException;
  * This class can be used to read and write files in binary. In addition to that, 
  * it can be used to view files in web browsers.
  * @author Ibrahim
- * @version 1.1.4
+ * @version 1.1.5
  */
 class File implements JsonI {
     /**
@@ -271,6 +271,17 @@ class File implements JsonI {
         return '';
     }
     /**
+     * Returns the directory at which the file exist on.
+     * The directory is simply the folder that contains the file. For example, 
+     * the directory can be something like "C:\Users\Me\Documents". Note that the 
+     * returned directory will be using backward slashes "\".
+     * @return string The directory at which the file exist on.
+     * @since 1.0
+     */
+    public function getDir() {
+        return $this->getPath();
+    }
+    /**
      * Returns MIME type of the file.
      * Note that if the file is specified by its path and name, the method 
      * File::read() must be called before calling this method to update its 
@@ -332,6 +343,7 @@ class File implements JsonI {
      * @return string The path to the file (such as "C:\Users\Me\Documents"). If 
      * the path is not set, the method will return empty string.
      * @since 1.0
+     * @deprecated since version 1.1.5 Use File::getDir() instead.
      */
     public function getPath() {
         return $this->path;
@@ -406,6 +418,21 @@ class File implements JsonI {
         return false;
     }
     /**
+     * /**
+     * Sets the name of the directory at which the file exist on.
+     * The directory is simply the folder that contains the file. For example, 
+     * the directory can be something like "C:/Users/Me/Documents". The directory can 
+     * use forward slashes or backward slashes.
+     * @param string $dir The directory which will contain the file. It must 
+     * be non-empty string in order to set.
+     * @return boolean The method will return true if the directory is set. Other 
+     * than that, the method will return false.
+     * @since 1.0
+     */
+    public function setDir($dir) {
+        return $this->setPath($dir);
+    }
+    /**
      * Sets the ID of the file.
      * This method is helpful in case the file is stored in database.
      * @param string $id The unique ID of the file.
@@ -447,6 +474,7 @@ class File implements JsonI {
      * @return boolean The method will return true if the path is set. Other 
      * than that, the method will return false.
      * @since 1.0
+     * @deprecated since version 1.1.5 Use File::setDir() instead.
      */
     public function setPath($fPath) {
         $retVal = false;
@@ -476,18 +504,24 @@ class File implements JsonI {
     }
     /**
      * Returns a JSON string that represents the file.
-     * @return string A JSON string on the following format:<br/>
-     * <b>{<br/>&nbsp;&nbsp;"id":"",<br/>&nbsp;&nbsp;"mime":"",<br/>&nbsp;&nbsp;"name":""<br/>
-     * &nbsp;&nbsp;"path":""<br/>&nbsp;&nbsp;"sizeInBytes":""<br/>&nbsp;&nbsp;"sizeInKBytes":""<br/>
+     * @return JsonX An object of type 'JsonX' that contains file information. 
+     * The object will have the following information:<br/>
+     * <b>{<br/>&nbsp;&nbsp;"id":"",<br/>&nbsp;&nbsp;"mime":"",<br/>&nbsp;&nbsp;"name":"",<br/>
+     * &nbsp;&nbsp;"path":"",<br/>&nbsp;&nbsp;"sizeInBytes":"",<br/>&nbsp;&nbsp;"sizeInKBytes":"",<br/>
      * &nbsp;&nbsp;"sizeInMBytes":""<br/>}</b>
      * @since 1.0
      */
     public function toJSON() {
+        try {
+            // This is used just to set the size of the file.
+            $this->read();
+        } catch (FileException $ex) {
+        }
         $jsonX = new JsonX();
         $jsonX->add('id', $this->getID());
         $jsonX->add('mime', $this->getFileMIMEType());
         $jsonX->add('name', $this->getName());
-        $jsonX->add('path', $this->getPath());
+        $jsonX->add('directory', $this->getDir());
         $jsonX->add('sizeInBytes', $this->getSize());
         $jsonX->add('sizeInKBytes', $this->getSize() / 1024);
         $jsonX->add('sizeInMBytes', ($this->getSize() / 1024) / 1024);

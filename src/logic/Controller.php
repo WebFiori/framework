@@ -92,28 +92,28 @@ class Controller {
      */
     const NOT_AUTH = 'not_autherized';
     /**
-     * An array that contains current active data set info.
-     * @var array 
-     */
-    private $currentDataset;
-    /**
      *
      * @var MySQLLink
      * @since 1.3.3 
      */
     private $activeDatabaseLink;
     /**
-     * An array that contains a set of active database connections as objects 
-     * of type 'MySQLLink'.
+     * An array that contains current active data set info.
      * @var array 
      */
-    private static $DbConnectionsPool;
+    private $currentDataset;
     /**
      * A stack that contains multiple data sets which was fetched from executing 
      * database queries.
      * @var Stack 
      */
     private $dataStack;
+    /**
+     * An array that contains a set of active database connections as objects 
+     * of type 'MySQLLink'.
+     * @var array 
+     */
+    private static $DbConnectionsPool;
     /**
      * An array that will hold database connection error info.
      * @var type 
@@ -171,16 +171,6 @@ class Controller {
         $this->currentDataset = null;
         $this->_setDBErrDetails(0, 'NO_ERR');
         $this->useSession(self::DEFAULT_SESSTION_OPTIONS);
-    }
-    /**
-     * Returns an associative array that contains the information of 
-     * all initialized sessions.
-     * @return array An associative array. The indices of the array are sessions names and the values are 
-     * object of type 'SessionManager'.
-     * @since 1.3.9
-     */
-    public static function getSessions() {
-        return self::$Sessions;
     }
     /**
      * Execute a database query.
@@ -344,6 +334,16 @@ class Controller {
         }
 
         return null;
+    }
+    /**
+     * Returns an associative array that contains the information of 
+     * all initialized sessions.
+     * @return array An associative array. The indices of the array are sessions names and the values are 
+     * object of type 'SessionManager'.
+     * @since 1.3.9
+     */
+    public static function getSessions() {
+        return self::$Sessions;
     }
     /**
      * Returns session variable given its name.
@@ -621,7 +621,7 @@ class Controller {
      */
     private function _connect($connParams) {
         if (!isset(self::$DbConnectionsPool[$connParams->getConnectionName()])) {
-                $result = DBConnectionFactory::mysqlLink([
+            $result = DBConnectionFactory::mysqlLink([
                 'host' => $connParams->getHost(),
                 'user' => $connParams->getUsername(),
                 'pass' => $connParams->getPassword(),
@@ -634,6 +634,7 @@ class Controller {
 
                 if ($result->getErrorCode() == 0) {
                     self::$DbConnectionsPool[$connParams->getConnectionName()] = $result;
+
                     return true;
                 }
                 //might be connected but database is not set.
@@ -647,6 +648,7 @@ class Controller {
             }
         } else {
             $this->activeDatabaseLink = self::$DbConnectionsPool[$connParams->getConnectionName()];
+
             return true;
         }
     }
@@ -677,8 +679,8 @@ class Controller {
     }
     private function _createSessionManager($givenSessionName, $options) {
         $mngr = new SessionManager($givenSessionName);
-        
-        if(!$mngr->resume()) {
+
+        if (!$mngr->resume()) {
             $sTime = isset($options['duration']) ? $options['duration'] : self::DEFAULT_SESSTION_OPTIONS['duration'];
             $mngr->setLifetime($sTime);
 
@@ -699,13 +701,13 @@ class Controller {
 
                 return true;
             }
-            
+
             return false;
         } else {
             self::$Sessions[$mngr->getName()] = $mngr;
             $this->sessionName = $mngr->getName();
         }
-        
+
         return true;
     }
     /**

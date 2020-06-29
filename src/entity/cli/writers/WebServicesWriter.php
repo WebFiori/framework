@@ -25,8 +25,8 @@
 namespace webfiori\entity\cli;
 
 use InvalidArgumentException;
-use restEasy\WebService;
 use restEasy\RequestParameter;
+use restEasy\WebService;
 use restEasy\WebServicesSet;
 
 /**
@@ -108,7 +108,7 @@ class WebServicesWriter extends ClassWriter {
                 }
             }
         }
- 
+
         if (($param->getType() == 'string' || $param->getType() == 'url' || $param->getType() == 'email') && $param->isEmptyStringAllowed()) {
             $this->append("'allow-empty' => '".$param->getDefault()."',", 5);
         }
@@ -243,6 +243,7 @@ class WebServicesWriter extends ClassWriter {
         foreach ($this->servicesObj->getActions() as $service) {
             $this->_writeServiceDoc($service);
         }
+
         foreach ($this->servicesObj->getAuthActions() as $service) {
             $this->_writeServiceDoc($service);
         }

@@ -229,62 +229,6 @@ class QueryClassWriter extends ClassWriter {
                 $this->_writeSelectAllQuery();
             }
         }
-        
-    }
-    private function _writeDeleteQuery($colsKeys, $primaryKeys) {
-        $this->append('/**', 1);
-        $this->append(' * Constructs a query that can be used to remove a record.', 1);
-        $this->append(' * @param '.$this->getEntityName().' $entity An instance of the class "'.$this->getEntityName().'" that contains record information.', 1);
-        $this->append(' */', 1);
-        $this->append("public function delete(\$entity) {",1);
-        $this->append('$this->deleteRecord([', 2);
-
-        foreach ($colsKeys as $colKey) {
-            if (in_array($colKey, $primaryKeys)) {
-                $this->append("'$colKey' => \$entity->".$this->entityMapper->mapToMethodName($colKey, 'g').'(),', 3);
-            }
-        }
-        $this->append(']);', 2);
-        $this->append('}',1);
-    }
-    private function _writeUpdateQuery($colsKeys, $primaryKeys) {
-        $this->append('/**', 1);
-        $this->append(' * Constructs a query that can be used to update a record.', 1);
-        $this->append(' * @param '.$this->getEntityName().' $entity An instance of the class "'.$this->getEntityName().'" that contains record information.', 1);
-        $this->append(' */', 1);
-        $this->append("public function update(\$entity) {", 1);
-        $this->append('$this->updateRecord([', 2);
-
-        foreach ($colsKeys as $colKey) {
-            if (!in_array($colKey, $primaryKeys)) {
-                $this->append("'$colKey' => \$entity->".$this->entityMapper->mapToMethodName($colKey, 'g').'(),', 3);
-            }
-        }
-        $this->append('], [', 2);
-
-        foreach ($colsKeys as $colKey) {
-            if (in_array($colKey, $primaryKeys)) {
-                $this->append("'$colKey' => \$entity->".$this->entityMapper->mapToMethodName($colKey, 'g').'(),', 3);
-            }
-        }
-        $this->append(']);', 2);
-        $this->append('}', 1);
-    }
-    private function _writeSelectAllQuery() {
-        $this->append("/**", 1);
-        $this->append(" * Constructs a query that can be used to select all records from the table.", 1);
-        $this->append(" * @param int \$limit The number of records that will be selected. Default is -1", 1);
-        $this->append(" * @param int \$offset The number of records that will be skipped from the first row. Default is -1.", 1);
-        $this->append(" */", 1);
-        $this->append('public function selectAll($limit = -1, $offset = -1) {', 1);
-        $this->append('$this->select([', 2);
-        $this->append("'limit' => \$limit,", 3);
-        $this->append("'offset' => \$offset,", 3);
-        if (strlen($this->getEntityName()) != 0) {
-            $this->append("'map-result-to' => '".$this->getEntityNamespace().'\\'.$this->getEntityName()."',", 3);
-        }
-        $this->append("]);", 2);
-        $this->append('}', 1);
     }
     /**
      * 
@@ -302,7 +246,7 @@ class QueryClassWriter extends ClassWriter {
 
         if ($colObj->isPrimary()) {
             $this->append("'primary' => true,", 4);
- 
+
             if ($colObj->isAutoInc()) {
                 $this->append("'is-unique' => true,", 4);
             }
@@ -347,6 +291,22 @@ class QueryClassWriter extends ClassWriter {
         $this->_addFks();
         $this->append('}', 1);
     }
+    private function _writeDeleteQuery($colsKeys, $primaryKeys) {
+        $this->append('/**', 1);
+        $this->append(' * Constructs a query that can be used to remove a record.', 1);
+        $this->append(' * @param '.$this->getEntityName().' $entity An instance of the class "'.$this->getEntityName().'" that contains record information.', 1);
+        $this->append(' */', 1);
+        $this->append("public function delete(\$entity) {",1);
+        $this->append('$this->deleteRecord([', 2);
+
+        foreach ($colsKeys as $colKey) {
+            if (in_array($colKey, $primaryKeys)) {
+                $this->append("'$colKey' => \$entity->".$this->entityMapper->mapToMethodName($colKey, 'g').'(),', 3);
+            }
+        }
+        $this->append(']);', 2);
+        $this->append('}',1);
+    }
     private function _writeHeaderSec() {
         $this->append("<?php\n");
         $this->append('namespace '.$this->getNamespace().";\n");
@@ -367,5 +327,45 @@ class QueryClassWriter extends ClassWriter {
         }
         $this->append(" * </ul>\n */");
         $this->append('class '.$this->getName().' extends MySQLQuery {');
+    }
+    private function _writeSelectAllQuery() {
+        $this->append("/**", 1);
+        $this->append(" * Constructs a query that can be used to select all records from the table.", 1);
+        $this->append(" * @param int \$limit The number of records that will be selected. Default is -1", 1);
+        $this->append(" * @param int \$offset The number of records that will be skipped from the first row. Default is -1.", 1);
+        $this->append(" */", 1);
+        $this->append('public function selectAll($limit = -1, $offset = -1) {', 1);
+        $this->append('$this->select([', 2);
+        $this->append("'limit' => \$limit,", 3);
+        $this->append("'offset' => \$offset,", 3);
+
+        if (strlen($this->getEntityName()) != 0) {
+            $this->append("'map-result-to' => '".$this->getEntityNamespace().'\\'.$this->getEntityName()."',", 3);
+        }
+        $this->append("]);", 2);
+        $this->append('}', 1);
+    }
+    private function _writeUpdateQuery($colsKeys, $primaryKeys) {
+        $this->append('/**', 1);
+        $this->append(' * Constructs a query that can be used to update a record.', 1);
+        $this->append(' * @param '.$this->getEntityName().' $entity An instance of the class "'.$this->getEntityName().'" that contains record information.', 1);
+        $this->append(' */', 1);
+        $this->append("public function update(\$entity) {", 1);
+        $this->append('$this->updateRecord([', 2);
+
+        foreach ($colsKeys as $colKey) {
+            if (!in_array($colKey, $primaryKeys)) {
+                $this->append("'$colKey' => \$entity->".$this->entityMapper->mapToMethodName($colKey, 'g').'(),', 3);
+            }
+        }
+        $this->append('], [', 2);
+
+        foreach ($colsKeys as $colKey) {
+            if (in_array($colKey, $primaryKeys)) {
+                $this->append("'$colKey' => \$entity->".$this->entityMapper->mapToMethodName($colKey, 'g').'(),', 3);
+            }
+        }
+        $this->append(']);', 2);
+        $this->append('}', 1);
     }
 }

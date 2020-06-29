@@ -24,11 +24,11 @@
  */
 namespace webfiori\entity;
 
+use Exception;
 use jsonx\JsonI;
 use jsonx\JsonX;
 use webfiori\conf\SiteConfig;
 use webfiori\entity\exceptions\SessionException;
-use Exception;
 /**
  * A helper class to manage system sessions.
  * @author Ibrahim 
@@ -128,6 +128,13 @@ class SessionManager implements JsonI {
         'EN','AR'
     ];
     /**
+     * The name of the index that contains session custom vars.
+     * The variables are set using the method SessionManager::setSessionVar()'.
+     * @var string
+     * @since 1.8.6 
+     */
+    private static $CSV = 'custom-session-vars';
+    /**
      * The lifetime of the session (in minutes).
      * @var int lifetime of the session (in minutes). The default is 10.
      * @since 1.4 
@@ -175,13 +182,6 @@ class SessionManager implements JsonI {
      * @since 1.8.6 
      */
     private static $SV = 'session-vars';
-    /**
-     * The name of the index that contains session custom vars.
-     * The variables are set using the method SessionManager::setSessionVar()'.
-     * @var string
-     * @since 1.8.6 
-     */
-    private static $CSV = 'custom-session-vars';
     /**
      * Creates new session manager.
      * @param string $session_name The name of the session. The name 
@@ -242,6 +242,23 @@ class SessionManager implements JsonI {
         }
 
         return $retVal;
+    }
+    /**
+     * Removes all custom set session variables.
+     * @return boolean If session is active and variables cleared, the method will 
+     * return true. If the session is not active, the method will return false.
+     * @since 1.8.7
+     */
+    public function clearCustomVars() {
+        $isActive = $this->_isActive();
+
+        if ($isActive) {
+            $_SESSION[self::$CSV] = [];
+
+            return true;
+        }
+
+        return false;
     }
     /**
      * Returns the ID of the session.
@@ -371,6 +388,21 @@ class SessionManager implements JsonI {
         return session_status();
     }
     /**
+     * Returns an associative array that contains custom-set session variables.
+     * @return array An associative array. The indices are the names 
+     * of the variables and the values are variables values.
+     * @since 1.8.7
+     */
+    public function getSessionCustomVars() {
+        $isActive = $this->_isActive();
+
+        if ($isActive) {
+            return $_SESSION[self::$CSV];
+        }
+
+        return [];
+    }
+    /**
      * Returns the ID of a session from a cookie given its name.
      * @param string $sessionName The name of the session.
      * @return boolean|string If the ID is found, the method will return it. 
@@ -463,21 +495,6 @@ class SessionManager implements JsonI {
 
         if ($isActive) {
             return $_SESSION[self::$SV];
-        }
-
-        return [];
-    }
-    /**
-     * Returns an associative array that contains custom-set session variables.
-     * @return array An associative array. The indices are the names 
-     * of the variables and the values are variables values.
-     * @since 1.8.7
-     */
-    public function getSessionCustomVars() {
-        $isActive = $this->_isActive();
-
-        if ($isActive) {
-            return $_SESSION[self::$CSV];
         }
 
         return [];
@@ -662,8 +679,10 @@ class SessionManager implements JsonI {
 
         if ($isActive) {
             $remTime = $this->getRemainingTime();
+
             if ($this->isRefresh()) {
                 $startTime = $this->getStartTime();
+
                 if ($startTime + $remTime < time()) {
                     return true;
                 }
@@ -816,7 +835,7 @@ class SessionManager implements JsonI {
     public function setSessionVar($name,$value) {
         $isActive = $this->_isActive();
         $trimmed = trim($name);
-        
+
         if ($isActive && strlen($trimmed) != 0) {
             $_SESSION[self::$CSV][$trimmed] = $value;
 
@@ -841,22 +860,6 @@ class SessionManager implements JsonI {
         }
 
         return $retVal;
-    }
-    /**
-     * Removes all custom set session variables.
-     * @return boolean If session is active and variables cleared, the method will 
-     * return true. If the session is not active, the method will return false.
-     * @since 1.8.7
-     */
-    public function clearCustomVars() {
-        $isActive = $this->_isActive();
-
-        if ($isActive) {
-            $_SESSION[self::$CSV] = [];
-            return true;
-        }
-
-        return false;
     }
     /**
      * Returns a 'JsonX' object that represents the manager.
@@ -892,7 +895,7 @@ class SessionManager implements JsonI {
             'inMinutes' => floor(($this->getPassedTime() / 60)),
             'inHours' => floor($this->getPassedTime() / 3600)
         ]));
-        
+
         $j->add('timeoutAfter', new JsonX([
             'inSeconds' => $this->getRemainingTime(),
             'inMinutes' => floor(($this->getRemainingTime() / 60)),
@@ -908,7 +911,7 @@ class SessionManager implements JsonI {
         if ($rsTm != PHP_SESSION_NONE && $rsTm != PHP_SESSION_ACTIVE && $rsTm != PHP_SESSION_DISABLED) {
             $j->add(self::MAIN_VARS[2], date('Y-m-d H:i:s',$this->getResumTime()));
         }
-        
+
         $j->add(self::MAIN_VARS[6], $this->getUser());
         $j->addArray('customVars', $this->getSessionCustomVars(), true);
 
@@ -1049,7 +1052,7 @@ class SessionManager implements JsonI {
 
         $params = session_get_cookie_params();
         session_write_close();
-        
+
         if (isset($params['secure'])) {
             $secure = $params['secure'];
         } else {
@@ -1064,7 +1067,7 @@ class SessionManager implements JsonI {
         $path = isset($params['path']) ? $params['path'] : '/';
         session_set_cookie_params(time() + $this->getLifetime() * 60, $path, $params['domain'], $secure, $httponly);
         $this->_switchToSession();
-        
+
         $retVal = true;
 
         if ($this->isTimeout()) {
@@ -1138,7 +1141,6 @@ class SessionManager implements JsonI {
         $started = session_start();
 
         if ($started) {
-            
             $this->resumed = false;
             $this->new = true;
             $_SESSION[self::$SV] = [];

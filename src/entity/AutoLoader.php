@@ -387,7 +387,7 @@ class AutoLoader {
     private static function _checkComposer() {
         if (defined('LOAD_COMPOSER_PACKAGES') && LOAD_COMPOSER_PACKAGES === true) {
             $composerVendors = self::_getComposerVendorDirs();
-            
+
             foreach ($composerVendors as $vendorFolder) {
                 self::$loader->addSearchDirectory($vendorFolder, true, false);
             }
@@ -407,7 +407,7 @@ class AutoLoader {
         $vendorFound = false;
         $vendorFolderName = 'vendor';
         $vendorDirs = [];
-        
+
         for ($x = 0 ; $x < $pathsCount; $x++) {
             if (is_dir($vendorPath.$vendorFolderName)) {
                 $vendorFound = true;

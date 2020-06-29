@@ -112,7 +112,7 @@ class GlobalConstants {
              */
             define('THEMES_PATH', $themesPath);
         }
-        
+
         if (!defined('MAX_BOX_MESSAGES')) {
             /**
              * The maximum number of message boxes to show in one page.

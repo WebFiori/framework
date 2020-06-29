@@ -561,22 +561,6 @@ abstract class AbstractJob {
 
         return $retVal;
     }
-    private function isHourHelper($hoursArr, $current) {
-        $hours = $hoursArr['at-every-x-hour'];
-        $retVal = in_array($current, $hours);
-
-        if ($retVal === false) {
-            $hours = $hoursArr['every-x-hours'];
-
-            foreach ($hours as $hour) {
-                if ($current % $hour == 0) {
-                    $retVal = true;
-                    break;
-                }
-            }
-        }
-        return $retVal;
-    }
     /**
      * Checks if current minute in time is a minute at which the job must be 
      * executed.
@@ -606,22 +590,6 @@ abstract class AbstractJob {
             }
         }
 
-        return $retVal;
-    }
-    private function isMinuteHelper($minuteArr, $current) {
-        $minutes = $minuteArr['at-every-x-minute'];
-        $retVal = in_array($current, $minutes);
-
-        if ($retVal === false) {
-            $minutes = $minuteArr['every-x-minutes'];
-
-            foreach ($minutes as $min) {
-                if ($current % $min == 0) {
-                    $retVal = true;
-                    break;
-                }
-            }
-        }
         return $retVal;
     }
     /**
@@ -738,21 +706,6 @@ abstract class AbstractJob {
             }
         }
 
-        return false;
-    }
-    private function onMonthHelper($monthNameOrNum, $minute, $hour, $dayNum) {
-        $trimmed = trim($monthNameOrNum);
-
-        if (in_array($trimmed, ['12','1','2','3','4','5','6','7','8','9','10','11'])) {
-            $monthNameOrNum = intval($trimmed);
-        } else {
-            return false;
-        }
-
-        if ($monthNameOrNum >= 1 && $monthNameOrNum <= 12) {
-            return $this->cron($minute.' '.$hour.' '.$dayNum.' '.$monthNameOrNum.' *');
-        }
-        
         return false;
     }
     /**
@@ -1354,6 +1307,55 @@ abstract class AbstractJob {
             if ($hour >= 0 && $hour <= 23 && $minute >= 0 && $minute <= 59) {
                 return $this->cron($minute.' '.$hour.' * * '.$day);
             }
+        }
+
+        return false;
+    }
+    private function isHourHelper($hoursArr, $current) {
+        $hours = $hoursArr['at-every-x-hour'];
+        $retVal = in_array($current, $hours);
+
+        if ($retVal === false) {
+            $hours = $hoursArr['every-x-hours'];
+
+            foreach ($hours as $hour) {
+                if ($current % $hour == 0) {
+                    $retVal = true;
+                    break;
+                }
+            }
+        }
+
+        return $retVal;
+    }
+    private function isMinuteHelper($minuteArr, $current) {
+        $minutes = $minuteArr['at-every-x-minute'];
+        $retVal = in_array($current, $minutes);
+
+        if ($retVal === false) {
+            $minutes = $minuteArr['every-x-minutes'];
+
+            foreach ($minutes as $min) {
+                if ($current % $min == 0) {
+                    $retVal = true;
+                    break;
+                }
+            }
+        }
+
+        return $retVal;
+    }
+    private function onMonthHelper($monthNameOrNum, $minute, $hour, $dayNum) {
+        $trimmed = trim($monthNameOrNum);
+
+        if (in_array($trimmed, ['12','1','2','3','4','5','6','7','8','9','10','11'])) {
+            $monthNameOrNum = intval($trimmed);
+        } else {
+            return false;
+        }
+
+        if ($monthNameOrNum >= 1 && $monthNameOrNum <= 12) {
+            return $this->cron($minute.' '.$hour.' '.$dayNum.' '.$monthNameOrNum.' *');
         }
 
         return false;

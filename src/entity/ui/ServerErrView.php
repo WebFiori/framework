@@ -60,6 +60,7 @@ class ServerErrView {
      */
     public function show($responseCode = 500) {
         http_response_code($responseCode);
+
         if (class_exists('phpStructs\html\HTMLNode')) {
             $this->_phpStructsExist($this->errOrThrowable);
             Page::render();

@@ -119,7 +119,7 @@ class Controller {
      * @var type 
      * @since 1.3.4
      */
-    private static $dbErrDetails;
+    private static $DbErrDetails;
     /**
      * A default database to connect to.
      * @var type 
@@ -144,7 +144,9 @@ class Controller {
      */
     private $sessionName;
     /**
-     *
+     * An associative array that contains all initialized sessions.
+     * The indices of the array are sessions names and the values are 
+     * object of type 'SessionManager'.
      * @var array
      * @since 1.3 
      */
@@ -169,6 +171,16 @@ class Controller {
         $this->currentDataset = null;
         $this->_setDBErrDetails(0, 'NO_ERR');
         $this->useSession(self::DEFAULT_SESSTION_OPTIONS);
+    }
+    /**
+     * Returns an associative array that contains the information of 
+     * all initialized sessions.
+     * @return array An associative array. The indices of the array are sessions names and the values are 
+     * object of type 'SessionManager'.
+     * @since 1.3.9
+     */
+    public static function getSessions() {
+        return self::$Sessions;
     }
     /**
      * Execute a database query.
@@ -212,7 +224,7 @@ class Controller {
      * @since 1.3.4
      */
     public function getDBErrDetails() {
-        return self::$dbErrDetails;
+        return self::$DbErrDetails;
     }
     /**
      * Returns the last executed query object.
@@ -555,7 +567,7 @@ class Controller {
      * will be refreshed with every request. Used only if the session is new.</li>
      * <li>user: An optional object of type user that represents session user. Used only if 
      * the session is new.</li>
-     * * <li>variables: An optional associative array of variables to set in the session. Used only if 
+     * <li>variables: An optional associative array of variables to set in the session. Used only if 
      * the session is new.</li>
      * </ul>
      * @return boolean If the session is exist or created, the method will 
@@ -665,29 +677,36 @@ class Controller {
     }
     private function _createSessionManager($givenSessionName, $options) {
         $mngr = new SessionManager($givenSessionName);
+        
+        if(!$mngr->resume()) {
+            $sTime = isset($options['duration']) ? $options['duration'] : self::DEFAULT_SESSTION_OPTIONS['duration'];
+            $mngr->setLifetime($sTime);
 
-        $sTime = isset($options['duration']) ? $options['duration'] : self::DEFAULT_SESSTION_OPTIONS['duration'];
-        $mngr->setLifetime($sTime);
+            $isRef = isset($options['refresh']) ? $options['refresh'] : self::DEFAULT_SESSTION_OPTIONS['refresh'];
+            $mngr->setIsRefresh($isRef);
 
-        $isRef = isset($options['refresh']) ? $options['refresh'] : self::DEFAULT_SESSTION_OPTIONS['refresh'];
-        $mngr->setIsRefresh($isRef);
+            if ($mngr->initSession($isRef)) {
+                $this->sessionName = $givenSessionName;
+                $sUser = isset($options['user']) ? $options['user'] : self::DEFAULT_SESSTION_OPTIONS['user'];
+                $mngr->setUser($sUser);
+                self::$Sessions[$mngr->getName()] = $mngr;
 
-        if ($mngr->initSession($isRef)) {
-            $this->sessionName = $givenSessionName;
-            $sUser = isset($options['user']) ? $options['user'] : self::DEFAULT_SESSTION_OPTIONS['user'];
-            $mngr->setUser($sUser);
-            self::$Sessions[$mngr->getName()] = $mngr;
-
-            if (isset($options['variables'])) {
-                foreach ($options['variables'] as $k => $v) {
-                    $mngr->setSessionVar($k,$v);
+                if (isset($options['variables'])) {
+                    foreach ($options['variables'] as $k => $v) {
+                        $mngr->setSessionVar($k,$v);
+                    }
                 }
+
+                return true;
             }
-
-            return true;
+            
+            return false;
+        } else {
+            self::$Sessions[$mngr->getName()] = $mngr;
+            $this->sessionName = $mngr->getName();
         }
-
-        return false;
+        
+        return true;
     }
     /**
      * 
@@ -701,7 +720,7 @@ class Controller {
 
         if ($result !== true) {
             $this->_setDBErrDetails($link->getErrorCode(),$link->getErrorMessage());
-            self::$dbErrDetails['query'] = $query->getQuery();
+            self::$DbErrDetails['query'] = $query->getQuery();
         }
         $qType = $query->getType();
 
@@ -727,7 +746,7 @@ class Controller {
      * @since 1.3.6
      */
     private function _setDBErrDetails($errCode,$errMessage) {
-        self::$dbErrDetails = [
+        self::$DbErrDetails = [
             'error-message' => $errMessage,
             'error-code' => $errCode,
             'controller' => get_class($this)

@@ -28,6 +28,7 @@ use jsonx\JsonI;
 use jsonx\JsonX;
 use webfiori\conf\SiteConfig;
 use webfiori\entity\exceptions\SessionException;
+use Exception;
 /**
  * A helper class to manage system sessions.
  * @author Ibrahim 
@@ -71,26 +72,26 @@ class SessionManager implements JsonI {
      * An array that contains the names of main session variables.
      * The array has the following values:
      * <ul>
-     * <li>lifetime</li>
-     * <li>started-at</li>
-     * <li>resumed-at</li>
-     * <li>refresh</li>
-     * <li>session-name</li>
-     * <li>ip-address</li>
-     * <li>user</li>
-     * <li>lang</li>
-     * <li></li>
+     * <li>lifetime: Session duration in minutes</li>
+     * <li>startedAt: The timestamp at which the session started in (in seconds)</li>
+     * <li>resumedAt: The timestamp at which the session resumed in (in seconds)</li>
+     * <li>refresh: A boolean. Set to true if session is set to refresh on 
+     * every request.</li>
+     * <li>sessionName: The name of the session.</li>
+     * <li>ipAddress: The IP address at which the request was made from.</li>
+     * <li>user: An object of type 'User' that represents session user.</li>
+     * <li>lang: The language of the session (such as 'EN' or 'AR').</li>
      * <ul>
      * @since 1.8.6
      * @var array 
      */
     const MAIN_VARS = [
         'lifetime',
-        'started-at',
-        'resumed-at',
+        'startedAt',
+        'resumedAt',
         'refresh',
-        'session-name',
-        'ip-address',
+        'sessionName',
+        'ipAddress',
         'user',
         'lang'
     ];
@@ -169,11 +170,18 @@ class SessionManager implements JsonI {
      */
     private $sId;
     /**
-     * The name of the index that contains session vara.
+     * The name of the index that contains session vars.
      * @var string
      * @since 1.8.6 
      */
     private static $SV = 'session-vars';
+    /**
+     * The name of the index that contains session custom vars.
+     * The variables are set using the method SessionManager::setSessionVar()'.
+     * @var string
+     * @since 1.8.6 
+     */
+    private static $CSV = 'custom-session-vars';
     /**
      * Creates new session manager.
      * @param string $session_name The name of the session. The name 
@@ -195,7 +203,7 @@ class SessionManager implements JsonI {
 
         if (session_status() == PHP_SESSION_ACTIVE) {
             //if the session is active, we might need to switch
-            //to new session
+            //to new session. Close existing one just in case.
             session_write_close();
         }
 
@@ -292,7 +300,7 @@ class SessionManager implements JsonI {
 
         if (session_status() == PHP_SESSION_ACTIVE && $this->_switchToSession() 
                 && isset($_SESSION[self::$SV][self::MAIN_VARS[0]])) {
-            $retVal = $_SESSION[self::$SV][self::MAIN_VARS[0]] / 60;
+            $retVal = $_SESSION[self::$SV][self::MAIN_VARS[0]];
         }
 
         return $retVal;
@@ -324,6 +332,8 @@ class SessionManager implements JsonI {
     }
     /**
      * Returns the remaining time till the session dies (in seconds).
+     * Note that if the session is set to refresh, the method will return 
+     * session duration.
      * @return int The remaining time till the session dies (in seconds).
      * @since 1.5
      * 
@@ -408,6 +418,8 @@ class SessionManager implements JsonI {
     }
     /**
      * Returns the value of a session variable given its name.
+     * Note that this method will only return the value of a custom 
+     * session variable (set using the method "SessionManager::setSessionVar()")
      * @param string $varName The name of the variable.
      * @return mixed If the session is active and the value of the given variable 
      * is set, its value will be returned. If the session is not active or 
@@ -418,7 +430,7 @@ class SessionManager implements JsonI {
         $isActive = $this->_isActive();
 
         if ($isActive) {
-            return isset($_SESSION[$varName]) ? $_SESSION[$varName] : null;
+            return isset($_SESSION[self::$CSV][$varName]) ? $_SESSION[self::$CSV][$varName] : null;
         }
 
         return null;
@@ -428,10 +440,10 @@ class SessionManager implements JsonI {
      * The values in array are the ones which is used to manage the session. 
      * The indices of the array are:
      * <ul>
-     * <li><b>session-name</b>: The name of the session.</li>
-     * <li><b>started-at</b>: The timestamp at which the session was started.</li>
-     * <li><b>resumed-at</b>: The timestamp at which the session was resumed at.</li>
-     * <li><b>ip-address</b>: The IP address at which the request was coming from.</li>
+     * <li><b>sessionName</b>: The name of the session.</li>
+     * <li><b>startedAt</b>: The timestamp at which the session was started.</li>
+     * <li><b>resumedAt</b>: The timestamp at which the session was resumed at.</li>
+     * <li><b>ipAddress</b>: The IP address at which the request was coming from.</li>
      * <li><b>refresh</b>: A boolean variable. If set to true, it means the session 
      * timeout-after time will be reset to session duration for every request.</li>
      * <li><b>never-expier</b>: A boolean variable. If set to true, it means the session 
@@ -451,6 +463,21 @@ class SessionManager implements JsonI {
 
         if ($isActive) {
             return $_SESSION[self::$SV];
+        }
+
+        return [];
+    }
+    /**
+     * Returns an associative array that contains custom-set session variables.
+     * @return array An associative array. The indices are the names 
+     * of the variables and the values are variables values.
+     * @since 1.8.7
+     */
+    public function getSessionCustomVars() {
+        $isActive = $this->_isActive();
+
+        if ($isActive) {
+            return $_SESSION[self::$CSV];
         }
 
         return [];
@@ -550,14 +577,14 @@ class SessionManager implements JsonI {
 
         if (!$this->_switchToSession()) {
             if (!$this->resume()) {
-                $mlifeTime = $this->getLifetime();
+                $minutesLifeTime = $this->getLifetime();
 
-                if ($mlifeTime == -1) {
+                if ($minutesLifeTime == -1) {
                     //set default time to two hours.
                     $this->setLifetime(self::DEFAULT_SESSION_DURATION);
-                    $mlifeTime = self::DEFAULT_SESSION_DURATION * 60;
+                    $minutesLifeTime = self::DEFAULT_SESSION_DURATION;
                 } 
-                $retVal = $this->_start($refresh, $mlifeTime,$useDefaultLang);
+                $retVal = $this->_start($refresh, $minutesLifeTime,$useDefaultLang);
             } else {
                 $retVal = true;
             }
@@ -622,6 +649,8 @@ class SessionManager implements JsonI {
     }
     /**
      * Checks if the session has timed out or not.
+     * Note that if a session is set to refresh and session duration has been 
+     * passed since last refresh, it will be considered as a timeout session.
      * @return boolean|int true if the session has timed out. false if not. If no 
      * session is active, the method will return the constant 'PHP_SESSION_NONE'. 
      * If sessions are disabled, the method will return the constant 'PHP_SESSION_DISABLED'.
@@ -633,6 +662,12 @@ class SessionManager implements JsonI {
 
         if ($isActive) {
             $remTime = $this->getRemainingTime();
+            if ($this->isRefresh()) {
+                $startTime = $this->getStartTime();
+                if ($startTime + $remTime < time()) {
+                    return true;
+                }
+            }
             $retVal = $remTime < 0;
         } else {
             $retVal = session_status();
@@ -689,9 +724,9 @@ class SessionManager implements JsonI {
     /**
      * Checks if there exist a session with the given session name or not. If there 
      * is a one and it is not timed out, the method will resume it.
-     * @return boolean true if there is a session with the given name 
-     * and it is resumed. false= otherwise. If the session is timed out, the 
-     * method will kill it.
+     * @return boolean The method will return true if there is a session with the given name 
+     * and it is resumed. false otherwise. If the session is timed out, the 
+     * method will kill it and return false.
      * @since 1.0
      */
     public function resume() {
@@ -780,9 +815,10 @@ class SessionManager implements JsonI {
      */
     public function setSessionVar($name,$value) {
         $isActive = $this->_isActive();
-
-        if ($isActive) {
-            $_SESSION[$name] = $value;
+        $trimmed = trim($name);
+        
+        if ($isActive && strlen($trimmed) != 0) {
+            $_SESSION[self::$CSV][$trimmed] = $value;
 
             return true;
         }
@@ -807,29 +843,61 @@ class SessionManager implements JsonI {
         return $retVal;
     }
     /**
+     * Removes all custom set session variables.
+     * @return boolean If session is active and variables cleared, the method will 
+     * return true. If the session is not active, the method will return false.
+     * @since 1.8.7
+     */
+    public function clearCustomVars() {
+        $isActive = $this->_isActive();
+
+        if ($isActive) {
+            $_SESSION[self::$CSV] = [];
+            return true;
+        }
+
+        return false;
+    }
+    /**
      * Returns a 'JsonX' object that represents the manager.
      * @return JsonX
      * @since 1.5
      */
     public function toJSON() {
+        $this->_switchToSession();
         $j = new JsonX();
         $j->add('name', $this->getName());
-        $lifetime = $this->getLifetime();
-
-        if ($lifetime == -1) {
-            $lifetime = self::DEFAULT_SESSION_DURATION;
-        }
-        $j->add('duration', $lifetime * 60);
+        $j->add('status', $this->sessionStatus);
         $j->add('hasCookie', $this->hasCookie());
         $j->add('sessionId', $this->getID());
         $j->add('language', $this->getLang());
         try {
             $j->add(self::MAIN_VARS[3], $this->isRefresh());
         } catch (Exception $ex) {
-            $j->add(self::MAIN_VARS[3], 'EXCEPTION');
+            $j->add(self::MAIN_VARS[3], 'EXCEPTION: '.$ex->getMessage());
         }
-        $j->add('passedTime', $this->getPassedTime());
-        $j->add('timeoutAfter', $this->getRemainingTime());
+        $lifetime = $this->getLifetime();
+
+        if ($lifetime == -1) {
+            $lifetime = self::DEFAULT_SESSION_DURATION;
+        }
+        $j->add('duration', new JsonX([
+            'inSeconds' => $lifetime * 60,
+            'inMinutes' => $lifetime,
+            'inHours' => floor($lifetime / 60)
+        ]));
+
+        $j->add('passedTime', new JsonX([
+            'inSeconds' => $this->getPassedTime(),
+            'inMinutes' => floor(($this->getPassedTime() / 60)),
+            'inHours' => floor($this->getPassedTime() / 3600)
+        ]));
+        
+        $j->add('timeoutAfter', new JsonX([
+            'inSeconds' => $this->getRemainingTime(),
+            'inMinutes' => floor(($this->getRemainingTime() / 60)),
+            'inHours' => floor($this->getRemainingTime() / 3600)
+        ]));
         $stTm = $this->getStartTime();
 
         if ($stTm != PHP_SESSION_NONE && $stTm != PHP_SESSION_ACTIVE && $stTm != PHP_SESSION_DISABLED) {
@@ -840,8 +908,9 @@ class SessionManager implements JsonI {
         if ($rsTm != PHP_SESSION_NONE && $rsTm != PHP_SESSION_ACTIVE && $rsTm != PHP_SESSION_DISABLED) {
             $j->add(self::MAIN_VARS[2], date('Y-m-d H:i:s',$this->getResumTime()));
         }
-        $j->add('status', $this->sessionStatus);
+        
         $j->add(self::MAIN_VARS[6], $this->getUser());
+        $j->addArray('customVars', $this->getSessionCustomVars(), true);
 
         return $j;
     }
@@ -969,13 +1038,14 @@ class SessionManager implements JsonI {
             $httponly = false;
         }
         $path = isset($params['path']) ? $params['path'] : '/';
+        $_SESSION = [];
         session_destroy();
         session_set_cookie_params(0, $path, $params['domain'], $secure, $httponly);
         $this->sessionStatus = self::KILLED;
     }
     private function _setLifetimeHelper($time) {
         $this->lifeTime = $time;
-        $_SESSION[self::$SV][self::MAIN_VARS[0]] = $time * 60;
+        $_SESSION[self::$SV][self::MAIN_VARS[0]] = $time;
 
         $params = session_get_cookie_params();
         session_write_close();
@@ -1004,7 +1074,9 @@ class SessionManager implements JsonI {
         return $retVal;
     }
     /**
-     * 
+     * Sets session variables.
+     * @param type $tmpId
+     * @param int $sessionTime The duration of the session in minutes.
      * @return boolean
      */
     private function _setSessionParams($tmpId, $sessionTime) {
@@ -1025,7 +1097,7 @@ class SessionManager implements JsonI {
 
             //if time is -1, then get stored one.
             //else, update session time.
-            $sessionTime = $sessionTime == -1 ? $this->getLifetime() * 60 : $sessionTime * 60;
+            $sessionTime = $sessionTime == -1 ? $this->getLifetime() : $sessionTime;
 
             $_SESSION[self::$SV][self::MAIN_VARS[0]] = $sessionTime;
             $this->resumed = true;
@@ -1047,26 +1119,30 @@ class SessionManager implements JsonI {
     }
     /**
      * The core method of the class. 
-     * @param type $refresh
-     * @param type $lifeTime
-     * @param type $useDefaultLang
-     * @return type
+     * @param boolean $refresh A boolean set to true if the session will be 
+     * refereshed with every request.
+     * @param int $lifeTime Session duration in minutes.
+     * @param boolean $useDefaultLang If set to true, default language will be 
+     * used ('EN') if no language is provided in the request.
+     * @return boolean If the session is started, the method will return true. 
      * @since 1.0
      */
     private function _start($refresh,$lifeTime,$useDefaultLang = false) {
         $this->sessionStatus = self::NEW_SESSION;
-        ini_set('session.gc_maxlifetime', $lifeTime);
-        ini_set('session.cookie_lifetime', $lifeTime);
+        ini_set('session.gc_maxlifetime', $lifeTime * 60);
+        ini_set('session.cookie_lifetime', $lifeTime * 60);
         ini_set('session.use_cookies', 1);
         session_name($this->getName());
         session_id($this->sId);
-        session_set_cookie_params($lifeTime,"/");
+        session_set_cookie_params($lifeTime * 60,"/");
         $started = session_start();
 
         if ($started) {
+            
             $this->resumed = false;
             $this->new = true;
             $_SESSION[self::$SV] = [];
+            $_SESSION[self::$CSV] = [];
             $_SESSION[self::$SV][self::MAIN_VARS[4]] = $this->getName();
             $_SESSION[self::$SV][self::MAIN_VARS[1]] = time();
             $_SESSION[self::$SV][self::MAIN_VARS[2]] = time();
@@ -1135,8 +1211,8 @@ class SessionManager implements JsonI {
     }
     /**
      * Validate session variables. Must be called after session is started.
-     * @return boolean  If the variables 'started-at', 'resumed-at', 'lifetime', 
-     * 'refresh', 'session-name' and 'ip-address' are 
+     * @return boolean  If the variables 'startedAt', 'resumedAt', 'lifetime', 
+     * 'refresh', 'sessionName' and 'ipAddress' are 
      * set, The method will return true. Other than that, it will return 
      * false.
      */

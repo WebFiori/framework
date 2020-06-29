@@ -54,7 +54,7 @@ use jsonx\JsonX;
  * }
  * </pre>
  * @author Ibrahim
- * @version 1.2.2
+ * @version 1.2.3
  */
 class Uploader implements JsonI {
     /**
@@ -224,12 +224,27 @@ class Uploader implements JsonI {
      * <li><b>mime</b>: MIME type of the file.</li>
      * <li><b>uploaded</b>: A boolean. Set to true if the file was uploaded.</li>
      * </ul>
-     * @return array
+     * @param boolean $asObj If this parameter is set to true, the returned array 
+     * will contain objects of type 'UploadedFile' instead of sub associative arrays. 
+     * Default value is true.
+     * @return array An indexed array that contains sub associative arrays or 
+     * objects of type 'UploadFile'.
      * @since 1.0
      * 
      */
-    public function getFiles() {
-        return $this->files;
+    public function getFiles($asObj = true) {
+        $asObjC = $asObj === true;
+        $retVal = [];
+
+        if ($asObjC) {
+            foreach ($this->files as $fArr) {
+                $retVal[] = $this->_createFileObjFromArray($fArr);
+            }
+        } else {
+            $retVal = $this->files;
+        }
+
+        return $retVal;
     }
     /**
      * Returns the directory at which the file or files will be uploaded to.
@@ -318,35 +333,13 @@ class Uploader implements JsonI {
      */
     public function toJSON() {
         $j = new JsonX();
-        $j->add('upload-directory', $this->getUploadDir());
-        $j->add('associated-file-name', $this->getAssociatedFileName());
-        $j->add('allowed-types', $this->getExts());
+        $j->add('uploadDirectory', $this->getUploadDir());
+        $j->add('associatedFileName', $this->getAssociatedFileName());
+        $j->add('allowedTypes', $this->getExts());
         $fsArr = [];
 
         foreach ($this->getFiles() as $fArr) {
-            $fileJson = new JsonX();
-            $fileJson->add('file-name', $fArr['name']);
-            $fileJson->add('size', $fArr['size']);
-            $fileJson->add('upload-path', $fArr['upload-path']);
-            $fileJson->add('upload-error', $fArr['upload-error']);
-            $mime = isset($fArr['mime']) ? $fArr['mime'] : null;
-            $fileJson->add('mime', $mime);
-
-            if (isset($fArr['is-exist'])) {
-                $isExist = $fArr['is-exist'] === true;
-            } else {
-                $isExist = false;
-            }
-            $fileJson->add('is-exist', $isExist);
-
-            if (isset($fArr['is-replace'])) {
-                $isReplace = $fArr['is-replace'] === true;
-            } else {
-                $isReplace = false;
-            }
-            $fileJson->add('is-replace',$isReplace);
-            $fileJson->add('is-uploaded', $fArr['uploaded']);
-            $fsArr[] = $fileJson;
+            $fsArr[] = $fArr;
         }
         $j->add('files', $fsArr);
 
@@ -376,7 +369,7 @@ class Uploader implements JsonI {
 
         if ($reqMeth == 'POST') {
             $fileOrFiles = null;
-            $associatedInputName = filter_input(INPUT_POST, 'file-input-name');
+            $associatedInputName = filter_input(INPUT_POST, 'file');
 
             if ($associatedInputName !== null) {
                 $this->asscociatedName = $associatedInputName;
@@ -404,6 +397,36 @@ class Uploader implements JsonI {
         }
 
         return $this->files;
+    }
+    /**
+     * Returns an array that contains objects of type 'UploadedFile'.
+     * @param bolean $replaceIfExist If a file with the given name found 
+     * and this parameter is set to true, the file will be replaced.
+     * @return array An array that contains objects of type 'UploadedFile'.
+     * @since 1.2.3
+     * 
+     */
+    public function uploadAsFileObj($replaceIfExist = false) {
+        $uploadedFiles = $this->upload($replaceIfExist);
+        $filesArr = [];
+
+        foreach ($uploadedFiles as $fileArray) {
+            $filesArr = $this->_createFileObjFromArray($fileArray);
+        }
+
+        return $filesArr;
+    }
+    private function _createFileObjFromArray($arr) {
+        $file = new UploadFile($arr['name'], $arr['upload-path']);
+        $file->setMIMEType($arr['mime']);
+
+        if (isset($arr['is-replace'])) {
+            $file->setIsReplace($arr['is-replace']);
+        }
+        $file->setIsUploaded($arr['uploaded']);
+        $file->setUploadErr($arr['upload-error']);
+
+        return $file;
     }
     private function _getFileArr($fileOrFiles,$replaceIfExist, $idx = null) {
         $mimeFunc = 'mime_content_type';

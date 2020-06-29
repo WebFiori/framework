@@ -808,6 +808,9 @@ class Router {
                 $instance = new $constructor();
 
                 if ($instance instanceof WebServicesSet) {
+                    if (!defined('API_CALL')) {
+                        define('API_CALL', true);
+                    }
                     $instance->process();
                 }
             }

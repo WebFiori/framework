@@ -55,10 +55,10 @@ class ServerErrView {
     /**
      * Show the view.
      * @param int $responseCode A response code to send before showing the view. 
-     * default is 200 - Ok.
+     * default is 500 - Server Error.
      * @since 1.0
      */
-    public function show($responseCode = 200) {
+    public function show($responseCode = 500) {
         http_response_code($responseCode);
         if (class_exists('phpStructs\html\HTMLNode')) {
             $this->_phpStructsExist($this->errOrThrowable);

@@ -210,7 +210,7 @@ class CreateCommand extends CLICommand {
                 'color' => 'yellow'
             ]);
             $this->println($queryObj->getQuery(), [
-                'color' => 'lightblue'
+                'color' => 'light-blue'
             ]);
             if ($this->confirm('Continue?', true)) {
                 if ($tempController->excQ($queryObj)) {

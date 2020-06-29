@@ -50,24 +50,20 @@ class BootstrapTheme extends Theme {
             $node->setClassName('row');
 
             return $node;
+        } else if ($type == 'container') {
+            $node = new HTMLNode();
+            $node->setClassName('container');
+
+            return $node;
+        } else if ($type == 'container-f') {
+            $node = new HTMLNode();
+            $node->setClassName('container-fluid');
+
+            return $node;
         } else {
-            if ($type == 'container') {
-                $node = new HTMLNode();
-                $node->setClassName('container');
+            $node = new HTMLNode();
 
-                return $node;
-            } else {
-                if ($type == 'container-f') {
-                    $node = new HTMLNode();
-                    $node->setClassName('container-fluid');
-
-                    return $node;
-                } else {
-                    $node = new HTMLNode();
-
-                    return $node;
-                }
-            }
+            return $node;
         }
     }
     /**

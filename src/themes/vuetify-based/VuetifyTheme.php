@@ -38,13 +38,11 @@ class VuetifyTheme extends Theme {
             $topDiv->setID('app');
             $headerSec = Page::document()->getChildByID('page-header');
             Page::document()->removeChild($headerSec);
-            $topDiv->addChild($headerSec);
             $bodySec = Page::document()->getChildByID('page-body');
             Page::document()->removeChild($bodySec);
-            $topDiv->addChild($bodySec);
             $footerSec = Page::document()->getChildByID('page-footer');
             Page::document()->removeChild($footerSec);
-            $topDiv->addChild($footerSec);
+            $topDiv->addChild($footerSec)->addChild($headerSec)->addChild($bodySec);
             Page::document()->getBody()->addChild($topDiv);
             Page::document()->getChildByID('main-content-area')->setNodeName('v-content');
             Page::document()->getChildByID('main-content-area')->setAttribute('app');
@@ -88,17 +86,15 @@ class VuetifyTheme extends Theme {
             }
 
             return $node;
-        } else {
-            if ($type == 'icon-button') {
-                $btn = new HTMLNode('v-btn');
-                $btn->setAttribute('icon');
-                $vIcon = new HTMLNode('v-icon');
-                $btn->addChild($vIcon);
-                $icon = isset($options['icon']) ? $options['icon'] : 'mdi-information';
-                $vIcon->addTextNode($icon);
+        } else if ($type == 'icon-button') {
+            $btn = new HTMLNode('v-btn');
+            $btn->setAttribute('icon');
+            $vIcon = new HTMLNode('v-icon');
+            $btn->addChild($vIcon);
+            $icon = isset($options['icon']) ? $options['icon'] : 'mdi-information';
+            $vIcon->addTextNode($icon);
 
-                return $btn;
-            }
+            return $btn;
         }
 
         return new HTMLNode();
@@ -120,7 +116,7 @@ class VuetifyTheme extends Theme {
             'src' => Page::imagesDir().'/side-nav.PNG',
             ':aspect-ratio' => "16/9"
         ]);
-        $node->addChild($bigImg);
+        
         $bigImgContentRow = new HTMLNode('v-row');
         $bigImgContentRow->setAttributes([
             'class' => 'lightbox white--text pa-2 fill-height',
@@ -135,7 +131,7 @@ class VuetifyTheme extends Theme {
 
         //create the side nav menu
         $list = new HTMLNode('v-list');
-        $node->addChild($list);
+        $node->addChild($bigImg)->addChild($list);
         $list->setAttributes([
             'dense',
             'nav'
@@ -147,18 +143,15 @@ class VuetifyTheme extends Theme {
             'type' => 'v-list-item',
             'title' => Page::translation()->get('side-menu/home'),
             'icon' => 'mdi-home'
-        ]));
-        $listGroup->addChild($this->createHTMLNode([
+        ]))->addChild($this->createHTMLNode([
             'type' => 'v-list-item',
             'title' => Page::translation()->get('side-menu/search'),
             'icon' => 'mdi-magnify'
-        ]));
-        $listGroup->addChild($this->createHTMLNode([
+        ]))->addChild($this->createHTMLNode([
             'type' => 'v-list-item',
             'title' => Page::translation()->get('side-menu/account'),
             'icon' => 'mdi-heart'
-        ]));
-        $listGroup->addChild($this->createHTMLNode([
+        ]))->addChild($this->createHTMLNode([
             'type' => 'v-list-item',
             'title' => Page::translation()->get('side-menu/something-else'),
             'icon' => 'mdi-information'
@@ -202,21 +195,22 @@ class VuetifyTheme extends Theme {
 
         $copywriteNoticeNode = new HTMLNode('strong');
         $copywriteNoticeNode->addTextNode(Page::translation()->get('example/footer/copyright-notice'));
-        $vCardText->addChild($copywriteNoticeNode);
+        
 
         $poweredByNode = new HTMLNode('p');
         $poweredByNode->setClassName('footer-notice');
         $poweredByNode->addTextNode('Powered By: ');
         $frameworkLink = new Anchor('https://webfiori.com', 'WebFiori Framework', '_blank');
         $poweredByNode->addChild($frameworkLink);
-        $vCardText->addChild($poweredByNode);
+        
 
         $vuetifyNode = new HTMLNode('p');
         $vuetifyNode->setClassName('footer-notice');
         $vuetifyNode->addTextNode('Theme Designed Using ');
         $vuetifyLink = new Anchor('https://vuetifyjs.com', 'Vuetify', '_blank');
         $vuetifyNode->addChild($vuetifyLink);
-        $vCardText->addChild($vuetifyNode);
+        
+        $vCardText->addChild($copywriteNoticeNode)->addChild($poweredByNode)->addChild($vuetifyNode);
 
         $vCard->addChild($vCardText);
 
@@ -253,8 +247,7 @@ class VuetifyTheme extends Theme {
      * Creates the header section of the page and return it.
      * @return HTMLNode
      */
-    public function getHeadrNode() {
-        $node = new HTMLNode();
+    public function getHeadrNode() { 
         $appBar = new HTMLNode('v-app-bar');
         $appBar->setAttributes([
             'color' => 'red',
@@ -271,41 +264,45 @@ class VuetifyTheme extends Theme {
             'max-height' => 45,
             'max-width' => 45
         ]);
-        $appBar->addChild($logo);
+        
 
         //Adds a gradiant
-        $appBar->addTextNode('<template v-slot:img="{ props }">
-          <v-img
-            v-bind="props"
-            gradient="to top right, rgba(19,84,122,.5), rgba(128,208,199,.8)"
-          ></v-img>
-        </template>', false);
+        
 
         //An icon to show and hide aside menu.
         $drawerIcon = new HTMLNode('v-app-bar-nav-icon');
-        $appBar->addChild($drawerIcon);
+        
         $drawerIcon->setAttribute('@click', 'drawer = true');
 
         //Adds a text to the bar that represents website name
         $titleNode = new HTMLNode('v-toolbar-title');
         $titleNode->addTextNode(Page::siteName());
-        $appBar->addChild($titleNode);
-
-
-        $appBar->addTextNode('<v-spacer></v-spacer>', false);
+        
+        $appBar->addChild(HTMLNode::createTextNode('<template v-slot:img="{ props }">
+                <v-img
+                  v-bind="props"
+                  gradient="to top right, rgba(19,84,122,.5), rgba(128,208,199,.8)"
+                ></v-img>
+              </template>', false))
+                ->addChild($logo)
+                ->addChild($drawerIcon)
+                ->addChild($titleNode)
+                ->addChild(HTMLNode::createTextNode('<v-spacer></v-spacer>', false))
 
         //Add extra actions to the bar such as search
-        $appBar->addChild($this->createHTMLNode([
-            'type' => 'icon-button',
-            'icon' => 'mdi-magnify'
-        ]));
-        $appBar->addChild($this->createHTMLNode([
-            'type' => 'icon-button'
-        ]));
-        $appBar->addChild($this->createHTMLNode([
-            'type' => 'icon-button',
-            'icon' => 'mdi-heart'
-        ]));
+                ->addChild($this->createHTMLNode([
+                    'type' => 'icon-button',
+                    'icon' => 'mdi-magnify'
+                ]))
+                ->addChild($this->createHTMLNode([
+                    'type' => 'icon-button'
+                ]))
+                ->addChild($this->createHTMLNode([
+                    'type' => 'icon-button',
+                    'icon' => 'mdi-heart'
+                ]));
+        
+        $node = new HTMLNode();
         $node->addChild($appBar);
 
         return $node;

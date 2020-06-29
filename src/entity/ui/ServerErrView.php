@@ -37,6 +37,12 @@ use webfiori\entity\Util;
  */
 class ServerErrView {
     /**
+     *
+     * @var Throwable|Error
+     * @since 1.0 
+     */
+    private $errOrThrowable;
+    /**
      * Creates a new instance of the class.
      * @param Throwable|array $throwableOrErr This can be an instance of the 
      * interface 'Throwable' or it can be an array that contains error information 
@@ -44,11 +50,7 @@ class ServerErrView {
      * @since 1.0
      */
     public function __construct($throwableOrErr) {
-        if (class_exists('phpStructs\html\HTMLNode')) {
-            $this->_phpStructsExist($throwableOrErr);
-        } else {
-            $this->_phpStructsDoesNotexist($throwableOrErr);
-        }
+        $this->errOrThrowable = $throwableOrErr;
     }
     /**
      * Show the view.
@@ -58,7 +60,11 @@ class ServerErrView {
      */
     public function show($responseCode = 200) {
         http_response_code($responseCode);
-        Page::render();
+        if (class_exists('phpStructs\html\HTMLNode')) {
+            $this->_phpStructsExist($this->errOrThrowable);
+        } else {
+            $this->_phpStructsDoesNotexist($this->errOrThrowable);
+        }
         die();
     }
     /**

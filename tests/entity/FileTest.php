@@ -122,7 +122,7 @@ class FileTest extends TestCase {
                 . '"id":-1, '
                 . '"mime":"text\/plain", '
                 . '"name":"'.$file->getName().'", '
-                . '"path":"'.JsonX::escapeJSONSpecialChars($file->getPath()).'", '
+                . '"directory":"'.JsonX::escapeJSONSpecialChars($file->getPath()).'", '
                 . '"sizeInBytes":12, '
                 . '"sizeInKBytes":0.01171875, '
                 . '"sizeInMBytes":1.1444091796875E-5'

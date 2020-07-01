@@ -43,26 +43,17 @@ class CronLoginView extends CronView {
         }
         $form = new HTMLNode('form');
         Page::insert($form);
-        $label = new Label('Enter Login Password:');
-        $label->setStyle([
-            'display' => 'block',
-            'font-weight' => 'bold'
-        ]);
-        $label->setAttribute('for', 'password-input');
-        $form->addChild($label);
-        $passInput = new Input('password');
-        $passInput->setAttribute('placeholder', 'Enter CRON password here.');
-        $passInput->setID('password-input');
-        $passInput->setStyle([
-            'width' => '200px'
-        ]);
-        $form->addChild($passInput);
-        $form->addTextNode('<br/><br/>', false);
-        $submit = new HTMLNode('button');
-        $submit->addTextNode('Login');
-        $submit->setAttribute('onclick', 'login(this);return false;');
-        $submit->setID('submit-button');
-        $form->addChild($submit);
+        $form->label('Enter Login Password:', [
+            'style' => 'display:block;font-weight:bold;',
+            'for' => 'password-input'
+        ])->input('password', [
+            'id' => 'password-input',
+            'placeholder' => 'Enter CRON password here.',
+            'style' => 'width:200px'
+        ])->br()->br()->addChild(new HTMLNode('button'), false, [
+            'id' => 'submit-button',
+            'onclock' => 'login(this);return false;'
+        ])->text('Login');
         Page::render();
     }
 }

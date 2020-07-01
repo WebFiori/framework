@@ -326,12 +326,15 @@ class Page {
      * @param HTMLNode $node The node that will be inserted.
      * @param string $parentNodeId The ID of the node that the given node 
      * will be inserted to.
-     * @return boolean The method will return true if the given node 
-     * was inserted. If it is not, the method will return false.
+     * @return HTMLNode|null The method will return the inserted 
+     * node if it was inserted. If it is not, the method will return null.
      * @since 1.9
      */
     public static function insert($node,$parentNodeId = self::MAIN_ELEMENTS[2]) {
-        return Page::get()->insertNode($node, $parentNodeId);
+        
+        if (Page::get()->insertNode($node, $parentNodeId)) {
+            return $node;
+        }
     }
     /**
      * Returns the directory at which JavaScript files of the theme exists.

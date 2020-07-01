@@ -233,7 +233,7 @@ class PageTest extends TestCase{
         Page::reset();
         $node = new HTMLNode();
         $node->setID('new-node');
-        $this->assertTrue(Page::insert($node));
+        $$this->assertNotNull(Page::insert($node));
         $this->assertEquals(1,Page::document()->getChildByID('main-content-area')->childrenCount());
         $el = Page::document()->getChildByID('new-node');
         $this->assertTrue($el === $node);
@@ -245,7 +245,7 @@ class PageTest extends TestCase{
         Page::reset();
         $node = new HTMLNode();
         $node->setID('new-node');
-        $this->assertFalse(Page::insert($node,''));
+        $this->assertNull(Page::insert($node,''));
         $this->assertEquals(0,Page::document()->getChildByID('main-content-area')->childrenCount());
         $el = Page::document()->getChildByID('new-node');
         $this->assertNull($el);

@@ -30,6 +30,7 @@ use phpStructs\html\HTMLDoc;
 use phpStructs\html\HTMLNode;
 use webfiori\conf\SiteConfig;
 use webfiori\entity\langs\Language;
+use webfiori\entity\exceptions\UIException;
 /**
  * A class used to initialize view components.
  * This class is one of the core components for creating web pages. It is simply 
@@ -364,19 +365,19 @@ class Page {
     }
     /**
      * Display the page in the web browser or gets the rendered document as string.
-     * @param boolean $returnResult If this parameter is set to true, the method 
-     * will return the rendered HTML document as string. Default value is 
-     * false.
      * @param boolean $formatted If this parameter is set to true, the rendered 
      * HTML document will be well formatted and readable. Note that by adding 
      * formatting to the page, the size of rendered HTML document 
      * will increase. Default is false.
+     * @param boolean $returnResult If this parameter is set to true, the method 
+     * will return the rendered HTML document as string. Default value is 
+     * false.
      * @return null|string If the parameter <b>$returnResult</b> is set to true, 
      * the method will return a string that represents the rendered page. Other 
      * than that, it will return null.
      * @since 1.9
      */
-    public static function render($returnResult = false,$formatted = false) {
+    public static function render($formatted = false, $returnResult = false) {
         if (Page::get()->beforeRender !== null) {
             call_user_func(Page::get()->beforeRender);
         }
@@ -498,10 +499,10 @@ class Page {
             $node = $loadedTheme->getAsideNode();
         }
 
-        if ($node instanceof HTMLNode) {
-            $node->setID(self::MAIN_ELEMENTS[3]);
+        if (!$node instanceof HTMLNode) {
+            throw new UIException('The the method "Theme::getAsideNode()" did not return '
+                    . 'an instance of the class "HTMLNode".');
         } else {
-            $node = new HTMLNode();
             $node->setID(self::MAIN_ELEMENTS[3]);
         }
 
@@ -516,10 +517,10 @@ class Page {
             $node = $loadedTheme->getFooterNode();
         }
 
-        if ($node instanceof HTMLNode) {
-            $node->setID(self::MAIN_ELEMENTS[4]);
+        if (!$node instanceof HTMLNode) {
+            throw new UIException('The the method "Theme::getFooterNode()" did not return '
+                    . 'an instance of the class "HTMLNode".');
         } else {
-            $node = new HTMLNode();
             $node->setID(self::MAIN_ELEMENTS[4]);
         }
 
@@ -537,6 +538,10 @@ class Page {
             );
         } else {
             $headNode = $loadedTheme->getHeadNode();
+            if (!$headNode instanceof HeadNode) {
+                throw new UIException('The method "Theme::getHeadNode()" did not return '
+                        . 'an instance of the class "HeadNode".');
+            }
         }
         $headNode->addMeta('charset','UTF-8',true);
         $headNode->setTitle($this->getTitle().$this->getTitleSep().$this->getWebsiteName());
@@ -558,10 +563,10 @@ class Page {
             $node = $loadedTheme->getHeadrNode();
         }
 
-        if ($node instanceof HTMLNode) {
-            $node->setID(self::MAIN_ELEMENTS[1]);
+        if (!$node instanceof HTMLNode) {
+            throw new UIException('The the method "Theme::getHeadrNode()" did not return '
+                    . 'an instance of the class "HTMLNode".');
         } else {
-            $node = new HTMLNode();
             $node->setID(self::MAIN_ELEMENTS[1]);
         }
 
@@ -897,13 +902,11 @@ class Page {
         if (gettype($bool) == self::$BoolType) {
             if (!$this->incFooter && $bool) {
                 $this->document->addChild($this->_getFooter());
-            } else {
-                if ($this->incFooter && !$bool) {
-                    $footer = $this->document->getChildByID(self::MAIN_ELEMENTS[4]);
+            } else if ($this->incFooter && !$bool) {
+                $footer = $this->document->getChildByID(self::MAIN_ELEMENTS[4]);
 
-                    if ($footer instanceof HTMLNode) {
-                        $this->document->removeChild($footer);
-                    }
+                if ($footer instanceof HTMLNode) {
+                    $this->document->removeChild($footer);
                 }
             }
             $this->incFooter = $bool;
@@ -927,14 +930,12 @@ class Page {
                 for ($x = 0 ; $x < $currentChCount ; $x++) {
                     $this->document->addChild($children->get($x));
                 }
-            } else {
-                if ($this->incHeader && !$bool) {
-                    //remove header
-                    $header = $this->document->getChildByID(self::MAIN_ELEMENTS[1]);
+            } else if ($this->incHeader && !$bool) {
+                //remove header
+                $header = $this->document->getChildByID(self::MAIN_ELEMENTS[1]);
 
-                    if ($header instanceof HTMLNode) {
-                        $this->document->removeChild($header);
-                    }
+                if ($header instanceof HTMLNode) {
+                    $this->document->removeChild($header);
                 }
             }
             $this->incHeader = $bool;

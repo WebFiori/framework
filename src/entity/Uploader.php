@@ -444,7 +444,7 @@ class Uploader implements JsonI {
         $tempIdx = 'tmp_name';
         $fileInfoArr = [];
         $fileInfoArr[$indices[0]] = $idx === null ? filter_var($fileOrFiles[$indices[0]], FILTER_SANITIZE_STRING) : filter_var($fileOrFiles[$indices[0]][$idx], FILTER_SANITIZE_STRING);
-        $fileInfoArr[$indices[1]] = $idx === null ? $fileOrFiles[$indices[1]] : $fileOrFiles[$indices[1]][$idx];
+        $fileInfoArr[$indices[1]] = $idx === null ? filter_var($fileOrFiles[$indices[1]], FILTER_SANITIZE_NUMBER_INT) : filter_var($fileOrFiles[$indices[1]][$idx], FILTER_SANITIZE_NUMBER_INT);
         $fileInfoArr[$indices[2]] = $this->getUploadDir();
         $fileInfoArr[$indices[3]] = 0;
         $fileInfoArr[$indices[6]] = 'N/A';

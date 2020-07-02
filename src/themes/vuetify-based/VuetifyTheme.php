@@ -108,38 +108,19 @@ class VuetifyTheme extends Theme {
         $node->setAttributes([
             'v-model' => 'drawer',
             'absolute',':right' => '$vuetify.rtl',
-            'temporary','fixed']);
-
-        //add an image with some text on it.
-        $bigImg = new HTMLNode('v-img');
-        $bigImg->setAttributes([
-            'src' => Page::imagesDir().'/side-nav.PNG',
-            ':aspect-ratio' => "16/9"
-        ]);
-        
-        $bigImgContentRow = new HTMLNode('v-row');
-        $bigImgContentRow->setAttributes([
-            'class' => 'lightbox white--text pa-2 fill-height',
-            'align' => 'end'
-        ]);
-        $bigImg->addChild($bigImgContentRow);
-        $bigImgContentCol = new HTMLNode('v-col');
-        $bigImgContentRow->addChild($bigImgContentCol);
-        $bigImgContentCol->addTextNode(''
-                .'<div class="subheading">Programming Academia</div>'
-                .'',false);
-
-        //create the side nav menu
-        $list = new HTMLNode('v-list');
-        $node->addChild($bigImg)->addChild($list);
-        $list->setAttributes([
-            'dense',
-            'nav'
-        ]);
-        $listGroup = new HTMLNode('v-list-item-group');
-        $list->addChild($listGroup);
-        $listGroup->setAttribute('active-class','deep-purple--text text--accent-4');
-        $listGroup->addChild($this->createHTMLNode([
+            'temporary','fixed'])->addChild('v-img',false,[
+                'src' => Page::imagesDir().'/side-nav.PNG',
+                ':aspect-ratio' => "16/9"
+            ], false)->addChild('v-row', [
+                'class' => 'lightbox white--text pa-2 fill-height',
+                'align' => 'end'
+            ], false)->addChild('v-col', false)
+            ->addChild('div',false,['class'=>'subheading'])->text('Programming Academia')
+            ->getParent()->getParent()->getParent()->getParent()->addChild('v-list', [
+                'dense','nav'
+            ], false)->addChild('v-list-item-group',false, [
+                'active-class'=>'deep-purple--text text--accent-4'
+                ])->addChild($this->createHTMLNode([
             'type' => 'v-list-item',
             'title' => Page::translation()->get('side-menu/home'),
             'icon' => 'mdi-home'

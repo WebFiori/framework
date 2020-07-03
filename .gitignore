@@ -7,3 +7,4 @@ test.*
 composer.lock
 *.cache
 cs-fixer.phar
+*.log

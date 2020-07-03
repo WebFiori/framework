@@ -493,14 +493,14 @@ class Page {
 
     private function _getAside() {
         $loadedTheme = $this->getTheme();
-        $node = null;
+        $node = new HTMLNode();
 
         if ($loadedTheme !== null) {
             $node = $loadedTheme->getAsideNode();
         }
 
-        if (!$node instanceof HTMLNode) {
-            throw new UIException('The the method "Theme::getAsideNode()" did not return '
+        if ($loadedTheme !== null && !$node instanceof HTMLNode) {
+            throw new UIException('The the method "'. get_class($loadedTheme) .'::getAsideNode()" did not return '
                     . 'an instance of the class "HTMLNode".');
         } else {
             $node->setID(self::MAIN_ELEMENTS[3]);
@@ -511,14 +511,14 @@ class Page {
 
     private function _getFooter() {
         $loadedTheme = $this->getTheme();
-        $node = null;
+        $node = new HTMLNode();
 
         if ($loadedTheme !== null) {
             $node = $loadedTheme->getFooterNode();
         }
 
-        if (!$node instanceof HTMLNode) {
-            throw new UIException('The the method "Theme::getFooterNode()" did not return '
+        if ($loadedTheme !== null && !$node instanceof HTMLNode) {
+            throw new UIException('The the method "'. get_class($loadedTheme) .'::getFooterNode()" did not return '
                     . 'an instance of the class "HTMLNode".');
         } else {
             $node->setID(self::MAIN_ELEMENTS[4]);
@@ -539,7 +539,7 @@ class Page {
         } else {
             $headNode = $loadedTheme->getHeadNode();
             if (!$headNode instanceof HeadNode) {
-                throw new UIException('The method "Theme::getHeadNode()" did not return '
+                throw new UIException('The method "'. get_class($loadedTheme) .'::getHeadNode()" did not return '
                         . 'an instance of the class "HeadNode".');
             }
         }
@@ -557,14 +557,14 @@ class Page {
 
     private function _getHeader() {
         $loadedTheme = $this->getTheme();
-        $node = null;
+        $node = new HTMLNode();
 
         if ($loadedTheme !== null) {
             $node = $loadedTheme->getHeadrNode();
         }
 
-        if (!$node instanceof HTMLNode) {
-            throw new UIException('The the method "Theme::getHeadrNode()" did not return '
+        if ($loadedTheme !== null && !$node instanceof HTMLNode) {
+            throw new UIException('The the method "'. get_class($loadedTheme) .'::getHeadrNode()" did not return '
                     . 'an instance of the class "HTMLNode".');
         } else {
             $node->setID(self::MAIN_ELEMENTS[1]);

@@ -45,7 +45,7 @@ class PageTest extends TestCase{
      */
     public function testRender00() {
         Page::reset();
-        $doc = Page::render(true);
+        $doc = Page::render(false, true);
         $this->assertEquals('<!DOCTYPE html>'
                 . '<html>'
                 . '<head>'
@@ -70,7 +70,7 @@ class PageTest extends TestCase{
      */
     public function testRender01() {
         Page::reset();
-        $doc = Page::render(true);
+        $doc = Page::render(false, true);
         $this->assertEquals('<!DOCTYPE html>'
                 . '<html>'
                 . '<head>'

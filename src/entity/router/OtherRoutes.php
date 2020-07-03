@@ -27,7 +27,7 @@ namespace webfiori\entity\router;
 /**
  * A class that only has one method to initiate some of system routes.
  * The class is meant to only initiate the routes which uses the method 
- * Router::other().
+ * Router::addRoute().
  * @author Ibrahim
  * @version 1.0
  */
@@ -37,7 +37,7 @@ class OtherRoutes {
      * @since 1.0
      */
     public static function create() {
-        Router::other([
+        Router::addRoute([
             'path' => 'my-custom/view-something', 
             'route-to' => 'my-folder/file.php'
         ]);

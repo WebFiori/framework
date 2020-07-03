@@ -13,6 +13,32 @@ class RouterUriTest extends TestCase {
     /**
      * @test
      */
+    public function testGetSitemapNode00() {
+        $uri = new RouterUri('https://example.com?hello=world', '');
+        $this->assertEquals('<url><loc>https://example.com</loc></url>', $uri->getSitemapNode()->toHTML());
+    }
+    /**
+     * @test
+     */
+    public function testGetSitemapNode02() {
+        $uri = new RouterUri('https://example.com?hello=world', '');
+        $uri->addLanguage('ar');
+        $this->assertEquals('<url><loc>https://example.com</loc><xhtml:link rel="alternate" hreflang="ar" href="https://example.com?lang=ar"/></url>', $uri->getSitemapNode()->toHTML());
+    }
+    /**
+     * @test
+     */
+    public function testGetSitemapNode03() {
+        $uri = new RouterUri('https://example.com?hello=world', '');
+        $uri->addLanguage('ar');
+        $uri->addLanguage('en');
+        $this->assertEquals('<url><loc>https://example.com</loc><xhtml:link rel="alternate" hreflang="ar" '
+                . 'href="https://example.com?lang=ar"/>'
+                . '<xhtml:link rel="alternate" hreflang="en" href="https://example.com?lang=en"/></url>', $uri->getSitemapNode()->toHTML());
+    }
+    /**
+     * @test
+     */
     public function testEquals00() {
         $uri1 = new RouterUri('https://example.com/my-folder', '');
         $uri2 = new RouterUri('https://example.com/my-folder', '');

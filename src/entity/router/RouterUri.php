@@ -25,6 +25,7 @@
 namespace webfiori\entity\router;
 
 use webfiori\entity\Util;
+use phpStructs\html\HTMLNode;
 use Closure;
 /**
  * A class that is used to split URIs and get their parameters.
@@ -41,9 +42,16 @@ use Closure;
  * The class is also used for routing.
  * For more information on URI structure, visit <a target="_blank" href="https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#Examples">Wikipedia</a>.
  * @author Ibrahim
- * @version 1.3.4
+ * @version 1.3.5
  */
 class RouterUri {
+    /**
+     * An array that contains all languages that the resource the URI is pointing 
+     * to can have.
+     * @var array
+     * @since 1.3.5 
+     */
+    private $languages;
     /**
      * 
      * @var type 
@@ -102,6 +110,47 @@ class RouterUri {
         $this->uriBroken = self::splitURI($requestedUri);
         $this->setClosureParams($closureParams);
         $this->incInSiteMap = false;
+        $this->languages = [];
+    }
+    /**
+     * Adds a language to the set of languages at which the resource that the URI 
+     * points to.
+     * @param string $langCode A two characters string such as 'AR' that represents 
+     * language code.
+     * @since 1.3.5
+     */
+    public function addLanguage($langCode) {
+        $lower = strtolower(trim($langCode));
+        if (strlen($lower) == 2) {
+            if ($lower[0] >= 'a' && $lower[0] <= 'z' && $lower[1] >= 'a' && $lower[1] <= 'z' && !in_array($lower, $this->languages)) {
+                $this->languages[] = $lower;
+            }
+        }
+    }
+    /**
+     * Returns an array that contains a set of languages at which the resource that the URI 
+     * points to can have.
+     * @return array An array that contains language codes.
+     * @since 1.3.5
+     */
+    public function getLanguages() {
+        return $this->languages;
+    }
+    /**
+     * Returns an object of type 'HTMLNode' that contains URI information which 
+     * can be used to construct XML sitemap.
+     * @return HTMLNode An object of type 'HTMLNode' that contains URI information which 
+     * can be used to construct XML sitemap.
+     * @since 1.3.5
+     * 
+     */
+    public function getSitemapNode() {
+        $node = new HTMLNode('url');
+        $node->addChild('loc', false)->text($this->getUri());
+        foreach ($this->getLanguages() as $langCode) {
+            $node->text('<xhtml:link rel="alternate" hreflang="'.$langCode.'" href="'.$this->getUri().'?lang='.$langCode.'"/>', false);
+        }
+        return $node;
     }
     /**
      * Checks if two URIs are equal or not.

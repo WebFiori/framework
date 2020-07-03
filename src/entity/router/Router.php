@@ -263,6 +263,9 @@ class Router {
      * If this one is set to false, then if a request is made to the URL 'https://example.com/one/two',
      * It will be the same as requesting the URL 'https://example.com/OnE/tWO'. Default 
      * is true.</li>
+     * <li><b>languages</b>: An indexed array that contains the languages at 
+     * which the resource can have. Each language is represented as two 
+     * characters such as 'AR'.</li>
      * </ul>
      * @return boolean The method will return true if the route was created. 
      * If a route for the given path was already created, the method will return 
@@ -355,7 +358,8 @@ class Router {
      * Adds a route to a basic xml site map. 
      * If this method is called, a route in the form 'http://example.com/sitemam.xml' 
      * The method will check all created RouterUri objects and check if they 
-     * should be included in the site map.
+     * should be included in the site map. Note that if a URI has variables, it 
+     * will be not included.
      * @since 1.3.2
      */
     public static function incSiteMapRoute() {
@@ -364,17 +368,13 @@ class Router {
             'route-to' => function()
             {
                 $urlSet = new HTMLNode('urlset');
-                $urlSet->setAttribute('xmlns', 'http://www.sitemaps.org/schemas/sitemap/0.9');
-                $urlSet->setAttribute('xmlns:xhtml', 'http://www.w3.org/1999/xhtml');
+                $urlSet->setAttribute('xmlns', 'http://www.sitemaps.org/schemas/sitemap/0.9')
+                ->setAttribute('xmlns:xhtml', 'http://www.w3.org/1999/xhtml');
                 $routes = Router::get()->_getRoutes();
 
                 foreach ($routes as $route) {
-                    if ($route->isInSiteMap()) {
-                        $url = new HTMLNode('url');
-                        $loc = new HTMLNode('loc');
-                        $loc->addChild(HTMLNode::createTextNode($route->getUri()));
-                        $url->addChild($loc);
-                        $urlSet->addChild($url);
+                    if ($route->isInSiteMap() && !$route->hasVars()) {
+                        $urlSet->addChild($route->getSitemapNode());
                     }
                 }
                 $retVal = '<?xml version="1.0" encoding="UTF-8"?>';
@@ -403,18 +403,22 @@ class Router {
      * It can be any file in the scope of the variable ROOT_DIR.</li>
      * <li><b>as-api</b>: If this parameter is set to true, the route will be 
      * treated as if it was an API route. This means that the constant 'API_ROUTE' 
-     * will be initiated when a request is made to the route. Default is false.</li>
+     * will be initiated when a request is made to the route. Note that if the PHP file that 
+     * the route is pointing to represents an API, no need to add this option. Default is false.</li>
      * <li><b>case-sensitive</b>: Make the URL case sensitive or not. 
      * If this one is set to false, then if a request is made to the URL 'https://example.com/one/two',
      * It will be the same as requesting the URL 'https://example.com/OnE/tWO'. Default 
      * is true.</li>
+     * <li><b>languages</b>: An indexed array that contains the languages at 
+     * which the resource can have. Each language is represented as two 
+     * characters such as 'AR'.</li>
      * </ul>
      * @return boolean The method will return true if the route was created. 
      * If a route for the given path was already created, the method will return 
      * false.
      * @since 1.2
      */
-    public static function other($options) {
+    public static function addRoute($options) {
         $options['type'] = Router::CUSTOMIZED;
 
         return Router::get()->_addRoute($options);
@@ -539,6 +543,10 @@ class Router {
      * If this one is set to false, then if a request is made to the URL 'https://example.com/one/two',
      * It will be the same as requesting the URL 'https://example.com/OnE/tWO'. Default 
      * is true.</li>
+     * <li><b>languages</b>: An indexed array that contains the languages at 
+     * which the resource can have. Each language is represented as two 
+     * characters such as 'AR'.</li>
+     * </ul>
      * </ul>
      * @return boolean The method will return true if the route was created. 
      * If a route for the given path was already created, the method will return 
@@ -641,6 +649,9 @@ class Router {
                 $routeUri->setType($routeType);
             }
             $routeUri->setIsInSiteMap($incInSiteMap);
+            foreach ($options['languages'] as $langCode) {
+                $routeUri->addLanguage($langCode);
+            }
             $this->routes[] = $routeUri;
 
             return true;
@@ -679,7 +690,7 @@ class Router {
         $closureParams = isset($options['closure-params']) && gettype($options['closure-params']) == 'array' ? 
                 $options['closure-params'] : [];
         $path = isset($options['path']) ? $this->_fixUriPath($options['path']) : '';
-
+        $languages = isset($options['languages']) && gettype($options['languages']) == 'array' ? $options['languages'] : [];
         return [
             'case-sensitive' => $caseSensitive,
             'type' => $routeType,
@@ -687,7 +698,8 @@ class Router {
             'as-api' => $asApi,
             'path' => $path,
             'route-to' => $routeTo,
-            'closure-params' => $closureParams
+            'closure-params' => $closureParams,
+            'languages' => $languages
         ];
     }
     private function _fixFilePath($path) {

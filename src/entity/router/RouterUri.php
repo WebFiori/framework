@@ -25,6 +25,7 @@
 namespace webfiori\entity\router;
 
 use webfiori\entity\Util;
+use Closure;
 /**
  * A class that is used to split URIs and get their parameters.
  * The main aim of this class is to extract URI parameters including:
@@ -88,24 +89,24 @@ class RouterUri {
     /**
      * Creates new instance.
      * @param string $requestedUri The URI such as 'https://www3.programmingacademia.com:80/{some-var}/hell/{other-var}/?do=dnt&y=#xyz'
-     * @param string $routeTo The file that the route will take the user to ar a closure.
+     * @param string|Closure $routeTo The file that the route will take the user to ar a closure.
      * @param boolean $caseSensitive A boolean. If the URI is case sensitive, 
      * then this value must be set to true. False if not. Default is true.
      * @param array $closureParams If the closure needs to use parameters, 
      * it is possible to supply them using this array.
      */
     public function __construct($requestedUri,$routeTo,$caseSensitive = true,$closureParams = []) {
+        $this->setType(Router::CUSTOMIZED);
         $this->setRoute($routeTo);
         $this->isCS = $caseSensitive === true;
         $this->uriBroken = self::splitURI($requestedUri);
         $this->setClosureParams($closureParams);
         $this->incInSiteMap = false;
-        $this->setType(Router::CUSTOMIZED);
     }
     /**
      * Checks if two URIs are equal or not.
      * Two URIs are considered equal if they have the same authority and the 
-     * same path name.
+     * same path name (same characters case). 
      * @param RouterUri $otherUri The URI which 'this' URI will be checked against. 
      * @return boolean The method will return true if the URIs are 
      * equal.
@@ -151,7 +152,7 @@ class RouterUri {
      * Returns class name based on the file which the route will point to.
      * The method will try to extract class name from the file which the 
      * route is pointing to.
-     * This only applies to routes of type API, view and other only.
+     * This only applies to routes which points to PHP classes only.
      * @return string Class name taken from file name. If route type is not 
      * API o not view, the method will return empty string.
      * @since 1.3.2
@@ -160,8 +161,13 @@ class RouterUri {
         if ($this->getType() != Router::CLOSURE_ROUTE) {
             $path = $this->getRouteTo();
             $pathExpl = explode(DIRECTORY_SEPARATOR, $path);
-
-            return explode('.', $pathExpl[count($pathExpl) - 1])[0];
+            
+            if (count($pathExpl) >= 1) {
+                $expld = explode('.', $pathExpl[count($pathExpl) - 1]);
+                if (count($expld) == 2 && $expld[1] == 'php') {
+                    return $expld[0];
+                }
+            }
         }
 
         return '';
@@ -510,11 +516,18 @@ class RouterUri {
     }
     /**
      * Sets the route which the URI will take to.
-     * @param string|callable $routeTo Usually, the route can be either a 
+     * @param string|Closure $routeTo Usually, the route can be either a 
      * file or it can be a callable. The file can be of any type.
      * @since 1.0
      */
     public function setRoute($routeTo) {
+        
+        if ($routeTo instanceof Closure) {
+            $this->setType(Router::CLOSURE_ROUTE);
+        } else {
+            $cleaned = str_replace('\\', DIRECTORY_SEPARATOR, $routeTo);
+            $routeTo = str_replace('/', DIRECTORY_SEPARATOR, $routeTo);
+        }
         $this->routeTo = $routeTo;
     }
     /**

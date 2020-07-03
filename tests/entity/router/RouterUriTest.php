@@ -13,6 +13,101 @@ class RouterUriTest extends TestCase {
     /**
      * @test
      */
+    public function testEquals00() {
+        $uri1 = new RouterUri('https://example.com/my-folder', '');
+        $uri2 = new RouterUri('https://example.com/my-folder', '');
+        $this->assertTrue($uri1->equals($uri2));
+        $this->assertTrue($uri2->equals($uri1));
+    }
+    /**
+     * @test
+     */
+    public function testEquals01() {
+        $uri1 = new RouterUri('https://example.com:80/my-folder', '');
+        $uri2 = new RouterUri('https://example.com/my-folder', '');
+        $this->assertFalse($uri1->equals($uri2));
+        $this->assertFalse($uri2->equals($uri1));
+    }
+    /**
+     * @test
+     */
+    public function testEquals02() {
+        $uri1 = new RouterUri('http://example.com/my-folder-2', '');
+        $uri2 = new RouterUri('https://example.com/my-folder', '');
+        $this->assertFalse($uri1->equals($uri2));
+        $this->assertFalse($uri2->equals($uri1));
+    }
+    /**
+     * @test
+     */
+    public function testEquals03() {
+        $uri1 = new RouterUri('http://example.com/my-folder', '');
+        $uri2 = new RouterUri('https://example.com/my-folder', '');
+        $this->assertTrue($uri1->equals($uri2));
+        $this->assertTrue($uri2->equals($uri1));
+    }
+    /**
+     * @test
+     */
+    public function testEquals04() {
+        $uri1 = new RouterUri('http://example.com/my-folder/{a-var}', '');
+        $uri2 = new RouterUri('https://example.com/my-folder/{a-var}', '');
+        $this->assertTrue($uri1->equals($uri2));
+        $this->assertTrue($uri2->equals($uri1));
+    }
+    /**
+     * @test
+     */
+    public function testgetClassName00() {
+        $uri = new RouterUri('', '/php/classes/MyClass.php');
+        $this->assertEquals('MyClass', $uri->getClassName());
+    }
+    /**
+     * @test
+     */
+    public function testgetClassName02() {
+        $uri = new RouterUri('', 'MyClass.php');
+        $this->assertEquals('MyClass', $uri->getClassName());
+    }
+    /**
+     * @test
+     */
+    public function testgetClassName03() {
+        $uri = new RouterUri('', 'MyClass');
+        $this->assertEquals('', $uri->getClassName());
+    }
+    /**
+     * @test
+     */
+    public function testgetClassName04() {
+        $uri = new RouterUri('', function () {});
+        $this->assertEquals('', $uri->getClassName());
+    }
+    /**
+     * @test
+     */
+    public function testGetComponents() {
+        $uri = new RouterUri('https://example.com:8080/hell?me=ibrahim#22', '');
+        $components = $uri->getComponents();
+        $this->assertEquals('https://example.com:8080/hell?me=ibrahim#22', $components['uri']);
+        $this->assertEquals('https',$components['scheme']);
+        $this->assertEquals('//example.com:8080', $components['authority']);
+        $this->assertEquals(8080, $components['port']);
+        $this->assertEquals('22', $components['fragment']);
+        $this->assertEquals(['hell'], $components['path']);
+    }
+    /**
+     * @test
+     */
+    public function testEquals06() {
+        $uri1 = new RouterUri('http://example.com/my-Folder/{a-var}', '', false);
+        $uri2 = new RouterUri('https://example.com/my-folder/{a-var}', '', false);
+        $this->assertFalse($uri1->equals($uri2));
+        $this->assertFalse($uri2->equals($uri1));
+    }
+    /**
+     * @test
+     */
     public function testCaseSensitive00() {
         $uri = 'https://www3.programmingacademia.com:80/{some-var}/hell/{other-var}/?do=dnt&y=#xyz';
         $uriObj = new RouterUri($uri, '',false);

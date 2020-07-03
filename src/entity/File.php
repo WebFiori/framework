@@ -352,11 +352,32 @@ class File implements JsonI {
      * Returns the raw data of the file.
      * The raw data is simply a string. It can be binary string or any basic 
      * string.
+     * @param string $encodeOrDecode This parameter is used to base-64 decode or 
+     * encode file data. The parameter can have one of 3 values:
+     * <ul>
+     * <li>e: Encode the raw data of the file.</li>
+     * <li>d: Decode the raw data of the file.</li>
+     * <li>none: Return the raw data of the file as it is. This is the default value.</li>
+     * </ul>
+     * If any other value is given, the method will use 'none'.
      * @return string|null Raw data of the file. If no data is set, the method 
      * will return null.
      * @since 1.0
      */
-    public function getRawData() {
+    public function getRawData($encodeOrDecode = 'none') {
+        $lower = strtolower(trim($encodeOrDecode));
+        
+        if ($this->rawData !== null) {
+            
+            if ($lower == 'e') {
+                
+                return base64_encode($this->rawData);
+            } else if ($lower = 'd') {
+                
+                return base64_decode($this->rawData);
+            }
+        }
+        
         return $this->rawData;
     }
     /**

@@ -6,7 +6,6 @@
     </php>
     <filter>
         <whitelist addUncoveredFilesFromWhitelist="true">
-            <directory suffix=".php">./src/entity/mail</directory>
             <file>./src/logic/Controller.php</file>
             <file>./src/entity/cron/CronJob.php</file>
             <file>./src/entity/router/RouterUri.php</file>

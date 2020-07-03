@@ -417,7 +417,7 @@ class Uploader implements JsonI {
         return $filesArr;
     }
     private function _createFileObjFromArray($arr) {
-        $file = new UploadFile($arr['name'], $arr['upload-path']);
+        $file = new UploadFile(filter_var($arr['name'], FILTER_SANITIZE_STRING), $arr['upload-path']);
         $file->setMIMEType($arr['mime']);
 
         if (isset($arr['is-replace'])) {

@@ -111,7 +111,7 @@ class DBConnectionFactory {
                         if (isset($connectionParams['db-name'])) {
                             $link = new MySQLLink($connectionParams['host'],$connectionParams['user'],$connectionParams['pass'],$connectionParams['port']);
 
-                            if ($link->setDB($connectionParams['db-name'])) {
+                            if ($link->getErrorCode() == 0 && $link->setDB($connectionParams['db-name'])) {
                                 $retVal = $link;
                             } else {
                                 $retVal = [

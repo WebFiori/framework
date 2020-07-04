@@ -50,10 +50,10 @@ class Config {
      * Initialize configuration.
      */
     private function __construct() {
-        $this->isConfigured = false;
-        $this->releaseDate = '2020-06-29';
+        $this->isConfigured = true;
+        $this->releaseDate = '2020-07-05';
         $this->version = '1.1.0';
-        $this->versionType = 'Beta 2';
+        $this->versionType = 'Beta 3';
         $this->configVision = '1.3.4';
         $this->dbConnections = [
         ];

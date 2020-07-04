@@ -59,9 +59,9 @@ class ConfigController extends Controller {
      */
     const INITIAL_CONFIG_VARS = [
         'is-config' => 'false',
-        'release-date' => '2020-06-29',
+        'release-date' => '2020-07-05',
         'version' => '1.1.0',
-        'version-type' => 'Beta 2',
+        'version-type' => 'Beta 3',
         'config-file-version' => '1.3.4',
         'databases' => []
     ];

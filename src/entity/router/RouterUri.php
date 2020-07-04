@@ -24,9 +24,10 @@
  */
 namespace webfiori\entity\router;
 
-use webfiori\entity\Util;
-use phpStructs\html\HTMLNode;
 use Closure;
+use InvalidArgumentException;
+use phpStructs\html\HTMLNode;
+use webfiori\entity\Util;
 /**
  * A class that is used to split URIs and get their parameters.
  * The main aim of this class is to extract URI parameters including:
@@ -42,16 +43,9 @@ use Closure;
  * The class is also used for routing.
  * For more information on URI structure, visit <a target="_blank" href="https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#Examples">Wikipedia</a>.
  * @author Ibrahim
- * @version 1.3.5
+ * @version 1.3.6
  */
 class RouterUri {
-    /**
-     * An array that contains all languages that the resource the URI is pointing 
-     * to can have.
-     * @var array
-     * @since 1.3.5 
-     */
-    private $languages;
     /**
      * 
      * @var type 
@@ -71,6 +65,13 @@ class RouterUri {
      * @since 1.3.1
      */
     private $isCS;
+    /**
+     * An array that contains all languages that the resource the URI is pointing 
+     * to can have.
+     * @var array
+     * @since 1.3.5 
+     */
+    private $languages;
     /**
      * The route which this URI will be routing to.
      * @var mixed This route can be a file or a method.
@@ -102,14 +103,21 @@ class RouterUri {
      * then this value must be set to true. False if not. Default is true.
      * @param array $closureParams If the closure needs to use parameters, 
      * it is possible to supply them using this array.
+     * @throws InvalidArgumentException The method will throw this exception if the 
+     * given URI is invalid.
      */
     public function __construct($requestedUri,$routeTo,$caseSensitive = true,$closureParams = []) {
         $this->setType(Router::CUSTOMIZED);
         $this->setRoute($routeTo);
         $this->isCS = $caseSensitive === true;
-        $this->uriBroken = self::splitURI($requestedUri);
+        $broken = self::splitURI($requestedUri);
+
+        if (gettype($broken) != 'array') {
+            throw new InvalidArgumentException('Invalid URI given.');
+        }
+        $this->uriBroken = $broken;
         $this->uriBroken['vars-possible-values'] = [];
-        
+
         foreach (array_keys($this->getUriVars()) as $varName) {
             $this->uriBroken['vars-possible-values'][$varName] = [];
         }
@@ -126,40 +134,46 @@ class RouterUri {
      */
     public function addLanguage($langCode) {
         $lower = strtolower(trim($langCode));
+
         if (strlen($lower) == 2) {
             if ($lower[0] >= 'a' && $lower[0] <= 'z' && $lower[1] >= 'a' && $lower[1] <= 'z' && !in_array($lower, $this->languages)) {
                 $this->languages[] = $lower;
             }
         }
     }
-    
-    public function addUriVarValue($varName, $varValue) {
-        
-    }
     /**
-     * Returns an array that contains a set of languages at which the resource that the URI 
-     * points to can have.
-     * @return array An array that contains language codes.
-     * @since 1.3.5
+     * Adds a possible value for a URI variable.
+     * This is used in constructing the sitemap node of the URI. If a value is 
+     * provided, then it will be part of the URI that will appear in the sitemap.
+     * @param string $varName The name of the variable. It must be exist as 
+     * the path part in the URI.
+     * @param string $varValue The value of the variable. Note that any extra spaces 
+     * in the value will be trimmed.
+     * @since 1.3.6
      */
-    public function getLanguages() {
-        return $this->languages;
-    }
-    /**
-     * Returns an object of type 'HTMLNode' that contains URI information which 
-     * can be used to construct XML sitemap.
-     * @return HTMLNode An object of type 'HTMLNode' that contains URI information which 
-     * can be used to construct XML sitemap.
-     * @since 1.3.5
-     * 
-     */
-    public function getSitemapNode() {
-        $node = new HTMLNode('url');
-        $node->addChild('loc', [], false)->text($this->getUri());
-        foreach ($this->getLanguages() as $langCode) {
-            $node->text('<xhtml:link rel="alternate" hreflang="'.$langCode.'" href="'.$this->getUri().'?lang='.$langCode.'"/>', false);
+    public function addVarValue($varName, $varValue) {
+        $trimmed = trim($varName);
+        $trimmedVal = trim($varValue);
+
+        if (strlen($trimmedVal) != 0 
+                && isset($this->uriBroken['vars-possible-values'][$trimmed]) 
+                && !in_array($trimmedVal, $this->uriBroken['vars-possible-values'][$trimmed])) {
+            $this->uriBroken['vars-possible-values'][$trimmed][] = $trimmedVal;
         }
-        return $node;
+    }
+    /**
+     * Adds multiple values to URI variable.
+     * @param string $varName The name of he variable.
+     * @param array $arrayOfVals An array that contains all possible values for 
+     * the variable.
+     * @since 1.3.6
+     */
+    public function addVarValues($varName, $arrayOfVals) {
+        if (gettype($arrayOfVals) == 'array') {
+            foreach ($arrayOfVals as $val) {
+                $this->addVarValue($varName, $val);
+            }
+        }
     }
     /**
      * Checks if two URIs are equal or not.
@@ -219,9 +233,10 @@ class RouterUri {
         if ($this->getType() != Router::CLOSURE_ROUTE) {
             $path = $this->getRouteTo();
             $pathExpl = explode(DIRECTORY_SEPARATOR, $path);
-            
+
             if (count($pathExpl) >= 1) {
                 $expld = explode('.', $pathExpl[count($pathExpl) - 1]);
+
                 if (count($expld) == 2 && $expld[1] == 'php') {
                     return $expld[0];
                 }
@@ -277,6 +292,15 @@ class RouterUri {
      */
     public function getHost() {
         return $this->uriBroken['host'];
+    }
+    /**
+     * Returns an array that contains a set of languages at which the resource that the URI 
+     * points to can have.
+     * @return array An array that contains language codes.
+     * @since 1.3.5
+     */
+    public function getLanguages() {
+        return $this->languages;
     }
     /**
      * Returns the path part of the URI.
@@ -372,6 +396,26 @@ class RouterUri {
         return $this->uriBroken['scheme'];
     }
     /**
+     * Returns an object of type 'HTMLNode' that contains URI information which 
+     * can be used to construct XML sitemap.
+     * @return array The method will return an array that contains objects 
+     * of type 'HTMLNode' that contains URI information which 
+     * can be used to construct XML sitemap.
+     * @since 1.3.5
+     * 
+     */
+    public function getSitemapNodes() {
+        $retVal = [];
+
+        if ($this->hasVars()) {
+            $this->_($this->getUri(), array_keys($this->getUriVars()), 0, $retVal);
+        } else {
+            $retVal[] = $this->_buildSitemapNode($this->getUri());
+        }
+
+        return $retVal;
+    }
+    /**
      * Returns the type of element that the URI will route to.
      * The type of the element can be 1 of 4 values:
      * <ul>
@@ -455,6 +499,23 @@ class RouterUri {
      */
     public function getUriVars() {
         return $this->uriBroken[self::$UV];
+    }
+    /**
+     * Returns an array that contains possible values for a URI variable.
+     * @param string $varName The name of the variable.
+     * @return array The method will return an array that contains all possible 
+     * values for the variable which was added using the method Router::addUriVarValue(). 
+     * If the variable does not exist, the array will be empty.
+     * @since 1.3.6
+     */
+    public function getVarValues($varName) {
+        $trimmed = trim($varName);
+
+        if (isset($this->uriBroken['vars-possible-values'][$trimmed])) {
+            return $this->uriBroken['vars-possible-values'][$trimmed];
+        }
+
+        return [];
     }
     /**
      * Checks if the URI has a variable or not given its name.
@@ -579,7 +640,6 @@ class RouterUri {
      * @since 1.0
      */
     public function setRoute($routeTo) {
-        
         if ($routeTo instanceof Closure) {
             $this->setType(Router::CLOSURE_ROUTE);
         } else {
@@ -719,6 +779,30 @@ class RouterUri {
         }
 
         return $retVal;
+    }
+    private function _($originalUriWithVars, $uriVars, $varIndex, &$nodesArr) {
+        $varName = $uriVars[$varIndex];
+        $varValues = $this->getVarValues($varName);
+
+        foreach ($varValues as $varValue) {
+            $uriWithVarsReplaced = str_replace('{'.$varName.'}', $varValue, $originalUriWithVars);
+
+            if ($varIndex + 1 == count($uriVars)) {
+                $nodesArr[] = $this->_buildSitemapNode($uriWithVarsReplaced);
+            } else {
+                $this->_($uriWithVarsReplaced, $uriVars, $varIndex + 1, $nodesArr);
+            }
+        }
+    }
+    private function _buildSitemapNode($uri) {
+        $node = new HTMLNode('url');
+        $node->addChild('loc', [], false)->text($uri);
+
+        foreach ($this->getLanguages() as $langCode) {
+            $node->text('<xhtml:link rel="alternate" hreflang="'.$langCode.'" href="'.$uri.'?lang='.$langCode.'"/>', false);
+        }
+
+        return $node;
     }
     /**
      * Validate the path part of original URI and the requested one.

@@ -23,10 +23,11 @@
  * THE SOFTWARE.
  */
 namespace webfiori\entity\cli;
-use webfiori\WebFiori;
+
 use webfiori\entity\DBConnectionFactory;
 use webfiori\entity\DBConnectionInfo;
 use webfiori\entity\mail\SMTPAccount;
+use webfiori\WebFiori;
 
 /**
  * A command which is used to add a database connection or SMTP account.
@@ -36,50 +37,36 @@ use webfiori\entity\mail\SMTPAccount;
  * @version 1.0
  */
 class AddCommand extends CLICommand {
-    
     public function __construct() {
         parent::__construct('add', [
-            
+
         ], 'Add a database connection or SMTP account.');
     }
     public function exec() {
         $options = [
             'New database connection.',
             'New SMTP connection.',
+            'New website language.',
             'Quit.'
         ];
         $answer = $this->select('What would you like to add?', $options, count($options) - 1);
+
         if ($answer == 'New database connection.') {
             return $this->_addDbConnection();
-        } else if ($answer == 'New SMTP connection.') {
-            return $this->_addSmtp();
+        } else {
+            if ($answer == 'New SMTP connection.') {
+                return $this->_addSmtp();
+            } else {
+                if ($answer == 'New website language.') {
+                    return $this->_addLang();
+                }
+            }
         }
+
         return 0;
     }
-    private function _addSmtp() {
-        $smtpConn = new SMTPAccount();
-        $smtpConn->setServerAddress($this->getInput('SMTP Server address:', 'localhost'));
-        $smtpConn->setPort($this->getInput('Port number:', 465));
-        $smtpConn->setUsername($this->getInput('Username:'));
-        $smtpConn->setPassword($this->getInput('Password:'));
-        $smtpConn->setAddress($this->getInput('Sender email address:', $smtpConn->getUsername()));
-        $smtpConn->setSenderName($this->getInput('Sender name:', 'WebFiori Framework'));
-        $smtpConn->setAccountName($this->getInput('Give your connection a friendly name:', 'smtp-connection-'.count(WebFiori::getMailConfig()->getAccounts())));
-        $this->println('Testing connection...');
-        $result = WebFiori::getEmailController()->getSocketMailer($smtpConn);
-        if (gettype($result) == 'object') {
-            $this->success('Connectd. Adding connection information...');
-            WebFiori::getEmailController()->updateOrAddEmailAccount($smtpConn);
-            $this->success('Connection information was stored in the class "webfiori\conf\MailConfig".');
-            return 0;
-        } else {
-            $this->error('Unable to connect to SMTP server.');
-            $this->println('Error Information: '.$result);
-            return -1;
-        }
-    }
     private function _addDbConnection() {
-        $host = $this->getInput('Database host:', 'localhost');
+        $host = $this->getInput('Database host:', '127.0.0.1');
         $port = $this->getInput('Port number:', 3306);
         $username = $this->getInput('Username:');
         $password = $this->getInput('Password:');
@@ -93,10 +80,12 @@ class AddCommand extends CLICommand {
             'pass' => $password,
             'db-name' => $databaseName
         ]);
+
         if (gettype($result) == 'array') {
             $this->error('Unable to connect to the database.');
             $this->println('Error Code: '.$result['error-code']);
             $this->println('Error Message: '.$result['error-message']);
+
             return -1;
         } else {
             $this->success('Connected. Adding the connection...');
@@ -104,8 +93,53 @@ class AddCommand extends CLICommand {
             $conn->setConnectionName($connName);
             WebFiori::getSysController()->addOrUpdateDBConnections([$conn]);
             $this->success('Connection information was stored in the class "webfiori\conf\Config".');
+
             return 0;
         }
-        
+    }
+    private function _addLang() {
+        $langCode = strtoupper(trim($this->getInput('Language code:')));
+
+        if (strlen($langCode) != 2) {
+            $this->error('Invalid language code.');
+
+            return -1;
+        }
+        $siteInfo = WebFiori::getWebsiteController()->getSiteConfigVars();
+
+        if (isset($siteInfo['website-names'][$langCode])) {
+            $this->info('This language already added. Nothing changed.');
+
+            return 0;
+        }
+        $siteInfo['website-names'][$langCode] = $this->getInput('Name of the website in the new language:');
+        $siteInfo['site-descriptions'][$langCode] = $this->getInput('Description of the website in the new language:');
+        WebFiori::getWebsiteController()->updateSiteInfo($siteInfo);
+        $this->success('Language added.');
+    }
+    private function _addSmtp() {
+        $smtpConn = new SMTPAccount();
+        $smtpConn->setServerAddress($this->getInput('SMTP Server address:', '127.0.0.1'));
+        $smtpConn->setPort($this->getInput('Port number:', 465));
+        $smtpConn->setUsername($this->getInput('Username:'));
+        $smtpConn->setPassword($this->getInput('Password:'));
+        $smtpConn->setAddress($this->getInput('Sender email address:', $smtpConn->getUsername()));
+        $smtpConn->setSenderName($this->getInput('Sender name:', 'WebFiori Framework'));
+        $smtpConn->setAccountName($this->getInput('Give your connection a friendly name:', 'smtp-connection-'.count(WebFiori::getMailConfig()->getAccounts())));
+        $this->println('Testing connection. This can take up to 1 minute...');
+        $result = WebFiori::getEmailController()->getSocketMailer($smtpConn);
+
+        if (gettype($result) == 'object') {
+            $this->success('Connectd. Adding connection information...');
+            WebFiori::getEmailController()->updateOrAddEmailAccount($smtpConn);
+            $this->success('Connection information was stored in the class "webfiori\conf\MailConfig".');
+
+            return 0;
+        } else {
+            $this->error('Unable to connect to SMTP server.');
+            $this->println('Error Information: '.$result);
+
+            return -1;
+        }
     }
 }

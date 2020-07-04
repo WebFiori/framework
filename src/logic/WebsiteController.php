@@ -25,6 +25,7 @@
 namespace webfiori\logic;
 
 use webfiori\conf\SiteConfig;
+use webfiori\entity\File;
 use webfiori\entity\FileHandler;
 /**
  * A class that can be used to control basic settings of the web site and 
@@ -203,235 +204,236 @@ class WebsiteController extends Controller {
      * @since 1.0
      */
     private function writeSiteConfig($configArr) {
-        $fh = new FileHandler(ROOT_DIR.'/conf/SiteConfig.php');
-        $fh->write('<?php', true, true);
-        $fh->write('namespace webfiori\conf;',true,true);
-        $fh->write('use webfiori\entity\Util;', true, true);
-        $fh->write('/** 
- * Website configuration class.
- * This class is used to control the following settings:
- * <ul>
- * <li>The base URL of the website.</li>
- * <li>The primary language of the website.</li>
- * <li>The name of the website in different languages.</li>
- * <li>The general description of the website in different languages.</li>
- * <li>The character that is used to separate the name of the website from page title.</li>
- * <li>The theme of the website.</li>
- * <li>Admin theme of the website (if uses one).</li>
- * <li>The home page of the website.</li>
- * </ul>
- */', true, true);
-        $fh->write('class SiteConfig{', true, true);
-        $fh->addTab();
-        $fh->write('/**
-     * An array which contains all website names in different languages.
-     * @var string 
-     * @since 1.0
-     */
-    private $webSiteNames;
-    /**
-     * The primary language of the website.
-     */
-    private $primaryLang;
-    /**
-     * An array which contains different descriptions in different languages.
-     * @var string 
-     * @since 1.0
-     */
-    private $descriptions;
-    /**
-     *
-     * @var string 
-     * @since 1.0
-     */
-    private $titleSep;
-    /**
-     * The URL of the home page.
-     * @var string 
-     * @since 1.0
-     */
-    private $homePage;
-    /**
-     * The base URL that is used by all web site pages to fetch resource files.
-     * @var string 
-     * @since 1.0
-     */
-    private $baseUrl;
-    /**
-     * The name of base website UI Theme.
-     * @var string 
-     * @since 1.3
-     */
-    private $baseThemeName;
-    /**
-     * The name of admin control pages Theme.
-     * @var string 
-     * @since 1.3
-     */
-    private $adminThemeName;
-    /**
-     * Configuration file version number.
-     * @var string 
-     * @since 1.2
-     */
-    private $configVision;
-    /**
-     * A singleton instance of the class.
-     * @var SiteConfig 
-     * @since 1.0
-     */
-    private static $siteCfg;
-    /**
-     * Returns an instance of the configuration file.
-     * @return SiteConfig
-     * @since 1.0
-     */
-    public static function get(){
-        if(self::$siteCfg != null){
-            return self::$siteCfg;
-        }
-        self::$siteCfg = new SiteConfig();
-        return self::$siteCfg;
-    }', true, true);
-        $names = 'array(';
-
+        $names = "[\n";
         foreach ($configArr['website-names'] as $k => $v) {
-            $names .= '\''.$k.'\'=>\''.$v.'\',';
+            $names .= '            \''.$k.'\'=>\''.$v.'\','."\n";
         }
-        $names .= ')';
-        $descriptions = 'array(';
+        $names .= '        ]';
+        $descriptions = "[\n";
 
         foreach ($configArr['site-descriptions'] as $k => $v) {
-            $descriptions .= '\''.$k.'\'=>\''.$v.'\',';
+            $descriptions .= '            \''.$k.'\'=>\''.$v.'\','."\n";
         }
-        $descriptions .= ')';
-        $fh->write('private function __construct() {
-        $this->configVision = \''.$configArr['config-file-version'].'\';
-        $this->webSiteNames = '.$names.';
-        $this->baseUrl = Util::getBaseURL();
-        $this->titleSep = \' '.trim($configArr['title-separator']).' \';
-        $this->primaryLang = \''.trim($configArr['primary-language']).'\';
-        $this->baseThemeName = \''.$configArr['theme-name'].'\';
-        $this->adminThemeName = \''.$configArr['admin-theme-name'].'\';
-        $this->homePage = Util::getBaseURL();
-        $this->descriptions = '.$descriptions.';
-    }', true, true);
-        $fh->write('
-    private function _getPrimaryLanguage(){
-        return $this->primaryLang;
-    }
-    /**
-     * Returns the primary language of the website.
-     * This function will return a language code such as \'EN\'.
-     * @return string Language code of the primary language.
-     * @since 1.3
-     */
-    public static function getPrimaryLanguage(){
-        return self::get()->_getPrimaryLanguage();
-    }
-    private function _getBaseThemeName(){
-        return $this->baseThemeName;
-    }
-    /**
-     * Returns the name of base theme that is used in website pages.
-     * Usually, this theme is used for the normall visitors of the web site.
-     * @return string The name of base theme that is used in website pages.
-     * @since 1.3
-     */
-    public static function getBaseThemeName(){
-        return self::get()->_getBaseThemeName();
-    }
-    private function _getAdminThemeName(){
-        return $this->adminThemeName;
-    }
-    /**
-     * Returns the name of the theme that is used in admin control pages.
-     * @return string The name of the theme that is used in admin control pages.
-     * @since 1.3
-     */
-    public static function getAdminThemeName(){
-        return self::get()->_getAdminThemeName();
-    }
-    private function _getConfigVersion(){
-        return $this->configVision;
-    }
-    /**
-     * Returns version number of the configuration file.
-     * This value can be used to check for the compatability of configuration 
-     * file
-     * @return string The version number of the configuration file.
-     * @since 1.0
-     */
-    public static function getConfigVersion(){
-        return self::get()->_getConfigVersion();
-    }
-    private function _getBaseURL(){
-        return $this->baseUrl;
-    }
-    /**
-     * Returns the base URL that is used to fetch resources.
-     * The return value of this method is usually used by the tag \'base\' 
-     * of web site pages.
-     * @return string the base URL.
-     * @since 1.0
-     */
-    public static function getBaseURL(){
-        return self::get()->_getBaseURL();
-    }
-    private function _getDescriptions(){
-        return $this->descriptions;
-    }
-    /**
-     * Returns an associative array which contains different website descriptions 
-     * in different languages.
-     * Each index will contain a language code and the value will be the description 
-     * of the website in the given language.
-     * @return string An associative array which contains different website descriptions 
-     * in different languages.
-     * @since 1.0
-     */
-    public static function getDescriptions(){
-        return self::get()->_getDescriptions();
-    }
-    private function _getTitleSep(){
-        return $this->titleSep;
-    }
-    /**
-     * Returns the character (or string) that is used to separate page title from website name.
-     * @return string A string such as \' - \' or \' | \'. Note that the method 
-     * will add the two spaces by default.
-     * @since 1.0
-     */
-    public static function getTitleSep(){
-        return self::get()->_getTitleSep();
-    }
-    private function _getHomePage(){
-        return $this->homePage;
-    }
-    /**
-     * Returns the home page URL of the website.
-     * @return string The home page URL of the website.
-     * @since 1.0
-     */
-    public static function getHomePage(){
-        return self::get()->_getHomePage();
-    }
-    private function _getWebsiteNames(){
-        return $this->webSiteNames;
-    }
-    /**
-     * Returns an array which contains diffrent website names in different languages.
-     * Each index will contain a language code and the value will be the name 
-     * of the website in the given language.
-     * @return array An array which contains diffrent website names in different languages.
-     * @since 1.0
-     */
-    public static function getWebsiteNames(){
-        return self::get()->_getWebsiteNames();
-    }
-    ', true, true);
-        $fh->reduceTab();
-        $fh->write('}', true, true);
-        $fh->close();
+        $descriptions .= '        ]';
+        
+        $fileAsStr = "<?php\n"
+            . "namespace webfiori\conf;\n"
+            . "\n"
+            . "use webfiori\\entity\Util;\n"
+            . "/**\n"
+            . "  * Website configuration class.\n"
+            . "  * This class is used to control the following settings:\n"
+            . "  * <ul>\n"
+            . "  * <li>The base URL of the website.</li>\n"
+            . "  * <li>The primary language of the website.</li>\n"
+            . "  * <li>The name of the website in different languages.</li>\n"
+            . "  * <li>The general description of the website in different languages.</li>\n"
+            . "  * <li>The character that is used to separate the name of the website from page title.</li>\n"
+            . "  * <li>The theme of the website.</li>\n"
+            . "  * <li>Admin theme of the website (if uses one).</li>\n"
+            . "  * <li>The home page of the website.</li>\n"
+            . "  * </ul>\n"
+            . "  */\n"
+            . "class SiteConfig {\n"
+            . "    /**\n"
+            . "     * The name of admin control pages Theme.\n"
+            . "     * @var string\n"
+            . "     * @since 1.3\n"
+            . "     */\n"
+            . "    private \$adminThemeName;\n"
+            . "    /**\n"
+            . "     * The name of base website UI Theme.\n"
+            . "     * @var string\n"
+            . "     * @since 1.3\n"
+            . "     */\n"
+            . "    private \$baseThemeName;\n"
+            . "    /**\n"
+            . "     * The base URL that is used by all web site pages to fetch resource files.\n"
+            . "     * @var string\n"
+            . "     * @since 1.0\n"
+            . "     */\n"
+            . "    private \$baseUrl;\n"
+            . "    /**\n"
+            . "     * Configuration file version number.\n"
+            . "     * @var string\n"
+            . "     * @since 1.2\n"
+            . "     */\n"
+            . "    private \$configVision;\n"
+            . "    /**\n"
+            . "     * An array which contains different descriptions in different languages.\n"
+            . "     * @var string\n"
+            . "     * @since 1.0\n"
+            . "     */\n"
+            . "    private \$descriptions;\n"
+            . "    /**\n"
+            . "     * The URL of the home page.\n"
+            . "     * @var string\n"
+            . "     * @since 1.0\n"
+            . "     */\n"
+            . "    private \$homePage;\n"
+            . "    /**\n"
+            . "     * The primary language of the website.\n"
+            . "     */\n"
+            . "    private \$primaryLang;\n"
+            . "    /**\n"
+            . "     * A singleton instance of the class.\n"
+            . "     * @var SiteConfig\n"
+            . "     * @since 1.0\n"
+            . "     */\n"
+            . "    private static \$siteCfg;\n"
+            . "    /**\n"
+            . "     *\n"
+            . "     * @var string\n"
+            . "     * @since 1.0\n"
+            . "     */\n"
+            . "    private \$titleSep;\n"
+            . "    /**\n"
+            . "     * An array which contains all website names in different languages.\n"
+            . "     * @var string\n"
+            . "     * @since 1.0\n"
+            . "     */\n"
+            . "    private \$webSiteNames;\n"
+            . "    private function __construct() {\n"
+            . "        \$this->configVision = '".$configArr['config-file-version']."';\n"
+            . "        \$this->webSiteNames = ".$names.";\n"
+            . "        \$this->baseUrl = Util::getBaseURL();\n"
+            . "        \$this->titleSep = '".trim($configArr['title-separator'])."';\n"
+            . "        \$this->primaryLang = '".trim($configArr['primary-language'])."';\n"
+            . "        \$this->baseThemeName = '".$configArr['theme-name']."';\n"
+            . "        \$this->adminThemeName = '".$configArr['admin-theme-name']."';\n"
+            . "        \$this->homePage = Util::getBaseURL();\n"
+            . "        \$this->descriptions = ".$descriptions.";\n"
+            . "    }\n"
+            . "    /**\n"
+            . "     * Returns an instance of the configuration file.\n"
+            . "     * @return SiteConfig\n"
+            . "     * @since 1.0\n"
+            . "     */\n"
+            . "    public static function get() {\n"
+            . "        if (self::\$siteCfg != null) {\n"
+            . "            return self::\$siteCfg;\n"
+            . "        }\n"
+            . "        self::\$siteCfg = new SiteConfig();\n"
+            . "        \n"
+            . "        return self::\$siteCfg;\n"
+            . "    }\n"
+            . "    /**\n"
+            . "     * Returns the name of the theme that is used in admin control pages.\n"
+            . "     * @return string The name of the theme that is used in admin control pages.\n"
+            . "     * @since 1.3\n"
+            . "     */\n"
+            . "    public static function getAdminThemeName() {\n"
+            . "        return self::get()->_getAdminThemeName();\n"
+            . "    }\n"
+            . "    /**\n"
+            . "     * Returns the name of base theme that is used in website pages.\n"
+            . "     * Usually, this theme is used for the normall visitors of the web site.\n"
+            . "     * @return string The name of base theme that is used in website pages.\n"
+            . "     * @since 1.3\n"
+            . "     */\n"
+            . "    public static function getBaseThemeName() {\n"
+            . "        return self::get()->_getBaseThemeName();\n"
+            . "    }\n"
+            . "    /**\n"
+            . "     * Returns the base URL that is used to fetch resources.\n"
+            . "     * The return value of this method is usually used by the tag 'base'\n"
+            . "     * of web site pages.\n"
+            . "     * @return string the base URL.\n"
+            . "     * @since 1.0\n"
+            . "     */\n"
+            . "    public static function getBaseURL() {\n"
+            . "        return self::get()->_getBaseURL();\n"
+            . "    }\n"
+            . "    /**\n"
+            . "     * Returns version number of the configuration file.\n"
+            . "     * This value can be used to check for the compatability of configuration\n"
+            . "     * file\n"
+            . "     * @return string The version number of the configuration file.\n"
+            . "     * @since 1.0\n"
+            . "     */\n"
+            . "    public static function getConfigVersion() {\n"
+            . "        return self::get()->_getConfigVersion();\n"
+            . "    }\n"
+            . "    /**\n"
+            . "     * Returns an associative array which contains different website descriptions\n"
+            . "     * in different languages.\n"
+            . "     * Each index will contain a language code and the value will be the description\n"
+            . "     * of the website in the given language.\n"
+            . "     * @return string An associative array which contains different website descriptions\n"
+            . "     * in different languages.\n"
+            . "     * @since 1.0\n"
+            . "     */\n"
+            . "    public static function getDescriptions() {\n"
+            . "        return self::get()->_getDescriptions();\n"
+            . "    }\n"
+            . "    /**\n"
+            . "     * Returns the home page URL of the website.\n"
+            . "     * @return string The home page URL of the website.\n"
+            . "     * @since 1.0\n"
+            . "     */\n"
+            . "    public static function getHomePage() {\n"
+            . "        return self::get()->_getHomePage();\n"
+            . "    }\n"
+            . "    /**\n"
+            . "     * Returns the primary language of the website.\n"
+            . "     * This function will return a language code such as 'EN'.\n"
+            . "     * @return string Language code of the primary language.\n"
+            . "     * @since 1.3\n"
+            . "     */\n"
+            . "    public static function getPrimaryLanguage() {\n"
+            . "        return self::get()->_getPrimaryLanguage();\n"
+            . "    }\n"
+            . "    /**\n"
+            . "     * Returns the character (or string) that is used to separate page title from website name.\n"
+            . "     * @return string A string such as ' - ' or ' | '. Note that the method\n"
+            . "     * will add the two spaces by default.\n"
+            . "     * @since 1.0\n"
+            . "     */\n"
+            . "    public static function getTitleSep() {\n"
+            . "        return self::get()->_getTitleSep();\n"
+            . "    }\n"
+            . "    /**\n"
+            . "     * Returns an array which contains diffrent website names in different languages.\n"
+            . "     * Each index will contain a language code and the value will be the name\n"
+            . "     * of the website in the given language.\n"
+            . "     * @return array An array which contains diffrent website names in different languages.\n"
+            . "     * @since 1.0\n"
+            . "     */\n"
+            . "    public static function getWebsiteNames() {\n"
+            . "        return self::get()->_getWebsiteNames();\n"
+            . "    }\n"
+            . "    private function _getAdminThemeName() {\n"
+            . "        return \$this->adminThemeName;\n"
+            . "    }\n"
+            . "    private function _getBaseThemeName() {\n"
+            . "        return \$this->baseThemeName;\n"
+            . "    }\n"
+            . "    private function _getBaseURL() {\n"
+            . "        return \$this->baseUrl;\n"
+            . "    }\n"
+            . "    private function _getConfigVersion() {\n"
+            . "        return \$this->configVision;\n"
+            . "    }\n"
+            . "    private function _getDescriptions() {\n"
+            . "        return \$this->descriptions;\n"
+            . "    }\n"
+            . "    private function _getHomePage() {\n"
+            . "        return \$this->homePage;\n"
+            . "    }\n"
+            . "    \n"
+            . "    private function _getPrimaryLanguage() {\n"
+            . "        return \$this->primaryLang;\n"
+            . "    }\n"
+            . "    private function _getTitleSep() {\n"
+            . "        return \$this->titleSep;\n"
+            . "    }\n"
+            . "    private function _getWebsiteNames() {\n"
+            . "        return \$this->webSiteNames;\n"
+            . "    }\n"
+            . "}\n";
+        $mailConfigFile = new File('SiteConfig.php', ROOT_DIR.DIRECTORY_SEPARATOR.'conf');
+        $mailConfigFile->remove();
+        $mailConfigFile->setRawData($fileAsStr);
+        $mailConfigFile->write(false, true);
     }
 }

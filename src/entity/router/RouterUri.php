@@ -108,6 +108,7 @@ class RouterUri {
         $this->setRoute($routeTo);
         $this->isCS = $caseSensitive === true;
         $this->uriBroken = self::splitURI($requestedUri);
+        
         $this->setClosureParams($closureParams);
         $this->incInSiteMap = false;
         $this->languages = [];
@@ -634,7 +635,7 @@ class RouterUri {
      * <li><b>fragment</b>: Any string that comes after the character '#' in the URI.</li>
      * <li><b>path</b>: An array that contains the names of path directories</li>
      * <li><b>query-string-vars</b>: An array that contains query string parameter and values.</li>
-     * <li><b>uri-vars</b>: An array that contains URI path variable and values.</li>
+     * <li><b>uri-vars</b>: An array that contains URI path variables and values.</li>
      * </ul>
      * @since 1.0
      */
@@ -659,6 +660,9 @@ class RouterUri {
             self::$UV => [
 
             ],
+            'uri-vars-values' => [
+                
+            ]
         ];
         //First step, extract the fragment
         $split1 = explode('#', $uri);
@@ -693,6 +697,7 @@ class RouterUri {
 
                 if ($dirName[0] == '{' && $dirName[strlen($dirName) - 1] == '}') {
                     $retVal[self::$UV][trim($split4[$x], '{}')] = null;
+                    $retVal['uri-vars-values'][trim($split4[$x], '{}')] = [];
                 }
             }
         }

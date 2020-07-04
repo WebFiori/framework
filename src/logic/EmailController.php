@@ -231,7 +231,7 @@ class EmailController extends Controller {
                 ."     */\n"
                 ."    private static \$inst;\n"
                 ."    private function __construct() {\n"
-                . "       \$this->emailAccounts = [];\n";
+                . "        \$this->emailAccounts = [];\n";
         $index = 0;
 
         foreach ($emailAccountsArr as $emailAcc) {

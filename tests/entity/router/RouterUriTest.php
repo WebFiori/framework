@@ -13,9 +13,52 @@ class RouterUriTest extends TestCase {
     /**
      * @test
      */
+    public function testSetUriPossibleVar00() {
+        $uri = new RouterUri('https://example.com/{first-var}', '');
+        $uri->addVarValue('first-var', 'Hello World');
+        $this->assertEquals(['Hello World'], $uri->getVarValues('first-var'));
+    }
+    /**
+     * @test
+     */
+    public function testSetUriPossibleVar01() {
+        $uri = new RouterUri('https://example.com/{first-var}', '');
+        $uri->addVarValue('  first-var  ', '  Hello World  ');
+        $this->assertEquals(['Hello World'], $uri->getVarValues('first-var'));
+    }
+    /**
+     * @test
+     */
+    public function testSetUriPossibleVar02() {
+        $uri = new RouterUri('https://example.com/{first-var}', '');
+        $uri->addVarValues('first-var', ['Hello','World']);
+        $this->assertEquals(['Hello','World'], $uri->getVarValues('first-var'));
+    }
+    /**
+     * @test
+     */
+    public function testSetUriPossibleVar03() {
+        $uri = new RouterUri('https://example.com/{first-var}/ok/{second-var}', '');
+        $uri->addVarValues('first-var', ['Hello','World']);
+        $uri->addVarValues('  second-var ', ['hell','is','not','heven']);
+        $uri->addVarValues('  secohhnd-var ', ['hell','is']);
+        $this->assertEquals(['Hello','World'], $uri->getVarValues('first-var'));
+        $this->assertEquals(['hell','is','not','heven'], $uri->getVarValues('second-var'));
+        $this->assertEquals([], $uri->getVarValues('secohhnd-var'));
+    }
+    /**
+     * @test
+     */
+    public function testInvalid00() {
+        $this->expectException('Exception');
+        $uri = new RouterUri('', '');
+    }
+    /**
+     * @test
+     */
     public function testGetSitemapNode00() {
         $uri = new RouterUri('https://example.com?hello=world', '');
-        $this->assertEquals('<url><loc>https://example.com</loc></url>', $uri->getSitemapNode()->toHTML());
+        $this->assertEquals('<url><loc>https://example.com</loc></url>', $uri->getSitemapNodes()[0]->toHTML());
     }
     /**
      * @test
@@ -23,7 +66,7 @@ class RouterUriTest extends TestCase {
     public function testGetSitemapNode02() {
         $uri = new RouterUri('https://example.com?hello=world', '');
         $uri->addLanguage('ar');
-        $this->assertEquals('<url><loc>https://example.com</loc><xhtml:link rel="alternate" hreflang="ar" href="https://example.com?lang=ar"/></url>', $uri->getSitemapNode()->toHTML());
+        $this->assertEquals('<url><loc>https://example.com</loc><xhtml:link rel="alternate" hreflang="ar" href="https://example.com?lang=ar"/></url>', $uri->getSitemapNodes()[0]->toHTML());
     }
     /**
      * @test
@@ -34,7 +77,75 @@ class RouterUriTest extends TestCase {
         $uri->addLanguage('en');
         $this->assertEquals('<url><loc>https://example.com</loc><xhtml:link rel="alternate" hreflang="ar" '
                 . 'href="https://example.com?lang=ar"/>'
-                . '<xhtml:link rel="alternate" hreflang="en" href="https://example.com?lang=en"/></url>', $uri->getSitemapNode()->toHTML());
+                . '<xhtml:link rel="alternate" hreflang="en" href="https://example.com?lang=en"/></url>', $uri->getSitemapNodes()[0]->toHTML());
+    }
+    /**
+     * @test
+     */
+    public function testGetSitemapNode04() {
+        $uri = new RouterUri('https://example.com/{var}', '');
+        $this->assertEquals(0, count($uri->getSitemapNodes()));
+    }
+    /**
+     * @test
+     */
+    public function testGetSitemapNode05() {
+        $uri = new RouterUri('https://example.com/{var}', '');
+        $uri->addVarValue('var', 'hello');
+        $this->assertEquals(1, count($uri->getSitemapNodes()));
+        $this->assertEquals('<url><loc>https://example.com/hello</loc></url>', $uri->getSitemapNodes()[0]->toHTML());
+    }
+    /**
+     * @test
+     */
+    public function testGetSitemapNode06() {
+        $uri = new RouterUri('https://example.com/{var}', '');
+        $uri->addVarValue('var', 'hello');
+        $uri->addLanguage('ar');
+        $this->assertEquals(1, count($uri->getSitemapNodes()));
+        $this->assertEquals('<url><loc>https://example.com/hello</loc>'
+                . '<xhtml:link rel="alternate" hreflang="ar" href="https://example.com/hello?lang=ar"/>'
+                . '</url>', $uri->getSitemapNodes()[0]->toHTML());
+    }
+    /**
+     * @test
+     */
+    public function testGetSitemapNode07() {
+        $uri = new RouterUri('https://example.com/{var}', '');
+        $uri->addVarValues('var', ['hello', 'world']);
+        $uri->addLanguage('ar');
+        $this->assertEquals(2, count($uri->getSitemapNodes()));
+        $this->assertEquals('<url><loc>https://example.com/hello</loc>'
+                . '<xhtml:link rel="alternate" hreflang="ar" href="https://example.com/hello?lang=ar"/>'
+                . '</url>', $uri->getSitemapNodes()[0]->toHTML());
+        $this->assertEquals('<url><loc>https://example.com/world</loc>'
+                . '<xhtml:link rel="alternate" hreflang="ar" href="https://example.com/world?lang=ar"/>'
+                . '</url>', $uri->getSitemapNodes()[1]->toHTML());
+    }
+    /**
+     * @test
+     */
+    public function testGetSitemapNode08() {
+        $uri = new RouterUri('https://example.com/{var}/world/ok/{another-var}', '');
+        $uri->addVarValues('var', ['hello', 'world']);
+        $uri->addLanguage('ar');
+        $this->assertEquals(0, count($uri->getSitemapNodes()));
+    }
+    /**
+     * @test
+     */
+    public function testGetSitemapNode09() {
+        $uri = new RouterUri('https://example.com/{var}/world/ok/{another-var}', '');
+        $uri->addVarValues('var', ['hello', 'world']);
+        $uri->addVarValue('another-var', 'good');
+        $uri->addLanguage('ar');
+        $this->assertEquals(2, count($uri->getSitemapNodes()));
+        $this->assertEquals('<url><loc>https://example.com/hello/world/ok/good</loc>'
+                . '<xhtml:link rel="alternate" hreflang="ar" href="https://example.com/hello/world/ok/good?lang=ar"/>'
+                . '</url>', $uri->getSitemapNodes()[0]->toHTML());
+        $this->assertEquals('<url><loc>https://example.com/world/world/ok/good</loc>'
+                . '<xhtml:link rel="alternate" hreflang="ar" href="https://example.com/world/world/ok/good?lang=ar"/>'
+                . '</url>', $uri->getSitemapNodes()[1]->toHTML());
     }
     /**
      * @test
@@ -85,28 +196,28 @@ class RouterUriTest extends TestCase {
      * @test
      */
     public function testgetClassName00() {
-        $uri = new RouterUri('', '/php/classes/MyClass.php');
+        $uri = new RouterUri('https://example.com', '/php/classes/MyClass.php');
         $this->assertEquals('MyClass', $uri->getClassName());
     }
     /**
      * @test
      */
     public function testgetClassName02() {
-        $uri = new RouterUri('', 'MyClass.php');
+        $uri = new RouterUri('https://example.com', 'MyClass.php');
         $this->assertEquals('MyClass', $uri->getClassName());
     }
     /**
      * @test
      */
     public function testgetClassName03() {
-        $uri = new RouterUri('', 'MyClass');
+        $uri = new RouterUri('https://example.com', 'MyClass');
         $this->assertEquals('', $uri->getClassName());
     }
     /**
      * @test
      */
     public function testgetClassName04() {
-        $uri = new RouterUri('', function () {});
+        $uri = new RouterUri('https://example.com', function () {});
         $this->assertEquals('', $uri->getClassName());
     }
     /**

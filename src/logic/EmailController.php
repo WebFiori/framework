@@ -99,12 +99,16 @@ class EmailController extends Controller {
             $m->setPort($emailAcc->getPort());
 
             if ($m->connect()) {
-                $m->setSender($emailAcc->getSenderName(), $emailAcc->getAddress());
+                try {
+                    $m->setSender($emailAcc->getSenderName(), $emailAcc->getAddress());
 
-                if ($m->login($emailAcc->getUsername(), $emailAcc->getPassword())) {
-                    $retVal = $m;
-                } else {
-                    $retVal = EmailController::INV_CREDENTIALS;
+                    if ($m->login($emailAcc->getUsername(), $emailAcc->getPassword())) {
+                        $retVal = $m;
+                    } else {
+                        $retVal = EmailController::INV_CREDENTIALS;
+                    }
+                } catch (\Exception $ex) {
+                    return $ex->getMessage();
                 }
             }
 
@@ -226,7 +230,8 @@ class EmailController extends Controller {
                 ."     * @since 1.0\n"
                 ."     */\n"
                 ."    private static \$inst;\n"
-                ."    private function __construct() {\n";
+                ."    private function __construct() {\n"
+                . "       \$this->emailAccounts = [];\n";
         $index = 0;
 
         foreach ($emailAccountsArr as $emailAcc) {
@@ -270,7 +275,6 @@ class EmailController extends Controller {
                 ."     * @since 1.0\n"
                 ."     */\n"
                 ."    public static function get() {\n"
-                ."        \n"
                 ."        if (self::\$inst === null) {\n"
                 ."            self::\$inst = new MailConfig();\n"
                 ."        }\n"

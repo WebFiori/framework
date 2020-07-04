@@ -187,6 +187,48 @@ class Router {
         return false;
     }
     /**
+     * Adds new route to a file inside the root folder.
+     * @param array $options An associative array of options. Available options 
+     * are: 
+     * <ul>
+     * <li><b>path</b>: The path part of the URI. For example, if the 
+     * requested URI is 'http://www.example.com/user/ibrahim', the path 
+     * part of the URI is '/user/ibrahim'. It is possible to include variables 
+     * in the path. To include a variable in the path, its name must be enclosed 
+     * between {}. The value of the variable will be stored in either the array 
+     * $_GET or $_POST after the requested URI is resolved. If we use the same 
+     * example above to get any user profile, We would add the following as 
+     * a path: 'user/{username}'. In this case, username will be available in 
+     * $_GET['username']. Note that its possible to get the value of the 
+     * variable using the method <b>Router::<a href="#getVarValue">getVarValue()</a></b></li>
+     * <li><b>route-to</b>: The path to the file that the route will point to. 
+     * It can be any file in the scope of the variable ROOT_DIR.</li>
+     * <li><b>as-api</b>: If this parameter is set to true, the route will be 
+     * treated as if it was an API route. This means that the constant 'API_ROUTE' 
+     * will be initiated when a request is made to the route. Note that if the PHP file that 
+     * the route is pointing to represents an API, no need to add this option. Default is false.</li>
+     * <li><b>case-sensitive</b>: Make the URL case sensitive or not. 
+     * If this one is set to false, then if a request is made to the URL 'https://example.com/one/two',
+     * It will be the same as requesting the URL 'https://example.com/OnE/tWO'. Default 
+     * is true.</li>
+     * <li><b>languages</b>: An indexed array that contains the languages at 
+     * which the resource can have. Each language is represented as two 
+     * characters such as 'AR'.</li>
+     * <li><b>vars-values</b>: An optional associative array which contains sub 
+     * indexed arrays that contains possible values for URI vars. This one is 
+     * used when building the sitemap.</li>
+     * </ul>
+     * @return boolean The method will return true if the route was created. 
+     * If a route for the given path was already created, the method will return 
+     * false.
+     * @since 1.2
+     */
+    public static function addRoute($options) {
+        $options['type'] = Router::CUSTOMIZED;
+
+        return Router::get()->_addRoute($options);
+    }
+    /**
      * Adds new route to a web services set.
      * @param array $options An associative array that contains route 
      * options. Available options are:
@@ -212,6 +254,9 @@ class Router {
      * If this one is set to false, then if a request is made to the URL 'https://example.com/one/two',
      * It will be the same as requesting the URL 'https://example.com/OnE/tWO'. Default 
      * is true.</li>
+     * <li><b>vars-values</b>: An optional associative array which contains sub 
+     * indexed arrays that contains possible values for URI vars. This one is 
+     * used when building the sitemap.</li>
      * </ul>
      * @return boolean The method will return true if the route was created. 
      * If a route for the given path was already created, the method will return 
@@ -267,6 +312,9 @@ class Router {
      * which the resource can have. Each language is represented as two 
      * characters such as 'AR'.</li>
      * </ul>
+     * <li><b>vars-values</b>: An optional associative array which contains sub 
+     * indexed arrays that contains possible values for URI vars. This one is 
+     * used when building the sitemap.</li>
      * @return boolean The method will return true if the route was created. 
      * If a route for the given path was already created, the method will return 
      * false. Also, if <b>'route-to'</b> is not a function, the method will return false.
@@ -373,8 +421,11 @@ class Router {
                 $routes = Router::get()->_getRoutes();
 
                 foreach ($routes as $route) {
-                    if ($route->isInSiteMap() && !$route->hasVars()) {
-                        $urlSet->addChild($route->getSitemapNode());
+                    if ($route->isInSiteMap()) {
+                        $nodes = $route->getSitemapNodes();
+                        foreach ($nodes as $node) {
+                            $urlSet->addChild($node);
+                        }
                     }
                 }
                 $retVal = '<?xml version="1.0" encoding="UTF-8"?>';
@@ -383,45 +434,6 @@ class Router {
                 echo $retVal;
             }
         ]);
-    }
-    /**
-     * Adds new route to a file inside the root folder.
-     * @param array $options An associative array of options. Available options 
-     * are: 
-     * <ul>
-     * <li><b>path</b>: The path part of the URI. For example, if the 
-     * requested URI is 'http://www.example.com/user/ibrahim', the path 
-     * part of the URI is '/user/ibrahim'. It is possible to include variables 
-     * in the path. To include a variable in the path, its name must be enclosed 
-     * between {}. The value of the variable will be stored in either the array 
-     * $_GET or $_POST after the requested URI is resolved. If we use the same 
-     * example above to get any user profile, We would add the following as 
-     * a path: 'user/{username}'. In this case, username will be available in 
-     * $_GET['username']. Note that its possible to get the value of the 
-     * variable using the method <b>Router::<a href="#getVarValue">getVarValue()</a></b></li>
-     * <li><b>route-to</b>: The path to the file that the route will point to. 
-     * It can be any file in the scope of the variable ROOT_DIR.</li>
-     * <li><b>as-api</b>: If this parameter is set to true, the route will be 
-     * treated as if it was an API route. This means that the constant 'API_ROUTE' 
-     * will be initiated when a request is made to the route. Note that if the PHP file that 
-     * the route is pointing to represents an API, no need to add this option. Default is false.</li>
-     * <li><b>case-sensitive</b>: Make the URL case sensitive or not. 
-     * If this one is set to false, then if a request is made to the URL 'https://example.com/one/two',
-     * It will be the same as requesting the URL 'https://example.com/OnE/tWO'. Default 
-     * is true.</li>
-     * <li><b>languages</b>: An indexed array that contains the languages at 
-     * which the resource can have. Each language is represented as two 
-     * characters such as 'AR'.</li>
-     * </ul>
-     * @return boolean The method will return true if the route was created. 
-     * If a route for the given path was already created, the method will return 
-     * false.
-     * @since 1.2
-     */
-    public static function addRoute($options) {
-        $options['type'] = Router::CUSTOMIZED;
-
-        return Router::get()->_addRoute($options);
     }
     /**
      * Display all routes details.
@@ -546,7 +558,9 @@ class Router {
      * <li><b>languages</b>: An indexed array that contains the languages at 
      * which the resource can have. Each language is represented as two 
      * characters such as 'AR'.</li>
-     * </ul>
+     * <li><b>vars-values</b>: An optional associative array which contains sub 
+     * indexed arrays that contains possible values for URI vars. This one is 
+     * used when building the sitemap.</li>
      * </ul>
      * @return boolean The method will return true if the route was created. 
      * If a route for the given path was already created, the method will return 
@@ -649,8 +663,13 @@ class Router {
                 $routeUri->setType($routeType);
             }
             $routeUri->setIsInSiteMap($incInSiteMap);
+
             foreach ($options['languages'] as $langCode) {
                 $routeUri->addLanguage($langCode);
+            }
+            
+            foreach ($options as $varName => $varValues) {
+                $routeUri->addVarValues($varName, $varValues);
             }
             $this->routes[] = $routeUri;
 
@@ -691,6 +710,7 @@ class Router {
                 $options['closure-params'] : [];
         $path = isset($options['path']) ? $this->_fixUriPath($options['path']) : '';
         $languages = isset($options['languages']) && gettype($options['languages']) == 'array' ? $options['languages'] : [];
+        $varValues = isset($options['vars-values']) && gettype($options['languages']) == 'array' ? $options['vars-values'] : [];
         return [
             'case-sensitive' => $caseSensitive,
             'type' => $routeType,
@@ -699,7 +719,8 @@ class Router {
             'path' => $path,
             'route-to' => $routeTo,
             'closure-params' => $closureParams,
-            'languages' => $languages
+            'languages' => $languages,
+            'vars-values' => $varValues
         ];
     }
     private function _fixFilePath($path) {

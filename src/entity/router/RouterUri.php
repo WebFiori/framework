@@ -108,7 +108,11 @@ class RouterUri {
         $this->setRoute($routeTo);
         $this->isCS = $caseSensitive === true;
         $this->uriBroken = self::splitURI($requestedUri);
+        $this->uriBroken['vars-possible-values'] = [];
         
+        foreach (array_keys($this->getUriVars()) as $varName) {
+            $this->uriBroken['vars-possible-values'][$varName] = [];
+        }
         $this->setClosureParams($closureParams);
         $this->incInSiteMap = false;
         $this->languages = [];
@@ -127,6 +131,10 @@ class RouterUri {
                 $this->languages[] = $lower;
             }
         }
+    }
+    
+    public function addUriVarValue($varName, $varValue) {
+        
     }
     /**
      * Returns an array that contains a set of languages at which the resource that the URI 
@@ -659,9 +667,6 @@ class RouterUri {
             ],
             self::$UV => [
 
-            ],
-            'uri-vars-values' => [
-                
             ]
         ];
         //First step, extract the fragment
@@ -697,7 +702,6 @@ class RouterUri {
 
                 if ($dirName[0] == '{' && $dirName[strlen($dirName) - 1] == '}') {
                     $retVal[self::$UV][trim($split4[$x], '{}')] = null;
-                    $retVal['uri-vars-values'][trim($split4[$x], '{}')] = [];
                 }
             }
         }

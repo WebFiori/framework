@@ -9,15 +9,15 @@ use webfiori\entity\Util;
 use webfiori\WebFiori;
 
 /**
- * Description of Webfiori110
+ * A generic template that can be used to create Vuetify based themes.
  *
  * @author Eng.Ibrahim
  */
-class Webfiori110 extends Theme {
+class VuetifyTemplate extends Theme {
     
     public function __construct() {
         parent::__construct();
-        $this->setName('WebFiori 110');
+        $this->setName('Vuetify Template');
         $this->setAuthor('Ibrahim BinAlshikh');
         $this->setLicenseName('MIT');
          $this->setJsDirName('js');
@@ -55,7 +55,7 @@ class Webfiori110 extends Theme {
     }
     
     public function createHTMLNode($options = array()) {
-        
+        return new HTMLNode();
     }
 
     public function getAsideNode() {

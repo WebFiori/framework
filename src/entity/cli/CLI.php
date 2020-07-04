@@ -190,6 +190,7 @@ class CLI {
         self::register(new CronCommand());
         self::register(new TestRouteCommand());
         self::register(new CreateCommand());
+        self::register(new AddCommand());
         //Call this method to register any user-defined commands.
         InitCliCommands::init();
     }

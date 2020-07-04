@@ -372,7 +372,7 @@ class File implements JsonI {
             if ($lower == 'e') {
                 
                 return base64_encode($this->rawData);
-            } else if ($lower = 'd') {
+            } else if ($lower == 'd') {
                 
                 return base64_decode($this->rawData);
             }
@@ -727,12 +727,10 @@ class File implements JsonI {
             } else {
                 throw new FileException("File not found: '$fPath'.");
             }
+        } else if ($append) {
+            $resource = $this->_createResource('ab', $fPath);
         } else {
-            if ($append) {
-                $resource = $this->_createResource('ab', $fPath);
-            } else {
-                $resource = $this->_createResource('rb+', $fPath);
-            }
+            $resource = $this->_createResource('rb+', $fPath);
         }
 
         if (!is_resource($resource)) {

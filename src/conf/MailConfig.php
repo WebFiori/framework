@@ -18,6 +18,7 @@ class MailConfig {
      */
     private static $inst;
     private function __construct() {
+       $this->emailAccounts = [];
     }
     /**
      * Adds new SMTP connection information or updates an existing one.
@@ -29,7 +30,7 @@ class MailConfig {
     public static function addSMTPAccount($accName, $smtpConnInfo) {
         if ($smtpConnInfo instanceof SMTPAccount) {
             $trimmedName = trim($accName);
-
+            
             if (strlen($trimmedName) != 0) {
                 self::get()->addAccount($smtpConnInfo, $trimmedName);
             }
@@ -46,7 +47,7 @@ class MailConfig {
         if (self::$inst === null) {
             self::$inst = new MailConfig();
         }
-
+        
         return self::$inst;
     }
     /**
@@ -75,7 +76,7 @@ class MailConfig {
         if (isset($this->emailAccounts[$name])) {
             return $this->emailAccounts[$name];
         }
-
+        
         return null;
     }
     private function _getAccounts() {

@@ -146,7 +146,7 @@ class RouterUri {
      */
     public function getSitemapNode() {
         $node = new HTMLNode('url');
-        $node->addChild('loc', false)->text($this->getUri());
+        $node->addChild('loc', [], false)->text($this->getUri());
         foreach ($this->getLanguages() as $langCode) {
             $node->text('<xhtml:link rel="alternate" hreflang="'.$langCode.'" href="'.$this->getUri().'?lang='.$langCode.'"/>', false);
         }

@@ -28,7 +28,7 @@ use Exception;
 use webfiori\conf\Config;
 use webfiori\entity\DBConnectionInfo;
 use webfiori\entity\exceptions\InitializationException;
-use webfiori\entity\FileHandler;
+use webfiori\entity\File;
 /**
  * A class that can be used to modify basic configuration settings of 
  * the web application. 
@@ -237,215 +237,216 @@ class ConfigController extends Controller {
      * @since 1.0
      */
     private function writeConfig($configArr) {
-        $configFileLoc = ROOT_DIR.'/conf/Config.php';
-        $fh = new FileHandler($configFileLoc);
-        $fh->write('<?php', true, true);
-        $fh->write('namespace webfiori\conf;', false, true);
-        $fh->write('use webfiori\entity\DBConnectionInfo;', true, true);
-        $fh->write('/**
- * Global configuration class. 
- * Used by the server part and the presentation part. It contains framework version 
- * information and database connection settings.
- * @author Ibrahim
- * @version 1.3.4
- */', true, true);
-        $fh->write('class Config{', true, true);
-        $fh->addTab();
-        //stat here
-        $fh->write('/**
-     * The type framework version that is used to build the system.
-     * @var string The framework version that is used to build the system.
-     * @since 1.0 
-     */
-    private $versionType;
-    /**
-     * The version of the framework that is used to build the system.
-     * @var string The version of the framework that is used to build the system.
-     * @since 1.0 
-     */
-    private $version;
-    /**
-     * The release date of the framework that is used to build the system.
-     * @var string Release date of of the framework that is used to build the system.
-     * @since 1.0 
-     */
-    private $releaseDate;
-    /**
-     * A boolean value. Set to true once system configuration is completed.
-     * @var boolean 
-     * @since 1.0
-     */
-    private $isConfigured;
-    /**
-     * An associative array that will contain database connections.
-     * @var type 
-     */
-    private $dbConnections;
-    ',true,true);
-        $fh->write('/**
-     * Initialize configuration.
-     */
-    private function __construct() {
-        $this->isConfigured = '.$configArr['is-config'].';
-        $this->releaseDate = \''.$configArr['release-date'].'\';
-        $this->version = \''.$configArr['version'].'\';
-        $this->versionType = \''.$configArr['version-type'].'\';
-        $this->configVision = \''.$configArr['config-file-version'].'\';
-        $this->dbConnections = [', true, true);
+        
+        $fileAsStr = "<?php\n"
+                . "namespace webfiori\conf;\n"
+                . "\n"
+                . "use webfiori\\entity\DBConnectionInfo;\n"
+                . "/**\n"
+                . " * Global configuration class.\n"
+                . " * Used by the server part and the presentation part. It contains framework version\n"
+                . " * information and database connection settings.\n"
+                . " * @author Ibrahim\n"
+                . " * @version 1.3.4\n"
+                . " */\n"
+                . "class Config {\n"
+                . "    /**\n"
+                . "     * An instance of Config.\n"
+                . "     * @var Config\n"
+                . "     * @since 1.0\n"
+                . "     */\n"
+                . "    private static \$cfg;\n"
+                . "    /**\n"
+                . "     * An associative array that will contain database connections.\n"
+                . "     * @var type\n"
+                . "     */\n"
+                . "    private \$dbConnections;\n"
+                . "    /**\n"
+                . "     * A boolean value. Set to true once system configuration is completed.\n"
+                . "     * @var boolean\n"
+                . "     * @since 1.0\n"
+                . "     */\n"
+                . "    private \$isConfigured;\n"
+                . "    /**\n"
+                . "     * The release date of the framework that is used to build the system.\n"
+                . "     * @var string Release date of of the framework that is used to build the system.\n"
+                . "     * @since 1.0\n"
+                . "     */\n"
+                . "    private \$releaseDate;\n"
+                . "    /**\n"
+                . "     * The version of the framework that is used to build the system.\n"
+                . "     * @var string The version of the framework that is used to build the system.\n"
+                . "     * @since 1.0\n"
+                . "     */\n"
+                . "    private \$version;\n"
+                . "    /**\n"
+                . "     * The type framework version that is used to build the system.\n"
+                . "     * @var string The framework version that is used to build the system.\n"
+                . "     * @since 1.0\n"
+                . "     */\n"
+                . "    private \$versionType;\n"
+                . "    \n"
+                . "    /**\n"
+                . "     * Initialize configuration.\n"
+                . "     */\n"
+                . "    private function __construct() {\n"
+                . "        \$this->isConfigured = ".$configArr['is-config'].";\n"
+                . "        \$this->releaseDate = '".$configArr['release-date']."';\n"
+                . "        \$this->version = '".$configArr['version']."';\n"
+                . "        \$this->versionType = '".$configArr['version-type']."';\n"
+                . "        \$this->configVision = '".$configArr['config-file-version']."';\n"
+                . "        \$this->dbConnections = [\n"
+                . "";
         $count = count($configArr['databases']);
         $i = 0;
 
         foreach ($configArr['databases'] as $dbConn) {
             if ($i + 1 == $count) {
-                $fh->write('        \''.$dbConn->getConnectionName().'\'=> new DBConnectionInfo(\''
-                    .$dbConn->getUsername()
-                    .'\',\''
-                    .$dbConn->getPassword()
-                    .'\',\''
-                    .$dbConn->getDBName()
-                    .'\',\''
-                    .$dbConn->getHost().'\','
-                    .''
-                    .$dbConn->getPort().')', true, true);
+                $fileAsStr .= "            '".$dbConn->getConnectionName()."' => new DBConnectionInfo("
+                        . "'".$dbConn->getUsername()."', "
+                        . "'".$dbConn->getPassword()."', "
+                        . "'".$dbConn->getDBName()."', "
+                        . "'".$dbConn->getHost()."', "
+                        . "".$dbConn->getPort().")";
             } else {
-                $fh->write('        \''.$dbConn->getConnectionName().'\'=> new DBConnectionInfo(\''
-                    .$dbConn->getUsername()
-                    .'\',\''
-                    .$dbConn->getPassword()
-                    .'\',\''
-                    .$dbConn->getDBName()
-                    .'\',\''
-                    .$dbConn->getHost().'\','
-                    .''
-                    .$dbConn->getPort().'),', true, true);
+                $fileAsStr .= "            '".$dbConn->getConnectionName()."' => new DBConnectionInfo("
+                        . "'".$dbConn->getUsername()."', "
+                        . "'".$dbConn->getPassword()."', "
+                        . "'".$dbConn->getDBName()."', "
+                        . "'".$dbConn->getHost()."', "
+                        . "".$dbConn->getPort()."),\n";
             }
             $i++;
         }
-        $fh->write('    ];', true, true);
-
+        $fileAsStr .= "\n"
+                   . "        ];\n";
         foreach ($configArr['databases'] as $dbConn) {
-            $fh->write('$this->dbConnections[\''.$dbConn->getConnectionName().'\']->setConnectionName(\''.$dbConn->getConnectionName().'\');', true, true);
+            $fileAsStr .= '        $this->dbConnections[\''.$dbConn->getConnectionName().'\']->setConnectionName(\''.$dbConn->getConnectionName().'\');'."\n";
         }
-        $fh->write('}', true, true);
-        $fh->write('/**
-     * An instance of Config.
-     * @var Config 
-     * @since 1.0
-     */
-    private static $cfg;
-    /**
-     * Returns an object that can be used to access configuration information.
-     * @return Config An object of type Config.
-     * @since 1.0
-     */
-    public static function get(){
-        if(self::$cfg != null){
-            return self::$cfg;
-        }
-        self::$cfg = new Config();
-        return self::$cfg;
-    }
-    /**
-     * Adds new database connection or updates an existing one.
-     * @param DBConnectionInfo $connectionInfo an object of type \'DBConnectionInfo\' 
-     * that will contain connection information.
-     * @since 1.3.4
-     */
-    public static function addDbConnection($connectionInfo){
-        if($connectionInfo instanceof DBConnectionInfo){
-            self::get()->dbConnections[$connectionInfo->getConnectionName()] = $connectionInfo;
-        }
-    }
-    private function _getConfigVersion(){
-        return $this->configVision;
-    }
-    /**
-     * Returns the version number of configuration file.
-     * The value is used to check for configuration compatibility since the 
-     * framework is updated and more features are added.
-     * @return string The version number of configuration file.
-     * @since 1.2
-     */
-    public static function getConfigVersion(){
-        return self::get()->_getConfigVersion();
-    }
-    private function _isConfig(){
-        return $this->isConfigured;
-    }
-    /**
-     * Checks if the system is configured or not.
-     * This method is helpful in case the developer would like to create some 
-     * kind of a setup wizard for the web application.
-     * @return boolean true if the system is configured.
-     * @since 1.0
-     */
-    public static function isConfig(){
-        return self::get()->_isConfig();
-    }
-    
-    private function _getVersion(){
-        return $this->version;
-    }
-    /**
-     * Returns WebFiori Framework version number.
-     * @return string WebFiori Framework version number. The version number will 
-     * have the following format: x.x.x
-     * @since 1.2
-     */
-    public static function getVersion(){
-        return self::get()->_getVersion();
-    }
-    private function _getVersionType(){
-        return $this->versionType;
-    }
-    /**
-     * Returns WebFiori Framework version type.
-     * @return string WebFiori Framework version type (e.g. \'Beta\', \'Alpha\', \'Preview\').
-     * @since 1.2
-     */
-    public static function getVersionType(){
-        return self::get()->_getVersionType();
-    }
-    private function _getReleaseDate(){
-        return $this->releaseDate;
-    }
-    /**
-     * Returns the date at which the current version of the framework is released.
-     * The format of the date will be YYYY-MM-DD.
-     * @return string The date at which the current version of the framework is released.
-     * @since 1.0
-     */
-    public static function getReleaseDate(){
-        return self::get()->_getReleaseDate();
-    }
-    /**
-     * Returns an associative array that contain the information of database connections.
-     * The keys of the array will be the name of database connection and the value of 
-     * each key will be an object of type DBConnectionInfo.
-     * @return array An associative array.
-     * @since 1.3.3
-     */
-    public static function getDBConnections(){
-        return self::get()->dbConnections;
-    }
-    /**
-     * Returns database connection information given connection name.
-     * @param string $conName The name of the connection.
-     * @return DBConnectionInfo|null The method will return an object of type 
-     * DBConnectionInfo if a connection info was found for the given connection name. 
-     * Other than that, the method will return null.
-     * @since 1.3.3
-     */
-    public static function getDBConnection($conName){
-        $conns = self::getDBConnections();
-        $trimmed = trim($conName);
-        if(isset($conns[$trimmed])){
-            return $conns[$trimmed];
-        }
-        return null;
-    } ', true, true);
-        $fh->reduceTab();
-        $fh->write('}', true, true);
-        $fh->close();
+                $fileAsStr .= ""
+                . "    }\n"
+                . "    /**\n"
+                . "     * Adds new database connection or updates an existing one.\n"
+                . "     * @param DBConnectionInfo \$connectionInfo an object of type 'DBConnectionInfo'\n"
+                . "     * that will contain connection information.\n"
+                . "     * @since 1.3.4\n"
+                . "     */\n"
+                . "    public static function addDbConnection(\$connectionInfo) {\n"
+                . "        if (\$connectionInfo instanceof DBConnectionInfo) {\n"
+                . "            self::get()->dbConnections[\$connectionInfo->getConnectionName()] = \$connectionInfo;\n"
+                . "        }\n"
+                . "    }\n"
+                . "    /**\n"
+                . "     * Returns an object that can be used to access configuration information.\n"
+                . "     * @return Config An object of type Config.\n"
+                . "     * @since 1.0\n"
+                . "     */\n"
+                . "    public static function get() {\n"
+                . "        if (self::\$cfg != null) {\n"
+                . "            return self::\$cfg;\n"
+                . "        }\n"
+                . "        self::\$cfg = new Config();\n"
+                . "        \n"
+                . "        return self::\$cfg;\n"
+                . "    }\n"
+                . "    /**\n"
+                . "     * Returns the version number of configuration file.\n"
+                . "     * The value is used to check for configuration compatibility since the\n"
+                . "     * framework is updated and more features are added.\n"
+                . "     * @return string The version number of configuration file.\n"
+                . "     * @since 1.2\n"
+                . "     */\n"
+                . "    public static function getConfigVersion() {\n"
+                . "        return self::get()->_getConfigVersion();\n"
+                . "    }\n"
+                . "    /**\n"
+                . "     * Returns database connection information given connection name.\n"
+                . "     * @param string \$conName The name of the connection.\n"
+                . "     * @return DBConnectionInfo|null The method will return an object of type\n"
+                . "     * DBConnectionInfo if a connection info was found for the given connection name.\n"
+                . "     * Other than that, the method will return null.\n"
+                . "     * @since 1.3.3\n"
+                . "     */\n"
+                . "    public static function getDBConnection(\$conName) {\n"
+                . "        \$conns = self::getDBConnections();\n"
+                . "        \$trimmed = trim(\$conName);\n"
+                . "        \n"
+                . "        if (isset(\$conns[\$trimmed])) {\n"
+                . "            return \$conns[\$trimmed];\n"
+                . "        }\n"
+                . "        \n"
+                . "        return null;\n"
+                . "    }\n"
+                . "    /**\n"
+                . "     * Returns an associative array that contain the information of database connections.\n"
+                . "     * The keys of the array will be the name of database connection and the value of\n"
+                . "     * each key will be an object of type DBConnectionInfo.\n"
+                . "     * @return array An associative array.\n"
+                . "     * @since 1.3.3\n"
+                . "     */\n"
+                . "    public static function getDBConnections() {\n"
+                . "        return self::get()->dbConnections;\n"
+                . "    }\n"
+                . "    /**\n"
+                . "     * Returns the date at which the current version of the framework is released.\n"
+                . "     * The format of the date will be YYYY-MM-DD.\n"
+                . "     * @return string The date at which the current version of the framework is released.\n"
+                . "     * @since 1.0\n"
+                . "     */\n"
+                . "    public static function getReleaseDate() {\n"
+                . "        return self::get()->_getReleaseDate();\n"
+                . "    }\n"
+                . "    /**\n"
+                . "     * Returns WebFiori Framework version number.\n"
+                . "     * @return string WebFiori Framework version number. The version number will\n"
+                . "     * have the following format: x.x.x\n"
+                . "     * @since 1.2\n"
+                . "     */\n"
+                . "    public static function getVersion() {\n"
+                . "        return self::get()->_getVersion();\n"
+                . "    }\n"
+                . "    /**\n"
+                . "     * Returns WebFiori Framework version type.\n"
+                . "     * @return string WebFiori Framework version type (e.g. 'Beta', 'Alpha', 'Preview').\n"
+                . "     * @since 1.2\n"
+                . "     */\n"
+                . "    public static function getVersionType() {\n"
+                . "        return self::get()->_getVersionType();\n"
+                . "    }\n"
+                . "    /**\n"
+                . "     * Checks if the system is configured or not.\n"
+                . "     * This method is helpful in case the developer would like to create some\n"
+                . "     * kind of a setup wizard for the web application.\n"
+                . "     * @return boolean true if the system is configured.\n"
+                . "     * @since 1.0\n"
+                . "     */\n"
+                . "    public static function isConfig() {\n"
+                . "        return self::get()->_isConfig();\n"
+                . "    }\n"
+                . "    private function _getConfigVersion() {\n"
+                . "        return \$this->configVision;\n"
+                . "    }\n"
+                . "    private function _getReleaseDate() {\n"
+                . "        return \$this->releaseDate;\n"
+                . "    }\n"
+                . "    \n"
+                . "    private function _getVersion() {\n"
+                . "        return \$this->version;\n"
+                . "    }\n"
+                . "    private function _getVersionType() {\n"
+                . "        return \$this->versionType;\n"
+                . "    }\n"
+                . "    private function _isConfig() {\n"
+                . "        return \$this->isConfigured;\n"
+                . "    }\n"
+                . "}\n"
+                . "";
+
+
+        
+        $mailConfigFile = new File('Config.php', ROOT_DIR.DIRECTORY_SEPARATOR.'conf');
+        $mailConfigFile->remove();
+        $mailConfigFile->setRawData($fileAsStr);
+        $mailConfigFile->write(false, true);
     }
 }

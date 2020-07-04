@@ -111,24 +111,24 @@ class Cron {
         $this->_setPassword('');
 
         if (defined('CRON_THROUGH_HTTP') && CRON_THROUGH_HTTP === true) {
-            Router::other([
+            Router::addRoute([
                 'path' => '/cron/login',
                 'route-to' => '/entity/cron/CronLoginView.php'
             ]);
-            Router::other([
+            Router::addRoute([
                 'path' => '/cron/apis/{action}',
                 'route-to' => '/entity/cron/CronAPIs.php',
                 'as-api' => true
             ]);
-            Router::other([
+            Router::addRoute([
                 'path' => '/cron',
                 'route-to' => '/entity/cron/CronLoginView.php'
             ]);
-            Router::other([
+            Router::addRoute([
                 'path' => '/cron/jobs',
                 'route-to' => '/entity/cron/CronTasksView.php'
             ]);
-            Router::other([
+            Router::addRoute([
                 'path' => '/cron/jobs/{job-name}',
                 'route-to' => '/entity/cron/CronTaskView.php'
             ]);

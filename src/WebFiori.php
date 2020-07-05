@@ -165,6 +165,11 @@ class WebFiori {
         }
         self::$AU = AutoLoader::get();
         InitAutoLoad::init();
+        
+        //Initialize privileges.
+        //This step must be done before initializing any controler.
+        InitPrivileges::init();
+        
         $this->_setHandlers();
         $this->_checkStandardLibs();
 
@@ -185,9 +190,6 @@ class WebFiori {
             $this->dbErrDetails = $this->sysStatus;
             $this->sysStatus = Util::DB_NEED_CONF;
         }
-
-        //Initialize privileges
-        InitPrivileges::init();
 
         //Initialize CLI
         CLI::init();

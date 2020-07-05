@@ -42,7 +42,7 @@ use webfiori\entity\SessionManager;
  * the system uses any. The developer can extend this class to add his own 
  * logic to the application that he is creating.
  * @author Ibrahim
- * @version 1.3.9
+ * @version 1.3.10
  */
 class Controller {
     /**
@@ -196,6 +196,15 @@ class Controller {
         }
 
         return $retVal;
+    }
+    /**
+     * Returns an array that contains all used active database connections.
+     * @return array The method will return an associative array. The indices 
+     * are connections names and values are objects of type 'MySQLLink'.
+     * @since 1.3.10
+     */
+    public static function getActiveConnections() {
+        return self::$DbConnectionsPool;
     }
     /**
      * Returns an associative array that contains database error info (if any)

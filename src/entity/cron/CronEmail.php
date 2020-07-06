@@ -40,9 +40,22 @@ use webfiori\WebFiori;
  * it will contain any log messages which was added by using the method 
  * 'Cron::log()'.
  * @author Ibrahim
- * @version 1.0
+ * @version 1.0.1
  */
 class CronEmail {
+    /**
+     * An array that contains the addresses of the people who will get the 
+     * email.
+     * @var array
+     * @since 1.0.1 
+     */
+    private $reciversArr;
+    /**
+     * The name of the account that will be used to send the message.
+     * @var string 
+     * @since 1.0.1 
+     */
+    private $sendAccName;
     /**
      * Creates new instance of the class.
      * @param string $sendAccName The name of SMTP account that will be 
@@ -102,8 +115,32 @@ class CronEmail {
             $file = new File($activeJob->getJobName().'-ExecLog-'.date('Y-m-d H-i-s').'.log');
             $file->setRawData($logTxt);
             EmailMessage::attach($file);
-            EmailMessage::send();
         }
+    }
+    /**
+     * Send the message.
+     * @since 1.0
+     */
+    public function send() {
+        EmailMessage::send();
+    }
+    /**
+     * Returns an associative array that contains the addresses of the people 
+     * who will get the notice.
+     * @return array The indices of the array will be the addresses and the 
+     * values will be receivers names.
+     * @since 1.0.1
+     */
+    public function getReceivers() {
+        return $this->reciversArr;
+    }
+    /**
+     * Returns the name of the account that will be used to send the message.
+     * @return string The name of the account that will be used to send the message.
+     * @since 1.0.1
+     */
+    public function getSendAccName() {
+        return $this->sendAccName;
     }
     /**
      * 

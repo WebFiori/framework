@@ -1043,7 +1043,18 @@ class SessionManager implements JsonI {
         $path = isset($params['path']) ? $params['path'] : '/';
         $_SESSION = [];
         session_destroy();
-        session_set_cookie_params(0, $path, $params['domain'], $secure, $httponly);
+        if (PHP_VERSION_ID < 70300) {
+            session_set_cookie_params(0, $path.'; sameSite=Lax', $params['domain'], $secure, $httponly);
+        } else {
+            session_set_cookie_params([
+                'lifetime' => 0,
+                'path' => $path,
+                'domain' => $params['domain'],
+                'secure' => $secure,
+                'httponly' => $httponly,
+                'sameSite' => 'Lax'
+            ]);
+        }
         $this->sessionStatus = self::KILLED;
     }
     private function _setLifetimeHelper($time) {
@@ -1065,7 +1076,19 @@ class SessionManager implements JsonI {
             $httponly = false;
         }
         $path = isset($params['path']) ? $params['path'] : '/';
-        session_set_cookie_params(time() + $this->getLifetime() * 60, $path, $params['domain'], $secure, $httponly);
+        if (PHP_VERSION_ID < 70300) {
+            session_set_cookie_params(time() + $this->getLifetime() * 60, $path.'; sameSite=Lax', $params['domain'], $secure, $httponly);
+        } else {
+            session_set_cookie_params([
+                'lifetime' => time() + $this->getLifetime() * 60,
+                'path' => $path,
+                'domain' => $params['domain'],
+                'secure' => $secure,
+                'httponly' => $httponly,
+                'samesite' => 'Lax'
+            ]);
+        }
+        
         $this->_switchToSession();
 
         $retVal = true;
@@ -1135,9 +1158,12 @@ class SessionManager implements JsonI {
         ini_set('session.gc_maxlifetime', $lifeTime * 60);
         ini_set('session.cookie_lifetime', $lifeTime * 60);
         ini_set('session.use_cookies', 1);
+        if (PHP_VERSION_ID >= 70300) { 
+            ini_set('session.cookie_samesite', 'Lax');
+        }
         session_name($this->getName());
         session_id($this->sId);
-        session_set_cookie_params($lifeTime * 60,"/");
+        session_set_cookie_params($lifeTime * 60,"/; sameSite=Lax");
         $started = session_start();
 
         if ($started) {

@@ -27,6 +27,7 @@ namespace webfiori\entity;
 use jsonx\JsonI;
 use jsonx\JsonX;
 use restEasy\WebServicesSet;
+use webfiori\logic\Controller;
 use webfiori\entity\langs\Language;
 use webfiori\WebFiori;
 /**
@@ -163,8 +164,10 @@ abstract class ExtendedWebServices extends WebServicesSet {
      * </p>
      * In here, 'OTHER_DATA' can be a basic string.
      * Also, The response will sent HTTP code 404 - Not Found.
-     * @param JsonI|JsonX|string $info An object of type JsonI or 
+     * @param JsonI|JsonX|Controller|string $info An object of type JsonI or 
      * JsonX that describe the error in more details. Also it can be a simple string. 
+     * Also, this parameter can be a controller that contains database error 
+     * information.
      * Note that the content of the field "message" might differ. It depends on 
      * the language. If no language is selected or language is not supported, 
      * The language that will be used is the language that was set as default 
@@ -173,7 +176,20 @@ abstract class ExtendedWebServices extends WebServicesSet {
      */
     public function databaseErr($info = '') {
         $message = $this->get('general/db-error');
-        $this->sendResponse($message, self::$E, 404, $info);
+        if ($info instanceof Controller) {
+            $dbErr = $info->getDBErrDetails();
+            $json = new JsonX([
+                'error-message'=>$dbErr['error-message'],
+                'error-code'=>$dbErr['error-code']
+            ]);
+            if (defined('VERBOSE') && VERBOSE === true) {
+                $json->add('controller', $dbErr['controller']);
+                $json->add('query', $dbErr['query']);
+            }
+            $this->sendResponse($message, self::$E, 404, $json);
+        } else {
+            $this->sendResponse($message, self::$E, 404, $info);
+        }
     }
     /**
      * Returns the value of a language variable.

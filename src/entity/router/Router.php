@@ -68,7 +68,7 @@ use webfiori\entity\Util;
  * </pre> 
  * </p>
  * @author Ibrahim
- * @version 1.3.9
+ * @version 1.3.10
  */
 class Router {
     /**
@@ -434,6 +434,13 @@ class Router {
                 echo $retVal;
             }
         ]);
+    }
+    /**
+     * Call the closure which was set if a route is not found.
+     * @since 1.3.10
+     */
+    public static function notFound() {
+        call_user_func(self::get()->onNotFound);
     }
     /**
      * Display all routes details.

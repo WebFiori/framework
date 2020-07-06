@@ -201,7 +201,7 @@ class Page {
      * @since 1.9.1
      */
     public static function beforeRender($callable = '') {
-        if (is_callable($callable)) {
+        if (is_callable($callable) || $callable instanceof \Closure) {
             self::get()->beforeRenderCallbacks[] = $callable;
             $callbacksCount = count(self::get()->beforeRenderCallbacks);
             return $callbacksCount - 1;

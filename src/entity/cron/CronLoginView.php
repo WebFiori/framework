@@ -50,10 +50,10 @@ class CronLoginView extends CronView {
             'id' => 'password-input',
             'placeholder' => 'Enter CRON password here.',
             'style' => 'width:200px'
-        ])->br()->br()->addChild(new HTMLNode('button'), false, [
+        ])->br()->br()->addChild(new HTMLNode('button'), [
             'id' => 'submit-button',
-            'onclock' => 'login(this);return false;'
-        ])->text('Login');
+            'onclick' => 'login(this);return false;'
+        ], false)->text('Login');
         Page::render();
     }
 }

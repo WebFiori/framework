@@ -17,10 +17,9 @@ class PageTest extends TestCase{
      */
     public function testBeforeRender00() {
         $this->assertNull(Page::beforeRender());
-        Page::beforeRender('random');
+        $this->assertNull(Page::beforeRender('random'));
         $this->assertNull(Page::beforeRender());
-        Page::beforeRender(function(){});
-        $this->assertTrue(is_callable(Page::beforeRender()));
+        $this->assertEquals(0,Page::beforeRender(function(){}));
         Page::reset();
         $this->assertNull(Page::beforeRender());
     }

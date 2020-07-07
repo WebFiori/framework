@@ -42,6 +42,12 @@ use phMysql\MySQLQuery;
 class QueryClassWriter extends ClassWriter {
     /**
      *
+     * @var array
+     * @since 1.0 
+     */
+    private $classInfoArr;
+    /**
+     *
      * @var EntityMapper|null
      * @since 1.0 
      */
@@ -86,7 +92,8 @@ class QueryClassWriter extends ClassWriter {
             throw new InvalidArgumentException('The given object is not an instance of the class \'MySQLQuery\'');
         }
         $this->queryObj = $queryObj;
-
+        $this->classInfoArr = $classInfoArr;
+        
         if (isset($classInfoArr['entity-info'])) {
             $this->entityMapper = new EntityMapper($this->queryObj->getTable(), 
                     $classInfoArr['entity-info']['name'], 
@@ -185,7 +192,7 @@ class QueryClassWriter extends ClassWriter {
         $fks = $this->queryObj->getTable()->getForeignKeys();
 
         foreach ($fks as $fkObj) {
-            $this->append('$this->getTable()->addReference($this, [', 2);
+            $this->append('$this->getTable()->addReference('.$this->classInfoArr['fk-info'][$fkObj->getKeyName()].', [', 2);
             $ownerCols = array_keys($fkObj->getOwnerCols());
             $sourceCols = array_keys($fkObj->getSourceCols());
 
@@ -224,11 +231,12 @@ class QueryClassWriter extends ClassWriter {
             }
 
             if (count($primaryKeys) !== 0) {
+                //$this->_writeSelectOneQuery($colsKeys, $primaryKeys);
                 $this->_writeUpdateQuery($colsKeys, $primaryKeys);
                 $this->_writeDeleteQuery($colsKeys, $primaryKeys);
-                $this->_writeSelectAllQuery();
             }
         }
+        $this->_writeSelectAllQuery();
     }
     /**
      * 
@@ -311,7 +319,11 @@ class QueryClassWriter extends ClassWriter {
         $this->append("<?php\n");
         $this->append('namespace '.$this->getNamespace().";\n");
         $this->append("use phMysql\MySQLQuery;");
-
+        if (isset($this->classInfoArr['fk-info'])) {
+            foreach ($this->classInfoArr['fk-info'] as $queryClassNS) {
+                $this->append('use '.$queryClassNS.';');
+            }
+        }
         if ($this->entityMapper !== null) {
             $this->append('use '.$this->getEntityNamespace().'\\'.$this->getEntityName().';');
         }
@@ -338,6 +350,26 @@ class QueryClassWriter extends ClassWriter {
         $this->append('$this->select([', 2);
         $this->append("'limit' => \$limit,", 3);
         $this->append("'offset' => \$offset,", 3);
+
+        if (strlen($this->getEntityName()) != 0) {
+            $this->append("'map-result-to' => '".$this->getEntityNamespace().'\\'.$this->getEntityName()."',", 3);
+        }
+        $this->append("]);", 2);
+        $this->append('}', 1);
+    }
+    private function _writeSelectOneQuery($colsKeys, $primaryKeys) {
+        $this->append("/**", 1);
+        $this->append(" * Constructs a query that can be used to select one records from the table.", 1);
+        $this->append(" */", 1);
+        $this->append('public function selectOne($entity) {', 1);
+        $this->append('$this->select([', 2);
+        $this->append("'where' => [", 3);
+        foreach ($colsKeys as $colKey) {
+            if (in_array($colKey, $primaryKeys)) {
+                $this->append("'$colKey' => \$entity->".$this->entityMapper->mapToMethodName($colKey, 'g').'(),', 4);
+            }
+        }
+        $this->append("]", 3);
 
         if (strlen($this->getEntityName()) != 0) {
             $this->append("'map-result-to' => '".$this->getEntityNamespace().'\\'.$this->getEntityName()."',", 3);

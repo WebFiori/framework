@@ -52,7 +52,7 @@ class CreateCommand extends CLICommand {
      */
     public function _addFks($query) {
         $addMoreFks = true;
-
+        $fksNs = [];
         do {
             $refQuery = null;
             $refQueryName = $this->getInput('Enter the name of the referenced query class (with namespace):');
@@ -80,6 +80,7 @@ class CreateCommand extends CLICommand {
                 $added = $query->getTable()->addReference($refQuery, $fkArr, $fkName, $onUpdate, $onDelete);
 
                 if ($added) {
+                    $fksNs[$fkName] = $refQueryName;
                     $this->success('Foreign key added.');
                 } else {
                     $this->success('Unable to add the key.');
@@ -90,6 +91,7 @@ class CreateCommand extends CLICommand {
 
             $addMoreFks = $this->confirm('Would you like to add another foreign key?');
         } while ($addMoreFks);
+        return $fksNs;
     }
     public function _createEntityFromQuery() {
         $queryClassNameValidity = false;
@@ -362,7 +364,7 @@ class CreateCommand extends CLICommand {
         $tempQuery->createTable();
 
         if ($this->confirm('Would you like to add foreign keys to the table?', false)) {
-            $this->_addFks($tempQuery);
+            $classInfo['fk-info'] = $this->_addFks($tempQuery);
         }
 
         if ($this->confirm('Would you like to create an entity class that maps to the database table?', false)) {
@@ -405,7 +407,7 @@ class CreateCommand extends CLICommand {
 
         do {
             $path = $this->getInput("Where would you like to store the class? (must be a directory inside '".ROOT_DIR."')");
-            $fixedPath = ROOT_DIR.DIRECTORY_SEPARATOR.trim(trim($path,'/'),'\\');
+            $fixedPath = ROOT_DIR.DIRECTORY_SEPARATOR.trim(trim(str_replace('\\', DIRECTORY_SEPARATOR, str_replace('/', DIRECTORY_SEPARATOR, $path)),'/'),'\\');
 
             if (Util::isDirectory($fixedPath)) {
                 if (!in_array($fixedPath, AutoLoader::getFolders())) {
@@ -456,7 +458,7 @@ class CreateCommand extends CLICommand {
             } else {
                 $this->error('The column is already added.');
             }
-            $moreCols = $this->confirm('Would you like to add another column to the foreign key?');
+            $moreCols = $this->confirm('Would you like to add another column to the foreign key?', false);
         } while ($moreCols);
 
         return $fkCols;
@@ -500,23 +502,19 @@ class CreateCommand extends CLICommand {
      * @param MySQLColumn $colObj
      */
     private function _setDefaultValue($colObj) {
-        if ($this->confirm('Would you like to include default value for the column?', false)) {
-            if ($colObj->getType() == 'bool' || $colObj->getType() == 'boolean') {
-                $defaultVal = trim($this->getInput('Enter default value (true or false):'));
+        if ($colObj->getType() == 'bool' || $colObj->getType() == 'boolean') {
+            $defaultVal = trim($this->getInput('Enter default value (true or false) (Hit "Enter" to skip):', ''));
 
-                if ($defaultVal == 'true') {
-                    $colObj->setDefault(true);
-                } else {
-                    if ($defaultVal == 'false') {
-                        $colObj->setDefault(false);
-                    }
-                }
-            } else {
-                $defaultVal = trim($this->getInput('Enter default value:'));
+            if ($defaultVal == 'true') {
+                $colObj->setDefault(true);
+            } else if ($defaultVal == 'false') {
+                $colObj->setDefault(false);
+            }
+        } else {
+            $defaultVal = trim($this->getInput('Enter default value (Hit "Enter" to skip):', ''));
 
-                if (strlen($defaultVal) != 0) {
-                    $colObj->setDefault($defaultVal);
-                }
+            if (strlen($defaultVal) != 0) {
+                $colObj->setDefault($defaultVal);
             }
         }
     }

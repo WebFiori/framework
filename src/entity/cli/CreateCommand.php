@@ -44,7 +44,20 @@ use webfiori\logic\Controller;
  */
 class CreateCommand extends CLICommand {
     public function __construct() {
-        parent::__construct('create', [], 'Creates a query class, entity, API or a controller (Experimental).');
+        parent::__construct('create', [
+            '--what' => [
+                'description' => 'An optional parameter which is used to specify what '
+                . 'would you like to create. Possible values are: "e" for entity, "t" for '
+                . 'database table.',
+                'optional' => true,
+                'values' => [
+                    'e','t'
+                ]
+            ],
+            '--query-class' => [
+                'optional' => true,
+            ]
+        ], 'Creates a query class, entity, API or a controller (Experimental).');
     }
     /**
      * 
@@ -95,9 +108,11 @@ class CreateCommand extends CLICommand {
     }
     public function _createEntityFromQuery() {
         $queryClassNameValidity = false;
-
+        $queryClassName = $this->getArgValue('--query-class');
         do {
-            $queryClassName = $this->getInput('Enter query class name (include namespace):');
+            if (strlen($queryClassName) == 0) {
+                $queryClassName = $this->getInput('Enter query class name (include namespace):');
+            }
 
             if (!class_exists($queryClassName)) {
                 $this->error('Class not found.');
@@ -107,6 +122,7 @@ class CreateCommand extends CLICommand {
 
             if (!$queryObj instanceof MySQLQuery) {
                 $this->error('The given class is not a child of the class "MySQLQuery".');
+                $queryClassName = '';
                 continue;
             }
             $queryClassNameValidity = true;
@@ -156,7 +172,15 @@ class CreateCommand extends CLICommand {
         return 0;
     }
     public function exec() {
-        $options = [
+        $what = $this->getArgValue('--what');
+        if ($what !== null) {
+            if ($what == 'e') {
+                $this->_createEntityFromQuery();
+            } else if ($what == 't') {
+                $this->_createDbTable();
+            }
+        } else {
+            $options = [
             'Query class.',
             'Entity class from query.',
             'Controller class.',
@@ -166,38 +190,43 @@ class CreateCommand extends CLICommand {
         ];
         $answer = $this->select('What would you like to create?', $options, count($options) - 1);
 
-        if ($answer == 'Quit.') {
-            return 0;
-        } else if ($answer == 'Query class.') {
-            return $this->_createQueryClass();
-        } else if ($answer == 'Entity class from query.') {
-            return $this->_createEntityFromQuery();
-        } else if ($answer == 'Controller class.') {
-            return $this->_createController();
-        } else if ($answer == 'Web services set.') {
-            return $this->_createWebServices();
-        } else if ($answer == 'Database table from query class.') {
-            $this->_createDbTable();
+            if ($answer == 'Quit.') {
+                return 0;
+            } else if ($answer == 'Query class.') {
+                return $this->_createQueryClass();
+            } else if ($answer == 'Entity class from query.') {
+                return $this->_createEntityFromQuery();
+            } else if ($answer == 'Controller class.') {
+                return $this->_createController();
+            } else if ($answer == 'Web services set.') {
+                return $this->_createWebServices();
+            } else if ($answer == 'Database table from query class.') {
+                $this->_createDbTable();
+            }
         }
     }
     private function _createDbTable() {
         $dbConnections = array_keys(WebFiori::getConfig()->getDBConnections());
 
         if (count($dbConnections) != 0) {
-            $dbConn = $this->select('Select database connection:', $dbConnections);
+            $dbConn = $this->select('Select database connection:', $dbConnections, 0);
             $queryClassNameValidity = false;
-            
+            $queryClassName = $this->getArgValue('--query-class');
             do {
-                $queryClassName = $this->getInput('Enter query class name (include namespace):');
+                if (strlen($queryClassName) == 0) {
+                    $queryClassName = $this->getInput('Enter query class name (include namespace):');
+                }
 
                 if (!class_exists($queryClassName)) {
                     $this->error('Class not found.');
+                    $queryClassName = '';
                     continue;
                 }
                 $queryObj = new $queryClassName();
 
                 if (!$queryObj instanceof MySQLQuery) {
                     $this->error('The given class is not a child of the class "MySQLQuery".');
+                    $queryClassName = '';
                     continue;
                 }
                 $queryClassNameValidity = true;
@@ -215,6 +244,7 @@ class CreateCommand extends CLICommand {
                 'color' => 'light-blue'
             ]);
             if ($this->confirm('Continue?', true)) {
+                $this->println('Creating your new table. Please wait a moment...');
                 if ($tempController->excQ($queryObj)) {
                     $this->success('Database table created.');
                 } else {
@@ -225,7 +255,7 @@ class CreateCommand extends CLICommand {
             }
             
         } else {
-            $this->error('No database connections available. Add connections inside the class \'Config\'.');
+            $this->error('No database connections available. Add connections inside the class \'Config\' or use the command "add".');
         }
     }
     /**
@@ -364,6 +394,7 @@ class CreateCommand extends CLICommand {
         $tempQuery->createTable();
 
         if ($this->confirm('Would you like to add foreign keys to the table?', false)) {
+            // TODO: Test adding forighn keys.
             $classInfo['fk-info'] = $this->_addFks($tempQuery);
         }
 
@@ -502,6 +533,7 @@ class CreateCommand extends CLICommand {
      * @param MySQLColumn $colObj
      */
     private function _setDefaultValue($colObj) {
+        // TODO: Test default value using empty.
         if ($colObj->getType() == 'bool' || $colObj->getType() == 'boolean') {
             $defaultVal = trim($this->getInput('Enter default value (true or false) (Hit "Enter" to skip):', ''));
 

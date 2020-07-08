@@ -921,7 +921,7 @@ abstract class CLICommand {
         }
 
         if (count($invalidArgsVals) != 0) {
-            $invalidStr = 'The following required argument(s) have invalid values: ';
+            $invalidStr = 'The following argument(s) have invalid values: ';
             $comma = '';
 
             foreach ($invalidArgsVals as $argName) {
@@ -955,8 +955,9 @@ abstract class CLICommand {
         } else {
             $optinsArr['optional'] = false;
         }
-
+        $optinsArr['description'] = isset($options['description']) ? $options['description'] : null;
         $this->_checkDescIndex($optinsArr);
+        $optinsArr['values'] = isset($options['values']) ? $options['values'] : [];
         $this->_checkValuesIndex($optinsArr);
 
 

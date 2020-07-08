@@ -156,7 +156,7 @@ class CronCommand extends CLICommand {
     private function _checkJobArgs($jobName) {
         $job = Cron::getJob($jobName);
         $args = $job->getExecArgsNames();
-        if (count($args) != 0 && $this->confirm('Would you like to supply custom execution arguments?')) {
+        if (count($args) != 0 && $this->confirm('Would you like to supply custom execution arguments?', false)) {
             $this->_setArgs($args);
         }
     }

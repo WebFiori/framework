@@ -34,6 +34,7 @@ namespace webfiori\ini;
  * default settings of the framework.
  * @author Ibrahim
  * @version 1.0
+ * @since 1.1.0
  */
 class GlobalConstants {
     /**
@@ -45,12 +46,33 @@ class GlobalConstants {
      * @since 1.0
      */
     public static function defineConstants() {
-        /**
-         * Fallback for older php versions that does not support the constant 
-         * PHP_INT_MIN.
-         * @since 1.0
-         */
+        if (!defined('SCRIPT_MEMORY_LIMIT')) {
+            /**
+             * Memory limit per script.
+             * This constant represents the maximum amount of memory each script will 
+             * consume before showing a fatal error. Default value is 2GB. The 
+             * developer can change this value as needed.
+             * @since 1.0
+             */
+            define('SCRIPT_MEMORY_LIMIT', '2048M');
+        }
+        if (!defined('DATE_TIMEZONE')) {
+            /**
+             * Define the timezone at which the system will operate in.
+             * The value of this constant is passed to the function 'date_default_timezone_set()'. 
+             * This one is used to fix some date and time related issues when the 
+             * application is deployed in multiple servers.
+             * See http://php.net/manual/en/timezones.php for supported time zones.
+             * Change this as needed.
+             */
+            define('DATE_TIMEZONE', 'Asia/Riyadh');
+        }
         if (!defined('PHP_INT_MIN')) {
+            /**
+             * Fallback for older php versions that does not support the constant 
+             * PHP_INT_MIN.
+             * @since 1.0
+             */
             define('PHP_INT_MIN', ~PHP_INT_MAX);
         }
 
@@ -126,6 +148,27 @@ class GlobalConstants {
              * @since 1.0
              */
             define('MAX_BOX_MESSAGES', 15);
+        }
+        if (!defined('CLI_HTTP_HOST')) {
+            /**
+             * Host name to use in case the system is executed through CLI.
+             * When the application is running throgh CLI, there is no actual 
+             * host name. For this reason, the host is set to 127.0.0.1 by default. 
+             * If this constant is defined, the host will be changed to the value of 
+             * the constant. Default value of the constant is 'example.com'.
+             * @since 1.0
+             */
+            define('CLI_HTTP_HOST', 'example.com');
+        }
+        if (!defined('USE_HTTP')) {
+            /**
+             * Sets the framework to use 'http://' or 'https://' for base URIs.
+             * The default behaviour of the framework is to use 'https://'. But 
+             * in some cases, there is a need for using 'http://'.
+             * If this constant is set to true, the framework will use 'http://' for 
+             * base URI of the system. Default value is false.
+             */
+            define('USE_HTTP', false);
         }
     }
 }

@@ -138,15 +138,19 @@ class WebFiori {
             mb_http_input($encoding);
             mb_regex_encoding($encoding);
         }
+        
+        require_once __DIR__.DIRECTORY_SEPARATOR.'ini'.DIRECTORY_SEPARATOR.'GlobalConstants.php';
+        GlobalConstants::defineConstants();
+        
         /**
-         * Set memory limit to 2GB per script
+         * Set memory limit.
          */
-        ini_set('memory_limit', '2048M');
+        ini_set('memory_limit', SCRIPT_MEMORY_LIMIT);
         /**
          * See http://php.net/manual/en/timezones.php for supported time zones.
          * Change this as needed.
          */
-        date_default_timezone_set('Asia/Riyadh');
+        date_default_timezone_set(DATE_TIMEZONE);
         /**
          * The root directory that is used to load all other required system files.
          */
@@ -154,8 +158,7 @@ class WebFiori {
             define('ROOT_DIR',__DIR__);
         }
 
-        require_once __DIR__.DIRECTORY_SEPARATOR.'ini'.DIRECTORY_SEPARATOR.'GlobalConstants.php';
-        GlobalConstants::defineConstants();
+        
 
         /**
          * Initialize autoloader.
@@ -611,7 +614,7 @@ WebFiori::getAndStart();
 
 if (CLI::isCLI() === true) {
     CLI::registerCommands();
-    CLI::runCLI();
+    exit(CLI::runCLI());
 } else {
     //route user request.
     Router::route(Util::getRequestedURL());

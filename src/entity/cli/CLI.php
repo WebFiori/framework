@@ -124,8 +124,11 @@ class CLI {
         fprintf(STDERR, $ex->getTraceAsString());
     }
     /**
-     * 
-     * @return CLICommand|null
+     * Returns the command which is being executed.
+     * @return CLICommand|null If a command is requested and currently in execute 
+     * stage, the method will return it as an object of type 'CLICommand'. If 
+     * no command is active, the method will return null.
+     * @since 1.0.2
      */
     public static function getActiveCommand() {
         return self::get()->activeCommand;

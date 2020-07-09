@@ -285,7 +285,7 @@ class Util {
      * @since 0.2
      */
     public static function getBaseURL() {
-        $host = filter_var($_SERVER['HTTP_HOST']);
+        $host = trim(filter_var($_SERVER['HTTP_HOST']),'/');
 
         if (isset($_SERVER['HTTPS'])) {
             $secureHost = filter_var($_SERVER['HTTPS']);
@@ -306,7 +306,7 @@ class Util {
             $toAppend = str_replace($_SERVER['HTTP_WEBFIORI_REMOVE_PATH'],'' ,$toAppend);
         }
 
-        return $protocol.$host.str_replace('\\', '/', $toAppend).'/';
+        return $protocol.$host.'/'.str_replace('\\', '/', $toAppend).'/';
     }
     /**
      * Returns the IP address of the user who is connected to the server.

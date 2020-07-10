@@ -24,95 +24,38 @@
  */
 namespace webfiori\examples\views;
 
-use phpStructs\html\HTMLNode;
-use phpStructs\html\PNode;
-use phpStructs\html\UnorderedList;
 use webfiori\entity\Page;
+use webfiori\WebFiori;
+
 class ExamplePage {
     public function __construct() {
-        //load UI template components (JS, CSS and others)
+        //load UI components (JS, CSS and others)
         //it is optional. to use a theme but recomended
         Page::theme('Vuetify Theme');
+        //Page::theme('Vuetify Template');
         //Page::theme('WebFiori V108');
         //Page::theme('Bootstrap Theme');
         //Page::theme('Greeny By Ibrahim Ali');
         //Page::theme('Template Theme');
         //Page::theme('WebFiori Theme');
-
-        //sets the title of the page
-        $lang = Page::lang();
-
-        if ($lang == 'AR') {
-            Page::title('مثال على صفحة');
-            //adds a paragraph to the body of the page.
-            $p = new PNode();
-            $p->addText('أهلا و سهلا من إطار "ويب فيوري"!');
-            Page::insert($p);
-        } else {
-            Page::title('Example Page');
-            //adds a paragraph to the body of the page.
-            $p = new PNode();
-            $p->addText('Hello from "WebFiori Framework"!');
-            Page::insert($p);
-        }
-
-        $sec = new HTMLNode('section');
-        Page::insert($sec);
-        $secH = new HTMLNode('h1');
-
-        if (Page::lang() == 'AR') {
-            $secH->addTextNode('ما هو إطار برمجة ويب فيوري؟');
-        } else {
-            $secH->addTextNode('What is WebFiori Framework? ');
-        }
-        $sec->addChild($secH);
-        $p2 = new PNode();
-
-        if (Page::lang() == 'AR') {
-            $p2->addText('إطار برمجة ويب فيوري هو اطار برمجة يستخدم في بناء '
-                     .'تطبيقات الشبكة بإستخدام لغة برمجة بي إتش بي .'
-                     .'الإطار بالكامل كائني التوجه و يسمح بإستخدام هيكلة ال MVC '
-                     .'لكنه لا يجبر المطور على استخدامها. الإطار يأتي مع العديد من الميزات '
-                     .'اللتي تُساعد مطور الشبكة على بناء المواقع الإلكترونية او '
-                     .'طبيقات الشبكة بشكل سريع.');
-        } else {
-            $p2->addText('WebFiori Framework is a web framework which is built '
-                .'using PHP language. The framework is fully object oriented '
-                .'(OOP). It allows the use of the famous model-view-controller '
-                .'(MVC) model but it does not force it. The framework comes '
-                .'with many features which can help in making your website '
-                .'or web application up and running in no time.');
-        }
-        $sec->addChild($p2);
-
-        $sec = new HTMLNode('section');
-        Page::insert($sec);
-        $secH = new HTMLNode('h1');
-
-        if (Page::lang() == 'AR') {
-            $secH->addTextNode('الميزات الأساسية');
-        } else {
-            $secH->addTextNode('Key Features');
-        }
-        $sec->addChild($secH);
-        $ul = new UnorderedList();
-        $ul->addListItems([
-            'Theming and the ability to create multiple UIs for the same web page using any CSS or JavaScript framework.',
-            'Support for routing that makes the ability of creating search-engine-friendly links an easy task.',
-            'Creation of web APIs that supports JSON, data filtering and validation.',
-            'Basic support for MySQL schema and query building.',
-            'Lightweight. The total size of framework core files is less than 3 megabytes.',
-            'Access management by assigning system user a set of privileges.',
-            'The ability to create and manage multiple sessions at once.',
-            'Support for creating and sending nice-looking emails in a simple way by using SMTP protocol.',
-            'Autoloading of user defined classes.',
-            'The ability to create automatic tasks and let them run in specific time using CRON.',
-            'Basic support for logging.',
-            'Well-defined file upload and file handling sub-system.',
-            'Building and manipulating the DOM of a web page using PHP language.',
-            'Basic support for running the framework throgh CLI.'
-        ]);
-        $sec->addChild($ul);
+        
+        //Sets the language of the page. Must be set before loading translation.
+        Page::lang(WebFiori::getWebsiteController()->getSessionLang());
+        //Load language
+        $translation = Page::translation();
+        
+        Page::title($translation->get('pages/sample-page/title'));
+        Page::description($translation->get('pages/sample-page/description'));
+        //adds a paragraph to the body of the page.
+        
+        $mainContentArea = Page::document()->getChildByID('main-content-area');
+        $mainContentArea->section(Page::title())
+                ->paragraph($translation->get('pages/sample-page/question'))
+                ->paragraph($translation->get('pages/sample-page/framework-description'))
+                ->label($translation->get('pages/sample-page/features'))
+                ->ul($translation->get('pages/sample-page/features-list'));
+        
+        //Render the page and display the result
         Page::render();
     }
 }

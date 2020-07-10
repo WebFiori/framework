@@ -318,12 +318,18 @@ class Language {
      * @param string $dir A string that looks like a 
      * directory. 
      * @param array $arr An associative array. The key will act as the variable 
-     * name and the value of the key will act as the variable value.
+     * name and the value of the key will act as the variable value. The value 
+     * can be a sub associative array of labels or simple strings.
      * @since 1.0
      */
     public function setMultiple($dir,$arr = []) {
         foreach ($arr as $k => $v) {
-            $this->set($dir, $k, $v);
+            if (gettype($v) == 'array') {
+                $this->createDirectory($dir.'/'.$k);
+                $this->setMultiple($dir.'/'.$k, $v);
+            } else {
+                $this->set($dir, $k, $v);
+            }
         }
     }
     /**

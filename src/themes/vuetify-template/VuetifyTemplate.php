@@ -20,7 +20,7 @@ class VuetifyTemplate extends Theme {
         $this->setName('Vuetify Template');
         $this->setAuthor('Ibrahim BinAlshikh');
         $this->setLicenseName('MIT');
-         $this->setJsDirName('js');
+        $this->setJsDirName('js');
         $this->setImagesDirName('img');
         $this->setBeforeLoaded(function()
         {

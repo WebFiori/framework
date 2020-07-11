@@ -87,17 +87,13 @@ If you plan to test the framework on your local machine, you have to download AM
 We suggest to use the ones that are offered by Bitnami. You can go to https://bitnami.com/stacks/infrastructure to check 
 the available options.
 
-Once downloaded and installed, download the latest release of the framework from https://webfiori.com/download. 
-After downloading, extract all files inside the folder '/htdocs'. The folder will be inside the place where you installed AMP
-stack.
+After installing AMP stack, you can ethier use composer to install the framework or download it throgh https://webfiori.com/download. If you plan to use composer, then you must first download it from their website: https://getcomposer.org/download/. Once downloaded, place the `.phar` file in the folder `htdocs` or your server root. Once you do that, run the terminal in `htdocs` and run the following command: 
 
-Another option is to use composer to install the framework. Simply, add following entry in your `composer.json` to download the framework and the packages that it depends on:
-``` json
-"require": {
-    "webfiori/framework":"*"
-}
 ```
-Once added, run composer and it should install everything.
+php composer.phar create-project --prefer-dist webfiori/framework my-site
+```
+This command will create new folder with the name `my-site` and install the framework inside it. 
+
 
 ## Notes
 * This project is a hoppy project. 

@@ -524,7 +524,7 @@ class WebFiori {
                     $routeType = Router::VIEW_ROUTE;
                 }
 
-                if ($routeType == Router::API_ROUTE) {
+                if ($routeType == Router::API_ROUTE || defined('API_CALL')) {
                     $j = new JsonX([
                         'message' => '500 - Server Error: Uncaught Exception.',
                         'type' => 'error',
@@ -594,13 +594,11 @@ class WebFiori {
                         'line' => $error["line"]
                     ], true);
                     die($j);
+                } else if ($isCli) {
+                    CLI::displayErr($error['type'], $error["message"], $error["file"], $error["line"]);
                 } else {
-                    if ($isCli) {
-                        CLI::displayErr($error['type'], $error["message"], $error["file"], $error["line"]);
-                    } else {
-                        $errPage = new ServerErrView($error);
-                        $errPage->show(500);
-                    }
+                    $errPage = new ServerErrView($error);
+                    $errPage->show(500);
                 }
             }
         });

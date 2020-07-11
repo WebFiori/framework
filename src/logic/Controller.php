@@ -760,7 +760,8 @@ class Controller {
         self::$DbErrDetails = [
             'error-message' => $errMessage,
             'error-code' => $errCode,
-            'controller' => get_class($this)
+            'controller' => get_class($this),
+            'query' => ''
         ];
     }
     /**

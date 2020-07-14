@@ -28,6 +28,7 @@ use phpStructs\html\HTMLNode;
 use Throwable;
 use webfiori\entity\Page;
 use webfiori\entity\Util;
+use webfiori\WebFiori;
 /**
  * A page which is used to display exception information when it is thrown or 
  * any other errors.
@@ -139,9 +140,19 @@ class ServerErrView {
         }
         echo '</body></html>';
     }
+    private function _getSiteName() {
+        $siteNames = WebFiori::getSiteConfig()->getWebsiteNames();
+        $currentLang = WebFiori::getSysController()->getSessionLang();
+        if (isset($siteNames[$currentLang])) {
+            return $siteNames[$currentLang];
+        }
+        return '';
+    }
     private function _phpStructsExist($throwableOrErr) {
         Page::reset();
         Page::title('Uncaught Exception');
+        Page::siteName($this->_getSiteName());
+        Page::separator(WebFiori::getSiteConfig()->getTitleSep());
         Page::document()->getHeadNode()->addCSS(Util::getBaseURL().'assets/css/server-err.css',[],false);
         $hNode = new HTMLNode('h1');
 

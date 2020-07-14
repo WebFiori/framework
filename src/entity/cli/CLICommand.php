@@ -470,7 +470,8 @@ abstract class CLICommand {
      * @param string $prompt The string that will be shown to the user. The 
      * string must be non-empty.
      * @param string $default An optional default value to use in case the user 
-     * hit "Enter" without entering any value.
+     * hit "Enter" without entering any value. If null is passed, no default 
+     * value will be set.
      * @param callable $validator A callback that can be used to validate user 
      * input. The callback accepts one parameter which is the value that 
      * the user has given. If the value is valid, the callback must return true. 
@@ -506,6 +507,15 @@ abstract class CLICommand {
             } while (true);
         }
     }
+    /**
+     * Validate user input and show error message if user input is invalid.
+     * @param type $input
+     * @param type $validator
+     * @param type $default
+     * @return array The method will return an array with two indices, 'valid' and 
+     * 'value'. The 'valid' index contains a boolean that is set to true if the 
+     * value is valid. The index 'value' will contain the passed value.
+     */
     private function getInputHelper($input, $validator, $default) {
         $retVal = [
             'valid' => true,
@@ -513,19 +523,16 @@ abstract class CLICommand {
         ];
         if (strlen($input) == 0 && $default !== null) {
             $retVal['value'] = $default;
-            return $retVal;
         } else if (is_callable($validator)) {
-            $retVal['value'] = $input;
             $retVal['valid'] = call_user_func_array($validator, [$input]);
 
             if ($retVal['valid'] === true) {
-                return $input;
+                
             } else {
                 $this->error('Invalid input is given. Try again.');
             }
-        } else {
-            return $retVal;
         }
+        return $retVal;
     }
     /**
      * Returns the name of the command.

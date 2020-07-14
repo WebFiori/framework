@@ -51,7 +51,7 @@ class CreateCommand extends CLICommand {
                 . 'database table.',
                 'optional' => true,
                 'values' => [
-                    'e','t'
+                    'e','t','c'
                 ]
             ],
             '--query-class' => [
@@ -184,6 +184,8 @@ class CreateCommand extends CLICommand {
                 $this->_createEntityFromQuery();
             } else if ($what == 't') {
                 $this->_createDbTable();
+            } else if ($what == 'c') {
+                $this->_createController();
             }
         } else {
             $options = [
@@ -348,10 +350,28 @@ class CreateCommand extends CLICommand {
         } while ($addMore);
     }
     private function _createController() {
+        
+        $linkedQuery = $this->getArgValue('--query-class');
+        if ($linkedQuery !== null) {
+            if (!class_exists($linkedQuery)) {
+                $this->error('No class was found which has the name "'.$linkedQuery.'".');
+                $linkedQuery = null;
+            } else {
+                $inst = new $linkedQuery();
+                if (!($inst instanceof MySQLQuery)) {
+                    $this->error('The class "'.$linkedQuery.'" is not of type "phMysql\MySQLQuery".');
+                    $linkedQuery = null;
+                }
+            }
+        }
+        
         $classInfo = $this->getClassInfo();
-
-        if ($this->confirm('Would you like to associate the controller with query class?', false)) {
-            $classInfo['linked-query'] = $this->_getControllerQuery();
+        $classInfo['linked-query'] = $linkedQuery;
+        
+        if ($classInfo['linked-query'] === null) {
+            if ($this->confirm('Would you like to associate the controller with query class?', false)) {
+                $classInfo['linked-query'] = $this->_getControllerQuery();
+            }
         }
         $dbConnections = array_keys(WebFiori::getConfig()->getDBConnections());
 
@@ -459,6 +479,10 @@ class CreateCommand extends CLICommand {
 
         return $fixedPath;
     }
+    /**
+     * 
+     * @return string The name of the query class with its namespace.
+     */
     private function _getControllerQuery() {
         $validQuery = false;
         $queryName = '';
@@ -469,7 +493,7 @@ class CreateCommand extends CLICommand {
                 $queryObj = new $queryName();
 
                 if (!($queryObj instanceof MySQLQuery)) {
-                    $this->error('Given object is not an instance of the class MySQLQuery.');
+                    $this->error('Given class is not of type "phMysql/MySQLQuery".');
                 } else {
                     $validQuery = true;
                 }

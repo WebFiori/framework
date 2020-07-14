@@ -77,7 +77,13 @@ class CreateCommand extends CLICommand {
             }
 
             if ($refQuery instanceof MySQLQuery) {
-                $fkName = $this->getInput('Enter a name for the foreign key:');
+                $fkName = $this->getInput('Enter a name for the foreign key:', null, function ($val) {
+                    $trimmed = trim($val);
+                    if (strlen($trimmed) == 0) {
+                        return false;
+                    }
+                    return true;
+                });
                 $fkCols = $this->_getFkCols($query);
                 $fkArr = [];
 

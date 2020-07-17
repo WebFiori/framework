@@ -522,14 +522,15 @@ class AutoLoader {
             $cacheArr = explode("\n", $casheStr);
 
             foreach ($cacheArr as $ca) {
-                $exploded = explode('=>', $ca);
-
-                if (isset($this->casheArr[$exploded[1]])) {
-                    $this->casheArr[$exploded[1]][] = $exploded[0];
-                } else {
-                    $this->casheArr[$exploded[1]] = [
-                        $exploded[0]
-                    ];
+                if (strlen(trim($ca)) !== 0) {
+                    $exploded = explode('=>', $ca);
+                    if (isset($this->casheArr[$exploded[1]])) {
+                        $this->casheArr[$exploded[1]][] = $exploded[0];
+                    } else {
+                        $this->casheArr[$exploded[1]] = [
+                            $exploded[0]
+                        ];
+                    }
                 }
             }
         }

@@ -31,20 +31,10 @@ use webfiori\conf\SiteConfig;
 use webfiori\entity\exceptions\SessionException;
 /**
  * A helper class to manage system sessions.
- * 
  * @author Ibrahim 
- * 
- * @version 1.8.8
+ * @version 1.8.7
  */
 class SessionManager implements JsonI {
-    /**
-     * An array that holds session cookie parameters.
-     * 
-     * @var array
-     * 
-     * @since 1.8.8 
-     */
-    private $sessionCookieParams;
     /**
      * The default lifetime for any new session (in minutes).
      * @version 1.8.4
@@ -201,7 +191,7 @@ class SessionManager implements JsonI {
      * @since 1.0
      */
     public function __construct($session_name = 'pa-seesion') {
-        $this->sessionCookieParams = [];
+
         //used to support older PHP versions which does not have 'random_int'.
         self::$randFunc = is_callable('random_int') ? 'random_int' : 'rand';
 
@@ -285,25 +275,6 @@ class SessionManager implements JsonI {
         }
 
         return $retVal;
-    }
-    /**
-     * Returns an associative array that contains session cookie parameters.
-     * 
-     * @return array The returned array will be associative and will have the 
-     * following indices:
-     * <ul>
-     * <li>lifetime</li>
-     * <li>path</li>
-     * <li>domain</li>
-     * <li>secure</li>
-     * <li>httponly</li>
-     * <li>samesite</li>
-     * </ul>
-     * 
-     * @since 1.8.8
-     */
-    public function getCookieParams() {
-        return $this->sessionCookieParams;
     }
     /**
      * Returns session language code.
@@ -620,6 +591,7 @@ class SessionManager implements JsonI {
      */
     public function initSession($refresh = false,$useDefaultLang = true) {
         $retVal = false;
+
         if (!$this->_switchToSession()) {
             if (!$this->resume()) {
                 $minutesLifeTime = $this->getLifetime();
@@ -1071,42 +1043,26 @@ class SessionManager implements JsonI {
         $path = isset($params['path']) ? $params['path'] : '/';
         $_SESSION = [];
         session_destroy();
-        $this->_setCookieParams();
-        $this->sessionStatus = self::KILLED;
-    }
-    /**
-     * Closes the session and set session cookie parameters.
-     */
-    private function _setCookieParams() {
-        if (session_status() == PHP_SESSION_ACTIVE) {
-            session_write_close();
-        }
-        if (count($this->getCookieParams()) == 0) {
-            $this->sessionCookieParams = [
-                'lifetime' => 60,
-                'path' => '/',
-                'domain' => trim(filter_var($_SERVER['HTTP_HOST']),'/'),
-                'secure' => true,
-                'httponly' => true,
-                'SameSite' => 'Lax'
-            ];
-        }
         if (PHP_VERSION_ID < 70300) {
-            session_set_cookie_params(
-            $this->getCookieParams()['lifetime'], 
-            $this->getCookieParams()['path'].';SameSite='.$this->getCookieParams()['SameSite'], 
-            $this->getCookieParams(['domain'], 
-            $this->getCookieParams()['secure'], 
-            $this->getCookieParams()['httponly']));
+            session_set_cookie_params(0, $path.'; sameSite=Lax', $params['domain'], $secure, $httponly);
         } else {
-            session_set_cookie_params($this->getCookieParams());
+            session_set_cookie_params([
+                'lifetime' => 0,
+                'path' => $path,
+                'domain' => $params['domain'],
+                'secure' => $secure,
+                'httponly' => $httponly,
+                'sameSite' => 'Lax'
+            ]);
         }
+        $this->sessionStatus = self::KILLED;
     }
     private function _setLifetimeHelper($time) {
         $this->lifeTime = $time;
         $_SESSION[self::$SV][self::MAIN_VARS[0]] = $time;
 
         $params = session_get_cookie_params();
+        session_write_close();
 
         if (isset($params['secure'])) {
             $secure = $params['secure'];
@@ -1120,15 +1076,19 @@ class SessionManager implements JsonI {
             $httponly = false;
         }
         $path = isset($params['path']) ? $params['path'] : '/';
-        $this->sessionCookieParams = [
-            'lifetime' => time() + $this->getLifetime() * 60,
-            'path' => $path,
-            'domain' => $params['domain'],
-            'secure' => $secure,
-            'httponly' => $httponly,
-            'SameSite' => 'Lax'
-        ];
-        $this->_setCookieParams();
+        if (PHP_VERSION_ID < 70300) {
+            session_set_cookie_params(time() + $this->getLifetime() * 60, $path.'; sameSite=Lax', $params['domain'], $secure, $httponly);
+        } else {
+            session_set_cookie_params([
+                'lifetime' => time() + $this->getLifetime() * 60,
+                'path' => $path,
+                'domain' => $params['domain'],
+                'secure' => $secure,
+                'httponly' => $httponly,
+                'samesite' => 'Lax'
+            ]);
+        }
+        
         $this->_switchToSession();
 
         $retVal = true;
@@ -1172,16 +1132,7 @@ class SessionManager implements JsonI {
             if ($this->isRefresh()) {
                 //refresh time till session cookie is dead
                 $params = session_get_cookie_params();
-                $this->sessionCookieParams = [
-                    'lifetime' => time() + $sessionTime,
-                    'path' => $params['path'],
-                    'domain' => $params['domain'],
-                    'secure' => $params['secure'],
-                    'httponly' => isset($params['httponly']) ? $params['httponly'] : true,
-                    'SameSite' => 'Lax'
-                ];
-                $this->_setCookieParams();
-                session_start();
+                setcookie($this->getName(), $this->getID(),time() + $sessionTime, $params['path'], $params['domain'], $params['secure'], isset($params['httponly']));
                 $this->setUser($this->getUser());
             }
             $retVal = true;
@@ -1212,15 +1163,7 @@ class SessionManager implements JsonI {
         }
         session_name($this->getName());
         session_id($this->sId);
-        $this->sessionCookieParams = [
-            'lifetime' => $lifeTime * 60,
-            'path' => '/',
-            'domain' => trim(filter_var($_SERVER['HTTP_HOST']),'/'),
-            'secure' => true,
-            'httponly' => true,
-            'SameSite' => 'Lax'
-        ];
-        $this->_setCookieParams();
+        session_set_cookie_params($lifeTime * 60,"/; sameSite=Lax");
         $started = session_start();
 
         if ($started) {

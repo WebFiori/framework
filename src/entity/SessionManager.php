@@ -268,6 +268,12 @@ class SessionManager implements JsonI {
             'httponly' => true,
             'samesite' => 'Lax'
         ];
+        ini_set('session.gc_maxlifetime', self::MAX_LIFETIME*60);
+        ini_set('session.cookie_lifetime', self::MAX_LIFETIME*60);
+        ini_set('session.use_cookies', 1);
+        if (PHP_VERSION_ID >= 70300) { 
+            ini_set('session.cookie_samesite', $this->cookieParams['samesite']);
+        }
     }
     /**
      * Returns a JSON string that represents the session.
@@ -934,7 +940,6 @@ class SessionManager implements JsonI {
 
         if ($this->hasCookie()) {
             session_name($this->getName());
-            ini_set('session.use_cookies', 1);
             $sid = $this->getSessionIDFromRequest();
             if ($sid !== false) {
                 session_id($sid);
@@ -1347,12 +1352,7 @@ class SessionManager implements JsonI {
      */
     private function _start($refresh,$lifeTime,$useDefaultLang = false) {
         $this->sessionStatus = self::NEW_SESSION;
-        ini_set('session.gc_maxlifetime', $lifeTime * 60);
-        ini_set('session.cookie_lifetime', $lifeTime * 60);
-        ini_set('session.use_cookies', 1);
-        if (PHP_VERSION_ID >= 70300) { 
-            ini_set('session.cookie_samesite', 'Lax');
-        }
+        
         session_name($this->getName());
         session_id($this->sId);
         $this->cookieParams['lifetime'] = $lifeTime * 60;

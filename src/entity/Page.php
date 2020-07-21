@@ -576,14 +576,11 @@ class Page {
                     Page::lang(SiteConfig::getPrimaryLanguage());
                 }
                 $translation = Page::translation();
-                $jsonx = new JsonX([
-                    'vars' => $translation->getLanguageVars()
-                ]);
-                Page::get()->document()
-                        ->getHeadNode()
-                        ->addChild('script', [
-                            'type' => 'text/javascript'
-                        ], false)->text('window.i18n = '.$jsonx.';');
+                $jsonx = new JsonX();
+                $jsonx->addArray('vars', $translation->getLanguageVars(), true);
+                $i18nJs = new HTMLNode('script');
+                $i18nJs->setAttribute('type', 'text/javascript')->text('window.i18n = '.$jsonx.';');
+                Page::get()->document()->getHeadNode()->addChild($i18nJs);
             }
         ];
         $this->setTitle('Hello World');

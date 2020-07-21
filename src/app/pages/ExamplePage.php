@@ -51,9 +51,9 @@ class ExamplePage {
         $mainContentArea = Page::document()->getChildByID('main-content-area');
         $mainContentArea->section(Page::title())
                 ->paragraph($translation->get('pages/sample-page/question'))
-                ->paragraph($translation->get('pages/sample-page/framework-description'))
+                ->paragraph($translation->get('pages/sample-page/frameworkDescription'))
                 ->label($translation->get('pages/sample-page/features'))
-                ->ul($translation->get('pages/sample-page/features-list'));
+                ->ul($translation->get('pages/sample-page/featuresList'));
         
         //Render the page and display the result
         Page::render();

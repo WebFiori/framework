@@ -26,6 +26,7 @@ namespace webfiori\examples\views;
 
 use webfiori\entity\Page;
 use webfiori\WebFiori;
+use phpStructs\html\HTMLNode;
 
 class ExamplePage {
     public function __construct() {
@@ -49,11 +50,10 @@ class ExamplePage {
         //adds a paragraph to the body of the page.
         
         $mainContentArea = Page::document()->getChildByID('main-content-area');
-        $mainContentArea->section(Page::title())
-                ->paragraph($translation->get('pages/sample-page/question'))
-                ->paragraph($translation->get('pages/sample-page/frameworkDescription'))
-                ->label($translation->get('pages/sample-page/features'))
-                ->ul($translation->get('pages/sample-page/featuresList'));
+        
+        $templateDir = ROOT_DIR.DS.'app'.DS.'pages'.DS.'example-template.html';
+        $mainContentArea->component($templateDir, $translation->get('pages/sample-page'));
+        
         
         //Render the page and display the result
         Page::render();

@@ -23,7 +23,9 @@
  * THE SOFTWARE.
  */
 namespace webfiori;
-
+ini_set('display_startup_errors', 1);
+        ini_set('display_errors', 1);
+        error_reporting(-1);
 use jsonx\JsonX;
 use webfiori\conf\Config;
 use webfiori\conf\MailConfig;
@@ -138,8 +140,24 @@ class WebFiori {
             mb_http_input($encoding);
             mb_regex_encoding($encoding);
         }
+        /**
+         * The root directory that is used to load all other required system files.
+         */
+        if (!defined('ROOT_DIR')) {
+            $publicFolder = DIRECTORY_SEPARATOR.'public';
+            
+            if (substr(__DIR__, strlen(__DIR__) - strlen($publicFolder)) == $publicFolder) {
+                //HTTP run
+                define('ROOT_DIR', substr(__DIR__,0, strlen(__DIR__) - strlen(DIRECTORY_SEPARATOR.'public')));
+            } else {
+                //CLI run
+                define('ROOT_DIR', __DIR__);
+            }
+        }
         
-        require_once __DIR__.DIRECTORY_SEPARATOR.'ini'.DIRECTORY_SEPARATOR.'GlobalConstants.php';
+        if (!class_exists('webfiori\ini\GlobalConstants')) {
+            require_once ROOT_DIR.DIRECTORY_SEPARATOR.'ini'.DIRECTORY_SEPARATOR.'GlobalConstants.php';
+        }
         GlobalConstants::defineConstants();
         
         /**
@@ -151,12 +169,7 @@ class WebFiori {
          * Change this as needed.
          */
         date_default_timezone_set(DATE_TIMEZONE);
-        /**
-         * The root directory that is used to load all other required system files.
-         */
-        if (!defined('ROOT_DIR')) {
-            define('ROOT_DIR',__DIR__);
-        }
+        
 
         
 

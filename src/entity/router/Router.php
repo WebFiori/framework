@@ -76,7 +76,7 @@ class Router {
      * should be created.
      * @since 1.0
      */
-    const API_ROUTE = DIRECTORY_SEPARATOR.'apis';
+    const API_ROUTE = DS.'app'.DS.'apis';
     /**
      * A constant that represents closure route. The value of the 
      * constant is 'func'.
@@ -87,13 +87,13 @@ class Router {
      * A constant for custom directory route.
      * @since 1.0
      */
-    const CUSTOMIZED = DIRECTORY_SEPARATOR;
+    const CUSTOMIZED = DS;
     /**
      * A constant that represents view route. It is simply the root directory where web 
      * pages should be created.
      * @since 1.0
      */
-    const VIEW_ROUTE = DIRECTORY_SEPARATOR.'pages';
+    const VIEW_ROUTE = DS.'app'.DS.'pages';
     /**
      *
      * @var type 

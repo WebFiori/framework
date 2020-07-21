@@ -1,10 +1,10 @@
 Options -Indexes
-#<IfModule mod_rewrite.c>
+<IfModule mod_rewrite.c>
     RewriteEngine on
     
-    # Uncomment next two lines to redirect http to https
-    #RewriteCond %{SERVER_PORT} 80
-    #RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [R,L]  
+    # Redirect http to https
+    RewriteCond %{SERVER_PORT} 80
+    RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [R,L]  
 
     # Send all trafic to framework seed and make your work bloom.
     RewriteCond %{REQUEST_FILENAME} !-f
@@ -18,7 +18,7 @@ Options -Indexes
     # Ones which are not here are public.
     # Add your own here.
     RewriteRule ^(vendor|apis|conf|entity|ini|logic|logs|pages) - [F,L]
-#</IfModule>
+</IfModule>
 <FilesMatch "\.(?:log|cache|config|sh|bat)$">
     # Deny access to any file with given extension.
     # Include your own at the top.

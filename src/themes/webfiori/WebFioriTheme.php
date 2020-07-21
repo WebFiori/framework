@@ -285,7 +285,7 @@ class WebFioriTheme extends Theme {
         $socialMedia->setWritingDir(Page::dir());
 
         $facebookIcon = new HTMLNode('img', false);
-        $facebookIcon->setAttribute('src', Page::imagesDir().'/facebook.png');
+        $facebookIcon->setAttribute('src', 'facebook.png');
         $facebookIcon->setClassName('social-media-icon');
         $facebookLink = new HTMLNode('a');
         $facebookLink->setAttribute('href', '');
@@ -294,7 +294,7 @@ class WebFioriTheme extends Theme {
         
 
         $twtrIcon = new HTMLNode('img', false);
-        $twtrIcon->setAttribute('src', Page::imagesDir().'/tweeter.png');
+        $twtrIcon->setAttribute('src', 'tweeter.png');
         $twtrIcon->setClassName('social-media-icon');
         $twtrLink = new HTMLNode('a');
         $twtrLink->setAttribute('href', '');
@@ -303,7 +303,7 @@ class WebFioriTheme extends Theme {
         
 
         $linkedinIcon = new HTMLNode('img', false);
-        $linkedinIcon->setAttribute('src', Page::imagesDir().'/linkedin.png');
+        $linkedinIcon->setAttribute('src', 'linkedin.png');
         $linkedinIcon->setClassName('social-media-icon');
         $linkedinLink = new HTMLNode('a');
         $linkedinLink->setAttribute('href', '');
@@ -312,7 +312,7 @@ class WebFioriTheme extends Theme {
         
 
         $snapIcon = new HTMLNode('img', false);
-        $snapIcon->setAttribute('src', Page::imagesDir().'/snapchat.png');
+        $snapIcon->setAttribute('src', 'snapchat.png');
         $snapIcon->setClassName('social-media-icon');
         $snapLink = new HTMLNode('a');
         $snapLink->setAttribute('href', '');
@@ -345,10 +345,10 @@ class WebFioriTheme extends Theme {
     public function getHeadNode() {
         $headTag = new HeadNode();
         $headTag->setBase(SiteConfig::getBaseURL());
-        $headTag->addLink('icon', Page::imagesDir().'/favicon.png');
-        $headTag->addCSS(Page::cssDir().'/Grid.css');
-        $headTag->addCSS(Page::cssDir().'/colors.css');
-        $headTag->addCSS(Page::cssDir().'/theme.css');
+        $headTag->addLink('icon', 'favicon.png');
+        $headTag->addCSS('Grid.css');
+        $headTag->addCSS('colors.css');
+        $headTag->addCSS('theme.css');
         $headTag->addMeta('robots', 'index, follow');
 
         return $headTag;
@@ -360,7 +360,7 @@ class WebFioriTheme extends Theme {
         $logoContainer->setID('inner-header');
         $logoContainer->setClassName('wf-'.Page::dir().'-col-11-nm-np');
         $img = new HTMLNode('img', false);
-        $img->setAttribute('src',Page::imagesDir().'/favicon.png');
+        $img->setAttribute('src','favicon.png');
         $img->setClassName('wf-'.Page::dir().'-col-1-np-nm');
         $img->setID('logo');
         $img->setWritingDir(Page::dir());

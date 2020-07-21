@@ -161,7 +161,7 @@ class File implements JsonI {
         'log' => 'text/plain',
         'ini' => 'text/plain',
         'css' => 'text/css',
-        'js' => 'application/javascript',
+        'js' => 'text/javascript',
         'asm' => 'text/x-asm',
         'java' => 'text/x-java-source',
         'htaccess' => 'application/x-extension-htaccess',

@@ -44,7 +44,7 @@ class VuetifyTheme extends Theme {
             Page::document()->removeChild($footerSec);
             $topDiv->addChild($footerSec)->addChild($headerSec)->addChild($bodySec);
             Page::document()->getBody()->addChild($topDiv);
-            Page::document()->getChildByID('main-content-area')->setNodeName('v-content');
+            Page::document()->getChildByID('main-content-area')->setNodeName('v-main');
             Page::document()->getChildByID('main-content-area')->setAttribute('app');
 
             //initialize vue before the page is rendered.

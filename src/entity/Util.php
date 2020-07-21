@@ -568,8 +568,11 @@ class Util {
             $toOutput = '<pre>'. $htmlEntityAdded .'</pre>';
             if ($asMessageBox === true) {
                 $messageBox = new MessageBox();
-                $messageBox->getBody()->addTextNode($toOutput,false);
-                echo $messageBox;
+                //If body is null, we reached max number of boxes.
+                if ($messageBox->getBody() !== null) {
+                    $messageBox->getBody()->addTextNode($toOutput,false);
+                    echo $messageBox;
+                }
             } else {
                 echo $toOutput;
             }

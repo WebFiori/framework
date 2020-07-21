@@ -68,7 +68,7 @@ class ThemeLoader {
             self::$AvailableThemes = [];
             $DS = DIRECTORY_SEPARATOR;
             $themesDirs = array_diff(scandir(THEMES_PATH), ['..', '.']);
-
+            
             foreach ($themesDirs as $dir) {
                 $pathToScan = THEMES_PATH.$DS.$dir;
                 $filesInDir = array_diff(scandir($pathToScan), ['..', '.']);
@@ -135,7 +135,6 @@ class ThemeLoader {
                 throw new NoSuchThemeException('No such theme: \''.$themeName.'\'.');
             }
         }
-
         if (isset($themeToLoad)) {
             $themeToLoad->invokeBeforeLoaded();
 
@@ -182,10 +181,9 @@ class ThemeLoader {
             if ($fileExt == '.php') {
                 $cName = str_replace('.php', '', $fileName);
                 $ns = require_once $pathToScan.DIRECTORY_SEPARATOR.$fileName;
-                $aNs = $ns != 1 ? $ns.'\\' : '';
+                $aNs = gettype($ns) == 'string' ? $ns.'\\' : '\\';
                 $aCName = $aNs.$cName;
-
-                if (class_exists($aCName)) {
+                if (!AutoLoader::isLoaded($aCName) && class_exists($aCName)) {
                     $instance = new $aCName();
 
                     if ($instance instanceof Theme) {

@@ -28,7 +28,7 @@ function execJob(source,jobName){
     window.isRefresh = false;
     disableOrEnableInputs();     
     source.innerHTML = 'Executing Job...';
-    var ajax = new AJAX({
+    var ajax = new AJAXRequest({
         method:'post',
         url:'cron/apis/force-execution'
     });

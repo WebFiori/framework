@@ -95,7 +95,7 @@ class CronView {
                 .'     },60000)'."\n"
                 .' };'."\n"
                 );
-        Page::document()->getHeadNode()->addJs('https://cdn.jsdelivr.net/gh/usernane/ajax@1.0.2/AJAX.js', [], false);
+        Page::document()->getHeadNode()->addJs('https://cdn.jsdelivr.net/gh/usernane/AJAXRequestJs@1.1.0/AJAXRequest.js', [], false);
         Page::document()->getHeadNode()->addJs('assets/js/cron.js');
         Page::document()->getHeadNode()->addCSS('assets/css/cron.css');
         Page::document()->getHeadNode()->addChild($jsCode);

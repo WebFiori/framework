@@ -33,7 +33,7 @@ use webfiori\WebFiori;
  * A class which has utility methods which are related to themes loading.
  *
  * @author Ibrahim
- * @version 1.0
+ * @version 1.0.1
  */
 class ThemeLoader {
     /**
@@ -145,19 +145,32 @@ class ThemeLoader {
                     require_once $themeDir.DS.$component;
                 }
             }
-            self::createAssetsRoutes($themeDir, $themeToLoad->getJsDirName());
-            self::createAssetsRoutes($themeDir, $themeToLoad->getCssDirName());
-            self::createAssetsRoutes($themeDir, $themeToLoad->getImagesDirName());
+            
             return $themeToLoad;
         }
     }
-    private static function createAssetsRoutes($themeRootDir, $dir) {
-        if (strlen($dir) != 0) {
+    /**
+     * Adds routes to all themes resource files (JavaSecript, CSS and images).
+     * The method will check for themes resources directories if set or not. 
+     * If set, it will scan each directory and add a route to it.
+     * @since 1.0.1
+     */
+    public static function registerResourcesRoutes() {
+        $availableThemes = self::getAvailableThemes();
+        foreach ($availableThemes as $themeObj) {
+            $themeDir = THEMES_PATH.DS.$themeObj->getDirectoryName();
+            self::createAssetsRoutes($themeObj->getDirectoryName(), $themeDir, $themeObj->getJsDirName());
+            self::createAssetsRoutes($themeObj->getDirectoryName(), $themeDir, $themeObj->getCssDirName());
+            self::createAssetsRoutes($themeObj->getDirectoryName(), $themeDir, $themeObj->getImagesDirName());
+        }
+    }
+    private static function createAssetsRoutes($themeDirName, $themeRootDir, $dir) {
+        if (strlen($dir) != 0 && Util::isDirectory($themeRootDir.DS.$dir)) {
             $filesInDir = array_diff(scandir($themeRootDir.DS.$dir), ['.','..']);
             foreach ($filesInDir as $fileName) {
                 Router::addRoute([
                     'path' => $fileName,
-                    'route-to' => $themeRootDir.DS.$fileName
+                    'route-to' => self::THEMES_DIR.DS.$themeDirName.DS.$dir.DS.$fileName
                 ]);
             }
         }

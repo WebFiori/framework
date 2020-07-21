@@ -1,7 +1,7 @@
 <?php
 namespace webfiori\theme\vutifyTheme;
 
-use webfiori\entity\langs\Language;
+use webfiori\entity\i18n\Language;
 /**
  * Description of LangExt
  *

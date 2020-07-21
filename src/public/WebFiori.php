@@ -23,9 +23,6 @@
  * THE SOFTWARE.
  */
 namespace webfiori;
-ini_set('display_startup_errors', 1);
-        ini_set('display_errors', 1);
-        error_reporting(-1);
 use jsonx\JsonX;
 use webfiori\conf\Config;
 use webfiori\conf\MailConfig;
@@ -594,7 +591,7 @@ class WebFiori {
                     return;
                 }
 
-                if (!$isCli) {
+                if (!$isCli && !headers_sent()) {
                     header("HTTP/1.1 500 Server Error");
                 }
 

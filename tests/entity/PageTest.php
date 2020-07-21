@@ -4,7 +4,7 @@ use PHPUnit\Framework\TestCase;
 use webfiori\entity\Page;
 use phpStructs\html\HTMLNode;
 use webfiori\entity\Theme;
-use webfiori\entity\langs\Language;
+use webfiori\entity\i18n\Language;
 use webfiori\conf\SiteConfig;
 /**
  * Description of PageTest

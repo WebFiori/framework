@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-namespace webfiori\entity\langs;
+namespace webfiori\entity\i18n;
 
 /**
  * A class that contain some of the common language labels in Arabic.
@@ -70,8 +70,8 @@ namespace webfiori\entity\langs;
  * </li>
  * <li>general/error: A set of common error messages The errors are:
  * <ul>
- * <li>db-error</li>
- * <li>db-connect-err</li>
+ * <li>dbError</li>
+ * <li>dbConnectErr</li>
  * <li>save</li>
  * <li>remove</li>
  * <li>delete</li>
@@ -185,8 +185,8 @@ class LanguageAR extends Language {
         ]);
 
         $this->createAndSet('general/error', [
-            'db-error' => 'خطأ في قاعدة البيانات.',
-            'db-connect-err' => 'غير قادر على الإتصال بقاعدة البيانات.'
+            'dbError' => 'خطأ في قاعدة البيانات.',
+            'dbConnectErr' => 'غير قادر على الإتصال بقاعدة البيانات.'
         ]);
 
         $this->createAndSet('general/status', [
@@ -260,14 +260,14 @@ class LanguageAR extends Language {
             'title' => 'مثال على صفحة',
             'description' => 'هذه الصفحة هي مثال اساسي يظهر صريقة استخدام إطار البرمجة.',
             'question' => 'ما هو إطار برمجة ويب فيوري؟',
-            'framework-description' => 'إطار برمجة ويب فيوري هو اطار برمجة يستخدم في بناء '
+            'frameworkDescription' => 'إطار برمجة ويب فيوري هو اطار برمجة يستخدم في بناء '
                      .'تطبيقات الشبكة بإستخدام لغة برمجة بي إتش بي .'
                      .'الإطار بالكامل كائني التوجه و يسمح بإستخدام هيكلة ال MVC '
                      .'لكنه لا يجبر المطور على استخدامها. الإطار يأتي مع العديد من الميزات '
                      .'اللتي تُساعد مطور الشبكة على بناء المواقع الإلكترونية او '
                      .'طبيقات الشبكة بشكل سريع.',
             'features' => 'الميزات الأساسية:',
-            'features-list' => [
+            'featuresList' => [
                 'القدرة على إنشاء الثيمات و واجهات المستخدم المتعددة بإستخدام اي اطار برمجة جافاسكربت او سي اس اس.',
                 'دعم التوجيه و اللذي يجعل عملية انشاء روابط متوافقة مع محركات البحث عملية سهلة.',
                 'القدرة علة إنشاء APIs تدعم JSON.',

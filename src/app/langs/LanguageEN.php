@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-namespace webfiori\entity\langs;
+namespace webfiori\entity\i18n;
 
 /**
  * A class that contain some of the common language labels in Arabic.
@@ -70,8 +70,8 @@ namespace webfiori\entity\langs;
  * </li>
  * <li>general/error: A set of common error messages The errors are:
  * <ul>
- * <li>db-error</li>
- * <li>db-connect-err</li>
+ * <li>dbError</li>
+ * <li>dbConnectErr</li>
  * <li>save</li>
  * <li>remove</li>
  * <li>delete</li>
@@ -185,8 +185,8 @@ class LanguageEN extends Language {
         ]);
 
         $this->createAndSet('general/error', [
-            'db-error' => 'Database Error.',
-            'db-connect-err' => 'Unable to connect to database.'
+            'dbError' => 'Database Error.',
+            'dbConnectErr' => 'Unable to connect to database.'
         ]);
 
         $this->createAndSet('general/status', [
@@ -260,14 +260,14 @@ class LanguageEN extends Language {
             'title' => 'Sample Page',
             'description' => 'This is a sample page which is used to show basic usage of the framework.',
             'question' => 'What is WebFiori Framework?',
-            'framework-description' => 'WebFiori Framework is a mini web development framework which is written '
+            'frameworkDescription' => 'WebFiori Framework is a mini web development framework which is written '
                 .'in PHP language. The framework is fully object oriented '
                 .'(OOP). It allows the use of the famous model-view-controller '
                 .'(MVC) model but it does not force it. The framework comes '
                 .'with many features which can help in making your website '
                 .'or web application up and running in no time.',
             'features' => 'Main Features:',
-            'features-list' => [
+            'featuresList' => [
                 'Theming and the ability to create multiple UIs for the same web page using any CSS or JavaScript framework.',
                 'Support for routing that makes the ability of creating search-engine-friendly links an easy task.',
                 'Creation of web APIs that supports JSON, data filtering and validation.',

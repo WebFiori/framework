@@ -28,8 +28,9 @@ use Exception;
 use phpStructs\html\HeadNode;
 use phpStructs\html\HTMLDoc;
 use phpStructs\html\HTMLNode;
+use jsonx\JsonX;
 use webfiori\conf\SiteConfig;
-use webfiori\entity\langs\Language;
+use webfiori\entity\i18n\Language;
 use webfiori\entity\exceptions\UIException;
 /**
  * A class used to initialize view components.
@@ -569,7 +570,22 @@ class Page {
     }
     private function _reset() {
         $this->document = new HTMLDoc();
-        $this->beforeRenderCallbacks = [];
+        $this->beforeRenderCallbacks = [
+            function () {
+                if (Page::lang() === null) {
+                    Page::lang(SiteConfig::getPrimaryLanguage());
+                }
+                $translation = Page::translation();
+                $jsonx = new JsonX([
+                    'vars' => $translation->getLanguageVars()
+                ]);
+                Page::get()->document()
+                        ->getHeadNode()
+                        ->addChild('script', [
+                            'type' => 'text/javascript'
+                        ], false)->text('window.i18n = '.$jsonx.';');
+            }
+        ];
         $this->setTitle('Hello World');
         $this->setWebsiteName('Hello Website');
         $this->setTitleSep('|');

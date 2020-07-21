@@ -28,7 +28,7 @@ use jsonx\JsonI;
 use jsonx\JsonX;
 use restEasy\WebServicesSet;
 use webfiori\logic\Controller;
-use webfiori\entity\langs\Language;
+use webfiori\entity\i18n\Language;
 use webfiori\WebFiori;
 /**
  * An extension for the class 'WebServicesSet' that adds support for multi-language 

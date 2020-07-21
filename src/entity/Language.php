@@ -22,16 +22,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-namespace webfiori\entity\langs;
+namespace webfiori\entity\i18n;
 
 use webfiori\entity\exceptions\MissingLangException;
 /**
  * A class that is can be used to make the application ready for 
- * Internationalization.
+ * Internationalization (i18n).
  * In order to create a language file, the developer must extend this class. 
- * The language class must be added to the namespace 'webfiori/entity/langs' and the name 
+ * The language class must be added to the namespace 'webfiori/entity/i18n' and the name 
  * of language file must be 'LanguageXX.php' where 'XX' are two characters that 
- * represents language code.
+ * represents language code. The directory at which the language file must exist in 
+ * is not important but it is recommended to add them to the folder 'app/langs' 
+ * of the framework.
  * @author Ibrahim
  * @version 1.2.2
  */
@@ -226,11 +228,10 @@ class Language {
         if (isset(self::$loadedLangs[$uLangCode])) {
             return self::$loadedLangs[$uLangCode];
         } else {
-            $langClassName = 'webfiori\entity\langs\Language'.$uLangCode;
+            $langClassName = 'webfiori\entity\i18n\Language'.$uLangCode;
 
             if (class_exists($langClassName)) {
                 $class = new $langClassName();
-
                 if ($class instanceof Language) {
                     if (isset(self::$loadedLangs[$uLangCode])) {
                         return self::$loadedLangs[$uLangCode];

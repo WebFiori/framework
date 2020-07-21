@@ -160,6 +160,15 @@ class GlobalConstants {
              */
             define('CLI_HTTP_HOST', 'example.com');
         }
+        if (!defined('DS')) {
+            /**
+             * Directory separator.
+             * This one is is used as a shorthand instead of using PHP 
+             * constant 'DIRECTORY_SEPARATOR'. The two will have the same value.
+             * @since 1.0
+             */
+            define('DS', DIRECTORY_SEPARATOR);
+        }
         if (!defined('USE_HTTP')) {
             /**
              * Sets the framework to use 'http://' or 'https://' for base URIs.

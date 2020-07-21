@@ -25,7 +25,9 @@
 namespace webfiori\entity;
 
 use webfiori\entity\exceptions\NoSuchThemeException;
+use webfiori\entity\router\Router;
 use webfiori\WebFiori;
+
 
 /**
  * A class which has utility methods which are related to themes loading.
@@ -129,7 +131,6 @@ class ThemeLoader {
 
             if (isset($themes[$themeName])) {
                 $themeToLoad = $themes[$themeName];
-                self::$loadedThemes[$themeName] = $themeToLoad;
             } else {
                 throw new NoSuchThemeException('No such theme: \''.$themeName.'\'.');
             }
@@ -137,16 +138,28 @@ class ThemeLoader {
 
         if (isset($themeToLoad)) {
             $themeToLoad->invokeBeforeLoaded();
-            $ds = DIRECTORY_SEPARATOR;
-            $themeDir = THEMES_PATH.$ds.$themeToLoad->getDirectoryName();
 
+            $themeDir = THEMES_PATH.DS.$themeToLoad->getDirectoryName();
             foreach ($themeToLoad->getComponents() as $component) {
-                if (file_exists($themeDir.$ds.$component)) {
-                    require_once $themeDir.$ds.$component;
+                if (file_exists($themeDir.DS.$component)) {
+                    require_once $themeDir.DS.$component;
                 }
             }
-
+            self::createAssetsRoutes($themeDir, $themeToLoad->getJsDirName());
+            self::createAssetsRoutes($themeDir, $themeToLoad->getCssDirName());
+            self::createAssetsRoutes($themeDir, $themeToLoad->getImagesDirName());
             return $themeToLoad;
+        }
+    }
+    private static function createAssetsRoutes($themeRootDir, $dir) {
+        if (strlen($dir) != 0) {
+            $filesInDir = array_diff(scandir($themeRootDir.DS.$dir), ['.','..']);
+            foreach ($filesInDir as $fileName) {
+                Router::addRoute([
+                    'path' => $fileName,
+                    'route-to' => $themeRootDir.DS.$fileName
+                ]);
+            }
         }
     }
     private static function _scanDir($filesInDir, $pathToScan) {

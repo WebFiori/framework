@@ -1,3 +1,3 @@
 #!/usr/bin/env php
 <?php
-require 'WebFiori.php';
+require 'public\\WebFiori.php';

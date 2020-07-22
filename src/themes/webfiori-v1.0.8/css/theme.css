@@ -4,6 +4,14 @@
 #page-header nav{
     box-shadow: 0 2px 4px -1px rgba(0,0,0,.2),0 4px 5px 0 rgba(0,0,0,.14),0 1px 10px 0 rgba(0,0,0,.12);
 }
+.question-box{
+    margin-bottom: 20px;
+    border-left: 1px solid;
+    padding: 20px;
+}
+a.nav-link{
+    padding-left: 20px !important;
+}
 .page-title{
     width: 90%;
 }
@@ -26,6 +34,7 @@
 }
 #side-content-area{
     background-color: #c1ec9b;
+    background: linear-gradient(90deg, rgba(193,236,155,1) 35%, rgba(255,255,255,0) 100%);
 }
 .block:first-child,
 .method-signator,

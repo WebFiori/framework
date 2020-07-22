@@ -51,6 +51,9 @@ use webfiori\logic\WebsiteController;
  * @since 1.1.0
  */
 define('MICRO_START', microtime(true));
+ini_set('display_startup_errors', 1);
+        ini_set('display_errors', 1);
+        error_reporting(-1);
 /**
  * The instance of this class is used to control basic settings of 
  * the framework. Also, it is the entry point of any request.

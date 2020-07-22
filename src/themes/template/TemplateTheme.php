@@ -60,10 +60,9 @@ class TemplateTheme extends Theme {
 
     public function getHeadNode() {
         $headTag = new HeadNode();
-        //always set base URL to correctly fetch resources
-        $headTag->setBase(SiteConfig::getBaseURL());
-        $headTag->addCSS(Page::cssDir().'/cssFile.css');
-        $headTag->addJs(Page::jsDir().'/jsFile.js');
+        //Add head tag tags here as needed.
+        //Note that you don't have to add CSS and JS files of the theme as 
+        //They will be added automatically for you.
 
         return $headTag;
     }

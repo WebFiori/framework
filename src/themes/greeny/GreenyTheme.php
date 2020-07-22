@@ -88,9 +88,6 @@ class GreenyTheme extends Theme {
         if (isset(SiteConfig::getWebsiteNames()[$lang])) {
             Page::siteName(SiteConfig::getWebsiteNames()[$lang]);
         }
-        $headTag->addCSS(Page::cssDir().'/Grid.css');
-        $headTag->addCSS(Page::cssDir().'/colors.css');
-        $headTag->addCSS(Page::cssDir().'/theme-specific.css');
         $headTag->addMeta('robots', 'index, follow');
 
         return $headTag;

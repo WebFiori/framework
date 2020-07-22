@@ -33,6 +33,17 @@ class WebFioriV108 extends Theme {
                 'height' => '10px'
             ]);
             Page::document()->getChildByID('main-content-area')->setClassName('col-10 p-5');
+            $img = new HTMLNode('img');
+            $img->setAttribute('src','assets/images/favicon.png');
+            $img->setStyle([
+                'background-position' => 'left',
+                'opacity' => '0.3',
+                'position' => 'fixed',
+                'top' => 0,
+                'left' => '50px',
+                'z-index' => -1,
+            ]);
+            Page::document()->getBody()->addChild($img);
         });
     }
 
@@ -233,11 +244,11 @@ class WebFioriV108 extends Theme {
         $footerLinksUl->getChild(2)->setClassName('nav-item ml-3');
         $footer->addChild($footerLinksUl);
         $powerdByNode = new HTMLNode('p');
-        $powerdByNode->addTextNode('Powered by: <a href="https://programmingacademia.com/webfiori">WebFiori Framework</a> v'.WebFiori::getConfig()->getVersion().'. '
+        $powerdByNode->addTextNode('Powered by: <a href="https://webfiori.com">WebFiori Framework</a> v'.WebFiori::getConfig()->getVersion().'. '
                 .'Code licensed under the <a href="https://opensource.org/licenses/MIT">MIT License</a>.', false);
         $footer->addChild($powerdByNode);
         $img = new HTMLNode('img');
-        $img->setAttribute('src', Page::imagesDir().'/favicon.png');
+        $img->setAttribute('src', 'assets/images/favicon.png');
         $img->setAttribute('alt', 'logo');
         $img->setStyle([
             'height' => '25px'
@@ -251,7 +262,6 @@ class WebFioriV108 extends Theme {
     }
     public function getHeadNode() {
         $head = new HeadNode();
-        $head->addCSS(Page::cssDir().'/theme.css');
         $head->addCSS('https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css',false);
         $head->addJs('https://code.jquery.com/jquery-3.4.1.slim.min.js',false);
         $head->addJs('https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js', false);
@@ -272,7 +282,7 @@ class WebFioriV108 extends Theme {
         ]);
         $logo = new HTMLNode('img');
         $logo->setID('main-logo');
-        $logo->setAttribute('src', Page::imagesDir().'/favicon.png');
+        $logo->setAttribute('src', 'favicon.png');
         $logo->setAttribute('alt', 'logo');
         $logoLink = new Anchor(WebFiori::getSiteConfig()->getHomePage(), $logo->toHTML());
         $logoLink->setClassName('navbar-brand ml-3');

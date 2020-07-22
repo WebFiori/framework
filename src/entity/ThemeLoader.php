@@ -168,7 +168,7 @@ class ThemeLoader {
             $filesInDir = array_diff(scandir($themeRootDir.DS.$dir), ['.','..']);
             foreach ($filesInDir as $fileName) {
                 Router::addRoute([
-                    'path' => $fileName,
+                    'path' => $themeDirName.DS.$fileName,
                     'route-to' => self::THEMES_DIR.DS.$themeDirName.DS.$dir.DS.$fileName
                 ]);
             }

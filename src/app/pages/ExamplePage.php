@@ -25,12 +25,11 @@
 namespace webfiori\examples\views;
 
 use webfiori\entity\Page;
-use webfiori\WebFiori;
-use phpStructs\html\HTMLNode;
 
 class ExamplePage {
     public function __construct() {
-        //load UI components (JS, CSS and others)
+        //load UI components (JS, CSS, ...)
+        //Experement with all themes.
         //it is optional. to use a theme but recomended
         Page::theme('Vuetify Theme');
         //Page::theme('Vuetify Template');
@@ -40,20 +39,17 @@ class ExamplePage {
         //Page::theme('Template Theme');
         //Page::theme('WebFiori Theme');
         
-        //Sets the language of the page. Must be set before loading translation.
-        Page::lang(WebFiori::getWebsiteController()->getSessionLang());
-        //Load language
+        //Load language. Used to make the page i18n compatable.
         $translation = Page::translation();
         
         Page::title($translation->get('pages/sample-page/title'));
         Page::description($translation->get('pages/sample-page/description'));
-        //adds a paragraph to the body of the page.
         
         $mainContentArea = Page::document()->getChildByID('main-content-area');
         
+        //Load HTML component and insert it in the body of the page.
         $templateDir = ROOT_DIR.DS.'app'.DS.'pages'.DS.'example-template.html';
         $mainContentArea->component($templateDir, $translation->get('pages/sample-page'));
-        
         
         //Render the page and display the result
         Page::render();

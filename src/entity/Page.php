@@ -32,6 +32,7 @@ use jsonx\JsonX;
 use webfiori\conf\SiteConfig;
 use webfiori\entity\i18n\Language;
 use webfiori\entity\exceptions\UIException;
+use webfiori\WebFiori;
 /**
  * A class used to initialize view components.
  * This class is one of the core components for creating web pages. It is simply 
@@ -597,52 +598,11 @@ class Page {
     }
     private function _reset() {
         $this->document = new HTMLDoc();
-        $this->beforeRenderCallbacks = [
-            function () {
-                if (Page::lang() === null) {
-                    Page::lang(SiteConfig::getPrimaryLanguage());
-                }
-                $translation = Page::translation();
-                $jsonx = new JsonX();
-                $jsonx->addArray('vars', $translation->getLanguageVars(), true);
-                $i18nJs = new HTMLNode('script');
-                $i18nJs->setAttribute('type', 'text/javascript')->text('window.i18n = '.$jsonx.';');
-                Page::get()->document()->getHeadNode()->addChild($i18nJs);
-                
-                //Load Js and CSS automatically
-                $theme = Page::theme();
-                if ($theme !== null) {
-                    $themeDir = THEMES_PATH.DS.$theme->getDirectoryName();
-                    $jsDir = $themeDir.DS.$theme->getJsDirName();
-                    if (Util::isDirectory($jsDir)) {
-                        $filesInDir = array_diff(scandir($jsDir), ['.','..']);
-                        foreach ($filesInDir as $fileName) {
-                            $expl = explode('.', $fileName);
-                            if (count($expl) == 2 && $expl[1] == 'js') {
-                                Page::get()->document()->getHeadNode()->addJs($theme->getDirectoryName().DS.$fileName);
-                            }
-                        }
-                    }
-                    
-                    $cssDir = $themeDir.DS.$theme->getCssDirName();
-                    if (Util::isDirectory($cssDir)) {
-                        $filesInDir = array_diff(scandir($cssDir), ['.','..']);
-                        foreach ($filesInDir as $fileName) {
-                            $expl = explode('.', $fileName);
-                            if (count($expl) == 2 && $expl[1] == 'css') {
-                                Page::get()->document()->getHeadNode()->addCSS($theme->getDirectoryName().DS.$fileName);
-                            }
-                        }
-                    }
-                }
-            }
-        ];
         $this->setTitle('Hello World');
         $this->setWebsiteName('Hello Website');
         $this->setTitleSep('|');
         $this->contentDir = 'ltr';
         $this->description = null;
-        $this->contentLang = null;
         $this->incFooter = true;
         $this->incHeader = true;
         $this->theme = null;
@@ -667,6 +627,52 @@ class Page {
         $footerNode = new HTMLNode();
         $footerNode->setID(self::MAIN_ELEMENTS[4]);
         $this->document->addChild($footerNode);
+        
+        $langCode = WebFiori::getSysController()->getSessionLang();
+        if ($langCode === null) {
+            $langCode = WebFiori::getSiteConfig()->getPrimaryLanguage();
+        }
+        $this->contentLang = $langCode;
+        $this->usingLanguage();
+ 
+        $this->beforeRenderParams = [
+            0 => []
+        ];
+        $this->beforeRenderCallbacks = [function () {
+            $translation = Page::translation();
+            $jsonx = new JsonX();
+            $jsonx->addArray('vars', $translation->getLanguageVars(), true);
+            $i18nJs = new HTMLNode('script');
+            $i18nJs->setAttribute('type', 'text/javascript')->text('window.i18n = '.$jsonx.';');
+            Page::get()->document()->getHeadNode()->addChild($i18nJs);
+
+            //Load Js and CSS automatically
+            $theme = Page::theme();
+            if ($theme !== null) {
+                $themeDir = THEMES_PATH.DS.$theme->getDirectoryName();
+                $jsDir = $themeDir.DS.$theme->getJsDirName();
+                if (Util::isDirectory($jsDir)) {
+                    $filesInDir = array_diff(scandir($jsDir), ['.','..']);
+                    foreach ($filesInDir as $fileName) {
+                        $expl = explode('.', $fileName);
+                        if (count($expl) == 2 && $expl[1] == 'js') {
+                            Page::get()->document()->getHeadNode()->addJs($theme->getDirectoryName().DS.$fileName);
+                        }
+                    }
+                }
+
+                $cssDir = $themeDir.DS.$theme->getCssDirName();
+                if (Util::isDirectory($cssDir)) {
+                    $filesInDir = array_diff(scandir($cssDir), ['.','..']);
+                    foreach ($filesInDir as $fileName) {
+                        $expl = explode('.', $fileName);
+                        if (count($expl) == 2 && $expl[1] == 'css') {
+                            Page::get()->document()->getHeadNode()->addCSS($theme->getDirectoryName().DS.$fileName);
+                        }
+                    }
+                }
+            }
+        }];
     }
     /**
      * Returns a single instance of 'Page'

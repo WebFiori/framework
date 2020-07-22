@@ -346,9 +346,6 @@ class WebFioriTheme extends Theme {
         $headTag = new HeadNode();
         $headTag->setBase(SiteConfig::getBaseURL());
         $headTag->addLink('icon', 'favicon.png');
-        $headTag->addCSS('Grid.css');
-        $headTag->addCSS('colors.css');
-        $headTag->addCSS('theme.css');
         $headTag->addMeta('robots', 'index, follow');
 
         return $headTag;

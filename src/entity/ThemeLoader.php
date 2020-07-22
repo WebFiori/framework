@@ -150,8 +150,20 @@ class ThemeLoader {
     }
     /**
      * Adds routes to all themes resource files (JavaSecript, CSS and images).
+     * 
      * The method will check for themes resources directories if set or not. 
-     * If set, it will scan each directory and add a route to it.
+     * If set, it will scan each directory and add a route to it. For CSS and 
+     * JavaScript files, the routes will depend on the directory at which the 
+     * files are placed on. Assuming that the domain is 'example.com' and the 
+     * name of theme directory is 'my-theme' and the directory at which CSS 
+     * files are placed on is CSS, then any CSS file can be accessed using 
+     * 'https://example.com/my-theme/css/my-file.css'. For any other resources, 
+     * they can be accessed directly. Assuming that we have an 
+     * image file somewhere in images directory of the theme. The 
+     * image can be accessed as follows: 'https://example.com/my-image.png'. Note that 
+     * CSS, JS and images directories of the theme must be set to correctly create 
+     * the routes.
+     * 
      * @since 1.0.1
      */
     public static function registerResourcesRoutes() {
@@ -167,10 +179,18 @@ class ThemeLoader {
         if (strlen($dir) != 0 && Util::isDirectory($themeRootDir.DS.$dir)) {
             $filesInDir = array_diff(scandir($themeRootDir.DS.$dir), ['.','..']);
             foreach ($filesInDir as $fileName) {
-                Router::addRoute([
-                    'path' => $themeDirName.DS.$fileName,
-                    'route-to' => self::THEMES_DIR.DS.$themeDirName.DS.$dir.DS.$fileName
-                ]);
+                $fileExp = explode('.', $fileName);
+                if (count($fileExp) == 2 && (strtolower($fileExp[1]) == 'js' || strtolower($fileExp[1]) == 'css')) {
+                    Router::addRoute([
+                        'path' => $themeDirName.DS.$fileName,
+                        'route-to' => self::THEMES_DIR.DS.$themeDirName.DS.$dir.DS.$fileName
+                    ]);
+                } else {
+                    Router::addRoute([
+                        'path' => $fileName,
+                        'route-to' => self::THEMES_DIR.DS.$themeDirName.DS.$dir.DS.$fileName
+                    ]);
+                }
             }
         }
     }

@@ -177,7 +177,7 @@ class WebFiori {
          * Initialize autoloader.
          */
         if (!class_exists('webfiori\entity\AutoLoader',false)) {
-            require_once ROOT_DIR.DIRECTORY_SEPARATOR.'entity'.DIRECTORY_SEPARATOR.'AutoLoader.php';
+            require_once ROOT_DIR.DS.'entity'.DS.'AutoLoader.php';
         }
         self::$AU = AutoLoader::get();
         InitAutoLoad::init();

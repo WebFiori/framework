@@ -624,10 +624,9 @@ class Cron {
 
     private function _logJobExecution($job,$forced = false) {
         if ($this->isLogEnabled) {
-            $ds = DIRECTORY_SEPARATOR;
-            $logFile = ROOT_DIR.$ds.'logs'.$ds.'cron.log';
+            $logFile = ROOT_DIR.DS.'logs'.DS.'cron.log';
 
-            if (Util::isDirectory(ROOT_DIR.$ds.'logs', true)) {
+            if (Util::isDirectory(ROOT_DIR.DS.'logs', true)) {
                 if (!file_exists($logFile)) {
                     $file = fopen($logFile, 'w');
                 } else {

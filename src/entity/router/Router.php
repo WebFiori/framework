@@ -735,22 +735,22 @@ class Router {
     }
     private function _fixFilePath($path) {
         if (strlen($path) != 0 && $path != '/') {
-            $path00 = str_replace('/', DIRECTORY_SEPARATOR, $path);
-            $path01 = str_replace('\\', DIRECTORY_SEPARATOR, $path00);
+            $path00 = str_replace('/', DS, $path);
+            $path01 = str_replace('\\', DS, $path00);
 
-            if ($path01[strlen($path01) - 1] == DIRECTORY_SEPARATOR || $path01[0] == DIRECTORY_SEPARATOR) {
-                while ($path01[0] == DIRECTORY_SEPARATOR || $path01[strlen($path01) - 1] == DIRECTORY_SEPARATOR) {
-                    $path01 = trim($path01, DIRECTORY_SEPARATOR);
+            if ($path01[strlen($path01) - 1] == DS || $path01[0] == DS) {
+                while ($path01[0] == DS || $path01[strlen($path01) - 1] == DS) {
+                    $path01 = trim($path01, DS);
                 }
-                $path01 = DIRECTORY_SEPARATOR.$path01;
+                $path01 = DS.$path01;
             }
 
-            if ($path01[0] != DIRECTORY_SEPARATOR) {
-                $path01 = DIRECTORY_SEPARATOR.$path01;
+            if ($path01[0] != DS) {
+                $path01 = DS.$path01;
             }
             $path = $path01;
         } else {
-            $path = DIRECTORY_SEPARATOR;
+            $path = DS;
         }
 
         return $path;

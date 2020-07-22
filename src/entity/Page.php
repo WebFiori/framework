@@ -647,27 +647,27 @@ class Page {
             Page::get()->document()->getHeadNode()->addChild($i18nJs);
 
             //Load Js and CSS automatically
-            $theme = Page::theme();
-            if ($theme !== null) {
-                $themeDir = THEMES_PATH.DS.$theme->getDirectoryName();
-                $jsDir = $themeDir.DS.$theme->getJsDirName();
+            $pageTheme = Page::theme();
+            if ($pageTheme !== null) {
+                $themeDir = THEMES_PATH.DS.$pageTheme->getDirectoryName();
+                $jsDir = $themeDir.DS.$pageTheme->getJsDirName();
                 if (Util::isDirectory($jsDir)) {
                     $filesInDir = array_diff(scandir($jsDir), ['.','..']);
                     foreach ($filesInDir as $fileName) {
                         $expl = explode('.', $fileName);
                         if (count($expl) == 2 && $expl[1] == 'js') {
-                            Page::get()->document()->getHeadNode()->addJs($theme->getDirectoryName().DS.$fileName);
+                            Page::get()->document()->getHeadNode()->addJs($pageTheme->getDirectoryName().DS.$fileName);
                         }
                     }
                 }
 
-                $cssDir = $themeDir.DS.$theme->getCssDirName();
+                $cssDir = $themeDir.DS.$pageTheme->getCssDirName();
                 if (Util::isDirectory($cssDir)) {
                     $filesInDir = array_diff(scandir($cssDir), ['.','..']);
                     foreach ($filesInDir as $fileName) {
                         $expl = explode('.', $fileName);
                         if (count($expl) == 2 && $expl[1] == 'css') {
-                            Page::get()->document()->getHeadNode()->addCSS($theme->getDirectoryName().DS.$fileName);
+                            Page::get()->document()->getHeadNode()->addCSS($pageTheme->getDirectoryName().DS.$fileName);
                         }
                     }
                 }

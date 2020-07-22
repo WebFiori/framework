@@ -330,7 +330,7 @@ class EmailController extends Controller {
                 ."    }\n";
         //End of class
         $fileData .= "}\n";
-        $mailConfigFile = new File('MailConfig.php', ROOT_DIR.DIRECTORY_SEPARATOR.'conf');
+        $mailConfigFile = new File('MailConfig.php', ROOT_DIR.DS.'conf');
         $mailConfigFile->remove();
         $mailConfigFile->setRawData($fileData);
         $mailConfigFile->write(false, true);

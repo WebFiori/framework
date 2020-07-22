@@ -982,10 +982,8 @@ class SessionManager implements JsonI {
      * @since 1.5
      */
     public function setIsRefresh($bool) {
-        if ($this->getSessionStatus() != self::NOT_RUNNING) {
-            if ($this->_switchToSession()) {
-                $_SESSION[self::$SV][self::MAIN_VARS[3]] = $bool === true;
-            }
+        if ($this->getSessionStatus() != self::NOT_RUNNING && $this->_switchToSession()) {
+            $_SESSION[self::$SV][self::MAIN_VARS[3]] = $bool === true;
         }
         $this->isRef = $bool === true;
     }
@@ -1438,16 +1436,12 @@ class SessionManager implements JsonI {
         return $retVal;
     }
     private function _setCookieParams() {
-        //if (PHP_VERSION_ID < 70300) {
             session_set_cookie_params(
             $this->cookieParams['lifetime'], 
             $this->cookieParams['path'].'; SameSite='.$this->cookieParams['samesite'], 
             $this->cookieParams['domain'], 
             $this->cookieParams['secure'], 
             $this->cookieParams['httponly']);
-      //  } else {
-         //   session_set_cookie_params($this->cookieParams);
-       // }
     }
     /**
      * Validate session variables. Must be called after session is started.

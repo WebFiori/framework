@@ -265,7 +265,7 @@ class File implements JsonI {
         $name = $this->getName();
 
         if (strlen($fPath) != 0 && strlen($name) != 0) {
-            return $fPath.DIRECTORY_SEPARATOR.$name;
+            return $fPath.DS.$name;
         }
 
         return '';
@@ -501,10 +501,9 @@ class File implements JsonI {
         $retVal = false;
         $pathV = self::_validatePath($fPath);
         $len = strlen($pathV);
-        $DS = DIRECTORY_SEPARATOR;
 
         if ($len > 0) {
-            $this->path = !Util::isDirectory($pathV) ? $DS.$pathV : $pathV;
+            $this->path = !Util::isDirectory($pathV) ? DS.$pathV : $pathV;
             $retVal = true;
         }
 
@@ -677,7 +676,7 @@ class File implements JsonI {
             }
         }
 
-        return str_replace('/', DIRECTORY_SEPARATOR, str_replace('\\', DIRECTORY_SEPARATOR, $trimmedPath));
+        return str_replace('/', DS, str_replace('\\', DS, $trimmedPath));
     }
     private function _viewFileHelper($asAttachment) {
         $contentType = $this->getFileMIMEType();

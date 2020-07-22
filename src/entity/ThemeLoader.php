@@ -66,11 +66,10 @@ class ThemeLoader {
     public static function getAvailableThemes() {
         if (self::$AvailableThemes === null) {
             self::$AvailableThemes = [];
-            $DS = DIRECTORY_SEPARATOR;
             $themesDirs = array_diff(scandir(THEMES_PATH), ['..', '.']);
             
             foreach ($themesDirs as $dir) {
-                $pathToScan = THEMES_PATH.$DS.$dir;
+                $pathToScan = THEMES_PATH.DS.$dir;
                 $filesInDir = array_diff(scandir($pathToScan), ['..', '.']);
                 self::_scanDir($filesInDir, $pathToScan);
             }
@@ -200,7 +199,7 @@ class ThemeLoader {
 
             if ($fileExt == '.php') {
                 $cName = str_replace('.php', '', $fileName);
-                $ns = require_once $pathToScan.DIRECTORY_SEPARATOR.$fileName;
+                $ns = require_once $pathToScan.DS.$fileName;
                 $aNs = gettype($ns) == 'string' ? $ns.'\\' : '\\';
                 $aCName = $aNs.$cName;
                 if (!AutoLoader::isLoaded($aCName) && class_exists($aCName)) {

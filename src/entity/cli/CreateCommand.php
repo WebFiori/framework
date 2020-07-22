@@ -296,7 +296,7 @@ class CreateCommand extends CLICommand {
         do {
             $path = $this->_getClassPath();
 
-            if (file_exists($path.DIRECTORY_SEPARATOR.$className.'.php')) {
+            if (file_exists($path.DS.$className.'.php')) {
                 $this->warning('A file which has the same as the class name was found.');
                 $isReplace = $this->confirm('Would you like to override the file?', false);
 
@@ -368,10 +368,8 @@ class CreateCommand extends CLICommand {
         $classInfo = $this->getClassInfo();
         $classInfo['linked-query'] = $linkedQuery;
         
-        if ($classInfo['linked-query'] === null) {
-            if ($this->confirm('Would you like to associate the controller with query class?', false)) {
-                $classInfo['linked-query'] = $this->_getControllerQuery();
-            }
+        if ($classInfo['linked-query'] === null&& $this->confirm('Would you like to associate the controller with query class?', false)) {
+            $classInfo['linked-query'] = $this->_getControllerQuery();
         }
         $dbConnections = array_keys(WebFiori::getConfig()->getDBConnections());
 
@@ -464,7 +462,7 @@ class CreateCommand extends CLICommand {
 
         do {
             $path = $this->getInput("Where would you like to store the class? (must be a directory inside '".ROOT_DIR."')");
-            $fixedPath = ROOT_DIR.DIRECTORY_SEPARATOR.trim(trim(str_replace('\\', DIRECTORY_SEPARATOR, str_replace('/', DIRECTORY_SEPARATOR, $path)),'/'),'\\');
+            $fixedPath = ROOT_DIR.DS.trim(trim(str_replace('\\', DS, str_replace('/', DS, $path)),'/'),'\\');
 
             if (Util::isDirectory($fixedPath)) {
                 if (!in_array($fixedPath, AutoLoader::getFolders())) {

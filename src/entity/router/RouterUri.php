@@ -135,10 +135,8 @@ class RouterUri {
     public function addLanguage($langCode) {
         $lower = strtolower(trim($langCode));
 
-        if (strlen($lower) == 2) {
-            if ($lower[0] >= 'a' && $lower[0] <= 'z' && $lower[1] >= 'a' && $lower[1] <= 'z' && !in_array($lower, $this->languages)) {
-                $this->languages[] = $lower;
-            }
+        if (strlen($lower) == 2 && $lower[0] >= 'a' && $lower[0] <= 'z' && $lower[1] >= 'a' && $lower[1] <= 'z' && !in_array($lower, $this->languages)) {
+            $this->languages[] = $lower;
         }
     }
     /**
@@ -232,7 +230,7 @@ class RouterUri {
     public function getClassName() {
         if ($this->getType() != Router::CLOSURE_ROUTE) {
             $path = $this->getRouteTo();
-            $pathExpl = explode(DIRECTORY_SEPARATOR, $path);
+            $pathExpl = explode(DS, $path);
 
             if (count($pathExpl) >= 1) {
                 $expld = explode('.', $pathExpl[count($pathExpl) - 1]);
@@ -643,8 +641,8 @@ class RouterUri {
         if ($routeTo instanceof Closure) {
             $this->setType(Router::CLOSURE_ROUTE);
         } else {
-            $cleaned = str_replace('\\', DIRECTORY_SEPARATOR, $routeTo);
-            $routeTo = str_replace('/', DIRECTORY_SEPARATOR, $routeTo);
+            $cleaned = str_replace('\\', DS, $routeTo);
+            $routeTo = str_replace('/', DS, $cleaned);
         }
         $this->routeTo = $routeTo;
     }

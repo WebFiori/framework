@@ -107,7 +107,6 @@ class CronCommand extends CLICommand {
                     $this->error("Provided password is incorrect");
                 } else {
                     $this->_printExcResult($result);
-                    $this->_showLog();
                     $retVal = 0;
                 }
             } else {
@@ -146,7 +145,6 @@ class CronCommand extends CLICommand {
                 $this->error("No job was found which has the name '".$jobName."'");
             } else {
                 $this->_printExcResult($result);
-                $this->_showLog();
                 $retVal = 0;
             }
         }
@@ -216,20 +214,6 @@ class CronCommand extends CLICommand {
             }
         } else {
             $this->println("<NO ARGS>");
-        }
-    }
-    private function _showLog() {
-        if ($this->isArgProvided('--show-log')) {
-            $this->println("\n------+-Execution Log-+------");
-
-            foreach (Cron::getLogArray() as $message) {
-                $this->println($message);
-            }
-        } else {
-            $this->prints("TIP: ", [
-                'color' => 'yellow'
-            ]);
-            $this->println("Supply the argument '--show-log' to show execution log.");
         }
     }
 }

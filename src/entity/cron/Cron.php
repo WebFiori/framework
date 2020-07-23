@@ -29,6 +29,7 @@ use phpStructs\Queue;
 use webfiori\entity\router\Router;
 use webfiori\entity\Util;
 use webfiori\WebFiori;
+use webfiori\entity\cli\CLICommand;
 /**
  * A class that is used to manage scheduled background jobs.
  * It is used to create jobs, schedule them and execute them. In order to run 
@@ -44,6 +45,11 @@ use webfiori\WebFiori;
  * @version 1.0.9
  */
 class Cron {
+    /**
+     *
+     * @var CLICommand 
+     */
+    private $command;
     /**
      * The password that is used to access and execute jobs.
      * @var string
@@ -324,6 +330,10 @@ class Cron {
      */
     public static function log($message) {
         self::_get()->logsArray[] = $message;
+        
+        if (self::_get()->command !== null && self::_get()->command->isArgProvided('--show-log')) {
+            self::_get()->command->println($message);
+        }
     }
     /**
      * Returns the number of current minute in the current hour as integer.
@@ -649,6 +659,7 @@ class Cron {
     private static function _runJob(&$retVal, $job, $xForce, $command = null) {
         if ($job->isTime() || $xForce) {
             if ($command !== null) {
+                self::_get()->command = $command;
                 foreach ($job->getExecArgsNames() as $attr) {
                     $command->addArg($attr);
                     $val = $command->getArgValue($attr);
@@ -671,6 +682,7 @@ class Cron {
                 $retVal['failed'][] = $job->getJobName();
             }
         }
+        self::_get()->command = null;
         self::_get()->_setActiveJob(null);
     }
     /**

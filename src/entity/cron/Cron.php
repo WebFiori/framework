@@ -139,11 +139,12 @@ class Cron {
                 'path' => '/cron/jobs/{job-name}',
                 'route-to' => '/entity/cron/CronTaskView.php'
             ]);
-            //$this->_registerJobs();
-        } else if (CLI::isCLI()) {
-            //$this->_registerJobs();
         }
     }
+    /**
+     * The main aim of this method is to automatically schedule any job which 
+     * exist inside the folder 'app/jobs'.
+     */
     private static function _registerJobs() {
         if (CLI::isCLI() || (defined('') && CRON_THROUGH_HTTP === true)) {
             $jobsDir = ROOT_DIR.DS.'app'.DS.'jobs';
@@ -157,7 +158,11 @@ class Cron {
                             $instanceNs = '';
                         }
                         $class = $instanceNs.'\\'.$expl[0];
-                        self::scheduleJob(new $class());
+                        try {
+                            self::scheduleJob(new $class());
+                        } catch (\Error $ex) {
+                            
+                        }
                     }
                 }
             }
@@ -608,6 +613,9 @@ class Cron {
     private static function _get() {
         if (self::$executer === null) {
             self::$executer = new Cron();
+            if (CLI::isCLI() || defined('CRON_THROUGH_HTTP') && CRON_THROUGH_HTTP === true) {
+                self::_registerJobs();
+            }
         }
         return self::$executer;
     }

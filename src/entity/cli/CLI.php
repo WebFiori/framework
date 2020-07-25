@@ -97,7 +97,10 @@ class CLI {
         fprintf(STDERR, "Error Description%5s %s\n",":",Util::ERR_TYPES[$errno]['description']);
         fprintf(STDERR, "Error File       %5s %s\n",":",$errfile);
         fprintf(STDERR, "Error Line:      %5s %s\n",":",$errline);
-        exit(-1);
+        
+        if (defined('STOP_CLI_ON_ERR') && STOP_CLI_ON_ERR === true) {
+            exit(-1);
+        }
     }
     /**
      * Display exception information in terminal.
@@ -122,6 +125,33 @@ class CLI {
         fprintf(STDERR, "Line: %s\n",$ex->getLine());
         fprintf(STDERR, "Stack Trace:\n");
         fprintf(STDERR, $ex->getTraceAsString());
+    }
+    /**
+     * The main aim of this method is to automatically register any commands which 
+     * exist inside the folder 'app/commands'.
+     */
+    private static function _autoRegister() {
+        if (CLI::isCLI() || (defined('') && CRON_THROUGH_HTTP === true)) {
+            $jobsDir = ROOT_DIR.DS.'app'.DS.'commands';
+            if (Util::isDirectory($jobsDir)) {
+                $dirContent = array_diff(scandir($jobsDir), ['.','..']);
+                foreach ($dirContent as $phpFile) {
+                    $expl = explode('.', $phpFile);
+                    if (count($expl) == 2 && $expl[1] == 'php') {
+                        $instanceNs = require_once $jobsDir.DS.$phpFile;
+                        if (strlen($instanceNs) == 0 || $instanceNs == 1) {
+                            $instanceNs = '';
+                        }
+                        $class = $instanceNs.'\\'.$expl[0];
+                        try {
+                            self::register(new $class());
+                        } catch (\Error $ex) {
+                            
+                        }
+                    }
+                }
+            }
+        }
     }
     /**
      * Returns the command which is being executed.
@@ -194,6 +224,7 @@ class CLI {
         self::register(new TestRouteCommand());
         self::register(new CreateCommand());
         self::register(new AddCommand());
+        self::_autoRegister();
         //Call this method to register any user-defined commands.
         InitCliCommands::init();
     }

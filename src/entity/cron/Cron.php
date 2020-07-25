@@ -27,6 +27,7 @@ namespace webfiori\entity\cron;
 use Exception;
 use phpStructs\Queue;
 use webfiori\entity\router\Router;
+use webfiori\entity\cli\CLI;
 use webfiori\entity\Util;
 use webfiori\WebFiori;
 use webfiori\entity\cli\CLICommand;
@@ -138,6 +139,28 @@ class Cron {
                 'path' => '/cron/jobs/{job-name}',
                 'route-to' => '/entity/cron/CronTaskView.php'
             ]);
+            //$this->_registerJobs();
+        } else if (CLI::isCLI()) {
+            //$this->_registerJobs();
+        }
+    }
+    private static function _registerJobs() {
+        if (CLI::isCLI() || (defined('') && CRON_THROUGH_HTTP === true)) {
+            $jobsDir = ROOT_DIR.DS.'app'.DS.'jobs';
+            if (Util::isDirectory($jobsDir)) {
+                $dirContent = array_diff(scandir($jobsDir), ['.','..']);
+                foreach ($dirContent as $phpFile) {
+                    $expl = explode('.', $phpFile);
+                    if (count($expl) == 2 && $expl[1] == 'php') {
+                        $instanceNs = require_once $jobsDir.DS.$phpFile;
+                        if (strlen($instanceNs) == 0 || $instanceNs == 1) {
+                            $instanceNs = '';
+                        }
+                        $class = $instanceNs.'\\'.$expl[0];
+                        self::scheduleJob(new $class());
+                    }
+                }
+            }
         }
     }
     /**
@@ -586,7 +609,6 @@ class Cron {
         if (self::$executer === null) {
             self::$executer = new Cron();
         }
-
         return self::$executer;
     }
     /**

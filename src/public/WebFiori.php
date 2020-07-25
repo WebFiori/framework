@@ -482,7 +482,7 @@ class WebFiori {
     private function _setErrHandler() {
         set_error_handler(function($errno, $errstr, $errfile, $errline)
         {
-            $isCli = class_exists('webfiori\entity\cli\CLI') ? CLI::isCLI() : php_sapi_name() == 'cli';
+            $isCli = class_exists('webfiori\entity\cli\CLI') ? CLI::isCLI() : http_response_code() === false;
 
             if ($isCli) {
                 fprintf(STDERR, "\n<%s>\n",Util::ERR_TYPES[$errno]['type']);
@@ -491,7 +491,10 @@ class WebFiori {
                 fprintf(STDERR, "Error Description%5s %s\n",":",Util::ERR_TYPES[$errno]['description']);
                 fprintf(STDERR, "Error File       %5s %s\n",":",$errfile);
                 fprintf(STDERR, "Error Line:      %5s %s\n",":",$errline);
-                exit(-1);
+                
+                if (defined('STOP_CLI_ON_ERR') && STOP_CLI_ON_ERR === true) {
+                    exit(-1);
+                }
             } else if (defined('API_CALL')) {
                 header("HTTP/1.1 500 Server Error");
                 $j = new JsonX([

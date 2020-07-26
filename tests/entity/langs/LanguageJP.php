@@ -1,5 +1,5 @@
 <?php
-namespace webfiori\entity\langs;
+namespace webfiori\entity\i18n;
 
 class LanguageJP extends Language {
     public function __construct() {

@@ -67,6 +67,18 @@ class AutoLoader {
      * @since 1.1.6
      */
     private $casheArr;
+    /**
+     * An array that contains the names of indices that are used by loaded class 
+     * info array.
+     * The array have the following indices:
+     * <ul>
+     * <li>class-name</li>
+     * <li>namespace</li>
+     * <li>path</li>
+     * <li>loaded-from-cache</li>
+     * </ul>
+     * @var array 
+     */
     private static $CLASS_INDICES = [
         'class-name',
         'namespace',
@@ -463,7 +475,7 @@ class AutoLoader {
 
         return $vendorDirs;
     }
-    private function _loadClassHelper($className, $classPath, $value, $appendRoot, $allPaths) {
+    private function _loadClassHelper($className, $classWithNs, $value, $appendRoot, $allPaths) {
         $loaded = false;
         $DS = DIRECTORY_SEPARATOR;
         $root = $this->getRoot();
@@ -476,7 +488,7 @@ class AutoLoader {
 
         if (file_exists($f) && !in_array($f, $allPaths)) {
             require_once $f;
-            $ns = count(explode('\\', $className)) == 1 ? '\\' : substr($classPath, 0, strlen($classPath) - strlen($className) - 1);
+            $ns = count(explode('\\', $classWithNs)) == 1 ? '\\' : substr($classWithNs, 0, strlen($classWithNs) - strlen($className) - 1);
             $this->loadedClasses[] = [
                 self::$CLASS_INDICES[0] => $className,
                 self::$CLASS_INDICES[1] => $ns,
@@ -485,7 +497,6 @@ class AutoLoader {
             ];
             $loaded = true;
         }
-
         return $loaded;
     }
     private function _loadFromCache($classPath, $className) {
@@ -494,7 +505,7 @@ class AutoLoader {
             foreach ($this->casheArr[$classPath] as $location) {
                 if (file_exists($location)) {
                     require_once $location;
-                    $ns = count(explode('\\', $className)) == 1 ? '\\' : substr($classPath, 0, strlen($classPath) - strlen($className) - 1);
+                    $ns = count(explode('\\', $classPath)) == 1 ? '\\' : substr($classPath, 0, strlen($classPath) - strlen($className) - 1);
                     $this->loadedClasses[] = [
                         self::$CLASS_INDICES[0] => $className,
                         self::$CLASS_INDICES[1] => $ns,
@@ -602,33 +613,33 @@ class AutoLoader {
     /**
      * Tries to load a class given its name.
      * 
-     * @param string $classPath The name of the class alongside its namespace.
+     * @param string $classWithNs The name of the class alongside its namespace.
      * 
      * @since 1.0
      */
-    private function loadClass($classPath) {
+    private function loadClass($classWithNs) {
         
-        if (self::isLoaded($classPath)) {
+        if (self::isLoaded($classWithNs)) {
             return;
         }
-        $cArr = explode('\\', $classPath);
+        $cArr = explode('\\', $classWithNs);
         $className = $cArr[count($cArr) - 1];
         $loaded = false;
         //checks if the class is cached or not.
-        if ($this->_loadFromCache($classPath, $className)) {
+        if ($this->_loadFromCache($classWithNs, $className)) {
             return;
         }
         
         $allPaths = self::getClassPath($className);
 
         foreach ($this->searchFolders as $value => $appendRoot) {
-            $loaded = $this->_loadClassHelper($className, $classPath, $value, $appendRoot, $allPaths);
+            $loaded = $this->_loadClassHelper($className, $classWithNs, $value, $appendRoot, $allPaths);
 
             if (!$loaded) {
-                $loaded = $this->_loadClassHelper(strtolower($className), $classPath, $value, $appendRoot, $allPaths);
+                $loaded = $this->_loadClassHelper(strtolower($className), $classWithNs, $value, $appendRoot, $allPaths);
             }
 
-            if ($loaded && (PHP_MAJOR_VERSION < 7 || (PHP_MAJOR_VERSION == 7 && PHP_MINOR_VERSION < 3))) {
+            if ($loaded && (PHP_MAJOR_VERSION < 7 || (PHP_MAJOR_VERSION == 7 && PHP_MINOR_VERSION <= 3))) {
                 //in php 7.2 and lower, if same class is loaded 
                 //from two namespaces with same name, it will 
                 //rise a fatal error with message 
@@ -637,11 +648,11 @@ class AutoLoader {
             }
         }
 
-        if (!$loaded) {
+        if ($loaded === false) {
             if (is_callable($this->onFail)) {
                 call_user_func($this->onFail);
             } else if ($this->onFail == self::ON_FAIL_ACTIONS[0]) {
-                throw new ClassLoaderException('Class \''.$classPath.'\' not found in any include directory. '
+                throw new ClassLoaderException('Class \''.$classWithNs.'\' not found in any include directory. '
                 .'Make sure that class path is included in auto-load directories and its namespace is correct.');
             }
         } else {

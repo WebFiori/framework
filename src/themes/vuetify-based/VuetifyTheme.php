@@ -44,7 +44,7 @@ class VuetifyTheme extends Theme {
             Page::document()->removeChild($footerSec);
             $topDiv->addChild($footerSec)->addChild($headerSec)->addChild($bodySec);
             Page::document()->getBody()->addChild($topDiv);
-            Page::document()->getChildByID('main-content-area')->setNodeName('v-content');
+            Page::document()->getChildByID('main-content-area')->setNodeName('v-main');
             Page::document()->getChildByID('main-content-area')->setAttribute('app');
 
             //initialize vue before the page is rendered.
@@ -53,7 +53,7 @@ class VuetifyTheme extends Theme {
             Page::beforeRender(function()
             {
                 $jsNode = new HTMLNode('script');
-                $jsNode->setAttribute('src', Page::jsDir().'/init-vuetify.js');
+                $jsNode->setAttribute('src', 'init-vuetify.js');
                 Page::document()->getBody()->addChild($jsNode);
             });
         });
@@ -116,7 +116,7 @@ class VuetifyTheme extends Theme {
                 'align' => 'end'
             ], false)->addChild('v-col', false)
             ->addChild('div',false,['class'=>'subheading'])->text('Programming Academia')
-            ->getParent()->getParent()->getParent()->getParent()->addChild('v-list', [
+            ->getParent()->getParent()->getParent()->addChild('v-list', [
                 'dense','nav'
             ], false)->addChild('v-list-item-group',false, [
                 'active-class'=>'deep-purple--text text--accent-4'
@@ -215,7 +215,7 @@ class VuetifyTheme extends Theme {
         $js->setID('data-model');
         $js->addCode('window.locale = '.$json.';');
         $node->addChild($js);
-        $node->addCSS(Page::cssDir().'/theme.css');
+        $node->addCSS('theme.css');
         $node->addCSS('https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900',[], false);
         $node->addCSS('https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css', [], false);
         $node->addCSS('https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css', [], false);

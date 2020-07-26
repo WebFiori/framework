@@ -25,13 +25,15 @@
 namespace webfiori\entity;
 
 use webfiori\entity\exceptions\NoSuchThemeException;
+use webfiori\entity\router\Router;
 use webfiori\WebFiori;
+
 
 /**
  * A class which has utility methods which are related to themes loading.
  *
  * @author Ibrahim
- * @version 1.0
+ * @version 1.0.1
  */
 class ThemeLoader {
     /**
@@ -64,11 +66,10 @@ class ThemeLoader {
     public static function getAvailableThemes() {
         if (self::$AvailableThemes === null) {
             self::$AvailableThemes = [];
-            $DS = DIRECTORY_SEPARATOR;
             $themesDirs = array_diff(scandir(THEMES_PATH), ['..', '.']);
-
+            
             foreach ($themesDirs as $dir) {
-                $pathToScan = THEMES_PATH.$DS.$dir;
+                $pathToScan = THEMES_PATH.DS.$dir;
                 $filesInDir = array_diff(scandir($pathToScan), ['..', '.']);
                 self::_scanDir($filesInDir, $pathToScan);
             }
@@ -129,24 +130,67 @@ class ThemeLoader {
 
             if (isset($themes[$themeName])) {
                 $themeToLoad = $themes[$themeName];
-                self::$loadedThemes[$themeName] = $themeToLoad;
             } else {
                 throw new NoSuchThemeException('No such theme: \''.$themeName.'\'.');
             }
         }
-
         if (isset($themeToLoad)) {
             $themeToLoad->invokeBeforeLoaded();
-            $ds = DIRECTORY_SEPARATOR;
-            $themeDir = THEMES_PATH.$ds.$themeToLoad->getDirectoryName();
 
+            $themeDir = THEMES_PATH.DS.$themeToLoad->getDirectoryName();
             foreach ($themeToLoad->getComponents() as $component) {
-                if (file_exists($themeDir.$ds.$component)) {
-                    require_once $themeDir.$ds.$component;
+                if (file_exists($themeDir.DS.$component)) {
+                    require_once $themeDir.DS.$component;
                 }
             }
-
+            
             return $themeToLoad;
+        }
+    }
+    /**
+     * Adds routes to all themes resource files (JavaSecript, CSS and images).
+     * 
+     * The method will check for themes resources directories if set or not. 
+     * If set, it will scan each directory and add a route to it. For CSS and 
+     * JavaScript files, the routes will depend on the directory at which the 
+     * files are placed on. Assuming that the domain is 'example.com' and the 
+     * name of theme directory is 'my-theme' and the directory at which CSS 
+     * files are placed on is CSS, then any CSS file can be accessed using 
+     * 'https://example.com/my-theme/css/my-file.css'. For any other resources, 
+     * they can be accessed directly. Assuming that we have an 
+     * image file somewhere in images directory of the theme. The 
+     * image can be accessed as follows: 'https://example.com/my-image.png'. Note that 
+     * CSS, JS and images directories of the theme must be set to correctly create 
+     * the routes.
+     * 
+     * @since 1.0.1
+     */
+    public static function registerResourcesRoutes() {
+        $availableThemes = self::getAvailableThemes();
+        foreach ($availableThemes as $themeObj) {
+            $themeDir = THEMES_PATH.DS.$themeObj->getDirectoryName();
+            self::createAssetsRoutes($themeObj->getDirectoryName(), $themeDir, $themeObj->getJsDirName());
+            self::createAssetsRoutes($themeObj->getDirectoryName(), $themeDir, $themeObj->getCssDirName());
+            self::createAssetsRoutes($themeObj->getDirectoryName(), $themeDir, $themeObj->getImagesDirName());
+        }
+    }
+    private static function createAssetsRoutes($themeDirName, $themeRootDir, $dir) {
+        if (strlen($dir) != 0 && Util::isDirectory($themeRootDir.DS.$dir)) {
+            $filesInDir = array_diff(scandir($themeRootDir.DS.$dir), ['.','..']);
+            foreach ($filesInDir as $fileName) {
+                $fileExp = explode('.', $fileName);
+                if (count($fileExp) == 2 && (strtolower($fileExp[1]) == 'js' || strtolower($fileExp[1]) == 'css')) {
+                    Router::addRoute([
+                        'path' => $themeDirName.DS.$fileName,
+                        'route-to' => self::THEMES_DIR.DS.$themeDirName.DS.$dir.DS.$fileName
+                    ]);
+                } else {
+                    Router::addRoute([
+                        'path' => $fileName,
+                        'route-to' => self::THEMES_DIR.DS.$themeDirName.DS.$dir.DS.$fileName
+                    ]);
+                }
+            }
         }
     }
     private static function _scanDir($filesInDir, $pathToScan) {
@@ -155,11 +199,10 @@ class ThemeLoader {
 
             if ($fileExt == '.php') {
                 $cName = str_replace('.php', '', $fileName);
-                $ns = require_once $pathToScan.DIRECTORY_SEPARATOR.$fileName;
-                $aNs = $ns != 1 ? $ns.'\\' : '';
+                $ns = require_once $pathToScan.DS.$fileName;
+                $aNs = gettype($ns) == 'string' ? $ns.'\\' : '\\';
                 $aCName = $aNs.$cName;
-
-                if (class_exists($aCName)) {
+                if (!AutoLoader::isLoaded($aCName) && class_exists($aCName)) {
                     $instance = new $aCName();
 
                     if ($instance instanceof Theme) {

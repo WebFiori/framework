@@ -27,8 +27,10 @@ namespace webfiori\entity\cron;
 use Exception;
 use phpStructs\Queue;
 use webfiori\entity\router\Router;
+use webfiori\entity\cli\CLI;
 use webfiori\entity\Util;
 use webfiori\WebFiori;
+use webfiori\entity\cli\CLICommand;
 /**
  * A class that is used to manage scheduled background jobs.
  * It is used to create jobs, schedule them and execute them. In order to run 
@@ -44,6 +46,11 @@ use webfiori\WebFiori;
  * @version 1.0.9
  */
 class Cron {
+    /**
+     *
+     * @var CLICommand 
+     */
+    private $command;
     /**
      * The password that is used to access and execute jobs.
      * @var string
@@ -132,6 +139,33 @@ class Cron {
                 'path' => '/cron/jobs/{job-name}',
                 'route-to' => '/entity/cron/CronTaskView.php'
             ]);
+        }
+    }
+    /**
+     * The main aim of this method is to automatically schedule any job which 
+     * exist inside the folder 'app/jobs'.
+     */
+    private static function _registerJobs() {
+        if (CLI::isCLI() || (defined('') && CRON_THROUGH_HTTP === true)) {
+            $jobsDir = ROOT_DIR.DS.'app'.DS.'jobs';
+            if (Util::isDirectory($jobsDir)) {
+                $dirContent = array_diff(scandir($jobsDir), ['.','..']);
+                foreach ($dirContent as $phpFile) {
+                    $expl = explode('.', $phpFile);
+                    if (count($expl) == 2 && $expl[1] == 'php') {
+                        $instanceNs = require_once $jobsDir.DS.$phpFile;
+                        if (strlen($instanceNs) == 0 || $instanceNs == 1) {
+                            $instanceNs = '';
+                        }
+                        $class = $instanceNs.'\\'.$expl[0];
+                        try {
+                            self::scheduleJob(new $class());
+                        } catch (\Error $ex) {
+                            
+                        }
+                    }
+                }
+            }
         }
     }
     /**
@@ -324,6 +358,10 @@ class Cron {
      */
     public static function log($message) {
         self::_get()->logsArray[] = $message;
+        
+        if (self::_get()->command !== null && self::_get()->command->isArgProvided('--show-log')) {
+            self::_get()->command->println($message);
+        }
     }
     /**
      * Returns the number of current minute in the current hour as integer.
@@ -575,8 +613,10 @@ class Cron {
     private static function _get() {
         if (self::$executer === null) {
             self::$executer = new Cron();
+            if (CLI::isCLI() || defined('CRON_THROUGH_HTTP') && CRON_THROUGH_HTTP === true) {
+                self::_registerJobs();
+            }
         }
-
         return self::$executer;
     }
     /**
@@ -624,10 +664,9 @@ class Cron {
 
     private function _logJobExecution($job,$forced = false) {
         if ($this->isLogEnabled) {
-            $ds = DIRECTORY_SEPARATOR;
-            $logFile = ROOT_DIR.$ds.'logs'.$ds.'cron.log';
+            $logFile = ROOT_DIR.DS.'logs'.DS.'cron.log';
 
-            if (Util::isDirectory(ROOT_DIR.$ds.'logs', true)) {
+            if (Util::isDirectory(ROOT_DIR.DS.'logs', true)) {
                 if (!file_exists($logFile)) {
                     $file = fopen($logFile, 'w');
                 } else {
@@ -650,6 +689,7 @@ class Cron {
     private static function _runJob(&$retVal, $job, $xForce, $command = null) {
         if ($job->isTime() || $xForce) {
             if ($command !== null) {
+                self::_get()->command = $command;
                 foreach ($job->getExecArgsNames() as $attr) {
                     $command->addArg($attr);
                     $val = $command->getArgValue($attr);
@@ -672,6 +712,7 @@ class Cron {
                 $retVal['failed'][] = $job->getJobName();
             }
         }
+        self::_get()->command = null;
         self::_get()->_setActiveJob(null);
     }
     /**

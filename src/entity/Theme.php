@@ -161,7 +161,7 @@ abstract class Theme implements JsonI {
         ];
 
         $reflection = new ReflectionClass($this);
-        $dirExpl = explode(DIRECTORY_SEPARATOR, dirname($reflection->getFileName()));       
+        $dirExpl = explode(DS, dirname($reflection->getFileName()));       
         $this->themeMeta['directory'] = $dirExpl[count($dirExpl) - 1];
 
         $this->setCssDirName('css');
@@ -327,7 +327,7 @@ abstract class Theme implements JsonI {
      * @since 1.2.6
      */
     public function getDirecotry() {
-        return THEMES_PATH.DIRECTORY_SEPARATOR.$this->getDirectoryName().DIRECTORY_SEPARATOR;
+        return THEMES_PATH.DS.$this->getDirectoryName().DS;
     }
     /**
      * Returns the name of the directory where all theme files are kept.

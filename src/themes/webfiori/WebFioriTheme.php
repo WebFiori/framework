@@ -32,55 +32,18 @@ class WebFioriTheme extends Theme {
         $this->addComponents([
             'LangExt.php'
         ]);
-        $this->setBeforeLoaded(function()
-        {
-            $session = WebsiteController::get()->getSession();
-
-            if ($session !== null) {
-                $lang = $session->getLang(true);
-                Page::lang($lang);
-
-                if ($lang == 'AR') {
-                    Page::dir('rtl');
-                } else {
-                    Page::dir('ltr');
-                }
-            }
+        $this->setBeforeLoaded(function(){
+            LangExt::extLang();
         });
         $this->setAfterLoaded(function()
         {
-            $session = WebsiteController::get()->getSession();
-
-            if ($session !== null) {
-                Page::lang($session->getLang(true));
-            } else {
-                Page::lang('en');
-            }
             Page::document()->getChildByID('main-content-area')->setClassName('wf-'.Page::dir().'-col-10');
             Page::document()->getChildByID('side-content-area')->setClassName('wf-'.Page::dir().'-col-2');
             Page::document()->getChildByID('page-body')->setClassName('wf-row');
             Page::document()->getChildByID('page-header')->setClassName('wf-row-np');
             Page::document()->getChildByID('page-footer')->setClassName('wf-row');
             Page::siteName(WebFiori::getSiteConfig()->getWebsiteNames()[Page::lang()]);
-            LangExt::extLang();
-            $translation = Page::translation();
-            //adding menu items 
-            $mainMenu = Page::document()->getChildByID('menu-items-container');
-
-            $item1 = new ListItem();
-            $link1 = new Anchor(SiteConfig::getBaseURL(), $translation->get('menus/main-menu/menu-item-1'));
-            $item1->addChild($link1);
-            $mainMenu->addChild($item1);
-
-            $item2 = new ListItem();
-            $link2 = new Anchor(SiteConfig::getBaseURL(), $translation->get('menus/main-menu/menu-item-2'));
-            $item2->addChild($link2);
-            $mainMenu->addChild($item2);
-
-            $item3 = new ListItem();
-            $link3 = new Anchor(SiteConfig::getBaseURL(), $translation->get('menus/main-menu/menu-item-3'));
-            $item3->addChild($link3);
-            $mainMenu->addChild($item3);
+            
         });
     }
     /**
@@ -273,133 +236,45 @@ class WebFioriTheme extends Theme {
     }
     public function getAsideNode() {
         $menu = new HTMLNode('div');
-
+        
         return $menu;
     }
 
     public function getFooterNode() {
-        $node = new HTMLNode('div');
-        $socialMedia = new HTMLNode();
-        $socialMedia->setClassName('wf-row');
-        $socialMedia->setID('social-media-container');
-        $socialMedia->setWritingDir(Page::dir());
-
-        $facebookIcon = new HTMLNode('img', false);
-        $facebookIcon->setAttribute('src', Page::imagesDir().'/facebook.png');
-        $facebookIcon->setClassName('social-media-icon');
-        $facebookLink = new HTMLNode('a');
-        $facebookLink->setAttribute('href', '');
-        $facebookLink->setAttribute('target', '_blank');
-        $facebookLink->addChild($facebookIcon);
+        $node = HTMLNode::loadComponent($this->getDirecotry().'footer.html', [
+            'version' => Config::getVersion(),
+            'version_type' => Config::getVersionType(),
+            'writing_dir' => Page::dir(),
+            'contact_phone' => '013 xxx xxxx',
+            'copyright' => 'All Rights Reserved',
+            'contact_mail' => 'hello@example.com'
+        ]);
         
-
-        $twtrIcon = new HTMLNode('img', false);
-        $twtrIcon->setAttribute('src', Page::imagesDir().'/tweeter.png');
-        $twtrIcon->setClassName('social-media-icon');
-        $twtrLink = new HTMLNode('a');
-        $twtrLink->setAttribute('href', '');
-        $twtrLink->setAttribute('target', '_blank');
-        $twtrLink->addChild($twtrIcon);
-        
-
-        $linkedinIcon = new HTMLNode('img', false);
-        $linkedinIcon->setAttribute('src', Page::imagesDir().'/linkedin.png');
-        $linkedinIcon->setClassName('social-media-icon');
-        $linkedinLink = new HTMLNode('a');
-        $linkedinLink->setAttribute('href', '');
-        $linkedinLink->setAttribute('target', '_blank');
-        $linkedinLink->addChild($linkedinIcon);
-        
-
-        $snapIcon = new HTMLNode('img', false);
-        $snapIcon->setAttribute('src', Page::imagesDir().'/snapchat.png');
-        $snapIcon->setClassName('social-media-icon');
-        $snapLink = new HTMLNode('a');
-        $snapLink->setAttribute('href', '');
-        $snapLink->setAttribute('target', '_blank');
-        $snapLink->addChild($snapIcon);
-        
-        $socialMedia->addChild($facebookLink)
-                ->addChild($twtrLink)
-                ->addChild($linkedinLink)
-                ->addChild($snapLink);
-
-        $node->addChild($socialMedia);
-        $contactInfo = new HTMLNode();
-        $contactInfo->setClassName('wf-'.Page::dir().'-col-12');
-        $p = new PNode();
-        $p->addText('013 xxx xxxx', ['new-line' => true]);
-        $p->addText('youremail@example.com',['new-line' => true]);
-        $contactInfo->addChild($p);
-        $node->addChild($contactInfo);
-        $p->addText('Your Copyright Notice © '.date('Y'));
-        $div = new HTMLNode('div');
-        $div->setAttribute('class', 'wf-ltr-col-12');
-        $div->addTextNode('<b style="color:gray;font-size:8pt;">Powered By: <a href="https://github.com/usernane/webfiori" '
-                .'target="_blank">WebFiori Framework</a> v'.Config::getVersion().' ('.Config::getVersionType().')</b>',false);
-        $node->addChild($div);
-
         return $node;
     }
 
     public function getHeadNode() {
         $headTag = new HeadNode();
         $headTag->setBase(SiteConfig::getBaseURL());
-        $headTag->addLink('icon', Page::imagesDir().'/favicon.png');
-        $headTag->addCSS(Page::cssDir().'/Grid.css');
-        $headTag->addCSS(Page::cssDir().'/colors.css');
-        $headTag->addCSS(Page::cssDir().'/theme.css');
+        $headTag->addLink('icon', 'favicon.png');
         $headTag->addMeta('robots', 'index, follow');
 
         return $headTag;
     }
 
     public function getHeadrNode() {
-        $headerSec = new HTMLNode();
-        $logoContainer = new HTMLNode();
-        $logoContainer->setID('inner-header');
-        $logoContainer->setClassName('wf-'.Page::dir().'-col-11-nm-np');
-        $img = new HTMLNode('img', false);
-        $img->setAttribute('src',Page::imagesDir().'/favicon.png');
-        $img->setClassName('wf-'.Page::dir().'-col-1-np-nm');
-        $img->setID('logo');
-        $img->setWritingDir(Page::dir());
-        $link = new Anchor(SiteConfig::getHomePage(), '');
-        $link->addChild($img);
-        $headerSec->addChild($link);
-        $session = WebsiteController::get()->getSession();
-
-        if ($session !== null) {
-            $langCode = WebsiteController::get()->getSession()->getLang(true);
-        } else {
-            $langCode = 'EN';
-        }
-        $p = new PNode();
-        $siteNames = SiteConfig::getWebsiteNames();
-
-        if (isset($siteNames[$langCode])) {
-            $p->addText($siteNames[$langCode], ['bold' => true]);
-        } else {
-            if (isset($_GET['language']) && isset($siteNames[$_GET['language']])) {
-                $p->addText($siteNames[$_GET['language']], ['bold' => true]);
-            } else {
-                $p->addText('<SITE NAME>', ['bold' => true]);
-            }
-        }
-        $logoContainer->addChild($p);
-        $headerSec->addChild($logoContainer);
-        //end of logo UI
-        //starting of main menu items
-        $menu = new HTMLNode('nav');
-        $menu->setID('main-navigation-menu');
-        $menu->setClassName('wf-'.Page::dir().'-col-9-np');
-        $ul = new UnorderedList();
-        $ul->setID('menu-items-container');
-        $ul->setClassName('wf-row-nm-np');
-        $ul->setAttribute('dir', Page::dir());
-        $menu->addChild($ul);
-        $logoContainer->addChild($menu);
-
+        $headerSec = HTMLNode::loadComponent($this->getDirecotry().'header.html', [
+            'menu-labels' => Page::translation()->get('menus/main-menu'),
+            'home_link' => WebFiori::getSiteConfig()->getBaseURL(),
+            'dir' => Page::dir(),
+            'site_name' => WebFiori::getSiteConfig()->getWebsiteNames()[Page::lang()],
+            'menu-links' => [
+                'm_1_link' => '#',
+                'm_2_link' => '#',
+                'm_3_link' => '#'
+            ],
+        ]);
+        
         return $headerSec;
     }
 }

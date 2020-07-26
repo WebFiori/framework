@@ -32,6 +32,8 @@ use webfiori\entity\cli\CLI;
 use webfiori\entity\exceptions\RoutingException;
 use webfiori\entity\ui\NotFoundView;
 use webfiori\entity\Util;
+use webfiori\entity\File;
+use webfiori\entity\ThemeLoader;
 /**
  * The basic class that is used to route user requests to the correct 
  * location.
@@ -76,7 +78,7 @@ class Router {
      * should be created.
      * @since 1.0
      */
-    const API_ROUTE = DIRECTORY_SEPARATOR.'apis';
+    const API_ROUTE = DS.'app'.DS.'apis';
     /**
      * A constant that represents closure route. The value of the 
      * constant is 'func'.
@@ -87,13 +89,13 @@ class Router {
      * A constant for custom directory route.
      * @since 1.0
      */
-    const CUSTOMIZED = DIRECTORY_SEPARATOR;
+    const CUSTOMIZED = DS;
     /**
      * A constant that represents view route. It is simply the root directory where web 
      * pages should be created.
      * @since 1.0
      */
-    const VIEW_ROUTE = DIRECTORY_SEPARATOR.'pages';
+    const VIEW_ROUTE = DS.'app'.DS.'pages';
     /**
      *
      * @var type 
@@ -485,6 +487,7 @@ class Router {
      * @since 1.2
      */
     public static function route($uri) {
+        ThemeLoader::registerResourcesRoutes();
         Router::get()->_resolveUrl($uri);
     }
     /**
@@ -732,22 +735,22 @@ class Router {
     }
     private function _fixFilePath($path) {
         if (strlen($path) != 0 && $path != '/') {
-            $path00 = str_replace('/', DIRECTORY_SEPARATOR, $path);
-            $path01 = str_replace('\\', DIRECTORY_SEPARATOR, $path00);
+            $path00 = str_replace('/', DS, $path);
+            $path01 = str_replace('\\', DS, $path00);
 
-            if ($path01[strlen($path01) - 1] == DIRECTORY_SEPARATOR || $path01[0] == DIRECTORY_SEPARATOR) {
-                while ($path01[0] == DIRECTORY_SEPARATOR || $path01[strlen($path01) - 1] == DIRECTORY_SEPARATOR) {
-                    $path01 = trim($path01, DIRECTORY_SEPARATOR);
+            if ($path01[strlen($path01) - 1] == DS || $path01[0] == DS) {
+                while ($path01[0] == DS || $path01[strlen($path01) - 1] == DS) {
+                    $path01 = trim($path01, DS);
                 }
-                $path01 = DIRECTORY_SEPARATOR.$path01;
+                $path01 = DS.$path01;
             }
 
-            if ($path01[0] != DIRECTORY_SEPARATOR) {
-                $path01 = DIRECTORY_SEPARATOR.$path01;
+            if ($path01[0] != DS) {
+                $path01 = DS.$path01;
             }
             $path = $path01;
         } else {
-            $path = DIRECTORY_SEPARATOR;
+            $path = DS;
         }
 
         return $path;
@@ -829,31 +832,48 @@ class Router {
     private function _isDirectoryAVar($dir) {
         return $dir[0] == '{' && $dir[strlen($dir) - 1] == '}';
     }
+    private function _getFileDirAndName($absDir) {
+        $expl = explode(DS, $absDir);
+        $fileName = $expl[count($expl) - 1];
+        $dir = substr($absDir, 0, strlen($absDir) - strlen($fileName));
+        return [
+            'name' => $fileName,
+            'dir' => $dir
+        ];
+    }
     /**
      * 
      * @param RouterUri $route
      */
     private function _loadResource($route) {
         $file = $route->getRouteTo();
-        $classNamespace = require_once $file;
+        $info = $this->_getFileDirAndName($file);
+        $fileObj = new File($info['name'], $info['dir']);
+        $fileObj->read();
+        
+        if ($fileObj->getFileMIMEType() === 'text/plain') {
+            $classNamespace = require_once $file;
 
-        if (gettype($classNamespace) == 'string') {
-            if (strlen($classNamespace) == 0) {
-                $constructor = '\\'.$route->getClassName();
-            } else {
-                $constructor = '\\'.$classNamespace.'\\'.$route->getClassName();
-            }
+            if (gettype($classNamespace) == 'string') {
+                if (strlen($classNamespace) == 0) {
+                    $constructor = '\\'.$route->getClassName();
+                } else {
+                    $constructor = '\\'.$classNamespace.'\\'.$route->getClassName();
+                }
 
-            if (class_exists($constructor)) {
-                $instance = new $constructor();
+                if (class_exists($constructor)) {
+                    $instance = new $constructor();
 
-                if ($instance instanceof WebServicesSet) {
-                    if (!defined('API_CALL')) {
-                        define('API_CALL', true);
+                    if ($instance instanceof WebServicesSet) {
+                        if (!defined('API_CALL')) {
+                            define('API_CALL', true);
+                        }
+                        $instance->process();
                     }
-                    $instance->process();
                 }
             }
+        } else {
+            $fileObj->view();
         }
     }
     /**

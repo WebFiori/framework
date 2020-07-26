@@ -53,7 +53,6 @@ class Controller {
      * <li>duration: 10080 (one week) </li>
      * <li>refresh: true </li>
      * <li>name: 'wf-session' </li>
-     * <li>create-new: true</li>
      * <li>user: null </li>
      * <li>variables: empty array. </li>
      * </ul>
@@ -63,7 +62,6 @@ class Controller {
         'duration' => 10080,
         'refresh' => true,
         'name' => 'wf-session',
-        'create-new' => true,
         'user' => null,
         'variables' => []
     ];
@@ -567,9 +565,6 @@ class Controller {
      * are: 
      * <ul>
      * <li>name: (Required) The name of the session that will be used or created.</li>
-     * <li>create-new: If no session was found which has the given name and 
-     * this index is set to true, new session will be created. Ignored if 
-     * a session which has the given name is already created.</li>
      * <li>duration: The duration of the session in minutes (optional). Used only if 
      * the session is new.</li>
      * <li>refresh: An optional boolean variable. If set to true, the session timeout time 

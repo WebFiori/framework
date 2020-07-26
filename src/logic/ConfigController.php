@@ -444,7 +444,7 @@ class ConfigController extends Controller {
 
 
         
-        $mailConfigFile = new File('Config.php', ROOT_DIR.DIRECTORY_SEPARATOR.'conf');
+        $mailConfigFile = new File('Config.php', ROOT_DIR.DS.'conf');
         $mailConfigFile->remove();
         $mailConfigFile->setRawData($fileAsStr);
         $mailConfigFile->write(false, true);

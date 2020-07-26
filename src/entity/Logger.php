@@ -385,7 +385,7 @@ class Logger {
         return self::$logger;
     }
     private function _getAbsolutePath() {
-        return $this->directory.DIRECTORY_SEPARATOR.$this->logFileName.'.log';
+        return $this->directory.DS.$this->logFileName.'.log';
     }
     /**
      * 

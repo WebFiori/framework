@@ -526,9 +526,7 @@ abstract class CLICommand {
         } else if (is_callable($validator)) {
             $retVal['valid'] = call_user_func_array($validator, [$input]);
 
-            if ($retVal['valid'] === true) {
-                
-            } else {
+            if (!($retVal['valid'] === true)) {
                 $this->error('Invalid input is given. Try again.');
             }
         }

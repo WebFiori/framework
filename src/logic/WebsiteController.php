@@ -430,7 +430,7 @@ class WebsiteController extends Controller {
             . "        return \$this->webSiteNames;\n"
             . "    }\n"
             . "}\n";
-        $mailConfigFile = new File('SiteConfig.php', ROOT_DIR.DIRECTORY_SEPARATOR.'conf');
+        $mailConfigFile = new File('SiteConfig.php', ROOT_DIR.DS.'conf');
         $mailConfigFile->remove();
         $mailConfigFile->setRawData($fileAsStr);
         $mailConfigFile->write(false, true);

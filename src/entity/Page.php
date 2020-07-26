@@ -28,9 +28,11 @@ use Exception;
 use phpStructs\html\HeadNode;
 use phpStructs\html\HTMLDoc;
 use phpStructs\html\HTMLNode;
+use jsonx\JsonX;
 use webfiori\conf\SiteConfig;
-use webfiori\entity\langs\Language;
+use webfiori\entity\i18n\Language;
 use webfiori\entity\exceptions\UIException;
+use webfiori\WebFiori;
 /**
  * A class used to initialize view components.
  * This class is one of the core components for creating web pages. It is simply 
@@ -54,7 +56,7 @@ use webfiori\entity\exceptions\UIException;
  * and canonical URL. Also, this class can be used to load a specific theme 
  * and use it to change the look and feel of the web site.
  * @author Ibrahim
- * @version 1.9.3
+ * @version 1.9.4
  */
 class Page {
     /**
@@ -82,6 +84,13 @@ class Page {
      * @var array
      */
     private $beforeRenderCallbacks;
+    /**
+     * An array that contains the parameters which will be based to the 
+     * callbacks which will be get executed before rendering the page.
+     * @var array
+     * @since 1.9.4
+     */
+    private $beforeRenderParams;
     /**
      *
      * @var string
@@ -190,19 +199,32 @@ class Page {
     }
     /**
      * Adds a function which will be executed before the page is fully rendered.
+     * 
      * The function will be executed when the method 'Page::render()' is called. 
      * One possible use is to do some modifications to the DOM before the 
      * page is displayed. It is possible to have multiple callbacks.
+     * 
      * @param callback $callable A PHP function that will be get executed. before 
      * the page is rendered.
+     * 
+     * @param array $params An array of parameters which will be passed to the 
+     * callback. The parameters can be accessed in the callback in the 
+     * same order at which they appear in the array.
+     * 
      * @return int|null If the callable is added, the method will return a 
      * number that represents its ID. If not added, the method will return 
      * null.
+     * 
      * @since 1.9.1
      */
-    public static function beforeRender($callable = '') {
+    public static function beforeRender($callable = '', $params = []) {
         if (is_callable($callable) || $callable instanceof \Closure) {
             self::get()->beforeRenderCallbacks[] = $callable;
+            if (gettype($params) == 'array') {
+                self::get()->beforeRenderParams[] = $params;
+            } else {
+                self::get()->beforeRenderParams[] = [];
+            }
             $callbacksCount = count(self::get()->beforeRenderCallbacks);
             return $callbacksCount - 1;
         }
@@ -360,21 +382,28 @@ class Page {
     }
     /**
      * Display the page in the web browser or gets the rendered document as string.
+     * 
      * @param boolean $formatted If this parameter is set to true, the rendered 
      * HTML document will be well formatted and readable. Note that by adding 
      * formatting to the page, the size of rendered HTML document 
-     * will increase. Default is false.
+     * will increase. The document will be compressed if this 
+     * parameter is set to false. Default is false.
+     * 
      * @param boolean $returnResult If this parameter is set to true, the method 
      * will return the rendered HTML document as string. Default value is 
      * false.
+     * 
      * @return null|string If the parameter <b>$returnResult</b> is set to true, 
      * the method will return a string that represents the rendered page. Other 
      * than that, it will return null.
+     * 
      * @since 1.9
      */
     public static function render($formatted = false, $returnResult = false) {
+        $index = 0;
         foreach (self::get()->beforeRenderCallbacks as $function) {
-            call_user_func($function);
+            call_user_func_array($function, self::get()->beforeRenderParams[$index]);
+            $index++;
         }
 
         if ($returnResult) {
@@ -569,13 +598,11 @@ class Page {
     }
     private function _reset() {
         $this->document = new HTMLDoc();
-        $this->beforeRenderCallbacks = [];
         $this->setTitle('Hello World');
         $this->setWebsiteName('Hello Website');
         $this->setTitleSep('|');
         $this->contentDir = 'ltr';
         $this->description = null;
-        $this->contentLang = null;
         $this->incFooter = true;
         $this->incHeader = true;
         $this->theme = null;
@@ -600,6 +627,52 @@ class Page {
         $footerNode = new HTMLNode();
         $footerNode->setID(self::MAIN_ELEMENTS[4]);
         $this->document->addChild($footerNode);
+        
+        $langCode = WebFiori::getSysController()->getSessionLang();
+        if ($langCode === null) {
+            $langCode = WebFiori::getSiteConfig()->getPrimaryLanguage();
+        }
+        $this->contentLang = $langCode;
+        $this->usingLanguage();
+ 
+        $this->beforeRenderParams = [
+            0 => []
+        ];
+        $this->beforeRenderCallbacks = [function () {
+            $translation = Page::translation();
+            $jsonx = new JsonX();
+            $jsonx->addArray('vars', $translation->getLanguageVars(), true);
+            $i18nJs = new HTMLNode('script');
+            $i18nJs->setAttribute('type', 'text/javascript')->text('window.i18n = '.$jsonx.';');
+            Page::get()->document()->getHeadNode()->addChild($i18nJs);
+
+            //Load Js and CSS automatically
+            $pageTheme = Page::theme();
+            if ($pageTheme !== null) {
+                $themeDir = THEMES_PATH.DS.$pageTheme->getDirectoryName();
+                $jsDir = $themeDir.DS.$pageTheme->getJsDirName();
+                if (Util::isDirectory($jsDir)) {
+                    $filesInDir = array_diff(scandir($jsDir), ['.','..']);
+                    foreach ($filesInDir as $fileName) {
+                        $expl = explode('.', $fileName);
+                        if (count($expl) == 2 && $expl[1] == 'js') {
+                            Page::get()->document()->getHeadNode()->addJs($pageTheme->getDirectoryName().DS.$fileName);
+                        }
+                    }
+                }
+
+                $cssDir = $themeDir.DS.$pageTheme->getCssDirName();
+                if (Util::isDirectory($cssDir)) {
+                    $filesInDir = array_diff(scandir($cssDir), ['.','..']);
+                    foreach ($filesInDir as $fileName) {
+                        $expl = explode('.', $fileName);
+                        if (count($expl) == 2 && $expl[1] == 'css') {
+                            Page::get()->document()->getHeadNode()->addCSS($pageTheme->getDirectoryName().DS.$fileName);
+                        }
+                    }
+                }
+            }
+        }];
     }
     /**
      * Returns a single instance of 'Page'

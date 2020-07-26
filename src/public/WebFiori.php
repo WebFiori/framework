@@ -23,7 +23,6 @@
  * THE SOFTWARE.
  */
 namespace webfiori;
-
 use jsonx\JsonX;
 use webfiori\conf\Config;
 use webfiori\conf\MailConfig;
@@ -52,6 +51,9 @@ use webfiori\logic\WebsiteController;
  * @since 1.1.0
  */
 define('MICRO_START', microtime(true));
+ini_set('display_startup_errors', 1);
+        ini_set('display_errors', 1);
+        error_reporting(-1);
 /**
  * The instance of this class is used to control basic settings of 
  * the framework. Also, it is the entry point of any request.
@@ -138,8 +140,24 @@ class WebFiori {
             mb_http_input($encoding);
             mb_regex_encoding($encoding);
         }
+        /**
+         * The root directory that is used to load all other required system files.
+         */
+        if (!defined('ROOT_DIR')) {
+            $publicFolder = DIRECTORY_SEPARATOR.'public';
+            
+            if (substr(__DIR__, strlen(__DIR__) - strlen($publicFolder)) == $publicFolder) {
+                //HTTP run
+                define('ROOT_DIR', substr(__DIR__,0, strlen(__DIR__) - strlen(DIRECTORY_SEPARATOR.'public')));
+            } else {
+                //CLI run
+                define('ROOT_DIR', __DIR__);
+            }
+        }
         
-        require_once __DIR__.DIRECTORY_SEPARATOR.'ini'.DIRECTORY_SEPARATOR.'GlobalConstants.php';
+        if (!class_exists('webfiori\ini\GlobalConstants')) {
+            require_once ROOT_DIR.DIRECTORY_SEPARATOR.'ini'.DIRECTORY_SEPARATOR.'GlobalConstants.php';
+        }
         GlobalConstants::defineConstants();
         
         /**
@@ -151,12 +169,7 @@ class WebFiori {
          * Change this as needed.
          */
         date_default_timezone_set(DATE_TIMEZONE);
-        /**
-         * The root directory that is used to load all other required system files.
-         */
-        if (!defined('ROOT_DIR')) {
-            define('ROOT_DIR',__DIR__);
-        }
+        
 
         
 
@@ -164,7 +177,7 @@ class WebFiori {
          * Initialize autoloader.
          */
         if (!class_exists('webfiori\entity\AutoLoader',false)) {
-            require_once ROOT_DIR.DIRECTORY_SEPARATOR.'entity'.DIRECTORY_SEPARATOR.'AutoLoader.php';
+            require_once ROOT_DIR.DS.'entity'.DS.'AutoLoader.php';
         }
         self::$AU = AutoLoader::get();
         InitAutoLoad::init();
@@ -469,7 +482,7 @@ class WebFiori {
     private function _setErrHandler() {
         set_error_handler(function($errno, $errstr, $errfile, $errline)
         {
-            $isCli = class_exists('webfiori\entity\cli\CLI') ? CLI::isCLI() : php_sapi_name() == 'cli';
+            $isCli = class_exists('webfiori\entity\cli\CLI') ? CLI::isCLI() : http_response_code() === false;
 
             if ($isCli) {
                 fprintf(STDERR, "\n<%s>\n",Util::ERR_TYPES[$errno]['type']);
@@ -478,7 +491,10 @@ class WebFiori {
                 fprintf(STDERR, "Error Description%5s %s\n",":",Util::ERR_TYPES[$errno]['description']);
                 fprintf(STDERR, "Error File       %5s %s\n",":",$errfile);
                 fprintf(STDERR, "Error Line:      %5s %s\n",":",$errline);
-                exit(-1);
+                
+                if (defined('STOP_CLI_ON_ERR') && STOP_CLI_ON_ERR === true) {
+                    exit(-1);
+                }
             } else if (defined('API_CALL')) {
                 header("HTTP/1.1 500 Server Error");
                 $j = new JsonX([
@@ -581,7 +597,7 @@ class WebFiori {
                     return;
                 }
 
-                if (!$isCli) {
+                if (!$isCli && !headers_sent()) {
                     header("HTTP/1.1 500 Server Error");
                 }
 

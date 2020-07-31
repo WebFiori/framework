@@ -12,7 +12,7 @@
         "webfiori/php-structs":"1.9.5",
         "webfiori/jsonx":"1.4.7",
         "webfiori/ph-mysql":"1.4.2",
-        "webfiori/rest-easy":"1.5.0"
+        "webfiori/rest-easy":"1.5.1"
 
     },
     "keywords": [

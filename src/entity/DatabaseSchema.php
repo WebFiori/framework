@@ -28,19 +28,24 @@ namespace webfiori\entity;
  * A class to create database schema.
  *
  * @author Ibrahim
+ * 
  * @version 1.2.1
  */
 class DatabaseSchema {
     /**
      * An array which contains all the names of the classes which 
      * extends the base class MySQLQuery.
+     * 
      * @var array
+     * 
      * @since 1.0 
      */
     private $queries;
     /**
      * Singleton of <b>DatabaseSchema</b>.
+     * 
      * @var DatabaseSchema
+     * 
      * @since 1.0 
      */
     private static $schema;
@@ -54,17 +59,21 @@ class DatabaseSchema {
     /**
      * Adds a query builder class name to the set of classes that represents 
      * database tables.
+     * 
      * @param string $queryClassName The name of query builder class. If the 
      * class is contained in a name space, the name of the name space must 
      * be included (e.g. 'myNs\myFolder\MyQuery').
+     * 
      * @param int $order The order of query builder table in the database. Used to 
      * make sure that the tables that are referenced by other tables put first. 
      * It must be a value greater than or equal to 20. If the given order is 
      * taken, the name will be added to the last position.
+     * 
      * @return boolean Once the name is added, the method will return true. 
      * If the given name is already added or it is invalid, the method will 
      * return false. The given name will be considered invalid only if 
      * no class was found which correspond to the given name.
+     * 
      * @since 1.0
      */
     public function add($queryClassName,$order) {
@@ -94,7 +103,9 @@ class DatabaseSchema {
     }
     /**
      * Returns a singleton of the class DatabaseSchema.
+     * 
      * @return DatabaseSchema
+     * 
      * @since 1.0
      */
     public static function get() {
@@ -107,7 +118,9 @@ class DatabaseSchema {
     }
     /**
      * Returns the array which contains the names of query builder classes.
+     * 
      * @return array The array which contains the names of query builder classes.
+     * 
      * @since 1.2
      */
     public function getClassNames() {
@@ -115,10 +128,14 @@ class DatabaseSchema {
     }
     /**
      * Creates and returns a query that can be used to create MySQL database.
+     * 
      * The generated SQL query will have 'create database' statement in 
      * addition to 'use' statement.
+     * 
      * @param string $schemaName The name of the database.
+     * 
      * @return string A string that can be used to create MySQL database.
+     * 
      * @since 1.2.1
      */
     public function getCreateDatabaseStatement($schemaName) {
@@ -128,8 +145,10 @@ class DatabaseSchema {
     }
     /**
      * Returns the order of the last query builder class name.
+     * 
      * @return int The order of the last  query builder class name. If the 
      * schema has no query builder class names, the method will return -1.
+     * 
      * @since 1.2
      */
     public function getLastOrder() {
@@ -156,10 +175,13 @@ class DatabaseSchema {
     }
     /**
      * Returns the order of query builder class given its name.
+     * 
      * @param string $queryClassName The name of the query builder class. 
+     * 
      * @return int If the given query builder class was added, the method will return 
      * its order. If no class was found which has the given name, the method will 
      * return -1.
+     * 
      * @since 1.2
      */
     public function getOrder($queryClassName) {
@@ -176,8 +198,10 @@ class DatabaseSchema {
     }
     /**
      * Returns a string which represents the database schema.
+     * 
      * @return string A string which represents the database schema. If 
      * the string is executed, it will create database tables.
+     * 
      * @since 1.0
      */
     public function getSchema() {

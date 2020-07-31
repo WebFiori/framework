@@ -30,19 +30,23 @@ use webfiori\entity\ui\MessageBox;
 use webfiori\WebFiori;
 /**
  * Framework utility class.
+ * 
  * @author Ibrahim
+ * 
  * @version 1.3.9
  */
 class Util {
     /**
      * A constant that is returned by Util::checkSystemStatus() to indicate 
      * that database connection was not established.
+     * 
      * @since 1.2
      */
     const DB_NEED_CONF = 'db_conf_err';
     /**
      * A constant array that contains all PHP error codes in 
      * addition to a description for each error.
+     * 
      * It is possible to access error information by simply using error 
      * number as an index. For example, to access E_ERROR info, do the following:<br/>
      * <code>
@@ -50,6 +54,7 @@ class Util {
      * echo $errInf['type'];<br/>
      * echo $errInf['description'];<br/>
      * </code>
+     * 
      * @since 1.3.9
      */
     const ERR_TYPES = [
@@ -117,24 +122,28 @@ class Util {
     /**
      * A constant that is returned by Util::checkSystemStatus() to indicate 
      * that the file 'Config.php' is missing.
+     * 
      * @since 1.2
      */
     const MISSING_CONF_FILE = 'missing_config_file';
     /**
      * A constant that is returned by Util::checkSystemStatus() to indicate 
      * that the file 'SiteConfig.php' is missing.
+     * 
      * @since 1.2
      */
     const MISSING_SITE_CONF_FILE = 'missing_site_config_file';
     /**
      * A constant that is returned by Util::checkSystemStatus() to indicate 
      * that system is not configured yet.
+     * 
      * @since 1.2
      */
     const NEED_CONF = 'sys_conf_err';
     /**
      *
      * @var DatabaseLink 
+     * 
      * @since 1.2
      */
     private static $dbTestInstance;
@@ -145,10 +154,13 @@ class Util {
     }
     /**
      * Converts a positive integer value to binary string.
+     * 
      * @param int $intVal The number that will be converted.
+     * 
      * @return boolean|string If the given value is an integer and it is greater 
      * than -1, a string of zeros and ones is returned. Other than that, 
      * false is returned.
+     * 
      * @since 1.3.8
      */
     public static function binaryString($intVal) {
@@ -173,6 +185,7 @@ class Util {
     }
     /**
      * Test a connection to system database or external one.
+     * 
      * @param array $dbAttrs An associative array. The array can 
      * have 4 indices:
      * <ul>
@@ -185,9 +198,11 @@ class Util {
      * </ul>
      * If the given parameter is not provided, the method will try to test 
      * database settings that where set in the class 'Config'.
+     * 
      * @return boolean|string If the connection was established, the method will 
      * return true. If no connection was established, the method will 
      * return 'Util::DB_NEED_CONF'.
+     * 
      * @since 1.3.2
      */
     public static function checkDbConnection($dbAttrs = []) {
@@ -213,9 +228,11 @@ class Util {
 
     /**
      * Check the overall status of the system.
+     * 
      * @param boolean $checkDb If set to true, the method will also check 
      * database connection status. The settings of the connection will 
      * be taken from the class 'Config'. Default is false.
+     * 
      * @return boolean|string The method will return true in case everything 
      * was fine. If the file 'Config.php' was not found, The method will return 
      * 'Util::MISSING_CONF_FILE'. If the file 'SiteConfig.php' was not found, The method will return 
@@ -224,6 +241,7 @@ class Util {
      * the database, the method will return an associative array 
      * with two indices that contains connection error info. The first 
      * one is 'error-code' and the second one is 'error-message'.
+     * 
      * @since 1.2
      */
     public static function checkSystemStatus($checkDb = false,$dbName = '') {
@@ -251,6 +269,7 @@ class Util {
     }
     /**
      * Call this method to display errors and warnings.
+     * 
      * @since 0.2
      */
     public static function displayErrors() {
@@ -261,8 +280,11 @@ class Util {
     /**
      * This method is used to filter scripting code such as 
      * JavaScript or PHP. 
+     * 
      * @param string $input
+     * 
      * @return string
+     * 
      * @since 0.2
      */
     public static function filterScripts($input) {
@@ -274,6 +296,7 @@ class Util {
     }
     /**
      * Returns the base URL of the framework.
+     * 
      * The returned value will depend on the folder where the framework files 
      * are located. For example, if your domain is 'example.com' and the framework 
      * is placed at the root and the requested resource is 'http://example.com/x/y/z', 
@@ -281,7 +304,9 @@ class Util {
      * placed inside a folder in the server which has the name 'system', and 
      * the same resource is requested, then the base URL will be 
      * 'http://example.com/system'.
+     * 
      * @return string The base URL (such as 'http//www.example.com/')
+     * 
      * @since 0.2
      */
     public static function getBaseURL() {
@@ -310,8 +335,10 @@ class Util {
     }
     /**
      * Returns the IP address of the user who is connected to the server.
+     * 
      * @return string The IP address of the user who is connected to the server. 
      * The value is taken from the array $_SERVER at index 'REMOTE_ADDR'.
+     * 
      * @since 1.3.1
      */
     public static function getClientIP() {
@@ -326,9 +353,11 @@ class Util {
     /**
      * Returns the instance of 'MySQLLink' which is used to check database 
      * connection using the method 'Util::checkDbConnection()'.
+     * 
      * @return MySQLLink|null The instance of 'MySQLLink' which is used to check database 
      * connection using the method 'Util::checkDbConnection()'. If no test was 
      * performed, the method will return null.
+     * 
      * @since 1.2
      */
     public static function getDatabaseTestInstance() {
@@ -336,9 +365,12 @@ class Util {
     }
     /**
      * Returns an array that contains the dates of current week's days in Gregorian calendar.
+     * 
      * The returned array will contain the dates starting from Sunday. The format 
      * of the dates will be 'Y-m-d'.
+     * 
      * @return array an array that contains the dates of current week's days.
+     * 
      * @since 1.3.4
      */
     public static function getGWeekDates() {
@@ -380,11 +412,14 @@ class Util {
     }
     /**
      * Returns the number of a day in the week given a date.
+     * 
      * @param string $date A date string that has the month, the date and 
      * year number. The string must be provided in the format 'YYYY-MM-DD'.
+     * 
      * @return int|boolean ISO-8601 numeric representation of the day that 
      * represents the given date in the week. 1 for Monday and 7 for Sunday. 
      * If the method fails, it will return false.
+     * 
      * @since 1.3.4
      */
     public static function getGWeekday($date) {
@@ -405,7 +440,9 @@ class Util {
     }
     /**
      * Returns the IPv4 address of server host.
+     * 
      * @return string The IPv4 address of server host.
+     * 
      * @since 1.3.1
      */
     public static function getHostIP() {
@@ -415,7 +452,9 @@ class Util {
     }
     /**
      * Returns the URI of the requested resource.
+     * 
      * @return string The URI of the requested resource. 
+     * 
      * @since 1.1
      */
     public static function getRequestedURL() {
@@ -437,14 +476,17 @@ class Util {
     }
     /**
      * Returns HTTP request headers.
+     * 
      * This method will try to extract request headers using two ways, 
      * first, it will check if the method 'apache_request_headers()' is 
      * exist or not. If it does, then request headers will be taken from 
      * there. If it does not exist, it will try to extract request headers 
      * from the super global $_SERVER.
+     * 
      * @return array An associative array of request headers. The indices 
      * will represents the headers and the values are the values of the 
      * headers. The indices will be all in lower case.
+     * 
      * @since 1.3.3
      */
     public static function getRequestHeaders() {
@@ -464,12 +506,16 @@ class Util {
     }
     /**
      * Checks if a given directory exists or not.
+     * 
      * @param string $dir A string in a form of directory (Such as 'root/home/res').
+     * 
      * @param boolean $createIfNot If set to true and the given directory does 
      * not exists, The method will try to create the directory.
+     * 
      * @return boolean In general, the method will return false if the 
      * given directory does not exists. The method will return true only 
      * in two cases, If the directory exits or it does not exists but was created.
+     * 
      * @since 0.1
      */
     public static function isDirectory($dir,$createIfNot = false) {
@@ -487,8 +533,11 @@ class Util {
     }
     /**
      * Checks if a given character is an upper case letter or lower case letter.
+     * 
      * @param char $char A character such as (A B C D " > < ...).
+     * 
      * @return bool True if the given character is in upper case.
+     * 
      * @since 0.1
      */
     public static function isUpper($char) {
@@ -500,11 +549,14 @@ class Util {
     }
     /**
      * Converts a string to its numeric value.
+     * 
      * @param string $str A string that represents a number.
+     * 
      * @return int|float|boolean If the given string represents an integer, 
      * the value is returned as an integer. If the given string represents a float, 
      * the value is returned as a float. If the method is unable to convert 
      * the string to its numerical value, it will return false.
+     * 
      * @since 1.3.5
      */
     public static function numericValue($str) {
@@ -540,15 +592,19 @@ class Util {
     }
     /**
      * Call the method 'print_r' and insert 'pre' around it.
+     * 
      * The method is used to make the output well formatted and user 
      * readable. Note that if the framework is running through command line 
      * interface, the output will be sent to STDOUTE.
+     * 
      * @param mixed $expr Any variable or value that can be passed to the 
      * function 'print_r'.
+     * 
      * @param boolean $asMessageBox If this attribute is set to true, the output
      * will be shown in a floating message box which can be moved around inside 
      * the web page. Default is true. It has no effect in case the framework 
      * is running through CLI.
+     * 
      * @since 1.0
      */
     public static function print_r($expr,$asMessageBox = true) {
@@ -580,14 +636,18 @@ class Util {
     }
     /**
      * Returns the reverse of a string.
+     * 
      * This method can be used to reverse the order of any string. 
      * For example, if the given string is '   Good Morning Buddy', the 
      * method will return 'ydduB gninriM dooG   '. If null is given, the 
      * method will return empty string. Note that if the given string is 
      * a unicode string, then the method needs mb_ extension to be exist for 
      * the output to be correct.
+     * 
      * @param string $str The string that will be reversed.
+     * 
      * @return string The string after reversing its order.
+     * 
      * @since 1.3.7
      */
     public static function reverse($str) {
@@ -614,11 +674,15 @@ class Util {
     }
     /**
      * Returns unicode code of a character.
+     * 
      * Common values: 32 = space, 10 = new line, 13 = carriage return.
      * Note that this method depends on mb_ functions.
+     * 
      * @param type $u a character.
+     * 
      * @return int|false The unicode code of a character. If mb_ library is not 
      * loaded, the method will return false.
+     * 
      * @since 0.2
      */
     public static function uniord($u) {

@@ -31,45 +31,54 @@ use webfiori\conf\SiteConfig;
 use webfiori\entity\exceptions\SessionException;
 /**
  * A helper class to manage system sessions.
+ * 
  * @author Ibrahim 
+ * 
  * @version 1.8.8
  */
 class SessionManager implements JsonI {
     /**
      * The default lifetime for any new session (in minutes).
-     * @version 1.8.4
+     * 
+     * @since 1.8.4
      */
     const DEFAULT_SESSION_DURATION = 120;
     /**
      * A constant that indicates the session has timed out.
+     * 
      * @since 1.7
      */
     const EXPIRED = 'status_session_timeout';
     /**
      * A constant that indicates the session has invalid cookie.
+     * 
      * @since 1.7
      */
     const INV_COOKIE = 'status_inv_cookie';
     /**
      * A constant that indicates the IP address of the request does not match 
      * the one stored in the session.
+     * 
      * @since 1.7
      */
     const INV_IP_ADDRESS = 'status_inv_ip_address';
     /**
      * A constant that indicates the session has invalid state (Usually one 
      * missing session variable).
+     * 
      * @since 1.7
      */
     const INV_STATE = 'status_invalid_state';
     /**
      * A constant that indicates the session has been killed by calling the 
      * method 'SessionManager::kill()'.
+     * 
      * @since 1.7
      */
     const KILLED = 'status_session_killed';
     /**
      * An array that contains the names of main session variables.
+     * 
      * The array has the following values:
      * <ul>
      * <li>lifetime: Session duration in minutes</li>
@@ -82,7 +91,9 @@ class SessionManager implements JsonI {
      * <li>user: An object of type 'User' that represents session user.</li>
      * <li>lang: The language of the session (such as 'EN' or 'AR').</li>
      * <ul>
+     * 
      * @since 1.8.6
+     * 
      * @var array 
      */
     const MAIN_VARS = [

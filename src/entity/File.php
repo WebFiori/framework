@@ -29,14 +29,18 @@ use jsonx\JsonX;
 use webfiori\entity\exceptions\FileException;
 /**
  * A class that represents a file.
+ * 
  * This class can be used to read and write files in binary. In addition to that, 
  * it can be used to view files in web browsers.
+ * 
  * @author Ibrahim
+ * 
  * @version 1.1.5
  */
 class File implements JsonI {
     /**
      * An associative array that contains MIME types of common files.
+     * 
      * As of version 1.1.2 of the class, the array contains the 
      * following MIME types:
      * <ul>
@@ -116,6 +120,7 @@ class File implements JsonI {
      * <li>swf: application/x-shockwave-flash</li>
      * <li>ogx: application/ogg</li>
      * </ul>
+     * 
      * @since 1.1.1
      */
     const MIME_TYPES = [
@@ -190,46 +195,61 @@ class File implements JsonI {
     ];
     /**
      * The name of the attachment.
+     * 
      * @var string 
+     * 
      * @since 1.0
      */
     private $fileName;
     /**
      * The size of the file in bytes.
+     * 
      * @var int
+     * 
      * @since 1.1 
      */
     private $fileSize;
     /**
      * A unique ID for the file.
+     * 
      * @var string
+     * 
      * @since 1.0 
      */
     private $id;
     /**
      * MIME type of the attachment (such as 'image/png')
+     * 
      * @var string 
+     * 
      * @since 1.0
      */
     private $mimeType;
     /**
      * The full path to the file.
+     * 
      * @var string 
      */
     private $path;
     /**
      * Raw data of the file in binary.
+     * 
      * @var type 
+     * 
      * @since 1.0
      */
     private $rawData;
     /**
      * Creates new instance of the class.
+     * 
      * This method will set the path and name to empty string. Also, it will 
      * set the size to 0 and ID to -1. Finally, it will set MIME type to 
      * "application/octet-stream"
+     * 
      * @param string $fName The name of the file such as 'my-file.png'.
+     * 
      * @param string $fPath The path of the file such as 'C:/Images/Test'.
+     * 
      * @since 1.0
      */
     public function __construct($fName = '',$fPath = '') {
@@ -244,6 +264,7 @@ class File implements JsonI {
     }
     /**
      * Returns JSON string that represents basic file info.
+     * 
      * @return string
      */
     public function __toString() {
@@ -251,13 +272,16 @@ class File implements JsonI {
     }
     /**
      * Returns the full path to the file.
+     * 
      * The full path of the file is a string that contains the path of the 
      * file alongside its name. Assuming that the path is set to "C:/Users/Me/Documents" 
      * and file name is set to "my-doc.docx", This method will return something like 
      * "C:\Users\Me\Documents\my-do.docx".
+     * 
      * @return string Full path to the file (e.g. 'root\images\hello.png').
      * If the name of the file is not set or the path is not set, the method 
      * will return empty string.
+     * 
      * @since 1.1.1
      */
     public function getAbsolutePath() {
@@ -272,10 +296,13 @@ class File implements JsonI {
     }
     /**
      * Returns the directory at which the file exist on.
+     * 
      * The directory is simply the folder that contains the file. For example, 
      * the directory can be something like "C:\Users\Me\Documents". Note that the 
      * returned directory will be using backward slashes "\".
+     * 
      * @return string The directory at which the file exist on.
+     * 
      * @since 1.0
      */
     public function getDir() {
@@ -283,11 +310,14 @@ class File implements JsonI {
     }
     /**
      * Returns MIME type of the file.
+     * 
      * Note that if the file is specified by its path and name, the method 
      * File::read() must be called before calling this method to update its 
      * MIME type.
+     * 
      * @return string MIME type of the file. If MIME type of the file is not set 
      * or not detected, the method will return 'application/octet-stream'.
+     * 
      * @since 1.0
      */
     public function getFileMIMEType() {
@@ -295,9 +325,12 @@ class File implements JsonI {
     }
     /**
      * Returns the ID of the file.
+     * 
      * This method is helpful in case the file is stored in database.
+     * 
      * @return string The ID of the file. If the ID is not set, the method 
      * will return -1.
+     * 
      * @since 1.0
      */
     public function getID() {
@@ -305,10 +338,14 @@ class File implements JsonI {
     }
     /**
      * Returns MIME type of a file type.
+     * 
      * The method will try to find MIME type based on its extension. If 
+     * 
      * @param string $ext File extension without the suffix (such as 'jpg').
+     * 
      * @return string|null If the extension MIME type is found, it will be 
      * returned. If not, the method will return null.
+     * 
      * @since 1.1.1
      */
     public static function getMIMEType($ext) {
@@ -326,10 +363,13 @@ class File implements JsonI {
     }
     /**
      * Returns the name of the file.
-     * * The name is used to construct the absolute path of the file in addition 
+     * 
+     * The name is used to construct the absolute path of the file in addition 
      * to its path.
+     * 
      * @return string The name of the file. If the name is not set, the method 
      * will return empty string.
+     * 
      * @since 1.0
      */
     public function getName() {
@@ -337,12 +377,16 @@ class File implements JsonI {
     }
     /**
      * Returns the path of the file.
+     * 
      * The path is simply the folder that contains the file. For example, 
      * the path can be something like "C:\Users\Me\Documents". Note that the 
      * returned path will be using backward slashes "\".
+     * 
      * @return string The path to the file (such as "C:\Users\Me\Documents"). If 
      * the path is not set, the method will return empty string.
+     * 
      * @since 1.0
+     * 
      * @deprecated since version 1.1.5 Use File::getDir() instead.
      */
     public function getPath() {
@@ -350,8 +394,10 @@ class File implements JsonI {
     }
     /**
      * Returns the raw data of the file.
+     * 
      * The raw data is simply a string. It can be binary string or any basic 
      * string.
+     * 
      * @param string $encodeOrDecode This parameter is used to base-64 decode or 
      * encode file data. The parameter can have one of 3 values:
      * <ul>
@@ -360,8 +406,10 @@ class File implements JsonI {
      * <li>none: Return the raw data of the file as it is. This is the default value.</li>
      * </ul>
      * If any other value is given, the method will use 'none'.
+     * 
      * @return string|null Raw data of the file. If no data is set, the method 
      * will return null.
+     * 
      * @since 1.0
      */
     public function getRawData($encodeOrDecode = 'none') {
@@ -382,9 +430,11 @@ class File implements JsonI {
     }
     /**
      * Returns the size of the file in bytes.
+     * 
      * Note that if the file is specified by its path and name, the method 
      * File::read() must be called before calling this method to update its 
      * size.
+     * 
      * @return int Size of the file in bytes.
      */
     public function getSize() {
@@ -392,17 +442,21 @@ class File implements JsonI {
     }
     /**
      * Reads the file in binary mode.
+     * 
      * First of all, this method checks the existence of the file. If it 
      * is exist, it tries to open the file in binary mode 'rb'. If a resource 
      * is created, it is used to read the content of the file. Also, the method 
      * will try to set MIME type of the file. If MIME type was not detected, 
      * it will set to 'application/octet-stream'. If the method is unable to 
      * read the file, it will throw an exception.
+     * 
      * @param int $from The byte at which the method will start reading from. If -1 
      * is given, then the method will start reading from byte 0.
+     * 
      * @param int $to The byte at which the method will read data to. If -1 
      * is given, then the method will read till last byte. Default is 
      * -1.
+     * 
      * @throws FileException The method will throw an exception in 3 cases: 
      * <ul>
      * <li>If file name is not set.</li>
@@ -423,10 +477,13 @@ class File implements JsonI {
     }
     /**
      * Removes a file given its name and path.
+     * 
      * Before calling this method, the name of the file and its path must 
      * be specified.
+     * 
      * @return boolean If the file was removed, the method will return 
      * true. Other than that, the method will return false.
+     * 
      * @since 1.1.2
      */
     public function remove() {
@@ -439,15 +496,18 @@ class File implements JsonI {
         return false;
     }
     /**
-     * /**
      * Sets the name of the directory at which the file exist on.
+     * 
      * The directory is simply the folder that contains the file. For example, 
      * the directory can be something like "C:/Users/Me/Documents". The directory can 
      * use forward slashes or backward slashes.
+     * 
      * @param string $dir The directory which will contain the file. It must 
      * be non-empty string in order to set.
+     * 
      * @return boolean The method will return true if the directory is set. Other 
      * than that, the method will return false.
+     * 
      * @since 1.0
      */
     public function setDir($dir) {
@@ -455,8 +515,11 @@ class File implements JsonI {
     }
     /**
      * Sets the ID of the file.
+     * 
      * This method is helpful in case the file is stored in database.
+     * 
      * @param string $id The unique ID of the file.
+     * 
      * @since 1.0
      */
     public function setID($id) {
@@ -464,10 +527,13 @@ class File implements JsonI {
     }
     /**
      * Sets the MIME type of the file.
+     * 
      * It is not recommended to update MIME type of the file manually. Only 
      * use this method for custom file types. MIME type will be set only 
      * if its non-empty string.
+     * 
      * @param string $type MIME type (such as 'application/pdf')
+     * 
      * @since 1.0
      */
     public function setMIMEType($type) {
@@ -477,9 +543,12 @@ class File implements JsonI {
     }
     /**
      * Sets the name of the file (such as 'my-image.png')
+     * 
      * The name is used to construct the absolute path of the file in addition 
      * to its path. The name of the file must include its extension (or suffix).
+     * 
      * @param string $name The name of the file.
+     * 
      * @since 1.0
      */
     public function setName($name) {
@@ -487,14 +556,19 @@ class File implements JsonI {
     }
     /**
      * Sets the path of the file.
+     * 
      * The path is simply the folder that contains the file. For example, 
      * the path can be something like "C:/Users/Me/Documents". The path can 
      * use forward slashes or backward slashes.
+     * 
      * @param string $fPath The folder which will contain the file. It must 
      * be non-empty string in order to set.
+     * 
      * @return boolean The method will return true if the path is set. Other 
      * than that, the method will return false.
+     * 
      * @since 1.0
+     * 
      * @deprecated since version 1.1.5 Use File::setDir() instead.
      */
     public function setPath($fPath) {
@@ -511,9 +585,12 @@ class File implements JsonI {
     }
     /**
      * Sets the binary representation of the file.
+     * 
      * The raw data is simply a string. It can be binary string or any basic 
      * string. Also, it can be a blob which was retrieved from a database.
+     * 
      * @param string $raw Binary raw data of the file.
+     * 
      * @since 1.0
      */
     public function setRawData($raw) {
@@ -524,11 +601,13 @@ class File implements JsonI {
     }
     /**
      * Returns a JSON string that represents the file.
+     * 
      * @return JsonX An object of type 'JsonX' that contains file information. 
      * The object will have the following information:<br/>
      * <b>{<br/>&nbsp;&nbsp;"id":"",<br/>&nbsp;&nbsp;"mime":"",<br/>&nbsp;&nbsp;"name":"",<br/>
      * &nbsp;&nbsp;"path":"",<br/>&nbsp;&nbsp;"sizeInBytes":"",<br/>&nbsp;&nbsp;"sizeInKBytes":"",<br/>
      * &nbsp;&nbsp;"sizeInMBytes":""<br/>}</b>
+     * 
      * @since 1.0
      */
     public function toJSON() {
@@ -550,14 +629,18 @@ class File implements JsonI {
     }
     /**
      * Display the file. 
+     * 
      * If the raw data of the file is null, the method will 
      * try to read the file that was specified by the name and its path. If 
      * the method is unable to read the file, an exception is thrown.
+     * 
      * @param boolean $asAttachment If this parameter is set to 
      * true, the header 'content-disposition' will have the attribute 'attachment' 
      * set instead of 'inline'. This will trigger 'save as' dialog to appear.
+     * 
      * @throws FileException An exception with the message "MIME type of raw data is not set." 
      * If MIME type of the file is not set.
+     * 
      * @since 1.1.1
      */
     public function view($asAttachment = false) {
@@ -572,11 +655,14 @@ class File implements JsonI {
     }
     /**
      * Write raw binary data into a file.
+     * 
      * The method will write the data using the binary write mode. 
      * If it fails, It will throw an exception.
+     * 
      * @param boolean $append If the file already exist in the file system and 
      * this attribute is set to true, the new raw data will be appended to the 
      * file. Default is true.
+     * 
      * @param boolean $create If the file does not exist and this attribute is set 
      * to true, the method will attempt to create the file. Default is false.
      * 
@@ -586,6 +672,7 @@ class File implements JsonI {
      * <li>If file path is not set.</li>
      * <li>If the file does not exist and the parameter $create is set to false.</li>
      * </ul>
+     * 
      * @since 1.1.1
      */
     public function write($append = true, $create = false) {
@@ -595,6 +682,7 @@ class File implements JsonI {
     /**
      * 
      * @return string
+     * 
      * @throws FileException
      */
     private function _checkNameAndPath() {

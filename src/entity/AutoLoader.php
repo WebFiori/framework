@@ -28,6 +28,7 @@ use Exception;
 use webfiori\entity\exceptions\ClassLoaderException;
 /**
  * An autoloader class to load classes as needed during runtime.
+ * 
  * The class aims to provide all needed utilities to autoload any classes 
  * which are within the scope of the framework. In addition, the developer 
  * can add his own custom folders to the autoloader. More to that, the autoloder 
@@ -35,7 +36,9 @@ use webfiori\entity\exceptions\ClassLoaderException;
  * is used to collect the dependencies. To activate this feature, the constant 
  * 'LOAD_COMPOSER_PACKAGES' must be defined and set to true. The class can be used independent of 
  * any other component to load classes.
+ * 
  * @author Ibrahim
+ * 
  * @version 1.1.7
  */
 class AutoLoader {
@@ -63,13 +66,16 @@ class AutoLoader {
      * An associative array that contains the info which was taken 
      * from autoloader's cache file.
      * This one is used to fasten the process of loading classes.
+     * 
      * @var array 
+     * 
      * @since 1.1.6
      */
     private $casheArr;
     /**
      * An array that contains the names of indices that are used by loaded class 
      * info array.
+     * 
      * The array have the following indices:
      * <ul>
      * <li>class-name</li>
@@ -77,6 +83,7 @@ class AutoLoader {
      * <li>path</li>
      * <li>loaded-from-cache</li>
      * </ul>
+     * 
      * @var array 
      */
     private static $CLASS_INDICES = [
@@ -87,32 +94,42 @@ class AutoLoader {
     ];
     /**
      * An array that contains the names of all loaded class.
+     * 
      * @var array
+     * 
      * @since 1.1.4
      */
     private $loadedClasses;
     /**
      * A single instance of the class 'AutoLoader'.
+     * 
      * @var AutoLoader
+     * 
      * @since 1.0 
      */
     private static $loader;
     /**
      * A string or callback that indicates what will happen if the loader 
      * is unable to load a class.
+     * 
      * @var string|callable
+     * 
      * @since 1.1.3 
      */
     private $onFail;
     /**
      * The relative root directory that is used to search on.
+     * 
      * @var string
+     * 
      * @since 1.0 
      */
     private $rootDir;
     /**
      * An array of folders to search on.
+     * 
      * @var array
+     * 
      * @since 1.0 
      */
     private $searchFolders;
@@ -195,7 +212,9 @@ class AutoLoader {
      * </ul>
      * </li>
      * </ul>
+     * 
      * @return AutoLoader
+     * 
      * @throws Exception 
      */
     public static function get($options = [

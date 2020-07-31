@@ -1,5 +1,5 @@
 Options -Indexes
-<IfModule mod_rewrite.c>
+#<IfModule mod_rewrite.c>
     RewriteEngine on
     
     # Redirect http to https
@@ -18,17 +18,17 @@ Options -Indexes
     # Ones which are not here are public.
     # Add your own here.
     RewriteRule ^(vendor|apis|conf|entity|ini|logic|logs|pages) - [F,L]
-</IfModule>
+#</IfModule>
 <FilesMatch "\.(?:log|cache|config|sh|bat)$">
     # Deny access to any file with given extension.
     # Include your own at the top.
     Order allow,deny
     Deny from all
 </FilesMatch>
-<IfModule lsapi_module>
+#<IfModule lsapi_module>
     # Disable opcache. This might reduce load speed if disabled.
     # php_flag opcache.enable Off
-</IfModule>
+#</IfModule>
 
 # Allow CORS. Be careful here.
 <IfModule mod_headers.c>

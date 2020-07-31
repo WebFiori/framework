@@ -28,74 +28,99 @@ use jsonx\JsonI;
 use jsonx\JsonX;
 /**
  * A class that represents a system user.
+ * 
  * @author Ibrahim
+ * 
  * @version 1.7.2
  */
 class User implements JsonI {
     /**
      * @since 1.2
+     * 
      * @var string 
      */
     private $dispName;
     /**
      * The email address of the user.
+     * 
      * @var string 
+     * 
      * @since 1.0
      */
     private $email;
     /**
      * The ID of the user.
+     * 
      * @var int 
+     * 
      * @since 1.0
      */
     private $id;
     /**
      * The last date at which the user did use the system.
+     * 
      * @var string
+     * 
      * @since 1.4 
      */
     private $lastLogin;
     /**
      * The time and date at which user password was last reseed.
+     * 
      * @var string
+     * 
      * @since 1.6 
      */
     private $lastPasswordReseted;
     /**
      * The password of the user.
+     * 
      * @var string 
+     * 
      * @since 1.0
      */
     private $password;
     /**
      * The date at which the user registered in the system.
+     * 
      * @var string
+     * 
      * @since 1.4 
      */
     private $regDate;
     /**
      * The number of times the user has requested a password reset.
+     * 
      * @var int
+     * 
      * @since 1.6 
      */
     private $resetPassCounts;
     /**
      * The username of the user.
+     * 
      * @var string 
+     * 
      * @since 1.0
      */
     private $userName;
     /**
      * An array which contains user permissions.
+     * 
      * @var array
+     * 
      * @since 1.7 
      */
     private $userPrivileges;
     /**
      * Creates new instance of the class.
+     * 
      * @param string $username Username of the user.
+     * 
      * @param string $password The login password of the user.
+     * 
      * @param string $email Email address of the user.
+     * 
      * @since 1.0
      */
     function __construct($username = '',$password = '',$email = '') {
@@ -109,6 +134,7 @@ class User implements JsonI {
     }
     /**
      * Returns a JSON string representation of the user.
+     * 
      * The JsonX object will create a JSON string which has the following 
      * format:
      * <p>{<br/>
@@ -117,7 +143,9 @@ class User implements JsonI {
      * &nbsp;&nbsp;"display-name":""<br/>
      * &nbsp;&nbsp;"username":""<br/>
      * }</p>
+     * 
      * @return string
+     * 
      * @since 1.0
      */
     public function __toString() {
@@ -125,11 +153,14 @@ class User implements JsonI {
     }
     /**
      * Adds new privilege to the array of user privileges.
+     * 
      * @param string $privilegeId The ID of the privilege. It must be exist in 
      * the class 'Access' or it won't be added. If the privilege is already 
      * added, It will be not added again. 
+     * 
      * @return boolean The method will return true if the privilege is 
      * added. false if not.
+     * 
      * @since 1.7
      */
     public function addPrivilege($privilegeId) {
@@ -150,7 +181,9 @@ class User implements JsonI {
     }
     /**
      * Adds a user to a privileges group given group ID.
+     * 
      * @param string $groupId The ID of the group.
+     * 
      * @since 1.7
      */
     public function addToGroup($groupId) {
@@ -162,8 +195,10 @@ class User implements JsonI {
     }
     /**
      * Returns the display name of the user.
+     * 
      * @return string|null The display name of the user. Default value is 
      * null.
+     * 
      * @since 1.2
      */
     public function getDisplayName() {
@@ -171,8 +206,10 @@ class User implements JsonI {
     }
     /**
      * Returns the value of the property '$email'.
+     * 
      * @return string The value of the property '$email'. Default value is 
      * empty string.
+     * 
      * @since 1.0
      */
     function getEmail() {
@@ -180,7 +217,9 @@ class User implements JsonI {
     }
     /**
      * Returns The ID of the user.
+     * 
      * @return int The ID of the user.
+     * 
      * @since 1.0
      */
     public function getID() {
@@ -188,8 +227,10 @@ class User implements JsonI {
     }
     /**
      * Returns the value of the property '$lastLogin'.
+     * 
      * @return string|null Last login date. If not set, the method will 
      * return null.
+     * 
      * @since 1.4
      */
     public function getLastLogin() {
@@ -197,8 +238,10 @@ class User implements JsonI {
     }
     /**
      * Returns the date at which user password was reseted.
+     * 
      * @return string|null the date at which user password was reseted. 
      * If not set, the method will return null.
+     * 
      * @since 1.6
      */
     public function getLastPasswordResetDate() {
@@ -206,8 +249,10 @@ class User implements JsonI {
     }
     /**
      * Returns the value of the property '$password'.
+     * 
      * @return string The value of the property '$password'. Default value is 
      * empty string.
+     * 
      * @since 1.0
      */
     function getPassword() {
@@ -215,8 +260,10 @@ class User implements JsonI {
     }
     /**
      * Returns the value of the property '$regDate'.
+     * 
      * @param string|null $date Registration date. If not set, the method will
      * return null.
+     * 
      * @since 1.4
      */
     public function getRegDate() {
@@ -225,8 +272,10 @@ class User implements JsonI {
     /**
      * Returns the number of times the user has requested that his password 
      * to be reseted.
+     * 
      * @return int The number of times the user has requested that his password 
      * to be reseted. Default value is 0.
+     * 
      * @since 1.6
      */
     public function getResetCount() {
@@ -234,8 +283,10 @@ class User implements JsonI {
     }
     /**
      * Returns the value of the property '$userName'.
+     * 
      * @return string The value of the property '$userName'. Default value is 
      * empty string.
+     * 
      * @since 1.0
      */
     function getUserName() {
@@ -243,9 +294,12 @@ class User implements JsonI {
     }
     /**
      * Checks if a user has privilege or not given its ID.
+     * 
      * @param string $privilegeId The ID of the privilege.
+     * 
      * @return boolean The method will return true if the user has the given 
      * privilege. false if not.
+     * 
      * @since 1.7
      */
     public function hasPrivilege($privilegeId) {
@@ -263,10 +317,13 @@ class User implements JsonI {
      * one privilege and he has all the 
      * privileges of that group. In addition, he must have all the privileges 
      * of all child groups of that group.
+     * 
      * @param string $groupId The ID of the group.
+     * 
      * @return boolean The method will return true if the user belongs 
      * to the users group. The user will be considered a part of the group 
      * only if he has all the permissions in the group.
+     * 
      * @since 1.7
      */
     public function inGroup($groupId) {
@@ -281,7 +338,9 @@ class User implements JsonI {
 
     /**
      * Returns an array which contains all user privileges.
+     * 
      * @return array An array which contains an objects of type Privilege.
+     * 
      * @since 1.7
      */
     public function privileges() {
@@ -289,6 +348,7 @@ class User implements JsonI {
     }
     /**
      * Reinitialize the array of user privileges.
+     * 
      * @since 1.7
      */
     public function removeAllPrivileges() {
@@ -296,9 +356,12 @@ class User implements JsonI {
     }
     /**
      * Removes a privilege from user privileges array given its ID.
+     * 
      * @param string $privilegeId The ID of the privilege.
+     * 
      * @return boolean If the privilege is removed, the method will 
      * return true. Other than that, the method will return false.
+     * 
      * @since 1.7.1
      */
     public function removePrivilege($privilegeId) {
@@ -328,9 +391,11 @@ class User implements JsonI {
     }
     /**
      * Sets the display name of the user.
+     * 
      * @param string $name Display name. It will be set only if it was a string 
      * with length that is greater than 0 (Not empty string). Note that the method will 
      * remove any extra spaces in the name.
+     * 
      * @since 1.2
      */
     public function setDisplayName($name) {
@@ -342,8 +407,10 @@ class User implements JsonI {
     }
     /**
      * Sets the value of the property '$email'.
+     * 
      * @param string $email The email to set. Note that the method will 
      * use the method 'trim()' in order to trim passed value.
+     * 
      * @since 1.0
      */
     public function setEmail($email) {
@@ -352,7 +419,9 @@ class User implements JsonI {
 
     /**
      * Sets the ID of the user.
+     * 
      * @param int $id The ID of the user.
+     * 
      * @since 1.0
      */
     public function setID($id) {
@@ -360,7 +429,9 @@ class User implements JsonI {
     }
     /**
      * Sets the value of the property <b>$lastLogin</b>.
+     * 
      * @param string $date Last login date date.
+     * 
      * @since 1.4
      */
     public function setLastLogin($date) {
@@ -368,7 +439,9 @@ class User implements JsonI {
     }
     /**
      * Sets the date at which user password was reseted.
+     * 
      * @param string $date The date at which user password was reseted.
+     * 
      * @since 1.6
      */
     public function setLastPasswordResetDate($date) {
@@ -376,7 +449,9 @@ class User implements JsonI {
     }
     /**
      * Sets the password of a user.
+     * 
      * @param string $password The password to set.
+     * 
      * @since 1.0
      */
     function setPassword($password) {
@@ -384,7 +459,9 @@ class User implements JsonI {
     }
     /**
      * Sets the value of the property '$regDate'.
+     * 
      * @param string $date Registration date.
+     * 
      * @since 1.4
      */
     public function setRegDate($date) {
@@ -393,8 +470,10 @@ class User implements JsonI {
     /**
      * Sets the number of times the user has requested that his password 
      * to be reseted.
+     * 
      * @param int $times The number of times the user has requested that his password 
      * to be reseted. Must be an integer greater than -1.
+     * 
      * @since 1.6
      */
     public function setResetCount($times) {
@@ -404,8 +483,10 @@ class User implements JsonI {
     }
     /**
      * Sets the user name of a user.
+     * 
      * @param string $username The username to set. Note that the method will 
      * use the method 'trim()' in order to trim passed value.
+     * 
      * @since 1.0
      */
     function setUserName($username) {
@@ -413,6 +494,7 @@ class User implements JsonI {
     }
     /**
      * Returns a JsonX object that represents the user.
+     * 
      * The JsonX object will create a JSON string which has the following 
      * format:
      * <p>{<br/>
@@ -421,7 +503,9 @@ class User implements JsonI {
      * &nbsp;&nbsp;"displayName":""<br/>
      * &nbsp;&nbsp;"username":""<br/>
      * }</p>
+     * 
      * @return JsonX An object of type JsonX.
+     * 
      * @since 1.0
      */
     public function toJSON() {

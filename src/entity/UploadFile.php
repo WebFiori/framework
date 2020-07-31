@@ -26,36 +26,48 @@ namespace webfiori\entity;
 
 /**
  * A class which is used by the class 'Uploader' to represents uploaded files.
+ * 
  * The class is used by the method 'Uploader::uploadAsFileObj()' to upload files 
  * as objects of type 'File'.
+ * 
  * @author Ibrahim
+ * 
  * @version 1.0
  */
 class UploadFile extends File {
     /**
      * A boolean which is set to true in case the file is uploaded and was replaced.
+     * 
      * @var boolean
+     * 
      * @since 1.0 
      */
     private $isReplace;
     /**
      * A boolean which is set to true in case the file is uploaded without issues.
+     * 
      * @var boolean
+     * 
      * @since 1.0 
      */
     private $isUploaded;
     /**
      * A string that contains a message which indicates what caused upload failure.
+     * 
      * @var string 
+     * 
      * @since 1.0
      */
     private $uploadError;
     /**
      * Creates new instance of the class.
+     * 
      * This method will set the path and name to empty string. Also, it will 
      * set the size to 0 and ID to -1. Finally, it will set MIME type to 
      * "application/octet-stream"
+     * 
      * @param string $fName The name of the file such as 'my-file.png'.
+     * 
      * @param string $fPath The path of the file such as 'C:/Images/Test'.
      */
     public function __construct($fName = '', $fPath = '') {
@@ -66,8 +78,10 @@ class UploadFile extends File {
     }
     /**
      * Returns a string that represents upload error.
+     * 
      * @return string A string that can be used to identify the cause of upload 
      * failure.
+     * 
      * @since 1.0
      */
     public function getUploadError() {
@@ -75,9 +89,11 @@ class UploadFile extends File {
     }
     /**
      * Checks if the file was replaced by another uploaded file.
+     * 
      * @return boolean If the file was already exist in the server and a one 
      * which has the same name was uploaded, the method will return true. Default 
      * return value is false.
+     * 
      * @since 1.0
      */
     public function isReplace() {
@@ -85,8 +101,10 @@ class UploadFile extends File {
     }
     /**
      * Checks if the file was uploaded successfully or not.
+     * 
      * @return boolean If the file was uploaded to the server without any errors, 
      * the method will return true. Default return value is false.
+     * 
      * @since 1.0
      */
     public function isUploaded() {
@@ -96,8 +114,10 @@ class UploadFile extends File {
      * Sets the value of the property '$isReplace'.
      * The property is used to check if the file was already exist in the server and 
      * was replaced by another uploaded file. 
+     * 
      * @param boolean $bool A boolen. If true is passed, it means the file was replaced 
      * by new one with the same name.
+     * 
      * @since 1.0
      */
     public function setIsReplace($bool) {
@@ -106,8 +126,10 @@ class UploadFile extends File {
     /**
      * Sets the value of the property '$isUploaded'.
      * The property is used to check if the file was successfully uploaded to the server.
+     * 
      * @param boolean $bool A boolen. If true is passed, it means the file was uploaded 
      * without any errors.
+     * 
      * @since 1.0
      */
     public function setIsUploaded($bool) {
@@ -115,7 +137,9 @@ class UploadFile extends File {
     }
     /**
      * Sets an error message that indicates the cause of upload failure.
+     * 
      * @param string $err Error message.
+     * 
      * @since 1.0
      */
     public function setUploadErr($err) {
@@ -123,6 +147,7 @@ class UploadFile extends File {
     }
     /**
      * Returns a JSON string that represents the file.
+     * 
      * @return JsonX An object of type 'JsonX' that contains file information. 
      * The object will have the following information:<br/>
      * <b>{<br/>&nbsp;&nbsp;"id":"",<br/>
@@ -133,6 +158,7 @@ class UploadFile extends File {
      * &nbsp;&nbsp;"sizeInKBytes":"",<br/>
      * &nbsp;&nbsp;"sizeInMBytes":"",<br/>&nbsp;&nbsp;"uploaded":"",<br/>
      * &nbsp;&nbsp;"isReplace":"",<br/>&nbsp;&nbsp;"uploadError":"",<br/>}</b>
+     * 
      * @since 1.0
      */
     public function toJSON() {

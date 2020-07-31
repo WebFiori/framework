@@ -33,23 +33,29 @@ use webfiori\WebFiori;
  * A class which has utility methods which are related to themes loading.
  *
  * @author Ibrahim
+ * 
  * @version 1.0.1
  */
 class ThemeLoader {
     /**
      * The directory where themes are located in.
+     * 
      * @since 1.0
      */
     const THEMES_DIR = 'themes';
     /**
      * An array that contains all available themes.
+     * 
      * @var array 
+     * 
      * @since 1.0
      */
     private static $AvailableThemes;
     /**
      * An array that contains all loaded themes.
+     * 
      * @var array
+     * 
      * @since 1.0 
      */
     private static $loadedThemes = [];
@@ -57,10 +63,13 @@ class ThemeLoader {
     }
     /**
      * Returns an array that contains the meta data of all available themes. 
+     * 
      * This method will return an associative array. The key is the theme 
      * name and the value is an object of type Theme that contains theme info.
+     * 
      * @return array An associative array that contains all themes information. The name 
      * of the theme will be the key and the value is an object of type 'Theme'.
+     * 
      * @since 1.0
      */
     public static function getAvailableThemes() {
@@ -79,9 +88,11 @@ class ThemeLoader {
     }
     /**
      * Returns an array which contains all loaded themes.
+     * 
      * @return array An associative array which contains all loaded themes. 
      * The index will be theme name and the value is an object of type 'Theme' 
      * which contains theme info.
+     * 
      * @since 1.0
      */
     public static function getLoadedThemes() {
@@ -89,10 +100,13 @@ class ThemeLoader {
     }
     /**
      * Checks if a theme is loaded or not given its name.
+     * 
      * @param string $themeName The name of the theme.
+     * 
      * @return boolean The method will return true if 
      * the theme was found in the array of loaded themes. false
      * if not.
+     * 
      * @since 1.0
      */
     public static function isThemeLoaded($themeName) {
@@ -100,7 +114,9 @@ class ThemeLoader {
     }
     /**
      * Reset the array which contains all loaded themes.
+     * 
      * By calling this method, all loaded themes will be unloaded.
+     * 
      * @since 1.0
      */
     public static function resetLoaded() {
@@ -108,13 +124,18 @@ class ThemeLoader {
     }
     /**
      * Loads a theme given its name.
+     * 
      * If the given name is null, the method will load the default theme as 
      * specified by the method SiteConfig::getBaseThemeName().
+     * 
      * @param string $themeName The name of the theme. 
+     * 
      * @return Theme The method will return an object of type Theme once the 
      * theme is loaded. The object will contain all theme information.
+     * 
      * @throws NoSuchThemeException The method will throw 
      * an exception if no theme was found which has the given name.
+     * 
      * @since 1.0
      */
     public static function usingTheme($themeName = null) {

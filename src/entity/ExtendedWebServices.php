@@ -33,21 +33,27 @@ use webfiori\WebFiori;
 /**
  * An extension for the class 'WebServicesSet' that adds support for multi-language 
  * response messages.
+ * 
  * The language can be set by sending a GET or POST request that has the 
  * parameter 'lang'.
+ * 
  * @author Ibrahim
+ * 
  * @version 1.0.2
  */
 abstract class ExtendedWebServices extends WebServicesSet {
     /**
      * A constant that represents error message type.
+     * 
      * @since 1.0.2
      */
     private static $E = 'error';
     private $translation;
     /**
      * Creates new instance of 'API'.
+     * 
      * @param string $version initial API version. Default is '1.0.0'.
+     * 
      * @since 1.0
      */
     public function __construct($version = '1.0.0') {
@@ -79,6 +85,7 @@ abstract class ExtendedWebServices extends WebServicesSet {
     }
     /**
      * Sends a response message to indicate that an action is not implemented.
+     * 
      * This method will send back a JSON string in the following format:
      * <p>
      * {<br/>
@@ -91,6 +98,7 @@ abstract class ExtendedWebServices extends WebServicesSet {
      * the language. If no language is selected or language is not supported, 
      * The language that will be used is the language that was set as default 
      * language in the class 'SiteConfig'.
+     * 
      * @since 1.0
      */
     public function actionNotImpl() {
@@ -99,6 +107,7 @@ abstract class ExtendedWebServices extends WebServicesSet {
     }
     /**
      * Sends a response message to indicate that an action is not supported by the API.
+     * 
      * This method will send back a JSON string in the following format:
      * <p>
      * {<br/>
@@ -111,6 +120,7 @@ abstract class ExtendedWebServices extends WebServicesSet {
      * the language. If no language is selected or language is not supported, 
      * The language that will be used is the language that was set as default 
      * language in the class 'SiteConfig'.
+     * 
      * @since 1.0
      */
     public function actionNotSupported() {
@@ -120,6 +130,7 @@ abstract class ExtendedWebServices extends WebServicesSet {
     /**
      * Sends a response message to indicate that request content type is 
      * not supported by the API.
+     * 
      * This method will send back a JSON string in the following format:
      * <p>
      * {<br/>
@@ -133,6 +144,7 @@ abstract class ExtendedWebServices extends WebServicesSet {
      * the language. If no language is selected or language is not supported, 
      * The language that will be used is the language that was set as default 
      * language in the class 'SiteConfig'.
+     * 
      * @since 1.1
      */
     public function contentTypeNotSupported($cType = '') {
@@ -141,12 +153,15 @@ abstract class ExtendedWebServices extends WebServicesSet {
     }
     /**
      * Creates a sub array to define language variables.
+     * 
      * An example: if the given string is 'general', 
      * an array with key name 'general' will be created. Another example is 
      * if the given string is 'pages/login', two arrays will be created. The 
      * top one will have the key value 'pages' and another one inside 
      * the pages array with key value 'login'.
+     * 
      * @param string $dir A string that looks like a directory.
+     * 
      * @since 1.0
      */
     public function createLangDir($dir) {
@@ -154,6 +169,7 @@ abstract class ExtendedWebServices extends WebServicesSet {
     }
     /**
      * Sends a response message to indicate that a database error has occur.
+     * 
      * This method will send back a JSON string in the following format:
      * <p>
      * {<br/>
@@ -164,6 +180,7 @@ abstract class ExtendedWebServices extends WebServicesSet {
      * </p>
      * In here, 'OTHER_DATA' can be a basic string.
      * Also, The response will sent HTTP code 404 - Not Found.
+     * 
      * @param JsonI|JsonX|Controller|string $info An object of type JsonI or 
      * JsonX that describe the error in more details. Also it can be a simple string. 
      * Also, this parameter can be a controller that contains database error 
@@ -172,6 +189,7 @@ abstract class ExtendedWebServices extends WebServicesSet {
      * the language. If no language is selected or language is not supported, 
      * The language that will be used is the language that was set as default 
      * language in the class 'SiteConfig'.
+     * 
      * @since 1.0
      */
     public function databaseErr($info = '') {
@@ -193,11 +211,14 @@ abstract class ExtendedWebServices extends WebServicesSet {
     }
     /**
      * Returns the value of a language variable.
+     * 
      * @param string $dir A directory to the language variable (such as 'pages/login/login-label').
+     * 
      * @return string|array If the given directory represents a label, the 
      * method will return its value. If it represents an array, the array will 
      * be returned. If nothing was found, the returned value will be the passed 
      * value to the method. 
+     * 
      * @since 1.0
      */
     public function get($dir) {
@@ -206,6 +227,7 @@ abstract class ExtendedWebServices extends WebServicesSet {
     /**
      * Returns an associative array that contains HTTP authorization header 
      * content.
+     * 
      * The generated associative array will have two indices: 
      * <ul>
      * <li><b>type</b>: Type of authorization (e.g. basic, bearer )</li>
@@ -213,7 +235,9 @@ abstract class ExtendedWebServices extends WebServicesSet {
      * this field will have different values.</li>
      * </ul>
      * Note that if no authorization header is sent, The two indices will be empty.
+     * 
      * @return array An associative array.
+     * 
      * @since 1.0.1
      */
     public function getAuthorizationHeader() {
@@ -236,7 +260,9 @@ abstract class ExtendedWebServices extends WebServicesSet {
     }
     /**
      * Returns the language instance which is linked with the API instance.
+     * 
      * @return Language an instance of the class 'Language'.
+     * 
      * @since 1.0
      */
     public function getTranslation() {
@@ -244,6 +270,7 @@ abstract class ExtendedWebServices extends WebServicesSet {
     }
     /**
      * Sends a response message to indicate that a request parameter(s) have invalid values.
+     * 
      * This method will send back a JSON string in the following format:
      * <p>
      * {<br/>
@@ -256,6 +283,7 @@ abstract class ExtendedWebServices extends WebServicesSet {
      * the language. If no language is selected or language is not supported, 
      * The language that will be used is the language that was set as default 
      * language in the class 'SiteConfig'.
+     * 
      * @since 1.3
      */
     public function invParams() {
@@ -280,6 +308,7 @@ abstract class ExtendedWebServices extends WebServicesSet {
     }
     /**
      * Sends a response message to indicate that a request parameter or parameters are missing.
+     * 
      * This method will send back a JSON string in the following format:
      * <p>
      * {<br/>
@@ -292,6 +321,7 @@ abstract class ExtendedWebServices extends WebServicesSet {
      * the language. If no language is selected or language is not supported, 
      * The language that will be used is the language that was set as default 
      * language in the class 'SiteConfig'.
+     * 
      * @since 1.3
      */
     public function missingParams() {
@@ -317,6 +347,7 @@ abstract class ExtendedWebServices extends WebServicesSet {
     /**
      * Sends a response message to indicate that a user is not authorized to 
      * do an API call.
+     * 
      * This method will send back a JSON string in the following format:
      * <p>
      * {<br/>
@@ -329,6 +360,7 @@ abstract class ExtendedWebServices extends WebServicesSet {
      * the language. If no language is selected or language is not supported, 
      * The language that will be used is the language that was set as default 
      * language in the class 'SiteConfig'.
+     * 
      * @since 1.0
      */
     public function notAuth() {
@@ -337,6 +369,7 @@ abstract class ExtendedWebServices extends WebServicesSet {
     }
     /**
      * Sends a response message to indicate that request method is not supported.
+     * 
      * This method will send back a JSON string in the following format:
      * <p>
      * {<br/>
@@ -349,6 +382,7 @@ abstract class ExtendedWebServices extends WebServicesSet {
      * the language. If no language is selected or language is not supported, 
      * The language that will be used is the language that was set as default 
      * language in the class 'SiteConfig'.
+     * 
      * @since 1.0
      */
     public function requestMethodNotAllowed() {
@@ -357,10 +391,13 @@ abstract class ExtendedWebServices extends WebServicesSet {
     }
     /**
      * Sets multiple language variables.
+     * 
      * @param string $dir A string that looks like a 
      * directory. 
+     * 
      * @param array $arr An associative array. The key will act as the variable 
      * and the value of the key will act as the variable value. 
+     * 
      * @since 1.0
      */
     public function setLangVars($dir,$arr = []) {

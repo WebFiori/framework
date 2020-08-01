@@ -555,7 +555,9 @@ class AutoLoader {
                 if (strlen(trim($ca)) !== 0) {
                     $exploded = explode('=>', $ca);
                     if (isset($this->casheArr[$exploded[1]])) {
-                        $this->casheArr[$exploded[1]][] = $exploded[0];
+                        if (!in_array($exploded[0], $this->casheArr[$exploded[1]])) {
+                            $this->casheArr[$exploded[1]][] = $exploded[0];
+                        }
                     } else {
                         $this->casheArr[$exploded[1]] = [
                             $exploded[0]

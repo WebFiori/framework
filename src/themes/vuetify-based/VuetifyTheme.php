@@ -46,16 +46,7 @@ class VuetifyTheme extends Theme {
             Page::document()->getBody()->addChild($topDiv);
             Page::document()->getChildByID('main-content-area')->setNodeName('v-main');
             Page::document()->getChildByID('main-content-area')->setAttribute('app');
-
-            //initialize vue before the page is rendered.
-            //the initialization process is performed by the file 
-            //'themes/vuetify-based/init-vuetify.js'
-            Page::beforeRender(function()
-            {
-                $jsNode = new HTMLNode('script');
-                $jsNode->setAttribute('src', 'init-vuetify.js');
-                Page::document()->getBody()->addChild($jsNode);
-            });
+            
         });
     }
     /**
@@ -211,11 +202,6 @@ class VuetifyTheme extends Theme {
         foreach ($langVars as $key => $val) {
             $json->add($key, $val,['array-as-object' => true]);
         }
-        $js = new JsCode();
-        $js->setID('data-model');
-        $js->addCode('window.locale = '.$json.';');
-        $node->addChild($js);
-        $node->addCSS('theme.css');
         $node->addCSS('https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900',[], false);
         $node->addCSS('https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css', [], false);
         $node->addCSS('https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css', [], false);

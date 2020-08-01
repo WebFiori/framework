@@ -50,11 +50,11 @@ window.onload = () => {
                 },
                 dark: true
             },
-            rtl: rtl,
+            rtl: window.i18n.vars.dir === 'rtl',
             lang: {
-                current: window.locale.code.toLocaleLowerCase(),
+                current: window.i18n.vars.code.toLocaleLowerCase(),
                 locales: {
-                    ar: window.locale['vuetify-defaults']
+                    ar: window.i18n.vars['vuetify-defaults']
                 }
             }
         }),

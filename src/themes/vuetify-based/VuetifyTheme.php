@@ -227,7 +227,7 @@ class VuetifyTheme extends Theme {
         //Adds a small logo in the bar
         $logo = new HTMLNode('v-img');
         $logo->setAttributes([
-            'src' => Page::imagesDir().'/favicon.png',
+            'src' => 'favicon.png',
             'max-height' => 45,
             'max-width' => 45
         ]);

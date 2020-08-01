@@ -1,24 +1,23 @@
 Options -Indexes
-#<IfModule mod_rewrite.c>
-    RewriteEngine on
-    
-    # Redirect http to https
-    RewriteCond %{SERVER_PORT} 80
-    RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [R,L]  
+RewriteEngine on
 
-    # Send all trafic to framework seed and make your work bloom.
-    RewriteCond %{REQUEST_FILENAME} !-f
-    ReWriteRule ^(.*)$ WebFiori.php [L,QSA]
+# Redirect http to https
+RewriteCond %{SERVER_PORT} 80
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [R,L]  
 
-    # Append authorization header if not exist.
-    RewriteCond %{HTTP:Authorization} ^(.*)
-    RewriteRule .* - [e=HTTP_AUTHORIZATION:%1]
-    
-    # Deny direct access to some folders.
-    # Ones which are not here are public.
-    # Add your own here.
-    RewriteRule ^(vendor|apis|conf|entity|ini|logic|logs|pages) - [F,L]
-#</IfModule>
+# Send all trafic to framework seed and make your work bloom.
+RewriteCond %{REQUEST_FILENAME} !-f
+ReWriteRule ^(.*)$ WebFiori.php [L,QSA]
+
+# Append authorization header if not exist.
+RewriteCond %{HTTP:Authorization} ^(.*)
+RewriteRule .* - [e=HTTP_AUTHORIZATION:%1]
+
+# Deny direct access to some folders.
+# Ones which are not here are public.
+# Add your own here.
+RewriteRule ^(vendor|apis|conf|entity|ini|logic|logs|pages) - [F,L]
+
 <FilesMatch "\.(?:log|cache|config|sh|bat)$">
     # Deny access to any file with given extension.
     # Include your own at the top.

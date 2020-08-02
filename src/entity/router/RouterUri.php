@@ -43,7 +43,7 @@ use webfiori\entity\Util;
  * The class is also used for routing.
  * For more information on URI structure, visit <a target="_blank" href="https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#Examples">Wikipedia</a>.
  * @author Ibrahim
- * @version 1.3.6
+ * @version 1.3.7
  */
 class RouterUri {
     /**
@@ -95,6 +95,14 @@ class RouterUri {
      * @since 1.3.3
      */
     private static $UV = 'uri-vars';
+    /**
+     * Set to true if the resource that the route points to is dynamic (PHP file or code).
+     * 
+     * @var boolean
+     * 
+     * @since 1.3.7 
+     */
+    private $isDynamic;
     /**
      * Creates new instance.
      * @param string $requestedUri The URI such as 'https://www3.programmingacademia.com:80/{some-var}/hell/{other-var}/?do=dnt&y=#xyz'
@@ -575,6 +583,19 @@ class RouterUri {
         return $this->isCS;
     }
     /**
+     * Checks if the resource that the URI is pointing to is dynamic.
+     * 
+     * A resource is considered as dynamic if it is a PHP code or a PHP file.
+     * 
+     * @return boolean If the resource is dynamic, the method will return true. 
+     * other than that, the method will return false.
+     * 
+     * @since 1.3.7
+     */
+    public function isDynamic() {
+        return $this->isDynamic;
+    }
+    /**
      * Checks if the URI will be included in auto-generated site map or not.
      * @return boolean If the URI will be included, the method will return 
      * true. Default is false.
@@ -631,6 +652,7 @@ class RouterUri {
 
         return true;
     }
+    
     /**
      * Sets the route which the URI will take to.
      * @param string|Closure $routeTo Usually, the route can be either a 
@@ -638,11 +660,18 @@ class RouterUri {
      * @since 1.0
      */
     public function setRoute($routeTo) {
+        $this->isDynamic = true;
+        
         if ($routeTo instanceof Closure) {
             $this->setType(Router::CLOSURE_ROUTE);
         } else {
             $cleaned = str_replace('\\', DS, $routeTo);
             $routeTo = str_replace('/', DS, $cleaned);
+            $expl = explode('.', $routeTo);
+            $extension = $expl[count($expl) - 1];
+            if ($extension != 'php') {
+                $this->isDynamic = false;
+            }
         }
         $this->routeTo = $routeTo;
     }

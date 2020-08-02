@@ -1306,6 +1306,14 @@ class Page {
             $tmpTheme = ThemeLoader::usingTheme($themeName);
         }
         $this->theme = $tmpTheme;
+        
+        $mainContentArea = Page::document()->getChildByID(self::MAIN_ELEMENTS[2]);
+        
+        if ($mainContentArea === null) {
+            $mainContentArea = new HTMLNode();
+            $mainContentArea->setID(self::MAIN_ELEMENTS[2]);
+        }
+        
         $this->document = new HTMLDoc();
         $headNode = $this->_getHead();
         $footerNode = $this->_getFooter();
@@ -1317,8 +1325,7 @@ class Page {
         $body = new HTMLNode();
         $body->setID(self::MAIN_ELEMENTS[0]);
         $body->addChild($asideNode);
-        $mainContentArea = new HTMLNode();
-        $mainContentArea->setID(self::MAIN_ELEMENTS[2]);
+        
         $body->addChild($mainContentArea);
         $this->document->addChild($body);
         $this->document->addChild($footerNode);

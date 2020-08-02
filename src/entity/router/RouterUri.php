@@ -30,6 +30,7 @@ use phpStructs\html\HTMLNode;
 use webfiori\entity\Util;
 /**
  * A class that is used to split URIs and get their parameters.
+ * 
  * The main aim of this class is to extract URI parameters including:
  * <ul>
  * <li>Host</li>
@@ -42,7 +43,9 @@ use webfiori\entity\Util;
  * </ul>
  * The class is also used for routing.
  * For more information on URI structure, visit <a target="_blank" href="https://en.wikipedia.org/wiki/Uniform_Resource_Identifier#Examples">Wikipedia</a>.
+ * 
  * @author Ibrahim
+ * 
  * @version 1.3.7
  */
 class RouterUri {
@@ -55,39 +58,51 @@ class RouterUri {
     /**
      * A boolean value that is set to true if the URI will be included in 
      * generated site map.
+     * 
      * @var boolean 
+     * 
      * @since 1.3
      */
     private $incInSiteMap;
     /**
      * A boolean which is set to true if URI is case sensitive.
+     * 
      * @var boolean 
+     * 
      * @since 1.3.1
      */
     private $isCS;
     /**
      * An array that contains all languages that the resource the URI is pointing 
      * to can have.
+     * 
      * @var array
+     * 
      * @since 1.3.5 
      */
     private $languages;
     /**
      * The route which this URI will be routing to.
+     * 
      * @var mixed This route can be a file or a method.
+     * 
      * @since 1.0 
      */
     private $routeTo;
     /**
      * The type of the route.
+     * 
      * @var string
+     * 
      * @since 1.1 
      */
     private $type;
     /**
      * The URI broken into its sub-components (scheme, authority ...) as an associative 
      * array.
+     * 
      * @var array 
+     * 
      * @since 1.0
      */
     private $uriBroken;
@@ -105,12 +120,17 @@ class RouterUri {
     private $isDynamic;
     /**
      * Creates new instance.
+     * 
      * @param string $requestedUri The URI such as 'https://www3.programmingacademia.com:80/{some-var}/hell/{other-var}/?do=dnt&y=#xyz'
+     * 
      * @param string|Closure $routeTo The file that the route will take the user to ar a closure.
+     * 
      * @param boolean $caseSensitive A boolean. If the URI is case sensitive, 
      * then this value must be set to true. False if not. Default is true.
+     * 
      * @param array $closureParams If the closure needs to use parameters, 
      * it is possible to supply them using this array.
+     * 
      * @throws InvalidArgumentException The method will throw this exception if the 
      * given URI is invalid.
      */
@@ -136,8 +156,10 @@ class RouterUri {
     /**
      * Adds a language to the set of languages at which the resource that the URI 
      * points to.
+     * 
      * @param string $langCode A two characters string such as 'AR' that represents 
      * language code.
+     * 
      * @since 1.3.5
      */
     public function addLanguage($langCode) {
@@ -149,12 +171,16 @@ class RouterUri {
     }
     /**
      * Adds a possible value for a URI variable.
+     * 
      * This is used in constructing the sitemap node of the URI. If a value is 
      * provided, then it will be part of the URI that will appear in the sitemap.
+     * 
      * @param string $varName The name of the variable. It must be exist as 
      * the path part in the URI.
+     * 
      * @param string $varValue The value of the variable. Note that any extra spaces 
      * in the value will be trimmed.
+     * 
      * @since 1.3.6
      */
     public function addVarValue($varName, $varValue) {
@@ -169,9 +195,12 @@ class RouterUri {
     }
     /**
      * Adds multiple values to URI variable.
+     * 
      * @param string $varName The name of he variable.
+     * 
      * @param array $arrayOfVals An array that contains all possible values for 
      * the variable.
+     * 
      * @since 1.3.6
      */
     public function addVarValues($varName, $arrayOfVals) {
@@ -183,11 +212,15 @@ class RouterUri {
     }
     /**
      * Checks if two URIs are equal or not.
+     * 
      * Two URIs are considered equal if they have the same authority and the 
      * same path name (same characters case). 
+     * 
      * @param RouterUri $otherUri The URI which 'this' URI will be checked against. 
+     * 
      * @return boolean The method will return true if the URIs are 
      * equal.
+     * 
      * @since 1.0
      */
     public function equals($otherUri) {
@@ -219,8 +252,10 @@ class RouterUri {
     }
     /**
      * Returns authority part of the URI.
+     * 
      * @return string The authority part of the URI. Usually, 
      * it is a string in the form '//www.example.com:80'.
+     * 
      * @since 1.0
      */
     public function getAuthority() {
@@ -228,11 +263,14 @@ class RouterUri {
     }
     /**
      * Returns class name based on the file which the route will point to.
+     * 
      * The method will try to extract class name from the file which the 
      * route is pointing to.
      * This only applies to routes which points to PHP classes only.
+     * 
      * @return string Class name taken from file name. If route type is not 
      * API o not view, the method will return empty string.
+     * 
      * @since 1.3.2
      */
     public function getClassName() {
@@ -254,7 +292,9 @@ class RouterUri {
     /**
      * Returns an array that contains the variables which will be passed to 
      * the closure.
+     * 
      * @return array
+     * 
      * @since 1.2
      */
     public function getClosureParams() {
@@ -262,6 +302,7 @@ class RouterUri {
     }
     /**
      * Returns an associative array which contains all URI parts.
+     * 
      * @return array The method will return an associative array that 
      * contains the components of the URI. The array will have the 
      * following indices:
@@ -277,6 +318,7 @@ class RouterUri {
      * <li><b>query-string-vars</b>: An array that contains query string parameter and values.</li>
      * <li><b>uri-vars</b>: An array that contains URI path variable and values.</li>
      * </ul>
+     * 
      * @since 1.0
      */
     public function getComponents() {
@@ -284,8 +326,10 @@ class RouterUri {
     }
     /**
      * Returns fragment part of the URI.
+     * 
      * @return string Fragment part of the URI. The fragment in the URI is 
      * any string that comes after the character '#'.
+     * 
      * @since 1.0
      */
     public function getFragment() {
@@ -293,7 +337,9 @@ class RouterUri {
     }
     /**
      * Returns host name from the host part of the URI.
+     * 
      * @return string The host name such as 'www.programmingacademia.com'.
+     * 
      * @since 1.0
      */
     public function getHost() {
@@ -302,7 +348,9 @@ class RouterUri {
     /**
      * Returns an array that contains a set of languages at which the resource that the URI 
      * points to can have.
+     * 
      * @return array An array that contains language codes.
+     * 
      * @since 1.3.5
      */
     public function getLanguages() {
@@ -310,7 +358,9 @@ class RouterUri {
     }
     /**
      * Returns the path part of the URI.
+     * 
      * @return string A string such as '/path1/path2/path3'.
+     * 
      * @since 1.0
      */
     public function getPath() {
@@ -324,9 +374,11 @@ class RouterUri {
     }
     /**
      * Returns an array which contains the names of URI directories.
+     * 
      * @return array An array which contains the names of URI directories. 
      * For example, if the path part of the URI is '/path1/path2', the 
      * array will contain the value 'path1' at index 0 and 'path2' at index 1.
+     * 
      * @since 1.0
      */
     public function getPathArray() {
@@ -334,8 +386,10 @@ class RouterUri {
     }
     /**
      * Returns port number of the authority part of the URI.
+     * 
      * @return string Port number of the authority part of the URI. If 
      * port number was not specified, the method will return empty string.
+     * 
      * @since 1.0
      */
     public function getPort() {
@@ -343,9 +397,11 @@ class RouterUri {
     }
     /**
      * Returns the query string that was appended to the URI.
+     * 
      * @return string The query string that was appended to the URI. 
      * If the URI has no query string, the method will return empty 
      * string.
+     * 
      * @since 1.0
      */
     public function getQueryString() {
@@ -353,9 +409,11 @@ class RouterUri {
     }
     /**
      * Returns an associative array which contains query string parameters.
+     * 
      * @return array An associative array which contains query string parameters. 
      * the keys will be acting as the names of the parameters and the values 
      * of each parameter will be in its key.
+     * 
      * @since 1.0
      */
     public function getQueryStringVars() {
@@ -363,6 +421,7 @@ class RouterUri {
     }
     /**
      * Returns an array that contains requested URI information.
+     * 
      * @return array The method will return an associative array that 
      * contains the components of the URI. The array will have the 
      * following indices:
@@ -378,6 +437,7 @@ class RouterUri {
      * <li><b>query-string-vars</b>: An array that contains query string parameter and values.</li>
      * <li><b>uri-vars</b>: An array that contains URI path variable and values.</li>
      * </ul>
+     * 
      * @since 1.3.4
      */
     public function getRequestedUri() {
@@ -385,8 +445,10 @@ class RouterUri {
     }
     /**
      * Returns the location where the URI will route to.
+     * 
      * @return string|callable Usually, the route can be either a callable 
      * or a path to a file. The file can be of any type.
+     * 
      * @since 1.0
      */
     public function getRouteTo() {
@@ -394,8 +456,10 @@ class RouterUri {
     }
     /**
      * Returns the scheme part of the URI.
+     * 
      * @return string The scheme part of the URI. Usually, it is called protocol 
      * (like http, ftp).
+     * 
      * @since 1.0
      */
     public function getScheme() {
@@ -404,9 +468,11 @@ class RouterUri {
     /**
      * Returns an object of type 'HTMLNode' that contains URI information which 
      * can be used to construct XML sitemap.
+     * 
      * @return array The method will return an array that contains objects 
      * of type 'HTMLNode' that contains URI information which 
      * can be used to construct XML sitemap.
+     * 
      * @since 1.3.5
      * 
      */
@@ -423,6 +489,7 @@ class RouterUri {
     }
     /**
      * Returns the type of element that the URI will route to.
+     * 
      * The type of the element can be 1 of 4 values:
      * <ul>
      * <li>Router::API_ROUTE</li>
@@ -430,8 +497,10 @@ class RouterUri {
      * <li>Router::CLOSURE_ROUTE</li>
      * <li>Router::CUSTOMIZED</li>
      * </ul>
+     * 
      * @return string The type of element that the URI will route to. Default 
      * return value is Router::CUSTOMIZED.
+     * 
      * @since 1.1
      */
     public function getType() {
@@ -439,11 +508,15 @@ class RouterUri {
     }
     /**
      * Returns the original requested URI.
+     * 
      * @param boolean $incQueryStr If set to true, the query string part 
      * will be included in the URL. Default is false.
+     * 
      * @param boolean $incFragment If set to true, the fragment part 
      * will be included in the URL. Default is false.
+     * 
      * @return string The original requested URI.
+     * 
      * @since 1.0
      */
     public function getUri($incQueryStr = false,$incFragment = false) {
@@ -480,13 +553,17 @@ class RouterUri {
     }
     /**
      * Returns the value of URI variable given its name.
+     * 
      * A variable is a string which is defined while creating the route. 
      * it is name is included between '{}'.
+     * 
      * @param string $varName The name of the variable. Note that this value 
      * must not include braces.
+     * 
      * @return string|null The method will return the value of the 
      * variable if found. If the variable is not set or the variable 
      * does not exist, the method will return null.
+     * 
      * @since 1.0
      */
     public function getUriVar($varName) {
@@ -498,9 +575,11 @@ class RouterUri {
     }
     /**
      * Returns an associative array which contains URI parameters.
+     * 
      * @return array An associative array which contains URI parameters. The 
      * keys will be the names of the variables and the value of each variable will 
      * be in its index.
+     * 
      * @since 1.0
      */
     public function getUriVars() {
@@ -508,10 +587,13 @@ class RouterUri {
     }
     /**
      * Returns an array that contains possible values for a URI variable.
+     * 
      * @param string $varName The name of the variable.
+     * 
      * @return array The method will return an array that contains all possible 
      * values for the variable which was added using the method Router::addUriVarValue(). 
      * If the variable does not exist, the array will be empty.
+     * 
      * @since 1.3.6
      */
     public function getVarValues($varName) {
@@ -525,11 +607,15 @@ class RouterUri {
     }
     /**
      * Checks if the URI has a variable or not given its name.
+     * 
      * A variable is a string which is defined while creating the route. 
      * it is name is included between '{}'.
+     * 
      * @param string $varName The name of the variable.
+     * 
      * @return boolean If the given variable name is exist, the method will 
      * return true. Other than that, the method will return false.
+     * 
      * @since 1.0
      */
     public function hasUriVar($varName) {
@@ -537,10 +623,13 @@ class RouterUri {
     }
     /**
      * Checks if the URI has any variables or not.
+     * 
      * A variable is a string which is defined while creating the route. 
      * it is name is included between '{}'.
+     * 
      * @return boolean If the URI has any variables, the method will 
      * return true.
+     * 
      * @since 1.0
      */
     public function hasVars() {
@@ -548,8 +637,10 @@ class RouterUri {
     }
     /**
      * Checks if the URI has WWW in the host part or not.
+     * 
      * @return boolean If the URI has WWW in the host, the method will return 
      * true. Other than that, it will return false.
+     * 
      * @since 1.3.4
      */
     public function hasWWW() {
@@ -560,8 +651,10 @@ class RouterUri {
     }
     /**
      * Checks if all URI variables has values or not.
+     * 
      * @return boolean The method will return true if all URI 
      * variables have a value other than null.
+     * 
      * @since 1.0
      */
     public function isAllVarsSet() {
@@ -576,7 +669,9 @@ class RouterUri {
     /**
      * Returns the value of the property that tells if the URI is case sensitive 
      * or not.
+     * 
      * @return boolean  True if URI case sensitive. False if not. Default is false.
+     * 
      * @since 1.3.1
      */
     public function isCaseSensitive() {
@@ -597,8 +692,10 @@ class RouterUri {
     }
     /**
      * Checks if the URI will be included in auto-generated site map or not.
+     * 
      * @return boolean If the URI will be included, the method will return 
      * true. Default is false.
+     * 
      * @since 1.3
      */
     public function isInSiteMap() {
@@ -606,8 +703,10 @@ class RouterUri {
     }
     /**
      * Print the details of the generated URI.
+     * 
      * This method will use the method 'Util::print_r()' to print the array 
      * that contains URI details.
+     * 
      * @since 1.0
      */
     public function printUri() {
@@ -615,8 +714,10 @@ class RouterUri {
     }
     /**
      * Sets the array of closure parameters.
+     * 
      * @param array $arr An array that contains all the values that will be 
      * passed to the closure.
+     * 
      * @since 1.2
      */
     public function setClosureParams($arr) {
@@ -626,8 +727,10 @@ class RouterUri {
     }
     /**
      * Sets the value of the property '$incInSiteMap'.
+     * 
      * @param boolean $bool If true is given, the URI will be included 
      * in site map.
+     * 
      * @since 1.3
      */
     public function setIsInSiteMap($bool) {
@@ -635,10 +738,13 @@ class RouterUri {
     }
     /**
      * Sets the requested URI.
+     * 
      * @param string $uri A string that represents requested URI.
+     * 
      * @return boolean If the requested URI is a match with the original URI which 
      * is stored in the object, it will be set and the method will return true. 
      * Other than that, the method will return false.
+     * 
      * @since 1.3.4 
      */
     public function setRequestedUri($uri) {
@@ -655,8 +761,10 @@ class RouterUri {
     
     /**
      * Sets the route which the URI will take to.
+     * 
      * @param string|Closure $routeTo Usually, the route can be either a 
      * file or it can be a callable. The file can be of any type.
+     * 
      * @since 1.0
      */
     public function setRoute($routeTo) {
@@ -677,6 +785,7 @@ class RouterUri {
     }
     /**
      * Sets the type of element that the URI will route to.
+     * 
      * The type of the element can be 1 of 4 values:
      * <ul>
      * <li>Router::API_ROUTE</li>
@@ -685,7 +794,9 @@ class RouterUri {
      * <li>Router::CUSTOMIZED</li>
      * </ul>
      * If any thing else is given, it won't update.
+     * 
      * @param string $type The type of element that the URI will route to.
+     * 
      * @since 1.1
      */
     public function setType($type) {
@@ -696,12 +807,17 @@ class RouterUri {
     }
     /**
      * Sets the value of a URI variable.
+     * 
      * A variable is a string which is defined while creating the route. 
      * it is name is included between '{}'.
+     * 
      * @param string $varName The name of the variable.
+     * 
      * @param string $value The value of the variable.
+     * 
      * @return boolean The method will return true if the variable 
      * was set. If the variable does not exist, the method will return false.
+     * 
      * @since 1.0
      */
     public function setUriVar($varName,$value) {
@@ -715,7 +831,9 @@ class RouterUri {
     }
     /**
      * Breaks a URI into its basic components.
+     * 
      * @param string $uri The URI that will be broken.
+     * 
      * @return array|boolean If the given URI is not valid, 
      * the Method will return false. Other than that, The method will return an associative array that 
      * contains the components of the URI. The array will have the 
@@ -732,6 +850,7 @@ class RouterUri {
      * <li><b>query-string-vars</b>: An array that contains query string parameter and values.</li>
      * <li><b>uri-vars</b>: An array that contains URI path variables and values.</li>
      * </ul>
+     * 
      * @since 1.0
      */
     public static function splitURI($uri) {
@@ -833,7 +952,9 @@ class RouterUri {
     }
     /**
      * Validate the path part of original URI and the requested one.
+     * 
      * @return boolean
+     * 
      * @since 1.3.4
      */
     private function _comparePath() {

@@ -35,6 +35,7 @@ use webfiori\entity\router\ClosureRoutes;
 use webfiori\entity\router\OtherRoutes;
 use webfiori\entity\router\Router;
 use webfiori\entity\router\ViewRoutes;
+use webfiori\entity\ThemeLoader;
 use webfiori\entity\ui\ErrorBox;
 use webfiori\entity\ui\ServerErrView;
 use webfiori\entity\ui\ServiceUnavailableView;
@@ -233,6 +234,7 @@ class WebFiori {
         ClosureRoutes::create();
         OtherRoutes::create();
 
+        ThemeLoader::registerResourcesRoutes();
         //initialize cron jobs
         InitCron::init();
 

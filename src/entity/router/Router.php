@@ -487,7 +487,6 @@ class Router {
      * @since 1.2
      */
     public static function route($uri) {
-        ThemeLoader::registerResourcesRoutes();
         Router::get()->_resolveUrl($uri);
     }
     /**

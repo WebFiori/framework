@@ -23,6 +23,9 @@
  * THE SOFTWARE.
  */
 namespace webfiori;
+ini_set('display_startup_errors', 1);
+        ini_set('display_errors', 1);
+        error_reporting(-1);
 use jsonx\JsonX;
 use webfiori\conf\Config;
 use webfiori\conf\MailConfig;
@@ -35,6 +38,7 @@ use webfiori\entity\router\ClosureRoutes;
 use webfiori\entity\router\OtherRoutes;
 use webfiori\entity\router\Router;
 use webfiori\entity\router\ViewRoutes;
+use webfiori\entity\ThemeLoader;
 use webfiori\entity\ui\ErrorBox;
 use webfiori\entity\ui\ServerErrView;
 use webfiori\entity\ui\ServiceUnavailableView;
@@ -232,7 +236,8 @@ class WebFiori {
         ViewRoutes::create();
         ClosureRoutes::create();
         OtherRoutes::create();
-
+        ThemeLoader::registerResourcesRoutes();
+        
         //initialize cron jobs
         InitCron::init();
 
@@ -479,29 +484,36 @@ class WebFiori {
      * @since 1.0
      */
     private function _needConfigration() {
-        header('HTTP/1.1 503 Service Unavailable');
         $routeUri = Router::getUriObjByURL(Util::getRequestedURL());
-
+        
         if ($routeUri !== null) {
             $routeType = $routeUri->getType();
         } else {
             $routeType = Router::VIEW_ROUTE;
         }
-
-        if ($routeType == Router::API_ROUTE) {
-            header('content-type:application/json');
-            $j = new JsonX([], true);
-            $j->add('message', '503 - Service Unavailable');
-            $j->add('type', 'error');
-            $j->add('description','This error means that the system is not configured yet. '
-                    .'Make sure to make the method Config::isConfig() return true. '
-                    .'One way is to go to the file "conf/Config.php". Change attribute "isConfigured" value to true. '
-                    .'Or Use the method ConfigController::configured(true). You must supply \'true\' as an attribute. '
-                    .'If you want to make the system do something else if the return value of the '
-                    .'given method is false, then open the file \'WebFiori.php\' and '
-                    .'change the code in the \'else\' code block at the end of class constructor. (Inside the "if" block).');
-            $j->add('powered-by', 'WebFiori Framework v'.Config::getVersion().' ('.Config::getVersionType().')');
-            die($j);
+        if ($routeUri !== null) {
+            if ($routeUri->isDynamic()) {
+                // Only apply to dynamic resources.
+                if ($routeType == Router::API_ROUTE) {
+                    header('HTTP/1.1 503 Service Unavailable');
+                    header('content-type:application/json');
+                    $j = new JsonX([], true);
+                    $j->add('message', '503 - Service Unavailable');
+                    $j->add('type', 'error');
+                    $j->add('description','This error means that the system is not configured yet. '
+                            .'Make sure to make the method Config::isConfig() return true. '
+                            .'One way is to go to the file "conf/Config.php". Change attribute "isConfigured" value to true. '
+                            .'Or Use the method ConfigController::configured(true). You must supply \'true\' as an attribute. '
+                            .'If you want to make the system do something else if the return value of the '
+                            .'given method is false, then open the file \'WebFiori.php\' and '
+                            .'change the code in the \'else\' code block at the end of class constructor. (Inside the "if" block).');
+                    $j->add('powered-by', 'WebFiori Framework v'.Config::getVersion().' ('.Config::getVersionType().')');
+                    die($j);
+                } else {
+                    $serviceUnavailable = new ServiceUnavailableView();
+                    $serviceUnavailable->show(503);
+                }
+            }
         } else {
             $serviceUnavailable = new ServiceUnavailableView();
             $serviceUnavailable->show(503);

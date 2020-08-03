@@ -37,6 +37,7 @@ use webfiori\entity\ThemeLoader;
 /**
  * The basic class that is used to route user requests to the correct 
  * location.
+ * 
  * The developer can use this class to create a readable URIs to system resources. 
  * In general, there are 4 types of routes:
  * <ul>
@@ -47,10 +48,10 @@ use webfiori\entity\ThemeLoader;
  * </ul>
  * <p>
  * A view route is a route that points to a file which exist inside the directory 
- * '/pages'. They are simply web pages (HTML or PHP).
+ * 'app/pages'. They are simply web pages (HTML or PHP).
  * </p>
  * <p>An API route is a route that points to a file which exist inside the 
- * directory '/apis'. This folder usually contains PHP files which extends 
+ * directory 'app/apis'. This folder usually contains PHP files which extends 
  * the class 'ExtendedWebServices' or the class 'WebServicesSet'.
  * </p>
  * <p>
@@ -63,9 +64,9 @@ use webfiori\entity\ThemeLoader;
  * 'my-files' and inside it, he might add 'my-view.html'. Then he can add a route 
  * to it as follows:
  * <pre>
- * Router::other([
- * 'path'=>'/custom-route',
- * 'route-to'=>'/my-files/my-view.html'
+ * Router::addRoute([<br/>
+ * 'path'=>'/custom-route',<br/>
+ * 'route-to'=>'/my-files/my-view.html'<br/>
  * ]);
  * </pre> 
  * </p>
@@ -76,60 +77,74 @@ class Router {
     /**
      * A constant that represents API route. It is simply the root directory where APIs 
      * should be created.
+     * 
      * @since 1.0
      */
     const API_ROUTE = DS.'app'.DS.'apis';
     /**
      * A constant that represents closure route. The value of the 
      * constant is 'func'.
+     * 
      * @since 1.0
      */
     const CLOSURE_ROUTE = 'func';
     /**
      * A constant for custom directory route.
+     * 
      * @since 1.0
      */
     const CUSTOMIZED = DS;
     /**
      * A constant that represents view route. It is simply the root directory where web 
      * pages should be created.
+     * 
      * @since 1.0
      */
     const VIEW_ROUTE = DS.'app'.DS.'pages';
     /**
      *
      * @var type 
+     * 
      * @since 1.1
      */
     private $baseUrl;
     /**
      * A callback function to call in case if a rout is 
      * not found.
+     * 
      * @var callable 
+     * 
      * @since 1.0
      */
     private $onNotFound;
     /**
      * A single instance of the router.
+     * 
      * @var Router
+     * 
      * @since 1.0 
      */
     private static $router;
     /**
      * An array which contains an objects of type 'RouteUri'.
+     * 
      * @var array
+     * 
      * @since 1.0 
      */
     private $routes;
     /**
      * An object of type 'RouterUri' which represents the route that the 
      * user was sent to.
+     * 
      * @var RouterUri 
+     * 
      * @since 1.3.5
      */
     private $uriObj;
     /**
      * Creates new instance of 'Router'
+     * 
      * @since 1.0
      */
     private function __construct() {
@@ -190,6 +205,7 @@ class Router {
     }
     /**
      * Adds new route to a file inside the root folder.
+     * 
      * @param array $options An associative array of options. Available options 
      * are: 
      * <ul>
@@ -220,9 +236,11 @@ class Router {
      * indexed arrays that contains possible values for URI vars. This one is 
      * used when building the sitemap.</li>
      * </ul>
+     * 
      * @return boolean The method will return true if the route was created. 
      * If a route for the given path was already created, the method will return 
      * false.
+     * 
      * @since 1.2
      */
     public static function addRoute($options) {
@@ -232,6 +250,7 @@ class Router {
     }
     /**
      * Adds new route to a web services set.
+     * 
      * @param array $options An associative array that contains route 
      * options. Available options are:
      * <ul>
@@ -260,9 +279,11 @@ class Router {
      * indexed arrays that contains possible values for URI vars. This one is 
      * used when building the sitemap.</li>
      * </ul>
+     * 
      * @return boolean The method will return true if the route was created. 
      * If a route for the given path was already created, the method will return 
      * false.
+     * 
      * @since 1.2
      */
     public static function api($options) {
@@ -276,9 +297,11 @@ class Router {
     }
     /**
      * Returns the base URI which is used to create routes.
+     * 
      * @return string The base URL which is used to create routes. The returned 
      * value is based on one of two values. Either the value that is returned 
      * by the method 'Util::getBaseURL()' or the method 'SiteConfig::getBaseURL()'.
+     * 
      * @since 1.3.1
      */
     public static function base() {
@@ -287,6 +310,7 @@ class Router {
 
     /**
      * Adds new closure route.
+     * 
      * @param array $options An associative array that contains route 
      * options. Available options are:
      * <ul>
@@ -317,9 +341,11 @@ class Router {
      * <li><b>vars-values</b>: An optional associative array which contains sub 
      * indexed arrays that contains possible values for URI vars. This one is 
      * used when building the sitemap.</li>
+     * 
      * @return boolean The method will return true if the route was created. 
      * If a route for the given path was already created, the method will return 
      * false. Also, if <b>'route-to'</b> is not a function, the method will return false.
+     * 
      * @since 1.2
      */
     public static function closure($options) {
@@ -333,8 +359,11 @@ class Router {
     }
     /**
      * Returns the value of the base URI which is appended to the path.
+     * 
      * This method is similar to calling the method <b>Router::<a href="#base">base()</a></b>.
+     * 
      * @return string
+     * 
      * @since 1.0
      */
     public static function getBase() {
@@ -342,11 +371,14 @@ class Router {
     }
     /**
      * Returns an object of type 'RouterUri' which contains route information.
+     * 
      * When the method Router::route() is called and a route is found, an 
      * object of type 'RouterUri' is created which has route information. 
+     * 
      * @return RouterUri|null An object which has route information. If the 
      * method 'Router::route()' is not yet called or no route was found, 
      * the method will return null.
+     * 
      * @since 1.3.5
      */
     public static function getRouteUri() {
@@ -354,10 +386,13 @@ class Router {
     }
     /**
      * Returns an object of type 'RouterUri' that represents route URI.
+     * 
      * @param string $path The path part of the URI.
+     * 
      * @return RouterUri|null If a route was found which has the given path, 
      * an object of type 'RouterUri' is returned. If no route is found, null 
      * is returned.
+     * 
      * @since 1.3.3
      */
     public static function getUriObj($path) {
@@ -365,9 +400,12 @@ class Router {
     }
     /**
      * Returns an object of type 'RouterUri' which contains URL route information.
+     * 
      * @param string $url A string that represents a URL (such as 'https://example.com/my-resource').
+     * 
      * @return RouterUri|null If a resource was found which has the given route, an 
      * object of type RouterUri is returned. Other than that, null is returned.
+     * 
      * @since 1.3.6
      */
     public static function getUriObjByURL($url) {
@@ -378,11 +416,14 @@ class Router {
     /**
      * Returns the value of a variable which exist in the path part of the 
      * URI.
+     * 
      * @param string $varName The name of the variable. Note that it must 
      * not include braces.
+     * 
      * @return string|null The method will return the value of the 
      * variable if it was set. If it is not set or routing is still not yet 
      * happend, the method will return null.
+     * 
      * @since 1.3.9
      */
     public static function getVarValue($varName) {
@@ -396,9 +437,12 @@ class Router {
     }
     /**
      * Checks if a given path has a route or not.
+     * 
      * @param string $path The path which will be checked (such as '/path1/path2')
+     * 
      * @return boolean The method will return true if the given path 
      * has a route.
+     * 
      * @since 1.3.8
      */
     public static function hasRoute($path) {
@@ -406,10 +450,12 @@ class Router {
     }
     /**
      * Adds a route to a basic xml site map. 
+     * 
      * If this method is called, a route in the form 'http://example.com/sitemam.xml' 
      * The method will check all created RouterUri objects and check if they 
      * should be included in the site map. Note that if a URI has variables, it 
      * will be not included.
+     * 
      * @since 1.3.2
      */
     public static function incSiteMapRoute() {
@@ -439,6 +485,7 @@ class Router {
     }
     /**
      * Call the closure which was set if a route is not found.
+     * 
      * @since 1.3.10
      */
     public static function notFound() {
@@ -446,6 +493,7 @@ class Router {
     }
     /**
      * Display all routes details.
+     * 
      * @since 1.3.8
      */
     public static function printRoutes() {
@@ -453,6 +501,7 @@ class Router {
     }
     /**
      * Remove all routes which has been added to the array of routes.
+     * 
      * @since 1.3.4
      */
     public static function removeAll() {
@@ -461,9 +510,12 @@ class Router {
     }
     /**
      * Removes a route given its path.
+     * 
      * @param string $path The path part of route URI.
+     * 
      * @return boolean If the route is removed, the method will return 
      * true. If not, The method will return false.
+     * 
      * @since 1.3.7
      */
     public static function removeRoute($path) {
@@ -483,17 +535,20 @@ class Router {
     }
     /**
      * Redirect a URI to its route.
+     * 
      * @param string $uri The URI.
+     * 
      * @since 1.2
      */
     public static function route($uri) {
-        ThemeLoader::registerResourcesRoutes();
         Router::get()->_resolveUrl($uri);
     }
     /**
      * Returns an associative array of all available routes.
+     * 
      * @return array An associative array of all available routes. The 
      * keys will be requested URIs and the values are the routes.
+     * 
      * @since 1.2
      */
     public static function routes() {
@@ -507,9 +562,12 @@ class Router {
     }
     /**
      * Returns an associative array that contains all routes.
+     * 
      * The indices of the array will be URLs that represents the route and 
      * the value at each index will be an object of type 'RouterUri'. 
+     * 
      * @return array An associative array that contains all routes.
+     * 
      * @since 1.3.7
      */
     public static function routesAsRouterUri() {
@@ -517,8 +575,10 @@ class Router {
     }
     /**
      * Sets a callback to call in case a given rout is not found.
+     * 
      * @param callable $func The function which will be called if 
      * the rout is not found.
+     * 
      * @since 1.3.8
      */
     public static function setOnNotFound($func) {
@@ -526,10 +586,13 @@ class Router {
     }
     /**
      * Adds an object of type 'RouterUri' as new route.
+     * 
      * @param RouterUri $routerUri An object of type 'RouterUri'.
+     * 
      * @return boolean If the object is added as new route, the method will 
      * return true. If the given parameter is not an instance of 'RouterUri' 
      * or a route is already added, The method will return false.
+     * 
      * @since 1.3.2
      */
     public static function uriObj($routerUri) {
@@ -544,6 +607,7 @@ class Router {
     /**
      * Adds new route to a view file.
      * A view file can be any file that is added inside the folder '/pages'.
+     * 
      * @param array $options An associative array that contains route 
      * options. Available options are:
      * <ul>
@@ -572,9 +636,11 @@ class Router {
      * indexed arrays that contains possible values for URI vars. This one is 
      * used when building the sitemap.</li>
      * </ul>
+     * 
      * @return boolean The method will return true if the route was created. 
      * If a route for the given path was already created, the method will return 
      * false.
+     * 
      * @since 1.2
      */
     public static function view($options) {
@@ -588,6 +654,7 @@ class Router {
     }
     /**
      * Adds new route to the router.
+     * 
      * @param array $options An associative array of route options. The 
      * array can have the following indices:
      * <ul>
@@ -623,9 +690,11 @@ class Router {
      * it is possible to pass values to it using this array. 
      * </li>
      * </ul>
+     * 
      * @return boolean If the route is added, the method will return true. 
      * The method one return false only in two cases, either the route type 
      * is not correct or a similar route was already added.
+     * 
      * @since 1.0
      */
     private function _addRoute($options) {
@@ -691,7 +760,9 @@ class Router {
     /**
      * Checks for provided options and set defaults for the ones which are 
      * not provided.
+     * 
      * @param array $options
+     * 
      * @return array
      */
     private function _checkOptionsArr($options) {
@@ -757,8 +828,11 @@ class Router {
     }
     /**
      * Removes any extra forward slash in the beginning or the end.
+     * 
      * @param string $path Any string that represents the path part of a URI.
+     * 
      * @return string A string in the format '/nice/work/boy'.
+     * 
      * @since 1.1
      */
     private function _fixUriPath($path) {
@@ -781,7 +855,9 @@ class Router {
     }
     /**
      * Returns an array which contains all routes as RouteURI object.
+     * 
      * @return array An array which contains all routes as RouteURI object.
+     * 
      * @since 1.2
      */
     private function _getRoutes() {
@@ -789,10 +865,13 @@ class Router {
     }
     /**
      * Returns an object of type 'RouterUri' that represents route URI.
+     * 
      * @param string $path The path part of the URI.
+     * 
      * @return RouterUri|null If a route was found which has the given path, 
      * an object of type 'RouterUri' is returned. If no route is found, null 
      * is returned.
+     * 
      * @since 1.3.3
      */
     private function _getUriObj($path) {
@@ -808,9 +887,12 @@ class Router {
     }
     /**
      * Checks if a given path has a route or not.
+     * 
      * @param string $path The path which will be checked (such as '/path1/path2')
+     * 
      * @return boolean The method will return true if the given path 
      * has a route.
+     * 
      * @since 1.1
      */
     private function _hasRoute($path) {
@@ -825,8 +907,11 @@ class Router {
     }
     /**
      * Checks if a directory name is a variable or not.
+     * 
      * @param type $dir
+     * 
      * @return boolean
+     * 
      * @since 1.1
      */
     private function _isDirectoryAVar($dir) {
@@ -878,6 +963,7 @@ class Router {
     }
     /**
      * Display all routes details.
+     * 
      * @since 1.1
      */
     private function _printRoutes() {
@@ -887,16 +973,20 @@ class Router {
     }
     /**
      * Route a given URI to its specified resource.
+     * 
      * If the router has no routes, the router will send back a '418 - I'm A 
      * Teapot' response. If the route is available but the file that the 
      * router is routing to does not exist, a '500 - Server Error' Response 
      * with the message 'The resource 'a_resource' was available but its route is not configured correctly.' is 
      * sent back. If the route is not found, The router will call the function 
      * that was set by the user in case a route is not found.
+     * 
      * @param string $uri A URI such as 'http://www.example.com/hello/ibrahim'
+     * 
      * @param boolean $loadResource If set to true, the resource that represents the 
      * route will be loaded. If false, the route will be only resolved. Default 
      * is true.
+     * 
      * @since 1.0
      */
     private function _resolveUrl($uri,$loadResource = true) {
@@ -968,8 +1058,10 @@ class Router {
     }
     /**
      * Sets a callback to call in case a given rout is not found.
+     * 
      * @param callable $function The function which will be called if 
      * the rout is not found.
+     * 
      * @since 1.0
      */
     private function _setOnNotFound($function) {
@@ -980,8 +1072,10 @@ class Router {
     /**
      * 
      * @param RouterUri $uriRouteObj One URI object taken from stored routes.
+     * 
      * @param array $requestedPathArr An array that contains requested URI path 
      * part.
+     * 
      * @param string $requestMethod
      */
     private function _setUriVars($uriRouteObj, $requestedPathArr, $requestMethod) {
@@ -1010,7 +1104,9 @@ class Router {
     }
     /**
      * Creates and Returns a single instance of the router.
+     * 
      * @return Router
+     * 
      * @since 1.0
      */
     private static function get() {
@@ -1023,6 +1119,7 @@ class Router {
     }
     /**
      * Send http 301 response code and redirect the request to non-www URI.
+     * 
      * @param RouterUri $uriObj
      */
     private function redirectToNonWWW($uriObj) {

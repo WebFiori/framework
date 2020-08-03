@@ -202,7 +202,7 @@ class ThemeLoader {
                 $fileExp = explode('.', $fileName);
                 if (count($fileExp) == 2 && (strtolower($fileExp[1]) == 'js' || strtolower($fileExp[1]) == 'css')) {
                     Router::addRoute([
-                        'path' => $themeDirName.DS.$fileName,
+                        'path' => $themeDirName.'/'.$fileName,
                         'route-to' => self::THEMES_DIR.DS.$themeDirName.DS.$dir.DS.$fileName
                     ]);
                 } else {

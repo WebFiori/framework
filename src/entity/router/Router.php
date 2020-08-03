@@ -747,7 +747,7 @@ class Router {
                 $routeUri->addLanguage($langCode);
             }
             
-            foreach ($options as $varName => $varValues) {
+            foreach ($options['vars-values'] as $varName => $varValues) {
                 $routeUri->addVarValues($varName, $varValues);
             }
             $this->routes[] = $routeUri;

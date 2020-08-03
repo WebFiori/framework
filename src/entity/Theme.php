@@ -28,6 +28,7 @@ use jsonx\JsonI;
 use jsonx\JsonX;
 use ReflectionClass;
 use webfiori\conf\SiteConfig;
+use phpStructs\html\HTMLNode;
 /**
  * A base class that is used to construct web site UI.
  * 
@@ -209,24 +210,38 @@ abstract class Theme implements JsonI {
     /**
      * Creates an instance of 'HTMLNode' given an array of options.
      * 
-     * This method is used to allow the creation of multiple HTML elements 
-     * depending on the way the developer will implement it. The method might 
-     * only return a single instance of the class 'HTMLNode' for every call or 
-     * the developer can make it customizable by supporting options. The options 
-     * can be passed as an array. A use case for this method would be as 
+     * The developer can override this method to make it create custom HTML 
+     * elements which can be re-used across web pages. By default, the method 
+     * will create a &lt;div&gt; element.
+     * A use case for this method would be as 
      * follows, the developer would like to create different type of input 
      * elements. One possible option in the passed array would be 'input-type'. 
      * By checking this option in the body of the method, the developer can return 
      * different types of input elements.
      * 
-     * @param array $options An array of options that developer can specify.
+     * @param array $options An array of options that developer can specify. Default 
+     * implementation of the method accepts two options, the option 'name' 
+     * which represents the name of HTML tag (such as 'div') and the option 
+     * 'attributes' which is a sub array that contains tag attributes.
      * 
      * @return HTMLNode The developer must implement this method in away that 
      * makes it return an instance of the class 'HTMLNode'. 
      * 
      * @since 1.2.3
      */
-    public abstract function createHTMLNode($options = []);
+    public function createHTMLNode($options = []) {
+        
+        if (gettype($options) != 'array') {
+            $options = [
+                'name' => 'div'
+            ];
+        }
+        $nodeName = isset($options['name']) ? $options['name'] : 'div';
+        $attributes = isset($options['attributes']) ? $options['attributes'] : [];
+        $node = new HTMLNode($nodeName, $attributes);
+        
+        return $node;
+    }
     /**
      * Returns an object of type 'HTMLNode' that represents aside section of the page. 
      * 

@@ -16,9 +16,6 @@
       <img src="https://img.shields.io/github/release/usernane/webfiori.svg?label=latest" />
   </a>
   <img src="https://img.shields.io/packagist/dt/webfiori/framework?color=light-green">
-  <a href="https://paypal.me/IbrahimBinAlshikh">
-    <img src="https://img.shields.io/endpoint.svg?url=https://webfiori.com/x/apis/shields-get-dontate-badget">
-  </a>
 </p>
 What is WebFiori Framework?
 
@@ -27,17 +24,18 @@ WebFiori Framework is a mini web development framework which is built using PHP 
 ## Key Features
 * Provide minimum utilities to setup a small web application.
 * Theming and the ability to create multiple UIs for the same web page using any CSS or JavaScript framework.
+* Building and manipulating the DOM of a web page using PHP language.
+* Basic template engine.
 * Fast routing system that makes the ability of creating search-engine-friendly links an easy task.
 * Creation of web services (or APIs) that supports JSON with data filtering and validation.
 * Basic support for MySQL schema and query building.
 * Lightweight. The total size of framework core files is less than 3 megabytes.
 * Access management by assigning system user a set of privileges.
-* The ability to create and manage multiple sessions at once.
+* Simple sesstion manager.
 * Support for creating and sending nice-looking HTML emails in a simple way by using SMTP protocol.
 * Autoloading of user defined classes (loading composer packages also supported).
 * The ability to create background tasks and let them run in specific time using CRON.
 * Well-defined file upload and file handling sub-system.
-* Building and manipulating the DOM of a web page using PHP language.
 * Basic support for running the framework throgh CLI.
 * Ability to implement custom CLI commands.
 

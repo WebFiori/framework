@@ -497,7 +497,7 @@ abstract class Theme implements JsonI {
      */
     public function invokeAfterLoaded() {
         if (is_callable($this->afterLoaded)) {
-            call_user_func($this->afterLoaded, $this->afterLoadedParams);
+            call_user_func_array($this->afterLoaded, $this->afterLoadedParams);
         }
     }
     /**
@@ -510,13 +510,15 @@ abstract class Theme implements JsonI {
      */
     public function invokeBeforeLoaded() {
         if (is_callable($this->beforeLoaded)) {
-            call_user_func($this->beforeLoaded, $this->beforeLoadedParams);
+            call_user_func_array($this->beforeLoaded, $this->beforeLoadedParams);
         }
     }
     /**
      * Sets the value of the callback which will be called after theme is loaded.
      * 
-     * @param callable $function The callback.
+     * @param callable $function The callback. The first parameter of the 
+     * callback will be always 'this' theme. (e.g. function ($theme){}). The function 
+     * can have other parameters if they are provided.
      * 
      * @param array $params An array of parameters which can be passed to the 
      * callback.
@@ -525,10 +527,14 @@ abstract class Theme implements JsonI {
      */
     public function setAfterLoaded($function,$params = []) {
         if (is_callable($function)) {
+            $this->afterLoadedParams = [$this];
             $this->afterLoaded = $function;
 
             if (gettype($params) == 'array') {
-                $this->afterLoadedParams = $params;
+                
+                foreach ($params as $param) {
+                    $this->afterLoadedParams[] = $param;
+                }
             }
         }
     }
@@ -579,7 +585,9 @@ abstract class Theme implements JsonI {
     /**
      * Sets the value of the callback which will be called before theme is loaded.
      * 
-     * @param callback $function The callback.
+     * @param callback $function The callback. The first parameter of the 
+     * callback will be always 'this' theme. (e.g. function ($theme){}). The function 
+     * can have other parameters if they are provided.
      * 
      * @param array $params An array of parameters which can be passed to the 
      * callback.
@@ -588,10 +596,14 @@ abstract class Theme implements JsonI {
      */
     public function setBeforeLoaded($function,$params = []) {
         if (is_callable($function)) {
+            $this->beforeLoadedParams = [$this];
             $this->beforeLoaded = $function;
 
             if (gettype($params) == 'array') {
-                $this->beforeLoadedParams = $params;
+                
+                foreach ($params as $param) {
+                    $this->beforeLoadedParams[] = $param;
+                }
             }
         }
     }

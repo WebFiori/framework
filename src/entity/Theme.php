@@ -133,7 +133,6 @@ abstract class Theme implements JsonI {
      * 
      * The default values will be set as follows:
      * <ul>
-     * <li>Theme name will be an empty string.</li>
      * <li>Theme URL will be an empty string.</li>
      * <li>Author name will be an empty string.</li>
      * <li>Author URL will be an empty string.</li>
@@ -146,9 +145,13 @@ abstract class Theme implements JsonI {
      * <li>Theme JS directory name will be set to 'js'</li>
      * <li>Theme images directory name will be set to 'images'</li>
      * </ul>
+     * 
+     * @param $themeName The name of the theme. The name is used to load the 
+     * theme. For that reason, it must be unique.
+     * 
      * @since 1.0
      */
-    public function __construct() {
+    public function __construct($themeName='') {
         $this->themeMeta = [
             'name' => '',
             'url' => '',
@@ -168,6 +171,7 @@ abstract class Theme implements JsonI {
         $this->setCssDirName('css');
         $this->setJsDirName('js');
         $this->setImagesDirName('images');
+        $this->setName($themeName);
         $this->themeComponents = [];
         $this->afterLoaded = null;
         $this->afterLoadedParams = [];

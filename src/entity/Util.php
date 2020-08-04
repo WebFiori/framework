@@ -615,22 +615,23 @@ class Util {
         } else if ($expr === false) {
             $expr = 'false';
         }
+        $debugTrace = debug_backtrace();
+        $lastTrace = $debugTrace[0];
+        $lineNumber = $lastTrace['line'];
+        $file = $lastTrace['file'];
         $readable = print_r($expr, true);
         if (CLI::isCLI()) {
-            fprintf(STDOUT, "%s\n",$readable);
+            fprintf(STDOUT, "%s - %s:\n%s\n",$file, $lineNumber, $readable);
         } else {
-            $readable = print_r($expr, true);
             $htmlEntityAdded = str_replace('<', '&lt;', str_replace('>', '&gt;', $readable));
             $toOutput = '<pre>'. $htmlEntityAdded .'</pre>';
             if ($asMessageBox === true) {
                 $messageBox = new MessageBox();
-                //If body is null, we reached max number of boxes.
-                if ($messageBox->getBody() !== null) {
-                    $messageBox->getBody()->addTextNode($toOutput,false);
-                    echo $messageBox;
-                }
+                $messageBox->getBody()->addTextNode($toOutput,false);
+                $messageBox->getHeader()->text($file.' - '.$lineNumber);
+                echo $messageBox;
             } else {
-                echo $toOutput;
+                echo '<pre>'.$file.' - '.$lineNumber."\n".'</pre>'.$toOutput;
             }
         }
     }

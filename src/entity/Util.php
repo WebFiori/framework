@@ -333,9 +333,9 @@ class Util {
         $xToAppend = str_replace('\\', '/', $toAppend);
         
         if (strlen($xToAppend) == 0) {
-            return $protocol.$host.'/';
+            return $protocol.$host;
         } else {
-            return $protocol.$host.'/'.$xToAppend.'/';
+            return $protocol.$host.'/'.$xToAppend;
         }
     }
     /**
@@ -467,7 +467,7 @@ class Util {
         
         $requestedURI = trim(filter_var(getenv('REQUEST_URI')),'/');
         
-        return $base.$requestedURI;
+        return $base.'/'.$requestedURI;
     }
     /**
      * Returns HTTP request headers.

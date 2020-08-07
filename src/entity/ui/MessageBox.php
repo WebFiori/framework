@@ -132,13 +132,13 @@ class MessageBox extends HTMLNode {
             $css = new HTMLNode('link');
             $css->setAttributes([
                 'rel' => 'stylesheet',
-                'href' => $base.'assets/css/message-box.css'
+                'href' => $base.'/assets/css/message-box.css'
             ]);
             $this->addChild($css);
             $js = new HTMLNode('script');
             $js->setAttributes([
                 'type' => 'text/javascript',
-                'src' => $base.'assets/js/message-box.js'
+                'src' => $base.'/assets/js/message-box.js'
             ]);
             $this->addChild($js);
         }

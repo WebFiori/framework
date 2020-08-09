@@ -684,7 +684,15 @@ class Page {
     private function _reset() {
         $this->document = new HTMLDoc();
         $this->setTitle('Hello World');
-        $this->setWebsiteName('Hello Website');
+        $siteNames = WebFiori::getSiteConfig()->getWebsiteNames();
+        
+        if (isset($siteNames[WebFiori::getSiteConfig()->getPrimaryLanguage()])) {
+            $this->setWebsiteName($siteNames[WebFiori::getSiteConfig()->getPrimaryLanguage()]);
+        } else {
+            $this->setWebsiteName('Hello Website');
+        }
+        
+        
         $this->setTitleSep('|');
         $this->contentDir = 'ltr';
         $this->description = null;

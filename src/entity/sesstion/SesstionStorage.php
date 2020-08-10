@@ -13,12 +13,12 @@ use webfiori\entity\sesstion\Sesstion;
  *
  * @author Ibrahim
  */
-interface SesstionStore {
+interface SesstionStorage {
     /**
      * 
      * @param Sesstion $sesstion
      */
     public function save($sesstion);
     public function read($sesstionId);
-    public function destroy($sesstionId);
+    public function remove($sesstionId); 
 }

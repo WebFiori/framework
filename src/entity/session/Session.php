@@ -5,14 +5,14 @@ namespace webfiori\entity\sesstion;
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-use SessionHandlerInterface;
-use SessionIdInterface;
+use webfiori\entity\User;
 /**
- * Description of Sesstion
+ * Description of session
  *
  * @author Ibrahim
  */
-class Sesstion {
+class Session {
+
     /**
      * A constant that indicates the session was expired.
      * 
@@ -58,6 +58,33 @@ class Sesstion {
      */
     const DEFAULT_SESSION_DURATION = 120;
     /**
+     * The lifetime of the session (in minutes).
+     * 
+     * @var int lifetime of the session (in minutes). The default is 10.
+     * 
+     * @since 1.0 
+     */
+    private $lifeTime;
+    /**
+     * The name of the index that contains session custom vars.
+     * 
+     * The variables are set using the method SessionManager::setSessionVar()'.
+     * 
+     * @var string
+     * 
+     * @since 1.0
+     */
+    private static $CSV = 'custom-session-vars';
+    /**
+     * An associative array that contains session cookie parameters.
+     * 
+     * @var array
+     * 
+     * @since 1.0 
+     */
+    private $cookieParams;
+    private $sessionArr;
+    /**
      * An array that contains the names of main session variables.
      * 
      * The array has the following values:
@@ -88,82 +115,67 @@ class Sesstion {
         'lang',
         'status'
     ];
+    /**
+     * A variable is set to true if the session is new and set to false if resumed.
+     * 
+     * @var boolean
+     * 
+     * @since 1.0 
+     */
+    private $new;
+    /**
+     * A variable is set to true if the session is resumed and set to false if new.
+     * 
+     * @var boolean
+     * 
+     * @since 1.0 
+     */
+    private $resumed;
     public function pause() {
         $this->sessionStatus = self::STATUS_PAUSED;
+    }
+    private function _initNewSesstionVars() {
+        $this->resumed = false;
+        $this->new = true;
+        $this->sessionArr[self::$SV][self::MAIN_VARS[4]] = $this->getName();
+        $this->sessionArr[self::$SV][self::MAIN_VARS[1]] = time();
+        $this->sessionArr[self::$SV][self::MAIN_VARS[2]] = time();
+        $this->sessionArr[self::$SV][self::MAIN_VARS[0]] = $lifeTime;
+        $this->sessionArr[self::$SV][self::MAIN_VARS[6]] = new User();
+        $this->sessionArr[self::$SV][self::MAIN_VARS[8]] = self::STATUS_NEW;
+        $this->sessionStatus = self::STATUS_NEW;
+        $ip = filter_var($_SERVER['REMOTE_ADDR'],FILTER_VALIDATE_IP);
+
+        if ($ip == '::1') {
+            $ip = '127.0.0.1';
+        }
+        $this->sessionArr[self::$SV][self::MAIN_VARS[5]] = $ip;
+        $this->sessionArr[self::$SV][self::MAIN_VARS[3]] = $refresh === true;
     }
     public function resume() {
         $this->sessionStatus = self::STATUS_RESUMED;
     }
-    /**
-     * Returns the ID of a session from a cookie given its name.
-     * 
-     * @param string $sessionName The name of the session.
-     * 
-     * @return boolean|string If the ID is found, the method will return it. 
-     * If the session cookie was not found, the method will return false.
-     * 
-     * @since 1.6
-     */
-    public static function getSessionIDFromCookie($sessionName) {
-        $sid = filter_input(INPUT_COOKIE, $sessionName);
-
-        if ($sid !== null && $sid !== false) {
-            return $sid;
-        }
-
-        return false;
+    
+    public function getCookieParams() {
+        return $this->cookieParams;
     }
-    /**
-     * Checks if the given session name has a cookie or not.
-     * 
-     * @return boolean true if a cookie with the name of 
-     * the session is fount. false otherwise.
-     * 
-     * @since 1.0
-     */
-    public function hasCookie() {
-        $sid = self::getSessionIDFromCookie(INPUT_COOKIE, $this->getName());
-
-        return $sid !== false;
-    }
-    /**
-     * Return session ID from session cookie, get or post parameter.
-     * 
-     * @return string|boolean If session ID is found, the method will 
-     * return it. Note that if it is in a cookie, the name of the cookie must 
-     * be the name of the session in order to take the ID from it. If it is 
-     * in GET or POST request, it must be in a parameter with the name 
-     * 'session-id'.
-     * 
-     * @since 1.0
-     */
-    public function getSessionIDFromRequest() {
-        $sid = self::getSessionIDFromCookie($this->getName());
-
-        if ($sid === false) {
-            $sid = filter_var($_POST['session-id'],FILTER_SANITIZE_STRING);
-
-            if ($sid === null || $sid === false) {
-                $sid = filter_var($_GET['session-id'],FILTER_SANITIZE_STRING);
-            }
-        }
-
-        return $sid;
-    }
+    
     private $sName;
-    private $sesstionData;
     
     
     public function kill() {
-        
+        SesstionsManager::getStorage()->remove($this->getId());
     }
     public function open() {
         $seestion = SesstionsManager::getStorage()->read($this->getId());
+        if ($seestion instanceof Session) {
+            $this->cookieParams = $seestion->cookieParams;
+            $this->sessionArr = $seestion->sessionArr;
+            $this->sName = $seestion->sName;
+        }
     }
     public function close() {
-        if ($this->getStorage() !== null) {
-            $this->sesstionData = $this->getStorage()->save($this->getId());
-        }
+        SesstionsManager::getStorage()->save($this);
     }
     /**
      * Returns the status of the session.
@@ -185,10 +197,42 @@ class Sesstion {
      */
     private static $randFunc;
     private $sId;
-    public function __construct() {
+    /**
+     * The name of the index that contains session vars.
+     * 
+     * @var string
+     * 
+     * @since 1.0
+     */
+    private static $SV = 'session-vars';
+    public function __construct($options = []) {
         //used to support older PHP versions which does not have 'random_int'.
         self::$randFunc = is_callable('random_int') ? 'random_int' : 'rand';
         $this->sessionStatus = self::STATUS_NONE;
+        $this->lifeTime = self::DEFAULT_SESSION_DURATION;
+        $this->sName = isset($options['name']) ? trim($options['name']) : 'new-sesstion';
+        if (strlen($this->sName) == 0) {
+            $this->sName = 'new-seestion';
+        }
+        $this->cookieParams = [
+            'lifetime' => time() + $this->getLifeTime() * 60,
+            'domain' => trim(filter_var($_SERVER['HTTP_HOST']),'/'),
+            'path' => '/',
+            'secure' => true,
+            'httponly' => true,
+            'samesite' => 'Lax'
+        ];
+        $this->sessionArr = [
+            self::$CSV => [],
+            self::$SV => []
+        ];
+    }
+    /**
+     * 
+     * @return type
+     */
+    public function getLifeTime() {
+        return $this->lifeTime;
     }
     public function getName() {
         return $this->sName;

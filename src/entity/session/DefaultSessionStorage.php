@@ -15,7 +15,7 @@ use webfiori\entity\File;
  *
  * @author Eng.Ibrahim
  */
-class DefaultSesstionStorage implements SesstionStorage {
+class DefaultSesstionStorage implements SessionStorage {
     private $storeLoc;
     public function __construct() {
         $this->storeLoc = ROOT_DIR.DS.'app'.DS.'storage'.DS.'sesstions';
@@ -24,7 +24,7 @@ class DefaultSesstionStorage implements SesstionStorage {
     /**
      * 
      * @param string $sesstionId
-     * @return Sesstion
+     * @return Session
      */
     public function read($sesstionId) {
         $file = new File($sesstionId, $this->storeLoc);
@@ -40,10 +40,10 @@ class DefaultSesstionStorage implements SesstionStorage {
     }
     /**
      * 
-     * @param Sesstion $sesstion
+     * @param Session $sesstion
      */
     public function save($sesstion) {
-        if ($sesstion instanceof Sesstion) {
+        if ($sesstion instanceof Session) {
             $serializedSesstion = serialize($sesstion);
             $file = new File($sesstion->getId(), $this->storeLoc);
             $file->setRawData($serializedSesstion);

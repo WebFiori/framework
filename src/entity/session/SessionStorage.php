@@ -1,7 +1,7 @@
 <?php
 namespace webfiori\entity\sesstion;
 
-use webfiori\entity\sesstion\Sesstion;
+use webfiori\entity\sesstion\Session;
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -13,10 +13,10 @@ use webfiori\entity\sesstion\Sesstion;
  *
  * @author Ibrahim
  */
-interface SesstionStorage {
+interface SessionStorage {
     /**
      * 
-     * @param Sesstion $sesstion
+     * @param Session $sesstion
      */
     public function save($sesstion);
     public function read($sesstionId);

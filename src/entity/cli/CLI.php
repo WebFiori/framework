@@ -66,7 +66,7 @@ class CLI {
             }
             $_SERVER['HTTP_HOST'] = $host;
             $_SERVER['REMOTE_ADDR'] = $host;
-            $_SERVER['DOCUMENT_ROOT'] = trim(filter_var($_SERVER['argv'][0], FILTER_SANITIZE_STRING),'WebFiori.php');
+            $_SERVER['DOCUMENT_ROOT'] = ROOT_DIR;
             $_SERVER['REQUEST_URI'] = '/';
             putenv('HTTP_HOST='.$host);
             putenv('REQUEST_URI=/');

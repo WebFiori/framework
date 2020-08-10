@@ -35,7 +35,7 @@ use webfiori\entity\exceptions\FileException;
  * 
  * @author Ibrahim
  * 
- * @version 1.1.5
+ * @version 1.1.6
  */
 class File implements JsonI {
     /**
@@ -261,6 +261,17 @@ class File implements JsonI {
         $this->setName($fName);
         $this->id = -1;
         $this->fileSize = 0;
+    }
+    /**
+     * Checks if the file exist or not.
+     * 
+     * @return boolean If the file exist, the method will return true. Other than 
+     * that, the method will return false.
+     * 
+     * @since 1.1.6
+     */
+    public function isExist() {
+        return file_exists($this->getAbsolutePath());
     }
     /**
      * Returns JSON string that represents basic file info.
@@ -713,7 +724,7 @@ class File implements JsonI {
         return false;
     }
     private function _readHelper($fPath,$from,$to) {
-        if (file_exists($fPath)) {
+        if ($this->isExist()) {
             $fSize = filesize($fPath);
             $this->_setSize($fSize);
             $bytesToRead = $to - $from > 0 ? $to - $from : $this->getSize();
@@ -808,7 +819,7 @@ class File implements JsonI {
      * @throws FileException
      */
     private function _writeHelper($fPath, $append = true, $createIfNotExist = false) {
-        if (!file_exists($fPath)) {
+        if (!$this->isExist()) {
             if ($createIfNotExist) {
                 $resource = $this->_createResource('wb', $fPath);
             } else {

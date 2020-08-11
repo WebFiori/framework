@@ -2,23 +2,37 @@
 namespace webfiori\entity\sesstion;
 
 use webfiori\entity\sesstion\Session;
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  * Description of SesstionStore
  *
  * @author Ibrahim
+ * 
+ * @since 1.1.0
+ * 
+ * @version 1.0
  */
 interface SessionStorage {
     /**
      * 
      * @param Session $sesstion
+     * 
+     * @since 1.0
      */
     public function save($sesstion);
+    /**
+     * 
+     * @param type $sesstionId
+     * 
+     * @return Sesstion Description
+     * 
+     * @since 1.0
+     */
     public function read($sesstionId);
+    /**
+     * 
+     * @param type $sesstionId
+     * 
+     * @since 1.0
+     */
     public function remove($sesstionId); 
 }

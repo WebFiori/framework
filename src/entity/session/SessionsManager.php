@@ -6,6 +6,10 @@ namespace webfiori\entity\sesstion;
  * Description of SesstionsManager
  *
  * @author Ibrahim
+ * 
+ * @since 1.1.0
+ * 
+ * @version 1.0
  */
 class SessionsManager {
     private $sesstionsArr;
@@ -30,11 +34,12 @@ class SessionsManager {
     private static $inst;
     /**
      * 
-     * @return SesstionsManager
+     * @return SessionsManager
      */
     private static function get() {
+        
         if (self::$inst === null) {
-            self::$inst = new SesstionsManager();
+            self::$inst = new SessionsManager();
         }
         return self::$inst;
     }
@@ -61,7 +66,10 @@ class SessionsManager {
     }
     private function __construct() {
         $this->sesstionsArr = [];
-        $this->sesstionStorage = new DefaultSesstionStorage();
+        $this->sesstionStorage = new DefaultSessionStorage();
+    }
+    public static function getSesstions() {
+        return self::get()->sesstionsArr;
     }
     /**
      * 
@@ -83,10 +91,12 @@ class SessionsManager {
         $sId = self::getSessionIDFromCookie($sName);
         
         if ($sId !== false) {
-            $sesstion = self::getStorage()->read($sId);
-            
-            if ($sesstion instanceof Session) {
-                self::get()->sesstionsArr[] = $sesstion;
+            $tempSesstion = new Session([
+                'session-id' => $sId
+            ]);
+            $tempSesstion->start();
+            if ($tempSesstion->getStatus() == Session::STATUS_RESUMED) {
+                self::get()->sesstionsArr[] = $tempSesstion;
                 return true;
             }
         }
@@ -149,28 +159,27 @@ class SessionsManager {
 
         return false;
     }
-    public static function start($sesstionName) {
+    public static function start($sesstionName, $duration = Session::DEFAULT_SESSION_DURATION) {
         self::get()->_pauseSesstions();
         if (!self::hasSesstion($sesstionName)) {
             $s = new Session([
-                'name' => $sesstionName
+                'name' => $sesstionName,
+                'duration' => $duration
             ]);
             $s->start();
             self::get()->sesstionsArr[] = $s;
         } else {
             foreach (self::get()->sesstionsArr as $sesstionObj) {
-                
                 if ($sesstionObj->getName() == $sesstionName) {
-                    $sesstionObj->resume();
+                    $sesstionObj->start();
                 }
             }
         }
     }
     private function _pauseSesstions() {
         $this->activeSesstion = null;
-        
         foreach ($this->sesstionsArr as $sesstion) {
-            $sesstion->pause();
+            $sesstion->close();
         }
     }
     public static function validateStorage() {
@@ -193,7 +202,7 @@ class SessionsManager {
         $httpOnly = $cookieParams['httponly'] === true ? '; HttpOnly' : '';
         $secure = $cookieParams['secure'] === true ? '; Secure' : '';
         $sameSite = $cookieParams['samesite'];
-        $lifetime = date(DATE_COOKIE, $cookieParams['lifetime']);
+        $lifetime = date(DATE_COOKIE, $cookieParams['expires']);
         $cookieHeader = "set-cookie: $name=$value; "
                 . "path=".$cookieParams['path']
                 . "; expires=$lifetime"

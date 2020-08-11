@@ -13,39 +13,49 @@ use webfiori\entity\File;
 /**
  * Description of DefaultSesstionStorage
  *
- * @author Eng.Ibrahim
+ * @author Ibrahim
+ * 
+ * @since 1.1.0
+ * 
+ * @version 1.0
  */
-class DefaultSesstionStorage implements SessionStorage {
+class DefaultSessionStorage implements SessionStorage {
     private $storeLoc;
     public function __construct() {
-        $this->storeLoc = ROOT_DIR.DS.'app'.DS.'storage'.DS.'sesstions';
+        $this->storeLoc = ROOT_DIR.DS.'app'.DS.'storage'.DS.'sessions';
         Util::isDirectory($this->storeLoc, true);
     }
     /**
      * 
-     * @param string $sesstionId
+     * @param string $sessionId
      * @return Session
      */
-    public function read($sesstionId) {
-        $file = new File($sesstionId, $this->storeLoc);
+    public function read($sessionId) {
+        $file = new File($sessionId, $this->storeLoc);
         if ($file->isExist()) {
             $file->read();
-            $sesstionObj = unserialize($file->getRawData());
-            return $sesstionObj;
+            $sesstion = new Session([
+                'session-id' => $sessionId
+            ]);
+            $sesstion->unserialize($file->getRawData());
+            
+            if ($sesstion->getId() == $sessionId) {
+                return $sesstion;
+            }
         }
     }
 
-    public function remove($sesstionId) {
-        unlink($this->storeLoc.DS.$sesstionId);
+    public function remove($sessionId) {
+        unlink($this->storeLoc.DS.$sessionId);
     }
     /**
      * 
-     * @param Session $sesstion
+     * @param Session $session
      */
-    public function save($sesstion) {
-        if ($sesstion instanceof Session) {
-            $serializedSesstion = serialize($sesstion);
-            $file = new File($sesstion->getId(), $this->storeLoc);
+    public function save($session) {
+        if ($session instanceof Session) {
+            $serializedSesstion = $session->serialize();
+            $file = new File($session->getId(), $this->storeLoc);
             $file->setRawData($serializedSesstion);
             $file->write(false, true);
         }

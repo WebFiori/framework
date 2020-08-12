@@ -159,18 +159,42 @@ class SessionsManager {
 
         return false;
     }
-    public static function start($sesstionName, $duration = Session::DEFAULT_SESSION_DURATION) {
+    /**
+     * Starts new session or resumes an existing one.
+     * 
+     * The method will first checks if a session which has the given name exist. 
+     * if there was such session, it will pause all sessions and resumes selected 
+     * one. If no session was found which has the given name, the method will 
+     * initialize new session.
+     * 
+     * @param string $sessionName The name of the session that will be resumed 
+     * or created.
+     * 
+     * @param array $options An associative array that contains options which 
+     * are used if the session is new. Available options are:
+     * <ul>
+     * <li><b>duration</b>: The duration of the session in minutes. Must be a number 
+     * greater than or equal to 0. If 0 is given, it means the session is not 
+     * presestent.</li>
+     * <li><b>refersh</b>: A boolean which is set to true if session timeout time 
+     * will be refreshed with every request. Default is false.</li>
+     * <li><b></b>: </li>
+     * v<li><b></b>: </li>
+     * </ul>
+     */
+    public static function start($sessionName, $options = []) {
         self::get()->_pauseSesstions();
-        if (!self::hasSesstion($sesstionName)) {
+        if (!self::hasSesstion($sessionName)) {
+            $options['name'] = $sessionName;
             $s = new Session([
-                'name' => $sesstionName,
+                'name' => $sessionName,
                 'duration' => $duration
             ]);
             $s->start();
             self::get()->sesstionsArr[] = $s;
         } else {
             foreach (self::get()->sesstionsArr as $sesstionObj) {
-                if ($sesstionObj->getName() == $sesstionName) {
+                if ($sesstionObj->getName() == $sessionName) {
                     $sesstionObj->start();
                 }
             }
@@ -209,6 +233,6 @@ class SessionsManager {
                 //. "$secure"
                 //. "$httpOnly"
                 . '; SameSite='.$sameSite;
-        header($cookieHeader);
+        header($cookieHeader, false);
     }
 }

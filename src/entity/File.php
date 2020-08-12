@@ -563,7 +563,12 @@ class File implements JsonI {
      * @since 1.0
      */
     public function setName($name) {
-        $this->fileName = $name;
+        $trimmed = trim($name);
+        
+        if (strlen($trimmed) != 0) {
+            $this->fileName = $name;
+            $this->_extractMimeFromName();
+        }
     }
     /**
      * Sets the path of the file.
@@ -709,6 +714,12 @@ class File implements JsonI {
             throw new FileException('Path cannot be empty string.');
         }
         throw new FileException('File name cannot be empty string.');
+    }
+    private function _extractMimeFromName() {
+        $exp = explode('.', $this->getName());
+        if (count($exp) == 2) {
+            $this->setMIMEType(self::getMIMEType($exp[1]));
+        }
     }
     private function _createResource($mode, $path) {
         set_error_handler(function()

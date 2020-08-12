@@ -186,10 +186,7 @@ class SessionsManager {
         self::get()->_pauseSesstions();
         if (!self::hasSesstion($sessionName)) {
             $options['name'] = $sessionName;
-            $s = new Session([
-                'name' => $sessionName,
-                'duration' => $duration
-            ]);
+            $s = new Session($options);
             $s->start();
             self::get()->sesstionsArr[] = $s;
         } else {
@@ -220,8 +217,9 @@ class SessionsManager {
             }
             self::get()->setSesssionCookie($sesstion->getName(), $sesstion->getId(),$cookieParams);
         }
-        
+        self::getStorage()->gc();
     }
+    
     private function setSesssionCookie($name, $value, $cookieParams) {
         $httpOnly = $cookieParams['httponly'] === true ? '; HttpOnly' : '';
         $secure = $cookieParams['secure'] === true ? '; Secure' : '';

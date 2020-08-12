@@ -35,7 +35,7 @@ use webfiori\entity\exceptions\FileException;
  * 
  * @author Ibrahim
  * 
- * @version 1.1.6
+ * @version 1.1.7
  */
 class File implements JsonI {
     /**
@@ -246,19 +246,25 @@ class File implements JsonI {
      * set the size to 0 and ID to -1. Finally, it will set MIME type to 
      * "application/octet-stream"
      * 
-     * @param string $fName The name of the file such as 'my-file.png'.
+     * @param string $fNameOrAbsPath The name of the file such as 'my-file.png'. 
+     * This also can be the absolute path of the file (such as 'home/usr/ibrahim/my-file.png').
      * 
-     * @param string $fPath The path of the file such as 'C:/Images/Test'.
+     * @param string|null $fPath The path of the file such as 'C:/Images/Test'. This can 
+     * be null if absolute path of the file was provided for the first parameter.
      * 
      * @since 1.0
      */
-    public function __construct($fName = '',$fPath = '') {
+    public function __construct($fNameOrAbsPath = '',$fPath = null) {
         $this->mimeType = 'application/octet-stream';
 
         if (!$this->setPath($fPath)) {
-            $this->path = '';
+            $info = $this->_extractPathAndName($fNameOrAbsPath);
+            $this->setDir($info['path']);
+            $this->setName($info['name']);
+        } else {
+            $this->setName($fNameOrAbsPath);
         }
-        $this->setName($fName);
+        
         $this->id = -1;
         $this->fileSize = 0;
     }
@@ -346,6 +352,32 @@ class File implements JsonI {
      */
     public function getID() {
         return $this->id;
+    }
+    /**
+     * Returns the time at which the file was last modified.
+     * 
+     * Note that this method will work only if the file exist in the file system.
+     * 
+     * @param string $format An optional format. The supported formats are the 
+     * same formats which are supported by the function <code>date()</code>.
+     * 
+     * @return string|int If no format is provided, the method will return the 
+     * time as integer. If a format is given, the method will return the time as 
+     * specified by the format. If the file does not exist, the method will return 
+     * 0.
+     * 
+     * @since 1.1.7
+     */
+    public function getLastModified($format = null) {
+        if (file_exists($this->getAbsolutePath())) {
+            clearstatcache();
+            
+            if ($format !== null) {
+                return date($format, filemtime($this->getAbsolutePath()));
+            }
+            return filemtime($this->getAbsolutePath());
+        }
+        return 0;
     }
     /**
      * Returns MIME type of a file type.
@@ -720,6 +752,28 @@ class File implements JsonI {
         if (count($exp) == 2) {
             $this->setMIMEType(self::getMIMEType($exp[1]));
         }
+    }
+    private function _extractPathAndName($absPath) {
+        $trimmed = trim($absPath);
+        $cleanPath = str_replace('\\', DS, str_replace('/', DS, $absPath));
+        $pathArr = explode(DS, $cleanPath);
+        
+        if (count($pathArr) != 0) {
+            $path = '';
+            $name = $pathArr[count($pathArr) - 1];
+            
+            for($x = 0 ; $x < count($pathArr) - 1 ; $x++) {
+                $path .= $pathArr[$x].DS;
+            }
+            return [
+                'path' => $path,
+                'name' => $name
+            ];
+        }
+        return [
+            'name' => $absPath,
+            'path' => ''
+        ];
     }
     private function _createResource($mode, $path) {
         set_error_handler(function()

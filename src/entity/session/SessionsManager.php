@@ -3,7 +3,7 @@
 namespace webfiori\entity\sesstion;
 
 /**
- * Description of SesstionsManager
+ * A class which is used to manage user sessions.
  *
  * @author Ibrahim
  * 
@@ -12,30 +12,69 @@ namespace webfiori\entity\sesstion;
  * @version 1.0
  */
 class SessionsManager {
-    private $sesstionsArr;
-    private $activeSesstion;
-    private static $Time;
     /**
-     *
+     * An array that contains all initialized sessions.
+     * 
+     * @var array
+     * 
+     * @since 1.0 
+     */
+    private $sesstionsArr;
+    /**
+     * The current active session.
+     * 
+     * @var Session|null
+     * 
+     * @since 1.0 
+     */
+    private $activeSesstion;
+    /**
+     * The storage interface which is used to store session state.
+     * 
      * @var SessionStorage 
+     * 
+     * @since 1.0
      */
     private $sesstionStorage;
+    /**
+     * Sets sessions storage engine.
+     * 
+     * This method is used to create a custom sessions storage engine. The 
+     * framework by default provide one type which is file storage. The 
+     * developer can implement a custom storage engine using the interface 
+     * 'SessionStorage'.
+     * 
+     * @param SesstionStorage $storage The new sessions storage.
+     * 
+     * @since 1.0
+     */
     public static function setStorage($storage) {
         if ($storage instanceof SesstionStorage) {
             self::get()->sesstionStorage = $storage;
         }
     }
     /**
+     * Returns storage engine which is used to store sessions state.
      * 
      * @return SessionStorage
+     * 
+     * @since 1.0
      */
     public static function getStorage() {
         return self::get()->sesstionStorage;
     }
+    /**
+     *
+     * @var SessionsManager 
+     * 
+     * @since 1.0
+     */
     private static $inst;
     /**
      * 
      * @return SessionsManager
+     * 
+     * @since 1.0
      */
     private static function get() {
         
@@ -45,8 +84,11 @@ class SessionsManager {
         return self::$inst;
     }
     /**
+     * Returns the currently active session.
      * 
-     * @return Session|null
+     * @return Session|null If a session is active, the method will return an 
+     * object of type 'Session' that contains session information. If no 
+     * session is active, the method will return null.
      * 
      * @since 1.0
      */
@@ -66,21 +108,41 @@ class SessionsManager {
         }
     }
     /**
-     * 
-     * @return int
-     * 
      * @since 1.0
      */
-    public static function time() {
-        return self::$Time;
-    }
     private function __construct() {
         $this->sesstionsArr = [];
         self::$Time = time();
         $this->sesstionStorage = new DefaultSessionStorage();
     }
+    /**
+     * Returns an indexed array that contains all created sessions.
+     * 
+     * @return array An array that contains objects of type 'Session'.
+     * 
+     * @since 1.0
+     */
     public static function getSesstions() {
         return self::get()->sesstionsArr;
+    }
+    /**
+     * Checks if the manager has specific session or not.
+     * 
+     * @param string $sName The name of the session.
+     * 
+     * @return boolean If the manager manages a session which has the given name, 
+     * the method will return true. False otherwise.
+     * 
+     * @since 1.0
+     */
+    public static function hasSesstion($sName) {
+        $trimmed = trim($sName);
+        
+        if (!self::_checkLoadedSesstions($trimmed)) {
+            return self::_checkAndLoadFromCookie($trimmed);
+        }
+        
+        return true;
     }
     /**
      * 
@@ -90,16 +152,8 @@ class SessionsManager {
      * 
      * @since 1.0
      */
-    public static function hasSesstion($sName) {
-        
-        foreach (self::get()->sesstionsArr as $sesstionObj) {
-            
-            if ($sesstionObj->getName() == $sName) {
-                return true;
-            }
-        }
-        
-        $sId = self::getSessionIDFromCookie($sName);
+    private static function _checkAndLoadFromCookie($sName) {
+        $sId = self::getSessionIDFromCookie($trimmed);
         
         if ($sId !== false) {
             $tempSesstion = new Session([
@@ -111,7 +165,23 @@ class SessionsManager {
                 return true;
             }
         }
-        
+        return false;
+    }
+    /**
+     * 
+     * @param type $sName
+     * 
+     * @return boolean
+     * 
+     * @since 1.0
+     */
+    private static function _checkLoadedSesstions($sName) {
+        foreach (self::get()->sesstionsArr as $sesstionObj) {
+            
+            if ($sesstionObj->getName() == $sName) {
+                return true;
+            }
+        }
         return false;
     }
     /**
@@ -129,10 +199,10 @@ class SessionsManager {
         $sid = self::getSessionIDFromCookie($seestionName);
 
         if ($sid === false) {
-            $sid = filter_var($_POST[$seestionName], FILTER_SANITIZE_STRING);
+            $sid = filter_input(INPUT_POST, $seestionName);
 
             if ($sid === null || $sid === false) {
-                $sid = filter_var($_GET[$seestionName], FILTER_SANITIZE_STRING);
+                $sid = filter_input(INPUT_POST, $seestionName);
             }
         }
 
@@ -181,20 +251,18 @@ class SessionsManager {
      * @param string $sessionName The name of the session that will be resumed 
      * or created.
      * 
-     * @param array $options An associative array that contains options which 
-     * are used if the session is new. Available options are:
+     * @param array $options An array that contains session options. Available 
+     * options are:
      * <ul>
      * <li><b>duration</b>: The duration of the session in minutes. Must be a number 
      * greater than or equal to 0. If 0 is given, it means the session is not 
-     * presestent.</li>
-     * <li><b>refersh</b>: A boolean which is set to true if session timeout time 
+     * persistent.</li>
+     * <li><b>refresh</b>: A boolean which is set to true if session timeout time 
      * will be refreshed with every request. Default is false.</li>
-     * <li><b></b>: </li>
-     * v<li><b></b>: </li>
      * </ul>
      */
     public static function start($sessionName, $options = []) {
-        self::get()->_pauseSesstions();
+        self::get()->_pauseSessions();
         if (!self::hasSesstion($sessionName)) {
             $options['name'] = $sessionName;
             $s = new Session($options);
@@ -208,44 +276,51 @@ class SessionsManager {
             }
         }
     }
-    private function _pauseSesstions() {
+    /**
+     * Stores the status of all sessions and pause them.
+     * 
+     * @since 1.0
+     */
+    public static function pauseAll() {
+        self::get()->_pauseSessions();
+    }
+    /**
+     * @since 1.0
+     */
+    private function _pauseSessions() {
         $this->activeSesstion = null;
         foreach ($this->sesstionsArr as $sesstion) {
             $sesstion->close();
         }
     }
+    /**
+     * Validate the current status of the storage.
+     * 
+     * This method will go through all sessions which was activated and check the 
+     * status of each one. If the session is new, paused or resumed, the method 
+     * will store session state using specified storage engine. If the status 
+     * of the session is killed, the method will remove session state from 
+     * the storage. In addition to that, the method will garbage-collect all 
+     * sessions which are not active any more. The garbage collection algorithm 
+     * will depends on the way the developer have implemented his own sessions 
+     * storage engine.
+     * 
+     * @since 1.0
+     */
     public static function validateStorage() {
-        foreach (self::get()->sesstionsArr as $sesstion) {
-            $status = $sesstion->getStatus();
-            $sesstion instanceof Session;
+        foreach (self::get()->sesstionsArr as $session) {
+            $status = $session->getStatus();
+            $session instanceof Session;
             if ($status == Session::STATUS_NEW ||
                 $status == Session::STATUS_PAUSED ||  
                 $status == Session::STATUS_RESUMED){
-                self::getStorage()->save($sesstion);
-                $cookieParams = $sesstion->getCookieParams();
+                self::getStorage()->save($session);
+                $cookieParams = $session->getCookieParams();
             } else if ($status == Session::STATUS_KILLED) {
-                self::getStorage()->remove($sesstion->getId());
+                self::getStorage()->remove($session->getId());
             }
-            self::get()->setSesssionCookie($sesstion->getName(), $sesstion->getId(),$cookieParams);
+            header($session->getCookieHeader());
         }
         self::getStorage()->gc();
-    }
-    
-    private function setSesssionCookie($name, $value, $cookieParams) {
-        $httpOnly = $cookieParams['httponly'] === true ? '; HttpOnly' : '';
-        $secure = $cookieParams['secure'] === true ? '; Secure' : '';
-        $sameSite = $cookieParams['samesite'];
-        if ($cookieParams['expires'] == 0) {
-            $lifetime = '';
-        } else {
-            $lifetime = '; expires='.date(DATE_COOKIE, $cookieParams['expires']);
-        }
-        $cookieHeader = "set-cookie: $name=$value; "
-                . "path=".$cookieParams['path']
-                . "$lifetime"
-                //. "$secure"
-                //. "$httpOnly"
-                . '; SameSite='.$sameSite;
-        header($cookieHeader, false);
     }
 }

@@ -1,10 +1,6 @@
 <?php
 namespace webfiori\entity\sesstion;
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 use webfiori\entity\User;
 use jsonx\JsonX;
 use jsonx\JsonI;
@@ -184,15 +180,12 @@ class Session implements JsonI {
      * Returns the number of seconds that has been passed since the session started.
      * 
      * @return int The number of seconds that has been passed since the session started. 
-     * If the session is not running, the method will return 0.
+     * If the session status is Session::STATUS_INACTIVE, the method will return 0.
      * 
      * @since 1.0
      */
     public function getPassedTime() {
-        if ($this->isRunning()) {
-            return  $this->getResumedAt() - $this->getStartedAt();
-        }
-        return 0;
+        return $this->passedTime;
     }
     /**
      * Returns session language code.
@@ -399,8 +392,8 @@ class Session implements JsonI {
         if (!$this->isRunning()) {
             $seesion = SessionsManager::getStorage()->read($this->getId());
             if ($seesion instanceof Session) {
-                $this->_clone($seesion);
                 $this->sessionStatus = self::STATUS_RESUMED;
+                $this->_clone($seesion);
                 $this->_checkIfExpired();
 
             } else {
@@ -428,6 +421,8 @@ class Session implements JsonI {
             SessionsManager::getStorage()->remove($this->getId());
             $this->sessionStatus = self::STATUS_EXPIERED;
             $this->cookieParams['expires'] = time() - 1;
+        } else if ($this->isRefresh()) {
+            $this->cookieParams['expires'] = time() + $this->getDuration()*60;
         }
     }
     /**
@@ -524,7 +519,7 @@ class Session implements JsonI {
      */
     public function getRemainingTime() {
         if ($this->isRefresh()) {
-            return $this->getDuration();
+            return $this->getDuration()*60;
         }
         $remainingTime = $this->getDuration()*60 - $this->getPassedTime();
         
@@ -541,15 +536,14 @@ class Session implements JsonI {
      * options are:
      * <ul>
      * <li><b>name</b>: The name of the session. A valid name can only 
-     * consist of [a-z] and [A-Z].</li>
+     * consist of [a-z], [A-Z], [0-9], dash and underscore.</li>
      * <li><b>duration</b>: The duration of the session in minutes. Must be a number 
      * greater than or equal to 0. If 0 is given, it means the session is not 
      * persistent.</li>
-     * <li><b>refersh</b>: A boolean which is set to true if session timeout time 
+     * <li><b>refresh</b>: A boolean which is set to true if session timeout time 
      * will be refreshed with every request. Default is false.</li>
-     * 
-     * <li><b></b>: </li>
      * </ul>
+     * 
      * @since 1.0
      */
     public function __construct($options = []) {
@@ -571,7 +565,6 @@ class Session implements JsonI {
         
         
         $this->resumedAt = 0;
-        $this->passedTime = 0;
         $this->startedAt = 0;
         $this->sessionArr = [];
         $ip = filter_var($_SERVER['REMOTE_ADDR'],FILTER_VALIDATE_IP);
@@ -589,6 +582,36 @@ class Session implements JsonI {
             'httponly' => true,
             'samesite' => 'Lax'
         ];
+    }
+    /**
+     * Returns a string which can be passed to the function 'header()' to set session 
+     * cookie.
+     * 
+     * @return string The string that will be returned will have the following 
+     * format: 
+     * 'Set-Cookie: &lt;cookie-name&gt;=&lt;val&gt;; expires=&lt;time&gt;; path=/ 
+     * SameSite=&lt;Lax|None|Strict&gt;'
+     * 
+     * @since 1.0
+     */
+    public function getCookieHeader() {
+        $cookieParams = $this->getCookieParams();
+        $httpOnly = $cookieParams['httponly'] === true ? '; HttpOnly' : '';
+        $secure = $cookieParams['secure'] === true ? '; Secure' : '';
+        $sameSite = $cookieParams['samesite'];
+        if ($cookieParams['expires'] == 0) {
+            $lifetime = '';
+        } else {
+            $lifetime = '; expires='.date(DATE_COOKIE, $cookieParams['expires']);
+        }
+        $name = $this->getName();
+        $value = $this->getId();
+        return "Set-Cookie: $name=$value; "
+                . "path=".$cookieParams['path']
+                . "$lifetime"
+                //. "$secure"
+                //. "$httpOnly"
+                . '; SameSite='.$sameSite;
     }
     private function _setName($name) {
         $trimmed = trim($name);
@@ -619,7 +642,8 @@ class Session implements JsonI {
      * Sets session duration.
      * 
      * Note that this method will also updates the 'expires' attribute of session 
-     * cookie.
+     * cookie. Also, note that if the new duration less than the passed time, 
+     * the session will expire.
      * 
      * @param int $time Session duration in minutes.
      * 
@@ -633,6 +657,7 @@ class Session implements JsonI {
         if ($time >= 0) {
             $this->lifeTime = $asInt;
             $this->cookieParams['expires'] = $asInt == 0 ? 0 : time() + $this->getDuration() * 60;
+            $this->_checkIfExpired();
             return true;
         }
         return false;
@@ -714,24 +739,36 @@ class Session implements JsonI {
         return $this->sesstionUser;
     }
     /**
+     * Returns an object of type 'JsonX' that represents the session.
      * 
      * @return JsonX
+     * 
+     * @since 1.0
      */
     public function toJSON() {
         return new JsonX([
             'name' => $this->getName(),
             'startedAt' => $this->getStartedAt(),
-            'duration' => $this->getDuration(),
+            'duration' => $this->getDuration()*60,
             'resumedAt' => $this->getResumedAt(),
             'passedTime' => $this->getPassedTime(),
+            'remainingTime' => $this->getRemainingTime(),
             'id' => $this->getId(),
             'isRefresh' => $this->isRefresh(),
+            'isPersistent' => $this->isPersistent(),
             'status' => $this->getStatus(),
             'user' => $this->getUser(),
             'vars' => $this->getVars()
         ]);
     }
-
+    /**
+     * Serialize the session.
+     * 
+     * @return string The method will return a string that represents serialized 
+     * session data.
+     * 
+     * @since 1.0
+     */
     public function serialize() {
         $serializedSesstion = serialize($this);
         $cipherMeth = 'aes-256-ctr';
@@ -752,7 +789,17 @@ class Session implements JsonI {
         }
         return $serializedSesstion;
     }
-
+    /**
+     * Unserialize a session and restore its data in the instance at which the 
+     * method is called on.
+     * 
+     * @param string $serialized The serialized session as string.
+     * 
+     * @return boolean If the Unserialize was successfully completed, the method 
+     * will return true. If Unserialize fails, the method will return false.
+     * 
+     * @since 1.0
+     */
     public function unserialize($serialized) {
         $cipherMeth = 'aes-256-ctr';
         if (in_array($cipherMeth, openssl_get_cipher_methods())) {
@@ -765,15 +812,20 @@ class Session implements JsonI {
             $sesstionObj = unserialize($encrypted);
             
             if ($sesstionObj instanceof Session) {
+                $this->sessionStatus = self::STATUS_RESUMED;
                 $this->_clone($sesstionObj);
+                return true;
             }
         } else {
             $sesstionObj = unserialize($serialized);
             
             if ($sesstionObj instanceof Session) {
+                $this->sessionStatus = self::STATUS_RESUMED;
                 $this->_clone($sesstionObj);
+                return true;
             }
         }
+        return false;
     }
 
 }

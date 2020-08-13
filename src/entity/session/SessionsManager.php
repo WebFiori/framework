@@ -14,6 +14,7 @@ namespace webfiori\entity\sesstion;
 class SessionsManager {
     private $sesstionsArr;
     private $activeSesstion;
+    private static $Time;
     /**
      *
      * @var SessionStorage 
@@ -64,8 +65,18 @@ class SessionsManager {
             }
         }
     }
+    /**
+     * 
+     * @return int
+     * 
+     * @since 1.0
+     */
+    public static function time() {
+        return self::$Time;
+    }
     private function __construct() {
         $this->sesstionsArr = [];
+        self::$Time = time();
         $this->sesstionStorage = new DefaultSessionStorage();
     }
     public static function getSesstions() {
@@ -224,10 +235,14 @@ class SessionsManager {
         $httpOnly = $cookieParams['httponly'] === true ? '; HttpOnly' : '';
         $secure = $cookieParams['secure'] === true ? '; Secure' : '';
         $sameSite = $cookieParams['samesite'];
-        $lifetime = date(DATE_COOKIE, $cookieParams['expires']);
+        if ($cookieParams['expires'] == 0) {
+            $lifetime = '';
+        } else {
+            $lifetime = '; expires='.date(DATE_COOKIE, $cookieParams['expires']);
+        }
         $cookieHeader = "set-cookie: $name=$value; "
                 . "path=".$cookieParams['path']
-                . "; expires=$lifetime"
+                . "$lifetime"
                 //. "$secure"
                 //. "$httpOnly"
                 . '; SameSite='.$sameSite;

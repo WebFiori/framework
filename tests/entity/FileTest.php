@@ -33,7 +33,7 @@ class FileTest extends TestCase {
         $this->assertEquals(ROOT_DIR.DIRECTORY_SEPARATOR.'tests'.DIRECTORY_SEPARATOR.'entity',$file->getPath());
         $this->assertEquals(-1,$file->getID());
         $this->assertNull($file->getRawData());
-        $this->assertEquals('application/octet-stream',$file->getFileMIMEType());
+        $this->assertEquals('text/plain',$file->getFileMIMEType());
 
         return $file;
     }

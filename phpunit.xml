@@ -18,6 +18,9 @@
             <file>./src/entity/User.php</file>
             <file>./src/entity/Page.php</file>
             <file>./src/entity/Theme.php</file>
+            <file>./src/entity/session/Session.php</file>
+            <file>./src/entity/session/SessionsManager.php</file>
+            <file>./src/entity/session/DefaultSessionStorage.php</file>
         </whitelist>
     </filter>
     <logging>
@@ -38,6 +41,9 @@
         </testsuite>
         <testsuite name="Controller Tests">
             <directory>./tests/logic/</directory>
+        </testsuite>
+        <testsuite name="Session Management Tests">
+            <directory>./tests/entity/session/</directory>
         </testsuite>
     </testsuites>
 </phpunit>

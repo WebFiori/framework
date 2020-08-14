@@ -22,11 +22,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 namespace webfiori\entity\session;
 
-use webfiori\entity\Util;
 use webfiori\entity\File;
+use webfiori\entity\Util;
 /**
  * The default sessions storage engine.
  *
@@ -52,6 +51,34 @@ class DefaultSessionStorage implements SessionStorage {
         Util::isDirectory($this->storeLoc, true);
     }
     /**
+     * Removes all inactive sessions.
+     * 
+     * This method will check if the constant 'SESSION_GC' is exist and its value 
+     * is valid. If exist and valid, it will be used as reference for removing 
+     * old sessions. If it does not exist, the method will remove any inactive 
+     * session which is older than 30 days.
+     * 
+     * @since 1.0
+     */
+    public function gc() {
+        $sessionsFiles = array_diff(scandir($this->storeLoc), ['.','..']);
+
+        if (defined('SESSION_GC') && SESSION_GC > 0) {
+            $olderThan = time() - SESSION_GC;
+        } else {
+            //Clear any sesstion which is older than 30 days
+            $olderThan = time() - 60 * 60 * 24 * 30;
+        }
+
+        foreach ($sessionsFiles as $file) {
+            $fileObj = new File($this->storeLoc.DS.$file);
+
+            if ($fileObj->getLastModified() < $olderThan) {
+                $fileObj->remove();
+            }
+        }
+    }
+    /**
      * Reads a session from session file.
      * 
      * @param string $sessionId The ID of the session.
@@ -64,8 +91,10 @@ class DefaultSessionStorage implements SessionStorage {
      */
     public function read($sessionId) {
         $file = new File($sessionId, $this->storeLoc);
+
         if ($file->isExist()) {
             $file->read();
+
             return $file->getRawData();
         }
     }
@@ -93,33 +122,4 @@ class DefaultSessionStorage implements SessionStorage {
         $file->setRawData($session);
         $file->write(false, true);
     }
-    /**
-     * Removes all inactive sessions.
-     * 
-     * This method will check if the constant 'SESSION_GC' is exist and its value 
-     * is valid. If exist and valid, it will be used as reference for removing 
-     * old sessions. If it does not exist, the method will remove any inactive 
-     * session which is older than 30 days.
-     * 
-     * @since 1.0
-     */
-    public function gc() {
-        $sessionsFiles = array_diff(scandir($this->storeLoc), ['.','..']);
-        
-        if (defined('SESSION_GC') && SESSION_GC > 0) {
-            $olderThan = time() - SESSION_GC;
-        } else {
-            //Clear any sesstion which is older than 30 days
-            $olderThan = time() - 60*60*24*30;
-        }
-       
-        foreach ($sessionsFiles as $file) {
-            $fileObj = new File($this->storeLoc.DS.$file);
-            
-            if ($fileObj->getLastModified() < $olderThan) {
-                $fileObj->remove();
-            }
-        }
-    }
-
 }

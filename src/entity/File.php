@@ -264,20 +264,9 @@ class File implements JsonI {
         } else {
             $this->setName($fNameOrAbsPath);
         }
-        
+
         $this->id = -1;
         $this->fileSize = 0;
-    }
-    /**
-     * Checks if the file exist or not.
-     * 
-     * @return boolean If the file exist, the method will return true. Other than 
-     * that, the method will return false.
-     * 
-     * @since 1.1.6
-     */
-    public function isExist() {
-        return file_exists($this->getAbsolutePath());
     }
     /**
      * Returns JSON string that represents basic file info.
@@ -371,12 +360,14 @@ class File implements JsonI {
     public function getLastModified($format = null) {
         if (file_exists($this->getAbsolutePath())) {
             clearstatcache();
-            
+
             if ($format !== null) {
                 return date($format, filemtime($this->getAbsolutePath()));
             }
+
             return filemtime($this->getAbsolutePath());
         }
+
         return 0;
     }
     /**
@@ -468,7 +459,7 @@ class File implements JsonI {
                 return base64_decode($this->rawData);
             }
         }
-        
+
         return $this->rawData;
     }
     /**
@@ -482,6 +473,17 @@ class File implements JsonI {
      */
     public function getSize() {
         return $this->fileSize;
+    }
+    /**
+     * Checks if the file exist or not.
+     * 
+     * @return boolean If the file exist, the method will return true. Other than 
+     * that, the method will return false.
+     * 
+     * @since 1.1.6
+     */
+    public function isExist() {
+        return file_exists($this->getAbsolutePath());
     }
     /**
      * Reads the file in binary mode.
@@ -596,7 +598,7 @@ class File implements JsonI {
      */
     public function setName($name) {
         $trimmed = trim($name);
-        
+
         if (strlen($trimmed) != 0) {
             $this->fileName = $name;
             $this->_extractMimeFromName();
@@ -747,34 +749,6 @@ class File implements JsonI {
         }
         throw new FileException('File name cannot be empty string.');
     }
-    private function _extractMimeFromName() {
-        $exp = explode('.', $this->getName());
-        if (count($exp) == 2) {
-            $this->setMIMEType(self::getMIMEType($exp[1]));
-        }
-    }
-    private function _extractPathAndName($absPath) {
-        $trimmed = trim($absPath);
-        $cleanPath = str_replace('\\', DS, str_replace('/', DS, $absPath));
-        $pathArr = explode(DS, $cleanPath);
-        
-        if (count($pathArr) != 0) {
-            $path = '';
-            $name = $pathArr[count($pathArr) - 1];
-            
-            for($x = 0 ; $x < count($pathArr) - 1 ; $x++) {
-                $path .= $pathArr[$x].DS;
-            }
-            return [
-                'path' => $path,
-                'name' => $name
-            ];
-        }
-        return [
-            'name' => $absPath,
-            'path' => ''
-        ];
-    }
     private function _createResource($mode, $path) {
         set_error_handler(function()
         {
@@ -787,6 +761,37 @@ class File implements JsonI {
         }
 
         return false;
+    }
+    private function _extractMimeFromName() {
+        $exp = explode('.', $this->getName());
+
+        if (count($exp) == 2) {
+            $this->setMIMEType(self::getMIMEType($exp[1]));
+        }
+    }
+    private function _extractPathAndName($absPath) {
+        $trimmed = trim($absPath);
+        $cleanPath = str_replace('\\', DS, str_replace('/', DS, $absPath));
+        $pathArr = explode(DS, $cleanPath);
+
+        if (count($pathArr) != 0) {
+            $path = '';
+            $name = $pathArr[count($pathArr) - 1];
+
+            for ($x = 0 ; $x < count($pathArr) - 1 ; $x++) {
+                $path .= $pathArr[$x].DS;
+            }
+
+            return [
+                'path' => $path,
+                'name' => $name
+            ];
+        }
+
+        return [
+            'name' => $absPath,
+            'path' => ''
+        ];
     }
     private function _readHelper($fPath,$from,$to) {
         if ($this->isExist()) {

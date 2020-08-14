@@ -22,7 +22,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 namespace webfiori\entity\session;
 
 /**
@@ -36,18 +35,11 @@ namespace webfiori\entity\session;
  */
 interface SessionStorage {
     /**
-     * Store session state.
-     * 
-     * This method must store serialized session. The developer can use the method 
-     * <code>Session::serialize()</code> to serialize any session.
-     * 
-     * @param string $sessionId The ID of the session that will be stored.
-     * 
-     * @param string $serializedSession A string that represents the session.
+     * Removes all inactive sessions from the storage.
      * 
      * @since 1.0
      */
-    public function save($sessionId, $serializedSession);
+    public function gc();
     /**
      * Reads session state.
      * 
@@ -73,9 +65,16 @@ interface SessionStorage {
      */
     public function remove($sesstionId);
     /**
-     * Removes all inactive sessions from the storage.
+     * Store session state.
+     * 
+     * This method must store serialized session. The developer can use the method 
+     * <code>Session::serialize()</code> to serialize any session.
+     * 
+     * @param string $sessionId The ID of the session that will be stored.
+     * 
+     * @param string $serializedSession A string that represents the session.
      * 
      * @since 1.0
      */
-    public function gc();
+    public function save($sessionId, $serializedSession);
 }

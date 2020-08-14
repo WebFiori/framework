@@ -1,10 +1,35 @@
 <?php
-namespace webfiori\entity\sesstion;
+/*
+ * The MIT License
+ *
+ * Copyright 2020 Ibrahim, WebFiori Framework.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+namespace webfiori\entity\session;
 
 use webfiori\entity\User;
 use jsonx\JsonX;
 use jsonx\JsonI;
 use webfiori\conf\SiteConfig;
+use webfiori\entity\exceptions\SessionException;
 use Serializable;
 /**
  * A class that represents a session.
@@ -111,6 +136,16 @@ class Session implements JsonI {
         return $this->isRef;
     }
     /**
+     * Returns a JSON string that represents the session.
+     * 
+     * @return string
+     * 
+     * @since 1.0
+     */
+    public function __toString() {
+        return $this->toJSON().'';
+    }
+    /**
      * An object of type 'User' that represents session user.
      * 
      * @var User
@@ -159,6 +194,7 @@ class Session implements JsonI {
      */
     private $passedTime;
     private function _initNewSesstionVars() {
+        $this->sessionArr = [];
         $this->resumedAt = time();
         $this->startedAt = time();
         $this->sesstionUser = new User();
@@ -390,15 +426,12 @@ class Session implements JsonI {
      */
     public function start() {
         if (!$this->isRunning()) {
-            $seesion = SessionsManager::getStorage()->read($this->getId());
-            if ($seesion instanceof Session) {
-                $this->sessionStatus = self::STATUS_RESUMED;
-                $this->_clone($seesion);
-                $this->_checkIfExpired();
-
-            } else {
+            $seesionStr = SessionsManager::getStorage()->read($this->getId());
+            if ($this->getStatus() == self::STATUS_KILLED || !$this->unserialize($seesionStr)) {
                 $this->reGenerateID();
                 $this->_initNewSesstionVars();
+            } else {
+                $this->_checkIfExpired();
             }
         }
     }
@@ -426,6 +459,45 @@ class Session implements JsonI {
         }
     }
     /**
+     * Retrieves the value of a session variable and removes it from the session.
+     *  
+     * @param string $varName The name of the variable.
+     * 
+     * @return mixed|null If the variable exist and its value is set, the method 
+     * will return its value. If the value is not set or the session is not 
+     * running, the method will return null.
+     * 
+     * @since 1.0
+     */
+    public function pull($varName) {
+        if ($this->isRunning()) {
+            $varVal = $this->get($varName);
+            $this->remove($varName);
+            return $varVal;
+        }
+    }
+    /**
+     * Removes the value of a session variable.
+     * 
+     * @param string $varName The name of the variable.
+     * 
+     * @return boolean If the value was deleted, the method will return true. 
+     * If the variable does not exist or the variable does not exist, the method 
+     * will return false.
+     * 
+     * @since 1.0
+     */
+    public function remove($varName) {
+        if ($this->isRunning()) {
+            $trimmed = trim($varName);
+            if (isset($this->sessionArr[$trimmed])) {
+                unset($this->sessionArr[$trimmed]);
+                return true;
+            }
+        }
+        return false;
+    }
+    /**
      * Sets session variable. 
      * 
      * Note that session variable will be set only if the session is running.
@@ -434,6 +506,9 @@ class Session implements JsonI {
      * 
      * @param mixed $val The value of the variable. It can be any thing.
      * 
+     * @return boolean If the variable is set, the method will return true. If 
+     * not, the method will return false.
+     * 
      * @since 1.0
      */
     public function set($name, $val) {
@@ -441,8 +516,10 @@ class Session implements JsonI {
             $trimmed = trim($name);
             if (strlen($trimmed) > 0) {
                 $this->sessionArr[$trimmed] = $val;
+                return true;
             }
         }
+        return false;
     }
     /**
      * Returns the value of a session variable.
@@ -484,8 +561,9 @@ class Session implements JsonI {
      */
     public function close() {
         if ($this->isRunning()) {
-            SessionsManager::getStorage()->save($this);
+            SessionsManager::getStorage()->save($this->getId(), $this->serialize());
             $this->sessionStatus = self::STATUS_PAUSED;
+            SessionsManager::pauseAll();            
         }
     }
     /**
@@ -536,13 +614,16 @@ class Session implements JsonI {
      * options are:
      * <ul>
      * <li><b>name</b>: The name of the session. A valid name can only 
-     * consist of [a-z], [A-Z], [0-9], dash and underscore.</li>
+     * consist of [a-z], [A-Z], [0-9], dash and underscore. This must be 
+     * provided or the method will throw an exception.</li>
      * <li><b>duration</b>: The duration of the session in minutes. Must be a number 
      * greater than or equal to 0. If 0 is given, it means the session is not 
-     * persistent.</li>
+     * persistent. If the duration is invalid, it will be set to Session::DEFAULT_SESSION_DURATION</li>
      * <li><b>refresh</b>: A boolean which is set to true if session timeout time 
      * will be refreshed with every request. Default is false.</li>
      * </ul>
+     * 
+     * @throws SessionException If session name is missing or invalid.
      * 
      * @since 1.0
      */
@@ -555,9 +636,9 @@ class Session implements JsonI {
             $this->setDuration(self::DEFAULT_SESSION_DURATION);
         }
         
-        $tempSName = isset($options['name']) ? trim($options['name']) : 'wf-session';
+        $tempSName = isset($options['name']) ? trim($options['name']) : null;
         if (!$this->_setName($tempSName)) {
-            $this->_setName('wf-seestion');
+            throw new SessionException('Invalid session name: \''.$tempSName.'\'.');
         }
         
         $this->sId = isset($options['session-id']) ? trim($options['session-id']) : $this->_generateSessionID();

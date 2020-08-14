@@ -1,7 +1,7 @@
 <?php
 use PHPUnit\Framework\TestCase;
 
-use webfiori\entity\sesstion\Session;
+use webfiori\entity\session\Session;
 /**
  * Description of SessionTest
  *

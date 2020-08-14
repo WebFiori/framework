@@ -1,7 +1,30 @@
 <?php
+/*
+ * The MIT License
+ *
+ * Copyright 2020 Ibrahim, WebFiori Framework.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 
-namespace webfiori\entity\sesstion;
-
+namespace webfiori\entity\session;
+use webfiori\entity\cli\CLI;
 /**
  * A class which is used to manage user sessions.
  *
@@ -50,8 +73,82 @@ class SessionsManager {
      */
     public static function setStorage($storage) {
         if ($storage instanceof SesstionStorage) {
-            self::get()->sesstionStorage = $storage;
+            self::_get()->sesstionStorage = $storage;
         }
+    }
+    /**
+     * Retrieves the value of a session variable and removes it from the session.
+     *  
+     * @param string $varName The name of the variable.
+     * 
+     * @return mixed|null If the variable exist and its value is set, the method 
+     * will return its value. If the value is not set or no session is
+     * active, the method will return null.
+     * 
+     * @since 1.0
+     */
+    public static function pull($varName) {
+        $active = self::getActiveSesstion();
+        if ($active !== null) {
+            return $active->pull($varName);
+        }
+    }
+    /**
+     * Removes the value of a session variable from the active session.
+     * 
+     * @param string $varName The name of the variable.
+     * 
+     * @return boolean If the value was deleted, the method will return true. 
+     * If the does not exist or no session is active, the method will return false.
+     * 
+     * @since 1.0
+     */
+    public static function remove($varName) {
+        $active = self::getActiveSesstion();
+        if ($active !== null) {
+            return $active->remove($varName);
+        }
+        return false;
+    }
+    /**
+     * Returns the value of a session variable.
+     * 
+     * The value will be taken from the active session.
+     * 
+     * @param string $varName The name of the variable.
+     * 
+     * @return null|mixed If a variable which has the given name is found, its 
+     * value is returned. If no such variable exist or there was no active session,
+     * the method will return null.
+     * 
+     * @since 1.0
+     */
+    public static function get($varName) {
+        $active = self::getActiveSesstion();
+        if ($active !== null) {
+            return $active->get($varName);
+        }
+    }
+    /**
+     * Sets session variable. 
+     * 
+     * Note that session variable will be set only if there was an active session.
+     * 
+     * @param string $varName The name of the variable. Must be non-empty string.
+     * 
+     * @param mixed $value The value of the variable. It can be any thing.
+     * 
+     * @return boolean If the variable is set, the method will return true. If 
+     * not, the method will return false.
+     * 
+     * @since 1.0
+     */
+    public static function set($varName, $value) {
+        $active = self::getActiveSesstion();
+        if ($active !== null) {
+            return $active->set($varName, $value);
+        }
+        return false;
     }
     /**
      * Returns storage engine which is used to store sessions state.
@@ -61,7 +158,7 @@ class SessionsManager {
      * @since 1.0
      */
     public static function getStorage() {
-        return self::get()->sesstionStorage;
+        return self::_get()->sesstionStorage;
     }
     /**
      *
@@ -76,7 +173,7 @@ class SessionsManager {
      * 
      * @since 1.0
      */
-    private static function get() {
+    private static function _get() {
         
         if (self::$inst === null) {
             self::$inst = new SessionsManager();
@@ -94,15 +191,15 @@ class SessionsManager {
      */
     public static function getActiveSesstion() {
         
-        if (self::get()->activeSesstion !== null) {
-            return self::get()->activeSesstion;
+        if (self::_get()->activeSesstion !== null) {
+            return self::_get()->activeSesstion;
         }
         
-        foreach (self::get()->sesstionsArr as $sesstion) {
+        foreach (self::_get()->sesstionsArr as $sesstion) {
             $sesstion instanceof Session;
             $status = $sesstion->getStatus();
             if ($status == Session::STATUS_NEW || $status == Session::STATUS_RESUMED) {
-                self::get()->activeSesstion = $sesstion;
+                self::_get()->activeSesstion = $sesstion;
                 return $sesstion;
             }
         }
@@ -112,7 +209,6 @@ class SessionsManager {
      */
     private function __construct() {
         $this->sesstionsArr = [];
-        self::$Time = time();
         $this->sesstionStorage = new DefaultSessionStorage();
     }
     /**
@@ -123,7 +219,7 @@ class SessionsManager {
      * @since 1.0
      */
     public static function getSesstions() {
-        return self::get()->sesstionsArr;
+        return self::_get()->sesstionsArr;
     }
     /**
      * Checks if the manager has specific session or not.
@@ -145,6 +241,21 @@ class SessionsManager {
         return true;
     }
     /**
+     * Destroy the active session.
+     * 
+     * Calling this method when there is no active session will have no effect.
+     * 
+     * @since 1.0
+     */
+    public static function destroy() {
+        $active = self::getActiveSesstion();
+        
+        if ($active !== null) {
+            $active->kill();
+            self::_get()->activeSesstion = null;
+        }
+    }
+    /**
      * 
      * @param type $sName
      * 
@@ -153,7 +264,7 @@ class SessionsManager {
      * @since 1.0
      */
     private static function _checkAndLoadFromCookie($sName) {
-        $sId = self::getSessionIDFromCookie($trimmed);
+        $sId = self::getSessionIDFromCookie($sName);
         
         if ($sId !== false) {
             $tempSesstion = new Session([
@@ -161,7 +272,7 @@ class SessionsManager {
             ]);
             $tempSesstion->start();
             if ($tempSesstion->getStatus() == Session::STATUS_RESUMED) {
-                self::get()->sesstionsArr[] = $tempSesstion;
+                self::_get()->sesstionsArr[] = $tempSesstion;
                 return true;
             }
         }
@@ -176,7 +287,7 @@ class SessionsManager {
      * @since 1.0
      */
     private static function _checkLoadedSesstions($sName) {
-        foreach (self::get()->sesstionsArr as $sesstionObj) {
+        foreach (self::_get()->sesstionsArr as $sesstionObj) {
             
             if ($sesstionObj->getName() == $sName) {
                 return true;
@@ -260,16 +371,18 @@ class SessionsManager {
      * <li><b>refresh</b>: A boolean which is set to true if session timeout time 
      * will be refreshed with every request. Default is false.</li>
      * </ul>
+     * 
+     * @throws SessionException If session name is missing or invalid.
      */
     public static function start($sessionName, $options = []) {
-        self::get()->_pauseSessions();
+        self::_get()->_pauseSessions();
         if (!self::hasSesstion($sessionName)) {
             $options['name'] = $sessionName;
             $s = new Session($options);
             $s->start();
-            self::get()->sesstionsArr[] = $s;
+            self::_get()->sesstionsArr[] = $s;
         } else {
-            foreach (self::get()->sesstionsArr as $sesstionObj) {
+            foreach (self::_get()->sesstionsArr as $sesstionObj) {
                 if ($sesstionObj->getName() == $sessionName) {
                     $sesstionObj->start();
                 }
@@ -282,7 +395,7 @@ class SessionsManager {
      * @since 1.0
      */
     public static function pauseAll() {
-        self::get()->_pauseSessions();
+        self::_get()->_pauseSessions();
     }
     /**
      * @since 1.0
@@ -308,18 +421,20 @@ class SessionsManager {
      * @since 1.0
      */
     public static function validateStorage() {
-        foreach (self::get()->sesstionsArr as $session) {
+        foreach (self::_get()->sesstionsArr as $session) {
             $status = $session->getStatus();
             $session instanceof Session;
             if ($status == Session::STATUS_NEW ||
                 $status == Session::STATUS_PAUSED ||  
                 $status == Session::STATUS_RESUMED){
-                self::getStorage()->save($session);
-                $cookieParams = $session->getCookieParams();
+                self::getStorage()->save($session->getId(), $session->serialize());
             } else if ($status == Session::STATUS_KILLED) {
                 self::getStorage()->remove($session->getId());
             }
-            header($session->getCookieHeader());
+            if (!CLI::isCLI()) {
+                header($session->getCookieHeader());
+            }
+            
         }
         self::getStorage()->gc();
     }

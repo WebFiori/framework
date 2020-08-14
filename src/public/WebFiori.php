@@ -39,7 +39,7 @@ use webfiori\entity\router\OtherRoutes;
 use webfiori\entity\router\Router;
 use webfiori\entity\router\ViewRoutes;
 use webfiori\entity\ThemeLoader;
-use webfiori\entity\sesstion\SessionsManager;
+use webfiori\entity\session\SessionsManager;
 use webfiori\entity\ui\ErrorBox;
 use webfiori\entity\ui\ServerErrView;
 use webfiori\entity\ui\ServiceUnavailableView;

@@ -9,3 +9,4 @@ composer.lock
 cs-fixer.phar
 *.log
 src/app/storage
+app/storage

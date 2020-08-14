@@ -448,15 +448,14 @@ class File implements JsonI {
      */
     public function getRawData($encodeOrDecode = 'none') {
         $lower = strtolower(trim($encodeOrDecode));
-        
+
         if ($this->rawData !== null) {
-            
             if ($lower == 'e') {
-                
                 return base64_encode($this->rawData);
-            } else if ($lower == 'd') {
-                
-                return base64_decode($this->rawData);
+            } else {
+                if ($lower == 'd') {
+                    return base64_decode($this->rawData);
+                }
             }
         }
 
@@ -895,10 +894,12 @@ class File implements JsonI {
             } else {
                 throw new FileException("File not found: '$fPath'.");
             }
-        } else if ($append) {
-            $resource = $this->_createResource('ab', $fPath);
         } else {
-            $resource = $this->_createResource('rb+', $fPath);
+            if ($append) {
+                $resource = $this->_createResource('ab', $fPath);
+            } else {
+                $resource = $this->_createResource('rb+', $fPath);
+            }
         }
 
         if (!is_resource($resource)) {

@@ -675,7 +675,7 @@ WebFiori::getAndStart();
 
 if (CLI::isCLI() === true) {
     CLI::registerCommands();
-    exit(CLI::runCLI());
+    CLI::runCLI();
 } else {
     //route user request.
     Router::route(Util::getRequestedURL());

@@ -19,7 +19,7 @@ class PageTest extends TestCase{
         $this->assertNull(Page::beforeRender());
         $this->assertNull(Page::beforeRender('random'));
         $this->assertNull(Page::beforeRender());
-        $this->assertEquals(0,Page::beforeRender(function(){}));
+        $this->assertEquals(1,Page::beforeRender(function(){}));
         Page::reset();
         $this->assertNull(Page::beforeRender());
     }
@@ -27,7 +27,7 @@ class PageTest extends TestCase{
      * @test
      */
     public function testDefaults00() {
-        $this->assertNull(Page::lang());
+        $this->assertEquals('EN',Page::lang());
         $this->assertNull(Page::description());
         $this->assertEquals('Hello World',Page::title());
         $this->assertEquals('Hello Website',Page::siteName());
@@ -36,7 +36,7 @@ class PageTest extends TestCase{
         $this->assertTrue(Page::footer());
         $this->assertTrue(Page::aside());
         $this->assertEquals('ltr',Page::dir());
-        $this->assertNull(Page::translation());
+        $this->assertNotNull(Page::translation());
         $this->assertEquals('https://127.0.0.1/',Page::canonical());
     }
     /**
@@ -46,7 +46,7 @@ class PageTest extends TestCase{
         Page::reset();
         $doc = Page::render(false, true);
         $this->assertEquals('<!DOCTYPE html>'
-                . '<html>'
+                . '<html lang="EN">'
                 . '<head>'
                 . '<base href="https://127.0.0.1/">'
                 . '<title>Hello World | Hello Website</title>'
@@ -71,7 +71,7 @@ class PageTest extends TestCase{
         Page::reset();
         $doc = Page::render(false, true);
         $this->assertEquals('<!DOCTYPE html>'
-                . '<html>'
+                . '<html lang="EN">'
                 . '<head>'
                 . '<base href="https://127.0.0.1/">'
                 . '<title>Hello World | Hello Website</title>'
@@ -138,7 +138,7 @@ class PageTest extends TestCase{
         $this->assertNotNull(Page::translation());
         
         Page::reset();
-        $this->assertNull(Page::lang());
+        $this->assertEquals('EN',Page::lang());
         $this->assertNull(Page::description());
         $this->assertEquals('Hello World',Page::title());
         $this->assertEquals('Hello Website',Page::siteName());
@@ -255,7 +255,8 @@ class PageTest extends TestCase{
     public function testUsingLang00() {
         Page::reset();
         $null = Page::translation();
-        $this->assertNull($null);
+        $this->assertNotNull($null);
+        $this->assertEquals('EN', $null->getCode());
     }
     /**
      * @test

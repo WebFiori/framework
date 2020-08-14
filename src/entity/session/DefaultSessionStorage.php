@@ -1,12 +1,29 @@
 <?php
-
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * The MIT License
+ *
+ * Copyright 2020 Ibrahim, WebFiori Framework.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
  */
 
-namespace webfiori\entity\sesstion;
+namespace webfiori\entity\session;
 
 use webfiori\entity\Util;
 use webfiori\entity\File;
@@ -39,8 +56,8 @@ class DefaultSessionStorage implements SessionStorage {
      * 
      * @param string $sessionId The ID of the session.
      * 
-     * @return Session|null If the method successfully accessed session state, 
-     * the method will return an object of type 'Session'. Other than that, 
+     * @return string|null If the method successfully accessed session state, 
+     * the method will return a string that represents the session. Other than that, 
      * the method will return null.
      * 
      * @since 1.0
@@ -49,14 +66,7 @@ class DefaultSessionStorage implements SessionStorage {
         $file = new File($sessionId, $this->storeLoc);
         if ($file->isExist()) {
             $file->read();
-            $sesstion = new Session([
-                'session-id' => $sessionId
-            ]);
-            $sesstion->unserialize($file->getRawData());
-            
-            if ($sesstion->getId() == $sessionId) {
-                return $sesstion;
-            }
+            return $file->getRawData();
         }
     }
     /**
@@ -72,17 +82,16 @@ class DefaultSessionStorage implements SessionStorage {
     /**
      * Stores session state to a file.
      * 
-     * @param Session $session The session that will be stored.
+     * @param Session $sessionId The session that will be stored.
+     * 
+     * @param string $$session The session that will be stored.
      * 
      * @since 1.0
      */
-    public function save($session) {
-        if ($session instanceof Session) {
-            $serializedSesstion = $session->serialize();
-            $file = new File($session->getId(), $this->storeLoc);
-            $file->setRawData($serializedSesstion);
-            $file->write(false, true);
-        }
+    public function save($sessionId, $session) {
+        $file = new File($sessionId, $this->storeLoc);
+        $file->setRawData($session);
+        $file->write(false, true);
     }
     /**
      * Removes all inactive sessions.

@@ -51,6 +51,8 @@ class PrivilegeTest extends TestCase {
      * @param Privilege $pr 
      */
     public function testToJson00($pr) {
-        $this->assertEquals('{"privilegeId":"Valid_ID_55", "name":"Valid Name"}',$pr->toJSON().'');
+        $j = $pr->toJSON();
+        $j->setPropsStyle('camel');
+        $this->assertEquals('{"privilegeId":"Valid_ID_55", "name":"Valid Name"}',$j.'');
     }
 }

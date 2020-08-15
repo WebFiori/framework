@@ -48,7 +48,9 @@ class SessionTest extends TestCase {
      * @test
      */
     public function testConstructor02() {
-        $session = new Session();
+        $session = new Session([
+            'name' => 'wf-session'
+        ]);
         $this->assertEquals('wf-session', $session->getName());
         $this->assertEquals(120, $session->getDuration());
         $this->assertEquals(120*60, $session->getRemainingTime());
@@ -60,7 +62,7 @@ class SessionTest extends TestCase {
         $this->assertEquals(Session::STATUS_INACTIVE, $session->getStatus());
         $this->assertEquals([
             'expires' => 60 * 120 + time(),
-            'domain' => '127.0.0.1',
+            'domain' => 'example.com',
             'path' => '/',
             'secure' => true,
             'httponly' => true,
@@ -76,26 +78,33 @@ class SessionTest extends TestCase {
     public function testConstructor03() {
         $session = new Session([
             'refresh' => true,
-            'duration' => 0
+            'duration' => 0,
+            'name' => 'hello'
         ]);
         $this->assertFalse($session->isPersistent());
         $this->assertFalse($session->isRunning());
         $this->assertTrue($session->isRefresh());
         $this->assertEquals([
             'expires' => 0,
-            'domain' => '127.0.0.1',
+            'domain' => 'example.com',
             'path' => '/',
             'secure' => true,
             'httponly' => true,
             'samesite' => 'Lax'
         ], $session->getCookieParams());
     }
-    
+    /**
+     * @test
+     */
+    public function testConstructor04() {
+        $this->expectException(\Exception::class);
+        $session = new Session();
+    }
     /**
      * @test
      */
     public function testStart00() {
-        $session = new Session();
+        $session = new Session(['name'=>'new']);
         $this->assertEquals(Session::STATUS_INACTIVE,$session->getStatus());
         $this->assertEquals(0, $session->getStartedAt());
         $this->assertFalse($session->isRunning());

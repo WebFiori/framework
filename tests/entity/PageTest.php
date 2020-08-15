@@ -30,7 +30,7 @@ class PageTest extends TestCase{
         $this->assertEquals('EN',Page::lang());
         $this->assertNull(Page::description());
         $this->assertEquals('Hello World',Page::title());
-        $this->assertEquals('Hello Website',Page::siteName());
+        $this->assertEquals('WebFiori',Page::siteName());
         $this->assertEquals(' | ',Page::separator());
         $this->assertTrue(Page::header());
         $this->assertTrue(Page::footer());
@@ -45,12 +45,13 @@ class PageTest extends TestCase{
     public function testRender00() {
         Page::reset();
         $doc = Page::render(false, true);
+        $doc->removeChild(Page::document()->getChildByID('i18n'));
         $this->assertEquals('<!DOCTYPE html>'
                 . '<html lang="EN">'
                 . '<head>'
-                . '<base href="https://127.0.0.1/">'
-                . '<title>Hello World | Hello Website</title>'
-                . '<link rel="canonical" href="https://127.0.0.1/">'
+                . '<base href="https://example.com">'
+                . '<title>Hello World | WebFiori</title>'
+                . '<link rel="canonical" href="https://example.com/">'
                 . '<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">'
                 . '</head>'
                 . '<body itemscope="" itemtype="http://schema.org/WebPage">'
@@ -62,7 +63,7 @@ class PageTest extends TestCase{
                 . '</div><div id="page-footer">'
                 . '</div>'
                 . '</body>'
-                . '</html>',$doc);
+                . '</html>',$doc.'');
     }
     /**
      * @test
@@ -70,12 +71,13 @@ class PageTest extends TestCase{
     public function testRender01() {
         Page::reset();
         $doc = Page::render(false, true);
+        $doc->removeChild(Page::document()->getChildByID('i18n'));
         $this->assertEquals('<!DOCTYPE html>'
                 . '<html lang="EN">'
                 . '<head>'
-                . '<base href="https://127.0.0.1/">'
-                . '<title>Hello World | Hello Website</title>'
-                . '<link rel="canonical" href="https://127.0.0.1/">'
+                . '<base href="https://example.com">'
+                . '<title>Hello World | WebFiori</title>'
+                . '<link rel="canonical" href="https://example.com/">'
                 . '<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">'
                 . '</head>'
                 . '<body itemscope="" itemtype="http://schema.org/WebPage">'
@@ -87,7 +89,7 @@ class PageTest extends TestCase{
                 . '</div><div id="page-footer">'
                 . '</div>'
                 . '</body>'
-                . '</html>',$doc);
+                . '</html>',$doc.'');
     }
     /**
      * @test
@@ -141,14 +143,14 @@ class PageTest extends TestCase{
         $this->assertEquals('EN',Page::lang());
         $this->assertNull(Page::description());
         $this->assertEquals('Hello World',Page::title());
-        $this->assertEquals('Hello Website',Page::siteName());
+        $this->assertEquals('WebFiori',Page::siteName());
         $this->assertEquals(' | ',Page::separator());
         $this->assertTrue(Page::header());
         $this->assertTrue(Page::footer());
         $this->assertTrue(Page::aside());
         $this->assertEquals('ltr',Page::dir());
         $this->assertNotNull(Page::translation());
-        $this->assertEquals('https://127.0.0.1/',Page::canonical());
+        $this->assertEquals('https://example.com/',Page::canonical());
     }
     /**
      * @test

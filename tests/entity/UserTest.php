@@ -170,7 +170,9 @@ class UserTest extends TestCase {
      * @depends test00
      */
     public function toStringTest00($user) {
-        $this->assertEquals('{"userId":-1, "email":"", "displayName":null, "username":""}',$user.'');
+        $j = $user->toJSON();
+        $j->setPropsStyle('camel');
+        $this->assertEquals('{"userId":-1, "email":"", "displayName":null, "username":""}',$j.'');
     }
     private function initPrivileges() {
         Access::clear();

@@ -118,6 +118,8 @@ class FileTest extends TestCase {
      * @depends testWrite01
      */
     public function toJson00($file) {
+        $j = $file->toJSON();
+        $j->setPropsStyle('camel');
         $this->assertEquals('{'
                 . '"id":-1, '
                 . '"mime":"text\/plain", '
@@ -126,7 +128,7 @@ class FileTest extends TestCase {
                 . '"sizeInBytes":12, '
                 . '"sizeInKBytes":0.01171875, '
                 . '"sizeInMBytes":1.1444091796875E-5'
-                . '}',$file->toJSON().'');
+                . '}',$j.'');
         return $file;
     }
     /**

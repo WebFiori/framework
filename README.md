@@ -19,7 +19,7 @@
 </p>
 What is WebFiori Framework?
 
-WebFiori Framework is a mini web development framework which is built using PHP language. The framework is fully object oriented (OOP). It allows the use of the famous model-view-controller (MVC) model but it does not force it. The framework comes with many features which can help in making your website or web application up and running in no time.
+WebFiori Framework is a mini web development framework which is built using PHP language. The framework is fully object oriented (OOP). It semi-MVC model but it does not force it. The framework comes with many features which can help in making your website or web application up and running in no time.
 
 ## Key Features
 * Provide minimum utilities to setup a small web application.
@@ -31,7 +31,7 @@ WebFiori Framework is a mini web development framework which is built using PHP 
 * Basic support for MySQL schema and query building.
 * Lightweight. The total size of framework core files is less than 3 megabytes.
 * Access management by assigning system user a set of privileges.
-* Simple sesstion manager.
+* Simple sesstions manager.
 * Support for creating and sending nice-looking HTML emails in a simple way by using SMTP protocol.
 * Autoloading of user defined classes (loading composer packages also supported).
 * The ability to create background tasks and let them run in specific time using CRON.
@@ -48,9 +48,10 @@ One of the things that any developer cares about any software project is the pro
 * Changing whole user interface by changing one line of code.
 * Ability to move the source code of the web application without having to do a lot of re-configuration.
 * Sending HTML email messages with attachments without having to write a lot of code.
+* Solved the issues which are found in default PHP session management implementation.
 
 ## Getting Started 
-To learn the basics of how to use the framework, please head on to https://webfiori.com/learn. Also, you can head on to the following playlist in YouTube which contains a good set of videos which can help: https://www.youtube.com/playlist?list=PLeU-QhqUhxjkACpXiPTRM9fH_zw1KF1UD.
+To learn the basics of how to use the framework, please head on to https://webfiori.com/learn. You can also read the docs which can be found in [docs repo](https://github.com/usernane/wf-docs). In addition to that, you can read the API docs of the framework at [the official website](https://webfiori.com/docs).
 
 ## Supported Environments 
 | PHP | AMD64 (Targeted)     | ppc64le              | s390x                | arm64                |
@@ -76,8 +77,6 @@ To learn the basics of how to use the framework, please head on to https://webfi
 [13]: https://travis-matrix-badges.herokuapp.com/repos/usernane/webfiori/branches/master/13
 [14]: https://travis-matrix-badges.herokuapp.com/repos/usernane/webfiori/branches/master/14
 
-## API Docs
-To read API docs of the framework, please head on to https://webfiori.com/docs.
 
 ## Setup
 ### Local Development Environment
@@ -98,6 +97,7 @@ This command will create new folder with the name `my-site` and install the fram
 * The main aim of this project is learning.
 * The project is reletivly new and for sure has issues.
 * If you think that there is a better way of doing things or wants new feature, feel free to drop an issue.
+* To report security vulnerabilities, please send an email to [ibrahim@webfiori.com](mailto:ibrahim@webfiori.com).
 
 ## License
 The project is licensed under MIT license.

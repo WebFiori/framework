@@ -806,7 +806,7 @@ class Session implements JsonI {
         $this->isRef = $session->isRef;
         $this->resumedAt = time();
         $this->lifeTime = $session->lifeTime;
-        $this->langCode = $session->langCode;
+        $this->langCode = $this->getLangCode(true);
         $this->passedTime = $this->getResumedAt() - $this->getStartedAt();
         $this->sesstionUser = $session->sesstionUser;
     }
@@ -878,7 +878,8 @@ class Session implements JsonI {
      * @since 1.2
      */
     private function _initLang($forceUpdate = false,$useDefault = true) {
-        if ($this->getStatus() == self::STATUS_NEW || $this->getStatus() == self::STATUS_RESUMED) {
+        
+        if ($this->isRunning()) {
             if ($this->langCode !== null && !$forceUpdate) {
                 return false;
             }
@@ -891,12 +892,10 @@ class Session implements JsonI {
 
             if ($this->langCode !== null && $langCodeFromReq == null) {
                 $retVal = false;
-            } else {
-                if ($langCodeFromReq == null && $useDefault === true) {
-                    $langCodeFromReq = $defaultLang;
-                } else if ($langCodeFromReq == null && $useDefault !== true) {
-                    $retVal = false;
-                }
+            } else if ($langCodeFromReq == null && $useDefault === true) {
+                $langCodeFromReq = $defaultLang;
+            } else if ($langCodeFromReq == null && $useDefault !== true) {
+                $retVal = false;
             }
             $langU = strtoupper($langCodeFromReq);
 
@@ -912,6 +911,7 @@ class Session implements JsonI {
                 $retVal = false;
             }
         }
+        return true;
     }
     private function _initNewSesstionVars() {
         $this->sessionArr = [];

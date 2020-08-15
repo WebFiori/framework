@@ -225,7 +225,7 @@ class SessionTest extends TestCase {
                 . '"resumed_at":'.$s->getStartedAt().', '
                 . '"passed_time":0, '
                 . '"remaining_time":60, '
-                . '"language":"FR", '
+                . '"language":"EN", '
                 . '"id":"'.$s->getId().'", '
                 . '"is_refresh":false, '
                 . '"is_persistent":true, '

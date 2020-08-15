@@ -400,7 +400,8 @@ class SessionsManager {
 
         if ($sId !== false) {
             $tempSesstion = new Session([
-                'session-id' => $sId
+                'session-id' => $sId,
+                'name' => 'x'
             ]);
             $tempSesstion->start();
 

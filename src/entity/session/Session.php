@@ -926,6 +926,10 @@ class Session implements JsonI {
     private function _setName($name) {
         $trimmed = trim($name);
 
+        if (strlen($trimmed) == 0) {
+            return false;
+        }
+        
         for ($x = 0 ; $x < strlen($trimmed) ; $x++) {
             $char = $trimmed[$x];
 

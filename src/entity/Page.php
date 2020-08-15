@@ -461,8 +461,8 @@ class Page {
      * will return the rendered HTML document as string. Default value is 
      * false.
      * 
-     * @return null|string If the parameter <b>$returnResult</b> is set to true, 
-     * the method will return a string that represents the rendered page. Other 
+     * @return null|HTMLDoc If the parameter <b>$returnResult</b> is set to true, 
+     * the method will return an object of type 'HTMLDoc' that represents the rendered page. Other 
      * than that, it will return null.
      * 
      * @since 1.9
@@ -476,7 +476,7 @@ class Page {
         }
 
         if ($returnResult) {
-            return Page::get()->getDocument()->toHTML($formatted);
+            return Page::get()->getDocument();
         } else {
             echo Page::get()->getDocument()->toHTML($formatted);
         }
@@ -741,7 +741,9 @@ class Page {
             $jsonx = new JsonX();
             $jsonx->addArray('vars', $translation->getLanguageVars(), true);
             $i18nJs = new HTMLNode('script');
-            $i18nJs->setAttribute('type', 'text/javascript')->text('window.i18n = '.$jsonx.';');
+            $i18nJs->setAttribute('type', 'text/javascript')
+                    ->text('window.i18n = '.$jsonx.';')
+                    ->setID('i18n');
             Page::get()->document()->getHeadNode()->addChild($i18nJs);
 
             //Load Js and CSS automatically

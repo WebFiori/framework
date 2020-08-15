@@ -123,7 +123,6 @@ class SessionsManager {
         }
 
         foreach (self::_get()->sesstionsArr as $sesstion) {
-            $sesstion instanceof Session;
             $status = $sesstion->getStatus();
 
             if ($status == Session::STATUS_NEW || $status == Session::STATUS_RESUMED) {
@@ -369,7 +368,6 @@ class SessionsManager {
     public static function validateStorage() {
         foreach (self::_get()->sesstionsArr as $session) {
             $status = $session->getStatus();
-            $session instanceof Session;
 
             if ($status == Session::STATUS_NEW ||
                 $status == Session::STATUS_PAUSED ||  

@@ -291,24 +291,24 @@ class Session implements JsonI {
      * @since 1.0
      */
     public function getCookieHeader() {
-        $cookieParams = $this->getCookieParams();
-        $httpOnly = $cookieParams['httponly'] === true ? '; HttpOnly' : '';
-        $secure = $cookieParams['secure'] === true ? '; Secure' : '';
-        $sameSite = $cookieParams['samesite'];
+        $cookieData = $this->getCookieParams();
+        $httpOnly = $cookieData['httponly'] === true ? '; HttpOnly' : '';
+        $secure = $cookieData['secure'] === true ? '; Secure' : '';
+        $sameSite = $cookieData['samesite'];
 
-        if ($cookieParams['expires'] == 0) {
+        if ($cookieData['expires'] == 0) {
             $lifetime = '';
         } else {
-            $lifetime = '; expires='.date(DATE_COOKIE, $cookieParams['expires']);
+            $lifetime = '; expires='.date(DATE_COOKIE, $cookieData['expires']);
         }
         $name = $this->getName();
         $value = $this->getId();
 
         return "Set-Cookie: $name=$value; "
-                ."path=".$cookieParams['path']
+                ."path=".$cookieData['path']
                 ."$lifetime"
-                //. "$secure"
-                //. "$httpOnly"
+                . "$secure"
+                . "$httpOnly"
                 .'; SameSite='.$sameSite;
     }
     /**
@@ -611,9 +611,8 @@ class Session implements JsonI {
 
 
         if (in_array($cipherMeth, openssl_get_cipher_methods())) {
-            $encrypted = openssl_encrypt($serializedSesstion, $cipherMeth, $key,0, $iv);
-
-            return $encrypted;
+            
+            return openssl_encrypt($serializedSesstion, $cipherMeth, $key,0, $iv);
         }
 
         return $serializedSesstion;
@@ -736,6 +735,7 @@ class Session implements JsonI {
             'resumedAt' => $this->getResumedAt(),
             'passedTime' => $this->getPassedTime(),
             'remainingTime' => $this->getRemainingTime(),
+            'language' => $this->getLangCode(),
             'id' => $this->getId(),
             'isRefresh' => $this->isRefresh(),
             'isPersistent' => $this->isPersistent(),
@@ -886,21 +886,19 @@ class Session implements JsonI {
             //used in case no language found 
             //in $_GET['lang'], $_POST['lang'] or in cookie
             $defaultLang = class_exists('webfiori\conf\SiteConfig') ? SiteConfig::getPrimaryLanguage() : 'EN';
-            $langCode = $this->_getLangFromRequest();
+            $langCodeFromReq = $this->_getLangFromRequest();
             $retVal = false;
 
-            if ($this->langCode !== null && $langCode == null) {
+            if ($this->langCode !== null && $langCodeFromReq == null) {
                 $retVal = false;
             } else {
-                if ($langCode == null && $useDefault === true) {
-                    $langCode = $defaultLang;
-                } else {
-                    if ($langCode == null && $useDefault !== true) {
-                        $retVal = false;
-                    }
+                if ($langCodeFromReq == null && $useDefault === true) {
+                    $langCodeFromReq = $defaultLang;
+                } else if ($langCodeFromReq == null && $useDefault !== true) {
+                    $retVal = false;
                 }
             }
-            $langU = strtoupper($langCode);
+            $langU = strtoupper($langCodeFromReq);
 
             if (strlen($langU) == 2) {
                 $this->langCode = $langU;

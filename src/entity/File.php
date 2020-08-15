@@ -770,25 +770,25 @@ class File implements JsonI {
     }
     private function _extractPathAndName($absPath) {
         $trimmed = trim($absPath);
-        $cleanPath = str_replace('\\', DS, str_replace('/', DS, $absPath));
+        $cleanPath = str_replace('\\', DS, str_replace('/', DS, $trimmed));
         $pathArr = explode(DS, $cleanPath);
 
         if (count($pathArr) != 0) {
-            $path = '';
+            $fPath = '';
             $name = $pathArr[count($pathArr) - 1];
 
             for ($x = 0 ; $x < count($pathArr) - 1 ; $x++) {
-                $path .= $pathArr[$x].DS;
+                $fPath .= $pathArr[$x].DS;
             }
 
             return [
-                'path' => $path,
+                'path' => $fPath,
                 'name' => $name
             ];
         }
 
         return [
-            'name' => $absPath,
+            'name' => $trimmed,
             'path' => ''
         ];
     }

@@ -808,7 +808,12 @@ class Session implements JsonI {
         $this->isRef = $session->isRef;
         $this->resumedAt = time();
         $this->lifeTime = $session->lifeTime;
-        $this->langCode = $this->getLangCode(true);
+        $langCodeR = $this->_getLangFromRequest();
+        if ($langCodeR) {
+            $this->langCode = $this->getLangCode(true);
+        } else {
+            $this->langCode = $session->langCode;
+        }
         $this->passedTime = $this->getResumedAt() - $this->getStartedAt();
         $this->sesstionUser = $session->sesstionUser;
     }

@@ -37,7 +37,7 @@ class PageTest extends TestCase{
         $this->assertTrue(Page::aside());
         $this->assertEquals('ltr',Page::dir());
         $this->assertNotNull(Page::translation());
-        $this->assertEquals('https://127.0.0.1/',Page::canonical());
+        $this->assertEquals('https://example.com/',Page::canonical());
     }
     /**
      * @test
@@ -147,7 +147,7 @@ class PageTest extends TestCase{
         $this->assertTrue(Page::footer());
         $this->assertTrue(Page::aside());
         $this->assertEquals('ltr',Page::dir());
-        $this->assertNull(Page::translation());
+        $this->assertNotNull(Page::translation());
         $this->assertEquals('https://127.0.0.1/',Page::canonical());
     }
     /**

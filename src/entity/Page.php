@@ -25,13 +25,13 @@
 namespace webfiori\entity;
 
 use Exception;
+use jsonx\JsonX;
 use phpStructs\html\HeadNode;
 use phpStructs\html\HTMLDoc;
 use phpStructs\html\HTMLNode;
-use jsonx\JsonX;
 use webfiori\conf\SiteConfig;
-use webfiori\entity\i18n\Language;
 use webfiori\entity\exceptions\UIException;
+use webfiori\entity\i18n\Language;
 use webfiori\WebFiori;
 /**
  * A class used to initialize view components.
@@ -257,12 +257,14 @@ class Page {
     public static function beforeRender($callable = '', $params = []) {
         if (is_callable($callable) || $callable instanceof \Closure) {
             self::get()->beforeRenderCallbacks[] = $callable;
+
             if (gettype($params) == 'array') {
                 self::get()->beforeRenderParams[] = $params;
             } else {
                 self::get()->beforeRenderParams[] = [];
             }
             $callbacksCount = count(self::get()->beforeRenderCallbacks);
+
             return $callbacksCount - 1;
         }
     }
@@ -411,7 +413,6 @@ class Page {
      * @since 1.9
      */
     public static function insert($node,$parentNodeId = self::MAIN_ELEMENTS[2]) {
-        
         if (Page::get()->insertNode($node, $parentNodeId)) {
             return $node;
         }
@@ -468,6 +469,7 @@ class Page {
      */
     public static function render($formatted = false, $returnResult = false) {
         $index = 0;
+
         foreach (self::get()->beforeRenderCallbacks as $function) {
             call_user_func_array($function, self::get()->beforeRenderParams[$index]);
             $index++;
@@ -609,8 +611,8 @@ class Page {
         }
 
         if ($loadedTheme !== null && !$node instanceof HTMLNode) {
-            throw new UIException('The the method "'. get_class($loadedTheme) .'::getAsideNode()" did not return '
-                    . 'an instance of the class "HTMLNode".');
+            throw new UIException('The the method "'.get_class($loadedTheme).'::getAsideNode()" did not return '
+                    .'an instance of the class "HTMLNode".');
         } else {
             $node->setID(self::MAIN_ELEMENTS[3]);
         }
@@ -627,8 +629,8 @@ class Page {
         }
 
         if ($loadedTheme !== null && !$node instanceof HTMLNode) {
-            throw new UIException('The the method "'. get_class($loadedTheme) .'::getFooterNode()" did not return '
-                    . 'an instance of the class "HTMLNode".');
+            throw new UIException('The the method "'.get_class($loadedTheme).'::getFooterNode()" did not return '
+                    .'an instance of the class "HTMLNode".');
         } else {
             $node->setID(self::MAIN_ELEMENTS[4]);
         }
@@ -647,9 +649,10 @@ class Page {
             );
         } else {
             $headNode = $loadedTheme->getHeadNode();
+
             if (!$headNode instanceof HeadNode) {
-                throw new UIException('The method "'. get_class($loadedTheme) .'::getHeadNode()" did not return '
-                        . 'an instance of the class "HeadNode".');
+                throw new UIException('The method "'.get_class($loadedTheme).'::getHeadNode()" did not return '
+                        .'an instance of the class "HeadNode".');
             }
         }
         $headNode->addMeta('charset','UTF-8',true);
@@ -673,8 +676,8 @@ class Page {
         }
 
         if ($loadedTheme !== null && !$node instanceof HTMLNode) {
-            throw new UIException('The the method "'. get_class($loadedTheme) .'::getHeadrNode()" did not return '
-                    . 'an instance of the class "HTMLNode".');
+            throw new UIException('The the method "'.get_class($loadedTheme).'::getHeadrNode()" did not return '
+                    .'an instance of the class "HTMLNode".');
         } else {
             $node->setID(self::MAIN_ELEMENTS[1]);
         }
@@ -712,18 +715,20 @@ class Page {
         $footerNode = new HTMLNode();
         $footerNode->setID(self::MAIN_ELEMENTS[4]);
         $this->document->addChild($footerNode);
-        
+
         $langCode = WebFiori::getSysController()->getSessionLang();
+
         if ($langCode === null) {
             $langCode = WebFiori::getSiteConfig()->getPrimaryLanguage();
         }
         $this->contentLang = $langCode;
         $this->usingLanguage();
- 
+
         $this->beforeRenderParams = [
             0 => []
         ];
-        $this->beforeRenderCallbacks = [function () {
+        $this->beforeRenderCallbacks = [function ()
+        {
             $translation = Page::translation();
             $jsonx = new JsonX();
             $jsonx->addArray('vars', $translation->getLanguageVars(), true);
@@ -732,14 +737,18 @@ class Page {
             Page::get()->document()->getHeadNode()->addChild($i18nJs);
 
             //Load Js and CSS automatically
-            $pageTheme = Page::theme();
+            $pageTheme = Page::theme('');
+
             if ($pageTheme !== null) {
                 $themeDir = THEMES_PATH.DS.$pageTheme->getDirectoryName();
                 $jsDir = $themeDir.DS.$pageTheme->getJsDirName();
+
                 if (Util::isDirectory($jsDir)) {
                     $filesInDir = array_diff(scandir($jsDir), ['.','..']);
+
                     foreach ($filesInDir as $fileName) {
                         $expl = explode('.', $fileName);
+
                         if (count($expl) == 2 && $expl[1] == 'js') {
                             Page::get()->document()->getHeadNode()->addJs($pageTheme->getDirectoryName().DS.$fileName);
                         }
@@ -747,10 +756,13 @@ class Page {
                 }
 
                 $cssDir = $themeDir.DS.$pageTheme->getCssDirName();
+
                 if (Util::isDirectory($cssDir)) {
                     $filesInDir = array_diff(scandir($cssDir), ['.','..']);
+
                     foreach ($filesInDir as $fileName) {
                         $expl = explode('.', $fileName);
+
                         if (count($expl) == 2 && $expl[1] == 'css') {
                             Page::get()->document()->getHeadNode()->addCSS($pageTheme->getDirectoryName().DS.$fileName);
                         }
@@ -1306,14 +1318,14 @@ class Page {
             $tmpTheme = ThemeLoader::usingTheme($themeName);
         }
         $this->theme = $tmpTheme;
-        
+
         $mainContentArea = Page::document()->getChildByID(self::MAIN_ELEMENTS[2]);
-        
+
         if ($mainContentArea === null) {
             $mainContentArea = new HTMLNode();
             $mainContentArea->setID(self::MAIN_ELEMENTS[2]);
         }
-        
+
         $this->document = new HTMLDoc();
         $headNode = $this->_getHead();
         $footerNode = $this->_getFooter();
@@ -1325,7 +1337,7 @@ class Page {
         $body = new HTMLNode();
         $body->setID(self::MAIN_ELEMENTS[0]);
         $body->addChild($asideNode);
-        
+
         $body->addChild($mainContentArea);
         $this->document->addChild($body);
         $this->document->addChild($footerNode);

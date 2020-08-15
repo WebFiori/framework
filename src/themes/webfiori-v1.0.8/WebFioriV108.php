@@ -44,6 +44,11 @@ class WebFioriV108 extends Theme {
                 'z-index' => -1,
             ]);
             Page::document()->getBody()->addChild($img);
+            Page::beforeRender(function(){
+                $js = new \phpStructs\html\JsCode();
+                $js->addCode("window.Prism = window.Prism || {};");
+                Page::document()->getHeadNode()->addChild($js);
+            });
         });
     }
 

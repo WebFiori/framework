@@ -330,8 +330,13 @@ class Util {
         if (isset($_SERVER['HTTP_WEBFIORI_REMOVE_PATH'])) {
             $toAppend = str_replace($_SERVER['HTTP_WEBFIORI_REMOVE_PATH'],'' ,$toAppend);
         }
-
-        return $protocol.$host.'/'.str_replace('\\', '/', $toAppend).'/';
+        $xToAppend = str_replace('\\', '/', $toAppend);
+        
+        if (strlen($xToAppend) == 0) {
+            return $protocol.$host;
+        } else {
+            return $protocol.$host.'/'.$xToAppend;
+        }
     }
     /**
      * Returns the IP address of the user who is connected to the server.
@@ -458,21 +463,11 @@ class Util {
      * @since 1.1
      */
     public static function getRequestedURL() {
-        if (isset($_SERVER['HTTPS'])) {
-            $secureHost = filter_var($_SERVER['HTTPS']);
-        } else {
-            $secureHost = '';
-        }
-        $protocol = "http://";
-        $useHttp = defined('USE_HTTP') && USE_HTTP === true;
-
-        if (strlen($secureHost) != 0 && !$useHttp) {
-            $protocol = "https://";
-        }
-        $server = filter_var(getenv('HTTP_HOST'));
-        $requestedURI = filter_var(getenv('REQUEST_URI'));
-
-        return $protocol.''.$server.''.$requestedURI;
+        $base = self::getBaseURL();
+        
+        $requestedURI = trim(filter_var(getenv('REQUEST_URI')),'/');
+        
+        return $base.'/'.$requestedURI;
     }
     /**
      * Returns HTTP request headers.

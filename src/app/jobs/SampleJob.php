@@ -1,5 +1,4 @@
 <?php
-
 namespace webfiori\jobs;
 
 use webfiori\entity\cron\AbstractJob;
@@ -9,7 +8,6 @@ use webfiori\entity\File;
  * A sample job that shows how to create jobs and make them schedule automatically.
  */
 class SampleJob extends AbstractJob {
-    
     public function __construct() {
         parent::__construct('Sample Job');
         $this->dailyAt(4, 30);
@@ -31,6 +29,7 @@ class SampleJob extends AbstractJob {
         $file = new File($this->getJobName(), ROOT_DIR);
         $file->setRawData('This is a test job under execution. Time: '.date(DATE_ISO8601));
         $file->write(false, true);
+
         return true;
     }
     /**
@@ -49,7 +48,6 @@ class SampleJob extends AbstractJob {
         $file->setRawData('The job has finished without errors. Time: '.date(DATE_ISO8601));
         $file->write(true, true);
     }
-
 }
 //Must return the namespace of the job if it has a namespace after creating it.
 //This makes the job to schedule automatically.

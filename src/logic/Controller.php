@@ -31,7 +31,8 @@ use webfiori\conf\Config;
 use webfiori\entity\cli\CLI;
 use webfiori\entity\DBConnectionFactory;
 use webfiori\entity\DBConnectionInfo;
-use webfiori\entity\SessionManager;
+use webfiori\entity\session\SessionsManager;
+use webfiori\entity\session\Session;
 /**
  * The base class for creating application logic.
  * Controllers manly used for controlling two things, the first is database 
@@ -136,20 +137,6 @@ class Controller {
      */
     private static $QueryStack;
     /**
-     *
-     * @var string
-     * @since 1.3
-     */
-    private $sessionName;
-    /**
-     * An associative array that contains all initialized sessions.
-     * The indices of the array are sessions names and the values are 
-     * object of type 'SessionManager'.
-     * @var array
-     * @since 1.3 
-     */
-    private static $Sessions;
-    /**
      * Creates new instance of the class.
      * When a new instance of the class is created, a session with name 'wf-sesstion' 
      * will be linked with it by default.
@@ -160,8 +147,7 @@ class Controller {
      * @since 1.0
      */
     public function __construct() {
-        if (self::$Sessions === null) {
-            self::$Sessions = [];
+        if (self::$QueryStack === null) {
             self::$QueryStack = new Stack();
             self::$DbConnectionsPool = [];
         }
@@ -310,18 +296,12 @@ class Controller {
      * be supplied to the method Controller::useSession(). Note that it is not possible 
      * to use session in command line interface. If the framework is running through 
      * CLI, This method will always return null.
-     * @return SessionManager|null An instance of 'SessionManager'. If no 
+     * @return Session|null An instance of 'SessionManager'. If no 
      * session is running or the method is called in CLI, the method will return null.
      * @since 1.3
      */
     public function getSession() {
-        $retVal = null;
-
-        if ($this->sessionName !== null) {
-            $retVal = self::$Sessions[$this->sessionName];
-        }
-
-        return $retVal;
+        return SessionsManager::getActiveSesstion();
     }
     /**
      * Returns language code from the currently used session manager.
@@ -337,7 +317,7 @@ class Controller {
         $session = $this->getSession();
 
         if ($session !== null) {
-            return $session->getLang($forceUpdate);
+            return $session->getLangCode($forceUpdate);
         }
 
         return null;
@@ -350,7 +330,7 @@ class Controller {
      * @since 1.3.9
      */
     public static function getSessions() {
-        return self::$Sessions;
+        return SessionsManager::getSesstions();
     }
     /**
      * Returns session variable given its name.
@@ -361,11 +341,7 @@ class Controller {
      * @since 1.3.7
      */
     public function getSessionVar($varName) {
-        $session = $this->getSession();
-
-        if ($session !== null) {
-            return $session->getSessionVar($varName);
-        }
+        return SessionsManager::get($varName);
     }
     /**
      * Returns the ID of the user from session manager.
@@ -379,7 +355,7 @@ class Controller {
         $sesstion = $this->getSession();
 
         if ($sesstion !== null) {
-            $user = $this->getSession()->getUser();
+            $user = $sesstion->getUser();
 
             if ($user !== null) {
                 $retVal = $user->getID().'';
@@ -502,17 +478,8 @@ class Controller {
      * @since 1.3.7
      */
     public function setSessionVar($varName,$varVal) {
-        $trimmedName = trim($varName);
 
-        if (strlen($trimmedName) != 0) {
-            $sesstion = $this->getSession();
-
-            if ($sesstion !== null) {
-                return $sesstion->setSessionVar($trimmedName, $varVal);
-            }
-        }
-
-        return false;
+        return SessionsManager::set($varName, $varVal);
     }
     /**
      * Initiate database connection.
@@ -578,19 +545,7 @@ class Controller {
      * return true. Other than that, the method will return false.
      */
     public function useSession($options = []) {
-        if (CLI::isCLI()) {
-            return false;
-        } else if (gettype($options) == 'array' && isset($options['name'])) {
-            $givenSessionName = trim($options['name']);
-
-            if (isset(self::$Sessions[$givenSessionName])) {
-                $this->sessionName = $givenSessionName;
-
-                return true;
-            } else {
-                return $this->_createSessionManager($givenSessionName, $options);
-            }
-        }
+        SessionsManager::start($options['name'], $options);
 
         return false;
     }
@@ -680,39 +635,6 @@ class Controller {
         }
 
         return $retVal;
-    }
-    private function _createSessionManager($givenSessionName, $options) {
-        $mngr = new SessionManager($givenSessionName);
-
-        if (!$mngr->resume()) {
-            $sTime = isset($options['duration']) ? $options['duration'] : self::DEFAULT_SESSTION_OPTIONS['duration'];
-            $mngr->setLifetime($sTime);
-
-            $isRef = isset($options['refresh']) ? $options['refresh'] : self::DEFAULT_SESSTION_OPTIONS['refresh'];
-            $mngr->setIsRefresh($isRef);
-
-            if ($mngr->initSession($isRef)) {
-                $this->sessionName = $givenSessionName;
-                $sUser = isset($options['user']) ? $options['user'] : self::DEFAULT_SESSTION_OPTIONS['user'];
-                $mngr->setUser($sUser);
-                self::$Sessions[$mngr->getName()] = $mngr;
-
-                if (isset($options['variables'])) {
-                    foreach ($options['variables'] as $k => $v) {
-                        $mngr->setSessionVar($k,$v);
-                    }
-                }
-
-                return true;
-            }
-
-            return false;
-        } else {
-            self::$Sessions[$mngr->getName()] = $mngr;
-            $this->sessionName = $mngr->getName();
-        }
-
-        return true;
     }
     /**
      * 

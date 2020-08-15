@@ -39,14 +39,14 @@ class ControllerTest extends TestCase {
      */
     public function testGetSession00() {
         $func = new Controller();
-        $this->assertNull($func->getSession());
+        $this->assertNotNull($func->getSession());
     }
     /**
      * @test
      */
     public function testGetSessionLang00() {
         $func = new Controller();
-        $this->assertNull($func->getSessionLang());
+        $this->assertEquals('EN',$func->getSessionLang());
     }
     /**
      * @test
@@ -120,7 +120,7 @@ class ControllerTest extends TestCase {
     public function testSetSessionVar00() {
         $func = new Controller();
         $this->assertFalse($func->setSessionVar(' ',null));
-        $this->assertFalse($func->setSessionVar('hello',null));
+        $this->assertTrue($func->setSessionVar('hello',null));
     }
     /**
      * @test
@@ -248,8 +248,10 @@ class ControllerTest extends TestCase {
      */
     public function testUseSession00() {
         $func = new Controller();
-        $r = $func->useSession();
-        $this->assertFalse($r);
+        $this->expectException('Exception');
+        $r = $func->useSession([
+            'name' => 'Invalid {'
+        ]);
     }
     /**
      * @test

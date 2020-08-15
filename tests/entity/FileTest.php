@@ -33,7 +33,7 @@ class FileTest extends TestCase {
         $this->assertEquals(ROOT_DIR.DIRECTORY_SEPARATOR.'tests'.DIRECTORY_SEPARATOR.'entity',$file->getPath());
         $this->assertEquals(-1,$file->getID());
         $this->assertNull($file->getRawData());
-        $this->assertEquals('application/octet-stream',$file->getFileMIMEType());
+        $this->assertEquals('text/plain',$file->getFileMIMEType());
 
         return $file;
     }
@@ -118,6 +118,8 @@ class FileTest extends TestCase {
      * @depends testWrite01
      */
     public function toJson00($file) {
+        $j = $file->toJSON();
+        $j->setPropsStyle('camel');
         $this->assertEquals('{'
                 . '"id":-1, '
                 . '"mime":"text\/plain", '
@@ -126,7 +128,7 @@ class FileTest extends TestCase {
                 . '"sizeInBytes":12, '
                 . '"sizeInKBytes":0.01171875, '
                 . '"sizeInMBytes":1.1444091796875E-5'
-                . '}',$file->toJSON().'');
+                . '}',$j.'');
         return $file;
     }
     /**

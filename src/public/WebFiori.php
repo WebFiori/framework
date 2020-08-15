@@ -39,6 +39,7 @@ use webfiori\entity\router\OtherRoutes;
 use webfiori\entity\router\Router;
 use webfiori\entity\router\ViewRoutes;
 use webfiori\entity\ThemeLoader;
+use webfiori\entity\session\SessionsManager;
 use webfiori\entity\ui\ErrorBox;
 use webfiori\entity\ui\ServerErrView;
 use webfiori\entity\ui\ServiceUnavailableView;
@@ -533,6 +534,7 @@ class WebFiori {
                 fprintf(STDERR, "Error Line:      %5s %s\n",":",$errline);
                 
                 if (defined('STOP_CLI_ON_ERR') && STOP_CLI_ON_ERR === true) {
+                    SessionsManager::validateStorage();
                     exit(-1);
                 }
             } else if (defined('API_CALL')) {
@@ -549,6 +551,7 @@ class WebFiori {
                     $j->add('line',$errline);
                 }
                 header('content-type: application/json');
+                SessionsManager::validateStorage();
                 die($j);
             } else {
                 $errBox = new ErrorBox();
@@ -566,6 +569,7 @@ class WebFiori {
     private function _setExceptionHandler() {
         set_exception_handler(function($ex)
         {
+            SessionsManager::validateStorage();
             $isCli = class_exists('webfiori\entity\cli\CLI') ? CLI::isCLI() : php_sapi_name() == 'cli';
 
             if ($isCli) {
@@ -624,6 +628,8 @@ class WebFiori {
         $this->_setExceptionHandler();
         register_shutdown_function(function()
         {
+            SessionsManager::validateStorage();
+            
             $isCli = class_exists('webfiori\entity\cli\CLI') ? CLI::isCLI() : php_sapi_name() == 'cli';
             $error = error_get_last();
 
@@ -669,7 +675,7 @@ WebFiori::getAndStart();
 
 if (CLI::isCLI() === true) {
     CLI::registerCommands();
-    exit(CLI::runCLI());
+    CLI::runCLI();
 } else {
     //route user request.
     Router::route(Util::getRequestedURL());

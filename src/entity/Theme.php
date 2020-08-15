@@ -26,9 +26,9 @@ namespace webfiori\entity;
 
 use jsonx\JsonI;
 use jsonx\JsonX;
+use phpStructs\html\HTMLNode;
 use ReflectionClass;
 use webfiori\conf\SiteConfig;
-use phpStructs\html\HTMLNode;
 /**
  * A base class that is used to construct web site UI.
  * 
@@ -151,7 +151,7 @@ abstract class Theme implements JsonI {
      * 
      * @since 1.0
      */
-    public function __construct($themeName='') {
+    public function __construct($themeName = '') {
         $this->themeMeta = [
             'name' => '',
             'url' => '',
@@ -234,7 +234,6 @@ abstract class Theme implements JsonI {
      * @since 1.2.3
      */
     public function createHTMLNode($options = []) {
-        
         if (gettype($options) != 'array') {
             $options = [
                 'name' => 'div'
@@ -243,7 +242,7 @@ abstract class Theme implements JsonI {
         $nodeName = isset($options['name']) ? $options['name'] : 'div';
         $attributes = isset($options['attributes']) ? $options['attributes'] : [];
         $node = new HTMLNode($nodeName, $attributes);
-        
+
         return $node;
     }
     /**
@@ -531,7 +530,6 @@ abstract class Theme implements JsonI {
             $this->afterLoaded = $function;
 
             if (gettype($params) == 'array') {
-                
                 foreach ($params as $param) {
                     $this->afterLoadedParams[] = $param;
                 }
@@ -600,7 +598,6 @@ abstract class Theme implements JsonI {
             $this->beforeLoaded = $function;
 
             if (gettype($params) == 'array') {
-                
                 foreach ($params as $param) {
                     $this->beforeLoadedParams[] = $param;
                 }

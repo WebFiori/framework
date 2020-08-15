@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit stderr="true" colors="true" bootstrap="bootstrap.php">
     <php>
-        <server name="HTTP_HOST" value="127.0.0.1"/>
-        <server name="REMOTE_ADDR" value="127.0.0.1"/>
     </php>
     <filter>
         <whitelist addUncoveredFilesFromWhitelist="true">
@@ -18,6 +16,9 @@
             <file>./src/entity/User.php</file>
             <file>./src/entity/Page.php</file>
             <file>./src/entity/Theme.php</file>
+            <file>./src/entity/session/Session.php</file>
+            <file>./src/entity/session/SessionsManager.php</file>
+            <file>./src/entity/session/DefaultSessionStorage.php</file>
         </whitelist>
     </filter>
     <logging>
@@ -38,6 +39,9 @@
         </testsuite>
         <testsuite name="Controller Tests">
             <directory>./tests/logic/</directory>
+        </testsuite>
+        <testsuite name="Session Management Tests">
+            <directory>./tests/entity/session/</directory>
         </testsuite>
     </testsuites>
 </phpunit>

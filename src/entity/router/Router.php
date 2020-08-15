@@ -1043,8 +1043,8 @@ class Router {
             define('API_CALL', true);
         }
         $file = $route->getRouteTo();
-
-        if (file_exists($file)) {
+        
+        if (gettype($file) == 'string' && file_exists($file)) {
             $this->uriObj = $route;
 
             if ($loadResource === true) {

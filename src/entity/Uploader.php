@@ -456,7 +456,7 @@ class Uploader implements JsonI {
         $filesArr = [];
 
         foreach ($uploadedFiles as $fileArray) {
-            $filesArr = $this->_createFileObjFromArray($fileArray);
+            $filesArr[] = $this->_createFileObjFromArray($fileArray);
         }
 
         return $filesArr;

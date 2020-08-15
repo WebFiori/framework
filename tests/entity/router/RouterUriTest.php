@@ -75,9 +75,13 @@ class RouterUriTest extends TestCase {
         $uri = new RouterUri('https://example.com?hello=world', '');
         $uri->addLanguage('ar');
         $uri->addLanguage('en');
-        $this->assertEquals('<url><loc>https://example.com</loc><xhtml:link rel="alternate" hreflang="ar" '
+        $this->assertEquals('<url>'
+                . '<loc>https://example.com</loc>'
+                . '<xhtml:link rel="alternate" hreflang="ar" '
                 . 'href="https://example.com?lang=ar"/>'
-                . '<xhtml:link rel="alternate" hreflang="en" href="https://example.com?lang=en"/></url>', $uri->getSitemapNodes()[0]->toHTML());
+                . '<xhtml:link rel="alternate" hreflang="en" '
+                . 'href="https://example.com?lang=en"/></url>', 
+                $uri->getSitemapNodes()[0]->toHTML());
     }
     /**
      * @test

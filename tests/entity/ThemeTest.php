@@ -20,7 +20,9 @@ class ThemeTest extends TestCase {
      */
     public function testToJson00() {
         $theme = ThemeLoader::usingTheme();
-        $this->assertEquals('{"themesPath":"'.\jsonx\JsonX::escapeJSONSpecialChars(THEMES_PATH).'", "name":"WebFiori Theme", "url":"https:\/\/ibrahim-2017.blogspot.com\/", "license":"MIT License", "licenseUrl":"https:\/\/opensource.org\/licenses\/MIT", "version":"1.0.1", "author":"Ibrahim Ali", "authorUrl":"", "imagesDirName":"images", "themeDirName":"webfiori", "cssDirName":"css", "jsDirName":"js", "components":["LangExt.php"]}',$theme->toJSON().'');
+        $j = $theme->toJSON();
+        $j->setPropsStyle('camel');
+        $this->assertEquals('{"themesPath":"'.\jsonx\JsonX::escapeJSONSpecialChars(THEMES_PATH).'", "name":"WebFiori Theme", "url":"https:\/\/ibrahim-2017.blogspot.com\/", "license":"MIT License", "licenseUrl":"https:\/\/opensource.org\/licenses\/MIT", "version":"1.0.1", "author":"Ibrahim Ali", "authorUrl":"", "imagesDirName":"images", "themeDirName":"webfiori", "cssDirName":"css", "jsDirName":"js", "components":["LangExt.php"]}',$j.'');
     }
     /**
      * @test

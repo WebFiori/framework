@@ -65,8 +65,8 @@ class CLI {
                 $host = '127.0.0.1';
             }
             $_SERVER['HTTP_HOST'] = $host;
-            $_SERVER['REMOTE_ADDR'] = $host;
-            $_SERVER['DOCUMENT_ROOT'] = trim(filter_var($_SERVER['argv'][0], FILTER_SANITIZE_STRING),'WebFiori.php');
+            $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
+            $_SERVER['DOCUMENT_ROOT'] = ROOT_DIR;
             $_SERVER['REQUEST_URI'] = '/';
             putenv('HTTP_HOST='.$host);
             putenv('REQUEST_URI=/');
@@ -238,7 +238,9 @@ class CLI {
             $command = self::get()->commands['help'];
             self::get()->activeCommand = $command;
 
-            return $command->excCommand();
+            if (!defined('__PHPUNIT_PHAR__')) {
+                exit($command->excCommand());
+            }
         } else if (defined('__PHPUNIT_PHAR__')) {
             return 0;
         }

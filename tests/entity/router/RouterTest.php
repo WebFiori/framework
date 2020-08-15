@@ -89,7 +89,7 @@ class RouterTest extends TestCase {
         ]);
         $obj = Router::getRouteUri();
         $this->assertNull($obj);
-        Router::route(Util::getBaseURL().'hello/world');
+        Router::route(Util::getBaseURL().'/hello/world');
         $obj = Router::getRouteUri();
         $this->assertTrue($obj instanceof RouterUri);
         $this->assertEquals('hello',$obj->getUriVar('var-1'));
@@ -110,7 +110,7 @@ class RouterTest extends TestCase {
             {
             }
         ]);
-        Router::route(Util::getBaseURL().'hello/world/boy');
+        Router::route(Util::getBaseURL().'/hello/world/boy');
         $obj = Router::getRouteUri();
         $this->assertTrue($obj instanceof RouterUri);
         $this->assertEquals('boy',$obj->getUriVar('var-1'));

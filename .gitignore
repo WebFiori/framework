@@ -8,3 +8,5 @@ composer.lock
 *.cache
 cs-fixer.phar
 *.log
+src/app/storage
+app/storage

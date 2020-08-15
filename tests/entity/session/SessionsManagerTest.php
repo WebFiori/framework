@@ -26,7 +26,7 @@ class SessionsManagerTest extends TestCase {
         
         $this->assertNotNull($activeSesstion);
         $this->assertEquals('hello', $activeSesstion->getName());
-        $this->assertEquals(120, $activeSesstion->getDuration());
+        $this->assertEquals(7200, $activeSesstion->getDuration());
         $this->assertEquals(Session::STATUS_NEW, $activeSesstion->getStatus());
         
         $activeSesstion->set('var-1', 'Good');
@@ -73,7 +73,7 @@ class SessionsManagerTest extends TestCase {
         $this->assertFalse($activeSesstion->isRunning());
         $this->assertEquals(Session::STATUS_PAUSED, $activeSesstion->getStatus());
         $active2 = SessionsManager::getActiveSesstion();
-        $this->assertEquals(5, $active2->getDuration());
+        $this->assertEquals(300, $active2->getDuration());
         $this->assertTrue($active2->isRefresh());
         $this->assertTrue($active2->isRunning());
         $this->assertNull(SessionsManager::get('var-3 '));
@@ -87,7 +87,7 @@ class SessionsManagerTest extends TestCase {
         $activeSesstion->start();
         $this->assertNotNull(SessionsManager::getActiveSesstion());
         $this->assertNull(SessionsManager::get('super-var'));
-        $this->assertEquals(120, SessionsManager::getActiveSesstion()->getDuration());
+        $this->assertEquals(7200, SessionsManager::getActiveSesstion()->getDuration());
         $this->assertEquals(Session::STATUS_PAUSED, $active2->getStatus());
         
         SessionsManager::start('another-one');
@@ -100,9 +100,19 @@ class SessionsManagerTest extends TestCase {
         $active2->start();
         $this->assertEquals(Session::STATUS_NEW, $active2->getStatus());
         $this->assertNotNull(SessionsManager::getActiveSesstion());
-        $this->assertEquals(5, SessionsManager::getActiveSesstion()->getDuration());
+        $this->assertEquals(300, SessionsManager::getActiveSesstion()->getDuration());
         $this->assertNull(SessionsManager::get('super-var'));
         SessionsManager::validateStorage();
     }
-    
+    /**
+     * @test
+     */
+    public function testGetSessionIDFromRequest() {
+        $this->assertFalse(SessionsManager::getSessionIDFromRequest('my-s'));
+        $_POST['my-s'] = 'xyz';
+        $this->assertEquals('xyz', SessionsManager::getSessionIDFromRequest('my-s'));
+        unset($_POST['my-s']);
+        $_GET['my-s'] = 'super';
+        $this->assertEquals('super', SessionsManager::getSessionIDFromRequest('my-s'));
+    }
 }

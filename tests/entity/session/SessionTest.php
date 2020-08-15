@@ -16,7 +16,7 @@ class SessionTest extends TestCase {
             'name' => 'my-new-sesstion'
         ]);
         $this->assertEquals('my-new-sesstion', $sesston->getName());
-        $this->assertEquals(120, $sesston->getDuration());
+        $this->assertEquals(7200, $sesston->getDuration());
         $this->assertEquals(0, $sesston->getStartedAt());
         $this->assertEquals(0, $sesston->getResumedAt());
         $this->assertEquals(0, $sesston->getPassedTime());
@@ -35,7 +35,7 @@ class SessionTest extends TestCase {
             'session-id' => 'super'
         ]);
         $this->assertEquals('my-new-sessionx', $sesston->getName());
-        $this->assertEquals(2, $sesston->getDuration());
+        $this->assertEquals(120, $sesston->getDuration());
         $this->assertEquals(0, $sesston->getStartedAt());
         $this->assertEquals(0, $sesston->getResumedAt());
         $this->assertEquals(0, $sesston->getPassedTime());
@@ -52,7 +52,7 @@ class SessionTest extends TestCase {
             'name' => 'wf-session'
         ]);
         $this->assertEquals('wf-session', $session->getName());
-        $this->assertEquals(120, $session->getDuration());
+        $this->assertEquals(7200, $session->getDuration());
         $this->assertEquals(120*60, $session->getRemainingTime());
         $this->assertEquals(0, $session->getStartedAt());
         $this->assertEquals(0, $session->getResumedAt());
@@ -154,5 +154,121 @@ class SessionTest extends TestCase {
         $this->assertEquals(time(), $session->getResumedAt());
         $this->assertTrue(in_array($session->getPassedTime(),[9,10,11,12]));
         $this->assertEquals('world', $session->get('hello'));
+    }
+    /**
+     * @test
+     */
+    public function testCookieHeader() {
+        $s = new Session([
+            'name' => 'super-session'
+        ]);
+        $params = $s->getCookieParams();
+        $this->assertEquals('Set-Cookie: '
+                . 'super-session='.$s->getId().'; '
+                . 'expires='.date(DATE_COOKIE,$params['expires']).'; '
+                . 'path=/; Secure; HttpOnly; SameSite=Lax', $s->getCookieHeader());
+        $s->setSameSite('none');
+        $this->assertEquals('Set-Cookie: '
+                . 'super-session='.$s->getId().'; '
+                . 'expires='.date(DATE_COOKIE,$params['expires']).'; '
+                . 'path=/; Secure; HttpOnly; SameSite=None', $s->getCookieHeader());
+        $s->setSameSite(' strict');
+        $this->assertEquals('Set-Cookie: '
+                . 'super-session='.$s->getId().'; '
+                . 'expires='.date(DATE_COOKIE,$params['expires']).'; '
+                . 'path=/; Secure; HttpOnly; SameSite=Strict', $s->getCookieHeader());
+        $s->setDuration(0);
+        $this->assertEquals('Set-Cookie: '
+                . 'super-session='.$s->getId().'; '
+                . 'path=/; Secure; HttpOnly; SameSite=Strict', $s->getCookieHeader());
+    }
+    /**
+     * @test
+     */
+    public function testRemainingTime() {
+        $s = new Session(['name'=>'session','duration'=>0.1]);
+        $s->start();
+        $this->assertEquals(6, $s->getDuration());
+        $s->close();
+        sleep(7);
+        $s->start();
+        
+        $this->assertEquals(-1, $s->getRemainingTime());
+    }
+    /**
+     * @test
+     */
+    public function testToJsonTest00() {
+        $_POST['lang'] = 'fr';
+        $s = new Session(['name'=>'session','duration'=>1]);
+        $j = $s->toJSON();
+        $j->setPropsStyle('snake');
+        $this->assertEquals('{"name":"session", '
+                . '"started_at":0, '
+                . '"duration":60, '
+                . '"resumed_at":0, '
+                . '"passed_time":0, '
+                . '"remaining_time":60, '
+                . '"language":null, '
+                . '"id":"'.$s->getId().'", '
+                . '"is_refresh":false, '
+                . '"is_persistent":true, '
+                . '"status":"status_none", '
+                . '"user":null, '
+                . '"vars":[]}',$j.'');
+        $s->start();
+        $j = $s->toJSON();
+        $j->setPropsStyle('snake');
+        $this->assertEquals('{"name":"session", '
+                . '"started_at":'.$s->getStartedAt().', '
+                . '"duration":60, '
+                . '"resumed_at":'.$s->getStartedAt().', '
+                . '"passed_time":0, '
+                . '"remaining_time":60, '
+                . '"language":"FR", '
+                . '"id":"'.$s->getId().'", '
+                . '"is_refresh":false, '
+                . '"is_persistent":true, '
+                . '"status":"status_new", '
+                . '"user":{"user-id":-1, "email":"", "display-name":null, "username":""}, '
+                . '"vars":[]}',$j.'');
+    }
+    /**
+     * @test
+     */
+    public function testToJsonTest01() {
+        $_GET['lang'] = 'en';
+        $s = new Session(['name'=>'session','duration'=>1]);
+        $j = $s->toJSON();
+        $j->setPropsStyle('snake');
+        $this->assertEquals('{"name":"session", '
+                . '"started_at":0, '
+                . '"duration":60, '
+                . '"resumed_at":0, '
+                . '"passed_time":0, '
+                . '"remaining_time":60, '
+                . '"language":null, '
+                . '"id":"'.$s->getId().'", '
+                . '"is_refresh":false, '
+                . '"is_persistent":true, '
+                . '"status":"status_none", '
+                . '"user":null, '
+                . '"vars":[]}',$j.'');
+        $s->start();
+        $j = $s->toJSON();
+        $j->setPropsStyle('snake');
+        $this->assertEquals('{"name":"session", '
+                . '"started_at":'.$s->getStartedAt().', '
+                . '"duration":60, '
+                . '"resumed_at":'.$s->getStartedAt().', '
+                . '"passed_time":0, '
+                . '"remaining_time":60, '
+                . '"language":"EN", '
+                . '"id":"'.$s->getId().'", '
+                . '"is_refresh":false, '
+                . '"is_persistent":true, '
+                . '"status":"status_new", '
+                . '"user":{"user-id":-1, "email":"", "display-name":null, "username":""}, '
+                . '"vars":[]}',$j.'');
     }
 }

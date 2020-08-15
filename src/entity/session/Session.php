@@ -213,7 +213,11 @@ class Session implements JsonI {
         }
 
         $this->sId = isset($options['session-id']) ? trim($options['session-id']) : $this->_generateSessionID();
-        $this->isRef = isset($options['refresh']) ? $options['refresh'] === true : false;
+        $this->setIsRefresh(false);
+        
+        if (isset($options['refresh'])) {
+            $this->setIsRefresh($options['refresh']);
+        }
 
 
         $this->resumedAt = 0;
@@ -226,7 +230,7 @@ class Session implements JsonI {
             $ip = '127.0.0.1';
         }
         $this->ipAddr = $ip;
-        $expires = $this->isPersistent() ? time() + $this->getDuration() * 60 : 0;
+        $expires = $this->isPersistent() ? time() + $this->getDuration() : 0;
         $this->cookieParams = [
             'expires' => $expires,
             'domain' => trim(filter_var($_SERVER['HTTP_HOST']),'/'),
@@ -304,9 +308,9 @@ class Session implements JsonI {
         $name = $this->getName();
         $value = $this->getId();
 
-        return "Set-Cookie: $name=$value; "
+        return "Set-Cookie: $name=$value"
+                ."$lifetime; "
                 ."path=".$cookieData['path']
-                ."$lifetime"
                 . "$secure"
                 . "$httpOnly"
                 .'; SameSite='.$sameSite;
@@ -333,13 +337,13 @@ class Session implements JsonI {
     /**
      * Returns the amount of time at which the session will be kept alive in.
      * 
-     * @return int This method will return session duration in minutes. The
-     * default duration of any new session is 120.
+     * @return int This method will return session duration in seconds. The
+     * default duration of any new session is 120 minutes (7200 seconds).
      * 
      * @since 1.0
      */
     public function getDuration() {
-        return $this->lifeTime;
+        return intval(round($this->lifeTime * 60));
     }
     /**
      * Returns the ID of the session.
@@ -412,9 +416,9 @@ class Session implements JsonI {
      */
     public function getRemainingTime() {
         if ($this->isRefresh()) {
-            return $this->getDuration() * 60;
+            return $this->getDuration();
         }
-        $remainingTime = $this->getDuration() * 60 - $this->getPassedTime();
+        $remainingTime = $this->getDuration() - $this->getPassedTime();
 
         if ($remainingTime < 0) {
             return -1;
@@ -659,11 +663,11 @@ class Session implements JsonI {
      * @since 1.0
      */
     public function setDuration($time) {
-        $asInt = intval($time);
+        $asFloat = floatval($time);
 
-        if ($time >= 0) {
-            $this->lifeTime = $asInt;
-            $this->cookieParams['expires'] = $asInt == 0 ? 0 : time() + $this->getDuration() * 60;
+        if ($asFloat >= 0) {
+            $this->lifeTime = $asFloat;
+            $this->cookieParams['expires'] = $asFloat == 0 ? 0 : time() + $this->getDuration();
             $this->_checkIfExpired();
 
             return true;
@@ -731,7 +735,7 @@ class Session implements JsonI {
         return new JsonX([
             'name' => $this->getName(),
             'startedAt' => $this->getStartedAt(),
-            'duration' => $this->getDuration() * 60,
+            'duration' => $this->getDuration(),
             'resumedAt' => $this->getResumedAt(),
             'passedTime' => $this->getPassedTime(),
             'remainingTime' => $this->getRemainingTime(),
@@ -791,10 +795,8 @@ class Session implements JsonI {
             SessionsManager::getStorage()->remove($this->getId());
             $this->sessionStatus = self::STATUS_EXPIERED;
             $this->cookieParams['expires'] = time() - 1;
-        } else {
-            if ($this->isRefresh()) {
-                $this->cookieParams['expires'] = time() + $this->getDuration() * 60;
-            }
+        } else if ($this->isRefresh()) {
+            $this->cookieParams['expires'] = time() + $this->getDuration();
         }
     }
     private function _clone($session) {
@@ -829,18 +831,13 @@ class Session implements JsonI {
      * @return string|null
      */
     private function _getLangFromRequest() {
-        $lang = null;
         $langIdx = 'lang';
         //get language code from $_GET
-        if (isset($_GET[$langIdx])) {
-            $lang = filter_var($_GET[$langIdx],FILTER_SANITIZE_STRING);
-        }
+        $lang = filter_input(INPUT_GET, $langIdx);
 
         if (!$lang || $lang == null) {
             //if not in $_GET, check $_POST
-            if (isset($_POST[$langIdx])) {
-                $lang = filter_var($_POST[$langIdx],FILTER_SANITIZE_STRING);
-            }
+            $lang = filter_input(INPUT_POST, $langIdx);
 
             //If not in $_POST, check cookie.
             if (!$lang || $lang == null) {

@@ -162,14 +162,23 @@ class SessionsManager {
      * 
      * @since 1.0
      */
-    public static function getSessionIDFromRequest($seestionName) {
-        $sid = self::getSessionIDFromCookie($seestionName);
-
+    public static function getSessionIDFromRequest($seesionName) {
+        $trimmedSName = trim($seesionName);
+        $sid = self::getSessionIDFromCookie($trimmedSName);
+        
         if ($sid === false) {
-            $sid = filter_input(INPUT_POST, $seestionName);
+            if (isset($_GET[$trimmedSName])) {
+                $sid = filter_var($_GET[$seesionName], FILTER_SANITIZE_STRING);
+            } 
 
             if ($sid === null || $sid === false) {
-                $sid = filter_input(INPUT_POST, $seestionName);
+                if (isset($_POST[$trimmedSName])) {
+                    $sid = filter_var($_POST[$seesionName], FILTER_SANITIZE_STRING);
+                } 
+                
+                if ($sid === null || $sid === false) {
+                    return false;
+                }
             }
         }
 
@@ -218,7 +227,7 @@ class SessionsManager {
      * 
      * @since 1.0
      */
-    public static function hasSesstion($sName) {
+    public static function hasSession($sName) {
         $trimmed = trim($sName);
 
         if (!self::_checkLoadedSesstions($trimmed)) {
@@ -338,7 +347,7 @@ class SessionsManager {
     public static function start($sessionName, $options = []) {
         self::_get()->_pauseSessions();
 
-        if (!self::hasSesstion($sessionName)) {
+        if (!self::hasSession($sessionName)) {
             $options['name'] = $sessionName;
             $s = new Session($options);
             $s->start();
@@ -394,7 +403,7 @@ class SessionsManager {
      * @since 1.0
      */
     private static function _checkAndLoadFromCookie($sName) {
-        $sId = self::getSessionIDFromCookie($sName);
+        $sId = self::getSessionIDFromRequest($sName);
 
         if ($sId !== false) {
             $tempSesstion = new Session([

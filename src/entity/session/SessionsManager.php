@@ -74,6 +74,19 @@ class SessionsManager {
         $this->sesstionStorage = new DefaultSessionStorage();
     }
     /**
+     * Saves the state of the active session and close it.
+     * 
+     * @since 1.0
+     */
+    public static function close() {
+        $active = self::getActiveSession();
+
+        if ($active !== null) {
+            $active->close();
+            self::_get()->activeSesstion = null;
+        }
+    }
+    /**
      * Destroy the active session.
      * 
      * Calling this method when there is no active session will have no effect.
@@ -81,7 +94,7 @@ class SessionsManager {
      * @since 1.0
      */
     public static function destroy() {
-        $active = self::getActiveSesstion();
+        $active = self::getActiveSession();
 
         if ($active !== null) {
             $active->kill();
@@ -102,7 +115,7 @@ class SessionsManager {
      * @since 1.0
      */
     public static function get($varName) {
-        $active = self::getActiveSesstion();
+        $active = self::getActiveSession();
 
         if ($active !== null) {
             return $active->get($varName);
@@ -117,7 +130,7 @@ class SessionsManager {
      * 
      * @since 1.0
      */
-    public static function getActiveSesstion() {
+    public static function getActiveSession() {
         if (self::_get()->activeSesstion !== null) {
             return self::_get()->activeSesstion;
         }
@@ -237,6 +250,22 @@ class SessionsManager {
         return true;
     }
     /**
+     * Generate new ID for the active session.
+     * 
+     * @return string|null If there was an active session and new ID is generated 
+     * for it, the method will return the new ID. Other than that, the method 
+     * will return null.
+     * 
+     * @since 1.0
+     */
+    public static function newId() {
+        $active = self::getActiveSession();
+
+        if ($active !== null) {
+            return $active->reGenerateID();
+        }
+    }
+    /**
      * Stores the status of all sessions and pause them.
      * 
      * @since 1.0
@@ -256,7 +285,7 @@ class SessionsManager {
      * @since 1.0
      */
     public static function pull($varName) {
-        $active = self::getActiveSesstion();
+        $active = self::getActiveSession();
 
         if ($active !== null) {
             return $active->pull($varName);
@@ -273,7 +302,7 @@ class SessionsManager {
      * @since 1.0
      */
     public static function remove($varName) {
-        $active = self::getActiveSesstion();
+        $active = self::getActiveSession();
 
         if ($active !== null) {
             return $active->remove($varName);
@@ -296,7 +325,7 @@ class SessionsManager {
      * @since 1.0
      */
     public static function set($varName, $value) {
-        $active = self::getActiveSesstion();
+        $active = self::getActiveSession();
 
         if ($active !== null) {
             return $active->set($varName, $value);

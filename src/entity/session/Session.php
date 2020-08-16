@@ -418,6 +418,9 @@ class Session implements JsonI {
         if ($this->isRefresh()) {
             return $this->getDuration();
         }
+        if (!$this->isPersistent()) {
+            return 0;
+        }
         $remainingTime = $this->getDuration() - $this->getPassedTime();
 
         if ($remainingTime < 0) {
@@ -488,6 +491,24 @@ class Session implements JsonI {
      */
     public function getVars() {
         return $this->sessionArr;
+    }
+    /**
+     * Checks if the session has a given value or not.
+     * 
+     * Note that the method will always return false if the session is not running.
+     * 
+     * @param string $varName The name of the variable that has the value.
+     * 
+     * @return boolean If the value exist, the method will return true. Other 
+     * than that, the method will return false.
+     * 
+     * @since 1.0
+     */
+    public function has($varName) {
+        if ($this->isRunning()) {
+            $trimmed = trim($varName);
+            return isset($this->sessionArr[$trimmed]);
+        }
     }
     /**
      * Checks if the session cookie is persistent or not. 

@@ -301,7 +301,7 @@ class Controller {
      * @since 1.3
      */
     public function getSession() {
-        return SessionsManager::getActiveSesstion();
+        return SessionsManager::getActiveSession();
     }
     /**
      * Returns language code from the currently used session manager.

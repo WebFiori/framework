@@ -724,6 +724,20 @@ class Session implements JsonI {
         }
     }
     /**
+     * Sets the user that represents session user.
+     * 
+     * Note that the user will be set only if the session is active.
+     * 
+     * @param User $userObj An object of type 'User'.
+     * 
+     * @since 1.0
+     */
+    public function setUser($userObj) {
+        if ($userObj instanceof User && $this->isRunning()) {
+            $this->sesstionUser = $userObj;
+        }
+    }
+    /**
      * Resumes or starts new session.
      * 
      * This method works as follows, it tries to read a session from sessions 

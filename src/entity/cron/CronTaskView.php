@@ -107,7 +107,8 @@ class CronTaskView extends CronView {
             $this->getControlsContainer()->addChild($forceNode);
             $this->createOutputWindow();
         } else {
-            header('location: '.WebFiori::getSiteConfig()->getBaseURL().'cron/jobs');
+            Response::addHeader('location', WebFiori::getSiteConfig()->getBaseURL().'cron/jobs');
+            Response::send();
         }
         Page::render();
     }

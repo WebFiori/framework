@@ -28,6 +28,7 @@ use phpStructs\html\HTMLNode;
 use phpStructs\html\JsCode;
 use webfiori\entity\Page;
 use webfiori\WebFiori;
+use webfiori\entity\Response;
 /**
  * A generic view for cron related operations. 
  * 
@@ -46,9 +47,11 @@ class CronView {
         if (Cron::password() != 'NO_PASSWORD' 
                 && $title != 'CRON Login' 
                 && WebFiori::getWebsiteController()->getSessionVar('cron-login-status') !== true) {
-            header('location: '.WebFiori::getSiteConfig()->getBaseURL().'cron/login');
+            Response::addHeader('location', WebFiori::getSiteConfig()->getBaseURL().'cron/login');
+            Response::send();
         } else if ($title == 'CRON Login' && Cron::password() == 'NO_PASSWORD') {
-            header('location: '.WebFiori::getSiteConfig()->getBaseURL().'cron/jobs');
+            Response::addHeader('location', WebFiori::getSiteConfig()->getBaseURL().'cron/jobs');
+            Response::send();
         }
         Page::title($title);
         Page::description($description);

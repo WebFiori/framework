@@ -34,6 +34,7 @@ use webfiori\entity\ui\NotFoundView;
 use webfiori\entity\Util;
 use webfiori\entity\File;
 use webfiori\entity\ThemeLoader;
+use webfiori\entity\Response;
 /**
  * The basic class that is used to route user requests to the correct 
  * location.
@@ -161,7 +162,7 @@ class Router {
                     'message' => 'Requested resource was not found.',
                     'type' => 'error'
                 ]);
-                echo $json;
+                Response::append($json);
             }
         };
 
@@ -478,8 +479,9 @@ class Router {
                 }
                 $retVal = '<?xml version="1.0" encoding="UTF-8"?>';
                 $retVal .= $urlSet->toHTML();
-                header('content-type:text/xml');
-                echo $retVal;
+                Response::append($retVal);
+                Response::addHeader('content-type','text/xml');
+                Response::send();
             }
         ]);
     }
@@ -1013,8 +1015,8 @@ class Router {
                 call_user_func($this->onNotFound);
             }
         } else if ($loadResource === true) {
-            header("HTTP/1.1 418 I'm a teapot");
-            die(''
+            Response::setResponseCode(418);
+            Response::append(''
             .'<!DOCTYPE html>'
             .'<html>'
             .'<head>'
@@ -1028,6 +1030,7 @@ class Router {
             .'</p>'
             .'</body>'
             .'</html>');
+            Response::send();
         }
     }
     private function _routeFound($route, $loadResource) {
@@ -1123,7 +1126,7 @@ class Router {
      * @param RouterUri $uriObj
      */
     private function redirectToNonWWW($uriObj) {
-        http_response_code(301);
+        Response::setResponseCode(301);
         $path = '';
 
         $host = substr($uriObj->getHost(), strpos($uriObj->getHost(), '.'));
@@ -1146,6 +1149,7 @@ class Router {
         if (strlen($uriObj->getPort()) > 0) {
             $port = ':'.$uriObj->getPort();
         }
-        header('location: '.$uriObj->getScheme().'://'.$host.$port.$path.$queryString.$fragment);
+        Response::addHeader('location', $uriObj->getScheme().'://'.$host.$port.$path.$queryString.$fragment);
+        Response::send();
     }
 }

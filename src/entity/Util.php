@@ -624,9 +624,9 @@ class Util {
                 $messageBox = new MessageBox();
                 $messageBox->getBody()->addTextNode($toOutput,false);
                 $messageBox->getHeader()->text($file.' - '.$lineNumber);
-                echo $messageBox;
+                Response::append($messageBox);
             } else {
-                echo '<pre>'.$file.' - '.$lineNumber."\n".'</pre>'.$toOutput;
+                Response::append('<pre>'.$file.' - '.$lineNumber."\n".'</pre>'.$toOutput);
             }
         }
     }

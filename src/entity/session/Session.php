@@ -289,7 +289,7 @@ class Session implements JsonI {
      * 
      * @return string The string that will be returned will have the following 
      * format: 
-     * 'Set-Cookie: &lt;cookie-name&gt;=&lt;val&gt;; expires=&lt;time&gt;; path=/ 
+     * '&lt;cookie-name&gt;=&lt;val&gt;; expires=&lt;time&gt;; path=/ 
      * SameSite=&lt;Lax|None|Strict&gt;'
      * 
      * @since 1.0
@@ -308,7 +308,7 @@ class Session implements JsonI {
         $name = $this->getName();
         $value = $this->getId();
 
-        return "Set-Cookie: $name=$value"
+        return "$name=$value"
                 ."$lifetime; "
                 ."path=".$cookieData['path']
                 . "$secure"

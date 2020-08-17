@@ -33,6 +33,7 @@ use webfiori\conf\SiteConfig;
 use webfiori\entity\exceptions\UIException;
 use webfiori\entity\i18n\Language;
 use webfiori\WebFiori;
+use webfiori\entity\Response;
 /**
  * A class used to initialize view components.
  * 
@@ -478,7 +479,7 @@ class Page {
         if ($returnResult) {
             return Page::get()->getDocument();
         } else {
-            echo Page::get()->getDocument()->toHTML($formatted);
+            Response::append(Page::get()->getDocument()->toHTML($formatted));
         }
     }
     /**

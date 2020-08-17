@@ -25,6 +25,7 @@
 namespace webfiori\entity\session;
 
 use webfiori\entity\cli\CLI;
+use webfiori\entity\Response;
 /**
  * A class which is used to manage user sessions.
  *
@@ -418,7 +419,7 @@ class SessionsManager {
             }
 
             if (!CLI::isCLI()) {
-                header($session->getCookieHeader());
+                Response::addHeader('Set-Cookie', $session->getCookieHeader());
             }
         }
         self::getStorage()->gc();

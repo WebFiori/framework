@@ -27,6 +27,7 @@ namespace webfiori\entity;
 use jsonx\JsonI;
 use jsonx\JsonX;
 use webfiori\entity\exceptions\FileException;
+use webfiori\entity\Response;
 /**
  * A class that represents a file.
  * 
@@ -850,8 +851,8 @@ class File implements JsonI {
         $contentType = $this->getFileMIMEType();
 
         if ($contentType !== null) {
-            header("Accept-Ranges: bytes");
-            header('Content-Type:'.$contentType);
+            Response::addHeader('Accept-Ranges', 'bytes');
+            Response::addHeader('content-type', $contentType);
 
             if (isset($_SERVER['HTTP_RANGE'])) {
                 $range = filter_var($_SERVER['HTTP_RANGE']);
@@ -862,19 +863,19 @@ class File implements JsonI {
                     $expl[1] = $this->getSize();
                 }
                 $this->read($expl[0], $expl[1]);
-                header('HTTP/1.1 206 Partial Content');
-                header('Content-Range: bytes '.$expl[0].'-'.$expl[1].'/'.$this->getSize());
-                header('Content-Length: '.($expl[1] - $expl[0]));
+                Response::setResponseCode(206);
+                Response::addHeader('content-range', 'bytes '.$expl[0].'-'.$expl[1].'/'.$this->getSize());
+                Response::addHeader('content-length', $expl[1] - $expl[0]);
             } else {
-                header('Content-Length: '.$this->getSize());
+                Response::addHeader('Content-Length', $this->getSize());
             }
 
             if ($asAttachment === true) {
-                header('Content-Disposition: attachment; filename="'.$this->getName().'"');
+                Response::addHeader('Content-Disposition', 'attachment; filename="'.$this->getName().'"');
             } else {
-                header('Content-Disposition: inline; filename="'.$this->getName().'"');
+                Response::addHeader('Content-Disposition', 'inline; filename="'.$this->getName().'"');
             }
-            echo $this->getRawData();
+            Response::append($this->getRawData());
         } else {
             throw new FileException('MIME type of raw data is not set.');
         }

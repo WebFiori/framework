@@ -23,9 +23,6 @@
  * THE SOFTWARE.
  */
 namespace webfiori;
-ini_set('display_startup_errors', 1);
-        ini_set('display_errors', 1);
-        error_reporting(-1);
 use jsonx\JsonX;
 use webfiori\conf\Config;
 use webfiori\conf\MailConfig;
@@ -39,7 +36,6 @@ use webfiori\entity\router\OtherRoutes;
 use webfiori\entity\router\Router;
 use webfiori\entity\router\ViewRoutes;
 use webfiori\entity\ThemeLoader;
-use webfiori\entity\session\SessionsManager;
 use webfiori\entity\Response;
 use webfiori\entity\ui\ErrorBox;
 use webfiori\entity\ui\ServerErrView;
@@ -680,6 +676,5 @@ if (CLI::isCLI() === true) {
 } else {
     //route user request.
     Router::route(Util::getRequestedURL());
-    Util::print_r('Hello');
     Response::send();
 }

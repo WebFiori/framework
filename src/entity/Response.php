@@ -95,7 +95,7 @@ class Response {
                 $values = self::getHeader($trimmedName);
                 $count = count($values);
                 if ($count == 1) {
-                    unset(self::get()->headers[$headerName]);
+                    unset(self::get()->headers[$trimmedName]);
                     $retVal = true;
                 } else {
                     $newValsArr = [];
@@ -106,10 +106,10 @@ class Response {
                             $retVal = true;
                         }
                     }
-                    self::get()->headers[$headerName] = $newValsArr;
+                    self::get()->headers[$trimmedName] = $newValsArr;
                 }
             } else {
-                unset(self::get()->headers[$headerName]);
+                unset(self::get()->headers[$trimmedName]);
                 $retVal = true;
             }
         }
@@ -125,16 +125,20 @@ class Response {
      */
     public static function send() {
         if (!CLI::isCLI()) {
+            register_shutdown_function(function() {
+                SessionsManager::validateStorage();
+            });
             $sessionsCookiesHeaders = SessionsManager::getCookiesHeaders();
             foreach ($sessionsCookiesHeaders as $headerVal) {
                 self::addHeader('set-cookie', $headerVal);
             }
-            http_response_code(self::getResponseCode());
+            http_response_code(self::getCode());
             foreach (self::getHeaders() as $headerName => $headerVals) {
                 foreach ($headerVals as $headerVal) {
                     header($headerName.': '.$headerVal, false);
                 }
             }
+            
             if (is_callable('fastcgi_finish_request')) {
                 echo self::getBody();
                 fastcgi_finish_request();
@@ -145,7 +149,6 @@ class Response {
                 ob_flush();
                 flush();
             }
-            SessionsManager::validateStorage();
             die();
         }
     }
@@ -156,7 +159,7 @@ class Response {
      * 
      * @since 1.0
      */
-    public static function getResponseCode() {
+    public static function getCode() {
         return self::get()->responseCode;
     }
     /**
@@ -167,7 +170,7 @@ class Response {
      * 
      * @since 1.0
      */
-    public static function setResponseCode($code) {
+    public static function setCode($code) {
         $asInt = intval($code);
         if ($asInt >= 100 && $asInt <= 599) {
             self::get()->responseCode = $code;
@@ -196,10 +199,29 @@ class Response {
      * 
      * @param string $str The string that will be appended.
      * 
+     * @return Response 
+     * 
      * @since 1.0
      */
     public static function append($str) {
         self::get()->body .= $str;
+        return self::get();
+    }
+    /**
+     * Removes all headers which where added to the response.
+     * 
+     * @since 1.0
+     */
+    public static function clearHeaders() {
+        self::get()->headers = [];
+    }
+    /**
+     * Reset the body of the response.
+     * 
+     * @since 1.0
+     */
+    public static function clearBody() {
+        self::get()->body = '';
     }
     /**
      * Returns the value(s) of specific HTTP header.

@@ -804,13 +804,16 @@ class Session implements JsonI {
 
             $iv = substr(hash('sha256', $key), 0,16);
             $encrypted = openssl_decrypt($serialized, $cipherMeth, $key,0, $iv);
-            $sesstionObj = unserialize($encrypted);
+            
+            if (strlen($encrypted) > 0) {
+                $sesstionObj = unserialize($encrypted);
 
-            if ($sesstionObj instanceof Session) {
-                $this->sessionStatus = self::STATUS_RESUMED;
-                $this->_clone($sesstionObj);
+                if ($sesstionObj instanceof Session) {
+                    $this->sessionStatus = self::STATUS_RESUMED;
+                    $this->_clone($sesstionObj);
 
-                return true;
+                    return true;
+                }
             }
         } else {
             $sesstionObj = unserialize($serialized);

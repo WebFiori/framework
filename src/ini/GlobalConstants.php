@@ -107,7 +107,7 @@ class GlobalConstants {
              * false.
              * @since 1.0
              */
-            define('VERBOSE', true);
+            define('VERBOSE', false);
         }
 
         if (!defined('NO_WWW')) {

@@ -57,4 +57,37 @@ class ResponseTest extends TestCase {
         Response::removeHeader('Set-cookie');
         $this->assertFalse(Response::hasHeader('Set-Cookie'));
     }
+    /**
+     * @test
+     */
+    public function testRemoveHeaders() {
+        Response::addHeader('content-type', 'application/json');
+        $this->assertTrue(Response::hasHeader('content-type'));
+        $this->assertFalse(Response::hasHeader('content-type','text/plain'));
+        Response::clearHeaders();
+        $this->assertEquals(0, count(Response::getHeaders()));
+    }
+    /**
+     * @test
+     */
+    public function testClearBody() {
+        Response::append('Hello World!');
+        $this->assertEquals('Hello World!', Response::getBody());
+        Response::clearBody();
+        $this->assertEquals('', Response::getBody());
+    }
+    /**
+     * @test
+     */
+    public function testSetResponseCode() {
+        $this->assertEquals(200, Response::getCode());
+        Response::setCode(99);
+        $this->assertEquals(200, Response::getCode());
+        Response::setCode(100);
+        $this->assertEquals(100, Response::getCode());
+        Response::setCode(599);
+        $this->assertEquals(599, Response::getCode());
+        Response::setCode(600);
+        $this->assertEquals(599, Response::getCode());
+    }
 }

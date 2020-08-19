@@ -330,7 +330,7 @@ class Controller {
      * @since 1.3.9
      */
     public static function getSessions() {
-        return SessionsManager::getSesstions();
+        return SessionsManager::getSessions();
     }
     /**
      * Returns session variable given its name.

@@ -124,15 +124,28 @@ class Response {
      * @since 1.0
      */
     public static function send() {
-        SessionsManager::validateStorage();
         if (!CLI::isCLI()) {
+            $sessionsCookiesHeaders = SessionsManager::getCookiesHeaders();
+            foreach ($sessionsCookiesHeaders as $headerVal) {
+                self::addHeader('set-cookie', $headerVal);
+            }
             http_response_code(self::getResponseCode());
             foreach (self::getHeaders() as $headerName => $headerVals) {
                 foreach ($headerVals as $headerVal) {
                     header($headerName.': '.$headerVal, false);
                 }
             }
-            echo self::getBody();
+            if (is_callable('fastcgi_finish_request')) {
+                echo self::getBody();
+                fastcgi_finish_request();
+            } else {
+                ob_start();
+                echo self::getBody();
+                ob_end_flush();
+                ob_flush();
+                flush();
+            }
+            SessionsManager::validateStorage();
             die();
         }
     }

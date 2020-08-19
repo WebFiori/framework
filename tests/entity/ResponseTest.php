@@ -10,7 +10,7 @@ use webfiori\entity\Response;
  * @author Ibrahim
  */
 
-class RequestTest extends TestCase {
+class ResponseTest extends TestCase {
     /**
      * @test
      */

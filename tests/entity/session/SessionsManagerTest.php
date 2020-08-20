@@ -115,4 +115,28 @@ class SessionsManagerTest extends TestCase {
         $_GET['my-s'] = 'super';
         $this->assertEquals('super', SessionsManager::getSessionIDFromRequest('my-s'));
     }
+    /**
+     * @test
+     */
+    public function testClose00() {
+        SessionsManager::pauseAll();
+        $this->assertNull(SessionsManager::getActiveSession());
+        SessionsManager::start('xyz');
+        $this->assertNotNull(SessionsManager::getActiveSession());
+        SessionsManager::close();
+        $this->assertNull(SessionsManager::getActiveSession());
+        SessionsManager::start('xyz');
+        $this->assertEquals(Session::STATUS_RESUMED, SessionsManager::getActiveSession()->getStatus());
+    }
+    /**
+     * @test
+     * @depends testClose00
+     */
+//    public function testCookiesHeaders() {
+//        $sessions = SessionsManager::getSessions();
+//        var_dump(SessionsManager::getCookiesHeaders());
+//        $this->assertEquals([
+//            
+//        ], SessionsManager::getCookiesHeaders());
+//    }
 }

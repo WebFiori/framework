@@ -131,7 +131,7 @@ class CronTasksView extends CronView {
                 $row->setClassName('tasks-table-row');
                 $jobNameCell = new TableCell();
                 $jobNameCell->setClassName('tasks-table-cell');
-                $jobNameCell->addTextNode('<a href="'.WebFiori::getSiteConfig()->getBaseURL().'cron/jobs/'.$job->getJobName().'">'.$job->getJobName().'</a>',false);
+                $jobNameCell->addTextNode('<a href="'.WebFiori::getSiteConfig()->getBaseURL().'/cron/jobs/'.$job->getJobName().'">'.$job->getJobName().'</a>',false);
                 $row->addChild($jobNameCell);
                 $exprCell = new TableCell();
                 $jobNameCell->setClassName('tasks-table-cell');

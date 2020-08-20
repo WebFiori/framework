@@ -39,8 +39,8 @@ class CronLoginView extends CronView {
     public function __construct() {
         parent::__construct('CRON Login', 'Login to CRON Control panel.');
 
-        if (WebFiori::getWebsiteController()->getSessionVar('cron-login-status')) {
-            Response::addHeader('location', WebFiori::getSiteConfig()->getBaseURL().'cron/jobs');
+        if (WebFiori::getWebsiteController()->getSession()->get('cron-login-status')) {
+            Response::addHeader('location', WebFiori::getSiteConfig()->getBaseURL().'/cron/jobs');
             Response::send();
         }
         $form = new HTMLNode('form');

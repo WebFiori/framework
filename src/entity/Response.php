@@ -119,7 +119,8 @@ class Response {
      * Send the response.
      * 
      * Note that if this method is called outside CLI environment,
-     * it will terminate the execution of code once the output is sent.
+     * it will terminate the execution of code once the output is sent. In terminal 
+     * environment, calling it will have no effect.
      * 
      * @since 1.0
      */
@@ -222,6 +223,15 @@ class Response {
      */
     public static function clearBody() {
         self::get()->body = '';
+    }
+    /**
+     * Removes all added headers and reset the body of the response.
+     * 
+     * @since 1.0
+     */
+    public static function clear() {
+        self::clearBody();
+        self::clearHeaders();
     }
     /**
      * Returns the value(s) of specific HTTP header.

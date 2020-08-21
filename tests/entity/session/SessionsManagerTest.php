@@ -13,6 +13,7 @@ class SessionsManagerTest extends TestCase {
      * @test
      */
     public function test00() {
+        SessionsManager::reset();
         $this->assertEquals(0, count(SessionsManager::getSessions()));
         $this->assertNull(SessionsManager::getActiveSession());
         $this->assertNull(SessionsManager::get('xyz'));
@@ -138,11 +139,11 @@ class SessionsManagerTest extends TestCase {
      * @depends testClose00
      */
     public function testCookiesHeaders() {
+        SessionsManager::reset();
+        SessionsManager::start('hello');
         $sessions = SessionsManager::getSessions();
         $this->assertEquals([
-            'hello='.$sessions[0]->getId().'; expires='.date(DATE_COOKIE, $sessions[0]->getCookieParams()['expires']).'; path=/; Secure; HttpOnly; SameSite=Lax',
-            'another-one='.$sessions[1]->getId().'; expires='.date(DATE_COOKIE, $sessions[1]->getCookieParams()['expires']).'; path=/; Secure; HttpOnly; SameSite=Lax',
-            'xyz='.$sessions[2]->getId().'; expires='.date(DATE_COOKIE, $sessions[2]->getCookieParams()['expires']).'; path=/; Secure; HttpOnly; SameSite=Lax',
-        ], SessionsManager::getCookiesHeaders());
+            'hello='.$sessions[0]->getId().'; expires='.date(DATE_COOKIE, $sessions[0]->getCookieParams()['expires']).'; path=/; Secure; HttpOnly; SameSite=Lax' 
+            ], SessionsManager::getCookiesHeaders());
     }
 }

@@ -374,7 +374,8 @@ class File implements JsonI {
     /**
      * Returns MIME type of a file type.
      * 
-     * The method will try to find MIME type based on its extension. If 
+     * The method will try to find MIME type based on its extension. The method 
+     * will look for MIME in the constant File::MIME_TYPES.
      * 
      * @param string $ext File extension without the suffix (such as 'jpg').
      * 
@@ -453,10 +454,8 @@ class File implements JsonI {
         if ($this->rawData !== null) {
             if ($lower == 'e') {
                 return base64_encode($this->rawData);
-            } else {
-                if ($lower == 'd') {
-                    return base64_decode($this->rawData);
-                }
+            } else if ($lower == 'd') {
+                return base64_decode($this->rawData);
             }
         }
 
@@ -567,7 +566,7 @@ class File implements JsonI {
      * 
      * @since 1.0
      */
-    public function setID($id) {
+    public function setId($id) {
         $this->id = $id;
     }
     /**
@@ -666,14 +665,15 @@ class File implements JsonI {
             $this->read();
         } catch (FileException $ex) {
         }
-        $jsonX = new JsonX();
-        $jsonX->add('id', $this->getID());
-        $jsonX->add('mime', $this->getFileMIMEType());
-        $jsonX->add('name', $this->getName());
-        $jsonX->add('directory', $this->getDir());
-        $jsonX->add('sizeInBytes', $this->getSize());
-        $jsonX->add('sizeInKBytes', $this->getSize() / 1024);
-        $jsonX->add('sizeInMBytes', ($this->getSize() / 1024) / 1024);
+        $jsonX = new JsonX([
+            'id' => $this->getID(),
+            'mime' => $this->getFileMIMEType(),
+            'name' => $this->getName(),
+            'directory' => $this->getDir(),
+            'sizeInBytes' => $this->getSize(),
+            'sizeInKBytes' => $this->getSize() / 1024,
+            'sizeInMBytes' => ($this->getSize() / 1024) / 1024
+        ]);
 
         return $jsonX;
     }

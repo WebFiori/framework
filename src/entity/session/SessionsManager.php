@@ -75,6 +75,16 @@ class SessionsManager {
         $this->sesstionStorage = new DefaultSessionStorage();
     }
     /**
+     * Reset sessions manager to defaults.
+     * 
+     * @since 1.0
+     */
+    public static function reset() {
+        self::_get()->sesstionsArr = [];
+        self::_get()->sesstionStorage = new DefaultSessionStorage();
+        self::_get()->activeSesstion = null;
+    }
+    /**
      * Saves the state of the active session and close it.
      * 
      * @since 1.0

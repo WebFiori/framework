@@ -19,6 +19,8 @@ class ControllerTest extends TestCase {
     public function testExecuteQuery00() {
         $f = new Controller();
         $r = $f->excQ();
+        $this->assertNull($f->getLastQuery());
+        $this->assertEquals(0, $f->getQueriesStack()->size());
         $this->assertFalse($r);
         $errDetails = $f->getDBErrDetails();
         $this->assertEquals(Controller::NO_QUERY,$errDetails['error-code']);
@@ -113,6 +115,7 @@ class ControllerTest extends TestCase {
         $q = new TestQuery_1();
         $this->assertTrue($func->setQueryObject($q));
         $this->assertTrue($func->getQueryObject() instanceof TestQuery_1);
+        
     }
     /**
      * @test
@@ -121,6 +124,7 @@ class ControllerTest extends TestCase {
         $func = new Controller();
         $this->assertFalse($func->setSessionVar(' ',null));
         $this->assertTrue($func->setSessionVar('hello',null));
+        $this->assertEquals(1, count($func->getSessions()));
     }
     /**
      * @test

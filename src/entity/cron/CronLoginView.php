@@ -29,6 +29,7 @@ use phpStructs\html\Input;
 use phpStructs\html\Label;
 use webfiori\entity\Page;
 use webfiori\WebFiori;
+use webfiori\entity\Response;
 /**
  * Description of CronLoginView
  *
@@ -38,8 +39,9 @@ class CronLoginView extends CronView {
     public function __construct() {
         parent::__construct('CRON Login', 'Login to CRON Control panel.');
 
-        if (WebFiori::getWebsiteController()->getSessionVar('cron-login-status')) {
-            header('location: '.WebFiori::getSiteConfig()->getBaseURL().'cron/jobs');
+        if (WebFiori::getWebsiteController()->getSession()->get('cron-login-status')) {
+            Response::addHeader('location', WebFiori::getSiteConfig()->getBaseURL().'/cron/jobs');
+            Response::send();
         }
         $form = new HTMLNode('form');
         Page::insert($form);

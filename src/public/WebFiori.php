@@ -23,9 +23,6 @@
  * THE SOFTWARE.
  */
 namespace webfiori;
-ini_set('display_startup_errors', 1);
-        ini_set('display_errors', 1);
-        error_reporting(-1);
 use jsonx\JsonX;
 use webfiori\conf\Config;
 use webfiori\conf\MailConfig;
@@ -39,7 +36,7 @@ use webfiori\entity\router\OtherRoutes;
 use webfiori\entity\router\Router;
 use webfiori\entity\router\ViewRoutes;
 use webfiori\entity\ThemeLoader;
-use webfiori\entity\session\SessionsManager;
+use webfiori\entity\Response;
 use webfiori\entity\ui\ErrorBox;
 use webfiori\entity\ui\ServerErrView;
 use webfiori\entity\ui\ServiceUnavailableView;
@@ -496,8 +493,8 @@ class WebFiori {
             if ($routeUri->isDynamic()) {
                 // Only apply to dynamic resources.
                 if ($routeType == Router::API_ROUTE) {
-                    header('HTTP/1.1 503 Service Unavailable');
-                    header('content-type:application/json');
+                    Response::setResponseCode(503);
+                    Response::addHeader('content-type', 'application/json');
                     $j = new JsonX([], true);
                     $j->add('message', '503 - Service Unavailable');
                     $j->add('type', 'error');
@@ -509,7 +506,8 @@ class WebFiori {
                             .'given method is false, then open the file \'WebFiori.php\' and '
                             .'change the code in the \'else\' code block at the end of class constructor. (Inside the "if" block).');
                     $j->add('powered-by', 'WebFiori Framework v'.Config::getVersion().' ('.Config::getVersionType().')');
-                    die($j);
+                    Response::append($j);
+                    Response::send();
                 } else {
                     $serviceUnavailable = new ServiceUnavailableView();
                     $serviceUnavailable->show(503);
@@ -534,11 +532,10 @@ class WebFiori {
                 fprintf(STDERR, "Error Line:      %5s %s\n",":",$errline);
                 
                 if (defined('STOP_CLI_ON_ERR') && STOP_CLI_ON_ERR === true) {
-                    SessionsManager::validateStorage();
                     exit(-1);
                 }
             } else if (defined('API_CALL')) {
-                header("HTTP/1.1 500 Server Error");
+                Response::setResponseCode(500);
                 $j = new JsonX([
                     'message' => $errstr,
                     'type' => Util::ERR_TYPES[$errno]['type'],
@@ -550,9 +547,9 @@ class WebFiori {
                     $j->add('file',$errfile);
                     $j->add('line',$errline);
                 }
-                header('content-type: application/json');
-                SessionsManager::validateStorage();
-                die($j);
+                Response::addHeader('content-type', 'application/json');
+                Response::append($j);
+                Response::send();
             } else {
                 $errBox = new ErrorBox();
                 $errBox->setError($errno);
@@ -560,7 +557,7 @@ class WebFiori {
                 $errBox->setFile($errfile);
                 $errBox->setMessage($errstr);
                 $errBox->setLine($errline);
-                echo $errBox;
+                Response::append($errBox);
             }
 
             return true;
@@ -569,13 +566,12 @@ class WebFiori {
     private function _setExceptionHandler() {
         set_exception_handler(function($ex)
         {
-            SessionsManager::validateStorage();
             $isCli = class_exists('webfiori\entity\cli\CLI') ? CLI::isCLI() : php_sapi_name() == 'cli';
 
             if ($isCli) {
                 CLI::displayException($ex);
             } else {
-                header("HTTP/1.1 500 Server Error");
+                Response::setResponseCode(500);
                 $routeUri = Router::getUriObjByURL(Util::getRequestedURL());
 
                 if ($routeUri !== null) {
@@ -610,8 +606,9 @@ class WebFiori {
                         }
                         $j->add('stack-trace',$stackTrace);
                     }
-                    header('content-type: application/json');
-                    die($j);
+                    Response::addHeader('content-type', 'application/json');
+                    Response::append($j);
+                    Response::send();
                 } else {
                     $exceptionView = new ServerErrView($ex);
                     $exceptionView->show(500);
@@ -628,7 +625,6 @@ class WebFiori {
         $this->_setExceptionHandler();
         register_shutdown_function(function()
         {
-            SessionsManager::validateStorage();
             
             $isCli = class_exists('webfiori\entity\cli\CLI') ? CLI::isCLI() : php_sapi_name() == 'cli';
             $error = error_get_last();
@@ -643,8 +639,8 @@ class WebFiori {
                     return;
                 }
 
-                if (!$isCli && !headers_sent()) {
-                    header("HTTP/1.1 500 Server Error");
+                if (!$isCli) {
+                    Response::setResponseCode(500);
                 }
 
                 if (defined('API_CALL')) {
@@ -655,7 +651,8 @@ class WebFiori {
                         'file' => $error["file"],
                         'line' => $error["line"]
                     ], true);
-                    die($j);
+                    Response::append($j);
+                    Response::send();
                 } else if ($isCli) {
                     CLI::displayErr($error['type'], $error["message"], $error["file"], $error["line"]);
                 } else {
@@ -679,4 +676,5 @@ if (CLI::isCLI() === true) {
 } else {
     //route user request.
     Router::route(Util::getRequestedURL());
+    Response::send();
 }

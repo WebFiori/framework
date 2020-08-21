@@ -27,6 +27,7 @@ namespace webfiori\entity;
 use jsonx\JsonI;
 use jsonx\JsonX;
 use webfiori\entity\exceptions\FileException;
+use webfiori\entity\Response;
 /**
  * A class that represents a file.
  * 
@@ -373,7 +374,8 @@ class File implements JsonI {
     /**
      * Returns MIME type of a file type.
      * 
-     * The method will try to find MIME type based on its extension. If 
+     * The method will try to find MIME type based on its extension. The method 
+     * will look for MIME in the constant File::MIME_TYPES.
      * 
      * @param string $ext File extension without the suffix (such as 'jpg').
      * 
@@ -452,10 +454,8 @@ class File implements JsonI {
         if ($this->rawData !== null) {
             if ($lower == 'e') {
                 return base64_encode($this->rawData);
-            } else {
-                if ($lower == 'd') {
-                    return base64_decode($this->rawData);
-                }
+            } else if ($lower == 'd') {
+                return base64_decode($this->rawData);
             }
         }
 
@@ -566,7 +566,7 @@ class File implements JsonI {
      * 
      * @since 1.0
      */
-    public function setID($id) {
+    public function setId($id) {
         $this->id = $id;
     }
     /**
@@ -665,16 +665,16 @@ class File implements JsonI {
             $this->read();
         } catch (FileException $ex) {
         }
-        $jsonX = new JsonX();
-        $jsonX->add('id', $this->getID());
-        $jsonX->add('mime', $this->getFileMIMEType());
-        $jsonX->add('name', $this->getName());
-        $jsonX->add('directory', $this->getDir());
-        $jsonX->add('sizeInBytes', $this->getSize());
-        $jsonX->add('sizeInKBytes', $this->getSize() / 1024);
-        $jsonX->add('sizeInMBytes', ($this->getSize() / 1024) / 1024);
+        return new JsonX([
+            'id' => $this->getID(),
+            'mime' => $this->getFileMIMEType(),
+            'name' => $this->getName(),
+            'directory' => $this->getDir(),
+            'sizeInBytes' => $this->getSize(),
+            'sizeInKBytes' => $this->getSize() / 1024,
+            'sizeInMBytes' => ($this->getSize() / 1024) / 1024
+        ]);
 
-        return $jsonX;
     }
     /**
      * Display the file. 
@@ -850,8 +850,8 @@ class File implements JsonI {
         $contentType = $this->getFileMIMEType();
 
         if ($contentType !== null) {
-            header("Accept-Ranges: bytes");
-            header('Content-Type:'.$contentType);
+            Response::addHeader('Accept-Ranges', 'bytes');
+            Response::addHeader('content-type', $contentType);
 
             if (isset($_SERVER['HTTP_RANGE'])) {
                 $range = filter_var($_SERVER['HTTP_RANGE']);
@@ -862,19 +862,19 @@ class File implements JsonI {
                     $expl[1] = $this->getSize();
                 }
                 $this->read($expl[0], $expl[1]);
-                header('HTTP/1.1 206 Partial Content');
-                header('Content-Range: bytes '.$expl[0].'-'.$expl[1].'/'.$this->getSize());
-                header('Content-Length: '.($expl[1] - $expl[0]));
+                Response::setResponseCode(206);
+                Response::addHeader('content-range', 'bytes '.$expl[0].'-'.$expl[1].'/'.$this->getSize());
+                Response::addHeader('content-length', $expl[1] - $expl[0]);
             } else {
-                header('Content-Length: '.$this->getSize());
+                Response::addHeader('Content-Length', $this->getSize());
             }
 
             if ($asAttachment === true) {
-                header('Content-Disposition: attachment; filename="'.$this->getName().'"');
+                Response::addHeader('Content-Disposition', 'attachment; filename="'.$this->getName().'"');
             } else {
-                header('Content-Disposition: inline; filename="'.$this->getName().'"');
+                Response::addHeader('Content-Disposition', 'inline; filename="'.$this->getName().'"');
             }
-            echo $this->getRawData();
+            Response::append($this->getRawData());
         } else {
             throw new FileException('MIME type of raw data is not set.');
         }

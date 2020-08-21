@@ -25,6 +25,7 @@
 namespace webfiori\entity\session;
 
 use webfiori\entity\cli\CLI;
+use webfiori\entity\Response;
 /**
  * A class which is used to manage user sessions.
  *
@@ -72,6 +73,16 @@ class SessionsManager {
     private function __construct() {
         $this->sesstionsArr = [];
         $this->sesstionStorage = new DefaultSessionStorage();
+    }
+    /**
+     * Reset sessions manager to defaults.
+     * 
+     * @since 1.0
+     */
+    public static function reset() {
+        self::_get()->sesstionsArr = [];
+        self::_get()->sesstionStorage = new DefaultSessionStorage();
+        self::_get()->activeSesstion = null;
     }
     /**
      * Saves the state of the active session and close it.
@@ -146,6 +157,26 @@ class SessionsManager {
         }
     }
     /**
+     * Returns an array that contains cookies headers values.
+     * 
+     * The returned values can be used to create cookies for sessions.
+     * 
+     * @return array The method will return an array that contains headers values 
+     * that can be used to create sessions cookies.
+     * 
+     * @since 1.0
+     */
+    public static function getCookiesHeaders() {
+        $sessions = self::getSessions();
+        $retVal = [];
+        
+        foreach ($sessions as $session) {
+            $retVal[] = $session->getCookieHeader();
+        }
+        
+        return $retVal;
+    }
+    /**
      * Returns the ID of a session from a cookie given its name.
      * 
      * @param string $sessionName The name of the session.
@@ -204,7 +235,7 @@ class SessionsManager {
      * 
      * @since 1.0
      */
-    public static function getSesstions() {
+    public static function getSessions() {
         return self::_get()->sesstionsArr;
     }
     /**
@@ -411,14 +442,8 @@ class SessionsManager {
                 $status == Session::STATUS_PAUSED ||  
                 $status == Session::STATUS_RESUMED) {
                 self::getStorage()->save($session->getId(), $session->serialize());
-            } else {
-                if ($status == Session::STATUS_KILLED) {
-                    self::getStorage()->remove($session->getId());
-                }
-            }
-
-            if (!CLI::isCLI()) {
-                header($session->getCookieHeader());
+            } else if ($status == Session::STATUS_KILLED) {
+                self::getStorage()->remove($session->getId());
             }
         }
         self::getStorage()->gc();
@@ -433,7 +458,6 @@ class SessionsManager {
      */
     private static function _checkAndLoadFromCookie($sName) {
         $sId = self::getSessionIDFromRequest($sName);
-
         if ($sId !== false) {
             $tempSesstion = new Session([
                 'session-id' => $sId,

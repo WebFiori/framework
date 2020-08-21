@@ -28,6 +28,7 @@ use phpStructs\html\HTMLNode;
 use phpStructs\html\JsCode;
 use webfiori\entity\Page;
 use webfiori\WebFiori;
+use webfiori\entity\Response;
 /**
  * A generic view for cron related operations. 
  * 
@@ -45,10 +46,12 @@ class CronView {
     public function __construct($title,$description = '') {
         if (Cron::password() != 'NO_PASSWORD' 
                 && $title != 'CRON Login' 
-                && WebFiori::getWebsiteController()->getSessionVar('cron-login-status') !== true) {
-            header('location: '.WebFiori::getSiteConfig()->getBaseURL().'cron/login');
+                && WebFiori::getWebsiteController()->getSession()->get('cron-login-status') !== true) {
+            Response::addHeader('location', WebFiori::getSiteConfig()->getBaseURL().'/cron/login');
+            Response::send();
         } else if ($title == 'CRON Login' && Cron::password() == 'NO_PASSWORD') {
-            header('location: '.WebFiori::getSiteConfig()->getBaseURL().'cron/jobs');
+            Response::addHeader('location', WebFiori::getSiteConfig()->getBaseURL().'/cron/jobs');
+            Response::send();
         }
         Page::title($title);
         Page::description($description);
@@ -95,7 +98,7 @@ class CronView {
                 .'     },60000)'."\n"
                 .' };'."\n"
                 );
-        Page::document()->getHeadNode()->addJs('https://cdn.jsdelivr.net/gh/usernane/AJAXRequestJs@1.1.0/AJAXRequest.js', [], false);
+        Page::document()->getHeadNode()->addJs('https://cdn.jsdelivr.net/gh/usernane/AJAXRequestJs@1.1.1/AJAXRequest.js', [], false);
         Page::document()->getHeadNode()->addJs('assets/js/cron.js');
         Page::document()->getHeadNode()->addCSS('assets/css/cron.css');
         Page::document()->getHeadNode()->addChild($jsCode);

@@ -29,6 +29,7 @@ use Throwable;
 use webfiori\entity\Page;
 use webfiori\entity\Util;
 use webfiori\WebFiori;
+use webfiori\entity\Response;
 /**
  * A page which is used to display exception information when it is thrown or 
  * any other errors.
@@ -60,7 +61,7 @@ class ServerErrView {
      * @since 1.0
      */
     public function show($responseCode = 500) {
-        http_response_code($responseCode);
+        Response::setResponseCode($responseCode);
 
         if (class_exists('phpStructs\html\HTMLNode')) {
             $this->_phpStructsExist($this->errOrThrowable);
@@ -68,7 +69,7 @@ class ServerErrView {
         } else {
             $this->_phpStructsDoesNotexist($this->errOrThrowable);
         }
-        die();
+        Response::send();
     }
     /**
      * 
@@ -93,13 +94,13 @@ class ServerErrView {
     private function _phpStructsDoesNotexist($throwableOrErr) {
         //this is a fall back if the library php-structs does not exist. 
         //Output HTML as string.
-        echo '<!DOCTYPE html>'
+        Response::append('<!DOCTYPE html>'
             .'<html>'
-            .'<head>';
+            .'<head>');
 
         if ($throwableOrErr instanceof Throwable) {
-            echo '<title>Uncaught Exception</title>'
-            .'<link href="'.Util::getBaseURL().'assets/css/server-err.css" rel="stylesheet">'
+            Response::append('<title>Uncaught Exception</title>'
+            .'<link href="'.Util::getBaseURL().'/assets/css/server-err.css" rel="stylesheet">'
             .'</head>'
             .'<body>'
             .'<h1>500 - Server Error: Uncaught Exception.</h1>'
@@ -107,21 +108,20 @@ class ServerErrView {
             .'<p>'
             .'<b class="nice-red mono">Exception Class:</b> <span class="mono">'.get_class($throwableOrErr)."</span><br/>"
             .'<b class="nice-red mono">Exception Message:</b> <span class="mono">'.$throwableOrErr->getMessage()."</span><br/>"
-            .'<b class="nice-red mono">Exception Code:</b> <span class="mono">'.$throwableOrErr->getCode()."</span><br/>";
-
+            .'<b class="nice-red mono">Exception Code:</b> <span class="mono">'.$throwableOrErr->getCode()."</span><br/>"); 
             if (defined('VERBOSE') && VERBOSE) {
-                echo '<b class="nice-red mono">File:</b> <span class="mono">'.$throwableOrErr->getFile()."</span><br/>"
+                Response::append('<b class="nice-red mono">File:</b> <span class="mono">'.$throwableOrErr->getFile()."</span><br/>"
                 .'<b class="nice-red mono">Line:</b> <span class="mono">'.$throwableOrErr->getLine()."</span><br>"
                 .'<b class="nice-red mono">Stack Trace:</b> '."<br/>"
                 .'</p>'
-                .'<pre>'.$throwableOrErr->getTraceAsString().'</pre>';
+                .'<pre>'.$throwableOrErr->getTraceAsString().'</pre>');
             } else {
                 $this->_showTip();
             }
-            echo '</body></html>';
+            Response::append('</body></html>');
         } else {
-            echo '<title>Server Error - 500</title>'
-                .'<link href="'.Util::getBaseURL().'assets/css/server-err.css" rel="stylesheet">'
+            Response::append('<title>Server Error - 500</title>'
+                .'<link href="'.Util::getBaseURL().'/assets/css/server-err.css" rel="stylesheet">'
                 .'</head>'
                 .'<body style="color:white;background-color:#1a000d;">'
                 .'<h1 style="color:#ff4d4d">500 - Server Error</h1>'
@@ -129,16 +129,16 @@ class ServerErrView {
                 .'<p>'
                 .'<b class="nice-red mono">Type:</b> <span class="mono">'.Util::ERR_TYPES[$throwableOrErr["type"]]['type']."</span><br/>"
                 .'<b class="nice-red mono">Description:</b> <span class="mono">'.Util::ERR_TYPES[$throwableOrErr["type"]]['description']."</span><br/>"
-                .'<b class="nice-red mono">Message:</b> <span class="mono">'.$throwableOrErr["message"]."</span><br>";
+                .'<b class="nice-red mono">Message:</b> <span class="mono">'.$throwableOrErr["message"]."</span><br>");
 
             if (defined('VERBOSE') && VERBOSE) {
-                echo '<b class="nice-red mono">File:</b> <span class="mono">'.$throwableOrErr["file"]."</span><br/>"
-                .'<b class="nice-red mono">Line:</b> <span class="mono">'.$throwableOrErr["line"]."</span><br/>" ;
+                Response::append('<b class="nice-red mono">File:</b> <span class="mono">'.$throwableOrErr["file"]."</span><br/>"
+                .'<b class="nice-red mono">Line:</b> <span class="mono">'.$throwableOrErr["line"]."</span><br/>");
             } else {
                 $this->_showTip();
             }
         }
-        echo '</body></html>';
+        Response::append('</body></html>');
     }
     private function _getSiteName() {
         $siteNames = WebFiori::getSiteConfig()->getWebsiteNames();
@@ -153,7 +153,7 @@ class ServerErrView {
         Page::title('Uncaught Exception');
         Page::siteName($this->_getSiteName());
         Page::separator(WebFiori::getSiteConfig()->getTitleSep());
-        Page::document()->getHeadNode()->addCSS(Util::getBaseURL().'assets/css/server-err.css',[],false);
+        Page::document()->getHeadNode()->addCSS(Util::getBaseURL().'/assets/css/server-err.css',[],false);
         $hNode = new HTMLNode('h1');
 
         if ($throwableOrErr instanceof Throwable) {
@@ -199,10 +199,10 @@ class ServerErrView {
                 .'the class "GlobalConstants"', false);
             Page::insert($paragraph);
         } else {
-            echo '<p class="mono"><b style="color:yellow">Tip</b>: To'
+            Response::append('<p class="mono"><b style="color:yellow">Tip</b>: To'
                 .' display more details about the error, '
                 .'define the constant "VERBOSE" and set its value to "true" in '
-                .'the class "GlobalConstants".</p>';
+                .'the class "GlobalConstants".</p>');
         }
     }
 }

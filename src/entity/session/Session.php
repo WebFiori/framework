@@ -289,7 +289,7 @@ class Session implements JsonI {
      * 
      * @return string The string that will be returned will have the following 
      * format: 
-     * 'Set-Cookie: &lt;cookie-name&gt;=&lt;val&gt;; expires=&lt;time&gt;; path=/ 
+     * '&lt;cookie-name&gt;=&lt;val&gt;; expires=&lt;time&gt;; path=/ 
      * SameSite=&lt;Lax|None|Strict&gt;'
      * 
      * @since 1.0
@@ -308,7 +308,7 @@ class Session implements JsonI {
         $name = $this->getName();
         $value = $this->getId();
 
-        return "Set-Cookie: $name=$value"
+        return "$name=$value"
                 ."$lifetime; "
                 ."path=".$cookieData['path']
                 . "$secure"
@@ -628,8 +628,9 @@ class Session implements JsonI {
         //Need to do more research about the security of this approach.
 
         $userAgent = isset($_SERVER['HTTP_USER_AGENT']) ? filter_var($_SERVER['HTTP_USER_AGENT'], FILTER_SANITIZE_STRING) : 'Other';
-
-        $key = $this->getId().$this->getIp().$userAgent;
+        //Shall we use IP address in key or not?
+        //It would add more security.
+        $key = $this->getId().$userAgent;
 
         $iv = substr(hash('sha256', $key), 0,16);
 
@@ -724,6 +725,20 @@ class Session implements JsonI {
         }
     }
     /**
+     * Sets the user that represents session user.
+     * 
+     * Note that the user will be set only if the session is active.
+     * 
+     * @param User $userObj An object of type 'User'.
+     * 
+     * @since 1.0
+     */
+    public function setUser($userObj) {
+        if ($userObj instanceof User && $this->isRunning()) {
+            $this->sesstionUser = $userObj;
+        }
+    }
+    /**
      * Resumes or starts new session.
      * 
      * This method works as follows, it tries to read a session from sessions 
@@ -785,21 +800,27 @@ class Session implements JsonI {
 
         if (in_array($cipherMeth, openssl_get_cipher_methods())) {
             $userAgent = isset($_SERVER['HTTP_USER_AGENT']) ? filter_var($_SERVER['HTTP_USER_AGENT'], FILTER_SANITIZE_STRING) : 'Other';
-
-            $key = $this->getId().$this->getIp().$userAgent;
+            
+            //Shall we use IP address in key or not?
+            //It would add more security. But the session will be invalid
+            //If user changes network.
+            $key = $this->getId().$userAgent;
 
             $iv = substr(hash('sha256', $key), 0,16);
             $encrypted = openssl_decrypt($serialized, $cipherMeth, $key,0, $iv);
-            $sesstionObj = unserialize($encrypted);
+            
+            if (strlen($encrypted) > 0) {
+                $sesstionObj = @unserialize($encrypted);
 
-            if ($sesstionObj instanceof Session) {
-                $this->sessionStatus = self::STATUS_RESUMED;
-                $this->_clone($sesstionObj);
+                if ($sesstionObj instanceof Session) {
+                    $this->sessionStatus = self::STATUS_RESUMED;
+                    $this->_clone($sesstionObj);
 
-                return true;
+                    return true;
+                }
             }
         } else {
-            $sesstionObj = unserialize($serialized);
+            $sesstionObj = @unserialize($serialized);
 
             if ($sesstionObj instanceof Session) {
                 $this->sessionStatus = self::STATUS_RESUMED;

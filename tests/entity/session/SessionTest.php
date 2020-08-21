@@ -163,23 +163,19 @@ class SessionTest extends TestCase {
             'name' => 'super-session'
         ]);
         $params = $s->getCookieParams();
-        $this->assertEquals('Set-Cookie: '
-                . 'super-session='.$s->getId().'; '
+        $this->assertEquals('super-session='.$s->getId().'; '
                 . 'expires='.date(DATE_COOKIE,$params['expires']).'; '
                 . 'path=/; Secure; HttpOnly; SameSite=Lax', $s->getCookieHeader());
         $s->setSameSite('none');
-        $this->assertEquals('Set-Cookie: '
-                . 'super-session='.$s->getId().'; '
+        $this->assertEquals('super-session='.$s->getId().'; '
                 . 'expires='.date(DATE_COOKIE,$params['expires']).'; '
                 . 'path=/; Secure; HttpOnly; SameSite=None', $s->getCookieHeader());
         $s->setSameSite(' strict');
-        $this->assertEquals('Set-Cookie: '
-                . 'super-session='.$s->getId().'; '
+        $this->assertEquals('super-session='.$s->getId().'; '
                 . 'expires='.date(DATE_COOKIE,$params['expires']).'; '
                 . 'path=/; Secure; HttpOnly; SameSite=Strict', $s->getCookieHeader());
         $s->setDuration(0);
-        $this->assertEquals('Set-Cookie: '
-                . 'super-session='.$s->getId().'; '
+        $this->assertEquals('super-session='.$s->getId().'; '
                 . 'path=/; Secure; HttpOnly; SameSite=Strict', $s->getCookieHeader());
     }
     /**

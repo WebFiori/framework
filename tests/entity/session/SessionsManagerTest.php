@@ -13,13 +13,16 @@ class SessionsManagerTest extends TestCase {
      * @test
      */
     public function test00() {
+        SessionsManager::reset();
+        $this->assertEquals(0, count(SessionsManager::getSessions()));
         $this->assertNull(SessionsManager::getActiveSession());
         $this->assertNull(SessionsManager::get('xyz'));
         $this->assertFalse(SessionsManager::remove('xyz'));
+        $this->assertFalse(SessionsManager::set('xyz','hello'));
         $this->assertNull(SessionsManager::pull('xyz'));
         
         SessionsManager::start('hello');
-        
+        $this->assertEquals(1, count(SessionsManager::getSessions()));
         $activeSesstion = SessionsManager::getActiveSession();
         $this->assertFalse($activeSesstion->isRefresh());
         $this->assertTrue($activeSesstion->isRunning());
@@ -114,5 +117,33 @@ class SessionsManagerTest extends TestCase {
         unset($_POST['my-s']);
         $_GET['my-s'] = 'super';
         $this->assertEquals('super', SessionsManager::getSessionIDFromRequest('my-s'));
+    }
+    /**
+     * @test
+     */
+    public function testClose00() {
+        SessionsManager::pauseAll();
+        $this->assertNull(SessionsManager::getActiveSession());
+        SessionsManager::start('xyz');
+        $this->assertNotNull(SessionsManager::getActiveSession());
+        SessionsManager::close();
+        $this->assertNull(SessionsManager::getActiveSession());
+        SessionsManager::start('xyz');
+        $this->assertEquals(Session::STATUS_RESUMED, SessionsManager::getActiveSession()->getStatus());
+        $oldId = SessionsManager::getActiveSession()->getId();
+        SessionsManager::newId();
+        $this->assertNotEquals($oldId, SessionsManager::getActiveSession()->getId());
+    }
+    /**
+     * @test
+     * @depends testClose00
+     */
+    public function testCookiesHeaders() {
+        SessionsManager::reset();
+        SessionsManager::start('hello');
+        $sessions = SessionsManager::getSessions();
+        $this->assertEquals([
+            'hello='.$sessions[0]->getId().'; expires='.date(DATE_COOKIE, $sessions[0]->getCookieParams()['expires']).'; path=/; Secure; HttpOnly; SameSite=Lax' 
+            ], SessionsManager::getCookiesHeaders());
     }
 }

@@ -54,7 +54,7 @@ class CronAPIs extends ExtendedWebServices {
         $this->addAction($logoutService);
     }
     public function isAuthorized() {
-        return WebFiori::getWebsiteController()->getSessionVar('cron-login-status') === true;
+        return WebFiori::getWebsiteController()->getSession()->get('cron-login-status') === true;
     }
 
     public function processRequest() {
@@ -63,14 +63,14 @@ class CronAPIs extends ExtendedWebServices {
         if ($calledServiceName == 'login') {
             $this->_login();
         } else if ($calledServiceName == 'logout') {
-            WebFiori::getWebsiteController()->setSessionVar('cron-login-status',false);
+            WebFiori::getWebsiteController()->getSession()->set('cron-login-status',false);
             $this->sendResponse('Logged out.', 'info');
         } else if ($calledServiceName == 'force-execution') {
             $this->_forceExecution();
         }
     }
     private function _forceExecution() {
-        $jobName = $this->getInputs()['job-name'];
+        $jobName = urldecode($this->getInputs()['job-name']);
         $result = Cron::run('', $jobName, true);
 
         if (gettype($result) == 'array') {
@@ -81,8 +81,14 @@ class CronAPIs extends ExtendedWebServices {
             $infoJ->add('failed', $result['failed']);
             $infoJ->addArray('log', Cron::getLogArray());
             $this->sendResponse('Job Successfully Executed.', 'info', 200, $infoJ);
+        } else if ($result == 'JOB_NOT_FOUND'){
+            $infoJ = new JsonX([
+                'message' => 'No job was found which has the name "'.$jobName.'".',
+                'type' => self::E
+            ]);
+            $this->send('application/json',$infoJ, 404);
         } else {
-            $this->sendResponse($result, 'info', 404);
+            $this->sendResponse($result, self::E, 404);
         }
     }
     private function _login() {
@@ -92,7 +98,7 @@ class CronAPIs extends ExtendedWebServices {
             $inputHash = hash('sha256', $this->getInputs()['password']);
 
             if ($inputHash == $cronPass) {
-                WebFiori::getWebsiteController()->setSessionVar('cron-login-status', true);
+                WebFiori::getWebsiteController()->getSession()->set('cron-login-status', true);
                 $this->sendResponse('Success', 'info', 200);
             } else {
                 $this->sendResponse('Incorrect password', 'error', 404);

@@ -665,7 +665,7 @@ class File implements JsonI {
             $this->read();
         } catch (FileException $ex) {
         }
-        $jsonX = new JsonX([
+        return new JsonX([
             'id' => $this->getID(),
             'mime' => $this->getFileMIMEType(),
             'name' => $this->getName(),
@@ -675,7 +675,6 @@ class File implements JsonI {
             'sizeInMBytes' => ($this->getSize() / 1024) / 1024
         ]);
 
-        return $jsonX;
     }
     /**
      * Display the file. 

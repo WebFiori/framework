@@ -628,8 +628,9 @@ class Session implements JsonI {
         //Need to do more research about the security of this approach.
 
         $userAgent = isset($_SERVER['HTTP_USER_AGENT']) ? filter_var($_SERVER['HTTP_USER_AGENT'], FILTER_SANITIZE_STRING) : 'Other';
-
-        $key = $this->getId().$this->getIp().$userAgent;
+        //Shall we use IP address in key or not?
+        //It would add more security.
+        $key = $this->getId().$userAgent;
 
         $iv = substr(hash('sha256', $key), 0,16);
 
@@ -799,14 +800,17 @@ class Session implements JsonI {
 
         if (in_array($cipherMeth, openssl_get_cipher_methods())) {
             $userAgent = isset($_SERVER['HTTP_USER_AGENT']) ? filter_var($_SERVER['HTTP_USER_AGENT'], FILTER_SANITIZE_STRING) : 'Other';
-
-            $key = $this->getId().$this->getIp().$userAgent;
+            
+            //Shall we use IP address in key or not?
+            //It would add more security. But the session will be invalid
+            //If user changes network.
+            $key = $this->getId().$userAgent;
 
             $iv = substr(hash('sha256', $key), 0,16);
             $encrypted = openssl_decrypt($serialized, $cipherMeth, $key,0, $iv);
             
             if (strlen($encrypted) > 0) {
-                $sesstionObj = unserialize($encrypted);
+                $sesstionObj = @unserialize($encrypted);
 
                 if ($sesstionObj instanceof Session) {
                     $this->sessionStatus = self::STATUS_RESUMED;
@@ -816,7 +820,7 @@ class Session implements JsonI {
                 }
             }
         } else {
-            $sesstionObj = unserialize($serialized);
+            $sesstionObj = @unserialize($serialized);
 
             if ($sesstionObj instanceof Session) {
                 $this->sessionStatus = self::STATUS_RESUMED;

@@ -121,6 +121,7 @@ class ControllerTest extends TestCase {
      * @test
      */
     public function testSetSessionVar00() {
+        \webfiori\entity\session\SessionsManager::reset();
         $func = new Controller();
         $this->assertFalse($func->setSessionVar(' ',null));
         $this->assertTrue($func->setSessionVar('hello',null));

@@ -493,7 +493,7 @@ class WebFiori {
             if ($routeUri->isDynamic()) {
                 // Only apply to dynamic resources.
                 if ($routeType == Router::API_ROUTE) {
-                    Response::setResponseCode(503);
+                    Response::setCode(503);
                     Response::addHeader('content-type', 'application/json');
                     $j = new JsonX([], true);
                     $j->add('message', '503 - Service Unavailable');
@@ -522,7 +522,7 @@ class WebFiori {
         set_error_handler(function($errno, $errstr, $errfile, $errline)
         {
             $isCli = class_exists('webfiori\entity\cli\CLI') ? CLI::isCLI() : http_response_code() === false;
-
+            Response::clear();
             if ($isCli) {
                 fprintf(STDERR, "\n<%s>\n",Util::ERR_TYPES[$errno]['type']);
                 fprintf(STDERR, "Error Message    %5s %s\n",":",$errstr);
@@ -535,7 +535,7 @@ class WebFiori {
                     exit(-1);
                 }
             } else if (defined('API_CALL')) {
-                Response::setResponseCode(500);
+                Response::setCode(500);
                 $j = new JsonX([
                     'message' => $errstr,
                     'type' => Util::ERR_TYPES[$errno]['type'],
@@ -567,11 +567,11 @@ class WebFiori {
         set_exception_handler(function($ex)
         {
             $isCli = class_exists('webfiori\entity\cli\CLI') ? CLI::isCLI() : php_sapi_name() == 'cli';
-
+            Response::clear();
             if ($isCli) {
                 CLI::displayException($ex);
             } else {
-                Response::setResponseCode(500);
+                Response::setCode(500);
                 $routeUri = Router::getUriObjByURL(Util::getRequestedURL());
 
                 if ($routeUri !== null) {
@@ -625,7 +625,7 @@ class WebFiori {
         $this->_setExceptionHandler();
         register_shutdown_function(function()
         {
-            
+            Response::clear();
             $isCli = class_exists('webfiori\entity\cli\CLI') ? CLI::isCLI() : php_sapi_name() == 'cli';
             $error = error_get_last();
 
@@ -640,7 +640,7 @@ class WebFiori {
                 }
 
                 if (!$isCli) {
-                    Response::setResponseCode(500);
+                    Response::setCode(500);
                 }
 
                 if (defined('API_CALL')) {

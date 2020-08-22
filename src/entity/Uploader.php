@@ -120,7 +120,7 @@ class Uploader implements JsonI {
      * Creates new instance of the class.
      * 
      * @param string $uploadPath A string that represents the location at 
-     * which files will be uploaded to. Default value is 'uploads'.
+     * which files will be uploaded to. Default value is 'app/storage/uploads'.
      * 
      * @param array $allowedTypes An array that contains allowed files types.
      * 
@@ -132,7 +132,7 @@ class Uploader implements JsonI {
         $this->setAssociatedFileName('files');
         
         if (strlen($uploadPath) == 0) {
-            $uploadPath = ROOT_DIR.DS.'uploads';
+            $uploadPath = ROOT_DIR.DS.'app'.DS.'storage'.DS.'uploads';
         }
         
         $this->setUploadDir($uploadPath);

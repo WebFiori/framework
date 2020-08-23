@@ -491,8 +491,8 @@ class AutoLoader {
         if (!$vendorFound && is_dir($vendorPath.$vendorFolderName)) {
             $vendorDirs[] = $vendorPath.$vendorFolderName;
         }
-
-        return $vendorDirs;
+        
+        return array_reverse($vendorDirs);
     }
     private function _loadClassHelper($className, $classWithNs, $value, $appendRoot, $allPaths) {
         $loaded = false;

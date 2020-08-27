@@ -862,7 +862,7 @@ class File implements JsonI {
                     $expl[1] = $this->getSize();
                 }
                 $this->read($expl[0], $expl[1]);
-                Response::setResponseCode(206);
+                Response::setCode(206);
                 Response::addHeader('content-range', 'bytes '.$expl[0].'-'.$expl[1].'/'.$this->getSize());
                 Response::addHeader('content-length', $expl[1] - $expl[0]);
             } else {

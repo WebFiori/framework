@@ -1015,7 +1015,7 @@ class Router {
                 call_user_func($this->onNotFound);
             }
         } else if ($loadResource === true) {
-            Response::setResponseCode(418);
+            Response::setCode(418);
             Response::append(''
             .'<!DOCTYPE html>'
             .'<html>'
@@ -1126,7 +1126,7 @@ class Router {
      * @param RouterUri $uriObj
      */
     private function redirectToNonWWW($uriObj) {
-        Response::setResponseCode(301);
+        Response::setCode(301);
         $path = '';
 
         $host = substr($uriObj->getHost(), strpos($uriObj->getHost(), '.'));

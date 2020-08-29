@@ -201,13 +201,17 @@ class WebFiori {
         self::$AU = AutoLoader::get();
         InitAutoLoad::init();
         
+        $this->_setHandlers();
+        $this->_checkStandardLibs();
+        
         //Initialize privileges.
         //This step must be done before initializing any controler.
         InitPrivileges::init();
         
-        $this->_setHandlers();
-        $this->_checkStandardLibs();
 
+        //Initialize CLI
+        CLI::init();
+        
         self::$SF = ConfigController::get();
         self::$WF = WebsiteController::get();
         self::$BMF = EmailController::get();
@@ -225,9 +229,6 @@ class WebFiori {
             $this->dbErrDetails = $this->sysStatus;
             $this->sysStatus = Util::DB_NEED_CONF;
         }
-
-        //Initialize CLI
-        CLI::init();
 
         //Initialize routes.
         APIRoutes::create();

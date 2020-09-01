@@ -146,7 +146,7 @@ class Cron {
      * exist inside the folder 'app/jobs'.
      */
     private static function _registerJobs() {
-        if (CLI::isCLI() || (defined('') && CRON_THROUGH_HTTP === true)) {
+        if (CLI::isCLI() || (defined('CRON_THROUGH_HTTP') && CRON_THROUGH_HTTP === true)) {
             $jobsDir = ROOT_DIR.DS.'app'.DS.'jobs';
             if (Util::isDirectory($jobsDir)) {
                 $dirContent = array_diff(scandir($jobsDir), ['.','..']);

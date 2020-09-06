@@ -795,7 +795,7 @@ abstract class AbstractJob {
      * @return null|boolean
      */
     private function _callMethod($fName) {
-        Cron::log('Calling the method '.__CLASS__."::$fName()");
+        Cron::log('Calling the method '. get_class($this)."::$fName()");
         try {
             return $this->$fName();
         } catch (Exception $ex) {

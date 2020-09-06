@@ -26,26 +26,32 @@ namespace webfiori\entity\cli;
 
 use webfiori\entity\Util;
 use webfiori\ini\InitCliCommands;
-
+use webfiori\entity\cron\Cron;
+use Exception;
 /**
  * A class which adds basic support for running the framework through 
  * command line interface (CLI).
  * In addition to adding support for CLI, this class is used to register any 
  * custom commands which are created by developers. Also, it initialize some of 
  * the attributes of the framework in order to use it in CLI environment.
+ * 
  * @author Ibrahim
+ * 
  * @version 1.0.2
  */
 class CLI {
     /**
      * The command that will be executed now.
+     * 
      * @var CLICommand|null
+     * 
      * @since 1.0.2 
      */
     private $activeCommand;
     /**
      *
      * @var An associative array that contains supported commands. 
+     * 
      * @since 1.0.2
      */
     private $commands;
@@ -80,10 +86,15 @@ class CLI {
     }
     /**
      * Display PHP error information in CLI.
+     * 
      * @param int $errno Error number
+     * 
      * @param string $errstr The error as string.
+     * 
      * @param string $errfile The file at which the error has accrued in.
+     * 
      * @param int $errline Line number at which the error has accrued in.
+     * 
      * @since 1.0.2
      */
     public static function displayErr($errno, $errstr, $errfile, $errline) {
@@ -96,16 +107,23 @@ class CLI {
         fprintf(STDERR, "Error Number     %5s %s\n",":",$errno);
         fprintf(STDERR, "Error Description%5s %s\n",":",Util::ERR_TYPES[$errno]['description']);
         fprintf(STDERR, "Error File       %5s %s\n",":",$errfile);
-        fprintf(STDERR, "Error Line:      %5s %s\n",":",$errline);
-        
+        fprintf(STDERR, "Error Line      %5s %s\n",":",$errline);
+        Cron::log("<".Util::ERR_TYPES[$errno]['type'].">\n");
+        Cron::log("Error Message      : $errstr\n");
+        Cron::log("Error Number       : $errno\n");
+        Cron::log("Error Description  : ".Util::ERR_TYPES[$errno]['description']."\n");
+        Cron::log("Error File         : $errfile\n");
+        Cron::log("Error Line         : $errline\n");
         if (defined('STOP_CLI_ON_ERR') && STOP_CLI_ON_ERR === true) {
             exit(-1);
         }
     }
     /**
      * Display exception information in terminal.
+     * 
      * @param Exception $ex An exception which is thrown any time during 
      * program execution.
+     * 
      * @since 1.0.2
      */
     public static function displayException($ex) {
@@ -125,10 +143,20 @@ class CLI {
         fprintf(STDERR, "Line: %s\n",$ex->getLine());
         fprintf(STDERR, "Stack Trace:\n");
         fprintf(STDERR, $ex->getTraceAsString());
+        Cron::log("<Uncaught Exception>\n");
+        Cron::log("Exception Message    : ".$ex->getMessage()."\n");
+        Cron::log("Exception Class      : ".get_class($ex)."\n");
+        Cron::log("File                 : ".$ex->getMessage()."\n");
+        Cron::log("Line                 : ".$ex->getMessage()."\n");
+        Cron::log("Stack Trace          : \n");
+        foreach ($ex->getTrace() as $arrEntry) {
+            Cron::log($arrEntry."\n");
+        }
     }
     /**
      * The main aim of this method is to automatically register any commands which 
      * exist inside the folder 'app/commands'.
+     * 
      */
     private static function _autoRegister() {
         if (CLI::isCLI() || (defined('') && CRON_THROUGH_HTTP === true)) {
@@ -155,9 +183,11 @@ class CLI {
     }
     /**
      * Returns the command which is being executed.
+     * 
      * @return CLICommand|null If a command is requested and currently in execute 
      * stage, the method will return it as an object of type 'CLICommand'. If 
      * no command is active, the method will return null.
+     * 
      * @since 1.0.2
      */
     public static function getActiveCommand() {
@@ -165,9 +195,11 @@ class CLI {
     }
     /**
      * Returns an associative array of registered commands.
+     * 
      * @return array The method will return an associative array. The keys of 
      * the array are the names of the commands and the value of the key is 
      * an object of type 'CLICommand'.
+     * 
      * @since 1.0.2
      */
     public static function getRegisteredCommands() {
@@ -183,8 +215,10 @@ class CLI {
     /**
      * Checks if the framework is running through command line interface (CLI) or 
      * through a web server.
+     * 
      * @return boolean If the framework is running through a command line, 
      * the method will return true. False if not.
+     * 
      * @since 1.0
      */
     public static function isCLI() {
@@ -195,7 +229,9 @@ class CLI {
     }
     /**
      * Register new command.
+     * 
      * @param CLICommand $cliCommand The command that will be registered.
+     * 
      * @since 1.0.2
      */
     public static function register($cliCommand) {
@@ -205,11 +241,13 @@ class CLI {
     }
     /**
      * Register CLI commands.
+     * 
      * This method will register the commands which are bundled with the 
      * framework first. Once it is finished, it will register any commands which 
      * are created by the developer using the method InitCliCommands::init(). This 
      * method should be only used during initialization stage. Calling it again 
      * will have no effect.
+     * 
      * @since 1.0
      */
     public static function registerCommands() {
@@ -230,8 +268,10 @@ class CLI {
     }
     /**
      * Run the provided CLI command.
+     * 
      * @return int If the CLI is completed without any errors, the method will 
      * return 0. 
+     * 
      */
     public static function runCLI() {
         if ($_SERVER['argc'] == 1) {

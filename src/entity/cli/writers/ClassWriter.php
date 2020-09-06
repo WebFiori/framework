@@ -28,34 +28,43 @@ use webfiori\entity\File;
 /**
  * A utility class which is used as a helper class with the command 'create'.
  * This class can be used to write .php classes.
+ * 
  * @author Ibrahim
+ * 
  * @version 1.0
  */
 class ClassWriter {
     /**
-     * The generated query class as string.
+     * The generated class as string.
+     * 
      * @var string
+     * 
      * @since 1.0 
      */
     private $classAsStr;
     /**
-     * The name of the query class that will be created.
+     * The name of the class that will be created.
+     * 
      * @var string
+     * 
      * @since 1.0 
      */
     private $className;
     /**
-     * The namespace that the query class will belong to.
+     * The namespace that the class will belong to.
+     * 
      * @var string 
      */
     private $ns;
     /**
      * The location at which the entity class will be created on.
+     * 
      * @since 1.0 
      */
     private $path;
     /**
      * Creates new instance of the class.
+     * 
      * @param array $classInfoArr An associative array that contains the information 
      * of the class that will be created. The array must have the following indices: 
      * <ul>
@@ -63,8 +72,9 @@ class ClassWriter {
      * string 'NewClass' is used.</li>
      * <li><b>namespace</b>: The namespace that the class will belong to. If not provided, 
      * the namespace 'webfiori' is used.</li>
-     * <li><b>path</b>: The location at which the query will be created on. If not 
+     * <li><b>path</b>: The location at which the class will be created on. If not 
      * provided, the constant ROOT_DIR is used. </li>
+     * 
      * </ul>
      */
     public function __construct($classInfoArr) {
@@ -87,11 +97,14 @@ class ClassWriter {
         }
     }
     /**
-     * Appends a string to the string that represents the query class.
+     * Appends a string to the string that represents the body of the class.
+     * 
      * @param string $str The string that will be appended. At the end of the string 
      * a new line character will be appended.
+     * 
      * @param int $tapsCount The number of taps that will be added to the string. 
      * A tap is represented as 4 spaces.
+     * 
      * @since 1.0
      */
     public function append($str, $tapsCount = 0) {
@@ -105,23 +118,29 @@ class ClassWriter {
     }
     /**
      * Returns the name of the class that will be created.
+     * 
      * @return string The name of the class that will be created.
+     * 
      * @since 1.0
      */
     public function getName() {
         return $this->className;
     }
     /**
-     * Returns the namespace at which the generated query class will be added to.
-     * @return string The namespace at which the generated query class will be added to.
+     * Returns the namespace at which the generated class will be added to.
+     * 
+     * @return string The namespace at which the generated class will be added to.
+     * 
      * @since 1.0
      */
     public function getNamespace() {
         return $this->ns;
     }
     /**
-     * Returns the location at which the query class will be created on.
+     * Returns the location at which the class will be created on.
+     * 
      * @return string The location at which the query class will be created on.
+     * 
      * @since 1.0
      */
     public function getPath() {
@@ -129,12 +148,13 @@ class ClassWriter {
     }
     /**
      * Write the new class to a .php file.
+     * 
      * @since 1.0
      */
     public function writeClass() {
-        $queryFile = new File($this->className.'.php', $this->path);
-        $queryFile->remove();
-        $queryFile->setRawData($this->classAsStr);
-        $queryFile->write(false, true);
+        $classFile = new File($this->className.'.php', $this->path);
+        $classFile->remove();
+        $classFile->setRawData($this->classAsStr);
+        $classFile->write(false, true);
     }
 }

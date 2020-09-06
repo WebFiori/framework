@@ -27,10 +27,13 @@ namespace webfiori\entity\cli;
 use restEasy\WebServicesSet;
 /**
  * A class which is used to hold CLI created services temporary.
+ * 
  * This class does not hold any web services. The main aim of this class is 
  * to hold the services which are created using CLI and later on, create the 
  * actual class that contains the web services.
+ * 
  * @author Ibrahim
+ * 
  * @version 1.0
  */
 class ServicesHolder extends WebServicesSet {
@@ -47,6 +50,8 @@ class ServicesHolder extends WebServicesSet {
     }
     /**
      * Process the request.
+     * 
+     * Actually, this method does nothing.
      */
     public function processRequest() {
     }

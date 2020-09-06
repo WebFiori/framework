@@ -33,7 +33,9 @@ use webfiori\WebFiori;
  * A command which is used to add a database connection or SMTP account.
  *
  * @author Ibrahim
+ * 
  * @since 1.1.0
+ * 
  * @version 1.0
  */
 class AddCommand extends CLICommand {
@@ -42,6 +44,11 @@ class AddCommand extends CLICommand {
 
         ], 'Add a database connection or SMTP account.');
     }
+    /**
+     * Execute the command.
+     * 
+     * @return int
+     */
     public function exec() {
         $options = [
             'New database connection.',
@@ -53,14 +60,10 @@ class AddCommand extends CLICommand {
 
         if ($answer == 'New database connection.') {
             return $this->_addDbConnection();
-        } else {
-            if ($answer == 'New SMTP connection.') {
-                return $this->_addSmtp();
-            } else {
-                if ($answer == 'New website language.') {
-                    return $this->_addLang();
-                }
-            }
+        } else if ($answer == 'New SMTP connection.') {
+            return $this->_addSmtp();
+        } else if ($answer == 'New website language.') {
+            return $this->_addLang();
         }
 
         return 0;

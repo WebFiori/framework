@@ -32,11 +32,13 @@ use phMysql\MySQLQuery;
 /**
  * A class which is used to write query class from an instance of the class 
  * 'MySQLQuery'.
+ * 
  * This class is used to write new query class based on a temporary 
  * query object. It is used as a helper class if the command 'create' is executed 
  * from CLI and the option 'Query class' is selected. 
  *
  * @author Ibrahim
+ * 
  * @version 1.0
  */
 class QueryClassWriter extends ClassWriter {
@@ -59,6 +61,7 @@ class QueryClassWriter extends ClassWriter {
     private $queryObj;
     /**
      * Creates new instance of the class.
+     * 
      * @param MySQLQuery $queryObj An object of type 'MySQLQuery' which contains the 
      * information of the query class that will be created.
      * @param array $classInfoArr An associative array that contains the information 
@@ -81,8 +84,10 @@ class QueryClassWriter extends ClassWriter {
      * </ul>
      * </li>
      * </ul>
+     * 
      * @throws InvalidArgumentException If the first parameter is not an object of 
      * type 'MySQLQuery'.
+     * 
      * @since 1.0
      */
     public function __construct($queryObj, $classInfoArr) {
@@ -108,9 +113,12 @@ class QueryClassWriter extends ClassWriter {
     }
     /**
      * Returns the name entity class will be created.
+     * 
      * @return string|null If the entity class information is set, the method will 
      * return a string that represents the name of the entity class. 
+     * 
      * Other than that, the method will return null.
+     * 
      * @since 1.0
      */
     public function getEntityName() {
@@ -120,9 +128,11 @@ class QueryClassWriter extends ClassWriter {
     }
     /**
      * Returns the namespace that the associated entity class belongs to.
+     * 
      * @return string|null If the entity class information is set, the method will 
      * return a string that represents the namespace that the entity belongs to. 
      * Other than that, the method will return null.
+     * 
      * @since 1.0
      */
     public function getEntityNamespace() {
@@ -133,9 +143,11 @@ class QueryClassWriter extends ClassWriter {
 
     /**
      * Returns the location at which the entity class will be created on.
+     * 
      * @return string|null If the entity class information is set, the method will 
      * return a string that represents the path that the entity will be created on. 
      * Other than that, the method will return null.
+     * 
      * @since 1.0
      */
     public function getEntityPath() {
@@ -145,9 +157,11 @@ class QueryClassWriter extends ClassWriter {
     }
     /**
      * Write the query class.
+     * 
      * This method will first attempt to create the query class. If it was created, 
      * it will create the entity class which is associated with it (if any 
      * entity is associated).
+     * 
      * @since 1.0
      */
     public function writeClass() {

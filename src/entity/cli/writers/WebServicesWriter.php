@@ -43,8 +43,10 @@ class WebServicesWriter extends ClassWriter {
     private $servicesObj;
     /**
      * Creates new instance of the class.
+     * 
      * @param WebServicesSet $webServicesObj The object that will be written to the 
      * class.
+     * 
      * @param array $classInfoArr An associative array that contains the information 
      * of the class that will be created. The array must have the following indices: 
      * <ul>

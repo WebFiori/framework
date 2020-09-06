@@ -27,7 +27,7 @@ namespace webfiori\entity\ui;
 use phpStructs\html\HTMLNode;
 use webfiori\entity\Page;
 use webfiori\WebFiori;
-
+use webfiori\entity\Response;
 /**
  * A basic view which is used to display 404 HTTP error code and 
  * messages.
@@ -59,5 +59,7 @@ class NotFoundView {
      */
     public function display() {
         Page::render();
+        Response::setCode(404);
+        Response::send();
     }
 }

@@ -1056,7 +1056,7 @@ class Router {
         } else if ($loadResource === true) {
             throw new RoutingException('The resource "'.Util::getRequestedURL().'" was availble. '
                 .'but its route is not configured correctly. '
-                .'The resource which the route is pointing to was not found.');
+                .'The resource which the route is pointing to was not found ('.$file.').');
         }
     }
     /**

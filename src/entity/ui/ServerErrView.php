@@ -24,7 +24,7 @@
  */
 namespace webfiori\entity\ui;
 
-use phpStructs\html\HTMLNode;
+use webfiori\ui\HTMLNode;
 use Throwable;
 use webfiori\entity\Page;
 use webfiori\entity\Util;
@@ -63,7 +63,7 @@ class ServerErrView {
     public function show($responseCode = 500) {
         Response::setCode($responseCode);
 
-        if (class_exists('phpStructs\html\HTMLNode')) {
+        if (class_exists('webfiori\ui\HTMLNode')) {
             $this->_phpStructsExist($this->errOrThrowable);
             Page::render();
         } else {
@@ -190,7 +190,7 @@ class ServerErrView {
         }
     }
     private function _showTip() {
-        if (class_exists('phpStructs\html\HTMLNode')) {
+        if (class_exists('webfiori\ui\HTMLNode')) {
             $paragraph = new HTMLNode('p');
             $paragraph->setClassName('mono');
             $paragraph->addTextNode('<b style="color:yellow">Tip</b>: To'

@@ -24,7 +24,7 @@
  */
 namespace webfiori\entity\ui;
 
-use phpStructs\html\HTMLNode;
+use webfiori\ui\HTMLNode;
 use webfiori\entity\Util;
 /**
  * A fixed box which is used to show PHP warnings and notices.

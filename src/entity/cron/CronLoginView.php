@@ -24,9 +24,9 @@
  */
 namespace webfiori\entity\cron;
 
-use phpStructs\html\HTMLNode;
-use phpStructs\html\Input;
-use phpStructs\html\Label;
+use webfiori\ui\HTMLNode;
+use webfiori\ui\Input;
+use webfiori\ui\Label;
 use webfiori\entity\Page;
 use webfiori\WebFiori;
 use webfiori\entity\Response;

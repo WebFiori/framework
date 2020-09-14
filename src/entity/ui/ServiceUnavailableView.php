@@ -25,8 +25,8 @@
  */
 namespace webfiori\entity\ui;
 
-use phpStructs\html\HTMLNode;
-use phpStructs\html\UnorderedList;
+use webfiori\ui\HTMLNode;
+use webfiori\ui\UnorderedList;
 use webfiori\conf\Config;
 use webfiori\entity\Page;
 

@@ -24,8 +24,8 @@
  */
 namespace webfiori\entity\mail;
 
-use phpStructs\html\HTMLDoc;
-use phpStructs\html\HTMLNode;
+use webfiori\ui\HTMLDoc;
+use webfiori\ui\HTMLNode;
 use webfiori\conf\MailConfig;
 use webfiori\entity\exceptions\SMTPException;
 use webfiori\entity\File;

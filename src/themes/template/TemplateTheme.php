@@ -1,7 +1,7 @@
 <?php
 
-use phpStructs\html\HeadNode;
-use phpStructs\html\HTMLNode;
+use webfiori\ui\HeadNode;
+use webfiori\ui\HTMLNode;
 use webfiori\conf\SiteConfig;
 use webfiori\entity\Page;
 use webfiori\entity\Theme;

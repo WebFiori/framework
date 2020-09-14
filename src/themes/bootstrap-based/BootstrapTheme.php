@@ -1,9 +1,9 @@
 <?php
 namespace webfiori\theme;
 
-use phpStructs\html\HeadNode;
-use phpStructs\html\HTMLNode;
-use phpStructs\html\ListItem;
+use webfiori\ui\HeadNode;
+use webfiori\ui\HTMLNode;
+use webfiori\ui\ListItem;
 use webfiori\entity\Page;
 use webfiori\entity\Theme;
 /**

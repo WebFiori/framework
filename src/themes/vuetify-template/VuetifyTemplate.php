@@ -1,10 +1,10 @@
 <?php
 use webfiori\entity\Theme;
-use phpStructs\html\HTMLNode;
+use webfiori\ui\HTMLNode;
 use webfiori\entity\Page;
-use phpStructs\html\HeadNode;
+use webfiori\ui\HeadNode;
 use jsonx\JsonX;
-use phpStructs\html\JsCode;
+use webfiori\ui\JsCode;
 use webfiori\entity\Util;
 use webfiori\WebFiori;
 

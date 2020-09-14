@@ -2,7 +2,7 @@
 namespace webfiori\tests\entity;
 use PHPUnit\Framework\TestCase;
 use webfiori\entity\Page;
-use phpStructs\html\HTMLNode;
+use webfiori\ui\HTMLNode;
 use webfiori\entity\Theme;
 use webfiori\entity\i18n\Language;
 use webfiori\conf\SiteConfig;

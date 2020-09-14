@@ -26,7 +26,7 @@ namespace webfiori\entity;
 
 use jsonx\JsonI;
 use jsonx\JsonX;
-use phpStructs\html\HTMLNode;
+use webfiori\ui\HTMLNode;
 use ReflectionClass;
 use webfiori\conf\SiteConfig;
 /**

@@ -24,11 +24,11 @@
  */
 namespace webfiori\entity\cron;
 
-use phpStructs\html\HTMLNode;
-use phpStructs\html\JsCode;
-use phpStructs\html\PNode;
-use phpStructs\html\TableCell;
-use phpStructs\html\TableRow;
+use webfiori\ui\HTMLNode;
+use webfiori\ui\JsCode;
+use webfiori\ui\PNode;
+use webfiori\ui\TableCell;
+use webfiori\ui\TableRow;
 use webfiori\entity\Page;
 use webfiori\entity\router\Router;
 use webfiori\WebFiori;

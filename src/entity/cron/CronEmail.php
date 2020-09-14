@@ -24,8 +24,8 @@
  */
 namespace webfiori\entity\cron;
 
-use phpStructs\html\HTMLNode;
-use phpStructs\html\TableRow;
+use webfiori\ui\HTMLNode;
+use webfiori\ui\TableRow;
 use webfiori\entity\File;
 use webfiori\entity\mail\EmailMessage;
 use webfiori\WebFiori;

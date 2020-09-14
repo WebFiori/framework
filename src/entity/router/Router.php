@@ -25,7 +25,7 @@
 namespace webfiori\entity\router;
 
 use jsonx\JsonX;
-use phpStructs\html\HTMLNode;
+use webfiori\ui\HTMLNode;
 use restEasy\WebServicesSet;
 use webfiori\conf\SiteConfig;
 use webfiori\entity\cli\CLI;

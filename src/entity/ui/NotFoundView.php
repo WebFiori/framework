@@ -24,7 +24,7 @@
  */
 namespace webfiori\entity\ui;
 
-use phpStructs\html\HTMLNode;
+use webfiori\ui\HTMLNode;
 use webfiori\entity\Page;
 use webfiori\WebFiori;
 use webfiori\entity\Response;

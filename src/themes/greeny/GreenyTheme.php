@@ -1,8 +1,8 @@
 <?php
 namespace webfiori\theme;
 
-use phpStructs\html\HeadNode;
-use phpStructs\html\HTMLNode;
+use webfiori\ui\HeadNode;
+use webfiori\ui\HTMLNode;
 use webfiori\conf\Config;
 use webfiori\conf\SiteConfig;
 use webfiori\entity\Page;

@@ -1,14 +1,14 @@
 <?php
 namespace webfiori\theme;
 
-use phpStructs\html\Anchor;
-use phpStructs\html\HeadNode;
-use phpStructs\html\HTMLNode;
-use phpStructs\html\Input;
-use phpStructs\html\Label;
-use phpStructs\html\ListItem;
-use phpStructs\html\PNode;
-use phpStructs\html\UnorderedList;
+use webfiori\ui\Anchor;
+use webfiori\ui\HeadNode;
+use webfiori\ui\HTMLNode;
+use webfiori\ui\Input;
+use webfiori\ui\Label;
+use webfiori\ui\ListItem;
+use webfiori\ui\PNode;
+use webfiori\ui\UnorderedList;
 use webfiori\conf\Config;
 use webfiori\conf\SiteConfig;
 use webfiori\entity\Page;

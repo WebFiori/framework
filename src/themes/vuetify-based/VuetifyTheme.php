@@ -2,10 +2,10 @@
 namespace webfiori\theme\vutifyTheme;
 
 use jsonx\JsonX;
-use phpStructs\html\Anchor;
-use phpStructs\html\HeadNode;
-use phpStructs\html\HTMLNode;
-use phpStructs\html\JsCode;
+use webfiori\ui\Anchor;
+use webfiori\ui\HeadNode;
+use webfiori\ui\HTMLNode;
+use webfiori\ui\JsCode;
 use webfiori\entity\Page;
 use webfiori\entity\Theme;
 use webfiori\WebFiori;

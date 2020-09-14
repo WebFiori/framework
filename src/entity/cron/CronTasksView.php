@@ -24,12 +24,12 @@
  */
 namespace webfiori\entity\cron;
 
-use phpStructs\html\HTMLNode;
-use phpStructs\html\Input;
-use phpStructs\html\Label;
-use phpStructs\html\PNode;
-use phpStructs\html\TableCell;
-use phpStructs\html\TableRow;
+use webfiori\ui\HTMLNode;
+use webfiori\ui\Input;
+use webfiori\ui\Label;
+use webfiori\ui\PNode;
+use webfiori\ui\TableCell;
+use webfiori\ui\TableRow;
 use webfiori\entity\File;
 use webfiori\entity\Page;
 use webfiori\WebFiori;

@@ -1,11 +1,11 @@
 <?php
 namespace webfiori\theme;
 
-use phpStructs\html\Anchor;
-use phpStructs\html\HeadNode;
-use phpStructs\html\HTMLNode;
-use phpStructs\html\ListItem;
-use phpStructs\html\UnorderedList;
+use webfiori\ui\Anchor;
+use webfiori\ui\HeadNode;
+use webfiori\ui\HTMLNode;
+use webfiori\ui\ListItem;
+use webfiori\ui\UnorderedList;
 use webfiori\entity\Page;
 use webfiori\entity\Theme;
 use webfiori\WebFiori;
@@ -45,7 +45,7 @@ class WebFioriV108 extends Theme {
             ]);
             Page::document()->getBody()->addChild($img);
             Page::beforeRender(function(){
-                $js = new \phpStructs\html\JsCode();
+                $js = new \webfiori\ui\JsCode();
                 $js->addCode("window.Prism = window.Prism || {};");
                 Page::document()->getHeadNode()->addChild($js);
             });

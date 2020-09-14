@@ -26,9 +26,9 @@ namespace webfiori\entity;
 
 use Exception;
 use jsonx\JsonX;
-use phpStructs\html\HeadNode;
-use phpStructs\html\HTMLDoc;
-use phpStructs\html\HTMLNode;
+use webfiori\ui\HeadNode;
+use webfiori\ui\HTMLDoc;
+use webfiori\ui\HTMLNode;
 use webfiori\conf\SiteConfig;
 use webfiori\entity\exceptions\UIException;
 use webfiori\entity\i18n\Language;

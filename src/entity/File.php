@@ -24,8 +24,8 @@
  */
 namespace webfiori\entity;
 
-use jsonx\JsonI;
-use jsonx\JsonX;
+use webfiori\json\JsonI;
+use webfiori\json\Json;
 use webfiori\entity\exceptions\FileException;
 use webfiori\entity\Response;
 /**
@@ -651,7 +651,7 @@ class File implements JsonI {
     /**
      * Returns a JSON string that represents the file.
      * 
-     * @return JsonX An object of type 'JsonX' that contains file information. 
+     * @return Json An object of type 'Json' that contains file information. 
      * The object will have the following information:<br/>
      * <b>{<br/>&nbsp;&nbsp;"id":"",<br/>&nbsp;&nbsp;"mime":"",<br/>&nbsp;&nbsp;"name":"",<br/>
      * &nbsp;&nbsp;"path":"",<br/>&nbsp;&nbsp;"sizeInBytes":"",<br/>&nbsp;&nbsp;"sizeInKBytes":"",<br/>
@@ -665,7 +665,7 @@ class File implements JsonI {
             $this->read();
         } catch (FileException $ex) {
         }
-        return new JsonX([
+        return new Json([
             'id' => $this->getID(),
             'mime' => $this->getFileMIMEType(),
             'name' => $this->getName(),

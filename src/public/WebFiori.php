@@ -23,7 +23,7 @@
  * THE SOFTWARE.
  */
 namespace webfiori;
-use jsonx\JsonX;
+use webfiori\json\Json;
 use webfiori\conf\Config;
 use webfiori\conf\MailConfig;
 use webfiori\conf\SiteConfig;
@@ -442,11 +442,15 @@ class WebFiori {
      * @since 1.3.5
      */
     private function _checkStandardLibs() {
-        if (!class_exists('phpStructs\Node')) {
-            throw new InitializationException("The standard library 'webfiori/php-structs' is missing.");
+        if (!class_exists('webfiori\collections\Node')) {
+            throw new InitializationException("The standard library 'webfiori/collections' is missing.");
+        }
+        
+        if (!class_exists('webfiori\ui\HTMLNode')) {
+            throw new InitializationException("The standard library 'webfiori/ui' is missing.");
         }
 
-        if (!class_exists('jsonx\JsonX')) {
+        if (!class_exists('webfiori\json\Json')) {
             throw new InitializationException("The standard library 'webfiori/jsonx' is missing.");
         }
 
@@ -496,7 +500,7 @@ class WebFiori {
                 if ($routeType == Router::API_ROUTE) {
                     Response::setCode(503);
                     Response::addHeader('content-type', 'application/json');
-                    $j = new JsonX([], true);
+                    $j = new Json([], true);
                     $j->add('message', '503 - Service Unavailable');
                     $j->add('type', 'error');
                     $j->add('description','This error means that the system is not configured yet. '
@@ -537,7 +541,7 @@ class WebFiori {
                 }
             } else if (defined('API_CALL')) {
                 Response::setCode(500);
-                $j = new JsonX([
+                $j = new Json([
                     'message' => $errstr,
                     'type' => Util::ERR_TYPES[$errno]['type'],
                     'description' => Util::ERR_TYPES[$errno]['description'],
@@ -582,7 +586,7 @@ class WebFiori {
                 }
 
                 if ($routeType == Router::API_ROUTE || defined('API_CALL')) {
-                    $j = new JsonX([
+                    $j = new Json([
                         'message' => '500 - Server Error: Uncaught Exception.',
                         'type' => 'error',
                         'exception-class' => get_class($ex),
@@ -593,7 +597,7 @@ class WebFiori {
                     if (defined('VERBOSE') && VERBOSE) {
                         $j->add('file', $ex->getFile());
                         $j->add('line', $ex->getLine());
-                        $stackTrace = new JsonX([], true);
+                        $stackTrace = new Json([], true);
                         $index = 0;
                         $trace = $ex->getTrace();
 
@@ -645,7 +649,7 @@ class WebFiori {
                 }
 
                 if (defined('API_CALL')) {
-                    $j = new JsonX([
+                    $j = new Json([
                         'message' => $error["message"],
                         'type' => 'error',
                         'error-number' => $error["type"],

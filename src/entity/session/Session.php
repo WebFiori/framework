@@ -24,8 +24,8 @@
  */
 namespace webfiori\entity\session;
 
-use jsonx\JsonI;
-use jsonx\JsonX;
+use webfiori\json\JsonI;
+use webfiori\json\Json;
 use webfiori\conf\SiteConfig;
 use webfiori\entity\exceptions\SessionException;
 use webfiori\entity\User;
@@ -761,14 +761,14 @@ class Session implements JsonI {
         }
     }
     /**
-     * Returns an object of type 'JsonX' that represents the session.
+     * Returns an object of type 'Json' that represents the session.
      * 
-     * @return JsonX
+     * @return Json
      * 
      * @since 1.0
      */
     public function toJSON() {
-        return new JsonX([
+        return new Json([
             'name' => $this->getName(),
             'startedAt' => $this->getStartedAt(),
             'duration' => $this->getDuration(),

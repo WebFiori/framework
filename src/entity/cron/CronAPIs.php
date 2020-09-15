@@ -24,7 +24,7 @@
  */
 namespace webfiori\entity\cron;
 
-use jsonx\JsonX;
+use webfiori\json\Json;
 use restEasy\APIAction;
 use restEasy\RequestParameter;
 use webfiori\entity\ExtendedWebServices;
@@ -74,7 +74,7 @@ class CronAPIs extends ExtendedWebServices {
         $result = Cron::run('', $jobName, true);
 
         if (gettype($result) == 'array') {
-            $infoJ = new JsonX([],true);
+            $infoJ = new Json([],true);
             $infoJ->add('jobs-count', $result['total-jobs']);
             $infoJ->add('executed-count', $result['executed-count']);
             $infoJ->add('successfully-completed', $result['successfully-completed']);
@@ -82,7 +82,7 @@ class CronAPIs extends ExtendedWebServices {
             $infoJ->addArray('log', Cron::getLogArray());
             $this->sendResponse('Job Successfully Executed.', 'info', 200, $infoJ);
         } else if ($result == 'JOB_NOT_FOUND'){
-            $infoJ = new JsonX([
+            $infoJ = new Json([
                 'message' => 'No job was found which has the name "'.$jobName.'".',
                 'type' => self::E
             ]);

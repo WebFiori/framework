@@ -3,7 +3,7 @@ use webfiori\entity\Theme;
 use webfiori\ui\HTMLNode;
 use webfiori\entity\Page;
 use webfiori\ui\HeadNode;
-use jsonx\JsonX;
+use webfiori\json\Json;
 use webfiori\ui\JsCode;
 use webfiori\entity\Util;
 use webfiori\WebFiori;
@@ -71,7 +71,7 @@ class VuetifyTemplate extends Theme {
     public function getHeadNode() {
         $node = new HeadNode();
         $lang = Page::translation();
-        $json = new JsonX();
+        $json = new Json();
         $langVars = $lang->getLanguageVars();
 
         foreach ($langVars as $key => $val) {

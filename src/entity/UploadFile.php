@@ -148,7 +148,7 @@ class UploadFile extends File {
     /**
      * Returns a JSON string that represents the file.
      * 
-     * @return JsonX An object of type 'JsonX' that contains file information. 
+     * @return Json An object of type 'Json' that contains file information. 
      * The object will have the following information:<br/>
      * <b>{<br/>&nbsp;&nbsp;"id":"",<br/>
      * &nbsp;&nbsp;"mime":"",<br/>

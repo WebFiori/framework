@@ -24,8 +24,8 @@
  */
 namespace webfiori\entity;
 
-use jsonx\JsonI;
-use jsonx\JsonX;
+use webfiori\json\JsonI;
+use webfiori\json\Json;
 /**
  * A class that represents a system user.
  * 
@@ -135,7 +135,7 @@ class User implements JsonI {
     /**
      * Returns a JSON string representation of the user.
      * 
-     * The JsonX object will create a JSON string which has the following 
+     * The Json object will create a JSON string which has the following 
      * format:
      * <p>{<br/>
      * &nbsp;&nbsp;"use-id":-1<br/>
@@ -493,9 +493,9 @@ class User implements JsonI {
         $this->userName = trim($username);
     }
     /**
-     * Returns a JsonX object that represents the user.
+     * Returns a Json object that represents the user.
      * 
-     * The JsonX object will create a JSON string which has the following 
+     * The Json object will create a JSON string which has the following 
      * format:
      * <p>{<br/>
      * &nbsp;&nbsp;"useId":-1<br/>
@@ -504,12 +504,12 @@ class User implements JsonI {
      * &nbsp;&nbsp;"username":""<br/>
      * }</p>
      * 
-     * @return JsonX An object of type JsonX.
+     * @return Json An object of type Json.
      * 
      * @since 1.0
      */
     public function toJSON() {
-        $json = new JsonX();
+        $json = new Json();
         $json->add('userId', $this->getID());
         $json->add('email', $this->getEmail());
         $json->add('displayName', $this->getDisplayName());

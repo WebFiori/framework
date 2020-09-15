@@ -25,7 +25,7 @@
 namespace webfiori\entity;
 
 use Exception;
-use jsonx\JsonX;
+use webfiori\json\Json;
 use webfiori\ui\HeadNode;
 use webfiori\ui\HTMLDoc;
 use webfiori\ui\HTMLNode;
@@ -740,11 +740,11 @@ class Page {
         $this->beforeRenderCallbacks = [function ()
         {
             $translation = Page::translation();
-            $jsonx = new JsonX();
-            $jsonx->addArray('vars', $translation->getLanguageVars(), true);
+            $json = new Json();
+            $json->addArray('vars', $translation->getLanguageVars(), true);
             $i18nJs = new HTMLNode('script');
             $i18nJs->setAttribute('type', 'text/javascript')
-                    ->text('window.i18n = '.$jsonx.';')
+                    ->text('window.i18n = '.$json.';')
                     ->setID('i18n');
             Page::get()->document()->getHeadNode()->addChild($i18nJs);
 

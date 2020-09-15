@@ -24,8 +24,8 @@
  */
 namespace webfiori\entity;
 
-use jsonx\JsonI;
-use jsonx\JsonX;
+use webfiori\json\JsonI;
+use webfiori\json\Json;
 /**
  * A helper class that is used to upload most types of files to the server's file system.
  * 
@@ -366,12 +366,12 @@ class Uploader implements JsonI {
     /**
      * Returns a JSON representation of the object.
      * 
-     * @return JsonX an object of type <b>JsonX</b>
+     * @return Json an object of type <b>Json</b>
      * 
      * @since 1.0
      */
     public function toJSON() {
-        $j = new JsonX();
+        $j = new Json();
         $j->add('uploadDirectory', $this->getUploadDir());
         $j->add('associatedFileName', $this->getAssociatedFileName());
         $j->add('allowedTypes', $this->getExts());

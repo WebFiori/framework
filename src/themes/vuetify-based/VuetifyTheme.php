@@ -1,7 +1,7 @@
 <?php
 namespace webfiori\theme\vutifyTheme;
 
-use jsonx\JsonX;
+use webfiori\json\Json;
 use webfiori\ui\Anchor;
 use webfiori\ui\HeadNode;
 use webfiori\ui\HTMLNode;
@@ -196,7 +196,7 @@ class VuetifyTheme extends Theme {
     public function getHeadNode() {
         $node = new HeadNode();
         $lang = Page::translation();
-        $json = new JsonX();
+        $json = new Json();
         $langVars = $lang->getLanguageVars();
 
         foreach ($langVars as $key => $val) {

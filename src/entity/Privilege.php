@@ -24,8 +24,8 @@
  */
 namespace webfiori\entity;
 
-use jsonx\JsonI;
-use jsonx\JsonX;
+use webfiori\json\JsonI;
+use webfiori\json\Json;
 /**
  * A class that represents a privilege.
  *
@@ -141,7 +141,7 @@ class Privilege implements JsonI {
         return false;
     }
     /**
-     * Returns an object of type JsonX that contains group info as JSON string.
+     * Returns an object of type Json that contains group info as JSON string.
      * 
      * The generated JSON string will have the following format:
      * <p>
@@ -152,7 +152,7 @@ class Privilege implements JsonI {
      * </p> 
      */
     public function toJSON() {
-        $j = new JsonX();
+        $j = new Json();
         $j->add('privilegeId', $this->getID());
         $j->add('name', $this->getName());
 

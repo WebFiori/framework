@@ -5,7 +5,7 @@ use PHPUnit\Framework\TestCase;
 use webfiori\entity\File;
 use webfiori\entity\exceptions\FileException;
 use webfiori\entity\Response;
-use jsonx\JsonX;
+use webfiori\json\Json;
 /**
  * A test class for testing the class 'webfiori\entity\File'.
  *
@@ -143,7 +143,7 @@ class FileTest extends TestCase {
                 . '"id":-1, '
                 . '"mime":"text\/plain", '
                 . '"name":"'.$file->getName().'", '
-                . '"directory":"'.JsonX::escapeJSONSpecialChars($file->getPath()).'", '
+                . '"directory":"'.Json::escapeJSONSpecialChars($file->getPath()).'", '
                 . '"sizeInBytes":12, '
                 . '"sizeInKBytes":0.01171875, '
                 . '"sizeInMBytes":1.1444091796875E-5'

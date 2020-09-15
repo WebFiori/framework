@@ -24,7 +24,7 @@
  */
 namespace webfiori\entity\router;
 
-use jsonx\JsonX;
+use webfiori\json\Json;
 use webfiori\ui\HTMLNode;
 use restEasy\WebServicesSet;
 use webfiori\conf\SiteConfig;
@@ -158,7 +158,7 @@ class Router {
                 $notFoundView = new NotFoundView();
                 $notFoundView->display();
             } else {
-                $json = new JsonX([
+                $json = new Json([
                     'message' => 'Requested resource was not found.',
                     'type' => 'error'
                 ]);

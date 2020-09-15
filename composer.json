@@ -13,7 +13,7 @@
         "webfiori/ui":"2.0.0",
         "webfiori/jsonx":"2.0.0",
         "webfiori/ph-mysql":"1.4.2",
-        "webfiori/rest-easy":"1.5.1"
+        "webfiori/rest-easy":"dev-json-support"
     },
     "keywords": [
         "framework",

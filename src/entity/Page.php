@@ -724,8 +724,9 @@ class Page {
         $footerNode = new HTMLNode();
         $footerNode->setID(self::MAIN_ELEMENTS[4]);
         $this->document->addChild($footerNode);
-
-        $langCode = WebFiori::getSysController()->getSessionLang();
+        
+        $session = WebFiori::getSysController()->getSession();
+        $langCode = $session !== null ? $session->getLangCode(true) : null;
 
         if ($langCode === null) {
             $langCode = WebFiori::getSiteConfig()->getPrimaryLanguage();

@@ -458,7 +458,7 @@ class WebFiori {
             throw new InitializationException("The standard library 'webfiori/ph-mysql' is missing.");
         }
 
-        if (!class_exists('restEasy\WebServicesSet')) {
+        if (!class_exists('webfiori\restEasy\WebServicesSet')) {
             throw new InitializationException("The standard library 'webfiori/rest-easy' is missing.");
         }
     }

@@ -26,6 +26,7 @@ namespace webfiori\entity\session;
 
 use webfiori\entity\File;
 use webfiori\entity\Util;
+use webfiori\entity\cli\CLI;
 /**
  * The default sessions storage engine.
  *
@@ -113,13 +114,15 @@ class DefaultSessionStorage implements SessionStorage {
      * 
      * @param Session $sessionId The session that will be stored.
      * 
-     * @param string $$session The session that will be stored.
+     * @param string $session The session that will be stored.
      * 
      * @since 1.0
      */
     public function save($sessionId, $session) {
-        $file = new File($sessionId, $this->storeLoc);
-        $file->setRawData($session);
-        $file->write(false, true);
+        if (!CLI::isCLI()) {
+            $file = new File($sessionId, $this->storeLoc);
+            $file->setRawData($session);
+            $file->write(false, true);
+        }
     }
 }

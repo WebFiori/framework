@@ -32,6 +32,7 @@ use webfiori\ui\HTMLNode;
 use webfiori\conf\SiteConfig;
 use webfiori\entity\exceptions\UIException;
 use webfiori\entity\i18n\Language;
+use webfiori\entity\session\SessionsManager;
 use webfiori\WebFiori;
 use webfiori\entity\Response;
 /**
@@ -725,7 +726,7 @@ class Page {
         $footerNode->setID(self::MAIN_ELEMENTS[4]);
         $this->document->addChild($footerNode);
         
-        $session = WebFiori::getSysController()->getSession();
+        $session = SessionsManager::getActiveSession();
         $langCode = $session !== null ? $session->getLangCode(true) : null;
 
         if ($langCode === null) {

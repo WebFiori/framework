@@ -142,7 +142,14 @@ class ServerErrView {
     }
     private function _getSiteName() {
         $siteNames = WebFiori::getSiteConfig()->getWebsiteNames();
-        $currentLang = WebFiori::getSysController()->getSessionLang();
+        $session = SessionsManager::getActiveSession();
+        
+        if ($session !== null) {
+            $currentLang = $session->getLangCode(true);
+        } else {
+            $currentLang = WebFiori::getSiteConfig()->getPrimaryLanguage();
+        }
+        
         if (isset($siteNames[$currentLang])) {
             return $siteNames[$currentLang];
         }

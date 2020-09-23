@@ -25,7 +25,7 @@
 namespace webfiori\entity\cron;
 
 use Exception;
-use phpStructs\Queue;
+use webfiori\collections\Queue;
 use webfiori\entity\router\Router;
 use webfiori\entity\cli\CLI;
 use webfiori\entity\Util;

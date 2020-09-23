@@ -26,7 +26,7 @@ namespace webfiori\entity\cron;
 
 use Error;
 use Exception;
-use phpStructs\Queue;
+use webfiori\collections\Queue;
 use webfiori\entity\exceptions\InvalidCRONExprException;
 /**
  * An abstract class that contains basic functionality for implementing cron 

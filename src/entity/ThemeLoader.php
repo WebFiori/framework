@@ -221,23 +221,34 @@ class ThemeLoader {
     }
     private static function createAssetsRoutes($themeDirName, $themeRootDir, $dir) {
         if (strlen($dir) != 0 && Util::isDirectory($themeRootDir.DS.$dir)) {
-            $filesInDir = array_diff(scandir($themeRootDir.DS.$dir), ['.','..']);
-
-            foreach ($filesInDir as $fileName) {
-                $fileExp = explode('.', $fileName);
-
-                if (count($fileExp) == 2 && (strtolower($fileExp[1]) == 'js' || strtolower($fileExp[1]) == 'css')) {
-                    Router::addRoute([
-                        'path' => $themeDirName.'/'.$fileName,
-                        'route-to' => self::THEMES_DIR.DS.$themeDirName.DS.$dir.DS.$fileName
-                    ]);
-                } else {
-                    Router::addRoute([
-                        'path' => $fileName,
-                        'route-to' => self::THEMES_DIR.DS.$themeDirName.DS.$dir.DS.$fileName
-                    ]);
-                }
-            }
+//            Router::closure([
+//                'path' => '{file-name}',
+//                'route-to' => function ($fileDir) {
+//                    $fileName = Router::getVarValue('file-name');
+//                    Util::print_r($fileName);
+//                    if (file_exists($fileDir.DS.$fileName)) {
+//                        $file = new File($fileDir.DS.$fileName);
+//                        $file->view();
+//                    }
+//                },
+//                'closure-params' => [
+//                    self::THEMES_DIR.DS.$themeDirName.DS.$dir.DS
+//                ]
+//            ]);
+            Router::closure([
+                'path' => $themeDirName.'/{file-name}',
+                'route-to' => function ($fileDir) {
+                    $fileName = Router::getVarValue('file-name');
+                    Util::print_r($fileName);
+                    if (file_exists($fileDir.DS.$fileName)) {
+                        $file = new File($fileDir.DS.$fileName);
+                        $file->view();
+                    }
+                },
+                'closure-params' => [
+                    self::THEMES_DIR.DS.$themeDirName.DS.$dir.DS
+                ]
+            ]);
         }
     }
 }

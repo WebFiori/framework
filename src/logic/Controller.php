@@ -26,7 +26,7 @@ namespace webfiori\logic;
 
 use phMysql\MySQLLink;
 use phMysql\MySQLQuery;
-use phpStructs\Stack;
+use webfiori\collections\Stack;
 use webfiori\conf\Config;
 use webfiori\entity\cli\CLI;
 use webfiori\entity\DBConnectionFactory;

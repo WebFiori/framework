@@ -1038,7 +1038,7 @@ class Router {
             $this->uriObj = $route;
 
             if ($loadResource === true) {
-                call_user_func($route->getRouteTo(),$route->getClosureParams());
+                call_user_func_array($route->getRouteTo(),$route->getClosureParams());
 
                 return;
             }

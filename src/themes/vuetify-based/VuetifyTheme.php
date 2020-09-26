@@ -99,19 +99,19 @@ class VuetifyTheme extends Theme {
         $node->setAttributes([
             'v-model' => 'drawer',
             'absolute',':right' => '$vuetify.rtl',
-            'temporary','fixed'])->addChild('v-img',false,[
+            'temporary','fixed'])->addChild('v-img',[
                 'src' => Page::imagesDir().'/side-nav.PNG',
                 ':aspect-ratio' => "16/9"
             ], false)->addChild('v-row', [
                 'class' => 'lightbox white--text pa-2 fill-height',
                 'align' => 'end'
-            ], false)->addChild('v-col', false)
-            ->addChild('div',false,['class'=>'subheading'])->text('Programming Academia')
+            ], false)->addChild('v-col',[] , false)
+            ->addChild('div',['class'=>'subheading'], false)->text('Programming Academia')
             ->getParent()->getParent()->getParent()->addChild('v-list', [
                 'dense','nav'
-            ], false)->addChild('v-list-item-group',false, [
+            ], false)->addChild('v-list-item-group', [
                 'active-class'=>'deep-purple--text text--accent-4'
-                ])->addChild($this->createHTMLNode([
+                ], false)->addChild($this->createHTMLNode([
             'type' => 'v-list-item',
             'title' => Page::translation()->get('side-menu/home'),
             'icon' => 'mdi-home'

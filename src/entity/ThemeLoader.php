@@ -239,14 +239,13 @@ class ThemeLoader {
                 'path' => $themeDirName.'/{file-name}',
                 'route-to' => function ($fileDir) {
                     $fileName = Router::getVarValue('file-name');
-                    Util::print_r($fileName);
                     if (file_exists($fileDir.DS.$fileName)) {
                         $file = new File($fileDir.DS.$fileName);
                         $file->view();
                     }
                 },
                 'closure-params' => [
-                    self::THEMES_DIR.DS.$themeDirName.DS.$dir.DS
+                    ROOT_DIR.DS.self::THEMES_DIR.DS.$themeDirName.DS.$dir
                 ]
             ]);
         }

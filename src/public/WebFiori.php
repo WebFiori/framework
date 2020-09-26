@@ -34,6 +34,7 @@ use webfiori\entity\router\APIRoutes;
 use webfiori\entity\router\ClosureRoutes;
 use webfiori\entity\router\OtherRoutes;
 use webfiori\entity\router\Router;
+use webfiori\entity\router\RouterUri;
 use webfiori\entity\router\ViewRoutes;
 use webfiori\entity\ThemeLoader;
 use webfiori\entity\Response;
@@ -229,16 +230,9 @@ class WebFiori {
             $this->dbErrDetails = $this->sysStatus;
             $this->sysStatus = Util::DB_NEED_CONF;
         }
-
-        //Initialize routes.
-        APIRoutes::create();
-        ViewRoutes::create();
-        ClosureRoutes::create();
-        OtherRoutes::create();
-        ThemeLoader::registerResourcesRoutes();
         
-        //initialize cron jobs
-        InitCron::init();
+        $this->_initRoutes();
+        $this->_initCRON();
 
         //class is now initialized
         self::$classStatus = 'INITIALIZED';
@@ -262,6 +256,22 @@ class WebFiori {
      */
     public static function configErr() {
         WebFiori::getAndStart()->_needConfigration();
+    }
+    private function _initRoutes() {
+        APIRoutes::create();
+        ViewRoutes::create();
+        ClosureRoutes::create();
+        OtherRoutes::create();
+        ThemeLoader::registerResourcesRoutes();
+    }
+    private function _initCRON() {
+        $uriObj = new RouterUri(Util::getRequestedURL(), function(){});
+        $pathArr = $uriObj->getPathArray();
+        if (CLI::isCLI() || (defined('CRON_THROUGH_HTTP') && CRON_THROUGH_HTTP && count($pathArr) != 0 && $pathArr[0] == 'cron')) {
+            //initialize cron jobs only if in CLI or cron is enabled throgh HTTP.
+            //
+            InitCron::init();
+        }
     }
     /**
      * Initiate the framework and return a single instance of the class that can 

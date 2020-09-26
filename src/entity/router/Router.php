@@ -26,7 +26,7 @@ namespace webfiori\entity\router;
 
 use webfiori\json\Json;
 use webfiori\ui\HTMLNode;
-use restEasy\WebServicesSet;
+use webfiori\restEasy\WebServicesManager;
 use webfiori\conf\SiteConfig;
 use webfiori\entity\cli\CLI;
 use webfiori\entity\exceptions\RoutingException;
@@ -951,7 +951,7 @@ class Router {
                 if (class_exists($constructor)) {
                     $instance = new $constructor();
 
-                    if ($instance instanceof WebServicesSet) {
+                    if ($instance instanceof WebServicesManager) {
                         if (!defined('API_CALL')) {
                             define('API_CALL', true);
                         }

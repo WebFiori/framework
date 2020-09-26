@@ -24,14 +24,14 @@
  */
 namespace webfiori\entity;
 
-use jsonx\JsonI;
-use jsonx\JsonX;
-use restEasy\WebServicesSet;
+use webfiori\json\JsonI;
+use webfiori\json\Json;
+use webfiori\restEasy\WebServicesManager;
 use webfiori\logic\Controller;
 use webfiori\entity\i18n\Language;
 use webfiori\WebFiori;
 /**
- * An extension for the class 'WebServicesSet' that adds support for multi-language 
+ * An extension for the class 'WebServicesManager' that adds support for multi-language 
  * response messages.
  * 
  * The language can be set by sending a GET or POST request that has the 
@@ -41,7 +41,7 @@ use webfiori\WebFiori;
  * 
  * @version 1.0.2
  */
-abstract class ExtendedWebServices extends WebServicesSet {
+abstract class ExtendedWebServicesManager extends WebServicesManager {
     /**
      * A constant that represents error message type.
      * 
@@ -181,8 +181,8 @@ abstract class ExtendedWebServices extends WebServicesSet {
      * In here, 'OTHER_DATA' can be a basic string.
      * Also, The response will sent HTTP code 404 - Not Found.
      * 
-     * @param JsonI|JsonX|Controller|string $info An object of type JsonI or 
-     * JsonX that describe the error in more details. Also it can be a simple string. 
+     * @param JsonI|Json|Controller|string $info An object of type JsonI or 
+     * Json that describe the error in more details. Also it can be a simple string. 
      * Also, this parameter can be a controller that contains database error 
      * information.
      * Note that the content of the field "message" might differ. It depends on 
@@ -196,7 +196,7 @@ abstract class ExtendedWebServices extends WebServicesSet {
         $message = $this->get('general/db-error');
         if ($info instanceof Controller) {
             $dbErr = $info->getDBErrDetails();
-            $json = new JsonX([
+            $json = new Json([
                 'error-message'=>$dbErr['error-message'],
                 'error-code'=>$dbErr['error-code']
             ]);

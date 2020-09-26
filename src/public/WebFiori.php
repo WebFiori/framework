@@ -2,7 +2,7 @@
 /*
  * The MIT License
  *
- * Copyright 2019 Ibrahim, WebFiori Framework.
+ * Copyright 2019, WebFiori Framework.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -458,7 +458,7 @@ class WebFiori {
             throw new InitializationException("The standard library 'webfiori/ph-mysql' is missing.");
         }
 
-        if (!class_exists('webfiori\restEasy\WebServicesSet')) {
+        if (!class_exists('webfiori\restEasy\WebServicesManager')) {
             throw new InitializationException("The standard library 'webfiori/rest-easy' is missing.");
         }
     }

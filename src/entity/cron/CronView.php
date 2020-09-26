@@ -2,7 +2,7 @@
 /*
  * The MIT License
  *
- * Copyright 2020 Ibrahim, WebFiori Framework.
+ * Copyright 2020, WebFiori Framework.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,6 +28,7 @@ use webfiori\ui\HTMLNode;
 use webfiori\ui\JsCode;
 use webfiori\entity\Page;
 use webfiori\WebFiori;
+use webfiori\entity\session\SessionsManager;
 use webfiori\entity\Response;
 /**
  * A generic view for cron related operations. 
@@ -44,12 +45,14 @@ class CronView {
      */
     private $controlsContainer;
     public function __construct($title,$description = '') {
+        $loginPageTitle = 'CRON Web Interface Login';
+        SessionsManager::start('cron-session');
         if (Cron::password() != 'NO_PASSWORD' 
-                && $title != 'CRON Login' 
-                && WebFiori::getWebsiteController()->getSession()->get('cron-login-status') !== true) {
+                && $title != $loginPageTitle
+                && SessionsManager::getActiveSession()->get('cron-login-status') !== true) {
             Response::addHeader('location', WebFiori::getSiteConfig()->getBaseURL().'/cron/login');
             Response::send();
-        } else if ($title == 'CRON Login' && Cron::password() == 'NO_PASSWORD') {
+        } else if ($title == $loginPageTitle && Cron::password() == 'NO_PASSWORD') {
             Response::addHeader('location', WebFiori::getSiteConfig()->getBaseURL().'/cron/jobs');
             Response::send();
         }
@@ -73,10 +76,10 @@ class CronView {
         $h1 = new HTMLNode('h1');
         $h1->addTextNode($title);
         Page::insert($h1);
-        $hr = new HTMLNode('hr',false);
+        $hr = new HTMLNode('hr');
         Page::insert($hr);
 
-        if (Cron::password() != 'NO_PASSWORD' && $title != 'CRON Login') {
+        if (Cron::password() != 'NO_PASSWORD' && $title != $loginPageTitle) {
             $this->controlsContainer->addTextNode('<button name="input-element" onclick="logout()"><b>Logout</b></button><br/>', false);
         }
         $jsCode = new JsCode();

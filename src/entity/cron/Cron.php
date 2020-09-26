@@ -2,7 +2,7 @@
 /*
  * The MIT License
  *
- * Copyright 2018 Ibrahim, WebFiori Framework.
+ * Copyright 2018, WebFiori Framework.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -33,6 +33,7 @@ use webfiori\WebFiori;
 use webfiori\entity\cli\CLICommand;
 /**
  * A class that is used to manage scheduled background jobs.
+ * 
  * It is used to create jobs, schedule them and execute them. In order to run 
  * the jobs automatically, the developer must add an entry in the following 
  * formate in crontab:
@@ -42,7 +43,9 @@ use webfiori\entity\cli\CLICommand;
  * If no password is set, then it can be removed from the command.
  * Note that the path to PHP executable might differ from "/usr/bin/php". 
  * It depends on where the executable has been installed.
+ * 
  * @author Ibrahim
+ * 
  * @version 1.0.9
  */
 class Cron {
@@ -53,54 +56,68 @@ class Cron {
     private $command;
     /**
      * The password that is used to access and execute jobs.
+     * 
      * @var string
+     * 
      * @since 1.0 
      */
     private $accessPass;
     /**
      * The job which is currently executing.
+     * 
      * @var CronJob|null
+     * 
      * @since 1.0.4 
      */
     private $activeJob;
     /**
      * A queue which contains all cron jobs.
+     * 
      * @var Queue 
+     * 
      * @since 1.0
      */
     private $cronJobsQueue;
     /**
      * An instance of 'CronExecuter'
+     * 
      * @var Cron 
+     * 
      * @since 1.0
      */
     private static $executer;
     /**
-     * A variable that is set to true if job execution log 
-     * is enabled.
+     * A variable that is set to true if job execution log is enabled.
+     * 
      * @var boolean
+     * 
      * @since 1.0.1 
      */
     private $isLogEnabled;
     /**
      *
      * @var type 
+     * 
      * @since 1.0.9
      */
     private $jobsNamesArr;
     /**
      * An array that contains strings which acts as log messages.
+     * 
      * @var array
+     * 
      * @since 1.0.8 
      */
     private $logsArray;
     /**
      * An array that contains current timestamp. 
+     * 
      * @var array 
      */
     private $timestamp;
     /**
      * Creates new instance of the class.
+     * 
      * @since 1.0
      */
     private function __construct() {
@@ -124,7 +141,7 @@ class Cron {
             ]);
             Router::addRoute([
                 'path' => '/cron/apis/{action}',
-                'route-to' => '/entity/cron/CronAPIs.php',
+                'route-to' => '/entity/cron/web-services/CronServicesManager.php',
                 'as-api' => true
             ]);
             Router::addRoute([
@@ -170,9 +187,11 @@ class Cron {
     }
     /**
      * Returns an object that represents the job which is currently being executed.
+     * 
      * @return CronJob|null If there is a job which is being executed, the 
-     * method will return an object of type 'CronJob' that represent it. If 
-     * no job is being executed, the method will return null.
+     * method will return an object of type 'CronJob' that represent it. 
+     * If no job is being executed, the method will return null.
+     * 
      * @since 1.0.4
      */
     public static function activeJob() {
@@ -180,19 +199,26 @@ class Cron {
     }
     /**
      * Creates new job using cron expression.
+     * 
      * The job will be created and scheduled only if the given cron expression 
      * is valid. For more information on cron expressions, go to 
      * https://en.wikipedia.org/wiki/Cron#CRON_expression. Note that 
      * the method does not support year field. This means 
      * the expression will have only 5 fields.
+     * 
      * @param string $when A cron expression.
-     * @param string $jobName An optional job name. 
+     * 
+     * @param string $jobName An optional job name.
+     *  
      * @param callable $function A function to run when it is the time to execute 
      * the job.
+     * 
      * @param array $funcParams An array of parameters that can be passed to the 
      * function. 
+     * 
      * @return boolean If the job was created and scheduled, the method will 
      * return true. Other than that, the method will return false.
+     * 
      * @since 1.0
      */
     public static function createJob($when = '*/5 * * * *',$jobName = '',$function = '',$funcParams = []) {
@@ -211,15 +237,21 @@ class Cron {
     }
     /**
      * Creates a daily job to execute every day at specific hour and minute.
+     * 
      * @param string $time A time in the form 'hh:mm'. hh can have any value 
      * between 0 and 23 inclusive. mm can have any value between 0 and 59 inclusive.
+     * 
      * @param string $name An optional name for the job. Can be null.
+     * 
      * @param callable $func A function that will be executed once it is the 
      * time to run the job.
+     * 
      * @param array $funcParams An optional array of parameters which will be passed to 
      * the callback that will be executed when its time to execute the job.
+     * 
      * @return boolean If the job was created and scheduled, the method will 
      * return true. Other than that, the method will return false.
+     * 
      * @since 1.0
      */
     public static function dailyJob($time,$name,$func,$funcParams = []) {
@@ -240,10 +272,13 @@ class Cron {
     }
     /**
      * Returns the number of current day in the current  month as integer.
+     * 
      * This method is used by the class 'CronJob' to validate cron job 
      * execution time.
+     * 
      * @return int An integer that represents current day number in 
      * the current month.
+     * 
      * @since 1.0.2
      */
     public static function dayOfMonth() {
@@ -251,11 +286,14 @@ class Cron {
     }
     /**
      * Returns the number of current day in the current  week as integer.
+     * 
      * This method is used by the class 'CronJob' to validate cron job 
      * execution time. The method will always return a value between 0 and 6 
      * inclusive. 0 Means Sunday and 6 is for Saturday.
+     * 
      * @return int An integer that represents current day number in 
      * the week.
+     * 
      * @since 1.0.2
      */
     public static function dayOfWeek() {
@@ -263,13 +301,17 @@ class Cron {
     }
     /**
      * Enable or disable logging for jobs execution. 
+     * 
      * This method is also used to check if logging is enabled or not. If 
      * execution log is enabled, a log file with the name 'cron.log' will be 
      * created in the folder '/logs'.
+     * 
      * @param boolean $bool If set to true, a log file that contains the details 
      * of the executed jobs will be created in 'logs' folder. Default value 
      * is null.
+     * 
      * @return boolean If logging is enabled, the method will return true.
+     * 
      * @since 1.0.1
      */
     public static function execLog($bool = null) {
@@ -281,10 +323,13 @@ class Cron {
     }
     /**
      * Returns a job given its name.
+     * 
      * @param string $jobName The name of the job.
+     * 
      * @return CronJob|null If a job which has the given name was found, 
      * the method will return an object of type 'CronJob' that represents 
      * the job. Other than that, the method will return null.
+     * 
      * @since 1.0.5
      */
     public static function getJob($jobName) {
@@ -311,7 +356,9 @@ class Cron {
     }
     /**
      * Returns an array that contains the names of scheduled jobs.
+     * 
      * @return array An array that contains the names of scheduled jobs.
+     * 
      * @since 1.0.9
      */
     public static function getJobsNames() {
@@ -319,9 +366,12 @@ class Cron {
     }
     /**
      * Returns the array that contains logged messages.
+     * 
      * The array will contain the messages which where logged using the method 
      * <code>Cron::log()</code>
+     * 
      * @return array An array of strings.
+     * 
      * @since 1.0.8
      */
     public static function getLogArray() {
@@ -329,9 +379,11 @@ class Cron {
     }
     /**
      * Returns the number of current hour in the day as integer.
+     * 
      * This method is used by the class 'CronJob' to validate cron job 
      * execution time. The method will always return a value between 0 and 23 
      * inclusive.
+     * 
      * @return int An integer that represents current hour number in 
      * the day.
      * @since 1.0.2
@@ -341,7 +393,9 @@ class Cron {
     }
     /**
      * Returns a queue of all queued jobs.
+     * 
      * @return Queue An object of type 'Queue' which contains all queued jobs.
+     * 
      * @since 1.0
      */
     public static function jobsQueue() {
@@ -349,11 +403,14 @@ class Cron {
     }
     /**
      * Appends a message to the array that contains logged messages.
+     * 
      * The main aim of the log is to help developers identify the issues which 
      * might cause a job to fail. This method can be called in any place to 
      * log a message while the code is executing.
+     * 
      * @param string $message A string that act as a log message. It will be 
      * appended as passed without any changes.
+     * 
      * @since 1.0.8
      */
     public static function log($message) {
@@ -365,11 +422,14 @@ class Cron {
     }
     /**
      * Returns the number of current minute in the current hour as integer.
+     * 
      * This method is used by the class 'CronJob' to validate cron job 
      * execution time. The method will always return a value between 0 and 59 
      * inclusive.
+     * 
      * @return int An integer that represents current minute number in 
      * the current hour.
+     * 
      * @since 1.0.2
      */
     public static function minute() {
@@ -377,9 +437,11 @@ class Cron {
     }
     /**
      * Returns the number of current month as integer.
+     * 
      * This method is used by the class 'CronJob' to validate cron job 
      * execution time. The method will always return a value between 1 and 12 
      * inclusive.
+     * 
      * @return int An integer that represents current month's number.
      * @since 1.0.2
      */
@@ -388,19 +450,26 @@ class Cron {
     }
     /**
      * Create a job that will be executed once every month.
+     * 
      * @param int $dayNumber The day of the month at which the job will be 
      * executed on. It can have any value between 1 and 31 inclusive.
+     * 
      * @param string $time A string that represents the time of the day that 
      * the job will execute on. The format of the time must be 'HH:MM'. where 
      * HH can have any value from '00' up to '23' and 'MM' can have any value 
      * from '00' up to '59'.
+     * 
      * @param string $name The name of cron job.
+     * 
      * @param callable $func A function that will be executed when its time to 
      * run the job.
+     * 
      * @param array $funcParams An optional array of parameters which will be 
      * passed to job function.
+     * 
      * @return boolean If the job was scheduled, the method will return true. 
      * If not, the method will return false.
+     * 
      * @since 1.0.3
      */
     public static function monthlyJob($dayNumber,$time,$name,$func,$funcParams = []) {
@@ -423,13 +492,17 @@ class Cron {
     }
     /**
      * Sets or gets the password that is used to protect the cron instance.
+     * 
      * The password is used to prevent unauthorized access to execute jobs. 
      * The provided password must be 'sha256' hashed string. It is recommended 
      * to hash the password externally then use the hash inside your code.
+     * 
      * @param string $pass If not null, the password will be updated to the 
      * given one.
+     * 
      * @return string If the password is set, the method will return it. 
      * If not set, the method will return the string 'NO_PASSWORD'.
+     * 
      * @since 1.0
      */
     public static function password($pass = null) {
@@ -441,16 +514,21 @@ class Cron {
     }
     /**
      * Check each scheduled job and run it if its time to run it.
+     * 
      * @param string $pass If cron password is set, this value must be 
      * provided. The given value will be hashed inside the body of the 
      * method and then compared with the password which was set. Default 
-     * is empty string
+     * is empty string.
+     * 
      * @param string|null $jobName An optional job name. If specified, only 
      * the given job will be checked. Default is null.
+     * 
      * @param boolean $force If this attribute is set to true and a job name 
      * was provided, the job will be forced to execute. Default is false.
+     * 
      * @param CronCommand $command If cron is run from CLI, this parameter is 
      * provided to set custom execution attributes of a job.
+     * 
      * @return string|array If cron password is set and the given one is 
      * invalid, the method will return the string 'INV_PASS'. If 
      * a job name is specified and no job was found which has the given 
@@ -465,6 +543,7 @@ class Cron {
      * <li><b>failed</b>: Number of jobs which did not 
      * finish successfully.</li>
      * </ul>
+     * 
      * @since 1.0.6
      */
     public static function run($pass = '',$jobName = null,$force = false, $command = null) {
@@ -508,8 +587,11 @@ class Cron {
 
     /**
      * Adds new job to jobs queue.
+     * 
      * @param AbstractJob $job An instance of the class 'AbstractJob'.
+     * 
      * @return boolean If the job is added, the method will return true.
+     * 
      * @since 1.0
      */
     public static function scheduleJob($job) {
@@ -517,6 +599,7 @@ class Cron {
     }
     /**
      * Returns the time at which jobs check was initialized.
+     * 
      * @return string The method will return a time string in the format 
      * 'YY-DD HH:MM' where: 
      * <ul>
@@ -525,6 +608,7 @@ class Cron {
      * <li>'HH' is the hour.</li>
      * <li>'MM' is the minute.</li>
      * </ul> 
+     * 
      * @since 1.0.7
      */
     public static function timestamp() {
@@ -553,18 +637,24 @@ class Cron {
     }
     /**
      * Creates a job that will be executed on specific time weekly.
+     * 
      * @param string $time A string in the format 'd-hh:mm'. 'd' can be a number 
      * between 0 and 6 inclusive or a 3 characters day name such as 'sun'. 0 is 
      * for Sunday and 6 is for Saturday.
      * 'hh' can have any value between 0 and 23 inclusive. mm can have any value 
      * between 0 and 59 inclusive.
-     * @param string $name An optional name for the job. Can be null
+     * 
+     * @param string $name An optional name for the job. Can be null.
+     * 
      * @param callable|null $func A function that will be executed once it is the 
      * time to run the job.
+     * 
      * @param array $funcParams An optional array of parameters which will be passed to 
      * the function.
+     * 
      * @return boolean If the job was created and scheduled, the method will 
      * return true. Other than that, the method will return false.
+     * 
      * @since 1.0
      */
     public static function weeklyJob($time,$name,$func,$funcParams = []) {

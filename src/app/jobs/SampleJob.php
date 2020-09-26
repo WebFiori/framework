@@ -11,7 +11,6 @@ class SampleJob extends AbstractJob {
     public function __construct() {
         parent::__construct('Sample Job');
         $this->dailyAt(4, 30);
-        $x = $y;
     }
     /**
      * A code that will get executed after the job finished successfully or not.

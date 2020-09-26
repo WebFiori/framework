@@ -2,7 +2,7 @@
 /*
  * The MIT License
  *
- * Copyright 2019 Ibrahim, WebFiori Framework.
+ * Copyright 2019, WebFiori Framework.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,7 @@ namespace webfiori\entity\cron;
 
 use webfiori\ui\HTMLNode;
 use webfiori\ui\JsCode;
-use webfiori\ui\PNode;
+use webfiori\ui\Paragraph;
 use webfiori\ui\TableCell;
 use webfiori\ui\TableRow;
 use webfiori\entity\Page;
@@ -117,7 +117,7 @@ class CronTaskView extends CronView {
         $h2 = new HTMLNode('h2');
         $h2->addTextNode('Custom Execution Parameters');
         $this->getControlsContainer()->addChild($h2);
-        $p = new PNode();
+        $p = new Paragraph();
         $p->addText('Here you can add extra parameters which will be sent with '
                 .'force execute command.');
         $this->getControlsContainer()->addChild($p);

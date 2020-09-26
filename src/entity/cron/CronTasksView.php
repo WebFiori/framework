@@ -2,7 +2,7 @@
 /*
  * The MIT License
  *
- * Copyright 2018 Ibrahim, WebFiori Framework.
+ * Copyright 2018, WebFiori Framework.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +27,7 @@ namespace webfiori\entity\cron;
 use webfiori\ui\HTMLNode;
 use webfiori\ui\Input;
 use webfiori\ui\Label;
-use webfiori\ui\PNode;
+use webfiori\ui\Paragraph;
 use webfiori\ui\TableCell;
 use webfiori\ui\TableRow;
 use webfiori\entity\File;
@@ -63,7 +63,7 @@ class CronTasksView extends CronView {
      */
     public function __construct() {
         parent::__construct('Scheduled CRON Tasks', 'A list of available CRON jobs.');
-        $parag = new PNode();
+        $parag = new Paragraph();
         $tasksCount = Cron::jobsQueue()->size();
         $parag->addText('<b>Total Scheduled Tasks:</b> '.$tasksCount.'.', ['esc-entities' => false]);
         $this->getControlsContainer()->addChild($parag);

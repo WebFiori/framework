@@ -2,7 +2,7 @@
 /*
  * The MIT License
  *
- * Copyright 2019 Ibrahim, WebFiori Framework.
+ * Copyright 2019, WebFiori Framework.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,16 +30,18 @@ use webfiori\ui\Label;
 use webfiori\entity\Page;
 use webfiori\WebFiori;
 use webfiori\entity\Response;
+use webfiori\entity\session\SessionsManager;
 /**
- * Description of CronLoginView
+ * A page which is used to show login form to enter login information to 
+ * access cron web interface.
  *
  * @author Ibrahim
  */
 class CronLoginView extends CronView {
     public function __construct() {
-        parent::__construct('CRON Login', 'Login to CRON Control panel.');
-
-        if (WebFiori::getWebsiteController()->getSession()->get('cron-login-status')) {
+        parent::__construct('CRON Web Interface Login', 'Login to CRON Control panel.');
+        
+        if (SessionsManager::get('cron-login-status')) {
             Response::addHeader('location', WebFiori::getSiteConfig()->getBaseURL().'/cron/jobs');
             Response::send();
         }

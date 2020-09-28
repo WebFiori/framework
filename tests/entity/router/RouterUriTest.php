@@ -17,6 +17,8 @@ class RouterUriTest extends TestCase {
         $uri = new RouterUri('https://example.com/{first-var}', '');
         $uri->addVarValue('first-var', 'Hello World');
         $this->assertEquals(['Hello World'], $uri->getVarValues('first-var'));
+        $this->assertEquals('/{first-var}', $uri->getPath());
+        $this->assertEquals(['{first-var}'], $uri->getPathArray());
     }
     /**
      * @test

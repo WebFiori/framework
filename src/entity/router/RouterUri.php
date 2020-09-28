@@ -225,26 +225,12 @@ class RouterUri {
      */
     public function equals($otherUri) {
         if ($otherUri instanceof RouterUri) {
-            $isEqual = true;
 
             if ($this->getAuthority() == $otherUri->getAuthority()) {
-                $thisPathNames = $this->getPathArray();
-                $otherPathNames = $otherUri->getPathArray();
-                $boolsArr = [];
-
-                foreach ($thisPathNames as $path1) {
-                    $boolsArr[] = in_array($path1, $otherPathNames);
-                }
-
-                foreach ($otherPathNames as $path) {
-                    $boolsArr[] = in_array($path, $thisPathNames);
-                }
-
-                foreach ($boolsArr as $bool) {
-                    $isEqual = $isEqual && $bool;
-                }
-
-                return $isEqual;
+                $thisPathNames = $this->getPath();
+                $otherPathNames = $otherUri->getPath();
+                
+                return $thisPathNames == $otherPathNames;
             }
         }
 
@@ -314,6 +300,7 @@ class RouterUri {
      * <li><b>scheme</b>: Scheme part of the URI (e.g. http or https).</li>
      * <li><b>query-string</b>: Query string if the URI has any.</li>
      * <li><b>fragment</b>: Any string that comes after the character '#' in the URI.</li>
+     * <li><b>full-path</b>: A string that represent the whole path of the URI.</li>
      * <li><b>path</b>: An array that contains the names of path directories</li>
      * <li><b>query-string-vars</b>: An array that contains query string parameter and values.</li>
      * <li><b>uri-vars</b>: An array that contains URI path variable and values.</li>
@@ -364,13 +351,7 @@ class RouterUri {
      * @since 1.0
      */
     public function getPath() {
-        $retVal = '';
-
-        foreach ($this->uriBroken['path'] as $dir) {
-            $retVal .= '/'.$dir;
-        }
-
-        return $retVal;
+        return $this->uriBroken['full-path'];
     }
     /**
      * Returns an array which contains the names of URI directories.
@@ -433,6 +414,8 @@ class RouterUri {
      * <li><b>scheme</b>: Scheme part of the URI (e.g. http or https).</li>
      * <li><b>query-string</b>: Query string if the URI has any.</li>
      * <li><b>fragment</b>: Any string that comes after the character '#' in the URI.</li>
+     * <li><b>full-path</b>: A string which is similar to '/path/to/resource' that represents path part of 
+     * a URL.</li>
      * <li><b>path</b>: An array that contains the names of path directories</li>
      * <li><b>query-string-vars</b>: An array that contains query string parameter and values.</li>
      * <li><b>uri-vars</b>: An array that contains URI path variable and values.</li>
@@ -847,6 +830,7 @@ class RouterUri {
      * <li><b>query-string</b>: Query string if the URI has any.</li>
      * <li><b>fragment</b>: Any string that comes after the character '#' in the URI.</li>
      * <li><b>path</b>: An array that contains the names of path directories</li>
+     * <li><b>full-path</b>: A string that represents whole path parts.</li>
      * <li><b>query-string-vars</b>: An array that contains query string parameter and values.</li>
      * <li><b>uri-vars</b>: An array that contains URI path variables and values.</li>
      * </ul>
@@ -867,6 +851,7 @@ class RouterUri {
             'scheme' => '',
             'query-string' => '',
             'fragment' => '',
+            'full-path' => '',
             'path' => [],
             'query-string-vars' => [
 
@@ -904,8 +889,9 @@ class RouterUri {
             $dirName = $split4[$x];
 
             if ($dirName != '') {
-                $retVal['path'][] = utf8_decode(urldecode($dirName));
-
+                $decoded = utf8_decode(urldecode($dirName));
+                $retVal['path'][] = $decoded;
+                $retVal['full-path'] .= '/'.$decoded;
                 if ($dirName[0] == '{' && $dirName[strlen($dirName) - 1] == '}') {
                     $retVal[self::$UV][trim($split4[$x], '{}')] = null;
                 }

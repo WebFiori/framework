@@ -149,10 +149,14 @@ class Router {
      * @since 1.0
      */
     private function __construct() {
-        $this->routes = [];
+        $this->routes = [
+            'static' => [],
+            'variable' => []
+        ];
+        $this->pathAndResourceArr = [];
         $this->onNotFound = function ()
         {
-            http_response_code(404);
+            Response::setCode(404);
 
             if (!defined('API_CALL')) {
                 $notFoundView = new NotFoundView();
@@ -172,12 +176,26 @@ class Router {
             $this->baseUrl = trim(Util::getBaseURL(), '/');
         }
     }
-    public function _searchRoute($routeUri, $uri, $loadResource, $withVars = false) {
+    /**
+     * 
+     * @param RouterUri $routeUri
+     * @param type $uri
+     * @param type $loadResource
+     * @param type $withVars
+     * @return boolean
+     */
+    private function _searchRoute($routeUri, $uri, $loadResource, $withVars = false) {
         $pathArray = $routeUri->getPathArray();
         $requestMethod = filter_var(getenv('REQUEST_METHOD'));
+        $indexToSearch = 'static';
+        if ($withVars) {
+            $indexToSearch = 'variable';
+        }
 
-        foreach ($this->routes as $route) {
-            if (!$withVars && !$route->hasVars()) {
+        if ($indexToSearch == 'static') {
+            $route = isset($this->routes[$indexToSearch][$routeUri->getPath()]) ? 
+                    $this->routes[$indexToSearch][$routeUri->getPath()] : null;
+            if ($route instanceof RouterUri) {
                 if (!$route->isCaseSensitive()) {
                     $isEqual = strtolower($route->getUri()) == 
                     strtolower($routeUri->getUri());
@@ -191,12 +209,13 @@ class Router {
 
                     return true;
                 }
-            } else if ($withVars && $route->hasVars()) {
+            }
+        } else {
+            foreach ($this->routes['variable'] as $route){
                 $this->_setUriVars($route, $pathArray, $requestMethod);
-                //if all variables are set, then we found our route.
                 if ($route->isAllVarsSet() && $route->setRequestedUri($uri)) {
                     $this->_routeFound($route, $loadResource);
-
+                    
                     return true;
                 }
             }
@@ -508,7 +527,10 @@ class Router {
      */
     public static function removeAll() {
         self::get()->uriObj = null;
-        self::get()->routes = [];
+        self::get()->routes = [
+            'static' => [],
+            'variable' => []
+        ];
     }
     /**
      * Removes a route given its path.
@@ -522,18 +544,18 @@ class Router {
      */
     public static function removeRoute($path) {
         $pathFix = self::base().self::get()->_fixUriPath($path);
-
-        for ($x = 0 ; $x < count(self::get()->routes) ; $x++) {
-            $routeObj = self::get()->routes[$x];
-
-            if ($routeObj->getUri() == $pathFix) {
-                unset(self::get()->routes[$x]);
-
-                return true;
-            }
+        $retVal = false;
+        if (isset(self::get()->routes['static'][$pathFix])) {
+            unset(self::get()->routes['static'][$pathFix]);
+            
+            $retVal = true;
+        } else if (self::get()->routes['variable'][$pathFix]) {
+            unset(self::get()->routes['variable'][$pathFix]);
+            
+            $retVal = true;
         }
-
-        return false;
+        
+        return $retVal;
     }
     /**
      * Redirect a URI to its route.
@@ -556,7 +578,10 @@ class Router {
     public static function routes() {
         $routesArr = [];
 
-        foreach (Router::get()->_getRoutes() as $routeUri) {
+        foreach (Router::get()->_getRoutes()['static'] as $routeUri) {
+            $routesArr[$routeUri->getUri()] = $routeUri->getRouteTo();
+        }
+        foreach (Router::get()->_getRoutes()['variable'] as $routeUri) {
             $routesArr[$routeUri->getUri()] = $routeUri->getRouteTo();
         }
 
@@ -565,7 +590,10 @@ class Router {
     /**
      * Returns an associative array that contains all routes.
      * 
-     * The indices of the array will be URLs that represents the route and 
+     * The returned array will have two indices, 'static' and 'variable'. The 'static' 
+     * index will contain routes to resources at which they don't contain variables in 
+     * their path part. Each index of the two will have another sub associative array.
+     * The indices of each sub array ill be URLs that represents the route and 
      * the value at each index will be an object of type 'RouterUri'. 
      * 
      * @return array An associative array that contains all routes.
@@ -599,7 +627,11 @@ class Router {
      */
     public static function uriObj($routerUri) {
         if ($routerUri instanceof RouterUri && !self::get()->_hasRoute($routerUri->getPath())) {
-            self::get()->routes[] = $routerUri;
+            if ($routerUri->hasVars()) {
+                self::get()->routes['variable'] = $routerUri;
+            } else {
+                self::get()->routes['static'] = $routerUri;
+            }
 
             return true;
         }
@@ -734,10 +766,10 @@ class Router {
         } else if (!is_callable($routeTo)) {
             return false;
         }
+        $routeUri = new RouterUri($this->getBase().$path, $routeTo,$caseSensitive, $closureParams);
 
-        if (!$this->_hasRoute($path)) {
-            $routeUri = new RouterUri($this->getBase().$path, $routeTo,$caseSensitive, $closureParams);
-
+        if (!$this->_hasRoute($routeUri)) {
+            
             if ($asApi === true) {
                 $routeUri->setType(self::API_ROUTE);
             } else {
@@ -752,8 +784,14 @@ class Router {
             foreach ($options['vars-values'] as $varName => $varValues) {
                 $routeUri->addVarValues($varName, $varValues);
             }
-            $this->routes[] = $routeUri;
-
+            $path = $routeUri->isCaseSensitive() ? $routeUri->getPath() : strtolower($routeUri->getPath());
+            
+            if ($routeUri->hasVars()) {
+                $this->routes['variable'][$path] = $routeUri;
+            } else {
+                $this->routes['static'][$path] = $routeUri;
+            }
+            
             return true;
         }
 
@@ -877,35 +915,35 @@ class Router {
      * @since 1.3.3
      */
     private function _getUriObj($path) {
-        $routeURI = new RouterUri($this->getBase().$this->_fixUriPath($path), '');
-
-        foreach ($this->routes as $route) {
-            if ($routeURI->equals($route)) {
-                return $route;
-            }
+        if (isset($this->routes['static'][$path])) {
+            return $this->routes['static'][$path];
+        } else if (isset($this->routes['variable'][$path])) {
+            return $this->routes['variable'][$path];
         }
-
+        
         return null;
     }
     /**
      * Checks if a given path has a route or not.
      * 
-     * @param string $path The path which will be checked (such as '/path1/path2')
+     * @param RouterUri $path The path which will be checked (such as '/path1/path2')
      * 
      * @return boolean The method will return true if the given path 
      * has a route.
      * 
      * @since 1.1
      */
-    private function _hasRoute($path) {
-        $hasRoute = false;
-        $routeURI = new RouterUri($this->getBase().$this->_fixUriPath($path), '');
-
-        foreach ($this->routes as $route) {
-            $hasRoute = $hasRoute || $routeURI->equals($route);
+    private function _hasRoute($uriObj) {
+        $path = $uriObj->getPath();
+        if (!$uriObj->isCaseSensitive()) {
+            $path = strtolower($path);
         }
-
-        return $hasRoute;
+        
+        if ($uriObj->hasVars()) {
+            return isset($this->routes['variable'][$path]);
+        } else {
+            return isset($this->routes['static'][$path]);
+        }
     }
     /**
      * Checks if a directory name is a variable or not.
@@ -969,7 +1007,10 @@ class Router {
      * @since 1.1
      */
     private function _printRoutes() {
-        foreach ($this->routes as $route) {
+        foreach ($this->routes['static'] as $route) {
+            $route->printUri();
+        }
+        foreach ($this->routes['variable'] as $route) {
             $route->printUri();
         }
     }
@@ -991,7 +1032,7 @@ class Router {
      * 
      * @since 1.0
      */
-    private function _resolveUrl($uri,$loadResource = true) {
+    private function _resolveUrl($uri, $loadResource = true) {
         $this->uriObj = null;
 
         if (count($this->routes) != 0) {

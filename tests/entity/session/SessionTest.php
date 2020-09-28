@@ -226,7 +226,7 @@ class SessionTest extends TestCase {
                 . '"is_refresh":false, '
                 . '"is_persistent":true, '
                 . '"status":"status_new", '
-                . '"user":{"user-id":-1, "email":"", "display-name":null, "username":""}, '
+                . '"user":{"user_id":-1, "email":"", "display_name":null, "username":""}, '
                 . '"vars":[]}',$j.'');
     }
     /**
@@ -264,7 +264,7 @@ class SessionTest extends TestCase {
                 . '"is_refresh":false, '
                 . '"is_persistent":true, '
                 . '"status":"status_new", '
-                . '"user":{"user-id":-1, "email":"", "display-name":null, "username":""}, '
+                . '"user":{"user_id":-1, "email":"", "display_name":null, "username":""}, '
                 . '"vars":[]}',$j.'');
     }
 }

@@ -293,6 +293,25 @@ class User implements JsonI {
         return $this->userName;
     }
     /**
+     * Checks if the user has one of multiple privileges.
+     * 
+     * @param array $privilegesIdsArr An array that contains the IDs of the 
+     * privileges.
+     * 
+     * @return boolean If the user has one of the given privileges, the method 
+     * will return true. Other than that, the method will return false.
+     */
+    public function hasAnyPrivilege(array $privilegesIdsArr) {
+        $hasPr = false;
+        foreach ($privilegesIdsArr as $prId) {
+            $hasPr = $this->hasPrivilege($prId);
+            if ($hasPr) {
+                break;
+            }
+        }
+        return $hasPr;
+    }
+    /**
      * Checks if a user has privilege or not given its ID.
      * 
      * @param string $privilegeId The ID of the privilege.

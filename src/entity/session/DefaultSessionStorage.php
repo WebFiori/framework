@@ -119,10 +119,11 @@ class DefaultSessionStorage implements SessionStorage {
      * @since 1.0
      */
     public function save($sessionId, $session) {
-        //if (!CLI::isCLI()) {
+        if (!CLI::isCLI() || defined('__PHPUNIT_PHAR__')) {
+            //Session storage should be only allowed in testing env or http
             $file = new File($sessionId, $this->storeLoc);
             $file->setRawData($session);
             $file->write(false, true);
-        //}
+        }
     }
 }

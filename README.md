@@ -66,20 +66,20 @@ To learn the basics of how to use the framework, please head on to https://webfi
 | 7.4 | [![Build13][04]][0]  | [![Build14][08]][0]  | [![Build15][11]][0]  | [![Build16][14]][0]  |
 
 [0]: https://travis-ci.org/usernane/webfiori
-[01]: https://travis-matrix-badges.herokuapp.com/repos/usernane/webfiori/branches/master/1
-[02]: https://travis-matrix-badges.herokuapp.com/repos/usernane/webfiori/branches/master/2
-[03]: https://travis-matrix-badges.herokuapp.com/repos/usernane/webfiori/branches/master/3
-[04]: https://travis-matrix-badges.herokuapp.com/repos/usernane/webfiori/branches/master/4
-[05]: https://travis-matrix-badges.herokuapp.com/repos/usernane/webfiori/branches/master/5
-[06]: https://travis-matrix-badges.herokuapp.com/repos/usernane/webfiori/branches/master/6
-[07]: https://travis-matrix-badges.herokuapp.com/repos/usernane/webfiori/branches/master/7
-[08]: https://travis-matrix-badges.herokuapp.com/repos/usernane/webfiori/branches/master/8
-[09]: https://travis-matrix-badges.herokuapp.com/repos/usernane/webfiori/branches/master/9
-[10]: https://travis-matrix-badges.herokuapp.com/repos/usernane/webfiori/branches/master/10
-[11]: https://travis-matrix-badges.herokuapp.com/repos/usernane/webfiori/branches/master/11
-[12]: https://travis-matrix-badges.herokuapp.com/repos/usernane/webfiori/branches/master/12
-[13]: https://travis-matrix-badges.herokuapp.com/repos/usernane/webfiori/branches/master/13
-[14]: https://travis-matrix-badges.herokuapp.com/repos/usernane/webfiori/branches/master/14
+[01]: https://travis-matrix-badges.herokuapp.com/repos/webfiori/framework/branches/master/1?use_travis_com=true
+[02]: https://travis-matrix-badges.herokuapp.com/repos/webfiori/framework/branches/master/2?use_travis_com=true
+[03]: https://travis-matrix-badges.herokuapp.com/repos/webfiori/framework/branches/master/3?use_travis_com=true
+[04]: https://travis-matrix-badges.herokuapp.com/repos/webfiori/framework/branches/master/4?use_travis_com=true
+[05]: https://travis-matrix-badges.herokuapp.com/repos/webfiori/framework/branches/master/5?use_travis_com=true
+[06]: https://travis-matrix-badges.herokuapp.com/repos/webfiori/framework/branches/master/6?use_travis_com=true
+[07]: https://travis-matrix-badges.herokuapp.com/repos/webfiori/framework/branches/master/7?use_travis_com=true
+[08]: https://travis-matrix-badges.herokuapp.com/repos/webfiori/framework/branches/master/8?use_travis_com=true
+[09]: https://travis-matrix-badges.herokuapp.com/repos/webfiori/framework/branches/master/9?use_travis_com=true
+[10]: https://travis-matrix-badges.herokuapp.com/repos/webfiori/framework/branches/master/10?use_travis_com=true
+[11]: https://travis-matrix-badges.herokuapp.com/repos/webfiori/framework/branches/master/11?use_travis_com=true
+[12]: https://travis-matrix-badges.herokuapp.com/repos/webfiori/framework/branches/master/12?use_travis_com=true
+[13]: https://travis-matrix-badges.herokuapp.com/repos/webfiori/framework/branches/master/13?use_travis_com=true
+[14]: https://travis-matrix-badges.herokuapp.com/repos/webfiori/framework/branches/master/14?use_travis_com=true
 
 
 ## Setup

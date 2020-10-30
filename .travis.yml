@@ -26,17 +26,17 @@ os:
 services:
     - mysql
 addons:
-  apt:
-    sources:
-      - mysql-5.7-trusty
-    packages:
-      - dpkg
-      - mysql-server
-      - mysql-client
-  sonarcloud:
-    organization: "usernane"
-    token:
-      secure: WiRRGSfM+g/Gld7JF4b2Ow+xJjCTvG9qUP317x3FVJ0N4HUlZxqmJQv6G7TzQEAH7hz1w6pVe5wPClMKJ7abNA0nB91Bf34kRxA17v/Mhuyjx+YJs+ptA7Jhp28I57edDU4JErFi4OlJraQYgvq/ZMtlZ/xPNpKO3UB5/mCC0FQOgrkQA0E7HN7PY2mSKHO6k/jt/WKe49Ta4OzyM9vdWk8CscxeJmPhLs4reaPjFjPGYKo7+muKCGsh7pCYpvsQvG0eH2W7uB4K6ck5t0Azquai6GjK8xyT+Ogd9ehGijJ/d6YfKzp3iHoaDcEn3CWLluiGD7FlcFGNt/uQwvn/Imapq73usqmtWbA4xnZ6IEDNHrC/odOZPmpq+2KxiS8/fCNLOgH2O+kdnwQuGSAywxQNyKMnU9ixnGjyIQYCHYfKbGSK+O65WBpJ9NtL8CfFHTAK84DemGNo9DsowwMpfiWYGqu4mZGaImR/qmAT+c9qwu1Vqgqh2RMBQOIckVm7b4ooULrHl1nk8chCe50TRI7H0pgnM3xGwet8BQe7de2Z/gUD/xiHelvbocUEbE3LKxtVLBruq8rbFWl4Psj0qyRqpQ4afo9nBxGVBWmxsDN5P0UQCUpTP1STUGI3cps7CWNPZSDlAkiQdnLQNptgi5E+3cpW2spkjV2ojTxU7HQ=
+    apt:
+        sources:
+            - mysql-5.7-trusty
+        packages:
+            - dpkg
+            - mysql-server
+            - mysql-client
+    sonarcloud:
+        organization: "webfiori"
+        token:
+            secure: Ew8NfjVlyTt5qwpIGS4682aCZiQqiFW3DYvVUPOqwCR0XlYDaL+igwiEUwFPYd13BnvcM4b3GbL694pxJS0fukHwNAwxFYCMZC39nLIjHqvo5dMyIK6eoDj0E+l+gfnuIRwddL+2dZywr2YNi9t5kWkShpa8oeqTNvtYgjPOGIdsKHD1guOIITiWTdXhIpkgoKAwZqZCO0ORlNCN9N0MqIIn0b0iBiq7PaAewKrzwL80AnKq4hvrEl3xT1NC7XX9zelRaKQWkrrVtJgs4qBtI1C+GkHLwq+K2DSXdV8R2GieYQ1AOn0GxUxstsltko3rC63Pvg8Nm0e3Z+TOxF0EYCi5O4hgtrKewNOr11BPwILPeTPZJdk7vWoQ6H4W0cBU405+DCWMlfrBuQFGEKQ0259xj542ZHKTlOlFhbjBHh/apnD08IVE6eHwJiW29FYIbL6wgtJva//9uM/CKoy+LN3yvffnvbeb/mrn6vXgx72inuaRjjURdEml+JMWogKcL7lBSVjzRiN7sOLSo2UNLFCOPUhSDB3r2k1vLFxy8nTBaOqKm7asXBfpoANeRqUhdWkULIoRa+p+CEwzSwy3R51GXewJL8tnVu3gqgv4I74OfSCnkFeHvh9wfrQtppWasJ+GfFOjQBxUdooc55dHXvp8K8Hl3ZHp0f+LoB68J3Y=
 install: 
     - sudo apt-get -y -q -m --no-install-suggests --no-install-recommends --allow-unauthenticated $(travis_apt_get_options) install dpkg mysql-server mysql-client 
 before_install:
@@ -54,7 +54,7 @@ before_script:
     - composer install --prefer-source --no-interaction
 script:
     - phpunit --verbose --configuration phpunit.xml
-    - sonar-scanner
 after_success:
     - mysql -e 'drop database testing_db;'
     - bash <(curl -s https://codecov.io/bash)
+    - sonar-scanner

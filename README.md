@@ -1,6 +1,6 @@
 # WebFiori Framework
 <p align="center">
-<img width="90px" hight="90px" src="https://programmingacademia.com/webfiori/themes/webfiori/images/favicon.png">
+<img width="90px" hight="90px" src="https://webfiori.com/assets/images/favicon.png">
 </p>
 
 <p align="center">

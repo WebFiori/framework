@@ -2,31 +2,35 @@
 <p align="center">
 <img width="90px" hight="90px" src="https://programmingacademia.com/webfiori/themes/webfiori/images/favicon.png">
 </p>
+
 <p align="center">
-  <a href="https://travis-ci.org/usernane/webfiori">
-    <img src="https://travis-ci.org/usernane/webfiori.svg?branch=master">
+  <a href="https://travis-ci.com/github/WebFiori/framework">
+    <img src="https://travis-ci.com/WebFiori/framework.svg?branch=master">
   </a>
-  <a href="https://codecov.io/gh/usernane/webfiori">
-    <img src="https://codecov.io/gh/usernane/webfiori/branch/master/graph/badge.svg" />
+  <a href="https://codecov.io/gh/WebFiori/framework">
+    <img src="https://codecov.io/gh/WebFiori/framework/branch/master/graph/badge.svg" />
   </a>
-  <a href="https://sonarcloud.io/dashboard?id=usernane_webfiori">
-      <img src="https://sonarcloud.io/api/project_badges/measure?project=usernane_webfiori&metric=alert_status" />
+  <a href="https://sonarcloud.io/dashboard?id=WebFiori_framework">
+      <img src="https://sonarcloud.io/api/project_badges/measure?project=WebFiori_framework&metric=alert_status" />
   </a>
-  <a href="https://github.com/usernane/webfiori/releases">
-      <img src="https://img.shields.io/github/release/usernane/webfiori.svg?label=latest" />
+  <a href="https://github.com/WebFiori/framework/releases">
+      <img src="https://img.shields.io/github/release/WebFiori/framework.svg?label=latest" />
   </a>
-  <img src="https://img.shields.io/packagist/dt/webfiori/framework?color=light-green">
+  <a href="https://packagist.org/packages/webfiori/framework">
+      <img src="https://img.shields.io/packagist/dt/webfiori/framework?color=light-green">
+  </a>
 </p>
+
 What is WebFiori Framework?
 
-WebFiori Framework is a mini web development framework which is built using PHP language. The framework is fully object oriented (OOP). It semi-MVC model but it does not force it. The framework comes with many features which can help in making your website or web application up and running in no time.
+WebFiori Framework is a mini web development framework which is built using PHP language. The framework is fully object oriented (OOP). It uses semi-MVC model but it does not force it. The framework comes with many features which can help in making your website or web application up and running in no time.
 
 ## Key Features
 * Provide minimum utilities to setup a small web application.
 * Theming and the ability to create multiple UIs for the same web page using any CSS or JavaScript framework.
 * Building and manipulating the DOM of a web page using PHP language.
 * Basic template engine.
-* Fast routing system that makes the ability of creating search-engine-friendly links an easy task.
+* Fast routing system that makes the ability of creating search-engine-friendly URLs an easy task.
 * Creation of web services (or APIs) that supports JSON with data filtering and validation.
 * Basic support for MySQL schema and query building.
 * Lightweight. The total size of framework core files is less than 3 megabytes.

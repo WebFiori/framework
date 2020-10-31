@@ -3,7 +3,7 @@ namespace webfiori\tests\entity;
 use PHPUnit\Framework\TestCase;
 use webfiori\framework\Page;
 use webfiori\ui\HTMLNode;
-use webfiori\entity\Theme;
+use webfiori\framework\Theme;
 use webfiori\framework\i18n\Language;
 use webfiori\conf\SiteConfig;
 /**

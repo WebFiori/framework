@@ -7,7 +7,7 @@ use webfiori\ui\HTMLNode;
 use webfiori\ui\ListItem;
 use webfiori\ui\UnorderedList;
 use webfiori\framework\Page;
-use webfiori\entity\Theme;
+use webfiori\framework\Theme;
 use webfiori\WebFiori;
 /**
  * WebFiori Theme Which is bundled with v1.0.8 of the framework.

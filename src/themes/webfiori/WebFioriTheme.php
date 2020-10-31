@@ -12,7 +12,7 @@ use webfiori\ui\UnorderedList;
 use webfiori\conf\Config;
 use webfiori\conf\SiteConfig;
 use webfiori\framework\Page;
-use webfiori\entity\Theme;
+use webfiori\framework\Theme;
 use webfiori\logic\WebsiteController;
 use webfiori\WebFiori;
 

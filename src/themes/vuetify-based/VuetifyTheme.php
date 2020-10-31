@@ -7,7 +7,7 @@ use webfiori\ui\HeadNode;
 use webfiori\ui\HTMLNode;
 use webfiori\ui\JsCode;
 use webfiori\framework\Page;
-use webfiori\entity\Theme;
+use webfiori\framework\Theme;
 use webfiori\WebFiori;
 /**
  * A basic theme which is based on Vuetify framework.

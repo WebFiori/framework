@@ -1,5 +1,5 @@
 <?php
-use webfiori\entity\Theme;
+use webfiori\framework\Theme;
 use webfiori\ui\HTMLNode;
 use webfiori\framework\Page;
 use webfiori\ui\HeadNode;

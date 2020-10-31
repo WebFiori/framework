@@ -277,6 +277,8 @@ class AutoLoader {
      * Returns an array that contains the paths to all files which has a class 
      * with the given name.
      * 
+     * Note that the method will only return the path to a loaded class only.
+     * 
      * @param string $className The name of the class.
      * 
      * @param string|null $namespace If specified, the search will only be specific 
@@ -518,13 +520,14 @@ class AutoLoader {
         }
         return $loaded;
     }
-    private function _loadFromCache($classPath, $className) {
+    private function _loadFromCache($classNS, $className) {
         $loaded = false;
-        if (isset($this->casheArr[$classPath])) {
-            foreach ($this->casheArr[$classPath] as $location) {
+        
+        if (isset($this->casheArr[$classNS])) {
+            foreach ($this->casheArr[$classNS] as $location) {
                 if (file_exists($location)) {
                     require_once $location;
-                    $ns = count(explode('\\', $classPath)) == 1 ? '\\' : substr($classPath, 0, strlen($classPath) - strlen($className) - 1);
+                    $ns = count(explode('\\', $classNS)) == 1 ? '\\' : substr($classNS, 0, strlen($classNS) - strlen($className) - 1);
                     $this->loadedClasses[] = [
                         self::$CLASS_INDICES[0] => $className,
                         self::$CLASS_INDICES[1] => $ns,
@@ -554,11 +557,15 @@ class AutoLoader {
             foreach ($cacheArr as $ca) {
                 if (strlen(trim($ca)) !== 0) {
                     $exploded = explode('=>', $ca);
+                    //Index 0 of the explode will contain the path to PHP class.
+                    //Index 1 of the explode will contain class namespace.
                     if (isset($this->casheArr[$exploded[1]])) {
                         if (!in_array($exploded[0], $this->casheArr[$exploded[1]])) {
                             $this->casheArr[$exploded[1]][] = $exploded[0];
                         }
                     } else {
+                        //The cashe array hold namespace as index and a set of 
+                        //Pathes to the same class.
                         $this->casheArr[$exploded[1]] = [
                             $exploded[0]
                         ];

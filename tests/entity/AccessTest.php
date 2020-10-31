@@ -2,7 +2,7 @@
 namespace webfiori\tests\entity;
 use PHPUnit\Framework\TestCase;
 use webfiori\framework\Access;
-use webfiori\entity\User;
+use webfiori\framework\User;
 /**
  * A test class for testing the class 'webfiori\entity\Access'.
  *

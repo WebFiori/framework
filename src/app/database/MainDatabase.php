@@ -4,7 +4,7 @@ namespace app\database;
 use webfiori\database\Database;
 use webfiori\framework\DB;
 use app\database\UsersTable;
-use webfiori\entity\User;
+use webfiori\framework\User;
 /**
  * A sample database instance.
  *

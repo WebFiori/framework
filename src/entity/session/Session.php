@@ -28,7 +28,7 @@ use webfiori\json\JsonI;
 use webfiori\json\Json;
 use webfiori\conf\SiteConfig;
 use webfiori\entity\exceptions\SessionException;
-use webfiori\entity\User;
+use webfiori\framework\User;
 /**
  * A class that represents a session.
  *

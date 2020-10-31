@@ -4,7 +4,7 @@ namespace webfiori\tests\database;
 use phMysql\MySQLColumn;
 use phMysql\MySQLQuery;
 use phMysql\MySQLTable;
-use webfiori\entity\User;
+use webfiori\framework\User;
 /**
  * Description of UsersQuery
  *

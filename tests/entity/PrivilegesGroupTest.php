@@ -3,7 +3,7 @@ namespace webfiori\tests\entity;
 
 use PHPUnit\Framework\TestCase;
 use webfiori\framework\Privilege;
-use webfiori\entity\PrivilegesGroup;
+use webfiori\framework\PrivilegesGroup;
 
 /**
  * A test class for testing the class 'webfiori\entity\File'.

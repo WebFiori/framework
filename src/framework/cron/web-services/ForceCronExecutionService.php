@@ -23,7 +23,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-namespace webfiori\entity\cron\webServices;
+namespace webfiori\framework\cron\webServices;
 
 use webfiori\restEasy\AbstractWebService;
 use webfiori\entity\cron\Cron;

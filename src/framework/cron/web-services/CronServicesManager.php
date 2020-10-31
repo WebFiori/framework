@@ -23,45 +23,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-namespace webfiori\entity\cron\webServices;
 
-use webfiori\restEasy\AbstractWebService;
-use webfiori\restEasy\RequestParameter;
-use webfiori\entity\session\SessionsManager;
-use webfiori\entity\cron\Cron;
+namespace webfiori\framework\cron\webServices;
+
+use webfiori\restEasy\WebServicesManager;
 /**
- * An API which is used to authenticate users to access CRON web interface.
+ * A class which is used to manage CRON jobs related services.
  *
  * @author Ibrahim
- * 
- * @version 1.0
  */
-class CronLoginService extends AbstractWebService {
+class CronServicesManager extends WebServicesManager {
+    /**
+     * Creates new instance of the class.
+     */
     public function __construct() {
-        parent::__construct('login');
-        $this->addRequestMethod('post');
-        $this->addParameter(new RequestParameter('password'));
+        parent::__construct();
+        $this->addService(new CronLoginService());
+        $this->addService(new ForceCronExecutionService());
+        $this->addService(new CronLogoutService());
     }
-    public function isAuthorized() {
-        return true;
-    }
-
-    public function processRequest() {
-        $cronPass = Cron::password();
-
-        if ($cronPass != 'NO_PASSWORD') {
-            $inputHash = hash('sha256', $this->getInputs()['password']);
-
-            if ($inputHash == $cronPass) {
-                SessionsManager::start('cron-session');
-                SessionsManager::set('cron-login-status', true);
-                $this->sendResponse('Success', 'info', 200);
-            } else {
-                $this->sendResponse('Incorrect password', 'error', 404);
-            }
-        } else {
-            $this->sendResponse('Success', 'info', 200);
-        }
-    }
-
 }
+return __NAMESPACE__;

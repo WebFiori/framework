@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-namespace webfiori\entity\cron;
+namespace webfiori\framework\cron;
 
 use Exception;
 use webfiori\collections\Queue;
@@ -137,24 +137,24 @@ class Cron {
         if (defined('CRON_THROUGH_HTTP') && CRON_THROUGH_HTTP === true) {
             Router::addRoute([
                 'path' => '/cron/login',
-                'route-to' => '/entity/cron/CronLoginView.php'
+                'route-to' => '/framework/cron/CronLoginView.php'
             ]);
             Router::addRoute([
                 'path' => '/cron/apis/{action}',
-                'route-to' => '/entity/cron/web-services/CronServicesManager.php',
+                'route-to' => '/framework/cron/web-services/CronServicesManager.php',
                 'as-api' => true
             ]);
             Router::addRoute([
                 'path' => '/cron',
-                'route-to' => '/entity/cron/CronLoginView.php'
+                'route-to' => '/framework/cron/CronLoginView.php'
             ]);
             Router::addRoute([
                 'path' => '/cron/jobs',
-                'route-to' => '/entity/cron/CronTasksView.php'
+                'route-to' => '/framework/cron/CronTasksView.php'
             ]);
             Router::addRoute([
                 'path' => '/cron/jobs/{job-name}',
-                'route-to' => '/entity/cron/CronTaskView.php'
+                'route-to' => '/framework/cron/CronTaskView.php'
             ]);
         }
     }

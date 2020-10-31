@@ -24,23 +24,28 @@
  * THE SOFTWARE.
  */
 
-namespace webfiori\entity\cron\webServices;
+namespace webfiori\framework\cron\webServices;
 
-use webfiori\restEasy\WebServicesManager;
+use webfiori\restEasy\AbstractWebService;
+use webfiori\entity\session\SessionsManager;
 /**
- * A class which is used to manage CRON jobs related services.
+ * A service which is used to logout user in CRON web interface.
  *
  * @author Ibrahim
  */
-class CronServicesManager extends WebServicesManager {
-    /**
-     * Creates new instance of the class.
-     */
+class CronLogoutService extends AbstractWebService {
     public function __construct() {
-        parent::__construct();
-        $this->addService(new CronLoginService());
-        $this->addService(new ForceCronExecutionService());
-        $this->addService(new CronLogoutService());
+        parent::__construct('logout');
+        $this->addRequestMethod('post');
     }
+    public function isAuthorized() {
+        return true;
+    }
+
+    public function processRequest() {
+        SessionsManager::start('cron-session');
+        SessionsManager::destroy();
+        $this->sendResponse('Logged out.', 'info');
+    }
+
 }
-return __NAMESPACE__;

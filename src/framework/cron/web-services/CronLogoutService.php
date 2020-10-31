@@ -27,7 +27,7 @@
 namespace webfiori\framework\cron\webServices;
 
 use webfiori\restEasy\AbstractWebService;
-use webfiori\entity\session\SessionsManager;
+use webfiori\framework\session\SessionsManager;
 /**
  * A service which is used to logout user in CRON web interface.
  *

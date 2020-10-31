@@ -28,7 +28,7 @@ use webfiori\ui\HTMLNode;
 use webfiori\ui\JsCode;
 use webfiori\framework\Page;
 use webfiori\WebFiori;
-use webfiori\entity\session\SessionsManager;
+use webfiori\framework\session\SessionsManager;
 use webfiori\framework\Response;
 /**
  * A generic view for cron related operations. 

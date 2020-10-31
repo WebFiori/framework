@@ -32,7 +32,7 @@ use webfiori\ui\HTMLNode;
 use webfiori\conf\SiteConfig;
 use webfiori\entity\exceptions\UIException;
 use webfiori\framework\i18n\Language;
-use webfiori\entity\session\SessionsManager;
+use webfiori\framework\session\SessionsManager;
 use webfiori\WebFiori;
 use webfiori\framework\Response;
 /**

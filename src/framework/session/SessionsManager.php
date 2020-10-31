@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-namespace webfiori\entity\session;
+namespace webfiori\framework\session;
 
 use webfiori\entity\cli\CLI;
 use webfiori\framework\Response;

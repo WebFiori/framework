@@ -27,7 +27,7 @@ namespace webfiori\framework\cron\webServices;
 
 use webfiori\restEasy\AbstractWebService;
 use webfiori\restEasy\RequestParameter;
-use webfiori\entity\session\SessionsManager;
+use webfiori\framework\session\SessionsManager;
 use webfiori\entity\cron\Cron;
 /**
  * An API which is used to authenticate users to access CRON web interface.

@@ -30,7 +30,7 @@ use webfiori\framework\Page;
 use webfiori\framework\Util;
 use webfiori\WebFiori;
 use webfiori\framework\Response;
-use webfiori\entity\session\SessionsManager;
+use webfiori\framework\session\SessionsManager;
 /**
  * A page which is used to display exception information when it is thrown or 
  * any other errors.

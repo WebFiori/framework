@@ -1,7 +1,7 @@
 <?php
 namespace webfiori\framework;
 use webfiori\entity\cli\CLI;
-use webfiori\entity\session\SessionsManager;
+use webfiori\framework\session\SessionsManager;
 /**
  * A class that represents HTTP response.
  * 

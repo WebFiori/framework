@@ -31,8 +31,8 @@ use webfiori\conf\Config;
 use webfiori\entity\cli\CLI;
 use webfiori\entity\DBConnectionFactory;
 use webfiori\entity\DBConnectionInfo;
-use webfiori\entity\session\SessionsManager;
-use webfiori\entity\session\Session;
+use webfiori\framework\session\SessionsManager;
+use webfiori\framework\session\Session;
 /**
  * The base class for creating application logic.
  * Controllers manly used for controlling two things, the first is database 

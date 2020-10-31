@@ -26,10 +26,10 @@ namespace webfiori\entity\cron;
 
 use webfiori\ui\HTMLNode;
 use webfiori\ui\JsCode;
-use webfiori\entity\Page;
+use webfiori\framework\Page;
 use webfiori\WebFiori;
 use webfiori\entity\session\SessionsManager;
-use webfiori\entity\Response;
+use webfiori\framework\Response;
 /**
  * A generic view for cron related operations. 
  * 

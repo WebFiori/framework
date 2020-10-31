@@ -37,7 +37,7 @@ use webfiori\entity\router\Router;
 use webfiori\entity\router\RouterUri;
 use webfiori\entity\router\ViewRoutes;
 use webfiori\entity\ThemeLoader;
-use webfiori\entity\Response;
+use webfiori\framework\Response;
 use webfiori\entity\ui\ErrorBox;
 use webfiori\entity\ui\ServerErrView;
 use webfiori\entity\ui\ServiceUnavailableView;

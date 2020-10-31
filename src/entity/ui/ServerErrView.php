@@ -29,7 +29,7 @@ use Throwable;
 use webfiori\framework\Page;
 use webfiori\entity\Util;
 use webfiori\WebFiori;
-use webfiori\entity\Response;
+use webfiori\framework\Response;
 use webfiori\entity\session\SessionsManager;
 /**
  * A page which is used to display exception information when it is thrown or 

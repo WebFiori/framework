@@ -34,7 +34,7 @@ use webfiori\entity\exceptions\UIException;
 use webfiori\framework\i18n\Language;
 use webfiori\entity\session\SessionsManager;
 use webfiori\WebFiori;
-use webfiori\entity\Response;
+use webfiori\framework\Response;
 /**
  * A class used to initialize view components.
  * 

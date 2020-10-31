@@ -27,7 +27,7 @@ namespace webfiori\framework;
 use webfiori\json\JsonI;
 use webfiori\json\Json;
 use webfiori\entity\exceptions\FileException;
-use webfiori\entity\Response;
+use webfiori\framework\Response;
 /**
  * A class that represents a file.
  * 

@@ -4,7 +4,7 @@ namespace webfiori\tests\entity;
 use PHPUnit\Framework\TestCase;
 use webfiori\framework\File;
 use webfiori\entity\exceptions\FileException;
-use webfiori\entity\Response;
+use webfiori\framework\Response;
 use webfiori\json\Json;
 /**
  * A test class for testing the class 'webfiori\entity\File'.

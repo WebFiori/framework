@@ -1,5 +1,5 @@
 <?php
-namespace webfiori\entity;
+namespace webfiori\framework;
 use webfiori\entity\cli\CLI;
 use webfiori\entity\session\SessionsManager;
 /**

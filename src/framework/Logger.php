@@ -22,9 +22,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-namespace webfiori\entity;
+namespace webfiori\framework;
 
-use phpStructs\Stack;
+use webfiori\collections\Stack;
 /**
  * A class that is used to log messages to a file.
  *

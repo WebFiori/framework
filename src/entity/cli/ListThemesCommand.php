@@ -24,7 +24,7 @@
  */
 namespace webfiori\entity\cli;
 
-use webfiori\entity\ThemeLoader;
+use webfiori\framework\ThemeLoader;
 
 /**
  * A CLI command which is used to list all registered themes.

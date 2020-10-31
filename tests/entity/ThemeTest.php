@@ -4,7 +4,7 @@ namespace webfiori\tests\entity;
 use PHPUnit\Framework\TestCase;
 use webfiori\conf\SiteConfig;
 use webfiori\framework\Theme;
-use webfiori\entity\ThemeLoader;
+use webfiori\framework\ThemeLoader;
 /**
  * Description of ThemeTest
  *

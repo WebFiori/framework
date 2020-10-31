@@ -33,7 +33,7 @@ use webfiori\entity\exceptions\RoutingException;
 use webfiori\entity\ui\NotFoundView;
 use webfiori\entity\Util;
 use webfiori\framework\File;
-use webfiori\entity\ThemeLoader;
+use webfiori\framework\ThemeLoader;
 use webfiori\framework\Response;
 /**
  * The basic class that is used to route user requests to the correct 

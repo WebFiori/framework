@@ -28,7 +28,7 @@ use webfiori\json\JsonI;
 use webfiori\json\Json;
 use webfiori\restEasy\WebServicesManager;
 use webfiori\logic\Controller;
-use webfiori\entity\i18n\Language;
+use webfiori\framework\i18n\Language;
 use webfiori\WebFiori;
 /**
  * An extension for the class 'WebServicesManager' that adds support for multi-language 

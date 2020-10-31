@@ -31,7 +31,7 @@ use webfiori\ui\HTMLDoc;
 use webfiori\ui\HTMLNode;
 use webfiori\conf\SiteConfig;
 use webfiori\entity\exceptions\UIException;
-use webfiori\entity\i18n\Language;
+use webfiori\framework\i18n\Language;
 use webfiori\entity\session\SessionsManager;
 use webfiori\WebFiori;
 use webfiori\entity\Response;

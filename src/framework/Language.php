@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-namespace webfiori\entity\i18n;
+namespace webfiori\framework\i18n;
 
 use webfiori\entity\exceptions\MissingLangException;
 /**

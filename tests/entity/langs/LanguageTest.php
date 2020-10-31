@@ -1,6 +1,6 @@
 <?php
 namespace webfiori\tests\entity;
-use webfiori\entity\i18n\Language;
+use webfiori\framework\i18n\Language;
 use PHPUnit\Framework\TestCase;
 use webfiori\framework\File;
 /**

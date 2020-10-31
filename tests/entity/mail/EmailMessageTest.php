@@ -3,10 +3,10 @@ namespace webfiori\tests\entity\mail;
 
 use PHPUnit\Framework\TestCase;
 use webfiori\conf\MailConfig;
-use webfiori\entity\mail\EmailMessage;
-use webfiori\entity\mail\SMTPAccount;
+use webfiori\framework\mail\EmailMessage;
+use webfiori\framework\mail\SMTPAccount;
 /**
- * A test class for testing the class 'webfiori\entity\mail\EmailMessage'.
+ * A test class for testing the class 'webfiori\framework\mail\EmailMessage'.
  *
  * @author Ibrahim
  */

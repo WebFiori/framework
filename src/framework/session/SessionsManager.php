@@ -24,7 +24,7 @@
  */
 namespace webfiori\framework\session;
 
-use webfiori\entity\cli\CLI;
+use webfiori\framework\cli\CLI;
 use webfiori\framework\Response;
 /**
  * A class which is used to manage user sessions.

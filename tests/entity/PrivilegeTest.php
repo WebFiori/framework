@@ -4,7 +4,7 @@ namespace webfiori\tests\entity;
 use PHPUnit\Framework\TestCase;
 use webfiori\framework\Privilege;
 /**
- * A test class for testing the class 'webfiori\entity\Privilege'.
+ * A test class for testing the class 'webfiori\framework\Privilege'.
  *
  * @author Ibrahim
  */

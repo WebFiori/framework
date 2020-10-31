@@ -26,7 +26,7 @@
 namespace webfiori\examples\webApis;
 
 use restEasy\WebService;
-use webfiori\entity\ExtendedWebServices;
+use webfiori\framework\ExtendedWebServices;
 
 //create class and extend the base class API
 class ExampleAPI extends ExtendedWebServices {

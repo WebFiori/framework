@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-namespace webfiori\entity\mail;
+namespace webfiori\framework\mail;
 
 /**
  * A class that represents an email account which is used to send or receive messages.

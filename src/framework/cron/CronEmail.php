@@ -27,7 +27,7 @@ namespace webfiori\framework\cron;
 use webfiori\ui\HTMLNode;
 use webfiori\ui\TableRow;
 use webfiori\framework\File;
-use webfiori\entity\mail\EmailMessage;
+use webfiori\framework\mail\EmailMessage;
 use webfiori\WebFiori;
 /**
  * A class which can be used to send an email regarding the status of 

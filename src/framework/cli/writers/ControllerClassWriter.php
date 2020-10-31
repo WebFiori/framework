@@ -23,7 +23,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-namespace webfiori\entity\cli;
+namespace webfiori\framework\cli;
 
 /**
  * A class which is used to write basic controller class skeleton.

@@ -3,7 +3,7 @@ use webfiori\logic\Controller;
 Use webfiori\tests\database\UsersQuery;
 use webfiori\tests\testEntity\UserWithContact;
 use webfiori\tests\database\UserContactInfo;
-use webfiori\entity\DBConnectionInfo;
+use webfiori\framework\DBConnectionInfo;
 use webfiori\WebFiori;
 /**
  * Description of SimpleController

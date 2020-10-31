@@ -3,7 +3,7 @@ namespace webfiori\tests\logic;
 
 use PHPUnit\Framework\TestCase;
 use SimpleController;
-use webfiori\entity\DBConnectionInfo;
+use webfiori\framework\DBConnectionInfo;
 use webfiori\logic\Controller;
 use webfiori\tests\entity\TestQuery_1;
 use webfiori\WebFiori;

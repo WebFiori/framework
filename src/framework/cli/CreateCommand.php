@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-namespace webfiori\entity\cli;
+namespace webfiori\framework\cli;
 
 use Error;
 use phMysql\MySQLColumn;

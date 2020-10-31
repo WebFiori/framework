@@ -26,8 +26,8 @@ namespace webfiori\logic;
 
 use webfiori\conf\MailConfig;
 use webfiori\framework\File;
-use webfiori\entity\mail\SMTPAccount;
-use webfiori\entity\mail\SocketMailer;
+use webfiori\framework\mail\SMTPAccount;
+use webfiori\framework\mail\SocketMailer;
 /**
  * A class for the methods that is related to mailing.
  * The controller is responsible for controlling the following operations:

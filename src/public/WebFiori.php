@@ -28,19 +28,19 @@ use webfiori\conf\Config;
 use webfiori\conf\MailConfig;
 use webfiori\conf\SiteConfig;
 use webfiori\framework\AutoLoader;
-use webfiori\entity\cli\CLI;
+use webfiori\framework\cli\CLI;
 use webfiori\framework\exceptions\InitializationException;
-use webfiori\entity\router\APIRoutes;
-use webfiori\entity\router\ClosureRoutes;
-use webfiori\entity\router\OtherRoutes;
+use webfiori\framework\router\APIRoutes;
+use webfiori\framework\router\ClosureRoutes;
+use webfiori\framework\router\OtherRoutes;
 use webfiori\framework\router\Router;
 use webfiori\framework\router\RouterUri;
-use webfiori\entity\router\ViewRoutes;
+use webfiori\framework\router\ViewRoutes;
 use webfiori\framework\ThemeLoader;
 use webfiori\framework\Response;
-use webfiori\entity\ui\ErrorBox;
-use webfiori\entity\ui\ServerErrView;
-use webfiori\entity\ui\ServiceUnavailableView;
+use webfiori\framework\ui\ErrorBox;
+use webfiori\framework\ui\ServerErrView;
+use webfiori\framework\ui\ServiceUnavailableView;
 use webfiori\framework\Util;
 use webfiori\ini\GlobalConstants;
 use webfiori\ini\InitAutoLoad;
@@ -196,7 +196,7 @@ class WebFiori {
         /**
          * Initialize autoloader.
          */
-        if (!class_exists('webfiori\entity\AutoLoader',false)) {
+        if (!class_exists('webfiori\framework\AutoLoader',false)) {
             require_once ROOT_DIR.DS.'entity'.DS.'AutoLoader.php';
         }
         self::$AU = AutoLoader::get();
@@ -536,7 +536,7 @@ class WebFiori {
     private function _setErrHandler() {
         set_error_handler(function($errno, $errstr, $errfile, $errline)
         {
-            $isCli = class_exists('webfiori\entity\cli\CLI') ? CLI::isCLI() : http_response_code() === false;
+            $isCli = class_exists('webfiori\framework\cli\CLI') ? CLI::isCLI() : http_response_code() === false;
             Response::clear();
             if ($isCli) {
                 fprintf(STDERR, "\n<%s>\n",Util::ERR_TYPES[$errno]['type']);
@@ -581,7 +581,7 @@ class WebFiori {
     private function _setExceptionHandler() {
         set_exception_handler(function($ex)
         {
-            $isCli = class_exists('webfiori\entity\cli\CLI') ? CLI::isCLI() : php_sapi_name() == 'cli';
+            $isCli = class_exists('webfiori\framework\cli\CLI') ? CLI::isCLI() : php_sapi_name() == 'cli';
             Response::clear();
             if ($isCli) {
                 CLI::displayException($ex);
@@ -641,7 +641,7 @@ class WebFiori {
         register_shutdown_function(function()
         {
             Response::clear();
-            $isCli = class_exists('webfiori\entity\cli\CLI') ? CLI::isCLI() : php_sapi_name() == 'cli';
+            $isCli = class_exists('webfiori\framework\cli\CLI') ? CLI::isCLI() : php_sapi_name() == 'cli';
             $error = error_get_last();
 
             if ($error !== null) {

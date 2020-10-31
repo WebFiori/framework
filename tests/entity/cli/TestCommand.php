@@ -2,7 +2,7 @@
 
 namespace webfiori\tests\entity\cli;
 
-use webfiori\entity\cli\CLICommand;
+use webfiori\framework\cli\CLICommand;
 
 class TestCommand extends CLICommand {
     public function __construct($commandName, $args = array(), $description = '') {

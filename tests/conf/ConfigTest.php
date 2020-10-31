@@ -3,7 +3,7 @@ namespace webfiori\tests\conf;
 
 use PHPUnit\Framework\TestCase;
 use webfiori\conf\Config;
-use webfiori\entity\DBConnectionInfo;
+use webfiori\framework\DBConnectionInfo;
 /**
  * A set of unit tests to test the class 'Config'.
  *

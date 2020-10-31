@@ -26,7 +26,7 @@ namespace webfiori\framework\session;
 
 use webfiori\framework\File;
 use webfiori\framework\Util;
-use webfiori\entity\cli\CLI;
+use webfiori\framework\cli\CLI;
 /**
  * The default sessions storage engine.
  *

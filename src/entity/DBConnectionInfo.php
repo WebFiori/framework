@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-namespace webfiori\entity;
+namespace webfiori\framework;
 
 /**
  * An entity that can be used to store database connection information. 

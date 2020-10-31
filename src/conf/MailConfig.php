@@ -1,7 +1,7 @@
 <?php
 namespace webfiori\conf;
 
-use webfiori\entity\mail\SMTPAccount;
+use webfiori\framework\mail\SMTPAccount;
 /**
  * SMTP configuration class.
  * The developer can create multiple SMTP accounts and add

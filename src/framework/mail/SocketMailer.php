@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-namespace webfiori\entity\mail;
+namespace webfiori\framework\mail;
 
 use webfiori\framework\exceptions\SMTPException;
 use webfiori\framework\File;
@@ -187,7 +187,7 @@ class SocketMailer {
     public function addAttachment($attachment) {
         $retVal = false;
 
-        if (class_exists('webfiori\entity\File') && $attachment instanceof File 
+        if (class_exists('webfiori\framework\File') && $attachment instanceof File 
             && (file_exists($attachment->getAbsolutePath()) || file_exists(str_replace('\\', '/', $attachment->getAbsolutePath())) || $attachment->getRawData() !== null)) {
             $this->attachments[] = $attachment;
             $retVal = true;

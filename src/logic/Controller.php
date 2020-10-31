@@ -28,9 +28,9 @@ use phMysql\MySQLLink;
 use phMysql\MySQLQuery;
 use webfiori\collections\Stack;
 use webfiori\conf\Config;
-use webfiori\entity\cli\CLI;
-use webfiori\entity\DBConnectionFactory;
-use webfiori\entity\DBConnectionInfo;
+use webfiori\framework\cli\CLI;
+use webfiori\framework\DBConnectionFactory;
+use webfiori\framework\DBConnectionInfo;
 use webfiori\framework\session\SessionsManager;
 use webfiori\framework\session\Session;
 /**

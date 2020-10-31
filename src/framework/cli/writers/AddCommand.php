@@ -22,11 +22,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-namespace webfiori\entity\cli;
+namespace webfiori\framework\cli;
 
-use webfiori\entity\DBConnectionFactory;
-use webfiori\entity\DBConnectionInfo;
-use webfiori\entity\mail\SMTPAccount;
+use webfiori\framework\DBConnectionFactory;
+use webfiori\framework\DBConnectionInfo;
+use webfiori\framework\mail\SMTPAccount;
 use webfiori\WebFiori;
 
 /**

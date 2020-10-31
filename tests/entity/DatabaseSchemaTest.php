@@ -2,9 +2,9 @@
 namespace webfiori\tests\entity;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\entity\DatabaseSchema;
+use webfiori\framework\DatabaseSchema;
 /**
- * A test class for testing the class 'webfiori\entity\DatabaseSchema'.
+ * A test class for testing the class 'webfiori\framework\DatabaseSchema'.
  *
  * @author Ibrahim
  */

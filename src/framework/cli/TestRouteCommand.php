@@ -2,7 +2,7 @@
 /*
  * The MIT License
  *
- * Copyright 2019 Ibrahim, WebFiori Framework.
+ * Copyright 2020 Ibrahim, WebFiori Framework.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,44 +22,44 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-namespace webfiori\entity\ui;
+namespace webfiori\framework\cli;
 
-use webfiori\ui\HTMLNode;
-use webfiori\framework\Page;
-use webfiori\WebFiori;
-use webfiori\framework\Response;
+use webfiori\framework\router\Router;
 /**
- * A basic view which is used to display 404 HTTP error code and 
- * messages.
+ * A CLI Command which is used to test the result of routing to a specific 
+ * route.
  *
  * @author Ibrahim
  */
-class NotFoundView {
+class TestRouteCommand extends CLICommand {
     /**
      * Creates new instance of the class.
+     * The command will have name '--route'. In addition to that, 
+     * it will have the following arguments:
+     * <ul>
+     * <li><b>url</b>: The URL at which its route will be tested.</li>
+     * </ul>
      */
     public function __construct() {
-        Page::theme(WebFiori::getSiteConfig()->getBaseThemeName());
-        Page::lang(WebFiori::getSysController()->getSessionLang());
-        Page::siteName(WebFiori::getSiteConfig()->getWebsiteNames()[Page::lang()]);
-        $labels = Page::translation()->get('general/http-codes/404');
-        Page::title($labels['code'].' - '.$labels['type']);
-        http_response_code($labels['code']);
-        $h1 = new HTMLNode('h1');
-        $h1->addTextNode(Page::title());
-        Page::insert($h1);
-        $hr = new HTMLNode('hr');
-        Page::insert($hr);
-        $paragraph = new HTMLNode('p');
-        $paragraph->addTextNode($labels['message']);
-        Page::insert($paragraph);
+        parent::__construct('route', [
+            '--url' => [
+                'optional' => false,
+                'description' => 'The URL that will be tested if it has a '
+                .'route or not.'
+            ]
+        ], 'Test the result of routing to a URL');
     }
     /**
-     * Display the page.
+     * Execute the command.
+     * @return int If the command executed without any errors, the 
+     * method will return 0. Other than that, it will return false.
+     * @since 1.0
      */
-    public function display() {
-        Page::render();
-        Response::setCode(404);
-        Response::send();
+    public function exec() {
+        $url = $this->getArgValue('--url');
+        $this->println("Trying to route to \"".$url."\"...");
+        Router::route($url);
+
+        return 0;
     }
 }

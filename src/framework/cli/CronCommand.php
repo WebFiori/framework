@@ -22,9 +22,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-namespace webfiori\entity\cli;
+namespace webfiori\framework\cli;
 
-use webfiori\entity\cron\Cron;
+use webfiori\framework\cron\Cron;
 /**
  * A CLI command which is related to executing 
  * background jobs or performing operations on them..

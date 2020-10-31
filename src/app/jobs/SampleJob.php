@@ -1,8 +1,8 @@
 <?php
 namespace webfiori\jobs;
 
-use webfiori\entity\cron\AbstractJob;
-use webfiori\entity\cron\CronEmail;
+use webfiori\framework\cron\AbstractJob;
+use webfiori\framework\cron\CronEmail;
 use webfiori\framework\File;
 /**
  * A sample job that shows how to create jobs and make them schedule automatically.

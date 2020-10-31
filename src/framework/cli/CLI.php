@@ -22,11 +22,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-namespace webfiori\entity\cli;
+namespace webfiori\framework\cli;
 
 use webfiori\framework\Util;
 use webfiori\ini\InitCliCommands;
-use webfiori\entity\cron\Cron;
+use webfiori\framework\cron\Cron;
 use Exception;
 /**
  * A class which adds basic support for running the framework through 

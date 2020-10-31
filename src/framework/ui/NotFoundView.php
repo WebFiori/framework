@@ -22,24 +22,44 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-namespace webfiori\framework\router;
+namespace webfiori\framework\ui;
 
+use webfiori\ui\HTMLNode;
+use webfiori\framework\Page;
+use webfiori\WebFiori;
+use webfiori\framework\Response;
 /**
- * A class that only has one method to initiate some of system routes.
- * The class is meant to only initiate the routes which uses the method 
- * Router::addRoute().
+ * A basic view which is used to display 404 HTTP error code and 
+ * messages.
+ *
  * @author Ibrahim
- * @version 1.0
  */
-class OtherRoutes {
+class NotFoundView {
     /**
-     * Create all other routes. Include your own here.
-     * @since 1.0
+     * Creates new instance of the class.
      */
-    public static function create() {
-        Router::addRoute([
-            'path' => 'my-custom/view-something', 
-            'route-to' => 'my-folder/file.php'
-        ]);
+    public function __construct() {
+        Page::theme(WebFiori::getSiteConfig()->getBaseThemeName());
+        Page::lang(WebFiori::getSysController()->getSessionLang());
+        Page::siteName(WebFiori::getSiteConfig()->getWebsiteNames()[Page::lang()]);
+        $labels = Page::translation()->get('general/http-codes/404');
+        Page::title($labels['code'].' - '.$labels['type']);
+        http_response_code($labels['code']);
+        $h1 = new HTMLNode('h1');
+        $h1->addTextNode(Page::title());
+        Page::insert($h1);
+        $hr = new HTMLNode('hr');
+        Page::insert($hr);
+        $paragraph = new HTMLNode('p');
+        $paragraph->addTextNode($labels['message']);
+        Page::insert($paragraph);
+    }
+    /**
+     * Display the page.
+     */
+    public function display() {
+        Page::render();
+        Response::setCode(404);
+        Response::send();
     }
 }

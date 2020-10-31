@@ -25,8 +25,8 @@
 namespace webfiori\framework;
 
 use webfiori\conf\Config;
-use webfiori\entity\cli\CLI;
-use webfiori\entity\ui\MessageBox;
+use webfiori\framework\cli\CLI;
+use webfiori\framework\ui\MessageBox;
 use webfiori\WebFiori;
 /**
  * Framework utility class.

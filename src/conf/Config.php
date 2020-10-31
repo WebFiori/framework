@@ -1,7 +1,7 @@
 <?php
 namespace webfiori\conf;
 
-use webfiori\entity\DBConnectionInfo;
+use webfiori\framework\DBConnectionInfo;
 /**
  * Global configuration class. 
  * Used by the server part and the presentation part. It contains framework version 

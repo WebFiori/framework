@@ -26,7 +26,7 @@
 namespace webfiori\framework\cron\webServices;
 
 use webfiori\restEasy\AbstractWebService;
-use webfiori\entity\cron\Cron;
+use webfiori\framework\cron\Cron;
 use webfiori\restEasy\RequestParameter;
 use webfiori\framework\session\SessionsManager;
 use webfiori\json\Json;

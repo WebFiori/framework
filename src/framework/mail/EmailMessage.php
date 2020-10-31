@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-namespace webfiori\entity\mail;
+namespace webfiori\framework\mail;
 
 use webfiori\ui\HTMLDoc;
 use webfiori\ui\HTMLNode;

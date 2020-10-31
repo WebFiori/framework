@@ -267,7 +267,7 @@ class Language {
         if (isset(self::$loadedLangs[$uLangCode])) {
             return self::$loadedLangs[$uLangCode];
         } else {
-            $langClassName = 'webfiori\entity\i18n\Language'.$uLangCode;
+            $langClassName = 'webfiori\framework\i18n\Language'.$uLangCode;
 
             if (class_exists($langClassName)) {
                 $class = new $langClassName();

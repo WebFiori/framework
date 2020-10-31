@@ -2,7 +2,7 @@
 namespace webfiori\tests\entity;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\entity\Privilege;
+use webfiori\framework\Privilege;
 use webfiori\entity\PrivilegesGroup;
 
 /**

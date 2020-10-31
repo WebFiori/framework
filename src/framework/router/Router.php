@@ -29,7 +29,7 @@ use webfiori\ui\HTMLNode;
 use webfiori\restEasy\WebServicesManager;
 use webfiori\conf\SiteConfig;
 use webfiori\entity\cli\CLI;
-use webfiori\entity\exceptions\RoutingException;
+use webfiori\framework\exceptions\RoutingException;
 use webfiori\entity\ui\NotFoundView;
 use webfiori\framework\Util;
 use webfiori\framework\File;

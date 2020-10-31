@@ -24,7 +24,7 @@
  */
 namespace webfiori\framework\i18n;
 
-use webfiori\entity\exceptions\MissingLangException;
+use webfiori\framework\exceptions\MissingLangException;
 /**
  * A class that is can be used to make the application ready for 
  * Internationalization (i18n).

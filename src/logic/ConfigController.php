@@ -27,7 +27,7 @@ namespace webfiori\logic;
 use Exception;
 use webfiori\conf\Config;
 use webfiori\entity\DBConnectionInfo;
-use webfiori\entity\exceptions\InitializationException;
+use webfiori\framework\exceptions\InitializationException;
 use webfiori\framework\File;
 /**
  * A class that can be used to modify basic configuration settings of 

@@ -24,7 +24,7 @@
  */
 namespace webfiori\entity\cli;
 
-use webfiori\entity\router\Router;
+use webfiori\framework\router\Router;
 /**
  * A CLI Command which is used to test the result of routing to a specific 
  * route.

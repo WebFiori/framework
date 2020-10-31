@@ -25,7 +25,7 @@
 namespace webfiori\framework;
 
 use Exception;
-use webfiori\entity\exceptions\ClassLoaderException;
+use webfiori\framework\exceptions\ClassLoaderException;
 /**
  * An autoloader class to load classes as needed during runtime.
  * 

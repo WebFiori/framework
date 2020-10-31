@@ -3,7 +3,7 @@ namespace webfiori\tests\entity;
 
 use PHPUnit\Framework\TestCase;
 use webfiori\framework\File;
-use webfiori\entity\exceptions\FileException;
+use webfiori\framework\exceptions\FileException;
 use webfiori\framework\Response;
 use webfiori\json\Json;
 /**

@@ -22,15 +22,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-namespace webfiori\entity\exceptions;
+namespace webfiori\framework\exceptions;
 
 use Exception;
-
 /**
- * An exception which is thrown to indicate that something went wrong when 
- * sending an email message using SMTP.
+ * An exception that might be thrown during initialization stage.
  *
  * @author Ibrahim
+ * @version 1.0
  */
-class SMTPException extends Exception {
+class InitializationException extends Exception {
 }

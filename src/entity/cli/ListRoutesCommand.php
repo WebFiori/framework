@@ -24,7 +24,7 @@
  */
 namespace webfiori\entity\cli;
 
-use webfiori\entity\router\Router;
+use webfiori\framework\router\Router;
 /**
  * A CLI command which is used to show a list of all added routes.
  *

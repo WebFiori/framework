@@ -24,7 +24,7 @@
  */
 namespace webfiori\entity\mail;
 
-use webfiori\entity\exceptions\SMTPException;
+use webfiori\framework\exceptions\SMTPException;
 use webfiori\framework\File;
 /**
  * A class that can be used to send email messages using sockets.

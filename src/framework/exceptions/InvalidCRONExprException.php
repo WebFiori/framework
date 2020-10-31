@@ -22,14 +22,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-namespace webfiori\entity\exceptions;
+namespace webfiori\framework\exceptions;
 
 use Exception;
 /**
- * An exception which is thrown when a translation was not found or no object 
- * of type 'Language' was found for a language.
+ * An exception which is thrown in case of invalid CRON expression was provided 
+ * when initializing CRON job.
  *
  * @author Ibrahim
  */
-class MissingLangException extends Exception {
+class InvalidCRONExprException extends Exception {
 }

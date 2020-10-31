@@ -27,7 +27,7 @@ namespace webfiori\entity\mail;
 use webfiori\ui\HTMLDoc;
 use webfiori\ui\HTMLNode;
 use webfiori\conf\MailConfig;
-use webfiori\entity\exceptions\SMTPException;
+use webfiori\framework\exceptions\SMTPException;
 use webfiori\framework\File;
 use webfiori\logic\EmailController;
 /**

@@ -30,7 +30,7 @@ use webfiori\ui\HeadNode;
 use webfiori\ui\HTMLDoc;
 use webfiori\ui\HTMLNode;
 use webfiori\conf\SiteConfig;
-use webfiori\entity\exceptions\UIException;
+use webfiori\framework\exceptions\UIException;
 use webfiori\framework\i18n\Language;
 use webfiori\framework\session\SessionsManager;
 use webfiori\WebFiori;

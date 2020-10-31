@@ -26,7 +26,7 @@ namespace webfiori\framework\cron;
 
 use Exception;
 use webfiori\collections\Queue;
-use webfiori\entity\router\Router;
+use webfiori\framework\router\Router;
 use webfiori\entity\cli\CLI;
 use webfiori\framework\Util;
 use webfiori\WebFiori;

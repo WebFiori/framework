@@ -30,7 +30,7 @@ use webfiori\ui\Paragraph;
 use webfiori\ui\TableCell;
 use webfiori\ui\TableRow;
 use webfiori\framework\Page;
-use webfiori\entity\router\Router;
+use webfiori\framework\router\Router;
 use webfiori\WebFiori;
 /**
  * A view to show details of a specific CRON task.

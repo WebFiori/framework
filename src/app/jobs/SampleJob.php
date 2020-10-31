@@ -3,7 +3,7 @@ namespace webfiori\jobs;
 
 use webfiori\entity\cron\AbstractJob;
 use webfiori\entity\cron\CronEmail;
-use webfiori\entity\File;
+use webfiori\framework\File;
 /**
  * A sample job that shows how to create jobs and make them schedule automatically.
  */

@@ -30,7 +30,7 @@ use webfiori\ui\Label;
 use webfiori\ui\Paragraph;
 use webfiori\ui\TableCell;
 use webfiori\ui\TableRow;
-use webfiori\entity\File;
+use webfiori\framework\File;
 use webfiori\entity\Page;
 use webfiori\WebFiori;
 /**

@@ -25,7 +25,7 @@
 namespace webfiori\logic;
 
 use webfiori\conf\MailConfig;
-use webfiori\entity\File;
+use webfiori\framework\File;
 use webfiori\entity\mail\SMTPAccount;
 use webfiori\entity\mail\SocketMailer;
 /**

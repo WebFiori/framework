@@ -28,7 +28,7 @@ use webfiori\ui\HTMLDoc;
 use webfiori\ui\HTMLNode;
 use webfiori\conf\MailConfig;
 use webfiori\entity\exceptions\SMTPException;
-use webfiori\entity\File;
+use webfiori\framework\File;
 use webfiori\logic\EmailController;
 /**
  * A class that can be used to write HTML formatted Email messages.

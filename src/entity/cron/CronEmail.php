@@ -26,7 +26,7 @@ namespace webfiori\entity\cron;
 
 use webfiori\ui\HTMLNode;
 use webfiori\ui\TableRow;
-use webfiori\entity\File;
+use webfiori\framework\File;
 use webfiori\entity\mail\EmailMessage;
 use webfiori\WebFiori;
 /**

@@ -32,7 +32,7 @@ use webfiori\entity\cli\CLI;
 use webfiori\entity\exceptions\RoutingException;
 use webfiori\entity\ui\NotFoundView;
 use webfiori\entity\Util;
-use webfiori\entity\File;
+use webfiori\framework\File;
 use webfiori\entity\ThemeLoader;
 use webfiori\entity\Response;
 /**

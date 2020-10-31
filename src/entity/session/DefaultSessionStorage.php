@@ -24,7 +24,7 @@
  */
 namespace webfiori\entity\session;
 
-use webfiori\entity\File;
+use webfiori\framework\File;
 use webfiori\entity\Util;
 use webfiori\entity\cli\CLI;
 /**

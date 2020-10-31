@@ -24,7 +24,7 @@
  */
 namespace webfiori\entity\cli;
 
-use webfiori\entity\File;
+use webfiori\framework\File;
 /**
  * A utility class which is used as a helper class with the command 'create'.
  * This class can be used to write .php classes.

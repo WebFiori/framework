@@ -1,6 +1,6 @@
 <?php
 
-use webfiori\entity\AutoLoader;
+use webfiori\framework\AutoLoader;
 use webfiori\entity\cli\CLI;
 use webfiori\ini\GlobalConstants;
 $DS = DIRECTORY_SEPARATOR;

@@ -27,7 +27,7 @@ use webfiori\json\Json;
 use webfiori\conf\Config;
 use webfiori\conf\MailConfig;
 use webfiori\conf\SiteConfig;
-use webfiori\entity\AutoLoader;
+use webfiori\framework\AutoLoader;
 use webfiori\entity\cli\CLI;
 use webfiori\entity\exceptions\InitializationException;
 use webfiori\entity\router\APIRoutes;

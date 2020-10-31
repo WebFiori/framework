@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-namespace webfiori\entity;
+namespace webfiori\framework;
 
 use Exception;
 use webfiori\entity\exceptions\ClassLoaderException;
@@ -506,7 +506,6 @@ class AutoLoader {
         } else {
             $f = $value.$DS.$className.'.php';
         }
-
         if (file_exists($f) && !in_array($f, $allPaths)) {
             require_once $f;
             $ns = count(explode('\\', $classWithNs)) == 1 ? '\\' : substr($classWithNs, 0, strlen($classWithNs) - strlen($className) - 1);
@@ -646,7 +645,6 @@ class AutoLoader {
      * @since 1.0
      */
     private function loadClass($classWithNs) {
-        
         if (self::isLoaded($classWithNs)) {
             return;
         }
@@ -655,7 +653,9 @@ class AutoLoader {
         $loaded = false;
         //checks if the class is cached or not.
         if ($this->_loadFromCache($classWithNs, $className)) {
-            return;
+            if (class_exists($classWithNs, false)) {
+                return;
+            }
         }
         
         $allPaths = self::getClassPath($className);
@@ -675,7 +675,7 @@ class AutoLoader {
                 break;
             }
         }
-
+        
         if ($loaded === false) {
             if (is_callable($this->onFail)) {
                 call_user_func($this->onFail);

@@ -30,7 +30,7 @@ use phMysql\MySQLQuery;
 use restEasy\WebService;
 use restEasy\APIFilter;
 use restEasy\RequestParameter;
-use webfiori\entity\AutoLoader;
+use webfiori\framework\AutoLoader;
 use webfiori\entity\Util;
 use webfiori\WebFiori;
 use webfiori\logic\Controller;

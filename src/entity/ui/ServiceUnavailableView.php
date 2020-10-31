@@ -28,7 +28,7 @@ namespace webfiori\entity\ui;
 use webfiori\ui\HTMLNode;
 use webfiori\ui\UnorderedList;
 use webfiori\conf\Config;
-use webfiori\entity\Page;
+use webfiori\framework\Page;
 
 /**
  * A view which is show to tell the user that the framework isn't configured 

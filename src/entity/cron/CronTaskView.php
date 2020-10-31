@@ -29,7 +29,7 @@ use webfiori\ui\JsCode;
 use webfiori\ui\Paragraph;
 use webfiori\ui\TableCell;
 use webfiori\ui\TableRow;
-use webfiori\entity\Page;
+use webfiori\framework\Page;
 use webfiori\entity\router\Router;
 use webfiori\WebFiori;
 /**

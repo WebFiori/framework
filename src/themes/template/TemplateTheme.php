@@ -3,7 +3,7 @@
 use webfiori\ui\HeadNode;
 use webfiori\ui\HTMLNode;
 use webfiori\conf\SiteConfig;
-use webfiori\entity\Page;
+use webfiori\framework\Page;
 use webfiori\entity\Theme;
 class TemplateTheme extends Theme {
     public function __construct() {

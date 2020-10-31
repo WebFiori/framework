@@ -6,7 +6,7 @@ use webfiori\ui\HeadNode;
 use webfiori\ui\HTMLNode;
 use webfiori\ui\ListItem;
 use webfiori\ui\UnorderedList;
-use webfiori\entity\Page;
+use webfiori\framework\Page;
 use webfiori\entity\Theme;
 use webfiori\WebFiori;
 /**

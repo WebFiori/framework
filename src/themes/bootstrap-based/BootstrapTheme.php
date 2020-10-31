@@ -4,7 +4,7 @@ namespace webfiori\theme;
 use webfiori\ui\HeadNode;
 use webfiori\ui\HTMLNode;
 use webfiori\ui\ListItem;
-use webfiori\entity\Page;
+use webfiori\framework\Page;
 use webfiori\entity\Theme;
 /**
  * A basic theme which is based on Bootstrap CSS framework.

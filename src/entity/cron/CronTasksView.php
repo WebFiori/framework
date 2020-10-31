@@ -31,7 +31,7 @@ use webfiori\ui\Paragraph;
 use webfiori\ui\TableCell;
 use webfiori\ui\TableRow;
 use webfiori\framework\File;
-use webfiori\entity\Page;
+use webfiori\framework\Page;
 use webfiori\WebFiori;
 /**
  * A view to display information about CRON Jobs.

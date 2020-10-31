@@ -25,7 +25,7 @@
 namespace webfiori\entity\ui;
 
 use webfiori\ui\HTMLNode;
-use webfiori\entity\Page;
+use webfiori\framework\Page;
 use webfiori\WebFiori;
 use webfiori\entity\Response;
 /**

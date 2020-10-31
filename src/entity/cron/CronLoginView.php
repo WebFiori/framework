@@ -27,7 +27,7 @@ namespace webfiori\entity\cron;
 use webfiori\ui\HTMLNode;
 use webfiori\ui\Input;
 use webfiori\ui\Label;
-use webfiori\entity\Page;
+use webfiori\framework\Page;
 use webfiori\WebFiori;
 use webfiori\entity\Response;
 use webfiori\entity\session\SessionsManager;

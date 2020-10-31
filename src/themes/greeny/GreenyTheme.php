@@ -5,7 +5,7 @@ use webfiori\ui\HeadNode;
 use webfiori\ui\HTMLNode;
 use webfiori\conf\Config;
 use webfiori\conf\SiteConfig;
-use webfiori\entity\Page;
+use webfiori\framework\Page;
 use webfiori\entity\Theme;
 use webfiori\logic\WebsiteController;
 class GreenyTheme extends Theme {

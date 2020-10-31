@@ -2,7 +2,7 @@
 namespace webfiori\theme;
 
 use webfiori\framework\i18n\Language;
-use webfiori\entity\Page;
+use webfiori\framework\Page;
 /**
  * Extending language file by adding more labels.
  *

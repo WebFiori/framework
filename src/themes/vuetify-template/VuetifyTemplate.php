@@ -1,7 +1,7 @@
 <?php
 use webfiori\entity\Theme;
 use webfiori\ui\HTMLNode;
-use webfiori\entity\Page;
+use webfiori\framework\Page;
 use webfiori\ui\HeadNode;
 use webfiori\json\Json;
 use webfiori\ui\JsCode;

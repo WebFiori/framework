@@ -27,7 +27,7 @@ namespace webfiori\entity\ui;
 use webfiori\ui\HTMLNode;
 use Throwable;
 use webfiori\framework\Page;
-use webfiori\entity\Util;
+use webfiori\framework\Util;
 use webfiori\WebFiori;
 use webfiori\framework\Response;
 use webfiori\entity\session\SessionsManager;

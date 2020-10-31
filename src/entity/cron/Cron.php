@@ -28,7 +28,7 @@ use Exception;
 use webfiori\collections\Queue;
 use webfiori\entity\router\Router;
 use webfiori\entity\cli\CLI;
-use webfiori\entity\Util;
+use webfiori\framework\Util;
 use webfiori\WebFiori;
 use webfiori\entity\cli\CLICommand;
 /**

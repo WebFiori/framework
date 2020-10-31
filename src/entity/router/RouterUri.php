@@ -27,7 +27,7 @@ namespace webfiori\entity\router;
 use Closure;
 use InvalidArgumentException;
 use webfiori\ui\HTMLNode;
-use webfiori\entity\Util;
+use webfiori\framework\Util;
 /**
  * A class that is used to split URIs and get their parameters.
  * 

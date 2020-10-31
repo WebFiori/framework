@@ -24,7 +24,7 @@
  */
 namespace webfiori\entity\cli;
 
-use webfiori\entity\Util;
+use webfiori\framework\Util;
 use webfiori\ini\InitCliCommands;
 use webfiori\entity\cron\Cron;
 use Exception;

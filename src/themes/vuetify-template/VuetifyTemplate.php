@@ -5,7 +5,7 @@ use webfiori\framework\Page;
 use webfiori\ui\HeadNode;
 use webfiori\json\Json;
 use webfiori\ui\JsCode;
-use webfiori\entity\Util;
+use webfiori\framework\Util;
 use webfiori\WebFiori;
 
 /**

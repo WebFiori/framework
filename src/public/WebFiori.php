@@ -41,7 +41,7 @@ use webfiori\framework\Response;
 use webfiori\entity\ui\ErrorBox;
 use webfiori\entity\ui\ServerErrView;
 use webfiori\entity\ui\ServiceUnavailableView;
-use webfiori\entity\Util;
+use webfiori\framework\Util;
 use webfiori\ini\GlobalConstants;
 use webfiori\ini\InitAutoLoad;
 use webfiori\ini\InitCron;

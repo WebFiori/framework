@@ -2,7 +2,7 @@
 namespace webfiori\tests\entity;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\entity\Util as U;
+use webfiori\framework\Util as U;
 /**
  * A unit test class for testing the class webfiori/entity/Util.
  *

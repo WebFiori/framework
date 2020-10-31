@@ -31,7 +31,7 @@ use restEasy\WebService;
 use restEasy\APIFilter;
 use restEasy\RequestParameter;
 use webfiori\framework\AutoLoader;
-use webfiori\entity\Util;
+use webfiori\framework\Util;
 use webfiori\WebFiori;
 use webfiori\logic\Controller;
 use webfiori\database\Table;

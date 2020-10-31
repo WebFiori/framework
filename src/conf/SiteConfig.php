@@ -1,7 +1,7 @@
 <?php
 namespace webfiori\conf;
 
-use webfiori\entity\Util;
+use webfiori\framework\Util;
 /** 
  * Website configuration class.
  * This class is used to control the following settings:

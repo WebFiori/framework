@@ -267,10 +267,10 @@ class WebFioriV108 extends Theme {
     }
     public function getHeadNode() {
         $head = new HeadNode();
-        $head->addCSS('https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css',false);
-        $head->addJs('https://code.jquery.com/jquery-3.4.1.slim.min.js',false);
-        $head->addJs('https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js', false);
-        $head->addJs('https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js',false);
+        $head->addCSS('https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css');
+        $head->addJs('https://code.jquery.com/jquery-3.4.1.slim.min.js');
+        $head->addJs('https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js');
+        $head->addJs('https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js');
 
         return $head;
     }

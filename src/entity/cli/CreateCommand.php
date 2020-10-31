@@ -34,6 +34,8 @@ use webfiori\entity\AutoLoader;
 use webfiori\entity\Util;
 use webfiori\WebFiori;
 use webfiori\logic\Controller;
+use webfiori\database\Table;
+use Exception;
 /**
  * A command which is used to automate some of the common tasks such as 
  * creating query classes or controllers.
@@ -193,7 +195,7 @@ class CreateCommand extends CLICommand {
             'Entity class from query.',
             'Controller class.',
             'Web services set.',
-            'Database table from query class.',
+            'Database table from class.',
             'Quit.'
         ];
         $answer = $this->select('What would you like to create?', $options, count($options) - 1);
@@ -208,7 +210,7 @@ class CreateCommand extends CLICommand {
                 return $this->_createController();
             } else if ($answer == 'Web services set.') {
                 return $this->_createWebServices();
-            } else if ($answer == 'Database table from query class.') {
+            } else if ($answer == 'Database table from class.') {
                 $this->_createDbTable();
             }
         }
@@ -219,46 +221,46 @@ class CreateCommand extends CLICommand {
         if (count($dbConnections) != 0) {
             $dbConn = $this->select('Select database connection:', $dbConnections, 0);
             $queryClassNameValidity = false;
-            $queryClassName = $this->getArgValue('--query-class');
+            $tableClassName = $this->getArgValue('--table');
             do {
-                if (strlen($queryClassName) == 0) {
-                    $queryClassName = $this->getInput('Enter query class name (include namespace):');
+                if (strlen($tableClassName) == 0) {
+                    $tableClassName = $this->getInput('Enter database table class name (include namespace):');
                 }
 
-                if (!class_exists($queryClassName)) {
+                if (!class_exists($tableClassName)) {
                     $this->error('Class not found.');
-                    $queryClassName = '';
+                    $tableClassName = '';
                     continue;
                 }
-                $queryObj = new $queryClassName();
+                $tableObj = new $tableClassName();
 
-                if (!$queryObj instanceof MySQLQuery) {
-                    $this->error('The given class is not a child of the class "MySQLQuery".');
-                    $queryClassName = '';
+                if (!$tableObj instanceof Table) {
+                    $this->error('The given class is not a child of the class "webfiori\database\Table".');
+                    $tableClassName = '';
                     continue;
                 }
                 $queryClassNameValidity = true;
             } while (!$queryClassNameValidity);
             
-            $tempController = new Controller();
-            $tempController->setConnection($dbConn);
-            $queryObj->createTable();
-            $conn = WebFiori::getConfig()->getDBConnection($dbConn);
+            $db = new \webfiori\framework\DB($dbConn);
+            $db->addTable($tableObj);
+            $db->table($tableObj->getName())->createTable();
+            
             $this->prints('The following query will be executed on the database ');
-            $this->println($conn->getDBName(),[
+            $this->println($db->getConnectionInfo()->getDBName(),[
                 'color' => 'yellow'
             ]);
-            $this->println($queryObj->getQuery(), [
+            $this->println($db->getLastQuery(), [
                 'color' => 'light-blue'
             ]);
             if ($this->confirm('Continue?', true)) {
                 $this->println('Creating your new table. Please wait a moment...');
-                if ($tempController->excQ($queryObj)) {
+                try {
+                    $db->execute();
                     $this->success('Database table created.');
-                } else {
+                } catch (Exception $ex) {
                     $this->error('Unable to create database table.');
-                    $err = $tempController->getDBErrDetails();
-                    $this->println("Error Code: %s\nError Message: %s", $err['error-code'], $err['error-message']);
+                    $this->error($ex->getMessage());
                 }
             }
             

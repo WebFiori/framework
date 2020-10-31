@@ -684,7 +684,6 @@ class WebFiori {
  * Planting application seed into the ground and make your work bloom.
  */
 WebFiori::getAndStart();
-
 if (CLI::isCLI() === true) {
     CLI::registerCommands();
     CLI::runCLI();

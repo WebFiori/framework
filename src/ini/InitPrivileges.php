@@ -24,7 +24,7 @@
  */
 namespace webfiori\ini;
 
-use webfiori\entity\Access;
+use webfiori\framework\Access;
 /**
  * A class that has one method which is used to initialize privileges.
  * 

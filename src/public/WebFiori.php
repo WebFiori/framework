@@ -463,9 +463,9 @@ class WebFiori {
         if (!class_exists('webfiori\json\Json')) {
             throw new InitializationException("The standard library 'webfiori/jsonx' is missing.");
         }
-
-        if (!class_exists('phMysql\MySQLLink')) {
-            throw new InitializationException("The standard library 'webfiori/ph-mysql' is missing.");
+        
+        if (!class_exists('webfiori\database\ResultSet')) {
+            throw new InitializationException("The standard library 'webfiori/database' is missing.");
         }
 
         if (!class_exists('webfiori\restEasy\WebServicesManager')) {

@@ -218,7 +218,7 @@ class WebsiteController extends Controller {
         $fileAsStr = "<?php\n"
             . "namespace webfiori\conf;\n"
             . "\n"
-            . "use webfiori\\entity\Util;\n"
+            . "use webfiori\\framework\Util;\n"
             . "/**\n"
             . "  * Website configuration class.\n"
             . "  * This class is used to control the following settings:\n"

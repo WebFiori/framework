@@ -214,7 +214,7 @@ class EmailController extends Controller {
                 ."<?php\n"
                 ."namespace webfiori\\conf;\n"
                 ."\n"
-                ."use webfiori\\entity\\mail\\SMTPAccount;\n"
+                ."use webfiori\\framework\\mail\\SMTPAccount;\n"
                 ."/**\n"
                 ." * SMTP configuration class.\n"
                 ." * The developer can create multiple SMTP accounts and add\n"

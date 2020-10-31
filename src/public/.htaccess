@@ -16,7 +16,7 @@ RewriteRule .* - [e=HTTP_AUTHORIZATION:%1]
 # Deny direct access to some folders.
 # Ones which are not here are public.
 # Add your own here.
-RewriteRule ^(vendor|apis|conf|entity|ini|logic|logs|pages) - [F,L]
+RewriteRule ^(vendor|apis|conf|framework|ini|logic|logs|pages) - [F,L]
 
 <FilesMatch "\.(?:log|cache|config|sh|bat)$">
     # Deny access to any file with given extension.

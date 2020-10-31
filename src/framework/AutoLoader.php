@@ -228,10 +228,10 @@ class AutoLoader {
         if (self::$loader === null) {
             $frameworkSearchFoldres = [
                 '',
-                $DS.'entity'.$DS.'exceptions',
-                $DS.'entity'.$DS.'cli',
-                $DS.'entity'.$DS.'ui',
-                $DS.'entity',
+                $DS.'framework'.$DS.'exceptions',
+                $DS.'framework'.$DS.'cli',
+                $DS.'framework'.$DS.'ui',
+                $DS.'framework',
                 $DS.'themes',
                 $DS.'logic',
                 $DS.'apis',

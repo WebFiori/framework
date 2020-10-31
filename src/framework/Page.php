@@ -581,7 +581,7 @@ class Page {
      * 
      * Note that page language must be set before calling this method in 
      * order to load a translation file. Translations can be found in 
-     * the folder '/entity/lang'. Also, the method will throw an exception 
+     * the folder '/app/lang'. Also, the method will throw an exception 
      * in case language file is not found or not initialized correctly.
      * 
      * @return Language|null An object of type Language is returned 

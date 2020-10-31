@@ -26,7 +26,7 @@ namespace webfiori\logic;
 
 use Exception;
 use webfiori\conf\Config;
-use webfiori\framework\DBConnectionInfo;
+use webfiori\database\ConnectionInfo;
 use webfiori\framework\exceptions\InitializationException;
 use webfiori\framework\File;
 /**
@@ -89,7 +89,7 @@ class ConfigController extends Controller {
     /**
      * Adds new database connections information or update existing connections.
      * The information of the connections will be stored in the file 'Config.php'.
-     * @param array $dbConnectionsInfo An array that contains objects of type DBConnectionInfo. 
+     * @param array $dbConnectionsInfo An array that contains objects of type ConnectionInfo. 
      * @since 1.4.3
      */
     public function addOrUpdateDBConnections($dbConnectionsInfo) {
@@ -97,7 +97,7 @@ class ConfigController extends Controller {
             $confVars = $this->getConfigVars();
 
             foreach ($dbConnectionsInfo as $con) {
-                if ($con instanceof DBConnectionInfo && strlen($con->getHost()) > 0 && 
+                if ($con instanceof ConnectionInfo && strlen($con->getHost()) > 0 && 
                     strlen($con->getPort()) > 0 &&
                     strlen($con->getUsername()) > 0 && 
                     strlen($con->getPassword()) > 0 && 
@@ -156,7 +156,7 @@ class ConfigController extends Controller {
      * <li>config-file-version: Configuration file version number.</li>
      * <li>databases: A sub associative array that contains multiple 
      * database connections information. The key will be the name of the database 
-     * and the value is an object of type DBConnectionInfo.</li>
+     * and the value is an object of type ConnectionInfo.</li>
      * </ul>
      * @return array An associative array that contains system configuration 
      * info.
@@ -241,7 +241,7 @@ class ConfigController extends Controller {
         $fileAsStr = "<?php\n"
                 . "namespace webfiori\conf;\n"
                 . "\n"
-                . "use webfiori\\entity\DBConnectionInfo;\n"
+                . "use webfiori\\database\ConnectionInfo;\n"
                 . "/**\n"
                 . " * Global configuration class.\n"
                 . " * Used by the server part and the presentation part. It contains framework version\n"
@@ -302,14 +302,14 @@ class ConfigController extends Controller {
 
         foreach ($configArr['databases'] as $dbConn) {
             if ($i + 1 == $count) {
-                $fileAsStr .= "            '".$dbConn->getConnectionName()."' => new DBConnectionInfo("
+                $fileAsStr .= "            '".$dbConn->getConnectionName()."' => new ConnectionInfo("
                         . "'".$dbConn->getUsername()."', "
                         . "'".$dbConn->getPassword()."', "
                         . "'".$dbConn->getDBName()."', "
                         . "'".$dbConn->getHost()."', "
                         . "".$dbConn->getPort().")";
             } else {
-                $fileAsStr .= "            '".$dbConn->getConnectionName()."' => new DBConnectionInfo("
+                $fileAsStr .= "            '".$dbConn->getConnectionName()."' => new ConnectionInfo("
                         . "'".$dbConn->getUsername()."', "
                         . "'".$dbConn->getPassword()."', "
                         . "'".$dbConn->getDBName()."', "
@@ -327,12 +327,12 @@ class ConfigController extends Controller {
                 . "    }\n"
                 . "    /**\n"
                 . "     * Adds new database connection or updates an existing one.\n"
-                . "     * @param DBConnectionInfo \$connectionInfo an object of type 'DBConnectionInfo'\n"
+                . "     * @param ConnectionInfo \$connectionInfo an object of type 'ConnectionInfo'\n"
                 . "     * that will contain connection information.\n"
                 . "     * @since 1.3.4\n"
                 . "     */\n"
                 . "    public static function addDbConnection(\$connectionInfo) {\n"
-                . "        if (\$connectionInfo instanceof DBConnectionInfo) {\n"
+                . "        if (\$connectionInfo instanceof ConnectionInfo) {\n"
                 . "            self::get()->dbConnections[\$connectionInfo->getConnectionName()] = \$connectionInfo;\n"
                 . "        }\n"
                 . "    }\n"
@@ -362,8 +362,8 @@ class ConfigController extends Controller {
                 . "    /**\n"
                 . "     * Returns database connection information given connection name.\n"
                 . "     * @param string \$conName The name of the connection.\n"
-                . "     * @return DBConnectionInfo|null The method will return an object of type\n"
-                . "     * DBConnectionInfo if a connection info was found for the given connection name.\n"
+                . "     * @return ConnectionInfo|null The method will return an object of type\n"
+                . "     * ConnectionInfo if a connection info was found for the given connection name.\n"
                 . "     * Other than that, the method will return null.\n"
                 . "     * @since 1.3.3\n"
                 . "     */\n"
@@ -380,7 +380,7 @@ class ConfigController extends Controller {
                 . "    /**\n"
                 . "     * Returns an associative array that contain the information of database connections.\n"
                 . "     * The keys of the array will be the name of database connection and the value of\n"
-                . "     * each key will be an object of type DBConnectionInfo.\n"
+                . "     * each key will be an object of type ConnectionInfo.\n"
                 . "     * @return array An associative array.\n"
                 . "     * @since 1.3.3\n"
                 . "     */\n"

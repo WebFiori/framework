@@ -25,8 +25,8 @@
 namespace webfiori\framework\cli;
 
 use Error;
-use phMysql\MySQLColumn;
-use phMysql\MySQLQuery;
+use webfiori\database\mysql\MySQLColumn;
+use webfiori\database\mysql\MySQLTable;
 use restEasy\WebService;
 use restEasy\APIFilter;
 use restEasy\RequestParameter;
@@ -388,40 +388,38 @@ class CreateCommand extends CLICommand {
     }
     private function _createQueryClass() {
         $classInfo = $this->getClassInfo();
-
-        $tempQuery = new MySQLQuery();
+        
+        $tableName = $this->getInput('Enter a name for the new table:');
+        
+        $tempTable = new MySQLTable($tableName);
         $addMoreCols = true;
-        $this->_setTableName($tempQuery);
-        $this->_setTableComment($tempQuery);
-        $addDefaultCols = $this->confirm('Would you like to include default columns? Default columns include "id", "created-on" and "last-updated".', false);
-
-        if ($addDefaultCols) {
-            $tempQuery->getTable()->addDefaultCols();
-        }
-        $this->println('Now we have to add columns to the table.');
+        $this->_setTableName($tempTable);
+        $this->_setTableComment($tempTable);
+        $this->println('Now you have to add columns to the table.');
 
         do {
             $colKey = $this->getInput('Enter a name for column key:');
-            $colDatatype = $this->select('Select column data type:', MySQLColumn::DATATYPES, 0);
-            $isAdded = $tempQuery->getTable()->addColumn($colKey, [
+            $col = new MySQLColumn();
+            $colDatatype = $this->select('Select column data type:', $col->getSupportedTypes(), 0);
+            $isAdded = $tempTable->getTable()->addColumn($colKey, [
                 'datatype' => $colDatatype
             ]);
 
             if (!$isAdded) {
                 $this->warning('The column was not added. Mostly, key name is invalid. Try again.');
             } else {
-                $colObj = $tempQuery->getCol($colKey);
+                $colObj = $tempTable->getCol($colKey);
                 $this->_setSize($colObj);
                 $this->_isPrimaryCheck($colObj);
                 $this->_addColComment($colObj);
             }
             $addMoreCols = $this->confirm('Would you like to add another column?', false);
         } while ($addMoreCols);
-        $tempQuery->createTable();
+        $tempTable->createTable();
 
         if ($this->confirm('Would you like to add foreign keys to the table?', false)) {
             // TODO: Test adding forighn keys.
-            $classInfo['fk-info'] = $this->_addFks($tempQuery);
+            $classInfo['fk-info'] = $this->_addFks($tempTable);
         }
 
         if ($this->confirm('Would you like to create an entity class that maps to the database table?', false)) {
@@ -431,15 +429,15 @@ class CreateCommand extends CLICommand {
         }
 
         if (strlen($classInfo['namespace']) == 0) {
-            $classInfo['namespace'] = 'phMysql\query';
-            $this->warning('The query class will be added to the namespace "'.$classInfo['namespace'].'" since no namespace was provided.');
+            $classInfo['namespace'] = 'app\database';
+            $this->warning('The table class will be added to the namespace "'.$classInfo['namespace'].'" since no namespace was provided.');
         }
 
         if (isset($classInfo['entity-info']) && strlen($classInfo['entity-info']['namespace']) == 0) {
-            $classInfo['entity-info']['namespace'] = 'phMysql\entity';
+            $classInfo['entity-info']['namespace'] = 'app\database';
             $this->warning('The entity class will be added to the namespace "'.$classInfo['entity-info']['namespace'].'" since no namespace was provided.');
         }
-        $writer = new QueryClassWriter($tempQuery, $classInfo);
+        $writer = new QueryClassWriter($tempTable, $classInfo);
         $writer->writeClass();
         $this->success('New class created.');
 

@@ -758,12 +758,12 @@ class Page {
 
                 if (Util::isDirectory($jsDir)) {
                     $filesInDir = array_diff(scandir($jsDir), ['.','..']);
-
+                    $fileBase = Page::jsDir().'/';
                     foreach ($filesInDir as $fileName) {
                         $expl = explode('.', $fileName);
 
                         if (count($expl) == 2 && $expl[1] == 'js') {
-                            Page::get()->document()->getHeadNode()->addJs($pageTheme->getDirectoryName().DS.$fileName);
+                            Page::get()->document()->getHeadNode()->addJs($fileBase.$fileName);
                         }
                     }
                 }
@@ -772,12 +772,12 @@ class Page {
 
                 if (Util::isDirectory($cssDir)) {
                     $filesInDir = array_diff(scandir($cssDir), ['.','..']);
-
+                    $fileBase = Page::cssDir().'/';
                     foreach ($filesInDir as $fileName) {
                         $expl = explode('.', $fileName);
 
                         if (count($expl) == 2 && $expl[1] == 'css') {
-                            Page::get()->document()->getHeadNode()->addCSS($pageTheme->getDirectoryName().DS.$fileName);
+                            Page::get()->document()->getHeadNode()->addCSS($fileBase.$fileName);
                         }
                     }
                 }
@@ -873,7 +873,7 @@ class Page {
      * Returns the directory at which CSS files of the theme exists.
      * 
      * @return string The directory at which CSS files of the theme exists 
-     * (e.g. 'publish/my-theme/css' ). 
+     * (e.g. 'my-theme/css' ). 
      * If the theme is not loaded, the method will return empty string.
      * 
      * @since 1.6
@@ -882,7 +882,7 @@ class Page {
         if ($this->isThemeLoaded()) {
             $loadedTheme = $this->getTheme();
 
-            return ThemeLoader::THEMES_DIR.'/'.$loadedTheme->getDirectoryName().'/'.$loadedTheme->getCssDirName();
+            return $loadedTheme->getDirectoryName().'/'.$loadedTheme->getCssDirName();
         }
 
         return '';
@@ -891,7 +891,7 @@ class Page {
      * Returns the directory at which image files of the theme exists.
      * 
      * @return string The directory at which image files of the theme exists 
-     * (e.g. 'publish/my-theme/images' ). 
+     * (e.g. 'my-theme/images' ). 
      * If the theme is not loaded, the method will return empty string.
      * 
      * @since 1.6
@@ -900,7 +900,7 @@ class Page {
         if ($this->isThemeLoaded()) {
             $loadedTheme = $this->getTheme();
 
-            return ThemeLoader::THEMES_DIR.'/'.$loadedTheme->getDirectoryName().'/'.$loadedTheme->getImagesDirName();
+            return $loadedTheme->getDirectoryName().'/'.$loadedTheme->getImagesDirName();
         }
 
         return '';
@@ -909,7 +909,7 @@ class Page {
      * Returns the directory at which JavaScript files of the theme exists.
      * 
      * @return string The directory at which JavaScript files of the theme exists 
-     * (e.g. 'publish/my-theme/js' ). 
+     * (e.g. 'my-theme/js' ). 
      * If the theme is not loaded, the method will return empty string.
      * 
      * @since 1.6
@@ -918,7 +918,7 @@ class Page {
         if ($this->isThemeLoaded()) {
             $loadedTheme = $this->getTheme();
 
-            return ThemeLoader::THEMES_DIR.'/'.$loadedTheme->getDirectoryName().'/'.$loadedTheme->getJsDirName();
+            return $loadedTheme->getDirectoryName().'/'.$loadedTheme->getJsDirName();
         }
 
         return '';

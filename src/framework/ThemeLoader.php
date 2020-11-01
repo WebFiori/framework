@@ -221,34 +221,22 @@ class ThemeLoader {
     }
     private static function createAssetsRoutes($themeDirName, $themeRootDir, $dir) {
         if (strlen($dir) != 0 && Util::isDirectory($themeRootDir.DS.$dir)) {
-//            Router::closure([
-//                'path' => '{file-name}',
-//                'route-to' => function ($fileDir) {
-//                    $fileName = Router::getVarValue('file-name');
-//                    Util::print_r($fileName);
-//                    if (file_exists($fileDir.DS.$fileName)) {
-//                        $file = new File($fileDir.DS.$fileName);
-//                        $file->view();
-//                    }
-//                },
-//                'closure-params' => [
-//                    self::THEMES_DIR.DS.$themeDirName.DS.$dir.DS
-//                ]
-//            ]);
             Router::closure([
-                'path' => $themeDirName.'/{file-name}',
-                'route-to' => function ($fileDir) {
+                'path' => $themeDirName.'/'.$dir.'/{file-name}',
+                'route-to' => function ($fileDir, $themeDirName, $dir) {
                     $fileName = Router::getVarValue('file-name');
-                    if (file_exists($fileDir.DS.$fileName)) {
-                        $file = new File($fileDir.DS.$fileName);
+                    if (file_exists($fileDir.DS.$dir.DS.$fileName)) {
+                        $file = new File($fileDir.DS.$dir.DS.$fileName);
                         $file->view();
                     } else {
-                        Response::append('Resource "'.$fileName.'" was not found.');
+                        Response::append('Resource "'.$themeDirName.'/'.$dir.'/'.$fileName.'" was not found.');
                         Response::setCode(404);
                     }
                 },
                 'closure-params' => [
-                    ROOT_DIR.DS.self::THEMES_DIR.DS.$themeDirName.DS.$dir
+                    ROOT_DIR.DS.self::THEMES_DIR.DS.$themeDirName,
+                    $themeDirName,
+                    $dir
                 ]
             ]);
         }

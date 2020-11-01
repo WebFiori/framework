@@ -25,9 +25,9 @@
 namespace webfiori\framework\cli;
 
 use InvalidArgumentException;
-use phMysql\EntityMapper;
-use phMysql\MySQLColumn;
-use phMysql\MySQLQuery;
+use webfiori\database\EntityMapper;
+use webfiori\database\mysql\MySQLColumn;
+use webfiori\database\Table;
 
 /**
  * A class which is used to write query class from an instance of the class 
@@ -56,14 +56,14 @@ class QueryClassWriter extends ClassWriter {
     private $entityMapper;
     /**
      *
-     * @var MySQLQuery 
+     * @var Table 
      */
-    private $queryObj;
+    private $tableObj;
     /**
      * Creates new instance of the class.
      * 
-     * @param MySQLQuery $queryObj An object of type 'MySQLQuery' which contains the 
-     * information of the query class that will be created.
+     * @param Table $tableObj An object of type 'webfiori\database\Table' which contains the 
+     * information of the table class that will be created.
      * @param array $classInfoArr An associative array that contains the information 
      * of the class that will be created. The array must have the following indices: 
      * <ul>
@@ -86,21 +86,21 @@ class QueryClassWriter extends ClassWriter {
      * </ul>
      * 
      * @throws InvalidArgumentException If the first parameter is not an object of 
-     * type 'MySQLQuery'.
+     * type 'webfiori\database\Table'.
      * 
      * @since 1.0
      */
-    public function __construct($queryObj, $classInfoArr) {
+    public function __construct($tableObj, $classInfoArr) {
         parent::__construct($classInfoArr);
 
-        if (!$queryObj instanceof MySQLQuery) {
-            throw new InvalidArgumentException('The given object is not an instance of the class \'MySQLQuery\'');
+        if (!$tableObj instanceof Table) {
+            throw new InvalidArgumentException('The given object is not an instance of the class "webfiori\database\Table".');
         }
-        $this->queryObj = $queryObj;
+        $this->tableObj = $tableObj;
         $this->classInfoArr = $classInfoArr;
         
         if (isset($classInfoArr['entity-info'])) {
-            $this->entityMapper = new EntityMapper($this->queryObj->getTable(), 
+            $this->entityMapper = new EntityMapper($this->tableObj, 
                     $classInfoArr['entity-info']['name'], 
                     $classInfoArr['entity-info']['path'], 
                     $classInfoArr['entity-info']['namespace']);
@@ -108,7 +108,6 @@ class QueryClassWriter extends ClassWriter {
         }
         $this->_writeHeaderSec();
         $this->_writeConstructor();
-        $this->_addQueries();
         $this->append('}');
     }
     /**
@@ -172,41 +171,18 @@ class QueryClassWriter extends ClassWriter {
         }
     }
     private function _addCols() {
-        $defaultColsKeys = $this->queryObj->getTable()->getDefaultColsKeys();
-        $hasDefault = false;
-        $defaultKeysArr = [];
+        $this->append('$this->addColumns([', 2);
 
-        foreach ($defaultColsKeys as $val) {
-            if ($val !== null) {
-                $hasDefault = true;
-            }
-        }
-
-        if ($hasDefault) {
-            $this->append('$this->getTable()->addDefaultCols([', 2);
-
-            foreach ($defaultColsKeys as $key => $val) {
-                if ($val !== null) {
-                    $defaultKeysArr[] = $key;
-                    $this->append("'$key' => [],", 3);
-                }
-            }
-            $this->append(']);', 2);
-        }
-        $this->append('$this->getTable()->addColumns([', 2);
-
-        foreach ($this->queryObj->getTable()->getColumns() as $key => $colObj) {
-            if (!in_array($key, $defaultKeysArr)) {
-                $this->_appendColObj($key, $colObj);
-            }
+        foreach ($this->tableObj->getTable()->getColumns() as $key => $colObj) {
+            $this->_appendColObj($key, $colObj);
         }
         $this->append(']);', 2);
     }
     private function _addFks() {
-        $fks = $this->queryObj->getTable()->getForeignKeys();
+        $fks = $this->tableObj->getTable()->getForeignKeys();
 
         foreach ($fks as $fkObj) {
-            $this->append('$this->getTable()->addReference('.$this->classInfoArr['fk-info'][$fkObj->getKeyName()].', [', 2);
+            $this->append('$this->addReference('.$this->classInfoArr['fk-info'][$fkObj->getKeyName()].', [', 2);
             $ownerCols = array_keys($fkObj->getOwnerCols());
             $sourceCols = array_keys($fkObj->getSourceCols());
 
@@ -215,42 +191,6 @@ class QueryClassWriter extends ClassWriter {
             }
             $this->append("], '".$fkObj->getKeyName()."', '".$fkObj->getOnUpdate()."', '".$fkObj->getOnDelete()."');", 2);
         }
-    }
-    private function _addQueries() {
-        $colsKeys = $this->queryObj->getTable()->colsKeys();
-        $defaultColsKeys = $this->queryObj->getTable()->getDefaultColsKeys();
-
-        if ($this->entityMapper !== null) {
-            $this->append('/**', 1);
-            $this->append(' * Constructs a query that can be used to add new record to the table.', 1);
-            $this->append(' * @param '.$this->getEntityName().' $entity An instance of the class "'.$this->getEntityName().'" that contains record information.', 1);
-            $this->append(' */', 1);
-            $this->append('public function add($entity) {', 1);
-            $this->append('$this->insertRecord([', 2);
-            $index = 0;
-
-            foreach ($colsKeys as $colKey) {
-                if (!(isset($defaultColsKeys[$colKey]) && $defaultColsKeys[$colKey] !== null)) {
-                    $this->append("'$colKey' => \$entity->".$this->entityMapper->mapToMethodName($colKey).'(),', 3);
-                }
-                $index++;
-            }
-            $this->append(']);', 2);
-            $this->append('}', 1);
-
-            $primaryKeys = $this->queryObj->getTable()->getPrimaryColsKeys();
-
-            if (count($primaryKeys) == 0) {
-                $primaryKeys = $this->queryObj->getTable()->getUniqueColsKeys();
-            }
-
-            if (count($primaryKeys) !== 0) {
-                //$this->_writeSelectOneQuery($colsKeys, $primaryKeys);
-                $this->_writeUpdateQuery($colsKeys, $primaryKeys);
-                $this->_writeDeleteQuery($colsKeys, $primaryKeys);
-            }
-        }
-        $this->_writeSelectAllQuery();
     }
     /**
      * 
@@ -304,35 +244,19 @@ class QueryClassWriter extends ClassWriter {
         $this->append(" * Creates new instance of the class.", 1);
         $this->append(" */", 1);
         $this->append('public function __construct(){', 1);
-        $this->append('parent::__construct(\''.$this->queryObj->getTableName().'\');', 2);
+        $this->append('parent::__construct(\''.$this->tableObj->getTableName().'\');', 2);
 
-        if ($this->queryObj->getTable()->getComment() !== null) {
-            $this->append('$this->getTable()->setComment(\''.$this->queryObj->getTable()->getComment().'\');', 2);
+        if ($this->tableObj->getTable()->getComment() !== null) {
+            $this->append('$this->setComment(\''.$this->tableObj->getTable()->getComment().'\');', 2);
         }
         $this->_addCols();
         $this->_addFks();
         $this->append('}', 1);
     }
-    private function _writeDeleteQuery($colsKeys, $primaryKeys) {
-        $this->append('/**', 1);
-        $this->append(' * Constructs a query that can be used to remove a record.', 1);
-        $this->append(' * @param '.$this->getEntityName().' $entity An instance of the class "'.$this->getEntityName().'" that contains record information.', 1);
-        $this->append(' */', 1);
-        $this->append("public function delete(\$entity) {",1);
-        $this->append('$this->deleteRecord([', 2);
-
-        foreach ($colsKeys as $colKey) {
-            if (in_array($colKey, $primaryKeys)) {
-                $this->append("'$colKey' => \$entity->".$this->entityMapper->mapToMethodName($colKey, 'g').'(),', 3);
-            }
-        }
-        $this->append(']);', 2);
-        $this->append('}',1);
-    }
     private function _writeHeaderSec() {
         $this->append("<?php\n");
         $this->append('namespace '.$this->getNamespace().";\n");
-        $this->append("use phMysql\MySQLQuery;");
+        $this->append("use webfiori\database\MySQLTable;");
         if (isset($this->classInfoArr['fk-info'])) {
             foreach ($this->classInfoArr['fk-info'] as $queryClassNS) {
                 $this->append('use '.$queryClassNS.';');
@@ -343,75 +267,15 @@ class QueryClassWriter extends ClassWriter {
         }
         $this->append('');
         $this->append("/**\n"
-                ." * A query class which represents the database table '".$this->queryObj->getTableName()."'.\n"
+                ." * A class which represents the database table '".$this->tableObj->getName()."'.\n"
                 ." * The table which is associated with this class will have the following columns:\n"
                 ." * <ul>"
                 );
 
-        foreach ($this->queryObj->getTable()->getColumns() as $key => $colObj) {
+        foreach ($this->tableObj->getCols() as $key => $colObj) {
             $this->append(" * <li><b>$key</b>: Name in database: '".$colObj->getName()."'. Data type: '".$colObj->getType()."'.</li>");
         }
         $this->append(" * </ul>\n */");
-        $this->append('class '.$this->getName().' extends MySQLQuery {');
-    }
-    private function _writeSelectAllQuery() {
-        $this->append("/**", 1);
-        $this->append(" * Constructs a query that can be used to select all records from the table.", 1);
-        $this->append(" * @param int \$limit The number of records that will be selected. Default is -1", 1);
-        $this->append(" * @param int \$offset The number of records that will be skipped from the first row. Default is -1.", 1);
-        $this->append(" */", 1);
-        $this->append('public function selectAll($limit = -1, $offset = -1) {', 1);
-        $this->append('$this->select([', 2);
-        $this->append("'limit' => \$limit,", 3);
-        $this->append("'offset' => \$offset,", 3);
-
-        if (strlen($this->getEntityName()) != 0) {
-            $this->append("'map-result-to' => '".$this->getEntityNamespace().'\\'.$this->getEntityName()."',", 3);
-        }
-        $this->append("]);", 2);
-        $this->append('}', 1);
-    }
-    private function _writeSelectOneQuery($colsKeys, $primaryKeys) {
-        $this->append("/**", 1);
-        $this->append(" * Constructs a query that can be used to select one records from the table.", 1);
-        $this->append(" */", 1);
-        $this->append('public function selectOne($entity) {', 1);
-        $this->append('$this->select([', 2);
-        $this->append("'where' => [", 3);
-        foreach ($colsKeys as $colKey) {
-            if (in_array($colKey, $primaryKeys)) {
-                $this->append("'$colKey' => \$entity->".$this->entityMapper->mapToMethodName($colKey, 'g').'(),', 4);
-            }
-        }
-        $this->append("]", 3);
-
-        if (strlen($this->getEntityName()) != 0) {
-            $this->append("'map-result-to' => '".$this->getEntityNamespace().'\\'.$this->getEntityName()."',", 3);
-        }
-        $this->append("]);", 2);
-        $this->append('}', 1);
-    }
-    private function _writeUpdateQuery($colsKeys, $primaryKeys) {
-        $this->append('/**', 1);
-        $this->append(' * Constructs a query that can be used to update a record.', 1);
-        $this->append(' * @param '.$this->getEntityName().' $entity An instance of the class "'.$this->getEntityName().'" that contains record information.', 1);
-        $this->append(' */', 1);
-        $this->append("public function update(\$entity) {", 1);
-        $this->append('$this->updateRecord([', 2);
-
-        foreach ($colsKeys as $colKey) {
-            if (!in_array($colKey, $primaryKeys)) {
-                $this->append("'$colKey' => \$entity->".$this->entityMapper->mapToMethodName($colKey, 'g').'(),', 3);
-            }
-        }
-        $this->append('], [', 2);
-
-        foreach ($colsKeys as $colKey) {
-            if (in_array($colKey, $primaryKeys)) {
-                $this->append("'$colKey' => \$entity->".$this->entityMapper->mapToMethodName($colKey, 'g').'(),', 3);
-            }
-        }
-        $this->append(']);', 2);
-        $this->append('}', 1);
+        $this->append('class '.$this->getName().' extends MySQLTable {');
     }
 }

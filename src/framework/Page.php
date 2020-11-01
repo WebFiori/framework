@@ -745,7 +745,7 @@ class Page {
             $json->addArray('vars', $translation->getLanguageVars(), true);
             $i18nJs = new HTMLNode('script');
             $i18nJs->setAttribute('type', 'text/javascript')
-                    ->text('window.i18n = '.$json.';')
+                    ->text('window.i18n = '.$json.';', false)
                     ->setID('i18n');
             Page::get()->document()->getHeadNode()->addChild($i18nJs);
 

@@ -242,6 +242,9 @@ class ThemeLoader {
                     if (file_exists($fileDir.DS.$fileName)) {
                         $file = new File($fileDir.DS.$fileName);
                         $file->view();
+                    } else {
+                        Response::append('Resource "'.$fileName.'" was not found.');
+                        Response::setCode(404);
                     }
                 },
                 'closure-params' => [

@@ -38,7 +38,7 @@ use webfiori\database\Table;
 use Exception;
 /**
  * A command which is used to automate some of the common tasks such as 
- * creating query classes or controllers.
+ * creating table classes or controllers.
  * Note that this feature is Experimental and might have issues. Also, it 
  * might be removed in the future.
  * @author Ibrahim
@@ -56,29 +56,30 @@ class CreateCommand extends CLICommand {
                     'e','t','c'
                 ]
             ],
-            '--query-class' => [
+            '--table-class' => [
                 'optional' => true,
             ]
-        ], 'Creates a query class, entity, API or a controller (Experimental).');
+        ], 'Creates a database table class, entity, API or a controller (Experimental).');
     }
     /**
      * 
-     * @param MySQLQuery $query
+     * @param Table $tableObj
      */
-    public function _addFks($query) {
+    public function _addFks($tableObj) {
         $addMoreFks = true;
+        $refTable = null;
         $fksNs = [];
         do {
-            $refQuery = null;
-            $refQueryName = $this->getInput('Enter the name of the referenced query class (with namespace):');
+            
+            $refQueryName = $this->getInput('Enter the name of the referenced table class (with namespace):');
             try {
-                $refQuery = new $refQueryName();
+                $refTable = new $refQueryName();
             } catch (Error $ex) {
                 $this->error($ex->getMessage());
                 continue;
             }
 
-            if ($refQuery instanceof MySQLQuery) {
+            if ($refTable instanceof Table) {
                 $fkName = $this->getInput('Enter a name for the foreign key:', null, function ($val) {
                     $trimmed = trim($val);
                     if (strlen($trimmed) == 0) {
@@ -86,11 +87,11 @@ class CreateCommand extends CLICommand {
                     }
                     return true;
                 });
-                $fkCols = $this->_getFkCols($query);
+                $fkCols = $this->_getFkCols($tableObj);
                 $fkArr = [];
 
                 foreach ($fkCols as $colKey) {
-                    $fkArr[$colKey] = $this->select('Select the column that will be referenced by the column \''.$colKey.'\':', $refQuery->getTable()->colsKeys());
+                    $fkArr[$colKey] = $this->select('Select the column that will be referenced by the column \''.$colKey.'\':', $refTable->getColsKeys());
                 }
                 $onUpdate = $this->select('Choose on update condition:', [
                     'cascade', 'restrict', 'set null', 'set default', 'no action'
@@ -98,7 +99,7 @@ class CreateCommand extends CLICommand {
                 $onDelete = $this->select('Choose on delete condition:', [
                     'cascade', 'restrict', 'set null', 'set default', 'no action'
                 ], 1);
-                $added = $query->getTable()->addReference($refQuery, $fkArr, $fkName, $onUpdate, $onDelete);
+                $added = $tableObj->addReference($refTable, $fkArr, $fkName, $onUpdate, $onDelete);
 
                 if ($added) {
                     $fksNs[$fkName] = $refQueryName;
@@ -115,40 +116,41 @@ class CreateCommand extends CLICommand {
         return $fksNs;
     }
     public function _createEntityFromQuery() {
-        $queryClassNameValidity = false;
-        $queryClassName = $this->getArgValue('--query-class');
+        $tableClassNameValidity = false;
+        $tableClassName = $this->getArgValue('--table-class');
         do {
-            if (strlen($queryClassName) == 0) {
-                $queryClassName = $this->getInput('Enter query class name (include namespace):');
+            if (strlen($tableClassName) == 0) {
+                $tableClassName = $this->getInput('Enter table class name (include namespace):');
             }
 
-            if (!class_exists($queryClassName)) {
+            if (!class_exists($tableClassName)) {
                 $this->error('Class not found.');
                 continue;
             }
-            $queryObj = new $queryClassName();
+            $tableObj = new $tableClassName();
 
-            if (!$queryObj instanceof MySQLQuery) {
-                $this->error('The given class is not a child of the class "MySQLQuery".');
-                $queryClassName = '';
+            if (!$tableObj instanceof Table) {
+                $this->error('The given class is not a child of the class "webfiori\database\Table".');
+                $tableClassName = '';
                 continue;
             }
-            $queryClassNameValidity = true;
-        } while (!$queryClassNameValidity);
+            $tableClassNameValidity = true;
+        } while (!$tableClassNameValidity);
         $this->println('We need from you to give us entity class information.');
         $classInfo = $this->getClassInfo();
         $implJsonI = $this->confirm('Would you like from your class to implement the interface JsonI?', true);
         $this->println('Generating your entity...');
 
         if (strlen($classInfo['namespace']) == 0) {
-            $this->warning('The entity class will be added to the namespace "phMysql\entity".');
+            $this->warning('The entity class will be added to the namespace "app\database".');
+            $classInfo['namespace'] = 'app\\database';
         }
-        $queryObj->getTable()->createEntityClass([
-            'store-path' => $classInfo['path'],
-            'namespace' => $classInfo['namespace'],
-            'class-name' => $classInfo['name'],
-            'implement-jsoni' => $implJsonI
-        ]);
+        $mapper = $tableObj->getEntityMapper();
+        $mapper->setPath($classInfo['path']);
+        $mapper->setNamespace($classInfo['namespace']);
+        $mapper->setEntityName($classInfo['name']);
+        $mapper->setUseJsonI($implJsonI);
+        $mapper->create();
         $this->success('Entity class created.');
 
         return 0;
@@ -191,8 +193,8 @@ class CreateCommand extends CLICommand {
             }
         } else {
             $options = [
-            'Query class.',
-            'Entity class from query.',
+            'Database table class.',
+            'Entity class from table.',
             'Controller class.',
             'Web services set.',
             'Database table from class.',
@@ -202,9 +204,9 @@ class CreateCommand extends CLICommand {
 
             if ($answer == 'Quit.') {
                 return 0;
-            } else if ($answer == 'Query class.') {
+            } else if ($answer == 'Database table class.') {
                 return $this->_createQueryClass();
-            } else if ($answer == 'Entity class from query.') {
+            } else if ($answer == 'Entity class from table.') {
                 return $this->_createEntityFromQuery();
             } else if ($answer == 'Controller class.') {
                 return $this->_createController();
@@ -220,7 +222,7 @@ class CreateCommand extends CLICommand {
 
         if (count($dbConnections) != 0) {
             $dbConn = $this->select('Select database connection:', $dbConnections, 0);
-            $queryClassNameValidity = false;
+            $tableClassNameValidity = false;
             $tableClassName = $this->getArgValue('--table');
             do {
                 if (strlen($tableClassName) == 0) {
@@ -239,8 +241,8 @@ class CreateCommand extends CLICommand {
                     $tableClassName = '';
                     continue;
                 }
-                $queryClassNameValidity = true;
-            } while (!$queryClassNameValidity);
+                $tableClassNameValidity = true;
+            } while (!$tableClassNameValidity);
             
             $db = new \webfiori\framework\DB($dbConn);
             $db->addTable($tableObj);
@@ -389,9 +391,8 @@ class CreateCommand extends CLICommand {
     private function _createQueryClass() {
         $classInfo = $this->getClassInfo();
         
-        $tableName = $this->getInput('Enter a name for the new table:');
         
-        $tempTable = new MySQLTable($tableName);
+        $tempTable = new MySQLTable();
         $addMoreCols = true;
         $this->_setTableName($tempTable);
         $this->_setTableComment($tempTable);
@@ -401,14 +402,13 @@ class CreateCommand extends CLICommand {
             $colKey = $this->getInput('Enter a name for column key:');
             $col = new MySQLColumn();
             $colDatatype = $this->select('Select column data type:', $col->getSupportedTypes(), 0);
-            $isAdded = $tempTable->getTable()->addColumn($colKey, [
-                'datatype' => $colDatatype
-            ]);
+            $col->setDatatype($colDatatype);
+            $isAdded = $tempTable->addColumn($colKey, $col);
 
             if (!$isAdded) {
                 $this->warning('The column was not added. Mostly, key name is invalid. Try again.');
             } else {
-                $colObj = $tempTable->getCol($colKey);
+                $colObj = $tempTable->getColByKey($colKey);
                 $this->_setSize($colObj);
                 $this->_isPrimaryCheck($colObj);
                 $this->_addColComment($colObj);
@@ -502,10 +502,15 @@ class CreateCommand extends CLICommand {
 
         return $queryName;
     }
-    private function _getFkCols($query) {
+    /**
+     * 
+     * @param Table $tableObj
+     * @return type
+     */
+    private function _getFkCols($tableObj) {
         $moreCols = true;
         $colNumber = 1;
-        $keys = $query->getTable()->colsKeys();
+        $keys = $tableObj->getColsKeys();
         $fkCols = [];
 
         do {
@@ -542,7 +547,7 @@ class CreateCommand extends CLICommand {
      */
     private function _isPrimaryCheck($colObj) {
         $colObj->setIsPrimary($this->confirm('Is this column primary?', false));
-        $type = $colObj->getType();
+        $type = $colObj->getDatatype();
 
         if (!$colObj->isPrimary()) {
             if (!($type == 'bool' || $type == 'boolean')) {
@@ -551,7 +556,7 @@ class CreateCommand extends CLICommand {
             $this->_setDefaultValue($colObj);
             $colObj->setIsNull($this->confirm('Can this column have null values?', false));
         } else {
-            if ($colObj->getType() == 'int') {
+            if ($colObj->getDatatype() == 'int') {
                 $colObj->setIsAutoInc($this->confirm('Is this column auto increment?', false));
             }
         }
@@ -562,7 +567,7 @@ class CreateCommand extends CLICommand {
      */
     private function _setDefaultValue($colObj) {
         // TODO: Test default value using empty.
-        if ($colObj->getType() == 'bool' || $colObj->getType() == 'boolean') {
+        if ($colObj->getDatatype() == 'bool' || $colObj->getDatatype() == 'boolean') {
             $defaultVal = trim($this->getInput('Enter default value (true or false) (Hit "Enter" to skip):', ''));
 
             if ($defaultVal == 'true') {
@@ -594,8 +599,12 @@ class CreateCommand extends CLICommand {
             }
         } while (!$validName);
     }
+    /**
+     * 
+     * @param MySQLColumn $colObj
+     */
     private function _setScale($colObj) {
-        $colDataType = $colObj->getType();
+        $colDataType = $colObj->getDatatype();
 
         if ($colDataType == 'decimal' || $colDataType == 'float' || $colDataType == 'double') {
             $validScale = false;
@@ -631,7 +640,7 @@ class CreateCommand extends CLICommand {
      * @param MySQLColumn $colObj
      */
     private function _setSize($colObj) {
-        $type = $colObj->getType();
+        $type = $colObj->getDatatype();
         $supportSize = $type == 'int' 
                 || $type == 'varchar'
                 || $type == 'decimal' 
@@ -643,10 +652,10 @@ class CreateCommand extends CLICommand {
             $valid = false;
 
             do {
-                $colDataType = $colObj->getType();
+                $colDataType = $colObj->getDatatype();
                 $dataSize = $this->getInput('Enter column size:');
 
-                if ($colObj->getType() == 'varchar' && $dataSize > 21845) {
+                if ($colObj->getDatatype() == 'varchar' && $dataSize > 21845) {
                     $this->warning('The data type "varchar" has a maximum size of 21845. The '
                             .'data type of the column will be changed to "mediumtext" if you continue.');
 
@@ -670,25 +679,29 @@ class CreateCommand extends CLICommand {
     }
     /**
      * 
-     * @param MySQLQuery $tempQuery
+     * @param Table $tempTable
      */
-    private function _setTableComment($tempQuery) {
+    private function _setTableComment($tempTable) {
         $incComment = $this->confirm('Would you like to add your comment about the table?', false);
 
         if ($incComment) {
             $tableComment = $this->getInput('Enter your comment:');
 
             if (strlen($tableComment) != 0) {
-                $tempQuery->getTable()->setComment($tableComment);
+                $tempTable->setComment($tableComment);
             }
         }
     }
-    private function _setTableName($tempQuery) {
+    /**
+     * 
+     * @param Table $tableObj
+     */
+    private function _setTableName($tableObj) {
         $invalidTableName = true;
 
         do {
             $tableName = $this->getInput('Enter database table name:');
-            $invalidTableName = !$tempQuery->getTable()->setName($tableName);
+            $invalidTableName = !$tableObj->setName($tableName);
 
             if ($invalidTableName) {
                 $this->error('The given name is invalid.');

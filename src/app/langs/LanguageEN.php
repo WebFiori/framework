@@ -262,7 +262,7 @@ class LanguageEN extends Language {
             'question' => 'What is WebFiori Framework?',
             'frameworkDescription' => 'WebFiori Framework is a mini web development framework which is written '
                 .'in PHP language. The framework is fully object oriented '
-                .'(OOP). It allows the use of the famous model-view-controller '
+                .'(OOP). It uses a semi-model-view-controller '
                 .'(MVC) model but it does not force it. The framework comes '
                 .'with many features which can help in making your website '
                 .'or web application up and running in no time.',

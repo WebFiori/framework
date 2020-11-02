@@ -873,7 +873,7 @@ class Page {
      * Returns the directory at which CSS files of the theme exists.
      * 
      * @return string The directory at which CSS files of the theme exists 
-     * (e.g. 'my-theme/css' ). 
+     * (e.g. 'assets/my-theme/css' ). 
      * If the theme is not loaded, the method will return empty string.
      * 
      * @since 1.6
@@ -882,7 +882,7 @@ class Page {
         if ($this->isThemeLoaded()) {
             $loadedTheme = $this->getTheme();
 
-            return $loadedTheme->getDirectoryName().'/'.$loadedTheme->getCssDirName();
+            return 'assets/'.$loadedTheme->getDirectoryName().'/'.$loadedTheme->getCssDirName();
         }
 
         return '';
@@ -900,7 +900,7 @@ class Page {
         if ($this->isThemeLoaded()) {
             $loadedTheme = $this->getTheme();
 
-            return $loadedTheme->getDirectoryName().'/'.$loadedTheme->getImagesDirName();
+            return 'assets/'.$loadedTheme->getDirectoryName().'/'.$loadedTheme->getImagesDirName();
         }
 
         return '';
@@ -918,7 +918,7 @@ class Page {
         if ($this->isThemeLoaded()) {
             $loadedTheme = $this->getTheme();
 
-            return $loadedTheme->getDirectoryName().'/'.$loadedTheme->getJsDirName();
+            return 'assets/'.$loadedTheme->getDirectoryName().'/'.$loadedTheme->getJsDirName();
         }
 
         return '';

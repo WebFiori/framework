@@ -145,35 +145,37 @@ class ErrorBox extends MessageBox {
             'top' => (self::getCount() * 10).'px',
             'left' => (self::getCount() * 10).'px'
         ]);
-        $this->getHeader()->setClassName('error-header', false);
-        $detailsContainer = &$this->getBody();
-        $this->errNode = new HTMLNode('p');
-        $this->errNode->setClassName('message-line');
-        $detailsContainer->addChild($this->errNode);
-        $this->descNode = new HTMLNode('p');
-        $this->descNode->setClassName('message-line');
-        $detailsContainer->addChild($this->descNode);
-        $this->messageNode = new HTMLNode('p');
-        $this->messageNode->setClassName('message-line');
-        $detailsContainer->addChild($this->messageNode);
-        $this->fileNode = new HTMLNode('p');
-        $this->fileNode->setClassName('message-line');
-        $detailsContainer->addChild($this->fileNode);
-        $this->lineNode = new HTMLNode('p');
-        $this->lineNode->setClassName('message-line');
-        $detailsContainer->addChild($this->lineNode);
+        if ($this->isInitialized()) {
+            $this->getHeader()->setClassName('error-header', false);
+            $detailsContainer = &$this->getBody();
+            $this->errNode = new HTMLNode('p');
+            $this->errNode->setClassName('message-line');
+            $detailsContainer->addChild($this->errNode);
+            $this->descNode = new HTMLNode('p');
+            $this->descNode->setClassName('message-line');
+            $detailsContainer->addChild($this->descNode);
+            $this->messageNode = new HTMLNode('p');
+            $this->messageNode->setClassName('message-line');
+            $detailsContainer->addChild($this->messageNode);
+            $this->fileNode = new HTMLNode('p');
+            $this->fileNode->setClassName('message-line');
+            $detailsContainer->addChild($this->fileNode);
+            $this->lineNode = new HTMLNode('p');
+            $this->lineNode->setClassName('message-line');
+            $detailsContainer->addChild($this->lineNode);
 
-        if (!defined('VERBOSE') || !VERBOSE) {
-            $this->tipNode = new HTMLNode('p');
-            $this->tipNode->setClassName('message-line');
-            $detailsContainer->addChild($this->tipNode);
-            $this->tipNode->addTextNode('<b style="color:yellow">Tip</b>: To'
-                .' display more details about the error, '
-                .'define the constant "VERBOSE" and set its value to "true" in '
-                .'the class "GlobalConstants".', false);
+            if (!defined('VERBOSE') || !VERBOSE) {
+                $this->tipNode = new HTMLNode('p');
+                $this->tipNode->setClassName('message-line');
+                $detailsContainer->addChild($this->tipNode);
+                $this->tipNode->addTextNode('<b style="color:yellow">Tip</b>: To'
+                    .' display more details about the error, '
+                    .'define the constant "VERBOSE" and set its value to "true" in '
+                    .'the class "GlobalConstants".', false);
+            }
+
+            $this->setAttribute('onmouseover', "if(this.getAttribute('dg') === null){addDragSupport(this)}");
+            $this->getHeader()->addTextNode('<b style="margin-left:10px;font-family:monospace;">Message ('.self::getCount().')</b>',false);
         }
-
-        $this->setAttribute('onmouseover', "if(this.getAttribute('dg') === null){addDragSupport(this)}");
-        $this->getHeader()->addTextNode('<b style="margin-left:10px;font-family:monospace;">Message ('.self::getCount().')</b>',false);
     }
 }

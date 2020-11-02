@@ -567,12 +567,14 @@ class WebFiori {
                 Response::send();
             } else {
                 $errBox = new ErrorBox();
-                $errBox->setError($errno);
-                $errBox->setDescription($errno);
-                $errBox->setFile($errfile);
-                $errBox->setMessage($errstr);
-                $errBox->setLine($errline);
-                Response::append($errBox);
+                if ($errBox->getBody() !== null) {
+                    $errBox->setError($errno);
+                    $errBox->setDescription($errno);
+                    $errBox->setFile($errfile);
+                    $errBox->setMessage($errstr);
+                    $errBox->setLine($errline);
+                    Response::append($errBox);
+                }
             }
 
             return true;

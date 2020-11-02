@@ -31,7 +31,7 @@ use webfiori\WebFiori;
  * in its body.
  *
  * @author Ibrahim
- * @version 1.0
+ * @version 1.0.1
  */
 class MessageBox extends HTMLNode {
     /**
@@ -53,17 +53,25 @@ class MessageBox extends HTMLNode {
      */
     private $messageHeader;
     /**
+     *
+     * @var boolean 
+     * 
+     * @since 1.0
+     */
+    private $isInit;
+    /**
      * Creates new instance of the class.
      * @since 1.0
      */
     public function __construct() {
         parent::__construct();
-
-        if (defined('MAX_BOX_MESSAGES') && self::getCount() < MAX_BOX_MESSAGES) {
+        $this->isInit = false;
+        if (defined('MAX_BOX_MESSAGES') && self::getCount() + 1 < MAX_BOX_MESSAGES) {
             $this->_init();
         } else if (!defined('MAX_BOX_MESSAGES')) {
             $this->_init();
         }
+        
     }
     /**
      * Returns the node that represents the header of the message.
@@ -143,5 +151,17 @@ class MessageBox extends HTMLNode {
             $this->addChild($js);
         }
         self::$Count++;
+        $this->isInit = true;
+    }
+    /**
+     * Checks if the message box is fully initialized.
+     * 
+     * @return boolean The method will return true if the message box is fully 
+     * initialized and its components are ready for use. False if not.
+     * 
+     * @since 1.0
+     */
+    public function isInitialized() {
+        return $this->isInit;
     }
 }

@@ -622,9 +622,11 @@ class Util {
             $toOutput = '<pre>'. $htmlEntityAdded .'</pre>';
             if ($asMessageBox === true) {
                 $messageBox = new MessageBox();
-                $messageBox->getBody()->addTextNode($toOutput,false);
-                $messageBox->getHeader()->text($file.' - '.$lineNumber);
-                Response::append($messageBox);
+                if ($messageBox->getBody() !== null) {
+                    $messageBox->getBody()->addTextNode($toOutput,false);
+                    $messageBox->getHeader()->text($file.' - '.$lineNumber);
+                    Response::append($messageBox);
+                }
             } else {
                 Response::append('<pre>'.$file.' - '.$lineNumber."\n".'</pre>'.$toOutput);
             }

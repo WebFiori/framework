@@ -173,13 +173,13 @@ class QueryClassWriter extends ClassWriter {
     private function _addCols() {
         $this->append('$this->addColumns([', 2);
 
-        foreach ($this->tableObj->getTable()->getColumns() as $key => $colObj) {
+        foreach ($this->tableObj->getCols() as $key => $colObj) {
             $this->_appendColObj($key, $colObj);
         }
         $this->append(']);', 2);
     }
     private function _addFks() {
-        $fks = $this->tableObj->getTable()->getForeignKeys();
+        $fks = $this->tableObj->getForignKeys();
 
         foreach ($fks as $fkObj) {
             $this->append('$this->addReference('.$this->classInfoArr['fk-info'][$fkObj->getKeyName()].', [', 2);
@@ -197,9 +197,9 @@ class QueryClassWriter extends ClassWriter {
      * @param MySQLColumn $colObj
      */
     private function _appendColObj($key, $colObj) {
-        $dataType = $colObj->getType();
+        $dataType = $colObj->getDatatype();
         $this->append("'$key' => [", 3);
-        $this->append("'type' => '".$colObj->getType()."',", 4);
+        $this->append("'type' => '".$colObj->getDatatype()."',", 4);
 
         if ($dataType == 'int' || $dataType == 'varchar' || $dataType == 'decimal' || 
                 $dataType == 'float' || $dataType == 'double') {
@@ -219,7 +219,7 @@ class QueryClassWriter extends ClassWriter {
         }
 
         if ($colObj->getDefault() !== null) {
-            if ($colObj->getType() == 'bool' || $colObj->getType() == 'boolean') {
+            if ($colObj->getDatatype() == 'bool' || $colObj->getDatatype() == 'boolean') {
                 if ($colObj->getDefault() === true) {
                     $this->append("'default' => true,", 4);
                 } else {
@@ -244,10 +244,10 @@ class QueryClassWriter extends ClassWriter {
         $this->append(" * Creates new instance of the class.", 1);
         $this->append(" */", 1);
         $this->append('public function __construct(){', 1);
-        $this->append('parent::__construct(\''.$this->tableObj->getTableName().'\');', 2);
+        $this->append('parent::__construct(\''.$this->tableObj->getName().'\');', 2);
 
-        if ($this->tableObj->getTable()->getComment() !== null) {
-            $this->append('$this->setComment(\''.$this->tableObj->getTable()->getComment().'\');', 2);
+        if ($this->tableObj->getComment() !== null) {
+            $this->append('$this->setComment(\''.$this->tableObj->getComment().'\');', 2);
         }
         $this->_addCols();
         $this->_addFks();
@@ -273,7 +273,7 @@ class QueryClassWriter extends ClassWriter {
                 );
 
         foreach ($this->tableObj->getCols() as $key => $colObj) {
-            $this->append(" * <li><b>$key</b>: Name in database: '".$colObj->getName()."'. Data type: '".$colObj->getType()."'.</li>");
+            $this->append(" * <li><b>$key</b>: Name in database: '".$colObj->getName()."'. Data type: '".$colObj->getDatatype()."'.</li>");
         }
         $this->append(" * </ul>\n */");
         $this->append('class '.$this->getName().' extends MySQLTable {');

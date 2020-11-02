@@ -415,7 +415,6 @@ class CreateCommand extends CLICommand {
             }
             $addMoreCols = $this->confirm('Would you like to add another column?', false);
         } while ($addMoreCols);
-        $tempTable->createTable();
 
         if ($this->confirm('Would you like to add foreign keys to the table?', false)) {
             // TODO: Test adding forighn keys.

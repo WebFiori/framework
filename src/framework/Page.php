@@ -753,8 +753,9 @@ class Page {
             $pageTheme = Page::theme('');
 
             if ($pageTheme !== null) {
-                $themeDir = THEMES_PATH.DS.$pageTheme->getDirectoryName();
-                $jsDir = $themeDir.DS.$pageTheme->getJsDirName();
+                $themeAssetsDir = 'assets'.DS.$pageTheme->getDirectoryName();
+                
+                $jsDir = $themeAssetsDir.DS.$pageTheme->getJsDirName();
 
                 if (Util::isDirectory($jsDir)) {
                     $filesInDir = array_diff(scandir($jsDir), ['.','..']);
@@ -768,7 +769,7 @@ class Page {
                     }
                 }
 
-                $cssDir = $themeDir.DS.$pageTheme->getCssDirName();
+                $cssDir = $themeAssetsDir.DS.$pageTheme->getCssDirName();
 
                 if (Util::isDirectory($cssDir)) {
                     $filesInDir = array_diff(scandir($cssDir), ['.','..']);
@@ -891,7 +892,7 @@ class Page {
      * Returns the directory at which image files of the theme exists.
      * 
      * @return string The directory at which image files of the theme exists 
-     * (e.g. 'my-theme/images' ). 
+     * (e.g. 'assets/my-theme/images' ). 
      * If the theme is not loaded, the method will return empty string.
      * 
      * @since 1.6
@@ -909,7 +910,7 @@ class Page {
      * Returns the directory at which JavaScript files of the theme exists.
      * 
      * @return string The directory at which JavaScript files of the theme exists 
-     * (e.g. 'my-theme/js' ). 
+     * (e.g. 'assets/my-theme/js' ). 
      * If the theme is not loaded, the method will return empty string.
      * 
      * @since 1.6

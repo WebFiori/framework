@@ -209,7 +209,7 @@ class ThemeLoader {
                 $aNs = gettype($ns) == 'string' ? $ns.'\\' : '\\';
                 $aCName = $aNs.$cName;
 
-                if (!AutoLoader::isLoaded($aCName) && class_exists($aCName)) {
+                if (!AutoLoader::isLoaded($cName, $aNs) && class_exists($aCName)) {
                     $instance = new $aCName();
 
                     if ($instance instanceof Theme) {

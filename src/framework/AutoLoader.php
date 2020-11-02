@@ -359,18 +359,28 @@ class AutoLoader {
     /**
      * Checks if a class is loaded or not.
      * 
-     * @param string $class The name of the class. Note that it must have 
+     * @param string $class The name of the class. Note that it must not have 
      * the namespace.
+     * 
+     * @param string $ns An optional namespace to check if the class 
+     * exist in.
      * 
      * @return boolean If the class was already loaded, the method will return true. 
      * Else, it will return false.
      * 
      * @since 1.1.5
      */
-    public  static function isLoaded($class) {
+    public  static function isLoaded($class, $ns = null) {
         foreach (self::getLoadedClasses() as $classArr) {
-            if ($class == $classArr[self::$CLASS_INDICES[1]].'\\'.$classArr[self::$CLASS_INDICES[0]]) {
-                return true;
+            if ($ns !== null) {
+                if ($class == $classArr[self::$CLASS_INDICES[0]] 
+                        && $ns == $classArr[self::$CLASS_INDICES[1]]) {
+                    return true;
+                }
+            } else {
+                if ($class == $classArr[self::$CLASS_INDICES[0]]) {
+                    return true;
+                }
             }
         }
 
@@ -645,17 +655,18 @@ class AutoLoader {
      * @since 1.0
      */
     private function loadClass($classWithNs) {
-        if (self::isLoaded($classWithNs)) {
-            return;
-        }
         $cArr = explode('\\', $classWithNs);
         $className = $cArr[count($cArr) - 1];
+        $classNs = implode('\\', array_slice($cArr, 0, count($cArr) - 1));
+        
+        if (self::isLoaded($className, $classNs)) {
+            return;
+        }
+        
         $loaded = false;
         //checks if the class is cached or not.
         if ($this->_loadFromCache($classWithNs, $className)) {
-            if (class_exists($classWithNs, false)) {
-                return;
-            }
+            return;
         }
         
         $allPaths = self::getClassPath($className);

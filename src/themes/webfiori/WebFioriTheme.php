@@ -247,7 +247,9 @@ class WebFioriTheme extends Theme {
             'writing_dir' => Page::dir(),
             'contact_phone' => '013 xxx xxxx',
             'copyright' => 'All Rights Reserved',
-            'contact_mail' => 'hello@example.com'
+            'contact_mail' => 'hello@example.com',
+            'theme-dir' => $this->getDirectoryName(),
+            'images-dir' => $this->getImagesDirName()
         ]);
         
         return $node;

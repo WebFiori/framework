@@ -285,10 +285,12 @@ class WebFioriV108 extends Theme {
             'background-color' => '#c1ec9b',
             'padding' => '0'
         ]);
-        $logo = new HTMLNode('img');
-        $logo->setID('main-logo');
-        $logo->setAttribute('src', 'favicon.png');
-        $logo->setAttribute('alt', 'logo');
+        $logo = new HTMLNode('img', [
+            'id' => 'main-logo',
+            'src' => 'favicon.png',
+            'alt' => 'logo',
+            'style' => 'width:40px'
+        ]);
         $logoLink = new Anchor(WebFiori::getSiteConfig()->getHomePage(), $logo->toHTML());
         $logoLink->setClassName('navbar-brand ml-3');
         $mainNav->addChild($logoLink);

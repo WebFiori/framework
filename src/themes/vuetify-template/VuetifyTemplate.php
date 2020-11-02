@@ -44,7 +44,7 @@ class VuetifyTemplate extends Theme {
 
             //initialize vue before the page is rendered.
             //the initialization process is performed by the file 
-            //'themes/vuetify-based/init-vuetify.js'
+            //'assets/vuetify-based/init-vuetify.js'
             Page::beforeRender(function()
             {
                 $jsNode = new HTMLNode('script');

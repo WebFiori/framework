@@ -74,10 +74,10 @@ abstract class CLICommand {
      * @param string $commandName A string that represents the name of the 
      * command such as '-v' or 'help'. If not provided, the 
      * value 'new-command' is used.
-     * @param array $args An indexed array of sub-associative arrays of arguments (or options) which can 
+     * @param array $args An associative array of sub-associative arrays of arguments (or options) which can 
      * be supplied to the command when running it. The 
      * key of each sub array is argument name. Each 
-     * sub-array can have the following indices:
+     * sub-array can have the following indices as argument options:
      * <ul>
      * <li><b>optional</b>: A boolean. if set to true, it means that the argument 
      * is optional and can be ignored when running the command.</li>
@@ -172,13 +172,11 @@ abstract class CLICommand {
      * be converted to the string 'n'.</li>
      * </ul>
      */
-    public function addArgs($arr) {
+    public function addArgs(array $arr) {
         $this->commandArgs = [];
-
-        if (gettype($arr) == 'array') {
-            foreach ($arr as $optionName => $options) {
-                $this->addArg($optionName, $options);
-            }
+        
+        foreach ($arr as $optionName => $options) {
+            $this->addArg($optionName, $options);
         }
     }
     /**
@@ -700,13 +698,23 @@ abstract class CLICommand {
      */
     public function println($str = '', ...$_) {
         $toPass = [
-            $str."\e[0m\e[k\n"
+            $this->asString($str)."\e[0m\e[k\n"
         ];
 
         foreach ($_ as $val) {
             $toPass[] = $val;
         }
         call_user_func_array([$this, 'prints'], $toPass);
+    }
+    private function asString($var) {
+        $type = gettype($var);
+        
+        if ($type == 'boolean') {
+            return $var === true ? 'true' : 'false';
+        } else if ($type == 'null') {
+            return 'null';
+        }
+        return $var;
     }
     /**
      * Print out a string.
@@ -722,6 +730,7 @@ abstract class CLICommand {
      * @since 1.0
      */
     public function prints($str, ...$_) {
+        $str = $this->asString($str);
         $argCount = count($_);
         $formattingOptions = [];
 

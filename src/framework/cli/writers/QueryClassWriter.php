@@ -256,7 +256,7 @@ class QueryClassWriter extends ClassWriter {
     private function _writeHeaderSec() {
         $this->append("<?php\n");
         $this->append('namespace '.$this->getNamespace().";\n");
-        $this->append("use webfiori\database\MySQLTable;");
+        $this->append("use webfiori\database\mysql\MySQLTable;");
         if (isset($this->classInfoArr['fk-info'])) {
             foreach ($this->classInfoArr['fk-info'] as $queryClassNS) {
                 $this->append('use '.$queryClassNS.';');

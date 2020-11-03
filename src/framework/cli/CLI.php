@@ -149,9 +149,17 @@ class CLI {
         Cron::log("File                 : ".$ex->getMessage()."\n");
         Cron::log("Line                 : ".$ex->getMessage()."\n");
         Cron::log("Stack Trace          : \n");
+        $num = 0;
         foreach ($ex->getTrace() as $arrEntry) {
-            Cron::log($arrEntry."\n");
+            Cron::log(self::_traceArrAsString($num, $arrEntry));
+            $num++;
         }
+    }
+    private static function _traceArrAsString($num, $arr) {
+        $file = $arr['file'];
+        $line = $arr['line'];
+        $class = isset($arr['class']) ? $arr['class'] : '';
+        return "#$num $file($line): $class";
     }
     /**
      * The main aim of this method is to automatically register any commands which 
@@ -262,6 +270,7 @@ class CLI {
         self::register(new TestRouteCommand());
         self::register(new CreateCommand());
         self::register(new AddCommand());
+        self::register(new UpdateTableCommand());
         self::_autoRegister();
         //Call this method to register any user-defined commands.
         InitCliCommands::init();

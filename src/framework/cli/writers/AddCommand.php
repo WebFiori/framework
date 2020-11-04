@@ -24,10 +24,11 @@
  */
 namespace webfiori\framework\cli;
 
-use webfiori\framework\DBConnectionFactory;
-use webfiori\framework\DBConnectionInfo;
+use webfiori\framework\DB;
+use webfiori\database\ConnectionInfo;
 use webfiori\framework\mail\SMTPAccount;
 use webfiori\WebFiori;
+use Exception;
 
 /**
  * A command which is used to add a database connection or SMTP account.
@@ -69,36 +70,31 @@ class AddCommand extends CLICommand {
         return 0;
     }
     private function _addDbConnection() {
-        $host = $this->getInput('Database host:', '127.0.0.1');
-        $port = $this->getInput('Port number:', 3306);
-        $username = $this->getInput('Username:');
-        $password = $this->getInput('Password:');
-        $databaseName = $this->getInput('Database name:');
-        $connName = $this->getInput('Give your connection a friendly name:', 'db-connection-'.count(WebFiori::getConfig()->getDBConnections()));
+        $connInfoObj = new ConnectionInfo('mysql', 'roor', 'pass', 'ok');
+        $connInfoObj->setHost($this->getInput('Database host:', '127.0.0.1'));
+        $connInfoObj->setPort($this->getInput('Port number:', 3306));
+        $connInfoObj->setUsername($this->getInput('Username:'));
+        $connInfoObj->setPassword($this->getInput('Password:'));
+        $connInfoObj->setDBName($this->getInput('Database name:'));
+        $connInfoObj->setName($this->getInput('Give your connection a friendly name:', 'db-connection-'.count(WebFiori::getConfig()->getDBConnections())));
         $this->println('Trying to connect to the database...');
-        $result = DBConnectionFactory::mysqlLink([
-            'host' => $host,
-            'port' => $port,
-            'user' => $username,
-            'pass' => $password,
-            'db-name' => $databaseName
-        ]);
-
-        if (gettype($result) == 'array') {
+        
+        $db = new DB($connInfoObj);
+        
+        try {
+            $db->getConnection();
+        } catch (Exception $ex) {
             $this->error('Unable to connect to the database.');
-            $this->println('Error Code: '.$result['error-code']);
-            $this->println('Error Message: '.$result['error-message']);
-
+            $this->error($ex->getMessage());
             return -1;
-        } else {
-            $this->success('Connected. Adding the connection...');
-            $conn = new DBConnectionInfo($username, $password, $databaseName, $host, $port);
-            $conn->setConnectionName($connName);
-            WebFiori::getSysController()->addOrUpdateDBConnections([$conn]);
-            $this->success('Connection information was stored in the class "webfiori\conf\Config".');
-
-            return 0;
         }
+
+        $this->success('Connected. Adding the connection...');
+
+        WebFiori::getSysController()->addOrUpdateDBConnections([$connInfoObj]);
+        $this->success('Connection information was stored in the class "webfiori\conf\Config".');
+
+        return 0;
     }
     private function _addLang() {
         $langCode = strtoupper(trim($this->getInput('Language code:')));

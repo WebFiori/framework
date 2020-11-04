@@ -11,11 +11,14 @@ use webfiori\framework\cli\CLICommand;
 use webfiori\database\Column;
 use webfiori\database\Table;
 use webfiori\database\mysql\MySQLTable;
+use webfiori\conf\Config;
+use webfiori\framework\DB;
 use webfiori\database\mysql\MySQLColumn;
 use webfiori\framework\AutoLoader;
 use webfiori\framework\cli\QueryClassWriter;
 use Error;
 use ErrorException;
+use Exception;
 /**
  * Description of UpdateTableCommand
  *
@@ -82,11 +85,15 @@ class UpdateTableCommand extends CLICommand {
             return;
         }
         $colToUpdate = $this->select('Which column would you like to update?', $colsKeys);
-        $col = $tableObj->getColByKey($colToUpdate);
+        $col = clone $tableObj->getColByKey($colToUpdate);
         
         $colKey = $this->getInput('Enter a new name for column key:', $colToUpdate);
         if ($colKey != $colToUpdate) {
+            $col->setName(str_replace('-', '_', $colKey));
+            $this->println($col->getName());
+            $this->println($colKey);
             $isAdded = $tableObj->addColumn($colKey, $col);
+            $this->println($isAdded);
         } else {
             $isAdded = true;
         }
@@ -105,7 +112,44 @@ class UpdateTableCommand extends CLICommand {
         $class = get_class($tableObj);
         $writer = new QueryClassWriter($tableObj, $this->getClassNs($class));
         $writer->writeClass();
-        $this->success('Column dropped.');
+        $db = $this->getDb('Would you like to run a query to '
+                . 'update the column in the database?');
+        
+        if ($db !== null) {
+            $db->addTable($tableObj);
+            $db->table($tableObj->getName())->modifyCol($colKey);
+            $this->runQuery($db);
+        }
+        
+        $this->success('Column updated.');
+    }
+    /**
+     * 
+     * @param DB $db
+     */
+    private function runQuery($db) {
+        $this->println('Exexuting the query "'.$db->getLastQuery().'"...');
+        try {
+            $db->execute();
+        } catch (Exception $ex) {
+            $this->error($ex->getMessage());
+        }
+    }
+    private function getDb($prompt) {
+        $runQuery = $this->confirm($prompt, false);
+        if ($runQuery) {
+            $dbConnections = array_keys(Config::getDBConnections());
+
+            if (count($dbConnections) != 0) {
+                $dbConn = $this->select('Select database connection:', $dbConnections, 0);
+
+
+                return new DB($dbConn);
+
+            } else {
+                $this->error('No database connections available. Add connections inside the class \'Config\' or use the command "add".');
+            }
+        }
     }
     /**
      * 
@@ -215,9 +259,18 @@ class UpdateTableCommand extends CLICommand {
             $this->warning('The column was not added. Mostly, key name is invalid.');
         } else {
             $colObj = $tableObj->getColByKey($colKey);
+            $colObj->setName(str_replace('-', '_', $colKey));
             $this->_setSize($colObj);
             $this->_isPrimaryCheck($colObj);
             $this->_addColComment($colObj);
+        }
+        $db = $this->getDb('Would you like to run a query to '
+                . 'add the column in the database?');
+        
+        if ($db !== null) {
+            $db->addTable($tableObj);
+            $db->table($tableObj->getName())->addCol($colKey);
+            $this->runQuery($db);
         }
         return $colObj;
     }

@@ -62,7 +62,7 @@ class ConfigController extends Controller {
         'release-date' => '2020-07-05',
         'version' => '1.1.0',
         'version-type' => 'Beta 3',
-        'config-file-version' => '1.3.4',
+        'config-file-version' => '1.3.5',
         'databases' => []
     ];
     /**
@@ -102,7 +102,7 @@ class ConfigController extends Controller {
                     strlen($con->getUsername()) > 0 && 
                     strlen($con->getPassword()) > 0 && 
                     strlen($con->getDBName()) > 0) {
-                    $confVars['databases'][$con->getConnectionName()] = $con;
+                    $confVars['databases'][$con->getName()] = $con;
                 }
             }
             $this->writeConfig($confVars);
@@ -247,7 +247,7 @@ class ConfigController extends Controller {
                 . " * Used by the server part and the presentation part. It contains framework version\n"
                 . " * information and database connection settings.\n"
                 . " * @author Ibrahim\n"
-                . " * @version 1.3.4\n"
+                . " * @version 1.3.5\n"
                 . " */\n"
                 . "class Config {\n"
                 . "    /**\n"
@@ -302,14 +302,16 @@ class ConfigController extends Controller {
 
         foreach ($configArr['databases'] as $dbConn) {
             if ($i + 1 == $count) {
-                $fileAsStr .= "            '".$dbConn->getConnectionName()."' => new ConnectionInfo("
+                $fileAsStr .= "            '".$dbConn->getName()."' => new ConnectionInfo("
+                        . "'".$dbConn->getDatabaseType()."', "
                         . "'".$dbConn->getUsername()."', "
                         . "'".$dbConn->getPassword()."', "
                         . "'".$dbConn->getDBName()."', "
                         . "'".$dbConn->getHost()."', "
                         . "".$dbConn->getPort().")";
             } else {
-                $fileAsStr .= "            '".$dbConn->getConnectionName()."' => new ConnectionInfo("
+                $fileAsStr .= "            '".$dbConn->getName()."' => new ConnectionInfo("
+                        . "'".$dbConn->getDatabaseType()."', "
                         . "'".$dbConn->getUsername()."', "
                         . "'".$dbConn->getPassword()."', "
                         . "'".$dbConn->getDBName()."', "
@@ -321,7 +323,7 @@ class ConfigController extends Controller {
         $fileAsStr .= "\n"
                    . "        ];\n";
         foreach ($configArr['databases'] as $dbConn) {
-            $fileAsStr .= '        $this->dbConnections[\''.$dbConn->getConnectionName().'\']->setConnectionName(\''.$dbConn->getConnectionName().'\');'."\n";
+            $fileAsStr .= '        $this->dbConnections[\''.$dbConn->getName().'\']->setName(\''.$dbConn->getName().'\');'."\n";
         }
                 $fileAsStr .= ""
                 . "    }\n"
@@ -333,7 +335,7 @@ class ConfigController extends Controller {
                 . "     */\n"
                 . "    public static function addDbConnection(\$connectionInfo) {\n"
                 . "        if (\$connectionInfo instanceof ConnectionInfo) {\n"
-                . "            self::get()->dbConnections[\$connectionInfo->getConnectionName()] = \$connectionInfo;\n"
+                . "            self::get()->dbConnections[\$connectionInfo->getName()] = \$connectionInfo;\n"
                 . "        }\n"
                 . "    }\n"
                 . "    /**\n"

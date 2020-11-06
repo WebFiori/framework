@@ -29,7 +29,7 @@ class ConfigTest extends TestCase {
      */
     public function testGetDbConnection01() {
         $conf = Config::get();
-        $newConn = new DBConnectionInfo('root', '123456', 'testing_db');
+        $newConn = new ConnectionInfo('mysql','root', '123456', 'testing_db');
         $conf->addDbConnection($newConn);
         $this->assertTrue($conf->getDBConnection('New_Connection') instanceof ConnectionInfo);
         $this->assertTrue($conf->getDBConnection(' New_Connection ') instanceof ConnectionInfo);

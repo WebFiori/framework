@@ -659,6 +659,7 @@ class CreateCommand extends CLICommand {
                             .'data type of the column will be changed to "mediumtext" if you continue.');
 
                     if (!$this->confirm('Would you like to change data type?', false)) {
+                        $valid = true;
                         continue;
                     }
                 }

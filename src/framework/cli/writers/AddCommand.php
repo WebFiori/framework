@@ -27,6 +27,7 @@ namespace webfiori\framework\cli;
 use webfiori\framework\DB;
 use webfiori\database\ConnectionInfo;
 use webfiori\framework\mail\SMTPAccount;
+use webfiori\framework\ConfigController;
 use webfiori\WebFiori;
 use Exception;
 
@@ -104,7 +105,7 @@ class AddCommand extends CLICommand {
 
             return -1;
         }
-        $siteInfo = WebFiori::getWebsiteController()->getSiteConfigVars();
+        $siteInfo = ConfigController::get()->getSiteConfigVars();
 
         if (isset($siteInfo['website-names'][$langCode])) {
             $this->info('This language already added. Nothing changed.');
@@ -113,7 +114,7 @@ class AddCommand extends CLICommand {
         }
         $siteInfo['website-names'][$langCode] = $this->getInput('Name of the website in the new language:');
         $siteInfo['site-descriptions'][$langCode] = $this->getInput('Description of the website in the new language:');
-        WebFiori::getWebsiteController()->updateSiteInfo($siteInfo);
+        ConfigController::get()->updateSiteInfo($siteInfo);
         $this->success('Language added.');
     }
     private function _addSmtp() {
@@ -126,11 +127,11 @@ class AddCommand extends CLICommand {
         $smtpConn->setSenderName($this->getInput('Sender name:', 'WebFiori Framework'));
         $smtpConn->setAccountName($this->getInput('Give your connection a friendly name:', 'smtp-connection-'.count(WebFiori::getMailConfig()->getAccounts())));
         $this->println('Testing connection. This can take up to 1 minute...');
-        $result = WebFiori::getEmailController()->getSocketMailer($smtpConn);
+        $result = ConfigController::get()->getSocketMailer($smtpConn);
 
         if (gettype($result) == 'object') {
             $this->success('Connectd. Adding connection information...');
-            WebFiori::getEmailController()->updateOrAddEmailAccount($smtpConn);
+            ConfigController::get()->updateOrAddEmailAccount($smtpConn);
             $this->success('Connection information was stored in the class "webfiori\conf\MailConfig".');
 
             return 0;

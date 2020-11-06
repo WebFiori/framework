@@ -8,7 +8,6 @@ use webfiori\conf\SiteConfig;
 use webfiori\framework\Page;
 use webfiori\framework\Theme;
 use webfiori\framework\session\SessionsManager;
-use webfiori\logic\WebsiteController;
 class GreenyTheme extends Theme {
     public function __construct() {
         parent::__construct();

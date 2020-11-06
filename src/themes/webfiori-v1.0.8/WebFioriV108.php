@@ -9,6 +9,7 @@ use webfiori\ui\UnorderedList;
 use webfiori\framework\Page;
 use webfiori\framework\Theme;
 use webfiori\WebFiori;
+use webfiori\framework\session\SessionsManager;
 /**
  * WebFiori Theme Which is bundled with v1.0.8 of the framework.
  *
@@ -22,8 +23,17 @@ class WebFioriV108 extends Theme {
         $this->setName('WebFiori V108');
         $this->setLicenseName('MIT License');
         $this->setLicenseUrl('https://opensource.org/licenses/MIT');
+        $this->setBeforeLoaded(function () {
+            $activeSession = SessionsManager::getActiveSession();
+            if ($activeSession !== null) {
+                Page::lang($activeSession->getLangCode(true));
+            } else {
+                Page::lang(WebFiori::getSiteConfig()->getPrimaryLanguage());
+            }
+        });
         $this->setAfterLoaded(function()
         {
+            
             Page::document()->getChildByID('page-body')->setClassName('row  ml-0 mr-0');
             Page::document()->getChildByID('page-body')->setStyle([
                 'margin-top' => '50px'

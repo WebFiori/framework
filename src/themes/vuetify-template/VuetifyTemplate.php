@@ -6,6 +6,7 @@ use webfiori\ui\HeadNode;
 use webfiori\json\Json;
 use webfiori\ui\JsCode;
 use webfiori\framework\Util;
+use webfiori\framework\session\SessionsManager;
 use webfiori\WebFiori;
 
 /**
@@ -24,7 +25,7 @@ class VuetifyTemplate extends Theme {
         $this->setImagesDirName('img');
         $this->setBeforeLoaded(function()
         {
-            Page::lang(WebFiori::getWebsiteController()->getSessionLang());
+            Page::lang(SessionsManager::getActiveSession()->getLangCode(true));
             Page::siteName(WebFiori::getSiteConfig()->getWebsiteNames()[Page::lang()]);
         });
         $this->setAfterLoaded(function()

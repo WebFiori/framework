@@ -24,22 +24,21 @@
  */
 namespace webfiori\framework\cli;
 
-use restEasy\WebServicesSet;
+use webfiori\restEasy\AbstractWebService;
 /**
  * A class which is used to hold CLI created services temporary.
  * 
- * This class does not hold any web services. The main aim of this class is 
- * to hold the services which are created using CLI and later on, create the 
- * actual class that contains the web services.
+ * This class does not hold any web service. The main aim of this class is 
+ * to hold the service which is created using CLI and later on, create the 
+ * actual class that contains the web service.
  * 
  * @author Ibrahim
  * 
  * @version 1.0
  */
-class ServicesHolder extends WebServicesSet {
+class ServiceHolder extends AbstractWebService {
     public function __construct() {
-        parent::__construct();
-        $this->removeServices();
+        parent::__construct('');
     }
     /**
      * 

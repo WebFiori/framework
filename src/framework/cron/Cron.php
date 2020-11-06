@@ -549,7 +549,7 @@ class Cron {
     public static function run($pass = '',$jobName = null,$force = false, $command = null) {
         self::log('Running job(s) check...');
 
-        if (Cron::password() != 'NO_PASSWORD' && WebFiori::getWebsiteController()->getSession()->get('cron-login-status') !== true && hash('sha256',$pass) != Cron::password()) {
+        if (Cron::password() != 'NO_PASSWORD' && \webfiori\framework\session\SessionsManager::getActiveSession()->get('cron-login-status') !== true && hash('sha256',$pass) != Cron::password()) {
             self::log('Error: Given password is incorrect.');
             self::log('Check finished.');
 

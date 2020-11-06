@@ -44,17 +44,20 @@ class ConfigController {
     /**
      * A constant that indicates the given username or password  
      * is invalid.
+     * 
      * @since 1.1
      */
     const INV_CREDENTIALS = 'inv_username_or_pass';
     /**
      * A constant that indicates a mail server address or its port 
      * is invalid.
+     * 
      * @since 1.1
      */
     const INV_HOST_OR_PORT = 'inv_mail_host_or_port';
     /**
      * A constant that indicates the selected database schema has tables.
+     * 
      * @since 1.1
      */
     const DB_NOT_EMPTY = 'db_has_tables';
@@ -80,6 +83,7 @@ class ConfigController {
     ];
     /**
      * An associative array that contains initial system configuration variables.
+     * 
      * The array has the following values:
      * <ul>
      * <li>site-descriptions = array(<ul>
@@ -98,6 +102,7 @@ class ConfigController {
      * </ul>)</li>
      * <li>config-file-version => 1.2.1</li>
      * </ul>
+     * 
      * @since 1.0
      */
     const INITIAL_WEBSITE_CONFIG_VARS = [
@@ -120,29 +125,37 @@ class ConfigController {
     
     /**
      * A constant that indicates the file MailConfig.php was not found.
+     * 
      * @since 1.2
      */
     const MAIL_CONFIG_MISSING = 'mail_config_file_missing';
     /**
      * A constant that indicates the file SiteConfig.php was not found.
+     * 
      * @since 1.2
      */
     const SITE_CONFIG_MISSING = 'site_config_file_missing';
     /**
      * A constant that indicates the file Config.php was not found.
+     * 
      * @since 1.2
      */
     const SYS_CONFIG_MISSING = 'config_file_missing';
     /**
-     * An instance of SystemFunctions
+     * An instance of the class.
+     * 
      * @var ConfigController
+     * 
      * @since 1.0 
      */
     private static $singleton;
     /**
      * Adds new database connections information or update existing connections.
+     * 
      * The information of the connections will be stored in the file 'Config.php'.
+     * 
      * @param array $dbConnectionsInfo An array that contains objects of type ConnectionInfo. 
+     * 
      * @since 1.4.3
      */
     public function addOrUpdateDBConnections($dbConnectionsInfo) {
@@ -163,6 +176,7 @@ class ConfigController {
     }
     /**
      * Creates the file 'SiteConfig.php' if it does not exist.
+     * 
      * @since 1.0
      */
     public function createSiteConfigFile() {
@@ -173,6 +187,7 @@ class ConfigController {
     }
     /**
      * Creates the file 'MailConfig.php' if it does not exist.
+     * 
      * @since 1.0
      */
     public function createEmailConfigFile() {
@@ -182,14 +197,18 @@ class ConfigController {
     }
     /**
      * Returns a new instance of the class SocketMailer.
+     * 
      * The method will try to establish a connection to SMTP server using 
      * the given SMTP account.
+     * 
      * @param SMTPAccount $emailAcc An account that is used to initiate 
      * socket mailer.
+     * 
      * @return SocketMailer|string The method will return an instance of SocketMailer
      * on successful connection. If no connection is established, the method will 
      * return MailFunctions::INV_HOST_OR_PORT. If user authentication fails, 
      * the method will return 'MailFunctions::INV_CREDENTIALS'.
+     * 
      * @since 1.0
      */
     public function getSocketMailer($emailAcc) {
@@ -221,10 +240,13 @@ class ConfigController {
     }
     /**
      * Removes SMTP email account if it is exist.
-     * @param string $accountName The name of the email account (such as 'no-replay').
+     * 
+     * @param string $accountName The name of the email account (such as 'no-reply').
+     * 
      * @return boolean If the account is not exist or the class 'MailConfig' 
      * does not exist, the method will return false. If the account was removed, 
      * The method will return true.
+     * 
      * @since 1.3
      */
     public function removeAccount($accountName) {
@@ -250,15 +272,19 @@ class ConfigController {
     }
     /**
      * Adds new SMTP account or Updates an existing one.
+     * 
      * Note that the connection will be added or updated only if it 
      * has correct information.
+     * 
      * @param SMTPAccount $emailAccount An instance of 'SMTPAccount'.
+     * 
      * @return boolean|string The method will return true if the email 
      * account was updated or added. If the email account contains wrong server
      *  information, the method will return MailFunctions::INV_HOST_OR_PORT. 
      * If the given email account contains wrong login info, the method will 
      * return MailFunctions::INV_CREDENTIALS. Other than that, the method 
      * will return false.
+     * 
      * @since 1.1
      */
     public function updateOrAddEmailAccount($emailAccount) {
@@ -290,8 +316,10 @@ class ConfigController {
     }
     /**
      * A method to save changes to mail configuration file.
+     * 
      * @param array $emailAccountsArr An associative array that contains an objects of 
      * type 'SMTPAccount'. The indices of the array are the names of the accounts.
+     * 
      * @since 1.1
      */
     private function writeMailConfig($emailAccountsArr) {
@@ -423,6 +451,7 @@ class ConfigController {
     /**
      * Returns an associative array that contains web site configuration 
      * info.
+     * 
      * The returned array will have the following indices: 
      * <ul>
      * <li><b>website-names</b>: A sub associative array. The index of the 
@@ -444,6 +473,7 @@ class ConfigController {
      * </ul> 
      * @return array An associative array that contains web site configuration 
      * info.
+     * 
      * @since 1.0
      */
     public function getSiteConfigVars() {
@@ -465,6 +495,7 @@ class ConfigController {
     }
     /**
      * Updates web site configuration based on some attributes.
+     * 
      * @param array $websiteInfoArr an associative array. The array can 
      * have the following indices: 
      * <ul>
@@ -487,6 +518,7 @@ class ConfigController {
      * array should be language code (such as 'EN') and the value 
      * should be the general web site description in the given language.</li></li>
      * </ul> 
+     * 
      * @since 1.0
      */
     public function updateSiteInfo($websiteInfoArr) {
@@ -501,8 +533,10 @@ class ConfigController {
     }
     /**
      * A method to save changes to web site configuration file.
+     * 
      * @param array $configArr An array that contains system configuration 
      * variables.
+     * 
      * @since 1.0
      */
     private function writeSiteConfig($configArr) {
@@ -740,6 +774,7 @@ class ConfigController {
     }
     /**
      * Creates the file 'Config.php' if it does not exist.
+     * 
      * @since 1.0
      */
     public function createConfigFile() {
@@ -750,7 +785,9 @@ class ConfigController {
     }
     /**
      * Returns a single instance of the class.
+     * 
      * @return ConfigController
+     * 
      * @since 1.0
      */
     public static function get() {
@@ -763,6 +800,7 @@ class ConfigController {
     /**
      * Returns an associative array that contains system configuration 
      * info.
+     * 
      * The array that will be returned will have the following information: 
      * <ul>
      * <li>release-date: The release date of WebFiori Framework.</li>
@@ -773,8 +811,10 @@ class ConfigController {
      * database connections information. The key will be the name of the database 
      * and the value is an object of type ConnectionInfo.</li>
      * </ul>
+     * 
      * @return array An associative array that contains system configuration 
      * info.
+     * 
      * @since 1.0
      */
     public function getConfigVars() {
@@ -788,13 +828,17 @@ class ConfigController {
     }
     /**
      * Checks if the application setup is completed or not.
+     * 
      * Note that the method will throw an exception in case one of the 3 main 
      * configuration files is missing.
+     * 
      * @return boolean If the system is configured, the method will return 
      * true. If it is not configured, It will return false.
+     * 
      * @throws InitializationException If one of configuration files is missing. The format 
      * of exception message will be 'XX.php is missing.' where XX is the name 
      * of the configuration file.
+     * 
      * @since 1.0
      */
     public function isSetupFinished() {
@@ -811,10 +855,13 @@ class ConfigController {
     }
     /**
      * Removes a set of database connections.
+     * 
      * This method will search for a connection which has the given database 
      * name. Once it found, it will remove the connection and save the updated 
      * information to the file 'Config.php'.
+     * 
      * @param array $connectionsNames An array that contains the names of database connections.
+     * 
      * @since 1.4.3
      */
     public function removeDBConnections($connectionsNames) {
@@ -829,8 +876,10 @@ class ConfigController {
     }
     /**
      * A method to save changes to configuration file.
+     * 
      * @param type $configArr An array that contains system configuration 
      * variables.
+     * 
      * @since 1.0
      */
     private function writeConfig($configArr) {
@@ -841,44 +890,58 @@ class ConfigController {
                 . "use webfiori\\database\ConnectionInfo;\n"
                 . "/**\n"
                 . " * Global configuration class.\n"
+                . " * \n"
                 . " * Used by the server part and the presentation part. It contains framework version\n"
                 . " * information and database connection settings.\n"
+                . " * \n"
                 . " * @author Ibrahim\n"
+                . " * \n"
                 . " * @version 1.3.5\n"
                 . " */\n"
                 . "class Config {\n"
                 . "    /**\n"
                 . "     * An instance of Config.\n"
+                . "     * \n"
                 . "     * @var Config\n"
+                . "     * \n"
                 . "     * @since 1.0\n"
                 . "     */\n"
                 . "    private static \$cfg;\n"
                 . "    /**\n"
                 . "     * An associative array that will contain database connections.\n"
+                . "     * \n"
                 . "     * @var type\n"
                 . "     */\n"
                 . "    private \$dbConnections;\n"
                 . "    /**\n"
                 . "     * A boolean value. Set to true once system configuration is completed.\n"
+                . "     * \n"
                 . "     * @var boolean\n"
+                . "     * \n"
                 . "     * @since 1.0\n"
                 . "     */\n"
                 . "    private \$isConfigured;\n"
                 . "    /**\n"
                 . "     * The release date of the framework that is used to build the system.\n"
+                . "     * \n"
                 . "     * @var string Release date of of the framework that is used to build the system.\n"
+                . "     * \n"
                 . "     * @since 1.0\n"
                 . "     */\n"
                 . "    private \$releaseDate;\n"
                 . "    /**\n"
                 . "     * The version of the framework that is used to build the system.\n"
+                . "     * \n"
                 . "     * @var string The version of the framework that is used to build the system.\n"
+                . "     * \n"
                 . "     * @since 1.0\n"
                 . "     */\n"
                 . "    private \$version;\n"
                 . "    /**\n"
                 . "     * The type framework version that is used to build the system.\n"
+                . "     * \n"
                 . "     * @var string The framework version that is used to build the system.\n"
+                . "     * \n"
                 . "     * @since 1.0\n"
                 . "     */\n"
                 . "    private \$versionType;\n"
@@ -925,8 +988,10 @@ class ConfigController {
                 . "    }\n"
                 . "    /**\n"
                 . "     * Adds new database connection or updates an existing one.\n"
+                . "     * \n"
                 . "     * @param ConnectionInfo \$connectionInfo an object of type 'ConnectionInfo'\n"
                 . "     * that will contain connection information.\n"
+                . "     * \n"
                 . "     * @since 1.3.4\n"
                 . "     */\n"
                 . "    public static function addDbConnection(\$connectionInfo) {\n"
@@ -936,7 +1001,9 @@ class ConfigController {
                 . "    }\n"
                 . "    /**\n"
                 . "     * Returns an object that can be used to access configuration information.\n"
+                . "     * \n"
                 . "     * @return Config An object of type Config.\n"
+                . "     * \n"
                 . "     * @since 1.0\n"
                 . "     */\n"
                 . "    public static function get() {\n"
@@ -949,9 +1016,12 @@ class ConfigController {
                 . "    }\n"
                 . "    /**\n"
                 . "     * Returns the version number of configuration file.\n"
+                . "     * \n"
                 . "     * The value is used to check for configuration compatibility since the\n"
                 . "     * framework is updated and more features are added.\n"
+                . "     * \n"
                 . "     * @return string The version number of configuration file.\n"
+                . "     * \n"
                 . "     * @since 1.2\n"
                 . "     */\n"
                 . "    public static function getConfigVersion() {\n"
@@ -959,10 +1029,13 @@ class ConfigController {
                 . "    }\n"
                 . "    /**\n"
                 . "     * Returns database connection information given connection name.\n"
+                . "     * \n"
                 . "     * @param string \$conName The name of the connection.\n"
+                . "     * \n"
                 . "     * @return ConnectionInfo|null The method will return an object of type\n"
                 . "     * ConnectionInfo if a connection info was found for the given connection name.\n"
                 . "     * Other than that, the method will return null.\n"
+                . "     * \n"
                 . "     * @since 1.3.3\n"
                 . "     */\n"
                 . "    public static function getDBConnection(\$conName) {\n"
@@ -977,9 +1050,12 @@ class ConfigController {
                 . "    }\n"
                 . "    /**\n"
                 . "     * Returns an associative array that contain the information of database connections.\n"
+                . "     * \n"
                 . "     * The keys of the array will be the name of database connection and the value of\n"
                 . "     * each key will be an object of type ConnectionInfo.\n"
+                . "     * \n"
                 . "     * @return array An associative array.\n"
+                . "     * \n"
                 . "     * @since 1.3.3\n"
                 . "     */\n"
                 . "    public static function getDBConnections() {\n"
@@ -987,8 +1063,11 @@ class ConfigController {
                 . "    }\n"
                 . "    /**\n"
                 . "     * Returns the date at which the current version of the framework is released.\n"
+                . "     * \n"
                 . "     * The format of the date will be YYYY-MM-DD.\n"
+                . "     * \n"
                 . "     * @return string The date at which the current version of the framework is released.\n"
+                . "     * \n"
                 . "     * @since 1.0\n"
                 . "     */\n"
                 . "    public static function getReleaseDate() {\n"
@@ -996,8 +1075,10 @@ class ConfigController {
                 . "    }\n"
                 . "    /**\n"
                 . "     * Returns WebFiori Framework version number.\n"
+                . "     * \n"
                 . "     * @return string WebFiori Framework version number. The version number will\n"
                 . "     * have the following format: x.x.x\n"
+                . "     * \n"
                 . "     * @since 1.2\n"
                 . "     */\n"
                 . "    public static function getVersion() {\n"
@@ -1005,7 +1086,9 @@ class ConfigController {
                 . "    }\n"
                 . "    /**\n"
                 . "     * Returns WebFiori Framework version type.\n"
+                . "     * \n"
                 . "     * @return string WebFiori Framework version type (e.g. 'Beta', 'Alpha', 'Preview').\n"
+                . "     * \n"
                 . "     * @since 1.2\n"
                 . "     */\n"
                 . "    public static function getVersionType() {\n"
@@ -1013,9 +1096,12 @@ class ConfigController {
                 . "    }\n"
                 . "    /**\n"
                 . "     * Checks if the system is configured or not.\n"
+                . "     * \n"
                 . "     * This method is helpful in case the developer would like to create some\n"
                 . "     * kind of a setup wizard for the web application.\n"
+                . "     * \n"
                 . "     * @return boolean true if the system is configured.\n"
+                . "     * \n"
                 . "     * @since 1.0\n"
                 . "     */\n"
                 . "    public static function isConfig() {\n"
@@ -1037,6 +1123,7 @@ class ConfigController {
                 . "    private function _isConfig() {\n"
                 . "        return \$this->isConfigured;\n"
                 . "    }\n"
+                . "\n"
                 . "}\n"
                 . "";
         

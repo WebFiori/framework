@@ -28,13 +28,15 @@ use Error;
 use webfiori\database\mysql\MySQLColumn;
 use webfiori\database\mysql\MySQLTable;
 use restEasy\WebService;
-use restEasy\APIFilter;
-use restEasy\RequestParameter;
+use webfiori\restEasy\APIFilter;
+use webfiori\restEasy\ParamTypes;
+use webfiori\restEasy\RequestParameter;
 use webfiori\framework\AutoLoader;
 use webfiori\framework\Util;
 use webfiori\WebFiori;
 use webfiori\database\Table;
 use Exception;
+use webfiori\restEasy\AbstractWebService;
 /**
  * A command which is used to automate some of the common tasks such as 
  * creating table classes or controllers.
@@ -157,27 +159,22 @@ class CreateCommand extends CLICommand {
     public function _createWebServices() {
         $classInfo = $this->getClassInfo();
         $addServices = true;
-        $servicesObj = new ServicesHolder();
+        $serviceObj = new ServiceHolder();
 
-        do {
-            $serviceObj = new WebService('');
-            $this->_setServiceName($serviceObj);
-            $serviceObj->addRequestMethod($this->select('Request method:', WebService::METHODS, 0));
-            $servicesObj->addAction($serviceObj, $this->confirm('Does the service require authorization?', false));
+        $this->_setServiceName($serviceObj);
+        $serviceObj->addRequestMethod($this->select('Request method:', AbstractWebService::METHODS, 0));
 
-            if ($this->confirm('Would you like to add request parameters to the service?', false)) {
-                $this->_addParamsToService($serviceObj);
-            }
+        if ($this->confirm('Would you like to add request parameters to the service?', false)) {
+            $this->_addParamsToService($serviceObj);
+        }
 
-            $addServices = $this->confirm('Would you like to add another web service?', false);
-        } while ($addServices);
 
 
         $this->println('Creating the class...');
-        $servicesCreator = new WebServicesWriter($servicesObj, $classInfo);
+        $servicesCreator = new WebServiceWriter($serviceObj, $classInfo);
         $servicesCreator->writeClass();
         $this->success('Class created.');
-        $this->info('Don\'t forget to add a route to the new service in the class \'APIRoutes\'.');
+        $this->info('Don\'t forget to add the service to a services manager.');
         return 0;
     }
     public function exec() {
@@ -333,14 +330,14 @@ class CreateCommand extends CLICommand {
     }
     /**
      * 
-     * @param WebService $serviceObj
+     * @param AbstractWebService $serviceObj
      */
     private function _addParamsToService($serviceObj) {
         $addMore = true;
 
         do {
             $paramObj = new RequestParameter('h');
-            $paramObj->setType($this->select('Choose parameter type:', APIFilter::TYPES, 0));
+            $paramObj->setType($this->select('Choose parameter type:', ParamTypes::getTypes(), 0));
             $this->_setParamName($paramObj);
             $added = $serviceObj->addParameter($paramObj);
  

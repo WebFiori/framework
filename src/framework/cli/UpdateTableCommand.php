@@ -85,15 +85,12 @@ class UpdateTableCommand extends CLICommand {
             return;
         }
         $colToUpdate = $this->select('Which column would you like to update?', $colsKeys);
-        $col = clone $tableObj->getColByKey($colToUpdate);
+        $col = $tableObj->removeColByKey($colToUpdate);
         
         $colKey = $this->getInput('Enter a new name for column key:', $colToUpdate);
+        $isAdded = $tableObj->addColumn($colKey, $col);
         if ($colKey != $colToUpdate) {
             $col->setName(str_replace('-', '_', $colKey));
-            $this->println($col->getName());
-            $this->println($colKey);
-            $isAdded = $tableObj->addColumn($colKey, $col);
-            $this->println($isAdded);
         } else {
             $isAdded = true;
         }
@@ -103,10 +100,9 @@ class UpdateTableCommand extends CLICommand {
         } else {
             $colDatatype = $this->select('Select column data type:', $col->getSupportedTypes(), 0);
             $col->setDatatype($colDatatype);
-            $colObj = $tableObj->getColByKey($colKey);
-            $this->_setSize($colObj);
-            $this->_isPrimaryCheck($colObj);
-            $this->_addColComment($colObj);
+            $this->_setSize($col);
+            $this->_isPrimaryCheck($col);
+            $this->_addColComment($col);
         }
         
         $class = get_class($tableObj);

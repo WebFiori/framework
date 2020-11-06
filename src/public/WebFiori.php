@@ -40,15 +40,13 @@ use webfiori\framework\ThemeLoader;
 use webfiori\framework\Response;
 use webfiori\framework\ui\ErrorBox;
 use webfiori\framework\ui\ServerErrView;
-use webfiori\framework\ui\ServiceUnavailableView;
 use webfiori\framework\Util;
 use webfiori\ini\GlobalConstants;
 use webfiori\ini\InitAutoLoad;
 use webfiori\ini\InitCron;
 use webfiori\ini\InitPrivileges;
-use webfiori\logic\ConfigController;
-use webfiori\logic\EmailController;
-use webfiori\logic\WebsiteController;
+use webfiori\framework\ConfigController;
+use webfiori\framework\session\SessionsManager;
 /**
  * The time at which the framework was booted in microseconds as a float.
  * 
@@ -72,14 +70,6 @@ class WebFiori {
      * @since 1.0
      */
     private static $AU;
-    /**
-     * An instance of basic mail functions class.
-     * 
-     * @var EmailController 
-     * 
-     * @since 1.0
-     */
-    private static $BMF;
     /**
      * A mutex lock to disallow class access during initialization state.
      * 
@@ -122,14 +112,6 @@ class WebFiori {
      * @since 1.0
      */
     private $sysStatus;
-    /**
-     * An instance of web site functions class.
-     * 
-     * @var WebsiteController 
-     * 
-     * @since 1.0
-     */
-    private static $WF;
     /**
      * The entry point for initiating the system.
      * 
@@ -214,15 +196,13 @@ class WebFiori {
         CLI::init();
         
         self::$SF = ConfigController::get();
-        self::$WF = WebsiteController::get();
-        self::$BMF = EmailController::get();
 
         $this->sysStatus = Util::checkSystemStatus();
 
         if ($this->sysStatus == Util::MISSING_CONF_FILE || $this->sysStatus == Util::MISSING_SITE_CONF_FILE) {
             self::$SF->createConfigFile();
-            self::$WF->createSiteConfigFile();
-            self::$BMF->createEmailConfigFile();
+            self::$SF->createSiteConfigFile();
+            self::$SF->createEmailConfigFile();
             $this->sysStatus = Util::checkSystemStatus();
         }
 
@@ -238,24 +218,6 @@ class WebFiori {
         self::$classStatus = 'INITIALIZED';
 
         define('INITIAL_SYS_STATUS', $this->_getSystemStatus());
-
-        if (!CLI::isCLI() && INITIAL_SYS_STATUS !== true) {
-            //you can modify this part to make 
-            //it do something else in case system 
-            //configuration is not equal to true
-            //
-            //show error message to tell the developer how to configure the system.
-            $this->_needConfigration();
-        }
-    }
-    /**
-     * Show an error message that tells the user about system status and how to 
-     * configure it.
-     * 
-     * @since 1.0
-     */
-    public static function configErr() {
-        WebFiori::getAndStart()->_needConfigration();
     }
     private function _initRoutes() {
         APIRoutes::create();
@@ -355,16 +317,6 @@ class WebFiori {
         return self::getAndStart()->dbErrDetails;
     }
     /**
-     * Returns a reference to an instance of 'EmailController'.
-     * 
-     * @return EmailController A reference to an instance of 'EmailController'.
-     * 
-     * @since 1.2.1
-     */
-    public static function getEmailController() {
-        return self::$BMF;
-    }
-    /**
      * Returns an instance of the class 'MailConfig'.
      * 
      * The class will contain SMTP accounts information.
@@ -409,16 +361,6 @@ class WebFiori {
      */
     public static function getSysController() {
         return self::$SF;
-    }
-    /**
-     * Returns a reference to an instance of 'WebsiteController'.
-     * 
-     * @return WebsiteController A reference to an instance of 'WebsiteController'.
-     * 
-     * @since 1.2.1
-     */
-    public static function getWebsiteController() {
-        return self::$WF;
     }
     /**
      * Returns the current status of the system.
@@ -489,49 +431,6 @@ class WebFiori {
         }
 
         return $this->sysStatus;
-    }
-    /**
-     * Show an error message that tells the user about system status and how to 
-     * configure it.
-     * 
-     * @since 1.0
-     */
-    private function _needConfigration() {
-        $routeUri = Router::getUriObjByURL(Util::getRequestedURL());
-        
-        if ($routeUri !== null) {
-            $routeType = $routeUri->getType();
-        } else {
-            $routeType = Router::VIEW_ROUTE;
-        }
-        if ($routeUri !== null) {
-            if ($routeUri->isDynamic()) {
-                // Only apply to dynamic resources.
-                if ($routeType == Router::API_ROUTE) {
-                    Response::setCode(503);
-                    Response::addHeader('content-type', 'application/json');
-                    $j = new Json([], true);
-                    $j->add('message', '503 - Service Unavailable');
-                    $j->add('type', 'error');
-                    $j->add('description','This error means that the system is not configured yet. '
-                            .'Make sure to make the method Config::isConfig() return true. '
-                            .'One way is to go to the file "conf/Config.php". Change attribute "isConfigured" value to true. '
-                            .'Or Use the method ConfigController::configured(true). You must supply \'true\' as an attribute. '
-                            .'If you want to make the system do something else if the return value of the '
-                            .'given method is false, then open the file \'WebFiori.php\' and '
-                            .'change the code in the \'else\' code block at the end of class constructor. (Inside the "if" block).');
-                    $j->add('powered-by', 'WebFiori Framework v'.Config::getVersion().' ('.Config::getVersionType().')');
-                    Response::append($j);
-                    Response::send();
-                } else {
-                    $serviceUnavailable = new ServiceUnavailableView();
-                    $serviceUnavailable->show(503);
-                }
-            }
-        } else {
-            $serviceUnavailable = new ServiceUnavailableView();
-            $serviceUnavailable->show(503);
-        }
     }
     private function _setErrHandler() {
         set_error_handler(function($errno, $errstr, $errfile, $errline)
@@ -691,6 +590,7 @@ if (CLI::isCLI() === true) {
     CLI::runCLI();
 } else {
     //route user request.
+    SessionsManager::start('wf-session');
     Router::route(Util::getRequestedURL());
     Response::send();
 }

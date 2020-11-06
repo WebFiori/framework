@@ -33,7 +33,6 @@ use restEasy\RequestParameter;
 use webfiori\framework\AutoLoader;
 use webfiori\framework\Util;
 use webfiori\WebFiori;
-use webfiori\logic\Controller;
 use webfiori\database\Table;
 use Exception;
 /**

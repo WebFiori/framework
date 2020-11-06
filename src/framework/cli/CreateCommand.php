@@ -54,7 +54,7 @@ class CreateCommand extends CLICommand {
                 . 'database table.',
                 'optional' => true,
                 'values' => [
-                    'e','t','c'
+                    'e','t','ws'
                 ]
             ],
             '--table-class' => [
@@ -158,7 +158,7 @@ class CreateCommand extends CLICommand {
     }
     public function _createWebServices() {
         $classInfo = $this->getClassInfo();
-        $addServices = true;
+        
         $serviceObj = new ServiceHolder();
 
         $this->_setServiceName($serviceObj);
@@ -184,15 +184,14 @@ class CreateCommand extends CLICommand {
                 $this->_createEntityFromQuery();
             } else if ($what == 't') {
                 $this->_createDbTable();
-            } else if ($what == 'c') {
-                $this->_createController();
+            } else if ($what == 'ws') {
+                $this->_createWebServices();
             }
         } else {
             $options = [
             'Database table class.',
             'Entity class from table.',
-            'Controller class.',
-            'Web services set.',
+            'New web service.',
             'Database table from class.',
             'Quit.'
         ];
@@ -204,9 +203,7 @@ class CreateCommand extends CLICommand {
                 return $this->_createQueryClass();
             } else if ($answer == 'Entity class from table.') {
                 return $this->_createEntityFromQuery();
-            } else if ($answer == 'Controller class.') {
-                return $this->_createController();
-            } else if ($answer == 'Web services set.') {
+            } else if ($answer == 'New web service.') {
                 return $this->_createWebServices();
             } else if ($answer == 'Database table from class.') {
                 $this->_createDbTable();
@@ -348,41 +345,6 @@ class CreateCommand extends CLICommand {
             }
             $addMore = $this->confirm('Would you like to add another parameter?', false);
         } while ($addMore);
-    }
-    private function _createController() {
-        
-        $linkedQuery = $this->getArgValue('--query-class');
-        if ($linkedQuery !== null) {
-            if (!class_exists($linkedQuery)) {
-                $this->error('No class was found which has the name "'.$linkedQuery.'".');
-                $linkedQuery = null;
-            } else {
-                $inst = new $linkedQuery();
-                if (!($inst instanceof MySQLQuery)) {
-                    $this->error('The class "'.$linkedQuery.'" is not of type "phMysql\MySQLQuery".');
-                    $linkedQuery = null;
-                }
-            }
-        }
-        
-        $classInfo = $this->getClassInfo();
-        $classInfo['linked-query'] = $linkedQuery;
-        
-        if ($classInfo['linked-query'] === null&& $this->confirm('Would you like to associate the controller with query class?', false)) {
-            $classInfo['linked-query'] = $this->_getControllerQuery();
-        }
-        $dbConnections = array_keys(WebFiori::getConfig()->getDBConnections());
-
-        if (count($dbConnections) != 0) {
-            $classInfo['db-connection'] = $this->select('Select database connection:', $dbConnections);
-        } else {
-            $this->warning('No database connections available. You must specify the connection manually later.');
-        }
-        $writer = new ControllerClassWriter($classInfo);
-        $writer->writeClass();
-        $this->success('Class created.');
-
-        return 0;
     }
     private function _createQueryClass() {
         $classInfo = $this->getClassInfo();

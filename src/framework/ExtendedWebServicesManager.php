@@ -27,9 +27,9 @@ namespace webfiori\framework;
 use webfiori\json\JsonI;
 use webfiori\json\Json;
 use webfiori\restEasy\WebServicesManager;
-use webfiori\logic\Controller;
 use webfiori\framework\i18n\Language;
-use webfiori\WebFiori;
+use webfiori\framework\DB;
+use webfiori\framework\ConfigController;
 /**
  * An extension for the class 'WebServicesManager' that adds support for multi-language 
  * response messages.
@@ -181,9 +181,9 @@ abstract class ExtendedWebServicesManager extends WebServicesManager {
      * In here, 'OTHER_DATA' can be a basic string.
      * Also, The response will sent HTTP code 404 - Not Found.
      * 
-     * @param JsonI|Json|Controller|string $info An object of type JsonI or 
+     * @param JsonI|Json|DB|string $info An object of type JsonI or 
      * Json that describe the error in more details. Also it can be a simple string. 
-     * Also, this parameter can be a controller that contains database error 
+     * Also, this parameter can be a database instance that contains database error 
      * information.
      * Note that the content of the field "message" might differ. It depends on 
      * the language. If no language is selected or language is not supported, 
@@ -194,15 +194,15 @@ abstract class ExtendedWebServicesManager extends WebServicesManager {
      */
     public function databaseErr($info = '') {
         $message = $this->get('general/db-error');
-        if ($info instanceof Controller) {
-            $dbErr = $info->getDBErrDetails();
+        if ($info instanceof DB) {
+            
+            $dbErr = $info->getLastError();
             $json = new Json([
-                'error-message'=>$dbErr['error-message'],
-                'error-code'=>$dbErr['error-code']
+                'error-message'=>$dbErr['message'],
+                'error-code'=>$dbErr['code']
             ]);
             if (defined('VERBOSE') && VERBOSE === true) {
-                $json->add('controller', $dbErr['controller']);
-                $json->add('query', $dbErr['query']);
+                $json->add('query', $info->getLastQuery());
             }
             $this->sendResponse($message, self::$E, 404, $json);
         } else {
@@ -410,12 +410,12 @@ abstract class ExtendedWebServicesManager extends WebServicesManager {
         $reqMeth = $this->getRequestMethod();
 
         if ($reqMeth == 'GET' || $reqMeth == 'DELETE') {
-            $langCode = isset($_GET['lang']) ? filter_var($_GET['lang']) : WebFiori::getWebsiteController()->getSessionLang();
+            $langCode = isset($_GET['lang']) ? filter_var($_GET['lang']) : ConfigController::get()->getSessionLang();
         } else {
             if ($reqMeth == 'POST' || $reqMeth == 'PUT') {
-                $langCode = isset($_POST['lang']) ? filter_var($_POST['lang']) : WebFiori::getWebsiteController()->getSessionLang();
+                $langCode = isset($_POST['lang']) ? filter_var($_POST['lang']) : ConfigController::get()->getSessionLang();
             } else {
-                $langCode = WebFiori::getWebsiteController()->getSessionLang();
+                $langCode = ConfigController::get()->getSessionLang();
             }
         }
         $this->translation = Language::loadTranslation($langCode);

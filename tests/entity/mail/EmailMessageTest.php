@@ -17,7 +17,7 @@ class EmailMessageTest extends TestCase {
     public function test00() {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('No SMTP account was found which has the name "not exist".');
-        $message = EmailMessage::createInstance('not exist');
+        $message = new EmailMessage('not exist');
     }
     /**
      * @test
@@ -28,7 +28,7 @@ class EmailMessageTest extends TestCase {
         MailConfig::get()->addSMTPAccount('smtp-acc-00', $smtp);
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('The account "smtp-acc-00" has invalid host or port number. Port: 465, Host: .');
-        $message = EmailMessage::createInstance('smtp-acc-00');
+        $message = new EmailMessage('smtp-acc-00');
     }
     /**
      * @test
@@ -43,7 +43,7 @@ class EmailMessageTest extends TestCase {
         $smtp->setServerAddress('mail.programmingacademia.com ');
         $smtp->setPort(255);
         MailConfig::get()->addSMTPAccount('smtp-acc-00', $smtp);
-        $message = EmailMessage::createInstance('smtp-acc-00');
+        $message = new EmailMessage('smtp-acc-00');
     }
     /**
      * @test
@@ -58,7 +58,7 @@ class EmailMessageTest extends TestCase {
         $smtp->setServerAddress('mail.programmingacademia.com ');
         $smtp->setPort(765765);
         MailConfig::get()->addSMTPAccount('smtp-acc-00', $smtp);
-        $message = EmailMessage::createInstance('smtp-acc-00');
+        $message = new EmailMessage('smtp-acc-00');
         $this->assertTrue($message instanceof EmailMessage);
     }
     /**

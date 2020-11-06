@@ -30,6 +30,8 @@ use webfiori\restEasy\WebServicesManager;
 use webfiori\framework\i18n\Language;
 use webfiori\framework\DB;
 use webfiori\framework\ConfigController;
+use webfiori\WebFiori;
+use webfiori\framework\session\SessionsManager;
 /**
  * An extension for the class 'WebServicesManager' that adds support for multi-language 
  * response messages.
@@ -408,15 +410,18 @@ abstract class ExtendedWebServicesManager extends WebServicesManager {
      */
     private function _setTranslation() {
         $reqMeth = $this->getRequestMethod();
-
-        if ($reqMeth == 'GET' || $reqMeth == 'DELETE') {
-            $langCode = isset($_GET['lang']) ? filter_var($_GET['lang']) : ConfigController::get()->getSessionLang();
+        $activeSession = SessionsManager::getActiveSession();
+        if ($activeSession !== null) {
+            $tempCode = $activeSession->getLangCode(true);
         } else {
-            if ($reqMeth == 'POST' || $reqMeth == 'PUT') {
-                $langCode = isset($_POST['lang']) ? filter_var($_POST['lang']) : ConfigController::get()->getSessionLang();
-            } else {
-                $langCode = ConfigController::get()->getSessionLang();
-            }
+            $tempCode = WebFiori::getSiteConfig()->getPrimaryLanguage();
+        }
+        if ($reqMeth == 'GET' || $reqMeth == 'DELETE') {
+            $langCode = isset($_GET['lang']) ? filter_var($_GET['lang']) : $tempCode;
+        } else if ($reqMeth == 'POST' || $reqMeth == 'PUT') {
+            $langCode = isset($_POST['lang']) ? filter_var($_POST['lang']) : $tempCode;
+        } else {
+            $langCode = $tempCode;
         }
         $this->translation = Language::loadTranslation($langCode);
     }

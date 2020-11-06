@@ -28,6 +28,7 @@ use webfiori\ui\HTMLNode;
 use webfiori\framework\Page;
 use webfiori\WebFiori;
 use webfiori\framework\Response;
+use webfiori\framework\session\SessionsManager;
 /**
  * A basic view which is used to display 404 HTTP error code and 
  * messages.
@@ -40,7 +41,12 @@ class NotFoundView {
      */
     public function __construct() {
         Page::theme(WebFiori::getSiteConfig()->getBaseThemeName());
-        Page::lang(WebFiori::getSysController()->getSessionLang());
+        $activeSession = SessionsManager::getActiveSession();
+        if ($activeSession !== null) {
+            Page::lang($activeSession->getLangCode(true));
+        } else {
+            Page::lang(WebFiori::getSiteConfig()->getPrimaryLanguage());
+        }
         Page::siteName(WebFiori::getSiteConfig()->getWebsiteNames()[Page::lang()]);
         $labels = Page::translation()->get('general/http-codes/404');
         Page::title($labels['code'].' - '.$labels['type']);

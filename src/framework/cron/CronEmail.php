@@ -32,60 +32,54 @@ use webfiori\WebFiori;
 /**
  * A class which can be used to send an email regarding the status of 
  * background job execution.
+ * 
  * This class must be only used in one of the abstract methods of a 
  * background job since using it while no job is active will have no 
  * effect.
+ * 
  * The email that will be sent will contain technical information about 
  * the job in addition to a basic log file that shows execution steps. Also, 
  * it will contain any log messages which was added by using the method 
  * 'Cron::log()'.
+ * 
  * @author Ibrahim
- * @version 1.0.1
+ * 
+ * @version 1.0.2
  */
-class CronEmail {
-    /**
-     * An array that contains the addresses of the people who will get the 
-     * email.
-     * @var array
-     * @since 1.0.1 
-     */
-    private $reciversArr;
-    /**
-     * The name of the account that will be used to send the message.
-     * @var string 
-     * @since 1.0.1 
-     */
-    private $sendAccName;
+class CronEmail extends EmailMessage {
     /**
      * Creates new instance of the class.
+     * 
      * @param string $sendAccName The name of SMTP account that will be 
      * used to send the message. Note that it must be exist in the class 
      * 'MailConfig'.
+     * 
      * @param array $receivers An associative array of receivers. The 
      * indices are the addresses of the receivers and the values are the 
      * names of the receivers (e.g. 'xy@example.com' => 'Super User');
+     * 
      * @since 1.0
      */
     public function __construct($sendAccName, $receivers = []) {
+        parent::__construct($sendAccName);
         $activeJob = Cron::activeJob();
 
         if ($activeJob !== null) {
-            EmailMessage::createInstance($sendAccName);
 
             if (gettype($receivers) == 'array' && count($receivers) != 0) {
                 foreach ($receivers as $addr => $name) {
-                    EmailMessage::addReceiver($name, $addr);
+                    $this->addReceiver($name, $addr);
                 }
             }
 
-            EmailMessage::subject('Background Task Status: Task \''.$activeJob->getJobName().'\'');
-            EmailMessage::importance(1);
-            EmailMessage::document()->getBody()->setStyle([
+            $this->subject('Background Task Status: Task \''.$activeJob->getJobName().'\'');
+            $this->importance(1);
+            $this->document()->getBody()->setStyle([
                 'font-family' => 'monospace'
             ]);
             $dearNode = new HTMLNode('p');
             $dearNode->addTextNode('Dear,');
-            EmailMessage::insertNode($dearNode);
+            $this->insertNode($dearNode);
             $paragraph = new HTMLNode('p');
             $paragraph->setStyle([
                 'text-align' => 'justify'
@@ -104,9 +98,9 @@ class CronEmail {
                         .'the cause of the issue.';
             }
             $paragraph->addTextNode($text, false);
-            EmailMessage::insertNode($paragraph);
-            EmailMessage::write('<p>Technical Info:</p>');
-            EmailMessage::insertNode($this->_createJobInfoTable($activeJob));
+            $this->insertNode($paragraph);
+            $this->write('<p>Technical Info:</p>');
+            $this->insertNode($this->_createJobInfoTable($activeJob));
             $logTxt = '';
 
             foreach (Cron::getLogArray() as $logEntry) {
@@ -114,33 +108,8 @@ class CronEmail {
             }
             $file = new File($activeJob->getJobName().'-ExecLog-'.date('Y-m-d H-i-s').'.log');
             $file->setRawData($logTxt);
-            EmailMessage::attach($file);
+            $this->attach($file);
         }
-    }
-    /**
-     * Send the message.
-     * @since 1.0
-     */
-    public function send() {
-        EmailMessage::send();
-    }
-    /**
-     * Returns an associative array that contains the addresses of the people 
-     * who will get the notice.
-     * @return array The indices of the array will be the addresses and the 
-     * values will be receivers names.
-     * @since 1.0.1
-     */
-    public function getReceivers() {
-        return $this->reciversArr;
-    }
-    /**
-     * Returns the name of the account that will be used to send the message.
-     * @return string The name of the account that will be used to send the message.
-     * @since 1.0.1
-     */
-    public function getSendAccName() {
-        return $this->sendAccName;
     }
     /**
      * 

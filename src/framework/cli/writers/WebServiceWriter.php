@@ -31,7 +31,7 @@ use webfiori\restEasy\AbstractWebService;
 use webfiori\restEasy\RequestParameter;
 
 /**
- * A writer class which is used to create new web services class.
+ * A writer class which is used to create new web service class.
  *
  * @author Ibrahim
  * @version 1.0
@@ -118,7 +118,6 @@ class WebServiceWriter extends ClassWriter {
         $this->append("public function isAuthorized() {", 1);
         $this->append('// TODO: Check if the client is authorized to call the service \''.$name.'\'.', 2);
 
-        $this->append('return false;', 2);
         $this->append('}', 1);
 
         $this->append("/**", 1);

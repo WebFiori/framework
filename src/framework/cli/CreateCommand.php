@@ -67,7 +67,6 @@ class CreateCommand extends CLICommand {
      * @param Table $tableObj
      */
     public function _addFks($tableObj) {
-        $addMoreFks = true;
         $refTable = null;
         $fksNs = [];
         do {
@@ -109,11 +108,10 @@ class CreateCommand extends CLICommand {
                     $this->success('Unable to add the key.');
                 }
             } else {
-                $this->error('The given class is not an instance of the class \'MySQLQuery\'.');
+                $this->error('The given class is not an instance of the class \'webfiori\\database\\mysql\\MySQLQuery\'.');
             }
 
-            $addMoreFks = $this->confirm('Would you like to add another foreign key?');
-        } while ($addMoreFks);
+        } while ($this->confirm('Would you like to add another foreign key?', false));
         return $fksNs;
     }
     public function _createEntityFromQuery() {
@@ -468,7 +466,6 @@ class CreateCommand extends CLICommand {
      * @return type
      */
     private function _getFkCols($tableObj) {
-        $moreCols = true;
         $colNumber = 1;
         $keys = $tableObj->getColsKeys();
         $fkCols = [];
@@ -482,8 +479,7 @@ class CreateCommand extends CLICommand {
             } else {
                 $this->error('The column is already added.');
             }
-            $moreCols = $this->confirm('Would you like to add another column to the foreign key?', false);
-        } while ($moreCols);
+        } while ($this->confirm('Would you like to add another column to the foreign key?', false));
 
         return $fkCols;
     }

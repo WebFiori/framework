@@ -351,14 +351,18 @@ class CreateCommand extends CLICommand {
         
         
         $tempTable = new MySQLTable();
-        $addMoreCols = true;
         $this->_setTableName($tempTable);
         $this->_setTableComment($tempTable);
         $this->println('Now you have to add columns to the table.');
 
         do {
             $colKey = $this->getInput('Enter a name for column key:');
+            if ($tempTable->hasColumnWithKey($colKey)) {
+                $this->warning("The table already has a key with name '$colKey'.");
+                continue;
+            }
             $col = new MySQLColumn();
+            $col->setName(str_replace('-', '_', $colKey));
             $colDatatype = $this->select('Select column data type:', $col->getSupportedTypes(), 0);
             $col->setDatatype($colDatatype);
             $isAdded = $tempTable->addColumn($colKey, $col);
@@ -371,8 +375,7 @@ class CreateCommand extends CLICommand {
                 $this->_isPrimaryCheck($colObj);
                 $this->_addColComment($colObj);
             }
-            $addMoreCols = $this->confirm('Would you like to add another column?', false);
-        } while ($addMoreCols);
+        } while ($this->confirm('Would you like to add another column?', false));
 
         if ($this->confirm('Would you like to add foreign keys to the table?', false)) {
             // TODO: Test adding forighn keys.

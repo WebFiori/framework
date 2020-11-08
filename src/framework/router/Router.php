@@ -263,7 +263,7 @@ class Router {
      * 
      * @since 1.2
      */
-    public static function addRoute($options) {
+    public static function addRoute(array $options) {
         $options['type'] = Router::CUSTOMIZED;
 
         return Router::get()->_addRoute($options);
@@ -731,7 +731,7 @@ class Router {
      * 
      * @since 1.0
      */
-    private function _addRoute($options) {
+    private function _addRoute(array $options) {
         if (!isset($options['route-to'])) {
             return false;
         } else {

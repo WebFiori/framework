@@ -51,6 +51,7 @@ class UpdateTableCommand extends CLICommand {
         
         $whatToDo = $this->select('What operation whould you like to do with the table?', [
             'Add new column.',
+            'Add foreign key.',
             'Update existing column.',
             'Drop column.'
         ]);
@@ -67,11 +68,103 @@ class UpdateTableCommand extends CLICommand {
             }
         } else if ($whatToDo == 'Drop column.') {
             $this->dropCol($tableObj);
+        } else if ($whatToDo == 'Add foreign key.') {
+            $this->_addFks($tableObj);
         } else if ($whatToDo == 'Update existing column.') {
             $this->updateCol($tableObj);
         } else {
             $this->error('Option not implemented.');
         }
+    }
+    /**
+     * 
+     * @param Table $tableObj
+     * @return type
+     */
+    private function _getFkCols($tableObj) {
+        $colNumber = 1;
+        $keys = $tableObj->getColsKeys();
+        $fkCols = [];
+
+        do {
+            $colKey = $this->select('Select column #'.$colNumber.':', $keys);
+
+            if (!in_array($colKey, $fkCols)) {
+                $fkCols[] = $colKey;
+                $colNumber++;
+            } else {
+                $this->error('The column is already added.');
+            }
+        } while ($this->confirm('Would you like to add another column to the foreign key?', false));
+
+        return $fkCols;
+    }
+    /**
+     * 
+     * @param Table $tableObj
+     */
+    public function _addFks($tableObj) {
+        $refTable = null;
+        $fksNs = [];
+        do {
+            
+            $refQueryName = $this->getInput('Enter the name of the referenced table class (with namespace):');
+            try {
+                $refTable = new $refQueryName();
+            } catch (Error $ex) {
+                $this->error($ex->getMessage());
+                continue;
+            }
+
+            if ($refTable instanceof Table) {
+                $fkName = $this->getInput('Enter a name for the foreign key:', null, function ($val) {
+                    $trimmed = trim($val);
+                    if (strlen($trimmed) == 0) {
+                        return false;
+                    }
+                    return true;
+                });
+                $fkCols = $this->_getFkCols($tableObj);
+                $fkArr = [];
+
+                foreach ($fkCols as $colKey) {
+                    $fkArr[$colKey] = $this->select('Select the column that will be referenced by the column \''.$colKey.'\':', $refTable->getColsKeys());
+                }
+                $onUpdate = $this->select('Choose on update condition:', [
+                    'cascade', 'restrict', 'set null', 'set default', 'no action'
+                ], 1);
+                $onDelete = $this->select('Choose on delete condition:', [
+                    'cascade', 'restrict', 'set null', 'set default', 'no action'
+                ], 1);
+                $added = $tableObj->addReference($refTable, $fkArr, $fkName, $onUpdate, $onDelete);
+
+                if ($added) {
+                    $fksNs[$fkName] = $refQueryName;
+                    $this->success('Foreign key added.');
+                } else {
+                    $this->success('Unable to add the key.');
+                }
+            } else {
+                $this->error('The given class is not an instance of the class \'MySQLQuery\'.');
+            }
+
+        } while ($this->confirm('Would you like to add another foreign key?', false));
+        
+        $class = get_class($tableObj);
+        $arr = $this->getClassNs($class);
+        $arr['fk-info'] = $fksNs;
+        $writer = new QueryClassWriter($tableObj, $arr);
+        $writer->writeClass();
+        //$db = $this->getDb('Would you like to run a query to '
+        //        . 'update the table in the database?');
+        
+       // if ($db !== null) {
+       //     $db->addTable($tableObj);
+            //$db->table($tableObj->getName())->a($colKey);
+            //$this->runQuery($db);
+       // }
+        
+        $this->success('Table updated.');
     }
     /**
      * 

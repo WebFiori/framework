@@ -53,7 +53,8 @@ class UpdateTableCommand extends CLICommand {
             'Add new column.',
             'Add foreign key.',
             'Update existing column.',
-            'Drop column.'
+            'Drop column.',
+            'Drop foreign key.'
         ]);
         if ($whatToDo == 'Add new column.') {
             $col = $this->_addColumn($tableObj);
@@ -72,6 +73,8 @@ class UpdateTableCommand extends CLICommand {
             $this->_addFks($tableObj);
         } else if ($whatToDo == 'Update existing column.') {
             $this->updateCol($tableObj);
+        } else if ($whatToDo == 'Drop foreign key.') {
+            $this->_removeFk($tableObj);
         } else {
             $this->error('Option not implemented.');
         }
@@ -103,14 +106,47 @@ class UpdateTableCommand extends CLICommand {
      * 
      * @param Table $tableObj
      */
+    private function _removeFk($tableObj) {
+        if ($tableObj->getForignKeysCount() == 0) {
+            $this->info('Selected table has no foreign keys.');
+            return;
+        }
+        $fks = $tableObj->getForignKeys();
+        $optionsArr = [];
+        foreach ($fks as $fkObj) {
+            $optionsArr[] = $fkObj->getKeyName();
+        }
+        $toRemove = $this->select('Select the key that you would like to remove:', $optionsArr);
+        $tableObj->removeReference($toRemove);
+        
+        $class = get_class($tableObj);
+        $arr = $this->getClassNs($class);
+
+        $writer = new QueryClassWriter($tableObj, $arr);
+        $writer->writeClass();
+        $db = $this->getDb('Would you like to run a query to '
+                . 'update the table in the database?');
+        
+        if ($db !== null) {
+            $db->addTable($tableObj);
+            $db->table($tableObj->getName())->dropForeignKey($toRemove);
+            $this->runQuery($db);
+        }
+        
+        $this->success('Table updated.');
+    }
+    /**
+     * 
+     * @param Table $tableObj
+     */
     public function _addFks($tableObj) {
         $refTable = null;
-        $fksNs = [];
+        $refTabelsNs = [];
         do {
             
-            $refQueryName = $this->getInput('Enter the name of the referenced table class (with namespace):');
+            $refTableName = $this->getInput('Enter the name of the referenced table class (with namespace):');
             try {
-                $refTable = new $refQueryName();
+                $refTable = new $refTableName();
             } catch (Error $ex) {
                 $this->error($ex->getMessage());
                 continue;
@@ -125,10 +161,10 @@ class UpdateTableCommand extends CLICommand {
                     return true;
                 });
                 $fkCols = $this->_getFkCols($tableObj);
-                $fkArr = [];
+                $fkColsArr = [];
 
                 foreach ($fkCols as $colKey) {
-                    $fkArr[$colKey] = $this->select('Select the column that will be referenced by the column \''.$colKey.'\':', $refTable->getColsKeys());
+                    $fkColsArr[$colKey] = $this->select('Select the column that will be referenced by the column \''.$colKey.'\':', $refTable->getColsKeys());
                 }
                 $onUpdate = $this->select('Choose on update condition:', [
                     'cascade', 'restrict', 'set null', 'set default', 'no action'
@@ -136,14 +172,14 @@ class UpdateTableCommand extends CLICommand {
                 $onDelete = $this->select('Choose on delete condition:', [
                     'cascade', 'restrict', 'set null', 'set default', 'no action'
                 ], 1);
-                $added = $tableObj->addReference($refTable, $fkArr, $fkName, $onUpdate, $onDelete);
-
-                if ($added) {
-                    $fksNs[$fkName] = $refQueryName;
+                
+                try {
+                    $tableObj->addReference($refTable, $fkColsArr, $fkName, $onUpdate, $onDelete);
                     $this->success('Foreign key added.');
-                } else {
-                    $this->success('Unable to add the key.');
-                }
+                    $refTabelsNs[$fkName] = $refTableName;
+                } catch (Exception $ex) {
+                    $this->error($ex->getMessage());
+                } 
             } else {
                 $this->error('The given class is not an instance of the class \'MySQLQuery\'.');
             }
@@ -152,17 +188,17 @@ class UpdateTableCommand extends CLICommand {
         
         $class = get_class($tableObj);
         $arr = $this->getClassNs($class);
-        $arr['fk-info'] = $fksNs;
+        $arr['fk-info'] = $refTabelsNs;
         $writer = new QueryClassWriter($tableObj, $arr);
         $writer->writeClass();
-        //$db = $this->getDb('Would you like to run a query to '
-        //        . 'update the table in the database?');
+        $db = $this->getDb('Would you like to run a query to '
+                . 'update the table in the database?');
         
-       // if ($db !== null) {
-       //     $db->addTable($tableObj);
-            //$db->table($tableObj->getName())->a($colKey);
-            //$this->runQuery($db);
-       // }
+        if ($db !== null) {
+            $db->addTable($tableObj);
+            $db->table($tableObj->getName())->addForeignKey($fkName);
+            $this->runQuery($db);
+        }
         
         $this->success('Table updated.');
     }

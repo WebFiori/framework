@@ -71,9 +71,9 @@ class CreateCommand extends CLICommand {
         $fksNs = [];
         do {
             
-            $refQueryName = $this->getInput('Enter the name of the referenced table class (with namespace):');
+            $refTableName = $this->getInput('Enter the name of the referenced table class (with namespace):');
             try {
-                $refTable = new $refQueryName();
+                $refTable = new $refTableName();
             } catch (Error $ex) {
                 $this->error($ex->getMessage());
                 continue;
@@ -88,10 +88,10 @@ class CreateCommand extends CLICommand {
                     return true;
                 });
                 $fkCols = $this->_getFkCols($tableObj);
-                $fkArr = [];
+                $fkColsArr = [];
 
                 foreach ($fkCols as $colKey) {
-                    $fkArr[$colKey] = $this->select('Select the column that will be referenced by the column \''.$colKey.'\':', $refTable->getColsKeys());
+                    $fkColsArr[$colKey] = $this->select('Select the column that will be referenced by the column \''.$colKey.'\':', $refTable->getColsKeys());
                 }
                 $onUpdate = $this->select('Choose on update condition:', [
                     'cascade', 'restrict', 'set null', 'set default', 'no action'
@@ -99,16 +99,16 @@ class CreateCommand extends CLICommand {
                 $onDelete = $this->select('Choose on delete condition:', [
                     'cascade', 'restrict', 'set null', 'set default', 'no action'
                 ], 1);
-                $added = $tableObj->addReference($refTable, $fkArr, $fkName, $onUpdate, $onDelete);
-
-                if ($added) {
-                    $fksNs[$fkName] = $refQueryName;
+                
+                try {
+                    $tableObj->addReference($refTable, $fkColsArr, $fkName, $onUpdate, $onDelete);
                     $this->success('Foreign key added.');
-                } else {
-                    $this->success('Unable to add the key.');
-                }
+                    $fksNs[$fkName] = $refTableName;
+                } catch (Exception $ex) {
+                    $this->error($ex->getMessage());
+                } 
             } else {
-                $this->error('The given class is not an instance of the class \'webfiori\\database\\mysql\\MySQLQuery\'.');
+                $this->error('The given class is not an instance of the class \'MySQLQuery\'.');
             }
 
         } while ($this->confirm('Would you like to add another foreign key?', false));

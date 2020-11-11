@@ -75,9 +75,9 @@ class ConfigController {
      * @since 1.0
      */
     const INITIAL_CONFIG_VARS = [
-        'release-date' => '2020-07-05',
-        'version' => '1.1.0',
-        'version-type' => 'Beta 3',
+        'release-date' => '2020-11-15',
+        'version' => '2.0',
+        'version-type' => 'Beta 1',
         'config-file-version' => '1.3.5',
         'databases' => []
     ];

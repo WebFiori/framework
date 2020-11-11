@@ -136,7 +136,7 @@ class CreateCommand extends CLICommand {
             $tableClassNameValidity = true;
         } while (!$tableClassNameValidity);
         $this->println('We need from you to give us entity class information.');
-        $classInfo = $this->getClassInfo();
+        $classInfo = $this->getClassInfo('app\\entity','app'.DS.'entity');
         $implJsonI = $this->confirm('Would you like from your class to implement the interface JsonI?', true);
         $this->println('Generating your entity...');
 
@@ -154,8 +154,8 @@ class CreateCommand extends CLICommand {
 
         return 0;
     }
-    public function _createWebServices() {
-        $classInfo = $this->getClassInfo();
+    private function _createWebServices() {
+        $classInfo = $this->getClassInfo('app\\apis','app'.DS.'apis');
         
         $serviceObj = new ServiceHolder();
 
@@ -273,12 +273,12 @@ class CreateCommand extends CLICommand {
      * </ul>
      * @since 1.0
      */
-    public function getClassInfo() {
+    public function getClassInfo($defaltNs = null, $defaultLoc = null) {
         $classExist = true;
 
         do {
             $className = $this->_getClassName();
-            $ns = $this->_getNamespace();
+            $ns = $this->_getNamespace($defaltNs);
             $classWithNs = $ns.'\\'.$className;
             $classExist = class_exists($classWithNs);
 
@@ -289,7 +289,7 @@ class CreateCommand extends CLICommand {
         $isFileExist = true;
 
         do {
-            $path = $this->_getClassPath();
+            $path = $this->_getClassPath($defaultLoc);
 
             if (file_exists($path.DS.$className.'.php')) {
                 $this->warning('A file which has the same as the class name was found.');
@@ -345,7 +345,7 @@ class CreateCommand extends CLICommand {
         } while ($addMore);
     }
     private function _createQueryClass() {
-        $classInfo = $this->getClassInfo();
+        $classInfo = $this->getClassInfo('app\\database','app'.DS.'database');
         
         
         $tempTable = new MySQLTable();
@@ -381,7 +381,7 @@ class CreateCommand extends CLICommand {
         }
 
         if ($this->confirm('Would you like to create an entity class that maps to the database table?', false)) {
-            $entityInfo = $this->getClassInfo();
+            $entityInfo = $this->getClassInfo('app\\entity', 'app'.DS.'entity');
             $entityInfo['implement-jsoni'] = $this->confirm('Would you like from your entity class to implement the interface JsonI?', true);
             $classInfo['entity-info'] = $entityInfo;
         }
@@ -415,11 +415,11 @@ class CreateCommand extends CLICommand {
 
         return $className;
     }
-    private function _getClassPath() {
+    private function _getClassPath($default) {
         $validPath = false;
 
         do {
-            $path = $this->getInput("Where would you like to store the class? (must be a directory inside '".ROOT_DIR."')");
+            $path = $this->getInput("Where would you like to store the class? (must be a directory inside '".ROOT_DIR."')", $default);
             $fixedPath = ROOT_DIR.DS.trim(trim(str_replace('\\', DS, str_replace('/', DS, $path)),'/'),'\\');
 
             if (Util::isDirectory($fixedPath)) {
@@ -434,31 +434,6 @@ class CreateCommand extends CLICommand {
         } while (!$validPath);
 
         return $fixedPath;
-    }
-    /**
-     * 
-     * @return string The name of the query class with its namespace.
-     */
-    private function _getControllerQuery() {
-        $validQuery = false;
-        $queryName = '';
-
-        do {
-            $queryName = $this->getInput('Enter query class name (include namespace):');
-            try {
-                $queryObj = new $queryName();
-
-                if (!($queryObj instanceof MySQLQuery)) {
-                    $this->error('Given class is not of type "phMysql/MySQLQuery".');
-                } else {
-                    $validQuery = true;
-                }
-            } catch (Error $ex) {
-                $this->error($ex->getMessage());
-            }
-        } while (!$validQuery);
-
-        return $queryName;
     }
     /**
      * 
@@ -483,11 +458,11 @@ class CreateCommand extends CLICommand {
 
         return $fkCols;
     }
-    private function _getNamespace() {
+    private function _getNamespace($defaultNs) {
         $isNameValid = false;
 
         do {
-            $ns = str_replace('/','\\',trim($this->getInput('Enter an optional namespace for the class:', '\\')));
+            $ns = str_replace('/','\\',trim($this->getInput('Enter an optional namespace for the class:', $defaultNs)));
             $isNameValid = $this->_validateNamespace($ns);
 
             if (!$isNameValid) {

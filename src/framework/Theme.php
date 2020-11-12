@@ -241,9 +241,8 @@ abstract class Theme implements JsonI {
         }
         $nodeName = isset($options['name']) ? $options['name'] : 'div';
         $attributes = isset($options['attributes']) ? $options['attributes'] : [];
-        $node = new HTMLNode($nodeName, $attributes);
-
-        return $node;
+        
+        return new HTMLNode($nodeName, $attributes);
     }
     /**
      * Returns an object of type 'HTMLNode' that represents aside section of the page. 

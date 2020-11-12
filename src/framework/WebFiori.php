@@ -58,7 +58,7 @@ define('MICRO_START', microtime(true));
  * 
  * @author Ibrahim
  * 
- * @version 1.3.5
+ * @version 1.3.6
  */
 class WebFiori {
     /**
@@ -209,12 +209,43 @@ class WebFiori {
         ThemeLoader::registerResourcesRoutes();
     }
     private function _initCRON() {
-        $uriObj = new RouterUri(Util::getRequestedURL(), function(){});
+        $uriObj = new RouterUri(Util::getRequestedURL());
         $pathArr = $uriObj->getPathArray();
         if (CLI::isCLI() || (defined('CRON_THROUGH_HTTP') && CRON_THROUGH_HTTP && count($pathArr) != 0 && $pathArr[0] == 'cron')) {
             //initialize cron jobs only if in CLI or cron is enabled throgh HTTP.
             //
             InitCron::init();
+        }
+    }
+    /**
+     * Register CLI commands or cron jobs.
+     * @param string $folder The name of the folder that contains the jobs or 
+     * commands. It must be a folder inside 'app' folder.
+     * 
+     * @param Closure $regCallback A callback which is used to register the 
+     * classes of the folder.
+     * 
+     * @since 1.3.6
+     */
+    public static function autoRegister($folder, $regCallback) {
+        $jobsDir = ROOT_DIR.DS.'app'.DS.$folder;
+        if (Util::isDirectory($jobsDir)) {
+            $dirContent = array_diff(scandir($jobsDir), ['.','..']);
+            foreach ($dirContent as $phpFile) {
+                $expl = explode('.', $phpFile);
+                if (count($expl) == 2 && $expl[1] == 'php') {
+                    $instanceNs = require_once $jobsDir.DS.$phpFile;
+                    if (strlen($instanceNs) == 0 || $instanceNs == 1) {
+                        $instanceNs = '';
+                    }
+                    $class = $instanceNs.'\\'.$expl[0];
+                    try {
+                        call_user_func_array($regCallback, [new $class()]);
+                    } catch (\Error $ex) {
+
+                    }
+                }
+            }
         }
     }
     /**

@@ -318,7 +318,6 @@ class UpdateTableCommand extends CLICommand {
      * @param MySQLColumn $colObj
      */
     private function _setDefaultValue($colObj) {
-        // TODO: Test default value using empty.
         if ($colObj->getDatatype() == 'bool' || $colObj->getDatatype() == 'boolean') {
             $defaultVal = trim($this->getInput('Enter default value (true or false) (Hit "Enter" to skip):', ''));
 
@@ -347,26 +346,6 @@ class UpdateTableCommand extends CLICommand {
             'namespace' => $ns,
             'path' => substr($path, 0, strlen($path) - strlen($cName.'.php'))
         ];
-    }
-    private function finalSteps() {
-        if ($this->confirm('Would you like to create an entity class that maps to the database table?', false)) {
-            $entityInfo = $this->getClassInfo();
-            $entityInfo['implement-jsoni'] = $this->confirm('Would you like from your entity class to implement the interface JsonI?', true);
-            $classInfo['entity-info'] = $entityInfo;
-        }
-
-        if (strlen($classInfo['namespace']) == 0) {
-            $classInfo['namespace'] = 'app\database';
-            $this->warning('The table class will be added to the namespace "'.$classInfo['namespace'].'" since no namespace was provided.');
-        }
-
-        if (isset($classInfo['entity-info']) && strlen($classInfo['entity-info']['namespace']) == 0) {
-            $classInfo['entity-info']['namespace'] = 'app\database';
-            $this->warning('The entity class will be added to the namespace "'.$classInfo['entity-info']['namespace'].'" since no namespace was provided.');
-        }
-        $writer = new QueryClassWriter($tempTable, $classInfo);
-        $writer->writeClass();
-        $this->success('New class created.');
     }
     /**
      * 

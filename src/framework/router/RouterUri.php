@@ -224,14 +224,11 @@ class RouterUri {
      * @since 1.0
      */
     public function equals($otherUri) {
-        if ($otherUri instanceof RouterUri) {
+        if ($otherUri instanceof RouterUri && $this->getAuthority() == $otherUri->getAuthority()) {
+            $thisPathNames = $this->getPath();
+            $otherPathNames = $otherUri->getPath();
 
-            if ($this->getAuthority() == $otherUri->getAuthority()) {
-                $thisPathNames = $this->getPath();
-                $otherPathNames = $otherUri->getPath();
-                
-                return $thisPathNames == $otherPathNames;
-            }
+            return $thisPathNames == $otherPathNames;
         }
 
         return false;

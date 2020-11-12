@@ -291,6 +291,9 @@ class AutoLoader {
      * @return array An array that contains all paths to the files which have 
      * a definition for the given class.
      * 
+     * @throws ClassLoaderException If $load is set to true and the class was not 
+     * loaded.
+     * 
      * @since 1.0
      */
     public static function getClassPath($className,$namespace = null,$load = false) {
@@ -300,6 +303,7 @@ class AutoLoader {
             try {
                 self::get()->loadClass($namespace.'\\'.$className);
             } catch (Exception $ex) {
+                throw new ClassLoaderException($ex->getMessage());
             }
         }
         $loadedClasses = self::getLoadedClasses();

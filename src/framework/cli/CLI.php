@@ -27,6 +27,7 @@ namespace webfiori\framework\cli;
 use webfiori\framework\Util;
 use webfiori\ini\InitCliCommands;
 use webfiori\framework\cron\Cron;
+use webfiori\framework\WebFiori;
 use Exception;
 /**
  * A class which adds basic support for running the framework through 
@@ -167,26 +168,10 @@ class CLI {
      * 
      */
     private static function _autoRegister() {
-        if (CLI::isCLI() || (defined('') && CRON_THROUGH_HTTP === true)) {
-            $jobsDir = ROOT_DIR.DS.'app'.DS.'commands';
-            if (Util::isDirectory($jobsDir)) {
-                $dirContent = array_diff(scandir($jobsDir), ['.','..']);
-                foreach ($dirContent as $phpFile) {
-                    $expl = explode('.', $phpFile);
-                    if (count($expl) == 2 && $expl[1] == 'php') {
-                        $instanceNs = require_once $jobsDir.DS.$phpFile;
-                        if (strlen($instanceNs) == 0 || $instanceNs == 1) {
-                            $instanceNs = '';
-                        }
-                        $class = $instanceNs.'\\'.$expl[0];
-                        try {
-                            self::register(new $class());
-                        } catch (\Error $ex) {
-                            
-                        }
-                    }
-                }
-            }
+        if (CLI::isCLI()) {
+            WebFiori::autoRegister('commands', function ($instance){
+                CLI::register($instance);
+            });
         }
     }
     /**

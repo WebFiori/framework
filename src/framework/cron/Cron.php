@@ -164,25 +164,9 @@ class Cron {
      */
     private static function _registerJobs() {
         if (CLI::isCLI() || (defined('CRON_THROUGH_HTTP') && CRON_THROUGH_HTTP === true)) {
-            $jobsDir = ROOT_DIR.DS.'app'.DS.'jobs';
-            if (Util::isDirectory($jobsDir)) {
-                $dirContent = array_diff(scandir($jobsDir), ['.','..']);
-                foreach ($dirContent as $phpFile) {
-                    $expl = explode('.', $phpFile);
-                    if (count($expl) == 2 && $expl[1] == 'php') {
-                        $instanceNs = require_once $jobsDir.DS.$phpFile;
-                        if (strlen($instanceNs) == 0 || $instanceNs == 1) {
-                            $instanceNs = '';
-                        }
-                        $class = $instanceNs.'\\'.$expl[0];
-                        try {
-                            self::scheduleJob(new $class());
-                        } catch (\Error $ex) {
-                            
-                        }
-                    }
-                }
-            }
+            WebFiori::autoRegister('jobs', function ($job) {
+                Cron::scheduleJob($job);
+            });
         }
     }
     /**

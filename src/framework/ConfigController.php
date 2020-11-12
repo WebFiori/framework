@@ -41,6 +41,7 @@ use webfiori\framework\exceptions\SMTPException;
  * @version 1.4.4
  */
 class ConfigController {
+    const NL = "\n";
     /**
      * A constant that indicates the given username or password  
      * is invalid.
@@ -324,145 +325,145 @@ class ConfigController {
      */
     private function writeMailConfig($emailAccountsArr) {
         $fileData = ""
-                ."<?php\n"
-                ."namespace webfiori\\conf;\n"
-                ."\n"
-                ."use webfiori\\framework\\mail\\SMTPAccount;\n"
-                ."/**\n"
-                ." * SMTP configuration class.\n"
-                ." * \n"
-                ." * The developer can create multiple SMTP accounts and add\n"
-                ." * Connection information inside the body of this class.\n"
-                ." * \n"
-                ." * @author Ibrahim\n"
-                ." * \n"
-                ." * @version 1.0.1\n"
-                ." */\n"
-                ."class MailConfig {\n"
-                ."    private \$emailAccounts;\n"
-                ."    /**\n"
-                ."     *\n"
-                ."     * @var MailConfig\n"
-                ."     * @since 1.0\n"
-                ."     */\n"
-                ."    private static \$inst;\n"
-                ."    private function __construct() {\n"
-                . "        \$this->emailAccounts = [];\n";
+                ."<?php".self::NL
+                ."namespace webfiori\\conf;".self::NL
+                ."".self::NL
+                ."use webfiori\\framework\\mail\\SMTPAccount;".self::NL
+                ."/**".self::NL
+                ." * SMTP configuration class.".self::NL
+                ." * ".self::NL
+                ." * The developer can create multiple SMTP accounts and add".self::NL
+                ." * Connection information inside the body of this class.".self::NL
+                ." * ".self::NL
+                ." * @author Ibrahim".self::NL
+                ." * ".self::NL
+                ." * @version 1.0.1".self::NL
+                ." */".self::NL
+                ."class MailConfig {".self::NL
+                ."    private \$emailAccounts;".self::NL
+                ."    /**".self::NL
+                ."     *".self::NL
+                ."     * @var MailConfig".self::NL
+                ."     * @since 1.0".self::NL
+                ."     */".self::NL
+                ."    private static \$inst;".self::NL
+                ."    private function __construct() {".self::NL
+                . "        \$this->emailAccounts = [];".self::NL;
         $index = 0;
 
         foreach ($emailAccountsArr as $emailAcc) {
             $fileData .= ""
-                    ."        \$acc$index = new SMTPAccount([\n"
-                    ."            'server-address' => '".$emailAcc->getServerAddress()."',\n"
-                    ."            'port' => ".$emailAcc->getPort().",\n"
-                    ."            'user' => '".$emailAcc->getUsername()."',\n"
-                    ."            'pass' => '".$emailAcc->getPassword()."',\n"
-                    ."            'sender-name' => '".$emailAcc->getSenderName()."',\n"
-                    ."            'sender-address' => '".$emailAcc->getAddress()."',\n"
-                    ."            'account-name' => '".$emailAcc->getAccountName()."'\n"
-                    ."        ]);\n"
-                    ."        \$this->addAccount(\$acc$index, '".$emailAcc->getAccountName()."');\n"
-                    ."        \n";
+                    ."        \$acc$index = new SMTPAccount([".self::NL
+                    ."            'server-address' => '".$emailAcc->getServerAddress()."',".self::NL
+                    ."            'port' => ".$emailAcc->getPort().",".self::NL
+                    ."            'user' => '".$emailAcc->getUsername()."',".self::NL
+                    ."            'pass' => '".$emailAcc->getPassword()."',".self::NL
+                    ."            'sender-name' => '".$emailAcc->getSenderName()."',".self::NL
+                    ."            'sender-address' => '".$emailAcc->getAddress()."',".self::NL
+                    ."            'account-name' => '".$emailAcc->getAccountName()."'".self::NL
+                    ."        ]);".self::NL
+                    ."        \$this->addAccount(\$acc$index, '".$emailAcc->getAccountName()."');".self::NL
+                    ."        ".self::NL;
             $index++;
         }
-        $fileData .= "    }\n"
-                ."    /**\n"
-                ."     * Adds new SMTP connection information or updates an existing one.\n"
-                ."     * \n"
-                ."     * @param string \$accName The name of the account that will be added or updated.\n"
-                ."     * \n"
-                ."     * @param SMTPAccount \$smtpConnInfo An object of type 'SMTPAccount' that\n"
-                ."     * will contain SMTP account information.\n"
-                ."     * \n"
-                ."     * @since 1.0.1\n"
-                ."     */\n"
-                ."    public static function addSMTPAccount(\$accName, \$smtpConnInfo) {\n"
-                ."        if (\$smtpConnInfo instanceof SMTPAccount) {\n"
-                ."            \$trimmedName = trim(\$accName);\n"
-                ."            \n"
-                ."            if (strlen(\$trimmedName) != 0) {\n"
-                ."                self::get()->addAccount(\$smtpConnInfo, \$trimmedName);\n"
-                ."            }\n"
-                ."        }\n"
-                ."    }\n"
+        $fileData .= "    }".self::NL
+                ."    /**".self::NL
+                ."     * Adds new SMTP connection information or updates an existing one.".self::NL
+                ."     * ".self::NL
+                ."     * @param string \$accName The name of the account that will be added or updated.".self::NL
+                ."     * ".self::NL
+                ."     * @param SMTPAccount \$smtpConnInfo An object of type 'SMTPAccount' that".self::NL
+                ."     * will contain SMTP account information.".self::NL
+                ."     * ".self::NL
+                ."     * @since 1.0.1".self::NL
+                ."     */".self::NL
+                ."    public static function addSMTPAccount(\$accName, \$smtpConnInfo) {".self::NL
+                ."        if (\$smtpConnInfo instanceof SMTPAccount) {".self::NL
+                ."            \$trimmedName = trim(\$accName);".self::NL
+                ."            ".self::NL
+                ."            if (strlen(\$trimmedName) != 0) {".self::NL
+                ."                self::get()->addAccount(\$smtpConnInfo, \$trimmedName);".self::NL
+                ."            }".self::NL
+                ."        }".self::NL
+                ."    }".self::NL
                 .""
-                ."    /**\n"
-                ."     * Return a single instance of the class.\n"
-                ."     * \n"
-                ."     * Calling this method multiple times will result in returning\n"
-                ."     * the same instance every time.\n"
-                ."     * \n"
-                ."     * @return MailConfig\n"
-                ."     * \n"
-                ."     * @since 1.0\n"
-                ."     */\n"
-                ."    public static function get() {\n"
-                ."        if (self::\$inst === null) {\n"
-                ."            self::\$inst = new MailConfig();\n"
-                ."        }\n"
-                ."        \n"
-                ."        return self::\$inst;\n"
-                ."    }\n"
+                ."    /**".self::NL
+                ."     * Return a single instance of the class.".self::NL
+                ."     * ".self::NL
+                ."     * Calling this method multiple times will result in returning".self::NL
+                ."     * the same instance every time.".self::NL
+                ."     * ".self::NL
+                ."     * @return MailConfig".self::NL
+                ."     * ".self::NL
+                ."     * @since 1.0".self::NL
+                ."     */".self::NL
+                ."    public static function get() {".self::NL
+                ."        if (self::\$inst === null) {".self::NL
+                ."            self::\$inst = new MailConfig();".self::NL
+                ."        }".self::NL
+                ."        ".self::NL
+                ."        return self::\$inst;".self::NL
+                ."    }".self::NL
                 .""
-                ."    /**\n"
-                ."     * Returns an email account given its name.\n"
-                ."     * \n"
-                ."     * The method will search for an account with the given name in the set\n"
+                ."    /**".self::NL
+                ."     * Returns an email account given its name.".self::NL
+                ."     * ".self::NL
+                ."     * The method will search for an account with the given name in the set".self::NL
                 ."     * of added accounts. If no account was found, null is returned.v"
-                ."     * \n"
-                ."     * @param string \$name The name of the account.\n"
-                ."     * \n"
-                ."     * @return SMTPAccount|null If the account is found, The method\n"
-                ."     * will return an object of type SMTPAccount. Else, the\n"
-                ."     * method will return null.\n"
-                ."     * \n"
-                ."     * @since 1.0\n"
-                ."     */\n"
-                ."    public static function getAccount(\$name) {\n"
-                ."        return self::get()->_getAccount(\$name);\n"
-                ."    }\n"
+                ."     * ".self::NL
+                ."     * @param string \$name The name of the account.".self::NL
+                ."     * ".self::NL
+                ."     * @return SMTPAccount|null If the account is found, The method".self::NL
+                ."     * will return an object of type SMTPAccount. Else, the".self::NL
+                ."     * method will return null.".self::NL
+                ."     * ".self::NL
+                ."     * @since 1.0".self::NL
+                ."     */".self::NL
+                ."    public static function getAccount(\$name) {".self::NL
+                ."        return self::get()->_getAccount(\$name);".self::NL
+                ."    }".self::NL
                 .""
-                ."    /**\n"
-                ."     * Returns an associative array that contains all email accounts.\n"
-                ."     * \n"
-                ."     * The indices of the array will act as the names of the accounts.\n"
-                ."     * The value of the index will be an object of type EmailAccount.\n"
-                ."     * \n"
-                ."     * @return array An associative array that contains all email accounts.\n"
-                ."     * \n"
-                ."     * @since 1.0\n"
-                ."     */\n"
-                ."    public static function getAccounts() {\n"
-                ."        return self::get()->_getAccounts();\n"
-                ."    }\n"
-                ."    private function _getAccount(\$name) {\n"
-                ."        if (isset(\$this->emailAccounts[\$name])) {\n"
-                ."            return \$this->emailAccounts[\$name];\n"
-                ."        }\n"
-                ."        \n"
-                ."        return null;\n"
-                ."    }\n"
-                ."    private function _getAccounts() {\n"
-                ."        return \$this->emailAccounts;\n"
-                ."    }\n"
+                ."    /**".self::NL
+                ."     * Returns an associative array that contains all email accounts.".self::NL
+                ."     * ".self::NL
+                ."     * The indices of the array will act as the names of the accounts.".self::NL
+                ."     * The value of the index will be an object of type EmailAccount.".self::NL
+                ."     * ".self::NL
+                ."     * @return array An associative array that contains all email accounts.".self::NL
+                ."     * ".self::NL
+                ."     * @since 1.0".self::NL
+                ."     */".self::NL
+                ."    public static function getAccounts() {".self::NL
+                ."        return self::get()->_getAccounts();".self::NL
+                ."    }".self::NL
+                ."    private function _getAccount(\$name) {".self::NL
+                ."        if (isset(\$this->emailAccounts[\$name])) {".self::NL
+                ."            return \$this->emailAccounts[\$name];".self::NL
+                ."        }".self::NL
+                ."        ".self::NL
+                ."        return null;".self::NL
+                ."    }".self::NL
+                ."    private function _getAccounts() {".self::NL
+                ."        return \$this->emailAccounts;".self::NL
+                ."    }".self::NL
                 .""
-                ."    /**\n"
-                ."     * Adds an email account.\n"
-                ."     * \n"
-                ."     * The developer can use this method to add new account during runtime.\n"
-                ."     * The account will be removed once the program finishes.\n"
-                ."     * \n"
-                ."     * @param SMTPAccount \$acc an object of type SMTPAccount.\n"
-                ."     * \n"
-                ."     * @param string \$name A name to associate with the email account.\n"
-                ."     * \n"
-                ."     * @since 1.0\n"
-                ."     */\n"
-                ."    private function addAccount(\$acc,\$name) {\n"
-                ."        \$this->emailAccounts[\$name] = \$acc;\n"
-                ."    }\n";
+                ."    /**".self::NL
+                ."     * Adds an email account.".self::NL
+                ."     * ".self::NL
+                ."     * The developer can use this method to add new account during runtime.".self::NL
+                ."     * The account will be removed once the program finishes.".self::NL
+                ."     * ".self::NL
+                ."     * @param SMTPAccount \$acc an object of type SMTPAccount.".self::NL
+                ."     * ".self::NL
+                ."     * @param string \$name A name to associate with the email account.".self::NL
+                ."     * ".self::NL
+                ."     * @since 1.0".self::NL
+                ."     */".self::NL
+                ."    private function addAccount(\$acc,\$name) {".self::NL
+                ."        \$this->emailAccounts[\$name] = \$acc;".self::NL
+                ."    }".self::NL;
         //End of class
-        $fileData .= "}\n";
+        $fileData .= "}".self::NL;
         $mailConfigFile = new File('MailConfig.php', ROOT_DIR.DS.'conf');
         $mailConfigFile->remove();
         $mailConfigFile->setRawData($fileData);
@@ -560,277 +561,277 @@ class ConfigController {
      * @since 1.0
      */
     private function writeSiteConfig($configArr) {
-        $names = "[\n";
+        $names = "[".self::NL;
         foreach ($configArr['website-names'] as $k => $v) {
-            $names .= '            \''.$k.'\'=>\''.$v.'\','."\n";
+            $names .= '            \''.$k.'\'=>\''.$v.'\','."".self::NL;
         }
         $names .= '        ]';
-        $descriptions = "[\n";
+        $descriptions = "[".self::NL;
 
         foreach ($configArr['site-descriptions'] as $k => $v) {
-            $descriptions .= '            \''.$k.'\'=>\''.$v.'\','."\n";
+            $descriptions .= '            \''.$k.'\'=>\''.$v.'\','."".self::NL;
         }
         $descriptions .= '        ]';
         
-        $fileAsStr = "<?php\n"
-            . "namespace webfiori\conf;\n"
-            . "\n"
-            . "use webfiori\\framework\Util;\n"
-            . "/**\n"
-            . "  * Website configuration class.\n"
-            . "  * \n"
-            . "  * This class is used to control the following settings:\n"
-            . "  * <ul>\n"
-            . "  * <li>The base URL of the website.</li>\n"
-            . "  * <li>The primary language of the website.</li>\n"
-            . "  * <li>The name of the website in different languages.</li>\n"
-            . "  * <li>The general description of the website in different languages.</li>\n"
-            . "  * <li>The character that is used to separate the name of the website from page title.</li>\n"
-            . "  * <li>The theme of the website.</li>\n"
-            . "  * <li>Admin theme of the website (if uses one).</li>\n"
-            . "  * <li>The home page of the website.</li>\n"
-            . "  * </ul>\n"
-            . "  */\n"
-            . "class SiteConfig {\n"
-            . "    /**\n"
-            . "     * The name of admin control pages Theme.\n"
-            . "     * \n"
-            . "     * @var string\n"
-            . "     * \n"
-            . "     * @since 1.3\n"
-            . "     */\n"
-            . "    private \$adminThemeName;\n"
-            . "    /**\n"
-            . "     * The name of base website UI Theme.\n"
-            . "     * \n"
-            . "     * @var string\n"
-            . "     * \n"
-            . "     * @since 1.3\n"
-            . "     */\n"
-            . "    private \$baseThemeName;\n"
-            . "    /**\n"
-            . "     * The base URL that is used by all web site pages to fetch resource files.\n"
-            . "     * \n"
-            . "     * @var string\n"
-            . "     * \n"
-            . "     * @since 1.0\n"
-            . "     */\n"
-            . "    private \$baseUrl;\n"
-            . "    /**\n"
-            . "     * Configuration file version number.\n"
-            . "     * \n"
-            . "     * @var string\n"
-            . "     * \n"
-            . "     * @since 1.2\n"
-            . "     */\n"
-            . "    private \$configVision;\n"
-            . "    /**\n"
-            . "     * An array which contains different descriptions in different languages.\n"
-            . "     * \n"
-            . "     * @var string\n"
-            . "     * \n"
-            . "     * @since 1.0\n"
-            . "     */\n"
-            . "    private \$descriptions;\n"
-            . "    /**\n"
-            . "     * The URL of the home page.\n"
-            . "     * \n"
-            . "     * @var string\n"
-            . "     * \n"
-            . "     * @since 1.0\n"
-            . "     */\n"
-            . "    private \$homePage;\n"
-            . "    /**\n"
-            . "     * The primary language of the website.\n"
-            . "     */\n"
-            . "    private \$primaryLang;\n"
-            . "    /**\n"
-            . "     * A singleton instance of the class.\n"
-            . "     * \n"
-            . "     * @var SiteConfig\n"
-            . "     * \n"
-            . "     * @since 1.0\n"
-            . "     */\n"
-            . "    private static \$siteCfg;\n"
-            . "    /**\n"
-            . "     *\n"
-            . "     * @var string\n"
-            . "     * \n"
-            . "     * @since 1.0\n"
-            . "     */\n"
-            . "    private \$titleSep;\n"
-            . "    /**\n"
-            . "     * An array which contains all website names in different languages.\n"
-            . "     * \n"
-            . "     * @var string\n"
-            . "     * \n"
-            . "     * @since 1.0\n"
-            . "     */\n"
-            . "    private \$webSiteNames;\n"
-            . "    private function __construct() {\n"
-            . "        \$this->configVision = '".$configArr['config-file-version']."';\n"
-            . "        \$this->webSiteNames = ".$names.";\n"
-            . "        \$this->baseUrl = Util::getBaseURL();\n"
-            . "        \$this->titleSep = '".trim($configArr['title-separator'])."';\n"
-            . "        \$this->primaryLang = '".trim($configArr['primary-language'])."';\n"
-            . "        \$this->baseThemeName = '".$configArr['theme-name']."';\n"
-            . "        \$this->adminThemeName = '".$configArr['admin-theme-name']."';\n"
-            . "        \$this->homePage = Util::getBaseURL();\n"
-            . "        \$this->descriptions = ".$descriptions.";\n"
-            . "    }\n"
-            . "    /**\n"
-            . "     * Returns an instance of the configuration file.\n"
-            . "     * \n"
-            . "     * @return SiteConfig\n"
-            . "     * \n"
-            . "     * @since 1.0\n"
-            . "     */\n"
-            . "    public static function get() {\n"
-            . "        if (self::\$siteCfg != null) {\n"
-            . "            return self::\$siteCfg;\n"
-            . "        }\n"
-            . "        self::\$siteCfg = new SiteConfig();\n"
-            . "        \n"
-            . "        return self::\$siteCfg;\n"
-            . "    }\n"
-            . "    /**\n"
-            . "     * Returns the name of the theme that is used in admin control pages.\n"
-            . "     * \n"
-            . "     * @return string The name of the theme that is used in admin control pages.\n"
-            . "     * \n"
-            . "     * @since 1.3\n"
-            . "     */\n"
-            . "    public static function getAdminThemeName() {\n"
-            . "        return self::get()->_getAdminThemeName();\n"
-            . "    }\n"
-            . "    /**\n"
-            . "     * Returns the name of base theme that is used in website pages.\n"
-            . "     * \n"
-            . "     * Usually, this theme is used for the normall visitors of the web site.\n"
-            . "     * \n"
-            . "     * @return string The name of base theme that is used in website pages.\n"
-            . "     * \n"
-            . "     * @since 1.3\n"
-            . "     */\n"
-            . "    public static function getBaseThemeName() {\n"
-            . "        return self::get()->_getBaseThemeName();\n"
-            . "    }\n"
-            . "    /**\n"
-            . "     * Returns the base URL that is used to fetch resources.\n"
-            . "     * \n"
-            . "     * The return value of this method is usually used by the tag 'base'\n"
-            . "     * of web site pages.\n"
-            . "     * \n"
-            . "     * @return string the base URL.\n"
-            . "     * \n"
-            . "     * @since 1.0\n"
-            . "     */\n"
-            . "    public static function getBaseURL() {\n"
-            . "        return self::get()->_getBaseURL();\n"
-            . "    }\n"
-            . "    /**\n"
-            . "     * Returns version number of the configuration file.\n"
-            . "     * \n"
-            . "     * This value can be used to check for the compatability of configuration\n"
-            . "     * file\n"
-            . "     * \n"
-            . "     * @return string The version number of the configuration file.\n"
-            . "     * \n"
-            . "     * @since 1.0\n"
-            . "     */\n"
-            . "    public static function getConfigVersion() {\n"
-            . "        return self::get()->_getConfigVersion();\n"
-            . "    }\n"
-            . "    /**\n"
-            . "     * Returns an associative array which contains different website descriptions\n"
-            . "     * in different languages.\n"
-            . "     * \n"
-            . "     * Each index will contain a language code and the value will be the description\n"
-            . "     * of the website in the given language.\n"
-            . "     * \n"
-            . "     * @return string An associative array which contains different website descriptions\n"
-            . "     * in different languages.\n"
-            . "     * \n"
-            . "     * @since 1.0\n"
-            . "     */\n"
-            . "    public static function getDescriptions() {\n"
-            . "        return self::get()->_getDescriptions();\n"
-            . "    }\n"
-            . "    /**\n"
-            . "     * Returns the home page URL of the website.\n"
-            . "     * \n"
-            . "     * @return string The home page URL of the website.\n"
-            . "     * \n"
-            . "     * @since 1.0\n"
-            . "     */\n"
-            . "    public static function getHomePage() {\n"
-            . "        return self::get()->_getHomePage();\n"
-            . "    }\n"
-            . "    /**\n"
-            . "     * Returns the primary language of the website.\n"
-            . "     * \n"
-            . "     * This function will return a language code such as 'EN'.\n"
-            . "     * \n"
-            . "     * @return string Language code of the primary language.\n"
-            . "     * \n"
-            . "     * @since 1.3\n"
-            . "     */\n"
-            . "    public static function getPrimaryLanguage() {\n"
-            . "        return self::get()->_getPrimaryLanguage();\n"
-            . "    }\n"
-            . "    /**\n"
-            . "     * Returns the character (or string) that is used to separate page title from website name.\n"
-            . "     * \n"
-            . "     * @return string A string such as ' - ' or ' | '. Note that the method\n"
-            . "     * will add the two spaces by default.\n"
-            . "     * \n"
-            . "     * @since 1.0\n"
-            . "     */\n"
-            . "    public static function getTitleSep() {\n"
-            . "        return self::get()->_getTitleSep();\n"
-            . "    }\n"
-            . "    /**\n"
-            . "     * Returns an array which contains diffrent website names in different languages.\n"
-            . "     * \n"
-            . "     * Each index will contain a language code and the value will be the name\n"
-            . "     * of the website in the given language.\n"
-            . "     * \n"
-            . "     * @return array An array which contains diffrent website names in different languages.\n"
-            . "     * \n"
-            . "     * @since 1.0\n"
-            . "     */\n"
-            . "    public static function getWebsiteNames() {\n"
-            . "        return self::get()->_getWebsiteNames();\n"
-            . "    }\n"
-            . "    private function _getAdminThemeName() {\n"
-            . "        return \$this->adminThemeName;\n"
-            . "    }\n"
-            . "    private function _getBaseThemeName() {\n"
-            . "        return \$this->baseThemeName;\n"
-            . "    }\n"
-            . "    private function _getBaseURL() {\n"
-            . "        return \$this->baseUrl;\n"
-            . "    }\n"
-            . "    private function _getConfigVersion() {\n"
-            . "        return \$this->configVision;\n"
-            . "    }\n"
-            . "    private function _getDescriptions() {\n"
-            . "        return \$this->descriptions;\n"
-            . "    }\n"
-            . "    private function _getHomePage() {\n"
-            . "        return \$this->homePage;\n"
-            . "    }\n"
-            . "    \n"
-            . "    private function _getPrimaryLanguage() {\n"
-            . "        return \$this->primaryLang;\n"
-            . "    }\n"
-            . "    private function _getTitleSep() {\n"
-            . "        return \$this->titleSep;\n"
-            . "    }\n"
-            . "    private function _getWebsiteNames() {\n"
-            . "        return \$this->webSiteNames;\n"
-            . "    }\n"
-            . "}\n";
+        $fileAsStr = "<?php".self::NL
+            . "namespace webfiori\conf;".self::NL
+            . "".self::NL
+            . "use webfiori\\framework\Util;".self::NL
+            . "/**".self::NL
+            . "  * Website configuration class.".self::NL
+            . "  * ".self::NL
+            . "  * This class is used to control the following settings:".self::NL
+            . "  * <ul>".self::NL
+            . "  * <li>The base URL of the website.</li>".self::NL
+            . "  * <li>The primary language of the website.</li>".self::NL
+            . "  * <li>The name of the website in different languages.</li>".self::NL
+            . "  * <li>The general description of the website in different languages.</li>".self::NL
+            . "  * <li>The character that is used to separate the name of the website from page title.</li>".self::NL
+            . "  * <li>The theme of the website.</li>".self::NL
+            . "  * <li>Admin theme of the website (if uses one).</li>".self::NL
+            . "  * <li>The home page of the website.</li>".self::NL
+            . "  * </ul>".self::NL
+            . "  */".self::NL
+            . "class SiteConfig {".self::NL
+            . "    /**".self::NL
+            . "     * The name of admin control pages Theme.".self::NL
+            . "     * ".self::NL
+            . "     * @var string".self::NL
+            . "     * ".self::NL
+            . "     * @since 1.3".self::NL
+            . "     */".self::NL
+            . "    private \$adminThemeName;".self::NL
+            . "    /**".self::NL
+            . "     * The name of base website UI Theme.".self::NL
+            . "     * ".self::NL
+            . "     * @var string".self::NL
+            . "     * ".self::NL
+            . "     * @since 1.3".self::NL
+            . "     */".self::NL
+            . "    private \$baseThemeName;".self::NL
+            . "    /**".self::NL
+            . "     * The base URL that is used by all web site pages to fetch resource files.".self::NL
+            . "     * ".self::NL
+            . "     * @var string".self::NL
+            . "     * ".self::NL
+            . "     * @since 1.0".self::NL
+            . "     */".self::NL
+            . "    private \$baseUrl;".self::NL
+            . "    /**".self::NL
+            . "     * Configuration file version number.".self::NL
+            . "     * ".self::NL
+            . "     * @var string".self::NL
+            . "     * ".self::NL
+            . "     * @since 1.2".self::NL
+            . "     */".self::NL
+            . "    private \$configVision;".self::NL
+            . "    /**".self::NL
+            . "     * An array which contains different descriptions in different languages.".self::NL
+            . "     * ".self::NL
+            . "     * @var string".self::NL
+            . "     * ".self::NL
+            . "     * @since 1.0".self::NL
+            . "     */".self::NL
+            . "    private \$descriptions;".self::NL
+            . "    /**".self::NL
+            . "     * The URL of the home page.".self::NL
+            . "     * ".self::NL
+            . "     * @var string".self::NL
+            . "     * ".self::NL
+            . "     * @since 1.0".self::NL
+            . "     */".self::NL
+            . "    private \$homePage;".self::NL
+            . "    /**".self::NL
+            . "     * The primary language of the website.".self::NL
+            . "     */".self::NL
+            . "    private \$primaryLang;".self::NL
+            . "    /**".self::NL
+            . "     * A singleton instance of the class.".self::NL
+            . "     * ".self::NL
+            . "     * @var SiteConfig".self::NL
+            . "     * ".self::NL
+            . "     * @since 1.0".self::NL
+            . "     */".self::NL
+            . "    private static \$siteCfg;".self::NL
+            . "    /**".self::NL
+            . "     *".self::NL
+            . "     * @var string".self::NL
+            . "     * ".self::NL
+            . "     * @since 1.0".self::NL
+            . "     */".self::NL
+            . "    private \$titleSep;".self::NL
+            . "    /**".self::NL
+            . "     * An array which contains all website names in different languages.".self::NL
+            . "     * ".self::NL
+            . "     * @var string".self::NL
+            . "     * ".self::NL
+            . "     * @since 1.0".self::NL
+            . "     */".self::NL
+            . "    private \$webSiteNames;".self::NL
+            . "    private function __construct() {".self::NL
+            . "        \$this->configVision = '".$configArr['config-file-version']."';".self::NL
+            . "        \$this->webSiteNames = ".$names.";".self::NL
+            . "        \$this->baseUrl = Util::getBaseURL();".self::NL
+            . "        \$this->titleSep = '".trim($configArr['title-separator'])."';".self::NL
+            . "        \$this->primaryLang = '".trim($configArr['primary-language'])."';".self::NL
+            . "        \$this->baseThemeName = '".$configArr['theme-name']."';".self::NL
+            . "        \$this->adminThemeName = '".$configArr['admin-theme-name']."';".self::NL
+            . "        \$this->homePage = Util::getBaseURL();".self::NL
+            . "        \$this->descriptions = ".$descriptions.";".self::NL
+            . "    }".self::NL
+            . "    /**".self::NL
+            . "     * Returns an instance of the configuration file.".self::NL
+            . "     * ".self::NL
+            . "     * @return SiteConfig".self::NL
+            . "     * ".self::NL
+            . "     * @since 1.0".self::NL
+            . "     */".self::NL
+            . "    public static function get() {".self::NL
+            . "        if (self::\$siteCfg != null) {".self::NL
+            . "            return self::\$siteCfg;".self::NL
+            . "        }".self::NL
+            . "        self::\$siteCfg = new SiteConfig();".self::NL
+            . "        ".self::NL
+            . "        return self::\$siteCfg;".self::NL
+            . "    }".self::NL
+            . "    /**".self::NL
+            . "     * Returns the name of the theme that is used in admin control pages.".self::NL
+            . "     * ".self::NL
+            . "     * @return string The name of the theme that is used in admin control pages.".self::NL
+            . "     * ".self::NL
+            . "     * @since 1.3".self::NL
+            . "     */".self::NL
+            . "    public static function getAdminThemeName() {".self::NL
+            . "        return self::get()->_getAdminThemeName();".self::NL
+            . "    }".self::NL
+            . "    /**".self::NL
+            . "     * Returns the name of base theme that is used in website pages.".self::NL
+            . "     * ".self::NL
+            . "     * Usually, this theme is used for the normall visitors of the web site.".self::NL
+            . "     * ".self::NL
+            . "     * @return string The name of base theme that is used in website pages.".self::NL
+            . "     * ".self::NL
+            . "     * @since 1.3".self::NL
+            . "     */".self::NL
+            . "    public static function getBaseThemeName() {".self::NL
+            . "        return self::get()->_getBaseThemeName();".self::NL
+            . "    }".self::NL
+            . "    /**".self::NL
+            . "     * Returns the base URL that is used to fetch resources.".self::NL
+            . "     * ".self::NL
+            . "     * The return value of this method is usually used by the tag 'base'".self::NL
+            . "     * of web site pages.".self::NL
+            . "     * ".self::NL
+            . "     * @return string the base URL.".self::NL
+            . "     * ".self::NL
+            . "     * @since 1.0".self::NL
+            . "     */".self::NL
+            . "    public static function getBaseURL() {".self::NL
+            . "        return self::get()->_getBaseURL();".self::NL
+            . "    }".self::NL
+            . "    /**".self::NL
+            . "     * Returns version number of the configuration file.".self::NL
+            . "     * ".self::NL
+            . "     * This value can be used to check for the compatability of configuration".self::NL
+            . "     * file".self::NL
+            . "     * ".self::NL
+            . "     * @return string The version number of the configuration file.".self::NL
+            . "     * ".self::NL
+            . "     * @since 1.0".self::NL
+            . "     */".self::NL
+            . "    public static function getConfigVersion() {".self::NL
+            . "        return self::get()->_getConfigVersion();".self::NL
+            . "    }".self::NL
+            . "    /**".self::NL
+            . "     * Returns an associative array which contains different website descriptions".self::NL
+            . "     * in different languages.".self::NL
+            . "     * ".self::NL
+            . "     * Each index will contain a language code and the value will be the description".self::NL
+            . "     * of the website in the given language.".self::NL
+            . "     * ".self::NL
+            . "     * @return string An associative array which contains different website descriptions".self::NL
+            . "     * in different languages.".self::NL
+            . "     * ".self::NL
+            . "     * @since 1.0".self::NL
+            . "     */".self::NL
+            . "    public static function getDescriptions() {".self::NL
+            . "        return self::get()->_getDescriptions();".self::NL
+            . "    }".self::NL
+            . "    /**".self::NL
+            . "     * Returns the home page URL of the website.".self::NL
+            . "     * ".self::NL
+            . "     * @return string The home page URL of the website.".self::NL
+            . "     * ".self::NL
+            . "     * @since 1.0".self::NL
+            . "     */".self::NL
+            . "    public static function getHomePage() {".self::NL
+            . "        return self::get()->_getHomePage();".self::NL
+            . "    }".self::NL
+            . "    /**".self::NL
+            . "     * Returns the primary language of the website.".self::NL
+            . "     * ".self::NL
+            . "     * This function will return a language code such as 'EN'.".self::NL
+            . "     * ".self::NL
+            . "     * @return string Language code of the primary language.".self::NL
+            . "     * ".self::NL
+            . "     * @since 1.3".self::NL
+            . "     */".self::NL
+            . "    public static function getPrimaryLanguage() {".self::NL
+            . "        return self::get()->_getPrimaryLanguage();".self::NL
+            . "    }".self::NL
+            . "    /**".self::NL
+            . "     * Returns the character (or string) that is used to separate page title from website name.".self::NL
+            . "     * ".self::NL
+            . "     * @return string A string such as ' - ' or ' | '. Note that the method".self::NL
+            . "     * will add the two spaces by default.".self::NL
+            . "     * ".self::NL
+            . "     * @since 1.0".self::NL
+            . "     */".self::NL
+            . "    public static function getTitleSep() {".self::NL
+            . "        return self::get()->_getTitleSep();".self::NL
+            . "    }".self::NL
+            . "    /**".self::NL
+            . "     * Returns an array which contains diffrent website names in different languages.".self::NL
+            . "     * ".self::NL
+            . "     * Each index will contain a language code and the value will be the name".self::NL
+            . "     * of the website in the given language.".self::NL
+            . "     * ".self::NL
+            . "     * @return array An array which contains diffrent website names in different languages.".self::NL
+            . "     * ".self::NL
+            . "     * @since 1.0".self::NL
+            . "     */".self::NL
+            . "    public static function getWebsiteNames() {".self::NL
+            . "        return self::get()->_getWebsiteNames();".self::NL
+            . "    }".self::NL
+            . "    private function _getAdminThemeName() {".self::NL
+            . "        return \$this->adminThemeName;".self::NL
+            . "    }".self::NL
+            . "    private function _getBaseThemeName() {".self::NL
+            . "        return \$this->baseThemeName;".self::NL
+            . "    }".self::NL
+            . "    private function _getBaseURL() {".self::NL
+            . "        return \$this->baseUrl;".self::NL
+            . "    }".self::NL
+            . "    private function _getConfigVersion() {".self::NL
+            . "        return \$this->configVision;".self::NL
+            . "    }".self::NL
+            . "    private function _getDescriptions() {".self::NL
+            . "        return \$this->descriptions;".self::NL
+            . "    }".self::NL
+            . "    private function _getHomePage() {".self::NL
+            . "        return \$this->homePage;".self::NL
+            . "    }".self::NL
+            . "    ".self::NL
+            . "    private function _getPrimaryLanguage() {".self::NL
+            . "        return \$this->primaryLang;".self::NL
+            . "    }".self::NL
+            . "    private function _getTitleSep() {".self::NL
+            . "        return \$this->titleSep;".self::NL
+            . "    }".self::NL
+            . "    private function _getWebsiteNames() {".self::NL
+            . "        return \$this->webSiteNames;".self::NL
+            . "    }".self::NL
+            . "}".self::NL;
         $mailConfigFile = new File('SiteConfig.php', ROOT_DIR.DS.'conf');
         $mailConfigFile->remove();
         $mailConfigFile->setRawData($fileAsStr);
@@ -948,77 +949,77 @@ class ConfigController {
      */
     private function writeConfig($configArr) {
         
-        $fileAsStr = "<?php\n"
-                . "namespace webfiori\conf;\n"
-                . "\n"
-                . "use webfiori\\database\ConnectionInfo;\n"
-                . "/**\n"
-                . " * Global configuration class.\n"
-                . " * \n"
-                . " * Used by the server part and the presentation part. It contains framework version\n"
-                . " * information and database connection settings.\n"
-                . " * \n"
-                . " * @author Ibrahim\n"
-                . " * \n"
-                . " * @version 1.3.5\n"
-                . " */\n"
-                . "class Config {\n"
-                . "    /**\n"
-                . "     * An instance of Config.\n"
-                . "     * \n"
-                . "     * @var Config\n"
-                . "     * \n"
-                . "     * @since 1.0\n"
-                . "     */\n"
-                . "    private static \$cfg;\n"
-                . "    /**\n"
-                . "     * An associative array that will contain database connections.\n"
-                . "     * \n"
-                . "     * @var type\n"
-                . "     */\n"
-                . "    private \$dbConnections;\n"
-                . "    /**\n"
-                . "     * A boolean value. Set to true once system configuration is completed.\n"
-                . "     * \n"
-                . "     * @var boolean\n"
-                . "     * \n"
-                . "     * @since 1.0\n"
-                . "     */\n"
-                . "    private \$isConfigured;\n"
-                . "    /**\n"
-                . "     * The release date of the framework that is used to build the system.\n"
-                . "     * \n"
-                . "     * @var string Release date of of the framework that is used to build the system.\n"
-                . "     * \n"
-                . "     * @since 1.0\n"
-                . "     */\n"
-                . "    private \$releaseDate;\n"
-                . "    /**\n"
-                . "     * The version of the framework that is used to build the system.\n"
-                . "     * \n"
-                . "     * @var string The version of the framework that is used to build the system.\n"
-                . "     * \n"
-                . "     * @since 1.0\n"
-                . "     */\n"
-                . "    private \$version;\n"
-                . "    /**\n"
-                . "     * The type framework version that is used to build the system.\n"
-                . "     * \n"
-                . "     * @var string The framework version that is used to build the system.\n"
-                . "     * \n"
-                . "     * @since 1.0\n"
-                . "     */\n"
-                . "    private \$versionType;\n"
-                . "    \n"
-                . "    /**\n"
-                . "     * Initialize configuration.\n"
-                . "     */\n"
-                . "    private function __construct() {\n"
-                . "        \$this->releaseDate = '".$configArr['release-date']."';\n"
-                . "        \$this->version = '".$configArr['version']."';\n"
-                . "        \$this->versionType = '".$configArr['version-type']."';\n"
-                . "        \$this->configVision = '".$configArr['config-file-version']."';\n"
-                . "        \$this->dbConnections = [\n"
+        $fileAsStr = "<?php".self::NL
+                . "namespace webfiori\conf;".self::NL
+                . "".self::NL
+                . "use webfiori\\database\ConnectionInfo;".self::NL
+                . "/**".self::NL
+                . " * Global configuration class.".self::NL
+                . " * ".self::NL
+                . " * Used by the server part and the presentation part. It contains framework version".self::NL
+                . " * information and database connection settings.".self::NL
+                . " * ".self::NL
+                . " * @author Ibrahim".self::NL
+                . " * ".self::NL
+                . " * @version 1.3.5".self::NL
+                . " */".self::NL
+                . "class Config {".self::NL
+                . "    /**".self::NL
+                . "     * An instance of Config.".self::NL
+                . "     * ".self::NL
+                . "     * @var Config".self::NL
+                . "     * ".self::NL
+                . "     * @since 1.0".self::NL
+                . "     */".self::NL
+                . "    private static \$cfg;".self::NL
+                . "    /**".self::NL
+                . "     * An associative array that will contain database connections.".self::NL
+                . "     * ".self::NL
+                . "     * @var type".self::NL
+                . "     */".self::NL
+                . "    private \$dbConnections;".self::NL
+                . "    /**".self::NL
+                . "     * A boolean value. Set to true once system configuration is completed.".self::NL
+                . "     * ".self::NL
+                . "     * @var boolean".self::NL
+                . "     * ".self::NL
+                . "     * @since 1.0".self::NL
+                . "     */".self::NL
+                . "    private \$isConfigured;".self::NL
+                . "    /**".self::NL
+                . "     * The release date of the framework that is used to build the system.".self::NL
+                . "     * ".self::NL
+                . "     * @var string Release date of of the framework that is used to build the system.".self::NL
+                . "     * ".self::NL
+                . "     * @since 1.0".self::NL
+                . "     */".self::NL
+                . "    private \$releaseDate;".self::NL
+                . "    /**".self::NL
+                . "     * The version of the framework that is used to build the system.".self::NL
+                . "     * ".self::NL
+                . "     * @var string The version of the framework that is used to build the system.".self::NL
+                . "     * ".self::NL
+                . "     * @since 1.0".self::NL
+                . "     */".self::NL
+                . "    private \$version;".self::NL
+                . "    /**".self::NL
+                . "     * The type framework version that is used to build the system.".self::NL
+                . "     * ".self::NL
+                . "     * @var string The framework version that is used to build the system.".self::NL
+                . "     * ".self::NL
+                . "     * @since 1.0".self::NL
+                . "     */".self::NL
+                . "    private \$versionType;".self::NL
+                . "    ".self::NL
+                . "    /**".self::NL
+                . "     * Initialize configuration.".self::NL
+                . "     */".self::NL
+                . "    private function __construct() {".self::NL
+                . "        \$this->releaseDate = '".$configArr['release-date']."';".self::NL
+                . "        \$this->version = '".$configArr['version']."';".self::NL
+                . "        \$this->versionType = '".$configArr['version-type']."';".self::NL
+                . "        \$this->configVision = '".$configArr['config-file-version']."';".self::NL
+                . "        \$this->dbConnections = [".self::NL
                 . "";
         $count = count($configArr['databases']);
         $i = 0;
@@ -1039,156 +1040,156 @@ class ConfigController {
                         . "'".$dbConn->getPassword()."', "
                         . "'".$dbConn->getDBName()."', "
                         . "'".$dbConn->getHost()."', "
-                        . "".$dbConn->getPort()."),\n";
+                        . "".$dbConn->getPort()."),".self::NL;
             }
             $i++;
         }
-        $fileAsStr .= "\n"
-                   . "        ];\n";
+        $fileAsStr .= "".self::NL
+                   . "        ];".self::NL;
         foreach ($configArr['databases'] as $dbConn) {
-            $fileAsStr .= '        $this->dbConnections[\''.$dbConn->getName().'\']->setName(\''.$dbConn->getName().'\');'."\n";
+            $fileAsStr .= '        $this->dbConnections[\''.$dbConn->getName().'\']->setName(\''.$dbConn->getName().'\');'."".self::NL;
         }
                 $fileAsStr .= ""
-                . "    }\n"
-                . "    /**\n"
-                . "     * Adds new database connection or updates an existing one.\n"
-                . "     * \n"
-                . "     * @param ConnectionInfo \$connectionInfo an object of type 'ConnectionInfo'\n"
-                . "     * that will contain connection information.\n"
-                . "     * \n"
-                . "     * @since 1.3.4\n"
-                . "     */\n"
-                . "    public static function addDbConnection(\$connectionInfo) {\n"
-                . "        if (\$connectionInfo instanceof ConnectionInfo) {\n"
-                . "            self::get()->dbConnections[\$connectionInfo->getName()] = \$connectionInfo;\n"
-                . "        }\n"
-                . "    }\n"
-                . "    /**\n"
-                . "     * Returns an object that can be used to access configuration information.\n"
-                . "     * \n"
-                . "     * @return Config An object of type Config.\n"
-                . "     * \n"
-                . "     * @since 1.0\n"
-                . "     */\n"
-                . "    public static function get() {\n"
-                . "        if (self::\$cfg != null) {\n"
-                . "            return self::\$cfg;\n"
-                . "        }\n"
-                . "        self::\$cfg = new Config();\n"
-                . "        \n"
-                . "        return self::\$cfg;\n"
-                . "    }\n"
-                . "    /**\n"
-                . "     * Returns the version number of configuration file.\n"
-                . "     * \n"
-                . "     * The value is used to check for configuration compatibility since the\n"
-                . "     * framework is updated and more features are added.\n"
-                . "     * \n"
-                . "     * @return string The version number of configuration file.\n"
-                . "     * \n"
-                . "     * @since 1.2\n"
-                . "     */\n"
-                . "    public static function getConfigVersion() {\n"
-                . "        return self::get()->_getConfigVersion();\n"
-                . "    }\n"
-                . "    /**\n"
-                . "     * Returns database connection information given connection name.\n"
-                . "     * \n"
-                . "     * @param string \$conName The name of the connection.\n"
-                . "     * \n"
-                . "     * @return ConnectionInfo|null The method will return an object of type\n"
-                . "     * ConnectionInfo if a connection info was found for the given connection name.\n"
-                . "     * Other than that, the method will return null.\n"
-                . "     * \n"
-                . "     * @since 1.3.3\n"
-                . "     */\n"
-                . "    public static function getDBConnection(\$conName) {\n"
-                . "        \$conns = self::getDBConnections();\n"
-                . "        \$trimmed = trim(\$conName);\n"
-                . "        \n"
-                . "        if (isset(\$conns[\$trimmed])) {\n"
-                . "            return \$conns[\$trimmed];\n"
-                . "        }\n"
-                . "        \n"
-                . "        return null;\n"
-                . "    }\n"
-                . "    /**\n"
-                . "     * Returns an associative array that contain the information of database connections.\n"
-                . "     * \n"
-                . "     * The keys of the array will be the name of database connection and the value of\n"
-                . "     * each key will be an object of type ConnectionInfo.\n"
-                . "     * \n"
-                . "     * @return array An associative array.\n"
-                . "     * \n"
-                . "     * @since 1.3.3\n"
-                . "     */\n"
-                . "    public static function getDBConnections() {\n"
-                . "        return self::get()->dbConnections;\n"
-                . "    }\n"
-                . "    /**\n"
-                . "     * Returns the date at which the current version of the framework is released.\n"
-                . "     * \n"
-                . "     * The format of the date will be YYYY-MM-DD.\n"
-                . "     * \n"
-                . "     * @return string The date at which the current version of the framework is released.\n"
-                . "     * \n"
-                . "     * @since 1.0\n"
-                . "     */\n"
-                . "    public static function getReleaseDate() {\n"
-                . "        return self::get()->_getReleaseDate();\n"
-                . "    }\n"
-                . "    /**\n"
-                . "     * Returns WebFiori Framework version number.\n"
-                . "     * \n"
-                . "     * @return string WebFiori Framework version number. The version number will\n"
-                . "     * have the following format: x.x.x\n"
-                . "     * \n"
-                . "     * @since 1.2\n"
-                . "     */\n"
-                . "    public static function getVersion() {\n"
-                . "        return self::get()->_getVersion();\n"
-                . "    }\n"
-                . "    /**\n"
-                . "     * Returns WebFiori Framework version type.\n"
-                . "     * \n"
-                . "     * @return string WebFiori Framework version type (e.g. 'Beta', 'Alpha', 'Preview').\n"
-                . "     * \n"
-                . "     * @since 1.2\n"
-                . "     */\n"
-                . "    public static function getVersionType() {\n"
-                . "        return self::get()->_getVersionType();\n"
-                . "    }\n"
-                . "    /**\n"
-                . "     * Checks if the system is configured or not.\n"
-                . "     * \n"
-                . "     * This method is helpful in case the developer would like to create some\n"
-                . "     * kind of a setup wizard for the web application.\n"
-                . "     * \n"
-                . "     * @return boolean true if the system is configured.\n"
-                . "     * \n"
-                . "     * @since 1.0\n"
-                . "     */\n"
-                . "    public static function isConfig() {\n"
-                . "        return self::get()->_isConfig();\n"
-                . "    }\n"
-                . "    private function _getConfigVersion() {\n"
-                . "        return \$this->configVision;\n"
-                . "    }\n"
-                . "    private function _getReleaseDate() {\n"
-                . "        return \$this->releaseDate;\n"
-                . "    }\n"
-                . "    \n"
-                . "    private function _getVersion() {\n"
-                . "        return \$this->version;\n"
-                . "    }\n"
-                . "    private function _getVersionType() {\n"
-                . "        return \$this->versionType;\n"
-                . "    }\n"
-                . "    private function _isConfig() {\n"
-                . "        return \$this->isConfigured;\n"
-                . "    }\n"
-                . "\n"
-                . "}\n"
+                . "    }".self::NL
+                . "    /**".self::NL
+                . "     * Adds new database connection or updates an existing one.".self::NL
+                . "     * ".self::NL
+                . "     * @param ConnectionInfo \$connectionInfo an object of type 'ConnectionInfo'".self::NL
+                . "     * that will contain connection information.".self::NL
+                . "     * ".self::NL
+                . "     * @since 1.3.4".self::NL
+                . "     */".self::NL
+                . "    public static function addDbConnection(\$connectionInfo) {".self::NL
+                . "        if (\$connectionInfo instanceof ConnectionInfo) {".self::NL
+                . "            self::get()->dbConnections[\$connectionInfo->getName()] = \$connectionInfo;".self::NL
+                . "        }".self::NL
+                . "    }".self::NL
+                . "    /**".self::NL
+                . "     * Returns an object that can be used to access configuration information.".self::NL
+                . "     * ".self::NL
+                . "     * @return Config An object of type Config.".self::NL
+                . "     * ".self::NL
+                . "     * @since 1.0".self::NL
+                . "     */".self::NL
+                . "    public static function get() {".self::NL
+                . "        if (self::\$cfg != null) {".self::NL
+                . "            return self::\$cfg;".self::NL
+                . "        }".self::NL
+                . "        self::\$cfg = new Config();".self::NL
+                . "        ".self::NL
+                . "        return self::\$cfg;".self::NL
+                . "    }".self::NL
+                . "    /**".self::NL
+                . "     * Returns the version number of configuration file.".self::NL
+                . "     * ".self::NL
+                . "     * The value is used to check for configuration compatibility since the".self::NL
+                . "     * framework is updated and more features are added.".self::NL
+                . "     * ".self::NL
+                . "     * @return string The version number of configuration file.".self::NL
+                . "     * ".self::NL
+                . "     * @since 1.2".self::NL
+                . "     */".self::NL
+                . "    public static function getConfigVersion() {".self::NL
+                . "        return self::get()->_getConfigVersion();".self::NL
+                . "    }".self::NL
+                . "    /**".self::NL
+                . "     * Returns database connection information given connection name.".self::NL
+                . "     * ".self::NL
+                . "     * @param string \$conName The name of the connection.".self::NL
+                . "     * ".self::NL
+                . "     * @return ConnectionInfo|null The method will return an object of type".self::NL
+                . "     * ConnectionInfo if a connection info was found for the given connection name.".self::NL
+                . "     * Other than that, the method will return null.".self::NL
+                . "     * ".self::NL
+                . "     * @since 1.3.3".self::NL
+                . "     */".self::NL
+                . "    public static function getDBConnection(\$conName) {".self::NL
+                . "        \$conns = self::getDBConnections();".self::NL
+                . "        \$trimmed = trim(\$conName);".self::NL
+                . "        ".self::NL
+                . "        if (isset(\$conns[\$trimmed])) {".self::NL
+                . "            return \$conns[\$trimmed];".self::NL
+                . "        }".self::NL
+                . "        ".self::NL
+                . "        return null;".self::NL
+                . "    }".self::NL
+                . "    /**".self::NL
+                . "     * Returns an associative array that contain the information of database connections.".self::NL
+                . "     * ".self::NL
+                . "     * The keys of the array will be the name of database connection and the value of".self::NL
+                . "     * each key will be an object of type ConnectionInfo.".self::NL
+                . "     * ".self::NL
+                . "     * @return array An associative array.".self::NL
+                . "     * ".self::NL
+                . "     * @since 1.3.3".self::NL
+                . "     */".self::NL
+                . "    public static function getDBConnections() {".self::NL
+                . "        return self::get()->dbConnections;".self::NL
+                . "    }".self::NL
+                . "    /**".self::NL
+                . "     * Returns the date at which the current version of the framework is released.".self::NL
+                . "     * ".self::NL
+                . "     * The format of the date will be YYYY-MM-DD.".self::NL
+                . "     * ".self::NL
+                . "     * @return string The date at which the current version of the framework is released.".self::NL
+                . "     * ".self::NL
+                . "     * @since 1.0".self::NL
+                . "     */".self::NL
+                . "    public static function getReleaseDate() {".self::NL
+                . "        return self::get()->_getReleaseDate();".self::NL
+                . "    }".self::NL
+                . "    /**".self::NL
+                . "     * Returns WebFiori Framework version number.".self::NL
+                . "     * ".self::NL
+                . "     * @return string WebFiori Framework version number. The version number will".self::NL
+                . "     * have the following format: x.x.x".self::NL
+                . "     * ".self::NL
+                . "     * @since 1.2".self::NL
+                . "     */".self::NL
+                . "    public static function getVersion() {".self::NL
+                . "        return self::get()->_getVersion();".self::NL
+                . "    }".self::NL
+                . "    /**".self::NL
+                . "     * Returns WebFiori Framework version type.".self::NL
+                . "     * ".self::NL
+                . "     * @return string WebFiori Framework version type (e.g. 'Beta', 'Alpha', 'Preview').".self::NL
+                . "     * ".self::NL
+                . "     * @since 1.2".self::NL
+                . "     */".self::NL
+                . "    public static function getVersionType() {".self::NL
+                . "        return self::get()->_getVersionType();".self::NL
+                . "    }".self::NL
+                . "    /**".self::NL
+                . "     * Checks if the system is configured or not.".self::NL
+                . "     * ".self::NL
+                . "     * This method is helpful in case the developer would like to create some".self::NL
+                . "     * kind of a setup wizard for the web application.".self::NL
+                . "     * ".self::NL
+                . "     * @return boolean true if the system is configured.".self::NL
+                . "     * ".self::NL
+                . "     * @since 1.0".self::NL
+                . "     */".self::NL
+                . "    public static function isConfig() {".self::NL
+                . "        return self::get()->_isConfig();".self::NL
+                . "    }".self::NL
+                . "    private function _getConfigVersion() {".self::NL
+                . "        return \$this->configVision;".self::NL
+                . "    }".self::NL
+                . "    private function _getReleaseDate() {".self::NL
+                . "        return \$this->releaseDate;".self::NL
+                . "    }".self::NL
+                . "    ".self::NL
+                . "    private function _getVersion() {".self::NL
+                . "        return \$this->version;".self::NL
+                . "    }".self::NL
+                . "    private function _getVersionType() {".self::NL
+                . "        return \$this->versionType;".self::NL
+                . "    }".self::NL
+                . "    private function _isConfig() {".self::NL
+                . "        return \$this->isConfigured;".self::NL
+                . "    }".self::NL
+                . "".self::NL
+                . "}".self::NL
                 . "";
         
         $mailConfigFile = new File('Config.php', ROOT_DIR.DS.'conf');

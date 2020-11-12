@@ -376,7 +376,6 @@ class CreateCommand extends CLICommand {
         } while ($this->confirm('Would you like to add another column?', false));
 
         if ($this->confirm('Would you like to add foreign keys to the table?', false)) {
-            // TODO: Test adding forighn keys.
             $classInfo['fk-info'] = $this->_addFks($tempTable);
         }
 
@@ -497,7 +496,6 @@ class CreateCommand extends CLICommand {
      * @param MySQLColumn $colObj
      */
     private function _setDefaultValue($colObj) {
-        // TODO: Test default value using empty.
         if ($colObj->getDatatype() == 'bool' || $colObj->getDatatype() == 'boolean') {
             $defaultVal = trim($this->getInput('Enter default value (true or false) (Hit "Enter" to skip):', ''));
 

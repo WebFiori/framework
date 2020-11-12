@@ -28,7 +28,7 @@ use webfiori\ui\HTMLNode;
 use webfiori\ui\TableRow;
 use webfiori\framework\File;
 use webfiori\framework\mail\EmailMessage;
-use webfiori\WebFiori;
+use webfiori\framework\WebFiori;
 /**
  * A class which can be used to send an email regarding the status of 
  * background job execution.

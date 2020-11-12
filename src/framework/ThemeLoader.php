@@ -26,7 +26,7 @@ namespace webfiori\framework;
 
 use webfiori\framework\exceptions\NoSuchThemeException;
 use webfiori\framework\router\Router;
-use webfiori\WebFiori;
+use webfiori\framework\WebFiori;
 
 
 /**

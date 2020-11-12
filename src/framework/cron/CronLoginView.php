@@ -28,7 +28,7 @@ use webfiori\ui\HTMLNode;
 use webfiori\ui\Input;
 use webfiori\ui\Label;
 use webfiori\framework\Page;
-use webfiori\WebFiori;
+use webfiori\framework\WebFiori;
 use webfiori\framework\Response;
 use webfiori\framework\session\SessionsManager;
 /**

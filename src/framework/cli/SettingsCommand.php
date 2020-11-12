@@ -24,7 +24,7 @@
  */
 namespace webfiori\framework\cli;
 
-use webfiori\WebFiori;
+use webfiori\framework\WebFiori;
 /**
  * A CLI command which is used to show framework configuration.
  *

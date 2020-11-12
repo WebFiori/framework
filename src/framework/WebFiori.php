@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-namespace webfiori;
+namespace webfiori\framework;
 use webfiori\json\Json;
 use webfiori\conf\Config;
 use webfiori\conf\MailConfig;
@@ -46,7 +46,6 @@ use webfiori\ini\InitAutoLoad;
 use webfiori\ini\InitCron;
 use webfiori\ini\InitPrivileges;
 use webfiori\framework\ConfigController;
-use webfiori\framework\session\SessionsManager;
 /**
  * The time at which the framework was booted in microseconds as a float.
  * 
@@ -142,20 +141,6 @@ class WebFiori {
             mb_http_input($encoding);
             mb_regex_encoding($encoding);
         }
-        /**
-         * The root directory that is used to load all other required system files.
-         */
-        if (!defined('ROOT_DIR')) {
-            $publicFolder = DIRECTORY_SEPARATOR.'public';
-            
-            if (substr(__DIR__, strlen(__DIR__) - strlen($publicFolder)) == $publicFolder) {
-                //HTTP run
-                define('ROOT_DIR', substr(__DIR__,0, strlen(__DIR__) - strlen(DIRECTORY_SEPARATOR.'public')));
-            } else {
-                //CLI run
-                define('ROOT_DIR', __DIR__);
-            }
-        }
         
         if (!class_exists('webfiori\ini\GlobalConstants')) {
             require_once ROOT_DIR.DIRECTORY_SEPARATOR.'ini'.DIRECTORY_SEPARATOR.'GlobalConstants.php';
@@ -172,9 +157,6 @@ class WebFiori {
          */
         date_default_timezone_set(DATE_TIMEZONE);
         
-
-        
-
         /**
          * Initialize autoloader.
          */
@@ -249,10 +231,8 @@ class WebFiori {
                 self::$classStatus = 'INITIALIZING';
                 self::$LC = new WebFiori();
             }
-        } else {
-            if (self::$classStatus == 'INITIALIZING') {
-                throw new InitializationException('Using the core class while it is not fully initialized.');
-            }
+        } else if (self::$classStatus == 'INITIALIZING') {
+            throw new InitializationException('Using the core class while it is not fully initialized.');
         }
 
         return self::$LC;
@@ -457,7 +437,7 @@ class WebFiori {
                     'error-number' => $errno
                 ], true);
                 
-                if (defined('VERBOSE') && VERBOSE) {
+                if (defined('WF_VERBOSE') && WF_VERBOSE) {
                     $j->add('file',$errfile);
                     $j->add('line',$errline);
                 }
@@ -505,7 +485,7 @@ class WebFiori {
                         'exception-code' => $ex->getMessage()
                     ], true);
 
-                    if (defined('VERBOSE') && VERBOSE) {
+                    if (defined('WF_VERBOSE') && WF_VERBOSE) {
                         $j->add('file', $ex->getFile());
                         $j->add('line', $ex->getLine());
                         $stackTrace = new Json([], true);
@@ -578,19 +558,4 @@ class WebFiori {
             }
         });
     }
-}
-/**
- * This where magic will start.
- * 
- * Planting application seed into the ground and make your work bloom.
- */
-WebFiori::getAndStart();
-if (CLI::isCLI() === true) {
-    CLI::registerCommands();
-    CLI::runCLI();
-} else {
-    //route user request.
-    SessionsManager::start('wf-session');
-    Router::route(Util::getRequestedURL());
-    Response::send();
 }

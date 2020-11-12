@@ -98,7 +98,7 @@ class ErrorBox extends MessageBox {
     }
     /**
      * Sets the file that caused the error.
-     * Note that if the constant 'VERBOSE' is not defined or set to 'false', 
+     * Note that if the constant 'WF_VERBOSE' is not defined or set to 'false', 
      * the method will have no effect.
      * @param string $file The absolute path of the file that has the error.
      * @since 1.0
@@ -107,14 +107,14 @@ class ErrorBox extends MessageBox {
         if ($this->fileNode !== null) {
             $this->fileNode->removeAllChildNodes();
 
-            if (defined('VERBOSE') && VERBOSE) {
+            if (defined('WF_VERBOSE') && WF_VERBOSE) {
                 $this->fileNode->addTextNode('<b class="err-label">File: </b>'.$file, false);
             }
         }
     }
     /**
      * Sets error line number.
-     * Note that if the constant 'VERBOSE' is not defined or set to 'false', 
+     * Note that if the constant 'WF_VERBOSE' is not defined or set to 'false', 
      * the method will have no effect.
      * @param string $line The line that caused the error.
      * @since 1.0
@@ -123,7 +123,7 @@ class ErrorBox extends MessageBox {
         if ($this->lineNode !== null) {
             $this->lineNode->removeAllChildNodes();
 
-            if (defined('VERBOSE') && VERBOSE) {
+            if (defined('WF_VERBOSE') && WF_VERBOSE) {
                 $this->lineNode->addTextNode('<b class="err-label">Line: </b>'.$line, false);
             }
         }
@@ -164,13 +164,13 @@ class ErrorBox extends MessageBox {
             $this->lineNode->setClassName('message-line');
             $detailsContainer->addChild($this->lineNode);
 
-            if (!defined('VERBOSE') || !VERBOSE) {
+            if (!defined('WF_VERBOSE') || !WF_VERBOSE) {
                 $this->tipNode = new HTMLNode('p');
                 $this->tipNode->setClassName('message-line');
                 $detailsContainer->addChild($this->tipNode);
                 $this->tipNode->addTextNode('<b style="color:yellow">Tip</b>: To'
                     .' display more details about the error, '
-                    .'define the constant "VERBOSE" and set its value to "true" in '
+                    .'define the constant "WF_VERBOSE" and set its value to "true" in '
                     .'the class "GlobalConstants".', false);
             }
 

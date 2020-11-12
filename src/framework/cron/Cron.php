@@ -29,7 +29,7 @@ use webfiori\collections\Queue;
 use webfiori\framework\router\Router;
 use webfiori\framework\cli\CLI;
 use webfiori\framework\Util;
-use webfiori\WebFiori;
+use webfiori\framework\WebFiori;
 use webfiori\framework\cli\CLICommand;
 /**
  * A class that is used to manage scheduled background jobs.

@@ -13,7 +13,7 @@ use webfiori\conf\Config;
 use webfiori\conf\SiteConfig;
 use webfiori\framework\Page;
 use webfiori\framework\Theme;
-use webfiori\WebFiori;
+use webfiori\framework\WebFiori;
 
 class WebFioriTheme extends Theme {
     public function __construct() {

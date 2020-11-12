@@ -28,7 +28,7 @@ use webfiori\framework\DB;
 use webfiori\database\ConnectionInfo;
 use webfiori\framework\mail\SMTPAccount;
 use webfiori\framework\ConfigController;
-use webfiori\WebFiori;
+use webfiori\framework\WebFiori;
 use Exception;
 
 /**

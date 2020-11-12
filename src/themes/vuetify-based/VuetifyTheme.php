@@ -11,7 +11,7 @@ use webfiori\framework\Theme;
 use webfiori\framework\session\SessionsManager;
 
 use webfiori\framework\ConfigController;
-use webfiori\WebFiori;
+use webfiori\framework\WebFiori;
 /**
  * A basic theme which is based on Vuetify framework.
  * @author Ibrahim

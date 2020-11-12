@@ -33,7 +33,7 @@ use webfiori\restEasy\ParamTypes;
 use webfiori\restEasy\RequestParameter;
 use webfiori\framework\AutoLoader;
 use webfiori\framework\Util;
-use webfiori\WebFiori;
+use webfiori\framework\WebFiori;
 use webfiori\database\Table;
 use Exception;
 use webfiori\restEasy\AbstractWebService;

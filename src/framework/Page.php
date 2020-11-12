@@ -33,7 +33,7 @@ use webfiori\conf\SiteConfig;
 use webfiori\framework\exceptions\UIException;
 use webfiori\framework\i18n\Language;
 use webfiori\framework\session\SessionsManager;
-use webfiori\WebFiori;
+use webfiori\framework\WebFiori;
 use webfiori\framework\Response;
 /**
  * A class used to initialize view components.

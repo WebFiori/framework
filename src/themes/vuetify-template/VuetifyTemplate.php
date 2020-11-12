@@ -7,7 +7,7 @@ use webfiori\json\Json;
 use webfiori\ui\JsCode;
 use webfiori\framework\Util;
 use webfiori\framework\session\SessionsManager;
-use webfiori\WebFiori;
+use webfiori\framework\WebFiori;
 
 /**
  * A generic template that can be used to create Vuetify based themes.

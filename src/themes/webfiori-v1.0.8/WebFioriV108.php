@@ -8,7 +8,7 @@ use webfiori\ui\ListItem;
 use webfiori\ui\UnorderedList;
 use webfiori\framework\Page;
 use webfiori\framework\Theme;
-use webfiori\WebFiori;
+use webfiori\framework\WebFiori;
 use webfiori\framework\session\SessionsManager;
 /**
  * WebFiori Theme Which is bundled with v1.0.8 of the framework.

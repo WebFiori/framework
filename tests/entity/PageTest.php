@@ -1,10 +1,10 @@
 <?php
 namespace webfiori\tests\entity;
 use PHPUnit\Framework\TestCase;
-use webfiori\entity\Page;
+use webfiori\framework\Page;
 use webfiori\ui\HTMLNode;
-use webfiori\entity\Theme;
-use webfiori\entity\i18n\Language;
+use webfiori\framework\Theme;
+use webfiori\framework\i18n\Language;
 use webfiori\conf\SiteConfig;
 /**
  * Description of PageTest
@@ -175,9 +175,9 @@ class PageTest extends TestCase{
      */
     public function testDirs01() {
         Page::theme();
-        $this->assertEquals('themes/webfiori/css',Page::cssDir());
-        $this->assertEquals('themes/webfiori/images',Page::imagesDir());
-        $this->assertEquals('themes/webfiori/js',Page::jsDir());
+        $this->assertEquals('assets/webfiori/css',Page::cssDir());
+        $this->assertEquals('assets/webfiori/images',Page::imagesDir());
+        $this->assertEquals('assets/webfiori/js',Page::jsDir());
     }
     /**
      * @test

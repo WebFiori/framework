@@ -11,10 +11,9 @@ use webfiori\ui\PNode;
 use webfiori\ui\UnorderedList;
 use webfiori\conf\Config;
 use webfiori\conf\SiteConfig;
-use webfiori\entity\Page;
-use webfiori\entity\Theme;
-use webfiori\logic\WebsiteController;
-use webfiori\WebFiori;
+use webfiori\framework\Page;
+use webfiori\framework\Theme;
+use webfiori\framework\WebFiori;
 
 class WebFioriTheme extends Theme {
     public function __construct() {
@@ -247,7 +246,9 @@ class WebFioriTheme extends Theme {
             'writing_dir' => Page::dir(),
             'contact_phone' => '013 xxx xxxx',
             'copyright' => 'All Rights Reserved',
-            'contact_mail' => 'hello@example.com'
+            'contact_mail' => 'hello@example.com',
+            'theme-dir' => $this->getDirectoryName(),
+            'images-dir' => $this->getImagesDirName()
         ]);
         
         return $node;

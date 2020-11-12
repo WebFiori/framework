@@ -6,9 +6,10 @@ use webfiori\ui\HeadNode;
 use webfiori\ui\HTMLNode;
 use webfiori\ui\ListItem;
 use webfiori\ui\UnorderedList;
-use webfiori\entity\Page;
-use webfiori\entity\Theme;
-use webfiori\WebFiori;
+use webfiori\framework\Page;
+use webfiori\framework\Theme;
+use webfiori\framework\WebFiori;
+use webfiori\framework\session\SessionsManager;
 /**
  * WebFiori Theme Which is bundled with v1.0.8 of the framework.
  *
@@ -22,8 +23,17 @@ class WebFioriV108 extends Theme {
         $this->setName('WebFiori V108');
         $this->setLicenseName('MIT License');
         $this->setLicenseUrl('https://opensource.org/licenses/MIT');
+        $this->setBeforeLoaded(function () {
+            $activeSession = SessionsManager::getActiveSession();
+            if ($activeSession !== null) {
+                Page::lang($activeSession->getLangCode(true));
+            } else {
+                Page::lang(WebFiori::getSiteConfig()->getPrimaryLanguage());
+            }
+        });
         $this->setAfterLoaded(function()
         {
+            
             Page::document()->getChildByID('page-body')->setClassName('row  ml-0 mr-0');
             Page::document()->getChildByID('page-body')->setStyle([
                 'margin-top' => '50px'
@@ -267,10 +277,10 @@ class WebFioriV108 extends Theme {
     }
     public function getHeadNode() {
         $head = new HeadNode();
-        $head->addCSS('https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css',false);
-        $head->addJs('https://code.jquery.com/jquery-3.4.1.slim.min.js',false);
-        $head->addJs('https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js', false);
-        $head->addJs('https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js',false);
+        $head->addCSS('https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css');
+        $head->addJs('https://code.jquery.com/jquery-3.4.1.slim.min.js');
+        $head->addJs('https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js');
+        $head->addJs('https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js');
 
         return $head;
     }
@@ -285,10 +295,12 @@ class WebFioriV108 extends Theme {
             'background-color' => '#c1ec9b',
             'padding' => '0'
         ]);
-        $logo = new HTMLNode('img');
-        $logo->setID('main-logo');
-        $logo->setAttribute('src', 'favicon.png');
-        $logo->setAttribute('alt', 'logo');
+        $logo = new HTMLNode('img', [
+            'id' => 'main-logo',
+            'src' => 'favicon.png',
+            'alt' => 'logo',
+            'style' => 'width:40px'
+        ]);
         $logoLink = new Anchor(WebFiori::getSiteConfig()->getHomePage(), $logo->toHTML());
         $logoLink->setClassName('navbar-brand ml-3');
         $mainNav->addChild($logoLink);

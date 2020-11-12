@@ -1,7 +1,7 @@
 <?php
 
-use webfiori\entity\AutoLoader;
-use webfiori\entity\cli\CLI;
+use webfiori\framework\AutoLoader;
+use webfiori\framework\cli\CLI;
 use webfiori\ini\GlobalConstants;
 $DS = DIRECTORY_SEPARATOR;
 
@@ -26,7 +26,7 @@ if (explode($DS, __DIR__)[0] == 'home') {
 
     foreach ($WebFioriFrameworkDirs as $dir) {
         //linux 
-        $file = $DS.$dir.'entity'.$DS.'AutoLoader.php';
+        $file = $DS.$dir.'framework'.$DS.'AutoLoader.php';
         fprintf(STDOUT,"Checking if file '$file' is exist...\n");
 
         if (file_exists($file)) {
@@ -40,7 +40,7 @@ if (explode($DS, __DIR__)[0] == 'home') {
 
     foreach ($WebFioriFrameworkDirs as $dir) {
         //other
-        $file = $dir.$DS.'entity'.$DS.'AutoLoader.php';
+        $file = $dir.$DS.'framework'.$DS.'AutoLoader.php';
         fprintf(STDOUT,"Checking if file '$file' is exist...\n");
 
         if (file_exists($file)) {

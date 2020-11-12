@@ -2,9 +2,9 @@
 namespace webfiori\tests\entity\mail;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\entity\mail\SMTPAccount;
+use webfiori\framework\mail\SMTPAccount;
 /**
- * A test class for testing the class 'webfiori\entity\mail\SMTPAccount'.
+ * A test class for testing the class 'webfiori\framework\mail\SMTPAccount'.
  *
  * @author Ibrahim
  */

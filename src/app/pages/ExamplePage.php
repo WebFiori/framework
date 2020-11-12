@@ -24,7 +24,7 @@
  */
 namespace webfiori\examples\views;
 
-use webfiori\entity\Page;
+use webfiori\framework\Page;
 
 class ExamplePage {
     public function __construct() {

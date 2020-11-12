@@ -1,8 +1,8 @@
 <?php
 namespace webfiori\theme;
 
-use webfiori\entity\i18n\Language;
-use webfiori\entity\Page;
+use webfiori\framework\i18n\Language;
+use webfiori\framework\Page;
 /**
  * Extending language file by adding more labels.
  *

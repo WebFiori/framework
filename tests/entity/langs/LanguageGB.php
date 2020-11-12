@@ -1,2 +1,2 @@
 <?php
-namespace webfiori\entity\i18n;
+namespace webfiori\framework\i18n;

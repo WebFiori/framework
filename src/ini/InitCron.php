@@ -24,7 +24,7 @@
  */
 namespace webfiori\ini;
 
-use webfiori\entity\cron\Cron;
+use webfiori\framework\cron\Cron;
 
 /**
  * A class that has one method to initialize cron jobs.

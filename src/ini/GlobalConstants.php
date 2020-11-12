@@ -93,10 +93,10 @@ class GlobalConstants {
              * panel is used to execute jobs and check execution status. Default value is false.
              * @since 1.0
              */
-            define('CRON_THROUGH_HTTP', false);
+            define('CRON_THROUGH_HTTP', true);
         }
 
-        if (!defined('VERBOSE')) {
+        if (!defined('WF_VERBOSE')) {
             /**
              * This constant is used to tell the framework if more information should 
              * be displayed if an exception is thrown or an error happens. The main aim 
@@ -107,7 +107,7 @@ class GlobalConstants {
              * false.
              * @since 1.0
              */
-            define('VERBOSE', false);
+            define('WF_VERBOSE', true);
         }
 
         if (!defined('NO_WWW')) {
@@ -134,7 +134,6 @@ class GlobalConstants {
              */
             define('THEMES_PATH', $themesPath);
         }
-
         if (!defined('MAX_BOX_MESSAGES')) {
             /**
              * The maximum number of message boxes to show in one page.

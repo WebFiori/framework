@@ -6,9 +6,12 @@ use webfiori\ui\Anchor;
 use webfiori\ui\HeadNode;
 use webfiori\ui\HTMLNode;
 use webfiori\ui\JsCode;
-use webfiori\entity\Page;
-use webfiori\entity\Theme;
-use webfiori\WebFiori;
+use webfiori\framework\Page;
+use webfiori\framework\Theme;
+use webfiori\framework\session\SessionsManager;
+
+use webfiori\framework\ConfigController;
+use webfiori\framework\WebFiori;
 /**
  * A basic theme which is based on Vuetify framework.
  * @author Ibrahim
@@ -28,7 +31,12 @@ class VuetifyTheme extends Theme {
         $this->setImagesDirName('img');
         $this->setBeforeLoaded(function()
         {
-            Page::lang(WebFiori::getWebsiteController()->getSessionLang());
+            $activeSession = SessionsManager::getActiveSession();
+            if ($activeSession !== null) {
+                Page::lang($activeSession->getLangCode(true));
+            } else {
+                Page::lang(WebFiori::getSiteConfig()->getPrimaryLanguage());
+            }
             LangExt::extendLang(Page::translation());
             Page::siteName(WebFiori::getSiteConfig()->getWebsiteNames()[Page::lang()]);
         });

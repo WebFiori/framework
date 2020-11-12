@@ -25,44 +25,15 @@
  */
 namespace webfiori\examples\webApis;
 
-use restEasy\WebService;
-use webfiori\entity\ExtendedWebServices;
+use webfiori\framework\ExtendedWebServicesManager;
 
-//create class and extend the base class API
-class ExampleAPI extends ExtendedWebServices {
+/**
+ * A sample manager which is used to mange services.
+ */
+class ExampleAPI extends ExtendedWebServicesManager {
     public function __construct() {
         parent::__construct();
-
-        //create API action
-        $a1 = new WebService('say-hello');
-
-        //set action request method
-        $a1->addRequestMethod('get');
-
-        //add the action to the API
-        $this->addAction($a1);
-    }
-
-    public function isAuthorized() {
-        //check if the user 
-        //is authorized to call the service.
-        return true;
-    }
-
-    public function processRequest() {
-        //get the name of the called service and process the request based on it
-        $a = $this->getCalledServiceName();
-
-        if ($a == 'say-hello') {
-            //say hello by sending html document
-            $lang = $this->getTranslation()->getCode();
-
-            if ($lang == 'AR') {
-                $this->send('text/html', '<html><head><title>قُل مرحباً</title></head><body><p dir="rtl">مرحباً بالعالم!</p></body></html>');
-            } else {
-                $this->send('text/html', '<html><head><title>Say Hello</title></head><body><p>hello world!</p></body></html>');
-            }
-        }
+        $this->addService(new SampleService());
     }
 }
 

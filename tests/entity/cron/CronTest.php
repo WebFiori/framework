@@ -2,7 +2,7 @@
 namespace webfiori\tests\entity\cron;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\entity\cron\Cron;
+use webfiori\framework\cron\Cron;
 /**
  * Description of CronTest
  *

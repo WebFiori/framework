@@ -2,9 +2,9 @@
 namespace webfiori\tests\entity\router;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\entity\router\Router;
-use webfiori\entity\router\RouterUri;
-use webfiori\entity\Util;
+use webfiori\framework\router\Router;
+use webfiori\framework\router\RouterUri;
+use webfiori\framework\Util;
 /**
  * Description of RouterTest
  *

@@ -2,7 +2,7 @@
 namespace webfiori\tests\entity\cron;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\entity\cron\CronJob;
+use webfiori\framework\cron\CronJob;
 /**
  * A set of test units for testing the class 'CronJob'.
  *

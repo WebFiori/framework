@@ -5,9 +5,9 @@ use webfiori\ui\HeadNode;
 use webfiori\ui\HTMLNode;
 use webfiori\conf\Config;
 use webfiori\conf\SiteConfig;
-use webfiori\entity\Page;
-use webfiori\entity\Theme;
-use webfiori\logic\WebsiteController;
+use webfiori\framework\Page;
+use webfiori\framework\Theme;
+use webfiori\framework\session\SessionsManager;
 class GreenyTheme extends Theme {
     public function __construct() {
         parent::__construct();
@@ -25,8 +25,8 @@ class GreenyTheme extends Theme {
         $this->setCssDirName('css');
         $this->setAfterLoaded(function()
         {
-            $session = WebsiteController::get()->getSession();
-            Page::lang($session->getLang(true));
+            $session = SessionsManager::getActiveSession();
+            Page::lang($session->getLangCode(true));
             Page::translation();
             Page::document()->getBody()->setClassName('pa-container');
             Page::document()->getChildByID('page-body')->setClassName('pa-row');
@@ -78,7 +78,8 @@ class GreenyTheme extends Theme {
     }
 
     public function getHeadNode() {
-        $lang = WebsiteController::get()->getSession()->getLang(true);
+        $session = SessionsManager::getActiveSession();
+        $lang = $session->getLangCode(true);
         Page::lang($lang);
         $headTag = new HeadNode();
         $headTag->setBase(SiteConfig::getBaseURL());

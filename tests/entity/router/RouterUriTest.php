@@ -2,8 +2,8 @@
 namespace webfiori\tests\entity\router;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\entity\router\Router;
-use webfiori\entity\router\RouterUri;
+use webfiori\framework\router\Router;
+use webfiori\framework\router\RouterUri;
 /**
  * Description of TestRouterUri
  *

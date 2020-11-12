@@ -3,7 +3,7 @@ namespace webfiori\tests\conf;
 
 use PHPUnit\Framework\TestCase;
 use webfiori\conf\Config;
-use webfiori\entity\DBConnectionInfo;
+use webfiori\database\ConnectionInfo;
 /**
  * A set of unit tests to test the class 'Config'.
  *
@@ -29,9 +29,9 @@ class ConfigTest extends TestCase {
      */
     public function testGetDbConnection01() {
         $conf = Config::get();
-        $newConn = new DBConnectionInfo('root', '123456', 'testing_db');
+        $newConn = new ConnectionInfo('mysql','root', '123456', 'testing_db');
         $conf->addDbConnection($newConn);
-        $this->assertTrue($conf->getDBConnection('New_Connection') instanceof DBConnectionInfo);
-        $this->assertTrue($conf->getDBConnection(' New_Connection ') instanceof DBConnectionInfo);
+        $this->assertTrue($conf->getDBConnection('New_Connection') instanceof ConnectionInfo);
+        $this->assertTrue($conf->getDBConnection(' New_Connection ') instanceof ConnectionInfo);
     }
 }

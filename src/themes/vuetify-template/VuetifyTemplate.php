@@ -1,12 +1,13 @@
 <?php
-use webfiori\entity\Theme;
+use webfiori\framework\Theme;
 use webfiori\ui\HTMLNode;
-use webfiori\entity\Page;
+use webfiori\framework\Page;
 use webfiori\ui\HeadNode;
 use webfiori\json\Json;
 use webfiori\ui\JsCode;
-use webfiori\entity\Util;
-use webfiori\WebFiori;
+use webfiori\framework\Util;
+use webfiori\framework\session\SessionsManager;
+use webfiori\framework\WebFiori;
 
 /**
  * A generic template that can be used to create Vuetify based themes.
@@ -24,7 +25,7 @@ class VuetifyTemplate extends Theme {
         $this->setImagesDirName('img');
         $this->setBeforeLoaded(function()
         {
-            Page::lang(WebFiori::getWebsiteController()->getSessionLang());
+            Page::lang(SessionsManager::getActiveSession()->getLangCode(true));
             Page::siteName(WebFiori::getSiteConfig()->getWebsiteNames()[Page::lang()]);
         });
         $this->setAfterLoaded(function()
@@ -44,7 +45,7 @@ class VuetifyTemplate extends Theme {
 
             //initialize vue before the page is rendered.
             //the initialization process is performed by the file 
-            //'themes/vuetify-based/init-vuetify.js'
+            //'assets/vuetify-based/init-vuetify.js'
             Page::beforeRender(function()
             {
                 $jsNode = new HTMLNode('script');

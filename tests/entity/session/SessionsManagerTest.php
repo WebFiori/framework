@@ -1,7 +1,7 @@
 <?php
 use PHPUnit\Framework\TestCase;
-use webfiori\entity\session\SessionsManager;
-use webfiori\entity\session\Session;
+use webfiori\framework\session\SessionsManager;
+use webfiori\framework\session\Session;
 
 /**
  * Description of SessionsManagerTest

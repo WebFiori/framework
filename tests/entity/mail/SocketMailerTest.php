@@ -2,9 +2,9 @@
 namespace webfiori\tests\entity\mail;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\entity\mail\SocketMailer;
+use webfiori\framework\mail\SocketMailer;
 /**
- * A test class for testing the class 'webfiori\entity\mail\SocketMailer'.
+ * A test class for testing the class 'webfiori\framework\mail\SocketMailer'.
  *
  * @author Ibrahim
  */

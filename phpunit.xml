@@ -4,21 +4,20 @@
     </php>
     <filter>
         <whitelist addUncoveredFilesFromWhitelist="true">
-            <file>./src/logic/Controller.php</file>
-            <file>./src/entity/cron/CronJob.php</file>
-            <file>./src/entity/router/RouterUri.php</file>
-            <file>./src/entity/langs/Language.php</file>
-            <file>./src/entity/Access.php</file>
-            <file>./src/entity/DBConnectionInfo.php</file>
-            <file>./src/entity/File.php</file>
-            <file>./src/entity/Privilege.php</file>
-            <file>./src/entity/PrivilegesGroup.php</file>
-            <file>./src/entity/User.php</file>
-            <file>./src/entity/Page.php</file>
-            <file>./src/entity/Theme.php</file>
-            <file>./src/entity/session/Session.php</file>
-            <file>./src/entity/session/SessionsManager.php</file>
-            <file>./src/entity/session/DefaultSessionStorage.php</file>
+            <file>./src/framework/cron/CronJob.php</file>
+            <file>./src/framework/router/RouterUri.php</file>
+            <file>./src/framework/langs/Language.php</file>
+            <file>./src/framework/Access.php</file>
+            <file>./src/framework/DBConnectionInfo.php</file>
+            <file>./src/framework/File.php</file>
+            <file>./src/framework/Privilege.php</file>
+            <file>./src/framework/PrivilegesGroup.php</file>
+            <file>./src/framework/User.php</file>
+            <file>./src/framework/Page.php</file>
+            <file>./src/framework/Theme.php</file>
+            <file>./src/framework/session/Session.php</file>
+            <file>./src/framework/session/SessionsManager.php</file>
+            <file>./src/framework/session/DefaultSessionStorage.php</file>
         </whitelist>
     </filter>
     <logging>

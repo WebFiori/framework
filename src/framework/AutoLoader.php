@@ -237,6 +237,7 @@ class AutoLoader {
                 $DS.'apis',
                 $DS.'pages',
                 $DS.'ini',
+                $DS.'libs',
                 $DS.'conf',
                 $DS.'app'
             ];

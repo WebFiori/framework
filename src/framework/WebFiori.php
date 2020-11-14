@@ -209,7 +209,7 @@ class WebFiori {
         ThemeLoader::registerResourcesRoutes();
     }
     private function _initCRON() {
-        $uriObj = new RouterUri(Util::getRequestedURL());
+        $uriObj = new RouterUri(Util::getRequestedURL(), '');
         $pathArr = $uriObj->getPathArray();
         if (CLI::isCLI() || (defined('CRON_THROUGH_HTTP') && CRON_THROUGH_HTTP && count($pathArr) != 0 && $pathArr[0] == 'cron')) {
             //initialize cron jobs only if in CLI or cron is enabled throgh HTTP.

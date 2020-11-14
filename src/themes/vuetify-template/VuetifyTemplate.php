@@ -72,18 +72,8 @@ class VuetifyTemplate extends Theme {
     public function getHeadNode() {
         $node = new HeadNode();
         $lang = Page::translation();
-        $json = new Json();
-        $langVars = $lang->getLanguageVars();
-
-        foreach ($langVars as $key => $val) {
-            $json->add($key, $val,['array-as-object' => true]);
-        }
-        $js = new JsCode();
-        $js->setID('data-model');
-        $js->addCode('window.locale = '.$json.';');
                 
-        $node->addChild($js)
-        ->addCSS(Page::cssDir().'/theme.css')
+        $node->addCSS(Page::cssDir().'/theme.css')
         ->addCSS('https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900',[], false)
         ->addCSS('https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css', [], false)
         ->addCSS('https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css', [], false)

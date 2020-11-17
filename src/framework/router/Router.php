@@ -466,7 +466,10 @@ class Router {
      * @since 1.3.8
      */
     public static function hasRoute($path) {
-        return self::get()->_hasRoute($path);
+        $routesArr = self::get()->routes;
+        $trimmed = self::get()->_fixUriPath($path);
+        
+        return isset($routesArr['static'][$trimmed]) || isset($routesArr['variable'][$trimmed]);
     }
     /**
      * Adds a route to a basic xml site map. 

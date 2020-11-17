@@ -448,6 +448,7 @@ class WebFiori {
         {
             $isCli = class_exists('webfiori\framework\cli\CLI') ? CLI::isCLI() : http_response_code() === false;
             Response::clear();
+            $routerObj = Router::getUriObjByURL(Util::getRequestedURL());
             if ($isCli) {
                 fprintf(STDERR, "\n<%s>\n",Util::ERR_TYPES[$errno]['type']);
                 fprintf(STDERR, "Error Message    %5s %s\n",":",$errstr);
@@ -459,7 +460,7 @@ class WebFiori {
                 if (defined('STOP_CLI_ON_ERR') && STOP_CLI_ON_ERR === true) {
                     exit(-1);
                 }
-            } else if (defined('API_CALL')) {
+            } else if ($routerObj->getType() == Router::API_ROUTE) {
                 Response::setCode(500);
                 $j = new Json([
                     'message' => $errstr,

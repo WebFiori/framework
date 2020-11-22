@@ -109,12 +109,24 @@ class CLI {
         fprintf(STDERR, "Error Description%5s %s\n",":",Util::ERR_TYPES[$errno]['description']);
         fprintf(STDERR, "Error File       %5s %s\n",":",$errfile);
         fprintf(STDERR, "Error Line      %5s %s\n",":",$errline);
+        fprintf(STDERR, "Stack Trace:\n");
         Cron::log("<".Util::ERR_TYPES[$errno]['type'].">\n");
         Cron::log("Error Message      : $errstr\n");
         Cron::log("Error Number       : $errno\n");
         Cron::log("Error Description  : ".Util::ERR_TYPES[$errno]['description']."\n");
         Cron::log("Error File         : $errfile\n");
         Cron::log("Error Line         : $errline\n");
+        Cron::log("Stack Trace:\n");
+        
+        $trace = debug_backtrace();
+        $num = 0;
+        foreach ($trace as $arr) {
+            $toPrint = self::_traceArrAsString($num, $arr)."\n";
+            fprintf(STDERR, $toPrint);
+            Cron::log($toPrint);
+            $num++;
+        }
+        
         if (defined('STOP_CLI_ON_ERR') && STOP_CLI_ON_ERR === true) {
             exit(-1);
         }

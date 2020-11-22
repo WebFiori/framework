@@ -450,13 +450,16 @@ class WebFiori {
             Response::clear();
             $routerObj = Router::getUriObjByURL(Util::getRequestedURL());
             if ($isCli) {
-                fprintf(STDERR, "\n<%s>\n",Util::ERR_TYPES[$errno]['type']);
-                fprintf(STDERR, "Error Message    %5s %s\n",":",$errstr);
-                fprintf(STDERR, "Error Number     %5s %s\n",":",$errno);
-                fprintf(STDERR, "Error Description%5s %s\n",":",Util::ERR_TYPES[$errno]['description']);
-                fprintf(STDERR, "Error File       %5s %s\n",":",$errfile);
-                fprintf(STDERR, "Error Line:      %5s %s\n",":",$errline);
-                
+                if (class_exists('webfiori\framework\cli\CLI')) {
+                    CLI::displayErr($errno, $errstr, $errfile, $errline);
+                } else {
+                    fprintf(STDERR, "\n<%s>\n",Util::ERR_TYPES[$errno]['type']);
+                    fprintf(STDERR, "Error Message    %5s %s\n",":",$errstr);
+                    fprintf(STDERR, "Error Number     %5s %s\n",":",$errno);
+                    fprintf(STDERR, "Error Description%5s %s\n",":",Util::ERR_TYPES[$errno]['description']);
+                    fprintf(STDERR, "Error File       %5s %s\n",":",$errfile);
+                    fprintf(STDERR, "Error Line:      %5s %s\n",":",$errline);
+                }
                 if (defined('STOP_CLI_ON_ERR') && STOP_CLI_ON_ERR === true) {
                     exit(-1);
                 }

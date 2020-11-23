@@ -511,7 +511,22 @@ class AutoLoader {
         
         return array_reverse($vendorDirs);
     }
-    private function _loadClassHelper($className, $classWithNs, $value, $appendRoot, $allPaths) {
+    /**
+     * 
+     * @param string $className The name of the class to load.
+     * @param string $classWithNs Class name including its namespace.
+     * @param string $value A path to directory to check in.
+     * @param boolean $appendRoot  If set to true, root directory will be 
+     * appended to file path.
+     * @param array $allPaths An array that holds pathes to classes which has 
+     * same name.
+     * @param boolean $classNameToLower If set to true, class name will be 
+     * converted to lower case. This is used to support the loading of 
+     * old style PHP classes.
+     * 
+     * @return boolean True if loaded. False if not.
+     */
+    private function _loadClassHelper($className, $classWithNs, $value, $appendRoot, $allPaths, $classNameToLower = false) {
         $loaded = false;
         $DS = DIRECTORY_SEPARATOR;
         $root = $this->getRoot();
@@ -521,16 +536,30 @@ class AutoLoader {
         } else {
             $f = $value.$DS.$className.'.php';
         }
-        if (file_exists($f) && !in_array($f, $allPaths)) {
-            require_once $f;
-            $ns = count(explode('\\', $classWithNs)) == 1 ? '\\' : substr($classWithNs, 0, strlen($classWithNs) - strlen($className) - 1);
-            $this->loadedClasses[] = [
-                self::$CLASS_INDICES[0] => $className,
-                self::$CLASS_INDICES[1] => $ns,
-                self::$CLASS_INDICES[2] => $f,
-                self::$CLASS_INDICES[3] => false
-            ];
-            $loaded = true;
+        $isFileLoaded = in_array($f, $allPaths);
+        
+        if (!$isFileLoaded) {
+            
+            if ($classNameToLower) {
+                
+                if ($appendRoot === true) {
+                    $f = $root.$value.$DS. strtolower($className).'.php';
+                } else {
+                    $f = $value.$DS. strtolower($className).'.php';
+                }
+            }
+            
+            if (file_exists($f)) {
+                require_once $f;
+                $ns = count(explode('\\', $classWithNs)) == 1 ? '\\' : substr($classWithNs, 0, strlen($classWithNs) - strlen($className) - 1);
+                $this->loadedClasses[] = [
+                    self::$CLASS_INDICES[0] => $className,
+                    self::$CLASS_INDICES[1] => $ns,
+                    self::$CLASS_INDICES[2] => $f,
+                    self::$CLASS_INDICES[3] => false
+                ];
+                $loaded = true;
+            }
         }
         return $loaded;
     }
@@ -680,7 +709,7 @@ class AutoLoader {
             $loaded = $this->_loadClassHelper($className, $classWithNs, $value, $appendRoot, $allPaths);
 
             if (!$loaded) {
-                $loaded = $this->_loadClassHelper(strtolower($className), $classWithNs, $value, $appendRoot, $allPaths);
+                $loaded = $this->_loadClassHelper($className, $classWithNs, $value, $appendRoot, $allPaths, true);
             }
 
             if ($loaded && (PHP_MAJOR_VERSION < 7 || (PHP_MAJOR_VERSION == 7 && PHP_MINOR_VERSION <= 3))) {

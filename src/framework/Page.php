@@ -640,7 +640,7 @@ class Page {
 
         if ($loadedTheme !== null && !$node instanceof HTMLNode) {
             throw new UIException('The the method "'.get_class($loadedTheme).'::getAsideNode()" did not return '
-                    .'an instance of the class "HTMLNode".');
+                    .'an instance of the class "webfiori\\ui\\HTMLNode".');
         } else {
             $node->setID(self::MAIN_ELEMENTS[3]);
         }
@@ -658,7 +658,7 @@ class Page {
 
         if ($loadedTheme !== null && !$node instanceof HTMLNode) {
             throw new UIException('The the method "'.get_class($loadedTheme).'::getFooterNode()" did not return '
-                    .'an instance of the class "HTMLNode".');
+                    .'an instance of the class "webfiori\\ui\\HTMLNode".');
         } else {
             $node->setID(self::MAIN_ELEMENTS[4]);
         }
@@ -680,7 +680,7 @@ class Page {
 
             if (!$headNode instanceof HeadNode) {
                 throw new UIException('The method "'.get_class($loadedTheme).'::getHeadNode()" did not return '
-                        .'an instance of the class "HeadNode".');
+                        .'an instance of the class "webfiori\\ui\\HeadNode".');
             }
         }
         $headNode->addMeta('charset','UTF-8',true);
@@ -705,7 +705,7 @@ class Page {
 
         if ($loadedTheme !== null && !$node instanceof HTMLNode) {
             throw new UIException('The the method "'.get_class($loadedTheme).'::getHeadrNode()" did not return '
-                    .'an instance of the class "HTMLNode".');
+                    .'an instance of the class "webfiori\\ui\\HTMLNode".');
         } else {
             $node->setID(self::MAIN_ELEMENTS[1]);
         }

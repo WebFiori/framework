@@ -1,4 +1,5 @@
 # WebFiori Framework
+
 <p align="center">
 <img width="90px" hight="90px" src="https://webfiori.com/assets/images/favicon.png">
 </p>
@@ -26,6 +27,7 @@ What is WebFiori Framework?
 WebFiori Framework is a mini web development framework which is built using PHP language. The framework is fully object oriented (OOP). It uses semi-MVC model but it does not force it. The framework comes with many features which can help in making your website or web application up and running in no time.
 
 ## Key Features
+
 * Provide minimum utilities to setup a small web application.
 * Theming and the ability to create multiple UIs for the same web page using any CSS or JavaScript framework.
 * Building and manipulating the DOM of a web page using PHP language.
@@ -43,7 +45,16 @@ WebFiori Framework is a mini web development framework which is built using PHP 
 * Basic support for running the framework throgh CLI.
 * Ability to implement custom CLI commands.
 
+## Standard Libraries
+| Library | Build | Latest |
+|----|----|----|
+| HTTP | <a href="https://travis-ci.com/github/WebFiori/restEasy"><img src="https://travis-ci.com/WebFiori/restEasy.svg?branch=master"></a> | <a href="https://github.com/WebFiori/restEasy/releases"><img src="https://img.shields.io/github/release/WebFiori/restEasy.svg" /></a> |
+| WebFiori Json | <a href="https://travis-ci.com/github/WebFiori/json"><img src="https://travis-ci.com/WebFiori/json.svg?branch=master"></a> | <a href="https://github.com/WebFiori/json/releases"><img src="https://img.shields.io/github/release/WebFiori/json.svg" /></a> |
+| UI | <a href="https://travis-ci.com/github/WebFiori/ui"><img src="https://travis-ci.com/WebFiori/ui.svg?branch=master"></a> | <a href="https://github.com/WebFiori/ui/releases"><img src="https://img.shields.io/github/release/WebFiori/ui.svg" /></a> |
+| Collections | <a href="https://travis-ci.com/github/WebFiori/collections"><img src="https://travis-ci.com/WebFiori/collections.svg?branch=master"></a> | <a href="https://github.com/WebFiori/collections/releases"><img src="https://img.shields.io/github/release/WebFiori/collections.svg" /></a> |
+| Database | <a href="https://travis-ci.com/github/WebFiori/database"><img src="https://travis-ci.com/WebFiori/database.svg?branch=main"></a> | <a href="https://github.com/WebFiori/database/releases"><img src="https://img.shields.io/github/release/WebFiori/database.svg" /></a> |
 ## Problems Solved
+
 One of the things that any developer cares about any software project is the problem or problems it solves. As for WebFiori framework, It can help in solving the following problems:
 * It helps in making any one with Java background to write PHP code.
 * The ability to create a customized links to web pages as needed using routing.

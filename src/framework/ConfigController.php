@@ -892,33 +892,6 @@ class ConfigController {
         return $cfgArr;
     }
     /**
-     * Checks if the application setup is completed or not.
-     * 
-     * Note that the method will throw an exception in case one of the 3 main 
-     * configuration files is missing.
-     * 
-     * @return boolean If the system is configured, the method will return 
-     * true. If it is not configured, It will return false.
-     * 
-     * @throws InitializationException If one of configuration files is missing. The format 
-     * of exception message will be 'XX.php is missing.' where XX is the name 
-     * of the configuration file.
-     * 
-     * @since 1.0
-     */
-    public function isSetupFinished() {
-        if (class_exists('webfiori\conf\Config')) {
-            if (class_exists('webfiori\conf\MailConfig')) {
-                if (class_exists('webfiori\conf\SiteConfig')) {
-                    return Config::isConfig();
-                }
-                throw new InitializationException('SiteConfig.php is missing.');
-            }
-            throw new InitializationException('MailConfig.php is missing.');
-        }
-        throw new InitializationException('Config.php is missing.');
-    }
-    /**
      * Removes a set of database connections.
      * 
      * This method will search for a connection which has the given database 
@@ -978,14 +951,6 @@ class ConfigController {
                 . "     * @var type".self::NL
                 . "     */".self::NL
                 . "    private \$dbConnections;".self::NL
-                . "    /**".self::NL
-                . "     * A boolean value. Set to true once system configuration is completed.".self::NL
-                . "     * ".self::NL
-                . "     * @var boolean".self::NL
-                . "     * ".self::NL
-                . "     * @since 1.0".self::NL
-                . "     */".self::NL
-                . "    private \$isConfigured;".self::NL
                 . "    /**".self::NL
                 . "     * The release date of the framework that is used to build the system.".self::NL
                 . "     * ".self::NL
@@ -1169,9 +1134,6 @@ class ConfigController {
                 . "     * ".self::NL
                 . "     * @since 1.0".self::NL
                 . "     */".self::NL
-                . "    public static function isConfig() {".self::NL
-                . "        return self::get()->_isConfig();".self::NL
-                . "    }".self::NL
                 . "    private function _getConfigVersion() {".self::NL
                 . "        return \$this->configVision;".self::NL
                 . "    }".self::NL
@@ -1184,9 +1146,6 @@ class ConfigController {
                 . "    }".self::NL
                 . "    private function _getVersionType() {".self::NL
                 . "        return \$this->versionType;".self::NL
-                . "    }".self::NL
-                . "    private function _isConfig() {".self::NL
-                . "        return \$this->isConfigured;".self::NL
                 . "    }".self::NL
                 . "".self::NL
                 . "}".self::NL

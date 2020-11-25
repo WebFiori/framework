@@ -28,13 +28,14 @@ namespace webfiori\framework;
 use webfiori\database\Database;
 use webfiori\database\ConnectionInfo;
 use webfiori\database\DatabaseException;
-use webfiori\ui\TableRow;
 use webfiori\conf\Config;
 
 /**
  * A class that can be used to represent system database.
  * 
- * The developer can extend this class to have his own database schema.
+ * The developer can extend this class to have his own database schema. The main 
+ * aim of this class is to make it easy for developers to use the connections 
+ * which are stored in the class 'Config'.
  *
  * @author Ibrahim
  * 
@@ -49,7 +50,8 @@ class DB extends Database {
      * specified when the connection was added to the file 'Config.php'.
      * 
      * 
-     * @throws DatabaseException
+     * @throws DatabaseException If no connection was found which has the 
+     * given name.
      * 
      * @since 1.0
      */
@@ -63,37 +65,5 @@ class DB extends Database {
             throw new DatabaseException("No connection was found which has the name '$connName'.");
         }
         parent::__construct($conn);
-    }
-    /**
-     * Returns HTML table that can be used to display the data of a specific 
-     * table in the database.
-     * 
-     * @param string $tableName The name of the table.
-     * 
-     * @return HTMLTable
-     * 
-     * @since 1.0
-     */
-    public function getHTMLTable($tableName) {
-        $this->table($tableName)->select()->execute();
-        $resultSet = $this->getLastResultSet();
-        $table = $this->getQueryGenerator()->getTable();
-        $dataTable = new \webfiori\ui\HTMLTable($resultSet->getRowsCount()+1, $table->getColsCount());
-        $rowIndex = 1;
-        $headerRow = $table->getColsNames();
-        $colIndex = 0;
-        foreach ($headerRow as $label) {
-            $dataTable->setValue(0, $colIndex, $label);
-            $colIndex++;
-        }
-        foreach ($resultSet as $record) {
-            $colIndex = 0;
-            foreach ($record as $data) {
-                $dataTable->setValue($rowIndex, $colIndex, $data);
-                $colIndex++;
-            }
-            $rowIndex++;
-        }
-        return $dataTable;
     }
 }

@@ -183,10 +183,16 @@ class QueryClassWriter extends ClassWriter {
 
         foreach ($fks as $fkObj) {
             $refTableNs = get_class($fkObj->getSource());
+            $cName = $this->getNamespace().'\\'. $this->getName();
             
-            $nsSplit = explode('\\', $refTableNs);
-            $refTableClassName = $nsSplit[count($nsSplit) - 1];
-            $this->append('$this->addReference(new '.$refTableClassName.'(), [', 2);
+            if ($cName == $refTableNs) {
+                $refTableClassName = '$this';
+            } else {
+                $nsSplit = explode('\\', $refTableNs);
+                $refTableClassName = 'new '.$nsSplit[count($nsSplit) - 1].'()';
+            }
+            
+            $this->append('$this->addReference('.$refTableClassName.', [', 2);
             $ownerCols = array_keys($fkObj->getOwnerCols());
             $sourceCols = array_keys($fkObj->getSourceCols());
 

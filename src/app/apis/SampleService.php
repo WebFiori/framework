@@ -3,7 +3,7 @@
 namespace webfiori\examples\webApis;
 
 use webfiori\framework\ExtendedWebServicesManager;
-use webfiori\restEasy\AbstractWebService;
+use webfiori\http\AbstractWebService;
 use webfiori\framework\WebFiori;
 /**
  * A sample service that can be used as a reference when creating web services.

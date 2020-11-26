@@ -26,7 +26,7 @@ namespace webfiori\framework\router;
 
 use webfiori\json\Json;
 use webfiori\ui\HTMLNode;
-use webfiori\restEasy\WebServicesManager;
+use webfiori\http\WebServicesManager;
 use webfiori\conf\SiteConfig;
 use webfiori\framework\cli\CLI;
 use webfiori\framework\exceptions\RoutingException;

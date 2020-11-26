@@ -26,7 +26,7 @@ namespace webfiori\framework;
 
 use webfiori\json\JsonI;
 use webfiori\json\Json;
-use webfiori\restEasy\WebServicesManager;
+use webfiori\http\WebServicesManager;
 use webfiori\framework\i18n\Language;
 use webfiori\framework\DB;
 use webfiori\framework\ConfigController;

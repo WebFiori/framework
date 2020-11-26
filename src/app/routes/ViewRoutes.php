@@ -44,7 +44,10 @@ class ViewRoutes {
         Router::view([
             'path' => '/example', 
             'route-to' => '/ExamplePage.php',
-            'case-sensitive' => false
+            'case-sensitive' => false,
+            'middleware' => [
+                'sample-middleware','sample-middleware-2'
+            ]
         ]);
     }
 }

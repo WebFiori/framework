@@ -29,7 +29,7 @@ use webfiori\ui\Input;
 use webfiori\ui\Label;
 use webfiori\framework\Page;
 use webfiori\framework\WebFiori;
-use webfiori\framework\Response;
+use webfiori\http\Response;
 use webfiori\framework\session\SessionsManager;
 /**
  * A page which is used to show login form to enter login information to 

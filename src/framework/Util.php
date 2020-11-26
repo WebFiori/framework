@@ -625,10 +625,10 @@ class Util {
                 if ($messageBox->getBody() !== null) {
                     $messageBox->getBody()->addTextNode($toOutput,false);
                     $messageBox->getHeader()->text($file.' - '.$lineNumber);
-                    Response::append($messageBox);
+                    Response::write($messageBox);
                 }
             } else {
-                Response::append('<pre>'.$file.' - '.$lineNumber."\n".'</pre>'.$toOutput);
+                Response::write('<pre>'.$file.' - '.$lineNumber."\n".'</pre>'.$toOutput);
             }
         }
     }

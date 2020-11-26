@@ -49,7 +49,7 @@ use webfiori\collections\LinkedList;
  * 
  * @author Ibrahim
  * 
- * @version 1.3.7
+ * @version 1.4.0
  */
 class RouterUri extends Uri {
     /**
@@ -67,7 +67,7 @@ class RouterUri extends Uri {
      * @since 1.3
      */
     private $incInSiteMap;
-    private $middlewares;
+    private $assignedMiddlewareList;
     /**
      * An array that contains all languages that the resource the URI is pointing 
      * to can have.
@@ -123,23 +123,38 @@ class RouterUri extends Uri {
         $this->setType(Router::CUSTOMIZED);
         $this->setRoute($routeTo);
         $this->setIsCaseSensitive($caseSensitive);
-        $this->middlewares = new LinkedList();
+        $this->assignedMiddlewareList = new LinkedList();
 
         $this->setClosureParams($closureParams);
         $this->incInSiteMap = false;
         $this->languages = [];
     }
     /**
+     * Returns a list that holds objects for the middleware.
      * 
      * @return LinkedList
+     * 
+     * @since 1.4.0
      */
-    public function getMiddlewars() {
-        return $this->middlewares;
+    public function getMiddlewar() {
+        return $this->assignedMiddlewareList;
     }
+    /**
+     * Adds the URI to middleware or to middleware group.
+     * 
+     * @param string $name The name of the middleware or the group.
+     * 
+     * @since 1.4
+     */
     public function addMiddleware($name) {
         $mw = MiddlewareManager::getMiddleware($name);
         if ($mw !== null) {
-            $this->middlewares->add($mw);
+            $this->assignedMiddlewareList->add($mw);
+        } else {
+            $group = MiddlewareManager::getGroup($name);
+            foreach ($group as $mw) {
+                $this->assignedMiddlewareList->add($mw);
+            }
         }
     }
     /**

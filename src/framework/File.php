@@ -27,7 +27,7 @@ namespace webfiori\framework;
 use webfiori\json\JsonI;
 use webfiori\json\Json;
 use webfiori\framework\exceptions\FileException;
-use webfiori\framework\Response;
+use webfiori\http\Response;
 /**
  * A class that represents a file.
  * 
@@ -874,7 +874,7 @@ class File implements JsonI {
             } else {
                 Response::addHeader('Content-Disposition', 'inline; filename="'.$this->getName().'"');
             }
-            Response::append($this->getRawData());
+            Response::write($this->getRawData());
         } else {
             throw new FileException('MIME type of raw data is not set.');
         }

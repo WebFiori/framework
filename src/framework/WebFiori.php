@@ -23,6 +23,7 @@
  * THE SOFTWARE.
  */
 namespace webfiori\framework;
+use webfiori\http\Response;
 use webfiori\json\Json;
 use webfiori\conf\Config;
 use webfiori\conf\MailConfig;
@@ -37,7 +38,6 @@ use webfiori\framework\router\Router;
 use webfiori\framework\router\RouterUri;
 use webfiori\framework\router\ViewRoutes;
 use webfiori\framework\ThemeLoader;
-use webfiori\framework\Response;
 use webfiori\framework\ui\ErrorBox;
 use webfiori\framework\ui\ServerErrView;
 use webfiori\framework\Util;
@@ -46,6 +46,8 @@ use webfiori\ini\InitAutoLoad;
 use webfiori\ini\InitCron;
 use webfiori\ini\InitPrivileges;
 use webfiori\framework\ConfigController;
+use webfiori\framework\middleware\MiddlewareManager;
+use webfiori\framework\session\SessionsManager;
 /**
  * The time at which the framework was booted in microseconds as a float.
  * 
@@ -192,10 +194,32 @@ class WebFiori {
             $this->dbErrDetails = $this->sysStatus;
             $this->sysStatus = Util::DB_NEED_CONF;
         }
-        
+        WebFiori::autoRegister('middleware', function($inst) {
+            MiddlewareManager::register($inst);
+        });
         $this->_initRoutes();
         $this->_initCRON();
-
+        Response::beforeSend(function () {
+            register_shutdown_function(function() {
+                SessionsManager::validateStorage();
+                $uriObj = Router::getRouteUri();
+                if ($uriObj !== null) {
+                    foreach ($uriObj->getMiddlewar() as $mw) {
+                        $mw->afterTerminate();
+                    }
+                }
+            });
+            $sessionsCookiesHeaders = SessionsManager::getCookiesHeaders();
+            foreach ($sessionsCookiesHeaders as $headerVal) {
+                Response::addHeader('set-cookie', $headerVal);
+            }
+            $uriObj = Router::getRouteUri();
+            if ($uriObj !== null) {
+                foreach ($uriObj->getMiddlewar() as $mw) {
+                    $mw->before();
+                }
+            }
+        });
         //class is now initialized
         self::$classStatus = 'INITIALIZED';
 
@@ -206,7 +230,6 @@ class WebFiori {
         ViewRoutes::create();
         ClosureRoutes::create();
         OtherRoutes::create();
-        ThemeLoader::registerResourcesRoutes();
     }
     private function _initCRON() {
         $uriObj = new RouterUri(Util::getRequestedURL(), '');
@@ -421,8 +444,8 @@ class WebFiori {
             throw new InitializationException("The standard library 'webfiori/database' is missing.");
         }
 
-        if (!class_exists('webfiori\restEasy\WebServicesManager')) {
-            throw new InitializationException("The standard library 'webfiori/rest-easy' is missing.");
+        if (!class_exists('webfiori\http\WebServicesManager')) {
+            throw new InitializationException("The standard library 'webfiori/http' is missing.");
         }
     }
     /**
@@ -463,7 +486,7 @@ class WebFiori {
                 if (defined('STOP_CLI_ON_ERR') && STOP_CLI_ON_ERR === true) {
                     exit(-1);
                 }
-            } else if ($routerObj->getType() == Router::API_ROUTE) {
+            } else if ($routerObj !== null && $routerObj->getType() == Router::API_ROUTE) {
                 Response::setCode(500);
                 $j = new Json([
                     'message' => $errstr,
@@ -477,7 +500,7 @@ class WebFiori {
                     $j->add('line',$errline);
                 }
                 Response::addHeader('content-type', 'application/json');
-                Response::append($j);
+                Response::write($j);
                 Response::send();
             } else {
                 $errBox = new ErrorBox();
@@ -487,7 +510,7 @@ class WebFiori {
                     $errBox->setFile($errfile);
                     $errBox->setMessage($errstr);
                     $errBox->setLine($errline);
-                    Response::append($errBox);
+                    Response::write($errBox);
                 }
             }
 
@@ -538,7 +561,7 @@ class WebFiori {
                         $j->add('stack-trace',$stackTrace);
                     }
                     Response::addHeader('content-type', 'application/json');
-                    Response::append($j);
+                    Response::write($j);
                     Response::send();
                 } else {
                     $exceptionView = new ServerErrView($ex);
@@ -582,7 +605,7 @@ class WebFiori {
                         'file' => $error["file"],
                         'line' => $error["line"]
                     ], true);
-                    Response::append($j);
+                    Response::write($j);
                     Response::send();
                 } else if ($isCli) {
                     CLI::displayErr($error['type'], $error["message"], $error["file"], $error["line"]);

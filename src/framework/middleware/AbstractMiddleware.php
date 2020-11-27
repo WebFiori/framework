@@ -173,13 +173,26 @@ abstract class AbstractMiddleware implements Comparable {
     /**
      * Compare the priority of the middleware with another one.
      * 
-     * @param Middleware $other
+     * @param AbstractMiddleware $other
      * 
      * @return int 
      * 
      * @since 1.0
      */
     public function compare($other) {
-        return $this->priority - $other->priority;
+        if ($this->priority == $other->priority) {
+            return strcmp($other->getName(), $this->getName());
+        }
+        return $this->getPriority() - $other->getPriority();
+    }
+    /**
+     * Returns the priority of the middleware.
+     * 
+     * @return int Priority of the middleware.
+     * 
+     * @since 1.0
+     */
+    public function getPriority() {
+        return $this->priority;
     }
 }

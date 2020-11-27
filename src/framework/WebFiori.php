@@ -215,8 +215,9 @@ class WebFiori {
             }
             $uriObj = Router::getRouteUri();
             if ($uriObj !== null) {
+                $uriObj->getMiddlewar()->insertionSort();
                 foreach ($uriObj->getMiddlewar() as $mw) {
-                    $mw->before();
+                    $mw->after();
                 }
             }
         });

@@ -1,5 +1,5 @@
 # Contribution Guidelines
-First of all, thank you for your interst in the project. This is a simple set of uidelines that you must follow in order to accept 
+First of all, thank you for your interest in the project. This is a simple set of guidelines that you must follow in order to accept 
 any changes you made to the source code of the project. Note that this document is still under construction and its content is 
 changing.
 

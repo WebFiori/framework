@@ -35,6 +35,7 @@ use webfiori\framework\Util;
 use webfiori\framework\File;
 use webfiori\framework\ThemeLoader;
 use webfiori\http\Response;
+use webfiori\http\Request;
 /**
  * The basic class that is used to route user requests to the correct 
  * location.
@@ -186,7 +187,7 @@ class Router {
      */
     private function _searchRoute($routeUri, $uri, $loadResource, $withVars = false) {
         $pathArray = $routeUri->getPathArray();
-        $requestMethod = filter_var(getenv('REQUEST_METHOD'));
+        $requestMethod = Request::getMethod();
         $indexToSearch = 'static';
         if ($withVars) {
             $indexToSearch = 'variable';
@@ -255,6 +256,9 @@ class Router {
      * <li><b>vars-values</b>: An optional associative array which contains sub 
      * indexed arrays that contains possible values for URI vars. This one is 
      * used when building the sitemap.</li>
+     * <li><b>middleware</b>: This can be a name of a middleware to assign to the 
+     * route. This also can be a middleware group. In addition to that, this can 
+     * be an array that holds middleware names or middleware groups names.</li>
      * </ul>
      * 
      * @return boolean The method will return true if the route was created. 
@@ -298,6 +302,9 @@ class Router {
      * <li><b>vars-values</b>: An optional associative array which contains sub 
      * indexed arrays that contains possible values for URI vars. This one is 
      * used when building the sitemap.</li>
+     * <li><b>middleware</b>: This can be a name of a middleware to assign to the 
+     * route. This also can be a middleware group. In addition to that, this can 
+     * be an array that holds middleware names or middleware groups names.</li>
      * </ul>
      * 
      * @return boolean The method will return true if the route was created. 
@@ -357,10 +364,15 @@ class Router {
      * <li><b>languages</b>: An indexed array that contains the languages at 
      * which the resource can have. Each language is represented as two 
      * characters such as 'AR'.</li>
-     * </ul>
      * <li><b>vars-values</b>: An optional associative array which contains sub 
      * indexed arrays that contains possible values for URI vars. This one is 
      * used when building the sitemap.</li>
+     * 
+     * <li><b>middleware</b>: This can be a name of a middleware to assign to the 
+     * route. This also can be a middleware group. In addition to that, this can 
+     * be an array that holds middleware names or middleware groups names.</li>
+     * </ul>
+     * 
      * 
      * @return boolean The method will return true if the route was created. 
      * If a route for the given path was already created, the method will return 
@@ -672,6 +684,9 @@ class Router {
      * <li><b>vars-values</b>: An optional associative array which contains sub 
      * indexed arrays that contains possible values for URI vars. This one is 
      * used when building the sitemap.</li>
+     * <li><b>middleware</b>: This can be a name of a middleware to assign to the 
+     * route. This also can be a middleware group. In addition to that, this can 
+     * be an array that holds middleware names or middleware groups names.</li>
      * </ul>
      * 
      * @return boolean The method will return true if the route was created. 

@@ -24,6 +24,7 @@
  */
 namespace webfiori\framework;
 
+use webfiori\http\Response;
 use webfiori\conf\Config;
 use webfiori\framework\cli\CLI;
 use webfiori\framework\ui\MessageBox;

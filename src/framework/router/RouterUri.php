@@ -128,6 +128,7 @@ class RouterUri extends Uri {
         $this->setClosureParams($closureParams);
         $this->incInSiteMap = false;
         $this->languages = [];
+        $this->addMiddleware('global');
     }
     /**
      * Returns a list that holds objects for the middleware.

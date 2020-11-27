@@ -251,11 +251,7 @@ class Util {
         if (class_exists('webfiori\conf\Config')) {
             if (class_exists('webfiori\conf\SiteConfig')) {
                 if (Config::isConfig() === true || WebFiori::getClassStatus() == 'INITIALIZING') {
-                    if ($checkDb === true) {
-                        $returnValue = self::_checkDbStatus($dbName);
-                    } else {
-                        $returnValue = true;
-                    }
+                    $returnValue = true;
                 } else {
                     $returnValue = Util::NEED_CONF;
                 }
@@ -712,30 +708,6 @@ class Util {
         }
 
         return $datesArr;
-    }
-    private static function _checkDbStatus($dbName) {
-        $connInfo = Config::getDBConnection($dbName);
-        $returnValue = false;
-
-        if ($connInfo instanceof DBConnectionInfo) {
-            $returnValue = DBConnectionFactory::mysqlLink([
-                'host' => $connInfo->getHost(),
-                'port' => $connInfo->getPort(),
-                'user' => $connInfo->getUsername(),
-                'pass' => $connInfo->getPassword(),
-                'db-name' => $connInfo->getDBName()
-            ]);
-
-            if (gettype($returnValue) == 'object') {
-                $returnValue = true;
-            } else {
-                $returnValue = self::DB_NEED_CONF;
-            }
-        } else {
-            $returnValue = self::DB_NEED_CONF;
-        }
-
-        return $returnValue;
     }
     /**
      * Collect request headers from the array $_SERVER.

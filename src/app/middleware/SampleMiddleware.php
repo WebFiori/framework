@@ -10,8 +10,14 @@ use webfiori\http\Response;
  */
 class SampleMiddleware extends AbstractMiddleware {
     public function __construct() {
+        //Each middleware must have a unique name.
         parent::__construct('sample-middleware');
+        
+        //Set the priority to higher number to reach it first.
         $this->setPriority(0);
+        
+        //Add the middleware to the global middleware group
+        $this->addToGroup('global');
     }
     public function after() {
         // A routine to execute after sending the response and before terminating 

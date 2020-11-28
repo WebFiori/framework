@@ -461,9 +461,13 @@ class Util {
      */
     public static function getRequestedURL() {
         $base = self::getBaseURL();
-        
-        $requestedURI = trim(filter_var(getenv('REQUEST_URI')),'/');
-        
+        $uri = getenv('REQUEST_URI');
+        if ($uri === false) {
+            // Using builtin server, it will be false
+            $uri = isset($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : '';
+            return $base.'/'.$uri;
+        }
+        $requestedURI = trim(filter_var($uri),'/');
         return $base.'/'.$requestedURI;
     }
     /**

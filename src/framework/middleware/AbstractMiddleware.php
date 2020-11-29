@@ -29,11 +29,16 @@ use webfiori\collections\Comparable;
  * An abstract class that can be used to implement custom middleware.
  * 
  * Every middleware the developer write must be placed in the folder 'app/middleware' 
- * of the framework.
+ * of the framework in order for the framework to auto-register the middleware. 
+ * If the middleware is placed in another place, then the developer must register 
+ * it manually using the method MiddlewareManager::register() before adding 
+ * the middleware to any route.
  *
  * @author Ibrahim
  * 
  * @version 1.0
+ * 
+ * @since 2.0.0
  */
 abstract class AbstractMiddleware implements Comparable {
     /**
@@ -62,6 +67,11 @@ abstract class AbstractMiddleware implements Comparable {
     /**
      * Perform an action before accessing application level.
      * 
+     * This method will get executed before routing happens. One use case of 
+     * this method is to use it to check if the user is authorized to access 
+     * the system or not. If he is not, then send back a redirect header that 
+     * takes the user to login screen or just send a 401 response code with 
+     * a message.
      * 
      * @since 1.0
      */
@@ -69,6 +79,9 @@ abstract class AbstractMiddleware implements Comparable {
     /**
      * Perform an action after accessing application level and before sending 
      * the request.
+     * 
+     * This method can be used to add extra payload to the response or even 
+     * change it totally before sending back the response.
      * 
      * @since 1.0
      */
@@ -79,7 +92,7 @@ abstract class AbstractMiddleware implements Comparable {
      * 
      * @since 1.0
      */
-    public abstract function afterTerminate();
+    public abstract function afterSend();
     /**
      * Creates new instance of the class.
      * 
@@ -109,6 +122,18 @@ abstract class AbstractMiddleware implements Comparable {
         $trimmed = trim($groupName);
         if (strlen($trimmed) > 0 && !in_array($trimmed, $this->getGroups())) {
             $this->groups[] = $trimmed;
+        }
+    }
+    /**
+     * Adds the middleware to more than one group.
+     * 
+     * @param array $groupsArr An array that contains the mames of the groups.
+     * 
+     * @since 1.0
+     */
+    public function addToGroups(array $groupsArr) {
+        foreach ($groupsArr as $groupName) {
+            $this->addToGroup($groupName);
         }
     }
     /**
@@ -173,7 +198,11 @@ abstract class AbstractMiddleware implements Comparable {
     /**
      * Compare the priority of the middleware with another one.
      * 
-     * @param AbstractMiddleware $other
+     * The main aim of this method is to prioritize which middleware will be reached 
+     * first. First the method checks the priority of the middleware. If the 
+     * two have same priority, it will use the name of the middleware.
+     * 
+     * @param AbstractMiddleware $other Another middleware to compare with.
      * 
      * @return int 
      * 

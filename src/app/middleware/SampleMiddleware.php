@@ -24,7 +24,7 @@ class SampleMiddleware extends AbstractMiddleware {
         // The application.
     }
 
-    public function afterTerminate() {
+    public function afterSend() {
         // A routine to execute after terminating The application
     }
 

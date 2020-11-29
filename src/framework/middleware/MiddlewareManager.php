@@ -31,6 +31,8 @@ use webfiori\framework\WebFiori;
  * @author Ibrahim
  * 
  * @since 1.0
+ * 
+ * @since 2.0.0
  */
 class MiddlewareManager {
     /**

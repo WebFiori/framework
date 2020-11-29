@@ -45,6 +45,7 @@ use webfiori\ini\GlobalConstants;
 use webfiori\ini\InitAutoLoad;
 use webfiori\ini\InitCron;
 use webfiori\ini\InitPrivileges;
+use webfiori\ini\InitMiddleware;
 use webfiori\framework\ConfigController;
 use webfiori\framework\middleware\MiddlewareManager;
 use webfiori\framework\session\SessionsManager;
@@ -197,6 +198,7 @@ class WebFiori {
         WebFiori::autoRegister('middleware', function($inst) {
             MiddlewareManager::register($inst);
         });
+        InitMiddleware::init();
         $this->_initRoutes();
         $this->_initCRON();
         Response::beforeSend(function () {
@@ -444,8 +446,8 @@ class WebFiori {
         if (!class_exists('webfiori\database\ResultSet')) {
             throw new InitializationException("The standard library 'webfiori/database' is missing.");
         }
-
-        if (!class_exists('webfiori\http\WebServicesManager')) {
+        
+        if (!class_exists('webfiori\http\Response')) {
             throw new InitializationException("The standard library 'webfiori/http' is missing.");
         }
     }
@@ -520,13 +522,17 @@ class WebFiori {
     }
     private function _setExceptionHandler() {
         set_exception_handler(function($ex)
-        {
+        { 
+            $useResponsClass = class_exists('webfiori\\http\\Response');
             $isCli = class_exists('webfiori\framework\cli\CLI') ? CLI::isCLI() : php_sapi_name() == 'cli';
-            Response::clear();
+            if ($useResponsClass) {
+                Response::clear();
+            }
             if ($isCli) {
                 CLI::displayException($ex);
             } else {
-                Response::setCode(500);
+                
+                
                 $routeUri = Router::getUriObjByURL(Util::getRequestedURL());
 
                 if ($routeUri !== null) {
@@ -534,8 +540,9 @@ class WebFiori {
                 } else {
                     $routeType = Router::VIEW_ROUTE;
                 }
-
+                
                 if ($routeType == Router::API_ROUTE || defined('API_CALL')) {
+                    
                     $j = new Json([
                         'message' => '500 - Server Error: Uncaught Exception.',
                         'type' => 'error',
@@ -543,7 +550,7 @@ class WebFiori {
                         'exception-message' => $ex->getMessage(),
                         'exception-code' => $ex->getMessage()
                     ], true);
-
+                    
                     if (defined('WF_VERBOSE') && WF_VERBOSE) {
                         $j->add('file', $ex->getFile());
                         $j->add('line', $ex->getLine());
@@ -561,11 +568,18 @@ class WebFiori {
                         }
                         $j->add('stack-trace',$stackTrace);
                     }
-                    Response::addHeader('content-type', 'application/json');
-                    Response::write($j);
-                    Response::send();
+                    if ($useResponsClass) {
+                        Response::addHeader('content-type', 'application/json');
+                        Response::write($j);
+                        Response::setCode(500);
+                        Response::send();
+                    } else {
+                        http_response_code(500);
+                        header('content-type:application/json');
+                        echo $j;
+                    }
                 } else {
-                    $exceptionView = new ServerErrView($ex);
+                    $exceptionView = new ServerErrView($ex, $useResponsClass);
                     $exceptionView->show(500);
                 }
             }

@@ -35,7 +35,11 @@ use webfiori\framework\cron\Cron;
 class InitCron {
     /**
      * A method that can be used to initialize cron jobs.
-     * The developer can use this method to create cron jobs.
+     * 
+     * The main aim of this method is to give the developer a way to register 
+     * the jobs which are created outside the folder 'app/jobs'. To register 
+     * any job, use the method Cron::scheduleJob().
+     * 
      * @since 1.0
      */
     public static function init() {

@@ -34,6 +34,7 @@ WebFiori Framework is a mini web development framework which is built using PHP 
 * Basic template engine.
 * Fast routing system that makes the ability of creating search-engine-friendly URLs an easy task.
 * Creation of web services (or APIs) that supports JSON with data filtering and validation.
+* Middleware support which can help in filtering HTTP requests before reaching application level.
 * Basic support for MySQL schema and query building.
 * Lightweight. The total size of framework core files is less than 3 megabytes.
 * Access management by assigning system user a set of privileges.
@@ -46,6 +47,7 @@ WebFiori Framework is a mini web development framework which is built using PHP 
 * Ability to implement custom CLI commands.
 
 ## Standard Libraries
+
 | Library | Build | Latest |
 |----|----|----|
 | [HTTP](https://github.com/WebFiori/http) | <a href="https://travis-ci.com/github/WebFiori/http"><img src="https://travis-ci.com/WebFiori/http.svg?branch=master"></a> | <a href="https://github.com/WebFiori/http/releases"><img src="https://img.shields.io/github/release/WebFiori/restEasy.svg" /></a> |
@@ -53,6 +55,7 @@ WebFiori Framework is a mini web development framework which is built using PHP 
 | [UI](https://github.com/WebFiori/ui) | <a href="https://travis-ci.com/github/WebFiori/ui"><img src="https://travis-ci.com/WebFiori/ui.svg?branch=master"></a> | <a href="https://github.com/WebFiori/ui/releases"><img src="https://img.shields.io/github/release/WebFiori/ui.svg" /></a> |
 | [Collections](https://github.com/WebFiori/collections) | <a href="https://travis-ci.com/github/WebFiori/collections"><img src="https://travis-ci.com/WebFiori/collections.svg?branch=master"></a> | <a href="https://github.com/WebFiori/collections/releases"><img src="https://img.shields.io/github/release/WebFiori/collections.svg" /></a> |
 | [Database](https://github.com/WebFiori/database) | <a href="https://travis-ci.com/github/WebFiori/database"><img src="https://travis-ci.com/WebFiori/database.svg?branch=main"></a> | <a href="https://github.com/WebFiori/database/releases"><img src="https://img.shields.io/github/release/WebFiori/database.svg" /></a> |
+
 ## Problems Solved
 
 One of the things that any developer cares about any software project is the problem or problems it solves. As for WebFiori framework, It can help in solving the following problems:
@@ -66,6 +69,7 @@ One of the things that any developer cares about any software project is the pro
 * Solved the issues which are found in default PHP session management implementation.
 
 ## Getting Started 
+
 To learn the basics of how to use the framework, please head on to https://webfiori.com/learn. You can also read the docs which can be found in [docs repo](https://github.com/usernane/wf-docs). In addition to that, you can read the API docs of the framework at [the official website](https://webfiori.com/docs).
 
 ## Supported Environments 
@@ -94,10 +98,10 @@ To learn the basics of how to use the framework, please head on to https://webfi
 
 
 ## Setup
+
 ### Local Development Environment
-If you plan to test the framework on your local machine, you have to download AMP (Apache, MySQL and PHP) stack first. 
-We suggest to use the ones that are offered by Bitnami. You can go to https://bitnami.com/stacks/infrastructure to check 
-the available options.
+
+If you plan to test the framework on your local machine, the recomended way is to have AMP stack (Apache, MySQL and PHP). There are many available online. We suggest to use the ones that are offered by Bitnami. You can go to https://bitnami.com/stacks/infrastructure to check  the available options.
 
 After installing AMP stack, you can ethier use composer to install the framework or download it throgh https://webfiori.com/download. If you plan to use composer, then you must first download it from their website: https://getcomposer.org/download/. Once downloaded, place the `.phar` file in the folder `htdocs` or your server root. Once you do that, run the terminal in `htdocs` and run the following command: 
 
@@ -106,13 +110,20 @@ php composer.phar create-project --prefer-dist webfiori/framework my-site
 ```
 This command will create new folder with the name `my-site` and install the framework inside it. 
 
+For more information about how to setup the framework, [check here](https://webfiori.com/learn/installation).
+
+
+## Contribution
+
+For information on how to contribute to the project, [check here](https://webfiori.com/contribute).
 
 ## Notes
 * This project is a hoppy project. 
 * The main aim of this project is learning.
 * The project is reletivly new and for sure has issues.
-* If you think that there is a better way of doing things or wants new feature, feel free to drop an issue.
+* If you think that there is a better way of doing things or wants new feature, feel free to [drop an issue](https://github.com/WebFiori/framework/issues/new).
 * To report security vulnerabilities, please send an email to [ibrahim@webfiori.com](mailto:ibrahim@webfiori.com).
 
 ## License
+
 The project is licensed under MIT license.

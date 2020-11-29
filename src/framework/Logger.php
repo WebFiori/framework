@@ -99,7 +99,7 @@ class Logger {
     private $logMessagesArr;
     private function __construct() {
         if (defined('ROOT_DIR')) {
-            $this->_setDirectory(ROOT_DIR.'/logs');
+            $this->_setDirectory(ROOT_DIR.DS.'app'.DS.'storage'.DS.'logs');
         } else {
             $this->_setDirectory('/logs');
         }

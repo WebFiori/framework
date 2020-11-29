@@ -32,6 +32,7 @@ use webfiori\framework\DB;
 use webfiori\framework\ConfigController;
 use webfiori\framework\WebFiori;
 use webfiori\framework\session\SessionsManager;
+use webfiori\http\Request;
 /**
  * An extension for the class 'WebServicesManager' that adds support for multi-language 
  * response messages.
@@ -409,7 +410,7 @@ abstract class ExtendedWebServicesManager extends WebServicesManager {
      * Set the language at which the API is going to use for the response.
      */
     private function _setTranslation() {
-        $reqMeth = $this->getRequestMethod();
+        $reqMeth = Request::getMethod();
         $activeSession = SessionsManager::getActiveSession();
         if ($activeSession !== null) {
             $tempCode = $activeSession->getLangCode(true);

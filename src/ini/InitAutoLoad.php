@@ -36,7 +36,8 @@ class InitAutoLoad {
      * Add user-defined directories to the set of directories at which the framework 
      * will search for classes.
      * The developer can use the method AutoLoader::newSearchFolder() to add 
-     * new search directory.
+     * new search directory. Note that the developer does not have to 
+     * register the folder 'vendor' as it will be auto-registered.
      */
     public static function init() {
         $AU = AutoLoader::get();

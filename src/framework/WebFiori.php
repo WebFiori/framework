@@ -169,7 +169,7 @@ class WebFiori {
         }
         self::$AU = AutoLoader::get();
         InitAutoLoad::init();
-        
+        $this->_initThemesPath();
         $this->_setHandlers();
         $this->_checkStandardLibs();
         
@@ -228,6 +228,17 @@ class WebFiori {
         self::$classStatus = 'INITIALIZED';
 
         define('INITIAL_SYS_STATUS', $this->_getSystemStatus());
+    }
+    private function _initThemesPath() {
+        if (!defined('THEMES_PATH')) {
+            $themesDirName = 'themes';
+            $themesPath = ROOT_DIR.DS.$themesDirName;
+            /**
+             * This constant represents the directory at which themes exist.
+             * @since 1.0
+             */
+            define('THEMES_PATH', $themesPath);
+        }
     }
     private function _initRoutes() {
         APIRoutes::create();
@@ -637,8 +648,8 @@ class WebFiori {
                         $errPage = new ServerErrView($error);
                         $errPage->show(500);
                     }
-                    Response::send();
                 }
+                Response::send();
             }
         });
     }

@@ -125,15 +125,6 @@ class GlobalConstants {
             define('NO_WWW', false);
         }
 
-        if (!defined('THEMES_PATH')) {
-            $themesDirName = 'themes';
-            $themesPath = substr(__DIR__, 0, strlen(__DIR__) - strlen('/ini')).DIRECTORY_SEPARATOR.$themesDirName;
-            /**
-             * This constant represents the directory at which themes exist.
-             * @since 1.0
-             */
-            define('THEMES_PATH', $themesPath);
-        }
         if (!defined('MAX_BOX_MESSAGES')) {
             /**
              * The maximum number of message boxes to show in one page.

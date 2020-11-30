@@ -49,6 +49,7 @@ use webfiori\ini\InitMiddleware;
 use webfiori\framework\ConfigController;
 use webfiori\framework\middleware\MiddlewareManager;
 use webfiori\framework\session\SessionsManager;
+use webfiori\http\Request;
 /**
  * The time at which the framework was booted in microseconds as a float.
  * 
@@ -146,7 +147,7 @@ class WebFiori {
         }
         
         if (!class_exists('webfiori\ini\GlobalConstants')) {
-            require_once ROOT_DIR.DIRECTORY_SEPARATOR.'ini'.DIRECTORY_SEPARATOR.'GlobalConstants.php';
+            require_once ROOT_DIR.DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR.'ini'.DIRECTORY_SEPARATOR.'GlobalConstants.php';
         }
         GlobalConstants::defineConstants();
         
@@ -594,39 +595,49 @@ class WebFiori {
         $this->_setExceptionHandler();
         register_shutdown_function(function()
         {
-            Response::clear();
-            $isCli = class_exists('webfiori\framework\cli\CLI') ? CLI::isCLI() : php_sapi_name() == 'cli';
-            $error = error_get_last();
+            if (!Response::isSent()) {
+                
+                $isCli = class_exists('webfiori\framework\cli\CLI') ? CLI::isCLI() : php_sapi_name() == 'cli';
+                $error = error_get_last();
 
-            if ($error !== null) {
-                $errNo = $error['type'];
+                if ($error !== null) {
+                    Response::clear();
+                    $errNo = $error['type'];
 
-                if ($errNo == E_WARNING || 
-                   $errNo == E_NOTICE || 
-                   $errNo == E_USER_ERROR || 
-                   $errNo == E_USER_NOTICE) {
-                    return;
-                }
+                    if ($errNo == E_WARNING || 
+                       $errNo == E_NOTICE || 
+                       $errNo == E_USER_ERROR || 
+                       $errNo == E_USER_NOTICE) {
+                        return;
+                    }
 
-                if (!$isCli) {
-                    Response::setCode(500);
-                }
-
-                if (defined('API_CALL')) {
-                    $j = new Json([
-                        'message' => $error["message"],
-                        'type' => 'error',
-                        'error-number' => $error["type"],
-                        'file' => $error["file"],
-                        'line' => $error["line"]
-                    ], true);
-                    Response::write($j);
+                    if (!$isCli) {
+                        Response::setCode(500);
+                    }
+                    $uri = Router::getUriObjByURL(Request::getRequestedURL());
+                    if ($uri !== null) {
+                        if ($uri->getType() == Router::API_ROUTE) {
+                            $j = new Json([
+                                'message' => $error["message"],
+                                'type' => 'error',
+                                'error-number' => $error["type"],
+                            ], true);
+                            if (defined('WF_VERBOSE') && WF_VERBOSE) {
+                                $j->add('file', $error["file"]);
+                                $j->add('line', $error["line"]);
+                            }
+                            Response::write($j);
+                        } else {
+                            $errPage = new ServerErrView($error);
+                            $errPage->show(500);
+                        }
+                    } else if ($isCli) {
+                        CLI::displayErr($error['type'], $error["message"], $error["file"], $error["line"]);
+                    } else {
+                        $errPage = new ServerErrView($error);
+                        $errPage->show(500);
+                    }
                     Response::send();
-                } else if ($isCli) {
-                    CLI::displayErr($error['type'], $error["message"], $error["file"], $error["line"]);
-                } else {
-                    $errPage = new ServerErrView($error);
-                    $errPage->show(500);
                 }
             }
         });

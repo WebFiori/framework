@@ -159,6 +159,15 @@ class GlobalConstants {
              */
             define('DS', DIRECTORY_SEPARATOR);
         }
+        if (!defined('THEMES_PATH')) {
+            $themesDirName = 'themes';
+            $themesPath = substr(__DIR__, 0, strlen(__DIR__) - strlen('/app/ini')).DIRECTORY_SEPARATOR.$themesDirName;
+            /**
+             * This constant represents the directory at which themes exist.
+             * @since 1.0
+             */
+            define('THEMES_PATH', $themesPath);
+        }
         if (!defined('USE_HTTP')) {
             /**
              * Sets the framework to use 'http://' or 'https://' for base URIs.

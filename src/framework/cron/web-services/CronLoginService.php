@@ -25,8 +25,8 @@
  */
 namespace webfiori\framework\cron\webServices;
 
-use webfiori\restEasy\AbstractWebService;
-use webfiori\restEasy\RequestParameter;
+use webfiori\http\AbstractWebService;
+use webfiori\http\RequestParameter;
 use webfiori\framework\session\SessionsManager;
 use webfiori\framework\cron\Cron;
 /**

@@ -25,12 +25,12 @@
  */
 namespace webfiori\framework\cron\webServices;
 
-use webfiori\restEasy\AbstractWebService;
+use webfiori\http\AbstractWebService;
 use webfiori\framework\cron\Cron;
-use webfiori\restEasy\RequestParameter;
+use webfiori\http\RequestParameter;
 use webfiori\framework\session\SessionsManager;
 use webfiori\json\Json;
-use webfiori\restEasy\WebServicesManager;
+use webfiori\http\WebServicesManager;
 /**
  * A web service which is used to force job execution using web interface.
  *

@@ -29,7 +29,7 @@ use webfiori\ui\JsCode;
 use webfiori\framework\Page;
 use webfiori\framework\WebFiori;
 use webfiori\framework\session\SessionsManager;
-use webfiori\framework\Response;
+use webfiori\http\Response;
 /**
  * A generic view for cron related operations. 
  * 

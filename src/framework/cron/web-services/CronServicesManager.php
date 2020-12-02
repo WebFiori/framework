@@ -26,7 +26,7 @@
 
 namespace webfiori\framework\cron\webServices;
 
-use webfiori\restEasy\WebServicesManager;
+use webfiori\http\WebServicesManager;
 /**
  * A class which is used to manage CRON jobs related services.
  *

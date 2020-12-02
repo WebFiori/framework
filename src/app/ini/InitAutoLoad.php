@@ -2,7 +2,7 @@
 /*
  * The MIT License
  *
- * Copyright 2020 Ibrahim, WebFiori Framework.
+ * Copyright 2019 Ibrahim, WebFiori Framework.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,24 +24,26 @@
  */
 namespace webfiori\ini;
 
-use webfiori\framework\cli\CLI;
+use webfiori\framework\AutoLoader;
 /**
- * A class that contains one method for registering custom CLI 
- * commands.
+ * A class that has one method to initialize user-defined autoload directories.
  *
  * @author Ibrahim
+ * @version 1.0
  */
-class InitCliCommands {
+class InitAutoLoad {
     /**
-     * Register user defined CLI commands.
-     * This method can be used by the developers to add any custom 
-     * CLI command that they have created. Assuming that we have a 
-     * custom command with the name 'ProcessEmailCommand', then it 
-     * can be registered as follows:<br/>
-     * <code>
-     * CLI::register(new ProcessEmailCommand());
-     * </code>
+     * Add user-defined directories to the set of directories at which the framework 
+     * will search for classes.
+     * The developer can use the method AutoLoader::newSearchFolder() to add 
+     * new search directory. Note that the developer does not have to 
+     * register the folder 'vendor' as it will be auto-registered.
      */
     public static function init() {
+        $AU = AutoLoader::get();
+
+        //this is a sample code that shows how to add folders.
+        $AU->newSearchFolder('my-system');
+        $AU->newSearchFolder('my-entities', false);
     }
 }

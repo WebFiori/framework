@@ -34,10 +34,12 @@ use webfiori\framework\Access;
 class InitPrivileges {
     /**
      * Initialize user groups and privileges.
+     * 
      * The developer can modify the body of this method to create user groups 
      * and assign privileges to each group. To create new group, use the 
      * method Access::newGroup(). To create a privilege in a group, use the 
      * method Access::newPrivilege().
+     * 
      * @since 1.0
      */
     public static function init() {

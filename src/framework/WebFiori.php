@@ -23,6 +23,7 @@
  * THE SOFTWARE.
  */
 namespace webfiori\framework;
+use webfiori\http\Response;
 use webfiori\json\Json;
 use webfiori\conf\Config;
 use webfiori\conf\MailConfig;
@@ -37,7 +38,6 @@ use webfiori\framework\router\Router;
 use webfiori\framework\router\RouterUri;
 use webfiori\framework\router\ViewRoutes;
 use webfiori\framework\ThemeLoader;
-use webfiori\framework\Response;
 use webfiori\framework\ui\ErrorBox;
 use webfiori\framework\ui\ServerErrView;
 use webfiori\framework\Util;
@@ -45,7 +45,11 @@ use webfiori\ini\GlobalConstants;
 use webfiori\ini\InitAutoLoad;
 use webfiori\ini\InitCron;
 use webfiori\ini\InitPrivileges;
+use webfiori\ini\InitMiddleware;
 use webfiori\framework\ConfigController;
+use webfiori\framework\middleware\MiddlewareManager;
+use webfiori\framework\session\SessionsManager;
+use webfiori\http\Request;
 /**
  * The time at which the framework was booted in microseconds as a float.
  * 
@@ -143,7 +147,7 @@ class WebFiori {
         }
         
         if (!class_exists('webfiori\ini\GlobalConstants')) {
-            require_once ROOT_DIR.DIRECTORY_SEPARATOR.'ini'.DIRECTORY_SEPARATOR.'GlobalConstants.php';
+            require_once ROOT_DIR.DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR.'ini'.DIRECTORY_SEPARATOR.'GlobalConstants.php';
         }
         GlobalConstants::defineConstants();
         
@@ -165,7 +169,7 @@ class WebFiori {
         }
         self::$AU = AutoLoader::get();
         InitAutoLoad::init();
-        
+        $this->_initThemesPath();
         $this->_setHandlers();
         $this->_checkStandardLibs();
         
@@ -192,21 +196,55 @@ class WebFiori {
             $this->dbErrDetails = $this->sysStatus;
             $this->sysStatus = Util::DB_NEED_CONF;
         }
-        
+        WebFiori::autoRegister('middleware', function($inst) {
+            MiddlewareManager::register($inst);
+        });
+        InitMiddleware::init();
         $this->_initRoutes();
         $this->_initCRON();
-
+        Response::beforeSend(function () {
+            register_shutdown_function(function() {
+                SessionsManager::validateStorage();
+                $uriObj = Router::getRouteUri();
+                if ($uriObj !== null) {
+                    foreach ($uriObj->getMiddlewar() as $mw) {
+                        $mw->afterTerminate();
+                    }
+                }
+            });
+            $sessionsCookiesHeaders = SessionsManager::getCookiesHeaders();
+            foreach ($sessionsCookiesHeaders as $headerVal) {
+                Response::addHeader('set-cookie', $headerVal);
+            }
+            $uriObj = Router::getRouteUri();
+            if ($uriObj !== null) {
+                $uriObj->getMiddlewar()->insertionSort();
+                foreach ($uriObj->getMiddlewar() as $mw) {
+                    $mw->after();
+                }
+            }
+        });
         //class is now initialized
         self::$classStatus = 'INITIALIZED';
 
         define('INITIAL_SYS_STATUS', $this->_getSystemStatus());
+    }
+    private function _initThemesPath() {
+        if (!defined('THEMES_PATH')) {
+            $themesDirName = 'themes';
+            $themesPath = ROOT_DIR.DS.$themesDirName;
+            /**
+             * This constant represents the directory at which themes exist.
+             * @since 1.0
+             */
+            define('THEMES_PATH', $themesPath);
+        }
     }
     private function _initRoutes() {
         APIRoutes::create();
         ViewRoutes::create();
         ClosureRoutes::create();
         OtherRoutes::create();
-        ThemeLoader::registerResourcesRoutes();
     }
     private function _initCRON() {
         $uriObj = new RouterUri(Util::getRequestedURL(), '');
@@ -420,9 +458,9 @@ class WebFiori {
         if (!class_exists('webfiori\database\ResultSet')) {
             throw new InitializationException("The standard library 'webfiori/database' is missing.");
         }
-
-        if (!class_exists('webfiori\restEasy\WebServicesManager')) {
-            throw new InitializationException("The standard library 'webfiori/rest-easy' is missing.");
+        
+        if (!class_exists('webfiori\http\Response')) {
+            throw new InitializationException("The standard library 'webfiori/http' is missing.");
         }
     }
     /**
@@ -463,7 +501,7 @@ class WebFiori {
                 if (defined('STOP_CLI_ON_ERR') && STOP_CLI_ON_ERR === true) {
                     exit(-1);
                 }
-            } else if ($routerObj->getType() == Router::API_ROUTE) {
+            } else if ($routerObj !== null && $routerObj->getType() == Router::API_ROUTE) {
                 Response::setCode(500);
                 $j = new Json([
                     'message' => $errstr,
@@ -477,7 +515,7 @@ class WebFiori {
                     $j->add('line',$errline);
                 }
                 Response::addHeader('content-type', 'application/json');
-                Response::append($j);
+                Response::write($j);
                 Response::send();
             } else {
                 $errBox = new ErrorBox();
@@ -487,7 +525,7 @@ class WebFiori {
                     $errBox->setFile($errfile);
                     $errBox->setMessage($errstr);
                     $errBox->setLine($errline);
-                    Response::append($errBox);
+                    Response::write($errBox);
                 }
             }
 
@@ -496,13 +534,17 @@ class WebFiori {
     }
     private function _setExceptionHandler() {
         set_exception_handler(function($ex)
-        {
+        { 
+            $useResponsClass = class_exists('webfiori\\http\\Response');
             $isCli = class_exists('webfiori\framework\cli\CLI') ? CLI::isCLI() : php_sapi_name() == 'cli';
-            Response::clear();
+            if ($useResponsClass) {
+                Response::clear();
+            }
             if ($isCli) {
                 CLI::displayException($ex);
             } else {
-                Response::setCode(500);
+                
+                
                 $routeUri = Router::getUriObjByURL(Util::getRequestedURL());
 
                 if ($routeUri !== null) {
@@ -510,8 +552,9 @@ class WebFiori {
                 } else {
                     $routeType = Router::VIEW_ROUTE;
                 }
-
+                
                 if ($routeType == Router::API_ROUTE || defined('API_CALL')) {
+                    
                     $j = new Json([
                         'message' => '500 - Server Error: Uncaught Exception.',
                         'type' => 'error',
@@ -519,7 +562,7 @@ class WebFiori {
                         'exception-message' => $ex->getMessage(),
                         'exception-code' => $ex->getMessage()
                     ], true);
-
+                    
                     if (defined('WF_VERBOSE') && WF_VERBOSE) {
                         $j->add('file', $ex->getFile());
                         $j->add('line', $ex->getLine());
@@ -537,11 +580,18 @@ class WebFiori {
                         }
                         $j->add('stack-trace',$stackTrace);
                     }
-                    Response::addHeader('content-type', 'application/json');
-                    Response::append($j);
-                    Response::send();
+                    if ($useResponsClass) {
+                        Response::addHeader('content-type', 'application/json');
+                        Response::write($j);
+                        Response::setCode(500);
+                        Response::send();
+                    } else {
+                        http_response_code(500);
+                        header('content-type:application/json');
+                        echo $j;
+                    }
                 } else {
-                    $exceptionView = new ServerErrView($ex);
+                    $exceptionView = new ServerErrView($ex, $useResponsClass);
                     $exceptionView->show(500);
                 }
             }
@@ -556,40 +606,50 @@ class WebFiori {
         $this->_setExceptionHandler();
         register_shutdown_function(function()
         {
-            Response::clear();
-            $isCli = class_exists('webfiori\framework\cli\CLI') ? CLI::isCLI() : php_sapi_name() == 'cli';
-            $error = error_get_last();
+            if (!Response::isSent()) {
+                
+                $isCli = class_exists('webfiori\framework\cli\CLI') ? CLI::isCLI() : php_sapi_name() == 'cli';
+                $error = error_get_last();
 
-            if ($error !== null) {
-                $errNo = $error['type'];
+                if ($error !== null) {
+                    Response::clear();
+                    $errNo = $error['type'];
 
-                if ($errNo == E_WARNING || 
-                   $errNo == E_NOTICE || 
-                   $errNo == E_USER_ERROR || 
-                   $errNo == E_USER_NOTICE) {
-                    return;
+                    if ($errNo == E_WARNING || 
+                       $errNo == E_NOTICE || 
+                       $errNo == E_USER_ERROR || 
+                       $errNo == E_USER_NOTICE) {
+                        return;
+                    }
+
+                    if (!$isCli) {
+                        Response::setCode(500);
+                    }
+                    $uri = Router::getUriObjByURL(Request::getRequestedURL());
+                    if ($uri !== null) {
+                        if ($uri->getType() == Router::API_ROUTE) {
+                            $j = new Json([
+                                'message' => $error["message"],
+                                'type' => 'error',
+                                'error-number' => $error["type"],
+                            ], true);
+                            if (defined('WF_VERBOSE') && WF_VERBOSE) {
+                                $j->add('file', $error["file"]);
+                                $j->add('line', $error["line"]);
+                            }
+                            Response::write($j);
+                        } else {
+                            $errPage = new ServerErrView($error);
+                            $errPage->show(500);
+                        }
+                    } else if ($isCli) {
+                        CLI::displayErr($error['type'], $error["message"], $error["file"], $error["line"]);
+                    } else {
+                        $errPage = new ServerErrView($error);
+                        $errPage->show(500);
+                    }
                 }
-
-                if (!$isCli) {
-                    Response::setCode(500);
-                }
-
-                if (defined('API_CALL')) {
-                    $j = new Json([
-                        'message' => $error["message"],
-                        'type' => 'error',
-                        'error-number' => $error["type"],
-                        'file' => $error["file"],
-                        'line' => $error["line"]
-                    ], true);
-                    Response::append($j);
-                    Response::send();
-                } else if ($isCli) {
-                    CLI::displayErr($error['type'], $error["message"], $error["file"], $error["line"]);
-                } else {
-                    $errPage = new ServerErrView($error);
-                    $errPage->show(500);
-                }
+                Response::send();
             }
         });
     }

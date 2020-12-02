@@ -24,7 +24,7 @@
  */
 namespace webfiori\framework\cli;
 
-use webfiori\restEasy\AbstractWebService;
+use webfiori\http\AbstractWebService;
 /**
  * A class which is used to hold CLI created services temporary.
  * 

@@ -229,7 +229,7 @@ class ThemeLoader {
                         $file = new File($fileDir.DS.$dir.DS.$fileName);
                         $file->view();
                     } else {
-                        Response::append('Resource "'.$themeDirName.'/'.$dir.'/'.$fileName.'" was not found.');
+                        Response::write('Resource "'.$themeDirName.'/'.$dir.'/'.$fileName.'" was not found.');
                         Response::setCode(404);
                     }
                 },

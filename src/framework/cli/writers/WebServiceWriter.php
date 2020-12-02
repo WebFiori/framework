@@ -27,8 +27,8 @@ namespace webfiori\framework\cli;
 use InvalidArgumentException;
 use restEasy\WebService;
 use restEasy\WebServicesSet;
-use webfiori\restEasy\AbstractWebService;
-use webfiori\restEasy\RequestParameter;
+use webfiori\http\AbstractWebService;
+use webfiori\http\RequestParameter;
 
 /**
  * A writer class which is used to create new web service class.

@@ -2,7 +2,7 @@
 
 namespace webfiori\tests\entity;
 use PHPUnit\Framework\TestCase;
-use webfiori\framework\Response;
+use webfiori\http\Response;
 
 /**
  * Description of RequestTest
@@ -71,7 +71,7 @@ class ResponseTest extends TestCase {
      * @test
      */
     public function testClearBody() {
-        Response::append('Hello World!');
+        Response::write('Hello World!');
         $this->assertEquals('Hello World!', Response::getBody());
         Response::clearBody();
         $this->assertEquals('', Response::getBody());

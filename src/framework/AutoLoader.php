@@ -590,7 +590,7 @@ class AutoLoader {
      * @since 1.1.6
      */
     private function _readCache() {
-        $autoloadCache = $this->getRoot().DIRECTORY_SEPARATOR.self::CACHE_NAME;
+        $autoloadCache = $this->getRoot().DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR.'storage'.DIRECTORY_SEPARATOR.self::CACHE_NAME;
         //For first run, the cache file might not exist.
         if (file_exists($autoloadCache)) {
             $casheStr = file_get_contents($autoloadCache);
@@ -625,7 +625,7 @@ class AutoLoader {
      * @since 1.1.6
      */
     private function _updateCache() {
-        $autoloadCache = $this->getRoot().DIRECTORY_SEPARATOR.self::CACHE_NAME;
+        $autoloadCache = $this->getRoot().DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR.'storage'.DIRECTORY_SEPARATOR.self::CACHE_NAME;
         $h = fopen($autoloadCache, 'w');
 
         foreach ($this->loadedClasses as $classArr) {

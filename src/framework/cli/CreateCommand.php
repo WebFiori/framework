@@ -28,15 +28,15 @@ use Error;
 use webfiori\database\mysql\MySQLColumn;
 use webfiori\database\mysql\MySQLTable;
 use restEasy\WebService;
-use webfiori\restEasy\APIFilter;
-use webfiori\restEasy\ParamTypes;
-use webfiori\restEasy\RequestParameter;
+use webfiori\http\APIFilter;
+use webfiori\http\ParamTypes;
+use webfiori\http\RequestParameter;
 use webfiori\framework\AutoLoader;
 use webfiori\framework\Util;
 use webfiori\framework\WebFiori;
 use webfiori\database\Table;
 use Exception;
-use webfiori\restEasy\AbstractWebService;
+use webfiori\http\AbstractWebService;
 /**
  * A command which is used to automate some of the common tasks such as 
  * creating table classes or controllers.

@@ -6,7 +6,8 @@ use webfiori\framework\WebFiori;
 use webfiori\framework\Util;
 use webfiori\framework\session\SessionsManager;
 use webfiori\framework\cli\CLI;
-use webfiori\framework\Response;
+use webfiori\http\Response;
+use webfiori\http\Request;
 use webfiori\framework\router\Router;
 /**
  * The entry point of all requests.
@@ -52,7 +53,7 @@ class Index {
         } else {
             //route user request.
             SessionsManager::start('wf-session');
-            Router::route(Util::getRequestedURL());
+            Router::route(Request::getRequestedURL());
             Response::send();
         }
     }

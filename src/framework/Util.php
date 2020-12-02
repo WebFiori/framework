@@ -24,6 +24,7 @@
  */
 namespace webfiori\framework;
 
+use webfiori\http\Response;
 use webfiori\conf\Config;
 use webfiori\framework\cli\CLI;
 use webfiori\framework\ui\MessageBox;
@@ -249,12 +250,8 @@ class Util {
 
         if (class_exists('webfiori\conf\Config')) {
             if (class_exists('webfiori\conf\SiteConfig')) {
-                if (Config::isConfig() === true || WebFiori::getClassStatus() == 'INITIALIZING') {
-                    if ($checkDb === true) {
-                        $returnValue = self::_checkDbStatus($dbName);
-                    } else {
-                        $returnValue = true;
-                    }
+                if (WebFiori::getClassStatus() == 'INITIALIZING') {
+                    $returnValue = true;
                 } else {
                     $returnValue = Util::NEED_CONF;
                 }
@@ -464,9 +461,13 @@ class Util {
      */
     public static function getRequestedURL() {
         $base = self::getBaseURL();
-        
-        $requestedURI = trim(filter_var(getenv('REQUEST_URI')),'/');
-        
+        $uri = getenv('REQUEST_URI');
+        if ($uri === false) {
+            // Using builtin server, it will be false
+            $uri = isset($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : '';
+            return $base.'/'.$uri;
+        }
+        $requestedURI = trim(filter_var($uri),'/');
         return $base.'/'.$requestedURI;
     }
     /**
@@ -625,10 +626,10 @@ class Util {
                 if ($messageBox->getBody() !== null) {
                     $messageBox->getBody()->addTextNode($toOutput,false);
                     $messageBox->getHeader()->text($file.' - '.$lineNumber);
-                    Response::append($messageBox);
+                    Response::write($messageBox);
                 }
             } else {
-                Response::append('<pre>'.$file.' - '.$lineNumber."\n".'</pre>'.$toOutput);
+                Response::write('<pre>'.$file.' - '.$lineNumber."\n".'</pre>'.$toOutput);
             }
         }
     }
@@ -711,30 +712,6 @@ class Util {
         }
 
         return $datesArr;
-    }
-    private static function _checkDbStatus($dbName) {
-        $connInfo = Config::getDBConnection($dbName);
-        $returnValue = false;
-
-        if ($connInfo instanceof DBConnectionInfo) {
-            $returnValue = DBConnectionFactory::mysqlLink([
-                'host' => $connInfo->getHost(),
-                'port' => $connInfo->getPort(),
-                'user' => $connInfo->getUsername(),
-                'pass' => $connInfo->getPassword(),
-                'db-name' => $connInfo->getDBName()
-            ]);
-
-            if (gettype($returnValue) == 'object') {
-                $returnValue = true;
-            } else {
-                $returnValue = self::DB_NEED_CONF;
-            }
-        } else {
-            $returnValue = self::DB_NEED_CONF;
-        }
-
-        return $returnValue;
     }
     /**
      * Collect request headers from the array $_SERVER.

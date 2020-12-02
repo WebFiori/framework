@@ -34,7 +34,7 @@ use webfiori\framework\exceptions\UIException;
 use webfiori\framework\i18n\Language;
 use webfiori\framework\session\SessionsManager;
 use webfiori\framework\WebFiori;
-use webfiori\framework\Response;
+use webfiori\http\Response;
 /**
  * A class used to initialize view components.
  * 
@@ -487,7 +487,7 @@ class Page {
         if ($returnResult) {
             return Page::get()->getDocument();
         } else {
-            Response::append(Page::get()->getDocument()->toHTML($formatted));
+            Response::write(Page::get()->getDocument()->toHTML($formatted));
         }
     }
     /**

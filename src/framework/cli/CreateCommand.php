@@ -124,6 +124,7 @@ class CreateCommand extends CLICommand {
 
             if (!class_exists($tableClassName)) {
                 $this->error('Class not found.');
+                $tableClassName = null;
                 continue;
             }
             $tableObj = new $tableClassName();

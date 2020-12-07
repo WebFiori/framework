@@ -305,7 +305,7 @@ class SocketMailer {
         $arr = [];
 
         foreach ($this->bcc as $address => $name) {
-            array_push($arr, $name.' <'.$address.'>');
+            array_push($arr, '=?UTF-8?B?'.base64_encode($name).'?='.' <'.$address.'>');
         }
 
         return implode(',', $arr);
@@ -333,7 +333,7 @@ class SocketMailer {
         $arr = [];
 
         foreach ($this->cc as $address => $name) {
-            array_push($arr, $name.' <'.$address.'>');
+            array_push($arr, '=?UTF-8?B?'.base64_encode($name).'?='.' <'.$address.'>');
         }
 
         return implode(',', $arr);
@@ -391,7 +391,7 @@ class SocketMailer {
         $arr = [];
 
         foreach ($this->receivers as $address => $name) {
-            array_push($arr, $name.' <'.$address.'>');
+            array_push($arr, '=?UTF-8?B?'.base64_encode($name).'?='.' <'.$address.'>');
         }
 
         return implode(',', $arr);
@@ -707,7 +707,7 @@ class SocketMailer {
 
             $this->sendC('Content-Transfer-Encoding: quoted-printable');
             $this->sendC('Importance: '.$importanceHeaderVal);
-            $this->sendC('From: "'.$this->getSenderName().'" <'.$this->getSenderAddress().'>');
+            $this->sendC('From: =?UTF-8?B?'. base64_encode($this->getSenderName()).'?= <'.$this->getSenderAddress().'>');
             $this->sendC('To: '.$this->getReceiversStr());
             $this->sendC('CC: '.$this->getCCStr());
             $this->sendC('BCC: '.$this->getBCCStr());

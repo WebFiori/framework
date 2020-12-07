@@ -33,9 +33,10 @@ use webfiori\framework\exceptions\RoutingException;
 use webfiori\framework\ui\NotFoundView;
 use webfiori\framework\Util;
 use webfiori\framework\File;
-use webfiori\framework\ThemeLoader;
 use webfiori\http\Response;
 use webfiori\http\Request;
+use Error;
+use Exception;
 /**
  * The basic class that is used to route user requests to the correct 
  * location.
@@ -440,14 +441,22 @@ class Router {
      * @param string $url A string that represents a URL (such as 'https://example.com/my-resource').
      * 
      * @return RouterUri|null If a resource was found which has the given route, an 
-     * object of type RouterUri is returned. Other than that, null is returned.
+     * object of type RouterUri is returned. Other than that, null is returned. Note 
+     * that if the URI is invalid, the method will return null. Also, if the library 
+     * 'http' is not loaded, the method will return null.
      * 
      * @since 1.3.6
      */
     public static function getUriObjByURL($url) {
-        self::get()->_resolveUrl($url, false);
+        try {
+            self::get()->_resolveUrl($url, false);
 
-        return self::getRouteUri();
+            return self::getRouteUri();
+        } catch (Error $ex) {
+            return null;
+        } catch (Exception $ex) {
+            return null;
+        }
     }
     /**
      * Returns the value of a variable which exist in the path part of the 

@@ -26,6 +26,7 @@ namespace webfiori\framework;
 
 use Exception;
 use webfiori\conf\Config;
+use webfiori\conf\MailConfig;
 use webfiori\database\ConnectionInfo;
 use webfiori\framework\exceptions\InitializationException;
 use webfiori\framework\File;

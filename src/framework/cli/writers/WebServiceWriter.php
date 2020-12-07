@@ -125,6 +125,7 @@ class WebServiceWriter extends ClassWriter {
         $this->append(" */", 1);
         $this->append("public function processRequest() {", 1);
         $this->append('// TODO: process the request for the service \''.$name.'\'.', 2);
+        $this->append('$this->getManager()->serviceNotImplemented();', 2);
         $this->append('}', 1);
     }
 
@@ -143,7 +144,7 @@ class WebServiceWriter extends ClassWriter {
     private function _writeHeaderSec() {
         $this->append("<?php\n");
         $this->append('namespace '.$this->getNamespace().";\n");
-        $this->append("use webfiori\\restEasy\\AbstractWebService;");
+        $this->append("use webfiori\\http\\AbstractWebService;");
         $this->append("");
         $this->append("/**");
         $this->append(" * A class that contains the implementation of the web service '".$this->servicesObj->getName()."'.");

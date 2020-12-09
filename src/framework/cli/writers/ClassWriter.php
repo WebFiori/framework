@@ -139,7 +139,7 @@ class ClassWriter {
     /**
      * Returns the location at which the class will be created on.
      * 
-     * @return string The location at which the query class will be created on.
+     * @return string The location at which the class will be created on.
      * 
      * @since 1.0
      */

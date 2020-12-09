@@ -191,6 +191,8 @@ class CreateCommand extends CLICommand {
             'Database table class.',
             'Entity class from table.',
             'New web service.',
+            'CRON job.',
+            'Middleware.',
             'Database table from class.',
             'Quit.'
         ];
@@ -206,6 +208,11 @@ class CreateCommand extends CLICommand {
                 return $this->_createWebServices();
             } else if ($answer == 'Database table from class.') {
                 $this->_createDbTable();
+            } else if ($answer == 'Middleware.') {
+                new CreateMiddleware($this);
+                return true;
+            } else {
+                $this->info('Not implemented yet.');
             }
         }
     }

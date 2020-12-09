@@ -765,6 +765,7 @@ class Cron {
         if ($job->isTime() || $xForce) {
             if ($command !== null) {
                 self::_get()->command = $command;
+                $job->setCommand($command);
                 foreach ($job->getExecArgsNames() as $attr) {
                     $command->addArg($attr);
                     $val = $command->getArgValue($attr);

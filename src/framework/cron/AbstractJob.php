@@ -28,26 +28,40 @@ use Error;
 use Exception;
 use webfiori\collections\Queue;
 use webfiori\framework\exceptions\InvalidCRONExprException;
+use webfiori\framework\cli\CronCommand;
 /**
  * An abstract class that contains basic functionality for implementing cron 
  * jobs.
  *
  * @author Ibrahim
+ * 
+ * @version 1.0.1
  */
 abstract class AbstractJob {
     /**
+     * The command which is used to execute the job.
+     * 
+     * @var CronCommand
+     * 
+     * @since 1.0.1 
+     */
+    private $command;
+    /**
      * A constant that indicates a sub cron expression is of type 'multi-value'.
+     * 
      * @since 1.0
      */
     const ANY_VAL = '*';
     /**
      * A constant that indicates a sub cron expression is invalid.
+     * 
      * @since 1.0
      */
     const INV_VAL = 'inv';
     /**
      * An associative array which holds the names and the numbers of year 
      * months.
+     * 
      * @since 1.0
      */
     const MONTHS_NAMES = [
@@ -56,22 +70,26 @@ abstract class AbstractJob {
     ];
     /**
      * A constant that indicates a sub cron expression is of type 'range'.
+     * 
      * @since 1.0
      */
     const RANGE_VAL = 'r';
     /**
      * A constant that indicates a sub cron expression is of type 'specific value'.
+     * 
      * @since 1.0
      */
     const SPECIFIC_VAL = 'spe';
     /**
      * A constant that indicates a sub cron expression is of type 'step value'.
+     * 
      * @since 1.0
      */
     const STEP_VAL = 's';
     /**
      * An associative array which holds the names and the numbers of week 
      * days.
+     * 
      * @since 1.0
      */
     const WEEK_DAYS = [
@@ -79,56 +97,74 @@ abstract class AbstractJob {
     ];
     /**
      * The full cron expression.
+     * 
      * @var type 
+     * 
      * @since 1.0
      */
     private $cronExpr;
     /**
      * An array that contains custom attributes which can be provided on 
      * job execution.
+     * 
      * @var array 
+     * 
      * @since 1.0
      */
     private $customAttrs;
     /**
      * An array which contains the events that will be executed if it is the time 
      * to execute the job.
+     * 
      * @var array
+     * 
      * @since 1.0 
      */
     private $events;
     /**
      * A boolean which is set to true if the job is forced to execute.
+     * 
      * @var boolean 
+     * 
      * @since 1.0
      */
     private $isForced;
     /**
      * A boolean which is set to true if the job was 
      * successfully executed.
+     * 
      * @var boolean 
+     * 
      * @since 1.0
      */
     private $isSuccess;
     /**
      * An array which contains all job details after parsing cron expression.
+     * 
      * @var array 
+     * 
      * @since 1.0
      */
     private $jobDetails;
     /**
      * A name for the cron job.
+     * 
      * @var string
+     * 
      * @since 1.0 
      */
     private $jobName;
     /**
      * Creates new instance of the class.
+     * 
      * @param string $jobName The name of the job.
+     * 
      * @param string $when A cron expression. An exception will be thrown if 
      * the given expression is invalid. Default is '* * * * *' which means run 
      * the job every minute.
+     * 
      * @throws Exception
+     * 
      * @since 1.0
      */
     public function __construct($jobName = '', $when = '* * * * *') {
@@ -163,7 +199,30 @@ abstract class AbstractJob {
         $this->setIsForced(false);
     }
     /**
+     * Associate the job with the command that was used to execute the job.
+     * 
+     * @param CronCommand $command
+     * 
+     * @since 1.0.1
+     */
+    public function setCommand(CronCommand $command) {
+        $this->command = $command;
+    }
+    /**
+     * Returns the command that was used to execute the job.
+     * 
+     * Note that the command will be null if not executed from CLI environment.
+     * 
+     * @return CronCommand|null 
+     * 
+     * @since 1.0.1
+     */
+    public function getCommand() {
+        return $this->command;
+    }
+    /**
      * Adds new execution argument.
+     * 
      * An execution argument is an argument that can be supplied to the 
      * job in case of force execute. They will appear in cron control panel 
      * as a table. They also can be provided to the job when executing it 
@@ -173,7 +232,9 @@ abstract class AbstractJob {
      * <li>Must be non-empty string.</li>
      * <li>Must not contain '#', '?', '&', '=' or space.</li>
      * </ul>
+     * 
      * @param string $name The name of the attribute.
+     * 
      * @since 1.0
      */
     public function addExecutionArg($name) {
@@ -186,8 +247,10 @@ abstract class AbstractJob {
     }
     /**
      * Adds multiple execution arguments at one shot.
+     * 
      * @param array $argsArr An array that contains the names of the 
      * arguments.
+     * 
      * @since 1.0
      */
     public function addExecutionArgs($argsArr) {
@@ -199,15 +262,18 @@ abstract class AbstractJob {
     }
     /**
      * Run some routines after the job is executed.
+     * 
      * The developer can implement this method to perform some actions after the 
      * job is executed. Note that the method will get executed if the job is failed 
      * or successfully completed. It is optional to implement that method. The developer can 
      * leave the body of the method empty.
+     * 
      * @since 1.0 
      */
     public abstract function afterExec();
     /**
      * Schedules a job using specific cron expression.
+     * 
      * For more information on cron expressions, go to 
      * https://en.wikipedia.org/wiki/Cron#CRON_expression. Note that 
      * the method does not support year field. This means 
@@ -217,11 +283,14 @@ abstract class AbstractJob {
      * <li>Step values are not supported for day of week.</li>
      * <li>Step values are not supported for day of month.</li>
      * </ul>
+     * 
      * @param string $when A cron expression (such as '8 15 * * 1'). Default 
      * is '* * * * *' which means run the job every minute.
+     * 
      * @return boolean If the given cron expression is valid, the method will 
      * set the time of cron job as specified by the expression and return 
      * true. If the expression is invalid, the method will return false.
+     * 
      * @since 1.0
      */
     public function cron($when = '* * * * *') {
@@ -258,17 +327,21 @@ abstract class AbstractJob {
     }
     /**
      * Schedules a cron job to run daily at specific hour and minute.
+     * 
      * The job will be executed every day at the given hour and minute. The 
      * function uses 24 hours mode. If no parameters are given, 
      * The default time is 00:00 which means that the job will be executed 
      * daily at midnight.
+     * 
      * @param int $hour A number between 0 and 23 inclusive. 0 Means daily at 
      * 12:00 AM and 23 means at 11:00 PM. Default is 0.
      * @param int $minute A number between 0 and 59 inclusive. Represents the 
      * minute part of an hour. Default is 0.
+     * 
      * @return boolean If job time is set, the method will return true. If 
      * not set, the method will return false. It will not set only if the 
      * given time is not correct.
+     * 
      * @since 1.0
      */
     public function dailyAt($hour = 0,$minute = 0) {
@@ -280,7 +353,9 @@ abstract class AbstractJob {
     }
     /**
      * Schedules a cron job to run every hour.
+     * 
      * The job will run at the start of the hour.
+     * 
      * @since 1.0.2
      */
     public function everyHour() {
@@ -288,11 +363,15 @@ abstract class AbstractJob {
     }
     /**
      * Schedules a cron job to run every month on specific day and time.
+     * 
      * @param int $dayNum The number of the day. It can be any value between 
      * 1 and 31 inclusive.
+     * 
      * @param string $time A day time string in the form 'hh:mm' in 24 hours mode.
+     * 
      * @return boolean If the time for the cron job is set, the method will 
      * return true. If not, it will return false.
+     * 
      * @since 1.0.1
      */
     public function everyMonthOn($dayNum = 1,$time = '00:00') {
@@ -313,16 +392,20 @@ abstract class AbstractJob {
     }
     /**
      * Execute the event which should run when it is time to execute the job. 
+     * 
      * This method will be called automatically when cron URL is accessed. The 
      * method will check if it is time to execute the associated event or 
      * not. If it is the time, The event will be executed. If 
      * the job is forced to execute, the event that is associated with the 
      * job will be executed even if it is not the time to execute the job.
+     * 
      * @param boolean $force If set to true, the job will be forced to execute 
      * even if it is not job time. Default is false.
+     * 
      * @return boolean If the event that is associated with the job is executed, 
      * the method will return true (Even if the job did not finish successfully).
      * If it is not executed, the method will return false. 
+     * 
      * @since 1.0
      */
     public function exec($force = false) {
@@ -347,26 +430,33 @@ abstract class AbstractJob {
     }
     /**
      * Execute the job.
+     * 
      * The code that will be in the body of that method is the code that will be 
      * get executed if it is time to run the job or the job is forced to 
      * executed. The developer must implement this method in a way it returns null or true 
      * if the job is executed successfully. If the implementation of the method 
      * throws an exception, the job will be considered as failed.
+     * 
      * @return boolean|null If the job successfully completed, the method should 
      * return null or true. If the job failed, the method should return false.
+     * 
      * @since 1.0
      */
     public abstract function execute();
     /**
-     * Returns the value of a custom execution argument.'
+     * Returns the value of a custom execution argument.
+     * 
      * The value of the argument can be supplied through the table that will 
      * appear in cron control panel. If the execution is performed through 
      * CLI, the value of the argument can be supplied to the job as arg-name="Arg Val".
+     * 
      * @param string $name the name of execution argument.
+     * 
      * @return string|null If the argument does exist on the job and its value 
      * is provided, the method will return its value. If it is not provided or 
      * it does not exist on the job, the method will return null.
-     * @since 1.0.8
+     * 
+     * @since 1.0
      */
     public function getArgValue($name) {
         $trimmed = trim($name);
@@ -381,11 +471,14 @@ abstract class AbstractJob {
     /**
      * Returns an associative array that contains the values of 
      * custom execution parameters.
+     * 
      * Note that the method will filter the values using the filter FILTER_SANITIZE_STRING.
+     * 
      * @return array An associative array. The keys are attributes values and 
      * the values are the values which are given as input. If a value 
      * is not provided, it will be set to null.
-     * @since 1.0.7
+     * 
+     * @since 1.0
      */
     public function getExecArgs() {
         $retVal = [];
@@ -409,16 +502,20 @@ abstract class AbstractJob {
     /**
      * Returns an array that contains the names of added custom 
      * execution attributes.
+     * 
      * @return array An indexed array that contains all added 
      * custom execution attributes values.
-     * @since 1.0.8
+     * 
+     * @since 1.0
      */
     public function getExecArgsNames() {
         return $this->customAttrs;
     }
     /**
      * Returns the cron expression which is associated with the job.
+     * 
      * @return string The cron expression which is associated with the job.
+     * 
      * @since 1.0
      */
     public function getExpression() {
@@ -427,6 +524,7 @@ abstract class AbstractJob {
     /**
      * Returns an associative array which contains details about the timings 
      * at which the job will be executed.
+     * 
      * @return array The array will have the following indices: 
      * <ul>
      * <li><b>minutes</b>: Contains sub arrays which has info about the minutes 
@@ -440,6 +538,7 @@ abstract class AbstractJob {
      * <li><b>days-of-week</b>: Contains sub arrays which has info about the days of week 
      * at which the job will be executed.</li>
      * </ul>
+     * 
      * @since 1.0
      */
     public function getJobDetails() {
@@ -447,11 +546,14 @@ abstract class AbstractJob {
     }
     /**
      * Returns the name of the job.
+     * 
      * The name is used to make different jobs unique. Each job must 
      * have its own name. Also, the name of the job is used to force job 
      * execution. It can be supplied as a part of cron URL. 
+     * 
      * @return string The name of the job. If no name is set, the function will return 
      * 'CRON-JOB'.
+     * 
      * @since 1.0
      */
     public function getJobName() {
@@ -460,8 +562,10 @@ abstract class AbstractJob {
     /**
      * Checks if current day of month in time is a day at which the job must be 
      * executed.
+     * 
      * @return boolean The method will return true if the current day of month in 
      * time is a day at which the job must be executed.
+     * 
      * @since 1.0
      */
     public function isDayOfMonth() {
@@ -492,8 +596,10 @@ abstract class AbstractJob {
     /**
      * Checks if current day of week in time is a day at which the job must be 
      * executed.
+     * 
      * @return boolean The method will return true if the current day of week in 
      * time is a day at which the job must be executed.
+     * 
      * @since 1.0
      */
     public function isDayOfWeek() {
@@ -523,9 +629,11 @@ abstract class AbstractJob {
     }
     /**
      * Checks if the job is forced to execute or not.
+     * 
      * @return boolean If the job was forced to execute, the method will return 
      * true. Other than that, it will return false.
-     * @since 1.0.6
+     * 
+     * @since 1.0
      */
     public function isForced() {
         return $this->isForced;
@@ -533,8 +641,10 @@ abstract class AbstractJob {
     /**
      * Checks if current hour in time is an hour at which the job must be 
      * executed.
+     * 
      * @return boolean The method will return true if the current hour in 
      * time is an hour at which the job must be executed.
+     * 
      * @since 1.0
      */
     public function isHour() {
@@ -564,8 +674,10 @@ abstract class AbstractJob {
     /**
      * Checks if current minute in time is a minute at which the job must be 
      * executed.
+     * 
      * @return boolean The method will return true if the current minute in 
      * time is a minute at which the job must be executed.
+     * 
      * @since 1.0
      */
     public function isMinute() {
@@ -595,8 +707,10 @@ abstract class AbstractJob {
     /**
      * Checks if current month in time is a month at which the job must be 
      * executed.
+     * 
      * @return boolean The method will return true if the current month in 
      * time is a month at which the job must be executed.
+     * 
      * @since 1.0
      */
     public function isMonth() {
@@ -626,14 +740,17 @@ abstract class AbstractJob {
     }
     /**
      * Returns true if the job was executed successfully.
+     * 
      * The value returned by this method will depends on the return value 
      * of the value which is returned by the method AbstractJob::execute(). 
      * If the method returned null or true, then it means the job 
      * was successfully executed. If it returns false, this means the job did 
      * not execute successfully. If it throws an exception, then the job is 
-     * not successfully complrted.
+     * not successfully completed.
+     * 
      * @return boolean True if the job was executed successfully. False 
      * if not.
+     * 
      * @since 1.0
      */
     public function isSuccess() {
@@ -641,8 +758,10 @@ abstract class AbstractJob {
     }
     /**
      * Checks if its time to execute the job or not.
+     * 
      * @return boolean If its time to execute the job, the method will return true. 
      * If not, it will return false.
+     * 
      * @since 1.0
      */
     public function isTime() {
@@ -650,26 +769,33 @@ abstract class AbstractJob {
     }
     /**
      * Run some routines if the job is executed and failed to completed successfully.
+     * 
      * The status of failure or success depends on the implementation of the method 
      * AbstractJob::execute().
      * The developer can implement this method to take actions after the 
      * job is executed and failed to completed. 
      * It is optional to implement that method. The developer can 
      * leave the body of the method empty.
+     * 
      * @since 1.0 
      */
     public abstract function onFail();
     /**
      * Schedules a job to run at specific day and time in a specific month.
+     * 
      * @param int|string $monthNameOrNum Month number from 1 to 12 inclusive 
      * or 3 letters month name. Default is 'jan'.
+     * 
      * @param int $dayNum The number of day in the month starting from 1 up to 
      * 31 inclusive. Default is 1.
+     * 
      * @param string $time A time in the form 'hh:mm'. hh can have any value 
-     * between 0 and 23 inclusive. mm can have any value btween 0 and 59 inclusive. 
+     * between 0 and 23 inclusive. mm can have any value between 0 and 59 inclusive. 
      * default is '00:00'.
+     * 
      * @return boolean If the time for the cron job is set, the method will 
      * return true. If not, it will return false.
+     * 
      * @since 1.0
      */
     public function onMonth($monthNameOrNum = 'jan',$dayNum = 1,$time = '00:00') {
@@ -710,21 +836,26 @@ abstract class AbstractJob {
     }
     /**
      * Run some routines if the job is executed and completed successfully.
+     * 
      * The status of failure or success depends on the implementation of the method 
      * AbstractJob::execute().
      * The developer can implement this method to perform actions after the 
      * job is executed and failed to completed. 
      * It is optional to implement that method. The developer can 
      * leave the body of the method empty.
+     * 
      * @since 1.0 
      */
     public abstract function onSuccess();
     /**
      * Sets an optional name for the job.
+     * 
      * The name is used to make different jobs unique. Each job must 
      * have its own name. Also, the name of the job is used to force job 
      * execution. It can be supplied as a part of cron URL. 
+     * 
      * @param string $name The name of the job.
+     * 
      * @since 1.0
      */
     public function setJobName($name) {
@@ -756,13 +887,17 @@ abstract class AbstractJob {
     }
     /**
      * Schedules a job to run weekly at specific week day and time.
+     * 
      * @param int $dayNameOrNum A 3 letter day name (such as 'sun' 
      * or 'tue') or a day number from 0 to 6. 0 for sunday. Default is 0.
+     * 
      * @param string $time A time in the form 'hh:mm'. hh can have any value 
      * between 0 and 23 inclusive. mm can have any value between 0 and 59 inclusive. 
      * default is '00:00'.
+     * 
      * @return boolean If the time for the cron job is set, the method will 
      * return true. If not, it will return false.
+     * 
      * @since 1.0
      */
     public function weeklyOn($dayNameOrNum = 0,$time = '00:00') {
@@ -790,8 +925,11 @@ abstract class AbstractJob {
     }
     /**
      * Calls one of the abstract methods of the class.
+     * 
      * This method is only used by the method AbstractJob::exec().
+     * 
      * @param string $fName The name of the method.
+     * 
      * @return null|boolean
      */
     private function _callMethod($fName) {
@@ -834,20 +972,15 @@ abstract class AbstractJob {
                 if ($exprType == self::INV_VAL) {
                     $isValidExpr = false;
                     break;
-                } else {
-                    if ($exprType == self::RANGE_VAL) {
-                        $range = explode('-', $subExpr);
-                        $start = in_array(strtoupper($range[0]), array_keys(self::WEEK_DAYS)) ? self::WEEK_DAYS[strtoupper($range[0])] : intval($range[0]);
-                        $end = in_array(strtoupper($range[1]), array_keys(self::WEEK_DAYS)) ? self::WEEK_DAYS[strtoupper($range[1])] : intval($range[1]);
+                } else if ($exprType == self::RANGE_VAL) {
+                    $range = explode('-', $subExpr);
+                    $start = in_array(strtoupper($range[0]), array_keys(self::WEEK_DAYS)) ? self::WEEK_DAYS[strtoupper($range[0])] : intval($range[0]);
+                    $end = in_array(strtoupper($range[1]), array_keys(self::WEEK_DAYS)) ? self::WEEK_DAYS[strtoupper($range[1])] : intval($range[1]);
 
-                        if ($start < $end) {
-                            if ($start >= 0 && $start < 6) {
-                                if ($end >= 0 && $end <= 6) {
-                                    $dayAttrs['at-range'][] = [$start,$end];
-                                } else {
-                                    $isValidExpr = false;
-                                    break;
-                                }
+                    if ($start < $end) {
+                        if ($start >= 0 && $start < 6) {
+                            if ($end >= 0 && $end <= 6) {
+                                $dayAttrs['at-range'][] = [$start,$end];
                             } else {
                                 $isValidExpr = false;
                                 break;
@@ -857,21 +990,20 @@ abstract class AbstractJob {
                             break;
                         }
                     } else {
-                        if ($exprType == self::STEP_VAL) {
-                            $isValidExpr = false;
-                        } else {
-                            if ($exprType == self::SPECIFIC_VAL) {
-                                $subExpr = strtoupper($subExpr);
-                                $value = in_array($subExpr, array_keys(self::WEEK_DAYS)) ? self::WEEK_DAYS[$subExpr] : intval($subExpr);
+                        $isValidExpr = false;
+                        break;
+                    }
+                } else if ($exprType == self::STEP_VAL) {
+                    $isValidExpr = false;
+                } else if ($exprType == self::SPECIFIC_VAL) {
+                    $subExpr = strtoupper($subExpr);
+                    $value = in_array($subExpr, array_keys(self::WEEK_DAYS)) ? self::WEEK_DAYS[$subExpr] : intval($subExpr);
 
-                                if ($value >= 0 && $value <= 6) {
-                                    $dayAttrs['at-x-day'][] = $value;
-                                } else {
-                                    $isValidExpr = false;
-                                    break;
-                                }
-                            }
-                        }
+                    if ($value >= 0 && $value <= 6) {
+                        $dayAttrs['at-x-day'][] = $value;
+                    } else {
+                        $isValidExpr = false;
+                        break;
                     }
                 }
             }
@@ -904,60 +1036,52 @@ abstract class AbstractJob {
 
             if ($exprType == self::ANY_VAL) {
                 $hoursAttrs['every-hour'] = true;
-            } else {
-                if ($exprType == self::INV_VAL) {
-                    $isValidExpr = false;
-                    break;
-                } else {
-                    if ($exprType == self::RANGE_VAL) {
-                        $range = explode('-', $subExpr);
-                        $start = intval($range[0]);
-                        $end = intval($range[1]);
+            } else if ($exprType == self::INV_VAL) {
+                $isValidExpr = false;
+                break;
+            } else if ($exprType == self::RANGE_VAL) {
+                $range = explode('-', $subExpr);
+                $start = intval($range[0]);
+                $end = intval($range[1]);
 
-                        if ($start < $end) {
-                            if ($start >= 0 && $start < 24) {
-                                if ($end >= 0 && $end < 24) {
-                                    $hoursAttrs['at-range'][] = [$start,$end];
-                                } else {
-                                    $isValidExpr = false;
-                                    break;
-                                }
-                            } else {
-                                $isValidExpr = false;
-                                break;
-                            }
+                if ($start < $end) {
+                    if ($start >= 0 && $start < 24) {
+                        if ($end >= 0 && $end < 24) {
+                            $hoursAttrs['at-range'][] = [$start,$end];
                         } else {
                             $isValidExpr = false;
                             break;
                         }
                     } else {
-                        if ($exprType == self::STEP_VAL) {
-                            $stepVal = intval(explode('/', $subExpr)[1]);
-
-                            if ($stepVal >= 0 && $stepVal < 24) {
-                                $hoursAttrs['every-x-hours'][] = $stepVal;
-                            } else {
-                                $isValidExpr = false;
-                                break;
-                            }
-                        } else {
-                            if ($exprType == self::SPECIFIC_VAL) {
-                                if ($this->_isNumber($subExpr)) {
-                                    $value = intval($subExpr);
-                                } else {
-                                    $isValidExpr = false;
-                                    break;
-                                }
-
-                                if ($value >= 0 && $value <= 23) {
-                                    $hoursAttrs['at-every-x-hour'][] = $value;
-                                } else {
-                                    $isValidExpr = false;
-                                    break;
-                                }
-                            }
-                        }
+                        $isValidExpr = false;
+                        break;
                     }
+                } else {
+                    $isValidExpr = false;
+                    break;
+                }
+            } else if ($exprType == self::STEP_VAL) {
+                $stepVal = intval(explode('/', $subExpr)[1]);
+
+                if ($stepVal >= 0 && $stepVal < 24) {
+                    $hoursAttrs['every-x-hours'][] = $stepVal;
+                } else {
+                    $isValidExpr = false;
+                    break;
+                }
+            } else if ($exprType == self::SPECIFIC_VAL) {
+                if ($this->_isNumber($subExpr)) {
+                    $value = intval($subExpr);
+                } else {
+                    $isValidExpr = false;
+                    break;
+                }
+
+                if ($value >= 0 && $value <= 23) {
+                    $hoursAttrs['at-every-x-hour'][] = $value;
+                } else {
+                    $isValidExpr = false;
+                    break;
                 }
             }
         }
@@ -990,60 +1114,52 @@ abstract class AbstractJob {
 
             if ($exprType == self::ANY_VAL) {
                 $minuteAttrs['every-minute'] = true;
-            } else {
-                if ($exprType == self::INV_VAL) {
-                    $isValidExpr = false;
-                    break;
-                } else {
-                    if ($exprType == self::RANGE_VAL) {
-                        $range = explode('-', $subExpr);
-                        $start = intval($range[0]);
-                        $end = intval($range[1]);
+            } else if ($exprType == self::INV_VAL) {
+                $isValidExpr = false;
+                break;
+            } else if ($exprType == self::RANGE_VAL) {
+                $range = explode('-', $subExpr);
+                $start = intval($range[0]);
+                $end = intval($range[1]);
 
-                        if ($start < $end) {
-                            if ($start >= 0 && $start <= 59) {
-                                if ($end >= 0 && $end <= 59) {
-                                    $minuteAttrs['at-range'][] = [$start,$end];
-                                } else {
-                                    $isValidExpr = false;
-                                    break;
-                                }
-                            } else {
-                                $isValidExpr = false;
-                                break;
-                            }
+                if ($start < $end) {
+                    if ($start >= 0 && $start <= 59) {
+                        if ($end >= 0 && $end <= 59) {
+                            $minuteAttrs['at-range'][] = [$start,$end];
                         } else {
                             $isValidExpr = false;
                             break;
                         }
                     } else {
-                        if ($exprType == self::STEP_VAL) {
-                            $stepVal = intval(explode('/', $subExpr)[1]);
-
-                            if ($stepVal >= 0 && $stepVal <= 59) {
-                                $minuteAttrs['every-x-minutes'][] = $stepVal;
-                            } else {
-                                $isValidExpr = false;
-                                break;
-                            }
-                        } else {
-                            if ($exprType == self::SPECIFIC_VAL) {
-                                if ($this->_isNumber($subExpr)) {
-                                    $value = intval($subExpr);
-                                } else {
-                                    $isValidExpr = false;
-                                    break;
-                                }
-
-                                if ($value >= 0 && $value <= 59) {
-                                    $minuteAttrs['at-every-x-minute'][] = $value;
-                                } else {
-                                    $isValidExpr = false;
-                                    break;
-                                }
-                            }
-                        }
+                        $isValidExpr = false;
+                        break;
                     }
+                } else {
+                    $isValidExpr = false;
+                    break;
+                }
+            } else if ($exprType == self::STEP_VAL) {
+                $stepVal = intval(explode('/', $subExpr)[1]);
+
+                if ($stepVal >= 0 && $stepVal <= 59) {
+                    $minuteAttrs['every-x-minutes'][] = $stepVal;
+                } else {
+                    $isValidExpr = false;
+                    break;
+                }
+            } else if ($exprType == self::SPECIFIC_VAL) {
+                if ($this->_isNumber($subExpr)) {
+                    $value = intval($subExpr);
+                } else {
+                    $isValidExpr = false;
+                    break;
+                }
+
+                if ($value >= 0 && $value <= 59) {
+                    $minuteAttrs['at-every-x-minute'][] = $value;
+                } else {
+                    $isValidExpr = false;
+                    break;
                 }
             }
         }
@@ -1074,49 +1190,41 @@ abstract class AbstractJob {
 
             if ($exprType == self::ANY_VAL) {
                 $monthAttrs['every-month'] = true;
-            } else {
-                if ($exprType == self::INV_VAL) {
-                    $isValidExpr = false;
-                    break;
-                } else {
-                    if ($exprType == self::RANGE_VAL) {
-                        $range = explode('-', $subExpr);
-                        $start = in_array(strtoupper($range[0]), array_keys(self::MONTHS_NAMES)) ? self::MONTHS_NAMES[strtoupper($range[0])] : intval($range[0]);
-                        $end = in_array(strtoupper($range[1]), array_keys(self::MONTHS_NAMES)) ? self::MONTHS_NAMES[strtoupper($range[1])] : intval($range[1]);
+            } else if ($exprType == self::INV_VAL) {
+                $isValidExpr = false;
+                break;
+            } else if ($exprType == self::RANGE_VAL) {
+                $range = explode('-', $subExpr);
+                $start = in_array(strtoupper($range[0]), array_keys(self::MONTHS_NAMES)) ? self::MONTHS_NAMES[strtoupper($range[0])] : intval($range[0]);
+                $end = in_array(strtoupper($range[1]), array_keys(self::MONTHS_NAMES)) ? self::MONTHS_NAMES[strtoupper($range[1])] : intval($range[1]);
 
-                        if ($start < $end) {
-                            if ($start >= 1 && $start < 13) {
-                                if ($end >= 1 && $end < 13) {
-                                    $monthAttrs['at-range'][] = [$start,$end];
-                                } else {
-                                    $isValidExpr = false;
-                                    break;
-                                }
-                            } else {
-                                $isValidExpr = false;
-                                break;
-                            }
+                if ($start < $end) {
+                    if ($start >= 1 && $start < 13) {
+                        if ($end >= 1 && $end < 13) {
+                            $monthAttrs['at-range'][] = [$start,$end];
                         } else {
                             $isValidExpr = false;
                             break;
                         }
                     } else {
-                        if ($exprType == self::STEP_VAL) {
-                            $isValidExpr = false;
-                        } else {
-                            if ($exprType == self::SPECIFIC_VAL) {
-                                $subExpr = strtoupper($subExpr);
-                                $value = in_array($subExpr, array_keys(self::MONTHS_NAMES)) ? self::MONTHS_NAMES[$subExpr] : intval($subExpr);
-
-                                if ($value >= 1 && $value <= 12) {
-                                    $monthAttrs['at-x-month'][] = $value;
-                                } else {
-                                    $isValidExpr = false;
-                                    break;
-                                }
-                            }
-                        }
+                        $isValidExpr = false;
+                        break;
                     }
+                } else {
+                    $isValidExpr = false;
+                    break;
+                }
+            } else if ($exprType == self::STEP_VAL) {
+                $isValidExpr = false;
+            } else if ($exprType == self::SPECIFIC_VAL) {
+                $subExpr = strtoupper($subExpr);
+                $value = in_array($subExpr, array_keys(self::MONTHS_NAMES)) ? self::MONTHS_NAMES[$subExpr] : intval($subExpr);
+
+                if ($value >= 1 && $value <= 12) {
+                    $monthAttrs['at-x-month'][] = $value;
+                } else {
+                    $isValidExpr = false;
+                    break;
                 }
             }
         }
@@ -1147,49 +1255,41 @@ abstract class AbstractJob {
 
             if ($exprType == self::ANY_VAL) {
                 $monthDaysAttrs['every-day'] = true;
-            } else {
-                if ($exprType == self::INV_VAL) {
-                    $isValidExpr = false;
-                    break;
-                } else {
-                    if ($exprType == self::RANGE_VAL) {
-                        $range = explode('-', $subExpr);
-                        $start = intval($range[0]);
-                        $end = intval($range[1]);
+            } else if ($exprType == self::INV_VAL) {
+                $isValidExpr = false;
+                break;
+            } else if ($exprType == self::RANGE_VAL) {
+                $range = explode('-', $subExpr);
+                $start = intval($range[0]);
+                $end = intval($range[1]);
 
-                        if ($start < $end) {
-                            if ($start >= 1 && $start < 32) {
-                                if ($end >= 1 && $end < 32) {
-                                    $monthDaysAttrs['at-range'][] = [$start,$end];
-                                } else {
-                                    $isValidExpr = false;
-                                    break;
-                                }
-                            } else {
-                                $isValidExpr = false;
-                                break;
-                            }
+                if ($start < $end) {
+                    if ($start >= 1 && $start < 32) {
+                        if ($end >= 1 && $end < 32) {
+                            $monthDaysAttrs['at-range'][] = [$start,$end];
                         } else {
                             $isValidExpr = false;
                             break;
                         }
                     } else {
-                        if ($exprType == self::STEP_VAL) {
-                            $isValidExpr = false;
-                            break;
-                        } else {
-                            if ($exprType == self::SPECIFIC_VAL) {
-                                $value = intval($subExpr);
-
-                                if ($value >= 1 && $value <= 31) {
-                                    $monthDaysAttrs['at-every-x-day'][] = $value;
-                                } else {
-                                    $isValidExpr = false;
-                                    break;
-                                }
-                            }
-                        }
+                        $isValidExpr = false;
+                        break;
                     }
+                } else {
+                    $isValidExpr = false;
+                    break;
+                }
+            } else if ($exprType == self::STEP_VAL) {
+                $isValidExpr = false;
+                break;
+            } else if ($exprType == self::SPECIFIC_VAL) {
+                $value = intval($subExpr);
+
+                if ($value >= 1 && $value <= 31) {
+                    $monthDaysAttrs['at-every-x-day'][] = $value;
+                } else {
+                    $isValidExpr = false;
+                    break;
                 }
             }
         }
@@ -1363,7 +1463,9 @@ abstract class AbstractJob {
     /**
      * Sets the value of the property which is used to check if the job is 
      * forced to execute or not.
+     * 
      * @param boolean $bool True or false.
+     * 
      * @since 1.0
      */
     private function setIsForced($bool) {

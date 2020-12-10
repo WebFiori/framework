@@ -190,8 +190,8 @@ class CreateCommand extends CLICommand {
             $options = [
             'Database table class.',
             'Entity class from table.',
-            'New web service.',
-            'CRON job.',
+            'Web service.',
+            'Background job.',
             'Middleware.',
             'Database table from class.',
             'Quit.'
@@ -204,12 +204,15 @@ class CreateCommand extends CLICommand {
                 return $this->_createQueryClass();
             } else if ($answer == 'Entity class from table.') {
                 return $this->_createEntityFromQuery();
-            } else if ($answer == 'New web service.') {
+            } else if ($answer == 'Web service.') {
                 return $this->_createWebServices();
             } else if ($answer == 'Database table from class.') {
                 $this->_createDbTable();
             } else if ($answer == 'Middleware.') {
                 new CreateMiddleware($this);
+                return true;
+            } else if ($answer == 'Background job.') {
+                new CreateCronJob($this);
                 return true;
             } else {
                 $this->info('Not implemented yet.');

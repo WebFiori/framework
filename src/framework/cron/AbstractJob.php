@@ -253,11 +253,9 @@ abstract class AbstractJob {
      * 
      * @since 1.0
      */
-    public function addExecutionArgs($argsArr) {
-        if (gettype($argsArr) == 'array') {
-            foreach ($argsArr as $argName) {
-                $this->addExecutionArg($argName);
-            }
+    public function addExecutionArgs(array $argsArr) {
+        foreach ($argsArr as $argName) {
+            $this->addExecutionArg($argName);
         }
     }
     /**

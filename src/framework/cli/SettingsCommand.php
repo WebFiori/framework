@@ -56,8 +56,7 @@ class SettingsCommand extends CLICommand {
         $this->println("    Version Type %".($spaces - strlen('Version Type'))."s %s",':',$C->getVersionType());
         $this->println("    Release Date %".($spaces - strlen('Release Date'))."s %s",':',$C->getReleaseDate());
         $this->println("    Config Version %".($spaces - strlen('Config Version'))."s %s",':',$C->getConfigVersion());
-        $isConfigured = $C->isConfig() === true ? 'Yes' : 'No';
-        $this->println("    Is System Configured %".($spaces - strlen('Is System Configured'))."s %s",':',$isConfigured);
+
         $this->println("SiteConfig.php Settings:", [
             'color' => 'yellow',
             'bold' => true

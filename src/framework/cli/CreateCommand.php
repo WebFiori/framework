@@ -60,7 +60,7 @@ class CreateCommand extends CLICommand {
             '--table-class' => [
                 'optional' => true,
             ]
-        ], 'Creates a database table class, entity, API or a controller (Experimental).');
+        ], 'Creates a system entity (middleware, web service, background process ...).');
     }
     /**
      * 

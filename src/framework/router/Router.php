@@ -803,13 +803,7 @@ class Router {
         $asApi = $options['as-api'];
         $closureParams = $options['closure-params'] ;
         $path = $options['path'];
-        if ($routeType != self::CLOSURE_ROUTE) {
-            if ($routeType != self::CUSTOMIZED) {
-                $routeTo = ROOT_DIR.$routeType.$this->_fixFilePath($routeTo);
-            } else {
-                $routeTo = ROOT_DIR.$this->_fixFilePath($routeTo);
-            }
-        } else if (!is_callable($routeTo)) {
+        if ($routeType == self::CLOSURE_ROUTE  && !is_callable($routeTo)) {
             return false;
         }
         $routeUri = new RouterUri($this->getBase().$path, $routeTo,$caseSensitive, $closureParams);
@@ -1162,16 +1156,29 @@ class Router {
         } else {
             $file = $route->getRouteTo();
 
-            if (gettype($file) == 'string' && file_exists($file)) {
-                $this->uriObj = $route;
-
-                if ($loadResource === true) {
-                    $this->_loadResource($route);
+            try {
+                $xFile = '\\'. str_replace("/", "\\", $file);
+                $class = new $xFile();
+            } catch (\Error $ex) {
+                $routeType = $route->getType();
+                
+                if ($routeType == self::VIEW_ROUTE || $routeType == self::CUSTOMIZED) {
+                    $file = ROOT_DIR.$routeType.$this->_fixFilePath($file);
+                } else {
+                    $file = ROOT_DIR.$this->_fixFilePath($file);
                 }
-            } else if ($loadResource === true) {
-                throw new RoutingException('The resource "'.Util::getRequestedURL().'" was availble. '
-                    .'but its route is not configured correctly. '
-                    .'The resource which the route is pointing to was not found ('.$file.').');
+                if (gettype($file) == 'string' && file_exists($file)) {
+                    $this->uriObj = $route;
+
+                    if ($loadResource === true) {
+                        $route->setRoute($file);
+                        $this->_loadResource($route);
+                    }
+                } else if ($loadResource === true) {
+                    throw new RoutingException('The resource "'.Util::getRequestedURL().'" was availble. '
+                        .'but its route is not configured correctly. '
+                        .'The resource which the route is pointing to was not found ('.$file.').');
+                }
             }
         }
         

@@ -1328,12 +1328,13 @@ class Page {
     /**
      * Loads a theme given its name.
      * 
-     * @param string $themeName The name of the theme as specified by the 
+     * @param string $themeNameOrClass The name of the theme as specified by the 
      * variable 'name' in theme definition. If the given name is 'null', the 
      * method will load the default theme as specified by the method 
      * 'SiteConfig::getBaseThemeName()'. Note that once the theme is updated, 
      * the document content of the page will reset if it was set before calling this 
-     * method.
+     * method. This also can be the value which can be taken from 'ClassName::class'. 
+     * 
      * 
      * @throws Exception The method will throw 
      * an exception if no theme was found which has the given name. Another case is 
@@ -1342,26 +1343,32 @@ class Page {
      * @since 1.4
      * @see Theme::usingTheme()
      */
-    private function usingTheme($themeName = null) {
-        if ($themeName === null && $this->theme === null) {
-            $themeName = SiteConfig::getBaseThemeName();
-        } else {
-            $themeName = trim($themeName);
-
-            if (strlen($themeName) == 0) {
-                return;
-            }
-        }
-
-        if ($this->theme !== null) {
-            if ($themeName != $this->theme->getName()) {
-                $tmpTheme = ThemeLoader::usingTheme($themeName);
+    private function usingTheme($themeNameOrClass = null) {
+        try {
+            $xthemeName = '\\'.$themeNameOrClass;
+            $tmpTheme = new $xthemeName();
+        } catch (\Error $ex) {
+            if ($themeNameOrClass === null && $this->theme === null) {
+                $themeNameOrClass = SiteConfig::getBaseThemeName();
             } else {
-                return;
+                $themeNameOrClass = trim($themeNameOrClass);
+
+                if (strlen($themeNameOrClass) == 0) {
+                    return;
+                }
             }
-        } else {
-            $tmpTheme = ThemeLoader::usingTheme($themeName);
+
+            if ($this->theme !== null) {
+                if ($themeNameOrClass != $this->theme->getName()) {
+                    $tmpTheme = ThemeLoader::usingTheme($themeNameOrClass);
+                } else {
+                    return;
+                }
+            } else {
+                $tmpTheme = ThemeLoader::usingTheme($themeNameOrClass);
+            }
         }
+        
         $this->theme = $tmpTheme;
 
         $mainContentArea = Page::document()->getChildByID(self::MAIN_ELEMENTS[2]);

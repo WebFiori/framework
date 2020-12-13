@@ -55,5 +55,3 @@ class ExamplePage {
         Page::render();
     }
 }
-
-return __NAMESPACE__;

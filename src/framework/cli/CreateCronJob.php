@@ -2,7 +2,7 @@
 namespace webfiori\framework\cli;
 
 /**
- * A helper class which is used to help in creating cron jobs classes.
+ * A helper class which is used to help in creating cron jobs classes using CLI.
  *
  * @author Ibrahim
  * 

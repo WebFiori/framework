@@ -184,7 +184,7 @@ class CreateCommand extends CLICommand {
             } else if ($what == 't') {
                 $this->_createDbTable();
             } else if ($what == 'ws') {
-                $this->_createWebServices();
+                new CreateWebService($this);
             }
         } else {
             $options = [
@@ -205,7 +205,7 @@ class CreateCommand extends CLICommand {
             } else if ($answer == 'Entity class from table.') {
                 return $this->_createEntityFromQuery();
             } else if ($answer == 'Web service.') {
-                return $this->_createWebServices();
+                new CreateWebService($this);
             } else if ($answer == 'Database table from class.') {
                 $this->_createDbTable();
             } else if ($answer == 'Middleware.') {
@@ -334,27 +334,7 @@ class CreateCommand extends CLICommand {
         }
         $this->success('Column added.');
     }
-    /**
-     * 
-     * @param AbstractWebService $serviceObj
-     */
-    private function _addParamsToService($serviceObj) {
-        $addMore = true;
-
-        do {
-            $paramObj = new RequestParameter('h');
-            $paramObj->setType($this->select('Choose parameter type:', ParamTypes::getTypes(), 0));
-            $this->_setParamName($paramObj);
-            $added = $serviceObj->addParameter($paramObj);
- 
-            if ($added) {
-                $this->success('New parameter added to the service \''.$serviceObj->getName().'\'.');
-            } else {
-                $this->warning('The parameter was not added.');
-            }
-            $addMore = $this->confirm('Would you like to add another parameter?', false);
-        } while ($addMore);
-    }
+    
     private function _createQueryClass() {
         $classInfo = $this->getClassInfo('app\\database','app'.DS.'database');
         
@@ -523,22 +503,7 @@ class CreateCommand extends CLICommand {
             }
         }
     }
-    /**
-     * 
-     * @param RequestParameter $paramObj
-     */
-    private function _setParamName($paramObj) {
-        $validName = false;
-
-        do {
-            $paramName = $this->getInput('Enter a name for the request parameter:');
-            $validName = $paramObj->setName($paramName);
-
-            if (!$validName) {
-                $this->error('Given name is invalid.');
-            }
-        } while (!$validName);
-    }
+    
     /**
      * 
      * @param MySQLColumn $colObj
@@ -559,22 +524,7 @@ class CreateCommand extends CLICommand {
             } while (!$validScale);
         }
     }
-    /**
-     * 
-     * @param WebService $serviceObj
-     */
-    private function _setServiceName($serviceObj) {
-        $validName = false;
-
-        do {
-            $serviceName = $this->getInput('Enter a name for the new web service:');
-            $validName = $serviceObj->setName($serviceName);
-
-            if (!$validName) {
-                $this->error('Given name is invalid.');
-            }
-        } while (!$validName);
-    }
+    
     /**
      * 
      * @param MySQLColumn $colObj

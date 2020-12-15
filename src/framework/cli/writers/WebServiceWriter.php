@@ -117,7 +117,7 @@ class WebServiceWriter extends ClassWriter {
         $this->append(" */", 1);
         $this->append("public function isAuthorized() {", 1);
         $this->append('// TODO: Check if the client is authorized to call the service \''.$name.'\'.', 2);
-
+         $this->append('// You can ignore this method or remove it.', 2);
         $this->append('}', 1);
 
         $this->append("/**", 1);
@@ -158,7 +158,7 @@ class WebServiceWriter extends ClassWriter {
             $this->append(' * <ul>');
 
             foreach ($service->getParameters() as $param) {
-                $this->append(' * <li><b>'.$param->getName().'</b>: Data type: '.$param->getType().'.');
+                $this->append(' * <li><b>'.$param->getName().'</b>: Data type: '.$param->getType().'.</li>');
             }
             $this->append(' * </ul>');
         }

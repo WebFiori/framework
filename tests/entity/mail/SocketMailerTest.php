@@ -24,12 +24,12 @@ class SocketMailerTest extends TestCase {
     public function testAddReciver01() {
         $sm = new SocketMailer();
         $this->assertTrue($sm->addReceiver('  <Hello  ', '  hello@>hello.com'));
-        $this->assertEquals('Hello <hello@hello.com>',$sm->getReceiversStr());
+        $this->assertEquals('=?UTF-8?B?SGVsbG8=?= <hello@hello.com>',$sm->getReceiversStr());
         $this->assertEquals('Hello',$sm->getReceivers()['hello@hello.com']);
         $this->assertTrue($sm->addReceiver('  <Hello2  ', '  hello@>hello.com'));
-        $this->assertEquals('Hello2 <hello@hello.com>',$sm->getReceiversStr());
+        $this->assertEquals('=?UTF-8?B?SGVsbG8y?= <hello@hello.com>',$sm->getReceiversStr());
         $this->assertTrue($sm->addReceiver('Hel>lo-9  ', '  hello-9@>hello.com'));
-        $this->assertEquals('Hello2 <hello@hello.com>,Hello-9 <hello-9@hello.com>',$sm->getReceiversStr());
+        $this->assertEquals('=?UTF-8?B?SGVsbG8y?= <hello@hello.com>,=?UTF-8?B?SGVsbG8tOQ==?= <hello-9@hello.com>',$sm->getReceiversStr());
     }
     /**
      * @test
@@ -37,12 +37,12 @@ class SocketMailerTest extends TestCase {
     public function testAddReciver02() {
         $sm = new SocketMailer();
         $this->assertTrue($sm->addReceiver('  <Hello  ', '  hello@>hello.com',true));
-        $this->assertEquals('Hello <hello@hello.com>',$sm->getCCStr());
+        $this->assertEquals('=?UTF-8?B?SGVsbG8=?= <hello@hello.com>',$sm->getCCStr());
         $this->assertEquals('Hello',$sm->getCC()['hello@hello.com']);
         $this->assertTrue($sm->addReceiver('  <Hello2  ', '  hello@>hello.com',true));
-        $this->assertEquals('Hello2 <hello@hello.com>',$sm->getCCStr());
+        $this->assertEquals('=?UTF-8?B?SGVsbG8y?= <hello@hello.com>',$sm->getCCStr());
         $this->assertTrue($sm->addReceiver('Hel>lo-9  ', '  hello-9@>hello.com',true));
-        $this->assertEquals('Hello2 <hello@hello.com>,Hello-9 <hello-9@hello.com>',$sm->getCCStr());
+        $this->assertEquals('=?UTF-8?B?SGVsbG8y?= <hello@hello.com>,=?UTF-8?B?SGVsbG8tOQ==?= <hello-9@hello.com>',$sm->getCCStr());
     }
     /**
      * @test
@@ -50,12 +50,12 @@ class SocketMailerTest extends TestCase {
     public function testAddReciver03() {
         $sm = new SocketMailer();
         $this->assertTrue($sm->addReceiver('  <Hello  ', '  hello@>hello.com',true,true));
-        $this->assertEquals('Hello <hello@hello.com>',$sm->getBCCStr());
+        $this->assertEquals('=?UTF-8?B?SGVsbG8=?= <hello@hello.com>',$sm->getBCCStr());
         $this->assertEquals('Hello',$sm->getBCC()['hello@hello.com']);
         $this->assertTrue($sm->addReceiver('  <Hello2  ', '  hello@>hello.com',true,true));
-        $this->assertEquals('Hello2 <hello@hello.com>',$sm->getBCCStr());
+        $this->assertEquals('=?UTF-8?B?SGVsbG8y?= <hello@hello.com>',$sm->getBCCStr());
         $this->assertTrue($sm->addReceiver('Hel>lo-9  ', '  hello-9@>hello.com',true,true));
-        $this->assertEquals('Hello2 <hello@hello.com>,Hello-9 <hello-9@hello.com>',$sm->getBCCStr());
+        $this->assertEquals('=?UTF-8?B?SGVsbG8y?= <hello@hello.com>,=?UTF-8?B?SGVsbG8tOQ==?= <hello-9@hello.com>',$sm->getBCCStr());
     }
     /**
      * @test

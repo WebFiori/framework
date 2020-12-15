@@ -1377,7 +1377,9 @@ class Page {
         $body->addChild($mainContentArea);
         $this->document->addChild($body);
         $this->document->addChild($footerNode);
-        $this->theme->invokeAfterLoaded();
+        if ($this->theme !== null) {
+            $this->theme->invokeAfterLoaded();
+        }
     }
     private function _loadByThemeName($themeNameOrClass) {
         if ($themeNameOrClass === null && $this->theme === null) {

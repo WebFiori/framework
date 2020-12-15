@@ -182,7 +182,7 @@ class CreateCommand extends CLICommand {
             if ($what == 'e') {
                 $this->_createEntityFromQuery();
             } else if ($what == 't') {
-                $this->_createDbTable();
+                new CreateTable($this);
             } else if ($what == 'ws') {
                 new CreateWebService($this);
             }
@@ -207,7 +207,7 @@ class CreateCommand extends CLICommand {
             } else if ($answer == 'Web service.') {
                 new CreateWebService($this);
             } else if ($answer == 'Database table from class.') {
-                $this->_createDbTable();
+                new CreateTable($this);
             } else if ($answer == 'Middleware.') {
                 new CreateMiddleware($this);
                 return true;
@@ -217,59 +217,6 @@ class CreateCommand extends CLICommand {
             } else {
                 $this->info('Not implemented yet.');
             }
-        }
-    }
-    private function _createDbTable() {
-        $dbConnections = array_keys(WebFiori::getConfig()->getDBConnections());
-
-        if (count($dbConnections) != 0) {
-            $dbConn = $this->select('Select database connection:', $dbConnections, 0);
-            $tableClassNameValidity = false;
-            $tableClassName = $this->getArgValue('--table');
-            do {
-                if (strlen($tableClassName) == 0) {
-                    $tableClassName = $this->getInput('Enter database table class name (include namespace):');
-                }
-
-                if (!class_exists($tableClassName)) {
-                    $this->error('Class not found.');
-                    $tableClassName = '';
-                    continue;
-                }
-                $tableObj = new $tableClassName();
-
-                if (!$tableObj instanceof Table) {
-                    $this->error('The given class is not a child of the class "webfiori\database\Table".');
-                    $tableClassName = '';
-                    continue;
-                }
-                $tableClassNameValidity = true;
-            } while (!$tableClassNameValidity);
-            
-            $db = new \webfiori\framework\DB($dbConn);
-            $db->addTable($tableObj);
-            $db->table($tableObj->getName())->createTable();
-            
-            $this->prints('The following query will be executed on the database ');
-            $this->println($db->getConnectionInfo()->getDBName(),[
-                'color' => 'yellow'
-            ]);
-            $this->println($db->getLastQuery(), [
-                'color' => 'light-blue'
-            ]);
-            if ($this->confirm('Continue?', true)) {
-                $this->println('Creating your new table. Please wait a moment...');
-                try {
-                    $db->execute();
-                    $this->success('Database table created.');
-                } catch (Exception $ex) {
-                    $this->error('Unable to create database table.');
-                    $this->error($ex->getMessage());
-                }
-            }
-            
-        } else {
-            $this->error('No database connections available. Add connections inside the class \'Config\' or use the command "add".');
         }
     }
     /**

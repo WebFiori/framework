@@ -43,12 +43,6 @@ jobs:
               
       - name: Install Dependencies
         run: composer install --prefer-source --no-interaction --no-dev
-      - name: Create Storage Dir
-        run: sudo mkdir /home/runner/work/framework/framework/src/storage
-      - name: Create Sessions Dir
-        run: sudo mkdir /home/runner/work/framework/framework/src/storage/sessions
-      - name: Create Autoload Cache
-        run: sudo touch /home/runner/work/framework/framework/src/storage/autoload.cache
       
       - name: Execute Tests
         run: phpunit

@@ -413,15 +413,15 @@ abstract class AbstractJob {
 
         if ($xForce || $this->isTime()) {
             $isSuccessRun = $this->_callMethod('execute');
+            $retVal = true;
             $this->isSuccess = $isSuccessRun === true || $isSuccessRun === null;
-
+            
             if (!$this->isSuccess()) {
                 $this->_callMethod('onFail');
             } else {
                 $this->_callMethod('onSuccess');
             }
             $this->_callMethod('afterExec');
-            $retVal = true;
         }
 
         return $retVal;
@@ -935,11 +935,11 @@ abstract class AbstractJob {
         try {
             return $this->$fName();
         } catch (Exception $ex) {
-            $this->_logExeException($ex);
+            $this->_logExeException($ex, $fName);
 
             return false;
         } catch (Error $ex) {
-            $this->_logExeException($ex);
+            $this->_logExeException($ex, $fName);
 
             return false;
         }
@@ -1364,14 +1364,16 @@ abstract class AbstractJob {
      * 
      * @param \Exception $ex
      */
-    private function _logExeException($ex) {
-        Cron::log('WARNING: An exception was thrown while performing the operation. '
+    private function _logExeException($ex, $meth = '') {
+        Cron::log('WARNING: An exception was thrown while performing the operation '. get_class($this).'::'.$meth.'. '
                 .'The output of the job might be not as expected.');
         Cron::log('Exception class: "'.get_class($ex).'"');
         Cron::log('Exception message: "'.$ex->getMessage().'"');
         Cron::log('Thrown in file: "'.$ex->getFile().'"');
         Cron::log('Line: "'.$ex->getLine().'"');
-        $this->isSuccess = false;
+        if ($meth == 'execute') {
+            $this->isSuccess = false;
+        }
     }
     /**
      * 

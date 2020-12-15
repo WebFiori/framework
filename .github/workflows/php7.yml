@@ -43,6 +43,8 @@ jobs:
               
       - name: Install Dependencies
         run: composer install --prefer-source --no-interaction --no-dev
+      - name: Create Storage Dir
+        run: sudo mkdir /home/runner/work/framework/framework/src/storage/{logs, sessions}
       
       - name: Execute Tests
         run: phpunit

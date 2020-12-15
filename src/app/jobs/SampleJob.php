@@ -25,7 +25,7 @@ class SampleJob extends AbstractJob {
      * The actual code that will get executed when the job is running.
      */
     public function execute() {
-        $file = new File($this->getJobName(), ROOT_DIR);
+        $file = new File($this->getJobName().'.txt', ROOT_DIR);
         $file->setRawData('This is a test job under execution. Time: '.date(DATE_ISO8601));
         $file->write(false, true);
 
@@ -35,7 +35,7 @@ class SampleJob extends AbstractJob {
      * Executed when the job failed to completed successfully.
      */
     public function onFail() {
-        $file = new File($this->getJobName(), ROOT_DIR);
+        $file = new File($this->getJobName().'.txt', ROOT_DIR);
         $file->setRawData('The job has faild. Time: '.date(DATE_ISO8601));
         $file->write(true, true);
     }

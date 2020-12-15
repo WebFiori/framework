@@ -1348,25 +1348,9 @@ class Page {
             $xthemeName = '\\'.$themeNameOrClass;
             $tmpTheme = new $xthemeName();
         } catch (\Error $ex) {
-            if ($themeNameOrClass === null && $this->theme === null) {
-                $themeNameOrClass = SiteConfig::getBaseThemeName();
-            } else {
-                $themeNameOrClass = trim($themeNameOrClass);
-
-                if (strlen($themeNameOrClass) == 0) {
-                    return;
-                }
-            }
-
-            if ($this->theme !== null) {
-                if ($themeNameOrClass != $this->theme->getName()) {
-                    $tmpTheme = ThemeLoader::usingTheme($themeNameOrClass);
-                } else {
-                    return;
-                }
-            } else {
-                $tmpTheme = ThemeLoader::usingTheme($themeNameOrClass);
-            }
+            $tmpTheme = $this->_loadByThemeName($themeNameOrClass);
+        } catch (\Exception $ex) {
+            $tmpTheme = $this->_loadByThemeName($themeNameOrClass);
         }
         
         $this->theme = $tmpTheme;
@@ -1394,5 +1378,27 @@ class Page {
         $this->document->addChild($body);
         $this->document->addChild($footerNode);
         $this->theme->invokeAfterLoaded();
+    }
+    private function _loadByThemeName($themeNameOrClass) {
+        if ($themeNameOrClass === null && $this->theme === null) {
+            $themeNameOrClass = SiteConfig::getBaseThemeName();
+        } else {
+            $themeNameOrClass = trim($themeNameOrClass);
+
+            if (strlen($themeNameOrClass) == 0) {
+                return;
+            }
+        }
+
+        if ($this->theme !== null) {
+            if ($themeNameOrClass != $this->theme->getName()) {
+                $tmpTheme = ThemeLoader::usingTheme($themeNameOrClass);
+            } else {
+                return;
+            }
+        } else {
+            $tmpTheme = ThemeLoader::usingTheme($themeNameOrClass);
+        }
+        return $tmpTheme;
     }
 }

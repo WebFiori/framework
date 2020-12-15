@@ -62,58 +62,7 @@ class CreateCommand extends CLICommand {
             ]
         ], 'Creates a system entity (middleware, web service, background process ...).');
     }
-    /**
-     * 
-     * @param Table $tableObj
-     */
-    public function _addFks($tableObj) {
-        $refTable = null;
-        $fksNs = [];
-        do {
-            
-            $refTableName = $this->getInput('Enter the name of the referenced table class (with namespace):');
-            try {
-                $refTable = new $refTableName();
-            } catch (Error $ex) {
-                $this->error($ex->getMessage());
-                continue;
-            }
-
-            if ($refTable instanceof Table) {
-                $fkName = $this->getInput('Enter a name for the foreign key:', null, function ($val) {
-                    $trimmed = trim($val);
-                    if (strlen($trimmed) == 0) {
-                        return false;
-                    }
-                    return true;
-                });
-                $fkCols = $this->_getFkCols($tableObj);
-                $fkColsArr = [];
-
-                foreach ($fkCols as $colKey) {
-                    $fkColsArr[$colKey] = $this->select('Select the column that will be referenced by the column \''.$colKey.'\':', $refTable->getColsKeys());
-                }
-                $onUpdate = $this->select('Choose on update condition:', [
-                    'cascade', 'restrict', 'set null', 'set default', 'no action'
-                ], 1);
-                $onDelete = $this->select('Choose on delete condition:', [
-                    'cascade', 'restrict', 'set null', 'set default', 'no action'
-                ], 1);
-                
-                try {
-                    $tableObj->addReference($refTable, $fkColsArr, $fkName, $onUpdate, $onDelete);
-                    $this->success('Foreign key added.');
-                    $fksNs[$fkName] = $refTableName;
-                } catch (Exception $ex) {
-                    $this->error($ex->getMessage());
-                } 
-            } else {
-                $this->error('The given class is not an instance of the class \'MySQLQuery\'.');
-            }
-
-        } while ($this->confirm('Would you like to add another foreign key?', false));
-        return $fksNs;
-    }
+    
     public function _createEntityFromQuery() {
         $tableClassNameValidity = false;
         $tableClassName = $this->getArgValue('--table-class');
@@ -155,27 +104,7 @@ class CreateCommand extends CLICommand {
 
         return 0;
     }
-    private function _createWebServices() {
-        $classInfo = $this->getClassInfo('app\\apis','app'.DS.'apis');
-        
-        $serviceObj = new ServiceHolder();
 
-        $this->_setServiceName($serviceObj);
-        $serviceObj->addRequestMethod($this->select('Request method:', AbstractWebService::METHODS, 0));
-
-        if ($this->confirm('Would you like to add request parameters to the service?', false)) {
-            $this->_addParamsToService($serviceObj);
-        }
-
-
-
-        $this->println('Creating the class...');
-        $servicesCreator = new WebServiceWriter($serviceObj, $classInfo);
-        $servicesCreator->writeClass();
-        $this->success('Class created.');
-        $this->info('Don\'t forget to add the service to a services manager.');
-        return 0;
-    }
     public function exec() {
         $what = $this->getArgValue('--what');
         if ($what !== null) {
@@ -201,7 +130,7 @@ class CreateCommand extends CLICommand {
             if ($answer == 'Quit.') {
                 return 0;
             } else if ($answer == 'Database table class.') {
-                return $this->_createQueryClass();
+                new CreateTableObj($this);
             } else if ($answer == 'Entity class from table.') {
                 return $this->_createEntityFromQuery();
             } else if ($answer == 'Web service.') {
@@ -267,77 +196,8 @@ class CreateCommand extends CLICommand {
             'path' => $path
         ];
     }
-    /**
-     * 
-     * @param MySQLColumn $colObj
-     */
-    private function _addColComment($colObj) {
-        if ($this->confirm('Would you like to add your own comment about the column?', false)) {
-            $comment = $this->getInput('Enter your comment:');
-
-            if (strlen($comment) != 0) {
-                $colObj->setComment($comment);
-            }
-        }
-        $this->success('Column added.');
-    }
     
-    private function _createQueryClass() {
-        $classInfo = $this->getClassInfo('app\\database','app'.DS.'database');
-        
-        
-        $tempTable = new MySQLTable();
-        $this->_setTableName($tempTable);
-        $this->_setTableComment($tempTable);
-        $this->println('Now you have to add columns to the table.');
-
-        do {
-            $colKey = $this->getInput('Enter a name for column key:');
-            if ($tempTable->hasColumnWithKey($colKey)) {
-                $this->warning("The table already has a key with name '$colKey'.");
-                continue;
-            }
-            $col = new MySQLColumn();
-            $col->setName(str_replace('-', '_', $colKey));
-            $colDatatype = $this->select('Select column data type:', $col->getSupportedTypes(), 0);
-            $col->setDatatype($colDatatype);
-            $isAdded = $tempTable->addColumn($colKey, $col);
-
-            if (!$isAdded) {
-                $this->warning('The column was not added. Mostly, key name is invalid. Try again.');
-            } else {
-                $colObj = $tempTable->getColByKey($colKey);
-                $this->_setSize($colObj);
-                $this->_isPrimaryCheck($colObj);
-                $this->_addColComment($colObj);
-            }
-        } while ($this->confirm('Would you like to add another column?', false));
-
-        if ($this->confirm('Would you like to add foreign keys to the table?', false)) {
-            $classInfo['fk-info'] = $this->_addFks($tempTable);
-        }
-
-        if ($this->confirm('Would you like to create an entity class that maps to the database table?', false)) {
-            $entityInfo = $this->getClassInfo('app\\entity', 'app'.DS.'entity');
-            $entityInfo['implement-jsoni'] = $this->confirm('Would you like from your entity class to implement the interface JsonI?', true);
-            $classInfo['entity-info'] = $entityInfo;
-        }
-
-        if (strlen($classInfo['namespace']) == 0) {
-            $classInfo['namespace'] = 'app\database';
-            $this->warning('The table class will be added to the namespace "'.$classInfo['namespace'].'" since no namespace was provided.');
-        }
-
-        if (isset($classInfo['entity-info']) && strlen($classInfo['entity-info']['namespace']) == 0) {
-            $classInfo['entity-info']['namespace'] = 'app\database';
-            $this->warning('The entity class will be added to the namespace "'.$classInfo['entity-info']['namespace'].'" since no namespace was provided.');
-        }
-        $writer = new QueryClassWriter($tempTable, $classInfo);
-        $writer->writeClass();
-        $this->success('New class created.');
-
-        return 0;
-    }
+    
     private function _getClassName() {
         $isNameValid = false;
 
@@ -359,12 +219,8 @@ class CreateCommand extends CLICommand {
             $path = $this->getInput("Where would you like to store the class? (must be a directory inside '".ROOT_DIR."')", $default);
             $fixedPath = ROOT_DIR.DS.trim(trim(str_replace('\\', DS, str_replace('/', DS, $path)),'/'),'\\');
 
-            if (Util::isDirectory($fixedPath)) {
-                if (!in_array($fixedPath, AutoLoader::getFolders())) {
-                    $this->error('Provoded directory is not part of autoload directories.');
-                } else {
-                    $validPath = true;
-                }
+            if (Util::isDirectory($fixedPath, true)) {
+               $validPath = true;
             } else {
                 $this->error('Provided direcory is not a directory or it does not exist.');
             }
@@ -372,29 +228,7 @@ class CreateCommand extends CLICommand {
 
         return $fixedPath;
     }
-    /**
-     * 
-     * @param Table $tableObj
-     * @return type
-     */
-    private function _getFkCols($tableObj) {
-        $colNumber = 1;
-        $keys = $tableObj->getColsKeys();
-        $fkCols = [];
-
-        do {
-            $colKey = $this->select('Select column #'.$colNumber.':', $keys);
-
-            if (!in_array($colKey, $fkCols)) {
-                $fkCols[] = $colKey;
-                $colNumber++;
-            } else {
-                $this->error('The column is already added.');
-            }
-        } while ($this->confirm('Would you like to add another column to the foreign key?', false));
-
-        return $fkCols;
-    }
+    
     private function _getNamespace($defaultNs) {
         $isNameValid = false;
 
@@ -409,143 +243,7 @@ class CreateCommand extends CLICommand {
 
         return trim($ns,'\\');
     }
-    /**
-     * 
-     * @param MySQLColumn $colObj
-     */
-    private function _isPrimaryCheck($colObj) {
-        $colObj->setIsPrimary($this->confirm('Is this column primary?', false));
-        $type = $colObj->getDatatype();
-
-        if (!$colObj->isPrimary()) {
-            if (!($type == 'bool' || $type == 'boolean')) {
-                $colObj->setIsUnique($this->confirm('Is this column unique?', false));
-            }
-            $this->_setDefaultValue($colObj);
-            $colObj->setIsNull($this->confirm('Can this column have null values?', false));
-        } else {
-            if ($colObj->getDatatype() == 'int') {
-                $colObj->setIsAutoInc($this->confirm('Is this column auto increment?', false));
-            }
-        }
-    }
-    /**
-     * 
-     * @param MySQLColumn $colObj
-     */
-    private function _setDefaultValue($colObj) {
-        if ($colObj->getDatatype() == 'bool' || $colObj->getDatatype() == 'boolean') {
-            $defaultVal = trim($this->getInput('Enter default value (true or false) (Hit "Enter" to skip):', ''));
-
-            if ($defaultVal == 'true') {
-                $colObj->setDefault(true);
-            } else if ($defaultVal == 'false') {
-                $colObj->setDefault(false);
-            }
-        } else {
-            $defaultVal = trim($this->getInput('Enter default value (Hit "Enter" to skip):', ''));
-
-            if (strlen($defaultVal) != 0) {
-                $colObj->setDefault($defaultVal);
-            }
-        }
-    }
     
-    /**
-     * 
-     * @param MySQLColumn $colObj
-     */
-    private function _setScale($colObj) {
-        $colDataType = $colObj->getDatatype();
-
-        if ($colDataType == 'decimal' || $colDataType == 'float' || $colDataType == 'double') {
-            $validScale = false;
-
-            do {
-                $scale = $this->getInput('Enter the scale (number of numbers to the right of decimal point):');
-                $validScale = $colObj->setScale($scale);
-
-                if (!$validScale) {
-                    $this->error('Invalid scale value.');
-                }
-            } while (!$validScale);
-        }
-    }
-    
-    /**
-     * 
-     * @param MySQLColumn $colObj
-     */
-    private function _setSize($colObj) {
-        $type = $colObj->getDatatype();
-        $supportSize = $type == 'int' 
-                || $type == 'varchar'
-                || $type == 'decimal' 
-                || $type == 'float'
-                || $type == 'double' 
-                || $type == 'text';
-
-        if ($supportSize) {
-            $valid = false;
-
-            do {
-                $colDataType = $colObj->getDatatype();
-                $dataSize = $this->getInput('Enter column size:');
-
-                if ($colObj->getDatatype() == 'varchar' && $dataSize > 21845) {
-                    $this->warning('The data type "varchar" has a maximum size of 21845. The '
-                            .'data type of the column will be changed to "mediumtext" if you continue.');
-
-                    if (!$this->confirm('Would you like to change data type?', false)) {
-                        $valid = true;
-                        continue;
-                    }
-                }
-
-                if ($colDataType == 'int' && $dataSize > 11) {
-                    $this->warning('Size is set to 11 since this is the maximum size for "int" type.');
-                }
-                $valid = $colObj->setSize($dataSize);
-
-                if (!$valid) {
-                    $this->error('Invalid size is given.');
-                } else {
-                    $this->_setScale($colObj);
-                }
-            } while (!$valid);
-        }
-    }
-    /**
-     * 
-     * @param Table $tempTable
-     */
-    private function _setTableComment($tempTable) {
-        $incComment = $this->confirm('Would you like to add your comment about the table?', false);
-
-        if ($incComment) {
-            $tableComment = $this->getInput('Enter your comment:');
-
-            if (strlen($tableComment) != 0) {
-                $tempTable->setComment($tableComment);
-            }
-        }
-    }
-    /**
-     * 
-     * @param Table $tableObj
-     */
-    private function _setTableName($tableObj) {
-        $invalidTableName = true;
-
-        do {
-            $tableName = $this->getInput('Enter database table name:');
-            $invalidTableName = !$tableObj->setName($tableName);
-
-            if ($invalidTableName) {
-                $this->error('The given name is invalid.');
-            }
-        } while ($invalidTableName);
-    }
     private function _validateClassName($name) {
         $len = strlen($name);
 

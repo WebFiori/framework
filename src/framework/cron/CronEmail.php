@@ -72,7 +72,7 @@ class CronEmail extends EmailMessage {
                 }
             }
 
-            $this->subject('Background Task Status: Task \''.$activeJob->getJobName().'\'');
+            
             $this->importance(1);
             $this->document()->getBody()->setStyle([
                 'font-family' => 'monospace'
@@ -86,11 +86,13 @@ class CronEmail extends EmailMessage {
             ]);
 
             if ($activeJob->isSuccess()) {
+                $this->subject('Background Task Status: Task \''.$activeJob->getJobName().'\' 😃');
                 $text = 'This automatic system email is sent to notify you that the background job '
                         .'\''.$activeJob->getJobName().'\' was <b style="color:green">successfully completed '
                         .'without any issues</b>. For more details about execution process, '
                         .'please check the attached execution log file.</p>';
             } else {
+                $this->subject('Background Task Status: Task \''.$activeJob->getJobName().'\' 😲');
                 $text = 'This automatic email is sent to notify you that the background job '
                         .'\''.$activeJob->getJobName().'\' <b style="color:red">did not successfully complet due some error(s)'
                         .'</b>. To investigate the cause of failure, '

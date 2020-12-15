@@ -590,7 +590,8 @@ class AutoLoader {
      * @since 1.1.6
      */
     private function _readCache() {
-        $autoloadCache = $this->getRoot().DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR.'storage'.DIRECTORY_SEPARATOR.self::CACHE_NAME;
+        $autoloadCachePath = $this->getRoot().DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR.'storage';
+        $autoloadCache = $autoloadCachePath.DIRECTORY_SEPARATOR.self::CACHE_NAME;
         //For first run, the cache file might not exist.
         if (file_exists($autoloadCache)) {
             $casheStr = file_get_contents($autoloadCache);
@@ -615,6 +616,10 @@ class AutoLoader {
                     }
                 }
             }
+        } else {
+            mkdir($autoloadCachePath);
+            $h = fopen($autoloadCache, 'w');
+            fclose($h);
         }
     }
     /**
@@ -711,14 +716,7 @@ class AutoLoader {
             if (!$loaded) {
                 $loaded = $this->_loadClassHelper($className, $classWithNs, $value, $appendRoot, $allPaths, true);
             }
-
-            if ($loaded && (PHP_MAJOR_VERSION < 7 || (PHP_MAJOR_VERSION == 7 && PHP_MINOR_VERSION <= 3))) {
-                //in php 7.2 and lower, if same class is loaded 
-                //from two namespaces with same name, it will 
-                //rise a fatal error with message 
-                // 'Cannot redeclare class'
-                break;
-            }
+            
         }
         
         if ($loaded === false) {

@@ -31,6 +31,7 @@ use webfiori\framework\cli\CLI;
 use webfiori\framework\Util;
 use webfiori\framework\WebFiori;
 use webfiori\framework\cli\CLICommand;
+use webfiori\framework\session\SessionsManager;
 /**
  * A class that is used to manage scheduled background jobs.
  * 
@@ -532,8 +533,9 @@ class Cron {
      */
     public static function run($pass = '',$jobName = null,$force = false, $command = null) {
         self::log('Running job(s) check...');
-
-        if (Cron::password() != 'NO_PASSWORD' && \webfiori\framework\session\SessionsManager::getActiveSession()->get('cron-login-status') !== true && hash('sha256',$pass) != Cron::password()) {
+        $activeSession = SessionsManager::getActiveSession();
+        $isSessionLogged = $activeSession !== null ? $activeSession->get('cron-login-status') : false;
+        if (Cron::password() != 'NO_PASSWORD' && $isSessionLogged !== true && hash('sha256',$pass) != Cron::password()) {
             self::log('Error: Given password is incorrect.');
             self::log('Check finished.');
 
@@ -738,7 +740,7 @@ class Cron {
 
     private function _logJobExecution($job,$forced = false) {
         if ($this->isLogEnabled) {
-            $logsPath = ROOT_DIR.DS.'app'.DS.'storage'.'logs';
+            $logsPath = ROOT_DIR.DS.'app'.DS.'storage'.DS.'logs';
             $logFile = $logsPath.DS.'cron.log';
 
             if (Util::isDirectory($logsPath, true)) {

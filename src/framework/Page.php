@@ -1344,17 +1344,17 @@ class Page {
      * @see Theme::usingTheme()
      */
     private function usingTheme($themeNameOrClass = null) {
-        if (strlen($themeNameOrClass) != 0) {
-            try {
-                $xthemeName = '\\'.$themeNameOrClass;
+        try {
+            $xthemeName = '\\'.$themeNameOrClass;
+            if ($xthemeName != '\\') {
                 $tmpTheme = new $xthemeName();
-            } catch (\Error $ex) {
-                $tmpTheme = $this->_loadByThemeName($themeNameOrClass);
-            } catch (\Exception $ex) {
+            } else {
                 $tmpTheme = $this->_loadByThemeName($themeNameOrClass);
             }
-        } else {
-            $tmpTheme = null;
+        } catch (\Error $ex) {
+            $tmpTheme = $this->_loadByThemeName($themeNameOrClass);
+        } catch (\Exception $ex) {
+            $tmpTheme = $this->_loadByThemeName($themeNameOrClass);
         }
         
         if ($tmpTheme !== null) {

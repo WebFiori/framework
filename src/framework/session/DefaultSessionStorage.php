@@ -49,7 +49,10 @@ class DefaultSessionStorage implements SessionStorage {
      */
     public function __construct() {
         $this->storeLoc = ROOT_DIR.DS.'app'.DS.'storage'.DS.'sessions';
-        Util::isDirectory($this->storeLoc, true);
+        
+        if (!file_exists($this->storeLoc)) {
+            mkdir($this->storeLoc, '0777', true);
+        }
     }
     /**
      * Removes all inactive sessions.

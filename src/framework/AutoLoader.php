@@ -617,7 +617,10 @@ class AutoLoader {
                 }
             }
         } else {
-            mkdir($autoloadCachePath, '0777', true);
+            
+            if (!file_exists($autoloadCachePath)) {
+                mkdir($autoloadCachePath, '0777', true);
+            }
             $h = fopen($autoloadCache, 'w');
             fclose($h);
         }

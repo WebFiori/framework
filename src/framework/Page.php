@@ -1344,16 +1344,12 @@ class Page {
      * @see Theme::usingTheme()
      */
     private function usingTheme($themeNameOrClass = null) {
-        try {
-            $xthemeName = '\\'.$themeNameOrClass;
-            if ($xthemeName != '\\') {
-                $tmpTheme = new $xthemeName();
-            } else {
+        if (class_exists($xthemeName)) {
+            $tmpTheme = new $xthemeName();
+            if (!($tmpTheme instanceof Theme)) {
                 $tmpTheme = $this->_loadByThemeName($themeNameOrClass);
             }
-        } catch (\Error $ex) {
-            $tmpTheme = $this->_loadByThemeName($themeNameOrClass);
-        } catch (\Exception $ex) {
+        } else {
             $tmpTheme = $this->_loadByThemeName($themeNameOrClass);
         }
         

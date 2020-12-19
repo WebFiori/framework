@@ -1344,6 +1344,8 @@ class Page {
      * @see Theme::usingTheme()
      */
     private function usingTheme($themeNameOrClass = null) {
+        $xthemeName = '\\'.$themeNameOrClass;
+        
         if (class_exists($xthemeName)) {
             $tmpTheme = new $xthemeName();
             if (!($tmpTheme instanceof Theme)) {

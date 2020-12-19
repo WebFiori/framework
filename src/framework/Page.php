@@ -556,7 +556,7 @@ class Page {
     public static function theme($name = null) {
         $p = Page::get();
         $p->usingTheme($name);
-
+        
         return $p->getTheme();
     }
     /**
@@ -1353,31 +1353,32 @@ class Page {
             $tmpTheme = $this->_loadByThemeName($themeNameOrClass);
         }
         
-        $this->theme = $tmpTheme;
+        if ($tmpTheme !== null) {
+            $this->theme = $tmpTheme;
 
-        $mainContentArea = Page::document()->getChildByID(self::MAIN_ELEMENTS[2]);
+            $mainContentArea = Page::document()->getChildByID(self::MAIN_ELEMENTS[2]);
 
-        if ($mainContentArea === null) {
-            $mainContentArea = new HTMLNode();
-            $mainContentArea->setID(self::MAIN_ELEMENTS[2]);
-        }
+            if ($mainContentArea === null) {
+                $mainContentArea = new HTMLNode();
+                $mainContentArea->setID(self::MAIN_ELEMENTS[2]);
+            }
 
-        $this->document = new HTMLDoc();
-        $headNode = $this->_getHead();
-        $footerNode = $this->_getFooter();
-        $asideNode = $this->_getAside();
-        $headerNode = $this->_getHeader();
-        $this->document->setLanguage($this->getLang());
-        $this->document->setHeadNode($headNode);
-        $this->document->addChild($headerNode);
-        $body = new HTMLNode();
-        $body->setID(self::MAIN_ELEMENTS[0]);
-        $body->addChild($asideNode);
+            $this->document = new HTMLDoc();
+            $headNode = $this->_getHead();
+            $footerNode = $this->_getFooter();
+            $asideNode = $this->_getAside();
+            $headerNode = $this->_getHeader();
+            $this->document->setLanguage($this->getLang());
+            $this->document->setHeadNode($headNode);
+            $this->document->addChild($headerNode);
+            $body = new HTMLNode();
+            $body->setID(self::MAIN_ELEMENTS[0]);
+            $body->addChild($asideNode);
 
-        $body->addChild($mainContentArea);
-        $this->document->addChild($body);
-        $this->document->addChild($footerNode);
-        if ($this->theme !== null) {
+            $body->addChild($mainContentArea);
+            $this->document->addChild($body);
+            $this->document->addChild($footerNode);
+        
             $this->theme->invokeAfterLoaded();
         }
     }

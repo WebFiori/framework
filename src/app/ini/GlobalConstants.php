@@ -107,7 +107,7 @@ class GlobalConstants {
              * false.
              * @since 1.0
              */
-            define('WF_VERBOSE', true);
+            define('WF_VERBOSE', false);
         }
 
         if (!defined('NO_WWW')) {

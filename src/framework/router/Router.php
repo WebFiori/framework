@@ -196,6 +196,7 @@ class Router {
         if ($indexToSearch == 'static') {
             $route = isset($this->routes[$indexToSearch][$routeUri->getPath()]) ? 
                     $this->routes[$indexToSearch][$routeUri->getPath()] : null;
+            
             if ($route instanceof RouterUri) {
                 if (!$route->isCaseSensitive()) {
                     $isEqual = strtolower($route->getUri()) == 
@@ -1155,14 +1156,25 @@ class Router {
             }
         } else {
             $file = $route->getRouteTo();
-
-            try {
-                $xFile = '\\'. str_replace("/", "\\", $file);
-                $class = new $xFile();
-            } catch (\Error $ex) {
+            // A route created using the syntax Class::class
+            $xFile = '\\'. str_replace("/", "\\", $file);
+            
+            if (class_exists($xFile)) {
+                try {
+                    $class = new $xFile();
+                
+                    if ($class instanceof WebServicesManager) {
+                        $class->process();
+                    }
+                } catch (Exception $ex) {
+                    throw new RoutingException("Unable to create an instance of the class $xFile. Reason: '".$ex->getMessage()."'");
+                } catch (Error $ex) {
+                    throw new RoutingException("Unable to create an instance of the class $xFile. Reason: '".$ex->getMessage()."'");
+                }
+            } else {
                 $routeType = $route->getType();
                 
-                if ($routeType == self::VIEW_ROUTE || $routeType == self::CUSTOMIZED) {
+                if ($routeType == self::VIEW_ROUTE || $routeType == self::CUSTOMIZED || $routeType == self::API_ROUTE) {
                     $file = ROOT_DIR.$routeType.$this->_fixFilePath($file);
                 } else {
                     $file = ROOT_DIR.$this->_fixFilePath($file);

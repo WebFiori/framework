@@ -36,7 +36,7 @@ use webfiori\http\Response;
  * 
  * @author Ibrahim
  * 
- * @version 1.1.7
+ * @version 1.1.8
  */
 class File implements JsonI {
     /**
@@ -359,7 +359,7 @@ class File implements JsonI {
      * @since 1.1.7
      */
     public function getLastModified($format = null) {
-        if (file_exists($this->getAbsolutePath())) {
+        if ($this->isExist()) {
             clearstatcache();
 
             if ($format !== null) {
@@ -482,7 +482,25 @@ class File implements JsonI {
      * @since 1.1.6
      */
     public function isExist() {
-        return file_exists($this->getAbsolutePath());
+        return self::isFileExist($this->getAbsolutePath());
+    }
+    /**
+     * Checks if file exist or not without throwing errors.
+     * 
+     * This method uses the function 'file_exists()' to check if a file is exist 
+     * or not given its path. The only difference is that it will not 
+     * throw an error if path is invalid.
+     * 
+     * @param string $path File path.
+     * 
+     * @since 1.1.8
+     */
+    public static function isFileExist($path) {
+        set_error_handler(function () {});
+        $isExist = file_exists($path);
+        restore_error_handler();
+        
+        return $isExist;
     }
     /**
      * Reads the file in binary mode.
@@ -531,7 +549,7 @@ class File implements JsonI {
      * @since 1.1.2
      */
     public function remove() {
-        if (file_exists($this->getAbsolutePath())) {
+        if ($this->isExist()) {
             unlink($this->getAbsolutePath());
 
             return true;

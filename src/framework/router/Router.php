@@ -1139,6 +1139,7 @@ class Router {
      * @throws RoutingException
      */
     private function _routeFound($route, $loadResource) {
+        $this->uriObj = $route;
         $route->getMiddlewar()->insertionSort(false);
         foreach ($route->getMiddlewar() as $mw) {
             $mw->before();
@@ -1149,7 +1150,6 @@ class Router {
         }
         
         if (is_callable($route->getRouteTo())) {
-            $this->uriObj = $route;
             
             if ($loadResource === true) {
                 call_user_func_array($route->getRouteTo(),$route->getClosureParams());
@@ -1180,7 +1180,6 @@ class Router {
                     $file = ROOT_DIR.$this->_fixFilePath($file);
                 }
                 if (gettype($file) == 'string' && file_exists($file)) {
-                    $this->uriObj = $route;
 
                     if ($loadResource === true) {
                         $route->setRoute($file);

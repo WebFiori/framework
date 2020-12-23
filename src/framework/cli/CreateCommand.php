@@ -216,6 +216,7 @@ class CreateCommand extends CLICommand {
         $validPath = false;
 
         do {
+            clearstatcache();
             $path = $this->getInput("Where would you like to store the class? (must be a directory inside '".ROOT_DIR."')", $default);
             $fixedPath = ROOT_DIR.DS.trim(trim(str_replace('\\', DS, str_replace('/', DS, $path)),'/'),'\\');
 

@@ -487,6 +487,7 @@ class Page {
         if ($returnResult) {
             return Page::get()->getDocument();
         } else {
+            $formatted = $formatted === true || (defined('WF_VERBOSE') && WF_VERBOSE);
             Response::write(Page::get()->getDocument()->toHTML($formatted));
         }
     }

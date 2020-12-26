@@ -30,7 +30,8 @@ use webfiori\framework\Util;
  * A fixed box which is used to show PHP warnings and notices.
  *
  * @author Ibrahim
- * @version 1.0.1
+ * 
+ * @version 1.0.2
  */
 class ErrorBox extends MessageBox {
     /**
@@ -58,6 +59,11 @@ class ErrorBox extends MessageBox {
      * @var HTMLNode 
      */
     private $messageNode;
+    /**
+     *
+     * @var HTMLNode 
+     */
+    private $traceNode;
     /**
      *
      * @var HTMLNode 
@@ -139,6 +145,40 @@ class ErrorBox extends MessageBox {
             $this->messageNode->addTextNode('<b class="err-label">Message: </b>'.$msg, false);
         }
     }
+    /**
+     * Sets the trace of the error.
+     * 
+     * This method will get the trace using the function debug_backtrace().
+     * 
+     * @since 1.0.2
+     * 
+     */
+    public function setTrace() {
+        if ($this->traceNode !== null) {
+            $this->traceNode->removeAllChildNodes();
+            $this->traceNode->addChild('p', [
+                'class' => 'message-line err-label'
+            ], false)
+                    ->text('Stack Trace:');
+            $num = 0;
+            $traceArr = debug_backtrace();
+            foreach ($traceArr as $arrEntry) {
+                $this->traceNode->addChild('p', [
+                    'class' => 'message-line',
+                    'style' => [
+                        'font-size' => '8pt'
+                    ]
+                ], false)->text(self::_traceArrAsString($num, $arrEntry));
+                $num++;
+            }
+        }
+    }
+    private static function _traceArrAsString($num, $arr) {
+        $file = $arr['file'];
+        $line = $arr['line'];
+        $class = isset($arr['class']) ? $arr['class'] : '';
+        return "#$num $file($line): $class";
+    }
     private function _init() {
         $this->setClassName('error-message-box');
         $this->setStyle([
@@ -148,8 +188,9 @@ class ErrorBox extends MessageBox {
         if ($this->isInitialized()) {
             $this->getHeader()->setClassName('error-header', false);
             $detailsContainer = &$this->getBody();
-            $this->errNode = new HTMLNode('p');
-            $this->errNode->setClassName('message-line');
+            $this->errNode = new HTMLNode('p', [
+                'class' => 'message-line'
+            ]);
             $detailsContainer->addChild($this->errNode);
             $this->descNode = new HTMLNode('p');
             $this->descNode->setClassName('message-line');
@@ -163,7 +204,7 @@ class ErrorBox extends MessageBox {
             $this->lineNode = new HTMLNode('p');
             $this->lineNode->setClassName('message-line');
             $detailsContainer->addChild($this->lineNode);
-
+            $this->traceNode = new HTMLNode();
             if (!defined('WF_VERBOSE') || !WF_VERBOSE) {
                 $this->tipNode = new HTMLNode('p');
                 $this->tipNode->setClassName('message-line');
@@ -172,6 +213,8 @@ class ErrorBox extends MessageBox {
                     .' display more details about the error, '
                     .'define the constant "WF_VERBOSE" and set its value to "true" in '
                     .'the class "GlobalConstants".', false);
+            } else {
+                $detailsContainer->addChild($this->traceNode);
             }
 
             $this->setAttribute('onmouseover', "if(this.getAttribute('dg') === null){addDragSupport(this)}");

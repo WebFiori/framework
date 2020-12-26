@@ -71,7 +71,9 @@ class MessageBox extends HTMLNode {
         } else if (!defined('MAX_BOX_MESSAGES')) {
             $this->_init();
         }
-        
+        $this->setStyle([
+            'font-size' => '8pt'
+        ]);
     }
     /**
      * Returns the node that represents the header of the message.

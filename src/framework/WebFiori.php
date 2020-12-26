@@ -525,6 +525,7 @@ class WebFiori {
                     $errBox->setFile($errfile);
                     $errBox->setMessage($errstr);
                     $errBox->setLine($errline);
+                    $errBox->setTrace();
                     Response::write($errBox);
                 }
             }

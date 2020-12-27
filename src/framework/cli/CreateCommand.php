@@ -24,6 +24,7 @@
  */
 namespace webfiori\framework\cli;
 
+use webfiori\framework\Util;
 use webfiori\database\Table;
 /**
  * A command which is used to automate some of the common tasks such as 

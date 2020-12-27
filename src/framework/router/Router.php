@@ -55,7 +55,7 @@ use Exception;
  * </p>
  * <p>An API route is a route that points to a file which exist inside the 
  * directory 'app/apis'. This folder usually contains PHP files which extends 
- * the class 'ExtendedWebServices' or the class 'WebServicesSet'.
+ * the class 'ExtendedWebServicesManager' or the class 'WebServicesManager'.
  * </p>
  * <p>
  * A closure route is simply a function that will be executed when the 
@@ -68,8 +68,18 @@ use Exception;
  * to it as follows:
  * <pre>
  * Router::addRoute([<br/>
- * 'path'=>'/custom-route',<br/>
- * 'route-to'=>'/my-files/my-view.html'<br/>
+ * &nbsp;&nbsp;&nbsp;&nbsp;'path'=>'/custom-route',<br/>
+ * &nbsp;&nbsp;&nbsp;&nbsp;'route-to'=>'/my-files/my-view.html'<br/>
+ * ]);
+ * </pre> 
+ * </p>
+ * <p>
+ * In addition to creating routes using files, it is possible to have routes which 
+ * points to classes as follows:
+ * <pre>
+ * Router::addRoute([<br/>
+ * &nbsp;&nbsp;&nbsp;&nbsp;'path'=>'/custom-route',<br/>
+ * &nbsp;&nbsp;&nbsp;&nbsp;'route-to'=> MyClass::class<br/>
  * ]);
  * </pre> 
  * </p>

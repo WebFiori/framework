@@ -228,7 +228,7 @@ class QueryClassWriter extends ClassWriter {
             $this->append("'primary' => true,", 4);
 
             if ($colObj->isAutoInc()) {
-                $this->append("'is-unique' => true,", 4);
+                $this->append("'auto-inc' => true,", 4);
             }
         }
 

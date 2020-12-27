@@ -109,6 +109,18 @@ namespace webfiori\framework\i18n;
 class LanguageAR extends Language {
     public function __construct() {
         parent::__construct('rtl', 'AR', true);
+        $this->createAndSet('general', [
+            'framework-name' => 'إطار برمجة ويب فيوري',
+        ]);
+        $this->createAndSet('general/social-media-names', [
+            'linkedin' => 'لنكد ان',
+            'github' => 'جيت هب',
+            'twitter' => 'تويتر',
+            'telegram' => 'تيليجرام',
+            'reddit' => 'ريدت',
+            'facebook' => 'فيس بوك',
+            'whatsapp' => 'واتس آب'
+        ]);
         $this->createAndSet('general/http-codes/200', [
             'code' => 200,
             'type' => 'OK',
@@ -181,7 +193,8 @@ class LanguageAR extends Language {
             'next' => 'التالي',
             'previous' => 'السابق',
             'skip' => 'تخطي',
-            'finish' => 'إنهاء'
+            'finish' => 'إنهاء',
+            'add' => 'اضافة'
         ]);
 
         $this->createAndSet('general/error', [
@@ -205,7 +218,9 @@ class LanguageAR extends Language {
             'printed' => 'تمت الطباعة.',
             'connecting' => 'جاري الإتصال...',
             'connected' => 'تم الإتصال.',
-            'disconnected' => 'غير متصل.'
+            'disconnected' => 'غير متصل.',
+            'adding' => 'جاري الإضافة...',
+            'added' => 'تمت الإضافة.'
         ]);
 
         $this->createAndSet('general/error', [
@@ -213,7 +228,8 @@ class LanguageAR extends Language {
             'remove' => 'غير قادر على الإزالة!',
             'delete' => 'غير قادر على الحذف!',
             'print' => 'غير قادر على الطباعة !',
-            'connect' => 'غير قادر على الإتصال!'
+            'connect' => 'غير قادر على الإتصال!',
+            'add' => 'غير قادر على الإضافة!'
         ]);
 
         $this->createAndSet('general/week-day', [

@@ -24,19 +24,7 @@
  */
 namespace webfiori\framework\cli;
 
-use Error;
-use webfiori\database\mysql\MySQLColumn;
-use webfiori\database\mysql\MySQLTable;
-use restEasy\WebService;
-use webfiori\http\APIFilter;
-use webfiori\http\ParamTypes;
-use webfiori\http\RequestParameter;
-use webfiori\framework\AutoLoader;
-use webfiori\framework\Util;
-use webfiori\framework\WebFiori;
 use webfiori\database\Table;
-use Exception;
-use webfiori\http\AbstractWebService;
 /**
  * A command which is used to automate some of the common tasks such as 
  * creating table classes or controllers.
@@ -107,41 +95,41 @@ class CreateCommand extends CLICommand {
 
     public function exec() {
         $what = $this->getArgValue('--what');
+        $create = null;
         if ($what !== null) {
             if ($what == 'e') {
                 $this->_createEntityFromQuery();
             } else if ($what == 't') {
-                new CreateTable($this);
+                $create = new CreateTable($this);
             } else if ($what == 'ws') {
-                new CreateWebService($this);
+                $create = new CreateWebService($this);
             }
         } else {
             $options = [
-            'Database table class.',
-            'Entity class from table.',
-            'Web service.',
-            'Background job.',
-            'Middleware.',
-            'Database table from class.',
-            'Quit.'
-        ];
-        $answer = $this->select('What would you like to create?', $options, count($options) - 1);
-
+                'Database table class.',
+                'Entity class from table.',
+                'Web service.',
+                'Background job.',
+                'Middleware.',
+                'Database table from class.',
+                'Quit.'
+            ];
+            $answer = $this->select('What would you like to create?', $options, count($options) - 1);
             if ($answer == 'Quit.') {
                 return 0;
             } else if ($answer == 'Database table class.') {
-                new CreateTableObj($this);
+                $create = new CreateTableObj($this);
             } else if ($answer == 'Entity class from table.') {
                 return $this->_createEntityFromQuery();
             } else if ($answer == 'Web service.') {
-                new CreateWebService($this);
+                $create = new CreateWebService($this);
             } else if ($answer == 'Database table from class.') {
                 new CreateTable($this);
             } else if ($answer == 'Middleware.') {
-                new CreateMiddleware($this);
+                $create = new CreateMiddleware($this);
                 return true;
             } else if ($answer == 'Background job.') {
-                new CreateCronJob($this);
+                $create = new CreateCronJob($this);
                 return true;
             } else {
                 $this->info('Not implemented yet.');

@@ -46,7 +46,7 @@ class CreateTableObj {
                 continue;
             }
             $col = new MySQLColumn();
-            $col->setName(str_replace('-', '_', $colKey));
+            $col->setName(str_replace('-', '_', str_replace(' ', '_', $colKey)));
             $colDatatype = $this->_getCommand()->select('Select column data type:', $col->getSupportedTypes(), 0);
             $col->setDatatype($colDatatype);
             $isAdded = $tempTable->addColumn($colKey, $col);
@@ -98,10 +98,8 @@ class CreateTableObj {
             }
             $this->_setDefaultValue($colObj);
             $colObj->setIsNull($this->_getCommand()->confirm('Can this column have null values?', false));
-        } else {
-            if ($colObj->getDatatype() == 'int') {
-                $colObj->setIsAutoInc($this->_getCommand()->confirm('Is this column auto increment?', false));
-            }
+        } else if ($colObj->getDatatype() == 'int') {
+            $colObj->setIsAutoInc($this->_getCommand()->confirm('Is this column auto increment?', false));
         }
     }
     /**

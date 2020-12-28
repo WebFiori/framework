@@ -469,9 +469,9 @@ class WebFiori {
      * @return boolean|string
      * @since 1.0
      */
-    private function _getSystemStatus($refresh = true,$testDb = false) {
+    private function _getSystemStatus($refresh = true) {
         if ($refresh === true) {
-            $this->sysStatus = Util::checkSystemStatus($testDb);
+            $this->sysStatus = Util::checkSystemStatus();
 
             if (gettype($this->sysStatus) == 'array') {
                 $this->dbErrDetails = $this->sysStatus;

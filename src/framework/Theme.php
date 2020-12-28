@@ -774,21 +774,21 @@ abstract class Theme implements JsonI {
      * @return Json An object of type Json.
      */
     public function toJSON() {
-        $j = new Json();
-        $j->add('themesPath', THEMES_PATH);
-        $j->add('name', $this->getName());
-        $j->add('url', $this->getUrl());
-        $j->add('license', $this->getLicenseName());
-        $j->add('licenseUrl', $this->getLicenseUrl());
-        $j->add('version', $this->getVersion());
-        $j->add('author', $this->getAuthor());
-        $j->add('authorUrl', $this->getAuthorUrl());
-        $j->add('imagesDirName', $this->getImagesDirName());
-        $j->add('themeDirName', $this->getDirectoryName());
-        $j->add('cssDirName', $this->getCssDirName());
-        $j->add('jsDirName', $this->getJsDirName());
-        $j->add('components', $this->getComponents());
-
+        $j = new Json([
+            'themesPath' => THEMES_PATH,
+            'name' => $this->getName(),
+            'url' => $this->getUrl(),
+            'license' => $this->getLicenseName(),
+            'licenseUrl' => $this->getLicenseUrl(),
+            'version' => $this->getVersion(),
+            'author' => $this->getAuthor(),
+            'authorUrl' => $this->getAuthorUrl(),
+            'imagesDirName' => $this->getImagesDirName(),
+            'themeDirName' => $this->getDirectoryName(),
+            'cssDirName' => $this->getCssDirName(),
+            'jsDirName' => $this->getJsDirName(),
+            'components' => $this->getComponents()
+        ]);
         return $j;
     }
 }

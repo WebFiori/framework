@@ -125,7 +125,7 @@ class CreateCommand extends CLICommand {
             } else if ($answer == 'Web service.') {
                 $create = new CreateWebService($this);
             } else if ($answer == 'Database table from class.') {
-                new CreateTable($this);
+                $create = new CreateTable($this);
             } else if ($answer == 'Middleware.') {
                 $create = new CreateMiddleware($this);
                 return true;

@@ -35,6 +35,7 @@ use webfiori\framework\i18n\Language;
 use webfiori\framework\session\SessionsManager;
 use webfiori\framework\WebFiori;
 use webfiori\http\Response;
+use webfiori\http\Request;
 /**
  * A class used to initialize view components.
  * 
@@ -717,13 +718,20 @@ class Page {
         $this->document = new HTMLDoc();
         $this->setTitle('Hello World');
         $siteNames = WebFiori::getSiteConfig()->getWebsiteNames();
+        $primaryLang = WebFiori::getSiteConfig()->getPrimaryLanguage();
+        $this->setLang($primaryLang);
         
-        if (isset($siteNames[WebFiori::getSiteConfig()->getPrimaryLanguage()])) {
-            $this->setWebsiteName($siteNames[WebFiori::getSiteConfig()->getPrimaryLanguage()]);
+        if (isset($siteNames[$primaryLang])) {
+            $this->setWebsiteName($siteNames[$primaryLang]);
         } else {
             $this->setWebsiteName('Hello Website');
         }
         
+        $siteDescriptions = WebFiori::getSiteConfig()->getDescriptions();
+        
+        if (isset($siteDescriptions[$primaryLang])) {
+            $this->setDescription($siteDescriptions[$primaryLang]);
+        }
         
         $this->setTitleSep('|');
         $this->contentDir = 'ltr';
@@ -733,7 +741,7 @@ class Page {
         $this->theme = null;
         $this->incAside = true;
         $this->setWritingDir();
-        $this->setCanonical(Util::getRequestedURL());
+        $this->setCanonical(Request::getRequestedURL());
         $this->document->setLanguage($this->getLang());
         $headNode = $this->_getHead();
         $this->document->setHeadNode($headNode);
@@ -753,16 +761,28 @@ class Page {
         $footerNode->setID(self::MAIN_ELEMENTS[4]);
         $this->document->addChild($footerNode);
         $this->includeLables = true;
-        $session = SessionsManager::getActiveSession();
-        $langCode = $session !== null ? $session->getLangCode(true) : null;
-
-        if ($langCode === null) {
-            $langCode = WebFiori::getSiteConfig()->getPrimaryLanguage();
-        }
-        $this->contentLang = $langCode;
+        
+        $this->_checkLang();
         $this->usingLanguage();
-
         $this->_resetBeforeLoaded();
+    }
+    /**
+     * Sets the language of the page based on session language or 
+     * request.
+     */
+    private function _checkLang() {
+        $session = SessionsManager::getActiveSession();
+        $langCodeFromSession = $session !== null ? $session->getLangCode(true) : null;
+
+        if ($langCodeFromSession !== null) {
+            $this->setLang($langCodeFromSession);
+        } else {
+            $langCodeFromRequest = Request::getParam('lang');
+            
+            if ($langCodeFromRequest !== null) {
+                $this->setLang($langCodeFromRequest);
+            }
+        }
     }
     private function _resetBeforeLoaded() {
         $this->beforeRenderParams = [
@@ -774,10 +794,11 @@ class Page {
                 $translation = Page::translation();
                 $json = new Json();
                 $json->addArray('vars', $translation->getLanguageVars(), true);
-                $i18nJs = new HTMLNode('script');
-                $i18nJs->setAttribute('type', 'text/javascript')
-                        ->text('window.i18n = '.$json.';', false)
-                        ->setID('i18n');
+                $i18nJs = new HTMLNode('script', [
+                    'type' => 'text/javascript',
+                    'id' => 'i18n'
+                ]);
+                $i18nJs->text('window.i18n = '.$json.';', false);
                 Page::get()->document()->getHeadNode()->addChild($i18nJs);
             }
 
@@ -794,9 +815,13 @@ class Page {
                     $fileBase = Page::jsDir().'/';
                     foreach ($filesInDir as $fileName) {
                         $expl = explode('.', $fileName);
-
-                        if (count($expl) == 2 && $expl[1] == 'js') {
-                            Page::get()->document()->getHeadNode()->addJs($fileBase.$fileName);
+                        
+                        if (count($expl) > 0) {
+                            $ext = $expl[count($expl) - 1];
+                            
+                            if ($ext == 'js') {
+                                Page::get()->document()->getHeadNode()->addJs($fileBase.$fileName);
+                            }
                         }
                     }
                 }
@@ -809,8 +834,12 @@ class Page {
                     foreach ($filesInDir as $fileName) {
                         $expl = explode('.', $fileName);
 
-                        if (count($expl) == 2 && $expl[1] == 'css') {
-                            Page::get()->document()->getHeadNode()->addCSS($fileBase.$fileName);
+                        if (count($expl) > 0) {
+                            $ext = $expl[count($expl) - 1];
+                            
+                            if ($ext == 'css') {
+                                Page::get()->document()->getHeadNode()->addJs($fileBase.$fileName);
+                            }
                         }
                     }
                 }

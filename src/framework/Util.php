@@ -238,14 +238,11 @@ class Util {
      * was fine. If the file 'Config.php' was not found, The method will return 
      * 'Util::MISSING_CONF_FILE'. If the file 'SiteConfig.php' was not found, The method will return 
      * 'Util::MISSING_CONF_FILE'. If the system is not configured yet, the method 
-     * will return 'Util::NEED_CONF'. If the system is unable to connect to 
-     * the database, the method will return an associative array 
-     * with two indices that contains connection error info. The first 
-     * one is 'error-code' and the second one is 'error-message'.
+     * will return 'Util::NEED_CONF'. 
      * 
      * @since 1.2
      */
-    public static function checkSystemStatus($checkDb = false,$dbName = '') {
+    public static function checkSystemStatus() {
         $returnValue = '';
 
         if (class_exists('webfiori\conf\Config')) {

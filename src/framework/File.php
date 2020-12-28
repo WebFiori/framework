@@ -782,8 +782,9 @@ class File implements JsonI {
     private function _extractMimeFromName() {
         $exp = explode('.', $this->getName());
 
-        if (count($exp) == 2) {
-            $this->setMIMEType(self::getMIMEType($exp[1]));
+        if (count($exp) > 1) {
+            $ext = $exp[count($exp) - 1];
+            $this->setMIMEType(self::getMIMEType($ext));
         }
     }
     private function _extractPathAndName($absPath) {
@@ -912,12 +913,10 @@ class File implements JsonI {
             } else {
                 throw new FileException("File not found: '$fPath'.");
             }
+        } else if ($append) {
+            $resource = $this->_createResource('ab', $fPath);
         } else {
-            if ($append) {
-                $resource = $this->_createResource('ab', $fPath);
-            } else {
-                $resource = $this->_createResource('rb+', $fPath);
-            }
+            $resource = $this->_createResource('rb+', $fPath);
         }
 
         if (!is_resource($resource)) {

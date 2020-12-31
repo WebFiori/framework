@@ -174,7 +174,7 @@ class VuetifyTheme extends Theme {
         $vCardText->setClassName('py-2 white--text text-center');
 
         $copywriteNoticeNode = new HTMLNode('strong');
-        $copywriteNoticeNode->addTextNode(Page::translation()->get('example/footer/copyright-notice'));
+        $copywriteNoticeNode->addTextNode('All Rights Reserved');
         
 
         $poweredByNode = new HTMLNode('p');

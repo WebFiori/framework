@@ -32,6 +32,7 @@ use webfiori\framework\Util;
 use webfiori\framework\WebFiori;
 use webfiori\framework\cli\CLICommand;
 use webfiori\framework\session\SessionsManager;
+use webfiori\framework\cron\webServices\CronServicesManager;
 /**
  * A class that is used to manage scheduled background jobs.
  * 
@@ -142,7 +143,7 @@ class Cron {
             ]);
             Router::addRoute([
                 'path' => '/cron/apis/{action}',
-                'route-to' => '/framework/cron/web-services/CronServicesManager.php',
+                'route-to' => CronServicesManager::class,
                 'as-api' => true
             ]);
             Router::addRoute([

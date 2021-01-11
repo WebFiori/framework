@@ -23,11 +23,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 namespace webfiori\framework\cron\webServices;
 
-use webfiori\http\AbstractWebService;
 use webfiori\framework\session\SessionsManager;
+use webfiori\http\AbstractWebService;
 /**
  * A service which is used to logout user in CRON web interface.
  *
@@ -47,5 +46,4 @@ class CronLogoutService extends AbstractWebService {
         SessionsManager::destroy();
         $this->sendResponse('Logged out.', 'info');
     }
-
 }

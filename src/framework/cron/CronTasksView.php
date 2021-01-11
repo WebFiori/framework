@@ -24,15 +24,15 @@
  */
 namespace webfiori\framework\cron;
 
+use webfiori\framework\File;
+use webfiori\framework\Page;
+use webfiori\framework\WebFiori;
 use webfiori\ui\HTMLNode;
 use webfiori\ui\Input;
 use webfiori\ui\Label;
 use webfiori\ui\Paragraph;
 use webfiori\ui\TableCell;
 use webfiori\ui\TableRow;
-use webfiori\framework\File;
-use webfiori\framework\Page;
-use webfiori\framework\WebFiori;
 /**
  * A view to display information about CRON Jobs.
  * The view will show a table of all scheduled cron jobs. The table will include 

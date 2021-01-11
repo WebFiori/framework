@@ -24,10 +24,10 @@
  */
 namespace webfiori\framework;
 
-use webfiori\json\JsonI;
-use webfiori\json\Json;
 use webfiori\framework\exceptions\FileException;
 use webfiori\http\Response;
+use webfiori\json\Json;
+use webfiori\json\JsonI;
 /**
  * A class that represents a file.
  * 
@@ -496,10 +496,12 @@ class File implements JsonI {
      * @since 1.1.8
      */
     public static function isFileExist($path) {
-        set_error_handler(function () {});
+        set_error_handler(function ()
+        {
+        });
         $isExist = file_exists($path);
         restore_error_handler();
-        
+
         return $isExist;
     }
     /**
@@ -683,6 +685,7 @@ class File implements JsonI {
             $this->read();
         } catch (FileException $ex) {
         }
+
         return new Json([
             'id' => $this->getID(),
             'mime' => $this->getFileMIMEType(),
@@ -692,7 +695,6 @@ class File implements JsonI {
             'sizeInKBytes' => $this->getSize() / 1024,
             'sizeInMBytes' => ($this->getSize() / 1024) / 1024
         ]);
-
     }
     /**
      * Display the file. 

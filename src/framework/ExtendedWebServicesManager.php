@@ -24,15 +24,12 @@
  */
 namespace webfiori\framework;
 
-use webfiori\json\JsonI;
-use webfiori\json\Json;
-use webfiori\http\WebServicesManager;
 use webfiori\framework\i18n\Language;
-use webfiori\framework\DB;
-use webfiori\framework\ConfigController;
-use webfiori\framework\WebFiori;
 use webfiori\framework\session\SessionsManager;
 use webfiori\http\Request;
+use webfiori\http\WebServicesManager;
+use webfiori\json\Json;
+use webfiori\json\JsonI;
 /**
  * An extension for the class 'WebServicesManager' that adds support for multi-language 
  * response messages.
@@ -197,13 +194,14 @@ abstract class ExtendedWebServicesManager extends WebServicesManager {
      */
     public function databaseErr($info = '') {
         $message = $this->get('general/db-error');
+
         if ($info instanceof DB) {
-            
             $dbErr = $info->getLastError();
             $json = new Json([
-                'error-message'=>$dbErr['message'],
-                'error-code'=>$dbErr['code']
+                'error-message' => $dbErr['message'],
+                'error-code' => $dbErr['code']
             ]);
+
             if (defined('WF_VERBOSE') && WF_VERBOSE === true) {
                 $json->add('query', $info->getLastQuery());
             }
@@ -412,11 +410,13 @@ abstract class ExtendedWebServicesManager extends WebServicesManager {
     private function _setTranslation() {
         $reqMeth = Request::getMethod();
         $activeSession = SessionsManager::getActiveSession();
+
         if ($activeSession !== null) {
             $tempCode = $activeSession->getLangCode(true);
         } else {
             $tempCode = WebFiori::getSiteConfig()->getPrimaryLanguage();
         }
+
         if ($reqMeth == 'GET' || $reqMeth == 'DELETE') {
             $langCode = isset($_GET['lang']) ? filter_var($_GET['lang']) : $tempCode;
         } else if ($reqMeth == 'POST' || $reqMeth == 'PUT') {

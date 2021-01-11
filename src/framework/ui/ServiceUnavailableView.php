@@ -25,10 +25,10 @@
  */
 namespace webfiori\framework\ui;
 
-use webfiori\ui\HTMLNode;
-use webfiori\ui\UnorderedList;
 use webfiori\conf\Config;
 use webfiori\framework\Page;
+use webfiori\ui\HTMLNode;
+use webfiori\ui\UnorderedList;
 
 /**
  * A view which is show to tell the user that the framework isn't configured 

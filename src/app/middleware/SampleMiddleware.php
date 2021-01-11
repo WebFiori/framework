@@ -12,10 +12,10 @@ class SampleMiddleware extends AbstractMiddleware {
     public function __construct() {
         //Each middleware must have a unique name.
         parent::__construct('sample-middleware');
-        
+
         //Set the priority to higher number to reach it first.
         $this->setPriority(0);
-        
+
         //Add the middleware to the global middleware group
         $this->addToGroup('global');
     }
@@ -33,7 +33,6 @@ class SampleMiddleware extends AbstractMiddleware {
         //Response::write('Terminate before reach app.');
         //Response::send();
     }
-
 }
 //Return namespace to auto-register the middleware
 return __NAMESPACE__;

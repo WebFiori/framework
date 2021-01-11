@@ -24,8 +24,8 @@
  */
 namespace webfiori\framework;
 
-use webfiori\json\JsonI;
 use webfiori\json\Json;
+use webfiori\json\JsonI;
 /**
  * A class that represents a system user.
  * 
@@ -303,12 +303,15 @@ class User implements JsonI {
      */
     public function hasAnyPrivilege(array $privilegesIdsArr) {
         $hasPr = false;
+
         foreach ($privilegesIdsArr as $prId) {
             $hasPr = $this->hasPrivilege($prId);
+
             if ($hasPr) {
                 break;
             }
         }
+
         return $hasPr;
     }
     /**

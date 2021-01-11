@@ -32,5 +32,5 @@ use Exception;
  * @author Ibrahim
  * @version 1.0
  */
-class UIException  extends Exception {
+class UIException extends Exception {
 }

@@ -26,7 +26,6 @@ namespace webfiori\framework;
 
 use webfiori\framework\exceptions\NoSuchThemeException;
 use webfiori\framework\router\Router;
-use webfiori\framework\WebFiori;
 
 
 /**
@@ -223,8 +222,10 @@ class ThemeLoader {
         if (strlen($dir) != 0 && Util::isDirectory($themeRootDir.DS.$dir)) {
             Router::closure([
                 'path' => $themeDirName.'/'.$dir.'/{file-name}',
-                'route-to' => function ($fileDir, $themeDirName, $dir) {
+                'route-to' => function ($fileDir, $themeDirName, $dir)
+                {
                     $fileName = Router::getVarValue('file-name');
+
                     if (file_exists($fileDir.DS.$dir.DS.$fileName)) {
                         $file = new File($fileDir.DS.$dir.DS.$fileName);
                         $file->view();

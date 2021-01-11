@@ -24,13 +24,13 @@
  */
 namespace webfiori\framework\ui;
 
-use webfiori\ui\HTMLNode;
 use Throwable;
 use webfiori\framework\Page;
+use webfiori\framework\session\SessionsManager;
 use webfiori\framework\Util;
 use webfiori\framework\WebFiori;
 use webfiori\http\Response;
-use webfiori\framework\session\SessionsManager;
+use webfiori\ui\HTMLNode;
 /**
  * A page which is used to display exception information when it is thrown or 
  * any other errors.
@@ -63,7 +63,7 @@ class ServerErrView {
      */
     public function show($responseCode = 500) {
         $responseExist = class_exists('webfiori\http\Response');
-        
+
         if ($responseExist) {
             Response::setCode($responseCode);
         } else {
@@ -76,6 +76,7 @@ class ServerErrView {
         } else {
             $page = $this->_phpStructsDoesNotexist($this->errOrThrowable);
         }
+
         if ($responseExist) {
             Response::write($page);
             Response::send();
@@ -104,6 +105,22 @@ class ServerErrView {
 
         return $node;
     }
+    private function _getSiteName() {
+        $siteNames = WebFiori::getSiteConfig()->getWebsiteNames();
+        $session = SessionsManager::getActiveSession();
+
+        if ($session !== null) {
+            $currentLang = $session->getLangCode(true);
+        } else {
+            $currentLang = WebFiori::getSiteConfig()->getPrimaryLanguage();
+        }
+
+        if (isset($siteNames[$currentLang])) {
+            return $siteNames[$currentLang];
+        }
+
+        return '';
+    }
     private function _phpStructsDoesNotexist($throwableOrErr) {
         //this is a fall back if the library php-structs does not exist. 
         //Output HTML as string.
@@ -121,7 +138,8 @@ class ServerErrView {
             .'<p>'
             .'<b class="nice-red mono">Exception Class:</b> <span class="mono">'.get_class($throwableOrErr)."</span><br/>"
             .'<b class="nice-red mono">Exception Message:</b> <span class="mono">'.$throwableOrErr->getMessage()."</span><br/>"
-            .'<b class="nice-red mono">Exception Code:</b> <span class="mono">'.$throwableOrErr->getCode()."</span><br/>"; 
+            .'<b class="nice-red mono">Exception Code:</b> <span class="mono">'.$throwableOrErr->getCode()."</span><br/>";
+ 
             if (defined('WF_VERBOSE') && WF_VERBOSE) {
                 $retVal .= '<b class="nice-red mono">File:</b> <span class="mono">'.$throwableOrErr->getFile()."</span><br/>"
                 .'<b class="nice-red mono">Line:</b> <span class="mono">'.$throwableOrErr->getLine()."</span><br>"
@@ -152,22 +170,8 @@ class ServerErrView {
             }
         }
         $retVal .= '</body></html>';
+
         return $retVal;
-    }
-    private function _getSiteName() {
-        $siteNames = WebFiori::getSiteConfig()->getWebsiteNames();
-        $session = SessionsManager::getActiveSession();
-        
-        if ($session !== null) {
-            $currentLang = $session->getLangCode(true);
-        } else {
-            $currentLang = WebFiori::getSiteConfig()->getPrimaryLanguage();
-        }
-        
-        if (isset($siteNames[$currentLang])) {
-            return $siteNames[$currentLang];
-        }
-        return '';
     }
     private function _phpStructsExist($throwableOrErr) {
         Page::reset();
@@ -219,7 +223,6 @@ class ServerErrView {
                 .'define the constant "WF_VERBOSE" and set its value to "true" in '
                 .'the class "GlobalConstants"', false);
             Page::insert($paragraph);
-            
         } else {
             return '<p class="mono"><b style="color:yellow">Tip</b>: To'
                 .' display more details about the error, '

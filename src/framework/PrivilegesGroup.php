@@ -24,8 +24,8 @@
  */
 namespace webfiori\framework;
 
-use webfiori\json\JsonI;
 use webfiori\json\Json;
+use webfiori\json\JsonI;
 /**
  * A class that represents a set of privileges.
  * 
@@ -107,35 +107,6 @@ class PrivilegesGroup implements JsonI {
      */
     public function &privileges() {
         return $this->privilegesArr;
-    }
-    /**
-     * Checks if a group has specific privilege or not.
-     * 
-     * @param PrivilegesGroup $group The group that will be checked
-     * 
-     * @param Privilege $p The privilege that will be checked. 
-     */
-    private function _hasPrivilege($group,$p) {
-        $hasPr = false;
-
-        foreach ($group->privileges() as $privilege) {
-            if ($p->getID() == $privilege->getID()) {
-                $hasPr = true;
-                break;
-            }
-        }
-
-        if (!$hasPr) {
-            foreach ($group->childGroups() as $g) {
-                $hasPr = $this->_hasPrivilege($g, $p);
-
-                if ($hasPr === true) {
-                    break;
-                }
-            }
-        }
-
-        return $hasPr;
     }
     /**
      * Adds new privilege to the array of group privileges.
@@ -403,6 +374,35 @@ class PrivilegesGroup implements JsonI {
         }
 
         return $bool;
+    }
+    /**
+     * Checks if a group has specific privilege or not.
+     * 
+     * @param PrivilegesGroup $group The group that will be checked
+     * 
+     * @param Privilege $p The privilege that will be checked. 
+     */
+    private function _hasPrivilege($group,$p) {
+        $hasPr = false;
+
+        foreach ($group->privileges() as $privilege) {
+            if ($p->getID() == $privilege->getID()) {
+                $hasPr = true;
+                break;
+            }
+        }
+
+        if (!$hasPr) {
+            foreach ($group->childGroups() as $g) {
+                $hasPr = $this->_hasPrivilege($g, $p);
+
+                if ($hasPr === true) {
+                    break;
+                }
+            }
+        }
+
+        return $hasPr;
     }
 
     private function _removeChildGroup($gId) {

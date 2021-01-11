@@ -23,8 +23,8 @@
  * THE SOFTWARE.
  */
 namespace webfiori\framework\middleware;
+
 use webfiori\collections\LinkedList;
-use webfiori\framework\WebFiori;
 /**
  * This class is used to manage the operations which are related to middleware.
  *
@@ -35,6 +35,7 @@ use webfiori\framework\WebFiori;
  * @since 2.0.0
  */
 class MiddlewareManager {
+    private static $inst;
     /**
      *
      * @var LinkedList 
@@ -42,16 +43,6 @@ class MiddlewareManager {
     private $middlewareList;
     private function __construct() {
         $this->middlewareList = new LinkedList();
-    }
-    /**
-     * Register a new middleware.
-     * 
-     * @param AbstractMiddleware $middleware The middleware that will be registered.
-     * 
-     * @since 1.0
-     */
-    public static function register(AbstractMiddleware $middleware) {
-        self::get()->middlewareList->add($middleware);
     }
     /**
      * Returns a set of meddalewares that belongs to a specific group.
@@ -66,11 +57,13 @@ class MiddlewareManager {
      */
     public static function getGroup($groupName) {
         $list = new LinkedList();
+
         foreach (self::get()->middlewareList as $mw) {
             if (in_array($groupName, $mw->getGroups())) {
                 $list->add($mw);
             }
         }
+
         return $list;
     }
     /**
@@ -92,6 +85,16 @@ class MiddlewareManager {
         }
     }
     /**
+     * Register a new middleware.
+     * 
+     * @param AbstractMiddleware $middleware The middleware that will be registered.
+     * 
+     * @since 1.0
+     */
+    public static function register(AbstractMiddleware $middleware) {
+        self::get()->middlewareList->add($middleware);
+    }
+    /**
      * Removes a middleware given its name.
      * 
      * @param string $name The name of the middleware.
@@ -100,11 +103,11 @@ class MiddlewareManager {
      */
     public static function remove($name) {
         $mw = self::getMiddleware($name);
+
         if ($mw instanceof AbstractMiddleware) {
             self::get()->middlewareList->remove(self::get()->middlewareList->indexOf($mw));
         }
     }
-    private static $inst;
     /**
      * 
      * @return MiddlewareManager
@@ -113,6 +116,7 @@ class MiddlewareManager {
         if (self::$inst === null) {
             self::$inst = new MiddlewareManager();
         }
+
         return self::$inst;
     }
 }

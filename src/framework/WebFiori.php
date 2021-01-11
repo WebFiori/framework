@@ -23,33 +23,30 @@
  * THE SOFTWARE.
  */
 namespace webfiori\framework;
-use webfiori\http\Response;
-use webfiori\json\Json;
+
 use webfiori\conf\Config;
 use webfiori\conf\MailConfig;
 use webfiori\conf\SiteConfig;
-use webfiori\framework\AutoLoader;
 use webfiori\framework\cli\CLI;
 use webfiori\framework\exceptions\InitializationException;
+use webfiori\framework\middleware\MiddlewareManager;
 use webfiori\framework\router\APIRoutes;
 use webfiori\framework\router\ClosureRoutes;
 use webfiori\framework\router\OtherRoutes;
 use webfiori\framework\router\Router;
 use webfiori\framework\router\RouterUri;
 use webfiori\framework\router\ViewRoutes;
-use webfiori\framework\ThemeLoader;
+use webfiori\framework\session\SessionsManager;
 use webfiori\framework\ui\ErrorBox;
 use webfiori\framework\ui\ServerErrView;
-use webfiori\framework\Util;
+use webfiori\http\Request;
+use webfiori\http\Response;
 use webfiori\ini\GlobalConstants;
 use webfiori\ini\InitAutoLoad;
 use webfiori\ini\InitCron;
-use webfiori\ini\InitPrivileges;
 use webfiori\ini\InitMiddleware;
-use webfiori\framework\ConfigController;
-use webfiori\framework\middleware\MiddlewareManager;
-use webfiori\framework\session\SessionsManager;
-use webfiori\http\Request;
+use webfiori\ini\InitPrivileges;
+use webfiori\json\Json;
 /**
  * The time at which the framework was booted in microseconds as a float.
  * 
@@ -145,12 +142,12 @@ class WebFiori {
             mb_http_input($encoding);
             mb_regex_encoding($encoding);
         }
-        
+
         if (!class_exists('webfiori\ini\GlobalConstants')) {
             require_once ROOT_DIR.DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR.'ini'.DIRECTORY_SEPARATOR.'GlobalConstants.php';
         }
         GlobalConstants::defineConstants();
-        
+
         /**
          * Set memory limit.
          */
@@ -160,7 +157,7 @@ class WebFiori {
          * Change this as needed.
          */
         date_default_timezone_set(DATE_TIMEZONE);
-        
+
         /**
          * Initialize autoloader.
          */
@@ -172,15 +169,15 @@ class WebFiori {
         $this->_initThemesPath();
         $this->_setHandlers();
         $this->_checkStandardLibs();
-        
+
         //Initialize privileges.
         //This step must be done before initializing any controler.
         InitPrivileges::init();
-        
+
 
         //Initialize CLI
         CLI::init();
-        
+
         self::$SF = ConfigController::get();
 
         $this->sysStatus = Util::checkSystemStatus();
@@ -196,16 +193,20 @@ class WebFiori {
             $this->dbErrDetails = $this->sysStatus;
             $this->sysStatus = Util::DB_NEED_CONF;
         }
-        WebFiori::autoRegister('middleware', function($inst) {
+        WebFiori::autoRegister('middleware', function($inst)
+        {
             MiddlewareManager::register($inst);
         });
         InitMiddleware::init();
         $this->_initRoutes();
         $this->_initCRON();
-        Response::beforeSend(function () {
-            register_shutdown_function(function() {
+        Response::beforeSend(function ()
+        {
+            register_shutdown_function(function()
+            {
                 SessionsManager::validateStorage();
                 $uriObj = Router::getRouteUri();
+
                 if ($uriObj !== null) {
                     foreach ($uriObj->getMiddlewar() as $mw) {
                         $mw->afterTerminate();
@@ -213,12 +214,15 @@ class WebFiori {
                 }
             });
             $sessionsCookiesHeaders = SessionsManager::getCookiesHeaders();
+
             foreach ($sessionsCookiesHeaders as $headerVal) {
                 Response::addHeader('set-cookie', $headerVal);
             }
             $uriObj = Router::getRouteUri();
+
             if ($uriObj !== null) {
                 $uriObj->getMiddlewar()->insertionSort();
+
                 foreach ($uriObj->getMiddlewar() as $mw) {
                     $mw->after();
                 }
@@ -228,32 +232,6 @@ class WebFiori {
         self::$classStatus = 'INITIALIZED';
 
         define('INITIAL_SYS_STATUS', $this->_getSystemStatus());
-    }
-    private function _initThemesPath() {
-        if (!defined('THEMES_PATH')) {
-            $themesDirName = 'themes';
-            $themesPath = ROOT_DIR.DS.$themesDirName;
-            /**
-             * This constant represents the directory at which themes exist.
-             * @since 1.0
-             */
-            define('THEMES_PATH', $themesPath);
-        }
-    }
-    private function _initRoutes() {
-        APIRoutes::create();
-        ViewRoutes::create();
-        ClosureRoutes::create();
-        OtherRoutes::create();
-    }
-    private function _initCRON() {
-        $uriObj = new RouterUri(Util::getRequestedURL(), '');
-        $pathArr = $uriObj->getPathArray();
-        if (CLI::isCLI() || (defined('CRON_THROUGH_HTTP') && CRON_THROUGH_HTTP && count($pathArr) != 0 && $pathArr[0] == 'cron')) {
-            //initialize cron jobs only if in CLI or cron is enabled throgh HTTP.
-            //
-            InitCron::init();
-        }
     }
     /**
      * Register CLI commands or cron jobs.
@@ -267,12 +245,16 @@ class WebFiori {
      */
     public static function autoRegister($folder, $regCallback) {
         $jobsDir = ROOT_DIR.DS.'app'.DS.$folder;
+
         if (Util::isDirectory($jobsDir)) {
             $dirContent = array_diff(scandir($jobsDir), ['.','..']);
+
             foreach ($dirContent as $phpFile) {
                 $expl = explode('.', $phpFile);
+
                 if (count($expl) == 2 && $expl[1] == 'php') {
                     $instanceNs = require_once $jobsDir.DS.$phpFile;
+
                     if (strlen($instanceNs) == 0 || $instanceNs == 1) {
                         $instanceNs = '';
                     }
@@ -280,7 +262,6 @@ class WebFiori {
                     try {
                         call_user_func_array($regCallback, [new $class()]);
                     } catch (\Error $ex) {
-
                     }
                 }
             }
@@ -446,7 +427,7 @@ class WebFiori {
         if (!class_exists('webfiori\collections\Node')) {
             throw new InitializationException("The standard library 'webfiori/collections' is missing.");
         }
-        
+
         if (!class_exists('webfiori\ui\HTMLNode')) {
             throw new InitializationException("The standard library 'webfiori/ui' is missing.");
         }
@@ -454,11 +435,11 @@ class WebFiori {
         if (!class_exists('webfiori\json\Json')) {
             throw new InitializationException("The standard library 'webfiori/jsonx' is missing.");
         }
-        
+
         if (!class_exists('webfiori\database\ResultSet')) {
             throw new InitializationException("The standard library 'webfiori/database' is missing.");
         }
-        
+
         if (!class_exists('webfiori\http\Response')) {
             throw new InitializationException("The standard library 'webfiori/http' is missing.");
         }
@@ -481,12 +462,40 @@ class WebFiori {
 
         return $this->sysStatus;
     }
+    private function _initCRON() {
+        $uriObj = new RouterUri(Util::getRequestedURL(), '');
+        $pathArr = $uriObj->getPathArray();
+
+        if (CLI::isCLI() || (defined('CRON_THROUGH_HTTP') && CRON_THROUGH_HTTP && count($pathArr) != 0 && $pathArr[0] == 'cron')) {
+            //initialize cron jobs only if in CLI or cron is enabled throgh HTTP.
+            //
+            InitCron::init();
+        }
+    }
+    private function _initRoutes() {
+        APIRoutes::create();
+        ViewRoutes::create();
+        ClosureRoutes::create();
+        OtherRoutes::create();
+    }
+    private function _initThemesPath() {
+        if (!defined('THEMES_PATH')) {
+            $themesDirName = 'themes';
+            $themesPath = ROOT_DIR.DS.$themesDirName;
+            /**
+             * This constant represents the directory at which themes exist.
+             * @since 1.0
+             */
+            define('THEMES_PATH', $themesPath);
+        }
+    }
     private function _setErrHandler() {
         set_error_handler(function($errno, $errstr, $errfile, $errline)
         {
             $isCli = class_exists('webfiori\framework\cli\CLI') ? CLI::isCLI() : http_response_code() === false;
             Response::clear();
             $routerObj = Router::getUriObjByURL(Util::getRequestedURL());
+
             if ($isCli) {
                 if (class_exists('webfiori\framework\cli\CLI')) {
                     CLI::displayErr($errno, $errstr, $errfile, $errline);
@@ -498,6 +507,7 @@ class WebFiori {
                     fprintf(STDERR, "Error File       %5s %s\n",":",$errfile);
                     fprintf(STDERR, "Error Line:      %5s %s\n",":",$errline);
                 }
+
                 if (defined('STOP_CLI_ON_ERR') && STOP_CLI_ON_ERR === true) {
                     exit(-1);
                 }
@@ -535,17 +545,17 @@ class WebFiori {
     }
     private function _setExceptionHandler() {
         set_exception_handler(function($ex)
-        { 
+        {
             $useResponsClass = class_exists('webfiori\\http\\Response');
             $isCli = class_exists('webfiori\framework\cli\CLI') ? CLI::isCLI() : php_sapi_name() == 'cli';
+
             if ($useResponsClass) {
                 Response::clear();
             }
+
             if ($isCli) {
                 CLI::displayException($ex);
             } else {
-                
-                
                 $routeUri = Router::getUriObjByURL(Util::getRequestedURL());
 
                 if ($routeUri !== null) {
@@ -553,9 +563,8 @@ class WebFiori {
                 } else {
                     $routeType = Router::VIEW_ROUTE;
                 }
-                
+
                 if ($routeType == Router::API_ROUTE || defined('API_CALL')) {
-                    
                     $j = new Json([
                         'message' => '500 - Server Error: Uncaught Exception.',
                         'type' => 'error',
@@ -563,7 +572,7 @@ class WebFiori {
                         'exception-message' => $ex->getMessage(),
                         'exception-code' => $ex->getMessage()
                     ], true);
-                    
+
                     if (defined('WF_VERBOSE') && WF_VERBOSE) {
                         $j->add('file', $ex->getFile());
                         $j->add('line', $ex->getLine());
@@ -581,6 +590,7 @@ class WebFiori {
                         }
                         $j->add('stack-trace',$stackTrace);
                     }
+
                     if ($useResponsClass) {
                         Response::addHeader('content-type', 'application/json');
                         Response::write($j);
@@ -608,7 +618,6 @@ class WebFiori {
         register_shutdown_function(function()
         {
             if (!Response::isSent()) {
-                
                 $isCli = class_exists('webfiori\framework\cli\CLI') ? CLI::isCLI() : php_sapi_name() == 'cli';
                 $error = error_get_last();
 
@@ -627,6 +636,7 @@ class WebFiori {
                         Response::setCode(500);
                     }
                     $uri = Router::getUriObjByURL(Request::getRequestedURL());
+
                     if ($uri !== null) {
                         if ($uri->getType() == Router::API_ROUTE) {
                             $j = new Json([
@@ -634,6 +644,7 @@ class WebFiori {
                                 'type' => 'error',
                                 'error-number' => $error["type"],
                             ], true);
+
                             if (defined('WF_VERBOSE') && WF_VERBOSE) {
                                 $j->add('file', $error["file"]);
                                 $j->add('line', $error["line"]);
@@ -643,11 +654,13 @@ class WebFiori {
                             $errPage = new ServerErrView($error);
                             $errPage->show(500);
                         }
-                    } else if ($isCli) {
-                        CLI::displayErr($error['type'], $error["message"], $error["file"], $error["line"]);
                     } else {
-                        $errPage = new ServerErrView($error);
-                        $errPage->show(500);
+                        if ($isCli) {
+                            CLI::displayErr($error['type'], $error["message"], $error["file"], $error["line"]);
+                        } else {
+                            $errPage = new ServerErrView($error);
+                            $errPage->show(500);
+                        }
                     }
                 }
                 Response::send();

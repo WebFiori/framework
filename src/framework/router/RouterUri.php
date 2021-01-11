@@ -26,11 +26,11 @@ namespace webfiori\framework\router;
 
 use Closure;
 use InvalidArgumentException;
-use webfiori\ui\HTMLNode;
+use webfiori\collections\LinkedList;
+use webfiori\framework\middleware\MiddlewareManager;
 use webfiori\framework\Util;
 use webfiori\http\Uri;
-use webfiori\framework\middleware\MiddlewareManager;
-use webfiori\collections\LinkedList;
+use webfiori\ui\HTMLNode;
 /**
  * A class that is used to split URIs and get their parameters.
  * 
@@ -52,6 +52,7 @@ use webfiori\collections\LinkedList;
  * @version 1.4.0
  */
 class RouterUri extends Uri {
+    private $assignedMiddlewareList;
     /**
      * 
      * @var type 
@@ -67,7 +68,15 @@ class RouterUri extends Uri {
      * @since 1.3
      */
     private $incInSiteMap;
-    private $assignedMiddlewareList;
+
+    /**
+     * Set to true if the resource that the route points to is dynamic (PHP file or code).
+     * 
+     * @var boolean
+     * 
+     * @since 1.3.7 
+     */
+    private $isDynamic;
     /**
      * An array that contains all languages that the resource the URI is pointing 
      * to can have.
@@ -93,15 +102,6 @@ class RouterUri extends Uri {
      * @since 1.1 
      */
     private $type;
-
-    /**
-     * Set to true if the resource that the route points to is dynamic (PHP file or code).
-     * 
-     * @var boolean
-     * 
-     * @since 1.3.7 
-     */
-    private $isDynamic;
     /**
      * Creates new instance.
      * 
@@ -131,34 +131,6 @@ class RouterUri extends Uri {
         $this->addMiddleware('global');
     }
     /**
-     * Returns a list that holds objects for the middleware.
-     * 
-     * @return LinkedList
-     * 
-     * @since 1.4.0
-     */
-    public function getMiddlewar() {
-        return $this->assignedMiddlewareList;
-    }
-    /**
-     * Adds the URI to middleware or to middleware group.
-     * 
-     * @param string $name The name of the middleware or the group.
-     * 
-     * @since 1.4
-     */
-    public function addMiddleware($name) {
-        $mw = MiddlewareManager::getMiddleware($name);
-        if ($mw !== null) {
-            $this->assignedMiddlewareList->add($mw);
-        } else {
-            $group = MiddlewareManager::getGroup($name);
-            foreach ($group as $mw) {
-                $this->assignedMiddlewareList->add($mw);
-            }
-        }
-    }
-    /**
      * Adds a language to the set of languages at which the resource that the URI 
      * points to.
      * 
@@ -172,6 +144,26 @@ class RouterUri extends Uri {
 
         if (strlen($lower) == 2 && $lower[0] >= 'a' && $lower[0] <= 'z' && $lower[1] >= 'a' && $lower[1] <= 'z' && !in_array($lower, $this->languages)) {
             $this->languages[] = $lower;
+        }
+    }
+    /**
+     * Adds the URI to middleware or to middleware group.
+     * 
+     * @param string $name The name of the middleware or the group.
+     * 
+     * @since 1.4
+     */
+    public function addMiddleware($name) {
+        $mw = MiddlewareManager::getMiddleware($name);
+
+        if ($mw !== null) {
+            $this->assignedMiddlewareList->add($mw);
+        } else {
+            $group = MiddlewareManager::getGroup($name);
+
+            foreach ($group as $mw) {
+                $this->assignedMiddlewareList->add($mw);
+            }
         }
     }
     /**
@@ -223,6 +215,16 @@ class RouterUri extends Uri {
      */
     public function getLanguages() {
         return $this->languages;
+    }
+    /**
+     * Returns a list that holds objects for the middleware.
+     * 
+     * @return LinkedList
+     * 
+     * @since 1.4.0
+     */
+    public function getMiddlewar() {
+        return $this->assignedMiddlewareList;
     }
 
     /**
@@ -377,7 +379,7 @@ class RouterUri extends Uri {
     public function setIsInSiteMap($bool) {
         $this->incInSiteMap = $bool === true;
     }
-    
+
     /**
      * Sets the route which the URI will take to.
      * 
@@ -388,7 +390,7 @@ class RouterUri extends Uri {
      */
     public function setRoute($routeTo) {
         $this->isDynamic = true;
-        
+
         if ($routeTo instanceof Closure) {
             $this->setType(Router::CLOSURE_ROUTE);
         } else {
@@ -396,6 +398,7 @@ class RouterUri extends Uri {
             $routeTo = str_replace('/', DS, $cleaned);
             $expl = explode('.', $routeTo);
             $extension = $expl[count($expl) - 1];
+
             if ($extension != 'php') {
                 $this->isDynamic = false;
             }

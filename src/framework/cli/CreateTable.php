@@ -24,10 +24,10 @@
  */
 namespace webfiori\framework\cli;
 
-use webfiori\framework\WebFiori;
+use Exception;
 use webfiori\database\Table;
 use webfiori\framework\DB;
-use Exception;
+use webfiori\framework\WebFiori;
 /**
  * A helper class for creating database table class.
  *
@@ -46,13 +46,14 @@ class CreateTable {
      */
     public function __construct(CreateCommand $command) {
         $this->command = $command;
-        
+
         $dbConnections = array_keys(WebFiori::getConfig()->getDBConnections());
 
         if (count($dbConnections) != 0) {
             $dbConn = $this->_getCommand()->select('Select database connection:', $dbConnections, 0);
             $tableClassNameValidity = false;
             $tableClassName = $this->_getCommand()->getArgValue('--table');
+
             do {
                 if (strlen($tableClassName) == 0) {
                     $tableClassName = $this->_getCommand()->getInput('Enter database table class name (include namespace):');
@@ -72,11 +73,11 @@ class CreateTable {
                 }
                 $tableClassNameValidity = true;
             } while (!$tableClassNameValidity);
-            
+
             $db = new DB($dbConn);
             $db->addTable($tableObj);
             $db->table($tableObj->getName())->createTable();
-            
+
             $this->_getCommand()->prints('The following query will be executed on the database ');
             $this->_getCommand()->println($db->getConnectionInfo()->getDBName(),[
                 'color' => 'yellow'
@@ -84,6 +85,7 @@ class CreateTable {
             $this->_getCommand()->println($db->getLastQuery(), [
                 'color' => 'light-blue'
             ]);
+
             if ($this->_getCommand()->confirm('Continue?', true)) {
                 $this->_getCommand()->println('Creating your new table. Please wait a moment...');
                 try {
@@ -94,7 +96,6 @@ class CreateTable {
                     $this->_getCommand()->error($ex->getMessage());
                 }
             }
-            
         } else {
             $this->_getCommand()->error('No database connections available. Add connections inside the class \'Config\' or use the command "add".');
         }

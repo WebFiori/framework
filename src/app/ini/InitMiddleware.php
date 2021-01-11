@@ -1,9 +1,8 @@
 <?php
-
 namespace webfiori\ini;
 
-use webfiori\framework\middleware\MiddlewareManager;
 use webfiori\examples\SampleMiddleware;
+use webfiori\framework\middleware\MiddlewareManager;
 /**
  * Register middleware which are created outside the folder 'app/middleware'.
  *

@@ -24,11 +24,11 @@
  */
 namespace webfiori\framework\cron;
 
-use webfiori\ui\HTMLNode;
-use webfiori\ui\TableRow;
 use webfiori\framework\File;
 use webfiori\framework\mail\EmailMessage;
 use webfiori\framework\WebFiori;
+use webfiori\ui\HTMLNode;
+use webfiori\ui\TableRow;
 /**
  * A class which can be used to send an email regarding the status of 
  * background job execution.
@@ -65,14 +65,13 @@ class CronEmail extends EmailMessage {
         $activeJob = Cron::activeJob();
 
         if ($activeJob !== null) {
-
             if (gettype($receivers) == 'array' && count($receivers) != 0) {
                 foreach ($receivers as $addr => $name) {
                     $this->addReceiver($name, $addr);
                 }
             }
 
-            
+
             $this->importance(1);
             $this->document()->getBody()->setStyle([
                 'font-family' => 'monospace'

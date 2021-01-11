@@ -24,12 +24,12 @@
  */
 namespace webfiori\framework\cli;
 
-use webfiori\framework\DB;
-use webfiori\database\ConnectionInfo;
-use webfiori\framework\mail\SMTPAccount;
-use webfiori\framework\ConfigController;
-use webfiori\framework\WebFiori;
 use Exception;
+use webfiori\database\ConnectionInfo;
+use webfiori\framework\ConfigController;
+use webfiori\framework\DB;
+use webfiori\framework\mail\SMTPAccount;
+use webfiori\framework\WebFiori;
 
 /**
  * A command which is used to add a database connection or SMTP account.
@@ -79,14 +79,15 @@ class AddCommand extends CLICommand {
         $connInfoObj->setDBName($this->getInput('Database name:'));
         $connInfoObj->setName($this->getInput('Give your connection a friendly name:', 'db-connection-'.count(WebFiori::getConfig()->getDBConnections())));
         $this->println('Trying to connect to the database...');
-        
+
         $db = new DB($connInfoObj);
-        
+
         try {
             $db->getConnection();
         } catch (Exception $ex) {
             $this->error('Unable to connect to the database.');
             $this->error($ex->getMessage());
+
             return -1;
         }
 

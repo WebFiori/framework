@@ -24,12 +24,12 @@
  */
 namespace webfiori\framework\cron;
 
+use webfiori\framework\Page;
+use webfiori\framework\session\SessionsManager;
+use webfiori\framework\WebFiori;
+use webfiori\http\Response;
 use webfiori\ui\HTMLNode;
 use webfiori\ui\JsCode;
-use webfiori\framework\Page;
-use webfiori\framework\WebFiori;
-use webfiori\framework\session\SessionsManager;
-use webfiori\http\Response;
 /**
  * A generic view for cron related operations. 
  * 
@@ -47,6 +47,7 @@ class CronView {
     public function __construct($title,$description = '') {
         $loginPageTitle = 'CRON Web Interface Login';
         SessionsManager::start('cron-session');
+
         if (Cron::password() != 'NO_PASSWORD' 
                 && $title != $loginPageTitle
                 && SessionsManager::getActiveSession()->get('cron-login-status') !== true) {

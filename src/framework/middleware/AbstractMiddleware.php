@@ -23,6 +23,7 @@
  * THE SOFTWARE.
  */
 namespace webfiori\framework\middleware;
+
 use webfiori\collections\Comparable;
 
 /**
@@ -42,13 +43,6 @@ use webfiori\collections\Comparable;
  */
 abstract class AbstractMiddleware implements Comparable {
     /**
-     *
-     * @var string
-     * 
-     * @since 1.0 
-     */
-    private $name;
-    /**
      * An array that contains the names of the groups that the 
      * middleware belongs to.
      * 
@@ -59,23 +53,63 @@ abstract class AbstractMiddleware implements Comparable {
     private $groups;
     /**
      *
+     * @var string
+     * 
+     * @since 1.0 
+     */
+    private $name;
+    /**
+     *
      * @var int
      * 
      * @since 1.0 
      */
     private $priority;
     /**
-     * Perform an action before accessing application level.
+     * Creates new instance of the class.
      * 
-     * This method will get executed before routing happens. One use case of 
-     * this method is to use it to check if the user is authorized to access 
-     * the system or not. If he is not, then send back a redirect header that 
-     * takes the user to login screen or just send a 401 response code with 
-     * a message.
+     * @param string $name A unique name for the middleware. The name will be 
+     * used later to assign the middleware to specific routes.
      * 
      * @since 1.0
      */
-    public abstract function before();
+    public function __construct($name) {
+        $this->groups = [];
+
+        if (!$this->setName($name)) {
+            $this->setName('middleware');
+        }
+        $this->setPriority(1);
+    }
+    /**
+     * Adds the middleware to specific group.
+     * 
+     * Group name can be used to apply multiple middlewares to specific 
+     * route.
+     * 
+     * @param string $groupName The name of the group.
+     * 
+     * @since 1.0
+     */
+    public function addToGroup($groupName) {
+        $trimmed = trim($groupName);
+
+        if (strlen($trimmed) > 0 && !in_array($trimmed, $this->getGroups())) {
+            $this->groups[] = $trimmed;
+        }
+    }
+    /**
+     * Adds the middleware to more than one group.
+     * 
+     * @param array $groupsArr An array that contains the mames of the groups.
+     * 
+     * @since 1.0
+     */
+    public function addToGroups(array $groupsArr) {
+        foreach ($groupsArr as $groupName) {
+            $this->addToGroup($groupName);
+        }
+    }
     /**
      * Perform an action after accessing application level and before sending 
      * the request.
@@ -94,106 +128,17 @@ abstract class AbstractMiddleware implements Comparable {
      */
     public abstract function afterSend();
     /**
-     * Creates new instance of the class.
+     * Perform an action before accessing application level.
      * 
-     * @param string $name A unique name for the middleware. The name will be 
-     * used later to assign the middleware to specific routes.
-     * 
-     * @since 1.0
-     */
-    public function __construct($name) {
-        $this->groups = [];
-        if (!$this->setName($name)) {
-            $this->setName('middleware');
-        }
-        $this->setPriority(1);
-    }
-    /**
-     * Adds the middleware to specific group.
-     * 
-     * Group name can be used to apply multiple middlewares to specific 
-     * route.
-     * 
-     * @param string $groupName The name of the group.
+     * This method will get executed before routing happens. One use case of 
+     * this method is to use it to check if the user is authorized to access 
+     * the system or not. If he is not, then send back a redirect header that 
+     * takes the user to login screen or just send a 401 response code with 
+     * a message.
      * 
      * @since 1.0
      */
-    public function addToGroup($groupName) {
-        $trimmed = trim($groupName);
-        if (strlen($trimmed) > 0 && !in_array($trimmed, $this->getGroups())) {
-            $this->groups[] = $trimmed;
-        }
-    }
-    /**
-     * Adds the middleware to more than one group.
-     * 
-     * @param array $groupsArr An array that contains the mames of the groups.
-     * 
-     * @since 1.0
-     */
-    public function addToGroups(array $groupsArr) {
-        foreach ($groupsArr as $groupName) {
-            $this->addToGroup($groupName);
-        }
-    }
-    /**
-     * Returns an array that holds the names of the groups that the middleware 
-     * belongs to.
-     * 
-     * @return array An array that holds the names of the groups that the middleware 
-     * belongs to.
-     * 
-     * @since 1.0
-     */
-    public function getGroups() {
-        return $this->groups;
-    }
-    /**
-     * Sets the priority of the middleware.
-     * 
-     * Priority of middleware is used to specify which middleware will be reached 
-     * first. The higher the priority, the sooner the middleware will be reached. 
-     * For example, a middleware with priority 100 will be reached before a 
-     * middleware with priority 99.
-     * 
-     * @param int $priority Middleware priority.
-     * 
-     * @since 1.0
-     */
-    public function setPriority($priority) {
-        $this->priority = intval($priority);
-    }
-    /**
-     * Sets the name of the middleware.
-     * 
-     * The name of the middleware is used to assign it to a route. For this reason, 
-     * each middleware must have a unique name.
-     * 
-     * @param string $name The name of the middleware.
-     * 
-     * @return boolean If the name is set, the method will return true. If not 
-     * set, the method will return false.
-     * 
-     * @since 1.0
-     */
-    public function setName($name) {
-        $trimmed = trim($name);
-        if (strlen($trimmed) > 0) {
-            $this->name = $name;
-            return true;
-        }
-        return false;
-    }
-    /**
-     * Returns the name of the middleware.
-     * 
-     * @return string the name of the middleware.
-     * 
-     * @since 1.0
-     */
-    public function getName() {
-        return $this->name;
-    }
+    public abstract function before();
 
     /**
      * Compare the priority of the middleware with another one.
@@ -212,7 +157,30 @@ abstract class AbstractMiddleware implements Comparable {
         if ($this->priority == $other->priority) {
             return strcmp($other->getName(), $this->getName());
         }
+
         return $this->getPriority() - $other->getPriority();
+    }
+    /**
+     * Returns an array that holds the names of the groups that the middleware 
+     * belongs to.
+     * 
+     * @return array An array that holds the names of the groups that the middleware 
+     * belongs to.
+     * 
+     * @since 1.0
+     */
+    public function getGroups() {
+        return $this->groups;
+    }
+    /**
+     * Returns the name of the middleware.
+     * 
+     * @return string the name of the middleware.
+     * 
+     * @since 1.0
+     */
+    public function getName() {
+        return $this->name;
     }
     /**
      * Returns the priority of the middleware.
@@ -223,5 +191,44 @@ abstract class AbstractMiddleware implements Comparable {
      */
     public function getPriority() {
         return $this->priority;
+    }
+    /**
+     * Sets the name of the middleware.
+     * 
+     * The name of the middleware is used to assign it to a route. For this reason, 
+     * each middleware must have a unique name.
+     * 
+     * @param string $name The name of the middleware.
+     * 
+     * @return boolean If the name is set, the method will return true. If not 
+     * set, the method will return false.
+     * 
+     * @since 1.0
+     */
+    public function setName($name) {
+        $trimmed = trim($name);
+
+        if (strlen($trimmed) > 0) {
+            $this->name = $name;
+
+            return true;
+        }
+
+        return false;
+    }
+    /**
+     * Sets the priority of the middleware.
+     * 
+     * Priority of middleware is used to specify which middleware will be reached 
+     * first. The higher the priority, the sooner the middleware will be reached. 
+     * For example, a middleware with priority 100 will be reached before a 
+     * middleware with priority 99.
+     * 
+     * @param int $priority Middleware priority.
+     * 
+     * @since 1.0
+     */
+    public function setPriority($priority) {
+        $this->priority = intval($priority);
     }
 }

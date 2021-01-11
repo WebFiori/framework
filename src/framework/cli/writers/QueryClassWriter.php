@@ -98,7 +98,7 @@ class QueryClassWriter extends ClassWriter {
         }
         $this->tableObj = $tableObj;
         $this->classInfoArr = $classInfoArr;
-        
+
         if (isset($classInfoArr['entity-info'])) {
             $this->entityMapper = new EntityMapper($this->tableObj, 
                     $classInfoArr['entity-info']['name'], 
@@ -183,15 +183,15 @@ class QueryClassWriter extends ClassWriter {
 
         foreach ($fks as $fkObj) {
             $refTableNs = get_class($fkObj->getSource());
-            $cName = $this->getNamespace().'\\'. $this->getName();
-            
+            $cName = $this->getNamespace().'\\'.$this->getName();
+
             if ($cName == $refTableNs) {
                 $refTableClassName = '$this';
             } else {
                 $nsSplit = explode('\\', $refTableNs);
                 $refTableClassName = 'new '.$nsSplit[count($nsSplit) - 1].'()';
             }
-            
+
             $this->append('$this->addReference('.$refTableClassName.', [', 2);
             $ownerCols = array_keys($fkObj->getOwnerCols());
             $sourceCols = array_keys($fkObj->getSourceCols());
@@ -200,14 +200,6 @@ class QueryClassWriter extends ClassWriter {
                 $this->append("'$ownerCols[$x]' => '$sourceCols[$x]',", 3);
             }
             $this->append("], '".$fkObj->getKeyName()."', '".$fkObj->getOnUpdate()."', '".$fkObj->getOnDelete()."');", 2);
-        }
-    }
-    private function addFksTables() {
-        $fks = $this->tableObj->getForignKeys();
-
-        foreach ($fks as $fkObj) {
-            $refTableNs = $refTableNs = get_class($fkObj->getSource());
-            $this->append('use '.$refTableNs.';');
         }
     }
     /**
@@ -276,6 +268,7 @@ class QueryClassWriter extends ClassWriter {
         $this->append('namespace '.$this->getNamespace().";\n");
         $this->append("use webfiori\database\mysql\MySQLTable;");
         $this->addFksTables();
+
         if ($this->entityMapper !== null) {
             $this->append('use '.$this->getEntityNamespace().'\\'.$this->getEntityName().';');
         }
@@ -291,5 +284,13 @@ class QueryClassWriter extends ClassWriter {
         }
         $this->append(" * </ul>\n */");
         $this->append('class '.$this->getName().' extends MySQLTable {');
+    }
+    private function addFksTables() {
+        $fks = $this->tableObj->getForignKeys();
+
+        foreach ($fks as $fkObj) {
+            $refTableNs = $refTableNs = get_class($fkObj->getSource());
+            $this->append('use '.$refTableNs.';');
+        }
     }
 }

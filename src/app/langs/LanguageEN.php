@@ -271,7 +271,7 @@ class LanguageEN extends Language {
             'm11' => 'Dhū al-Qa‘dah',
             'm12' => 'Dhū al-Ḥijjah',
         ]);
-        
+
         $this->createAndSet('pages/sample-page', [
             'title' => 'Sample Page',
             'description' => 'This is a sample page which is used to show basic usage of the framework.',

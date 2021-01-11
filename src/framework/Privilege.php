@@ -24,8 +24,8 @@
  */
 namespace webfiori\framework;
 
-use webfiori\json\JsonI;
 use webfiori\json\Json;
+use webfiori\json\JsonI;
 /**
  * A class that represents a privilege.
  *

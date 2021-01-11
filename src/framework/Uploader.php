@@ -24,8 +24,8 @@
  */
 namespace webfiori\framework;
 
-use webfiori\json\JsonI;
 use webfiori\json\Json;
+use webfiori\json\JsonI;
 /**
  * A helper class that is used to upload most types of files to the server's file system.
  * 
@@ -130,11 +130,11 @@ class Uploader implements JsonI {
         $this->uploadStatusMessage = 'NO ACTION';
         $this->files = [];
         $this->setAssociatedFileName('files');
-        
+
         if (strlen($uploadPath) == 0) {
             $uploadPath = ROOT_DIR.DS.'app'.DS.'storage'.DS.'uploads';
         }
-        
+
         $this->setUploadDir($uploadPath);
         $this->addExts($allowedTypes);
     }

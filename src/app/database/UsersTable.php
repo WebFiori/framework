@@ -1,6 +1,6 @@
 <?php
-
 namespace app\database;
+
 use webfiori\database\mysql\MySQLTable;
 
 /**
@@ -16,7 +16,7 @@ use webfiori\database\mysql\MySQLTable;
 class UsersTable extends MySQLTable {
     public function __construct() {
         parent::__construct('users');
-        
+
         $this->addColumns([
             'user-id' => [
                 'type' => 'int',
@@ -35,6 +35,5 @@ class UsersTable extends MySQLTable {
                 'is-unique' => true
             ]
         ]);
-        
     }
 }

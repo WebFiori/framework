@@ -271,7 +271,7 @@ class LanguageAR extends Language {
             'm11' => 'ذو القُعدة',
             'm12' => 'ذو الحُحجة',
         ]);
-        
+
         $this->createAndSet('pages/sample-page', [
             'title' => 'مثال على صفحة',
             'description' => 'هذه الصفحة هي مثال اساسي يظهر صريقة استخدام إطار البرمجة.',

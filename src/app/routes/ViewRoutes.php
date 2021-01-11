@@ -23,6 +23,7 @@
  * THE SOFTWARE.
  */
 namespace webfiori\framework\router;
+
 use webfiori\examples\views\ExamplePage;
 /**
  * A class that only has one method to initiate some of system routes.

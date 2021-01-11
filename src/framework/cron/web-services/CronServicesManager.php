@@ -23,7 +23,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 namespace webfiori\framework\cron\webServices;
 
 use webfiori\http\WebServicesManager;
@@ -43,4 +42,5 @@ class CronServicesManager extends WebServicesManager {
         $this->addService(new CronLogoutService());
     }
 }
+
 return __NAMESPACE__;

@@ -379,22 +379,6 @@ abstract class CLICommand {
         return self::_getFormattedOutput($string, $validatedOptions);
     }
     /**
-     * Returns an associative array that contains command args.
-     * @return array An associative array. The indices of the array are 
-     * the names of the arguments and the values are sub-associative arrays. 
-     * the sub arrays will have the following indices: 
-     * <ul>
-     * <li>optional</li>
-     * <li>description</li>
-     * <li>default</li>
-     * <ul>
-     * Note that the last index might not be set.
-     * @since 1.0
-     */
-    public function getArgs() {
-        return $this->commandArgs;
-    }
-    /**
      * Returns an associative array that contains one argument information.
      * @param string $argName The name of the argument.
      * @return array If the argument exist, the method will return an associative 
@@ -417,7 +401,24 @@ abstract class CLICommand {
         if ($this->hasArg($argName)) {
             return $this->commandArgs[$argName];
         }
+
         return [];
+    }
+    /**
+     * Returns an associative array that contains command args.
+     * @return array An associative array. The indices of the array are 
+     * the names of the arguments and the values are sub-associative arrays. 
+     * the sub arrays will have the following indices: 
+     * <ul>
+     * <li>optional</li>
+     * <li>description</li>
+     * <li>default</li>
+     * <ul>
+     * Note that the last index might not be set.
+     * @since 1.0
+     */
+    public function getArgs() {
+        return $this->commandArgs;
     }
     /**
      * Returns the value of command option from CLI given its name.
@@ -497,38 +498,14 @@ abstract class CLICommand {
                 }
                 $this->println();
                 $input = $this->readln();
-                
+
                 $check = $this->getInputHelper($input, $validator, $default);
+
                 if ($check['valid']) {
                     return $check['value'];
                 }
             } while (true);
         }
-    }
-    /**
-     * Validate user input and show error message if user input is invalid.
-     * @param type $input
-     * @param type $validator
-     * @param type $default
-     * @return array The method will return an array with two indices, 'valid' and 
-     * 'value'. The 'valid' index contains a boolean that is set to true if the 
-     * value is valid. The index 'value' will contain the passed value.
-     */
-    private function getInputHelper($input, $validator, $default) {
-        $retVal = [
-            'valid' => true,
-            'value' => $input
-        ];
-        if (strlen($input) == 0 && $default !== null) {
-            $retVal['value'] = $default;
-        } else if (is_callable($validator)) {
-            $retVal['valid'] = call_user_func_array($validator, [$input]);
-
-            if (!($retVal['valid'] === true)) {
-                $this->error('Invalid input is given. Try again.');
-            }
-        }
-        return $retVal;
     }
     /**
      * Returns the name of the command.
@@ -706,16 +683,6 @@ abstract class CLICommand {
         }
         call_user_func_array([$this, 'prints'], $toPass);
     }
-    private function asString($var) {
-        $type = gettype($var);
-        
-        if ($type == 'boolean') {
-            return $var === true ? 'true' : 'false';
-        } else if ($type == 'null') {
-            return 'null';
-        }
-        return $var;
-    }
     /**
      * Print out a string.
      * This method works exactly like the function 'fprintf()'. The only 
@@ -775,10 +742,12 @@ abstract class CLICommand {
     public function readln() {
         $retVal = '';
         $char = '';
+
         while ($char != "\n") {
             $char = fread(STDIN, 1);
             $retVal .= $char;
         }
+
         return trim($retVal);
     }
     /**
@@ -838,8 +807,10 @@ abstract class CLICommand {
         $trimmedArgName = trim($argName);
         $trimmedArgVal = trim($argValue);
         $retVal = false;
+
         if (isset($this->commandArgs[$trimmedArgName]) && strlen($trimmedArgVal) != 0) {
             $allowedVals = $this->commandArgs[$trimmedArgName]['values'];
+
             if (count($allowedVals) != 0) {
                 if (in_array($argValue, $allowedVals)) {
                     $retVal = true;
@@ -848,9 +819,11 @@ abstract class CLICommand {
                 $retVal = true;
             }
         }
+
         if ($retVal) {
             $this->commandArgs[$trimmedArgName]['val'] = $argValue;
         }
+
         return $retVal;
     }
     /**
@@ -924,6 +897,7 @@ abstract class CLICommand {
     }
     private function _checkAllowedArgValues() {
         $invalidArgsVals = [];
+
         foreach ($this->commandArgs as $argName => $argArray) {
             if ($this->isArgProvided($argName) && count($argArray['values']) != 0) {
                 $argValue = $argArray['val'];
@@ -1140,6 +1114,19 @@ abstract class CLICommand {
 
         return $str.$code;
     }
+    private function asString($var) {
+        $type = gettype($var);
+
+        if ($type == 'boolean') {
+            return $var === true ? 'true' : 'false';
+        } else {
+            if ($type == 'null') {
+                return 'null';
+            }
+        }
+
+        return $var;
+    }
     private static function getCharsManner($options) {
         $mannerStr = '';
 
@@ -1194,5 +1181,34 @@ abstract class CLICommand {
         }
 
         return $mannerStr;
+    }
+    /**
+     * Validate user input and show error message if user input is invalid.
+     * @param type $input
+     * @param type $validator
+     * @param type $default
+     * @return array The method will return an array with two indices, 'valid' and 
+     * 'value'. The 'valid' index contains a boolean that is set to true if the 
+     * value is valid. The index 'value' will contain the passed value.
+     */
+    private function getInputHelper($input, $validator, $default) {
+        $retVal = [
+            'valid' => true,
+            'value' => $input
+        ];
+
+        if (strlen($input) == 0 && $default !== null) {
+            $retVal['value'] = $default;
+        } else {
+            if (is_callable($validator)) {
+                $retVal['valid'] = call_user_func_array($validator, [$input]);
+
+                if (!($retVal['valid'] === true)) {
+                    $this->error('Invalid input is given. Try again.');
+                }
+            }
+        }
+
+        return $retVal;
     }
 }

@@ -23,11 +23,10 @@
  * THE SOFTWARE.
  */
 namespace webfiori\framework\cli;
-use webfiori\framework\cli\ServiceHolder;
-use webfiori\framework\cli\WebServiceWriter;
+
+use webfiori\http\AbstractWebService;
 use webfiori\http\ParamTypes;
 use webfiori\http\RequestParameter;
-use webfiori\http\AbstractWebService;
 
 /**
  * A helper class for creating web services classes.
@@ -41,31 +40,15 @@ class CreateWebService {
      */
     private $command;
     /**
-     * 
-     * @param WebService $serviceObj
-     */
-    private function _setServiceName($serviceObj) {
-        $validName = false;
-
-        do {
-            $serviceName = $this->_getCommand()->getInput('Enter a name for the new web service:');
-            $validName = $serviceObj->setName($serviceName);
-
-            if (!$validName) {
-                $this->_getCommand()->error('Given name is invalid.');
-            }
-        } while (!$validName);
-    }
-    /**
      * Creates new instance of the class.
      * 
      * @param CreateCommand $command A command that is used to call the class.
      */
     public function __construct(CreateCommand $command) {
         $this->command = $command;
-        
+
         $classInfo = $this->_getCommand()->getClassInfo('app\\apis','app'.DS.'apis');
-        
+
         $serviceObj = new ServiceHolder();
 
         $this->_setServiceName($serviceObj);
@@ -96,7 +79,7 @@ class CreateWebService {
             $this->_setParamName($paramObj);
             $added = $serviceObj->addParameter($paramObj);
             $paramObj->setIsOptional($this->_getCommand()->confirm('Is this parameter optional?', true));
-            
+
             if ($added) {
                 $this->_getCommand()->success('New parameter added to the service \''.$serviceObj->getName().'\'.');
             } else {
@@ -104,6 +87,13 @@ class CreateWebService {
             }
             $addMore = $this->_getCommand()->confirm('Would you like to add another parameter?', false);
         } while ($addMore);
+    }
+    /**
+     * 
+     * @return CreateCommand
+     */
+    private function _getCommand() {
+        return $this->command;
     }
     /**
      * 
@@ -123,9 +113,18 @@ class CreateWebService {
     }
     /**
      * 
-     * @return CreateCommand
+     * @param WebService $serviceObj
      */
-    private function _getCommand() {
-        return $this->command;
+    private function _setServiceName($serviceObj) {
+        $validName = false;
+
+        do {
+            $serviceName = $this->_getCommand()->getInput('Enter a name for the new web service:');
+            $validName = $serviceObj->setName($serviceName);
+
+            if (!$validName) {
+                $this->_getCommand()->error('Given name is invalid.');
+            }
+        } while (!$validName);
     }
 }

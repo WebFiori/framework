@@ -24,11 +24,11 @@
  */
 namespace webfiori\framework\session;
 
-use webfiori\json\JsonI;
-use webfiori\json\Json;
 use webfiori\conf\SiteConfig;
 use webfiori\framework\exceptions\SessionException;
 use webfiori\framework\User;
+use webfiori\json\Json;
+use webfiori\json\JsonI;
 /**
  * A class that represents a session.
  *
@@ -214,7 +214,7 @@ class Session implements JsonI {
 
         $this->sId = isset($options['session-id']) ? trim($options['session-id']) : $this->_generateSessionID();
         $this->setIsRefresh(false);
-        
+
         if (isset($options['refresh'])) {
             $this->setIsRefresh($options['refresh']);
         }
@@ -311,8 +311,8 @@ class Session implements JsonI {
         return "$name=$value"
                 ."$lifetime; "
                 ."path=".$cookieData['path']
-                . "$secure"
-                . "$httpOnly"
+                ."$secure"
+                ."$httpOnly"
                 .'; SameSite='.$sameSite;
     }
     /**
@@ -418,6 +418,7 @@ class Session implements JsonI {
         if ($this->isRefresh()) {
             return $this->getDuration();
         }
+
         if (!$this->isPersistent()) {
             return 0;
         }
@@ -507,6 +508,7 @@ class Session implements JsonI {
     public function has($varName) {
         if ($this->isRunning()) {
             $trimmed = trim($varName);
+
             return isset($this->sessionArr[$trimmed]);
         }
     }
@@ -637,7 +639,6 @@ class Session implements JsonI {
 
 
         if (in_array($cipherMeth, openssl_get_cipher_methods())) {
-            
             return openssl_encrypt($serializedSesstion, $cipherMeth, $key,0, $iv);
         }
 
@@ -800,7 +801,7 @@ class Session implements JsonI {
 
         if (in_array($cipherMeth, openssl_get_cipher_methods())) {
             $userAgent = isset($_SERVER['HTTP_USER_AGENT']) ? filter_var($_SERVER['HTTP_USER_AGENT'], FILTER_SANITIZE_STRING) : 'Other';
-            
+
             //Shall we use IP address in key or not?
             //It would add more security. But the session will be invalid
             //If user changes network.
@@ -808,7 +809,7 @@ class Session implements JsonI {
 
             $iv = substr(hash('sha256', $key), 0,16);
             $encrypted = openssl_decrypt($serialized, $cipherMeth, $key,0, $iv);
-            
+
             if (strlen($encrypted) > 0) {
                 $sesstionObj = @unserialize($encrypted);
 
@@ -851,6 +852,7 @@ class Session implements JsonI {
         $this->resumedAt = time();
         $this->lifeTime = $session->lifeTime;
         $langCodeR = $this->_getLangFromRequest();
+
         if ($langCodeR) {
             $this->langCode = $this->getLangCode(true);
         } else {
@@ -922,7 +924,6 @@ class Session implements JsonI {
      * @since 1.2
      */
     private function _initLang($forceUpdate = false,$useDefault = true) {
-        
         if ($this->isRunning()) {
             if ($this->langCode !== null && !$forceUpdate) {
                 return false;
@@ -955,6 +956,7 @@ class Session implements JsonI {
                 $retVal = false;
             }
         }
+
         return true;
     }
     private function _initNewSesstionVars() {
@@ -971,7 +973,7 @@ class Session implements JsonI {
         if (strlen($trimmed) == 0) {
             return false;
         }
-        
+
         for ($x = 0 ; $x < strlen($trimmed) ; $x++) {
             $char = $trimmed[$x];
 

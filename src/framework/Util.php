@@ -24,11 +24,10 @@
  */
 namespace webfiori\framework;
 
-use webfiori\http\Response;
 use webfiori\conf\Config;
 use webfiori\framework\cli\CLI;
 use webfiori\framework\ui\MessageBox;
-use webfiori\framework\WebFiori;
+use webfiori\http\Response;
 /**
  * Framework utility class.
  * 
@@ -325,7 +324,7 @@ class Util {
             $toAppend = str_replace($_SERVER['HTTP_WEBFIORI_REMOVE_PATH'],'' ,$toAppend);
         }
         $xToAppend = str_replace('\\', '/', $toAppend);
-        
+
         if (strlen($xToAppend) == 0) {
             return $protocol.$host;
         } else {
@@ -459,12 +458,15 @@ class Util {
     public static function getRequestedURL() {
         $base = self::getBaseURL();
         $uri = getenv('REQUEST_URI');
+
         if ($uri === false) {
             // Using builtin server, it will be false
             $uri = isset($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : '';
+
             return $base.'/'.$uri;
         }
         $requestedURI = trim(filter_var($uri),'/');
+
         return $base.'/'.$requestedURI;
     }
     /**
@@ -613,13 +615,16 @@ class Util {
         $lineNumber = $lastTrace['line'];
         $file = $lastTrace['file'];
         $readable = print_r($expr, true);
+
         if (CLI::isCLI()) {
             fprintf(STDOUT, "%s - %s:\n%s\n",$file, $lineNumber, $readable);
         } else {
             $htmlEntityAdded = str_replace('<', '&lt;', str_replace('>', '&gt;', $readable));
-            $toOutput = '<pre>'. $htmlEntityAdded .'</pre>';
+            $toOutput = '<pre>'.$htmlEntityAdded.'</pre>';
+
             if ($asMessageBox === true) {
                 $messageBox = new MessageBox();
+
                 if ($messageBox->getBody() !== null) {
                     $messageBox->getBody()->addTextNode($toOutput,false);
                     $messageBox->getHeader()->text($file.' - '.$lineNumber);

@@ -24,11 +24,11 @@
  */
 namespace webfiori\framework\cli;
 
-use webfiori\framework\Util;
-use webfiori\ini\InitCliCommands;
-use webfiori\framework\cron\Cron;
-use webfiori\framework\WebFiori;
 use Exception;
+use webfiori\framework\cron\Cron;
+use webfiori\framework\Util;
+use webfiori\framework\WebFiori;
+use webfiori\ini\InitCliCommands;
 /**
  * A class which adds basic support for running the framework through 
  * command line interface (CLI).
@@ -117,16 +117,17 @@ class CLI {
         Cron::log("Error File         : $errfile\n");
         Cron::log("Error Line         : $errline\n");
         Cron::log("Stack Trace:\n");
-        
+
         $trace = debug_backtrace();
         $num = 0;
+
         foreach ($trace as $arr) {
             $toPrint = self::_traceArrAsString($num, $arr)."\n";
             fprintf(STDERR, $toPrint);
             Cron::log($toPrint);
             $num++;
         }
-        
+
         if (defined('STOP_CLI_ON_ERR') && STOP_CLI_ON_ERR === true) {
             exit(-1);
         }
@@ -163,27 +164,10 @@ class CLI {
         Cron::log("Line                 : ".$ex->getMessage()."\n");
         Cron::log("Stack Trace          : \n");
         $num = 0;
+
         foreach ($ex->getTrace() as $arrEntry) {
             Cron::log(self::_traceArrAsString($num, $arrEntry));
             $num++;
-        }
-    }
-    private static function _traceArrAsString($num, $arr) {
-        $file = $arr['file'];
-        $line = $arr['line'];
-        $class = isset($arr['class']) ? $arr['class'] : '';
-        return "#$num $file($line): $class";
-    }
-    /**
-     * The main aim of this method is to automatically register any commands which 
-     * exist inside the folder 'app/commands'.
-     * 
-     */
-    private static function _autoRegister() {
-        if (CLI::isCLI()) {
-            WebFiori::autoRegister('commands', function ($instance){
-                CLI::register($instance);
-            });
         }
     }
     /**
@@ -287,11 +271,26 @@ class CLI {
             if (!defined('__PHPUNIT_PHAR__')) {
                 exit($command->excCommand());
             }
-        } else if (defined('__PHPUNIT_PHAR__')) {
-            return 0;
+        } else {
+            if (defined('__PHPUNIT_PHAR__')) {
+                return 0;
+            }
         }
 
         return self::get()->_runCommand();
+    }
+    /**
+     * The main aim of this method is to automatically register any commands which 
+     * exist inside the folder 'app/commands'.
+     * 
+     */
+    private static function _autoRegister() {
+        if (CLI::isCLI()) {
+            WebFiori::autoRegister('commands', function ($instance)
+            {
+                CLI::register($instance);
+            });
+        }
     }
     private function _regCommand($command) {
         $this->commands[$command->getName()] = $command;
@@ -310,6 +309,13 @@ class CLI {
 
             return -1;
         }
+    }
+    private static function _traceArrAsString($num, $arr) {
+        $file = $arr['file'];
+        $line = $arr['line'];
+        $class = isset($arr['class']) ? $arr['class'] : '';
+
+        return "#$num $file($line): $class";
     }
     /**
      * 

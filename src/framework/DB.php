@@ -22,13 +22,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 namespace webfiori\framework;
 
-use webfiori\database\Database;
-use webfiori\database\ConnectionInfo;
-use webfiori\database\DatabaseException;
 use webfiori\conf\Config;
+use webfiori\database\ConnectionInfo;
+use webfiori\database\Database;
+use webfiori\database\DatabaseException;
 
 /**
  * A class that can be used to represent system database.
@@ -60,9 +59,11 @@ class DB extends Database {
     public function __construct($connName) {
         if ($connName instanceof ConnectionInfo) {
             parent::__construct($connName);
+
             return;
         }
         $conn = Config::getDBConnection($connName);
+
         if (!($conn instanceof ConnectionInfo)) {
             throw new DatabaseException("No connection was found which has the name '$connName'.");
         }

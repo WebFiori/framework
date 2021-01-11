@@ -25,8 +25,6 @@
 namespace webfiori\framework\cli;
 
 use InvalidArgumentException;
-use restEasy\WebService;
-use restEasy\WebServicesSet;
 use webfiori\http\AbstractWebService;
 use webfiori\http\RequestParameter;
 
@@ -61,6 +59,7 @@ class WebServiceWriter extends ClassWriter {
      */
     public function __construct($webServicesObj, $classInfoArr) {
         parent::__construct($classInfoArr);
+
         if (!$webServicesObj instanceof AbstractWebService) {
             throw new InvalidArgumentException('Given parameter is not an instance of \'webfiori\restEasy\AbstractWebService\'');
         }
@@ -117,7 +116,7 @@ class WebServiceWriter extends ClassWriter {
         $this->append(" */", 1);
         $this->append("public function isAuthorized() {", 1);
         $this->append('// TODO: Check if the client is authorized to call the service \''.$name.'\'.', 2);
-         $this->append('// You can ignore this method or remove it.', 2);
+        $this->append('// You can ignore this method or remove it.', 2);
         $this->append('}', 1);
 
         $this->append("/**", 1);
@@ -136,6 +135,7 @@ class WebServiceWriter extends ClassWriter {
         $this->append('public function __construct(){', 1);
         $this->append('parent::__construct(\''.$this->servicesObj->getName().'\');', 2);
         $this->append('$this->addRequestMethod(\''.$this->servicesObj->getRequestMethods()[0].'\');', 2);
+
         foreach ($this->servicesObj->getParameters() as $paramObj) {
             $this->_appendParam($paramObj);
         }

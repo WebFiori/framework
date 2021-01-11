@@ -24,8 +24,8 @@
  */
 namespace webfiori\framework\ui;
 
-use webfiori\ui\HTMLNode;
 use webfiori\framework\WebFiori;
+use webfiori\ui\HTMLNode;
 /**
  * A generic class for showing a floating box in web pages that can have any content 
  * in its body.
@@ -41,6 +41,13 @@ class MessageBox extends HTMLNode {
      */
     private static $Count = 0;
     /**
+     *
+     * @var boolean 
+     * 
+     * @since 1.0
+     */
+    private $isInit;
+    /**
      * The node that represents the body of the message box.
      * @var HTMLNode
      * @since 1.0 
@@ -53,19 +60,13 @@ class MessageBox extends HTMLNode {
      */
     private $messageHeader;
     /**
-     *
-     * @var boolean 
-     * 
-     * @since 1.0
-     */
-    private $isInit;
-    /**
      * Creates new instance of the class.
      * @since 1.0
      */
     public function __construct() {
         parent::__construct();
         $this->isInit = false;
+
         if (defined('MAX_BOX_MESSAGES') && self::getCount() + 1 < MAX_BOX_MESSAGES) {
             $this->_init();
         } else if (!defined('MAX_BOX_MESSAGES')) {
@@ -103,6 +104,17 @@ class MessageBox extends HTMLNode {
      */
     public static function getCount() {
         return self::$Count;
+    }
+    /**
+     * Checks if the message box is fully initialized.
+     * 
+     * @return boolean The method will return true if the message box is fully 
+     * initialized and its components are ready for use. False if not.
+     * 
+     * @since 1.0
+     */
+    public function isInitialized() {
+        return $this->isInit;
     }
     /**
      * Initialize the node that represents the body of the box.
@@ -154,16 +166,5 @@ class MessageBox extends HTMLNode {
         }
         self::$Count++;
         $this->isInit = true;
-    }
-    /**
-     * Checks if the message box is fully initialized.
-     * 
-     * @return boolean The method will return true if the message box is fully 
-     * initialized and its components are ready for use. False if not.
-     * 
-     * @since 1.0
-     */
-    public function isInitialized() {
-        return $this->isInit;
     }
 }

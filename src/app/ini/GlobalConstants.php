@@ -56,6 +56,7 @@ class GlobalConstants {
              */
             define('SCRIPT_MEMORY_LIMIT', '2048M');
         }
+
         if (!defined('DATE_TIMEZONE')) {
             /**
              * Define the timezone at which the system will operate in.
@@ -67,6 +68,7 @@ class GlobalConstants {
              */
             define('DATE_TIMEZONE', 'Asia/Riyadh');
         }
+
         if (!defined('PHP_INT_MIN')) {
             /**
              * Fallback for older php versions that does not support the constant 
@@ -139,6 +141,7 @@ class GlobalConstants {
              */
             define('MAX_BOX_MESSAGES', 15);
         }
+
         if (!defined('CLI_HTTP_HOST')) {
             /**
              * Host name to use in case the system is executed through CLI.
@@ -150,6 +153,7 @@ class GlobalConstants {
              */
             define('CLI_HTTP_HOST', 'example.com');
         }
+
         if (!defined('DS')) {
             /**
              * Directory separator.
@@ -159,6 +163,7 @@ class GlobalConstants {
              */
             define('DS', DIRECTORY_SEPARATOR);
         }
+
         if (!defined('THEMES_PATH')) {
             $themesDirName = 'themes';
             $themesPath = substr(__DIR__, 0, strlen(__DIR__) - strlen('/app/ini')).DIRECTORY_SEPARATOR.$themesDirName;
@@ -168,6 +173,7 @@ class GlobalConstants {
              */
             define('THEMES_PATH', $themesPath);
         }
+
         if (!defined('USE_HTTP')) {
             /**
              * Sets the framework to use 'http://' or 'https://' for base URIs.

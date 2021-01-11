@@ -27,8 +27,8 @@ namespace webfiori\framework\cron;
 use Error;
 use Exception;
 use webfiori\collections\Queue;
-use webfiori\framework\exceptions\InvalidCRONExprException;
 use webfiori\framework\cli\CronCommand;
+use webfiori\framework\exceptions\InvalidCRONExprException;
 /**
  * An abstract class that contains basic functionality for implementing cron 
  * jobs.
@@ -38,14 +38,6 @@ use webfiori\framework\cli\CronCommand;
  * @version 1.0.1
  */
 abstract class AbstractJob {
-    /**
-     * The command which is used to execute the job.
-     * 
-     * @var CronCommand
-     * 
-     * @since 1.0.1 
-     */
-    private $command;
     /**
      * A constant that indicates a sub cron expression is of type 'multi-value'.
      * 
@@ -95,6 +87,14 @@ abstract class AbstractJob {
     const WEEK_DAYS = [
         'SAT' => 6,'SUN' => 0,'MON' => 1,'TUE' => 2,'WED' => 3,'THU' => 4,'FRI' => 5
     ];
+    /**
+     * The command which is used to execute the job.
+     * 
+     * @var CronCommand
+     * 
+     * @since 1.0.1 
+     */
+    private $command;
     /**
      * The full cron expression.
      * 
@@ -197,28 +197,6 @@ abstract class AbstractJob {
             $this->cron();
         }
         $this->setIsForced(false);
-    }
-    /**
-     * Associate the job with the command that was used to execute the job.
-     * 
-     * @param CronCommand $command
-     * 
-     * @since 1.0.1
-     */
-    public function setCommand(CronCommand $command) {
-        $this->command = $command;
-    }
-    /**
-     * Returns the command that was used to execute the job.
-     * 
-     * Note that the command will be null if not executed from CLI environment.
-     * 
-     * @return CronCommand|null 
-     * 
-     * @since 1.0.1
-     */
-    public function getCommand() {
-        return $this->command;
     }
     /**
      * Adds new execution argument.
@@ -415,7 +393,7 @@ abstract class AbstractJob {
             $isSuccessRun = $this->_callMethod('execute');
             $retVal = true;
             $this->isSuccess = $isSuccessRun === true || $isSuccessRun === null;
-            
+
             if (!$this->isSuccess()) {
                 $this->_callMethod('onFail');
             } else {
@@ -465,6 +443,18 @@ abstract class AbstractJob {
         }
 
         return null;
+    }
+    /**
+     * Returns the command that was used to execute the job.
+     * 
+     * Note that the command will be null if not executed from CLI environment.
+     * 
+     * @return CronCommand|null 
+     * 
+     * @since 1.0.1
+     */
+    public function getCommand() {
+        return $this->command;
     }
     /**
      * Returns an associative array that contains the values of 
@@ -846,6 +836,16 @@ abstract class AbstractJob {
      */
     public abstract function onSuccess();
     /**
+     * Associate the job with the command that was used to execute the job.
+     * 
+     * @param CronCommand $command
+     * 
+     * @since 1.0.1
+     */
+    public function setCommand(CronCommand $command) {
+        $this->command = $command;
+    }
+    /**
      * Sets an optional name for the job.
      * 
      * The name is used to make different jobs unique. Each job must 
@@ -931,7 +931,7 @@ abstract class AbstractJob {
      * @return null|boolean
      */
     private function _callMethod($fName) {
-        Cron::log('Calling the method '. get_class($this)."::$fName()");
+        Cron::log('Calling the method '.get_class($this)."::$fName()");
         try {
             return $this->$fName();
         } catch (Exception $ex) {
@@ -1365,12 +1365,13 @@ abstract class AbstractJob {
      * @param \Exception $ex
      */
     private function _logExeException($ex, $meth = '') {
-        Cron::log('WARNING: An exception was thrown while performing the operation '. get_class($this).'::'.$meth.'. '
+        Cron::log('WARNING: An exception was thrown while performing the operation '.get_class($this).'::'.$meth.'. '
                 .'The output of the job might be not as expected.');
         Cron::log('Exception class: "'.get_class($ex).'"');
         Cron::log('Exception message: "'.$ex->getMessage().'"');
         Cron::log('Thrown in file: "'.$ex->getFile().'"');
         Cron::log('Line: "'.$ex->getLine().'"');
+
         if ($meth == 'execute') {
             $this->isSuccess = false;
         }

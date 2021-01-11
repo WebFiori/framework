@@ -24,12 +24,12 @@
  */
 namespace webfiori\framework\mail;
 
-use webfiori\ui\HTMLDoc;
-use webfiori\ui\HTMLNode;
 use webfiori\conf\MailConfig;
+use webfiori\framework\ConfigController;
 use webfiori\framework\exceptions\SMTPException;
 use webfiori\framework\File;
-use webfiori\framework\ConfigController;
+use webfiori\ui\HTMLDoc;
+use webfiori\ui\HTMLNode;
 /**
  * A class that can be used to write HTML formatted Email messages.
  *
@@ -43,7 +43,7 @@ class EmailMessage {
      * @since 1.0 
      */
     private $asHtml;
-    
+
     private $log;
     /**
      *
@@ -66,15 +66,18 @@ class EmailMessage {
 
             if ($acc instanceof SMTPAccount) {
                 $this->socketMailer = ConfigController::get()->getSocketMailer($acc);
-                
+
                 if ($this->socketMailer == ConfigController::INV_CREDENTIALS) {
                     throw new SMTPException('The account "'.$sendAccountName.'" has invalid credintials.');
-                } else if ($this->socketMailer == ConfigController::INV_HOST_OR_PORT) {
-                    throw new SMTPException('The account "'.$sendAccountName.'" has invalid host or port number. Port: '.$acc->getPort().', Host: '.$acc->getServerAddress().'.');
                 } else {
-                    $this->asHtml = new HTMLDoc();
-                    $this->asHtml->getHeadNode()->addMeta('charset', 'UTF-8');
-                    return;
+                    if ($this->socketMailer == ConfigController::INV_HOST_OR_PORT) {
+                        throw new SMTPException('The account "'.$sendAccountName.'" has invalid host or port number. Port: '.$acc->getPort().', Host: '.$acc->getServerAddress().'.');
+                    } else {
+                        $this->asHtml = new HTMLDoc();
+                        $this->asHtml->getHeadNode()->addMeta('charset', 'UTF-8');
+
+                        return;
+                    }
                 }
             }
             throw new SMTPException('No SMTP account was found which has the name "'.$sendAccountName.'".');

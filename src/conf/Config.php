@@ -51,7 +51,7 @@ class Config {
      * @since 1.0
      */
     private $versionType;
-    
+
     /**
      * Initialize configuration.
      */
@@ -89,7 +89,7 @@ class Config {
             return self::$cfg;
         }
         self::$cfg = new Config();
-        
+
         return self::$cfg;
     }
     /**
@@ -119,11 +119,11 @@ class Config {
     public static function getDBConnection($conName) {
         $conns = self::getDBConnections();
         $trimmed = trim($conName);
-        
+
         if (isset($conns[$trimmed])) {
             return $conns[$trimmed];
         }
-        
+
         return null;
     }
     /**
@@ -188,12 +188,11 @@ class Config {
     private function _getReleaseDate() {
         return $this->releaseDate;
     }
-    
+
     private function _getVersion() {
         return $this->version;
     }
     private function _getVersionType() {
         return $this->versionType;
     }
-
 }

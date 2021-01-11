@@ -24,14 +24,14 @@
  */
 namespace webfiori\framework\cron;
 
+use webfiori\framework\Page;
+use webfiori\framework\router\Router;
+use webfiori\framework\WebFiori;
 use webfiori\ui\HTMLNode;
 use webfiori\ui\JsCode;
 use webfiori\ui\Paragraph;
 use webfiori\ui\TableCell;
 use webfiori\ui\TableRow;
-use webfiori\framework\Page;
-use webfiori\framework\router\Router;
-use webfiori\framework\WebFiori;
 /**
  * A view to show details of a specific CRON task.
  *

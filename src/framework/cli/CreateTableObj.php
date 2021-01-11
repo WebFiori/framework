@@ -1,9 +1,8 @@
 <?php
 namespace webfiori\framework\cli;
 
-use webfiori\database\mysql\MySQLTable;
 use webfiori\database\mysql\MySQLColumn;
-use webfiori\framework\cli\QueryClassWriter;
+use webfiori\database\mysql\MySQLTable;
 use webfiori\database\Table;
 /**
  * A helper class for creating database tables classes.
@@ -23,10 +22,10 @@ class CreateTableObj {
      */
     public function __construct(CreateCommand $command) {
         $this->command = $command;
-        
+
         $classInfo = $this->_getCommand()->getClassInfo('app\\database','app'.DS.'database');
-        
-        
+
+
         $tempTable = new MySQLTable();
         $this->_setTableName($tempTable);
         $this->_setTableComment($tempTable);
@@ -34,6 +33,7 @@ class CreateTableObj {
 
         do {
             $colKey = $this->_getCommand()->getInput('Enter a name for column key:');
+
             if ($tempTable->hasColumnWithKey($colKey)) {
                 $this->_getCommand()->warning("The table already has a key with name '$colKey'.");
                 continue;
@@ -81,76 +81,6 @@ class CreateTableObj {
      * 
      * @param MySQLColumn $colObj
      */
-    private function _isPrimaryCheck($colObj) {
-        $colObj->setIsPrimary($this->_getCommand()->confirm('Is this column primary?', false));
-        $type = $colObj->getDatatype();
-
-        if (!$colObj->isPrimary()) {
-            if (!($type == 'bool' || $type == 'boolean')) {
-                $colObj->setIsUnique($this->_getCommand()->confirm('Is this column unique?', false));
-            }
-            $this->_setDefaultValue($colObj);
-            $colObj->setIsNull($this->_getCommand()->confirm('Can this column have null values?', false));
-        } else if ($colObj->getDatatype() == 'int') {
-            $colObj->setIsAutoInc($this->_getCommand()->confirm('Is this column auto increment?', false));
-        }
-    }
-    /**
-     * 
-     * @param MySQLColumn $colObj
-     */
-    private function _setDefaultValue($colObj) {
-        if ($colObj->getDatatype() == 'bool' || $colObj->getDatatype() == 'boolean') {
-            $defaultVal = trim($this->_getCommand()->getInput('Enter default value (true or false) (Hit "Enter" to skip):', ''));
-
-            if ($defaultVal == 'true') {
-                $colObj->setDefault(true);
-            } else if ($defaultVal == 'false') {
-                $colObj->setDefault(false);
-            }
-        } else {
-            $defaultVal = trim($this->_getCommand()->getInput('Enter default value (Hit "Enter" to skip):', ''));
-
-            if (strlen($defaultVal) != 0) {
-                $colObj->setDefault($defaultVal);
-            }
-        }
-    }
-    /**
-     * 
-     * @param Table $tempTable
-     */
-    private function _setTableComment($tempTable) {
-        $incComment = $this->_getCommand()->confirm('Would you like to add your comment about the table?', false);
-
-        if ($incComment) {
-            $tableComment = $this->_getCommand()->getInput('Enter your comment:');
-
-            if (strlen($tableComment) != 0) {
-                $tempTable->setComment($tableComment);
-            }
-        }
-    }
-    /**
-     * 
-     * @param Table $tableObj
-     */
-    private function _setTableName($tableObj) {
-        $invalidTableName = true;
-
-        do {
-            $tableName = $this->_getCommand()->getInput('Enter database table name:');
-            $invalidTableName = !$tableObj->setName($tableName);
-
-            if ($invalidTableName) {
-                $this->_getCommand()->error('The given name is invalid.');
-            }
-        } while ($invalidTableName);
-    }
-    /**
-     * 
-     * @param MySQLColumn $colObj
-     */
     private function _addColComment($colObj) {
         if ($this->_getCommand()->confirm('Would you like to add your own comment about the column?', false)) {
             $comment = $this->_getCommand()->getInput('Enter your comment:');
@@ -168,8 +98,8 @@ class CreateTableObj {
     private function _addFks($tableObj) {
         $refTable = null;
         $fksNs = [];
+
         do {
-            
             $refTableName = $this->_getCommand()->getInput('Enter the name of the referenced table class (with namespace):');
             try {
                 $refTable = new $refTableName();
@@ -179,11 +109,14 @@ class CreateTableObj {
             }
 
             if ($refTable instanceof Table) {
-                $fkName = $this->_getCommand()->getInput('Enter a name for the foreign key:', null, function ($val) {
+                $fkName = $this->_getCommand()->getInput('Enter a name for the foreign key:', null, function ($val)
+                {
                     $trimmed = trim($val);
+
                     if (strlen($trimmed) == 0) {
                         return false;
                     }
+
                     return true;
                 });
                 $fkCols = $this->_getFkCols($tableObj);
@@ -198,20 +131,27 @@ class CreateTableObj {
                 $onDelete = $this->_getCommand()->select('Choose on delete condition:', [
                     'cascade', 'restrict', 'set null', 'set default', 'no action'
                 ], 1);
-                
+
                 try {
                     $tableObj->addReference($refTable, $fkColsArr, $fkName, $onUpdate, $onDelete);
                     $this->_getCommand()->success('Foreign key added.');
                     $fksNs[$fkName] = $refTableName;
                 } catch (Exception $ex) {
                     $this->_getCommand()->error($ex->getMessage());
-                } 
+                }
             } else {
                 $this->_getCommand()->error('The given class is not an instance of the class \'webfiori\\database\\Table\'.');
             }
-
         } while ($this->_getCommand()->confirm('Would you like to add another foreign key?', false));
+
         return $fksNs;
+    }
+    /**
+     * 
+     * @return CreateCommand
+     */
+    private function _getCommand() {
+        return $this->command;
     }
     /**
      * 
@@ -235,6 +175,69 @@ class CreateTableObj {
         } while ($this->_getCommand()->confirm('Would you like to add another column to the foreign key?', false));
 
         return $fkCols;
+    }
+    /**
+     * 
+     * @param MySQLColumn $colObj
+     */
+    private function _isPrimaryCheck($colObj) {
+        $colObj->setIsPrimary($this->_getCommand()->confirm('Is this column primary?', false));
+        $type = $colObj->getDatatype();
+
+        if (!$colObj->isPrimary()) {
+            if (!($type == 'bool' || $type == 'boolean')) {
+                $colObj->setIsUnique($this->_getCommand()->confirm('Is this column unique?', false));
+            }
+            $this->_setDefaultValue($colObj);
+            $colObj->setIsNull($this->_getCommand()->confirm('Can this column have null values?', false));
+        } else {
+            if ($colObj->getDatatype() == 'int') {
+                $colObj->setIsAutoInc($this->_getCommand()->confirm('Is this column auto increment?', false));
+            }
+        }
+    }
+    /**
+     * 
+     * @param MySQLColumn $colObj
+     */
+    private function _setDefaultValue($colObj) {
+        if ($colObj->getDatatype() == 'bool' || $colObj->getDatatype() == 'boolean') {
+            $defaultVal = trim($this->_getCommand()->getInput('Enter default value (true or false) (Hit "Enter" to skip):', ''));
+
+            if ($defaultVal == 'true') {
+                $colObj->setDefault(true);
+            } else {
+                if ($defaultVal == 'false') {
+                    $colObj->setDefault(false);
+                }
+            }
+        } else {
+            $defaultVal = trim($this->_getCommand()->getInput('Enter default value (Hit "Enter" to skip):', ''));
+
+            if (strlen($defaultVal) != 0) {
+                $colObj->setDefault($defaultVal);
+            }
+        }
+    }
+    /**
+     * 
+     * @param MySQLColumn $colObj
+     */
+    private function _setScale($colObj) {
+        $colDataType = $colObj->getDatatype();
+
+        if ($colDataType == 'decimal' || $colDataType == 'float' || $colDataType == 'double') {
+            $validScale = false;
+
+            do {
+                $scale = $this->_getCommand()->getInput('Enter the scale (number of numbers to the right of decimal point):');
+                $validScale = $colObj->setScale($scale);
+
+                if (!$validScale) {
+                    $this->_getCommand()->error('Invalid scale value.');
+                }
+            } while (!$validScale);
+        }
     }
     /**
      * 
@@ -281,29 +284,33 @@ class CreateTableObj {
     }
     /**
      * 
-     * @param MySQLColumn $colObj
+     * @param Table $tempTable
      */
-    private function _setScale($colObj) {
-        $colDataType = $colObj->getDatatype();
+    private function _setTableComment($tempTable) {
+        $incComment = $this->_getCommand()->confirm('Would you like to add your comment about the table?', false);
 
-        if ($colDataType == 'decimal' || $colDataType == 'float' || $colDataType == 'double') {
-            $validScale = false;
+        if ($incComment) {
+            $tableComment = $this->_getCommand()->getInput('Enter your comment:');
 
-            do {
-                $scale = $this->_getCommand()->getInput('Enter the scale (number of numbers to the right of decimal point):');
-                $validScale = $colObj->setScale($scale);
-
-                if (!$validScale) {
-                    $this->_getCommand()->error('Invalid scale value.');
-                }
-            } while (!$validScale);
+            if (strlen($tableComment) != 0) {
+                $tempTable->setComment($tableComment);
+            }
         }
     }
     /**
      * 
-     * @return CreateCommand
+     * @param Table $tableObj
      */
-    private function _getCommand() {
-        return $this->command;
+    private function _setTableName($tableObj) {
+        $invalidTableName = true;
+
+        do {
+            $tableName = $this->_getCommand()->getInput('Enter database table name:');
+            $invalidTableName = !$tableObj->setName($tableName);
+
+            if ($invalidTableName) {
+                $this->_getCommand()->error('The given name is invalid.');
+            }
+        } while ($invalidTableName);
     }
 }

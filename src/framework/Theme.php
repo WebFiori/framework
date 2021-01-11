@@ -24,11 +24,11 @@
  */
 namespace webfiori\framework;
 
-use webfiori\json\JsonI;
-use webfiori\json\Json;
-use webfiori\ui\HTMLNode;
 use ReflectionClass;
 use webfiori\conf\SiteConfig;
+use webfiori\json\Json;
+use webfiori\json\JsonI;
+use webfiori\ui\HTMLNode;
 /**
  * A base class that is used to construct web site UI.
  * 
@@ -241,7 +241,7 @@ abstract class Theme implements JsonI {
         }
         $nodeName = isset($options['name']) ? $options['name'] : 'div';
         $attributes = isset($options['attributes']) ? $options['attributes'] : [];
-        
+
         return new HTMLNode($nodeName, $attributes);
     }
     /**
@@ -789,6 +789,7 @@ abstract class Theme implements JsonI {
             'jsDirName' => $this->getJsDirName(),
             'components' => $this->getComponents()
         ]);
+
         return $j;
     }
 }

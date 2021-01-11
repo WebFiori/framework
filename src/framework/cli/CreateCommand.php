@@ -24,8 +24,8 @@
  */
 namespace webfiori\framework\cli;
 
-use webfiori\framework\Util;
 use webfiori\database\Table;
+use webfiori\framework\Util;
 /**
  * A command which is used to automate some of the common tasks such as 
  * creating table classes or controllers.
@@ -39,8 +39,8 @@ class CreateCommand extends CLICommand {
         parent::__construct('create', [
             '--what' => [
                 'description' => 'An optional parameter which is used to specify what '
-                . 'would you like to create. Possible values are: "e" for entity, "t" for '
-                . 'database table.',
+                .'would you like to create. Possible values are: "e" for entity, "t" for '
+                .'database table.',
                 'optional' => true,
                 'values' => [
                     'e','t','ws'
@@ -51,10 +51,11 @@ class CreateCommand extends CLICommand {
             ]
         ], 'Creates a system entity (middleware, web service, background process ...).');
     }
-    
+
     public function _createEntityFromQuery() {
         $tableClassNameValidity = false;
         $tableClassName = $this->getArgValue('--table-class');
+
         do {
             if (strlen($tableClassName) == 0) {
                 $tableClassName = $this->getInput('Enter table class name (include namespace):');
@@ -97,6 +98,7 @@ class CreateCommand extends CLICommand {
     public function exec() {
         $what = $this->getArgValue('--what');
         $create = null;
+
         if ($what !== null) {
             if ($what == 'e') {
                 $this->_createEntityFromQuery();
@@ -116,6 +118,7 @@ class CreateCommand extends CLICommand {
                 'Quit.'
             ];
             $answer = $this->select('What would you like to create?', $options, count($options) - 1);
+
             if ($answer == 'Quit.') {
                 return 0;
             } else if ($answer == 'Database table class.') {
@@ -185,8 +188,8 @@ class CreateCommand extends CLICommand {
             'path' => $path
         ];
     }
-    
-    
+
+
     private function _getClassName() {
         $isNameValid = false;
 
@@ -210,7 +213,7 @@ class CreateCommand extends CLICommand {
             $fixedPath = ROOT_DIR.DS.trim(trim(str_replace('\\', DS, str_replace('/', DS, $path)),'/'),'\\');
 
             if (Util::isDirectory($fixedPath, true)) {
-               $validPath = true;
+                $validPath = true;
             } else {
                 $this->error('Provided direcory is not a directory or it does not exist.');
             }
@@ -218,7 +221,7 @@ class CreateCommand extends CLICommand {
 
         return $fixedPath;
     }
-    
+
     private function _getNamespace($defaultNs) {
         $isNameValid = false;
 
@@ -233,7 +236,7 @@ class CreateCommand extends CLICommand {
 
         return trim($ns,'\\');
     }
-    
+
     private function _validateClassName($name) {
         $len = strlen($name);
 

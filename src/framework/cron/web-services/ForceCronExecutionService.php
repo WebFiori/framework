@@ -25,12 +25,12 @@
  */
 namespace webfiori\framework\cron\webServices;
 
-use webfiori\http\AbstractWebService;
 use webfiori\framework\cron\Cron;
-use webfiori\http\RequestParameter;
 use webfiori\framework\session\SessionsManager;
-use webfiori\json\Json;
+use webfiori\http\AbstractWebService;
+use webfiori\http\RequestParameter;
 use webfiori\http\WebServicesManager;
+use webfiori\json\Json;
 /**
  * A web service which is used to force job execution using web interface.
  *
@@ -44,6 +44,7 @@ class ForceCronExecutionService extends AbstractWebService {
     }
     public function isAuthorized() {
         SessionsManager::start('cron-session');
+
         return SessionsManager::get('cron-login-status') === true;
     }
 
@@ -69,5 +70,4 @@ class ForceCronExecutionService extends AbstractWebService {
             $this->sendResponse($result, WebServicesManager::E, 404);
         }
     }
-
 }

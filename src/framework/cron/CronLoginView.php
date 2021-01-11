@@ -24,13 +24,11 @@
  */
 namespace webfiori\framework\cron;
 
-use webfiori\ui\HTMLNode;
-use webfiori\ui\Input;
-use webfiori\ui\Label;
 use webfiori\framework\Page;
+use webfiori\framework\session\SessionsManager;
 use webfiori\framework\WebFiori;
 use webfiori\http\Response;
-use webfiori\framework\session\SessionsManager;
+use webfiori\ui\HTMLNode;
 /**
  * A page which is used to show login form to enter login information to 
  * access cron web interface.
@@ -40,7 +38,7 @@ use webfiori\framework\session\SessionsManager;
 class CronLoginView extends CronView {
     public function __construct() {
         parent::__construct('CRON Web Interface Login', 'Login to CRON Control panel.');
-        
+
         if (SessionsManager::get('cron-login-status')) {
             Response::addHeader('location', WebFiori::getSiteConfig()->getBaseURL().'/cron/jobs');
             Response::send();

@@ -21,7 +21,12 @@ class IbrahimTheme extends Theme {
                 . 'using Vue, Vuetify and WebFiori framework.');
         $this->setLicenseName('MIT Licesnse');
         $this->setVersion('1.0');
-        Page::siteName(WebFiori::getSiteConfig()->getWebsiteNames()[SessionsManager::getActiveSession()->getLangCode(true)]);
+        $langCode = WebFiori::getSiteConfig()->getPrimaryLanguage();
+        $session = SessionsManager::getActiveSession();
+        if ($session !== null) {
+            $langCode = SessionsManager::getActiveSession()->getLangCode(true);
+        }
+        Page::siteName(WebFiori::getSiteConfig()->getWebsiteNames()[$langCode]);
         Page::beforeRender(function ($theme) {
             
             $gta = $theme->getGta();

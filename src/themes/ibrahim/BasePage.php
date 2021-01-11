@@ -1,14 +1,12 @@
 <?php
-
 namespace ibrahim\themes;
 
+use webfiori\framework\Page;
 use webfiori\framework\session\SessionsManager;
 use webfiori\http\Request;
-use webfiori\framework\Page;
-use ibrahim\themes\IbrahimTheme;
 use webfiori\json\Json;
-use webfiori\ui\JsCode;
 use webfiori\ui\HTMLNode;
+use webfiori\ui\JsCode;
 
 /**
  * A base page that can be extended to create system pages.
@@ -19,17 +17,17 @@ use webfiori\ui\HTMLNode;
  */
 class BasePage {
     /**
-     *
-     * @var JsCode 
-     */
-    private $topInlineJs;
-    /**
      * A json object that holds backend data. Used to send data to 
      * frontend.
      * 
      * @var Json 
      */
     private $jsonData;
+    /**
+     *
+     * @var JsCode 
+     */
+    private $topInlineJs;
     /**
      * Creates new instance of the class.
      * 
@@ -47,7 +45,8 @@ class BasePage {
             'name' => 'heading',
             'title' => $pageTitle
         ]));
-        Page::beforeRender(function ($vueScript) {
+        Page::beforeRender(function ($vueScript)
+        {
             if (strlen($vueScript) > 0) {
                 Page::document()->addChild('script', [
                     'src' => $vueScript,
@@ -64,8 +63,9 @@ class BasePage {
                 'text' => '',
             ]),
         ]);
-        Page::beforeRender(function($thisPage) {
-            $thisPage->addInlineJs('window.data = ' . $thisPage->getJson() . ';');
+        Page::beforeRender(function($thisPage)
+        {
+            $thisPage->addInlineJs('window.data = '.$thisPage->getJson().';');
             $node = new HTMLNode('v-snackbar');
             $node->setAttribute('v-model','snackbar.visible');
             $node->addTextNode('{{ snackbar.text }}');
@@ -79,7 +79,7 @@ class BasePage {
             Page::insert($node);
         },[$this]);
         $this->topInlineJs = new JsCode();
-            
+
         Page::document()->getHeadNode()->addChild($this->topInlineJs);
         $this->_checkIsDark();
     }
@@ -95,41 +95,6 @@ class BasePage {
         $this->getTopInlineJs()->addCode($code."\n");
     }
     /**
-     * Returns the object that holds the inline JavaScript code.
-     * 
-     * @return JsCode
-     */
-    public function getTopInlineJs() {
-        return $this->topInlineJs;
-    }
-    private function _checkIsDark() {
-        $darkArg = Request::getParam('dark');
-        if ($darkArg !== null) {
-            $darkArg = $darkArg == 't' ? true : false;
-        } else {
-            $darkArg = SessionsManager::get('dark');
-            
-            if ($darkArg === null) {
-                $darkArg = true;
-            }
-        }
-        SessionsManager::set('dark', $darkArg);
-        $this->addToJson([
-            'dark' => $darkArg
-        ]);
-    }
-    /**
-     * Returns an object of type Json that contains all JSON attributes.
-     * 
-     * Initially, the object will contain all common attributes for all pages.
-     * 
-     * @return Json
-     * 
-     */
-    public function getJson() {
-        return $this->jsonData;
-    }
-    /**
      * Adds a set of attributes to the json data.
      * 
      * @param array $arrOfAttrs An associative array. The indices of the array 
@@ -140,56 +105,6 @@ class BasePage {
         foreach ($arrOfAttrs as $attrKey => $attrVal) {
             $this->getJson()->add($attrKey, $attrVal);
         }
-    }
-    /**
-     * Creates a basic date picker input element.
-     * 
-     * @param string $menuModel The name of the model which is used to 
-     * represents the menu of the input.
-     * 
-     * @param array $attrs An associative array that holds extra attributes 
-     * for the date picker input.
-     * 
-     * @return HTMLNode
-     */
-    public function datePicker($menuModel = 'menu', $attrs = []) {
-        $dateModel = isset($attrs['v-model']) ? $attrs['v-model'] : 'date';
-        
-        $node = new HTMLNode('v-menu', [
-            'ref' => "$menuModel",
-            'v-model' => "$menuModel",
-            ':close-on-content-click' => "false",
-            ':return-value.sync' => "$dateModel",
-            'transition' => "scale-transition",
-            'offset-y',
-            'min-width' => "290px",
-        ]);
-        $attrs[] = 'no-title';
-        $attrs[] = 'scrollable';
-        
-        $attrs['v-model'] = $dateModel;
-        $label = isset($attrs['label']) ? $attrs['label'] : 'Select a date.';
-        $node->addChild('template ', [
-            'v-slot:activator' => "{ on, attrs }"
-        ], false)->addChild('v-text-field', [
-            'v-model' => "$dateModel",
-            'label' => "$label",
-            'prepend-icon' => "mdi-calendar",
-            'readonly',
-            'v-bind' => "attrs",
-            'v-on' => "on"
-        ]);
-        $node->addChild('v-date-picker', $attrs, false)->addChild('v-spacer')
-        ->addChild('v-btn', [
-            'text',
-            '@click' => "$menuModel = false",
-        ], false)->text('Cancel')
-        ->getParent()
-        ->addChild('v-btn', [
-            'text',
-            '@click' => "\$refs.$menuModel.save($dateModel)"
-        ], false)->text('Ok');
-        return $node;
     }
     /**
      * Creates a v-btn element.
@@ -207,13 +122,15 @@ class BasePage {
      */
     public function createButton($props = [], $text = null, $icon = null, $iconProps = []) {
         $btn = new HTMLNode('v-btn', $props);
-        
+
         if ($text !== null) {
             $btn->text($text);
         }
+
         if ($icon !== null) {
             $btn->addChild('v-icon', $iconProps, false)->text($icon);
         }
+
         return $btn;
     }
     /**
@@ -241,6 +158,7 @@ class BasePage {
         $attrs[':search'] = $searchModel;
         $table->addChild($searchArea);
         $table->setAttributes($attrs);
+
         return $table;
     }
     /**
@@ -257,12 +175,100 @@ class BasePage {
      */
     public function createSelect($items, $label, array $extraAttrs) {
         $select = new HTMLNode('v-autocomplete');
+
         if ($items !== null) {
             $select->setAttribute(':items', $items);
         }
         $select->setAttribute('label', $label);
         $select->setAttributes($extraAttrs);
+
         return $select;
     }
-}
+    /**
+     * Creates a basic date picker input element.
+     * 
+     * @param string $menuModel The name of the model which is used to 
+     * represents the menu of the input.
+     * 
+     * @param array $attrs An associative array that holds extra attributes 
+     * for the date picker input.
+     * 
+     * @return HTMLNode
+     */
+    public function datePicker($menuModel = 'menu', $attrs = []) {
+        $dateModel = isset($attrs['v-model']) ? $attrs['v-model'] : 'date';
 
+        $node = new HTMLNode('v-menu', [
+            'ref' => "$menuModel",
+            'v-model' => "$menuModel",
+            ':close-on-content-click' => "false",
+            ':return-value.sync' => "$dateModel",
+            'transition' => "scale-transition",
+            'offset-y',
+            'min-width' => "290px",
+        ]);
+        $attrs[] = 'no-title';
+        $attrs[] = 'scrollable';
+
+        $attrs['v-model'] = $dateModel;
+        $label = isset($attrs['label']) ? $attrs['label'] : 'Select a date.';
+        $node->addChild('template ', [
+            'v-slot:activator' => "{ on, attrs }"
+        ], false)->addChild('v-text-field', [
+            'v-model' => "$dateModel",
+            'label' => "$label",
+            'prepend-icon' => "mdi-calendar",
+            'readonly',
+            'v-bind' => "attrs",
+            'v-on' => "on"
+        ]);
+        $node->addChild('v-date-picker', $attrs, false)->addChild('v-spacer')
+        ->addChild('v-btn', [
+            'text',
+            '@click' => "$menuModel = false",
+        ], false)->text('Cancel')
+        ->getParent()
+        ->addChild('v-btn', [
+            'text',
+            '@click' => "\$refs.$menuModel.save($dateModel)"
+        ], false)->text('Ok');
+
+        return $node;
+    }
+    /**
+     * Returns an object of type Json that contains all JSON attributes.
+     * 
+     * Initially, the object will contain all common attributes for all pages.
+     * 
+     * @return Json
+     * 
+     */
+    public function getJson() {
+        return $this->jsonData;
+    }
+    /**
+     * Returns the object that holds the inline JavaScript code.
+     * 
+     * @return JsCode
+     */
+    public function getTopInlineJs() {
+        return $this->topInlineJs;
+    }
+    private function _checkIsDark() {
+        $darkArg = Request::getParam('dark');
+
+        if ($darkArg !== null) {
+            $darkArg = $darkArg == 't' ? true : false;
+        } else {
+            $darkArg = SessionsManager::get('dark');
+
+            if ($darkArg === null) {
+                $darkArg = true;
+            }
+        }
+        SessionsManager::set('dark', $darkArg);
+        $this->addToJson([
+            'dark' => $darkArg
+        ]);
+    }
+}

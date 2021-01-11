@@ -5,9 +5,7 @@
 </p>
 
 <p align="center">
-  <a href="https://travis-ci.com/github/WebFiori/framework">
-    <img src="https://travis-ci.com/WebFiori/framework.svg?branch=master">
-  </a>
+  <a href="https://github.com/WebFiori/framework/actions"><img src="https://github.com/WebFiori/framework/workflows/Build%20PHP%207,8/badge.svg?branch=master"></a>
   <a href="https://codecov.io/gh/WebFiori/framework">
     <img src="https://codecov.io/gh/WebFiori/framework/branch/master/graph/badge.svg" />
   </a>
@@ -51,8 +49,8 @@ WebFiori Framework is a mini web development framework which is built using PHP 
 | Library | Build | Latest |
 |----|----|----|
 | [HTTP](https://github.com/WebFiori/http) | <a href="https://github.com/WebFiori/http/actions"><img src="https://github.com/WebFiori/http/workflows/Build%20PHP%207,8/badge.svg?branch=master"></a> | <a href="https://github.com/WebFiori/http/releases"><img src="https://img.shields.io/github/release/WebFiori/restEasy.svg" /></a> |
-| [Json](https://github.com/WebFiori/json) | <a href="https://travis-ci.com/github/WebFiori/json"><img src="https://travis-ci.com/WebFiori/json.svg?branch=master"></a> | <a href="https://github.com/WebFiori/json/releases"><img src="https://img.shields.io/github/release/WebFiori/json.svg" /></a> |
-| [UI](https://github.com/WebFiori/ui) | <a href="https://travis-ci.com/github/WebFiori/ui"><img src="https://travis-ci.com/WebFiori/ui.svg?branch=master"></a> | <a href="https://github.com/WebFiori/ui/releases"><img src="https://img.shields.io/github/release/WebFiori/ui.svg" /></a> |
+| [Json](https://github.com/WebFiori/json) | <a href="https://github.com/WebFiori/json/actions"><img src="https://github.com/WebFiori/json/workflows/Build%20PHP%207,8/badge.svg?branch=master"></a> | <a href="https://github.com/WebFiori/json/releases"><img src="https://img.shields.io/github/release/WebFiori/json.svg" /></a> |
+| [UI](https://github.com/WebFiori/ui) | <a href="https://github.com/WebFiori/ui/actions"><img src="https://github.com/WebFiori/ui/workflows/Build%20PHP%207,8/badge.svg?branch=master"></a> | <a href="https://github.com/WebFiori/ui/releases"><img src="https://img.shields.io/github/release/WebFiori/ui.svg" /></a> |
 | [Collections](https://github.com/WebFiori/collections) | <a href="https://travis-ci.com/github/WebFiori/collections"><img src="https://travis-ci.com/WebFiori/collections.svg?branch=master"></a> | <a href="https://github.com/WebFiori/collections/releases"><img src="https://img.shields.io/github/release/WebFiori/collections.svg" /></a> |
 | [Database](https://github.com/WebFiori/database) | <a href="https://travis-ci.com/github/WebFiori/database"><img src="https://travis-ci.com/WebFiori/database.svg?branch=main"></a> | <a href="https://github.com/WebFiori/database/releases"><img src="https://img.shields.io/github/release/WebFiori/database.svg" /></a> |
 
@@ -71,30 +69,6 @@ One of the things that any developer cares about any software project is the pro
 ## Getting Started 
 
 To learn the basics of how to use the framework, please head on to https://webfiori.com/learn. You can also read the docs which can be found in [docs repo](https://github.com/usernane/wf-docs). In addition to that, you can read the API docs of the framework at [the official website](https://webfiori.com/docs).
-
-## Supported Environments 
-| PHP | AMD64 (Targeted)     | ppc64le              | s390x                | arm64                |
-| --- | -------------------- | -------------------- | -------------------- | -------------------- |
-| 5.6 | [![Build01][01]][0]  | [![Build02][05]][0]  | Not Applicable       | Not Applicable       |
-| 7.2 | [![Build05][02]][0]  | [![Build06][06]][0]  | [![Build07][09]][0]  | [![Build08][12]][0]  |
-| 7.3 | [![Build09][03]][0]  | [![Build10][07]][0]  | [![Build11][10]][0]  | [![Build12][13]][0]  |
-| 7.4 | [![Build13][04]][0]  | [![Build14][08]][0]  | [![Build15][11]][0]  | [![Build16][14]][0]  |
-
-[0]: https://travis-ci.org/usernane/webfiori
-[01]: https://travis-matrix-badges.herokuapp.com/repos/webfiori/framework/branches/master/1?use_travis_com=true
-[02]: https://travis-matrix-badges.herokuapp.com/repos/webfiori/framework/branches/master/2?use_travis_com=true
-[03]: https://travis-matrix-badges.herokuapp.com/repos/webfiori/framework/branches/master/3?use_travis_com=true
-[04]: https://travis-matrix-badges.herokuapp.com/repos/webfiori/framework/branches/master/4?use_travis_com=true
-[05]: https://travis-matrix-badges.herokuapp.com/repos/webfiori/framework/branches/master/5?use_travis_com=true
-[06]: https://travis-matrix-badges.herokuapp.com/repos/webfiori/framework/branches/master/6?use_travis_com=true
-[07]: https://travis-matrix-badges.herokuapp.com/repos/webfiori/framework/branches/master/7?use_travis_com=true
-[08]: https://travis-matrix-badges.herokuapp.com/repos/webfiori/framework/branches/master/8?use_travis_com=true
-[09]: https://travis-matrix-badges.herokuapp.com/repos/webfiori/framework/branches/master/9?use_travis_com=true
-[10]: https://travis-matrix-badges.herokuapp.com/repos/webfiori/framework/branches/master/10?use_travis_com=true
-[11]: https://travis-matrix-badges.herokuapp.com/repos/webfiori/framework/branches/master/11?use_travis_com=true
-[12]: https://travis-matrix-badges.herokuapp.com/repos/webfiori/framework/branches/master/12?use_travis_com=true
-[13]: https://travis-matrix-badges.herokuapp.com/repos/webfiori/framework/branches/master/13?use_travis_com=true
-[14]: https://travis-matrix-badges.herokuapp.com/repos/webfiori/framework/branches/master/14?use_travis_com=true
 
 
 ## Setup

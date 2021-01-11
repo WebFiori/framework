@@ -50,7 +50,7 @@ WebFiori Framework is a mini web development framework which is built using PHP 
 
 | Library | Build | Latest |
 |----|----|----|
-| [HTTP](https://github.com/WebFiori/http) | <a href="https://travis-ci.com/github/WebFiori/http"><img src="https://travis-ci.com/WebFiori/http.svg?branch=master"></a> | <a href="https://github.com/WebFiori/http/releases"><img src="https://img.shields.io/github/release/WebFiori/restEasy.svg" /></a> |
+| [HTTP](https://github.com/WebFiori/http) | <a href="https://github.com/WebFiori/http/actions"><img src="https://github.com/WebFiori/http/workflows/Build%20PHP%207,8/badge.svg?branch=master"></a> | <a href="https://github.com/WebFiori/http/releases"><img src="https://img.shields.io/github/release/WebFiori/restEasy.svg" /></a> |
 | [Json](https://github.com/WebFiori/json) | <a href="https://travis-ci.com/github/WebFiori/json"><img src="https://travis-ci.com/WebFiori/json.svg?branch=master"></a> | <a href="https://github.com/WebFiori/json/releases"><img src="https://img.shields.io/github/release/WebFiori/json.svg" /></a> |
 | [UI](https://github.com/WebFiori/ui) | <a href="https://travis-ci.com/github/WebFiori/ui"><img src="https://travis-ci.com/WebFiori/ui.svg?branch=master"></a> | <a href="https://github.com/WebFiori/ui/releases"><img src="https://img.shields.io/github/release/WebFiori/ui.svg" /></a> |
 | [Collections](https://github.com/WebFiori/collections) | <a href="https://travis-ci.com/github/WebFiori/collections"><img src="https://travis-ci.com/WebFiori/collections.svg?branch=master"></a> | <a href="https://github.com/WebFiori/collections/releases"><img src="https://img.shields.io/github/release/WebFiori/collections.svg" /></a> |

@@ -30,7 +30,7 @@ use webfiori\framework\exceptions\MissingLangException;
  * Internationalization (i18n).
  * 
  * In order to create a language file, the developer must extend this class. 
- * The language class must be added to the namespace 'webfiori/entity/i18n' and the name 
+ * The language class must be added to the namespace 'webfiori/framework/i18n' and the name 
  * of language file must be 'LanguageXX.php' where 'XX' are two characters that 
  * represents language code. The directory at which the language file must exist in 
  * is not important but it is recommended to add them to the folder 'app/langs' 

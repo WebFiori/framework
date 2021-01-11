@@ -13,7 +13,7 @@ use webfiori\framework\ThemeLoader;
 class ThemeTest extends TestCase {
     public function testAvailableThemes00() {
         $themes = ThemeLoader::getAvailableThemes();
-        $this->assertEquals(7,count($themes));
+        $this->assertEquals(8,count($themes));
     }
     /**
      * @test

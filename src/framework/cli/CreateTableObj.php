@@ -1,19 +1,12 @@
 <?php
-
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 namespace webfiori\framework\cli;
+
 use webfiori\database\mysql\MySQLTable;
 use webfiori\database\mysql\MySQLColumn;
-use webfiori\database\ForeignKey;
 use webfiori\framework\cli\QueryClassWriter;
 use webfiori\database\Table;
 /**
- * Description of CreateTableObj
+ * A helper class for creating database tables classes.
  *
  * @author Ibrahim
  */

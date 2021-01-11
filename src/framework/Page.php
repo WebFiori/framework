@@ -838,7 +838,7 @@ class Page {
                             $ext = $expl[count($expl) - 1];
                             
                             if ($ext == 'css') {
-                                Page::get()->document()->getHeadNode()->addJs($fileBase.$fileName);
+                                Page::get()->document()->getHeadNode()->addCSS($fileBase.$fileName);
                             }
                         }
                     }

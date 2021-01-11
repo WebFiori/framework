@@ -26,13 +26,15 @@ namespace webfiori\examples\views;
 
 use webfiori\framework\Page;
 use webfiori\theme\vutifyTheme\VuetifyTheme;
+use ibrahim\themes\IbrahimTheme;
 
 class ExamplePage {
     public function __construct() {
         //load UI components (JS, CSS, ...)
         //Experement with all themes.
         //it is optional. to use a theme but recomended
-        Page::theme(VuetifyTheme::class);
+        //Page::theme(VuetifyTheme::class);
+        Page::theme(IbrahimTheme::class);
         //Page::theme('Vuetify Template');
         //Page::theme('WebFiori V108');
         //Page::theme('Bootstrap Theme');

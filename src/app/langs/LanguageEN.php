@@ -299,5 +299,9 @@ class LanguageEN extends Language {
                 'Basic support for running the framework throgh CLI.'
             ]
         ]);
+        $this->createAndSet('main-menu/lang-switch', [
+            'AR' => 'العربية',
+            'EN' => 'English'
+        ]);
     }
 }

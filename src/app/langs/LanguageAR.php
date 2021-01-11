@@ -299,5 +299,9 @@ class LanguageAR extends Language {
                 'دعم اساسي لتشغيل اطار البرمجة عن طريق ال Terminal.'
             ]
         ]);
+        $this->createAndSet('main-menu/lang-switch', [
+            'AR' => 'العربية',
+            'EN' => 'English'
+        ]);
     }
 }

@@ -914,7 +914,7 @@ class File implements JsonI {
                 Util::isDirectory($this->getDir(), true);
                 $resource = $this->_createResource('wb', $fPath);
             } else {
-                throw new FileException("File not found: '$fPath'.");
+                throw new FileException("File not found: '$fPath'."); 
             }
         } else if ($append) {
             $resource = $this->_createResource('ab', $fPath);

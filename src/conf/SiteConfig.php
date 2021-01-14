@@ -3,20 +3,20 @@ namespace webfiori\conf;
 
 use webfiori\framework\Util;
 /**
- * Website configuration class.
- * 
- * This class is used to control the following settings:
- * <ul>
- * <li>The base URL of the website.</li>
- * <li>The primary language of the website.</li>
- * <li>The name of the website in different languages.</li>
- * <li>The general description of the website in different languages.</li>
- * <li>The character that is used to separate the name of the website from page title.</li>
- * <li>The theme of the website.</li>
- * <li>Admin theme of the website (if uses one).</li>
- * <li>The home page of the website.</li>
- * </ul>
- */
+  * Website configuration class.
+  * 
+  * This class is used to control the following settings:
+  * <ul>
+  * <li>The base URL of the website.</li>
+  * <li>The primary language of the website.</li>
+  * <li>The name of the website in different languages.</li>
+  * <li>The general description of the website in different languages.</li>
+  * <li>The character that is used to separate the name of the website from page title.</li>
+  * <li>The theme of the website.</li>
+  * <li>Admin theme of the website (if uses one).</li>
+  * <li>The home page of the website.</li>
+  * </ul>
+  */
 class SiteConfig {
     /**
      * The name of admin control pages Theme.
@@ -96,18 +96,18 @@ class SiteConfig {
     private function __construct() {
         $this->configVision = '1.2.1';
         $this->webSiteNames = [
-            'EN' => 'WebFiori',
-            'AR' => 'ويب فيوري',
+            'EN'=>'WebFiori',
+            'AR'=>'ويب فيوري',
         ];
         $this->baseUrl = Util::getBaseURL();
         $this->titleSep = '|';
         $this->primaryLang = 'EN';
-        $this->baseThemeName = 'WebFiori Theme';
-        $this->adminThemeName = 'WebFiori Theme';
+        $this->baseThemeName = 'webfiori\theme\WebFioriV108';
+        $this->adminThemeName = 'webfiori\theme\WebFioriV108';
         $this->homePage = Util::getBaseURL();
         $this->descriptions = [
-            'EN' => '',
-            'AR' => '',
+            'EN'=>'',
+            'AR'=>'',
         ];
     }
     /**
@@ -122,7 +122,7 @@ class SiteConfig {
             return self::$siteCfg;
         }
         self::$siteCfg = new SiteConfig();
-
+        
         return self::$siteCfg;
     }
     /**
@@ -252,7 +252,7 @@ class SiteConfig {
     private function _getHomePage() {
         return $this->homePage;
     }
-
+    
     private function _getPrimaryLanguage() {
         return $this->primaryLang;
     }

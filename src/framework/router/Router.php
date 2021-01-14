@@ -1142,16 +1142,10 @@ class Router {
             $xFile = '\\'.str_replace("/", "\\", $file);
 
             if (class_exists($xFile)) {
-                try {
-                    $class = new $xFile();
+                $class = new $xFile();
 
-                    if ($class instanceof WebServicesManager) {
-                        $class->process();
-                    }
-                } catch (Exception $ex) {
-                    throw new RoutingException("Unable to create an instance of the class $xFile. Reason: '".$ex->getMessage()."'");
-                } catch (Error $ex) {
-                    throw new RoutingException("Unable to create an instance of the class $xFile. Reason: '".$ex->getMessage()."'");
+                if ($class instanceof WebServicesManager) {
+                    $class->process();
                 }
             } else {
                 $routeType = $route->getType();
@@ -1169,9 +1163,15 @@ class Router {
                     }
                 } else {
                     if ($loadResource === true) {
-                        throw new RoutingException('The resource "'.Util::getRequestedURL().'" was availble. '
+                        $message = 'The resource "'.Util::getRequestedURL().'" was availble. '
                         .'but its route is not configured correctly. '
-                        .'The resource which the route is pointing to was not found ('.$file.').');
+                        .'The resource which the route is pointing to was not found.';
+                        if (defined('WF_') && WF_VERBOSE) {
+                            $message = 'The resource "'.Util::getRequestedURL().'" was availble. '
+                            .'but its route is not configured correctly. '
+                            .'The resource which the route is pointing to was not found ('.$file.').';
+                        }
+                        throw new RoutingException($message);
                     }
                 }
             }

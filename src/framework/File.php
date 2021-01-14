@@ -911,7 +911,7 @@ class File implements JsonI {
     private function _writeHelper($fPath, $append = true, $createIfNotExist = false) {
         if (!$this->isExist()) {
             if ($createIfNotExist) {
-                Util::isDirectory($fPath, true);
+                Util::isDirectory($this->getDir(), true);
                 $resource = $this->_createResource('wb', $fPath);
             } else {
                 throw new FileException("File not found: '$fPath'.");

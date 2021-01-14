@@ -175,9 +175,9 @@ class PageTest extends TestCase{
      */
     public function testDirs01() {
         Page::theme();
-        $this->assertEquals('assets/webfiori/css',Page::cssDir());
-        $this->assertEquals('assets/webfiori/images',Page::imagesDir());
-        $this->assertEquals('assets/webfiori/js',Page::jsDir());
+        $this->assertEquals('assets/webfiori-v1.0.8/css',Page::cssDir());
+        $this->assertEquals('assets/webfiori-v1.0.8/images',Page::imagesDir());
+        $this->assertEquals('assets/webfiori-v1.0.8/js',Page::jsDir());
     }
     /**
      * @test

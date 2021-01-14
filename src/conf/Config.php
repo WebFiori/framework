@@ -51,14 +51,14 @@ class Config {
      * @since 1.0
      */
     private $versionType;
-
+    
     /**
      * Initialize configuration.
      */
     private function __construct() {
-        $this->releaseDate = '2020-12-20';
+        $this->releaseDate = '2020-01-14';
         $this->version = '2.0.0';
-        $this->versionType = 'Beta 5';
+        $this->versionType = 'Stable';
         $this->configVision = '1.3.5';
         $this->dbConnections = [
 
@@ -89,7 +89,7 @@ class Config {
             return self::$cfg;
         }
         self::$cfg = new Config();
-
+        
         return self::$cfg;
     }
     /**
@@ -119,11 +119,11 @@ class Config {
     public static function getDBConnection($conName) {
         $conns = self::getDBConnections();
         $trimmed = trim($conName);
-
+        
         if (isset($conns[$trimmed])) {
             return $conns[$trimmed];
         }
-
+        
         return null;
     }
     /**
@@ -188,11 +188,12 @@ class Config {
     private function _getReleaseDate() {
         return $this->releaseDate;
     }
-
+    
     private function _getVersion() {
         return $this->version;
     }
     private function _getVersionType() {
         return $this->versionType;
     }
+
 }

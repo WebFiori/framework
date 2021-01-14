@@ -19,9 +19,10 @@ class WebFioriV108 extends Theme {
     public function __construct() {
         parent::__construct();
         $this->setVersion('1.0');
-        $this->setAuthor('Ibrahim');
+        $this->setAuthor('Ibrahim Ali');
         $this->setName('WebFiori V108');
         $this->setLicenseName('MIT License');
+        $this->setUrl('https://ibrahim-2017.blogspot.com/');
         $this->setLicenseUrl('https://opensource.org/licenses/MIT');
         $this->setBeforeLoaded(function () {
             $activeSession = SessionsManager::getActiveSession();

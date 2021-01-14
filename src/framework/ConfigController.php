@@ -30,7 +30,6 @@ use webfiori\database\ConnectionInfo;
 use webfiori\framework\exceptions\SMTPException;
 use webfiori\framework\mail\SMTPAccount;
 use webfiori\framework\mail\SocketMailer;
-use webfiori\theme\WebFioriV108;
 /**
  * A class that can be used to modify basic configuration settings of 
  * the web application. 
@@ -99,8 +98,8 @@ class ConfigController {
         'primary-language' => 'EN',
         'title-separator' => ' | ',
         'home-page' => 'index',
-        'admin-theme-name' => WebFioriV108::class,
-        'theme-name' => WebFioriV108::class,
+        'admin-theme-name' => 'WebFiori V108',
+        'theme-name' => 'WebFiori V108',
         'site-descriptions' => [
             'EN' => '',
             'AR' => ''

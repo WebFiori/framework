@@ -65,10 +65,11 @@ One of the things that any developer cares about any software project is the pro
 * Ability to move the source code of the web application without having to do a lot of re-configuration.
 * Sending HTML email messages with attachments without having to write a lot of code.
 * Solved the issues which are found in default PHP session management implementation.
+* Reduce the number of dependencies at which a developer need to setup a web application.
 
 ## Getting Started 
 
-To learn the basics of how to use the framework, please head on to https://webfiori.com/learn. You can also read the docs which can be found in [docs repo](https://github.com/usernane/wf-docs). In addition to that, you can read the API docs of the framework at [the official website](https://webfiori.com/docs).
+To learn the basics of how to use the framework, please head on to https://webfiori.com/learn. You can also read samedocs docs which can be found in [docs repo](https://github.com/usernane/wf-docs). In addition to that, you can read the API docs of the framework at [the official website](https://webfiori.com/docs).
 
 
 ## Setup

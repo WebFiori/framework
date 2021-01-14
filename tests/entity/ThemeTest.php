@@ -22,7 +22,7 @@ class ThemeTest extends TestCase {
         $theme = ThemeLoader::usingTheme();
         $j = $theme->toJSON();
         $j->setPropsStyle('camel');
-        $this->assertEquals('{"themesPath":"'. \webfiori\json\Json::escapeJSONSpecialChars(THEMES_PATH).'", "name":"'.SiteConfig::getBaseURL().'", "url":"https:\/\/ibrahim-2017.blogspot.com\/", "license":"MIT License", "licenseUrl":"https:\/\/opensource.org\/licenses\/MIT", "version":"1.0.1", "author":"Ibrahim Ali", "authorUrl":"", "imagesDirName":"images", "themeDirName":"webfiori", "cssDirName":"css", "jsDirName":"js", "components":["LangExt.php"]}',$j.'');
+        $this->assertEquals('{"themesPath":"'. \webfiori\json\Json::escapeJSONSpecialChars(THEMES_PATH).'", "name":"'.SiteConfig::getBaseThemeName().'", "url":"https:\/\/ibrahim-2017.blogspot.com\/", "license":"MIT License", "licenseUrl":"https:\/\/opensource.org\/licenses\/MIT", "version":"1.0.1", "author":"Ibrahim Ali", "authorUrl":"", "imagesDirName":"images", "themeDirName":"webfiori", "cssDirName":"css", "jsDirName":"js", "components":["LangExt.php"]}',$j.'');
     }
     /**
      * @test

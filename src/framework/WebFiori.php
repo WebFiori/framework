@@ -166,6 +166,10 @@ class WebFiori {
         }
         self::$AU = AutoLoader::get();
         InitAutoLoad::init();
+        
+        //Initialize CLI
+        CLI::init();
+        
         $this->_initThemesPath();
         $this->_setHandlers();
         $this->_checkStandardLibs();
@@ -173,10 +177,6 @@ class WebFiori {
         //Initialize privileges.
         //This step must be done before initializing any controler.
         InitPrivileges::init();
-
-
-        //Initialize CLI
-        CLI::init();
 
         self::$SF = ConfigController::get();
 

@@ -430,7 +430,8 @@ class Page {
     /**
      * Adds a child node inside the body of a node given its ID.
      * 
-     * @param HTMLNode $node The node that will be inserted.
+     * @param HTMLNode|string $node The node that will be inserted. Also, 
+     * this can be the tag name of the node such as 'div'.
      * 
      * @param string $parentNodeId The ID of the node that the given node 
      * will be inserted to.
@@ -441,6 +442,9 @@ class Page {
      * @since 1.9
      */
     public static function insert($node,$parentNodeId = self::MAIN_ELEMENTS[2]) {
+        if (gettype($node) == 'string') {
+            $node = new HTMLNode($node);
+        }
         if (Page::get()->insertNode($node, $parentNodeId)) {
             return $node;
         }

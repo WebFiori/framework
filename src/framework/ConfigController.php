@@ -54,15 +54,19 @@ class ConfigController {
      * <li>version</li>
      * <li>version-type</li>
      * <li>config-file-version</li>
+     * <li>app-version</li>
      * <li>databases</li>
      * </ul>
      * @since 1.0
      */
     const INITIAL_CONFIG_VARS = [
-        'release-date' => '2020-01-14',
-        'version' => '2.0.0',
-        'version-type' => 'Stable',
-        'config-file-version' => '1.3.5',
+        'framework-release-date' => '2020-01-14',
+        'framework-version' => '2.0.0',
+        'framework-version-type' => 'Stable',
+        'config-file-version' => '1.3.6',
+        'app-version' => '1.0',
+        'app-version-date' => '2021-03-01',
+        'app-version-type' => 'Stable',
         'databases' => []
     ];
     /**
@@ -517,6 +521,14 @@ class ConfigController {
                 ."     * @since 1.0".self::NL
                 ."     */".self::NL
                 ."    private \$releaseDate;".self::NL
+                ."    /**".self::NL
+                ."     * The release date of the system.".self::NL
+                ."     * ".self::NL
+                ."     * @var string Release date of the system.".self::NL
+                ."     * ".self::NL
+                ."     * @since 1.0".self::NL
+                ."     */".self::NL
+                ."    private \$appReleaseDate;".self::NL
                 ."    /**".self::NL
                 ."     * The version of the framework that is used to build the system.".self::NL
                 ."     * ".self::NL

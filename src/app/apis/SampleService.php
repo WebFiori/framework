@@ -2,7 +2,7 @@
 namespace webfiori\examples\webApis;
 
 use webfiori\framework\ExtendedWebServicesManager;
-use webfiori\framework\WebFiori;
+use webfiori\framework\WebFioriApp;
 use webfiori\http\AbstractWebService;
 /**
  * A sample service that can be used as a reference when creating web services.
@@ -23,7 +23,7 @@ class SampleService extends AbstractWebService {
         if ($manager instanceof ExtendedWebServicesManager) {
             $lang = $manager->getTranslation()->getCode();
         } else {
-            WebFiori::getSiteConfig()->getPrimaryLanguage();
+            WebFioriApp::getSiteConfig()->getPrimaryLanguage();
         }
 
         if ($lang == 'AR') {

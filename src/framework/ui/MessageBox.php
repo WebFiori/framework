@@ -24,7 +24,7 @@
  */
 namespace webfiori\framework\ui;
 
-use webfiori\framework\WebFiori;
+use webfiori\framework\WebFioriApp;
 use webfiori\ui\HTMLNode;
 /**
  * A generic class for showing a floating box in web pages that can have any content 
@@ -150,7 +150,7 @@ class MessageBox extends HTMLNode {
         $this->setAttribute('onmouseover', "if(this.getAttribute('dg') === null){addDragSupport(this)}");
 
         if (self::getCount() == 0) {
-            $base = WebFiori::getSiteConfig()->getBaseURL();
+            $base = WebFioriApp::getSiteConfig()->getBaseURL();
             $css = new HTMLNode('link');
             $css->setAttributes([
                 'rel' => 'stylesheet',

@@ -27,7 +27,7 @@ namespace webfiori\framework\cli;
 use Exception;
 use webfiori\database\Table;
 use webfiori\framework\DB;
-use webfiori\framework\WebFiori;
+use webfiori\framework\WebFioriApp;
 /**
  * A helper class for creating database table class.
  *
@@ -47,7 +47,7 @@ class CreateTable {
     public function __construct(CreateCommand $command) {
         $this->command = $command;
 
-        $dbConnections = array_keys(WebFiori::getConfig()->getDBConnections());
+        $dbConnections = array_keys(WebFioriApp::getConfig()->getDBConnections());
 
         if (count($dbConnections) != 0) {
             $dbConn = $this->_getCommand()->select('Select database connection:', $dbConnections, 0);

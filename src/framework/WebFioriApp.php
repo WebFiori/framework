@@ -61,7 +61,7 @@ define('MICRO_START', microtime(true));
  * 
  * @version 1.3.6
  */
-class WebFiori {
+class WebFioriApp {
     /**
      * An instance of autoloader class.
      * 
@@ -90,7 +90,7 @@ class WebFiori {
     /**
      * A single instance of the class.
      * 
-     * @var WebFiori
+     * @var WebFioriApp
      * 
      * @since 1.0 
      */
@@ -193,7 +193,7 @@ class WebFiori {
             $this->dbErrDetails = $this->sysStatus;
             $this->sysStatus = Util::DB_NEED_CONF;
         }
-        WebFiori::autoRegister('middleware', function($inst)
+        WebFioriApp::autoRegister('middleware', function($inst)
         {
             MiddlewareManager::register($inst);
         });
@@ -271,7 +271,7 @@ class WebFiori {
      * Initiate the framework and return a single instance of the class that can 
      * be used to control basic settings of the framework.
      * 
-     * @return WebFiori An instance of the class.
+     * @return WebFioriApp An instance of the class.
      * 
      * @since 1.0
      */
@@ -279,7 +279,7 @@ class WebFiori {
         if (self::$classStatus == 'NONE') {
             if (self::$LC === null) {
                 self::$classStatus = 'INITIALIZING';
-                self::$LC = new WebFiori();
+                self::$LC = new WebFioriApp();
             }
         } else if (self::$classStatus == 'INITIALIZING') {
             throw new InitializationException('Using the core class while it is not fully initialized.');

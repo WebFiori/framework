@@ -7,7 +7,7 @@ use webfiori\json\Json;
 use webfiori\ui\JsCode;
 use webfiori\framework\Util;
 use webfiori\framework\session\SessionsManager;
-use webfiori\framework\WebFiori;
+use webfiori\framework\WebFioriApp;
 
 /**
  * A generic template that can be used to create Vuetify based themes.
@@ -26,7 +26,7 @@ class VuetifyTemplate extends Theme {
         $this->setBeforeLoaded(function()
         {
             Page::lang(SessionsManager::getActiveSession()->getLangCode(true));
-            Page::siteName(WebFiori::getSiteConfig()->getWebsiteNames()[Page::lang()]);
+            Page::siteName(WebFioriApp::getSiteConfig()->getWebsiteNames()[Page::lang()]);
         });
         $this->setAfterLoaded(function()
         {

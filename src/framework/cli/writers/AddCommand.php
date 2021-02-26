@@ -29,7 +29,7 @@ use webfiori\database\ConnectionInfo;
 use webfiori\framework\ConfigController;
 use webfiori\framework\DB;
 use webfiori\framework\mail\SMTPAccount;
-use webfiori\framework\WebFiori;
+use webfiori\framework\WebFioriApp;
 
 /**
  * A command which is used to add a database connection or SMTP account.
@@ -77,7 +77,7 @@ class AddCommand extends CLICommand {
         $connInfoObj->setUsername($this->getInput('Username:'));
         $connInfoObj->setPassword($this->getInput('Password:'));
         $connInfoObj->setDBName($this->getInput('Database name:'));
-        $connInfoObj->setName($this->getInput('Give your connection a friendly name:', 'db-connection-'.count(WebFiori::getConfig()->getDBConnections())));
+        $connInfoObj->setName($this->getInput('Give your connection a friendly name:', 'db-connection-'.count(WebFioriApp::getConfig()->getDBConnections())));
         $this->println('Trying to connect to the database...');
 
         $db = new DB($connInfoObj);
@@ -93,7 +93,7 @@ class AddCommand extends CLICommand {
 
         $this->success('Connected. Adding the connection...');
 
-        WebFiori::getSysController()->addOrUpdateDBConnections([$connInfoObj]);
+        WebFioriApp::getSysController()->addOrUpdateDBConnections([$connInfoObj]);
         $this->success('Connection information was stored in the class "webfiori\conf\Config".');
 
         return 0;
@@ -126,7 +126,7 @@ class AddCommand extends CLICommand {
         $smtpConn->setPassword($this->getInput('Password:'));
         $smtpConn->setAddress($this->getInput('Sender email address:', $smtpConn->getUsername()));
         $smtpConn->setSenderName($this->getInput('Sender name:', 'WebFiori Framework'));
-        $smtpConn->setAccountName($this->getInput('Give your connection a friendly name:', 'smtp-connection-'.count(WebFiori::getMailConfig()->getAccounts())));
+        $smtpConn->setAccountName($this->getInput('Give your connection a friendly name:', 'smtp-connection-'.count(WebFioriApp::getMailConfig()->getAccounts())));
         $this->println('Testing connection. This can take up to 1 minute...');
         $result = ConfigController::get()->getSocketMailer($smtpConn);
 

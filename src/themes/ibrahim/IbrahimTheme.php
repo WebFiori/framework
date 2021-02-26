@@ -5,7 +5,7 @@ use webfiori\framework\Theme;
 use webfiori\ui\HeadNode;
 use webfiori\ui\HTMLNode;
 use webfiori\framework\Page;
-use webfiori\framework\WebFiori;
+use webfiori\framework\WebFioriApp;
 use webfiori\framework\session\SessionsManager;
 use webfiori\ui\Anchor;
 use webfiori\ui\JsCode;
@@ -21,12 +21,12 @@ class IbrahimTheme extends Theme {
                 . 'using Vue, Vuetify and WebFiori framework.');
         $this->setLicenseName('MIT Licesnse');
         $this->setVersion('1.0');
-        $langCode = WebFiori::getSiteConfig()->getPrimaryLanguage();
+        $langCode = WebFioriApp::getSiteConfig()->getPrimaryLanguage();
         $session = SessionsManager::getActiveSession();
         if ($session !== null) {
             $langCode = SessionsManager::getActiveSession()->getLangCode(true);
         }
-        Page::siteName(WebFiori::getSiteConfig()->getWebsiteNames()[$langCode]);
+        Page::siteName(WebFioriApp::getSiteConfig()->getWebsiteNames()[$langCode]);
         Page::beforeRender(function ($theme) {
             
             $gta = $theme->getGta();

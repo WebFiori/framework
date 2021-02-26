@@ -761,8 +761,8 @@ class Page {
     private function _reset() {
         $this->document = new HTMLDoc();
         $this->setTitle('Hello World');
-        $siteNames = WebFiori::getSiteConfig()->getWebsiteNames();
-        $primaryLang = WebFiori::getSiteConfig()->getPrimaryLanguage();
+        $siteNames = WebFioriApp::getSiteConfig()->getWebsiteNames();
+        $primaryLang = WebFioriApp::getSiteConfig()->getPrimaryLanguage();
         $this->setLang($primaryLang);
 
         if (isset($siteNames[$primaryLang])) {
@@ -771,7 +771,7 @@ class Page {
             $this->setWebsiteName('Hello Website');
         }
 
-        $siteDescriptions = WebFiori::getSiteConfig()->getDescriptions();
+        $siteDescriptions = WebFioriApp::getSiteConfig()->getDescriptions();
 
         if (isset($siteDescriptions[$primaryLang])) {
             $this->setDescription($siteDescriptions[$primaryLang]);

@@ -11,7 +11,7 @@ use webfiori\framework\Theme;
 use webfiori\framework\session\SessionsManager;
 
 use webfiori\framework\ConfigController;
-use webfiori\framework\WebFiori;
+use webfiori\framework\WebFioriApp;
 /**
  * A basic theme which is based on Vuetify framework.
  * @author Ibrahim
@@ -35,10 +35,10 @@ class VuetifyTheme extends Theme {
             if ($activeSession !== null) {
                 Page::lang($activeSession->getLangCode(true));
             } else {
-                Page::lang(WebFiori::getSiteConfig()->getPrimaryLanguage());
+                Page::lang(WebFioriApp::getSiteConfig()->getPrimaryLanguage());
             }
             LangExt::extendLang(Page::translation());
-            Page::siteName(WebFiori::getSiteConfig()->getWebsiteNames()[Page::lang()]);
+            Page::siteName(WebFioriApp::getSiteConfig()->getWebsiteNames()[Page::lang()]);
         });
         $this->setAfterLoaded(function()
         {

@@ -25,7 +25,7 @@
  */
 namespace webfiori\framework\cli;
 
-use webfiori\framework\WebFiori;
+use webfiori\framework\WebFioriApp;
 /**
  * Description of VersionCommand
  *
@@ -44,17 +44,17 @@ class VersionCommand extends CLICommand {
                 'color' => 'light-blue',
                 'bold' => true
             ]);
-            $this->println(WebFiori::getConfig()->getVersion());
+            $this->println(WebFioriApp::getConfig()->getVersion());
             $this->prints("Release Date: ", [
                 'color' => 'light-blue',
                 'bold' => true
             ]);
-            $this->println(WebFiori::getConfig()->getReleaseDate());
+            $this->println(WebFioriApp::getConfig()->getReleaseDate());
             $this->prints("Version Type: ", [
                 'color' => 'light-blue',
                 'bold' => true
             ]);
-            $this->println(WebFiori::getConfig()->getVersionType());
+            $this->println(WebFioriApp::getConfig()->getVersionType());
         } else {
             $this->println(
                  "|\                /|                          \n"
@@ -73,7 +73,7 @@ class VersionCommand extends CLICommand {
                 'bold' => true
             ]);
             $this->prints(' (c) Version ');
-            $this->println(WebFiori::getConfig()->getVersion()." ".WebFiori::getConfig()->getVersionType()."\n\n", [
+            $this->println(WebFioriApp::getConfig()->getVersion()." ".WebFioriApp::getConfig()->getVersionType()."\n\n", [
                 'color' => 'light-yellow',
                 'bold' => true
             ]);

@@ -246,7 +246,7 @@ class Util {
 
         if (class_exists('webfiori\conf\Config')) {
             if (class_exists('webfiori\conf\SiteConfig')) {
-                if (WebFiori::getClassStatus() == 'INITIALIZING') {
+                if (WebFioriApp::getClassStatus() == 'INITIALIZING') {
                     $returnValue = true;
                 } else {
                     $returnValue = Util::NEED_CONF;

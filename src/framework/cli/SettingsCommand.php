@@ -24,7 +24,7 @@
  */
 namespace webfiori\framework\cli;
 
-use webfiori\framework\WebFiori;
+use webfiori\framework\WebFioriApp;
 /**
  * A CLI command which is used to show framework configuration.
  *
@@ -47,7 +47,7 @@ class SettingsCommand extends CLICommand {
      */
     public function exec() {
         $spaces = 25;
-        $C = WebFiori::getConfig();
+        $C = WebFioriApp::getConfig();
         $this->println("Config.php Settings:", [
             'color' => 'yellow',
             'bold' => true
@@ -61,7 +61,7 @@ class SettingsCommand extends CLICommand {
             'color' => 'yellow',
             'bold' => true
         ]);
-        $SC = WebFiori::getSiteConfig();
+        $SC = WebFioriApp::getSiteConfig();
         $this->println("    Base URL %".($spaces - strlen('Base URL'))."s %s",':',$SC->getBaseURL());
         $this->println("    Admin Theme %".($spaces - strlen('Admin Theme'))."s %s",':',$SC->getAdminThemeName());
         $this->println("    Base Theme %".($spaces - strlen('Base Theme'))."s %s",':',$SC->getBaseThemeName());

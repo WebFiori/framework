@@ -13,7 +13,7 @@ use webfiori\conf\Config;
 use webfiori\conf\SiteConfig;
 use webfiori\framework\Page;
 use webfiori\framework\Theme;
-use webfiori\framework\WebFiori;
+use webfiori\framework\WebFioriApp;
 
 class WebFioriTheme extends Theme {
     public function __construct() {
@@ -41,7 +41,7 @@ class WebFioriTheme extends Theme {
             Page::document()->getChildByID('page-body')->setClassName('wf-row');
             Page::document()->getChildByID('page-header')->setClassName('wf-row-np');
             Page::document()->getChildByID('page-footer')->setClassName('wf-row');
-            Page::siteName(WebFiori::getSiteConfig()->getWebsiteNames()[Page::lang()]);
+            Page::siteName(WebFioriApp::getSiteConfig()->getWebsiteNames()[Page::lang()]);
             
         });
     }
@@ -266,9 +266,9 @@ class WebFioriTheme extends Theme {
     public function getHeadrNode() {
         $headerSec = HTMLNode::loadComponent($this->getDirecotry().'header.html', [
             'menu-labels' => Page::translation()->get('menus/main-menu'),
-            'home_link' => WebFiori::getSiteConfig()->getBaseURL(),
+            'home_link' => WebFioriApp::getSiteConfig()->getBaseURL(),
             'dir' => Page::dir(),
-            'site_name' => WebFiori::getSiteConfig()->getWebsiteNames()[Page::lang()],
+            'site_name' => WebFioriApp::getSiteConfig()->getWebsiteNames()[Page::lang()],
             'menu-links' => [
                 'm_1_link' => '#',
                 'm_2_link' => '#',

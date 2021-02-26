@@ -4,7 +4,7 @@ namespace webfiori;
 use webfiori\framework\cli\CLI;
 use webfiori\framework\router\Router;
 use webfiori\framework\session\SessionsManager;
-use webfiori\framework\WebFiori;
+use webfiori\framework\WebFioriApp;
 use webfiori\http\Request;
 use webfiori\http\Response;
 /**
@@ -35,7 +35,7 @@ class Index {
          * 
          * Planting application seed into the ground and make your work bloom.
          */
-        WebFiori::getAndStart();
+        WebFioriApp::getAndStart();
 
         if (CLI::isCLI() === true) {
             CLI::registerCommands();

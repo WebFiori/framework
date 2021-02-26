@@ -26,7 +26,7 @@ namespace webfiori\framework\cron;
 
 use webfiori\framework\File;
 use webfiori\framework\Page;
-use webfiori\framework\WebFiori;
+use webfiori\framework\WebFioriApp;
 use webfiori\ui\HTMLNode;
 use webfiori\ui\Input;
 use webfiori\ui\Label;
@@ -131,7 +131,7 @@ class CronTasksView extends CronView {
                 $row->setClassName('tasks-table-row');
                 $jobNameCell = new TableCell();
                 $jobNameCell->setClassName('tasks-table-cell');
-                $jobNameCell->addTextNode('<a href="'.WebFiori::getSiteConfig()->getBaseURL().'/cron/jobs/'.$job->getJobName().'">'.$job->getJobName().'</a>',false);
+                $jobNameCell->addTextNode('<a href="'.WebFioriApp::getSiteConfig()->getBaseURL().'/cron/jobs/'.$job->getJobName().'">'.$job->getJobName().'</a>',false);
                 $row->addChild($jobNameCell);
                 $exprCell = new TableCell();
                 $jobNameCell->setClassName('tasks-table-cell');

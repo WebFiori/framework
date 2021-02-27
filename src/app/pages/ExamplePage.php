@@ -26,9 +26,9 @@ namespace webfiori\examples\views;
 
 use ibrahim\themes\IbrahimTheme;
 use webfiori\framework\Page;
+use webfiori\framework\ui\WebPage;
 use webfiori\theme\vutifyTheme\VuetifyTheme;
 use webfiori\theme\WebFioriV108;
-use webfiori\framework\ui\WebPage;
 class ExamplePage extends WebPage {
     public function __construct() {
         parent::__construct();

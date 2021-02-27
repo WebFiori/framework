@@ -24,6 +24,7 @@
  */
 namespace webfiori\framework;
 
+use app\AppConfig;
 use webfiori\conf\Config;
 use webfiori\conf\MailConfig;
 use webfiori\conf\SiteConfig;
@@ -47,7 +48,6 @@ use webfiori\ini\InitCron;
 use webfiori\ini\InitMiddleware;
 use webfiori\ini\InitPrivileges;
 use webfiori\json\Json;
-use app\AppConfig;
 /**
  * The time at which the framework was booted in microseconds as a float.
  * 
@@ -168,11 +168,11 @@ class WebFioriApp {
         }
         self::$AU = AutoLoader::get();
         InitAutoLoad::init();
-        
+
         //Initialize CLI
         CLI::init();
         $this->appConfig = new AppConfig();
-        
+
         $this->_initThemesPath();
         $this->_setHandlers();
         $this->_checkStandardLibs();
@@ -291,6 +291,13 @@ class WebFioriApp {
         return self::$LC;
     }
     /**
+     * 
+     * @return AppConfig
+     */
+    public static function getAppConfig() {
+        return self::$LC->appConfig;
+    }
+    /**
      * Returns a reference to an instance of 'AutoLoader'.
      * 
      * @return AutoLoader A reference to an instance of 'AutoLoader'.
@@ -332,13 +339,6 @@ class WebFioriApp {
         }
 
         return null;
-    }
-    /**
-     * 
-     * @return AppConfig
-     */
-    public static function getAppConfig() {
-        return self::$LC->appConfig;
     }
     /**
      * Returns an associative array that contains database connection error 

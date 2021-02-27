@@ -29,16 +29,16 @@ use webfiori\conf\SiteConfig;
 use webfiori\framework\exceptions\UIException;
 use webfiori\framework\i18n\Language;
 use webfiori\framework\session\SessionsManager;
+use webfiori\framework\Theme;
+use webfiori\framework\ThemeLoader;
+use webfiori\framework\Util;
+use webfiori\framework\WebFioriApp;
 use webfiori\http\Request;
 use webfiori\http\Response;
 use webfiori\json\Json;
 use webfiori\ui\HeadNode;
 use webfiori\ui\HTMLDoc;
 use webfiori\ui\HTMLNode;
-use webfiori\framework\WebFioriApp;
-use webfiori\framework\ThemeLoader;
-use webfiori\framework\Theme;
-use webfiori\framework\Util;
 /**
  * A base class that can be used to implement web pages.
  *
@@ -70,11 +70,6 @@ class WebPage {
         'side-content-area',
         'page-footer'
     ];
-    /**
-     *
-     * @var Language|null 
-     */
-    private $tr;
     /**
      * An array that contains closures 
      * which will be called before the page is fully rendered.
@@ -197,6 +192,11 @@ class WebPage {
      */
     private $titleSep;
     /**
+     *
+     * @var Language|null 
+     */
+    private $tr;
+    /**
      * The name of the web site that will be appended with the title of 
      * the page.
      * 
@@ -205,27 +205,173 @@ class WebPage {
      * @since 1.0
      */
     private $websiteName;
-    /**
-     * Sets the canonical URL of the page.
-     * 
-     * Note that if empty string is given, it 
-     * won't be set. To unset the canonical, use 'null' as value.
-     * 
-     * @since 1.0
-     * 
-     * @param string $url The canonical URL of the page.
-     */
-    public function setCanonical($url) {
-        if (strlen($url) != 0) {
-            $this->canonical = $url;
-
-            if ($this->document !== null) {
-                $this->document->getHeadNode()->setCanonical($url);
-            }
-        }
-    }
     public function __construct() {
         $this->reset();
+    }
+    /**
+     * Adds a function which will be executed before the page is fully rendered.
+     * 
+     * The function will be executed when the method 'WebPage::render()' is called. 
+     * One possible use is to do some modifications to the DOM before the 
+     * page is displayed. It is possible to have multiple callbacks.
+     * 
+     * @param callback $callable A PHP function that will be get executed. before 
+     * the page is rendered.
+     * 
+     * @param array $params An array of parameters which will be passed to the 
+     * callback. The parameters can be accessed in the callback in the 
+     * same order at which they appear in the array.
+     * 
+     * @return int|null If the callable is added, the method will return a 
+     * number that represents its ID. If not added, the method will return 
+     * null.
+     * 
+     * @since 1.0
+     */
+    public function addBeforeRender($callable = '', $params = []) {
+        if (is_callable($callable) || $callable instanceof \Closure) {
+            $this->beforeRenderCallbacks[] = $callable;
+            $xParamsArr = [$this];
+
+            if (gettype($params) == 'array') {
+                foreach ($params as $p) {
+                    $xParamsArr[] = $p;
+                }
+            }
+            $this->beforeRenderParams[] = $xParamsArr;
+            $callbacksCount = count($this->beforeRenderCallbacks);
+
+            return $callbacksCount - 1;
+        }
+    }
+    public function get($label) {
+        $langObj = $this->getTranslation();
+
+        if ($langObj !== null) {
+            return $langObj->get($label);
+        }
+
+        return $label;
+    }
+    /**
+     * Returns a child node given its ID.
+     * 
+     * @param string $id The ID of the child.
+     * 
+     * @return null|HTMLNode The method returns an object of type HTMLNode. 
+     * if found. If no node has the given ID, the method will return null.
+     * 
+     * @since 1.0
+     */
+    public function getChildByID($id) {
+        return $this->getDocument()->getChildByID($id);
+    }
+    /**
+     * Returns the document that is associated with the page.
+     * 
+     * @return HTMLDoc An object of type 'HTMLDoc'.
+     * 
+     * @since 1.0
+     */
+    public function getDocument() {
+        return $this->document;
+    }
+    /**
+     * Returns the language code of the page.
+     * 
+     * @return string|null Two digit language code. In case language is not set, the 
+     * method will return null
+     * 
+     * @since 1.0
+     */
+    public function getLangCode() {
+        return $this->contentLang;
+    }
+    /**
+     * 
+     * @return Theme
+     */
+    public function getTheme() {
+        return $this->theme;
+    }
+    /**
+     * Returns the directory at which CSS files of the theme exists.
+     * 
+     * @return string The directory at which CSS files of the theme exists 
+     * (e.g. 'assets/my-theme/css' ). 
+     * If the theme is not loaded, the method will return empty string.
+     * 
+     * @since 1.0
+     */
+    public function getThemeCSSDir() {
+        if ($this->isThemeLoaded()) {
+            $loadedTheme = $this->getTheme();
+
+            return 'assets/'.$loadedTheme->getDirectoryName().'/'.$loadedTheme->getCssDirName();
+        }
+
+        return '';
+    }
+    /**
+     * Returns the directory at which JavaScript files of the theme exists.
+     * 
+     * @return string The directory at which JavaScript files of the theme exists 
+     * (e.g. 'assets/my-theme/js' ). 
+     * If the theme is not loaded, the method will return empty string.
+     * 
+     * @since 1.0
+     */
+    public function getThemeJSDir() {
+        if ($this->isThemeLoaded()) {
+            $loadedTheme = $this->getTheme();
+
+            return 'assets/'.$loadedTheme->getDirectoryName().'/'.$loadedTheme->getJsDirName();
+        }
+
+        return '';
+    }
+    /**
+     * Returns the title of the page.
+     * 
+     * @return string|null The title of the page. Default return value is 
+     * 'Default X'.
+     * 
+     * @since 1.0
+     */
+    public function getTitle() {
+        return $this->title;
+    }
+    /**
+     * Returns the character or string that is used to separate web page title 
+     * and web site name.
+     * 
+     * @return string The character or string that is used to separate web page title 
+     * and web site name. If the separator was not set 
+     * using the method <b>WebPage::setTitleSep()</b>, the returned value will 
+     * be ' | '.
+     * 
+     * @since 1.0
+     */
+    public function getTitleSep() {
+        return $this->titleSep;
+    }
+    /**
+     * 
+     * @return Language
+     */
+    public function getTranslation() {
+        return $this->tr;
+    }
+    /**
+     * Returns the writing direction of the page.
+     * 
+     * @return string|null 'ltr' or 'rtl'. If the writing direction is not set, 
+     * the method will return null.
+     * 
+     * @since 1.0
+     */
+    public function getWritingDir() {
+        return $this->contentDir;
     }
     /**
      * Checks if the page will have an aside section or not.
@@ -257,7 +403,159 @@ class WebPage {
     public function hasHeader() {
         return $this->incHeader;
     }
-    
+    /**
+     * Sets the value of the property which is used to determine if the 
+     * JavaScript variable 'window.i18n' will be included or not.
+     * 
+     * @param boolean|null $bool true to include it. False to not. Passing null 
+     * will cause no change.
+     * 
+     * @return boolean The method will return true if the variable will be included. 
+     * False if not. Default return value is true.
+     * 
+     * @since 1.0
+     */
+    public function includeI18nLables($bool = null) {
+        if ($bool !== null) {
+            $this->includeLables = $bool === true;
+        }
+
+        return $this->includeLables;
+    }
+    /**
+     * Display the page in the web browser or gets the rendered document as string.
+     * 
+     * @param boolean $formatted If this parameter is set to true, the rendered 
+     * HTML document will be well formatted and readable. Note that by adding 
+     * formatting to the page, the size of rendered HTML document 
+     * will increase. The document will be compressed if this 
+     * parameter is set to false. Default is false.
+     * 
+     * @param boolean $returnResult If this parameter is set to true, the method 
+     * will return the rendered HTML document as string. Default value is 
+     * false.
+     * 
+     * @return null|HTMLDoc If the parameter <b>$returnResult</b> is set to true, 
+     * the method will return an object of type 'HTMLDoc' that represents the rendered page. Other 
+     * than that, it will return null.
+     * 
+     * @since 1.0
+     */
+    public function render($formatted = false, $returnResult = false) {
+        $index = 0;
+
+        foreach ($this->beforeRenderCallbacks as $function) {
+            call_user_func_array($function, $this->beforeRenderParams[$index]);
+            $index++;
+        }
+
+        if ($returnResult) {
+            return $this->getDocument();
+        } else {
+            $formatted = $formatted === true || (defined('WF_VERBOSE') && WF_VERBOSE);
+            Response::write($this->getDocument()->toHTML($formatted));
+        }
+    }
+    public function reset() {
+        $this->document = new HTMLDoc();
+        $this->_checkLang();
+        $this->usingLanguage();
+
+        $websiteName = WebFioriApp::getAppConfig()->getWebsiteName($this->getLangCode());
+        $websiteName !== null ? $this->setWebsiteName($websiteName) : $this->setWebsiteName('New Website');
+
+        $websiteDesc = WebFioriApp::getAppConfig()->getDescription($this->getLangCode());
+        $websiteDesc !== null ? $this->setWebsiteName($websiteDesc) : '';
+
+        $pageTitle = WebFioriApp::getAppConfig()->getWebsiteName($this->getLangCode());
+        $pageTitle !== null ? $this->setTitle($websiteName) : $this->setTitle('Hello World');
+
+
+        $this->setTitleSep(WebFioriApp::getAppConfig()->getTitleSep());
+
+        $langObj = $this->getTranslation();
+
+        if ($langObj !== null) {
+            $this->contentDir = $langObj->getWritingDir();
+        } else {
+            $this->contentDir = 'ltr';
+        }
+
+        $this->incFooter = true;
+        $this->incHeader = true;
+        $this->theme = null;
+        $this->incAside = true;
+        $this->setWritingDir();
+        $this->setCanonical(Request::getRequestedURL());
+        $this->document->setLanguage($this->getLangCode());
+        $headNode = $this->_getHead();
+        $this->document->setHeadNode($headNode);
+        $headerNode = new HTMLNode();
+        $headerNode->setID(self::MAIN_ELEMENTS[1]);
+        $this->document->addChild($headerNode);
+        $body = new HTMLNode();
+        $body->setID(self::MAIN_ELEMENTS[0]);
+        $asideNode = new HTMLNode();
+        $asideNode->setID(self::MAIN_ELEMENTS[3]);
+        $body->addChild($asideNode);
+        $contentArea = new HTMLNode();
+        $contentArea->setID(self::MAIN_ELEMENTS[2]);
+        $body->addChild($contentArea);
+        $this->document->addChild($body);
+        $footerNode = new HTMLNode();
+        $footerNode->setID(self::MAIN_ELEMENTS[4]);
+        $this->document->addChild($footerNode);
+        $this->includeLables = true;
+
+        $this->_resetBeforeLoaded();
+    }
+    /**
+     * Sets the canonical URL of the page.
+     * 
+     * Note that if empty string is given, it 
+     * won't be set. To unset the canonical, use 'null' as value.
+     * 
+     * @since 1.0
+     * 
+     * @param string $url The canonical URL of the page.
+     */
+    public function setCanonical($url) {
+        if (strlen($url) != 0) {
+            $this->canonical = $url;
+
+            if ($this->document !== null) {
+                $this->document->getHeadNode()->setCanonical($url);
+            }
+        }
+    }
+    /**
+     * Sets the description of the page.
+     * 
+     * @param string $val The description of the page. 
+     * If <b>null</b> is given, 
+     * the description meta tag will be removed from the &lt;head&gt; node. If 
+     * empty string is given, nothing will change.
+     * 
+     * @since 1.0
+     */
+    public function setDescription($val) {
+        if ($val === null) {
+            $descNode = $this->document->getHeadNode()->getMeta('description');
+            $this->document->getHeadNode()->removeChild($descNode);
+            $this->description = null;
+
+            if (strlen($desc) !== 0) {
+                $this->description = $desc;
+                $this->document->getHeadNode()->addMeta('description', $desc, true);
+            } else {
+                $descNode = $this->document->getHeadNode()->getMeta('description');
+                $this->document->getHeadNode()->removeChild($descNode);
+                $this->description = null;
+            }
+        } else {
+        }
+    }
+
     /**
      * Sets the property that is used to check if page has an aside section or not.
      * 
@@ -309,11 +607,13 @@ class WebPage {
         if (gettype($bool) == self::$BoolType) {
             if (!$this->incFooter && $bool) {
                 $this->document->addChild($this->_getFooter());
-            } else if ($this->incFooter && !$bool) {
-                $footer = $this->document->getChildByID(self::MAIN_ELEMENTS[4]);
+            } else {
+                if ($this->incFooter && !$bool) {
+                    $footer = $this->document->getChildByID(self::MAIN_ELEMENTS[4]);
 
-                if ($footer instanceof HTMLNode) {
-                    $this->document->removeChild($footer);
+                    if ($footer instanceof HTMLNode) {
+                        $this->document->removeChild($footer);
+                    }
                 }
             }
             $this->incFooter = $bool;
@@ -339,27 +639,125 @@ class WebPage {
                 for ($x = 0 ; $x < $currentChCount ; $x++) {
                     $this->document->addChild($children->get($x));
                 }
-            } else if ($this->incHeader && !$bool) {
-                //remove header
-                $header = $this->document->getChildByID(self::MAIN_ELEMENTS[1]);
+            } else {
+                if ($this->incHeader && !$bool) {
+                    //remove header
+                    $header = $this->document->getChildByID(self::MAIN_ELEMENTS[1]);
 
-                if ($header instanceof HTMLNode) {
-                    $this->document->removeChild($header);
+                    if ($header instanceof HTMLNode) {
+                        $this->document->removeChild($header);
+                    }
                 }
             }
             $this->incHeader = $bool;
         }
     }
     /**
-     * Returns the language code of the page.
+     * Loads a theme given its name.
      * 
-     * @return string|null Two digit language code. In case language is not set, the 
-     * method will return null
+     * @param string $themeNameOrClass The name of the theme as specified by the 
+     * variable 'name' in theme definition. If the given name is 'null', the 
+     * method will load the default theme as specified by the method 
+     * 'SiteConfig::getBaseThemeName()'. Note that once the theme is updated, 
+     * the document content of the page will reset if it was set before calling this 
+     * method. This also can be the value which can be taken from 'ClassName::class'. 
+     * 
+     * 
+     * @throws Exception The method will throw 
+     * an exception if no theme was found which has the given name. Another case is 
+     * when the file 'theme.php' of the theme is missing. 
+     * Finally, an exception will be thrown if theme component is not found.
+     * @since 1.0
+     * @see Theme::usingTheme()
+     */
+    public function setTheme($themeNameOrClass = null) {
+        $xthemeName = '\\'.$themeNameOrClass;
+
+        if (class_exists($xthemeName)) {
+            $tmpTheme = new $xthemeName();
+
+            if (!($tmpTheme instanceof Theme)) {
+                $tmpTheme = $this->_loadByThemeName($themeNameOrClass);
+            }
+
+            $tmpTheme->setPage($this);
+            $tmpTheme->invokeBeforeLoaded();
+        } else {
+            $tmpTheme = $this->_loadByThemeName($themeNameOrClass);
+        }
+
+        if ($tmpTheme !== null) {
+            $this->theme = $tmpTheme;
+            $this->theme->setPage($this);
+            $mainContentArea = $this->getDocument()->getChildByID(self::MAIN_ELEMENTS[2]);
+
+            if ($mainContentArea === null) {
+                $mainContentArea = new HTMLNode();
+                $mainContentArea->setID(self::MAIN_ELEMENTS[2]);
+            }
+
+            $this->document = new HTMLDoc();
+            $headNode = $this->_getHead();
+            $footerNode = $this->_getFooter();
+            $asideNode = $this->_getAside();
+            $headerNode = $this->_getHeader();
+            $this->document->setLanguage($this->getLangCode());
+            $this->document->setHeadNode($headNode);
+            $this->document->addChild($headerNode);
+            $body = new HTMLNode();
+            $body->setID(self::MAIN_ELEMENTS[0]);
+            $body->addChild($asideNode);
+
+            $body->addChild($mainContentArea);
+            $this->document->addChild($body);
+            $this->document->addChild($footerNode);
+
+            $this->theme->invokeAfterLoaded();
+        }
+    }
+    /**
+     * Sets the title of the page.
+     * 
+     * @param string $val The title of the page. If <b>null</b> is given, 
+     * the title will not updated. Also note that if page document was created, 
+     * calling this method will set the value of the &lt;titlt&gt; node. 
+     * The format of the title is <b>PAGE_NAME TITLE_SEP WEBSITE_NAME</b>. 
+     * for example, if the page name is 'Home' and title separator is 
+     * '|' and the name of the website is 'Programming Academia'. The title 
+     * of the page will be 'Home | Programming Academia'.
      * 
      * @since 1.0
      */
-    public function getLangCode() {
-        return $this->contentLang;
+    public function setTitle($val) {
+        if ($val != null) {
+            $this->title = $val;
+            $this->document->getHeadNode()->setTitle($this->getTitle().$this->getTitleSep().$this->getWebsiteName());
+        }
+    }
+    /**
+     * Sets the character or string that is used to separate web page title.
+     * 
+     * The given character or string is used in setting the title of the page. 
+     * The format of the title is 'PAGE_NAME TITLE_SEP WEBSITE_NAME'. 
+     * for example, if the page name is 'Home' and title separator is 
+     * '|' and the name of the web site is 'Programming Academia'. The title 
+     * of the page will be 'Home | Programming Academia'.
+     * The character be updated only if the given string is not empty. 
+     * Also note that if page document was created, 
+     * calling this method will set the value of the &lt;titlt&gt; node.
+     * 
+     * @param string $str The new character or string that will be used to 
+     * separate page title and web site name.
+     * 
+     * @since 1.0
+     */
+    public function setTitleSep($str) {
+        $trimmed = trim($str);
+
+        if (strlen($trimmed) != 0) {
+            $this->titleSep = ' '.$trimmed.' ';
+            $this->setTitle($this->getTitle());
+        }
     }
     /**
      * Sets the name of the web site.
@@ -385,72 +783,41 @@ class WebPage {
         }
     }
     /**
-     * Returns the title of the page.
+     * Sets the writing direction of the page.
      * 
-     * @return string|null The title of the page. Default return value is 
-     * 'Default X'.
+     * @param string $dir Language::DIR_LTR or Language::DIR_RTL.
      * 
-     * @since 1.0
-     */
-    public function getTitle() {
-        return $this->title;
-    }
-    /**
-     * Sets the title of the page.
-     * 
-     * @param string $val The title of the page. If <b>null</b> is given, 
-     * the title will not updated. Also note that if page document was created, 
-     * calling this method will set the value of the &lt;titlt&gt; node. 
-     * The format of the title is <b>PAGE_NAME TITLE_SEP WEBSITE_NAME</b>. 
-     * for example, if the page name is 'Home' and title separator is 
-     * '|' and the name of the website is 'Programming Academia'. The title 
-     * of the page will be 'Home | Programming Academia'.
+     * @return boolean True if the direction was not set and its the first time to set. 
+     * if it was set before, the method will return false.
+     * @throws Exception If the writing direction is not Language::DIR_LTR or Language::DIR_RTL.
      * 
      * @since 1.0
      */
-    public function setTitle($val) {
-        if ($val != null) {
-            $this->title = $val;
-            $this->document->getHeadNode()->setTitle($this->getTitle().$this->getTitleSep().$this->getWebsiteName());
+    public function setWritingDir($dir = 'ltr') {
+        $dirL = strtolower($dir);
+
+        if ($dirL == Language::DIR_LTR || $dirL == Language::DIR_RTL) {
+            $this->contentDir = $dirL;
         }
     }
     /**
-     * Returns the character or string that is used to separate web page title 
-     * and web site name.
-     * 
-     * @return string The character or string that is used to separate web page title 
-     * and web site name. If the separator was not set 
-     * using the method <b>WebPage::setTitleSep()</b>, the returned value will 
-     * be ' | '.
-     * 
-     * @since 1.0
+     * Sets the language of the page based on session language or 
+     * request.
      */
-    public function getTitleSep() {
-        return $this->titleSep;
-    }
-    /**
-     * Sets the character or string that is used to separate web page title.
-     * 
-     * The given character or string is used in setting the title of the page. 
-     * The format of the title is 'PAGE_NAME TITLE_SEP WEBSITE_NAME'. 
-     * for example, if the page name is 'Home' and title separator is 
-     * '|' and the name of the web site is 'Programming Academia'. The title 
-     * of the page will be 'Home | Programming Academia'.
-     * The character be updated only if the given string is not empty. 
-     * Also note that if page document was created, 
-     * calling this method will set the value of the &lt;titlt&gt; node.
-     * 
-     * @param string $str The new character or string that will be used to 
-     * separate page title and web site name.
-     * 
-     * @since 1.0
-     */
-    public function setTitleSep($str) {
-        $trimmed = trim($str);
+    private function _checkLang() {
+        $session = SessionsManager::getActiveSession();
+        $langCodeFromSession = $session !== null ? $session->getLangCode(true) : null;
 
-        if (strlen($trimmed) != 0) {
-            $this->titleSep = ' '.$trimmed.' ';
-            $this->setTitle($this->getTitle());
+        if ($langCodeFromSession !== null) {
+            $this->setLang($langCodeFromSession);
+        } else {
+            $langCodeFromRequest = Request::getParam('lang');
+
+            if ($langCodeFromRequest !== null) {
+                $this->setLang($langCodeFromRequest);
+            } else {
+                $this->setLang(WebFioriApp::getAppConfig()->getPrimaryLanguage());
+            }
         }
     }
     private function _getAside() {
@@ -487,28 +854,6 @@ class WebPage {
         }
 
         return $node;
-    }
-    /**
-     * Returns the description of the page.
-     * 
-     * @return string|null The description of the page. If the description is not set, 
-     * the method will return null.
-     * 
-     * @since 1.0
-     */
-    private function getDescription() {
-        return $this->description;
-    }
-    /**
-     * Returns the canonical URL of the page.
-     * 
-     * @return null|string The method will return the  canonical URL of the page 
-     * if set. If not, the method will return null.
-     * 
-     * @since 1.0
-     */
-    private function getCanonical() {
-        return $this->canonical;
     }
     private function _getHead() {
         $loadedTheme = $this->getTheme();
@@ -578,332 +923,6 @@ class WebPage {
         }
 
         return $tmpTheme;
-    }
-    /**
-     * Returns the name of the web site.
-     * 
-     * @return string The name of the web site. If the name was not set 
-     * using the method WebPage::siteName(), the returned value will 
-     * be 'My X Website'.
-     * 
-     * @since 1.0
-     */
-    private function getWebsiteName() {
-        return $this->websiteName;
-    }
-    /**
-     * Returns the writing direction of the page.
-     * 
-     * @return string|null 'ltr' or 'rtl'. If the writing direction is not set, 
-     * the method will return null.
-     * 
-     * @since 1.0
-     */
-    public function getWritingDir() {
-        return $this->contentDir;
-    }
-    /**
-     * Sets the writing direction of the page.
-     * 
-     * @param string $dir Language::DIR_LTR or Language::DIR_RTL.
-     * 
-     * @return boolean True if the direction was not set and its the first time to set. 
-     * if it was set before, the method will return false.
-     * @throws Exception If the writing direction is not Language::DIR_LTR or Language::DIR_RTL.
-     * 
-     * @since 1.0
-     */
-    public function setWritingDir($dir = 'ltr') {
-        $dirL = strtolower($dir);
-
-        if ($dirL == Language::DIR_LTR || $dirL == Language::DIR_RTL) {
-            $this->contentDir = $dirL;
-        }
-    }
-    public function reset() {
-        $this->document = new HTMLDoc();
-        $this->_checkLang();
-        $this->usingLanguage();
-        
-        $websiteName = WebFioriApp::getAppConfig()->getWebsiteName($this->getLangCode());
-        $websiteName !== null ? $this->setWebsiteName($websiteName) : $this->setWebsiteName('New Website');
-        
-        $websiteDesc = WebFioriApp::getAppConfig()->getDescription($this->getLangCode());
-        $websiteDesc !== null ? $this->setWebsiteName($websiteDesc) : '';
-        
-        $pageTitle = WebFioriApp::getAppConfig()->getWebsiteName($this->getLangCode());
-        $pageTitle !== null ? $this->setTitle($websiteName) : $this->setTitle('Hello World');
-
-
-        $this->setTitleSep(WebFioriApp::getAppConfig()->getTitleSep());
-        
-        $langObj = $this->getTranslation();
-        
-        if ($langObj !== null) {
-            $this->contentDir = $langObj->getWritingDir();
-        } else {
-            $this->contentDir = 'ltr';
-        }
-        
-        $this->incFooter = true;
-        $this->incHeader = true;
-        $this->theme = null;
-        $this->incAside = true;
-        $this->setWritingDir();
-        $this->setCanonical(Request::getRequestedURL());
-        $this->document->setLanguage($this->getLangCode());
-        $headNode = $this->_getHead();
-        $this->document->setHeadNode($headNode);
-        $headerNode = new HTMLNode();
-        $headerNode->setID(self::MAIN_ELEMENTS[1]);
-        $this->document->addChild($headerNode);
-        $body = new HTMLNode();
-        $body->setID(self::MAIN_ELEMENTS[0]);
-        $asideNode = new HTMLNode();
-        $asideNode->setID(self::MAIN_ELEMENTS[3]);
-        $body->addChild($asideNode);
-        $contentArea = new HTMLNode();
-        $contentArea->setID(self::MAIN_ELEMENTS[2]);
-        $body->addChild($contentArea);
-        $this->document->addChild($body);
-        $footerNode = new HTMLNode();
-        $footerNode->setID(self::MAIN_ELEMENTS[4]);
-        $this->document->addChild($footerNode);
-        $this->includeLables = true;
-        
-        $this->_resetBeforeLoaded();
-    }
-    /**
-     * 
-     * @return Language
-     */
-    public function getTranslation() {
-        return $this->tr;
-    }
-    /**
-     * Sets the language of the page based on session language or 
-     * request.
-     */
-    private function _checkLang() {
-        $session = SessionsManager::getActiveSession();
-        $langCodeFromSession = $session !== null ? $session->getLangCode(true) : null;
-
-        if ($langCodeFromSession !== null) {
-            $this->setLang($langCodeFromSession);
-        } else {
-            $langCodeFromRequest = Request::getParam('lang');
-
-            if ($langCodeFromRequest !== null) {
-                $this->setLang($langCodeFromRequest);
-            } else {
-                $this->setLang(WebFioriApp::getAppConfig()->getPrimaryLanguage());
-            }
-        }
-    }
-    /**
-     * Sets the display language of the page.
-     * 
-     * The length of the given string must be 2 characters in order to set the 
-     * language code.
-     * 
-     * @param string $lang a two digit language code such as AR or EN.
-     * 
-     * @since 1.0
-     */
-    private function setLang($lang = 'EN') {
-        $langU = strtoupper(trim($lang));
-
-        if (strlen($lang) == 2) {
-            $this->contentLang = $langU;
-
-            if ($this->document != null) {
-                $this->document->setLanguage($langU);
-            }
-        }
-    }
-    /**
-     * Load the translation file based on the language code. 
-     * 
-     * The method uses 
-     * two checks to load the translation. If the page language is set using 
-     * the method WebPage::getLanguageCode(), then the language that will be loaded 
-     * will be based on the value returned by the method Page::getLanguageCode(). If 
-     * the language of the page is not set, The method will throw an exception.
-     * 
-     * @since 1.0
-     */
-    private function usingLanguage() {
-        if ($this->getLangCode() !== null) {
-            $this->tr = Language::loadTranslation($this->getLangCode());
-            $pageLang = $this->getTranslation();
-            $this->setWritingDir($pageLang->getWritingDir());
-        }
-    }
-    /**
-     * Sets the value of the property which is used to determine if the 
-     * JavaScript variable 'window.i18n' will be included or not.
-     * 
-     * @param boolean|null $bool true to include it. False to not. Passing null 
-     * will cause no change.
-     * 
-     * @return boolean The method will return true if the variable will be included. 
-     * False if not. Default return value is true.
-     * 
-     * @since 1.0
-     */
-    public function includeI18nLables($bool = null) {
-        if ($bool !== null) {
-            $this->includeLables = $bool === true;
-        }
-
-        return $this->includeLables;
-    }
-    /**
-     * Returns the document that is associated with the page.
-     * 
-     * @return HTMLDoc An object of type 'HTMLDoc'.
-     * 
-     * @since 1.0
-     */
-    public function getDocument() {
-        return $this->document;
-    }
-    /**
-     * Returns a child node given its ID.
-     * 
-     * @param string $id The ID of the child.
-     * 
-     * @return null|HTMLNode The method returns an object of type HTMLNode. 
-     * if found. If no node has the given ID, the method will return null.
-     * 
-     * @since 1.0
-     */
-    public function getChildByID($id) {
-        return $this->getDocument()->getChildByID($id);
-    }
-    /**
-     * Loads a theme given its name.
-     * 
-     * @param string $themeNameOrClass The name of the theme as specified by the 
-     * variable 'name' in theme definition. If the given name is 'null', the 
-     * method will load the default theme as specified by the method 
-     * 'SiteConfig::getBaseThemeName()'. Note that once the theme is updated, 
-     * the document content of the page will reset if it was set before calling this 
-     * method. This also can be the value which can be taken from 'ClassName::class'. 
-     * 
-     * 
-     * @throws Exception The method will throw 
-     * an exception if no theme was found which has the given name. Another case is 
-     * when the file 'theme.php' of the theme is missing. 
-     * Finally, an exception will be thrown if theme component is not found.
-     * @since 1.0
-     * @see Theme::usingTheme()
-     */
-    public function setTheme($themeNameOrClass = null) {
-        $xthemeName = '\\'.$themeNameOrClass;
-
-        if (class_exists($xthemeName)) {
-            
-            $tmpTheme = new $xthemeName();
-            
-            if (!($tmpTheme instanceof Theme)) {
-                $tmpTheme = $this->_loadByThemeName($themeNameOrClass);
-            }
-            
-            $tmpTheme->setPage($this);
-            $tmpTheme->invokeBeforeLoaded();
-        } else {
-            $tmpTheme = $this->_loadByThemeName($themeNameOrClass);
-        }
-
-        if ($tmpTheme !== null) {
-            $this->theme = $tmpTheme;
-            $this->theme->setPage($this);
-            $mainContentArea = $this->getDocument()->getChildByID(self::MAIN_ELEMENTS[2]);
-
-            if ($mainContentArea === null) {
-                $mainContentArea = new HTMLNode();
-                $mainContentArea->setID(self::MAIN_ELEMENTS[2]);
-            }
-
-            $this->document = new HTMLDoc();
-            $headNode = $this->_getHead();
-            $footerNode = $this->_getFooter();
-            $asideNode = $this->_getAside();
-            $headerNode = $this->_getHeader();
-            $this->document->setLanguage($this->getLangCode());
-            $this->document->setHeadNode($headNode);
-            $this->document->addChild($headerNode);
-            $body = new HTMLNode();
-            $body->setID(self::MAIN_ELEMENTS[0]);
-            $body->addChild($asideNode);
-
-            $body->addChild($mainContentArea);
-            $this->document->addChild($body);
-            $this->document->addChild($footerNode);
-
-            $this->theme->invokeAfterLoaded();
-        }
-    }
-    /**
-     * 
-     * @return Theme
-     */
-    public function getTheme() {
-        return $this->theme;
-    }
-    /**
-     * Checks if a theme is loaded or not.
-     * 
-     * @return boolean true if loaded. false if not loaded.
-     * 
-     * @since 1.0
-     */
-    private function isThemeLoaded() {
-        return $this->theme instanceof Theme;
-    }
-    /**
-     * Returns the directory at which CSS files of the theme exists.
-     * 
-     * @return string The directory at which CSS files of the theme exists 
-     * (e.g. 'assets/my-theme/css' ). 
-     * If the theme is not loaded, the method will return empty string.
-     * 
-     * @since 1.0
-     */
-    public function getThemeCSSDir() {
-        if ($this->isThemeLoaded()) {
-            $loadedTheme = $this->getTheme();
-
-            return 'assets/'.$loadedTheme->getDirectoryName().'/'.$loadedTheme->getCssDirName();
-        }
-
-        return '';
-    }
-    /**
-     * Returns the directory at which JavaScript files of the theme exists.
-     * 
-     * @return string The directory at which JavaScript files of the theme exists 
-     * (e.g. 'assets/my-theme/js' ). 
-     * If the theme is not loaded, the method will return empty string.
-     * 
-     * @since 1.0
-     */
-    public function getThemeJSDir() {
-        if ($this->isThemeLoaded()) {
-            $loadedTheme = $this->getTheme();
-
-            return 'assets/'.$loadedTheme->getDirectoryName().'/'.$loadedTheme->getJsDirName();
-        }
-
-        return '';
-    }
-    public function get($label) {
-        $langObj = $this->getTranslation();
-        if ($langObj !== null) {
-            return $langObj->get($label);
-        }
-        return $label;
     }
     private function _resetBeforeLoaded() {
         $this->beforeRenderParams = [
@@ -975,101 +994,86 @@ class WebPage {
         }];
     }
     /**
-     * Adds a function which will be executed before the page is fully rendered.
+     * Returns the canonical URL of the page.
      * 
-     * The function will be executed when the method 'WebPage::render()' is called. 
-     * One possible use is to do some modifications to the DOM before the 
-     * page is displayed. It is possible to have multiple callbacks.
-     * 
-     * @param callback $callable A PHP function that will be get executed. before 
-     * the page is rendered.
-     * 
-     * @param array $params An array of parameters which will be passed to the 
-     * callback. The parameters can be accessed in the callback in the 
-     * same order at which they appear in the array.
-     * 
-     * @return int|null If the callable is added, the method will return a 
-     * number that represents its ID. If not added, the method will return 
-     * null.
+     * @return null|string The method will return the  canonical URL of the page 
+     * if set. If not, the method will return null.
      * 
      * @since 1.0
      */
-    public function addBeforeRender($callable = '', $params = []) {
-        if (is_callable($callable) || $callable instanceof \Closure) {
-            $this->beforeRenderCallbacks[] = $callable;
-            $xParamsArr = [$this];
-            if (gettype($params) == 'array') {
-                foreach ($params as $p) {
-                    $xParamsArr[] = $p;
-                }
-                
-            }
-            $this->beforeRenderParams[] = $xParamsArr;
-            $callbacksCount = count($this->beforeRenderCallbacks);
+    private function getCanonical() {
+        return $this->canonical;
+    }
+    /**
+     * Returns the description of the page.
+     * 
+     * @return string|null The description of the page. If the description is not set, 
+     * the method will return null.
+     * 
+     * @since 1.0
+     */
+    private function getDescription() {
+        return $this->description;
+    }
+    /**
+     * Returns the name of the web site.
+     * 
+     * @return string The name of the web site. If the name was not set 
+     * using the method WebPage::siteName(), the returned value will 
+     * be 'My X Website'.
+     * 
+     * @since 1.0
+     */
+    private function getWebsiteName() {
+        return $this->websiteName;
+    }
+    /**
+     * Checks if a theme is loaded or not.
+     * 
+     * @return boolean true if loaded. false if not loaded.
+     * 
+     * @since 1.0
+     */
+    private function isThemeLoaded() {
+        return $this->theme instanceof Theme;
+    }
+    /**
+     * Sets the display language of the page.
+     * 
+     * The length of the given string must be 2 characters in order to set the 
+     * language code.
+     * 
+     * @param string $lang a two digit language code such as AR or EN.
+     * 
+     * @since 1.0
+     */
+    private function setLang($lang = 'EN') {
+        $langU = strtoupper(trim($lang));
 
-            return $callbacksCount - 1;
+        if (strlen($lang) == 2) {
+            $this->contentLang = $langU;
+
+            if ($this->document != null) {
+                $this->document->setLanguage($langU);
+            }
         }
     }
     /**
-     * Sets the description of the page.
+     * Load the translation file based on the language code. 
      * 
-     * @param string $val The description of the page. 
-     * If <b>null</b> is given, 
-     * the description meta tag will be removed from the &lt;head&gt; node. If 
-     * empty string is given, nothing will change.
-     * 
-     * @since 1.0
-     */
-    public function setDescription($val) {
-        if ($val === null) {
-            $descNode = $this->document->getHeadNode()->getMeta('description');
-            $this->document->getHeadNode()->removeChild($descNode);
-            $this->description = null;
-
-            if (strlen($desc) !== 0) {
-                $this->description = $desc;
-                $this->document->getHeadNode()->addMeta('description', $desc, true);
-            } else {
-                $descNode = $this->document->getHeadNode()->getMeta('description');
-                $this->document->getHeadNode()->removeChild($descNode);
-                $this->description = null;
-            }
-        } else {
-            
-        }
-    }
-    /**
-     * Display the page in the web browser or gets the rendered document as string.
-     * 
-     * @param boolean $formatted If this parameter is set to true, the rendered 
-     * HTML document will be well formatted and readable. Note that by adding 
-     * formatting to the page, the size of rendered HTML document 
-     * will increase. The document will be compressed if this 
-     * parameter is set to false. Default is false.
-     * 
-     * @param boolean $returnResult If this parameter is set to true, the method 
-     * will return the rendered HTML document as string. Default value is 
-     * false.
-     * 
-     * @return null|HTMLDoc If the parameter <b>$returnResult</b> is set to true, 
-     * the method will return an object of type 'HTMLDoc' that represents the rendered page. Other 
-     * than that, it will return null.
+     * The method uses 
+     * two checks to load the translation. If the page language is set using 
+     * the method WebPage::getLanguageCode(), then the language that will be loaded 
+     * will be based on the value returned by the method Page::getLanguageCode(). If 
+     * the language of the page is not set, The method will throw an exception.
      * 
      * @since 1.0
      */
-    public function render($formatted = false, $returnResult = false) {
-        $index = 0;
-
-        foreach ($this->beforeRenderCallbacks as $function) {
-            call_user_func_array($function, $this->beforeRenderParams[$index]);
-            $index++;
-        }
-
-        if ($returnResult) {
-            return $this->getDocument();
-        } else {
-            $formatted = $formatted === true || (defined('WF_VERBOSE') && WF_VERBOSE);
-            Response::write($this->getDocument()->toHTML($formatted));
+    private function usingLanguage() {
+        if ($this->getLangCode() !== null) {
+            $this->tr = Language::loadTranslation($this->getLangCode());
+            $pageLang = $this->getTranslation();
+            $this->setWritingDir($pageLang->getWritingDir());
         }
     }
 }

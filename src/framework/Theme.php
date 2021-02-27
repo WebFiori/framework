@@ -29,6 +29,7 @@ use webfiori\conf\SiteConfig;
 use webfiori\json\Json;
 use webfiori\json\JsonI;
 use webfiori\ui\HTMLNode;
+use webfiori\framework\ui\WebPage;
 /**
  * A base class that is used to construct web site UI.
  * 
@@ -43,9 +44,17 @@ use webfiori\ui\HTMLNode;
  * 
  * @author Ibrahim
  * 
- * @version 1.2.6
+ * @version 1.2.7
  */
 abstract class Theme implements JsonI {
+    /**
+     * The web page at which the theme will be applied to.
+     * 
+     * @var WebPage|null
+     * 
+     * @since 1.2.7 
+     */
+    private $page;
     /**
      * A callback function to call after the theme is loaded.
      * 
@@ -177,6 +186,29 @@ abstract class Theme implements JsonI {
         $this->afterLoadedParams = [];
         $this->beforeLoaded = null;
         $this->beforeLoadedParams = [];
+    }
+    /**
+     * Sets the page at which the theme will be applied to.
+     * 
+     * @param WebPage $page The page that the theme is applied to.
+     * 
+     * @since 1.2.7
+     */
+    public function setPage(WebPage $page) {
+        var_dump($page);
+        $this->page = $page;
+    }
+    /**
+     * Returns the page at which the theme will be applied to.
+     * 
+     * @return WebPage|null If the theme is applied to a page, the 
+     * method will return it as an object. If theme is not applied to 
+     * any page, the method will return null.
+     * 
+     * @since 1.2.7
+     */
+    public function getPage() {
+        return $this->page;
     }
     /**
      * Adds a single component to the set of theme components.

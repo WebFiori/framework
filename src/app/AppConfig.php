@@ -147,12 +147,11 @@ class AppConfig {
      * 
      * @param SMTPAccount $acc an object of type SMTPAccount.
      * 
-     * @param string $name A name to associate with the email account.
      * 
      * @since 1.0
      */
-    public function addAccount(SMTPAccount $acc,$name) {
-        $this->emailAccounts[$name] = $acc;
+    public function addAccount(SMTPAccount $acc) {
+        $this->emailAccounts[$acc->getAccountName()] = $acc;
     }
     /**
      * Adds new database connection or updates an existing one.
@@ -168,29 +167,10 @@ class AppConfig {
         }
     }
     /**
-     * Adds new SMTP connection information or updates an existing one.
-     * 
-     * @param string $accName The name of the account that will be added or updated.
-     * 
-     * @param SMTPAccount $smtpConnInfo An object of type 'SMTPAccount' that
-     * will contain SMTP account information.
-     * 
-     * @since 1.0
-     */
-    public static function addSMTPAccount($accName, $smtpConnInfo) {
-        if ($smtpConnInfo instanceof SMTPAccount) {
-            $trimmedName = trim($accName);
-
-            if (strlen($trimmedName) != 0) {
-                self::get()->addAccount($smtpConnInfo, $trimmedName);
-            }
-        }
-    }
-    /**
      * Returns SMTP account given its name.
      * 
      * The method will search for an account with the given name in the set
-     * of added accounts. If no account was found, null is returned.v     * 
+     * of added accounts. If no account was found, null is returned.
      * @param string $name The name of the account.
      * 
      * @return SMTPAccount|null If the account is found, The method
@@ -210,7 +190,7 @@ class AppConfig {
      * Returns an associative array that contains all email accounts.
      * 
      * The indices of the array will act as the names of the accounts.
-     * The value of the index will be an object of type EmailAccount.
+     * The value of the index will be an object of type SMTPAccount.
      * 
      * @return array An associative array that contains all email accounts.
      * 
@@ -381,9 +361,7 @@ class AppConfig {
     /**
      * Returns the primary language of the website.
      * 
-     * This function will return a language code such as 'EN'.
-     * 
-     * @return string Language code of the primary language.
+     * @return string Language code of the primary language such as 'EN'.
      * 
      * @since 1.0
      */
@@ -454,12 +432,12 @@ class AppConfig {
         }
     }
     /**
-     * Returns an array which contains diffrent website names in different languages.
+     * Returns an array which contains different website names in different languages.
      * 
      * Each index will contain a language code and the value will be the name
      * of the website in the given language.
      * 
-     * @return array An array which contains diffrent website names in different languages.
+     * @return array An array which contains different website names in different languages.
      * 
      * @since 1.0
      */

@@ -423,7 +423,7 @@ class WebPage {
      * using the method <b>WebPage::setTitleSep()</b>, the returned value will 
      * be ' | '.
      * 
-     * @since 1.8
+     * @since 1.0
      */
     public function getTitleSep() {
         return $this->titleSep;
@@ -505,7 +505,7 @@ class WebPage {
      * @return null|string The method will return the  canonical URL of the page 
      * if set. If not, the method will return null.
      * 
-     * @since 1.2
+     * @since 1.0
      */
     private function getCanonical() {
         return $this->canonical;
@@ -586,7 +586,7 @@ class WebPage {
      * using the method WebPage::siteName(), the returned value will 
      * be 'My X Website'.
      * 
-     * @since 1.8
+     * @since 1.0
      */
     private function getWebsiteName() {
         return $this->websiteName;
@@ -749,7 +749,7 @@ class WebPage {
      * @return boolean The method will return true if the variable will be included. 
      * False if not. Default return value is true.
      * 
-     * @since 1.9.6
+     * @since 1.0
      */
     public function includeI18nLables($bool = null) {
         if ($bool !== null) {
@@ -763,10 +763,23 @@ class WebPage {
      * 
      * @return HTMLDoc An object of type 'HTMLDoc'.
      * 
-     * @since 1.1
+     * @since 1.0
      */
     public function getDocument() {
         return $this->document;
+    }
+    /**
+     * Returns a child node given its ID.
+     * 
+     * @param string $id The ID of the child.
+     * 
+     * @return null|HTMLNode The method returns an object of type HTMLNode. 
+     * if found. If no node has the given ID, the method will return null.
+     * 
+     * @since 1.0
+     */
+    public function getChildByID($id) {
+        return $this->getDocument()->getChildByID($id);
     }
     /**
      * Loads a theme given its name.
@@ -783,14 +796,14 @@ class WebPage {
      * an exception if no theme was found which has the given name. Another case is 
      * when the file 'theme.php' of the theme is missing. 
      * Finally, an exception will be thrown if theme component is not found.
-     * @since 1.4
+     * @since 1.0
      * @see Theme::usingTheme()
      */
     public function setTheme($themeNameOrClass = null) {
         $xthemeName = '\\'.$themeNameOrClass;
 
         if (class_exists($xthemeName)) {
-            die('gggggggg');
+            
             $tmpTheme = new $xthemeName();
             
             if (!($tmpTheme instanceof Theme)) {
@@ -982,7 +995,7 @@ class WebPage {
      * 
      * @since 1.0
      */
-    public static function addBeforeRender($callable = '', $params = []) {
+    public function addBeforeRender($callable = '', $params = []) {
         if (is_callable($callable) || $callable instanceof \Closure) {
             $this->beforeRenderCallbacks[] = $callable;
             $xParamsArr = [$this];

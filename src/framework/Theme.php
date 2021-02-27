@@ -195,7 +195,6 @@ abstract class Theme implements JsonI {
      * @since 1.2.7
      */
     public function setPage(WebPage $page) {
-        var_dump($page);
         $this->page = $page;
     }
     /**

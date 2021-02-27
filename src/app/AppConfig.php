@@ -1,23 +1,80 @@
 <?php
 namespace app;
+
 use webfiori\http\Uri;
 /**
- * Description of AppConfig
+ * Configuration class of the application
  *
  * @author Ibrahim
+ * 
+ * @version 1.0
+ * 
+ * @since 2.1.0
  */
 class AppConfig {
+    /**
+     * Version of the web application.
+     * 
+     * @var string
+     * 
+     * @since 1.0 
+     */
     private $appVestion;
+    /**
+     * The date at which the application was released.
+     * 
+     * @var string
+     * 
+     * @since 1.0 
+     */
     private $appReleaseDate;
+    /**
+     * A string that represents the type of the release.
+     * 
+     * @var string
+     * 
+     * @since 1.0 
+     */
     private $appVersionType;
+    /**
+     * An array that is used to hold default page titles 
+     * for different languages.
+     * 
+     * @var array
+     * 
+     * @since 1.0 
+     */
     private $defaultPageTitles;
-
+    /**
+     * Returns version number of the application.
+     * 
+     * @return string The method should return a string in the 
+     * form 'x.x.x.x'.
+     * 
+     * @since 1.0
+     */
     public function getVersion() {
         return $this->appVestion;
     }
+    /**
+     * Returns the date at which the application was released at.
+     * 
+     * @return string The method will return a string in the format 
+     * 'YYYY-MM-DD' that represents application release date.
+     * 
+     * @since 1.0
+     */
     public function getReleaseDate() {
         return $this->appReleaseDate;
     }
+    /**
+     * Returns a string that represents application release type.
+     * 
+     * @return string The method will return a string such as 
+     * 'Stable', 'Alpha', 'Beta' and so on.
+     * 
+     * @since 1.0
+     */
     public function getVersionType() {
         return $this->appVersionType;
     }
@@ -26,7 +83,7 @@ class AppConfig {
      * 
      * @var string
      * 
-     * @since 1.3
+     * @since 1.0
      */
     private $adminThemeName;
     /**
@@ -34,7 +91,7 @@ class AppConfig {
      * 
      * @var string
      * 
-     * @since 1.3
+     * @since 1.0
      */
     private $baseThemeName;
     /**
@@ -50,7 +107,7 @@ class AppConfig {
      * 
      * @var string
      * 
-     * @since 1.2
+     * @since 1.0
      */
     private $configVision;
     /**
@@ -81,6 +138,12 @@ class AppConfig {
      */
     private $titleSep;
     /**
+     * An associative array that will contain database connections.
+     * 
+     * @var type
+     */
+    private $dbConnections;
+    /**
      * An array which contains all website names in different languages.
      * 
      * @var string
@@ -88,8 +151,11 @@ class AppConfig {
      * @since 1.0
      */
     private $webSiteNames;
+    /**
+     * Creates new instance of the class.
+     */
     public function __construct() {
-        $this->configVision = '1.2.1';
+        $this->configVision = '1.0.0';
         $this->webSiteNames = [
             'EN'=>'WebFiori',
             'AR'=>'ويب فيوري',
@@ -108,11 +174,55 @@ class AppConfig {
             'EN' => 'Hello World',
             'AR' => 'أهلا بالعالم'
         ];
+        $this->dbConnections = [
+
+        ];
     }
     /**
+     * Returns database connection information given connection name.
      * 
-     * @param type $langCode
-     * @return type
+     * @param string $conName The name of the connection.
+     * 
+     * @return ConnectionInfo|null The method will return an object of type
+     * ConnectionInfo if a connection info was found for the given connection name.
+     * Other than that, the method will return null.
+     * 
+     * @since 1.0
+     */
+    public function getDBConnection($conName) {
+        $conns = $this->getDBConnections();
+        $trimmed = trim($conName);
+        
+        if (isset($conns[$trimmed])) {
+            return $conns[$trimmed];
+        }
+        
+        return null;
+    }
+    /**
+     * Returns an associative array that contain the information of database connections.
+     * 
+     * The keys of the array will be the name of database connection and the value of
+     * each key will be an object of type ConnectionInfo.
+     * 
+     * @return array An associative array.
+     * 
+     * @since 1.0
+     */
+    public function getDBConnections() {
+        return $this->dbConnections;
+    }
+    /**
+     * Returns the global description of the web site that will be 
+     * used as default page description.
+     * 
+     * @param string $langCode Language code such as 'AR' or 'EN'.
+     * 
+     * @return string|null If the description for the given language 
+     * does exist, the method will return it. If no such description, the 
+     * method will return null.
+     * 
+     * @since 1.0
      */
     public function getDescription($langCode) {
         $langs = $this->getDescriptions();
@@ -122,6 +232,17 @@ class AppConfig {
             return $langs[$langCode];
         }
     }
+    /**
+     * Returns the global website name.
+     * 
+     * @param string $langCode Language code such as 'AR' or 'EN'.
+     * 
+     * @return string|null If the name of the website for the given language 
+     * does exist, the method will return it. If no such name, the 
+     * method will return null.
+     * 
+     * @since 1.0
+     */
     public function getWebsiteName($langCode) {
         $langs = $this->getWebsiteNames();
         $langCodeF = strtoupper(trim($langCode));
@@ -130,9 +251,30 @@ class AppConfig {
             return $langs[$langCode];
         }
     }
+    /**
+     * Returns an array that holds the default pages titles for different 
+     * languages.
+     * 
+     * @return array The indices of the array will be languages codes such as 
+     * 'AR' and the value at each index will be page title in that language.
+     * 
+     * @since 1.0
+     */
     public function getDefaultTitles() {
         return $this->defaultPageTitles;
     }
+    /**
+     * Returns the global title of the web site that will be 
+     * used as default page title.
+     * 
+     * @param string $langCode Language code such as 'AR' or 'EN'.
+     * 
+     * @return string|null If the title of the page 
+     * does exist in the given language, the method will return it. 
+     * If no such title, the method will return null.
+     * 
+     * @since 1.0
+     */
     public function getDefaultTitle($langCode) {
         $langs = $this->getDefaultTitles();
         $langCodeF = strtoupper(trim($langCode));
@@ -146,7 +288,7 @@ class AppConfig {
      * 
      * @return string The name of the theme that is used in admin control pages.
      * 
-     * @since 1.3
+     * @since 1.0
      */
     public function getAdminThemeName() {
         return $this->adminThemeName;
@@ -158,7 +300,7 @@ class AppConfig {
      * 
      * @return string The name of base theme that is used in website pages.
      * 
-     * @since 1.3
+     * @since 1.0
      */
     public function getBaseThemeName() {
         return $this->baseThemeName;
@@ -221,7 +363,7 @@ class AppConfig {
      * 
      * @return string Language code of the primary language.
      * 
-     * @since 1.3
+     * @since 1.0
      */
     public function getPrimaryLanguage() {
         return $this->primaryLang;

@@ -47,6 +47,7 @@ use webfiori\ini\InitCron;
 use webfiori\ini\InitMiddleware;
 use webfiori\ini\InitPrivileges;
 use webfiori\json\Json;
+use app\AppConfig;
 /**
  * The time at which the framework was booted in microseconds as a float.
  * 
@@ -62,6 +63,7 @@ define('MICRO_START', microtime(true));
  * @version 1.3.6
  */
 class WebFioriApp {
+    private $appConfig;
     /**
      * An instance of autoloader class.
      * 
@@ -169,6 +171,7 @@ class WebFioriApp {
         
         //Initialize CLI
         CLI::init();
+        $this->appConfig = new AppConfig();
         
         $this->_initThemesPath();
         $this->_setHandlers();
@@ -329,6 +332,13 @@ class WebFioriApp {
         }
 
         return null;
+    }
+    /**
+     * 
+     * @return AppConfig
+     */
+    public static function getAppConfig() {
+        return self::$LC->appConfig;
     }
     /**
      * Returns an associative array that contains database connection error 

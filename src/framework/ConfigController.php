@@ -30,6 +30,7 @@ use webfiori\database\ConnectionInfo;
 use webfiori\framework\exceptions\SMTPException;
 use webfiori\framework\mail\SMTPAccount;
 use webfiori\framework\mail\SocketMailer;
+use webfiori\theme\WebFioriV108;
 /**
  * A class that can be used to modify basic configuration settings of 
  * the web application. 
@@ -54,61 +55,42 @@ class ConfigController {
      * <li>version</li>
      * <li>version-type</li>
      * <li>config-file-version</li>
-     * <li>app-version</li>
-     * <li>databases</li>
      * </ul>
      * @since 1.0
      */
     const INITIAL_CONFIG_VARS = [
-        'framework-release-date' => '2020-01-14',
-        'framework-version' => '2.0.0',
-        'framework-version-type' => 'Stable',
-        'config-file-version' => '1.3.6',
-        'app-version' => '1.0',
-        'app-version-date' => '2021-03-01',
-        'app-version-type' => 'Stable',
-        'databases' => []
+        'release-date' => '2020-01-14',
+        'version' => '2.0.0',
+        'version-type' => 'Stable',
+        'config-file-version' => '1.3.5',
     ];
-    /**
-     * An associative array that contains initial system configuration variables.
-     * 
-     * The array has the following values:
-     * <ul>
-     * <li>site-descriptions = array(<ul>
-     * <li>EN = 'WebFiori'</li>
-     * <li>AR = 'ويب فيوري'</li>
-     * </ul>)</li>
-     * <li>base-url = ''</li>
-     * <li>primary-language = 'EN'</li>
-     * <li>title-separator = ' | '</li>
-     * <li>home-page = 'index'</li>
-     * <li>admin-theme-name = 'WebFiori Theme'</li>
-     * <li>theme-name = 'WebFiori Theme'</li>
-     * <li>site-descriptions = array(<ul>
-     * <li>EN = ''</li>
-     * <li>AR = ''</li>
-     * </ul>)</li>
-     * <li>config-file-version => 1.2.1</li>
-     * </ul>
-     * 
-     * @since 1.0
-     */
-    const INITIAL_WEBSITE_CONFIG_VARS = [
-        'website-names' => [
-            'EN' => 'WebFiori',
-            'AR' => 'ويب فيوري'
+    const DEFAULT_APP_CONFIG = [
+        'config-file-version' => '1.0',
+        'version' => [
+            'v' => '1.0',
+            'v-type' => 'Stable',
+            'release-date' => '2021-01-10'
         ],
-        'base-url' => '',
-        'primary-language' => 'EN',
-        'title-separator' => ' | ',
-        'home-page' => 'index',
-        'admin-theme-name' => 'WebFiori V108',
-        'theme-name' => 'WebFiori V108',
-        'site-descriptions' => [
-            'EN' => '',
-            'AR' => ''
-        ],
-        'config-file-version' => '1.2.1',
+        'site' => [
+            'base-url' => '',
+            'primary-language' => 'EN',
+            'title-separator' => ' | ',
+            'home-page' => 'index',
+            'admin-theme-name' => WebFioriV108::class,
+            'theme-name' => WebFioriV108::class,
+            'site-descriptions' => [
+                'EN' => '',
+                'AR' => ''
+            ],
+            'website-names' => [
+                'EN' => 'WebFiori',
+                'AR' => 'ويب فيوري'
+            ],
+            'titles' => [
+                'EN' => 'Hello World',
+                'AR' => 'اهلا و سهلا'
+            ],
+        ]
     ];
     /**
      * A constant that indicates the given username or password  
@@ -522,14 +504,6 @@ class ConfigController {
                 ."     */".self::NL
                 ."    private \$releaseDate;".self::NL
                 ."    /**".self::NL
-                ."     * The release date of the system.".self::NL
-                ."     * ".self::NL
-                ."     * @var string Release date of the system.".self::NL
-                ."     * ".self::NL
-                ."     * @since 1.0".self::NL
-                ."     */".self::NL
-                ."    private \$appReleaseDate;".self::NL
-                ."    /**".self::NL
                 ."     * The version of the framework that is used to build the system.".self::NL
                 ."     * ".self::NL
                 ."     * @var string The version of the framework that is used to build the system.".self::NL
@@ -726,6 +700,159 @@ class ConfigController {
         $mailConfigFile->remove();
         $mailConfigFile->setRawData($fileAsStr);
         $mailConfigFile->write(false, true);
+    }
+    public function writeAppConfig($appConfigArr) {
+        $cFile = new File('AppConfig.php', ROOT_DIR.DS.'app');
+        $cFile->remove();
+        $this->a($cFile, "<?php");
+        $this->a($cFile, "");
+        $this->a($cFile, "use webfiori\database\ConnectionInfo;");
+        $this->a($cFile, "use webfiori\framework\mail\SMTPAccount;");
+        $this->a($cFile, "use webfiori\http\Uri;");
+        $this->a($cFile, "/**");
+        $this->a($cFile, " * Configuration class of the application");
+        $this->a($cFile, " *");
+        $this->a($cFile, " * @author Ibrahim");
+        $this->a($cFile, " *");
+        $this->a($cFile, " * @version 1.0");
+        $this->a($cFile, " *");
+        $this->a($cFile, " * @since 2.1.0");
+        $this->a($cFile, " */");
+        $this->a($cFile, "class AppConfig {");
+        
+        $this->a($cFile, "    /**");
+        $this->a($cFile, "     * The name of admin control pages Theme.");
+        $this->a($cFile, "     *");
+        $this->a($cFile, "     * @var string");
+        $this->a($cFile, "     *");
+        $this->a($cFile, "     * @since 1.0");
+        $this->a($cFile, "     */");
+        $this->a($cFile, "    private \$adminThemeName;");
+        
+        $this->a($cFile, "    /**");
+        $this->a($cFile, "     * The date at which the application was released.");
+        $this->a($cFile, "     *");
+        $this->a($cFile, "     * @var string");
+        $this->a($cFile, "     *");
+        $this->a($cFile, "     * @since 1.0");
+        $this->a($cFile, "     */");
+        $this->a($cFile, "    private \$appReleaseDate;");
+        
+        $this->a($cFile, "    /**");
+        $this->a($cFile, "     * A string that represents the type of the release.");
+        $this->a($cFile, "     *");
+        $this->a($cFile, "     * @var string");
+        $this->a($cFile, "     *");
+        $this->a($cFile, "     * @since 1.0");
+        $this->a($cFile, "     */");
+        $this->a($cFile, "    private \$appVersionType;");
+        
+        $this->a($cFile, "    /**");
+        $this->a($cFile, "     * Version of the web application.");
+        $this->a($cFile, "     *");
+        $this->a($cFile, "     * @var string");
+        $this->a($cFile, "     *");
+        $this->a($cFile, "     * @since 1.0");
+        $this->a($cFile, "     */");
+        $this->a($cFile, "    private \$appVestion;");
+        
+        $this->a($cFile, "    /**");
+        $this->a($cFile, "     * The name of base website UI Theme.");
+        $this->a($cFile, "     *");
+        $this->a($cFile, "     * @var string");
+        $this->a($cFile, "     *");
+        $this->a($cFile, "     * @since 1.0");
+        $this->a($cFile, "     */");
+        $this->a($cFile, "    private \$baseThemeName;");
+        
+        $this->a($cFile, "    /**");
+        $this->a($cFile, "     * The base URL that is used by all web site pages to fetch resource files.");
+        $this->a($cFile, "     *");
+        $this->a($cFile, "     * @var string");
+        $this->a($cFile, "     *");
+        $this->a($cFile, "     * @since 1.0");
+        $this->a($cFile, "     */");
+        $this->a($cFile, "    private \$baseUrl;");
+        
+        $this->a($cFile, "    /**");
+        $this->a($cFile, "     * Configuration file version number.");
+        $this->a($cFile, "     *");
+        $this->a($cFile, "     * @var string");
+        $this->a($cFile, "     *");
+        $this->a($cFile, "     * @since 1.0");
+        $this->a($cFile, "     */");
+        $this->a($cFile, "    private \$configVision;");
+        
+        $this->a($cFile, "    /**");
+        $this->a($cFile, "     * An associative array that will contain database connections.");
+        $this->a($cFile, "     *");
+        $this->a($cFile, "     * @var array");
+        $this->a($cFile, "     *");
+        $this->a($cFile, "     * @since 1.0");
+        $this->a($cFile, "     */");
+        $this->a($cFile, "    private \$dbConnections;");
+        
+        $this->a($cFile, "    /**");
+        $this->a($cFile, "     * An array that is used to hold default page titles for different languages.");
+        $this->a($cFile, "     *");
+        $this->a($cFile, "     * @var array");
+        $this->a($cFile, "     *");
+        $this->a($cFile, "     * @since 1.0");
+        $this->a($cFile, "     */");
+        $this->a($cFile, "    private \$defaultPageTitles;");
+        
+        $this->a($cFile, "    /**");
+        $this->a($cFile, "     * An array that holds SMTP connections information.");
+        $this->a($cFile, "     *");
+        $this->a($cFile, "     * @var string");
+        $this->a($cFile, "     *");
+        $this->a($cFile, "     * @since 1.0");
+        $this->a($cFile, "     */");
+        $this->a($cFile, "    private \$emailAccounts;");
+        
+        $this->a($cFile, "    /**");
+        $this->a($cFile, "     * The URL of the home page.");
+        $this->a($cFile, "     *");
+        $this->a($cFile, "     * @var string");
+        $this->a($cFile, "     *");
+        $this->a($cFile, "     * @since 1.0");
+        $this->a($cFile, "     */");
+        $this->a($cFile, "    private \$homePage;");
+        
+        $this->a($cFile, "    /**");
+        $this->a($cFile, "     * The primary language of the website.");
+        $this->a($cFile, "     *");
+        $this->a($cFile, "     * @var string");
+        $this->a($cFile, "     *");
+        $this->a($cFile, "     * @since 1.0");
+        $this->a($cFile, "     */");
+        $this->a($cFile, "    private \$primaryLang;");
+        
+        $this->a($cFile, "    /**");
+        $this->a($cFile, "     * The character which is used to saperate site name from page title.");
+        $this->a($cFile, "     *");
+        $this->a($cFile, "     * @var string");
+        $this->a($cFile, "     *");
+        $this->a($cFile, "     * @since 1.0");
+        $this->a($cFile, "     */");
+        $this->a($cFile, "    private \$titleSep;");
+        
+        $this->a($cFile, "    /**");
+        $this->a($cFile, "     * An array which contains all website names in different languages.");
+        $this->a($cFile, "     *");
+        $this->a($cFile, "     * @var string");
+        $this->a($cFile, "     *");
+        $this->a($cFile, "     * @since 1.0");
+        $this->a($cFile, "     */");
+        $this->a($cFile, "    private \$webSiteNames;");
+        
+        $this->a($cFile, "");
+        $this->a($cFile, "");
+        $this->a($cFile, "");
+        $this->a($cFile, "}");
+    }
+    private function a(File $file, $str) {
+        $file->append($str.self::NL);
     }
     /**
      * A method to save changes to mail configuration file.

@@ -32,18 +32,19 @@ class WebFioriV108 extends Theme {
                 Page::lang(WebFioriApp::getSiteConfig()->getPrimaryLanguage());
             }
         });
-        $this->setAfterLoaded(function()
+        $this->setAfterLoaded(function(Theme $theme)
         {
+            $page = $theme->getPage();
             
-            Page::document()->getChildByID('page-body')->setClassName('row  ml-0 mr-0');
-            Page::document()->getChildByID('page-body')->setStyle([
+            $page->getChildByID('page-body')->setClassName('row  ml-0 mr-0');
+            $page->getChildByID('page-body')->setStyle([
                 'margin-top' => '50px'
             ]);
-            Page::document()->getBody()->setStyle([
+            $page->getDocument()->getBody()->setStyle([
                 'max-height' => '10px',
                 'height' => '10px'
             ]);
-            Page::document()->getChildByID('main-content-area')->setClassName('col-10 p-5');
+            $page->getChildByID('main-content-area')->setClassName('col-10 p-5');
             $img = new HTMLNode('img');
             $img->setAttribute('src','assets/images/favicon.png');
             $img->setStyle([
@@ -54,11 +55,11 @@ class WebFioriV108 extends Theme {
                 'left' => '50px',
                 'z-index' => -1,
             ]);
-            Page::document()->getBody()->addChild($img);
-            Page::beforeRender(function(){
+            $page->getDocument()->getBody()->addChild($img);
+            $page->addBeforeRender(function ($page) {
                 $js = new \webfiori\ui\JsCode();
                 $js->addCode("window.Prism = window.Prism || {};");
-                Page::document()->getHeadNode()->addChild($js);
+                $page->getDocument()->getHeadNode()->addChild($js);
             });
         });
     }

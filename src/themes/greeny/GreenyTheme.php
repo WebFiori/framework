@@ -8,6 +8,7 @@ use webfiori\conf\SiteConfig;
 use webfiori\framework\Page;
 use webfiori\framework\Theme;
 use webfiori\framework\session\SessionsManager;
+use webfiori\framework\ui\WebPage;
 class GreenyTheme extends Theme {
     public function __construct() {
         parent::__construct();
@@ -23,21 +24,19 @@ class GreenyTheme extends Theme {
         $this->setImagesDirName('images');
         $this->setJsDirName('js');
         $this->setCssDirName('css');
-        $this->setAfterLoaded(function()
+        $this->setAfterLoaded(function(Theme $theme)
         {
-            $session = SessionsManager::getActiveSession();
-            Page::lang($session->getLangCode(true));
-            Page::translation();
-            Page::document()->getBody()->setClassName('pa-container');
-            Page::document()->getChildByID('page-body')->setClassName('pa-row');
+            $page = $theme->getPage();
+            $page->getDocument()->getBody()->setClassName('pa-container');
+            $page->getDocument()->getChildByID('page-body')->setClassName('pa-row');
 
-            if (Page::aside()) {
-                Page::document()->getChildByID('side-content-area')->setClassName('pa-'.Page::dir().'-col-2 show-border');
-                Page::document()->getChildByID('main-content-area')->setClassName('pa-'.Page::dir().'-col-10 show-border');
+            if ($page->hasAside()) {
+                $page->getDocument()->getChildByID('side-content-area')->setClassName('pa-'.Page::dir().'-col-2 show-border');
+                $page->getDocument()->getChildByID('main-content-area')->setClassName('pa-'.Page::dir().'-col-10 show-border');
             } else {
-                Page::document()->getChildByID('main-content-area')->setClassName('pa-'.Page::dir().'-col-12 show-border');
+                $page->getDocument()->getChildByID('main-content-area')->setClassName('pa-'.Page::dir().'-col-12 show-border');
             }
-            Page::document()->getChildByID('main-content-area')->addTextNode('Main Content Area.');
+            $page->getDocument()->getChildByID('main-content-area')->addTextNode('Main Content Area.');
         });
         $this->setBeforeLoaded(function()
         {

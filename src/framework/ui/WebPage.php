@@ -813,7 +813,6 @@ class WebPage {
             $tmpTheme->setPage($this);
             $tmpTheme->invokeBeforeLoaded();
         } else {
-            die('jhghjg');
             $tmpTheme = $this->_loadByThemeName($themeNameOrClass);
         }
 

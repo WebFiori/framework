@@ -9,6 +9,7 @@ use webfiori\framework\WebFioriApp;
 use webfiori\framework\session\SessionsManager;
 use webfiori\ui\Anchor;
 use webfiori\ui\JsCode;
+use webfiori\framework\ui\WebPage;
 /**
  * A theme which is created to be used by the website https://ibrahim-binalshikh.me
  * 
@@ -21,48 +22,46 @@ class IbrahimTheme extends Theme {
                 . 'using Vue, Vuetify and WebFiori framework.');
         $this->setLicenseName('MIT Licesnse');
         $this->setVersion('1.0');
-        $langCode = WebFioriApp::getSiteConfig()->getPrimaryLanguage();
-        $session = SessionsManager::getActiveSession();
-        if ($session !== null) {
-            $langCode = SessionsManager::getActiveSession()->getLangCode(true);
-        }
-        Page::siteName(WebFioriApp::getSiteConfig()->getWebsiteNames()[$langCode]);
-        Page::beforeRender(function ($theme) {
+        
+        $this->setAfterLoaded(function (IbrahimTheme $theme) {
+            $page = $theme->getPage();
+            $page->addBeforeRender(function (WebPage $page, IbrahimTheme $theme) {
             
-            $gta = $theme->getGta();
-            if ($gta !== null) {
-                Page::document()->getBody()->insert($gta, 0);
-            }
-            
-            $appDiv = new HTMLNode('div', [
-                'id' => 'app'
-            ]);
-            $vApp = new HTMLNode('v-app');
-            $appDiv->addChild($vApp);
-            $appDiv->addChild($appDiv);
-            $body = Page::document()->getChildByID('page-body');
-            $body->setNodeName('v-main');
-            
-            $header = Page::document()->getChildByID('page-header');
-            $footer = Page::document()->getChildByID('page-footer');
-            $vApp->addChild($header);
-            $vApp->addChild($body);
-            $sideMenu = $body->getChildByID('side-content-area');
-            $body->removeChild($sideMenu);
-            $vApp->addChild($sideMenu);
-            $vApp->addChild($footer);
-            Page::document()->removeChild($header);
-            Page::document()->removeChild($body);
-            Page::document()->removeChild($footer);
-            Page::document()->addChild($appDiv);
-            Page::document()->getChildByID('main-content-area')->setClassName('container');
-        }, [$this]);
-        Page::beforeRender(function() {
-            Page::document()->getBody()->addChild('script', [
-                'type' => 'text/javascript',
-                'src' => 'assets/ibrahim/default.js',
-                'id' => 'default-vue-init'
-            ]);
+                $gta = $theme->getGta();
+                if ($gta !== null) {
+                    Page::document()->getBody()->insert($gta, 0);
+                }
+
+                $appDiv = new HTMLNode('div', [
+                    'id' => 'app'
+                ]);
+                $vApp = new HTMLNode('v-app');
+                $appDiv->addChild($vApp);
+                $appDiv->addChild($appDiv);
+                $body = $page->getChildByID('page-body');
+                $body->setNodeName('v-main');
+
+                $header = $page->getChildByID('page-header');
+                $footer = $page->getChildByID('page-footer');
+                $vApp->addChild($header);
+                $vApp->addChild($body);
+                $sideMenu = $body->getChildByID('side-content-area');
+                $body->removeChild($sideMenu);
+                $vApp->addChild($sideMenu);
+                $vApp->addChild($footer);
+                $page->getDocument()->removeChild($header);
+                $page->getDocument()->removeChild($body);
+                $page->getDocument()->removeChild($footer);
+                $page->getDocument()->addChild($appDiv);
+                $page->getDocument()->getChildByID('main-content-area')->setClassName('container');
+            }, [$theme]);
+            $page->addBeforeRender(function (WebPage $page) {
+                $page->getDocument()->getBody()->addChild('script', [
+                    'type' => 'text/javascript',
+                    'src' => 'assets/ibrahim/default.js',
+                    'id' => 'default-vue-init'
+                ]);
+            });
         });
     }
 

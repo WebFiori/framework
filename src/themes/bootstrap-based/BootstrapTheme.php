@@ -18,21 +18,23 @@ class BootstrapTheme extends Theme {
         $this->setVersion('1.0');
         $this->setAuthor('Ibrahim');
         $this->setName('Bootstrap Theme');
-        $this->setAfterLoaded(function()
+        $this->setAfterLoaded(function(Theme $theme)
         {
-            Page::document()->getChildByID('page-body')->setClassName('row');
-            Page::document()->getBody()->setClassName('container-fluid');
-            Page::document()->getChildByID('main-content-area')->setClassName('col');
+            $page = $theme->getPage();
+            
+            $page->getChildByID('page-body')->setClassName('row');
+            $page->getDocument()->getBody()->setClassName('container-fluid');
+            $page->getChildByID('main-content-area')->setClassName('col');
             $breadCrump = new HTMLNode('nav');
             $breadCrump->setClassName('col');
-            Page::document()->getChildByID('main-content-area')->addChild($breadCrump);
+            $page->getChildByID('main-content-area')->addChild($breadCrump);
             $breadCrump->setAttribute('aria-label', 'breadcrumb');
             $olBr = new HTMLNode('ol');
             $olBr->setClassName('breadcrumb');
             $breadCrump->addChild($olBr);
             $li = new ListItem();
             $li->setAttribute('aria-current', 'page');
-            $li->addTextNode(Page::title());
+            $li->addTextNode($page->getTitle());
             $li->setClassName('breadcrumb-item active');
             $olBr->addChild($li);
         });

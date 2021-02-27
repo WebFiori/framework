@@ -34,14 +34,14 @@ class WebFioriTheme extends Theme {
         $this->setBeforeLoaded(function(){
             LangExt::extLang();
         });
-        $this->setAfterLoaded(function()
+        $this->setAfterLoaded(function(Theme $theme)
         {
-            Page::document()->getChildByID('main-content-area')->setClassName('wf-'.Page::dir().'-col-10');
-            Page::document()->getChildByID('side-content-area')->setClassName('wf-'.Page::dir().'-col-2');
-            Page::document()->getChildByID('page-body')->setClassName('wf-row');
-            Page::document()->getChildByID('page-header')->setClassName('wf-row-np');
-            Page::document()->getChildByID('page-footer')->setClassName('wf-row');
-            Page::siteName(WebFioriApp::getSiteConfig()->getWebsiteNames()[Page::lang()]);
+            $page = $theme->getPage();
+            $page->getChildByID('main-content-area')->setClassName('wf-'.Page::dir().'-col-10');
+            $page->getChildByID('side-content-area')->setClassName('wf-'.Page::dir().'-col-2');
+            $page->getChildByID('page-body')->setClassName('wf-row');
+            $page->getChildByID('page-header')->setClassName('wf-row-np');
+            $page->getChildByID('page-footer')->setClassName('wf-row');
             
         });
     }

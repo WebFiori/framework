@@ -748,12 +748,12 @@ class Page {
 
         if ($this->theme !== null) {
             if ($themeNameOrClass != $this->theme->getName()) {
-                $tmpTheme = ThemeLoader::usingTheme($themeNameOrClass);
+                $tmpTheme = ThemeLoader::usingTheme(null, $themeNameOrClass);
             } else {
                 return;
             }
         } else {
-            $tmpTheme = ThemeLoader::usingTheme($themeNameOrClass);
+            $tmpTheme = ThemeLoader::usingTheme(null, $themeNameOrClass);
         }
 
         return $tmpTheme;

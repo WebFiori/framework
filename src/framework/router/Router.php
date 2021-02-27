@@ -37,6 +37,7 @@ use webfiori\http\Response;
 use webfiori\http\WebServicesManager;
 use webfiori\json\Json;
 use webfiori\ui\HTMLNode;
+use webfiori\framework\ui\WebPage;
 /**
  * The basic class that is used to route user requests to the correct 
  * location.
@@ -1030,6 +1031,8 @@ class Router {
                             define('API_CALL', true);
                         }
                         $instance->process();
+                    } else if ($instance instanceof WebPage) {
+                        $instance->render();
                     }
                 }
             }
@@ -1146,6 +1149,8 @@ class Router {
 
                 if ($class instanceof WebServicesManager) {
                     $class->process();
+                } else if ($class instanceof WebPage) {
+                    $class->render();
                 }
             } else {
                 $routeType = $route->getType();

@@ -36,7 +36,7 @@ use webfiori\json\JsonI;
  * 
  * @author Ibrahim
  * 
- * @version 1.1.8
+ * @version 1.1.9
  */
 class File implements JsonI {
     /**
@@ -653,6 +653,16 @@ class File implements JsonI {
         return $retVal;
     }
     /**
+     * Appends a string of data to the already existing data.
+     * 
+     * @param string $data A string that represents the extra data.
+     * 
+     * @since 1.1.9
+     */
+    public function append($data) {
+        $this->rawData .= $data;
+    }
+    /**
      * Sets the binary representation of the file.
      * 
      * The raw data is simply a string. It can be binary string or any basic 
@@ -914,12 +924,14 @@ class File implements JsonI {
                 Util::isDirectory($this->getDir(), true);
                 $resource = $this->_createResource('wb', $fPath);
             } else {
-                throw new FileException("File not found: '$fPath'."); 
+                throw new FileException("File not found: '$fPath'.");
             }
-        } else if ($append) {
-            $resource = $this->_createResource('ab', $fPath);
         } else {
-            $resource = $this->_createResource('rb+', $fPath);
+            if ($append) {
+                $resource = $this->_createResource('ab', $fPath);
+            } else {
+                $resource = $this->_createResource('rb+', $fPath);
+            }
         }
 
         if (!is_resource($resource)) {

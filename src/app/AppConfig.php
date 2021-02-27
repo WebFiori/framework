@@ -1,6 +1,8 @@
 <?php
 namespace app;
 
+use webfiori\database\ConnectionInfo;
+use webfiori\framework\mail\SMTPAccount;
 use webfiori\http\Uri;
 /**
  * Configuration class of the application
@@ -75,8 +77,7 @@ class AppConfig {
      */
     private $dbConnections;
     /**
-     * An array that is used to hold default page titles 
-     * for different languages.
+     * An array that is used to hold default page titles for different languages.
      * 
      * @var array
      * 
@@ -91,6 +92,14 @@ class AppConfig {
      * @since 1.0
      */
     private $descriptions;
+    /**
+     * An array that holds SMTP connections information.
+     * 
+     * @var array
+     * 
+     * @since 1.0 
+     */
+    private $emailAccounts;
     /**
      * The URL of the home page.
      * 
@@ -120,30 +129,95 @@ class AppConfig {
     private $webSiteNames;
     /**
      * Creates new instance of the class.
+     * 
+     * @since 1.0
      */
     public function __construct() {
         $this->configVision = '1.0.0';
-        $this->webSiteNames = [
-            'EN' => 'WebFiori',
-            'AR' => 'ويب فيوري',
-        ];
-        $this->baseUrl = Uri::getBaseURL();
-        $this->titleSep = '|';
-        $this->primaryLang = 'EN';
-        $this->baseThemeName = 'WebFiori V108';
-        $this->adminThemeName = 'WebFiori V108';
-        $this->homePage = Uri::getBaseURL();
-        $this->descriptions = [
-            'EN' => '',
-            'AR' => '',
-        ];
-        $this->defaultPageTitles = [
-            'EN' => 'Hello World',
-            'AR' => 'أهلا بالعالم'
-        ];
-        $this->dbConnections = [
+        $this->initVersionInfo();
+        $this->initSiteInfo();
+        $this->initDbConnections();
+        $this->initSmtpConnections();
+    }
+    /**
+     * Adds an email account.
+     * 
+     * The developer can use this method to add new account during runtime.
+     * The account will be removed once the program finishes.
+     * 
+     * @param SMTPAccount $acc an object of type SMTPAccount.
+     * 
+     * @param string $name A name to associate with the email account.
+     * 
+     * @since 1.0
+     */
+    public function addAccount(SMTPAccount $acc,$name) {
+        $this->emailAccounts[$name] = $acc;
+    }
+    /**
+     * Adds new database connection or updates an existing one.
+     * 
+     * @param ConnectionInfo $connectionInfo an object of type 'ConnectionInfo'
+     * that will contain connection information.
+     * 
+     * @since 1.0
+     */
+    public function addDbConnection($connectionInfo) {
+        if ($connectionInfo instanceof ConnectionInfo) {
+            $this->dbConnections[$connectionInfo->getName()] = $connectionInfo;
+        }
+    }
+    /**
+     * Adds new SMTP connection information or updates an existing one.
+     * 
+     * @param string $accName The name of the account that will be added or updated.
+     * 
+     * @param SMTPAccount $smtpConnInfo An object of type 'SMTPAccount' that
+     * will contain SMTP account information.
+     * 
+     * @since 1.0
+     */
+    public static function addSMTPAccount($accName, $smtpConnInfo) {
+        if ($smtpConnInfo instanceof SMTPAccount) {
+            $trimmedName = trim($accName);
 
-        ];
+            if (strlen($trimmedName) != 0) {
+                self::get()->addAccount($smtpConnInfo, $trimmedName);
+            }
+        }
+    }
+    /**
+     * Returns SMTP account given its name.
+     * 
+     * The method will search for an account with the given name in the set
+     * of added accounts. If no account was found, null is returned.v     * 
+     * @param string $name The name of the account.
+     * 
+     * @return SMTPAccount|null If the account is found, The method
+     * will return an object of type SMTPAccount. Else, the
+     * method will return null.
+     * 
+     * @since 1.0
+     */
+    public function getAccount($name) {
+        if (isset($this->emailAccounts[$name])) {
+            return $this->emailAccounts[$name];
+        }
+
+        return null;
+    }
+    /**
+     * Returns an associative array that contains all email accounts.
+     * 
+     * The indices of the array will act as the names of the accounts.
+     * The value of the index will be an object of type EmailAccount.
+     * 
+     * @return array An associative array that contains all email accounts.
+     * 
+     * @since 1.0
+     */
+    public function getAccounts() {
+        return $this->emailAccounts;
     }
     /**
      * Returns the name of the theme that is used in admin control pages.
@@ -391,5 +465,52 @@ class AppConfig {
      */
     public function getWebsiteNames() {
         return $this->webSiteNames;
+    }
+    /**
+     * @since 1.0
+     */
+    private function initDbConnections() {
+        $this->dbConnections = [
+
+        ];
+    }
+    /**
+     * @since 1.0
+     */
+    private function initSiteInfo() {
+        $this->webSiteNames = [
+            'EN' => 'WebFiori',
+            'AR' => 'ويب فيوري',
+        ];
+        $this->defaultPageTitles = [
+            'EN' => 'Hello World',
+            'AR' => 'أهلا بالعالم'
+        ];
+        $this->descriptions = [
+            'EN' => '',
+            'AR' => '',
+        ];
+        $this->baseUrl = Uri::getBaseURL();
+        $this->titleSep = '|';
+        $this->primaryLang = 'EN';
+        $this->baseThemeName = 'WebFiori V108';
+        $this->adminThemeName = 'WebFiori V108';
+        $this->homePage = Uri::getBaseURL();
+    }
+    /**
+     * @since 1.0
+     */
+    private function initSmtpConnections() {
+        $this->emailAccounts = [
+
+        ];
+    }
+    /**
+     * @since 1.0
+     */
+    private function initVersionInfo() {
+        $this->appVestion = '1.0';
+        $this->appVersionType = 'Stable';
+        $this->appReleaseDate = '2021-01-10';
     }
 }

@@ -29,7 +29,7 @@ class Index {
                 define('ROOT_DIR', __DIR__);
             }
         }
-        require_once ROOT_DIR.DIRECTORY_SEPARATOR.'framework'.DIRECTORY_SEPARATOR.'WebFiori.php';
+        require_once ROOT_DIR.DIRECTORY_SEPARATOR.'framework'.DIRECTORY_SEPARATOR.'WebFioriApp.php';
         /**
          * This where magic will start.
          * 

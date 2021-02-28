@@ -266,9 +266,9 @@ class WebFioriTheme extends Theme {
     public function getHeadrNode() {
         $headerSec = HTMLNode::loadComponent($this->getDirecotry().'header.html', [
             'menu-labels' => Page::translation()->get('menus/main-menu'),
-            'home_link' => WebFioriApp::getSiteConfig()->getBaseURL(),
+            'home_link' => WebFioriApp::getAppConfig()->getBaseURL(),
             'dir' => Page::dir(),
-            'site_name' => WebFioriApp::getSiteConfig()->getWebsiteNames()[Page::lang()],
+            'site_name' => WebFioriApp::getAppConfig()->getWebsiteNames()[Page::lang()],
             'menu-links' => [
                 'm_1_link' => '#',
                 'm_2_link' => '#',

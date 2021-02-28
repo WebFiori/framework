@@ -106,13 +106,13 @@ class ServerErrView {
         return $node;
     }
     private function _getSiteName() {
-        $siteNames = WebFioriApp::getSiteConfig()->getWebsiteNames();
+        $siteNames = WebFioriApp::getAppConfig()->getWebsiteNames();
         $session = SessionsManager::getActiveSession();
 
         if ($session !== null) {
             $currentLang = $session->getLangCode(true);
         } else {
-            $currentLang = WebFioriApp::getSiteConfig()->getPrimaryLanguage();
+            $currentLang = WebFioriApp::getAppConfig()->getPrimaryLanguage();
         }
 
         if (isset($siteNames[$currentLang])) {
@@ -177,7 +177,7 @@ class ServerErrView {
         Page::reset();
         Page::title('Uncaught Exception');
         Page::siteName($this->_getSiteName());
-        Page::separator(WebFioriApp::getSiteConfig()->getTitleSep());
+        Page::separator(WebFioriApp::getAppConfig()->getTitleSep());
         Page::document()->getHeadNode()->addCSS(Util::getBaseURL().'/assets/css/server-err.css',[],false);
         $hNode = new HTMLNode('h1');
 

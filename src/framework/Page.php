@@ -62,6 +62,8 @@ use webfiori\ui\HTMLNode;
  * @author Ibrahim
  * 
  * @version 1.9.5
+ * 
+ * @deprecated since version 2.1 Use the class 'WebPage' instead.
  */
 class Page {
     /**
@@ -761,8 +763,8 @@ class Page {
     private function _reset() {
         $this->document = new HTMLDoc();
         $this->setTitle('Hello World');
-        $siteNames = WebFioriApp::getSiteConfig()->getWebsiteNames();
-        $primaryLang = WebFioriApp::getSiteConfig()->getPrimaryLanguage();
+        $siteNames = WebFioriApp::getAppConfig()->getWebsiteNames();
+        $primaryLang = WebFioriApp::getAppConfig()->getPrimaryLanguage();
         $this->setLang($primaryLang);
 
         if (isset($siteNames[$primaryLang])) {
@@ -771,7 +773,7 @@ class Page {
             $this->setWebsiteName('Hello Website');
         }
 
-        $siteDescriptions = WebFioriApp::getSiteConfig()->getDescriptions();
+        $siteDescriptions = WebFioriApp::getAppConfig()->getDescriptions();
 
         if (isset($siteDescriptions[$primaryLang])) {
             $this->setDescription($siteDescriptions[$primaryLang]);

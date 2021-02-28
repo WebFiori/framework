@@ -414,7 +414,7 @@ abstract class ExtendedWebServicesManager extends WebServicesManager {
         if ($activeSession !== null) {
             $tempCode = $activeSession->getLangCode(true);
         } else {
-            $tempCode = WebFioriApp::getSiteConfig()->getPrimaryLanguage();
+            $tempCode = WebFioriApp::getAppConfig()->getPrimaryLanguage();
         }
 
         if ($reqMeth == 'GET' || $reqMeth == 'DELETE') {

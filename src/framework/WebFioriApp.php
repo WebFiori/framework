@@ -124,16 +124,58 @@ class WebFioriApp {
          * first, check for php streams if they are open or not.
          */
         if (!defined('STDIN')) {
+            /**
+             * A constant that represents standard input stream of PHP.
+             * 
+             * The value of the constant is a 'resource' which can be used with 
+             * all file related PHP functions.
+             * 
+             */
             define('STDIN', fopen('php://stdin', 'r'));
         }
 
         if (!defined('STDOUT')) {
+            /**
+             * A constant that represents standard output stream of PHP.
+             * 
+             * The value of the constant is a 'resource' which can be used with 
+             * all file related PHP functions.
+             */
             define('STDOUT', fopen('php://stdout', 'w'));
         }
 
         if (!defined('STDERR')) {
+            /**
+             * A constant that represents standard error output stream of PHP.
+             * 
+             * The value of the constant is a 'resource' which can be used with 
+             * all file related PHP functions.
+             * 
+             */
             define('STDERR',fopen('php://stderr', 'w'));
         }
+        /**
+         * A constant that represents version number of the framework.
+         * 
+         * @since 2.1
+         */
+        define('WF_VERSION', '2.1.0');
+        /**
+         * A constant that tells the type of framework version.
+         * 
+         * The constant can have values such as 'Alpha', 'Beta' or 'Stable'.
+         * 
+         * @since 2.1
+         */
+        define('WF_VERSION_TYPE', 'Beta 1');
+        /**
+         * The date at which the framework version was released.
+         * 
+         * The value of the constant will be a string in the format YYYY-MM-DD.
+         * 
+         * @since 2.1
+         */
+        define('WF_RELEASE_DATE', '2021-03-01');
         /**
          * Change encoding of mb_ functions to UTF-8
          */
@@ -184,11 +226,8 @@ class WebFioriApp {
         self::$SF = ConfigController::get();
 
         $this->sysStatus = Util::checkSystemStatus();
-
+        
         if ($this->sysStatus == Util::MISSING_CONF_FILE || $this->sysStatus == Util::MISSING_SITE_CONF_FILE) {
-            self::$SF->createConfigFile();
-            self::$SF->createSiteConfigFile();
-            self::$SF->createEmailConfigFile();
             self::$SF->createAppConfigFile();
             $this->sysStatus = Util::checkSystemStatus();
         }
@@ -323,26 +362,6 @@ class WebFioriApp {
     public static function getClassStatus() {
         return self::$classStatus;
     }
-
-    /**
-     * Returns an instance of the class 'Config'.
-     * 
-     * The class will contain some of framework settings in addition to 
-     * database connection information.
-     * 
-     * @return Config|null If class file is exist and the class is loaded, 
-     * an object of type 'Config' is returned. Other than that, the method 
-     * will return null.
-     * 
-     * @since 1.3.3
-     */
-    public static function getConfig() {
-        if (class_exists('webfiori\conf\Config')) {
-            return Config::get();
-        }
-
-        return null;
-    }
     /**
      * Returns an associative array that contains database connection error 
      * information.
@@ -358,42 +377,6 @@ class WebFioriApp {
      */
     public static function getDBErrDetails() {
         return self::getAndStart()->dbErrDetails;
-    }
-    /**
-     * Returns an instance of the class 'MailConfig'.
-     * 
-     * The class will contain SMTP accounts information.
-     * 
-     * @return MailConfig|null If class file is exist and the class is loaded, 
-     * an object of type 'MailConfig' is returned. Other than that, the method 
-     * will return null.
-     * 
-     * @since 1.3.3
-     */
-    public static function getMailConfig() {
-        if (class_exists('webfiori\conf\MailConfig')) {
-            return MailConfig::get();
-        }
-
-        return null;
-    }
-    /**
-     * Returns an instance of the class 'SiteConfig'.
-     * 
-     * The class will contain website settings such as main language and theme.
-     * 
-     * @return SiteConfig|null If class file is exist and the class is loaded, 
-     * an object of type 'SiteConfig' is returned. Other than that, the method 
-     * will return null.
-     * 
-     * @since 1.3.3
-     */
-    public static function getSiteConfig() {
-        if (class_exists('webfiori\conf\SiteConfig')) {
-            return SiteConfig::get();
-        }
-
-        return null;
     }
     /**
      * Returns a reference to an instance of 'ConfigController'.

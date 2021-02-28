@@ -295,7 +295,11 @@ class WebFioriApp {
      * @return AppConfig
      */
     public static function getAppConfig() {
-        return self::$LC->appConfig;
+        if (self::$LC !== null) {
+            return self::$LC->appConfig;
+        }
+
+        return new AppConfig();
     }
     /**
      * Returns a reference to an instance of 'AutoLoader'.

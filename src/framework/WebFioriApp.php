@@ -171,7 +171,7 @@ class WebFioriApp {
 
         //Initialize CLI
         CLI::init();
-        $this->appConfig = new AppConfig();
+        
 
         $this->_initThemesPath();
         $this->_setHandlers();
@@ -189,9 +189,12 @@ class WebFioriApp {
             self::$SF->createConfigFile();
             self::$SF->createSiteConfigFile();
             self::$SF->createEmailConfigFile();
+            self::$SF->createAppConfigFile();
             $this->sysStatus = Util::checkSystemStatus();
         }
 
+        $this->appConfig = new AppConfig();
+        
         if (gettype($this->sysStatus) == 'array') {
             $this->dbErrDetails = $this->sysStatus;
             $this->sysStatus = Util::DB_NEED_CONF;

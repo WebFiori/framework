@@ -44,17 +44,17 @@ class VersionCommand extends CLICommand {
                 'color' => 'light-blue',
                 'bold' => true
             ]);
-            $this->println(WebFioriApp::getConfig()->getVersion());
+            $this->println(WF_VERSION);
             $this->prints("Release Date: ", [
                 'color' => 'light-blue',
                 'bold' => true
             ]);
-            $this->println(WebFioriApp::getConfig()->getReleaseDate());
+            $this->println(WF_RELEASE_DATE);
             $this->prints("Version Type: ", [
                 'color' => 'light-blue',
                 'bold' => true
             ]);
-            $this->println(WebFioriApp::getConfig()->getVersionType());
+            $this->println(WF_VERSION_TYPE);
         } else {
             $this->println(
                  "|\                /|                          \n"
@@ -73,7 +73,7 @@ class VersionCommand extends CLICommand {
                 'bold' => true
             ]);
             $this->prints(' (c) Version ');
-            $this->println(WebFioriApp::getConfig()->getVersion()." ".WebFioriApp::getConfig()->getVersionType()."\n\n", [
+            $this->println(WF_VERSION." ".WF_VERSION_TYPE."\n\n", [
                 'color' => 'light-yellow',
                 'bold' => true
             ]);

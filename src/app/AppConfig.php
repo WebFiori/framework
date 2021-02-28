@@ -1,6 +1,6 @@
 <?php
-namespace app;
 
+namespace app;
 use webfiori\database\ConnectionInfo;
 use webfiori\framework\mail\SMTPAccount;
 use webfiori\http\Uri;
@@ -8,9 +8,9 @@ use webfiori\http\Uri;
  * Configuration class of the application
  *
  * @author Ibrahim
- * 
+ *
  * @version 1.0
- * 
+ *
  * @since 2.1.0
  */
 class AppConfig {
@@ -27,7 +27,7 @@ class AppConfig {
      * 
      * @var string
      * 
-     * @since 1.0 
+     * @since 1.0
      */
     private $appReleaseDate;
     /**
@@ -35,7 +35,7 @@ class AppConfig {
      * 
      * @var string
      * 
-     * @since 1.0 
+     * @since 1.0
      */
     private $appVersionType;
     /**
@@ -43,7 +43,7 @@ class AppConfig {
      * 
      * @var string
      * 
-     * @since 1.0 
+     * @since 1.0
      */
     private $appVestion;
     /**
@@ -73,7 +73,9 @@ class AppConfig {
     /**
      * An associative array that will contain database connections.
      * 
-     * @var type
+     * @var array
+     * 
+     * @since 1.0
      */
     private $dbConnections;
     /**
@@ -81,23 +83,15 @@ class AppConfig {
      * 
      * @var array
      * 
-     * @since 1.0 
+     * @since 1.0
      */
     private $defaultPageTitles;
     /**
-     * An array which contains different descriptions in different languages.
+     * An array that holds SMTP connections information.
      * 
      * @var string
      * 
      * @since 1.0
-     */
-    private $descriptions;
-    /**
-     * An array that holds SMTP connections information.
-     * 
-     * @var array
-     * 
-     * @since 1.0 
      */
     private $emailAccounts;
     /**
@@ -110,10 +104,15 @@ class AppConfig {
     private $homePage;
     /**
      * The primary language of the website.
+     * 
+     * @var string
+     * 
+     * @since 1.0
      */
     private $primaryLang;
     /**
-     *
+     * The character which is used to saperate site name from page title.
+     * 
      * @var string
      * 
      * @since 1.0
@@ -147,10 +146,9 @@ class AppConfig {
      * 
      * @param SMTPAccount $acc an object of type SMTPAccount.
      * 
-     * 
      * @since 1.0
      */
-    public function addAccount(SMTPAccount $acc) {
+     public function addAccount(SMTPAccount $acc) {
         $this->emailAccounts[$acc->getAccountName()] = $acc;
     }
     /**
@@ -161,16 +159,15 @@ class AppConfig {
      * 
      * @since 1.0
      */
-    public function addDbConnection($connectionInfo) {
-        if ($connectionInfo instanceof ConnectionInfo) {
-            $this->dbConnections[$connectionInfo->getName()] = $connectionInfo;
-        }
+    public function addDbConnection(ConnectionInfo $connectionInfo) {
+        $this->dbConnections[$connectionInfo->getName()] = $connectionInfo;
     }
     /**
      * Returns SMTP account given its name.
      * 
      * The method will search for an account with the given name in the set
      * of added accounts. If no account was found, null is returned.
+     * 
      * @param string $name The name of the account.
      * 
      * @return SMTPAccount|null If the account is found, The method
@@ -183,8 +180,6 @@ class AppConfig {
         if (isset($this->emailAccounts[$name])) {
             return $this->emailAccounts[$name];
         }
-
-        return null;
     }
     /**
      * Returns an associative array that contains all email accounts.
@@ -237,8 +232,7 @@ class AppConfig {
     /**
      * Returns version number of the configuration file.
      * 
-     * This value can be used to check for the compatability of configuration
-     * file
+     * This value can be used to check for the compatability of configuration file
      * 
      * @return string The version number of the configuration file.
      * 
@@ -261,18 +255,16 @@ class AppConfig {
     public function getDBConnection($conName) {
         $conns = $this->getDBConnections();
         $trimmed = trim($conName);
-
+        
         if (isset($conns[$trimmed])) {
             return $conns[$trimmed];
         }
-
-        return null;
     }
     /**
      * Returns an associative array that contain the information of database connections.
      * 
-     * The keys of the array will be the name of database connection and the value of
-     * each key will be an object of type ConnectionInfo.
+     * The keys of the array will be the name of database connection and the
+     * value of each key will be an object of type ConnectionInfo.
      * 
      * @return array An associative array.
      * 
@@ -282,13 +274,13 @@ class AppConfig {
         return $this->dbConnections;
     }
     /**
-     * Returns the global title of the web site that will be 
+     * Returns the global title of the web site that will be
      * used as default page title.
      * 
      * @param string $langCode Language code such as 'AR' or 'EN'.
      * 
-     * @return string|null If the title of the page 
-     * does exist in the given language, the method will return it. 
+     * @return string|null If the title of the page
+     * does exist in the given language, the method will return it.
      * If no such title, the method will return null.
      * 
      * @since 1.0
@@ -296,16 +288,15 @@ class AppConfig {
     public function getDefaultTitle($langCode) {
         $langs = $this->getDefaultTitles();
         $langCodeF = strtoupper(trim($langCode));
-
+        
         if (isset($langs[$langCodeF])) {
             return $langs[$langCode];
         }
     }
     /**
-     * Returns an array that holds the default pages titles for different 
-     * languages.
+     * Returns an array that holds the default pages titles for different languages.
      * 
-     * @return array The indices of the array will be languages codes such as 
+     * @return array The indices of the array will be languages codes such as
      * 'AR' and the value at each index will be page title in that language.
      * 
      * @since 1.0
@@ -314,13 +305,13 @@ class AppConfig {
         return $this->defaultPageTitles;
     }
     /**
-     * Returns the global description of the web site that will be 
+     * Returns the global description of the web site that will be
      * used as default page description.
      * 
      * @param string $langCode Language code such as 'AR' or 'EN'.
      * 
-     * @return string|null If the description for the given language 
-     * does exist, the method will return it. If no such description, the 
+     * @return string|null If the description for the given language
+     * does exist, the method will return it. If no such description, the
      * method will return null.
      * 
      * @since 1.0
@@ -328,7 +319,6 @@ class AppConfig {
     public function getDescription($langCode) {
         $langs = $this->getDescriptions();
         $langCodeF = strtoupper(trim($langCode));
-
         if (isset($langs[$langCodeF])) {
             return $langs[$langCode];
         }
@@ -371,13 +361,25 @@ class AppConfig {
     /**
      * Returns the date at which the application was released at.
      * 
-     * @return string The method will return a string in the format 
+     * @return string The method will return a string in the format
      * 'YYYY-MM-DD' that represents application release date.
      * 
      * @since 1.0
      */
     public function getReleaseDate() {
         return $this->appReleaseDate;
+    }
+    /**
+     * Returns an array that holds the default page title for different display 
+     * languages.
+     * 
+     * @return array An associative array. The indices of the array are language codes 
+     * and the values are pages titles.
+     * 
+     * @since 1.0
+     */
+    public function getTitles() {
+        return $this->defaultPageTitles;
     }
     /**
      * Returns the character (or string) that is used to separate page title from website name.
@@ -393,7 +395,7 @@ class AppConfig {
     /**
      * Returns version number of the application.
      * 
-     * @return string The method should return a string in the 
+     * @return string The method should return a string in the
      * form 'x.x.x.x'.
      * 
      * @since 1.0
@@ -404,7 +406,7 @@ class AppConfig {
     /**
      * Returns a string that represents application release type.
      * 
-     * @return string The method will return a string such as 
+     * @return string The method will return a string such as
      * 'Stable', 'Alpha', 'Beta' and so on.
      * 
      * @since 1.0
@@ -417,8 +419,8 @@ class AppConfig {
      * 
      * @param string $langCode Language code such as 'AR' or 'EN'.
      * 
-     * @return string|null If the name of the website for the given language 
-     * does exist, the method will return it. If no such name, the 
+     * @return string|null If the name of the website for the given language
+     * does exist, the method will return it. If no such name, the
      * method will return null.
      * 
      * @since 1.0
@@ -426,7 +428,7 @@ class AppConfig {
     public function getWebsiteName($langCode) {
         $langs = $this->getWebsiteNames();
         $langCodeF = strtoupper(trim($langCode));
-
+        
         if (isset($langs[$langCodeF])) {
             return $langs[$langCode];
         }
@@ -449,7 +451,6 @@ class AppConfig {
      */
     private function initDbConnections() {
         $this->dbConnections = [
-
         ];
     }
     /**
@@ -460,19 +461,20 @@ class AppConfig {
             'EN' => 'WebFiori',
             'AR' => 'ويب فيوري',
         ];
+    
         $this->defaultPageTitles = [
-            'EN' => 'Hello World',
-            'AR' => 'أهلا بالعالم'
+            'EN' => 'WebFiori',
+            'AR' => 'ويب فيوري',
         ];
         $this->descriptions = [
-            'EN' => '',
-            'AR' => '',
+            'EN' => 'WebFiori',
+            'AR' => 'ويب فيوري',
         ];
         $this->baseUrl = Uri::getBaseURL();
-        $this->titleSep = '|';
+        $this->titleSep = ' | ';
         $this->primaryLang = 'EN';
-        $this->baseThemeName = 'WebFiori V108';
-        $this->adminThemeName = 'WebFiori V108';
+        $this->baseThemeName = \webfiori\theme\WebFioriV108::class;
+        $this->adminThemeName = \webfiori\theme\WebFioriV108::class;
         $this->homePage = Uri::getBaseURL();
     }
     /**
@@ -480,7 +482,6 @@ class AppConfig {
      */
     private function initSmtpConnections() {
         $this->emailAccounts = [
-
         ];
     }
     /**

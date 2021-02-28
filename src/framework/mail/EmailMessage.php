@@ -24,7 +24,7 @@
  */
 namespace webfiori\framework\mail;
 
-use webfiori\conf\MailConfig;
+use webfiori\framework\WebFioriApp;
 use webfiori\framework\ConfigController;
 use webfiori\framework\exceptions\SMTPException;
 use webfiori\framework\File;
@@ -62,7 +62,7 @@ class EmailMessage {
         $this->log = [];
 
         if (class_exists('webfiori\conf\MailConfig')) {
-            $acc = MailConfig::getAccount($sendAccountName);
+            $acc = WebFioriApp::getAppConfig()->getAccount($sendAccountName);
 
             if ($acc instanceof SMTPAccount) {
                 $this->socketMailer = ConfigController::get()->getSocketMailer($acc);

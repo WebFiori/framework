@@ -1,16 +1,11 @@
 <?php
 namespace webfiori\theme;
 
-use webfiori\ui\Anchor;
 use webfiori\ui\HeadNode;
 use webfiori\ui\HTMLNode;
 use webfiori\ui\Input;
 use webfiori\ui\Label;
-use webfiori\ui\ListItem;
 use webfiori\ui\PNode;
-use webfiori\ui\UnorderedList;
-use webfiori\conf\Config;
-use webfiori\conf\SiteConfig;
 use webfiori\framework\Page;
 use webfiori\framework\Theme;
 use webfiori\framework\WebFioriApp;
@@ -241,8 +236,8 @@ class WebFioriTheme extends Theme {
 
     public function getFooterNode() {
         $node = HTMLNode::loadComponent($this->getDirecotry().'footer.html', [
-            'version' => Config::getVersion(),
-            'version_type' => Config::getVersionType(),
+            'version' => WF_VERSION,
+            'version_type' => WF_VERSION_TYPE,
             'writing_dir' => Page::dir(),
             'contact_phone' => '013 xxx xxxx',
             'copyright' => 'All Rights Reserved',
@@ -256,7 +251,6 @@ class WebFioriTheme extends Theme {
 
     public function getHeadNode() {
         $headTag = new HeadNode();
-        $headTag->setBase(SiteConfig::getBaseURL());
         $headTag->addLink('icon', 'favicon.png');
         $headTag->addMeta('robots', 'index, follow');
 

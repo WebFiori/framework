@@ -25,9 +25,6 @@
 namespace webfiori\framework;
 
 use app\AppConfig;
-use webfiori\conf\Config;
-use webfiori\conf\MailConfig;
-use webfiori\conf\SiteConfig;
 use webfiori\framework\cli\CLI;
 use webfiori\framework\exceptions\InitializationException;
 use webfiori\framework\middleware\MiddlewareManager;

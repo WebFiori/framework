@@ -2,7 +2,7 @@
 namespace webfiori\tests\entity;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\conf\SiteConfig;
+use webfiori\framework\WebFioriApp;
 use webfiori\framework\Theme;
 use webfiori\framework\ThemeLoader;
 /**
@@ -22,7 +22,7 @@ class ThemeTest extends TestCase {
         $theme = ThemeLoader::usingTheme();
         $j = $theme->toJSON();
         $j->setPropsStyle('camel');
-        $this->assertEquals('{"themesPath":"'. \webfiori\json\Json::escapeJSONSpecialChars(THEMES_PATH).'", "name":"'.SiteConfig::getBaseThemeName().'", "url":"https:\/\/ibrahim-2017.blogspot.com\/", "license":"MIT License", "licenseUrl":"https:\/\/opensource.org\/licenses\/MIT", "version":"1.0", "author":"Ibrahim Ali", "authorUrl":"", "imagesDirName":"images", "themeDirName":"webfiori-v1.0.8", "cssDirName":"css", "jsDirName":"js", "components":[]}',$j.'');
+        $this->assertEquals('{"themesPath":"'. \webfiori\json\Json::escapeJSONSpecialChars(THEMES_PATH).'", "name":"'.WebFioriApp::getAppConfig()->getBaseThemeName().'", "url":"https:\/\/ibrahim-2017.blogspot.com\/", "license":"MIT License", "licenseUrl":"https:\/\/opensource.org\/licenses\/MIT", "version":"1.0", "author":"Ibrahim Ali", "authorUrl":"", "imagesDirName":"images", "themeDirName":"webfiori-v1.0.8", "cssDirName":"css", "jsDirName":"js", "components":[]}',$j.'');
     }
     /**
      * @test
@@ -48,7 +48,7 @@ class ThemeTest extends TestCase {
         $theme = ThemeLoader::usingTheme();
         $this->assertTrue($theme instanceof Theme);
         $this->assertEquals('WebFiori V108',$theme->getName());
-        $this->assertEquals(SiteConfig::getBaseURL(),$theme->getBaseURL());
+        $this->assertEquals(WebFioriApp::getAppConfig()->getBaseURL(),$theme->getBaseURL());
         $theme->setBaseURL('https://example.com/x');
         $this->assertEquals('https://example.com/x',$theme->getBaseURL());
     }

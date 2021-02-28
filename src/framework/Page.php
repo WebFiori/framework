@@ -25,7 +25,6 @@
 namespace webfiori\framework;
 
 use Exception;
-use webfiori\conf\SiteConfig;
 use webfiori\framework\exceptions\UIException;
 use webfiori\framework\i18n\Language;
 use webfiori\framework\session\SessionsManager;
@@ -698,7 +697,7 @@ class Page {
             $headNode = new HeadNode(
                 $this->getTitle().$this->getTitleSep().$this->getWebsiteName(),
                 $this->getCanonical(),
-                SiteConfig::getBaseURL()
+                WebFioriApp::getAppConfig()->getBaseURL()
             );
         } else {
             $headNode = $loadedTheme->getHeadNode();
@@ -710,7 +709,7 @@ class Page {
         }
         $headNode->addMeta('charset','UTF-8',true);
         $headNode->setTitle($this->getTitle().$this->getTitleSep().$this->getWebsiteName());
-        $headNode->setBase(SiteConfig::getBaseURL());
+        $headNode->setBase(WebFioriApp::getAppConfig()->getBaseURL());
         $headNode->setCanonical($this->getCanonical());
 
         if ($this->getDescription() != null) {
@@ -739,7 +738,7 @@ class Page {
     }
     private function _loadByThemeName($themeNameOrClass) {
         if ($themeNameOrClass === null && $this->theme === null) {
-            $themeNameOrClass = SiteConfig::getBaseThemeName();
+            $themeNameOrClass = WebFioriApp::getAppConfig()->getBaseURL();
         } else {
             $themeNameOrClass = trim($themeNameOrClass);
 

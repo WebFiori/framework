@@ -24,7 +24,7 @@
  */
 namespace webfiori\framework;
 
-use webfiori\conf\Config;
+use webfiori\framework\WebFioriApp;
 use webfiori\database\ConnectionInfo;
 use webfiori\database\Database;
 use webfiori\database\DatabaseException;
@@ -62,7 +62,7 @@ class DB extends Database {
 
             return;
         }
-        $conn = Config::getDBConnection($connName);
+        $conn = WebFioriApp::getAppConfig()->getDBConnection($connName);
 
         if (!($conn instanceof ConnectionInfo)) {
             throw new DatabaseException("No connection was found which has the name '$connName'.");

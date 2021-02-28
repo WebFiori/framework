@@ -24,7 +24,6 @@
  */
 namespace webfiori\framework;
 
-use webfiori\conf\Config;
 use webfiori\framework\cli\CLI;
 use webfiori\framework\ui\MessageBox;
 use webfiori\http\Response;
@@ -182,48 +181,6 @@ class Util {
         }
 
         return false;
-    }
-    /**
-     * Test a connection to system database or external one.
-     * 
-     * @param array $dbAttrs An associative array. The array can 
-     * have 4 indices:
-     * <ul>
-     * <li><b>host</b>: The name of database host. It can be a URL, an IP address 
-     * or 'localhost'.</li>
-     * <li><b>user</b>: The username of the user that will be used to connect to 
-     * the database.</li>
-     * <li><b>pass</b>: The password of the user.</li>
-     * <li><b>db-name</b>: The name of the database.</li>
-     * </ul>
-     * If the given parameter is not provided, the method will try to test 
-     * database settings that where set in the class 'Config'.
-     * 
-     * @return boolean|string If the connection was established, the method will 
-     * return true. If no connection was established, the method will 
-     * return 'Util::DB_NEED_CONF'.
-     * 
-     * @since 1.3.2
-     */
-    public static function checkDbConnection($dbAttrs = []) {
-        $C = Config::get();
-        $host = isset($dbAttrs['host']) ? $dbAttrs['host'] : $C->getDBHost();
-        $user = isset($dbAttrs['user']) ? $dbAttrs['user'] : $C->getDBHost();
-        $pass = isset($dbAttrs['pass']) ? $dbAttrs['pass'] : $C->getDBHost();
-        $dbName = isset($dbAttrs['db-name']) ? $dbAttrs['db-name'] : $C->getDBHost();
-        self::$dbTestInstance = new DatabaseLink($host, $user, $pass);
-
-        if (self::$dbTestInstance->isConnected()) {
-            if (self::$dbTestInstance->setDB($dbName)) {
-                $returnValue = true;
-            } else {
-                $returnValue = Util::DB_NEED_CONF;
-            }
-        } else {
-            $returnValue = Util::DB_NEED_CONF;
-        }
-
-        return $returnValue;
     }
 
     /**

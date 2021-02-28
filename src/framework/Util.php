@@ -246,10 +246,14 @@ class Util {
 
         if (class_exists('webfiori\conf\Config')) {
             if (class_exists('webfiori\conf\SiteConfig')) {
-                if (WebFioriApp::getClassStatus() == 'INITIALIZING') {
-                    $returnValue = true;
+                if (class_exists('app\AppConfig')) {
+                    if (WebFioriApp::getClassStatus() == 'INITIALIZING') {
+                        $returnValue = true;
+                    } else {
+                        $returnValue = Util::NEED_CONF;
+                    }
                 } else {
-                    $returnValue = Util::NEED_CONF;
+                    $returnValue = Util::MISSING_SITE_CONF_FILE;
                 }
             } else {
                 $returnValue = Util::MISSING_SITE_CONF_FILE;

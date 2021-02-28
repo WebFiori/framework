@@ -160,6 +160,11 @@ class ConfigController {
             $this->writeConfig($confVars);
         }
     }
+    public function createAppConfigFile() {
+        if (!class_exists('app\AppConfig')) {
+            $this->writeAppConfig([]);
+        }
+    }
     /**
      * Creates the file 'Config.php' if it does not exist.
      * 
@@ -1208,7 +1213,92 @@ class ConfigController {
         $this->a($cFile, "     * @since 1.0");
         $this->a($cFile, "     */");
         $this->a($cFile, "    private function initSiteInfo() {");
+        
+        if (isset($appConfigArr['website-names']) && gettype($appConfigArr['website-names']) == 'array') {
+            $wNamesArr = $appConfigArr['website-names'];
+        } else {
+            $wNamesArr = $this->getWebsiteNames();
+        }
+        $this->a($cFile, "        \$this->webSiteNames = [");
+        foreach ($wNamesArr as $langCode => $name) {
+            $desc = str_replace("'", "\'", $name);
+            $this->a($cFile, "            '$langCode' => '$name',");
+        }
+        $this->a($cFile, "        ];");
         $this->a($cFile, "    ");
+        
+        if (isset($appConfigArr['titles']) && gettype($appConfigArr['titles']) == 'array') {
+            $titlesArr = $appConfigArr['titles'];
+        } else {
+            $titlesArr = $this->getTitles();
+        }
+        $this->a($cFile, "        \$this->defaultPageTitles = [");
+        foreach ($wNamesArr as $langCode => $title) {
+            $desc = str_replace("'", "\'", $title);
+            $this->a($cFile, "            '$langCode' => '$title',");
+        }
+        $this->a($cFile, "        ];");
+        
+        if (isset($appConfigArr['descriptions']) && gettype($appConfigArr['descriptions']) == 'array') {
+            $descArr = $appConfigArr['descriptions'];
+        } else {
+            $descArr = $this->getDescriptions();
+        }
+        $this->a($cFile, "        \$this->descriptions = [");
+        foreach ($wNamesArr as $langCode => $desc) {
+            $desc = str_replace("'", "\'", $desc);
+            $this->a($cFile, "            '$langCode' => '$desc',");
+        }
+        $this->a($cFile, "        ];");
+        
+        $this->a($cFile, "        \$this->baseUrl = Uri::getBaseURL();");
+        
+        if (isset($appConfigArr['title-sep'])) {
+            $sep = $appConfigArr['title-sep'];
+        } else {
+            $sep = $this->getTitleSep();
+        }
+        $this->a($cFile, "        \$this->titleSep = '$sep';");
+        
+        if (isset($appConfigArr['primary-lang'])) {
+            $lang = $appConfigArr['primary-lang'];
+        } else {
+            $lang = $this->getPrimaryLang();
+        }
+        $this->a($cFile, "        \$this->primaryLang = '$lang';");
+        
+        if (isset($appConfigArr['base-theme'])) {
+            $baseTheme = $appConfigArr['base-theme'];
+        } else {
+            $baseTheme = $this->getBaseTheme();
+        }
+        if (class_exists($baseTheme)) {
+            $this->a($cFile, "        \$this->baseThemeName = $baseTheme;");
+        } else {
+            $this->a($cFile, "        \$this->baseThemeName = '$baseTheme';");
+        }
+        
+        if (isset($appConfigArr['admin-theme'])) {
+            $adminTheme = $appConfigArr['admin-theme'];
+        } else {
+            $adminTheme = $this->getBaseTheme();
+        }
+        if (class_exists($adminTheme)) {
+            $this->a($cFile, "        \$this->adminThemeName = $adminTheme;");
+        } else {
+            $this->a($cFile, "        \$this->adminThemeName = '$adminTheme';");
+        }
+        if (isset($appConfigArr['home-page'])) {
+            $this->a($cFile, "        \$this->homePage = '".$appConfigArr['home-page']."';");
+        } else {
+            $home = $this->getHomePage();
+            if ($home === null) {
+                $this->a($cFile, "        \$this->homePage = Uri::getBaseURL();");
+            } else {
+                $this->a($cFile, "        \$this->homePage = '$home';");
+            }
+        }
+        
         $this->a($cFile, "    }");
         
         $this->a($cFile, "    /**");
@@ -1246,6 +1336,62 @@ class ConfigController {
         $this->a($cFile, "    }");
         
         $this->a($cFile, "}");
+    }
+    public function getHomePage() {
+        if (class_exists('app\\AppConfig')) {
+            $c = new AppConfig();
+            return $c->getHomePage();
+        }
+        return null;
+    }
+    public function getAdminTheme() {
+        if (class_exists('app\\AppConfig')) {
+            $c = new AppConfig();
+            return $c->getAdminThemeName();
+        }
+        return self::DEFAULT_APP_CONFIG['site']['admin-theme-name'];
+    }
+    public function getBaseTheme() {
+        if (class_exists('app\\AppConfig')) {
+            $c = new AppConfig();
+            return $c->getBaseThemeName();
+        }
+        return self::DEFAULT_APP_CONFIG['site']['theme-name'];
+    }
+    public function getPrimaryLang() {
+        if (class_exists('app\\AppConfig')) {
+            $c = new AppConfig();
+            return $c->getPrimaryLanguage();
+        }
+        return self::DEFAULT_APP_CONFIG['site']['primary-language'];
+    }
+    public function getTitleSep() {
+        if (class_exists('app\\AppConfig')) {
+            $c = new AppConfig();
+            return $c->getTitleSep();
+        }
+        return self::DEFAULT_APP_CONFIG['site']['title-separator'];
+    }
+    public function getDescriptions() {
+        if (class_exists('app\\AppConfig')) {
+            $c = new AppConfig();
+            return $c->getDescriptions();
+        }
+        return self::DEFAULT_APP_CONFIG['site']['site-descriptions'];
+    }
+    public function getTitles() {
+        if (class_exists('app\\AppConfig')) {
+            $c = new AppConfig();
+            return $c->getWebsiteNames();
+        }
+        return self::DEFAULT_APP_CONFIG['site']['titles'];
+    }
+    public function getWebsiteNames() {
+        if (class_exists('app\\AppConfig')) {
+            $c = new AppConfig();
+            return $c->getWebsiteNames();
+        }
+        return self::DEFAULT_APP_CONFIG['site']['website-names'];
     }
     public function getDatabaseConnections() {
         if (class_exists('app\\AppConfig')) {

@@ -169,7 +169,7 @@ class ThemeLoader {
      */
     public static function usingTheme($page = null, $themeName = null) {
         if ($themeName === null) {
-            $themeName = WebFioriApp::getSiteConfig()->getBaseThemeName();
+            $themeName = WebFioriApp::getAppConfig()->getBaseThemeName();
         }
         $themeToLoad = null;
 

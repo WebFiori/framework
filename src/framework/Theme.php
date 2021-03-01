@@ -25,7 +25,6 @@
 namespace webfiori\framework;
 
 use ReflectionClass;
-use webfiori\conf\SiteConfig;
 use webfiori\json\Json;
 use webfiori\json\JsonI;
 use webfiori\ui\HTMLNode;
@@ -324,7 +323,7 @@ abstract class Theme implements JsonI {
         if ($this->baseUrl !== null) {
             return $this->baseUrl;
         } else {
-            return SiteConfig::getBaseURL();
+            return WebFioriApp::getAppConfig()->getBaseURL();
         }
     }
     /**

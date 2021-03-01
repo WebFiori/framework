@@ -23,7 +23,7 @@ class SampleService extends AbstractWebService {
         if ($manager instanceof ExtendedWebServicesManager) {
             $lang = $manager->getTranslation()->getCode();
         } else {
-            WebFioriApp::getSiteConfig()->getPrimaryLanguage();
+            WebFioriApp::getAppConfig()->getPrimaryLanguage();
         }
 
         if ($lang == 'AR') {

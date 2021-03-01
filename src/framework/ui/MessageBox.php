@@ -150,7 +150,7 @@ class MessageBox extends HTMLNode {
         $this->setAttribute('onmouseover', "if(this.getAttribute('dg') === null){addDragSupport(this)}");
 
         if (self::getCount() == 0) {
-            $base = WebFioriApp::getSiteConfig()->getBaseURL();
+            $base = WebFioriApp::getAppConfig()->getBaseURL();
             $css = new HTMLNode('link');
             $css->setAttributes([
                 'rel' => 'stylesheet',

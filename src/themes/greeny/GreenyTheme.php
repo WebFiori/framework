@@ -3,8 +3,7 @@ namespace webfiori\theme;
 
 use webfiori\ui\HeadNode;
 use webfiori\ui\HTMLNode;
-use webfiori\conf\Config;
-use webfiori\conf\SiteConfig;
+use webfiori\framework\WebFioriApp;
 use webfiori\framework\Page;
 use webfiori\framework\Theme;
 use webfiori\framework\session\SessionsManager;
@@ -70,24 +69,18 @@ class GreenyTheme extends Theme {
         $div = new HTMLNode('div');
         $div->setAttribute('class', 'pa-ltr-col-twelve');
         $div->addTextNode('<b style="color:gray;font-size:8pt;">Powered By: <a href="https://github.com/usernane/webfiori" '
-                .'target="_blank">WebFiori Framework</a> v'.Config::getVersion().' ('.Config::getVersionType().')</b>',false);
+                .'target="_blank">WebFiori Framework</a> v'.WF_VERSION.' ('.WF_VERSION_TYPE.')</b>',false);
         $fNode->addChild($div);
 
         return $node;
     }
 
     public function getHeadNode() {
-        $session = SessionsManager::getActiveSession();
-        $lang = $session->getLangCode(true);
-        Page::lang($lang);
         $headTag = new HeadNode();
-        $headTag->setBase(SiteConfig::getBaseURL());
+        $headTag->setBase(WebFioriApp::getAppConfig()->getBaseURL());
         $headTag->addLink('icon', Page::imagesDir().'/favicon.png');
-        $headTag->setCanonical(SiteConfig::getBaseURL().Page::canonical());
-
-        if (isset(SiteConfig::getWebsiteNames()[$lang])) {
-            Page::siteName(SiteConfig::getWebsiteNames()[$lang]);
-        }
+        $headTag->setCanonical(WebFioriApp::getAppConfig()->getBaseURL().Page::canonical());
+        
         $headTag->addMeta('robots', 'index, follow');
 
         return $headTag;

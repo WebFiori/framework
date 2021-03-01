@@ -5,7 +5,7 @@ use webfiori\framework\Page;
 use webfiori\ui\HTMLNode;
 use webfiori\framework\Theme;
 use webfiori\framework\i18n\Language;
-use webfiori\conf\SiteConfig;
+use webfiori\framework\WebFioriApp;
 /**
  * Description of PageTest
  *
@@ -186,7 +186,7 @@ class PageTest extends TestCase{
         Page::reset();
         $theme = Page::theme();
         $this->assertTrue($theme instanceof Theme);
-        $this->assertEquals(SiteConfig::getBaseThemeName(),$theme->getName());
+        $this->assertEquals(WebFioriApp::getAppConfig()->getBaseThemeName(),$theme->getName());
         $theme2 = Page::theme();
         $this->assertTrue($theme2 === $theme);
         $theme3 = Page::theme('Template Theme');

@@ -47,7 +47,7 @@ class CreateTable {
     public function __construct(CreateCommand $command) {
         $this->command = $command;
 
-        $dbConnections = array_keys(WebFioriApp::getConfig()->getDBConnections());
+        $dbConnections = array_keys(WebFioriApp::getAppConfig()->getDBConnections());
 
         if (count($dbConnections) != 0) {
             $dbConn = $this->_getCommand()->select('Select database connection:', $dbConnections, 0);

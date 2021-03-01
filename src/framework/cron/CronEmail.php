@@ -128,7 +128,7 @@ class CronEmail extends EmailMessage {
         $jobTable->addChild($this->_createTableRow('Check Started:', Cron::timestamp()));
         $jobTable->addChild($this->_createTableRow('Run Time:', date('Y-m-d H:i:s')));
         $jobTable->addChild($this->_createTableRow('PHP Version:', PHP_VERSION));
-        $jobTable->addChild($this->_createTableRow('Framework Version:', WebFioriApp::getConfig()->getVersion()));
+        $jobTable->addChild($this->_createTableRow('Framework Version:', WF_VERSION));
         $jobTable->addChild($this->_createTableRow('Root Directory:', ROOT_DIR));
 
         if ($job->isSuccess()) {

@@ -77,7 +77,7 @@ class AddCommand extends CLICommand {
         $connInfoObj->setUsername($this->getInput('Username:'));
         $connInfoObj->setPassword($this->getInput('Password:'));
         $connInfoObj->setDBName($this->getInput('Database name:'));
-        $connInfoObj->setName($this->getInput('Give your connection a friendly name:', 'db-connection-'.count(WebFioriApp::getConfig()->getDBConnections())));
+        $connInfoObj->setName($this->getInput('Give your connection a friendly name:', 'db-connection-'.count(WebFioriApp::getAppConfig()->getDBConnections())));
         $this->println('Trying to connect to the database...');
 
         $db = new DB($connInfoObj);
@@ -93,7 +93,7 @@ class AddCommand extends CLICommand {
 
         $this->success('Connected. Adding the connection...');
 
-        WebFioriApp::getSysController()->addOrUpdateDBConnections([$connInfoObj]);
+        WebFioriApp::getSysController()->addOrUpdateDBConnection($connInfoObj);
         $this->success('Connection information was stored in the class "webfiori\conf\Config".');
 
         return 0;
@@ -114,7 +114,8 @@ class AddCommand extends CLICommand {
             return 0;
         }
         $siteInfo['website-names'][$langCode] = $this->getInput('Name of the website in the new language:');
-        $siteInfo['site-descriptions'][$langCode] = $this->getInput('Description of the website in the new language:');
+        $siteInfo['descriptions'][$langCode] = $this->getInput('Description of the website in the new language:');
+        $siteInfo['titles'][$langCode] = $this->getInput('Default page title in the new language:');
         ConfigController::get()->updateSiteInfo($siteInfo);
         $this->success('Language added.');
     }
@@ -126,7 +127,7 @@ class AddCommand extends CLICommand {
         $smtpConn->setPassword($this->getInput('Password:'));
         $smtpConn->setAddress($this->getInput('Sender email address:', $smtpConn->getUsername()));
         $smtpConn->setSenderName($this->getInput('Sender name:', 'WebFiori Framework'));
-        $smtpConn->setAccountName($this->getInput('Give your connection a friendly name:', 'smtp-connection-'.count(WebFioriApp::getMailConfig()->getAccounts())));
+        $smtpConn->setAccountName($this->getInput('Give your connection a friendly name:', 'smtp-connection-'.count(WebFioriApp::getAppConfig()->getAccounts())));
         $this->println('Testing connection. This can take up to 1 minute...');
         $result = ConfigController::get()->getSocketMailer($smtpConn);
 

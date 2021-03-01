@@ -26,7 +26,7 @@ namespace webfiori\framework\router;
 
 use Error;
 use Exception;
-use webfiori\conf\SiteConfig;
+use webfiori\framework\WebFioriApp;
 use webfiori\framework\cli\CLI;
 use webfiori\framework\exceptions\RoutingException;
 use webfiori\framework\File;
@@ -184,7 +184,7 @@ class Router {
         };
 
         if (class_exists('webfiori\conf\SiteConfig')) {
-            $this->baseUrl = trim(SiteConfig::getBaseURL(), '/');
+            $this->baseUrl = trim(WebFioriApp::getAppConfig()->getBaseURL(), '/');
         } else {
             $this->baseUrl = trim(Util::getBaseURL(), '/');
         }

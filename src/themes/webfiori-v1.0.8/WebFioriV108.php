@@ -29,7 +29,7 @@ class WebFioriV108 extends Theme {
             if ($activeSession !== null) {
                 Page::lang($activeSession->getLangCode(true));
             } else {
-                Page::lang(WebFioriApp::getSiteConfig()->getPrimaryLanguage());
+                Page::lang(WebFioriApp::getAppConfig()->getPrimaryLanguage());
             }
         });
         $this->setAfterLoaded(function(Theme $theme)
@@ -261,7 +261,7 @@ class WebFioriV108 extends Theme {
         $footerLinksUl->getChild(2)->setClassName('nav-item ml-3');
         $footer->addChild($footerLinksUl);
         $powerdByNode = new HTMLNode('p');
-        $powerdByNode->addTextNode('Powered by: <a href="https://webfiori.com">WebFiori Framework</a> v'.WebFioriApp::getConfig()->getVersion().'. '
+        $powerdByNode->addTextNode('Powered by: <a href="https://webfiori.com">WebFiori Framework</a> v'.WF_VERSION.'. '
                 .'Code licensed under the <a href="https://opensource.org/licenses/MIT">MIT License</a>.', false);
         $footer->addChild($powerdByNode);
         $img = new HTMLNode('img');
@@ -303,7 +303,7 @@ class WebFioriV108 extends Theme {
             'alt' => 'logo',
             'style' => 'width:40px'
         ]);
-        $logoLink = new Anchor(WebFioriApp::getSiteConfig()->getHomePage(), $logo->toHTML());
+        $logoLink = new Anchor(WebFioriApp::getAppConfig()->getHomePage(), $logo->toHTML());
         $logoLink->setClassName('navbar-brand ml-3');
         $mainNav->addChild($logoLink);
 

@@ -30,7 +30,7 @@ use webfiori\framework\mail\SMTPAccount;
 use webfiori\framework\mail\SocketMailer;
 use webfiori\theme\WebFioriV108;
 use app\AppConfig;
-use webfiori\http\Uri;
+
 /**
  * A class that can be used to modify basic configuration settings of 
  * the web application. 
@@ -879,13 +879,14 @@ class ConfigController {
         foreach ($dbCons as $connObj) {
             if ($connObj instanceof ConnectionInfo) {
                 $cName = $connObj->getName();
-                $this->a($cFile, "        '$cName' => new ConnectionInfo('".$connObj->getDatabaseType()."',"
-                        . "'".$connObj->getUsername()."',"
-                        . "'".$connObj->getPassword()."',"
-                        . "'".$connObj->getDBName()."',"
-                        . "'".$connObj->getHost()."',"
-                        . "".$connObj->getPort().",");
-                $this->a($cFile, "        ['connection-name' => ".$cName."])");
+                $this->a($cFile, "            '$cName' => new ConnectionInfo('".$connObj->getDatabaseType()."',"
+                        . "'".$connObj->getUsername()."', "
+                        . "'".$connObj->getPassword()."', "
+                        . "'".$connObj->getDBName()."', "
+                        . "'".$connObj->getHost()."', "
+                        . "".$connObj->getPort().", [");
+                $this->a($cFile, "                'connection-name' => '". str_replace("'", "\'", $cName)."'");
+                $this->a($cFile, "            ]),");
             }
         }
         $this->a($cFile, "        ];");
@@ -903,7 +904,7 @@ class ConfigController {
         }
         $this->a($cFile, "        \$this->webSiteNames = [");
         foreach ($wNamesArr as $langCode => $name) {
-            $desc = str_replace("'", "\'", $name);
+            $name = str_replace("'", "\'", $name);
             $this->a($cFile, "            '$langCode' => '$name',");
         }
         $this->a($cFile, "        ];");
@@ -915,8 +916,8 @@ class ConfigController {
             $titlesArr = $this->getTitles();
         }
         $this->a($cFile, "        \$this->defaultPageTitles = [");
-        foreach ($wNamesArr as $langCode => $title) {
-            $desc = str_replace("'", "\'", $title);
+        foreach ($titlesArr as $langCode => $title) {
+            $title = str_replace("'", "\'", $title);
             $this->a($cFile, "            '$langCode' => '$title',");
         }
         $this->a($cFile, "        ];");
@@ -927,7 +928,7 @@ class ConfigController {
             $descArr = $this->getDescriptions();
         }
         $this->a($cFile, "        \$this->descriptions = [");
-        foreach ($wNamesArr as $langCode => $desc) {
+        foreach ($descArr as $langCode => $desc) {
             $desc = str_replace("'", "\'", $desc);
             $this->a($cFile, "            '$langCode' => '$desc',");
         }
@@ -997,11 +998,11 @@ class ConfigController {
             if ($smtpAcc instanceof SMTPAccount) {
                 $this->a($cFile, "            '".$smtpAcc->getAccountName()."' => new SMTPAccount([");
                 $this->a($cFile, "                'port' => ".$smtpAcc->getPort().",");
-                $this->a($cFile, "                'user' => ".$smtpAcc->getUsername().",");
-                $this->a($cFile, "                'pass' => ".$smtpAcc->getPassword().",");
-                $this->a($cFile, "                'sender-name' => ".$smtpAcc->getSenderName().",");
-                $this->a($cFile, "                'sender-address' => ".$smtpAcc->getAddress().",");
-                $this->a($cFile, "                'account-name' => ".$smtpAcc->getAccountName()."");
+                $this->a($cFile, "                'user' => ".$smtpAcc->getUsername()."',");
+                $this->a($cFile, "                'pass' => '".$smtpAcc->getPassword()."',");
+                $this->a($cFile, "                'sender-name' => '". str_replace("'", "\'", $smtpAcc->getSenderName())."',");
+                $this->a($cFile, "                'sender-address' => '".$smtpAcc->getAddress()."',");
+                $this->a($cFile, "                'account-name' => '". str_replace("'", "\'", $smtpAcc->getAccountName())."'");
                 $this->a($cFile, "            ]),");
             }
         }

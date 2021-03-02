@@ -38,6 +38,8 @@ use webfiori\json\Json;
 use webfiori\ui\HeadNode;
 use webfiori\ui\HTMLDoc;
 use webfiori\ui\HTMLNode;
+use webfiori\framework\session\SessionsManager;
+use webfiori\framework\session\Session;
 /**
  * A base class that can be used to implement web pages.
  *
@@ -1056,6 +1058,18 @@ class WebPage {
                 $this->document->setLanguage($langU);
             }
         }
+    }
+    /**
+     * Returns the session which is currently active.
+     * 
+     * @return Session|null If a session is active, the method will return its 
+     * data stored in an object. If no session is active, the method will return 
+     * null.
+     * 
+     * @since 1.0
+     */
+    public function getActiveSession() {
+        return SessionsManager::getActiveSession();
     }
     /**
      * Load the translation file based on the language code. 

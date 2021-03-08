@@ -245,6 +245,60 @@ class WebPage {
             return $callbacksCount - 1;
         }
     }
+    /**
+     * Adds new meta tag.
+     * 
+     * @param string $name The value of the property 'name'. Must be non empty 
+     * string.
+     * 
+     * @param string $content The value of the property 'content'.
+     * 
+     * @param boolean $override A boolean attribute. If a meta node was found 
+     * which has the given name and this attribute is set to true, 
+     * the content of the meta will be overridden by the passed value. 
+     * 
+     * @return HeadNote The method will return the instance at which the method 
+     * is called on.
+     * 
+     * @since 1.0
+     */
+    public function addMeta($name, $content, $override = false) {
+        $this->getDocument()->getHeadNode()->addMeta($name, $content, $override);
+    }
+    /**
+     * Adds new CSS source file.
+     * 
+     * @param string $href The link to the file. Must be non empty string. It is 
+     * possible to append query string to the end of the link.
+     * 
+     * @param $attrs An associative array of additional attributes 
+     * to set for the node.
+     * 
+     * @since 1.0
+     */
+    public function addCSS($href, array $attrs = []) {
+        if (!isset($attrs['revision'])) {
+            $attrs['revision'] = WebFioriApp::getAppConfig()->getVersion();
+        }
+        $this->getDocument()->getHeadNode()->addCSS($href, $attrs);
+    }
+    /**
+     * Adds new JavsScript source file.
+     * 
+     * @param string $src The location of the file. Must be non-empty string. It 
+     * can have query string at the end.
+     * 
+     * @param $attrs An associative array of additional attributes 
+     * to set for the JavaScript node.
+     * 
+     * @since 1.0
+     */
+    public function addJS($src, array $attrs = []) {
+        if (!isset($attrs['revision'])) {
+            $attrs['revision'] = WebFioriApp::getAppConfig()->getVersion();
+        }
+        $this->getDocument()->getHeadNode()->addJs($src, $attrs);
+    }
     public function get($label) {
         $langObj = $this->getTranslation();
 
@@ -964,7 +1018,7 @@ class WebPage {
 
                             if ($ext == 'js') {
                                 $page->getDocument()->getHeadNode()->addJs($fileBase.$fileName, [
-                                    'revision' => $sysV
+                                    'revision' => $pageTheme->getVersion()
                                 ]);
                             }
                         }
@@ -985,7 +1039,7 @@ class WebPage {
 
                             if ($ext == 'css') {
                                 $page->getDocument()->getHeadNode()->addCSS($fileBase.$fileName, [
-                                    'revision' => $sysV
+                                    'revision' => $pageTheme->getVersion()
                                 ]);
                             }
                         }

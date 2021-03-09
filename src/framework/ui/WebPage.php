@@ -38,7 +38,6 @@ use webfiori\json\Json;
 use webfiori\ui\HeadNode;
 use webfiori\ui\HTMLDoc;
 use webfiori\ui\HTMLNode;
-use webfiori\framework\session\SessionsManager;
 use webfiori\framework\session\Session;
 /**
  * A base class that can be used to implement web pages.
@@ -560,9 +559,33 @@ class WebPage {
         $footerNode = new HTMLNode();
         $footerNode->setID(self::MAIN_ELEMENTS[4]);
         $this->document->addChild($footerNode);
-        $this->includeLables = true;
+        $this->includeLables = false;
 
         $this->_resetBeforeLoaded();
+    }
+    /**
+     * Adds a child node inside the body of a node given its ID.
+     * 
+     * @param HTMLNode|string $node The node that will be inserted. Also, 
+     * this can be the tag name of the node such as 'div'.
+     * 
+     * @param string $parentNodeId The ID of the node that the given node 
+     * will be inserted to.
+     * 
+     * @return HTMLNode|null The method will return the inserted 
+     * node if it was inserted. If it is not, the method will return null.
+     * 
+     * @since 1.0
+     */
+    public function insert($node, $parentNodeId = self::MAIN_ELEMENTS[2]) {
+        if (gettype($node) == 'string') {
+            $node = new HTMLNode($node);
+        }
+        $parent = $this->getDocument()->getChildByID($parentNodeId);
+        if ($parent !== null) {
+            $parent->addChild($node);
+            return $node;
+        }
     }
     /**
      * Sets the canonical URL of the page.

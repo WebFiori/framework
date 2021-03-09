@@ -216,7 +216,8 @@ class WebPage {
      * page is displayed. It is possible to have multiple callbacks.
      * 
      * @param callback $callable A PHP function that will be get executed. before 
-     * the page is rendered.
+     * the page is rendered. Note that the first argument of the function will 
+     * always be an object of type "WebPage".
      * 
      * @param array $params An array of parameters which will be passed to the 
      * callback. The parameters can be accessed in the callback in the 
@@ -1134,6 +1135,7 @@ class WebPage {
             if ($this->document != null) {
                 $this->document->setLanguage($langU);
             }
+            $this->usingLanguage();
         }
     }
     /**

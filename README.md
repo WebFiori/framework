@@ -51,20 +51,19 @@ WebFiori Framework is a mini web development framework which is built using PHP 
 | [HTTP](https://github.com/WebFiori/http) | <a href="https://github.com/WebFiori/http/actions"><img src="https://github.com/WebFiori/http/workflows/Build%20PHP%207,8/badge.svg?branch=master"></a> | <a href="https://github.com/WebFiori/http/releases"><img src="https://img.shields.io/github/release/WebFiori/restEasy.svg" /></a> |
 | [Json](https://github.com/WebFiori/json) | <a href="https://github.com/WebFiori/json/actions"><img src="https://github.com/WebFiori/json/workflows/Build%20PHP%207,8/badge.svg?branch=master"></a> | <a href="https://github.com/WebFiori/json/releases"><img src="https://img.shields.io/github/release/WebFiori/json.svg" /></a> |
 | [UI](https://github.com/WebFiori/ui) | <a href="https://github.com/WebFiori/ui/actions"><img src="https://github.com/WebFiori/ui/workflows/Build%20PHP%207,8/badge.svg?branch=master"></a> | <a href="https://github.com/WebFiori/ui/releases"><img src="https://img.shields.io/github/release/WebFiori/ui.svg" /></a> |
-| [Collections](https://github.com/WebFiori/collections) | <a href="https://travis-ci.com/github/WebFiori/collections"><img src="https://travis-ci.com/WebFiori/collections.svg?branch=master"></a> | <a href="https://github.com/WebFiori/collections/releases"><img src="https://img.shields.io/github/release/WebFiori/collections.svg" /></a> |
+| [Collections](https://github.com/WebFiori/collections) | <a href="https://github.com/WebFiori/collections/actions"><img src="https://github.com/WebFiori/collections/workflows/Build%20PHP%207,8/badge.svg?branch=master"></a> | <a href="https://github.com/WebFiori/collections/releases"><img src="https://img.shields.io/github/release/WebFiori/collections.svg" /></a> |
 | [Database](https://github.com/WebFiori/database) | <a href="https://github.com/WebFiori/database/actions"><img src="https://github.com/WebFiori/database/workflows/Build%20PHP%207,8/badge.svg?branch=main"></a> | <a href="https://github.com/WebFiori/database/releases"><img src="https://img.shields.io/github/release/WebFiori/database.svg" /></a> |
 
 ## Problems Solved
 
 One of the things that any developer cares about any software project is the problem or problems it solves. As for WebFiori framework, It can help in solving the following problems:
-* It helps in making any one with Java background to write PHP code.
-* The ability to create a customized links to web pages as needed using routing.
-* No need for touching HTML to play with the DOM. Only use PHP.
-* Run PHP code as a CRON task through HTTP protocol or through terminal.
-* Changing whole user interface by changing one line of code.
+* The ability to create a customized links to web pages as needed ([Routing](https://webfiori.com/learn/routing)).
+* No need for touching HTML to play with the DOM ([Building UI](https://webfiori.com/learn/ui-package)).
+* Run PHP code as a CRON task through HTTP protocol or through terminal ([Background Jobs](https://webfiori.com/learn/background-tasks)).
+* Changing whole user interface by changing one line of code ([Theming](https://webfiori.com/learn/themes)).
 * Ability to move the source code of the web application without having to do a lot of re-configuration.
-* Sending HTML email messages with attachments without having to write a lot of code.
-* Solved the issues which are found in default PHP session management implementation.
+* Sending HTML email messages with attachments without having to write a lot of code ([Sending Emails](https://webfiori.com/learn/sending-emails)).
+* Solved the issues which are found in default PHP session management implementation ([Sessions Management](https://webfiori.com/learn/sessions-management)).
 * Reduce the number of dependencies at which a developer need to setup a web application.
 
 ## Getting Started 
@@ -78,7 +77,7 @@ To learn the basics of how to use the framework, please head on to https://webfi
 
 If you plan to test the framework on your local machine, the recomended way is to have AMP stack (Apache, MySQL and PHP). There are many available online. We suggest to use the ones that are offered by Bitnami. You can go to https://bitnami.com/stacks/infrastructure to check  the available options.
 
-After installing AMP stack, you can ethier use composer to install the framework or download it throgh https://webfiori.com/download. If you plan to use composer, then you must first download it from their website: https://getcomposer.org/download/. Once downloaded, place the `.phar` file in the folder `htdocs` or your server root. Once you do that, run the terminal in `htdocs` and run the following command: 
+After installing AMP stack, you can ethier use composer to install the framework or install it manually by download it throgh https://webfiori.com/download. If you plan to use composer, then you must first download composer from their website: https://getcomposer.org/download/. Once downloaded, place the `.phar` file in the folder `htdocs` or your server root. Once you do that, run the terminal in `htdocs` and run the following command: 
 
 ```
 php composer.phar create-project --prefer-dist webfiori/framework my-site
@@ -95,7 +94,6 @@ For information on how to contribute to the project, [check here](https://webfio
 ## Notes
 * This project is a hoppy project. 
 * The main aim of this project is learning.
-* The project is reletivly new and for sure has issues.
 * If you think that there is a better way of doing things or wants new feature, feel free to [drop an issue](https://github.com/WebFiori/framework/issues/new).
 * To report security vulnerabilities, please send an email to [ibrahim@webfiori.com](mailto:ibrahim@webfiori.com).
 

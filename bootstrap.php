@@ -1,6 +1,7 @@
 <?php
 
 use webfiori\framework\AutoLoader;
+use webfiori\framework\WebFioriApp;
 use webfiori\framework\cli\CLI;
 use webfiori\ini\GlobalConstants;
 $DS = DIRECTORY_SEPARATOR;
@@ -69,10 +70,8 @@ AutoLoader::get([
     'on-load-failure' => 'do-nothing'
 ]);
 fprintf(STDOUT,'Autoloader Initialized.'."\n");
-fprintf(STDOUT,"Defining global constants...\n");
-GlobalConstants::defineConstants();
-fprintf(STDOUT,'Initializing CLI of the Framework...'."\n");
-CLI::init();
+fprintf(STDOUT,"Initializing application...\n");
+WebFioriApp::start();
 fprintf(STDOUT,'Done.'."\n");
 fprintf(STDOUT,'Root Directory: \''.AutoLoader::get()->root().'\'.'."\n");
 

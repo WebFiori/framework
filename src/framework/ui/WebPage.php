@@ -368,6 +368,24 @@ class WebPage {
         return '';
     }
     /**
+     * Returns the directory at which image files of the theme exists.
+     * 
+     * @return string The directory at which image files of the theme exists 
+     * (e.g. 'assets/my-theme/images' ). 
+     * If the theme is not loaded, the method will return empty string.
+     * 
+     * @since 1.0
+     */
+    public function getThemeImagesDir() {
+        if ($this->isThemeLoaded()) {
+            $loadedTheme = $this->getTheme();
+
+            return 'assets/'.$loadedTheme->getDirectoryName().'/'.$loadedTheme->getImagesDirName();
+        }
+
+        return '';
+    }
+    /**
      * Returns the directory at which JavaScript files of the theme exists.
      * 
      * @return string The directory at which JavaScript files of the theme exists 
@@ -385,6 +403,7 @@ class WebPage {
 
         return '';
     }
+    
     /**
      * Returns the title of the page.
      * 
@@ -623,8 +642,8 @@ class WebPage {
             $this->document->getHeadNode()->removeChild($descNode);
             $this->description = null;
 
-            if (strlen($desc) !== 0) {
-                $this->description = $desc;
+            if (strlen($val) !== 0) {
+                $this->description = $val;
                 $this->document->getHeadNode()->addMeta('description', $desc, true);
             } else {
                 $descNode = $this->document->getHeadNode()->getMeta('description');
@@ -634,7 +653,6 @@ class WebPage {
         } else {
         }
     }
-
     /**
      * Sets the property that is used to check if page has an aside section or not.
      * 
@@ -737,7 +755,7 @@ class WebPage {
      * @param string $themeNameOrClass The name of the theme as specified by the 
      * variable 'name' in theme definition. If the given name is 'null', the 
      * method will load the default theme as specified by the method 
-     * 'SiteConfig::getBaseThemeName()'. Note that once the theme is updated, 
+     * 'AppConfig::getBaseThemeName()'. Note that once the theme is updated, 
      * the document content of the page will reset if it was set before calling this 
      * method. This also can be the value which can be taken from 'ClassName::class'. 
      * 
@@ -750,8 +768,8 @@ class WebPage {
      * @see Theme::usingTheme()
      */
     public function setTheme($themeNameOrClass = null) {
-        $xthemeName = '\\'.$themeNameOrClass;
-
+        $xthemeName = $themeNameOrClass === null ? WebFioriApp::getAppConfig()->getBaseThemeName() : '\\'.$themeNameOrClass;
+        
         if (class_exists($xthemeName)) {
             $tmpTheme = new $xthemeName();
 
@@ -1080,7 +1098,7 @@ class WebPage {
      * 
      * @since 1.0
      */
-    private function getCanonical() {
+    public function getCanonical() {
         return $this->canonical;
     }
     /**
@@ -1091,7 +1109,7 @@ class WebPage {
      * 
      * @since 1.0
      */
-    private function getDescription() {
+    public function getDescription() {
         return $this->description;
     }
     /**
@@ -1103,7 +1121,7 @@ class WebPage {
      * 
      * @since 1.0
      */
-    private function getWebsiteName() {
+    public function getWebsiteName() {
         return $this->websiteName;
     }
     /**
@@ -1113,7 +1131,7 @@ class WebPage {
      * 
      * @since 1.0
      */
-    private function isThemeLoaded() {
+    public function isThemeLoaded() {
         return $this->theme instanceof Theme;
     }
     /**
@@ -1126,7 +1144,7 @@ class WebPage {
      * 
      * @since 1.0
      */
-    private function setLang($lang = 'EN') {
+    public function setLang($lang = 'EN') {
         $langU = strtoupper(trim($lang));
 
         if (strlen($lang) == 2) {

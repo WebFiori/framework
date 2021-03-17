@@ -162,7 +162,7 @@ class WebFioriApp {
             $encoding = 'UTF-8';
             mb_internal_encoding($encoding);
             mb_http_output($encoding);
-            mb_http_input($encoding);
+            //mb_http_input($encoding);
             mb_regex_encoding($encoding);
         }
 
@@ -208,7 +208,7 @@ class WebFioriApp {
             self::$SF->createAppConfigFile();
         }
 
-        WebFioriApp::setConfig(new AppConfig());
+        $this->appConfig = new AppConfig();
         
         WebFioriApp::autoRegister('middleware', function($inst)
         {
@@ -257,7 +257,9 @@ class WebFioriApp {
      * @since 2.1.0
      */
     public static function setConfig(AppConfig $conf) {
-        self::$LC->appConfig = $conf;
+        if (self::$LC) {
+            self::$LC->appConfig = $conf;
+        }
     }
     /**
      * Register CLI commands or cron jobs.

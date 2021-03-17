@@ -35,7 +35,7 @@ class Index {
          * 
          * Planting application seed into the ground and make your work bloom.
          */
-        WebFioriApp::getAndStart();
+        WebFioriApp::start();
 
         if (CLI::isCLI() === true) {
             CLI::registerCommands();

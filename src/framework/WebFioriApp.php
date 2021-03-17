@@ -78,15 +78,6 @@ class WebFioriApp {
      */
     private static $classStatus = 'NONE';
     /**
-     * An associative array that contains database connection error that might 
-     * happen during initialization.
-     * 
-     * @var array|null 
-     * 
-     * @since 1.3.3
-     */
-    private $dbErrDetails;
-    /**
      * A single instance of the class.
      * 
      * @var WebFioriApp
@@ -102,15 +93,6 @@ class WebFioriApp {
      * @since 1.0
      */
     private static $SF;
-    /**
-     * A variable to store system status. The variable will be set to true 
-     * if everything is Ok.
-     * 
-     * @var boolean|string 
-     * 
-     * @since 1.0
-     */
-    private $sysStatus;
     /**
      * The entry point for initiating the system.
      * 
@@ -221,20 +203,13 @@ class WebFioriApp {
         InitPrivileges::init();
 
         self::$SF = ConfigController::get();
-
-        $this->sysStatus = Util::checkSystemStatus();
         
-        if ($this->sysStatus == Util::MISSING_CONF_FILE || $this->sysStatus == Util::MISSING_SITE_CONF_FILE) {
+        if (!class_exists('app\AppConfig')) {
             self::$SF->createAppConfigFile();
-            $this->sysStatus = Util::checkSystemStatus();
         }
 
-        $this->appConfig = new AppConfig();
+        WebFioriApp::setConfig(new AppConfig());
         
-        if (gettype($this->sysStatus) == 'array') {
-            $this->dbErrDetails = $this->sysStatus;
-            $this->sysStatus = Util::DB_NEED_CONF;
-        }
         WebFioriApp::autoRegister('middleware', function($inst)
         {
             MiddlewareManager::register($inst);
@@ -272,8 +247,17 @@ class WebFioriApp {
         });
         //class is now initialized
         self::$classStatus = 'INITIALIZED';
-
-        define('INITIAL_SYS_STATUS', $this->_getSystemStatus());
+    }
+    /**
+     * Sets the configuration object that will be used to configure some of the 
+     * framework settings.
+     * 
+     * @param AppConfig $conf
+     * 
+     * @since 2.1.0
+     */
+    public static function setConfig(AppConfig $conf) {
+        self::$LC->appConfig = $conf;
     }
     /**
      * Register CLI commands or cron jobs.
@@ -310,14 +294,13 @@ class WebFioriApp {
         }
     }
     /**
-     * Initiate the framework and return a single instance of the class that can 
-     * be used to control basic settings of the framework.
+     * Start your WebFiori application.
      * 
      * @return WebFioriApp An instance of the class.
      * 
      * @since 1.0
      */
-    public static function getAndStart() {
+    public static function start() {
         if (self::$classStatus == 'NONE') {
             if (self::$LC === null) {
                 self::$classStatus = 'INITIALIZING';
@@ -364,22 +347,6 @@ class WebFioriApp {
         return self::$classStatus;
     }
     /**
-     * Returns an associative array that contains database connection error 
-     * information.
-     * 
-     * If an error happens while connecting with the database at initialization 
-     * stage, this method can be used to get error details. The array will 
-     * have two indices: 'error-code' and 'error-message'.
-     * 
-     * @return array|null An associative array that contains database connection error 
-     * information. If no errors, the method will return null.
-     * 
-     * @since 1.3.3
-     */
-    public static function getDBErrDetails() {
-        return self::getAndStart()->dbErrDetails;
-    }
-    /**
      * Returns a reference to an instance of 'ConfigController'.
      * 
      * @return ConfigController A reference to an instance of 'ConfigController'.
@@ -388,29 +355,6 @@ class WebFioriApp {
      */
     public static function getSysController() {
         return self::$SF;
-    }
-    /**
-     * Returns the current status of the system.
-     * 
-     * @return boolean|string If the system is configured correctly, the method 
-     * will return true. If the file 'Config.php' was not found, The method will return 
-     * 'Util::MISSING_CONF_FILE'. If the file 'SiteConfig.php' was not found, The method will return 
-     * 'Util::MISSING_CONF_FILE'. If the system is not configured yet, the method 
-     * will return 'Util::NEED_CONF'. If the system is unable to connect to 
-     * the database, the method will return an associative array with two 
-     * indices which gives more details about the error. The first index is 
-     * 'error-code' and the second one is 'error-message'.
-     * 
-     * @since 1.0
-     */
-    public static function sysStatus() {
-        $retVal = self::$classStatus;
-
-        if (self::getClassStatus() == 'INITIALIZED') {
-            $retVal = self::getAndStart()->_getSystemStatus(true);
-        }
-
-        return $retVal;
     }
     /**
      * Checks if framework standard libraries are loaded or not.
@@ -440,24 +384,6 @@ class WebFioriApp {
         if (!class_exists('webfiori\http\Response')) {
             throw new InitializationException("The standard library 'webfiori/http' is missing.");
         }
-    }
-    /**
-     * 
-     * @param type $refresh
-     * @return boolean|string
-     * @since 1.0
-     */
-    private function _getSystemStatus($refresh = true) {
-        if ($refresh === true) {
-            $this->sysStatus = Util::checkSystemStatus();
-
-            if (gettype($this->sysStatus) == 'array') {
-                $this->dbErrDetails = $this->sysStatus;
-                $this->sysStatus = Util::DB_NEED_CONF;
-            }
-        }
-
-        return $this->sysStatus;
     }
     private function _initCRON() {
         $uriObj = new RouterUri(Util::getRequestedURL(), '');

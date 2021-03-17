@@ -182,45 +182,6 @@ class Util {
 
         return false;
     }
-
-    /**
-     * Check the overall status of the system.
-     * 
-     * @param boolean $checkDb If set to true, the method will also check 
-     * database connection status. The settings of the connection will 
-     * be taken from the class 'Config'. Default is false.
-     * 
-     * @return boolean|string The method will return true in case everything 
-     * was fine. If the file 'Config.php' was not found, The method will return 
-     * 'Util::MISSING_CONF_FILE'. If the file 'SiteConfig.php' was not found, The method will return 
-     * 'Util::MISSING_CONF_FILE'. If the system is not configured yet, the method 
-     * will return 'Util::NEED_CONF'. 
-     * 
-     * @since 1.2
-     */
-    public static function checkSystemStatus() {
-        $returnValue = '';
-
-        if (class_exists('webfiori\conf\Config')) {
-            if (class_exists('webfiori\conf\SiteConfig')) {
-                if (class_exists('app\AppConfig')) {
-                    if (WebFioriApp::getClassStatus() == 'INITIALIZING') {
-                        $returnValue = true;
-                    } else {
-                        $returnValue = Util::NEED_CONF;
-                    }
-                } else {
-                    $returnValue = Util::MISSING_SITE_CONF_FILE;
-                }
-            } else {
-                $returnValue = Util::MISSING_SITE_CONF_FILE;
-            }
-        } else {
-            $returnValue = Util::MISSING_CONF_FILE;
-        }
-
-        return $returnValue;
-    }
     /**
      * Call this method to display errors and warnings.
      * 

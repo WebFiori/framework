@@ -17,12 +17,11 @@ class PageTest extends TestCase{
      * @test
      */
     public function testBeforeRender00() {
-        $this->assertNull(Page::beforeRender());
-        $this->assertNull(Page::beforeRender('random'));
-        $this->assertNull(Page::beforeRender());
-        $this->assertEquals(1,Page::beforeRender(function(){}));
         $page = new WebPage();
-        $this->assertNull(Page::beforeRender());
+        $this->assertNull($page->addBeforeRender());
+        $this->assertNull($page->addBeforeRender('random'));
+        $this->assertNull($page->addBeforeRender());
+        $this->assertEquals(1,$page->addBeforeRender(function(){}));
     }
     /**
      * @test
@@ -49,14 +48,14 @@ class PageTest extends TestCase{
         $doc = $page->render(false, true);
         $doc->removeChild($page->getChildByID('i18n'));
         $this->assertEquals('<!DOCTYPE html>'
-                . '<html lang="EN">'
+                . '<html lang=EN>'
                 . '<head>'
-                . '<base href="https://example.com">'
+                . '<base href=https://example.com>'
                 . '<title>Hello World | WebFiori</title>'
-                . '<link rel="canonical" href="https://example.com/">'
-                . '<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">'
+                . '<link rel=canonical href=https://example.com/>'
+                . '<meta name=viewport content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">'
                 . '</head>'
-                . '<body itemscope itemtype="http://schema.org/WebPage">'
+                . '<body itemscope itemtype=http://schema.org/WebPage>'
                 . '<div id="page-header">'
                 . '</div>'
                 . '<div id="page-body">'
@@ -75,14 +74,14 @@ class PageTest extends TestCase{
         $doc =$page->render(false, true);
         $doc->removeChild($page->getChildByID('i18n'));
         $this->assertEquals('<!DOCTYPE html>'
-                . '<html lang="EN">'
+                . '<html lang=EN>'
                 . '<head>'
-                . '<base href="https://example.com">'
+                . '<base href=https://example.com>'
                 . '<title>Hello World | WebFiori</title>'
-                . '<link rel="canonical" href="https://example.com/">'
-                . '<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">'
+                . '<link rel=canonical href=https://example.com/>'
+                . '<meta name=viewport content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">'
                 . '</head>'
-                . '<body itemscope itemtype="http://schema.org/WebPage">'
+                . '<body itemscope itemtype=http://schema.org/WebPage>'
                 . '<div id="page-header">'
                 . '</div>'
                 . '<div id="page-body">'
@@ -100,8 +99,8 @@ class PageTest extends TestCase{
         $page = new WebPage();
         $this->assertFalse($page->getDocument()->getHeadNode()->hasMeta('description'));
         $page->setDescription('Hello World Page.');
-        $this->assertTrue($page->getDocument()->getHeadNode()->hasMeta('description'));
         $this->assertEquals('Hello World Page.',$page->getDescription());
+        $this->assertTrue($page->getDocument()->getHeadNode()->hasMeta('description'));
         return $page;
     }
     /**
@@ -237,7 +236,7 @@ class PageTest extends TestCase{
         $this->assertEquals($firstThemeName,$fTheme->getName());
         $page->setTheme($secondThemeName);
         $sTheme = $page->getTheme();
-        $this->assertTrue($sTheme === Page::theme());
+        $this->assertTrue($sTheme === $page->getTheme());
         $this->assertEquals($secondThemeName,$sTheme->getName());
         $page->setTheme($firstThemeName);
         $f2Theme = $page->getTheme();
@@ -250,9 +249,9 @@ class PageTest extends TestCase{
         $page = new WebPage();
         $node = new HTMLNode();
         $node->setID('new-node');
-        $this->assertNotNull(Page::insert($node));
-        $this->assertEquals(1,Page::document()->getChildByID('main-content-area')->childrenCount());
-        $el = Page::document()->getChildByID('new-node');
+        $this->assertNotNull($page->insert($node));
+        $this->assertEquals(1,$page->getChildByID('main-content-area')->childrenCount());
+        $el = $page->getChildByID('new-node');
         $this->assertTrue($el === $node);
     }
     /**
@@ -262,9 +261,9 @@ class PageTest extends TestCase{
         $page = new WebPage();
         $node = new HTMLNode();
         $node->setID('new-node');
-        $this->assertNull(Page::insert($node,''));
-        $this->assertEquals(0,Page::document()->getChildByID('main-content-area')->childrenCount());
-        $el = Page::document()->getChildByID('new-node');
+        $this->assertNull($page->insert($node,''));
+        $this->assertEquals(0,$page->getChildByID('main-content-area')->childrenCount());
+        $el = $page->getChildByID('new-node');
         $this->assertNull($el);
     }
     /**
@@ -272,7 +271,7 @@ class PageTest extends TestCase{
      */
     public function testUsingLang00() {
         $page = new WebPage();
-        $null = Page::translation();
+        $null = $page->getTranslation();
         $this->assertNotNull($null);
         $this->assertEquals('EN', $null->getCode());
     }
@@ -281,14 +280,14 @@ class PageTest extends TestCase{
      */
     public function testUsingLang01() {
         $page = new WebPage();
-        Page::lang('en');
-        $lang = Page::translation();
+        $page->setLang('en');
+        $lang = $page->getTranslation();
         $this->assertTrue($lang instanceof Language);
-        $lang2 = Page::translation();
+        $lang2 = $page->getTranslation();
         $this->assertTrue($lang2 instanceof Language);
         $this->assertTrue($lang === $lang2);
-        Page::lang('ar');
-        $lang3 = Page::translation();
+        $page->setLang('ar');
+        $lang3 = $page->getTranslation();
         $this->assertTrue($lang3 instanceof Language);
         $this->assertFalse($lang3 === $lang2);
     }
@@ -299,8 +298,7 @@ class PageTest extends TestCase{
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('No language class was found for the language \'NM\'.');
         $page = new WebPage();
-        Page::lang('nm');
-        Page::translation();
+        $page->setLang('nm');
     }
     /**
      * @test

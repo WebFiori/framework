@@ -39,6 +39,7 @@ use webfiori\ui\HeadNode;
 use webfiori\ui\HTMLDoc;
 use webfiori\ui\HTMLNode;
 use webfiori\framework\session\Session;
+use webfiori\framework\exceptions\MissingLangException;
 /**
  * A base class that can be used to implement web pages.
  *
@@ -590,7 +591,7 @@ class WebPage {
      * this can be the tag name of the node such as 'div'.
      * 
      * @param string $parentNodeId The ID of the node that the given node 
-     * will be inserted to.
+     * will be inserted to. Default value is 'main-content-area'.
      * 
      * @return HTMLNode|null The method will return the inserted 
      * node if it was inserted. If it is not, the method will return null.
@@ -601,7 +602,7 @@ class WebPage {
         if (gettype($node) == 'string') {
             $node = new HTMLNode($node);
         }
-        $parent = $this->getDocument()->getChildByID($parentNodeId);
+        $parent = $this->getChildByID($parentNodeId);
         if ($parent !== null) {
             $parent->addChild($node);
             return $node;
@@ -637,20 +638,17 @@ class WebPage {
      * @since 1.0
      */
     public function setDescription($val) {
-        if ($val === null) {
+        if ($val !== null) {
+            $trim = trim($val);
+
+            if (strlen($trim) !== 0) {
+                $this->description = $trim;
+                $this->document->getHeadNode()->addMeta('description', $trim, true);
+            }
+        } else {
             $descNode = $this->document->getHeadNode()->getMeta('description');
             $this->document->getHeadNode()->removeChild($descNode);
             $this->description = null;
-
-            if (strlen($val) !== 0) {
-                $this->description = $val;
-                $this->document->getHeadNode()->addMeta('description', $desc, true);
-            } else {
-                $descNode = $this->document->getHeadNode()->getMeta('description');
-                $this->document->getHeadNode()->removeChild($descNode);
-                $this->description = null;
-            }
-        } else {
         }
     }
     /**
@@ -1177,11 +1175,21 @@ class WebPage {
      * will be based on the value returned by the method Page::getLanguageCode(). If 
      * the language of the page is not set, The method will throw an exception.
      * 
+     * @throws MissingLangException An exception will be thrown if no language file 
+     * was found that matches the given language code. Language files must 
+     * have the name 'LanguageXX.php' where 'XX' is language code. Also the function 
+     * will throw an exception when the translation file is loaded but no object 
+     * of type 'Language' was stored in the set of loaded translations.
+     * 
      * @since 1.0
      */
     private function usingLanguage() {
         if ($this->getLangCode() !== null) {
-            $this->tr = Language::loadTranslation($this->getLangCode());
+            try {
+                $this->tr = Language::loadTranslation($this->getLangCode());
+            } catch (MissingLangException $ex) {
+                throw new MissingLangException($ex->getMessage());
+            }
             $pageLang = $this->getTranslation();
             $this->setWritingDir($pageLang->getWritingDir());
         }

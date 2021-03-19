@@ -61,7 +61,7 @@ class EmailMessage {
     public function __construct($sendAccountName = '') {
         $this->log = [];
 
-        if (class_exists('webfiori\conf\MailConfig')) {
+        if (class_exists('app\AppConfig')) {
             $acc = WebFioriApp::getAppConfig()->getAccount($sendAccountName);
 
             if ($acc instanceof SMTPAccount) {
@@ -82,7 +82,7 @@ class EmailMessage {
             }
             throw new SMTPException('No SMTP account was found which has the name "'.$sendAccountName.'".');
         }
-        throw new SMTPException('Class "MailConfig" not found.');
+        throw new SMTPException('Class "AppConfig" not found.');
     }
     /**
      * Adds new receiver address to the list of message receivers.

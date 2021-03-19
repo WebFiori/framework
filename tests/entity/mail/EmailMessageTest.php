@@ -2,9 +2,9 @@
 namespace webfiori\tests\entity\mail;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\conf\MailConfig;
 use webfiori\framework\mail\EmailMessage;
 use webfiori\framework\mail\SMTPAccount;
+use webfiori\framework\WebFioriApp;
 /**
  * A test class for testing the class 'webfiori\framework\mail\EmailMessage'.
  *
@@ -24,8 +24,9 @@ class EmailMessageTest extends TestCase {
      */
     public function test01() {
         $smtp = new SMTPAccount();
+        $smtp->setAccountName('smtp-acc-00');
         //$smtp->setServerAddress('mail.invalid.com');
-        MailConfig::get()->addSMTPAccount('smtp-acc-00', $smtp);
+        WebFioriApp::getAppConfig()->addAccount($smtp);
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('The account "smtp-acc-00" has invalid host or port number. Port: 465, Host: .');
         $message = new EmailMessage('smtp-acc-00');
@@ -42,7 +43,8 @@ class EmailMessageTest extends TestCase {
         $smtp->setUsername('test@programmingacademia.com');
         $smtp->setServerAddress('mail.programmingacademia.com ');
         $smtp->setPort(255);
-        MailConfig::get()->addSMTPAccount('smtp-acc-00', $smtp);
+        $smtp->setAccountName('smtp-acc-00');
+        WebFioriApp::getAppConfig()->addAccount($smtp);
         $message = new EmailMessage('smtp-acc-00');
     }
     /**
@@ -57,7 +59,8 @@ class EmailMessageTest extends TestCase {
         $smtp->setUsername('test@programmingacademia.com');
         $smtp->setServerAddress('mail.programmingacademia.com ');
         $smtp->setPort(765765);
-        MailConfig::get()->addSMTPAccount('smtp-acc-00', $smtp);
+        $smtp->setAccountName('smtp-acc-00');
+        WebFioriApp::getAppConfig()->addAccount($smtp);
         $message = new EmailMessage('smtp-acc-00');
         $this->assertTrue($message instanceof EmailMessage);
     }

@@ -25,7 +25,6 @@
 namespace webfiori\framework;
 
 use Exception;
-use webfiori\conf\SiteConfig;
 use webfiori\framework\exceptions\UIException;
 use webfiori\framework\i18n\Language;
 use webfiori\framework\session\SessionsManager;
@@ -62,6 +61,8 @@ use webfiori\ui\HTMLNode;
  * @author Ibrahim
  * 
  * @version 1.9.5
+ * 
+ * @deprecated since version 2.1 Use the class 'WebPage' instead.
  */
 class Page {
     /**
@@ -696,7 +697,7 @@ class Page {
             $headNode = new HeadNode(
                 $this->getTitle().$this->getTitleSep().$this->getWebsiteName(),
                 $this->getCanonical(),
-                SiteConfig::getBaseURL()
+                WebFioriApp::getAppConfig()->getBaseURL()
             );
         } else {
             $headNode = $loadedTheme->getHeadNode();
@@ -708,7 +709,7 @@ class Page {
         }
         $headNode->addMeta('charset','UTF-8',true);
         $headNode->setTitle($this->getTitle().$this->getTitleSep().$this->getWebsiteName());
-        $headNode->setBase(SiteConfig::getBaseURL());
+        $headNode->setBase(WebFioriApp::getAppConfig()->getBaseURL());
         $headNode->setCanonical($this->getCanonical());
 
         if ($this->getDescription() != null) {
@@ -737,7 +738,7 @@ class Page {
     }
     private function _loadByThemeName($themeNameOrClass) {
         if ($themeNameOrClass === null && $this->theme === null) {
-            $themeNameOrClass = SiteConfig::getBaseThemeName();
+            $themeNameOrClass = WebFioriApp::getAppConfig()->getBaseURL();
         } else {
             $themeNameOrClass = trim($themeNameOrClass);
 
@@ -748,12 +749,12 @@ class Page {
 
         if ($this->theme !== null) {
             if ($themeNameOrClass != $this->theme->getName()) {
-                $tmpTheme = ThemeLoader::usingTheme($themeNameOrClass);
+                $tmpTheme = ThemeLoader::usingTheme(null, $themeNameOrClass);
             } else {
                 return;
             }
         } else {
-            $tmpTheme = ThemeLoader::usingTheme($themeNameOrClass);
+            $tmpTheme = ThemeLoader::usingTheme(null, $themeNameOrClass);
         }
 
         return $tmpTheme;
@@ -761,8 +762,8 @@ class Page {
     private function _reset() {
         $this->document = new HTMLDoc();
         $this->setTitle('Hello World');
-        $siteNames = WebFiori::getSiteConfig()->getWebsiteNames();
-        $primaryLang = WebFiori::getSiteConfig()->getPrimaryLanguage();
+        $siteNames = WebFioriApp::getAppConfig()->getWebsiteNames();
+        $primaryLang = WebFioriApp::getAppConfig()->getPrimaryLanguage();
         $this->setLang($primaryLang);
 
         if (isset($siteNames[$primaryLang])) {
@@ -771,7 +772,7 @@ class Page {
             $this->setWebsiteName('Hello Website');
         }
 
-        $siteDescriptions = WebFiori::getSiteConfig()->getDescriptions();
+        $siteDescriptions = WebFioriApp::getAppConfig()->getDescriptions();
 
         if (isset($siteDescriptions[$primaryLang])) {
             $this->setDescription($siteDescriptions[$primaryLang]);

@@ -11,7 +11,7 @@ use webfiori\framework\Theme;
 use webfiori\framework\session\SessionsManager;
 
 use webfiori\framework\ConfigController;
-use webfiori\framework\WebFiori;
+use webfiori\framework\WebFioriApp;
 /**
  * A basic theme which is based on Vuetify framework.
  * @author Ibrahim
@@ -29,31 +29,26 @@ class VuetifyTheme extends Theme {
         $this->setName('Vuetify Theme');
         $this->setJsDirName('js');
         $this->setImagesDirName('img');
-        $this->setBeforeLoaded(function()
+        $this->setBeforeLoaded(function(Theme $theme)
         {
-            $activeSession = SessionsManager::getActiveSession();
-            if ($activeSession !== null) {
-                Page::lang($activeSession->getLangCode(true));
-            } else {
-                Page::lang(WebFiori::getSiteConfig()->getPrimaryLanguage());
-            }
-            LangExt::extendLang(Page::translation());
-            Page::siteName(WebFiori::getSiteConfig()->getWebsiteNames()[Page::lang()]);
+            $page = $theme->getPage();
+            LangExt::extendLang($page->getTranslation());
         });
-        $this->setAfterLoaded(function()
+        $this->setAfterLoaded(function(Theme $theme)
         {
+            $page = $theme->getPage();
             $topDiv = new HTMLNode('v-app');
             $topDiv->setID('app');
-            $headerSec = Page::document()->getChildByID('page-header');
-            Page::document()->removeChild($headerSec);
-            $bodySec = Page::document()->getChildByID('page-body');
-            Page::document()->removeChild($bodySec);
-            $footerSec = Page::document()->getChildByID('page-footer');
-            Page::document()->removeChild($footerSec);
+            $headerSec = $page->getChildByID('page-header');
+            $page->getDocument()->removeChild($headerSec);
+            $bodySec = $page->getChildByID('page-body');
+            $page->getDocument()->removeChild($bodySec);
+            $footerSec = $page->getChildByID('page-footer');
+            $page->getDocument()->removeChild($footerSec);
             $topDiv->addChild($footerSec)->addChild($headerSec)->addChild($bodySec);
-            Page::document()->getBody()->addChild($topDiv);
-            Page::document()->getChildByID('main-content-area')->setNodeName('v-main');
-            Page::document()->getChildByID('main-content-area')->setAttribute('app');
+            $page->getDocument()->getBody()->addChild($topDiv);
+            $page->getDocument()->getChildByID('main-content-area')->setNodeName('v-main');
+            $page->getDocument()->getChildByID('main-content-area')->setAttribute('app');
             
         });
     }

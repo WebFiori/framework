@@ -1,19 +1,14 @@
 <?php
 namespace webfiori\theme;
 
-use webfiori\ui\Anchor;
 use webfiori\ui\HeadNode;
 use webfiori\ui\HTMLNode;
 use webfiori\ui\Input;
 use webfiori\ui\Label;
-use webfiori\ui\ListItem;
 use webfiori\ui\PNode;
-use webfiori\ui\UnorderedList;
-use webfiori\conf\Config;
-use webfiori\conf\SiteConfig;
 use webfiori\framework\Page;
 use webfiori\framework\Theme;
-use webfiori\framework\WebFiori;
+use webfiori\framework\WebFioriApp;
 
 class WebFioriTheme extends Theme {
     public function __construct() {
@@ -34,14 +29,14 @@ class WebFioriTheme extends Theme {
         $this->setBeforeLoaded(function(){
             LangExt::extLang();
         });
-        $this->setAfterLoaded(function()
+        $this->setAfterLoaded(function(Theme $theme)
         {
-            Page::document()->getChildByID('main-content-area')->setClassName('wf-'.Page::dir().'-col-10');
-            Page::document()->getChildByID('side-content-area')->setClassName('wf-'.Page::dir().'-col-2');
-            Page::document()->getChildByID('page-body')->setClassName('wf-row');
-            Page::document()->getChildByID('page-header')->setClassName('wf-row-np');
-            Page::document()->getChildByID('page-footer')->setClassName('wf-row');
-            Page::siteName(WebFiori::getSiteConfig()->getWebsiteNames()[Page::lang()]);
+            $page = $theme->getPage();
+            $page->getChildByID('main-content-area')->setClassName('wf-'.Page::dir().'-col-10');
+            $page->getChildByID('side-content-area')->setClassName('wf-'.Page::dir().'-col-2');
+            $page->getChildByID('page-body')->setClassName('wf-row');
+            $page->getChildByID('page-header')->setClassName('wf-row-np');
+            $page->getChildByID('page-footer')->setClassName('wf-row');
             
         });
     }
@@ -241,8 +236,8 @@ class WebFioriTheme extends Theme {
 
     public function getFooterNode() {
         $node = HTMLNode::loadComponent($this->getDirecotry().'footer.html', [
-            'version' => Config::getVersion(),
-            'version_type' => Config::getVersionType(),
+            'version' => WF_VERSION,
+            'version_type' => WF_VERSION_TYPE,
             'writing_dir' => Page::dir(),
             'contact_phone' => '013 xxx xxxx',
             'copyright' => 'All Rights Reserved',
@@ -256,7 +251,6 @@ class WebFioriTheme extends Theme {
 
     public function getHeadNode() {
         $headTag = new HeadNode();
-        $headTag->setBase(SiteConfig::getBaseURL());
         $headTag->addLink('icon', 'favicon.png');
         $headTag->addMeta('robots', 'index, follow');
 
@@ -266,9 +260,9 @@ class WebFioriTheme extends Theme {
     public function getHeadrNode() {
         $headerSec = HTMLNode::loadComponent($this->getDirecotry().'header.html', [
             'menu-labels' => Page::translation()->get('menus/main-menu'),
-            'home_link' => WebFiori::getSiteConfig()->getBaseURL(),
+            'home_link' => WebFioriApp::getAppConfig()->getBaseURL(),
             'dir' => Page::dir(),
-            'site_name' => WebFiori::getSiteConfig()->getWebsiteNames()[Page::lang()],
+            'site_name' => WebFioriApp::getAppConfig()->getWebsiteNames()[Page::lang()],
             'menu-links' => [
                 'm_1_link' => '#',
                 'm_2_link' => '#',

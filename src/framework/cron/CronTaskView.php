@@ -26,7 +26,7 @@ namespace webfiori\framework\cron;
 
 use webfiori\framework\Page;
 use webfiori\framework\router\Router;
-use webfiori\framework\WebFiori;
+use webfiori\framework\WebFioriApp;
 use webfiori\ui\HTMLNode;
 use webfiori\ui\JsCode;
 use webfiori\ui\Paragraph;
@@ -107,7 +107,7 @@ class CronTaskView extends CronView {
             $this->getControlsContainer()->addChild($forceNode);
             $this->createOutputWindow();
         } else {
-            Response::addHeader('location', WebFiori::getSiteConfig()->getBaseURL().'/cron/jobs');
+            Response::addHeader('location', WebFioriApp::getAppConfig()->getBaseURL().'/cron/jobs');
             Response::send();
         }
         Page::render();

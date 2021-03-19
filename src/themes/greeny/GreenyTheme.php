@@ -3,11 +3,11 @@ namespace webfiori\theme;
 
 use webfiori\ui\HeadNode;
 use webfiori\ui\HTMLNode;
-use webfiori\conf\Config;
-use webfiori\conf\SiteConfig;
+use webfiori\framework\WebFioriApp;
 use webfiori\framework\Page;
 use webfiori\framework\Theme;
 use webfiori\framework\session\SessionsManager;
+use webfiori\framework\ui\WebPage;
 class GreenyTheme extends Theme {
     public function __construct() {
         parent::__construct();
@@ -23,21 +23,19 @@ class GreenyTheme extends Theme {
         $this->setImagesDirName('images');
         $this->setJsDirName('js');
         $this->setCssDirName('css');
-        $this->setAfterLoaded(function()
+        $this->setAfterLoaded(function(Theme $theme)
         {
-            $session = SessionsManager::getActiveSession();
-            Page::lang($session->getLangCode(true));
-            Page::translation();
-            Page::document()->getBody()->setClassName('pa-container');
-            Page::document()->getChildByID('page-body')->setClassName('pa-row');
+            $page = $theme->getPage();
+            $page->getDocument()->getBody()->setClassName('pa-container');
+            $page->getDocument()->getChildByID('page-body')->setClassName('pa-row');
 
-            if (Page::aside()) {
-                Page::document()->getChildByID('side-content-area')->setClassName('pa-'.Page::dir().'-col-2 show-border');
-                Page::document()->getChildByID('main-content-area')->setClassName('pa-'.Page::dir().'-col-10 show-border');
+            if ($page->hasAside()) {
+                $page->getDocument()->getChildByID('side-content-area')->setClassName('pa-'.Page::dir().'-col-2 show-border');
+                $page->getDocument()->getChildByID('main-content-area')->setClassName('pa-'.Page::dir().'-col-10 show-border');
             } else {
-                Page::document()->getChildByID('main-content-area')->setClassName('pa-'.Page::dir().'-col-12 show-border');
+                $page->getDocument()->getChildByID('main-content-area')->setClassName('pa-'.Page::dir().'-col-12 show-border');
             }
-            Page::document()->getChildByID('main-content-area')->addTextNode('Main Content Area.');
+            $page->getDocument()->getChildByID('main-content-area')->addTextNode('Main Content Area.');
         });
         $this->setBeforeLoaded(function()
         {
@@ -71,24 +69,18 @@ class GreenyTheme extends Theme {
         $div = new HTMLNode('div');
         $div->setAttribute('class', 'pa-ltr-col-twelve');
         $div->addTextNode('<b style="color:gray;font-size:8pt;">Powered By: <a href="https://github.com/usernane/webfiori" '
-                .'target="_blank">WebFiori Framework</a> v'.Config::getVersion().' ('.Config::getVersionType().')</b>',false);
+                .'target="_blank">WebFiori Framework</a> v'.WF_VERSION.' ('.WF_VERSION_TYPE.')</b>',false);
         $fNode->addChild($div);
 
         return $node;
     }
 
     public function getHeadNode() {
-        $session = SessionsManager::getActiveSession();
-        $lang = $session->getLangCode(true);
-        Page::lang($lang);
         $headTag = new HeadNode();
-        $headTag->setBase(SiteConfig::getBaseURL());
+        $headTag->setBase(WebFioriApp::getAppConfig()->getBaseURL());
         $headTag->addLink('icon', Page::imagesDir().'/favicon.png');
-        $headTag->setCanonical(SiteConfig::getBaseURL().Page::canonical());
-
-        if (isset(SiteConfig::getWebsiteNames()[$lang])) {
-            Page::siteName(SiteConfig::getWebsiteNames()[$lang]);
-        }
+        $headTag->setCanonical(WebFioriApp::getAppConfig()->getBaseURL().Page::canonical());
+        
         $headTag->addMeta('robots', 'index, follow');
 
         return $headTag;

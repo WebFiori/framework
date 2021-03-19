@@ -56,7 +56,23 @@ class GlobalConstants {
              */
             define('SCRIPT_MEMORY_LIMIT', '2048M');
         }
-
+        if (!defined('WF_SESSION_STORAGE')) {
+            /**
+             * A constant which holds the class name of sessions storage 
+             * engine alongside its namespace.
+             * 
+             * The value of this constant is used to configure session storage 
+             * engine. For example, if the name of the class that represents 
+             * storage engine is 'MySessionStorage' and the class exist in the 
+             * namespace 'extras\util', then the value of the constant should be 
+             * '\extras\util\MySessionStorage'.
+             * 
+             * @var string
+             * 
+             * @since 2.1.0
+             */
+            define('WF_SESSION_STORAGE', '\webfiori\framework\session\DefaultSessionStorage');
+        }
         if (!defined('DATE_TIMEZONE')) {
             /**
              * Define the timezone at which the system will operate in.

@@ -5,7 +5,8 @@ use webfiori\framework\Page;
 use webfiori\ui\HTMLNode;
 use webfiori\framework\Theme;
 use webfiori\framework\i18n\Language;
-use webfiori\conf\SiteConfig;
+use webfiori\framework\WebFioriApp;
+use webfiori\framework\ui\WebPage;
 /**
  * Description of PageTest
  *
@@ -16,45 +17,45 @@ class PageTest extends TestCase{
      * @test
      */
     public function testBeforeRender00() {
-        $this->assertNull(Page::beforeRender());
-        $this->assertNull(Page::beforeRender('random'));
-        $this->assertNull(Page::beforeRender());
-        $this->assertEquals(1,Page::beforeRender(function(){}));
-        Page::reset();
-        $this->assertNull(Page::beforeRender());
+        $page = new WebPage();
+        $this->assertNull($page->addBeforeRender());
+        $this->assertNull($page->addBeforeRender('random'));
+        $this->assertNull($page->addBeforeRender());
+        $this->assertEquals(1,$page->addBeforeRender(function(){}));
     }
     /**
      * @test
      */
     public function testDefaults00() {
-        $this->assertEquals('EN',Page::lang());
-        $this->assertNull(Page::description());
-        $this->assertEquals('Hello World',Page::title());
-        $this->assertEquals('WebFiori',Page::siteName());
-        $this->assertEquals(' | ',Page::separator());
-        $this->assertTrue(Page::header());
-        $this->assertTrue(Page::footer());
-        $this->assertTrue(Page::aside());
-        $this->assertEquals('ltr',Page::dir());
-        $this->assertNotNull(Page::translation());
-        $this->assertEquals('https://example.com/',Page::canonical());
+        $page = new WebPage();
+        $this->assertEquals('EN',$page->getLangCode());
+        $this->assertNull($page->getDescription());
+        $this->assertEquals('Hello World',$page->getTitle());
+        $this->assertEquals('WebFiori',$page->getWebsiteName());
+        $this->assertEquals(' | ',$page->getTitleSep());
+        $this->assertTrue($page->hasHeader());
+        $this->assertTrue($page->hasFooter());
+        $this->assertTrue($page->hasAside());
+        $this->assertEquals('ltr',$page->getWritingDir());
+        $this->assertNotNull($page->getTranslation());
+        $this->assertEquals('https://example.com/',$page->getCanonical());
     }
     /**
      * @test
      */
     public function testRender00() {
-        Page::reset();
-        $doc = Page::render(false, true);
-        $doc->removeChild(Page::document()->getChildByID('i18n'));
+        $page = new WebPage();
+        $doc = $page->render(false, true);
+        $doc->removeChild($page->getChildByID('i18n'));
         $this->assertEquals('<!DOCTYPE html>'
-                . '<html lang="EN">'
+                . '<html lang=EN>'
                 . '<head>'
-                . '<base href="https://example.com">'
+                . '<base href=https://example.com>'
                 . '<title>Hello World | WebFiori</title>'
-                . '<link rel="canonical" href="https://example.com/">'
-                . '<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">'
+                . '<link rel=canonical href=https://example.com/>'
+                . '<meta name=viewport content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">'
                 . '</head>'
-                . '<body itemscope itemtype="http://schema.org/WebPage">'
+                . '<body itemscope itemtype=http://schema.org/WebPage>'
                 . '<div id="page-header">'
                 . '</div>'
                 . '<div id="page-body">'
@@ -69,18 +70,18 @@ class PageTest extends TestCase{
      * @test
      */
     public function testRender01() {
-        Page::reset();
-        $doc = Page::render(false, true);
-        $doc->removeChild(Page::document()->getChildByID('i18n'));
+        $page = new WebPage();
+        $doc =$page->render(false, true);
+        $doc->removeChild($page->getChildByID('i18n'));
         $this->assertEquals('<!DOCTYPE html>'
-                . '<html lang="EN">'
+                . '<html lang=EN>'
                 . '<head>'
-                . '<base href="https://example.com">'
+                . '<base href=https://example.com>'
                 . '<title>Hello World | WebFiori</title>'
-                . '<link rel="canonical" href="https://example.com/">'
-                . '<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">'
+                . '<link rel=canonical href=https://example.com/>'
+                . '<meta name=viewport content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">'
                 . '</head>'
-                . '<body itemscope itemtype="http://schema.org/WebPage">'
+                . '<body itemscope itemtype=http://schema.org/WebPage>'
                 . '<div id="page-header">'
                 . '</div>'
                 . '<div id="page-body">'
@@ -95,119 +96,129 @@ class PageTest extends TestCase{
      * @test
      */
     public function testSetDescription00() {
-        Page::reset();
-        $this->assertFalse(Page::document()->getHeadNode()->hasMeta('description'));
-        Page::description('Hello World Page.');
-        $this->assertTrue(Page::document()->getHeadNode()->hasMeta('description'));
-        $this->assertEquals('Hello World Page.',Page::description());
+        $page = new WebPage();
+        $this->assertFalse($page->getDocument()->getHeadNode()->hasMeta('description'));
+        $page->setDescription('Hello World Page.');
+        $this->assertEquals('Hello World Page.',$page->getDescription());
+        $this->assertTrue($page->getDocument()->getHeadNode()->hasMeta('description'));
+        return $page;
     }
     /**
      * @test
      * @depends testSetDescription00
      */
-    public function testSetDescription01() {
-        Page::description();
-        $this->assertEquals('Hello World Page.',Page::description());
-        Page::description('');
-        $this->assertNull(Page::description());
-        $this->assertFalse(Page::document()->getHeadNode()->hasMeta('description'));
+    public function testSetDescription01(WebPage $page) {
+        $this->assertEquals('Hello World Page.',$page->getDescription());
+        $page->setDescription(null);
+        $this->assertNull($page->getDescription());
+        $this->assertFalse($page->getDocument()->getHeadNode()->hasMeta('description'));
     }
     /**
      * @test
      */
     public function testReset00() {
-        Page::theme('WebFiori Theme');
-        Page::lang('ar');
-        Page::description('This is a test page.');
-        Page::title('Login');
-        Page::siteName('Small ERP');
-        Page::separator('-');
-        Page::header(false);
-        Page::footer(false);
-        Page::aside(false);
-        Page::translation();
+        $page = new WebPage();
+        $page->setTheme('WebFiori Theme');
+        $page->setDescription('This is a test page.');
+        $page->setLang('ar');
+        $page->setTitle('Login');
+        $page->setWebsiteName('Small ERP');
+        $page->setTitleSep('-');
+        $page->setHasHeader(false);
+        $page->setHasFooter(false);
+        $page->setHasAside(false);
         
-        $this->assertEquals('AR',Page::lang());
-        $this->assertEquals('This is a test page.',Page::description());
-        $this->assertEquals('Login',Page::title());
-        $this->assertEquals('Small ERP',Page::siteName());
-        $this->assertEquals(' - ',Page::separator());
-        $this->assertFalse(Page::header());
-        $this->assertFalse(Page::footer());
-        $this->assertFalse(Page::aside());
-        $this->assertNotNull(Page::theme());
-        $this->assertEquals('rtl',Page::dir());
-        $this->assertNotNull(Page::translation());
+        $this->assertEquals('AR',$page->getLangCode());
+        $this->assertEquals('This is a test page.',$page->getDescription());
+        $this->assertEquals('Login',$page->getTitle());
+        $this->assertEquals('Small ERP',$page->getWebsiteName());
+        $this->assertEquals(' - ',$page->getTitleSep());
+        $this->assertFalse($page->hasHeader());
+        $this->assertFalse($page->hasFooter());
+        $this->assertFalse($page->hasAside());
+        $this->assertNotNull($page->getTheme());
+        $this->assertEquals('rtl',$page->getWritingDir());
+        $this->assertNotNull($page->getTranslation());
         
-        Page::reset();
-        $this->assertEquals('EN',Page::lang());
-        $this->assertNull(Page::description());
-        $this->assertEquals('Hello World',Page::title());
-        $this->assertEquals('WebFiori',Page::siteName());
-        $this->assertEquals(' | ',Page::separator());
-        $this->assertTrue(Page::header());
-        $this->assertTrue(Page::footer());
-        $this->assertTrue(Page::aside());
-        $this->assertEquals('ltr',Page::dir());
-        $this->assertNotNull(Page::translation());
-        $this->assertEquals('https://example.com/',Page::canonical());
+        $page = new WebPage();
+        $this->assertEquals('EN',$page->getLangCode());
+        $this->assertNull($page->getDescription());
+        $this->assertEquals('Hello World',$page->getTitle());
+        $this->assertEquals('WebFiori',$page->getWebsiteName());
+        $this->assertEquals(' | ',$page->getTitleSep());
+        $this->assertTrue($page->hasAside());
+        $this->assertTrue($page->hasFooter());
+        $this->assertTrue($page->hasHeader());
+        $this->assertEquals('ltr',$page->getWritingDir());
+        $this->assertNotNull($page->getTranslation());
+        $this->assertEquals('https://example.com/',$page->getCanonical());
     }
     /**
      * @test
      */
     public function testCanonical() {
-        $c = Page::canonical('https://example.com/home');
+        $page = new WebPage();
+        $page->setCanonical('https://example.com/home');
+        $c = $page->getCanonical();
         $this->assertEquals('https://example.com/home',$c);
-        $this->assertEquals('https://example.com/home',Page::document()->getHeadNode()->getCanonical());
+        $this->assertEquals('https://example.com/home',$page->getDocument()->getHeadNode()->getCanonical());
     }
     /**
      * @test
      */
     public function testDirs00() {
-        Page::reset();
-        $this->assertEquals('',Page::cssDir());
-        $this->assertEquals('',Page::imagesDir());
-        $this->assertEquals('',Page::jsDir());
+        $page = new WebPage();
+        $this->assertEquals('',$page->getThemeCSSDir());
+        $this->assertEquals('',$page->getThemeJSDir());
+        $this->assertEquals('',$page->getThemeImagesDir());
     }
     /**
      * @test
      * @depends testDirs00
      */
     public function testDirs01() {
-        Page::theme();
-        $this->assertEquals('assets/webfiori-v1.0.8/css',Page::cssDir());
-        $this->assertEquals('assets/webfiori-v1.0.8/images',Page::imagesDir());
-        $this->assertEquals('assets/webfiori-v1.0.8/js',Page::jsDir());
+        $page = new WebPage();
+        $page->setTheme();
+        $this->assertEquals('assets/webfiori-v1.0.8/css',$page->getThemeCSSDir());
+        $this->assertEquals('assets/webfiori-v1.0.8/images',$page->getThemeImagesDir());
+        $this->assertEquals('assets/webfiori-v1.0.8/js',$page->getThemeJSDir());
     }
     /**
      * @test
      */
     public function testTheme00() {
-        Page::reset();
-        $theme = Page::theme();
+        $page = new WebPage();
+        $page->setTheme();
+        $theme = $page->getTheme();
         $this->assertTrue($theme instanceof Theme);
-        $this->assertEquals(SiteConfig::getBaseThemeName(),$theme->getName());
-        $theme2 = Page::theme();
+        $this->assertEquals(WebFioriApp::getAppConfig()->getBaseThemeName(), get_class($theme));
+        $page->setTheme(get_class($theme));
+        $theme2 = $page->getTheme();
         $this->assertTrue($theme2 === $theme);
-        $theme3 = Page::theme('Template Theme');
+        $page->setTheme('Template Theme');
+        $theme3 = $page->getTheme();
         $this->assertFalse($theme3 === $theme2);
-        $theme4 = Page::theme('Template Theme');
+        $page->setTheme('Template Theme');
+        $theme4 = $page->getTheme('Template Theme');
         $this->assertTrue($theme3 === $theme4);
     }
     /**
      * @test
      */
     public function testTheme01() {
-        Page::reset();
-        $this->assertNull(Page::theme(''));
-        $this->assertNull(Page::theme('    '));
+        $page = new WebPage();
+        $page->setTheme('');
+        $this->assertNull($page->getTheme());
+        $page->setTheme('      ');
+        $this->assertNull($page->getTheme());
     }
     /**
      * @test
      */
     public function testTheme02() {
-        Page::reset();
-        $theme3 = Page::theme('      Template Theme      ');
+        $page = new WebPage();
+        $page->setTheme('      Template Theme      ');
+        $theme3 = $page->getTheme();
         $this->assertTrue($theme3 instanceof Theme);
     }
     /**
@@ -216,47 +227,48 @@ class PageTest extends TestCase{
     public function testTheme03() {
         $firstThemeName = 'Template Theme';
         $secondThemeName = 'WebFiori Theme';
-        Page::reset();
-        $theme3 = Page::theme($firstThemeName);
-        $fTheme = Page::theme();
-        $this->assertTrue($theme3 === $fTheme);
-        $this->assertEquals($firstThemeName,$fTheme->getName());
-        $sTheme = Page::theme($secondThemeName);
-        $this->assertTrue($sTheme === Page::theme());
+        $page = new WebPage();
+        $page->setTheme($firstThemeName);
+        $theme3 = $page->getTheme();
+        $page->setTheme();
+        $fTheme = $page->getTheme();
+        $this->assertFalse($theme3 === $fTheme);
+        $this->assertNotEquals($firstThemeName,$fTheme->getName());
+        $page->setTheme($secondThemeName);
+        $sTheme = $page->getTheme();
+        $this->assertTrue($sTheme === $page->getTheme());
         $this->assertEquals($secondThemeName,$sTheme->getName());
-        $f2Theme = Page::theme($firstThemeName);
-        $this->assertTrue($f2Theme === $fTheme);
     }
     /**
      * @test
      */
     public function testInsert00() {
-        Page::reset();
+        $page = new WebPage();
         $node = new HTMLNode();
         $node->setID('new-node');
-        $this->assertNotNull(Page::insert($node));
-        $this->assertEquals(1,Page::document()->getChildByID('main-content-area')->childrenCount());
-        $el = Page::document()->getChildByID('new-node');
+        $this->assertNotNull($page->insert($node));
+        $this->assertEquals(1,$page->getChildByID('main-content-area')->childrenCount());
+        $el = $page->getChildByID('new-node');
         $this->assertTrue($el === $node);
     }
     /**
      * @test
      */
     public function testInsert01() {
-        Page::reset();
+        $page = new WebPage();
         $node = new HTMLNode();
         $node->setID('new-node');
-        $this->assertNull(Page::insert($node,''));
-        $this->assertEquals(0,Page::document()->getChildByID('main-content-area')->childrenCount());
-        $el = Page::document()->getChildByID('new-node');
+        $this->assertNull($page->insert($node,''));
+        $this->assertEquals(0,$page->getChildByID('main-content-area')->childrenCount());
+        $el = $page->getChildByID('new-node');
         $this->assertNull($el);
     }
     /**
      * @test
      */
     public function testUsingLang00() {
-        Page::reset();
-        $null = Page::translation();
+        $page = new WebPage();
+        $null = $page->getTranslation();
         $this->assertNotNull($null);
         $this->assertEquals('EN', $null->getCode());
     }
@@ -264,15 +276,15 @@ class PageTest extends TestCase{
      * @test
      */
     public function testUsingLang01() {
-        Page::reset();
-        Page::lang('en');
-        $lang = Page::translation();
+        $page = new WebPage();
+        $page->setLang('en');
+        $lang = $page->getTranslation();
         $this->assertTrue($lang instanceof Language);
-        $lang2 = Page::translation();
+        $lang2 = $page->getTranslation();
         $this->assertTrue($lang2 instanceof Language);
         $this->assertTrue($lang === $lang2);
-        Page::lang('ar');
-        $lang3 = Page::translation();
+        $page->setLang('ar');
+        $lang3 = $page->getTranslation();
         $this->assertTrue($lang3 instanceof Language);
         $this->assertFalse($lang3 === $lang2);
     }
@@ -282,9 +294,8 @@ class PageTest extends TestCase{
     public function testUsingLang02() {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('No language class was found for the language \'NM\'.');
-        Page::reset();
-        Page::lang('nm');
-        Page::translation();
+        $page = new WebPage();
+        $page->setLang('nm');
     }
     /**
      * @test
@@ -292,134 +303,143 @@ class PageTest extends TestCase{
     public function testUsingLang03() {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('The translation file was found. But no object of type \'Language\' is stored. Make sure that the parameter $addtoLoadedAfterCreate is set to true when creating the language object.');
-        Page::reset();
-        Page::lang('jp');
-        Page::translation();
+        $page = new WebPage();
+        $page->setLang('jp');
     }
     /**
      * @test
      */
     public function testHeader00() {
-        Page::reset();
-        $this->assertTrue(Page::header());
-        $node = Page::document()->getChildByID('page-header');
+        $page = new WebPage();
+        $this->assertTrue($page->hasHeader());
+        $node = $page->getChildByID('page-header');
         $this->assertTrue($node instanceof HTMLNode);
-        $this->assertEquals(3,Page::document()->getBody()->childrenCount());
+        $this->assertEquals(3,$page->getDocument()->getBody()->childrenCount());
     }
     /**
      * @test
      */
     public function testHeader01() {
-        Page::reset();
-        $this->assertFalse(Page::header(false));
-        $node = Page::document()->getChildByID('page-header');
+        $page = new WebPage();
+        $page->setHasHeader(false);
+        $this->assertFalse($page->hasHeader());
+        $node = $page->getChildByID('page-header');
         $this->assertNull($node);
-        $this->assertEquals(2,Page::document()->getBody()->childrenCount());
+        $this->assertEquals(2,$page->getDocument()->getBody()->childrenCount());
+    
+        return $page;
     }
     /**
      * @test
      * @depends testHeader01
      */
-    public function testHeader02() {
-        $this->assertFalse(Page::header());
-        $node = Page::document()->getChildByID('page-header');
+    public function testHeader02(WebPage $page) {
+        $this->assertFalse($page->hasHeader());
+        $node = $page->getChildByID('page-header');
         $this->assertNull($node);
-        $this->assertEquals(2,Page::document()->getBody()->childrenCount());
-        $this->assertTrue(Page::header(true));
-        $node2 = Page::document()->getChildByID('page-header');
+        $this->assertEquals(2,$page->getDocument()->getBody()->childrenCount());
+        $page->setHasHeader(true);
+        $this->assertTrue($page->hasHeader());
+        $node2 = $page->getChildByID('page-header');
         $this->assertTrue($node2 instanceof HTMLNode);
-        $this->assertEquals(3,Page::document()->getBody()->childrenCount());
-        $this->assertEquals('page-header',Page::document()->getBody()->getChild(0)->getAttribute('id'));
+        $this->assertEquals(3,$page->getDocument()->getBody()->childrenCount());
+        $this->assertEquals('page-header',$page->getDocument()->getBody()->getChild(0)->getAttribute('id'));
     }
     /**
      * @test
      */
     public function testFooter00() {
-        Page::reset();
-        $this->assertTrue(Page::footer());
-        $node = Page::document()->getChildByID('page-footer');
+        $page = new WebPage();
+        $this->assertTrue($page->hasFooter());
+        $node = $page->getChildByID('page-footer');
         $this->assertTrue($node instanceof HTMLNode);
-        $this->assertEquals(3,Page::document()->getBody()->childrenCount());
+        $this->assertEquals(3,$page->getDocument()->getBody()->childrenCount());
     }
     /**
      * @test
      */
     public function testFooter01() {
-        Page::reset();
-        $this->assertFalse(Page::footer(false));
-        $node = Page::document()->getChildByID('page-footer');
+        $page = new WebPage();
+        $page->setHasFooter(false);
+        $this->assertFalse($page->hasFooter());
+        $node = $page->getChildByID('page-footer');
         $this->assertNull($node);
-        $this->assertEquals(2,Page::document()->getBody()->childrenCount());
+        $this->assertEquals(2,$page->getDocument()->getBody()->childrenCount());
+        return $page;
     }
     /**
      * @test
      * @depends testFooter01
      */
-    public function testFooter02() {
-        $this->assertFalse(Page::footer());
-        $node = Page::document()->getChildByID('page-footer');
+    public function testFooter02(WebPage $page) {
+        $this->assertFalse($page->hasFooter());
+        $node = $page->getChildByID('page-footer');
         $this->assertNull($node);
-        $this->assertEquals(2,Page::document()->getBody()->childrenCount());
-        $this->assertTrue(Page::footer(true));
-        $node2 = Page::document()->getChildByID('page-footer');
+        $this->assertEquals(2,$page->getDocument()->getBody()->childrenCount());
+        $page->setHasFooter(true);
+        $this->assertTrue($page->hasFooter());
+        $node2 = $page->getChildByID('page-footer');
         $this->assertTrue($node2 instanceof HTMLNode);
-        $this->assertEquals(3,Page::document()->getBody()->childrenCount());
-        $this->assertEquals('page-footer',Page::document()->getBody()->getChild(2)->getAttribute('id'));
+        $this->assertEquals(3,$page->getDocument()->getBody()->childrenCount());
+        $this->assertEquals('page-footer',$page->getDocument()->getBody()->getChild(2)->getAttribute('id'));
     }
     /**
      * @test
      */
     public function testAside00() {
-        Page::reset();
-        $this->assertTrue(Page::aside());
-        $node = Page::document()->getChildByID('side-content-area');
+        $page = new WebPage();
+        $this->assertTrue($page->hasAside());
+        $node = $page->getChildByID('side-content-area');
         $this->assertTrue($node instanceof HTMLNode);
-        $this->assertEquals(2,Page::document()->getChildByID('page-body')->childrenCount());
+        $this->assertEquals(2,$page->getChildByID('page-body')->childrenCount());
     }
     /**
      * @test
      */
     public function testAside01() {
-        Page::reset();
-        $this->assertFalse(Page::aside(false));
-        $node = Page::document()->getChildByID('side-content-area');
+        $page = new WebPage();
+        $page->setHasAside(false);
+        $this->assertFalse($page->hasAside());
+        $node = $page->getChildByID('side-content-area');
         $this->assertNull($node);
-        $this->assertEquals(1,Page::document()->getChildByID('page-body')->childrenCount());
+        $this->assertEquals(1,$page->getChildByID('page-body')->childrenCount());
+        return $page;
     }
     /**
      * @test
-     * @depends testFooter01
+     * @depends testAside01
      */
-    public function testAside02() {
-        $this->assertFalse(Page::aside());
-        $node = Page::document()->getChildByID('side-content-area');
+    public function testAside02(WebPage $page) {
+        $this->assertFalse($page->hasAside());
+        $node = $page->getChildByID('side-content-area');
         $this->assertNull($node);
-        $this->assertEquals(1,Page::document()->getChildByID('page-body')->childrenCount());
-        $this->assertTrue(Page::aside(true));
-        $node2 = Page::document()->getChildByID('side-content-area');
+        $this->assertEquals(1,$page->getChildByID('page-body')->childrenCount());
+        $page->setHasAside(true);
+        $this->assertTrue($page->hasAside());
+        $node2 = $page->getChildByID('side-content-area');
         $this->assertTrue($node2 instanceof HTMLNode);
-        $this->assertEquals(2,Page::document()->getChildByID('page-body')->childrenCount());
-        $this->assertEquals('side-content-area',Page::document()->getChildByID('page-body')->getChild(0)->getAttribute('id'));
+        $this->assertEquals(2,$page->getChildByID('page-body')->childrenCount());
+        $this->assertEquals('side-content-area',$page->getChildByID('page-body')->getChild(0)->getAttribute('id'));
     }
     /**
      * @test
      */
     public function testHead00() {
-        Page::reset();
-        $head00 = Page::document()->getHeadNode();
-        Page::theme();
-        $head01 = Page::document()->getHeadNode();
+        $page = new WebPage();
+        $head00 = $page->getDocument()->getHeadNode();
+        $page->setTheme();
+        $head01 = $page->getDocument()->getHeadNode();
         $this->assertFalse($head00 === $head01);
     }
     /**
      * @test
      */
     public function testHead01() {
-        Page::reset();
-        Page::description('This is for testing.');
-        $head00 = Page::document()->getHeadNode();
-        Page::theme();
-        $head01 = Page::document()->getHeadNode();
+        $page = new WebPage();
+        $page->setDescription('This is for testing.');
+        $head00 = $page->getDocument()->getHeadNode();
+        $page->setTheme();
+        $head01 = $page->getDocument()->getHeadNode();
         $this->assertFalse($head00 === $head01);
         $this->assertEquals($head00->getMeta('description')->getAttribute('content'),
                 $head01->getMeta('description')->getAttribute('content'));

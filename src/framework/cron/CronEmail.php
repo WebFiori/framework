@@ -26,7 +26,7 @@ namespace webfiori\framework\cron;
 
 use webfiori\framework\File;
 use webfiori\framework\mail\EmailMessage;
-use webfiori\framework\WebFiori;
+use webfiori\framework\WebFioriApp;
 use webfiori\ui\HTMLNode;
 use webfiori\ui\TableRow;
 /**
@@ -128,7 +128,7 @@ class CronEmail extends EmailMessage {
         $jobTable->addChild($this->_createTableRow('Check Started:', Cron::timestamp()));
         $jobTable->addChild($this->_createTableRow('Run Time:', date('Y-m-d H:i:s')));
         $jobTable->addChild($this->_createTableRow('PHP Version:', PHP_VERSION));
-        $jobTable->addChild($this->_createTableRow('Framework Version:', WebFiori::getConfig()->getVersion()));
+        $jobTable->addChild($this->_createTableRow('Framework Version:', WF_VERSION));
         $jobTable->addChild($this->_createTableRow('Root Directory:', ROOT_DIR));
 
         if ($job->isSuccess()) {

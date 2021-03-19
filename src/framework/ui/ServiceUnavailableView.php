@@ -25,7 +25,6 @@
  */
 namespace webfiori\framework\ui;
 
-use webfiori\conf\Config;
 use webfiori\framework\Page;
 use webfiori\ui\HTMLNode;
 use webfiori\ui\UnorderedList;
@@ -63,7 +62,7 @@ class ServiceUnavailableView {
         Page::insert($changesParag);
         $poweredByParag = new HTMLNode('p');
         $poweredByParag->addTextNode('System Powerd By: <a href="https://github.com/usernane/webfiori" target="_blank"><b>'
-                    .'WebFiori Framework v'.Config::getVersion().' ('.Config::getVersionType().')'
+                    .'WebFiori Framework v'.WF_VERSION.' ('.WF_VERSION_TYPE.')'
                     .'</b></a>', false);
         Page::insert($poweredByParag);
     }

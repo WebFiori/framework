@@ -8,7 +8,7 @@ use webfiori\ui\ListItem;
 use webfiori\ui\UnorderedList;
 use webfiori\framework\Page;
 use webfiori\framework\Theme;
-use webfiori\framework\WebFiori;
+use webfiori\framework\WebFioriApp;
 use webfiori\framework\session\SessionsManager;
 /**
  * WebFiori Theme Which is bundled with v1.0.8 of the framework.
@@ -29,21 +29,22 @@ class WebFioriV108 extends Theme {
             if ($activeSession !== null) {
                 Page::lang($activeSession->getLangCode(true));
             } else {
-                Page::lang(WebFiori::getSiteConfig()->getPrimaryLanguage());
+                Page::lang(WebFioriApp::getAppConfig()->getPrimaryLanguage());
             }
         });
-        $this->setAfterLoaded(function()
+        $this->setAfterLoaded(function(Theme $theme)
         {
+            $page = $theme->getPage();
             
-            Page::document()->getChildByID('page-body')->setClassName('row  ml-0 mr-0');
-            Page::document()->getChildByID('page-body')->setStyle([
+            $page->getChildByID('page-body')->setClassName('row  ml-0 mr-0');
+            $page->getChildByID('page-body')->setStyle([
                 'margin-top' => '50px'
             ]);
-            Page::document()->getBody()->setStyle([
+            $page->getDocument()->getBody()->setStyle([
                 'max-height' => '10px',
                 'height' => '10px'
             ]);
-            Page::document()->getChildByID('main-content-area')->setClassName('col-10 p-5');
+            $page->getChildByID('main-content-area')->setClassName('col-10 p-5');
             $img = new HTMLNode('img');
             $img->setAttribute('src','assets/images/favicon.png');
             $img->setStyle([
@@ -54,11 +55,11 @@ class WebFioriV108 extends Theme {
                 'left' => '50px',
                 'z-index' => -1,
             ]);
-            Page::document()->getBody()->addChild($img);
-            Page::beforeRender(function(){
+            $page->getDocument()->getBody()->addChild($img);
+            $page->addBeforeRender(function ($page) {
                 $js = new \webfiori\ui\JsCode();
                 $js->addCode("window.Prism = window.Prism || {};");
-                Page::document()->getHeadNode()->addChild($js);
+                $page->getDocument()->getHeadNode()->addChild($js);
             });
         });
     }
@@ -260,7 +261,7 @@ class WebFioriV108 extends Theme {
         $footerLinksUl->getChild(2)->setClassName('nav-item ml-3');
         $footer->addChild($footerLinksUl);
         $powerdByNode = new HTMLNode('p');
-        $powerdByNode->addTextNode('Powered by: <a href="https://webfiori.com">WebFiori Framework</a> v'.WebFiori::getConfig()->getVersion().'. '
+        $powerdByNode->addTextNode('Powered by: <a href="https://webfiori.com">WebFiori Framework</a> v'.WF_VERSION.'. '
                 .'Code licensed under the <a href="https://opensource.org/licenses/MIT">MIT License</a>.', false);
         $footer->addChild($powerdByNode);
         $img = new HTMLNode('img');
@@ -302,7 +303,7 @@ class WebFioriV108 extends Theme {
             'alt' => 'logo',
             'style' => 'width:40px'
         ]);
-        $logoLink = new Anchor(WebFiori::getSiteConfig()->getHomePage(), $logo->toHTML());
+        $logoLink = new Anchor(WebFioriApp::getAppConfig()->getHomePage(), $logo->toHTML());
         $logoLink->setClassName('navbar-brand ml-3');
         $mainNav->addChild($logoLink);
 

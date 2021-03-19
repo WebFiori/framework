@@ -26,7 +26,7 @@ namespace webfiori\framework\cron;
 
 use webfiori\framework\Page;
 use webfiori\framework\session\SessionsManager;
-use webfiori\framework\WebFiori;
+use webfiori\framework\WebFioriApp;
 use webfiori\http\Response;
 use webfiori\ui\HTMLNode;
 use webfiori\ui\JsCode;
@@ -51,16 +51,16 @@ class CronView {
         if (Cron::password() != 'NO_PASSWORD' 
                 && $title != $loginPageTitle
                 && SessionsManager::getActiveSession()->get('cron-login-status') !== true) {
-            Response::addHeader('location', WebFiori::getSiteConfig()->getBaseURL().'/cron/login');
+            Response::addHeader('location', WebFioriApp::getAppConfig()->getBaseURL().'/cron/login');
             Response::send();
         } else if ($title == $loginPageTitle && Cron::password() == 'NO_PASSWORD') {
-            Response::addHeader('location', WebFiori::getSiteConfig()->getBaseURL().'/cron/jobs');
+            Response::addHeader('location', WebFioriApp::getAppConfig()->getBaseURL().'/cron/jobs');
             Response::send();
         }
         Page::title($title);
         Page::description($description);
-        $defaltSiteLang = WebFiori::getSiteConfig()->getPrimaryLanguage();
-        $siteNames = WebFiori::getSiteConfig()->getWebsiteNames();
+        $defaltSiteLang = WebFioriApp::getAppConfig()->getPrimaryLanguage();
+        $siteNames = WebFioriApp::getAppConfig()->getWebsiteNames();
         $siteName = isset($siteNames[$defaltSiteLang]) ? $siteNames[$defaltSiteLang] : null;
 
         if ($siteName !== null) {

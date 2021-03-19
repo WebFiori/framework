@@ -23,6 +23,8 @@
  * THE SOFTWARE.
  */
 namespace webfiori\framework\session;
+use Exception;
+use ErrorException;
 
 /**
  * A class which is used to manage user sessions.
@@ -70,7 +72,22 @@ class SessionsManager {
      */
     private function __construct() {
         $this->sesstionsArr = [];
-        $this->sesstionStorage = new DefaultSessionStorage();
+        if (defined('WF_SESSION_STORAGE')) {
+            
+            try {
+                $constructor = WF_SESSION_STORAGE.'';
+                $classObj = new $constructor();
+
+                if (is_subclass_of($classObj, '\webfiori\framework\session\SessionStorage')) {
+                    $this->sesstionStorage = $classObj;
+                }
+            } catch (Exception $ex) {} 
+            catch (ErrorException $ex) {}
+        }
+        
+        if ($this->sesstionStorage === null) {
+            $this->sesstionStorage = new DefaultSessionStorage();
+        }
     }
     /**
      * Saves the state of the active session and close it.
@@ -375,7 +392,7 @@ class SessionsManager {
      * @since 1.0
      */
     public static function setStorage($storage) {
-        if ($storage instanceof SesstionStorage) {
+        if (is_subclass_of($storage, '\webfiori\framework\session\SessionStorage')) {
             self::_get()->sesstionStorage = $storage;
         }
     }

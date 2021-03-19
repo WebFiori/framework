@@ -10,7 +10,7 @@ namespace webfiori\framework\cli;
 use Error;
 use ErrorException;
 use Exception;
-use webfiori\conf\Config;
+use webfiori\framework\WebFioriApp;
 use webfiori\database\Column;
 use webfiori\database\mysql\MySQLColumn;
 use webfiori\database\Table;
@@ -404,7 +404,7 @@ class UpdateTableCommand extends CLICommand {
         $runQuery = $this->confirm($prompt, false);
 
         if ($runQuery) {
-            $dbConnections = array_keys(Config::getDBConnections());
+            $dbConnections = array_keys(WebFioriApp::getAppConfig()->getDBConnections());
 
             if (count($dbConnections) != 0) {
                 $dbConn = $this->select('Select database connection:', $dbConnections, 0);

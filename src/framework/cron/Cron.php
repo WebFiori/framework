@@ -32,7 +32,7 @@ use webfiori\framework\cron\webServices\CronServicesManager;
 use webfiori\framework\router\Router;
 use webfiori\framework\session\SessionsManager;
 use webfiori\framework\Util;
-use webfiori\framework\WebFiori;
+use webfiori\framework\WebFioriApp;
 /**
  * A class that is used to manage scheduled background jobs.
  * 
@@ -756,7 +756,7 @@ class Cron {
      */
     private static function _registerJobs() {
         if (CLI::isCLI() || (defined('CRON_THROUGH_HTTP') && CRON_THROUGH_HTTP === true)) {
-            WebFiori::autoRegister('jobs', function ($job)
+            WebFioriApp::autoRegister('jobs', function ($job)
             {
                 Cron::scheduleJob($job);
             });

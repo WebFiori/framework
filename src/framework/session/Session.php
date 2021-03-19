@@ -24,7 +24,7 @@
  */
 namespace webfiori\framework\session;
 
-use webfiori\conf\SiteConfig;
+use webfiori\framework\WebFioriApp;
 use webfiori\framework\exceptions\SessionException;
 use webfiori\framework\User;
 use webfiori\json\Json;
@@ -931,7 +931,7 @@ class Session implements JsonI {
             //the value of default language.
             //used in case no language found 
             //in $_GET['lang'], $_POST['lang'] or in cookie
-            $defaultLang = class_exists('webfiori\conf\SiteConfig') ? SiteConfig::getPrimaryLanguage() : 'EN';
+            $defaultLang = WebFioriApp::getAppConfig()->getPrimaryLanguage();
             $langCodeFromReq = $this->_getLangFromRequest();
             $retVal = false;
 

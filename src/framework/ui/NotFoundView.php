@@ -26,7 +26,7 @@ namespace webfiori\framework\ui;
 
 use webfiori\framework\Page;
 use webfiori\framework\session\SessionsManager;
-use webfiori\framework\WebFiori;
+use webfiori\framework\WebFioriApp;
 use webfiori\http\Response;
 use webfiori\ui\HTMLNode;
 /**
@@ -40,15 +40,15 @@ class NotFoundView {
      * Creates new instance of the class.
      */
     public function __construct() {
-        Page::theme(WebFiori::getSiteConfig()->getBaseThemeName());
+        Page::theme(WebFioriApp::getAppConfig()->getBaseThemeName());
         $activeSession = SessionsManager::getActiveSession();
 
         if ($activeSession !== null) {
             Page::lang($activeSession->getLangCode(true));
         } else {
-            Page::lang(WebFiori::getSiteConfig()->getPrimaryLanguage());
+            Page::lang(WebFioriApp::getAppConfig()->getPrimaryLanguage());
         }
-        Page::siteName(WebFiori::getSiteConfig()->getWebsiteNames()[Page::lang()]);
+        Page::siteName(WebFioriApp::getAppConfig()->getWebsiteNames()[Page::lang()]);
         $labels = Page::translation()->get('general/http-codes/404');
         Page::title($labels['code'].' - '.$labels['type']);
         http_response_code($labels['code']);

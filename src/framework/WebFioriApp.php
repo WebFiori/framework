@@ -24,9 +24,7 @@
  */
 namespace webfiori\framework;
 
-use webfiori\conf\Config;
-use webfiori\conf\MailConfig;
-use webfiori\conf\SiteConfig;
+use app\AppConfig;
 use webfiori\framework\cli\CLI;
 use webfiori\framework\exceptions\InitializationException;
 use webfiori\framework\middleware\MiddlewareManager;
@@ -61,7 +59,8 @@ define('MICRO_START', microtime(true));
  * 
  * @version 1.3.6
  */
-class WebFiori {
+class WebFioriApp {
+    private $appConfig;
     /**
      * An instance of autoloader class.
      * 
@@ -79,18 +78,9 @@ class WebFiori {
      */
     private static $classStatus = 'NONE';
     /**
-     * An associative array that contains database connection error that might 
-     * happen during initialization.
-     * 
-     * @var array|null 
-     * 
-     * @since 1.3.3
-     */
-    private $dbErrDetails;
-    /**
      * A single instance of the class.
      * 
-     * @var WebFiori
+     * @var WebFioriApp
      * 
      * @since 1.0 
      */
@@ -104,15 +94,6 @@ class WebFiori {
      */
     private static $SF;
     /**
-     * A variable to store system status. The variable will be set to true 
-     * if everything is Ok.
-     * 
-     * @var boolean|string 
-     * 
-     * @since 1.0
-     */
-    private $sysStatus;
-    /**
      * The entry point for initiating the system.
      * 
      * @since 1.0
@@ -122,16 +103,58 @@ class WebFiori {
          * first, check for php streams if they are open or not.
          */
         if (!defined('STDIN')) {
+            /**
+             * A constant that represents standard input stream of PHP.
+             * 
+             * The value of the constant is a 'resource' which can be used with 
+             * all file related PHP functions.
+             * 
+             */
             define('STDIN', fopen('php://stdin', 'r'));
         }
 
         if (!defined('STDOUT')) {
+            /**
+             * A constant that represents standard output stream of PHP.
+             * 
+             * The value of the constant is a 'resource' which can be used with 
+             * all file related PHP functions.
+             */
             define('STDOUT', fopen('php://stdout', 'w'));
         }
 
         if (!defined('STDERR')) {
+            /**
+             * A constant that represents standard error output stream of PHP.
+             * 
+             * The value of the constant is a 'resource' which can be used with 
+             * all file related PHP functions.
+             * 
+             */
             define('STDERR',fopen('php://stderr', 'w'));
         }
+        /**
+         * A constant that represents version number of the framework.
+         * 
+         * @since 2.1
+         */
+        define('WF_VERSION', '2.1.0');
+        /**
+         * A constant that tells the type of framework version.
+         * 
+         * The constant can have values such as 'Alpha', 'Beta' or 'Stable'.
+         * 
+         * @since 2.1
+         */
+        define('WF_VERSION_TYPE', 'Beta 1');
+        /**
+         * The date at which the framework version was released.
+         * 
+         * The value of the constant will be a string in the format YYYY-MM-DD.
+         * 
+         * @since 2.1
+         */
+        define('WF_RELEASE_DATE', '2021-03-01');
         /**
          * Change encoding of mb_ functions to UTF-8
          */
@@ -139,7 +162,7 @@ class WebFiori {
             $encoding = 'UTF-8';
             mb_internal_encoding($encoding);
             mb_http_output($encoding);
-            mb_http_input($encoding);
+            //mb_http_input($encoding);
             mb_regex_encoding($encoding);
         }
 
@@ -166,10 +189,11 @@ class WebFiori {
         }
         self::$AU = AutoLoader::get();
         InitAutoLoad::init();
-        
+
         //Initialize CLI
         CLI::init();
         
+
         $this->_initThemesPath();
         $this->_setHandlers();
         $this->_checkStandardLibs();
@@ -179,21 +203,14 @@ class WebFiori {
         InitPrivileges::init();
 
         self::$SF = ConfigController::get();
-
-        $this->sysStatus = Util::checkSystemStatus();
-
-        if ($this->sysStatus == Util::MISSING_CONF_FILE || $this->sysStatus == Util::MISSING_SITE_CONF_FILE) {
-            self::$SF->createConfigFile();
-            self::$SF->createSiteConfigFile();
-            self::$SF->createEmailConfigFile();
-            $this->sysStatus = Util::checkSystemStatus();
+        
+        if (!class_exists('app\AppConfig')) {
+            self::$SF->createAppConfigFile();
         }
 
-        if (gettype($this->sysStatus) == 'array') {
-            $this->dbErrDetails = $this->sysStatus;
-            $this->sysStatus = Util::DB_NEED_CONF;
-        }
-        WebFiori::autoRegister('middleware', function($inst)
+        $this->appConfig = new AppConfig();
+        
+        WebFioriApp::autoRegister('middleware', function($inst)
         {
             MiddlewareManager::register($inst);
         });
@@ -230,8 +247,19 @@ class WebFiori {
         });
         //class is now initialized
         self::$classStatus = 'INITIALIZED';
-
-        define('INITIAL_SYS_STATUS', $this->_getSystemStatus());
+    }
+    /**
+     * Sets the configuration object that will be used to configure some of the 
+     * framework settings.
+     * 
+     * @param AppConfig $conf
+     * 
+     * @since 2.1.0
+     */
+    public static function setConfig(AppConfig $conf) {
+        if (self::$LC) {
+            self::$LC->appConfig = $conf;
+        }
     }
     /**
      * Register CLI commands or cron jobs.
@@ -268,24 +296,34 @@ class WebFiori {
         }
     }
     /**
-     * Initiate the framework and return a single instance of the class that can 
-     * be used to control basic settings of the framework.
+     * Start your WebFiori application.
      * 
-     * @return WebFiori An instance of the class.
+     * @return WebFioriApp An instance of the class.
      * 
      * @since 1.0
      */
-    public static function getAndStart() {
+    public static function start() {
         if (self::$classStatus == 'NONE') {
             if (self::$LC === null) {
                 self::$classStatus = 'INITIALIZING';
-                self::$LC = new WebFiori();
+                self::$LC = new WebFioriApp();
             }
         } else if (self::$classStatus == 'INITIALIZING') {
             throw new InitializationException('Using the core class while it is not fully initialized.');
         }
 
         return self::$LC;
+    }
+    /**
+     * 
+     * @return AppConfig
+     */
+    public static function getAppConfig() {
+        if (self::$LC !== null) {
+            return self::$LC->appConfig;
+        }
+
+        return new AppConfig();
     }
     /**
      * Returns a reference to an instance of 'AutoLoader'.
@@ -310,78 +348,6 @@ class WebFiori {
     public static function getClassStatus() {
         return self::$classStatus;
     }
-
-    /**
-     * Returns an instance of the class 'Config'.
-     * 
-     * The class will contain some of framework settings in addition to 
-     * database connection information.
-     * 
-     * @return Config|null If class file is exist and the class is loaded, 
-     * an object of type 'Config' is returned. Other than that, the method 
-     * will return null.
-     * 
-     * @since 1.3.3
-     */
-    public static function getConfig() {
-        if (class_exists('webfiori\conf\Config')) {
-            return Config::get();
-        }
-
-        return null;
-    }
-    /**
-     * Returns an associative array that contains database connection error 
-     * information.
-     * 
-     * If an error happens while connecting with the database at initialization 
-     * stage, this method can be used to get error details. The array will 
-     * have two indices: 'error-code' and 'error-message'.
-     * 
-     * @return array|null An associative array that contains database connection error 
-     * information. If no errors, the method will return null.
-     * 
-     * @since 1.3.3
-     */
-    public static function getDBErrDetails() {
-        return self::getAndStart()->dbErrDetails;
-    }
-    /**
-     * Returns an instance of the class 'MailConfig'.
-     * 
-     * The class will contain SMTP accounts information.
-     * 
-     * @return MailConfig|null If class file is exist and the class is loaded, 
-     * an object of type 'MailConfig' is returned. Other than that, the method 
-     * will return null.
-     * 
-     * @since 1.3.3
-     */
-    public static function getMailConfig() {
-        if (class_exists('webfiori\conf\MailConfig')) {
-            return MailConfig::get();
-        }
-
-        return null;
-    }
-    /**
-     * Returns an instance of the class 'SiteConfig'.
-     * 
-     * The class will contain website settings such as main language and theme.
-     * 
-     * @return SiteConfig|null If class file is exist and the class is loaded, 
-     * an object of type 'SiteConfig' is returned. Other than that, the method 
-     * will return null.
-     * 
-     * @since 1.3.3
-     */
-    public static function getSiteConfig() {
-        if (class_exists('webfiori\conf\SiteConfig')) {
-            return SiteConfig::get();
-        }
-
-        return null;
-    }
     /**
      * Returns a reference to an instance of 'ConfigController'.
      * 
@@ -391,29 +357,6 @@ class WebFiori {
      */
     public static function getSysController() {
         return self::$SF;
-    }
-    /**
-     * Returns the current status of the system.
-     * 
-     * @return boolean|string If the system is configured correctly, the method 
-     * will return true. If the file 'Config.php' was not found, The method will return 
-     * 'Util::MISSING_CONF_FILE'. If the file 'SiteConfig.php' was not found, The method will return 
-     * 'Util::MISSING_CONF_FILE'. If the system is not configured yet, the method 
-     * will return 'Util::NEED_CONF'. If the system is unable to connect to 
-     * the database, the method will return an associative array with two 
-     * indices which gives more details about the error. The first index is 
-     * 'error-code' and the second one is 'error-message'.
-     * 
-     * @since 1.0
-     */
-    public static function sysStatus() {
-        $retVal = self::$classStatus;
-
-        if (self::getClassStatus() == 'INITIALIZED') {
-            $retVal = self::getAndStart()->_getSystemStatus(true);
-        }
-
-        return $retVal;
     }
     /**
      * Checks if framework standard libraries are loaded or not.
@@ -443,24 +386,6 @@ class WebFiori {
         if (!class_exists('webfiori\http\Response')) {
             throw new InitializationException("The standard library 'webfiori/http' is missing.");
         }
-    }
-    /**
-     * 
-     * @param type $refresh
-     * @return boolean|string
-     * @since 1.0
-     */
-    private function _getSystemStatus($refresh = true) {
-        if ($refresh === true) {
-            $this->sysStatus = Util::checkSystemStatus();
-
-            if (gettype($this->sysStatus) == 'array') {
-                $this->dbErrDetails = $this->sysStatus;
-                $this->sysStatus = Util::DB_NEED_CONF;
-            }
-        }
-
-        return $this->sysStatus;
     }
     private function _initCRON() {
         $uriObj = new RouterUri(Util::getRequestedURL(), '');

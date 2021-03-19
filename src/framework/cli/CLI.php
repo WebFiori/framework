@@ -27,7 +27,7 @@ namespace webfiori\framework\cli;
 use Exception;
 use webfiori\framework\cron\Cron;
 use webfiori\framework\Util;
-use webfiori\framework\WebFiori;
+use webfiori\framework\WebFioriApp;
 use webfiori\ini\InitCliCommands;
 /**
  * A class which adds basic support for running the framework through 
@@ -286,7 +286,7 @@ class CLI {
      */
     private static function _autoRegister() {
         if (CLI::isCLI()) {
-            WebFiori::autoRegister('commands', function ($instance)
+            WebFioriApp::autoRegister('commands', function ($instance)
             {
                 CLI::register($instance);
             });

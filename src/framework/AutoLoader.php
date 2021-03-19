@@ -636,17 +636,19 @@ class AutoLoader {
      */
     private function _updateCache() {
         $autoloadCache = $this->getRoot().DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR.'storage'.DIRECTORY_SEPARATOR.self::CACHE_NAME;
-        $h = fopen($autoloadCache, 'w');
+        $h = @fopen($autoloadCache, 'w');
 
-        foreach ($this->loadedClasses as $classArr) {
-            if ($classArr[self::$CLASS_INDICES[1]] == '\\') {
-                //A class without a namespace
-                fwrite($h, $classArr[self::$CLASS_INDICES[2]].'=>'.$classArr[self::$CLASS_INDICES[0]]."\n");
-            } else {
-                fwrite($h, $classArr[self::$CLASS_INDICES[2]].'=>'.$classArr[self::$CLASS_INDICES[1]].'\\'.$classArr[self::$CLASS_INDICES[0]]."\n");
+        if (is_resource($h)) {
+            foreach ($this->loadedClasses as $classArr) {
+                if ($classArr[self::$CLASS_INDICES[1]] == '\\') {
+                    //A class without a namespace
+                    fwrite($h, $classArr[self::$CLASS_INDICES[2]].'=>'.$classArr[self::$CLASS_INDICES[0]]."\n");
+                } else {
+                    fwrite($h, $classArr[self::$CLASS_INDICES[2]].'=>'.$classArr[self::$CLASS_INDICES[1]].'\\'.$classArr[self::$CLASS_INDICES[0]]."\n");
+                }
             }
+            fclose($h);
         }
-        fclose($h);
     }
     /**
      * Adds new search directory to the array of search 

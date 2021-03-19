@@ -29,7 +29,8 @@ use webfiori\database\ConnectionInfo;
 use webfiori\framework\ConfigController;
 use webfiori\framework\DB;
 use webfiori\framework\mail\SMTPAccount;
-use webfiori\framework\WebFiori;
+use webfiori\framework\WebFioriApp;
+use webfiori\framework\cli\LangClassWriter;
 
 /**
  * A command which is used to add a database connection or SMTP account.
@@ -77,7 +78,7 @@ class AddCommand extends CLICommand {
         $connInfoObj->setUsername($this->getInput('Username:'));
         $connInfoObj->setPassword($this->getInput('Password:'));
         $connInfoObj->setDBName($this->getInput('Database name:'));
-        $connInfoObj->setName($this->getInput('Give your connection a friendly name:', 'db-connection-'.count(WebFiori::getConfig()->getDBConnections())));
+        $connInfoObj->setName($this->getInput('Give your connection a friendly name:', 'db-connection-'.count(WebFioriApp::getAppConfig()->getDBConnections())));
         $this->println('Trying to connect to the database...');
 
         $db = new DB($connInfoObj);
@@ -93,7 +94,7 @@ class AddCommand extends CLICommand {
 
         $this->success('Connected. Adding the connection...');
 
-        WebFiori::getSysController()->addOrUpdateDBConnections([$connInfoObj]);
+        WebFioriApp::getSysController()->addOrUpdateDBConnection($connInfoObj);
         $this->success('Connection information was stored in the class "webfiori\conf\Config".');
 
         return 0;
@@ -114,9 +115,18 @@ class AddCommand extends CLICommand {
             return 0;
         }
         $siteInfo['website-names'][$langCode] = $this->getInput('Name of the website in the new language:');
-        $siteInfo['site-descriptions'][$langCode] = $this->getInput('Description of the website in the new language:');
+        $siteInfo['descriptions'][$langCode] = $this->getInput('Description of the website in the new language:');
+        $siteInfo['titles'][$langCode] = $this->getInput('Default page title in the new language:');
+        $writingDir = $this->select('Select writing direction:', [
+            'ltr', 'rtl'
+        ]);
         ConfigController::get()->updateSiteInfo($siteInfo);
-        $this->success('Language added.');
+        $writer = new LangClassWriter($langCode, $writingDir);
+        $writer->writeClass();
+        $this->success('Language added. Also, a class for the language '
+                . 'is created at "app\langs" for that language.');
+        
+        
     }
     private function _addSmtp() {
         $smtpConn = new SMTPAccount();
@@ -126,7 +136,7 @@ class AddCommand extends CLICommand {
         $smtpConn->setPassword($this->getInput('Password:'));
         $smtpConn->setAddress($this->getInput('Sender email address:', $smtpConn->getUsername()));
         $smtpConn->setSenderName($this->getInput('Sender name:', 'WebFiori Framework'));
-        $smtpConn->setAccountName($this->getInput('Give your connection a friendly name:', 'smtp-connection-'.count(WebFiori::getMailConfig()->getAccounts())));
+        $smtpConn->setAccountName($this->getInput('Give your connection a friendly name:', 'smtp-connection-'.count(WebFioriApp::getAppConfig()->getAccounts())));
         $this->println('Testing connection. This can take up to 1 minute...');
         $result = ConfigController::get()->getSocketMailer($smtpConn);
 

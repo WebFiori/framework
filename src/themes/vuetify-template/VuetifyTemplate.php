@@ -7,7 +7,8 @@ use webfiori\json\Json;
 use webfiori\ui\JsCode;
 use webfiori\framework\Util;
 use webfiori\framework\session\SessionsManager;
-use webfiori\framework\WebFiori;
+use webfiori\framework\WebFioriApp;
+use webfiori\framework\ui\WebPage;
 
 /**
  * A generic template that can be used to create Vuetify based themes.
@@ -23,34 +24,41 @@ class VuetifyTemplate extends Theme {
         $this->setLicenseName('MIT');
         $this->setJsDirName('js');
         $this->setImagesDirName('img');
-        $this->setBeforeLoaded(function()
+        
+        $this->setAfterLoaded(function(Theme $theme)
         {
-            Page::lang(SessionsManager::getActiveSession()->getLangCode(true));
-            Page::siteName(WebFiori::getSiteConfig()->getWebsiteNames()[Page::lang()]);
-        });
-        $this->setAfterLoaded(function()
-        {
-            $topDiv = new HTMLNode('v-app');
-            $topDiv->setID('app');
-            $headerSec = Page::document()->getChildByID('page-header');
-            Page::document()->removeChild($headerSec);
-            $bodySec = Page::document()->getChildByID('page-body');
-            Page::document()->removeChild($bodySec);
-            $footerSec = Page::document()->getChildByID('page-footer');
-            Page::document()->removeChild($footerSec);
-            $topDiv->addChild($footerSec)->addChild($headerSec)->addChild($bodySec);
-            Page::document()->getBody()->addChild($topDiv);
-            Page::document()->getChildByID('main-content-area')->setNodeName('v-main');
-            Page::document()->getChildByID('main-content-area')->setAttribute('app');
+            $page = $theme->getPage();
+            $page->addBeforeRender(function (WebPage $page) {
 
-            //initialize vue before the page is rendered.
-            //the initialization process is performed by the file 
-            //'assets/vuetify-based/init-vuetify.js'
-            Page::beforeRender(function()
-            {
-                $jsNode = new HTMLNode('script');
-                $jsNode->setAttribute('src', Page::jsDir().'/init-vuetify.js');
-                Page::document()->getBody()->addChild($jsNode);
+                $appDiv = new HTMLNode('div', [
+                    'id' => 'app'
+                ]);
+                $vApp = new HTMLNode('v-app');
+                $appDiv->addChild($vApp);
+                $appDiv->addChild($appDiv);
+                $body = $page->getChildByID('page-body');
+                $body->setNodeName('v-main');
+
+                $header = $page->getChildByID('page-header');
+                $footer = $page->getChildByID('page-footer');
+                $vApp->addChild($header);
+                $vApp->addChild($body);
+                $sideMenu = $body->getChildByID('side-content-area');
+                $body->removeChild($sideMenu);
+                $vApp->addChild($sideMenu);
+                $vApp->addChild($footer);
+                $page->getDocument()->removeChild($header);
+                $page->getDocument()->removeChild($body);
+                $page->getDocument()->removeChild($footer);
+                $page->getDocument()->addChild($appDiv);
+                $page->getDocument()->getChildByID('main-content-area')->setClassName('container');
+            }, [$theme]);
+            $page->addBeforeRender(function (WebPage $page) {
+                $page->getDocument()->getBody()->addChild('script', [
+                    'type' => 'text/javascript',
+                    'src' => 'assets/vuetify-template/default.js',
+                    'id' => 'default-vue-init'
+                ]);
             });
         });
     }

@@ -43,7 +43,7 @@ class InitPrivileges {
      * @since 1.0
      */
     public static function init() {
-        Access::newGroup('MY_GROUP');
-        Access::newPrivilege('MY_GROUP', 'MY_PR');
+        //Access::newGroup('MY_GROUP');
+        //Access::newPrivilege('MY_GROUP', 'MY_PR');
     }
 }

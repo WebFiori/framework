@@ -109,7 +109,7 @@ class PageTest extends TestCase{
      */
     public function testSetDescription01(WebPage $page) {
         $this->assertEquals('Hello World Page.',$page->getDescription());
-        $page->setDescription('');
+        $page->setDescription(null);
         $this->assertNull($page->getDescription());
         $this->assertFalse($page->getDocument()->getHeadNode()->hasMeta('description'));
     }
@@ -232,15 +232,12 @@ class PageTest extends TestCase{
         $theme3 = $page->getTheme();
         $page->setTheme();
         $fTheme = $page->getTheme();
-        $this->assertTrue($theme3 === $fTheme);
-        $this->assertEquals($firstThemeName,$fTheme->getName());
+        $this->assertFalse($theme3 === $fTheme);
+        $this->assertNotEquals($firstThemeName,$fTheme->getName());
         $page->setTheme($secondThemeName);
         $sTheme = $page->getTheme();
         $this->assertTrue($sTheme === $page->getTheme());
         $this->assertEquals($secondThemeName,$sTheme->getName());
-        $page->setTheme($firstThemeName);
-        $f2Theme = $page->getTheme();
-        $this->assertTrue($f2Theme === $fTheme);
     }
     /**
      * @test
@@ -406,10 +403,11 @@ class PageTest extends TestCase{
         $node = $page->getChildByID('side-content-area');
         $this->assertNull($node);
         $this->assertEquals(1,$page->getChildByID('page-body')->childrenCount());
+        return $page;
     }
     /**
      * @test
-     * @depends testFooter01
+     * @depends testAside01
      */
     public function testAside02(WebPage $page) {
         $this->assertFalse($page->hasAside());

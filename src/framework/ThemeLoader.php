@@ -26,7 +26,8 @@ namespace webfiori\framework;
 
 use webfiori\framework\exceptions\NoSuchThemeException;
 use webfiori\framework\router\Router;
-use webfiori\framework\ui\WebPage;
+use webfiori\framework\WebFioriApp;
+
 
 /**
  * A class which has utility methods which are related to themes loading.
@@ -157,8 +158,6 @@ class ThemeLoader {
      * 
      * @param string $themeName The name of the theme. 
      * 
-     * @param WebPage|null $page The page that the theme will be applied to.
-     * 
      * @return Theme The method will return an object of type Theme once the 
      * theme is loaded. The object will contain all theme information.
      * 
@@ -167,12 +166,21 @@ class ThemeLoader {
      * 
      * @since 1.0
      */
-    public static function usingTheme($page = null, $themeName = null) {
+    public static function usingTheme($themeName = null) {
         if ($themeName === null) {
             $themeName = WebFioriApp::getAppConfig()->getBaseThemeName();
         }
         $themeToLoad = null;
+        $xName = $themeName;
+        if (class_exists($xName)) {
+            $tmpTheme = new $xName();
 
+            if ($tmpTheme instanceof Theme) {
+                $themeToLoad = $tmpTheme;
+                $themeName = $themeToLoad->getName();
+            }
+        }
+        
         if (self::isThemeLoaded($themeName)) {
             $themeToLoad = self::$loadedThemes[$themeName];
         } else {
@@ -187,9 +195,6 @@ class ThemeLoader {
 
         if (isset($themeToLoad)) {
             self::$loadedThemes[$themeToLoad->getName()] = $themeToLoad;
-            if ($page !== null) {
-                $themeToLoad->setPage($page);
-            }
             $themeToLoad->invokeBeforeLoaded();
 
             $themeDir = THEMES_PATH.DS.$themeToLoad->getDirectoryName();

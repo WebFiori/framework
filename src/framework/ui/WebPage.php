@@ -542,8 +542,8 @@ class WebPage {
         $websiteDesc = WebFioriApp::getAppConfig()->getDescription($this->getLangCode());
         $websiteDesc !== null ? $this->setWebsiteName($websiteDesc) : '';
 
-        $pageTitle = WebFioriApp::getAppConfig()->getWebsiteName($this->getLangCode());
-        $pageTitle !== null ? $this->setTitle($websiteName) : $this->setTitle('Hello World');
+        $pageTitle = WebFioriApp::getAppConfig()->getDefaultTitle($this->getLangCode());
+        $pageTitle !== null ? $this->setTitle($pageTitle) : $this->setTitle('Hello World');
 
 
         $this->setTitleSep(WebFioriApp::getAppConfig()->getTitleSep());
@@ -782,6 +782,9 @@ class WebPage {
         }
 
         if ($tmpTheme !== null) {
+            if ($this->theme !== null && $tmpTheme->getName() == $this->theme->getName()) {
+                return;
+            }
             $this->theme = $tmpTheme;
             $this->theme->setPage($this);
             $mainContentArea = $this->getDocument()->getChildByID(self::MAIN_ELEMENTS[2]);
@@ -1009,12 +1012,12 @@ class WebPage {
 
         if ($this->theme !== null) {
             if ($themeNameOrClass != $this->theme->getName()) {
-                $tmpTheme = ThemeLoader::usingTheme($this, $themeNameOrClass);
+                $tmpTheme = ThemeLoader::usingTheme($themeNameOrClass);
             } else {
                 return;
             }
         } else {
-            $tmpTheme = ThemeLoader::usingTheme($this, $themeNameOrClass);
+            $tmpTheme = ThemeLoader::usingTheme($themeNameOrClass);
         }
 
         return $tmpTheme;

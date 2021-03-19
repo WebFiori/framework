@@ -1,6 +1,7 @@
 <?php
 
 namespace app;
+
 use webfiori\database\ConnectionInfo;
 use webfiori\framework\mail\SMTPAccount;
 use webfiori\http\Uri;
@@ -370,11 +371,12 @@ class AppConfig {
         return $this->appReleaseDate;
     }
     /**
-     * Returns an array that holds the default page title for different display 
+     * Returns an array that holds the default page title for different display
      * languages.
      * 
-     * @return array An associative array. The indices of the array are language codes 
+     * @return array An associative array. The indices of the array are language codes
      * and the values are pages titles.
+     * 
      * 
      * @since 1.0
      */
@@ -463,15 +465,15 @@ class AppConfig {
         ];
     
         $this->defaultPageTitles = [
-            'EN' => 'WebFiori',
-            'AR' => 'ويب فيوري',
+            'EN' => 'Hello World',
+            'AR' => 'اهلا و سهلا',
         ];
         $this->descriptions = [
-            'EN' => 'WebFiori',
-            'AR' => 'ويب فيوري',
+            'EN' => '',
+            'AR' => '',
         ];
         $this->baseUrl = Uri::getBaseURL();
-        $this->titleSep = ' | ';
+        $this->titleSep = '|';
         $this->primaryLang = 'EN';
         $this->baseThemeName = \webfiori\theme\WebFioriV108::class;
         $this->adminThemeName = \webfiori\theme\WebFioriV108::class;

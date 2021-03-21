@@ -99,16 +99,7 @@ class PrivilegesGroupTest extends TestCase {
         $this->assertTrue($parent->hasPrivilege($pr));
         $this->assertFalse($parent->hasPrivilege($pr,false));
     }
-    /**
-     * @test
-     * @depends testSetParentGroup00
-     * @param $gArr Description
-     */
-    public function testRemoveParentGroup00($gArr) {
-        $this->assertTrue($gArr['child']->setParentGroup());
-        $this->assertEquals(0,count($gArr['parent']->childGroups()));
-        $this->assertNull($gArr['child']->getParentGroup());
-    }
+    
     /**
      * @test
      */
@@ -161,6 +152,16 @@ class PrivilegesGroupTest extends TestCase {
             'child' => $child,
             'parent' => $parentGroup
         ];
+    }
+    /**
+     * @test
+     * @depends testSetParentGroup00
+     * @param $gArr Description
+     */
+    public function testRemoveParentGroup00($gArr) {
+        $this->assertTrue($gArr['child']->setParentGroup());
+        $this->assertEquals(0,count($gArr['parent']->childGroups()));
+        $this->assertNull($gArr['child']->getParentGroup());
     }
     /**
      * 

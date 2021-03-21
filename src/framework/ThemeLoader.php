@@ -151,14 +151,15 @@ class ThemeLoader {
         self::$loadedThemes = [];
     }
     /**
-     * Loads a theme given its name.
+     * Loads a theme given its name or class name.
      * 
-     * If the given name is null, the method will load the default theme as 
-     * specified by the method SiteConfig::getBaseThemeName().
+     * If the given name is null or empty string, the method will load the default theme as 
+     * specified by the method AppConfig::getBaseThemeName().
      * 
-     * @param string $themeName The name of the theme. 
+     * @param string $themeName The name of the theme. This also can be the name of 
+     * theme class including its namespace (e.g. Theme::class). 
      * 
-     * @return Theme|null The method will return an object of type Theme once the 
+     * @return Theme The method will return an object of type Theme once the 
      * theme is loaded. The object will contain all theme information. If provided 
      * theme name is empty string, the method will return null.
      * 
@@ -172,11 +173,9 @@ class ThemeLoader {
         if (strlen($trimmedName) != 0) {
             $themeName = $trimmedName;
         } else {
-            return null;
-        }
-        if ($themeName === null) {
             $themeName = WebFioriApp::getAppConfig()->getBaseThemeName();
         }
+        
         $themeToLoad = null;
         $xName = '\\'.$themeName;
         if (class_exists($xName)) {

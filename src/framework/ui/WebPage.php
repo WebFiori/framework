@@ -826,6 +826,9 @@ class WebPage {
      * @see Theme::usingTheme()
      */
     public function setTheme($themeNameOrClass = null) {
+        if ($themeNameOrClass !== null && strlen(trim($themeNameOrClass)) == 0) {
+            return;
+        }
         $xthemeName = $themeNameOrClass === null ? WebFioriApp::getAppConfig()->getBaseThemeName() : $themeNameOrClass;
         $tmpTheme = ThemeLoader::usingTheme($xthemeName);
 

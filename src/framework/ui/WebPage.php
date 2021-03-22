@@ -1032,7 +1032,18 @@ class WebPage {
 
         return $headNode;
     }
-
+    /**
+     * Returns the value of the attribute 'href' of the node 'base' of page document.
+     * 
+     * @return string|null If the base URL is set, the method will return its value. 
+     * If the value of the base URL is not set, the method will return null.
+     * 
+     * @since 1.0
+     */
+    public function getBase() {
+        $headNode = $this->getDocument()->getHeadNode();
+        return $headNode->getBaseURL();
+    }
     private function _getHeader() {
         $loadedTheme = $this->getTheme();
         $node = new HTMLNode();

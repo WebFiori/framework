@@ -555,11 +555,11 @@ class WebFioriApp {
         $this->_setExceptionHandler();
         register_shutdown_function(function()
         {
-            if (!Response::isSent()) {
-                $isCli = class_exists('webfiori\framework\cli\CLI') ? CLI::isCLI() : php_sapi_name() == 'cli';
-                $error = error_get_last();
-
-                if ($error !== null) {
+            $error = error_get_last();
+            if ($error !== null) {
+                if (!Response::isSent()) {
+                    $isCli = class_exists('webfiori\framework\cli\CLI') ? CLI::isCLI() : php_sapi_name() == 'cli';
+                    $error = error_get_last();
                     Response::clear();
                     $errNo = $error['type'];
 
@@ -571,37 +571,36 @@ class WebFioriApp {
                     }
 
                     if (!$isCli) {
+                        $uri = Router::getUriObjByURL(Request::getRequestedURL());
                         Response::setCode(500);
-                    }
-                    $uri = Router::getUriObjByURL(Request::getRequestedURL());
+                        if ($uri !== null) {
+                            if ($uri->getType() == Router::API_ROUTE) {
+                                $j = new Json([
+                                    'message' => $error["message"],
+                                    'type' => 'error',
+                                    'error-number' => $error["type"],
+                                ], true);
 
-                    if ($uri !== null) {
-                        if ($uri->getType() == Router::API_ROUTE) {
-                            $j = new Json([
-                                'message' => $error["message"],
-                                'type' => 'error',
-                                'error-number' => $error["type"],
-                            ], true);
-
-                            if (defined('WF_VERBOSE') && WF_VERBOSE) {
-                                $j->add('file', $error["file"]);
-                                $j->add('line', $error["line"]);
+                                if (defined('WF_VERBOSE') && WF_VERBOSE) {
+                                    $j->add('file', $error["file"]);
+                                    $j->add('line', $error["line"]);
+                                }
+                                Response::write($j);
+                                Response::send();
+                            } else {
+                                $errPage = new ServerErrView($error);
+                                $errPage->show(500);
                             }
-                            Response::write($j);
                         } else {
                             $errPage = new ServerErrView($error);
                             $errPage->show(500);
                         }
+                        
                     } else {
-                        if ($isCli) {
-                            CLI::displayErr($error['type'], $error["message"], $error["file"], $error["line"]);
-                        } else {
-                            $errPage = new ServerErrView($error);
-                            $errPage->show(500);
-                        }
+                        CLI::displayErr($error['type'], $error["message"], $error["file"], $error["line"]);
                     }
                 }
-                Response::send();
+                
             }
         });
     }

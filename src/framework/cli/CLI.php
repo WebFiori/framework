@@ -311,8 +311,8 @@ class CLI {
         }
     }
     private static function _traceArrAsString($num, $arr) {
-        $file = $arr['file'];
-        $line = $arr['line'];
+        $file = isset($arr['file']) ? $arr['file'] : 'X_F';
+        $line = isset($arr['line']) ? $arr['line'] : 'X_L';
         $class = isset($arr['class']) ? $arr['class'] : '';
 
         return "#$num $file($line): $class";

@@ -173,7 +173,7 @@ class Router {
 
             if (!defined('API_CALL')) {
                 $notFoundView = new NotFoundView();
-                $notFoundView->display();
+                $notFoundView->render();
             } else {
                 $json = new Json([
                     'message' => 'Requested resource was not found.',

@@ -24,10 +24,7 @@
  */
 namespace webfiori\framework\ui;
 
-use webfiori\framework\Page;
-use webfiori\framework\session\SessionsManager;
 use webfiori\framework\WebFioriApp;
-use webfiori\http\Response;
 use webfiori\ui\HTMLNode;
 /**
  * A basic view which is used to display 404 HTTP error code and 
@@ -35,38 +32,24 @@ use webfiori\ui\HTMLNode;
  *
  * @author Ibrahim
  */
-class NotFoundView {
+class NotFoundView extends WebPage {
     /**
      * Creates new instance of the class.
      */
     public function __construct() {
-        Page::theme(WebFioriApp::getAppConfig()->getBaseThemeName());
-        $activeSession = SessionsManager::getActiveSession();
+        parent::__construct();
+        $this->setTheme(WebFioriApp::getAppConfig()->getBaseThemeName());
 
-        if ($activeSession !== null) {
-            Page::lang($activeSession->getLangCode(true));
-        } else {
-            Page::lang(WebFioriApp::getAppConfig()->getPrimaryLanguage());
-        }
-        Page::siteName(WebFioriApp::getAppConfig()->getWebsiteNames()[Page::lang()]);
-        $labels = Page::translation()->get('general/http-codes/404');
-        Page::title($labels['code'].' - '.$labels['type']);
+        $labels = $this->get('general/http-codes/404');
+        $this->setTitle($labels['code'].' - '.$labels['type']);
         http_response_code($labels['code']);
         $h1 = new HTMLNode('h1');
-        $h1->addTextNode(Page::title());
-        Page::insert($h1);
+        $h1->text($this->getTitle());
+        $this->insert($h1);
         $hr = new HTMLNode('hr');
-        Page::insert($hr);
+        $this->insert($hr);
         $paragraph = new HTMLNode('p');
-        $paragraph->addTextNode($labels['message']);
-        Page::insert($paragraph);
-    }
-    /**
-     * Display the page.
-     */
-    public function display() {
-        Page::render();
-        Response::setCode(404);
-        Response::send();
+        $paragraph->text($labels['message']);
+        $this->insert($paragraph);
     }
 }

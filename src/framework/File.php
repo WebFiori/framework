@@ -36,7 +36,7 @@ use webfiori\json\JsonI;
  * 
  * @author Ibrahim
  * 
- * @version 1.1.9
+ * @version 1.2.0
  */
 class File implements JsonI {
     /**
@@ -276,6 +276,23 @@ class File implements JsonI {
      */
     public function __toString() {
         return $this->toJSON().'';
+    }
+    /**
+     * Extract file extension from file name and return it.
+     * 
+     * @return string If file name is not set, the method will return empty string. 
+     * If its name is set and the extension is included in the name, the 
+     * method will return it.
+     * 
+     * @since 1.2.0
+     */
+    public function getExtension() {
+        $ext = '';
+        $fArr = explode('.', $this->getName());
+        if (count($fArr) >= 1) {
+            $ext = $fArr[count($fArr) - 1];
+        }
+        return $ext;
     }
     /**
      * Returns the full path to the file.

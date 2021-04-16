@@ -29,14 +29,11 @@ class VuetifyTheme extends Theme {
         $this->setName('Vuetify Theme');
         $this->setJsDirName('js');
         $this->setImagesDirName('img');
-        $this->setBeforeLoaded(function(Theme $theme)
-        {
-            $page = $theme->getPage();
-            LangExt::extendLang($page->getTranslation());
-        });
         $this->setAfterLoaded(function(Theme $theme)
         {
             $page = $theme->getPage();
+            $page->includeI18nLables(true);
+            LangExt::extendLang($page->getTranslation());
             $topDiv = new HTMLNode('v-app');
             $topDiv->setID('app');
             $headerSec = $page->getChildByID('page-header');
@@ -98,26 +95,27 @@ class VuetifyTheme extends Theme {
      * @return HTMLNode
      */
     public function getAsideNode() {
-        $node = new HTMLNode('v-navigation-drawer');
-        $node->setAttributes([
+        $node = new HTMLNode('v-navigation-drawer',[
             'v-model' => 'drawer',
             'absolute',':right' => '$vuetify.rtl',
-            'temporary','fixed'])->addChild('v-img',[
-                'src' => Page::imagesDir().'/side-nav.PNG',
-                ':aspect-ratio' => "16/9"
-            ], false)->addChild('v-row', [
-                'class' => 'lightbox white--text pa-2 fill-height',
-                'align' => 'end'
-            ], false)->addChild('v-col',[] , false)
-            ->addChild('div',['class'=>'subheading'], false)->text('Programming Academia')
-            ->getParent()->getParent()->getParent()->addChild('v-list', [
-                'dense','nav'
-            ], false)->addChild('v-list-item-group', [
-                'active-class'=>'deep-purple--text text--accent-4'
-                ], false)->addChild($this->createHTMLNode([
-            'type' => 'v-list-item',
-            'title' => Page::translation()->get('side-menu/home'),
-            'icon' => 'mdi-home'
+            'temporary','fixed'
+        ]);
+        $node->addChild('v-img',[
+            'src' => Page::imagesDir().'/side-nav.PNG',
+            ':aspect-ratio' => "16/9"
+        ], true)->addChild('v-row', [
+            'class' => 'lightbox white--text pa-2 fill-height',
+            'align' => 'end'
+        ])->addChild('v-col')
+        ->addChild('div',['class'=>'subheading'])->text('Programming Academia')
+        ->getParent()->getParent()->getParent()->addChild('v-list', [
+            'dense','nav'
+        ])->addChild('v-list-item-group', [
+            'active-class'=>'deep-purple--text text--accent-4'
+            ])->addChild($this->createHTMLNode([
+        'type' => 'v-list-item',
+        'title' => Page::translation()->get('side-menu/home'),
+        'icon' => 'mdi-home'
         ]))->addChild($this->createHTMLNode([
             'type' => 'v-list-item',
             'title' => Page::translation()->get('side-menu/search'),
@@ -185,7 +183,9 @@ class VuetifyTheme extends Theme {
         $vuetifyLink = new Anchor('https://vuetifyjs.com', 'Vuetify', '_blank');
         $vuetifyNode->addChild($vuetifyLink);
         
-        $vCardText->addChild($copywriteNoticeNode)->addChild($poweredByNode)->addChild($vuetifyNode);
+        $vCardText->addChild($copywriteNoticeNode, true)
+                ->addChild($poweredByNode, true)
+                ->addChild($vuetifyNode);
 
         $vCard->addChild($vCardText);
 
@@ -248,25 +248,25 @@ class VuetifyTheme extends Theme {
         $titleNode = new HTMLNode('v-toolbar-title');
         $titleNode->addTextNode(Page::siteName());
         
-        $appBar->addChild(HTMLNode::createTextNode('<template v-slot:img="{ props }">
-                <v-img
-                  v-bind="props"
-                  gradient="to top right, rgba(19,84,122,.5), rgba(128,208,199,.8)"
-                ></v-img>
-              </template>', false))
-                ->addChild($logo)
-                ->addChild($drawerIcon)
-                ->addChild($titleNode)
-                ->addChild(HTMLNode::createTextNode('<v-spacer></v-spacer>', false))
+        $appBar->addChild('template', [
+            'v-slot:img' => "{ props }"
+        ])->addChild('v-img',[
+            'v-bind' => 'props',
+            'gradient' => "to top right, rgba(19,84,122,.5), rgba(128,208,199,.8)"
+        ])->getParent()->getParent()
+        ->addChild($logo, true)
+        ->addChild($drawerIcon, true)
+        ->addChild($titleNode, true)
+        ->addChild('v-spacer', true)
 
         //Add extra actions to the bar such as search
                 ->addChild($this->createHTMLNode([
                     'type' => 'icon-button',
                     'icon' => 'mdi-magnify'
-                ]))
+                ]), true)
                 ->addChild($this->createHTMLNode([
                     'type' => 'icon-button'
-                ]))
+                ]), true)
                 ->addChild($this->createHTMLNode([
                     'type' => 'icon-button',
                     'icon' => 'mdi-heart'

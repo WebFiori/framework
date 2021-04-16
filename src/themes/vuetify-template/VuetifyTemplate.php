@@ -28,6 +28,7 @@ class VuetifyTemplate extends Theme {
         $this->setAfterLoaded(function(Theme $theme)
         {
             $page = $theme->getPage();
+            $page->includeI18nLables(true);
             $page->addBeforeRender(function (WebPage $page) {
 
                 $appDiv = new HTMLNode('div', [

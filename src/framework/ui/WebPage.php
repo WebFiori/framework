@@ -275,7 +275,7 @@ class WebPage {
      * @param string $href The link to the file. Must be non empty string. It is 
      * possible to append query string to the end of the link.
      * 
-     * @param $attrs An associative array of additional attributes 
+     * @param array $attrs An associative array of additional attributes 
      * to set for the node.
      * 
      * @since 1.0
@@ -292,7 +292,7 @@ class WebPage {
      * @param string $src The location of the file. Must be non-empty string. It 
      * can have query string at the end.
      * 
-     * @param $attrs An associative array of additional attributes 
+     * @param array $attrs An associative array of additional attributes 
      * to set for the JavaScript node.
      * 
      * @since 1.0

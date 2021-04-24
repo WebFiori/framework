@@ -13,7 +13,7 @@
         "webfiori/ui":"2.2.0",
         "webfiori/jsonx":"2.0.2",
         "webfiori/http":"3.0.5",
-        "webfiori/database":"0.2.6"
+        "webfiori/database":"0.2.7"
     },
     "keywords": [
         "framework",

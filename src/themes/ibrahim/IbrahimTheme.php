@@ -27,9 +27,9 @@ class IbrahimTheme extends Theme {
             $page = $theme->getPage();
             $page->addBeforeRender(function (WebPage $page, IbrahimTheme $theme) {
             
-                $gta = $theme->getGta();
+                $gta = $theme->getGtag();
                 if ($gta !== null) {
-                    Page::document()->getBody()->insert($gta, 0);
+                    $theme->getPage()->getDocument()->getBody()->insert($gta, 0);
                 }
 
                 $appDiv = new HTMLNode('div', [
@@ -59,17 +59,17 @@ class IbrahimTheme extends Theme {
                 $page->getDocument()->getBody()->addChild('script', [
                     'type' => 'text/javascript',
                     'src' => 'assets/ibrahim/default.js',
-                    'id' => 'default-vue-init'
+                    'id' => 'vue-script'
                 ]);
             });
         });
     }
 
-    public function getGta() {
-        if (defined('GTA')) {
+    public function getGtag() {
+        if (defined('G_TAG')) {
             $node = new HTMLNode('noscript');
             $node->addChild('iframe', [
-                'src' => "https://www.googletagmanager.com/ns.html?id=".GTA,
+                'src' => "https://www.googletagmanager.com/ns.html?id=".G_TAG,
                 'height' => "0",
                 'width' => "0",
                 'style' => "display:none;visibility:hidden"
@@ -80,7 +80,7 @@ class IbrahimTheme extends Theme {
 
 
     public function getAsideNode() {
-        if (Page::lang() == 'AR') {
+        if ($this->getPage()->getLangCode() == 'AR') {
             $right = 'right';
         } else {
             $right = '';
@@ -97,15 +97,15 @@ class IbrahimTheme extends Theme {
         $sideDrawer->addChild($itemsPanel);
         $itemsPanel->addChild('v-expansion-panels', [], false)
         ->addChild($this->createDrawerMenuItem($this->createButton(['text', 'block', 'href' => $this->getBaseURL().'/about-me'], Page::translation()->get('main-menu/about-me'), 'mdi-information-variant')))
-                ->addChild($this->createDrawerMenuItem($this->createButton(['text', 'block', 'href' => $this->getBaseURL().'/contact-me'], Page::translation()->get('main-menu/contact-me'), 'mdi-comment-plus-outline')));
+        ->addChild($this->createDrawerMenuItem($this->createButton(['text', 'block', 'href' => $this->getBaseURL().'/contact-me'], Page::translation()->get('main-menu/contact-me'), 'mdi-comment-plus-outline')));
         return $sideDrawer;
     }
     public function createAvatar() {
         $vList = new HTMLNode('v-list');
-        $vList->addChild('v-list-item', [], false)
-                ->addChild('v-list-item-avatar', [], false)
+        $vList->addChild('v-list-item')
+                ->addChild('v-list-item-avatar')
                 ->addChild('img', [
-                    'src' => 'res/images/WFLogo512.png',
+                    'src' => 'assets/images/WFLogo512.png',
                     'alt' => 'A'
                 ]);
         return $vList;
@@ -114,41 +114,37 @@ class IbrahimTheme extends Theme {
         $footer = new HTMLNode('v-footer', [
             'padless'
         ]);
-        $footer->addChild('v-snackbar', [
-            'v-model' => 'snackbar.visible',
-            ':color' => 'snackbar.color'
-        ], false)->text('{{snackbar.text}}');
         $card = new HTMLNode('v-card', ['flat', 'tile', 'class' => 'flex', 'dark']);
         $footer->addChild($card);
-        $card->addChild('v-card-text', [], false)
+        $card->addChild('v-card-text')
                 ->addChild($this->createButton([
                     'text', 
                     'fab', 
                     'x-small',
                     'target' => '_blank',
-                    'href' => 'https://www.linkedin.com/in/ibrahim-binalshikh/'], null, 'mdi-linkedin'))
+                    'href' => 'https://www.linkedin.com/in/ibrahim-binalshikh/'], null, 'mdi-linkedin'), true)
                 ->addChild($this->createButton([
                     'text', 
                     'fab', 
                     'x-small',
                     'target' => '_blank',
-                    'href' => 'https://t.me/WarriorVx'], null, 'mdi-telegram'))
+                    'href' => 'https://t.me/WarriorVx'], null, 'mdi-telegram'), true)
                 ->addChild($this->createButton([
                     'text', 
                     'fab', 
                     'x-small',
                     'target' => '_blank',
-                    'href' => 'https://github.com/usernane'], null, 'mdi-github'));
+                    'href' => 'https://github.com/usernane'], null, 'mdi-github'), true);
         
         //
-        $card->addChild('v-card-text', [], false)
-        ->addChild('small', [], false)
-        ->text(Page::translation()->get('footer/built-with'))
-         ->addChild(new Anchor('https://webfiori.com', Page::translation()->get('general/framework-name')));
+        $card->addChild('v-card-text')
+        ->addChild('small')
+        ->text($this->getPage()->get('footer/built-with'))
+         ->addChild(new Anchor('https://webfiori.com', $this->getPage()->get('general/framework-name')));
         
         $card->addChild('v-divider')
         ->addChild('v-card-text', ['flat'], false)
-        ->addChild('small', [], false)->text(Page::translation()->get('footer/all-rights').' '.date('Y'));
+        ->addChild('small', [], false)->text($this->getPage()->get('footer/all-rights').' '.date('Y'));
         return $footer;
     }
 
@@ -165,8 +161,8 @@ class IbrahimTheme extends Theme {
         if (defined('RECAPTCHA_SITE_KEY')) {
             $head->addJs('https://www.google.com/recaptcha/api.js?render='.RECAPTCHA_SITE_KEY);
         }
-        if (defined('GTA')) {
-            $head->addJs('https://www.googletagmanager.com/gtag/js?id='.GTA, [
+        if (defined('G_TAG')) {
+            $head->addJs('https://www.googletagmanager.com/gtag/js?id='.G_TAG, [
                 'async'
             ]);
             $head->addChild('script', [
@@ -192,35 +188,34 @@ class IbrahimTheme extends Theme {
         ]);
         
         $vAppBar->addChild('v-app-bar-nav-icon', [
-                    'class' => 'd-sm-flex d-md-none',
-                    '@click' => "drawer = !drawer",
-                ])->addChild('v-toolbar-title', [
-                    'style' => [
-                        'min-width' => '250px'
-                    ]
-                ], false)
-                ->addChild(new Anchor($this->getBaseURL(), Page::siteName()), [
-                    'style' => [
-                        'color' => 'white',
-                        'text-decoration' => 'none',
-                        'font-weight' => 'bold'
-                    ],
-                    'class' => 'site-name'
-                ])
-                ->getParent()
-                ->addChild(HTMLNode::createTextNode('<template v-slot:img="{ props }">
-                <v-img
-                  v-bind="props"
-                  gradient="to top right, rgba(19,84,122,.5), rgba(128,208,199,.8)"
-                ></v-img>
-              </template>', false));
+            'class' => 'd-sm-flex d-md-none',
+            '@click' => "drawer = !drawer",
+        ], true)->addChild('v-toolbar-title', [
+            'style' => [
+                'min-width' => '250px'
+            ]
+        ])
+        ->addChild(new Anchor($this->getBaseURL(), $this->getPage()->getWebsiteName()), [
+            'style' => [
+                'color' => 'white',
+                'text-decoration' => 'none',
+                'font-weight' => 'bold'
+            ],
+            'class' => 'site-name'
+        ])
+        ->getParent()
+        ->addChild('template', ['v-slot:img' => "{ props }"])
+        ->addChild('v-img', [
+            'v-bind' => 'props',
+            'gradient' => 'to top right, rgba(19,84,122,.5), rgba(128,208,199,.8)'
+        ]);
         $vAppBar->addChild('v-spacer');
         $navLinksContainer = new HTMLNode('v-container', [
             'class' => 'd-none d-md-flex'
         ]);
         $vAppBar->addChild($navLinksContainer);
-        $navLinksContainer->addChild($this->createButton(['text', 'href' => $this->getBaseURL().'/about-me'], Page::translation()->get('main-menu/about-me'), 'mdi-information-variant'))
-                ->addChild($this->createButton(['text', 'href' => $this->getBaseURL().'/contact-me'], Page::translation()->get('main-menu/contact-me'), 'mdi-comment-plus-outline'))
+        $navLinksContainer->addChild($this->createButton(['text', 'href' => $this->getBaseURL().'/about-me'], $this->getPage()->get('main-menu/about-me'), 'mdi-information-variant'), true)
+                ->addChild($this->createButton(['text', 'href' => $this->getBaseURL().'/contact-me'], $this->getPage()->get('main-menu/contact-me'), 'mdi-comment-plus-outline'), true)
                 ->getParent()->addChild('v-spacer');
         $this->createDarkSwitch($vAppBar);
         $this->createLangSwitch($vAppBar);
@@ -244,8 +239,8 @@ class IbrahimTheme extends Theme {
         ], null, 'mdi-earth'));
         $langsList = new HTMLNode('v-list');
         $switchLangMenu->addChild($langsList);
-        $canonical = explode('?', Page::canonical())[0];
-        foreach (Page::translation()->get('main-menu/lang-switch') as $langCode => $label) {
+        $canonical = explode('?', $this->getPage()->getCanonical())[0];
+        foreach ($this->getPage()->get('main-menu/lang-switch') as $langCode => $label) {
             $langsList->addChild('v-list-item', [], false)
                     ->addChild('v-list-item-title', [], false)
                     ->addChild(new Anchor($canonical.'?lang='.$langCode, $label));
@@ -273,7 +268,7 @@ class IbrahimTheme extends Theme {
         return $btn;
     }
     private function createShareButton() {
-        $dir = Page::dir() == 'ltr' ? 'right' : 'left';
+        $dir = $this->getPage()->getWritingDir() == 'ltr' ? 'right' : 'left';
         $btn = new HTMLNode('v-speed-dial', [
             'v-model' => "fab",
             'transition' => 'slide-y-reverse-transition',
@@ -335,7 +330,7 @@ class IbrahimTheme extends Theme {
             $panel->addChild('v-expansion-panel-content');
             return $panel;
         } else if ($type == 'title') {
-            $title = isset($options['title']) ? $options['title'] : Page::title();
+            $title = isset($options['title']) ? $options['title'] : $this->getPage()->getTitle();
             return $this->createPageTitle($title);
         } else if ($type == 'select') {
             $select = new HTMLNode('v-autocomplete');

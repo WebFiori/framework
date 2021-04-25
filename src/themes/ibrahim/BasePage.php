@@ -7,6 +7,8 @@ use webfiori\http\Request;
 use webfiori\json\Json;
 use webfiori\ui\HTMLNode;
 use webfiori\ui\JsCode;
+use webfiori\framework\ui\WebPage;
+use webfiori\framework\WebFioriApp;
 
 /**
  * A base page that can be extended to create system pages.
@@ -15,7 +17,8 @@ use webfiori\ui\JsCode;
  *
  * @author Ibrahim
  */
-class BasePage {
+class BasePage extends WebPage {
+    private $isDark;
     /**
      * A json object that holds backend data. Used to send data to 
      * frontend.
@@ -39,48 +42,96 @@ class BasePage {
      * @param string $description The description of the page.
      */
     public function __construct($vueScript = '', $pageTitle = 'Title', $description = '') {
-        Page::theme(IbrahimTheme::class);
-        Page::description($description);
-        Page::insert(Page::theme()->createHTMLNode([
+        parent::__construct();
+        $this->setTheme(IbrahimTheme::class);
+        $this->jsonData = new Json([
+            'rtl' => $this->getTranslation()->getWritingDir() == 'rtl',
+            'darkTheme' => new Json([
+                'primary' => '#8bc34a',
+                'secondary' => '#4caf50',
+                'accent' => '#795548',
+                'error' => '#f44336',
+                'warning' => '#ff9800', 
+                'info' => '#607d8b',
+                'success' => '#00bcd4'
+            ]),
+            'lightTheme' => new Json([
+                'primary' => '#8bc34a',
+                'secondary' => '#4caf50',
+                'accent' => '#795548',
+                'error' => '#f44336',
+                'warning' => '#ff9800', 
+                'info' => '#607d8b',
+                'success' => '#00bcd4'
+            ])
+        ]);
+        if (strlen($vueScript) != 0) {
+            $this->setVueJs($vueScript);
+        } else {
+            $this->setVueJs('assets/ibrahim/default.js');
+        }
+        $this->setTitle($pageTitle);
+        $this->setDescription($description);
+        $this->insert($this->getTheme()->createHTMLNode([
             'name' => 'heading',
             'title' => $pageTitle
         ]));
-        Page::beforeRender(function ($vueScript)
-        {
-            if (strlen($vueScript) > 0) {
-                Page::document()->addChild('script', [
-                    'src' => $vueScript,
-                    'type' => 'text/javascript'
+        $this->addBeforeRender(function(BasePage $thisPage) {
+            
+            $snackBarsCount = 4;
+            $snackbarsJsonArr = [];
+            for ($x = 0 ; $x < $snackBarsCount ; $x++) {
+                $node = new HTMLNode('v-snackbar', [
+                    'v-model' => "snackbars[$x].snackbar",
+                    ':color' => "snackbars[$x].statusColor",
+                    ':timeout' => "snackbars[$x].snackbarTimeout",
                 ]);
-                Page::document()->removeChild('default-vue-init');
+
+                $node->addChild('v-icon')
+                ->text("{{snackbars[$x].icon}}");
+                $node->addChild('div', [
+                    'v-html' => "snackbars[$x].statusText",
+                    'style' => [
+                        'display' => 'inline'
+                    ]
+                ]);
+                $node->addChild('template', [
+                    'v-slot:action' => '{attrs}'
+                ])->addChild('v-btn', [
+                    '@click' => "snackbars[$x].snackbar = false",
+                    'v-bind' => "attrs",
+                    ':color' => "snackbars[$x].statusColor",
+                    'icon'
+                ])->addChild('v-icon', [
+                    'color' => 'white'
+                ])->text('mdi-close-circle');
+
+                $snackbarsJsonArr[] = new Json([
+                    'snackbar' => false,
+                    'statusColor' => 'green',
+                    'snackbarTimeout' => 5000,
+                    'statusText' => 'Hello',
+                    'icon' => 'mdi-information'
+                ]);
+                $thisPage->insert($node);
             }
-        },[$vueScript]);
-        Page::title($pageTitle);
-        $this->jsonData = new Json([
-            'snackbar' => new Json([
-                'visible' => false,
-                'color' => '',
-                'text' => '',
-            ]),
-        ]);
-        Page::beforeRender(function($thisPage)
-        {
-            $thisPage->addInlineJs('window.data = '.$thisPage->getJson().';');
-            $node = new HTMLNode('v-snackbar');
-            $node->setAttribute('v-model','snackbar.visible');
-            $node->addTextNode('{{ snackbar.text }}');
-            $node->setAttribute(':color', 'snackbar.color');
-            $closeButton = new HTMLNode('v-btn');
-            $closeButton->setAttribute('text');
-            $closeTxt = Page::translation()->get('general/action/close');
-            $closeButton->addTextNode($closeTxt);
-            $closeButton->setAttribute('@click','snackbar.visible = false');
-            $node->addChild($closeButton);
-            Page::insert($node);
-        },[$this]);
+
+            $thisPage->addToJson([
+                'snackbars' => $snackbarsJsonArr
+            ]);
+
+
+            if ($thisPage->isDark()) {
+                $css = new HTMLNode('style');
+                $css->addTextNode("input{color:white;}");
+                $thisPage->getDocument()->getHeadNode()->addChild($css);
+            }
+
+            $thisPage->addInlineJs('window.data = ' . $thisPage->getJson() . ';');
+        });
         $this->topInlineJs = new JsCode();
 
-        Page::document()->getHeadNode()->addChild($this->topInlineJs);
+        $this->getDocument()->getHeadNode()->addChild($this->topInlineJs);
         $this->_checkIsDark();
     }
     /**
@@ -184,6 +235,9 @@ class BasePage {
 
         return $select;
     }
+    public function isDark() {
+        return $this->isDark;
+    }
     /**
      * Creates a basic date picker input element.
      * 
@@ -197,21 +251,23 @@ class BasePage {
      */
     public function datePicker($menuModel = 'menu', $attrs = []) {
         $dateModel = isset($attrs['v-model']) ? $attrs['v-model'] : 'date';
-
+        
         $node = new HTMLNode('v-menu', [
             'ref' => "$menuModel",
             'v-model' => "$menuModel",
             ':close-on-content-click' => "false",
-            ':return-value.sync' => "$dateModel",
             'transition' => "scale-transition",
             'offset-y',
             'min-width' => "290px",
         ]);
         $attrs[] = 'no-title';
         $attrs[] = 'scrollable';
-
+        $attrs['color'] = 'green lighten-1';
+        
         $attrs['v-model'] = $dateModel;
+        
         $label = isset($attrs['label']) ? $attrs['label'] : 'Select a date.';
+        $disabled = in_array('disabled', $attrs) ? 'disabled' : '';
         $node->addChild('template ', [
             'v-slot:activator' => "{ on, attrs }"
         ], false)->addChild('v-text-field', [
@@ -219,20 +275,22 @@ class BasePage {
             'label' => "$label",
             'prepend-icon' => "mdi-calendar",
             'readonly',
+            'clearable',
             'v-bind' => "attrs",
-            'v-on' => "on"
+            'v-on' => "on",
+            $disabled
         ]);
-        $node->addChild('v-date-picker', $attrs, false)->addChild('v-spacer')
-        ->addChild('v-btn', [
-            'text',
-            '@click' => "$menuModel = false",
-        ], false)->text('Cancel')
-        ->getParent()
-        ->addChild('v-btn', [
-            'text',
-            '@click' => "\$refs.$menuModel.save($dateModel)"
-        ], false)->text('Ok');
-
+        if (isset($attrs['@input'])) {
+            $node->getLastChild()->getLastChild()->setAttribute('@input', $attrs['@input']);
+            $attrs['@change'] = $attrs['@input'];
+            unset($attrs['@input']);
+        }
+        if (isset($attrs[':loading'])) {
+            $node->getLastChild()->getLastChild()->setAttribute(':loading', $attrs[':loading']);
+            unset($attrs[':loading']);
+        }
+        $attrs['@input'] = "$menuModel = false";
+        $node->addChild('v-date-picker', $attrs);
         return $node;
     }
     /**
@@ -266,9 +324,27 @@ class BasePage {
                 $darkArg = true;
             }
         }
+        $this->isDark = $darkArg;
         SessionsManager::set('dark', $darkArg);
         $this->addToJson([
             'dark' => $darkArg
         ]);
+    }
+    /**
+     * Sets the JavaScript file which will be used to initialize vue.
+     * 
+     * @param string $jsFilePath A string that represents the path of the 
+     * file such as 'assets/js/init-vue.js'.
+     * 
+     */
+    public function setVueJs($jsFilePath) {
+        $this->addBeforeRender(function (WebPage $page, $jsPath) {
+            $page->removeChild('vue-script');
+            $page->getDocument()->addChild('script', [
+                'type' => 'text/javascript',
+                'src' => $jsPath.'?jv='.WebFioriApp::getAppConfig()->getVersion(),
+                'id' => 'vue-script'
+            ]);
+        }, [$jsFilePath]);
     }
 }

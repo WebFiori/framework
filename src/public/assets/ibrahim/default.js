@@ -1,38 +1,45 @@
-var rtl = window.i18n.vars.dir === 'rtl';
 if (!window.data) {
     window.data = {
         dark:true,
-        snackbar:{
-            color:'',
-            text:'',
-            visible:false
+        snackbars:[],
+        darkTheme:{
+            primary:'#8bc34a',
+            secondary:'#4caf50',
+            accent:'#795548',
+            error:'#f44336',
+            warning:'#ff9800', 
+            info:'#607d8b',
+            success:'#00bcd4'
+        },
+        lightTheme:{
+            primary:'#8bc34a',
+            secondary:'#4caf50',
+            accent:'#795548',
+            error:'#f44336',
+            warning:'#ff9800', 
+            info:'#607d8b',
+            success:'#00bcd4'
         }
     };
 }
-window.app = new Vue({
+new Vue({
     el: '#app',
     vuetify: new Vuetify({
-        rtl:rtl,
+        rtl:window.data.rtl,
         theme: {
             dark:window.data.dark,
-            themes: {
-                light: {
-                    
-                }
+            themes:{
+                dark:window.data.darkTheme,
+                light:window.data.lightTheme
             }
         }
     }),
     data:{
         loading:false,
         drawer:false,
-        snackbar:window.data.snackbar
+        snackbars:window.data.snackbars
     },
     methods:{
         
     }
 });
-function showSnackbar(message, color = '') {
-    window.app.snackbar.color = color;
-    window.app.snackbar.text = message;
-    window.app.snackbar.visible = true;
-}

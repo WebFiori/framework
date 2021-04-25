@@ -461,6 +461,21 @@ class WebFioriApp {
                         $index++;
                     }
                     $j->add('stack-trace',$stackTrace);
+                } else {
+                    $j->add('class', Util::extractClassName($errfile));
+                    $j->add('line',$errline);
+                    $index = 0;
+                    $trace = debug_backtrace();
+
+                    foreach ($trace as $arr) {
+                        if (isset($arr['file'])) {
+                            $stackTrace->add('#'.$index, Util::extractClassName($arr['file']).' (Line '.$arr['line'].')');
+                        } else if (isset($arr['function'])) {
+                            $stackTrace->add('#'.$index,$arr['function']);
+                        }
+                        $index++;
+                    }
+                    $j->add('stack-trace',$stackTrace);
                 }
                 Response::addHeader('content-type', 'application/json');
                 Response::write($j);
@@ -527,6 +542,22 @@ class WebFioriApp {
                             $index++;
                         }
                         $j->add('stack-trace',$stackTrace);
+                    } else {
+                        $j->add('class', Util::extractClassName($ex->getFile()));
+                        $j->add('line', $ex->getLine());
+                        $stackTrace = new Json([], true);
+                        $index = 0;
+                        $trace = $ex->getTrace();
+
+                        foreach ($trace as $arr) {
+                            if (isset($arr['file'])) {
+                                $stackTrace->add('#'.$index, Util::extractClassName($arr['file']).' (Line '.$arr['line'].')');
+                            } else if (isset($arr['function'])) {
+                                $stackTrace->add('#'.$index,$arr['function']);
+                            }
+                            $index++;
+                        }
+                        $j->add('stack-trace',$stackTrace);
                     }
 
                     if ($useResponsClass) {
@@ -583,6 +614,9 @@ class WebFioriApp {
 
                                 if (defined('WF_VERBOSE') && WF_VERBOSE) {
                                     $j->add('file', $error["file"]);
+                                    $j->add('line', $error["line"]);
+                                } else {
+                                    $j->add('class', Util::extractClassName($error["file"]));
                                     $j->add('line', $error["line"]);
                                 }
                                 Response::write($j);

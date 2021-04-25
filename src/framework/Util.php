@@ -27,6 +27,7 @@ namespace webfiori\framework;
 use webfiori\framework\cli\CLI;
 use webfiori\framework\ui\MessageBox;
 use webfiori\http\Response;
+use webfiori\framework\File;
 /**
  * Framework utility class.
  * 
@@ -150,6 +151,12 @@ class Util {
      * Disallow creating instances of the class.
      */
     private function __construct() {
+    }
+    public static function extractClassName($filePath) {
+        $expl = explode(DS, $filePath);
+        $classFile = $expl[count($expl) - 1];
+        $firstChar = $classFile[0];
+        return strtoupper($firstChar).''.explode('.', substr($classFile, 1))[0];
     }
     /**
      * Converts a positive integer value to binary string.

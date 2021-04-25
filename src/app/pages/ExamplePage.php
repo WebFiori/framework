@@ -44,7 +44,7 @@ class ExamplePage extends WebPage {
         $this->setTheme('WebFiori Theme');
         //$this->setTheme(WebFioriV108::class);
         //Load language. Used to make the page i18n compatable.
-
+        
         $this->setTitle($this->get('pages/sample-page/title'));
         $this->setDescription($this->get('pages/sample-page/description'));
 

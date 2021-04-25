@@ -112,6 +112,9 @@ class LanguageAR extends Language {
         $this->createAndSet('general', [
             'framework-name' => 'إطار برمجة ويب فيوري',
         ]);
+        $this->createAndSet('footer', [
+            'built-with' => 'صُنع بإستخدام: '
+        ]);
         $this->createAndSet('general/social-media-names', [
             'linkedin' => 'لنكد ان',
             'github' => 'جيت هب',

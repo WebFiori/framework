@@ -10,6 +10,8 @@ use webfiori\framework\session\SessionsManager;
 use webfiori\ui\Anchor;
 use webfiori\ui\JsCode;
 use webfiori\framework\ui\WebPage;
+use webfiori\json\Json;
+use webfiori\http\Request;
 /**
  * A theme which is created to be used by the website https://ibrahim-binalshikh.me
  * 
@@ -61,6 +63,48 @@ class IbrahimTheme extends Theme {
                     'src' => 'assets/ibrahim/default.js',
                     'id' => 'vue-script'
                 ]);
+            });
+            $page->addBeforeRender(function (WebPage $p) {
+                if (!($p instanceof BasePage)) {
+                    $darkArg = Request::getParam('dark');
+
+                    if ($darkArg !== null) {
+                        $darkArg = $darkArg == 't' ? true : false;
+                    } else {
+                        $darkArg = SessionsManager::get('dark');
+
+                        if ($darkArg === null) {
+                            $darkArg = true;
+                        }
+                    }
+                    $this->isDark = $darkArg;
+                    SessionsManager::set('dark', $darkArg);
+                    $jsonData = new Json([
+                        'rtl' => $p->getTranslation()->getWritingDir() == 'rtl',
+                        'dark' => $darkArg,
+                        'darkTheme' => new Json([
+                            'primary' => '#8bc34a',
+                            'secondary' => '#4caf50',
+                            'accent' => '#795548',
+                            'error' => '#f44336',
+                            'warning' => '#ff9800', 
+                            'info' => '#607d8b',
+                            'success' => '#00bcd4'
+                        ]),
+                        'lightTheme' => new Json([
+                            'primary' => '#8bc34a',
+                            'secondary' => '#4caf50',
+                            'accent' => '#795548',
+                            'error' => '#f44336',
+                            'warning' => '#ff9800', 
+                            'info' => '#607d8b',
+                            'success' => '#00bcd4'
+                        ])
+                    ]);
+                    $inlineJs = new JsCode();
+                    $inlineJs->addCode('window.data = '.$jsonData.';');
+                    $p->getDocument()->getHeadNode()->addChild($inlineJs);
+                }
             });
         });
     }
@@ -182,9 +226,10 @@ class IbrahimTheme extends Theme {
             'app',
             'color' => 'green',
             //'src' => $this->getBaseURL().'/assets/images/WFLogo512.png',
-            'hide-on-scroll',
+            //'hide-on-scroll',
             'elevate-on-scroll',
-            'fixed'
+            'fixed',
+            'perminant'
         ]);
         
         $vAppBar->addChild('v-app-bar-nav-icon', [
@@ -195,29 +240,44 @@ class IbrahimTheme extends Theme {
                 'min-width' => '250px'
             ]
         ])
-        ->addChild(new Anchor($this->getBaseURL(), $this->getPage()->getWebsiteName()), [
+        ->addChild('v-row',[
+            'class' => 'd-none d-md-flex'
+        ])
+        ->addChild('v-col', [
+            'cols' => 12,
+            'md' => 4
+        ])->addChild('img', [
+            'src' => 'assets/images/WFLogo512.png',
+            'style' => [
+                'width' => '60px'
+            ]
+        ], true)
+        ->getParent()
+        ->addChild('v-col', [
+            'cols' => 12,
+            'md' => 8,
+            'class' => 'align-center d-flex'
+        ])
+        ->addChild(new Anchor($this->getBaseURL(), 
+        $this->getPage()->getWebsiteName()
+                ), [
             'style' => [
                 'color' => 'white',
                 'text-decoration' => 'none',
                 'font-weight' => 'bold'
             ],
-            'class' => 'site-name'
-        ])
-        ->getParent()
-        ->addChild('template', ['v-slot:img' => "{ props }"])
-        ->addChild('v-img', [
-            'v-bind' => 'props',
-            'gradient' => 'to top right, rgba(19,84,122,.5), rgba(128,208,199,.8)'
+            'class' => 'site-name align-center'
         ]);
         $vAppBar->addChild('v-spacer');
         $navLinksContainer = new HTMLNode('v-container', [
             'class' => 'd-none d-md-flex'
         ]);
         $vAppBar->addChild($navLinksContainer);
-        $navLinksContainer->addChild($this->createButton(['text', 'href' => $this->getBaseURL().'/about-me'], $this->getPage()->get('main-menu/about-me'), 'mdi-information-variant'), true)
+        $navLinksContainer
+                ->addChild($this->createButton(['text', 'href' => $this->getBaseURL().'/about-me'], $this->getPage()->get('main-menu/about-me'), 'mdi-information-variant'), true)
                 ->addChild($this->createButton(['text', 'href' => $this->getBaseURL().'/contact-me'], $this->getPage()->get('main-menu/contact-me'), 'mdi-comment-plus-outline'), true)
                 ->getParent()->addChild('v-spacer');
-        $this->createDarkSwitch($vAppBar);
+        //$this->createDarkSwitch($vAppBar);
         $this->createLangSwitch($vAppBar);
         return $vAppBar;
     }
@@ -263,6 +323,13 @@ class IbrahimTheme extends Theme {
             $btn->text($text);
         }
         if ($icon !== null) {
+            if (isset($iconProps['style'])) {
+                $iconProps['style']['margin'] = '8px';
+            } else {
+                $iconProps['style'] = [
+                    'margin' => '5px'
+                ];
+            }
             $btn->addChild('v-icon', $iconProps, false)->text($icon);
         }
         return $btn;

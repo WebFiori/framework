@@ -112,6 +112,9 @@ class LanguageEN extends Language {
         $this->createAndSet('general', [
             'framework-name' => 'WebFiori Framework',
         ]);
+        $this->createAndSet('footer', [
+            'built-with' => 'Powered By: '
+        ]);
         $this->createAndSet('general/social-media-names', [
             'linkedin' => 'LinkedIn',
             'github' => 'GitHub',

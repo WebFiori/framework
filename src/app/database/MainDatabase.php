@@ -13,8 +13,7 @@ class MainDatabase extends DB {
     public function __construct() {
         parent::__construct('conn-00');
 
-        //Add tables to the schema as needed.
-        $this->addTable(new UsersTable());
+        $this->register('app/database');
     }
     /**
      * 

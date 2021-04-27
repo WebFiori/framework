@@ -28,6 +28,8 @@ use webfiori\framework\WebFioriApp;
 use webfiori\database\ConnectionInfo;
 use webfiori\database\Database;
 use webfiori\database\DatabaseException;
+use webfiori\database\Table;
+use webfiori\framework\AutoLoader;
 
 /**
  * A class that can be used to represent system database.
@@ -38,7 +40,7 @@ use webfiori\database\DatabaseException;
  *
  * @author Ibrahim
  * 
- * @version 1.0
+ * @version 1.0.1
  * 
  * @since 2.0.0
  */
@@ -68,5 +70,44 @@ class DB extends Database {
             throw new DatabaseException("No connection was found which has the name '$connName'.");
         }
         parent::__construct($conn);
+    }
+    /**
+     * Auto-register database tables which exist on a specific path.
+     * 
+     * Note that the statement 'return __NAMESPACE__' must be included at the 
+     * end of the table class for auto-register to work.
+     * 
+     * @param string $pathToScan A path which is relative to application source 
+     * code. For example, if tables classes exist in the folder 
+     * 'C:\Server\apache\htdocs\src\app\database', then the value of this 
+     * argument must be 'app\database\.
+     * 
+     * @since 1.0.1
+     */
+    public function register($pathToScan) {
+        $pathToScan = ROOT_DIR.DS.$pathToScan;
+        $filesInDir = array_diff(scandir($pathToScan), ['..', '.']);
+        Util::print_r($filesInDir);
+        self::_scanDir($filesInDir, $pathToScan);
+    }
+    private function _scanDir($filesInDir, $pathToScan) {
+        foreach ($filesInDir as $fileName) {
+            $fileExt = substr($fileName, -4);
+
+            if ($fileExt == '.php') {
+                $cName = str_replace('.php', '', $fileName);
+                $ns = require_once $pathToScan.DS.$fileName;
+                $aNs = gettype($ns) == 'string' ? $ns.'\\' : '\\';
+                $aCName = $aNs.$cName;
+
+                if (!AutoLoader::isLoaded($cName, $aNs) && class_exists($aCName)) {
+                    $instance = new $aCName();
+
+                    if ($instance instanceof Table) {
+                        $this->addTable($instance);
+                    }
+                }
+            }
+        }
     }
 }

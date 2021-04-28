@@ -29,6 +29,8 @@ use webfiori\framework\Page;
 use webfiori\framework\ui\WebPage;
 use webfiori\theme\vutifyTheme\VuetifyTheme;
 use webfiori\theme\WebFioriV108;
+use webfiori\theme\NewFiori;
+
 class ExamplePage extends WebPage {
     public function __construct() {
         parent::__construct();
@@ -41,8 +43,9 @@ class ExamplePage extends WebPage {
         //$this->setTheme('Bootstrap Theme');
         //$this->setTheme('Greeny By Ibrahim Ali');
         //Page::theme('Template Theme');
-        $this->setTheme('WebFiori Theme');
+        //$this->setTheme('WebFiori Theme');
         //$this->setTheme(WebFioriV108::class);
+        $this->setTheme(NewFiori::class);
         //Load language. Used to make the page i18n compatable.
         
         $this->setTitle($this->get('pages/sample-page/title'));

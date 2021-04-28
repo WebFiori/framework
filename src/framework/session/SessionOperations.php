@@ -1,7 +1,7 @@
 <?php
 namespace webfiori\framework\session;
 
-
+use app\database\MainDatabase;
 /**
  * A class which includes all database related operations to add, update, 
  * and delete sessions from a database.
@@ -20,6 +20,7 @@ class SessionOperations extends MainDatabase {
      */
     public function __construct() {
         parent::__construct();
+        $this->addTable(new SessionsTable());
     }
     /**
      * Returns a record that holds session data given Its ID.

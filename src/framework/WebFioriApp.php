@@ -444,11 +444,12 @@ class WebFioriApp {
                     'description' => Util::ERR_TYPES[$errno]['description'],
                     'error-number' => $errno
                 ], true);
+                $stackTrace = new Json([], true);
                 
                 if (defined('WF_VERBOSE') && WF_VERBOSE) {
                     $j->add('file',$errfile);
                     $j->add('line',$errline);
-                    $stackTrace = new Json([], true);
+                    
                     $index = 0;
                     $trace = debug_backtrace();
 

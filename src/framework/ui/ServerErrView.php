@@ -173,7 +173,8 @@ class ServerErrView {
                 .'<b class="nice-red mono">Type:</b> <span class="mono">'.Util::ERR_TYPES[$throwableOrErr["type"]]['type']."</span><br/>"
                 .'<b class="nice-red mono">Description:</b> <span class="mono">'.Util::ERR_TYPES[$throwableOrErr["type"]]['description']."</span><br/>"
                 .'<b class="nice-red mono">Message:</b> <span class="mono">'.$throwableOrErr["message"]."</span><br>";
-
+            $traceStr = '';
+            
             if (defined('WF_VERBOSE') && WF_VERBOSE) {
                 $retVal .= '<b class="nice-red mono">File:</b> <span class="mono">'.$throwableOrErr["file"]."</span><br/>"
                 .'<b class="nice-red mono">Line:</b> <span class="mono">'.$throwableOrErr["line"]."</span><br/>"
@@ -186,7 +187,7 @@ class ServerErrView {
                 }
             } else {
                 $trace = debug_backtrace();
-                $traceStr = '';
+                
                 $index = 0;
                 foreach ($trace as $arr) {
                     $traceStr .= '<span class="mono">#'.$index.' At class '.Util::extractClassName($arr['file']).'. Line '.$arr['line'].'</span><br/>';

@@ -65,7 +65,8 @@ class GlobalConstants {
              * engine. For example, if the name of the class that represents 
              * storage engine is 'MySessionStorage' and the class exist in the 
              * namespace 'extras\util', then the value of the constant should be 
-             * '\extras\util\MySessionStorage'.
+             * '\extras\util\MySessionStorage'. To use database session storage 
+             * set this constant to the value '\webfiori\framework\session\DatabaseSessionStorage'.
              * 
              * @var string
              * 

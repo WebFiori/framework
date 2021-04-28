@@ -1,17 +1,13 @@
 <?php
 namespace webfiori\theme\vutifyTheme;
 
+use webfiori\framework\Page;
+use webfiori\framework\Theme;
 use webfiori\json\Json;
 use webfiori\ui\Anchor;
 use webfiori\ui\HeadNode;
 use webfiori\ui\HTMLNode;
-use webfiori\ui\JsCode;
-use webfiori\framework\Page;
-use webfiori\framework\Theme;
-use webfiori\framework\session\SessionsManager;
 
-use webfiori\framework\ConfigController;
-use webfiori\framework\WebFioriApp;
 /**
  * A basic theme which is based on Vuetify framework.
  * @author Ibrahim
@@ -46,7 +42,6 @@ class VuetifyTheme extends Theme {
             $page->getDocument()->getBody()->addChild($topDiv);
             $page->getDocument()->getChildByID('main-content-area')->setNodeName('v-main');
             $page->getDocument()->getChildByID('main-content-area')->setAttribute('app');
-            
         });
     }
     /**
@@ -77,15 +72,17 @@ class VuetifyTheme extends Theme {
             }
 
             return $node;
-        } else if ($type == 'icon-button') {
-            $btn = new HTMLNode('v-btn');
-            $btn->setAttribute('icon');
-            $vIcon = new HTMLNode('v-icon');
-            $btn->addChild($vIcon);
-            $icon = isset($options['icon']) ? $options['icon'] : 'mdi-information';
-            $vIcon->addTextNode($icon);
+        } else {
+            if ($type == 'icon-button') {
+                $btn = new HTMLNode('v-btn');
+                $btn->setAttribute('icon');
+                $vIcon = new HTMLNode('v-icon');
+                $btn->addChild($vIcon);
+                $icon = isset($options['icon']) ? $options['icon'] : 'mdi-information';
+                $vIcon->addTextNode($icon);
 
-            return $btn;
+                return $btn;
+            }
         }
 
         return new HTMLNode();
@@ -107,11 +104,11 @@ class VuetifyTheme extends Theme {
             'class' => 'lightbox white--text pa-2 fill-height',
             'align' => 'end'
         ])->addChild('v-col')
-        ->addChild('div',['class'=>'subheading'])->text('Programming Academia')
+        ->addChild('div',['class' => 'subheading'])->text('Programming Academia')
         ->getParent()->getParent()->getParent()->addChild('v-list', [
             'dense','nav'
         ])->addChild('v-list-item-group', [
-            'active-class'=>'deep-purple--text text--accent-4'
+            'active-class' => 'deep-purple--text text--accent-4'
             ])->addChild($this->createHTMLNode([
         'type' => 'v-list-item',
         'title' => Page::translation()->get('side-menu/home'),
@@ -168,21 +165,21 @@ class VuetifyTheme extends Theme {
 
         $copywriteNoticeNode = new HTMLNode('strong');
         $copywriteNoticeNode->addTextNode('All Rights Reserved');
-        
+
 
         $poweredByNode = new HTMLNode('p');
         $poweredByNode->setClassName('footer-notice');
         $poweredByNode->addTextNode('Powered By: ');
         $frameworkLink = new Anchor('https://webfiori.com', 'WebFiori Framework', '_blank');
         $poweredByNode->addChild($frameworkLink);
-        
+
 
         $vuetifyNode = new HTMLNode('p');
         $vuetifyNode->setClassName('footer-notice');
         $vuetifyNode->addTextNode('Theme Designed Using ');
         $vuetifyLink = new Anchor('https://vuetifyjs.com', 'Vuetify', '_blank');
         $vuetifyNode->addChild($vuetifyLink);
-        
+
         $vCardText->addChild($copywriteNoticeNode, true)
                 ->addChild($poweredByNode, true)
                 ->addChild($vuetifyNode);
@@ -217,7 +214,7 @@ class VuetifyTheme extends Theme {
      * Creates the header section of the page and return it.
      * @return HTMLNode
      */
-    public function getHeadrNode() { 
+    public function getHeadrNode() {
         $appBar = new HTMLNode('v-app-bar');
         $appBar->setAttributes([
             'color' => 'red',
@@ -234,20 +231,20 @@ class VuetifyTheme extends Theme {
             'max-height' => 45,
             'max-width' => 45
         ]);
-        
+
 
         //Adds a gradiant
-        
+
 
         //An icon to show and hide aside menu.
         $drawerIcon = new HTMLNode('v-app-bar-nav-icon');
-        
+
         $drawerIcon->setAttribute('@click', 'drawer = true');
 
         //Adds a text to the bar that represents website name
         $titleNode = new HTMLNode('v-toolbar-title');
         $titleNode->addTextNode(Page::siteName());
-        
+
         $appBar->addChild('template', [
             'v-slot:img' => "{ props }"
         ])->addChild('v-img',[
@@ -271,7 +268,7 @@ class VuetifyTheme extends Theme {
                     'type' => 'icon-button',
                     'icon' => 'mdi-heart'
                 ]));
-        
+
         $node = new HTMLNode();
         $node->addChild($appBar);
 

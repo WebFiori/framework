@@ -1,11 +1,10 @@
 <?php
 namespace webfiori\theme;
 
+use webfiori\framework\Theme;
 use webfiori\ui\HeadNode;
 use webfiori\ui\HTMLNode;
 use webfiori\ui\ListItem;
-use webfiori\framework\Page;
-use webfiori\framework\Theme;
 /**
  * A basic theme which is based on Bootstrap CSS framework.
  * It loads all needed CSS and JS files which are needed to create a 
@@ -21,7 +20,7 @@ class BootstrapTheme extends Theme {
         $this->setAfterLoaded(function(Theme $theme)
         {
             $page = $theme->getPage();
-            
+
             $page->getChildByID('page-body')->setClassName('row');
             $page->getDocument()->getBody()->setClassName('container-fluid');
             $page->getChildByID('main-content-area')->setClassName('col');

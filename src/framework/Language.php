@@ -271,6 +271,7 @@ class Language {
 
             if (class_exists($langClassName)) {
                 $class = new $langClassName();
+
                 if ($class instanceof Language) {
                     if (isset(self::$loadedLangs[$uLangCode])) {
                         return self::$loadedLangs[$uLangCode];

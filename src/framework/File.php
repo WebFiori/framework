@@ -278,21 +278,14 @@ class File implements JsonI {
         return $this->toJSON().'';
     }
     /**
-     * Extract file extension from file name and return it.
+     * Appends a string of data to the already existing data.
      * 
-     * @return string If file name is not set, the method will return empty string. 
-     * If its name is set and the extension is included in the name, the 
-     * method will return it.
+     * @param string $data A string that represents the extra data.
      * 
-     * @since 1.2.0
+     * @since 1.1.9
      */
-    public function getExtension() {
-        $ext = '';
-        $fArr = explode('.', $this->getName());
-        if (count($fArr) >= 1) {
-            $ext = $fArr[count($fArr) - 1];
-        }
-        return $ext;
+    public function append($data) {
+        $this->rawData .= $data;
     }
     /**
      * Returns the full path to the file.
@@ -331,6 +324,25 @@ class File implements JsonI {
      */
     public function getDir() {
         return $this->getPath();
+    }
+    /**
+     * Extract file extension from file name and return it.
+     * 
+     * @return string If file name is not set, the method will return empty string. 
+     * If its name is set and the extension is included in the name, the 
+     * method will return it.
+     * 
+     * @since 1.2.0
+     */
+    public function getExtension() {
+        $ext = '';
+        $fArr = explode('.', $this->getName());
+
+        if (count($fArr) >= 1) {
+            $ext = $fArr[count($fArr) - 1];
+        }
+
+        return $ext;
     }
     /**
      * Returns MIME type of the file.
@@ -668,16 +680,6 @@ class File implements JsonI {
         }
 
         return $retVal;
-    }
-    /**
-     * Appends a string of data to the already existing data.
-     * 
-     * @param string $data A string that represents the extra data.
-     * 
-     * @since 1.1.9
-     */
-    public function append($data) {
-        $this->rawData .= $data;
     }
     /**
      * Sets the binary representation of the file.

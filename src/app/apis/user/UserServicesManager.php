@@ -10,7 +10,7 @@ use webfiori\framework\ExtendedWebServicesManager;
 class UserServicesManager extends ExtendedWebServicesManager {
     public function __construct() {
         parent::__construct();
-        
+
         $this->addService(new AddUserService());
     }
 }

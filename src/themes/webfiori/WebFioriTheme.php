@@ -1,14 +1,14 @@
 <?php
 namespace webfiori\theme;
 
+use webfiori\framework\Page;
+use webfiori\framework\Theme;
+use webfiori\framework\WebFioriApp;
 use webfiori\ui\HeadNode;
 use webfiori\ui\HTMLNode;
 use webfiori\ui\Input;
 use webfiori\ui\Label;
 use webfiori\ui\PNode;
-use webfiori\framework\Page;
-use webfiori\framework\Theme;
-use webfiori\framework\WebFioriApp;
 
 class WebFioriTheme extends Theme {
     public function __construct() {
@@ -26,7 +26,8 @@ class WebFioriTheme extends Theme {
         $this->addComponents([
             'LangExt.php'
         ]);
-        $this->setBeforeLoaded(function(){
+        $this->setBeforeLoaded(function()
+        {
             LangExt::extLang();
         });
         $this->setAfterLoaded(function(Theme $theme)
@@ -37,7 +38,6 @@ class WebFioriTheme extends Theme {
             $page->getChildByID('page-body')->setClassName('wf-row');
             $page->getChildByID('page-header')->setClassName('wf-row-np');
             $page->getChildByID('page-footer')->setClassName('wf-row');
-            
         });
     }
     /**
@@ -135,94 +135,102 @@ class WebFioriTheme extends Theme {
                         $node->setClassName('wf-'.Page::get()->getWritingDir().'-col-'.$colSize.$wm.$wp);
 
                         return $node;
-                    } else if ($nodeType == 'page-title') {
-                        $titleRow = $this->createHTMLNode([
+                    } else {
+                        if ($nodeType == 'page-title') {
+                            $titleRow = $this->createHTMLNode([
                             'type' => 'wf-row'
                         ]);
-                        $titleRow->setID('page-title');
-                        $title = isset($options['title']) ? $options['title'] : Page::title();
-                        $h1 = new HTMLNode('h2');
-                        $h1->addTextNode($title);
-                        $h1->setClassName('wf-'.Page::dir().'-col-10-nm-np');
-                        $titleRow->addChild($h1);
+                            $titleRow->setID('page-title');
+                            $title = isset($options['title']) ? $options['title'] : Page::title();
+                            $h1 = new HTMLNode('h2');
+                            $h1->addTextNode($title);
+                            $h1->setClassName('wf-'.Page::dir().'-col-10-nm-np');
+                            $titleRow->addChild($h1);
 
-                        return $titleRow;
-                    } else if ($nodeType == 'status-label') {
-                        $statusContainer = $this->createHTMLNode(['type' => 'wf-row']);
-                        $statusContainer->setClassName($statusContainer->getAttributeValue('class').' status-label-container');
-                        $statusLabel = new PNode();
-                        $statusLabel->setID('status-label');
-                        $statusContainer->addChild($statusLabel);
-
-                        return $statusContainer;
-                    } else if ($nodeType == 'input-element') {
-                        $row = $this->createHTMLNode(['type' => 'wf-row']);
-                        $label = isset($options['label']) ? $options['label'] : 'Input_label';
-                        $labelNode = new Label($label);
-                        $inputId = isset($options['input-id']) ? $options['input-id'] : 'input-el';
-                        $labelNode->setAttribute('for', $inputId);
-                        $inputType = isset($options['input-type']) ? $options['input-type'] : 'text';
-
-                        if ($inputType == 'select') {
-                            $row->addChild($labelNode);
-                            $inputEl = new HTMLNode('select');
-                            $inputEl->setID($inputId);
-
-                            if (isset($options['select-data'])) {
-                                foreach ($options['select-data'] as $data) {
-                                    $label = isset($data['label']) ? $data['label'] : 'Lbl';
-                                    $val = isset($data['value']) ? $data['value']:null;
-                                    $isDisabled = isset($data['disabled']) ? $data['disabled'] === true : false;
-
-                                    if ($val !== null) {
-                                        $o = new HTMLNode('option');
-                                        $o->addTextNode($label);
-                                        $o->setAttribute('value', $val);
-
-                                        if (isset($data['selected']) && $data['selected'] === true) {
-                                            $o->setAttribute('selected', '');
-                                        }
-
-                                        if ($isDisabled) {
-                                            $o->setAttribute('disabled', '');
-                                        }
-                                        $inputEl->addChild($o);
-                                    }
-                                }
-                            }
-                            $onInput = isset($options['on-input']) ? $options['on-input'] : "console.log(this.id+' has changed value.');";
-                            $inputEl->setAttribute('onchange', $onInput);
+                            return $titleRow;
                         } else {
-                            $inputEl = new Input($inputType);
-                            $inputEl->setID($inputId);
-                            $onInput = isset($options['on-input']) ? $options['on-input'] : "console.log(this.id+' has changed value.');";
+                            if ($nodeType == 'status-label') {
+                                $statusContainer = $this->createHTMLNode(['type' => 'wf-row']);
+                                $statusContainer->setClassName($statusContainer->getAttributeValue('class').' status-label-container');
+                                $statusLabel = new PNode();
+                                $statusLabel->setID('status-label');
+                                $statusContainer->addChild($statusLabel);
 
-                            if ($inputType == 'submit') {
-                                $inputEl->setAttribute('onclick', $onInput);
-                                $inputEl->setAttribute('value', $label);
-                            } else if ($inputType == 'checkbox' || $inputType == 'radio') {
-                                $labelNode->setStyle([
+                                return $statusContainer;
+                            } else {
+                                if ($nodeType == 'input-element') {
+                                    $row = $this->createHTMLNode(['type' => 'wf-row']);
+                                    $label = isset($options['label']) ? $options['label'] : 'Input_label';
+                                    $labelNode = new Label($label);
+                                    $inputId = isset($options['input-id']) ? $options['input-id'] : 'input-el';
+                                    $labelNode->setAttribute('for', $inputId);
+                                    $inputType = isset($options['input-type']) ? $options['input-type'] : 'text';
+
+                                    if ($inputType == 'select') {
+                                        $row->addChild($labelNode);
+                                        $inputEl = new HTMLNode('select');
+                                        $inputEl->setID($inputId);
+
+                                        if (isset($options['select-data'])) {
+                                            foreach ($options['select-data'] as $data) {
+                                                $label = isset($data['label']) ? $data['label'] : 'Lbl';
+                                                $val = isset($data['value']) ? $data['value']:null;
+                                                $isDisabled = isset($data['disabled']) ? $data['disabled'] === true : false;
+
+                                                if ($val !== null) {
+                                                    $o = new HTMLNode('option');
+                                                    $o->addTextNode($label);
+                                                    $o->setAttribute('value', $val);
+
+                                                    if (isset($data['selected']) && $data['selected'] === true) {
+                                                        $o->setAttribute('selected', '');
+                                                    }
+
+                                                    if ($isDisabled) {
+                                                        $o->setAttribute('disabled', '');
+                                                    }
+                                                    $inputEl->addChild($o);
+                                                }
+                                            }
+                                        }
+                                        $onInput = isset($options['on-input']) ? $options['on-input'] : "console.log(this.id+' has changed value.');";
+                                        $inputEl->setAttribute('onchange', $onInput);
+                                    } else {
+                                        $inputEl = new Input($inputType);
+                                        $inputEl->setID($inputId);
+                                        $onInput = isset($options['on-input']) ? $options['on-input'] : "console.log(this.id+' has changed value.');";
+
+                                        if ($inputType == 'submit') {
+                                            $inputEl->setAttribute('onclick', $onInput);
+                                            $inputEl->setAttribute('value', $label);
+                                        } else {
+                                            if ($inputType == 'checkbox' || $inputType == 'radio') {
+                                                $labelNode->setStyle([
                                     'display' => 'inline-block'
                                 ]);
-                                $row->addChild($inputEl);
-                                $row->addChild($labelNode);
+                                                $row->addChild($inputEl);
+                                                $row->addChild($labelNode);
 
-                                if ($inputType == 'radio') {
-                                    $name = isset($options['name']) ? $options['name'] : 'radio-group';
-                                    $inputEl->setName($name);
+                                                if ($inputType == 'radio') {
+                                                    $name = isset($options['name']) ? $options['name'] : 'radio-group';
+                                                    $inputEl->setName($name);
+                                                }
+
+                                                return $row;
+                                            } else {
+                                                $row->addChild($labelNode);
+                                                $placeholder = isset($options['placeholder']) ? $options['placeholder'] : '';
+                                                $inputEl->setAttribute('placeholder', $placeholder);
+                                                $inputEl->setAttribute('oninput', $onInput);
+                                            }
+                                        }
+                                    }
+                                    $row->addChild($inputEl);
+
+                                    return $row;
                                 }
-
-                                return $row;
-                            } else {
-                                $row->addChild($labelNode);
-                                $placeholder = isset($options['placeholder']) ? $options['placeholder'] : '';
-                                $inputEl->setAttribute('placeholder', $placeholder);
-                                $inputEl->setAttribute('oninput', $onInput);
                             }
                         }
-                        $row->addChild($inputEl);
-
-                        return $row;
                     }
                 }
             }
@@ -230,7 +238,7 @@ class WebFioriTheme extends Theme {
     }
     public function getAsideNode() {
         $menu = new HTMLNode('div');
-        
+
         return $menu;
     }
 
@@ -245,7 +253,7 @@ class WebFioriTheme extends Theme {
             'theme-dir' => $this->getDirectoryName(),
             'images-dir' => $this->getImagesDirName()
         ]);
-        
+
         return $node;
     }
 
@@ -269,7 +277,7 @@ class WebFioriTheme extends Theme {
                 'm_3_link' => '#'
             ],
         ]);
-        
+
         return $headerSec;
     }
 }

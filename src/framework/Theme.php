@@ -25,10 +25,10 @@
 namespace webfiori\framework;
 
 use ReflectionClass;
+use webfiori\framework\ui\WebPage;
 use webfiori\json\Json;
 use webfiori\json\JsonI;
 use webfiori\ui\HTMLNode;
-use webfiori\framework\ui\WebPage;
 /**
  * A base class that is used to construct web site UI.
  * 
@@ -46,14 +46,6 @@ use webfiori\framework\ui\WebPage;
  * @version 1.2.7
  */
 abstract class Theme implements JsonI {
-    /**
-     * The web page at which the theme will be applied to.
-     * 
-     * @var WebPage|null
-     * 
-     * @since 1.2.7 
-     */
-    private $page;
     /**
      * A callback function to call after the theme is loaded.
      * 
@@ -121,6 +113,14 @@ abstract class Theme implements JsonI {
      */
     private $jsDir;
     /**
+     * The web page at which the theme will be applied to.
+     * 
+     * @var WebPage|null
+     * 
+     * @since 1.2.7 
+     */
+    private $page;
+    /**
      * An array that contains the names of theme component files.
      * 
      * @var array
@@ -185,28 +185,6 @@ abstract class Theme implements JsonI {
         $this->afterLoadedParams = [];
         $this->beforeLoaded = null;
         $this->beforeLoadedParams = [];
-    }
-    /**
-     * Sets the page at which the theme will be applied to.
-     * 
-     * @param WebPage $page The page that the theme is applied to.
-     * 
-     * @since 1.2.7
-     */
-    public function setPage(WebPage $page) {
-        $this->page = $page;
-    }
-    /**
-     * Returns the page at which the theme will be applied to.
-     * 
-     * @return WebPage|null If the theme is applied to a page, the 
-     * method will return it as an object. If theme is not applied to 
-     * any page, the method will return null.
-     * 
-     * @since 1.2.7
-     */
-    public function getPage() {
-        return $this->page;
     }
     /**
      * Adds a single component to the set of theme components.
@@ -492,6 +470,18 @@ abstract class Theme implements JsonI {
         return $this->themeMeta['name'];
     }
     /**
+     * Returns the page at which the theme will be applied to.
+     * 
+     * @return WebPage|null If the theme is applied to a page, the 
+     * method will return it as an object. If theme is not applied to 
+     * any page, the method will return null.
+     * 
+     * @since 1.2.7
+     */
+    public function getPage() {
+        return $this->page;
+    }
+    /**
      * Returns A URL which should point to theme web site.
      * 
      * @return string A URL which should point to theme web site. Usually, 
@@ -750,6 +740,16 @@ abstract class Theme implements JsonI {
         if (strlen($trimmed) != 0) {
             $this->themeMeta['name'] = $trimmed;
         }
+    }
+    /**
+     * Sets the page at which the theme will be applied to.
+     * 
+     * @param WebPage $page The page that the theme is applied to.
+     * 
+     * @since 1.2.7
+     */
+    public function setPage(WebPage $page) {
+        $this->page = $page;
     }
     /**
      * Sets the URL of theme designer web site. 

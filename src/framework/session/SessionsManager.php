@@ -23,8 +23,9 @@
  * THE SOFTWARE.
  */
 namespace webfiori\framework\session;
-use Exception;
+
 use ErrorException;
+use Exception;
 
 /**
  * A class which is used to manage user sessions.
@@ -72,8 +73,8 @@ class SessionsManager {
      */
     private function __construct() {
         $this->sesstionsArr = [];
+
         if (defined('WF_SESSION_STORAGE')) {
-            
             try {
                 $constructor = WF_SESSION_STORAGE.'';
                 $classObj = new $constructor();
@@ -84,7 +85,7 @@ class SessionsManager {
             } catch (Exception $ex) {} 
             catch (ErrorException $ex) {}
         }
-        
+
         if ($this->sesstionStorage === null) {
             $this->sesstionStorage = new DefaultSessionStorage();
         }

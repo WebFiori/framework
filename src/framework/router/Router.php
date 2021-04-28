@@ -26,18 +26,18 @@ namespace webfiori\framework\router;
 
 use Error;
 use Exception;
-use webfiori\framework\WebFioriApp;
 use webfiori\framework\cli\CLI;
 use webfiori\framework\exceptions\RoutingException;
 use webfiori\framework\File;
 use webfiori\framework\ui\NotFoundView;
+use webfiori\framework\ui\WebPage;
 use webfiori\framework\Util;
+use webfiori\framework\WebFioriApp;
 use webfiori\http\Request;
 use webfiori\http\Response;
 use webfiori\http\WebServicesManager;
 use webfiori\json\Json;
 use webfiori\ui\HTMLNode;
-use webfiori\framework\ui\WebPage;
 /**
  * The basic class that is used to route user requests to the correct 
  * location.
@@ -1171,6 +1171,7 @@ class Router {
                         $message = 'The resource "'.Util::getRequestedURL().'" was availble. '
                         .'but its route is not configured correctly. '
                         .'The resource which the route is pointing to was not found.';
+
                         if (defined('WF_') && WF_VERBOSE) {
                             $message = 'The resource "'.Util::getRequestedURL().'" was availble. '
                             .'but its route is not configured correctly. '

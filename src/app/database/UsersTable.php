@@ -54,4 +54,5 @@ class UsersTable extends MySQLTable {
         ]);
     }
 }
+
 return __NAMESPACE__;

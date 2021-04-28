@@ -17,7 +17,7 @@ class SessionsTable extends MySQLTable {
     /**
      * Creates new instance of the class.
      */
-    public function __construct(){
+    public function __construct() {
         parent::__construct('`sessions`');
         $this->setComment('This table is used to store session related data');
         $this->addColumns([
@@ -45,4 +45,5 @@ class SessionsTable extends MySQLTable {
         ]);
     }
 }
+
 return __NAMESPACE__;

@@ -1,15 +1,15 @@
 <?php
 namespace webfiori\theme;
 
+use webfiori\framework\Page;
+use webfiori\framework\session\SessionsManager;
+use webfiori\framework\Theme;
+use webfiori\framework\WebFioriApp;
 use webfiori\ui\Anchor;
 use webfiori\ui\HeadNode;
 use webfiori\ui\HTMLNode;
 use webfiori\ui\ListItem;
 use webfiori\ui\UnorderedList;
-use webfiori\framework\Page;
-use webfiori\framework\Theme;
-use webfiori\framework\WebFioriApp;
-use webfiori\framework\session\SessionsManager;
 /**
  * WebFiori Theme Which is bundled with v1.0.8 of the framework.
  *
@@ -24,8 +24,10 @@ class WebFioriV108 extends Theme {
         $this->setLicenseName('MIT License');
         $this->setUrl('https://ibrahim-2017.blogspot.com/');
         $this->setLicenseUrl('https://opensource.org/licenses/MIT');
-        $this->setBeforeLoaded(function () {
+        $this->setBeforeLoaded(function ()
+        {
             $activeSession = SessionsManager::getActiveSession();
+
             if ($activeSession !== null) {
                 Page::lang($activeSession->getLangCode(true));
             } else {
@@ -35,7 +37,7 @@ class WebFioriV108 extends Theme {
         $this->setAfterLoaded(function(Theme $theme)
         {
             $page = $theme->getPage();
-            
+
             $page->getChildByID('page-body')->setClassName('row  ml-0 mr-0');
             $page->getChildByID('page-body')->setStyle([
                 'margin-top' => '50px'
@@ -56,7 +58,8 @@ class WebFioriV108 extends Theme {
                 'z-index' => -1,
             ]);
             $page->getDocument()->getBody()->addChild($img);
-            $page->addBeforeRender(function ($page) {
+            $page->addBeforeRender(function ($page)
+            {
                 $js = new \webfiori\ui\JsCode();
                 $js->addCode("window.Prism = window.Prism || {};");
                 $page->getDocument()->getHeadNode()->addChild($js);

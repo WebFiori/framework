@@ -201,8 +201,9 @@ class ErrorBox extends MessageBox {
             $this->lineNode->setClassName('message-line');
             $detailsContainer->addChild($this->lineNode);
             $this->traceNode = new HTMLNode();
-            
+
             $detailsContainer->addChild($this->traceNode);
+
             if (!defined('WF_VERBOSE') || !WF_VERBOSE) {
                 $this->tipNode = new HTMLNode('p');
                 $this->tipNode->setClassName('message-line');
@@ -212,7 +213,7 @@ class ErrorBox extends MessageBox {
                     .'define the constant "WF_VERBOSE" and set its value to "true" in '
                     .'the class "GlobalConstants".', false);
             }
-            
+
 
             $this->setAttribute('onmouseover', "if(this.getAttribute('dg') === null){addDragSupport(this)}");
             $this->getHeader()->addTextNode('<b style="margin-left:10px;font-family:monospace;">Message ('.self::getCount().')</b>',false);
@@ -224,7 +225,7 @@ class ErrorBox extends MessageBox {
         $file = isset($arr['file']) ? $arr['file'] : $arr['function'];
         $line = $arr['line'];
         $class = isset($arr['class']) ? $arr['class'] : Util::extractClassName($file);
-        
+
         if (defined('WF_VERBOSE') && WF_VERBOSE === true) {
             return "#$num $file($line): $class";
         } else {

@@ -32,7 +32,7 @@ window.app = new Vue({
         methods_search_results:[],
         docs_search_results:[],
         search_val:'',
-        show_search_menu:false
+        show_search_menu:false,
     },
     methods:{
         search:function() {

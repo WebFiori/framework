@@ -25,8 +25,10 @@
 namespace webfiori\framework\ui;
 
 use Exception;
+use webfiori\framework\exceptions\MissingLangException;
 use webfiori\framework\exceptions\UIException;
 use webfiori\framework\i18n\Language;
+use webfiori\framework\session\Session;
 use webfiori\framework\session\SessionsManager;
 use webfiori\framework\Theme;
 use webfiori\framework\ThemeLoader;
@@ -38,8 +40,6 @@ use webfiori\json\Json;
 use webfiori\ui\HeadNode;
 use webfiori\ui\HTMLDoc;
 use webfiori\ui\HTMLNode;
-use webfiori\framework\session\Session;
-use webfiori\framework\exceptions\MissingLangException;
 /**
  * A base class that can be used to implement web pages.
  *
@@ -250,26 +250,6 @@ class WebPage {
         }
     }
     /**
-     * Adds new meta tag.
-     * 
-     * @param string $name The value of the property 'name'. Must be non empty 
-     * string.
-     * 
-     * @param string $content The value of the property 'content'.
-     * 
-     * @param boolean $override A boolean parameter. If a meta node was found 
-     * which has the given name and this attribute is set to true, 
-     * the content of the meta will be overridden by the passed value. 
-     * 
-     * @return HeadNote The method will return the instance at which the method 
-     * is called on.
-     * 
-     * @since 1.0
-     */
-    public function addMeta($name, $content, $override = false) {
-        $this->getDocument()->getHeadNode()->addMeta($name, $content, $override);
-    }
-    /**
      * Adds new CSS source file.
      * 
      * @param string $href The link to the file. Must be non empty string. It is 
@@ -304,6 +284,47 @@ class WebPage {
         $this->getDocument()->getHeadNode()->addJs($src, $attrs);
     }
     /**
+     * Adds new meta tag.
+     * 
+     * @param string $name The value of the property 'name'. Must be non empty 
+     * string.
+     * 
+     * @param string $content The value of the property 'content'.
+     * 
+     * @param boolean $override A boolean parameter. If a meta node was found 
+     * which has the given name and this attribute is set to true, 
+     * the content of the meta will be overridden by the passed value. 
+     * 
+     * @return HeadNote The method will return the instance at which the method 
+     * is called on.
+     * 
+     * @since 1.0
+     */
+    public function addMeta($name, $content, $override = false) {
+        $this->getDocument()->getHeadNode()->addMeta($name, $content, $override);
+    }
+    /**
+     * Create HTML node based on the method which exist on the applied theme.
+     * 
+     * This method can be only used if a theme is applied and the method 
+     * Theme::createHTMLNode() is implemented.
+     * 
+     * @param array $nodeInfo An array that holds node information.
+     * 
+     * @return HTMLNode|null The returned HTML node will depend on how the 
+     * developer has implemented the method Theme::createHTMLNode(). If 
+     * no theme is applied, the method will return null.
+     * 
+     * @since 1.0
+     */
+    public function createHTMLNode($nodeInfo) {
+        $theme = $this->getTheme();
+
+        if ($theme !== null) {
+            return $theme->createHTMLNode($nodeInfo);
+        }
+    }
+    /**
      * Returns the value of a language label.
      * 
      * @param string $label A directory to the language variable 
@@ -326,6 +347,42 @@ class WebPage {
         return $label;
     }
     /**
+     * Returns the session which is currently active.
+     * 
+     * @return Session|null If a session is active, the method will return its 
+     * data stored in an object. If no session is active, the method will return 
+     * null.
+     * 
+     * @since 1.0
+     */
+    public function getActiveSession() {
+        return SessionsManager::getActiveSession();
+    }
+    /**
+     * Returns the value of the attribute 'href' of the node 'base' of page document.
+     * 
+     * @return string|null If the base URL is set, the method will return its value. 
+     * If the value of the base URL is not set, the method will return null.
+     * 
+     * @since 1.0
+     */
+    public function getBase() {
+        $headNode = $this->getDocument()->getHeadNode();
+
+        return $headNode->getBaseURL();
+    }
+    /**
+     * Returns the canonical URL of the page.
+     * 
+     * @return null|string The method will return the  canonical URL of the page 
+     * if set. If not, the method will return null.
+     * 
+     * @since 1.0
+     */
+    public function getCanonical() {
+        return $this->canonical;
+    }
+    /**
      * Returns a child node given its ID.
      * 
      * @param string $id The ID of the child.
@@ -339,6 +396,17 @@ class WebPage {
         return $this->getDocument()->getChildByID($id);
     }
     /**
+     * Returns the description of the page.
+     * 
+     * @return string|null The description of the page. If the description is not set, 
+     * the method will return null.
+     * 
+     * @since 1.0
+     */
+    public function getDescription() {
+        return $this->description;
+    }
+    /**
      * Returns the document that is associated with the page.
      * 
      * @return HTMLDoc An object of type 'HTMLDoc'.
@@ -347,20 +415,6 @@ class WebPage {
      */
     public function getDocument() {
         return $this->document;
-    }
-    /**
-     * Removes a child node from the document of the page.
-     * 
-     * @param HTMLNode|string $node The node that will be removed.  This also 
-     * can be the value of the attribute ID of the node that will be removed.
-     * 
-     * @return HTMLNode|null The method will return the node if removed. 
-     * If not removed, the method will return null.
-     * 
-     * @since 1.0
-     */
-    public function removeChild($node) {
-        return $this->getDocument()->removeChild($node);
     }
     /**
      * Returns the language code of the page.
@@ -384,26 +438,6 @@ class WebPage {
      */
     public function getTheme() {
         return $this->theme;
-    }
-    /**
-     * Create HTML node based on the method which exist on the applied theme.
-     * 
-     * This method can be only used if a theme is applied and the method 
-     * Theme::createHTMLNode() is implemented.
-     * 
-     * @param array $nodeInfo An array that holds node information.
-     * 
-     * @return HTMLNode|null The returned HTML node will depend on how the 
-     * developer has implemented the method Theme::createHTMLNode(). If 
-     * no theme is applied, the method will return null.
-     * 
-     * @since 1.0
-     */
-    public function createHTMLNode($nodeInfo) {
-        $theme = $this->getTheme();
-        if ($theme !== null) {
-            return $theme->createHTMLNode($nodeInfo);
-        }
     }
     /**
      * Returns the name of the directory at which CSS files of the applied theme exists.
@@ -460,7 +494,7 @@ class WebPage {
 
         return '';
     }
-    
+
     /**
      * Returns the title of the page.
      * 
@@ -496,6 +530,18 @@ class WebPage {
      */
     public function getTranslation() {
         return $this->tr;
+    }
+    /**
+     * Returns the name of the web site.
+     * 
+     * @return string The name of the web site. If the name was not set 
+     * using the method WebPage::siteName(), the returned value will 
+     * be 'My X Website'.
+     * 
+     * @since 1.0
+     */
+    public function getWebsiteName() {
+        return $this->websiteName;
     }
     /**
      * Returns the writing direction of the page.
@@ -556,6 +602,56 @@ class WebPage {
         }
 
         return $this->includeLables;
+    }
+    /**
+     * Adds a child node inside the body of a node given its ID.
+     * 
+     * @param HTMLNode|string $node The node that will be inserted. Also, 
+     * this can be the tag name of the node such as 'div'.
+     * 
+     * @param string $parentNodeId The ID of the node that the given node 
+     * will be inserted to. Default value is 'main-content-area'.
+     * 
+     * @return HTMLNode|null The method will return the inserted 
+     * node if it was inserted. If it is not, the method will return null.
+     * 
+     * @since 1.0
+     */
+    public function insert($node, $parentNodeId = self::MAIN_ELEMENTS[2]) {
+        if (gettype($node) == 'string') {
+            $node = new HTMLNode($node);
+        }
+        $parent = $this->getChildByID($parentNodeId);
+
+        if ($parent !== null) {
+            $parent->addChild($node);
+
+            return $node;
+        }
+    }
+    /**
+     * Checks if a theme is loaded or not.
+     * 
+     * @return boolean true if loaded. false if not loaded.
+     * 
+     * @since 1.0
+     */
+    public function isThemeLoaded() {
+        return $this->theme instanceof Theme;
+    }
+    /**
+     * Removes a child node from the document of the page.
+     * 
+     * @param HTMLNode|string $node The node that will be removed.  This also 
+     * can be the value of the attribute ID of the node that will be removed.
+     * 
+     * @return HTMLNode|null The method will return the node if removed. 
+     * If not removed, the method will return null.
+     * 
+     * @since 1.0
+     */
+    public function removeChild($node) {
+        return $this->getDocument()->removeChild($node);
     }
     /**
      * Display the page in the web browser or gets the rendered document as string.
@@ -648,30 +744,6 @@ class WebPage {
         $this->includeLables = false;
 
         $this->_resetBeforeLoaded();
-    }
-    /**
-     * Adds a child node inside the body of a node given its ID.
-     * 
-     * @param HTMLNode|string $node The node that will be inserted. Also, 
-     * this can be the tag name of the node such as 'div'.
-     * 
-     * @param string $parentNodeId The ID of the node that the given node 
-     * will be inserted to. Default value is 'main-content-area'.
-     * 
-     * @return HTMLNode|null The method will return the inserted 
-     * node if it was inserted. If it is not, the method will return null.
-     * 
-     * @since 1.0
-     */
-    public function insert($node, $parentNodeId = self::MAIN_ELEMENTS[2]) {
-        if (gettype($node) == 'string') {
-            $node = new HTMLNode($node);
-        }
-        $parent = $this->getChildByID($parentNodeId);
-        if ($parent !== null) {
-            $parent->addChild($node);
-            return $node;
-        }
     }
     /**
      * Sets the canonical URL of the page.
@@ -804,6 +876,29 @@ class WebPage {
                 }
             }
             $this->incHeader = $bool;
+        }
+    }
+    /**
+     * Sets the display language of the page.
+     * 
+     * The length of the given string must be 2 characters in order to set the 
+     * language code.
+     * 
+     * @param string $lang a two digit language code such as AR or EN. Default 
+     * value is 'EN'.
+     * 
+     * @since 1.0
+     */
+    public function setLang($lang = 'EN') {
+        $langU = strtoupper(trim($lang));
+
+        if (strlen($lang) == 2) {
+            $this->contentLang = $langU;
+
+            if ($this->document !== null) {
+                $this->document->setLanguage($langU);
+            }
+            $this->usingLanguage();
         }
     }
     /**
@@ -1032,18 +1127,6 @@ class WebPage {
 
         return $headNode;
     }
-    /**
-     * Returns the value of the attribute 'href' of the node 'base' of page document.
-     * 
-     * @return string|null If the base URL is set, the method will return its value. 
-     * If the value of the base URL is not set, the method will return null.
-     * 
-     * @since 1.0
-     */
-    public function getBase() {
-        $headNode = $this->getDocument()->getHeadNode();
-        return $headNode->getBaseURL();
-    }
     private function _getHeader() {
         $loadedTheme = $this->getTheme();
         $node = new HTMLNode();
@@ -1128,85 +1211,6 @@ class WebPage {
                 }
             }
         }];
-    }
-    /**
-     * Returns the canonical URL of the page.
-     * 
-     * @return null|string The method will return the  canonical URL of the page 
-     * if set. If not, the method will return null.
-     * 
-     * @since 1.0
-     */
-    public function getCanonical() {
-        return $this->canonical;
-    }
-    /**
-     * Returns the description of the page.
-     * 
-     * @return string|null The description of the page. If the description is not set, 
-     * the method will return null.
-     * 
-     * @since 1.0
-     */
-    public function getDescription() {
-        return $this->description;
-    }
-    /**
-     * Returns the name of the web site.
-     * 
-     * @return string The name of the web site. If the name was not set 
-     * using the method WebPage::siteName(), the returned value will 
-     * be 'My X Website'.
-     * 
-     * @since 1.0
-     */
-    public function getWebsiteName() {
-        return $this->websiteName;
-    }
-    /**
-     * Checks if a theme is loaded or not.
-     * 
-     * @return boolean true if loaded. false if not loaded.
-     * 
-     * @since 1.0
-     */
-    public function isThemeLoaded() {
-        return $this->theme instanceof Theme;
-    }
-    /**
-     * Sets the display language of the page.
-     * 
-     * The length of the given string must be 2 characters in order to set the 
-     * language code.
-     * 
-     * @param string $lang a two digit language code such as AR or EN. Default 
-     * value is 'EN'.
-     * 
-     * @since 1.0
-     */
-    public function setLang($lang = 'EN') {
-        $langU = strtoupper(trim($lang));
-
-        if (strlen($lang) == 2) {
-            $this->contentLang = $langU;
-
-            if ($this->document !== null) {
-                $this->document->setLanguage($langU);
-            }
-            $this->usingLanguage();
-        }
-    }
-    /**
-     * Returns the session which is currently active.
-     * 
-     * @return Session|null If a session is active, the method will return its 
-     * data stored in an object. If no session is active, the method will return 
-     * null.
-     * 
-     * @since 1.0
-     */
-    public function getActiveSession() {
-        return SessionsManager::getActiveSession();
     }
     /**
      * Load the translation file based on the language code. 

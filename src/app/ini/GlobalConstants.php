@@ -56,6 +56,7 @@ class GlobalConstants {
              */
             define('SCRIPT_MEMORY_LIMIT', '2048M');
         }
+
         if (!defined('WF_SESSION_STORAGE')) {
             /**
              * A constant which holds the class name of sessions storage 
@@ -74,6 +75,7 @@ class GlobalConstants {
              */
             define('WF_SESSION_STORAGE', '\webfiori\framework\session\DefaultSessionStorage');
         }
+
         if (!defined('DATE_TIMEZONE')) {
             /**
              * Define the timezone at which the system will operate in.

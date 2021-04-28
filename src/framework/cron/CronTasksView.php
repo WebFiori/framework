@@ -201,10 +201,10 @@ class CronTasksView extends CronView {
         $sec->addChild($h);
         $sec->addChild($pre);
         Page::insert($sec);
-        
+
         $logsPath = ROOT_DIR.DS.'app'.DS.'storage'.DS.'logs';
         $logFile = $logsPath.DS.'cron.log';
-        
+
         if (file_exists($logFile)) {
             $file = new File($logFile);
             $file->read();

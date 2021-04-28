@@ -27,9 +27,9 @@ namespace webfiori\examples\views;
 use ibrahim\themes\IbrahimTheme;
 use webfiori\framework\Page;
 use webfiori\framework\ui\WebPage;
+use webfiori\theme\NewFiori;
 use webfiori\theme\vutifyTheme\VuetifyTheme;
 use webfiori\theme\WebFioriV108;
-use webfiori\theme\NewFiori;
 
 class ExamplePage extends WebPage {
     public function __construct() {
@@ -47,7 +47,7 @@ class ExamplePage extends WebPage {
         //$this->setTheme(WebFioriV108::class);
         $this->setTheme(NewFiori::class);
         //Load language. Used to make the page i18n compatable.
-        
+
         $this->setTitle($this->get('pages/sample-page/title'));
         $this->setDescription($this->get('pages/sample-page/description'));
 

@@ -27,7 +27,6 @@ namespace webfiori\framework;
 use webfiori\framework\cli\CLI;
 use webfiori\framework\ui\MessageBox;
 use webfiori\http\Response;
-use webfiori\framework\File;
 /**
  * Framework utility class.
  * 
@@ -152,12 +151,6 @@ class Util {
      */
     private function __construct() {
     }
-    public static function extractClassName($filePath) {
-        $expl = explode(DS, $filePath);
-        $classFile = $expl[count($expl) - 1];
-        $firstChar = $classFile[0];
-        return strtoupper($firstChar).''.explode('.', substr($classFile, 1))[0];
-    }
     /**
      * Converts a positive integer value to binary string.
      * 
@@ -198,6 +191,13 @@ class Util {
         ini_set('display_startup_errors', 1);
         ini_set('display_errors', 1);
         error_reporting(-1);
+    }
+    public static function extractClassName($filePath) {
+        $expl = explode(DS, $filePath);
+        $classFile = $expl[count($expl) - 1];
+        $firstChar = $classFile[0];
+
+        return strtoupper($firstChar).''.explode('.', substr($classFile, 1))[0];
     }
     /**
      * This method is used to filter scripting code such as 

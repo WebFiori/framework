@@ -1,9 +1,6 @@
 <?php
 namespace webfiori\framework\session;
 
-use webfiori\framework\session\SessionStorage;
-use app\database\MainDatabase;
-use app\database\SessionsTable;
 use app\database\SessionOperations;
 /**
  * A session storage engine which uses database to store session state.
@@ -73,5 +70,4 @@ class DatabaseSessionStorage implements SessionStorage {
     public function save($sessionId, $serializedSession) {
         $this->dbController->saveSession($sessionId, $serializedSession);
     }
-
 }

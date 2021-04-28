@@ -1,13 +1,11 @@
 <?php
 namespace webfiori\theme;
 
-use webfiori\ui\HeadNode;
-use webfiori\ui\HTMLNode;
-use webfiori\framework\WebFioriApp;
 use webfiori\framework\Page;
 use webfiori\framework\Theme;
-use webfiori\framework\session\SessionsManager;
-use webfiori\framework\ui\WebPage;
+use webfiori\framework\WebFioriApp;
+use webfiori\ui\HeadNode;
+use webfiori\ui\HTMLNode;
 class GreenyTheme extends Theme {
     public function __construct() {
         parent::__construct();
@@ -80,7 +78,7 @@ class GreenyTheme extends Theme {
         $headTag->setBase(WebFioriApp::getAppConfig()->getBaseURL());
         $headTag->addLink('icon', Page::imagesDir().'/favicon.png');
         $headTag->setCanonical(WebFioriApp::getAppConfig()->getBaseURL().Page::canonical());
-        
+
         $headTag->addMeta('robots', 'index, follow');
 
         return $headTag;

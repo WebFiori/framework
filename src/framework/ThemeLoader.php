@@ -175,9 +175,10 @@ class ThemeLoader {
         } else {
             $themeName = WebFioriApp::getAppConfig()->getBaseThemeName();
         }
-        
+
         $themeToLoad = null;
         $xName = '\\'.$themeName;
+
         if (class_exists($xName)) {
             $tmpTheme = new $xName();
 
@@ -186,7 +187,7 @@ class ThemeLoader {
                 $themeName = $themeToLoad->getName();
             }
         }
-        
+
         if (self::isThemeLoaded($themeName)) {
             $themeToLoad = self::$loadedThemes[$themeName];
         } else if ($themeToLoad === null) {

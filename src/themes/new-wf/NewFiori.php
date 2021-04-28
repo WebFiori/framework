@@ -83,8 +83,17 @@ class NewFiori extends Theme {
                 $this->createButton([
                     'text', 'block', 
                     'href' => $this->getBaseURL().'/docs/webfiori'
-                    ], 'API Reference', 'mdi-information-variant')))
-        
+                    ], 'API Reference', 'mdi-information-variant')), true)
+        ->addChild($this->createDrawerMenuItem(
+                $this->createButton([
+                    'text', 'block', 
+                    'href' => $this->getBaseURL().'/download'
+                    ], 'Download', 'mdi-information-variant')), true)
+        ->addChild($this->createDrawerMenuItem(
+                $this->createButton([
+                    'text', 'block', 
+                    'href' => $this->getBaseURL().'/contribute'
+                    ], 'Contribute', 'mdi-information-variant')), true)
         ;
         return $sideDrawer;
     }
@@ -97,35 +106,39 @@ class NewFiori extends Theme {
         $card = new HTMLNode('v-card', [
             'flat', 'tile', 'class' => 'flex text-center', 'dark']);
         $footer->addChild($card);
-        $card->addChild('v-card-text')
-                ->addChild($this->createButton([
-                    'text', 
-                    'fab', 
-                    'x-small',
-                    'target' => '_blank',
-                    'href' => 'https://www.linkedin.com/in/ibrahim-binalshikh/'], null, 'mdi-linkedin'), true)
-                ->addChild($this->createButton([
-                    'text', 
-                    'fab', 
-                    'x-small',
-                    'target' => '_blank',
-                    'href' => 'https://t.me/WarriorVx'], null, 'mdi-telegram'), true)
-                ->addChild($this->createButton([
-                    'text', 
-                    'fab', 
-                    'x-small',
-                    'target' => '_blank',
-                    'href' => 'https://github.com/usernane'], null, 'mdi-github'), true);
-        
+//        $card->addChild('v-card-text')
+//                ->addChild($this->createButton([
+//                    'text', 
+//                    'fab', 
+//                    'x-small',
+//                    'target' => '_blank',
+//                    'href' => 'https://www.linkedin.com/in/ibrahim-binalshikh/'], null, 'mdi-linkedin'), true)
+//                ->addChild($this->createButton([
+//                    'text', 
+//                    'fab', 
+//                    'x-small',
+//                    'target' => '_blank',
+//                    'href' => 'https://t.me/WarriorVx'], null, 'mdi-telegram'), true)
+//                ->addChild($this->createButton([
+//                    'text', 
+//                    'fab', 
+//                    'x-small',
+//                    'target' => '_blank',
+//                    'href' => 'https://github.com/usernane'], null, 'mdi-github'), true);
+//        
         //
         $card->addChild('v-card-text')
         ->addChild('small')
         ->text($page->get('footer/built-with'))
-         ->addChild(new Anchor('https://webfiori.com', $page->get('general/framework-name')));
+        ->addChild(new Anchor('https://webfiori.com', $page->get('general/framework-name')), true)
+        ->text(', ')
+        ->addChild(new Anchor('https://vuejs.org', 'Vue'), true)
+        ->text(' and ')
+        ->addChild(new Anchor('https://vuetifyjs.com', 'Vuetify'), true);
         
-        $card->addChild('v-divider')
+        $card->addChild('v-divider', true)
         ->addChild('v-card-text', ['flat'])
-        ->addChild('small')->text($page->get('footer/all-rights').' '.date('Y'));
+        ->addChild('small')->text('All Rights Reserved'.'  © 2018 - '.date('Y'));
         return $footer;
     }
 
@@ -169,14 +182,17 @@ class NewFiori extends Theme {
             //'hide-on-scroll',
             //'elevate-on-scroll',
             'fixed',
-            'height' => '80px',
-            'flat'
+            'height' => '50px',
+            'flat',
+            'dense'
         ]);
         
         $vAppBar->addChild('v-app-bar-nav-icon', [
                     'class' => 'd-sm-flex d-md-none',
                     '@click' => "drawer = !drawer",
-                ], true)->addChild('v-toolbar-title', [
+                ], true);
+        //Add Title with logo
+        $vAppBar->addChild('v-toolbar-title', [
                     'class' => 'd-none d-md-flex',
                     'style' => [
                         'min-width' => '250px'
@@ -191,7 +207,7 @@ class NewFiori extends Theme {
                 ])->addChild('img', [
                     'src' => 'assets/images/WFLogo512.png',
                     'style' => [
-                        'width' => '80px'
+                        'width' => '45px'
                     ]
                 ], true)->getParent()
                 ->addChild('v-col', [
@@ -217,13 +233,31 @@ class NewFiori extends Theme {
         $navLinksContainer->addChild(
                 self::createButton(['text', 
                     'href' => $this->getBaseURL().'/docs/webfiori'], 'API Reference'), true)
-                ->addChild(
-                self::createButton(['text', 'href' => $this->getBaseURL().'/learn'], 'Learn'), true)
+                ->addChild(self::createButton(['text', 'href' => $this->getBaseURL().'/learn'], 'Learn'), true)
+                ->addChild(self::createButton(['text', 'href' => $this->getBaseURL().'/download'], 'Download'), true)
+                ->addChild(self::createButton(['text', 'href' => $this->getBaseURL().'/contribute'], 'Contribute'), true)
                 ->getParent()->addChild('v-spacer');
+        
+        $vAppBar->addChild($this->createTopSearchBar());
+        $vAppBar->addChild('v-spacer');
+        $homeImgContainer = $vAppBar->addChild('div', [
+            'class' => 'd-sm-flex d-md-none align-center',
+        ]);
+        $homeImgContainer->addChild('a', [
+            'href' => \webfiori\framework\WebFioriApp::getAppConfig()->getHomePage()
+        ])->img([
+            'src' => 'assets/images/WFLogo512.png',
+            'style' => [
+                'width' => '45px'
+            ]
+        ]);
+        return $vAppBar;
+    }
+    private function createTopSearchBar() {
         $searchContainer = new HTMLNode('v-container', [
             'class' => 'd-flex align-center d-none d-md-flex'
         ]);
-        $vAppBar->addChild($searchContainer);
+        
         $row = $searchContainer->addChild('v-row', [
             'no-gutters'
         ]);
@@ -328,19 +362,7 @@ class NewFiori extends Theme {
             'src' => 'assets/images/search-by-algolia-light-background.webp',
             'style'=> ['width' => '130px']
         ]);
-        $vAppBar->addChild('v-spacer');
-        $homeImgContainer = $vAppBar->addChild('div', [
-            'class' => 'd-sm-flex d-md-none align-center',
-        ]);
-        $homeImgContainer->addChild('a', [
-            'href' => \webfiori\framework\WebFioriApp::getAppConfig()->getHomePage()
-        ])->img([
-            'src' => 'assets/images/WFLogo512.png',
-            'style' => [
-                'width' => '80px'
-            ]
-        ]);
-        return $vAppBar;
+        return $searchContainer;
     }
     public static function createButton($props = [], $text = null, $icon = null, $iconProps = []) {
         $btn = new HTMLNode('v-btn', $props);

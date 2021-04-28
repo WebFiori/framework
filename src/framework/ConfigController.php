@@ -24,12 +24,12 @@
  */
 namespace webfiori\framework;
 
+use app\AppConfig;
 use webfiori\database\ConnectionInfo;
 use webfiori\framework\exceptions\SMTPException;
 use webfiori\framework\mail\SMTPAccount;
 use webfiori\framework\mail\SocketMailer;
 use webfiori\theme\WebFioriV108;
-use app\AppConfig;
 
 /**
  * A class that can be used to modify basic configuration settings of 
@@ -153,6 +153,123 @@ class ConfigController {
         return self::$singleton;
     }
     /**
+     * Returns a string that represents the name of admin theme of the web 
+     * application.
+     * 
+     * @return string
+     * 
+     * @since 1.0
+     */
+    public function getAdminTheme() {
+        if (class_exists('app\\AppConfig')) {
+            $c = new AppConfig();
+
+            return $c->getAdminThemeName();
+        }
+
+        return self::DEFAULT_APP_CONFIG['site']['admin-theme'];
+    }
+    /**
+     * Returns the base URL which is use as a value for the tag &gt;base&lt;.
+     * 
+     * @return string
+     * 
+     * @since 1.0
+     */
+    public function getBase() {
+        if (class_exists('app\\AppConfig')) {
+            $c = new AppConfig();
+
+            return $c->getBaseURL();
+        }
+
+        return '';
+    }
+    /**
+     * Returns a string that represents the name of the base theme of the web 
+     * application.
+     * 
+     * @return string
+     * 
+     * @since 1.0
+     */
+    public function getBaseTheme() {
+        if (class_exists('app\\AppConfig')) {
+            $c = new AppConfig();
+
+            return $c->getBaseThemeName();
+        }
+
+        return self::DEFAULT_APP_CONFIG['site']['base-theme'];
+    }
+    /**
+     * Returns an array that holds database connections.
+     * 
+     * @return array The indices of the array are names of the connections and 
+     * the value of each index is an object of type 'ConnectionInfo'.
+     * 
+     * @since 1.0
+     */
+    public function getDatabaseConnections() {
+        if (class_exists('app\\AppConfig')) {
+            $c = new AppConfig();
+
+            return $c->getDBConnections();
+        }
+
+        return [];
+    }
+    /**
+     * Returns an array that holds different descriptions for the web application 
+     * on different languages.
+     * 
+     * @return array The indices of the array are language codes such as 'AR' and 
+     * the value of the index is the description.
+     * 
+     * @since 1.0
+     */
+    public function getDescriptions() {
+        if (class_exists('app\\AppConfig')) {
+            $c = new AppConfig();
+
+            return $c->getDescriptions();
+        }
+
+        return self::DEFAULT_APP_CONFIG['site']['descriptions'];
+    }
+    /**
+     * Returns a link that represents the home page of the web application.
+     * 
+     * @return string
+     * 
+     * @since 1.0
+     */
+    public function getHomePage() {
+        if (class_exists('app\\AppConfig')) {
+            $c = new AppConfig();
+
+            return $c->getHomePage();
+        }
+
+        return null;
+    }
+    /**
+     * Returns a string that represents primary language of the web application.
+     * 
+     * @return string A two characters string such as 'EN'.
+     * 
+     * @since 1.0
+     */
+    public function getPrimaryLang() {
+        if (class_exists('app\\AppConfig')) {
+            $c = new AppConfig();
+
+            return $c->getPrimaryLanguage();
+        }
+
+        return self::DEFAULT_APP_CONFIG['site']['primary-language'];
+    }
+    /**
      * Returns an associative array that contains web site configuration 
      * info.
      * 
@@ -191,7 +308,25 @@ class ConfigController {
         $cfgArr['titles'] = $this->getTitles();
         $cfgArr['base-theme'] = $this->getBaseTheme();
         $cfgArr['admin-theme'] = $this->getAdminTheme();
+
         return $cfgArr;
+    }
+    /**
+     * Returns an array that holds SMTP connections.
+     * 
+     * @return array The indices of the array are names of the connections and 
+     * the value of each index is an object of type 'SMTPAccount'.
+     * 
+     * @since 1.0
+     */
+    public function getSMTPAccounts() {
+        if (class_exists('app\\AppConfig')) {
+            $c = new AppConfig();
+
+            return $c->getAccounts();
+        }
+
+        return [];
     }
     /**
      * Returns a new instance of the class SocketMailer.
@@ -237,6 +372,59 @@ class ConfigController {
         return false;
     }
     /**
+     * Returns an array that holds different page titles for the web application 
+     * on different languages.
+     * 
+     * @return array The indices of the array are language codes such as 'AR' and 
+     * the value of the index is the title.
+     * 
+     * @since 1.0
+     */
+    public function getTitles() {
+        if (class_exists('app\\AppConfig')) {
+            $c = new AppConfig();
+
+            return $c->getWebsiteNames();
+        }
+
+        return self::DEFAULT_APP_CONFIG['site']['titles'];
+    }
+    /**
+     * Returns a string that represents the string that will be used to separate 
+     * website name from page title.
+     * 
+     * @return string
+     * 
+     * @since 1.0
+     */
+    public function getTitleSep() {
+        if (class_exists('app\\AppConfig')) {
+            $c = new AppConfig();
+
+            return $c->getTitleSep();
+        }
+
+        return self::DEFAULT_APP_CONFIG['site']['title-separator'];
+    }
+    /**
+     * Returns an array that holds different names for the web application 
+     * on different languages.
+     * 
+     * @return array The indices of the array are language codes such as 'AR' and 
+     * the value of the index is the name.
+     * 
+     * @since 1.0
+     */
+    public function getWebsiteNames() {
+        if (class_exists('app\\AppConfig')) {
+            $c = new AppConfig();
+
+            return $c->getWebsiteNames();
+        }
+
+        return self::DEFAULT_APP_CONFIG['site']['website-names'];
+    }
+    /**
      * Removes SMTP email account if it is exist.
      * 
      * @param string $accountName The name of the email account (such as 'no-reply').
@@ -245,7 +433,7 @@ class ConfigController {
      */
     public function removeAccount($accountName) {
         $accounts = $this->getSMTPAccounts();
-        
+
         if (isset($accounts[$accountName])) {
             unset($accounts[$accountName]);
         }
@@ -267,6 +455,7 @@ class ConfigController {
     public function removeDBConnection($connectionName) {
         $connections = $this->getDatabaseConnections();
         $updated = [];
+
         foreach ($connections as $name => $conObj) {
             if ($name != $connectionName) {
                 $updated[] = $conObj;
@@ -343,7 +532,7 @@ class ConfigController {
     public function updateSiteInfo($websiteInfoArr) {
         $this->writeAppConfig($websiteInfoArr);
     }
-    
+
     /**
      * Stores configuration variables into the application configuration class.
      * 
@@ -393,7 +582,7 @@ class ConfigController {
         $this->a($cFile, " * @since 2.1.0");
         $this->a($cFile, " */");
         $this->a($cFile, "class AppConfig {");
-        
+
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * The name of admin control pages Theme.");
         $this->a($cFile, "     * ");
@@ -402,7 +591,7 @@ class ConfigController {
         $this->a($cFile, "     * @since 1.0");
         $this->a($cFile, "     */");
         $this->a($cFile, "    private \$adminThemeName;");
-        
+
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * The date at which the application was released.");
         $this->a($cFile, "     * ");
@@ -411,7 +600,7 @@ class ConfigController {
         $this->a($cFile, "     * @since 1.0");
         $this->a($cFile, "     */");
         $this->a($cFile, "    private \$appReleaseDate;");
-        
+
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * A string that represents the type of the release.");
         $this->a($cFile, "     * ");
@@ -420,7 +609,7 @@ class ConfigController {
         $this->a($cFile, "     * @since 1.0");
         $this->a($cFile, "     */");
         $this->a($cFile, "    private \$appVersionType;");
-        
+
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Version of the web application.");
         $this->a($cFile, "     * ");
@@ -429,7 +618,7 @@ class ConfigController {
         $this->a($cFile, "     * @since 1.0");
         $this->a($cFile, "     */");
         $this->a($cFile, "    private \$appVestion;");
-        
+
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * The name of base website UI Theme.");
         $this->a($cFile, "     * ");
@@ -438,7 +627,7 @@ class ConfigController {
         $this->a($cFile, "     * @since 1.0");
         $this->a($cFile, "     */");
         $this->a($cFile, "    private \$baseThemeName;");
-        
+
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * The base URL that is used by all web site pages to fetch resource files.");
         $this->a($cFile, "     * ");
@@ -447,7 +636,7 @@ class ConfigController {
         $this->a($cFile, "     * @since 1.0");
         $this->a($cFile, "     */");
         $this->a($cFile, "    private \$baseUrl;");
-        
+
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Configuration file version number.");
         $this->a($cFile, "     * ");
@@ -456,7 +645,7 @@ class ConfigController {
         $this->a($cFile, "     * @since 1.0");
         $this->a($cFile, "     */");
         $this->a($cFile, "    private \$configVision;");
-        
+
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * An associative array that will contain database connections.");
         $this->a($cFile, "     * ");
@@ -465,7 +654,7 @@ class ConfigController {
         $this->a($cFile, "     * @since 1.0");
         $this->a($cFile, "     */");
         $this->a($cFile, "    private \$dbConnections;");
-        
+
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * An array that is used to hold default page titles for different languages.");
         $this->a($cFile, "     * ");
@@ -474,7 +663,7 @@ class ConfigController {
         $this->a($cFile, "     * @since 1.0");
         $this->a($cFile, "     */");
         $this->a($cFile, "    private \$defaultPageTitles;");
-        
+
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * An array that holds SMTP connections information.");
         $this->a($cFile, "     * ");
@@ -483,7 +672,7 @@ class ConfigController {
         $this->a($cFile, "     * @since 1.0");
         $this->a($cFile, "     */");
         $this->a($cFile, "    private \$emailAccounts;");
-        
+
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * The URL of the home page.");
         $this->a($cFile, "     * ");
@@ -492,7 +681,7 @@ class ConfigController {
         $this->a($cFile, "     * @since 1.0");
         $this->a($cFile, "     */");
         $this->a($cFile, "    private \$homePage;");
-        
+
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * The primary language of the website.");
         $this->a($cFile, "     * ");
@@ -501,7 +690,7 @@ class ConfigController {
         $this->a($cFile, "     * @since 1.0");
         $this->a($cFile, "     */");
         $this->a($cFile, "    private \$primaryLang;");
-        
+
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * The character which is used to saperate site name from page title.");
         $this->a($cFile, "     * ");
@@ -510,7 +699,7 @@ class ConfigController {
         $this->a($cFile, "     * @since 1.0");
         $this->a($cFile, "     */");
         $this->a($cFile, "    private \$titleSep;");
-        
+
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * An array which contains all website names in different languages.");
         $this->a($cFile, "     * ");
@@ -519,7 +708,7 @@ class ConfigController {
         $this->a($cFile, "     * @since 1.0");
         $this->a($cFile, "     */");
         $this->a($cFile, "    private \$webSiteNames;");
-        
+
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Creates new instance of the class.");
         $this->a($cFile, "     * ");
@@ -532,7 +721,7 @@ class ConfigController {
         $this->a($cFile, "        \$this->initDbConnections();");
         $this->a($cFile, "        \$this->initSmtpConnections();");
         $this->a($cFile, "    }");
-        
+
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Adds an email account.");
         $this->a($cFile, "     * ");
@@ -546,7 +735,7 @@ class ConfigController {
         $this->a($cFile, "     public function addAccount(SMTPAccount \$acc) {");
         $this->a($cFile, "        \$this->emailAccounts[\$acc->getAccountName()] = \$acc;");
         $this->a($cFile, "    }");
-        
+
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Adds new database connection or updates an existing one.");
         $this->a($cFile, "     * ");
@@ -558,7 +747,7 @@ class ConfigController {
         $this->a($cFile, "    public function addDbConnection(ConnectionInfo \$connectionInfo) {");
         $this->a($cFile, "        \$this->dbConnections[\$connectionInfo->getName()] = \$connectionInfo;");
         $this->a($cFile, "    }");
-        
+
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Returns SMTP account given its name.");
         $this->a($cFile, "     * ");
@@ -578,7 +767,7 @@ class ConfigController {
         $this->a($cFile, "            return \$this->emailAccounts[\$name];");
         $this->a($cFile, "        }");
         $this->a($cFile, "    }");
-        
+
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Returns an associative array that contains all email accounts.");
         $this->a($cFile, "     * ");
@@ -592,7 +781,7 @@ class ConfigController {
         $this->a($cFile, "    public function getAccounts() {");
         $this->a($cFile, "        return \$this->emailAccounts;");
         $this->a($cFile, "    }");
-        
+
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Returns the name of the theme that is used in admin control pages.");
         $this->a($cFile, "     * ");
@@ -603,7 +792,7 @@ class ConfigController {
         $this->a($cFile, "    public function getAdminThemeName() {");
         $this->a($cFile, "        return \$this->adminThemeName;");
         $this->a($cFile, "    }");
-        
+
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Returns the name of base theme that is used in website pages.");
         $this->a($cFile, "     * ");
@@ -616,7 +805,7 @@ class ConfigController {
         $this->a($cFile, "    public function getBaseThemeName() {");
         $this->a($cFile, "        return \$this->baseThemeName;");
         $this->a($cFile, "    }");
-        
+
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Returns the base URL that is used to fetch resources.");
         $this->a($cFile, "     * ");
@@ -630,7 +819,7 @@ class ConfigController {
         $this->a($cFile, "    public function getBaseURL() {");
         $this->a($cFile, "        return \$this->baseUrl;");
         $this->a($cFile, "    }");
-        
+
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Returns version number of the configuration file.");
         $this->a($cFile, "     * ");
@@ -643,7 +832,7 @@ class ConfigController {
         $this->a($cFile, "    public function getConfigVersion() {");
         $this->a($cFile, "        return \$this->configVision;");
         $this->a($cFile, "    }");
-        
+
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Returns database connection information given connection name.");
         $this->a($cFile, "     * ");
@@ -663,7 +852,7 @@ class ConfigController {
         $this->a($cFile, "            return \$conns[\$trimmed];");
         $this->a($cFile, "        }");
         $this->a($cFile, "    }");
-        
+
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Returns an associative array that contain the information of database connections.");
         $this->a($cFile, "     * ");
@@ -677,7 +866,7 @@ class ConfigController {
         $this->a($cFile, "    public function getDBConnections() {");
         $this->a($cFile, "        return \$this->dbConnections;");
         $this->a($cFile, "    }");
-        
+
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Returns the global title of the web site that will be");
         $this->a($cFile, "     * used as default page title.");
@@ -698,7 +887,7 @@ class ConfigController {
         $this->a($cFile, "            return \$langs[\$langCode];");
         $this->a($cFile, "        }");
         $this->a($cFile, "    }");
-        
+
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Returns an array that holds the default pages titles for different languages.");
         $this->a($cFile, "     * ");
@@ -710,7 +899,7 @@ class ConfigController {
         $this->a($cFile, "    public function getDefaultTitles() {");
         $this->a($cFile, "        return \$this->defaultPageTitles;");
         $this->a($cFile, "    }");
-        
+
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Returns the global description of the web site that will be");
         $this->a($cFile, "     * used as default page description.");
@@ -730,7 +919,7 @@ class ConfigController {
         $this->a($cFile, "            return \$langs[\$langCode];");
         $this->a($cFile, "        }");
         $this->a($cFile, "    }");
-        
+
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Returns an associative array which contains different website descriptions");
         $this->a($cFile, "     * in different languages.");
@@ -746,7 +935,7 @@ class ConfigController {
         $this->a($cFile, "    public function getDescriptions() {");
         $this->a($cFile, "        return \$this->descriptions;");
         $this->a($cFile, "    }");
-        
+
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Returns the home page URL of the website.");
         $this->a($cFile, "     * ");
@@ -757,7 +946,7 @@ class ConfigController {
         $this->a($cFile, "    public function getHomePage() {");
         $this->a($cFile, "        return \$this->homePage;");
         $this->a($cFile, "    }");
-        
+
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Returns the primary language of the website.");
         $this->a($cFile, "     * ");
@@ -768,7 +957,7 @@ class ConfigController {
         $this->a($cFile, "    public function getPrimaryLanguage() {");
         $this->a($cFile, "        return \$this->primaryLang;");
         $this->a($cFile, "    }");
-        
+
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Returns the date at which the application was released at.");
         $this->a($cFile, "     * ");
@@ -780,7 +969,7 @@ class ConfigController {
         $this->a($cFile, "    public function getReleaseDate() {");
         $this->a($cFile, "        return \$this->appReleaseDate;");
         $this->a($cFile, "    }");
-        
+
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Returns an array that holds the default page title for different display");
         $this->a($cFile, "     * languages.");
@@ -794,7 +983,7 @@ class ConfigController {
         $this->a($cFile, "    public function getTitles() {");
         $this->a($cFile, "        return \$this->defaultPageTitles;");
         $this->a($cFile, "    }");
-        
+
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Returns the character (or string) that is used to separate page title from website name.");
         $this->a($cFile, "     * ");
@@ -806,7 +995,7 @@ class ConfigController {
         $this->a($cFile, "    public function getTitleSep() {");
         $this->a($cFile, "        return \$this->titleSep;");
         $this->a($cFile, "    }");
-        
+
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Returns version number of the application.");
         $this->a($cFile, "     * ");
@@ -818,7 +1007,7 @@ class ConfigController {
         $this->a($cFile, "    public function getVersion() {");
         $this->a($cFile, "        return \$this->appVestion;");
         $this->a($cFile, "    }");
-        
+
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Returns a string that represents application release type.");
         $this->a($cFile, "     * ");
@@ -830,7 +1019,7 @@ class ConfigController {
         $this->a($cFile, "    public function getVersionType() {");
         $this->a($cFile, "        return \$this->appVersionType;");
         $this->a($cFile, "    }");
-        
+
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Returns the global website name.");
         $this->a($cFile, "     * ");
@@ -850,7 +1039,7 @@ class ConfigController {
         $this->a($cFile, "            return \$langs[\$langCode];");
         $this->a($cFile, "        }");
         $this->a($cFile, "    }");
-        
+
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Returns an array which contains different website names in different languages.");
         $this->a($cFile, "     * ");
@@ -864,151 +1053,161 @@ class ConfigController {
         $this->a($cFile, "    public function getWebsiteNames() {");
         $this->a($cFile, "        return \$this->webSiteNames;");
         $this->a($cFile, "    }");
-        
+
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * @since 1.0");
         $this->a($cFile, "     */");
         $this->a($cFile, "    private function initDbConnections() {");
         $this->a($cFile, "        \$this->dbConnections = [");
-        
+
         if (isset($appConfigArr['db-connections']) && gettype($appConfigArr['db-connections']) == 'array') {
             $dbCons = $appConfigArr['db-connections'];
         } else {
             $dbCons = $this->getDatabaseConnections();
         }
+
         foreach ($dbCons as $connObj) {
             if ($connObj instanceof ConnectionInfo) {
                 $cName = $connObj->getName();
                 $this->a($cFile, "            '$cName' => new ConnectionInfo('".$connObj->getDatabaseType()."',"
-                        . "'".$connObj->getUsername()."', "
-                        . "'".$connObj->getPassword()."', "
-                        . "'".$connObj->getDBName()."', "
-                        . "'".$connObj->getHost()."', "
-                        . "".$connObj->getPort().", [");
-                $this->a($cFile, "                'connection-name' => '". str_replace("'", "\'", $cName)."'");
+                        ."'".$connObj->getUsername()."', "
+                        ."'".$connObj->getPassword()."', "
+                        ."'".$connObj->getDBName()."', "
+                        ."'".$connObj->getHost()."', "
+                        ."".$connObj->getPort().", [");
+                $this->a($cFile, "                'connection-name' => '".str_replace("'", "\'", $cName)."'");
                 $this->a($cFile, "            ]),");
             }
         }
         $this->a($cFile, "        ];");
         $this->a($cFile, "    }");
-        
+
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * @since 1.0");
         $this->a($cFile, "     */");
         $this->a($cFile, "    private function initSiteInfo() {");
-        
+
         if (isset($appConfigArr['website-names']) && gettype($appConfigArr['website-names']) == 'array') {
             $wNamesArr = $appConfigArr['website-names'];
         } else {
             $wNamesArr = $this->getWebsiteNames();
         }
         $this->a($cFile, "        \$this->webSiteNames = [");
+
         foreach ($wNamesArr as $langCode => $name) {
             $name = str_replace("'", "\'", $name);
             $this->a($cFile, "            '$langCode' => '$name',");
         }
         $this->a($cFile, "        ];");
         $this->a($cFile, "    ");
-        
+
         if (isset($appConfigArr['titles']) && gettype($appConfigArr['titles']) == 'array') {
             $titlesArr = $appConfigArr['titles'];
         } else {
             $titlesArr = $this->getTitles();
         }
         $this->a($cFile, "        \$this->defaultPageTitles = [");
+
         foreach ($titlesArr as $langCode => $title) {
             $title = str_replace("'", "\'", $title);
             $this->a($cFile, "            '$langCode' => '$title',");
         }
         $this->a($cFile, "        ];");
-        
+
         if (isset($appConfigArr['descriptions']) && gettype($appConfigArr['descriptions']) == 'array') {
             $descArr = $appConfigArr['descriptions'];
         } else {
             $descArr = $this->getDescriptions();
         }
         $this->a($cFile, "        \$this->descriptions = [");
+
         foreach ($descArr as $langCode => $desc) {
             $desc = str_replace("'", "\'", $desc);
             $this->a($cFile, "            '$langCode' => '$desc',");
         }
         $this->a($cFile, "        ];");
-        
+
         $this->a($cFile, "        \$this->baseUrl = Uri::getBaseURL();");
-        
+
         if (isset($appConfigArr['title-sep'])) {
             $sep = $appConfigArr['title-sep'];
         } else {
             $sep = $this->getTitleSep();
         }
         $this->a($cFile, "        \$this->titleSep = '$sep';");
-        
+
         if (isset($appConfigArr['primary-lang'])) {
             $lang = $appConfigArr['primary-lang'];
         } else {
             $lang = $this->getPrimaryLang();
         }
         $this->a($cFile, "        \$this->primaryLang = '$lang';");
-        
+
         if (isset($appConfigArr['base-theme'])) {
             $baseTheme = $appConfigArr['base-theme'];
         } else {
             $baseTheme = $this->getBaseTheme();
         }
+
         if (class_exists($baseTheme)) {
             $this->a($cFile, "        \$this->baseThemeName = \\$baseTheme::class;");
         } else {
             $this->a($cFile, "        \$this->baseThemeName = '$baseTheme';");
         }
-        
+
         if (isset($appConfigArr['admin-theme'])) {
             $adminTheme = $appConfigArr['admin-theme'];
         } else {
             $adminTheme = $this->getBaseTheme();
         }
+
         if (class_exists($adminTheme)) {
             $this->a($cFile, "        \$this->adminThemeName = \\$adminTheme::class;");
         } else {
             $this->a($cFile, "        \$this->adminThemeName = '$adminTheme';");
         }
+
         if (isset($appConfigArr['home-page'])) {
             $this->a($cFile, "        \$this->homePage = '".$appConfigArr['home-page']."';");
         } else {
             $home = $this->getHomePage();
+
             if ($home === null) {
                 $this->a($cFile, "        \$this->homePage = Uri::getBaseURL();");
             } else {
                 $this->a($cFile, "        \$this->homePage = '$home';");
             }
         }
-        
+
         $this->a($cFile, "    }");
-        
+
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * @since 1.0");
         $this->a($cFile, "     */");
         $this->a($cFile, "    private function initSmtpConnections() {");
         $this->a($cFile, "        \$this->emailAccounts = [");
+
         if (isset($appConfigArr['smtp']) && gettype($appConfigArr['smtp']) == 'array') {
             $smtpAccArr = $appConfigArr['smtp'];
         } else {
             $smtpAccArr = $this->getSMTPAccounts();
         }
+
         foreach ($smtpAccArr as $smtpAcc) {
             if ($smtpAcc instanceof SMTPAccount) {
                 $this->a($cFile, "            '".$smtpAcc->getAccountName()."' => new SMTPAccount([");
                 $this->a($cFile, "                'port' => ".$smtpAcc->getPort().",");
                 $this->a($cFile, "                'user' => ".$smtpAcc->getUsername()."',");
                 $this->a($cFile, "                'pass' => '".$smtpAcc->getPassword()."',");
-                $this->a($cFile, "                'sender-name' => '". str_replace("'", "\'", $smtpAcc->getSenderName())."',");
+                $this->a($cFile, "                'sender-name' => '".str_replace("'", "\'", $smtpAcc->getSenderName())."',");
                 $this->a($cFile, "                'sender-address' => '".$smtpAcc->getAddress()."',");
-                $this->a($cFile, "                'account-name' => '". str_replace("'", "\'", $smtpAcc->getAccountName())."'");
+                $this->a($cFile, "                'account-name' => '".str_replace("'", "\'", $smtpAcc->getAccountName())."'");
                 $this->a($cFile, "            ]),");
             }
         }
         $this->a($cFile, "        ];");
         $this->a($cFile, "    }");
-        
+
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * @since 1.0");
         $this->a($cFile, "     */");
@@ -1017,174 +1216,9 @@ class ConfigController {
         $this->a($cFile, "        \$this->appVersionType = 'Stable';");
         $this->a($cFile, "        \$this->appReleaseDate = '2021-01-10';");
         $this->a($cFile, "    }");
-        
+
         $this->a($cFile, "}");
         $cFile->write(false, true);
-    }
-    /**
-     * Returns the base URL which is use as a value for the tag &gt;base&lt;.
-     * 
-     * @return string
-     * 
-     * @since 1.0
-     */
-    public function getBase() {
-        if (class_exists('app\\AppConfig')) {
-            $c = new AppConfig();
-            return $c->getBaseURL();
-        }
-        return '';
-    }
-    /**
-     * Returns a link that represents the home page of the web application.
-     * 
-     * @return string
-     * 
-     * @since 1.0
-     */
-    public function getHomePage() {
-        if (class_exists('app\\AppConfig')) {
-            $c = new AppConfig();
-            return $c->getHomePage();
-        }
-        return null;
-    }
-    /**
-     * Returns a string that represents the name of admin theme of the web 
-     * application.
-     * 
-     * @return string
-     * 
-     * @since 1.0
-     */
-    public function getAdminTheme() {
-        if (class_exists('app\\AppConfig')) {
-            $c = new AppConfig();
-            return $c->getAdminThemeName();
-        }
-        return self::DEFAULT_APP_CONFIG['site']['admin-theme'];
-    }
-    /**
-     * Returns a string that represents the name of the base theme of the web 
-     * application.
-     * 
-     * @return string
-     * 
-     * @since 1.0
-     */
-    public function getBaseTheme() {
-        if (class_exists('app\\AppConfig')) {
-            $c = new AppConfig();
-            return $c->getBaseThemeName();
-        }
-        return self::DEFAULT_APP_CONFIG['site']['base-theme'];
-    }
-    /**
-     * Returns a string that represents primary language of the web application.
-     * 
-     * @return string A two characters string such as 'EN'.
-     * 
-     * @since 1.0
-     */
-    public function getPrimaryLang() {
-        if (class_exists('app\\AppConfig')) {
-            $c = new AppConfig();
-            return $c->getPrimaryLanguage();
-        }
-        return self::DEFAULT_APP_CONFIG['site']['primary-language'];
-    }
-    /**
-     * Returns a string that represents the string that will be used to separate 
-     * website name from page title.
-     * 
-     * @return string
-     * 
-     * @since 1.0
-     */
-    public function getTitleSep() {
-        if (class_exists('app\\AppConfig')) {
-            $c = new AppConfig();
-            return $c->getTitleSep();
-        }
-        return self::DEFAULT_APP_CONFIG['site']['title-separator'];
-    }
-    /**
-     * Returns an array that holds different descriptions for the web application 
-     * on different languages.
-     * 
-     * @return array The indices of the array are language codes such as 'AR' and 
-     * the value of the index is the description.
-     * 
-     * @since 1.0
-     */
-    public function getDescriptions() {
-        if (class_exists('app\\AppConfig')) {
-            $c = new AppConfig();
-            return $c->getDescriptions();
-        }
-        return self::DEFAULT_APP_CONFIG['site']['descriptions'];
-    }
-    /**
-     * Returns an array that holds different page titles for the web application 
-     * on different languages.
-     * 
-     * @return array The indices of the array are language codes such as 'AR' and 
-     * the value of the index is the title.
-     * 
-     * @since 1.0
-     */
-    public function getTitles() {
-        if (class_exists('app\\AppConfig')) {
-            $c = new AppConfig();
-            return $c->getWebsiteNames();
-        }
-        return self::DEFAULT_APP_CONFIG['site']['titles'];
-    }
-    /**
-     * Returns an array that holds different names for the web application 
-     * on different languages.
-     * 
-     * @return array The indices of the array are language codes such as 'AR' and 
-     * the value of the index is the name.
-     * 
-     * @since 1.0
-     */
-    public function getWebsiteNames() {
-        if (class_exists('app\\AppConfig')) {
-            $c = new AppConfig();
-            return $c->getWebsiteNames();
-        }
-        return self::DEFAULT_APP_CONFIG['site']['website-names'];
-    }
-    /**
-     * Returns an array that holds database connections.
-     * 
-     * @return array The indices of the array are names of the connections and 
-     * the value of each index is an object of type 'ConnectionInfo'.
-     * 
-     * @since 1.0
-     */
-    public function getDatabaseConnections() {
-        if (class_exists('app\\AppConfig')) {
-            $c = new AppConfig();
-            return $c->getDBConnections();
-        }
-        return [];
-    }
-    /**
-     * Returns an array that holds SMTP connections.
-     * 
-     * @return array The indices of the array are names of the connections and 
-     * the value of each index is an object of type 'SMTPAccount'.
-     * 
-     * @since 1.0
-     */
-    public function getSMTPAccounts() {
-        if (class_exists('app\\AppConfig')) {
-            $c = new AppConfig();
-            return $c->getAccounts();
-        }
-        return [];
     }
     private function a(File $file, $str) {
         $file->append($str.self::NL);

@@ -23,7 +23,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
 namespace webfiori\framework\cli;
 
 use webfiori\framework\cli\ClassWriter;
@@ -55,7 +54,7 @@ class LangClassWriter extends ClassWriter {
             'path' => ROOT_DIR.DS.'app'.DS.'langs'
         ];
         parent::__construct($classInfoArr);
-        
+
         $this->append("<?php\n");
         $this->append('namespace '.$this->getNamespace().";\n");
         $this->append("use webfiori\\framework\\i18n\\Language;");
@@ -64,7 +63,7 @@ class LangClassWriter extends ClassWriter {
                 ." * A class which holds language information for the language which has code '$langCode'.");
         $this->append(" */");
         $this->append('class '.$this->getName().' extends Language {');
-        
+
         $this->append("/**", 1);
         $this->append(" * Creates new instance of the class.", 1);
         $this->append(" */", 1);

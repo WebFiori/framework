@@ -1,10 +1,9 @@
 <?php
-
 namespace app\apis;
 
-use webfiori\http\AbstractWebService;
 use app\database\MainDatabase;
 use webfiori\framework\User;
+use webfiori\http\AbstractWebService;
 /**
  * A class that contains the implementation of the web service 'add-user'.
  * This service has the following parameters:
@@ -18,7 +17,7 @@ class AddUserService extends AbstractWebService {
     /**
      * Creates new instance of the class.
      */
-    public function __construct(){
+    public function __construct() {
         parent::__construct('add-user');
         $this->addRequestMethod('POST');
         $this->addParameter([

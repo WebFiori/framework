@@ -192,7 +192,7 @@ class WebFioriApp {
 
         //Initialize CLI
         CLI::init();
-        
+
 
         $this->_initThemesPath();
         $this->_setHandlers();
@@ -203,13 +203,13 @@ class WebFioriApp {
         InitPrivileges::init();
 
         self::$SF = ConfigController::get();
-        
+
         if (!class_exists('app\AppConfig')) {
             self::$SF->createAppConfigFile();
         }
 
         $this->appConfig = new AppConfig();
-        
+
         WebFioriApp::autoRegister('middleware', function($inst)
         {
             MiddlewareManager::register($inst);
@@ -249,19 +249,6 @@ class WebFioriApp {
         self::$classStatus = 'INITIALIZED';
     }
     /**
-     * Sets the configuration object that will be used to configure some of the 
-     * framework settings.
-     * 
-     * @param AppConfig $conf
-     * 
-     * @since 2.1.0
-     */
-    public static function setConfig(AppConfig $conf) {
-        if (self::$LC) {
-            self::$LC->appConfig = $conf;
-        }
-    }
-    /**
      * Register CLI commands or cron jobs.
      * @param string $folder The name of the folder that contains the jobs or 
      * commands. It must be a folder inside 'app' folder.
@@ -294,25 +281,6 @@ class WebFioriApp {
                 }
             }
         }
-    }
-    /**
-     * Start your WebFiori application.
-     * 
-     * @return WebFioriApp An instance of the class.
-     * 
-     * @since 1.0
-     */
-    public static function start() {
-        if (self::$classStatus == 'NONE') {
-            if (self::$LC === null) {
-                self::$classStatus = 'INITIALIZING';
-                self::$LC = new WebFioriApp();
-            }
-        } else if (self::$classStatus == 'INITIALIZING') {
-            throw new InitializationException('Using the core class while it is not fully initialized.');
-        }
-
-        return self::$LC;
     }
     /**
      * 
@@ -357,6 +325,40 @@ class WebFioriApp {
      */
     public static function getSysController() {
         return self::$SF;
+    }
+    /**
+     * Sets the configuration object that will be used to configure some of the 
+     * framework settings.
+     * 
+     * @param AppConfig $conf
+     * 
+     * @since 2.1.0
+     */
+    public static function setConfig(AppConfig $conf) {
+        if (self::$LC) {
+            self::$LC->appConfig = $conf;
+        }
+    }
+    /**
+     * Start your WebFiori application.
+     * 
+     * @return WebFioriApp An instance of the class.
+     * 
+     * @since 1.0
+     */
+    public static function start() {
+        if (self::$classStatus == 'NONE') {
+            if (self::$LC === null) {
+                self::$classStatus = 'INITIALIZING';
+                self::$LC = new WebFioriApp();
+            }
+        } else {
+            if (self::$classStatus == 'INITIALIZING') {
+                throw new InitializationException('Using the core class while it is not fully initialized.');
+            }
+        }
+
+        return self::$LC;
     }
     /**
      * Checks if framework standard libraries are loaded or not.
@@ -588,6 +590,7 @@ class WebFioriApp {
         register_shutdown_function(function()
         {
             $error = error_get_last();
+
             if ($error !== null) {
                 if (!Response::isSent()) {
                     $isCli = class_exists('webfiori\framework\cli\CLI') ? CLI::isCLI() : php_sapi_name() == 'cli';
@@ -605,6 +608,7 @@ class WebFioriApp {
                     if (!$isCli) {
                         $uri = Router::getUriObjByURL(Request::getRequestedURL());
                         Response::setCode(500);
+
                         if ($uri !== null) {
                             if ($uri->getType() == Router::API_ROUTE) {
                                 $j = new Json([
@@ -630,12 +634,10 @@ class WebFioriApp {
                             $errPage = new ServerErrView($error);
                             $errPage->show(500);
                         }
-                        
                     } else {
                         CLI::displayErr($error['type'], $error["message"], $error["file"], $error["line"]);
                     }
                 }
-                
             }
         });
     }

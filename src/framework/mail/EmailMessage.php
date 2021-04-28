@@ -24,10 +24,10 @@
  */
 namespace webfiori\framework\mail;
 
-use webfiori\framework\WebFioriApp;
 use webfiori\framework\ConfigController;
 use webfiori\framework\exceptions\SMTPException;
 use webfiori\framework\File;
+use webfiori\framework\WebFioriApp;
 use webfiori\ui\HTMLDoc;
 use webfiori\ui\HTMLNode;
 /**

@@ -3,12 +3,12 @@ namespace ibrahim\themes;
 
 use webfiori\framework\Page;
 use webfiori\framework\session\SessionsManager;
+use webfiori\framework\ui\WebPage;
+use webfiori\framework\WebFioriApp;
 use webfiori\http\Request;
 use webfiori\json\Json;
 use webfiori\ui\HTMLNode;
 use webfiori\ui\JsCode;
-use webfiori\framework\ui\WebPage;
-use webfiori\framework\WebFioriApp;
 
 /**
  * A base page that can be extended to create system pages.
@@ -65,6 +65,7 @@ class BasePage extends WebPage {
                 'success' => '#00bcd4'
             ])
         ]);
+
         if (strlen($vueScript) != 0) {
             $this->setVueJs($vueScript);
         } else {
@@ -76,10 +77,11 @@ class BasePage extends WebPage {
             'name' => 'heading',
             'title' => $pageTitle
         ]));
-        $this->addBeforeRender(function(BasePage $thisPage) {
-            
+        $this->addBeforeRender(function(BasePage $thisPage)
+        {
             $snackBarsCount = 4;
             $snackbarsJsonArr = [];
+
             for ($x = 0 ; $x < $snackBarsCount ; $x++) {
                 $node = new HTMLNode('v-snackbar', [
                     'v-model' => "snackbars[$x].snackbar",
@@ -127,7 +129,7 @@ class BasePage extends WebPage {
                 $thisPage->getDocument()->getHeadNode()->addChild($css);
             }
 
-            $thisPage->addInlineJs('window.data = ' . $thisPage->getJson() . ';');
+            $thisPage->addInlineJs('window.data = '.$thisPage->getJson().';');
         });
         $this->topInlineJs = new JsCode();
 
@@ -235,9 +237,6 @@ class BasePage extends WebPage {
 
         return $select;
     }
-    public function isDark() {
-        return $this->isDark;
-    }
     /**
      * Creates a basic date picker input element.
      * 
@@ -251,7 +250,7 @@ class BasePage extends WebPage {
      */
     public function datePicker($menuModel = 'menu', $attrs = []) {
         $dateModel = isset($attrs['v-model']) ? $attrs['v-model'] : 'date';
-        
+
         $node = new HTMLNode('v-menu', [
             'ref' => "$menuModel",
             'v-model' => "$menuModel",
@@ -263,9 +262,9 @@ class BasePage extends WebPage {
         $attrs[] = 'no-title';
         $attrs[] = 'scrollable';
         $attrs['color'] = 'green lighten-1';
-        
+
         $attrs['v-model'] = $dateModel;
-        
+
         $label = isset($attrs['label']) ? $attrs['label'] : 'Select a date.';
         $disabled = in_array('disabled', $attrs) ? 'disabled' : '';
         $node->addChild('template ', [
@@ -280,17 +279,20 @@ class BasePage extends WebPage {
             'v-on' => "on",
             $disabled
         ]);
+
         if (isset($attrs['@input'])) {
             $node->getLastChild()->getLastChild()->setAttribute('@input', $attrs['@input']);
             $attrs['@change'] = $attrs['@input'];
             unset($attrs['@input']);
         }
+
         if (isset($attrs[':loading'])) {
             $node->getLastChild()->getLastChild()->setAttribute(':loading', $attrs[':loading']);
             unset($attrs[':loading']);
         }
         $attrs['@input'] = "$menuModel = false";
         $node->addChild('v-date-picker', $attrs);
+
         return $node;
     }
     /**
@@ -312,6 +314,27 @@ class BasePage extends WebPage {
     public function getTopInlineJs() {
         return $this->topInlineJs;
     }
+    public function isDark() {
+        return $this->isDark;
+    }
+    /**
+     * Sets the JavaScript file which will be used to initialize vue.
+     * 
+     * @param string $jsFilePath A string that represents the path of the 
+     * file such as 'assets/js/init-vue.js'.
+     * 
+     */
+    public function setVueJs($jsFilePath) {
+        $this->addBeforeRender(function (WebPage $page, $jsPath)
+        {
+            $page->removeChild('vue-script');
+            $page->getDocument()->addChild('script', [
+                'type' => 'text/javascript',
+                'src' => $jsPath.'?jv='.WebFioriApp::getAppConfig()->getVersion(),
+                'id' => 'vue-script'
+            ]);
+        }, [$jsFilePath]);
+    }
     private function _checkIsDark() {
         $darkArg = Request::getParam('dark');
 
@@ -329,22 +352,5 @@ class BasePage extends WebPage {
         $this->addToJson([
             'dark' => $darkArg
         ]);
-    }
-    /**
-     * Sets the JavaScript file which will be used to initialize vue.
-     * 
-     * @param string $jsFilePath A string that represents the path of the 
-     * file such as 'assets/js/init-vue.js'.
-     * 
-     */
-    public function setVueJs($jsFilePath) {
-        $this->addBeforeRender(function (WebPage $page, $jsPath) {
-            $page->removeChild('vue-script');
-            $page->getDocument()->addChild('script', [
-                'type' => 'text/javascript',
-                'src' => $jsPath.'?jv='.WebFioriApp::getAppConfig()->getVersion(),
-                'id' => 'vue-script'
-            ]);
-        }, [$jsFilePath]);
     }
 }

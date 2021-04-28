@@ -1,8 +1,8 @@
 <?php
 
+use webfiori\framework\Theme;
 use webfiori\ui\HeadNode;
 use webfiori\ui\HTMLNode;
-use webfiori\framework\Theme;
 class TemplateTheme extends Theme {
     public function __construct() {
         parent::__construct();

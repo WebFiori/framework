@@ -77,7 +77,7 @@ class SettingsCommand extends CLICommand {
         foreach ($C->getDescriptions() as $langCode => $desc) {
             $this->println("        $langCode => $desc");
         }
-        
+
         $this->println("    Pages Titles:",':');
 
         foreach ($C->getTitles() as $langCode => $title) {

@@ -24,9 +24,9 @@
  */
 namespace webfiori\framework\session;
 
-use webfiori\framework\WebFioriApp;
 use webfiori\framework\exceptions\SessionException;
 use webfiori\framework\User;
+use webfiori\framework\WebFioriApp;
 use webfiori\json\Json;
 use webfiori\json\JsonI;
 /**

@@ -10,12 +10,12 @@ namespace webfiori\framework\cli;
 use Error;
 use ErrorException;
 use Exception;
-use webfiori\framework\WebFioriApp;
 use webfiori\database\Column;
 use webfiori\database\mysql\MySQLColumn;
 use webfiori\database\Table;
 use webfiori\framework\AutoLoader;
 use webfiori\framework\DB;
+use webfiori\framework\WebFioriApp;
 /**
  * Description of UpdateTableCommand
  *

@@ -13,6 +13,9 @@ use webfiori\framework\session\SessionsManager;
  */
 class MainDatabase extends DB {
     private $userMappFunc;
+    /**
+     * Creates new instance of the class.
+     */
     public function __construct() {
         parent::__construct('conn-00');
 
@@ -56,16 +59,17 @@ class MainDatabase extends DB {
      * object of type 'User'. If not, the method will return null.
      */
     public function login($userNameOrEmail, $userPass, $sessionDuration = 5, $isRef = true) {
-        $result = $this->table('users')->select()
-        ->where('username', '=', $userNameOrEmail)
-        ->andWhere('password', '=', hash('sha256', $userPass))->execute();
+        $this->table('users')->select()
+        ->where('email', '=', $userNameOrEmail)
+        ->andWhere('password', '=', hash('sha256', $userPass));
+        $result = $this->execute();
         
-        if ($result->getRowsCount() == 0) {
+        if ($result == null || $result->getRowsCount() == 0) {
             $result = $this->table('users')->select()
             ->where('username', '=', $userNameOrEmail)
             ->andWhere('password', '=', hash('sha256', $userPass))->execute();
             
-            if ($result->getRowsCount() == 0) {
+            if ($result == null || $result->getRowsCount() == 0) {
                 return null;
             }
         }

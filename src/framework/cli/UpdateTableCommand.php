@@ -25,7 +25,9 @@ class UpdateTableCommand extends CLICommand {
     public function __construct() {
         parent::__construct('update-table', [
             '--table' => [
-
+                'description' => 'The namespace of the table class (including namespace). '
+                . 'Note that every \ in the namespace must be written as \\\\.',
+                'optional' => true,
             ]
         ], 'Update a database table.');
     }
@@ -99,7 +101,17 @@ class UpdateTableCommand extends CLICommand {
         $this->success('Table updated.');
     }
     public function exec() {
-        $tableClass = $this->getArgValue('--table');
+        $tableClassInput = $this->getArgValue('--table');
+        
+        while ($tableClassInput === null) {
+            $tableClassInput = $this->getInput('Enter the name of table class (including namespace):');
+            if (strlen($tableClassInput) == 0) {
+                $tableClassInput = null;
+                $this->error('Given class name is invalid!');
+            }
+        }
+        $tableClass = trim($tableClassInput, '\\\\');
+        
         try {
             $tableObj = new $tableClass();
 
@@ -139,24 +151,16 @@ class UpdateTableCommand extends CLICommand {
             } else {
                 return -1;
             }
+        } else if ($whatToDo == 'Drop column.') {
+            $this->dropCol($tableObj);
+        } else if ($whatToDo == 'Add foreign key.') {
+            $this->_addFks($tableObj);
+        } else if ($whatToDo == 'Update existing column.') {
+            $this->updateCol($tableObj);
+        } else if ($whatToDo == 'Drop foreign key.') {
+            $this->_removeFk($tableObj);
         } else {
-            if ($whatToDo == 'Drop column.') {
-                $this->dropCol($tableObj);
-            } else {
-                if ($whatToDo == 'Add foreign key.') {
-                    $this->_addFks($tableObj);
-                } else {
-                    if ($whatToDo == 'Update existing column.') {
-                        $this->updateCol($tableObj);
-                    } else {
-                        if ($whatToDo == 'Drop foreign key.') {
-                            $this->_removeFk($tableObj);
-                        } else {
-                            $this->error('Option not implemented.');
-                        }
-                    }
-                }
-            }
+            $this->error('Option not implemented.');
         }
     }
     /**

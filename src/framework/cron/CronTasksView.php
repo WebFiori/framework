@@ -25,7 +25,6 @@
 namespace webfiori\framework\cron;
 
 use webfiori\framework\File;
-use webfiori\framework\Page;
 use webfiori\framework\WebFioriApp;
 use webfiori\ui\HTMLNode;
 use webfiori\ui\Input;
@@ -71,7 +70,6 @@ class CronTasksView extends CronView {
         $this->_createTasksTable();
         $this->createOutputWindow();
         $this->_displayExecLog();
-        Page::render();
     }
     /**
      * Creates a form which contains the controls that allow the user to 
@@ -200,7 +198,7 @@ class CronTasksView extends CronView {
         $h->addTextNode('Jobs Execution Log:');
         $sec->addChild($h);
         $sec->addChild($pre);
-        Page::insert($sec);
+        $this->insert($sec);
 
         $logsPath = ROOT_DIR.DS.'app'.DS.'storage'.DS.'logs';
         $logFile = $logsPath.DS.'cron.log';

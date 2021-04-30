@@ -24,7 +24,6 @@
  */
 namespace webfiori\framework\cron;
 
-use webfiori\framework\Page;
 use webfiori\framework\session\SessionsManager;
 use webfiori\framework\WebFioriApp;
 use webfiori\http\Response;
@@ -44,19 +43,20 @@ class CronLoginView extends CronView {
             Response::send();
         }
         $form = new HTMLNode('form');
-        Page::insert($form);
+        $this->insert($form);
         $form->label('Enter Login Password:', [
             'style' => 'display:block;font-weight:bold;',
             'for' => 'password-input'
-        ])->input('password', [
+        ]);
+        $form->input('password', [
             'id' => 'password-input',
             'placeholder' => 'Enter CRON password here.',
             'style' => 'width:200px'
-        ])->br()->br()->addChild(new HTMLNode('button'), [
+        ]);
+        $form->br()->br()->addChild(new HTMLNode('button'), [
             'id' => 'submit-button',
             'onclick' => 'login(this);return false;'
         ], false)->text('Login');
-        Page::render();
     }
 }
 

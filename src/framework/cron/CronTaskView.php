@@ -24,7 +24,6 @@
  */
 namespace webfiori\framework\cron;
 
-use webfiori\framework\Page;
 use webfiori\framework\router\Router;
 use webfiori\framework\WebFioriApp;
 use webfiori\ui\HTMLNode;
@@ -101,7 +100,7 @@ class CronTaskView extends CronView {
                     .'     },60000)'."\n"
                     .' };'."\n"
                     );
-            Page::document()->getHeadNode()->addChild($jsCode);
+            $this->getDocument()->getHeadNode()->addChild($jsCode);
             $forceNode = new HTMLNode();
             $forceNode->addTextNode('<button style="margin-top:30px" name="input-element" onclick="execJob(this,\''.$job->getJobName().'\')" class="force-execution-button">Force Execution</button>', false);
             $this->getControlsContainer()->addChild($forceNode);
@@ -110,7 +109,6 @@ class CronTaskView extends CronView {
             Response::addHeader('location', WebFioriApp::getAppConfig()->getBaseURL().'/cron/jobs');
             Response::send();
         }
-        Page::render();
     }
 
     private function _createCustomParamsContainer() {

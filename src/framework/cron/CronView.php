@@ -30,6 +30,7 @@ use webfiori\framework\WebFioriApp;
 use webfiori\http\Response;
 use webfiori\ui\HTMLNode;
 use webfiori\ui\JsCode;
+use webfiori\framework\ui\WebPage;
 /**
  * A generic view for cron related operations. 
  * 
@@ -38,13 +39,14 @@ use webfiori\ui\JsCode;
  *
  * @author Ibrahim
  */
-class CronView {
+class CronView extends WebPage {
     /**
      * A top container that contains all task related controls.
      * @var HTMLNode 
      */
     private $controlsContainer;
-    public function __construct($title,$description = '') {
+    public function __construct($title, $description = '') {
+        parent::__construct();
         $loginPageTitle = 'CRON Web Interface Login';
         SessionsManager::start('cron-session');
 
@@ -57,14 +59,14 @@ class CronView {
             Response::addHeader('location', WebFioriApp::getAppConfig()->getBaseURL().'/cron/jobs');
             Response::send();
         }
-        Page::title($title);
-        Page::description($description);
+        $this->setTitle($title);
+        $this->setDescription($description);
         $defaltSiteLang = WebFioriApp::getAppConfig()->getPrimaryLanguage();
         $siteNames = WebFioriApp::getAppConfig()->getWebsiteNames();
         $siteName = isset($siteNames[$defaltSiteLang]) ? $siteNames[$defaltSiteLang] : null;
 
         if ($siteName !== null) {
-            Page::siteName($siteName);
+            $this->setWebsiteName($siteName);
         }
         $this->controlsContainer = new HTMLNode();
         $this->controlsContainer->setWritingDir('ltr');
@@ -76,9 +78,9 @@ class CronView {
 
         $h1 = new HTMLNode('h1');
         $h1->addTextNode($title);
-        Page::insert($h1);
+        $this->insert($h1);
         $hr = new HTMLNode('hr');
-        Page::insert($hr);
+        $this->insert($hr);
 
         if (Cron::password() != 'NO_PASSWORD' && $title != $loginPageTitle) {
             $this->controlsContainer->addTextNode('<button name="input-element" onclick="logout()"><b>Logout</b></button><br/>', false);
@@ -102,11 +104,11 @@ class CronView {
                 .'     },60000)'."\n"
                 .' };'."\n"
                 );
-        Page::document()->getHeadNode()->addJs('https://cdn.jsdelivr.net/gh/usernane/AJAXRequestJs@1.1.1/AJAXRequest.js', [], false);
-        Page::document()->getHeadNode()->addJs('assets/js/cron.js');
-        Page::document()->getHeadNode()->addCSS('assets/css/cron.css');
-        Page::document()->getHeadNode()->addChild($jsCode);
-        Page::insert($this->controlsContainer);
+        $this->addJS('https://cdn.jsdelivr.net/gh/usernane/AJAXRequestJs@1.1.1/AJAXRequest.js', [], false);
+        $this->addJs('assets/js/cron.js');
+        $this->addCSS('assets/css/cron.css');
+        $this->getDocument()->getHeadNode()->addChild($jsCode);
+        $this->insert($this->controlsContainer);
     }
     /**
      * Adds an area which is used to show server output.
@@ -116,7 +118,7 @@ class CronView {
         $outputWindow->setID('output-window');
         $outputWindow->addTextNode('<p class="output-window-title">Output Window</p><pre'
                 .' id="output-area"></pre>', false);
-        Page::insert($outputWindow);
+        $this->insert($outputWindow);
     }
     /**
      * 

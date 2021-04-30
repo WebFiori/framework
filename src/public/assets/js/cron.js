@@ -64,6 +64,15 @@ function execJob(source,jobName){
         source.innerHTML = '<b>Connection Lost. Try Again.</b>';
     });
     ajax.setAfterAjax(function(){
+        if (this.jsonResponse !== null) {
+            if (this.jsonResponse['more-info']) {
+                outputWindow.innerHTML += "Server Log:\n";
+                for (var x = 0 ; x < this.jsonResponse['more-info'].log.length ; x++) {
+                    var logMessage = this.jsonResponse['more-info'].log[x];
+                    outputWindow.innerHTML += logMessage+"\n";
+                }
+            }
+        }
         outputWindow.innerHTML += 'Raw server response:\n'+this.response;
         disableOrEnableInputs(false);
         window.isRefresh = refresh;

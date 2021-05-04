@@ -185,7 +185,7 @@ class WebFioriApp {
          * Initialize autoloader.
          */
         if (!class_exists('webfiori\framework\AutoLoader',false)) {
-            require_once ROOT_DIR.DS.'framework'.DS.'AutoLoader.php';
+            require_once WF_CORE_PATH.DS.'AutoLoader.php';
         }
         self::$AU = AutoLoader::get();
         InitAutoLoad::init();
@@ -352,10 +352,8 @@ class WebFioriApp {
                 self::$classStatus = 'INITIALIZING';
                 self::$LC = new WebFioriApp();
             }
-        } else {
-            if (self::$classStatus == 'INITIALIZING') {
-                throw new InitializationException('Using the core class while it is not fully initialized.');
-            }
+        } else if (self::$classStatus == 'INITIALIZING') {
+            throw new InitializationException('Using the core class while it is not fully initialized.');
         }
 
         return self::$LC;

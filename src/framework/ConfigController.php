@@ -29,7 +29,6 @@ use webfiori\database\ConnectionInfo;
 use webfiori\framework\exceptions\SMTPException;
 use webfiori\framework\mail\SMTPAccount;
 use webfiori\framework\mail\SocketMailer;
-use webfiori\theme\WebFioriV108;
 
 /**
  * A class that can be used to modify basic configuration settings of 
@@ -59,8 +58,8 @@ class ConfigController {
             'primary-language' => 'EN',
             'title-separator' => '|',
             'home-page' => 'index',
-            'admin-theme' => WebFioriV108::class,
-            'base-theme' => WebFioriV108::class,
+            'admin-theme' => '\themes\newFiori\NewFiori',
+            'base-theme' => '\themes\newFiori\NewFiori',
             'descriptions' => [
                 'EN' => '',
                 'AR' => ''

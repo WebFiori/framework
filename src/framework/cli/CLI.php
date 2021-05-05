@@ -30,6 +30,7 @@ use webfiori\framework\Util;
 use webfiori\framework\WebFioriApp;
 use app\ini\InitCliCommands;
 /**
+ * 
  * A class which adds basic support for running the framework through 
  * command line interface (CLI).
  * In addition to adding support for CLI, this class is used to register any 

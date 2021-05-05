@@ -1,2 +1,2 @@
 <?php
-namespace webfiori\framework\i18n;
+namespace app\langs;

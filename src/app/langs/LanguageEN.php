@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-namespace webfiori\framework\i18n;
+namespace app\langs;
 
 /**
  * A class that contain some of the common language labels in Arabic.

@@ -28,22 +28,22 @@ use app\AppConfig;
 use webfiori\framework\cli\CLI;
 use webfiori\framework\exceptions\InitializationException;
 use webfiori\framework\middleware\MiddlewareManager;
-use webfiori\framework\router\APIRoutes;
-use webfiori\framework\router\ClosureRoutes;
-use webfiori\framework\router\OtherRoutes;
 use webfiori\framework\router\Router;
 use webfiori\framework\router\RouterUri;
-use webfiori\framework\router\ViewRoutes;
 use webfiori\framework\session\SessionsManager;
 use webfiori\framework\ui\ErrorBox;
 use webfiori\framework\ui\ServerErrView;
 use webfiori\http\Request;
 use webfiori\http\Response;
-use webfiori\ini\GlobalConstants;
-use webfiori\ini\InitAutoLoad;
-use webfiori\ini\InitCron;
-use webfiori\ini\InitMiddleware;
-use webfiori\ini\InitPrivileges;
+use app\ini\GlobalConstants;
+use app\ini\InitAutoLoad;
+use app\ini\InitCron;
+use app\ini\InitMiddleware;
+use app\ini\InitPrivileges;
+use app\ini\routes\APIRoutes;
+use app\ini\routes\ClosureRoutes;
+use app\ini\routes\ViewRoutes;
+use app\ini\routes\OtherRoutes;
 use webfiori\json\Json;
 /**
  * The time at which the framework was booted in microseconds as a float.
@@ -166,10 +166,28 @@ class WebFioriApp {
             mb_regex_encoding($encoding);
         }
 
-        if (!class_exists('webfiori\ini\GlobalConstants')) {
-            require_once ROOT_DIR.DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR.'ini'.DIRECTORY_SEPARATOR.'GlobalConstants.php';
+        if (!class_exists('app\ini\GlobalConstants')) {
+            $path = ROOT_DIR.DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR.'ini'.DIRECTORY_SEPARATOR.'GlobalConstants.php';
+            
+            if (file_exists($path)) {
+                require_once ROOT_DIR.DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR.'ini'.DIRECTORY_SEPARATOR.'GlobalConstants.php';
+                GlobalConstants::defineConstants();
+            } else {
+                //Fall back. Usually in testing environment
+                define('DS', DIRECTORY_SEPARATOR);
+                define('SCRIPT_MEMORY_LIMIT', '2048M');
+                define('DATE_TIMEZONE', 'Asia/Riyadh');
+                define('LOAD_COMPOSER_PACKAGES', true);
+                define('WF_VERBOSE', false);
+                define('CLI_HTTP_HOST', 'example.com');
+                define('THEMES_PATH', ROOT_DIR.DS.'src'.DS.'themes');
+                
+                if (!defined('PHP_INT_MIN')) {
+                    define('PHP_INT_MIN', ~PHP_INT_MAX);
+                }
+            }
         }
-        GlobalConstants::defineConstants();
+        
 
         /**
          * Set memory limit.
@@ -188,7 +206,10 @@ class WebFioriApp {
             require_once WF_CORE_PATH.DS.'AutoLoader.php';
         }
         self::$AU = AutoLoader::get();
-        InitAutoLoad::init();
+        
+        if (class_exists('app\ini\InitAutoLoad')) {
+            InitAutoLoad::init();
+        }
 
         //Initialize CLI
         CLI::init();
@@ -198,9 +219,11 @@ class WebFioriApp {
         $this->_setHandlers();
         $this->_checkStandardLibs();
 
-        //Initialize privileges.
-        //This step must be done before initializing any controler.
-        InitPrivileges::init();
+        if (class_exists('app\ini\InitPrivileges')) {
+            //Initialize privileges.
+            //This step must be done before initializing any controler.
+            InitPrivileges::init();
+        }
 
         self::$SF = ConfigController::get();
 
@@ -214,7 +237,9 @@ class WebFioriApp {
         {
             MiddlewareManager::register($inst);
         });
-        InitMiddleware::init();
+        if (class_exists('app\ini\InitMiddleware')) {
+            InitMiddleware::init();
+        }
         $this->_initRoutes();
         $this->_initCRON();
         Response::beforeSend(function ()
@@ -393,15 +418,24 @@ class WebFioriApp {
 
         if (CLI::isCLI() || (defined('CRON_THROUGH_HTTP') && CRON_THROUGH_HTTP && count($pathArr) != 0 && $pathArr[0] == 'cron')) {
             //initialize cron jobs only if in CLI or cron is enabled throgh HTTP.
-            //
-            InitCron::init();
+            if (class_exists('app\ini\InitCron')) {
+                InitCron::init();
+            }
         }
     }
     private function _initRoutes() {
-        APIRoutes::create();
-        ViewRoutes::create();
-        ClosureRoutes::create();
-        OtherRoutes::create();
+        if (class_exists('app\ini\APIRoutes')) {
+            APIRoutes::create();
+        }
+        if (class_exists('app\ini\ViewRoutes')) {
+            ViewRoutes::create();
+        }
+        if (class_exists('app\ini\ClosureRoutes')) {
+            ClosureRoutes::create();
+        }
+        if (class_exists('app\ini\OtherRoutes')) {
+            OtherRoutes::create();
+        }
     }
     private function _initThemesPath() {
         if (!defined('THEMES_PATH')) {

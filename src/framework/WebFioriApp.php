@@ -424,16 +424,16 @@ class WebFioriApp {
         }
     }
     private function _initRoutes() {
-        if (class_exists('app\ini\APIRoutes')) {
+        if (class_exists('app\ini\routes\APIRoutes')) {
             APIRoutes::create();
         }
-        if (class_exists('app\ini\ViewRoutes')) {
+        if (class_exists('app\ini\routes\ViewRoutes')) {
             ViewRoutes::create();
         }
-        if (class_exists('app\ini\ClosureRoutes')) {
+        if (class_exists('app\ini\routes\ClosureRoutes')) {
             ClosureRoutes::create();
         }
-        if (class_exists('app\ini\OtherRoutes')) {
+        if (class_exists('app\ini\routes\OtherRoutes')) {
             OtherRoutes::create();
         }
     }

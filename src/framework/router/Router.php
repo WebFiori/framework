@@ -896,6 +896,7 @@ class Router {
     }
     
     private function _getRequestMethods($options) {
+        $requestMethodsArr = [];
         if (isset($options['methods'])) {
             $methTypes = gettype($options['methods']);
             

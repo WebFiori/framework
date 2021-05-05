@@ -12,7 +12,7 @@
         "webfiori/collections":"1.0.3",
         "webfiori/ui":"2.2.2",
         "webfiori/jsonx":"2.0.2",
-        "webfiori/http":"3.0.6",
+        "webfiori/http":"3.0.7",
         "webfiori/database":"0.2.7"
     },
     "keywords": [

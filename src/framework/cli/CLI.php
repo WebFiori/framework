@@ -28,7 +28,7 @@ use Exception;
 use webfiori\framework\cron\Cron;
 use webfiori\framework\Util;
 use webfiori\framework\WebFioriApp;
-use webfiori\ini\InitCliCommands;
+use app\ini\InitCliCommands;
 /**
  * A class which adds basic support for running the framework through 
  * command line interface (CLI).

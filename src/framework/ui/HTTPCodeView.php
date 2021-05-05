@@ -40,7 +40,7 @@ class HTTPCodeView extends WebPage {
         parent::__construct();
         $this->setTheme(WebFioriApp::getAppConfig()->getBaseThemeName());
 
-        $this->setTitle($this->get("general/http-codes/$errCode/code").' - '.$this->get("general/http-codes/$errCodetype/type"));
+        $this->setTitle($this->get("general/http-codes/$errCode/code").' - '.$this->get("general/http-codes/$errCode/type"));
         http_response_code(intval($this->get("general/http-codes/$errCode/code")));
         $h1 = new HTMLNode('h1');
         $h1->text($this->getTitle());

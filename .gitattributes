@@ -1,6 +1,8 @@
 # Files and folders here will be not included when creating package
 /tests export-ignore
 /src/app export-ignore
+/src/public export-ignore
+/src/themes export-ignore
 /.github export-ignore
 /.gitignore export-ignore
 /.travis.yml export-ignore

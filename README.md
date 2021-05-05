@@ -20,6 +20,8 @@
   </a>
 </p>
 
+> Note: This repo contains the core of the framework. Application template can be found in the repo [`webfiori/app`](https://github.com/webfiori/app)
+
 ## What is WebFiori Framework?
 
 WebFiori Framework is a mini web development framework which is built using PHP language. The framework is fully object oriented (OOP). It uses semi-MVC model but it does not force it. The framework comes with many features which can help in making your website or web application up and running in no time.
@@ -83,7 +85,7 @@ If you plan to test the framework on your local machine, the recomended way is t
 After installing AMP stack, you can ethier use composer to install the framework or install it manually by download it throgh https://webfiori.com/download. If you plan to use composer, then you must first download composer from their website: https://getcomposer.org/download/. Once downloaded, place the `.phar` file in the folder `htdocs` or your server root. Once you do that, run the terminal in `htdocs` and run the following command: 
 
 ```
-php composer.phar create-project --prefer-dist webfiori/framework my-site
+php composer.phar create-project --prefer-dist webfiori/app my-site
 ```
 This command will create new folder with the name `my-site` and install the framework inside it. 
 

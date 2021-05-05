@@ -498,11 +498,7 @@ class AutoLoader {
                 $vendorDirs[] = $vendorPath.$vendorFolderName;
             }
 
-            if ($x + 1 == $pathsCount) {
-                $vendorPath .= $split[$x];
-            } else {
-                $vendorPath .= $split[$x].$DS;
-            }
+            $vendorPath .= $split[$x].$DS;
         }
 
         if (!$vendorFound && is_dir($vendorPath.$vendorFolderName)) {

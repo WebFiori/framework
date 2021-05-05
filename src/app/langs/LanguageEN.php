@@ -24,6 +24,7 @@
  */
 namespace app\langs;
 
+use webfiori\framework\i18n\Language;
 /**
  * A class that contain some of the common language labels in Arabic.
  * So far, the class has the following variables:

@@ -905,14 +905,14 @@ class Router {
                     $upper = strtoupper(trim($reqMethod));
                     
                     if (in_array($upper, Request::METHODS)) {
-                        $requestMethodsArr[] = $reqMethod;
+                        $requestMethodsArr[] = $upper;
                     }
                 }
             } else if ($methTypes == 'string') {
-                $upper = strtoupper(trim($reqMethod));
+                $upper = strtoupper(trim($options['methods']));
                 
                 if (in_array($upper, Request::METHODS)) {
-                    $requestMethodsArr[] = $reqMethod;
+                    $requestMethodsArr[] = $upper;
                 }
             }
         }

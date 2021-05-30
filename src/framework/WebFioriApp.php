@@ -219,12 +219,13 @@ class WebFioriApp {
         $this->_setHandlers();
         $this->_checkStandardLibs();
 
-        if (class_exists('app\ini\InitPrivileges')) {
-            //Initialize privileges.
-            //This step must be done before initializing any controler.
-            InitPrivileges::init();
+        if (!class_exists('app\ini\InitPrivileges')) {
+            ConfigController::get()->createIniClass('InitPrivileges', 'Initialize user groups and privileges.');
         }
-
+        //Initialize privileges.
+        //This step must be done before initializing anything.
+        InitPrivileges::init();
+        
         self::$SF = ConfigController::get();
 
         if (!class_exists('app\AppConfig')) {
@@ -418,24 +419,29 @@ class WebFioriApp {
 
         if (CLI::isCLI() || (defined('CRON_THROUGH_HTTP') && CRON_THROUGH_HTTP && count($pathArr) != 0 && $pathArr[0] == 'cron')) {
             //initialize cron jobs only if in CLI or cron is enabled throgh HTTP.
-            if (class_exists('app\ini\InitCron')) {
-                InitCron::init();
+            if (!class_exists('app\ini\InitCron')) {
+                ConfigController::get()->createIniClass('InitCron', 'A method that can be used to initialize cron jobs.');
             }
+            InitCron::init();
         }
     }
     private function _initRoutes() {
-        if (class_exists('app\ini\routes\APIRoutes')) {
-            APIRoutes::create();
+        if (!class_exists('app\ini\routes\APIRoutes')) {
+            ConfigController::get()->createRoutesClass('APIRoutes');
         }
-        if (class_exists('app\ini\routes\ViewRoutes')) {
-            ViewRoutes::create();
+        if (!class_exists('app\ini\routes\ViewRoutes')) {
+            ConfigController::get()->createRoutesClass('ViewRoutes');
         }
-        if (class_exists('app\ini\routes\ClosureRoutes')) {
-            ClosureRoutes::create();
+        if (!class_exists('app\ini\routes\ClosureRoutes')) {
+            ConfigController::get()->createRoutesClass('ClosureRoutes');
         }
-        if (class_exists('app\ini\routes\OtherRoutes')) {
-            OtherRoutes::create();
+        if (!class_exists('app\ini\routes\OtherRoutes')) {
+            ConfigController::get()->createRoutesClass('OtherRoutes');
         }
+        OtherRoutes::create();
+        ClosureRoutes::create();
+        ViewRoutes::create();
+        APIRoutes::create();
     }
     private function _initThemesPath() {
         if (!defined('THEMES_PATH')) {

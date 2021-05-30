@@ -36,7 +36,7 @@ use webfiori\framework\mail\SocketMailer;
  *
  * @author Ibrahim
  * 
- * @version 1.5
+ * @version 1.5.1
  */
 class ConfigController {
     /**
@@ -136,6 +136,65 @@ class ConfigController {
         if (!class_exists('app\AppConfig')) {
             $this->writeAppConfig([]);
         }
+    }
+    /**
+     * Creates initialization class.
+     * 
+     * Note that if routes class already exist, this method will override 
+     * existing file.
+     * 
+     * @param string $className The name of the class.
+     * 
+     * @param string $comment A PHPDoc comment for class method.
+     * 
+     * @since 1.5.1
+     */
+    public function createIniClass($className, $comment) {
+        $cFile = new File("$className.php", ROOT_DIR.DS.'app'.DS.'ini');
+        $cFile->remove();
+        $this->a($cFile, "<?php");
+        $this->a($cFile, "");
+        $this->a($cFile, "namespace namespace app\\ini;");
+        $this->a($cFile, "");
+        $this->a($cFile, "class $className {");
+        $this->a($cFile, "    /**");
+        $this->a($cFile, "     * $comment");
+        $this->a($cFile, "     * ");
+        $this->a($cFile, "     * @since 1.0");
+        $this->a($cFile, "     */");
+        $this->a($cFile, "    public static function init() {");
+        $this->a($cFile, "        ");
+        $this->a($cFile, "    }");
+        $this->a($cFile, "}");
+    }
+    /**
+     * Creates a file that holds class information which is used to create 
+     * routes.
+     * 
+     * Note that if routes class already exist, this method will override 
+     * existing file.
+     * 
+     * @param string $className The name of the class.
+     * 
+     * @since 1.5.1
+     */
+    public function createRoutesClass($className) {
+        $cFile = new File("$className.php", ROOT_DIR.DS.'app'.DS.'ini'.DS.'routes');
+        $cFile->remove();
+        $this->a($cFile, "<?php");
+        $this->a($cFile, "");
+        $this->a($cFile, "namespace namespace app\\ini\\routes;");
+        $this->a($cFile, "");
+        $this->a($cFile, "class $className {");
+        $this->a($cFile, "    /**");
+        $this->a($cFile, "     * Initialize system routes.");
+        $this->a($cFile, "     * ");
+        $this->a($cFile, "     * @since 1.0");
+        $this->a($cFile, "     */");
+        $this->a($cFile, "    public static function create() {");
+        $this->a($cFile, "        //TODO: Add your own routes here.");
+        $this->a($cFile, "    }");
+        $this->a($cFile, "}");
     }
     /**
      * Returns a single instance of the class.
@@ -531,7 +590,7 @@ class ConfigController {
     public function updateSiteInfo($websiteInfoArr) {
         $this->writeAppConfig($websiteInfoArr);
     }
-
+    
     /**
      * Stores configuration variables into the application configuration class.
      * 

@@ -679,6 +679,8 @@ class WebFioriApp {
                         CLI::displayErr($error['type'], $error["message"], $error["file"], $error["line"]);
                     }
                 }
+            } else if (!Response::isSent()) {
+                Response::send();
             }
         });
     }

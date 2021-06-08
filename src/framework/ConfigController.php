@@ -166,6 +166,7 @@ class ConfigController {
         $this->a($cFile, "        ");
         $this->a($cFile, "    }");
         $this->a($cFile, "}");
+        $cFile->write(true, true);
     }
     /**
      * Creates a file that holds class information which is used to create 

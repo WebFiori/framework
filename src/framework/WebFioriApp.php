@@ -418,6 +418,9 @@ class WebFioriApp {
         $pathArr = $uriObj->getPathArray();
 
         if (CLI::isCLI() || (defined('CRON_THROUGH_HTTP') && CRON_THROUGH_HTTP && count($pathArr) != 0 && $pathArr[0] == 'cron')) {
+            if (defined('CRON_THROUGH_HTTP') && CRON_THROUGH_HTTP) {
+                cron\Cron::initRoutes();
+            }
             //initialize cron jobs only if in CLI or cron is enabled throgh HTTP.
             if (!class_exists('app\ini\InitCron')) {
                 ConfigController::get()->createIniClass('InitCron', 'A method that can be used to initialize cron jobs.');

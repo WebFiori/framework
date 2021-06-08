@@ -48,7 +48,7 @@ use webfiori\framework\WebFioriApp;
  * 
  * @author Ibrahim
  * 
- * @version 1.0.9
+ * @version 1.1.0
  */
 class Cron {
     /**
@@ -136,29 +136,43 @@ class Cron {
         $this->cronJobsQueue = new Queue();
         $this->_setPassword('');
 
-        if (defined('CRON_THROUGH_HTTP') && CRON_THROUGH_HTTP === true) {
-            Router::addRoute([
-                'path' => '/cron/login',
-                'route-to' => '/framework/cron/CronLoginView.php'
-            ]);
-            Router::addRoute([
-                'path' => '/cron/apis/{action}',
-                'route-to' => CronServicesManager::class,
-                'as-api' => true
-            ]);
-            Router::addRoute([
-                'path' => '/cron',
-                'route-to' => '/framework/cron/CronLoginView.php'
-            ]);
-            Router::addRoute([
-                'path' => '/cron/jobs',
-                'route-to' => '/framework/cron/CronTasksView.php'
-            ]);
-            Router::addRoute([
-                'path' => '/cron/jobs/{job-name}',
-                'route-to' => '/framework/cron/CronTaskView.php'
-            ]);
-        }
+    }
+    /**
+     * Creates routes to cron web interface pages.
+     * 
+     * This method is used to initialize the following routes:
+     * <ul>
+     * <li>/cron</li>
+     * <li>/cron/login</li>
+     * <li>/cron/apis/{action}</li>
+     * <li>/cron/jobs</li>
+     * <li>/cron/jobs/{job-name}</li>
+     * </ul>
+     * 
+     * @since 1.1.0
+     */
+    public static function initRoutes() {
+        Router::addRoute([
+            'path' => '/cron/login',
+            'route-to' => CronLoginView::class
+        ]);
+        Router::addRoute([
+            'path' => '/cron/apis/{action}',
+            'route-to' => CronServicesManager::class,
+            'as-api' => true
+        ]);
+        Router::addRoute([
+            'path' => '/cron',
+            'route-to' => CronLoginView::class
+        ]);
+        Router::addRoute([
+            'path' => '/cron/jobs',
+            'route-to' => CronLoginView::class
+        ]);
+        Router::addRoute([
+            'path' => '/cron/jobs/{job-name}',
+            'route-to' => CronLoginView::class
+        ]);
     }
     /**
      * Returns an object that represents the job which is currently being executed.

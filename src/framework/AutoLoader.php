@@ -225,6 +225,7 @@ class AutoLoader {
     ]) {
         $DS = DIRECTORY_SEPARATOR;
 
+        $appFolder = defined('APP_ROOT') ? APP_ROOT : 'app';
         if (self::$loader === null) {
             $frameworkSearchFoldres = [
                 '',
@@ -239,7 +240,7 @@ class AutoLoader {
                 $DS.'ini',
                 $DS.'libs',
                 $DS.'conf',
-                $DS.'app'
+                $DS.$appFolder
             ];
 
             if (isset($options['search-folders'])) {
@@ -522,7 +523,7 @@ class AutoLoader {
      * 
      * @return boolean True if loaded. False if not.
      */
-    private function _loadClassHelper($className, $classWithNs, $value, $appendRoot, $allPaths, $classNameToLower = false) {
+    private function _loadClassHelper($className, $classWithNs, $value, $appendRoot, $allPaths) {
         $loaded = false;
         $DS = DIRECTORY_SEPARATOR;
         $root = $this->getRoot();
@@ -535,12 +536,10 @@ class AutoLoader {
         $isFileLoaded = in_array($f, $allPaths);
 
         if (!$isFileLoaded) {
-            if ($classNameToLower) {
-                if ($appendRoot === true) {
-                    $f = $root.$value.$DS.strtolower($className).'.php';
-                } else {
-                    $f = $value.$DS.strtolower($className).'.php';
-                }
+            if ($appendRoot === true) {
+                $f = $root.$value.$DS.strtolower($className).'.php';
+            } else {
+                $f = $value.$DS.strtolower($className).'.php';
             }
 
             if (file_exists($f)) {
@@ -555,7 +554,7 @@ class AutoLoader {
                 $loaded = true;
             }
         }
-
+        
         return $loaded;
     }
     private function _loadFromCache($classNS, $className) {
@@ -714,13 +713,9 @@ class AutoLoader {
         $allPaths = self::getClassPath($className);
 
         foreach ($this->searchFolders as $value => $appendRoot) {
-            $loaded = $this->_loadClassHelper($className, $classWithNs, $value, $appendRoot, $allPaths);
-
-            if (!$loaded) {
-                $loaded = $this->_loadClassHelper($className, $classWithNs, $value, $appendRoot, $allPaths, true);
-            }
+            $loaded = $this->_loadClassHelper($className, $classWithNs, $value, $appendRoot, $allPaths) || $loaded;
         }
-
+        
         if ($loaded === false) {
             if (is_callable($this->onFail)) {
                 call_user_func($this->onFail);

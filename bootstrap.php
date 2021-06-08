@@ -63,7 +63,8 @@ AutoLoader::get([
     'search-folders' => [
         'tests',
         'src',
-        'vendor'
+        'vendor',
+        'app'
     ],
     'define-root' => true,
     'root' => __DIR__,

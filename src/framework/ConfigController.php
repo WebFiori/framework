@@ -154,7 +154,7 @@ class ConfigController {
         $cFile->remove();
         $this->a($cFile, "<?php");
         $this->a($cFile, "");
-        $this->a($cFile, "namespace namespace app\\ini;");
+        $this->a($cFile, "namespace app\\ini;");
         $this->a($cFile, "");
         $this->a($cFile, "class $className {");
         $this->a($cFile, "    /**");
@@ -184,7 +184,7 @@ class ConfigController {
         $cFile->remove();
         $this->a($cFile, "<?php");
         $this->a($cFile, "");
-        $this->a($cFile, "namespace namespace app\\ini\\routes;");
+        $this->a($cFile, "namespace app\\ini\\routes;");
         $this->a($cFile, "");
         $this->a($cFile, "class $className {");
         $this->a($cFile, "    /**");
@@ -196,6 +196,7 @@ class ConfigController {
         $this->a($cFile, "        //TODO: Add your own routes here.");
         $this->a($cFile, "    }");
         $this->a($cFile, "}");
+        $cFile->write(true, true);
     }
     /**
      * Returns a single instance of the class.

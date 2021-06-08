@@ -675,7 +675,7 @@ class File implements JsonI {
         $len = strlen($pathV);
 
         if ($len > 0) {
-            $this->path = !Util::isDirectory($pathV) ? DS.$pathV : $pathV;
+            $this->path = $pathV;
             $retVal = true;
         }
 

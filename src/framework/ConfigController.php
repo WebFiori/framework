@@ -167,6 +167,7 @@ class ConfigController {
         $this->a($cFile, "    }");
         $this->a($cFile, "}");
         $cFile->write(true, true);
+        require_once ROOT_DIR.DS.'app'.DS.'ini'.DS."$className.php";
     }
     /**
      * Creates a file that holds class information which is used to create 
@@ -1279,6 +1280,7 @@ class ConfigController {
 
         $this->a($cFile, "}");
         $cFile->write(false, true);
+        require_once ROOT_DIR.DS.'app'.DS.'AppConfig.php';
     }
     private function a(File $file, $str) {
         $file->append($str.self::NL);

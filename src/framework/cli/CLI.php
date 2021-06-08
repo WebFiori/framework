@@ -25,6 +25,7 @@
 namespace webfiori\framework\cli;
 
 use Exception;
+use webfiori\framework\ConfigController;
 use webfiori\framework\cron\Cron;
 use webfiori\framework\Util;
 use webfiori\framework\WebFioriApp;
@@ -84,6 +85,9 @@ class CLI {
             } else {
                 $_SERVER['HTTPS'] = 'yes';
             }
+        }
+        if (!class_exists('app\ini\InitCliCommands')) {
+            ConfigController::get()->createIniClass('InitCliCommands', 'Register user defined CLI commands.');
         }
     }
     /**

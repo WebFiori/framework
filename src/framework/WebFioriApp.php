@@ -207,10 +207,11 @@ class WebFioriApp {
         }
         self::$AU = AutoLoader::get();
         
-        if (class_exists('app\ini\InitAutoLoad')) {
-            InitAutoLoad::init();
+        if (!class_exists('app\ini\InitAutoLoad')) {
+            ConfigController::get()->createIniClass('InitAutoLoad', 'Add user-defined directories to the set of directories at which the framework will search for classes.');
         }
-
+        InitAutoLoad::init();
+        
         //Initialize CLI
         CLI::init();
 
@@ -238,9 +239,10 @@ class WebFioriApp {
         {
             MiddlewareManager::register($inst);
         });
-        if (class_exists('app\ini\InitMiddleware')) {
-            InitMiddleware::init();
+        if (!class_exists('app\ini\InitMiddleware')) {
+            ConfigController::get()->createIniClass('InitMiddleware', 'Register middleware which are created outside the folder \'app/middleware\'.');
         }
+        InitMiddleware::init();
         $this->_initRoutes();
         $this->_initCRON();
         Response::beforeSend(function ()
@@ -416,15 +418,16 @@ class WebFioriApp {
     private function _initCRON() {
         $uriObj = new RouterUri(Util::getRequestedURL(), '');
         $pathArr = $uriObj->getPathArray();
-
+        
+        if (!class_exists('app\ini\InitCron')) {
+            ConfigController::get()->createIniClass('InitCron', 'A method that can be used to initialize cron jobs.');
+        }
+            
         if (CLI::isCLI() || (defined('CRON_THROUGH_HTTP') && CRON_THROUGH_HTTP && count($pathArr) != 0 && $pathArr[0] == 'cron')) {
             if (defined('CRON_THROUGH_HTTP') && CRON_THROUGH_HTTP) {
                 cron\Cron::initRoutes();
             }
             //initialize cron jobs only if in CLI or cron is enabled throgh HTTP.
-            if (!class_exists('app\ini\InitCron')) {
-                ConfigController::get()->createIniClass('InitCron', 'A method that can be used to initialize cron jobs.');
-            }
             InitCron::init();
         }
     }

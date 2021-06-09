@@ -306,7 +306,7 @@ class File implements JsonI {
         $name = $this->getName();
 
         if (strlen($fPath) != 0 && strlen($name) != 0) {
-            return $fPath.DS.$name;
+            return $fPath.DIRECTORY_SEPARATOR.$name;
         }
 
         return '';
@@ -894,7 +894,7 @@ class File implements JsonI {
             }
         }
 
-        return str_replace('/', DS, str_replace('\\', DS, $trimmedPath));
+        return str_replace('/', DIRECTORY_SEPARATOR, str_replace('\\', DIRECTORY_SEPARATOR, $trimmedPath));
     }
     private function _viewFileHelper($asAttachment) {
         $contentType = $this->getFileMIMEType();

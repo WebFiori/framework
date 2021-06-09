@@ -169,6 +169,222 @@ class ConfigController {
         $cFile->write(true, true);
         require_once ROOT_DIR.DS.'app'.DS.'ini'.DS."$className.php";
     }
+    public function createConstClass() {
+        $cFile = new File("GlobalConstants.php", ROOT_DIR.DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR.'ini');
+        $this->a($cFile, "<?php");
+        $this->a($cFile, "");
+        $this->a($cFile, "namespace app\\ini;");
+        $this->a($cFile, "/**");
+        $this->a($cFile, "* A class which is used to initialize global constants.");
+        $this->a($cFile, "* ");
+        $this->a($cFile, "* This class has one static method which is used to define the constants.");
+        $this->a($cFile, "* The class can be used to initialize any constant that the application depends");
+        $this->a($cFile, "* on. The constants that this class will initialize are the constants which");
+        $this->a($cFile, "* uses the function <code>define()</code>.");
+        $this->a($cFile, "* Also, the developer can modify existing ones as needed to change some of the");
+        $this->a($cFile, "* default settings of the framework.");
+        $this->a($cFile, "* ");
+        $this->a($cFile, "* @since 1.1.0");
+        $this->a($cFile, "*/");
+        $this->a($cFile, "class GlobalConstants {");
+        $this->a($cFile, "    /**");
+        $this->a($cFile, "     * Initialize the constants.");
+        $this->a($cFile, "     * ");
+        $this->a($cFile, "     * Include your own in the body of this method or modify existing ones");
+        $this->a($cFile, "     * to suite your configuration. It is recommended to check if the global");
+        $this->a($cFile, "     * constant is defined or not before defining it using the function");
+        $this->a($cFile, "     * <code>defined</code>.");
+        $this->a($cFile, "     * ");
+        $this->a($cFile, "     * @since 1.0");
+        $this->a($cFile, "     */");
+        $this->a($cFile, "    public static function defineConstants() {");
+        $this->addConst($cFile, [
+            'name' => 'SCRIPT_MEMORY_LIMIT',
+            'summary' => 'Memory limit per script.',
+            'description' => "This constant represents the maximum amount of memory each script will 
+             * consume before showing a fatal error. Default value is 2GB. The 
+             * developer can change this value as needed.",
+            'since' => '1.0',
+            'type' => 'string',
+            'value' => "'2048M'"
+        ]);
+        $this->addConst($cFile, [
+            'name' => 'WF_SESSION_STORAGE',
+            'summary' => 'A constant which holds the class name of sessions storage 
+             * engine alongside its namespace.',
+            'description' => "The value of this constant is used to configure session storage 
+             * engine. For example, if the name of the class that represents 
+             * storage engine is 'MySessionStorage' and the class exist in the 
+             * namespace 'extras\\util', then the value of the constant should be 
+             * '\\extras\\util\\MySessionStorage'. To use database session storage 
+             * set this constant to the value '\\webfiori\\framework\\session\\DatabaseSessionStorage'.",
+            'since' => '2.1.0',
+            'type' => 'string',
+            'value' => "'\\webfiori\\framework\\session\\DefaultSessionStorage'"
+        ]);
+        $this->addConst($cFile, [
+            'name' => 'DATE_TIMEZONE',
+            'summary' => 'Define the timezone at which the system will operate in.',
+            'description' => "The value of this constant is passed to the function 'date_default_timezone_set()'. 
+             * This one is used to fix some date and time related issues when the 
+             * application is deployed in multiple servers.
+             * See http://php.net/manual/en/timezones.php for supported time zones.
+             * Change this as needed.",
+            'since' => '1.0',
+            'type' => 'string',
+            'value' => "'Asia/Riyadh'"
+        ]);
+        $this->addConst($cFile, [
+            'name' => 'PHP_INT_MIN',
+            'summary' => 'Fallback for older php versions that does not support the constant 
+             * PHP_INT_MIN.',
+            'since' => '1.0',
+            'type' => 'int',
+            'value' => '~PHP_INT_MAX'
+        ]);
+        $this->addConst($cFile, [
+            'name' => 'LOAD_COMPOSER_PACKAGES',
+            'summary' => 'This constant is used to tell the core if the application uses composer 
+             * packages or not.',
+            'description' => "If set to true, then composer packages will be loaded.",
+            'since' => '1.0',
+            'type' => 'boolean',
+            'value' => "true"
+        ]);
+        $this->addConst($cFile, [
+            'name' => 'CRON_THROUGH_HTTP',
+            'summary' => 'A constant which is used to enable or disable HTTP access to cron.',
+            'description' => "If the constant value is set to true, the framework will add routes to the 
+             * components which is used to allow access to cron control panel. The control 
+             * panel is used to execute jobs and check execution status. Default value is false.",
+            'since' => '1.0',
+            'type' => 'boolean',
+            'value' => "false"
+        ]);
+        $this->addConst($cFile, [
+            'name' => 'WF_VERBOSE',
+            'summary' => 'This constant is used to tell the framework if more information should 
+             * be displayed if an exception is thrown or an error happens.',
+            'description' => "The main aim 
+             * of this constant is to hide some sensitive information from users if the 
+             * system is in production environment. Note that the constant will have effect 
+             * only if the framework is accessed through HTTP protocol. If used in CLI 
+             * environment, everything will appear. Default value of the constant is 
+             * false.",
+            'since' => '1.0',
+            'type' => 'boolean',
+            'value' => "false"
+        ]);
+        $this->addConst($cFile, [
+            'name' => 'NO_WWW',
+            'summary' => 'This constant is used to redirect a URI with www to non-www.',
+            'description' => "If this constant is defined and is set to true and a user tried to 
+             * access a resource using a URI that contains www in the host part,
+             * the router will send a 301 - permanent redirect HTTP response code and 
+             * send the user to non-www host. For example, if a request is sent to 
+             * 'https://www.example.com/my-page', it will be redirected to 
+             * 'https://example.com/my-page'. Default value of the constant is false which 
+             * means no redirection will be performed.",
+            'since' => '1.0',
+            'type' => 'boolean',
+            'value' => "false"
+        ]);
+        $this->addConst($cFile, [
+            'name' => 'MAX_BOX_MESSAGES',
+            'summary' => 'The maximum number of message boxes to show in one page.',
+            'description' => "A message box is a box which will be shown in a web page that 
+             * contains some information. The 
+             * box can be created manually by using the method 'Util::print_r()' or 
+             * it can be as a result of an error during execution.
+             * Default value is 15. The developer can change the value as needed. Note 
+             * that if the constant is not defined, the number of boxes will 
+             * be almost unlimited.",
+            'since' => '1.0',
+            'type' => 'int',
+            'value' => "15"
+        ]);
+        $this->addConst($cFile, [
+            'name' => 'CLI_HTTP_HOST',
+            'summary' => 'Host name to use in case the system is executed through CLI.',
+            'description' => "When the application is running throgh CLI, there is no actual 
+             * host name. For this reason, the host is set to 127.0.0.1 by default. 
+             * If this constant is defined, the host will be changed to the value of 
+             * the constant. Default value of the constant is 'example.com'.",
+            'since' => '1.0',
+            'type' => 'string',
+            'value' => "'example.com'"
+        ]);
+        $this->addConst($cFile, [
+            'name' => 'DS',
+            'summary' => 'Directory separator.',
+            'description' => "This one is is used as a shorthand instead of using PHP 
+             * constant 'DIRECTORY_SEPARATOR'. The two will have the same value.",
+            'since' => '1.0',
+            'type' => 'string',
+            'value' => "DIRECTORY_SEPARATOR"
+        ]);
+        
+        $this->a($cFile, "        if (!defined('THEMES_PATH')){");
+        $this->a($cFile, "            \$themesDirName = 'themes';");
+        $this->a($cFile, "            \$themesPath = substr(__DIR__, 0, strlen(__DIR__) - strlen('/app/ini')).DIRECTORY_SEPARATOR.\$themesDirName;");
+        $this->a($cFile, '            /**');
+        $this->a($cFile, '             * This constant represents the directory at which themes exist.');
+        $this->a($cFile, '             * ');
+        $this->a($cFile, '             * @var string');
+        $this->a($cFile, '             * ');
+        $this->a($cFile, '             * @since 1.0');
+        $this->a($cFile, '             * ');
+        $this->a($cFile, '             */');
+        $this->a($cFile, "            define('THEMES_PATH', \$themesPath);");
+        $this->a($cFile, '        }');
+        
+        $this->addConst($cFile, [
+            'name' => 'USE_HTTP',
+            'summary' => 'Sets the framework to use \'http://\' or \'https://\' for base URIs.',
+            'description' => "The default behaviour of the framework is to use 'https://'. But 
+             * in some cases, there is a need for using 'http://'.
+             * If this constant is set to true, the framework will use 'http://' for 
+             * base URI of the system. Default value is false.",
+            'since' => '1.0',
+            'type' => 'boolean',
+            'value' => "false"
+        ]);
+        $this->a($cFile, "    }");
+        $this->a($cFile, "}");
+        $cFile->write(true, true);
+    }
+    /**
+     * 
+     * @param File $file
+     * @param type $name
+     * @param type $val
+     * @param type $docBlock
+     */
+    private function addConst($file, $options) {
+        $this->a($file, "        if (!defined('".$options['name']."')){");
+        $this->a($file, '            /**');
+        
+        if (isset($options['summary'])) {
+            $this->a($file, '             * '.$options['summary']);
+            $this->a($file, '             * ');
+        }
+        if (isset($options['description'])) {
+            $this->a($file, '             * '.$options['description']);
+            $this->a($file, '             * ');
+        }
+        if (isset($options['type'])) {
+            $this->a($file, '             * @var '.$options['type']);
+            $this->a($file, '             * ');
+        }
+        if (isset($options['since'])) {
+            $this->a($file, '             * @since '.$options['since']);
+            $this->a($file, '             * ');
+        }
+        $this->a($file, '             */');
+        $val = $options['value'];
+        $this->a($file, "            define('".$options['name']."', $val);");
+        $this->a($file, '        }');
+    }
     /**
      * Creates a file that holds class information which is used to create 
      * routes.

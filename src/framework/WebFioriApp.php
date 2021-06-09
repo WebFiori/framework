@@ -165,29 +165,34 @@ class WebFioriApp {
             //mb_http_input($encoding);
             mb_regex_encoding($encoding);
         }
-
+        
         if (!class_exists('app\ini\GlobalConstants')) {
+            $confControllerPath = ROOT_DIR.DIRECTORY_SEPARATOR.
+                    'vendor'.DIRECTORY_SEPARATOR.
+                    'webfiori'.DIRECTORY_SEPARATOR.
+                    'framework'.DIRECTORY_SEPARATOR.
+                    'src'.DIRECTORY_SEPARATOR.
+                    'framework'.DIRECTORY_SEPARATOR.
+                    'ConfigController.php';
+            
+            if (!file_exists($confControllerPath)) {
+                $confControllerPath = ROOT_DIR.DIRECTORY_SEPARATOR.
+                        'src'.DIRECTORY_SEPARATOR.
+                        'framework'.DIRECTORY_SEPARATOR.
+                        'ConfigController.php';
+            }
+            require_once $confControllerPath;
+            ConfigController::get()->createConstClass();
             $path = ROOT_DIR.DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR.'ini'.DIRECTORY_SEPARATOR.'GlobalConstants.php';
             
             if (file_exists($path)) {
                 require_once ROOT_DIR.DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR.'ini'.DIRECTORY_SEPARATOR.'GlobalConstants.php';
-                GlobalConstants::defineConstants();
+                
             } else {
                 //Fall back. Usually in testing environment
-                define('DS', DIRECTORY_SEPARATOR);
-                define('SCRIPT_MEMORY_LIMIT', '2048M');
-                define('DATE_TIMEZONE', 'Asia/Riyadh');
-                define('LOAD_COMPOSER_PACKAGES', true);
-                define('WF_VERBOSE', false);
-                define('CLI_HTTP_HOST', 'example.com');
-                define('THEMES_PATH', ROOT_DIR.DS.'src'.DS.'themes');
-                
-                if (!defined('PHP_INT_MIN')) {
-                    define('PHP_INT_MIN', ~PHP_INT_MAX);
-                }
             }
         }
-        
+        GlobalConstants::defineConstants();
 
         /**
          * Set memory limit.

@@ -75,12 +75,14 @@ class ThemeLoader {
     public static function getAvailableThemes() {
         if (self::$AvailableThemes === null) {
             self::$AvailableThemes = [];
-            $themesDirs = array_diff(scandir(THEMES_PATH), ['..', '.']);
+            if (Util::isDirectory(THEMES_PATH, true)) {
+                $themesDirs = array_diff(scandir(THEMES_PATH), ['..', '.']);
 
-            foreach ($themesDirs as $dir) {
-                $pathToScan = THEMES_PATH.DS.$dir;
-                $filesInDir = array_diff(scandir($pathToScan), ['..', '.']);
-                self::_scanDir($filesInDir, $pathToScan);
+                foreach ($themesDirs as $dir) {
+                    $pathToScan = THEMES_PATH.DS.$dir;
+                    $filesInDir = array_diff(scandir($pathToScan), ['..', '.']);
+                    self::_scanDir($filesInDir, $pathToScan);
+                }
             }
         }
 

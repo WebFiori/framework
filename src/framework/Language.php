@@ -307,8 +307,6 @@ class Language {
      * 
      * @param string $varValue The value of the variable.
      * 
-     * @return boolean The function will return <b>true</b> if the variable is set. 
-     * Other than that, the function will return <b>false</b>.
      * 
      * @since 1.0
      */
@@ -324,14 +322,15 @@ class Language {
                 if (isset($this->languageVars[$subSplit[0]])) {
                     $this->languageVars[$subSplit[0]][$varTrimmed] = $varValue;
 
-                    return true;
                 }
             } else if (isset($this->languageVars[$subSplit[0]])) {
                 return $this->_set($subSplit, $this->languageVars[$subSplit[0]],$varTrimmed,$varValue, 1);
+            } else {
+                $this->createAndSet($dir, [
+                    $varName => $varValue
+                ]);
             }
         }
-
-        return false;
     }
     /**
      * Sets the code of the language.

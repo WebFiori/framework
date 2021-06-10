@@ -29,6 +29,7 @@ use webfiori\database\ConnectionInfo;
 use webfiori\framework\exceptions\SMTPException;
 use webfiori\framework\mail\SMTPAccount;
 use webfiori\framework\mail\SocketMailer;
+use webfiori\framework\cli\LangClassWriter;
 
 /**
  * A class that can be used to modify basic configuration settings of 
@@ -89,25 +90,7 @@ class ConfigController {
      */
     const INV_HOST_OR_PORT = 'inv_mail_host_or_port';
 
-    /**
-     * A constant that indicates the file MailConfig.php was not found.
-     * 
-     * @since 1.2
-     */
-    const MAIL_CONFIG_MISSING = 'mail_config_file_missing';
     const NL = "\n";
-    /**
-     * A constant that indicates the file SiteConfig.php was not found.
-     * 
-     * @since 1.2
-     */
-    const SITE_CONFIG_MISSING = 'site_config_file_missing';
-    /**
-     * A constant that indicates the file Config.php was not found.
-     * 
-     * @since 1.2
-     */
-    const SYS_CONFIG_MISSING = 'config_file_missing';
     /**
      * An instance of the class.
      * 
@@ -1388,6 +1371,14 @@ class ConfigController {
         foreach ($titlesArr as $langCode => $title) {
             $title = str_replace("'", "\'", $title);
             $this->a($cFile, "            '$langCode' => '$title',");
+            if (!class_exists('app\\langs\\Language'.$langCode)) {
+                
+                //This require a fix in the future
+                $dir = $langCode == 'AR' ? 'rtl' : 'ltr';
+                
+                $writer = new LangClassWriter($langCode, $dir);
+                $writer->writeClass();
+            }
         }
         $this->a($cFile, "        ];");
 

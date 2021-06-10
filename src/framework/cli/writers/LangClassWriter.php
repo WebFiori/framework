@@ -50,7 +50,7 @@ class LangClassWriter extends ClassWriter {
     public function __construct($langCode, $writingDir) {
         $classInfoArr = [
             'name' => 'Language'.$langCode,
-            'namespace' => "webfiori\\framework\\i18n",
+            'namespace' => "app\\langs",
             'path' => ROOT_DIR.DS.'app'.DS.'langs'
         ];
         parent::__construct($classInfoArr);
@@ -71,5 +71,6 @@ class LangClassWriter extends ClassWriter {
         $this->append('parent::__construct(\''.$writingDir.'\', \''.$langCode.'\', true);', 2);
         $this->append('//TODO: Add the language "'.$langCode.'" labels.', 2);
         $this->append('}', 1);
+        $this->append('}', 0);
     }
 }

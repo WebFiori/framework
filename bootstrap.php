@@ -70,7 +70,11 @@ AutoLoader::get([
     'root' => __DIR__,
     'on-load-failure' => 'do-nothing'
 ]);
+
 fprintf(STDOUT,'Autoloader Initialized.'."\n");
+$themesPath = TESTS_DIRECTORY.DIRECTORY_SEPARATOR.'themes';
+fprintf(STDOUT, 'Setting themes path to "'.$themesPath.'" ...');
+define('THEMES_PATH', $themesPath);
 fprintf(STDOUT,"Initializing application...\n");
 WebFioriApp::start();
 fprintf(STDOUT,'Done.'."\n");

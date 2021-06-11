@@ -1,5 +1,5 @@
 <?php
-namespace webfiori\theme;
+namespace themes\newFiori;
 
 use webfiori\framework\Theme;
 use webfiori\framework\ui\WebPage;

@@ -179,7 +179,7 @@ class ThemeLoader {
         }
 
         $themeToLoad = null;
-        $xName = '\\'.$themeName;
+        $xName = '\\'.trim($themeName, '\\');
 
         if (class_exists($xName)) {
             $tmpTheme = new $xName();

@@ -298,6 +298,8 @@ class Language {
     /**
      * Sets or updates a language variable.
      * 
+     * Note that the variable will be set only if the directory does exist.
+     * 
      * @param string $dir A string that looks like a 
      * directory. 
      * 
@@ -306,7 +308,6 @@ class Language {
      * which has the given name and value.
      * 
      * @param string $varValue The value of the variable.
-     * 
      * 
      * @since 1.0
      */

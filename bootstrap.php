@@ -31,6 +31,7 @@ if (explode($DS, __DIR__)[0] == 'home') {
 
         if (file_exists($file)) {
             require_once $file;
+            require_once $DS.$dir.'framework'.$DS.'WebFioriApp.php';
             $isAutoloaderLoaded = true;
             break;
         }
@@ -45,6 +46,7 @@ if (explode($DS, __DIR__)[0] == 'home') {
 
         if (file_exists($file)) {
             require_once $file;
+            require_once $dir.$DS.'framework'.$DS.'WebFioriApp.php';
             $isAutoloaderLoaded = true;
             break;
         }

@@ -12,3 +12,4 @@ src/app/storage
 app/storage
 /release/
 php-cs-fixer-v2.phar
+/app/

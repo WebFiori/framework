@@ -2,8 +2,7 @@
 
 use webfiori\framework\AutoLoader;
 use webfiori\framework\WebFioriApp;
-use webfiori\framework\cli\CLI;
-use webfiori\ini\GlobalConstants;
+
 $DS = DIRECTORY_SEPARATOR;
 
 //the name of tests directory. Update as needed.
@@ -13,8 +12,8 @@ define('TESTS_DIRECTORY', 'tests');
 //WebFiori Framework might exist.
 //Add and remove directories as needed.
 $WebFioriFrameworkDirs = [
-    __DIR__.$DS.'src',
-    __DIR__.$DS.'vendor'.$DS.'webfiori'.$DS.'framework'
+    __DIR__.$DS.'webfiori',
+    __DIR__.$DS.'vendor'.$DS.'webfiori'.$DS.'webfiori'
 ];
 fprintf(STDOUT, "Bootstrap Path: '".__DIR__."'\n");
 fprintf(STDOUT,"Tests Directory: '".TESTS_DIRECTORY."'.\n");
@@ -62,7 +61,7 @@ fprintf(STDOUT,"Class 'Initializing autoload directories...\n");
 AutoLoader::get([
     'search-folders' => [
         'tests',
-        'src',
+        'webfiori',
         'vendor',
         'app'
     ],

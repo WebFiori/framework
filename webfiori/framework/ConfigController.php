@@ -1418,7 +1418,7 @@ class ConfigController {
         }
 
         if (class_exists($baseTheme)) {
-            $this->a($cFile, "        \$this->baseThemeName = \\$baseTheme::class;");
+            $this->a($cFile, "        \$this->baseThemeName = \\".trim($baseTheme, '\\')."::class;");
         } else {
             $this->a($cFile, "        \$this->baseThemeName = '$baseTheme';");
         }
@@ -1430,7 +1430,7 @@ class ConfigController {
         }
 
         if (class_exists($adminTheme)) {
-            $this->a($cFile, "        \$this->adminThemeName = \\$adminTheme::class;");
+            $this->a($cFile, "        \$this->adminThemeName = \\".trim($adminTheme, '\\')."::class;");
         } else {
             $this->a($cFile, "        \$this->adminThemeName = '$adminTheme';");
         }

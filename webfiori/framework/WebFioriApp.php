@@ -171,13 +171,13 @@ class WebFioriApp {
                     'vendor'.DIRECTORY_SEPARATOR.
                     'webfiori'.DIRECTORY_SEPARATOR.
                     'framework'.DIRECTORY_SEPARATOR.
-                    'src'.DIRECTORY_SEPARATOR.
+                    'webfiori'.DIRECTORY_SEPARATOR.
                     'framework'.DIRECTORY_SEPARATOR.
                     'ConfigController.php';
             
             if (!file_exists($confControllerPath)) {
                 $confControllerPath = ROOT_DIR.DIRECTORY_SEPARATOR.
-                        'src'.DIRECTORY_SEPARATOR.
+                        'webfiori'.DIRECTORY_SEPARATOR.
                         'framework'.DIRECTORY_SEPARATOR.
                         'ConfigController.php';
             }

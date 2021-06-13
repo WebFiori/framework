@@ -31,7 +31,7 @@ use webfiori\framework\File;
  * 
  * @author Ibrahim
  * 
- * @version 1.0
+ * @version 1.0.1
  */
 class ClassWriter {
     /**
@@ -145,6 +145,16 @@ class ClassWriter {
      */
     public function getPath() {
         return $this->path;
+    }
+    /**
+     * Returns the absolute path of the class that will be created.
+     * 
+     * @return string The absolute path of the file that holds class information.
+     * 
+     * @since 1.0.1
+     */
+    public function getAbsolutePath() {
+        return $this->getPath().DS.$this->className.'.php';
     }
     /**
      * Write the new class to a .php file.

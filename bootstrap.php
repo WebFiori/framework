@@ -72,6 +72,11 @@ AutoLoader::get([
 ]);
 
 fprintf(STDOUT,'Autoloader Initialized.'."\n");
+fprintf(STDOUT,'Class Search Paths:'."\n");
+$dirs = AutoLoader::getFolders();
+foreach ($dirs as $dir){
+    fprintf(STDOUT, $dir."\n");
+}
 $themesPath = TESTS_DIRECTORY.DIRECTORY_SEPARATOR.'themes';
 fprintf(STDOUT, 'Setting themes path to "'.$themesPath.'" ...');
 define('THEMES_PATH', $themesPath);
@@ -80,11 +85,7 @@ WebFioriApp::start();
 fprintf(STDOUT,'Done.'."\n");
 fprintf(STDOUT,'Root Directory: \''.AutoLoader::get()->root().'\'.'."\n");
 
-fprintf(STDOUT,'Class Search Paths:'."\n");
-$dirs = AutoLoader::getFolders();
-foreach ($dirs as $dir){
-    fprintf(STDOUT, $dir."\n");
-}
+
 fprintf(STDOUT, "Registering shutdown function...\n");
 //run sum code after tests completion.
 register_shutdown_function(function()

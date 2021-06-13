@@ -335,6 +335,7 @@ class ConfigController {
         $this->a($cFile, "    }");
         $this->a($cFile, "}");
         $cFile->write(true, true);
+        require_once $cFile->getAbsolutePath();
     }
     /**
      * 
@@ -397,6 +398,7 @@ class ConfigController {
         $this->a($cFile, "    }");
         $this->a($cFile, "}");
         $cFile->write(true, true);
+        require_once $cFile->getAbsolutePath();
     }
     /**
      * Returns a single instance of the class.
@@ -1378,6 +1380,7 @@ class ConfigController {
                 
                 $writer = new LangClassWriter($langCode, $dir);
                 $writer->writeClass();
+                require_once $writer->getAbsolutePath();
             }
         }
         $this->a($cFile, "        ];");

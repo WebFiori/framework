@@ -537,12 +537,18 @@ class AutoLoader {
 
         if (!$isFileLoaded) {
             if ($appendRoot === true) {
-                $f = $root.$value.$DS.strtolower($className).'.php';
+                $f = $root.$value.$DS.$className.'.php';
             } else {
-                $f = $value.$DS.strtolower($className).'.php';
+                $f = $value.$DS.$className.'.php';
             }
-            var_dump($f);
-            var_dump(file_exists($f));
+            if (!file_exists($f)) {
+                //Old style classes (all lower case)
+                if ($appendRoot === true) {
+                    $f = $root.$value.$DS.strtolower($className).'.php';
+                } else {
+                    $f = $value.$DS.strtolower($className).'.php';
+                }
+            }
             if (file_exists($f)) {
                 require_once $f;
                 $ns = count(explode('\\', $classWithNs)) == 1 ? '\\' : substr($classWithNs, 0, strlen($classWithNs) - strlen($className) - 1);
@@ -718,8 +724,7 @@ class AutoLoader {
         foreach ($this->searchFolders as $value => $appendRoot) {
             $loaded = $this->_loadClassHelper($className, $classWithNs, $value, $appendRoot, $allPaths) || $loaded;
         }
-        var_dump($classWithNs);
-        var_dump($loaded);
+        
         if ($loaded === false) {
             if (is_callable($this->onFail)) {
                 call_user_func($this->onFail);

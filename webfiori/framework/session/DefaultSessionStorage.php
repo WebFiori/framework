@@ -47,13 +47,9 @@ class DefaultSessionStorage implements SessionStorage {
      * @since 1.0
      */
     public function __construct() {
-        if (defined('__PHPUNIT_PHAR__')) {
-            $this->storeLoc = ROOT_DIR.DS.'src'.DS.'app'.DS.'storage'.DS.'sessions';
-        } else {
-            $this->storeLoc = ROOT_DIR.DS.'app'.DS.'storage'.DS.'sessions';
-        }
+        $this->storeLoc = ROOT_DIR.DS.'app'.DS.'storage'.DS.'sessions';
 
-        if (!file_exists($this->storeLoc)) {
+        if (!file_exists($this->storeLoc) && is_writable($this->storeLoc)) {
             mkdir($this->storeLoc, '0777', true);
         }
     }

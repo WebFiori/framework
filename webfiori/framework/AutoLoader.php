@@ -541,7 +541,8 @@ class AutoLoader {
             } else {
                 $f = $value.$DS.strtolower($className).'.php';
             }
-
+            var_dump($f);
+            var_dump(file_exists($f));
             if (file_exists($f)) {
                 require_once $f;
                 $ns = count(explode('\\', $classWithNs)) == 1 ? '\\' : substr($classWithNs, 0, strlen($classWithNs) - strlen($className) - 1);

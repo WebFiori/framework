@@ -717,7 +717,8 @@ class AutoLoader {
         foreach ($this->searchFolders as $value => $appendRoot) {
             $loaded = $this->_loadClassHelper($className, $classWithNs, $value, $appendRoot, $allPaths) || $loaded;
         }
-        
+        var_dump($classWithNs);
+        var_dump($loaded);
         if ($loaded === false) {
             if (is_callable($this->onFail)) {
                 call_user_func($this->onFail);

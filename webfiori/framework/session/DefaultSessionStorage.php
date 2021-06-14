@@ -37,7 +37,7 @@ use webfiori\framework\File;
  * 
  * @since 1.1.0
  * 
- * @version 1.0
+ * @version 1.0.1
  */
 class DefaultSessionStorage implements SessionStorage {
     private $storeLoc;
@@ -54,6 +54,17 @@ class DefaultSessionStorage implements SessionStorage {
         }
     }
     /**
+     * Checks if sessions storage location is exist and writable.
+     * 
+     * @return bolean If sessions storage location exist and is writable, 
+     * the method will return true.
+     * 
+     * @since 1.0.1
+     */
+    public function isStorageDirExist() {
+        return file_exists($this->storeLoc) && is_writable($this->storeLoc);
+    }
+    /**
      * Removes all inactive sessions.
      * 
      * This method will check if the constant 'SESSION_GC' is exist and its value 
@@ -64,6 +75,10 @@ class DefaultSessionStorage implements SessionStorage {
      * @since 1.0
      */
     public function gc() {
+        
+        if (!$this->isStorageDirExist()) {
+            return;
+        }
         $sessionsFiles = array_diff(scandir($this->storeLoc), ['.','..']);
 
         if (defined('SESSION_GC') && SESSION_GC > 0) {
@@ -93,6 +108,10 @@ class DefaultSessionStorage implements SessionStorage {
      * @since 1.0
      */
     public function read($sessionId) {
+        
+        if (!$this->isStorageDirExist()) {
+            return;
+        }
         $file = new File($sessionId, $this->storeLoc);
 
         if ($file->isExist()) {
@@ -109,7 +128,10 @@ class DefaultSessionStorage implements SessionStorage {
      * @since 1.0
      */
     public function remove($sessionId) {
-        unlink($this->storeLoc.DS.$sessionId);
+        
+        if ($this->isStorageDirExist()) {
+            unlink($this->storeLoc.DS.$sessionId);
+        }
     }
     /**
      * Stores session state to a file.
@@ -123,9 +145,11 @@ class DefaultSessionStorage implements SessionStorage {
     public function save($sessionId, $session) {
         if (!CLI::isCLI() || defined('__PHPUNIT_PHAR__')) {
             //Session storage should be only allowed in testing env or http
-            $file = new File($sessionId, $this->storeLoc);
-            $file->setRawData($session);
-            $file->write(false, true);
+            if ($this->isStorageDirExist()) {
+                $file = new File($sessionId, $this->storeLoc);
+                $file->setRawData($session);
+                $file->write(false, true);
+            }
         }
     }
 }

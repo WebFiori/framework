@@ -592,9 +592,9 @@ class AutoLoader {
      */
     private function _readCache() {
         if (defined('__PHPUNIT_PHAR__')) {
-            $autoloadCachePath = $this->getRoot().DIRECTORY_SEPARATOR.'src'.DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR.'storage';
+            $autoloadCachePath = $this->getRoot().DIRECTORY_SEPARATOR.'src'.DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR.'sto';
         } else {
-            $autoloadCachePath = $this->getRoot().DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR.'storage';
+            $autoloadCachePath = $this->getRoot().DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR.'sto';
         }
         $autoloadCache = $autoloadCachePath.DIRECTORY_SEPARATOR.self::CACHE_NAME;
         //For first run, the cache file might not exist.
@@ -637,7 +637,7 @@ class AutoLoader {
      * @since 1.1.6
      */
     private function _updateCache() {
-        $autoloadCache = $this->getRoot().DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR.'storage'.DIRECTORY_SEPARATOR.self::CACHE_NAME;
+        $autoloadCache = $this->getRoot().DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR.'sto'.DIRECTORY_SEPARATOR.self::CACHE_NAME;
         if (file_exists($autoloadCache)) {
             $h = @fopen($autoloadCache, 'w');
 

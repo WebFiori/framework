@@ -747,7 +747,7 @@ class Cron {
 
     private function _logJobExecution($job,$forced = false) {
         if ($this->isLogEnabled) {
-            $logsPath = ROOT_DIR.DS.'app'.DS.'storage'.DS.'logs';
+            $logsPath = ROOT_DIR.DS.'app'.DS.'sto'.DS.'logs';
             $logFile = $logsPath.DS.'cron.log';
 
             if (Util::isDirectory($logsPath, true)) {

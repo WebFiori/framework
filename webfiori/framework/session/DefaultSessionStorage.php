@@ -47,7 +47,7 @@ class DefaultSessionStorage implements SessionStorage {
      * @since 1.0
      */
     public function __construct() {
-        $this->storeLoc = ROOT_DIR.DS.'app'.DS.'storage'.DS.'sessions';
+        $this->storeLoc = ROOT_DIR.DS.'app'.DS.'sto'.DS.'sessions';
 
         if (!file_exists($this->storeLoc) && is_writable($this->storeLoc)) {
             mkdir($this->storeLoc, '0777', true);

@@ -880,9 +880,11 @@ class File implements JsonI {
     private static function _validatePath($fPath) {
         $trimmedPath = trim($fPath);
         $len = strlen($trimmedPath);
-
+        $start = '';
+        
         if ($len != 0) {
             $start = $fPath[0] == DS ? DS : '';
+            
             while ($trimmedPath[$len - 1] == '/' || $trimmedPath[$len - 1] == '\\') {
                 $tmpDir = trim($trimmedPath,'/');
                 $trimmedPath = trim($tmpDir,'\\');

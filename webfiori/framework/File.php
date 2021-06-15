@@ -882,6 +882,7 @@ class File implements JsonI {
         $len = strlen($trimmedPath);
 
         if ($len != 0) {
+            $start = $fPath[0] == DS ? DS : '';
             while ($trimmedPath[$len - 1] == '/' || $trimmedPath[$len - 1] == '\\') {
                 $tmpDir = trim($trimmedPath,'/');
                 $trimmedPath = trim($tmpDir,'\\');
@@ -894,7 +895,7 @@ class File implements JsonI {
             }
         }
 
-        return str_replace('/', DIRECTORY_SEPARATOR, str_replace('\\', DIRECTORY_SEPARATOR, $trimmedPath));
+        return $start.str_replace('/', DIRECTORY_SEPARATOR, str_replace('\\', DIRECTORY_SEPARATOR, $trimmedPath));
     }
     private function _viewFileHelper($asAttachment) {
         $contentType = $this->getFileMIMEType();

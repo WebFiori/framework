@@ -1142,7 +1142,7 @@ class ConfigController {
         $this->a($cFile, "     * @since 1.0");
         $this->a($cFile, "     */");
         $this->a($cFile, "    public function getDefaultTitle(\$langCode) {");
-        $this->a($cFile, "        \$langs = \$this->getDefaultTitles();");
+        $this->a($cFile, "        \$langs = \$this->getTitles();");
         $this->a($cFile, "        \$langCodeF = strtoupper(trim(\$langCode));");
         $this->a($cFile, "        ");
         $this->a($cFile, "        if (isset(\$langs[\$langCodeF])) {");
@@ -1150,17 +1150,6 @@ class ConfigController {
         $this->a($cFile, "        }");
         $this->a($cFile, "    }");
 
-        $this->a($cFile, "    /**");
-        $this->a($cFile, "     * Returns an array that holds the default pages titles for different languages.");
-        $this->a($cFile, "     * ");
-        $this->a($cFile, "     * @return array The indices of the array will be languages codes such as");
-        $this->a($cFile, "     * 'AR' and the value at each index will be page title in that language.");
-        $this->a($cFile, "     * ");
-        $this->a($cFile, "     * @since 1.0");
-        $this->a($cFile, "     */");
-        $this->a($cFile, "    public function getDefaultTitles() {");
-        $this->a($cFile, "        return \$this->defaultPageTitles;");
-        $this->a($cFile, "    }");
 
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Returns the global description of the web site that will be");

@@ -287,23 +287,12 @@ class AppConfig {
      * @since 1.0
      */
     public function getDefaultTitle($langCode) {
-        $langs = $this->getDefaultTitles();
+        $langs = $this->getTitles();
         $langCodeF = strtoupper(trim($langCode));
         
         if (isset($langs[$langCodeF])) {
             return $langs[$langCode];
         }
-    }
-    /**
-     * Returns an array that holds the default pages titles for different languages.
-     * 
-     * @return array The indices of the array will be languages codes such as
-     * 'AR' and the value at each index will be page title in that language.
-     * 
-     * @since 1.0
-     */
-    public function getDefaultTitles() {
-        return $this->defaultPageTitles;
     }
     /**
      * Returns the global description of the web site that will be

@@ -901,16 +901,16 @@ class Session implements JsonI {
         return $lang;
     }
     /**
-     * Initialize session language. The initialization depends on the attribute 
-     * 'lang'. 
+     * Initialize session language. 
      * 
+     * The initialization depends on the attribute 'lang'. 
      * It can be send via 'get' request, 'post' request or a cookie. 
-     * The provided language must be in the array 'SessionManager::SUPOORTED_LANGS'. 
      * If the given language code is not in the given array, 
-     * The used value will depend on the existence of the class 'SiteConfig'. 
-     * If it is exist, The value that is returned by SiteConfig::getPrimaryLanguage()' .
+     * The used value will depend on the existence of the class 'AppConfig'. 
+     * If it is exist, The value that is returned by AppConfig::getPrimaryLanguage()' .
      * If not, 'EN' is used by default.
-     * Also if the language is set before, it will not be updated unless the parameter '$forceUpdate' is set to true.
+     * Also if the language is set before, it will not be updated unless the 
+     * parameter '$forceUpdate' is set to true.
      * 
      * @param boolean $forceUpdate Set to true if the language is set and want to 
      * reset it. Default is false.
@@ -919,7 +919,8 @@ class Session implements JsonI {
      * use default language if no language attribute is found in request body.
      * 
      * @return boolean The method will return true if the language is set or 
-     * updated. Other than that, the method will return false. Default is true.
+     * updated. Other than that, the method will return false. Default is true which 
+     * happens when session is not running.
      * 
      * @since 1.2
      */
@@ -955,6 +956,8 @@ class Session implements JsonI {
             } else {
                 $retVal = false;
             }
+            
+            return $retVal;
         }
 
         return true;

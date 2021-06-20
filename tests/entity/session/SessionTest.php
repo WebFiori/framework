@@ -111,7 +111,7 @@ class SessionTest extends TestCase {
         $this->assertEquals(0, $session->getResumedAt());
         $session->set('hello', 'world');
         $this->assertNull($session->get('hello'));
-        $session->start();
+        $session->start();      
         $this->assertEquals(0, $session->getPassedTime());
         $this->assertEquals(Session::STATUS_NEW,$session->getStatus());
         $this->assertEquals(time(), $session->getStartedAt());
@@ -129,6 +129,8 @@ class SessionTest extends TestCase {
      */
     public function testClose00($session) {
         $session->close();
+        $filePath = ROOT_DIR.DS.'app'.DS.'sto'.DS.'sessions'.DS.$session->getId();
+        $this->assertTrue(webfiori\framework\File::isFileExist($filePath));
         $this->assertFalse($session->isRunning());
         $this->assertEquals(0, $session->getStartedAt());
         $this->assertEquals(0, $session->getResumedAt());

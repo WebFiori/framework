@@ -152,36 +152,50 @@ class ConfigController {
         $cFile->write(true, true);
         require_once ROOT_DIR.DS.'app'.DS.'ini'.DS."$className.php";
     }
+    /**
+     * Creates the class 'GlobalConstants'.
+     * 
+     * By default, the class will be created inside the folder 'app/ini'.
+     * 
+     * @throws \Exception The method will throw an exception if the method
+     * was unable to create the class.
+     */
     public function createConstClass() {
-        $cFile = new File("GlobalConstants.php", ROOT_DIR.DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR.'ini');
-        $this->a($cFile, "<?php");
-        $this->a($cFile, "");
-        $this->a($cFile, "namespace app\\ini;");
-        $this->a($cFile, "/**");
-        $this->a($cFile, "* A class which is used to initialize global constants.");
-        $this->a($cFile, "* ");
-        $this->a($cFile, "* This class has one static method which is used to define the constants.");
-        $this->a($cFile, "* The class can be used to initialize any constant that the application depends");
-        $this->a($cFile, "* on. The constants that this class will initialize are the constants which");
-        $this->a($cFile, "* uses the function <code>define()</code>.");
-        $this->a($cFile, "* Also, the developer can modify existing ones as needed to change some of the");
-        $this->a($cFile, "* default settings of the framework.");
-        $this->a($cFile, "* ");
-        $this->a($cFile, "* @since 1.1.0");
-        $this->a($cFile, "*/");
-        $this->a($cFile, "class GlobalConstants {");
-        $this->a($cFile, "    /**");
-        $this->a($cFile, "     * Initialize the constants.");
-        $this->a($cFile, "     * ");
-        $this->a($cFile, "     * Include your own in the body of this method or modify existing ones");
-        $this->a($cFile, "     * to suite your configuration. It is recommended to check if the global");
-        $this->a($cFile, "     * constant is defined or not before defining it using the function");
-        $this->a($cFile, "     * <code>defined</code>.");
-        $this->a($cFile, "     * ");
-        $this->a($cFile, "     * @since 1.0");
-        $this->a($cFile, "     */");
-        $this->a($cFile, "    public static function defineConstants() {");
-        $this->addConst($cFile, [
+        //The class GlobalConstants must exist before autoloader.
+        //For this reason, use the 'resource' instead of the class 'File'.
+        $path = ROOT_DIR.DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR.'ini'.DIRECTORY_SEPARATOR."GlobalConstants.php";
+        $resource = fopen($path, 'w');
+        if (!is_resource($resource)) {
+            throw new \Exception('Unable to create the file "'.$path.'"');
+        }
+        $this->a($resource, "<?php");
+        $this->a($resource, "");
+        $this->a($resource, "namespace app\\ini;");
+        $this->a($resource, "/**");
+        $this->a($resource, "* A class which is used to initialize global constants.");
+        $this->a($resource, "* ");
+        $this->a($resource, "* This class has one static method which is used to define the constants.");
+        $this->a($resource, "* The class can be used to initialize any constant that the application depends");
+        $this->a($resource, "* on. The constants that this class will initialize are the constants which");
+        $this->a($resource, "* uses the function <code>define()</code>.");
+        $this->a($resource, "* Also, the developer can modify existing ones as needed to change some of the");
+        $this->a($resource, "* default settings of the framework.");
+        $this->a($resource, "* ");
+        $this->a($resource, "* @since 1.1.0");
+        $this->a($resource, "*/");
+        $this->a($resource, "class GlobalConstants {");
+        $this->a($resource, "    /**");
+        $this->a($resource, "     * Initialize the constants.");
+        $this->a($resource, "     * ");
+        $this->a($resource, "     * Include your own in the body of this method or modify existing ones");
+        $this->a($resource, "     * to suite your configuration. It is recommended to check if the global");
+        $this->a($resource, "     * constant is defined or not before defining it using the function");
+        $this->a($resource, "     * <code>defined</code>.");
+        $this->a($resource, "     * ");
+        $this->a($resource, "     * @since 1.0");
+        $this->a($resource, "     */");
+        $this->a($resource, "    public static function defineConstants() {");
+        $this->addConst($resource, [
             'name' => 'SCRIPT_MEMORY_LIMIT',
             'summary' => 'Memory limit per script.',
             'description' => "This constant represents the maximum amount of memory each script will 
@@ -191,7 +205,7 @@ class ConfigController {
             'type' => 'string',
             'value' => "'2048M'"
         ]);
-        $this->addConst($cFile, [
+        $this->addConst($resource, [
             'name' => 'WF_SESSION_STORAGE',
             'summary' => 'A constant which holds the class name of sessions storage 
              * engine alongside its namespace.',
@@ -205,7 +219,7 @@ class ConfigController {
             'type' => 'string',
             'value' => "'\\webfiori\\framework\\session\\DefaultSessionStorage'"
         ]);
-        $this->addConst($cFile, [
+        $this->addConst($resource, [
             'name' => 'DATE_TIMEZONE',
             'summary' => 'Define the timezone at which the system will operate in.',
             'description' => "The value of this constant is passed to the function 'date_default_timezone_set()'. 
@@ -217,7 +231,7 @@ class ConfigController {
             'type' => 'string',
             'value' => "'Asia/Riyadh'"
         ]);
-        $this->addConst($cFile, [
+        $this->addConst($resource, [
             'name' => 'PHP_INT_MIN',
             'summary' => 'Fallback for older php versions that does not support the constant 
              * PHP_INT_MIN.',
@@ -225,7 +239,7 @@ class ConfigController {
             'type' => 'int',
             'value' => '~PHP_INT_MAX'
         ]);
-        $this->addConst($cFile, [
+        $this->addConst($resource, [
             'name' => 'LOAD_COMPOSER_PACKAGES',
             'summary' => 'This constant is used to tell the core if the application uses composer 
              * packages or not.',
@@ -234,7 +248,7 @@ class ConfigController {
             'type' => 'boolean',
             'value' => "true"
         ]);
-        $this->addConst($cFile, [
+        $this->addConst($resource, [
             'name' => 'CRON_THROUGH_HTTP',
             'summary' => 'A constant which is used to enable or disable HTTP access to cron.',
             'description' => "If the constant value is set to true, the framework will add routes to the 
@@ -244,7 +258,7 @@ class ConfigController {
             'type' => 'boolean',
             'value' => "false"
         ]);
-        $this->addConst($cFile, [
+        $this->addConst($resource, [
             'name' => 'WF_VERBOSE',
             'summary' => 'This constant is used to tell the framework if more information should 
              * be displayed if an exception is thrown or an error happens.',
@@ -258,7 +272,7 @@ class ConfigController {
             'type' => 'boolean',
             'value' => "false"
         ]);
-        $this->addConst($cFile, [
+        $this->addConst($resource, [
             'name' => 'NO_WWW',
             'summary' => 'This constant is used to redirect a URI with www to non-www.',
             'description' => "If this constant is defined and is set to true and a user tried to 
@@ -272,7 +286,7 @@ class ConfigController {
             'type' => 'boolean',
             'value' => "false"
         ]);
-        $this->addConst($cFile, [
+        $this->addConst($resource, [
             'name' => 'MAX_BOX_MESSAGES',
             'summary' => 'The maximum number of message boxes to show in one page.',
             'description' => "A message box is a box which will be shown in a web page that 
@@ -286,7 +300,7 @@ class ConfigController {
             'type' => 'int',
             'value' => "15"
         ]);
-        $this->addConst($cFile, [
+        $this->addConst($resource, [
             'name' => 'CLI_HTTP_HOST',
             'summary' => 'Host name to use in case the system is executed through CLI.',
             'description' => "When the application is running throgh CLI, there is no actual 
@@ -297,7 +311,7 @@ class ConfigController {
             'type' => 'string',
             'value' => "'example.com'"
         ]);
-        $this->addConst($cFile, [
+        $this->addConst($resource, [
             'name' => 'DS',
             'summary' => 'Directory separator.',
             'description' => "This one is is used as a shorthand instead of using PHP 
@@ -307,21 +321,21 @@ class ConfigController {
             'value' => "DIRECTORY_SEPARATOR"
         ]);
         
-        $this->a($cFile, "        if (!defined('THEMES_PATH')){");
-        $this->a($cFile, "            \$themesDirName = 'themes';");
-        $this->a($cFile, "            \$themesPath = substr(__DIR__, 0, strlen(__DIR__) - strlen('/app/ini')).DIRECTORY_SEPARATOR.\$themesDirName;");
-        $this->a($cFile, '            /**');
-        $this->a($cFile, '             * This constant represents the directory at which themes exist.');
-        $this->a($cFile, '             * ');
-        $this->a($cFile, '             * @var string');
-        $this->a($cFile, '             * ');
-        $this->a($cFile, '             * @since 1.0');
-        $this->a($cFile, '             * ');
-        $this->a($cFile, '             */');
-        $this->a($cFile, "            define('THEMES_PATH', \$themesPath);");
-        $this->a($cFile, '        }');
+        $this->a($resource, "        if (!defined('THEMES_PATH')){");
+        $this->a($resource, "            \$themesDirName = 'themes';");
+        $this->a($resource, "            \$themesPath = substr(__DIR__, 0, strlen(__DIR__) - strlen('/app/ini')).DIRECTORY_SEPARATOR.\$themesDirName;");
+        $this->a($resource, '            /**');
+        $this->a($resource, '             * This constant represents the directory at which themes exist.');
+        $this->a($resource, '             * ');
+        $this->a($resource, '             * @var string');
+        $this->a($resource, '             * ');
+        $this->a($resource, '             * @since 1.0');
+        $this->a($resource, '             * ');
+        $this->a($resource, '             */');
+        $this->a($resource, "            define('THEMES_PATH', \$themesPath);");
+        $this->a($resource, '        }');
         
-        $this->addConst($cFile, [
+        $this->addConst($resource, [
             'name' => 'USE_HTTP',
             'summary' => 'Sets the framework to use \'http://\' or \'https://\' for base URIs.',
             'description' => "The default behaviour of the framework is to use 'https://'. But 
@@ -332,10 +346,10 @@ class ConfigController {
             'type' => 'boolean',
             'value' => "false"
         ]);
-        $this->a($cFile, "    }");
-        $this->a($cFile, "}");
-        $cFile->write(true, true);
-        require_once $cFile->getAbsolutePath();
+        $this->a($resource, "    }");
+        $this->a($resource, "}");
+        fclose($resource);
+        require_once $path;
     }
     /**
      * 
@@ -1481,7 +1495,11 @@ class ConfigController {
         $cFile->write(false, true);
         require_once ROOT_DIR.DS.'app'.DS.'AppConfig.php';
     }
-    private function a(File $file, $str) {
-        $file->append($str.self::NL);
+    private function a($file, $str) {
+        if (is_resource($file)) {
+            fwrite($file, $str.self::NL);
+        } else {
+            $file->append($str.self::NL);
+        }
     }
 }

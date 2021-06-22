@@ -458,9 +458,12 @@ class AutoLoader {
     private function _addSrachDirectoryHelper2($xDir, $fullPath, $dirsStack, $appendRoot) {
         $subDirs = scandir($fullPath);
 
-        foreach ($subDirs as $subDir) {
-            if ($subDir != '.' && $subDir != '..') {
-                $dirsStack[] = $xDir.DIRECTORY_SEPARATOR.$subDir;
+        if (gettype($subDirs) == 'array') {
+            foreach ($subDirs as $subDir) {
+                
+                if ($subDir != '.' && $subDir != '..') {
+                    $dirsStack[] = $xDir.DIRECTORY_SEPARATOR.$subDir;
+                }
             }
         }
         $this->searchFolders[$xDir] = $appendRoot;
@@ -625,7 +628,10 @@ class AutoLoader {
             if (!file_exists($autoloadCachePath) && is_writable($autoloadCachePath)) {
                 mkdir($autoloadCachePath, '0777', true);
                 $h = fopen($autoloadCache, 'w');
-                fclose($h);
+                
+                if (is_resource($h)) {
+                    fclose($h);
+                }
             }
         }
     }

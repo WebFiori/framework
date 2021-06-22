@@ -2,9 +2,9 @@ name: Build PHP 7,8
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, dev ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, dev ]
 
 jobs:
   test:
@@ -44,7 +44,7 @@ jobs:
         run: composer install --prefer-dist --no-interaction --no-dev
         
       - name: Create DIr
-        run: mkdir -m777 -p /home/runner/work/framework/framework/app/sto
+        run: mkdir -m777 -p /home/runner/work/framework/framework/app/sto/sessions
         
       - name: Execute Tests
         run: phpunit -v

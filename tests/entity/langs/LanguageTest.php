@@ -191,6 +191,9 @@ class LanguageTest extends TestCase{
      */
     public function testSet00() {
         $lang = Language::loadTranslation('en');
+        $lang->createAndSet('general/status', [
+            'wait' => 'Please wait a moment...'
+        ]);
         $this->assertEquals('Please wait a moment...',$lang->get('general/status/wait'));
         $this->assertTrue($lang->set('general/status', 'wait', 'Wait a sec...'));
         $this->assertEquals('Wait a sec...',$lang->get('general/status/wait'));
@@ -198,16 +201,10 @@ class LanguageTest extends TestCase{
     /**
      * @test
      */
-    public function testSet01() {
-        $lang = Language::loadTranslation('en');
-        $this->assertFalse($lang->set('', '', ''));
-    }
-    /**
-     * @test
-     */
     public function testSet02() {
         $lang = Language::loadTranslation('en');
-        $this->assertFalse($lang->set('general/xcderf', 'a-var', 'mmm'));
+        $lang->set('general/xcderf', 'a-var', 'mmm');
+        $this->assertEquals('general/xcderf/a-var',$lang->get('general/xcderf/a-var'));
     }
     /**
      * @test
@@ -215,7 +212,7 @@ class LanguageTest extends TestCase{
     public function testSet03() {
         $lang = Language::loadTranslation('en');
         $this->assertEquals('array', gettype($lang->get('general')));
-        $this->assertTrue($lang->set('general', 'a-var', 'mmm'));
+        $lang->set('general', 'a-var', 'mmm');
         $this->assertEquals('mmm',$lang->get('general/a-var'));
     }
     /**
@@ -224,10 +221,12 @@ class LanguageTest extends TestCase{
      */
     public function testGet00() {
         $lang = Language::loadTranslation('ar');
+        $lang->createDirectory('general');
         $var = $lang->get('   this/does/not/exist/');
         $this->assertEquals('this/does/not/exist',$var);
         $var2 = $lang->get('general/not-exist');
         $this->assertEquals('general/not-exist',$var2);
+        
         $var3 = $lang->get('general');
         $this->assertEquals('array', gettype($var3));
     }

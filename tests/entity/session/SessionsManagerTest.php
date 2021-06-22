@@ -131,8 +131,10 @@ class SessionsManagerTest extends TestCase {
         SessionsManager::start('xyz');
         $this->assertEquals(Session::STATUS_RESUMED, SessionsManager::getActiveSession()->getStatus());
         $oldId = SessionsManager::getActiveSession()->getId();
-        SessionsManager::newId();
+        $newId = SessionsManager::newId();
+        $this->assertNotEquals($oldId, $newId);
         $this->assertNotEquals($oldId, SessionsManager::getActiveSession()->getId());
+        $this->assertEquals($newId, SessionsManager::getActiveSession()->getId());
     }
     /**
      * @test

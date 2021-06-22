@@ -30,9 +30,9 @@ class FileTest extends TestCase {
      * @test
      */
     public function test01() {
-        $file = new File('text-file.txt',ROOT_DIR.DIRECTORY_SEPARATOR.'tests'.DIRECTORY_SEPARATOR.'entity');
+        $file = new File('text-file.txt',ROOT_DIR.DS.'tests'.DS.'entity');
         $this->assertEquals('text-file.txt',$file->getName());
-        $this->assertEquals(ROOT_DIR.DIRECTORY_SEPARATOR.'tests'.DIRECTORY_SEPARATOR.'entity',$file->getPath());
+        $this->assertEquals(ROOT_DIR.DS.'tests'.DS.'entity',$file->getPath());
         $this->assertEquals(-1,$file->getID());
         $this->assertNull($file->getRawData());
         $this->assertEquals('text/plain',$file->getFileMIMEType());
@@ -203,7 +203,7 @@ class FileTest extends TestCase {
      * @test
      */
     public function viewTest01() {
-        $file = new File('text-file-2.txt',ROOT_DIR.DIRECTORY_SEPARATOR.'tests'.DIRECTORY_SEPARATOR.'entity');
+        $file = new File('text-file-2.txt',ROOT_DIR.DS.'tests'.DS.'entity');
         $file->view();
         $this->assertEquals('Testing the class \'File\'.', Response::getBody());
         $this->assertEquals([

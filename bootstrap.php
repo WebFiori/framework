@@ -2,8 +2,7 @@
 
 use webfiori\framework\AutoLoader;
 use webfiori\framework\WebFioriApp;
-use webfiori\framework\cli\CLI;
-use webfiori\ini\GlobalConstants;
+
 $DS = DIRECTORY_SEPARATOR;
 
 //the name of tests directory. Update as needed.
@@ -13,8 +12,8 @@ define('TESTS_DIRECTORY', 'tests');
 //WebFiori Framework might exist.
 //Add and remove directories as needed.
 $WebFioriFrameworkDirs = [
-    __DIR__.$DS.'src',
-    __DIR__.$DS.'vendor'.$DS.'webfiori'.$DS.'framework'
+    __DIR__.$DS.'webfiori',
+    __DIR__.$DS.'vendor'.$DS.'webfiori'.$DS.'webfiori'
 ];
 fprintf(STDOUT, "Bootstrap Path: '".__DIR__."'\n");
 fprintf(STDOUT,"Tests Directory: '".TESTS_DIRECTORY."'.\n");
@@ -32,6 +31,7 @@ if (explode($DS, __DIR__)[0] == 'home') {
 
         if (file_exists($file)) {
             require_once $file;
+            //require_once $DS.$dir.'framework'.$DS.'WebFioriApp.php';
             $isAutoloaderLoaded = true;
             break;
         }
@@ -46,6 +46,7 @@ if (explode($DS, __DIR__)[0] == 'home') {
 
         if (file_exists($file)) {
             require_once $file;
+            //require_once $dir.$DS.'framework'.$DS.'WebFioriApp.php';
             $isAutoloaderLoaded = true;
             break;
         }
@@ -62,24 +63,30 @@ fprintf(STDOUT,"Class 'Initializing autoload directories...\n");
 AutoLoader::get([
     'search-folders' => [
         'tests',
-        'src',
-        'vendor'
+        'webfiori',
+        'vendor',
+        'app'
     ],
     'define-root' => true,
     'root' => __DIR__,
     'on-load-failure' => 'do-nothing'
 ]);
+
 fprintf(STDOUT,'Autoloader Initialized.'."\n");
+fprintf(STDOUT,'Class Search Paths:'."\n");
+$dirs = AutoLoader::getFolders();
+foreach ($dirs as $dir){
+    fprintf(STDOUT, $dir."\n");
+}
+$themesPath = TESTS_DIRECTORY.DIRECTORY_SEPARATOR.'themes';
+fprintf(STDOUT, 'Setting themes path to "'.$themesPath.'" ...');
+define('THEMES_PATH', $themesPath);
 fprintf(STDOUT,"Initializing application...\n");
 WebFioriApp::start();
 fprintf(STDOUT,'Done.'."\n");
 fprintf(STDOUT,'Root Directory: \''.AutoLoader::get()->root().'\'.'."\n");
 
-//fprintf(STDOUT,'Class Search Paths:'."\n");
-//$dirs = AutoLoader::getFolders();
-//foreach ($dirs as $dir){
-//    fprintf(STDOUT, $dir."\n");
-//}
+
 fprintf(STDOUT, "Registering shutdown function...\n");
 //run sum code after tests completion.
 register_shutdown_function(function()

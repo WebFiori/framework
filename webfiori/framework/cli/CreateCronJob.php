@@ -21,7 +21,7 @@ class CreateCronJob {
      */
     public function __construct(CreateCommand $command) {
         $this->command = $command;
-        $classInfo = $command->getClassInfo('app\\jobs', 'app'.DS.'jobs');
+        $classInfo = $command->getClassInfo('app\\jobs');
         $jobName = $this->_getJobName();
 
         if ($command->confirm('Would you like to add arguments to the job?', false)) {

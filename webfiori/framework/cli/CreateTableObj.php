@@ -25,7 +25,7 @@ class CreateTableObj {
     public function __construct(CreateCommand $command) {
         $this->command = $command;
 
-        $classInfo = $this->_getCommand()->getClassInfo('app\\database','app'.DS.'database');
+        $classInfo = $this->_getCommand()->getClassInfo('app\\database');
 
 
         $tempTable = new MySQLTable();
@@ -61,7 +61,7 @@ class CreateTableObj {
         }
 
         if ($this->_getCommand()->confirm('Would you like to create an entity class that maps to the database table?', false)) {
-            $entityInfo = $this->_getCommand()->getClassInfo('app\\entity', 'app'.DS.'entity');
+            $entityInfo = $this->_getCommand()->getClassInfo('app\\entity');
             $entityInfo['implement-jsoni'] = $this->_getCommand()->confirm('Would you like from your entity class to implement the interface JsonI?', true);
             $classInfo['entity-info'] = $entityInfo;
         }

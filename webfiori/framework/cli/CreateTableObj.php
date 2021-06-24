@@ -4,6 +4,8 @@ namespace webfiori\framework\cli;
 use webfiori\database\mysql\MySQLColumn;
 use webfiori\database\mysql\MySQLTable;
 use webfiori\database\Table;
+use Error;
+use Exception;
 /**
  * A helper class for creating database tables classes.
  *
@@ -106,6 +108,9 @@ class CreateTableObj {
             } catch (Error $ex) {
                 $this->_getCommand()->error($ex->getMessage());
                 continue;
+            } catch (Exception $ex) {
+                $this->_getCommand()->error($ex->getMessage());
+                continue;
             }
 
             if ($refTable instanceof Table) {
@@ -137,6 +142,8 @@ class CreateTableObj {
                     $this->_getCommand()->success('Foreign key added.');
                     $fksNs[$fkName] = $refTableName;
                 } catch (Exception $ex) {
+                    $this->_getCommand()->error($ex->getMessage());
+                } catch (Error $ex) {
                     $this->_getCommand()->error($ex->getMessage());
                 }
             } else {
@@ -190,10 +197,8 @@ class CreateTableObj {
             }
             $this->_setDefaultValue($colObj);
             $colObj->setIsNull($this->_getCommand()->confirm('Can this column have null values?', false));
-        } else {
-            if ($colObj->getDatatype() == 'int') {
-                $colObj->setIsAutoInc($this->_getCommand()->confirm('Is this column auto increment?', false));
-            }
+        } else if ($colObj->getDatatype() == 'int') {
+            $colObj->setIsAutoInc($this->_getCommand()->confirm('Is this column auto increment?', false));
         }
     }
     /**
@@ -206,10 +211,8 @@ class CreateTableObj {
 
             if ($defaultVal == 'true') {
                 $colObj->setDefault(true);
-            } else {
-                if ($defaultVal == 'false') {
-                    $colObj->setDefault(false);
-                }
+            } else if ($defaultVal == 'false') {
+                $colObj->setDefault(false);
             }
         } else {
             $defaultVal = trim($this->_getCommand()->getInput('Enter default value (Hit "Enter" to skip):', ''));

@@ -270,9 +270,6 @@ class QueryClassWriter extends ClassWriter {
         $this->append("use webfiori\database\mysql\MySQLTable;");
         $this->addFksTables();
 
-        if ($this->entityMapper !== null) {
-            $this->append('use '.$this->getEntityNamespace().'\\'.$this->getEntityName().';');
-        }
         $this->append('');
         $this->append("/**\n"
                 ." * A class which represents the database table '".$this->tableObj->getName()."'.\n"
@@ -288,10 +285,14 @@ class QueryClassWriter extends ClassWriter {
     }
     private function addFksTables() {
         $fks = $this->tableObj->getForignKeys();
-
+        $addedRefs = [];
         foreach ($fks as $fkObj) {
-            $refTableNs = $refTableNs = get_class($fkObj->getSource());
-            $this->append('use '.$refTableNs.';');
+            $refTableNs = get_class($fkObj->getSource());
+            
+            if (!in_array($refTableNs, $addedRefs)) {
+                $this->append('use '.$refTableNs.';');
+                $addedRefs[] = $refTableNs;
+            }
         }
     }
 }

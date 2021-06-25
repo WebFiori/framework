@@ -85,7 +85,7 @@ use webfiori\ui\HTMLNode;
  * </pre> 
  * </p>
  * @author Ibrahim
- * @version 1.3.10
+ * @version 1.3.11
  */
 class Router {
     /**
@@ -1096,6 +1096,18 @@ class Router {
         }
     }
     /**
+     * Returns the number of routes at which the router has.
+     * 
+     * @return int Number of routes.
+     * 
+     * @since 1.3.11
+     */
+    public static function routesCount() {
+        $routesArr = self::get()->routes;
+        
+        return count($routesArr['variable']) + count($routesArr['static']);
+    }
+    /**
      * Route a given URI to its specified resource.
      * 
      * If the router has no routes, the router will send back a '418 - I'm A 
@@ -1115,8 +1127,8 @@ class Router {
      */
     private function _resolveUrl($uri, $loadResource = true) {
         $this->uriObj = null;
-
-        if (count($this->routes) != 0) {
+        
+        if (self::routesCount() != 0) {
             $routeUri = new RouterUri($uri, '');
 
             if ($routeUri->hasWWW() && defined('NO_WWW') && NO_WWW === true) {

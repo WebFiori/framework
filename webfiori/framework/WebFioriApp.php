@@ -165,7 +165,15 @@ class WebFioriApp {
             //mb_http_input($encoding);
             mb_regex_encoding($encoding);
         }
-        
+        if (!defined('APP_DIR_NAME')) {
+            /**
+            * The name of the directory at which the developer will have his own application 
+            * code.
+            * 
+            * @since 2.2.1
+            */
+            define('APP_DIR_NAME','app');
+        }
         if (!class_exists('app\ini\GlobalConstants')) {
             $confControllerPath = ROOT_DIR.DIRECTORY_SEPARATOR.
                     'vendor'.DIRECTORY_SEPARATOR.

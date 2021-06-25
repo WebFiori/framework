@@ -153,6 +153,21 @@ class ConfigController {
         require_once ROOT_DIR.DS.'app'.DS.'ini'.DS."$className.php";
     }
     /**
+     * Creates all directories at which the application needs to run.
+     */
+    private function createAppDirs() {
+        $DS = DIRECTORY_SEPARATOR;
+        mkdir(ROOT_DIR.$DS.'app');
+        mkdir(ROOT_DIR.$DS.'app'.$DS.'ini');
+        mkdir(ROOT_DIR.$DS.'app'.$DS.'ini'.$DS.'routes');
+        mkdir(ROOT_DIR.$DS.'app'.$DS.'pages');
+        mkdir(ROOT_DIR.$DS.'app'.$DS.'jobs');
+        mkdir(ROOT_DIR.$DS.'app'.$DS.'middleware');
+        mkdir(ROOT_DIR.$DS.'app'.$DS.'langs');
+        mkdir(ROOT_DIR.$DS.'public');
+        mkdir(ROOT_DIR.$DS.'themes');
+    }
+    /**
      * Creates the class 'GlobalConstants'.
      * 
      * By default, the class will be created inside the folder 'app/ini'.
@@ -161,8 +176,9 @@ class ConfigController {
      * was unable to create the class.
      */
     public function createConstClass() {
+        $this->createAppDirs();
         //The class GlobalConstants must exist before autoloader.
-        //For this reason, use the 'resource' instead of the class 'File'.
+        //For this reason, use the 'resource' instead of the class 'File'. 
         $path = ROOT_DIR.DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR.'ini'.DIRECTORY_SEPARATOR."GlobalConstants.php";
         $resource = fopen($path, 'w');
         if (!is_resource($resource)) {

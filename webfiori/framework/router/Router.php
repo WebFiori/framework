@@ -1150,22 +1150,38 @@ class Router {
             }
         } else {
             if ($loadResource === true) {
-                Response::setCode(418);
-                Response::write(''
-            .'<!DOCTYPE html>'
-            .'<html>'
-            .'<head>'
-            .'<title>I\'m a teapot</title>'
-            .'</head>'
-            .'<body>'
-            .'<h1>418 - I\'m a teabot</h1>'
-            .'<hr>'
-            .'<p>'
-            .'Acctually, I\'m an empty teapot since I don\'t have routes yet.'
-            .'</p>'
-            .'</body>'
-            .'</html>');
-                Response::send();
+                $page = new WebPage();
+                $page->getDocument()->getDocumentRoot()->setStyle([
+                    'background-color' => '#e0f2b4'
+                ]);
+                $page->setTitle('Welcome to WebFiori');
+                $div = $page->insert('div');
+                $div->addChild('img', [
+                    'src' => 'https://webfiori.com/assets/images/WFLogo512.png',
+                    'style' => 'width:250px;height:250px;border-radius:250px;background-color:black'
+                ]);
+                $div->setStyle([
+                    'text-align' => 'center'
+                ]);
+                $div->addChild('h2')->text('Welcome to WebFiori v'.WF_VERSION);
+                $div->addChild('p', [
+                    'style' => "font-size: 16pt;"
+                    . "font-weight: bold;"
+                    . "background-color: cadetblue;"
+                    . "margin: 0;"
+                    . "border-radius: 25px;"
+                    . "height: 50px;"
+                ])->text('You can start by building your application at');
+                $div->addChild('p', [
+                    'style' => "background-color: #046525;"
+                    . "color: white;"
+                    . "font-weight: bold;"
+                    . "border-radius: 25px;"
+                    . "height: 50px;font-size: 18pt;"
+                    . "text-align: center;"
+                    . "padding: 0px;margin: 0px;"
+                ])->text(ROOT_DIR.DS.APP_DIR_NAME);
+                $page->render();
             }
         }
     }

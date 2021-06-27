@@ -24,7 +24,6 @@
  */
 namespace webfiori\framework;
 
-use app\AppConfig;
 use webfiori\database\ConnectionInfo;
 use webfiori\framework\exceptions\SMTPException;
 use webfiori\framework\mail\SMTPAccount;
@@ -116,7 +115,7 @@ class ConfigController {
         ]);
     }
     public function createAppConfigFile() {
-        if (!class_exists('app\AppConfig')) {
+        if (!class_exists(APP_DIR_NAME.'\AppConfig')) {
             $this->writeAppConfig([]);
         }
     }
@@ -453,8 +452,9 @@ class ConfigController {
      * @since 1.0
      */
     public function getAdminTheme() {
-        if (class_exists('app\\AppConfig')) {
-            $c = new AppConfig();
+        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
+            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
+            $c = new $constructor();
 
             return $c->getAdminThemeName();
         }
@@ -469,8 +469,9 @@ class ConfigController {
      * @since 1.0
      */
     public function getBase() {
-        if (class_exists('app\\AppConfig')) {
-            $c = new AppConfig();
+        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
+            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
+            $c = new $constructor();
 
             return $c->getBaseURL();
         }
@@ -486,8 +487,9 @@ class ConfigController {
      * @since 1.0
      */
     public function getBaseTheme() {
-        if (class_exists('app\\AppConfig')) {
-            $c = new AppConfig();
+        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
+            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
+            $c = new $constructor();
 
             return $c->getBaseThemeName();
         }
@@ -503,8 +505,9 @@ class ConfigController {
      * @since 1.0
      */
     public function getDatabaseConnections() {
-        if (class_exists('app\\AppConfig')) {
-            $c = new AppConfig();
+        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
+            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
+            $c = new $constructor();
 
             return $c->getDBConnections();
         }
@@ -521,8 +524,9 @@ class ConfigController {
      * @since 1.0
      */
     public function getDescriptions() {
-        if (class_exists('app\\AppConfig')) {
-            $c = new AppConfig();
+        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
+            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
+            $c = new $constructor();
 
             return $c->getDescriptions();
         }
@@ -537,8 +541,9 @@ class ConfigController {
      * @since 1.0
      */
     public function getHomePage() {
-        if (class_exists('app\\AppConfig')) {
-            $c = new AppConfig();
+        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
+            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
+            $c = new $constructor();
 
             return $c->getHomePage();
         }
@@ -553,8 +558,9 @@ class ConfigController {
      * @since 1.0
      */
     public function getPrimaryLang() {
-        if (class_exists('app\\AppConfig')) {
-            $c = new AppConfig();
+        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
+            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
+            $c = new $constructor();
 
             return $c->getPrimaryLanguage();
         }
@@ -612,8 +618,9 @@ class ConfigController {
      * @since 1.0
      */
     public function getSMTPAccounts() {
-        if (class_exists('app\\AppConfig')) {
-            $c = new AppConfig();
+        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
+            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
+            $c = new $constructor();
 
             return $c->getAccounts();
         }
@@ -673,8 +680,9 @@ class ConfigController {
      * @since 1.0
      */
     public function getTitles() {
-        if (class_exists('app\\AppConfig')) {
-            $c = new AppConfig();
+        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
+            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
+            $c = new $constructor();
 
             return $c->getWebsiteNames();
         }
@@ -690,8 +698,9 @@ class ConfigController {
      * @since 1.0
      */
     public function getTitleSep() {
-        if (class_exists('app\\AppConfig')) {
-            $c = new AppConfig();
+        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
+            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
+            $c = new $constructor();
 
             return $c->getTitleSep();
         }
@@ -708,8 +717,9 @@ class ConfigController {
      * @since 1.0
      */
     public function getWebsiteNames() {
-        if (class_exists('app\\AppConfig')) {
-            $c = new AppConfig();
+        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
+            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
+            $c = new $constructor();
 
             return $c->getWebsiteNames();
         }
@@ -855,14 +865,15 @@ class ConfigController {
      * @since 1.5
      */
     public function writeAppConfig($appConfigArr) {
-        $cFile = new File('AppConfig.php', ROOT_DIR.DS.'app');
+        $cFile = new File('AppConfig.php', ROOT_DIR.DS.APP_DIR_NAME);
         $cFile->remove();
         $this->a($cFile, "<?php");
         $this->a($cFile, "");
-        $this->a($cFile, "namespace app;");
+        $this->a($cFile, "namespace ".APP_DIR_NAME.";");
         $this->a($cFile, "");
         $this->a($cFile, "use webfiori\\database\\ConnectionInfo;");
         $this->a($cFile, "use webfiori\\framework\\mail\\SMTPAccount;");
+        $this->a($cFile, "use webfiori\\framework\\Config;");
         $this->a($cFile, "use webfiori\\http\\Uri;");
         $this->a($cFile, "/**");
         $this->a($cFile, " * Configuration class of the application");
@@ -873,7 +884,7 @@ class ConfigController {
         $this->a($cFile, " *");
         $this->a($cFile, " * @since 2.1.0");
         $this->a($cFile, " */");
-        $this->a($cFile, "class AppConfig {");
+        $this->a($cFile, "class AppConfig extends Config{");
 
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * The name of admin control pages Theme.");
@@ -1509,7 +1520,7 @@ class ConfigController {
 
         $this->a($cFile, "}");
         $cFile->write(false, true);
-        require_once ROOT_DIR.DS.'app'.DS.'AppConfig.php';
+        require_once ROOT_DIR.DS.APP_DIR_NAME.DS.'AppConfig.php';
     }
     private function a($file, $str) {
         if (is_resource($file)) {

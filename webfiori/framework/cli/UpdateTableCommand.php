@@ -46,6 +46,9 @@ class UpdateTableCommand extends CLICommand {
             } catch (Error $ex) {
                 $this->error($ex->getMessage());
                 continue;
+            } catch (Exception $ex) {
+                $this->error($ex->getMessage());
+                continue;
             }
 
             if ($refTable instanceof Table) {

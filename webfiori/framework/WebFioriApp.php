@@ -24,7 +24,7 @@
  */
 namespace webfiori\framework;
 
-use app\AppConfig;
+use webfiori\framework\Config;
 use webfiori\framework\cli\CLI;
 use webfiori\framework\exceptions\InitializationException;
 use webfiori\framework\middleware\MiddlewareManager;
@@ -35,15 +35,6 @@ use webfiori\framework\ui\ErrorBox;
 use webfiori\framework\ui\ServerErrView;
 use webfiori\http\Request;
 use webfiori\http\Response;
-use app\ini\GlobalConstants;
-use app\ini\InitAutoLoad;
-use app\ini\InitCron;
-use app\ini\InitMiddleware;
-use app\ini\InitPrivileges;
-use app\ini\routes\APIRoutes;
-use app\ini\routes\ClosureRoutes;
-use app\ini\routes\ViewRoutes;
-use app\ini\routes\OtherRoutes;
 use webfiori\json\Json;
 /**
  * The time at which the framework was booted in microseconds as a float.
@@ -174,7 +165,7 @@ class WebFioriApp {
             */
             define('APP_DIR_NAME','app');
         }
-        if (!class_exists('app\ini\GlobalConstants')) {
+        if (!class_exists(APP_DIR_NAME.'\ini\GlobalConstants')) {
             $confControllerPath = ROOT_DIR.DIRECTORY_SEPARATOR.
                     'vendor'.DIRECTORY_SEPARATOR.
                     'webfiori'.DIRECTORY_SEPARATOR.
@@ -191,16 +182,16 @@ class WebFioriApp {
             }
             require_once $confControllerPath;
             ConfigController::get()->createConstClass();
-            $path = ROOT_DIR.DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR.'ini'.DIRECTORY_SEPARATOR.'GlobalConstants.php';
+            $path = ROOT_DIR.DIRECTORY_SEPARATOR.APP_DIR_NAME.DIRECTORY_SEPARATOR.'ini'.DIRECTORY_SEPARATOR.'GlobalConstants.php';
             
             if (file_exists($path)) {
-                require_once ROOT_DIR.DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR.'ini'.DIRECTORY_SEPARATOR.'GlobalConstants.php';
+                require_once ROOT_DIR.DIRECTORY_SEPARATOR.APP_DIR_NAME.DIRECTORY_SEPARATOR.'ini'.DIRECTORY_SEPARATOR.'GlobalConstants.php';
                 
             } else {
                 //Fall back. Usually in testing environment
             }
         }
-        GlobalConstants::defineConstants();
+        call_user_func(APP_DIR_NAME.'\ini\GlobalConstants::defineConstants');
 
         /**
          * Set memory limit.
@@ -220,10 +211,10 @@ class WebFioriApp {
         }
         self::$AU = AutoLoader::get();
         
-        if (!class_exists('app\ini\InitAutoLoad')) {
+        if (!class_exists(APP_DIR_NAME.'\ini\InitAutoLoad')) {
             ConfigController::get()->createIniClass('InitAutoLoad', 'Add user-defined directories to the set of directories at which the framework will search for classes.');
         }
-        InitAutoLoad::init();
+        call_user_func(APP_DIR_NAME.'\ini\InitAutoLoad::init');
         
         //Initialize CLI
         CLI::init();
@@ -233,29 +224,30 @@ class WebFioriApp {
         $this->_setHandlers();
         $this->_checkStandardLibs();
 
-        if (!class_exists('app\ini\InitPrivileges')) {
+        if (!class_exists(APP_DIR_NAME.'\ini\InitPrivileges')) {
             ConfigController::get()->createIniClass('InitPrivileges', 'Initialize user groups and privileges.');
         }
         //Initialize privileges.
         //This step must be done before initializing anything.
-        InitPrivileges::init();
+        call_user_func(APP_DIR_NAME.'\ini\InitPrivileges::init');
         
         self::$SF = ConfigController::get();
 
-        if (!class_exists('app\AppConfig')) {
+        if (!class_exists(APP_DIR_NAME.'\AppConfig')) {
             self::$SF->createAppConfigFile();
         }
-
-        $this->appConfig = new AppConfig();
+        
+        $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
+        $this->appConfig = new $constructor();
 
         WebFioriApp::autoRegister('middleware', function($inst)
         {
             MiddlewareManager::register($inst);
         });
-        if (!class_exists('app\ini\InitMiddleware')) {
+        if (!class_exists(APP_DIR_NAME.'\ini\InitMiddleware')) {
             ConfigController::get()->createIniClass('InitMiddleware', 'Register middleware which are created outside the folder \'app/middleware\'.');
         }
-        InitMiddleware::init();
+        call_user_func(APP_DIR_NAME.'\ini\InitMiddleware::init');
         $this->_initRoutes();
         $this->_initCRON();
         Response::beforeSend(function ()
@@ -292,7 +284,8 @@ class WebFioriApp {
     /**
      * Register CLI commands or cron jobs.
      * @param string $folder The name of the folder that contains the jobs or 
-     * commands. It must be a folder inside 'app' folder.
+     * commands. It must be a folder inside 'app' folder or the folder which is defined 
+     * by the constant 'APP_DIR_NAME'.
      * 
      * @param Closure $regCallback A callback which is used to register the 
      * classes of the folder.
@@ -300,16 +293,16 @@ class WebFioriApp {
      * @since 1.3.6
      */
     public static function autoRegister($folder, $regCallback) {
-        $jobsDir = ROOT_DIR.DS.'app'.DS.$folder;
+        $dir = ROOT_DIR.DS.APP_DIR_NAME.DS.$folder;
 
-        if (Util::isDirectory($jobsDir)) {
-            $dirContent = array_diff(scandir($jobsDir), ['.','..']);
+        if (Util::isDirectory($dir)) {
+            $dirContent = array_diff(scandir($dir), ['.','..']);
 
             foreach ($dirContent as $phpFile) {
                 $expl = explode('.', $phpFile);
 
                 if (count($expl) == 2 && $expl[1] == 'php') {
-                    $instanceNs = require_once $jobsDir.DS.$phpFile;
+                    $instanceNs = require_once $dir.DS.$phpFile;
 
                     if (strlen($instanceNs) == 0 || $instanceNs == 1) {
                         $instanceNs = '';
@@ -325,14 +318,15 @@ class WebFioriApp {
     }
     /**
      * 
-     * @return AppConfig
+     * @return Config
      */
     public static function getAppConfig() {
         if (self::$LC !== null) {
             return self::$LC->appConfig;
         }
-
-        return new AppConfig();
+        $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
+        
+        return new $constructor();
     }
     /**
      * Returns a reference to an instance of 'AutoLoader'.
@@ -371,11 +365,11 @@ class WebFioriApp {
      * Sets the configuration object that will be used to configure some of the 
      * framework settings.
      * 
-     * @param AppConfig $conf
+     * @param Config $conf
      * 
      * @since 2.1.0
      */
-    public static function setConfig(AppConfig $conf) {
+    public static function setConfig(Config $conf) {
         if (self::$LC) {
             self::$LC->appConfig = $conf;
         }
@@ -432,7 +426,7 @@ class WebFioriApp {
         $uriObj = new RouterUri(Util::getRequestedURL(), '');
         $pathArr = $uriObj->getPathArray();
         
-        if (!class_exists('app\ini\InitCron')) {
+        if (!class_exists(APP_DIR_NAME.'\ini\InitCron')) {
             ConfigController::get()->createIniClass('InitCron', 'A method that can be used to initialize cron jobs.');
         }
             
@@ -441,26 +435,26 @@ class WebFioriApp {
                 cron\Cron::initRoutes();
             }
             //initialize cron jobs only if in CLI or cron is enabled throgh HTTP.
-            InitCron::init();
+            call_user_func(APP_DIR_NAME.'\ini\InitCron::init');
         }
     }
     private function _initRoutes() {
-        if (!class_exists('app\ini\routes\APIRoutes')) {
+        if (!class_exists(APP_DIR_NAME.'\ini\routes\APIRoutes')) {
             ConfigController::get()->createRoutesClass('APIRoutes');
         }
-        if (!class_exists('app\ini\routes\ViewRoutes')) {
+        if (!class_exists(APP_DIR_NAME.'\ini\routes\ViewRoutes')) {
             ConfigController::get()->createRoutesClass('ViewRoutes');
         }
-        if (!class_exists('app\ini\routes\ClosureRoutes')) {
+        if (!class_exists(APP_DIR_NAME.'\ini\routes\ClosureRoutes')) {
             ConfigController::get()->createRoutesClass('ClosureRoutes');
         }
-        if (!class_exists('app\ini\routes\OtherRoutes')) {
+        if (!class_exists(APP_DIR_NAME.'\ini\routes\OtherRoutes')) {
             ConfigController::get()->createRoutesClass('OtherRoutes');
         }
-        OtherRoutes::create();
-        ClosureRoutes::create();
-        ViewRoutes::create();
-        APIRoutes::create();
+        call_user_func(APP_DIR_NAME.'\ini\routes\OtherRoutes::create');
+        call_user_func(APP_DIR_NAME.'\ini\routes\ClosureRoutes::create');
+        call_user_func(APP_DIR_NAME.'\ini\routes\ViewRoutes::create');
+        call_user_func(APP_DIR_NAME.'\ini\routes\APIRoutes::create');
     }
     private function _initThemesPath() {
         if (!defined('THEMES_PATH')) {

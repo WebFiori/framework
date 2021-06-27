@@ -229,6 +229,9 @@ class Router {
      * <li><b>methods</b>: An optional array that can have a set of 
      * allowed request methods for fetching the resource. This can be 
      * also a single string such as 'GET' or 'POST'.</li>
+     * <li><b>action</b>: If the class that the route is pointing to 
+     * represents a controller, this index can have the value of the 
+     * action that will be performed (the name of the class method).</li>
      * </ul>
      * 
      * @return boolean The method will return true if the route was created. 

@@ -170,7 +170,7 @@ class ConfigController {
         $this->_mkdir(ROOT_DIR.$DS.'themes');
     }
     private function _mkdir($dir) {
-        if (!is_file($dir) && !is_dir($dir)) {
+        if (!is_dir($dir)) {
             mkdir($dir);
         }
     }
@@ -346,7 +346,7 @@ class ConfigController {
         
         $this->a($resource, "        if (!defined('THEMES_PATH')){");
         $this->a($resource, "            \$themesDirName = 'themes';");
-        $this->a($resource, "            \$themesPath = substr(__DIR__, 0, strlen(__DIR__) - strlen('/app/ini')).DIRECTORY_SEPARATOR.\$themesDirName;");
+        $this->a($resource, "            \$themesPath = substr(__DIR__, 0, strlen(__DIR__) - strlen(APP_DIR_NAME.'/ini')).DIRECTORY_SEPARATOR.\$themesDirName;");
         $this->a($resource, '            /**');
         $this->a($resource, '             * This constant represents the directory at which themes exist.');
         $this->a($resource, '             * ');

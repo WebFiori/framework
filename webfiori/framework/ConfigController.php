@@ -1411,7 +1411,7 @@ class ConfigController {
         foreach ($titlesArr as $langCode => $title) {
             $title = str_replace("'", "\'", $title);
             $this->a($cFile, "            '$langCode' => '$title',");
-            if (!class_exists('app\\langs\\Language'.$langCode)) {
+            if (!class_exists(APP_DIR_NAME.'\\langs\\Language'.$langCode)) {
                 
                 //This require a fix in the future
                 $dir = $langCode == 'AR' ? 'rtl' : 'ltr';
@@ -1506,7 +1506,8 @@ class ConfigController {
             if ($smtpAcc instanceof SMTPAccount) {
                 $this->a($cFile, "            '".$smtpAcc->getAccountName()."' => new SMTPAccount([");
                 $this->a($cFile, "                'port' => ".$smtpAcc->getPort().",");
-                $this->a($cFile, "                'user' => ".$smtpAcc->getUsername()."',");
+                $this->a($cFile, "                'server-address' => '".$smtpAcc->getServerAddress()."',");
+                $this->a($cFile, "                'user' => '".$smtpAcc->getUsername()."',");
                 $this->a($cFile, "                'pass' => '".$smtpAcc->getPassword()."',");
                 $this->a($cFile, "                'sender-name' => '".str_replace("'", "\'", $smtpAcc->getSenderName())."',");
                 $this->a($cFile, "                'sender-address' => '".$smtpAcc->getAddress()."',");

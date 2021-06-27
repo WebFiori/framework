@@ -76,13 +76,13 @@ class CreateCommand extends CLICommand {
             $tableClassNameValidity = true;
         } while (!$tableClassNameValidity);
         $this->println('We need from you to give us entity class information.');
-        $classInfo = $this->getClassInfo('app\\entity');
+        $classInfo = $this->getClassInfo(APP_DIR_NAME.'\\entity');
         $implJsonI = $this->confirm('Would you like from your class to implement the interface JsonI?', true);
         $this->println('Generating your entity...');
 
         if (strlen($classInfo['namespace']) == 0) {
-            $this->warning('The entity class will be added to the namespace "app\database".');
-            $classInfo['namespace'] = 'app\\database';
+            $this->warning('The entity class will be added to the namespace "'.APP_DIR_NAME.'\database".');
+            $classInfo['namespace'] = APP_DIR_NAME.'\\database';
         }
         $mapper = $tableObj->getEntityMapper();
         $mapper->setPath($classInfo['path']);

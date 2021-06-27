@@ -25,7 +25,7 @@ class CreateTableObj {
     public function __construct(CreateCommand $command) {
         $this->command = $command;
 
-        $classInfo = $this->_getCommand()->getClassInfo('app\\database');
+        $classInfo = $this->_getCommand()->getClassInfo(APP_DIR_NAME.'\\database');
 
 
         $tempTable = new MySQLTable();
@@ -61,18 +61,18 @@ class CreateTableObj {
         }
 
         if ($this->_getCommand()->confirm('Would you like to create an entity class that maps to the database table?', false)) {
-            $entityInfo = $this->_getCommand()->getClassInfo('app\\entity');
+            $entityInfo = $this->_getCommand()->getClassInfo(APP_DIR_NAME.'\\entity');
             $entityInfo['implement-jsoni'] = $this->_getCommand()->confirm('Would you like from your entity class to implement the interface JsonI?', true);
             $classInfo['entity-info'] = $entityInfo;
         }
 
         if (strlen($classInfo['namespace']) == 0) {
-            $classInfo['namespace'] = 'app\database';
+            $classInfo['namespace'] = APP_DIR_NAME.'\database';
             $this->_getCommand()->warning('The table class will be added to the namespace "'.$classInfo['namespace'].'" since no namespace was provided.');
         }
 
         if (isset($classInfo['entity-info']) && strlen($classInfo['entity-info']['namespace']) == 0) {
-            $classInfo['entity-info']['namespace'] = 'app\database';
+            $classInfo['entity-info']['namespace'] = APP_DIR_NAME.'\database';
             $this->_getCommand()->warning('The entity class will be added to the namespace "'.$classInfo['entity-info']['namespace'].'" since no namespace was provided.');
         }
         $writer = new QueryClassWriter($tempTable, $classInfo);

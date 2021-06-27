@@ -21,7 +21,7 @@ class CreateMiddleware {
      */
     public function __construct(CreateCommand $command) {
         $this->command = $command;
-        $classInfo = $command->getClassInfo('app\\middleware');
+        $classInfo = $command->getClassInfo(APP_DIR_NAME.'\\middleware');
         $middlewareName = $this->_getMiddlewareName();
         $priority = $this->_getMiddlewareProprity();
 

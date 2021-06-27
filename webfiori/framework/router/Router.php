@@ -827,7 +827,8 @@ class Router {
             return false;
         }
         $routeUri = new RouterUri($this->getBase().$path, $routeTo,$caseSensitive, $closureParams);
-
+        $routeUri->setAction($options['action']);
+        
         if (!$this->_hasRoute($routeUri)) {
             if ($asApi === true) {
                 $routeUri->setType(self::API_ROUTE);
@@ -909,7 +910,15 @@ class Router {
         $path = isset($options['path']) ? $this->_fixUriPath($options['path']) : '';
         $languages = isset($options['languages']) && gettype($options['languages']) == 'array' ? $options['languages'] : [];
         $varValues = isset($options['vars-values']) && gettype($options['languages']) == 'array' ? $options['vars-values'] : [];
-
+        
+        $action = '';
+        
+        if(isset($options['action'])) {
+            $trimmed = trim($options['action']);
+            if (strlen($trimmed) > 0) {
+                $action = $trimmed;
+            }
+        }
         return [
             'case-sensitive' => $caseSensitive,
             'type' => $routeType,
@@ -921,7 +930,8 @@ class Router {
             'languages' => $languages,
             'vars-values' => $varValues,
             'middleware' => $mdArr,
-            'request-methods' => $this->_getRequestMethods($options)
+            'request-methods' => $this->_getRequestMethods($options),
+            'action' => $action
         ];
     }
     
@@ -1104,6 +1114,9 @@ class Router {
                         $instance->process();
                     } else if ($instance instanceof WebPage) {
                         $instance->render();
+                    } else if ($route->getAction() !== null) {
+                        $toCall = $route->getAction();
+                        $instance->$toCall();
                     }
                 }
             }
@@ -1251,6 +1264,9 @@ class Router {
                         $class->process();
                     } else if ($class instanceof WebPage) {
                         $class->render();
+                    } else if ($route->getAction() !== null) {
+                        $toCall = $route->getAction();
+                        $class->$toCall();
                     }
                 } else {
                     $routeType = $route->getType();

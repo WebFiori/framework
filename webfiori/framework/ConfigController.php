@@ -156,15 +156,23 @@ class ConfigController {
      */
     private function createAppDirs() {
         $DS = DIRECTORY_SEPARATOR;
-        mkdir(ROOT_DIR.$DS.APP_DIR_NAME);
-        mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'ini');
-        mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'ini'.$DS.'routes');
-        mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'pages');
-        mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'jobs');
-        mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'middleware');
-        mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'langs');
-        mkdir(ROOT_DIR.$DS.'public');
-        mkdir(ROOT_DIR.$DS.'themes');
+        $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME);
+        $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'ini');
+        $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'ini'.$DS.'routes');
+        $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'pages');
+        $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'jobs');
+        $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'middleware');
+        $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'langs');
+        $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'sto');
+        $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'sto'.$DS.'uploads');
+        $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'sto'.$DS.'logs');
+        $this->_mkdir(ROOT_DIR.$DS.'public');
+        $this->_mkdir(ROOT_DIR.$DS.'themes');
+    }
+    private function _mkdir($dir) {
+        if (!is_file($dir) && !is_dir($dir)) {
+            mkdir($dir);
+        }
     }
     /**
      * Creates the class 'GlobalConstants'.
@@ -884,7 +892,7 @@ class ConfigController {
         $this->a($cFile, " *");
         $this->a($cFile, " * @since 2.1.0");
         $this->a($cFile, " */");
-        $this->a($cFile, "class AppConfig extends Config{");
+        $this->a($cFile, "class AppConfig implements Config {");
 
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * The name of admin control pages Theme.");

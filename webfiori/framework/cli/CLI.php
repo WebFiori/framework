@@ -29,7 +29,6 @@ use webfiori\framework\ConfigController;
 use webfiori\framework\cron\Cron;
 use webfiori\framework\Util;
 use webfiori\framework\WebFioriApp;
-use app\ini\InitCliCommands;
 /**
  * 
  * A class which adds basic support for running the framework through 
@@ -86,7 +85,7 @@ class CLI {
                 $_SERVER['HTTPS'] = 'yes';
             }
         }
-        if (!class_exists('app\ini\InitCliCommands')) {
+        if (!class_exists(APP_DIR_NAME.'\ini\InitCliCommands')) {
             ConfigController::get()->createIniClass('InitCliCommands', 'Register user defined CLI commands.');
         }
     }
@@ -259,7 +258,7 @@ class CLI {
         self::register(new UpdateTableCommand());
         self::_autoRegister();
         //Call this method to register any user-defined commands.
-        InitCliCommands::init();
+        call_user_func(APP_DIR_NAME.'\ini\InitCliCommands::init');
     }
     /**
      * Run the provided CLI command.

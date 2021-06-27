@@ -94,7 +94,7 @@ class Router {
      * 
      * @since 1.0
      */
-    const API_ROUTE = DS.'app'.DS.'apis';
+    const API_ROUTE = DS.APP_DIR_NAME.DS.'apis';
     /**
      * A constant that represents closure route. The value of the 
      * constant is 'func'.
@@ -114,7 +114,7 @@ class Router {
      * 
      * @since 1.0
      */
-    const VIEW_ROUTE = DS.'app'.DS.'pages';
+    const VIEW_ROUTE = DS.APP_DIR_NAME.DS.'pages';
     /**
      *
      * @var type 

@@ -243,6 +243,36 @@ class Router {
         return Router::get()->_addRoute($options);
     }
     /**
+     * Adds a redirect route.
+     * 
+     * @param string $path The path at which when the user visits will be redirected. 
+     * 
+     * @param string $to A path or a URL at which the user will be sent to.
+     * 
+     * @param int $code HTTP redirect code. Can have one of the following values:
+     * 301, 302, 303, 307 and 308. Default is 301 (Permanent redirect).
+     * 
+     * @since 1.3.11
+     */
+    public static function redirect($path, $to, $code = 301) {
+        Router::closure([
+            'path' => $path,
+            'route-to' => function ($to, $httpCode) {
+                $allowedCodes = [301, 302, 303, 307, 308];
+                
+                if (!in_array($httpCode, $allowedCodes)) {
+                    $httpCode = 301;
+                }
+                Response::addHeader('location', $to);
+                Response::setCode($httpCode);
+                Response::send();
+            },
+            'closure-params' => [
+                $to, $code
+            ]
+        ]);
+    }
+    /**
      * Adds new route to a web services set.
      * 
      * @param array $options An associative array that contains route 

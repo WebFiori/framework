@@ -225,7 +225,7 @@ class AutoLoader {
     ]) {
         $DS = DIRECTORY_SEPARATOR;
 
-        $appFolder = defined('APP_ROOT') ? APP_ROOT : 'app';
+        $appFolder = defined('APP_DIR_NAME') ? APP_DIR_NAME : 'app';
         if (self::$loader === null) {
             $frameworkSearchFoldres = [
                 '',

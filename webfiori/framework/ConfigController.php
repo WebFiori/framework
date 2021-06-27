@@ -133,11 +133,11 @@ class ConfigController {
      * @since 1.5.1
      */
     public function createIniClass($className, $comment) {
-        $cFile = new File("$className.php", ROOT_DIR.DS.'app'.DS.'ini');
+        $cFile = new File("$className.php", ROOT_DIR.DS.APP_DIR_NAME.DS.'ini');
         $cFile->remove();
         $this->a($cFile, "<?php");
         $this->a($cFile, "");
-        $this->a($cFile, "namespace app\\ini;");
+        $this->a($cFile, "namespace ".APP_DIR_NAME."\\ini;");
         $this->a($cFile, "");
         $this->a($cFile, "class $className {");
         $this->a($cFile, "    /**");
@@ -150,20 +150,20 @@ class ConfigController {
         $this->a($cFile, "    }");
         $this->a($cFile, "}");
         $cFile->write(true, true);
-        require_once ROOT_DIR.DS.'app'.DS.'ini'.DS."$className.php";
+        require_once ROOT_DIR.DS.APP_DIR_NAME.DS.'ini'.DS."$className.php";
     }
     /**
      * Creates all directories at which the application needs to run.
      */
     private function createAppDirs() {
         $DS = DIRECTORY_SEPARATOR;
-        mkdir(ROOT_DIR.$DS.'app');
-        mkdir(ROOT_DIR.$DS.'app'.$DS.'ini');
-        mkdir(ROOT_DIR.$DS.'app'.$DS.'ini'.$DS.'routes');
-        mkdir(ROOT_DIR.$DS.'app'.$DS.'pages');
-        mkdir(ROOT_DIR.$DS.'app'.$DS.'jobs');
-        mkdir(ROOT_DIR.$DS.'app'.$DS.'middleware');
-        mkdir(ROOT_DIR.$DS.'app'.$DS.'langs');
+        mkdir(ROOT_DIR.$DS.APP_DIR_NAME);
+        mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'ini');
+        mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'ini'.$DS.'routes');
+        mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'pages');
+        mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'jobs');
+        mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'middleware');
+        mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'langs');
         mkdir(ROOT_DIR.$DS.'public');
         mkdir(ROOT_DIR.$DS.'themes');
     }
@@ -179,14 +179,14 @@ class ConfigController {
         $this->createAppDirs();
         //The class GlobalConstants must exist before autoloader.
         //For this reason, use the 'resource' instead of the class 'File'. 
-        $path = ROOT_DIR.DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR.'ini'.DIRECTORY_SEPARATOR."GlobalConstants.php";
+        $path = ROOT_DIR.DIRECTORY_SEPARATOR.APP_DIR_NAME.DIRECTORY_SEPARATOR.'ini'.DIRECTORY_SEPARATOR."GlobalConstants.php";
         $resource = fopen($path, 'w');
         if (!is_resource($resource)) {
             throw new \Exception('Unable to create the file "'.$path.'"');
         }
         $this->a($resource, "<?php");
         $this->a($resource, "");
-        $this->a($resource, "namespace app\\ini;");
+        $this->a($resource, "namespace ".APP_DIR_NAME."\\ini;");
         $this->a($resource, "/**");
         $this->a($resource, "* A class which is used to initialize global constants.");
         $this->a($resource, "* ");
@@ -411,11 +411,11 @@ class ConfigController {
      * @since 1.5.1
      */
     public function createRoutesClass($className) {
-        $cFile = new File("$className.php", ROOT_DIR.DS.'app'.DS.'ini'.DS.'routes');
+        $cFile = new File("$className.php", ROOT_DIR.DS.APP_DIR_NAME.DS.'ini'.DS.'routes');
         $cFile->remove();
         $this->a($cFile, "<?php");
         $this->a($cFile, "");
-        $this->a($cFile, "namespace app\\ini\\routes;");
+        $this->a($cFile, "namespace ".APP_DIR_NAME."\\ini\\routes;");
         $this->a($cFile, "");
         $this->a($cFile, "class $className {");
         $this->a($cFile, "    /**");

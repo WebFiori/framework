@@ -536,6 +536,7 @@ class Cron {
      * @since 1.0.6
      */
     public static function run($pass = '',$jobName = null,$force = false, $command = null) {
+        self::_get()->command = $command;
         self::log('Running job(s) check...');
         $activeSession = SessionsManager::getActiveSession();
         $isSessionLogged = $activeSession !== null ? $activeSession->get('cron-login-status') : false;
@@ -785,7 +786,6 @@ class Cron {
     private static function _runJob(&$retVal, $job, $xForce, $command = null) {
         if ($job->isTime() || $xForce) {
             if ($command !== null) {
-                self::_get()->command = $command;
                 $job->setCommand($command);
 
                 foreach ($job->getExecArgsNames() as $attr) {
@@ -810,7 +810,6 @@ class Cron {
                 $retVal['failed'][] = $job->getJobName();
             }
         }
-        self::_get()->command = null;
         self::_get()->_setActiveJob(null);
     }
     /**

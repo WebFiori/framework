@@ -60,7 +60,6 @@ if ($isAutoloaderLoaded === false) {
     fprintf(STDOUT,"Class 'AutoLoader' successfully loaded.\n");
 }
 fprintf(STDOUT,"Initializing autoload directories...\n");
-var_dump(defined('APP_DIR_NAME'));
 AutoLoader::get([
     'search-folders' => [
         'tests',
@@ -72,7 +71,6 @@ AutoLoader::get([
     'root' => __DIR__,
     'on-load-failure' => 'do-nothing'
 ]);
-var_dump(defined('APP_DIR_NAME'));
 fprintf(STDOUT,'Autoloader Initialized.'."\n");
 fprintf(STDOUT,'Class Search Paths:'."\n");
 $dirs = AutoLoader::getFolders();

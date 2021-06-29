@@ -50,8 +50,8 @@ class LangClassWriter extends ClassWriter {
     public function __construct($langCode, $writingDir) {
         $classInfoArr = [
             'name' => 'Language'.$langCode,
-            'namespace' => "app\\langs",
-            'path' => ROOT_DIR.DS.'app'.DS.'langs'
+            'namespace' => APP_DIR_NAME."\\langs",
+            'path' => ROOT_DIR.DS.APP_DIR_NAME.DS.'langs'
         ];
         parent::__construct($classInfoArr);
 

@@ -47,7 +47,7 @@ class CreateWebService {
     public function __construct(CreateCommand $command) {
         $this->command = $command;
 
-        $classInfo = $this->_getCommand()->getClassInfo('app\\apis','app'.DS.'apis');
+        $classInfo = $this->_getCommand()->getClassInfo(APP_DIR_NAME.'\\apis');
 
         $serviceObj = new ServiceHolder();
 

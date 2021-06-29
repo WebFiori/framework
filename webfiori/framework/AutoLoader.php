@@ -224,8 +224,10 @@ class AutoLoader {
         'on-load-failure' => self::ON_FAIL_ACTIONS[1]
     ]) {
         $DS = DIRECTORY_SEPARATOR;
-
-        $appFolder = defined('APP_ROOT') ? APP_ROOT : 'app';
+        if (!defined('APP_DIR_NAME')) {
+            define('APP_DIR_NAME', 'app');
+        }
+        $appFolder = APP_DIR_NAME;
         if (self::$loader === null) {
             $frameworkSearchFoldres = [
                 '',
@@ -595,9 +597,9 @@ class AutoLoader {
      */
     private function _readCache() {
         if (defined('__PHPUNIT_PHAR__')) {
-            $autoloadCachePath = $this->getRoot().DIRECTORY_SEPARATOR.'src'.DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR.'sto';
+            $autoloadCachePath = $this->getRoot().DIRECTORY_SEPARATOR.'src'.DIRECTORY_SEPARATOR.APP_DIR_NAME.DIRECTORY_SEPARATOR.'sto';
         } else {
-            $autoloadCachePath = $this->getRoot().DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR.'sto';
+            $autoloadCachePath = $this->getRoot().DIRECTORY_SEPARATOR.APP_DIR_NAME.DIRECTORY_SEPARATOR.'sto';
         }
         $autoloadCache = $autoloadCachePath.DIRECTORY_SEPARATOR.self::CACHE_NAME;
         //For first run, the cache file might not exist.
@@ -643,7 +645,7 @@ class AutoLoader {
      * @since 1.1.6
      */
     private function _updateCache() {
-        $autoloadCache = $this->getRoot().DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR.'sto'.DIRECTORY_SEPARATOR.self::CACHE_NAME;
+        $autoloadCache = $this->getRoot().DIRECTORY_SEPARATOR.APP_DIR_NAME.DIRECTORY_SEPARATOR.'sto'.DIRECTORY_SEPARATOR.self::CACHE_NAME;
         if (file_exists($autoloadCache)) {
             $h = @fopen($autoloadCache, 'w');
 

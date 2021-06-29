@@ -51,6 +51,37 @@ class RouterUriTest extends TestCase {
     /**
      * @test
      */
+    public function testsetAction00() {
+        $uri = new RouterUri('https://example.com/{first-var}', '');
+        $this->assertNull($uri->getAction());
+    }
+    /**
+     * @test
+     */
+    public function testsetAction01() {
+        $uri = new RouterUri('https://example.com/{first-var}', '');
+        $uri->setAction('');
+        $this->assertNull($uri->getAction());
+    }
+    /**
+     * @test
+     */
+    public function testsetAction02() {
+        $uri = new RouterUri('https://example.com/{first-var}', '');
+        $uri->setAction('hello');
+        $this->assertEquals('hello',$uri->getAction());
+    }
+    /**
+     * @test
+     */
+    public function testsetAction03() {
+        $uri = new RouterUri('https://example.com/{first-var}', '');
+        $uri->setAction('hello    ');
+        $this->assertEquals('hello',$uri->getAction());
+    }
+    /**
+     * @test
+     */
     public function testInvalid00() {
         $this->expectException('Exception');
         $uri = new RouterUri('', '');

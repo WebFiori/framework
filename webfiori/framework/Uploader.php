@@ -132,7 +132,7 @@ class Uploader implements JsonI {
         $this->setAssociatedFileName('files');
 
         if (strlen($uploadPath) == 0) {
-            $uploadPath = ROOT_DIR.DS.'app'.DS.'sto'.DS.'uploads';
+            $uploadPath = ROOT_DIR.DS.APP_DIR_NAME.DS.'sto'.DS.'uploads';
         }
 
         $this->setUploadDir($uploadPath);

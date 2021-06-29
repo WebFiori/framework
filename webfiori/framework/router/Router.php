@@ -85,7 +85,7 @@ use webfiori\ui\HTMLNode;
  * </pre> 
  * </p>
  * @author Ibrahim
- * @version 1.3.10
+ * @version 1.3.11
  */
 class Router {
     /**
@@ -94,7 +94,7 @@ class Router {
      * 
      * @since 1.0
      */
-    const API_ROUTE = DS.'app'.DS.'apis';
+    const API_ROUTE = DS.APP_DIR_NAME.DS.'apis';
     /**
      * A constant that represents closure route. The value of the 
      * constant is 'func'.
@@ -114,7 +114,7 @@ class Router {
      * 
      * @since 1.0
      */
-    const VIEW_ROUTE = DS.'app'.DS.'pages';
+    const VIEW_ROUTE = DS.APP_DIR_NAME.DS.'pages';
     /**
      *
      * @var type 
@@ -229,6 +229,9 @@ class Router {
      * <li><b>methods</b>: An optional array that can have a set of 
      * allowed request methods for fetching the resource. This can be 
      * also a single string such as 'GET' or 'POST'.</li>
+     * <li><b>action</b>: If the class that the route is pointing to 
+     * represents a controller, this index can have the value of the 
+     * action that will be performed (the name of the class method).</li>
      * </ul>
      * 
      * @return boolean The method will return true if the route was created. 
@@ -241,6 +244,36 @@ class Router {
         $options['type'] = Router::CUSTOMIZED;
 
         return Router::get()->_addRoute($options);
+    }
+    /**
+     * Adds a redirect route.
+     * 
+     * @param string $path The path at which when the user visits will be redirected. 
+     * 
+     * @param string $to A path or a URL at which the user will be sent to.
+     * 
+     * @param int $code HTTP redirect code. Can have one of the following values:
+     * 301, 302, 303, 307 and 308. Default is 301 (Permanent redirect).
+     * 
+     * @since 1.3.11
+     */
+    public static function redirect($path, $to, $code = 301) {
+        Router::closure([
+            'path' => $path,
+            'route-to' => function ($to, $httpCode) {
+                $allowedCodes = [301, 302, 303, 307, 308];
+                
+                if (!in_array($httpCode, $allowedCodes)) {
+                    $httpCode = 301;
+                }
+                Response::addHeader('location', $to);
+                Response::setCode($httpCode);
+                Response::send();
+            },
+            'closure-params' => [
+                $to, $code
+            ]
+        ]);
     }
     /**
      * Adds new route to a web services set.
@@ -797,7 +830,8 @@ class Router {
             return false;
         }
         $routeUri = new RouterUri($this->getBase().$path, $routeTo,$caseSensitive, $closureParams);
-
+        $routeUri->setAction($options['action']);
+        
         if (!$this->_hasRoute($routeUri)) {
             if ($asApi === true) {
                 $routeUri->setType(self::API_ROUTE);
@@ -879,7 +913,15 @@ class Router {
         $path = isset($options['path']) ? $this->_fixUriPath($options['path']) : '';
         $languages = isset($options['languages']) && gettype($options['languages']) == 'array' ? $options['languages'] : [];
         $varValues = isset($options['vars-values']) && gettype($options['languages']) == 'array' ? $options['vars-values'] : [];
-
+        
+        $action = '';
+        
+        if(isset($options['action'])) {
+            $trimmed = trim($options['action']);
+            if (strlen($trimmed) > 0) {
+                $action = $trimmed;
+            }
+        }
         return [
             'case-sensitive' => $caseSensitive,
             'type' => $routeType,
@@ -891,7 +933,8 @@ class Router {
             'languages' => $languages,
             'vars-values' => $varValues,
             'middleware' => $mdArr,
-            'request-methods' => $this->_getRequestMethods($options)
+            'request-methods' => $this->_getRequestMethods($options),
+            'action' => $action
         ];
     }
     
@@ -1074,6 +1117,9 @@ class Router {
                         $instance->process();
                     } else if ($instance instanceof WebPage) {
                         $instance->render();
+                    } else if ($route->getAction() !== null) {
+                        $toCall = $route->getAction();
+                        $instance->$toCall();
                     }
                 }
             }
@@ -1096,6 +1142,18 @@ class Router {
         }
     }
     /**
+     * Returns the number of routes at which the router has.
+     * 
+     * @return int Number of routes.
+     * 
+     * @since 1.3.11
+     */
+    public static function routesCount() {
+        $routesArr = self::get()->routes;
+        
+        return count($routesArr['variable']) + count($routesArr['static']);
+    }
+    /**
      * Route a given URI to its specified resource.
      * 
      * If the router has no routes, the router will send back a '418 - I'm A 
@@ -1115,8 +1173,8 @@ class Router {
      */
     private function _resolveUrl($uri, $loadResource = true) {
         $this->uriObj = null;
-
-        if (count($this->routes) != 0) {
+        
+        if (self::routesCount() != 0) {
             $routeUri = new RouterUri($uri, '');
 
             if ($routeUri->hasWWW() && defined('NO_WWW') && NO_WWW === true) {
@@ -1138,22 +1196,38 @@ class Router {
             }
         } else {
             if ($loadResource === true) {
-                Response::setCode(418);
-                Response::write(''
-            .'<!DOCTYPE html>'
-            .'<html>'
-            .'<head>'
-            .'<title>I\'m a teapot</title>'
-            .'</head>'
-            .'<body>'
-            .'<h1>418 - I\'m a teabot</h1>'
-            .'<hr>'
-            .'<p>'
-            .'Acctually, I\'m an empty teapot since I don\'t have routes yet.'
-            .'</p>'
-            .'</body>'
-            .'</html>');
-                Response::send();
+                $page = new WebPage();
+                $page->getDocument()->getDocumentRoot()->setStyle([
+                    'background-color' => '#e0f2b4'
+                ]);
+                $page->setTitle('Welcome to WebFiori');
+                $div = $page->insert('div');
+                $div->addChild('img', [
+                    'src' => 'https://webfiori.com/assets/images/WFLogo512.png',
+                    'style' => 'width:250px;height:250px;border-radius:250px;background-color:black'
+                ]);
+                $div->setStyle([
+                    'text-align' => 'center'
+                ]);
+                $div->addChild('h2')->text('Welcome to WebFiori v'.WF_VERSION);
+                $div->addChild('p', [
+                    'style' => "font-size: 16pt;"
+                    . "font-weight: bold;"
+                    . "background-color: cadetblue;"
+                    . "margin: 0;"
+                    . "border-radius: 25px;"
+                    . "height: 50px;"
+                ])->text('You can start by building your application at');
+                $div->addChild('p', [
+                    'style' => "background-color: #046525;"
+                    . "color: white;"
+                    . "font-weight: bold;"
+                    . "border-radius: 25px;"
+                    . "height: 50px;font-size: 18pt;"
+                    . "text-align: center;"
+                    . "padding: 0px;margin: 0px;"
+                ])->text(ROOT_DIR.DS.APP_DIR_NAME);
+                $page->render();
             }
         }
     }
@@ -1193,6 +1267,9 @@ class Router {
                         $class->process();
                     } else if ($class instanceof WebPage) {
                         $class->render();
+                    } else if ($route->getAction() !== null) {
+                        $toCall = $route->getAction();
+                        $class->$toCall();
                     }
                 } else {
                     $routeType = $route->getType();

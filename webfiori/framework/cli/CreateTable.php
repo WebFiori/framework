@@ -97,7 +97,7 @@ class CreateTable {
                 }
             }
         } else {
-            $this->_getCommand()->error('No database connections available. Add connections inside the class \'Config\' or use the command "add".');
+            $this->_getCommand()->error('No database connections available. Add connections inside the class \'AppConfig\' or use the command "add".');
         }
     }
     /**

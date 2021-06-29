@@ -129,8 +129,13 @@ class CronEmail extends EmailMessage {
         $jobTable->addChild($this->_createTableRow('Run Time:', date('Y-m-d H:i:s')));
         $jobTable->addChild($this->_createTableRow('PHP Version:', PHP_VERSION));
         $jobTable->addChild($this->_createTableRow('Framework Version:', WF_VERSION));
+        $jobTable->addChild($this->_createTableRow('Framework Release Date:', WF_RELEASE_DATE));
         $jobTable->addChild($this->_createTableRow('Root Directory:', ROOT_DIR));
-
+        $jobTable->addChild($this->_createTableRow('Application Directory:', ROOT_DIR.DS.APP_DIR_NAME));
+        $jobTable->addChild($this->_createTableRow('Application Version:', WebFioriApp::getAppConfig()->getVersion()));
+        $jobTable->addChild($this->_createTableRow('Version Type:', WebFioriApp::getAppConfig()->getVersionType()));
+        $jobTable->addChild($this->_createTableRow('Application Release Date:', WebFioriApp::getAppConfig()->getReleaseDate()));
+        
         if ($job->isSuccess()) {
             $jobTable->addChild($this->_createTableRow('Exit Status:', '<b style="color:green">Success</b>'));
         } else {

@@ -76,13 +76,13 @@ class CreateCommand extends CLICommand {
             $tableClassNameValidity = true;
         } while (!$tableClassNameValidity);
         $this->println('We need from you to give us entity class information.');
-        $classInfo = $this->getClassInfo('app\\entity','app'.DS.'entity');
+        $classInfo = $this->getClassInfo(APP_DIR_NAME.'\\entity');
         $implJsonI = $this->confirm('Would you like from your class to implement the interface JsonI?', true);
         $this->println('Generating your entity...');
 
         if (strlen($classInfo['namespace']) == 0) {
-            $this->warning('The entity class will be added to the namespace "app\database".');
-            $classInfo['namespace'] = 'app\\database';
+            $this->warning('The entity class will be added to the namespace "'.APP_DIR_NAME.'\database".');
+            $classInfo['namespace'] = APP_DIR_NAME.'\\database';
         }
         $mapper = $tableObj->getEntityMapper();
         $mapper->setPath($classInfo['path']);
@@ -142,7 +142,9 @@ class CreateCommand extends CLICommand {
     }
     /**
      * Prompts the user to enter class information such as it is name.
+     * 
      * This method is useful in case we would like to create a class.
+     * 
      * @return array The method will return an array that contains 3 indices: 
      * <ul>
      * <li><b>name</b>: The name of the class.</li>
@@ -150,9 +152,10 @@ class CreateCommand extends CLICommand {
      * namespace is entered.</li>
      * <li><b>path</b>: The location at which the class will be created.</li>
      * </ul>
+     * 
      * @since 1.0
      */
-    public function getClassInfo($defaltNs = null, $defaultLoc = null) {
+    public function getClassInfo($defaltNs = null) {
         $classExist = true;
 
         do {
@@ -168,7 +171,7 @@ class CreateCommand extends CLICommand {
         $isFileExist = true;
 
         do {
-            $path = $this->_getClassPath($defaultLoc);
+            $path = $this->_getClassPath($ns);
 
             if (file_exists($path.DS.$className.'.php')) {
                 $this->warning('A file which has the same as the class name was found.');

@@ -24,7 +24,6 @@
  */
 namespace webfiori\framework;
 
-use app\AppConfig;
 use webfiori\database\ConnectionInfo;
 use webfiori\framework\exceptions\SMTPException;
 use webfiori\framework\mail\SMTPAccount;
@@ -116,7 +115,7 @@ class ConfigController {
         ]);
     }
     public function createAppConfigFile() {
-        if (!class_exists('app\AppConfig')) {
+        if (!class_exists(APP_DIR_NAME.'\AppConfig')) {
             $this->writeAppConfig([]);
         }
     }
@@ -133,11 +132,11 @@ class ConfigController {
      * @since 1.5.1
      */
     public function createIniClass($className, $comment) {
-        $cFile = new File("$className.php", ROOT_DIR.DS.'app'.DS.'ini');
+        $cFile = new File("$className.php", ROOT_DIR.DS.APP_DIR_NAME.DS.'ini');
         $cFile->remove();
         $this->a($cFile, "<?php");
         $this->a($cFile, "");
-        $this->a($cFile, "namespace app\\ini;");
+        $this->a($cFile, "namespace ".APP_DIR_NAME."\\ini;");
         $this->a($cFile, "");
         $this->a($cFile, "class $className {");
         $this->a($cFile, "    /**");
@@ -150,7 +149,30 @@ class ConfigController {
         $this->a($cFile, "    }");
         $this->a($cFile, "}");
         $cFile->write(true, true);
-        require_once ROOT_DIR.DS.'app'.DS.'ini'.DS."$className.php";
+        require_once ROOT_DIR.DS.APP_DIR_NAME.DS.'ini'.DS."$className.php";
+    }
+    /**
+     * Creates all directories at which the application needs to run.
+     */
+    private function createAppDirs() {
+        $DS = DIRECTORY_SEPARATOR;
+        $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME);
+        $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'ini');
+        $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'ini'.$DS.'routes');
+        $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'pages');
+        $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'jobs');
+        $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'middleware');
+        $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'langs');
+        $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'sto');
+        $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'sto'.$DS.'uploads');
+        $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'sto'.$DS.'logs');
+        $this->_mkdir(ROOT_DIR.$DS.'public');
+        $this->_mkdir(ROOT_DIR.$DS.'themes');
+    }
+    private function _mkdir($dir) {
+        if (!is_dir($dir)) {
+            mkdir($dir);
+        }
     }
     /**
      * Creates the class 'GlobalConstants'.
@@ -161,16 +183,17 @@ class ConfigController {
      * was unable to create the class.
      */
     public function createConstClass() {
+        $this->createAppDirs();
         //The class GlobalConstants must exist before autoloader.
-        //For this reason, use the 'resource' instead of the class 'File'.
-        $path = ROOT_DIR.DIRECTORY_SEPARATOR.'app'.DIRECTORY_SEPARATOR.'ini'.DIRECTORY_SEPARATOR."GlobalConstants.php";
+        //For this reason, use the 'resource' instead of the class 'File'. 
+        $path = ROOT_DIR.DIRECTORY_SEPARATOR.APP_DIR_NAME.DIRECTORY_SEPARATOR.'ini'.DIRECTORY_SEPARATOR."GlobalConstants.php";
         $resource = fopen($path, 'w');
         if (!is_resource($resource)) {
             throw new \Exception('Unable to create the file "'.$path.'"');
         }
         $this->a($resource, "<?php");
         $this->a($resource, "");
-        $this->a($resource, "namespace app\\ini;");
+        $this->a($resource, "namespace ".APP_DIR_NAME."\\ini;");
         $this->a($resource, "/**");
         $this->a($resource, "* A class which is used to initialize global constants.");
         $this->a($resource, "* ");
@@ -323,7 +346,7 @@ class ConfigController {
         
         $this->a($resource, "        if (!defined('THEMES_PATH')){");
         $this->a($resource, "            \$themesDirName = 'themes';");
-        $this->a($resource, "            \$themesPath = substr(__DIR__, 0, strlen(__DIR__) - strlen('/app/ini')).DIRECTORY_SEPARATOR.\$themesDirName;");
+        $this->a($resource, "            \$themesPath = substr(__DIR__, 0, strlen(__DIR__) - strlen(APP_DIR_NAME.'/ini')).DIRECTORY_SEPARATOR.\$themesDirName;");
         $this->a($resource, '            /**');
         $this->a($resource, '             * This constant represents the directory at which themes exist.');
         $this->a($resource, '             * ');
@@ -395,11 +418,11 @@ class ConfigController {
      * @since 1.5.1
      */
     public function createRoutesClass($className) {
-        $cFile = new File("$className.php", ROOT_DIR.DS.'app'.DS.'ini'.DS.'routes');
+        $cFile = new File("$className.php", ROOT_DIR.DS.APP_DIR_NAME.DS.'ini'.DS.'routes');
         $cFile->remove();
         $this->a($cFile, "<?php");
         $this->a($cFile, "");
-        $this->a($cFile, "namespace app\\ini\\routes;");
+        $this->a($cFile, "namespace ".APP_DIR_NAME."\\ini\\routes;");
         $this->a($cFile, "");
         $this->a($cFile, "class $className {");
         $this->a($cFile, "    /**");
@@ -437,8 +460,9 @@ class ConfigController {
      * @since 1.0
      */
     public function getAdminTheme() {
-        if (class_exists('app\\AppConfig')) {
-            $c = new AppConfig();
+        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
+            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
+            $c = new $constructor();
 
             return $c->getAdminThemeName();
         }
@@ -453,8 +477,9 @@ class ConfigController {
      * @since 1.0
      */
     public function getBase() {
-        if (class_exists('app\\AppConfig')) {
-            $c = new AppConfig();
+        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
+            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
+            $c = new $constructor();
 
             return $c->getBaseURL();
         }
@@ -470,8 +495,9 @@ class ConfigController {
      * @since 1.0
      */
     public function getBaseTheme() {
-        if (class_exists('app\\AppConfig')) {
-            $c = new AppConfig();
+        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
+            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
+            $c = new $constructor();
 
             return $c->getBaseThemeName();
         }
@@ -487,8 +513,9 @@ class ConfigController {
      * @since 1.0
      */
     public function getDatabaseConnections() {
-        if (class_exists('app\\AppConfig')) {
-            $c = new AppConfig();
+        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
+            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
+            $c = new $constructor();
 
             return $c->getDBConnections();
         }
@@ -505,8 +532,9 @@ class ConfigController {
      * @since 1.0
      */
     public function getDescriptions() {
-        if (class_exists('app\\AppConfig')) {
-            $c = new AppConfig();
+        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
+            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
+            $c = new $constructor();
 
             return $c->getDescriptions();
         }
@@ -521,8 +549,9 @@ class ConfigController {
      * @since 1.0
      */
     public function getHomePage() {
-        if (class_exists('app\\AppConfig')) {
-            $c = new AppConfig();
+        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
+            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
+            $c = new $constructor();
 
             return $c->getHomePage();
         }
@@ -537,8 +566,9 @@ class ConfigController {
      * @since 1.0
      */
     public function getPrimaryLang() {
-        if (class_exists('app\\AppConfig')) {
-            $c = new AppConfig();
+        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
+            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
+            $c = new $constructor();
 
             return $c->getPrimaryLanguage();
         }
@@ -596,8 +626,9 @@ class ConfigController {
      * @since 1.0
      */
     public function getSMTPAccounts() {
-        if (class_exists('app\\AppConfig')) {
-            $c = new AppConfig();
+        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
+            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
+            $c = new $constructor();
 
             return $c->getAccounts();
         }
@@ -657,8 +688,9 @@ class ConfigController {
      * @since 1.0
      */
     public function getTitles() {
-        if (class_exists('app\\AppConfig')) {
-            $c = new AppConfig();
+        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
+            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
+            $c = new $constructor();
 
             return $c->getWebsiteNames();
         }
@@ -674,8 +706,9 @@ class ConfigController {
      * @since 1.0
      */
     public function getTitleSep() {
-        if (class_exists('app\\AppConfig')) {
-            $c = new AppConfig();
+        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
+            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
+            $c = new $constructor();
 
             return $c->getTitleSep();
         }
@@ -692,8 +725,9 @@ class ConfigController {
      * @since 1.0
      */
     public function getWebsiteNames() {
-        if (class_exists('app\\AppConfig')) {
-            $c = new AppConfig();
+        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
+            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
+            $c = new $constructor();
 
             return $c->getWebsiteNames();
         }
@@ -839,14 +873,15 @@ class ConfigController {
      * @since 1.5
      */
     public function writeAppConfig($appConfigArr) {
-        $cFile = new File('AppConfig.php', ROOT_DIR.DS.'app');
+        $cFile = new File('AppConfig.php', ROOT_DIR.DS.APP_DIR_NAME);
         $cFile->remove();
         $this->a($cFile, "<?php");
         $this->a($cFile, "");
-        $this->a($cFile, "namespace app;");
+        $this->a($cFile, "namespace ".APP_DIR_NAME.";");
         $this->a($cFile, "");
         $this->a($cFile, "use webfiori\\database\\ConnectionInfo;");
         $this->a($cFile, "use webfiori\\framework\\mail\\SMTPAccount;");
+        $this->a($cFile, "use webfiori\\framework\\Config;");
         $this->a($cFile, "use webfiori\\http\\Uri;");
         $this->a($cFile, "/**");
         $this->a($cFile, " * Configuration class of the application");
@@ -857,7 +892,7 @@ class ConfigController {
         $this->a($cFile, " *");
         $this->a($cFile, " * @since 2.1.0");
         $this->a($cFile, " */");
-        $this->a($cFile, "class AppConfig {");
+        $this->a($cFile, "class AppConfig implements Config {");
 
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * The name of admin control pages Theme.");
@@ -1376,7 +1411,7 @@ class ConfigController {
         foreach ($titlesArr as $langCode => $title) {
             $title = str_replace("'", "\'", $title);
             $this->a($cFile, "            '$langCode' => '$title',");
-            if (!class_exists('app\\langs\\Language'.$langCode)) {
+            if (!class_exists(APP_DIR_NAME.'\\langs\\Language'.$langCode)) {
                 
                 //This require a fix in the future
                 $dir = $langCode == 'AR' ? 'rtl' : 'ltr';
@@ -1471,7 +1506,8 @@ class ConfigController {
             if ($smtpAcc instanceof SMTPAccount) {
                 $this->a($cFile, "            '".$smtpAcc->getAccountName()."' => new SMTPAccount([");
                 $this->a($cFile, "                'port' => ".$smtpAcc->getPort().",");
-                $this->a($cFile, "                'user' => ".$smtpAcc->getUsername()."',");
+                $this->a($cFile, "                'server-address' => '".$smtpAcc->getServerAddress()."',");
+                $this->a($cFile, "                'user' => '".$smtpAcc->getUsername()."',");
                 $this->a($cFile, "                'pass' => '".$smtpAcc->getPassword()."',");
                 $this->a($cFile, "                'sender-name' => '".str_replace("'", "\'", $smtpAcc->getSenderName())."',");
                 $this->a($cFile, "                'sender-address' => '".$smtpAcc->getAddress()."',");
@@ -1493,7 +1529,7 @@ class ConfigController {
 
         $this->a($cFile, "}");
         $cFile->write(false, true);
-        require_once ROOT_DIR.DS.'app'.DS.'AppConfig.php';
+        require_once ROOT_DIR.DS.APP_DIR_NAME.DS.'AppConfig.php';
     }
     private function a($file, $str) {
         if (is_resource($file)) {

@@ -4,6 +4,8 @@ namespace webfiori\framework\cli;
 use webfiori\database\mysql\MySQLColumn;
 use webfiori\database\mysql\MySQLTable;
 use webfiori\database\Table;
+use Error;
+use Exception;
 /**
  * A helper class for creating database tables classes.
  *
@@ -23,7 +25,7 @@ class CreateTableObj {
     public function __construct(CreateCommand $command) {
         $this->command = $command;
 
-        $classInfo = $this->_getCommand()->getClassInfo('app\\database','app'.DS.'database');
+        $classInfo = $this->_getCommand()->getClassInfo(APP_DIR_NAME.'\\database');
 
 
         $tempTable = new MySQLTable();
@@ -59,18 +61,18 @@ class CreateTableObj {
         }
 
         if ($this->_getCommand()->confirm('Would you like to create an entity class that maps to the database table?', false)) {
-            $entityInfo = $this->_getCommand()->getClassInfo('app\\entity', 'app'.DS.'entity');
+            $entityInfo = $this->_getCommand()->getClassInfo(APP_DIR_NAME.'\\entity');
             $entityInfo['implement-jsoni'] = $this->_getCommand()->confirm('Would you like from your entity class to implement the interface JsonI?', true);
             $classInfo['entity-info'] = $entityInfo;
         }
 
         if (strlen($classInfo['namespace']) == 0) {
-            $classInfo['namespace'] = 'app\database';
+            $classInfo['namespace'] = APP_DIR_NAME.'\database';
             $this->_getCommand()->warning('The table class will be added to the namespace "'.$classInfo['namespace'].'" since no namespace was provided.');
         }
 
         if (isset($classInfo['entity-info']) && strlen($classInfo['entity-info']['namespace']) == 0) {
-            $classInfo['entity-info']['namespace'] = 'app\database';
+            $classInfo['entity-info']['namespace'] = APP_DIR_NAME.'\database';
             $this->_getCommand()->warning('The entity class will be added to the namespace "'.$classInfo['entity-info']['namespace'].'" since no namespace was provided.');
         }
         $writer = new QueryClassWriter($tempTable, $classInfo);
@@ -106,6 +108,9 @@ class CreateTableObj {
             } catch (Error $ex) {
                 $this->_getCommand()->error($ex->getMessage());
                 continue;
+            } catch (Exception $ex) {
+                $this->_getCommand()->error($ex->getMessage());
+                continue;
             }
 
             if ($refTable instanceof Table) {
@@ -137,6 +142,8 @@ class CreateTableObj {
                     $this->_getCommand()->success('Foreign key added.');
                     $fksNs[$fkName] = $refTableName;
                 } catch (Exception $ex) {
+                    $this->_getCommand()->error($ex->getMessage());
+                } catch (Error $ex) {
                     $this->_getCommand()->error($ex->getMessage());
                 }
             } else {
@@ -190,10 +197,8 @@ class CreateTableObj {
             }
             $this->_setDefaultValue($colObj);
             $colObj->setIsNull($this->_getCommand()->confirm('Can this column have null values?', false));
-        } else {
-            if ($colObj->getDatatype() == 'int') {
-                $colObj->setIsAutoInc($this->_getCommand()->confirm('Is this column auto increment?', false));
-            }
+        } else if ($colObj->getDatatype() == 'int') {
+            $colObj->setIsAutoInc($this->_getCommand()->confirm('Is this column auto increment?', false));
         }
     }
     /**
@@ -206,10 +211,8 @@ class CreateTableObj {
 
             if ($defaultVal == 'true') {
                 $colObj->setDefault(true);
-            } else {
-                if ($defaultVal == 'false') {
-                    $colObj->setDefault(false);
-                }
+            } else if ($defaultVal == 'false') {
+                $colObj->setDefault(false);
             }
         } else {
             $defaultVal = trim($this->_getCommand()->getInput('Enter default value (Hit "Enter" to skip):', ''));

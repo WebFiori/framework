@@ -124,7 +124,7 @@ class AddCommand extends CLICommand {
         $writer = new LangClassWriter($langCode, $writingDir);
         $writer->writeClass();
         $this->success('Language added. Also, a class for the language '
-                . 'is created at "app\langs" for that language.');
+                . 'is created at "'.APP_DIR_NAME.'\langs" for that language.');
         
         
     }

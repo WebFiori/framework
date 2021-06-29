@@ -60,7 +60,11 @@ class SettingsCommand extends CLICommand {
             'color' => 'yellow',
             'bold' => true
         ]);
-        $this->println("    Base URL %".($spaces - strlen('Base URL'))."s %s",':',$C->getBaseURL());
+        $this->println("    Application Path %".($spaces - strlen('Application Path'))."s %s",':',ROOT_DIR.DS.APP_DIR_NAME);
+        $this->println("    Application Version %".($spaces - strlen('Application Version'))."s %s",':',$C->getVersion());
+        $this->println("    Version Type %".($spaces - strlen('Version Type'))."s %s",':',$C->getVersionType());
+        $this->println("    Application Release Date %".($spaces - strlen('Application Release Date'))."s %s",':',$C->getReleaseDate());
+        $this->println("    Base CLI URL %".($spaces - strlen('Base CLI URL'))."s %s",':',$C->getBaseURL());
         $this->println("    Admin Theme %".($spaces - strlen('Admin Theme'))."s %s",':',$C->getAdminThemeName());
         $this->println("    Base Theme %".($spaces - strlen('Base Theme'))."s %s",':',$C->getBaseThemeName());
         $this->println("    Title Separator %".($spaces - strlen('Title Separator'))."s %s",':',$C->getTitleSep());

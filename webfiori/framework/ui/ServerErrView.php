@@ -25,12 +25,12 @@
 namespace webfiori\framework\ui;
 
 use Throwable;
-use webfiori\framework\Page;
 use webfiori\framework\session\SessionsManager;
 use webfiori\framework\Util;
 use webfiori\framework\WebFioriApp;
 use webfiori\http\Response;
 use webfiori\ui\HTMLNode;
+use webfiori\framework\ui\WebPage;
 /**
  * A page which is used to display exception information when it is thrown or 
  * any other errors.
@@ -39,6 +39,13 @@ use webfiori\ui\HTMLNode;
  * @version 1.0.1
  */
 class ServerErrView {
+    /**
+     * 
+     * @var WebPage
+     * 
+     * @since 1.0.2
+     */
+    private $page;
     /**
      *
      * @var Throwable|Error
@@ -72,7 +79,7 @@ class ServerErrView {
 
         if (class_exists('webfiori\ui\HTMLNode')) {
             $this->_phpStructsExist($this->errOrThrowable);
-            $page = Page::render(false, true);
+            $page = $this->page->render(false, true);
         } else {
             $page = $this->_phpStructsDoesNotexist($this->errOrThrowable);
         }
@@ -209,26 +216,25 @@ class ServerErrView {
         return $retVal;
     }
     private function _phpStructsExist($throwableOrErr) {
-        Page::reset();
-        Page::title('Uncaught Exception');
-        Page::siteName($this->_getSiteName());
-        Page::separator(WebFioriApp::getAppConfig()->getTitleSep());
-        Page::document()->getHeadNode()->addCSS(Util::getBaseURL().'/assets/css/server-err.css',[],false);
-        $hNode = new HTMLNode('h1');
+        $this->page = new WebPage();
+        $this->page->setTitle('Uncaught Exception');
+        $this->page->setWebsiteName($this->_getSiteName());
+        $this->page->setTitleSep(WebFioriApp::getAppConfig()->getTitleSep());
+        $this->page->addCSS(Util::getBaseURL().'/assets/css/server-err.css',[],false);
+        $hNode = $this->page->insert('h1');
         //var_dump($throwableOrErr);
         if ($throwableOrErr instanceof Throwable) {
             $hNode->addTextNode('500 - Server Error: Uncaught Exception.');
 
-            Page::insert($hNode);
-            Page::insert($this->_createMessageLine('Exception Class:', get_class($throwableOrErr)));
-            Page::insert($this->_createMessageLine('Exception Message:', $throwableOrErr->getMessage()));
-            Page::insert($this->_createMessageLine('Exception Code:', $throwableOrErr->getCode()));
-            Page::insert($this->_createMessageLine('Class:', Util::extractClassName($throwableOrErr->getFile())));
-            Page::insert($this->_createMessageLine('At Line:', $throwableOrErr->getLine()));
+            $this->page->insert($this->_createMessageLine('Exception Class:', get_class($throwableOrErr)));
+            $this->page->insert($this->_createMessageLine('Exception Message:', $throwableOrErr->getMessage()));
+            $this->page->insert($this->_createMessageLine('Exception Code:', $throwableOrErr->getCode()));
+            $this->page->insert($this->_createMessageLine('Class:', Util::extractClassName($throwableOrErr->getFile())));
+            $this->page->insert($this->_createMessageLine('At Line:', $throwableOrErr->getLine()));
 
             if (defined('WF_VERBOSE') && WF_VERBOSE) {
-                Page::insert($this->_createMessageLine('File:', $throwableOrErr->getFile()));
-                Page::insert($this->_createMessageLine('Stack Trace:', ''));
+                $this->page->insert($this->_createMessageLine('File:', $throwableOrErr->getFile()));
+                $this->page->insert($this->_createMessageLine('Stack Trace:', ''));
                 $stackTrace = new HTMLNode('div', [
                     'class' => 'mono'
                 ]);
@@ -248,9 +254,9 @@ class ServerErrView {
                     $index++;
                 }
 
-                Page::insert($stackTrace);
+                $this->page->insert($stackTrace);
             } else {
-                Page::insert($this->_createMessageLine('Stack Trace:', ''));
+                $this->page->insert($this->_createMessageLine('Stack Trace:', ''));
                 $stackTrace = new HTMLNode('div', [
                     'class' => 'mono'
                 ]);
@@ -270,20 +276,20 @@ class ServerErrView {
                     $index++;
                 }
 
-                Page::insert($stackTrace);
+                $this->page->insert($stackTrace);
                 $this->_showTip();
             }
         } else {
             $hNode->addTextNode('500 - Server Error');
-            Page::insert($hNode);
-            Page::insert($this->_createMessageLine('Type:', Util::ERR_TYPES[$throwableOrErr["type"]]['type']));
-            Page::insert($this->_createMessageLine('Description:', Util::ERR_TYPES[$throwableOrErr["type"]]['description']));
-            Page::insert($this->_createMessageLine('Message: ', '<pre>'.$throwableOrErr["message"].'</pre>'));
+            $this->page->insert($hNode);
+            $this->page->insert($this->_createMessageLine('Type:', Util::ERR_TYPES[$throwableOrErr["type"]]['type']));
+            $this->page->insert($this->_createMessageLine('Description:', Util::ERR_TYPES[$throwableOrErr["type"]]['description']));
+            $this->page->insert($this->_createMessageLine('Message: ', '<pre>'.$throwableOrErr["message"].'</pre>'));
 
             if (defined('WF_VERBOSE') && WF_VERBOSE) {
-                Page::insert($this->_createMessageLine('File: ', $throwableOrErr["file"]));
-                Page::insert($this->_createMessageLine('Line: ', $throwableOrErr["line"]));
-                Page::insert($this->_createMessageLine('Stack Trace:', ''));
+                $this->page->insert($this->_createMessageLine('File: ', $throwableOrErr["file"]));
+                $this->page->insert($this->_createMessageLine('Line: ', $throwableOrErr["line"]));
+                $this->page->insert($this->_createMessageLine('Stack Trace:', ''));
                 $stackTrace = new HTMLNode('div', [
                     'class' => 'mono'
                 ]);
@@ -299,9 +305,9 @@ class ServerErrView {
                     $index++;
                 }
 
-                Page::insert($stackTrace);
+                $this->page->insert($stackTrace);
             } else {
-                Page::insert($this->_createMessageLine('Stack Trace:', ''));
+                $this->page->insert($this->_createMessageLine('Stack Trace:', ''));
                 $stackTrace = new HTMLNode('div', [
                     'class' => 'mono'
                 ]);
@@ -316,7 +322,7 @@ class ServerErrView {
                     $index++;
                 }
 
-                Page::insert($stackTrace);
+                $this->page->insert($stackTrace);
                 $this->_showTip();
             }
         }
@@ -329,7 +335,7 @@ class ServerErrView {
                 .' display more details about the error, '
                 .'define the constant "WF_VERBOSE" and set its value to "true" in '
                 .'the class "GlobalConstants"', false);
-            Page::insert($paragraph);
+            $this->page->insert($paragraph);
         } else {
             return '<p class="mono"><b style="color:yellow">Tip</b>: To'
                 .' display more details about the error, '

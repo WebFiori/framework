@@ -803,7 +803,7 @@ class Router {
      * 
      * @since 1.3.12
      */
-    public function page($options) {
+    public static function page($options) {
         return self::view($options);
     }
     /**

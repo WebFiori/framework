@@ -267,7 +267,7 @@ class Language {
         if (isset(self::$loadedLangs[$uLangCode])) {
             return self::$loadedLangs[$uLangCode];
         } else {
-            $langClassName = 'app\\langs\\Language'.$uLangCode;
+            $langClassName = APP_DIR_NAME.'\\langs\\Language'.$uLangCode;
 
             if (class_exists($langClassName)) {
                 $class = new $langClassName();

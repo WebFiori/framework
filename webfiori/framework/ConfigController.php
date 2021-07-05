@@ -424,6 +424,8 @@ class ConfigController {
         $this->a($cFile, "");
         $this->a($cFile, "namespace ".APP_DIR_NAME."\\ini\\routes;");
         $this->a($cFile, "");
+        $this->a($cFile, "use webfiori\\framework\\router\\Router;");
+        $this->a($cFile, "");
         $this->a($cFile, "class $className {");
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Initialize system routes.");

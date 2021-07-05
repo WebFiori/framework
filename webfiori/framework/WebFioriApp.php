@@ -455,6 +455,13 @@ class WebFioriApp {
         call_user_func(APP_DIR_NAME.'\ini\routes\ClosureRoutes::create');
         call_user_func(APP_DIR_NAME.'\ini\routes\ViewRoutes::create');
         call_user_func(APP_DIR_NAME.'\ini\routes\APIRoutes::create');
+        
+        if (Router::routesCount() != 0) {
+            $home = trim(self::getAppConfig()->getHomePage());
+            if (strlen($home) != 0) {
+                Router::redirect('/', WebFioriApp::getAppConfig()->getHomePage());
+            }
+        }
     }
     private function _initThemesPath() {
         if (!defined('THEMES_PATH')) {

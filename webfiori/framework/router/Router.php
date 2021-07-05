@@ -39,6 +39,7 @@ use webfiori\http\WebServicesManager;
 use webfiori\json\Json;
 use webfiori\ui\HTMLNode;
 use webfiori\framework\ui\StarterPage;
+use webfiori\http\Uri;
 /**
  * The basic class that is used to route user requests to the correct 
  * location.
@@ -184,11 +185,7 @@ class Router {
             }
         };
 
-        if (class_exists('webfiori\conf\SiteConfig')) {
-            $this->baseUrl = trim(WebFioriApp::getAppConfig()->getBaseURL(), '/');
-        } else {
-            $this->baseUrl = trim(Util::getBaseURL(), '/');
-        }
+        $this->baseUrl = trim(Uri::getBaseURL(), '/');
     }
     /**
      * Adds new route to a file inside the root folder.

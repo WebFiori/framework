@@ -115,6 +115,7 @@ class CreateCommand extends CLICommand {
                 'Background job.',
                 'Middleware.',
                 'Database table from class.',
+                'CLI Command.',
                 'Quit.'
             ];
             $answer = $this->select('What would you like to create?', $options, count($options) - 1);
@@ -131,6 +132,9 @@ class CreateCommand extends CLICommand {
                 $create = new CreateTable($this);
             } else if ($answer == 'Middleware.') {
                 $create = new CreateMiddleware($this);
+                return true;
+            } else if ($answer == 'CLI Command.') {
+                $create = new CreateCLIClassHelper($this);
                 return true;
             } else if ($answer == 'Background job.') {
                 $create = new CreateCronJob($this);

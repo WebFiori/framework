@@ -23,7 +23,7 @@ class CreateCLIClassHelper {
         $this->command = $command;
         $classInfo = $command->getClassInfo(APP_DIR_NAME.'\\commands');
         $commandName = $this->_getCommandName();
-
+        $commandDesc = $this->_getCommand()->getInput('Give a short description of the command:');
         if ($command->confirm('Would you like to add arguments to the command?', false)) {
             $argsArr = $this->_getArgs();
         } else {
@@ -51,7 +51,7 @@ class CreateCLIClassHelper {
         $writer->append(' */');
         $writer->append('class '.$writer->getName().' extends CLICommand {');
 
-        $this->_writeConstructor($writer, $commandName, $argsArr);
+        $this->_writeConstructor($writer, $commandName, $argsArr, $commandDesc);
 
         $writer->append('/**', 1);
         $writer->append(' * Execute the command.', 1);
@@ -62,6 +62,7 @@ class CreateCLIClassHelper {
         $writer->append('}', 1);
 
         $writer->append("}");
+        $writer->append("return __NAMESPACE__;");
 
         $writer->writeClass();
         $command->info('New CLI class was created at "'.$writer->getPath().'".');
@@ -133,35 +134,36 @@ class CreateCLIClassHelper {
      * @param type $name
      * @param type $priority
      * @param array $args
+     * @param string $commandDesc Description
      */
-    private function _writeConstructor($writer, $name,array $args) {
+    private function _writeConstructor($writer, $name,array $args, $commandDesc) {
         $writer->append('/**', 1);
         $writer->append(' * Creates new instance of the class.', 1);
         $writer->append(' */', 1);
         $writer->append('public function __construct(){', 1);
-        $writer->append("parent::__construct('$name', [", 2);
+        
 
         if (count($args) > 0) {
-
+            $writer->append("parent::__construct('$name', [", 2);
             foreach ($args as $argArr) {
                 $writer->append("'".$argArr['name']."' => [", 3);
                 if (strlen($argArr['description']) != 0) {
-                    $writer->append("'description' => ". str_replace("'", "\'", $argArr['description'])."',", 4);
+                    $writer->append("'description' => '". str_replace("'", "\'", $argArr['description'])."',", 4);
                 }
                 $writer->append("'optional' => ".($argArr['optional'] === true ? 'true' : 'false').",", 4);
                 if (count($argArr['values']) != 0) {
                     $writer->append("'values' => [", 4);
                     foreach ($argArr['values'] as $val) {
-                        $writer->append("'". str_replace("'", "\'", $val)."',", 4);
+                        $writer->append("'". str_replace("'", "\'", $val)."',", 5);
                     }
-                    $writer->append("]", 3);
+                    $writer->append("]", 4);
                 }
+                $writer->append("],", 3);
             }
-            $writer->append(']', 2);
+            $writer->append("], '". str_replace("'", "\'", $commandDesc)."');", 2);
+        } else {
+            $writer->append("parent::__construct('$name', '".str_replace("'", "\'", $commandDesc)."');", 2);
         }
-        $writer->append(');', 2);
-        $writer->append('// TODO: Specify the time at which the process will run at.', 2);
-        $writer->append('// You can use one of the following methods to specifiy the time:', 2);
 
         $writer->append('}', 1);
     }

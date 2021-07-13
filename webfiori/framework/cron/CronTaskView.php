@@ -235,5 +235,3 @@ class CronTaskView extends CronView {
         return $cell;
     }
 }
-
-return __NAMESPACE__;

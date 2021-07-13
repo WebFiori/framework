@@ -87,7 +87,6 @@ class CreateCronJob {
         $writer->append('}', 1);
 
         $writer->append("}");
-        $writer->append("return __NAMESPACE__;");
 
         $writer->writeClass();
         $command->info('New background job class was created at "'.$writer->getPath().'".');

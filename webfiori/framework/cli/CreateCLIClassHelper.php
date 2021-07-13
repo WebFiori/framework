@@ -62,7 +62,6 @@ class CreateCLIClassHelper {
         $writer->append('}', 1);
 
         $writer->append("}");
-        $writer->append("return __NAMESPACE__;");
 
         $writer->writeClass();
         $command->info('New CLI class was created at "'.$writer->getPath().'".');

@@ -59,5 +59,3 @@ class CronLoginView extends CronView {
         ], false)->text('Login');
     }
 }
-
-return __NAMESPACE__;

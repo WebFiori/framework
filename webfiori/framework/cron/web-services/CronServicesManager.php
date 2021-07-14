@@ -42,5 +42,3 @@ class CronServicesManager extends WebServicesManager {
         $this->addService(new CronLogoutService());
     }
 }
-
-return __NAMESPACE__;

@@ -294,18 +294,16 @@ class WebFioriApp {
      */
     public static function autoRegister($folder, $regCallback) {
         $dir = ROOT_DIR.DS.APP_DIR_NAME.DS.$folder;
-
+        
         if (Util::isDirectory($dir)) {
             $dirContent = array_diff(scandir($dir), ['.','..']);
-
             foreach ($dirContent as $phpFile) {
                 $expl = explode('.', $phpFile);
 
                 if (count($expl) == 2 && $expl[1] == 'php') {
                     $instanceNs = require_once $dir.DS.$phpFile;
-
                     if (strlen($instanceNs) == 0 || $instanceNs == 1) {
-                        $instanceNs = '';
+                        $instanceNs = '\\'.APP_DIR_NAME.'\\'.$folder;
                     }
                     $class = $instanceNs.'\\'.$expl[0];
                     try {

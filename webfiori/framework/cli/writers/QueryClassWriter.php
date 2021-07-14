@@ -109,7 +109,6 @@ class QueryClassWriter extends ClassWriter {
         $this->_writeHeaderSec();
         $this->_writeConstructor();
         $this->append('}');
-        $this->append('return __NAMESPACE__;');
     }
     /**
      * Returns the name entity class will be created.

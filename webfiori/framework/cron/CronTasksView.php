@@ -217,5 +217,3 @@ class CronTasksView extends CronView {
         }
     }
 }
-
-return __NAMESPACE__;

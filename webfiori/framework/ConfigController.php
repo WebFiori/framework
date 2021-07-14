@@ -160,6 +160,7 @@ class ConfigController {
         $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'ini');
         $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'ini'.$DS.'routes');
         $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'pages');
+        $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'commands');
         $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'jobs');
         $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'middleware');
         $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'langs');

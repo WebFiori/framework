@@ -419,7 +419,7 @@ class UpdateTableCommand extends CLICommand {
 
                 return new DB($dbConn);
             } else {
-                $this->error('No database connections available. Add connections inside the class \'Config\' or use the command "add".');
+                $this->error('No database connections available. Add connections inside the class \'AppConfig\' or use the command "add".');
             }
         }
     }

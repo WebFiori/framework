@@ -43,7 +43,13 @@ class RunSQLQueryCommand extends CLICommand {
         parent::__construct('run-query', [
             'connection' => [
                 'description' => 'Database connection that the query will '
-                . 'be executed on.'
+                . 'be executed on.',
+                'optional' => true,
+            ],
+            'schema' => [
+                'description' => 'The namespace of a class that extends the class "webfiori\\framework\\DB" which represents '
+                . 'database schema.',
+                'optional' => true,
             ]
         ], 'Execute SQL query on specific database.');
     }

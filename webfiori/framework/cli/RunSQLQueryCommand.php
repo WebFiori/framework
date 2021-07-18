@@ -56,6 +56,11 @@ class RunSQLQueryCommand extends CLICommand {
             ]
         ], 'Execute SQL query on specific database.');
     }
+    /**
+     * Execute the command.
+     * 
+     * @return int 0 in case of success. Other value if failed.
+     */
     public function exec() {
         $dbConnections = array_keys(WebFioriApp::getAppConfig()->getDBConnections());
         $schema = $this->getArgValue('schema');
@@ -63,7 +68,7 @@ class RunSQLQueryCommand extends CLICommand {
             if ($schema !== null && class_exists($schema)) {
                 $schemaInst = new $schema();
                 if ($schemaInst instanceof DB) {
-                    $this->queryOnSchema($schemaInst);
+                    return $this->queryOnSchema($schemaInst);
                 } else {
                     $this->error('Given class is not an instance of "webfiori\\framework\\DB"!');
                     return -1;
@@ -71,12 +76,10 @@ class RunSQLQueryCommand extends CLICommand {
             } else {
                 $connName = $this->getArgValue('connection');
             
-
-            
                 if ($connName === null) {
                     $connName = $this->select('Select database connection:', $dbConnections, 0);
                     $schema = new DB($connName);
-                    $this->generalQuery($schema);
+                    return $this->generalQuery($schema);
                 } else if (!in_array($connName, $dbConnections)){
                     $this->error('No connection with name "'.$connName.'" was found!');
                     return -1;
@@ -84,6 +87,7 @@ class RunSQLQueryCommand extends CLICommand {
             }
         } else {
             $this->error('No database connections available. Add connections inside the class \'AppConfig\' or use the command "add".');
+            return -1;
         }
     }
     private function generalQuery(DB $schema) {
@@ -101,7 +105,7 @@ class RunSQLQueryCommand extends CLICommand {
                 $schema->execute();
             } catch (DatabaseException $ex) {
                 $this->error('The query finished execution with an error: '.$ex->getCode().' - '.$ex->getMessage());
-                return -1;
+                return $ex->getCode();
             }
             $this->success('Query executed without errors.');
             return 0;
@@ -127,14 +131,90 @@ class RunSQLQueryCommand extends CLICommand {
                 }
                 $tableClassNameValidity = true;
             } while (!$tableClassNameValidity);
-            
+            $schema->addTable($tableObj);
+            return $this->tableQuery($schema, $tableObj);
+        }
+    }
+    private function tableQuery($schema, $tableObj) {
+        $queryTypes = [
+            'Create database table.',
+            'Drop database table.',
+            'Add Column.',
+            'Modify Column.',
+            'Drop Column.'
+        ];
+        if ($tableObj->getForignKeysCount() != 0) {
+            $queryTypes[] = 'Add Forign Key.';
+            $queryTypes[] = 'Drop Forign Key.';
+        }
+        $selectedQuery = $this->select('Select query type:', $queryTypes);
+
+        if ($selectedQuery == 'Add Column.' || $selectedQuery == 'Update Column.' || $selectedQuery == 'Drop Column.') {
+            $this->colQuery($schema, $selectedQuery, $tableObj->getColsKeys(), $tableObj);
+        } else if ($selectedQuery == 'Add Forign Key.' || $selectedQuery == 'Drop Forign Key.') {
+            $this->fkQuery($schema, $selectedQuery, $tableObj);
+        } else if ($selectedQuery == 'Create database table.') {
+            $schema->table($tableObj->getName())->createTable();
+        } else if ($selectedQuery == 'Drop database table.') {
+            $schema->table($tableObj->getName())->drop();
+        }
+        
+        return $this->confirmExecute($schema);
+    }
+    private function confirmExecute($schema) {
+        $this->println('The following query will be executed on the database:');
+        $this->println($schema->getLastQuery(), [
+            'color' => 'blue'
+        ]);
+        if ($this->confirm('Continue?')) {
+            $this->info('Executing the query...');
+            try {
+                $this->success('Query executed without errors.');
+            } catch (DatabaseException $ex) {
+                $this->error($ex->getCode().' - '.$ex->getMessage());
+                return $ex->getCode();
+            }
+        } else {
+            $this->info('Nothing to execute.');
+        }
+        return 0;
+    }
+    private function fkQuery($schema, $selectedQuery, $tableObj) {
+        $keys = $tableObj->getForignKeys();
+        $keysNamesArr = [];
+        foreach ($keys as $fkObj) {
+            $keysNamesArr[] = $fkObj->getName();
+        }
+        $fkName = $this->select('Select the forign key:', $keysNamesArr);
+
+        if ($selectedQuery == 'Add Forign Key.') {
+            $schema->table($tableObj->getName())->addForeignKey($fkName);
+        } else {
+            $schema->table($tableObj->getName())->dropForeignKey($fkName);
+        }
+    }
+    private function colQuery(&$schema, $selectedQuery, $colsKeys, $tableObj) {
+        $selectedCol = $this->select('Select the column:', $colsKeys);
+        if ($selectedQuery == 'Add Column.') {
+            $schema->table($tableObj->getName())->addCol($selectedCol);
+        } else if ($selectedQuery == 'Modify Column.') {
+            $schema->table($tableObj->getName())->modifyCol($selectedCol);
+        } else if ($selectedQuery == 'Drop Column.') {
+            $schema->table($tableObj->getName())->dropCol($selectedCol);
         }
     }
     private function queryOnSchema(DB $schema) {
-        
+        $options = [
+            'Create Database.',
+            'Run Query on Specific Table.'
+        ];
+        $selected = $this->select('Select an option:', $options);
+        if ($selected == 'Create Database.') {
+            $schema->createTables();
+        } else {
+            $selectedTable = $this->select('Select database table:', array_keys($schema->getTables()));
+            $this->tableQuery($schema, $schema->getTable($selectedTable));
+        }
+        return $this->confirmExecute($schema);
     }
-    private function getConnName($connsArr) {
-        
-    }
-
 }

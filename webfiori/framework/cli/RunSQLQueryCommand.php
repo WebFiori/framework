@@ -29,7 +29,6 @@ namespace webfiori\framework\cli;
 use webfiori\framework\cli\CLICommand;
 use webfiori\framework\DB;
 use webfiori\framework\WebFioriApp;
-use webfiori\framework\DB;
 use webfiori\database\DatabaseException;
 use webfiori\database\Table;
 
@@ -44,12 +43,12 @@ use webfiori\database\Table;
 class RunSQLQueryCommand extends CLICommand {
     public function __construct() {
         parent::__construct('run-query', [
-            'connection' => [
+            '--connection' => [
                 'description' => 'Database connection that the query will '
                 . 'be executed on.',
                 'optional' => true,
             ],
-            'schema' => [
+            '--schema' => [
                 'description' => 'The namespace of a class that extends the class "webfiori\\framework\\DB" which represents '
                 . 'database schema.',
                 'optional' => true,
@@ -63,7 +62,7 @@ class RunSQLQueryCommand extends CLICommand {
      */
     public function exec() {
         $dbConnections = array_keys(WebFioriApp::getAppConfig()->getDBConnections());
-        $schema = $this->getArgValue('schema');
+        $schema = $this->getArgValue('--schema');
         if (count($dbConnections) != 0) {
             if ($schema !== null && class_exists($schema)) {
                 $schemaInst = new $schema();
@@ -74,7 +73,7 @@ class RunSQLQueryCommand extends CLICommand {
                     return -1;
                 }
             } else {
-                $connName = $this->getArgValue('connection');
+                $connName = $this->getArgValue('--connection');
             
                 if ($connName === null) {
                     $connName = $this->select('Select database connection:', $dbConnections, 0);
@@ -104,7 +103,7 @@ class RunSQLQueryCommand extends CLICommand {
             try {
                 $schema->execute();
             } catch (DatabaseException $ex) {
-                $this->error('The query finished execution with an error: '.$ex->getCode().' - '.$ex->getMessage());
+                $this->error('The query finished execution with an error: '.$ex->getMessage());
                 return $ex->getCode();
             }
             $this->success('Query executed without errors.');
@@ -132,7 +131,8 @@ class RunSQLQueryCommand extends CLICommand {
                 $tableClassNameValidity = true;
             } while (!$tableClassNameValidity);
             $schema->addTable($tableObj);
-            return $this->tableQuery($schema, $tableObj);
+            $this->tableQuery($schema, $tableObj);
+            return $this->confirmExecute($schema);
         }
     }
     private function tableQuery($schema, $tableObj) {
@@ -149,7 +149,7 @@ class RunSQLQueryCommand extends CLICommand {
         }
         $selectedQuery = $this->select('Select query type:', $queryTypes);
 
-        if ($selectedQuery == 'Add Column.' || $selectedQuery == 'Update Column.' || $selectedQuery == 'Drop Column.') {
+        if ($selectedQuery == 'Add Column.' || $selectedQuery == 'Modify Column.' || $selectedQuery == 'Drop Column.') {
             $this->colQuery($schema, $selectedQuery, $tableObj->getColsKeys(), $tableObj);
         } else if ($selectedQuery == 'Add Forign Key.' || $selectedQuery == 'Drop Forign Key.') {
             $this->fkQuery($schema, $selectedQuery, $tableObj);
@@ -158,8 +158,6 @@ class RunSQLQueryCommand extends CLICommand {
         } else if ($selectedQuery == 'Drop database table.') {
             $schema->table($tableObj->getName())->drop();
         }
-        
-        return $this->confirmExecute($schema);
     }
     private function confirmExecute($schema) {
         $this->println('The following query will be executed on the database:');
@@ -169,15 +167,17 @@ class RunSQLQueryCommand extends CLICommand {
         if ($this->confirm('Continue?')) {
             $this->info('Executing the query...');
             try {
+                $schema->execute();
                 $this->success('Query executed without errors.');
+                return 0;
             } catch (DatabaseException $ex) {
-                $this->error($ex->getCode().' - '.$ex->getMessage());
+                $this->error($ex->getMessage());
                 return $ex->getCode();
             }
         } else {
             $this->info('Nothing to execute.');
+            return 0;
         }
-        return 0;
     }
     private function fkQuery($schema, $selectedQuery, $tableObj) {
         $keys = $tableObj->getForignKeys();

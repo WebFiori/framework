@@ -87,7 +87,7 @@ class DB extends Database {
     public function register($pathToScan) {
         $pathToScan = ROOT_DIR.DS.$pathToScan;
         $filesInDir = array_diff(scandir($pathToScan), ['..', '.']);
-        Util::print_r($filesInDir);
+        
         self::_scanDir($filesInDir, $pathToScan);
     }
     private function _scanDir($filesInDir, $pathToScan) {

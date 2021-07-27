@@ -45,11 +45,20 @@ use webfiori\ui\HTMLNode;
  *
  * @author Ibrahim
  * 
- * @version 1.0
+ * @version 1.0.1
  * 
  * @since 2.1.0
  */
 class WebPage {
+    /**
+     * A lock to disable language loading status during class initialization 
+     * stage.
+     * 
+     * @var boolean
+     * 
+     * @since 1.0.1
+     */
+    private $skipLangCheck;
     /**
      * An array that contains the IDs of the 3 main page elements.
      * 
@@ -693,6 +702,7 @@ class WebPage {
      * @since 1.0
      */
     public function reset() {
+        $this->skipLangCheck = true;
         $this->document = new HTMLDoc();
         $this->_checkLang();
         $this->usingLanguage();
@@ -744,6 +754,7 @@ class WebPage {
         $this->includeLables = false;
 
         $this->_resetBeforeLoaded();
+        $this->skipLangCheck = false;
     }
     /**
      * Sets the canonical URL of the page.
@@ -1234,10 +1245,14 @@ class WebPage {
             try {
                 $this->tr = Language::loadTranslation($this->getLangCode());
             } catch (MissingLangException $ex) {
-                throw new MissingLangException($ex->getMessage());
+                if (!$this->skipLangCheck) {
+                    throw new MissingLangException($ex->getMessage());
+                }
             }
             $pageLang = $this->getTranslation();
-            $this->setWritingDir($pageLang->getWritingDir());
+            if ($pageLang !== null) {
+                $this->setWritingDir($pageLang->getWritingDir());
+            }
         }
     }
 }

@@ -1,7 +1,7 @@
 <?php
 namespace webfiori\framework\session;
 
-use app\database\MainDatabase;
+use webfiori\framework\session\SessionsTable;
 /**
  * A class which includes all database related operations to add, update, 
  * and delete sessions from a database.

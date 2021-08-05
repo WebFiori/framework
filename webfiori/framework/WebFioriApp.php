@@ -181,15 +181,12 @@ class WebFioriApp {
                         'ConfigController.php';
             }
             require_once $confControllerPath;
-            ConfigController::get()->createConstClass();
             $path = ROOT_DIR.DIRECTORY_SEPARATOR.APP_DIR_NAME.DIRECTORY_SEPARATOR.'ini'.DIRECTORY_SEPARATOR.'GlobalConstants.php';
             
-            if (file_exists($path)) {
-                require_once ROOT_DIR.DIRECTORY_SEPARATOR.APP_DIR_NAME.DIRECTORY_SEPARATOR.'ini'.DIRECTORY_SEPARATOR.'GlobalConstants.php';
-                
-            } else {
-                //Fall back. Usually in testing environment
+            if (!file_exists($path)) {
+                ConfigController::get()->createConstClass();
             }
+            require_once ROOT_DIR.DIRECTORY_SEPARATOR.APP_DIR_NAME.DIRECTORY_SEPARATOR.'ini'.DIRECTORY_SEPARATOR.'GlobalConstants.php';
         }
         call_user_func(APP_DIR_NAME.'\ini\GlobalConstants::defineConstants');
 

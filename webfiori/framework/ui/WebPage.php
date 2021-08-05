@@ -1060,7 +1060,14 @@ class WebPage {
      * request.
      */
     private function _checkLang() {
-        $session = SessionsManager::getActiveSession();
+        try {
+            $session = SessionsManager::getActiveSession();
+        } catch (Exception $ex) {
+            if (!$this->skipLangCheck) {
+                throw new SessionException($ex->getMessage(), $ex->getCode(), $ex);
+            }
+            $session = null;
+        }
         $langCodeFromSession = $session !== null ? $session->getLangCode(true) : null;
 
         if ($langCodeFromSession !== null) {

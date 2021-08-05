@@ -114,7 +114,11 @@ class ServerErrView {
     }
     private function _getSiteName() {
         $siteNames = WebFioriApp::getAppConfig()->getWebsiteNames();
-        $session = SessionsManager::getActiveSession();
+        try {
+            $session = SessionsManager::getActiveSession();
+        } catch (\Exception $ex) {
+            $session = null;
+        }
 
         if ($session !== null) {
             $currentLang = $session->getLangCode(true);
@@ -281,7 +285,6 @@ class ServerErrView {
             }
         } else {
             $hNode->addTextNode('500 - Server Error');
-            $this->page->insert($hNode);
             $this->page->insert($this->_createMessageLine('Type:', Util::ERR_TYPES[$throwableOrErr["type"]]['type']));
             $this->page->insert($this->_createMessageLine('Description:', Util::ERR_TYPES[$throwableOrErr["type"]]['description']));
             $this->page->insert($this->_createMessageLine('Message: ', '<pre>'.$throwableOrErr["message"].'</pre>'));

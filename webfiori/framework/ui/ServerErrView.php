@@ -85,6 +85,7 @@ class ServerErrView {
         }
 
         if ($responseExist) {
+            Response::clear();
             Response::write($page);
             Response::send();
         } else {

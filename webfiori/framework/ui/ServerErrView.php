@@ -119,6 +119,8 @@ class ServerErrView {
             $session = SessionsManager::getActiveSession();
         } catch (\Exception $ex) {
             $session = null;
+        } catch (\Error $ex) {
+            $session = null;
         }
 
         if ($session !== null) {
@@ -142,7 +144,7 @@ class ServerErrView {
 
         if ($throwableOrErr instanceof Throwable) {
             $retVal .= '<title>Uncaught Exception</title>'
-            .'<link href="'.Util::getBaseURL().'/assets/css/server-err.css" rel="stylesheet">'
+            .'<link href="https://cdn.jsdelivr.net/gh/webfiori/app@'.WF_VERSION.'/public/assets/css/server-err.css" rel="stylesheet">'
             .'</head>'
             .'<body>'
             .'<h1>500 - Server Error: Uncaught Exception.</h1>'
@@ -177,7 +179,7 @@ class ServerErrView {
             $retVal .= '</body></html>';
         } else {
             $retVal .= '<title>Server Error - 500</title>'
-                .'<link href="'.Util::getBaseURL().'/assets/css/server-err.css" rel="stylesheet">'
+                .'<link href="https://cdn.jsdelivr.net/gh/webfiori/app@'.WF_VERSION.'/public/assets/css/server-err.css" rel="stylesheet">'
                 .'</head>'
                 .'<body style="color:white;background-color:#1a000d;">'
                 .'<h1 style="color:#ff4d4d">500 - Server Error</h1>'
@@ -225,7 +227,7 @@ class ServerErrView {
         $this->page->setTitle('Uncaught Exception');
         $this->page->setWebsiteName($this->_getSiteName());
         $this->page->setTitleSep(WebFioriApp::getAppConfig()->getTitleSep());
-        $this->page->addCSS(Util::getBaseURL().'/assets/css/server-err.css',[],false);
+        $this->page->addCSS('https://cdn.jsdelivr.net/gh/webfiori/app@'.WF_VERSION.'/public/assets/css/server-err.css',[],false);
         $hNode = $this->page->insert('h1');
         //var_dump($throwableOrErr);
         if ($throwableOrErr instanceof Throwable) {

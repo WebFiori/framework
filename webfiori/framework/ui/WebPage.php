@@ -1067,6 +1067,11 @@ class WebPage {
                 throw new SessionException($ex->getMessage(), $ex->getCode(), $ex);
             }
             $session = null;
+        } catch (\Error $ex) {
+            if (!$this->skipLangCheck) {
+                throw new SessionException($ex->getMessage(), $ex->getCode(), $ex);
+            }
+            $session = null;
         }
         $langCodeFromSession = $session !== null ? $session->getLangCode(true) : null;
 
@@ -1186,7 +1191,7 @@ class WebPage {
             if ($pageTheme !== null) {
                 $themeAssetsDir = 'assets'.DS.$pageTheme->getDirectoryName();
 
-                $jsDir = $themeAssetsDir.DS.$pageTheme->getJsDirName();
+                $jsDir = ROOT_DIR.DS.'public'.DS.$themeAssetsDir.DS.$pageTheme->getJsDirName();
 
                 if (Util::isDirectory($jsDir)) {
                     $filesInDir = array_diff(scandir($jsDir), ['.','..']);
@@ -1207,8 +1212,8 @@ class WebPage {
                     }
                 }
 
-                $cssDir = $themeAssetsDir.DS.$pageTheme->getCssDirName();
-
+                $cssDir = ROOT_DIR.DS.'public'.DS.$themeAssetsDir.DS.$pageTheme->getCssDirName();
+                
                 if (Util::isDirectory($cssDir)) {
                     $filesInDir = array_diff(scandir($cssDir), ['.','..']);
                     $fileBase = $page->getThemeCSSDir().'/';

@@ -150,17 +150,16 @@ class MessageBox extends HTMLNode {
         $this->setAttribute('onmouseover', "if(this.getAttribute('dg') === null){addDragSupport(this)}");
 
         if (self::getCount() == 0) {
-            $base = WebFioriApp::getAppConfig()->getBaseURL();
             $css = new HTMLNode('link');
             $css->setAttributes([
                 'rel' => 'stylesheet',
-                'href' => $base.'/assets/css/message-box.css'
+                'href' => 'https://cdn.jsdelivr.net/gh/webfiori/app@'.WF_VERSION.'/public/assets/css/message-box.css'
             ]);
             $this->addChild($css);
             $js = new HTMLNode('script');
             $js->setAttributes([
                 'type' => 'text/javascript',
-                'src' => $base.'/assets/js/message-box.js'
+                'src' => 'https://cdn.jsdelivr.net/gh/webfiori/app@'.WF_VERSION.'/public/assets/js/message-box.js'
             ]);
             $this->addChild($js);
         }

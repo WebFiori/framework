@@ -819,16 +819,16 @@ class File implements JsonI {
         }
     }
     private function _extractPathAndName($absPath) {
-        $trimmed = trim($absPath);
-        $cleanPath = str_replace('\\', DS, str_replace('/', DS, $trimmed));
-        $pathArr = explode(DS, $cleanPath);
+        $DS = DIRECTORY_SEPARATOR;
+        $cleanPath = str_replace('\\', $DS, str_replace('/', $DS, trim($absPath)));
+        $pathArr = explode($DS, $cleanPath);
 
         if (count($pathArr) != 0) {
             $fPath = '';
             $name = $pathArr[count($pathArr) - 1];
 
             for ($x = 0 ; $x < count($pathArr) - 1 ; $x++) {
-                $fPath .= $pathArr[$x].DS;
+                $fPath .= $pathArr[$x].$DS;
             }
 
             return [
@@ -838,7 +838,7 @@ class File implements JsonI {
         }
 
         return [
-            'name' => $trimmed,
+            'name' => $cleanPath,
             'path' => ''
         ];
     }
@@ -878,12 +878,13 @@ class File implements JsonI {
         }
     }
     private static function _validatePath($fPath) {
-        $trimmedPath = trim($fPath);
+        $DS = DIRECTORY_SEPARATOR;
+        $trimmedPath = str_replace('/', $DS, str_replace('\\', $DS, trim($fPath)));
         $len = strlen($trimmedPath);
         $start = '';
         
         if ($len != 0) {
-            $start = $fPath[0] == DS ? DS : '';
+            $start = $trimmedPath[0] == $DS ? $DS : '';
             
             while ($trimmedPath[$len - 1] == '/' || $trimmedPath[$len - 1] == '\\') {
                 $tmpDir = trim($trimmedPath,'/');
@@ -897,7 +898,7 @@ class File implements JsonI {
             }
         }
 
-        return $start.str_replace('/', DIRECTORY_SEPARATOR, str_replace('\\', DIRECTORY_SEPARATOR, $trimmedPath));
+        return $start.$trimmedPath;
     }
     private function _viewFileHelper($asAttachment) {
         $contentType = $this->getFileMIMEType();

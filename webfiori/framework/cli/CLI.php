@@ -256,6 +256,7 @@ class CLI {
         self::register(new CreateCommand());
         self::register(new AddCommand());
         self::register(new UpdateTableCommand());
+        self::register(new RunSQLQueryCommand());
         self::_autoRegister();
         //Call this method to register any user-defined commands.
         call_user_func(APP_DIR_NAME.'\ini\InitCliCommands::init');

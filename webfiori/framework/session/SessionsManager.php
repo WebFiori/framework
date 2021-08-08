@@ -75,19 +75,13 @@ class SessionsManager {
         $this->sesstionsArr = [];
 
         if (defined('WF_SESSION_STORAGE')) {
-            try {
-                $constructor = WF_SESSION_STORAGE.'';
-                $classObj = new $constructor();
+            $constructor = WF_SESSION_STORAGE.'';
+            $classObj = new $constructor();
 
-                if (is_subclass_of($classObj, '\webfiori\framework\session\SessionStorage')) {
-                    $this->sesstionStorage = $classObj;
-                } else {
-                    throw new Exception('The class "'.WF_SESSION_STORAGE.'" does not implement "\webfiori\framework\session\SessionStorage".');
-                }
-            } catch (Exception $ex) {
-                throw new Exception('Unable to initialize session storage: "'.WF_SESSION_STORAGE.'" Due to an error: '.$ex->getMessage());
-            } catch (Error $ex) {
-                throw new Exception('Unable to initialize session storage: "'.WF_SESSION_STORAGE.'" Due to an error: '.$ex->getMessage());
+            if (is_subclass_of($classObj, '\webfiori\framework\session\SessionStorage')) {
+                $this->sesstionStorage = $classObj;
+            } else {
+                throw new Exception('The class "'.WF_SESSION_STORAGE.'" does not implement "\webfiori\framework\session\SessionStorage".');
             }
         }
 

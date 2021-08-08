@@ -260,11 +260,16 @@ class WebFioriApp {
                     }
                 }
             });
-            $sessionsCookiesHeaders = SessionsManager::getCookiesHeaders();
+            try {
+                $sessionsCookiesHeaders = SessionsManager::getCookiesHeaders();
 
-            foreach ($sessionsCookiesHeaders as $headerVal) {
-                Response::addHeader('set-cookie', $headerVal);
+                foreach ($sessionsCookiesHeaders as $headerVal) {
+                    Response::addHeader('set-cookie', $headerVal);
+                }
+            } catch (\Error $exc) {
+                
             }
+
             $uriObj = Router::getRouteUri();
 
             if ($uriObj !== null) {

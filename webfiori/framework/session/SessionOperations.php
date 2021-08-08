@@ -2,6 +2,7 @@
 namespace webfiori\framework\session;
 
 use webfiori\framework\session\SessionsTable;
+use app\database\MainDatabase;
 /**
  * A class which includes all database related operations to add, update, 
  * and delete sessions from a database.

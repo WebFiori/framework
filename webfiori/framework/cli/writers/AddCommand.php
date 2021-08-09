@@ -95,7 +95,7 @@ class AddCommand extends CLICommand {
         $this->success('Connected. Adding the connection...');
 
         WebFioriApp::getSysController()->addOrUpdateDBConnection($connInfoObj);
-        $this->success('Connection information was stored in the class "webfiori\conf\Config".');
+        $this->success('Connection information was stored in the class "'.APP_DIR_NAME.'\\AppConfig".');
 
         return 0;
     }
@@ -143,7 +143,7 @@ class AddCommand extends CLICommand {
         if (gettype($result) == 'object') {
             $this->success('Connectd. Adding connection information...');
             ConfigController::get()->updateOrAddEmailAccount($smtpConn);
-            $this->success('Connection information was stored in the class "webfiori\conf\MailConfig".');
+            $this->success('Connection information was stored in the class "'.APP_DIR_NAME.'\\AppConfig".');
 
             return 0;
         } else {

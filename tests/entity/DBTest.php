@@ -49,6 +49,7 @@ class DBTest extends TestCase {
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $db = new DB($conn);
         $db->addTable(new TestTable());
+        
         $db->table('test')->select()->execute();
     }
     /**

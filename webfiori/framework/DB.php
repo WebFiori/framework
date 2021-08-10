@@ -72,35 +72,42 @@ class DB extends Database {
         parent::__construct($conn);
     }
     /**
-     * Auto-register database tables which exist on a specific path.
+     * Auto-register database tables which exist on a specific directory.
      * 
      * Note that the statement 'return __NAMESPACE__' must be included at the 
-     * end of the table class for auto-register to work.
+     * end of the table class for auto-register to work. If the statement 
+     * does not exist, the method will assume that the path is the namespace of 
+     * the classes. Also, the classes which represents tables must be suffixed 
+     * with the word 'Table' (e.g. UsersTable).
      * 
      * @param string $pathToScan A path which is relative to application source 
      * code. For example, if tables classes exist in the folder 
-     * 'C:\Server\apache\htdocs\src\app\database', then the value of this 
+     * 'C:\Server\apache\htdocs\app\database', then the value of this 
      * argument must be 'app\database\.
      * 
      * @since 1.0.1
      */
     public function register($pathToScan) {
+        $defaultNs = str_replace('/', '\\', $pathToScan);
         $pathToScan = ROOT_DIR.DS.$pathToScan;
         $filesInDir = array_diff(scandir($pathToScan), ['..', '.']);
         
-        self::_scanDir($filesInDir, $pathToScan);
+        self::_scanDir($filesInDir, $pathToScan, $defaultNs);
     }
-    private function _scanDir($filesInDir, $pathToScan) {
+    private function _scanDir($filesInDir, $pathToScan, $defaultNs) {
+        
         foreach ($filesInDir as $fileName) {
             $fileExt = substr($fileName, -4);
 
             if ($fileExt == '.php') {
                 $cName = str_replace('.php', '', $fileName);
                 $ns = require_once $pathToScan.DS.$fileName;
-                $aNs = gettype($ns) == 'string' ? $ns.'\\' : '\\';
+                $aNs = gettype($ns) == 'string' ? $ns.'\\' : $defaultNs.'\\';
+                
                 $aCName = $aNs.$cName;
-
-                if (!AutoLoader::isLoaded($cName, $aNs) && class_exists($aCName)) {
+                $classSuffix = substr($aCName, -5);
+                
+                if ($classSuffix == 'Table' && class_exists($aCName)) {
                     $instance = new $aCName();
 
                     if ($instance instanceof Table) {

@@ -9,11 +9,12 @@
             <file>./webfiori/framework/Language.php</file>
             <file>./webfiori/framework/Access.php</file>
             <file>./webfiori/framework/DBConnectionInfo.php</file>
+            <file>./webfiori/framework/DB.php</file>
             <file>./webfiori/framework/File.php</file>
             <file>./webfiori/framework/Privilege.php</file>
             <file>./webfiori/framework/PrivilegesGroup.php</file>
             <file>./webfiori/framework/User.php</file>
-            <file>./webfiori/framework/Page.php</file>
+            <file>./webfiori/framework/ui/WebPage.php</file>
             <file>./webfiori/framework/Theme.php</file>
             <file>./webfiori/framework/session/Session.php</file>
             <file>./webfiori/framework/session/SessionsManager.php</file>

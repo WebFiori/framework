@@ -40,7 +40,12 @@ jobs:
           mysql user: 'root' 
           mysql password: 123456
               
-              
+      - name: Wait for MySQL
+        run: |
+          while ! mysqladmin ping --host=127.0.0.1 --password=123456 --silent; do
+            sleep 1
+          done
+          
       - name: Install Dependencies
         run: composer install --prefer-dist --no-interaction --no-dev
         

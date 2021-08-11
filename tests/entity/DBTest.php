@@ -32,7 +32,6 @@ class DBTest extends TestCase {
      */
     public function test01() {
         $this->expectException(DatabaseException::class);
-        $this->expectExceptionMessage("1045 - Access denied for user 'root'@'localhost' (using password: YES)");
         
         $conn = new ConnectionInfo('mysql', 'root', '12345', 'testing_db', '127.0.0.1');
         $db = new DB($conn);
@@ -44,7 +43,6 @@ class DBTest extends TestCase {
      */
     public function test02() {
         $this->expectException(DatabaseException::class);
-        $this->expectExceptionMessage("1146 - Table 'testing_db.test' doesn't exist");
         
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db', '127.0.0.1');
         $db = new DB($conn);

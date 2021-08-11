@@ -882,10 +882,10 @@ class File implements JsonI {
         $trimmedPath = str_replace('/', $DS, str_replace('\\', $DS, trim($fPath)));
         $len = strlen($trimmedPath);
         $start = '';
-        
+
         if ($len != 0) {
             $start = $trimmedPath[0] == $DS ? $DS : '';
-            
+
             while ($trimmedPath[$len - 1] == '/' || $trimmedPath[$len - 1] == '\\') {
                 $tmpDir = trim($trimmedPath,'/');
                 $trimmedPath = trim($tmpDir,'\\');

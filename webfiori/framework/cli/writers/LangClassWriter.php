@@ -25,8 +25,6 @@
  */
 namespace webfiori\framework\cli;
 
-use webfiori\framework\cli\ClassWriter;
-
 /**
  * A writer which is used to write any class that represents a language class.
  *

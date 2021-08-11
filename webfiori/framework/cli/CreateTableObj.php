@@ -1,11 +1,11 @@
 <?php
 namespace webfiori\framework\cli;
 
+use Error;
+use Exception;
 use webfiori\database\mysql\MySQLColumn;
 use webfiori\database\mysql\MySQLTable;
 use webfiori\database\Table;
-use Error;
-use Exception;
 /**
  * A helper class for creating database tables classes.
  *

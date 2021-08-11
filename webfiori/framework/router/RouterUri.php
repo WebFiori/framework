@@ -52,6 +52,14 @@ use webfiori\ui\HTMLNode;
  * @version 1.5.0
  */
 class RouterUri extends Uri {
+    /**
+     * The action (class method) that will be performed.
+     * 
+     * @var string|null
+     * 
+     * @since 1.5.0
+     */
+    private $action;
     private $assignedMiddlewareList;
     /**
      * 
@@ -103,14 +111,6 @@ class RouterUri extends Uri {
      */
     private $type;
     /**
-     * The action (class method) that will be performed.
-     * 
-     * @var string|null
-     * 
-     * @since 1.5.0
-     */
-    private $action;
-    /**
      * Creates new instance.
      * 
      * @param string $requestedUri The URI such as 'https://www3.programmingacademia.com:80/{some-var}/hell/{other-var}/?do=dnt&y=#xyz'
@@ -137,30 +137,6 @@ class RouterUri extends Uri {
         $this->incInSiteMap = false;
         $this->languages = [];
         $this->addMiddleware('global');
-    }
-    /**
-     * Sets the name of the action that will be called in the controller.
-     * 
-     * @param string $action The name of the controller method.
-     * 
-     * @since 1.5.0
-     */
-    public function setAction($action) {
-        $trimmed = trim($action);
-        
-        if (strlen($trimmed) != 0) {
-            $this->action = $trimmed;
-        }
-    }
-    /**
-     * Returns the name of the action that will be called in the controller.
-     * 
-     * @return string|null The name of the controller method.
-     * 
-     * @since 1.5.0
-     */
-    public function getAction() {
-        return $this->action;
     }
     /**
      * Adds a language to the set of languages at which the resource that the URI 
@@ -197,6 +173,16 @@ class RouterUri extends Uri {
                 $this->assignedMiddlewareList->add($mw);
             }
         }
+    }
+    /**
+     * Returns the name of the action that will be called in the controller.
+     * 
+     * @return string|null The name of the controller method.
+     * 
+     * @since 1.5.0
+     */
+    public function getAction() {
+        return $this->action;
     }
     /**
      * Returns class name based on the file which the route will point to.
@@ -386,6 +372,20 @@ class RouterUri extends Uri {
      */
     public function printUri() {
         Util::print_r($this->getComponents(),false);
+    }
+    /**
+     * Sets the name of the action that will be called in the controller.
+     * 
+     * @param string $action The name of the controller method.
+     * 
+     * @since 1.5.0
+     */
+    public function setAction($action) {
+        $trimmed = trim($action);
+
+        if (strlen($trimmed) != 0) {
+            $this->action = $trimmed;
+        }
     }
     /**
      * Sets the array of closure parameters.

@@ -30,7 +30,6 @@ use webfiori\framework\Util;
 use webfiori\framework\WebFioriApp;
 use webfiori\http\Response;
 use webfiori\ui\HTMLNode;
-use webfiori\framework\ui\WebPage;
 /**
  * A page which is used to display exception information when it is thrown or 
  * any other errors.
@@ -40,18 +39,18 @@ use webfiori\framework\ui\WebPage;
  */
 class ServerErrView {
     /**
+     *
+     * @var Throwable|Error
+     * @since 1.0 
+     */
+    private $errOrThrowable;
+    /**
      * 
      * @var WebPage
      * 
      * @since 1.0.2
      */
     private $page;
-    /**
-     *
-     * @var Throwable|Error
-     * @since 1.0 
-     */
-    private $errOrThrowable;
     /**
      * Creates a new instance of the class.
      * @param Throwable|array $throwableOrErr This can be an instance of the 

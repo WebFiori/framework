@@ -446,6 +446,7 @@ class Page {
         if (gettype($node) == 'string') {
             $node = new HTMLNode($node);
         }
+
         if (Page::get()->insertNode($node, $parentNodeId)) {
             return $node;
         }

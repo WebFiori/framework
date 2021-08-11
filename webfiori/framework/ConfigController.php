@@ -25,10 +25,10 @@
 namespace webfiori\framework;
 
 use webfiori\database\ConnectionInfo;
+use webfiori\framework\cli\LangClassWriter;
 use webfiori\framework\exceptions\SMTPException;
 use webfiori\framework\mail\SMTPAccount;
 use webfiori\framework\mail\SocketMailer;
-use webfiori\framework\cli\LangClassWriter;
 
 /**
  * A class that can be used to modify basic configuration settings of 
@@ -120,62 +120,6 @@ class ConfigController {
         }
     }
     /**
-     * Creates initialization class.
-     * 
-     * Note that if routes class already exist, this method will override 
-     * existing file.
-     * 
-     * @param string $className The name of the class.
-     * 
-     * @param string $comment A PHPDoc comment for class method.
-     * 
-     * @since 1.5.1
-     */
-    public function createIniClass($className, $comment) {
-        $cFile = new File("$className.php", ROOT_DIR.DS.APP_DIR_NAME.DS.'ini');
-        $cFile->remove();
-        $this->a($cFile, "<?php");
-        $this->a($cFile, "");
-        $this->a($cFile, "namespace ".APP_DIR_NAME."\\ini;");
-        $this->a($cFile, "");
-        $this->a($cFile, "class $className {");
-        $this->a($cFile, "    /**");
-        $this->a($cFile, "     * $comment");
-        $this->a($cFile, "     * ");
-        $this->a($cFile, "     * @since 1.0");
-        $this->a($cFile, "     */");
-        $this->a($cFile, "    public static function init() {");
-        $this->a($cFile, "        ");
-        $this->a($cFile, "    }");
-        $this->a($cFile, "}");
-        $cFile->write(true, true);
-        require_once ROOT_DIR.DS.APP_DIR_NAME.DS.'ini'.DS."$className.php";
-    }
-    /**
-     * Creates all directories at which the application needs to run.
-     */
-    private function createAppDirs() {
-        $DS = DIRECTORY_SEPARATOR;
-        $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME);
-        $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'ini');
-        $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'ini'.$DS.'routes');
-        $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'pages');
-        $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'commands');
-        $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'jobs');
-        $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'middleware');
-        $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'langs');
-        $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'sto');
-        $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'sto'.$DS.'uploads');
-        $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'sto'.$DS.'logs');
-        $this->_mkdir(ROOT_DIR.$DS.'public');
-        $this->_mkdir(ROOT_DIR.$DS.'themes');
-    }
-    private function _mkdir($dir) {
-        if (!is_dir($dir)) {
-            mkdir($dir);
-        }
-    }
-    /**
      * Creates the class 'GlobalConstants'.
      * 
      * By default, the class will be created inside the folder 'app/ini'.
@@ -189,6 +133,7 @@ class ConfigController {
         //For this reason, use the 'resource' instead of the class 'File'. 
         $path = ROOT_DIR.DIRECTORY_SEPARATOR.APP_DIR_NAME.DIRECTORY_SEPARATOR.'ini'.DIRECTORY_SEPARATOR."GlobalConstants.php";
         $resource = fopen($path, 'w');
+
         if (!is_resource($resource)) {
             throw new \Exception('Unable to create the file "'.$path.'"');
         }
@@ -344,7 +289,7 @@ class ConfigController {
             'type' => 'string',
             'value' => "DIRECTORY_SEPARATOR"
         ]);
-        
+
         $this->a($resource, "        if (!defined('THEMES_PATH')){");
         $this->a($resource, "            \$themesDirName = 'themes';");
         $this->a($resource, "            \$themesPath = substr(__DIR__, 0, strlen(__DIR__) - strlen(APP_DIR_NAME.'/ini')).DIRECTORY_SEPARATOR.\$themesDirName;");
@@ -358,7 +303,7 @@ class ConfigController {
         $this->a($resource, '             */');
         $this->a($resource, "            define('THEMES_PATH', \$themesPath);");
         $this->a($resource, '        }');
-        
+
         $this->addConst($resource, [
             'name' => 'USE_HTTP',
             'summary' => 'Sets the framework to use \'http://\' or \'https://\' for base URIs.',
@@ -376,36 +321,36 @@ class ConfigController {
         require_once $path;
     }
     /**
+     * Creates initialization class.
      * 
-     * @param File $file
-     * @param type $name
-     * @param type $val
-     * @param type $docBlock
+     * Note that if routes class already exist, this method will override 
+     * existing file.
+     * 
+     * @param string $className The name of the class.
+     * 
+     * @param string $comment A PHPDoc comment for class method.
+     * 
+     * @since 1.5.1
      */
-    private function addConst($file, $options) {
-        $this->a($file, "        if (!defined('".$options['name']."')){");
-        $this->a($file, '            /**');
-        
-        if (isset($options['summary'])) {
-            $this->a($file, '             * '.$options['summary']);
-            $this->a($file, '             * ');
-        }
-        if (isset($options['description'])) {
-            $this->a($file, '             * '.$options['description']);
-            $this->a($file, '             * ');
-        }
-        if (isset($options['type'])) {
-            $this->a($file, '             * @var '.$options['type']);
-            $this->a($file, '             * ');
-        }
-        if (isset($options['since'])) {
-            $this->a($file, '             * @since '.$options['since']);
-            $this->a($file, '             * ');
-        }
-        $this->a($file, '             */');
-        $val = $options['value'];
-        $this->a($file, "            define('".$options['name']."', $val);");
-        $this->a($file, '        }');
+    public function createIniClass($className, $comment) {
+        $cFile = new File("$className.php", ROOT_DIR.DS.APP_DIR_NAME.DS.'ini');
+        $cFile->remove();
+        $this->a($cFile, "<?php");
+        $this->a($cFile, "");
+        $this->a($cFile, "namespace ".APP_DIR_NAME."\\ini;");
+        $this->a($cFile, "");
+        $this->a($cFile, "class $className {");
+        $this->a($cFile, "    /**");
+        $this->a($cFile, "     * $comment");
+        $this->a($cFile, "     * ");
+        $this->a($cFile, "     * @since 1.0");
+        $this->a($cFile, "     */");
+        $this->a($cFile, "    public static function init() {");
+        $this->a($cFile, "        ");
+        $this->a($cFile, "    }");
+        $this->a($cFile, "}");
+        $cFile->write(true, true);
+        require_once ROOT_DIR.DS.APP_DIR_NAME.DS.'ini'.DS."$className.php";
     }
     /**
      * Creates a file that holds class information which is used to create 
@@ -845,7 +790,7 @@ class ConfigController {
     public function updateSiteInfo($websiteInfoArr) {
         $this->writeAppConfig($websiteInfoArr);
     }
-    
+
     /**
      * Stores configuration variables into the application configuration class.
      * 
@@ -1414,11 +1359,12 @@ class ConfigController {
         foreach ($titlesArr as $langCode => $title) {
             $title = str_replace("'", "\'", $title);
             $this->a($cFile, "            '$langCode' => '$title',");
+
             if (!class_exists(APP_DIR_NAME.'\\langs\\Language'.$langCode)) {
-                
+
                 //This require a fix in the future
                 $dir = $langCode == 'AR' ? 'rtl' : 'ltr';
-                
+
                 $writer = new LangClassWriter($langCode, $dir);
                 $writer->writeClass();
                 require_once $writer->getAbsolutePath();
@@ -1534,11 +1480,71 @@ class ConfigController {
         $cFile->write(false, true);
         require_once ROOT_DIR.DS.APP_DIR_NAME.DS.'AppConfig.php';
     }
+    private function _mkdir($dir) {
+        if (!is_dir($dir)) {
+            mkdir($dir);
+        }
+    }
     private function a($file, $str) {
         if (is_resource($file)) {
             fwrite($file, $str.self::NL);
         } else {
             $file->append($str.self::NL);
         }
+    }
+    /**
+     * 
+     * @param File $file
+     * @param type $name
+     * @param type $val
+     * @param type $docBlock
+     */
+    private function addConst($file, $options) {
+        $this->a($file, "        if (!defined('".$options['name']."')){");
+        $this->a($file, '            /**');
+
+        if (isset($options['summary'])) {
+            $this->a($file, '             * '.$options['summary']);
+            $this->a($file, '             * ');
+        }
+
+        if (isset($options['description'])) {
+            $this->a($file, '             * '.$options['description']);
+            $this->a($file, '             * ');
+        }
+
+        if (isset($options['type'])) {
+            $this->a($file, '             * @var '.$options['type']);
+            $this->a($file, '             * ');
+        }
+
+        if (isset($options['since'])) {
+            $this->a($file, '             * @since '.$options['since']);
+            $this->a($file, '             * ');
+        }
+        $this->a($file, '             */');
+        $val = $options['value'];
+        $this->a($file, "            define('".$options['name']."', $val);");
+        $this->a($file, '        }');
+    }
+    /**
+     * Creates all directories at which the application needs to run.
+     */
+    private function createAppDirs() {
+        $DS = DIRECTORY_SEPARATOR;
+        $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME);
+        $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'ini');
+        $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'ini'.$DS.'routes');
+        $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'pages');
+        $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'commands');
+        $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'jobs');
+        $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'middleware');
+        $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'langs');
+        $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'sto');
+        $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'sto'.$DS.'uploads');
+        $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'sto'.$DS.'logs');
+        $this->_mkdir(ROOT_DIR.$DS.APP_DIR_NAME.$DS.'sto'.$DS.'sessions');
+        $this->_mkdir(ROOT_DIR.$DS.'public');
+        $this->_mkdir(ROOT_DIR.$DS.'themes');
     }
 }

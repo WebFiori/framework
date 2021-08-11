@@ -51,15 +51,6 @@ use webfiori\ui\HTMLNode;
  */
 class WebPage {
     /**
-     * A lock to disable language loading status during class initialization 
-     * stage.
-     * 
-     * @var boolean
-     * 
-     * @since 1.0.1
-     */
-    private $skipLangCheck;
-    /**
      * An array that contains the IDs of the 3 main page elements.
      * 
      * The array has the following values:
@@ -176,6 +167,15 @@ class WebPage {
      * @since 1.0
      */
     private $includeLables;
+    /**
+     * A lock to disable language loading status during class initialization 
+     * stage.
+     * 
+     * @var boolean
+     * 
+     * @since 1.0.1
+     */
+    private $skipLangCheck;
     /**
      * An object of type <b>Theme</b> that contains loaded theme info.
      * 
@@ -1213,7 +1213,7 @@ class WebPage {
                 }
 
                 $cssDir = ROOT_DIR.DS.'public'.DS.$themeAssetsDir.DS.$pageTheme->getCssDirName();
-                
+
                 if (Util::isDirectory($cssDir)) {
                     $filesInDir = array_diff(scandir($cssDir), ['.','..']);
                     $fileBase = $page->getThemeCSSDir().'/';
@@ -1262,6 +1262,7 @@ class WebPage {
                 }
             }
             $pageLang = $this->getTranslation();
+
             if ($pageLang !== null) {
                 $this->setWritingDir($pageLang->getWritingDir());
             }

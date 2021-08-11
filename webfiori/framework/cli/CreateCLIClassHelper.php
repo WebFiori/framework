@@ -24,6 +24,7 @@ class CreateCLIClassHelper {
         $classInfo = $command->getClassInfo(APP_DIR_NAME.'\\commands');
         $commandName = $this->_getCommandName();
         $commandDesc = $this->_getCommand()->getInput('Give a short description of the command:');
+
         if ($command->confirm('Would you like to add arguments to the command?', false)) {
             $argsArr = $this->_getArgs();
         } else {
@@ -76,37 +77,18 @@ class CreateCLIClassHelper {
             $groupName = $this->_getCommand()->getInput('Enter argument name:');
 
             if (strlen($groupName) > 0) {
-                
                 $argArr['name'] = $groupName;
             }
             $argArr['description'] = $this->_getCommand()->getInput('Describe this argument and how to use it:', '');
             $argArr['values'] = $this->_getFixedVals();
             $argArr['optional'] = $this->_getCommand()->confirm('Is this argument optional or not?', true);
             $argArr['default'] = $this->_getCommand()->getInput('Enter default value:');
-            
+
             $argsArr[] = $argArr;
             $addToMore = $this->_getCommand()->confirm('Would you like to add more arguments?', false);
         }
 
         return $argsArr;
-    }
-    private function _getFixedVals() {
-        
-        if (!$this->_getCommand()->confirm('Does this argument have a fixed set of values?', false)) {
-            return [];
-        }
-        $addVals = true;
-        $valsArr = [];
-        
-        while ($addVals) {
-            $val = $this->_getCommand()->getInput('Enter the value:');
-            
-            if (!in_array($val, $valsArr)) {
-                $valsArr[] = $val;
-            }
-            $addVals = $this->_getCommand()->confirm('Would you like to add more values?', false);
-        }
-        return $valsArr;
     }
     /**
      * 
@@ -127,6 +109,24 @@ class CreateCLIClassHelper {
             return false;
         });
     }
+    private function _getFixedVals() {
+        if (!$this->_getCommand()->confirm('Does this argument have a fixed set of values?', false)) {
+            return [];
+        }
+        $addVals = true;
+        $valsArr = [];
+
+        while ($addVals) {
+            $val = $this->_getCommand()->getInput('Enter the value:');
+
+            if (!in_array($val, $valsArr)) {
+                $valsArr[] = $val;
+            }
+            $addVals = $this->_getCommand()->confirm('Would you like to add more values?', false);
+        }
+
+        return $valsArr;
+    }
 
     /**
      * 
@@ -141,26 +141,30 @@ class CreateCLIClassHelper {
         $writer->append(' * Creates new instance of the class.', 1);
         $writer->append(' */', 1);
         $writer->append('public function __construct(){', 1);
-        
+
 
         if (count($args) > 0) {
             $writer->append("parent::__construct('$name', [", 2);
+
             foreach ($args as $argArr) {
                 $writer->append("'".$argArr['name']."' => [", 3);
+
                 if (strlen($argArr['description']) != 0) {
-                    $writer->append("'description' => '". str_replace("'", "\'", $argArr['description'])."',", 4);
+                    $writer->append("'description' => '".str_replace("'", "\'", $argArr['description'])."',", 4);
                 }
                 $writer->append("'optional' => ".($argArr['optional'] === true ? 'true' : 'false').",", 4);
+
                 if (count($argArr['values']) != 0) {
                     $writer->append("'values' => [", 4);
+
                     foreach ($argArr['values'] as $val) {
-                        $writer->append("'". str_replace("'", "\'", $val)."',", 5);
+                        $writer->append("'".str_replace("'", "\'", $val)."',", 5);
                     }
                     $writer->append("]", 4);
                 }
                 $writer->append("],", 3);
             }
-            $writer->append("], '". str_replace("'", "\'", $commandDesc)."');", 2);
+            $writer->append("], '".str_replace("'", "\'", $commandDesc)."');", 2);
         } else {
             $writer->append("parent::__construct('$name', '".str_replace("'", "\'", $commandDesc)."');", 2);
         }

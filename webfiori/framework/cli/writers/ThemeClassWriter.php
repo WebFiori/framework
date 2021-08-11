@@ -1,8 +1,6 @@
 <?php
 namespace webfiori\framework\cli;
 
-use webfiori\framework\cli\ClassWriter;
-
 /**
  * Description of ThemeClassWriter
  *
@@ -28,7 +26,7 @@ class ThemeClassWriter extends ClassWriter {
         $this->append('public function __construct(){', 1);
         $this->append('parent::__construct();', 2);
         $this->append('//TODO: Set the properties of your theme.', 2);
-        
+
         $this->append('//$this->setName(\'Super Theme\');', 2);
         $this->append('//$this->setVersion(\'1.0\');', 2);
         $this->append('//$this->setAuthor(\'Me\');', 2);
@@ -39,9 +37,9 @@ class ThemeClassWriter extends ClassWriter {
         $this->append('//$this->setCssDirName(\'css\');', 2);
         $this->append('//$this->setJsDirName(\'js\');', 2);
         $this->append('//$this->setImagesDirName(\'images\');', 2);
-        
+
         $this->append('}', 1);
-        
+
         $this->append('/**', 1);
         $this->append(" * Returns an object of type 'HTMLNode' that represents aside section of the page. ", 1);
         $this->append(' *', 1);
@@ -52,7 +50,7 @@ class ThemeClassWriter extends ClassWriter {
         $this->append('$asideNode = new HTMLNode();', 2);
         $this->append('return $asideNode;', 2);
         $this->append('}', 1);
-        
+
         $this->append('/**', 1);
         $this->append(" * Returns an object of type 'HTMLNode' that represents footer section of the page.", 1);
         $this->append(' *', 1);
@@ -63,7 +61,7 @@ class ThemeClassWriter extends ClassWriter {
         $this->append('$footerNode = new HTMLNode();', 2);
         $this->append('return $footerNode;', 2);
         $this->append('}', 1);
-        
+
         $this->append('/**', 1);
         $this->append(" * Returns an object of type HeadNode that represents HTML &lt;head&gt; node.", 1);
         $this->append(' *', 1);
@@ -73,7 +71,7 @@ class ThemeClassWriter extends ClassWriter {
         $this->append('$headNode = new HeadNode();', 2);
         $this->append('return $headNode;', 2);
         $this->append('}', 1);
-        
+
         $this->append('/**', 1);
         $this->append(" * Returns an object of type HTMLNode that represents header section of the page.", 1);
         $this->append(' *', 1);
@@ -84,7 +82,7 @@ class ThemeClassWriter extends ClassWriter {
         $this->append('$headerNode = new HTMLNode();', 2);
         $this->append('return $headerNode;', 2);
         $this->append('}', 1);
-        
+
         $this->append('}');
         $this->append('return __NAMESPACE__;');
     }

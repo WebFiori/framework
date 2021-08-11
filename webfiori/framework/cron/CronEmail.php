@@ -135,7 +135,7 @@ class CronEmail extends EmailMessage {
         $jobTable->addChild($this->_createTableRow('Application Version:', WebFioriApp::getAppConfig()->getVersion()));
         $jobTable->addChild($this->_createTableRow('Version Type:', WebFioriApp::getAppConfig()->getVersionType()));
         $jobTable->addChild($this->_createTableRow('Application Release Date:', WebFioriApp::getAppConfig()->getReleaseDate()));
-        
+
         if ($job->isSuccess()) {
             $jobTable->addChild($this->_createTableRow('Exit Status:', '<b style="color:green">Success</b>'));
         } else {

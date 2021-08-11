@@ -1,7 +1,6 @@
 <?php
 namespace webfiori\framework\session;
 
-use webfiori\framework\session\SessionOperations;
 /**
  * A session storage engine which uses database to store session state.
  *

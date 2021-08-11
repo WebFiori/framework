@@ -24,7 +24,6 @@
  */
 namespace webfiori\framework\session;
 
-use Error;
 use Exception;
 
 /**

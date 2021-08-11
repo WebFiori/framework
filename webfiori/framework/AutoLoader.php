@@ -160,6 +160,7 @@ class AutoLoader {
         }
         //Read cashe after setting root dir as it depends on it.
         $this->_readCache();
+
         if (gettype($searchFolders) == 'array') {
             foreach ($searchFolders as $folder) {
                 $this->addSearchDirectory($folder, true);
@@ -224,10 +225,12 @@ class AutoLoader {
         'on-load-failure' => self::ON_FAIL_ACTIONS[1]
     ]) {
         $DS = DIRECTORY_SEPARATOR;
+
         if (!defined('APP_DIR_NAME')) {
             define('APP_DIR_NAME', 'app');
         }
         $appFolder = APP_DIR_NAME;
+
         if (self::$loader === null) {
             $frameworkSearchFoldres = [
                 '',
@@ -462,7 +465,6 @@ class AutoLoader {
 
         if (gettype($subDirs) == 'array') {
             foreach ($subDirs as $subDir) {
-                
                 if ($subDir != '.' && $subDir != '..') {
                     $dirsStack[] = $xDir.DIRECTORY_SEPARATOR.$subDir;
                 }
@@ -546,6 +548,7 @@ class AutoLoader {
             } else {
                 $f = $value.$DS.$className.'.php';
             }
+
             if (!file_exists($f)) {
                 //Old style classes (all lower case)
                 if ($appendRoot === true) {
@@ -554,6 +557,7 @@ class AutoLoader {
                     $f = $value.$DS.strtolower($className).'.php';
                 }
             }
+
             if (file_exists($f)) {
                 require_once $f;
                 $ns = count(explode('\\', $classWithNs)) == 1 ? '\\' : substr($classWithNs, 0, strlen($classWithNs) - strlen($className) - 1);
@@ -566,7 +570,7 @@ class AutoLoader {
                 $loaded = true;
             }
         }
-        
+
         return $loaded;
     }
     private function _loadFromCache($classNS, $className) {
@@ -630,7 +634,7 @@ class AutoLoader {
             if (!file_exists($autoloadCachePath) && is_writable($autoloadCachePath)) {
                 mkdir($autoloadCachePath, '0777', true);
                 $h = fopen($autoloadCache, 'w');
-                
+
                 if (is_resource($h)) {
                     fclose($h);
                 }
@@ -646,6 +650,7 @@ class AutoLoader {
      */
     private function _updateCache() {
         $autoloadCache = $this->getRoot().DIRECTORY_SEPARATOR.APP_DIR_NAME.DIRECTORY_SEPARATOR.'sto'.DIRECTORY_SEPARATOR.self::CACHE_NAME;
+
         if (file_exists($autoloadCache)) {
             $h = @fopen($autoloadCache, 'w');
 
@@ -732,7 +737,7 @@ class AutoLoader {
         foreach ($this->searchFolders as $value => $appendRoot) {
             $loaded = $this->_loadClassHelper($className, $classWithNs, $value, $appendRoot, $allPaths) || $loaded;
         }
-        
+
         if ($loaded === false) {
             if (is_callable($this->onFail)) {
                 call_user_func($this->onFail);

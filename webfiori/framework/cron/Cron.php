@@ -135,44 +135,6 @@ class Cron {
         $this->isLogEnabled = false;
         $this->cronJobsQueue = new Queue();
         $this->_setPassword('');
-
-    }
-    /**
-     * Creates routes to cron web interface pages.
-     * 
-     * This method is used to initialize the following routes:
-     * <ul>
-     * <li>/cron</li>
-     * <li>/cron/login</li>
-     * <li>/cron/apis/{action}</li>
-     * <li>/cron/jobs</li>
-     * <li>/cron/jobs/{job-name}</li>
-     * </ul>
-     * 
-     * @since 1.1.0
-     */
-    public static function initRoutes() {
-        Router::addRoute([
-            'path' => '/cron/login',
-            'route-to' => CronLoginView::class
-        ]);
-        Router::addRoute([
-            'path' => '/cron/apis/{action}',
-            'route-to' => CronServicesManager::class,
-            'as-api' => true
-        ]);
-        Router::addRoute([
-            'path' => '/cron',
-            'route-to' => CronLoginView::class
-        ]);
-        Router::addRoute([
-            'path' => '/cron/jobs',
-            'route-to' => CronLoginView::class
-        ]);
-        Router::addRoute([
-            'path' => '/cron/jobs/{job-name}',
-            'route-to' => CronLoginView::class
-        ]);
     }
     /**
      * Returns an object that represents the job which is currently being executed.
@@ -379,6 +341,43 @@ class Cron {
      */
     public static function hour() {
         return self::_get()->timestamp['hour'];
+    }
+    /**
+     * Creates routes to cron web interface pages.
+     * 
+     * This method is used to initialize the following routes:
+     * <ul>
+     * <li>/cron</li>
+     * <li>/cron/login</li>
+     * <li>/cron/apis/{action}</li>
+     * <li>/cron/jobs</li>
+     * <li>/cron/jobs/{job-name}</li>
+     * </ul>
+     * 
+     * @since 1.1.0
+     */
+    public static function initRoutes() {
+        Router::addRoute([
+            'path' => '/cron/login',
+            'route-to' => CronLoginView::class
+        ]);
+        Router::addRoute([
+            'path' => '/cron/apis/{action}',
+            'route-to' => CronServicesManager::class,
+            'as-api' => true
+        ]);
+        Router::addRoute([
+            'path' => '/cron',
+            'route-to' => CronLoginView::class
+        ]);
+        Router::addRoute([
+            'path' => '/cron/jobs',
+            'route-to' => CronLoginView::class
+        ]);
+        Router::addRoute([
+            'path' => '/cron/jobs/{job-name}',
+            'route-to' => CronLoginView::class
+        ]);
     }
     /**
      * Returns a queue of all queued jobs.

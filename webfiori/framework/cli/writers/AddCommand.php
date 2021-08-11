@@ -30,7 +30,6 @@ use webfiori\framework\ConfigController;
 use webfiori\framework\DB;
 use webfiori\framework\mail\SMTPAccount;
 use webfiori\framework\WebFioriApp;
-use webfiori\framework\cli\LangClassWriter;
 
 /**
  * A command which is used to add a database connection or SMTP account.
@@ -124,9 +123,7 @@ class AddCommand extends CLICommand {
         $writer = new LangClassWriter($langCode, $writingDir);
         $writer->writeClass();
         $this->success('Language added. Also, a class for the language '
-                . 'is created at "'.APP_DIR_NAME.'\langs" for that language.');
-        
-        
+                .'is created at "'.APP_DIR_NAME.'\langs" for that language.');
     }
     private function _addSmtp() {
         $smtpConn = new SMTPAccount();

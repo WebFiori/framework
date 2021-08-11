@@ -25,7 +25,6 @@
  */
 namespace webfiori\framework\cli;
 
-use webfiori\framework\WebFioriApp;
 /**
  * Description of VersionCommand
  *

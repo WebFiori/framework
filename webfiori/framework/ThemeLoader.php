@@ -26,7 +26,6 @@ namespace webfiori\framework;
 
 use webfiori\framework\exceptions\NoSuchThemeException;
 use webfiori\framework\router\Router;
-use webfiori\framework\WebFioriApp;
 
 
 /**
@@ -75,6 +74,7 @@ class ThemeLoader {
     public static function getAvailableThemes() {
         if (self::$AvailableThemes === null) {
             self::$AvailableThemes = [];
+
             if (Util::isDirectory(THEMES_PATH, true)) {
                 $themesDirs = array_diff(scandir(THEMES_PATH), ['..', '.']);
 
@@ -172,6 +172,7 @@ class ThemeLoader {
      */
     public static function usingTheme($themeName = null) {
         $trimmedName = trim($themeName);
+
         if (strlen($trimmedName) != 0) {
             $themeName = $trimmedName;
         } else {

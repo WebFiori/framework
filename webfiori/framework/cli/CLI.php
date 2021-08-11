@@ -85,6 +85,7 @@ class CLI {
                 $_SERVER['HTTPS'] = 'yes';
             }
         }
+
         if (!class_exists(APP_DIR_NAME.'\ini\InitCliCommands')) {
             ConfigController::get()->createIniClass('InitCliCommands', 'Register user defined CLI commands.');
         }

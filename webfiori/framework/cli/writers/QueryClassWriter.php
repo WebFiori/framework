@@ -285,9 +285,10 @@ class QueryClassWriter extends ClassWriter {
     private function addFksTables() {
         $fks = $this->tableObj->getForignKeys();
         $addedRefs = [];
+
         foreach ($fks as $fkObj) {
             $refTableNs = get_class($fkObj->getSource());
-            
+
             if (!in_array($refTableNs, $addedRefs)) {
                 $this->append('use '.$refTableNs.';');
                 $addedRefs[] = $refTableNs;

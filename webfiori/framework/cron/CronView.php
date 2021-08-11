@@ -24,13 +24,12 @@
  */
 namespace webfiori\framework\cron;
 
-use webfiori\framework\Page;
 use webfiori\framework\session\SessionsManager;
+use webfiori\framework\ui\WebPage;
 use webfiori\framework\WebFioriApp;
 use webfiori\http\Response;
 use webfiori\ui\HTMLNode;
 use webfiori\ui\JsCode;
-use webfiori\framework\ui\WebPage;
 /**
  * A generic view for cron related operations. 
  * 

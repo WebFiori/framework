@@ -26,7 +26,7 @@ class UpdateTableCommand extends CLICommand {
         parent::__construct('update-table', [
             '--table' => [
                 'description' => 'The namespace of the table class (including namespace). '
-                . 'Note that every \ in the namespace must be written as \\\\.',
+                .'Note that every \ in the namespace must be written as \\\\.',
                 'optional' => true,
             ]
         ], 'Update a database table.');
@@ -105,16 +105,17 @@ class UpdateTableCommand extends CLICommand {
     }
     public function exec() {
         $tableClassInput = $this->getArgValue('--table');
-        
+
         while ($tableClassInput === null) {
             $tableClassInput = $this->getInput('Enter the name of table class (including namespace):');
+
             if (strlen($tableClassInput) == 0) {
                 $tableClassInput = null;
                 $this->error('Given class name is invalid!');
             }
         }
         $tableClass = trim($tableClassInput, '\\\\');
-        
+
         try {
             $tableObj = new $tableClass();
 

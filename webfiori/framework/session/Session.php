@@ -956,7 +956,7 @@ class Session implements JsonI {
             } else {
                 $retVal = false;
             }
-            
+
             return $retVal;
         }
 

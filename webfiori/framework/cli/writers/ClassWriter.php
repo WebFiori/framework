@@ -117,6 +117,16 @@ class ClassWriter {
         $this->classAsStr .= $tabStr.$str."\n";
     }
     /**
+     * Returns the absolute path of the class that will be created.
+     * 
+     * @return string The absolute path of the file that holds class information.
+     * 
+     * @since 1.0.1
+     */
+    public function getAbsolutePath() {
+        return $this->getPath().DS.$this->className.'.php';
+    }
+    /**
      * Returns the name of the class that will be created.
      * 
      * @return string The name of the class that will be created.
@@ -145,16 +155,6 @@ class ClassWriter {
      */
     public function getPath() {
         return $this->path;
-    }
-    /**
-     * Returns the absolute path of the class that will be created.
-     * 
-     * @return string The absolute path of the file that holds class information.
-     * 
-     * @since 1.0.1
-     */
-    public function getAbsolutePath() {
-        return $this->getPath().DS.$this->className.'.php';
     }
     /**
      * Write the new class to a .php file.

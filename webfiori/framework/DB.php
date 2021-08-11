@@ -24,12 +24,10 @@
  */
 namespace webfiori\framework;
 
-use webfiori\framework\WebFioriApp;
 use webfiori\database\ConnectionInfo;
 use webfiori\database\Database;
 use webfiori\database\DatabaseException;
 use webfiori\database\Table;
-use webfiori\framework\AutoLoader;
 
 /**
  * A class that can be used to represent system database.
@@ -91,11 +89,10 @@ class DB extends Database {
         $defaultNs = str_replace('/', '\\', $pathToScan);
         $pathToScan = ROOT_DIR.DS.$pathToScan;
         $filesInDir = array_diff(scandir($pathToScan), ['..', '.']);
-        
+
         self::_scanDir($filesInDir, $pathToScan, $defaultNs);
     }
     private function _scanDir($filesInDir, $pathToScan, $defaultNs) {
-        
         foreach ($filesInDir as $fileName) {
             $fileExt = substr($fileName, -4);
 
@@ -103,10 +100,10 @@ class DB extends Database {
                 $cName = str_replace('.php', '', $fileName);
                 $ns = require_once $pathToScan.DS.$fileName;
                 $aNs = gettype($ns) == 'string' ? $ns.'\\' : $defaultNs.'\\';
-                
+
                 $aCName = $aNs.$cName;
                 $classSuffix = substr($aCName, -5);
-                
+
                 if ($classSuffix == 'Table' && class_exists($aCName)) {
                     $instance = new $aCName();
 

@@ -50,21 +50,10 @@ class DefaultSessionStorage implements SessionStorage {
         $sessionsDirName = 'sessions';
         $sessionsStoragePath = ROOT_DIR.DS.'app'.DS.'sto';
         $this->storeLoc = $sessionsStoragePath.DS.$sessionsDirName;
-        
+
         if (!file_exists($this->storeLoc) && is_writable($sessionsStoragePath)) {
             mkdir($this->storeLoc);
         }
-    }
-    /**
-     * Checks if sessions storage location is exist and writable.
-     * 
-     * @return bolean If sessions storage location exist and is writable, 
-     * the method will return true.
-     * 
-     * @since 1.0.1
-     */
-    public function isStorageDirExist() {
-        return file_exists($this->storeLoc) && is_writable($this->storeLoc);
     }
     /**
      * Removes all inactive sessions.
@@ -77,7 +66,6 @@ class DefaultSessionStorage implements SessionStorage {
      * @since 1.0
      */
     public function gc() {
-        
         if (!$this->isStorageDirExist()) {
             return;
         }
@@ -99,6 +87,17 @@ class DefaultSessionStorage implements SessionStorage {
         }
     }
     /**
+     * Checks if sessions storage location is exist and writable.
+     * 
+     * @return bolean If sessions storage location exist and is writable, 
+     * the method will return true.
+     * 
+     * @since 1.0.1
+     */
+    public function isStorageDirExist() {
+        return file_exists($this->storeLoc) && is_writable($this->storeLoc);
+    }
+    /**
      * Reads a session from session file.
      * 
      * @param string $sessionId The ID of the session.
@@ -110,7 +109,6 @@ class DefaultSessionStorage implements SessionStorage {
      * @since 1.0
      */
     public function read($sessionId) {
-        
         if (!$this->isStorageDirExist()) {
             return;
         }
@@ -130,7 +128,6 @@ class DefaultSessionStorage implements SessionStorage {
      * @since 1.0
      */
     public function remove($sessionId) {
-        
         if ($this->isStorageDirExist()) {
             unlink($this->storeLoc.DS.$sessionId);
         }

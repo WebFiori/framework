@@ -174,7 +174,7 @@ abstract class CLICommand {
      */
     public function addArgs(array $arr) {
         $this->commandArgs = [];
-        
+
         foreach ($arr as $optionName => $options) {
             $this->addArg($optionName, $options);
         }

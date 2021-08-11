@@ -1,7 +1,6 @@
 <?php
 namespace webfiori\framework\session;
 
-use webfiori\framework\session\SessionsTable;
 use webfiori\framework\DB;
 /**
  * A class which includes all database related operations to add, update, 

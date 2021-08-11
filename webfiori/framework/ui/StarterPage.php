@@ -1,7 +1,6 @@
 <?php
 namespace webfiori\framework\ui;
 
-use webfiori\framework\ui\WebPage;
 /**
  * A page which is shown to the framework users when the developer has not 
  * configured any routes.
@@ -31,7 +30,7 @@ class StarterPage extends WebPage {
             'text-align' => 'center'
         ]);
         $div->addChild('h2')->text('Welcome to WebFiori v'.WF_VERSION);
-        
+
         $row = $div->addChild('v-row', ['justify' => 'center']);
         $row->addChild('v-col', [
             'cols' => 12, 'sm' => 12, 'md' => 6
@@ -40,7 +39,7 @@ class StarterPage extends WebPage {
             'disabled',
             'label' => 'Your application is ready at'
         ]);
-        
+
         $cardsRow = $row->addChild('v-col', [
             'cols' => 12,
         ])->addChild('v-row');
@@ -48,25 +47,25 @@ class StarterPage extends WebPage {
                 'mdi-book-open-variant', 
                 'Learn', 
                 'Documentation is always the first place where developers can find what they need.'
-                . 'The framework has good documentation base which is still in development and '
-                . 'content is added and revewed regularly. '
-                . 'Whether you are new to WebFiori framework or have some '
-                . 'experience with it, we recommend the '
-                . 'documentation as they will help in a way or another.',
+                .'The framework has good documentation base which is still in development and '
+                .'content is added and revewed regularly. '
+                .'Whether you are new to WebFiori framework or have some '
+                .'experience with it, we recommend the '
+                .'documentation as they will help in a way or another.',
                 $cardsRow->addChild('v-col', ['cols' => 12, 'md' => 6, 'sm' => 12]));
         $this->createCard('https://webfiori.com/docs/webfiori',
                 'mdi-book-check-outline',
                 'API Reference', 
                 'This reference has all information about core framework classes that a developer '
-                . 'might need to have specific functionality. In addition to that, it describes all '
-                . 'uses of every public class attribute and method. It can be handy when developers starts '
-                . 'using advanced features of the framework.',
+                .'might need to have specific functionality. In addition to that, it describes all '
+                .'uses of every public class attribute and method. It can be handy when developers starts '
+                .'using advanced features of the framework.',
                 $cardsRow->addChild('v-col', ['cols' => 12, 'md' => 6, 'sm' => 12]));
         $this->createCard('https://webfiori.com/contribute',
                 'mdi-comment-plus-outline', 
                 'Support The Project', 
                 'Want to help in development of the framework or contribute? This place is for you. It holds '
-                . 'basic instructions on how you may help in supporting the framework in many ways.',
+                .'basic instructions on how you may help in supporting the framework in many ways.',
                 $cardsRow->addChild('v-col', ['cols' => 12, 'md' => 6, 'sm' => 12]));
     }
     private function createCard($link, $icon, $cardTitle, $paragraph, \webfiori\ui\HTMLNode $el) {
@@ -83,22 +82,22 @@ class StarterPage extends WebPage {
     private function initAppScript() {
         $script = $this->getDocument()->addChild('script');
         $script->text(""
-                . "new Vue({"
-                . "    el:'#page-body',"
-                . "    vuetify:new Vuetify({"
-                . "        theme: {"
-                . "            dark:true,"
-                . "            themes:{"
-                . "                dark:{},"
-                . "                light:{}"
-                . "            }"
-                . "        }"
-                . "    })"
-                . "});"
-                . ""
-                . ""
-                . ""
-                . "");
+                ."new Vue({"
+                ."    el:'#page-body',"
+                ."    vuetify:new Vuetify({"
+                ."        theme: {"
+                ."            dark:true,"
+                ."            themes:{"
+                ."                dark:{},"
+                ."                light:{}"
+                ."            }"
+                ."        }"
+                ."    })"
+                ."});"
+                .""
+                .""
+                .""
+                ."");
     }
     private function initHead() {
         $head = $this->getDocument()->getHeadNode();

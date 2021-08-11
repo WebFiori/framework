@@ -24,7 +24,6 @@
  */
 namespace webfiori\framework;
 
-use webfiori\framework\Config;
 use webfiori\framework\cli\CLI;
 use webfiori\framework\exceptions\InitializationException;
 use webfiori\framework\middleware\MiddlewareManager;
@@ -156,15 +155,17 @@ class WebFioriApp {
             //mb_http_input($encoding);
             mb_regex_encoding($encoding);
         }
+
         if (!defined('APP_DIR_NAME')) {
             /**
-            * The name of the directory at which the developer will have his own application 
-            * code.
-            * 
-            * @since 2.2.1
-            */
+             * The name of the directory at which the developer will have his own application 
+             * code.
+             * 
+             * @since 2.2.1
+             */
             define('APP_DIR_NAME','app');
         }
+
         if (!class_exists(APP_DIR_NAME.'\ini\GlobalConstants')) {
             $confControllerPath = ROOT_DIR.DIRECTORY_SEPARATOR.
                     'vendor'.DIRECTORY_SEPARATOR.
@@ -173,7 +174,7 @@ class WebFioriApp {
                     'webfiori'.DIRECTORY_SEPARATOR.
                     'framework'.DIRECTORY_SEPARATOR.
                     'ConfigController.php';
-            
+
             if (!file_exists($confControllerPath)) {
                 $confControllerPath = ROOT_DIR.DIRECTORY_SEPARATOR.
                         'webfiori'.DIRECTORY_SEPARATOR.
@@ -182,7 +183,7 @@ class WebFioriApp {
             }
             require_once $confControllerPath;
             $path = ROOT_DIR.DIRECTORY_SEPARATOR.APP_DIR_NAME.DIRECTORY_SEPARATOR.'ini'.DIRECTORY_SEPARATOR.'GlobalConstants.php';
-            
+
             if (!file_exists($path)) {
                 ConfigController::get()->createConstClass();
             }
@@ -207,12 +208,12 @@ class WebFioriApp {
             require_once WF_CORE_PATH.DS.'AutoLoader.php';
         }
         self::$AU = AutoLoader::get();
-        
+
         if (!class_exists(APP_DIR_NAME.'\ini\InitAutoLoad')) {
             ConfigController::get()->createIniClass('InitAutoLoad', 'Add user-defined directories to the set of directories at which the framework will search for classes.');
         }
         call_user_func(APP_DIR_NAME.'\ini\InitAutoLoad::init');
-        
+
         //Initialize CLI
         CLI::init();
 
@@ -227,13 +228,13 @@ class WebFioriApp {
         //Initialize privileges.
         //This step must be done before initializing anything.
         call_user_func(APP_DIR_NAME.'\ini\InitPrivileges::init');
-        
+
         self::$SF = ConfigController::get();
 
         if (!class_exists(APP_DIR_NAME.'\AppConfig')) {
             self::$SF->createAppConfigFile();
         }
-        
+
         $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
         $this->appConfig = new $constructor();
 
@@ -241,6 +242,7 @@ class WebFioriApp {
         {
             MiddlewareManager::register($inst);
         });
+
         if (!class_exists(APP_DIR_NAME.'\ini\InitMiddleware')) {
             ConfigController::get()->createIniClass('InitMiddleware', 'Register middleware which are created outside the folder \'app/middleware\'.');
         }
@@ -267,7 +269,6 @@ class WebFioriApp {
                     Response::addHeader('set-cookie', $headerVal);
                 }
             } catch (\Error $exc) {
-                
             }
 
             $uriObj = Router::getRouteUri();
@@ -296,14 +297,16 @@ class WebFioriApp {
      */
     public static function autoRegister($folder, $regCallback) {
         $dir = ROOT_DIR.DS.APP_DIR_NAME.DS.$folder;
-        
+
         if (Util::isDirectory($dir)) {
             $dirContent = array_diff(scandir($dir), ['.','..']);
+
             foreach ($dirContent as $phpFile) {
                 $expl = explode('.', $phpFile);
 
                 if (count($expl) == 2 && $expl[1] == 'php') {
                     $instanceNs = require_once $dir.DS.$phpFile;
+
                     if (strlen($instanceNs) == 0 || $instanceNs == 1) {
                         $instanceNs = '\\'.APP_DIR_NAME.'\\'.$folder;
                     }
@@ -325,7 +328,7 @@ class WebFioriApp {
             return self::$LC->appConfig;
         }
         $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
-        
+
         return new $constructor();
     }
     /**
@@ -425,11 +428,11 @@ class WebFioriApp {
     private function _initCRON() {
         $uriObj = new RouterUri(Util::getRequestedURL(), '');
         $pathArr = $uriObj->getPathArray();
-        
+
         if (!class_exists(APP_DIR_NAME.'\ini\InitCron')) {
             ConfigController::get()->createIniClass('InitCron', 'A method that can be used to initialize cron jobs.');
         }
-            
+
         if (CLI::isCLI() || (defined('CRON_THROUGH_HTTP') && CRON_THROUGH_HTTP && count($pathArr) != 0 && $pathArr[0] == 'cron')) {
             if (defined('CRON_THROUGH_HTTP') && CRON_THROUGH_HTTP) {
                 cron\Cron::initRoutes();
@@ -442,12 +445,15 @@ class WebFioriApp {
         if (!class_exists(APP_DIR_NAME.'\ini\routes\APIRoutes')) {
             ConfigController::get()->createRoutesClass('APIRoutes');
         }
+
         if (!class_exists(APP_DIR_NAME.'\ini\routes\ViewRoutes')) {
             ConfigController::get()->createRoutesClass('ViewRoutes');
         }
+
         if (!class_exists(APP_DIR_NAME.'\ini\routes\ClosureRoutes')) {
             ConfigController::get()->createRoutesClass('ClosureRoutes');
         }
+
         if (!class_exists(APP_DIR_NAME.'\ini\routes\OtherRoutes')) {
             ConfigController::get()->createRoutesClass('OtherRoutes');
         }
@@ -455,9 +461,10 @@ class WebFioriApp {
         call_user_func(APP_DIR_NAME.'\ini\routes\ClosureRoutes::create');
         call_user_func(APP_DIR_NAME.'\ini\routes\ViewRoutes::create');
         call_user_func(APP_DIR_NAME.'\ini\routes\APIRoutes::create');
-        
+
         if (Router::routesCount() != 0) {
             $home = trim(self::getAppConfig()->getHomePage());
+
             if (strlen($home) != 0) {
                 Router::redirect('/', WebFioriApp::getAppConfig()->getHomePage());
             }

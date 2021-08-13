@@ -372,11 +372,11 @@ class Cron {
         ]);
         Router::addRoute([
             'path' => '/cron/jobs',
-            'route-to' => CronLoginView::class
+            'route-to' => CronTaskView::class
         ]);
         Router::addRoute([
             'path' => '/cron/jobs/{job-name}',
-            'route-to' => CronLoginView::class
+            'route-to' => CronTaskView::class
         ]);
     }
     /**

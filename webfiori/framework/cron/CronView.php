@@ -105,7 +105,7 @@ class CronView extends WebPage {
                 );
         $this->addJS('https://cdn.jsdelivr.net/gh/usernane/AJAXRequestJs@1.1.1/AJAXRequest.js', [], false);
         $this->addJs('assets/js/cron.js');
-        $this->addCSS('assets/css/cron.css');
+        $this->addCSS('https://cdn.jsdelivr.net/gh/webfiori/app@'.WF_VERSION.'/public/assets/css/cron.css');
         $this->getDocument()->getHeadNode()->addChild($jsCode);
         $this->insert($this->controlsContainer);
     }

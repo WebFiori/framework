@@ -52,6 +52,7 @@ class DefaultSessionStorage implements SessionStorage {
         $this->storeLoc = $sessionsStoragePath.DS.$sessionsDirName;
 
         if (!file_exists($this->storeLoc) && is_writable($sessionsStoragePath)) {
+            mkdir($sessionsStoragePath);
             mkdir($this->storeLoc);
         }
     }

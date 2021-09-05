@@ -24,6 +24,7 @@
  */
 namespace webfiori\framework;
 
+use webfiori\framework\cron\Cron;
 use webfiori\framework\cli\CLI;
 use webfiori\framework\exceptions\InitializationException;
 use webfiori\framework\middleware\MiddlewareManager;
@@ -435,10 +436,11 @@ class WebFioriApp {
 
         if (CLI::isCLI() || (defined('CRON_THROUGH_HTTP') && CRON_THROUGH_HTTP && count($pathArr) != 0 && $pathArr[0] == 'cron')) {
             if (defined('CRON_THROUGH_HTTP') && CRON_THROUGH_HTTP) {
-                cron\Cron::initRoutes();
+                Cron::initRoutes();
             }
             //initialize cron jobs only if in CLI or cron is enabled throgh HTTP.
             call_user_func(APP_DIR_NAME.'\ini\InitCron::init');
+            Cron::registerJobs();
         }
     }
     private function _initRoutes() {

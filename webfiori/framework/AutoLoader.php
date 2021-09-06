@@ -447,10 +447,11 @@ class AutoLoader {
     }
     private function _addSearchDirectoryHelper($cleanDir, $appendRoot) {
         $dirsStack = [$cleanDir];
-
+        $root = $this->getRoot();
+        
         while ($xDir = array_pop($dirsStack)) {
             if ($appendRoot === true) {
-                $fullPath = $this->getRoot().$xDir;
+                $fullPath = $root.$xDir;
             } else {
                 $fullPath = $xDir;
             }
@@ -528,12 +529,14 @@ class AutoLoader {
      * converted to lower case. This is used to support the loading of 
      * old style PHP classes.
      * 
+     * @param strint $root The root directory at which the loader will try to load 
+     * classes from. Used only if the parameter $appendRoot is set to true.
+     * 
      * @return boolean True if loaded. False if not.
      */
-    private function _loadClassHelper($className, $classWithNs, $value, $appendRoot, $allPaths) {
+    private function _loadClassHelper($className, $classWithNs, $value, $appendRoot, $allPaths, $root) {
         $loaded = false;
         $DS = DIRECTORY_SEPARATOR;
-        $root = $this->getRoot();
 
         if ($appendRoot === true) {
             $f = $root.$value.$DS.$className.'.php';
@@ -543,20 +546,6 @@ class AutoLoader {
         $isFileLoaded = in_array($f, $allPaths);
 
         if (!$isFileLoaded) {
-            if ($appendRoot === true) {
-                $f = $root.$value.$DS.$className.'.php';
-            } else {
-                $f = $value.$DS.$className.'.php';
-            }
-
-            if (!file_exists($f)) {
-                //Old style classes (all lower case)
-                if ($appendRoot === true) {
-                    $f = $root.$value.$DS.strtolower($className).'.php';
-                } else {
-                    $f = $value.$DS.strtolower($className).'.php';
-                }
-            }
 
             if (file_exists($f)) {
                 require_once $f;
@@ -600,11 +589,8 @@ class AutoLoader {
      * @since 1.1.6
      */
     private function _readCache() {
-        if (defined('__PHPUNIT_PHAR__')) {
-            $autoloadCachePath = $this->getRoot().DIRECTORY_SEPARATOR.'src'.DIRECTORY_SEPARATOR.APP_DIR_NAME.DIRECTORY_SEPARATOR.'sto';
-        } else {
-            $autoloadCachePath = $this->getRoot().DIRECTORY_SEPARATOR.APP_DIR_NAME.DIRECTORY_SEPARATOR.'sto';
-        }
+        
+        $autoloadCachePath = $this->getRoot().DIRECTORY_SEPARATOR.APP_DIR_NAME.DIRECTORY_SEPARATOR.'sto';
         $autoloadCache = $autoloadCachePath.DIRECTORY_SEPARATOR.self::CACHE_NAME;
         //For first run, the cache file might not exist.
         if (file_exists($autoloadCache)) {
@@ -631,10 +617,10 @@ class AutoLoader {
                 }
             }
         } else {
-            if (!file_exists($autoloadCachePath) && is_writable($autoloadCachePath)) {
-                mkdir($autoloadCachePath, '0777', true);
+            if (!file_exists($autoloadCache) && is_writable($autoloadCachePath)) {
+                mkdir($autoloadCachePath, 0777, true);
                 $h = fopen($autoloadCache, 'w');
-
+                
                 if (is_resource($h)) {
                     fclose($h);
                 }
@@ -733,9 +719,10 @@ class AutoLoader {
         }
 
         $allPaths = self::getClassPath($className);
-
+        $root = $this->getRoot();
+        
         foreach ($this->searchFolders as $value => $appendRoot) {
-            $loaded = $this->_loadClassHelper($className, $classWithNs, $value, $appendRoot, $allPaths) || $loaded;
+            $loaded = $this->_loadClassHelper($className, $classWithNs, $value, $appendRoot, $allPaths, $root) || $loaded;
         }
 
         if ($loaded === false) {

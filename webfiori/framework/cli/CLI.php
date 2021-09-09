@@ -40,6 +40,7 @@ use webfiori\framework\cli\commands\SettingsCommand;
 use webfiori\framework\cli\commands\TestRouteCommand;
 use webfiori\framework\cli\commands\UpdateTableCommand;
 use webfiori\framework\cli\commands\VersionCommand;
+use webfiori\framework\cli\commands\AddCommand;
 /**
  * 
  * A class which adds basic support for running the framework through 

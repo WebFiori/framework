@@ -26,6 +26,7 @@ namespace webfiori\framework\cli\commands;
 
 use webfiori\framework\cli\CLICommand;
 use webfiori\framework\cron\Cron;
+use webfiori\framework\cli\CLI;
 /**
  * A CLI command which is used to list all scheduled cron jobs.
  *

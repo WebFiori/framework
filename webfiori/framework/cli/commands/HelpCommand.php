@@ -25,6 +25,8 @@
 namespace webfiori\framework\cli\commands;
 
 use webfiori\framework\cli\CLICommand;
+use webfiori\framework\cli\CLI;
+
 /**
  * A class that represents help command of framework's CLI.
  *

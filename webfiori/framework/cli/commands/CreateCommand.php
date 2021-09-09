@@ -33,6 +33,7 @@ use webfiori\framework\cli\helpers\CreateWebService;
 use webfiori\framework\cli\helpers\CreateMiddleware;
 use webfiori\framework\cli\helpers\CreateCLIClassHelper;
 use webfiori\framework\cli\helpers\CreateCronJob;
+use webfiori\framework\cli\CLI;
 /**
  * A command which is used to automate some of the common tasks such as 
  * creating table classes or controllers.

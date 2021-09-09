@@ -23,7 +23,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-namespace webfiori\framework\cli;
+namespace webfiori\framework\cli\writers;
 
 /**
  * A writer which is used to write any class that represents a language class.

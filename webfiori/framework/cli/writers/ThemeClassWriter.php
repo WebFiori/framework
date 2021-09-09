@@ -1,5 +1,5 @@
 <?php
-namespace webfiori\framework\cli;
+namespace webfiori\framework\cli\writers;
 
 /**
  * Description of ThemeClassWriter

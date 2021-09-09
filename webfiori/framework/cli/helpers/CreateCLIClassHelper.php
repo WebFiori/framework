@@ -2,6 +2,7 @@
 namespace webfiori\framework\cli\helpers;
 
 use webfiori\framework\cli\commands\CreateCommand;
+use webfiori\framework\cli\ClassWriter;
 /**
  * A helper class which is used to help in creating cron jobs classes using CLI.
  *

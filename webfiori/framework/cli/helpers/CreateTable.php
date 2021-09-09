@@ -22,12 +22,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-namespace webfiori\framework\cli;
+namespace webfiori\framework\cli\helpers;
 
 use Exception;
 use webfiori\database\Table;
 use webfiori\framework\DB;
 use webfiori\framework\WebFioriApp;
+use webfiori\framework\cli\commands\CreateCommand;
 /**
  * A helper class for creating database table class.
  *

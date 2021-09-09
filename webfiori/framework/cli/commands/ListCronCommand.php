@@ -22,23 +22,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-namespace webfiori\framework\cli;
+namespace webfiori\framework\cli\commands;
 
-use webfiori\framework\router\Router;
+use webfiori\framework\cli\CLICommand;
+use webfiori\framework\cron\Cron;
 /**
- * A CLI command which is used to show a list of all added routes.
+ * A CLI command which is used to list all scheduled cron jobs.
  *
  * @author Ibrahim
  */
-class ListRoutesCommand extends CLICommand {
+class ListCronCommand extends CLICommand {
     /**
      * Creates new instance of the class.
-     * The command will have name '--list-routes'. This command 
-     * is used to list all registered routes and at which resource they 
-     * point to.
+     * The command will have name '--list-jobs'. The command is used to list 
+     * all registered background jobs.
      */
     public function __construct() {
-        parent::__construct('list-routes', [], 'List all created routes and which resource they point to.');
+        parent::__construct('list-jobs', [], 'List all scheduled CRON jobs.');
     }
     /**
      * Execute the command.
@@ -47,26 +47,25 @@ class ListRoutesCommand extends CLICommand {
      * @since 1.0
      */
     public function exec() {
-        $routesArr = Router::routes();
-        $maxRouteLen = 0;
+        $jobs = Cron::jobsQueue();
+        $i = 1;
+        $this->println("Number Of Jobs: ".$jobs->size());
 
-        foreach ($routesArr as $requestedUrl => $routeTo) {
-            $len = strlen($requestedUrl);
-
-            if ($len > $maxRouteLen) {
-                $maxRouteLen = $len;
-            }
-        }
-        $maxRouteLen += 4;
-
-        foreach ($routesArr as $requestedUrl => $routeTo) {
-            $location = $maxRouteLen - strlen($requestedUrl);
-
-            if (gettype($routeTo) == 'object') {
-                $this->println("$requestedUrl %".$location."s <object>", " => ");
+        while ($job = $jobs->dequeue()) {
+            if ($i < 10) {
+                $this->println("--------- Job #0$i ---------", [
+                    'color' => 'light-blue',
+                    'bold' => true
+                ]);
             } else {
-                $this->println("$requestedUrl %".$location."s $routeTo"," => ");
+                $this->println("--------- Job #$i ---------", [
+                    'color' => 'light-blue',
+                    'bold' => true
+                ]);
             }
+            $this->println("Job Name %".(18 - strlen('Job Name'))."s %s",[], ":",$job->getJobName());
+            $this->println("Cron Expression %".(18 - strlen('Cron Expression'))."s %s",[],":",$job->getExpression());
+            $i++;
         }
 
         return 0;

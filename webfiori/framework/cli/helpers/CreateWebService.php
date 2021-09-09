@@ -22,11 +22,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-namespace webfiori\framework\cli;
+namespace webfiori\framework\cli\helpers;
 
 use webfiori\http\AbstractWebService;
 use webfiori\http\ParamTypes;
 use webfiori\http\RequestParameter;
+use webfiori\framework\cli\commands\CreateCommand;
 
 /**
  * A helper class for creating web services classes.

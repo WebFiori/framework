@@ -5,8 +5,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-namespace webfiori\framework\cli;
+namespace webfiori\framework\cli\commands;
 
+use webfiori\framework\cli\CLICommand;
+use webfiori\framework\cli\CLI;
 use Error;
 use ErrorException;
 use Exception;

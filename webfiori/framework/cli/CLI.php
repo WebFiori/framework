@@ -29,6 +29,17 @@ use webfiori\framework\ConfigController;
 use webfiori\framework\cron\Cron;
 use webfiori\framework\Util;
 use webfiori\framework\WebFioriApp;
+use webfiori\framework\cli\commands\CreateCommand;
+use webfiori\framework\cli\commands\CronCommand;
+use webfiori\framework\cli\commands\HelpCommand;
+use webfiori\framework\cli\commands\ListCronCommand;
+use webfiori\framework\cli\commands\ListRoutesCommand;
+use webfiori\framework\cli\commands\ListThemesCommand;
+use webfiori\framework\cli\commands\RunSQLQueryCommand;
+use webfiori\framework\cli\commands\SettingsCommand;
+use webfiori\framework\cli\commands\TestRouteCommand;
+use webfiori\framework\cli\commands\UpdateTableCommand;
+use webfiori\framework\cli\commands\VersionCommand;
 /**
  * 
  * A class which adds basic support for running the framework through 

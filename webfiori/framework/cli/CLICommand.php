@@ -754,9 +754,10 @@ abstract class CLICommand {
      * @since 1.0
      */
     public function println($str = '', ...$_) {
-        if (gettype($_[count($_) - 1]) == 'array') {
+        $argsCount = count($_);
+        if ($argsCount != 0 && gettype($_[$argsCount - 1]) == 'array') {
             //Last index contains formatting options.
-            $str = self::formatOutput($str, $_[count($_)  - 1]);
+            $str = self::formatOutput($str, $_[$argsCount  - 1]);
         }
         $this->getOutputStream()->println($str, $_);
     }

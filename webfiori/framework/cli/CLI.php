@@ -41,6 +41,8 @@ use webfiori\framework\cli\commands\TestRouteCommand;
 use webfiori\framework\cli\commands\UpdateTableCommand;
 use webfiori\framework\cli\commands\VersionCommand;
 use webfiori\framework\cli\commands\AddCommand;
+use webfiori\framework\cli\StdIn;
+use webfiori\framework\cli\StdOut;
 /**
  * 
  * A class which adds basic support for running the framework through 
@@ -51,9 +53,23 @@ use webfiori\framework\cli\commands\AddCommand;
  * 
  * @author Ibrahim
  * 
- * @version 1.0.2
+ * @version 1.0.3
  */
 class CLI {
+    /**
+     * 
+     * @var InputStream
+     * 
+     * @since 1.0.3
+     */
+    private $inputStream;
+    /**
+     * 
+     * @var OutputStream
+     * 
+     * @since 1.0.3
+     */
+    private $outputStream;
     /**
      * The command that will be executed now.
      * 
@@ -96,11 +112,35 @@ class CLI {
             } else {
                 $_SERVER['HTTPS'] = 'yes';
             }
+            $this->inputStream = new StdIn();
+            $this->outputStream = new StdOut();
         }
 
         if (!class_exists(APP_DIR_NAME.'\ini\InitCliCommands')) {
             ConfigController::get()->createIniClass('InitCliCommands', 'Register user defined CLI commands.');
         }
+    }
+    /**
+     * Sets the stream at which the registered commands will use to send 
+     * output to.
+     * 
+     * @param OutputStream $stream The output stream.
+     * 
+     * @since 1.0.3
+     */
+    public static function setOutputStream(OutputStream $stream) {
+        self::get()->outputStream = $stream;
+    }
+    /**
+     * Sets the stream at which the registered commands will use to send 
+     * output to.
+     * 
+     * @param OutputStream $stream The output stream.
+     * 
+     * @since 1.0.3
+     */
+    public function setInputStream(InputStream $stream) {
+        self::get()->inputStream = $stream;
     }
     /**
      * Display PHP error information in CLI.
@@ -310,7 +350,9 @@ class CLI {
             });
         }
     }
-    private function _regCommand($command) {
+    private function _regCommand(CLICommand $command) {
+        $command->setInputStream($this->inputStream);
+        $command->setOutputStream($this->outputStream);
         $this->commands[$command->getName()] = $command;
     }
     private function _runCommand() {

@@ -36,25 +36,19 @@ namespace webfiori\framework\cli;
  */
 abstract class CLICommand {
     /**
-     * An array that holds a map of special keyboard keys codes and the 
-     * meaning of each code.
      * 
-     * @var array
+     * @var OutputStream
      * 
      * @since 1.0.1
      */
-    const KEY_MAP = [
-        "\033[A" => 'UP',
-        "\033[B" => 'DOWN',
-        "\033[C" => 'RIGHT',
-        "\033[D" => 'LEFT',
-        "\n" => 'ENTER',
-        " " => 'SPACE',
-        "\010" => 'BACKSPACE',
-        "\177" => 'BACKSPACE',
-        "\t" => 'TAP',
-        "\e" => 'ESC'
-    ];
+    private $outputStream;
+    /**
+     * 
+     * @var InputStream
+     * 
+     * @since 1.0.1
+     */
+    private $inputStream;
     /**
      * An associative array that contains color codes and names.
      * @since 1.0
@@ -126,6 +120,48 @@ abstract class CLICommand {
         if (!$this->setDescription($description)) {
             $this->setDescription('<NO DESCRIPTION>');
         }
+    }
+    /**
+     * Sets the stream at which the command will read input from.
+     * 
+     * @param InputStream $stream An instance that implements an input stream.
+     * 
+     * @since 1.0.1
+     */
+    public function setInputStream(InputStream $stream) {
+        $this->inputStream = $stream;
+    }
+    /**
+     * Returns the stream at which the command is sing to read inputs.
+     * 
+     * @return null|InputStream If the stream is set, it will be returned as 
+     * an object. Other than that, the method will return null.
+     * 
+     * @since 1.0.1
+     */
+    public function getInputStream() {
+        return $this->inputStream;
+    }
+    /**
+     * Sets the stream at which the command will send output to.
+     * 
+     * @param OutputStream $stream An instance that implements output stream.
+     * 
+     * @since 1.0.1
+     */
+    public function setOutputStream(OutputStream $stream) {
+        $this->outputStream = $stream;
+    }
+    /**
+     * Returns the stream at which the command is using to send output.
+     * 
+     * @return null|OutputStream If the stream is set, it will be returned as 
+     * an object. Other than that, the method will return null.
+     * 
+     * @since 1.0.1
+     */
+    public function getOutputStream() {
+        return $this->outputStream;
     }
     /**
      * Add command argument.
@@ -246,13 +282,15 @@ abstract class CLICommand {
     /**
      * Clears the line at which the cursor is in and move it back to the start 
      * of the line.
+     * 
      * Note that support for this operation depends on terminal support for 
      * ANSI escape codes.
+     * 
      * @since 1.0
      */
     public function clearLine() {
-        $this->prints(STDOUT, "\e[2K");
-        $this->prints(STDOUT, "\r");
+        $this->prints("\e[2K");
+        $this->prints("\r");
     }
     /**
      * Asks the user to conform something.
@@ -307,9 +345,12 @@ abstract class CLICommand {
     }
     /**
      * Display a message that represents an error.
+     * 
      * The message will be prefixed with the string 'Error:' in 
-     * red. The output will be sent to STDOUT.
+     * red.
+     * 
      * @param string $message The message that will be shown.
+     * 
      * @since 1.0
      */
     public function error($message) {
@@ -354,14 +395,17 @@ abstract class CLICommand {
     public abstract function exec();
     /**
      * Formats an output string.
+     * 
      * This method is used to add colors to the output string or 
      * make it bold or underlined. The returned value of this 
-     * method can be sent to STDOUT using the method 'fprintf()'. 
-     * Note that the support for colors 
+     * method can be sent to any output stream using the method 'fprintf()'. 
+     * Note that the support for colors
      * and formatting will depend on the terminal configuration. In addition, 
      * if the constant NO_COLOR is defined or is set in the environment, the 
      * returned string will be returned as is.
+     * 
      * @param string $string The string that will be formatted.
+     * 
      * @param array $formatOptions An associative array of formatting 
      * options. Supported options are:
      * <ul>
@@ -393,6 +437,7 @@ abstract class CLICommand {
      * blink.</li>
      * </ul>
      * @return string The string after applying the formatting to it.
+     * 
      * @since 1.0
      */
     public static function formatOutput($string, $formatOptions) {
@@ -487,20 +532,24 @@ abstract class CLICommand {
     }
     /**
      * Take an input value from the user.
-     * This method will read the input from STDIN.
+     * 
      * @param string $prompt The string that will be shown to the user. The 
      * string must be non-empty.
+     * 
      * @param string $default An optional default value to use in case the user 
      * hit "Enter" without entering any value. If null is passed, no default 
      * value will be set.
+     * 
      * @param callable $validator A callback that can be used to validate user 
      * input. The callback accepts one parameter which is the value that 
      * the user has given. If the value is valid, the callback must return true. 
      * If the callback returns anything else, it means the value which is given 
      * by the user is invalid and this method will ask the user to enter the 
      * value again.
+     * 
      * @return string The method will return the value which was taken from the 
      * user.
+     * 
      * @since 1.0
      */
     public function getInput($prompt, $default = null, $validator = null) {
@@ -553,9 +602,12 @@ abstract class CLICommand {
     }
     /**
      * Display a message that represents extra information.
+     * 
      * The message will be prefixed with the string 'Info:' in 
-     * blue. The output will be sent to STDOUT.
+     * blue.
+     * 
      * @param string $message The message that will be shown.
+     * 
      * @since 1.0
      */
     public function info($message) {
@@ -685,11 +737,15 @@ abstract class CLICommand {
     /**
      * Print out a string and terminates the current line by writing the 
      * line separator string.
+     * 
      * This method will work like the function fprintf(). The difference is that 
-     * it will print out directly to STDOUT and the text can have formatting 
+     * it will print out to the stream at which was specified by the method 
+     * CLICommand::setOutputStream() and the text can have formatting 
      * options. Note that support for output formatting depends on terminal support for 
      * ANSI escape codes.
-     * @param string $str The string that will be printed to STDOUT.
+     * 
+     * @param string $str The string that will be printed.
+     * 
      * @param mixed $_ One or more extra arguments that can be supplied to the 
      * method. The last argument can be an array that contains text formatting options. 
      * for available options, check the method CLICommand::formatOutput().
@@ -707,19 +763,25 @@ abstract class CLICommand {
     }
     /**
      * Print out a string.
+     * 
      * This method works exactly like the function 'fprintf()'. The only 
-     * difference is that the method will print out the output to STDOUT and 
+     * difference is that the method will print out the output to the stream 
+     * that was specified using the method CLICommand::setOutputStream() and 
      * the method accepts formatting options as last argument to format the output. 
      * Note that support for output formatting depends on terminal support for 
      * ANSI escape codes.
-     * @param string $str The string that will be printed to STDOUT.
+     * 
+     * @param string $str The string that will be printed.
+     * 
      * @param mixed $_ One or more extra arguments that can be supplied to the 
      * method. The last argument can be an array that contains text formatting options. 
      * for available options, check the method CLICommand::formatOutput().
+     * 
      * @since 1.0
      */
     public function prints($str, ...$_) {
         $str = $this->asString($str);
+        
         $argCount = count($_);
         $formattingOptions = [];
 
@@ -729,93 +791,39 @@ abstract class CLICommand {
 
         $formattingOptions['force-styling'] = $this->isArgProvided('force-styling');
         $formattingOptions['no-ansi'] = $this->isArgProvided('--no-ansi');
-        $arrayToPass = [
-            STDOUT,
-            $this->formatOutput($str, $formattingOptions)
-        ];
-
-        foreach ($_ as $val) {
-            $type = gettype($val);
-
-            if ($type != 'array') {
-                $arrayToPass[] = $val;
-            }
-        }
-        call_user_func_array('fprintf', $arrayToPass);
+        
+        $formattedStr = $this->formatOutput($str, $formattingOptions);
+        
+        $this->getOutputStream()->prints($formattedStr, $_);
     }
     /**
-     * Reads a string of bytes from STDIN.
+     * Reads a string of bytes from input stream.
      * 
-     * This method is used to read specific number of characters from STDIN.
+     * This method is used to read specific number of characters from input stream.
      * 
      * @return string The method will return the string which was given as input 
-     * in STDIN.
+     * in the input stream.
      * 
      * @since 1.0
      */
     public function read($bytes = 1) {
-        $input = '';
-        while (strlen($input) < $bytes) {
-            $char = $this->readAndTranslate();
-            if ($char == 'BACKSPACE' && strlen($input) > 0) {
-                $input = substr($input, 0, strlen($input) - 1);
-            } else if ($char == 'ESC') {
-                return '';
-            } else if ($char == 'DOWN') {
-                // read history;
-            } else if ($char == 'UP') {
-                // read history;
-            } else {
-                $input .= $char;
-            }
-        }
-        return $input;
+        $this->getInputStream()->read($bytes);
     }
     /**
-     * Reads one line from STDIN.
+     * Reads one line from input stream.
      * 
-     * The method will continue to read from STDIN till it finds end of 
+     * The method will continue to read from input stream till it finds end of 
      * line character "\n".
      * 
      * @return string The method will return the string which was taken from 
-     * STDIN without the end of line character.
+     * input stream without the end of line character.
      * 
      * @since 1.0
      */
     public function readln() {
-        $input = '';
-        $char = '';
-        while ($char != 'ENTER') {
-            $char = $this->readAndTranslate();
-            if ($char == 'BACKSPACE' && strlen($input) > 0) {
-                $input = substr($input, 0, strlen($input) - 1);
-            } else if ($char == 'ESC') {
-                return '';
-            } else if ($char == 'DOWN') {
-                // read history;
-            } else if ($char == 'UP') {
-                // read history;
-            } else {
-                $input .= $char;
-            }
-        }
-        return $input;
+        $this->getInputStream()->readLine();
     }
-    /**
-     * 
-     * @return string
-     * 
-     * @since 1.0.1
-     */
-    private function readAndTranslate() {
-        $keypress = fgets(STDIN);
-        $keyMap = self::KEY_MAP;
-        
-        if (isset($keyMap[$keypress])) {
-            return $keyMap[$keypress];
-        }
-        return $keypress;
-    }
+    
     /**
      * Ask the user to select one of multiple values.
      * This method will display a prompt and wait for the user to select 
@@ -935,9 +943,11 @@ abstract class CLICommand {
     }
     /**
      * Display a message that represents a success status.
+     * 
      * The message will be prefixed with the string "Success:" in green. 
-     * The output will be sent to STDOUT.
+     * 
      * @param string $message The message that will be displayed.
+     * 
      * @since 1.0
      */
     public function success($message) {
@@ -949,9 +959,12 @@ abstract class CLICommand {
     }
     /**
      * Display a message that represents a warning.
+     * 
      * The message will be prefixed with the string 'Warning:' in 
-     * red. The output will be sent to STDOUT.
+     * red.
+     * 
      * @param string $message The message that will be shown.
+     * 
      * @since 1.0
      */
     public function warning($message) {

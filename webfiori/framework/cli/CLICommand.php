@@ -752,14 +752,7 @@ abstract class CLICommand {
      * @since 1.0
      */
     public function println($str = '', ...$_) {
-        $toPass = [
-            $this->asString($str)."\e[0m\e[k\n"
-        ];
-
-        foreach ($_ as $val) {
-            $toPass[] = $val;
-        }
-        call_user_func_array([$this, 'prints'], $toPass);
+        $this->getOutputStream()->println($str, $_);
     }
     /**
      * Print out a string.

@@ -62,14 +62,14 @@ class CLI {
      * 
      * @since 1.0.3
      */
-    private $inputStream;
+    private static $inputStream;
     /**
      * 
      * @var OutputStream
      * 
      * @since 1.0.3
      */
-    private $outputStream;
+    private static $outputStream;
     /**
      * The command that will be executed now.
      * 
@@ -95,8 +95,6 @@ class CLI {
         $isCli = self::isCLI();
 
         if ($isCli === true) {
-            $this->inputStream = new StdIn();
-            $this->outputStream = new StdOut();
             
             if (defined('CLI_HTTP_HOST')) {
                 $host = CLI_HTTP_HOST;
@@ -130,7 +128,7 @@ class CLI {
      * @since 1.0.3
      */
     public static function setOutputStream(OutputStream $stream) {
-        self::get()->outputStream = $stream;
+        self::$outputStream = $stream;
     }
     /**
      * Sets the stream at which the registered commands will use to send 
@@ -141,7 +139,7 @@ class CLI {
      * @since 1.0.3
      */
     public function setInputStream(InputStream $stream) {
-        self::get()->inputStream = $stream;
+        self::$inputStream = $stream;
     }
     /**
      * Display PHP error information in CLI.
@@ -233,22 +231,30 @@ class CLI {
     /**
      * Returns the stream at which the engine is using to send output.
      * 
-     * @return OutputStream
+     * @return OutputStream Note that if output stream is set to null, the stream 
+     * will be set to default which is 'StdOut'.
      * 
      * @since 1.0.3
      */
     public static function getOutputStream() {
-        return self::get()->outputStream;
+        if (self::$outputStream === null) {
+            self::$outputStream = new StdOut();
+        }
+        return self::$outputStream;
     }
     /**
      * Returns the stream at which the engine is using to get input.
      * 
-     * @return OutputStream
+     * @return InputStream Note that if input stream is set to null, the stream 
+     * will be set to default which is 'StdIn'.
      * 
      * @since 1.0.3
      */
     public static function getInputStream() {
-        return self::get()->inputStream;
+        if (self::$inputStream === null) {
+            self::$inputStream = new StdIn();
+        }
+        return self::$inputStream;
     }
     /**
      * Returns the command which is being executed.
@@ -372,8 +378,6 @@ class CLI {
         }
     }
     private function _regCommand(CLICommand $command) {
-        $command->setInputStream($this->inputStream);
-        $command->setOutputStream($this->outputStream);
         $this->commands[$command->getName()] = $command;
     }
     private function _runCommand() {

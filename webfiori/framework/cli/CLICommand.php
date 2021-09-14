@@ -120,6 +120,8 @@ abstract class CLICommand {
         if (!$this->setDescription($description)) {
             $this->setDescription('<NO DESCRIPTION>');
         }
+        $this->setInputStream(CLI::getInputStream());
+        $this->setOutputStream(CLI::getOutputStream());
     }
     /**
      * Sets the stream at which the command will read input from.

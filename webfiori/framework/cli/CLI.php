@@ -95,6 +95,9 @@ class CLI {
         $isCli = self::isCLI();
 
         if ($isCli === true) {
+            $this->inputStream = new StdIn();
+            $this->outputStream = new StdOut();
+            
             if (defined('CLI_HTTP_HOST')) {
                 $host = CLI_HTTP_HOST;
             } else {
@@ -112,8 +115,6 @@ class CLI {
             } else {
                 $_SERVER['HTTPS'] = 'yes';
             }
-            $this->inputStream = new StdIn();
-            $this->outputStream = new StdOut();
         }
 
         if (!class_exists(APP_DIR_NAME.'\ini\InitCliCommands')) {
@@ -156,17 +157,18 @@ class CLI {
      * @since 1.0.2
      */
     public static function displayErr($errno, $errstr, $errfile, $errline) {
-        fprintf(STDERR, CLICommand::formatOutput("<".Util::ERR_TYPES[$errno]['type'].">\n", [
+        $stream = self::getOutputStream();
+        $stream->prints(CLICommand::formatOutput("<".Util::ERR_TYPES[$errno]['type'].">\n", [
             'color' => 'red',
             'bold' => true,
             'blink' => true
         ]));
-        fprintf(STDERR, "Error Message    %5s %s\n",":",$errstr);
-        fprintf(STDERR, "Error Number     %5s %s\n",":",$errno);
-        fprintf(STDERR, "Error Description%5s %s\n",":",Util::ERR_TYPES[$errno]['description']);
-        fprintf(STDERR, "Error File       %5s %s\n",":",$errfile);
-        fprintf(STDERR, "Error Line      %5s %s\n",":",$errline);
-        fprintf(STDERR, "Stack Trace:\n");
+        $stream->prints("Error Message    %5s %s\n",":",$errstr);
+        $stream->prints("Error Number     %5s %s\n",":",$errno);
+        $stream->prints("Error Description%5s %s\n",":",Util::ERR_TYPES[$errno]['description']);
+        $stream->prints("Error File       %5s %s\n",":",$errfile);
+        $stream->prints("Error Line      %5s %s\n",":",$errline);
+        $stream->prints("Stack Trace:\n");
         Cron::log("<".Util::ERR_TYPES[$errno]['type'].">\n");
         Cron::log("Error Message      : $errstr\n");
         Cron::log("Error Number       : $errno\n");
@@ -180,7 +182,7 @@ class CLI {
 
         foreach ($trace as $arr) {
             $toPrint = self::_traceArrAsString($num, $arr)."\n";
-            fprintf(STDERR, $toPrint);
+            $stream->prints($toPrint);
             Cron::log($toPrint);
             $num++;
         }
@@ -198,22 +200,23 @@ class CLI {
      * @since 1.0.2
      */
     public static function displayException($ex) {
-        fprintf(STDERR, CLICommand::formatOutput("Uncaught Exception\n", [
+        $stream = self::getOutputStream();
+        $stream->prints(CLICommand::formatOutput("Uncaught Exception\n", [
             'color' => 'red',
             'bold' => true,
             'blink' => true
         ]));
-        fprintf(STDERR, CLICommand::formatOutput('Exception Message: ', [
+        $stream->prints(CLICommand::formatOutput('Exception Message: ', [
             'color' => 'yellow',
             'bold' => true,
         ]));
-        fprintf(STDERR, $ex->getMessage()."\n");
-        fprintf(STDERR, "Exception Class: %s\n", get_class($ex));
-        fprintf(STDERR, "Exception Code: %s\n",$ex->getCode());
-        fprintf(STDERR, "File: %s\n",$ex->getFile());
-        fprintf(STDERR, "Line: %s\n",$ex->getLine());
-        fprintf(STDERR, "Stack Trace:\n");
-        fprintf(STDERR, $ex->getTraceAsString());
+        $stream->prints($ex->getMessage()."\n");
+        $stream->prints("Exception Class: %s\n", get_class($ex));
+        $stream->prints("Exception Code: %s\n",$ex->getCode());
+        $stream->prints("File: %s\n",$ex->getFile());
+        $stream->prints("Line: %s\n",$ex->getLine());
+        $stream->prints("Stack Trace:\n");
+        $stream->prints($ex->getTraceAsString());
         Cron::log("<Uncaught Exception>\n");
         Cron::log("Exception Message    : ".$ex->getMessage()."\n");
         Cron::log("Exception Class      : ".get_class($ex)."\n");
@@ -226,6 +229,26 @@ class CLI {
             Cron::log(self::_traceArrAsString($num, $arrEntry));
             $num++;
         }
+    }
+    /**
+     * Returns the stream at which the engine is using to send output.
+     * 
+     * @return OutputStream
+     * 
+     * @since 1.0.3
+     */
+    public static function getOutputStream() {
+        return self::get()->outputStream;
+    }
+    /**
+     * Returns the stream at which the engine is using to get input.
+     * 
+     * @return OutputStream
+     * 
+     * @since 1.0.3
+     */
+    public static function getInputStream() {
+        return self::get()->inputStream;
     }
     /**
      * Returns the command which is being executed.
@@ -329,10 +352,8 @@ class CLI {
             if (!defined('__PHPUNIT_PHAR__')) {
                 exit($command->excCommand());
             }
-        } else {
-            if (defined('__PHPUNIT_PHAR__')) {
-                return 0;
-            }
+        } else if (defined('__PHPUNIT_PHAR__')) {
+            return 0;
         }
 
         return self::get()->_runCommand();
@@ -365,7 +386,7 @@ class CLI {
 
             return $command->excCommand();
         } else {
-            fprintf(STDERR,"Error: The command '".$commandName."' is not supported.");
+            $this->outputStream->prints("Error: The command '".$commandName."' is not supported.");
 
             return -1;
         }
@@ -382,7 +403,7 @@ class CLI {
      * @return CLI
      */
     private static function get() {
-        if (self::$inst == null) {
+        if (self::$inst === null) {
             self::$inst = new CLI();
         }
 

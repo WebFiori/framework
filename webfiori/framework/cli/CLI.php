@@ -351,6 +351,7 @@ class CLI {
      * 
      */
     public static function runCLI() {
+        self::registerCommands();
         if ($_SERVER['argc'] == 1) {
             $command = self::get()->commands['help'];
             self::get()->activeCommand = $command;
@@ -359,7 +360,9 @@ class CLI {
                 exit($command->excCommand());
             }
         } else if (defined('__PHPUNIT_PHAR__')) {
-            return 0;
+            $command = self::get()->commands['help'];
+            self::get()->activeCommand = $command;
+            $command->excCommand();
         }
 
         return self::get()->_runCommand();
@@ -390,7 +393,7 @@ class CLI {
 
             return $command->excCommand();
         } else {
-            $this->outputStream->prints("Error: The command '".$commandName."' is not supported.");
+            self::getOutputStream()->prints("Error: The command '".$commandName."' is not supported.");
 
             return -1;
         }

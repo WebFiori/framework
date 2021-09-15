@@ -24,7 +24,8 @@ class StdIn implements InputStream {
         "\033[B" => 'DOWN',
         "\033[C" => 'RIGHT',
         "\033[D" => 'LEFT',
-        "\n" => 'ENTER',
+        "\n" => 'LF',
+        "\r" => 'CR',
         " " => 'SPACE',
         "\010" => 'BACKSPACE',
         "\177" => 'BACKSPACE',
@@ -45,6 +46,7 @@ class StdIn implements InputStream {
         $input = '';
         while (strlen($input) < $bytes) {
             $char = $this->readAndTranslate();
+            
             if ($char == 'BACKSPACE' && strlen($input) > 0) {
                 $input = substr($input, 0, strlen($input) - 1);
             } else if ($char == 'ESC') {
@@ -54,7 +56,11 @@ class StdIn implements InputStream {
             } else if ($char == 'UP') {
                 // read history?
             } else {
-                $input .= $char;
+                if ($char == 'SPACE') {
+                    $input .= ' ';
+                } else {
+                    $input .= $char;
+                }
             }
         }
         return $input;
@@ -73,18 +79,25 @@ class StdIn implements InputStream {
     public function readLine() {
         $input = '';
         $char = '';
-        while ($char != 'ENTER') {
+        while ($char != 'LF') {
             $char = $this->readAndTranslate();
+            
             if ($char == 'BACKSPACE' && strlen($input) > 0) {
                 $input = substr($input, 0, strlen($input) - 1);
             } else if ($char == 'ESC') {
                 return '';
+            } else if ($char == 'CR') {
+                return $input;
             } else if ($char == 'DOWN') {
                 // read history;
             } else if ($char == 'UP') {
                 // read history;
-            } else {
-                $input .= $char;
+            } else if ($char != 'CR' && $char != 'LF') {
+                if ($char == 'SPACE') {
+                    $input .= ' ';
+                } else {
+                    $input .= $char;
+                }
             }
         }
         return $input;

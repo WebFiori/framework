@@ -759,7 +759,7 @@ abstract class CLICommand {
             //Last index contains formatting options.
             $str = self::formatOutput($str, $_[$argsCount  - 1]);
         }
-        $this->getOutputStream()->println($str, $_);
+        call_user_func_array([$this->getOutputStream(), 'println'], $this->_createPassArray($str, $_));
     }
     /**
      * Print out a string.
@@ -794,8 +794,21 @@ abstract class CLICommand {
         
         $formattedStr = $this->formatOutput($str, $formattingOptions);
         
-        $this->getOutputStream()->prints($formattedStr, $_);
+        call_user_func_array([$this->getOutputStream(), 'prints'], $this->_createPassArray($formattedStr, $_));
+        
     }
+    private function _createPassArray($string, array $args) {
+        $retVal = [$string];
+        
+        foreach ($args as $arg) {
+            if (gettype($arg) != 'array') {
+                $retVal[] = $arg;
+            }
+        }
+        
+        return $retVal;
+    }
+
     /**
      * Reads a string of bytes from input stream.
      * 

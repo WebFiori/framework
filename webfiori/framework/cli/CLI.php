@@ -352,6 +352,24 @@ class CLI {
      */
     public static function runCLI() {
         self::registerCommands();
+        if (self::isIntaractive()) {
+            $exit = false;
+            $commandName = null;
+            while (!$exit) {
+                self::run($commandName);
+                self::getOutputStream()->println('Type commant name or "exit" to close.');
+                self::readInteractiv();
+                $argsCount = count($_SERVER['argv']);
+                if ($argsCount >= 2) {
+                    $exit = $_SERVER['argv'][1] == 'exit';
+                }
+                if ($argsCount >= 3) {
+                    $commandName = $_SERVER['argv'][2];
+                }
+            }
+        }
+    }
+    private function run() {
         if ($_SERVER['argc'] == 1) {
             $command = self::get()->commands['help'];
             self::get()->activeCommand = $command;
@@ -367,6 +385,16 @@ class CLI {
 
         return self::get()->_runCommand();
     }
+    private static function isIntaractive() {
+        $interactive = false;
+        if (isset($_SERVER['argv'])) {
+            foreach ($_SERVER['argv'] as $arg) {
+                $interactive = $arg == '-i' || $interactive;
+            }
+        }
+        return $interactive;
+    }
+
     /**
      * The main aim of this method is to automatically register any commands which 
      * exist inside the folder 'app/commands'.
@@ -380,12 +408,19 @@ class CLI {
             });
         }
     }
+    private static function readInteractiv() {
+        $input = self::getInputStream()->readLine();
+        $_SERVER['argv'] = [''];
+        foreach (explode(' ', $input) as $arg) {
+            $_SERVER['argv'] = $arg;
+        }
+    }
     private function _regCommand(CLICommand $command) {
         $this->commands[$command->getName()] = $command;
     }
-    private function _runCommand() {
+    private function _runCommand($cName = null) {
         $args = $_SERVER['argv'];
-        $commandName = filter_var($args[1], FILTER_SANITIZE_STRING);
+        $commandName = $cName == null ? filter_var($args[1], FILTER_SANITIZE_STRING) : $cName;
 
         if (isset($this->commands[$commandName])) {
             $command = self::get()->commands[$commandName];

@@ -353,23 +353,31 @@ class CLI {
     public static function runCLI() {
         self::registerCommands();
         if (self::isIntaractive()) {
+            self::getOutputStream()->println('Running CLI in interactive mode.');
+            self::getOutputStream()->println('WF-CLI > Type commant name or "exit" to close.');
+            self::getOutputStream()->prints('>>');
             $exit = false;
-            $commandName = null;
+            
             while (!$exit) {
-                self::run($commandName);
-                self::getOutputStream()->println('Type commant name or "exit" to close.');
+                
                 self::readInteractiv();
                 $argsCount = count($_SERVER['argv']);
                 if ($argsCount >= 2) {
-                    $exit = $_SERVER['argv'][1] == 'exit';
+                    
+                    if ($argsCount >= 2) {
+                        $exit = $_SERVER['argv'][1] == 'exit';
+                        if (!$exit) {
+                            self::run();
+                        }
+                    } 
                 }
-                if ($argsCount >= 3) {
-                    $commandName = $_SERVER['argv'][2];
-                }
+                self::getOutputStream()->prints('>');
             }
+        } else {
+            self::run();
         }
     }
-    private function run() {
+    private static function run() {
         if ($_SERVER['argc'] == 1) {
             $command = self::get()->commands['help'];
             self::get()->activeCommand = $command;
@@ -387,6 +395,7 @@ class CLI {
     }
     private static function isIntaractive() {
         $interactive = false;
+        
         if (isset($_SERVER['argv'])) {
             foreach ($_SERVER['argv'] as $arg) {
                 $interactive = $arg == '-i' || $interactive;
@@ -410,17 +419,21 @@ class CLI {
     }
     private static function readInteractiv() {
         $input = self::getInputStream()->readLine();
+        
         $_SERVER['argv'] = [''];
-        foreach (explode(' ', $input) as $arg) {
-            $_SERVER['argv'] = $arg;
+        $args = explode(' ', $input);
+        foreach ($args as $arg) {
+            if (strlen($arg) != 0) {
+                $_SERVER['argv'][] = $arg;
+            }
         }
     }
     private function _regCommand(CLICommand $command) {
         $this->commands[$command->getName()] = $command;
     }
-    private function _runCommand($cName = null) {
+    private function _runCommand() {
         $args = $_SERVER['argv'];
-        $commandName = $cName == null ? filter_var($args[1], FILTER_SANITIZE_STRING) : $cName;
+        $commandName = filter_var($args[1], FILTER_SANITIZE_STRING);
 
         if (isset($this->commands[$commandName])) {
             $command = self::get()->commands[$commandName];
@@ -428,7 +441,7 @@ class CLI {
 
             return $command->excCommand();
         } else {
-            self::getOutputStream()->prints("Error: The command '".$commandName."' is not supported.");
+            self::getOutputStream()->println("Error: The command '".$commandName."' is not supported.");
 
             return -1;
         }

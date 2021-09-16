@@ -33,6 +33,7 @@ use webfiori\framework\cli\helpers\CreateWebService;
 use webfiori\framework\cli\helpers\CreateMiddleware;
 use webfiori\framework\cli\helpers\CreateCLIClassHelper;
 use webfiori\framework\cli\helpers\CreateCronJob;
+use webfiori\framework\cli\helpers\CreateThemeHelper;
 use webfiori\framework\cli\CLI;
 /**
  * A command which is used to automate some of the common tasks such as 
@@ -124,6 +125,7 @@ class CreateCommand extends CLICommand {
                 'Middleware.',
                 'Database table from class.',
                 'CLI Command.',
+                'Theme.',
                 'Quit.'
             ];
             $answer = $this->select('What would you like to create?', $options, count($options) - 1);
@@ -146,6 +148,9 @@ class CreateCommand extends CLICommand {
                 return true;
             } else if ($answer == 'Background job.') {
                 $create = new CreateCronJob($this);
+                return true;
+            } else if ($answer == 'Theme.') {
+                $create = new CreateThemeHelper($this);
                 return true;
             } else {
                 $this->info('Not implemented yet.');

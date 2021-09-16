@@ -27,4 +27,11 @@ class CreateThemeHelper {
         $writer = new ThemeClassWriter($classInfo['path'], $classInfo['name']);
         $writer->writeClass();
     }
+    /**
+     * 
+     * @return CreateCommand
+     */
+    private function _getCommand() {
+        return $this->command;
+    }
 }

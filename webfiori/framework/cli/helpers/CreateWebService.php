@@ -29,6 +29,7 @@ use webfiori\http\ParamTypes;
 use webfiori\http\RequestParameter;
 use webfiori\framework\cli\commands\CreateCommand;
 use webfiori\framework\cli\writers\ServiceHolder;
+use webfiori\framework\cli\writers\WebServiceWriter;
 
 /**
  * A helper class for creating web services classes.

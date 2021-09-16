@@ -87,7 +87,7 @@ class StdIn implements InputStream {
             } else if ($char == 'ESC') {
                 return '';
             } else if ($char == 'CR') {
-                return $input;
+                // Do nothing?
             } else if ($char == 'DOWN') {
                 // read history;
             } else if ($char == 'UP') {

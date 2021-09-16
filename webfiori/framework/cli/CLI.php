@@ -57,6 +57,14 @@ use webfiori\framework\cli\StdOut;
  */
 class CLI {
     /**
+     * An attribute which is set to true if CLI is running in interactive mode 
+     * or not.
+     * 
+     * @var boolean
+     */
+    private $isInteractive;
+
+    /**
      * 
      * @var InputStream
      * 
@@ -93,9 +101,14 @@ class CLI {
     private function __construct() {
         $this->commands = [];
         $isCli = self::isCLI();
-
+        $this->isInteractive = false;
+        
         if ($isCli === true) {
-            
+            if (isset($_SERVER['argv'])) {
+                foreach ($_SERVER['argv'] as $arg) {
+                    $this->isInteractive = $arg == '-i' || $this->isInteractive;
+                }
+            }
             if (defined('CLI_HTTP_HOST')) {
                 $host = CLI_HTTP_HOST;
             } else {
@@ -393,15 +406,16 @@ class CLI {
 
         return self::get()->_runCommand();
     }
-    private static function isIntaractive() {
-        $interactive = false;
-        
-        if (isset($_SERVER['argv'])) {
-            foreach ($_SERVER['argv'] as $arg) {
-                $interactive = $arg == '-i' || $interactive;
-            }
-        }
-        return $interactive;
+    /**
+     * Checks if CLI is running in interactive mode or not.
+     * 
+     * @return boolean If CLI is running in interactive mode, the method will 
+     * return true. False otherwise.
+     * 
+     * @since 1.0.3
+     */
+    public static function isIntaractive() {
+        return self::get()->isInteractive;
     }
 
     /**

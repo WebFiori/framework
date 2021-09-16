@@ -384,7 +384,7 @@ class CLI {
                         }
                     } 
                 }
-                self::getOutputStream()->prints('>');
+                self::getOutputStream()->prints('>>');
             }
         } else {
             self::run();

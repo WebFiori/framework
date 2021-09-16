@@ -28,6 +28,7 @@ use webfiori\http\AbstractWebService;
 use webfiori\http\ParamTypes;
 use webfiori\http\RequestParameter;
 use webfiori\framework\cli\commands\CreateCommand;
+use webfiori\framework\cli\writers\ServiceHolder;
 
 /**
  * A helper class for creating web services classes.

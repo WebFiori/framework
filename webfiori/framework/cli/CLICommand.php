@@ -885,7 +885,7 @@ abstract class CLICommand {
      * @since 1.0
      */
     public function read($bytes = 1) {
-        $this->getInputStream()->read($bytes);
+        return $this->getInputStream()->read($bytes);
     }
     /**
      * Reads one line from input stream.
@@ -899,7 +899,7 @@ abstract class CLICommand {
      * @since 1.0
      */
     public function readln() {
-        $this->getInputStream()->readLine();
+        return $this->getInputStream()->readLine();
     }
     
     /**

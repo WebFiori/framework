@@ -12,6 +12,11 @@ class TestCLICommand extends TestCase{
         $this->assertEquals('<NO DESCRIPTION>', $command->getDescription());
         $this->assertEquals(0, count($command->getArgs()));
     }
+    public function test01() {
+        $command = new TestCommand('new-command');
+        $command->println('%30s', 'ok');
+        $this->assertTrue(true);
+    }
     /**
      * @test
      */

@@ -29,15 +29,17 @@ use Exception;
 use webfiori\collections\Queue;
 use webfiori\framework\cli\commands\CronCommand;
 use webfiori\framework\exceptions\InvalidCRONExprException;
+use webfiori\json\JsonI;
+use webfiori\json\Json;
 /**
  * An abstract class that contains basic functionality for implementing cron 
  * jobs.
  *
  * @author Ibrahim
  * 
- * @version 1.0.1
+ * @version 1.0.2
  */
-abstract class AbstractJob {
+abstract class AbstractJob implements JsonI {
     /**
      * A constant that indicates a sub cron expression is of type 'multi-value'.
      * 
@@ -139,6 +141,12 @@ abstract class AbstractJob {
      */
     private $isSuccess;
     /**
+     * A string that describes what does the job do.
+     * 
+     * @var string
+     */
+    private $jobDesc;
+    /**
      * An array which contains all job details after parsing cron expression.
      * 
      * @var array 
@@ -169,6 +177,7 @@ abstract class AbstractJob {
      */
     public function __construct($jobName = '', $when = '* * * * *') {
         $this->setJobName($jobName);
+        $this->setDescription('NO DESCRIPTION');
         $this->customAttrs = [];
         $this->isSuccess = false;
         $this->jobDetails = [
@@ -457,6 +466,19 @@ abstract class AbstractJob {
         return $this->command;
     }
     /**
+     * Returns job description.
+     * 
+     * Job description is a string which is used to describe what does the job 
+     * do.
+     * 
+     * @return string Job description. Default return value is 'NO DESCRIPTION'.
+     * 
+     * @since 1.0.2
+     */
+    public function getDescription() {
+        return $this->jobDesc;
+    }
+    /**
      * Returns an associative array that contains the values of 
      * custom execution parameters.
      * 
@@ -492,7 +514,7 @@ abstract class AbstractJob {
      * execution attributes.
      * 
      * @return array An indexed array that contains all added 
-     * custom execution attributes values.
+     * custom execution attributes names.
      * 
      * @since 1.0
      */
@@ -846,6 +868,18 @@ abstract class AbstractJob {
         $this->command = $command;
     }
     /**
+     * Sets job description.
+     * 
+     * Job description is a string which is used to describe what does the job do.
+     * 
+     * @param string $desc Job description.
+     * 
+     * @since 1.0.2
+     */
+    public function setDescription($desc) {
+        $this->jobDesc = trim($desc);
+    }
+    /**
      * Sets an optional name for the job.
      * 
      * The name is used to make different jobs unique. Each job must 
@@ -882,6 +916,14 @@ abstract class AbstractJob {
                 $this->setJobName($trimmed.'-'.call_user_func($randF, 0, 1000));
             }
         }
+    }
+    public function toJSON() {
+        return new Json([
+            'name' => $this->getJobName(),
+            'expression' => $this->getExpression(),
+            'args' => $this->getExecArgsNames(),
+            'description' => $this->getDescription()
+        ]);
     }
     /**
      * Schedules a job to run weekly at specific week day and time.

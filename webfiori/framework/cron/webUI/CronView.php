@@ -39,11 +39,6 @@ use webfiori\ui\JsCode;
  * @author Ibrahim
  */
 class CronView extends WebPage {
-    /**
-     * A top container that contains all task related controls.
-     * @var HTMLNode 
-     */
-    private $controlsContainer;
     public function __construct($title, $description = '') {
         parent::__construct();
         $loginPageTitle = 'CRON Web Interface Login';
@@ -67,47 +62,66 @@ class CronView extends WebPage {
         if ($siteName !== null) {
             $this->setWebsiteName($siteName);
         }
-        $this->controlsContainer = new HTMLNode();
-        $this->controlsContainer->setWritingDir('ltr');
-        $this->controlsContainer->setStyle([
-            'direction' => 'ltr',
-            'width' => '100%',
-            'float' => 'left'
-        ]);
-
-        $h1 = new HTMLNode('h1');
-        $h1->addTextNode($title);
-        $this->insert($h1);
-        $hr = new HTMLNode('hr');
-        $this->insert($hr);
+        $this->changePageStructure();
+        $this->iniHead();
+        
+        $row = $this->insert('v-row');
+        $row->addChild('v-col', [
+            'cols' => 12
+        ])->addChild('h1')->text($title);
 
         if (Cron::password() != 'NO_PASSWORD' && $title != $loginPageTitle) {
-            $this->controlsContainer->addTextNode('<button name="input-element" onclick="logout()"><b>Logout</b></button><br/>', false);
+            $row = $this->insert('v-row');
+            $row->addChild('v-col', [
+                'cols' => 12
+            ])->addChild('v-btn', [
+                '@click' => 'logout',
+                'color' => 'primary'
+            ])->text('Logout');
         }
-        $jsCode = new JsCode();
-        $isRefresh = 'false';
+    }
+    private function changePageStructure() {
+        $this->addBeforeRender(function (WebPage $page)
+        {
+            $appDiv = new HTMLNode('div', [
+                'id' => 'app'
+            ]);
+            $vApp = new HTMLNode('v-app');
+            $appDiv->addChild($vApp);
+            $appDiv->addChild($appDiv);
+            $body = $page->getChildByID('page-body');
+            $body->setNodeName('v-main');
 
-        if (isset($_GET['refresh'])) {
-            $isRefresh = 'true';
-        }
-        $jsCode->addCode(''
-                .'window.onload = function(){'."\n"
-                .'     window.isRefresh = '.$isRefresh.';'."\n"
-                ."     "
-                .'     window.intervalId = window.setInterval(function(){'."\n"
-                .'         if(window.isRefresh){'."\n"
-                .'             disableOrEnableInputs();'."\n"
-                .'             document.getElementById(\'refresh-label\').innerHTML = \'<b>Refreshing...</b>\';'."\n"
-                .'             window.location.href = \'cron/jobs?refresh=yes\';'."\n"
-                .'         }'."\n"
-                .'     },60000)'."\n"
-                .' };'."\n"
-                );
+            $header = $page->getChildByID('page-header');
+            $footer = $page->getChildByID('page-footer');
+            $vApp->addChild($header);
+            $vApp->addChild($body);
+            $sideMenu = $body->getChildByID('side-content-area');
+            $body->removeChild($sideMenu);
+            $vApp->addChild($sideMenu);
+            $vApp->addChild($footer);
+            $page->getDocument()->removeChild($header);
+            $page->getDocument()->removeChild($body);
+            $page->getDocument()->removeChild($footer);
+            $page->getDocument()->addChild($appDiv);
+            $page->getDocument()->getChildByID('main-content-area')->setClassName('container');
+        });
+        $this->addBeforeRender(function (WebPage $page)
+        {
+            $page->getDocument()->getBody()->addChild('script', [
+                'type' => 'text/javascript',
+                'src' => 'assets/js/cron.js',
+            ]);
+        });
+    }
+
+    private function iniHead() {
+        $this->addCSS('https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900');
+        $this->addCSS('https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css');
+        $this->addCSS('https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css');
+        $this->addJS('https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js');
+        $this->addJS('https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js');
         $this->addJS('https://cdn.jsdelivr.net/gh/usernane/AJAXRequestJs@1.1.1/AJAXRequest.js', [], false);
-        $this->addJs('assets/js/cron.js');
-        $this->addCSS('https://cdn.jsdelivr.net/gh/webfiori/app@'.WF_VERSION.'/public/assets/css/cron.css');
-        $this->getDocument()->getHeadNode()->addChild($jsCode);
-        $this->insert($this->controlsContainer);
     }
     /**
      * Adds an area which is used to show server output.
@@ -118,12 +132,5 @@ class CronView extends WebPage {
         $outputWindow->addTextNode('<p class="output-window-title">Output Window</p><pre'
                 .' id="output-area"></pre>', false);
         $this->insert($outputWindow);
-    }
-    /**
-     * 
-     * @return HTMLNode
-     */
-    public function getControlsContainer() {
-        return $this->controlsContainer;
     }
 }

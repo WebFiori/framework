@@ -44,7 +44,7 @@ class CronLoginView extends CronView {
         }
         $row = $this->insert('v-row');
         $row->setAttributes([
-            'align-content' => 'center'
+            'align' => 'center'
         ]);
         $card = $row->addChild('v-col', [
             'cols' => 12,
@@ -64,7 +64,9 @@ class CronLoginView extends CronView {
             ->addChild('v-btn', [
                 '@click' => 'login',
                 'color' => 'primary',
-                ':loading' => 'loading'
-            ]);
+                ':loading' => 'loading',
+                ':disabled' => 'login_btn_disabled'
+            ])->text('Login');
     }
+    
 }

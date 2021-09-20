@@ -32,7 +32,7 @@ class ThemeClassWriter extends ClassWriter {
     }
     public function __construct($themePath, $className) {
         parent::__construct([
-            'path' => THEMES_PATH.DS.$themePath,
+            'path' => $themePath,
             'namespace' => 'themes\\'.$themePath,
             'name' => $className
         ]);

@@ -27,14 +27,21 @@ class ThemeClassWriter extends ClassWriter {
         $writer->append('public function __construct(){', 1);
         $writer->append('parent::__construct(\'div\');', 2);
         $writer->append('//TODO: '.$todoTxt, 2);
-        $this->append('}', 1);
-        $this->append('}');
+        $writer->append('}', 1);
+        $writer->append('}');
+        $writer->writeClass();
     }
-    public function __construct($themePath, $className) {
+    /**
+     * Creates new instance of the class.
+     * 
+     * @param array $classNameInfo An associative array that holds theme class
+     * information. The array must have 3 indices, 'path', 'name' and 'namespace'.
+     */
+    public function __construct($classNameInfo) {
         parent::__construct([
-            'path' => $themePath,
-            'namespace' => 'themes\\'.$themePath,
-            'name' => $className
+            'path' => $classNameInfo['path'],
+            'namespace' => $classNameInfo['namespace'],
+            'name' => $classNameInfo['name']
         ]);
         $this->append('<?php');
         $this->append('namespace '.$this->getNamespace().';');

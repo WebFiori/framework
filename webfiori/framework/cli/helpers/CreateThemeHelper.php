@@ -25,7 +25,9 @@ class CreateThemeHelper {
 
         $classInfo = $this->_getCommand()->getClassInfo('themes');
         $writer = new ThemeClassWriter($classInfo['path'], $classInfo['name']);
+        $command->println('Creating theme at "'.$writer->getPath().'"...');
         $writer->writeClass();
+        $command->success('Created.');
     }
     /**
      * 

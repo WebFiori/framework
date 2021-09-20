@@ -29,6 +29,7 @@ use webfiori\framework\ui\WebPage;
 use webfiori\framework\WebFioriApp;
 use webfiori\http\Response;
 use webfiori\ui\HTMLNode;
+use webfiori\framework\cron\Cron;
 use webfiori\ui\JsCode;
 /**
  * A generic view for cron related operations. 
@@ -79,6 +80,62 @@ class CronView extends WebPage {
                 'color' => 'primary'
             ])->text('Logout');
         }
+        $this->createVDialog('dialog.show', 'dialog.title', 'dialog.message', 'dialogClosed');
+    }
+    /**
+     * Adds a very basic v-dialog that can be used to show status messages and so on.
+     * 
+     * @param string $model The vue model which is used to make the dialig visible.
+     * 
+     * @param string $titleModel A string that represents the model which is used 
+     * to set the title.
+     * 
+     * @param string $messageModel The name of the model that will hold dialog
+     * message.
+     * 
+     * @param string $closeAction The name of the method which will be invoked 
+     * when close button is clicked.
+     * 
+     * @param array $iconProps An optional array that holds icon props. the 
+     * array can have two indices: 'model' and 'color-model'.
+     */
+    public function createVDialog($model, $titleModel, $messageModel, $closeAction, $iconProps = []) {
+        $dialog = new HTMLNode('v-dialog');
+        $dialog->setAttribute('v-model', $model);
+        
+        $dialog->setAttributes([
+            'v-model' => $model,
+            'width' => '500'
+        ]);
+        
+        $dialogCard = $dialog->addChild('v-card');
+        
+        $iconModel = isset($iconProps['model']) ? '{{ '.$iconProps['model'].' }}' : 'mdi-information';
+        $propsArr = [
+            'style' => [
+                'margin' => '10px'
+            ],
+        ];
+        isset($iconProps['color-model']) ? $propsArr[':color'] = $iconProps['color-model'] : $propsArr['color'] = 'green';
+        $dialogCard->addChild('v-card-title', [
+            'class' => ""
+        ])->addChild('v-icon', $propsArr)->text($iconModel)
+        ->getParent()->addChild('div', [
+            'style' => [
+                'display' => 'inline'
+            ]
+        ])->text("{{ $titleModel }}");
+        $dialogCard->addChild('v-divider');
+        $dialogCard->addChild('v-card-text')->text("{{ $messageModel }}");
+        $dialogCard->addChild('v-divider');
+        $dialogActions = $dialogCard->addChild('v-card-actions');
+        $dialogActions->addChild('v-spacer');
+        $dialogActions->addChild('v-btn', [
+            'color' => "primary",
+            'text',
+            '@click' => "$closeAction"
+        ])->text($this->get('general/action/close'));
+        $this->insert($dialog);
     }
     private function changePageStructure() {
         $this->addBeforeRender(function (WebPage $page)

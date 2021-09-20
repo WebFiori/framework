@@ -16,16 +16,20 @@ class ThemeClassWriter extends ClassWriter {
         $writer->append('<?php');
         $writer->append('namespace '.$writer->getNamespace().';');
         $writer->append('');
-        $writer->append('use webfiori\\ui\\'.$extends);
+        $writer->append('use webfiori\\ui\\'.$extends.';');
         $writer->append('/**');
         $writer->append('  * '.$classComment);
-        $writer->append(' */');
+        $writer->append('  */');
         $writer->append("class ".$writer->getName().' extends '.$extends.' {');
         $writer->append("/**", 1);
         $writer->append(" * Creates new instance of the class.", 1);
         $writer->append(" */", 1);
         $writer->append('public function __construct(){', 1);
-        $writer->append('parent::__construct(\'div\');', 2);
+        if ($extends != 'HeadNode') {
+            $writer->append('parent::__construct(\'div\');', 2);
+        } else {
+            $writer->append('parent::__construct();', 2);
+        }
         $writer->append('//TODO: '.$todoTxt, 2);
         $writer->append('}', 1);
         $writer->append('}');
@@ -48,6 +52,10 @@ class ThemeClassWriter extends ClassWriter {
         $this->append('');
         $this->append('use webfiori\\framework\\Theme;');
         $this->append('use webfiori\\ui\\HTMLNode;');
+        $this->append('use '.$this->getNamespace().'\\AsideSection;');
+        $this->append('use '.$this->getNamespace().'\\FooterSection;');
+        $this->append('use '.$this->getNamespace().'\\HeadSection;');
+        $this->append('use '.$this->getNamespace().'\\HeaderSection;');
         $this->append('');
         $this->append("class ".$this->getName().' extends Theme {');
         $this->append("/**", 1);

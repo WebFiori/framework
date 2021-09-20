@@ -27,7 +27,7 @@ namespace webfiori\framework\cron;
 use Error;
 use Exception;
 use webfiori\collections\Queue;
-use webfiori\framework\cli\CronCommand;
+use webfiori\framework\cli\commands\CronCommand;
 use webfiori\framework\exceptions\InvalidCRONExprException;
 /**
  * An abstract class that contains basic functionality for implementing cron 

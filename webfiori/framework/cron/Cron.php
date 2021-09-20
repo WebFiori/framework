@@ -359,7 +359,7 @@ class Cron {
     public static function initRoutes() {
         Router::addRoute([
             'path' => '/cron/login',
-            'route-to' => CronLoginView::class
+            'route-to' => webUI\CronLoginView::class
         ]);
         Router::addRoute([
             'path' => '/cron/apis/{action}',
@@ -368,15 +368,15 @@ class Cron {
         ]);
         Router::addRoute([
             'path' => '/cron',
-            'route-to' => CronLoginView::class
+            'route-to' => webUI\CronLoginView::class
         ]);
         Router::addRoute([
             'path' => '/cron/jobs',
-            'route-to' => CronTasksView::class
+            'route-to' => webUI\CronTasksView::class
         ]);
         Router::addRoute([
             'path' => '/cron/jobs/{job-name}',
-            'route-to' => CronTaskView::class
+            'route-to' => webUI\CronTaskView::class
         ]);
     }
     /**

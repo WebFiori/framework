@@ -211,8 +211,8 @@ abstract class AbstractJob implements JsonI {
      * Adds new execution argument.
      * 
      * An execution argument is an argument that can be supplied to the 
-     * job in case of force execute. They will appear in cron control panel 
-     * as a table. They also can be provided to the job when executing it 
+     * job in case of force execute. They will appear in cron control panel.
+     * They also can be provided to the job when executing it 
      * throw CLI as 'arg-name="argVal".
      * The argument name must follow the following rules:
      * <ul>
@@ -220,17 +220,38 @@ abstract class AbstractJob implements JsonI {
      * <li>Must not contain '#', '?', '&', '=' or space.</li>
      * </ul>
      * 
-     * @param string $name The name of the attribute.
+     * @param string|JobArgument $nameOrObj The name of the argument. This also can be an 
+     * object.
      * 
      * @since 1.0
      */
-    public function addExecutionArg($name) {
-        $trimmed = trim($name);
-        $isValid = $this->_validateAttrName($trimmed);
-
-        if ($isValid && !in_array($trimmed, $this->customAttrs)) {
-            $this->customAttrs[] = $trimmed;
+    public function addExecutionArg($nameOrObj) {
+        if (gettype($nameOrObj) == 'string') {
+            $arg = new JobArgument($nameOrObj);
+        } else if ($nameOrObj instanceof JobArgument) {
+            $arg = $nameOrObj;
         }
+
+        if (!$this->hasArg($arg->getName())) {
+            $this->customAttrs[] = $arg;
+        }
+    }
+    /**
+     * Checks if an argument with specific name belongs to the job or not.
+     * 
+     * @param string $name The name of the argument that will be checked.
+     * 
+     * @return boolean If an argument with the given name already exist, the 
+     * method will return true. False if not.
+     * 
+     * @since 1.0.2
+     */
+    public function hasArg($name) {
+        $added = false;
+        foreach ($this->getArguments() as $argObj) {
+            $added = $added || $argObj->getName() == $name;
+        }
+        return $added;
     }
     /**
      * Adds multiple execution arguments at one shot.
@@ -482,29 +503,18 @@ abstract class AbstractJob implements JsonI {
      * Returns an associative array that contains the values of 
      * custom execution parameters.
      * 
-     * Note that the method will filter the values using the filter FILTER_SANITIZE_STRING.
-     * 
-     * @return array An associative array. The keys are attributes values and 
+     * @return array An associative array. The keys are attributes names and 
      * the values are the values which are given as input. If a value 
      * is not provided, it will be set to null.
      * 
      * @since 1.0
      */
     public function getExecArgs() {
+        
         $retVal = [];
 
-        foreach ($this->customAttrs as $attrName) {
-            if (isset($_POST[$attrName])) {
-                $filtered = filter_var(urldecode($_POST[$attrName]), FILTER_SANITIZE_STRING);
-
-                if ($filtered !== false) {
-                    $retVal[$attrName] = $filtered;
-                } else {
-                    $retVal[$attrName] = null;
-                }
-            } else {
-                $retVal[$attrName] = null;
-            }
+        foreach ($this->customAttrs as $attrObj) {
+            $retVal[$attrObj->getName()] = $attrObj->getValue();
         }
 
         return $retVal;
@@ -519,6 +529,18 @@ abstract class AbstractJob implements JsonI {
      * @since 1.0
      */
     public function getExecArgsNames() {
+        return array_map(function($obj){
+            return $obj->getName();
+        }, $this->getArguments());
+    }
+    /**
+     * Returns an array that holds execution arguments of the job.
+     * 
+     * @return array An array that holds objects of type 'JobArgument'.
+     * 
+     * @since 1.0.2
+     */
+    public function getArguments() {
         return $this->customAttrs;
     }
     /**
@@ -921,7 +943,7 @@ abstract class AbstractJob implements JsonI {
         $json = new Json([
             'name' => $this->getJobName(),
             'expression' => $this->getExpression(),
-            'args' => $this->getExecArgsNames(),
+            'args' => $this->getArguments(),
             'description' => $this->getDescription(),
             'is-time' => $this->isTime(),
             'time' => new Json([

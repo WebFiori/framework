@@ -64,6 +64,16 @@ class CronTasksView extends CronView {
     public function __construct() {
         parent::__construct('Scheduled CRON Tasks', 'A list of available CRON jobs.');
         
+        $searchRow = $this->insert('v-row');
+        $searchRow->addChild('v-col', [
+                    'cols' => 12, 'sm' => 12, 'md' => 4
+                ])
+                ->addChild('v-text-field', [
+                    'label' => 'Search for a specific job...',
+                    'v-model' => 'search',
+                    'dense', 'outlined'
+                ]);
+        
         $row = $this->insert('v-row');
         
         $table = $row->addChild('v-col', [
@@ -72,7 +82,10 @@ class CronTasksView extends CronView {
             ':items' => 'jobs',
             ':loading' => 'loading',
             ':headers' => 'jobs_table_headers',
-            'dense', 'show-expand'
+            'show-expand', 'single-expand',
+            ':expanded.sync' => "expanded",
+            'item-key' => "name",
+            ':search' => 'search'
         ]);
 
         
@@ -86,43 +99,64 @@ class CronTasksView extends CronView {
         ])->addChild('v-btn', [
             '@click' => 'forceExec(item)',
             ':loading' => 'item.executing',
-            'small', 'color' => 'primary'
+            ':disabled' => 'loading',
+            'x-small', 'color' => 'primary'
         ])->text('Force Execution');
         $tableRow = $table->addChild('template', [
             '#expanded-item' => "{ headers, item }"
         ])->addChild('td', [
             ':colspan' => "headers.length"
+        ])->addChild('div', [
+            'style' => [
+                'padding' => '20px'
+            ]
         ])->addChild('v-row');
+        
         $tableRow->addChild('v-col', [
-            'cols' => 12, 'sm' => 12, 'md' => 4
-        ])->addChild('v-text-field', [
-            'label' => 'Name',
-            'v-model' => 'item.name',
-            'disabled'
-        ]);
-        $tableRow->addChild('v-col', [
-            'cols' => 12, 'sm' => 12, 'md' => 4
+            'cols' => 12, 'sm' => 12, 'md' => 6
         ])->addChild('v-textarea', [
             'label' => 'Job Description',
             'v-model' => 'item.description',
-            'disabled'
+            'disabled', 'outlined'
         ]);
         $card = $tableRow->addChild('v-col', [
-            'cols' => 12, 'sm' => 12, 'md' => '4'
-        ])->addChild('v-card');
-        $card->addChild('v-card-title')->text('Job Arguments');
-        $card->addChild('v-card-text', [
-            'v-if' => 'item.args.length !== 0',
+            'cols' => 12, 'sm' => 12, 'md' => 6
+        ])->addChild('div');
+        $card->addChild('h3')->text('Job Arguments');
+        $card->addChild('div', [
+            'v-if' => 'item.args.length !== 0'
+        ])->addChild('v-tooltip', [
+            'left',
             'v-for' => 'arg in item.args'
-        ])->addChild('v-row')->addChild('v-col', [
-            'cols' => 12
+        ])->addChild('template', [
+            '#activator' => '{ on, attrs }'
         ])->addChild('v-text-field', [
-            'label' => 'arg'
-        ]);
-        $card->addChild('v-card-text', [
+            'outlined', 'dense',
+            'v-model' => 'arg.value',
+            ':label' => 'arg.name',
+            'v-bind' => "attrs",
+            'v-on' => "on"
+        ], true)->getParent()->addChild('span')->text('{{ arg.description }}');
+        $card->addChild('p', [
             'v-else'
         ])->text('No Arguments.');
+        
+        $logRow = $this->insert('v-row');
+        $card = $logRow->addChild('v-col', [
+            'cols' => 12
+        ])->addChild('v-card');
+        $card->addChild('v-card-title')->text('Jobs Execution Log');
+        $file = new File(ROOT_DIR.DS.APP_DIR_NAME.DS.'sto'.DS.'logs'.DS.'cron.log');
+        if ($file->isExist()) {
+            $file->read();
+            $card->addChild('v-card-text')->addChild('pre')->text($file->getRawData());
+        } else {
+            $card->addChild('v-card-text')->addChild('pre', [
+                'style' => 'color:red'
+            ])->text('Log file not found!');
+        }
     }
+
     /**
      * 
      * @param HTMLNode $table
@@ -134,11 +168,13 @@ class CronTasksView extends CronView {
         ]);
         $template->addChild('v-chip', [
             'v-if' => 'item.time.'.$slot,
-            'color' => 'green'
+            'color' => 'green',
+            'small'
         ])->text('Yes');
         $template->addChild('v-chip', [
             'v-else',
-            'color' => 'red'
+            'color' => 'red',
+            'small'
         ])->text('No');
     }
 }

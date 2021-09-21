@@ -31,6 +31,7 @@ use webfiori\http\Response;
 use webfiori\ui\HTMLNode;
 use webfiori\framework\cron\Cron;
 use webfiori\ui\JsCode;
+use webfiori\json\Json;
 /**
  * A generic view for cron related operations. 
  * 
@@ -40,8 +41,12 @@ use webfiori\ui\JsCode;
  * @author Ibrahim
  */
 class CronView extends WebPage {
+    private $jsonData;
     public function __construct($title, $description = '') {
         parent::__construct();
+        $this->jsonData = new Json([
+            'title' => $title
+        ]);
         $loginPageTitle = 'CRON Web Interface Login';
         SessionsManager::start('cron-session');
 
@@ -77,10 +82,23 @@ class CronView extends WebPage {
                 'cols' => 12
             ])->addChild('v-btn', [
                 '@click' => 'logout',
-                'color' => 'primary'
+                'color' => 'primary',
+                ':loading' => 'loading'
             ])->text('Logout');
         }
         $this->createVDialog('dialog.show', 'dialog.title', 'dialog.message', 'dialogClosed');
+        $this->addBeforeRender(function (CronView $view) {
+            $code = new JsCode();
+            $code->addCode('window.data = '.$view->getJson().';');
+            $view->getDocument()->getHeadNode()->addChild($code);
+        });
+    }
+    /**
+     * 
+     * @return Json
+     */
+    public function getJson() {
+        return $this->jsonData;
     }
     /**
      * Adds a very basic v-dialog that can be used to show status messages and so on.
@@ -134,7 +152,7 @@ class CronView extends WebPage {
             'color' => "primary",
             'text',
             '@click' => "$closeAction"
-        ])->text($this->get('general/action/close'));
+        ])->text('Close');
         $this->insert($dialog);
     }
     private function changePageStructure() {

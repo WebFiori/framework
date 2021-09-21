@@ -32,6 +32,7 @@ use webfiori\ui\Label;
 use webfiori\ui\Paragraph;
 use webfiori\ui\TableCell;
 use webfiori\ui\TableRow;
+use webfiori\framework\cron\Cron;
 /**
  * A view to display information about CRON Jobs.
  * The view will show a table of all scheduled cron jobs. The table will include 
@@ -62,158 +63,82 @@ class CronTasksView extends CronView {
      */
     public function __construct() {
         parent::__construct('Scheduled CRON Tasks', 'A list of available CRON jobs.');
-        $parag = new Paragraph();
-        $tasksCount = Cron::jobsQueue()->size();
-        $parag->addText('<b>Total Scheduled Tasks:</b> '.$tasksCount.'.', ['esc-entities' => false]);
-        $this->getControlsContainer()->addChild($parag);
-        $this->_createRefreshControls();
-        $this->_createTasksTable();
-        $this->createOutputWindow();
-        $this->_displayExecLog();
-    }
-    /**
-     * Creates a form which contains the controls that allow the user to 
-     * enable refresh functionality.
-     */
-    private function _createRefreshControls() {
-        $form = new HTMLNode('form');
-        $form->setID('refresh-controls-form');
-        $refreshCheckBox = new Input('checkbox');
-        $refreshCheckBox->setName('input-element');
-        $refreshCheckBox->setID('refresh-checkbox');
-        $refreshCheckBox->setAttribute('onclick', 'window.isRefresh = this.checked;');
-
-        if (isset($_GET['refresh']) && $_GET['refresh'] == 'yes') {
-            $refreshCheckBox->setAttribute('checked');
-        }
-        $form->addChild($refreshCheckBox);
-        $label = new Label('Refresh The Page Every <input style="width:50px" disabled value="60" id="refresh-time-input" min="5" type="number"> Second(s).');
-        $label->setStyle([
-            'display' => 'inline-block'
+        
+        $row = $this->insert('v-row');
+        
+        $table = $row->addChild('v-col', [
+            'cols' => 12
+        ])->addChild('v-data-table', [
+            ':items' => 'jobs',
+            ':loading' => 'loading',
+            ':headers' => 'jobs_table_headers',
+            'dense', 'show-expand'
         ]);
-        $label->setAttribute('for', 'refresh-checkbox');
-        $label->setID('refresh-label');
-        $form->addChild($label);
-        $this->getControlsContainer()->addChild($form);
-    }
-    /**
-     * Creates the table that is used to display cron jobs information.
-     */
-    private function _createTasksTable() {
-        $tasksTable = new HTMLNode('table');
-        $tasksTable->setID('tasks-table');
-        $this->getControlsContainer()->addChild($tasksTable);
-        $tasksTable->setAttribute('border', 1);
-        $tableHeader = new TableRow();
-        $tableHeader->setID('tasks-table-header-row');
-        $tasksTable->addChild($tableHeader);
-        $tableHeader->addChild($this->_createTasksTableHeaderCell('Job Name'));
-        $tableHeader->addChild($this->_createTasksTableHeaderCell('Cron Excepression'));
-        $tableHeader->addChild($this->_createTasksTableHeaderCell('Is Minute'));
-        $tableHeader->addChild($this->_createTasksTableHeaderCell('Is Hour'));
-        $tableHeader->addChild($this->_createTasksTableHeaderCell('Is Day of Month'));
-        $tableHeader->addChild($this->_createTasksTableHeaderCell('Is Month'));
-        $tableHeader->addChild($this->_createTasksTableHeaderCell('Is Day of Week'));
-        $tableHeader->addChild($this->_createTasksTableHeaderCell('Execute'));
-        $jobsQueue = Cron::jobsQueue();
 
-        if ($jobsQueue->size() == 0) {
-            $cell = new TableCell();
-            $cell->setColSpan(8);
-            $cell->addTextNode('No Jobs Has Been Scheduled.');
-            $cell->setClassName('empty-cell');
-            $tasksTable->addChild($cell);
-        } else {
-            while ($job = $jobsQueue->dequeue()) {
-                $row = new TableRow();
-                $row->setClassName('tasks-table-row');
-                $jobNameCell = new TableCell();
-                $jobNameCell->setClassName('tasks-table-cell');
-                $jobNameCell->addTextNode('<a href="'.WebFioriApp::getAppConfig()->getBaseURL().'/cron/jobs/'.$job->getJobName().'">'.$job->getJobName().'</a>',false);
-                $row->addChild($jobNameCell);
-                $exprCell = new TableCell();
-                $jobNameCell->setClassName('tasks-table-cell');
-                $exprCell->addTextNode($job->getExpression());
-                $row->addChild($exprCell);
-                $row->addChild($this->_createTasksTableCell($job->isMinute()));
-                $row->addChild($this->_createTasksTableCell($job->isHour()));
-                $row->addChild($this->_createTasksTableCell($job->isDayOfMonth()));
-                $row->addChild($this->_createTasksTableCell($job->isMonth()));
-                $row->addChild($this->_createTasksTableCell($job->isDayOfWeek()));
-                $forceCell = new TableCell();
-                $forceCell->addTextNode('<button name="input-element" onclick="execJob(this,\''.$job->getJobName().'\')" class="force-execution-button">Force Execution</button>', false);
-                $row->addChild($forceCell);
-                $tasksTable->addChild($row);
-            }
-        }
-    }
-    /**
-     * Creates an object of type TableCell that represents one of cron jobs table 
-     * cells.
-     * @param boolean $isTime If true is passed, the cell body will have a 'Yes' 
-     * in the body and its background color will be green. If false is passed, 
-     * the cell body will have a 'No' in the body and its background color will be red.
-     * @return TableCell
-     */
-    private function _createTasksTableCell($isTime) {
-        $cell = new TableCell();
-        $cell->setClassName('tasks-table-cell');
-
-        if ($isTime) {
-            $cell->setClassName('yes-cell');
-            $cell->addTextNode('Yes');
-        } else {
-            $cell->setClassName('no-cell');
-            $cell->addTextNode('No');
-        }
-
-        return $cell;
-    }
-    /**
-     * Creates an object of type TableCell that represents cron jobs table 
-     * header.
-     * @param string $cellText The text that will be displayed in the body of the 
-     * cell.
-     * @return TableCell
-     */
-    private function _createTasksTableHeaderCell($cellText) {
-        $headerCell = new TableCell('th');
-        $headerCell->setClassName('tasks-table-header-cell');
-        $headerCell->setStyle([
-            'padding' => '10px'
+        
+        $this->addIsTimeSlot($table, 'is_minute');
+        $this->addIsTimeSlot($table, 'is_hour');
+        $this->addIsTimeSlot($table, 'is_day_of_week');
+        $this->addIsTimeSlot($table, 'is_month');
+        $this->addIsTimeSlot($table, 'is_day_of_month');
+        $table->addChild('template', [
+            '#item.actions' => '{ item }'
+        ])->addChild('v-btn', [
+            '@click' => 'forceExec(item)',
+            ':loading' => 'item.executing',
+            'small', 'color' => 'primary'
+        ])->text('Force Execution');
+        $tableRow = $table->addChild('template', [
+            '#expanded-item' => "{ headers, item }"
+        ])->addChild('td', [
+            ':colspan' => "headers.length"
+        ])->addChild('v-row');
+        $tableRow->addChild('v-col', [
+            'cols' => 12, 'sm' => 12, 'md' => 4
+        ])->addChild('v-text-field', [
+            'label' => 'Name',
+            'v-model' => 'item.name',
+            'disabled'
         ]);
-        $headerCell->addTextNode($cellText);
-
-        return $headerCell;
+        $tableRow->addChild('v-col', [
+            'cols' => 12, 'sm' => 12, 'md' => 4
+        ])->addChild('v-textarea', [
+            'label' => 'Job Description',
+            'v-model' => 'item.description',
+            'disabled'
+        ]);
+        $card = $tableRow->addChild('v-col', [
+            'cols' => 12, 'sm' => 12, 'md' => '4'
+        ])->addChild('v-card');
+        $card->addChild('v-card-title')->text('Job Arguments');
+        $card->addChild('v-card-text', [
+            'v-if' => 'item.args.length !== 0',
+            'v-for' => 'arg in item.args'
+        ])->addChild('v-row')->addChild('v-col', [
+            'cols' => 12
+        ])->addChild('v-text-field', [
+            'label' => 'arg'
+        ]);
+        $card->addChild('v-card-text', [
+            'v-else'
+        ])->text('No Arguments.');
     }
     /**
-     * Creates the section that is used to display execution logs of 
-     * Cron jobs.
+     * 
+     * @param HTMLNode $table
+     * @param type $slot
      */
-    private function _displayExecLog() {
-        $pre = new HTMLNode('pre');
-        $pre->setID('execution-log-view');
-        $sec = new HTMLNode('section');
-        $h = new HTMLNode('h2');
-        $h->addTextNode('Jobs Execution Log:');
-        $sec->addChild($h);
-        $sec->addChild($pre);
-        $this->insert($sec);
-
-        $logsPath = ROOT_DIR.DS.'app'.DS.'sto'.DS.'logs';
-        $logFile = $logsPath.DS.'cron.log';
-
-        if (file_exists($logFile)) {
-            $file = new File($logFile);
-            $file->read();
-
-            if (strlen(trim($file->getRawData())) != 0) {
-                $pre->addTextNode($file->getRawData());
-            } else {
-                $pre->addTextNode('No logs found. Log file is empty.');
-            }
-        } else {
-            $pre->addTextNode('<b style="color:red">Log file not found.</b>',false);
-        }
+    private function addIsTimeSlot(&$table, $slot) {
+        $template = $table->addChild('template', [
+            '#item.time.'.$slot => '{ item }'
+        ]);
+        $template->addChild('v-chip', [
+            'v-if' => 'item.time.'.$slot,
+            'color' => 'green'
+        ])->text('Yes');
+        $template->addChild('v-chip', [
+            'v-else',
+            'color' => 'red'
+        ])->text('No');
     }
 }

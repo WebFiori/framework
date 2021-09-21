@@ -924,6 +924,22 @@ abstract class AbstractJob implements JsonI {
             'args' => $this->getExecArgsNames(),
             'description' => $this->getDescription()
         ]);
+        $json = new Json([
+            'name' => $this->getJobName(),
+            'expression' => $this->getExpression(),
+            'args' => $this->getExecArgsNames(),
+            'description' => $this->getDescription(),
+            'is-time' => $this->isTime(),
+            'time' => new Json([
+                'is-minute' => $this->isMinute(),
+                'is-day-of-week' => $this->isDayOfWeek(),
+                'is-month' => $this->isMonth(),
+                'is-hour' => $this->isHour(),
+                'is-day-of-month' => $this->isDayOfMonth()
+            ])
+        ]);
+        $json->setPropsStyle('snake');
+        return $json;
     }
     /**
      * Schedules a job to run weekly at specific week day and time.

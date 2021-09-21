@@ -19,8 +19,9 @@ class GetJobsService extends AbstractWebService {
     }
     public function isAuthorized() {
         SessionsManager::start('cron-session');
-
-        return SessionsManager::get('cron-login-status') === true;
+        
+        return SessionsManager::get('cron-login-status') === true
+                || Cron::password() == 'NO_PASSWORD';
     }
     
     public function processRequest() {

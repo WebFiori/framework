@@ -4,6 +4,7 @@ namespace webfiori\framework\cron\webServices;
 use webfiori\http\AbstractWebService;
 use webfiori\json\Json;
 use webfiori\framework\cron\Cron;
+use webfiori\framework\session\SessionsManager;
 /**
  * A web service which is used to fetch a list of all scheduled jobs.
  *

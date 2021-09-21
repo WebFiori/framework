@@ -918,12 +918,6 @@ abstract class AbstractJob implements JsonI {
         }
     }
     public function toJSON() {
-        return new Json([
-            'name' => $this->getJobName(),
-            'expression' => $this->getExpression(),
-            'args' => $this->getExecArgsNames(),
-            'description' => $this->getDescription()
-        ]);
         $json = new Json([
             'name' => $this->getJobName(),
             'expression' => $this->getExpression(),

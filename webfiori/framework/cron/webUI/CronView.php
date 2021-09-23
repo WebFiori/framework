@@ -185,7 +185,7 @@ class CronView extends WebPage {
         {
             $page->getDocument()->getBody()->addChild('script', [
                 'type' => 'text/javascript',
-                'src' => 'assets/js/cron.js',
+                'src' => 'https://cdn.jsdelivr.net/gh/webfiori/app@'.WF_VERSION.'/public/assets/js/cron.js',
             ]);
         });
     }

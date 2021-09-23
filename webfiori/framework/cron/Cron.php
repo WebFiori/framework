@@ -374,10 +374,6 @@ class Cron {
             'path' => '/cron/jobs',
             'route-to' => webUI\CronTasksView::class
         ]);
-        Router::addRoute([
-            'path' => '/cron/jobs/{job-name}',
-            'route-to' => webUI\CronTaskView::class
-        ]);
     }
     /**
      * Returns a queue of all queued jobs.

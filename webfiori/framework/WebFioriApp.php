@@ -36,6 +36,7 @@ use webfiori\framework\ui\ServerErrView;
 use webfiori\http\Request;
 use webfiori\http\Response;
 use webfiori\json\Json;
+use webfiori\framework\Config;
 /**
  * The time at which the framework was booted in microseconds as a float.
  * 
@@ -51,6 +52,10 @@ define('MICRO_START', microtime(true));
  * @version 1.3.6
  */
 class WebFioriApp {
+    /**
+     * 
+     * @var Config
+     */
     private $appConfig;
     /**
      * An instance of autoloader class.
@@ -435,6 +440,7 @@ class WebFioriApp {
             if (defined('CRON_THROUGH_HTTP') && CRON_THROUGH_HTTP) {
                 Cron::initRoutes();
             }
+            Cron::password($this->appConfig->getCRONPassword());
             //initialize cron jobs only if in CLI or cron is enabled throgh HTTP.
             call_user_func(APP_DIR_NAME.'\ini\InitCron::init');
             Cron::registerJobs();

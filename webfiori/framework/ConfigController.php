@@ -36,7 +36,7 @@ use webfiori\framework\mail\SocketMailer;
  *
  * @author Ibrahim
  * 
- * @version 1.5.1
+ * @version 1.5.2
  */
 class ConfigController {
     /**
@@ -471,6 +471,25 @@ class ConfigController {
         return [];
     }
     /**
+     * Returns password hash of the password which is used to protect background 
+     * jobs from unauthorized execution.
+     * 
+     * @return string Password hash or the string 'NO PASSWORD' if there is no 
+     * password.
+     * 
+     * @since 1.5.2
+     */
+    public function getCRONPassword() {
+        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
+            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
+            $c = new $constructor();
+            
+            return $c->getCRONPassword();
+        }
+
+        return 'NO PASSWORD';
+    }
+    /**
      * Returns an array that holds different descriptions for the web application 
      * on different languages.
      * 
@@ -724,6 +743,20 @@ class ConfigController {
         ]);
     }
     /**
+     * Updates the password which is used to protect cron jobs from unauthorized 
+     * execution.
+     * 
+     * @param string $newPass The new password. If empty string is given, the password 
+     * will be set to the string 'NO PASSWORD'.
+     * 
+     * @since 1.5.2
+     */
+    public function updateCronPassword($newPass) {
+        $this->writeAppConfig([
+            'cron-pass' => $newPass
+        ]);
+    }
+    /**
      * Adds new SMTP account or Updates an existing one.
      * 
      * Note that the connection will be added or updated only if it 
@@ -790,7 +823,7 @@ class ConfigController {
     public function updateSiteInfo($websiteInfoArr) {
         $this->writeAppConfig($websiteInfoArr);
     }
-
+    
     /**
      * Stores configuration variables into the application configuration class.
      * 
@@ -816,6 +849,9 @@ class ConfigController {
      * pages that will be shown to all users (public and private)</li>
      * <li><b>admin-theme</b>: The name of the theme that will be shown 
      * in control pages of the system.</li>
+     * <li><b>cron-pass</b>: The password which is used to protect cron jobs 
+     * fron unauthorized access. If empty string is given, the string 
+     * 'NO PASSWORD' is used.</li>
      * </ul>
      * 
      * @since 1.5
@@ -836,7 +872,7 @@ class ConfigController {
         $this->a($cFile, " *");
         $this->a($cFile, " * @author Ibrahim");
         $this->a($cFile, " *");
-        $this->a($cFile, " * @version 1.0");
+        $this->a($cFile, " * @version 1.0.1");
         $this->a($cFile, " *");
         $this->a($cFile, " * @since 2.1.0");
         $this->a($cFile, " */");
@@ -904,6 +940,15 @@ class ConfigController {
         $this->a($cFile, "     * @since 1.0");
         $this->a($cFile, "     */");
         $this->a($cFile, "    private \$configVision;");
+        
+        $this->a($cFile, "    /**");
+        $this->a($cFile, "     * Password hash of CRON sub-system.");
+        $this->a($cFile, "     * ");
+        $this->a($cFile, "     * @var string");
+        $this->a($cFile, "     * ");
+        $this->a($cFile, "     * @since 1.0");
+        $this->a($cFile, "     */");
+        $this->a($cFile, "    private \$cronPass;");
 
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * An associative array that will contain database connections.");
@@ -974,11 +1019,21 @@ class ConfigController {
         $this->a($cFile, "     * @since 1.0");
         $this->a($cFile, "     */");
         $this->a($cFile, "    public function __construct() {");
-        $this->a($cFile, "        \$this->configVision = '1.0.0';");
+        $this->a($cFile, "        \$this->configVision = '1.0.1';");
         $this->a($cFile, "        \$this->initVersionInfo();");
         $this->a($cFile, "        \$this->initSiteInfo();");
         $this->a($cFile, "        \$this->initDbConnections();");
         $this->a($cFile, "        \$this->initSmtpConnections();");
+        if (isset($appConfigArr['cron-pass'])) {
+            if (strlen(trim($appConfigArr['cron-pass'])) == 0) {
+                $this->a($cFile, "        \$this->cronPass = 'NO PASSWORD';");
+            } else {
+                $this->a($cFile, "        \$this->cronPass = '".hash('sha256', $appConfigArr['cron-pass'])."';");
+            }
+        } else {
+            $password = $this->getCRONPassword();
+            $this->a($cFile, "        \$this->cronPass = '".$password."';");
+        }
         $this->a($cFile, "    }");
 
         $this->a($cFile, "    /**");
@@ -1090,6 +1145,18 @@ class ConfigController {
         $this->a($cFile, "     */");
         $this->a($cFile, "    public function getConfigVersion() {");
         $this->a($cFile, "        return \$this->configVision;");
+        $this->a($cFile, "    }");
+        
+        $this->a($cFile, "    /**");
+        $this->a($cFile, "     * Returns sha256 hash of the password which is used to prevent unauthorized");
+        $this->a($cFile, "     * access to run the jobs or access CRON web interface.");
+        $this->a($cFile, "     * ");
+        $this->a($cFile, "     * @return Password hash or the string 'NO PASSWORD' if there is no password.");
+        $this->a($cFile, "     * ");
+        $this->a($cFile, "     * @since 1.0.1");
+        $this->a($cFile, "     */");
+        $this->a($cFile, "    public function getCRONPassword() {");
+        $this->a($cFile, "        return \$this->cronPass;");
         $this->a($cFile, "    }");
 
         $this->a($cFile, "    /**");

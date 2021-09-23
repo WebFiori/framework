@@ -219,6 +219,15 @@ class WebFioriApp {
             ConfigController::get()->createIniClass('InitAutoLoad', 'Add user-defined directories to the set of directories at which the framework will search for classes.');
         }
         call_user_func(APP_DIR_NAME.'\ini\InitAutoLoad::init');
+        
+        self::$SF = ConfigController::get();
+
+        if (!class_exists(APP_DIR_NAME.'\AppConfig')) {
+            self::$SF->createAppConfigFile();
+        }
+
+        $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
+        $this->appConfig = new $constructor();
 
         //Initialize CLI
         CLI::init();
@@ -235,14 +244,7 @@ class WebFioriApp {
         //This step must be done before initializing anything.
         call_user_func(APP_DIR_NAME.'\ini\InitPrivileges::init');
 
-        self::$SF = ConfigController::get();
-
-        if (!class_exists(APP_DIR_NAME.'\AppConfig')) {
-            self::$SF->createAppConfigFile();
-        }
-
-        $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
-        $this->appConfig = new $constructor();
+        
 
         $this->_initMiddleware();
         $this->_initRoutes();

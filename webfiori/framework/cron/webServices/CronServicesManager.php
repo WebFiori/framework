@@ -40,5 +40,6 @@ class CronServicesManager extends WebServicesManager {
         $this->addService(new CronLoginService());
         $this->addService(new ForceCronExecutionService());
         $this->addService(new CronLogoutService());
+        $this->addService(new GetJobsService());
     }
 }

@@ -1,5 +1,8 @@
 <?php
-namespace webfiori\framework\cli;
+namespace webfiori\framework\cli\helpers;
+
+use webfiori\framework\cli\commands\CreateCommand;
+use webfiori\framework\cli\writers\ClassWriter;
 
 /**
  * A helper class that works with the create command to create a middleware.

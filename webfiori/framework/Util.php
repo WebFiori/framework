@@ -446,7 +446,7 @@ class Util {
         $dirFix = str_replace('\\', '/', $dir);
 
         if (!is_dir($dirFix)) {
-            if ($createIfNot === true && mkdir($dir, 0755 , true)) {
+            if ($createIfNot === true && mkdir($dir, 0777 , true)) {
                 return true;
             }
 

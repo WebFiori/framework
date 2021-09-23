@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-namespace webfiori\framework\cron;
+namespace webfiori\framework\cron\webUI;
 
 use webfiori\framework\session\SessionsManager;
 use webfiori\framework\WebFioriApp;
@@ -42,20 +42,31 @@ class CronLoginView extends CronView {
             Response::addHeader('location', WebFioriApp::getAppConfig()->getBaseURL().'/cron/jobs');
             Response::send();
         }
-        $form = new HTMLNode('form');
-        $this->insert($form);
-        $form->label('Enter Login Password:', [
-            'style' => 'display:block;font-weight:bold;',
-            'for' => 'password-input'
+        $row = $this->insert('v-row');
+        $row->setAttributes([
+            'align' => 'center'
         ]);
-        $form->input('password', [
-            'id' => 'password-input',
-            'placeholder' => 'Enter CRON password here.',
-            'style' => 'width:200px'
+        $card = $row->addChild('v-col', [
+            'cols' => 12,
+            'md' => 4, 'sm' => 12
+        ])->addChild('v-card', [
+            ':loading' => 'loading',
+            ':disabled' => 'loading'
         ]);
-        $form->br()->br()->addChild(new HTMLNode('button'), [
-            'id' => 'submit-button',
-            'onclick' => 'login(this);return false;'
-        ], false)->text('Login');
+        $card->addChild('v-card-text')
+            ->addChild('v-text-field', [
+                'type' => 'password',
+                'v-model' => 'password',
+                'label' => 'Enter CRON password here.',
+                ':loading' => 'loading'
+            ]);
+        $card->addChild('v-card-text')
+            ->addChild('v-btn', [
+                '@click' => 'login',
+                'color' => 'primary',
+                ':loading' => 'loading',
+                ':disabled' => 'login_btn_disabled'
+            ])->text('Login');
     }
+    
 }

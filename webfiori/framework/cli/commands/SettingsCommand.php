@@ -22,9 +22,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-namespace webfiori\framework\cli;
+namespace webfiori\framework\cli\commands;
 
+use webfiori\framework\cli\CLICommand;
 use webfiori\framework\WebFioriApp;
+use webfiori\framework\cli\CLI;
 /**
  * A CLI command which is used to show framework configuration.
  *

@@ -22,32 +22,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-namespace webfiori\framework\cli;
+namespace webfiori\framework\cli\commands;
 
-use webfiori\framework\router\Router;
+use webfiori\framework\cli\CLICommand;
+use webfiori\framework\cron\Cron;
+use webfiori\framework\cli\CLI;
 /**
- * A CLI Command which is used to test the result of routing to a specific 
- * route.
+ * A CLI command which is used to list all scheduled cron jobs.
  *
  * @author Ibrahim
  */
-class TestRouteCommand extends CLICommand {
+class ListCronCommand extends CLICommand {
     /**
      * Creates new instance of the class.
-     * The command will have name '--route'. In addition to that, 
-     * it will have the following arguments:
-     * <ul>
-     * <li><b>url</b>: The URL at which its route will be tested.</li>
-     * </ul>
+     * The command will have name '--list-jobs'. The command is used to list 
+     * all registered background jobs.
      */
     public function __construct() {
-        parent::__construct('route', [
-            '--url' => [
-                'optional' => false,
-                'description' => 'The URL that will be tested if it has a '
-                .'route or not.'
-            ]
-        ], 'Test the result of routing to a URL');
+        parent::__construct('list-jobs', [], 'List all scheduled CRON jobs.');
     }
     /**
      * Execute the command.
@@ -56,9 +48,26 @@ class TestRouteCommand extends CLICommand {
      * @since 1.0
      */
     public function exec() {
-        $url = $this->getArgValue('--url');
-        $this->println("Trying to route to \"".$url."\"...");
-        Router::route($url);
+        $jobs = Cron::jobsQueue();
+        $i = 1;
+        $this->println("Number Of Jobs: ".$jobs->size());
+
+        while ($job = $jobs->dequeue()) {
+            if ($i < 10) {
+                $this->println("--------- Job #0$i ---------", [
+                    'color' => 'light-blue',
+                    'bold' => true
+                ]);
+            } else {
+                $this->println("--------- Job #$i ---------", [
+                    'color' => 'light-blue',
+                    'bold' => true
+                ]);
+            }
+            $this->println("Job Name %".(18 - strlen('Job Name'))."s %s",[], ":",$job->getJobName());
+            $this->println("Cron Expression %".(18 - strlen('Cron Expression'))."s %s",[],":",$job->getExpression());
+            $i++;
+        }
 
         return 0;
     }

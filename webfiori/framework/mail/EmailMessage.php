@@ -34,7 +34,7 @@ use webfiori\ui\HTMLNode;
  * A class that can be used to write HTML formatted Email messages.
  *
  * @author Ibrahim
- * @version 1.0.4
+ * @version 1.0.5
  */
 class EmailMessage {
     /**
@@ -129,7 +129,7 @@ class EmailMessage {
             $this->_setDocument($new);
         }
 
-        return $this->_getDocument();
+        return $this->getDocument();
     }
     /**
      * Returns an associative array that contains the names and the addresses 
@@ -253,6 +253,47 @@ class EmailMessage {
         return $this->_getSocketMailer()->getPriority();
     }
     /**
+     * Adds a child node inside the body of a node given its ID.
+     * 
+     * @param HTMLNode|string $node The node that will be inserted. Also, 
+     * this can be the tag name of the node such as 'div'.
+     * 
+     * @param string|null $parentNodeId The ID of the node that the given node 
+     * will be inserted to. If null is given, the node will be added directly inside 
+     * the element &lt;body&gt;. Default value is null.
+     * 
+     * @return HTMLNode|null The method will return the inserted 
+     * node if it was inserted. If it is not, the method will return null.
+     * 
+     * @since 1.0.5
+     */
+    public function insert($node, $parentNodeId = null) {
+        if (gettype($node) == 'string') {
+            $node = new HTMLNode($node);
+        }
+        $parent = $parentNodeId !== null ? $this->getChildByID($parentNodeId) 
+                : $this->getDocument()->getBody();
+
+        if ($parent !== null) {
+            $parent->addChild($node);
+
+            return $node;
+        }
+    }
+    /**
+     * Returns a child node given its ID.
+     * 
+     * @param string $id The ID of the child.
+     * 
+     * @return null|HTMLNode The method returns an object of type HTMLNode. 
+     * if found. If no node has the given ID, the method will return null.
+     * 
+     * @since 1.0.5
+     */
+    public function getChildByID($id) {
+        return $this->getDocument()->getChildByID($id);
+    }
+    /**
      * Adds a child HTML node to the body of the message.
      * 
      * @param HTMLNode $htmlNode An instance of 'HTMLNode'.
@@ -260,7 +301,7 @@ class EmailMessage {
      * @since 1.0
      */
     public function insertNode($htmlNode) {
-        $this->_getDocument()->addChild($htmlNode);
+        $this->getDocument()->addChild($htmlNode);
     }
     /**
      * Sends the message and set message instance to null.
@@ -288,14 +329,16 @@ class EmailMessage {
      * @since 1.0
      */
     public function write($text) {
-        $this->_getDocument()->addChild(HTMLNode::createTextNode($text,false));
+        $this->getDocument()->addChild(HTMLNode::createTextNode($text,false));
     }
     /**
+     * Returns the document that is associated with the page.
      * 
-     * @return HTMLDoc
-     * @since 1.0
+     * @return HTMLDoc An object of type 'HTMLDoc'.
+     * 
+     * @since 1.0.5
      */
-    private function &_getDocument() {
+    private function getDocument() {
         return $this->asHtml;
     }
     /**
@@ -314,10 +357,13 @@ class EmailMessage {
         $this->log = $this->socketMailer->getResponsesLog();
     }
     /**
+     * Sets the document at which the message will use.
      * 
-     * @param HTMLDoc $doc
+     * @param HTMLDoc $doc An HTML document.
+     * 
+     * @since 1.0.5
      */
-    private function _setDocument($doc) {
+    public function setDocument($doc) {
         if ($doc instanceof HTMLDoc) {
             $this->asHtml = $doc;
         }

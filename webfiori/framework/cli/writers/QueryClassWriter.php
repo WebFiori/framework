@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-namespace webfiori\framework\cli;
+namespace webfiori\framework\cli\writers;
 
 use InvalidArgumentException;
 use webfiori\database\EntityMapper;
@@ -214,6 +214,9 @@ class QueryClassWriter extends ClassWriter {
         if ($dataType == 'int' || $dataType == 'varchar' || $dataType == 'decimal' || 
                 $dataType == 'float' || $dataType == 'double') {
             $this->append("'size' => '".$colObj->getSize()."',", 4);
+            if ($dataType == 'decimal') {
+                $this->append("'scale' => '".$colObj->getScale()."',", 4);
+            }
         }
 
         if ($colObj->isPrimary()) {

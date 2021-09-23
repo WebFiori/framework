@@ -29,10 +29,26 @@ namespace webfiori\framework\cli;
  * The developer can extend this class and use it to create a custom CLI 
  * command. The class can be used to display output to terminal and also read 
  * user input. In addition, the output can be formatted using ANSI escape sequences.
+ * 
  * @author Ibrahim
- * @version 1.0
+ * 
+ * @version 1.0.1
  */
 abstract class CLICommand {
+    /**
+     * 
+     * @var OutputStream
+     * 
+     * @since 1.0.1
+     */
+    private $outputStream;
+    /**
+     * 
+     * @var InputStream
+     * 
+     * @since 1.0.1
+     */
+    private $inputStream;
     /**
      * An associative array that contains color codes and names.
      * @since 1.0
@@ -71,9 +87,11 @@ abstract class CLICommand {
     private $description;
     /**
      * Creates new instance of the class.
+     * 
      * @param string $commandName A string that represents the name of the 
      * command such as '-v' or 'help'. If not provided, the 
      * value 'new-command' is used.
+     * 
      * @param array $args An associative array of sub-associative arrays of arguments (or options) which can 
      * be supplied to the command when running it. The 
      * key of each sub array is argument name. Each 
@@ -91,6 +109,7 @@ abstract class CLICommand {
      * provided, true will be converted to the string 'y' and false will 
      * be converted to the string 'n'.</li>
      * </ul>
+     * 
      * @param string $description A string that describes what does the job 
      * do. The description will appear when the command 'help' is executed.
      * @since 1.0
@@ -104,18 +123,65 @@ abstract class CLICommand {
         if (!$this->setDescription($description)) {
             $this->setDescription('<NO DESCRIPTION>');
         }
+        $this->setInputStream(CLI::getInputStream());
+        $this->setOutputStream(CLI::getOutputStream());
+    }
+    /**
+     * Sets the stream at which the command will read input from.
+     * 
+     * @param InputStream $stream An instance that implements an input stream.
+     * 
+     * @since 1.0.1
+     */
+    public function setInputStream(InputStream $stream) {
+        $this->inputStream = $stream;
+    }
+    /**
+     * Returns the stream at which the command is sing to read inputs.
+     * 
+     * @return null|InputStream If the stream is set, it will be returned as 
+     * an object. Other than that, the method will return null.
+     * 
+     * @since 1.0.1
+     */
+    public function getInputStream() {
+        return $this->inputStream;
+    }
+    /**
+     * Sets the stream at which the command will send output to.
+     * 
+     * @param OutputStream $stream An instance that implements output stream.
+     * 
+     * @since 1.0.1
+     */
+    public function setOutputStream(OutputStream $stream) {
+        $this->outputStream = $stream;
+    }
+    /**
+     * Returns the stream at which the command is using to send output.
+     * 
+     * @return null|OutputStream If the stream is set, it will be returned as 
+     * an object. Other than that, the method will return null.
+     * 
+     * @since 1.0.1
+     */
+    public function getOutputStream() {
+        return $this->outputStream;
     }
     /**
      * Add command argument.
+     * 
      * An argument is a string that comes after the name of the command. The value 
      * of an argument can be set using equal sign. For example, if command name 
      * is 'do-it' and one argument has the name 'what-to-do', then the full 
      * CLI command would be "do-it what-to-do=say-hi". An argument can be 
      * also treated as an option.
+     * 
      * @param string $name The name of the argument. It must be non-empty string 
      * and does not contain spaces. Note that if the argument is already added and 
      * the developer is trying to add it again, the new options array will override 
      * the existing options array.
+     * 
      * @param array $options An optional array of options. Available options are:
      * <ul>
      * <li><b>optional</b>: A boolean. if set to true, it means that the argument 
@@ -130,8 +196,10 @@ abstract class CLICommand {
      * provided, true will be converted to the string 'y' and false will 
      * be converted to the string 'n'.</li>
      * </ul>
+     * 
      * @return boolean If the argument is added, the method will return true. 
      * Other than that, the method will return false.
+     * 
      * @since 1.0
      */
     public function addArg($name, $options = []) {
@@ -154,7 +222,8 @@ abstract class CLICommand {
         return false;
     }
     /**
-     * Adds multiple arguments to the command
+     * Adds multiple arguments to the command.
+     * 
      * @param array $arr An associative array of sub associative arrays. The 
      * key of each sub array is argument name. Each 
      * sub-array can have the following indices:
@@ -181,14 +250,17 @@ abstract class CLICommand {
     }
     /**
      * Clears the output before or after cursor position.
+     * 
      * This method will replace the visible characters with spaces.
      * Note that support for this operation depends on terminal support for 
      * ANSI escape codes.
+     * 
      * @param int $numberOfCols Number of columns to clear. The columns that 
      * will be cleared are before and after cursor position. They don't include 
      * the character at which the cursor is currently pointing to.
      * @param boolean $beforeCursor If set to true, the characters which 
      * are before the cursor will be cleared. Default is true.
+     * 
      * @since 1.0
      */
     public function clear($numberOfCols = 1, $beforeCursor = true) {
@@ -214,8 +286,10 @@ abstract class CLICommand {
     }
     /**
      * Clears the whole content of the console.
+     * 
      * Note that support for this operation depends on terminal support for 
      * ANSI escape codes.
+     * 
      * @since 1.0
      */
     public function clearConsole() {
@@ -224,28 +298,35 @@ abstract class CLICommand {
     /**
      * Clears the line at which the cursor is in and move it back to the start 
      * of the line.
+     * 
      * Note that support for this operation depends on terminal support for 
      * ANSI escape codes.
+     * 
      * @since 1.0
      */
     public function clearLine() {
-        $this->prints(STDOUT, "\e[2K");
-        $this->prints(STDOUT, "\r");
+        $this->prints("\e[2K");
+        $this->prints("\r");
     }
     /**
      * Asks the user to conform something.
+     * 
      * This method will display the question and wait for the user to confirm the 
      * action by entering 'y' or 'n' in the terminal. If the user give something 
      * other than 'Y' or 'n', it will shows an error and ask him to confirm 
      * again. If a default answer is provided, it will appear in upper case in the 
      * terminal. For example, if default is set to true, at the end of the prompt, 
      * the string that shows the options would be like '(Y/n)'.
+     * 
      * @param string $confirmTxt The text of the question which will be asked. 
+     * 
      * @return boolean If the user choose 'y', the method will return true. If 
      * he choose 'n', the method will return false. 
+     * 
      * @param boolean|null $default Default answer to use if empty input is given. 
      * It can be true for 'y' and false for 'n'. Default value is null which 
      * means no default will be used.
+     * 
      * @since 1.0
      * 
      */
@@ -285,9 +366,12 @@ abstract class CLICommand {
     }
     /**
      * Display a message that represents an error.
+     * 
      * The message will be prefixed with the string 'Error:' in 
-     * red. The output will be sent to STDOUT.
+     * red.
+     * 
      * @param string $message The message that will be shown.
+     * 
      * @since 1.0
      */
     public function error($message) {
@@ -299,10 +383,13 @@ abstract class CLICommand {
     }
     /**
      * Execute the command.
+     * 
      * This method should not be called manually by the developer.
+     * 
      * @return int If the command is executed, the method will return 0. Other 
      * than that, it will return a number which depends on the return value of 
      * the method 'CLICommand::exec()'.
+     * 
      * @since 1.0
      */
     public function excCommand() {
@@ -322,24 +409,30 @@ abstract class CLICommand {
     }
     /**
      * Execute the command.
+     * 
      * The implementation of this method should contain the code that will run 
      * when the command is executed.
+     * 
      * @return int The developer should implement this method in a way it returns 0 
      * or null if the command is executed successfully and return -1 if the 
      * command did not execute successfully.
+     * 
      * @since 1.0
      */
     public abstract function exec();
     /**
      * Formats an output string.
+     * 
      * This method is used to add colors to the output string or 
      * make it bold or underlined. The returned value of this 
-     * method can be sent to STDOUT using the method 'fprintf()'. 
-     * Note that the support for colors 
+     * method can be sent to any output stream using the method 'fprintf()'. 
+     * Note that the support for colors
      * and formatting will depend on the terminal configuration. In addition, 
      * if the constant NO_COLOR is defined or is set in the environment, the 
      * returned string will be returned as is.
+     * 
      * @param string $string The string that will be formatted.
+     * 
      * @param array $formatOptions An associative array of formatting 
      * options. Supported options are:
      * <ul>
@@ -371,6 +464,7 @@ abstract class CLICommand {
      * blink.</li>
      * </ul>
      * @return string The string after applying the formatting to it.
+     * 
      * @since 1.0
      */
     public static function formatOutput($string, $formatOptions) {
@@ -380,7 +474,9 @@ abstract class CLICommand {
     }
     /**
      * Returns an associative array that contains one argument information.
+     * 
      * @param string $argName The name of the argument.
+     * 
      * @return array If the argument exist, the method will return an associative 
      * array. The returned array will possibly have the following indices:
      * <ul>
@@ -395,6 +491,7 @@ abstract class CLICommand {
      * <li><b>val</b>: The value of the argument taken from the command line interface.</li>
      * </ul>
      * If the argument does not exist, the returned array will be empty.
+     * 
      * @since 1.0
      */
     public function getArgInfo($argName) {
@@ -406,6 +503,7 @@ abstract class CLICommand {
     }
     /**
      * Returns an associative array that contains command args.
+     * 
      * @return array An associative array. The indices of the array are 
      * the names of the arguments and the values are sub-associative arrays. 
      * the sub arrays will have the following indices: 
@@ -415,6 +513,7 @@ abstract class CLICommand {
      * <li>default</li>
      * <ul>
      * Note that the last index might not be set.
+     * 
      * @since 1.0
      */
     public function getArgs() {
@@ -422,15 +521,18 @@ abstract class CLICommand {
     }
     /**
      * Returns the value of command option from CLI given its name.
+     * 
      * @param string $optionName The name of the option.
+     * 
      * @return string|null If the value of the option is set, the method will 
      * return its value as string. If it is not set, the method will return null.
+     * 
      * @since 1.0
      */
     public function getArgValue($optionName) {
         $trimmedOptName = trim($optionName);
 
-        if (isset($this->commandArgs[$trimmedOptName]['val'])) {
+        if (!CLI::isIntaractive() && isset($this->commandArgs[$trimmedOptName]['val'])) {
             return $this->commandArgs[$trimmedOptName]['val'];
         }
 
@@ -454,10 +556,13 @@ abstract class CLICommand {
     }
     /**
      * Returns the description of the command.
+     * 
      * The description of the command is a string that describes what does the 
      * command do and it will appear in CLI if the command 'help' is executed.
+     * 
      * @return string The description of the command. Default return value 
      * is '&lt;NO DESCRIPTION&gt;'
+     * 
      * @since 1.0
      */
     public function getDescription() {
@@ -465,20 +570,24 @@ abstract class CLICommand {
     }
     /**
      * Take an input value from the user.
-     * This method will read the input from STDIN.
+     * 
      * @param string $prompt The string that will be shown to the user. The 
      * string must be non-empty.
+     * 
      * @param string $default An optional default value to use in case the user 
      * hit "Enter" without entering any value. If null is passed, no default 
      * value will be set.
+     * 
      * @param callable $validator A callback that can be used to validate user 
      * input. The callback accepts one parameter which is the value that 
      * the user has given. If the value is valid, the callback must return true. 
      * If the callback returns anything else, it means the value which is given 
      * by the user is invalid and this method will ask the user to enter the 
      * value again.
+     * 
      * @return string The method will return the value which was taken from the 
      * user.
+     * 
      * @since 1.0
      */
     public function getInput($prompt, $default = null, $validator = null) {
@@ -509,10 +618,13 @@ abstract class CLICommand {
     }
     /**
      * Returns the name of the command.
+     * 
      * The name of the command is a string which is used to call the command 
      * from CLI.
+     * 
      * @return string The name of the command (such as 'v' or 'help'). Default 
      * return value is 'new-command'.
+     * 
      * @since 1.0
      */
     public function getName() {
@@ -520,10 +632,13 @@ abstract class CLICommand {
     }
     /**
      * Checks if the command has a specific command line argument or not.
+     * 
      * @param string $argName The name of the command line argument.
+     * 
      * @return boolean If the argument is added to the command, the method will 
      * return true. If no argument which has the given name does exist, the method 
      * will return false.
+     * 
      * @since 1.0
      */
     public function hasArg($argName) {
@@ -531,9 +646,12 @@ abstract class CLICommand {
     }
     /**
      * Display a message that represents extra information.
+     * 
      * The message will be prefixed with the string 'Info:' in 
-     * blue. The output will be sent to STDOUT.
+     * blue.
+     * 
      * @param string $message The message that will be shown.
+     * 
      * @since 1.0
      */
     public function info($message) {
@@ -545,10 +663,14 @@ abstract class CLICommand {
     }
     /**
      * Checks if an argument is provided in the CLI or not.
+     * 
      * The method will not check if the argument has a value or not.
+     * 
      * @param string $argName The name of the command line argument.
+     * 
      * @return boolean If the argument is provided, the method will return 
      * true. Other than that, the method will return false.
+     * 
      * @since 1.0
      */
     public function isArgProvided($argName) {
@@ -564,10 +686,13 @@ abstract class CLICommand {
     }
     /**
      * Moves the cursor down by specific number of lines.
+     * 
      * Note that support for this operation depends on terminal support for 
      * ANSI escape codes.
+     * 
      * @param int $lines The number of lines the cursor will be moved. Default 
      * value is 1.
+     * 
      * @since 1.0
      */
     public function moveCursorDown($lines = 1) {
@@ -579,10 +704,13 @@ abstract class CLICommand {
     }
     /**
      * Moves the cursor to the left by specific number of columns.
+     * 
      * Note that support for this operation depends on terminal support for 
      * ANSI escape codes.
+     * 
      * @param int $numberOfCols The number of columns the cursor will be moved. Default 
      * value is 1.
+     * 
      * @since 1.0
      */
     public function moveCursorLeft($numberOfCols = 1) {
@@ -594,10 +722,13 @@ abstract class CLICommand {
     }
     /**
      * Moves the cursor to the right by specific number of columns.
+     * 
      * Note that support for this operation depends on terminal support for 
      * ANSI escape codes.
+     * 
      * @param int $numberOfCols The number of columns the cursor will be moved. Default 
      * value is 1.
+     * 
      * @since 1.0
      */
     public function moveCursorRight($numberOfCols = 1) {
@@ -609,14 +740,18 @@ abstract class CLICommand {
     }
     /**
      * Moves the cursor to specific position in the terminal.
+     * 
      * If no arguments are supplied to the method, it will move the cursor 
      * to the upper-left corner of the screen (line 0, column 0).
      * Note that support for this operation depends on terminal support for 
      * ANSI escape codes.
+     * 
      * @param int $line The number of line at which the cursor will be moved 
      * to. If not specified, 0 is used.
+     * 
      * @param int $col The number of column at which the cursor will be moved 
      * to. If not specified, 0 is used.
+     * 
      * @since 1.0
      */
     public function moveCursorTo($line = 0, $col = 0) {
@@ -629,10 +764,13 @@ abstract class CLICommand {
     }
     /**
      * Moves the cursor up by specific number of lines.
+     * 
      * Note that support for this operation depends on terminal support for 
      * ANSI escape codes.
+     * 
      * @param int $lines The number of lines the cursor will be moved. Default 
      * value is 1.
+     * 
      * @since 1.0
      */
     public function moveCursorUp($lines = 1) {
@@ -644,10 +782,13 @@ abstract class CLICommand {
     }
     /**
      * Prints an array as a list of items.
+     * 
      * This method is useful if the developer would like to print out a list 
      * of multiple items. Each item will be prefixed with a number that represents 
      * its index in the array.
+     * 
      * @param array $array The array that will be printed.
+     * 
      * @since 1.0
      */
     public function printList($array) {
@@ -663,41 +804,49 @@ abstract class CLICommand {
     /**
      * Print out a string and terminates the current line by writing the 
      * line separator string.
+     * 
      * This method will work like the function fprintf(). The difference is that 
-     * it will print out directly to STDOUT and the text can have formatting 
+     * it will print out to the stream at which was specified by the method 
+     * CLICommand::setOutputStream() and the text can have formatting 
      * options. Note that support for output formatting depends on terminal support for 
      * ANSI escape codes.
-     * @param string $str The string that will be printed to STDOUT.
+     * 
+     * @param string $str The string that will be printed.
+     * 
      * @param mixed $_ One or more extra arguments that can be supplied to the 
      * method. The last argument can be an array that contains text formatting options. 
      * for available options, check the method CLICommand::formatOutput().
      * @since 1.0
      */
     public function println($str = '', ...$_) {
-        $toPass = [
-            $this->asString($str)."\e[0m\e[k\n"
-        ];
-
-        foreach ($_ as $val) {
-            $toPass[] = $val;
+        $argsCount = count($_);
+        if ($argsCount != 0 && gettype($_[$argsCount - 1]) == 'array') {
+            //Last index contains formatting options.
+            $str = self::formatOutput($str, $_[$argsCount  - 1]);
         }
-        call_user_func_array([$this, 'prints'], $toPass);
+        call_user_func_array([$this->getOutputStream(), 'println'], $this->_createPassArray($str, $_));
     }
     /**
      * Print out a string.
+     * 
      * This method works exactly like the function 'fprintf()'. The only 
-     * difference is that the method will print out the output to STDOUT and 
+     * difference is that the method will print out the output to the stream 
+     * that was specified using the method CLICommand::setOutputStream() and 
      * the method accepts formatting options as last argument to format the output. 
      * Note that support for output formatting depends on terminal support for 
      * ANSI escape codes.
-     * @param string $str The string that will be printed to STDOUT.
+     * 
+     * @param string $str The string that will be printed.
+     * 
      * @param mixed $_ One or more extra arguments that can be supplied to the 
      * method. The last argument can be an array that contains text formatting options. 
      * for available options, check the method CLICommand::formatOutput().
+     * 
      * @since 1.0
      */
     public function prints($str, ...$_) {
         $str = $this->asString($str);
+        
         $argCount = count($_);
         $formattingOptions = [];
 
@@ -707,62 +856,71 @@ abstract class CLICommand {
 
         $formattingOptions['force-styling'] = $this->isArgProvided('force-styling');
         $formattingOptions['no-ansi'] = $this->isArgProvided('--no-ansi');
-        $arrayToPass = [
-            STDOUT,
-            $this->formatOutput($str, $formattingOptions)
-        ];
-
-        foreach ($_ as $val) {
-            $type = gettype($val);
-
-            if ($type != 'array') {
-                $arrayToPass[] = $val;
+        
+        $formattedStr = $this->formatOutput($str, $formattingOptions);
+        
+        call_user_func_array([$this->getOutputStream(), 'prints'], $this->_createPassArray($formattedStr, $_));
+        
+    }
+    private function _createPassArray($string, array $args) {
+        $retVal = [$string];
+        
+        foreach ($args as $arg) {
+            if (gettype($arg) != 'array') {
+                $retVal[] = $arg;
             }
         }
-        call_user_func_array('fprintf', $arrayToPass);
+        
+        return $retVal;
     }
+
     /**
-     * Reads a string from STDIN stream.
-     * This method is limit to read 1024 bytes at once from STDIN.
+     * Reads a string of bytes from input stream.
+     * 
+     * This method is used to read specific number of characters from input stream.
+     * 
      * @return string The method will return the string which was given as input 
-     * in STDIN.
+     * in the input stream.
+     * 
      * @since 1.0
      */
-    public function read() {
-        return trim(fread(STDIN, 1024));
+    public function read($bytes = 1) {
+        return $this->getInputStream()->read($bytes);
     }
     /**
-     * Reads one line from STDIN.
-     * The method will continue to read from STDIN till it finds end of 
+     * Reads one line from input stream.
+     * 
+     * The method will continue to read from input stream till it finds end of 
      * line character "\n".
+     * 
      * @return string The method will return the string which was taken from 
-     * STDIN without the end of line character.
+     * input stream without the end of line character.
+     * 
      * @since 1.0
      */
     public function readln() {
-        $retVal = '';
-        $char = '';
-
-        while ($char != "\n") {
-            $char = fread(STDIN, 1);
-            $retVal .= $char;
-        }
-
-        return trim($retVal);
+        return $this->getInputStream()->readLine();
     }
+    
     /**
      * Ask the user to select one of multiple values.
+     * 
      * This method will display a prompt and wait for the user to select 
      * the a value from a set of values. If the user give something other than the listed values, 
      * it will shows an error and ask him to select again again. The 
      * user can select an answer by typing its text or its number which will appear 
      * in the terminal.
+     * 
      * @param string $prompt The text that will be shown for the user.
+     * 
      * @param array $choices An indexed array of values to select from.
+     * 
      * @param int $defaultIndex The index of the default value in case no value 
      * is selected and the user hit enter.
+     * 
      * @return string The method will return the value which is selected by 
      * the user.
+     * 
      * @since 1.0
      */
     public function select($prompt, $choices, $defaultIndex = null) {
@@ -790,9 +948,13 @@ abstract class CLICommand {
     }
     /**
      * Sets the value of an argument.
+     * 
      * This method is useful in writing test cases for the commands.
+     * 
      * @param string $argName The name of the argument.
+     * 
      * @param string $argValue The value to set.
+     * 
      * @return boolean If the value of the argument is set, the method will return 
      * true. If not set, the method will return false. The value of the attribute 
      * will be not set in the following cases:
@@ -801,6 +963,7 @@ abstract class CLICommand {
      * value is not one of them.</li>
      * <li>The given value is empty string or null.</li>
      * </u>
+     * 
      * @since 1.0
      */
     public function setArgValue($argName, $argValue) {
@@ -828,10 +991,13 @@ abstract class CLICommand {
     }
     /**
      * Sets the description of the command.
+     * 
      * The description of the command is a string that describes what does the 
      * command do and it will appear in CLI if the command 'help' is executed.
+     * 
      * @param string $str A string that describes the command. It must be non-empty 
      * string.
+     * 
      * @return boolean If the description of the command is set, the method will return 
      * true. Other than that, the method will return false.
      */
@@ -848,12 +1014,16 @@ abstract class CLICommand {
     }
     /**
      * Sets the name of the command.
+     * 
      * The name of the command is a string which is used to call the command 
      * from CLI.
+     * 
      * @param string $name The name of the command (such as 'v' or 'help'). 
      * It must be non-empty string and does not contain spaces.
+     * 
      * @return boolean If the name of the command is set, the method will return 
      * true. Other than that, the method will return false.
+     * 
      * @since 1.0
      */
     public function setName($name) {
@@ -869,9 +1039,11 @@ abstract class CLICommand {
     }
     /**
      * Display a message that represents a success status.
+     * 
      * The message will be prefixed with the string "Success:" in green. 
-     * The output will be sent to STDOUT.
+     * 
      * @param string $message The message that will be displayed.
+     * 
      * @since 1.0
      */
     public function success($message) {
@@ -883,9 +1055,12 @@ abstract class CLICommand {
     }
     /**
      * Display a message that represents a warning.
+     * 
      * The message will be prefixed with the string 'Warning:' in 
-     * red. The output will be sent to STDOUT.
+     * red.
+     * 
      * @param string $message The message that will be shown.
+     * 
      * @since 1.0
      */
     public function warning($message) {
@@ -1058,10 +1233,11 @@ abstract class CLICommand {
     private function _printChoices($choices, $default) {
         foreach ($choices as $choiceIndex => $choiceTxt) {
             if ($choiceTxt == $default) {
-                $this->println($choiceIndex.": ".$choiceTxt, [
+                $this->prints($choiceIndex.": ".$choiceTxt, [
                     'color' => 'light-blue',
                     'bold' => 'true'
                 ]);
+                $this->println(' <--');
             } else {
                 $this->println($choiceIndex.": ".$choiceTxt);
             }

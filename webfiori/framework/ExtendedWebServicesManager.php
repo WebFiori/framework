@@ -30,6 +30,7 @@ use webfiori\http\Request;
 use webfiori\http\WebServicesManager;
 use webfiori\json\Json;
 use webfiori\json\JsonI;
+use webfiori\http\AbstractWebService;
 /**
  * An extension for the class 'WebServicesManager' that adds support for multi-language 
  * response messages.
@@ -367,6 +368,51 @@ abstract class ExtendedWebServicesManager extends WebServicesManager {
     public function notAuth() {
         $message = $this->get('general/http-codes/401/message');
         $this->sendResponse($message, self::$E, 401);
+    }
+    /**
+     * Auto-register services tables which exist on a specific directory.
+     * 
+     * Note that the statement 'return __NAMESPACE__' must be included at the 
+     * end of service class for auto-register to work. If the statement 
+     * does not exist, the method will assume that the path is the namespace of 
+     * each class. Also, the classes which represents web services must be suffixed 
+     * with the word 'Service' (e.g. RegisterUserService).
+     * 
+     * @param string $pathToScan A path which is relative to application source 
+     * code. For example, if tables classes exist in the folder 
+     * 'C:\Server\apache\htdocs\app\apis', then the value of this 
+     * argument must be 'app\apis\.
+     * 
+     * @since 1.0.1
+     */
+    public function registerServices($pathToScan) {
+        $defaultNs = str_replace('/', '\\', $pathToScan);
+        $pathToScan = ROOT_DIR.DS.$pathToScan;
+        $filesInDir = array_diff(scandir($pathToScan), ['..', '.']);
+
+        self::_scanDir($filesInDir, $pathToScan, $defaultNs);
+    }
+    private function _scanDir($filesInDir, $pathToScan, $defaultNs) {
+        foreach ($filesInDir as $fileName) {
+            $fileExt = substr($fileName, -4);
+
+            if ($fileExt == '.php') {
+                $cName = str_replace('.php', '', $fileName);
+                $ns = require_once $pathToScan.DS.$fileName;
+                $aNs = gettype($ns) == 'string' ? $ns.'\\' : $defaultNs.'\\';
+
+                $aCName = $aNs.$cName;
+                $classSuffix = substr($aCName, -7);
+
+                if ($classSuffix == 'Service' && class_exists($aCName)) {
+                    $instance = new $aCName();
+
+                    if ($instance instanceof AbstractWebService) {
+                        $this->addService($instance);
+                    }
+                }
+            }
+        }
     }
     /**
      * Sends a response message to indicate that request method is not supported.

@@ -22,23 +22,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-namespace webfiori\framework\cli;
+namespace webfiori\framework\cli\commands;
 
+use webfiori\framework\cli\CLICommand;
 use webfiori\framework\router\Router;
+use webfiori\framework\cli\CLI;
 /**
- * A CLI command which is used to show a list of all added routes.
+ * A CLI Command which is used to test the result of routing to a specific 
+ * route.
  *
  * @author Ibrahim
  */
-class ListRoutesCommand extends CLICommand {
+class TestRouteCommand extends CLICommand {
     /**
      * Creates new instance of the class.
-     * The command will have name '--list-routes'. This command 
-     * is used to list all registered routes and at which resource they 
-     * point to.
+     * The command will have name '--route'. In addition to that, 
+     * it will have the following arguments:
+     * <ul>
+     * <li><b>url</b>: The URL at which its route will be tested.</li>
+     * </ul>
      */
     public function __construct() {
-        parent::__construct('list-routes', [], 'List all created routes and which resource they point to.');
+        parent::__construct('route', [
+            '--url' => [
+                'optional' => false,
+                'description' => 'The URL that will be tested if it has a '
+                .'route or not.'
+            ]
+        ], 'Test the result of routing to a URL');
     }
     /**
      * Execute the command.
@@ -47,27 +58,9 @@ class ListRoutesCommand extends CLICommand {
      * @since 1.0
      */
     public function exec() {
-        $routesArr = Router::routes();
-        $maxRouteLen = 0;
-
-        foreach ($routesArr as $requestedUrl => $routeTo) {
-            $len = strlen($requestedUrl);
-
-            if ($len > $maxRouteLen) {
-                $maxRouteLen = $len;
-            }
-        }
-        $maxRouteLen += 4;
-
-        foreach ($routesArr as $requestedUrl => $routeTo) {
-            $location = $maxRouteLen - strlen($requestedUrl);
-
-            if (gettype($routeTo) == 'object') {
-                $this->println("$requestedUrl %".$location."s <object>", " => ");
-            } else {
-                $this->println("$requestedUrl %".$location."s $routeTo"," => ");
-            }
-        }
+        $url = $this->getArgValue('--url');
+        $this->println("Trying to route to \"".$url."\"...");
+        Router::route($url);
 
         return 0;
     }

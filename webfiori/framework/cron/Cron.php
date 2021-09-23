@@ -359,7 +359,7 @@ class Cron {
     public static function initRoutes() {
         Router::addRoute([
             'path' => '/cron/login',
-            'route-to' => CronLoginView::class
+            'route-to' => webUI\CronLoginView::class
         ]);
         Router::addRoute([
             'path' => '/cron/apis/{action}',
@@ -368,15 +368,11 @@ class Cron {
         ]);
         Router::addRoute([
             'path' => '/cron',
-            'route-to' => CronLoginView::class
+            'route-to' => webUI\CronLoginView::class
         ]);
         Router::addRoute([
             'path' => '/cron/jobs',
-            'route-to' => CronTasksView::class
-        ]);
-        Router::addRoute([
-            'path' => '/cron/jobs/{job-name}',
-            'route-to' => CronTaskView::class
+            'route-to' => webUI\CronTasksView::class
         ]);
     }
     /**
@@ -694,10 +690,6 @@ class Cron {
     private static function _get() {
         if (self::$executer === null) {
             self::$executer = new Cron();
-
-            if (CLI::isCLI() || defined('CRON_THROUGH_HTTP') && CRON_THROUGH_HTTP === true) {
-                self::_registerJobs();
-            }
         }
 
         return self::$executer;
@@ -765,10 +757,12 @@ class Cron {
         }
     }
     /**
-     * The main aim of this method is to automatically schedule any job which 
-     * exist inside the folder 'app/jobs'.
+     * Register any CRON job which exist in the folder 'jobs' of the application.
+     * 
+     * Note that this method will register jobs only if the framework is running
+     * using CLI or the constant 'CRON_THROUGH_HTTP' is set to true.
      */
-    private static function _registerJobs() {
+    public static function registerJobs() {
         if (CLI::isCLI() || (defined('CRON_THROUGH_HTTP') && CRON_THROUGH_HTTP === true)) {
             WebFioriApp::autoRegister('jobs', function ($job)
             {

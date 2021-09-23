@@ -22,10 +22,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-namespace webfiori\framework\cli;
+namespace webfiori\framework\cli\commands;
 
+use webfiori\framework\cli\CLICommand;
 use webfiori\database\Table;
 use webfiori\framework\Util;
+use webfiori\framework\cli\helpers\CreateTable;
+use webfiori\framework\cli\helpers\CreateTableObj;
+use webfiori\framework\cli\helpers\CreateWebService;
+use webfiori\framework\cli\helpers\CreateMiddleware;
+use webfiori\framework\cli\helpers\CreateCLIClassHelper;
+use webfiori\framework\cli\helpers\CreateCronJob;
+use webfiori\framework\cli\helpers\CreateThemeHelper;
+use webfiori\framework\cli\CLI;
 /**
  * A command which is used to automate some of the common tasks such as 
  * creating table classes or controllers.
@@ -116,6 +125,7 @@ class CreateCommand extends CLICommand {
                 'Middleware.',
                 'Database table from class.',
                 'CLI Command.',
+                'Theme.',
                 'Quit.'
             ];
             $answer = $this->select('What would you like to create?', $options, count($options) - 1);
@@ -138,6 +148,9 @@ class CreateCommand extends CLICommand {
                 return true;
             } else if ($answer == 'Background job.') {
                 $create = new CreateCronJob($this);
+                return true;
+            } else if ($answer == 'Theme.') {
+                $create = new CreateThemeHelper($this);
                 return true;
             } else {
                 $this->info('Not implemented yet.');

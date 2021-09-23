@@ -29,6 +29,21 @@ use webfiori\framework\ConfigController;
 use webfiori\framework\cron\Cron;
 use webfiori\framework\Util;
 use webfiori\framework\WebFioriApp;
+use webfiori\framework\cli\commands\CreateCommand;
+use webfiori\framework\cli\commands\CronCommand;
+use webfiori\framework\cli\commands\HelpCommand;
+use webfiori\framework\cli\commands\ListCronCommand;
+use webfiori\framework\cli\commands\ListRoutesCommand;
+use webfiori\framework\cli\commands\ListThemesCommand;
+use webfiori\framework\cli\commands\RunSQLQueryCommand;
+use webfiori\framework\cli\commands\SettingsCommand;
+use webfiori\framework\cli\commands\TestRouteCommand;
+use webfiori\framework\cli\commands\UpdateTableCommand;
+use webfiori\framework\cli\commands\VersionCommand;
+use webfiori\framework\cli\commands\AddCommand;
+use webfiori\framework\cli\commands\UpdateSettingsCommand;
+use webfiori\framework\cli\StdIn;
+use webfiori\framework\cli\StdOut;
 /**
  * 
  * A class which adds basic support for running the framework through 
@@ -39,9 +54,31 @@ use webfiori\framework\WebFioriApp;
  * 
  * @author Ibrahim
  * 
- * @version 1.0.2
+ * @version 1.0.3
  */
 class CLI {
+    /**
+     * An attribute which is set to true if CLI is running in interactive mode 
+     * or not.
+     * 
+     * @var boolean
+     */
+    private $isInteractive;
+
+    /**
+     * 
+     * @var InputStream
+     * 
+     * @since 1.0.3
+     */
+    private static $inputStream;
+    /**
+     * 
+     * @var OutputStream
+     * 
+     * @since 1.0.3
+     */
+    private static $outputStream;
     /**
      * The command that will be executed now.
      * 
@@ -65,8 +102,14 @@ class CLI {
     private function __construct() {
         $this->commands = [];
         $isCli = self::isCLI();
-
+        $this->isInteractive = false;
+        
         if ($isCli === true) {
+            if (isset($_SERVER['argv'])) {
+                foreach ($_SERVER['argv'] as $arg) {
+                    $this->isInteractive = $arg == '-i' || $this->isInteractive;
+                }
+            }
             if (defined('CLI_HTTP_HOST')) {
                 $host = CLI_HTTP_HOST;
             } else {
@@ -91,6 +134,28 @@ class CLI {
         }
     }
     /**
+     * Sets the stream at which the registered commands will use to send 
+     * output to.
+     * 
+     * @param OutputStream $stream The output stream.
+     * 
+     * @since 1.0.3
+     */
+    public static function setOutputStream(OutputStream $stream) {
+        self::$outputStream = $stream;
+    }
+    /**
+     * Sets the stream at which the registered commands will use to send 
+     * output to.
+     * 
+     * @param OutputStream $stream The output stream.
+     * 
+     * @since 1.0.3
+     */
+    public function setInputStream(InputStream $stream) {
+        self::$inputStream = $stream;
+    }
+    /**
      * Display PHP error information in CLI.
      * 
      * @param int $errno Error number
@@ -104,17 +169,18 @@ class CLI {
      * @since 1.0.2
      */
     public static function displayErr($errno, $errstr, $errfile, $errline) {
-        fprintf(STDERR, CLICommand::formatOutput("<".Util::ERR_TYPES[$errno]['type'].">\n", [
+        $stream = self::getOutputStream();
+        $stream->prints(CLICommand::formatOutput("<".Util::ERR_TYPES[$errno]['type'].">\n", [
             'color' => 'red',
             'bold' => true,
             'blink' => true
         ]));
-        fprintf(STDERR, "Error Message    %5s %s\n",":",$errstr);
-        fprintf(STDERR, "Error Number     %5s %s\n",":",$errno);
-        fprintf(STDERR, "Error Description%5s %s\n",":",Util::ERR_TYPES[$errno]['description']);
-        fprintf(STDERR, "Error File       %5s %s\n",":",$errfile);
-        fprintf(STDERR, "Error Line      %5s %s\n",":",$errline);
-        fprintf(STDERR, "Stack Trace:\n");
+        $stream->prints("Error Message    %5s %s\n",":",$errstr);
+        $stream->prints("Error Number     %5s %s\n",":",$errno);
+        $stream->prints("Error Description%5s %s\n",":",Util::ERR_TYPES[$errno]['description']);
+        $stream->prints("Error File       %5s %s\n",":",$errfile);
+        $stream->prints("Error Line      %5s %s\n",":",$errline);
+        $stream->prints("Stack Trace:\n");
         Cron::log("<".Util::ERR_TYPES[$errno]['type'].">\n");
         Cron::log("Error Message      : $errstr\n");
         Cron::log("Error Number       : $errno\n");
@@ -128,7 +194,7 @@ class CLI {
 
         foreach ($trace as $arr) {
             $toPrint = self::_traceArrAsString($num, $arr)."\n";
-            fprintf(STDERR, $toPrint);
+            $stream->prints($toPrint);
             Cron::log($toPrint);
             $num++;
         }
@@ -146,22 +212,23 @@ class CLI {
      * @since 1.0.2
      */
     public static function displayException($ex) {
-        fprintf(STDERR, CLICommand::formatOutput("Uncaught Exception\n", [
+        $stream = self::getOutputStream();
+        $stream->prints(CLICommand::formatOutput("Uncaught Exception\n", [
             'color' => 'red',
             'bold' => true,
             'blink' => true
         ]));
-        fprintf(STDERR, CLICommand::formatOutput('Exception Message: ', [
+        $stream->prints(CLICommand::formatOutput('Exception Message: ', [
             'color' => 'yellow',
             'bold' => true,
         ]));
-        fprintf(STDERR, $ex->getMessage()."\n");
-        fprintf(STDERR, "Exception Class: %s\n", get_class($ex));
-        fprintf(STDERR, "Exception Code: %s\n",$ex->getCode());
-        fprintf(STDERR, "File: %s\n",$ex->getFile());
-        fprintf(STDERR, "Line: %s\n",$ex->getLine());
-        fprintf(STDERR, "Stack Trace:\n");
-        fprintf(STDERR, $ex->getTraceAsString());
+        $stream->prints($ex->getMessage()."\n");
+        $stream->prints("Exception Class: %s\n", get_class($ex));
+        $stream->prints("Exception Code: %s\n",$ex->getCode());
+        $stream->prints("File: %s\n",$ex->getFile());
+        $stream->prints("Line: %s\n",$ex->getLine());
+        $stream->prints("Stack Trace:\n");
+        $stream->prints($ex->getTraceAsString());
         Cron::log("<Uncaught Exception>\n");
         Cron::log("Exception Message    : ".$ex->getMessage()."\n");
         Cron::log("Exception Class      : ".get_class($ex)."\n");
@@ -174,6 +241,34 @@ class CLI {
             Cron::log(self::_traceArrAsString($num, $arrEntry));
             $num++;
         }
+    }
+    /**
+     * Returns the stream at which the engine is using to send output.
+     * 
+     * @return OutputStream Note that if output stream is set to null, the stream 
+     * will be set to default which is 'StdOut'.
+     * 
+     * @since 1.0.3
+     */
+    public static function getOutputStream() {
+        if (self::$outputStream === null) {
+            self::$outputStream = new StdOut();
+        }
+        return self::$outputStream;
+    }
+    /**
+     * Returns the stream at which the engine is using to get input.
+     * 
+     * @return InputStream Note that if input stream is set to null, the stream 
+     * will be set to default which is 'StdIn'.
+     * 
+     * @since 1.0.3
+     */
+    public static function getInputStream() {
+        if (self::$inputStream === null) {
+            self::$inputStream = new StdIn();
+        }
+        return self::$inputStream;
     }
     /**
      * Returns the command which is being executed.
@@ -258,6 +353,7 @@ class CLI {
         self::register(new AddCommand());
         self::register(new UpdateTableCommand());
         self::register(new RunSQLQueryCommand());
+        self::register(new UpdateSettingsCommand());
         self::_autoRegister();
         //Call this method to register any user-defined commands.
         call_user_func(APP_DIR_NAME.'\ini\InitCliCommands::init');
@@ -270,6 +366,33 @@ class CLI {
      * 
      */
     public static function runCLI() {
+        self::registerCommands();
+        if (self::isIntaractive()) {
+            self::getOutputStream()->println('Running CLI in interactive mode.');
+            self::getOutputStream()->println('WF-CLI > Type commant name or "exit" to close.');
+            self::getOutputStream()->prints('>>');
+            $exit = false;
+            
+            while (!$exit) {
+                
+                self::readInteractiv();
+                $argsCount = count($_SERVER['argv']);
+                if ($argsCount >= 2) {
+                    
+                    if ($argsCount >= 2) {
+                        $exit = $_SERVER['argv'][1] == 'exit';
+                        if (!$exit) {
+                            self::run();
+                        }
+                    } 
+                }
+                self::getOutputStream()->prints('>>');
+            }
+        } else {
+            self::run();
+        }
+    }
+    private static function run() {
         if ($_SERVER['argc'] == 1) {
             $command = self::get()->commands['help'];
             self::get()->activeCommand = $command;
@@ -277,14 +400,26 @@ class CLI {
             if (!defined('__PHPUNIT_PHAR__')) {
                 exit($command->excCommand());
             }
-        } else {
-            if (defined('__PHPUNIT_PHAR__')) {
-                return 0;
-            }
+        } else if (defined('__PHPUNIT_PHAR__')) {
+            $command = self::get()->commands['help'];
+            self::get()->activeCommand = $command;
+            $command->excCommand();
         }
 
         return self::get()->_runCommand();
     }
+    /**
+     * Checks if CLI is running in interactive mode or not.
+     * 
+     * @return boolean If CLI is running in interactive mode, the method will 
+     * return true. False otherwise.
+     * 
+     * @since 1.0.3
+     */
+    public static function isIntaractive() {
+        return self::get()->isInteractive;
+    }
+
     /**
      * The main aim of this method is to automatically register any commands which 
      * exist inside the folder 'app/commands'.
@@ -298,7 +433,18 @@ class CLI {
             });
         }
     }
-    private function _regCommand($command) {
+    private static function readInteractiv() {
+        $input = self::getInputStream()->readLine();
+        
+        $_SERVER['argv'] = [''];
+        $args = explode(' ', $input);
+        foreach ($args as $arg) {
+            if (strlen($arg) != 0) {
+                $_SERVER['argv'][] = $arg;
+            }
+        }
+    }
+    private function _regCommand(CLICommand $command) {
         $this->commands[$command->getName()] = $command;
     }
     private function _runCommand() {
@@ -311,7 +457,7 @@ class CLI {
 
             return $command->excCommand();
         } else {
-            fprintf(STDERR,"Error: The command '".$commandName."' is not supported.");
+            self::getOutputStream()->println("Error: The command '".$commandName."' is not supported.");
 
             return -1;
         }
@@ -328,7 +474,7 @@ class CLI {
      * @return CLI
      */
     private static function get() {
-        if (self::$inst == null) {
+        if (self::$inst === null) {
             self::$inst = new CLI();
         }
 

@@ -23,12 +23,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-namespace webfiori\framework\cli;
+namespace webfiori\framework\cli\commands;
 
+use webfiori\framework\cli\CLICommand;
 use webfiori\database\DatabaseException;
 use webfiori\database\Table;
 use webfiori\framework\DB;
 use webfiori\framework\WebFioriApp;
+use webfiori\framework\cli\CLI;
 
 /**
  * A command which can be used to execute SQL queries on 

@@ -474,7 +474,7 @@ class ConfigController {
      * Returns password hash of the password which is used to protect background 
      * jobs from unauthorized execution.
      * 
-     * @return string Password hash or the string 'NO PASSWORD' if there is no 
+     * @return string Password hash or the string 'NO_PASSWORD' if there is no 
      * password.
      * 
      * @since 1.5.2
@@ -487,7 +487,7 @@ class ConfigController {
             return $c->getCRONPassword();
         }
 
-        return 'NO PASSWORD';
+        return 'NO_PASSWORD';
     }
     /**
      * Returns an array that holds different descriptions for the web application 
@@ -747,7 +747,7 @@ class ConfigController {
      * execution.
      * 
      * @param string $newPass The new password. If empty string is given, the password 
-     * will be set to the string 'NO PASSWORD'.
+     * will be set to the string 'NO_PASSWORD'.
      * 
      * @since 1.5.2
      */
@@ -851,7 +851,7 @@ class ConfigController {
      * in control pages of the system.</li>
      * <li><b>cron-pass</b>: The password which is used to protect cron jobs 
      * fron unauthorized access. If empty string is given, the string 
-     * 'NO PASSWORD' is used.</li>
+     * 'NO_PASSWORD' is used.</li>
      * </ul>
      * 
      * @since 1.5
@@ -1026,7 +1026,7 @@ class ConfigController {
         $this->a($cFile, "        \$this->initSmtpConnections();");
         if (isset($appConfigArr['cron-pass'])) {
             if (strlen(trim($appConfigArr['cron-pass'])) == 0) {
-                $this->a($cFile, "        \$this->cronPass = 'NO PASSWORD';");
+                $this->a($cFile, "        \$this->cronPass = 'NO_PASSWORD';");
             } else {
                 $this->a($cFile, "        \$this->cronPass = '".hash('sha256', $appConfigArr['cron-pass'])."';");
             }
@@ -1151,7 +1151,7 @@ class ConfigController {
         $this->a($cFile, "     * Returns sha256 hash of the password which is used to prevent unauthorized");
         $this->a($cFile, "     * access to run the jobs or access CRON web interface.");
         $this->a($cFile, "     * ");
-        $this->a($cFile, "     * @return Password hash or the string 'NO PASSWORD' if there is no password.");
+        $this->a($cFile, "     * @return Password hash or the string 'NO_PASSWORD' if there is no password.");
         $this->a($cFile, "     * ");
         $this->a($cFile, "     * @since 1.0.1");
         $this->a($cFile, "     */");

@@ -41,9 +41,9 @@ interface Config {
      * 
      * The password should be hashed before using this method as this one should
      * return the hashed value. If no password is set, this method should return the 
-     * string 'NO PASSWORD'.
+     * string 'NO_PASSWORD'.
      * 
-     * @return string Password hash or the string 'NO PASSWORD' if there is no 
+     * @return string Password hash or the string 'NO_PASSWORD' if there is no 
      * password.
      */
     public function getCRONPassword();

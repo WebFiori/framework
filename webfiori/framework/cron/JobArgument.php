@@ -106,7 +106,11 @@ class JobArgument implements JsonI {
         $nTrim = trim($name);
         
         if (!$this->_validateName($nTrim)) {
-            throw new InvalidArgumentException('Invalid argument name: '.$nTrim);
+            if (strlen($nTrim) == 0) {
+                throw new InvalidArgumentException('Invalid argument name: <empty string>');
+            } else {
+                throw new InvalidArgumentException('Invalid argument name: '.$nTrim);
+            }
         }
         $this->name = $nTrim;
     }

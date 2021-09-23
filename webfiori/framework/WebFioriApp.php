@@ -134,7 +134,7 @@ class WebFioriApp {
          * 
          * @since 2.1
          */
-        define('WF_VERSION', '2.3.0');
+        define('WF_VERSION', '2.3.1');
         /**
          * A constant that tells the type of framework version.
          * 
@@ -150,7 +150,7 @@ class WebFioriApp {
          * 
          * @since 2.1
          */
-        define('WF_RELEASE_DATE', '2021-08-12');
+        define('WF_RELEASE_DATE', '2021-09-24');
         /**
          * Change encoding of mb_ functions to UTF-8
          */

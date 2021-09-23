@@ -14,7 +14,6 @@ class CronJobTest extends TestCase {
      */
     public function testAttributes00() {
         $job = new CronJob();
-        $job->addExecutionArg('');
         $this->assertEquals(0,count($job->getExecArgs()));
         $job->addExecutionArg('Hello&world');
         $this->assertEquals(0,count($job->getExecArgs()));

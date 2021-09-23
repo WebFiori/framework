@@ -3,6 +3,7 @@ namespace webfiori\tests\entity\cron;
 
 use PHPUnit\Framework\TestCase;
 use webfiori\framework\cron\CronJob;
+use InvalidArgumentException;
 /**
  * A set of test units for testing the class 'CronJob'.
  *
@@ -13,18 +14,11 @@ class CronJobTest extends TestCase {
      * @test
      */
     public function testAttributes00() {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid argument name: Hello&world');
         $job = new CronJob();
         $this->assertEquals(0,count($job->getExecArgs()));
         $job->addExecutionArg('Hello&world');
-        $this->assertEquals(0,count($job->getExecArgs()));
-        $job->addExecutionArg('hello#world');
-        $this->assertEquals(0,count($job->getExecArgs()));
-        $job->addExecutionArg('hello=x');
-        $this->assertEquals(0,count($job->getExecArgs()));
-        $job->addExecutionArg('?hello World');
-        $this->assertEquals(0,count($job->getExecArgs()));
-        $job->addExecutionArg('    ');
-        $this->assertEquals(0,count($job->getExecArgs()));
     }
     /**
      * @test
@@ -35,6 +29,45 @@ class CronJobTest extends TestCase {
         $this->assertEquals(1,count($job->getExecArgs()));
         $job->addExecutionArg('Hello');
         $this->assertEquals(2,count($job->getExecArgs()));
+    }
+    /**
+     * @test
+     */
+    public function testAttributes02() {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid argument name: hello#world');
+        $job = new CronJob();
+        $this->assertEquals(0,count($job->getExecArgs()));
+        $job->addExecutionArg('hello#world');
+    }
+    /**
+     * @test
+     */
+    public function testAttributes03() {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid argument name: hello=x');
+        $job = new CronJob();
+        $this->assertEquals(0,count($job->getExecArgs()));
+        $job->addExecutionArg('hello=x');
+    }
+    /**
+     * @test
+     */
+    public function testAttributes04() {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid argument name: ?hello World');
+        $job = new CronJob();
+        $this->assertEquals(0,count($job->getExecArgs()));
+        $job->addExecutionArg('?hello World');
+    }
+    /**
+     * @test
+     */
+    public function testAttributes05() {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Invalid argument name: <empty string>');
+        $job = new CronJob();
+        $job->addExecutionArg('    ');
     }
     /**
      * @test

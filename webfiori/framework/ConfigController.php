@@ -25,7 +25,7 @@
 namespace webfiori\framework;
 
 use webfiori\database\ConnectionInfo;
-use webfiori\framework\cli\LangClassWriter;
+use webfiori\framework\cli\writers\LangClassWriter;
 use webfiori\framework\exceptions\SMTPException;
 use webfiori\framework\mail\SMTPAccount;
 use webfiori\framework\mail\SocketMailer;

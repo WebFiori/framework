@@ -41,6 +41,7 @@ use webfiori\framework\cli\commands\TestRouteCommand;
 use webfiori\framework\cli\commands\UpdateTableCommand;
 use webfiori\framework\cli\commands\VersionCommand;
 use webfiori\framework\cli\commands\AddCommand;
+use webfiori\framework\cli\commands\UpdateSettingsCommand;
 use webfiori\framework\cli\StdIn;
 use webfiori\framework\cli\StdOut;
 /**
@@ -352,6 +353,7 @@ class CLI {
         self::register(new AddCommand());
         self::register(new UpdateTableCommand());
         self::register(new RunSQLQueryCommand());
+        self::register(new UpdateSettingsCommand());
         self::_autoRegister();
         //Call this method to register any user-defined commands.
         call_user_func(APP_DIR_NAME.'\ini\InitCliCommands::init');

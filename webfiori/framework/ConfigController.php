@@ -48,9 +48,9 @@ class ConfigController {
 
     const DEFAULT_APP_CONFIG = [
         'config-file-version' => '1.0',
-        'version' => [
-            'v' => '1.0',
-            'v-type' => 'Stable',
+        'version-info' => [
+            'version' => '1.0',
+            'version-type' => 'Stable',
             'release-date' => '2021-01-10'
         ],
         'site' => [
@@ -658,11 +658,33 @@ class ConfigController {
         if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
             $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
             $c = new $constructor();
-
-            return $c->getWebsiteNames();
+            
+            return $c->getTitles();
         }
 
         return self::DEFAULT_APP_CONFIG['site']['titles'];
+    }
+    /**
+     * Returns an associative array that holds application version info.
+     * 
+     * @return array The array will have the following indices: 'version', 
+     * 'version-type' and 'release-date'.
+     * 
+     * @since 1.5.2
+     */
+    public function getAppVersionInfo() {
+        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
+            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
+            $c = new $constructor();
+            
+            return [
+                'version' => $c->getVersion(),
+                'version-type' => $c->getVersionType(),
+                'release-date' => $c->getReleaseDate()
+            ];
+        }
+
+        return self::DEFAULT_APP_CONFIG['version-info'];
     }
     /**
      * Returns a string that represents the string that will be used to separate 
@@ -798,7 +820,7 @@ class ConfigController {
      * @param array $websiteInfoArr an associative array. The array can 
      * have the following indices: 
      * <ul>
-     * <li><b>primary-language</b>: The main display language of the website.
+     * <li><b>primary-lang</b>: The main display language of the website.
      * <li><b>website-names</b>: A sub associative array. The index of the 
      * array should be language code (such as 'EN') and the value 
      * should be the name of the web site in the given language.</li>
@@ -823,7 +845,26 @@ class ConfigController {
     public function updateSiteInfo($websiteInfoArr) {
         $this->writeAppConfig($websiteInfoArr);
     }
-    
+    /**
+     * Update application version information.
+     * 
+     * @param string $vNum Version number such as 1.0.0.
+     * 
+     * @param string $vType Version type such as 'Beta', 'Alpha' or 'RC'.
+     * 
+     * @param string $releaseDate The date at which the version was released on.
+     * 
+     * @since 1.5.2
+     */
+    public function updateAppVersionInfo($vNum, $vType, $releaseDate) {
+        $this->writeAppConfig([
+            'version-info' => [
+                'version' => $vNum,
+                'version-type' => $vType,
+                'release-date' => $releaseDate
+            ]
+        ]);
+    }
     /**
      * Stores configuration variables into the application configuration class.
      * 
@@ -1538,9 +1579,31 @@ class ConfigController {
         $this->a($cFile, "     * @since 1.0");
         $this->a($cFile, "     */");
         $this->a($cFile, "    private function initVersionInfo() {");
-        $this->a($cFile, "        \$this->appVestion = '1.0';");
-        $this->a($cFile, "        \$this->appVersionType = 'Stable';");
-        $this->a($cFile, "        \$this->appReleaseDate = '2021-01-10';");
+        
+        $versionInfo = $this->getAppVersionInfo();
+        
+        if (isset($appConfigArr['version-info'])) {
+            if (isset($appConfigArr['version-info']['version'])) {
+                $this->a($cFile, "        \$this->appVestion = '".$appConfigArr['version-info']['version']."';");
+            } else {
+                $this->a($cFile, "        \$this->appVestion = '".$versionInfo['version']."';");
+            }
+            if (isset($appConfigArr['version-info']['version-type'])) {
+                $this->a($cFile, "        \$this->appVersionType = '".$appConfigArr['version-info']['version-type']."';");
+            } else {
+                $this->a($cFile, "        \$this->appVersionType = '".$versionInfo['version-type']."';");
+            }
+            if (isset($appConfigArr['version-info']['release-date'])) {
+                $this->a($cFile, "        \$this->appReleaseDate = '".$appConfigArr['version-info']['release-date']."';");
+            } else {
+                $this->a($cFile, "        \$this->appReleaseDate = '".$versionInfo['release-date']."';");
+            }
+        } else {
+            $this->a($cFile, "        \$this->appVestion = '".$versionInfo['version']."';");
+            $this->a($cFile, "        \$this->appVersionType = '".$versionInfo['version-type']."';");
+            $this->a($cFile, "        \$this->appReleaseDate = '".$versionInfo['release-date']."';");
+        }
+        
         $this->a($cFile, "    }");
 
         $this->a($cFile, "}");

@@ -482,7 +482,7 @@ class AppConfig implements Config {
             'EN' => '',
             'AR' => '',
         ];
-        $this->baseUrl = Uri::getBaseURL();
+        $this->baseUrl = 'https://example.com';
         $this->titleSep = '|';
         $this->primaryLang = 'EN';
         $this->baseThemeName = \themes\newFiori\NewFiori::class;

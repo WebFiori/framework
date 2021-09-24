@@ -26,9 +26,9 @@ namespace webfiori\framework\cli\helpers;
 
 use Exception;
 use webfiori\database\Table;
+use webfiori\framework\cli\commands\CreateCommand;
 use webfiori\framework\DB;
 use webfiori\framework\WebFioriApp;
-use webfiori\framework\cli\commands\CreateCommand;
 
 /**
  * A helper class for creating database table class.

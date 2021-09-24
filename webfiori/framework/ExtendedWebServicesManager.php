@@ -26,11 +26,11 @@ namespace webfiori\framework;
 
 use webfiori\framework\i18n\Language;
 use webfiori\framework\session\SessionsManager;
+use webfiori\http\AbstractWebService;
 use webfiori\http\Request;
 use webfiori\http\WebServicesManager;
 use webfiori\json\Json;
 use webfiori\json\JsonI;
-use webfiori\http\AbstractWebService;
 /**
  * An extension for the class 'WebServicesManager' that adds support for multi-language 
  * response messages.
@@ -392,28 +392,6 @@ abstract class ExtendedWebServicesManager extends WebServicesManager {
 
         self::_scanDir($filesInDir, $pathToScan, $defaultNs);
     }
-    private function _scanDir($filesInDir, $pathToScan, $defaultNs) {
-        foreach ($filesInDir as $fileName) {
-            $fileExt = substr($fileName, -4);
-
-            if ($fileExt == '.php') {
-                $cName = str_replace('.php', '', $fileName);
-                $ns = require_once $pathToScan.DS.$fileName;
-                $aNs = gettype($ns) == 'string' ? $ns.'\\' : $defaultNs.'\\';
-
-                $aCName = $aNs.$cName;
-                $classSuffix = substr($aCName, -7);
-
-                if ($classSuffix == 'Service' && class_exists($aCName)) {
-                    $instance = new $aCName();
-
-                    if ($instance instanceof AbstractWebService) {
-                        $this->addService($instance);
-                    }
-                }
-            }
-        }
-    }
     /**
      * Sends a response message to indicate that request method is not supported.
      * 
@@ -449,6 +427,28 @@ abstract class ExtendedWebServicesManager extends WebServicesManager {
      */
     public function setLangVars($dir,$arr = []) {
         $this->getTranslation()->setMultiple($dir, $arr);
+    }
+    private function _scanDir($filesInDir, $pathToScan, $defaultNs) {
+        foreach ($filesInDir as $fileName) {
+            $fileExt = substr($fileName, -4);
+
+            if ($fileExt == '.php') {
+                $cName = str_replace('.php', '', $fileName);
+                $ns = require_once $pathToScan.DS.$fileName;
+                $aNs = gettype($ns) == 'string' ? $ns.'\\' : $defaultNs.'\\';
+
+                $aCName = $aNs.$cName;
+                $classSuffix = substr($aCName, -7);
+
+                if ($classSuffix == 'Service' && class_exists($aCName)) {
+                    $instance = new $aCName();
+
+                    if ($instance instanceof AbstractWebService) {
+                        $this->addService($instance);
+                    }
+                }
+            }
+        }
     }
     /**
      * Set the language at which the API is going to use for the response.

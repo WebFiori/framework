@@ -24,17 +24,16 @@
  */
 namespace webfiori\framework\cli\commands;
 
-use webfiori\framework\cli\CLICommand;
 use webfiori\database\Table;
-use webfiori\framework\Util;
-use webfiori\framework\cli\helpers\CreateTable;
-use webfiori\framework\cli\helpers\CreateTableObj;
-use webfiori\framework\cli\helpers\CreateWebService;
-use webfiori\framework\cli\helpers\CreateMiddleware;
+use webfiori\framework\cli\CLICommand;
 use webfiori\framework\cli\helpers\CreateCLIClassHelper;
 use webfiori\framework\cli\helpers\CreateCronJob;
+use webfiori\framework\cli\helpers\CreateMiddleware;
+use webfiori\framework\cli\helpers\CreateTable;
+use webfiori\framework\cli\helpers\CreateTableObj;
 use webfiori\framework\cli\helpers\CreateThemeHelper;
-use webfiori\framework\cli\CLI;
+use webfiori\framework\cli\helpers\CreateWebService;
+use webfiori\framework\Util;
 /**
  * A command which is used to automate some of the common tasks such as 
  * creating table classes or controllers.

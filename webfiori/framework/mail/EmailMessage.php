@@ -187,6 +187,19 @@ class EmailMessage {
         $this->_getSocketMailer()->getCCStr();
     }
     /**
+     * Returns a child node given its ID.
+     * 
+     * @param string $id The ID of the child.
+     * 
+     * @return null|HTMLNode The method returns an object of type HTMLNode. 
+     * if found. If no node has the given ID, the method will return null.
+     * 
+     * @since 1.0.5
+     */
+    public function getChildByID($id) {
+        return $this->getDocument()->getChildByID($id);
+    }
+    /**
      * Returns an array that contains log messages which are generated 
      * from sending SMTP commands.
      * 
@@ -281,19 +294,6 @@ class EmailMessage {
         }
     }
     /**
-     * Returns a child node given its ID.
-     * 
-     * @param string $id The ID of the child.
-     * 
-     * @return null|HTMLNode The method returns an object of type HTMLNode. 
-     * if found. If no node has the given ID, the method will return null.
-     * 
-     * @since 1.0.5
-     */
-    public function getChildByID($id) {
-        return $this->getDocument()->getChildByID($id);
-    }
-    /**
      * Adds a child HTML node to the body of the message.
      * 
      * @param HTMLNode $htmlNode An instance of 'HTMLNode'.
@@ -310,6 +310,18 @@ class EmailMessage {
      */
     public function send() {
         $this->_sendMessage();
+    }
+    /**
+     * Sets the document at which the message will use.
+     * 
+     * @param HTMLDoc $doc An HTML document.
+     * 
+     * @since 1.0.5
+     */
+    public function setDocument($doc) {
+        if ($doc instanceof HTMLDoc) {
+            $this->asHtml = $doc;
+        }
     }
     /**
      * Sets the subject of the email message.
@@ -332,16 +344,6 @@ class EmailMessage {
         $this->getDocument()->addChild(HTMLNode::createTextNode($text,false));
     }
     /**
-     * Returns the document that is associated with the page.
-     * 
-     * @return HTMLDoc An object of type 'HTMLDoc'.
-     * 
-     * @since 1.0.5
-     */
-    private function getDocument() {
-        return $this->asHtml;
-    }
-    /**
      * 
      * @return SocketMailer
      * @since 1.0
@@ -357,15 +359,13 @@ class EmailMessage {
         $this->log = $this->socketMailer->getResponsesLog();
     }
     /**
-     * Sets the document at which the message will use.
+     * Returns the document that is associated with the page.
      * 
-     * @param HTMLDoc $doc An HTML document.
+     * @return HTMLDoc An object of type 'HTMLDoc'.
      * 
      * @since 1.0.5
      */
-    public function setDocument($doc) {
-        if ($doc instanceof HTMLDoc) {
-            $this->asHtml = $doc;
-        }
+    private function getDocument() {
+        return $this->asHtml;
     }
 }

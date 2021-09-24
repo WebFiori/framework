@@ -27,7 +27,6 @@ namespace webfiori\framework\cron\webUI;
 use webfiori\framework\session\SessionsManager;
 use webfiori\framework\WebFioriApp;
 use webfiori\http\Response;
-use webfiori\ui\HTMLNode;
 /**
  * A page which is used to show login form to enter login information to 
  * access cron web interface.
@@ -68,5 +67,4 @@ class CronLoginView extends CronView {
                 ':disabled' => 'login_btn_disabled'
             ])->text('Login');
     }
-    
 }

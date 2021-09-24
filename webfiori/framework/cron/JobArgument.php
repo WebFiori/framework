@@ -1,9 +1,9 @@
 <?php
 namespace webfiori\framework\cron;
 
-use webfiori\json\JsonI;
-use webfiori\json\Json;
 use InvalidArgumentException;
+use webfiori\json\Json;
+use webfiori\json\JsonI;
 /**
  * A class that represents execution argument of a job.
  *
@@ -20,14 +20,14 @@ class JobArgument implements JsonI {
      * 
      * @since 1.0
      */
-    private $name;
+    private $description;
     /**
      * 
      * @var string
      * 
      * @since 1.0
      */
-    private $description;
+    private $name;
     /**
      * Creates new instance of the class.
      * 
@@ -41,9 +41,31 @@ class JobArgument implements JsonI {
      */
     public function __construct($name, $desc = '') {
         $this->setName($name);
+
         if (!$this->setDescription($desc)) {
             $this->setDescription('NO DESCRIPTION');
         }
+    }
+    /**
+     * Returns argument description.
+     * 
+     * @return string A string that describes how the argument will affect job 
+     * execution. Default return value is 'NO DESCRIPTION'.
+     *  
+     * @since 1.0
+     */
+    public function getDescription() {
+        return $this->description;
+    }
+    /**
+     * Returns the name of the argument.
+     * 
+     * @return string The name of the argument.
+     * 
+     * @since 1.0
+     */
+    public function getName() {
+        return $this->name;
     }
     /**
      * Returns the value of job argument.
@@ -61,17 +83,17 @@ class JobArgument implements JsonI {
         $uName = str_replace(' ', '_', $name);
         $retVal = null;
         $filtered = false;
-        
+
         if (isset($_POST[$name])) {
             $filtered = filter_var(urldecode($_POST[$name]), FILTER_SANITIZE_STRING);
         } else if (isset($_POST[$uName])) {
             $filtered = filter_var(urldecode($_POST[$uName]), FILTER_SANITIZE_STRING);
         }
-        
+
         if ($filtered !== false) {
             $retVal = $filtered;
         }
-        
+
         return $retVal;
     }
     /**
@@ -87,11 +109,13 @@ class JobArgument implements JsonI {
      */
     public function setDescription($desc) {
         $trimmed = trim($desc);
-        
+
         if (strlen($trimmed) > 0) {
             $this->description = $trimmed;
+
             return true;
         }
+
         return false;
     }
     /**
@@ -104,7 +128,7 @@ class JobArgument implements JsonI {
      */
     public function setName($name) {
         $nTrim = trim($name);
-        
+
         if (!$this->_validateName($nTrim)) {
             if (strlen($nTrim) == 0) {
                 throw new InvalidArgumentException('Invalid argument name: <empty string>');
@@ -113,6 +137,26 @@ class JobArgument implements JsonI {
             }
         }
         $this->name = $nTrim;
+    }
+    /**
+     * Returns an object that represents the argument in JSON.
+     * 
+     * @return Json An object that holds the following JSON attributes:
+     * <ul>
+     * <li>name</li>
+     * <li>description</li>
+     * </ul>
+     * 
+     * @since 1.0
+     */
+    public function toJSON() {
+        $json = new Json([
+            'name' => $this->getName(),
+            'description' => $this->getDescription()
+        ]);
+        $json->setPropsStyle('snake');
+
+        return $json;
     }
     /**
      * 
@@ -136,45 +180,4 @@ class JobArgument implements JsonI {
 
         return false;
     }
-    /**
-     * Returns the name of the argument.
-     * 
-     * @return string The name of the argument.
-     * 
-     * @since 1.0
-     */
-    public function getName() {
-        return $this->name;
-    }
-    /**
-     * Returns argument description.
-     * 
-     * @return string A string that describes how the argument will affect job 
-     * execution. Default return value is 'NO DESCRIPTION'.
-     *  
-     * @since 1.0
-     */
-    public function getDescription() {
-        return $this->description;
-    }
-    /**
-     * Returns an object that represents the argument in JSON.
-     * 
-     * @return Json An object that holds the following JSON attributes:
-     * <ul>
-     * <li>name</li>
-     * <li>description</li>
-     * </ul>
-     * 
-     * @since 1.0
-     */
-    public function toJSON() {
-        $json = new Json([
-            'name' => $this->getName(),
-            'description' => $this->getDescription()
-        ]);
-        $json->setPropsStyle('snake');
-        return $json;
-    }
-
 }

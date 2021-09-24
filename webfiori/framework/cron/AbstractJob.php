@@ -29,8 +29,8 @@ use Exception;
 use webfiori\collections\Queue;
 use webfiori\framework\cli\commands\CronCommand;
 use webfiori\framework\exceptions\InvalidCRONExprException;
-use webfiori\json\JsonI;
 use webfiori\json\Json;
+use webfiori\json\JsonI;
 /**
  * An abstract class that contains basic functionality for implementing cron 
  * jobs.
@@ -237,23 +237,6 @@ abstract class AbstractJob implements JsonI {
         }
     }
     /**
-     * Checks if an argument with specific name belongs to the job or not.
-     * 
-     * @param string $name The name of the argument that will be checked.
-     * 
-     * @return boolean If an argument with the given name already exist, the 
-     * method will return true. False if not.
-     * 
-     * @since 1.0.2
-     */
-    public function hasArg($name) {
-        $added = false;
-        foreach ($this->getArguments() as $argObj) {
-            $added = $added || $argObj->getName() == $name;
-        }
-        return $added;
-    }
-    /**
      * Adds multiple execution arguments at one shot.
      * 
      * @param array $argsArr An array that contains the names of the 
@@ -450,6 +433,16 @@ abstract class AbstractJob implements JsonI {
      */
     public abstract function execute();
     /**
+     * Returns an array that holds execution arguments of the job.
+     * 
+     * @return array An array that holds objects of type 'JobArgument'.
+     * 
+     * @since 1.0.2
+     */
+    public function getArguments() {
+        return $this->customAttrs;
+    }
+    /**
      * Returns the value of a custom execution argument.
      * 
      * The value of the argument can be supplied through the table that will 
@@ -510,7 +503,6 @@ abstract class AbstractJob implements JsonI {
      * @since 1.0
      */
     public function getExecArgs() {
-        
         $retVal = [];
 
         foreach ($this->customAttrs as $attrObj) {
@@ -529,19 +521,10 @@ abstract class AbstractJob implements JsonI {
      * @since 1.0
      */
     public function getExecArgsNames() {
-        return array_map(function($obj){
+        return array_map(function($obj)
+        {
             return $obj->getName();
         }, $this->getArguments());
-    }
-    /**
-     * Returns an array that holds execution arguments of the job.
-     * 
-     * @return array An array that holds objects of type 'JobArgument'.
-     * 
-     * @since 1.0.2
-     */
-    public function getArguments() {
-        return $this->customAttrs;
     }
     /**
      * Returns the cron expression which is associated with the job.
@@ -590,6 +573,25 @@ abstract class AbstractJob implements JsonI {
      */
     public function getJobName() {
         return $this->jobName;
+    }
+    /**
+     * Checks if an argument with specific name belongs to the job or not.
+     * 
+     * @param string $name The name of the argument that will be checked.
+     * 
+     * @return boolean If an argument with the given name already exist, the 
+     * method will return true. False if not.
+     * 
+     * @since 1.0.2
+     */
+    public function hasArg($name) {
+        $added = false;
+
+        foreach ($this->getArguments() as $argObj) {
+            $added = $added || $argObj->getName() == $name;
+        }
+
+        return $added;
     }
     /**
      * Checks if current day of month in time is a day at which the job must be 
@@ -955,6 +957,7 @@ abstract class AbstractJob implements JsonI {
             ])
         ]);
         $json->setPropsStyle('snake');
+
         return $json;
     }
     /**

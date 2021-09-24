@@ -26,11 +26,11 @@ namespace webfiori\framework\cli\commands;
 
 use Exception;
 use webfiori\database\ConnectionInfo;
+use webfiori\framework\cli\CLICommand;
 use webfiori\framework\ConfigController;
 use webfiori\framework\DB;
 use webfiori\framework\mail\SMTPAccount;
 use webfiori\framework\WebFioriApp;
-use webfiori\framework\cli\CLICommand;
 
 /**
  * A command which is used to add a database connection or SMTP account.

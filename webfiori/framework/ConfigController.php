@@ -418,6 +418,28 @@ class ConfigController {
         return self::DEFAULT_APP_CONFIG['site']['admin-theme'];
     }
     /**
+     * Returns an associative array that holds application version info.
+     * 
+     * @return array The array will have the following indices: 'version', 
+     * 'version-type' and 'release-date'.
+     * 
+     * @since 1.5.2
+     */
+    public function getAppVersionInfo() {
+        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
+            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
+            $c = new $constructor();
+
+            return [
+                'version' => $c->getVersion(),
+                'version-type' => $c->getVersionType(),
+                'release-date' => $c->getReleaseDate()
+            ];
+        }
+
+        return self::DEFAULT_APP_CONFIG['version-info'];
+    }
+    /**
      * Returns the base URL which is use as a value for the tag &gt;base&lt;.
      * 
      * @return string
@@ -453,6 +475,25 @@ class ConfigController {
         return self::DEFAULT_APP_CONFIG['site']['base-theme'];
     }
     /**
+     * Returns password hash of the password which is used to protect background 
+     * jobs from unauthorized execution.
+     * 
+     * @return string Password hash or the string 'NO_PASSWORD' if there is no 
+     * password.
+     * 
+     * @since 1.5.2
+     */
+    public function getCRONPassword() {
+        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
+            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
+            $c = new $constructor();
+
+            return $c->getCRONPassword();
+        }
+
+        return 'NO_PASSWORD';
+    }
+    /**
      * Returns an array that holds database connections.
      * 
      * @return array The indices of the array are names of the connections and 
@@ -469,25 +510,6 @@ class ConfigController {
         }
 
         return [];
-    }
-    /**
-     * Returns password hash of the password which is used to protect background 
-     * jobs from unauthorized execution.
-     * 
-     * @return string Password hash or the string 'NO_PASSWORD' if there is no 
-     * password.
-     * 
-     * @since 1.5.2
-     */
-    public function getCRONPassword() {
-        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
-            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
-            $c = new $constructor();
-            
-            return $c->getCRONPassword();
-        }
-
-        return 'NO_PASSWORD';
     }
     /**
      * Returns an array that holds different descriptions for the web application 
@@ -658,33 +680,11 @@ class ConfigController {
         if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
             $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
             $c = new $constructor();
-            
+
             return $c->getTitles();
         }
 
         return self::DEFAULT_APP_CONFIG['site']['titles'];
-    }
-    /**
-     * Returns an associative array that holds application version info.
-     * 
-     * @return array The array will have the following indices: 'version', 
-     * 'version-type' and 'release-date'.
-     * 
-     * @since 1.5.2
-     */
-    public function getAppVersionInfo() {
-        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
-            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
-            $c = new $constructor();
-            
-            return [
-                'version' => $c->getVersion(),
-                'version-type' => $c->getVersionType(),
-                'release-date' => $c->getReleaseDate()
-            ];
-        }
-
-        return self::DEFAULT_APP_CONFIG['version-info'];
     }
     /**
      * Returns a string that represents the string that will be used to separate 
@@ -762,6 +762,26 @@ class ConfigController {
         }
         $this->writeAppConfig([
             'db-connections' => $updated
+        ]);
+    }
+    /**
+     * Update application version information.
+     * 
+     * @param string $vNum Version number such as 1.0.0.
+     * 
+     * @param string $vType Version type such as 'Beta', 'Alpha' or 'RC'.
+     * 
+     * @param string $releaseDate The date at which the version was released on.
+     * 
+     * @since 1.5.2
+     */
+    public function updateAppVersionInfo($vNum, $vType, $releaseDate) {
+        $this->writeAppConfig([
+            'version-info' => [
+                'version' => $vNum,
+                'version-type' => $vType,
+                'release-date' => $releaseDate
+            ]
         ]);
     }
     /**
@@ -844,26 +864,6 @@ class ConfigController {
      */
     public function updateSiteInfo($websiteInfoArr) {
         $this->writeAppConfig($websiteInfoArr);
-    }
-    /**
-     * Update application version information.
-     * 
-     * @param string $vNum Version number such as 1.0.0.
-     * 
-     * @param string $vType Version type such as 'Beta', 'Alpha' or 'RC'.
-     * 
-     * @param string $releaseDate The date at which the version was released on.
-     * 
-     * @since 1.5.2
-     */
-    public function updateAppVersionInfo($vNum, $vType, $releaseDate) {
-        $this->writeAppConfig([
-            'version-info' => [
-                'version' => $vNum,
-                'version-type' => $vType,
-                'release-date' => $releaseDate
-            ]
-        ]);
     }
     /**
      * Stores configuration variables into the application configuration class.
@@ -981,7 +981,7 @@ class ConfigController {
         $this->a($cFile, "     * @since 1.0");
         $this->a($cFile, "     */");
         $this->a($cFile, "    private \$configVision;");
-        
+
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Password hash of CRON sub-system.");
         $this->a($cFile, "     * ");
@@ -1065,6 +1065,7 @@ class ConfigController {
         $this->a($cFile, "        \$this->initSiteInfo();");
         $this->a($cFile, "        \$this->initDbConnections();");
         $this->a($cFile, "        \$this->initSmtpConnections();");
+
         if (isset($appConfigArr['cron-pass'])) {
             if (strlen(trim($appConfigArr['cron-pass'])) == 0) {
                 $this->a($cFile, "        \$this->cronPass = 'NO_PASSWORD';");
@@ -1187,7 +1188,7 @@ class ConfigController {
         $this->a($cFile, "    public function getConfigVersion() {");
         $this->a($cFile, "        return \$this->configVision;");
         $this->a($cFile, "    }");
-        
+
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Returns sha256 hash of the password which is used to prevent unauthorized");
         $this->a($cFile, "     * access to run the jobs or access CRON web interface.");
@@ -1579,20 +1580,22 @@ class ConfigController {
         $this->a($cFile, "     * @since 1.0");
         $this->a($cFile, "     */");
         $this->a($cFile, "    private function initVersionInfo() {");
-        
+
         $versionInfo = $this->getAppVersionInfo();
-        
+
         if (isset($appConfigArr['version-info'])) {
             if (isset($appConfigArr['version-info']['version'])) {
                 $this->a($cFile, "        \$this->appVestion = '".$appConfigArr['version-info']['version']."';");
             } else {
                 $this->a($cFile, "        \$this->appVestion = '".$versionInfo['version']."';");
             }
+
             if (isset($appConfigArr['version-info']['version-type'])) {
                 $this->a($cFile, "        \$this->appVersionType = '".$appConfigArr['version-info']['version-type']."';");
             } else {
                 $this->a($cFile, "        \$this->appVersionType = '".$versionInfo['version-type']."';");
             }
+
             if (isset($appConfigArr['version-info']['release-date'])) {
                 $this->a($cFile, "        \$this->appReleaseDate = '".$appConfigArr['version-info']['release-date']."';");
             } else {
@@ -1603,7 +1606,7 @@ class ConfigController {
             $this->a($cFile, "        \$this->appVersionType = '".$versionInfo['version-type']."';");
             $this->a($cFile, "        \$this->appReleaseDate = '".$versionInfo['release-date']."';");
         }
-        
+
         $this->a($cFile, "    }");
 
         $this->a($cFile, "}");

@@ -29,5 +29,4 @@ interface InputStream {
      * @return string The method should return the bytes as string.
      */
     public function readLine();
-    
 }

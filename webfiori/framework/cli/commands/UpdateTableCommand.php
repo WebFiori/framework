@@ -7,8 +7,6 @@
  */
 namespace webfiori\framework\cli\commands;
 
-use webfiori\framework\cli\CLICommand;
-use webfiori\framework\cli\CLI;
 use Error;
 use ErrorException;
 use Exception;
@@ -16,6 +14,7 @@ use webfiori\database\Column;
 use webfiori\database\mysql\MySQLColumn;
 use webfiori\database\Table;
 use webfiori\framework\AutoLoader;
+use webfiori\framework\cli\CLICommand;
 use webfiori\framework\DB;
 use webfiori\framework\WebFioriApp;
 /**

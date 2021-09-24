@@ -448,7 +448,7 @@ class AutoLoader {
     private function _addSearchDirectoryHelper($cleanDir, $appendRoot) {
         $dirsStack = [$cleanDir];
         $root = $this->getRoot();
-        
+
         while ($xDir = array_pop($dirsStack)) {
             if ($appendRoot === true) {
                 $fullPath = $root.$xDir;
@@ -546,7 +546,6 @@ class AutoLoader {
         $isFileLoaded = in_array($f, $allPaths);
 
         if (!$isFileLoaded) {
-
             if (file_exists($f)) {
                 require_once $f;
                 $ns = count(explode('\\', $classWithNs)) == 1 ? '\\' : substr($classWithNs, 0, strlen($classWithNs) - strlen($className) - 1);
@@ -589,7 +588,6 @@ class AutoLoader {
      * @since 1.1.6
      */
     private function _readCache() {
-        
         $autoloadCachePath = $this->getRoot().DIRECTORY_SEPARATOR.APP_DIR_NAME.DIRECTORY_SEPARATOR.'sto';
         $autoloadCache = $autoloadCachePath.DIRECTORY_SEPARATOR.self::CACHE_NAME;
         //For first run, the cache file might not exist.
@@ -620,7 +618,7 @@ class AutoLoader {
             if (!file_exists($autoloadCache) && is_writable($autoloadCachePath)) {
                 mkdir($autoloadCachePath, 0777, true);
                 $h = fopen($autoloadCache, 'w');
-                
+
                 if (is_resource($h)) {
                     fclose($h);
                 }

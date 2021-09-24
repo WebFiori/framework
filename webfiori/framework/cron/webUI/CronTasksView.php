@@ -24,15 +24,9 @@
  */
 namespace webfiori\framework\cron\webUI;
 
-use webfiori\framework\File;
-use webfiori\framework\WebFioriApp;
-use webfiori\ui\HTMLNode;
-use webfiori\ui\Input;
-use webfiori\ui\Label;
-use webfiori\ui\Paragraph;
-use webfiori\ui\TableCell;
-use webfiori\ui\TableRow;
 use webfiori\framework\cron\Cron;
+use webfiori\framework\File;
+use webfiori\ui\HTMLNode;
 /**
  * A view to display information about CRON Jobs.
  * The view will show a table of all scheduled cron jobs. The table will include 
@@ -63,7 +57,7 @@ class CronTasksView extends CronView {
      */
     public function __construct() {
         parent::__construct('Scheduled CRON Tasks', 'A list of available CRON jobs.');
-        
+
         $searchRow = $this->insert('v-row');
         $searchRow->addChild('v-col', [
                     'cols' => 12, 'sm' => 12, 'md' => 4
@@ -73,9 +67,9 @@ class CronTasksView extends CronView {
                     'v-model' => 'search',
                     'dense', 'outlined'
                 ]);
-        
+
         $row = $this->insert('v-row');
-        
+
         $table = $row->addChild('v-col', [
             'cols' => 12
         ])->addChild('v-data-table', [
@@ -88,7 +82,7 @@ class CronTasksView extends CronView {
             ':search' => 'search'
         ]);
 
-        
+
         $this->addIsTimeSlot($table, 'is_minute');
         $this->addIsTimeSlot($table, 'is_hour');
         $this->addIsTimeSlot($table, 'is_day_of_week');
@@ -111,7 +105,7 @@ class CronTasksView extends CronView {
                 'padding' => '20px'
             ]
         ])->addChild('v-row');
-        
+
         $tableRow->addChild('v-col', [
             'cols' => 12, 'sm' => 12, 'md' => 6
         ])->addChild('v-textarea', [
@@ -140,13 +134,14 @@ class CronTasksView extends CronView {
         $card->addChild('p', [
             'v-else'
         ])->text('No Arguments.');
-        
+
         $logRow = $this->insert('v-row');
         $card = $logRow->addChild('v-col', [
             'cols' => 12
         ])->addChild('v-card');
         $card->addChild('v-card-title')->text('Jobs Execution Log');
         $file = new File(ROOT_DIR.DS.APP_DIR_NAME.DS.'sto'.DS.'logs'.DS.'cron.log');
+
         if ($file->isExist()) {
             $file->read();
             $card->addChild('v-card-text')->addChild('pre')->text($file->getRawData());

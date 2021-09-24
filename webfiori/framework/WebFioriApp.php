@@ -24,8 +24,9 @@
  */
 namespace webfiori\framework;
 
-use webfiori\framework\cron\Cron;
+use Exception;
 use webfiori\framework\cli\CLI;
+use webfiori\framework\cron\Cron;
 use webfiori\framework\exceptions\InitializationException;
 use webfiori\framework\middleware\MiddlewareManager;
 use webfiori\framework\router\Router;
@@ -36,8 +37,6 @@ use webfiori\framework\ui\ServerErrView;
 use webfiori\http\Request;
 use webfiori\http\Response;
 use webfiori\json\Json;
-use webfiori\framework\Config;
-use Exception;
 /**
  * The time at which the framework was booted in microseconds as a float.
  * 
@@ -177,6 +176,7 @@ class WebFioriApp {
             http_response_code(500);
             die('Error: Unable to initialize the application. Invalid application directory name: "'.APP_DIR_NAME.'".');
         }
+
         if (!class_exists(APP_DIR_NAME.'\ini\GlobalConstants')) {
             $confControllerPath = ROOT_DIR.DIRECTORY_SEPARATOR.
                     'vendor'.DIRECTORY_SEPARATOR.
@@ -224,7 +224,7 @@ class WebFioriApp {
             ConfigController::get()->createIniClass('InitAutoLoad', 'Add user-defined directories to the set of directories at which the framework will search for classes.');
         }
         call_user_func(APP_DIR_NAME.'\ini\InitAutoLoad::init');
-        
+
         self::$SF = ConfigController::get();
 
         if (!class_exists(APP_DIR_NAME.'\AppConfig')) {
@@ -249,7 +249,7 @@ class WebFioriApp {
         //This step must be done before initializing anything.
         call_user_func(APP_DIR_NAME.'\ini\InitPrivileges::init');
 
-        
+
 
         $this->_initMiddleware();
         $this->_initRoutes();
@@ -417,23 +417,12 @@ class WebFioriApp {
             'webfiori/database' => 'webfiori\database\ResultSet',
             'webfiori/http' => 'webfiori\http\Response'
         ];
-        
+
         foreach ($standardLibsClasses as $lib => $class) {
             if (!class_exists($class)) {
                 throw new InitializationException("The standard library '$lib' is missing.");
             }
         }
-    }
-    private function _initMiddleware() {
-        WebFioriApp::autoRegister('middleware', function($inst)
-        {
-            MiddlewareManager::register($inst);
-        });
-
-        if (!class_exists(APP_DIR_NAME.'\ini\InitMiddleware')) {
-            ConfigController::get()->createIniClass('InitMiddleware', 'Register middleware which are created outside the folder \'app/middleware\'.');
-        }
-        call_user_func(APP_DIR_NAME.'\ini\InitMiddleware::init');
     }
     private function _initCRON() {
         $uriObj = new RouterUri(Util::getRequestedURL(), '');
@@ -453,8 +442,20 @@ class WebFioriApp {
             Cron::registerJobs();
         }
     }
+    private function _initMiddleware() {
+        WebFioriApp::autoRegister('middleware', function($inst)
+        {
+            MiddlewareManager::register($inst);
+        });
+
+        if (!class_exists(APP_DIR_NAME.'\ini\InitMiddleware')) {
+            ConfigController::get()->createIniClass('InitMiddleware', 'Register middleware which are created outside the folder \'app/middleware\'.');
+        }
+        call_user_func(APP_DIR_NAME.'\ini\InitMiddleware::init');
+    }
     private function _initRoutes() {
         $routesClasses = ['APIRoutes', 'ViewRoutes', 'ClosureRoutes', 'OtherRoutes'];
+
         foreach ($routesClasses as $className) {
             if (!class_exists(APP_DIR_NAME.'\\ini\\routes\\'.$className)) {
                 ConfigController::get()->createRoutesClass($className);
@@ -464,7 +465,7 @@ class WebFioriApp {
 
         if (Router::routesCount() != 0) {
             $home = trim(self::getAppConfig()->getHomePage());
-            
+
             if (strlen($home) != 0) {
                 Router::redirect('/', WebFioriApp::getAppConfig()->getHomePage());
             }

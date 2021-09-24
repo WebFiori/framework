@@ -11,7 +11,6 @@ namespace webfiori\framework\cli;
  * @version 1.0
  */
 class StdOut implements OutputStream {
-
     public function println($str, ...$_) {
         $toPass = [
             $this->asString($str)."\e[0m\e[k\n"
@@ -38,7 +37,7 @@ class StdOut implements OutputStream {
         }
         call_user_func_array('fprintf', $arrayToPass);
     }
-    
+
     private function asString($var) {
         $type = gettype($var);
 

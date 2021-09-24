@@ -36,20 +36,6 @@ namespace webfiori\framework\cli;
  */
 abstract class CLICommand {
     /**
-     * 
-     * @var OutputStream
-     * 
-     * @since 1.0.1
-     */
-    private $outputStream;
-    /**
-     * 
-     * @var InputStream
-     * 
-     * @since 1.0.1
-     */
-    private $inputStream;
-    /**
      * An associative array that contains color codes and names.
      * @since 1.0
      */
@@ -85,6 +71,20 @@ abstract class CLICommand {
      * @since 1.0 
      */
     private $description;
+    /**
+     * 
+     * @var InputStream
+     * 
+     * @since 1.0.1
+     */
+    private $inputStream;
+    /**
+     * 
+     * @var OutputStream
+     * 
+     * @since 1.0.1
+     */
+    private $outputStream;
     /**
      * Creates new instance of the class.
      * 
@@ -125,48 +125,6 @@ abstract class CLICommand {
         }
         $this->setInputStream(CLI::getInputStream());
         $this->setOutputStream(CLI::getOutputStream());
-    }
-    /**
-     * Sets the stream at which the command will read input from.
-     * 
-     * @param InputStream $stream An instance that implements an input stream.
-     * 
-     * @since 1.0.1
-     */
-    public function setInputStream(InputStream $stream) {
-        $this->inputStream = $stream;
-    }
-    /**
-     * Returns the stream at which the command is sing to read inputs.
-     * 
-     * @return null|InputStream If the stream is set, it will be returned as 
-     * an object. Other than that, the method will return null.
-     * 
-     * @since 1.0.1
-     */
-    public function getInputStream() {
-        return $this->inputStream;
-    }
-    /**
-     * Sets the stream at which the command will send output to.
-     * 
-     * @param OutputStream $stream An instance that implements output stream.
-     * 
-     * @since 1.0.1
-     */
-    public function setOutputStream(OutputStream $stream) {
-        $this->outputStream = $stream;
-    }
-    /**
-     * Returns the stream at which the command is using to send output.
-     * 
-     * @return null|OutputStream If the stream is set, it will be returned as 
-     * an object. Other than that, the method will return null.
-     * 
-     * @since 1.0.1
-     */
-    public function getOutputStream() {
-        return $this->outputStream;
     }
     /**
      * Add command argument.
@@ -617,6 +575,17 @@ abstract class CLICommand {
         }
     }
     /**
+     * Returns the stream at which the command is sing to read inputs.
+     * 
+     * @return null|InputStream If the stream is set, it will be returned as 
+     * an object. Other than that, the method will return null.
+     * 
+     * @since 1.0.1
+     */
+    public function getInputStream() {
+        return $this->inputStream;
+    }
+    /**
      * Returns the name of the command.
      * 
      * The name of the command is a string which is used to call the command 
@@ -629,6 +598,17 @@ abstract class CLICommand {
      */
     public function getName() {
         return $this->commandName;
+    }
+    /**
+     * Returns the stream at which the command is using to send output.
+     * 
+     * @return null|OutputStream If the stream is set, it will be returned as 
+     * an object. Other than that, the method will return null.
+     * 
+     * @since 1.0.1
+     */
+    public function getOutputStream() {
+        return $this->outputStream;
     }
     /**
      * Checks if the command has a specific command line argument or not.
@@ -820,9 +800,10 @@ abstract class CLICommand {
      */
     public function println($str = '', ...$_) {
         $argsCount = count($_);
+
         if ($argsCount != 0 && gettype($_[$argsCount - 1]) == 'array') {
             //Last index contains formatting options.
-            $str = self::formatOutput($str, $_[$argsCount  - 1]);
+            $str = self::formatOutput($str, $_[$argsCount - 1]);
         }
         call_user_func_array([$this->getOutputStream(), 'println'], $this->_createPassArray($str, $_));
     }
@@ -846,7 +827,7 @@ abstract class CLICommand {
      */
     public function prints($str, ...$_) {
         $str = $this->asString($str);
-        
+
         $argCount = count($_);
         $formattingOptions = [];
 
@@ -856,22 +837,10 @@ abstract class CLICommand {
 
         $formattingOptions['force-styling'] = $this->isArgProvided('force-styling');
         $formattingOptions['no-ansi'] = $this->isArgProvided('--no-ansi');
-        
+
         $formattedStr = $this->formatOutput($str, $formattingOptions);
-        
+
         call_user_func_array([$this->getOutputStream(), 'prints'], $this->_createPassArray($formattedStr, $_));
-        
-    }
-    private function _createPassArray($string, array $args) {
-        $retVal = [$string];
-        
-        foreach ($args as $arg) {
-            if (gettype($arg) != 'array') {
-                $retVal[] = $arg;
-            }
-        }
-        
-        return $retVal;
     }
 
     /**
@@ -901,7 +870,7 @@ abstract class CLICommand {
     public function readln() {
         return $this->getInputStream()->readLine();
     }
-    
+
     /**
      * Ask the user to select one of multiple values.
      * 
@@ -1013,6 +982,16 @@ abstract class CLICommand {
         return false;
     }
     /**
+     * Sets the stream at which the command will read input from.
+     * 
+     * @param InputStream $stream An instance that implements an input stream.
+     * 
+     * @since 1.0.1
+     */
+    public function setInputStream(InputStream $stream) {
+        $this->inputStream = $stream;
+    }
+    /**
      * Sets the name of the command.
      * 
      * The name of the command is a string which is used to call the command 
@@ -1036,6 +1015,16 @@ abstract class CLICommand {
         }
 
         return false;
+    }
+    /**
+     * Sets the stream at which the command will send output to.
+     * 
+     * @param OutputStream $stream An instance that implements output stream.
+     * 
+     * @since 1.0.1
+     */
+    public function setOutputStream(OutputStream $stream) {
+        $this->outputStream = $stream;
     }
     /**
      * Display a message that represents a success status.
@@ -1205,6 +1194,17 @@ abstract class CLICommand {
         } else {
             $options['values'] = [];
         }
+    }
+    private function _createPassArray($string, array $args) {
+        $retVal = [$string];
+
+        foreach ($args as $arg) {
+            if (gettype($arg) != 'array') {
+                $retVal[] = $arg;
+            }
+        }
+
+        return $retVal;
     }
     private static function _getFormattedOutput($outputString, $formatOptions) {
         $outputManner = self::getCharsManner($formatOptions);

@@ -1,13 +1,13 @@
 <?php
 namespace webfiori\framework\cli\commands;
 
+use Error;
+use Exception;
 use webfiori\framework\cli\CLICommand;
 use webfiori\framework\ConfigController;
-use webfiori\framework\WebFioriApp;
 use webfiori\framework\router\Router;
 use webfiori\framework\Theme;
-use Exception;
-use Error;
+use webfiori\framework\WebFioriApp;
 /**
  * This class implements a CLI command which is used to update the settings which are 
  * stored in the class 'AppConfing' of the application.
@@ -35,7 +35,7 @@ class UpdateSettingsCommand extends CLICommand {
             'Quit.'
         ];
         $whatToUpdate = $this->select('What would you like to update?', $options, count($options) - 1);
-        
+
         if ($whatToUpdate == 'Quit.') {
             return 0;
         } else if ($whatToUpdate == 'Update application name.') {

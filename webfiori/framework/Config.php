@@ -36,18 +36,6 @@ use webfiori\framework\mail\SMTPAccount;
  */
 interface Config {
     /**
-     * Returns sha256 hash of the password which is used to prevent unauthorized
-     * access to run the jobs or access CRON web interface.
-     * 
-     * The password should be hashed before using this method as this one should
-     * return the hashed value. If no password is set, this method should return the 
-     * string 'NO_PASSWORD'.
-     * 
-     * @return string Password hash or the string 'NO_PASSWORD' if there is no 
-     * password.
-     */
-    public function getCRONPassword();
-    /**
      * Adds an email account.
      * 
      * The developer can use this method to add new account during runtime.
@@ -132,6 +120,18 @@ interface Config {
      * @since 1.0
      */
     public function getConfigVersion();
+    /**
+     * Returns sha256 hash of the password which is used to prevent unauthorized
+     * access to run the jobs or access CRON web interface.
+     * 
+     * The password should be hashed before using this method as this one should
+     * return the hashed value. If no password is set, this method should return the 
+     * string 'NO_PASSWORD'.
+     * 
+     * @return string Password hash or the string 'NO_PASSWORD' if there is no 
+     * password.
+     */
+    public function getCRONPassword();
     /**
      * Returns database connection information given connection name.
      * 

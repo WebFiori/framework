@@ -25,10 +25,7 @@
 namespace webfiori\framework\cli;
 
 use Exception;
-use webfiori\framework\ConfigController;
-use webfiori\framework\cron\Cron;
-use webfiori\framework\Util;
-use webfiori\framework\WebFioriApp;
+use webfiori\framework\cli\commands\AddCommand;
 use webfiori\framework\cli\commands\CreateCommand;
 use webfiori\framework\cli\commands\CronCommand;
 use webfiori\framework\cli\commands\HelpCommand;
@@ -38,12 +35,13 @@ use webfiori\framework\cli\commands\ListThemesCommand;
 use webfiori\framework\cli\commands\RunSQLQueryCommand;
 use webfiori\framework\cli\commands\SettingsCommand;
 use webfiori\framework\cli\commands\TestRouteCommand;
+use webfiori\framework\cli\commands\UpdateSettingsCommand;
 use webfiori\framework\cli\commands\UpdateTableCommand;
 use webfiori\framework\cli\commands\VersionCommand;
-use webfiori\framework\cli\commands\AddCommand;
-use webfiori\framework\cli\commands\UpdateSettingsCommand;
-use webfiori\framework\cli\StdIn;
-use webfiori\framework\cli\StdOut;
+use webfiori\framework\ConfigController;
+use webfiori\framework\cron\Cron;
+use webfiori\framework\Util;
+use webfiori\framework\WebFioriApp;
 /**
  * 
  * A class which adds basic support for running the framework through 
@@ -57,28 +55,6 @@ use webfiori\framework\cli\StdOut;
  * @version 1.0.3
  */
 class CLI {
-    /**
-     * An attribute which is set to true if CLI is running in interactive mode 
-     * or not.
-     * 
-     * @var boolean
-     */
-    private $isInteractive;
-
-    /**
-     * 
-     * @var InputStream
-     * 
-     * @since 1.0.3
-     */
-    private static $inputStream;
-    /**
-     * 
-     * @var OutputStream
-     * 
-     * @since 1.0.3
-     */
-    private static $outputStream;
     /**
      * The command that will be executed now.
      * 
@@ -94,22 +70,45 @@ class CLI {
      * @since 1.0.2
      */
     private $commands;
+
+    /**
+     * 
+     * @var InputStream
+     * 
+     * @since 1.0.3
+     */
+    private static $inputStream;
     /**
      *
      * @var CLI 
      */
     private static $inst;
+    /**
+     * An attribute which is set to true if CLI is running in interactive mode 
+     * or not.
+     * 
+     * @var boolean
+     */
+    private $isInteractive;
+    /**
+     * 
+     * @var OutputStream
+     * 
+     * @since 1.0.3
+     */
+    private static $outputStream;
     private function __construct() {
         $this->commands = [];
         $isCli = self::isCLI();
         $this->isInteractive = false;
-        
+
         if ($isCli === true) {
             if (isset($_SERVER['argv'])) {
                 foreach ($_SERVER['argv'] as $arg) {
                     $this->isInteractive = $arg == '-i' || $this->isInteractive;
                 }
             }
+
             if (defined('CLI_HTTP_HOST')) {
                 $host = CLI_HTTP_HOST;
             } else {
@@ -132,28 +131,6 @@ class CLI {
         if (!class_exists(APP_DIR_NAME.'\ini\InitCliCommands')) {
             ConfigController::get()->createIniClass('InitCliCommands', 'Register user defined CLI commands.');
         }
-    }
-    /**
-     * Sets the stream at which the registered commands will use to send 
-     * output to.
-     * 
-     * @param OutputStream $stream The output stream.
-     * 
-     * @since 1.0.3
-     */
-    public static function setOutputStream(OutputStream $stream) {
-        self::$outputStream = $stream;
-    }
-    /**
-     * Sets the stream at which the registered commands will use to send 
-     * output to.
-     * 
-     * @param OutputStream $stream The output stream.
-     * 
-     * @since 1.0.3
-     */
-    public function setInputStream(InputStream $stream) {
-        self::$inputStream = $stream;
     }
     /**
      * Display PHP error information in CLI.
@@ -243,18 +220,16 @@ class CLI {
         }
     }
     /**
-     * Returns the stream at which the engine is using to send output.
+     * Returns the command which is being executed.
      * 
-     * @return OutputStream Note that if output stream is set to null, the stream 
-     * will be set to default which is 'StdOut'.
+     * @return CLICommand|null If a command is requested and currently in execute 
+     * stage, the method will return it as an object of type 'CLICommand'. If 
+     * no command is active, the method will return null.
      * 
-     * @since 1.0.3
+     * @since 1.0.2
      */
-    public static function getOutputStream() {
-        if (self::$outputStream === null) {
-            self::$outputStream = new StdOut();
-        }
-        return self::$outputStream;
+    public static function getActiveCommand() {
+        return self::get()->activeCommand;
     }
     /**
      * Returns the stream at which the engine is using to get input.
@@ -268,19 +243,23 @@ class CLI {
         if (self::$inputStream === null) {
             self::$inputStream = new StdIn();
         }
+
         return self::$inputStream;
     }
     /**
-     * Returns the command which is being executed.
+     * Returns the stream at which the engine is using to send output.
      * 
-     * @return CLICommand|null If a command is requested and currently in execute 
-     * stage, the method will return it as an object of type 'CLICommand'. If 
-     * no command is active, the method will return null.
+     * @return OutputStream Note that if output stream is set to null, the stream 
+     * will be set to default which is 'StdOut'.
      * 
-     * @since 1.0.2
+     * @since 1.0.3
      */
-    public static function getActiveCommand() {
-        return self::get()->activeCommand;
+    public static function getOutputStream() {
+        if (self::$outputStream === null) {
+            self::$outputStream = new StdOut();
+        }
+
+        return self::$outputStream;
     }
     /**
      * Returns an associative array of registered commands.
@@ -315,6 +294,17 @@ class CLI {
         // or in a web server.
         // Did a lot of reaseach on that.
         return http_response_code() === false;
+    }
+    /**
+     * Checks if CLI is running in interactive mode or not.
+     * 
+     * @return boolean If CLI is running in interactive mode, the method will 
+     * return true. False otherwise.
+     * 
+     * @since 1.0.3
+     */
+    public static function isIntaractive() {
+        return self::get()->isInteractive;
     }
     /**
      * Register new command.
@@ -367,24 +357,25 @@ class CLI {
      */
     public static function runCLI() {
         self::registerCommands();
+
         if (self::isIntaractive()) {
             self::getOutputStream()->println('Running CLI in interactive mode.');
             self::getOutputStream()->println('WF-CLI > Type commant name or "exit" to close.');
             self::getOutputStream()->prints('>>');
             $exit = false;
-            
+
             while (!$exit) {
-                
                 self::readInteractiv();
                 $argsCount = count($_SERVER['argv']);
+
                 if ($argsCount >= 2) {
-                    
                     if ($argsCount >= 2) {
                         $exit = $_SERVER['argv'][1] == 'exit';
+
                         if (!$exit) {
                             self::run();
                         }
-                    } 
+                    }
                 }
                 self::getOutputStream()->prints('>>');
             }
@@ -392,32 +383,27 @@ class CLI {
             self::run();
         }
     }
-    private static function run() {
-        if ($_SERVER['argc'] == 1) {
-            $command = self::get()->commands['help'];
-            self::get()->activeCommand = $command;
-
-            if (!defined('__PHPUNIT_PHAR__')) {
-                exit($command->excCommand());
-            }
-        } else if (defined('__PHPUNIT_PHAR__')) {
-            $command = self::get()->commands['help'];
-            self::get()->activeCommand = $command;
-            $command->excCommand();
-        }
-
-        return self::get()->_runCommand();
-    }
     /**
-     * Checks if CLI is running in interactive mode or not.
+     * Sets the stream at which the registered commands will use to send 
+     * output to.
      * 
-     * @return boolean If CLI is running in interactive mode, the method will 
-     * return true. False otherwise.
+     * @param OutputStream $stream The output stream.
      * 
      * @since 1.0.3
      */
-    public static function isIntaractive() {
-        return self::get()->isInteractive;
+    public function setInputStream(InputStream $stream) {
+        self::$inputStream = $stream;
+    }
+    /**
+     * Sets the stream at which the registered commands will use to send 
+     * output to.
+     * 
+     * @param OutputStream $stream The output stream.
+     * 
+     * @since 1.0.3
+     */
+    public static function setOutputStream(OutputStream $stream) {
+        self::$outputStream = $stream;
     }
 
     /**
@@ -431,17 +417,6 @@ class CLI {
             {
                 CLI::register($instance);
             });
-        }
-    }
-    private static function readInteractiv() {
-        $input = self::getInputStream()->readLine();
-        
-        $_SERVER['argv'] = [''];
-        $args = explode(' ', $input);
-        foreach ($args as $arg) {
-            if (strlen($arg) != 0) {
-                $_SERVER['argv'][] = $arg;
-            }
         }
     }
     private function _regCommand(CLICommand $command) {
@@ -479,5 +454,35 @@ class CLI {
         }
 
         return self::$inst;
+    }
+    private static function readInteractiv() {
+        $input = self::getInputStream()->readLine();
+
+        $_SERVER['argv'] = [''];
+        $args = explode(' ', $input);
+
+        foreach ($args as $arg) {
+            if (strlen($arg) != 0) {
+                $_SERVER['argv'][] = $arg;
+            }
+        }
+    }
+    private static function run() {
+        if ($_SERVER['argc'] == 1) {
+            $command = self::get()->commands['help'];
+            self::get()->activeCommand = $command;
+
+            if (!defined('__PHPUNIT_PHAR__')) {
+                exit($command->excCommand());
+            }
+        } else {
+            if (defined('__PHPUNIT_PHAR__')) {
+                $command = self::get()->commands['help'];
+                self::get()->activeCommand = $command;
+                $command->excCommand();
+            }
+        }
+
+        return self::get()->_runCommand();
     }
 }

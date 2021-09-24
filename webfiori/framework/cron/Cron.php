@@ -497,6 +497,20 @@ class Cron {
         return self::_get()->_getPassword();
     }
     /**
+     * Register any CRON job which exist in the folder 'jobs' of the application.
+     * 
+     * Note that this method will register jobs only if the framework is running
+     * using CLI or the constant 'CRON_THROUGH_HTTP' is set to true.
+     */
+    public static function registerJobs() {
+        if (CLI::isCLI() || (defined('CRON_THROUGH_HTTP') && CRON_THROUGH_HTTP === true)) {
+            WebFioriApp::autoRegister('jobs', function ($job)
+            {
+                Cron::scheduleJob($job);
+            });
+        }
+    }
+    /**
      * Check each scheduled job and run it if its time to run it.
      * 
      * @param string $pass If cron password is set, this value must be 
@@ -754,20 +768,6 @@ class Cron {
                     fclose($file);
                 }
             }
-        }
-    }
-    /**
-     * Register any CRON job which exist in the folder 'jobs' of the application.
-     * 
-     * Note that this method will register jobs only if the framework is running
-     * using CLI or the constant 'CRON_THROUGH_HTTP' is set to true.
-     */
-    public static function registerJobs() {
-        if (CLI::isCLI() || (defined('CRON_THROUGH_HTTP') && CRON_THROUGH_HTTP === true)) {
-            WebFioriApp::autoRegister('jobs', function ($job)
-            {
-                Cron::scheduleJob($job);
-            });
         }
     }
     /**

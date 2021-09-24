@@ -24,12 +24,12 @@
  */
 namespace webfiori\framework\cli\helpers;
 
-use webfiori\http\AbstractWebService;
-use webfiori\http\ParamTypes;
-use webfiori\http\RequestParameter;
 use webfiori\framework\cli\commands\CreateCommand;
 use webfiori\framework\cli\writers\ServiceHolder;
 use webfiori\framework\cli\writers\WebServiceWriter;
+use webfiori\http\AbstractWebService;
+use webfiori\http\ParamTypes;
+use webfiori\http\RequestParameter;
 
 /**
  * A helper class for creating web services classes.

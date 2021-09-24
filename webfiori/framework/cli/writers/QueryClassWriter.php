@@ -214,6 +214,7 @@ class QueryClassWriter extends ClassWriter {
         if ($dataType == 'int' || $dataType == 'varchar' || $dataType == 'decimal' || 
                 $dataType == 'float' || $dataType == 'double') {
             $this->append("'size' => '".$colObj->getSize()."',", 4);
+
             if ($dataType == 'decimal') {
                 $this->append("'scale' => '".$colObj->getScale()."',", 4);
             }

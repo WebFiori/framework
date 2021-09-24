@@ -58,7 +58,7 @@ class MiddlewareManager {
     public static function getGroup($groupName) {
         $list = new LinkedList();
         $mdList = self::get()->middlewareList;
-        
+
         foreach ($mdList as $mw) {
             if (in_array($groupName, $mw->getGroups())) {
                 $list->add($mw);
@@ -80,7 +80,7 @@ class MiddlewareManager {
      */
     public static function getMiddleware($name) {
         $mdList = self::get()->middlewareList;
-        
+
         foreach ($mdList as $mw) {
             if ($mw->getName() == $name) {
                 return $mw;
@@ -107,7 +107,7 @@ class MiddlewareManager {
     public static function remove($name) {
         $manager = self::get();
         $mw = $manager->getMiddleware($name);
-        
+
         if ($mw instanceof AbstractMiddleware) {
             $manager->middlewareList->remove($manager->middlewareList->indexOf($mw));
         }

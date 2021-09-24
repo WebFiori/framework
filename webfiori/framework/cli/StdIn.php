@@ -44,9 +44,10 @@ class StdIn implements InputStream {
      */
     public function read($bytes = 1) {
         $input = '';
+
         while (strlen($input) < $bytes) {
             $char = $this->readAndTranslate();
-            
+
             if ($char == 'BACKSPACE' && strlen($input) > 0) {
                 $input = substr($input, 0, strlen($input) - 1);
             } else if ($char == 'ESC') {
@@ -79,9 +80,10 @@ class StdIn implements InputStream {
     public function readLine() {
         $input = '';
         $char = '';
+
         while ($char != 'LF') {
             $char = $this->readAndTranslate();
-            
+
             if ($char == 'BACKSPACE' && strlen($input) > 0) {
                 $input = substr($input, 0, strlen($input) - 1);
             } else if ($char == 'ESC') {
@@ -100,9 +102,10 @@ class StdIn implements InputStream {
                 }
             }
         }
+
         return $input;
     }
-    
+
     /**
      * 
      * @return string
@@ -112,10 +115,11 @@ class StdIn implements InputStream {
     private function readAndTranslate() {
         $keypress = fgetc(STDIN);
         $keyMap = self::KEY_MAP;
-        
+
         if (isset($keyMap[$keypress])) {
             return $keyMap[$keypress];
         }
+
         return $keypress;
     }
 }

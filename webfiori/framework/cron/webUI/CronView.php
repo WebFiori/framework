@@ -24,14 +24,14 @@
  */
 namespace webfiori\framework\cron\webUI;
 
+use webfiori\framework\cron\Cron;
 use webfiori\framework\session\SessionsManager;
 use webfiori\framework\ui\WebPage;
 use webfiori\framework\WebFioriApp;
 use webfiori\http\Response;
-use webfiori\ui\HTMLNode;
-use webfiori\framework\cron\Cron;
-use webfiori\ui\JsCode;
 use webfiori\json\Json;
+use webfiori\ui\HTMLNode;
+use webfiori\ui\JsCode;
 /**
  * A generic view for cron related operations. 
  * 
@@ -55,9 +55,11 @@ class CronView extends WebPage {
                 && SessionsManager::getActiveSession()->get('cron-login-status') !== true) {
             Response::addHeader('location', WebFioriApp::getAppConfig()->getBaseURL().'/cron/login');
             Response::send();
-        } else if ($title == $loginPageTitle && Cron::password() == 'NO_PASSWORD') {
-            Response::addHeader('location', WebFioriApp::getAppConfig()->getBaseURL().'/cron/jobs');
-            Response::send();
+        } else {
+            if ($title == $loginPageTitle && Cron::password() == 'NO_PASSWORD') {
+                Response::addHeader('location', WebFioriApp::getAppConfig()->getBaseURL().'/cron/jobs');
+                Response::send();
+            }
         }
         $this->setTitle($title);
         $this->setDescription($description);
@@ -70,7 +72,7 @@ class CronView extends WebPage {
         }
         $this->changePageStructure();
         $this->iniHead();
-        
+
         $row = $this->insert('v-row');
         $row->addChild('v-col', [
             'cols' => 12
@@ -87,18 +89,22 @@ class CronView extends WebPage {
             ])->text('Logout');
         }
         $this->createVDialog('dialog.show', 'dialog.title', 'dialog.message', 'dialogClosed');
-        $this->addBeforeRender(function (CronView $view) {
+        $this->addBeforeRender(function (CronView $view)
+        {
             $code = new JsCode();
             $code->addCode('window.data = '.$view->getJson().';');
             $view->getDocument()->getHeadNode()->addChild($code);
         });
     }
     /**
-     * 
-     * @return Json
+     * Adds an area which is used to show server output.
      */
-    public function getJson() {
-        return $this->jsonData;
+    public function createOutputWindow() {
+        $outputWindow = new HTMLNode();
+        $outputWindow->setID('output-window');
+        $outputWindow->addTextNode('<p class="output-window-title">Output Window</p><pre'
+                .' id="output-area"></pre>', false);
+        $this->insert($outputWindow);
     }
     /**
      * Adds a very basic v-dialog that can be used to show status messages and so on.
@@ -120,14 +126,14 @@ class CronView extends WebPage {
     public function createVDialog($model, $titleModel, $messageModel, $closeAction, $iconProps = []) {
         $dialog = new HTMLNode('v-dialog');
         $dialog->setAttribute('v-model', $model);
-        
+
         $dialog->setAttributes([
             'v-model' => $model,
             'width' => '500'
         ]);
-        
+
         $dialogCard = $dialog->addChild('v-card');
-        
+
         $iconModel = isset($iconProps['model']) ? '{{ '.$iconProps['model'].' }}' : 'mdi-information';
         $propsArr = [
             'style' => [
@@ -154,6 +160,13 @@ class CronView extends WebPage {
             '@click' => "$closeAction"
         ])->text('Close');
         $this->insert($dialog);
+    }
+    /**
+     * 
+     * @return Json
+     */
+    public function getJson() {
+        return $this->jsonData;
     }
     private function changePageStructure() {
         $this->addBeforeRender(function (WebPage $page)
@@ -197,15 +210,5 @@ class CronView extends WebPage {
         $this->addJS('https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js');
         $this->addJS('https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js');
         $this->addJS('https://cdn.jsdelivr.net/gh/usernane/AJAXRequestJs@1.1.1/AJAXRequest.js', [], false);
-    }
-    /**
-     * Adds an area which is used to show server output.
-     */
-    public function createOutputWindow() {
-        $outputWindow = new HTMLNode();
-        $outputWindow->setID('output-window');
-        $outputWindow->addTextNode('<p class="output-window-title">Output Window</p><pre'
-                .' id="output-area"></pre>', false);
-        $this->insert($outputWindow);
     }
 }

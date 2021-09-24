@@ -37,6 +37,7 @@ use webfiori\http\Request;
 use webfiori\http\Response;
 use webfiori\json\Json;
 use webfiori\framework\Config;
+use Exception;
 /**
  * The time at which the framework was booted in microseconds as a float.
  * 
@@ -172,6 +173,10 @@ class WebFioriApp {
             define('APP_DIR_NAME','app');
         }
 
+        if (strpos(APP_DIR_NAME, ' ') !== false || strpos(APP_DIR_NAME, '-')) {
+            http_response_code(500);
+            die('Error: Unable to initialize the application. Invalid application directory name: "'.APP_DIR_NAME.'".');
+        }
         if (!class_exists(APP_DIR_NAME.'\ini\GlobalConstants')) {
             $confControllerPath = ROOT_DIR.DIRECTORY_SEPARATOR.
                     'vendor'.DIRECTORY_SEPARATOR.

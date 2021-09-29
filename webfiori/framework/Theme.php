@@ -43,25 +43,23 @@ use webfiori\ui\HTMLNode;
  * 
  * @author Ibrahim
  * 
- * @version 1.2.7
+ * @version 1.2.8
  */
 abstract class Theme implements JsonI {
     /**
-     * A callback function to call after the theme is loaded.
-     * 
-     * @var Function
-     * 
-     * @since 1.0 
-     */
-    private $afterLoaded;
-    /**
-     * An array of callback parameters.
      * 
      * @var array
      * 
-     * @since 1.3 
+     * @since 1.2.8
      */
-    private $afterLoadedParams;
+    private $afterLoadedPool;
+    /**
+     * 
+     * @var array
+     * 
+     * @since 1.2.8
+     */
+    private $afterLoadedParamsPool;
     /**
      * An optional base URL.
      * 
@@ -73,21 +71,19 @@ abstract class Theme implements JsonI {
      */
     private $baseUrl;
     /**
-     * A callback function to call after the theme is loaded.
-     * 
-     * @var Function
-     * 
-     * @since 1.2.1
-     */
-    private $beforeLoaded;
-    /**
-     * An array of callback parameters.
      * 
      * @var array
      * 
-     * @since 1.2.1
+     * @since 1.2.8
      */
-    private $beforeLoadedParams;
+    private $beforeLoadedPool;
+    /**
+     * 
+     * @var array
+     * 
+     * @since 1.2.8
+     */
+    private $beforeLoadedParamsPool;
     /**
      * The name of theme CSS files directory. 
      * 
@@ -181,10 +177,11 @@ abstract class Theme implements JsonI {
         $this->setImagesDirName('images');
         $this->setName($themeName);
         $this->themeComponents = [];
-        $this->afterLoaded = null;
-        $this->afterLoadedParams = [];
-        $this->beforeLoaded = null;
-        $this->beforeLoadedParams = [];
+      
+        $this->beforeLoadedParamsPool = [];
+        $this->beforeLoadedPool = [];
+        $this->afterLoadedParamsPool = [];
+        $this->afterLoadedPool = [];
     }
     /**
      * Adds a single component to the set of theme components.
@@ -514,8 +511,10 @@ abstract class Theme implements JsonI {
      * @since 1.0
      */
     public function invokeAfterLoaded() {
-        if (is_callable($this->afterLoaded)) {
-            call_user_func_array($this->afterLoaded, $this->afterLoadedParams);
+        $callbackCount = count($this->afterLoadedPool);
+        
+        for ($x = 0 ; $x < $callbackCount ; $x++) {
+            call_user_func_array($this->afterLoadedPool[$x], $this->afterLoadedParamsPool[$x]);
         }
     }
     /**
@@ -527,8 +526,10 @@ abstract class Theme implements JsonI {
      * @since 1.2.1
      */
     public function invokeBeforeLoaded() {
-        if (is_callable($this->beforeLoaded)) {
-            call_user_func_array($this->beforeLoaded, $this->beforeLoadedParams);
+        $callbackCount = count($this->beforeLoadedPool);
+        
+        for ($x = 0 ; $x < $callbackCount ; $x++) {
+            call_user_func_array($this->beforeLoadedPool[$x], $this->beforeLoadedParamsPool[$x]);
         }
     }
     /**
@@ -545,14 +546,15 @@ abstract class Theme implements JsonI {
      */
     public function setAfterLoaded($function,$params = []) {
         if (is_callable($function)) {
-            $this->afterLoadedParams = [$this];
-            $this->afterLoaded = $function;
+            $afterLoadedParams = [$this];
 
             if (gettype($params) == 'array') {
                 foreach ($params as $param) {
-                    $this->afterLoadedParams[] = $param;
+                    $afterLoadedParams[] = $param;
                 }
             }
+            $this->afterLoadedPool[] = $function;
+            $this->afterLoadedParamsPool[] = $afterLoadedParams;
         }
     }
     /**
@@ -613,14 +615,15 @@ abstract class Theme implements JsonI {
      */
     public function setBeforeLoaded($function,$params = []) {
         if (is_callable($function)) {
-            $this->beforeLoadedParams = [$this];
-            $this->beforeLoaded = $function;
+            $beforeLoadedParams = [$this];
 
             if (gettype($params) == 'array') {
                 foreach ($params as $param) {
-                    $this->beforeLoadedParams[] = $param;
+                    $beforeLoadedParams[] = $param;
                 }
             }
+            $this->beforeLoadedPool[] = $function;
+            $this->beforeLoadedParamsPool[] = $beforeLoadedParams;
         }
     }
     /**

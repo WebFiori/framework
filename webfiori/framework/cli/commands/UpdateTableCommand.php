@@ -17,6 +17,7 @@ use webfiori\framework\AutoLoader;
 use webfiori\framework\cli\CLICommand;
 use webfiori\framework\DB;
 use webfiori\framework\WebFioriApp;
+use webfiori\framework\cli\writers\QueryClassWriter;
 /**
  * Description of UpdateTableCommand
  *

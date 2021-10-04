@@ -205,12 +205,12 @@ class WebFioriApp {
         /**
          * Set memory limit.
          */
-        ini_set('memory_limit', SCRIPT_MEMORY_LIMIT);
+        ini_set('memory_limit', defined('SCRIPT_MEMORY_LIMIT') ? SCRIPT_MEMORY_LIMIT : '2048M');
         /**
          * See http://php.net/manual/en/timezones.php for supported time zones.
          * Change this as needed.
          */
-        date_default_timezone_set(DATE_TIMEZONE);
+        date_default_timezone_set(defined('DATE_TIMEZONE') ? DATE_TIMEZONE : 'Asia/Riyadh');
 
         /**
          * Initialize autoloader.

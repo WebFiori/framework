@@ -618,8 +618,8 @@ class AutoLoader {
             if (!file_exists($autoloadCachePath)) {
                 mkdir($autoloadCachePath, 0777, true);
             }
+
             if (!file_exists($autoloadCache) && is_writable($autoloadCachePath)) {
-                
                 $h = fopen($autoloadCache, 'w');
 
                 if (is_resource($h)) {
@@ -721,7 +721,7 @@ class AutoLoader {
 
         $allPaths = self::getClassPath($className);
         $root = $this->getRoot();
-        
+
         foreach ($this->searchFolders as $value => $appendRoot) {
             $loaded = $this->_loadClassHelper($className, $classWithNs, $value, $appendRoot, $allPaths, $root) || $loaded;
         }

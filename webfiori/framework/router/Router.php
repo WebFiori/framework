@@ -879,11 +879,14 @@ class Router {
         if (isset($options['routes'])) {
             $routesArr = $this->_addRoutesGroup($options);
             $added = true;
+
             foreach ($routesArr as $route) {
                 $added = $added && $this->_addRoute($route);
             }
+
             return $added;
         }
+
         if (!isset($options['route-to'])) {
             return false;
         } else {
@@ -899,98 +902,6 @@ class Router {
         }
 
         return false;
-    }
-    private function _addRoutesGroup($options, &$routesToAddArr = []) {
-        $subRoutes = isset($options['routes']) && gettype($options['routes']) == 'array' ? $options['routes'] : [];
-        
-        foreach ($subRoutes as $subRoute) {
-            if (isset($subRoute['path'])) {
-                $this->_copyOptionsToSub($options, $subRoute);
-                $subRoute['path'] = $options['path'].'/'.$subRoute['path'];
-
-                if (isset($subRoute['routes']) && gettype($subRoute['routes']) == 'array') {
-                    $this->_addRoutesGroup($subRoute, $routesToAddArr);
-                } else {
-                    $routesToAddArr[] = $subRoute;
-                }
-            }
-        }
-        
-        return $routesToAddArr;
-    }
-    private function _copyOptionsToSub($options, &$subRoute) {
-        if (!isset($subRoute['case-sensitive'])) {
-            if (isset($options['case-sensitive'])) {
-                $caseSensitive = $options['case-sensitive'] === true;
-            } else {
-                $caseSensitive = true;
-            }
-            $subRoute['case-sensitive'] = $caseSensitive;
-        }
-
-        $subRoute['type'] = isset($options['type']) ? $options['type'] : Router::CUSTOMIZED;
-
-        if (!isset($subRoute['in-sitemap'])) {
-            if (isset($options['in-sitemap'])) {
-                $incInSiteMap = $options['in-sitemap'];
-            } else {
-                $incInSiteMap = false;
-            }
-            $subRoute['in-sitemap'] = $incInSiteMap;
-        }
-
-        if (isset($options['middleware'])) {
-            if (gettype($options['middleware']) == 'array') {
-                $mdArr = $options['middleware'];
-            } else if (gettype($options['middleware']) == 'string') {
-                $mdArr = [$options['middleware']];
-            } else {
-                $mdArr = [];
-            }
-        } else {
-            $mdArr = [];
-        }
-        if (!isset($subRoute['middleware'])) {
-            $subRoute['middleware'] = $mdArr;
-        } else {
-            if (gettype($subRoute['middleware']) == 'array') {
-                foreach ($mdArr as $md) {
-                    $subRoute['middleware'][] = $md;
-                }
-            } else if (gettype($subRoute['middleware']) == 'string') {
-                $newMd = [$subRoute['middleware']];
-                foreach ($mdArr as $md) {
-                    $newMd[] = $md;
-                }
-                $subRoute['middleware'] = $newMd;
-            }
-        }
-        $languages = isset($options['languages']) && gettype($options['languages']) == 'array' ? $options['languages'] : [];
-        
-        if (isset($subRoute['languages']) && gettype($subRoute['languages']) == 'array') {
-            foreach ($languages as $langCode) {
-                if (!in_array($langCode, $subRoute['languages'])) {
-                    $subRoute['languages'][] = $langCode;
-                }
-            }
-        } else {
-            $subRoute['languages'] = $languages;
-        }
-        
-        $reqMethArr = $this->_getRequestMethods($options);
-        if (isset($subRoute['methods'])) {
-            if (gettype($subRoute['methods']) != 'array') {
-                $reqMethArr[] = $subRoute['methods'];
-                $subRoute['methods'] = $reqMethArr;
-            } else {
-                foreach ($reqMethArr as $meth) {
-                    $subRoute['methods'][] = $meth;
-                }
-            }
-        } else {
-            $subRoute['methods'] = $reqMethArr;
-        }
-        
     }
     private function _addRouteHelper($options) {
         $routeTo = $options['route-to'];
@@ -1041,6 +952,24 @@ class Router {
 
         return false;
     }
+    private function _addRoutesGroup($options, &$routesToAddArr = []) {
+        $subRoutes = isset($options['routes']) && gettype($options['routes']) == 'array' ? $options['routes'] : [];
+
+        foreach ($subRoutes as $subRoute) {
+            if (isset($subRoute['path'])) {
+                $this->_copyOptionsToSub($options, $subRoute);
+                $subRoute['path'] = $options['path'].'/'.$subRoute['path'];
+
+                if (isset($subRoute['routes']) && gettype($subRoute['routes']) == 'array') {
+                    $this->_addRoutesGroup($subRoute, $routesToAddArr);
+                } else {
+                    $routesToAddArr[] = $subRoute;
+                }
+            }
+        }
+
+        return $routesToAddArr;
+    }
     /**
      * Checks for provided options and set defaults for the ones which are 
      * not provided.
@@ -1088,15 +1017,17 @@ class Router {
         $path = isset($options['path']) ? $this->_fixUriPath($options['path']) : '';
         $languages = isset($options['languages']) && gettype($options['languages']) == 'array' ? $options['languages'] : [];
         $varValues = isset($options['vars-values']) && gettype($options['languages']) == 'array' ? $options['vars-values'] : [];
-        
+
         $action = '';
-        
-        if(isset($options['action'])) {
+
+        if (isset($options['action'])) {
             $trimmed = trim($options['action']);
+
             if (strlen($trimmed) > 0) {
                 $action = $trimmed;
             }
         }
+
         return [
             'case-sensitive' => $caseSensitive,
             'type' => $routeType,
@@ -1111,6 +1042,86 @@ class Router {
             'methods' => $this->_getRequestMethods($options),
             'action' => $action
         ];
+    }
+    private function _copyOptionsToSub($options, &$subRoute) {
+        if (!isset($subRoute['case-sensitive'])) {
+            if (isset($options['case-sensitive'])) {
+                $caseSensitive = $options['case-sensitive'] === true;
+            } else {
+                $caseSensitive = true;
+            }
+            $subRoute['case-sensitive'] = $caseSensitive;
+        }
+
+        $subRoute['type'] = isset($options['type']) ? $options['type'] : Router::CUSTOMIZED;
+
+        if (!isset($subRoute['in-sitemap'])) {
+            if (isset($options['in-sitemap'])) {
+                $incInSiteMap = $options['in-sitemap'];
+            } else {
+                $incInSiteMap = false;
+            }
+            $subRoute['in-sitemap'] = $incInSiteMap;
+        }
+
+        if (isset($options['middleware'])) {
+            if (gettype($options['middleware']) == 'array') {
+                $mdArr = $options['middleware'];
+            } else {
+                if (gettype($options['middleware']) == 'string') {
+                    $mdArr = [$options['middleware']];
+                } else {
+                    $mdArr = [];
+                }
+            }
+        } else {
+            $mdArr = [];
+        }
+
+        if (!isset($subRoute['middleware'])) {
+            $subRoute['middleware'] = $mdArr;
+        } else {
+            if (gettype($subRoute['middleware']) == 'array') {
+                foreach ($mdArr as $md) {
+                    $subRoute['middleware'][] = $md;
+                }
+            } else {
+                if (gettype($subRoute['middleware']) == 'string') {
+                    $newMd = [$subRoute['middleware']];
+
+                    foreach ($mdArr as $md) {
+                        $newMd[] = $md;
+                    }
+                    $subRoute['middleware'] = $newMd;
+                }
+            }
+        }
+        $languages = isset($options['languages']) && gettype($options['languages']) == 'array' ? $options['languages'] : [];
+
+        if (isset($subRoute['languages']) && gettype($subRoute['languages']) == 'array') {
+            foreach ($languages as $langCode) {
+                if (!in_array($langCode, $subRoute['languages'])) {
+                    $subRoute['languages'][] = $langCode;
+                }
+            }
+        } else {
+            $subRoute['languages'] = $languages;
+        }
+
+        $reqMethArr = $this->_getRequestMethods($options);
+
+        if (isset($subRoute['methods'])) {
+            if (gettype($subRoute['methods']) != 'array') {
+                $reqMethArr[] = $subRoute['methods'];
+                $subRoute['methods'] = $reqMethArr;
+            } else {
+                foreach ($reqMethArr as $meth) {
+                    $subRoute['methods'][] = $meth;
+                }
+            }
+        } else {
+            $subRoute['methods'] = $reqMethArr;
+        }
     }
     private function _fixFilePath($path) {
         if (strlen($path) != 0 && $path != '/') {

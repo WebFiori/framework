@@ -615,8 +615,11 @@ class AutoLoader {
                 }
             }
         } else {
-            if (!file_exists($autoloadCache) && is_writable($autoloadCachePath)) {
+            if (!file_exists($autoloadCachePath)) {
                 mkdir($autoloadCachePath, 0777, true);
+            }
+            if (!file_exists($autoloadCache) && is_writable($autoloadCachePath)) {
+                
                 $h = fopen($autoloadCache, 'w');
 
                 if (is_resource($h)) {

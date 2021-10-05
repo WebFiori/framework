@@ -113,6 +113,7 @@ class CLI {
                 $host = CLI_HTTP_HOST;
             } else {
                 $host = '127.0.0.1';
+                define('CLI_HTTP_HOST', $host);
             }
             $_SERVER['HTTP_HOST'] = $host;
             $_SERVER['REMOTE_ADDR'] = '127.0.0.1';

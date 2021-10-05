@@ -682,7 +682,6 @@ class WebPage {
      * @since 1.0
      */
     public function render($formatted = false, $returnResult = false) {
-
         for ($x = 0 ; $x < count($this->beforeRenderCallbacks) ; $x++) {
             call_user_func_array($this->beforeRenderCallbacks[$x], $this->beforeRenderParams[$x]);
         }

@@ -52,14 +52,14 @@ abstract class Theme implements JsonI {
      * 
      * @since 1.2.8
      */
-    private $afterLoadedPool;
+    private $afterLoadedParamsPool;
     /**
      * 
      * @var array
      * 
      * @since 1.2.8
      */
-    private $afterLoadedParamsPool;
+    private $afterLoadedPool;
     /**
      * An optional base URL.
      * 
@@ -76,14 +76,14 @@ abstract class Theme implements JsonI {
      * 
      * @since 1.2.8
      */
-    private $beforeLoadedPool;
+    private $beforeLoadedParamsPool;
     /**
      * 
      * @var array
      * 
      * @since 1.2.8
      */
-    private $beforeLoadedParamsPool;
+    private $beforeLoadedPool;
     /**
      * The name of theme CSS files directory. 
      * 
@@ -177,7 +177,7 @@ abstract class Theme implements JsonI {
         $this->setImagesDirName('images');
         $this->setName($themeName);
         $this->themeComponents = [];
-      
+
         $this->beforeLoadedParamsPool = [];
         $this->beforeLoadedPool = [];
         $this->afterLoadedParamsPool = [];
@@ -512,7 +512,7 @@ abstract class Theme implements JsonI {
      */
     public function invokeAfterLoaded() {
         $callbackCount = count($this->afterLoadedPool);
-        
+
         for ($x = 0 ; $x < $callbackCount ; $x++) {
             call_user_func_array($this->afterLoadedPool[$x], $this->afterLoadedParamsPool[$x]);
         }
@@ -527,7 +527,7 @@ abstract class Theme implements JsonI {
      */
     public function invokeBeforeLoaded() {
         $callbackCount = count($this->beforeLoadedPool);
-        
+
         for ($x = 0 ; $x < $callbackCount ; $x++) {
             call_user_func_array($this->beforeLoadedPool[$x], $this->beforeLoadedParamsPool[$x]);
         }

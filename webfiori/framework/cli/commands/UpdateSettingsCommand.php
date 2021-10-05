@@ -63,62 +63,12 @@ class UpdateSettingsCommand extends CLICommand {
         }
         return 0;
     }
-    private function _updateVersionInfo() {
-        $versionNum = $this->getInput('Application version:', WebFioriApp::getAppConfig()->getVersion(), function ($val) {
-            return strlen(trim($val)) != 0;
-        });
-        $versionType = $this->getInput('Application version type:', WebFioriApp::getAppConfig()->getVersionType(), function ($val) {
-            return strlen(trim($val)) != 0;
-        });
-        $versionReleaseDate = $this->getInput('Release date (YYYY-MM-DD):', date('Y-m-d'), function ($val) {
-            $trimmed = trim($val);
-            if (strlen($trimmed) == 0) {
-                return false;
-            }
-            $expl = explode('-', $trimmed);
-            if (count($expl) != 3) {
-                return false;
-            }
-            return intval($expl[0]) > 0
-                && intval($expl[0]) < 10000
-                && intval($expl[1]) > 0
-                && intval($expl[1]) < 13
-                && intval($expl[2]) > 0
-                && intval($expl[2]) < 32;
-        });
-        ConfigController::get()->updateAppVersionInfo($versionNum, $versionType, date('Y-m-d', strtotime($versionReleaseDate)));
-        $this->println('Version information successfully updated.');
-    }
     private function _setAdminTheme() {
         $classNs = $this->getThemeNs();
         ConfigController::get()->updateSiteInfo([
             'admin-theme' => $classNs
         ]);
         $this->println('Admin theme successfully updated.');
-    }
-    private function _setPrimaryTheme() {
-        $classNs = $this->getThemeNs();
-        ConfigController::get()->updateSiteInfo([
-            'base-theme' => $classNs
-        ]);
-        $this->println('Primary theme successfully updated.');
-    }
-    private function getThemeNs() {
-        return $this->getInput('Enter theme class name with namespace:', null, function ($themeNs) {
-            if (!class_exists($themeNs)) {
-                return false;
-            }
-            try {
-                $instance = new $themeNs();
-                if ($instance instanceof Theme) {
-                    return true;
-                }
-            } catch (Exception $exc) {
-                return false;
-            } catch (Error $exc) {
-                return false;
-            }
-        });
     }
     private function _setHome() {
         $routes = array_keys(Router::routes());
@@ -128,45 +78,24 @@ class UpdateSettingsCommand extends CLICommand {
         ]);
         $this->println('Home page successfully updated.');
     }
-    private function _updatePrimaryLang() {
-        $langs = array_keys(WebFioriApp::getAppConfig()->getWebsiteNames());
-        $newPrimary = $this->select('Select new primary language:', $langs);
+    private function _setPrimaryTheme() {
+        $classNs = $this->getThemeNs();
         ConfigController::get()->updateSiteInfo([
-            'primary-lang' => $newPrimary
+            'base-theme' => $classNs
         ]);
-        $this->println('Primary language successfully updated.');
+        $this->println('Primary theme successfully updated.');
     }
     private function _updateCronPass() {
         $newPass = $this->getInput('Enter new password:', '');
         ConfigController::get()->updateCronPassword($newPass);
         $this->println('Password successfully updated.');
     }
-    private function _updateTitleSep() {
-        $newSep = $this->getInput('Enter new title separator string:', '|', function ($val) {
-            return strlen(trim($val)) != 0;
-        });
-        ConfigController::get()->updateSiteInfo([
-            'title-sep' => $newSep
-        ]);
-        $this->println('Title separator successfully updated.');
-    }
-    private function _updateTitle() {
-        $lang = $this->whichLang();
-        $newName = $this->getInput('Enter new title:', null, function ($val) {
-            $trimmed = trim($val);
-            return strlen($trimmed) != 0;
-        });
-        $titles = WebFioriApp::getAppConfig()->getTitles();
-        $titles[$lang] = $newName;
-        ConfigController::get()->updateSiteInfo([
-            'titles' => $titles
-        ]);
-        $this->println('Title successfully updated.');
-    }
     private function _updateDescription() {
         $lang = $this->whichLang();
-        $newName = $this->getInput('Enter new description:', null, function ($val) {
+        $newName = $this->getInput('Enter new description:', null, function ($val)
+        {
             $trimmed = trim($val);
+
             return strlen($trimmed) != 0;
         });
         $descriptions = WebFioriApp::getAppConfig()->getDescriptions();
@@ -178,8 +107,10 @@ class UpdateSettingsCommand extends CLICommand {
     }
     private function _updateName() {
         $lang = $this->whichLang();
-        $newName = $this->getInput('Enter new name:', null, function ($val) {
+        $newName = $this->getInput('Enter new name:', null, function ($val)
+        {
             $trimmed = trim($val);
+
             return strlen($trimmed) != 0;
         });
         $names = WebFioriApp::getAppConfig()->getWebsiteNames();
@@ -189,8 +120,93 @@ class UpdateSettingsCommand extends CLICommand {
         ]);
         $this->println('Name successfully updated.');
     }
+    private function _updatePrimaryLang() {
+        $langs = array_keys(WebFioriApp::getAppConfig()->getWebsiteNames());
+        $newPrimary = $this->select('Select new primary language:', $langs);
+        ConfigController::get()->updateSiteInfo([
+            'primary-lang' => $newPrimary
+        ]);
+        $this->println('Primary language successfully updated.');
+    }
+    private function _updateTitle() {
+        $lang = $this->whichLang();
+        $newName = $this->getInput('Enter new title:', null, function ($val)
+        {
+            $trimmed = trim($val);
+
+            return strlen($trimmed) != 0;
+        });
+        $titles = WebFioriApp::getAppConfig()->getTitles();
+        $titles[$lang] = $newName;
+        ConfigController::get()->updateSiteInfo([
+            'titles' => $titles
+        ]);
+        $this->println('Title successfully updated.');
+    }
+    private function _updateTitleSep() {
+        $newSep = $this->getInput('Enter new title separator string:', '|', function ($val)
+        {
+            return strlen(trim($val)) != 0;
+        });
+        ConfigController::get()->updateSiteInfo([
+            'title-sep' => $newSep
+        ]);
+        $this->println('Title separator successfully updated.');
+    }
+    private function _updateVersionInfo() {
+        $versionNum = $this->getInput('Application version:', WebFioriApp::getAppConfig()->getVersion(), function ($val)
+        {
+            return strlen(trim($val)) != 0;
+        });
+        $versionType = $this->getInput('Application version type:', WebFioriApp::getAppConfig()->getVersionType(), function ($val)
+        {
+            return strlen(trim($val)) != 0;
+        });
+        $versionReleaseDate = $this->getInput('Release date (YYYY-MM-DD):', date('Y-m-d'), function ($val)
+        {
+            $trimmed = trim($val);
+
+            if (strlen($trimmed) == 0) {
+                return false;
+            }
+            $expl = explode('-', $trimmed);
+
+            if (count($expl) != 3) {
+                return false;
+            }
+
+            return intval($expl[0]) > 0
+                && intval($expl[0]) < 10000
+                && intval($expl[1]) > 0
+                && intval($expl[1]) < 13
+                && intval($expl[2]) > 0
+                && intval($expl[2]) < 32;
+        });
+        ConfigController::get()->updateAppVersionInfo($versionNum, $versionType, date('Y-m-d', strtotime($versionReleaseDate)));
+        $this->println('Version information successfully updated.');
+    }
+    private function getThemeNs() {
+        return $this->getInput('Enter theme class name with namespace:', null, function ($themeNs)
+        {
+            if (!class_exists($themeNs)) {
+                return false;
+            }
+            try {
+                $instance = new $themeNs();
+
+                if ($instance instanceof Theme) {
+                    return true;
+                }
+            } catch (Exception $exc) {
+                return false;
+            } catch (Error $exc) {
+                return false;
+            }
+        });
+    }
     private function whichLang() {
         $langs = array_keys(WebFioriApp::getAppConfig()->getWebsiteNames());
+
         return $this->select('In which language you would like to update?', $langs);
     }
 }

@@ -86,7 +86,7 @@ use webfiori\ui\HTMLNode;
  * </pre> 
  * </p>
  * @author Ibrahim
- * @version 1.3.12
+ * @version 1.4.0
  */
 class Router {
     /**
@@ -229,6 +229,8 @@ class Router {
      * <li><b>action</b>: If the class that the route is pointing to 
      * represents a controller, this index can have the value of the 
      * action that will be performed (the name of the class method).</li>
+     * <li><b>routes</b> This option is used to have sub-routes in the same path. This 
+     * option is used to group multiple routes which share initial part of a path.</li>
      * </ul>
      * 
      * @return boolean The method will return true if the route was created. 
@@ -278,6 +280,8 @@ class Router {
      * <li><b>methods</b>: An optional array that can have a set of 
      * allowed request methods for fetching the resource. This can be 
      * also a single string such as 'GET' or 'POST'.</li>
+     * <li><b>routes</b> This option is used to have sub-routes in the same path. This 
+     * option is used to group multiple routes which share initial part of a path.</li>
      * </ul>
      * 
      * @return boolean The method will return true if the route was created. 
@@ -350,6 +354,8 @@ class Router {
      * <li><b>methods</b>: An optional array that can have a set of 
      * allowed request methods for fetching the resource. This can be 
      * also a single string such as 'GET' or 'POST'.</li>
+     * <li><b>routes</b> This option is used to have sub-routes in the same path. This 
+     * option is used to group multiple routes which share initial part of a path.</li>
      * </ul>
      * 
      * 
@@ -573,6 +579,8 @@ class Router {
      * <li><b>methods</b>: An optional array that can have a set of 
      * allowed request methods for fetching the resource. This can be 
      * also a single string such as 'GET' or 'POST'.</li>
+     * <li><b>routes</b> This option is used to have sub-routes in the same path. This 
+     * option is used to group multiple routes which share initial part of a path.</li>
      * </ul>
      * 
      * @return boolean The method will return true if the route was created. 
@@ -796,6 +804,8 @@ class Router {
      * <li><b>methods</b>: An optional array that can have a set of 
      * allowed request methods for fetching the resource. This can be 
      * also a single string such as 'GET' or 'POST'.</li>
+     * <li><b>routes</b> This option is used to have sub-routes in the same path. This 
+     * option is used to group multiple routes which share initial part of a path.</li>
      * </ul>
      * 
      * @return boolean The method will return true if the route was created. 
@@ -855,6 +865,8 @@ class Router {
      * <li><b>closure-params</b>:If the route type is closure route, 
      * it is possible to pass values to it using this array. 
      * </li>
+     * <li><b>routes</b> This option is used to have sub-routes in the same path. This 
+     * option is used to group multiple routes which share initial part of a path.</li>
      * </ul>
      * 
      * @return boolean If the route is added, the method will return true. 
@@ -864,6 +876,14 @@ class Router {
      * @since 1.0
      */
     private function _addRoute(array $options) {
+        if (isset($options['routes'])) {
+            $routesArr = $this->_addRoutesGroup($options);
+            $added = true;
+            foreach ($routesArr as $route) {
+                $added = $added && $this->_addRoute($route);
+            }
+            return $added;
+        }
         if (!isset($options['route-to'])) {
             return false;
         } else {
@@ -879,6 +899,98 @@ class Router {
         }
 
         return false;
+    }
+    private function _addRoutesGroup($options, &$routesToAddArr = []) {
+        $subRoutes = isset($options['routes']) && gettype($options['routes']) == 'array' ? $options['routes'] : [];
+        
+        foreach ($subRoutes as $subRoute) {
+            if (isset($subRoute['path'])) {
+                $this->_copyOptionsToSub($options, $subRoute);
+                $subRoute['path'] = $options['path'].'/'.$subRoute['path'];
+
+                if (isset($subRoute['routes']) && gettype($subRoute['routes']) == 'array') {
+                    $this->_addRoutesGroup($subRoute, $routesToAddArr);
+                } else {
+                    $routesToAddArr[] = $subRoute;
+                }
+            }
+        }
+        
+        return $routesToAddArr;
+    }
+    private function _copyOptionsToSub($options, &$subRoute) {
+        if (!isset($subRoute['case-sensitive'])) {
+            if (isset($options['case-sensitive'])) {
+                $caseSensitive = $options['case-sensitive'] === true;
+            } else {
+                $caseSensitive = true;
+            }
+            $subRoute['case-sensitive'] = $caseSensitive;
+        }
+
+        $subRoute['type'] = isset($options['type']) ? $options['type'] : Router::CUSTOMIZED;
+
+        if (!isset($subRoute['in-sitemap'])) {
+            if (isset($options['in-sitemap'])) {
+                $incInSiteMap = $options['in-sitemap'];
+            } else {
+                $incInSiteMap = false;
+            }
+            $subRoute['in-sitemap'] = $incInSiteMap;
+        }
+
+        if (isset($options['middleware'])) {
+            if (gettype($options['middleware']) == 'array') {
+                $mdArr = $options['middleware'];
+            } else if (gettype($options['middleware']) == 'string') {
+                $mdArr = [$options['middleware']];
+            } else {
+                $mdArr = [];
+            }
+        } else {
+            $mdArr = [];
+        }
+        if (!isset($subRoute['middleware'])) {
+            $subRoute['middleware'] = $mdArr;
+        } else {
+            if (gettype($subRoute['middleware']) == 'array') {
+                foreach ($mdArr as $md) {
+                    $subRoute['middleware'][] = $md;
+                }
+            } else if (gettype($subRoute['middleware']) == 'string') {
+                $newMd = [$subRoute['middleware']];
+                foreach ($mdArr as $md) {
+                    $newMd[] = $md;
+                }
+                $subRoute['middleware'] = $newMd;
+            }
+        }
+        $languages = isset($options['languages']) && gettype($options['languages']) == 'array' ? $options['languages'] : [];
+        
+        if (isset($subRoute['languages']) && gettype($subRoute['languages']) == 'array') {
+            foreach ($languages as $langCode) {
+                if (!in_array($langCode, $subRoute['languages'])) {
+                    $subRoute['languages'][] = $langCode;
+                }
+            }
+        } else {
+            $subRoute['languages'] = $languages;
+        }
+        
+        $reqMethArr = $this->_getRequestMethods($options);
+        if (isset($subRoute['methods'])) {
+            if (gettype($subRoute['methods']) != 'array') {
+                $reqMethArr[] = $subRoute['methods'];
+                $subRoute['methods'] = $reqMethArr;
+            } else {
+                foreach ($reqMethArr as $meth) {
+                    $subRoute['methods'][] = $meth;
+                }
+            }
+        } else {
+            $subRoute['methods'] = $reqMethArr;
+        }
+        
     }
     private function _addRouteHelper($options) {
         $routeTo = $options['route-to'];
@@ -903,7 +1015,7 @@ class Router {
             }
             $routeUri->setIsInSiteMap($incInSiteMap);
 
-            $routeUri->setRequestMethods($options['request-methods']);
+            $routeUri->setRequestMethods($options['methods']);
 
             foreach ($options['languages'] as $langCode) {
                 $routeUri->addLanguage($langCode);
@@ -996,7 +1108,7 @@ class Router {
             'languages' => $languages,
             'vars-values' => $varValues,
             'middleware' => $mdArr,
-            'request-methods' => $this->_getRequestMethods($options),
+            'methods' => $this->_getRequestMethods($options),
             'action' => $action
         ];
     }
@@ -1059,7 +1171,16 @@ class Router {
             'dir' => $dir
         ];
     }
-
+    /**
+     * Returns an array that holds allowed request methods for fetching the 
+     * specified resource.
+     * 
+     * @param array $options The array which used to hold route options.
+     * 
+     * @return array If the route has no specific request methods, the 
+     * array will be empty. Other than that, the array will have request 
+     * methods as strings.
+     */
     private function _getRequestMethods($options) {
         $requestMethodsArr = [];
 

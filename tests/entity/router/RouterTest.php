@@ -35,6 +35,71 @@ class RouterTest extends TestCase {
     /**
      * @test
      */
+    public function testRoutesGroup00() {
+        Router::removeAll();
+        Router::page([
+            'path' => 'users',
+            'case-sensitive' => false,
+            'middleware' => 'M1',
+            'languages' => ['EN'],
+            'methods' => 'post',
+            'routes' => [
+                [
+                    'path' => 'view-user/{user-id}',
+                    'route-to' => 'ViewUserPage.php',
+                    'languages' => ['AR']
+                ],
+                [
+                    'path' => 'get-users',
+                    'languages' => ['AR'],
+                    'case-sensitive' => true,
+                    'routes' => [
+                        [
+                            'path' => 'by-name',
+                            'route-to' => 'GetUserByName.php',
+                            'languages' => ['FR'],
+                            'case-sensitive' => false,
+                        ],
+                        [
+                            'path' => 'by-email',
+                            'route-to' => 'GetUserByEmail.php'
+                        ]
+                    ],
+                ],
+                [
+                    'path' => '/',
+                    'route-to' => 'ListUsers.php',
+                    'case-sensitive' => true,
+                    'methods' => ['options', 'get']
+                ]
+            ]
+        ]);
+        $this->assertTrue(Router::hasRoute('users'));
+        $this->assertTrue(Router::hasRoute('users/view-user/{user-id}'));
+        
+        $route2 = Router::getUriObj('/users/view-user/{user-id}');
+        $this->assertEquals('ViewUserPage.php', $route2->getRouteTo());
+        $this->assertFalse($route2->isCaseSensitive());
+        $this->assertEquals(['ar', 'en'], $route2->getLanguages());
+        $this->assertEquals(['POST'], $route2->getRequestMethods());
+        
+        $route = Router::getUriObj('/users');
+        $this->assertEquals('ListUsers.php', $route->getRouteTo());
+        $this->assertEquals(['en'], $route->getLanguages());
+        $this->assertEquals(['OPTIONS','GET', 'POST'], $route->getRequestMethods());
+        $this->assertTrue($route->isCaseSensitive());
+        
+        $route3 = Router::getUriObj('/users/get-users/by-name');
+        $this->assertEquals('GetUserByName.php', $route3->getRouteTo());
+        
+        $this->assertEquals(['fr','ar','en'], $route3->getLanguages());
+        $this->assertFalse($route3->isCaseSensitive());
+        
+        
+    }
+    /**
+     * @test
+     */
     public function testAddClosureRoute00() {
         $c1 = function()
         {

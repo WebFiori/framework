@@ -89,6 +89,7 @@ class CronView extends WebPage {
             ])->text('Logout');
         }
         $this->createVDialog('dialog.show', 'dialog.title', 'dialog.message', 'dialogClosed');
+        $this->createOutputDialog();
         $this->addBeforeRender(function (CronView $view)
         {
             $code = new JsCode();
@@ -96,15 +97,32 @@ class CronView extends WebPage {
             $view->getDocument()->getHeadNode()->addChild($code);
         });
     }
-    /**
-     * Adds an area which is used to show server output.
-     */
-    public function createOutputWindow() {
-        $outputWindow = new HTMLNode();
-        $outputWindow->setID('output-window');
-        $outputWindow->addTextNode('<p class="output-window-title">Output Window</p><pre'
-                .' id="output-area"></pre>', false);
-        $this->insert($outputWindow);
+    private function createOutputDialog() {
+        $dialog = $this->insert('v-dialog');
+        $dialog->setAttributes([
+            'v-model' => 'output_dialog.show',
+            'max-width' => '850px',
+            'scrollable'
+        ]);
+        $card = $dialog->addChild('v-card');
+        $card->addChild('v-card-title')->text('Job Execution Output');
+        $card->addChild('v-divider');
+        $card->addChild('v-card-text', [
+            'style' => [
+                "height" => '400px;',
+                'color' => 'white',
+                'background-color' => 'black',
+                'text-align' => 'justify'
+            ],
+            'v-html' => 'output_dialog.output'
+        ]);
+        $card->addChild('v-divider');
+        $card->addChild('v-card-actions')
+            ->addChild('v-btn', [
+                'color' => "primary",
+                'text',
+                '@click' => "output_dialog.show = false",
+            ])->text('Close');
     }
     /**
      * Adds a very basic v-dialog that can be used to show status messages and so on.
@@ -159,6 +177,11 @@ class CronView extends WebPage {
             'text',
             '@click' => "$closeAction"
         ])->text('Close');
+        $dialogActions->addChild('v-btn', [
+            'color' => "primary",
+            'text',
+            '@click' => "output_dialog.show = true"
+        ])->text('View Job Output');
         $this->insert($dialog);
     }
     /**

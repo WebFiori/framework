@@ -101,14 +101,19 @@ class CronView extends WebPage {
         $dialog = $this->insert('v-dialog');
         $dialog->setAttributes([
             'v-model' => 'output_dialog.show',
-            'max-width' => '350px',
+            'max-width' => '850px',
             'scrollable'
         ]);
         $card = $dialog->addChild('v-card');
         $card->addChild('v-card-title')->text('Job Execution Output');
         $card->addChild('v-divider');
         $card->addChild('v-card-text', [
-            'style' => "height: 400px;",
+            'style' => [
+                "height" => '400px;',
+                'color' => 'white',
+                'background-color' => 'black',
+                'text-align' => 'justify'
+            ],
             'v-html' => 'output_dialog.output'
         ]);
         $card->addChild('v-divider');

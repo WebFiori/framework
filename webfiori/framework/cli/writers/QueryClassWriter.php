@@ -27,6 +27,8 @@ namespace webfiori\framework\cli\writers;
 use InvalidArgumentException;
 use webfiori\database\EntityMapper;
 use webfiori\database\mysql\MySQLColumn;
+use webfiori\database\mysql\MySQLTable;
+use webfiori\database\mssql\MSSQLTable;
 use webfiori\database\Table;
 
 /**
@@ -223,7 +225,7 @@ class QueryClassWriter extends ClassWriter {
         if ($colObj->isPrimary()) {
             $this->append("'primary' => true,", 4);
 
-            if ($colObj->isAutoInc()) {
+            if ($colObj instanceof MySQLColumn && $colObj->isAutoInc()) {
                 $this->append("'auto-inc' => true,", 4);
             }
         }
@@ -270,7 +272,11 @@ class QueryClassWriter extends ClassWriter {
     private function _writeHeaderSec() {
         $this->append("<?php\n");
         $this->append('namespace '.$this->getNamespace().";\n");
-        $this->append("use webfiori\database\mysql\MySQLTable;");
+        if ($this->tableObj instanceof MySQLTable) {
+            $this->append("use webfiori\database\mysql\MySQLTable;");
+        } else if ($this->tableObj instanceof MSSQLTable) {
+            $this->append("use webfiori\database\mssql\MSSQLTable;");
+        }
         $this->addFksTables();
 
         $this->append('');
@@ -284,7 +290,11 @@ class QueryClassWriter extends ClassWriter {
             $this->append(" * <li><b>$key</b>: Name in database: '".$colObj->getName()."'. Data type: '".$colObj->getDatatype()."'.</li>");
         }
         $this->append(" * </ul>\n */");
-        $this->append('class '.$this->getName().' extends MySQLTable {');
+        if ($this->tableObj instanceof MySQLTable) {
+            $this->append('class '.$this->getName().' extends MySQLTable {');
+        } else if ($this->tableObj instanceof MSSQLTable) {
+            $this->append('class '.$this->getName().' extends MSSQLTable {');
+        }
     }
     private function addFksTables() {
         $fks = $this->tableObj->getForignKeys();

@@ -72,7 +72,13 @@ class AddCommand extends CLICommand {
         return 0;
     }
     private function _addDbConnection() {
-        $connInfoObj = new ConnectionInfo('mysql', 'roor', 'pass', 'ok');
+        $dbType = $this->select('Select database type:', ConnectionInfo::SUPPORTED_DATABASES);
+        if ($dbType == 'mysql') {
+            $connInfoObj = new ConnectionInfo('mysql', 'roor', 'pass', 'ok');
+        } else if ($dbType == 'mssql') {
+            $connInfoObj = new ConnectionInfo('mssql', 'roor', 'pass', 'ok');
+        }
+        
         $connInfoObj->setHost($this->getInput('Database host:', '127.0.0.1'));
         $connInfoObj->setPort($this->getInput('Port number:', 3306));
         $connInfoObj->setUsername($this->getInput('Username:'));

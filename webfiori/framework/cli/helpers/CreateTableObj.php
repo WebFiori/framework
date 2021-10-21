@@ -211,7 +211,7 @@ class CreateTableObj {
             }
             $this->_setDefaultValue($colObj);
             $colObj->setIsNull($this->_getCommand()->confirm('Can this column have null values?', false));
-        } else if ($colObj->getDatatype() == 'int') {
+        } else if ($colObj->getDatatype() == 'int' && $colObj instanceof MySQLColumn) {
             $colObj->setIsAutoInc($this->_getCommand()->confirm('Is this column auto increment?', false));
         }
     }
@@ -262,14 +262,23 @@ class CreateTableObj {
      */
     private function _setSize($colObj) {
         $type = $colObj->getDatatype();
-        $supportSize = $type == 'int' 
+        $mySqlSupportSize = $type == 'int' 
                 || $type == 'varchar'
                 || $type == 'decimal' 
                 || $type == 'float'
                 || $type == 'double' 
                 || $type == 'text';
+        $mssqlSupportSize = $type == 'char'
+                || $type == 'nchar'
+                || $type == 'varchar'
+                || $type == 'nvarchar'
+                || $type == 'binary'
+                || $type == 'varbinary'
+                || $type == 'decimal'
+                || $type == 'float';
 
-        if ($supportSize) {
+        if (($colObj instanceof MySQLColumn && in_array($type, $mySqlSupportSize))
+                || $colObj instanceof MSSQLColumn && in_array($type, $mssqlSupportSize)) {
             $valid = false;
 
             do {

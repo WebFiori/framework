@@ -277,8 +277,8 @@ class CreateTableObj {
                 || $type == 'decimal'
                 || $type == 'float';
 
-        if (($colObj instanceof MySQLColumn && in_array($type, $mySqlSupportSize))
-                || $colObj instanceof MSSQLColumn && in_array($type, $mssqlSupportSize)) {
+        if (($colObj instanceof MySQLColumn && $mySqlSupportSize)
+                || $colObj instanceof MSSQLColumn && $mssqlSupportSize) {
             $valid = false;
 
             do {

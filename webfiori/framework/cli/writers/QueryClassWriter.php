@@ -260,7 +260,7 @@ class QueryClassWriter extends ClassWriter {
         $this->append(" * Creates new instance of the class.", 1);
         $this->append(" */", 1);
         $this->append('public function __construct(){', 1);
-        $this->append('parent::__construct(\''.$this->tableObj->getName().'\');', 2);
+        $this->append('parent::__construct(\''.$this->tableObj->getNormalName().'\');', 2);
 
         if ($this->tableObj->getComment() !== null) {
             $this->append('$this->setComment(\''.$this->tableObj->getComment().'\');', 2);
@@ -281,13 +281,13 @@ class QueryClassWriter extends ClassWriter {
 
         $this->append('');
         $this->append("/**\n"
-                ." * A class which represents the database table '".$this->tableObj->getName()."'.\n"
+                ." * A class which represents the database table '".$this->tableObj->getNormalName()."'.\n"
                 ." * The table which is associated with this class will have the following columns:\n"
                 ." * <ul>"
                 );
 
         foreach ($this->tableObj->getCols() as $key => $colObj) {
-            $this->append(" * <li><b>$key</b>: Name in database: '".$colObj->getName()."'. Data type: '".$colObj->getDatatype()."'.</li>");
+            $this->append(" * <li><b>$key</b>: Name in database: '".$colObj->getNormalName()."'. Data type: '".$colObj->getDatatype()."'.</li>");
         }
         $this->append(" * </ul>\n */");
         if ($this->tableObj instanceof MySQLTable) {

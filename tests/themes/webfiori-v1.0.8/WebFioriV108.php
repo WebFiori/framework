@@ -290,7 +290,7 @@ class WebFioriV108 extends Theme {
         return $head;
     }
 
-    public function getHeadrNode() {
+    public function getHeaderNode() {
         $header = new HTMLNode('header');
         $header->setClassName('container-fluid');
         $mainNav = new HTMLNode('nav');

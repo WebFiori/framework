@@ -284,7 +284,7 @@ class IbrahimTheme extends Theme {
         return $head;
     }
 
-    public function getHeadrNode() {
+    public function getHeaderNode() {
         $vAppBar = new HTMLNode('v-app-bar', [
             'app',
             'color' => 'green',

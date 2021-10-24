@@ -15,8 +15,6 @@ class TemplateTheme extends Theme {
         $this->setImagesDirName('images');
         $this->setJsDirName('js');
         $this->setCssDirName('css');
-        $this->addComponents([
-        ]);
         $this->setBeforeLoaded(function()
         {
             //the code in here will be executed before the theme is loaded.
@@ -65,7 +63,7 @@ class TemplateTheme extends Theme {
         return $headTag;
     }
 
-    public function getHeadrNode() {
+    public function getHeaderNode() {
         $headerSec = new HTMLNode();
         $headerBody = new HTMLNode();
         $headerBody->addTextNode('Header Sec');

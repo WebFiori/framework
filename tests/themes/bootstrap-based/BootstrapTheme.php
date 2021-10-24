@@ -106,7 +106,7 @@ class BootstrapTheme extends Theme {
         return $node;
     }
 
-    public function getHeadrNode() {
+    public function getHeaderNode() {
         $node = $this->createHTMLNode(['type' => 'row']);
         $topNav = HTMLNode::loadComponent($this->getDirecotry().'header.html', [
             // TODO: Supply values for placeholders.

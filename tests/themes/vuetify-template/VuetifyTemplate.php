@@ -90,7 +90,7 @@ class VuetifyTemplate extends Theme {
         return $node;
     }
 
-    public function getHeadrNode() {
+    public function getHeaderNode() {
         $aside = new HTMLNode('v-toolbar');
 
         return $aside;

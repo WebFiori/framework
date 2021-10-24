@@ -84,7 +84,7 @@ class GreenyTheme extends Theme {
         return $headTag;
     }
 
-    public function getHeadrNode() {
+    public function getHeaderNode() {
         $headerSec = new HTMLNode();
         $headerSec->setClassName('pa-row');
         $headerBody = new HTMLNode();

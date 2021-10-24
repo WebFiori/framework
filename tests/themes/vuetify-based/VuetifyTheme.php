@@ -214,7 +214,7 @@ class VuetifyTheme extends Theme {
      * Creates the header section of the page and return it.
      * @return HTMLNode
      */
-    public function getHeadrNode() {
+    public function getHeaderNode() {
         $appBar = new HTMLNode('v-app-bar');
         $appBar->setAttributes([
             'color' => 'red',

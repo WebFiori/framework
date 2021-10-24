@@ -205,6 +205,16 @@ class WebFioriApp {
         }
         call_user_func(APP_DIR_NAME.'\ini\InitAutoLoad::init');
     }
+    private function _initAppConfig() {
+        self::$SF = ConfigController::get();
+
+        if (!class_exists(APP_DIR_NAME.'\AppConfig')) {
+            self::$SF->createAppConfigFile();
+        }
+
+        $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
+        $this->appConfig = new $constructor();
+    }
     /**
      * The entry point for initiating the system.
      * 
@@ -235,15 +245,7 @@ class WebFioriApp {
         date_default_timezone_set(defined('DATE_TIMEZONE') ? DATE_TIMEZONE : 'Asia/Riyadh');
 
         $this->_initAutoLoader();
-
-        self::$SF = ConfigController::get();
-
-        if (!class_exists(APP_DIR_NAME.'\AppConfig')) {
-            self::$SF->createAppConfigFile();
-        }
-
-        $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
-        $this->appConfig = new $constructor();
+        $this->_initAppConfig();
 
         //Initialize CLI
         CLI::init();

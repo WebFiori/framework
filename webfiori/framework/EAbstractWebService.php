@@ -10,24 +10,7 @@ use webfiori\framework\ExtendedWebServicesManager;
  * 
  * @since 2.3.6
  */
-abstract class AbstractWebService extends AbstractWebService {
-    /**
-     * Creates new instance of the class.
-     * 
-     * The developer can supply an optional service name. 
-     * A valid service name must follow the following rules:
-     * <ul>
-     * <li>It can contain the letters [A-Z] and [a-z].</li>
-     * <li>It can contain the numbers [0-9].</li>
-     * <li>It can have the character '-' and the character '_'.</li>
-     * </ul>
-     * If The given name is invalid, the name of the service will be set to 'new-service'.
-     * 
-     * @param string $name The name of the web service. 
-     */
-    public function __construct($name) {
-        parent::__construct($name);
-    }
+abstract class EAbstractWebService extends AbstractWebService {
     /**
      * 
      * @return ExtendedWebServicesManager|null

@@ -57,7 +57,7 @@ class DBTest extends TestCase {
         $conn = new ConnectionInfo('mysql', 'root', '123456', 'testing_db');
         $db = new DB($conn);
         $this->assertEquals(0, count($db->getTables()));
-        $db->register('app/database');
+        $db->register('database');
         $this->assertEquals(1, count($db->getTables()));
     }
 }

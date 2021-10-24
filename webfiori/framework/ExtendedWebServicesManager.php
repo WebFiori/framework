@@ -386,9 +386,9 @@ abstract class ExtendedWebServicesManager extends WebServicesManager {
      * @since 1.0.1
      */
     public function registerServices($pathToScan) {
-        $defaultNs = str_replace('/', '\\', $pathToScan);
-        $pathToScan = ROOT_DIR.DS.$pathToScan;
-        $filesInDir = array_diff(scandir($pathToScan), ['..', '.']);
+        WebFioriApp::autoRegister($pathToScan, function (AbstractWebService $ws, ExtendedWebServicesManager $m) {
+            $m->addService($ws);
+        }, 'Service', [$this]);
 
         self::_scanDir($filesInDir, $pathToScan, $defaultNs);
     }
@@ -427,28 +427,6 @@ abstract class ExtendedWebServicesManager extends WebServicesManager {
      */
     public function setLangVars($dir,$arr = []) {
         $this->getTranslation()->setMultiple($dir, $arr);
-    }
-    private function _scanDir($filesInDir, $pathToScan, $defaultNs) {
-        foreach ($filesInDir as $fileName) {
-            $fileExt = substr($fileName, -4);
-
-            if ($fileExt == '.php') {
-                $cName = str_replace('.php', '', $fileName);
-                $ns = require_once $pathToScan.DS.$fileName;
-                $aNs = gettype($ns) == 'string' ? $ns.'\\' : $defaultNs.'\\';
-
-                $aCName = $aNs.$cName;
-                $classSuffix = substr($aCName, -7);
-
-                if ($classSuffix == 'Service' && class_exists($aCName)) {
-                    $instance = new $aCName();
-
-                    if ($instance instanceof AbstractWebService) {
-                        $this->addService($instance);
-                    }
-                }
-            }
-        }
     }
     /**
      * Set the language at which the API is going to use for the response.

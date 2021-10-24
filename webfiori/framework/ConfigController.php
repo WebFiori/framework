@@ -90,6 +90,9 @@ class ConfigController {
     const INV_HOST_OR_PORT = 'inv_mail_host_or_port';
 
     const NL = "\n";
+    private $since10;
+    private $docEnd;
+    private $blockEnd;
     /**
      * An instance of the class.
      * 
@@ -161,8 +164,8 @@ class ConfigController {
         $this->a($resource, "     * constant is defined or not before defining it using the function");
         $this->a($resource, "     * <code>defined</code>.");
         $this->a($resource, "     * ");
-        $this->a($resource, "     * @since 1.0");
-        $this->a($resource, "     */");
+        $this->a($resource, $this->since10);
+        $this->a($resource, $this->docEnd);
         $this->a($resource, "    public static function defineConstants() {");
         $this->addConst($resource, [
             'name' => 'SCRIPT_MEMORY_LIMIT',
@@ -315,7 +318,7 @@ class ConfigController {
             'type' => 'boolean',
             'value' => "false"
         ]);
-        $this->a($resource, "    }");
+        $this->a($resource, $this->blockEnd);
         $this->a($resource, "}");
         fclose($resource);
         require_once $path;
@@ -343,11 +346,11 @@ class ConfigController {
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * $comment");
         $this->a($cFile, "     * ");
-        $this->a($cFile, "     * @since 1.0");
-        $this->a($cFile, "     */");
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
         $this->a($cFile, "    public static function init() {");
         $this->a($cFile, "        ");
-        $this->a($cFile, "    }");
+        $this->a($cFile, $this->blockEnd);
         $this->a($cFile, "}");
         $cFile->write(true, true);
         require_once ROOT_DIR.DS.APP_DIR_NAME.DS.'ini'.DS."$className.php";
@@ -376,14 +379,19 @@ class ConfigController {
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Initialize system routes.");
         $this->a($cFile, "     * ");
-        $this->a($cFile, "     * @since 1.0");
-        $this->a($cFile, "     */");
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
         $this->a($cFile, "    public static function create() {");
         $this->a($cFile, "        //TODO: Add your own routes here.");
-        $this->a($cFile, "    }");
+        $this->a($cFile, $this->blockEnd);
         $this->a($cFile, "}");
         $cFile->write(true, true);
         require_once $cFile->getAbsolutePath();
+    }
+    private function __construct() {
+        $this->since10 = "     * @since 1.0";
+        $this->docEnd = "     */";
+        $this->blockEnd = "    }";
     }
     /**
      * Returns a single instance of the class.
@@ -764,6 +772,18 @@ class ConfigController {
             'db-connections' => $updated
         ]);
     }
+    private function _writeCronPass(&$cFile, $appConfigArr) {
+        if (isset($appConfigArr['cron-pass'])) {
+            if (strlen(trim($appConfigArr['cron-pass'])) == 0) {
+                $this->a($cFile, "        \$this->cronPass = 'NO_PASSWORD';");
+            } else {
+                $this->a($cFile, "        \$this->cronPass = '".hash('sha256', $appConfigArr['cron-pass'])."';");
+            }
+        } else {
+            $password = $this->getCRONPassword();
+            $this->a($cFile, "        \$this->cronPass = '".$password."';");
+        }
+    }
     /**
      * Update application version information.
      * 
@@ -924,8 +944,8 @@ class ConfigController {
         $this->a($cFile, "     * ");
         $this->a($cFile, "     * @var string");
         $this->a($cFile, "     * ");
-        $this->a($cFile, "     * @since 1.0");
-        $this->a($cFile, "     */");
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
         $this->a($cFile, "    private \$adminThemeName;");
 
         $this->a($cFile, "    /**");
@@ -933,8 +953,8 @@ class ConfigController {
         $this->a($cFile, "     * ");
         $this->a($cFile, "     * @var string");
         $this->a($cFile, "     * ");
-        $this->a($cFile, "     * @since 1.0");
-        $this->a($cFile, "     */");
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
         $this->a($cFile, "    private \$appReleaseDate;");
 
         $this->a($cFile, "    /**");
@@ -942,8 +962,8 @@ class ConfigController {
         $this->a($cFile, "     * ");
         $this->a($cFile, "     * @var string");
         $this->a($cFile, "     * ");
-        $this->a($cFile, "     * @since 1.0");
-        $this->a($cFile, "     */");
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
         $this->a($cFile, "    private \$appVersionType;");
 
         $this->a($cFile, "    /**");
@@ -951,8 +971,8 @@ class ConfigController {
         $this->a($cFile, "     * ");
         $this->a($cFile, "     * @var string");
         $this->a($cFile, "     * ");
-        $this->a($cFile, "     * @since 1.0");
-        $this->a($cFile, "     */");
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
         $this->a($cFile, "    private \$appVestion;");
 
         $this->a($cFile, "    /**");
@@ -960,8 +980,8 @@ class ConfigController {
         $this->a($cFile, "     * ");
         $this->a($cFile, "     * @var string");
         $this->a($cFile, "     * ");
-        $this->a($cFile, "     * @since 1.0");
-        $this->a($cFile, "     */");
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
         $this->a($cFile, "    private \$baseThemeName;");
 
         $this->a($cFile, "    /**");
@@ -969,8 +989,8 @@ class ConfigController {
         $this->a($cFile, "     * ");
         $this->a($cFile, "     * @var string");
         $this->a($cFile, "     * ");
-        $this->a($cFile, "     * @since 1.0");
-        $this->a($cFile, "     */");
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
         $this->a($cFile, "    private \$baseUrl;");
 
         $this->a($cFile, "    /**");
@@ -978,8 +998,8 @@ class ConfigController {
         $this->a($cFile, "     * ");
         $this->a($cFile, "     * @var string");
         $this->a($cFile, "     * ");
-        $this->a($cFile, "     * @since 1.0");
-        $this->a($cFile, "     */");
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
         $this->a($cFile, "    private \$configVision;");
 
         $this->a($cFile, "    /**");
@@ -987,8 +1007,8 @@ class ConfigController {
         $this->a($cFile, "     * ");
         $this->a($cFile, "     * @var string");
         $this->a($cFile, "     * ");
-        $this->a($cFile, "     * @since 1.0");
-        $this->a($cFile, "     */");
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
         $this->a($cFile, "    private \$cronPass;");
 
         $this->a($cFile, "    /**");
@@ -996,8 +1016,8 @@ class ConfigController {
         $this->a($cFile, "     * ");
         $this->a($cFile, "     * @var array");
         $this->a($cFile, "     * ");
-        $this->a($cFile, "     * @since 1.0");
-        $this->a($cFile, "     */");
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
         $this->a($cFile, "    private \$dbConnections;");
 
         $this->a($cFile, "    /**");
@@ -1005,8 +1025,8 @@ class ConfigController {
         $this->a($cFile, "     * ");
         $this->a($cFile, "     * @var array");
         $this->a($cFile, "     * ");
-        $this->a($cFile, "     * @since 1.0");
-        $this->a($cFile, "     */");
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
         $this->a($cFile, "    private \$defaultPageTitles;");
 
         $this->a($cFile, "    /**");
@@ -1014,8 +1034,8 @@ class ConfigController {
         $this->a($cFile, "     * ");
         $this->a($cFile, "     * @var string");
         $this->a($cFile, "     * ");
-        $this->a($cFile, "     * @since 1.0");
-        $this->a($cFile, "     */");
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
         $this->a($cFile, "    private \$emailAccounts;");
 
         $this->a($cFile, "    /**");
@@ -1023,8 +1043,8 @@ class ConfigController {
         $this->a($cFile, "     * ");
         $this->a($cFile, "     * @var string");
         $this->a($cFile, "     * ");
-        $this->a($cFile, "     * @since 1.0");
-        $this->a($cFile, "     */");
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
         $this->a($cFile, "    private \$homePage;");
 
         $this->a($cFile, "    /**");
@@ -1032,8 +1052,8 @@ class ConfigController {
         $this->a($cFile, "     * ");
         $this->a($cFile, "     * @var string");
         $this->a($cFile, "     * ");
-        $this->a($cFile, "     * @since 1.0");
-        $this->a($cFile, "     */");
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
         $this->a($cFile, "    private \$primaryLang;");
 
         $this->a($cFile, "    /**");
@@ -1041,8 +1061,8 @@ class ConfigController {
         $this->a($cFile, "     * ");
         $this->a($cFile, "     * @var string");
         $this->a($cFile, "     * ");
-        $this->a($cFile, "     * @since 1.0");
-        $this->a($cFile, "     */");
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
         $this->a($cFile, "    private \$titleSep;");
 
         $this->a($cFile, "    /**");
@@ -1050,15 +1070,15 @@ class ConfigController {
         $this->a($cFile, "     * ");
         $this->a($cFile, "     * @var string");
         $this->a($cFile, "     * ");
-        $this->a($cFile, "     * @since 1.0");
-        $this->a($cFile, "     */");
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
         $this->a($cFile, "    private \$webSiteNames;");
 
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Creates new instance of the class.");
         $this->a($cFile, "     * ");
-        $this->a($cFile, "     * @since 1.0");
-        $this->a($cFile, "     */");
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
         $this->a($cFile, "    public function __construct() {");
         $this->a($cFile, "        \$this->configVision = '1.0.1';");
         $this->a($cFile, "        \$this->initVersionInfo();");
@@ -1066,17 +1086,10 @@ class ConfigController {
         $this->a($cFile, "        \$this->initDbConnections();");
         $this->a($cFile, "        \$this->initSmtpConnections();");
 
-        if (isset($appConfigArr['cron-pass'])) {
-            if (strlen(trim($appConfigArr['cron-pass'])) == 0) {
-                $this->a($cFile, "        \$this->cronPass = 'NO_PASSWORD';");
-            } else {
-                $this->a($cFile, "        \$this->cronPass = '".hash('sha256', $appConfigArr['cron-pass'])."';");
-            }
-        } else {
-            $password = $this->getCRONPassword();
-            $this->a($cFile, "        \$this->cronPass = '".$password."';");
-        }
-        $this->a($cFile, "    }");
+        
+        $this->_writeCronPass($cFile, $appConfigArr);
+        
+        $this->a($cFile, $this->blockEnd);
 
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Adds an email account.");
@@ -1086,11 +1099,11 @@ class ConfigController {
         $this->a($cFile, "     * "); 
         $this->a($cFile, "     * @param SMTPAccount \$acc an object of type SMTPAccount."); 
         $this->a($cFile, "     * "); 
-        $this->a($cFile, "     * @since 1.0");
-        $this->a($cFile, "     */");
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
         $this->a($cFile, "     public function addAccount(SMTPAccount \$acc) {");
         $this->a($cFile, "        \$this->emailAccounts[\$acc->getAccountName()] = \$acc;");
-        $this->a($cFile, "    }");
+        $this->a($cFile, $this->blockEnd);
 
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Adds new database connection or updates an existing one.");
@@ -1098,11 +1111,11 @@ class ConfigController {
         $this->a($cFile, "     * @param ConnectionInfo \$connectionInfo an object of type 'ConnectionInfo'");
         $this->a($cFile, "     * that will contain connection information.");
         $this->a($cFile, "     * ");
-        $this->a($cFile, "     * @since 1.0");
-        $this->a($cFile, "     */");
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
         $this->a($cFile, "    public function addDbConnection(ConnectionInfo \$connectionInfo) {");
         $this->a($cFile, "        \$this->dbConnections[\$connectionInfo->getName()] = \$connectionInfo;");
-        $this->a($cFile, "    }");
+        $this->a($cFile, $this->blockEnd);
 
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Returns SMTP account given its name.");
@@ -1116,13 +1129,13 @@ class ConfigController {
         $this->a($cFile, "     * will return an object of type SMTPAccount. Else, the");
         $this->a($cFile, "     * method will return null.");
         $this->a($cFile, "     * ");
-        $this->a($cFile, "     * @since 1.0");
-        $this->a($cFile, "     */");
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
         $this->a($cFile, "    public function getAccount(\$name) {");
         $this->a($cFile, "        if (isset(\$this->emailAccounts[\$name])) {");
         $this->a($cFile, "            return \$this->emailAccounts[\$name];");
         $this->a($cFile, "        }");
-        $this->a($cFile, "    }");
+        $this->a($cFile, $this->blockEnd);
 
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Returns an associative array that contains all email accounts.");
@@ -1132,22 +1145,22 @@ class ConfigController {
         $this->a($cFile, "     * ");
         $this->a($cFile, "     * @return array An associative array that contains all email accounts.");
         $this->a($cFile, "     * ");
-        $this->a($cFile, "     * @since 1.0");
-        $this->a($cFile, "     */");
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
         $this->a($cFile, "    public function getAccounts() {");
         $this->a($cFile, "        return \$this->emailAccounts;");
-        $this->a($cFile, "    }");
+        $this->a($cFile, $this->blockEnd);
 
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Returns the name of the theme that is used in admin control pages.");
         $this->a($cFile, "     * ");
         $this->a($cFile, "     * @return string The name of the theme that is used in admin control pages.");
         $this->a($cFile, "     * ");
-        $this->a($cFile, "     * @since 1.0");
-        $this->a($cFile, "     */");
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
         $this->a($cFile, "    public function getAdminThemeName() {");
         $this->a($cFile, "        return \$this->adminThemeName;");
-        $this->a($cFile, "    }");
+        $this->a($cFile, $this->blockEnd);
 
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Returns the name of base theme that is used in website pages.");
@@ -1156,11 +1169,11 @@ class ConfigController {
         $this->a($cFile, "     * ");
         $this->a($cFile, "     * @return string The name of base theme that is used in website pages.");
         $this->a($cFile, "     * ");
-        $this->a($cFile, "     * @since 1.0");
-        $this->a($cFile, "     */");
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
         $this->a($cFile, "    public function getBaseThemeName() {");
         $this->a($cFile, "        return \$this->baseThemeName;");
-        $this->a($cFile, "    }");
+        $this->a($cFile, $this->blockEnd);
 
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Returns the base URL that is used to fetch resources.");
@@ -1170,11 +1183,11 @@ class ConfigController {
         $this->a($cFile, "     * ");
         $this->a($cFile, "     * @return string the base URL.");
         $this->a($cFile, "     * ");
-        $this->a($cFile, "     * @since 1.0");
-        $this->a($cFile, "     */");
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
         $this->a($cFile, "    public function getBaseURL() {");
         $this->a($cFile, "        return \$this->baseUrl;");
-        $this->a($cFile, "    }");
+        $this->a($cFile, $this->blockEnd);
 
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Returns version number of the configuration file.");
@@ -1183,11 +1196,11 @@ class ConfigController {
         $this->a($cFile, "     * ");
         $this->a($cFile, "     * @return string The version number of the configuration file.");
         $this->a($cFile, "     * ");
-        $this->a($cFile, "     * @since 1.0");
-        $this->a($cFile, "     */");
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
         $this->a($cFile, "    public function getConfigVersion() {");
         $this->a($cFile, "        return \$this->configVision;");
-        $this->a($cFile, "    }");
+        $this->a($cFile, $this->blockEnd);
 
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Returns sha256 hash of the password which is used to prevent unauthorized");
@@ -1196,10 +1209,10 @@ class ConfigController {
         $this->a($cFile, "     * @return Password hash or the string 'NO_PASSWORD' if there is no password.");
         $this->a($cFile, "     * ");
         $this->a($cFile, "     * @since 1.0.1");
-        $this->a($cFile, "     */");
+        $this->a($cFile, $this->docEnd);
         $this->a($cFile, "    public function getCRONPassword() {");
         $this->a($cFile, "        return \$this->cronPass;");
-        $this->a($cFile, "    }");
+        $this->a($cFile, $this->blockEnd);
 
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Returns database connection information given connection name.");
@@ -1210,8 +1223,8 @@ class ConfigController {
         $this->a($cFile, "     * ConnectionInfo if a connection info was found for the given connection name.");
         $this->a($cFile, "     * Other than that, the method will return null.");
         $this->a($cFile, "     * ");
-        $this->a($cFile, "     * @since 1.0");
-        $this->a($cFile, "     */");
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
         $this->a($cFile, "    public function getDBConnection(\$conName) {");
         $this->a($cFile, "        \$conns = \$this->getDBConnections();");
         $this->a($cFile, "        \$trimmed = trim(\$conName);");
@@ -1219,7 +1232,7 @@ class ConfigController {
         $this->a($cFile, "        if (isset(\$conns[\$trimmed])) {");
         $this->a($cFile, "            return \$conns[\$trimmed];");
         $this->a($cFile, "        }");
-        $this->a($cFile, "    }");
+        $this->a($cFile, $this->blockEnd);
 
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Returns an associative array that contain the information of database connections.");
@@ -1229,11 +1242,11 @@ class ConfigController {
         $this->a($cFile, "     * ");
         $this->a($cFile, "     * @return array An associative array.");
         $this->a($cFile, "     * ");
-        $this->a($cFile, "     * @since 1.0");
-        $this->a($cFile, "     */");
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
         $this->a($cFile, "    public function getDBConnections() {");
         $this->a($cFile, "        return \$this->dbConnections;");
-        $this->a($cFile, "    }");
+        $this->a($cFile, $this->blockEnd);
 
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Returns the global title of the web site that will be");
@@ -1245,8 +1258,8 @@ class ConfigController {
         $this->a($cFile, "     * does exist in the given language, the method will return it.");
         $this->a($cFile, "     * If no such title, the method will return null.");
         $this->a($cFile, "     * ");
-        $this->a($cFile, "     * @since 1.0");
-        $this->a($cFile, "     */");
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
         $this->a($cFile, "    public function getDefaultTitle(\$langCode) {");
         $this->a($cFile, "        \$langs = \$this->getTitles();");
         $this->a($cFile, "        \$langCodeF = strtoupper(trim(\$langCode));");
@@ -1254,7 +1267,7 @@ class ConfigController {
         $this->a($cFile, "        if (isset(\$langs[\$langCodeF])) {");
         $this->a($cFile, "            return \$langs[\$langCode];");
         $this->a($cFile, "        }");
-        $this->a($cFile, "    }");
+        $this->a($cFile, $this->blockEnd);
 
 
         $this->a($cFile, "    /**");
@@ -1267,15 +1280,15 @@ class ConfigController {
         $this->a($cFile, "     * does exist, the method will return it. If no such description, the");
         $this->a($cFile, "     * method will return null.");
         $this->a($cFile, "     * ");
-        $this->a($cFile, "     * @since 1.0");
-        $this->a($cFile, "     */");
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
         $this->a($cFile, "    public function getDescription(\$langCode) {");
         $this->a($cFile, "        \$langs = \$this->getDescriptions();");
         $this->a($cFile, "        \$langCodeF = strtoupper(trim(\$langCode));");
         $this->a($cFile, "        if (isset(\$langs[\$langCodeF])) {");
         $this->a($cFile, "            return \$langs[\$langCode];");
         $this->a($cFile, "        }");
-        $this->a($cFile, "    }");
+        $this->a($cFile, $this->blockEnd);
 
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Returns an associative array which contains different website descriptions");
@@ -1287,33 +1300,33 @@ class ConfigController {
         $this->a($cFile, "     * @return array An associative array which contains different website descriptions");
         $this->a($cFile, "     * in different languages.");
         $this->a($cFile, "     * ");
-        $this->a($cFile, "     * @since 1.0");
-        $this->a($cFile, "     */");
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
         $this->a($cFile, "    public function getDescriptions() {");
         $this->a($cFile, "        return \$this->descriptions;");
-        $this->a($cFile, "    }");
+        $this->a($cFile, $this->blockEnd);
 
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Returns the home page URL of the website.");
         $this->a($cFile, "     * ");
         $this->a($cFile, "     * @return string The home page URL of the website.");
         $this->a($cFile, "     * ");
-        $this->a($cFile, "     * @since 1.0");
-        $this->a($cFile, "     */");
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
         $this->a($cFile, "    public function getHomePage() {");
         $this->a($cFile, "        return \$this->homePage;");
-        $this->a($cFile, "    }");
+        $this->a($cFile, $this->blockEnd);
 
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Returns the primary language of the website.");
         $this->a($cFile, "     * ");
         $this->a($cFile, "     * @return string Language code of the primary language such as 'EN'.");
         $this->a($cFile, "     * ");
-        $this->a($cFile, "     * @since 1.0");
-        $this->a($cFile, "     */");
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
         $this->a($cFile, "    public function getPrimaryLanguage() {");
         $this->a($cFile, "        return \$this->primaryLang;");
-        $this->a($cFile, "    }");
+        $this->a($cFile, $this->blockEnd);
 
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Returns the date at which the application was released at.");
@@ -1321,11 +1334,11 @@ class ConfigController {
         $this->a($cFile, "     * @return string The method will return a string in the format");
         $this->a($cFile, "     * 'YYYY-MM-DD' that represents application release date.");
         $this->a($cFile, "     * ");
-        $this->a($cFile, "     * @since 1.0");
-        $this->a($cFile, "     */");
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
         $this->a($cFile, "    public function getReleaseDate() {");
         $this->a($cFile, "        return \$this->appReleaseDate;");
-        $this->a($cFile, "    }");
+        $this->a($cFile, $this->blockEnd);
 
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Returns an array that holds the default page title for different display");
@@ -1335,11 +1348,11 @@ class ConfigController {
         $this->a($cFile, "     * and the values are pages titles.");
         $this->a($cFile, "     * ");
         $this->a($cFile, "     * ");
-        $this->a($cFile, "     * @since 1.0");
-        $this->a($cFile, "     */");
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
         $this->a($cFile, "    public function getTitles() {");
         $this->a($cFile, "        return \$this->defaultPageTitles;");
-        $this->a($cFile, "    }");
+        $this->a($cFile, $this->blockEnd);
 
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Returns the character (or string) that is used to separate page title from website name.");
@@ -1347,11 +1360,11 @@ class ConfigController {
         $this->a($cFile, "     * @return string A string such as ' - ' or ' | '. Note that the method");
         $this->a($cFile, "     * will add the two spaces by default.");
         $this->a($cFile, "     * ");
-        $this->a($cFile, "     * @since 1.0");
-        $this->a($cFile, "     */");
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
         $this->a($cFile, "    public function getTitleSep() {");
         $this->a($cFile, "        return \$this->titleSep;");
-        $this->a($cFile, "    }");
+        $this->a($cFile, $this->blockEnd);
 
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Returns version number of the application.");
@@ -1359,11 +1372,11 @@ class ConfigController {
         $this->a($cFile, "     * @return string The method should return a string in the");
         $this->a($cFile, "     * form 'x.x.x.x'.");
         $this->a($cFile, "     * ");
-        $this->a($cFile, "     * @since 1.0");
-        $this->a($cFile, "     */");
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
         $this->a($cFile, "    public function getVersion() {");
         $this->a($cFile, "        return \$this->appVestion;");
-        $this->a($cFile, "    }");
+        $this->a($cFile, $this->blockEnd);
 
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Returns a string that represents application release type.");
@@ -1371,11 +1384,11 @@ class ConfigController {
         $this->a($cFile, "     * @return string The method will return a string such as");
         $this->a($cFile, "     * 'Stable', 'Alpha', 'Beta' and so on.");
         $this->a($cFile, "     * ");
-        $this->a($cFile, "     * @since 1.0");
-        $this->a($cFile, "     */");
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
         $this->a($cFile, "    public function getVersionType() {");
         $this->a($cFile, "        return \$this->appVersionType;");
-        $this->a($cFile, "    }");
+        $this->a($cFile, $this->blockEnd);
 
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Returns the global website name.");
@@ -1386,8 +1399,8 @@ class ConfigController {
         $this->a($cFile, "     * does exist, the method will return it. If no such name, the");
         $this->a($cFile, "     * method will return null.");
         $this->a($cFile, "     * ");
-        $this->a($cFile, "     * @since 1.0");
-        $this->a($cFile, "     */");
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
         $this->a($cFile, "    public function getWebsiteName(\$langCode) {");
         $this->a($cFile, "        \$langs = \$this->getWebsiteNames();");
         $this->a($cFile, "        \$langCodeF = strtoupper(trim(\$langCode));");
@@ -1395,7 +1408,7 @@ class ConfigController {
         $this->a($cFile, "        if (isset(\$langs[\$langCodeF])) {");
         $this->a($cFile, "            return \$langs[\$langCode];");
         $this->a($cFile, "        }");
-        $this->a($cFile, "    }");
+        $this->a($cFile, $this->blockEnd);
 
         $this->a($cFile, "    /**");
         $this->a($cFile, "     * Returns an array which contains different website names in different languages.");
@@ -1405,43 +1418,89 @@ class ConfigController {
         $this->a($cFile, "     * ");
         $this->a($cFile, "     * @return array An array which contains different website names in different languages.");
         $this->a($cFile, "     * ");
-        $this->a($cFile, "     * @since 1.0");
-        $this->a($cFile, "     */");
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
         $this->a($cFile, "    public function getWebsiteNames() {");
         $this->a($cFile, "        return \$this->webSiteNames;");
-        $this->a($cFile, "    }");
+        $this->a($cFile, $this->blockEnd);
 
+        $this->_writeDbCon($cFile, $appConfigArr);
+        $this->_writeSiteInfo($cFile, $appConfigArr);
+        $this->_writeSmtpConn($cFile, $appConfigArr);
+        $this->_writeAppVersionInfo();
+
+        $this->a($cFile, "}");
+        $cFile->write(false, true);
+        require_once ROOT_DIR.DS.APP_DIR_NAME.DS.'AppConfig.php';
+    }
+    private function _writeAppVersionInfo(&$cFile, $appConfigArr) {
         $this->a($cFile, "    /**");
-        $this->a($cFile, "     * @since 1.0");
-        $this->a($cFile, "     */");
-        $this->a($cFile, "    private function initDbConnections() {");
-        $this->a($cFile, "        \$this->dbConnections = [");
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
+        $this->a($cFile, "    private function initVersionInfo() {");
 
-        if (isset($appConfigArr['db-connections']) && gettype($appConfigArr['db-connections']) == 'array') {
-            $dbCons = $appConfigArr['db-connections'];
+        $versionInfo = $this->getAppVersionInfo();
+
+        if (isset($appConfigArr['version-info'])) {
+            if (isset($appConfigArr['version-info']['version'])) {
+                $this->a($cFile, "        \$this->appVestion = '".$appConfigArr['version-info']['version']."';");
+            } else {
+                $this->a($cFile, "        \$this->appVestion = '".$versionInfo['version']."';");
+            }
+
+            if (isset($appConfigArr['version-info']['version-type'])) {
+                $this->a($cFile, "        \$this->appVersionType = '".$appConfigArr['version-info']['version-type']."';");
+            } else {
+                $this->a($cFile, "        \$this->appVersionType = '".$versionInfo['version-type']."';");
+            }
+
+            if (isset($appConfigArr['version-info']['release-date'])) {
+                $this->a($cFile, "        \$this->appReleaseDate = '".$appConfigArr['version-info']['release-date']."';");
+            } else {
+                $this->a($cFile, "        \$this->appReleaseDate = '".$versionInfo['release-date']."';");
+            }
         } else {
-            $dbCons = $this->getDatabaseConnections();
+            $this->a($cFile, "        \$this->appVestion = '".$versionInfo['version']."';");
+            $this->a($cFile, "        \$this->appVersionType = '".$versionInfo['version-type']."';");
+            $this->a($cFile, "        \$this->appReleaseDate = '".$versionInfo['release-date']."';");
         }
 
-        foreach ($dbCons as $connObj) {
-            if ($connObj instanceof ConnectionInfo) {
-                $cName = $connObj->getName();
-                $this->a($cFile, "            '$cName' => new ConnectionInfo('".$connObj->getDatabaseType()."',"
-                        ."'".$connObj->getUsername()."', "
-                        ."'".$connObj->getPassword()."', "
-                        ."'".$connObj->getDBName()."', "
-                        ."'".$connObj->getHost()."', "
-                        ."".$connObj->getPort().", [");
-                $this->a($cFile, "                'connection-name' => '".str_replace("'", "\'", $cName)."'");
+        $this->a($cFile, $this->blockEnd);
+    }
+    private function _writeSmtpConn(&$cFile, $appConfigArr) {
+        $this->a($cFile, "    /**");
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
+        $this->a($cFile, "    private function initSmtpConnections() {");
+        $this->a($cFile, "        \$this->emailAccounts = [");
+
+        if (isset($appConfigArr['smtp']) && gettype($appConfigArr['smtp']) == 'array') {
+            $smtpAccArr = $appConfigArr['smtp'];
+        } else {
+            $smtpAccArr = $this->getSMTPAccounts();
+        }
+
+        foreach ($smtpAccArr as $smtpAcc) {
+            if ($smtpAcc instanceof SMTPAccount) {
+                $this->a($cFile, "            '".$smtpAcc->getAccountName()."' => new SMTPAccount([");
+                $this->a($cFile, "                'port' => ".$smtpAcc->getPort().",");
+                $this->a($cFile, "                'server-address' => '".$smtpAcc->getServerAddress()."',");
+                $this->a($cFile, "                'user' => '".$smtpAcc->getUsername()."',");
+                $this->a($cFile, "                'pass' => '".$smtpAcc->getPassword()."',");
+                $this->a($cFile, "                'sender-name' => '".str_replace("'", "\'", $smtpAcc->getSenderName())."',");
+                $this->a($cFile, "                'sender-address' => '".$smtpAcc->getAddress()."',");
+                $this->a($cFile, "                'account-name' => '".str_replace("'", "\'", $smtpAcc->getAccountName())."'");
                 $this->a($cFile, "            ]),");
             }
         }
         $this->a($cFile, "        ];");
-        $this->a($cFile, "    }");
+        $this->a($cFile, $this->blockEnd);
+    }
 
+    private function _writeSiteInfo(&$cFile,  $appConfigArr) {
         $this->a($cFile, "    /**");
-        $this->a($cFile, "     * @since 1.0");
-        $this->a($cFile, "     */");
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
         $this->a($cFile, "    private function initSiteInfo() {");
 
         if (isset($appConfigArr['website-names']) && gettype($appConfigArr['website-names']) == 'array') {
@@ -1546,72 +1605,36 @@ class ConfigController {
             }
         }
 
-        $this->a($cFile, "    }");
-
+        $this->a($cFile, $this->blockEnd);
+    }
+    private function _writeDbCon(&$cFile, $appConfigArr) {
         $this->a($cFile, "    /**");
-        $this->a($cFile, "     * @since 1.0");
-        $this->a($cFile, "     */");
-        $this->a($cFile, "    private function initSmtpConnections() {");
-        $this->a($cFile, "        \$this->emailAccounts = [");
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
+        $this->a($cFile, "    private function initDbConnections() {");
+        $this->a($cFile, "        \$this->dbConnections = [");
 
-        if (isset($appConfigArr['smtp']) && gettype($appConfigArr['smtp']) == 'array') {
-            $smtpAccArr = $appConfigArr['smtp'];
+        if (isset($appConfigArr['db-connections']) && gettype($appConfigArr['db-connections']) == 'array') {
+            $dbCons = $appConfigArr['db-connections'];
         } else {
-            $smtpAccArr = $this->getSMTPAccounts();
+            $dbCons = $this->getDatabaseConnections();
         }
 
-        foreach ($smtpAccArr as $smtpAcc) {
-            if ($smtpAcc instanceof SMTPAccount) {
-                $this->a($cFile, "            '".$smtpAcc->getAccountName()."' => new SMTPAccount([");
-                $this->a($cFile, "                'port' => ".$smtpAcc->getPort().",");
-                $this->a($cFile, "                'server-address' => '".$smtpAcc->getServerAddress()."',");
-                $this->a($cFile, "                'user' => '".$smtpAcc->getUsername()."',");
-                $this->a($cFile, "                'pass' => '".$smtpAcc->getPassword()."',");
-                $this->a($cFile, "                'sender-name' => '".str_replace("'", "\'", $smtpAcc->getSenderName())."',");
-                $this->a($cFile, "                'sender-address' => '".$smtpAcc->getAddress()."',");
-                $this->a($cFile, "                'account-name' => '".str_replace("'", "\'", $smtpAcc->getAccountName())."'");
+        foreach ($dbCons as $connObj) {
+            if ($connObj instanceof ConnectionInfo) {
+                $cName = $connObj->getName();
+                $this->a($cFile, "            '$cName' => new ConnectionInfo('".$connObj->getDatabaseType()."',"
+                        ."'".$connObj->getUsername()."', "
+                        ."'".$connObj->getPassword()."', "
+                        ."'".$connObj->getDBName()."', "
+                        ."'".$connObj->getHost()."', "
+                        ."".$connObj->getPort().", [");
+                $this->a($cFile, "                'connection-name' => '".str_replace("'", "\'", $cName)."'");
                 $this->a($cFile, "            ]),");
             }
         }
         $this->a($cFile, "        ];");
-        $this->a($cFile, "    }");
-
-        $this->a($cFile, "    /**");
-        $this->a($cFile, "     * @since 1.0");
-        $this->a($cFile, "     */");
-        $this->a($cFile, "    private function initVersionInfo() {");
-
-        $versionInfo = $this->getAppVersionInfo();
-
-        if (isset($appConfigArr['version-info'])) {
-            if (isset($appConfigArr['version-info']['version'])) {
-                $this->a($cFile, "        \$this->appVestion = '".$appConfigArr['version-info']['version']."';");
-            } else {
-                $this->a($cFile, "        \$this->appVestion = '".$versionInfo['version']."';");
-            }
-
-            if (isset($appConfigArr['version-info']['version-type'])) {
-                $this->a($cFile, "        \$this->appVersionType = '".$appConfigArr['version-info']['version-type']."';");
-            } else {
-                $this->a($cFile, "        \$this->appVersionType = '".$versionInfo['version-type']."';");
-            }
-
-            if (isset($appConfigArr['version-info']['release-date'])) {
-                $this->a($cFile, "        \$this->appReleaseDate = '".$appConfigArr['version-info']['release-date']."';");
-            } else {
-                $this->a($cFile, "        \$this->appReleaseDate = '".$versionInfo['release-date']."';");
-            }
-        } else {
-            $this->a($cFile, "        \$this->appVestion = '".$versionInfo['version']."';");
-            $this->a($cFile, "        \$this->appVersionType = '".$versionInfo['version-type']."';");
-            $this->a($cFile, "        \$this->appReleaseDate = '".$versionInfo['release-date']."';");
-        }
-
-        $this->a($cFile, "    }");
-
-        $this->a($cFile, "}");
-        $cFile->write(false, true);
-        require_once ROOT_DIR.DS.APP_DIR_NAME.DS.'AppConfig.php';
+        $this->a($cFile, $this->blockEnd);
     }
     private function _mkdir($dir) {
         if (!is_dir($dir)) {

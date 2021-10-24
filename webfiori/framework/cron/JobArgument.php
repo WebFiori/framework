@@ -27,7 +27,7 @@ class JobArgument implements JsonI {
      * 
      * @since 1.0
      */
-    private $name;
+    private $argName;
     /**
      * Creates new instance of the class.
      * 
@@ -65,7 +65,7 @@ class JobArgument implements JsonI {
      * @since 1.0
      */
     public function getName() {
-        return $this->name;
+        return $this->argName;
     }
     /**
      * Returns the value of job argument.
@@ -136,7 +136,7 @@ class JobArgument implements JsonI {
                 throw new InvalidArgumentException('Invalid argument name: '.$nTrim);
             }
         }
-        $this->name = $nTrim;
+        $this->argName = $nTrim;
     }
     /**
      * Returns an object that represents the argument in JSON.

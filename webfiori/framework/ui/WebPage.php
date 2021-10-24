@@ -327,10 +327,10 @@ class WebPage {
      * @since 1.0
      */
     public function createHTMLNode($nodeInfo) {
-        $theme = $this->getTheme();
+        $pageTheme = $this->getTheme();
 
-        if ($theme !== null) {
-            return $theme->createHTMLNode($nodeInfo);
+        if ($pageTheme !== null) {
+            return $pageTheme->createHTMLNode($nodeInfo);
         }
     }
     /**
@@ -704,8 +704,8 @@ class WebPage {
         $this->_checkLang();
         $this->usingLanguage();
 
-        $websiteName = WebFioriApp::getAppConfig()->getWebsiteName($this->getLangCode());
-        $websiteName !== null ? $this->setWebsiteName($websiteName) : $this->setWebsiteName('New Website');
+        $appName = WebFioriApp::getAppConfig()->getWebsiteName($this->getLangCode());
+        $appName !== null ? $this->setWebsiteName($appName) : $this->setWebsiteName('New Website');
 
         $websiteDesc = WebFioriApp::getAppConfig()->getDescription($this->getLangCode());
         $websiteDesc !== null ? $this->setWebsiteName($websiteDesc) : '';
@@ -814,7 +814,7 @@ class WebPage {
                     $children = $mainContentArea->children();
                     $currentChCount = $children->size();
                     $mainContentArea->removeAllChildNodes();
-                    $mainContentArea->addChild($this->_getAside());
+                    $mainContentArea->addChild($this->_getComponent('getAsideNode', self::MAIN_ELEMENTS[3]));
                     $this->incAside = true;
 
                     for ($x = 0 ; $x < $currentChCount ; $x++) {
@@ -844,7 +844,7 @@ class WebPage {
     public function setHasFooter($bool) {
         if (gettype($bool) == self::$BoolType) {
             if (!$this->incFooter && $bool) {
-                $this->document->addChild($this->_getFooter());
+                $this->document->addChild($this->_getComponent('getFooterNode', self::MAIN_ELEMENTS[4]));
             } else if ($this->incFooter && !$bool) {
                 $footer = $this->document->getChildByID(self::MAIN_ELEMENTS[4]);
 
@@ -870,7 +870,7 @@ class WebPage {
                 $children = $this->document->getBody()->children();
                 $currentChCount = $children->size();
                 $this->document->getBody()->removeAllChildNodes();
-                $this->document->addChild($this->_getHeader());
+                $this->document->addChild($this->_getComponent('getHeaderNode', self::MAIN_ELEMENTS[1]));
 
                 for ($x = 0 ; $x < $currentChCount ; $x++) {
                     $this->document->addChild($children->get($x));
@@ -950,9 +950,9 @@ class WebPage {
 
             $this->document = new HTMLDoc();
             $headNode = $this->_getHead();
-            $footerNode = $this->_getFooter();
-            $asideNode = $this->_getAside();
-            $headerNode = $this->_getHeader();
+            $footerNode = $this->_getComponent('getFooterNode', self::MAIN_ELEMENTS[4]);
+            $asideNode = $this->_getComponent('getAsideNode', self::MAIN_ELEMENTS[3]);
+            $headerNode = $this->_getComponent('getHeaderNode', self::MAIN_ELEMENTS[1]);
             $this->document->setLanguage($this->getLangCode());
             $this->document->setHeadNode($headNode);
             $this->document->addChild($headerNode);
@@ -1084,41 +1084,25 @@ class WebPage {
             }
         }
     }
-    private function _getAside() {
+    private function _getComponent($methToCall, $nodeId) {
         $loadedTheme = $this->getTheme();
         $node = new HTMLNode();
 
         if ($loadedTheme !== null) {
-            $node = $loadedTheme->getAsideNode();
+            $node = $loadedTheme->$methToCall();
         }
 
         if ($loadedTheme !== null && !$node instanceof HTMLNode) {
-            throw new UIException('The the method "'.get_class($loadedTheme).'::getAsideNode()" did not return '
+            throw new UIException('The the method "'.get_class($loadedTheme).'::'.$methToCall.'()" did not return '
                     .'an instance of the class "webfiori\\ui\\HTMLNode".');
         } else {
-            $node->setID(self::MAIN_ELEMENTS[3]);
+            $node->setID($nodeId);
         }
 
         return $node;
     }
 
-    private function _getFooter() {
-        $loadedTheme = $this->getTheme();
-        $node = new HTMLNode();
-
-        if ($loadedTheme !== null) {
-            $node = $loadedTheme->getFooterNode();
-        }
-
-        if ($loadedTheme !== null && !$node instanceof HTMLNode) {
-            throw new UIException('The the method "'.get_class($loadedTheme).'::getFooterNode()" did not return '
-                    .'an instance of the class "webfiori\\ui\\HTMLNode".');
-        } else {
-            $node->setID(self::MAIN_ELEMENTS[4]);
-        }
-
-        return $node;
-    }
+    
     private function _getHead() {
         $loadedTheme = $this->getTheme();
 
@@ -1146,23 +1130,6 @@ class WebPage {
         }
 
         return $headNode;
-    }
-    private function _getHeader() {
-        $loadedTheme = $this->getTheme();
-        $node = new HTMLNode();
-
-        if ($loadedTheme !== null) {
-            $node = $loadedTheme->getHeadrNode();
-        }
-
-        if ($loadedTheme !== null && !$node instanceof HTMLNode) {
-            throw new UIException('The the method "'.get_class($loadedTheme).'::getHeadrNode()" did not return '
-                    .'an instance of the class "webfiori\\ui\\HTMLNode".');
-        } else {
-            $node->setID(self::MAIN_ELEMENTS[1]);
-        }
-
-        return $node;
     }
     private function _resetBeforeLoaded() {
         $this->beforeRenderParams = [

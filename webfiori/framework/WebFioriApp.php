@@ -89,12 +89,7 @@ class WebFioriApp {
      * @since 1.0
      */
     private static $SF;
-    /**
-     * The entry point for initiating the system.
-     * 
-     * @since 1.0
-     */
-    private function __construct() {
+    private function _checkStdInOut() {
         /*
          * first, check for php streams if they are open or not.
          */
@@ -129,6 +124,8 @@ class WebFioriApp {
              */
             define('STDERR',fopen('php://stderr', 'w'));
         }
+    }
+    private function _initVersionInfo() {
         /**
          * A constant that represents version number of the framework.
          * 
@@ -151,17 +148,8 @@ class WebFioriApp {
          * @since 2.1
          */
         define('WF_RELEASE_DATE', '2021-10-20');
-        /**
-         * Change encoding of mb_ functions to UTF-8
-         */
-        if (function_exists('mb_internal_encoding')) {
-            $encoding = 'UTF-8';
-            mb_internal_encoding($encoding);
-            mb_http_output($encoding);
-            //mb_http_input($encoding);
-            mb_regex_encoding($encoding);
-        }
-
+    }
+    private function _checkAppDir() {
         if (!defined('APP_DIR_NAME')) {
             /**
              * The name of the directory at which the developer will have his own application 
@@ -176,7 +164,8 @@ class WebFioriApp {
             http_response_code(500);
             die('Error: Unable to initialize the application. Invalid application directory name: "'.APP_DIR_NAME.'".');
         }
-
+    }
+    private function _loadConstants() {
         if (!class_exists(APP_DIR_NAME.'\ini\GlobalConstants')) {
             $confControllerPath = ROOT_DIR.DIRECTORY_SEPARATOR.
                     'vendor'.DIRECTORY_SEPARATOR.
@@ -201,17 +190,8 @@ class WebFioriApp {
             require_once ROOT_DIR.DIRECTORY_SEPARATOR.APP_DIR_NAME.DIRECTORY_SEPARATOR.'ini'.DIRECTORY_SEPARATOR.'GlobalConstants.php';
         }
         call_user_func(APP_DIR_NAME.'\ini\GlobalConstants::defineConstants');
-
-        /**
-         * Set memory limit.
-         */
-        ini_set('memory_limit', defined('SCRIPT_MEMORY_LIMIT') ? SCRIPT_MEMORY_LIMIT : '2048M');
-        /**
-         * See http://php.net/manual/en/timezones.php for supported time zones.
-         * Change this as needed.
-         */
-        date_default_timezone_set(defined('DATE_TIMEZONE') ? DATE_TIMEZONE : 'Asia/Riyadh');
-
+    }
+    private function _initAutoLoader() {
         /**
          * Initialize autoloader.
          */
@@ -224,6 +204,37 @@ class WebFioriApp {
             ConfigController::get()->createIniClass('InitAutoLoad', 'Add user-defined directories to the set of directories at which the framework will search for classes.');
         }
         call_user_func(APP_DIR_NAME.'\ini\InitAutoLoad::init');
+    }
+    /**
+     * The entry point for initiating the system.
+     * 
+     * @since 1.0
+     */
+    private function __construct() {
+        $this->_checkStdInOut();
+        $this->_initVersionInfo();
+        $this->_checkAppDir();
+        /**
+         * Change encoding of mb_ functions to UTF-8
+         */
+        if (function_exists('mb_internal_encoding')) {
+            $encoding = 'UTF-8';
+            mb_internal_encoding($encoding);
+            mb_http_output($encoding);
+            mb_regex_encoding($encoding);
+        }
+        $this->_loadConstants();
+        /**
+         * Set memory limit.
+         */
+        ini_set('memory_limit', defined('SCRIPT_MEMORY_LIMIT') ? SCRIPT_MEMORY_LIMIT : '2048M');
+        /**
+         * See http://php.net/manual/en/timezones.php for supported time zones.
+         * Change this as needed.
+         */
+        date_default_timezone_set(defined('DATE_TIMEZONE') ? DATE_TIMEZONE : 'Asia/Riyadh');
+
+        $this->_initAutoLoader();
 
         self::$SF = ConfigController::get();
 
@@ -298,9 +309,17 @@ class WebFioriApp {
      * @param Closure $regCallback A callback which is used to register the 
      * classes of the folder.
      * 
+     * @param string|null $suffix A string which is appended to class name.
+     * For example, if class name is 'UsersTable', the suffix in this case would 
+     * be 'Table' If provided, only classes with the specified suffix will 
+     * be considered.
+     * 
+     * @param array $otherParams An optional array that can hold extra parameters 
+     * which will be passed to the register callback.
+     * 
      * @since 1.3.6
      */
-    public static function autoRegister($folder, $regCallback) {
+    public static function autoRegister($folder, $regCallback, $suffix = null, array $otherParams= []) {
         $dir = ROOT_DIR.DS.APP_DIR_NAME.DS.$folder;
 
         if (Util::isDirectory($dir)) {
@@ -310,6 +329,14 @@ class WebFioriApp {
                 $expl = explode('.', $phpFile);
 
                 if (count($expl) == 2 && $expl[1] == 'php') {
+                    if ($suffix !== null) {
+                        $classSuffix = substr($expl[0], -1* strlen($suffix));
+                        
+                        if ($classSuffix !== $suffix) {
+                            continue;
+                        }
+                    }
+                    
                     $instanceNs = require_once $dir.DS.$phpFile;
 
                     if (strlen($instanceNs) == 0 || $instanceNs == 1) {
@@ -317,7 +344,11 @@ class WebFioriApp {
                     }
                     $class = $instanceNs.'\\'.$expl[0];
                     try {
-                        call_user_func_array($regCallback, [new $class()]);
+                        $toPass = [new $class()];
+                        foreach ($otherParams as $param) {
+                            $toPass[] = $param;
+                        }
+                        call_user_func_array($regCallback, $toPass);
                     } catch (\Error $ex) {
                     }
                 }

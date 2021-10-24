@@ -212,6 +212,11 @@ class RunSQLQueryCommand extends CLICommand {
 
         return $this->confirmExecute($schema);
     }
+    /**
+     * 
+     * @param type $schema
+     * @param Table $tableObj
+     */
     private function tableQuery($schema, $tableObj) {
         $queryTypes = [
             'Create database table.',
@@ -232,9 +237,9 @@ class RunSQLQueryCommand extends CLICommand {
         } else if ($selectedQuery == 'Add Forign Key.' || $selectedQuery == 'Drop Forign Key.') {
             $this->fkQuery($schema, $selectedQuery, $tableObj);
         } else if ($selectedQuery == 'Create database table.') {
-            $schema->table($tableObj->getName())->createTable();
+            $schema->table($tableObj->getNormalName())->createTable();
         } else if ($selectedQuery == 'Drop database table.') {
-            $schema->table($tableObj->getName())->drop();
+            $schema->table($tableObj->getNormalName())->drop();
         }       
     }
 }

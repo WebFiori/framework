@@ -4,10 +4,13 @@ namespace webfiori\framework\cli\helpers;
 use Error;
 use Exception;
 use webfiori\database\mysql\MySQLColumn;
+use webfiori\database\mssql\MSSQLColumn;
 use webfiori\database\mysql\MySQLTable;
+use webfiori\database\mssql\MSSQLTable;
 use webfiori\database\Table;
 use webfiori\framework\cli\commands\CreateCommand;
 use webfiori\framework\cli\writers\QueryClassWriter;
+use webfiori\database\ConnectionInfo;
 /**
  * A helper class for creating database tables classes.
  *
@@ -26,11 +29,16 @@ class CreateTableObj {
      */
     public function __construct(CreateCommand $command) {
         $this->command = $command;
-
+        $dbType = $this->_getCommand()->select('Database type:', ConnectionInfo::SUPPORTED_DATABASES);
+        
         $classInfo = $this->_getCommand()->getClassInfo(APP_DIR_NAME.'\\database');
 
 
-        $tempTable = new MySQLTable();
+        if ($dbType == 'mysql') {
+            $tempTable = new MySQLTable();
+        } else if ($dbType == 'mssql') {
+            $tempTable = new MSSQLTable();
+        }
         $this->_setTableName($tempTable);
         $this->_setTableComment($tempTable);
         $this->_getCommand()->println('Now you have to add columns to the table.');
@@ -42,7 +50,11 @@ class CreateTableObj {
                 $this->_getCommand()->warning("The table already has a key with name '$colKey'.");
                 continue;
             }
-            $col = new MySQLColumn();
+            if ($tempTable instanceof MySQLTable) {
+                $col = new MySQLColumn();
+            } else {
+                $col = new MSSQLColumn();
+            }
             $col->setName(str_replace('-', '_', str_replace(' ', '_', $colKey)));
             $colDatatype = $this->_getCommand()->select('Select column data type:', $col->getSupportedTypes(), 0);
             $col->setDatatype($colDatatype);
@@ -199,7 +211,7 @@ class CreateTableObj {
             }
             $this->_setDefaultValue($colObj);
             $colObj->setIsNull($this->_getCommand()->confirm('Can this column have null values?', false));
-        } else if ($colObj->getDatatype() == 'int') {
+        } else if ($colObj->getDatatype() == 'int' && $colObj instanceof MySQLColumn) {
             $colObj->setIsAutoInc($this->_getCommand()->confirm('Is this column auto increment?', false));
         }
     }
@@ -250,14 +262,23 @@ class CreateTableObj {
      */
     private function _setSize($colObj) {
         $type = $colObj->getDatatype();
-        $supportSize = $type == 'int' 
+        $mySqlSupportSize = $type == 'int' 
                 || $type == 'varchar'
                 || $type == 'decimal' 
                 || $type == 'float'
                 || $type == 'double' 
                 || $type == 'text';
+        $mssqlSupportSize = $type == 'char'
+                || $type == 'nchar'
+                || $type == 'varchar'
+                || $type == 'nvarchar'
+                || $type == 'binary'
+                || $type == 'varbinary'
+                || $type == 'decimal'
+                || $type == 'float';
 
-        if ($supportSize) {
+        if (($colObj instanceof MySQLColumn && $mySqlSupportSize)
+                || $colObj instanceof MSSQLColumn && $mssqlSupportSize) {
             $valid = false;
 
             do {

@@ -111,7 +111,7 @@ class DefaultSessionStorage implements SessionStorage {
      */
     public function read($sessionId) {
         if (!$this->isStorageDirExist()) {
-            return;
+            return null;
         }
         $file = new File($sessionId, $this->storeLoc);
 
@@ -143,13 +143,11 @@ class DefaultSessionStorage implements SessionStorage {
      * @since 1.0
      */
     public function save($sessionId, $session) {
-        if (!CLI::isCLI() || defined('__PHPUNIT_PHAR__')) {
+        if ((!CLI::isCLI() || defined('__PHPUNIT_PHAR__')) && $this->isStorageDirExist()) {
             //Session storage should be only allowed in testing env or http
-            if ($this->isStorageDirExist()) {
-                $file = new File($sessionId, $this->storeLoc);
-                $file->setRawData($session);
-                $file->write(false, true);
-            }
+            $file = new File($sessionId, $this->storeLoc);
+            $file->setRawData($session);
+            $file->write(false, true);
         }
     }
 }

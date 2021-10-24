@@ -725,7 +725,7 @@ class Page {
         $node = new HTMLNode();
 
         if ($loadedTheme !== null) {
-            $node = $loadedTheme->getHeadrNode();
+            $node = $loadedTheme->getHeaderNode();
         }
 
         if ($loadedTheme !== null && !$node instanceof HTMLNode) {

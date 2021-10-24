@@ -144,7 +144,7 @@ class WebServiceWriter extends ClassWriter {
     private function _writeHeaderSec() {
         $this->append("<?php\n");
         $this->append('namespace '.$this->getNamespace().";\n");
-        $this->append("use webfiori\\http\\AbstractWebService;");
+        $this->append("use webfiori\\framework\\AbstractWebService;");
         $this->append("");
         $this->append("/**");
         $this->append(" * A class that contains the implementation of the web service '".$this->servicesObj->getName()."'.");

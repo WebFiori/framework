@@ -79,39 +79,15 @@ class DB extends Database {
      * with the word 'Table' (e.g. UsersTable).
      * 
      * @param string $pathToScan A path which is relative to application source 
-     * code. For example, if tables classes exist in the folder 
-     * 'C:\Server\apache\htdocs\app\database', then the value of this 
-     * argument must be 'app\database\.
+     * code. For example, If your application folder name is 'app' 
+     * and if tables classes exist in the folder 'app\database', then the value of this 
+     * argument must be 'database'.
      * 
      * @since 1.0.1
      */
     public function register($pathToScan) {
-        $defaultNs = str_replace('/', '\\', $pathToScan);
-        $pathToScan = ROOT_DIR.DS.$pathToScan;
-        $filesInDir = array_diff(scandir($pathToScan), ['..', '.']);
-
-        self::_scanDir($filesInDir, $pathToScan, $defaultNs);
-    }
-    private function _scanDir($filesInDir, $pathToScan, $defaultNs) {
-        foreach ($filesInDir as $fileName) {
-            $fileExt = substr($fileName, -4);
-
-            if ($fileExt == '.php') {
-                $cName = str_replace('.php', '', $fileName);
-                $ns = require_once $pathToScan.DS.$fileName;
-                $aNs = gettype($ns) == 'string' ? $ns.'\\' : $defaultNs.'\\';
-
-                $aCName = $aNs.$cName;
-                $classSuffix = substr($aCName, -5);
-
-                if ($classSuffix == 'Table' && class_exists($aCName)) {
-                    $instance = new $aCName();
-
-                    if ($instance instanceof Table) {
-                        $this->addTable($instance);
-                    }
-                }
-            }
-        }
+        WebFioriApp::autoRegister($pathToScan, function (Table $table, DB $db) {
+            $db->addTable($table);
+        }, 'Table', [$this]);
     }
 }

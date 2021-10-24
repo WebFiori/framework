@@ -207,14 +207,6 @@ class ThemeLoader {
             self::$loadedThemes[$themeToLoad->getName()] = $themeToLoad;
             $themeToLoad->invokeBeforeLoaded();
 
-            $themeDir = THEMES_PATH.DS.$themeToLoad->getDirectoryName();
-
-            foreach ($themeToLoad->getComponents() as $component) {
-                if (file_exists($themeDir.DS.$component)) {
-                    require_once $themeDir.DS.$component;
-                }
-            }
-
             return $themeToLoad;
         }
     }

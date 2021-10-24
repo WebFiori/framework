@@ -13,6 +13,6 @@ class LanguageAR extends Language {
      */
     public function __construct(){
         parent::__construct('rtl', 'AR', true);
-        //TODO: Add the language "AR" labels.
+        
     }
 }

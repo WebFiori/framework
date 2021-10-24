@@ -1453,28 +1453,6 @@ abstract class AbstractJob implements JsonI {
             $this->isSuccess = false;
         }
     }
-    /**
-     * 
-     * @param type $val
-     * @return boolean
-     */
-    private function _validateAttrName($val) {
-        $len = strlen($val);
-
-        if ($len > 0) {
-            for ($x = 0 ; $x < $len ; $x++) {
-                $char = $val[$x];
-
-                if ($char == ' ' || $char == '=' || $char == '&' || $char == '#' || $char == '?') {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        return false;
-    }
     private function _weeklyOn($day,$time) {
         $timeSplit = explode(':', $time);
 

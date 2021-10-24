@@ -117,14 +117,6 @@ abstract class Theme implements JsonI {
      */
     private $page;
     /**
-     * An array that contains the names of theme component files.
-     * 
-     * @var array
-     * 
-     * @since 1.0 
-     */
-    private $themeComponents;
-    /**
      * An associative array that contains theme meta info.
      * 
      * @var array
@@ -176,46 +168,13 @@ abstract class Theme implements JsonI {
         $this->setJsDirName('js');
         $this->setImagesDirName('images');
         $this->setName($themeName);
-        $this->themeComponents = [];
 
         $this->beforeLoadedParamsPool = [];
         $this->beforeLoadedPool = [];
         $this->afterLoadedParamsPool = [];
         $this->afterLoadedPool = [];
     }
-    /**
-     * Adds a single component to the set of theme components.
-     * 
-     * Theme components are a set of PHP files that must exist inside theme 
-     * directory.
-     * 
-     * @param string $componentName The name of the component file (such as 'head.php')
-     * 
-     * @since 1.0
-     */
-    public function addComponent($componentName) {
-        $trimmed = trim($componentName);
-
-        if (strlen($trimmed) != 0 && !in_array($trimmed, $this->themeComponents)) {
-            $this->themeComponents[] = $trimmed;
-        }
-    }
-    /**
-     * Adds a set of theme components to the theme.
-     * 
-     * Theme components are a set of PHP files that must exist inside theme 
-     * directory. The developer can create any number of components and add 
-     * them to the theme.
-     * @param array $arr An array that contains the names of components files 
-     * (such as 'head.php').
-     * 
-     * @since 1.0
-     */
-    public function addComponents($arr) {
-        foreach ($arr as $component) {
-            $this->addComponent($component);
-        }
-    }
+    
     /**
      * Creates an instance of 'HTMLNode' given an array of options.
      * 
@@ -301,19 +260,7 @@ abstract class Theme implements JsonI {
             return WebFioriApp::getAppConfig()->getBaseURL();
         }
     }
-    /**
-     * Returns an array which contains the names of theme components files.
-     * 
-     * Theme components are a set of PHP files that must exist inside theme 
-     * directory.
-     * 
-     * @return array An array which contains the names of theme components files.
-     * 
-     * @since 1.0
-     */
-    public function getComponents() {
-        return $this->themeComponents;
-    }
+    
     /**
      * Returns the name of the directory where CSS files are kept.
      * 
@@ -409,7 +356,7 @@ abstract class Theme implements JsonI {
      * 
      * @since 1.2.2
      */
-    public abstract function getHeadrNode();
+    public abstract function getHeaderNode();
     /**
      * Returns the name of the directory where theme images are kept.
      * 
@@ -800,14 +747,13 @@ abstract class Theme implements JsonI {
      * &nbsp;&nbsp;"themeDirName":""<br/>
      * &nbsp;&nbsp;"cssDirName":""<br/>
      * &nbsp;&nbsp;"jsDirName":""<br/>
-     * &nbsp;&nbsp;"components":[]<br/>
      * }
      * </p>
      * 
      * @return Json An object of type Json.
      */
     public function toJSON() {
-        $j = new Json([
+        return new Json([
             'themesPath' => THEMES_PATH,
             'name' => $this->getName(),
             'url' => $this->getUrl(),
@@ -820,9 +766,6 @@ abstract class Theme implements JsonI {
             'themeDirName' => $this->getDirectoryName(),
             'cssDirName' => $this->getCssDirName(),
             'jsDirName' => $this->getJsDirName(),
-            'components' => $this->getComponents()
         ]);
-
-        return $j;
     }
 }

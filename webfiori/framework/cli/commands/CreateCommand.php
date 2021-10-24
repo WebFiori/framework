@@ -105,7 +105,6 @@ class CreateCommand extends CLICommand {
 
     public function exec() {
         $what = $this->getArgValue('--what');
-        $create = null;
 
         if ($what !== null) {
             if ($what == 'e') {

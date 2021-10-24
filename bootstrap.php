@@ -1,5 +1,5 @@
 <?php
-
+//Bootstrap file which is used to boot testing process.
 use webfiori\framework\AutoLoader;
 use webfiori\framework\WebFioriApp;
 
@@ -31,7 +31,6 @@ if (explode($DS, __DIR__)[0] == 'home') {
 
         if (file_exists($file)) {
             require_once $file;
-            //require_once $DS.$dir.'framework'.$DS.'WebFioriApp.php';
             $isAutoloaderLoaded = true;
             break;
         }
@@ -46,7 +45,6 @@ if (explode($DS, __DIR__)[0] == 'home') {
 
         if (file_exists($file)) {
             require_once $file;
-            //require_once $dir.$DS.'framework'.$DS.'WebFioriApp.php';
             $isAutoloaderLoaded = true;
             break;
         }
@@ -88,7 +86,7 @@ fprintf(STDOUT,'Root Directory: \''.AutoLoader::get()->root().'\'.'."\n");
 
 
 fprintf(STDOUT, "Registering shutdown function...\n");
-//run sum code after tests completion.
+//run code after tests completion.
 register_shutdown_function(function()
 {
 });

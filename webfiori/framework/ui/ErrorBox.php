@@ -220,8 +220,6 @@ class ErrorBox extends MessageBox {
         }
     }
     private static function _traceArrAsString($num, $arr) {
-        //echo '<pre>';
-        //var_dump($arr);
         $file = isset($arr['file']) ? $arr['file'] : $arr['function'];
         $line = $arr['line'];
         $class = isset($arr['class']) ? $arr['class'] : Util::extractClassName($file);

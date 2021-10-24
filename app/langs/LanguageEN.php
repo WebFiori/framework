@@ -13,6 +13,6 @@ class LanguageEN extends Language {
      */
     public function __construct(){
         parent::__construct('ltr', 'EN', true);
-        //TODO: Add the language "EN" labels.
+        
     }
 }

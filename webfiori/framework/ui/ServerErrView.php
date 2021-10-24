@@ -78,17 +78,17 @@ class ServerErrView {
 
         if (class_exists('webfiori\ui\HTMLNode')) {
             $this->_phpStructsExist($this->errOrThrowable);
-            $page = $this->page->render(false, true);
+            $webPage = $this->page->render(false, true);
         } else {
-            $page = $this->_phpStructsDoesNotexist($this->errOrThrowable);
+            $webPage = $this->_phpStructsDoesNotexist($this->errOrThrowable);
         }
 
         if ($responseExist) {
             Response::clear();
-            Response::write($page);
+            Response::write($webPage);
             Response::send();
         } else {
-            echo $page;
+            echo $webPage;
             die;
         }
     }
@@ -228,7 +228,7 @@ class ServerErrView {
         $this->page->setTitleSep(WebFioriApp::getAppConfig()->getTitleSep());
         $this->page->addCSS('https://cdn.jsdelivr.net/gh/webfiori/app@'.WF_VERSION.'/public/assets/css/server-err.css',[],false);
         $hNode = $this->page->insert('h1');
-        //var_dump($throwableOrErr);
+        
         if ($throwableOrErr instanceof Throwable) {
             $hNode->addTextNode('500 - Server Error: Uncaught Exception.');
 

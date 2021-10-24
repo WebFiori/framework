@@ -593,37 +593,43 @@ class AutoLoader {
         //For first run, the cache file might not exist.
         if (file_exists($autoloadCache)) {
             $casheStr = file_get_contents($autoloadCache);
-
-            $cacheArr = explode("\n", $casheStr);
-
-            foreach ($cacheArr as $ca) {
-                if (strlen(trim($ca)) !== 0) {
-                    $exploded = explode('=>', $ca);
-                    //Index 0 of the explode will contain the path to PHP class.
-                    //Index 1 of the explode will contain class namespace.
-                    if (isset($this->casheArr[$exploded[1]])) {
-                        if (!in_array($exploded[0], $this->casheArr[$exploded[1]])) {
-                            $this->casheArr[$exploded[1]][] = $exploded[0];
-                        }
-                    } else {
-                        //The cashe array hold namespace as index and a set of 
-                        //Pathes to the same class.
-                        $this->casheArr[$exploded[1]] = [
-                            $exploded[0]
-                        ];
-                    }
-                }
-            }
+            $this->_parseCacheString($casheStr);
+            
         } else {
-            if (!file_exists($autoloadCachePath)) {
-                mkdir($autoloadCachePath, 0777, true);
+            $this->_attemptCreateCache($autoloadCachePath, $autoloadCache);
+        }
+    }
+    private function _attemptCreateCache($autoloadCachePath, $autoloadCache) {
+        if (!file_exists($autoloadCachePath)) {
+            mkdir($autoloadCachePath, 0777, true);
+        }
+
+        if (!file_exists($autoloadCache) && is_writable($autoloadCachePath)) {
+            $h = fopen($autoloadCache, 'w');
+
+            if (is_resource($h)) {
+                fclose($h);
             }
+        }
+    }
+    private function _parseCacheString($str) {
+        $cacheArr = explode("\n", $str);
 
-            if (!file_exists($autoloadCache) && is_writable($autoloadCachePath)) {
-                $h = fopen($autoloadCache, 'w');
-
-                if (is_resource($h)) {
-                    fclose($h);
+        foreach ($cacheArr as $ca) {
+            if (strlen(trim($ca)) !== 0) {
+                $exploded = explode('=>', $ca);
+                //Index 0 of the explode will contain the path to PHP class.
+                //Index 1 of the explode will contain class namespace.
+                if (isset($this->casheArr[$exploded[1]])) {
+                    if (!in_array($exploded[0], $this->casheArr[$exploded[1]])) {
+                        $this->casheArr[$exploded[1]][] = $exploded[0];
+                    }
+                } else {
+                    //The cashe array hold namespace as index and a set of 
+                    //Pathes to the same class.
+                    $this->casheArr[$exploded[1]] = [
+                        $exploded[0]
+                    ];
                 }
             }
         }

@@ -370,12 +370,10 @@ class CLI {
                 $argsCount = count($_SERVER['argv']);
 
                 if ($argsCount >= 2) {
-                    if ($argsCount >= 2) {
-                        $exit = $_SERVER['argv'][1] == 'exit';
+                    $exit = $_SERVER['argv'][1] == 'exit';
 
-                        if (!$exit) {
-                            self::run();
-                        }
+                    if (!$exit) {
+                        self::run();
                     }
                 }
                 self::getOutputStream()->prints('>>');

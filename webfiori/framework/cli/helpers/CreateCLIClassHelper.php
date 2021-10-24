@@ -102,10 +102,8 @@ class CreateCLIClassHelper {
     private function _getCommandName() {
         return $this->_getCommand()->getInput('Enter a name for the command:', null, function ($val)
         {
-            if (strlen($val) > 0) {
-                if (strpos($val, ' ') === false) {
-                    return true;
-                }
+            if (strlen($val) > 0 && strpos($val, ' ') === false) {
+                return true;
             }
 
             return false;

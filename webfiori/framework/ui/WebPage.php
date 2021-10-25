@@ -949,20 +949,23 @@ class WebPage {
             }
 
             $this->document = new HTMLDoc();
-            $headNode = $this->_getHead();
-            $footerNode = $this->_getComponent('getFooterNode', self::MAIN_ELEMENTS[4]);
-            $asideNode = $this->_getComponent('getAsideNode', self::MAIN_ELEMENTS[3]);
-            $headerNode = $this->_getComponent('getHeaderNode', self::MAIN_ELEMENTS[1]);
-            $this->document->setLanguage($this->getLangCode());
-            $this->document->setHeadNode($headNode);
-            $this->document->addChild($headerNode);
+            $this->document->setHeadNode($this->_getHead());
+            
             $body = new HTMLNode();
             $body->setID(self::MAIN_ELEMENTS[0]);
-            $body->addChild($asideNode);
-
+            
+            $this->document->setLanguage($this->getLangCode());
+            
+            //Header first
+            $this->document->addChild($this->_getComponent('getHeaderNode', self::MAIN_ELEMENTS[1]));
+            
+            //Then body and inside it side and main
+            $body->addChild($this->_getComponent('getAsideNode', self::MAIN_ELEMENTS[3]));
             $body->addChild($mainContentArea);
             $this->document->addChild($body);
-            $this->document->addChild($footerNode);
+            
+            //Finally, footer
+            $this->document->addChild($this->_getComponent('getFooterNode', self::MAIN_ELEMENTS[4]));
 
             $this->theme->invokeAfterLoaded();
         }

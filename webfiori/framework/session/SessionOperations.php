@@ -20,7 +20,7 @@ class SessionOperations extends DB {
      */
     public function __construct() {
         parent::__construct('sessions-connection');
-        $this->addTable(new SessionsTable());
+        $this->addTable(new MySQLSessionsTable());
     }
     /**
      * Clears the sessions which are older than the constant 'SESSION_GC' or 

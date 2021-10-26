@@ -13,7 +13,7 @@ use webfiori\database\mysql\MySQLTable;
  * <li><b>session-data</b>: Name in database: '`session_data`'. Data type: 'mediumtext'.</li>
  * </ul>
  */
-class SessionsTable extends MySQLTable {
+class MySQLSessionsTable extends MySQLTable {
     /**
      * Creates new instance of the class.
      */

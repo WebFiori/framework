@@ -28,6 +28,8 @@ use webfiori\database\ConnectionInfo;
 use webfiori\database\Database;
 use webfiori\database\DatabaseException;
 use webfiori\database\Table;
+use webfiori\database\mysql\MySQLTable;
+use webfiori\database\mssql\MSSQLTable;
 
 /**
  * A class that can be used to represent system database.
@@ -72,11 +74,13 @@ class DB extends Database {
     /**
      * Auto-register database tables which exist on a specific directory.
      * 
-     * Note that the statement 'return __NAMESPACE__' must be included at the 
+     * Note that the statement 'return __NAMESPACE__' should be included at the 
      * end of the table class for auto-register to work. If the statement 
      * does not exist, the method will assume that the path is the namespace of 
      * the classes. Also, the classes which represents tables must be suffixed 
-     * with the word 'Table' (e.g. UsersTable).
+     * with the word 'Table' (e.g. UsersTable). Also, the registration will depend 
+     * on the database that the connection is for. For example, if the connection 
+     * is for MySQL database, then only tables of type 'MySQLTable'.
      * 
      * @param string $pathToScan A path which is relative to application source 
      * code. For example, If your application folder name is 'app' 
@@ -87,7 +91,17 @@ class DB extends Database {
      */
     public function register($pathToScan) {
         WebFioriApp::autoRegister($pathToScan, function (Table $table, DB $db) {
-            $db->addTable($table);
+            $connInfo = $db->getConnectionInfo();
+            
+            if ($connInfo !== null) {
+                $db->addTable($table);
+            } else {
+                if ($connInfo->getDatabaseType() == 'mysql' && $table instanceof MySQLTable) {
+                    $db->addTable($table);
+                } else if ($connInfo->getDatabaseType() == 'mssql' && $table instanceof MSSQLTable) {
+                    $db->addTable($table);
+                }
+            }
         }, 'Table', [$this]);
     }
 }

@@ -64,34 +64,44 @@ class RunSQLQueryCommand extends CLICommand {
         $schema = $this->getArgValue('--schema');
 
         if (count($dbConnections) != 0) {
-            if ($schema !== null && class_exists($schema)) {
-                $schemaInst = new $schema();
-
-                if ($schemaInst instanceof DB) {
-                    return $this->queryOnSchema($schemaInst);
+            if ($schema !== null) {
+                if (class_exists($schema)) {
+                    return $this->_schemaBased($schema);
                 } else {
-                    $this->error('Given class is not an instance of "webfiori\\framework\\DB"!');
-
-                    return -1;
+                    $this->warning('Schema not found: '.$schema);
+                    return $this->_connectionBased($dbConnections);
                 }
+                
             } else {
-                $connName = $this->getArgValue('--connection');
-
-                if ($connName === null) {
-                    $connName = $this->select('Select database connection:', $dbConnections, 0);
-                    $schema = new DB($connName);
-
-                    return $this->generalQuery($schema);
-                } else {
-                    if (!in_array($connName, $dbConnections)) {
-                        $this->error('No connection with name "'.$connName.'" was found!');
-
-                        return -1;
-                    }
-                }
+                return $this->_connectionBased($dbConnections);
             }
         } else {
             $this->error('No database connections available. Add connections inside the class \'AppConfig\' or use the command "add".');
+
+            return -1;
+        }
+    }
+    private function _connectionBased($dbConnections) {
+        $connName = $this->getArgValue('--connection');
+
+        if ($connName === null) {
+            $connName = $this->select('Select database connection:', $dbConnections, 0);
+            $schema = new DB($connName);
+
+            return $this->generalQuery($schema);
+        } else if (!in_array($connName, $dbConnections)) {
+            $this->error('No connection with name "'.$connName.'" was found!');
+
+            return -1;
+        }
+    }
+    private function _schemaBased($schema) {
+        $schemaInst = new $schema();
+
+        if ($schemaInst instanceof DB) {
+            return $this->queryOnSchema($schemaInst);
+        } else {
+            $this->error('Given class is not an instance of "webfiori\\framework\\DB"!');
 
             return -1;
         }

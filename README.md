@@ -38,7 +38,7 @@ The framework can be run on PHP 5.6 up to PHP 8.0 .
 * Fast routing system that makes the ability of creating search-engine-friendly URLs an easy task.
 * Creation of web services (or APIs) that supports JSON with data filtering and validation.
 * Middleware support which can help in filtering HTTP requests before reaching application level.
-* Basic support for MySQL schema and query building.
+* Basic support for MySQL and MSSQL schema and query building.
 * Lightweight. The total size of framework core files is less than 3 megabytes.
 * Access management by assigning system user a set of privileges.
 * Simple sessions manager.

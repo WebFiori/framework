@@ -372,16 +372,16 @@ abstract class ExtendedWebServicesManager extends WebServicesManager {
     /**
      * Auto-register services tables which exist on a specific directory.
      * 
-     * Note that the statement 'return __NAMESPACE__' must be included at the 
+     * Note that the statement 'return __NAMESPACE__' should be included at the 
      * end of service class for auto-register to work. If the statement 
      * does not exist, the method will assume that the path is the namespace of 
      * each class. Also, the classes which represents web services must be suffixed 
-     * with the word 'Service' (e.g. RegisterUserService).
+     * with the word 'Service' in order to register them (e.g. RegisterUserService).
      * 
      * @param string $pathToScan A path which is relative to application source 
-     * code. For example, if tables classes exist in the folder 
-     * 'C:\Server\apache\htdocs\app\apis', then the value of this 
-     * argument must be 'app\apis\.
+     * code folder. For example, if application folder name is 'my-app' and 
+     * the web services are in the folder 'my-app/apis/user,
+     * then the value of the argument must be 'apis/user'.
      * 
      * @since 1.0.1
      */
@@ -389,8 +389,6 @@ abstract class ExtendedWebServicesManager extends WebServicesManager {
         WebFioriApp::autoRegister($pathToScan, function (AbstractWebService $ws, ExtendedWebServicesManager $m) {
             $m->addService($ws);
         }, 'Service', [$this]);
-
-        self::_scanDir($filesInDir, $pathToScan, $defaultNs);
     }
     /**
      * Sends a response message to indicate that request method is not supported.

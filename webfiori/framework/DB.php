@@ -91,7 +91,17 @@ class DB extends Database {
      */
     public function register($pathToScan) {
         WebFioriApp::autoRegister($pathToScan, function (Table $table, DB $db) {
-            $db->addTable($table);
+            $connInfo = $db->getConnectionInfo();
+            
+            if ($connInfo !== null) {
+                $db->addTable($table);
+            } else {
+                if ($connInfo->getDatabaseType() == 'mysql' && $table instanceof MySQLTable) {
+                    $db->addTable($table);
+                } else if ($connInfo->getDatabaseType() == 'mssql' && $table instanceof MSSQLTable) {
+                    $db->addTable($table);
+                }
+            }
         }, 'Table', [$this]);
     }
     /**

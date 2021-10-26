@@ -326,7 +326,11 @@ class WebFioriApp {
 
         if (Util::isDirectory($dir)) {
             $dirContent = array_diff(scandir($dir), ['.','..']);
-
+            
+            //Since it will be used to build class namespace, each
+            //backslash must be replaced with forward slash.
+            $folder = str_replace('/', '\\', $folder);
+            
             foreach ($dirContent as $phpFile) {
                 $expl = explode('.', $phpFile);
 

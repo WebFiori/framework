@@ -99,7 +99,7 @@ class SMTPServer {
      * 
      * @since 1.0
      */
-    public function getLastLogMessage() {
+    public function getLastResponse() {
         return $this->lastResponse;
     }
     public function getServerOptions() {
@@ -149,9 +149,9 @@ class SMTPServer {
         if (!$this->isConnected()) {
             set_error_handler(function($errno, $errstr, $errfile, $errline)
             {
-                echo 'ErrorNo: '.$errno."\n";;
-                echo 'ErrorLine: '.$errline."\n";;
-                echo 'ErrorStr: '.$errstr."\n";;
+                echo 'ErrorNo: '.$errno."\n";
+                echo 'ErrorLine: '.$errline."\n";
+                echo 'ErrorStr: '.$errstr."\n";
             });
             $portNum = $this->getPort();
             $protocol = '';
@@ -167,15 +167,22 @@ class SMTPServer {
             $this->conn = $this->_tryConnect($protocol, $err, $errStr);
             
             if ($this->conn === false) {
-                $this->conn = $this->_tryConnect($protocol, $err, $errStr);
+                $this->conn = $this->_tryConnect('', $err, $errStr);
             }
             
             set_error_handler(null);
 
             if (is_resource($this->conn)) {
                 $this->_log('-', 0, $this->read());
-                if ($this->sendCommand('EHLO '.$this->host)) {
-                    $retVal = true;
+                if ($this->sendHello()) {
+                    if (in_array('STARTTLS', $this->getServerOptions())) {
+                        if ($this->_switchToTls()) {
+                            $this->sendHello();
+                            $retVal = true;
+                        }
+                    } else {
+                        $retVal = true;
+                    }
                 }
             } else {
                 $retVal = false;
@@ -279,15 +286,35 @@ class SMTPServer {
             $logEntry['response-code'] = $this->getLastResponseCode();
             $this->responseLog[] = $logEntry;
             
-            if (substr($command, 0, 4) == 'HELO' || substr($command, 0, 4) == 'EHLO') {
-                $this->_parseHelloResponse($response);
-            }
             return true;
         } else {
             $this->responseLog[] = $logEntry;
 
             return false;
         }
+    }
+    private function _switchToTls() {
+        $crypMethod = STREAM_CRYPTO_METHOD_TLS_CLIENT 
+                | STREAM_CRYPTO_METHOD_TLSv1_1_CLIENT
+                | STREAM_CRYPTO_METHOD_TLSv1_1_CLIENT;
+
+
+        set_error_handler(function () {});
+        $success = stream_socket_enable_crypto(
+            $this->conn,
+            true,
+            $crypMethod
+        );
+        restore_error_handler();
+
+        return $success === true;
+    }
+    public function sendHello() {
+        if($this->sendCommand('EHLO '.$this->getHost())) {
+            $this->_parseHelloResponse($this->getLastResponse());
+            return true;
+        }
+        return false;
     }
     /**
      * Sets the timeout time of the connection.

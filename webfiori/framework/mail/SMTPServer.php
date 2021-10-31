@@ -1,6 +1,6 @@
 <?php
 
-namespace webfiori\tests\entity\mail;
+namespace webfiori\framework\mail;
 
 /**
  * A class which can be used to connect to SMTP server and execute commands on it.

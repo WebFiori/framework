@@ -26,6 +26,7 @@ namespace webfiori\framework\mail;
 
 use webfiori\framework\ConfigController;
 use webfiori\framework\mail\SMTPServer;
+use webfiori\framework\mail\SMTPAccount;
 use webfiori\framework\exceptions\SMTPException;
 use webfiori\framework\File;
 use webfiori\framework\WebFioriApp;
@@ -171,12 +172,14 @@ class EmailMessage {
         ];
         $this->attachments = [];
         $this->inReplyTo = [];
+        $this->asHtml = new HTMLDoc();
         
         if (class_exists(APP_DIR_NAME.'\AppConfig')) {
             $acc = WebFioriApp::getAppConfig()->getAccount($sendAccountName);
 
             if ($acc instanceof SMTPAccount) {
                 $this->smtpAcc = $acc;
+                return;
             }
             throw new SMTPException('No SMTP account was found which has the name "'.$sendAccountName.'".');
         }
@@ -489,6 +492,17 @@ class EmailMessage {
             }
             $this->smtpServer->sendCommand('--'.$this->boundry.'--');
         }
+    }
+    /**
+     * Returns the priority of the message.
+     * 
+     * @return int The priority of the message. -1 for non-urgent, 0 
+     * for normal and 1 for urgent. Default value is 0.
+     * 
+     * @since 2.0
+     */
+    public function getPriority() {
+        return $this->priority;
     }
     private function _priorityCommand() {
         $priorityAsInt = $this->getPriority();

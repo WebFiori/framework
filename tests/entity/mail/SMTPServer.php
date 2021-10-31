@@ -3,7 +3,7 @@
 namespace webfiori\tests\entity\mail;
 
 /**
- * Description of SMTPServer
+ * A class which can be used to connect to SMTP server and execute commands on it.
  *
  * @author Ibrahim
  * 
@@ -60,14 +60,54 @@ class SMTPServer {
     private $responseLog;
     /**
      * Connection timeout (in minutes)
+     * 
      * @var int 
      */
     private $timeout;
+    /**
+     * Initiates new instance of the class.
+     * 
+     * @param string $serverAddress SMTP Server address such as 'smtp.example.com'.
+     * 
+     * @param string $port SMTP server port such as 25, 465 or 587.
+     */
     public function __construct($serverAddress, $port) {
         $this->port = $port;
         $this->host = $serverAddress;
         $this->serverOptions = [];
         $this->timeout = 5;
+    }
+    /**
+     * Use plain authorization method to log in the user to SMTP server.
+     * 
+     * This method will attempt to establish a connection to SMTP server if 
+     * the method 'SMTPServer::connect()' is called.
+     * 
+     * @param string $username The username of SMTP server user.
+     * 
+     * @param string $pass The password of the user.
+     * 
+     * @return boolean If the user is authenticated successfully, the method
+     * will return true. Other than that, the method will return false.
+     * 
+     * @since 1.0
+     */
+    public function authLogin($username, $pass) {
+        if (!$this->isConnected()) {
+            $this->connect();
+            
+            if (!$this->isConnected()) {
+                return false;
+            }
+        }
+        $this->sendCommand('AUTH LOGIN');
+        $this->sendCommand(base64_encode($username));
+        $this->sendCommand(base64_encode($pass));
+        
+        if ($this->getLastResponseCode() == 535) {
+            return false;
+        }
+        return true;
     }
     /**
      * Returns the last command which was sent to SMTP server.
@@ -102,14 +142,31 @@ class SMTPServer {
     public function getLastResponse() {
         return $this->lastResponse;
     }
+    /**
+     * Returns an array that contains server supported commands.
+     * 
+     * The method will only be able to get the options after sending the 
+     * command 'EHLO' to the server. The array will be empty if not 
+     * connected to SMTP server.
+     * 
+     * @return array An array that holds supported SMTP server options.
+     * 
+     * @since 1.0
+     */
     public function getServerOptions() {
         return $this->serverOptions;
     }
     private function _parseHelloResponse($response) {
         $split = explode(self::NL, $response);
+        $index = 0;
+        $this->serverOptions = [];
         foreach ($split as $part) {
-            $xPart = substr($part, 4);
-            $this->serverOptions[] = $xPart;
+            //Index 0 will usually hold server address
+            if ($index != 0) {
+                $xPart = substr($part, 4);
+                $this->serverOptions[] = $xPart;
+            }
+            $index++;
         }
     }
     private function _tryConnect($protocol) {
@@ -130,7 +187,7 @@ class SMTPServer {
                     'crypto_type' => STREAM_CRYPTO_METHOD_TLSv1_2_SERVER
                 ]
             ]);
-            var_dump(STREAM_CRYPTO_METHOD_TLSv1_2_SERVER);
+
             
             $this->_log('Connect', 0, 'Trying to connect to the server using "stream_socket_client"...');
             $conn = stream_socket_client($protocol.$host.':'.$portNum, $err, $errStr, $timeout * 60, STREAM_CLIENT_CONNECT, $context);
@@ -143,15 +200,21 @@ class SMTPServer {
         }
         return $conn;
     }
+    /**
+     * Connects to SMTP server.
+     * 
+     * @return boolean If the connection was established and the 'EHLO' command 
+     * was successfully sent, the method will return true. Other than that, the 
+     * method will return false.
+     * 
+     * @since 1.0
+     */
     public function connect() {
         $retVal = true;
 
         if (!$this->isConnected()) {
             set_error_handler(function($errno, $errstr, $errfile, $errline)
             {
-                echo 'ErrorNo: '.$errno."\n";
-                echo 'ErrorLine: '.$errline."\n";
-                echo 'ErrorStr: '.$errstr."\n";
             });
             $portNum = $this->getPort();
             $protocol = '';
@@ -179,6 +242,8 @@ class SMTPServer {
                         if ($this->_switchToTls()) {
                             $this->sendHello();
                             $retVal = true;
+                        } else {
+                            $retVal = false;
                         }
                     } else {
                         $retVal = true;
@@ -193,19 +258,17 @@ class SMTPServer {
     }
     /**
      * Read server response after sending a command to the server.
+     * 
      * @return string
+     * 
      * @since 1.0
      */
     public function read() {
         $message = '';
-        $lastComm = $this->getLastSentCommand();
         
         while (!feof($this->conn)) {
             $str = fgets($this->conn);
             
-            if ($lastComm == 'EHLO' && strlen($message) != 0) {
-                $this->_addServerOption($str);
-            }
             $message .= $str;
             
             if (!isset($str[3]) || (isset($str[3]) && $str[3] == ' ')) {
@@ -221,20 +284,20 @@ class SMTPServer {
      * commands which was sent to the server.
      * 
      * @return array The array will hold sub-associative arrays. Each array 
-     * will have 3 indices, '
+     * will have 3 indices, 'command', 'response-code' and 'response-message'
+     * 
+     * @since 1.0
      */
     public function getLog() {
         return $this->responseLog;
     }
-    private function _addServerOption($str) {
-        $option = trim(substr($str, 3),"- ".self::NL);
-        $this->serverOptions[] = $option;
-    }
     /**
      * Sets the code that was the result of executing SMTP command.
+     * 
      * @param string $serverResponseMessage The last message which was sent by 
      * the server after executing specific command.
-     * @since 1.4.7
+     * 
+     * @since 1.0
      */
     private function _setLastResponseCode($serverResponseMessage) {
         $firstNum = $serverResponseMessage[0];
@@ -266,11 +329,6 @@ class SMTPServer {
      */
     public function sendCommand($command) {
         $this->lastCommand = explode(' ', $command)[0];
-        $logEntry = [
-            'command' => $command,
-            'response-code' => 0,
-            'response-message' => ''
-        ];
 
         if ($this->lastResponseCode >= 400) {
             throw new SMTPException('Unable to send SMTP commend "'.$command.'" due to '
@@ -282,33 +340,52 @@ class SMTPServer {
             fwrite($this->conn, $command.self::NL);
             $response = trim($this->read());
             $this->lastResponse = $response;
-            $logEntry['response-message'] = $response;
-            $logEntry['response-code'] = $this->getLastResponseCode();
-            $this->responseLog[] = $logEntry;
+            $this->_log($command, $this->getLastResponseCode(), $response);
             
             return true;
         } else {
-            $this->responseLog[] = $logEntry;
+            $this->_log($command, 0, '');
 
             return false;
         }
     }
     private function _switchToTls() {
-        $crypMethod = STREAM_CRYPTO_METHOD_TLS_CLIENT 
-                | STREAM_CRYPTO_METHOD_TLSv1_1_CLIENT
-                | STREAM_CRYPTO_METHOD_TLSv1_1_CLIENT;
+        $this->sendCommand('STARTTLS');
+        $cryptoMethod = STREAM_CRYPTO_METHOD_TLS_CLIENT;
+
+        if (defined('STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT')) {
+            $cryptoMethod |= STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT;
+            $cryptoMethod |= STREAM_CRYPTO_METHOD_TLSv1_1_CLIENT;
+        }
 
 
-        set_error_handler(function () {});
+        set_error_handler(function ($errno, $errstr, $errfile, $errline)
+            {
+                echo 'ErrorNo: '.$errno."\n";
+                echo 'ErrorLine: '.$errline."\n";
+                echo 'ErrorStr: '.$errstr."\n";
+                
+            });
         $success = stream_socket_enable_crypto(
             $this->conn,
             true,
-            $crypMethod
+            $cryptoMethod
         );
         restore_error_handler();
 
         return $success === true;
     }
+    /**
+     * Sends 'EHLO' command to SMTP server.
+     * 
+     * The developer does not have to call this method manually as its 
+     * called when connecting to SMTP server.
+     * 
+     * @return boolean If the command was sent successfully, the method will 
+     * return true. Other than that, the method will return false.
+     * 
+     * @since 1.0
+     */
     public function sendHello() {
         if($this->sendCommand('EHLO '.$this->getHost())) {
             $this->_parseHelloResponse($this->getLastResponse());
@@ -331,8 +408,9 @@ class SMTPServer {
         }
     }
     /**
+     * Returns SMTP server port number.
      * 
-     * @return type
+     * @return int Common values are : 25, 465 (SSL) and 586 (TLS).
      * 
      * @since 1.0
      */
@@ -340,8 +418,9 @@ class SMTPServer {
         return $this->port;
     }
     /**
+     * Returns SMTP server host address.
      * 
-     * @return type
+     * @return string A string such as 'smtp.example.com'.
      * 
      * @since 1.0
      */

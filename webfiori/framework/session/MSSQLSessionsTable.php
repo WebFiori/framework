@@ -38,7 +38,7 @@ class MSSQLSessionsTable extends MSSQLTable {
                 'comment' => 'The date and time at which the user has activity during the session.',
             ],
             'session-data' => [
-                'type' => 'varbinary',
+                'type' => 'varchar',
                 'size' => '4000',
                 'comment' => 'Session state.',
             ],

@@ -117,27 +117,4 @@ class DB extends Database {
             }
         }
     }
-    /**
-     * Adds a table to the instance.
-     * 
-     * @param Table $table the table that will be added.
-     * 
-     * @return boolean If the table is added, the method will return true. False 
-     * otherwise.
-     * 
-     * @since 1.0
-     */
-    public function addTable(Table $table) {
-        $connInfo = $this->getConnectionInfo();
-            
-        if ($connInfo !== null) {
-            parent::addTable($table);
-        } else {
-            if ($connInfo->getDatabaseType() == 'mysql' && $table instanceof MySQLTable) {
-                parent::addTable($table);
-            } else if ($connInfo->getDatabaseType() == 'mssql' && $table instanceof MSSQLTable) {
-                parent::addTable($table);
-            }
-        }
-    }
 }

@@ -163,6 +163,7 @@ class EmailMessage {
      */
     public function __construct($sendAccountName = '') {
         $this->log = [];
+        $this->subject = 'Hello From WebFiori Framework';
         $this->setPriority(0);
         $this->boundry = hash('sha256', date(DATE_ISO8601));
         $this->receiversArr = [
@@ -179,6 +180,7 @@ class EmailMessage {
 
             if ($acc instanceof SMTPAccount) {
                 $this->smtpAcc = $acc;
+                $this->smtpServer = new SMTPServer($acc->getServerAddress(), $acc->getPort());
                 return;
             }
             throw new SMTPException('No SMTP account was found which has the name "'.$sendAccountName.'".');
@@ -296,7 +298,7 @@ class EmailMessage {
         $arr = [];
 
         foreach ($this->receiversArr[$type] as $address => $name) {
-            array_push($arr, '=?UTF-8?B?'.base64_encode($name).'?='.' <'.$address.'>');
+            $arr[] =  '=?UTF-8?B?'.base64_encode($name).'?='.' <'.$address.'>';
         }
 
         return implode(',', $arr);
@@ -313,7 +315,7 @@ class EmailMessage {
      * @since 1.0.3
      */
     public function getBCCStr() {
-        $this->_getReceiversStr('bcc');
+        return $this->_getReceiversStr('bcc');
     }
     /**
      * Returns an associative array that contains the names and the addresses 
@@ -327,7 +329,7 @@ class EmailMessage {
      * @since 1.0.2
      */
     public function getCC() {
-        $this->receiversArr['cc'];
+        return $this->receiversArr['cc'];
     }
     /**
      * Returns a string that contains the names and the addresses 
@@ -341,7 +343,7 @@ class EmailMessage {
      * @since 1.0.3
      */
     public function getCCStr() {
-        $this->_getReceiversStr('cc');
+        return $this->_getReceiversStr('cc');
     }
     /**
      * Returns a child node given its ID.
@@ -371,11 +373,7 @@ class EmailMessage {
      * @since 1.0.4
      */
     public function getLog() {
-        if ($this->_getSocketMailer() !== null) {
-            return $this->_getSocketMailer()->getResponsesLog();
-        }
-
-        return $this->log;
+        return $this->smtpServer->getLog();
     }
     /**
      * Returns an associative array that contains the names and the addresses 
@@ -452,19 +450,19 @@ class EmailMessage {
             
             $this->smtpServer->sendCommand('Content-Transfer-Encoding: quoted-printable');
             $this->smtpServer->sendCommand('Importance: '.$importanceHeaderVal);
-            $this->smtpServer->sendCommand('From: =?UTF-8?B?'. base64_encode($acc->getSenderName()).'?= <'.$acc->getSenderName().'>');
+            $this->smtpServer->sendCommand('From: =?UTF-8?B?'. base64_encode($acc->getSenderName()).'?= <'.$acc->getAddress().'>');
             $this->smtpServer->sendCommand('To: '.$this->getToStr());
             $this->smtpServer->sendCommand('CC: '.$this->getCCStr());
             $this->smtpServer->sendCommand('BCC: '.$this->getBCCStr());
             $this->smtpServer->sendCommand('Date:'.date('r (T)'));
             $this->smtpServer->sendCommand('Subject:'.'=?UTF-8?B?'.base64_encode($this->getSubject()).'?=');
             $this->smtpServer->sendCommand('MIME-Version: 1.0');
-            $this->smtpServer->sendCommand('Content-Type: multipart/mixed; boundary="'.$this->boundry.'"'.self::NL);
+            $this->smtpServer->sendCommand('Content-Type: multipart/mixed; boundary="'.$this->boundry.'"'.SMTPServer::NL);
             $this->smtpServer->sendCommand('--'.$this->boundry);
-            $this->smtpServer->sendCommand('Content-Type: text/html; charset="UTF-8"'.self::NL);
+            $this->smtpServer->sendCommand('Content-Type: text/html; charset="UTF-8"'.SMTPServer::NL);
             $this->smtpServer->sendCommand($this->_trimControlChars($this->getDocument()->toHTML()));
             $this->_appendAttachments();
-            $this->smtpServer->sendCommand(self::NL.'.');
+            $this->smtpServer->sendCommand(SMTPServer::NL.'.');
             $this->smtpServer->sendCommand('QUIT');
             
         } else {
@@ -484,13 +482,13 @@ class EmailMessage {
                 }
                 $content = $file->getRawData();
                 $contentChunk = chunk_split(base64_encode($content));
-                $this->smtpServer->sendCommand('--'.$this->boundry);
+                $this->smtpServer->sendCommand('--'.$this->boundry.SMTPServer::NL);
                 $this->smtpServer->sendCommand('Content-Type: '.$file->getFileMIMEType().'; name="'.$file->getName().'"');
                 $this->smtpServer->sendCommand('Content-Transfer-Encoding: base64');
-                $this->smtpServer->sendCommand('Content-Disposition: attachment; filename="'.$file->getName().'"'.self::NL);
+                $this->smtpServer->sendCommand('Content-Disposition: attachment; filename="'.$file->getName().'"'.SMTPServer::NL);
                 $this->smtpServer->sendCommand($contentChunk);
             }
-            $this->smtpServer->sendCommand('--'.$this->boundry.'--');
+            $this->smtpServer->sendCommand('--'.$this->boundry.'--'.SMTPServer::NL);
         }
     }
     /**
@@ -532,14 +530,19 @@ class EmailMessage {
         return $this->smtpAcc;
     }
     /**
-     * Adds a text node to the body of the message.
+     * Returns an object that holds SMTP server information.
      * 
-     * @param string $text The text that will be in the body of the node.
+     * The returned instance can be used to access SMTP server messages log 
+     * to see if the message was transfered or not. Note that the 
+     * connection to the server will only be established once the 
+     * method 'EmailMessage::send()'.
      * 
-     * @since 1.0
+     * @return SMTPServer An instance which represents SMTP server.
+     * 
+     * @since 1.0.5
      */
-    public function write($text) {
-        $this->getDocument()->addChild(HTMLNode::createTextNode($text,false));
+    public function getSMTPServer() {
+        return $this->smtpServer;
     }
     /**
      * Returns the document that is associated with the page.

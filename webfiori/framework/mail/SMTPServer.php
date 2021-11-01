@@ -10,6 +10,7 @@ namespace webfiori\framework\mail;
  * @version 1.0
  */
 class SMTPServer {
+    private $isWriting;
     private $lastCommand;
     const NL = "\r\n";
     private $serverOptions;
@@ -76,6 +77,9 @@ class SMTPServer {
         $this->host = $serverAddress;
         $this->serverOptions = [];
         $this->timeout = 5;
+        $this->lastResponse = '';
+        $this->lastResponseCode = 0;
+        $this->isWriting = false;
     }
     /**
      * Use plain authorization method to log in the user to SMTP server.
@@ -338,9 +342,22 @@ class SMTPServer {
 
         if ($this->isConnected()) {
             fwrite($this->conn, $command.self::NL);
-            $response = trim($this->read());
-            $this->lastResponse = $response;
-            $this->_log($command, $this->getLastResponseCode(), $response);
+            if (!$this->isInWritingMode()) {
+                $response = trim($this->read());
+                $this->lastResponse = $response;
+                $this->_log($command, $this->getLastResponseCode(), $response);
+            } else {
+                $this->_log($command, 0, '-');
+            }
+            if ($command == 'DATA') {
+                $this->isWriting = true;
+            }
+            if ($command == self::NL.'.') {
+                $this->writeMode = false;
+                $response = trim($this->read());
+                $this->lastResponse = $response;
+                $this->_log($command, $this->getLastResponseCode(), $response);
+            }
             
             return true;
         } else {
@@ -348,6 +365,19 @@ class SMTPServer {
 
             return false;
         }
+    }
+    /**
+     * Checks if the server is in message writing mode.
+     * 
+     * The server will be in writing mode if the command 'DATA' was sent.
+     * 
+     * @return boolean If the server is in message writing mode, the method 
+     * will return true. False otherwise.
+     * 
+     * @since 1.0
+     */
+    public function isInWritingMode() {
+        return $this->isWriting;
     }
     private function _switchToTls() {
         $this->sendCommand('STARTTLS');

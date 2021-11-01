@@ -39,7 +39,7 @@ class MSSQLSessionsTable extends MSSQLTable {
             ],
             'session-data' => [
                 'type' => 'varchar',
-                'size' => '50000',
+                'size' => '4000',
                 'comment' => 'Session state.',
             ],
         ]);

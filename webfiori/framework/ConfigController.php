@@ -29,6 +29,7 @@ use webfiori\framework\cli\writers\LangClassWriter;
 use webfiori\framework\exceptions\SMTPException;
 use webfiori\framework\mail\SMTPAccount;
 use webfiori\framework\mail\SocketMailer;
+use webfiori\framework\mail\SMTPServer;
 
 /**
  * A class that can be used to modify basic configuration settings of 
@@ -633,49 +634,6 @@ class ConfigController {
         return [];
     }
     /**
-     * Returns a new instance of the class SocketMailer.
-     * 
-     * The method will try to establish a connection to SMTP server using 
-     * the given SMTP account.
-     * 
-     * @param SMTPAccount $emailAcc An account that is used to initiate 
-     * socket mailer.
-     * 
-     * @return SocketMailer|string The method will return an instance of SocketMailer
-     * on successful connection. If no connection is established, the method will 
-     * return MailFunctions::INV_HOST_OR_PORT. If user authentication fails, 
-     * the method will return 'MailFunctions::INV_CREDENTIALS'.
-     * 
-     * @since 1.0
-     */
-    public function getSocketMailer(SMTPAccount $emailAcc) {
-        if ($emailAcc instanceof SMTPAccount) {
-            $retVal = self::INV_HOST_OR_PORT;
-            $m = new SocketMailer();
-
-            $m->setHost($emailAcc->getServerAddress());
-            $m->setPort($emailAcc->getPort());
-
-            if ($m->connect()) {
-                try {
-                    $m->setSender($emailAcc->getSenderName(), $emailAcc->getAddress());
-
-                    if ($m->login($emailAcc->getUsername(), $emailAcc->getPassword())) {
-                        $retVal = $m;
-                    } else {
-                        $retVal = self::INV_CREDENTIALS;
-                    }
-                } catch (\Exception $ex) {
-                    throw new SMTPException($ex->getMessage());
-                }
-            }
-
-            return $retVal;
-        }
-
-        return false;
-    }
-    /**
      * Returns an array that holds different page titles for the web application 
      * on different languages.
      * 
@@ -826,33 +784,15 @@ class ConfigController {
      * 
      * @param SMTPAccount $emailAccount An instance of 'SMTPAccount'.
      * 
-     * @return boolean|string The method will return true if the email 
-     * account was updated or added. If the email account contains wrong server
-     *  information, the method will return MailFunctions::INV_HOST_OR_PORT. 
-     * If the given email account contains wrong login info, the method will 
-     * return MailFunctions::INV_CREDENTIALS. Other than that, the method 
-     * will return false.
      * 
      * @since 1.1
      */
     public function updateOrAddEmailAccount(SMTPAccount $emailAccount) {
-        $retVal = false;
-
-        if ($emailAccount instanceof SMTPAccount) {
-            $sm = $this->getSocketMailer($emailAccount);
-
-            if ($sm instanceof SocketMailer) {
-                $accountsArr = $this->getSMTPAccounts();
-                $accountsArr[$emailAccount->getAccountName()] = $emailAccount;
-                $this->writeAppConfig([
-                    'smtp' => $accountsArr
-                ]);
-                $retVal = true;
-            }
-            $retVal = $sm;
-        }
-
-        return $retVal;
+        $accountsArr = $this->getSMTPAccounts();
+        $accountsArr[$emailAccount->getAccountName()] = $emailAccount;
+        $this->writeAppConfig([
+            'smtp' => $accountsArr
+        ]);
     }
     /**
      * Updates web site configuration based on some attributes.

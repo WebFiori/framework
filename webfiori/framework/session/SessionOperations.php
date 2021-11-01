@@ -58,11 +58,7 @@ class SessionOperations extends DB {
         $resultSet = $this->getLastResultSet();
 
         if ($resultSet->getRowsCount() == 1) {
-            if ($this->getTable('sessions') instanceof MSSQLSessionsTable) {
-                return pack('H*', $resultSet->getRows()[0]['session_data']);
-            } else {
-                return $resultSet->getRows()[0]['session_data'];
-            }
+            return $resultSet->getRows()[0]['session_data'];
         }
     }
     /**

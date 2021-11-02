@@ -1,7 +1,6 @@
 <?php
 namespace webfiori\tests\entity;
 use PHPUnit\Framework\TestCase;
-use webfiori\framework\Page;
 use webfiori\ui\HTMLNode;
 use webfiori\framework\Theme;
 use webfiori\framework\i18n\Language;

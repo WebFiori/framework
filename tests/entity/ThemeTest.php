@@ -22,7 +22,7 @@ class ThemeTest extends TestCase {
         $theme = ThemeLoader::usingTheme();
         $j = $theme->toJSON();
         $j->setPropsStyle('camel');
-        $this->assertEquals('{"themesPath":"'. \webfiori\json\Json::escapeJSONSpecialChars(THEMES_PATH).'", "name":"New Fiori", "url":"", "license":"MIT", "licenseUrl":"", "version":"1.0", "author":"", "authorUrl":"", "imagesDirName":"images", "themeDirName":"new-wf", "cssDirName":"css", "jsDirName":"js"}',$j.'');
+        $this->assertEquals('{"themesPath":"'. \webfiori\json\Json::escapeJSONSpecialChars(THEMES_PATH).'", "name":"New Fiori", "url":"", "license":"MIT", "licenseUrl":"", "version":"1.0", "author":"", "authorUrl":"", "imagesDirName":"images", "themeDirName":"newFiori", "cssDirName":"css", "jsDirName":"js"}',$j.'');
     }
     /**
      * @test

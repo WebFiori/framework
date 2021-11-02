@@ -178,9 +178,9 @@ class PageTest extends TestCase{
     public function testDirs01() {
         $page = new WebPage();
         $page->setTheme();
-        $this->assertEquals('assets/new-wf/css',$page->getThemeCSSDir());
-        $this->assertEquals('assets/new-wf/images',$page->getThemeImagesDir());
-        $this->assertEquals('assets/new-wf/js',$page->getThemeJSDir());
+        $this->assertEquals('assets/newFiori/css',$page->getThemeCSSDir());
+        $this->assertEquals('assets/newFiori/images',$page->getThemeImagesDir());
+        $this->assertEquals('assets/newFiori/js',$page->getThemeJSDir());
     }
     /**
      * @test

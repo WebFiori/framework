@@ -1,5 +1,5 @@
 <?php
-namespace webfiori\theme;
+namespace themes\greeny;
 
 use webfiori\framework\Page;
 use webfiori\framework\Theme;

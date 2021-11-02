@@ -1,5 +1,5 @@
 <?php
-namespace webfiori\theme;
+namespace themes\webfiori;
 
 use webfiori\framework\Page;
 use webfiori\framework\Theme;
@@ -9,6 +9,7 @@ use webfiori\ui\HTMLNode;
 use webfiori\ui\Input;
 use webfiori\ui\Label;
 use webfiori\ui\PNode;
+use webfiori\theme\LangExt;
 
 class WebFioriTheme extends Theme {
     public function __construct() {
@@ -23,15 +24,11 @@ class WebFioriTheme extends Theme {
         $this->setImagesDirName('images');
         $this->setJsDirName('js');
         $this->setCssDirName('css');
-        $this->setBeforeLoaded(function()
-        {
-            LangExt::extLang();
-        });
         $this->setAfterLoaded(function(Theme $theme)
         {
             $page = $theme->getPage();
-            $page->getChildByID('main-content-area')->setClassName('wf-'.Page::dir().'-col-10');
-            $page->getChildByID('side-content-area')->setClassName('wf-'.Page::dir().'-col-2');
+            $page->getChildByID('main-content-area')->setClassName('wf-'.$this->getPage()->getWritingDir().'-col-10');
+            $page->getChildByID('side-content-area')->setClassName('wf-'.$this->getPage()->getWritingDir().'-col-2');
             $page->getChildByID('page-body')->setClassName('wf-row');
             $page->getChildByID('page-header')->setClassName('wf-row-np');
             $page->getChildByID('page-footer')->setClassName('wf-row');
@@ -129,7 +126,7 @@ class WebFioriTheme extends Theme {
                         $wp = $withPadding === true ? '' : '-np';
                         $wm = $withMargin === true ? '' : '-nm';
                         $node = new HTMLNode();
-                        $node->setClassName('wf-'.Page::get()->getWritingDir().'-col-'.$colSize.$wm.$wp);
+                        $node->setClassName('wf-'.$this->getPage()->getWritingDir().'-col-'.$colSize.$wm.$wp);
 
                         return $node;
                     } else {
@@ -138,10 +135,10 @@ class WebFioriTheme extends Theme {
                             'type' => 'wf-row'
                         ]);
                             $titleRow->setID('page-title');
-                            $title = isset($options['title']) ? $options['title'] : Page::title();
+                            $title = isset($options['title']) ? $options['title'] : $this->getPage()->getTitle();
                             $h1 = new HTMLNode('h2');
                             $h1->addTextNode($title);
-                            $h1->setClassName('wf-'.Page::dir().'-col-10-nm-np');
+                            $h1->setClassName('wf-'.$this->getPage()->getWritingDir().'-col-10-nm-np');
                             $titleRow->addChild($h1);
 
                             return $titleRow;
@@ -243,7 +240,7 @@ class WebFioriTheme extends Theme {
         $node = HTMLNode::loadComponent($this->getDirecotry().'footer.html', [
             'version' => WF_VERSION,
             'version_type' => WF_VERSION_TYPE,
-            'writing_dir' => Page::dir(),
+            'writing_dir' => $this->getPage()->getWritingDir(),
             'contact_phone' => '013 xxx xxxx',
             'copyright' => 'All Rights Reserved',
             'contact_mail' => 'hello@example.com',
@@ -264,10 +261,10 @@ class WebFioriTheme extends Theme {
 
     public function getHeaderNode() {
         $headerSec = HTMLNode::loadComponent($this->getDirecotry().'header.html', [
-            'menu-labels' => Page::translation()->get('menus/main-menu'),
+            'menu-labels' => $this->getPage()->get('menus/main-menu'),
             'home_link' => WebFioriApp::getAppConfig()->getBaseURL(),
-            'dir' => Page::dir(),
-            'site_name' => WebFioriApp::getAppConfig()->getWebsiteNames()[Page::lang()],
+            'dir' => $this->getPage()->getWritingDir(),
+            'site_name' => WebFioriApp::getAppConfig()->getWebsiteNames()[$this->getPage()->getLangCode()],
             'menu-links' => [
                 'm_1_link' => '#',
                 'm_2_link' => '#',

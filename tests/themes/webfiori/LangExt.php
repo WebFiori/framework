@@ -2,7 +2,6 @@
 namespace webfiori\theme;
 
 use webfiori\framework\i18n\Language;
-use webfiori\framework\Page;
 /**
  * Extending language file by adding more labels.
  *
@@ -10,9 +9,6 @@ use webfiori\framework\Page;
  */
 class LangExt {
     public static function extLang(&$trans = null) {
-        if (!($trans instanceof Language)) {
-            $trans = Page::translation();
-        }
         $trans->createDirectory('menus/main-menu');
         $langCode = $trans->getCode();
 

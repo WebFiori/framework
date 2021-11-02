@@ -7,7 +7,6 @@ use webfiori\ui\HTMLNode;
 use webfiori\ui\HeadNode;
 use webfiori\ui\Anchor;
 use webfiori\ui\JsCode;
-
 /**
  * The new WebFiori framework website theme.
  *
@@ -47,7 +46,7 @@ class NewFiori extends Theme {
             $page->addBeforeRender(function (WebPage $page) {
                 $page->getDocument()->getBody()->addChild('script', [
                     'type' => 'text/javascript',
-                    'src' => 'assets/new-wf/default.js',
+                    'src' => 'assets/newFiori/default.js',
                     'id' => 'default-vue-init'
                 ]);
                 $page->getDocument()->getBody()->addChild('script', [

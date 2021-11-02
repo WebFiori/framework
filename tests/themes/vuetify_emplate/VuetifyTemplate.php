@@ -1,4 +1,5 @@
 <?php
+namespace themes\vuetify_emplate;
 
 use webfiori\framework\Page;
 use webfiori\framework\Theme;
@@ -54,7 +55,7 @@ class VuetifyTemplate extends Theme {
                 $page->getDocument()->getBody()->addChild('script', [
                     'type' => 'text/javascript',
                     'src' => 'assets/vuetify-template/default.js',
-                    'id' => 'default-vue-init'
+                    'id' => 'vue-script'
                 ]);
             });
         });

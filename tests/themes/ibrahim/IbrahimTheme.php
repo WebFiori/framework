@@ -1,5 +1,5 @@
 <?php
-namespace ibrahim\themes;
+namespace themes\ibrahim;
 
 use webfiori\framework\Page;
 use webfiori\framework\session\SessionsManager;

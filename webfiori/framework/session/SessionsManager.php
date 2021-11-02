@@ -24,7 +24,7 @@
  */
 namespace webfiori\framework\session;
 
-use Exception;
+use webfiori\framework\exceptions\SessionException;
 
 /**
  * A class which is used to manage user sessions.
@@ -80,7 +80,7 @@ class SessionsManager {
             if (is_subclass_of($classObj, '\webfiori\framework\session\SessionStorage')) {
                 $this->sesstionStorage = $classObj;
             } else {
-                throw new Exception('The class "'.WF_SESSION_STORAGE.'" does not implement "\webfiori\framework\session\SessionStorage".');
+                throw new SessionException('The class "'.WF_SESSION_STORAGE.'" does not implement "\webfiori\framework\session\SessionStorage".');
             }
         }
 

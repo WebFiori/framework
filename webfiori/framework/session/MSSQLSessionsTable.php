@@ -18,29 +18,29 @@ class MSSQLSessionsTable extends MSSQLTable {
      */
     public function __construct() {
         parent::__construct('sessions');
-        $this->setComment('This table is used to store session related data');
+        $this->setComment('This table is used to store session related info.');
         $this->addColumns([
             's-id' => [
-                'type' => 'varchar',
+                'type' => 'nvarchar',
                 'size' => '128',
                 'primary' => true,
                 'is-unique' => true,
-                'comment' => 'The unique ID of the session.',
+                'comment' => 'Session identifier. Each session must have unique ID.',
             ],
             'started-at' => [
                 'type' => 'datetime2',
                 'default' => 'now',
-                'comment' => 'The date and time at which the session started.',
+                'comment' => 'The date and time at which the session was initiated.',
             ],
             'last-used' => [
                 'type' => 'datetime2',
                 'default' => 'now',
-                'comment' => 'The date and time at which the user has activity during the session.',
+                'comment' => 'The date and time at which the session was used.',
             ],
             'session-data' => [
-                'type' => 'varchar',
-                'size' => '4000',
-                'comment' => 'Session state.',
+                'type' => 'nvarchar',
+                'size' => '8000',
+                'comment' => 'Session state. This one will be encoded.',
             ],
         ]);
     }

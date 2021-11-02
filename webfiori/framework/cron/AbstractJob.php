@@ -1330,7 +1330,7 @@ abstract class AbstractJob implements JsonI {
 
             if ($exprType == self::ANY_VAL) {
                 $monthDaysAttrs['every-day'] = true;
-            } else if ($exprType == self::INV_VAL) {
+            } else if ($exprType == self::INV_VAL || $exprType == self::STEP_VAL) {
                 $isValidExpr = false;
                 break;
             } else if ($exprType == self::RANGE_VAL) {
@@ -1354,9 +1354,6 @@ abstract class AbstractJob implements JsonI {
                     $isValidExpr = false;
                     break;
                 }
-            } else if ($exprType == self::STEP_VAL) {
-                $isValidExpr = false;
-                break;
             } else if ($exprType == self::SPECIFIC_VAL) {
                 $value = intval($subExpr);
 

@@ -127,33 +127,29 @@ class CreateCommand extends CLICommand {
                 'Quit.'
             ];
             $answer = $this->select('What would you like to create?', $options, count($options) - 1);
-
             if ($answer == 'Quit.') {
-                return 0;
             } else if ($answer == 'Database table class.') {
                 $create = new CreateTableObj($this);
             } else if ($answer == 'Entity class from table.') {
-                return $this->_createEntityFromQuery();
+                $this->_createEntityFromQuery();
             } else if ($answer == 'Web service.') {
                 $create = new CreateWebService($this);
             } else if ($answer == 'Database table from class.') {
                 $create = new CreateTable($this);
             } else if ($answer == 'Middleware.') {
                 $create = new CreateMiddleware($this);
-                return true;
             } else if ($answer == 'CLI Command.') {
                 $create = new CreateCLIClassHelper($this);
-                return true;
             } else if ($answer == 'Background job.') {
                 $create = new CreateCronJob($this);
                 return true;
             } else if ($answer == 'Theme.') {
                 $create = new CreateThemeHelper($this);
-                return true;
             } else {
                 $this->info('Not implemented yet.');
             }
         }
+        return 0;
     }
     /**
      * Prompts the user to enter class information such as it is name.

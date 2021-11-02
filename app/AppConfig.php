@@ -494,6 +494,24 @@ class AppConfig implements Config {
      */
     private function initSmtpConnections() {
         $this->emailAccounts = [
+            'no-reply' => new SMTPAccount([
+                'port' => 587,
+                'server-address' => 'outlook.office365.com',
+                'user' => 'randomxyz@hotmail.com',
+                'pass' => '???',
+                'sender-name' => 'Ibrahim',
+                'sender-address' => 'randomxyz@hotmail.com',
+                'account-name' => 'no-reply'
+            ]),
+            'no-reply2' => new SMTPAccount([
+                'port' => 465,
+                'server-address' => 'smtp.gmail.com',
+                'user' => 'randomxyz@gmail.com',
+                'pass' => '???',
+                'sender-name' => 'Ibrahim',
+                'sender-address' => 'randomxyz@gmail.com',
+                'account-name' => 'no-reply2'
+            ])
         ];
     }
     /**

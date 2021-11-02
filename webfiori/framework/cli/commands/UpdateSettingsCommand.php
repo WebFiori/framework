@@ -74,7 +74,7 @@ class UpdateSettingsCommand extends CLICommand {
         $routes = array_keys(Router::routes());
         $home = $this->select('Select home page route:', $routes);
         ConfigController::get()->updateSiteInfo([
-            'home-page' => $home
+            'home-page' => trim($home, Router::base())
         ]);
         $this->println('Home page successfully updated.');
     }

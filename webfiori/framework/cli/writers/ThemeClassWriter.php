@@ -89,7 +89,7 @@ class ThemeClassWriter extends ClassWriter {
         $this->append(" * @return HTMLNode|null @return HTMLNode|null An object of type 'HTMLNode'. If the theme has no header", 1);
         $this->append(' * section, the method might return null.', 1);
         $this->append(' */', 1);
-        $this->append('public function getHeadrNode() {', 1);
+        $this->append('public function getHeaderNode() {', 1);
         $this->append('return new HeaderSection();', 2);
         $this->append('}', 1);
         $this->writeComponent('HeaderSection', 'HTMLNode', 'A class that represents the top section of the theme.', 'Add header components such as navigation links.');

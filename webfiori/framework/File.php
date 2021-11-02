@@ -525,9 +525,7 @@ class File implements JsonI {
      * @since 1.1.8
      */
     public static function isFileExist($path) {
-        set_error_handler(function ()
-        {
-        });
+        set_error_handler(null);
         $isExist = file_exists($path);
         restore_error_handler();
 

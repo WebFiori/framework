@@ -110,9 +110,9 @@ class DB extends Database {
         if ($connInfo !== null) {
             parent::addTable($table);
         } else {
-            if ($connInfo->getDatabaseType() == 'mysql' && $table instanceof MySQLTable) {
-                parent::addTable($table);
-            } else if ($connInfo->getDatabaseType() == 'mssql' && $table instanceof MSSQLTable) {
+            $connType = $connInfo->getDatabaseType();
+            if (($connType == 'mysql' && $table instanceof MySQLTable) 
+             || ($connType == 'mssql' && $table instanceof MSSQLTable)) {
                 parent::addTable($table);
             }
         }

@@ -534,12 +534,12 @@ class AutoLoader {
      * 
      * @return boolean True if loaded. False if not.
      */
-    private function _loadClassHelper($className, $classWithNs, $value, $appendRoot, $allPaths, $root) {
+    private function _loadClassHelper($className, $classWithNs, $value, $appendRoot, $allPaths) {
         $loaded = false;
         $DS = DIRECTORY_SEPARATOR;
 
         if ($appendRoot === true) {
-            $f = $root.$value.$DS.$className.'.php';
+            $f = $this->getRoot().$value.$DS.$className.'.php';
         } else {
             $f = $value.$DS.$className.'.php';
         }
@@ -726,10 +726,9 @@ class AutoLoader {
         }
 
         $allPaths = self::getClassPath($className);
-        $root = $this->getRoot();
 
         foreach ($this->searchFolders as $value => $appendRoot) {
-            $loaded = $this->_loadClassHelper($className, $classWithNs, $value, $appendRoot, $allPaths, $root) || $loaded;
+            $loaded = $this->_loadClassHelper($className, $classWithNs, $value, $appendRoot, $allPaths) || $loaded;
         }
 
         if ($loaded === false) {

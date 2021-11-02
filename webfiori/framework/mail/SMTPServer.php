@@ -19,7 +19,7 @@ class SMTPServer {
      * 
      * @var resource 
      */
-    private $conn;
+    private $serverCon;
     /**
      * The name of mail server host.
      * 
@@ -27,7 +27,7 @@ class SMTPServer {
      * 
      * @since 1.0
      */
-    private $host;
+    private $serverHost;
     /**
      * The last message that was sent by email server.
      * 
@@ -51,7 +51,7 @@ class SMTPServer {
      * 
      * @since 1.0
      */
-    private $port;
+    private $serverPort;
     /**
      *
      * @var array
@@ -64,7 +64,7 @@ class SMTPServer {
      * 
      * @var int 
      */
-    private $timeout;
+    private $responseTimeout;
     /**
      * Initiates new instance of the class.
      * 
@@ -73,10 +73,10 @@ class SMTPServer {
      * @param string $port SMTP server port such as 25, 465 or 587.
      */
     public function __construct($serverAddress, $port) {
-        $this->port = $port;
-        $this->host = $serverAddress;
+        $this->serverPort = $port;
+        $this->serverHost = $serverAddress;
         $this->serverOptions = [];
-        $this->timeout = 5;
+        $this->responseTimeout = 5;
         $this->lastResponse = '';
         $this->lastResponseCode = 0;
         $this->isWriting = false;
@@ -197,12 +197,21 @@ class SMTPServer {
             $conn = stream_socket_client($protocol.$host.':'.$portNum, $err, $errStr, $timeout * 60, STREAM_CLIENT_CONNECT, $context);
         } else {
             $this->_log('Connect', 0, 'Trying to connect to the server using "fsockopen"...');
-            $conn = fsockopen($protocol.$this->host, $portNum, $err, $errStr, $timeout * 60);
+            $conn = fsockopen($protocol.$this->serverHost, $portNum, $err, $errStr, $timeout * 60);
         }
         if (!is_resource($conn)) {
             $this->_log('Connect', $err, 'Faild to connect: '.$errStr);
         }
         return $conn;
+    }
+    private function _getTransport() {
+        $port = $this->getPort();
+        if ($port == 465) {
+            return "ssl://";
+        } else  if ($port == 587) {
+            return "tls://";
+        }
+        return '';
     }
     /**
      * Connects to SMTP server.
@@ -217,48 +226,44 @@ class SMTPServer {
         $retVal = true;
 
         if (!$this->isConnected()) {
-            set_error_handler(function($errno, $errstr, $errfile, $errline)
-            {
-            });
-            $portNum = $this->getPort();
-            $protocol = '';
-
-            if ($portNum == 465) {
-                $protocol = "ssl://";
-            } else  if ($portNum == 587) {
-                $protocol = "tls://";
-            }
+            set_error_handler(null);
+            $transport = $this->_getTransport();
             $err = 0;
             $errStr = '';
             
-            $this->conn = $this->_tryConnect($protocol, $err, $errStr);
+            $this->serverCon = $this->_tryConnect($transport, $err, $errStr);
             
-            if ($this->conn === false) {
-                $this->conn = $this->_tryConnect('', $err, $errStr);
+            if ($this->serverCon === false) {
+                $this->serverCon = $this->_tryConnect('', $err, $errStr);
             }
-            
-            set_error_handler(null);
 
-            if (is_resource($this->conn)) {
+            if (is_resource($this->serverCon)) {
                 $this->_log('-', 0, $this->read());
                 if ($this->sendHello()) {
-                    if (in_array('STARTTLS', $this->getServerOptions())) {
-                        if ($this->_switchToTls()) {
-                            $this->sendHello();
-                            $retVal = true;
-                        } else {
-                            $retVal = false;
-                        }
-                    } else {
-                        $retVal = true;
-                    }
+                    //We might need to switch to secure connection.
+                    $retVal = $this->_checkStartTls();
+                } else {
+                    $retVal = false;
                 }
             } else {
                 $retVal = false;
             }
+            restore_error_handler();
         }
 
         return $retVal;
+    }
+    private function _checkStartTls() {
+        if (in_array('STARTTLS', $this->getServerOptions())) {
+            if ($this->_switchToTls()) {
+                $this->sendHello();
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return true;
+        }
     }
     /**
      * Read server response after sending a command to the server.
@@ -270,8 +275,8 @@ class SMTPServer {
     public function read() {
         $message = '';
         
-        while (!feof($this->conn)) {
-            $str = fgets($this->conn);
+        while (!feof($this->serverCon)) {
+            $str = fgets($this->serverCon);
             
             $message .= $str;
             
@@ -341,7 +346,7 @@ class SMTPServer {
         }
 
         if ($this->isConnected()) {
-            fwrite($this->conn, $command.self::NL);
+            fwrite($this->serverCon, $command.self::NL);
             if (!$this->isInWritingMode()) {
                 $response = trim($this->read());
                 $this->lastResponse = $response;
@@ -389,19 +394,11 @@ class SMTPServer {
         }
 
 
-        set_error_handler(function ($errno, $errstr, $errfile, $errline)
-            {
-                echo 'ErrorNo: '.$errno."\n";
-                echo 'ErrorLine: '.$errline."\n";
-                echo 'ErrorStr: '.$errstr."\n";
-                
-            });
         $success = stream_socket_enable_crypto(
-            $this->conn,
+            $this->serverCon,
             true,
             $cryptoMethod
         );
-        restore_error_handler();
 
         return $success === true;
     }
@@ -434,7 +431,7 @@ class SMTPServer {
      */
     public function setTimeout($val) {
         if ($val >= 1 && !$this->isConnected()) {
-            $this->timeout = $val;
+            $this->responseTimeout = $val;
         }
     }
     /**
@@ -445,7 +442,7 @@ class SMTPServer {
      * @since 1.0
      */
     public function getPort() {
-        return $this->port;
+        return $this->serverPort;
     }
     /**
      * Returns SMTP server host address.
@@ -455,7 +452,7 @@ class SMTPServer {
      * @since 1.0
      */
     public function getHost() {
-        return $this->host;
+        return $this->serverHost;
     }
     /**
      * Returns the time at which the connection will timeout if no response 
@@ -466,7 +463,7 @@ class SMTPServer {
      * @since 1.0
      */
     public function getTimeout() {
-        return $this->timeout;
+        return $this->responseTimeout;
     }
     /**
      * Checks if the connection is still open or is it closed.
@@ -476,6 +473,6 @@ class SMTPServer {
      * @since 1.0
      */
     public function isConnected() {
-        return is_resource($this->conn);
+        return is_resource($this->serverCon);
     }
 }

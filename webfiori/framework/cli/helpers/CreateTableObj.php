@@ -285,7 +285,7 @@ class CreateTableObj {
                 $colDataType = $colObj->getDatatype();
                 $dataSize = $this->_getCommand()->getInput('Enter column size:');
 
-                if ($colObj->getDatatype() == 'varchar' && $dataSize > 21845) {
+                if ($colObj instanceof MySQLColumn && $colObj->getDatatype() == 'varchar' && $dataSize > 21845) {
                     $this->_getCommand()->warning('The data type "varchar" has a maximum size of 21845. The '
                             .'data type of the column will be changed to "mediumtext" if you continue.');
 

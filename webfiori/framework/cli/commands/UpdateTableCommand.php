@@ -18,6 +18,9 @@ use webfiori\framework\cli\CLICommand;
 use webfiori\framework\cli\writers\QueryClassWriter;
 use webfiori\framework\DB;
 use webfiori\framework\WebFioriApp;
+use webfiori\database\mysql\MySQLTable;
+use webfiori\database\mssql\MSSQLTable;
+use webfiori\database\mssql\MSSQLColumn;
 /**
  * Description of UpdateTableCommand
  *
@@ -27,8 +30,7 @@ class UpdateTableCommand extends CLICommand {
     public function __construct() {
         parent::__construct('update-table', [
             '--table' => [
-                'description' => 'The namespace of the table class (including namespace). '
-                .'Note that every \ in the namespace must be written as \\\\.',
+                'description' => 'The namespace of the table class (including namespace).',
                 'optional' => true,
             ]
         ], 'Update a database table.');
@@ -190,7 +192,11 @@ class UpdateTableCommand extends CLICommand {
      */
     private function _addColumn($tableObj) {
         $colKey = $this->getInput('Enter a name for column key:');
-        $col = new MySQLColumn();
+        if ($tableObj instanceof MSSQLTable) {
+            $col = new MSSQLColumn();
+        } else if ($tableObj instanceof MySQLTable) {
+            $col = new MySQLColumn();
+        }
         $colDatatype = $this->select('Select column data type:', $col->getSupportedTypes(), 0);
         $col->setDatatype($colDatatype);
         $isAdded = $tableObj->addColumn($colKey, $col);
@@ -318,7 +324,7 @@ class UpdateTableCommand extends CLICommand {
     }
     /**
      * 
-     * @param MySQLColumn $colObj
+     * @param Column $colObj
      */
     private function _setScale($colObj) {
         $colDataType = $colObj->getDatatype();
@@ -342,25 +348,35 @@ class UpdateTableCommand extends CLICommand {
      */
     private function _setSize($colObj) {
         $type = $colObj->getDatatype();
-        $supportSize = $type == 'int' 
+        $mySqlSupportSize = $type == 'int' 
                 || $type == 'varchar'
                 || $type == 'decimal' 
                 || $type == 'float'
                 || $type == 'double' 
                 || $type == 'text';
+        $mssqlSupportSize = $type == 'char'
+                || $type == 'nchar'
+                || $type == 'varchar'
+                || $type == 'nvarchar'
+                || $type == 'binary'
+                || $type == 'varbinary'
+                || $type == 'decimal'
+                || $type == 'float';
 
-        if ($supportSize) {
+        if (($colObj instanceof MySQLColumn && $mySqlSupportSize)
+                || $colObj instanceof MSSQLColumn && $mssqlSupportSize) {
             $valid = false;
 
             do {
                 $colDataType = $colObj->getDatatype();
-                $dataSize = $this->getInput('Enter column size:');
+                $dataSize = $this->_getCommand()->getInput('Enter column size:');
 
-                if ($colObj->getDatatype() == 'varchar' && $dataSize > 21845) {
-                    $this->warning('The data type "varchar" has a maximum size of 21845. The '
+                if ($colObj instanceof MySQLColumn && $colObj->getDatatype() == 'varchar' && $dataSize > 21845) {
+                    $this->_getCommand()->warning('The data type "varchar" has a maximum size of 21845. The '
                             .'data type of the column will be changed to "mediumtext" if you continue.');
 
-                    if (!$this->confirm('Would you like to change data type?', false)) {
+                    if (!$this->_getCommand()->confirm('Would you like to change data type?', false)) {
+                        $valid = true;
                         continue;
                     }
                 }

@@ -199,12 +199,13 @@ class SessionOperations extends DB {
                     'chunk-number' => $x
                 ])->execute();
             } catch (DatabaseException $ex) {
-                $table = $this->getTable('session_data');
-                $query = "update ".$table->getName()." set ".$table->getColByKey('data')->getName()." = '".$chunks[$x]
-                        ."' where ".$table->getColByKey('s-id')->getName()." = '".$sId
-                        ."' and ".$table->getColByKey('chunk-number')->getName()." = ".$x;
-                $this->setQuery($query);
-                  $this->execute();
+                $this->clear();
+                $this->table('session_data')
+                        ->update([
+                            'data' => $chunks[$x]
+                        ])->where('s-id', '=', $sId)
+                        ->andWhere('chunk-number', '=', $x);
+                $this->execute();
             }
         }
         $newChunksCount = count($chunks);

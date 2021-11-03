@@ -37,11 +37,6 @@ class MSSQLSessionsTable extends MSSQLTable {
                 'default' => 'now',
                 'comment' => 'The date and time at which the session was used.',
             ],
-            'session-data' => [
-                'type' => 'nvarchar',
-                'size' => '8000',
-                'comment' => 'Session state. This one will be encoded.',
-            ],
         ]);
     }
 }

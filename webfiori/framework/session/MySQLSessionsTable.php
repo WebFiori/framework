@@ -38,10 +38,6 @@ class MySQLSessionsTable extends MySQLTable {
                 'default' => 'now()',
                 'comment' => 'The date and time at which the user has activity during the session.',
             ],
-            'session-data' => [
-                'type' => 'mediumtext',
-                'comment' => 'Session state.',
-            ],
         ]);
     }
 }

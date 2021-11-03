@@ -1,5 +1,4 @@
 <?php
-
 namespace app\ini;
 
 class InitPrivileges {
@@ -9,6 +8,5 @@ class InitPrivileges {
      * @since 1.0
      */
     public static function init() {
-        
     }
 }

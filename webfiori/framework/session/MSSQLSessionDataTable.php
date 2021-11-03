@@ -1,9 +1,7 @@
 <?php
-
 namespace webfiori\framework\session;
 
 use webfiori\database\mssql\MSSQLTable;
-use webfiori\framework\session\MSSQLSessionsTable;
 
 /**
  * A class which represents the database table 'session_data'.
@@ -18,7 +16,7 @@ class MSSQLSessionDataTable extends MSSQLTable {
     /**
      * Creates new instance of the class.
      */
-    public function __construct(){
+    public function __construct() {
         parent::__construct('session_data');
         $this->setComment('This table is used to hold the data part of sessions.');
         $this->addColumns([
@@ -39,8 +37,9 @@ class MSSQLSessionDataTable extends MSSQLTable {
                 'comment' => 'One data chunk of size 1000.',
             ],
         ]);
-        
+
         $this->addReference(new MSSQLSessionsTable(), ['s-id'], 'session_data_fk', 'cascade', 'cascade');
     }
 }
+
 return __NAMESPACE__;

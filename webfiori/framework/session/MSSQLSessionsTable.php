@@ -42,4 +42,3 @@ class MSSQLSessionsTable extends MSSQLTable {
 }
 
 return __NAMESPACE__;
-

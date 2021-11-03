@@ -322,7 +322,6 @@ class Language {
             if (count($subSplit) == 1) {
                 if (isset($this->languageVars[$subSplit[0]])) {
                     $this->languageVars[$subSplit[0]][$varTrimmed] = $varValue;
-
                 }
             } else if (isset($this->languageVars[$subSplit[0]])) {
                 return $this->_set($subSplit, $this->languageVars[$subSplit[0]],$varTrimmed,$varValue, 1);

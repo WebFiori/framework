@@ -30,8 +30,8 @@ use webfiori\framework\cli\CLICommand;
 use webfiori\framework\ConfigController;
 use webfiori\framework\DB;
 use webfiori\framework\mail\SMTPAccount;
-use webfiori\framework\WebFioriApp;
 use webfiori\framework\mail\SMTPServer;
+use webfiori\framework\WebFioriApp;
 
 /**
  * A command which is used to add a database connection or SMTP account.
@@ -144,7 +144,7 @@ class AddCommand extends CLICommand {
         $smtpConn->setAccountName($this->getInput('Give your connection a friendly name:', 'smtp-connection-'.count(WebFioriApp::getAppConfig()->getAccounts())));
         $this->println('Testing connection. This can take up to 1 minute...');
         $server = new SMTPServer($smtpConn->getServerAddress(), $smtpConn->getPort());
-        
+
 
         if ($server->authLogin($smtpConn->getUsername(), $smtpConn->getPassword())) {
             $this->success('Connectd. Adding connection information...');

@@ -3,14 +3,14 @@ namespace webfiori\framework\cli\helpers;
 
 use Error;
 use Exception;
-use webfiori\database\mysql\MySQLColumn;
+use webfiori\database\ConnectionInfo;
 use webfiori\database\mssql\MSSQLColumn;
-use webfiori\database\mysql\MySQLTable;
 use webfiori\database\mssql\MSSQLTable;
+use webfiori\database\mysql\MySQLColumn;
+use webfiori\database\mysql\MySQLTable;
 use webfiori\database\Table;
 use webfiori\framework\cli\commands\CreateCommand;
 use webfiori\framework\cli\writers\QueryClassWriter;
-use webfiori\database\ConnectionInfo;
 /**
  * A helper class for creating database tables classes.
  *
@@ -30,7 +30,7 @@ class CreateTableObj {
     public function __construct(CreateCommand $command) {
         $this->command = $command;
         $dbType = $this->_getCommand()->select('Database type:', ConnectionInfo::SUPPORTED_DATABASES);
-        
+
         $classInfo = $this->_getCommand()->getClassInfo(APP_DIR_NAME.'\\database');
 
 
@@ -50,6 +50,7 @@ class CreateTableObj {
                 $this->_getCommand()->warning("The table already has a key with name '$colKey'.");
                 continue;
             }
+
             if ($tempTable instanceof MySQLTable) {
                 $col = new MySQLColumn();
             } else {

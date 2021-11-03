@@ -97,33 +97,6 @@ class CronView extends WebPage {
             $view->getDocument()->getHeadNode()->addChild($code);
         });
     }
-    private function createOutputDialog() {
-        $dialog = $this->insert('v-dialog');
-        $dialog->setAttributes([
-            'v-model' => 'output_dialog.show',
-            'max-width' => '850px',
-            'scrollable'
-        ]);
-        $card = $dialog->addChild('v-card');
-        $card->addChild('v-card-title')->text('Job Execution Output');
-        $card->addChild('v-divider');
-        $card->addChild('v-card-text', [
-            'style' => [
-                "height" => '400px;',
-                'color' => 'white',
-                'background-color' => 'black',
-                'text-align' => 'justify'
-            ],
-            'v-html' => 'output_dialog.output'
-        ]);
-        $card->addChild('v-divider');
-        $card->addChild('v-card-actions')
-            ->addChild('v-btn', [
-                'color' => "primary",
-                'text',
-                '@click' => "output_dialog.show = false",
-            ])->text('Close');
-    }
     /**
      * Adds a very basic v-dialog that can be used to show status messages and so on.
      * 
@@ -224,6 +197,33 @@ class CronView extends WebPage {
                 'src' => 'https://cdn.jsdelivr.net/gh/webfiori/app@'.WF_VERSION.'/public/assets/js/cron.js',
             ]);
         });
+    }
+    private function createOutputDialog() {
+        $dialog = $this->insert('v-dialog');
+        $dialog->setAttributes([
+            'v-model' => 'output_dialog.show',
+            'max-width' => '850px',
+            'scrollable'
+        ]);
+        $card = $dialog->addChild('v-card');
+        $card->addChild('v-card-title')->text('Job Execution Output');
+        $card->addChild('v-divider');
+        $card->addChild('v-card-text', [
+            'style' => [
+                "height" => '400px;',
+                'color' => 'white',
+                'background-color' => 'black',
+                'text-align' => 'justify'
+            ],
+            'v-html' => 'output_dialog.output'
+        ]);
+        $card->addChild('v-divider');
+        $card->addChild('v-card-actions')
+            ->addChild('v-btn', [
+                'color' => "primary",
+                'text',
+                '@click' => "output_dialog.show = false",
+            ])->text('Close');
     }
 
     private function iniHead() {

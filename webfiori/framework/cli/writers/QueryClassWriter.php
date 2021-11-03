@@ -26,9 +26,9 @@ namespace webfiori\framework\cli\writers;
 
 use InvalidArgumentException;
 use webfiori\database\EntityMapper;
+use webfiori\database\mssql\MSSQLTable;
 use webfiori\database\mysql\MySQLColumn;
 use webfiori\database\mysql\MySQLTable;
-use webfiori\database\mssql\MSSQLTable;
 use webfiori\database\Table;
 
 /**
@@ -277,6 +277,7 @@ class QueryClassWriter extends ClassWriter {
     private function _writeHeaderSec() {
         $this->append("<?php\n");
         $this->append('namespace '.$this->getNamespace().";\n");
+
         if ($this->tableObj instanceof MySQLTable) {
             $this->append("use webfiori\database\mysql\MySQLTable;");
         } else if ($this->tableObj instanceof MSSQLTable) {
@@ -295,6 +296,7 @@ class QueryClassWriter extends ClassWriter {
             $this->append(" * <li><b>$key</b>: Name in database: '".$colObj->getNormalName()."'. Data type: '".$colObj->getDatatype()."'.</li>");
         }
         $this->append(" * </ul>\n */");
+
         if ($this->tableObj instanceof MySQLTable) {
             $this->append('class '.$this->getName().' extends MySQLTable {');
         } else if ($this->tableObj instanceof MSSQLTable) {

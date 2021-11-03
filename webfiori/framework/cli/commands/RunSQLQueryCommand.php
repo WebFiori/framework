@@ -69,9 +69,9 @@ class RunSQLQueryCommand extends CLICommand {
                     return $this->_schemaBased($schema);
                 } else {
                     $this->warning('Schema not found: '.$schema);
+
                     return $this->_connectionBased($dbConnections);
                 }
-                
             } else {
                 return $this->_connectionBased($dbConnections);
             }

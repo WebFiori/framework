@@ -1,4 +1,5 @@
 <?php
+
 //Bootstrap file which is used to boot testing process.
 use webfiori\framework\AutoLoader;
 use webfiori\framework\WebFioriApp;

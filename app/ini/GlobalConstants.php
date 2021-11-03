@@ -1,18 +1,18 @@
 <?php
-
 namespace app\ini;
+
 /**
-* A class which is used to initialize global constants.
-* 
-* This class has one static method which is used to define the constants.
-* The class can be used to initialize any constant that the application depends
-* on. The constants that this class will initialize are the constants which
-* uses the function <code>define()</code>.
-* Also, the developer can modify existing ones as needed to change some of the
-* default settings of the framework.
-* 
-* @since 1.1.0
-*/
+ * A class which is used to initialize global constants.
+ * 
+ * This class has one static method which is used to define the constants.
+ * The class can be used to initialize any constant that the application depends
+ * on. The constants that this class will initialize are the constants which
+ * uses the function <code>define()</code>.
+ * Also, the developer can modify existing ones as needed to change some of the
+ * default settings of the framework.
+ * 
+ * @since 1.1.0
+ */
 class GlobalConstants {
     /**
      * Initialize the constants.
@@ -25,7 +25,7 @@ class GlobalConstants {
      * @since 1.0
      */
     public static function defineConstants() {
-        if (!defined('SCRIPT_MEMORY_LIMIT')){
+        if (!defined('SCRIPT_MEMORY_LIMIT')) {
             /**
              * Memory limit per script.
              * 
@@ -40,7 +40,8 @@ class GlobalConstants {
              */
             define('SCRIPT_MEMORY_LIMIT', '2048M');
         }
-        if (!defined('WF_SESSION_STORAGE')){
+
+        if (!defined('WF_SESSION_STORAGE')) {
             /**
              * A constant which holds the class name of sessions storage 
              * engine alongside its namespace.
@@ -59,7 +60,8 @@ class GlobalConstants {
              */
             define('WF_SESSION_STORAGE', '\webfiori\framework\session\DefaultSessionStorage');
         }
-        if (!defined('DATE_TIMEZONE')){
+
+        if (!defined('DATE_TIMEZONE')) {
             /**
              * Define the timezone at which the system will operate in.
              * 
@@ -76,7 +78,8 @@ class GlobalConstants {
              */
             define('DATE_TIMEZONE', 'Asia/Riyadh');
         }
-        if (!defined('PHP_INT_MIN')){
+
+        if (!defined('PHP_INT_MIN')) {
             /**
              * Fallback for older php versions that does not support the constant 
              * PHP_INT_MIN.
@@ -88,7 +91,8 @@ class GlobalConstants {
              */
             define('PHP_INT_MIN', ~PHP_INT_MAX);
         }
-        if (!defined('LOAD_COMPOSER_PACKAGES')){
+
+        if (!defined('LOAD_COMPOSER_PACKAGES')) {
             /**
              * This constant is used to tell the core if the application uses composer 
              * packages or not.
@@ -102,7 +106,8 @@ class GlobalConstants {
              */
             define('LOAD_COMPOSER_PACKAGES', true);
         }
-        if (!defined('CRON_THROUGH_HTTP')){
+
+        if (!defined('CRON_THROUGH_HTTP')) {
             /**
              * A constant which is used to enable or disable HTTP access to cron.
              * 
@@ -117,7 +122,8 @@ class GlobalConstants {
              */
             define('CRON_THROUGH_HTTP', false);
         }
-        if (!defined('WF_VERBOSE')){
+
+        if (!defined('WF_VERBOSE')) {
             /**
              * This constant is used to tell the framework if more information should 
              * be displayed if an exception is thrown or an error happens.
@@ -136,7 +142,8 @@ class GlobalConstants {
              */
             define('WF_VERBOSE', false);
         }
-        if (!defined('NO_WWW')){
+
+        if (!defined('NO_WWW')) {
             /**
              * This constant is used to redirect a URI with www to non-www.
              * 
@@ -155,7 +162,8 @@ class GlobalConstants {
              */
             define('NO_WWW', false);
         }
-        if (!defined('MAX_BOX_MESSAGES')){
+
+        if (!defined('MAX_BOX_MESSAGES')) {
             /**
              * The maximum number of message boxes to show in one page.
              * 
@@ -174,7 +182,8 @@ class GlobalConstants {
              */
             define('MAX_BOX_MESSAGES', 15);
         }
-        if (!defined('CLI_HTTP_HOST')){
+
+        if (!defined('CLI_HTTP_HOST')) {
             /**
              * Host name to use in case the system is executed through CLI.
              * 
@@ -190,7 +199,8 @@ class GlobalConstants {
              */
             define('CLI_HTTP_HOST', 'example.com');
         }
-        if (!defined('DS')){
+
+        if (!defined('DS')) {
             /**
              * Directory separator.
              * 
@@ -204,7 +214,8 @@ class GlobalConstants {
              */
             define('DS', DIRECTORY_SEPARATOR);
         }
-        if (!defined('THEMES_PATH')){
+
+        if (!defined('THEMES_PATH')) {
             $themesDirName = 'themes';
             $themesPath = substr(__DIR__, 0, strlen(__DIR__) - strlen('/app/ini')).DIRECTORY_SEPARATOR.$themesDirName;
             /**
@@ -217,7 +228,8 @@ class GlobalConstants {
              */
             define('THEMES_PATH', $themesPath);
         }
-        if (!defined('USE_HTTP')){
+
+        if (!defined('USE_HTTP')) {
             /**
              * Sets the framework to use 'http://' or 'https://' for base URIs.
              * 

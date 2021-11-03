@@ -2,7 +2,6 @@
 namespace webfiori\framework;
 
 use webfiori\http\AbstractWebService;
-use webfiori\framework\ExtendedWebServicesManager;
 /**
  * A class which represents a web service.
  *

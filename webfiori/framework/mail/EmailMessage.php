@@ -24,16 +24,13 @@
  */
 namespace webfiori\framework\mail;
 
-use webfiori\framework\ConfigController;
-use webfiori\framework\mail\SMTPServer;
-use webfiori\framework\mail\SMTPAccount;
+use webfiori\framework\exceptions\MissingLangException;
 use webfiori\framework\exceptions\SMTPException;
 use webfiori\framework\File;
+use webfiori\framework\i18n\Language;
 use webfiori\framework\WebFioriApp;
 use webfiori\ui\HTMLDoc;
 use webfiori\ui\HTMLNode;
-use webfiori\framework\i18n\Language;
-use webfiori\framework\exceptions\MissingLangException;
 /**
  * A class that can be used to write HTML formatted Email messages.
  *
@@ -42,12 +39,26 @@ use webfiori\framework\exceptions\MissingLangException;
  */
 class EmailMessage {
     /**
+     * A constant that colds the possible values for the header 'Priority'. 
      * 
-     * @var string
+     * @see https://tools.ietf.org/html/rfc4021#page-33
      * 
-     * @since 1.0.5
+     * @since 2.0
      */
-    private $contentLang;
+    const PRIORITIES = [
+        -1 => 'non-urgent',
+        0 => 'normal',
+        1 => 'urgent'
+    ];
+    /**
+     * An array that contains an objects of type 'File' or 
+     * file path. 
+     * 
+     * @var array 
+     * 
+     * @since 2.0
+     */
+    private $attachments;
     /**
      * A boundary variable used to separate email message parts.
      * 
@@ -56,6 +67,38 @@ class EmailMessage {
      * @since 2.0
      */
     private $boundry;
+    /**
+     * 
+     * @var string
+     * 
+     * @since 1.0.5
+     */
+    private $contentLang;
+    /**
+     *
+     * @var HTMLDoc 
+     * 
+     * @since 1.0 
+     */
+    private $document;
+    private $inReplyTo;
+
+    private $log;
+    /**
+     * 
+     * @var array
+     * 
+     * @since 2.0
+     */
+    private $receiversArr;
+    /**
+     * SMTP account that will be used to send the message.
+     * 
+     * @var SMTPAccount
+     * 
+     * @since 1.0
+     */
+    private $smtpAcc;
     /**
      * 
      * @var SMTPServer|null
@@ -72,97 +115,12 @@ class EmailMessage {
      */
     private $subject;
     /**
-     * An array that contains an objects of type 'File' or 
-     * file path. 
-     * 
-     * @var array 
-     * 
-     * @since 2.0
-     */
-    private $attachments;
-    /**
-     * SMTP account that will be used to send the message.
-     * 
-     * @var SMTPAccount
-     * 
-     * @since 1.0
-     */
-    private $smtpAcc;
-    /**
-     * A constant that colds the possible values for the header 'Priority'. 
-     * 
-     * @see https://tools.ietf.org/html/rfc4021#page-33
-     * 
-     * @since 2.0
-     */
-    const PRIORITIES = [
-        -1 => 'non-urgent',
-        0 => 'normal',
-        1 => 'urgent'
-    ];
-    /**
-     * 
-     * @var array
-     * 
-     * @since 2.0
-     */
-    private $receiversArr;
-    private $inReplyTo;
-    /**
-     * Sets the subject of the message.
-     * 
-     * @param string $subject Email subject.
-     * 
-     * @since 2.0
-     */
-    public function setSubject($subject) {
-        $trimmed = $this->_trimControlChars($subject);
-
-        if (strlen($trimmed) > 0) {
-            $this->subject = $trimmed;
-        }
-    }
-    /**
-     * Returns the subject of the email.
-     * 
-     * @return string The subject of the email. Default return value is 
-     * 'Hello From WebFiori Framework'.
-     * 
-     * @since 2.0
-     */
-    public function getSubject() {
-        return $this->subject;
-    }
-    /**
-     * Sets the priority of the message.
-     * 
-     * @param int $priority The priority of the message. -1 for non-urgent, 0 
-     * for normal and 1 for urgent. If the passed value is greater than 1, 
-     * then 1 will be used. If the passed value is less than -1, then -1 is 
-     * used. Other than that, 0 will be used.
-     * 
-     * @since 2.0
-     */
-    public function setPriority($priority) {
-        $asInt = intval($priority);
-
-        if ($asInt <= -1) {
-            $this->priority = -1;
-        } else if ($asInt >= 1) {
-            $this->priority = 1;
-        } else {
-            $this->priority = 0;
-        }
-    }
-    /**
      *
-     * @var HTMLDoc 
+     * @var Language|null 
      * 
-     * @since 1.0 
+     * @since 1.0.5
      */
-    private $document;
-
-    private $log;
+    private $tr;
     /**
      * Creates new instance of the class.
      * 
@@ -187,34 +145,19 @@ class EmailMessage {
         $this->attachments = [];
         $this->inReplyTo = [];
         $this->document = new HTMLDoc();
-        
+
         if (class_exists(APP_DIR_NAME.'\AppConfig')) {
             $acc = WebFioriApp::getAppConfig()->getAccount($sendAccountName);
 
             if ($acc instanceof SMTPAccount) {
                 $this->smtpAcc = $acc;
                 $this->smtpServer = new SMTPServer($acc->getServerAddress(), $acc->getPort());
+
                 return;
             }
             throw new SMTPException('No SMTP account was found which has the name "'.$sendAccountName.'".');
         }
         throw new SMTPException('Class "'.APP_DIR_NAME.'\\AppConfig" not found.');
-    }
-    /**
-     * Adds new receiver address to the list of 'to' receivers.
-     * 
-     * @param string $address The email address of the receiver (such as 'example@example.com').
-     * 
-     * @param string $name An optional receiver name. If not provided, the 
-     * email address is used as name.
-     * 
-     * @return boolean If the address is added, the method will return 
-     * true. False otherwise.
-     * 
-     * @since 2.0
-     */
-    public function addTo($address, $name = null) {
-        return $this->_addAddress($address, $name, 'to');
     }
     /**
      * Adds a file as email attachment.
@@ -231,7 +174,7 @@ class EmailMessage {
         $retVal = false;
 
         $type = gettype($fileObjOrFilePath);
-        
+
         if ($type == 'string') {
             if (file_exists($fileObjOrFilePath)) {
                 $this->attachments[] = $fileObjOrFilePath;
@@ -246,6 +189,22 @@ class EmailMessage {
         }
 
         return $retVal;
+    }
+    /**
+     * Adds new receiver address to the list of 'bcc' receivers.
+     * 
+     * @param string $address The email address of the receiver (such as 'example@example.com').
+     * 
+     * @param string $name An optional receiver name. If not provided, the 
+     * email address is used as name.
+     * 
+     * @return boolean If the address is added, the method will return 
+     * true. False otherwise.
+     * 
+     * @since 2.0
+     */
+    public function addBCC($address, $name = null) {
+        return $this->_addAddress($address, $name, 'bcc');
     }
     /**
      * Adds new receiver address to the list of 'cc' receivers.
@@ -264,7 +223,7 @@ class EmailMessage {
         return $this->_addAddress($address, $name, 'cc');
     }
     /**
-     * Adds new receiver address to the list of 'bcc' receivers.
+     * Adds new receiver address to the list of 'to' receivers.
      * 
      * @param string $address The email address of the receiver (such as 'example@example.com').
      * 
@@ -276,22 +235,30 @@ class EmailMessage {
      * 
      * @since 2.0
      */
-    public function addBCC($address, $name = null) {
-        return $this->_addAddress($address, $name, 'bcc');
+    public function addTo($address, $name = null) {
+        return $this->_addAddress($address, $name, 'to');
     }
-    private function _addAddress($address, $name, $type) {
-        $nameTrimmed = $this->_trimControlChars(str_replace('<', '', str_replace('>', '', $name)));
-        $addressTrimmed = $this->_trimControlChars(str_replace('<', '', str_replace('>', '', $address)));
-        
-        if (strlen($nameTrimmed) == 0) {
-            $nameTrimmed = $addressTrimmed;
-        }
-        if (strlen($addressTrimmed) != 0 && in_array($type, ['cc', 'bcc', 'to'])) {
-            $this->receiversArr[$type][$addressTrimmed] = $nameTrimmed;
-            return true;
+    /**
+     * Returns the value of a language label.
+     * 
+     * @param string $label A directory to the language variable 
+     * (such as 'pages/login/login-label').
+     * 
+     * @return string|array If the given directory represents a label, the 
+     * method will return its value. If it represents an array, the array will 
+     * be returned. If nothing was found, the returned value will be the passed 
+     * value to the method.
+     * 
+     * @since 1.0 
+     */
+    public function get($label) {
+        $langObj = $this->getTranslation();
+
+        if ($langObj !== null) {
+            return $langObj->get($label);
         }
 
-        return false;
+        return $label;
     }
     /**
      * Returns an associative array that contains the names and the addresses 
@@ -306,15 +273,6 @@ class EmailMessage {
      */
     public function getBCC() {
         return $this->receiversArr['bcc'];
-    }
-    private function _getReceiversStr($type) {
-        $arr = [];
-
-        foreach ($this->receiversArr[$type] as $address => $name) {
-            $arr[] =  '=?UTF-8?B?'.base64_encode($name).'?='.' <'.$address.'>';
-        }
-
-        return implode(',', $arr);
     }
     /**
      * Returns a string that contains the names and the addresses 
@@ -372,6 +330,17 @@ class EmailMessage {
         return $this->getDocument()->getChildByID($id);
     }
     /**
+     * Returns the language code of the email.
+     * 
+     * @return string|null Two digit language code. In case language is not set, the 
+     * method will return null
+     * 
+     * @since 1.0.5
+     */
+    public function getLang() {
+        return $this->contentLang;
+    }
+    /**
      * Returns an array that contains log messages which are generated 
      * from sending SMTP commands.
      * 
@@ -387,6 +356,50 @@ class EmailMessage {
      */
     public function getLog() {
         return $this->smtpServer->getLog();
+    }
+    /**
+     * Returns the priority of the message.
+     * 
+     * @return int The priority of the message. -1 for non-urgent, 0 
+     * for normal and 1 for urgent. Default value is 0.
+     * 
+     * @since 2.0
+     */
+    public function getPriority() {
+        return $this->priority;
+    }
+    /**
+     * 
+     * @return SMTPAccount
+     */
+    public function getSMTPAccount() {
+        return $this->smtpAcc;
+    }
+    /**
+     * Returns an object that holds SMTP server information.
+     * 
+     * The returned instance can be used to access SMTP server messages log 
+     * to see if the message was transfered or not. Note that the 
+     * connection to the server will only be established once the 
+     * method 'EmailMessage::send()'.
+     * 
+     * @return SMTPServer An instance which represents SMTP server.
+     * 
+     * @since 1.0.5
+     */
+    public function getSMTPServer() {
+        return $this->smtpServer;
+    }
+    /**
+     * Returns the subject of the email.
+     * 
+     * @return string The subject of the email. Default return value is 
+     * 'Hello From WebFiori Framework'.
+     * 
+     * @since 2.0
+     */
+    public function getSubject() {
+        return $this->subject;
     }
     /**
      * Returns an associative array that contains the names and the addresses 
@@ -417,6 +430,18 @@ class EmailMessage {
         return $this->_getReceiversStr('to');
     }
     /**
+     * Returns an object which holds i18n labels.
+     * 
+     * @return Language|null The returned object labels will be based on the 
+     * language of the email. If no translation is loaded, the method will 
+     * return null.
+     * 
+     * @since 1.0.5
+     */
+    public function getTranslation() {
+        return $this->tr;
+    }
+    /**
      * Adds a child node inside the body of a node given its ID.
      * 
      * @param HTMLNode|string $node The node that will be inserted. Also, 
@@ -445,6 +470,43 @@ class EmailMessage {
         }
     }
     /**
+     * Sends the message and set message instance to null.
+     * 
+     * @since 1.0
+     */
+    public function send() {
+        $acc = $this->getSMTPAccount();
+        $this->smtpServer = new SMTPServer($acc->getServerAddress(), $acc->getPort());
+
+        if ($this->smtpServer->authLogin($acc->getUsername(), $acc->getPassword())) {
+            $this->smtpServer->sendCommand('MAIL FROM: <'.$acc->getAddress().'>');
+            $this->_receiversCommand('to');
+            $this->_receiversCommand('cc');
+            $this->_receiversCommand('bcc');
+            $this->smtpServer->sendCommand('DATA');
+            $importanceHeaderVal = $this->_priorityCommand();
+
+            $this->smtpServer->sendCommand('Content-Transfer-Encoding: quoted-printable');
+            $this->smtpServer->sendCommand('Importance: '.$importanceHeaderVal);
+            $this->smtpServer->sendCommand('From: =?UTF-8?B?'.base64_encode($acc->getSenderName()).'?= <'.$acc->getAddress().'>');
+            $this->smtpServer->sendCommand('To: '.$this->getToStr());
+            $this->smtpServer->sendCommand('CC: '.$this->getCCStr());
+            $this->smtpServer->sendCommand('BCC: '.$this->getBCCStr());
+            $this->smtpServer->sendCommand('Date:'.date('r (T)'));
+            $this->smtpServer->sendCommand('Subject:'.'=?UTF-8?B?'.base64_encode($this->getSubject()).'?=');
+            $this->smtpServer->sendCommand('MIME-Version: 1.0');
+            $this->smtpServer->sendCommand('Content-Type: multipart/mixed; boundary="'.$this->boundry.'"'.SMTPServer::NL);
+            $this->smtpServer->sendCommand('--'.$this->boundry);
+            $this->smtpServer->sendCommand('Content-Type: text/html; charset="UTF-8"'.SMTPServer::NL);
+            $this->smtpServer->sendCommand($this->_trimControlChars($this->getDocument()->toHTML()));
+            $this->_appendAttachments();
+            $this->smtpServer->sendCommand(SMTPServer::NL.'.');
+            $this->smtpServer->sendCommand('QUIT');
+        } else {
+            throw new SMTPException('Unable to login to SMTP server: '.$this->smtpServer->getLastResponse(), $this->smtpServer->getLastResponseCode());
+        }
+    }
+    /**
      * Sets the display language of the email.
      * 
      * The length of the given string must be 2 characters in order to set the 
@@ -468,108 +530,57 @@ class EmailMessage {
         }
     }
     /**
-     * Returns the value of a language label.
+     * Sets the priority of the message.
      * 
-     * @param string $label A directory to the language variable 
-     * (such as 'pages/login/login-label').
+     * @param int $priority The priority of the message. -1 for non-urgent, 0 
+     * for normal and 1 for urgent. If the passed value is greater than 1, 
+     * then 1 will be used. If the passed value is less than -1, then -1 is 
+     * used. Other than that, 0 will be used.
      * 
-     * @return string|array If the given directory represents a label, the 
-     * method will return its value. If it represents an array, the array will 
-     * be returned. If nothing was found, the returned value will be the passed 
-     * value to the method.
-     * 
-     * @since 1.0 
+     * @since 2.0
      */
-    public function get($label) {
-        $langObj = $this->getTranslation();
+    public function setPriority($priority) {
+        $asInt = intval($priority);
 
-        if ($langObj !== null) {
-            return $langObj->get($label);
-        }
-
-        return $label;
-    }
-    /**
-     * Returns the language code of the email.
-     * 
-     * @return string|null Two digit language code. In case language is not set, the 
-     * method will return null
-     * 
-     * @since 1.0.5
-     */
-    public function getLang() {
-        return $this->contentLang;
-    }
-    /**
-     *
-     * @var Language|null 
-     * 
-     * @since 1.0.5
-     */
-    private $tr;
-    private function usingLanguage() {
-        if ($this->getLang() !== null) {
-            try {
-                $this->tr = Language::loadTranslation($this->getLang());
-            } catch (MissingLangException $ex) {
-                throw new MissingLangException($ex->getMessage());
-            }
-            $lang = $this->getTranslation();
-            $this->document->getDocumentRoot()->setAttribute('lang', $lang->getCode());
-            $this->document->getBody()->setStyle([
-                'dir' => $lang->getWritingDir()
-            ]);
-        }
-    }
-    /**
-     * Returns an object which holds i18n labels.
-     * 
-     * @return Language|null The returned object labels will be based on the 
-     * language of the email. If no translation is loaded, the method will 
-     * return null.
-     * 
-     * @since 1.0.5
-     */
-    public function getTranslation() {
-        return $this->tr;
-    }
-    /**
-     * Sends the message and set message instance to null.
-     * 
-     * @since 1.0
-     */
-    public function send() {
-        $acc = $this->getSMTPAccount();
-        $this->smtpServer = new SMTPServer($acc->getServerAddress(), $acc->getPort());
-        
-        if ($this->smtpServer->authLogin($acc->getUsername(), $acc->getPassword())) {
-            $this->smtpServer->sendCommand('MAIL FROM: <'.$acc->getAddress().'>');
-            $this->_receiversCommand('to');
-            $this->_receiversCommand('cc');
-            $this->_receiversCommand('bcc');
-            $this->smtpServer->sendCommand('DATA');
-            $importanceHeaderVal = $this->_priorityCommand();
-            
-            $this->smtpServer->sendCommand('Content-Transfer-Encoding: quoted-printable');
-            $this->smtpServer->sendCommand('Importance: '.$importanceHeaderVal);
-            $this->smtpServer->sendCommand('From: =?UTF-8?B?'. base64_encode($acc->getSenderName()).'?= <'.$acc->getAddress().'>');
-            $this->smtpServer->sendCommand('To: '.$this->getToStr());
-            $this->smtpServer->sendCommand('CC: '.$this->getCCStr());
-            $this->smtpServer->sendCommand('BCC: '.$this->getBCCStr());
-            $this->smtpServer->sendCommand('Date:'.date('r (T)'));
-            $this->smtpServer->sendCommand('Subject:'.'=?UTF-8?B?'.base64_encode($this->getSubject()).'?=');
-            $this->smtpServer->sendCommand('MIME-Version: 1.0');
-            $this->smtpServer->sendCommand('Content-Type: multipart/mixed; boundary="'.$this->boundry.'"'.SMTPServer::NL);
-            $this->smtpServer->sendCommand('--'.$this->boundry);
-            $this->smtpServer->sendCommand('Content-Type: text/html; charset="UTF-8"'.SMTPServer::NL);
-            $this->smtpServer->sendCommand($this->_trimControlChars($this->getDocument()->toHTML()));
-            $this->_appendAttachments();
-            $this->smtpServer->sendCommand(SMTPServer::NL.'.');
-            $this->smtpServer->sendCommand('QUIT');
-            
+        if ($asInt <= -1) {
+            $this->priority = -1;
         } else {
-            throw new SMTPException('Unable to login to SMTP server: '.$this->smtpServer->getLastResponse(), $this->smtpServer->getLastResponseCode());
+            if ($asInt >= 1) {
+                $this->priority = 1;
+            } else {
+                $this->priority = 0;
+            }
         }
+    }
+    /**
+     * Sets the subject of the message.
+     * 
+     * @param string $subject Email subject.
+     * 
+     * @since 2.0
+     */
+    public function setSubject($subject) {
+        $trimmed = $this->_trimControlChars($subject);
+
+        if (strlen($trimmed) > 0) {
+            $this->subject = $trimmed;
+        }
+    }
+    private function _addAddress($address, $name, $type) {
+        $nameTrimmed = $this->_trimControlChars(str_replace('<', '', str_replace('>', '', $name)));
+        $addressTrimmed = $this->_trimControlChars(str_replace('<', '', str_replace('>', '', $address)));
+
+        if (strlen($nameTrimmed) == 0) {
+            $nameTrimmed = $addressTrimmed;
+        }
+
+        if (strlen($addressTrimmed) != 0 && in_array($type, ['cc', 'bcc', 'to'])) {
+            $this->receiversArr[$type][$addressTrimmed] = $nameTrimmed;
+
+            return true;
+        }
+
+        return false;
     }
     /**
      * A method that is used to include email attachments.
@@ -593,16 +604,14 @@ class EmailMessage {
             $this->smtpServer->sendCommand('--'.$this->boundry.'--'.SMTPServer::NL);
         }
     }
-    /**
-     * Returns the priority of the message.
-     * 
-     * @return int The priority of the message. -1 for non-urgent, 0 
-     * for normal and 1 for urgent. Default value is 0.
-     * 
-     * @since 2.0
-     */
-    public function getPriority() {
-        return $this->priority;
+    private function _getReceiversStr($type) {
+        $arr = [];
+
+        foreach ($this->receiversArr[$type] as $address => $name) {
+            $arr[] = '=?UTF-8?B?'.base64_encode($name).'?='.' <'.$address.'>';
+        }
+
+        return implode(',', $arr);
     }
     private function _priorityCommand() {
         $priorityAsInt = $this->getPriority();
@@ -610,10 +619,12 @@ class EmailMessage {
 
         if ($priorityAsInt == -1) {
             $importanceHeaderVal = 'low';
-        } else if ($priorityAsInt == 1) {
-            $importanceHeaderVal = 'High';
         } else {
-            $importanceHeaderVal = 'normal';
+            if ($priorityAsInt == 1) {
+                $importanceHeaderVal = 'High';
+            } else {
+                $importanceHeaderVal = 'normal';
+            }
         }
         $this->smtpServer->sendCommand('Priority: '.$priorityHeaderVal);
 
@@ -625,26 +636,15 @@ class EmailMessage {
         }
     }
     /**
+     * Removes control characters from the start and end of string in addition 
+     * to white spaces.
      * 
-     * @return SMTPAccount
+     * @param string $str The string that will be trimmed.
+     * 
+     * @return string The string after its control characters trimmed.
      */
-    public function getSMTPAccount() {
-        return $this->smtpAcc;
-    }
-    /**
-     * Returns an object that holds SMTP server information.
-     * 
-     * The returned instance can be used to access SMTP server messages log 
-     * to see if the message was transfered or not. Note that the 
-     * connection to the server will only be established once the 
-     * method 'EmailMessage::send()'.
-     * 
-     * @return SMTPServer An instance which represents SMTP server.
-     * 
-     * @since 1.0.5
-     */
-    public function getSMTPServer() {
-        return $this->smtpServer;
+    private function _trimControlChars($str) {
+        return trim($str, "\x00..\x20");
     }
     /**
      * Returns the document that is associated with the page.
@@ -656,15 +656,18 @@ class EmailMessage {
     private function getDocument() {
         return $this->document;
     }
-    /**
-     * Removes control characters from the start and end of string in addition 
-     * to white spaces.
-     * 
-     * @param string $str The string that will be trimmed.
-     * 
-     * @return string The string after its control characters trimmed.
-     */
-    private function _trimControlChars($str) {
-        return trim($str, "\x00..\x20");
+    private function usingLanguage() {
+        if ($this->getLang() !== null) {
+            try {
+                $this->tr = Language::loadTranslation($this->getLang());
+            } catch (MissingLangException $ex) {
+                throw new MissingLangException($ex->getMessage());
+            }
+            $lang = $this->getTranslation();
+            $this->document->getDocumentRoot()->setAttribute('lang', $lang->getCode());
+            $this->document->getBody()->setStyle([
+                'dir' => $lang->getWritingDir()
+            ]);
+        }
     }
 }

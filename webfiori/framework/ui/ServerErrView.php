@@ -228,7 +228,7 @@ class ServerErrView {
         $this->page->setTitleSep(WebFioriApp::getAppConfig()->getTitleSep());
         $this->page->addCSS('https://cdn.jsdelivr.net/gh/webfiori/app@'.WF_VERSION.'/public/assets/css/server-err.css',[],false);
         $hNode = $this->page->insert('h1');
-        
+
         if ($throwableOrErr instanceof Throwable) {
             $hNode->addTextNode('500 - Server Error: Uncaught Exception.');
 

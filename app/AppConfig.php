@@ -1,10 +1,9 @@
 <?php
-
 namespace app;
 
 use webfiori\database\ConnectionInfo;
-use webfiori\framework\mail\SMTPAccount;
 use webfiori\framework\Config;
+use webfiori\framework\mail\SMTPAccount;
 use webfiori\http\Uri;
 /**
  * Configuration class of the application
@@ -159,7 +158,7 @@ class AppConfig implements Config {
      * 
      * @since 1.0
      */
-     public function addAccount(SMTPAccount $acc) {
+    public function addAccount(SMTPAccount $acc) {
         $this->emailAccounts[$acc->getAccountName()] = $acc;
     }
     /**
@@ -277,7 +276,7 @@ class AppConfig implements Config {
     public function getDBConnection($conName) {
         $conns = $this->getDBConnections();
         $trimmed = trim($conName);
-        
+
         if (isset($conns[$trimmed])) {
             return $conns[$trimmed];
         }
@@ -310,7 +309,7 @@ class AppConfig implements Config {
     public function getDefaultTitle($langCode) {
         $langs = $this->getTitles();
         $langCodeF = strtoupper(trim($langCode));
-        
+
         if (isset($langs[$langCodeF])) {
             return $langs[$langCode];
         }
@@ -330,6 +329,7 @@ class AppConfig implements Config {
     public function getDescription($langCode) {
         $langs = $this->getDescriptions();
         $langCodeF = strtoupper(trim($langCode));
+
         if (isset($langs[$langCodeF])) {
             return $langs[$langCode];
         }
@@ -440,7 +440,7 @@ class AppConfig implements Config {
     public function getWebsiteName($langCode) {
         $langs = $this->getWebsiteNames();
         $langCodeF = strtoupper(trim($langCode));
-        
+
         if (isset($langs[$langCodeF])) {
             return $langs[$langCode];
         }
@@ -473,7 +473,7 @@ class AppConfig implements Config {
             'EN' => 'WebFiori',
             'AR' => 'ويب فيوري',
         ];
-    
+
         $this->defaultPageTitles = [
             'EN' => 'Hello World',
             'AR' => 'اهلا و سهلا',

@@ -1,5 +1,4 @@
 <?php
-
 namespace app\langs;
 
 use webfiori\framework\i18n\Language;
@@ -11,8 +10,7 @@ class LanguageAR extends Language {
     /**
      * Creates new instance of the class.
      */
-    public function __construct(){
+    public function __construct() {
         parent::__construct('rtl', 'AR', true);
-        
     }
 }

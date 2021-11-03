@@ -236,25 +236,6 @@ class Cron {
         return self::_get()->timestamp['month-day'];
     }
     /**
-     * Sets the number of day in the month at which the scheduler started to 
-     * execute jobs.
-     * 
-     * This method is helpful for the developer to test if jobs will run on 
-     * the specified time or not.
-     * 
-     * @param int $dayOfMonth The number of day. 1 for the first day of month and 
-     * 31 for the last day of the month.
-     * 
-     * @since 1.1.1
-     */
-    public function setDayOfMonth($dayOfMonth) {
-        $asInt = intval($dayOfMonth);
-        
-        if ($asInt >= 1 && $asInt <= 31) {
-            self::_get()->timestamp['month-day'] = $asInt;
-        }
-    }
-    /**
      * Returns the number of current day in the current  week as integer.
      * 
      * This method is used by the class 'CronJob' to validate cron job 
@@ -268,25 +249,6 @@ class Cron {
      */
     public static function dayOfWeek() {
         return self::_get()->timestamp['week-day'];
-    }
-    /**
-     * Sets the value of the week at which the scheduler started to 
-     * run.
-     * 
-     * This method is helpful for the developer to test if jobs will run on 
-     * the specified time or not.
-     * 
-     * @param int $val Numeric representation of the day of the week. 
-     * 0 for Sunday through 6 for Saturday.
-     * 
-     * @since 1.1.1
-     */
-    public static function setDayOfWeek($val) {
-        $asInt = intval($val);
-        
-        if ($asInt >= 0 && $asInt <= 6) {
-            self::_get()->timestamp['week-day'] = $asInt;
-        }
     }
     /**
      * Enable or disable logging for jobs execution. 
@@ -381,25 +343,6 @@ class Cron {
         return self::_get()->timestamp['hour'];
     }
     /**
-     * Sets the hour at which the scheduler started to 
-     * execute jobs.
-     * 
-     * This method is helpful for the developer to test if jobs will run on 
-     * the specified time or not.
-     * 
-     * @param int $hour The number of hour. Can be any value between 1 and 
-     * 23 inclusive.
-     * 
-     * @since 1.1.1
-     */
-    public function setHour($hour) {
-        $asInt = intval($hour);
-        
-        if ($asInt >= 1 && $asInt <= 23) {
-            self::_get()->timestamp['hour'] = $asInt;
-        }
-    }
-    /**
      * Creates routes to cron web interface pages.
      * 
      * This method is used to initialize the following routes:
@@ -477,25 +420,6 @@ class Cron {
         return self::_get()->timestamp['minute'];
     }
     /**
-     * Sets the minute at which the scheduler started to 
-     * execute jobs.
-     * 
-     * This method is helpful for the developer to test if jobs will run on 
-     * the specified time or not.
-     * 
-     * @param int $minute The number of the minute. Can be any value from 
-     * 1 to 59.
-     * 
-     * @since 1.1.1
-     */
-    public function setMinute($minute) {
-        $asInt = intval($minute);
-        
-        if ($asInt >= 1 && $asInt <= 59) {
-            self::_get()->timestamp['minute'] = $asInt;
-        }
-    }
-    /**
      * Returns the number of current month as integer.
      * 
      * This method is used by the class 'CronJob' to validate cron job 
@@ -507,25 +431,6 @@ class Cron {
      */
     public static function month() {
         return self::_get()->timestamp['month'];
-    }
-    /**
-     * Sets the month at which the scheduler started to 
-     * execute jobs.
-     * 
-     * This method is helpful for the developer to test if jobs will run on 
-     * the specified time or not.
-     * 
-     * @param int $month The number of the month. Can be any value 
-     * between 1 and 12 inclusive.
-     * 
-     * @since 1.1.1
-     */
-    public function setMonth($month) {
-        $asInt = intval($month);
-        
-        if ($asInt >= 1 && $asInt <= 31) {
-            self::_get()->timestamp['month'] = $asInt;
-        }
     }
     /**
      * Create a job that will be executed once every month.
@@ -692,6 +597,101 @@ class Cron {
      */
     public static function scheduleJob($job) {
         return self::_get()->_addJob($job);
+    }
+    /**
+     * Sets the number of day in the month at which the scheduler started to 
+     * execute jobs.
+     * 
+     * This method is helpful for the developer to test if jobs will run on 
+     * the specified time or not.
+     * 
+     * @param int $dayOfMonth The number of day. 1 for the first day of month and 
+     * 31 for the last day of the month.
+     * 
+     * @since 1.1.1
+     */
+    public function setDayOfMonth($dayOfMonth) {
+        $asInt = intval($dayOfMonth);
+
+        if ($asInt >= 1 && $asInt <= 31) {
+            self::_get()->timestamp['month-day'] = $asInt;
+        }
+    }
+    /**
+     * Sets the value of the week at which the scheduler started to 
+     * run.
+     * 
+     * This method is helpful for the developer to test if jobs will run on 
+     * the specified time or not.
+     * 
+     * @param int $val Numeric representation of the day of the week. 
+     * 0 for Sunday through 6 for Saturday.
+     * 
+     * @since 1.1.1
+     */
+    public static function setDayOfWeek($val) {
+        $asInt = intval($val);
+
+        if ($asInt >= 0 && $asInt <= 6) {
+            self::_get()->timestamp['week-day'] = $asInt;
+        }
+    }
+    /**
+     * Sets the hour at which the scheduler started to 
+     * execute jobs.
+     * 
+     * This method is helpful for the developer to test if jobs will run on 
+     * the specified time or not.
+     * 
+     * @param int $hour The number of hour. Can be any value between 1 and 
+     * 23 inclusive.
+     * 
+     * @since 1.1.1
+     */
+    public function setHour($hour) {
+        $asInt = intval($hour);
+
+        if ($asInt >= 1 && $asInt <= 23) {
+            self::_get()->timestamp['hour'] = $asInt;
+        }
+    }
+    /**
+     * Sets the minute at which the scheduler started to 
+     * execute jobs.
+     * 
+     * This method is helpful for the developer to test if jobs will run on 
+     * the specified time or not.
+     * 
+     * @param int $minute The number of the minute. Can be any value from 
+     * 1 to 59.
+     * 
+     * @since 1.1.1
+     */
+    public function setMinute($minute) {
+        $asInt = intval($minute);
+
+        if ($asInt >= 1 && $asInt <= 59) {
+            self::_get()->timestamp['minute'] = $asInt;
+        }
+    }
+    /**
+     * Sets the month at which the scheduler started to 
+     * execute jobs.
+     * 
+     * This method is helpful for the developer to test if jobs will run on 
+     * the specified time or not.
+     * 
+     * @param int $month The number of the month. Can be any value 
+     * between 1 and 12 inclusive.
+     * 
+     * @since 1.1.1
+     */
+    public function setMonth($month) {
+        $asInt = intval($month);
+
+        if ($asInt >= 1 && $asInt <= 31) {
+            self::_get()->timestamp['month'] = $asInt;
+        }
     }
     /**
      * Returns the time at which jobs check was initialized.

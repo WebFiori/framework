@@ -27,9 +27,9 @@ namespace webfiori\framework;
 use webfiori\database\ConnectionInfo;
 use webfiori\database\Database;
 use webfiori\database\DatabaseException;
-use webfiori\database\Table;
-use webfiori\database\mysql\MySQLTable;
 use webfiori\database\mssql\MSSQLTable;
+use webfiori\database\mysql\MySQLTable;
+use webfiori\database\Table;
 
 /**
  * A class that can be used to represent system database.
@@ -72,6 +72,30 @@ class DB extends Database {
         parent::__construct($conn);
     }
     /**
+     * Adds a table to the instance.
+     * 
+     * @param Table $table the table that will be added.
+     * 
+     * @return boolean If the table is added, the method will return true. False 
+     * otherwise.
+     * 
+     * @since 1.0
+     */
+    public function addTable(Table $table) {
+        $connInfo = $this->getConnectionInfo();
+
+        if ($connInfo === null) {
+            parent::addTable($table);
+        } else {
+            $connType = $connInfo->getDatabaseType();
+
+            if (($connType == 'mysql' && $table instanceof MySQLTable) 
+             || ($connType == 'mssql' && $table instanceof MSSQLTable)) {
+                parent::addTable($table);
+            }
+        }
+    }
+    /**
      * Auto-register database tables which exist on a specific directory.
      * 
      * Note that the statement 'return __NAMESPACE__' should be included at the 
@@ -90,31 +114,9 @@ class DB extends Database {
      * @since 1.0.1
      */
     public function register($pathToScan) {
-        WebFioriApp::autoRegister($pathToScan, function (Table $table, DB $db) {
+        WebFioriApp::autoRegister($pathToScan, function (Table $table, DB $db)
+        {
             $db->addTable($table);
         }, 'Table', [$this]);
-    }
-    /**
-     * Adds a table to the instance.
-     * 
-     * @param Table $table the table that will be added.
-     * 
-     * @return boolean If the table is added, the method will return true. False 
-     * otherwise.
-     * 
-     * @since 1.0
-     */
-    public function addTable(Table $table) {
-        $connInfo = $this->getConnectionInfo();
-            
-        if ($connInfo === null) {
-            parent::addTable($table);
-        } else {
-            $connType = $connInfo->getDatabaseType();
-            if (($connType == 'mysql' && $table instanceof MySQLTable) 
-             || ($connType == 'mssql' && $table instanceof MSSQLTable)) {
-                parent::addTable($table);
-            }
-        }
     }
 }

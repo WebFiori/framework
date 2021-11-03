@@ -11,16 +11,16 @@ use Error;
 use ErrorException;
 use Exception;
 use webfiori\database\Column;
+use webfiori\database\mssql\MSSQLColumn;
+use webfiori\database\mssql\MSSQLTable;
 use webfiori\database\mysql\MySQLColumn;
+use webfiori\database\mysql\MySQLTable;
 use webfiori\database\Table;
 use webfiori\framework\AutoLoader;
 use webfiori\framework\cli\CLICommand;
 use webfiori\framework\cli\writers\QueryClassWriter;
 use webfiori\framework\DB;
 use webfiori\framework\WebFioriApp;
-use webfiori\database\mysql\MySQLTable;
-use webfiori\database\mssql\MSSQLTable;
-use webfiori\database\mssql\MSSQLColumn;
 /**
  * Description of UpdateTableCommand
  *
@@ -192,6 +192,7 @@ class UpdateTableCommand extends CLICommand {
      */
     private function _addColumn($tableObj) {
         $colKey = $this->getInput('Enter a name for column key:');
+
         if ($tableObj instanceof MSSQLTable) {
             $col = new MSSQLColumn();
         } else if ($tableObj instanceof MySQLTable) {

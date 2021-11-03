@@ -1,5 +1,4 @@
 <?php
-
 namespace app\ini;
 
 class InitCliCommands {
@@ -9,6 +8,5 @@ class InitCliCommands {
      * @since 1.0
      */
     public static function init() {
-        
     }
 }

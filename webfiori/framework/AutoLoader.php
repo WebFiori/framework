@@ -475,6 +475,19 @@ class AutoLoader {
 
         return $dirsStack;
     }
+    private function _attemptCreateCache($autoloadCachePath, $autoloadCache) {
+        if (!file_exists($autoloadCachePath)) {
+            mkdir($autoloadCachePath, 0777, true);
+        }
+
+        if (!file_exists($autoloadCache) && is_writable($autoloadCachePath)) {
+            $h = fopen($autoloadCache, 'w');
+
+            if (is_resource($h)) {
+                fclose($h);
+            }
+        }
+    }
     private static function _checkComposer() {
         if (defined('LOAD_COMPOSER_PACKAGES') && LOAD_COMPOSER_PACKAGES === true) {
             $composerVendors = self::_getComposerVendorDirs();
@@ -582,36 +595,6 @@ class AutoLoader {
 
         return $loaded;
     }
-    /**
-     * Read the file which contains autoloader cached content.
-     * 
-     * @since 1.1.6
-     */
-    private function _readCache() {
-        $autoloadCachePath = $this->getRoot().DIRECTORY_SEPARATOR.APP_DIR_NAME.DIRECTORY_SEPARATOR.'sto';
-        $autoloadCache = $autoloadCachePath.DIRECTORY_SEPARATOR.self::CACHE_NAME;
-        //For first run, the cache file might not exist.
-        if (file_exists($autoloadCache)) {
-            $casheStr = file_get_contents($autoloadCache);
-            $this->_parseCacheString($casheStr);
-            
-        } else {
-            $this->_attemptCreateCache($autoloadCachePath, $autoloadCache);
-        }
-    }
-    private function _attemptCreateCache($autoloadCachePath, $autoloadCache) {
-        if (!file_exists($autoloadCachePath)) {
-            mkdir($autoloadCachePath, 0777, true);
-        }
-
-        if (!file_exists($autoloadCache) && is_writable($autoloadCachePath)) {
-            $h = fopen($autoloadCache, 'w');
-
-            if (is_resource($h)) {
-                fclose($h);
-            }
-        }
-    }
     private function _parseCacheString($str) {
         $cacheArr = explode("\n", $str);
 
@@ -632,6 +615,22 @@ class AutoLoader {
                     ];
                 }
             }
+        }
+    }
+    /**
+     * Read the file which contains autoloader cached content.
+     * 
+     * @since 1.1.6
+     */
+    private function _readCache() {
+        $autoloadCachePath = $this->getRoot().DIRECTORY_SEPARATOR.APP_DIR_NAME.DIRECTORY_SEPARATOR.'sto';
+        $autoloadCache = $autoloadCachePath.DIRECTORY_SEPARATOR.self::CACHE_NAME;
+        //For first run, the cache file might not exist.
+        if (file_exists($autoloadCache)) {
+            $casheStr = file_get_contents($autoloadCache);
+            $this->_parseCacheString($casheStr);
+        } else {
+            $this->_attemptCreateCache($autoloadCachePath, $autoloadCache);
         }
     }
     /**

@@ -26,11 +26,8 @@ namespace webfiori\framework;
 
 use webfiori\database\ConnectionInfo;
 use webfiori\framework\cli\writers\LangClassWriter;
-use webfiori\framework\exceptions\SMTPException;
-use webfiori\framework\mail\SMTPAccount;
-use webfiori\framework\mail\SocketMailer;
-use webfiori\framework\mail\SMTPServer;
 use webfiori\framework\exceptions\InitializationException;
+use webfiori\framework\mail\SMTPAccount;
 
 /**
  * A class that can be used to modify basic configuration settings of 
@@ -92,10 +89,11 @@ class ConfigController {
     const INV_HOST_OR_PORT = 'inv_mail_host_or_port';
 
     const NL = "\n";
-    private $since10;
-    private $docEnd;
     private $blockEnd;
+    private $docEmptyLine;
+    private $docEnd;
     private $docStart;
+    private $since10;
     /**
      * An instance of the class.
      * 
@@ -104,6 +102,13 @@ class ConfigController {
      * @since 1.0 
      */
     private static $singleton;
+    private function __construct() {
+        $this->since10 = "     * @since 1.0";
+        $this->docEnd = "     */";
+        $this->blockEnd = "    }";
+        $this->docStart = "    /**";
+        $this->docEmptyLine = "     * ";
+    }
     /**
      * Adds new database connections information or update existing connections.
      * 
@@ -392,14 +397,6 @@ class ConfigController {
         $this->a($cFile, "}");
         $cFile->write(true, true);
         require_once $cFile->getAbsolutePath();
-    }
-    private $docEmptyLine;
-    private function __construct() {
-        $this->since10 = "     * @since 1.0";
-        $this->docEnd = "     */";
-        $this->blockEnd = "    }";
-        $this->docStart = "    /**";
-        $this->docEmptyLine = "     * ";
     }
     /**
      * Returns a single instance of the class.
@@ -737,18 +734,6 @@ class ConfigController {
             'db-connections' => $updated
         ]);
     }
-    private function _writeCronPass(&$cFile, $appConfigArr) {
-        if (isset($appConfigArr['cron-pass'])) {
-            if (strlen(trim($appConfigArr['cron-pass'])) == 0) {
-                $this->a($cFile, "        \$this->cronPass = 'NO_PASSWORD';");
-            } else {
-                $this->a($cFile, "        \$this->cronPass = '".hash('sha256', $appConfigArr['cron-pass'])."';");
-            }
-        } else {
-            $password = $this->getCRONPassword();
-            $this->a($cFile, "        \$this->cronPass = '".$password."';");
-        }
-    }
     /**
      * Update application version information.
      * 
@@ -832,162 +817,6 @@ class ConfigController {
     public function updateSiteInfo($websiteInfoArr) {
         $this->writeAppConfig($websiteInfoArr);
     }
-    private function _writeAppConfigAttrs(&$cFile) {
-        $this->a($cFile, "<?php");
-        $this->a($cFile, "");
-        $this->a($cFile, "namespace ".APP_DIR_NAME.";");
-        $this->a($cFile, "");
-        $this->a($cFile, "use webfiori\\database\\ConnectionInfo;");
-        $this->a($cFile, "use webfiori\\framework\\mail\\SMTPAccount;");
-        $this->a($cFile, "use webfiori\\framework\\Config;");
-        $this->a($cFile, "use webfiori\\http\\Uri;");
-        $this->a($cFile, "/**");
-        $this->a($cFile, " * Configuration class of the application");
-        $this->a($cFile, " *");
-        $this->a($cFile, " * @author Ibrahim");
-        $this->a($cFile, " *");
-        $this->a($cFile, " * @version 1.0.1");
-        $this->a($cFile, " *");
-        $this->a($cFile, " * @since 2.1.0");
-        $this->a($cFile, " */");
-        $this->a($cFile, "class AppConfig implements Config {");
-
-        $this->a($cFile, $this->docStart);
-        $this->a($cFile, "     * The name of admin control pages Theme.");
-        $this->a($cFile, $this->docEmptyLine);
-        $this->a($cFile, "     * @var string");
-        $this->a($cFile, $this->docEmptyLine);
-        $this->a($cFile, $this->since10);
-        $this->a($cFile, $this->docEnd);
-        $this->a($cFile, "    private \$adminThemeName;");
-
-        $this->a($cFile, $this->docStart);
-        $this->a($cFile, "     * The date at which the application was released.");
-        $this->a($cFile, $this->docEmptyLine);
-        $this->a($cFile, "     * @var string");
-        $this->a($cFile, $this->docEmptyLine);
-        $this->a($cFile, $this->since10);
-        $this->a($cFile, $this->docEnd);
-        $this->a($cFile, "    private \$appReleaseDate;");
-
-        $this->a($cFile, $this->docStart);
-        $this->a($cFile, "     * A string that represents the type of the release.");
-        $this->a($cFile, $this->docEmptyLine);
-        $this->a($cFile, "     * @var string");
-        $this->a($cFile, $this->docEmptyLine);
-        $this->a($cFile, $this->since10);
-        $this->a($cFile, $this->docEnd);
-        $this->a($cFile, "    private \$appVersionType;");
-
-        $this->a($cFile, $this->docStart);
-        $this->a($cFile, "     * Version of the web application.");
-        $this->a($cFile, $this->docEmptyLine);
-        $this->a($cFile, "     * @var string");
-        $this->a($cFile, $this->docEmptyLine);
-        $this->a($cFile, $this->since10);
-        $this->a($cFile, $this->docEnd);
-        $this->a($cFile, "    private \$appVestion;");
-
-        $this->a($cFile, $this->docStart);
-        $this->a($cFile, "     * The name of base website UI Theme.");
-        $this->a($cFile, $this->docEmptyLine);
-        $this->a($cFile, "     * @var string");
-        $this->a($cFile, $this->docEmptyLine);
-        $this->a($cFile, $this->since10);
-        $this->a($cFile, $this->docEnd);
-        $this->a($cFile, "    private \$baseThemeName;");
-
-        $this->a($cFile, $this->docStart);
-        $this->a($cFile, "     * The base URL that is used by all web site pages to fetch resource files.");
-        $this->a($cFile, $this->docEmptyLine);
-        $this->a($cFile, "     * @var string");
-        $this->a($cFile, $this->docEmptyLine);
-        $this->a($cFile, $this->since10);
-        $this->a($cFile, $this->docEnd);
-        $this->a($cFile, "    private \$baseUrl;");
-
-        $this->a($cFile, $this->docStart);
-        $this->a($cFile, "     * Configuration file version number.");
-        $this->a($cFile, $this->docEmptyLine);
-        $this->a($cFile, "     * @var string");
-        $this->a($cFile, $this->docEmptyLine);
-        $this->a($cFile, $this->since10);
-        $this->a($cFile, $this->docEnd);
-        $this->a($cFile, "    private \$configVision;");
-
-        $this->a($cFile, $this->docStart);
-        $this->a($cFile, "     * Password hash of CRON sub-system.");
-        $this->a($cFile, $this->docEmptyLine);
-        $this->a($cFile, "     * @var string");
-        $this->a($cFile, $this->docEmptyLine);
-        $this->a($cFile, $this->since10);
-        $this->a($cFile, $this->docEnd);
-        $this->a($cFile, "    private \$cronPass;");
-
-        $this->a($cFile, $this->docStart);
-        $this->a($cFile, "     * An associative array that will contain database connections.");
-        $this->a($cFile, $this->docEmptyLine);
-        $this->a($cFile, "     * @var array");
-        $this->a($cFile, $this->docEmptyLine);
-        $this->a($cFile, $this->since10);
-        $this->a($cFile, $this->docEnd);
-        $this->a($cFile, "    private \$dbConnections;");
-
-        $this->a($cFile, $this->docStart);
-        $this->a($cFile, "     * An array that is used to hold default page titles for different languages.");
-        $this->a($cFile, $this->docEmptyLine);
-        $this->a($cFile, "     * @var array");
-        $this->a($cFile, $this->docEmptyLine);
-        $this->a($cFile, $this->since10);
-        $this->a($cFile, $this->docEnd);
-        $this->a($cFile, "    private \$defaultPageTitles;");
-
-        $this->a($cFile, $this->docStart);
-        $this->a($cFile, "     * An array that holds SMTP connections information.");
-        $this->a($cFile, $this->docEmptyLine);
-        $this->a($cFile, "     * @var string");
-        $this->a($cFile, $this->docEmptyLine);
-        $this->a($cFile, $this->since10);
-        $this->a($cFile, $this->docEnd);
-        $this->a($cFile, "    private \$emailAccounts;");
-
-        $this->a($cFile, $this->docStart);
-        $this->a($cFile, "     * The URL of the home page.");
-        $this->a($cFile, $this->docEmptyLine);
-        $this->a($cFile, "     * @var string");
-        $this->a($cFile, $this->docEmptyLine);
-        $this->a($cFile, $this->since10);
-        $this->a($cFile, $this->docEnd);
-        $this->a($cFile, "    private \$homePage;");
-
-        $this->a($cFile, $this->docStart);
-        $this->a($cFile, "     * The primary language of the website.");
-        $this->a($cFile, $this->docEmptyLine);
-        $this->a($cFile, "     * @var string");
-        $this->a($cFile, $this->docEmptyLine);
-        $this->a($cFile, $this->since10);
-        $this->a($cFile, $this->docEnd);
-        $this->a($cFile, "    private \$primaryLang;");
-
-        $this->a($cFile, $this->docStart);
-        $this->a($cFile, "     * The character which is used to saperate site name from page title.");
-        $this->a($cFile, $this->docEmptyLine);
-        $this->a($cFile, "     * @var string");
-        $this->a($cFile, $this->docEmptyLine);
-        $this->a($cFile, $this->since10);
-        $this->a($cFile, $this->docEnd);
-        $this->a($cFile, "    private \$titleSep;");
-
-        $this->a($cFile, $this->docStart);
-        $this->a($cFile, "     * An array which contains all website names in different languages.");
-        $this->a($cFile, $this->docEmptyLine);
-        $this->a($cFile, "     * @var string");
-        $this->a($cFile, $this->docEmptyLine);
-        $this->a($cFile, $this->since10);
-        $this->a($cFile, $this->docEnd);
-        $this->a($cFile, "    private \$webSiteNames;");
-
-    }
     /**
      * Stores configuration variables into the application configuration class.
      * 
@@ -1023,9 +852,9 @@ class ConfigController {
     public function writeAppConfig($appConfigArr) {
         $cFile = new File('AppConfig.php', ROOT_DIR.DS.APP_DIR_NAME);
         $cFile->remove();
-        
+
         $this->_writeAppConfigAttrs($cFile);
-        
+
         $this->a($cFile, $this->docStart);
         $this->a($cFile, "     * Creates new instance of the class.");
         $this->a($cFile, $this->docEmptyLine);
@@ -1038,9 +867,9 @@ class ConfigController {
         $this->a($cFile, "        \$this->initDbConnections();");
         $this->a($cFile, "        \$this->initSmtpConnections();");
 
-        
+
         $this->_writeCronPass($cFile, $appConfigArr);
-        
+
         $this->a($cFile, $this->blockEnd);
 
         $this->a($cFile, $this->docStart);
@@ -1385,6 +1214,166 @@ class ConfigController {
         $cFile->write(false, true);
         require_once ROOT_DIR.DS.APP_DIR_NAME.DS.'AppConfig.php';
     }
+    private function _mkdir($dir) {
+        if (!is_dir($dir)) {
+            mkdir($dir);
+        }
+    }
+    private function _writeAppConfigAttrs(&$cFile) {
+        $this->a($cFile, "<?php");
+        $this->a($cFile, "");
+        $this->a($cFile, "namespace ".APP_DIR_NAME.";");
+        $this->a($cFile, "");
+        $this->a($cFile, "use webfiori\\database\\ConnectionInfo;");
+        $this->a($cFile, "use webfiori\\framework\\mail\\SMTPAccount;");
+        $this->a($cFile, "use webfiori\\framework\\Config;");
+        $this->a($cFile, "use webfiori\\http\\Uri;");
+        $this->a($cFile, "/**");
+        $this->a($cFile, " * Configuration class of the application");
+        $this->a($cFile, " *");
+        $this->a($cFile, " * @author Ibrahim");
+        $this->a($cFile, " *");
+        $this->a($cFile, " * @version 1.0.1");
+        $this->a($cFile, " *");
+        $this->a($cFile, " * @since 2.1.0");
+        $this->a($cFile, " */");
+        $this->a($cFile, "class AppConfig implements Config {");
+
+        $this->a($cFile, $this->docStart);
+        $this->a($cFile, "     * The name of admin control pages Theme.");
+        $this->a($cFile, $this->docEmptyLine);
+        $this->a($cFile, "     * @var string");
+        $this->a($cFile, $this->docEmptyLine);
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
+        $this->a($cFile, "    private \$adminThemeName;");
+
+        $this->a($cFile, $this->docStart);
+        $this->a($cFile, "     * The date at which the application was released.");
+        $this->a($cFile, $this->docEmptyLine);
+        $this->a($cFile, "     * @var string");
+        $this->a($cFile, $this->docEmptyLine);
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
+        $this->a($cFile, "    private \$appReleaseDate;");
+
+        $this->a($cFile, $this->docStart);
+        $this->a($cFile, "     * A string that represents the type of the release.");
+        $this->a($cFile, $this->docEmptyLine);
+        $this->a($cFile, "     * @var string");
+        $this->a($cFile, $this->docEmptyLine);
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
+        $this->a($cFile, "    private \$appVersionType;");
+
+        $this->a($cFile, $this->docStart);
+        $this->a($cFile, "     * Version of the web application.");
+        $this->a($cFile, $this->docEmptyLine);
+        $this->a($cFile, "     * @var string");
+        $this->a($cFile, $this->docEmptyLine);
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
+        $this->a($cFile, "    private \$appVestion;");
+
+        $this->a($cFile, $this->docStart);
+        $this->a($cFile, "     * The name of base website UI Theme.");
+        $this->a($cFile, $this->docEmptyLine);
+        $this->a($cFile, "     * @var string");
+        $this->a($cFile, $this->docEmptyLine);
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
+        $this->a($cFile, "    private \$baseThemeName;");
+
+        $this->a($cFile, $this->docStart);
+        $this->a($cFile, "     * The base URL that is used by all web site pages to fetch resource files.");
+        $this->a($cFile, $this->docEmptyLine);
+        $this->a($cFile, "     * @var string");
+        $this->a($cFile, $this->docEmptyLine);
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
+        $this->a($cFile, "    private \$baseUrl;");
+
+        $this->a($cFile, $this->docStart);
+        $this->a($cFile, "     * Configuration file version number.");
+        $this->a($cFile, $this->docEmptyLine);
+        $this->a($cFile, "     * @var string");
+        $this->a($cFile, $this->docEmptyLine);
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
+        $this->a($cFile, "    private \$configVision;");
+
+        $this->a($cFile, $this->docStart);
+        $this->a($cFile, "     * Password hash of CRON sub-system.");
+        $this->a($cFile, $this->docEmptyLine);
+        $this->a($cFile, "     * @var string");
+        $this->a($cFile, $this->docEmptyLine);
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
+        $this->a($cFile, "    private \$cronPass;");
+
+        $this->a($cFile, $this->docStart);
+        $this->a($cFile, "     * An associative array that will contain database connections.");
+        $this->a($cFile, $this->docEmptyLine);
+        $this->a($cFile, "     * @var array");
+        $this->a($cFile, $this->docEmptyLine);
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
+        $this->a($cFile, "    private \$dbConnections;");
+
+        $this->a($cFile, $this->docStart);
+        $this->a($cFile, "     * An array that is used to hold default page titles for different languages.");
+        $this->a($cFile, $this->docEmptyLine);
+        $this->a($cFile, "     * @var array");
+        $this->a($cFile, $this->docEmptyLine);
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
+        $this->a($cFile, "    private \$defaultPageTitles;");
+
+        $this->a($cFile, $this->docStart);
+        $this->a($cFile, "     * An array that holds SMTP connections information.");
+        $this->a($cFile, $this->docEmptyLine);
+        $this->a($cFile, "     * @var string");
+        $this->a($cFile, $this->docEmptyLine);
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
+        $this->a($cFile, "    private \$emailAccounts;");
+
+        $this->a($cFile, $this->docStart);
+        $this->a($cFile, "     * The URL of the home page.");
+        $this->a($cFile, $this->docEmptyLine);
+        $this->a($cFile, "     * @var string");
+        $this->a($cFile, $this->docEmptyLine);
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
+        $this->a($cFile, "    private \$homePage;");
+
+        $this->a($cFile, $this->docStart);
+        $this->a($cFile, "     * The primary language of the website.");
+        $this->a($cFile, $this->docEmptyLine);
+        $this->a($cFile, "     * @var string");
+        $this->a($cFile, $this->docEmptyLine);
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
+        $this->a($cFile, "    private \$primaryLang;");
+
+        $this->a($cFile, $this->docStart);
+        $this->a($cFile, "     * The character which is used to saperate site name from page title.");
+        $this->a($cFile, $this->docEmptyLine);
+        $this->a($cFile, "     * @var string");
+        $this->a($cFile, $this->docEmptyLine);
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
+        $this->a($cFile, "    private \$titleSep;");
+
+        $this->a($cFile, $this->docStart);
+        $this->a($cFile, "     * An array which contains all website names in different languages.");
+        $this->a($cFile, $this->docEmptyLine);
+        $this->a($cFile, "     * @var string");
+        $this->a($cFile, $this->docEmptyLine);
+        $this->a($cFile, $this->since10);
+        $this->a($cFile, $this->docEnd);
+        $this->a($cFile, "    private \$webSiteNames;");
+    }
     private function _writeAppVersionInfo(&$cFile, $appConfigArr) {
         $this->a($cFile, $this->docStart);
         $this->a($cFile, $this->since10);
@@ -1419,73 +1408,46 @@ class ConfigController {
 
         $this->a($cFile, $this->blockEnd);
     }
-    private function _writeSmtpConn(&$cFile, $appConfigArr) {
+    private function _writeCronPass(&$cFile, $appConfigArr) {
+        if (isset($appConfigArr['cron-pass'])) {
+            if (strlen(trim($appConfigArr['cron-pass'])) == 0) {
+                $this->a($cFile, "        \$this->cronPass = 'NO_PASSWORD';");
+            } else {
+                $this->a($cFile, "        \$this->cronPass = '".hash('sha256', $appConfigArr['cron-pass'])."';");
+            }
+        } else {
+            $password = $this->getCRONPassword();
+            $this->a($cFile, "        \$this->cronPass = '".$password."';");
+        }
+    }
+    private function _writeDbCon(&$cFile, $appConfigArr) {
         $this->a($cFile, $this->docStart);
         $this->a($cFile, $this->since10);
         $this->a($cFile, $this->docEnd);
-        $this->a($cFile, "    private function initSmtpConnections() {");
-        $this->a($cFile, "        \$this->emailAccounts = [");
+        $this->a($cFile, "    private function initDbConnections() {");
+        $this->a($cFile, "        \$this->dbConnections = [");
 
-        if (isset($appConfigArr['smtp']) && gettype($appConfigArr['smtp']) == 'array') {
-            $smtpAccArr = $appConfigArr['smtp'];
+        if (isset($appConfigArr['db-connections']) && gettype($appConfigArr['db-connections']) == 'array') {
+            $dbCons = $appConfigArr['db-connections'];
         } else {
-            $smtpAccArr = $this->getSMTPAccounts();
+            $dbCons = $this->getDatabaseConnections();
         }
 
-        foreach ($smtpAccArr as $smtpAcc) {
-            if ($smtpAcc instanceof SMTPAccount) {
-                $this->a($cFile, "            '".$smtpAcc->getAccountName()."' => new SMTPAccount([");
-                $this->a($cFile, "                'port' => ".$smtpAcc->getPort().",");
-                $this->a($cFile, "                'server-address' => '".$smtpAcc->getServerAddress()."',");
-                $this->a($cFile, "                'user' => '".$smtpAcc->getUsername()."',");
-                $this->a($cFile, "                'pass' => '".$smtpAcc->getPassword()."',");
-                $this->a($cFile, "                'sender-name' => '".str_replace("'", "\'", $smtpAcc->getSenderName())."',");
-                $this->a($cFile, "                'sender-address' => '".$smtpAcc->getAddress()."',");
-                $this->a($cFile, "                'account-name' => '".str_replace("'", "\'", $smtpAcc->getAccountName())."'");
+        foreach ($dbCons as $connObj) {
+            if ($connObj instanceof ConnectionInfo) {
+                $cName = $connObj->getName();
+                $this->a($cFile, "            '$cName' => new ConnectionInfo('".$connObj->getDatabaseType()."',"
+                        ."'".$connObj->getUsername()."', "
+                        ."'".$connObj->getPassword()."', "
+                        ."'".$connObj->getDBName()."', "
+                        ."'".$connObj->getHost()."', "
+                        ."".$connObj->getPort().", [");
+                $this->a($cFile, "                'connection-name' => '".str_replace("'", "\'", $cName)."'");
                 $this->a($cFile, "            ]),");
             }
         }
         $this->a($cFile, "        ];");
         $this->a($cFile, $this->blockEnd);
-    }
-    private function _writeSiteNames(&$cFile, $appConfigArr) {
-        if (isset($appConfigArr['website-names']) && gettype($appConfigArr['website-names']) == 'array') {
-            $wNamesArr = $appConfigArr['website-names'];
-        } else {
-            $wNamesArr = $this->getWebsiteNames();
-        }
-        $this->a($cFile, "        \$this->webSiteNames = [");
-
-        foreach ($wNamesArr as $langCode => $name) {
-            $name = str_replace("'", "\'", $name);
-            $this->a($cFile, "            '$langCode' => '$name',");
-        }
-        $this->a($cFile, "        ];");
-        $this->a($cFile, "    ");
-    }
-    private function _writeSiteTitles($cFile, $appConfigArr) {
-        if (isset($appConfigArr['titles']) && gettype($appConfigArr['titles']) == 'array') {
-            $titlesArr = $appConfigArr['titles'];
-        } else {
-            $titlesArr = $this->getTitles();
-        }
-        $this->a($cFile, "        \$this->defaultPageTitles = [");
-
-        foreach ($titlesArr as $langCode => $title) {
-            $title = str_replace("'", "\'", $title);
-            $this->a($cFile, "            '$langCode' => '$title',");
-
-            if (!class_exists(APP_DIR_NAME.'\\langs\\Language'.$langCode)) {
-
-                //This require a fix in the future
-                $dir = $langCode == 'AR' ? 'rtl' : 'ltr';
-
-                $writer = new LangClassWriter($langCode, $dir);
-                $writer->writeClass();
-                require_once $writer->getAbsolutePath();
-            }
-        }
-        $this->a($cFile, "        ];");
     }
     private function _writeSiteDescriptions(&$cFile, $appConfigArr) {
         if (isset($appConfigArr['descriptions']) && gettype($appConfigArr['descriptions']) == 'array') {
@@ -1510,7 +1472,7 @@ class ConfigController {
         $this->_writeSiteNames($cFile, $appConfigArr);
         $this->_writeSiteTitles($cFile, $appConfigArr);
         $this->_writeSiteDescriptions($cFile, $appConfigArr);
-        
+
         $this->a($cFile, "        \$this->baseUrl = Uri::getBaseURL();");
 
         if (isset($appConfigArr['title-sep'])) {
@@ -1565,39 +1527,73 @@ class ConfigController {
 
         $this->a($cFile, $this->blockEnd);
     }
-    private function _writeDbCon(&$cFile, $appConfigArr) {
+    private function _writeSiteNames(&$cFile, $appConfigArr) {
+        if (isset($appConfigArr['website-names']) && gettype($appConfigArr['website-names']) == 'array') {
+            $wNamesArr = $appConfigArr['website-names'];
+        } else {
+            $wNamesArr = $this->getWebsiteNames();
+        }
+        $this->a($cFile, "        \$this->webSiteNames = [");
+
+        foreach ($wNamesArr as $langCode => $name) {
+            $name = str_replace("'", "\'", $name);
+            $this->a($cFile, "            '$langCode' => '$name',");
+        }
+        $this->a($cFile, "        ];");
+        $this->a($cFile, "    ");
+    }
+    private function _writeSiteTitles($cFile, $appConfigArr) {
+        if (isset($appConfigArr['titles']) && gettype($appConfigArr['titles']) == 'array') {
+            $titlesArr = $appConfigArr['titles'];
+        } else {
+            $titlesArr = $this->getTitles();
+        }
+        $this->a($cFile, "        \$this->defaultPageTitles = [");
+
+        foreach ($titlesArr as $langCode => $title) {
+            $title = str_replace("'", "\'", $title);
+            $this->a($cFile, "            '$langCode' => '$title',");
+
+            if (!class_exists(APP_DIR_NAME.'\\langs\\Language'.$langCode)) {
+
+                //This require a fix in the future
+                $dir = $langCode == 'AR' ? 'rtl' : 'ltr';
+
+                $writer = new LangClassWriter($langCode, $dir);
+                $writer->writeClass();
+                require_once $writer->getAbsolutePath();
+            }
+        }
+        $this->a($cFile, "        ];");
+    }
+    private function _writeSmtpConn(&$cFile, $appConfigArr) {
         $this->a($cFile, $this->docStart);
         $this->a($cFile, $this->since10);
         $this->a($cFile, $this->docEnd);
-        $this->a($cFile, "    private function initDbConnections() {");
-        $this->a($cFile, "        \$this->dbConnections = [");
+        $this->a($cFile, "    private function initSmtpConnections() {");
+        $this->a($cFile, "        \$this->emailAccounts = [");
 
-        if (isset($appConfigArr['db-connections']) && gettype($appConfigArr['db-connections']) == 'array') {
-            $dbCons = $appConfigArr['db-connections'];
+        if (isset($appConfigArr['smtp']) && gettype($appConfigArr['smtp']) == 'array') {
+            $smtpAccArr = $appConfigArr['smtp'];
         } else {
-            $dbCons = $this->getDatabaseConnections();
+            $smtpAccArr = $this->getSMTPAccounts();
         }
 
-        foreach ($dbCons as $connObj) {
-            if ($connObj instanceof ConnectionInfo) {
-                $cName = $connObj->getName();
-                $this->a($cFile, "            '$cName' => new ConnectionInfo('".$connObj->getDatabaseType()."',"
-                        ."'".$connObj->getUsername()."', "
-                        ."'".$connObj->getPassword()."', "
-                        ."'".$connObj->getDBName()."', "
-                        ."'".$connObj->getHost()."', "
-                        ."".$connObj->getPort().", [");
-                $this->a($cFile, "                'connection-name' => '".str_replace("'", "\'", $cName)."'");
+        foreach ($smtpAccArr as $smtpAcc) {
+            if ($smtpAcc instanceof SMTPAccount) {
+                $this->a($cFile, "            '".$smtpAcc->getAccountName()."' => new SMTPAccount([");
+                $this->a($cFile, "                'port' => ".$smtpAcc->getPort().",");
+                $this->a($cFile, "                'server-address' => '".$smtpAcc->getServerAddress()."',");
+                $this->a($cFile, "                'user' => '".$smtpAcc->getUsername()."',");
+                $this->a($cFile, "                'pass' => '".$smtpAcc->getPassword()."',");
+                $this->a($cFile, "                'sender-name' => '".str_replace("'", "\'", $smtpAcc->getSenderName())."',");
+                $this->a($cFile, "                'sender-address' => '".$smtpAcc->getAddress()."',");
+                $this->a($cFile, "                'account-name' => '".str_replace("'", "\'", $smtpAcc->getAccountName())."'");
                 $this->a($cFile, "            ]),");
             }
         }
         $this->a($cFile, "        ];");
         $this->a($cFile, $this->blockEnd);
-    }
-    private function _mkdir($dir) {
-        if (!is_dir($dir)) {
-            mkdir($dir);
-        }
     }
     private function a($file, $str) {
         if (is_resource($file)) {

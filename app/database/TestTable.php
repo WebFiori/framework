@@ -1,5 +1,4 @@
 <?php
-
 namespace app\database;
 
 use webfiori\database\mysql\MySQLTable;

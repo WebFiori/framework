@@ -1,5 +1,4 @@
 <?php
-
 namespace app\ini\routes;
 
 class OtherRoutes {
@@ -9,6 +8,5 @@ class OtherRoutes {
      * @since 1.0
      */
     public static function create() {
-        
     }
 }

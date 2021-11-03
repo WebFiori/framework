@@ -20,14 +20,14 @@ class JobArgument implements JsonI {
      * 
      * @since 1.0
      */
-    private $description;
+    private $argName;
     /**
      * 
      * @var string
      * 
      * @since 1.0
      */
-    private $argName;
+    private $description;
     /**
      * Creates new instance of the class.
      * 

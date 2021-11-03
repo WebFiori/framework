@@ -64,6 +64,7 @@ class StdIn implements InputStream {
                 }
             }
         }
+
         return $input;
     }
     /**

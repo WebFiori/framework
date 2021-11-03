@@ -61,6 +61,7 @@ class UpdateSettingsCommand extends CLICommand {
         } else {
             $this->println('Not implemented yet.');
         }
+
         return 0;
     }
     private function _setAdminTheme() {

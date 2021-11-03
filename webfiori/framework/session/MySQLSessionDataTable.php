@@ -1,9 +1,7 @@
 <?php
-
 namespace webfiori\framework\session;
 
 use webfiori\database\mysql\MySQLTable;
-use webfiori\framework\session\MySQLSessionsTable;
 
 /**
  * A class which represents the database table 'session_data'.
@@ -18,7 +16,7 @@ class MySQLSessionDataTable extends MySQLTable {
     /**
      * Creates new instance of the class.
      */
-    public function __construct(){
+    public function __construct() {
         parent::__construct('session_data');
         $this->setComment('This table is used to hold the data part of sessions.');
         $this->addColumns([
@@ -27,7 +25,7 @@ class MySQLSessionDataTable extends MySQLTable {
                 'size' => '128',
                 'primary' => true,
                 'comment' => 'The ID of the session. '
-                . 'Taken from main sessions table.',
+                .'Taken from main sessions table.',
             ],
             'chunk-number' => [
                 'type' => 'int',
@@ -40,8 +38,9 @@ class MySQLSessionDataTable extends MySQLTable {
                 'comment' => 'One data chunk of size 1000.',
             ],
         ]);
-        
+
         $this->addReference(new MySQLSessionsTable(), ['s-id'], 'session_data_fk', 'cascade', 'cascade');
     }
 }
+
 return __NAMESPACE__;

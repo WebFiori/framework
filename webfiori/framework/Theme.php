@@ -174,7 +174,7 @@ abstract class Theme implements JsonI {
         $this->afterLoadedParamsPool = [];
         $this->afterLoadedPool = [];
     }
-    
+
     /**
      * Creates an instance of 'HTMLNode' given an array of options.
      * 
@@ -260,7 +260,7 @@ abstract class Theme implements JsonI {
             return WebFioriApp::getAppConfig()->getBaseURL();
         }
     }
-    
+
     /**
      * Returns the name of the directory where CSS files are kept.
      * 
@@ -328,20 +328,6 @@ abstract class Theme implements JsonI {
      */
     public abstract function getFooterNode();
     /**
-     * Returns an object of type HeadNode that represents HTML &lt;head&gt; node. 
-     * 
-     * The developer must implement this method such that it returns an 
-     * object of type HeadNode. The developer can use this method to include 
-     * any JavaScript or CSS files that website pages needs. Also, it can be used to 
-     * add custom meta tags to &lt;head&gt; node or any tag that can be added 
-     * to the &lt;head&gt; HTML element.
-     * 
-     * @return HeadNode An object of type HeadNode.
-     * 
-     * @since 1.2.2
-     */
-    public abstract function getHeadNode();
-    /**
      * Returns an object of type HTMLNode that represents header section of the page. 
      * 
      * The developer must implement this method such that it returns an 
@@ -357,6 +343,20 @@ abstract class Theme implements JsonI {
      * @since 1.2.2
      */
     public abstract function getHeaderNode();
+    /**
+     * Returns an object of type HeadNode that represents HTML &lt;head&gt; node. 
+     * 
+     * The developer must implement this method such that it returns an 
+     * object of type HeadNode. The developer can use this method to include 
+     * any JavaScript or CSS files that website pages needs. Also, it can be used to 
+     * add custom meta tags to &lt;head&gt; node or any tag that can be added 
+     * to the &lt;head&gt; HTML element.
+     * 
+     * @return HeadNode An object of type HeadNode.
+     * 
+     * @since 1.2.2
+     */
+    public abstract function getHeadNode();
     /**
      * Returns the name of the directory where theme images are kept.
      * 

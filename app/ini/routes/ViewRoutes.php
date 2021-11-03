@@ -1,5 +1,4 @@
 <?php
-
 namespace app\ini\routes;
 
 class ViewRoutes {
@@ -9,6 +8,5 @@ class ViewRoutes {
      * @since 1.0
      */
     public static function create() {
-        
     }
 }

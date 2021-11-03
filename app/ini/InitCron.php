@@ -1,5 +1,4 @@
 <?php
-
 namespace app\ini;
 
 class InitCron {
@@ -9,6 +8,5 @@ class InitCron {
      * @since 1.0
      */
     public static function init() {
-        
     }
 }

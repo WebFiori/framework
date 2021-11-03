@@ -1,5 +1,4 @@
 <?php
-
 namespace app\ini;
 
 class InitMiddleware {
@@ -9,6 +8,5 @@ class InitMiddleware {
      * @since 1.0
      */
     public static function init() {
-        
     }
 }

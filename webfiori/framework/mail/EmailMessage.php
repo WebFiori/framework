@@ -32,6 +32,8 @@ use webfiori\framework\File;
 use webfiori\framework\WebFioriApp;
 use webfiori\ui\HTMLDoc;
 use webfiori\ui\HTMLNode;
+use webfiori\framework\i18n\Language;
+use webfiori\framework\exceptions\MissingLangException;
 /**
  * A class that can be used to write HTML formatted Email messages.
  *
@@ -39,6 +41,13 @@ use webfiori\ui\HTMLNode;
  * @version 1.0.5
  */
 class EmailMessage {
+    /**
+     * 
+     * @var string
+     * 
+     * @since 1.0.5
+     */
+    private $contentLang;
     /**
      * A boundary variable used to separate email message parts.
      * 
@@ -151,17 +160,21 @@ class EmailMessage {
      * 
      * @since 1.0 
      */
-    private $asHtml;
+    private $document;
 
     private $log;
     /**
      * Creates new instance of the class.
-     * @param type $sendAccountName
-     * @return type
-     * @throws SMTPException
+     * 
+     * @param string $sendAccountName The name of SMTP connection that will be 
+     * used to send the message. It must exist in the class 'AppConfig'. Default 
+     * value is 'no-reply'.
+     * 
+     * @throws SMTPException If the given SMTP connection does not exist.
+     * 
      * @since 1.0
      */
-    public function __construct($sendAccountName = '') {
+    public function __construct($sendAccountName = 'no-reply') {
         $this->log = [];
         $this->subject = 'Hello From WebFiori Framework';
         $this->setPriority(0);
@@ -173,7 +186,7 @@ class EmailMessage {
         ];
         $this->attachments = [];
         $this->inReplyTo = [];
-        $this->asHtml = new HTMLDoc();
+        $this->document = new HTMLDoc();
         
         if (class_exists(APP_DIR_NAME.'\AppConfig')) {
             $acc = WebFioriApp::getAppConfig()->getAccount($sendAccountName);
@@ -432,6 +445,95 @@ class EmailMessage {
         }
     }
     /**
+     * Sets the display language of the email.
+     * 
+     * The length of the given string must be 2 characters in order to set the 
+     * language code.
+     * 
+     * @param string $lang a two digit language code such as AR or EN. Default 
+     * value is 'EN'.
+     * 
+     * @since 1.0.5
+     */
+    public function setLang($lang = 'EN') {
+        $langU = strtoupper(trim($lang));
+
+        if (strlen($lang) == 2) {
+            $this->contentLang = $langU;
+
+            if ($this->document !== null) {
+                $this->document->setLanguage($langU);
+            }
+            $this->usingLanguage();
+        }
+    }
+    /**
+     * Returns the value of a language label.
+     * 
+     * @param string $label A directory to the language variable 
+     * (such as 'pages/login/login-label').
+     * 
+     * @return string|array If the given directory represents a label, the 
+     * method will return its value. If it represents an array, the array will 
+     * be returned. If nothing was found, the returned value will be the passed 
+     * value to the method.
+     * 
+     * @since 1.0 
+     */
+    public function get($label) {
+        $langObj = $this->getTranslation();
+
+        if ($langObj !== null) {
+            return $langObj->get($label);
+        }
+
+        return $label;
+    }
+    /**
+     * Returns the language code of the email.
+     * 
+     * @return string|null Two digit language code. In case language is not set, the 
+     * method will return null
+     * 
+     * @since 1.0.5
+     */
+    public function getLang() {
+        return $this->contentLang;
+    }
+    /**
+     *
+     * @var Language|null 
+     * 
+     * @since 1.0.5
+     */
+    private $tr;
+    private function usingLanguage() {
+        if ($this->getLang() !== null) {
+            try {
+                $this->tr = Language::loadTranslation($this->getLang());
+            } catch (MissingLangException $ex) {
+                throw new MissingLangException($ex->getMessage());
+            }
+            $lang = $this->getTranslation();
+            $this->document->getDocumentRoot()->setAttribute('lang', $lang->getCode());
+            $this->document->getBody()->setStyle([
+                'dir' => $lang->getWritingDir()
+            ]);
+        }
+    }
+    /**
+     * Returns an object which holds i18n labels.
+     * 
+     * @return Language|null The returned object labels will be based on the 
+     * language of the email. If no translation is loaded, the method will 
+     * return null.
+     * 
+     * @since 1.0.5
+     */
+    public function getTranslation() {
+        return $this->tr;
+    }
+    /**
      * Sends the message and set message instance to null.
      * 
      * @since 1.0
@@ -552,7 +654,7 @@ class EmailMessage {
      * @since 1.0.5
      */
     private function getDocument() {
-        return $this->asHtml;
+        return $this->document;
     }
     /**
      * Removes control characters from the start and end of string in addition 

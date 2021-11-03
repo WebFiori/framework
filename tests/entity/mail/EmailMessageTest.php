@@ -14,6 +14,30 @@ class EmailMessageTest extends TestCase {
     /**
      * @test
      */
+    public function testLang00() {
+        $message = new EmailMessage();
+        $this->assertEquals('test/notloaded', $message->get('test/notloaded'));
+        $this->assertNull($message->getTranslation());
+    }
+    /**
+     * @test
+     */
+    public function testLang01() {
+        $this->expectException(\webfiori\framework\exceptions\MissingLangException::class);
+        $message = new EmailMessage();
+        $message->setLang('KR');
+    }
+    /**
+     * @test
+     */
+    public function testLang02() {
+        $message = new EmailMessage();
+        $message->setLang('EN');
+        $this->assertNotNull($message->getTranslation());
+    }
+    /**
+     * @test
+     */
     public function testAddReciver00() {
         $sm = new EmailMessage('no-reply');
         $this->assertFalse($sm->addTo('', ''));

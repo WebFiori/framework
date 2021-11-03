@@ -23,6 +23,8 @@ class SessionOperations extends DB {
         parent::__construct('sessions-connection');
         $this->addTable(new MySQLSessionsTable());
         $this->addTable(new MSSQLSessionsTable());
+        $this->addTable(new MSSQLSessionDataTable());
+        $this->addTable(new MySQLSessionDataTable());
     }
     /**
      * Clears the sessions which are older than the constant 'SESSION_GC' or 

@@ -200,7 +200,7 @@ class SessionOperations extends DB {
                 ])->execute();
             } catch (DatabaseException $ex) {
                 $query = "update session_data set data = '".$chunks[$x]
-                        ." where s_id = '".$sId.' and chunk_number = '.$x;
+                        ."' where s_id = '".$sId."' and chunk_number = ".$x;
                 $this->setQuery($query);
                   $this->execute();
             }

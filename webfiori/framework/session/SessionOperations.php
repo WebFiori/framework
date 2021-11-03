@@ -2,6 +2,7 @@
 namespace webfiori\framework\session;
 
 use webfiori\framework\DB;
+use webfiori\database\DatabaseException;
 /**
  * A class which includes all database related operations to add, update, 
  * and delete sessions from a database.
@@ -10,7 +11,7 @@ use webfiori\framework\DB;
  * 
  * @version 1.0
  * 
- * @since 2.1.0
+ * @since 2.1.1
  */
 class SessionOperations extends DB {
     /**
@@ -54,11 +55,17 @@ class SessionOperations extends DB {
      * @since 1.0
      */
     public function getSession($sId) {
-        $this->table('sessions')->select()->where('s-id', '=', $sId)->execute();
+        $this->table('session_data')->select()->where('s-id', '=', $sId)
+                ->orderBy(['chunk-number' => 'a'])->execute();
         $resultSet = $this->getLastResultSet();
 
-        if ($resultSet->getRowsCount() == 1) {
-            return $resultSet->getRows()[0]['session_data'];
+        if ($resultSet->getRowsCount() != 0) {
+            $retVal = '';
+            
+            foreach ($resultSet->getRows() as $record) {
+                $retVal .= $record['data'];
+            }
+            return $retVal;
         }
     }
     /**
@@ -111,19 +118,110 @@ class SessionOperations extends DB {
      */
     public function saveSession($sId, $session) {
         $sData = $this->getSession($sId);
-
+        
         if ($sData !== null) {
             $this->table('sessions')->update([
-                'session-data' => $session,
                 'last-used' => date('Y-m-d H:i:s')
-            ])->where('s-id', '=', $sId)->execute();
+            ])->where('s-id', '=', $sId)
+              ->execute();
         } else {
             $this->table('sessions')->insert([
                 's-id' => $sId,
-                'session-data' => $session,
                 'last-used' => date('Y-m-d H:i:s'),
                 'started-at' => date('Y-m-d H:i:s'),
             ])->execute();
         }
+        $this->_storeChunks($sId, $session);
+    }
+    /**
+     * This method is used to remove any extra chunks which remains in the 
+     * database after updating a session.
+     * 
+     * @param type $sId
+     * @param type $chunksCount
+     * @param type $startNumber
+     */
+    private function _removeExtraChunks($sId, $chunksCount, $startNumber) {
+        for ($x = 0 ; $x < $chunksCount ; $x++) {
+            $this->table('session_data')
+                    ->delete()->where('s-id', '=', $sId)
+                    ->andWhere('chunk-number', '=', $startNumber)
+                    ->execute();
+            $startNumber++;
+        }
+    }
+    /**
+     * Returns the number of data chunks a session has.
+     * 
+     * @param string $sId The ID of the session.
+     * 
+     * @return int If the session does not exist, the method will return 0.
+     * Other than that, it will return data chunks count.
+     * 
+     * @since 2.1.1
+     */
+    public function getChunksCount($sId) {
+        $resultSet = $this->table('session_data')
+                ->selectCount()
+                ->where('s-id', '=', $sId)
+                ->execute();
+        $row = $resultSet->getRows()[0];
+        
+        if ($row['count'] !== null) {
+            return $row['count'];
+        }
+        return 0;
+    }
+    private function _storeChunks($sId, $data) {
+        $chunks = $this->_getChunks($data);
+        $currentChunksCount = $this->getChunksCount($sId);
+        
+        for($x = 0 ; $x < count($chunks) ; $x++) {
+            try {
+                $this->table('session_data')->update([
+                    'data' => $chunks[$x]
+                ])->where('s-id', '=', $sId)
+                  ->andWhere('chunk-number', '=', $x)
+                  ->execute();
+            } catch (DatabaseException $ex) {
+                $this->table('session_data')->insert([
+                    'data' => $chunks[$x],
+                    's-id' => $sId,
+                    'chunk-number' => $x
+                ])->execute();
+            }
+        }
+        $newChunksCount = count($chunks);
+        if ($currentChunksCount > $newChunksCount) {
+            $chunksCountToRemove = $currentChunksCount - $newChunksCount;
+            $this->_removeExtraChunks($sId, $chunksCountToRemove, $newChunksCount + 1);
+        }
+    }
+    /**
+     * Split session data into smaller chunks.
+     * 
+     * @param type $data
+     * @return type
+     */
+    private function _getChunks($data) {
+        $retVal = [];
+        $index = 0;
+        $chunkSize = $this->getTable('session_data')->getColByKey('data')->getSize();
+        $dataLen = strlen($data);
+        
+        while ($index < $dataLen) {
+            $retVal[] = substr($data, $index, $chunkSize);
+        }
+        
+        //This part is to add any extra remaining 
+        //data in the last part of the session
+        $chunksTotalLen = $dataLen - count($retVal);
+        $remainingChars = $chunksTotalLen*$chunkSize;
+        
+        if ($remainingChars != 0) {
+            $retVal[] = substr($data, $chunksTotalLen);
+        }
+        
+        return $retVal;
     }
 }

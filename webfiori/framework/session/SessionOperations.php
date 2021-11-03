@@ -193,17 +193,17 @@ class SessionOperations extends DB {
         
         for($x = 0 ; $x < count($chunks) ; $x++) {
             try {
-                $this->table('session_data')->update([
-                    'data' => $chunks[$x]
-                ])->where('s-id', '=', $sId)
-                  ->andWhere('chunk-number', '=', $x)
-                  ->execute();
-            } catch (DatabaseException $ex) {
                 $this->table('session_data')->insert([
                     'data' => $chunks[$x],
                     's-id' => $sId,
                     'chunk-number' => $x
                 ])->execute();
+            } catch (DatabaseException $ex) {
+                $this->table('session_data')->update([
+                    'data' => $chunks[$x]
+                ])->where('s-id', '=', $sId)
+                  ->andWhere('chunk-number', '=', $x)
+                  ->execute();
             }
         }
         $newChunksCount = count($chunks);
@@ -232,11 +232,10 @@ class SessionOperations extends DB {
         
         //This part is to add any extra remaining 
         //data in the last part of the session
-        $chunksTotalLen = $dataLen - count($retVal);
-        $remainingChars = $chunksTotalLen*$chunkSize;
+        $remainingChars = $dataLen - count($retVal)*$chunkSize;
         
-        if ($remainingChars != 0) {
-            $retVal[] = substr($data, $chunksTotalLen);
+        if ($remainingChars > 0) {
+            $retVal[] = substr($data, $index);
         }
         
         return $retVal;

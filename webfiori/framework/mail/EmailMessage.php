@@ -584,7 +584,7 @@ class EmailMessage {
                 }
                 $content = $file->getRawData();
                 $contentChunk = chunk_split(base64_encode($content));
-                $this->smtpServer->sendCommand('--'.$this->boundry.SMTPServer::NL);
+                $this->smtpServer->sendCommand('--'.$this->boundry);
                 $this->smtpServer->sendCommand('Content-Type: '.$file->getFileMIMEType().'; name="'.$file->getName().'"');
                 $this->smtpServer->sendCommand('Content-Transfer-Encoding: base64');
                 $this->smtpServer->sendCommand('Content-Disposition: attachment; filename="'.$file->getName().'"'.SMTPServer::NL);

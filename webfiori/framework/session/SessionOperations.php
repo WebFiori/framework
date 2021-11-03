@@ -227,6 +227,7 @@ class SessionOperations extends DB {
         
         while ($index < $dataLen) {
             $retVal[] = substr($data, $index, $chunkSize);
+            $index += $chunkSize;
         }
         
         //This part is to add any extra remaining 

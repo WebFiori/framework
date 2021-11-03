@@ -199,11 +199,10 @@ class SessionOperations extends DB {
                     'chunk-number' => $x
                 ])->execute();
             } catch (DatabaseException $ex) {
-                $this->table('session_data')->update([
-                    'data' => $chunks[$x]
-                ])->where('s-id', '=', $sId)
-                  ->andWhere('chunk-number', '=', $x)
-                  ->execute();
+                $query = "update session_data set data = '".$chunks[$x]
+                        ." where s_id = '".$sId.' and chunk_number = '.$x;
+                $this->setQuery($query);
+                  $this->execute();
             }
         }
         $newChunksCount = count($chunks);

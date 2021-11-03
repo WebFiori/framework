@@ -47,6 +47,20 @@ class SessionOperations extends DB {
         }
     }
     /**
+     * Checks if a session which has the given ID exist or not in the database.
+     * 
+     * @param string $sId The unique identifier of the session.
+     * 
+     * @return boolean If a session which has the given ID exist, the method will 
+     * return true. Other than that, the method will return false.
+     * 
+     * @since 2.1.1
+     */
+    public function isSessionExist($sId) {
+        $resultSet = $this->table('sessions')->select()->where('s-id', '=', $sId)->execute();
+        return $resultSet->getRowsCount() == 1;
+    }
+    /**
      * Returns a record that holds session data given Its ID.
      * 
      * @param string $sId The ID of the session.
@@ -119,9 +133,8 @@ class SessionOperations extends DB {
      * @since 1.0
      */
     public function saveSession($sId, $session) {
-        $sData = $this->getSession($sId);
         
-        if ($sData !== null) {
+        if ($this->isSessionExist($sId)) {
             $this->table('sessions')->update([
                 'last-used' => date('Y-m-d H:i:s')
             ])->where('s-id', '=', $sId)
@@ -194,6 +207,7 @@ class SessionOperations extends DB {
             }
         }
         $newChunksCount = count($chunks);
+        
         if ($currentChunksCount > $newChunksCount) {
             $chunksCountToRemove = $currentChunksCount - $newChunksCount;
             $this->_removeExtraChunks($sId, $chunksCountToRemove, $newChunksCount + 1);

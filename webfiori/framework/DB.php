@@ -107,7 +107,7 @@ class DB extends Database {
     public function addTable(Table $table) {
         $connInfo = $this->getConnectionInfo();
             
-        if ($connInfo !== null) {
+        if ($connInfo === null) {
             parent::addTable($table);
         } else {
             $connType = $connInfo->getDatabaseType();

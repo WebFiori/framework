@@ -213,8 +213,13 @@ class QueryClassWriter extends ClassWriter {
         $this->append("'$key' => [", 3);
         $this->append("'type' => '".$colObj->getDatatype()."',", 4);
 
-        if ($dataType == 'int' || $dataType == 'varchar' || $dataType == 'decimal' || 
-                $dataType == 'float' || $dataType == 'double') {
+        if (($dataType == 'int' && $colObj instanceof MySQLTable) 
+                || $dataType == 'varchar' 
+                || $dataType == 'decimal' 
+                || $dataType == 'float' 
+                || $dataType == 'double'
+                || $dataType == 'binary'
+                || $dataType == 'varbinary') {
             $this->append("'size' => '".$colObj->getSize()."',", 4);
 
             if ($dataType == 'decimal') {
@@ -235,7 +240,7 @@ class QueryClassWriter extends ClassWriter {
         }
 
         if ($colObj->getDefault() !== null) {
-            if ($colObj->getDatatype() == 'bool' || $colObj->getDatatype() == 'boolean') {
+            if ($dataType == 'bool' || $dataType == 'boolean') {
                 if ($colObj->getDefault() === true) {
                     $this->append("'default' => true,", 4);
                 } else {

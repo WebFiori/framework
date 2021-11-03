@@ -81,7 +81,7 @@ class SessionOperations extends DB {
             foreach ($resultSet->getRows() as $record) {
                 $retVal .= $record['data'];
             }
-            return $retVal;
+            return base64_decode($retVal);
         }
     }
     /**
@@ -146,7 +146,7 @@ class SessionOperations extends DB {
                 'started-at' => date('Y-m-d H:i:s'),
             ])->execute();
         }
-        $this->_storeChunks($sId, $session);
+        $this->_storeChunks($sId, base64_encode($session));
     }
     /**
      * This method is used to remove any extra chunks which remains in the 
@@ -222,7 +222,7 @@ class SessionOperations extends DB {
     private function _getChunks($data) {
         $retVal = [];
         $index = 0;
-        $chunkSize = $this->getTable('session_data')->getColByKey('data')->getSize();
+        $chunkSize = $this->getTable('session_data')->getColByKey('data')->getSize() - 50;
         $dataLen = strlen($data);
         
         while ($index < $dataLen) {

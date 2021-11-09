@@ -30,7 +30,7 @@ use webfiori\database\Table;
 use webfiori\framework\cli\CLICommand;
 use webfiori\framework\DB;
 use webfiori\framework\WebFioriApp;
-
+use webfiori\framework\File;
 /**
  * A command which can be used to execute SQL queries on 
  * specific database.
@@ -159,7 +159,8 @@ class RunSQLQueryCommand extends CLICommand {
     private function generalQuery(DB $schema) {
         $options = [
             'Run general query.',
-            'Run query on table instance.'
+            'Run query on table instance.',
+            'Run query from file.'
         ];
         $selected = $this->select('What type of query you would like to run?', $options);
 
@@ -204,6 +205,35 @@ class RunSQLQueryCommand extends CLICommand {
             $this->tableQuery($schema, $tableObj);
 
             return $this->confirmExecute($schema);
+        } else if ($selected == 'Run query from file.') {
+            $filePath = '';
+            $file = null;
+            while (!File::isFileExist($filePath)) {
+                $filePath = $this->getInput('File path:');
+                if (File::isFileExist($filePath)) {
+                    $file = new File($filePath);
+                    $file->read();
+                    if ($file->getFileMIMEType() == 'application/sql') {
+                        break;
+                    } else {
+                        $this->error('Provided file is not SQL file!');
+                    }
+                } else {
+                    $this->error('No such file!');
+                }
+            }
+            $this->println('Executing the query...');
+            $schema->setQuery($file->getRawData());
+            try {
+                $schema->execute();
+            } catch (DatabaseException $ex) {
+                $this->error('The query finished execution with an error: '.$ex->getMessage());
+
+                return $ex->getCode();
+            }
+            $this->success('Query executed without errors.');
+
+            return 0;
         }
     }
     private function queryOnSchema(DB $schema) {

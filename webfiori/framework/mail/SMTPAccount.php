@@ -36,7 +36,7 @@ class SMTPAccount {
      * @var string 
      * @since 1.0.2
      */
-    private $accName;
+    private $accName; 
     /**
      * Email address.
      * @var string 

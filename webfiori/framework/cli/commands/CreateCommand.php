@@ -86,13 +86,25 @@ class CreateCommand extends CLICommand {
         $this->println('We need from you to give us entity class information.');
         $classInfo = $this->getClassInfo(APP_DIR_NAME.'\\entity');
         $implJsonI = $this->confirm('Would you like from your class to implement the interface JsonI?', true);
-        $this->println('Generating your entity...');
-
+        
         if (strlen($classInfo['namespace']) == 0) {
             $this->warning('The entity class will be added to the namespace "'.APP_DIR_NAME.'\database".');
             $classInfo['namespace'] = APP_DIR_NAME.'\\database';
         }
         $mapper = $tableObj->getEntityMapper();
+        if ($this->confirm('Would you like to add extra attributes to the entity?', false)) {
+            $addExtra = true;
+            
+            while ($addExtra) {
+                if ($mapper->addAttribute($this->getInput('Enter attribute name:'))) {
+                    $this->success('Attribute successfully added.');
+                } else {
+                    $this->warning('Unable to add attribute.');
+                }
+                $addExtra = $this->confirm('Would you like to add another attribute?', false);
+            }
+        }
+        $this->println('Generating your entity...');
         $mapper->setPath($classInfo['path']);
         $mapper->setNamespace($classInfo['namespace']);
         $mapper->setEntityName($classInfo['name']);
@@ -102,7 +114,6 @@ class CreateCommand extends CLICommand {
 
         return 0;
     }
-
     public function exec() {
         $what = $this->getArgValue('--what');
 

@@ -219,7 +219,10 @@ class QueryClassWriter extends ClassWriter {
                 || $dataType == 'float' 
                 || $dataType == 'double'
                 || $dataType == 'binary'
-                || $dataType == 'varbinary') {
+                || $dataType == 'varbinary'
+                || $dataType == 'char'
+                || $dataType == 'nchar'
+                || $dataType == 'nvarchar') {
             $this->append("'size' => '".$colObj->getSize()."',", 4);
 
             if ($dataType == 'decimal') {

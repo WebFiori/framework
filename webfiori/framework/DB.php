@@ -85,15 +85,26 @@ class DB extends Database {
         $connInfo = $this->getConnectionInfo();
 
         if ($connInfo === null) {
-            parent::addTable($table);
+            
+            foreach ($table->getForignKeys() as $fk) {
+                parent::addTable($table);
+            }
+            
+            return parent::addTable($table);
         } else {
             $connType = $connInfo->getDatabaseType();
 
             if (($connType == 'mysql' && $table instanceof MySQLTable) 
              || ($connType == 'mssql' && $table instanceof MSSQLTable)) {
-                parent::addTable($table);
+                
+                foreach ($table->getForignKeys() as $fk) {
+                    parent::addTable($table);
+                }
+                
+                return parent::addTable($table);
             }
         }
+        return false;
     }
     /**
      * Auto-register database tables which exist on a specific directory.

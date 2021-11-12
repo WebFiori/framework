@@ -370,13 +370,13 @@ class UpdateTableCommand extends CLICommand {
 
             do {
                 $colDataType = $colObj->getDatatype();
-                $dataSize = $this->_getCommand()->getInput('Enter column size:');
+                $dataSize = $this->getInput('Enter column size:');
 
                 if ($colObj instanceof MySQLColumn && $colObj->getDatatype() == 'varchar' && $dataSize > 21845) {
-                    $this->_getCommand()->warning('The data type "varchar" has a maximum size of 21845. The '
+                    $this->warning('The data type "varchar" has a maximum size of 21845. The '
                             .'data type of the column will be changed to "mediumtext" if you continue.');
 
-                    if (!$this->_getCommand()->confirm('Would you like to change data type?', false)) {
+                    if (!$this->confirm('Would you like to change data type?', false)) {
                         $valid = true;
                         continue;
                     }

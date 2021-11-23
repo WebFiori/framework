@@ -296,7 +296,7 @@ class Router {
     public static function api($options) {
         if (gettype($options) == 'array') {
             $options['type'] = Router::API_ROUTE;
-            $this->_addToMiddlewareGroup($options, 'api');
+            self::_addToMiddlewareGroup($options, 'api');
             
             return Router::get()->_addRoute($options);
         }
@@ -375,7 +375,7 @@ class Router {
     public static function closure($options) {
         if (gettype($options) == 'array') {
             $options['type'] = Router::CLOSURE_ROUTE;
-            $this->_addToMiddlewareGroup($options, 'closure');
+            self::_addToMiddlewareGroup($options, 'closure');
             
             return Router::get()->_addRoute($options);
         }
@@ -775,8 +775,9 @@ class Router {
         return false;
     }
     /**
-     * Adds new route to a view file.
-     * A view file can be any file that is added inside the folder '/pages'.
+     * Adds new route to a page.
+     * 
+     * A page can be any file that is added inside the folder '/pages'.
      * 
      * @param array $options An associative array that contains route 
      * options. Available options are:
@@ -828,14 +829,14 @@ class Router {
     private static function view($options) {
         if (gettype($options) == 'array') {
             $options['type'] = Router::VIEW_ROUTE;
-            $this->_addToMiddlewareGroup($options, 'web');
+            self::_addToMiddlewareGroup($options, 'web');
             
             return Router::get()->_addRoute($options);
         }
 
         return false;
     }
-    private function _addToMiddlewareGroup(&$options, $groupName) {
+    private static function _addToMiddlewareGroup(&$options, $groupName) {
         if (isset($options['middleware'])) {
             if (gettype($options['middleware']) == 'array') {
                 $options['middleware'][] = $groupName;

@@ -29,7 +29,7 @@ use webfiori\json\JsonI;
 /**
  * A helper class that is used to upload most types of files to the server's file system.
  * 
- * The main aim of this class is to allow the developer to upload files 
+ * The main aim of this class is to allow developer to upload files 
  * without having to deal directly with the array $_FILES. It can be used to 
  * perform the following tasks:
  * <ul>
@@ -37,7 +37,6 @@ use webfiori\json\JsonI;
  * <li>Restrict the types of files which can be uploaded.</li>
  * <li>Store the uploaded file(s) to a specific location on the server.</li>
  * <li>View upload status of each file.</li>
- * <li>The ability to get MIME type of most file types using file extension only.<li>
  * </ul>
  * A basic example on how to use this class:
  * <pre>
@@ -120,9 +119,10 @@ class Uploader implements JsonI {
      * Creates new instance of the class.
      * 
      * @param string $uploadPath A string that represents the location at 
-     * which files will be uploaded to. Default value is 'app/storage/uploads'.
+     * which files will be uploaded to. Default value is 'app/sto/uploads'.
      * 
-     * @param array $allowedTypes An array that contains allowed files types.
+     * @param array $allowedTypes An array that contains allowed files types. The 
+     * array can have values such as 'jpg', 'png', 'doc', etc...
      * 
      * @since 1.0
      */
@@ -307,12 +307,13 @@ class Uploader implements JsonI {
     /**
      * Sets The name of the index at which the file is stored in the array $_FILES.
      * 
-     * This value is the value of the attribute 'name' in case of HTML file. The 
-     * developer can set the value of the propery in the front end by using a 
-     * hidden input field with name = 'file-input-name' and the value of that input 
+     * This value is the value of the attribute 'name' in case of HTML file input. 
+     * 
+     * It is possible to set the value of the property in the front end by using a 
+     * hidden input field with name = 'file' and the value of that input 
      * field must be the value of the attribute 'name' of the original file input. 
      * In case of API call, it can be supplied as a POST parameter with name 
-     * 'file-input-name'.
+     * 'file'.
      * 
      * @param string $name The name of the index at which the file is stored in the array $_FILES.
      * input element.
@@ -415,11 +416,11 @@ class Uploader implements JsonI {
             $associatedInputName = filter_input(INPUT_POST, 'file');
 
             if ($associatedInputName !== null) {
-                $this->asscociatedName = $associatedInputName;
+                $this->setAssociatedFileName($associatedInputName);
             }
 
-            if (isset($_FILES[$this->asscociatedName])) {
-                $fileOrFiles = $_FILES[$this->asscociatedName];
+            if (isset($_FILES[$this->getAssociatedFileName()])) {
+                $fileOrFiles = $_FILES[$this->getAssociatedFileName()];
             }
 
             if ($fileOrFiles !== null) {

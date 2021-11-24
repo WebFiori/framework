@@ -106,15 +106,22 @@ class RunSQLQueryCommand extends CLICommand {
             return -1;
         }
     }
+    /**
+     * 
+     * @param type $schema
+     * @param type $selectedQuery
+     * @param type $colsKeys
+     * @param Table $tableObj
+     */
     private function colQuery(&$schema, $selectedQuery, $colsKeys, $tableObj) {
         $selectedCol = $this->select('Select the column:', $colsKeys);
 
         if ($selectedQuery == 'Add Column.') {
-            $schema->table($tableObj->getName())->addCol($selectedCol);
+            $schema->table($tableObj->getNormalName())->addCol($selectedCol);
         } else if ($selectedQuery == 'Modify Column.') {
-            $schema->table($tableObj->getName())->modifyCol($selectedCol);
+            $schema->table($tableObj->getNormalName())->modifyCol($selectedCol);
         } else if ($selectedQuery == 'Drop Column.') {
-            $schema->table($tableObj->getName())->dropCol($selectedCol);
+            $schema->table($tableObj->getNormalName())->dropCol($selectedCol);
         }
     }
     private function confirmExecute($schema) {
@@ -151,9 +158,9 @@ class RunSQLQueryCommand extends CLICommand {
         $fkName = $this->select('Select the forign key:', $keysNamesArr);
 
         if ($selectedQuery == 'Add Forign Key.') {
-            $schema->table($tableObj->getName())->addForeignKey($fkName);
+            $schema->table($tableObj->getNormalName())->addForeignKey($fkName);
         } else {
-            $schema->table($tableObj->getName())->dropForeignKey($fkName);
+            $schema->table($tableObj->getNormalName())->dropForeignKey($fkName);
         }
     }
     private function generalQuery(DB $schema) {

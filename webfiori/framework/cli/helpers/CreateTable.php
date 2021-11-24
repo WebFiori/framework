@@ -78,7 +78,7 @@ class CreateTable {
 
             $db = new DB($dbConn);
             $db->addTable($tableObj);
-            $db->table($tableObj->getName())->createTable();
+            $db->table($tableObj->getNormalName())->createTable();
 
             $this->_getCommand()->prints('The following query will be executed on the database ');
             $this->_getCommand()->println($db->getConnectionInfo()->getDBName(),[

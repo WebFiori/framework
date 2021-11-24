@@ -25,55 +25,70 @@
 namespace webfiori\framework\mail;
 
 /**
- * A class that represents an email account which is used to send or receive messages.
+ * A class that represents an SMTP account which is used to connect to SMTP server.
  *
  * @author Ibrahim
- * @version 1.0.2
+ * 
+ * @version 1.0.3
  */
 class SMTPAccount {
     /**
      * The name of SMTP account.
+     * 
      * @var string 
+     * 
      * @since 1.0.2
      */
     private $accName; 
     /**
      * Email address.
+     * 
      * @var string 
      */
     private $address;
     /**
      * Server address of the email account.
+     * 
      * @var string
+     * 
      * @since 1.0 
      */
     private $emailServerAddress;
     /**
      * The name of the email account.
+     * 
      * @var string
+     * 
      * @since 1.0 
      */
     private $name;
     /**
      * The password of the user account.
+     * 
      * @var string
+     * 
      * @since 1.0 
      */
     private $password;
     /**
      * The port number that is used to access the email server.
+     * 
      * @var int
+     * 
      * @since 1.0 
      */
     private $port;
     /**
      * The user name that is used to login.
+     * 
      * @var string
+     * 
      * @since 1.0 
      */
     private $userName;
     /**
      * Creates new instance of the class.
+     * 
      * @param array $options An optional array that contains connection info. The array 
      * can have the following indices:
      * <ul>
@@ -88,6 +103,7 @@ class SMTPAccount {
      * <li><b>account-name</b>: A unique name for the account. Used when creating 
      * new email message. If not provided, 'sender-name' is used.</li>
      * </ul>
+     * 
      * @since 1.0.1
      */
     public function __construct($options = []) {
@@ -135,9 +151,11 @@ class SMTPAccount {
     }
     /**
      * Returns the name of the account.
+     * 
      * The name of the account is used by the class 'EmailMessage' when creating 
-     * new instance of the class. Also, the name is used when storing the account 
-     * programatically.
+     * new instance of the class. Also, the name is used when storing account 
+     * information.
+     * 
      * @return string A string that represents the name of the account.
      */
     public function getAccountName() {
@@ -145,52 +163,63 @@ class SMTPAccount {
     }
     /**
      * Returns the email address.
+     * 
      * @return string The email address which will be used in the header 
      * 'FROM' when sending an email. Default is empty string.
+     * 
      * @since 1.0
      */
     public function getAddress() {
         return $this->address;
     }
     /**
-     * Returns the password of the user account that is used to access email server.
+     * Returns the password of the account that will be used to access SMTP server.
+     * 
      * @return string The password of the user account that is used to access email server. 
      * default is empty string.
+     * 
      * @since 1.0
      */
     public function getPassword() {
         return $this->password;
     }
     /**
-     * Returns the port number of email server.
-     * @return int The port number of email server. Default is 465.
+     * Returns SMTP server port number.
+     * 
+     * @return int Default is 465.
+     * 
      * @since 1.0
      */
     public function getPort() {
         return $this->port;
     }
     /**
-     * Returns the name of sender.
-     * @return string The name of the email sender. The name will be used in the header 
-     * 'FROM' when sending an email. Default is empty string.
+     * Returns the name of sender that will be used in the 'FROM' header.
+     * 
+     * @return string The name of the email sender. Usually this is similar to 
+     * email address but can also be a name.
+     * 
      * @since 1.0
      */
     public function getSenderName() {
         return $this->name;
     }
     /**
-     * Returns The address of the email server.
-     * @return string The address of the email server (such as 'mail.example.com'). 
-     * Default is empty string.
+     * Returns SMTP server address.
+     * 
+     * @return string The address of the SMTP server (such as 'mail.example.com'). 
+     * 
      * @since 1.0
      */
     public function getServerAddress() {
         return $this->emailServerAddress;
     }
     /**
-     * Returns the username that is used to access email server.
+     * Returns the username that is used to access SMTP server.
+     * 
      * @return string The username that is used to access email server. Default 
      * is empty string.
+     * 
      * @since 1.0
      */
     public function getUsername() {
@@ -198,10 +227,12 @@ class SMTPAccount {
     }
     /**
      * Sets the name of the account.
+     * 
      * The name of the account is used by the class 'EmailMessage' when creating 
-     * new instance of the class. Also, the name is used when storing the account 
-     * programatically.
+     * new instance of the class. Also, the name is used when storing the account.
+     * 
      * @param string $name The name of the account.
+     * 
      * @since 1.0.2
      */
     public function setAccountName($name) {
@@ -209,36 +240,43 @@ class SMTPAccount {
     }
     /**
      * Sets the email address.
+     * 
      * @param string $address An email address.
+     * 
+     * @since 1.0
      */
     public function setAddress($address) {
         $this->address = trim($address);
     }
     /**
      * Sets the password of the user account that is used to access email server.
+     * 
      * @param string $pass The password of the user account that is used to access email server.
+     * 
      * @since 1.0
      */
     public function setPassword($pass) {
         $this->password = $pass;
     }
     /**
-     * Sets the port number of email server.
-     * @param int $port The port number of email server such as 25. It will 
-     * be only set if the given value is an integer and it is greater than 0.
+     * Sets port number of SMTP server.
+     * 
+     * @param int $port The port number of email server. Common ports are 25, 465
+     * and 586.
+     * 
      * @since 1.0
      */
     public function setPort($port) {
-        if (gettype($port) == 'integer' && $port > 0) {
-            $this->port = $port;
-        }
+        $this->port = intval($port);
     }
     /**
      * Sets the name of the email account.
+     * 
      * @param string $name The name of the account (such as 'Programming Team'). 
      * The name is used when sending an email message using the given SMTP account. 
      * The name will be used in the header 
-     * 'FROM' when sending an email
+     * 'FROM' when sending an email.
+     * 
      * @since 1.0
      */
     public function setSenderName($name) {
@@ -246,7 +284,9 @@ class SMTPAccount {
     }
     /**
      * Sets the address of the email server.
+     * 
      * @param string $addr The address of the email server (such as 'mail.example.com').
+     * 
      * @since 1.0
      */
     public function setServerAddress($addr) {
@@ -254,7 +294,9 @@ class SMTPAccount {
     }
     /**
      * Sets the username that is used to access email server.
+     * 
      * @param string $u The username that is used to access email server.
+     * 
      * @since 1.0
      */
     public function setUsername($u) {

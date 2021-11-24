@@ -66,9 +66,9 @@ class SMTPAccountTest extends TestCase {
     public function testSetPort00() {
         $acc = new SMTPAccount();
         $acc->setPort('88');
-        $this->assertNotEquals(88,$acc->getPort());
+        $this->assertEquals(88,$acc->getPort());
         $acc->setPort(0);
-        $this->assertNotEquals(0,$acc->getPort());
+        $this->assertEquals(0,$acc->getPort());
         $acc->setPort(1);
         $this->assertEquals(1,$acc->getPort());
     }

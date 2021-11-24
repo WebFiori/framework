@@ -25,10 +25,10 @@ class RouterTest extends TestCase {
         $this->assertTrue(Router::api([
             'path' => '/call-api-00', 
             'route-to' => '/my-api.php']));
-        $this->assertFalse(Router::view([
+        $this->assertFalse(Router::page([
             'path' => '/call-api-00', 
             'route-to' => '/my-other-api.php']));
-        $this->assertTrue(Router::view([
+        $this->assertTrue(Router::page([
             'path' => '/call-api-01', 
             'route-to' => '/my-api.php']));
     }
@@ -128,13 +128,13 @@ class RouterTest extends TestCase {
      * @test
      */
     public function testAddViewRoute00() {
-        $this->assertTrue(Router::view([
+        $this->assertTrue(Router::page([
             'path' => '/view-something',
             'route-to' => 'my-view.php']));
-        $this->assertFalse(Router::view([
+        $this->assertFalse(Router::page([
             'path' => '/view-something', 
             'route-to' => '/my-other-view.php']));
-        $this->assertTrue(Router::view([
+        $this->assertTrue(Router::page([
             'path' => '/view-something-2', 
             'route-to' => '/my-view.php']));
     }

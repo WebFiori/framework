@@ -247,6 +247,9 @@ class Router {
     /**
      * Adds new route to a web services set.
      * 
+     * Note that the route which created using this method will be added to 
+     * 'global' and 'api' middleware groups.
+     * 
      * @param array $options An associative array that contains route 
      * options. Available options are:
      * <ul>
@@ -293,7 +296,8 @@ class Router {
     public static function api($options) {
         if (gettype($options) == 'array') {
             $options['type'] = Router::API_ROUTE;
-
+            self::_addToMiddlewareGroup($options, 'api');
+            
             return Router::get()->_addRoute($options);
         }
 
@@ -314,6 +318,9 @@ class Router {
 
     /**
      * Adds new closure route.
+     * 
+     * Note that the route which created using this method will be added to 
+     * 'global' and 'closure' middleware groups.
      * 
      * @param array $options An associative array that contains route 
      * options. Available options are:
@@ -368,7 +375,8 @@ class Router {
     public static function closure($options) {
         if (gettype($options) == 'array') {
             $options['type'] = Router::CLOSURE_ROUTE;
-
+            self::_addToMiddlewareGroup($options, 'closure');
+            
             return Router::get()->_addRoute($options);
         }
 
@@ -542,7 +550,8 @@ class Router {
     /**
      * Adds new route to a web page.
      * 
-     * A web page can be any file or class that is added inside the folder '/pages'.
+     * Note that the route which created using this method will be added to 
+     * 'global' and 'web' middleware groups.
      * 
      * @param array $options An associative array that contains route 
      * options. Available options are:
@@ -766,8 +775,9 @@ class Router {
         return false;
     }
     /**
-     * Adds new route to a view file.
-     * A view file can be any file that is added inside the folder '/pages'.
+     * Adds new route to a page.
+     * 
+     * A page can be any file that is added inside the folder '/pages'.
      * 
      * @param array $options An associative array that contains route 
      * options. Available options are:
@@ -816,14 +826,26 @@ class Router {
      * 
      * @deprecated since version 1.3.12
      */
-    public static function view($options) {
+    private static function view($options) {
         if (gettype($options) == 'array') {
             $options['type'] = Router::VIEW_ROUTE;
-
+            self::_addToMiddlewareGroup($options, 'web');
+            
             return Router::get()->_addRoute($options);
         }
 
         return false;
+    }
+    private static function _addToMiddlewareGroup(&$options, $groupName) {
+        if (isset($options['middleware'])) {
+            if (gettype($options['middleware']) == 'array') {
+                $options['middleware'][] = $groupName;
+            } else {
+                $options['middleware'] = [$options['middleware'], $groupName];
+            }
+        } else {
+            $options['middleware'] = $groupName;
+        }
     }
     /**
      * Adds new route to the router.

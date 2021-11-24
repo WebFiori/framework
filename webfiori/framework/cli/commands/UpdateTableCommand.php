@@ -101,7 +101,7 @@ class UpdateTableCommand extends CLICommand {
 
         if ($db !== null) {
             $db->addTable($tableObj);
-            $db->table($tableObj->getName())->addForeignKey($fkName);
+            $db->table($tableObj->getNormalName())->addForeignKey($fkName);
             $this->runQuery($db);
         }
 
@@ -216,7 +216,7 @@ class UpdateTableCommand extends CLICommand {
 
         if ($db !== null) {
             $db->addTable($tableObj);
-            $db->table($tableObj->getName())->addCol($colKey);
+            $db->table($tableObj->getNormalName())->addCol($colKey);
             $this->runQuery($db);
         }
 
@@ -294,7 +294,7 @@ class UpdateTableCommand extends CLICommand {
 
         if ($db !== null) {
             $db->addTable($tableObj);
-            $db->table($tableObj->getName())->dropForeignKey($toRemove);
+            $db->table($tableObj->getNormalName())->dropForeignKey($toRemove);
             $this->runQuery($db);
         }
 
@@ -498,7 +498,7 @@ class UpdateTableCommand extends CLICommand {
 
         if ($db !== null) {
             $db->addTable($tableObj);
-            $db->table($tableObj->getName())->modifyCol($colKey);
+            $db->table($tableObj->getNormalName())->modifyCol($colKey);
             $this->runQuery($db);
         }
 

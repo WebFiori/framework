@@ -1,6 +1,7 @@
 <?php
 namespace webfiori\framework\mail;
 
+use webfiori\framework\exceptions\SMTPException;
 /**
  * A class which can be used to connect to SMTP server and execute commands on it.
  *
@@ -139,7 +140,9 @@ class SMTPServer {
 
             if (is_resource($this->serverCon)) {
                 $this->_log('-', 0, $this->read());
-
+                if ($this->getLastResponseCode() != 220) {
+                    throw new SMTPException('Server did not respond with code 220 during initial connection.');
+                }
                 if ($this->sendHello()) {
                     //We might need to switch to secure connection.
                     $retVal = $this->_checkStartTls();
@@ -276,14 +279,17 @@ class SMTPServer {
      */
     public function read() {
         $message = '';
-
+        
         while (!feof($this->serverCon)) {
-            $str = fgets($this->serverCon);
+            $str = stream_get_contents($this->serverCon);
+            if ($str !== false) {
+                $message .= $str;
 
-            $message .= $str;
-
-            if (!isset($str[3]) || (isset($str[3]) && $str[3] == ' ')) {
-                break;
+                if (!isset($str[3]) || (isset($str[3]) && $str[3] == ' ')) {
+                    break;
+                }
+            } else {
+                $this->_log('-', '0', 'Unable to read server response.');
             }
         }
         $this->_setLastResponseCode($message);
@@ -429,13 +435,15 @@ class SMTPServer {
      * @since 1.0
      */
     private function _setLastResponseCode($serverResponseMessage) {
-        $firstNum = $serverResponseMessage[0];
-        $firstAsInt = intval($firstNum);
+        if (strlen($serverResponseMessage) != 0) {
+            $firstNum = $serverResponseMessage[0];
+            $firstAsInt = intval($firstNum);
 
-        if ($firstAsInt != 0) {
-            $secNum = $serverResponseMessage[1];
-            $thirdNum = $serverResponseMessage[2];
-            $this->lastResponseCode = intval($firstNum) * 100 + (intval($secNum * 10)) + (intval($thirdNum));
+            if ($firstAsInt != 0) {
+                $secNum = $serverResponseMessage[1];
+                $thirdNum = $serverResponseMessage[2];
+                $this->lastResponseCode = intval($firstNum) * 100 + (intval($secNum * 10)) + (intval($thirdNum));
+            }
         }
     }
     private function _switchToTls() {
@@ -484,7 +492,11 @@ class SMTPServer {
         }
 
         if (!is_resource($conn)) {
-            $this->_log('Connect', $err, 'Faild to connect: '.$errStr);
+            if (strlen($errStr) == 0) {
+                $this->_log('Connect', $err, 'Faild to connect due to unspecified error.');
+            } else {
+                $this->_log('Connect', $err, 'Faild to connect: '.$errStr);
+            }
         }
 
         return $conn;

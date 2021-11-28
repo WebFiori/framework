@@ -281,7 +281,8 @@ class SMTPServer {
         $message = '';
         
         while (!feof($this->serverCon)) {
-            $str = stream_get_contents($this->serverCon);
+            $str = fgets($this->serverCon);
+            
             if ($str !== false) {
                 $message .= $str;
 
@@ -418,7 +419,7 @@ class SMTPServer {
         $this->serverOptions = [];
 
         foreach ($split as $part) {
-            //Index 0 will usually hold server address
+            //Index 0 will hold server address
             if ($index != 0) {
                 $xPart = substr($part, 4);
                 $this->serverOptions[] = $xPart;

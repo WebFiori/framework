@@ -136,27 +136,50 @@ class AddCommand extends CLICommand {
     private function _addSmtp() {
         $smtpConn = new SMTPAccount();
         $smtpConn->setServerAddress($this->getInput('SMTP Server address:', '127.0.0.1'));
-        $smtpConn->setPort($this->getInput('Port number:', 465));
+        $smtpConn->setPort(25);
+        $addr = $smtpConn->getAddress();
+        
+        if ($addr == 'smtp.outlook.com'
+            || $addr == 'outlook.office365.com'
+            || $addr == 'smtp.office365.com') {
+            $smtpConn->setPort(587);
+        } else if ($addr == 'smtp.gmail.com'
+            || $addr == 'smtp.mail.yahoo.com') {
+            $smtpConn->setPort(465);
+        }
+        $smtpConn->setPort($this->getInput('Port number:', $smtpConn->getPort()));
         $smtpConn->setUsername($this->getInput('Username:'));
         $smtpConn->setPassword($this->getInput('Password:'));
         $smtpConn->setAddress($this->getInput('Sender email address:', $smtpConn->getUsername()));
-        $smtpConn->setSenderName($this->getInput('Sender name:', 'WebFiori Framework'));
+        $smtpConn->setSenderName($this->getInput('Sender name:', $smtpConn->getAddress()));
         $smtpConn->setAccountName($this->getInput('Give your connection a friendly name:', 'smtp-connection-'.count(WebFioriApp::getAppConfig()->getAccounts())));
         $this->println('Testing connection. This can take up to 1 minute...');
         $server = new SMTPServer($smtpConn->getServerAddress(), $smtpConn->getPort());
 
+        try {
+            if ($server->authLogin($smtpConn->getUsername(), $smtpConn->getPassword())) {
+                $this->success('Connectd. Adding connection information...');
+                ConfigController::get()->updateOrAddEmailAccount($smtpConn);
+                $this->success('Connection information was stored in the class "'.APP_DIR_NAME.'\\AppConfig".');
 
-        if ($server->authLogin($smtpConn->getUsername(), $smtpConn->getPassword())) {
-            $this->success('Connectd. Adding connection information...');
+                
+            } else {
+                $this->error('Unable to connect to SMTP server.');
+                $this->println('Error Information: '.$server->getLastResponse());
+
+                $this->_confirmAdd($smtpConn);
+            }
+        } catch (Exception $ex) {
+            $this->error('An exception with message "'.$ex->getMessage().'" was thrown while trying to connect.');
+            $this->_confirmAdd($smtpConn);
+        }
+        
+        return 0;
+    }
+    private function _confirmAdd($smtpConn) {
+        if ($this->confirm('Would you like to store connection information anyway?')) {
             ConfigController::get()->updateOrAddEmailAccount($smtpConn);
             $this->success('Connection information was stored in the class "'.APP_DIR_NAME.'\\AppConfig".');
-
-            return 0;
-        } else {
-            $this->error('Unable to connect to SMTP server.');
-            $this->println('Error Information: '.$server->getLastResponse());
-
-            return -1;
         }
     }
 }

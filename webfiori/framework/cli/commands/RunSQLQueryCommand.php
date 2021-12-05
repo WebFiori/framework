@@ -261,13 +261,14 @@ class RunSQLQueryCommand extends CLICommand {
     }
     /**
      * 
-     * @param type $schema
+     * @param DB $schema
      * @param Table $tableObj
      */
     private function tableQuery($schema, $tableObj) {
         $queryTypes = [
             'Create database table.',
             'Drop database table.',
+            'Drop and create table.',
             'Add Column.',
             'Modify Column.',
             'Drop Column.'
@@ -287,6 +288,11 @@ class RunSQLQueryCommand extends CLICommand {
             $schema->table($tableObj->getNormalName())->createTable();
         } else if ($selectedQuery == 'Drop database table.') {
             $schema->table($tableObj->getNormalName())->drop();
-        }       
+        } else if ($selectedQuery == 'Drop and create table.') {
+            $schema->table($tableObj->getNormalName())->drop();
+            $query1 = $schema->getLastQuery();
+            $schema->table($tableObj->getNormalName())->createTable();
+            $schema->setQuery($query1."\n".$schema->getLastQuery());
+        }     
     }
 }

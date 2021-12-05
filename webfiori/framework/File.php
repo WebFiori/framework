@@ -36,7 +36,7 @@ use webfiori\json\JsonI;
  * 
  * @author Ibrahim
  * 
- * @version 1.2.0
+ * @version 1.2.1
  */
 class File implements JsonI {
     /**
@@ -310,6 +310,54 @@ class File implements JsonI {
         }
 
         return '';
+    }
+    /**
+     * Split file raw data into chunks of fixed size.
+     * 
+     * @param int $chunkSize The number of bytes in every chunk. If a negative 
+     * number is given, default value is used which is 1000.
+     * 
+     * @param string $encodeOrDecode This parameter is used to base-64 decode or 
+     * encode file data. The parameter can have one of 3 values:
+     * <ul>
+     * <li>e: Encode the raw data of the file.</li>
+     * <li>d: Decode the raw data of the file.</li>
+     * <li>none: Return the raw data of the file as it is. This is the default value.</li>
+     * </ul>
+     * If any other value is given, the method will use 'e' since data is mostly 
+     * will be moved ss chunks.
+     * 
+     * @return array The method will return an array that holds file data as 
+     * chunks.
+     * 
+     * @since 1.2.1
+     */
+    public function getChunks($chunkSize = 1000, $encodeOrDecode = 'e') {
+        if ($chunkSize < 0) {
+            $chunkSize = 1000;
+        }
+        
+        $data = $this->getRawData($encodeOrDecode);
+        
+        if ($data === null) {
+            return [];
+        }
+        $dataLen = strlen($data);
+        $retVal = [];
+        $index = 0;
+        
+        while ($index < $dataLen) {
+            $retVal[] = substr($data, $index, $chunkSize);
+            $index += $chunkSize;
+        }
+
+        $remainingChars = $dataLen - count($retVal) * $chunkSize;
+
+        if ($remainingChars > 0) {
+            $retVal[] = substr($data, $index);
+        }
+
+        return $retVal;
     }
     /**
      * Returns the directory at which the file exist on.

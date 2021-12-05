@@ -7,7 +7,7 @@ use webfiori\framework\exceptions\SMTPException;
  *
  * @author Ibrahim
  * 
- * @version 1.0
+ * @version 1.0.1
  */
 class SMTPServer {
     const NL = "\r\n";
@@ -141,7 +141,8 @@ class SMTPServer {
             if (is_resource($this->serverCon)) {
                 $this->_log('-', 0, $this->read());
                 if ($this->getLastResponseCode() != 220) {
-                    throw new SMTPException('Server did not respond with code 220 during initial connection.');
+                    $this->_log('Connect', 0, 'Server did not respond with code 220 during initial connection.');
+                    throw new SMTPException($this->getLastLogEntry()['message']);
                 }
                 if ($this->sendHello()) {
                     //We might need to switch to secure connection.
@@ -205,12 +206,34 @@ class SMTPServer {
      * commands which was sent to the server.
      * 
      * @return array The array will hold sub-associative arrays. Each array 
-     * will have 3 indices, 'command', 'response-code' and 'response-message'
+     * will have 4 indices, 'command', 'code', 'message' and 'time'
      * 
      * @since 1.0
      */
     public function getLog() {
         return $this->responseLog;
+    }
+    /**
+     * Returns an array that contains last log entry.
+     * 
+     * @return array The array will have 4 indices, 'command', 'code',
+     * 'message' and 'time'.
+     * 
+     * @since 1.0.1
+     */
+    public function getLastLogEntry() {
+        $entries = $this->getLog();
+        $entriesCount = count($entries);
+        
+        if ($entriesCount != 0) {
+            return $entries[$entriesCount - 1];
+        }
+        return [
+            'command' => '',
+            'code' => 0,
+            'message' => '',
+            'time' => ''
+        ];
     }
     /**
      * Returns SMTP server port number.
@@ -281,7 +304,8 @@ class SMTPServer {
         $message = '';
         
         while (!feof($this->serverCon)) {
-            $str = stream_get_contents($this->serverCon);
+            $str = fgets($this->serverCon);
+            
             if ($str !== false) {
                 $message .= $str;
 
@@ -290,6 +314,7 @@ class SMTPServer {
                 }
             } else {
                 $this->_log('-', '0', 'Unable to read server response.');
+                break;
             }
         }
         $this->_setLastResponseCode($message);
@@ -408,8 +433,9 @@ class SMTPServer {
     private function _log($command, $code, $message) {
         $this->responseLog[] = [
             'command' => $command,
-            'response-code' => $code,
-            'response-message' => $message
+            'code' => $code,
+            'message' => $message,
+            'time' => date('Y-m-d H:i:s')
         ];
     }
     private function _parseHelloResponse($response) {
@@ -418,7 +444,7 @@ class SMTPServer {
         $this->serverOptions = [];
 
         foreach ($split as $part) {
-            //Index 0 will usually hold server address
+            //Index 0 will hold server address
             if ($index != 0) {
                 $xPart = substr($part, 4);
                 $this->serverOptions[] = $xPart;
@@ -484,19 +510,21 @@ class SMTPServer {
             ]);
 
 
-            $this->_log('Connect', 0, 'Trying to connect to the server using "stream_socket_client"...');
-            $conn = stream_socket_client($protocol.$host.':'.$portNum, $err, $errStr, $timeout * 60, STREAM_CLIENT_CONNECT, $context);
+            $this->_log('Connect', 0, 'Trying to open connection to the server using "stream_socket_client"...');
+            $conn = @stream_socket_client($protocol.$host.':'.$portNum, $err, $errStr, $timeout * 60, STREAM_CLIENT_CONNECT, $context);
         } else {
-            $this->_log('Connect', 0, 'Trying to connect to the server using "fsockopen"...');
+            $this->_log('Connect', 0, 'Trying to open connection to the server using "fsockopen"...');
             $conn = fsockopen($protocol.$this->serverHost, $portNum, $err, $errStr, $timeout * 60);
         }
 
         if (!is_resource($conn)) {
             if (strlen($errStr) == 0) {
-                $this->_log('Connect', $err, 'Faild to connect due to unspecified error.');
+                $this->_log('Connect', $err, 'Faild to open connection due to unspecified error.');
             } else {
-                $this->_log('Connect', $err, 'Faild to connect: '.$errStr);
+                $this->_log('Connect', $err, 'Faild to open connection: '.$errStr);
             }
+        } else {
+            $this->_log('Connect', 0, 'Connection opened.');
         }
 
         return $conn;

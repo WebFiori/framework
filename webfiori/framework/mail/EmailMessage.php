@@ -653,7 +653,7 @@ class EmailMessage {
      * 
      * @since 1.0.5
      */
-    private function getDocument() {
+    public function getDocument() {
         return $this->document;
     }
     private function usingLanguage() {

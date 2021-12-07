@@ -45,7 +45,8 @@ class CronView extends WebPage {
     public function __construct($title, $description = '') {
         parent::__construct();
         $this->jsonData = new Json([
-            'title' => $title
+            'title' => $title,
+            'base' => $this->getBase()
         ]);
         $loginPageTitle = 'CRON Web Interface Login';
         SessionsManager::start('cron-session');

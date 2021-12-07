@@ -420,7 +420,7 @@ class WebFioriApp {
             ConfigController::get()->createIniClass('InitCron', 'A method that can be used to initialize cron jobs.');
         }
 
-        if (CLI::isCLI() || (defined('CRON_THROUGH_HTTP') && CRON_THROUGH_HTTP && count($pathArr) != 0 && $pathArr[0] == 'cron')) {
+        if (CLI::isCLI() || (defined('CRON_THROUGH_HTTP') && CRON_THROUGH_HTTP && in_array('cron', $pathArr))) {
             if (defined('CRON_THROUGH_HTTP') && CRON_THROUGH_HTTP) {
                 Cron::initRoutes();
             }
@@ -476,7 +476,7 @@ class WebFioriApp {
          * 
          * @since 2.1
          */
-        define('WF_VERSION', '2.4.1');
+        define('WF_VERSION', '2.4.3');
         /**
          * A constant that tells the type of framework version.
          * 
@@ -492,7 +492,7 @@ class WebFioriApp {
          * 
          * @since 2.1
          */
-        define('WF_RELEASE_DATE', '2021-11-11');
+        define('WF_RELEASE_DATE', '2021-12-08');
     }
     private function _loadConstants() {
         if (!class_exists(APP_DIR_NAME.'\ini\GlobalConstants')) {

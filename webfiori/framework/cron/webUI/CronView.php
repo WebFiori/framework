@@ -233,6 +233,6 @@ class CronView extends WebPage {
         $this->addCSS('https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css');
         $this->addJS('https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js');
         $this->addJS('https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js');
-        $this->addJS('https://cdn.jsdelivr.net/gh/usernane/AJAXRequestJs@1.1.1/AJAXRequest.js', [], false);
+        $this->addJS('https://cdn.jsdelivr.net/gh/usernane/AJAXRequestJs@1.x.x/AJAXRequest.js', [], false);
     }
 }

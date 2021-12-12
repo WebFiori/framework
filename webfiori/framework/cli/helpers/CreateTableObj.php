@@ -79,13 +79,27 @@ class CreateTableObj {
             $entityInfo = $this->_getCommand()->getClassInfo(APP_DIR_NAME.'\\entity');
             $entityInfo['implement-jsoni'] = $this->_getCommand()->confirm('Would you like from your entity class to implement the interface JsonI?', true);
             $classInfo['entity-info'] = $entityInfo;
+            
+            if ($this->confirm('Would you like to add extra attributes to the entity?', false)) {
+                $addExtra = true;
+
+                while ($addExtra) {
+                    
+                    if ($tempTable->getEntityMapper()->addAttribute($this->_getCommand()->getInput('Enter attribute name:'))) {
+                        $this->_getCommand()->success('Attribute successfully added.');
+                    } else {
+                        $this->_getCommand()->warning('Unable to add attribute.');
+                    }
+                    $addExtra = $this->_getCommand()->confirm('Would you like to add another attribute?', false);
+                }
+            }
         }
 
         if (strlen($classInfo['namespace']) == 0) {
             $classInfo['namespace'] = APP_DIR_NAME.'\database';
             $this->_getCommand()->warning('The table class will be added to the namespace "'.$classInfo['namespace'].'" since no namespace was provided.');
         }
-
+        
         if (isset($classInfo['entity-info']) && strlen($classInfo['entity-info']['namespace']) == 0) {
             $classInfo['entity-info']['namespace'] = APP_DIR_NAME.'\database';
             $this->_getCommand()->warning('The entity class will be added to the namespace "'.$classInfo['entity-info']['namespace'].'" since no namespace was provided.');

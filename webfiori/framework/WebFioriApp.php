@@ -476,7 +476,7 @@ class WebFioriApp {
          * 
          * @since 2.1
          */
-        define('WF_VERSION', '2.4.3');
+        define('WF_VERSION', '2.4.4');
         /**
          * A constant that tells the type of framework version.
          * 
@@ -492,7 +492,7 @@ class WebFioriApp {
          * 
          * @since 2.1
          */
-        define('WF_RELEASE_DATE', '2021-12-08');
+        define('WF_RELEASE_DATE', '2021-12-12');
     }
     private function _loadConstants() {
         if (!class_exists(APP_DIR_NAME.'\ini\GlobalConstants')) {
@@ -525,7 +525,7 @@ class WebFioriApp {
         {
             $isCli = class_exists('webfiori\framework\cli\CLI') ? CLI::isCLI() : http_response_code() === false;
             Response::clear();
-            $routerObj = Router::getUriObjByURL(Util::getRequestedURL());
+            $routerObj = Router::getUriObjByURL(Request::getRequestedURL());
 
             if ($isCli) {
                 if (class_exists('webfiori\framework\cli\CLI')) {

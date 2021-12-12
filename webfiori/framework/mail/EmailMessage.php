@@ -35,7 +35,7 @@ use webfiori\ui\HTMLNode;
  * A class that can be used to write HTML formatted Email messages.
  *
  * @author Ibrahim
- * @version 1.0.5
+ * @version 1.0.6
  */
 class EmailMessage {
     /**
@@ -59,6 +59,15 @@ class EmailMessage {
      * @since 2.0
      */
     private $attachments;
+    /**
+     * An array that holds callbacks which will get executed before sending
+     * the message.
+     * 
+     * @var array
+     * 
+     * @since 1.0.6
+     */
+    private $beforeSendPool;
     /**
      * A boundary variable used to separate email message parts.
      * 
@@ -144,6 +153,7 @@ class EmailMessage {
         ];
         $this->attachments = [];
         $this->inReplyTo = [];
+        $this->beforeSendPool = [];
         $this->document = new HTMLDoc();
 
         if (class_exists(APP_DIR_NAME.'\AppConfig')) {
@@ -205,6 +215,27 @@ class EmailMessage {
      */
     public function addBCC($address, $name = null) {
         return $this->_addAddress($address, $name, 'bcc');
+    }
+    /**
+     * Adds a callback to execute before the message is sent.
+     * 
+     * @param Callable $callback A function that will get executed before sending
+     * the message. Note that the first parameter of the callback will be always
+     * the message (e.g. function (EmailMessage $message) {})
+     * 
+     * @param array $extraParams An optional array of extra parameters that will
+     * be passed to the callback.
+     * 
+     * @since 1.0.6
+     */
+    public function addBeforeSend($callback, array $extraParams = []) {
+        
+        if (is_callable($callback)) {
+            $this->beforeSendPool[] = [
+                'func' => $callback,
+                'params' => array_merge([$this], $extraParams)
+            ];
+        }
     }
     /**
      * Adds new receiver address to the list of 'cc' receivers.
@@ -475,6 +506,9 @@ class EmailMessage {
      * @since 1.0
      */
     public function send() {
+        foreach ($this->beforeSendPool as $callArr) {
+            call_user_func_array($callArr['func'], $callArr['params']);
+        }
         $acc = $this->getSMTPAccount();
         $this->smtpServer = new SMTPServer($acc->getServerAddress(), $acc->getPort());
 

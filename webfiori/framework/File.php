@@ -36,7 +36,7 @@ use webfiori\json\JsonI;
  * 
  * @author Ibrahim
  * 
- * @version 1.2.1
+ * @version 1.2.2
  */
 class File implements JsonI {
     /**
@@ -376,14 +376,28 @@ class File implements JsonI {
     /**
      * Extract file extension from file name and return it.
      * 
-     * @return string If file name is not set, the method will return empty string. 
-     * If its name is set and the extension is included in the name, the 
-     * method will return it.
+     * File extension will depend on one of two things. If MIME of the file is
+     * set, then the extension of the file will depend on it. For example, if
+     * MIME of the file is 'video/mp4', the method will return the value 'mp4'.
+     * The other thing that will be checked is file name. If the extension is
+     * included in file name, it will be returned.
+     * 
+     * @return string A string such as 'mp3' or 'jpeg'. Default return value is
+     * 'bin' which stands for binary file.
      * 
      * @since 1.2.0
      */
     public function getExtension() {
-        $ext = '';
+        $mime = $this->getFileMIMEType();
+        $mimeTypes = self::MIME_TYPES;
+        
+        foreach ($mimeTypes as $ext => $xMime) {
+            if ($xMime == $mime) {
+                return $ext;
+            }
+        }
+        
+        $ext = 'bin';
         $fArr = explode('.', $this->getName());
 
         if (count($fArr) >= 1) {

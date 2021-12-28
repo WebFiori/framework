@@ -140,7 +140,7 @@ class FileTest extends TestCase {
         $j = $file->toJSON();
         $j->setPropsStyle('camel');
         $this->assertEquals('{'
-                . '"id":-1, '
+                . '"id":-1,'
                 . '"mime":"text\/plain",'
                 . '"name":"'.$file->getName().'",'
                 . '"directory":"'.Json::escapeJSONSpecialChars($file->getPath()).'",'

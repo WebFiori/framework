@@ -442,7 +442,7 @@ class WebFioriApp {
         call_user_func(APP_DIR_NAME.'\ini\InitMiddleware::init');
     }
     private function _initRoutes() {
-        $routesClasses = ['APIRoutes', 'ViewRoutes', 'ClosureRoutes', 'OtherRoutes'];
+        $routesClasses = ['APIsRoutes', 'PagesRoutes', 'ClosureRoutes', 'OtherRoutes'];
 
         foreach ($routesClasses as $className) {
             if (!class_exists(APP_DIR_NAME.'\\ini\\routes\\'.$className)) {

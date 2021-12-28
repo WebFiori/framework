@@ -140,12 +140,12 @@ class FileTest extends TestCase {
         $j = $file->toJSON();
         $j->setPropsStyle('camel');
         $this->assertEquals('{'
-                . '"id":-1, '
-                . '"mime":"text\/plain", '
-                . '"name":"'.$file->getName().'", '
-                . '"directory":"'.Json::escapeJSONSpecialChars($file->getPath()).'", '
-                . '"sizeInBytes":12, '
-                . '"sizeInKBytes":0.01171875, '
+                . '"id":-1,'
+                . '"mime":"text\/plain",'
+                . '"name":"'.$file->getName().'",'
+                . '"directory":"'.Json::escapeJSONSpecialChars($file->getPath()).'",'
+                . '"sizeInBytes":12,'
+                . '"sizeInKBytes":0.01171875,'
                 . '"sizeInMBytes":1.1444091796875E-5'
                 . '}',$j.'');
         return $file;

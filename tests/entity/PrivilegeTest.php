@@ -53,6 +53,6 @@ class PrivilegeTest extends TestCase {
     public function testToJson00($pr) {
         $j = $pr->toJSON();
         $j->setPropsStyle('camel');
-        $this->assertEquals('{"privilegeId":"Valid_ID_55", "name":"Valid Name"}',$j.'');
+        $this->assertEquals('{"privilegeId":"Valid_ID_55","name":"Valid Name"}',$j.'');
     }
 }

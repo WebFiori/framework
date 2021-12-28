@@ -172,6 +172,6 @@ class PrivilegesGroupTest extends TestCase {
     public function testToJson00($group) {
         $j = $group->toJSON();
         $j->setPropsStyle('kebab');
-        $this->assertEquals('{"group-id":"valid_ID", "parent-group-id":null, "name":"Valid Name", "privileges":[], "child-groups":[]}',$j.'');
+        $this->assertEquals('{"group-id":"valid_ID","parent-group-id":null,"name":"Valid Name","privileges":[],"child-groups":[]}',$j.'');
     }
 }

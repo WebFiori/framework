@@ -700,8 +700,8 @@ class EmailMessage {
             $lang = $this->getTranslation();
             $this->document->getDocumentRoot()->setAttribute('lang', $lang->getCode());
             $this->document->getBody()->setStyle([
-                'dir' => $lang->getWritingDir()
-            ]);
+                'direction' => $lang->getWritingDir()
+            ], true);
         }
     }
 }

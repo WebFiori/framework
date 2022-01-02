@@ -38,6 +38,21 @@ class EmailMessageTest extends TestCase {
     /**
      * @test
      */
+    public function testLang03() {
+        $message = new EmailMessage();
+        $message->setLang('EN');
+        $this->assertNotNull($message->getTranslation());
+        $this->assertEquals([
+            'direction' => 'ltr'
+        ], $message->getDocument()->getBody()->getStyle());
+        $message->setLang('ar');
+        $this->assertEquals([
+            'direction' => 'rtl'
+        ], $message->getDocument()->getBody()->getStyle());
+    }
+    /**
+     * @test
+     */
     public function testAddReciver00() {
         $sm = new EmailMessage('no-reply');
         $this->assertFalse($sm->addTo('', ''));

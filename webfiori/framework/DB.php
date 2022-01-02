@@ -87,7 +87,7 @@ class DB extends Database {
         if ($connInfo === null) {
             
             foreach ($table->getForignKeys() as $fk) {
-                parent::addTable($table);
+                parent::addTable($fk->getSource());
             }
             
             return parent::addTable($table);
@@ -98,7 +98,7 @@ class DB extends Database {
              || ($connType == 'mssql' && $table instanceof MSSQLTable)) {
                 
                 foreach ($table->getForignKeys() as $fk) {
-                    parent::addTable($table);
+                    parent::addTable($fk->getSource());
                 }
                 
                 return parent::addTable($table);

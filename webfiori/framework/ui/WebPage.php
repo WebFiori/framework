@@ -265,7 +265,10 @@ class WebPage {
      * possible to append query string to the end of the link.
      * 
      * @param array $attrs An associative array of additional attributes 
-     * to set for the node.
+     * to set for the node. One special attribute has the name 'revision'. If
+     * set to true, a query string parameter in the form '?cv=x.x' is appended
+     * to the 'href' attribute value. The 'x.x' represent application version
+     * taken from the class 'AppConfig' Default value of the attribute is true.
      * 
      * @since 1.0
      */
@@ -282,7 +285,10 @@ class WebPage {
      * can have query string at the end.
      * 
      * @param array $attrs An associative array of additional attributes 
-     * to set for the JavaScript node.
+     * to set for the JavaScript node. One special attribute has the name 'revision'. If
+     * set to true, a query string parameter in the form '?jv=x.x' is appended
+     * to the 'href' attribute value. The 'x.x' represent application version
+     * taken from the class 'AppConfig' Default value of the attribute is true.
      * 
      * @since 1.0
      */

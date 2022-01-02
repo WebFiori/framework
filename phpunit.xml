@@ -26,22 +26,16 @@
     </logging>
     <testsuites>
         <testsuite name="Language Tests">
-            <directory>./tests/entity/langs/</directory>
+            <directory>./tests/webfiori/framework/test/langs/</directory>
         </testsuite>
-        <testsuite name="Entity Tests">
-            <directory>./tests/entity/</directory>
-        </testsuite>
-        <testsuite name="Config Files Tests">
-            <directory>./tests/conf/</directory>
+        <testsuite name="Core Tests">
+            <directory>./tests/webfiori/framework/test</directory>
         </testsuite>
         <testsuite name="Router Tests">
-            <directory>./tests/entity/router/</directory>
-        </testsuite>
-        <testsuite name="Controller Tests">
-            <directory>./tests/logic/</directory>
+            <directory>./tests/webfiori/framework/test/router/</directory>
         </testsuite>
         <testsuite name="Session Management Tests">
-            <directory>./tests/entity/session/</directory>
+            <directory>./tests/webfiori/framework/test/session/</directory>
         </testsuite>
     </testsuites>
 </phpunit>

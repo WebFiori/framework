@@ -217,23 +217,39 @@ class WebFioriApp {
                         }
                     }
 
-                    $instanceNs = require_once $dir.DS.$phpFile;
-
-                    if (strlen($instanceNs) == 0 || $instanceNs == 1) {
-                        $instanceNs = '\\'.APP_DIR_NAME.'\\'.$folder;
-                    }
-                    $class = $instanceNs.'\\'.$expl[0];
-                    try {
-                        $toPass = [new $class()];
-
-                        foreach ($otherParams as $param) {
-                            $toPass[] = $param;
-                        }
-                        call_user_func_array($regCallback, $toPass);
-                    } catch (\Error $ex) {
-                    }
+                    self::_autoRegisterHelper([
+                        'dir' => $dir, 
+                        'php-file' => $phpFile, 
+                        'folder' => $folder, 
+                        'class-name' => $expl[0], 
+                        'params' => $otherParams, 
+                        'callback' => $regCallback
+                    ]);
                 }
             }
+        }
+    }
+    private static function _autoRegisterHelper($options) {
+        $dir = $options['dir'];
+        $phpFile = $options['php-file'];
+        $folder = $options['folder'];
+        $className = $options['class-name'];
+        $otherParams = $options['params'];
+        $regCallback = $options['callback'];
+        $instanceNs = require_once $dir.DS.$phpFile;
+
+        if (strlen($instanceNs) == 0 || $instanceNs == 1) {
+            $instanceNs = '\\'.APP_DIR_NAME.'\\'.$folder;
+        }
+        $class = $instanceNs.'\\'.$className;
+        try {
+            $toPass = [new $class()];
+
+            foreach ($otherParams as $param) {
+                $toPass[] = $param;
+            }
+            call_user_func_array($regCallback, $toPass);
+        } catch (\Error $ex) {
         }
     }
     /**

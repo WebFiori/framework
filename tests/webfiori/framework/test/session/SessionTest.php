@@ -2,7 +2,7 @@
 namespace webfiori\framework\test\session;
 
 use PHPUnit\Framework\TestCase;
-
+use webfiori\framework\File;
 use webfiori\framework\session\Session;
 /**
  * Description of SessionTest
@@ -132,7 +132,7 @@ class SessionTest extends TestCase {
     public function testClose00($session) {
         $session->close();
         $filePath = ROOT_DIR.DS.'app'.DS.'sto'.DS.'sessions'.DS.$session->getId();
-        $this->assertTrue(webfiori\framework\File::isFileExist($filePath));
+        $this->assertTrue(File::isFileExist($filePath));
         $this->assertFalse($session->isRunning());
         $this->assertEquals(0,$session->getStartedAt());
         $this->assertEquals(0,$session->getResumedAt());

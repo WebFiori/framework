@@ -1440,7 +1440,7 @@ class Router {
                 // A route created using the syntax Class::class
                 $xFile = '\\'.str_replace("/", "\\", $file);
 
-                if (class_exists($xFile)) {
+                if (class_exists($xFile) && $loadResource) {
                     $class = new $xFile();
 
                     if ($class instanceof WebServicesManager) {

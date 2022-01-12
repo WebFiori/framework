@@ -1436,7 +1436,7 @@ abstract class AbstractJob implements JsonI {
     }
     /**
      * 
-     * @param \Exception $ex
+     * @param \Exception|\Error $ex
      */
     private function _logExeException($ex, $meth = '') {
         Cron::log('WARNING: An exception was thrown while performing the operation '.get_class($this).'::'.$meth.'. '
@@ -1445,7 +1445,13 @@ abstract class AbstractJob implements JsonI {
         Cron::log('Exception message: "'.$ex->getMessage().'"');
         Cron::log('Thrown in file: "'.$ex->getFile().'"');
         Cron::log('Line: "'.$ex->getLine().'"');
-
+        
+        $trace = $ex->getTrace();
+        Cron::log('Stack Trace:');
+        
+        foreach ($trace as $traceArr) {
+            Cron::log('File: '.$traceArr['file'].', Line '.$traceArr['line']);
+        }
         if ($meth == 'execute') {
             $this->isSuccess = false;
         }

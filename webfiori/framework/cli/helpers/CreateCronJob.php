@@ -25,7 +25,8 @@ class CreateCronJob {
         $this->command = $command;
         $classInfo = $command->getClassInfo(APP_DIR_NAME.'\\jobs');
         $jobName = $this->_getJobName();
-
+        $jobDesc = $this->_getJobDesc();
+        
         if ($command->confirm('Would you like to add arguments to the job?', false)) {
             $argsArr = $this->_getArgs();
         } else {
@@ -47,15 +48,15 @@ class CreateCronJob {
             $writer->append(' * In addition, the proces have the following args:');
             $writer->append(' * <ul>');
 
-            foreach ($argsArr as $argName) {
-                $writer->append(" * <li>$argName</li>");
+            foreach ($argsArr as $argName => $options) {
+                $writer->append(" * <li>$argName: ".$options['description']."</li>");
             }
             $writer->append(' * </ul>');
         }
         $writer->append(' */');
         $writer->append('class '.$writer->getName().' extends AbstractJob {');
 
-        $this->_writeConstructor($writer, $jobName, $argsArr);
+        $this->_writeConstructor($writer, $jobName, $argsArr, $jobDesc);
 
         $writer->append('/**', 1);
         $writer->append(' * Execute the process.', 1);
@@ -98,10 +99,19 @@ class CreateCronJob {
         $addToMore = true;
 
         while ($addToMore) {
-            $groupName = $this->_getCommand()->getInput('Enter argument name:');
+            $argName = $this->_getCommand()->getInput('Enter argument name:');
 
-            if (strlen($groupName) > 0) {
-                $argsArr[] = $groupName;
+            if (strlen($argName) > 0) {
+                $argsArr[$argName] = [
+                    'description' => $this->_getCommand()->getInput('Enter argument name:', 'No Description.', function ($val) {
+                        if (strlen($val) != 0) {
+                            return $val;
+                        }
+                        return false;
+                    })
+                ];
+                
+                
             }
             $addToMore = $this->_getCommand()->confirm('Would you like to add more arguments?', false);
         }
@@ -114,6 +124,16 @@ class CreateCronJob {
      */
     private function _getCommand() {
         return $this->command;
+    }
+    private function _getJobDesc() {
+        return $this->_getCommand()->getInput('Provide short description of what does the job will do:', null, function ($val)
+        {
+            if (strlen($val) > 0) {
+                return true;
+            }
+
+            return false;
+        });
     }
     private function _getJobName() {
         return $this->_getCommand()->getInput('Enter a name for the job:', null, function ($val)
@@ -132,18 +152,21 @@ class CreateCronJob {
      * @param type $priority
      * @param array $args
      */
-    private function _writeConstructor($writer, $name,array $args) {
+    private function _writeConstructor($writer, $name, array $args, $jobDesc) {
         $writer->append('/**', 1);
         $writer->append(' * Creates new instance of the class.', 1);
         $writer->append(' */', 1);
         $writer->append('public function __construct(){', 1);
         $writer->append("parent::__construct('$name');", 2);
-
+        $writer->append("\$this->setDescription('". str_replace('\'', '\\\'', $jobDesc)."');", 2);
+        
         if (count($args) > 0) {
             $writer->append('$this->addExecutionArgs([', 2);
 
-            foreach ($args as $gName) {
-                $writer->append("'$gName',", 3);
+            foreach ($args as $argName => $argOptions) {
+                $writer->append("'$argName' => [", 3);
+                $writer->append("'description' => '".str_replace('\'', '\\\'', $argOptions['description'])."'", 4);
+                $writer->append("],", 3);
             }
             $writer->append(']);', 2);
         }

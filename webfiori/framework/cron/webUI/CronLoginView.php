@@ -57,7 +57,8 @@ class CronLoginView extends CronView {
                 'type' => 'password',
                 'v-model' => 'password',
                 'label' => 'Enter CRON password here.',
-                ':loading' => 'loading'
+                ':loading' => 'loading',
+                '@keydown' => 'checkIfEnterHit'
             ]);
         $card->addChild('v-card-text')
             ->addChild('v-btn', [

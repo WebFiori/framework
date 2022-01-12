@@ -37,7 +37,7 @@ use webfiori\json\JsonI;
  *
  * @author Ibrahim
  * 
- * @version 1.0.2
+ * @version 1.0.3
  */
 abstract class AbstractJob implements JsonI {
     /**
@@ -171,13 +171,16 @@ abstract class AbstractJob implements JsonI {
      * the given expression is invalid. Default is '* * * * *' which means run 
      * the job every minute.
      * 
+     * @param string $description A description for the job. Shown in CRON
+     * web interface or CLI.
+     * 
      * @throws Exception
      * 
      * @since 1.0
      */
-    public function __construct($jobName = '', $when = '* * * * *') {
+    public function __construct($jobName = '', $when = '* * * * *', $description = 'NO DESCRIPTION') {
         $this->setJobName($jobName);
-        $this->setDescription('NO DESCRIPTION');
+        $this->setDescription($description);
         $this->customAttrs = [];
         $this->isSuccess = false;
         $this->jobDetails = [
@@ -240,13 +243,24 @@ abstract class AbstractJob implements JsonI {
      * Adds multiple execution arguments at one shot.
      * 
      * @param array $argsArr An array that contains the names of the 
-     * arguments.
+     * arguments. This also can be an associative array. The indices
+     * are arguments names and the values are argument options.
      * 
      * @since 1.0
      */
     public function addExecutionArgs(array $argsArr) {
-        foreach ($argsArr as $argName) {
-            $this->addExecutionArg($argName);
+        foreach ($argsArr as $argName => $argParamsOrName) {
+            
+            if (gettype($argName) == 'integer') {
+                $this->addExecutionArg($argParamsOrName);
+            } else {
+                $argObj = new JobArgument($argName);
+                
+                if (isset($argParamsOrName['description'])) {
+                    $argObj->setDescription($argParamsOrName['description']);
+                }
+                $this->addExecutionArg($argObj);
+            }
         }
     }
     /**
@@ -432,6 +446,26 @@ abstract class AbstractJob implements JsonI {
      * @since 1.0
      */
     public abstract function execute();
+    /**
+     * Returns job argument as an object given its name.
+     * 
+     * @param string $argName The name of the argument.
+     * 
+     * @return JobArgument|null If an argument which has the given name was added
+     * to the job, the method will return it as an object. Other than that, the
+     * method will return null.
+     * 
+     * @since 1.0.3
+     */
+    public function getArgument($argName) {
+        
+        foreach ($this->getArguments() as $jobArgObj) {
+            
+            if ($jobArgObj->getName() == $argName) {
+                return $jobArgObj;
+            }
+        }
+    }
     /**
      * Returns an array that holds execution arguments of the job.
      * 
@@ -1436,7 +1470,7 @@ abstract class AbstractJob implements JsonI {
     }
     /**
      * 
-     * @param \Exception $ex
+     * @param \Exception|\Error $ex
      */
     private function _logExeException($ex, $meth = '') {
         Cron::log('WARNING: An exception was thrown while performing the operation '.get_class($this).'::'.$meth.'. '
@@ -1445,7 +1479,13 @@ abstract class AbstractJob implements JsonI {
         Cron::log('Exception message: "'.$ex->getMessage().'"');
         Cron::log('Thrown in file: "'.$ex->getFile().'"');
         Cron::log('Line: "'.$ex->getLine().'"');
-
+        
+        $trace = $ex->getTrace();
+        Cron::log('Stack Trace:');
+        
+        foreach ($trace as $traceArr) {
+            Cron::log('File: '.$traceArr['file'].', Line '.$traceArr['line']);
+        }
         if ($meth == 'execute') {
             $this->isSuccess = false;
         }

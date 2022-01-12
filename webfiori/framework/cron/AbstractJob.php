@@ -171,13 +171,16 @@ abstract class AbstractJob implements JsonI {
      * the given expression is invalid. Default is '* * * * *' which means run 
      * the job every minute.
      * 
+     * @param string $description A description for the job. Shown in CRON
+     * web interface or CLI.
+     * 
      * @throws Exception
      * 
      * @since 1.0
      */
-    public function __construct($jobName = '', $when = '* * * * *') {
+    public function __construct($jobName = '', $when = '* * * * *', $description = 'NO DESCRIPTION') {
         $this->setJobName($jobName);
-        $this->setDescription('NO DESCRIPTION');
+        $this->setDescription($description);
         $this->customAttrs = [];
         $this->isSuccess = false;
         $this->jobDetails = [

@@ -240,13 +240,24 @@ abstract class AbstractJob implements JsonI {
      * Adds multiple execution arguments at one shot.
      * 
      * @param array $argsArr An array that contains the names of the 
-     * arguments.
+     * arguments. This also can be an associative array. The indices
+     * are arguments names and the values are argument options.
      * 
      * @since 1.0
      */
     public function addExecutionArgs(array $argsArr) {
-        foreach ($argsArr as $argName) {
-            $this->addExecutionArg($argName);
+        foreach ($argsArr as $argName => $argParamsOrName) {
+            
+            if (gettype($argName) == 'integer') {
+                $this->addExecutionArg($argParamsOrName);
+            } else {
+                $argObj = new JobArgument($argName);
+                
+                if (isset($argParamsOrName['description'])) {
+                    $argObj->setDescription($argParamsOrName['description']);
+                }
+                $this->addExecutionArg($argObj);
+            }
         }
     }
     /**

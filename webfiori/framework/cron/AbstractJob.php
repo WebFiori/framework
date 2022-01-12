@@ -37,7 +37,7 @@ use webfiori\json\JsonI;
  *
  * @author Ibrahim
  * 
- * @version 1.0.2
+ * @version 1.0.3
  */
 abstract class AbstractJob implements JsonI {
     /**
@@ -432,6 +432,26 @@ abstract class AbstractJob implements JsonI {
      * @since 1.0
      */
     public abstract function execute();
+    /**
+     * Returns job argument as an object given its name.
+     * 
+     * @param string $argName The name of the argument.
+     * 
+     * @return JobArgument|null If an argument which has the given name was added
+     * to the job, the method will return it as an object. Other than that, the
+     * method will return null.
+     * 
+     * @since 1.0.3
+     */
+    public function getArgument($argName) {
+        
+        foreach ($this->getArguments() as $jobArgObj) {
+            
+            if ($jobArgObj->getName() == $argName) {
+                return $jobArgObj;
+            }
+        }
+    }
     /**
      * Returns an array that holds execution arguments of the job.
      * 

@@ -492,7 +492,7 @@ class WebFioriApp {
          * 
          * @since 2.1
          */
-        define('WF_VERSION', '2.4.5');
+        define('WF_VERSION', '2.4.6');
         /**
          * A constant that tells the type of framework version.
          * 
@@ -508,7 +508,7 @@ class WebFioriApp {
          * 
          * @since 2.1
          */
-        define('WF_RELEASE_DATE', '2022-01-03');
+        define('WF_RELEASE_DATE', '2022-01-17');
     }
     private function _loadConstants() {
         if (!class_exists(APP_DIR_NAME.'\ini\GlobalConstants')) {

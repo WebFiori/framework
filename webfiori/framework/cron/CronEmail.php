@@ -72,26 +72,26 @@ class CronEmail extends EmailMessage {
             }
 
 
-            $this->importance(1);
-            $this->document()->getBody()->setStyle([
+            $this->setPriority(1);
+            $this->getDocument()->getBody()->setStyle([
                 'font-family' => 'monospace'
             ]);
             $dearNode = new HTMLNode('p');
             $dearNode->addTextNode('Dear,');
-            $this->insertNode($dearNode);
+            $this->insert($dearNode);
             $paragraph = new HTMLNode('p');
             $paragraph->setStyle([
                 'text-align' => 'justify'
             ]);
 
             if ($activeJob->isSuccess()) {
-                $this->subject('Background Task Status: Task \''.$activeJob->getJobName().'\' 😃');
+                $this->setSubject('Background Task Status: Task \''.$activeJob->getJobName().'\' 😃');
                 $text = 'This automatic system email is sent to notify you that the background job '
                         .'\''.$activeJob->getJobName().'\' was <b style="color:green">successfully completed '
                         .'without any issues</b>. For more details about execution process, '
                         .'please check the attached execution log file.</p>';
             } else {
-                $this->subject('Background Task Status: Task \''.$activeJob->getJobName().'\' 😲');
+                $this->setSubject('Background Task Status: Task \''.$activeJob->getJobName().'\' 😲');
                 $text = 'This automatic email is sent to notify you that the background job '
                         .'\''.$activeJob->getJobName().'\' <b style="color:red">did not successfully complet due some error(s)'
                         .'</b>. To investigate the cause of failure, '
@@ -99,9 +99,9 @@ class CronEmail extends EmailMessage {
                         .'the cause of the issue.';
             }
             $paragraph->addTextNode($text, false);
-            $this->insertNode($paragraph);
-            $this->write('<p>Technical Info:</p>');
-            $this->insertNode($this->_createJobInfoTable($activeJob));
+            $this->insert($paragraph);
+            $this->insert('p')->text('Technical Info:');
+            $this->insert($this->_createJobInfoTable($activeJob));
             $logTxt = '';
 
             foreach (Cron::getLogArray() as $logEntry) {
@@ -109,7 +109,7 @@ class CronEmail extends EmailMessage {
             }
             $file = new File($activeJob->getJobName().'-ExecLog-'.date('Y-m-d H-i-s').'.log');
             $file->setRawData($logTxt);
-            $this->attach($file);
+            $this->addAttachment($file);
         }
     }
     /**

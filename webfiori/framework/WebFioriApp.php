@@ -82,7 +82,7 @@ class WebFioriApp {
      */
     private static $LC;
     /**
-     * An instance of system functions class.
+     * An instance of framework configuration class.
      * 
      * @var ConfigController 
      * 
@@ -253,6 +253,7 @@ class WebFioriApp {
         }
     }
     /**
+     * Returns the instance which is used as main application configuration class.
      * 
      * @return Config
      */
@@ -492,7 +493,7 @@ class WebFioriApp {
          * 
          * @since 2.1
          */
-        define('WF_VERSION', '2.4.6');
+        define('WF_VERSION', '2.4.7');
         /**
          * A constant that tells the type of framework version.
          * 
@@ -508,7 +509,7 @@ class WebFioriApp {
          * 
          * @since 2.1
          */
-        define('WF_RELEASE_DATE', '2022-01-17');
+        define('WF_RELEASE_DATE', '2022-01-31');
     }
     private function _loadConstants() {
         if (!class_exists(APP_DIR_NAME.'\ini\GlobalConstants')) {

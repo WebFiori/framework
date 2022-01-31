@@ -152,6 +152,7 @@ class CronView extends WebPage {
             '@click' => "$closeAction"
         ])->text('Close');
         $dialogActions->addChild('v-btn', [
+            'v-if' => 'output_dialog.output.length !== 0',
             'color' => "primary",
             'text',
             '@click' => "output_dialog.show = true"

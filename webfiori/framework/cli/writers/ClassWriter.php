@@ -109,11 +109,7 @@ class ClassWriter {
      */
     public function append($str, $tapsCount = 0) {
         $tabSpaces = '    ';
-        $tabStr = '';
-
-        for ($x = 0 ; $x < $tapsCount ; $x++) {
-            $tabStr .= $tabSpaces;
-        }
+        $tabStr = str_repeat($tabSpaces, $tapsCount);
         $this->classAsStr .= $tabStr.$str."\n";
     }
     /**
@@ -158,6 +154,9 @@ class ClassWriter {
     }
     /**
      * Write the new class to a .php file.
+     * 
+     * Note that the method will remove the file if it was already created and create
+     * new one.
      * 
      * @since 1.0
      */

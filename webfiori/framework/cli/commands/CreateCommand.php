@@ -177,11 +177,11 @@ class CreateCommand extends CLICommand {
      * 
      * @since 1.0
      */
-    public function getClassInfo($defaltNs = null) {
+    public function getClassInfo($defaltNs = null, $suffix) {
         $classExist = true;
 
         do {
-            $className = $this->_getClassName();
+            $className = $this->_getClassName($suffix);
             $ns = $this->_getNamespace($defaltNs);
             $classWithNs = $ns.'\\'.$className;
             $classExist = class_exists($classWithNs);
@@ -215,11 +215,18 @@ class CreateCommand extends CLICommand {
     }
 
 
-    private function _getClassName() {
+    private function _getClassName($suffix) {
         $isNameValid = false;
 
         do {
             $className = trim($this->getInput('Enter a name for the new class:'));
+            
+            $subSuffix = substr($className, strlen($className) - 1);
+            
+            if ($subSuffix != $suffix) {
+                $className .= $subSuffix;
+            }
+            
             $isNameValid = $this->_validateClassName($className);
 
             if (!$isNameValid) {

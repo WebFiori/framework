@@ -77,8 +77,8 @@ class ClassWriter {
      * 
      * </ul>
      */
-    public function __construct($classInfoArr) {
-        if (strlen($classInfoArr['namespace']) != 0) {
+    public function __construct($classInfoArr = []) {
+        if (isset($classInfoArr['namespace']) && strlen($classInfoArr['namespace']) != 0) {
             $this->ns = $classInfoArr['namespace'];
         } else {
             $this->ns = 'webfiori';

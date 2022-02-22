@@ -40,22 +40,23 @@ class CreateCronJob extends CreateClassHelper {
             " * The process will have the name '$jobName'."
         ]);
         
-
+        $argsPartArr = [];
+        
         if (count($argsArr) != 0) {
-            $argsArr = [
+            $argsPartArr = [
                 ' * In addition, the proces have the following args:',
                 ' * <ul>'
             ];
             
 
             foreach ($argsArr as $argName => $options) {
-                $argsArr[] = " * <li>$argName: ".$options['description']."</li>";
+                $argsPartArr[] = " * <li>$argName: ".$options['description']."</li>";
             }
-            $argsArr[] = ' * </ul>';
+            $argsPartArr[] = ' * </ul>';
         }
-        $argsArr[] = ' */';
-        $argsArr[] = 'class '.$this->getWriter()->getName().' extends AbstractJob {';
-        $this->append($argsArr);
+        $argsPartArr[] = ' */';
+        $argsPartArr[] = 'class '.$this->getWriter()->getName().' extends AbstractJob {';
+        $this->append($argsPartArr);
 
         $this->_writeConstructor($jobName, $argsArr, $jobDesc);
         
@@ -111,7 +112,7 @@ class CreateCronJob extends CreateClassHelper {
 
             if (strlen($argName) > 0) {
                 $argsArr[$argName] = [
-                    'description' => $this->getInput('Enter argument name:', 'No Description.', function ($val) {
+                    'description' => $this->getInput('Enter argument description:', 'No Description.', function ($val) {
                         if (strlen($val) != 0) {
                             return $val;
                         }

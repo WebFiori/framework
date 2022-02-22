@@ -3,12 +3,18 @@ namespace webfiori\framework\cli\helpers;
 
 use webfiori\framework\cli\commands\CreateCommand;
 use webfiori\framework\cli\writers\ClassWriter;
+use webfiori\framework\cli\helpers\ClassInfoReader;
 /**
  * A wrapper class which helps in creating classes using CLI.
  *
  * @author Ibrahim
  */
 class CreateClassHelper {
+    /**
+     * 
+     * @var ClassInfoReader
+     */
+    private $classInfoReader;
     /**
      * 
      * @var ClassWriter
@@ -22,6 +28,7 @@ class CreateClassHelper {
     public function __construct(CreateCommand $command) {
         $this->command = $command;
         $this->classWriter = new ClassWriter([]);
+        $this->classInfoReader = new ClassInfoReader($this->command);
     }
     /**
      * 
@@ -98,7 +105,7 @@ class CreateClassHelper {
     public function select($prompt, $choices, $defaultIndex = null) {
         $this->getCommand()->select($prompt, $choices, $defaultIndex);
     }
-    public function getClassInfo($defaltNs) {
-        return $this->getCommand()->getClassInfo($defaltNs);
+    public function getClassInfo($defaultNs = null, $suffix = null) {
+        return $this->classInfoReader->readClassInfo($defaultNs, $suffix);
     }
 }

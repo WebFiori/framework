@@ -94,7 +94,7 @@ class CreateClassHelper {
         $this->getCommand()->success($message);
     }
     public function confirm($confirmTxt, $default = null) {
-        $this->getCommand()->confirm($confirmTxt, $default);
+        return $this->getCommand()->confirm($confirmTxt, $default);
     }
     public function getInput($prompt, $default = null, $validator = null) {
         return $this->getCommand()->getInput($prompt, $default, $validator);

@@ -96,6 +96,15 @@ class ClassWriter {
             $this->className = 'NewClass';
         }
     }
+    public function setNamespace($namespace) {
+        $this->ns = $namespace;
+    }
+    public function setPath($path) {
+        $this->path = $path;
+    }
+    public function setClassName($name) {
+        $this->className = $name;
+    }
     /**
      * Appends a string to the string that represents the body of the class.
      * 

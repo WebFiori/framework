@@ -69,7 +69,7 @@ class CreateClassHelper {
     }
     public function writeClass() {
         $this->getWriter()->writeClass();
-        $this->info('New CLI class was created at "'.$this->getWriter()->getPath().'".');
+        $this->info('New class was created at "'.$this->getWriter()->getPath().'".');
     }
     /**
      * 

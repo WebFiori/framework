@@ -71,7 +71,7 @@ class CreateCronJob extends CreateClassHelper {
         $this->append([
             '}',
             '/**',
-            ' * Execute a set of instructions when the job faild to complete without errors.',
+            ' * Execute a set of instructions when the job failed to complete without errors.',
             ' */',
             'public function onFail() {'
         ], 1);

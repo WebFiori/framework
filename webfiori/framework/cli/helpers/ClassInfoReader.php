@@ -149,8 +149,8 @@ class ClassInfoReader {
             $className = trim($this->getOwner()->getInput('Enter a name for the new class:'));
             
             if ($suffix !== null) {
-                $subSuffix = substr($className, strlen($className) - 1);
-            
+                $subSuffix = substr($className, strlen($className) - strlen($suffix));
+                
                 if ($subSuffix != $suffix) {
                     $className .= $suffix;
                 }

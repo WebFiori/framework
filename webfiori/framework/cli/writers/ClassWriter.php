@@ -106,19 +106,39 @@ class ClassWriter {
         $this->className = $name;
     }
     /**
-     * Appends a string to the string that represents the body of the class.
+     * Appends a string or array of strings to the string that represents the
+     * body of the class.
      * 
-     * @param string $str The string that will be appended. At the end of the string 
-     * a new line character will be appended.
+     * @param string $strOrArr The string that will be appended. At the end of the string 
+     * a new line character will be appended. This can also be an array of strings.
      * 
-     * @param int $tapsCount The number of taps that will be added to the string. 
-     * A tap is represented as 4 spaces.
+     * @param int $tabsCount The number of tabs that will be added to the string. 
+     * A tab is represented as 4 spaces.
      * 
      * @since 1.0
      */
-    public function append($str, $tapsCount = 0) {
-        $tabSpaces = '    ';
-        $tabStr = str_repeat($tabSpaces, $tapsCount);
+    public function append($strOrArr, $tabsCount = 0) {
+        if (gettype($strOrArr) == 'array') {
+            foreach ($strOrArr as $str) {
+                $this->_a($str, $tabsCount);
+            }
+        } else {
+            $this->_a($strOrArr, $tabsCount);
+        }
+    }
+    /**
+     * Appends the string that represents the start of PHP class.
+     * 
+     * The method will add the tag '&lt;php?' in addition to namespace declaration.
+     */
+    public function appendTop() {
+        $this->append([
+            '<?php',
+            'namespace '.$this->getNamespace().";\n"
+        ]);
+    }
+    private function _a($str, $tapsCount) {
+        $tabStr = str_repeat('    ', $tapsCount);
         $this->classAsStr .= $tabStr.$str."\n";
     }
     /**

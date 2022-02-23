@@ -2,7 +2,7 @@
 namespace webfiori\framework\cli\helpers;
 
 use webfiori\framework\cli\commands\CreateCommand;
-use webfiori\framework\cli\writers\ClassWriter;
+use webfiori\framework\cli\writers\CLICommandClassWriter;
 /**
  * A helper class which is used to help in creating CLI command classes using CLI.
  *
@@ -27,44 +27,7 @@ class CreateCLIClassHelper extends CreateClassHelper {
         } else {
             $argsArr = [];
         }
-        $this->appendTop();
-        $topArr = [
-            "use webfiori\\framework\\cli\\CLICommand;",
-            '/**',
-            ' * A CLI command  which was created using the command "create".',
-            ' *',
-            " * The command will have the name '$commandName'."
-        ];
-
-        if (count($argsArr) != 0) {
-            $topArr[] = ' * In addition, the command have the following args:';
-            $topArr[] = ' * <ul>';
-
-            foreach ($argsArr as $argArr) {
-                $topArr[] = " * <li>".$argArr['name']."</li>";
-            }
-            $topArr[] = ' * </ul>';
-        }
-        $topArr[] = ' */';
-        $topArr[] = 'class '.$this->getWriter()->getName().' extends CLICommand {';
-        $this->append($topArr, 0);
-        $this->_writeConstructor($commandName, $argsArr, $commandDesc);
-        
-        $this->append([
-            '/**',
-            ' * Execute the command.',
-            ' */',
-            'public function exec() {',
-        ], 1);
-        $this->append([
-            '//TODO: Write the code that represents the command.',
-            'return 0;',
-        ], 2);
-        $this->append('}', 1);
-
-        $this->append("}");
-        $this->append("return __NAMESPACE__;");
-
+        $this->setWriter(new CLICommandClassWriter([], $commandName, $commandDesc, $argsArr));
         $this->writeClass();
     }
     private function _getArgs() {
@@ -116,50 +79,5 @@ class CreateCLIClassHelper extends CreateClassHelper {
         }
 
         return $valsArr;
-    }
-
-    /**
-     * 
-     * @param ClassWriter $writer
-     * @param type $name
-     * @param type $priority
-     * @param array $args
-     * @param string $commandDesc Description
-     */
-    private function _writeConstructor($name, array $args, $commandDesc) {
-        $this->append([
-            '/**',
-            ' * Creates new instance of the class.',
-            ' */',
-            'public function __construct(){'
-        ], 1);
-
-        if (count($args) > 0) {
-            $this->append(["parent::__construct('$name', ["], 2);
-
-            foreach ($args as $argArr) {
-                $this->append("'".$argArr['name']."' => [", 3);
-
-                if (strlen($argArr['description']) != 0) {
-                    $this->append("'description' => '".str_replace("'", "\'", $argArr['description'])."',", 4);
-                }
-                $this->append("'optional' => ".($argArr['optional'] === true ? 'true' : 'false').",", 4);
-
-                if (count($argArr['values']) != 0) {
-                    $writer->append("'values' => [", 4);
-
-                    foreach ($argArr['values'] as $val) {
-                        $this->append("'".str_replace("'", "\'", $val)."',", 5);
-                    }
-                    $this->append("]", 4);
-                }
-                $this->append("],", 3);
-            }
-            $this->append("], '".str_replace("'", "\'", $commandDesc)."');", 2);
-        } else {
-            $this->append("parent::__construct('$name', '".str_replace("'", "\'", $commandDesc)."');", 2);
-        }
-
-        $this->append('}', 1);
     }
 }

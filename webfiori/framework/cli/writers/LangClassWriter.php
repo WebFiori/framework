@@ -53,21 +53,26 @@ class LangClassWriter extends ClassWriter {
         ];
         parent::__construct($classInfoArr);
 
-        $this->append("<?php\n");
-        $this->append('namespace '.$this->getNamespace().";\n");
-        $this->append("use webfiori\\framework\\i18n\\Language;");
-        $this->append('');
-        $this->append("/**\n"
-                ." * A class which holds language information for the language which has code '$langCode'.");
-        $this->append(" */");
-        $this->append('class '.$this->getName().' extends Language {');
+        $this->appendTop();
+        $this->append([
+            "use webfiori\\framework\\i18n\\Language;",
+            '',
+            "/**",
+            " * A class which holds language information for the language which has code '$langCode'.",
+            " */",
+            'class '.$this->getName().' extends Language {'
+        ]);
+        $this->append([
+            "/**",
+            " * Creates new instance of the class.",
+            " */",
+            'public function __construct() {'
+        ], 1);
 
-        $this->append("/**", 1);
-        $this->append(" * Creates new instance of the class.", 1);
-        $this->append(" */", 1);
-        $this->append('public function __construct(){', 1);
-        $this->append('parent::__construct(\''.$writingDir.'\', \''.$langCode.'\', true);', 2);
-        $this->append('//TODO: Add the language "'.$langCode.'" labels.', 2);
+        $this->append([
+            'parent::__construct(\''.$writingDir.'\', \''.$langCode.'\', true);',
+            '//TODO: Add the language "'.$langCode.'" labels.'
+        ], 2);
         $this->append('}', 1);
         $this->append('}', 0);
     }

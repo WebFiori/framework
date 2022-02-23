@@ -134,7 +134,8 @@ class ClassWriter {
     public function appendTop() {
         $this->append([
             '<?php',
-            'namespace '.$this->getNamespace().";\n"
+            'namespace '.$this->getNamespace().";\n",
+            ''
         ]);
     }
     private function _a($str, $tapsCount) {

@@ -25,10 +25,27 @@ class CreateClassHelper {
      * @var CreateCommand
      */
     private $command;
-    public function __construct(CreateCommand $command) {
+    public function __construct(CreateCommand $command, ClassWriter $writer = null) {
         $this->command = $command;
-        $this->classWriter = new ClassWriter();
+        $this->classWriter = $writer !== null ? $writer : new ClassWriter();
         $this->classInfoReader = new ClassInfoReader($this->command);
+    }
+    /**
+     * Sets the writer to new one.
+     * 
+     * Note that if the writer was already set, the name of the class, path and
+     * namespace will be copied from the one which was set before.
+     * 
+     * @param ClassWriter $writer
+     */
+    public function setWriter(ClassWriter $writer) {
+        if ($writer !== null) {
+            $current = $this->getWriter();
+            $this->classWriter = $writer;
+            $this->classWriter->setClassName($current->getName());
+            $this->classWriter->setPath($current->getPath());
+            $this->classWriter->setNamespace($current->getNamespace());
+        }
     }
     /**
      * 
@@ -53,19 +70,10 @@ class CreateClassHelper {
         $this->setPath($classInfo['path']);
     }
     public function appendTop() {
-        $this->append([
-            '<?php',
-            "namespace ".$this->getWriter()->getNamespace().";\n"
-        ], 0);
+        $this->getWriter()->appendTop();
     }
     public function append($strArr, $tapsCount = 0) {
-        if (gettype($strArr) == 'array') {
-            foreach ($strArr as $str) {
-                $this->getWriter()->append($str, $tapsCount);
-            }
-        } else {
-            $this->getWriter()->append($strArr, $tapsCount);
-        }
+        $this->getWriter()->append($strArr, $tapsCount);
     }
     public function writeClass() {
         $this->getWriter()->writeClass();

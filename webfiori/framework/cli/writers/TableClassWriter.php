@@ -32,18 +32,17 @@ use webfiori\database\mysql\MySQLTable;
 use webfiori\database\Table;
 
 /**
- * A class which is used to write query class from an instance of the class 
- * 'MySQLQuery'.
+ * A class which is used to write database table classes.
  * 
- * This class is used to write new query class based on a temporary 
- * query object. It is used as a helper class if the command 'create' is executed 
- * from CLI and the option 'Query class' is selected. 
+ * This class is used to write new table class based on a temporary 
+ * table object. It is used as a helper class if the command 'create' is executed 
+ * from CLI and the option 'Database Table Class' is selected. 
  *
  * @author Ibrahim
  * 
  * @version 1.0
  */
-class QueryClassWriter extends ClassWriter {
+class TableClassWriter extends ClassWriter {
     /**
      *
      * @var array
@@ -264,10 +263,12 @@ class QueryClassWriter extends ClassWriter {
         $this->append("],", 3);
     }
     private function _writeConstructor() {
-        $this->append("/**", 1);
-        $this->append(" * Creates new instance of the class.", 1);
-        $this->append(" */", 1);
-        $this->append('public function __construct(){', 1);
+        $this->append([
+            "/**",
+            " * Creates new instance of the class.",
+            " */",
+            'public function __construct() {',
+        ], 1);
         $this->append('parent::__construct(\''.$this->tableObj->getNormalName().'\');', 2);
 
         if ($this->tableObj->getComment() !== null) {
@@ -278,8 +279,7 @@ class QueryClassWriter extends ClassWriter {
         $this->append('}', 1);
     }
     private function _writeHeaderSec() {
-        $this->append("<?php\n");
-        $this->append('namespace '.$this->getNamespace().";\n");
+        $this->appendTop();
 
         if ($this->tableObj instanceof MySQLTable) {
             $this->append("use webfiori\database\mysql\MySQLTable;");

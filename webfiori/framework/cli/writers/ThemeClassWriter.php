@@ -33,7 +33,7 @@ class ThemeClassWriter extends ClassWriter {
      * <li>name: Holds theme name.</li>
      * </ul>
      */
-    public function __construct($classNameInfo) {
+    public function __construct($classNameInfo = []) {
         parent::__construct([
             'path' => $classNameInfo['path'],
             'namespace' => $classNameInfo['namespace'],

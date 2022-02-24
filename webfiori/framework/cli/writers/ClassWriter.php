@@ -33,7 +33,7 @@ use webfiori\framework\File;
  * 
  * @version 1.0.1
  */
-class ClassWriter {
+abstract class ClassWriter {
     private $useArr;
     /**
      * The generated class as string.

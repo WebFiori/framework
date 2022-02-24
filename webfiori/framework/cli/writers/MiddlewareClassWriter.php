@@ -7,6 +7,9 @@ namespace webfiori\framework\cli\writers;
  * @author Ibrahim
  */
 class MiddlewareClassWriter extends ClassWriter {
+    private $priority;
+    private $name;
+    private $groups;
     /**
      * Creates new instance of the class.
      * 
@@ -32,35 +35,40 @@ class MiddlewareClassWriter extends ClassWriter {
      */
     public function __construct(array $classInfoArr, $middlewareName, $priority, array $groupsArr = []) {
         parent::__construct($classInfoArr);
-        
-        $this->appendTop();
-        $classTop = [
-            "use webfiori\\framework\\middleware\\AbstractMiddleware;",
-            "use webfiori\\framework\\SessionsManager;",
-            "use webfiori\\http\\Request;",
-            "use webfiori\\http\\Response;\n",
+        $this->addUseStatement([
+            "webfiori\\framework\\middleware\\AbstractMiddleware",
+            "webfiori\\framework\\SessionsManager",
+            "webfiori\\http\\Request",
+            "webfiori\\http\\Response",
+        ]);
+        $this->priority = $priority;
+        $this->name = $middlewareName;
+        $this->groups = $groupsArr;
+    }
+    private function _writeConstructor() {
+        $this->append([
             '/**',
-            ' * A middleware which is created using the command "create".',
-            ' *',
-            " * The middleware will have the name '$middlewareName' and ",
-            " * Priority $priority."
-        ];
+            ' * Creates new instance of the class.',
+            ' */',
+            'public function __construct(){',
+            
+        ], 1);
+        $this->append("parent::__construct('$this->name');", 2);
+        $this->append("\$this->setPriority($this->priority);", 2);
 
-        if (count($groupsArr) != 0) {
-            $classTop[] = ' * In addition, the middleware is added to the following groups:';
-            $classTop[] = ' * <ul>';
+        if (count($this->groups) > 0) {
+            $this->append('$this->addToGroups([', 2);
 
-            foreach ($groupsArr as $gName) {
-                $classTop[] = " * <li>$gName</li>";
+            foreach ($this->groups as $gName) {
+                $this->append("'$gName',", 3);
             }
-            $classTop[] = ' * </ul>';
+            $this->append(']);', 2);
         }
-        $classTop[] = ' */';
-        $classTop[] = 'class '.$this->getName().' extends AbstractMiddleware {';
-        $this->append($classTop);
+        $this->append('}', 1);
+    }
 
-        $this->_writeConstructor($middlewareName, $priority, $groupsArr);
-
+    public function writeClassBody() {
+        $this->_writeConstructor();
         $this->append([
             '/**',
             ' * Execute a set of instructions before accessing the application.',
@@ -89,25 +97,31 @@ class MiddlewareClassWriter extends ClassWriter {
 
         $this->append("}");
     }
-    private function _writeConstructor($name, $priority, array $groups) {
-        $this->append([
+
+    public function writeClassComment() {
+        $classTop = [
             '/**',
-            ' * Creates new instance of the class.',
-            ' */',
-            'public function __construct(){',
-            
-        ], 1);
-        $this->append("parent::__construct('$name');", 2);
-        $this->append("\$this->setPriority($priority);", 2);
+            ' * A middleware which is created using the command "create".',
+            ' *',
+            " * The middleware will have the name '$this->name' and ",
+            " * Priority $this->priority."
+        ];
 
-        if (count($groups) > 0) {
-            $this->append('$this->addToGroups([', 2);
+        if (count($this->groups) != 0) {
+            $classTop[] = ' * In addition, the middleware is added to the following groups:';
+            $classTop[] = ' * <ul>';
 
-            foreach ($groups as $gName) {
-                $this->append("'$gName',", 3);
+            foreach ($this->groups as $gName) {
+                $classTop[] = " * <li>$gName</li>";
             }
-            $this->append(']);', 2);
+            $classTop[] = ' * </ul>';
         }
-        $this->append('}', 1);
+        $classTop[] = ' */';
+        $this->append($classTop);
     }
+
+    public function writeClassDeclaration() {
+        $this->append('class '.$this->getName().' extends AbstractMiddleware {');
+    }
+
 }

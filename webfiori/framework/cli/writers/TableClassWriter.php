@@ -98,7 +98,6 @@ class TableClassWriter extends ClassWriter {
             throw new InvalidArgumentException('The given object is not an instance of the class "webfiori\database\Table".');
         }
         $this->tableObj = $tableObj;
-        $this->classInfoArr = $classInfoArr;
 
         if (isset($classInfoArr['entity-info'])) {
             $this->entityMapper = new EntityMapper($this->tableObj, 
@@ -107,9 +106,7 @@ class TableClassWriter extends ClassWriter {
                     $classInfoArr['entity-info']['namespace']);
             $this->entityMapper->setUseJsonI($classInfoArr['entity-info']['implement-jsoni']);
         }
-        $this->_writeHeaderSec();
-        $this->_writeConstructor();
-        $this->append('}');
+        $this->addAllUse();
     }
     /**
      * Returns the name entity class will be created.
@@ -278,17 +275,35 @@ class TableClassWriter extends ClassWriter {
         $this->_addFks();
         $this->append('}', 1);
     }
-    private function _writeHeaderSec() {
-        $this->appendTop();
+    private function addAllUse() {
 
         if ($this->tableObj instanceof MySQLTable) {
-            $this->append("use webfiori\database\mysql\MySQLTable;");
+            $this->addUseStatement("webfiori\database\mysql\MySQLTable");
         } else if ($this->tableObj instanceof MSSQLTable) {
-            $this->append("use webfiori\database\mssql\MSSQLTable;");
+            $this->addUseStatement("webfiori\database\mssql\MSSQLTable");
         }
-        $this->addFksTables();
+        $this->addFksUseTables();
+    }
+    private function addFksUseTables() {
+        $fks = $this->tableObj->getForignKeys();
+        $addedRefs = [];
 
-        $this->append('');
+        foreach ($fks as $fkObj) {
+            $refTableNs = get_class($fkObj->getSource());
+
+            if (!in_array($refTableNs, $addedRefs)) {
+                $this->addUseStatement($refTableNs);
+                $addedRefs[] = $refTableNs;
+            }
+        }
+    }
+
+    public function writeClassBody() {
+        $this->_writeConstructor();
+        $this->append('}');
+    }
+
+    public function writeClassComment() {
         $this->append("/**\n"
                 ." * A class which represents the database table '".$this->tableObj->getNormalName()."'.\n"
                 ." * The table which is associated with this class will have the following columns:\n"
@@ -299,24 +314,14 @@ class TableClassWriter extends ClassWriter {
             $this->append(" * <li><b>$key</b>: Name in database: '".$colObj->getNormalName()."'. Data type: '".$colObj->getDatatype()."'.</li>");
         }
         $this->append(" * </ul>\n */");
+    }
 
+    public function writeClassDeclaration() {
         if ($this->tableObj instanceof MySQLTable) {
             $this->append('class '.$this->getName().' extends MySQLTable {');
         } else if ($this->tableObj instanceof MSSQLTable) {
             $this->append('class '.$this->getName().' extends MSSQLTable {');
         }
     }
-    private function addFksTables() {
-        $fks = $this->tableObj->getForignKeys();
-        $addedRefs = [];
 
-        foreach ($fks as $fkObj) {
-            $refTableNs = get_class($fkObj->getSource());
-
-            if (!in_array($refTableNs, $addedRefs)) {
-                $this->append('use '.$refTableNs.';');
-                $addedRefs[] = $refTableNs;
-            }
-        }
-    }
 }

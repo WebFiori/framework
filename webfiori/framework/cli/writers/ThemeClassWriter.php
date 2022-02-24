@@ -2,11 +2,26 @@
 namespace webfiori\framework\cli\writers;
 
 /**
- * Description of ThemeClassWriter
+ * A class which is used to create basic theme skeleton.
  *
  * @author Ibrahim
  */
 class ThemeClassWriter extends ClassWriter {
+    private $name;
+    public function writeUseStatements() {
+        parent::writeUseStatements();
+        $this->addUseStatement([
+            $this->getNamespace().'\\AsideSection;',
+            $this->getNamespace().'\\FooterSection;',
+            $this->getNamespace().'\\HeadSection;',
+            $this->getNamespace().'\\HeaderSection;',
+        ]);
+        $useArr = [];
+        foreach ($this->getUseStatements() as $className) {
+            $useArr[] = 'use '.$className.';';
+        }
+        $this->append($useArr);
+    }
     /**
      * Creates new instance of the class.
      * 
@@ -24,26 +39,57 @@ class ThemeClassWriter extends ClassWriter {
             'namespace' => $classNameInfo['namespace'],
             'name' => $classNameInfo['name']
         ]);
-        $this->appendTop();
-        $this->append([
-            'use webfiori\\framework\\Theme;',
-            'use webfiori\\ui\\HTMLNode;',
-            'use '.$this->getNamespace().'\\AsideSection;',
-            'use '.$this->getNamespace().'\\FooterSection;',
-            'use '.$this->getNamespace().'\\HeadSection;',
-            'use '.$this->getNamespace().'\\HeaderSection;',
-            '',
-            "class ".$this->getName().' extends Theme {'
+        $this->addUseStatement([
+            'webfiori\\framework\\Theme',
+            'webfiori\\ui\\HTMLNode',
         ]);
+
+        
+        $this->name = isset($classNameInfo['name']) ? "'".$classNameInfo['name']."'" : null;
+        
+    }
+    private function writeComponent($className, $extends, $classComment, $todoTxt) {
+        $writer = new ClassWriter([
+            'path' => $this->getPath(),
+            'namespace' => $this->getNamespace(),
+            'name' => $className
+        ]);
+        $writer->addNsDeclaration();
+        $writer->append([
+            'use webfiori\\ui\\'.$extends.';',
+            '',
+            '/**',
+            '  * '.$classComment,
+            '  */',
+            "class ".$writer->getName().' extends '.$extends.' {'
+        ]);
+        $writer->append([
+            "/**",
+            " * Creates new instance of the class.",
+            " */",
+            'public function __construct(){',
+        ], 1);
+
+        if ($extends != 'HeadNode') {
+            $writer->append('parent::__construct(\'div\');', 2);
+        } else {
+            $writer->append('parent::__construct();', 2);
+        }
+        $writer->append('//TODO: '.$todoTxt, 2);
+        $writer->append('}', 1);
+        $writer->append('}');
+        $writer->writeClass();
+    }
+
+    public function writeClassBody() {
         $this->append([
             "/**",
             " * Creates new instance of the class.",
             " */",
             'public function __construct() {'
         ], 1);
-        $name = isset($classNameInfo['name']) ? "'".$classNameInfo['name']."'" : null;
         $this->append([
-            "parent::__construct($name);",
+            "parent::__construct($this->name);",
             '//TODO: Set the properties of your theme.',
             '//$this->setName(\'Super Theme\');',
             '//$this->setVersion(\'1.0\');',
@@ -111,36 +157,13 @@ class ThemeClassWriter extends ClassWriter {
         $this->append('}');
         $this->append('return __NAMESPACE__;');
     }
-    private function writeComponent($className, $extends, $classComment, $todoTxt) {
-        $writer = new ClassWriter([
-            'path' => $this->getPath(),
-            'namespace' => $this->getNamespace(),
-            'name' => $className
-        ]);
-        $writer->appendTop();
-        $writer->append([
-            'use webfiori\\ui\\'.$extends.';',
-            '',
-            '/**',
-            '  * '.$classComment,
-            '  */',
-            "class ".$writer->getName().' extends '.$extends.' {'
-        ]);
-        $writer->append([
-            "/**",
-            " * Creates new instance of the class.",
-            " */",
-            'public function __construct(){',
-        ], 1);
 
-        if ($extends != 'HeadNode') {
-            $writer->append('parent::__construct(\'div\');', 2);
-        } else {
-            $writer->append('parent::__construct();', 2);
-        }
-        $writer->append('//TODO: '.$todoTxt, 2);
-        $writer->append('}', 1);
-        $writer->append('}');
-        $writer->writeClass();
+    public function writeClassComment() {
+        
     }
+
+    public function writeClassDeclaration() {
+        $this->append("class ".$this->getName().' extends Theme {');
+    }
+
 }

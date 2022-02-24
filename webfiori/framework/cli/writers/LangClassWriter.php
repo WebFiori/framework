@@ -35,6 +35,8 @@ namespace webfiori\framework\cli\writers;
  * @since 2.1
  */
 class LangClassWriter extends ClassWriter {
+    private $code;
+    private $dir;
     /**
      * Creates new instance of the class.
      * 
@@ -52,16 +54,12 @@ class LangClassWriter extends ClassWriter {
             'path' => ROOT_DIR.DS.APP_DIR_NAME.DS.'langs'
         ];
         parent::__construct($classInfoArr);
+        $this->code = $langCode;
+        $this->dir = $writingDir;
+        $this->addUseStatement('webfiori\\framework\\i18n\\Language');
+    }
 
-        $this->appendTop();
-        $this->append([
-            "use webfiori\\framework\\i18n\\Language;",
-            '',
-            "/**",
-            " * A class which holds language information for the language which has code '$langCode'.",
-            " */",
-            'class '.$this->getName().' extends Language {'
-        ]);
+    public function writeClassBody() {
         $this->append([
             "/**",
             " * Creates new instance of the class.",
@@ -70,10 +68,23 @@ class LangClassWriter extends ClassWriter {
         ], 1);
 
         $this->append([
-            'parent::__construct(\''.$writingDir.'\', \''.$langCode.'\', true);',
-            '//TODO: Add the language "'.$langCode.'" labels.'
+            'parent::__construct(\''.$this->dir.'\', \''.$this->code.'\', true);',
+            '//TODO: Add the language "'.$this->code.'" labels.'
         ], 2);
         $this->append('}', 1);
         $this->append('}', 0);
     }
+
+    public function writeClassComment() {
+        $this->append([
+            "/**",
+            " * A class which holds language information for the language which has code '$this->code'.",
+            " */",
+        ]);
+    }
+
+    public function writeClassDeclaration() {
+        $this->append('class '.$this->getName().' extends Language {');
+    }
+
 }

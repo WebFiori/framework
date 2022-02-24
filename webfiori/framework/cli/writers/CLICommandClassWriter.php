@@ -8,6 +8,9 @@ use webfiori\framework\cli\writers\ClassWriter;
  * @author Ibrahim
  */
 class CLICommandClassWriter extends ClassWriter {
+    private $name;
+    private $desc;
+    private $args;
     /**
      * Creates new instance of the class.
      * 
@@ -31,47 +34,16 @@ class CLICommandClassWriter extends ClassWriter {
      */
     public function __construct($classInfoArr, $commandName, $commandDesc, $argsArr = []) {
         parent::__construct($classInfoArr);
+        $this->name = $commandName;
+        $this->args = $argsArr;
+        $this->desc = $commandDesc;
         
-        $this->appendTop();
-        $topArr = [
-            "use webfiori\\framework\\cli\\CLICommand;",
-            '/**',
-            ' * A CLI command  which was created using the command "create".',
-            ' *',
-            " * The command will have the name '$commandName'."
-        ];
-
-        if (count($argsArr) != 0) {
-            $topArr[] = ' * In addition, the command have the following args:';
-            $topArr[] = ' * <ul>';
-
-            foreach ($argsArr as $argArr) {
-                $topArr[] = " * <li>".$argArr['name']."</li>";
-            }
-            $topArr[] = ' * </ul>';
-        }
-        $topArr[] = ' */';
-        $topArr[] = 'class '.$this->getWriter()->getName().' extends CLICommand {';
-        $this->append($topArr, 0);
-        $this->_writeConstructor($commandName, $argsArr, $commandDesc);
-        
-        $this->append([
-            '/**',
-            ' * Execute the command.',
-            ' */',
-            'public function exec() {',
-        ], 1);
-        $this->append([
-            '//TODO: Write the code that represents the command.',
-            'return 0;',
-        ], 2);
-        $this->append('}', 1);
-
-        $this->append("}");
-        $this->append("return __NAMESPACE__;");
+        $this->addUseStatement([
+            'webfiori\\framework\\cli\\CLICommand'
+        ]);
     }
     
-    private function _writeConstructor($name, array $args, $commandDesc) {
+    private function _writeConstructor() {
         $this->append([
             '/**',
             ' * Creates new instance of the class.',
@@ -79,10 +51,10 @@ class CLICommandClassWriter extends ClassWriter {
             'public function __construct(){'
         ], 1);
 
-        if (count($args) > 0) {
-            $this->append(["parent::__construct('$name', ["], 2);
+        if (count($this->args) > 0) {
+            $this->append(["parent::__construct('$this->name', ["], 2);
 
-            foreach ($args as $argArr) {
+            foreach ($this->args as $argArr) {
                 $this->append("'".$argArr['name']."' => [", 3);
 
                 if (strlen($argArr['description']) != 0) {
@@ -100,11 +72,56 @@ class CLICommandClassWriter extends ClassWriter {
                 }
                 $this->append("],", 3);
             }
-            $this->append("], '".str_replace("'", "\'", $commandDesc)."');", 2);
+            $this->append("], '".str_replace("'", "\'", $this->desc)."');", 2);
         } else {
-            $this->append("parent::__construct('$name', '".str_replace("'", "\'", $commandDesc)."');", 2);
+            $this->append("parent::__construct('$this->name', '".str_replace("'", "\'", $this->desc)."');", 2);
         }
 
         $this->append('}', 1);
     }
+
+    public function writeClassBody() {
+        $this->_writeConstructor();
+        
+        $this->append([
+            '/**',
+            ' * Execute the command.',
+            ' */',
+            'public function exec() {',
+        ], 1);
+        $this->append([
+            '//TODO: Write the code that represents the command.',
+            'return 0;',
+        ], 2);
+        $this->append('}', 1);
+
+        $this->append("}");
+        $this->append("return __NAMESPACE__;");
+    }
+
+    public function writeClassComment() {
+        $topArr = [
+            '/**',
+            ' * A CLI command  which was created using the command "create".',
+            ' *',
+            " * The command will have the name '$this->name'."
+        ];
+
+        if (count($this->args) != 0) {
+            $topArr[] = ' * In addition, the command have the following args:';
+            $topArr[] = ' * <ul>';
+
+            foreach ($this->args as $argArr) {
+                $topArr[] = " * <li>".$argArr['name']."</li>";
+            }
+            $topArr[] = ' * </ul>';
+        }
+        $topArr[] = ' */';
+        $this->append($topArr);
+    }
+
+    public function writeClassDeclaration() {
+        $this->append('class '.$this->getName().' extends CLICommand {');
+    }
+
 }

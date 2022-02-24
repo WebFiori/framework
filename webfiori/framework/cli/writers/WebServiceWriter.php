@@ -64,10 +64,7 @@ class WebServiceWriter extends ClassWriter {
             throw new InvalidArgumentException('Given parameter is not an instance of \'webfiori\restEasy\AbstractWebService\'');
         }
         $this->servicesObj = $webServicesObj;
-        $this->_writeHeaderSec();
-        $this->_writeConstructor();
-        $this->_implementMethods();
-        $this->append('}');
+        $this->addUseStatement('webfiori\\framework\\EAbstractWebService');
     }
     /**
      * 
@@ -153,18 +150,6 @@ class WebServiceWriter extends ClassWriter {
         }
         $this->append('}', 1);
     }
-    private function _writeHeaderSec() {
-        $this->appendTop();
-        $this->append([
-            "use webfiori\\framework\\EAbstractWebService;",
-            '',
-            "/**",
-            " * A class that contains the implementation of the web service '".$this->servicesObj->getName()."'."
-        ]);
-        $this->_writeServiceDoc($this->servicesObj);
-        $this->append(" */");
-        $this->append('class '.$this->getName().' extends EAbstractWebService {');
-    }
     private function _writeServiceDoc($service) {
         $docArr = [];
         if (count($service->getParameters()) != 0) {
@@ -178,4 +163,26 @@ class WebServiceWriter extends ClassWriter {
             $this->append($docArr);
         }
     }
+
+    public function writeClassBody() {
+        $this->_writeConstructor();
+        $this->_implementMethods();
+        $this->append('}');
+    }
+
+    public function writeClassComment() {
+        $this->append([
+            "",
+            '',
+            "/**",
+            " * A class that contains the implementation of the web service '".$this->servicesObj->getName()."'."
+        ]);
+        $this->_writeServiceDoc($this->servicesObj);
+        $this->append(" */");
+    }
+
+    public function writeClassDeclaration() {
+        $this->append('class '.$this->getName().' extends EAbstractWebService {');
+    }
+
 }

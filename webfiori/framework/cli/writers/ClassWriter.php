@@ -132,12 +132,15 @@ class ClassWriter {
     public abstract function writeClassDeclaration();
     public abstract function writeClassBody();
     
-    private function writeUseStatements() {
+    public function writeUseStatements() {
         $useArr = [];
         foreach ($this->useArr as $className) {
             $useArr[] = 'use '.$className.';';
         }
         $this->append($useArr);
+    }
+    public function getUseStatements() {
+        return $this->useArr;
     }
     public function addUseStatement($classesToUse) {
         if (gettype($classesToUse) == 'array') {

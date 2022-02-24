@@ -30,44 +30,37 @@ use webfiori\framework\cli\writers\WebServiceWriter;
 use webfiori\http\AbstractWebService;
 use webfiori\http\ParamTypes;
 use webfiori\http\RequestParameter;
+use webfiori\framework\cli\helpers\CreateClassHelper;
 
 /**
  * A helper class for creating web services classes.
  *
  * @author Ibrahim
  */
-class CreateWebService {
-    /**
-     *
-     * @var CLICommand 
-     */
-    private $command;
+class CreateWebService extends CreateClassHelper {
     /**
      * Creates new instance of the class.
      * 
      * @param CreateCommand $command A command that is used to call the class.
      */
     public function __construct(CreateCommand $command) {
-        $this->command = $command;
+        parent::__construct($command);
 
-        $classInfo = $this->_getCommand()->getClassInfo(APP_DIR_NAME.'\\apis');
+        $this->setClassInfo(APP_DIR_NAME.'\\apis', 'Service');
 
         $serviceObj = new ServiceHolder();
 
         $this->_setServiceName($serviceObj);
-        $serviceObj->addRequestMethod($this->_getCommand()->select('Request method:', AbstractWebService::METHODS, 0));
+        $serviceObj->addRequestMethod($this->select('Request method:', AbstractWebService::METHODS, 0));
 
-        if ($this->_getCommand()->confirm('Would you like to add request parameters to the service?', false)) {
+        if ($this->confirm('Would you like to add request parameters to the service?', false)) {
             $this->_addParamsToService($serviceObj);
         }
 
-
-
-        $this->_getCommand()->println('Creating the class...');
-        $servicesCreator = new WebServiceWriter($serviceObj, $classInfo);
-        $servicesCreator->writeClass();
-        $this->_getCommand()->success('Class created.');
-        $this->_getCommand()->info('Don\'t forget to add the service to a services manager.');
+        $this->println('Creating the class...');
+        $this->setWriter(new WebServiceWriter($serviceObj));
+        $this->writeClass();
+        $this->info('Don\'t forget to add the service to a services manager.');
     }
     /**
      * 
@@ -78,24 +71,24 @@ class CreateWebService {
 
         do {
             $paramObj = new RequestParameter('h');
-            $paramObj->setType($this->_getCommand()->select('Choose parameter type:', ParamTypes::getTypes(), 0));
+            $paramObj->setType($this->select('Choose parameter type:', ParamTypes::getTypes(), 0));
             $this->_setParamName($paramObj);
             $added = $serviceObj->addParameter($paramObj);
-            $paramObj->setIsOptional($this->_getCommand()->confirm('Is this parameter optional?', true));
+            $paramObj->setIsOptional($this->confirm('Is this parameter optional?', true));
 
             if ($added) {
-                $this->_getCommand()->success('New parameter added to the service \''.$serviceObj->getName().'\'.');
+                $this->success('New parameter added to the service \''.$serviceObj->getName().'\'.');
             } else {
-                $this->_getCommand()->warning('The parameter was not added.');
+                $this->warning('The parameter was not added.');
             }
-            $addMore = $this->_getCommand()->confirm('Would you like to add another parameter?', false);
+            $addMore = $this->confirm('Would you like to add another parameter?', false);
         } while ($addMore);
     }
     /**
      * 
      * @return CreateCommand
      */
-    private function _getCommand() {
+    private function  {
         return $this->command;
     }
     /**
@@ -106,11 +99,11 @@ class CreateWebService {
         $validName = false;
 
         do {
-            $paramName = $this->_getCommand()->getInput('Enter a name for the request parameter:');
+            $paramName = $this->getInput('Enter a name for the request parameter:');
             $validName = $paramObj->setName($paramName);
 
             if (!$validName) {
-                $this->_getCommand()->error('Given name is invalid.');
+                $this->error('Given name is invalid.');
             }
         } while (!$validName);
     }
@@ -122,11 +115,11 @@ class CreateWebService {
         $validName = false;
 
         do {
-            $serviceName = $this->_getCommand()->getInput('Enter a name for the new web service:');
+            $serviceName = $this->getInput('Enter a name for the new web service:');
             $validName = $serviceObj->setName($serviceName);
 
             if (!$validName) {
-                $this->_getCommand()->error('Given name is invalid.');
+                $this->error('Given name is invalid.');
             }
         } while (!$validName);
     }

@@ -86,13 +86,6 @@ class CreateWebService extends CreateClassHelper {
     }
     /**
      * 
-     * @return CreateCommand
-     */
-    private function  {
-        return $this->command;
-    }
-    /**
-     * 
      * @param RequestParameter $paramObj
      */
     private function _setParamName($paramObj) {

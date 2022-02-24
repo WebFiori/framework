@@ -34,6 +34,7 @@ use webfiori\framework\File;
  * @version 1.0.1
  */
 class ClassWriter {
+    private $useArr;
     /**
      * The generated class as string.
      * 
@@ -95,6 +96,7 @@ class ClassWriter {
         } else {
             $this->className = 'NewClass';
         }
+        $this->useArr = [];
     }
     public function setNamespace($namespace) {
         $this->ns = $namespace;
@@ -126,12 +128,32 @@ class ClassWriter {
             $this->_a($strOrArr, $tabsCount);
         }
     }
+    public abstract function writeClassComment();
+    public abstract function writeClassDeclaration();
+    public abstract function writeClassBody();
+    
+    private function writeUseStatements() {
+        $useArr = [];
+        foreach ($this->useArr as $className) {
+            $useArr[] = 'use '.$className.';';
+        }
+        $this->append($useArr);
+    }
+    public function addUseStatement($classesToUse) {
+        if (gettype($classesToUse) == 'array') {
+            foreach ($classesToUse as $class) {
+                $this->useArr[] = $class;
+            }
+        } else {
+            $this->useArr[] = $classesToUse;
+        }
+    }
     /**
      * Appends the string that represents the start of PHP class.
      * 
      * The method will add the tag '&lt;php?' in addition to namespace declaration.
      */
-    public function appendTop() {
+    public function writeNsDeclaration() {
         $this->append([
             '<?php',
             'namespace '.$this->getNamespace().";\n",
@@ -193,6 +215,12 @@ class ClassWriter {
     public function writeClass() {
         $classFile = new File($this->className.'.php', $this->path);
         $classFile->remove();
+        $this->classAsStr = '';
+        $this->addNsDeclaration();
+        $this->writeUseStatements();
+        $this->writeClassComment();
+        $this->writeClassDeclaration();
+        $this->writeClassBody();
         $classFile->setRawData($this->classAsStr);
         $classFile->write(false, true);
     }

@@ -69,12 +69,6 @@ class CreateClassHelper {
         $this->setClassName($classInfo['name']);
         $this->setPath($classInfo['path']);
     }
-    public function appendTop() {
-        $this->getWriter()->appendTop();
-    }
-    public function append($strArr, $tapsCount = 0) {
-        $this->getWriter()->append($strArr, $tapsCount);
-    }
     public function writeClass() {
         $this->getWriter()->writeClass();
         $this->info('New class was created at "'.$this->getWriter()->getPath().'".');

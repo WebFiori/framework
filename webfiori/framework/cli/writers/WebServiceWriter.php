@@ -57,7 +57,7 @@ class WebServiceWriter extends ClassWriter {
      * provided, the constant ROOT_DIR is used. </li>
      * </ul>
      */
-    public function __construct($webServicesObj, $classInfoArr) {
+    public function __construct($webServicesObj, $classInfoArr = []) {
         parent::__construct($classInfoArr);
 
         if (!$webServicesObj instanceof AbstractWebService) {

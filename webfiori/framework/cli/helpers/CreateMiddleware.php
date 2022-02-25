@@ -18,7 +18,7 @@ class CreateMiddleware extends CreateClassHelper {
      * @param CreateCommand $command A command that is used to call the class.
      */
     public function __construct(CreateCommand $command) {
-        parent::__construct($command);
+        parent::__construct($command, new MiddlewareClassWriter());
         $this->setClassInfo(APP_DIR_NAME.'\\middleware', 'Middleware');
         
         $middlewareName = $this->_getMiddlewareName();
@@ -30,7 +30,9 @@ class CreateMiddleware extends CreateClassHelper {
             $groupsArr = [];
         }
         
-        $this->setWriter(new MiddlewareClassWriter([], $middlewareName, $priority, $groupsArr));
+        $this->getWriter()->setMiddlewareName($middlewareName);
+        $this->getWriter()->setPriority($priority);
+        $this->getWriter()->setGroups($groupsArr);
         $this->writeClass();
     }
     private function _getGroups() {

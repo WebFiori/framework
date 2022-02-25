@@ -33,7 +33,7 @@ class MiddlewareClassWriter extends ClassWriter {
      * @param array $groupsArr An array that holds groups at which the middleware
      * will be added to.
      */
-    public function __construct(array $classInfoArr, $middlewareName, $priority, array $groupsArr = []) {
+    public function __construct(array $classInfoArr = [], $middlewareName = '', $priority = 0, array $groupsArr = []) {
         parent::__construct($classInfoArr);
         $this->addUseStatement([
             "webfiori\\framework\\middleware\\AbstractMiddleware",
@@ -44,6 +44,15 @@ class MiddlewareClassWriter extends ClassWriter {
         $this->priority = $priority;
         $this->name = $middlewareName;
         $this->groups = $groupsArr;
+    }
+    public function setGroups(array $groupsArr) {
+        $this->groups = $groupsArr;
+    }
+    public function setMiddlewarePriority($pr) {
+        $this->priority = $pr;
+    }
+    public function setMiddlewareName($mdName) {
+        $this->name = $mdName;
     }
     private function _writeConstructor() {
         $this->append([

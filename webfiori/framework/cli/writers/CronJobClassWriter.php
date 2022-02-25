@@ -33,7 +33,7 @@ class CronJobClassWriter extends ClassWriter {
      * @param array $argsArr An associative array that holds any arguments that
      * the job needs.
      */
-    public function __construct($classInfoArr, $jobName, $jobDesc, $argsArr) {
+    public function __construct($classInfoArr = [], $jobName = '', $jobDesc = '', array $argsArr = []) {
         parent::__construct($classInfoArr);
         $this->name = $jobName;
         $this->args = $argsArr;
@@ -44,6 +44,15 @@ class CronJobClassWriter extends ClassWriter {
             "webfiori\\framework\\cron\\CronEmail",
             "webfiori\\framework\\cron\\Cron",
         ]);
+    }
+    public function setArgs(array $argsArr) {
+        $this->args = $argsArr;
+    }
+    public function setJobName($jobName) {
+        $this->name = $jobName;
+    }
+    public function setJobDescription($jobDesc) {
+        $this->desc = $jobDesc;
     }
     private function _writeConstructor() {
         $this->append([

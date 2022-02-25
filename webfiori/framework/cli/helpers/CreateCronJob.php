@@ -17,7 +17,7 @@ class CreateCronJob extends CreateClassHelper {
      * @param CreateCommand $command A command that is used to call the class.
      */
     public function __construct(CreateCommand $command) {
-        parent::__construct($command);
+        parent::__construct($command, new CronJobClassWriter());
         
         $this->setClassInfo(APP_DIR_NAME.'\\jobs', 'Job');
         $jobName = $this->_getJobName();
@@ -29,7 +29,10 @@ class CreateCronJob extends CreateClassHelper {
             $argsArr = [];
         }
         
-        $this->setWriter(new CronJobClassWriter([], $jobName, $jobDesc, $argsArr));
+        $this->getWriter()->setJobName($jobName);
+        $this->getWriter()->setJobDescription($jobName);
+        $this->getWriter()->setArgs($argsArr);
+        
         $this->writeClass();
     }
     private function _getArgs() {

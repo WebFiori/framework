@@ -32,7 +32,7 @@ class CLICommandClassWriter extends ClassWriter {
      * @param array $argsArr An associative array that holds the names of the argument
      * the command will have.
      */
-    public function __construct($classInfoArr, $commandName, $commandDesc, $argsArr = []) {
+    public function __construct($classInfoArr = '', $commandName = '', $commandDesc = '', $argsArr = []) {
         parent::__construct($classInfoArr);
         $this->name = $commandName;
         $this->args = $argsArr;
@@ -42,7 +42,15 @@ class CLICommandClassWriter extends ClassWriter {
             'webfiori\\framework\\cli\\CLICommand'
         ]);
     }
-    
+    public function setArgs(array $argsArr) {
+        $this->args = $argsArr;
+    }
+    public function setCommandDescription($desc) {
+        $this->desc = $desc;
+    }
+    public function setCommandName($name) {
+        $this->name = $name;
+    }
     private function _writeConstructor() {
         $this->append([
             '/**',

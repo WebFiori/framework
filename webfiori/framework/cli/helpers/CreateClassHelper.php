@@ -27,7 +27,7 @@ class CreateClassHelper {
     private $command;
     public function __construct(CreateCommand $command, ClassWriter $writer = null) {
         $this->command = $command;
-        $this->classWriter = $writer !== null ? $writer : new ClassWriter();
+        $this->classWriter = $writer;
         $this->classInfoReader = new ClassInfoReader($this->command);
     }
     /**

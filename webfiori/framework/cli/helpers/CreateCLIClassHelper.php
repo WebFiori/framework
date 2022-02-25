@@ -17,7 +17,7 @@ class CreateCLIClassHelper extends CreateClassHelper {
      * @param CreateCommand $command A command that is used to call the class.
      */
     public function __construct(CreateCommand $command) {
-        parent::__construct($command);
+        parent::__construct($command, new CLICommandClassWriter());
         $this->setClassInfo(APP_DIR_NAME.'\\commands', 'Command');
         $commandName = $this->_getCommandName();
         $commandDesc = $this->getInput('Give a short description of the command:');
@@ -27,7 +27,10 @@ class CreateCLIClassHelper extends CreateClassHelper {
         } else {
             $argsArr = [];
         }
-        $this->setWriter(new CLICommandClassWriter([], $commandName, $commandDesc, $argsArr));
+        $this->getWriter()->setCommandName($commandName);
+        $this->getWriter()->setCommandDescription($commandDesc);
+        $this->getWriter()->setArgs($argsArr);
+        
         $this->writeClass();
     }
     private function _getArgs() {

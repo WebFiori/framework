@@ -219,7 +219,7 @@ abstract class ClassWriter {
         $classFile = new File($this->className.'.php', $this->path);
         $classFile->remove();
         $this->classAsStr = '';
-        $this->addNsDeclaration();
+        $this->writeNsDeclaration();
         $this->writeUseStatements();
         $this->writeClassComment();
         $this->writeClassDeclaration();

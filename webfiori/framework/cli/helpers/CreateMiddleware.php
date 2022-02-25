@@ -31,7 +31,7 @@ class CreateMiddleware extends CreateClassHelper {
         }
         
         $this->getWriter()->setMiddlewareName($middlewareName);
-        $this->getWriter()->setPriority($priority);
+        $this->getWriter()->setMiddlewarePriority($priority);
         $this->getWriter()->setGroups($groupsArr);
         $this->writeClass();
     }

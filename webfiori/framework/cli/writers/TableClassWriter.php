@@ -95,7 +95,6 @@ class TableClassWriter extends ClassWriter {
                     $classInfoArr['entity-info']['namespace']);
             $this->entityMapper->setUseJsonI($classInfoArr['entity-info']['implement-jsoni']);
         }
-        $this->addAllUse();
     }
     public function setEntityInfo($infoArr) {
         $this->entityMapper = new EntityMapper($this->tableObj, 
@@ -165,6 +164,7 @@ class TableClassWriter extends ClassWriter {
      * @since 1.0
      */
     public function writeClass() {
+        $this->addAllUse();
         parent::writeClass();
 
         if ($this->entityMapper !== null) {
@@ -288,15 +288,17 @@ class TableClassWriter extends ClassWriter {
         $this->addFksUseTables();
     }
     private function addFksUseTables() {
-        $fks = $this->tableObj->getForignKeys();
-        $addedRefs = [];
+        if ($this->tableObj !== null) {
+            $fks = $this->tableObj->getForignKeys();
+            $addedRefs = [];
 
-        foreach ($fks as $fkObj) {
-            $refTableNs = get_class($fkObj->getSource());
+            foreach ($fks as $fkObj) {
+                $refTableNs = get_class($fkObj->getSource());
 
-            if (!in_array($refTableNs, $addedRefs)) {
-                $this->addUseStatement($refTableNs);
-                $addedRefs[] = $refTableNs;
+                if (!in_array($refTableNs, $addedRefs)) {
+                    $this->addUseStatement($refTableNs);
+                    $addedRefs[] = $refTableNs;
+                }
             }
         }
     }

@@ -34,11 +34,7 @@ class ThemeClassWriter extends ClassWriter {
      * </ul>
      */
     public function __construct($classNameInfo = []) {
-        parent::__construct([
-            'path' => $classNameInfo['path'],
-            'namespace' => $classNameInfo['namespace'],
-            'name' => $classNameInfo['name']
-        ]);
+        parent::__construct($classNameInfo);
         $this->addUseStatement([
             'webfiori\\framework\\Theme',
             'webfiori\\ui\\HTMLNode',

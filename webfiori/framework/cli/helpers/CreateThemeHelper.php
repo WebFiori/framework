@@ -17,11 +17,9 @@ class CreateThemeHelper extends CreateClassHelper {
      * @param CreateCommand $command A command that is used to call the class.
      */
     public function __construct(CreateCommand $command) {
-        parent::__construct($command);
+        parent::__construct($command, new ThemeClassWriter());
 
         $this->setClassInfo('themes', 'Theme');
-        
-        $this->setWriter(new ThemeClassWriter());
 
         $command->println('Creating theme at "'.$this->getWriter()->getPath().'"...');
         $this->writeClass();

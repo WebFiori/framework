@@ -105,7 +105,7 @@ class CreateClassHelper {
         $this->getCommand()->println($str, $_);
     }
     public function select($prompt, $choices, $defaultIndex = null) {
-        $this->getCommand()->select($prompt, $choices, $defaultIndex);
+        return $this->getCommand()->select($prompt, $choices, $defaultIndex);
     }
     public function getClassInfo($defaultNs = null, $suffix = null) {
         return $this->classInfoReader->readClassInfo($defaultNs, $suffix);

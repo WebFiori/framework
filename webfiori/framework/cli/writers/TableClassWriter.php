@@ -45,12 +45,6 @@ use webfiori\database\Table;
 class TableClassWriter extends ClassWriter {
     /**
      *
-     * @var array
-     * @since 1.0 
-     */
-    private $classInfoArr;
-    /**
-     *
      * @var EntityMapper|null
      * @since 1.0 
      */
@@ -86,17 +80,12 @@ class TableClassWriter extends ClassWriter {
      * </li>
      * </ul>
      * 
-     * @throws InvalidArgumentException If the first parameter is not an object of 
-     * type 'webfiori\database\Table'.
      * 
      * @since 1.0
      */
-    public function __construct($tableObj, $classInfoArr) {
+    public function __construct($tableObj = null, $classInfoArr = []) {
         parent::__construct($classInfoArr);
 
-        if (!$tableObj instanceof Table) {
-            throw new InvalidArgumentException('The given object is not an instance of the class "webfiori\database\Table".');
-        }
         $this->tableObj = $tableObj;
 
         if (isset($classInfoArr['entity-info'])) {
@@ -107,6 +96,20 @@ class TableClassWriter extends ClassWriter {
             $this->entityMapper->setUseJsonI($classInfoArr['entity-info']['implement-jsoni']);
         }
         $this->addAllUse();
+    }
+    public function setEntityInfo($infoArr) {
+        $this->entityMapper = new EntityMapper($this->tableObj, 
+                    $infoArr['name'], 
+                    $infoArr['path'], 
+                    $infoArr['namespace']);
+            $this->entityMapper->setUseJsonI($infoArr['implement-jsoni']);
+    }
+    /**
+     * 
+     * @param Table $table
+     */
+    public function setTable($table) {
+        $this->tableObj = $table;
     }
     /**
      * Returns the name entity class will be created.

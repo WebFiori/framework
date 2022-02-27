@@ -11,10 +11,10 @@ class ThemeClassWriter extends ClassWriter {
     public function writeUseStatements() {
         parent::writeUseStatements();
         $this->addUseStatement([
-            $this->getNamespace().'\\AsideSection;',
-            $this->getNamespace().'\\FooterSection;',
-            $this->getNamespace().'\\HeadSection;',
-            $this->getNamespace().'\\HeaderSection;',
+            $this->getNamespace().'\\AsideSection',
+            $this->getNamespace().'\\FooterSection',
+            $this->getNamespace().'\\HeadSection',
+            $this->getNamespace().'\\HeaderSection',
         ]);
         $useArr = [];
         foreach ($this->getUseStatements() as $className) {

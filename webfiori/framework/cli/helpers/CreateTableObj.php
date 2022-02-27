@@ -24,7 +24,7 @@ class CreateTableObj extends CreateClassHelper {
      * @param CreateCommand $command A command that is used to call the class.
      */
     public function __construct(CreateCommand $command) {
-        parent::__construct($command);
+        parent::__construct($command, new TableClassWriter());
         
         $dbType = $this->select('Database type:', ConnectionInfo::SUPPORTED_DATABASES);
 
@@ -36,6 +36,7 @@ class CreateTableObj extends CreateClassHelper {
         } else if ($dbType == 'mssql') {
             $tempTable = new MSSQLTable();
         }
+        $this->getWriter()->setTable($tempTable);
         $this->_setTableName($tempTable);
         $this->_setTableComment($tempTable);
         $this->println('Now you have to add columns to the table.');
@@ -66,6 +67,7 @@ class CreateTableObj extends CreateClassHelper {
                 $this->_isPrimaryCheck($colObj);
                 $this->_addColComment($colObj);
             }
+            $this->getWriter()->writeClass();
         } while ($this->confirm('Would you like to add another column?', false));
 
         if ($this->confirm('Would you like to add foreign keys to the table?', false)) {
@@ -101,7 +103,6 @@ class CreateTableObj extends CreateClassHelper {
             $classInfo['entity-info']['namespace'] = APP_DIR_NAME.'\database';
             $this->warning('The entity class will be added to the namespace "'.$classInfo['entity-info']['namespace'].'" since no namespace was provided.');
         }
-        $this->setWriter(new TableClassWriter($tempTable, $classInfo));
         $this->writeClass();
     }
     /**
@@ -164,6 +165,7 @@ class CreateTableObj extends CreateClassHelper {
 
                 try {
                     $tableObj->addReference($refTable, $fkColsArr, $fkName, $onUpdate, $onDelete);
+                    $this->getWriter()->writeClass();
                     $this->success('Foreign key added.');
                     $fksNs[$fkName] = $refTableName;
                 } catch (Exception $ex) {
@@ -177,13 +179,6 @@ class CreateTableObj extends CreateClassHelper {
         } while ($this->confirm('Would you like to add another foreign key?', false));
 
         return $fksNs;
-    }
-    /**
-     * 
-     * @return CreateCommand
-     */
-    private function _getCommand() {
-        return $this->command;
     }
     /**
      * 

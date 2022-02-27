@@ -71,13 +71,13 @@ class CreateTableObj extends CreateClassHelper {
         } while ($this->confirm('Would you like to add another column?', false));
 
         if ($this->confirm('Would you like to add foreign keys to the table?', false)) {
-            $classInfo['fk-info'] = $this->_addFks($tempTable);
+            $this->_addFks($tempTable);
         }
 
         if ($this->confirm('Would you like to create an entity class that maps to the database table?', false)) {
             $entityInfo = $this->getClassInfo(APP_DIR_NAME.'\\entity');
             $entityInfo['implement-jsoni'] = $this->confirm('Would you like from your entity class to implement the interface JsonI?', true);
-            $classInfo['entity-info'] = $entityInfo;
+            $this->getWriter()->setEntityInfo($entityInfo);
             
             if ($this->confirm('Would you like to add extra attributes to the entity?', false)) {
                 $addExtra = true;
@@ -93,16 +93,7 @@ class CreateTableObj extends CreateClassHelper {
                 }
             }
         }
-
-        if (strlen($classInfo['namespace']) == 0) {
-            $classInfo['namespace'] = APP_DIR_NAME.'\database';
-            $this->warning('The table class will be added to the namespace "'.$classInfo['namespace'].'" since no namespace was provided.');
-        }
         
-        if (isset($classInfo['entity-info']) && strlen($classInfo['entity-info']['namespace']) == 0) {
-            $classInfo['entity-info']['namespace'] = APP_DIR_NAME.'\database';
-            $this->warning('The entity class will be added to the namespace "'.$classInfo['entity-info']['namespace'].'" since no namespace was provided.');
-        }
         $this->writeClass();
     }
     /**
@@ -125,7 +116,6 @@ class CreateTableObj extends CreateClassHelper {
      */
     private function _addFks($tableObj) {
         $refTable = null;
-        $fksNs = [];
 
         do {
             $refTableName = $this->getInput('Enter the name of the referenced table class (with namespace):');
@@ -167,7 +157,6 @@ class CreateTableObj extends CreateClassHelper {
                     $tableObj->addReference($refTable, $fkColsArr, $fkName, $onUpdate, $onDelete);
                     $this->getWriter()->writeClass();
                     $this->success('Foreign key added.');
-                    $fksNs[$fkName] = $refTableName;
                 } catch (Exception $ex) {
                     $this->error($ex->getMessage());
                 } catch (Error $ex) {
@@ -178,7 +167,6 @@ class CreateTableObj extends CreateClassHelper {
             }
         } while ($this->confirm('Would you like to add another foreign key?', false));
 
-        return $fksNs;
     }
     /**
      * 

@@ -49,35 +49,11 @@ class ThemeClassWriter extends ClassWriter {
         
     }
     private function writeComponent($className, $extends, $classComment, $todoTxt) {
-        $writer = new ClassWriter([
+        $writer = new ThemeComponentWriter([
             'path' => $this->getPath(),
             'namespace' => $this->getNamespace(),
             'name' => $className
-        ]);
-        $writer->addNsDeclaration();
-        $writer->append([
-            'use webfiori\\ui\\'.$extends.';',
-            '',
-            '/**',
-            '  * '.$classComment,
-            '  */',
-            "class ".$writer->getName().' extends '.$extends.' {'
-        ]);
-        $writer->append([
-            "/**",
-            " * Creates new instance of the class.",
-            " */",
-            'public function __construct(){',
-        ], 1);
-
-        if ($extends != 'HeadNode') {
-            $writer->append('parent::__construct(\'div\');', 2);
-        } else {
-            $writer->append('parent::__construct();', 2);
-        }
-        $writer->append('//TODO: '.$todoTxt, 2);
-        $writer->append('}', 1);
-        $writer->append('}');
+        ], $extends, $classComment, $todoTxt);
         $writer->writeClass();
     }
 

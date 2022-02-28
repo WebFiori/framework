@@ -71,7 +71,7 @@ class CLICommandClassWriter extends ClassWriter {
                 $this->append("'optional' => ".($argArr['optional'] === true ? 'true' : 'false').",", 4);
 
                 if (count($argArr['values']) != 0) {
-                    $writer->append("'values' => [", 4);
+                    $this->append("'values' => [", 4);
 
                     foreach ($argArr['values'] as $val) {
                         $this->append("'".str_replace("'", "\'", $val)."',", 5);

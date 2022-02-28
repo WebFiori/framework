@@ -121,7 +121,6 @@ class WebServiceWriter extends ClassWriter {
             '//$authType = $authHeader[\'type\'];',
             '//$token = $authHeader[\'credentials\'];'
         ], 2);
-        $this->append( 2);
         $this->append('}', 1);
 
         $this->append([

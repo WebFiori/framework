@@ -44,11 +44,12 @@ class CreateWebService extends CreateClassHelper {
      * @param CreateCommand $command A command that is used to call the class.
      */
     public function __construct(CreateCommand $command) {
-        parent::__construct($command);
+        $serviceObj = new ServiceHolder();
+        parent::__construct($command, new WebServiceWriter($webServicesObj));
 
         $this->setClassInfo(APP_DIR_NAME.'\\apis', 'Service');
 
-        $serviceObj = new ServiceHolder();
+        
 
         $this->_setServiceName($serviceObj);
         $serviceObj->addRequestMethod($this->select('Request method:', AbstractWebService::METHODS, 0));
@@ -58,7 +59,6 @@ class CreateWebService extends CreateClassHelper {
         }
 
         $this->println('Creating the class...');
-        $this->setWriter(new WebServiceWriter($serviceObj));
         $this->writeClass();
         $this->info('Don\'t forget to add the service to a services manager.');
     }

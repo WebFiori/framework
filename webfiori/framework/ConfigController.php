@@ -367,7 +367,8 @@ class ConfigController {
             $this->docEnd,
             'public static function init() {'
         ], 1);
-        $this->a($cFile, "        ");
+        $this->a($cFile, "", 3);
+        $this->a($cFile, "}", 1);
         $this->a($cFile, "}");
         $cFile->write(true, true);
         require_once ROOT_DIR.DS.APP_DIR_NAME.DS.'ini'.DS."$className.php";

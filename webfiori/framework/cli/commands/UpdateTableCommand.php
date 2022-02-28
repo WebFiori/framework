@@ -128,10 +128,10 @@ class UpdateTableCommand extends CLICommand {
 
                 return -1;
             }
-        } catch (Error $ex) {
+        } catch (\Error $ex) {
             $message = $ex->getMessage();
 
-            if ($message == "Class '$tableClass' not found") {
+            if ($message == "Class \"'$tableClass'\" not found") {
                 $this->error($ex->getMessage());
 
                 return -1;

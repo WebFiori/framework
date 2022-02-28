@@ -280,12 +280,20 @@ class File implements JsonI {
     /**
      * Appends a string of data to the already existing data.
      * 
-     * @param string $data A string that represents the extra data.
+     * @param string|array $data A string that represents the extra data.
+     * This also can be an array that holds multiple strings that will be
+     * appended.
      * 
      * @since 1.1.9
      */
     public function append($data) {
-        $this->rawData .= $data;
+        if (gettype($data) == 'array') {
+            foreach ($data as $str) {
+                $this->rawData .= $data;
+            }
+        } else {
+            $this->rawData .= $data;
+        }
     }
     /**
      * Returns the full path to the file.

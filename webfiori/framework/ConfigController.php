@@ -103,11 +103,11 @@ class ConfigController {
      */
     private static $singleton;
     private function __construct() {
-        $this->since10 = "     * @since 1.0";
-        $this->docEnd = "     */";
-        $this->blockEnd = "    }";
-        $this->docStart = "    /**";
-        $this->docEmptyLine = "     * ";
+        $this->since10 = "* @since 1.0";
+        $this->docEnd = "*/";
+        $this->blockEnd = "}";
+        $this->docStart = "/**";
+        $this->docEmptyLine = "* ";
     }
     /**
      * Adds new database connections information or update existing connections.
@@ -150,33 +150,38 @@ class ConfigController {
             require_once ROOT_DIR.$DS.'vendor'.$DS.'webfiori'.$DS.'framework'.$DS.'webfiori'.$DS.'framework'.$DS.'exceptions'.$DS.'InitializationException.php';
             throw new InitializationException('Unable to create the file "'.$path.'"');
         }
-        $this->a($resource, "<?php");
-        $this->a($resource, "");
-        $this->a($resource, "namespace ".APP_DIR_NAME."\\ini;");
-        $this->a($resource, "/**");
-        $this->a($resource, "* A class which is used to initialize global constants.");
-        $this->a($resource, "* ");
-        $this->a($resource, "* This class has one static method which is used to define the constants.");
-        $this->a($resource, "* The class can be used to initialize any constant that the application depends");
-        $this->a($resource, "* on. The constants that this class will initialize are the constants which");
-        $this->a($resource, "* uses the function <code>define()</code>.");
-        $this->a($resource, "* Also, the developer can modify existing ones as needed to change some of the");
-        $this->a($resource, "* default settings of the framework.");
-        $this->a($resource, "* ");
-        $this->a($resource, "* @since 1.1.0");
-        $this->a($resource, "*/");
-        $this->a($resource, "class GlobalConstants {");
-        $this->a($resource, $this->docStart);
-        $this->a($resource, "     * Initialize the constants.");
-        $this->a($resource, $this->docEmptyLine);
-        $this->a($resource, "     * Include your own in the body of this method or modify existing ones");
-        $this->a($resource, "     * to suite your configuration. It is recommended to check if the global");
-        $this->a($resource, "     * constant is defined or not before defining it using the function");
-        $this->a($resource, "     * <code>defined</code>.");
-        $this->a($resource, $this->docEmptyLine);
-        $this->a($resource, $this->since10);
-        $this->a($resource, $this->docEnd);
-        $this->a($resource, "    public static function defineConstants() {");
+        $this->a($resource, [
+            "<?php",
+            '',
+            "namespace ".APP_DIR_NAME."\\ini;",
+            $this->docStart,
+            "* A class which is used to initialize global constants.",
+            $this->docEmptyLine,
+            "* This class has one static method which is used to define the constants.",
+            "* The class can be used to initialize any constant that the application depends",
+            "* on. The constants that this class will initialize are the constants which",
+            "* uses the function <code>define()</code>.",
+            "* Also, the developer can modify existing ones as needed to change some of the",
+            "* default settings of the framework.",
+            $this->docEmptyLine,
+            "* @since 1.1.0",
+            $this->docEnd,
+            "class GlobalConstants {"
+        ]);
+
+        $this->a($resource, [
+            $this->docStart,
+            "* Initialize the constants.",
+            "* Include your own in the body of this method or modify existing ones",
+            "* to suite your configuration. It is recommended to check if the global",
+            "* constant is defined or not before defining it using the function",
+            "* <code>defined</code>.",
+            $this->docEmptyLine,
+            $this->since10,
+            $this->docEnd,
+            "public static function defineConstants() {"
+        ], 1);
+
         $this->addConst($resource, [
             'name' => 'SCRIPT_MEMORY_LIMIT',
             'summary' => 'Memory limit per script.',
@@ -348,19 +353,21 @@ class ConfigController {
     public function createIniClass($className, $comment) {
         $cFile = new File("$className.php", ROOT_DIR.DS.APP_DIR_NAME.DS.'ini');
         $cFile->remove();
-        $this->a($cFile, "<?php");
-        $this->a($cFile, "");
-        $this->a($cFile, "namespace ".APP_DIR_NAME."\\ini;");
-        $this->a($cFile, "");
-        $this->a($cFile, "class $className {");
-        $this->a($cFile, $this->docStart);
-        $this->a($cFile, "     * $comment");
-        $this->a($cFile, $this->docEmptyLine);
-        $this->a($cFile, $this->since10);
-        $this->a($cFile, $this->docEnd);
-        $this->a($cFile, "    public static function init() {");
+        $this->a($cFile, [
+            "<?php",
+            '',
+            "namespace ".APP_DIR_NAME."\\ini;",
+            "class $className {",
+            $this->docStart
+        ]);
+        $this->a($cFile, [
+            "* $comment",
+            $this->docEmptyLine,
+            $this->since10,
+            $this->docEnd,
+            'public static function init() {'
+        ], 1);
         $this->a($cFile, "        ");
-        $this->a($cFile, $this->blockEnd);
         $this->a($cFile, "}");
         $cFile->write(true, true);
         require_once ROOT_DIR.DS.APP_DIR_NAME.DS.'ini'.DS."$className.php";
@@ -1375,35 +1382,40 @@ class ConfigController {
         $this->a($cFile, "    private \$webSiteNames;");
     }
     private function _writeAppVersionInfo(&$cFile, $appConfigArr) {
-        $this->a($cFile, $this->docStart);
-        $this->a($cFile, $this->since10);
-        $this->a($cFile, $this->docEnd);
-        $this->a($cFile, "    private function initVersionInfo() {");
+        $this->a($cFile, [
+            $this->docStart,
+            $this->since10,
+            $this->docEnd
+        ], 1);
+
+        $this->a($cFile, "private function initVersionInfo() {", 1);
 
         $versionInfo = $this->getAppVersionInfo();
 
         if (isset($appConfigArr['version-info'])) {
             if (isset($appConfigArr['version-info']['version'])) {
-                $this->a($cFile, "        \$this->appVestion = '".$appConfigArr['version-info']['version']."';");
+                $this->a($cFile, "\$this->appVestion = '".$appConfigArr['version-info']['version']."';", 2);
             } else {
-                $this->a($cFile, "        \$this->appVestion = '".$versionInfo['version']."';");
+                $this->a($cFile, "\$this->appVestion = '".$versionInfo['version']."';", 2);
             }
 
             if (isset($appConfigArr['version-info']['version-type'])) {
-                $this->a($cFile, "        \$this->appVersionType = '".$appConfigArr['version-info']['version-type']."';");
+                $this->a($cFile, "\$this->appVersionType = '".$appConfigArr['version-info']['version-type']."';", 2);
             } else {
-                $this->a($cFile, "        \$this->appVersionType = '".$versionInfo['version-type']."';");
+                $this->a($cFile, "\$this->appVersionType = '".$versionInfo['version-type']."';", 2);
             }
 
             if (isset($appConfigArr['version-info']['release-date'])) {
-                $this->a($cFile, "        \$this->appReleaseDate = '".$appConfigArr['version-info']['release-date']."';");
+                $this->a($cFile, "\$this->appReleaseDate = '".$appConfigArr['version-info']['release-date']."';", 2);
             } else {
-                $this->a($cFile, "        \$this->appReleaseDate = '".$versionInfo['release-date']."';");
+                $this->a($cFile, "\$this->appReleaseDate = '".$versionInfo['release-date']."';", 2);
             }
         } else {
-            $this->a($cFile, "        \$this->appVestion = '".$versionInfo['version']."';");
-            $this->a($cFile, "        \$this->appVersionType = '".$versionInfo['version-type']."';");
-            $this->a($cFile, "        \$this->appReleaseDate = '".$versionInfo['release-date']."';");
+            $this->a($cFile, [
+                "\$this->appVestion = '".$versionInfo['version']."';",
+                "\$this->appVersionType = '".$versionInfo['version-type']."';",
+                "\$this->appReleaseDate = '".$versionInfo['release-date']."';"
+            ], 2);
         }
 
         $this->a($cFile, $this->blockEnd);
@@ -1595,11 +1607,23 @@ class ConfigController {
         $this->a($cFile, "        ];");
         $this->a($cFile, $this->blockEnd);
     }
-    private function a($file, $str) {
-        if (is_resource($file)) {
-            fwrite($file, $str.self::NL);
+    private function a($file, $str, $tabSize = 0) {
+        $isResource = is_resource($file);
+        $tabStr = $tabSize > 0 ? '    ' : '';
+        if (gettype($str) == 'array') {
+            foreach ($str as $subStr) {
+                if ($isResource) {
+                fwrite($file, str_repeat($tabStr, $tabSize).$subStr.self::NL);
+                } else {
+                    $file->append(str_repeat($tabStr, $tabSize).$subStr.self::NL);
+                }
+            }
         } else {
-            $file->append($str.self::NL);
+            if ($isResource) {
+                fwrite($file, str_repeat($tabStr, $tabSize).$str.self::NL);
+            } else {
+                $file->append(str_repeat($tabStr, $tabSize).$str.self::NL);
+            }
         }
     }
     /**

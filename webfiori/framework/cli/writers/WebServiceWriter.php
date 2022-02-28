@@ -57,17 +57,14 @@ class WebServiceWriter extends ClassWriter {
      * provided, the constant ROOT_DIR is used. </li>
      * </ul>
      */
-    public function __construct($webServicesObj, $classInfoArr) {
+    public function __construct($webServicesObj, $classInfoArr = []) {
         parent::__construct($classInfoArr);
 
         if (!$webServicesObj instanceof AbstractWebService) {
             throw new InvalidArgumentException('Given parameter is not an instance of \'webfiori\restEasy\AbstractWebService\'');
         }
         $this->servicesObj = $webServicesObj;
-        $this->_writeHeaderSec();
-        $this->_writeConstructor();
-        $this->_implementMethods();
-        $this->append('}');
+        $this->addUseStatement('webfiori\\framework\\EAbstractWebService');
     }
     /**
      * 
@@ -109,30 +106,41 @@ class WebServiceWriter extends ClassWriter {
     }
     private function _implementMethods() {
         $name = $this->servicesObj->getName();
-        $this->append("/**", 1);
-        $this->append(" * Checks if the client is authorized to call a service or not.", 1);
-        $this->append(" *", 1);
-        $this->append(" * @return boolean If the client is authorized, the method will return true.", 1);
-        $this->append(" */", 1);
-        $this->append("public function isAuthorized() {", 1);
-        $this->append('// TODO: Check if the client is authorized to call the service \''.$name.'\'.', 2);
-        $this->append('// You can ignore this method or remove it.', 2);
+        $this->append([
+            "/**",
+            " * Checks if the client is authorized to call a service or not.",
+            " *",
+            " * @return boolean If the client is authorized, the method will return true.",
+            " */",
+            "public function isAuthorized() {",
+        ], 1);
+        $this->append([
+            '// TODO: Check if the client is authorized to call the service \''.$name.'\'.',
+            '// You can ignore this method or remove it.',
+            '//$authHeader = $this->getAuthHeader();',
+            '//$authType = $authHeader[\'type\'];',
+            '//$token = $authHeader[\'credentials\'];'
+        ], 2);
         $this->append('}', 1);
 
-        $this->append("/**", 1);
-        $this->append(" * Process the request.", 1);
-        $this->append(" */", 1);
-        $this->append("public function processRequest() {", 1);
+        $this->append([
+            "/**",
+            " * Process the request.",
+            " */",
+            "public function processRequest() {",
+        ], 1);
         $this->append('// TODO: process the request for the service \''.$name.'\'.', 2);
         $this->append('$this->getManager()->serviceNotImplemented();', 2);
         $this->append('}', 1);
     }
 
     private function _writeConstructor() {
-        $this->append("/**", 1);
-        $this->append(" * Creates new instance of the class.", 1);
-        $this->append(" */", 1);
-        $this->append('public function __construct(){', 1);
+        $this->append([
+            "/**",
+            " * Creates new instance of the class.",
+            " */",
+            'public function __construct(){',
+        ], 1);
         $this->append('parent::__construct(\''.$this->servicesObj->getName().'\');', 2);
         $this->append('$this->addRequestMethod(\''.$this->servicesObj->getRequestMethods()[0].'\');', 2);
 
@@ -141,26 +149,39 @@ class WebServiceWriter extends ClassWriter {
         }
         $this->append('}', 1);
     }
-    private function _writeHeaderSec() {
-        $this->append("<?php\n");
-        $this->append('namespace '.$this->getNamespace().";\n");
-        $this->append("use webfiori\\framework\\EAbstractWebService;");
-        $this->append("");
-        $this->append("/**");
-        $this->append(" * A class that contains the implementation of the web service '".$this->servicesObj->getName()."'.");
-        $this->_writeServiceDoc($this->servicesObj);
-        $this->append(" */");
-        $this->append('class '.$this->getName().' extends EAbstractWebService {');
-    }
     private function _writeServiceDoc($service) {
+        $docArr = [];
         if (count($service->getParameters()) != 0) {
-            $this->append(" * This service has the following parameters:");
-            $this->append(' * <ul>');
+            $docArr[] = " * This service has the following parameters:";
+            $docArr[] = ' * <ul>';
 
             foreach ($service->getParameters() as $param) {
-                $this->append(' * <li><b>'.$param->getName().'</b>: Data type: '.$param->getType().'.</li>');
+                $docArr[] = ' * <li><b>'.$param->getName().'</b>: Data type: '.$param->getType().'.</li>';
             }
-            $this->append(' * </ul>');
+            $docArr[] = ' * </ul>';
+            $this->append($docArr);
         }
     }
+
+    public function writeClassBody() {
+        $this->_writeConstructor();
+        $this->_implementMethods();
+        $this->append('}');
+    }
+
+    public function writeClassComment() {
+        $this->append([
+            "",
+            '',
+            "/**",
+            " * A class that contains the implementation of the web service '".$this->servicesObj->getName()."'."
+        ]);
+        $this->_writeServiceDoc($this->servicesObj);
+        $this->append(" */");
+    }
+
+    public function writeClassDeclaration() {
+        $this->append('class '.$this->getName().' extends EAbstractWebService {');
+    }
+
 }

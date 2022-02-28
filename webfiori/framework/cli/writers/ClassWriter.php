@@ -33,7 +33,8 @@ use webfiori\framework\File;
  * 
  * @version 1.0.1
  */
-class ClassWriter {
+abstract class ClassWriter {
+    private $useArr;
     /**
      * The generated class as string.
      * 
@@ -77,8 +78,8 @@ class ClassWriter {
      * 
      * </ul>
      */
-    public function __construct($classInfoArr) {
-        if (strlen($classInfoArr['namespace']) != 0) {
+    public function __construct($classInfoArr = []) {
+        if (isset($classInfoArr['namespace']) && strlen($classInfoArr['namespace']) != 0) {
             $this->ns = $classInfoArr['namespace'];
         } else {
             $this->ns = 'webfiori';
@@ -95,25 +96,105 @@ class ClassWriter {
         } else {
             $this->className = 'NewClass';
         }
+        $this->useArr = [];
     }
     /**
-     * Appends a string to the string that represents the body of the class.
+     * Sets the namespace of the class that will be created.
      * 
-     * @param string $str The string that will be appended. At the end of the string 
-     * a new line character will be appended.
+     * @param string $namespace
+     */
+    public function setNamespace($namespace) {
+        $this->ns = $namespace;
+    }
+    /**
+     * Sets the location at which the class will be created on.
      * 
-     * @param int $tapsCount The number of taps that will be added to the string. 
-     * A tap is represented as 4 spaces.
+     * @param string $path A string that represents folder path.
+     */
+    public function setPath($path) {
+        $this->path = $path;
+    }
+    /**
+     * Sets the name of the class will be created on.
+     * 
+     * @param string $name A string that represents class name.
+     */
+    public function setClassName($name) {
+        $this->className = $name;
+    }
+    /**
+     * Appends a string or array of strings to the string that represents the
+     * body of the class.
+     * 
+     * @param string $strOrArr The string that will be appended. At the end of the string 
+     * a new line character will be appended. This can also be an array of strings.
+     * 
+     * @param int $tabsCount The number of tabs that will be added to the string. 
+     * A tab is represented as 4 spaces.
      * 
      * @since 1.0
      */
-    public function append($str, $tapsCount = 0) {
-        $tabSpaces = '    ';
-        $tabStr = '';
-
-        for ($x = 0 ; $x < $tapsCount ; $x++) {
-            $tabStr .= $tabSpaces;
+    public function append($strOrArr, $tabsCount = 0) {
+        if (gettype($strOrArr) == 'array') {
+            foreach ($strOrArr as $str) {
+                $this->_a($str, $tabsCount);
+            }
+        } else {
+            $this->_a($strOrArr, $tabsCount);
         }
+    }
+    public abstract function writeClassComment();
+    public abstract function writeClassDeclaration();
+    public abstract function writeClassBody();
+    /**
+     * Writes the section of the class that contains the 'use' classes.
+     */
+    public function writeUseStatements() {
+        $useClassesArr = [];
+        foreach ($this->useArr as $className) {
+            $useClassesArr[] = 'use '.$className.';';
+        }
+        $this->append($useClassesArr);
+    }
+    /**
+     * Returns an array that contains all classes which will be included
+     * in the 'use' part of the class.
+     * 
+     * @return array An array of strings.
+     */
+    public function getUseStatements() {
+        return $this->useArr;
+    }
+    /**
+     * Adds a single or multiple classes to be included in the 'use' section of the
+     * class.
+     * 
+     * @param string|array $classesToUse A string or array of strings that
+     * contains the names of the classes with namespace.
+     */
+    public function addUseStatement($classesToUse) {
+        if (gettype($classesToUse) == 'array') {
+            foreach ($classesToUse as $class) {
+                $this->useArr[] = $class;
+            }
+        } else {
+            $this->useArr[] = $classesToUse;
+        }
+    }
+    /**
+     * Appends the string that represents the start of PHP class.
+     * 
+     * The method will add the tag '&lt;php?' in addition to namespace declaration.
+     */
+    public function writeNsDeclaration() {
+        $this->append([
+            '<?php',
+            'namespace '.$this->getNamespace().";\n",
+            ''
+        ]);
+    }
+    private function _a($str, $tapsCount) {
+        $tabStr = str_repeat('    ', $tapsCount);
         $this->classAsStr .= $tabStr.$str."\n";
     }
     /**
@@ -159,11 +240,20 @@ class ClassWriter {
     /**
      * Write the new class to a .php file.
      * 
+     * Note that the method will remove the file if it was already created and create
+     * new one.
+     * 
      * @since 1.0
      */
     public function writeClass() {
-        $classFile = new File($this->className.'.php', $this->path);
+        $classFile = new File($this->getName().'.php', $this->getPath());
         $classFile->remove();
+        $this->classAsStr = '';
+        $this->writeNsDeclaration();
+        $this->writeUseStatements();
+        $this->writeClassComment();
+        $this->writeClassDeclaration();
+        $this->writeClassBody();
         $classFile->setRawData($this->classAsStr);
         $classFile->write(false, true);
     }

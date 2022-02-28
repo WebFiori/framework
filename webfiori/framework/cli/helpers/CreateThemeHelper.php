@@ -4,36 +4,24 @@ namespace webfiori\framework\cli\helpers;
 use webfiori\framework\cli\CLICommand;
 use webfiori\framework\cli\commands\CreateCommand;
 use webfiori\framework\cli\writers\ThemeClassWriter;
+use webfiori\framework\cli\helpers\CreateClassHelper;
 /**
  * Description of CreateTheme
  *
  * @author Ibrahim
  */
-class CreateThemeHelper {
-    /**
-     *
-     * @var CLICommand 
-     */
-    private $command;
+class CreateThemeHelper extends CreateClassHelper {
     /**
      * Creates new instance of the class.
      * 
      * @param CreateCommand $command A command that is used to call the class.
      */
     public function __construct(CreateCommand $command) {
-        $this->command = $command;
+        parent::__construct($command, new ThemeClassWriter());
 
-        $classInfo = $this->_getCommand()->getClassInfo('themes');
-        $writer = new ThemeClassWriter($classInfo);
-        $command->println('Creating theme at "'.$writer->getPath().'"...');
-        $writer->writeClass();
-        $command->success('Created.');
-    }
-    /**
-     * 
-     * @return CreateCommand
-     */
-    private function _getCommand() {
-        return $this->command;
+        $this->setClassInfo('themes', 'Theme');
+
+        $command->println('Creating theme at "'.$this->getWriter()->getPath().'"...');
+        $this->writeClass();
     }
 }

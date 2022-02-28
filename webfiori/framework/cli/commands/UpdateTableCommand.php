@@ -18,7 +18,7 @@ use webfiori\database\mysql\MySQLTable;
 use webfiori\database\Table;
 use webfiori\framework\AutoLoader;
 use webfiori\framework\cli\CLICommand;
-use webfiori\framework\cli\writers\QueryClassWriter;
+use webfiori\framework\cli\writers\TableClassWriter;
 use webfiori\framework\DB;
 use webfiori\framework\WebFioriApp;
 /**
@@ -94,7 +94,7 @@ class UpdateTableCommand extends CLICommand {
         $class = get_class($tableObj);
         $arr = $this->getClassNs($class);
         $arr['fk-info'] = $refTabelsNs;
-        $writer = new QueryClassWriter($tableObj, $arr);
+        $writer = new TableClassWriter($tableObj, $arr);
         $writer->writeClass();
         $db = $this->getDb('Would you like to run a query to '
                 .'update the table in the database?');
@@ -153,7 +153,7 @@ class UpdateTableCommand extends CLICommand {
             if ($col instanceof Column) {
                 $classInfo = $this->getClassNs($tableClass);
 
-                $writer = new QueryClassWriter($tableObj, $classInfo);
+                $writer = new TableClassWriter($tableObj, $classInfo);
                 $writer->writeClass();
                 $this->success('New column was added to the table.');
             } else {
@@ -287,7 +287,7 @@ class UpdateTableCommand extends CLICommand {
         $class = get_class($tableObj);
         $arr = $this->getClassNs($class);
 
-        $writer = new QueryClassWriter($tableObj, $arr);
+        $writer = new TableClassWriter($tableObj, $arr);
         $writer->writeClass();
         $db = $this->getDb('Would you like to run a query to '
                 .'update the table in the database?');
@@ -410,7 +410,7 @@ class UpdateTableCommand extends CLICommand {
         $colToDrop = $this->select('Which column would you like to drop?', $colsKeys);
         $tableObj->removeColByKey($colToDrop);
         $class = get_class($tableObj);
-        $writer = new QueryClassWriter($tableObj, $this->getClassNs($class));
+        $writer = new TableClassWriter($tableObj, $this->getClassNs($class));
         $writer->writeClass();
         $this->success('Column dropped.');
     }
@@ -491,7 +491,7 @@ class UpdateTableCommand extends CLICommand {
         }
 
         $class = get_class($tableObj);
-        $writer = new QueryClassWriter($tableObj, $this->getClassNs($class));
+        $writer = new TableClassWriter($tableObj, $this->getClassNs($class));
         $writer->writeClass();
         $db = $this->getDb('Would you like to run a query to '
                 .'update the column in the database?');

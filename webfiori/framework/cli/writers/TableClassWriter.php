@@ -32,24 +32,17 @@ use webfiori\database\mysql\MySQLTable;
 use webfiori\database\Table;
 
 /**
- * A class which is used to write query class from an instance of the class 
- * 'MySQLQuery'.
+ * A class which is used to write database table classes.
  * 
- * This class is used to write new query class based on a temporary 
- * query object. It is used as a helper class if the command 'create' is executed 
- * from CLI and the option 'Query class' is selected. 
+ * This class is used to write new table class based on a temporary 
+ * table object. It is used as a helper class if the command 'create' is executed 
+ * from CLI and the option 'Database Table Class' is selected. 
  *
  * @author Ibrahim
  * 
  * @version 1.0
  */
-class QueryClassWriter extends ClassWriter {
-    /**
-     *
-     * @var array
-     * @since 1.0 
-     */
-    private $classInfoArr;
+class TableClassWriter extends ClassWriter {
     /**
      *
      * @var EntityMapper|null
@@ -87,19 +80,13 @@ class QueryClassWriter extends ClassWriter {
      * </li>
      * </ul>
      * 
-     * @throws InvalidArgumentException If the first parameter is not an object of 
-     * type 'webfiori\database\Table'.
      * 
      * @since 1.0
      */
-    public function __construct($tableObj, $classInfoArr) {
+    public function __construct($tableObj = null, $classInfoArr = []) {
         parent::__construct($classInfoArr);
 
-        if (!$tableObj instanceof Table) {
-            throw new InvalidArgumentException('The given object is not an instance of the class "webfiori\database\Table".');
-        }
         $this->tableObj = $tableObj;
-        $this->classInfoArr = $classInfoArr;
 
         if (isset($classInfoArr['entity-info'])) {
             $this->entityMapper = new EntityMapper($this->tableObj, 
@@ -108,9 +95,20 @@ class QueryClassWriter extends ClassWriter {
                     $classInfoArr['entity-info']['namespace']);
             $this->entityMapper->setUseJsonI($classInfoArr['entity-info']['implement-jsoni']);
         }
-        $this->_writeHeaderSec();
-        $this->_writeConstructor();
-        $this->append('}');
+    }
+    public function setEntityInfo($infoArr) {
+        $this->entityMapper = new EntityMapper($this->tableObj, 
+                    $infoArr['name'], 
+                    $infoArr['path'], 
+                    $infoArr['namespace']);
+            $this->entityMapper->setUseJsonI($infoArr['implement-jsoni']);
+    }
+    /**
+     * 
+     * @param Table $table
+     */
+    public function setTable($table) {
+        $this->tableObj = $table;
     }
     /**
      * Returns the name entity class will be created.
@@ -166,6 +164,7 @@ class QueryClassWriter extends ClassWriter {
      * @since 1.0
      */
     public function writeClass() {
+        $this->addAllUse();
         parent::writeClass();
 
         if ($this->entityMapper !== null) {
@@ -264,10 +263,12 @@ class QueryClassWriter extends ClassWriter {
         $this->append("],", 3);
     }
     private function _writeConstructor() {
-        $this->append("/**", 1);
-        $this->append(" * Creates new instance of the class.", 1);
-        $this->append(" */", 1);
-        $this->append('public function __construct(){', 1);
+        $this->append([
+            "/**",
+            " * Creates new instance of the class.",
+            " */",
+            'public function __construct() {',
+        ], 1);
         $this->append('parent::__construct(\''.$this->tableObj->getNormalName().'\');', 2);
 
         if ($this->tableObj->getComment() !== null) {
@@ -277,18 +278,37 @@ class QueryClassWriter extends ClassWriter {
         $this->_addFks();
         $this->append('}', 1);
     }
-    private function _writeHeaderSec() {
-        $this->append("<?php\n");
-        $this->append('namespace '.$this->getNamespace().";\n");
+    private function addAllUse() {
 
         if ($this->tableObj instanceof MySQLTable) {
-            $this->append("use webfiori\database\mysql\MySQLTable;");
+            $this->addUseStatement("webfiori\database\mysql\MySQLTable");
         } else if ($this->tableObj instanceof MSSQLTable) {
-            $this->append("use webfiori\database\mssql\MSSQLTable;");
+            $this->addUseStatement("webfiori\database\mssql\MSSQLTable");
         }
-        $this->addFksTables();
+        $this->addFksUseTables();
+    }
+    private function addFksUseTables() {
+        if ($this->tableObj !== null) {
+            $fks = $this->tableObj->getForignKeys();
+            $addedRefs = [];
 
-        $this->append('');
+            foreach ($fks as $fkObj) {
+                $refTableNs = get_class($fkObj->getSource());
+
+                if (!in_array($refTableNs, $addedRefs)) {
+                    $this->addUseStatement($refTableNs);
+                    $addedRefs[] = $refTableNs;
+                }
+            }
+        }
+    }
+
+    public function writeClassBody() {
+        $this->_writeConstructor();
+        $this->append('}');
+    }
+
+    public function writeClassComment() {
         $this->append("/**\n"
                 ." * A class which represents the database table '".$this->tableObj->getNormalName()."'.\n"
                 ." * The table which is associated with this class will have the following columns:\n"
@@ -299,24 +319,14 @@ class QueryClassWriter extends ClassWriter {
             $this->append(" * <li><b>$key</b>: Name in database: '".$colObj->getNormalName()."'. Data type: '".$colObj->getDatatype()."'.</li>");
         }
         $this->append(" * </ul>\n */");
+    }
 
+    public function writeClassDeclaration() {
         if ($this->tableObj instanceof MySQLTable) {
             $this->append('class '.$this->getName().' extends MySQLTable {');
         } else if ($this->tableObj instanceof MSSQLTable) {
             $this->append('class '.$this->getName().' extends MSSQLTable {');
         }
     }
-    private function addFksTables() {
-        $fks = $this->tableObj->getForignKeys();
-        $addedRefs = [];
 
-        foreach ($fks as $fkObj) {
-            $refTableNs = get_class($fkObj->getSource());
-
-            if (!in_array($refTableNs, $addedRefs)) {
-                $this->append('use '.$refTableNs.';');
-                $addedRefs[] = $refTableNs;
-            }
-        }
-    }
 }

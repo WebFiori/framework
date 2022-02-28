@@ -45,7 +45,7 @@ class CreateWebService extends CreateClassHelper {
      */
     public function __construct(CreateCommand $command) {
         $serviceObj = new ServiceHolder();
-        parent::__construct($command, new WebServiceWriter($webServicesObj));
+        parent::__construct($command, new WebServiceWriter($serviceObj));
 
         $this->setClassInfo(APP_DIR_NAME.'\\apis', 'Service');
 

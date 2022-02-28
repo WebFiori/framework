@@ -98,12 +98,27 @@ abstract class ClassWriter {
         }
         $this->useArr = [];
     }
+    /**
+     * Sets the namespace of the class that will be created.
+     * 
+     * @param string $namespace
+     */
     public function setNamespace($namespace) {
         $this->ns = $namespace;
     }
+    /**
+     * Sets the location at which the class will be created on.
+     * 
+     * @param string $path A string that represents folder path.
+     */
     public function setPath($path) {
         $this->path = $path;
     }
+    /**
+     * Sets the name of the class will be created on.
+     * 
+     * @param string $name A string that represents class name.
+     */
     public function setClassName($name) {
         $this->className = $name;
     }
@@ -131,17 +146,32 @@ abstract class ClassWriter {
     public abstract function writeClassComment();
     public abstract function writeClassDeclaration();
     public abstract function writeClassBody();
-    
+    /**
+     * Writes the section of the class that contains the 'use' classes.
+     */
     public function writeUseStatements() {
-        $useArr = [];
+        $useClassesArr = [];
         foreach ($this->useArr as $className) {
-            $useArr[] = 'use '.$className.';';
+            $useClassesArr[] = 'use '.$className.';';
         }
-        $this->append($useArr);
+        $this->append($useClassesArr);
     }
+    /**
+     * Returns an array that contains all classes which will be included
+     * in the 'use' part of the class.
+     * 
+     * @return array An array of strings.
+     */
     public function getUseStatements() {
         return $this->useArr;
     }
+    /**
+     * Adds a single or multiple classes to be included in the 'use' section of the
+     * class.
+     * 
+     * @param string|array $classesToUse A string or array of strings that
+     * contains the names of the classes with namespace.
+     */
     public function addUseStatement($classesToUse) {
         if (gettype($classesToUse) == 'array') {
             foreach ($classesToUse as $class) {
@@ -216,7 +246,7 @@ abstract class ClassWriter {
      * @since 1.0
      */
     public function writeClass() {
-        $classFile = new File($this->className.'.php', $this->path);
+        $classFile = new File($this->getName().'.php', $this->getPath());
         $classFile->remove();
         $this->classAsStr = '';
         $this->writeNsDeclaration();

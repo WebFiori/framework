@@ -30,7 +30,7 @@ class CreateCronJob extends CreateClassHelper {
         }
         
         $this->getWriter()->setJobName($jobName);
-        $this->getWriter()->setJobDescription($jobName);
+        $this->getWriter()->setJobDescription($jobDesc);
         $this->getWriter()->setArgs($argsArr);
         
         $this->writeClass();

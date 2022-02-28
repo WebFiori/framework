@@ -91,6 +91,7 @@ class CronJobClassWriter extends ClassWriter {
     }
 
     public function writeClassBody() {
+        $this->_writeConstructor();
         $this->append([
             '/**',
             ' * Execute the process.',

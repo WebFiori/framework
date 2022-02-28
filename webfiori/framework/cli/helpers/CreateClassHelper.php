@@ -25,6 +25,14 @@ class CreateClassHelper {
      * @var CreateCommand
      */
     private $command;
+    /**
+     * Creates new instance.
+     * 
+     * @param CreateCommand $command The command that will be used to read inputs
+     * and send outputs to the terminal.
+     * 
+     * @param ClassWriter $writer The writer that will hold class information.
+     */
     public function __construct(CreateCommand $command, ClassWriter $writer = null) {
         $this->command = $command;
         $this->classWriter = $writer;

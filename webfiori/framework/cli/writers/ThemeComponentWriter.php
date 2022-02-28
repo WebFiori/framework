@@ -30,8 +30,8 @@ class ThemeComponentWriter extends ClassWriter {
             " */",
             'public function __construct(){',
         ], 1);
-        $extends = $this->getExtends();
-        if ($extends != 'HeadNode') {
+        $extendsClass = $this->getExtends();
+        if ($extendsClass != 'HeadNode') {
             $this->append('parent::__construct(\'div\');', 2);
         } else {
             $this->append('parent::__construct();', 2);
@@ -44,13 +44,13 @@ class ThemeComponentWriter extends ClassWriter {
         return $this->extends;
     }
     public function writeClassComment() {
-        $extends = $this->getExtends();
-        $classComment = $this->getComment();
+        $extendsClass = $this->getExtends();
+        $comment = $this->getComment();
         $this->append([
-            'use webfiori\\ui\\'.$extends.';',
+            'use webfiori\\ui\\'.$extendsClass.';',
             '',
             '/**',
-            '  * '.$classComment,
+            '  * '.$comment,
             '  */',
         ]);
         

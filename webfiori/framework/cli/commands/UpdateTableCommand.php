@@ -138,7 +138,10 @@ class UpdateTableCommand extends CLICommand {
             }
             throw new ErrorException($ex->getMessage(), $ex->getCode(), E_ERROR, $ex->getFile(), $ex->getLine(), $ex->getPrevious());
         }
-
+        
+        $updateHelper = new \webfiori\framework\cli\helpers\CreateUpdateTableHelper($this, $tableObj);
+        $update = new \webfiori\framework\cli\helpers\TableObjHelper($update, $tableObj);
+        
         $whatToDo = $this->select('What operation whould you like to do with the table?', [
             'Add new column.',
             'Add foreign key.',
@@ -152,7 +155,7 @@ class UpdateTableCommand extends CLICommand {
 
             if ($col instanceof Column) {
                 $classInfo = $this->getClassNs($tableClass);
-
+                
                 $writer = new TableClassWriter($tableObj, $classInfo);
                 $writer->writeClass();
                 $this->success('New column was added to the table.');

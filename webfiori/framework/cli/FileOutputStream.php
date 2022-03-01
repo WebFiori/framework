@@ -20,7 +20,14 @@ class FileOutputStream implements OutputStream {
      */
     public function __construct($path) {
         $this->file = new File($path);
+        $this->reset();
+    }
+    /**
+     * Removes the file that represents output stream and re-create it.
+     */
+    public function reset() {
         $this->file->remove();
+        $this->file->setRawData('');
         $this->file->write(false, true);
     }
     /**

@@ -390,7 +390,7 @@ class CLI {
      * 
      * @since 1.0.3
      */
-    public function setInputStream(InputStream $stream) {
+    public static function setInputStream(InputStream $stream) {
         self::$inputStream = $stream;
     }
     /**

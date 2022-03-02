@@ -64,6 +64,7 @@ class CommandRunner {
         foreach ($argsVals as $argName => $argVal) {
             $command->setArgValue($argName, $argVal);
         }
+        $_SERVER['argv']['--no-ansi'] = '';
         $this->exitStatus = $command->excCommand();
         return $this->exitStatus;
     }

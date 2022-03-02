@@ -162,7 +162,11 @@ abstract class CLICommand {
      */
     public function addArg($name, $options = []) {
         $trimmed = trim($name);
-
+        
+        if ($this->hasArg($trimmed)) {
+            return false;
+        }
+        
         if (strlen($trimmed) > 0 && !strpos($trimmed, ' ')) {
             if (gettype($options) == 'array') {
                 $this->commandArgs[$trimmed] = $this->_checkArgOptions($options);

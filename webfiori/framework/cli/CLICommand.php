@@ -361,7 +361,7 @@ abstract class CLICommand {
 
         if ($this->_checkIsArgsSet() && $this->_checkAllowedArgValues()) {
             $execResult = $this->exec();
-            var_dump($execResult);
+            
             if ($execResult === null) {
                 $execResult = 0;
             }

@@ -65,7 +65,7 @@ class CommandRunner {
             $command->setArgValue($argName, $argVal);
         }
         $command->addArg('--no-ansi');
-        $command->setArgValue('--no-ansi', 'y');
+        $command->setArgValue('--no-ansi');
         $this->exitStatus = $command->excCommand();
         return $this->exitStatus;
     }

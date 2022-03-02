@@ -29,8 +29,23 @@ class CommandTest {
         CLI::setInputStream(new FileInputStream($inputFile));
         CLI::setOutputStream(new FileOutputStream($outputFile));
     }
+    /**
+     * Returns an array that contains the output of the command after running it.
+     * 
+     * @return array Each line which was sent to the output stream will be in
+     * one index.
+     */
     public function getOutputsArray() {
         return CLI::getOutputStream()->readOutput();
+    }
+    /**
+     * Returns exit status of the command after executing it.
+     * 
+     * @return int An integer value. If no command was executed, the method will
+     * return null.
+     */
+    public function getExitStatus() {
+        return $this->exitStatus;
     }
     /**
      * Execute a command given as an object.
@@ -53,14 +68,14 @@ class CommandTest {
         return $this->exitStatus;
     }
     /**
-     * Checks if exis status of the command equals to specific value or not.
+     * Checks if exit status of the command equals to specific value or not.
      * 
      * @param int $val The value to check with.
      * 
      * @return boolean If exit status is equals to the given value, the method
      * will return true. Other than that, the method will return false.
      */
-    public function assertExitStatusEquals($val) {
+    public function isExitStatusEquals($val) {
         return $this->exitStatus == $val;
     }
     /**
@@ -74,7 +89,7 @@ class CommandTest {
      * method will return true. Other than that, the method will return
      * false.
      */
-    public function assertOutputEquals(array $outputsStr, TestCase $case = null) {
+    public function isOutputEquals(array $outputsStr, TestCase $case = null) {
         $actualOutputArr = $this->getOutputsArray();
         $isEqual = count($actualOutputArr) == count($outputsStr);
         

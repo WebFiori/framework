@@ -2,7 +2,7 @@
 namespace webfiori\framework\test;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\framework\cli\CommandTest;
+use webfiori\framework\cli\CommandRunner;
 use webfiori\framework\cli\commands\CreateCommand;
 /**
  * Description of TestCreateCommand
@@ -12,7 +12,7 @@ use webfiori\framework\cli\commands\CreateCommand;
 class CreateCommandTest extends TestCase {
 
     public function testCreateBackgroundJob00() {
-        $commandRunner = new CommandTest(TESTS_PATH.DS.'input-streams'.DS.'create-job-00.txt', TESTS_PATH.DS.'output.txt');
+        $commandRunner = new CommandRunner(TESTS_PATH.DS.'input-streams'.DS.'create-job-00.txt', TESTS_PATH.DS.'output.txt');
         $commandRunner->runCommand(new CreateCommand());
         $this->assertEquals(0, $commandRunner->getExitStatus());
         $this->assertTrue($commandRunner->isOutputEquals([

@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
  *
  * @author Ibrahim
  */
-class CommandTest {
+class CommandRunner {
     private $exitStatus;
     /**
      * Creates new instance.

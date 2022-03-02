@@ -3,7 +3,7 @@
 namespace webfiori\framework\test\cli;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\framework\cli\CommandTest;
+use webfiori\framework\cli\CommandRunner;
 use webfiori\framework\cli\commands\VersionCommand;
 /**
  * Description of VersionCommandTest
@@ -13,7 +13,7 @@ use webfiori\framework\cli\commands\VersionCommand;
 class VersionCommandTest extends TestCase {
 
     public function test00() {
-        $commandRunner = new CommandTest(TESTS_PATH.DS.'input.txt', TESTS_PATH.DS.'output.txt');
+        $commandRunner = new CommandRunner(TESTS_PATH.DS.'input.txt', TESTS_PATH.DS.'output.txt');
         $commandRunner->runCommand(new VersionCommand());
         $this->assertEquals(0, $commandRunner->getExitStatus());
         $this->assertTrue($commandRunner->isOutputEquals([

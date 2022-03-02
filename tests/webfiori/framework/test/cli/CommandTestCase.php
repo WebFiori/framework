@@ -2,7 +2,7 @@
 
 namespace webfiori\framework\test\cli;
 use PHPUnit\Framework\TestCase;
-use webfiori\framework\cli\CommandTest;
+use webfiori\framework\cli\CommandRunner;
 /**
  * Description of CommandTest
  *
@@ -13,7 +13,7 @@ class CommandTestCase extends TestCase {
      * @test
      */
     public function test00() {
-        $test = new CommandTest(TESTS_PATH.DIRECTORY_SEPARATOR.'input.txt', TESTS_PATH.DIRECTORY_SEPARATOR.'output.txt');
+        $test = new CommandRunner(TESTS_PATH.DIRECTORY_SEPARATOR.'input.txt', TESTS_PATH.DIRECTORY_SEPARATOR.'output.txt');
         $test->runCommand(new TestCommand('hello', [
             'name' => []
         ]), [
@@ -30,7 +30,7 @@ class CommandTestCase extends TestCase {
      * @test
      */
     public function test01() {
-        $test = new CommandTest(TESTS_PATH.DIRECTORY_SEPARATOR.'input.txt', TESTS_PATH.DIRECTORY_SEPARATOR.'output.txt');
+        $test = new CommandRunner(TESTS_PATH.DIRECTORY_SEPARATOR.'input.txt', TESTS_PATH.DIRECTORY_SEPARATOR.'output.txt');
         $test->runCommand(new TestCommand('hello', [
             'name' => []
         ]), [

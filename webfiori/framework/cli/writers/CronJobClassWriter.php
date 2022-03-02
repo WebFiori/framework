@@ -161,7 +161,7 @@ class CronJobClassWriter extends ClassWriter {
     }
 
     public function writeClassDeclaration() {
-        $this->append('class '.$this->getWriter()->getName().' extends AbstractJob {');
+        $this->append('class '.$this->getName().' extends AbstractJob {');
     }
 
 }

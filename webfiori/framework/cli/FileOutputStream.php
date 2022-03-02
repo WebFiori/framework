@@ -38,8 +38,7 @@ class FileOutputStream implements OutputStream {
         $f = new File($this->file->getAbsolutePath());
         $f->read();
         $raw = $f->getRawData();
-        $split = explode("\n", $raw);
-        return $split;
+        return explode("\n", $raw);
     }
     public function println($str, ...$_) {
         $toPass = [

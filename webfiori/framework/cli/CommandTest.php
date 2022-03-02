@@ -3,6 +3,7 @@ namespace webfiori\framework\cli;
 
 use webfiori\framework\cli\FileInputStream;
 use webfiori\framework\cli\FileOutputStream;
+use PHPUnit\Framework\TestCase;
 /**
  * A class which can be used to test custom made CLI commands.
  * 
@@ -73,12 +74,15 @@ class CommandTest {
      * method will return true. Other than that, the method will return
      * false.
      */
-    public function assertOutputEquals(array $outputsStr) {
+    public function assertOutputEquals(array $outputsStr, TestCase $case = null) {
         $actualOutputArr = $this->getOutputsArray();
         $isEqual = count($actualOutputArr) == count($outputsStr);
         
         if ($isEqual) {
             for ($x = 0 ; $x < count($actualOutputArr) ; $x++) {
+                if ($case !== null) {
+                    $case->assertEquals($outputsStr[$x], $actualOutputArr[$x]);
+                }
                 $isEqual = $actualOutputArr[$x] == $outputsStr[$x];
             }
         }

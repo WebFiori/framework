@@ -11,6 +11,7 @@ use webfiori\framework\cli\KeysMap;
  */
 class FileInputStream implements InputStream {
     private $file;
+    private $seek;
     /**
      * Creates new instance of the class.
      * 
@@ -19,6 +20,7 @@ class FileInputStream implements InputStream {
      */
     public function __construct($path) {
         $this->file = new File($path);
+        $this->seek = 0;
     }
     /**
      * Reads a string of bytes from the file.
@@ -31,7 +33,9 @@ class FileInputStream implements InputStream {
      * @since 1.0
      */
     public function read($bytes = 1) {
-        return $this->file->read(0, $bytes);
+        $this->file->read($this->seek, $this->seek + $bytes);
+        $this->seek += $bytes;
+        return $this->file->getRawData();
     }
     /**
      * Reads one line from the file.

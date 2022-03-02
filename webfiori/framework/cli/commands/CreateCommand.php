@@ -154,7 +154,6 @@ class CreateCommand extends CLICommand {
                 $create = new CreateCLIClassHelper($this);
             } else if ($answer == 'Background job.') {
                 $create = new CreateCronJob($this);
-                return true;
             } else if ($answer == 'Theme.') {
                 $create = new CreateThemeHelper($this);
             } else {

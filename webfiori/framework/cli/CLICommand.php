@@ -363,7 +363,7 @@ abstract class CLICommand {
             $execResult = $this->exec();
 
             if ($execResult === null) {
-                $retVal = 0;
+                $execResult = 0;
             }
 
             $retVal = intval($execResult);

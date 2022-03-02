@@ -351,19 +351,21 @@ abstract class CLICommand {
      * @since 1.0
      */
     public function excCommand() {
+        CLI::setActiveCommand($this);
+        $retVal = -1;
         $this->_parseArgs();
 
         if ($this->_checkIsArgsSet() && $this->_checkAllowedArgValues()) {
             $execResult = $this->exec();
 
             if ($execResult === null) {
-                return 0;
+                $retVal = 0;
             }
 
-            return intval($execResult);
+            $retVal = intval($execResult);
         }
-
-        return -1;
+        CLI::setActiveCommand(null);
+        return $retVal;
     }
     /**
      * Execute the command.

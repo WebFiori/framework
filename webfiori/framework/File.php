@@ -649,6 +649,7 @@ class File implements JsonI {
      */
     public function remove() {
         if ($this->isExist()) {
+            $this->rawData = '';
             unlink($this->getAbsolutePath());
 
             return true;
@@ -866,9 +867,7 @@ class File implements JsonI {
         throw new FileException('File name cannot be empty string.');
     }
     private function _createResource($mode, $path) {
-        set_error_handler(function()
-        {
-        });
+        set_error_handler(null);
         $resource = fopen($path, $mode);
         restore_error_handler();
 

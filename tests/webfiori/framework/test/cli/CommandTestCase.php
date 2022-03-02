@@ -19,7 +19,7 @@ class CommandTestCase extends TestCase {
         ]), [
             'name' => 'Ibrahim'
         ]);
-        $this->assertTrue($test->assertExitStatusEquals(0));
+        $this->assertTrue($test->isExitStatusEquals(0));
         $this->assertTrue($test->isOutputEquals([
             "Hello Ibrahim!",
             "Ok",
@@ -36,7 +36,7 @@ class CommandTestCase extends TestCase {
         ]), [
             'name' => 'Hassan Hussain'
         ]);
-        $this->assertTrue($test->assertExitStatusEquals(0));
+        $this->assertTrue($test->isExitStatusEquals(0));
         $this->assertTrue($test->isOutputEquals([
             "Hello Hassan Hussain!",
             "Ok",

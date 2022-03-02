@@ -27,7 +27,6 @@ class FileOutputStream implements OutputStream {
      */
     public function reset() {
         $this->file->remove();
-        $this->file->setRawData('');
         $this->file->write(false, true);
     }
     /**

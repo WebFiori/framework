@@ -84,7 +84,7 @@ fprintf(STDOUT,"Initializing application...\n");
 WebFioriApp::start();
 fprintf(STDOUT,'Done.'."\n");
 fprintf(STDOUT,'Root Directory: \''.AutoLoader::get()->root().'\'.'."\n");
-
+define('TESTS_PATH', AutoLoader::get()->root().$DS.TESTS_DIRECTORY);
 
 fprintf(STDOUT, "Registering shutdown function...\n");
 //run code after tests completion.

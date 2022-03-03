@@ -28,7 +28,7 @@ class CreateCommandTest extends TestCase {
             '8: Quit. <--',
             'Enter a name for the new class:',
             'Enter an optional namespace for the class: Enter = "app\jobs"',
-            'Where would you like to store the '. "class? (must be a directory inside '".ROOT_DIR."') Enter =".' "app'.DS.'jobs"',
+            'Where would you like to store the '. "class? (must be a directory inside '".ROOT_DIR."') Enter =".' "app\jobs"',
             'Enter a name for the job:',
             'Provide short description of what does the job will do:',
             'Would you like to add arguments to the job?(y/N)',

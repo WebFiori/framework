@@ -35,7 +35,7 @@ class CreateCommandTest extends TestCase {
             'Info: New class was created at "'.ROOT_DIR.DS.'app'.DS.'jobs".',
             ""
         ], $this));
-        $this->assertTrue(class_exists('app\\jobs\\SuperCoolJob'));
+        $this->assertTrue(class_exists('\\app\\jobs\\SuperCoolJob'));
     }
 
 }

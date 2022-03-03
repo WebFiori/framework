@@ -941,12 +941,12 @@ abstract class CLICommand {
      * 
      * @since 1.0
      */
-    public function setArgValue($argName, $argValue = null) {
+    public function setArgValue($argName, $argValue = '') {
         $trimmedArgName = trim($argName);
         $trimmedArgVal = trim($argValue);
         $retVal = false;
 
-        if (isset($this->commandArgs[$trimmedArgName]) && (strlen($trimmedArgVal) != 0 || $argValue === null)) {
+        if (isset($this->commandArgs[$trimmedArgName])) {
             $allowedVals = $this->commandArgs[$trimmedArgName]['values'];
 
             if (count($allowedVals) != 0) {

@@ -390,7 +390,7 @@ class CLI {
      * 
      * @since 1.0.3
      */
-    public function setInputStream(InputStream $stream) {
+    public static function setInputStream(InputStream $stream) {
         self::$inputStream = $stream;
     }
     /**
@@ -421,13 +421,15 @@ class CLI {
     private function _regCommand(CLICommand $command) {
         $this->commands[$command->getName()] = $command;
     }
+    public static function setActiveCommand($c) {
+        self::get()->activeCommand = $c;
+    }
     private function _runCommand() {
         $args = $_SERVER['argv'];
         $commandName = filter_var($args[1], FILTER_SANITIZE_STRING);
 
         if (isset($this->commands[$commandName])) {
             $command = self::get()->commands[$commandName];
-            $this->activeCommand = $command;
 
             return $command->excCommand();
         } else {

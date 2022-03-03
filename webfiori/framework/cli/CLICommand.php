@@ -162,7 +162,11 @@ abstract class CLICommand {
      */
     public function addArg($name, $options = []) {
         $trimmed = trim($name);
-
+        
+        if ($this->hasArg($trimmed)) {
+            return false;
+        }
+        
         if (strlen($trimmed) > 0 && !strpos($trimmed, ' ')) {
             if (gettype($options) == 'array') {
                 $this->commandArgs[$trimmed] = $this->_checkArgOptions($options);
@@ -351,19 +355,21 @@ abstract class CLICommand {
      * @since 1.0
      */
     public function excCommand() {
+        CLI::setActiveCommand($this);
+        $retVal = -1;
         $this->_parseArgs();
 
         if ($this->_checkIsArgsSet() && $this->_checkAllowedArgValues()) {
             $execResult = $this->exec();
-
+            
             if ($execResult === null) {
-                return 0;
+                $execResult = 0;
             }
 
-            return intval($execResult);
+            $retVal = intval($execResult);
         }
-
-        return -1;
+        CLI::setActiveCommand(null);
+        return $retVal;
     }
     /**
      * Execute the command.
@@ -803,6 +809,8 @@ abstract class CLICommand {
 
         if ($argsCount != 0 && gettype($_[$argsCount - 1]) == 'array') {
             //Last index contains formatting options.
+            $_[$argsCount - 1]['no-ansi'] = $this->isArgProvided('--no-ansi');
+            $_[$argsCount - 1]['force-styling'] = $this->isArgProvided('--ansi');
             $str = self::formatOutput($str, $_[$argsCount - 1]);
         }
         call_user_func_array([$this->getOutputStream(), 'println'], $this->_createPassArray($str, $_));
@@ -835,7 +843,7 @@ abstract class CLICommand {
             $formattingOptions = $_[$argCount - 1];
         }
 
-        $formattingOptions['force-styling'] = $this->isArgProvided('force-styling');
+        $formattingOptions['force-styling'] = $this->isArgProvided('--ansi');
         $formattingOptions['no-ansi'] = $this->isArgProvided('--no-ansi');
 
         $formattedStr = $this->formatOutput($str, $formattingOptions);
@@ -935,12 +943,12 @@ abstract class CLICommand {
      * 
      * @since 1.0
      */
-    public function setArgValue($argName, $argValue) {
+    public function setArgValue($argName, $argValue = '') {
         $trimmedArgName = trim($argName);
         $trimmedArgVal = trim($argValue);
         $retVal = false;
 
-        if (isset($this->commandArgs[$trimmedArgName]) && strlen($trimmedArgVal) != 0) {
+        if (isset($this->commandArgs[$trimmedArgName])) {
             $allowedVals = $this->commandArgs[$trimmedArgName]['values'];
 
             if (count($allowedVals) != 0) {
@@ -954,6 +962,7 @@ abstract class CLICommand {
 
         if ($retVal) {
             $this->commandArgs[$trimmedArgName]['val'] = $argValue;
+            $this->commandArgs[$trimmedArgName]['provided'] = true;
         }
 
         return $retVal;
@@ -1085,7 +1094,7 @@ abstract class CLICommand {
             foreach ($invalidArgsVals as $argName) {
                 $this->prints('Info:', [
                     'color' => 'light-yellow',
-                    'force-styling' => $this->isArgProvided('force-styling')
+                    'force-styling' => $this->isArgProvided('--ansi')
                 ]);
                 $this->println("Allowed values for the argument '$argName':");
 

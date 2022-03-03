@@ -9,6 +9,9 @@ class TestCommand extends CLICommand {
         parent::__construct($commandName, $args, $description);
     }
     public function exec() {
+        $name = $this->getArgValue('name');
+        $this->println('Hello '.$name.'!');
+        $this->println('Ok');
         return 0;
     }
 

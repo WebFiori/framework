@@ -40,7 +40,7 @@ class FileOutputStream implements OutputStream {
         $expl = explode("\n", $raw);
         $retVal = [];
         foreach ($expl as $str) {
-            $retVal[] = trim($str);
+            $retVal[] = $str;
         }
         return $retVal;
     }

@@ -28,6 +28,7 @@ class CommandRunner {
     public function __construct($inputFile, $outputFile) {
         CLI::setInputStream(new FileInputStream($inputFile));
         CLI::setOutputStream(new FileOutputStream($outputFile));
+        CLI::registerCommands();
     }
     /**
      * Returns an array that contains the output of the command after running it.

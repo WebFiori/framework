@@ -19,6 +19,9 @@
             <file>./webfiori/framework/session/Session.php</file>
             <file>./webfiori/framework/session/SessionsManager.php</file>
             <file>./webfiori/framework/session/DefaultSessionStorage.php</file>
+            <file>./webfiori/framework/cli/commands</file>
+            <file>./webfiori/framework/cli/writers</file>
+            <file>./webfiori/framework/cli/helpers</file>
         </whitelist>
     </filter>
     <logging>
@@ -36,6 +39,9 @@
         </testsuite>
         <testsuite name="Session Management Tests">
             <directory>./tests/webfiori/framework/test/session/</directory>
+        </testsuite>
+        <testsuite name="CLI Tests">
+            <directory>./tests/webfiori/framework/test/cli/</directory>
         </testsuite>
     </testsuites>
 </phpunit>

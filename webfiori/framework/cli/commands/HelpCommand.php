@@ -70,6 +70,10 @@ class HelpCommand extends CLICommand {
         } else {
             if ($_SERVER['argc'] == 1) {
                 $vCommand = new VersionCommand();
+                if ($this->isArgProvided('--no-ansi')) {
+                    $vCommand->addArg('--no-ansi');
+                    $vCommand->setArgValue('--no-ansi', $this->getArgValue('--no-ansi'));
+                }
                 $vCommand->exec();
             }
             $this->println("Usage:",[

@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
  * @author Ibrahim
  */
 class CommandRunner {
+    private $command;
     private $exitStatus;
     /**
      * Creates new instance.
@@ -62,13 +63,24 @@ class CommandRunner {
      */
     public function runCommand(CLICommand $command, array $argsVals = []) {
         CLI::getOutputStream()->reset();
+        $this->command = $command;
         foreach ($argsVals as $argName => $argVal) {
             $command->setArgValue($argName, $argVal);
         }
+        //$command->addArg('--ansi');
         $command->addArg('--no-ansi');
+        
         $command->setArgValue('--no-ansi');
         $this->exitStatus = $command->excCommand();
         return $this->exitStatus;
+    }
+    /**
+     * Returns the command that will be executed by the runner.
+     * 
+     * @return CLICommand
+     */
+    public function getCommand() {
+        return $this->command;
     }
     /**
      * Checks if exit status of the command equals to specific value or not.
@@ -95,7 +107,9 @@ class CommandRunner {
     public function isOutputEquals(array $outputsStr, TestCase $case = null) {
         $actualOutputArr = $this->getOutputsArray();
         $isEqual = count($actualOutputArr) == count($outputsStr);
-        
+        if ($case !== null) {
+            $case->assertEquals(count($outputsStr), count($actualOutputArr));
+        }
         if ($isEqual) {
             for ($x = 0 ; $x < count($actualOutputArr) ; $x++) {
                 if ($case !== null) {

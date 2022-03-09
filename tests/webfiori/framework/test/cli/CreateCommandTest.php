@@ -10,7 +10,9 @@ use webfiori\framework\cli\commands\CreateCommand;
  * @author Ibrahim
  */
 class CreateCommandTest extends TestCase {
-
+    /**
+     * @test
+     */
     public function testCreateBackgroundJob00() {
         $commandRunner = new CommandRunner(TESTS_PATH.DS.'input-streams'.DS.'create-job-00.txt', TESTS_PATH.DS.'output.txt');
         $commandRunner->runCommand(new CreateCommand());
@@ -37,5 +39,33 @@ class CreateCommandTest extends TestCase {
         ], $this));
         $this->assertTrue(class_exists('\\app\\jobs\\SuperCoolJob'));
     }
-
+    /**
+     * @test
+     */
+    public function testCreateMiddleware00() {
+        $commandRunner = new CommandRunner(TESTS_PATH.DS.'input-streams'.DS.'create-middleware-00.txt', TESTS_PATH.DS.'output.txt');
+        $commandRunner->runCommand(new CreateCommand());
+        $this->assertEquals(0, $commandRunner->getExitStatus());
+        $this->assertTrue($commandRunner->isOutputEquals([
+            'What would you like to create?',
+            '0: Database table class.',
+            '1: Entity class from table.',
+            '2: Web service.',
+            '3: Background job.',
+            '4: Middleware.',
+            '5: Database table from class.',
+            '6: CLI Command.',
+            '7: Theme.',
+            '8: Quit. <--',
+            'Enter a name for the new class:',
+            'Enter an optional namespace for the class: Enter = "app\middleware"',
+            'Where would you like to store the '. "class? (must be a directory inside '".ROOT_DIR."') Enter =".' "app\middleware"',
+            'Enter a name for the middleware:',
+            'Enter middleware priority: Enter = "0"',
+            'Would you like to add the middleware to a group?(y/N)',
+            'Info: New class was created at "'.ROOT_DIR.DS.'app'.DS.'middleware".',
+            ""
+        ], $this));
+        $this->assertTrue(class_exists('\\app\\middleware\\NewCoolMdMiddleware'));
+    }
 }

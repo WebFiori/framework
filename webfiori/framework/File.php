@@ -265,9 +265,13 @@ class File implements JsonI {
         } else {
             $this->setName($fNameOrAbsPath);
         }
-
+        if (self::isFileExist($this->getAbsolutePath())) {
+            set_error_handler(null);
+            $this->fileSize = filesize($this->getAbsolutePath());
+            restore_error_handler();
+        }
         $this->id = -1;
-        $this->fileSize = 0;
+        
     }
     /**
      * Returns JSON string that represents basic file info.
@@ -563,11 +567,8 @@ class File implements JsonI {
     /**
      * Returns the size of the file in bytes.
      * 
-     * Note that if the file is specified by its path and name, the method 
-     * File::read() must be called before calling this method to update its 
-     * size.
-     * 
-     * @return int Size of the file in bytes.
+     * @return int|null Size of the file in bytes. If the raw data of the file
+     * is not set or the file does not exist, the method will return null.
      */
     public function getSize() {
         return $this->fileSize;
@@ -651,7 +652,6 @@ class File implements JsonI {
         if ($this->isExist()) {
             $this->rawData = '';
             unlink($this->getAbsolutePath());
-
             return true;
         }
 
@@ -915,7 +915,9 @@ class File implements JsonI {
             $this->_setSize($fSize);
             $bytesToRead = $to - $from > 0 ? $to - $from : $this->getSize();
             $resource = $this->_createResource('rb', $fPath);
-
+            if ($bytesToRead > $this->getSize() || $to > $this->getSize()) {
+                throw new FileException('Reached end of file while trying to read '.$bytesToRead.' byte(s).');
+            }
             if (is_resource($resource)) {
                 if ($bytesToRead > 0) {
                     fseek($resource, $from);

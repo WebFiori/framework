@@ -34,7 +34,7 @@ jobs:
       - name: Set up MySQL
         uses: mirromutth/mysql-action@v1.1
         with:
-          mysql version: '5.6'
+          mysql version: '5.7'
           mysql database: 'testing_db'
           mysql root password: 123456
           mysql user: 'root' 

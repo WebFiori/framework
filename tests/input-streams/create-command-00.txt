@@ -1,0 +1,7 @@
+6
+NewCLI
+app\commands
+app\commands
+print-hello
+Prints 'Hello World' in the console.
+N

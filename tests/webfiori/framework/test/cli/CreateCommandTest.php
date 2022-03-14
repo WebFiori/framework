@@ -176,7 +176,7 @@ class CreateCommandTest extends TestCase {
             'Enter a name for the new class:',
             'Enter an optional namespace for the class: Enter = "themes"',
             'Where would you like to store the '. "class? (must be a directory inside '".ROOT_DIR."') Enter =".' "themes\fiori"',
-            'Creating theme at "C:\Server\apache2\htdocs\framework\themes\fiori"...',
+            'Creating theme at "'.ROOT_DIR.DS.'themes'.DS.'fiori"...',
             'Info: New class was created at "'.ROOT_DIR.DS.'themes'.DS.'fiori".',
             ""
         ], $this));

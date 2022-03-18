@@ -13,7 +13,7 @@ class CommandTestCase extends TestCase {
      * @test
      */
     public function test00() {
-        $test = new CommandRunner(TESTS_PATH.DIRECTORY_SEPARATOR.'input.txt', TESTS_PATH.DIRECTORY_SEPARATOR.'output.txt');
+        $test = new CommandRunner();
         $test->runCommand(new TestCommand('hello', [
             'name' => []
         ]), [
@@ -21,16 +21,15 @@ class CommandTestCase extends TestCase {
         ]);
         $this->assertTrue($test->isExitStatusEquals(0));
         $this->assertTrue($test->isOutputEquals([
-            "Hello Ibrahim!",
-            "Ok",
-            ""
-        ]));
+            "Hello Ibrahim!\n",
+            "Ok\n",
+        ], $this));
     }
     /**
      * @test
      */
     public function test01() {
-        $test = new CommandRunner(TESTS_PATH.DIRECTORY_SEPARATOR.'input.txt', TESTS_PATH.DIRECTORY_SEPARATOR.'output.txt');
+        $test = new CommandRunner();
         $test->runCommand(new TestCommand('hello', [
             'name' => []
         ]), [
@@ -38,9 +37,8 @@ class CommandTestCase extends TestCase {
         ]);
         $this->assertTrue($test->isExitStatusEquals(0));
         $this->assertTrue($test->isOutputEquals([
-            "Hello Hassan Hussain!",
-            "Ok",
-            ""
-        ]));
+            "Hello Hassan Hussain!\n",
+            "Ok\n",
+        ], $this));
     }
 }

@@ -11,6 +11,8 @@ class ThemeClassWriter extends ClassWriter {
     public function writeUseStatements() {
         parent::writeUseStatements();
         $this->addUseStatement([
+            'webfiori\\framework\\Theme',
+            'webfiori\\ui\\HTMLNode',
             $this->getNamespace().'\\AsideSection',
             $this->getNamespace().'\\FooterSection',
             $this->getNamespace().'\\HeadSection',
@@ -35,12 +37,6 @@ class ThemeClassWriter extends ClassWriter {
      */
     public function __construct($classNameInfo = []) {
         parent::__construct($classNameInfo);
-        $this->addUseStatement([
-            'webfiori\\framework\\Theme',
-            'webfiori\\ui\\HTMLNode',
-        ]);
-
-        
         $this->name = isset($classNameInfo['name']) ? "'".$classNameInfo['name']."'" : null;
         
     }

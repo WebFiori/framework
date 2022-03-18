@@ -19,6 +19,41 @@
             <file>./webfiori/framework/session/Session.php</file>
             <file>./webfiori/framework/session/SessionsManager.php</file>
             <file>./webfiori/framework/session/DefaultSessionStorage.php</file>
+            <file>./webfiori/framework/cli/CLICommand.php</file>
+            <file>./webfiori/framework/cli/FileInputStream.php</file>
+            <file>./webfiori/framework/cli/FileOutputStream.php</file>
+            <file>./webfiori/framework/cli/commands/AddCommand.php</file>
+            <file>./webfiori/framework/cli/commands/CreateCommand.php</file>
+            <file>./webfiori/framework/cli/commands/CronCommand.php</file>
+            <file>./webfiori/framework/cli/commands/HelpCommand.php</file>
+            <file>./webfiori/framework/cli/commands/ListCronCommand.php</file>
+            <file>./webfiori/framework/cli/commands/ListRoutesCommand.php</file>
+            <file>./webfiori/framework/cli/commands/ListThemesCommand.php</file>
+            <file>./webfiori/framework/cli/commands/RunSQLQueryCommand.php</file>
+            <file>./webfiori/framework/cli/commands/SettingsCommand.php</file>
+            <file>./webfiori/framework/cli/commands/TestRouteCommand.php</file>
+            <file>./webfiori/framework/cli/commands/UpdateSettingsCommand.php</file>
+            <file>./webfiori/framework/cli/commands/UpdateTableCommand.php</file>
+            <file>./webfiori/framework/cli/commands/VersionCommand.php</file>
+            <file>./webfiori/framework/cli/writers/CLICommandClassWriter.php</file>
+            <file>./webfiori/framework/cli/writers/ClassWriter.php</file>
+            <file>./webfiori/framework/cli/writers/CronJobClassWriter.php</file>
+            <file>./webfiori/framework/cli/writers/LangClassWriter.php</file>
+            <file>./webfiori/framework/cli/writers/MiddlewareClassWriter.php</file>
+            <file>./webfiori/framework/cli/writers/TableClassWriter.php</file>
+            <file>./webfiori/framework/cli/writers/ThemeClassWriter.php</file>
+            <file>./webfiori/framework/cli/writers/WebServiceWriter.php</file>
+            <file>./webfiori/framework/cli/helpers/ClassInfoReader.php</file>
+            <file>./webfiori/framework/cli/helpers/CreateCLIClassHelper.php</file>
+            <file>./webfiori/framework/cli/helpers/CreateClassHelper.php</file>
+            <file>./webfiori/framework/cli/helpers/CreateCronJob.php</file>
+            <file>./webfiori/framework/cli/helpers/CreateMiddleware.php</file>
+            <file>./webfiori/framework/cli/helpers/CreateTable.php</file>
+            <file>./webfiori/framework/cli/helpers/CreateTableObj.php</file>
+            <file>./webfiori/framework/cli/helpers/CreateThemeHelper.php</file>
+            <file>./webfiori/framework/cli/helpers/CreateUpdateTableHelper.php</file>
+            <file>./webfiori/framework/cli/helpers/CreateWebService.php</file>
+            <file>./webfiori/framework/cli/helpers/TableObjHelper.php</file>
         </whitelist>
     </filter>
     <logging>
@@ -36,6 +71,9 @@
         </testsuite>
         <testsuite name="Session Management Tests">
             <directory>./tests/webfiori/framework/test/session/</directory>
+        </testsuite>
+        <testsuite name="CLI Tests">
+            <directory>./tests/webfiori/framework/test/cli/</directory>
         </testsuite>
     </testsuites>
 </phpunit>

@@ -49,7 +49,7 @@ jobs:
       - name: Install Dependencies
         run: composer install --prefer-dist --no-interaction --no-dev
         
-      - name: Create DIr
+      - name: Create DIR
         run: mkdir -m777 -p /home/runner/work/framework/framework/app/sto/sessions
         
       - name: Execute Tests

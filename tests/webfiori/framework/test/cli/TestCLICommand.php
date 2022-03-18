@@ -2,7 +2,7 @@
 namespace webfiori\framework\test\cli;
 use PHPUnit\Framework\TestCase;
 
-class TestCLICommand extends TestCase{
+class TestCLICommand extends TestCase {
     /**
      * @test
      */

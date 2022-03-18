@@ -104,6 +104,56 @@ class FileTest extends TestCase {
     }
     /**
      * @test
+     */
+    public function testRead02() {
+        $file = new File('text-file.txt',ROOT_DIR.DS.'tests'.DS.'entity');
+        $file->read(0, $file->getSize());
+        $this->assertEquals('Testing the class \'File\'.', $file->getRawData());
+    }
+    /**
+     * @test
+     */
+    public function testRead03() {
+        $this->expectException(FileException::class);
+        $this->expectExceptionMessage('Reached end of file while trying to read 26 byte(s).');
+        $file = new File('text-file.txt',ROOT_DIR.DS.'tests'.DS.'entity');
+        $file->read(0, $file->getSize() + 1);
+    }
+    /**
+     * @test
+     */
+    public function testRead04() {
+        $this->expectException(FileException::class);
+        $this->expectExceptionMessage('Reached end of file while trying to read 6 byte(s).');
+        $file = new File('text-file.txt',ROOT_DIR.DS.'tests'.DS.'entity');
+        $file->read(20, $file->getSize() + 1);
+    }
+    /**
+     * @test
+     */
+    public function testRead05() {
+        $file = new File('text-file.txt',ROOT_DIR.DS.'tests'.DS.'entity');
+        $file->read(20, $file->getSize());
+        $this->assertEquals('ile\'.', $file->getRawData());
+    }
+    /**
+     * @test
+     */
+    public function testRead06() {
+        $file = new File('text-file.txt',ROOT_DIR.DS.'tests'.DS.'entity');
+        $file->read(2, $file->getSize());
+        $this->assertEquals('sting the class \'File\'.', $file->getRawData());
+    }
+    /**
+     * @test
+     */
+    public function testRead07() {
+        $file = new File('text-file.txt',ROOT_DIR.DS.'tests'.DS.'entity');
+        $file->read(2, 4);
+        $this->assertEquals('st', $file->getRawData());
+    }
+    /**
+     * @test
      * @depends testRead00
      */
     public function removeTest() {

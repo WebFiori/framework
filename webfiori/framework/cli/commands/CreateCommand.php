@@ -33,8 +33,6 @@ use webfiori\framework\cli\helpers\CreateTable;
 use webfiori\framework\cli\helpers\CreateTableObj;
 use webfiori\framework\cli\helpers\CreateThemeHelper;
 use webfiori\framework\cli\helpers\CreateWebService;
-use webfiori\framework\Util;
-use webfiori\framework\cli\helpers\ClassInfoReader;
 /**
  * A command which is used to automate some of the common tasks such as 
  * creating table classes or controllers.
@@ -45,20 +43,7 @@ use webfiori\framework\cli\helpers\ClassInfoReader;
  */
 class CreateCommand extends CLICommand {
     public function __construct() {
-        parent::__construct('create', [
-            '--what' => [
-                'description' => 'An optional parameter which is used to specify what '
-                .'would you like to create. Possible values are: "e" for entity, "t" for '
-                .'database table.',
-                'optional' => true,
-                'values' => [
-                    'e','t','ws'
-                ]
-            ],
-            '--table-class' => [
-                'optional' => true,
-            ]
-        ], 'Creates a system entity (middleware, web service, background process ...).');
+        parent::__construct('create', [], 'Creates a system entity (middleware, web service, background process ...).');
     }
 
     public function _createEntityFromQuery() {
@@ -116,50 +101,39 @@ class CreateCommand extends CLICommand {
         return 0;
     }
     public function exec() {
-        $what = $this->getArgValue('--what');
-
-        if ($what !== null) {
-            if ($what == 'e') {
-                $this->_createEntityFromQuery();
-            } else if ($what == 't') {
-                $create = new CreateTable($this);
-            } else if ($what == 'ws') {
-                $create = new CreateWebService($this);
-            }
+        $options = [
+            'Database table class.',
+            'Entity class from table.',
+            'Web service.',
+            'Background job.',
+            'Middleware.',
+            'Database table from class.',
+            'CLI Command.',
+            'Theme.',
+            'Quit.'
+        ];
+        $answer = $this->select('What would you like to create?', $options, count($options) - 1);
+        if ($answer == 'Quit.') {
+        } else if ($answer == 'Database table class.') {
+            $create = new CreateTableObj($this);
+        } else if ($answer == 'Entity class from table.') {
+            $this->_createEntityFromQuery();
+        } else if ($answer == 'Web service.') {
+            $create = new CreateWebService($this);
+        } else if ($answer == 'Database table from class.') {
+            $create = new CreateTable($this);
+        } else if ($answer == 'Middleware.') {
+            $create = new CreateMiddleware($this);
+        } else if ($answer == 'CLI Command.') {
+            $create = new CreateCLIClassHelper($this);
+        } else if ($answer == 'Background job.') {
+            $create = new CreateCronJob($this);
+        } else if ($answer == 'Theme.') {
+            $create = new CreateThemeHelper($this);
         } else {
-            $options = [
-                'Database table class.',
-                'Entity class from table.',
-                'Web service.',
-                'Background job.',
-                'Middleware.',
-                'Database table from class.',
-                'CLI Command.',
-                'Theme.',
-                'Quit.'
-            ];
-            $answer = $this->select('What would you like to create?', $options, count($options) - 1);
-            if ($answer == 'Quit.') {
-            } else if ($answer == 'Database table class.') {
-                $create = new CreateTableObj($this);
-            } else if ($answer == 'Entity class from table.') {
-                $this->_createEntityFromQuery();
-            } else if ($answer == 'Web service.') {
-                $create = new CreateWebService($this);
-            } else if ($answer == 'Database table from class.') {
-                $create = new CreateTable($this);
-            } else if ($answer == 'Middleware.') {
-                $create = new CreateMiddleware($this);
-            } else if ($answer == 'CLI Command.') {
-                $create = new CreateCLIClassHelper($this);
-            } else if ($answer == 'Background job.') {
-                $create = new CreateCronJob($this);
-            } else if ($answer == 'Theme.') {
-                $create = new CreateThemeHelper($this);
-            } else {
-                $this->info('Not implemented yet.');
-            }
+            $this->info('Not implemented yet.');
         }
+        
         return 0;
     }
 }

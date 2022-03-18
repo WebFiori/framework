@@ -41,24 +41,18 @@ class VersionCommand extends CLICommand {
      */
     public function exec() {
         if (CLI::getActiveCommand()->getName() == $this->getName()) {
-            $this->prints("Framework Version: ", [
+            $formattingOptions = [
                 'color' => 'light-blue',
                 'bold' => true
-            ]);
+            ];
+            $this->prints("Framework Version: ", $formattingOptions);
             $this->println(WF_VERSION);
-            $this->prints("Release Date: ", [
-                'color' => 'light-blue',
-                'bold' => true
-            ]);
+            $this->prints("Release Date: ", $formattingOptions);
             $this->println(WF_RELEASE_DATE);
-            $this->prints("Version Type: ", [
-                'color' => 'light-blue',
-                'bold' => true
-            ]);
+            $this->prints("Version Type: ", $formattingOptions);
             $this->println(WF_VERSION_TYPE);
         } else {
-            $this->println(
-                 "|\                /|                          \n"
+            $wfLogo = "|\                /|                          \n"
                 ."| \      /\      / |              |  / \  |\n"
                 ."\  \    /  \    /  / __________   |\/   \/|\n"
                 ." \  \  /    \  /  / /  /______ /  | \/ \/ |\n"
@@ -67,17 +61,15 @@ class VersionCommand extends CLICommand {
                 ."    \  /    \  / /  /______ /       \ | /  \n"
                 ."     \/  /\  \/ /  /                  |    \n"
                 ."      \ /  \ / /  /                   |    \n"
-                ."       ______ /__/                    |    \n");
-
-            $this->prints('WebFiori Framework ', [
+                ."       ______ /__/                    |    \n";
+            $this->println($wfLogo);
+            $formattingOptions = [
                 'color' => 'light-green',
                 'bold' => true
-            ]);
+            ];
+            $this->prints('WebFiori Framework ', $formattingOptions);
             $this->prints(' (c) Version ');
-            $this->println(WF_VERSION." ".WF_VERSION_TYPE."\n\n", [
-                'color' => 'light-yellow',
-                'bold' => true
-            ]);
+            $this->println(WF_VERSION." ".WF_VERSION_TYPE."\n\n", $formattingOptions);
         }
     }
 }

@@ -13,14 +13,13 @@ use webfiori\framework\cli\commands\VersionCommand;
 class VersionCommandTest extends TestCase {
 
     public function test00() {
-        $commandRunner = new CommandRunner(TESTS_PATH.DS.'input.txt', TESTS_PATH.DS.'output.txt');
+        $commandRunner = new CommandRunner();
         $commandRunner->runCommand(new VersionCommand());
         $this->assertEquals(0, $commandRunner->getExitStatus());
         $this->assertTrue($commandRunner->isOutputEquals([
-            'Framework Version: '.WF_VERSION,
-            'Release Date: '.WF_RELEASE_DATE,
-            'Version Type: '.WF_VERSION_TYPE,
-            ""
+            'Framework Version: '.WF_VERSION."\n",
+            'Release Date: '.WF_RELEASE_DATE."\n",
+            'Version Type: '.WF_VERSION_TYPE."\n",
         ], $this));
     }
 

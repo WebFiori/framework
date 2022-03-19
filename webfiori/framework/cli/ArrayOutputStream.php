@@ -12,8 +12,12 @@ use webfiori\framework\cli\OutputStream;
  */
 class ArrayOutputStream implements OutputStream {
     private $outputArr;
+    private $isPrintln;
+    private $isLastPrintLn;
     public function __construct() {
         $this->outputArr = [];
+        $this->isPrintln = false;
+        $this->isLastPrintLn = false;
     }
     /**
      * Sends a line as output to the array.
@@ -23,6 +27,7 @@ class ArrayOutputStream implements OutputStream {
      * @param array $_ Any extra formatting options.
      */
     public function println($str, ...$_) {
+        $this->isPrintln = true;
         $toPass = [
             $this->asString($str)."\n"
         ];
@@ -31,6 +36,7 @@ class ArrayOutputStream implements OutputStream {
             $toPass[] = $val;
         }
         call_user_func_array([$this, 'prints'], $toPass);
+        $this->isPrintln = false;
     }
     /**
      * Sends a string to the stream.
@@ -53,8 +59,20 @@ class ArrayOutputStream implements OutputStream {
                 $arrayToPass[] = $val;
             }
         }
+        $index = count($this->outputArr);
+        if ($index >= 1) {
+            if ($this->isLastPrintLn) {
+                $this->outputArr[] = call_user_func_array('sprintf', $arrayToPass);
+                $this->isLastPrintLn = false;
+            } else {
+                $this->outputArr[$index - 1] .= call_user_func_array('sprintf', $arrayToPass);
+                $this->isLastPrintLn = false;
+            }
+        } else {
+            $this->outputArr[] = call_user_func_array('sprintf', $arrayToPass);
+        }
         
-        $this->outputArr[] = call_user_func_array('sprintf', $arrayToPass);
+        $this->isLastPrintLn = $this->isPrintln;
     }
     /**
      * Returns the array that holds all output values.

@@ -27,6 +27,7 @@ class CommandRunner {
      * output stream.
      */
     public function __construct(array $inputsArray = []) {
+        CLI::registerCommands();
         CLI::setInputStream(new ArrayInputStream($inputsArray));
         CLI::setOutputStream(new ArrayOutputStream());
     }

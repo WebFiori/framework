@@ -1,15 +1,15 @@
 <?php
 namespace webfiori\framework\cli;
 
-use webfiori\framework\cli\FileInputStream;
-use webfiori\framework\cli\FileOutputStream;
+use webfiori\framework\cli\ArrayOutputStream;
+use webfiori\framework\cli\ArrayInputStream;
 use PHPUnit\Framework\TestCase;
 /**
  * A class which can be used to test custom made CLI commands.
  * 
- * The class uses files as input streams and output streams. What it does
- * is it executes a command and read inputs from file and send output to 
- * file. Then it can be used to compare final output with specific string
+ * The class uses arrays as input streams and output streams. What it does
+ * is it executes a command and read inputs from an array and send output to 
+ * another array. Then it can be used to compare final output with specific string
  * value to validate command execution result.
  *
  * @author Ibrahim
@@ -26,10 +26,10 @@ class CommandRunner {
      * @param string $outputFile The path to the file that will be used as
      * output stream.
      */
-    public function __construct($inputFile, $outputFile) {
-        CLI::setInputStream(new FileInputStream($inputFile));
-        CLI::setOutputStream(new FileOutputStream($outputFile));
+    public function __construct(array $inputsArray = []) {
         CLI::registerCommands();
+        CLI::setInputStream(new ArrayInputStream($inputsArray));
+        CLI::setOutputStream(new ArrayOutputStream());
     }
     /**
      * Returns an array that contains the output of the command after running it.
@@ -38,7 +38,7 @@ class CommandRunner {
      * one index.
      */
     public function getOutputsArray() {
-        return CLI::getOutputStream()->readOutput();
+        return CLI::getOutputStream()->getOutputArray();
     }
     /**
      * Returns exit status of the command after executing it.

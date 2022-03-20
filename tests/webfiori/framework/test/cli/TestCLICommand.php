@@ -12,6 +12,9 @@ class TestCLICommand extends TestCase {
         $this->assertEquals('<NO DESCRIPTION>', $command->getDescription());
         $this->assertEquals(0, count($command->getArgs()));
     }
+    /**
+     * @test
+     */
     public function test01() {
         $command = new TestCommand('new-command');
         $command->println('%30s', 'ok');
@@ -20,9 +23,18 @@ class TestCLICommand extends TestCase {
     /**
      * @test
      */
+    public function test03() {
+        $command = new TestCommand('with space');
+        $this->assertEquals('new-command', $command->getName());
+        $this->assertEquals('<NO DESCRIPTION>', $command->getDescription());
+    }
+    /**
+     * @test
+     */
     public function testAddArg00() {
         $command = new TestCommand('new-command');
         $this->assertFalse($command->addArg(''));
+        $this->assertFalse($command->addArg('with space'));
         $this->assertFalse($command->addArg('       '));
         $this->assertFalse($command->addArg('invalid name'));
         $this->assertTrue($command->addArg('valid'));
@@ -48,6 +60,21 @@ class TestCLICommand extends TestCase {
      */
     public function testAddArg02() {
         $command = new TestCommand('new-command');
+        $this->assertTrue($command->addArg('default-options', [
+            'optional' => true
+        ]));
+        $argDetails = $command->getArgInfo('default-options');
+        $this->assertEquals([
+            'optional' => true,
+            'description' => '<NO DESCRIPTION>',
+            'values' => []
+        ], $argDetails);
+    }
+    /**
+     * @test
+     */
+    public function testAddArg03() {
+        $command = new TestCommand('new');
         $this->assertTrue($command->addArg('default-options', [
             'optional' => true
         ]));

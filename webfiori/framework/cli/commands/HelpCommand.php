@@ -76,15 +76,13 @@ class HelpCommand extends CLICommand {
                 }
                 $vCommand->exec();
             }
-            $this->println("Usage:",[
+            $formattingOptions = [
                 'bold' => true,
                 'color' => 'light-yellow'
-            ]);
+            ];
+            $this->println("Usage:", $formattingOptions);
             $this->println("    command [arg1 arg2=\"val\" arg3...]\n");
-            $this->println("Available Commands:", [
-                'bold' => true,
-                'color' => 'light-yellow'
-            ]);
+            $this->println("Available Commands:", $formattingOptions);
 
             foreach ($regCommands as $commandObj) {
                 $this->printCommandInfo($commandObj);

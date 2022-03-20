@@ -89,7 +89,7 @@ abstract class CLICommand {
      * Creates new instance of the class.
      * 
      * @param string $commandName A string that represents the name of the 
-     * command such as '-v' or 'help'. If not provided, the 
+     * command such as '-v' or 'help'. If invalid name provided, the 
      * value 'new-command' is used.
      * 
      * @param array $args An associative array of sub-associative arrays of arguments (or options) which can 
@@ -160,7 +160,7 @@ abstract class CLICommand {
      * 
      * @since 1.0
      */
-    public function addArg($name, $options = []) {
+    public function addArg($name, array $options = []) {
         $trimmed = trim($name);
         
         if ($this->hasArg($trimmed)) {
@@ -168,15 +168,7 @@ abstract class CLICommand {
         }
         
         if (strlen($trimmed) > 0 && !strpos($trimmed, ' ')) {
-            if (gettype($options) == 'array') {
-                $this->commandArgs[$trimmed] = $this->_checkArgOptions($options);
-            } else {
-                $this->commandArgs[$trimmed] = [
-                    'optional' => false,
-                    'description' => '<NO DESCRIPTION>',
-                    'values' => []
-                ];
-            }
+            $this->commandArgs[$trimmed] = $this->_checkArgOptions($options);
 
             return true;
         }
@@ -1116,7 +1108,7 @@ abstract class CLICommand {
         } else {
             $optinsArr['optional'] = false;
         }
-        $optinsArr['description'] = isset($options['description']) ? $options['description'] : null;
+        $optinsArr['description'] = isset($options['description']) ? $options['description'] : '<NO DESCRIPTION>';
         $this->_checkDescIndex($optinsArr);
         $optinsArr['values'] = isset($options['values']) ? $options['values'] : [];
         $this->_checkValuesIndex($optinsArr);

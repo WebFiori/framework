@@ -15,199 +15,188 @@ class HelpCommandTest extends TestCase {
      * @test
      */
     public function test00() {
-        $commandRunner = new CommandRunner(TESTS_PATH.DS.'input.txt', TESTS_PATH.DS.'output.txt');
+        $commandRunner = new CommandRunner();
         
         $commandRunner->runCommand(new HelpCommand());
         $this->assertEquals(0, $commandRunner->getExitStatus());
-        $this->assertEquals([
-            'Usage:',
-            '    command [arg1 arg2="val" arg3...]',
-            '',
-            'Available Commands:',
-            '    help',
-            '        Display CLI Help. To display help for specific command, use the argument "--command-name" with this command.',
-            '',
-            '    v',
-            '        Display framework version info.',
-            '',
-            '    show-config',
-            '        Display framework configuration.',
-            '',
-            '    list-themes',
-            '        List all registered themes.',
-            '',
-            '    list-jobs',
-            '        List all scheduled CRON jobs.',
-            '',
-            '    list-routes',
-            '        List all created routes and which resource they point to.',
-            '',
-            '    cron',
-            '               Run CRON Scheduler',
-            '',
-            '    route',
-            '        Test the result of routing to a URL',
-            '',
-            '    create',
-            '        Creates a system entity (middleware, web service, background process ...).',
-            '',
-            '    add',
-            '        Add a database connection or SMTP account.',
-            '',
-            '    update-table',
-            '         Update a database table.',
-            '',
-            '    run-query',
-            '        Execute SQL query on specific database.',
-            '',
-            '    update-settings',
-            '        Update application settings which are stored in the class "AppConfig".',
-            '',
-            '',
-        ], $commandRunner->getOutputsArray());
+        $this->assertTrue($commandRunner->isOutputEquals([
+            'Usage:'."\n",
+            '    command [arg1 arg2="val" arg3...]'."\n\n",
+            'Available Commands:'."\n",
+            '    help'."\n",
+            '        Display CLI Help. To display help for specific command, use the argument "--command-name" with this command.'."\n\n",
+
+            '    v'."\n",
+            '        Display framework version info.'."\n\n",
+
+            '    show-config'."\n",
+            '        Display framework configuration.'."\n\n",
+
+            '    list-themes'."\n",
+            '        List all registered themes.'."\n\n",
+
+            '    list-jobs'."\n",
+            '        List all scheduled CRON jobs.'."\n\n",
+
+            '    list-routes'."\n",
+            '        List all created routes and which resource they point to.'."\n\n",
+
+            '    cron'."\n",
+            '               Run CRON Scheduler'."\n\n",
+
+            '    route'."\n",
+            '        Test the result of routing to a URL'."\n\n",
+
+            '    create'."\n",
+            '        Creates a system entity (middleware, web service, background process ...).'."\n\n",
+
+            '    add'."\n",
+            '        Add a database connection or SMTP account.'."\n\n",
+
+            '    update-table'."\n",
+            '         Update a database table.'."\n\n",
+
+            '    run-query'."\n",
+            '        Execute SQL query on specific database.'."\n\n",
+
+            '    update-settings'."\n",
+            '        Update application settings which are stored in the class "AppConfig".'."\n\n",
+
+        ], $this));
     }
     /**
      * @test
      */
     public function test01() {
-        $commandRunner = new CommandRunner(TESTS_PATH.DS.'input.txt', TESTS_PATH.DS.'output.txt');
+        $commandRunner = new CommandRunner();
         $_SERVER['argc'] = 1;
         $commandRunner->runCommand(new HelpCommand());
         $this->assertEquals(0, $commandRunner->getExitStatus());
         $this->assertTrue($commandRunner->isOutputEquals([
-            '|\                /|                          ',                        
-            '| \      /\      / |              |  / \  |',
-            '\  \    /  \    /  / __________   |\/   \/|',
-            ' \  \  /    \  /  / /  /______ /  | \/ \/ |',
-            '  \  \/  /\  \/  / /  /           |  \ /  |',
-            '   \    /  \    / /  /______      |\  |  /|',
-            '    \  /    \  / /  /______ /       \ | /  ',
-            '     \/  /\  \/ /  /                  |    ',
-            '      \ /  \ / /  /                   |    ',
-            '       ______ /__/                    |    ',
-            '',
-            'WebFiori Framework  (c) Version 2.4.7 Stable',
-            '',
-            '',
-            'Usage:',
-            '    command [arg1 arg2="val" arg3...]',
-            '',
-            'Available Commands:',
-            '    help',
-            '        Display CLI Help. To display help for specific command, use the argument "--command-name" with this command.',
-            '',
-            '    v',
-            '        Display framework version info.',
-            '',
-            '    show-config',
-            '        Display framework configuration.',
-            '',
-            '    list-themes',
-            '        List all registered themes.',
-            '',
-            '    list-jobs',
-            '        List all scheduled CRON jobs.',
-            '',
-            '    list-routes',
-            '        List all created routes and which resource they point to.',
-            '',
-            '    cron',
-            '               Run CRON Scheduler',
-            '',
-            '    route',
-            '        Test the result of routing to a URL',
-            '',
-            '    create',
-            '        Creates a system entity (middleware, web service, background process ...).',
-            '',
-            '    add',
-            '        Add a database connection or SMTP account.',
-            '',
-            '    update-table',
-            '         Update a database table.',
-            '',
-            '    run-query',
-            '        Execute SQL query on specific database.',
-            '',
-            '    update-settings',
-            '        Update application settings which are stored in the class "AppConfig".',
-            '',
-            '',
+            "|\                /|                          \n"
+            ."| \      /\      / |              |  / \  |\n"
+            ."\  \    /  \    /  / __________   |\/   \/|\n"
+            ." \  \  /    \  /  / /  /______ /  | \/ \/ |\n"
+            ."  \  \/  /\  \/  / /  /           |  \ /  |\n"
+            ."   \    /  \    / /  /______      |\  |  /|\n"
+            ."    \  /    \  / /  /______ /       \ | /  \n"
+            ."     \/  /\  \/ /  /                  |    \n"
+            ."      \ /  \ / /  /                   |    \n"
+            ."       ______ /__/                    |    \n\n",
+
+            'WebFiori Framework  (c) Version 2.4.7 Stable'."\n\n\n",
+
+
+            'Usage:'."\n",
+            '    command [arg1 arg2="val" arg3...]'."\n\n",
+
+            'Available Commands:'."\n",
+            '    help'."\n",
+            '        Display CLI Help. To display help for specific command, use the argument "--command-name" with this command.'."\n\n",
+
+            '    v'."\n",
+            '        Display framework version info.'."\n\n",
+
+            '    show-config'."\n",
+            '        Display framework configuration.'."\n\n",
+
+            '    list-themes'."\n",
+            '        List all registered themes.'."\n\n",
+
+            '    list-jobs'."\n",
+            '        List all scheduled CRON jobs.'."\n\n",
+
+            '    list-routes'."\n",
+            '        List all created routes and which resource they point to.'."\n\n",
+
+            '    cron'."\n",
+            '               Run CRON Scheduler'."\n\n",
+
+            '    route'."\n",
+            '        Test the result of routing to a URL'."\n\n",
+
+            '    create'."\n",
+            '        Creates a system entity (middleware, web service, background process ...).'."\n\n",
+
+            '    add'."\n",
+            '        Add a database connection or SMTP account.'."\n\n",
+
+            '    update-table'."\n",
+            '         Update a database table.'."\n\n",
+
+            '    run-query'."\n",
+            '        Execute SQL query on specific database.'."\n\n",
+
+            '    update-settings'."\n",
+            '        Update application settings which are stored in the class "AppConfig".'."\n\n",
+
         ], $this));
     }
     /**
      * @test
      */
     public function test02() {
-        $commandRunner = new CommandRunner(TESTS_PATH.DS.'input.txt', TESTS_PATH.DS.'output.txt');
+        $commandRunner = new CommandRunner();
         
         $commandRunner->runCommand(new HelpCommand(), [
             '--command-name' => 'help'
         ]);
         $this->assertEquals(0, $commandRunner->getExitStatus());
         $this->assertEquals([
-        '    help',
-        '        Display CLI Help. To display help for specific command, use the argument "--command-name" with this command.',
-        '',
-        '    Supported Arguments:',
-        '               --command-name: [Optional] An optional command name. If provided, help will be specific to the given command only.',
-        //'                       --ansi: [Optional] Force the use of ANSI output.',
-        //'                    --no-ansi: [Optional] Force the output to not use ANSI.',
-        ''
+        '    help'."\n",
+        '        Display CLI Help. To display help for specific command, use the argument "--command-name" with this command.'."\n\n",
+        '    Supported Arguments:'."\n",
+        '               --command-name: [Optional] An optional command name. If provided, help will be specific to the given command only.'."\n",
         ], $commandRunner->getOutputsArray());
     }
     /**
      * @test
      */
     public function test03() {
-        $commandRunner = new CommandRunner(TESTS_PATH.DS.'input.txt', TESTS_PATH.DS.'output.txt');
+        $commandRunner = new CommandRunner();
         
         $commandRunner->runCommand(new HelpCommand(), [
             '--command-name' => 'no-command'
         ]);
         $this->assertEquals(0, $commandRunner->getExitStatus());
         $this->assertEquals([
-        'Error: Command \'no-command\' is not supported.',
-        ''
+        'Error: Command \'no-command\' is not supported.'."\n",
         ], $commandRunner->getOutputsArray());
     }
     /**
      * @test
      */
     public function test04() {
-        $commandRunner = new CommandRunner(TESTS_PATH.DS.'input.txt', TESTS_PATH.DS.'output.txt');
+        $commandRunner = new CommandRunner();
         
         $commandRunner->runCommand(new HelpCommand(), [
             '--command-name' => 'no-command'
         ]);
         $this->assertEquals(0, $commandRunner->getExitStatus());
         $this->assertEquals([
-        'Error: Command \'no-command\' is not supported.',
-        ''
+        'Error: Command \'no-command\' is not supported.'."\n",
         ], $commandRunner->getOutputsArray());
     }
     /**
      * @test
      */
     public function test05() {
-        $commandRunner = new CommandRunner(TESTS_PATH.DS.'input.txt', TESTS_PATH.DS.'output.txt');
+        $commandRunner = new CommandRunner();
         
         $commandRunner->runCommand(new HelpCommand(), [
             '--command-name' => 'cron'
         ]);
         $this->assertEquals(0, $commandRunner->getExitStatus());
-        $this->assertEquals([
-        '    cron',
-        '               Run CRON Scheduler',
-        '',
-        '    Supported Arguments:',
-        '                            p: [Optional] CRON password. If it is set in CRON, then it must be provided here.',
-        '                      --check: [Optional] Run a check aginst all jobs to check if it is time to execute them or not.',
-        '                      --force: [Optional] Force a specific job to execute.',
-        '                   --job-name: [Optional] The name of the job that will be forced to execute.',
-        '              --show-job-args: [Optional] If this one is provided with job name and a job has custom execution args, they will be shown.',
-        '                   --show-log: [Optional] If set, execution log will be shown after execution is completed.',
-        ''
-        ], $commandRunner->getOutputsArray());
+        $this->assertTrue($commandRunner->isOutputEquals([
+        '    cron'."\n",
+        '               Run CRON Scheduler'."\n\n",
+        '    Supported Arguments:'."\n",
+        '                            p: [Optional] CRON password. If it is set in CRON, then it must be provided here.'."\n",
+        '                      --check: [Optional] Run a check aginst all jobs to check if it is time to execute them or not.'."\n",
+        '                      --force: [Optional] Force a specific job to execute.'."\n",
+        '                   --job-name: [Optional] The name of the job that will be forced to execute.'."\n",
+        '              --show-job-args: [Optional] If this one is provided with job name and a job has custom execution args, they will be shown.'."\n",
+        '                   --show-log: [Optional] If set, execution log will be shown after execution is completed.'."\n",
+        ], $this));
     }
 }

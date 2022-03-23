@@ -32,6 +32,7 @@ use webfiori\framework\DB;
 use webfiori\framework\mail\SMTPAccount;
 use webfiori\framework\mail\SMTPServer;
 use webfiori\framework\WebFioriApp;
+use webfiori\framework\cli\writers\LangClassWriter;
 
 /**
  * A command which is used to add a database connection or SMTP account.
@@ -92,18 +93,17 @@ class AddCommand extends CLICommand {
 
         try {
             $db->getConnection();
+            $this->success('Connected. Adding the connection...');
+
+            WebFioriApp::getSysController()->addOrUpdateDBConnection($connInfoObj);
+            $this->success('Connection information was stored in the class "'.APP_DIR_NAME.'\\AppConfig".');
         } catch (Exception $ex) {
             $this->error('Unable to connect to the database.');
             $this->error($ex->getMessage());
 
-            return -1;
+            $this->_confirmAdd($connInfoObj);
         }
-
-        $this->success('Connected. Adding the connection...');
-
-        WebFioriApp::getSysController()->addOrUpdateDBConnection($connInfoObj);
-        $this->success('Connection information was stored in the class "'.APP_DIR_NAME.'\\AppConfig".');
-
+        
         return 0;
     }
     private function _addLang() {
@@ -176,9 +176,13 @@ class AddCommand extends CLICommand {
         
         return 0;
     }
-    private function _confirmAdd($smtpConn) {
-        if ($this->confirm('Would you like to store connection information anyway?')) {
-            ConfigController::get()->updateOrAddEmailAccount($smtpConn);
+    private function _confirmAdd($smtpOrDbConn) {
+        if ($this->confirm('Would you like to store connection information anyway?', false)) {
+            if ($smtpOrDbConn instanceof SMTPAccount) {
+                ConfigController::get()->updateOrAddEmailAccount($smtpOrDbConn);
+            } else if ($smtpOrDbConn instanceof ConnectionInfo) {
+                ConfigController::get()->addOrUpdateDBConnection($smtpOrDbConn);
+            }
             $this->success('Connection information was stored in the class "'.APP_DIR_NAME.'\\AppConfig".');
         }
     }

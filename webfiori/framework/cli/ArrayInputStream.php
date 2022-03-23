@@ -41,6 +41,9 @@ class ArrayInputStream implements InputStream {
      * @return string A string that represents a single line.
      */
     public function readLine() {
+        if ($this->currentLine >= count($this->inputsArr)) {
+            throw new \Exception('Array index out of bounds: '.$this->currentLine);
+        }
         $this->currentLine++;
         return $this->inputsArr[$this->currentLine];
     }

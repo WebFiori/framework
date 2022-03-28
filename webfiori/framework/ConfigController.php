@@ -896,7 +896,7 @@ class ConfigController {
         $this->a($cFile, $this->docEmptyLine, 1); 
         $this->a($cFile, $this->since10, 1);
         $this->a($cFile, $this->docEnd, 1);
-        $this->a($cFile, "     public function addAccount(SMTPAccount \$acc) {");
+        $this->a($cFile, "    public function addAccount(SMTPAccount \$acc) {");
         $this->a($cFile, "        \$this->emailAccounts[\$acc->getAccountName()] = \$acc;");
         $this->a($cFile, $this->blockEnd, 1);
 
@@ -926,9 +926,9 @@ class ConfigController {
         $this->a($cFile, $this->since101, 1);
         $this->a($cFile, $this->docEnd, 1);
         $this->a($cFile, "    public function addLanguage(\$code, \$siteName, \$defaultTitle, \$defaultDescription) {");
-        $this->a($cFile, "        \$this->webSiteNames['\$code'] = \$siteName;");
-        $this->a($cFile, "        \$this->descriptions['\$code'] = \$defaultDescription;");
-        $this->a($cFile, "        \$this->defaultPageTitles['\$code'] = \$defaultTitle;");
+        $this->a($cFile, "        \$this->webSiteNames[\$code] = \$siteName;");
+        $this->a($cFile, "        \$this->descriptions[\$code] = \$defaultDescription;");
+        $this->a($cFile, "        \$this->defaultPageTitles[\$code] = \$defaultTitle;");
         $this->a($cFile, $this->blockEnd, 1);
         
         $this->a($cFile, $this->docStart, 1);

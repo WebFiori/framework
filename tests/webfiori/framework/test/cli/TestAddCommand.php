@@ -178,6 +178,49 @@ class TestAddCommand extends TestCase {
         $this->assertTrue(class_exists('\\app\\langs\\LanguageFK'));
         $this->removeClass('\\app\\langs\\LanguageFK');
     }
+    /**
+     * @test
+     * @depends testAddLang00
+     */
+    public function testAddLang01() {
+        $runner = new CommandRunner([
+            '2',
+            'FK',
+        ]);
+        $runner->runCommand(new AddCommand());
+        $this->assertEquals(0, $runner->getExitStatus());
+        $this->assertTrue($runner->isOutputEquals([
+            "What would you like to add?\n",
+            "0: New database connection.\n",
+            "1: New SMTP connection.\n",
+            "2: New website language.\n",
+            "3: Quit. <--\n",
+            "Language code:\n",
+            "Info: This language already added. Nothing changed.\n",
+        ], $this));
+    }
+    /**
+     * @test
+     */
+    public function testAddLang02() {
+        $runner = new CommandRunner([
+            '2',
+            'FKRR',
+        ]);
+        $runner->runCommand(new AddCommand());
+        $this->assertEquals(-1, $runner->getExitStatus());
+        $this->assertTrue($runner->isOutputEquals([
+            "What would you like to add?\n",
+            "0: New database connection.\n",
+            "1: New SMTP connection.\n",
+            "2: New website language.\n",
+            "3: Quit. <--\n",
+            "Language code:\n",
+            "Error: Invalid language code.\n",
+        ], $this));
+        $this->assertTrue(class_exists('\\app\\langs\\LanguageFK'));
+        $this->removeClass('\\app\\langs\\LanguageFK');
+    }
     private function removeClass($classPath) {
         $file = new File(ROOT_DIR.$classPath.'.php');
         $file->remove();

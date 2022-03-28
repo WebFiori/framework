@@ -549,6 +549,9 @@ class ConfigController {
      */
     public function getDescriptions() {
         if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
+            if (WebFioriApp::getClassStatus() == WebFioriApp::STATUS_INITIALIZED) {
+                return WebFioriApp::getAppConfig()->getDescriptions();
+            }
             $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
             $c = new $constructor();
 
@@ -662,6 +665,9 @@ class ConfigController {
      */
     public function getTitles() {
         if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
+            if (WebFioriApp::getClassStatus() == WebFioriApp::STATUS_INITIALIZED) {
+                return WebFioriApp::getAppConfig()->getTitles();
+            }
             $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
             $c = new $constructor();
 
@@ -699,6 +705,9 @@ class ConfigController {
      */
     public function getWebsiteNames() {
         if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
+            if (WebFioriApp::getClassStatus() == WebFioriApp::STATUS_INITIALIZED) {
+                return WebFioriApp::getAppConfig()->getWebsiteNames();
+            }
             $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
             $c = new $constructor();
 

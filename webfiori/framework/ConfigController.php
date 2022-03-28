@@ -94,6 +94,7 @@ class ConfigController {
     private $docEnd;
     private $docStart;
     private $since10;
+    private $since101;
     /**
      * An instance of the class.
      * 
@@ -104,6 +105,7 @@ class ConfigController {
     private static $singleton;
     private function __construct() {
         $this->since10 = " * @since 1.0";
+        $this->since10 = " * @since 1.0.1";
         $this->docEnd = " */";
         $this->blockEnd = "}";
         $this->docStart = "/**";
@@ -909,7 +911,26 @@ class ConfigController {
         $this->a($cFile, "    public function addDbConnection(ConnectionInfo \$connectionInfo) {");
         $this->a($cFile, "        \$this->dbConnections[\$connectionInfo->getName()] = \$connectionInfo;");
         $this->a($cFile, $this->blockEnd, 1);
-
+        
+        $this->a($cFile, $this->docStart, 1);
+        $this->a($cFile, "     * Adds new language or update the info of existing one.");
+        $this->a($cFile, $this->docEmptyLine, 1);
+        $this->a($cFile, "     * @param string \$code The code of the language such as 'EN'.");
+        $this->a($cFile, $this->docEmptyLine, 1);
+        $this->a($cFile, "     * @param string \$siteName The name of the application in the given language.");
+        $this->a($cFile, $this->docEmptyLine, 1);
+        $this->a($cFile, "     * @param string \$defaultTitle The default title of a web page in the given language.");
+        $this->a($cFile, $this->docEmptyLine, 1);
+        $this->a($cFile, "     * @param string \$defaultDescription The default description of a web page in the given language.");
+        $this->a($cFile, $this->docEmptyLine, 1);
+        $this->a($cFile, $this->since101, 1);
+        $this->a($cFile, $this->docEnd, 1);
+        $this->a($cFile, "    public function addLanguage(\$code, \$siteName, \$defaultTitle, \$defaultDescription) {");
+        $this->a($cFile, "        \$this->webSiteNames['\$code'] = \$siteName;");
+        $this->a($cFile, "        \$this->descriptions['\$code'] = \$defaultDescription;");
+        $this->a($cFile, "        \$this->defaultPageTitles['\$code'] = \$defaultTitle;");
+        $this->a($cFile, $this->blockEnd, 1);
+        
         $this->a($cFile, $this->docStart, 1);
         $this->a($cFile, "     * Returns SMTP account given its name.");
         $this->a($cFile, $this->docEmptyLine, 1);

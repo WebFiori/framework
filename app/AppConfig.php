@@ -1,9 +1,10 @@
 <?php
+
 namespace app;
 
 use webfiori\database\ConnectionInfo;
-use webfiori\framework\Config;
 use webfiori\framework\mail\SMTPAccount;
+use webfiori\framework\Config;
 use webfiori\http\Uri;
 /**
  * Configuration class of the application
@@ -173,6 +174,24 @@ class AppConfig implements Config {
         $this->dbConnections[$connectionInfo->getName()] = $connectionInfo;
     }
     /**
+     * Adds new language or update the info of existing one.
+     * 
+     * @param string $code The code of the language such as 'EN'.
+     * 
+     * @param string $siteName The name of the application in the given language.
+     * 
+     * @param string $defaultTitle The default title of a web page in the given language.
+     * 
+     * @param string $defaultDescription The default description of a web page in the given language.
+     * 
+     * @since 1.0.1
+     */
+    public function addLanguage($code, $siteName, $defaultTitle, $defaultDescription) {
+        $this->webSiteNames[$code] = $siteName;
+        $this->descriptions[$code] = $defaultDescription;
+        $this->defaultPageTitles[$code] = $defaultTitle;
+    }
+    /**
      * Returns SMTP account given its name.
      * 
      * The method will search for an account with the given name in the set
@@ -276,7 +295,7 @@ class AppConfig implements Config {
     public function getDBConnection($conName) {
         $conns = $this->getDBConnections();
         $trimmed = trim($conName);
-
+        
         if (isset($conns[$trimmed])) {
             return $conns[$trimmed];
         }
@@ -309,7 +328,7 @@ class AppConfig implements Config {
     public function getDefaultTitle($langCode) {
         $langs = $this->getTitles();
         $langCodeF = strtoupper(trim($langCode));
-
+        
         if (isset($langs[$langCodeF])) {
             return $langs[$langCode];
         }
@@ -329,7 +348,6 @@ class AppConfig implements Config {
     public function getDescription($langCode) {
         $langs = $this->getDescriptions();
         $langCodeF = strtoupper(trim($langCode));
-
         if (isset($langs[$langCodeF])) {
             return $langs[$langCode];
         }
@@ -440,7 +458,7 @@ class AppConfig implements Config {
     public function getWebsiteName($langCode) {
         $langs = $this->getWebsiteNames();
         $langCodeF = strtoupper(trim($langCode));
-
+        
         if (isset($langs[$langCodeF])) {
             return $langs[$langCode];
         }
@@ -473,7 +491,7 @@ class AppConfig implements Config {
             'EN' => 'WebFiori',
             'AR' => 'ويب فيوري',
         ];
-
+    
         $this->defaultPageTitles = [
             'EN' => 'Hello World',
             'AR' => 'اهلا و سهلا',

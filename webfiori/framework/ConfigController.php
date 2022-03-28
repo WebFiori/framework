@@ -105,7 +105,7 @@ class ConfigController {
     private static $singleton;
     private function __construct() {
         $this->since10 = " * @since 1.0";
-        $this->since10 = " * @since 1.0.1";
+        $this->since101 = " * @since 1.0.1";
         $this->docEnd = " */";
         $this->blockEnd = "}";
         $this->docStart = "/**";

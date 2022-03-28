@@ -49,9 +49,27 @@ define('MICRO_START', microtime(true));
  * 
  * @author Ibrahim
  * 
- * @version 1.3.6
+ * @version 1.3.7
  */
 class WebFioriApp {
+    /**
+     * A constant that indicates that the status of the class is 'none'.
+     * 
+     * @since 1.3.7
+     */
+    const STATUS_NONE = 'NONE';
+    /**
+     * A constant that indicates that the status of the class is 'initialized'.
+     * 
+     * @since 1.3.7
+     */
+    const STATUS_INITIALIZED = 'INITIALIZED';
+    /**
+     * A constant that indicates that the status of the class is 'initializing'.
+     * 
+     * @since 1.3.7
+     */
+    const STATUS_INITIALIZING = 'INITIALIZING';
     /**
      * 
      * @var Config

@@ -20,6 +20,9 @@
             <file>./webfiori/framework/session/SessionsManager.php</file>
             <file>./webfiori/framework/session/DefaultSessionStorage.php</file>
             <file>./webfiori/framework/cli/CLICommand.php</file>
+            <file>./webfiori/framework/cli/CommandRunner.php</file>
+            <file>./webfiori/framework/cli/ArrayInputStream.php</file>
+            <file>./webfiori/framework/cli/ArrayOutputStream.php</file>
             <file>./webfiori/framework/cli/FileInputStream.php</file>
             <file>./webfiori/framework/cli/FileOutputStream.php</file>
             <file>./webfiori/framework/cli/commands/AddCommand.php</file>

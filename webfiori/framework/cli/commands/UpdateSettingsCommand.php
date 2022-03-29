@@ -88,6 +88,11 @@ class UpdateSettingsCommand extends CLICommand {
     }
     private function _updateCronPass() {
         $newPass = $this->getInput('Enter new password:', '');
+        if (strlen($newPass) == 0) {
+            $newPass = 'NO_PASSWORD';
+        } else {
+            $newPass = hash('sha256', $newPass);
+        }
         ConfigController::get()->updateCronPassword($newPass);
         $this->success('Password successfully updated.');
     }
@@ -104,7 +109,7 @@ class UpdateSettingsCommand extends CLICommand {
         ConfigController::get()->updateSiteInfo([
             'descriptions' => $descriptions
         ]);
-        $this->println('Description successfully updated.');
+        $this->success('Description successfully updated.');
     }
     private function _updateName() {
         $lang = $this->whichLang();
@@ -115,7 +120,7 @@ class UpdateSettingsCommand extends CLICommand {
             return strlen($trimmed) != 0;
         });
         $names = WebFioriApp::getAppConfig()->getWebsiteNames();
-        $names[$lang] = $newName;
+        $names[$lang] = trim($newName);
         ConfigController::get()->updateSiteInfo([
             'website-names' => $names
         ]);
@@ -127,7 +132,7 @@ class UpdateSettingsCommand extends CLICommand {
         ConfigController::get()->updateSiteInfo([
             'primary-lang' => $newPrimary
         ]);
-        $this->println('Primary language successfully updated.');
+        $this->success('Primary language successfully updated.');
     }
     private function _updateTitle() {
         $lang = $this->whichLang();
@@ -138,7 +143,7 @@ class UpdateSettingsCommand extends CLICommand {
             return strlen($trimmed) != 0;
         });
         $titles = WebFioriApp::getAppConfig()->getTitles();
-        $titles[$lang] = $newName;
+        $titles[$lang] = trim($newName);
         ConfigController::get()->updateSiteInfo([
             'titles' => $titles
         ]);
@@ -152,7 +157,7 @@ class UpdateSettingsCommand extends CLICommand {
         ConfigController::get()->updateSiteInfo([
             'title-sep' => $newSep
         ]);
-        $this->println('Title separator successfully updated.');
+        $this->success('Title separator successfully updated.');
     }
     private function _updateVersionInfo() {
         $versionNum = $this->getInput('Application version:', WebFioriApp::getAppConfig()->getVersion(), function ($val)

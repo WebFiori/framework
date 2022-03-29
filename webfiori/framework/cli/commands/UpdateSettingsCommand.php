@@ -89,7 +89,7 @@ class UpdateSettingsCommand extends CLICommand {
     private function _updateCronPass() {
         $newPass = $this->getInput('Enter new password:', '');
         ConfigController::get()->updateCronPassword($newPass);
-        $this->println('Password successfully updated.');
+        $this->success('Password successfully updated.');
     }
     private function _updateDescription() {
         $lang = $this->whichLang();
@@ -142,7 +142,7 @@ class UpdateSettingsCommand extends CLICommand {
         ConfigController::get()->updateSiteInfo([
             'titles' => $titles
         ]);
-        $this->println('Title successfully updated.');
+        $this->success('Title successfully updated.');
     }
     private function _updateTitleSep() {
         $newSep = $this->getInput('Enter new title separator string:', '|', function ($val)

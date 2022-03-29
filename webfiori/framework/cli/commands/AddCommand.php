@@ -95,7 +95,7 @@ class AddCommand extends CLICommand {
             $db->getConnection();
             $this->success('Connected. Adding the connection...');
 
-            WebFioriApp::getSysController()->addOrUpdateDBConnection($connInfoObj);
+            ConfigController::get()->addOrUpdateDBConnection($connInfoObj);
             $this->success('Connection information was stored in the class "'.APP_DIR_NAME.'\\AppConfig".');
         } catch (Exception $ex) {
             $this->error('Unable to connect to the database.');

@@ -35,58 +35,9 @@ use webfiori\framework\mail\SMTPAccount;
  *
  * @author Ibrahim
  * 
- * @version 1.5.2
+ * @version 1.5.3
  */
 class ConfigController {
-    /**
-     * A constant that indicates the selected database schema has tables.
-     * 
-     * @since 1.1
-     */
-    const DB_NOT_EMPTY = 'db_has_tables';
-
-    const DEFAULT_APP_CONFIG = [
-        'config-file-version' => '1.0',
-        'version-info' => [
-            'version' => '1.0',
-            'version-type' => 'Stable',
-            'release-date' => '2021-01-10'
-        ],
-        'site' => [
-            'base-url' => '',
-            'primary-language' => 'EN',
-            'title-separator' => '|',
-            'home-page' => 'index',
-            'admin-theme' => '\themes\newFiori\NewFiori',
-            'base-theme' => '\themes\newFiori\NewFiori',
-            'descriptions' => [
-                'EN' => '',
-                'AR' => ''
-            ],
-            'website-names' => [
-                'EN' => 'WebFiori',
-                'AR' => 'ويب فيوري'
-            ],
-            'titles' => [
-                'EN' => 'Hello World',
-                'AR' => 'اهلا و سهلا'
-            ],
-        ]
-    ];
-    /**
-     * A constant that indicates the given username or password  
-     * is invalid.
-     * 
-     * @since 1.1
-     */
-    const INV_CREDENTIALS = 'inv_username_or_pass';
-    /**
-     * A constant that indicates a mail server address or its port 
-     * is invalid.
-     * 
-     * @since 1.1
-     */
-    const INV_HOST_OR_PORT = 'inv_mail_host_or_port';
 
     const NL = "\n";
     private $blockEnd;
@@ -95,6 +46,7 @@ class ConfigController {
     private $docStart;
     private $since10;
     private $since101;
+    private $configVars;
     /**
      * An instance of the class.
      * 
@@ -103,6 +55,33 @@ class ConfigController {
      * @since 1.0 
      */
     private static $singleton;
+    /**
+     * Sets the configuration that will be used by the class.
+     * 
+     * @param Config $cfg
+     * 
+     * @since 1.5.3
+     */
+    public function setConfig(Config $cfg) {
+        $this->configVars['smtp-connections'] = $cfg->getAccounts();
+        $this->configVars['database-connections'] = $cfg->getDBConnections();
+        $this->configVars['version-info'] = [
+            'version' => $cfg->getVersion(),
+            'version-type' => $cfg->getVersionType(),
+            'release-date' => $cfg->getReleaseDate()
+        ];
+        $this->configVars['site'] = [
+            'base-url' => $cfg->getBaseURL(),
+            'primary-lang' => $cfg->getPrimaryLanguage(),
+            'title-sep' => $cfg->getTitleSep(),
+            'home-page' => $cfg->getHomePage(),
+            'admin-theme' => $cfg->getAdminThemeName(),
+            'base-theme' => $cfg->getBaseThemeName(),
+            'descriptions' => $cfg->getDescriptions(),
+            'website-names' => $cfg->getWebsiteNames(),
+            'titles' => $cfg->getTitles(),
+        ];
+    }
     private function __construct() {
         $this->since10 = " * @since 1.0";
         $this->since101 = " * @since 1.0.1";
@@ -110,6 +89,37 @@ class ConfigController {
         $this->blockEnd = "}";
         $this->docStart = "/**";
         $this->docEmptyLine = " * ";
+        $this->configVars = [
+            'config-file-version' => '1.0',
+            'smtp-connections' => [],
+            'database-connections' => [],
+            'cron-password' => 'NO_PASSWORD',
+            'version-info' => [
+                'version' => '1.0',
+                'version-type' => 'Stable',
+                'release-date' => '2021-01-10'
+            ],
+            'site' => [
+                'base-url' => '',
+                'primary-lang' => 'EN',
+                'title-sep' => '|',
+                'home-page' => null,
+                'admin-theme' => '\themes\newFiori\NewFiori',
+                'base-theme' => '\themes\newFiori\NewFiori',
+                'descriptions' => [
+                    'EN' => '',
+                    'AR' => ''
+                ],
+                'website-names' => [
+                    'EN' => 'WebFiori',
+                    'AR' => 'ويب فيوري'
+                ],
+                'titles' => [
+                    'EN' => 'Hello World',
+                    'AR' => 'اهلا و سهلا'
+                ],
+            ]
+        ];
     }
     /**
      * Adds new database connections information or update existing connections.
@@ -121,15 +131,12 @@ class ConfigController {
      * @since 1.4.3
      */
     public function addOrUpdateDBConnection(ConnectionInfo $dbConnectionsInfo) {
-        $connections = $this->getDatabaseConnections();
-        $connections[$dbConnectionsInfo->getName()] = $dbConnectionsInfo;
-        $this->writeAppConfig([
-            'db-connections' => $connections
-        ]);
+        $this->configVars['database-connections'][$dbConnectionsInfo->getName()] = $dbConnectionsInfo;
+        $this->writeAppConfig();
     }
     public function createAppConfigFile() {
         if (!class_exists(APP_DIR_NAME.'\AppConfig')) {
-            $this->writeAppConfig([]);
+            $this->writeAppConfig();
         }
     }
     /**
@@ -435,14 +442,8 @@ class ConfigController {
      * @since 1.0
      */
     public function getAdminTheme() {
-        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
-            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
-            $c = new $constructor();
 
-            return $c->getAdminThemeName();
-        }
-
-        return self::DEFAULT_APP_CONFIG['site']['admin-theme'];
+        return $this->configVars['site']['admin-theme'];
     }
     /**
      * Returns an associative array that holds application version info.
@@ -453,18 +454,8 @@ class ConfigController {
      * @since 1.5.2
      */
     public function getAppVersionInfo() {
-        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
-            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
-            $c = new $constructor();
 
-            return [
-                'version' => $c->getVersion(),
-                'version-type' => $c->getVersionType(),
-                'release-date' => $c->getReleaseDate()
-            ];
-        }
-
-        return self::DEFAULT_APP_CONFIG['version-info'];
+        return $this->configVars['version-info'];
     }
     /**
      * Returns the base URL which is use as a value for the tag &gt;base&lt;.
@@ -474,14 +465,8 @@ class ConfigController {
      * @since 1.0
      */
     public function getBase() {
-        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
-            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
-            $c = new $constructor();
 
-            return $c->getBaseURL();
-        }
-
-        return '';
+        return $this->configVars['site']['base-url'];
     }
     /**
      * Returns a string that represents the name of the base theme of the web 
@@ -492,14 +477,8 @@ class ConfigController {
      * @since 1.0
      */
     public function getBaseTheme() {
-        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
-            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
-            $c = new $constructor();
 
-            return $c->getBaseThemeName();
-        }
-
-        return self::DEFAULT_APP_CONFIG['site']['base-theme'];
+        return $this->configVars['site']['base-theme'];
     }
     /**
      * Returns password hash of the password which is used to protect background 
@@ -511,14 +490,8 @@ class ConfigController {
      * @since 1.5.2
      */
     public function getCRONPassword() {
-        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
-            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
-            $c = new $constructor();
 
-            return $c->getCRONPassword();
-        }
-
-        return 'NO_PASSWORD';
+        return $this->configVars['cron-password'];
     }
     /**
      * Returns an array that holds database connections.
@@ -529,14 +502,8 @@ class ConfigController {
      * @since 1.0
      */
     public function getDatabaseConnections() {
-        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
-            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
-            $c = new $constructor();
 
-            return $c->getDBConnections();
-        }
-
-        return [];
+        return $this->configVars['database-connections'];
     }
     /**
      * Returns an array that holds different descriptions for the web application 
@@ -548,17 +515,8 @@ class ConfigController {
      * @since 1.0
      */
     public function getDescriptions() {
-        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
-            if (WebFioriApp::getClassStatus() == WebFioriApp::STATUS_INITIALIZED) {
-                return WebFioriApp::getAppConfig()->getDescriptions();
-            }
-            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
-            $c = new $constructor();
 
-            return $c->getDescriptions();
-        }
-
-        return self::DEFAULT_APP_CONFIG['site']['descriptions'];
+        return $this->configVars['site']['descriptions'];
     }
     /**
      * Returns a link that represents the home page of the web application.
@@ -568,12 +526,7 @@ class ConfigController {
      * @since 1.0
      */
     public function getHomePage() {
-        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
-            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
-            $c = new $constructor();
-
-            return $c->getHomePage();
-        }
+        $this->configVars['site']['home-page'];
 
         return null;
     }
@@ -585,14 +538,8 @@ class ConfigController {
      * @since 1.0
      */
     public function getPrimaryLang() {
-        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
-            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
-            $c = new $constructor();
 
-            return $c->getPrimaryLanguage();
-        }
-
-        return self::DEFAULT_APP_CONFIG['site']['primary-language'];
+        return $this->configVars['site']['primary-lang'];
     }
     /**
      * Returns an associative array that contains web site configuration 
@@ -605,12 +552,12 @@ class ConfigController {
      * will be the name of the web site in the given language.</li>
      * <li><b>base-url</b>: The URL at which system pages will be served from. 
      * usually, this URL is used in the tag 'base' of the web page.</li>
-     * <li><b>title-separator</b>: A character or a string that is used 
+     * <li><b>title-sep</b>: A character or a string that is used 
      * to separate web site name from web page title.</li>
      * <li><b>home-page</b>: The URL of the home page of the web site.</li>
      * <li><b>base-theme</b>: The name of the theme that will be used to style 
      * web site UI.</li>
-     * <li><b>primary-language</b>: Primary language of the website.
+     * <li><b>primary-lang</b>: Primary language of the website.
      * <li><b>admin-theme</b>: The name of the theme that is used to style 
      * admin web pages.</li>
      * <li><b>descriptions</b>: A sub associative array. The index of the 
@@ -623,18 +570,8 @@ class ConfigController {
      * @since 1.0
      */
     public function getSiteConfigVars() {
-        $cfgArr = self::DEFAULT_APP_CONFIG['site'];
-        $cfgArr['website-names'] = $this->getWebsiteNames();
-        $cfgArr['base-url'] = $this->getBase();
-        $cfgArr['title-separator'] = $this->getTitleSep();
-        $cfgArr['home-page'] = $this->getHomePage();
-        $cfgArr['primary-language'] = $this->getHomePage();
-        $cfgArr['descriptions'] = $this->getDescriptions();
-        $cfgArr['titles'] = $this->getTitles();
-        $cfgArr['base-theme'] = $this->getBaseTheme();
-        $cfgArr['admin-theme'] = $this->getAdminTheme();
 
-        return $cfgArr;
+        return $this->configVars['site'];
     }
     /**
      * Returns an array that holds SMTP connections.
@@ -645,14 +582,8 @@ class ConfigController {
      * @since 1.0
      */
     public function getSMTPAccounts() {
-        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
-            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
-            $c = new $constructor();
 
-            return $c->getAccounts();
-        }
-
-        return [];
+        return $this->configVars['smtp-connections'];
     }
     /**
      * Returns an array that holds different page titles for the web application 
@@ -664,17 +595,8 @@ class ConfigController {
      * @since 1.0
      */
     public function getTitles() {
-        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
-            if (WebFioriApp::getClassStatus() == WebFioriApp::STATUS_INITIALIZED) {
-                return WebFioriApp::getAppConfig()->getTitles();
-            }
-            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
-            $c = new $constructor();
 
-            return $c->getTitles();
-        }
-
-        return self::DEFAULT_APP_CONFIG['site']['titles'];
+        return $this->configVars['site']['titles'];
     }
     /**
      * Returns a string that represents the string that will be used to separate 
@@ -685,14 +607,8 @@ class ConfigController {
      * @since 1.0
      */
     public function getTitleSep() {
-        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
-            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
-            $c = new $constructor();
 
-            return $c->getTitleSep();
-        }
-
-        return self::DEFAULT_APP_CONFIG['site']['title-separator'];
+        return $this->configVars['site']['title-sep'];
     }
     /**
      * Returns an array that holds different names for the web application 
@@ -704,17 +620,8 @@ class ConfigController {
      * @since 1.0
      */
     public function getWebsiteNames() {
-        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
-            if (WebFioriApp::getClassStatus() == WebFioriApp::STATUS_INITIALIZED) {
-                return WebFioriApp::getAppConfig()->getWebsiteNames();
-            }
-            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
-            $c = new $constructor();
 
-            return $c->getWebsiteNames();
-        }
-
-        return self::DEFAULT_APP_CONFIG['site']['website-names'];
+        return $this->configVars['site']['website-names'];
     }
     /**
      * Removes SMTP email account if it is exist.
@@ -724,14 +631,11 @@ class ConfigController {
      * @since 1.3
      */
     public function removeAccount($accountName) {
-        $accounts = $this->getSMTPAccounts();
 
-        if (isset($accounts[$accountName])) {
-            unset($accounts[$accountName]);
+        if (isset($this->configVars['smtp-connections'][$accountName])) {
+            unset($this->configVars['smtp-connections'][$accountName]);
         }
-        $this->writeAppConfig([
-            'smtp' => $accounts
-        ]);
+        $this->writeAppConfig();
     }
     /**
      * Removes database connection given its name.
@@ -753,9 +657,8 @@ class ConfigController {
                 $updated[] = $conObj;
             }
         }
-        $this->writeAppConfig([
-            'db-connections' => $updated
-        ]);
+        $this->configVars['database-connections'] = $updated;
+        $this->writeAppConfig();
     }
     /**
      * Update application version information.
@@ -769,13 +672,12 @@ class ConfigController {
      * @since 1.5.2
      */
     public function updateAppVersionInfo($vNum, $vType, $releaseDate) {
-        $this->writeAppConfig([
-            'version-info' => [
-                'version' => $vNum,
-                'version-type' => $vType,
-                'release-date' => $releaseDate
-            ]
-        ]);
+        $this->configVars['version-info'] = [
+            'version' => $vNum,
+            'version-type' => $vType,
+            'release-date' => $releaseDate
+        ];
+        $this->writeAppConfig();
     }
     /**
      * Updates the password which is used to protect cron jobs from unauthorized 
@@ -787,9 +689,8 @@ class ConfigController {
      * @since 1.5.2
      */
     public function updateCronPassword($newPass) {
-        $this->writeAppConfig([
-            'cron-pass' => $newPass
-        ]);
+        $this->configVars['cron-password'] = $newPass;
+        $this->writeAppConfig();
     }
     /**
      * Adds new SMTP account or Updates an existing one.
@@ -803,11 +704,8 @@ class ConfigController {
      * @since 1.1
      */
     public function updateOrAddEmailAccount(SMTPAccount $emailAccount) {
-        $accountsArr = $this->getSMTPAccounts();
-        $accountsArr[$emailAccount->getAccountName()] = $emailAccount;
-        $this->writeAppConfig([
-            'smtp' => $accountsArr
-        ]);
+        $this->configVars[$emailAccount->getAccountName()] = $emailAccount;
+        $this->writeAppConfig();
     }
     /**
      * Updates web site configuration based on some attributes.
@@ -838,41 +736,25 @@ class ConfigController {
      * @since 1.0
      */
     public function updateSiteInfo($websiteInfoArr) {
-        $this->writeAppConfig($websiteInfoArr);
+        $keys = array_keys($this->configVars['site']);
+        $updated = [];
+        
+        foreach ($keys as $key) {
+            if (isset($websiteInfoArr[$key])) {
+                $updated[$key] = $websiteInfoArr[$key];
+            } else {
+                $updated[$key] = $this->configVars['site'][$key];
+            }
+        }
+        $this->configVars['site'] = $updated;
+        $this->writeAppConfig();
     }
     /**
      * Stores configuration variables into the application configuration class.
      * 
-     * @param array $appConfigArr An array that holds configuration vatiables. 
-     * The array can have the following indices:
-     * <ul>
-     * <li><b>db-connections</b>: An array that holds objects of type 
-     * 'ConnectionInfo'.</li>
-     * <li><b>smtp</b>: An array that holds objects of type 'SMTPAccount' that 
-     * holds SMTP connection information.</li>
-     * <li><b>website-names</b>: An associative array that holds website names 
-     * in different display languages. The index should be language code such 
-     * as 'EN' and the value of the index is website name in that language.</li>
-     * <li><b>titles</b>: An associative array that holds default page titles 
-     * in different display languages. The index should be language code such 
-     * as 'EN' and the value of the index is page title in that language.</li>
-     * <li><b>descriptions</b>: An associative array that holds page descriptions 
-     * in different display languages. The index should be language code such 
-     * as 'EN' and the value of the index is page description in that language.</li>
-     * <li><b>home-page</b>: A link that represents home page of the website.</li>
-     * <li><b>primary-lang</b>: The primary display language of the website.</li>
-     * <li><b>base-theme</b>: The name of the theme that will be used in the 
-     * pages that will be shown to all users (public and private)</li>
-     * <li><b>admin-theme</b>: The name of the theme that will be shown 
-     * in control pages of the system.</li>
-     * <li><b>cron-pass</b>: The password which is used to protect cron jobs 
-     * fron unauthorized access. If empty string is given, the string 
-     * 'NO_PASSWORD' is used.</li>
-     * </ul>
-     * 
      * @since 1.5
      */
-    public function writeAppConfig($appConfigArr) {
+    public function writeAppConfig() {
         $cFile = new File('AppConfig.php', ROOT_DIR.DS.APP_DIR_NAME);
         $cFile->remove();
 
@@ -891,7 +773,7 @@ class ConfigController {
         $this->a($cFile, "        \$this->initSmtpConnections();");
 
 
-        $this->_writeCronPass($cFile, $appConfigArr);
+        $this->_writeCronPass($cFile);
 
         $this->a($cFile, $this->blockEnd, 1);
 
@@ -1246,11 +1128,11 @@ class ConfigController {
         $this->a($cFile, "    public function getWebsiteNames() {");
         $this->a($cFile, "        return \$this->webSiteNames;");
         $this->a($cFile, $this->blockEnd, 1);
-
-        $this->_writeDbCon($cFile, $appConfigArr);
-        $this->_writeSiteInfo($cFile, $appConfigArr);
-        $this->_writeSmtpConn($cFile, $appConfigArr);
-        $this->_writeAppVersionInfo($cFile, $appConfigArr);
+        
+        $this->_writeDbCon($cFile);
+        $this->_writeSiteInfo($cFile);
+        $this->_writeSmtpConn($cFile);
+        $this->_writeAppVersionInfo($cFile);
 
         $this->a($cFile, "}");
         $cFile->write(false, true);
@@ -1416,7 +1298,7 @@ class ConfigController {
         $this->a($cFile, $this->docEnd, 1);
         $this->a($cFile, "    private \$webSiteNames;");
     }
-    private function _writeAppVersionInfo(&$cFile, $appConfigArr) {
+    private function _writeAppVersionInfo(&$cFile) {
         $this->a($cFile, [
             $this->docStart,
             $this->since10,
@@ -1427,58 +1309,28 @@ class ConfigController {
 
         $versionInfo = $this->getAppVersionInfo();
 
-        if (isset($appConfigArr['version-info'])) {
-            if (isset($appConfigArr['version-info']['version'])) {
-                $this->a($cFile, "\$this->appVestion = '".$appConfigArr['version-info']['version']."';", 2);
-            } else {
-                $this->a($cFile, "\$this->appVestion = '".$versionInfo['version']."';", 2);
-            }
-
-            if (isset($appConfigArr['version-info']['version-type'])) {
-                $this->a($cFile, "\$this->appVersionType = '".$appConfigArr['version-info']['version-type']."';", 2);
-            } else {
-                $this->a($cFile, "\$this->appVersionType = '".$versionInfo['version-type']."';", 2);
-            }
-
-            if (isset($appConfigArr['version-info']['release-date'])) {
-                $this->a($cFile, "\$this->appReleaseDate = '".$appConfigArr['version-info']['release-date']."';", 2);
-            } else {
-                $this->a($cFile, "\$this->appReleaseDate = '".$versionInfo['release-date']."';", 2);
-            }
-        } else {
-            $this->a($cFile, [
-                "\$this->appVestion = '".$versionInfo['version']."';",
-                "\$this->appVersionType = '".$versionInfo['version-type']."';",
-                "\$this->appReleaseDate = '".$versionInfo['release-date']."';"
-            ], 2);
-        }
+        $this->a($cFile, [
+            "\$this->appVestion = '".$versionInfo['version']."';",
+            "\$this->appVersionType = '".$versionInfo['version-type']."';",
+            "\$this->appReleaseDate = '".$versionInfo['release-date']."';"
+        ], 2);
 
         $this->a($cFile, $this->blockEnd, 1);
     }
-    private function _writeCronPass(&$cFile, $appConfigArr) {
-        if (isset($appConfigArr['cron-pass'])) {
-            if (strlen(trim($appConfigArr['cron-pass'])) == 0) {
-                $this->a($cFile, "        \$this->cronPass = 'NO_PASSWORD';");
-            } else {
-                $this->a($cFile, "        \$this->cronPass = '".hash('sha256', $appConfigArr['cron-pass'])."';");
-            }
-        } else {
-            $password = $this->getCRONPassword();
-            $this->a($cFile, "        \$this->cronPass = '".$password."';");
-        }
+    private function _writeCronPass(&$cFile) {
+        
+        $password = $this->getCRONPassword();
+        $this->a($cFile, "        \$this->cronPass = '".$password."';");
     }
-    private function _writeDbCon(&$cFile, $appConfigArr) {
+    private function _writeDbCon(&$cFile) {
         $this->a($cFile, $this->docStart, 1);
         $this->a($cFile, $this->since10, 1);
         $this->a($cFile, $this->docEnd, 1);
         $this->a($cFile, "    private function initDbConnections() {");
         $this->a($cFile, "        \$this->dbConnections = [");
 
-        if (isset($appConfigArr['db-connections']) && gettype($appConfigArr['db-connections']) == 'array') {
-            $dbCons = $appConfigArr['db-connections'];
-        } else {
-            $dbCons = $this->getDatabaseConnections();
-        }
+        
+        $dbCons = $this->getDatabaseConnections();
 
         foreach ($dbCons as $connObj) {
             if ($connObj instanceof ConnectionInfo) {
@@ -1496,12 +1348,9 @@ class ConfigController {
         $this->a($cFile, "        ];");
         $this->a($cFile, $this->blockEnd, 1);
     }
-    private function _writeSiteDescriptions(&$cFile, $appConfigArr) {
-        if (isset($appConfigArr['descriptions']) && gettype($appConfigArr['descriptions']) == 'array') {
-            $descArr = $appConfigArr['descriptions'];
-        } else {
-            $descArr = $this->getDescriptions();
-        }
+    private function _writeSiteDescriptions(&$cFile) {
+        
+        $descArr = $this->getDescriptions();
         $this->a($cFile, "        \$this->descriptions = [");
 
         foreach ($descArr as $langCode => $desc) {
@@ -1510,37 +1359,26 @@ class ConfigController {
         }
         $this->a($cFile, "        ];");
     }
-    private function _writeSiteInfo(&$cFile,  $appConfigArr) {
+    private function _writeSiteInfo(&$cFile) {
         $this->a($cFile, $this->docStart, 1);
         $this->a($cFile, $this->since10, 1);
         $this->a($cFile, $this->docEnd, 1);
         $this->a($cFile, "    private function initSiteInfo() {");
 
-        $this->_writeSiteNames($cFile, $appConfigArr);
-        $this->_writeSiteTitles($cFile, $appConfigArr);
-        $this->_writeSiteDescriptions($cFile, $appConfigArr);
-
+        $this->_writeSiteNames($cFile);
+        $this->_writeSiteTitles($cFile);
+        $this->_writeSiteDescriptions($cFile);
+        
         $this->a($cFile, "        \$this->baseUrl = Uri::getBaseURL();");
 
-        if (isset($appConfigArr['title-sep'])) {
-            $sep = $appConfigArr['title-sep'];
-        } else {
-            $sep = $this->getTitleSep();
-        }
+        $sep = $this->getTitleSep();
         $this->a($cFile, "        \$this->titleSep = '$sep';");
 
-        if (isset($appConfigArr['primary-lang'])) {
-            $lang = $appConfigArr['primary-lang'];
-        } else {
-            $lang = $this->getPrimaryLang();
-        }
+        $lang = $this->getPrimaryLang();
         $this->a($cFile, "        \$this->primaryLang = '$lang';");
 
-        if (isset($appConfigArr['base-theme'])) {
-            $baseTheme = $appConfigArr['base-theme'];
-        } else {
-            $baseTheme = $this->getBaseTheme();
-        }
+        
+        $baseTheme = $this->getBaseTheme();
 
         if (class_exists($baseTheme)) {
             $this->a($cFile, "        \$this->baseThemeName = \\".trim($baseTheme, '\\')."::class;");
@@ -1548,11 +1386,8 @@ class ConfigController {
             $this->a($cFile, "        \$this->baseThemeName = '$baseTheme';");
         }
 
-        if (isset($appConfigArr['admin-theme'])) {
-            $adminTheme = $appConfigArr['admin-theme'];
-        } else {
-            $adminTheme = $this->getBaseTheme();
-        }
+        $adminTheme = $this->getBaseTheme();
+        
 
         if (class_exists($adminTheme)) {
             $this->a($cFile, "        \$this->adminThemeName = \\".trim($adminTheme, '\\')."::class;");
@@ -1560,26 +1395,20 @@ class ConfigController {
             $this->a($cFile, "        \$this->adminThemeName = '$adminTheme';");
         }
 
-        if (isset($appConfigArr['home-page'])) {
-            $this->a($cFile, "        \$this->homePage = '".$appConfigArr['home-page']."';");
-        } else {
-            $home = $this->getHomePage();
+        
+        $home = $this->getHomePage();
 
-            if ($home === null) {
-                $this->a($cFile, "        \$this->homePage = Uri::getBaseURL();");
-            } else {
-                $this->a($cFile, "        \$this->homePage = '$home';");
-            }
+        if ($home === null) {
+            $this->a($cFile, "        \$this->homePage = Uri::getBaseURL();");
+        } else {
+            $this->a($cFile, "        \$this->homePage = '$home';");
         }
+        
 
         $this->a($cFile, $this->blockEnd, 1);
     }
-    private function _writeSiteNames(&$cFile, $appConfigArr) {
-        if (isset($appConfigArr['website-names']) && gettype($appConfigArr['website-names']) == 'array') {
-            $wNamesArr = $appConfigArr['website-names'];
-        } else {
-            $wNamesArr = $this->getWebsiteNames();
-        }
+    private function _writeSiteNames(&$cFile) {
+        $wNamesArr = $this->getWebsiteNames();
         $this->a($cFile, "        \$this->webSiteNames = [");
 
         foreach ($wNamesArr as $langCode => $name) {
@@ -1589,12 +1418,8 @@ class ConfigController {
         $this->a($cFile, "        ];");
         $this->a($cFile, "    ");
     }
-    private function _writeSiteTitles($cFile, $appConfigArr) {
-        if (isset($appConfigArr['titles']) && gettype($appConfigArr['titles']) == 'array') {
-            $titlesArr = $appConfigArr['titles'];
-        } else {
-            $titlesArr = $this->getTitles();
-        }
+    private function _writeSiteTitles($cFile) {
+        $titlesArr = $this->getTitles();
         $this->a($cFile, "        \$this->defaultPageTitles = [");
 
         foreach ($titlesArr as $langCode => $title) {
@@ -1613,18 +1438,14 @@ class ConfigController {
         }
         $this->a($cFile, "        ];");
     }
-    private function _writeSmtpConn(&$cFile, $appConfigArr) {
+    private function _writeSmtpConn(&$cFile) {
         $this->a($cFile, $this->docStart, 1);
         $this->a($cFile, $this->since10, 1);
         $this->a($cFile, $this->docEnd, 1);
         $this->a($cFile, "    private function initSmtpConnections() {");
         $this->a($cFile, "        \$this->emailAccounts = [");
 
-        if (isset($appConfigArr['smtp']) && gettype($appConfigArr['smtp']) == 'array') {
-            $smtpAccArr = $appConfigArr['smtp'];
-        } else {
-            $smtpAccArr = $this->getSMTPAccounts();
-        }
+        $smtpAccArr = $this->getSMTPAccounts();
 
         foreach ($smtpAccArr as $smtpAcc) {
             if ($smtpAcc instanceof SMTPAccount) {

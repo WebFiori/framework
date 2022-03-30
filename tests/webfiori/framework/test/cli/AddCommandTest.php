@@ -7,6 +7,7 @@ use webfiori\framework\cli\CommandRunner;
 use webfiori\framework\cli\commands\AddCommand;
 use webfiori\framework\WebFioriApp;
 use webfiori\framework\File;
+use webfiori\framework\ConfigController;
 /**
  * Description of TestAddCommand
  *
@@ -177,15 +178,15 @@ class AddCommandTest extends TestCase {
         ], $this));
         $this->assertTrue(class_exists('\\app\\langs\\LanguageFK'));
         $this->removeClass('\\app\\langs\\LanguageFK');
+        ConfigController::get()->resetConfig();
     }
     /**
      * @test
-     * @depends testAddLang00
      */
     public function testAddLang01() {
         $runner = new CommandRunner([
             '2',
-            'FK',
+            'EN',
         ]);
         $runner->runCommand(new AddCommand());
         $this->assertEquals(0, $runner->getExitStatus());
@@ -198,6 +199,7 @@ class AddCommandTest extends TestCase {
             "Language code:\n",
             "Info: This language already added. Nothing changed.\n",
         ], $this));
+        ConfigController::get()->resetConfig();
     }
     /**
      * @test

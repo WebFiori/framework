@@ -174,24 +174,6 @@ class AppConfig implements Config {
         $this->dbConnections[$connectionInfo->getName()] = $connectionInfo;
     }
     /**
-     * Adds new language or update the info of existing one.
-     * 
-     * @param string $code The code of the language such as 'EN'.
-     * 
-     * @param string $siteName The name of the application in the given language.
-     * 
-     * @param string $defaultTitle The default title of a web page in the given language.
-     * 
-     * @param string $defaultDescription The default description of a web page in the given language.
-     * 
-     * @since 1.0.1
-     */
-    public function addLanguage($code, $siteName, $defaultTitle, $defaultDescription) {
-        $this->webSiteNames[$code] = $siteName;
-        $this->descriptions[$code] = $defaultDescription;
-        $this->defaultPageTitles[$code] = $defaultTitle;
-    }
-    /**
      * Returns SMTP account given its name.
      * 
      * The method will search for an account with the given name in the set

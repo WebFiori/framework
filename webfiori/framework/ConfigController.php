@@ -576,6 +576,10 @@ class ConfigController {
 
         return $this->configVars['smtp-connections'];
     }
+    public function resetConfig() {
+        self::get()->setConfig(WebFioriApp::getAppConfig());
+        $this->writeAppConfig();
+    }
     /**
      * Returns an array that holds different page titles for the web application 
      * on different languages.
@@ -792,25 +796,6 @@ class ConfigController {
         $this->a($cFile, $this->docEnd, 1);
         $this->a($cFile, "    public function addDbConnection(ConnectionInfo \$connectionInfo) {");
         $this->a($cFile, "        \$this->dbConnections[\$connectionInfo->getName()] = \$connectionInfo;");
-        $this->a($cFile, $this->blockEnd, 1);
-        
-        $this->a($cFile, $this->docStart, 1);
-        $this->a($cFile, "     * Adds new language or update the info of existing one.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * @param string \$code The code of the language such as 'EN'.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * @param string \$siteName The name of the application in the given language.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * @param string \$defaultTitle The default title of a web page in the given language.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * @param string \$defaultDescription The default description of a web page in the given language.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, $this->since101, 1);
-        $this->a($cFile, $this->docEnd, 1);
-        $this->a($cFile, "    public function addLanguage(\$code, \$siteName, \$defaultTitle, \$defaultDescription) {");
-        $this->a($cFile, "        \$this->webSiteNames[\$code] = \$siteName;");
-        $this->a($cFile, "        \$this->descriptions[\$code] = \$defaultDescription;");
-        $this->a($cFile, "        \$this->defaultPageTitles[\$code] = \$defaultTitle;");
         $this->a($cFile, $this->blockEnd, 1);
         
         $this->a($cFile, $this->docStart, 1);

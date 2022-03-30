@@ -55,7 +55,6 @@ interface Config {
      * @since 1.0
      */
     public function addDbConnection(ConnectionInfo $connectionInfo);
-    public function addLanguage($code, $siteName, $defaultTitle, $defaultDescription);
     /**
      * Returns SMTP account given its name.
      * 

@@ -132,7 +132,6 @@ class AddCommand extends CLICommand {
         $writer->writeClass();
         $this->success('Language added. Also, a class for the language '
                 .'is created at "'.APP_DIR_NAME.'\langs" for that language.');
-        WebFioriApp::getAppConfig()->addLanguage($langCode, $siteInfo['website-names'][$langCode], $siteInfo['titles'][$langCode], $siteInfo['descriptions'][$langCode]);
     }
     private function _addSmtp() {
         $smtpConn = new SMTPAccount();

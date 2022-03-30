@@ -69,22 +69,26 @@ class UpdateSettingsCommand extends CLICommand {
         ConfigController::get()->updateSiteInfo([
             'admin-theme' => $classNs
         ]);
-        $this->println('Admin theme successfully updated.');
+        $this->success('Admin theme successfully updated.');
     }
     private function _setHome() {
         $routes = array_keys(Router::routes());
+        if (count($routes) == 0) {
+            $this->info('Router has no routes. Nothing to change.');
+            return;
+        }
         $home = $this->select('Select home page route:', $routes);
         ConfigController::get()->updateSiteInfo([
             'home-page' => trim($home, Router::base())
         ]);
-        $this->println('Home page successfully updated.');
+        $this->success('Home page successfully updated.');
     }
     private function _setPrimaryTheme() {
         $classNs = $this->getThemeNs();
         ConfigController::get()->updateSiteInfo([
             'base-theme' => $classNs
         ]);
-        $this->println('Primary theme successfully updated.');
+        $this->success('Primary theme successfully updated.');
     }
     private function _updateCronPass() {
         $newPass = $this->getInput('Enter new password:', '');

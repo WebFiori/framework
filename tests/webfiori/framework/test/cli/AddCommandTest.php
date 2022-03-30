@@ -12,7 +12,7 @@ use webfiori\framework\File;
  *
  * @author Ibrahim
  */
-class TestAddCommand extends TestCase {
+class AddCommandTest extends TestCase {
     /**
      * @test
      */

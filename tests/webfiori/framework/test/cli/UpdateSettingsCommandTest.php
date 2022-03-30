@@ -12,7 +12,7 @@ use webfiori\framework\ConfigController;
  *
  * @author Ibrahim
  */
-class TestUpdateSettingsCommand extends TestCase {
+class UpdateSettingsCommandTest extends TestCase {
     /**
      * @test
      */

@@ -343,7 +343,7 @@ class TestUpdateSettingsCommand extends TestCase {
      */
     public function testUpdateHomePage00() {
         $runner = new CommandRunner([
-            '10',
+            '7',
         ]);
         $runner->runCommand(new UpdateSettingsCommand());
         $this->assertEquals(0, $runner->getExitStatus());
@@ -360,6 +360,7 @@ class TestUpdateSettingsCommand extends TestCase {
             "8: Set primay theme.\n",
             "9: Set admin theme.\n",
             "10: Quit. <--\n",
+            "Info: Router has no routes. Nothing to change.\n",
         ], $this));
     }
     /**
@@ -367,7 +368,8 @@ class TestUpdateSettingsCommand extends TestCase {
      */
     public function testUpdatePrimaryTheme00() {
         $runner = new CommandRunner([
-            '10',
+            '8',
+            'themes\\greeny\\GreenyTheme'
         ]);
         $runner->runCommand(new UpdateSettingsCommand());
         $this->assertEquals(0, $runner->getExitStatus());
@@ -384,14 +386,52 @@ class TestUpdateSettingsCommand extends TestCase {
             "8: Set primay theme.\n",
             "9: Set admin theme.\n",
             "10: Quit. <--\n",
+            "Enter theme class name with namespace:\n",
+            "Success: Primary theme successfully updated.\n"
         ], $this));
+        $this->assertEquals('themes\\greeny\\GreenyTheme', ConfigController::get()->getBaseTheme());
+    }
+    /**
+     * @test
+     */
+    public function testUpdatePrimaryTheme01() {
+        $runner = new CommandRunner([
+            '8',
+            'themes\\greeny\\NotATheme',
+            '',
+            'themes\\greeny\\GreenyTheme'
+        ]);
+        $runner->runCommand(new UpdateSettingsCommand());
+        $this->assertEquals(0, $runner->getExitStatus());
+        $this->assertTrue($runner->isOutputEquals([
+            "What would you like to update?\n",
+            "0: Update application version info.\n",
+            "1: Update application name.\n",
+            "2: Update CRON password.\n",
+            "3: Update default page title.\n",
+            "4: Update default page description.\n",
+            "5: Change primary language.\n",
+            "6: Change title separator.\n",
+            "7: Set home page.\n",
+            "8: Set primay theme.\n",
+            "9: Set admin theme.\n",
+            "10: Quit. <--\n",
+            "Enter theme class name with namespace:\n",
+            "Error: Invalid input is given. Try again.\n",
+            "Enter theme class name with namespace:\n",
+            "Error: Invalid input is given. Try again.\n",
+            "Enter theme class name with namespace:\n",
+            "Success: Primary theme successfully updated.\n"
+        ], $this));
+        $this->assertEquals('themes\\greeny\\GreenyTheme', ConfigController::get()->getBaseTheme());
     }
     /**
      * @test
      */
     public function testUpdateAdminTheme00() {
         $runner = new CommandRunner([
-            '10',
+            '9',
+            'themes\\greeny\\GreenyTheme'
         ]);
         $runner->runCommand(new UpdateSettingsCommand());
         $this->assertEquals(0, $runner->getExitStatus());
@@ -408,6 +448,43 @@ class TestUpdateSettingsCommand extends TestCase {
             "8: Set primay theme.\n",
             "9: Set admin theme.\n",
             "10: Quit. <--\n",
+            "Enter theme class name with namespace:\n",
+            "Success: Admin theme successfully updated.\n"
         ], $this));
+        $this->assertEquals('themes\\greeny\\GreenyTheme', ConfigController::get()->getAdminTheme());
+    }
+    /**
+     * @test
+     */
+    public function testUpdateAdminTheme01() {
+        $runner = new CommandRunner([
+            '9',
+            'themes\\greeny\\NotATheme',
+            '',
+            'themes\\greeny\\GreenyTheme'
+        ]);
+        $runner->runCommand(new UpdateSettingsCommand());
+        $this->assertEquals(0, $runner->getExitStatus());
+        $this->assertTrue($runner->isOutputEquals([
+            "What would you like to update?\n",
+            "0: Update application version info.\n",
+            "1: Update application name.\n",
+            "2: Update CRON password.\n",
+            "3: Update default page title.\n",
+            "4: Update default page description.\n",
+            "5: Change primary language.\n",
+            "6: Change title separator.\n",
+            "7: Set home page.\n",
+            "8: Set primay theme.\n",
+            "9: Set admin theme.\n",
+            "10: Quit. <--\n",
+            "Enter theme class name with namespace:\n",
+            "Error: Invalid input is given. Try again.\n",
+            "Enter theme class name with namespace:\n",
+            "Error: Invalid input is given. Try again.\n",
+            "Enter theme class name with namespace:\n",
+            "Success: Admin theme successfully updated.\n"
+        ], $this));
+        $this->assertEquals('themes\\greeny\\GreenyTheme', ConfigController::get()->getAdminTheme());
     }
 }

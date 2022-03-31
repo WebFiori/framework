@@ -48,6 +48,8 @@ jobs:
           
       - name: Start MySQL
         run: |
+          sudo chmod -R u+rwx /etc/mysql/
+          sudo chown -R mysql.mysql /etc/mysql/
           sudo systemctl start mysql
         
       - name: Update MySQL Auth Method

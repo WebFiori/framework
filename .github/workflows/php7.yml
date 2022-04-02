@@ -45,7 +45,7 @@ jobs:
       - name: Show MySQL Version
         run: |
           sudo systemctl start mysql.service
-          mysql -uroot -p123456 -v
+          mysql -uroot -proot -v
         
       - name: Shutdown Ubuntu MySQL
         run: sudo service mysql stop

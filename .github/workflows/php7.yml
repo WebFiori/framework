@@ -45,7 +45,7 @@ jobs:
       - name: Show MySQL Version
         run: |
           sudo systemctl start mysql.service
-          while ! root ping --host=127.0.0.1 --password=root --silent; do
+          while ! mysqladmin ping --host=127.0.0.1 --password=root --silent; do
             sleep 1
           done
         

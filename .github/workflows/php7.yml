@@ -15,8 +15,6 @@ jobs:
         env:
           MYSQL_ROOT_PASSWORD: root
           MYSQL_DATABASE: testing_db
-          MYSQL_USER: root
-          MYSQL_PASSWORD: root
         ports:
           - 33306:3306
         options: >-
@@ -44,7 +42,7 @@ jobs:
           extensions: mysqli, mbstring
           tools: phpunit:5.7.27, composer
       
-      - name: Setup MySQL
+      - name: Start MySQL
         run: |
           sudo systemctl start mysql.service
           while ! mysqladmin ping --host=127.0.0.1 --password=root --silent; do

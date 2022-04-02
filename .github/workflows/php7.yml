@@ -43,7 +43,9 @@ jobs:
           tools: phpunit:5.7.27, composer
       
       - name: Show MySQL Version
-        run: mysql -v
+        run: |
+          sudo systemctl start mysql.service
+          mysql -v
         
       - name: Shutdown Ubuntu MySQL
         run: sudo service mysql stop

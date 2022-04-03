@@ -144,7 +144,7 @@ class AddCommandTest extends TestCase {
             "Error: Unable to connect to the database.\n",
             "Error: Unable to connect to database: 1045 - Access denied for user 'root'@'localhost' (using password: YES)\n",
             "Would you like to store connection information anyway?(y/N)\n",
-            "Connection information was stored in the class \"".APP_DIR_NAME."\\AppConfig\"."
+            "Success: Connection information was stored in the class \"".APP_DIR_NAME."\\AppConfig\"."
         ], $this));
     }
     /**

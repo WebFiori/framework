@@ -103,7 +103,7 @@ class AddCommandTest extends TestCase {
             "Give your connection a friendly name: Enter = \"$connName\"\n",
             "Trying to connect to the database...\n",
             "Error: Unable to connect to the database.\n",
-            "Error: Unable to connect to database: 1045 - Access denied for user 'root'@'localhost' (using password: YES)\n",
+            "Error: Unable to connect to database: 1045 - Access denied for user 'root'@'".getHostByName(getHostName())."' (using password: YES)\n",
             "Would you like to store connection information anyway?(y/N)\n"
         ], $this));
     }
@@ -142,7 +142,7 @@ class AddCommandTest extends TestCase {
             "Give your connection a friendly name: Enter = \"$connName\"\n",
             "Trying to connect to the database...\n",
             "Error: Unable to connect to the database.\n",
-            "Error: Unable to connect to database: 1045 - Access denied for user 'root'@'localhost' (using password: YES)\n",
+            "Error: Unable to connect to database: 1045 - Access denied for user 'root'@'".getHostByName(getHostName())."' (using password: YES)\n",
             "Would you like to store connection information anyway?(y/N)\n",
             "Success: Connection information was stored in the class \"".APP_DIR_NAME."\\AppConfig\".\n"
         ], $this));

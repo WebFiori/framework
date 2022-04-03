@@ -9,6 +9,20 @@ on:
 jobs:
   test:
     runs-on: ${{ matrix.os }} 
+    services: 
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: 123456
+          MYSQL_DATABASE: testing_db
+        ports:
+          - 33306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+        
     strategy: 
       fail-fast: true
       matrix: 
@@ -27,31 +41,14 @@ jobs:
           php-version: ${{ matrix.php }} 
           extensions: mysqli, mbstring
           tools: phpunit:5.7.27, composer
-          
-      - name: Shutdown Ubuntu MySQL
-        run: sudo service mysql stop
-        
-      - name: Set up MySQL
-        uses: mirromutth/mysql-action@v1.1
-        with:
-          mysql version: '8.0'
-          mysql database: 'testing_db'
-          mysql root password: 123456
-          mysql user: 'root' 
-          mysql password: 123456
-              
-      - name: Wait for MySQL
+      
+      - name: Start MySQL
         run: |
+          sudo systemctl start mysql.service
           while ! mysqladmin ping --host=127.0.0.1 --password=123456 --silent; do
             sleep 1
           done
-          
-      - name: Start MySQL
-        run: |
-          sudo systemctl start mysql
         
-      - name: Update MySQL Auth Method
-        run: mysql -uroot -p123456 -e "ALTER USER 'root'@'127.0.0.1' IDENTIFIED WITH mysql_native_password BY '123456';"
           
       - name: Install Dependencies
         run: composer install --prefer-dist --no-interaction --no-dev

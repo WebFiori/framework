@@ -13,7 +13,7 @@ jobs:
       mysql:
         image: mysql:5.7
         env:
-          MYSQL_ROOT_PASSWORD: root
+          MYSQL_ROOT_PASSWORD: 123456
           MYSQL_DATABASE: testing_db
         ports:
           - 33306:3306
@@ -45,12 +45,10 @@ jobs:
       - name: Start MySQL
         run: |
           sudo systemctl start mysql.service
-          while ! mysqladmin ping --host=127.0.0.1 --password=root --silent; do
+          while ! mysqladmin ping --host=127.0.0.1 --password=123456 --silent; do
             sleep 1
           done
         
-      - name: Update MySQL Auth Method
-        run: mysql -uroot -proot -e "ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY '123456';"
           
       - name: Install Dependencies
         run: composer install --prefer-dist --no-interaction --no-dev

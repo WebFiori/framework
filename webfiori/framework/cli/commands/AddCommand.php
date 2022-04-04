@@ -98,10 +98,21 @@ class AddCommand extends CLICommand {
             ConfigController::get()->addOrUpdateDBConnection($connInfoObj);
             $this->success('Connection information was stored in the class "'.APP_DIR_NAME.'\\AppConfig".');
         } catch (Exception $ex) {
-            $this->error('Unable to connect to the database.');
-            $this->error($ex->getMessage());
+            if ($connInfoObj->getHost() == '127.0.0.1') {
+                $connInfoObj->setHost('localhost');
+                try {
+                    $db->getConnection();
+                    $this->success('Connected. Adding the connection...');
 
-            $this->_confirmAdd($connInfoObj);
+                    ConfigController::get()->addOrUpdateDBConnection($connInfoObj);
+                    $this->success('Connection information was stored in the class "'.APP_DIR_NAME.'\\AppConfig".');
+                } catch (Exception $ex) {
+                    $this->_confirmAdd($connInfoObj);
+                }
+            } else {
+
+                $this->_confirmAdd($connInfoObj);
+            }
         }
         
         return 0;

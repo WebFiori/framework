@@ -50,9 +50,6 @@ jobs:
             sleep 1
           done
           
-      - name: MySQL Create Database
-        run: mysql -h 127.0.0.1 -uroot -p123456 -e "create database testing_db;"
-          
       - name: Install Dependencies
         run: composer install --prefer-dist --no-interaction --no-dev
         

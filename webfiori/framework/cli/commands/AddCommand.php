@@ -89,33 +89,39 @@ class AddCommand extends CLICommand {
         $connInfoObj->setName($this->getInput('Give your connection a friendly name:', 'db-connection-'.count(WebFioriApp::getAppConfig()->getDBConnections())));
         $this->println('Trying to connect to the database...');
 
-        $db = new DB($connInfoObj);
+        $addConnection = $this->tryConnect($connInfoObj);
 
-        try {
-            $db->getConnection();
+        if ($addConnection !== true) {
+            if ($connInfoObj->getHost() == '127.0.0.1') {
+                $connInfoObj->setHost('localhost');
+                $addConnection = $this->tryConnect($connInfoObj);
+            } else if ($connInfoObj->getHost() == 'localhost') {
+                $connInfoObj->setHost('127.0.0.1');
+                $addConnection = $this->tryConnect($connInfoObj);
+            }
+        } 
+        
+        if ($addConnection === true) {
             $this->success('Connected. Adding the connection...');
 
             ConfigController::get()->addOrUpdateDBConnection($connInfoObj);
             $this->success('Connection information was stored in the class "'.APP_DIR_NAME.'\\AppConfig".');
-        } catch (Exception $ex) {
-            if ($connInfoObj->getHost() == '127.0.0.1') {
-                $connInfoObj->setHost('localhost');
-                try {
-                    $db->getConnection();
-                    $this->success('Connected. Adding the connection...');
-
-                    ConfigController::get()->addOrUpdateDBConnection($connInfoObj);
-                    $this->success('Connection information was stored in the class "'.APP_DIR_NAME.'\\AppConfig".');
-                } catch (Exception $ex) {
-                    $this->_confirmAdd($connInfoObj);
-                }
-            } else {
-
-                $this->_confirmAdd($connInfoObj);
-            }
+        } else {
+            $this->error('Unable to connect to the database.');
+            $this->error($addConnection->getMessage());
+            $this->_confirmAdd($connInfoObj);
         }
-        
         return 0;
+    }
+    private function tryConnect($connectionInfo) {
+        $db = new DB($connectionInfo);
+        
+        try {
+            $db->getConnection();
+            return true;
+        } catch (Exception $ex) {
+            return $ex;
+        }
     }
     private function _addLang() {
         $langCode = strtoupper(trim($this->getInput('Language code:')));

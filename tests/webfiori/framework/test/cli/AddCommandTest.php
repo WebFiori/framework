@@ -47,6 +47,7 @@ class AddCommandTest extends TestCase {
         ]);
         $runner->runCommand(new AddCommand());
         $this->assertEquals(0, $runner->getExitStatus());
+        var_dump($runner->getOutputsArray());
         $connName = 'db-connection-'.count(WebFioriApp::getAppConfig()->getDBConnections());
         $this->assertTrue($runner->isOutputEquals([
             "What would you like to add?\n",

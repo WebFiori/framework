@@ -32,8 +32,8 @@ jobs:
     name: PHP${{matrix.php}} - ${{matrix.os}}
     
     steps: 
-      - name: MySQL Check Version 
-        run: mysql -uroot -p123456 -V
+      - name: MySQL Create Database
+        run: mysql -uroot -p123456 -e "create database testing_db;"
       - name: Clone Repo
         uses: actions/checkout@v1
       

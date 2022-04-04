@@ -49,7 +49,7 @@ jobs:
           while ! mysqladmin ping --host=127.0.0.1 --password=123456 --silent; do
             sleep 1
           done
-          mysql -uroor -p123456 -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '123456';"
+          mysql -h127.0.0.1 -uroor -p123456 -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '123456';"
           
       - name: Install Dependencies
         run: composer install --prefer-dist --no-interaction --no-dev

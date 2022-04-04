@@ -11,7 +11,7 @@ jobs:
     runs-on: ${{ matrix.os }} 
     services: 
       mysql:
-        image: mysql:5.7
+        image: mysql:8.0.26
         env:
           MYSQL_ROOT_PASSWORD: 123456
           MYSQL_DATABASE: testing_db
@@ -51,8 +51,6 @@ jobs:
           while ! mysqladmin ping --host=127.0.0.1 --password=123456 --silent; do
             sleep 1
           done
-          mysql -h 127.0.0.1 -utest_user -p123456 -e "create database if not exists testing_db;"
-          mysql -h 127.0.0.1 -utest_user -p123456 -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '123456';"
           
       - name: Install Dependencies
         run: composer install --prefer-dist --no-interaction --no-dev

@@ -34,40 +34,40 @@ class AddCommandTest extends TestCase {
     /**
      * @test
      */
-    public function testAddDBConnection00() {
-        $runner = new CommandRunner([
-            '0',
-            '0',
-            '127.0.0.1',
-            '',
-            'root',
-            '123456',
-            'testing_db',
-            ''
-        ]);
-        $runner->runCommand(new AddCommand());
-        $this->assertEquals(0, $runner->getExitStatus());
-        $connName = 'db-connection-'.count(WebFioriApp::getAppConfig()->getDBConnections());
-        $this->assertTrue($runner->isOutputEquals([
-            "What would you like to add?\n",
-            "0: New database connection.\n",
-            "1: New SMTP connection.\n",
-            "2: New website language.\n",
-            "3: Quit. <--\n",
-            "Select database type:\n",
-            "0: mysql\n",
-            "1: mssql\n",
-            "Database host: Enter = \"127.0.0.1\"\n",
-            "Port number: Enter = \"3306\"\n",
-            "Username:\n",
-            "Password:\n",
-            "Database name:\n",
-            "Give your connection a friendly name: Enter = \"$connName\"\n",
-            "Trying to connect to the database...\n",
-            "Success: Connected. Adding the connection...\n",
-            'Success: Connection information was stored in the class "'.APP_DIR_NAME.'\\AppConfig".'."\n"
-        ], $this));
-    }
+//    public function testAddDBConnection00() {
+//        $runner = new CommandRunner([
+//            '0',
+//            '0',
+//            '127.0.0.1',
+//            '',
+//            'root',
+//            '123456',
+//            'testing_db',
+//            ''
+//        ]);
+//        $runner->runCommand(new AddCommand());
+//        $this->assertEquals(0, $runner->getExitStatus());
+//        $connName = 'db-connection-'.count(WebFioriApp::getAppConfig()->getDBConnections());
+//        $this->assertTrue($runner->isOutputEquals([
+//            "What would you like to add?\n",
+//            "0: New database connection.\n",
+//            "1: New SMTP connection.\n",
+//            "2: New website language.\n",
+//            "3: Quit. <--\n",
+//            "Select database type:\n",
+//            "0: mysql\n",
+//            "1: mssql\n",
+//            "Database host: Enter = \"127.0.0.1\"\n",
+//            "Port number: Enter = \"3306\"\n",
+//            "Username:\n",
+//            "Password:\n",
+//            "Database name:\n",
+//            "Give your connection a friendly name: Enter = \"$connName\"\n",
+//            "Trying to connect to the database...\n",
+//            "Success: Connected. Adding the connection...\n",
+//            'Success: Connection information was stored in the class "'.APP_DIR_NAME.'\\AppConfig".'."\n"
+//        ], $this));
+//    }
     /**
      * @test
      */

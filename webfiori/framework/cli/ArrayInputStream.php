@@ -2,6 +2,7 @@
 namespace webfiori\framework\cli;
 
 use webfiori\framework\cli\InputStream;
+use webfiori\framework\exceptions\ArrayIndexOutOfBoundsException;
 /**
  * A stream that uses array as its source of input.
  * 
@@ -42,7 +43,7 @@ class ArrayInputStream implements InputStream {
      */
     public function readLine() {
         if ($this->currentLine >= count($this->inputsArr)) {
-            throw new \Exception('Array index out of bounds: '.$this->currentLine);
+            throw new ArrayIndexOutOfBoundsException('Array index out of bounds: '.$this->currentLine);
         }
         $this->currentLine++;
         return $this->inputsArr[$this->currentLine];

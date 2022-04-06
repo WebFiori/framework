@@ -780,7 +780,7 @@ class ConfigController {
             $phpDocArr[] = $this->docEmptyLine;
         }
         if ($returns !== null && gettype($returns) == 'array') {
-            $phpDocArr[] = ' * @returns '.$returns['type'].' ';
+            $phpDocArr[] = ' * @return '.$returns['type'].' ';
             
             if (gettype($returns['description']) == 'array') {
                 $phpDocArr[count($phpDocArr) - 1] .= $returns['description'][0];

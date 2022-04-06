@@ -830,8 +830,8 @@ class ConfigController {
                     'The developer can use this method to add new account during runtime.',
                     'The account will be removed once the program finishes.'
                 ], [
-                    'SMTPAccount' => [
-                        'name' => '$acc',
+                    '$acc' => [
+                        'type' => 'SMTPAccount',
                         'description' => [
                             'An object of type SMTPAccount.'
                         ]
@@ -845,8 +845,8 @@ class ConfigController {
                 'Adds new database connection or updates an existing one.', 
                 '', 
                 [
-                    'ConnectionInfo' => [
-                        'name' => '$connectionInfo',
+                    '$connectionInfo' => [
+                        'type' => 'ConnectionInfo',
                         'description' => [
                             "An object of type 'ConnectionInfo' that will contain connection information."
                         ]
@@ -863,8 +863,8 @@ class ConfigController {
                     'of added accounts. If no account was found, null is returned.'
                 ], 
                 [
-                    'string' => [
-                        'name' => '$name',
+                    '$name' => [
+                        'type' => 'string',
                         'description' => 'The name of the account.'
                     ]
                 ], 
@@ -964,8 +964,8 @@ class ConfigController {
                 'Returns database connection information given connection name.', 
                 '', 
                 [
-                    'string' => [
-                        'name' => '$conName',
+                    '$conName' => [
+                        'type' => 'string',
                         'description' => 'The name of the connection.'
                     ]
                 ], 
@@ -1005,8 +1005,8 @@ class ConfigController {
                 'Returns the global title of the web site that will be used as default page title.', 
                 '', 
                 [
-                    'string' => [
-                        'name' => '$langCode',
+                    '$langCode' => [
+                        'type' => 'string',
                         'description' => "Language code such as 'AR' or 'EN'."
                     ]
                 ], 
@@ -1032,8 +1032,8 @@ class ConfigController {
                 'Returns the global description of the web site that will be used as default page description.', 
                 '', 
                 [
-                    'string' => [
-                        'name' => '$langCode',
+                    '$langCode' => [
+                        'type' => 'string',
                         'description' => "Language code such as 'AR' or 'EN'."
                     ]
                 ], 
@@ -1174,8 +1174,8 @@ class ConfigController {
                 'Returns the global website name.', 
                 '', 
                 [
-                    'string' => [
-                        'name' => '$langCode',
+                    '$langCode' => [
+                        'type' => 'string',
                         'description' => "Language code such as 'AR' or 'EN'."
                     ]
                 ], 

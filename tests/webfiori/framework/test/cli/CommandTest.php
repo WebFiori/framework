@@ -8,7 +8,7 @@ use webfiori\framework\cli\CommandRunner;
  *
  * @author Ibrahim
  */
-class CommandTestCase extends TestCase {
+class CommandTest extends TestCase {
     /**
      * @test
      */

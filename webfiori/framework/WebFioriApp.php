@@ -49,9 +49,27 @@ define('MICRO_START', microtime(true));
  * 
  * @author Ibrahim
  * 
- * @version 1.3.6
+ * @version 1.3.7
  */
 class WebFioriApp {
+    /**
+     * A constant that indicates that the status of the class is 'none'.
+     * 
+     * @since 1.3.7
+     */
+    const STATUS_NONE = 'NONE';
+    /**
+     * A constant that indicates that the status of the class is 'initialized'.
+     * 
+     * @since 1.3.7
+     */
+    const STATUS_INITIALIZED = 'INITIALIZED';
+    /**
+     * A constant that indicates that the status of the class is 'initializing'.
+     * 
+     * @since 1.3.7
+     */
+    const STATUS_INITIALIZING = 'INITIALIZING';
     /**
      * 
      * @var Config
@@ -81,14 +99,6 @@ class WebFioriApp {
      * @since 1.0 
      */
     private static $LC;
-    /**
-     * An instance of framework configuration class.
-     * 
-     * @var ConfigController 
-     * 
-     * @since 1.0
-     */
-    private static $SF;
     /**
      * The entry point for initiating the system.
      * 
@@ -289,16 +299,6 @@ class WebFioriApp {
         return self::$classStatus;
     }
     /**
-     * Returns a reference to an instance of 'ConfigController'.
-     * 
-     * @return ConfigController A reference to an instance of 'ConfigController'.
-     * 
-     * @since 1.2.1
-     */
-    public static function getSysController() {
-        return self::$SF;
-    }
-    /**
      * Sets the configuration object that will be used to configure some of the 
      * framework settings.
      * 
@@ -406,14 +406,14 @@ class WebFioriApp {
         }
     }
     private function _initAppConfig() {
-        self::$SF = ConfigController::get();
 
         if (!class_exists(APP_DIR_NAME.'\AppConfig')) {
-            self::$SF->createAppConfigFile();
+            ConfigController::get()->createAppConfigFile();
         }
 
         $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
         $this->appConfig = new $constructor();
+        ConfigController::get()->setConfig($this->appConfig);
     }
     private function _initAutoLoader() {
         /**

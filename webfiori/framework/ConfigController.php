@@ -35,58 +35,9 @@ use webfiori\framework\mail\SMTPAccount;
  *
  * @author Ibrahim
  * 
- * @version 1.5.2
+ * @version 1.5.3
  */
 class ConfigController {
-    /**
-     * A constant that indicates the selected database schema has tables.
-     * 
-     * @since 1.1
-     */
-    const DB_NOT_EMPTY = 'db_has_tables';
-
-    const DEFAULT_APP_CONFIG = [
-        'config-file-version' => '1.0',
-        'version-info' => [
-            'version' => '1.0',
-            'version-type' => 'Stable',
-            'release-date' => '2021-01-10'
-        ],
-        'site' => [
-            'base-url' => '',
-            'primary-language' => 'EN',
-            'title-separator' => '|',
-            'home-page' => 'index',
-            'admin-theme' => '\themes\newFiori\NewFiori',
-            'base-theme' => '\themes\newFiori\NewFiori',
-            'descriptions' => [
-                'EN' => '',
-                'AR' => ''
-            ],
-            'website-names' => [
-                'EN' => 'WebFiori',
-                'AR' => 'ويب فيوري'
-            ],
-            'titles' => [
-                'EN' => 'Hello World',
-                'AR' => 'اهلا و سهلا'
-            ],
-        ]
-    ];
-    /**
-     * A constant that indicates the given username or password  
-     * is invalid.
-     * 
-     * @since 1.1
-     */
-    const INV_CREDENTIALS = 'inv_username_or_pass';
-    /**
-     * A constant that indicates a mail server address or its port 
-     * is invalid.
-     * 
-     * @since 1.1
-     */
-    const INV_HOST_OR_PORT = 'inv_mail_host_or_port';
 
     const NL = "\n";
     private $blockEnd;
@@ -94,6 +45,8 @@ class ConfigController {
     private $docEnd;
     private $docStart;
     private $since10;
+    private $since101;
+    private $configVars;
     /**
      * An instance of the class.
      * 
@@ -102,12 +55,71 @@ class ConfigController {
      * @since 1.0 
      */
     private static $singleton;
+    /**
+     * Sets the configuration that will be used by the class.
+     * 
+     * @param Config $cfg
+     * 
+     * @since 1.5.3
+     */
+    public function setConfig(Config $cfg) {
+        $this->configVars['smtp-connections'] = $cfg->getAccounts();
+        $this->configVars['database-connections'] = $cfg->getDBConnections();
+        $this->configVars['version-info'] = [
+            'version' => $cfg->getVersion(),
+            'version-type' => $cfg->getVersionType(),
+            'release-date' => $cfg->getReleaseDate()
+        ];
+        $this->configVars['site'] = [
+            'base-url' => $cfg->getBaseURL(),
+            'primary-lang' => $cfg->getPrimaryLanguage(),
+            'title-sep' => $cfg->getTitleSep(),
+            'home-page' => $cfg->getHomePage(),
+            'admin-theme' => $cfg->getAdminThemeName(),
+            'base-theme' => $cfg->getBaseThemeName(),
+            'descriptions' => $cfg->getDescriptions(),
+            'website-names' => $cfg->getWebsiteNames(),
+            'titles' => $cfg->getTitles(),
+        ];
+    }
     private function __construct() {
         $this->since10 = " * @since 1.0";
+        $this->since101 = " * @since 1.0.1";
         $this->docEnd = " */";
         $this->blockEnd = "}";
         $this->docStart = "/**";
         $this->docEmptyLine = " * ";
+        $this->configVars = [
+            'config-file-version' => '1.0',
+            'smtp-connections' => [],
+            'database-connections' => [],
+            'cron-password' => 'NO_PASSWORD',
+            'version-info' => [
+                'version' => '1.0',
+                'version-type' => 'Stable',
+                'release-date' => '2021-01-10'
+            ],
+            'site' => [
+                'base-url' => '',
+                'primary-lang' => 'EN',
+                'title-sep' => '|',
+                'home-page' => null,
+                'admin-theme' => '\themes\newFiori\NewFiori',
+                'base-theme' => '\themes\newFiori\NewFiori',
+                'descriptions' => [
+                    'EN' => '',
+                    'AR' => ''
+                ],
+                'website-names' => [
+                    'EN' => 'WebFiori',
+                    'AR' => 'ويب فيوري'
+                ],
+                'titles' => [
+                    'EN' => 'Hello World',
+                    'AR' => 'اهلا و سهلا'
+                ],
+            ]
+        ];
     }
     /**
      * Adds new database connections information or update existing connections.
@@ -119,15 +131,16 @@ class ConfigController {
      * @since 1.4.3
      */
     public function addOrUpdateDBConnection(ConnectionInfo $dbConnectionsInfo) {
-        $connections = $this->getDatabaseConnections();
-        $connections[$dbConnectionsInfo->getName()] = $dbConnectionsInfo;
-        $this->writeAppConfig([
-            'db-connections' => $connections
-        ]);
+        $this->configVars['database-connections'][$dbConnectionsInfo->getName()] = $dbConnectionsInfo;
+        $this->writeAppConfig();
     }
+    /**
+     * Creates application configuration class in the root directory of application
+     * folder if not exist.
+     */
     public function createAppConfigFile() {
         if (!class_exists(APP_DIR_NAME.'\AppConfig')) {
-            $this->writeAppConfig([]);
+            $this->writeAppConfig();
         }
     }
     /**
@@ -183,133 +196,136 @@ class ConfigController {
             $this->docEnd,
             "public static function defineConstants() {"
         ], 1);
-
-        $this->addConst($resource, [
-            'name' => 'SCRIPT_MEMORY_LIMIT',
-            'summary' => 'Memory limit per script.',
-            'description' => "This constant represents the maximum amount of memory each script will 
-             * consume before showing a fatal error. Default value is 2GB. The 
-             * developer can change this value as needed.",
-            'since' => '1.0',
-            'type' => 'string',
-            'value' => "'2048M'"
-        ]);
-        $this->addConst($resource, [
-            'name' => 'WF_SESSION_STORAGE',
-            'summary' => 'A constant which holds the class name of sessions storage 
-             * engine alongside its namespace.',
-            'description' => "The value of this constant is used to configure session storage 
-             * engine. For example, if the name of the class that represents 
-             * storage engine is 'MySessionStorage' and the class exist in the 
-             * namespace 'extras\\util', then the value of the constant should be 
-             * '\\extras\\util\\MySessionStorage'. To use database session storage 
-             * set this constant to the value '\\webfiori\\framework\\session\\DatabaseSessionStorage'.",
-            'since' => '2.1.0',
-            'type' => 'string',
-            'value' => "'\\webfiori\\framework\\session\\DefaultSessionStorage'"
-        ]);
-        $this->addConst($resource, [
-            'name' => 'DATE_TIMEZONE',
-            'summary' => 'Define the timezone at which the system will operate in.',
-            'description' => "The value of this constant is passed to the function 'date_default_timezone_set()'. 
-             * This one is used to fix some date and time related issues when the 
-             * application is deployed in multiple servers.
-             * See http://php.net/manual/en/timezones.php for supported time zones.
-             * Change this as needed.",
-            'since' => '1.0',
-            'type' => 'string',
-            'value' => "'Asia/Riyadh'"
-        ]);
-        $this->addConst($resource, [
-            'name' => 'PHP_INT_MIN',
-            'summary' => 'Fallback for older php versions that does not support the constant 
-             * PHP_INT_MIN.',
-            'since' => '1.0',
-            'type' => 'int',
-            'value' => '~PHP_INT_MAX'
-        ]);
-        $this->addConst($resource, [
-            'name' => 'LOAD_COMPOSER_PACKAGES',
-            'summary' => 'This constant is used to tell the core if the application uses composer 
-             * packages or not.',
-            'description' => "If set to true, then composer packages will be loaded.",
-            'since' => '1.0',
-            'type' => 'boolean',
-            'value' => "true"
-        ]);
-        $this->addConst($resource, [
-            'name' => 'CRON_THROUGH_HTTP',
-            'summary' => 'A constant which is used to enable or disable HTTP access to cron.',
-            'description' => "If the constant value is set to true, the framework will add routes to the 
-             * components which is used to allow access to cron control panel. The control 
-             * panel is used to execute jobs and check execution status. Default value is false.",
-            'since' => '1.0',
-            'type' => 'boolean',
-            'value' => "false"
-        ]);
-        $this->addConst($resource, [
-            'name' => 'WF_VERBOSE',
-            'summary' => 'This constant is used to tell the framework if more information should 
-             * be displayed if an exception is thrown or an error happens.',
-            'description' => "The main aim 
-             * of this constant is to hide some sensitive information from users if the 
-             * system is in production environment. Note that the constant will have effect 
-             * only if the framework is accessed through HTTP protocol. If used in CLI 
-             * environment, everything will appear. Default value of the constant is 
-             * false.",
-            'since' => '1.0',
-            'type' => 'boolean',
-            'value' => "false"
-        ]);
-        $this->addConst($resource, [
-            'name' => 'NO_WWW',
-            'summary' => 'This constant is used to redirect a URI with www to non-www.',
-            'description' => "If this constant is defined and is set to true and a user tried to 
-             * access a resource using a URI that contains www in the host part,
-             * the router will send a 301 - permanent redirect HTTP response code and 
-             * send the user to non-www host. For example, if a request is sent to 
-             * 'https://www.example.com/my-page', it will be redirected to 
-             * 'https://example.com/my-page'. Default value of the constant is false which 
-             * means no redirection will be performed.",
-            'since' => '1.0',
-            'type' => 'boolean',
-            'value' => "false"
-        ]);
-        $this->addConst($resource, [
-            'name' => 'MAX_BOX_MESSAGES',
-            'summary' => 'The maximum number of message boxes to show in one page.',
-            'description' => "A message box is a box which will be shown in a web page that 
-             * contains some information. The 
-             * box can be created manually by using the method 'Util::print_r()' or 
-             * it can be as a result of an error during execution.
-             * Default value is 15. The developer can change the value as needed. Note 
-             * that if the constant is not defined, the number of boxes will 
-             * be almost unlimited.",
-            'since' => '1.0',
-            'type' => 'int',
-            'value' => "15"
-        ]);
-        $this->addConst($resource, [
-            'name' => 'CLI_HTTP_HOST',
-            'summary' => 'Host name to use in case the system is executed through CLI.',
-            'description' => "When the application is running throgh CLI, there is no actual 
-             * host name. For this reason, the host is set to 127.0.0.1 by default. 
-             * If this constant is defined, the host will be changed to the value of 
-             * the constant. Default value of the constant is 'example.com'.",
-            'since' => '1.0',
-            'type' => 'string',
-            'value' => "'example.com'"
-        ]);
-        $this->addConst($resource, [
-            'name' => 'DS',
-            'summary' => 'Directory separator.',
-            'description' => "This one is is used as a shorthand instead of using PHP 
-             * constant 'DIRECTORY_SEPARATOR'. The two will have the same value.",
-            'since' => '1.0',
-            'type' => 'string',
-            'value' => "DIRECTORY_SEPARATOR"
-        ]);
-
+        $constantsArr = [
+            'SCRIPT_MEMORY_LIMIT' => [
+                'summary' => 'Memory limit per script.',
+                'description' => "This constant represents the maximum amount of memory each script will 
+                 * consume before showing a fatal error. Default value is 2GB. The 
+                 * developer can change this value as needed.",
+                'since' => '1.0',
+                'type' => 'string',
+                'value' => "'2048M'"
+            ],
+            'WF_SESSION_STORAGE' => [
+                'summary' => 'A constant which holds the class name of sessions storage 
+                * engine alongside its namespace.',
+               'description' => "The value of this constant is used to configure session storage 
+                * engine. For example, if the name of the class that represents 
+                * storage engine is 'MySessionStorage' and the class exist in the 
+                * namespace 'extras\\util', then the value of the constant should be 
+                * '\\extras\\util\\MySessionStorage'. To use database session storage 
+                * set this constant to the value '\\webfiori\\framework\\session\\DatabaseSessionStorage'.",
+               'since' => '2.1.0',
+               'type' => 'string',
+               'value' => "'\\webfiori\\framework\\session\\DefaultSessionStorage'"
+            ],
+            'DATE_TIMEZONE' => [
+                'summary' => 'Define the timezone at which the system will operate in.',
+                'description' => "The value of this constant is passed to the function 'date_default_timezone_set()'. 
+                 * This one is used to fix some date and time related issues when the 
+                 * application is deployed in multiple servers.
+                 * See http://php.net/manual/en/timezones.php for supported time zones.
+                 * Change this as needed.",
+                'since' => '1.0',
+                'type' => 'string',
+                'value' => "'Asia/Riyadh'"
+            ],
+            'PHP_INT_MIN' => [
+                'summary' => 'Fallback for older php versions that does not support the constant 
+                * PHP_INT_MIN.',
+               'since' => '1.0',
+               'type' => 'int',
+               'value' => '~PHP_INT_MAX'
+            ],
+            'LOAD_COMPOSER_PACKAGES' => [
+                'summary' => 'This constant is used to tell the core if the application uses composer 
+                * packages or not.',
+               'description' => "If set to true, then composer packages will be loaded.",
+               'since' => '1.0',
+               'type' => 'boolean',
+               'value' => "true"
+            ],
+            'CRON_THROUGH_HTTP' => [
+                'summary' => 'A constant which is used to enable or disable HTTP access to cron.',
+                'description' => "If the constant value is set to true, the framework will add routes to the 
+                 * components which is used to allow access to cron control panel. The control 
+                 * panel is used to execute jobs and check execution status. Default value is false.",
+                'since' => '1.0',
+                'type' => 'boolean',
+                'value' => "false"
+            ],
+            'WF_VERBOSE' => [
+                'summary' => 'This constant is used to tell the framework if more information should 
+                * be displayed if an exception is thrown or an error happens.',
+               'description' => "The main aim 
+                * of this constant is to hide some sensitive information from users if the 
+                * system is in production environment. Note that the constant will have effect 
+                * only if the framework is accessed through HTTP protocol. If used in CLI 
+                * environment, everything will appear. Default value of the constant is 
+                * false.",
+               'since' => '1.0',
+               'type' => 'boolean',
+               'value' => "false"
+            ],
+            'NO_WWW' => [
+                'summary' => 'This constant is used to redirect a URI with www to non-www.',
+                'description' => "If this constant is defined and is set to true and a user tried to 
+                 * access a resource using a URI that contains www in the host part,
+                 * the router will send a 301 - permanent redirect HTTP response code and 
+                 * send the user to non-www host. For example, if a request is sent to 
+                 * 'https://www.example.com/my-page', it will be redirected to 
+                 * 'https://example.com/my-page'. Default value of the constant is false which 
+                 * means no redirection will be performed.",
+                'since' => '1.0',
+                'type' => 'boolean',
+                'value' => "false"
+            ],
+            'MAX_BOX_MESSAGES' => [
+                'summary' => 'The maximum number of message boxes to show in one page.',
+                'description' => "A message box is a box which will be shown in a web page that 
+                 * contains some information. The 
+                 * box can be created manually by using the method 'Util::print_r()' or 
+                 * it can be as a result of an error during execution.
+                 * Default value is 15. The developer can change the value as needed. Note 
+                 * that if the constant is not defined, the number of boxes will 
+                 * be almost unlimited.",
+                'since' => '1.0',
+                'type' => 'int',
+                'value' => "15"
+            ],
+            'CLI_HTTP_HOST' => [
+                'summary' => 'Host name to use in case the system is executed through CLI.',
+                'description' => "When the application is running throgh CLI, there is no actual 
+                 * host name. For this reason, the host is set to 127.0.0.1 by default. 
+                 * If this constant is defined, the host will be changed to the value of 
+                 * the constant. Default value of the constant is 'example.com'.",
+                'since' => '1.0',
+                'type' => 'string',
+                'value' => "'example.com'"
+            ],
+            'DS' => [
+                'summary' => 'Directory separator.',
+                'description' => "This one is is used as a shorthand instead of using PHP 
+                 * constant 'DIRECTORY_SEPARATOR'. The two will have the same value.",
+                'since' => '1.0',
+                'type' => 'string',
+                'value' => "DIRECTORY_SEPARATOR"
+            ],
+            'USE_HTTP' => [
+                'summary' => 'Sets the framework to use \'http://\' or \'https://\' for base URIs.',
+                'description' => "The default behaviour of the framework is to use 'https://'. But 
+                 * in some cases, there is a need for using 'http://'.
+                 * If this constant is set to true, the framework will use 'http://' for 
+                 * base URI of the system. Default value is false.",
+                'since' => '1.0',
+                'type' => 'boolean',
+                'value' => "false"
+            ]
+        ];
+        foreach ($constantsArr as $constName => $props) {
+            $props['name'] = $constName;
+            $this->addConst($resource, $props);
+        }
         $this->a($resource, "        if (!defined('THEMES_PATH')){");
         $this->a($resource, "            \$themesDirName = 'themes';");
         $this->a($resource, "            \$themesPath = substr(__DIR__, 0, strlen(__DIR__) - strlen(APP_DIR_NAME.'/ini')).DIRECTORY_SEPARATOR.\$themesDirName;");
@@ -323,18 +339,6 @@ class ConfigController {
         $this->a($resource, '             */');
         $this->a($resource, "            define('THEMES_PATH', \$themesPath);");
         $this->a($resource, '        }');
-
-        $this->addConst($resource, [
-            'name' => 'USE_HTTP',
-            'summary' => 'Sets the framework to use \'http://\' or \'https://\' for base URIs.',
-            'description' => "The default behaviour of the framework is to use 'https://'. But 
-             * in some cases, there is a need for using 'http://'.
-             * If this constant is set to true, the framework will use 'http://' for 
-             * base URI of the system. Default value is false.",
-            'since' => '1.0',
-            'type' => 'boolean',
-            'value' => "false"
-        ]);
         $this->a($resource, $this->blockEnd, 1);
         $this->a($resource, $this->blockEnd);
         fclose($resource);
@@ -433,14 +437,8 @@ class ConfigController {
      * @since 1.0
      */
     public function getAdminTheme() {
-        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
-            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
-            $c = new $constructor();
 
-            return $c->getAdminThemeName();
-        }
-
-        return self::DEFAULT_APP_CONFIG['site']['admin-theme'];
+        return $this->configVars['site']['admin-theme'];
     }
     /**
      * Returns an associative array that holds application version info.
@@ -451,18 +449,8 @@ class ConfigController {
      * @since 1.5.2
      */
     public function getAppVersionInfo() {
-        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
-            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
-            $c = new $constructor();
 
-            return [
-                'version' => $c->getVersion(),
-                'version-type' => $c->getVersionType(),
-                'release-date' => $c->getReleaseDate()
-            ];
-        }
-
-        return self::DEFAULT_APP_CONFIG['version-info'];
+        return $this->configVars['version-info'];
     }
     /**
      * Returns the base URL which is use as a value for the tag &gt;base&lt;.
@@ -472,14 +460,8 @@ class ConfigController {
      * @since 1.0
      */
     public function getBase() {
-        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
-            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
-            $c = new $constructor();
 
-            return $c->getBaseURL();
-        }
-
-        return '';
+        return $this->configVars['site']['base-url'];
     }
     /**
      * Returns a string that represents the name of the base theme of the web 
@@ -490,14 +472,8 @@ class ConfigController {
      * @since 1.0
      */
     public function getBaseTheme() {
-        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
-            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
-            $c = new $constructor();
 
-            return $c->getBaseThemeName();
-        }
-
-        return self::DEFAULT_APP_CONFIG['site']['base-theme'];
+        return $this->configVars['site']['base-theme'];
     }
     /**
      * Returns password hash of the password which is used to protect background 
@@ -509,14 +485,8 @@ class ConfigController {
      * @since 1.5.2
      */
     public function getCRONPassword() {
-        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
-            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
-            $c = new $constructor();
 
-            return $c->getCRONPassword();
-        }
-
-        return 'NO_PASSWORD';
+        return $this->configVars['cron-password'];
     }
     /**
      * Returns an array that holds database connections.
@@ -527,14 +497,8 @@ class ConfigController {
      * @since 1.0
      */
     public function getDatabaseConnections() {
-        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
-            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
-            $c = new $constructor();
 
-            return $c->getDBConnections();
-        }
-
-        return [];
+        return $this->configVars['database-connections'];
     }
     /**
      * Returns an array that holds different descriptions for the web application 
@@ -546,14 +510,8 @@ class ConfigController {
      * @since 1.0
      */
     public function getDescriptions() {
-        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
-            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
-            $c = new $constructor();
 
-            return $c->getDescriptions();
-        }
-
-        return self::DEFAULT_APP_CONFIG['site']['descriptions'];
+        return $this->configVars['site']['descriptions'];
     }
     /**
      * Returns a link that represents the home page of the web application.
@@ -563,12 +521,7 @@ class ConfigController {
      * @since 1.0
      */
     public function getHomePage() {
-        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
-            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
-            $c = new $constructor();
-
-            return $c->getHomePage();
-        }
+        $this->configVars['site']['home-page'];
 
         return null;
     }
@@ -580,14 +533,8 @@ class ConfigController {
      * @since 1.0
      */
     public function getPrimaryLang() {
-        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
-            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
-            $c = new $constructor();
 
-            return $c->getPrimaryLanguage();
-        }
-
-        return self::DEFAULT_APP_CONFIG['site']['primary-language'];
+        return $this->configVars['site']['primary-lang'];
     }
     /**
      * Returns an associative array that contains web site configuration 
@@ -600,12 +547,12 @@ class ConfigController {
      * will be the name of the web site in the given language.</li>
      * <li><b>base-url</b>: The URL at which system pages will be served from. 
      * usually, this URL is used in the tag 'base' of the web page.</li>
-     * <li><b>title-separator</b>: A character or a string that is used 
+     * <li><b>title-sep</b>: A character or a string that is used 
      * to separate web site name from web page title.</li>
      * <li><b>home-page</b>: The URL of the home page of the web site.</li>
      * <li><b>base-theme</b>: The name of the theme that will be used to style 
      * web site UI.</li>
-     * <li><b>primary-language</b>: Primary language of the website.
+     * <li><b>primary-lang</b>: Primary language of the website.
      * <li><b>admin-theme</b>: The name of the theme that is used to style 
      * admin web pages.</li>
      * <li><b>descriptions</b>: A sub associative array. The index of the 
@@ -618,18 +565,8 @@ class ConfigController {
      * @since 1.0
      */
     public function getSiteConfigVars() {
-        $cfgArr = self::DEFAULT_APP_CONFIG['site'];
-        $cfgArr['website-names'] = $this->getWebsiteNames();
-        $cfgArr['base-url'] = $this->getBase();
-        $cfgArr['title-separator'] = $this->getTitleSep();
-        $cfgArr['home-page'] = $this->getHomePage();
-        $cfgArr['primary-language'] = $this->getHomePage();
-        $cfgArr['descriptions'] = $this->getDescriptions();
-        $cfgArr['titles'] = $this->getTitles();
-        $cfgArr['base-theme'] = $this->getBaseTheme();
-        $cfgArr['admin-theme'] = $this->getAdminTheme();
 
-        return $cfgArr;
+        return $this->configVars['site'];
     }
     /**
      * Returns an array that holds SMTP connections.
@@ -640,14 +577,12 @@ class ConfigController {
      * @since 1.0
      */
     public function getSMTPAccounts() {
-        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
-            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
-            $c = new $constructor();
 
-            return $c->getAccounts();
-        }
-
-        return [];
+        return $this->configVars['smtp-connections'];
+    }
+    public function resetConfig() {
+        self::get()->setConfig(WebFioriApp::getAppConfig());
+        $this->writeAppConfig();
     }
     /**
      * Returns an array that holds different page titles for the web application 
@@ -659,14 +594,8 @@ class ConfigController {
      * @since 1.0
      */
     public function getTitles() {
-        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
-            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
-            $c = new $constructor();
 
-            return $c->getTitles();
-        }
-
-        return self::DEFAULT_APP_CONFIG['site']['titles'];
+        return $this->configVars['site']['titles'];
     }
     /**
      * Returns a string that represents the string that will be used to separate 
@@ -677,14 +606,8 @@ class ConfigController {
      * @since 1.0
      */
     public function getTitleSep() {
-        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
-            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
-            $c = new $constructor();
 
-            return $c->getTitleSep();
-        }
-
-        return self::DEFAULT_APP_CONFIG['site']['title-separator'];
+        return $this->configVars['site']['title-sep'];
     }
     /**
      * Returns an array that holds different names for the web application 
@@ -696,14 +619,8 @@ class ConfigController {
      * @since 1.0
      */
     public function getWebsiteNames() {
-        if (class_exists(APP_DIR_NAME.'\\AppConfig')) {
-            $constructor = '\\'.APP_DIR_NAME.'\\'.'AppConfig';
-            $c = new $constructor();
 
-            return $c->getWebsiteNames();
-        }
-
-        return self::DEFAULT_APP_CONFIG['site']['website-names'];
+        return $this->configVars['site']['website-names'];
     }
     /**
      * Removes SMTP email account if it is exist.
@@ -713,14 +630,11 @@ class ConfigController {
      * @since 1.3
      */
     public function removeAccount($accountName) {
-        $accounts = $this->getSMTPAccounts();
 
-        if (isset($accounts[$accountName])) {
-            unset($accounts[$accountName]);
+        if (isset($this->configVars['smtp-connections'][$accountName])) {
+            unset($this->configVars['smtp-connections'][$accountName]);
         }
-        $this->writeAppConfig([
-            'smtp' => $accounts
-        ]);
+        $this->writeAppConfig();
     }
     /**
      * Removes database connection given its name.
@@ -742,9 +656,8 @@ class ConfigController {
                 $updated[] = $conObj;
             }
         }
-        $this->writeAppConfig([
-            'db-connections' => $updated
-        ]);
+        $this->configVars['database-connections'] = $updated;
+        $this->writeAppConfig();
     }
     /**
      * Update application version information.
@@ -758,13 +671,12 @@ class ConfigController {
      * @since 1.5.2
      */
     public function updateAppVersionInfo($vNum, $vType, $releaseDate) {
-        $this->writeAppConfig([
-            'version-info' => [
-                'version' => $vNum,
-                'version-type' => $vType,
-                'release-date' => $releaseDate
-            ]
-        ]);
+        $this->configVars['version-info'] = [
+            'version' => $vNum,
+            'version-type' => $vType,
+            'release-date' => $releaseDate
+        ];
+        $this->writeAppConfig();
     }
     /**
      * Updates the password which is used to protect cron jobs from unauthorized 
@@ -776,9 +688,8 @@ class ConfigController {
      * @since 1.5.2
      */
     public function updateCronPassword($newPass) {
-        $this->writeAppConfig([
-            'cron-pass' => $newPass
-        ]);
+        $this->configVars['cron-password'] = $newPass;
+        $this->writeAppConfig();
     }
     /**
      * Adds new SMTP account or Updates an existing one.
@@ -792,11 +703,8 @@ class ConfigController {
      * @since 1.1
      */
     public function updateOrAddEmailAccount(SMTPAccount $emailAccount) {
-        $accountsArr = $this->getSMTPAccounts();
-        $accountsArr[$emailAccount->getAccountName()] = $emailAccount;
-        $this->writeAppConfig([
-            'smtp' => $accountsArr
-        ]);
+        $this->configVars[$emailAccount->getAccountName()] = $emailAccount;
+        $this->writeAppConfig();
     }
     /**
      * Updates web site configuration based on some attributes.
@@ -827,41 +735,72 @@ class ConfigController {
      * @since 1.0
      */
     public function updateSiteInfo($websiteInfoArr) {
-        $this->writeAppConfig($websiteInfoArr);
+        $keys = array_keys($this->configVars['site']);
+        $updated = [];
+        
+        foreach ($keys as $key) {
+            if (isset($websiteInfoArr[$key])) {
+                $updated[$key] = $websiteInfoArr[$key];
+            } else {
+                $updated[$key] = $this->configVars['site'][$key];
+            }
+        }
+        $this->configVars['site'] = $updated;
+        $this->writeAppConfig();
+    }
+    private function writeFuncHeader(&$cFile, $methSig, $methodSummary = '', $description = [], $params = [], $returns = null) {
+        $phpDocArr = [
+            $this->docStart,
+            ' * '.$methodSummary,
+            $this->docEmptyLine,
+        ];
+        if (gettype($description) == 'array') {
+            foreach ($description as $line) {
+                $phpDocArr[] = ' * '.$line;
+            }
+            $phpDocArr[] = $this->docEmptyLine;
+        } else if (strlen($description) != 0) {
+            $phpDocArr[] = ' * '.$description;
+            $phpDocArr[] = $this->docEmptyLine;
+        }
+        
+        
+        foreach ($params as $paramName => $paramArr) {
+            $currentDescLine = ' * @param '.$paramArr['type'].' '.$paramName.' ';
+            
+            if (gettype($paramArr['description']) == 'array') {
+                $currentDescLine .= $paramArr['description'][0];
+                $phpDocArr[] = $currentDescLine;
+                for ($x = 1 ; $x < count($paramArr['description']) ; $x++) {
+                    $phpDocArr[] = ' * '.$paramArr['description'][$x];
+                }
+            } else {
+                $phpDocArr[] = $currentDescLine.$paramArr['description'];
+            }
+            $phpDocArr[] = $this->docEmptyLine;
+        }
+        if ($returns !== null && gettype($returns) == 'array') {
+            $phpDocArr[] = ' * @return '.$returns['type'].' ';
+            
+            if (gettype($returns['description']) == 'array') {
+                $phpDocArr[count($phpDocArr) - 1] .= $returns['description'][0];
+                for ($x = 1 ; $x < count($returns['description']) ; $x++) {
+                    $phpDocArr[] = ' * '.$returns['description'][$x];
+                }
+            } else {
+                $phpDocArr[count($phpDocArr) - 1] .= $returns['description'];
+            }
+        }
+        $phpDocArr[] = $this->docEnd;
+        $phpDocArr[] = $methSig.' {';
+        $this->a($cFile, $phpDocArr, 1);
     }
     /**
      * Stores configuration variables into the application configuration class.
      * 
-     * @param array $appConfigArr An array that holds configuration vatiables. 
-     * The array can have the following indices:
-     * <ul>
-     * <li><b>db-connections</b>: An array that holds objects of type 
-     * 'ConnectionInfo'.</li>
-     * <li><b>smtp</b>: An array that holds objects of type 'SMTPAccount' that 
-     * holds SMTP connection information.</li>
-     * <li><b>website-names</b>: An associative array that holds website names 
-     * in different display languages. The index should be language code such 
-     * as 'EN' and the value of the index is website name in that language.</li>
-     * <li><b>titles</b>: An associative array that holds default page titles 
-     * in different display languages. The index should be language code such 
-     * as 'EN' and the value of the index is page title in that language.</li>
-     * <li><b>descriptions</b>: An associative array that holds page descriptions 
-     * in different display languages. The index should be language code such 
-     * as 'EN' and the value of the index is page description in that language.</li>
-     * <li><b>home-page</b>: A link that represents home page of the website.</li>
-     * <li><b>primary-lang</b>: The primary display language of the website.</li>
-     * <li><b>base-theme</b>: The name of the theme that will be used in the 
-     * pages that will be shown to all users (public and private)</li>
-     * <li><b>admin-theme</b>: The name of the theme that will be shown 
-     * in control pages of the system.</li>
-     * <li><b>cron-pass</b>: The password which is used to protect cron jobs 
-     * fron unauthorized access. If empty string is given, the string 
-     * 'NO_PASSWORD' is used.</li>
-     * </ul>
-     * 
      * @since 1.5
      */
-    public function writeAppConfig($appConfigArr) {
+    public function writeAppConfig() {
         $cFile = new File('AppConfig.php', ROOT_DIR.DS.APP_DIR_NAME);
         $cFile->remove();
 
@@ -880,145 +819,164 @@ class ConfigController {
         $this->a($cFile, "        \$this->initSmtpConnections();");
 
 
-        $this->_writeCronPass($cFile, $appConfigArr);
+        $this->_writeCronPass($cFile);
 
         $this->a($cFile, $this->blockEnd, 1);
-
-        $this->a($cFile, $this->docStart, 1);
-        $this->a($cFile, "     * Adds an email account.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * The developer can use this method to add new account during runtime.");
-        $this->a($cFile, "     * The account will be removed once the program finishes.");
-        $this->a($cFile, $this->docEmptyLine, 1); 
-        $this->a($cFile, "     * @param SMTPAccount \$acc an object of type SMTPAccount."); 
-        $this->a($cFile, $this->docEmptyLine, 1); 
-        $this->a($cFile, $this->since10, 1);
-        $this->a($cFile, $this->docEnd, 1);
-        $this->a($cFile, "     public function addAccount(SMTPAccount \$acc) {");
+        
+        $this->writeFuncHeader($cFile, 
+                'public function addAccount(SMTPAccount $acc)', 
+                'Adds SMTP account.', 
+                [
+                    'The developer can use this method to add new account during runtime.',
+                    'The account will be removed once the program finishes.'
+                ], [
+                    '$acc' => [
+                        'type' => 'SMTPAccount',
+                        'description' => [
+                            'An object of type SMTPAccount.'
+                        ]
+                    ]
+                ]);
         $this->a($cFile, "        \$this->emailAccounts[\$acc->getAccountName()] = \$acc;");
         $this->a($cFile, $this->blockEnd, 1);
-
-        $this->a($cFile, $this->docStart, 1);
-        $this->a($cFile, "     * Adds new database connection or updates an existing one.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * @param ConnectionInfo \$connectionInfo an object of type 'ConnectionInfo'");
-        $this->a($cFile, "     * that will contain connection information.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, $this->since10, 1);
-        $this->a($cFile, $this->docEnd, 1);
-        $this->a($cFile, "    public function addDbConnection(ConnectionInfo \$connectionInfo) {");
+        
+        $this->writeFuncHeader($cFile, 
+                'public function addDbConnection(ConnectionInfo $connectionInfo)', 
+                'Adds new database connection or updates an existing one.', 
+                '', 
+                [
+                    '$connectionInfo' => [
+                        'type' => 'ConnectionInfo',
+                        'description' => [
+                            "An object of type 'ConnectionInfo' that will contain connection information."
+                        ]
+                    ]
+                ]);
         $this->a($cFile, "        \$this->dbConnections[\$connectionInfo->getName()] = \$connectionInfo;");
         $this->a($cFile, $this->blockEnd, 1);
-
-        $this->a($cFile, $this->docStart, 1);
-        $this->a($cFile, "     * Returns SMTP account given its name.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * The method will search for an account with the given name in the set");
-        $this->a($cFile, "     * of added accounts. If no account was found, null is returned.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * @param string \$name The name of the account.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * @return SMTPAccount|null If the account is found, The method");
-        $this->a($cFile, "     * will return an object of type SMTPAccount. Else, the");
-        $this->a($cFile, "     * method will return null.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, $this->since10, 1);
-        $this->a($cFile, $this->docEnd, 1);
-        $this->a($cFile, "    public function getAccount(\$name) {");
+        
+        $this->writeFuncHeader($cFile, 
+                'public function getAccount($name)', 
+                'Returns SMTP account given its name.', 
+                [
+                    'The method will search for an account with the given name in the set',
+                    'of added accounts. If no account was found, null is returned.'
+                ], 
+                [
+                    '$name' => [
+                        'type' => 'string',
+                        'description' => 'The name of the account.'
+                    ]
+                ], 
+                [
+                    'type' => 'SMTPAccount|null',
+                    'description' => [
+                        'If the account is found, The method',
+                        'will return an object of type SMTPAccount. Else, the',
+                        'method will return null.'
+                    ]
+                ]);
         $this->a($cFile, "        if (isset(\$this->emailAccounts[\$name])) {");
         $this->a($cFile, "            return \$this->emailAccounts[\$name];");
         $this->a($cFile, "        }");
         $this->a($cFile, $this->blockEnd, 1);
 
-        $this->a($cFile, $this->docStart, 1);
-        $this->a($cFile, "     * Returns an associative array that contains all email accounts.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * The indices of the array will act as the names of the accounts.");
-        $this->a($cFile, "     * The value of the index will be an object of type SMTPAccount.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * @return array An associative array that contains all email accounts.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, $this->since10, 1);
-        $this->a($cFile, $this->docEnd, 1);
-        $this->a($cFile, "    public function getAccounts() {");
+        $this->writeFuncHeader($cFile, 
+                'public function getAccounts()', 
+                'Returns an associative array that contains all email accounts.', 
+                [
+                    'The indices of the array will act as the names of the accounts.',
+                    'The value of the index will be an object of type SMTPAccount.'
+                ], 
+                [], 
+                [
+                    'type' => 'array',
+                    'description' => 'An associative array that contains all email accounts.'
+                ]);
         $this->a($cFile, "        return \$this->emailAccounts;");
         $this->a($cFile, $this->blockEnd, 1);
 
-        $this->a($cFile, $this->docStart, 1);
-        $this->a($cFile, "     * Returns the name of the theme that is used in admin control pages.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * @return string The name of the theme that is used in admin control pages.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, $this->since10, 1);
-        $this->a($cFile, $this->docEnd, 1);
-        $this->a($cFile, "    public function getAdminThemeName() {");
+        $this->writeFuncHeader($cFile, 
+                'public function getAdminThemeName()', 
+                'Returns the name of the theme that is used in admin control pages.', 
+                '', 
+                [], 
+                [
+                    'type' => 'string',
+                    'description' => 'The name of the theme that is used in admin control pages.'
+                ]);
         $this->a($cFile, "        return \$this->adminThemeName;");
         $this->a($cFile, $this->blockEnd, 1);
 
-        $this->a($cFile, $this->docStart, 1);
-        $this->a($cFile, "     * Returns the name of base theme that is used in website pages.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * Usually, this theme is used for the normally visitors of the web site.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * @return string The name of base theme that is used in website pages.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, $this->since10, 1);
-        $this->a($cFile, $this->docEnd, 1);
-        $this->a($cFile, "    public function getBaseThemeName() {");
+        $this->writeFuncHeader($cFile, 
+                'public function getBaseThemeName()', 
+                'Returns the name of base theme that is used in website pages.', 
+                'Usually, this theme is used for the normally visitors of the web site.', 
+                [], 
+                [
+                    'type' => 'string',
+                    'description' => 'The name of base theme that is used in website pages.'
+                ]);
         $this->a($cFile, "        return \$this->baseThemeName;");
         $this->a($cFile, $this->blockEnd, 1);
 
-        $this->a($cFile, $this->docStart, 1);
-        $this->a($cFile, "     * Returns the base URL that is used to fetch resources.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * The return value of this method is usually used by the tag 'base'");
-        $this->a($cFile, "     * of web site pages.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * @return string the base URL.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, $this->since10, 1);
-        $this->a($cFile, $this->docEnd, 1);
-        $this->a($cFile, "    public function getBaseURL() {");
+        $this->writeFuncHeader($cFile, 
+                'public function getBaseURL()', 
+                'Returns the base URL that is used to fetch resources.', 
+                [
+                    "The return value of this method is usually used by the tag 'base'",
+                    'of web site pages.'
+                ], 
+                [], 
+                [
+                    'type' => 'string',
+                    'description' => 'The base URL.'
+                ]);
         $this->a($cFile, "        return \$this->baseUrl;");
         $this->a($cFile, $this->blockEnd, 1);
 
-        $this->a($cFile, $this->docStart, 1);
-        $this->a($cFile, "     * Returns version number of the configuration file.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * This value can be used to check for the compatability of configuration file");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * @return string The version number of the configuration file.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, $this->since10, 1);
-        $this->a($cFile, $this->docEnd, 1);
-        $this->a($cFile, "    public function getConfigVersion() {");
+        $this->writeFuncHeader($cFile, 
+                'public function getConfigVersion()', 
+                'Returns version number of the configuration file.', 
+                'This value can be used to check for the compatability of configuration file', 
+                [], 
+                [
+                    'type' => 'string',
+                    'description' => 'The version number of the configuration file.'
+                ]);
         $this->a($cFile, "        return \$this->configVision;");
         $this->a($cFile, $this->blockEnd, 1);
 
-        $this->a($cFile, $this->docStart, 1);
-        $this->a($cFile, "     * Returns sha256 hash of the password which is used to prevent unauthorized");
-        $this->a($cFile, "     * access to run the jobs or access CRON web interface.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * @return Password hash or the string 'NO_PASSWORD' if there is no password.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * @since 1.0.1");
-        $this->a($cFile, $this->docEnd, 1);
-        $this->a($cFile, "    public function getCRONPassword() {");
+        $this->writeFuncHeader($cFile, 
+                'public function getCRONPassword()', 
+                'Returns sha256 hash of the password which is used to prevent unauthorized access to run the jobs or access CRON web interface.', 
+                '', 
+                [], 
+                [
+                    'type' => 'string',
+                    'description' => "Password hash or the string 'NO_PASSWORD' if there is no password."
+                ]);
         $this->a($cFile, "        return \$this->cronPass;");
         $this->a($cFile, $this->blockEnd, 1);
 
-        $this->a($cFile, $this->docStart, 1);
-        $this->a($cFile, "     * Returns database connection information given connection name.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * @param string \$conName The name of the connection.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * @return ConnectionInfo|null The method will return an object of type");
-        $this->a($cFile, "     * ConnectionInfo if a connection info was found for the given connection name.");
-        $this->a($cFile, "     * Other than that, the method will return null.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, $this->since10, 1);
-        $this->a($cFile, $this->docEnd, 1);
-        $this->a($cFile, "    public function getDBConnection(\$conName) {");
+        $this->writeFuncHeader($cFile, 
+                'public function getDBConnection($conName)', 
+                'Returns database connection information given connection name.', 
+                '', 
+                [
+                    '$conName' => [
+                        'type' => 'string',
+                        'description' => 'The name of the connection.'
+                    ]
+                ], 
+                [
+                    'type' => 'ConnectionInfo|null',
+                    'description' => [
+                        'The method will return an object of type',
+                        'ConnectionInfo if a connection info was found for the given connection name.',
+                        'Other than that, the method will return null.'
+                    ]
+                ]);
         $this->a($cFile, "        \$conns = \$this->getDBConnections();");
         $this->a($cFile, "        \$trimmed = trim(\$conName);");
         $this->a($cFile, "        ");
@@ -1027,33 +985,39 @@ class ConfigController {
         $this->a($cFile, "        }");
         $this->a($cFile, $this->blockEnd, 1);
 
-        $this->a($cFile, $this->docStart, 1);
-        $this->a($cFile, "     * Returns an associative array that contain the information of database connections.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * The keys of the array will be the name of database connection and the");
-        $this->a($cFile, "     * value of each key will be an object of type ConnectionInfo.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * @return array An associative array.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, $this->since10, 1);
-        $this->a($cFile, $this->docEnd, 1);
-        $this->a($cFile, "    public function getDBConnections() {");
+        $this->writeFuncHeader($cFile, 
+                'public function getDBConnections()', 
+                'Returns an associative array that contain the information of database connections.', 
+                [
+                    'The keys of the array will be the name of database connection and the',
+                    'value of each key will be an object of type ConnectionInfo.'
+                ], 
+                [], 
+                [
+                    'type' => 'array',
+                    'description' => 'An associative array.'
+                ]);
         $this->a($cFile, "        return \$this->dbConnections;");
         $this->a($cFile, $this->blockEnd, 1);
 
-        $this->a($cFile, $this->docStart, 1);
-        $this->a($cFile, "     * Returns the global title of the web site that will be");
-        $this->a($cFile, "     * used as default page title.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * @param string \$langCode Language code such as 'AR' or 'EN'.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * @return string|null If the title of the page");
-        $this->a($cFile, "     * does exist in the given language, the method will return it.");
-        $this->a($cFile, "     * If no such title, the method will return null.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, $this->since10, 1);
-        $this->a($cFile, $this->docEnd, 1);
-        $this->a($cFile, "    public function getDefaultTitle(\$langCode) {");
+        $this->writeFuncHeader($cFile, 
+                'public function getDefaultTitle($langCode)', 
+                'Returns the global title of the web site that will be used as default page title.', 
+                '', 
+                [
+                    '$langCode' => [
+                        'type' => 'string',
+                        'description' => "Language code such as 'AR' or 'EN'."
+                    ]
+                ], 
+                [
+                    'type' => 'string|null',
+                    'description' => [
+                        'If the title of the page',
+                        'does exist in the given language, the method will return it.',
+                        'If no such title, the method will return null.'
+                    ]
+                ]);
         $this->a($cFile, "        \$langs = \$this->getTitles();");
         $this->a($cFile, "        \$langCodeF = strtoupper(trim(\$langCode));");
         $this->a($cFile, "        ");
@@ -1063,19 +1027,24 @@ class ConfigController {
         $this->a($cFile, $this->blockEnd, 1);
 
 
-        $this->a($cFile, $this->docStart, 1);
-        $this->a($cFile, "     * Returns the global description of the web site that will be");
-        $this->a($cFile, "     * used as default page description.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * @param string \$langCode Language code such as 'AR' or 'EN'.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * @return string|null If the description for the given language");
-        $this->a($cFile, "     * does exist, the method will return it. If no such description, the");
-        $this->a($cFile, "     * method will return null.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, $this->since10, 1);
-        $this->a($cFile, $this->docEnd, 1);
-        $this->a($cFile, "    public function getDescription(\$langCode) {");
+        $this->writeFuncHeader($cFile, 
+                'public function getDescription($langCode)', 
+                'Returns the global description of the web site that will be used as default page description.', 
+                '', 
+                [
+                    '$langCode' => [
+                        'type' => 'string',
+                        'description' => "Language code such as 'AR' or 'EN'."
+                    ]
+                ], 
+                [
+                    'type' => 'string|null',
+                    'description' => [
+                        'If the description for the given language',
+                        'does exist, the method will return it. If no such description, the',
+                        'method will return null.'
+                    ]
+                ]);
         $this->a($cFile, "        \$langs = \$this->getDescriptions();");
         $this->a($cFile, "        \$langCodeF = strtoupper(trim(\$langCode));");
         $this->a($cFile, "        if (isset(\$langs[\$langCodeF])) {");
@@ -1083,118 +1052,141 @@ class ConfigController {
         $this->a($cFile, "        }");
         $this->a($cFile, $this->blockEnd, 1);
 
-        $this->a($cFile, $this->docStart, 1);
-        $this->a($cFile, "     * Returns an associative array which contains different website descriptions");
-        $this->a($cFile, "     * in different languages.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * Each index will contain a language code and the value will be the description");
-        $this->a($cFile, "     * of the website in the given language.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * @return array An associative array which contains different website descriptions");
-        $this->a($cFile, "     * in different languages.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, $this->since10, 1);
-        $this->a($cFile, $this->docEnd, 1);
-        $this->a($cFile, "    public function getDescriptions() {");
+        $this->writeFuncHeader($cFile, 
+                'public function getDescriptions()', 
+                'Returns an associative array which contains different website descriptions in different languages.', 
+                [
+                    'Each index will contain a language code and the value will be the description',
+                    'of the website in the given language.'
+                ], 
+                [], 
+                [
+                    'type' => 'array',
+                    'description' => [
+                        'An associative array which contains different website descriptions',
+                        'in different languages.'
+                    ]
+                ]);
         $this->a($cFile, "        return \$this->descriptions;");
         $this->a($cFile, $this->blockEnd, 1);
 
-        $this->a($cFile, $this->docStart, 1);
-        $this->a($cFile, "     * Returns the home page URL of the website.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * @return string The home page URL of the website.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, $this->since10, 1);
-        $this->a($cFile, $this->docEnd, 1);
-        $this->a($cFile, "    public function getHomePage() {");
+        $this->writeFuncHeader($cFile, 
+                'public function getHomePage()', 
+                'Returns the home page URL of the website.', 
+                '', 
+                [], 
+                [
+                    'type' => 'string',
+                    'description' => 'The home page URL of the website.'
+                ]);
         $this->a($cFile, "        return \$this->homePage;");
         $this->a($cFile, $this->blockEnd, 1);
 
-        $this->a($cFile, $this->docStart, 1);
-        $this->a($cFile, "     * Returns the primary language of the website.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * @return string Language code of the primary language such as 'EN'.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, $this->since10, 1);
-        $this->a($cFile, $this->docEnd, 1);
-        $this->a($cFile, "    public function getPrimaryLanguage() {");
+        $this->writeFuncHeader($cFile, 
+                'public function getPrimaryLanguage()', 
+                'Returns the primary language of the website.', 
+                '', 
+                [], 
+                [
+                    'type' => 'string',
+                    'description' => "Language code of the primary language such as 'EN'."
+                ]);
         $this->a($cFile, "        return \$this->primaryLang;");
         $this->a($cFile, $this->blockEnd, 1);
 
-        $this->a($cFile, $this->docStart, 1);
-        $this->a($cFile, "     * Returns the date at which the application was released at.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * @return string The method will return a string in the format");
-        $this->a($cFile, "     * 'YYYY-MM-DD' that represents application release date.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, $this->since10, 1);
-        $this->a($cFile, $this->docEnd, 1);
-        $this->a($cFile, "    public function getReleaseDate() {");
+        $this->writeFuncHeader($cFile, 
+                'public function getReleaseDate()', 
+                'Returns the date at which the application was released at.', 
+                '', 
+                [], 
+                [
+                    'type' => 'string',
+                    'description' => [
+                        'The method will return a string in the format',
+                        "YYYY-MM-DD' that represents application release date."
+                    ]
+                ]);
         $this->a($cFile, "        return \$this->appReleaseDate;");
         $this->a($cFile, $this->blockEnd, 1);
 
-        $this->a($cFile, $this->docStart, 1);
-        $this->a($cFile, "     * Returns an array that holds the default page title for different display");
-        $this->a($cFile, "     * languages.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * @return array An associative array. The indices of the array are language codes");
-        $this->a($cFile, "     * and the values are pages titles.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, $this->since10, 1);
-        $this->a($cFile, $this->docEnd, 1);
-        $this->a($cFile, "    public function getTitles() {");
+        $this->writeFuncHeader($cFile, 
+                'public function getTitles()', 
+                'Returns an array that holds the default page title for different display languages.', 
+                '', 
+                [], 
+                [
+                    'type' => 'array',
+                    'description' => [
+                        'An associative array. The indices of the array are language codes',
+                        'and the values are pages titles.'
+                    ]
+                ]);
         $this->a($cFile, "        return \$this->defaultPageTitles;");
         $this->a($cFile, $this->blockEnd, 1);
 
-        $this->a($cFile, $this->docStart, 1);
-        $this->a($cFile, "     * Returns the character (or string) that is used to separate page title from website name.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * @return string A string such as ' - ' or ' | '. Note that the method");
-        $this->a($cFile, "     * will add the two spaces by default.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, $this->since10, 1);
-        $this->a($cFile, $this->docEnd, 1);
-        $this->a($cFile, "    public function getTitleSep() {");
+        $this->writeFuncHeader($cFile, 
+                'public function getTitleSep()', 
+                'Returns the character (or string) that is used to separate page title from website name.', 
+                '', 
+                [], 
+                [
+                    'type' => 'string',
+                    'description' => [
+                        "A string such as ' - ' or ' | '. Note that the method",
+                        'will add the two spaces by default.'
+                    ]
+                ]);
         $this->a($cFile, "        return \$this->titleSep;");
         $this->a($cFile, $this->blockEnd, 1);
 
-        $this->a($cFile, $this->docStart, 1);
-        $this->a($cFile, "     * Returns version number of the application.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * @return string The method should return a string in the");
-        $this->a($cFile, "     * form 'x.x.x.x'.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, $this->since10, 1);
-        $this->a($cFile, $this->docEnd, 1);
-        $this->a($cFile, "    public function getVersion() {");
+        $this->writeFuncHeader($cFile, 
+                'public function getVersion()', 
+                'Returns version number of the application.', 
+                '', 
+                [], 
+                [
+                    'type' => 'string',
+                    'description' => [
+                        'The method should return a string in the',
+                        "form 'x.x.x.x'."
+                    ]
+                ]);
         $this->a($cFile, "        return \$this->appVestion;");
         $this->a($cFile, $this->blockEnd, 1);
 
-        $this->a($cFile, $this->docStart, 1);
-        $this->a($cFile, "     * Returns a string that represents application release type.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * @return string The method will return a string such as");
-        $this->a($cFile, "     * 'Stable', 'Alpha', 'Beta' and so on.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, $this->since10, 1);
-        $this->a($cFile, $this->docEnd, 1);
-        $this->a($cFile, "    public function getVersionType() {");
+        $this->writeFuncHeader($cFile, 
+                'public function getVersionType()', 
+                'Returns a string that represents application release type.', 
+                '', 
+                [], 
+                [
+                    'type' => 'string',
+                    'description' => [
+                        'The method will return a string such as',
+                        "'Stable', 'Alpha', 'Beta' and so on."
+                    ]
+                ]);
         $this->a($cFile, "        return \$this->appVersionType;");
         $this->a($cFile, $this->blockEnd, 1);
 
-        $this->a($cFile, $this->docStart, 1);
-        $this->a($cFile, "     * Returns the global website name.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * @param string \$langCode Language code such as 'AR' or 'EN'.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * @return string|null If the name of the website for the given language");
-        $this->a($cFile, "     * does exist, the method will return it. If no such name, the");
-        $this->a($cFile, "     * method will return null.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, $this->since10, 1);
-        $this->a($cFile, $this->docEnd, 1);
-        $this->a($cFile, "    public function getWebsiteName(\$langCode) {");
+        $this->writeFuncHeader($cFile, 
+                'public function getWebsiteName($langCode)', 
+                'Returns the global website name.', 
+                '', 
+                [
+                    '$langCode' => [
+                        'type' => 'string',
+                        'description' => "Language code such as 'AR' or 'EN'."
+                    ]
+                ], 
+                [
+                    'type' => 'string|null',
+                    'description' => [
+                        'If the name of the website for the given language',
+                        'does exist, the method will return it. If no such name, the',
+                        'method will return null.'
+                    ]
+                ]);
         $this->a($cFile, "        \$langs = \$this->getWebsiteNames();");
         $this->a($cFile, "        \$langCodeF = strtoupper(trim(\$langCode));");
         $this->a($cFile, "        ");
@@ -1203,24 +1195,27 @@ class ConfigController {
         $this->a($cFile, "        }");
         $this->a($cFile, $this->blockEnd, 1);
 
-        $this->a($cFile, $this->docStart, 1);
-        $this->a($cFile, "     * Returns an array which contains different website names in different languages.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * Each index will contain a language code and the value will be the name");
-        $this->a($cFile, "     * of the website in the given language.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, "     * @return array An array which contains different website names in different languages.");
-        $this->a($cFile, $this->docEmptyLine, 1);
-        $this->a($cFile, $this->since10, 1);
-        $this->a($cFile, $this->docEnd, 1);
-        $this->a($cFile, "    public function getWebsiteNames() {");
+        $this->writeFuncHeader($cFile, 
+                'public function getWebsiteNames()', 
+                'Returns an array which contains different website names in different languages.', 
+                [
+                    'Each index will contain a language code and the value will be the name',
+                    'of the website in the given language.'
+                ], 
+                [], 
+                [
+                    'type' => 'array',
+                    'description' => [
+                        'An array which contains different website names in different languages.'
+                    ]
+                ]);
         $this->a($cFile, "        return \$this->webSiteNames;");
         $this->a($cFile, $this->blockEnd, 1);
-
-        $this->_writeDbCon($cFile, $appConfigArr);
-        $this->_writeSiteInfo($cFile, $appConfigArr);
-        $this->_writeSmtpConn($cFile, $appConfigArr);
-        $this->_writeAppVersionInfo($cFile, $appConfigArr);
+        
+        $this->_writeDbCon($cFile);
+        $this->_writeSiteInfo($cFile);
+        $this->_writeSmtpConn($cFile);
+        $this->_writeAppVersionInfo($cFile);
 
         $this->a($cFile, "}");
         $cFile->write(false, true);
@@ -1386,7 +1381,7 @@ class ConfigController {
         $this->a($cFile, $this->docEnd, 1);
         $this->a($cFile, "    private \$webSiteNames;");
     }
-    private function _writeAppVersionInfo(&$cFile, $appConfigArr) {
+    private function _writeAppVersionInfo(&$cFile) {
         $this->a($cFile, [
             $this->docStart,
             $this->since10,
@@ -1397,58 +1392,28 @@ class ConfigController {
 
         $versionInfo = $this->getAppVersionInfo();
 
-        if (isset($appConfigArr['version-info'])) {
-            if (isset($appConfigArr['version-info']['version'])) {
-                $this->a($cFile, "\$this->appVestion = '".$appConfigArr['version-info']['version']."';", 2);
-            } else {
-                $this->a($cFile, "\$this->appVestion = '".$versionInfo['version']."';", 2);
-            }
-
-            if (isset($appConfigArr['version-info']['version-type'])) {
-                $this->a($cFile, "\$this->appVersionType = '".$appConfigArr['version-info']['version-type']."';", 2);
-            } else {
-                $this->a($cFile, "\$this->appVersionType = '".$versionInfo['version-type']."';", 2);
-            }
-
-            if (isset($appConfigArr['version-info']['release-date'])) {
-                $this->a($cFile, "\$this->appReleaseDate = '".$appConfigArr['version-info']['release-date']."';", 2);
-            } else {
-                $this->a($cFile, "\$this->appReleaseDate = '".$versionInfo['release-date']."';", 2);
-            }
-        } else {
-            $this->a($cFile, [
-                "\$this->appVestion = '".$versionInfo['version']."';",
-                "\$this->appVersionType = '".$versionInfo['version-type']."';",
-                "\$this->appReleaseDate = '".$versionInfo['release-date']."';"
-            ], 2);
-        }
+        $this->a($cFile, [
+            "\$this->appVestion = '".$versionInfo['version']."';",
+            "\$this->appVersionType = '".$versionInfo['version-type']."';",
+            "\$this->appReleaseDate = '".$versionInfo['release-date']."';"
+        ], 2);
 
         $this->a($cFile, $this->blockEnd, 1);
     }
-    private function _writeCronPass(&$cFile, $appConfigArr) {
-        if (isset($appConfigArr['cron-pass'])) {
-            if (strlen(trim($appConfigArr['cron-pass'])) == 0) {
-                $this->a($cFile, "        \$this->cronPass = 'NO_PASSWORD';");
-            } else {
-                $this->a($cFile, "        \$this->cronPass = '".hash('sha256', $appConfigArr['cron-pass'])."';");
-            }
-        } else {
-            $password = $this->getCRONPassword();
-            $this->a($cFile, "        \$this->cronPass = '".$password."';");
-        }
+    private function _writeCronPass(&$cFile) {
+        
+        $password = $this->getCRONPassword();
+        $this->a($cFile, "        \$this->cronPass = '".$password."';");
     }
-    private function _writeDbCon(&$cFile, $appConfigArr) {
+    private function _writeDbCon(&$cFile) {
         $this->a($cFile, $this->docStart, 1);
         $this->a($cFile, $this->since10, 1);
         $this->a($cFile, $this->docEnd, 1);
         $this->a($cFile, "    private function initDbConnections() {");
         $this->a($cFile, "        \$this->dbConnections = [");
 
-        if (isset($appConfigArr['db-connections']) && gettype($appConfigArr['db-connections']) == 'array') {
-            $dbCons = $appConfigArr['db-connections'];
-        } else {
-            $dbCons = $this->getDatabaseConnections();
-        }
+        
+        $dbCons = $this->getDatabaseConnections();
 
         foreach ($dbCons as $connObj) {
             if ($connObj instanceof ConnectionInfo) {
@@ -1466,12 +1431,9 @@ class ConfigController {
         $this->a($cFile, "        ];");
         $this->a($cFile, $this->blockEnd, 1);
     }
-    private function _writeSiteDescriptions(&$cFile, $appConfigArr) {
-        if (isset($appConfigArr['descriptions']) && gettype($appConfigArr['descriptions']) == 'array') {
-            $descArr = $appConfigArr['descriptions'];
-        } else {
-            $descArr = $this->getDescriptions();
-        }
+    private function _writeSiteDescriptions(&$cFile) {
+        
+        $descArr = $this->getDescriptions();
         $this->a($cFile, "        \$this->descriptions = [");
 
         foreach ($descArr as $langCode => $desc) {
@@ -1480,37 +1442,26 @@ class ConfigController {
         }
         $this->a($cFile, "        ];");
     }
-    private function _writeSiteInfo(&$cFile,  $appConfigArr) {
+    private function _writeSiteInfo(&$cFile) {
         $this->a($cFile, $this->docStart, 1);
         $this->a($cFile, $this->since10, 1);
         $this->a($cFile, $this->docEnd, 1);
         $this->a($cFile, "    private function initSiteInfo() {");
 
-        $this->_writeSiteNames($cFile, $appConfigArr);
-        $this->_writeSiteTitles($cFile, $appConfigArr);
-        $this->_writeSiteDescriptions($cFile, $appConfigArr);
-
+        $this->_writeSiteNames($cFile);
+        $this->_writeSiteTitles($cFile);
+        $this->_writeSiteDescriptions($cFile);
+        
         $this->a($cFile, "        \$this->baseUrl = Uri::getBaseURL();");
 
-        if (isset($appConfigArr['title-sep'])) {
-            $sep = $appConfigArr['title-sep'];
-        } else {
-            $sep = $this->getTitleSep();
-        }
+        $sep = $this->getTitleSep();
         $this->a($cFile, "        \$this->titleSep = '$sep';");
 
-        if (isset($appConfigArr['primary-lang'])) {
-            $lang = $appConfigArr['primary-lang'];
-        } else {
-            $lang = $this->getPrimaryLang();
-        }
+        $lang = $this->getPrimaryLang();
         $this->a($cFile, "        \$this->primaryLang = '$lang';");
 
-        if (isset($appConfigArr['base-theme'])) {
-            $baseTheme = $appConfigArr['base-theme'];
-        } else {
-            $baseTheme = $this->getBaseTheme();
-        }
+        
+        $baseTheme = $this->getBaseTheme();
 
         if (class_exists($baseTheme)) {
             $this->a($cFile, "        \$this->baseThemeName = \\".trim($baseTheme, '\\')."::class;");
@@ -1518,11 +1469,8 @@ class ConfigController {
             $this->a($cFile, "        \$this->baseThemeName = '$baseTheme';");
         }
 
-        if (isset($appConfigArr['admin-theme'])) {
-            $adminTheme = $appConfigArr['admin-theme'];
-        } else {
-            $adminTheme = $this->getBaseTheme();
-        }
+        $adminTheme = $this->getBaseTheme();
+        
 
         if (class_exists($adminTheme)) {
             $this->a($cFile, "        \$this->adminThemeName = \\".trim($adminTheme, '\\')."::class;");
@@ -1530,26 +1478,20 @@ class ConfigController {
             $this->a($cFile, "        \$this->adminThemeName = '$adminTheme';");
         }
 
-        if (isset($appConfigArr['home-page'])) {
-            $this->a($cFile, "        \$this->homePage = '".$appConfigArr['home-page']."';");
-        } else {
-            $home = $this->getHomePage();
+        
+        $home = $this->getHomePage();
 
-            if ($home === null) {
-                $this->a($cFile, "        \$this->homePage = Uri::getBaseURL();");
-            } else {
-                $this->a($cFile, "        \$this->homePage = '$home';");
-            }
+        if ($home === null) {
+            $this->a($cFile, "        \$this->homePage = Uri::getBaseURL();");
+        } else {
+            $this->a($cFile, "        \$this->homePage = '$home';");
         }
+        
 
         $this->a($cFile, $this->blockEnd, 1);
     }
-    private function _writeSiteNames(&$cFile, $appConfigArr) {
-        if (isset($appConfigArr['website-names']) && gettype($appConfigArr['website-names']) == 'array') {
-            $wNamesArr = $appConfigArr['website-names'];
-        } else {
-            $wNamesArr = $this->getWebsiteNames();
-        }
+    private function _writeSiteNames(&$cFile) {
+        $wNamesArr = $this->getWebsiteNames();
         $this->a($cFile, "        \$this->webSiteNames = [");
 
         foreach ($wNamesArr as $langCode => $name) {
@@ -1559,12 +1501,8 @@ class ConfigController {
         $this->a($cFile, "        ];");
         $this->a($cFile, "    ");
     }
-    private function _writeSiteTitles($cFile, $appConfigArr) {
-        if (isset($appConfigArr['titles']) && gettype($appConfigArr['titles']) == 'array') {
-            $titlesArr = $appConfigArr['titles'];
-        } else {
-            $titlesArr = $this->getTitles();
-        }
+    private function _writeSiteTitles($cFile) {
+        $titlesArr = $this->getTitles();
         $this->a($cFile, "        \$this->defaultPageTitles = [");
 
         foreach ($titlesArr as $langCode => $title) {
@@ -1583,18 +1521,14 @@ class ConfigController {
         }
         $this->a($cFile, "        ];");
     }
-    private function _writeSmtpConn(&$cFile, $appConfigArr) {
+    private function _writeSmtpConn(&$cFile) {
         $this->a($cFile, $this->docStart, 1);
         $this->a($cFile, $this->since10, 1);
         $this->a($cFile, $this->docEnd, 1);
         $this->a($cFile, "    private function initSmtpConnections() {");
         $this->a($cFile, "        \$this->emailAccounts = [");
 
-        if (isset($appConfigArr['smtp']) && gettype($appConfigArr['smtp']) == 'array') {
-            $smtpAccArr = $appConfigArr['smtp'];
-        } else {
-            $smtpAccArr = $this->getSMTPAccounts();
-        }
+        $smtpAccArr = $this->getSMTPAccounts();
 
         foreach ($smtpAccArr as $smtpAcc) {
             if ($smtpAcc instanceof SMTPAccount) {

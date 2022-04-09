@@ -11,10 +11,12 @@ jobs:
     runs-on: ${{ matrix.os }} 
     services: 
       mysql:
-        image: mysql:5.7
+        image: mysql:8.0.26
         env:
           MYSQL_ROOT_PASSWORD: 123456
           MYSQL_DATABASE: testing_db
+          MYSQL_USER: test_user
+          MYSQL_PASSWORD: 123456
         ports:
           - 33306:3306
         options: >-

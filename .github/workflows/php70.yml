@@ -39,7 +39,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }} 
           extensions: mysqli, mbstring
-          tools: phpunit:6.5.13, composer
+          tools: phpunit, composer
           
           
       - name: Install Dependencies

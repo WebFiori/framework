@@ -49,8 +49,8 @@ jobs:
           extensions: mysqli, mbstring
           tools: phpunit:5.7.27, composer
           
-      - name: List Containers IPs
-        run: docker inspect -f '{{.Name}} - {{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(docker ps -aq)
+      #- name: List Containers IPs
+      #  run: docker inspect -f '{{.Name}} - {{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(docker ps -aq)
         
       - name: Install Dependencies
         run: composer install --prefer-dist --no-interaction --no-dev

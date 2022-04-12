@@ -35,6 +35,13 @@ jobs:
       - name: Clone Repo
         uses: actions/checkout@v1
       
+      - name: Start MySQL
+        run: |
+          sudo systemctl start mysql.service
+          while ! mysqladmin ping --host=127.0.0.1 --password=123456 --silent; do
+            sleep 1
+          done
+      
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:

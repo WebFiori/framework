@@ -11,7 +11,7 @@ jobs:
     runs-on: ${{ matrix.os }} 
     services: 
       mysql-db:
-        image: mysql:latest
+        image: mysql:8.0
         env:
           MYSQL_ROOT_PASSWORD: 123456
           MYSQL_DATABASE: testing_db

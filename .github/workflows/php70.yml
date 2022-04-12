@@ -16,7 +16,7 @@ jobs:
           MYSQL_ROOT_PASSWORD: 123456
           MYSQL_DATABASE: testing_db
         ports:
-          - 33306:3306
+          - 3306:3306
         options: >-
           --health-cmd="mysqladmin ping"
           --health-interval=10s
@@ -30,9 +30,7 @@ jobs:
             
     name: PHP ${{matrix.php}} - ${{matrix.os}}
     
-    steps: 
-      - name: List IPs
-        run: docker inspect -f '{{.Name}} - {{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(docker ps -aq)
+    steps:
       
       - name: Clone Repo
         uses: actions/checkout@v1
@@ -44,7 +42,9 @@ jobs:
           extensions: mysqli, mbstring
           tools: phpunit:5.7.27, composer
           
-          
+      - name: List IPs
+        run: docker inspect -f '{{.Name}} - {{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(docker ps -aq)
+        
       - name: Install Dependencies
         run: composer install --prefer-dist --no-interaction --no-dev
         

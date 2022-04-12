@@ -31,6 +31,9 @@ jobs:
     name: PHP ${{matrix.php}} - ${{matrix.os}}
     
     steps: 
+      - name: List IPs
+        run: docker inspect -f '{{.Name}} - {{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $(docker ps -aq)
+      
       - name: Clone Repo
         uses: actions/checkout@v1
       

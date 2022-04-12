@@ -11,7 +11,7 @@ jobs:
     runs-on: ${{ matrix.os }} 
     services: 
       mysql-db:
-        image: mysql:8.0
+        image: mysql:5.7
         env:
           MYSQL_ROOT_PASSWORD: 123456
           MYSQL_DATABASE: testing_db
@@ -34,13 +34,6 @@ jobs:
       
       - name: Clone Repo
         uses: actions/checkout@v1
-      
-      - name: Start MySQL
-        run: |
-          sudo systemctl start mysql.service
-          while ! mysqladmin ping --host=127.0.0.1 --password=123456 --silent; do
-            sleep 1
-          done
       
       - name: Setup PHP
         uses: shivammathur/setup-php@v2

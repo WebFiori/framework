@@ -46,7 +46,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }} 
-          extensions: mysqli, mbstring
+          extensions: mysqli, mbstring, sqlsrv
           tools: phpunit:5.7.27, composer
           
       #- name: List Containers IPs

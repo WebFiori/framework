@@ -160,7 +160,7 @@ class WebFioriApp {
 
                 if ($uriObj !== null) {
                     foreach ($uriObj->getMiddlewar() as $mw) {
-                        $mw->afterTerminate();
+                        $mw->afterSend(Request::get(), Response::get());
                     }
                 }
             });
@@ -179,7 +179,7 @@ class WebFioriApp {
                 $uriObj->getMiddlewar()->insertionSort();
 
                 foreach ($uriObj->getMiddlewar() as $mw) {
-                    $mw->after();
+                    $mw->after(Request::get(), Response::get());
                 }
             }
         });

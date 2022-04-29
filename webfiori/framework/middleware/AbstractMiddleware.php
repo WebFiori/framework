@@ -25,6 +25,8 @@
 namespace webfiori\framework\middleware;
 
 use webfiori\collections\Comparable;
+use webfiori\http\Request;
+use webfiori\http\Response;
 
 /**
  * An abstract class that can be used to implement custom middleware.
@@ -73,7 +75,7 @@ abstract class AbstractMiddleware implements Comparable {
      * 
      * @since 1.0
      */
-    public function __construct($name) {
+    public function __construct(string $name) {
         $this->groups = [];
 
         if (!$this->setName($name)) {
@@ -91,7 +93,7 @@ abstract class AbstractMiddleware implements Comparable {
      * 
      * @since 1.0
      */
-    public function addToGroup($groupName) {
+    public function addToGroup(string $groupName) {
         $trimmed = trim($groupName);
 
         if (strlen($trimmed) > 0 && !in_array($trimmed, $this->getGroups())) {
@@ -117,16 +119,28 @@ abstract class AbstractMiddleware implements Comparable {
      * This method can be used to add extra payload to the response or even 
      * change it totally before sending back the response.
      * 
+     * @param Request $request An object that represents the request that
+     * will be received.
+     * 
+     * @param Response $response An object that represents the response
+     * that will be sent back.
+     * 
      * @since 1.0
      */
-    public abstract function after();
+    public abstract function after(Request $request, Response $response);
     /**
      * Perform an action after sending the response and before terminating the 
      * application.
      * 
+     * @param Request $request An object that represents the request that
+     * will be received.
+     * 
+     * @param Response $response An object that represents the response
+     * that will be sent back.
+     * 
      * @since 1.0
      */
-    public abstract function afterSend();
+    public abstract function afterSend(Request $request, Response $response);
     /**
      * Perform an action before accessing application level.
      * 
@@ -136,9 +150,15 @@ abstract class AbstractMiddleware implements Comparable {
      * takes the user to login screen or just send a 401 response code with 
      * a message.
      * 
+     * @param Request $request An object that represents the request that
+     * will be received.
+     * 
+     * @param Response $response An object that represents the response
+     * that will be sent back.
+     * 
      * @since 1.0
      */
-    public abstract function before();
+    public abstract function before(Request $request, Response $response);
 
     /**
      * Compare the priority of the middleware with another one.
@@ -153,7 +173,7 @@ abstract class AbstractMiddleware implements Comparable {
      * 
      * @since 1.0
      */
-    public function compare($other) {
+    public function compare($other) : int {
         if ($this->priority == $other->priority) {
             return strcmp($other->getName(), $this->getName());
         }
@@ -169,7 +189,7 @@ abstract class AbstractMiddleware implements Comparable {
      * 
      * @since 1.0
      */
-    public function getGroups() {
+    public function getGroups() : array {
         return $this->groups;
     }
     /**
@@ -179,7 +199,7 @@ abstract class AbstractMiddleware implements Comparable {
      * 
      * @since 1.0
      */
-    public function getName() {
+    public function getName() : string {
         return $this->name;
     }
     /**
@@ -189,7 +209,7 @@ abstract class AbstractMiddleware implements Comparable {
      * 
      * @since 1.0
      */
-    public function getPriority() {
+    public function getPriority() : int {
         return $this->priority;
     }
     /**
@@ -205,7 +225,7 @@ abstract class AbstractMiddleware implements Comparable {
      * 
      * @since 1.0
      */
-    public function setName($name) {
+    public function setName(string $name) {
         $trimmed = trim($name);
 
         if (strlen($trimmed) > 0) {
@@ -228,7 +248,7 @@ abstract class AbstractMiddleware implements Comparable {
      * 
      * @since 1.0
      */
-    public function setPriority($priority) {
+    public function setPriority(int $priority) {
         $this->priority = intval($priority);
     }
 }

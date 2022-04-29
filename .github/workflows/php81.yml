@@ -1,4 +1,4 @@
-name: Build PHP 7.0
+name: Build PHP 8.2
 
 on:
   push:
@@ -22,7 +22,7 @@ jobs:
       fail-fast: true
       matrix: 
         os: [ ubuntu-latest ]
-        php: [7.0]
+        php: [8.2]
             
     name: PHP${{matrix.php}} - ${{matrix.os}}
     
@@ -35,7 +35,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }} 
           extensions: mysqli, mbstring, sqlsrv
-          tools: phpunit:5.7.27, composer
+          tools: phpunit:9.5.20, composer
           
       - name: Shutdown Ubuntu MySQL
         run: sudo service mysql stop
@@ -57,10 +57,10 @@ jobs:
           
       - name: Setup MSSQL
         run: sqlcmd -S localhost -U SA -P 1234567890@Eu -Q 'create database testing_db'
-      
+          
       - name: Install Dependencies
         run: composer install --prefer-source --no-interaction --no-dev
-        
+      
       - name: Execute Tests
         run: phpunit
         

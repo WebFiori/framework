@@ -1,4 +1,4 @@
-name: Build PHP 7.0
+name: Build PHP 7.1
 
 on:
   push:
@@ -22,7 +22,7 @@ jobs:
       fail-fast: true
       matrix: 
         os: [ ubuntu-latest ]
-        php: [7.0]
+        php: [7.1]
             
     name: PHP${{matrix.php}} - ${{matrix.os}}
     

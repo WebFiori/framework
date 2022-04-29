@@ -1,4 +1,4 @@
-name: Build PHP 7.0
+name: Build PHP 8.0
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   test:
-    runs-on: ${{ matrix.os }} 
+    runs-on: ${{ matrix.os }}
     services:
       sql.data:
         image: mcr.microsoft.com/mssql/server:2019-latest
@@ -22,7 +22,7 @@ jobs:
       fail-fast: true
       matrix: 
         os: [ ubuntu-latest ]
-        php: [7.0]
+        php: [ 8.0 ]
             
     name: PHP${{matrix.php}} - ${{matrix.os}}
     
@@ -35,7 +35,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }} 
           extensions: mysqli, mbstring, sqlsrv
-          tools: phpunit:5.7.27, composer
+          tools: phpunit:8.5.13
           
       - name: Shutdown Ubuntu MySQL
         run: sudo service mysql stop
@@ -63,6 +63,6 @@ jobs:
         
       - name: Execute Tests
         run: phpunit
-        
+      
       - name: CodeCov
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v1   

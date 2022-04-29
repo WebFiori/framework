@@ -90,7 +90,7 @@ class FileTest extends TestCase {
     public function test07() {
         $file = new File('hello.txt', ROOT_DIR);
         $this->expectException(FileException::class);
-        $this->expectExceptionMessage("File not found: '".$file->getAbsolutePath()."'");
+        $this->expectExceptionMessage("No data is set to write.");
         $file->write();
     }
     /**
@@ -165,11 +165,12 @@ class FileTest extends TestCase {
      */
     public function testWrite01() {
         $file = new File('hello.txt', ROOT_DIR);
+        $file->setRawData('b');
         $file->write(true, true);
         $file->read();
-        $this->assertEquals('', $file->getRawData());
+        $this->assertEquals('b', $file->getRawData());
         $file->setRawData('Hello.');
-        $file->write();
+        $file->write(false);
         $file->read();
         $this->assertEquals('Hello.', $file->getRawData());
         $file->setRawData('World.');

@@ -255,9 +255,12 @@ class File implements JsonI {
      * 
      * @since 1.0
      */
-    public function __construct($fNameOrAbsPath = '',$fPath = null) {
+    public function __construct(string $fNameOrAbsPath = '', string $fPath = '') {
         $this->mimeType = 'application/octet-stream';
-
+        $this->fileSize = -1;
+        $this->path = '';
+        $this->fileName = '';
+        
         if (!$this->setPath($fPath)) {
             $info = $this->_extractPathAndName($fNameOrAbsPath);
             $this->setDir($info['path']);
@@ -313,7 +316,7 @@ class File implements JsonI {
      * 
      * @since 1.1.1
      */
-    public function getAbsolutePath() {
+    public function getAbsolutePath() : string {
         $fPath = $this->getPath();
         $name = $this->getName();
 
@@ -332,7 +335,7 @@ class File implements JsonI {
      * @param string $encodeOrDecode This parameter is used to base-64 decode or 
      * encode file data. The parameter can have one of 3 values:
      * <ul>
-     * <li>e: Encode the raw data of the file.</li>
+     * <li>e: Encode the raw data of the file (default).</li>
      * <li>d: Decode the raw data of the file.</li>
      * <li>none: Return the raw data of the file as it is. This is the default value.</li>
      * </ul>
@@ -344,7 +347,7 @@ class File implements JsonI {
      * 
      * @since 1.2.1
      */
-    public function getChunks($chunkSize = 1000, $encodeOrDecode = 'e') {
+    public function getChunks(int $chunkSize = 1000, string $encodeOrDecode = 'e') {
         if ($chunkSize < 0) {
             $chunkSize = 1000;
         }
@@ -382,7 +385,7 @@ class File implements JsonI {
      * 
      * @since 1.0
      */
-    public function getDir() {
+    public function getDir() : string {
         return $this->getPath();
     }
     /**
@@ -399,7 +402,7 @@ class File implements JsonI {
      * 
      * @since 1.2.0
      */
-    public function getExtension() {
+    public function getExtension() : string {
         $mime = $this->getFileMIMEType();
         $mimeTypes = self::MIME_TYPES;
         
@@ -430,7 +433,7 @@ class File implements JsonI {
      * 
      * @since 1.0
      */
-    public function getFileMIMEType() {
+    public function getFileMIMEType() : string {
         return $this->mimeType;
     }
     /**
@@ -487,7 +490,7 @@ class File implements JsonI {
      * 
      * @since 1.1.1
      */
-    public static function getMIMEType($ext) {
+    public static function getMIMEType(string $ext) {
         $lowerCase = strtolower($ext);
         $retVal = null;
 
@@ -511,7 +514,7 @@ class File implements JsonI {
      * 
      * @since 1.0
      */
-    public function getName() {
+    public function getName() : string {
         return $this->fileName;
     }
     /**
@@ -528,7 +531,7 @@ class File implements JsonI {
      * 
      * @deprecated since version 1.1.5 Use File::getDir() instead.
      */
-    public function getPath() {
+    public function getPath() : string {
         return $this->path;
     }
     /**
@@ -551,7 +554,7 @@ class File implements JsonI {
      * 
      * @since 1.0
      */
-    public function getRawData($encodeOrDecode = 'none') {
+    public function getRawData(string $encodeOrDecode = 'none') {
         $lower = strtolower(trim($encodeOrDecode));
 
         if ($this->rawData !== null) {
@@ -567,10 +570,10 @@ class File implements JsonI {
     /**
      * Returns the size of the file in bytes.
      * 
-     * @return int|null Size of the file in bytes. If the raw data of the file
-     * is not set or the file does not exist, the method will return null.
+     * @return int Size of the file in bytes. If the raw data of the file
+     * is not set or the file does not exist, the method will return -1.
      */
-    public function getSize() {
+    public function getSize() : int {
         return $this->fileSize;
     }
     /**
@@ -581,7 +584,7 @@ class File implements JsonI {
      * 
      * @since 1.1.6
      */
-    public function isExist() {
+    public function isExist() : bool {
         return self::isFileExist($this->getAbsolutePath());
     }
     /**
@@ -595,7 +598,7 @@ class File implements JsonI {
      * 
      * @since 1.1.8
      */
-    public static function isFileExist($path) {
+    public static function isFileExist(string $path) : bool {
         set_error_handler(null);
         $isExist = file_exists($path);
         restore_error_handler();
@@ -626,7 +629,7 @@ class File implements JsonI {
      * <li>If the file does not exist.</li>
      * </ul>
      */
-    public function read($from = -1,$to = -1) {
+    public function read(int $from = -1, int $to = -1) {
         $fPath = $this->_checkNameAndPath();
 
         if (!$this->_readHelper($fPath,$from,$to)) {
@@ -648,7 +651,7 @@ class File implements JsonI {
      * 
      * @since 1.1.2
      */
-    public function remove() {
+    public function remove() : bool {
         if ($this->isExist()) {
             $this->rawData = '';
             unlink($this->getAbsolutePath());
@@ -672,7 +675,7 @@ class File implements JsonI {
      * 
      * @since 1.0
      */
-    public function setDir($dir) {
+    public function setDir(string $dir) {
         return $this->setPath($dir);
     }
     /**
@@ -684,7 +687,7 @@ class File implements JsonI {
      * 
      * @since 1.0
      */
-    public function setId($id) {
+    public function setId(string $id) {
         $this->id = $id;
     }
     /**
@@ -698,7 +701,7 @@ class File implements JsonI {
      * 
      * @since 1.0
      */
-    public function setMIMEType($type) {
+    public function setMIMEType(string $type) {
         if (strlen($type) != 0) {
             $this->mimeType = $type;
         }
@@ -713,7 +716,7 @@ class File implements JsonI {
      * 
      * @since 1.0
      */
-    public function setName($name) {
+    public function setName(string $name) {
         $trimmed = trim($name);
 
         if (strlen($trimmed) != 0) {
@@ -738,7 +741,7 @@ class File implements JsonI {
      * 
      * @deprecated since version 1.1.5 Use File::setDir() instead.
      */
-    public function setPath($fPath) {
+    public function setPath(string $fPath) {
         $retVal = false;
         $pathV = self::_validatePath($fPath);
         $len = strlen($pathV);
@@ -760,7 +763,7 @@ class File implements JsonI {
      * 
      * @since 1.0
      */
-    public function setRawData($raw) {
+    public function setRawData(string $raw) {
         if (strlen($raw) > 0) {
             $this->rawData = $raw;
             $this->_setSize(strlen($raw));
@@ -777,7 +780,7 @@ class File implements JsonI {
      * 
      * @since 1.0
      */
-    public function toJSON() {
+    public function toJSON() : Json {
         try {
             // This is used just to set the size of the file.
             $this->read();
@@ -810,7 +813,7 @@ class File implements JsonI {
      * 
      * @since 1.1.1
      */
-    public function view($asAttachment = false) {
+    public function view(bool $asAttachment = false) {
         $raw = $this->getRawData();
 
         if ($raw !== null) {
@@ -842,7 +845,7 @@ class File implements JsonI {
      * 
      * @since 1.1.1
      */
-    public function write($append = true, $create = false) {
+    public function write(bool $append = true, bool $create = false) {
         $pathV = $this->_checkNameAndPath();
         $this->_writeHelper($pathV, $append === true, $create === true);
     }
@@ -1011,6 +1014,9 @@ class File implements JsonI {
      * @throws FileException
      */
     private function _writeHelper($fPath, $append = true, $createIfNotExist = false) {
+        if ($this->getRawData() === null) {
+            throw new FileException("No data is set to write.");
+        }
         if (!$this->isExist()) {
             if ($createIfNotExist) {
                 Util::isDirectory($this->getDir(), true);

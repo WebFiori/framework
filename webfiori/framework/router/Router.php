@@ -1424,7 +1424,7 @@ class Router {
             $route->getMiddlewar()->insertionSort(false);
 
             foreach ($route->getMiddlewar() as $mw) {
-                $mw->before();
+                $mw->before(Request::get(), Response::get());
             }
 
             if ($route->getType() == self::API_ROUTE && !defined('API_CALL')) {

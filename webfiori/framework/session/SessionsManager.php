@@ -25,7 +25,7 @@
 namespace webfiori\framework\session;
 
 use webfiori\framework\exceptions\SessionException;
-
+use webfiori\http\Request;
 /**
  * A class which is used to manage user sessions.
  *
@@ -215,18 +215,10 @@ class SessionsManager {
         $sid = self::getSessionIDFromCookie($trimmedSName);
 
         if ($sid === false) {
-            if (isset($_GET[$trimmedSName])) {
-                $sid = filter_var($_GET[$seesionName], FILTER_SANITIZE_STRING);
-            } 
-
-            if ($sid === null || $sid === false) {
-                if (isset($_POST[$trimmedSName])) {
-                    $sid = filter_var($_POST[$seesionName], FILTER_SANITIZE_STRING);
-                } 
-
-                if ($sid === null || $sid === false) {
-                    return false;
-                }
+            $sid = Request::getParam($seesionName);
+            
+            if ($sid === null) {
+                return false;
             }
         }
 

@@ -4,6 +4,7 @@ namespace webfiori\framework\cron;
 use InvalidArgumentException;
 use webfiori\json\Json;
 use webfiori\json\JsonI;
+use webfiori\http\Request;
 /**
  * A class that represents execution argument of a job.
  *
@@ -83,11 +84,11 @@ class JobArgument implements JsonI {
         $uName = str_replace(' ', '_', $name);
         $retVal = null;
         $filtered = false;
-
-        if (isset($_POST[$name])) {
-            $filtered = filter_var(urldecode($_POST[$name]), FILTER_SANITIZE_STRING);
-        } else if (isset($_POST[$uName])) {
-            $filtered = filter_var(urldecode($_POST[$uName]), FILTER_SANITIZE_STRING);
+        
+        $filtered = Request::getParam($name);
+        
+        if ($filtered === null) {
+            $filtered = Request::getParam($uName);
         }
 
         if ($filtered !== false) {

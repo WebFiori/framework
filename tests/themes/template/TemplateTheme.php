@@ -33,20 +33,20 @@ class TemplateTheme extends Theme {
      * @param type $options
      * @return HTMLNode
      */
-    public function createHTMLNode($options = []) {
+    public function createHTMLNode(array $options = []) : HTMLNode {
         $node = new HTMLNode();
 
         return $node;
     }
 
-    public function getAsideNode() {
+    public function getAsideNode() : HTMLNode {
         $menu = new HTMLNode('div');
         $menu->addTextNode('Aside');
 
         return $menu;
     }
 
-    public function getFooterNode() {
+    public function getFooterNode() : HTMLNode {
         $node = new HTMLNode('div');
         $fNode = new HTMLNode('footer');
         $fNode->addTextNode('Footer Section');
@@ -55,7 +55,7 @@ class TemplateTheme extends Theme {
         return $node;
     }
 
-    public function getHeadNode() {
+    public function getHeadNode() : HeadNode {
         $headTag = new HeadNode();
         //Add head tag tags here as needed.
         //Note that you don't have to add CSS and JS files of the theme as 
@@ -64,7 +64,7 @@ class TemplateTheme extends Theme {
         return $headTag;
     }
 
-    public function getHeaderNode() {
+    public function getHeaderNode() : HTMLNode {
         $headerSec = new HTMLNode();
         $headerBody = new HTMLNode();
         $headerBody->addTextNode('Header Sec');

@@ -88,7 +88,7 @@ class WebFioriTheme extends Theme {
      * </ul>
      * @return HTMLNode
      */
-    public function createHTMLNode($options = []) {
+    public function createHTMLNode(array $options = []) : HTMLNode {
         $nodeType = isset($options['type']) ? $options['type'] : 'div';
         $withPadding = isset($options['with-padding']) ? $options['with-padding'] === true : true;
         $withMargin = isset($options['with-margin']) ? $options['with-margin'] === true : true;
@@ -230,13 +230,13 @@ class WebFioriTheme extends Theme {
             }
         }
     }
-    public function getAsideNode() {
+    public function getAsideNode() : HTMLNode {
         $menu = new HTMLNode('div');
 
         return $menu;
     }
 
-    public function getFooterNode() {
+    public function getFooterNode() : HTMLNode {
         $node = HTMLNode::loadComponent($this->getDirecotry().'footer.html', [
             'version' => WF_VERSION,
             'version_type' => WF_VERSION_TYPE,
@@ -251,7 +251,7 @@ class WebFioriTheme extends Theme {
         return $node;
     }
 
-    public function getHeadNode() {
+    public function getHeadNode() : HeadNode {
         $headTag = new HeadNode();
         $headTag->addLink('icon', 'favicon.png');
         $headTag->addMeta('robots', 'index, follow');
@@ -259,7 +259,7 @@ class WebFioriTheme extends Theme {
         return $headTag;
     }
 
-    public function getHeaderNode() {
+    public function getHeaderNode() : HTMLNode {
         $headerSec = HTMLNode::loadComponent($this->getDirecotry().'header.html', [
             'menu-labels' => $this->getPage()->get('menus/main-menu'),
             'home_link' => WebFioriApp::getAppConfig()->getBaseURL(),

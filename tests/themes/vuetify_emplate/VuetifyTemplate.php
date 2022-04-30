@@ -61,23 +61,23 @@ class VuetifyTemplate extends Theme {
         });
     }
 
-    public function createHTMLNode($options = []) {
+    public function createHTMLNode(array $options = []) : HTMLNode {
         return new HTMLNode();
     }
 
-    public function getAsideNode() {
+    public function getAsideNode() : HTMLNode {
         $aside = new HTMLNode('v-container');
 
         return $aside;
     }
 
-    public function getFooterNode() {
+    public function getFooterNode() : HTMLNode {
         $footer = new HTMLNode('v-footer');
 
         return $footer;
     }
 
-    public function getHeadNode() {
+    public function getHeadNode() : HeadNode {
         $node = new HeadNode();
         $lang = Page::translation();
 
@@ -91,7 +91,7 @@ class VuetifyTemplate extends Theme {
         return $node;
     }
 
-    public function getHeaderNode() {
+    public function getHeaderNode() : HTMLNode {
         $aside = new HTMLNode('v-toolbar');
 
         return $aside;

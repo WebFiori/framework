@@ -35,12 +35,12 @@ class ThemeClassWriter extends ClassWriter {
      * <li>name: Holds theme name.</li>
      * </ul>
      */
-    public function __construct($classNameInfo = []) {
+    public function __construct(array $classNameInfo = []) {
         parent::__construct($classNameInfo);
         $this->name = isset($classNameInfo['name']) ? "'".$classNameInfo['name']."'" : null;
         
     }
-    private function writeComponent($className, $extends, $classComment, $todoTxt) {
+    private function writeComponent(string $className, string $extends, string $classComment, string $todoTxt) {
         $writer = new ThemeComponentWriter([
             'path' => $this->getPath(),
             'namespace' => $this->getNamespace(),
@@ -78,7 +78,7 @@ class ThemeClassWriter extends ClassWriter {
             " * @return HTMLNode|null An object of type 'HTMLNode'. If the theme has no aside",
             ' * section, the method might return null.',
             ' */',
-            'public function getAsideNode() {', 
+            'public function getAsideNode() : HTMLNode {', 
         ], 1);
         $this->append('return new AsideSection();', 2);
         $this->append('}', 1);
@@ -91,7 +91,7 @@ class ThemeClassWriter extends ClassWriter {
             " * @return HTMLNode|null An object of type 'HTMLNode'. If the theme has no footer",
             ' * section, the method might return null.',
             ' */',
-            'public function getFooterNode() {',
+            'public function getFooterNode() : HTMLNode {',
         ], 1);
         $this->append('return new FooterSection();', 2);
         $this->append('}', 1);
@@ -104,7 +104,7 @@ class ThemeClassWriter extends ClassWriter {
             ' *',
             " * @return HeadNode",
             ' */',
-            'public function getHeadNode() {',
+            'public function getHeadNode() : HeadNode {',
         ], 1);
         $this->append('return new HeadSection();', 2);
         $this->append('}', 1);
@@ -117,7 +117,7 @@ class ThemeClassWriter extends ClassWriter {
             " * @return HTMLNode|null @return HTMLNode|null An object of type 'HTMLNode'. If the theme has no header",
             ' * section, the method might return null.',
             ' */',
-            'public function getHeaderNode() {',
+            'public function getHeaderNode() : HTMLNode {',
         ], 1);
         $this->append('return new HeaderSection();', 2);
         $this->append('}', 1);

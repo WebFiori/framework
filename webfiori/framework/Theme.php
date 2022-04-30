@@ -29,6 +29,7 @@ use webfiori\framework\ui\WebPage;
 use webfiori\json\Json;
 use webfiori\json\JsonI;
 use webfiori\ui\HTMLNode;
+use webfiori\ui\HeadNode;
 /**
  * A base class that is used to construct web site UI.
  * 
@@ -147,7 +148,7 @@ abstract class Theme implements JsonI {
      * 
      * @since 1.0
      */
-    public function __construct($themeName = '') {
+    public function __construct(string $themeName = '') {
         $this->themeMeta = [
             'name' => '',
             'url' => '',
@@ -197,12 +198,8 @@ abstract class Theme implements JsonI {
      * 
      * @since 1.2.3
      */
-    public function createHTMLNode($options = []) {
-        if (gettype($options) != 'array') {
-            $options = [
-                'name' => 'div'
-            ];
-        }
+    public function createHTMLNode(array $options = []) : HTMLNode {
+
         $nodeName = isset($options['name']) ? $options['name'] : 'div';
         $attributes = isset($options['attributes']) ? $options['attributes'] : [];
 
@@ -221,7 +218,7 @@ abstract class Theme implements JsonI {
      * 
      * @since 1.2.2
      */
-    public abstract function getAsideNode();
+    public abstract function getAsideNode() : HTMLNode;
     /**
      * Returns the name of theme author.
      * 
@@ -230,7 +227,7 @@ abstract class Theme implements JsonI {
      * 
      * @since 1.1
      */
-    public function getAuthor() {
+    public function getAuthor() : string {
         return $this->themeMeta['author'];
     }
     /**
@@ -241,7 +238,7 @@ abstract class Theme implements JsonI {
      * 
      * @since 1.1
      */
-    public function getAuthorUrl() {
+    public function getAuthorUrl() : string {
         return $this->themeMeta['author-url'];
     }
     /**
@@ -253,7 +250,7 @@ abstract class Theme implements JsonI {
      * 
      * @return string The base URL that will be used by the theme.
      */
-    public function getBaseURL() {
+    public function getBaseURL() : string {
         if ($this->baseUrl !== null) {
             return $this->baseUrl;
         } else {
@@ -270,7 +267,7 @@ abstract class Theme implements JsonI {
      * 
      * @since 1.0
      */
-    public function getCssDirName() {
+    public function getCssDirName() : string {
         return $this->cssDir;
     }
     /**
@@ -281,7 +278,7 @@ abstract class Theme implements JsonI {
      * 
      * @since 1.1
      */
-    public function getDescription() {
+    public function getDescription() : string {
         return $this->themeMeta['description'];
     }
     /**
@@ -295,7 +292,7 @@ abstract class Theme implements JsonI {
      * 
      * @since 1.2.6
      */
-    public function getDirecotry() {
+    public function getDirecotry() : string {
         return THEMES_PATH.DS.$this->getDirectoryName().DS;
     }
     /**
@@ -309,7 +306,7 @@ abstract class Theme implements JsonI {
      * 
      * @since 1.0
      */
-    public function getDirectoryName() {
+    public function getDirectoryName() : string {
         return $this->themeMeta['directory'];
     }
     /**
@@ -326,7 +323,7 @@ abstract class Theme implements JsonI {
      * 
      * @since 1.2.2
      */
-    public abstract function getFooterNode();
+    public abstract function getFooterNode() : HTMLNode;
     /**
      * Returns an object of type HTMLNode that represents header section of the page. 
      * 
@@ -342,7 +339,7 @@ abstract class Theme implements JsonI {
      * 
      * @since 1.2.2
      */
-    public abstract function getHeaderNode();
+    public abstract function getHeaderNode() : HTMLNode;
     /**
      * Returns an object of type HeadNode that represents HTML &lt;head&gt; node. 
      * 
@@ -356,7 +353,7 @@ abstract class Theme implements JsonI {
      * 
      * @since 1.2.2
      */
-    public abstract function getHeadNode();
+    public abstract function getHeadNode() : HeadNode;
     /**
      * Returns the name of the directory where theme images are kept.
      * 
@@ -366,7 +363,7 @@ abstract class Theme implements JsonI {
      * 
      * @since 1.0
      */
-    public function getImagesDirName() {
+    public function getImagesDirName() : string {
         return $this->imagesDir;
     }
     /**
@@ -378,7 +375,7 @@ abstract class Theme implements JsonI {
      * 
      * @since 1.0
      */
-    public function getJsDirName() {
+    public function getJsDirName() : string {
         return $this->jsDir;
     }
     /**
@@ -387,7 +384,7 @@ abstract class Theme implements JsonI {
      * @return string The name of theme license. If it is not set, 
      * the method will return empty string.
      */
-    public function getLicenseName() {
+    public function getLicenseName() : string {
         return $this->themeMeta['license'];
     }
     /**
@@ -398,7 +395,7 @@ abstract class Theme implements JsonI {
      * 
      * @since 1.1
      */
-    public function getLicenseUrl() {
+    public function getLicenseUrl() : string {
         return $this->themeMeta['license-url'];
     }
     /**
@@ -410,7 +407,7 @@ abstract class Theme implements JsonI {
      * 
      * @since 1.0
      */
-    public function getName() {
+    public function getName() : string {
         return $this->themeMeta['name'];
     }
     /**
@@ -434,7 +431,7 @@ abstract class Theme implements JsonI {
      * 
      * @since 1.1
      */
-    public function getUrl() {
+    public function getUrl() : string {
         return $this->themeMeta['url'];
     }
     /**
@@ -446,7 +443,7 @@ abstract class Theme implements JsonI {
      * 
      * @since 1.1
      */
-    public function getVersion() {
+    public function getVersion() : string {
         return $this->themeMeta['version'];
     }
     /**
@@ -491,7 +488,7 @@ abstract class Theme implements JsonI {
      * 
      * @since 1.0
      */
-    public function setAfterLoaded($function,$params = []) {
+    public function setAfterLoaded($function, array $params = []) {
         if (is_callable($function)) {
             $afterLoadedParams = [$this];
 
@@ -511,7 +508,7 @@ abstract class Theme implements JsonI {
      * 
      * @since 1.0
      */
-    public function setAuthor($author) {
+    public function setAuthor(string $author) {
         $trimmed = trim($author);
 
         if (strlen($trimmed) > 0) {
@@ -525,7 +522,7 @@ abstract class Theme implements JsonI {
      * 
      * @since 1.0
      */
-    public function setAuthorUrl($authorUrl) {
+    public function setAuthorUrl(string $authorUrl) {
         $trimmed = trim($authorUrl);
 
         if (strlen($trimmed) > 0) {
@@ -541,7 +538,7 @@ abstract class Theme implements JsonI {
      * @param string $url The base URL that will be used by the theme.
      * @since 1.0
      */
-    public function setBaseURL($url) {
+    public function setBaseURL(string $url) {
         $trimmed = trim($url);
 
         if (strlen($trimmed) > 0) {
@@ -560,7 +557,7 @@ abstract class Theme implements JsonI {
      * 
      * @since 1.2.1
      */
-    public function setBeforeLoaded($function,$params = []) {
+    public function setBeforeLoaded($function, array $params = []) {
         if (is_callable($function)) {
             $beforeLoadedParams = [$this];
 
@@ -585,7 +582,7 @@ abstract class Theme implements JsonI {
      * 
      * @since 1.0
      */
-    public function setCssDirName($name) {
+    public function setCssDirName(string $name) {
         $trimmed = trim($name);
 
         if (strlen($trimmed) != 0) {
@@ -600,7 +597,7 @@ abstract class Theme implements JsonI {
      * 
      * @since 1.0
      */
-    public function setDescription($desc) {
+    public function setDescription(string $desc) {
         $trimmed = trim($desc);
 
         if (strlen($trimmed) > 0) {
@@ -619,7 +616,7 @@ abstract class Theme implements JsonI {
      * 
      * @since 1.0
      */
-    public function setImagesDirName($name) {
+    public function setImagesDirName(string $name) {
         $trimmed = trim($name);
 
         if (strlen($trimmed) != 0) {
@@ -638,7 +635,7 @@ abstract class Theme implements JsonI {
      * 
      * @since 1.0
      */
-    public function setJsDirName($name) {
+    public function setJsDirName(string $name) {
         $trimmed = trim($name);
 
         if (strlen($trimmed) != 0) {
@@ -653,7 +650,7 @@ abstract class Theme implements JsonI {
      * 
      * @since 1.0
      */
-    public function setLicenseName($text) {
+    public function setLicenseName(string $text) {
         $trimmed = trim($text);
 
         if (strlen($trimmed) != 0) {
@@ -667,7 +664,7 @@ abstract class Theme implements JsonI {
      * 
      * @since 1.0
      */
-    public function setLicenseUrl($url) {
+    public function setLicenseUrl(string $url) {
         $trimmed = trim($url);
 
         if (strlen($trimmed) > 0) {
@@ -684,7 +681,7 @@ abstract class Theme implements JsonI {
      * 
      * @since 1.0
      */
-    public function setName($name) {
+    public function setName(string $name) {
         $trimmed = trim($name);
 
         if (strlen($trimmed) != 0) {
@@ -710,7 +707,7 @@ abstract class Theme implements JsonI {
      * 
      * @since 1.0
      */
-    public function setUrl($url) {
+    public function setUrl(string $url) {
         $trimmed = trim($url);
 
         if (strlen($trimmed) > 0) {
@@ -725,7 +722,7 @@ abstract class Theme implements JsonI {
      * 
      * @since 1.0
      */
-    public function setVersion($vNum) {
+    public function setVersion(string $vNum) {
         $trimmed = trim($vNum);
 
         if (strlen($trimmed) != 0) {
@@ -752,7 +749,7 @@ abstract class Theme implements JsonI {
      * 
      * @return Json An object of type Json.
      */
-    public function toJSON() {
+    public function toJSON() : Json {
         return new Json([
             'themesPath' => THEMES_PATH,
             'name' => $this->getName(),

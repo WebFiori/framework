@@ -122,7 +122,7 @@ class IbrahimTheme extends Theme {
         return $vList;
     }
 
-    public function createHTMLNode($options = []) {
+    public function createHTMLNode(array $options = []) : HTMLNode {
         $type = isset($options['name']) ? $options['name'] : 'div';
 
         if ($type == 'heading') {
@@ -177,7 +177,7 @@ class IbrahimTheme extends Theme {
     }
 
 
-    public function getAsideNode() {
+    public function getAsideNode() : HTMLNode {
         if ($this->getPage()->getLangCode() == 'AR') {
             $right = 'right';
         } else {
@@ -199,7 +199,7 @@ class IbrahimTheme extends Theme {
 
         return $sideDrawer;
     }
-    public function getFooterNode() {
+    public function getFooterNode() : HTMLNode {
         $footer = new HTMLNode('v-footer', [
             'padless'
         ]);
@@ -252,7 +252,7 @@ class IbrahimTheme extends Theme {
         }
     }
 
-    public function getHeadNode() {
+    public function getHeadNode() : HeadNode {
         $head = new HeadNode();
         $head->addJs('https://unpkg.com/vue@2.x.x');
         $head->addCSS('https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900');
@@ -284,7 +284,7 @@ class IbrahimTheme extends Theme {
         return $head;
     }
 
-    public function getHeaderNode() {
+    public function getHeaderNode() : HTMLNode {
         $vAppBar = new HTMLNode('v-app-bar', [
             'app',
             'color' => 'green',

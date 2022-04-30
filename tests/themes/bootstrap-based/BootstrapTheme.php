@@ -42,7 +42,7 @@ class BootstrapTheme extends Theme {
      * @param type $options
      * @return HTMLNode
      */
-    public function createHTMLNode($options = []) {
+    public function createHTMLNode(array $options = []) : HTMLNode {
         $type = isset($options['type']) ? $options['type'] : 'div';
 
         if ($type == 'row') {
@@ -70,20 +70,20 @@ class BootstrapTheme extends Theme {
      * 
      * @return HTMLNode
      */
-    public function getAsideNode() {
+    public function getAsideNode() : HTMLNode {
         $node = new HTMLNode();
         $node->setClassName('col-2');
 
         return $node;
     }
 
-    public function getFooterNode() {
+    public function getFooterNode() : HTMLNode {
         $node = $this->createHTMLNode(['type' => 'row']);
 
         return $node;
     }
 
-    public function getHeadNode() {
+    public function getHeadNode() : HeadNode {
         $node = new HeadNode();
         $node->addCSS('https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css', [
             'integrity' => 'sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T',
@@ -105,7 +105,7 @@ class BootstrapTheme extends Theme {
         return $node;
     }
 
-    public function getHeaderNode() {
+    public function getHeaderNode() : HTMLNode {
         $node = $this->createHTMLNode(['type' => 'row']);
         $topNav = HTMLNode::loadComponent($this->getDirecotry().'header.html', [
             // TODO: Supply values for placeholders.

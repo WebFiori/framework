@@ -493,7 +493,7 @@ abstract class CLICommand {
         }
 
         foreach ($_SERVER['argv'] as $option) {
-            $optionClean = filter_var($option, FILTER_SANITIZE_STRING);
+            $optionClean = filter_var($option, FILTER_DEFAULT);
             $optExpl = explode('=', $optionClean);
             $optionNameFromCLI = $optExpl[0];
 

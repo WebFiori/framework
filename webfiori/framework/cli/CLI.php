@@ -426,7 +426,7 @@ class CLI {
     }
     private function _runCommand() {
         $args = $_SERVER['argv'];
-        $commandName = filter_var($args[1], FILTER_SANITIZE_STRING);
+        $commandName = filter_var($args[1], FILTER_DEFAULT);
 
         if (isset($this->commands[$commandName])) {
             $command = self::get()->commands[$commandName];

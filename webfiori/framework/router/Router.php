@@ -1580,12 +1580,12 @@ class Router {
                     $uriRouteObj->setUriVar($varName, $requestedPathArr[$x]);
 
                     if ($requestMethod == 'POST' || $requestMethod == 'PUT') {
-                        $_POST[$varName] = filter_var(urldecode($requestedPathArr[$x]),FILTER_SANITIZE_STRING);
+                        $_POST[$varName] = filter_var(urldecode($requestedPathArr[$x]));
                     } else {
                         if ($requestMethod == 'GET' || $requestMethod == 'DELETE' || CLI::isCLI()) {
                             //usually, in CLI there is no request method. 
                             //but we store result in $_GET.
-                            $_GET[$varName] = filter_var(urldecode($requestedPathArr[$x]),FILTER_SANITIZE_STRING);
+                            $_GET[$varName] = filter_var(urldecode($requestedPathArr[$x]));
                         }
                     }
                 } else {

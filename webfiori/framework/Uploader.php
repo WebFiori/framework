@@ -26,6 +26,7 @@ namespace webfiori\framework;
 
 use webfiori\json\Json;
 use webfiori\json\JsonI;
+use webfiori\http\Request;
 /**
  * A helper class that is used to upload most types of files to the server's file system.
  * 
@@ -409,7 +410,7 @@ class Uploader implements JsonI {
      */
     public function upload($replaceIfExist = false) {
         $this->files = [];
-        $reqMeth = filter_var($_SERVER['REQUEST_METHOD'],FILTER_SANITIZE_STRING);
+        $reqMeth = Request::getMethod();
 
         if ($reqMeth == 'POST') {
             $fileOrFiles = null;
@@ -463,7 +464,7 @@ class Uploader implements JsonI {
         return $filesArr;
     }
     private function _createFileObjFromArray($arr) {
-        $file = new UploadFile(filter_var($arr['name'], FILTER_SANITIZE_STRING), $arr['upload-path']);
+        $file = new UploadFile(filter_var($arr['name'], FILTER_SANITIZE_FULL_SPECIAL_CHARS), $arr['upload-path']);
         $file->setMIMEType($arr['mime']);
 
         if (isset($arr['is-replace'])) {
@@ -489,7 +490,7 @@ class Uploader implements JsonI {
         $errIdx = 'error';
         $tempIdx = 'tmp_name';
         $fileInfoArr = [];
-        $fileInfoArr[$indices[0]] = $idx === null ? filter_var($fileOrFiles[$indices[0]], FILTER_SANITIZE_STRING) : filter_var($fileOrFiles[$indices[0]][$idx], FILTER_SANITIZE_STRING);
+        $fileInfoArr[$indices[0]] = $idx === null ? filter_var($fileOrFiles[$indices[0]], FILTER_SANITIZE_FULL_SPECIAL_CHARS) : filter_var($fileOrFiles[$indices[0]][$idx], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         $fileInfoArr[$indices[1]] = $idx === null ? filter_var($fileOrFiles[$indices[1]], FILTER_SANITIZE_NUMBER_INT) : filter_var($fileOrFiles[$indices[1]][$idx], FILTER_SANITIZE_NUMBER_INT);
         $fileInfoArr[$indices[2]] = $this->getUploadDir();
         $fileInfoArr[$indices[3]] = 0;
@@ -507,7 +508,7 @@ class Uploader implements JsonI {
                         $fileInfoArr[$indices[4]] = false;
                         $fileInfoArr[$indices[5]] = false;
                         $name = $idx === null ? $fileOrFiles[$tempIdx] : $fileOrFiles[$tempIdx][$idx];
-                        $sanitizedName = filter_var($name,FILTER_SANITIZE_STRING);
+                        $sanitizedName = filter_var($name, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 
                         if (move_uploaded_file($sanitizedName, $filePath)) {
                             $fileInfoArr[$indices[7]] = true;
@@ -537,7 +538,7 @@ class Uploader implements JsonI {
                             $fileInfoArr[$indices[5]] = true;
                             unlink($filePath);
                             $name = $idx === null ? $fileOrFiles[$tempIdx] : $fileOrFiles[$tempIdx][$idx];
-                            $sanitizedName = $sanitizedName = filter_var($name,FILTER_SANITIZE_STRING);
+                            $sanitizedName = $sanitizedName = filter_var($name, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 
                             if (move_uploaded_file($sanitizedName, $filePath)) {
                                 $fileInfoArr[$indices[7]] = true;

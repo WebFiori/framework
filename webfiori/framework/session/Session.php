@@ -629,7 +629,7 @@ class Session implements JsonI {
 
         //Need to do more research about the security of this approach.
 
-        $userAgent = isset($_SERVER['HTTP_USER_AGENT']) ? filter_var($_SERVER['HTTP_USER_AGENT'], FILTER_SANITIZE_STRING) : 'Other';
+        $userAgent = isset($_SERVER['HTTP_USER_AGENT']) ? filter_var($_SERVER['HTTP_USER_AGENT'], FILTER_SANITIZE_FULL_SPECIAL_CHARS) : 'Other';
         //Shall we use IP address in key or not?
         //It would add more security.
         $key = $this->getId().$userAgent;
@@ -800,7 +800,7 @@ class Session implements JsonI {
         $cipherMeth = 'aes-256-ctr';
 
         if (in_array($cipherMeth, openssl_get_cipher_methods())) {
-            $userAgent = isset($_SERVER['HTTP_USER_AGENT']) ? filter_var($_SERVER['HTTP_USER_AGENT'], FILTER_SANITIZE_STRING) : 'Other';
+            $userAgent = isset($_SERVER['HTTP_USER_AGENT']) ? filter_var($_SERVER['HTTP_USER_AGENT'], FILTER_SANITIZE_FULL_SPECIAL_CHARS) : 'Other';
 
             //Shall we use IP address in key or not?
             //It would add more security. But the session will be invalid

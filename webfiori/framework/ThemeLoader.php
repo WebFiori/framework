@@ -171,7 +171,7 @@ class ThemeLoader {
      * @since 1.0
      */
     public static function usingTheme($themeName = null) {
-        $trimmedName = trim($themeName);
+        $trimmedName = trim((string)$themeName);
 
         if (strlen($trimmedName) != 0) {
             $themeName = $trimmedName;

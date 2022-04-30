@@ -67,7 +67,7 @@ class WebFioriV108 extends Theme {
         });
     }
 
-    public function createHTMLNode($options = []) {
+    public function createHTMLNode(array $options = []) : HTMLNode {
         $nodeType = isset($options['type']) ? $options['type'] : '';
         $elementId = isset($options['element-id']) ? $options['element-id'] : null;
 
@@ -241,14 +241,14 @@ class WebFioriV108 extends Theme {
         return $node;
     }
 
-    public function getAsideNode() {
+    public function getAsideNode() : HTMLNode {
         $aside = new HTMLNode();
         $aside->setClassName('col-2');
 
         return $aside;
     }
 
-    public function getFooterNode() {
+    public function getFooterNode() : HTMLNode {
         $footer = new HTMLNode('footer');
         $footer->setClassName('bd-footer text-muted');
         $footer->setClassName('container-fluid p-md-4');
@@ -280,7 +280,7 @@ class WebFioriV108 extends Theme {
 
         return $footer;
     }
-    public function getHeadNode() {
+    public function getHeadNode() : HeadNode {
         $head = new HeadNode();
         $head->addCSS('https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css');
         $head->addJs('https://code.jquery.com/jquery-3.4.1.slim.min.js');
@@ -290,7 +290,7 @@ class WebFioriV108 extends Theme {
         return $head;
     }
 
-    public function getHeaderNode() {
+    public function getHeaderNode() : HTMLNode {
         $header = new HTMLNode('header');
         $header->setClassName('container-fluid');
         $mainNav = new HTMLNode('nav');

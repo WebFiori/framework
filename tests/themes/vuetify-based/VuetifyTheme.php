@@ -51,7 +51,7 @@ class VuetifyTheme extends Theme {
      * @param array $options An associative array that contains options.
      * @return HTMLNode
      */
-    public function createHTMLNode($options = []) {
+    public function createHTMLNode(array $options = []) : HTMLNode {
         $type = isset($options['type']) ? $options['type'] : 'div';
 
         if ($type == 'v-list-item') {
@@ -91,7 +91,7 @@ class VuetifyTheme extends Theme {
      * Creates the drawer which appears when menu button is clicked.
      * @return HTMLNode
      */
-    public function getAsideNode() {
+    public function getAsideNode() : HTMLNode {
         $node = new HTMLNode('v-navigation-drawer',[
             'v-model' => 'drawer',
             'absolute',':right' => '$vuetify.rtl',
@@ -133,7 +133,7 @@ class VuetifyTheme extends Theme {
      * Creates the footer of the page.
      * @return HTMLNode
      */
-    public function getFooterNode() {
+    public function getFooterNode() : HTMLNode {
         $node = new HTMLNode();
         $app = new HTMLNode('v-footer');
         $app->setAttribute('app');
@@ -193,7 +193,7 @@ class VuetifyTheme extends Theme {
      * It simply loads all needed JavaScript, CSS and any other resources.
      * @return HeadNode
      */
-    public function getHeadNode() {
+    public function getHeadNode() : HeadNode {
         $node = new HeadNode();
         $lang = Page::translation();
         $json = new Json();
@@ -214,7 +214,7 @@ class VuetifyTheme extends Theme {
      * Creates the header section of the page and return it.
      * @return HTMLNode
      */
-    public function getHeaderNode() {
+    public function getHeaderNode() : HTMLNode {
         $appBar = new HTMLNode('v-app-bar');
         $appBar->setAttributes([
             'color' => 'red',

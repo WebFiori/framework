@@ -40,19 +40,22 @@ class GreenyTheme extends Theme {
         });
     }
 
-    public function createHTMLNode($options = []) {
+    public function createHTMLNode(array $options = []) : HTMLNode {
+        if (isset($options['name'])) {
+            return parent::createHTMLNode($options);
+        }
         $node = new HTMLNode();
 
         return $node;
     }
-    public function getAsideNode() {
+    public function getAsideNode() : HTMLNode {
         $menu = new HTMLNode('div');
         $menu->addTextNode('Aside');
 
         return $menu;
     }
 
-    public function getFooterNode() {
+    public function getFooterNode() : HTMLNode {
         $node = new HTMLNode('div');
         $node->setAttribute('class', 'pa-row');
         $fNode = new HTMLNode('footer');
@@ -73,7 +76,7 @@ class GreenyTheme extends Theme {
         return $node;
     }
 
-    public function getHeadNode() {
+    public function getHeadNode() : HeadNode {
         $headTag = new HeadNode();
         $headTag->setBase(WebFioriApp::getAppConfig()->getBaseURL());
         $headTag->addLink('icon', Page::imagesDir().'/favicon.png');
@@ -84,7 +87,7 @@ class GreenyTheme extends Theme {
         return $headTag;
     }
 
-    public function getHeaderNode() {
+    public function getHeaderNode() : HTMLNode {
         $headerSec = new HTMLNode();
         $headerSec->setClassName('pa-row');
         $headerBody = new HTMLNode();

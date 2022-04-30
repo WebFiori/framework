@@ -60,7 +60,7 @@ class NewFiori extends Theme {
             });
         });
     }
-    public function getAsideNode() {
+    public function getAsideNode() : HTMLNode {
         $page = $this->getPage();
         $right = $page->getWritingDir() == 'rtl' ? 'right' : '';
         $sideDrawer = new HTMLNode('v-navigation-drawer', [
@@ -97,7 +97,7 @@ class NewFiori extends Theme {
         return $sideDrawer;
     }
 
-    public function getFooterNode() {
+    public function getFooterNode() : HTMLNode {
         $page = $this->getPage();
         $footer = new HTMLNode('v-footer', [
             'padless',
@@ -141,7 +141,7 @@ class NewFiori extends Theme {
         return $footer;
     }
 
-    public function getHeadNode() {
+    public function getHeadNode() : HeadNode {
         $head = new HeadNode();
         $head->addCSS('assets/css/prism.css');
         $head->addCSS('assets/css/code-theme.css');
@@ -171,7 +171,7 @@ class NewFiori extends Theme {
         return $head;
     }
 
-    public function getHeaderNode() {
+    public function getHeaderNode() : HTMLNode {
         $page = $this->getPage();
         
         $vAppBar = new HTMLNode('v-app-bar', [

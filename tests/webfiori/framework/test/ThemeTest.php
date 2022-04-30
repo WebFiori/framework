@@ -47,7 +47,7 @@ class ThemeTest extends TestCase {
     public function testUseTheme01() {
         $theme = ThemeLoader::usingTheme();
         $this->assertTrue($theme instanceof Theme);
-        $this->assertEquals('New Fiori',$theme->getName());
+        $this->assertEquals('New Fiori', $theme->getName());
         $this->assertEquals(WebFioriApp::getAppConfig()->getBaseURL(),$theme->getBaseURL());
         $theme->setBaseURL('https://example.com/x');
         $this->assertEquals('https://example.com/x',$theme->getBaseURL());
@@ -58,6 +58,7 @@ class ThemeTest extends TestCase {
     public function testCreateHTMLNode00() {
         $theme = ThemeLoader::usingTheme();
         $this->assertTrue($theme instanceof Theme);
+        $this->assertEquals('New Fiori', $theme->getName());
         $node = $theme->createHTMLNode();
         $this->assertEquals('div', $node->getNodeName());
         

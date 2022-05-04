@@ -91,15 +91,6 @@ class ClassUtilTest extends TestCase {
 
         $num03 = U::numericValue('1.88.4');
         $this->assertFalse($num03);
-
-        $num04 = U::numericValue(null);
-        $this->assertFalse($num04);
-
-        $num05 = U::numericValue(true);
-        $this->assertFalse($num05);
-
-        $num06 = U::numericValue(new \Exception());
-        $this->assertFalse($num06);
     }
     /**
      * Testing the method Util::reverse().

@@ -60,7 +60,7 @@ class Privilege implements JsonI {
      * 
      * @since 1.0
      */
-    public function __construct($id = 'PR',$name = '') {
+    public function __construct(string $id = 'PR', string $name = '') {
         if (!$this->setID($id)) {
             $this->setID('PR');
         }
@@ -77,7 +77,7 @@ class Privilege implements JsonI {
      * 
      * @since 1.0
      */
-    public function getID() {
+    public function getID() : string {
         return $this->code;
     }
     /**
@@ -88,7 +88,7 @@ class Privilege implements JsonI {
      * 
      * @since 1.0
      */
-    public function getName() {
+    public function getName() : string {
         return $this->name;
     }
     /**
@@ -103,7 +103,7 @@ class Privilege implements JsonI {
      * 
      * @since 1.0
      */
-    public function setID($code) {
+    public function setID(string $code) {
         $xid = trim($code);
         $len = strlen($xid);
 
@@ -129,7 +129,7 @@ class Privilege implements JsonI {
      * 
      * @since 1.0
      */
-    public function setName($name) {
+    public function setName(string $name) {
         $trimmed = trim($name);
 
         if (strlen($trimmed) > 0) {
@@ -151,7 +151,7 @@ class Privilege implements JsonI {
      * }
      * </p> 
      */
-    public function toJSON() {
+    public function toJSON() : Json {
         $j = new Json();
         $j->add('privilegeId', $this->getID());
         $j->add('name', $this->getName());

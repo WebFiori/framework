@@ -83,7 +83,7 @@ class PrivilegesGroup implements JsonI {
      * 
      * @since 1.0
      */
-    public function __construct($gId = 'GROUP',$gName = 'G_NAME') {
+    public function __construct(string $gId = 'GROUP', string $gName = 'G_NAME') {
         $this->privilegesArr = [];
         $this->childGroups = [];
 
@@ -105,7 +105,7 @@ class PrivilegesGroup implements JsonI {
      * 
      * @since 1.0
      */
-    public function &privileges() {
+    public function &privileges() : array {
         return $this->privilegesArr;
     }
     /**
@@ -120,7 +120,7 @@ class PrivilegesGroup implements JsonI {
      * 
      * @since 1.0
      */
-    public function addPrivilage($pr) {
+    public function addPrivilage(Privilege $pr) : bool {
         if ($pr instanceof Privilege) {
             foreach ($this->privilegesArr as $prev) {
                 if ($prev->getID() == $pr->getID()) {
@@ -141,7 +141,7 @@ class PrivilegesGroup implements JsonI {
      * 
      * @since 1.1
      */
-    public function childGroups() {
+    public function childGroups() : array {
         return $this->childGroups;
     }
     /**
@@ -151,7 +151,7 @@ class PrivilegesGroup implements JsonI {
      * 
      * @since 1.0
      */
-    public function getID() {
+    public function getID() : string {
         return $this->groupId;
     }
     /**
@@ -164,7 +164,7 @@ class PrivilegesGroup implements JsonI {
      * 
      * @since 1.0
      */
-    public function getName() {
+    public function getName() : string {
         return $this->groupName;
     }
 
@@ -197,7 +197,7 @@ class PrivilegesGroup implements JsonI {
      * 
      * @since 1.0
      */
-    public function hasPrivilege($p,$checkChildGroups = true) {
+    public function hasPrivilege(Privilege $p, bool $checkChildGroups = true) : bool {
         $hasPr = false;
 
         if ($p instanceof Privilege) {
@@ -234,7 +234,7 @@ class PrivilegesGroup implements JsonI {
      * 
      * @since 1.0
      */
-    public function setID($id) {
+    public function setID(string $id) : bool {
         $xid = trim($id);
         $len = strlen($xid);
         $parentG = $this->getParentGroup();
@@ -286,7 +286,7 @@ class PrivilegesGroup implements JsonI {
      * 
      * @since 1.0
      */
-    public function setName($name) {
+    public function setName(string $name) : bool {
         $trimmed = trim($name);
 
         if (strlen($trimmed) > 0) {
@@ -310,7 +310,7 @@ class PrivilegesGroup implements JsonI {
      * 
      * @since 1.1
      */
-    public function setParentGroup($group = null) {
+    public function setParentGroup($group = null) : bool {
         if ($group instanceof PrivilegesGroup) {
             if ($group !== $this && $group->getID() != $this->getID()) {
                 $this->parentGroup = $group;
@@ -347,7 +347,7 @@ class PrivilegesGroup implements JsonI {
      * 
      * @return Json
      */
-    public function toJSON() {
+    public function toJSON() : Json {
         $j = new Json();
         $parentId = $this->getParentGroup() !== null ? $this->getParentGroup()->getID() : null;
         $j->add('group-id', $this->getID());

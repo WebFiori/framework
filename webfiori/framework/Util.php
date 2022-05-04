@@ -483,11 +483,11 @@ class Util {
      * 
      * @since 1.3.5
      */
-    public static function numericValue($str) {
+    public static function numericValue(string $str) {
         $strToConvert = trim($str);
         $len = strlen($strToConvert);
 
-        if ($len == 0 || gettype($str) != 'string') {
+        if ($len == 0) {
             return false;
         }
         $isFloat = false;

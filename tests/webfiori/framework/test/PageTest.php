@@ -109,7 +109,7 @@ class PageTest extends TestCase{
      */
     public function testSetDescription01(WebPage $page) {
         $this->assertEquals('Hello World Page.',$page->getDescription());
-        $page->setDescription(null);
+        $page->setDescription('  ');
         $this->assertNull($page->getDescription());
         $this->assertFalse($page->getDocument()->getHeadNode()->hasMeta('description'));
     }
@@ -255,6 +255,18 @@ class PageTest extends TestCase{
      * @test
      */
     public function testInsert01() {
+        $page = new WebPage();
+        $node = new HTMLNode();
+        $node->setID('new-node');
+        $this->assertNull($page->insert($node,''));
+        $this->assertEquals(0,$page->getChildByID('main-content-area')->childrenCount());
+        $el = $page->getChildByID('new-node');
+        $this->assertNull($el);
+    }
+    /**
+     * @test
+     */
+    public function testInsert02() {
         $page = new WebPage();
         $node = new HTMLNode();
         $node->setID('new-node');
@@ -415,6 +427,62 @@ class PageTest extends TestCase{
         $this->assertEquals(1, count($page->getDocument()->getHeadNode()->getCSSNodes()));
         $cssNode = $page->getChildByID('my-css');
         $this->assertEquals('assets/css/theme.css', $cssNode->getAttributeValue('href'));
+    }
+    /**
+     * @test
+     */
+    public function testAddMeta00() {
+        $page = new WebPage();
+        $page->addMeta('robots', 'index, follow');
+        $this->assertEquals(2, count($page->getDocument()->getHeadNode()->getMetaNodes()));
+        $this->assertEquals('index, follow', $page->getMetaVal('robots'));
+    }
+    /**
+     * @test
+     */
+    public function testAddMeta01() {
+        $page = new WebPage();
+        $this->assertEquals('', $page->getMetaVal('robots'));
+        $page->addMeta('robots', 'index, follow');
+        $page->addMeta('robots', 'no-index');
+        $this->assertEquals('index, follow', $page->getMetaVal('robots'));
+        $page->addMeta('robots', 'no-index', true);
+        $this->assertEquals('no-index', $page->getMetaVal('robots'));
+    }
+    /**
+     * @test
+     */
+    public function testCreateHtmlNode00() {
+        $page = new WebPage();
+        $node = $page->createHTMLNode();
+        $this->assertEquals('div', $node->getNodeName());
+    }
+    /**
+     * @test
+     */
+    public function testCreateHtmlNode01() {
+        $page = new WebPage();
+        $node = $page->createHTMLNode([
+            'name' => 'input',
+            'attributes' => [
+                'type' => 'text'
+            ]
+        ]);
+        $this->assertEquals('input', $node->getNodeName());
+        $this->assertEquals('text', $node->getAttribute('type'));
+    }
+    /**
+     * @test
+     */
+    public function testCreateHtmlNode02() {
+        $page = new WebPage();
+        $page->setTheme(\themes\webfiori108\WebFioriV108::class);
+        $node = $page->createHTMLNode([
+            'type' => 'section',
+            'element-id' => 'super-sec'
+        ]);
+        $this->assertEquals('section', $node->getNodeName());
+        $this->assertEquals('super-sec', $node->getChild(0)->getID());
     }
     /**
      * @test

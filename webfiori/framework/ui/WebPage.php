@@ -219,6 +219,8 @@ class WebPage {
      * Creates new instance of the class.
      */
     public function __construct() {
+        $this->title = '';
+        $this->titleSep = '|';
         $this->reset();
     }
     /**
@@ -242,15 +244,13 @@ class WebPage {
      * 
      * @since 1.0
      */
-    public function addBeforeRender($callable = '', $params = []) {
+    public function addBeforeRender($callable = '', array $params = []) {
         if (is_callable($callable) || $callable instanceof \Closure) {
             $this->beforeRenderCallbacks[] = $callable;
             $xParamsArr = [$this];
 
-            if (gettype($params) == 'array') {
-                foreach ($params as $p) {
-                    $xParamsArr[] = $p;
-                }
+            foreach ($params as $p) {
+                $xParamsArr[] = $p;
             }
             $this->beforeRenderParams[] = $xParamsArr;
             $callbacksCount = count($this->beforeRenderCallbacks);
@@ -272,7 +272,7 @@ class WebPage {
      * 
      * @since 1.0
      */
-    public function addCSS($href, array $attrs = []) {
+    public function addCSS(string $href, array $attrs = []) {
         if (!isset($attrs['revision'])) {
             $attrs['revision'] = WebFioriApp::getAppConfig()->getVersion();
         }
@@ -292,7 +292,7 @@ class WebPage {
      * 
      * @since 1.0
      */
-    public function addJS($src, array $attrs = []) {
+    public function addJS(string $src, array $attrs = []) {
         if (!isset($attrs['revision'])) {
             $attrs['revision'] = WebFioriApp::getAppConfig()->getVersion();
         }
@@ -315,28 +315,40 @@ class WebPage {
      * 
      * @since 1.0
      */
-    public function addMeta($name, $content, $override = false) {
+    public function addMeta(string $name, string $content, bool $override = false) {
         $this->getDocument()->getHeadNode()->addMeta($name, $content, $override);
     }
     /**
-     * Create HTML node based on the method which exist on the applied theme.
+     * Create HTML node.
      * 
-     * This method can be only used if a theme is applied and the method 
-     * Theme::createHTMLNode() is implemented.
+     * If a theme is applied to the web page, the created node will be based on
+     * the implementation of the method Theme::createHTMLNode(). If no theme is
+     * applied, the method will create an object based on two indices on the 
+     * given options array. The first one is 'name' and the second one is 'attributes'.
+     * The first index represents node name such as 'div' and the second represents
+     * a set of attributes for the node.
      * 
-     * @param array $nodeInfo An array that holds node information.
+     * @param array $nodeInfo An array that holds node options. If not provided,
+     * the method will create a 'div' element.
      * 
-     * @return HTMLNode|null The returned HTML node will depend on how the 
-     * developer has implemented the method Theme::createHTMLNode(). If 
-     * no theme is applied, the method will return null.
+     * @return HTMLNode The created HTML node as an object.
      * 
      * @since 1.0
      */
-    public function createHTMLNode($nodeInfo) {
+    public function createHTMLNode(array $nodeInfo = []) : HTMLNode {
         $pageTheme = $this->getTheme();
 
         if ($pageTheme !== null) {
             return $pageTheme->createHTMLNode($nodeInfo);
+        } else {
+            $name = isset($nodeInfo['name']) ? trim((string)$nodeInfo['name']) : 'div';
+            
+            if (strlen($name) == 0) {
+                $name = 'div';
+            }
+            $attrs = isset($nodeInfo['attributes']) && gettype($nodeInfo['attributes']) == 'array' ? $nodeInfo['attributes'] : [];
+            
+            return new HTMLNode($name, $attrs);
         }
     }
     /**
@@ -352,7 +364,7 @@ class WebPage {
      * 
      * @since 1.0 
      */
-    public function get($label) {
+    public function get(string $label) {
         $langObj = $this->getTranslation();
 
         if ($langObj !== null) {
@@ -407,7 +419,7 @@ class WebPage {
      * 
      * @since 1.0
      */
-    public function getChildByID($id) {
+    public function getChildByID(string $id) {
         return $this->getDocument()->getChildByID($id);
     }
     /**
@@ -428,7 +440,7 @@ class WebPage {
      * 
      * @since 1.0
      */
-    public function getDocument() {
+    public function getDocument() : HTMLDoc {
         return $this->document;
     }
     /**
@@ -464,7 +476,7 @@ class WebPage {
      * 
      * @since 1.0
      */
-    public function getThemeCSSDir() {
+    public function getThemeCSSDir() : string {
         if ($this->isThemeLoaded()) {
             $loadedTheme = $this->getTheme();
 
@@ -482,7 +494,7 @@ class WebPage {
      * 
      * @since 1.0
      */
-    public function getThemeImagesDir() {
+    public function getThemeImagesDir() : string {
         if ($this->isThemeLoaded()) {
             $loadedTheme = $this->getTheme();
 
@@ -500,7 +512,7 @@ class WebPage {
      * 
      * @since 1.0
      */
-    public function getThemeJSDir() {
+    public function getThemeJSDir() : string {
         if ($this->isThemeLoaded()) {
             $loadedTheme = $this->getTheme();
 
@@ -513,12 +525,12 @@ class WebPage {
     /**
      * Returns the title of the page.
      * 
-     * @return string|null The title of the page. Default return value is 
+     * @return string The title of the page. Default return value is 
      * 'Default X'.
      * 
      * @since 1.0
      */
-    public function getTitle() {
+    public function getTitle() : string {
         return $this->title;
     }
     /**
@@ -532,7 +544,7 @@ class WebPage {
      * 
      * @since 1.0
      */
-    public function getTitleSep() {
+    public function getTitleSep() : string {
         return $this->titleSep;
     }
     /**
@@ -543,7 +555,7 @@ class WebPage {
      * 
      * @since 1.0
      */
-    public function getTranslation() {
+    public function getTranslation() : Language {
         return $this->tr;
     }
     /**
@@ -555,7 +567,7 @@ class WebPage {
      * 
      * @since 1.0
      */
-    public function getWebsiteName() {
+    public function getWebsiteName() : string {
         return $this->websiteName;
     }
     /**
@@ -576,7 +588,7 @@ class WebPage {
      * 
      * @since 1.0
      */
-    public function hasAside() {
+    public function hasAside() : bool {
         return $this->incAside;
     }
     /**
@@ -586,7 +598,7 @@ class WebPage {
      * 
      * @since 1.0
      */
-    public function hasFooter() {
+    public function hasFooter() : bool {
         return $this->incFooter;
     }
     /**
@@ -596,7 +608,7 @@ class WebPage {
      * 
      * @since 1.0
      */
-    public function hasHeader() {
+    public function hasHeader() : bool {
         return $this->incHeader;
     }
     /**
@@ -611,7 +623,7 @@ class WebPage {
      * 
      * @since 1.0
      */
-    public function includeI18nLables($bool = null) {
+    public function includeI18nLables($bool = null) : bool {
         if ($bool !== null) {
             $this->includeLables = $bool === true;
         }
@@ -632,7 +644,7 @@ class WebPage {
      * 
      * @since 1.0
      */
-    public function insert($node, $parentNodeId = self::MAIN_ELEMENTS[2]) {
+    public function insert($node, string $parentNodeId = self::MAIN_ELEMENTS[2]) {
         if (gettype($node) == 'string') {
             $node = new HTMLNode($node);
         }
@@ -651,7 +663,7 @@ class WebPage {
      * 
      * @since 1.0
      */
-    public function isThemeLoaded() {
+    public function isThemeLoaded() : bool {
         return $this->theme instanceof Theme;
     }
     /**
@@ -687,7 +699,7 @@ class WebPage {
      * 
      * @since 1.0
      */
-    public function render($formatted = false, $returnResult = false) {
+    public function render(bool $formatted = false, bool $returnResult = false) {
         for ($x = 0 ; $x < count($this->beforeRenderCallbacks) ; $x++) {
             call_user_func_array($this->beforeRenderCallbacks[$x], $this->beforeRenderParams[$x]);
         }
@@ -765,11 +777,12 @@ class WebPage {
      * Note that if empty string is given, it 
      * won't be set. To unset the canonical, use 'null' as value.
      * 
+     * @param string $url The canonical URL of the page.
+     * 
      * @since 1.0
      * 
-     * @param string $url The canonical URL of the page.
      */
-    public function setCanonical($url) {
+    public function setCanonical(string $url) {
         if (strlen($url) != 0) {
             $this->canonical = $url;
 
@@ -779,23 +792,39 @@ class WebPage {
         }
     }
     /**
+     * Returns the content attribute of a meta given its name.
+     * 
+     * @param string $name The value of the attribute 'name' of the meta 
+     * tag. 
+     * 
+     * @return string If a meta tag which has the given name was found, 
+     * the method will return the value of the attribute 'content'. Other than
+     * that, the method will return empty string.
+     */
+    public function getMetaVal(string $name) : string {
+        $node = $this->getDocument()->getHeadNode()->getMeta($name);
+        
+        if ($node !== null) {
+            return $node->getAttribute('content');
+        }
+        
+        return '';
+    }
+    /**
      * Sets the description of the page.
      * 
      * @param string $val The description of the page. 
-     * If null is given, 
-     * the description meta tag will be removed from the &lt;head&gt; node. If 
-     * empty string is given, nothing will change.
+     * If empty string is given, 
+     * the description meta tag will be removed from the &lt;head&gt; node.
      * 
      * @since 1.0
      */
-    public function setDescription($val) {
-        if ($val !== null) {
-            $trim = trim($val);
-
-            if (strlen($trim) !== 0) {
-                $this->description = $trim;
-                $this->document->getHeadNode()->addMeta('description', $trim, true);
-            }
+    public function setDescription(string $val) {
+        $trimmed = trim($val);
+        
+        if (strlen($trimmed) != 0) {
+            $this->description = $trimmed;
+            $this->document->getHeadNode()->addMeta('description', $trimmed, true);
         } else {
             $descNode = $this->document->getHeadNode()->getMeta('description');
             $this->document->getHeadNode()->removeChild($descNode);
@@ -810,7 +839,7 @@ class WebPage {
      * 
      * @since 1.0
      */
-    public function setHasAside($bool) {
+    public function setHasAside(bool $bool) {
         if (gettype($bool) == self::$BoolType) {
             if (!$this->incAside && $bool) {
                 //add aside
@@ -847,7 +876,7 @@ class WebPage {
      * 
      * @since 1.0
      */
-    public function setHasFooter($bool) {
+    public function setHasFooter(bool $bool) {
         if (gettype($bool) == self::$BoolType) {
             if (!$this->incFooter && $bool) {
                 $this->document->addChild($this->_getComponent('getFooterNode', self::MAIN_ELEMENTS[4]));
@@ -869,7 +898,7 @@ class WebPage {
      * 
      * @since 1.0
      */
-    public function setHasHeader($bool) {
+    public function setHasHeader(bool $bool) {
         if (gettype($bool) == self::$BoolType) {
             if (!$this->incHeader && $bool) {
                 //add the header
@@ -903,7 +932,7 @@ class WebPage {
      * 
      * @since 1.0
      */
-    public function setLang($lang = 'EN') {
+    public function setLang(string $lang = 'EN') {
         $langU = strtoupper(trim($lang));
 
         if (strlen($lang) == 2) {
@@ -989,7 +1018,7 @@ class WebPage {
      * 
      * @since 1.0
      */
-    public function setTitle($val) {
+    public function setTitle(string $val) {
         if ($val !== null) {
             $this->title = $val;
             $this->document->getHeadNode()->setTitle($this->getTitle().$this->getTitleSep().$this->getWebsiteName());
@@ -1012,7 +1041,7 @@ class WebPage {
      * 
      * @since 1.0
      */
-    public function setTitleSep($str) {
+    public function setTitleSep(string $str) {
         $trimmed = trim($str);
 
         if (strlen($trimmed) != 0) {
@@ -1037,7 +1066,7 @@ class WebPage {
      * 
      * @since 1.0
      */
-    public function setWebsiteName($name) {
+    public function setWebsiteName(string $name) {
         if (strlen($name) != 0) {
             $this->websiteName = $name;
             $this->setTitle($this->getTitle());
@@ -1054,7 +1083,7 @@ class WebPage {
      * 
      * @since 1.0
      */
-    public function setWritingDir($dir = 'ltr') {
+    public function setWritingDir(string $dir = 'ltr') {
         $dirL = strtolower($dir);
 
         if ($dirL == Language::DIR_LTR || $dirL == Language::DIR_RTL) {

@@ -22,8 +22,8 @@ class SessionTest extends TestCase {
         $this->assertEquals(0,$sesston->getStartedAt());
         $this->assertEquals(0,$sesston->getResumedAt());
         $this->assertEquals(0,$sesston->getPassedTime());
-        $this->assertNull($sesston->getLangCode());
-        $this->assertNull($sesston->getUser());
+        $this->assertEquals('', $sesston->getLangCode());
+        //$this->assertNull($sesston->getUser());
         $this->assertNotNull($sesston->getId());
         $this->assertEquals(Session::STATUS_INACTIVE,$sesston->getStatus());
     }
@@ -41,8 +41,8 @@ class SessionTest extends TestCase {
         $this->assertEquals(0,$sesston->getStartedAt());
         $this->assertEquals(0,$sesston->getResumedAt());
         $this->assertEquals(0,$sesston->getPassedTime());
-        $this->assertNull($sesston->getLangCode());
-        $this->assertNull($sesston->getUser());
+        $this->assertEquals('', $sesston->getLangCode());
+        //$this->assertNull($sesston->getUser());
         $this->assertEquals('super',$sesston->getId());
         $this->assertEquals(Session::STATUS_INACTIVE,$sesston->getStatus());
     }
@@ -59,8 +59,8 @@ class SessionTest extends TestCase {
         $this->assertEquals(0,$session->getStartedAt());
         $this->assertEquals(0,$session->getResumedAt());
         $this->assertEquals(0,$session->getPassedTime());
-        $this->assertNull($session->getLangCode());
-        $this->assertNull($session->getUser());
+        $this->assertEquals('', $session->getLangCode());
+        //$this->assertNull($session->getUser());
         $this->assertEquals(Session::STATUS_INACTIVE,$session->getStatus());
         $this->assertEquals([
             'expires' => 60 * 120 + time(),
@@ -85,7 +85,7 @@ class SessionTest extends TestCase {
         ]);
         $this->assertFalse($session->isPersistent());
         $this->assertFalse($session->isRunning());
-        $this->assertTrue($session->isRefresh());
+        $this->assertFalse($session->isRefresh());
         $this->assertEquals([
             'expires' => 0,
             'domain' => 'example.com',
@@ -101,6 +101,18 @@ class SessionTest extends TestCase {
     public function testConstructor04() {
         $this->expectException(\Exception::class);
         $session = new Session();
+    }
+    /**
+     * @test
+     */
+    public function testConstructor05() {
+        $_SERVER['REMOTE_ADDR'] = '::1';
+        $session = new Session([
+            'refresh' => true,
+            'duration' => 0,
+            'name' => 'hello'
+        ]);
+        $this->assertEquals('127.0.0.1', $session->getIp());
     }
     /**
      * @test
@@ -188,12 +200,12 @@ class SessionTest extends TestCase {
     public function testRemainingTime() {
         $s = new Session(['name'=>'session','duration'=>0.1]);
         $s->start();
-        $this->assertEquals(6,$s->getDuration());
+        $this->assertEquals(6, $s->getDuration());
         $s->close();
         sleep(7);
         $s->start();
         
-        $this->assertEquals(-1,$s->getRemainingTime());
+        $this->assertEquals(-1, $s->getRemainingTime());
     }
     /**
      * @test
@@ -209,12 +221,50 @@ class SessionTest extends TestCase {
                 . '"resumed_at":0,'
                 . '"passed_time":0,'
                 . '"remaining_time":60,'
-                . '"language":null,'
+                . '"language":"",'
                 . '"id":"'.$s->getId().'",'
                 . '"is_refresh":false,'
                 . '"is_persistent":true,'
                 . '"status":"status_none",'
-                . '"user":null,'
+                . '"user":{"user_id":-1,"email":"","display_name":null,"username":""},'
+                . '"vars":[]}',$j.'');
+        $s->start();
+       // $j = $s->toJSON();
+       // $j->setPropsStyle('snake');
+        $this->assertEquals('{"name":"session",'
+                . '"startedAt":'.$s->getStartedAt().','
+                . '"duration":60,'
+                . '"resumedAt":'.$s->getStartedAt().','
+                . '"passedTime":0,'
+                . '"remainingTime":60,'
+                . '"language":"EN",'
+                . '"id":"'.$s->getId().'",'
+                . '"isRefresh":false,'
+                . '"isPersistent":true,'
+                . '"status":"status_new",'
+                . '"user":{"userId":-1,"email":"","displayName":null,"username":""},'
+                . '"vars":[]}',$s.'');
+    }
+    /**
+     * @test
+     */
+    public function testToJsonTest01() {
+        $_GET['lang'] = 'en';
+        $s = new Session(['name'=>'session','duration'=>1]);
+        $j = $s->toJSON();
+        $j->setPropsStyle('snake');
+        $this->assertEquals('{"name":"session",'
+                . '"started_at":0,'
+                . '"duration":60,'
+                . '"resumed_at":0,'
+                . '"passed_time":0,'
+                . '"remaining_time":60,'
+                . '"language":"",'
+                . '"id":"'.$s->getId().'",'
+                . '"is_refresh":false,'
+                . '"is_persistent":true,'
+                . '"status":"status_none",'
+                . '"user":{"user_id":-1,"email":"","display_name":null,"username":""},'
                 . '"vars":[]}',$j.'');
         $s->start();
         $j = $s->toJSON();
@@ -236,39 +286,16 @@ class SessionTest extends TestCase {
     /**
      * @test
      */
-    public function testToJsonTest01() {
-        $_GET['lang'] = 'en';
-        $s = new Session(['name'=>'session','duration'=>1]);
-        $j = $s->toJSON();
-        $j->setPropsStyle('snake');
-        $this->assertEquals('{"name":"session",'
-                . '"started_at":0,'
-                . '"duration":60,'
-                . '"resumed_at":0,'
-                . '"passed_time":0,'
-                . '"remaining_time":60,'
-                . '"language":null,'
-                . '"id":"'.$s->getId().'",'
-                . '"is_refresh":false,'
-                . '"is_persistent":true,'
-                . '"status":"status_none",'
-                . '"user":null,'
-                . '"vars":[]}',$j.'');
-        $s->start();
-        $j = $s->toJSON();
-        $j->setPropsStyle('snake');
-        $this->assertEquals('{"name":"session",'
-                . '"started_at":'.$s->getStartedAt().','
-                . '"duration":60,'
-                . '"resumed_at":'.$s->getStartedAt().','
-                . '"passed_time":0,'
-                . '"remaining_time":60,'
-                . '"language":"EN",'
-                . '"id":"'.$s->getId().'",'
-                . '"is_refresh":false,'
-                . '"is_persistent":true,'
-                . '"status":"status_new",'
-                . '"user":{"user_id":-1,"email":"","display_name":null,"username":""},'
-                . '"vars":[]}',$j.'');
+    public function testSetVar00() {
+        $session = new Session(['name'=>'new']);
+        $this->assertFalse($session->has('test'));
+        $session->start();
+        $this->assertFalse($session->has('test'));
+        $session->set('super', 700);
+        $this->assertTrue($session->has('super'));
+        $this->assertEquals(700, $session->get('super'));
+        $var = $session->pull('super');
+        $this->assertEquals(700, $var);
+        $this->assertFalse($session->has('super'));
     }
 }

@@ -86,7 +86,9 @@ class PrivilegesGroup implements JsonI {
     public function __construct(string $gId = 'GROUP', string $gName = 'G_NAME') {
         $this->privilegesArr = [];
         $this->childGroups = [];
-
+        $this->groupId = '';
+        $this->groupName = '';
+        
         if (!$this->setID($gId)) {
             $this->setID('GROUP');
         }

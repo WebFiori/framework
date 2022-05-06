@@ -239,7 +239,7 @@ class Router {
      * 
      * @since 1.2
      */
-    public static function addRoute(array $options) {
+    public static function addRoute(array $options) : bool {
         $options['type'] = Router::CUSTOMIZED;
 
         return Router::get()->_addRoute($options);
@@ -293,15 +293,11 @@ class Router {
      * 
      * @since 1.2
      */
-    public static function api($options) {
-        if (gettype($options) == 'array') {
-            $options['type'] = Router::API_ROUTE;
-            self::_addToMiddlewareGroup($options, 'api');
-            
-            return Router::get()->_addRoute($options);
-        }
+    public static function api(array $options) : bool {
+        $options['type'] = Router::API_ROUTE;
+        self::_addToMiddlewareGroup($options, 'api');
 
-        return false;
+        return Router::get()->_addRoute($options);
     }
     /**
      * Returns the base URI which is used to create routes.
@@ -312,7 +308,7 @@ class Router {
      * 
      * @since 1.3.1
      */
-    public static function base() {
+    public static function base() : string {
         return Router::get()->getBase();
     }
 
@@ -372,15 +368,11 @@ class Router {
      * 
      * @since 1.2
      */
-    public static function closure($options) {
-        if (gettype($options) == 'array') {
-            $options['type'] = Router::CLOSURE_ROUTE;
-            self::_addToMiddlewareGroup($options, 'closure');
-            
-            return Router::get()->_addRoute($options);
-        }
+    public static function closure(array $options) : bool {
+        $options['type'] = Router::CLOSURE_ROUTE;
+        self::_addToMiddlewareGroup($options, 'closure');
 
-        return false;
+        return Router::get()->_addRoute($options);
     }
     /**
      * Returns the value of the base URI which is appended to the path.
@@ -391,7 +383,7 @@ class Router {
      * 
      * @since 1.0
      */
-    public static function getBase() {
+    public static function getBase() : string {
         return self::get()->baseUrl;
     }
     /**
@@ -420,7 +412,7 @@ class Router {
      * 
      * @since 1.3.3
      */
-    public static function getUriObj($path) {
+    public static function getUriObj(string $path) {
         return self::get()->_getUriObj($path);
     }
     /**
@@ -435,7 +427,7 @@ class Router {
      * 
      * @since 1.3.6
      */
-    public static function getUriObjByURL($url) {
+    public static function getUriObjByURL(string $url) {
         try {
             self::get()->_resolveUrl($url, false);
 
@@ -459,7 +451,7 @@ class Router {
      * 
      * @since 1.3.9
      */
-    public static function getVarValue($varName) {
+    public static function getVarValue(string $varName) {
         $routeUri = self::getRouteUri();
 
         if ($routeUri instanceof RouterUri) {
@@ -478,7 +470,7 @@ class Router {
      * 
      * @since 1.3.8
      */
-    public static function hasRoute($path) {
+    public static function hasRoute(string $path) {
         $routesArr = self::get()->routes;
         $trimmed = self::get()->_fixUriPath($path);
 
@@ -598,7 +590,7 @@ class Router {
      * 
      * @since 1.3.12
      */
-    public static function page($options) {
+    public static function page(array $options) : bool {
         return self::view($options);
     }
     /**
@@ -621,7 +613,7 @@ class Router {
      * 
      * @since 1.3.11
      */
-    public static function redirect($path, $to, $code = 301) {
+    public static function redirect(string $path, string $to, int $code = 301) {
         Router::closure([
             'path' => $path,
             'route-to' => function ($to, $httpCode)
@@ -662,7 +654,7 @@ class Router {
      * 
      * @since 1.3.7
      */
-    public static function removeRoute($path) {
+    public static function removeRoute(string $path) : bool {
         $pathFix = self::base().self::get()->_fixUriPath($path);
         $retVal = false;
 
@@ -687,7 +679,7 @@ class Router {
      * 
      * @since 1.2
      */
-    public static function route($uri) {
+    public static function route(string $uri) {
         Router::get()->_resolveUrl($uri);
     }
     /**
@@ -698,7 +690,7 @@ class Router {
      * 
      * @since 1.2
      */
-    public static function routes() {
+    public static function routes() : array {
         $routesArr = [];
 
         foreach (Router::get()->_getRoutes()['static'] as $routeUri) {
@@ -724,7 +716,7 @@ class Router {
      * 
      * @since 1.3.7
      */
-    public static function routesAsRouterUri() {
+    public static function routesAsRouterUri() : array {
         return self::get()->routes;
     }
     /**
@@ -734,7 +726,7 @@ class Router {
      * 
      * @since 1.3.11
      */
-    public static function routesCount() {
+    public static function routesCount() : int {
         $routesArr = self::get()->routes;
 
         return count($routesArr['variable']) + count($routesArr['static']);
@@ -761,7 +753,7 @@ class Router {
      * 
      * @since 1.3.2
      */
-    public static function uriObj($routerUri) {
+    public static function uriObj(RouterUri $routerUri) : bool {
         if ($routerUri instanceof RouterUri && !self::get()->_hasRoute($routerUri->getPath())) {
             if ($routerUri->hasVars()) {
                 self::get()->routes['variable'] = $routerUri;

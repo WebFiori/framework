@@ -24,14 +24,14 @@ class WebFioriV108 extends Theme {
         $this->setLicenseName('MIT License');
         $this->setUrl('https://ibrahim-2017.blogspot.com/');
         $this->setLicenseUrl('https://opensource.org/licenses/MIT');
-        $this->setBeforeLoaded(function ()
+        $this->setAfterLoaded(function (Theme $theme)
         {
             $activeSession = SessionsManager::getActiveSession();
 
             if ($activeSession !== null) {
-                Page::lang($activeSession->getLangCode(true));
+                $theme->getPage()->setLang($activeSession->getLangCode(true));
             } else {
-                Page::lang(WebFioriApp::getAppConfig()->getPrimaryLanguage());
+                $theme->getPage()->setLang(WebFioriApp::getAppConfig()->getPrimaryLanguage());
             }
         });
         $this->setAfterLoaded(function(Theme $theme)

@@ -58,7 +58,7 @@ class DB extends Database {
      * 
      * @since 1.0
      */
-    public function __construct(string $connName) {
+    public function __construct($connName) {
         if ($connName instanceof ConnectionInfo) {
             parent::__construct($connName);
 

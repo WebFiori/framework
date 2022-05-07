@@ -104,7 +104,7 @@ class ThemeClassWriter extends ClassWriter {
             ' *',
             " * @return HeadNode",
             ' */',
-            'public function getHeadNode() : HeadNode {',
+            'public function getHeadNode() : HeadSection {',
         ], 1);
         $this->append('return new HeadSection();', 2);
         $this->append('}', 1);

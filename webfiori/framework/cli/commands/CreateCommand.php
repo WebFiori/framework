@@ -100,7 +100,7 @@ class CreateCommand extends CLICommand {
 
         return 0;
     }
-    public function exec() {
+    public function exec() : int {
         $options = [
             'Database table class.',
             'Entity class from table.',

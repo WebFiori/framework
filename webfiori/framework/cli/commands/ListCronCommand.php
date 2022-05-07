@@ -47,7 +47,7 @@ class ListCronCommand extends CLICommand {
      * method will return 0. Other than that, it will return false.
      * @since 1.0
      */
-    public function exec() {
+    public function exec() : int {
         $jobs = Cron::jobsQueue();
         $i = 1;
         $this->println("Number Of Jobs: ".$jobs->size());

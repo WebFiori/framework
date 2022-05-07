@@ -20,7 +20,7 @@ class UpdateSettingsCommand extends CLICommand {
     public function __construct() {
         parent::__construct('update-settings', [], 'Update application settings which are stored in the class "AppConfig".');
     }
-    public function exec() {
+    public function exec() : int {
         $options = [
             'Update application version info.',
             'Update application name.',

@@ -54,7 +54,7 @@ class AddCommand extends CLICommand {
      * 
      * @return int
      */
-    public function exec() {
+    public function exec() : int {
         $options = [
             'New database connection.',
             'New SMTP connection.',

@@ -96,7 +96,7 @@ class Language {
      * 
      * @since 1.0
      */
-    public function __construct($dir = 'ltr',$code = 'XX',$addtoLoadedAfterCreate = true) {
+    public function __construct(string $dir = 'ltr', string $code = 'XX', bool $addtoLoadedAfterCreate = true) {
         $this->languageVars = [];
         $this->loadLang = $addtoLoadedAfterCreate === true;
 
@@ -117,7 +117,7 @@ class Language {
      * 
      * @since 1.1
      */
-    public static function &getLoadedLangs() {
+    public static function &getLoadedLangs() : array {
         return self::$loadedLangs;
     }
     /**
@@ -132,7 +132,7 @@ class Language {
      * 
      * @since 1.2.1
      */
-    public function createAndSet($dir,$labels) {
+    public function createAndSet(string $dir, array $labels) {
         $this->createDirectory($dir);
         $this->setMultiple($dir, $labels);
     }
@@ -148,7 +148,7 @@ class Language {
      * 
      * @since 1.0
      */
-    public function createDirectory($param) {
+    public function createDirectory(string $param) {
         $trim00 = trim($param);
         $trim01 = trim($trim00,'/');
 
@@ -177,7 +177,7 @@ class Language {
      * 
      * @since 1.0
      */
-    public function get($name) {
+    public function get(string $name) {
         $trimmed = trim($name);
         $toReturn = trim($trimmed, '/');
         $trim = $toReturn;
@@ -207,7 +207,7 @@ class Language {
      * 
      * @since 1.1
      */
-    public function getCode() {
+    public function getCode() : string {
         if (isset($this->languageVars['code'])) {
             return $this->languageVars['code'];
         }
@@ -221,7 +221,7 @@ class Language {
      * 
      * @since 1.0
      */
-    public function getLanguageVars() {
+    public function getLanguageVars() : array {
         return $this->languageVars;
     }
     /**
@@ -231,7 +231,7 @@ class Language {
      * 
      * @since 1.0
      */
-    public function getWritingDir() {
+    public function getWritingDir() : string {
         return $this->languageVars['dir'];
     }
     /**
@@ -242,7 +242,7 @@ class Language {
      * 
      * @since 1.2
      */
-    public function isLoaded() {
+    public function isLoaded() : bool {
         return $this->loadLang;
     }
     /**
@@ -261,7 +261,7 @@ class Language {
      * 
      * @since 1.1
      */
-    public static function loadTranslation($langCode) {
+    public static function loadTranslation(string $langCode) {
         $uLangCode = strtoupper(trim($langCode));
 
         if (isset(self::$loadedLangs[$uLangCode])) {
@@ -311,7 +311,7 @@ class Language {
      * 
      * @since 1.0
      */
-    public function set($dir,$varName,$varValue) {
+    public function set(string $dir, string $varName, string $varValue) {
         $dirTrimmed = trim($dir);
         $varTrimmed = trim($varName);
 
@@ -342,7 +342,7 @@ class Language {
      * 
      * @since 1.1
      */
-    public function setCode($code) {
+    public function setCode(string $code) : bool {
         $trimmedCode = strtoupper(trim($code));
 
         if (strlen($trimmedCode) == 2 && $trimmedCode[0] >= 'A' && $trimmedCode[0] <= 'Z' && $trimmedCode[1] >= 'A' && $trimmedCode[1] <= 'Z') {
@@ -374,7 +374,7 @@ class Language {
      * 
      * @since 1.0
      */
-    public function setMultiple($dir,$arr = []) {
+    public function setMultiple(string $dir, array $arr = []) {
         foreach ($arr as $k => $v) {
             if (gettype($v) == 'array') {
                 $this->createDirectory($dir.'/'.$k);
@@ -396,7 +396,7 @@ class Language {
      * 
      * @since 1.0
      */
-    public function setWritingDir($dir) {
+    public function setWritingDir(string $dir) {
         $lDir = strtolower(trim($dir));
 
         if ($lDir == self::DIR_LTR || $lDir == self::DIR_RTL) {
@@ -417,7 +417,7 @@ class Language {
      * 
      * @since 1.2 
      */
-    public static function unloadTranslation($langCode) {
+    public static function unloadTranslation(string $langCode) {
         $uLangCode = strtoupper(trim($langCode));
 
         if (isset(self::$loadedLangs[$uLangCode])) {

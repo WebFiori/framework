@@ -95,7 +95,7 @@ class CLICommandClassWriter extends ClassWriter {
             '/**',
             ' * Execute the command.',
             ' */',
-            'public function exec() {',
+            'public function exec() : int {',
         ], 1);
         $this->append([
             '//TODO: Write the code that represents the command.',

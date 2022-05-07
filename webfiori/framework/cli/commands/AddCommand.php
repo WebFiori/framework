@@ -149,6 +149,7 @@ class AddCommand extends CLICommand {
         $writer->writeClass();
         $this->success('Language added. Also, a class for the language '
                 .'is created at "'.APP_DIR_NAME.'\langs" for that language.');
+        return 0;
     }
     private function _addSmtp() {
         $smtpConn = new SMTPAccount();

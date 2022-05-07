@@ -141,7 +141,7 @@ class EmailMessage {
      * 
      * @since 1.0
      */
-    public function __construct($sendAccountName = 'no-reply') {
+    public function __construct(string $sendAccountName = 'no-reply') {
         $this->log = [];
         $this->subject = 'Hello From WebFiori Framework';
         $this->setPriority(0);
@@ -213,7 +213,7 @@ class EmailMessage {
      * 
      * @since 2.0
      */
-    public function addBCC($address, $name = null) {
+    public function addBCC(string $address, $name = null) {
         return $this->_addAddress($address, $name, 'bcc');
     }
     /**
@@ -250,7 +250,7 @@ class EmailMessage {
      * 
      * @since 2.0
      */
-    public function addCC($address, $name = null) {
+    public function addCC(string $address, $name = null) {
         return $this->_addAddress($address, $name, 'cc');
     }
     /**
@@ -266,7 +266,7 @@ class EmailMessage {
      * 
      * @since 2.0
      */
-    public function addTo($address, $name = null) {
+    public function addTo(string $address, $name = null) {
         return $this->_addAddress($address, $name, 'to');
     }
     /**
@@ -282,7 +282,7 @@ class EmailMessage {
      * 
      * @since 1.0 
      */
-    public function get($label) {
+    public function get(string $label) {
         $langObj = $this->getTranslation();
 
         if ($langObj !== null) {
@@ -302,7 +302,7 @@ class EmailMessage {
      * 
      * @since 1.0.2
      */
-    public function getBCC() {
+    public function getBCC() : array {
         return $this->receiversArr['bcc'];
     }
     /**
@@ -316,7 +316,7 @@ class EmailMessage {
      * 
      * @since 1.0.3
      */
-    public function getBCCStr() {
+    public function getBCCStr() : string {
         return $this->_getReceiversStr('bcc');
     }
     /**
@@ -330,7 +330,7 @@ class EmailMessage {
      * 
      * @since 1.0.2
      */
-    public function getCC() {
+    public function getCC() : array {
         return $this->receiversArr['cc'];
     }
     /**
@@ -344,7 +344,7 @@ class EmailMessage {
      * 
      * @since 1.0.3
      */
-    public function getCCStr() {
+    public function getCCStr() : string {
         return $this->_getReceiversStr('cc');
     }
     /**
@@ -357,7 +357,7 @@ class EmailMessage {
      * 
      * @since 1.0.5
      */
-    public function getChildByID($id) {
+    public function getChildByID(string $id) {
         return $this->getDocument()->getChildByID($id);
     }
     /**
@@ -385,7 +385,7 @@ class EmailMessage {
      * 
      * @since 1.0.4
      */
-    public function getLog() {
+    public function getLog() : array {
         return $this->smtpServer->getLog();
     }
     /**
@@ -396,14 +396,14 @@ class EmailMessage {
      * 
      * @since 2.0
      */
-    public function getPriority() {
+    public function getPriority() : int {
         return $this->priority;
     }
     /**
      * 
      * @return SMTPAccount
      */
-    public function getSMTPAccount() {
+    public function getSMTPAccount() : SMTPAccount {
         return $this->smtpAcc;
     }
     /**
@@ -418,7 +418,7 @@ class EmailMessage {
      * 
      * @since 1.0.5
      */
-    public function getSMTPServer() {
+    public function getSMTPServer() : SMTPServer {
         return $this->smtpServer;
     }
     /**
@@ -429,7 +429,7 @@ class EmailMessage {
      * 
      * @since 2.0
      */
-    public function getSubject() {
+    public function getSubject() : string {
         return $this->subject;
     }
     /**
@@ -443,7 +443,7 @@ class EmailMessage {
      * 
      * @since 1.0.2
      */
-    public function getTo() {
+    public function getTo() : array {
         return $this->receiversArr['to'];
     }
     /**
@@ -457,7 +457,7 @@ class EmailMessage {
      * 
      * @since 1.0.3
      */
-    public function getToStr() {
+    public function getToStr() : string {
         return $this->_getReceiversStr('to');
     }
     /**
@@ -551,7 +551,7 @@ class EmailMessage {
      * 
      * @since 1.0.5
      */
-    public function setLang($lang = 'EN') {
+    public function setLang(string $lang = 'EN') {
         $langU = strtoupper(trim($lang));
 
         if (strlen($lang) == 2) {
@@ -573,7 +573,7 @@ class EmailMessage {
      * 
      * @since 2.0
      */
-    public function setPriority($priority) {
+    public function setPriority(int $priority) {
         $asInt = intval($priority);
 
         if ($asInt <= -1) {
@@ -593,14 +593,14 @@ class EmailMessage {
      * 
      * @since 2.0
      */
-    public function setSubject($subject) {
+    public function setSubject(string $subject) {
         $trimmed = $this->_trimControlChars($subject);
 
         if (strlen($trimmed) > 0) {
             $this->subject = $trimmed;
         }
     }
-    private function _addAddress($address, $name, $type) {
+    private function _addAddress(string $address, string $name, string $type) {
         $nameTrimmed = $this->_trimControlChars(str_replace('<', '', str_replace('>', '', $name)));
         $addressTrimmed = $this->_trimControlChars(str_replace('<', '', str_replace('>', '', $address)));
 

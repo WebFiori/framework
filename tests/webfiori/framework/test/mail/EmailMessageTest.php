@@ -117,11 +117,11 @@ class EmailMessageTest extends TestCase {
         $this->assertSame(-1,$sm->getPriority());
         $sm->setPriority(100);
         $this->assertSame(1,$sm->getPriority());
-        $sm->setPriority("hello");
-        $this->assertSame(0,$sm->getPriority());
-        $sm->setPriority("-26544");
+        $sm->setPriority(33);
+        $this->assertEquals(1, $sm->getPriority());
+        $sm->setPriority(-26544);
         $this->assertSame(-1,$sm->getPriority());
-        $sm->setPriority("26544");
+        $sm->setPriority(26544);
         $this->assertSame(1,$sm->getPriority());
         $sm->setPriority(0);
         $this->assertSame(0,$sm->getPriority());

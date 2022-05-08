@@ -167,7 +167,6 @@ class Router {
             'static' => [],
             'variable' => []
         ];
-        $this->pathAndResourceArr = [];
         $this->onNotFound = function ()
         {
             Response::setCode(404);

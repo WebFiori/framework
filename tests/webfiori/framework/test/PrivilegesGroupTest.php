@@ -14,16 +14,6 @@ class PrivilegesGroupTest extends TestCase {
     /**
      * @test
      */
-    public function testAddPrivilege00() {
-        $g = new PrivilegesGroup();
-        $pr = null;
-        $this->assertFalse($g->addPrivilage($pr));
-        $pr2 = '';
-        $this->assertFalse($g->addPrivilage($pr2));
-    }
-    /**
-     * @test
-     */
     public function testAddPrivilege01() {
         $g = new PrivilegesGroup();
         $pr = new Privilege();

@@ -123,18 +123,14 @@ class PrivilegesGroup implements JsonI {
      * @since 1.0
      */
     public function addPrivilage(Privilege $pr) : bool {
-        if ($pr instanceof Privilege) {
-            foreach ($this->privilegesArr as $prev) {
-                if ($prev->getID() == $pr->getID()) {
-                    return false;
-                }
+        foreach ($this->privilegesArr as $prev) {
+            if ($prev->getID() == $pr->getID()) {
+                return false;
             }
-            $this->privilegesArr[] = $pr;
-
-            return true;
         }
+        $this->privilegesArr[] = $pr;
 
-        return false;
+        return true;
     }
     /**
      * Returns an array that contains all child groups of the group.

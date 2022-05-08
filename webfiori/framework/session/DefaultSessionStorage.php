@@ -55,9 +55,10 @@ class DefaultSessionStorage implements SessionStorage {
             set_error_handler(null);
             if (!is_dir($sessionsStoragePath)) {
                 mkdir($sessionsStoragePath);
+            }
+            if (!is_dir($this->storeLoc)) {
                 mkdir($this->storeLoc);
             }
-            
             restore_error_handler();
         }
     }

@@ -9,6 +9,7 @@
     ],
     "require": {
         "php": ">=7.0",
+        "webfiori/file":"1.0.0",
         "webfiori/collections":"1.1.0",
         "webfiori/ui":"2.3.1",
         "webfiori/jsonx":"3.1.2",

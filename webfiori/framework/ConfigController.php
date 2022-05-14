@@ -359,6 +359,7 @@ class ConfigController {
     public function createIniClass($className, $comment) {
         $cFile = new File("$className.php", ROOT_DIR.DS.APP_DIR_NAME.DS.'ini');
         $cFile->remove();
+        $cFile->create();
         $this->a($cFile, [
             "<?php",
             '',
@@ -378,7 +379,8 @@ class ConfigController {
         $this->a($cFile, "", 3);
         $this->a($cFile, "}", 1);
         $this->a($cFile, "}");
-        $cFile->write(true, true);
+        
+        $cFile->write();
         require_once ROOT_DIR.DS.APP_DIR_NAME.DS.'ini'.DS."$className.php";
     }
     /**
@@ -411,7 +413,7 @@ class ConfigController {
         $this->a($cFile, "        //TODO: Add your own routes here.");
         $this->a($cFile, $this->blockEnd, 1);
         $this->a($cFile, "}");
-        $cFile->write(true, true);
+        $cFile->write();
         require_once $cFile->getAbsolutePath();
     }
     /**
@@ -1218,7 +1220,8 @@ class ConfigController {
         $this->_writeAppVersionInfo($cFile);
 
         $this->a($cFile, "}");
-        $cFile->write(false, true);
+        $cFile->create();
+        $cFile->write();
         require_once ROOT_DIR.DS.APP_DIR_NAME.DS.'AppConfig.php';
     }
     private function _mkdir($dir) {

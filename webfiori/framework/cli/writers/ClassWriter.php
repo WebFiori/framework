@@ -255,6 +255,7 @@ abstract class ClassWriter {
         $this->writeClassDeclaration();
         $this->writeClassBody();
         $classFile->setRawData($this->classAsStr);
-        $classFile->write(false, true);
+        $classFile->create();
+        $classFile->write();
     }
 }

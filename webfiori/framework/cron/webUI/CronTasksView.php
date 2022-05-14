@@ -146,7 +146,8 @@ class CronTasksView extends CronView {
             $file->read();
             $card->addChild('v-card-text')->addChild('pre')->text($file->getRawData());
         } else {
-            $file->write(false, true);
+            $file->create();
+            $file->write();
             $card->addChild('v-card-text')->addChild('pre', [
                 'style' => 'color:red'
             ])->text('Log file not found!');

@@ -37,6 +37,10 @@ use webfiori\framework\ui\ServerErrView;
 use webfiori\http\Request;
 use webfiori\http\Response;
 use webfiori\json\Json;
+use webfiori\error\Handler;
+use webfiori\framework\handlers\CLIExceptionHandler;
+use webfiori\framework\handlers\APICallExceptionHandler;
+use webfiori\framework\handlers\HTTPExceptionHandler;
 /**
  * The time at which the framework was booted in microseconds as a float.
  * 
@@ -537,231 +541,30 @@ class WebFioriApp {
         }
         call_user_func(APP_DIR_NAME.'\ini\GlobalConstants::defineConstants');
     }
-    private function _setErrHandler() {
-        set_error_handler(function($errno, $errstr, $errfile, $errline)
-        {
-            $isCli = class_exists('webfiori\framework\cli\CLI') ? CLI::isCLI() : http_response_code() === false;
-            Response::clear();
-            $routerObj = Router::getUriObjByURL(Request::getRequestedURL());
+    
+    private function setHandler() {
+        if (CLI::isCLI()) {
+            Handler::setHandler(new CLIExceptionHandler());
+        } else {
+            $routeUri = Router::getUriObjByURL(Util::getRequestedURL());
 
-            if ($isCli) {
-                if (class_exists('webfiori\framework\cli\CLI')) {
-                    CLI::displayErr($errno, $errstr, $errfile, $errline);
-                } else {
-                    fprintf(STDERR, "\n<%s>\n",Util::ERR_TYPES[$errno]['type']);
-                    fprintf(STDERR, "Error Message    %5s %s\n",":",$errstr);
-                    fprintf(STDERR, "Error Number     %5s %s\n",":",$errno);
-                    fprintf(STDERR, "Error Description%5s %s\n",":",Util::ERR_TYPES[$errno]['description']);
-                    fprintf(STDERR, "Error File       %5s %s\n",":",$errfile);
-                    fprintf(STDERR, "Error Line:      %5s %s\n",":",$errline);
-                }
-
-                if (defined('STOP_CLI_ON_ERR') && STOP_CLI_ON_ERR === true) {
-                    exit(-1);
-                }
-            } else if ($routerObj !== null && $routerObj->getType() == Router::API_ROUTE) {
-                Response::setCode(500);
-                $j = new Json([
-                    'message' => $errstr,
-                    'type' => Util::ERR_TYPES[$errno]['type'],
-                    'description' => Util::ERR_TYPES[$errno]['description'],
-                    'error-number' => $errno
-                ], true);
-                $stackTrace = new Json([], true);
-                
-                if (defined('WF_VERBOSE') && WF_VERBOSE) {
-                    $j->add('file',$errfile);
-                    $j->add('line',$errline);
-                    
-                    $index = 0;
-                    $trace = debug_backtrace();
-
-                    foreach ($trace as $arr) {
-                        if (isset($arr['file'])) {
-                            $stackTrace->add('#'.$index,$arr['file'].' (Line '.$arr['line'].')');
-                        } else if (isset($arr['function'])) {
-                            $stackTrace->add('#'.$index,$arr['function']);
-                        }
-                        $index++;
-                    }
-                    $j->add('stack-trace',$stackTrace);
-                } else {
-                    $j->add('class', Util::extractClassName($errfile));
-                    $j->add('line',$errline);
-                    $index = 0;
-                    $trace = debug_backtrace();
-
-                    foreach ($trace as $arr) {
-                        if (isset($arr['file'])) {
-                            $stackTrace->add('#'.$index, Util::extractClassName($arr['file']).' (Line '.$arr['line'].')');
-                        } else if (isset($arr['function'])) {
-                            $stackTrace->add('#'.$index,$arr['function']);
-                        }
-                        $index++;
-                    }
-                    $j->add('stack-trace',$stackTrace);
-                }
-                Response::addHeader('content-type', 'application/json');
-                Response::write($j);
-                Response::send();
+            if ($routeUri !== null) {
+                $routeType = $routeUri->getType();
             } else {
-                $errBox = new ErrorBox();
-                if ($errBox->getBody() !== null) {
-                    $errBox->setError($errno);
-                    $errBox->setDescription($errno);
-                    $errBox->setFile($errfile);
-                    $errBox->setMessage($errstr);
-                    $errBox->setLine($errline);
-                    $errBox->setTrace();
-                    Response::write($errBox);
-                }
+                $routeType = Router::VIEW_ROUTE;
             }
-
-            return true;
-        });
-    }
-    private function _setExceptionHandler() {
-        set_exception_handler(function($ex)
-        {
-            $useResponsClass = class_exists('webfiori\\http\\Response');
-            $isCli = class_exists('webfiori\framework\cli\CLI') ? CLI::isCLI() : php_sapi_name() == 'cli';
-
-            if ($useResponsClass) {
-                Response::clear();
-            }
-
-            if ($isCli) {
-                CLI::displayException($ex);
+            if ($routeType == Router::API_ROUTE || defined('API_CALL')) {
+                Handler::setHandler(new APICallExceptionHandler());
             } else {
-                $routeUri = Router::getUriObjByURL(Util::getRequestedURL());
-
-                if ($routeUri !== null) {
-                    $routeType = $routeUri->getType();
-                } else {
-                    $routeType = Router::VIEW_ROUTE;
-                }
-
-                if ($routeType == Router::API_ROUTE || defined('API_CALL')) {
-                    $j = new Json([
-                        'message' => '500 - Server Error: Uncaught Exception.',
-                        'type' => 'error',
-                        'exception-class' => get_class($ex),
-                        'exception-message' => $ex->getMessage(),
-                        'exception-code' => $ex->getMessage()
-                    ], true);
-
-                    if (defined('WF_VERBOSE') && WF_VERBOSE) {
-                        $j->add('file', $ex->getFile());
-                        $j->add('line', $ex->getLine());
-                        $stackTrace = new Json([], true);
-                        $index = 0;
-                        $trace = $ex->getTrace();
-
-                        foreach ($trace as $arr) {
-                            if (isset($arr['file'])) {
-                                $stackTrace->add('#'.$index,$arr['file'].' (Line '.$arr['line'].')');
-                            } else if (isset($arr['function'])) {
-                                $stackTrace->add('#'.$index,$arr['function']);
-                            }
-                            $index++;
-                        }
-                        $j->add('stack-trace',$stackTrace);
-                    } else {
-                        $j->add('class', Util::extractClassName($ex->getFile()));
-                        $j->add('line', $ex->getLine());
-                        $stackTrace = new Json([], true);
-                        $index = 0;
-                        $trace = $ex->getTrace();
-
-                        foreach ($trace as $arr) {
-                            if (isset($arr['file'])) {
-                                $stackTrace->add('#'.$index, Util::extractClassName($arr['file']).' (Line '.$arr['line'].')');
-                            } else if (isset($arr['function'])) {
-                                $stackTrace->add('#'.$index,$arr['function']);
-                            }
-                            $index++;
-                        }
-                        $j->add('stack-trace',$stackTrace);
-                    }
-
-                    if ($useResponsClass) {
-                        Response::addHeader('content-type', 'application/json');
-                        Response::write($j);
-                        Response::setCode(500);
-                        Response::send();
-                    } else {
-                        http_response_code(500);
-                        header('content-type:application/json');
-                        echo $j;
-                    }
-                } else {
-                    $exceptionView = new ServerErrView($ex, $useResponsClass);
-                    $exceptionView->show(500);
-                }
+                Handler::setHandler(new HTTPExceptionHandler());
             }
-        });
+        }
     }
     /**
      * Sets new error and exception handler.
      */
     private function _setHandlers() {
         error_reporting(E_ALL & ~E_ERROR & ~E_COMPILE_ERROR & ~E_CORE_ERROR & ~E_RECOVERABLE_ERROR);
-        $this->_setErrHandler();
-        $this->_setExceptionHandler();
-        register_shutdown_function(function()
-        {
-            $error = error_get_last();
-
-            if ($error !== null) {
-                if (!Response::isSent()) {
-                    $isCli = class_exists('webfiori\framework\cli\CLI') ? CLI::isCLI() : php_sapi_name() == 'cli';
-                    $error = error_get_last();
-                    Response::clear();
-                    $errNo = $error['type'];
-
-                    if ($errNo == E_WARNING || 
-                       $errNo == E_NOTICE || 
-                       $errNo == E_USER_ERROR || 
-                       $errNo == E_USER_NOTICE) {
-                        return;
-                    }
-
-                    if (!$isCli) {
-                        $uri = Router::getUriObjByURL(Request::getRequestedURL());
-                        Response::setCode(500);
-
-                        if ($uri !== null) {
-                            if ($uri->getType() == Router::API_ROUTE) {
-                                $j = new Json([
-                                    'message' => $error["message"],
-                                    'type' => 'error',
-                                    'error-number' => $error["type"],
-                                ], true);
-
-                                if (defined('WF_VERBOSE') && WF_VERBOSE) {
-                                    $j->add('file', $error["file"]);
-                                    $j->add('line', $error["line"]);
-                                } else {
-                                    $j->add('class', Util::extractClassName($error["file"]));
-                                    $j->add('line', $error["line"]);
-                                }
-                                Response::write($j);
-                                Response::send();
-                            } else {
-                                $errPage = new ServerErrView($error);
-                                $errPage->show(500);
-                            }
-                        } else {
-                            $errPage = new ServerErrView($error);
-                            $errPage->show(500);
-                        }
-                    } else {
-                        CLI::displayErr($error['type'], $error["message"], $error["file"], $error["line"]);
-                    }
-                }
-            } else if (!Response::isSent()) {
-                Response::send();
-            }
-        });
+        $this->setHandler();
     }
 }

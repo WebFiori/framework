@@ -530,7 +530,7 @@ class User implements JsonI {
      * 
      * @since 1.0
      */
-    public function toJSON() {
+    public function toJSON() : Json {
         $json = new Json();
         $json->add('userId', $this->getID());
         $json->add('email', $this->getEmail());

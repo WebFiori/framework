@@ -543,22 +543,10 @@ class WebFioriApp {
     }
     
     private function setHandler() {
-        if (CLI::isCLI()) {
-            Handler::setHandler(new CLIExceptionHandler());
-        } else {
-            $routeUri = Router::getUriObjByURL(Util::getRequestedURL());
-
-            if ($routeUri !== null) {
-                $routeType = $routeUri->getType();
-            } else {
-                $routeType = Router::VIEW_ROUTE;
-            }
-            if ($routeType == Router::API_ROUTE || defined('API_CALL')) {
-                Handler::setHandler(new APICallExceptionHandler());
-            } else {
-                Handler::setHandler(new HTTPExceptionHandler());
-            }
-        }
+        Handler::registerHandler(new CLIExceptionHandler());
+        Handler::registerHandler(new APICallExceptionHandler());
+        Handler::registerHandler(new HTTPExceptionHandler());
+        Handler::unregisterHandler(Handler::getHandler('Default'));
     }
     /**
      * Sets new error and exception handler.

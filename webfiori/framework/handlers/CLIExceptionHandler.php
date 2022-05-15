@@ -1,7 +1,7 @@
 <?php
 namespace webfiori\framework\handlers;
 
-use webfiori\error\AbstractExceptionHandler;
+use webfiori\error\AbstractHandler;
 use webfiori\framework\cron\Cron;
 use webfiori\framework\cli\CLI;
 use webfiori\framework\cli\CLICommand;
@@ -10,7 +10,7 @@ use webfiori\framework\cli\CLICommand;
  *
  * @author Ibrahim
  */
-class CLIExceptionHandler  extends AbstractExceptionHandler {
+class CLIExceptionHandler  extends AbstractHandler {
     
     public function handle() {
         $stream = CLI::getOutputStream();
@@ -42,6 +42,14 @@ class CLIExceptionHandler  extends AbstractExceptionHandler {
             Cron::log($num.' Class '.$arrEntry->getClass().' line '.$arrEntry->getLine());
             $num++;
         }
+    }
+
+    public function isActive(): bool {
+        return CLI::isCLI();
+    }
+
+    public function isShutdownHandler(): bool {
+        return true;
     }
 
 }

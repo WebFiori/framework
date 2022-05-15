@@ -30,7 +30,7 @@ use webfiori\framework\Util;
 use webfiori\framework\WebFioriApp;
 use webfiori\http\Response;
 use webfiori\ui\HTMLNode;
-use webfiori\error\AbstractExceptionHandler;
+use webfiori\error\AbstractHandler;
 use webfiori\framework\ui\WebPage;
 /**
  * A page which is used to display exception information when it is thrown or 
@@ -56,12 +56,12 @@ class ServerErrView extends WebPage {
     /**
      * Creates a new instance of the class.
      * 
-     * @param AbstractExceptionHandler $throwableOrErr The handler which is
+     * @param AbstractHandler $throwableOrErr The handler which is
      * used to handle exceptions.
      * 
      * @since 1.0
      */
-    public function __construct(AbstractExceptionHandler $throwableOrErr) {
+    public function __construct(AbstractHandler $throwableOrErr) {
         parent::__construct();
         
         $this->setTitle('Uncaught Exception');

@@ -106,6 +106,7 @@ class CommandRunner {
      */
     public function isOutputEquals(array $outputsStr, TestCase $case = null) {
         $actualOutputArr = $this->getOutputsArray();
+        var_dump($actualOutputArr);
         $isEqual = count($actualOutputArr) == count($outputsStr);
         if ($case !== null) {
             $case->assertEquals(count($outputsStr), count($actualOutputArr));

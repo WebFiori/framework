@@ -161,7 +161,7 @@ class UploadFile extends File {
      * 
      * @since 1.0
      */
-    public function toJSON() {
+    public function toJSON() : Json {
         $json = parent::toJSON();
         $json->addMultiple([
             'uploaded' => $this->isUploaded(),

@@ -38,9 +38,9 @@ use webfiori\http\Request;
 use webfiori\http\Response;
 use webfiori\json\Json;
 use webfiori\error\Handler;
-use webfiori\framework\handlers\CLIExceptionHandler;
-use webfiori\framework\handlers\APICallExceptionHandler;
-use webfiori\framework\handlers\HTTPExceptionHandler;
+use webfiori\framework\handlers\CLIErrHandler;
+use webfiori\framework\handlers\APICallErrHandler;
+use webfiori\framework\handlers\HTTPErrHandler;
 /**
  * The time at which the framework was booted in microseconds as a float.
  * 
@@ -543,9 +543,9 @@ class WebFioriApp {
     }
     
     private function setHandler() {
-        Handler::registerHandler(new CLIExceptionHandler());
-        Handler::registerHandler(new APICallExceptionHandler());
-        Handler::registerHandler(new HTTPExceptionHandler());
+        Handler::registerHandler(new CLIErrHandler());
+        Handler::registerHandler(new APICallErrHandler());
+        Handler::registerHandler(new HTTPErrHandler());
         Handler::unregisterHandler(Handler::getHandler('Default'));
     }
     /**

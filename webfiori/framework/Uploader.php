@@ -127,7 +127,7 @@ class Uploader implements JsonI {
      * 
      * @since 1.0
      */
-    public function __construct($uploadPath = '', $allowedTypes = []) {
+    public function __construct(string $uploadPath = '', array $allowedTypes = []) {
         $this->uploadStatusMessage = 'NO ACTION';
         $this->files = [];
         $this->setAssociatedFileName('files');
@@ -166,7 +166,7 @@ class Uploader implements JsonI {
      * 
      * @since 1.0
      */
-    public function addExt($ext) {
+    public function addExt(string $ext) : bool {
         $ext = str_replace('.', '', $ext);
         $len = strlen($ext);
         $retVal = true;
@@ -201,11 +201,11 @@ class Uploader implements JsonI {
      * 
      * @since 1.2.2
      */
-    public function addExts($arr) {
+    public function addExts(array $arr) : array {
         $retVal = [];
 
         foreach ($arr as $ext) {
-            $retVal[] = $this->addExt($ext);
+            $retVal[$ext] = $this->addExt($ext);
         }
 
         return $retVal;
@@ -219,7 +219,7 @@ class Uploader implements JsonI {
      * @return string the name of the index at which the uploaded files will exist on in the array $_FILES.
      * Default value is 'files'.
      */
-    public function getAssociatedFileName() {
+    public function getAssociatedFileName() : string {
         return $this->asscociatedName;
     }
     /**
@@ -229,7 +229,7 @@ class Uploader implements JsonI {
      * 
      * @since 1.0
      */
-    public function getExts() {
+    public function getExts() : array {
         return $this->extentions;
     }
     /**
@@ -259,7 +259,7 @@ class Uploader implements JsonI {
      * @since 1.0
      * 
      */
-    public function getFiles($asObj = true) {
+    public function getFiles(bool $asObj = true) : array {
         $asObjC = $asObj === true;
         $retVal = [];
 
@@ -280,7 +280,7 @@ class Uploader implements JsonI {
      * 
      * @since 1.0
      */
-    public function getUploadDir() {
+    public function getUploadDir() : string {
         return $this->uploadDir;
     }
     /**
@@ -292,7 +292,7 @@ class Uploader implements JsonI {
      * 
      * @since 1.0
      */
-    public function removeExt($ext) {
+    public function removeExt(string $ext) : bool {
         $count = count($this->extentions);
         $retVal = false;
 
@@ -321,7 +321,7 @@ class Uploader implements JsonI {
      * 
      * @since 1.0
      */
-    public function setAssociatedFileName($name) {
+    public function setAssociatedFileName(string $name) {
         $this->asscociatedName = $name;
     }
     /**
@@ -340,7 +340,7 @@ class Uploader implements JsonI {
      * 
      * @since 1.0
      */
-    public function setUploadDir($dir) {
+    public function setUploadDir(string $dir) {
         $retVal = false;
         $len = strlen($dir);
 
@@ -372,7 +372,7 @@ class Uploader implements JsonI {
      * 
      * @since 1.0
      */
-    public function toJSON() {
+    public function toJSON() : Json {
         $j = new Json();
         $j->add('uploadDirectory', $this->getUploadDir());
         $j->add('associatedFileName', $this->getAssociatedFileName());
@@ -408,7 +408,7 @@ class Uploader implements JsonI {
      * 
      * @since 1.0
      */
-    public function upload($replaceIfExist = false) {
+    public function upload(bool $replaceIfExist = false) : array {
         $this->files = [];
         $reqMeth = Request::getMethod();
 
@@ -453,7 +453,7 @@ class Uploader implements JsonI {
      * 
      * @since 1.2.3
      */
-    public function uploadAsFileObj($replaceIfExist = false) {
+    public function uploadAsFileObj(bool $replaceIfExist = false) : array {
         $uploadedFiles = $this->upload($replaceIfExist);
         $filesArr = [];
 

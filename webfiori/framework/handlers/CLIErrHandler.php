@@ -10,8 +10,11 @@ use webfiori\framework\cli\CLICommand;
  *
  * @author Ibrahim
  */
-class CLIExceptionHandler  extends AbstractHandler {
-    
+class CLIErrHandler  extends AbstractHandler {
+    public function __construct() {
+        parent::__construct();
+        $this->setName('CLI Errors Handler');
+    }
     public function handle() {
         $stream = CLI::getOutputStream();
         $stream->prints(CLICommand::formatOutput("Uncaught Exception\n", [

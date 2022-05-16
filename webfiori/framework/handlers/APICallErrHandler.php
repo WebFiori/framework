@@ -5,12 +5,17 @@ use webfiori\error\AbstractHandler;
 use webfiori\json\Json;
 use webfiori\http\Response;
 use webfiori\framework\router\Router;
+use webfiori\framework\Util;
 /**
  * Exceptions handler which is used to handle exceptions in case of API call.
  *
  * @author Ibrahim
  */
-class APICallExceptionHandler extends AbstractHandler {
+class APICallErrHandler extends AbstractHandler {
+    public function __construct() {
+        parent::__construct();
+        $this->setName('API Call Errors Handler');
+    }
     /**
      * Handles the exception
      */
@@ -32,10 +37,12 @@ class APICallExceptionHandler extends AbstractHandler {
             $index++;
         }
         $j->add('stack-trace',$stackTrace);
-        Response::clear();
-        Response::setCode(500);
-        Response::write($j);
-        Response::send();
+        if (!Response::isSent()) {
+            Response::clear();
+            Response::setCode(500);
+            Response::write($j);
+            Response::send();
+        }
     }
 
     public function isActive(): bool {

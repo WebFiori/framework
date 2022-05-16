@@ -3,16 +3,28 @@ namespace webfiori\framework\handlers;
 
 use webfiori\error\AbstractHandler;
 use webfiori\framework\ui\ServerErrView;
+use webfiori\framework\Util;
+use webfiori\framework\router\Router;
+use webfiori\framework\i18n\Language;
+use webfiori\http\Response;
 /**
  * Description of HTTPExceptionHandler
  *
  * @author Ibrahim
  */
-class HTTPExceptionHandler  extends AbstractHandler {
-    
+class HTTPErrHandler  extends AbstractHandler {
+    public function __construct() {
+        parent::__construct();
+        $this->setName('HTTP Errors Handler');
+    }
     public function handle() {
         $exceptionView = new ServerErrView($this);
-        $exceptionView->show(500);
+        Response::clear();
+        $exceptionView->render();
+        
+        if (!Response::isSent()) {
+            Response::send();
+        }
     }
 
     public function isActive(): bool {

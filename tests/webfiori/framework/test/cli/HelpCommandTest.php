@@ -16,7 +16,7 @@ class HelpCommandTest extends TestCase {
      */
     public function test00() {
         $commandRunner = new CommandRunner();
-        
+        $_SERVER['argc'] = 0;
         $commandRunner->runCommand(new HelpCommand());
         $this->assertEquals(0, $commandRunner->getExitStatus());
         $this->assertTrue($commandRunner->isOutputEquals([

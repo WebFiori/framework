@@ -12,6 +12,13 @@ class ThemeClassWriter extends ClassWriter {
         parent::writeUseStatements();
         $this->addUseStatement([
             'webfiori\\framework\\Theme',
+        ]);
+        if (PHP_VERSION_ID <= 70333) {
+            $this->addUseStatement([
+                'webfiori\\ui\\HeadNode',
+            ]);
+        }
+        $this->addUseStatement([
             'webfiori\\ui\\HTMLNode',
             $this->getNamespace().'\\AsideSection',
             $this->getNamespace().'\\FooterSection',
@@ -104,7 +111,7 @@ class ThemeClassWriter extends ClassWriter {
             ' *',
             
         ], 1);
-        if (PHP_VERSION_ID <= 70300) {
+        if (PHP_VERSION_ID <= 70333) {
             $this->append([
                 " * @return HeadNode",
                 ' */',

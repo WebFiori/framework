@@ -104,7 +104,7 @@ class ThemeClassWriter extends ClassWriter {
             ' *',
             
         ], 1);
-        if (PHP_VERSION_ID < 70300) {
+        if (PHP_VERSION_ID <= 70300) {
             $this->append([
                 " * @return HeadNode",
                 ' */',

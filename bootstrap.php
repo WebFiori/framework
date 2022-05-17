@@ -16,6 +16,8 @@ $WebFioriFrameworkDirs = [
     __DIR__.$DS.'webfiori',
     __DIR__.$DS.'vendor'.$DS.'webfiori'.$DS.'webfiori'
 ];
+fprintf(STDOUT, "PHP Version: '".PHP_VERSION."'\n");
+fprintf(STDOUT, "Version ID: '".PHP_VERSION_ID."'\n");
 fprintf(STDOUT, "Bootstrap Path: '".__DIR__."'\n");
 fprintf(STDOUT,"Tests Directory: '".TESTS_DIRECTORY."'.\n");
 fprintf(STDOUT,'Include Path: \''.get_include_path().'\''."\n");

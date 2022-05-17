@@ -130,6 +130,7 @@ class EmailMessage {
      * @since 1.0.5
      */
     private $tr;
+    private $priority;
     /**
      * Creates new instance of the class.
      * 
@@ -143,8 +144,8 @@ class EmailMessage {
      */
     public function __construct(string $sendAccountName = 'no-reply') {
         $this->log = [];
+        $this->priority = 0;
         $this->subject = 'Hello From WebFiori Framework';
-        $this->setPriority(0);
         $this->boundry = hash('sha256', date(DATE_ISO8601));
         $this->receiversArr = [
             'cc' => [],

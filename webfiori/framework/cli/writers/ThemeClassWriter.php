@@ -102,10 +102,21 @@ class ThemeClassWriter extends ClassWriter {
             '/**',
             " * Returns an object of type HeadNode that represents HTML &lt;head&gt; node.",
             ' *',
-            " * @return HeadNode",
-            ' */',
-            'public function getHeadNode() : HeadSection {',
+            
         ], 1);
+        if (PHP_VERSION_ID < 70300) {
+            $this->append([
+                " * @return HeadNode",
+                ' */',
+                'public function getHeadNode() : HeadNode {',
+            ], 1);
+        } else {
+            $this->append([
+                " * @return HeadSection",
+                ' */',
+                'public function getHeadNode() : HeadSection {',
+            ], 1);
+        }
         $this->append('return new HeadSection();', 2);
         $this->append('}', 1);
         $this->writeComponent('HeadSection', 'HeadNode', 'A class that represents "head" tag of the theme.', 'Include meta tags, CSS and JS files of the theme.');

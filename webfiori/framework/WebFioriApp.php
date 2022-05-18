@@ -32,7 +32,6 @@ use webfiori\framework\middleware\MiddlewareManager;
 use webfiori\framework\router\Router;
 use webfiori\framework\router\RouterUri;
 use webfiori\framework\session\SessionsManager;
-use webfiori\framework\ui\ErrorBox;
 use webfiori\framework\ui\ServerErrView;
 use webfiori\http\Request;
 use webfiori\http\Response;

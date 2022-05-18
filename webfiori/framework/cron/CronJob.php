@@ -52,7 +52,7 @@ class CronJob extends AbstractJob {
      * @throws Exception
      * @since 1.0
      */
-    public function __construct($when = '* * * * *') {
+    public function __construct(string $when = '* * * * *') {
         parent::__construct('CRON-JOB', $when);
         $this->events = [
             'on' => [
@@ -72,10 +72,12 @@ class CronJob extends AbstractJob {
     }
     /**
      * Execute the job.
+     * 
      * @return null|boolean The return value of the method will depend on the 
      * closure which is set to execute. If no closure is set, the method will 
      * return null. If it is set, the return value of the closure will be returned 
      * by this method.
+     * 
      * @since 1.0
      */
     public function execute() {
@@ -91,8 +93,10 @@ class CronJob extends AbstractJob {
     /**
      * Returns a callable which represents the code that will be 
      * executed when its time to run the job.
+     * 
      * @return Callable|null A callable which represents the code that will be 
      * executed when its time to run the job.
+     * 
      * @since 1.0.3
      */
     public function getOnExecution() {
@@ -114,12 +118,15 @@ class CronJob extends AbstractJob {
 
     /**
      * Sets the event that will be fired in case it is time to execute the job.
+     * 
      * @param callable $func The function that will be executed if it is the 
      * time to execute the job. This function can have a return value If the function 
      * returned null or true, then it means the job was successfully executed. 
      * If it returns false, this means the job did not execute successfully.
+     * 
      * @param array $funcParams An array which can hold some parameters that 
      * can be passed to the function.
+     * 
      * @since 1.0
      */
     public function setOnExecution($func,$funcParams = []) {
@@ -133,12 +140,15 @@ class CronJob extends AbstractJob {
     }
     /**
      * Sets a function to call in case the job function has returned false.
+     * 
      * @param callable $func The function that will be executed.
+     * 
      * @param array $params An array of parameters that will be passed to the 
      * function.
+     * 
      * @since 1.0.5
      */
-    public function setOnFailure($func,$params = []) {
+    public function setOnFailure($func, array $params = []) {
         if (is_callable($func)) {
             $this->events['on-failure']['func'] = $func;
 

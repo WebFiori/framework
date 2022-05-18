@@ -3,7 +3,7 @@
 namespace webfiori\framework\test\mail;
 
 use PHPUnit\Framework\TestCase;
-use PHPMailer\PHPMailer;
+use webfiori\framework\mail\SMTPServer;
 /**
  * Description of TestSMTPServer
  *

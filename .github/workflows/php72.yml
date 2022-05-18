@@ -59,7 +59,7 @@ jobs:
         run: sqlcmd -S localhost -U SA -P 1234567890@Eu -Q 'create database testing_db'
       
       - name: Install Dependencies
-        run: composer install --prefer-source --no-interaction --no-dev
+        run: composer install --prefer-dist --no-interaction --no-dev
         
       - name: Execute Tests
         run: phpunit

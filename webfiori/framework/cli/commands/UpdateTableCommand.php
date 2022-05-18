@@ -107,7 +107,7 @@ class UpdateTableCommand extends CLICommand {
 
         $this->success('Table updated.');
     }
-    public function exec() {
+    public function exec() : int {
         $tableClassInput = $this->getArgValue('--table');
 
         while ($tableClassInput === null) {

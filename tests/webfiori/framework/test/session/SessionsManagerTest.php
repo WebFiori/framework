@@ -79,7 +79,7 @@ class SessionsManagerTest extends TestCase {
         $this->assertEquals(Session::STATUS_PAUSED, $activeSesstion->getStatus());
         $active2 = SessionsManager::getActiveSession();
         $this->assertEquals(300, $active2->getDuration());
-        $this->assertTrue($active2->isRefresh());
+        $this->assertFalse($active2->isRefresh());
         $this->assertTrue($active2->isRunning());
         $this->assertNull(SessionsManager::get('var-3 '));
         $this->assertNull(SessionsManager::get(' var-4 '));
@@ -114,11 +114,13 @@ class SessionsManagerTest extends TestCase {
      */
     public function testGetSessionIDFromRequest() {
         $this->assertFalse(SessionsManager::getSessionIDFromRequest('my-s'));
-        $_POST['my-s'] = 'xyz';
-        $this->assertEquals('xyz', SessionsManager::getSessionIDFromRequest('my-s'));
-        unset($_POST['my-s']);
         $_GET['my-s'] = 'super';
         $this->assertEquals('super', SessionsManager::getSessionIDFromRequest('my-s'));
+        
+        $_POST['my-s'] = 'xyz';
+        putenv('REQUEST_METHOD=POST');
+        $this->assertEquals('xyz', SessionsManager::getSessionIDFromRequest('my-s'));
+        
     }
     /**
      * @test

@@ -59,7 +59,7 @@ class RunSQLQueryCommand extends CLICommand {
      * 
      * @return int 0 in case of success. Other value if failed.
      */
-    public function exec() {
+    public function exec() : int {
         $dbConnections = array_keys(WebFioriApp::getAppConfig()->getDBConnections());
         $schema = $this->getArgValue('--schema');
 

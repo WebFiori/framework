@@ -39,7 +39,7 @@ class VersionCommand extends CLICommand {
     /**
      * Execute the command
      */
-    public function exec() {
+    public function exec() : int {
         if (CLI::getActiveCommand()->getName() == $this->getName()) {
             $formattingOptions = [
                 'color' => 'light-blue',
@@ -71,5 +71,6 @@ class VersionCommand extends CLICommand {
             $this->prints(' (c) Version ');
             $this->println(WF_VERSION." ".WF_VERSION_TYPE."\n\n", $formattingOptions);
         }
+        return 0;
     }
 }

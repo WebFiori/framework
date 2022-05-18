@@ -235,6 +235,7 @@ class RouterUriTest extends TestCase {
     public function testgetClassName00() {
         $uri = new RouterUri('https://example.com', '/php/classes/MyClass.php');
         $this->assertEquals('MyClass', $uri->getClassName());
+        $this->assertTrue($uri->isDynamic());
     }
     /**
      * @test
@@ -242,6 +243,7 @@ class RouterUriTest extends TestCase {
     public function testgetClassName02() {
         $uri = new RouterUri('https://example.com', 'MyClass.php');
         $this->assertEquals('MyClass', $uri->getClassName());
+        $this->assertTrue($uri->isDynamic());
     }
     /**
      * @test
@@ -364,5 +366,15 @@ class RouterUriTest extends TestCase {
         $uriObj = new RouterUri($uri, '');
         $this->assertEquals('/{some-var}/{x}/{some-var}',$uriObj->getPath());
         $this->assertEquals(2,count($uriObj->getUriVars()));
+    }
+    /**
+     * @test
+     */
+    public function testAddToMiddleware00() {
+        $uri = new RouterUri('https://www3.programmingacademia.com:80/test', '');
+        \webfiori\framework\middleware\MiddlewareManager::register(new \TestMiddleware());
+        $uri->addMiddleware('global');
+        $this->assertEquals(1, $uri->getMiddlewar()->size());
+        $this->assertFalse($uri->isDynamic());
     }
 }

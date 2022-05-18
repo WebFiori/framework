@@ -129,7 +129,7 @@ class SessionsManager {
      * 
      * @since 1.0
      */
-    public static function get($varName) {
+    public static function get(string $varName) {
         $active = self::getActiveSession();
 
         if ($active !== null) {
@@ -170,7 +170,7 @@ class SessionsManager {
      * 
      * @since 1.0
      */
-    public static function getCookiesHeaders() {
+    public static function getCookiesHeaders() : array {
         $sessions = self::getSessions();
         $retVal = [];
 
@@ -190,7 +190,7 @@ class SessionsManager {
      * 
      * @since 1.0
      */
-    public static function getSessionIDFromCookie($sessionName) {
+    public static function getSessionIDFromCookie(string $sessionName) {
         $sid = filter_input(INPUT_COOKIE, $sessionName);
 
         if ($sid !== null && $sid !== false) {
@@ -210,7 +210,7 @@ class SessionsManager {
      * 
      * @since 1.0
      */
-    public static function getSessionIDFromRequest($seesionName) {
+    public static function getSessionIDFromRequest(string $seesionName) {
         $trimmedSName = trim($seesionName);
         $sid = self::getSessionIDFromCookie($trimmedSName);
 
@@ -231,7 +231,7 @@ class SessionsManager {
      * 
      * @since 1.0
      */
-    public static function getSessions() {
+    public static function getSessions() : array {
         return self::_get()->sesstionsArr;
     }
     /**
@@ -241,7 +241,7 @@ class SessionsManager {
      * 
      * @since 1.0
      */
-    public static function getStorage() {
+    public static function getStorage() : SessionStorage {
         return self::_get()->sesstionStorage;
     }
     /**
@@ -252,7 +252,7 @@ class SessionsManager {
      * 
      * @since 1.0
      */
-    public function hasCookie() {
+    public function hasCookie() : bool {
         $sid = self::getSessionIDFromCookie(INPUT_COOKIE, $this->getName());
 
         return $sid !== false;
@@ -267,7 +267,7 @@ class SessionsManager {
      * 
      * @since 1.0
      */
-    public static function hasSession($sName) {
+    public static function hasSession(string $sName) {
         $trimmed = trim($sName);
 
         if (!self::_checkLoadedSesstions($trimmed)) {
@@ -311,7 +311,7 @@ class SessionsManager {
      * 
      * @since 1.0
      */
-    public static function pull($varName) {
+    public static function pull(string $varName) {
         $active = self::getActiveSession();
 
         if ($active !== null) {
@@ -328,7 +328,7 @@ class SessionsManager {
      * 
      * @since 1.0
      */
-    public static function remove($varName) {
+    public static function remove(string $varName) {
         $active = self::getActiveSession();
 
         if ($active !== null) {
@@ -361,7 +361,7 @@ class SessionsManager {
      * 
      * @since 1.0
      */
-    public static function set($varName, $value) {
+    public static function set(string $varName, $value) {
         $active = self::getActiveSession();
 
         if ($active !== null) {
@@ -382,10 +382,8 @@ class SessionsManager {
      * 
      * @since 1.0
      */
-    public static function setStorage($storage) {
-        if (is_subclass_of($storage, '\webfiori\framework\session\SessionStorage')) {
-            self::_get()->sesstionStorage = $storage;
-        }
+    public static function setStorage(SessionStorage $storage) {
+        self::_get()->sesstionStorage = $storage;
     }
     /**
      * Starts new session or resumes an existing one.
@@ -410,7 +408,7 @@ class SessionsManager {
      * 
      * @throws SessionException If session name is missing or invalid.
      */
-    public static function start($sessionName, $options = []) {
+    public static function start(string $sessionName, array $options = []) {
         self::_get()->_pauseSessions();
 
         if (!self::hasSession($sessionName)) {

@@ -158,7 +158,7 @@ class SMTPAccount {
      * 
      * @return string A string that represents the name of the account.
      */
-    public function getAccountName() {
+    public function getAccountName() : string {
         return $this->accName;
     }
     /**
@@ -169,7 +169,7 @@ class SMTPAccount {
      * 
      * @since 1.0
      */
-    public function getAddress() {
+    public function getAddress() : string {
         return $this->address;
     }
     /**
@@ -180,7 +180,7 @@ class SMTPAccount {
      * 
      * @since 1.0
      */
-    public function getPassword() {
+    public function getPassword() : string {
         return $this->password;
     }
     /**
@@ -190,7 +190,7 @@ class SMTPAccount {
      * 
      * @since 1.0
      */
-    public function getPort() {
+    public function getPort() : int {
         return $this->port;
     }
     /**
@@ -201,7 +201,7 @@ class SMTPAccount {
      * 
      * @since 1.0
      */
-    public function getSenderName() {
+    public function getSenderName() : string {
         return $this->name;
     }
     /**
@@ -211,7 +211,7 @@ class SMTPAccount {
      * 
      * @since 1.0
      */
-    public function getServerAddress() {
+    public function getServerAddress() : string {
         return $this->emailServerAddress;
     }
     /**
@@ -222,7 +222,7 @@ class SMTPAccount {
      * 
      * @since 1.0
      */
-    public function getUsername() {
+    public function getUsername() : string {
         return $this->userName;
     }
     /**
@@ -235,7 +235,7 @@ class SMTPAccount {
      * 
      * @since 1.0.2
      */
-    public function setAccountName($name) {
+    public function setAccountName(string $name) {
         $this->accName = $name;
     }
     /**
@@ -245,7 +245,7 @@ class SMTPAccount {
      * 
      * @since 1.0
      */
-    public function setAddress($address) {
+    public function setAddress(string $address) {
         $this->address = trim($address);
     }
     /**
@@ -255,7 +255,7 @@ class SMTPAccount {
      * 
      * @since 1.0
      */
-    public function setPassword($pass) {
+    public function setPassword(string $pass) {
         $this->password = $pass;
     }
     /**
@@ -266,7 +266,7 @@ class SMTPAccount {
      * 
      * @since 1.0
      */
-    public function setPort($port) {
+    public function setPort(int $port) {
         $this->port = intval($port);
     }
     /**
@@ -279,7 +279,7 @@ class SMTPAccount {
      * 
      * @since 1.0
      */
-    public function setSenderName($name) {
+    public function setSenderName(string $name) {
         $this->name = trim($name);
     }
     /**
@@ -289,7 +289,7 @@ class SMTPAccount {
      * 
      * @since 1.0
      */
-    public function setServerAddress($addr) {
+    public function setServerAddress(string $addr) {
         $this->emailServerAddress = trim($addr);
     }
     /**
@@ -299,7 +299,7 @@ class SMTPAccount {
      * 
      * @since 1.0
      */
-    public function setUsername($u) {
+    public function setUsername(string $u) {
         $this->userName = trim($u);
     }
 }

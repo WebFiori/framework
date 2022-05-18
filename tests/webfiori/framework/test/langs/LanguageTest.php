@@ -216,6 +216,29 @@ class LanguageTest extends TestCase{
         $this->assertEquals('mmm',$lang->get('general/a-var'));
     }
     /**
+     * @test
+     */
+    public function testSet04() {
+        $lang = Language::loadTranslation('en');
+        $this->assertEquals('a/var/not/exist', $lang->get('a/var/not/exist'));
+        $lang->set('a/var/not', 'exist', 'No I Exist');
+        $this->assertEquals('No I Exist', $lang->get('a/var/not/exist'));
+    }
+    /**
+     * @test
+     */
+    public function testSet05() {
+        $lang = Language::loadTranslation('en');
+        $lang->setMultiple('a/var', [
+            'x' => 'Good',
+            'y' => [
+                'Z' => 'Super'
+            ]
+        ]);
+        $this->assertEquals('Good', $lang->get('a/var/x'));
+        $this->assertEquals('Super', $lang->get('a/var/y/Z'));
+    }
+    /**
      * Testing the method Language::get() with non-exiting language variable.
      * @test
      */

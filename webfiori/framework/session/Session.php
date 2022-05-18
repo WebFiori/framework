@@ -29,6 +29,7 @@ use webfiori\framework\User;
 use webfiori\framework\WebFioriApp;
 use webfiori\json\Json;
 use webfiori\json\JsonI;
+use webfiori\http\Request;
 /**
  * A class that represents a session.
  *
@@ -197,11 +198,20 @@ class Session implements JsonI {
      * 
      * @since 1.0
      */
-    public function __construct($options = []) {
+    public function __construct(array $options = []) {
         //used to support older PHP versions which does not have 'random_int'.
         self::$randFunc = is_callable('random_int') ? 'random_int' : 'rand';
         $this->sessionStatus = self::STATUS_INACTIVE;
-
+        $this->passedTime = 0;
+        $this->langCode = '';
+        $this->sesstionUser = new User();
+        
+        if (isset($options['refresh'])) {
+            $this->setIsRefresh($options['refresh']);
+        } else {
+            $this->isRef = false;
+        }
+        
         if (!(isset($options['duration']) && $this->setDuration($options['duration']))) {
             $this->setDuration(self::DEFAULT_SESSION_DURATION);
         }
@@ -215,21 +225,16 @@ class Session implements JsonI {
         $this->sId = isset($options['session-id']) ? trim($options['session-id']) : $this->_generateSessionID();
         $this->setIsRefresh(false);
 
-        if (isset($options['refresh'])) {
-            $this->setIsRefresh($options['refresh']);
-        }
+        
 
 
         $this->resumedAt = 0;
         $this->startedAt = 0;
         $this->sessionArr = [];
-        $ip = filter_var($_SERVER['REMOTE_ADDR'],FILTER_VALIDATE_IP);
+
         $this->passedTime = 0;
 
-        if ($ip == '::1') {
-            $ip = '127.0.0.1';
-        }
-        $this->ipAddr = $ip;
+        $this->ipAddr = Request::getClientIP();
         $expires = $this->isPersistent() ? time() + $this->getDuration() : 0;
         $this->cookieParams = [
             'expires' => $expires,
@@ -274,7 +279,7 @@ class Session implements JsonI {
      * 
      * @since 1.0
      */
-    public function get($varName) {
+    public function get(string $varName) {
         if ($this->isRunning()) {
             $trimmed = trim($varName);
 
@@ -294,7 +299,7 @@ class Session implements JsonI {
      * 
      * @since 1.0
      */
-    public function getCookieHeader() {
+    public function getCookieHeader() : string {
         $cookieData = $this->getCookieParams();
         $httpOnly = $cookieData['httponly'] === true ? '; HttpOnly' : '';
         $secure = $cookieData['secure'] === true ? '; Secure' : '';
@@ -331,7 +336,7 @@ class Session implements JsonI {
      * 
      * @since 1.0
      */
-    public function getCookieParams() {
+    public function getCookieParams() : array {
         return $this->cookieParams;
     }
     /**
@@ -342,7 +347,7 @@ class Session implements JsonI {
      * 
      * @since 1.0
      */
-    public function getDuration() {
+    public function getDuration() : int {
         return intval(round($this->lifeTime * 60));
     }
     /**
@@ -350,7 +355,7 @@ class Session implements JsonI {
      * 
      * @return string The ID of the session.
      */
-    public function getId() {
+    public function getId() : string {
         return $this->sId;
     }
     /**
@@ -360,7 +365,7 @@ class Session implements JsonI {
      * 
      * @since 1.0
      */
-    public function getIp() {
+    public function getIp() : string {
         return $this->ipAddr;
     }
     /**
@@ -375,11 +380,11 @@ class Session implements JsonI {
      * to true, 'EN' will be used.
      * 
      * @return string|null two digit language code (such as 'EN'). If the session 
-     * is not running or the language is not set, the method will return null.
+     * is not running or the language is not set, the method will return empty string.
      * 
      * @since 1.0
      */
-    public function getLangCode($forceUpdate = false) {
+    public function getLangCode(bool $forceUpdate = false) : string {
         $this->_initLang($forceUpdate);
 
         return $this->langCode;
@@ -391,7 +396,7 @@ class Session implements JsonI {
      * 
      * @since 1.0
      */
-    public function getName() {
+    public function getName() : string {
         return $this->sName;
     }
     /**
@@ -402,7 +407,7 @@ class Session implements JsonI {
      * 
      * @since 1.0
      */
-    public function getPassedTime() {
+    public function getPassedTime() : int {
         return $this->passedTime;
     }
     /**
@@ -414,7 +419,7 @@ class Session implements JsonI {
      * 
      * @since 1.0
      */
-    public function getRemainingTime() {
+    public function getRemainingTime() : int {
         if ($this->isRefresh()) {
             return $this->getDuration();
         }
@@ -439,7 +444,7 @@ class Session implements JsonI {
      * 
      * @since 1.0
      */
-    public function getResumedAt() {
+    public function getResumedAt() : int {
         if ($this->isRunning()) {
             return $this->resumedAt;
         }
@@ -454,7 +459,7 @@ class Session implements JsonI {
      * 
      * @since 1.0
      */
-    public function getStartedAt() {
+    public function getStartedAt() : int {
         if ($this->isRunning()) {
             return $this->startedAt;
         }
@@ -468,7 +473,7 @@ class Session implements JsonI {
      * 
      * @since 1.0
      */
-    public function getStatus() {
+    public function getStatus() : string {
         return $this->sessionStatus;
     }
     /**
@@ -478,7 +483,7 @@ class Session implements JsonI {
      * 
      * @since 1.0
      */
-    public function getUser() {
+    public function getUser() : User {
         return $this->sesstionUser;
     }
     /**
@@ -490,7 +495,7 @@ class Session implements JsonI {
      * 
      * @since 1.0
      */
-    public function getVars() {
+    public function getVars() : array {
         return $this->sessionArr;
     }
     /**
@@ -505,12 +510,14 @@ class Session implements JsonI {
      * 
      * @since 1.0
      */
-    public function has($varName) {
+    public function has(string $varName) : bool {
         if ($this->isRunning()) {
             $trimmed = trim($varName);
 
             return isset($this->sessionArr[$trimmed]);
         }
+        
+        return false;
     }
     /**
      * Checks if the session cookie is persistent or not. 
@@ -523,7 +530,7 @@ class Session implements JsonI {
      * 
      * @since 1.0
      */
-    public function isPersistent() {
+    public function isPersistent() : bool {
         return $this->getDuration() != 0;
     }
     /**
@@ -539,7 +546,7 @@ class Session implements JsonI {
      * 
      * @since 1.5
      */
-    public function isRefresh() {
+    public function isRefresh() : bool {
         return $this->isRef;
     }
     /**
@@ -550,7 +557,7 @@ class Session implements JsonI {
      * 
      * @since 1.0
      */
-    public function isRunning() {
+    public function isRunning() : bool {
         return $this->getStatus() == self::STATUS_NEW || $this->getStatus() == self::STATUS_RESUMED;
     }
 
@@ -571,7 +578,7 @@ class Session implements JsonI {
      * 
      * @since 1.0
      */
-    public function pull($varName) {
+    public function pull(string $varName) {
         if ($this->isRunning()) {
             $varVal = $this->get($varName);
             $this->remove($varName);
@@ -586,7 +593,7 @@ class Session implements JsonI {
      * 
      * @since 1.0
      */
-    public function reGenerateID() {
+    public function reGenerateID() : string {
         $this->sId = $this->_generateSessionID();
 
         return $this->sId;
@@ -602,7 +609,7 @@ class Session implements JsonI {
      * 
      * @since 1.0
      */
-    public function remove($varName) {
+    public function remove(string $varName) : bool {
         if ($this->isRunning()) {
             $trimmed = trim($varName);
 
@@ -623,7 +630,7 @@ class Session implements JsonI {
      * 
      * @since 1.0
      */
-    public function serialize() {
+    public function serialize() : string {
         $serializedSesstion = serialize($this);
         $cipherMeth = 'aes-256-ctr';
 
@@ -658,7 +665,7 @@ class Session implements JsonI {
      * 
      * @since 1.0
      */
-    public function set($name, $val) {
+    public function set(string $name, $val) : bool {
         if ($this->isRunning()) {
             $trimmed = trim($name);
 
@@ -678,14 +685,14 @@ class Session implements JsonI {
      * cookie. Also, note that if the new duration less than the passed time, 
      * the session will expire.
      * 
-     * @param int $time Session duration in minutes.
+     * @param float $time Session duration in minutes.
      * 
      * @return boolean If session duration is updated, the method will return true. 
      * False otherwise.
      * 
      * @since 1.0
      */
-    public function setDuration($time) {
+    public function setDuration(float $time) : bool {
         $asFloat = floatval($time);
 
         if ($asFloat >= 0) {
@@ -707,7 +714,7 @@ class Session implements JsonI {
      * 
      * @since 1.0
      */
-    public function setIsRefresh($bool) {
+    public function setIsRefresh(bool $bool) {
         $this->isRef = $bool === true;
     }
     /**
@@ -718,7 +725,7 @@ class Session implements JsonI {
      * 
      * @since 1.0
      */
-    public function setSameSite($val) {
+    public function setSameSite(string $val) {
         $trimmed = strtolower(trim($val));
 
         if ($trimmed == 'lax' || $trimmed == 'none' || $trimmed == 'strict') {
@@ -734,8 +741,8 @@ class Session implements JsonI {
      * 
      * @since 1.0
      */
-    public function setUser($userObj) {
-        if ($userObj instanceof User && $this->isRunning()) {
+    public function setUser(User $userObj) {
+        if ($this->isRunning()) {
             $this->sesstionUser = $userObj;
         }
     }
@@ -753,7 +760,7 @@ class Session implements JsonI {
         if (!$this->isRunning()) {
             $seesionStr = SessionsManager::getStorage()->read($this->getId());
 
-            if ($this->getStatus() == self::STATUS_KILLED || !$this->unserialize($seesionStr)) {
+            if ($this->getStatus() == self::STATUS_KILLED || $seesionStr === null || !$this->unserialize($seesionStr)) {
                 $this->reGenerateID();
                 $this->_initNewSesstionVars();
             } else {
@@ -768,7 +775,7 @@ class Session implements JsonI {
      * 
      * @since 1.0
      */
-    public function toJSON() {
+    public function toJSON() : Json {
         return new Json([
             'name' => $this->getName(),
             'startedAt' => $this->getStartedAt(),
@@ -796,7 +803,7 @@ class Session implements JsonI {
      * 
      * @since 1.0
      */
-    public function unserialize($serialized) {
+    public function unserialize(string $serialized) {
         $cipherMeth = 'aes-256-ctr';
 
         if (in_array($cipherMeth, openssl_get_cipher_methods())) {
@@ -926,7 +933,7 @@ class Session implements JsonI {
      */
     private function _initLang($forceUpdate = false,$useDefault = true) {
         if ($this->isRunning()) {
-            if ($this->langCode !== null && !$forceUpdate) {
+            if ($this->langCode != '' && !$forceUpdate) {
                 return false;
             }
             //the value of default language.
@@ -935,26 +942,30 @@ class Session implements JsonI {
             $defaultLang = WebFioriApp::getAppConfig()->getPrimaryLanguage();
             $langCodeFromReq = $this->_getLangFromRequest();
             $retVal = false;
-
-            if ($this->langCode !== null && $langCodeFromReq == null) {
-                $retVal = false;
-            } else if ($langCodeFromReq == null && $useDefault === true) {
-                $langCodeFromReq = $defaultLang;
-            } else if ($langCodeFromReq == null && $useDefault !== true) {
-                $retVal = false;
-            }
-            $langU = strtoupper($langCodeFromReq);
-
-            if (strlen($langU) == 2) {
-                $this->langCode = $langU;
-                $retVal = true;
+            $isNullCode = $langCodeFromReq === null;
+            
+            if ($isNullCode) {
+                if ($this->langCode != '' || $useDefault === false) {
+                    $retVal = false;
+                } else if ($useDefault) {
+                    $langCodeFromReq = $defaultLang;
+                }
             }
 
-            if ($useDefault && !$retVal && $this->langCode === null) {
-                $this->langCode = $defaultLang;
-                $retVal = true;
-            } else {
-                $retVal = false;
+            if ($langCodeFromReq !== null) {
+                $langU = strtoupper($langCodeFromReq);
+
+                if (strlen($langU) == 2) {
+                    $this->langCode = $langU;
+                    $retVal = true;
+                }
+
+                if ($useDefault && !$retVal && $this->langCode == '') {
+                    $this->langCode = $defaultLang;
+                    $retVal = true;
+                } else {
+                    $retVal = false;
+                }
             }
 
             return $retVal;
@@ -966,7 +977,7 @@ class Session implements JsonI {
         $this->sessionArr = [];
         $this->resumedAt = time();
         $this->startedAt = time();
-        $this->sesstionUser = new User();
+        
         $this->sessionStatus = self::STATUS_NEW;
         $this->_initLang();
     }

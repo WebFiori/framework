@@ -114,7 +114,7 @@ abstract class CLICommand {
      * do. The description will appear when the command 'help' is executed.
      * @since 1.0
      */
-    public function __construct($commandName, $args = [], $description = '') {
+    public function __construct(string $commandName, array $args = [], string $description = '') {
         if (!$this->setName($commandName)) {
             $this->setName('new-command');
         }
@@ -160,7 +160,7 @@ abstract class CLICommand {
      * 
      * @since 1.0
      */
-    public function addArg($name, array $options = []) {
+    public function addArg(string $name, array $options = []) {
         $trimmed = trim($name);
         
         if ($this->hasArg($trimmed)) {
@@ -217,7 +217,7 @@ abstract class CLICommand {
      * 
      * @since 1.0
      */
-    public function clear($numberOfCols = 1, $beforeCursor = true) {
+    public function clear(int $numberOfCols = 1, bool $beforeCursor = true) {
         $asInt = intval($numberOfCols);
 
         if ($asInt >= 1) {
@@ -284,7 +284,7 @@ abstract class CLICommand {
      * @since 1.0
      * 
      */
-    public function confirm($confirmTxt, $default = null) {
+    public function confirm(string $confirmTxt, $default = null) {
         $answer = null;
 
         do {
@@ -328,7 +328,7 @@ abstract class CLICommand {
      * 
      * @since 1.0
      */
-    public function error($message) {
+    public function error(string $message) {
         $this->prints('Error: ', [
             'color' => 'light-red',
             'bold' => true
@@ -346,7 +346,7 @@ abstract class CLICommand {
      * 
      * @since 1.0
      */
-    public function excCommand() {
+    public function excCommand() : int {
         CLI::setActiveCommand($this);
         $retVal = -1;
         $this->_parseArgs();
@@ -370,12 +370,12 @@ abstract class CLICommand {
      * when the command is executed.
      * 
      * @return int The developer should implement this method in a way it returns 0 
-     * or null if the command is executed successfully and return -1 if the 
+     * if the command is executed successfully and return -1 if the 
      * command did not execute successfully.
      * 
      * @since 1.0
      */
-    public abstract function exec();
+    public abstract function exec() : int;
     /**
      * Formats an output string.
      * 
@@ -423,7 +423,7 @@ abstract class CLICommand {
      * 
      * @since 1.0
      */
-    public static function formatOutput($string, $formatOptions) {
+    public static function formatOutput(string $string, array $formatOptions) {
         $validatedOptions = self::_validateOutputOptions($formatOptions);
 
         return self::_getFormattedOutput($string, $validatedOptions);
@@ -472,7 +472,7 @@ abstract class CLICommand {
      * 
      * @since 1.0
      */
-    public function getArgs() {
+    public function getArgs() : array {
         return $this->commandArgs;
     }
     /**
@@ -485,7 +485,7 @@ abstract class CLICommand {
      * 
      * @since 1.0
      */
-    public function getArgValue($optionName) {
+    public function getArgValue(string $optionName) {
         $trimmedOptName = trim($optionName);
 
         if (!CLI::isIntaractive() && isset($this->commandArgs[$trimmedOptName]['val'])) {
@@ -521,7 +521,7 @@ abstract class CLICommand {
      * 
      * @since 1.0
      */
-    public function getDescription() {
+    public function getDescription() : string {
         return $this->description;
     }
     /**
@@ -546,7 +546,7 @@ abstract class CLICommand {
      * 
      * @since 1.0
      */
-    public function getInput($prompt, $default = null, $validator = null) {
+    public function getInput(string $prompt, $default = null, $validator = null) {
         $trimidPrompt = trim($prompt);
 
         if (strlen($trimidPrompt) > 0) {
@@ -594,7 +594,7 @@ abstract class CLICommand {
      * 
      * @since 1.0
      */
-    public function getName() {
+    public function getName() : string {
         return $this->commandName;
     }
     /**
@@ -619,7 +619,7 @@ abstract class CLICommand {
      * 
      * @since 1.0
      */
-    public function hasArg($argName) {
+    public function hasArg(string $argName) {
         return isset($this->getArgs()[trim($argName)]);
     }
     /**
@@ -632,7 +632,7 @@ abstract class CLICommand {
      * 
      * @since 1.0
      */
-    public function info($message) {
+    public function info(string $message) {
         $this->prints('Info: ', [
             'color' => 'blue',
             'bold' => true
@@ -651,7 +651,7 @@ abstract class CLICommand {
      * 
      * @since 1.0
      */
-    public function isArgProvided($argName) {
+    public function isArgProvided(string $argName) {
         if ($this->hasArg($argName)) {
             $trimmed = trim($argName);
 
@@ -673,7 +673,7 @@ abstract class CLICommand {
      * 
      * @since 1.0
      */
-    public function moveCursorDown($lines = 1) {
+    public function moveCursorDown(int $lines = 1) {
         $asInt = intval($lines);
 
         if ($asInt >= 1) {
@@ -691,7 +691,7 @@ abstract class CLICommand {
      * 
      * @since 1.0
      */
-    public function moveCursorLeft($numberOfCols = 1) {
+    public function moveCursorLeft(int $numberOfCols = 1) {
         $asInt = intval($numberOfCols);
 
         if ($asInt >= 1) {
@@ -709,7 +709,7 @@ abstract class CLICommand {
      * 
      * @since 1.0
      */
-    public function moveCursorRight($numberOfCols = 1) {
+    public function moveCursorRight(int $numberOfCols = 1) {
         $asInt = intval($numberOfCols);
 
         if ($asInt >= 1) {
@@ -732,7 +732,7 @@ abstract class CLICommand {
      * 
      * @since 1.0
      */
-    public function moveCursorTo($line = 0, $col = 0) {
+    public function moveCursorTo(int $line = 0, int $col = 0) {
         $lineAsInt = intval($line);
         $colAsInt = intval($col);
 
@@ -751,7 +751,7 @@ abstract class CLICommand {
      * 
      * @since 1.0
      */
-    public function moveCursorUp($lines = 1) {
+    public function moveCursorUp(int $lines = 1) {
         $asInt = intval($lines);
 
         if ($asInt >= 1) {
@@ -769,7 +769,7 @@ abstract class CLICommand {
      * 
      * @since 1.0
      */
-    public function printList($array) {
+    public function printList(array $array) {
         if (gettype($array) == 'array') {
             for ($x = 0 ; $x < count($array) ; $x++) {
                 $this->prints("- ", [
@@ -796,7 +796,7 @@ abstract class CLICommand {
      * for available options, check the method CLICommand::formatOutput().
      * @since 1.0
      */
-    public function println($str = '', ...$_) {
+    public function println(string $str = '', ...$_) {
         $argsCount = count($_);
 
         if ($argsCount != 0 && gettype($_[$argsCount - 1]) == 'array') {
@@ -825,7 +825,7 @@ abstract class CLICommand {
      * 
      * @since 1.0
      */
-    public function prints($str, ...$_) {
+    public function prints(string $str, ...$_) {
         $str = $this->asString($str);
 
         $argCount = count($_);
@@ -853,7 +853,7 @@ abstract class CLICommand {
      * 
      * @since 1.0
      */
-    public function read($bytes = 1) {
+    public function read(int $bytes = 1) {
         return $this->getInputStream()->read($bytes);
     }
     /**
@@ -867,7 +867,7 @@ abstract class CLICommand {
      * 
      * @since 1.0
      */
-    public function readln() {
+    public function readln() : string {
         return $this->getInputStream()->readLine();
     }
 
@@ -892,7 +892,7 @@ abstract class CLICommand {
      * 
      * @since 1.0
      */
-    public function select($prompt, $choices, $defaultIndex = null) {
+    public function select(string $prompt, array $choices, $defaultIndex = null) {
         if (gettype($choices) == 'array' && count($choices) != 0) {
             do {
                 $this->println($prompt, [
@@ -935,7 +935,7 @@ abstract class CLICommand {
      * 
      * @since 1.0
      */
-    public function setArgValue($argName, $argValue = '') {
+    public function setArgValue(string $argName, $argValue = '') {
         $trimmedArgName = trim($argName);
         $trimmedArgVal = trim($argValue);
         $retVal = false;
@@ -971,7 +971,7 @@ abstract class CLICommand {
      * @return boolean If the description of the command is set, the method will return 
      * true. Other than that, the method will return false.
      */
-    public function setDescription($str) {
+    public function setDescription(string $str) {
         $trimmed = trim($str);
 
         if (strlen($trimmed) > 0) {
@@ -1006,7 +1006,7 @@ abstract class CLICommand {
      * 
      * @since 1.0
      */
-    public function setName($name) {
+    public function setName(string $name) {
         $trimmed = trim($name);
 
         if (strlen($trimmed) > 0 && !strpos($trimmed, ' ')) {
@@ -1036,7 +1036,7 @@ abstract class CLICommand {
      * 
      * @since 1.0
      */
-    public function success($message) {
+    public function success(string $message) {
         $this->prints("Success: ", [
             'color' => 'light-green',
             'bold' => true
@@ -1053,7 +1053,7 @@ abstract class CLICommand {
      * 
      * @since 1.0
      */
-    public function warning($message) {
+    public function warning(string $message) {
         $this->prints('Warning: ', [
             'color' => 'light-yellow',
             'bold' => true

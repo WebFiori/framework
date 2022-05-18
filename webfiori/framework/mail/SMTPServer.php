@@ -70,9 +70,9 @@ class SMTPServer {
      * 
      * @param string $serverAddress SMTP Server address such as 'smtp.example.com'.
      * 
-     * @param string $port SMTP server port such as 25, 465 or 587.
+     * @param int $port SMTP server port such as 25, 465 or 587.
      */
-    public function __construct($serverAddress, $port) {
+    public function __construct(string $serverAddress, int $port) {
         $this->serverPort = $port;
         $this->serverHost = $serverAddress;
         $this->serverOptions = [];
@@ -96,7 +96,7 @@ class SMTPServer {
      * 
      * @since 1.0
      */
-    public function authLogin($username, $pass) {
+    public function authLogin(string $username, string $pass) {
         if (!$this->isConnected()) {
             $this->connect();
 
@@ -123,7 +123,7 @@ class SMTPServer {
      * 
      * @since 1.0
      */
-    public function connect() {
+    public function connect() : bool {
         $retVal = true;
 
         if (!$this->isConnected()) {
@@ -165,7 +165,7 @@ class SMTPServer {
      * 
      * @since 1.0
      */
-    public function getHost() {
+    public function getHost() : string {
         return $this->serverHost;
     }
     /**
@@ -176,7 +176,7 @@ class SMTPServer {
      * 
      * @since 1.0
      */
-    public function getLastResponse() {
+    public function getLastResponse() : string {
         return $this->lastResponse;
     }
     /**
@@ -188,7 +188,7 @@ class SMTPServer {
      * 
      * @since 1.0
      */
-    public function getLastResponseCode() {
+    public function getLastResponseCode() : int {
         return $this->lastResponseCode;
     }
     /**
@@ -198,7 +198,7 @@ class SMTPServer {
      * 
      * @since 1.0
      */
-    public function getLastSentCommand() {
+    public function getLastSentCommand() : string {
         return $this->lastCommand;
     }
     /**
@@ -210,7 +210,7 @@ class SMTPServer {
      * 
      * @since 1.0
      */
-    public function getLog() {
+    public function getLog() : array {
         return $this->responseLog;
     }
     /**
@@ -221,7 +221,7 @@ class SMTPServer {
      * 
      * @since 1.0.1
      */
-    public function getLastLogEntry() {
+    public function getLastLogEntry() : array {
         $entries = $this->getLog();
         $entriesCount = count($entries);
         
@@ -242,7 +242,7 @@ class SMTPServer {
      * 
      * @since 1.0
      */
-    public function getPort() {
+    public function getPort() : int {
         return $this->serverPort;
     }
     /**
@@ -256,7 +256,7 @@ class SMTPServer {
      * 
      * @since 1.0
      */
-    public function getServerOptions() {
+    public function getServerOptions() : array {
         return $this->serverOptions;
     }
     /**
@@ -267,7 +267,7 @@ class SMTPServer {
      * 
      * @since 1.0
      */
-    public function getTimeout() {
+    public function getTimeout() : int {
         return $this->responseTimeout;
     }
     /**
@@ -277,7 +277,7 @@ class SMTPServer {
      * 
      * @since 1.0
      */
-    public function isConnected() {
+    public function isConnected() : bool {
         return is_resource($this->serverCon);
     }
     /**
@@ -290,7 +290,7 @@ class SMTPServer {
      * 
      * @since 1.0
      */
-    public function isInWritingMode() {
+    public function isInWritingMode() : bool {
         return $this->isWriting;
     }
     /**
@@ -300,7 +300,7 @@ class SMTPServer {
      * 
      * @since 1.0
      */
-    public function read() {
+    public function read() : string {
         $message = '';
         
         while (!feof($this->serverCon)) {
@@ -332,7 +332,7 @@ class SMTPServer {
      * 
      * @since 1.0
      */
-    public function sendCommand($command) {
+    public function sendCommand(string $command) : bool {
         $this->lastCommand = explode(' ', $command)[0];
 
         if ($this->lastResponseCode >= 400) {
@@ -381,7 +381,7 @@ class SMTPServer {
      * 
      * @since 1.0
      */
-    public function sendHello() {
+    public function sendHello() : bool {
         if ($this->sendCommand('EHLO '.$this->getHost())) {
             $this->_parseHelloResponse($this->getLastResponse());
 
@@ -399,7 +399,7 @@ class SMTPServer {
      * 
      * @since 1.0
      */
-    public function setTimeout($val) {
+    public function setTimeout(int $val) {
         if ($val >= 1 && !$this->isConnected()) {
             $this->responseTimeout = $val;
         }
@@ -422,10 +422,8 @@ class SMTPServer {
 
         if ($port == 465) {
             return "ssl://";
-        } else {
-            if ($port == 587) {
-                return "tls://";
-            }
+        } else if ($port == 587) {
+            return "tls://";
         }
 
         return '';

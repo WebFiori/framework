@@ -126,7 +126,7 @@ class RouterUri extends Uri {
      * @throws InvalidArgumentException The method will throw this exception if the 
      * given URI is invalid.
      */
-    public function __construct($requestedUri,$routeTo,$caseSensitive = true,$closureParams = []) {
+    public function __construct(string $requestedUri, $routeTo, bool $caseSensitive = true, array $closureParams = []) {
         parent::__construct($requestedUri);
         $this->setType(Router::CUSTOMIZED);
         $this->setRoute($routeTo);
@@ -147,7 +147,7 @@ class RouterUri extends Uri {
      * 
      * @since 1.3.5
      */
-    public function addLanguage($langCode) {
+    public function addLanguage(string $langCode) {
         $lower = strtolower(trim($langCode));
 
         if (strlen($lower) == 2 && $lower[0] >= 'a' && $lower[0] <= 'z' && $lower[1] >= 'a' && $lower[1] <= 'z' && !in_array($lower, $this->languages)) {
@@ -161,7 +161,7 @@ class RouterUri extends Uri {
      * 
      * @since 1.4
      */
-    public function addMiddleware($name) {
+    public function addMiddleware(string $name) {
         $mw = MiddlewareManager::getMiddleware($name);
 
         if ($mw !== null) {
@@ -196,7 +196,7 @@ class RouterUri extends Uri {
      * 
      * @since 1.3.2
      */
-    public function getClassName() {
+    public function getClassName() : string {
         if ($this->getType() != Router::CLOSURE_ROUTE) {
             $path = $this->getRouteTo();
             $pathExpl = explode(DS, $path);
@@ -220,7 +220,7 @@ class RouterUri extends Uri {
      * 
      * @since 1.2
      */
-    public function getClosureParams() {
+    public function getClosureParams() : array {
         return $this->closureParams;
     }
     /**
@@ -231,7 +231,7 @@ class RouterUri extends Uri {
      * 
      * @since 1.3.5
      */
-    public function getLanguages() {
+    public function getLanguages() : array {
         return $this->languages;
     }
     /**
@@ -241,7 +241,7 @@ class RouterUri extends Uri {
      * 
      * @since 1.4.0
      */
-    public function getMiddlewar() {
+    public function getMiddlewar() : LinkedList {
         return $this->assignedMiddlewareList;
     }
 
@@ -268,7 +268,7 @@ class RouterUri extends Uri {
      * 
      * @since 1.3.4
      */
-    public function getRequestedUri() {
+    public function getRequestedUri() : array {
         return isset($this->getComponents()['requested-uri']) ? $this->getComponents()['requested-uri'] : null;
     }
     /**
@@ -293,7 +293,7 @@ class RouterUri extends Uri {
      * @since 1.3.5
      * 
      */
-    public function getSitemapNodes() {
+    public function getSitemapNodes() : array {
         $retVal = [];
 
         if ($this->hasVars()) {
@@ -320,7 +320,7 @@ class RouterUri extends Uri {
      * 
      * @since 1.1
      */
-    public function getType() {
+    public function getType() : string {
         return $this->type;
     }
 
@@ -332,7 +332,7 @@ class RouterUri extends Uri {
      * 
      * @since 1.3.4
      */
-    public function hasWWW() {
+    public function hasWWW() : bool {
         $host = $this->getHost();
         $www = substr($host, 0, 3);
 
@@ -348,7 +348,7 @@ class RouterUri extends Uri {
      * 
      * @since 1.3.7
      */
-    public function isDynamic() {
+    public function isDynamic() : bool {
         return $this->isDynamic;
     }
     /**
@@ -359,7 +359,7 @@ class RouterUri extends Uri {
      * 
      * @since 1.3
      */
-    public function isInSiteMap() {
+    public function isInSiteMap() : bool {
         return $this->incInSiteMap;
     }
     /**
@@ -380,7 +380,7 @@ class RouterUri extends Uri {
      * 
      * @since 1.5.0
      */
-    public function setAction($action) {
+    public function setAction(string $action) {
         $trimmed = trim($action);
 
         if (strlen($trimmed) != 0) {
@@ -395,10 +395,8 @@ class RouterUri extends Uri {
      * 
      * @since 1.2
      */
-    public function setClosureParams($arr) {
-        if (gettype($arr) == 'array') {
-            $this->closureParams = $arr;
-        }
+    public function setClosureParams(array $arr) {
+        $this->closureParams = $arr;
     }
     /**
      * Sets the value of the property '$incInSiteMap'.
@@ -408,7 +406,7 @@ class RouterUri extends Uri {
      * 
      * @since 1.3
      */
-    public function setIsInSiteMap($bool) {
+    public function setIsInSiteMap(bool $bool) {
         $this->incInSiteMap = $bool === true;
     }
 
@@ -453,7 +451,7 @@ class RouterUri extends Uri {
      * 
      * @since 1.1
      */
-    public function setType($type) {
+    public function setType(string $type) {
         if ($type == Router::API_ROUTE || $type == Router::CLOSURE_ROUTE || 
                 $type == Router::CUSTOMIZED || $type == Router::VIEW_ROUTE) {
             $this->type = $type;

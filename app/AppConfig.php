@@ -182,7 +182,7 @@ class AppConfig implements Config {
      * will return an object of type SMTPAccount. Else, the
      * method will return null.
      */
-    public function getAccount($name) {
+    public function getAccount(string $name) {
         if (isset($this->emailAccounts[$name])) {
             return $this->emailAccounts[$name];
         }
@@ -195,7 +195,7 @@ class AppConfig implements Config {
      * 
      * @return array An associative array that contains all email accounts.
      */
-    public function getAccounts() {
+    public function getAccounts() : array {
         return $this->emailAccounts;
     }
     /**
@@ -203,7 +203,7 @@ class AppConfig implements Config {
      * 
      * @return string The name of the theme that is used in admin control pages.
      */
-    public function getAdminThemeName() {
+    public function getAdminThemeName() : string {
         return $this->adminThemeName;
     }
     /**
@@ -213,7 +213,7 @@ class AppConfig implements Config {
      * 
      * @return string The name of base theme that is used in website pages.
      */
-    public function getBaseThemeName() {
+    public function getBaseThemeName() : string {
         return $this->baseThemeName;
     }
     /**
@@ -224,7 +224,7 @@ class AppConfig implements Config {
      * 
      * @return string The base URL.
      */
-    public function getBaseURL() {
+    public function getBaseURL() : string {
         return $this->baseUrl;
     }
     /**
@@ -234,7 +234,7 @@ class AppConfig implements Config {
      * 
      * @return string The version number of the configuration file.
      */
-    public function getConfigVersion() {
+    public function getConfigVersion() : string {
         return $this->configVision;
     }
     /**
@@ -242,7 +242,7 @@ class AppConfig implements Config {
      * 
      * @return string Password hash or the string 'NO_PASSWORD' if there is no password.
      */
-    public function getCRONPassword() {
+    public function getCRONPassword() : string {
         return $this->cronPass;
     }
     /**
@@ -254,7 +254,7 @@ class AppConfig implements Config {
      * ConnectionInfo if a connection info was found for the given connection name.
      * Other than that, the method will return null.
      */
-    public function getDBConnection($conName) {
+    public function getDBConnection(string $conName) {
         $conns = $this->getDBConnections();
         $trimmed = trim($conName);
         
@@ -270,7 +270,7 @@ class AppConfig implements Config {
      * 
      * @return array An associative array.
      */
-    public function getDBConnections() {
+    public function getDBConnections() : array {
         return $this->dbConnections;
     }
     /**
@@ -282,7 +282,7 @@ class AppConfig implements Config {
      * does exist in the given language, the method will return it.
      * If no such title, the method will return null.
      */
-    public function getDefaultTitle($langCode) {
+    public function getDefaultTitle(string $langCode) {
         $langs = $this->getTitles();
         $langCodeF = strtoupper(trim($langCode));
         
@@ -299,7 +299,7 @@ class AppConfig implements Config {
      * does exist, the method will return it. If no such description, the
      * method will return null.
      */
-    public function getDescription($langCode) {
+    public function getDescription(string $langCode) {
         $langs = $this->getDescriptions();
         $langCodeF = strtoupper(trim($langCode));
         if (isset($langs[$langCodeF])) {
@@ -315,7 +315,7 @@ class AppConfig implements Config {
      * @return array An associative array which contains different website descriptions
      * in different languages.
      */
-    public function getDescriptions() {
+    public function getDescriptions() : array {
         return $this->descriptions;
     }
     /**
@@ -323,7 +323,7 @@ class AppConfig implements Config {
      * 
      * @return string The home page URL of the website.
      */
-    public function getHomePage() {
+    public function getHomePage() : string {
         return $this->homePage;
     }
     /**
@@ -331,7 +331,7 @@ class AppConfig implements Config {
      * 
      * @return string Language code of the primary language such as 'EN'.
      */
-    public function getPrimaryLanguage() {
+    public function getPrimaryLanguage() : string {
         return $this->primaryLang;
     }
     /**
@@ -340,7 +340,7 @@ class AppConfig implements Config {
      * @return string The method will return a string in the format
      * YYYY-MM-DD' that represents application release date.
      */
-    public function getReleaseDate() {
+    public function getReleaseDate() : string {
         return $this->appReleaseDate;
     }
     /**
@@ -349,7 +349,7 @@ class AppConfig implements Config {
      * @return array An associative array. The indices of the array are language codes
      * and the values are pages titles.
      */
-    public function getTitles() {
+    public function getTitles() : array {
         return $this->defaultPageTitles;
     }
     /**
@@ -358,7 +358,7 @@ class AppConfig implements Config {
      * @return string A string such as ' - ' or ' | '. Note that the method
      * will add the two spaces by default.
      */
-    public function getTitleSep() {
+    public function getTitleSep() : string {
         return $this->titleSep;
     }
     /**
@@ -367,7 +367,7 @@ class AppConfig implements Config {
      * @return string The method should return a string in the
      * form 'x.x.x.x'.
      */
-    public function getVersion() {
+    public function getVersion() : string {
         return $this->appVestion;
     }
     /**
@@ -376,7 +376,7 @@ class AppConfig implements Config {
      * @return string The method will return a string such as
      * 'Stable', 'Alpha', 'Beta' and so on.
      */
-    public function getVersionType() {
+    public function getVersionType() : string {
         return $this->appVersionType;
     }
     /**
@@ -388,7 +388,7 @@ class AppConfig implements Config {
      * does exist, the method will return it. If no such name, the
      * method will return null.
      */
-    public function getWebsiteName($langCode) {
+    public function getWebsiteName(string $langCode) {
         $langs = $this->getWebsiteNames();
         $langCodeF = strtoupper(trim($langCode));
         
@@ -404,7 +404,7 @@ class AppConfig implements Config {
      * 
      * @return array An array which contains different website names in different languages.
      */
-    public function getWebsiteNames() {
+    public function getWebsiteNames() : array {
         return $this->webSiteNames;
     }
     /**
@@ -431,7 +431,7 @@ class AppConfig implements Config {
             'EN' => '',
             'AR' => '',
         ];
-        $this->baseUrl = 'https://example.com';
+        $this->baseUrl = Uri::getBaseURL();
         $this->titleSep = '|';
         $this->primaryLang = 'EN';
         $this->baseThemeName = \themes\newFiori\NewFiori::class;

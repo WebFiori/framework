@@ -79,8 +79,8 @@ class GreenyTheme extends Theme {
     public function getHeadNode() : HeadNode {
         $headTag = new HeadNode();
         $headTag->setBase(WebFioriApp::getAppConfig()->getBaseURL());
-        $headTag->addLink('icon', Page::imagesDir().'/favicon.png');
-        $headTag->setCanonical(WebFioriApp::getAppConfig()->getBaseURL().Page::canonical());
+        $headTag->addLink('icon', $this->getImagesDirName().'/favicon.png');
+//        $headTag->setCanonical(WebFioriApp::getAppConfig()->getBaseURL().Page::canonical());
 
         $headTag->addMeta('robots', 'index, follow');
 

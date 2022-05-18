@@ -82,7 +82,7 @@ class MiddlewareClassWriter extends ClassWriter {
             '/**',
             ' * Execute a set of instructions before accessing the application.',
             ' */',
-            'public function before(Request $request, $response ) {',
+            'public function before(Request $request, Response $response ) {',
             
         ], 1);
         $this->append('//TODO: Implement the action to perform before processing the request.', 2);

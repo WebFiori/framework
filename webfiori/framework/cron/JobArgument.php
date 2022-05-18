@@ -150,7 +150,7 @@ class JobArgument implements JsonI {
      * 
      * @since 1.0
      */
-    public function toJSON() {
+    public function toJSON() : Json {
         $json = new Json([
             'name' => $this->getName(),
             'description' => $this->getDescription()

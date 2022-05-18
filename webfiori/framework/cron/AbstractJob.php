@@ -178,7 +178,9 @@ abstract class AbstractJob implements JsonI {
      * 
      * @since 1.0
      */
-    public function __construct($jobName = '', $when = '* * * * *', $description = 'NO DESCRIPTION') {
+    public function __construct(string $jobName = '', string $when = '* * * * *', string $description = 'NO DESCRIPTION') {
+        $this->jobDesc = '';
+        $this->jobName = ''; 
         $this->setJobName($jobName);
         $this->setDescription($description);
         $this->customAttrs = [];
@@ -296,7 +298,7 @@ abstract class AbstractJob implements JsonI {
      * 
      * @since 1.0
      */
-    public function cron($when = '* * * * *') {
+    public function cron(string $when = '* * * * *') {
         $retVal = false;
         $trimmed = trim($when);
         $split = explode(' ', $trimmed);
@@ -347,7 +349,7 @@ abstract class AbstractJob implements JsonI {
      * 
      * @since 1.0
      */
-    public function dailyAt($hour = 0,$minute = 0) {
+    public function dailyAt(int $hour = 0, int $minute = 0) {
         if ($hour >= 0 && $hour <= 23 && $minute >= 0 && $minute <= 59) {
             return $this->cron($minute.' '.$hour.' * * *');
         }
@@ -377,7 +379,7 @@ abstract class AbstractJob implements JsonI {
      * 
      * @since 1.0.1
      */
-    public function everyMonthOn($dayNum = 1,$time = '00:00') {
+    public function everyMonthOn(int $dayNum = 1, string $time = '00:00') {
         if ($dayNum >= 1 && $dayNum <= 31) {
             $timeSplit = explode(':', $time);
 
@@ -411,7 +413,7 @@ abstract class AbstractJob implements JsonI {
      * 
      * @since 1.0
      */
-    public function exec($force = false) {
+    public function exec(bool $force = false) {
         $xForce = $force === true;
         $retVal = false;
         $this->setIsForced($xForce);
@@ -457,7 +459,7 @@ abstract class AbstractJob implements JsonI {
      * 
      * @since 1.0.3
      */
-    public function getArgument($argName) {
+    public function getArgument(string $argName) {
         
         foreach ($this->getArguments() as $jobArgObj) {
             
@@ -473,7 +475,7 @@ abstract class AbstractJob implements JsonI {
      * 
      * @since 1.0.2
      */
-    public function getArguments() {
+    public function getArguments() : array {
         return $this->customAttrs;
     }
     /**
@@ -491,7 +493,7 @@ abstract class AbstractJob implements JsonI {
      * 
      * @since 1.0
      */
-    public function getArgValue($name) {
+    public function getArgValue(string $name) {
         $trimmed = trim($name);
         $args = $this->getExecArgs();
 
@@ -523,7 +525,7 @@ abstract class AbstractJob implements JsonI {
      * 
      * @since 1.0.2
      */
-    public function getDescription() {
+    public function getDescription() : string {
         return $this->jobDesc;
     }
     /**
@@ -536,7 +538,7 @@ abstract class AbstractJob implements JsonI {
      * 
      * @since 1.0
      */
-    public function getExecArgs() {
+    public function getExecArgs() : array {
         $retVal = [];
 
         foreach ($this->customAttrs as $attrObj) {
@@ -554,7 +556,7 @@ abstract class AbstractJob implements JsonI {
      * 
      * @since 1.0
      */
-    public function getExecArgsNames() {
+    public function getExecArgsNames() : array {
         return array_map(function($obj)
         {
             return $obj->getName();
@@ -567,7 +569,7 @@ abstract class AbstractJob implements JsonI {
      * 
      * @since 1.0
      */
-    public function getExpression() {
+    public function getExpression() : string {
         return $this->cronExpr;
     }
     /**
@@ -590,7 +592,7 @@ abstract class AbstractJob implements JsonI {
      * 
      * @since 1.0
      */
-    public function getJobDetails() {
+    public function getJobDetails() : array {
         return $this->jobDetails;
     }
     /**
@@ -605,7 +607,7 @@ abstract class AbstractJob implements JsonI {
      * 
      * @since 1.0
      */
-    public function getJobName() {
+    public function getJobName() : string {
         return $this->jobName;
     }
     /**
@@ -618,7 +620,7 @@ abstract class AbstractJob implements JsonI {
      * 
      * @since 1.0.2
      */
-    public function hasArg($name) {
+    public function hasArg(string $name) : bool {
         $added = false;
 
         foreach ($this->getArguments() as $argObj) {
@@ -636,7 +638,7 @@ abstract class AbstractJob implements JsonI {
      * 
      * @since 1.0
      */
-    public function isDayOfMonth() {
+    public function isDayOfMonth() : bool {
         $monthDaysArr = $this->jobDetails['days-of-month'];
 
         if ($monthDaysArr['every-day'] === true) {
@@ -670,7 +672,7 @@ abstract class AbstractJob implements JsonI {
      * 
      * @since 1.0
      */
-    public function isDayOfWeek() {
+    public function isDayOfWeek() : bool {
         $daysArr = $this->jobDetails['days-of-week'];
 
         if ($daysArr['every-day'] === true) {
@@ -703,7 +705,7 @@ abstract class AbstractJob implements JsonI {
      * 
      * @since 1.0
      */
-    public function isForced() {
+    public function isForced() : bool {
         return $this->isForced;
     }
     /**
@@ -715,7 +717,7 @@ abstract class AbstractJob implements JsonI {
      * 
      * @since 1.0
      */
-    public function isHour() {
+    public function isHour() : bool {
         $hoursArr = $this->jobDetails['hours'];
 
         if ($hoursArr['every-hour'] === true) {
@@ -748,7 +750,7 @@ abstract class AbstractJob implements JsonI {
      * 
      * @since 1.0
      */
-    public function isMinute() {
+    public function isMinute() : bool {
         $minuteArr = $this->jobDetails['minutes'];
 
         if ($minuteArr['every-minute'] === true) {
@@ -781,7 +783,7 @@ abstract class AbstractJob implements JsonI {
      * 
      * @since 1.0
      */
-    public function isMonth() {
+    public function isMonth() : bool {
         $monthsArr = $this->jobDetails['months'];
 
         if ($monthsArr['every-month'] === true) {
@@ -821,7 +823,7 @@ abstract class AbstractJob implements JsonI {
      * 
      * @since 1.0
      */
-    public function isSuccess() {
+    public function isSuccess() : bool {
         return $this->isSuccess;
     }
     /**
@@ -832,7 +834,7 @@ abstract class AbstractJob implements JsonI {
      * 
      * @since 1.0
      */
-    public function isTime() {
+    public function isTime() : bool {
         return $this->isMinute() && $this->isHour() && $this->isDayOfMonth() && $this->isMonth() && $this->isDayOfWeek();
     }
     /**
@@ -866,7 +868,7 @@ abstract class AbstractJob implements JsonI {
      * 
      * @since 1.0
      */
-    public function onMonth($monthNameOrNum = 'jan',$dayNum = 1,$time = '00:00') {
+    public function onMonth($monthNameOrNum = 'jan', int $dayNum = 1, string $time = '00:00') {
         if (gettype($dayNum) == 'string') {
             $trimmed = trim($dayNum);
 
@@ -934,7 +936,7 @@ abstract class AbstractJob implements JsonI {
      * 
      * @since 1.0.2
      */
-    public function setDescription($desc) {
+    public function setDescription(string $desc) {
         $this->jobDesc = trim($desc);
     }
     /**
@@ -948,7 +950,7 @@ abstract class AbstractJob implements JsonI {
      * 
      * @since 1.0
      */
-    public function setJobName($name) {
+    public function setJobName(string $name) {
         $trimmed = trim($name);
         $this->getJobName();
 
@@ -975,7 +977,7 @@ abstract class AbstractJob implements JsonI {
             }
         }
     }
-    public function toJSON() {
+    public function toJSON() : Json {
         $json = new Json([
             'name' => $this->getJobName(),
             'expression' => $this->getExpression(),
@@ -1009,7 +1011,7 @@ abstract class AbstractJob implements JsonI {
      * 
      * @since 1.0
      */
-    public function weeklyOn($dayNameOrNum = 0,$time = '00:00') {
+    public function weeklyOn($dayNameOrNum = 0, string $time = '00:00') {
         $uDayName = strtoupper($dayNameOrNum);
 
         if (in_array($uDayName, array_keys(self::WEEK_DAYS))) {
@@ -1484,7 +1486,9 @@ abstract class AbstractJob implements JsonI {
         Cron::log('Stack Trace:');
         
         foreach ($trace as $traceArr) {
-            Cron::log('File: '.$traceArr['file'].', Line '.$traceArr['line']);
+            $file = isset($traceArr['file']) ? $traceArr['file'] : 'X_FILE';
+            $line = isset($traceArr['line']) ? $traceArr['line'] : 'X_LINE';
+            Cron::log('File: '.$file.', Line '.$line);
         }
         if ($meth == 'execute') {
             $this->isSuccess = false;

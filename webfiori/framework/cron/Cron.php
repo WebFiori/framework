@@ -172,7 +172,7 @@ class Cron {
      * 
      * @since 1.0
      */
-    public static function createJob($when = '*/5 * * * *',$jobName = '',$function = '',$funcParams = []) {
+    public static function createJob(string $when = '*/5 * * * *', string $jobName = '', $function = '', array $funcParams = []) : bool {
         try {
             $job = new CronJob($when);
             $job->setOnExecution($function, $funcParams);
@@ -205,7 +205,7 @@ class Cron {
      * 
      * @since 1.0
      */
-    public static function dailyJob($time,$name,$func,$funcParams = []) {
+    public static function dailyJob(string $time, string $name, $func, array $funcParams = []) {
         $split = explode(':', $time);
 
         if (count($split) == 2 && is_callable($func)) {
@@ -232,7 +232,7 @@ class Cron {
      * 
      * @since 1.0.2
      */
-    public static function dayOfMonth() {
+    public static function dayOfMonth() : int {
         return self::_get()->timestamp['month-day'];
     }
     /**
@@ -247,7 +247,7 @@ class Cron {
      * 
      * @since 1.0.2
      */
-    public static function dayOfWeek() {
+    public static function dayOfWeek() : int {
         return self::_get()->timestamp['week-day'];
     }
     /**
@@ -265,7 +265,7 @@ class Cron {
      * 
      * @since 1.0.1
      */
-    public static function execLog($bool = null) {
+    public static function execLog($bool = null) : bool {
         if ($bool !== null) {
             self::_get()->_setLogEnabled($bool);
         }
@@ -283,7 +283,7 @@ class Cron {
      * 
      * @since 1.0.5
      */
-    public static function getJob($jobName) {
+    public static function getJob(string $jobName) {
         $trimmed = trim($jobName);
         $retVal = null;
 
@@ -312,7 +312,7 @@ class Cron {
      * 
      * @since 1.0.9
      */
-    public static function getJobsNames() {
+    public static function getJobsNames() : array {
         return self::_get()->jobsNamesArr;
     }
     /**
@@ -325,7 +325,7 @@ class Cron {
      * 
      * @since 1.0.8
      */
-    public static function getLogArray() {
+    public static function getLogArray() : array {
         return self::_get()->logsArray;
     }
     /**
@@ -339,7 +339,7 @@ class Cron {
      * the day.
      * @since 1.0.2
      */
-    public static function hour() {
+    public static function hour() : int {
         return self::_get()->timestamp['hour'];
     }
     /**
@@ -382,7 +382,7 @@ class Cron {
      * 
      * @since 1.0
      */
-    public static function jobsQueue() {
+    public static function jobsQueue() : Queue {
         return self::_get()->_getQueue();
     }
     /**
@@ -397,7 +397,7 @@ class Cron {
      * 
      * @since 1.0.8
      */
-    public static function log($message) {
+    public static function log(string $message) {
         self::_get()->logsArray[] = $message;
 
         if (self::_get()->command !== null && self::_get()->command->isArgProvided('--show-log')) {
@@ -416,7 +416,7 @@ class Cron {
      * 
      * @since 1.0.2
      */
-    public static function minute() {
+    public static function minute() : int {
         return self::_get()->timestamp['minute'];
     }
     /**
@@ -429,7 +429,7 @@ class Cron {
      * @return int An integer that represents current month's number.
      * @since 1.0.2
      */
-    public static function month() {
+    public static function month() : int {
         return self::_get()->timestamp['month'];
     }
     /**
@@ -456,7 +456,7 @@ class Cron {
      * 
      * @since 1.0.3
      */
-    public static function monthlyJob($dayNumber,$time,$name,$func,$funcParams = []) {
+    public static function monthlyJob(int $dayNumber, string $time, string $name, $func, array $funcParams = []) {
         if ($dayNumber > 0 && $dayNumber < 32) {
             $split = explode(':', $time);
 
@@ -489,7 +489,7 @@ class Cron {
      * 
      * @since 1.0
      */
-    public static function password($pass = null) {
+    public static function password($pass = null) : string {
         if ($pass !== null) {
             self::_get()->_setPassword($pass);
         }
@@ -544,7 +544,7 @@ class Cron {
      * 
      * @since 1.0.6
      */
-    public static function run($pass = '',$jobName = null,$force = false, $command = null) {
+    public static function run(string $pass = '', string $jobName = null, bool $force = false, $command = null) {
         self::_get()->command = $command;
         self::log('Running job(s) check...');
         $activeSession = SessionsManager::getActiveSession();
@@ -595,7 +595,7 @@ class Cron {
      * 
      * @since 1.0
      */
-    public static function scheduleJob($job) {
+    public static function scheduleJob(AbstractJob $job) : bool {
         return self::_get()->_addJob($job);
     }
     /**
@@ -610,7 +610,7 @@ class Cron {
      * 
      * @since 1.1.1
      */
-    public function setDayOfMonth($dayOfMonth) {
+    public function setDayOfMonth(int $dayOfMonth) {
         $asInt = intval($dayOfMonth);
 
         if ($asInt >= 1 && $asInt <= 31) {
@@ -629,7 +629,7 @@ class Cron {
      * 
      * @since 1.1.1
      */
-    public static function setDayOfWeek($val) {
+    public static function setDayOfWeek(int $val) {
         $asInt = intval($val);
 
         if ($asInt >= 0 && $asInt <= 6) {
@@ -648,7 +648,7 @@ class Cron {
      * 
      * @since 1.1.1
      */
-    public function setHour($hour) {
+    public function setHour(int $hour) {
         $asInt = intval($hour);
 
         if ($asInt >= 1 && $asInt <= 23) {
@@ -667,7 +667,7 @@ class Cron {
      * 
      * @since 1.1.1
      */
-    public function setMinute($minute) {
+    public function setMinute(int $minute) {
         $asInt = intval($minute);
 
         if ($asInt >= 1 && $asInt <= 59) {
@@ -686,7 +686,7 @@ class Cron {
      * 
      * @since 1.1.1
      */
-    public function setMonth($month) {
+    public function setMonth(int $month) {
         $asInt = intval($month);
 
         if ($asInt >= 1 && $asInt <= 31) {
@@ -707,7 +707,7 @@ class Cron {
      * 
      * @since 1.0.7
      */
-    public static function timestamp() {
+    public static function timestamp() : string {
         $month = self::month();
 
         if ($month < 10) {
@@ -753,7 +753,7 @@ class Cron {
      * 
      * @since 1.0
      */
-    public static function weeklyJob($time,$name,$func,$funcParams = []) {
+    public static function weeklyJob(string $time, string $name, $func, array $funcParams = []) {
         $split1 = explode('-', $time);
 
         if (count($split1) == 2) {

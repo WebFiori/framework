@@ -30,6 +30,8 @@ use webfiori\framework\Util;
 use webfiori\framework\WebFioriApp;
 use webfiori\http\Response;
 use webfiori\ui\HTMLNode;
+use webfiori\error\AbstractHandler;
+use webfiori\framework\ui\WebPage;
 /**
  * A page which is used to display exception information when it is thrown or 
  * any other errors.
@@ -37,315 +39,86 @@ use webfiori\ui\HTMLNode;
  * @author Ibrahim
  * @version 1.0.1
  */
-class ServerErrView {
-    /**
-     *
-     * @var Throwable|Error
-     * @since 1.0 
-     */
-    private $errOrThrowable;
-    /**
-     * 
-     * @var WebPage
-     * 
-     * @since 1.0.2
-     */
-    private $page;
+class ServerErrView extends WebPage {
     /**
      * Creates a new instance of the class.
-     * @param Throwable|array $throwableOrErr This can be an instance of the 
-     * interface 'Throwable' or it can be an array that contains error information 
-     * which was returned from the method 'error_get_last()'.
-     * @since 1.0
-     */
-    public function __construct($throwableOrErr) {
-        $this->errOrThrowable = $throwableOrErr;
-    }
-    /**
-     * Show the view.
-     * @param int $responseCode A response code to send before showing the view. 
-     * default is 500 - Server Error.
-     * @since 1.0
-     */
-    public function show($responseCode = 500) {
-        $responseExist = class_exists('webfiori\http\Response');
-
-        if ($responseExist) {
-            Response::setCode($responseCode);
-        } else {
-            http_response_code(500);
-        }
-
-        if (class_exists('webfiori\ui\HTMLNode')) {
-            $this->_phpStructsExist($this->errOrThrowable);
-            $webPage = $this->page->render(false, true);
-        } else {
-            $webPage = $this->_phpStructsDoesNotexist($this->errOrThrowable);
-        }
-
-        if ($responseExist) {
-            Response::clear();
-            Response::write($webPage);
-            Response::send();
-        } else {
-            echo $webPage;
-            die;
-        }
-    }
-    /**
      * 
-     * @param string $label
-     * @param string $info
-     * @return HTMLNode
+     * @param AbstractHandler $throwableOrErr The handler which is
+     * used to handle exceptions.
+     * 
      * @since 1.0
      */
-    private function _createMessageLine($label, $info) {
-        $node = new HTMLNode('p');
-        $labelNode = new HTMLNode('b');
-        $labelNode->setClassName('nice-red mono');
-        $labelNode->addTextNode($label.' ');
-        $node->addChild($labelNode);
-        $infoNode = new HTMLNode('span');
-        $infoNode->setClassName('mono');
-        $infoNode->addTextNode($info, false);
-        $node->addChild($infoNode);
+    public function __construct(AbstractHandler $throwableOrErr) {
+        parent::__construct();
+        
+        $this->setTitle('Uncaught Exception');
+        $this->changeDom();
+        $this->addCSS('https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900',[], false);
+        $this->addCSS('https://cdn.jsdelivr.net/npm/@mdi/font@4.x/css/materialdesignicons.min.css', [], false);
+        $this->addCSS('https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.min.css', [], false);
+        $this->addJs('https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js', [], false);
+        $this->addJs('https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js', [], false);
+        $this->addBeforeRender(function (WebPage $p) {
+            $p->getDocument()->getBody()->addChild('script', [
+                'src' => 'https://cdn.jsdelivr.net/gh/webfiori/app@'.WF_VERSION.'/public/assets/js/server-err.js',
+                'type' => 'text/javascript'
+            ]);
+        });
+        $container = $this->insert('v-container');
+        $row = $container->addChild('v-row');
+        $hNode = $row->addChild('v-col', [
+            'cols' => 12
+        ])->addChild('v-alert');
+        $hNode->setAttributes([
+            'prominent',
+            'type' => "error"
+        ]);
+        $hNode->addChild('v-row', [
+            'align' => "center"
+        ])->addChild('v-col')->text('500 - Server Error: Uncaught Exception.');
+        $card = $row->addChild('v-col', [
+            'cols' => 12
+        ])->addChild('v-card');
+        $card->addChild('v-card-title')->text('Exception Details');
+        $detailsList = $card->addChild('v-card-text')->addChild('v-list');
+        $this->addDetails($detailsList, 'Exception Message', $throwableOrErr->getMessage());
+        $this->addDetails($detailsList, 'Exception Class', get_class($throwableOrErr->getException()));
+        $this->addDetails($detailsList, 'At Class', $throwableOrErr->getClass());
+        $this->addDetails($detailsList, 'Line', $throwableOrErr->getLine());
+        
+      
+        
 
-        return $node;
-    }
-    private function _getSiteName() {
-        $siteNames = WebFioriApp::getAppConfig()->getWebsiteNames();
-        try {
-            $session = SessionsManager::getActiveSession();
-        } catch (\Exception $ex) {
-            $session = null;
-        } catch (\Error $ex) {
-            $session = null;
-        }
-
-        if ($session !== null) {
-            $currentLang = $session->getLangCode(true);
-        } else {
-            $currentLang = WebFioriApp::getAppConfig()->getPrimaryLanguage();
-        }
-
-        if (isset($siteNames[$currentLang])) {
-            return $siteNames[$currentLang];
-        }
-
-        return '';
-    }
-    private function _phpStructsDoesNotexist($throwableOrErr) {
-        //this is a fall back if the library php-structs does not exist. 
-        //Output HTML as string.
-        $retVal = '<!DOCTYPE html>'
-            .'<html>'
-            .'<head>';
-
-        if ($throwableOrErr instanceof Throwable) {
-            $retVal .= '<title>Uncaught Exception</title>'
-            .'<link href="https://cdn.jsdelivr.net/gh/webfiori/app@'.WF_VERSION.'/public/assets/css/server-err.css" rel="stylesheet">'
-            .'</head>'
-            .'<body>'
-            .'<h1>500 - Server Error: Uncaught Exception.</h1>'
-            .'<hr>'
-            .'<p>'
-            .'<b class="nice-red mono">Exception Class:</b> <span class="mono">'.get_class($throwableOrErr)."</span><br/>"
-            .'<b class="nice-red mono">Exception Message:</b> <span class="mono">'.$throwableOrErr->getMessage()."</span><br/>"
-            .'<b class="nice-red mono">Exception Code:</b> <span class="mono">'.$throwableOrErr->getCode()."</span><br/>";
-
-            if (defined('WF_VERBOSE') && WF_VERBOSE) {
-                $retVal .= '<b class="nice-red mono">File:</b> <span class="mono">'.$throwableOrErr->getFile()."</span><br/>"
-                .'<b class="nice-red mono">Line:</b> <span class="mono">'.$throwableOrErr->getLine()."</span><br>"
-                .'<b class="nice-red mono">Stack Trace:</b> '."<br/>"
-                .'</p>'
-                .'<pre>'.$throwableOrErr->getTraceAsString().'</pre>';
-            } else {
-                $trace = $throwableOrErr->getTrace();
-                $traceStr = '';
-                $index = 0;
-
-                foreach ($trace as $arr) {
-                    $traceStr .= '<span class="mono">#'.$index.' At class '.Util::extractClassName($arr['file']).'. Line '.$arr['line'].'</span><br/>';
-                    $index++;
-                }
-                $retVal .= '<b class="nice-red mono">Class:</b> <span class="mono">'.Util::extractClassName($throwableOrErr->getFile())."</span><br/>"
-                .'<b class="nice-red mono">Line:</b> <span class="mono">'.$throwableOrErr->getLine()."</span><br>"
-                .'<b class="nice-red mono">Stack Trace:</b> '."<br/>"
-                .'</p>'
-                .$traceStr;
-                $retVal .= $this->_showTip();
-            }
-            $retVal .= '</body></html>';
-        } else {
-            $retVal .= '<title>Server Error - 500</title>'
-                .'<link href="https://cdn.jsdelivr.net/gh/webfiori/app@'.WF_VERSION.'/public/assets/css/server-err.css" rel="stylesheet">'
-                .'</head>'
-                .'<body style="color:white;background-color:#1a000d;">'
-                .'<h1 style="color:#ff4d4d">500 - Server Error</h1>'
-                .'<hr>'
-                .'<p>'
-                .'<b class="nice-red mono">Type:</b> <span class="mono">'.Util::ERR_TYPES[$throwableOrErr["type"]]['type']."</span><br/>"
-                .'<b class="nice-red mono">Description:</b> <span class="mono">'.Util::ERR_TYPES[$throwableOrErr["type"]]['description']."</span><br/>"
-                .'<b class="nice-red mono">Message:</b> <span class="mono">'.$throwableOrErr["message"]."</span><br>";
-            $traceStr = '';
-
-            if (defined('WF_VERBOSE') && WF_VERBOSE) {
-                $retVal .= '<b class="nice-red mono">File:</b> <span class="mono">'.$throwableOrErr["file"]."</span><br/>"
-                .'<b class="nice-red mono">Line:</b> <span class="mono">'.$throwableOrErr["line"]."</span><br/>"
-                .'<b class="nice-red mono">Stack Trace:</b> '."<br/>";
-                $trace = debug_backtrace();
-                $index = 0;
-
-                foreach ($trace as $arr) {
-                    $traceStr .= '<span class="mono">#'.$index.' At file '.$arr['file'].'. Line '.$arr['line'].'</span><br/>';
-                    $index++;
-                }
-            } else {
-                $trace = debug_backtrace();
-
-                $index = 0;
-
-                foreach ($trace as $arr) {
-                    $traceStr .= '<span class="mono">#'.$index.' At class '.Util::extractClassName($arr['file']).'. Line '.$arr['line'].'</span><br/>';
-                    $index++;
-                }
-                $retVal .= '<b class="nice-red mono">Class:</b> <span class="mono">'.Util::extractClassName($throwableOrErr->getFile())."</span><br/>"
-                .'<b class="nice-red mono">Line:</b> <span class="mono">'.$throwableOrErr->getLine()."</span><br>"
-                .'<b class="nice-red mono">Stack Trace:</b> '."<br/>"
-                .'</p>'
-                .$traceStr;
-                $retVal .= $this->_showTip();
-            }
-        }
-        $retVal .= '</body></html>';
-
-        return $retVal;
-    }
-    private function _phpStructsExist($throwableOrErr) {
-        $this->page = new WebPage();
-        $this->page->setTitle('Uncaught Exception');
-        $this->page->setWebsiteName($this->_getSiteName());
-        $this->page->setTitleSep(WebFioriApp::getAppConfig()->getTitleSep());
-        $this->page->addCSS('https://cdn.jsdelivr.net/gh/webfiori/app@'.WF_VERSION.'/public/assets/css/server-err.css',[],false);
-        $hNode = $this->page->insert('h1');
-
-        if ($throwableOrErr instanceof Throwable) {
-            $hNode->addTextNode('500 - Server Error: Uncaught Exception.');
-
-            $this->page->insert($this->_createMessageLine('Exception Class:', get_class($throwableOrErr)));
-            $this->page->insert($this->_createMessageLine('Exception Message:', $throwableOrErr->getMessage()));
-            $this->page->insert($this->_createMessageLine('Exception Code:', $throwableOrErr->getCode()));
-            $this->page->insert($this->_createMessageLine('Class:', Util::extractClassName($throwableOrErr->getFile())));
-            $this->page->insert($this->_createMessageLine('At Line:', $throwableOrErr->getLine()));
-
-            if (defined('WF_VERBOSE') && WF_VERBOSE) {
-                $this->page->insert($this->_createMessageLine('File:', $throwableOrErr->getFile()));
-                $this->page->insert($this->_createMessageLine('Stack Trace:', ''));
-                $stackTrace = new HTMLNode('div', [
-                    'class' => 'mono'
-                ]);
-                $traceArr = $throwableOrErr->getTrace();
-                $index = 0;
-
-                foreach ($traceArr as $arr) {
-                    $line = isset($arr['line']) ? $arr['line'] : 'X';
-                    $file = isset($arr['file']) ? $arr['file'] : $arr['function'];
-
-                    if ($line == 'X') {
-                        $stackTrace->text('#'.$index.' At file '.$file);
-                    } else {
-                        $stackTrace->text('#'.$index.' At file '.$file.'. Line '.$line);
-                    }
-                    $stackTrace->br();
-                    $index++;
-                }
-
-                $this->page->insert($stackTrace);
-            } else {
-                $this->page->insert($this->_createMessageLine('Stack Trace:', ''));
-                $stackTrace = new HTMLNode('div', [
-                    'class' => 'mono'
-                ]);
-                $traceArr = $throwableOrErr->getTrace();
-                $index = 0;
-
-                foreach ($traceArr as $arr) {
-                    $line = isset($arr['line']) ? $arr['line'] : 'X';
-                    $file = isset($arr['file']) ? $arr['file'] : $arr['function'];
-
-                    if ($line == 'X') {
-                        $stackTrace->text('#'.$index.' At class '.Util::extractClassName($file));
-                    } else {
-                        $stackTrace->text('#'.$index.' At class '.Util::extractClassName($file).'. Line '.$line);
-                    }
-                    $stackTrace->br();
-                    $index++;
-                }
-
-                $this->page->insert($stackTrace);
-                $this->_showTip();
-            }
-        } else {
-            $hNode->addTextNode('500 - Server Error');
-            $this->page->insert($this->_createMessageLine('Type:', Util::ERR_TYPES[$throwableOrErr["type"]]['type']));
-            $this->page->insert($this->_createMessageLine('Description:', Util::ERR_TYPES[$throwableOrErr["type"]]['description']));
-            $this->page->insert($this->_createMessageLine('Message: ', '<pre>'.$throwableOrErr["message"].'</pre>'));
-
-            if (defined('WF_VERBOSE') && WF_VERBOSE) {
-                $this->page->insert($this->_createMessageLine('File: ', $throwableOrErr["file"]));
-                $this->page->insert($this->_createMessageLine('Line: ', $throwableOrErr["line"]));
-                $this->page->insert($this->_createMessageLine('Stack Trace:', ''));
-                $stackTrace = new HTMLNode('div', [
-                    'class' => 'mono'
-                ]);
-                $traceArr = debug_backtrace();
-                $index = 0;
-
-                foreach ($traceArr as $arr) {
-                    $line = isset($arr['line']) ? $arr['line'] : 'X';
-                    $file = isset($arr['file']) ? $arr['file'] : $arr['function'];
-
-                    $stackTrace->text('#'.$index.' At file '.$file.'. Line '.$line);
-                    $stackTrace->br();
-                    $index++;
-                }
-
-                $this->page->insert($stackTrace);
-            } else {
-                $this->page->insert($this->_createMessageLine('Stack Trace:', ''));
-                $stackTrace = new HTMLNode('div', [
-                    'class' => 'mono'
-                ]);
-                $traceArr = debug_backtrace();
-                $index = 0;
-
-                foreach ($traceArr as $arr) {
-                    $line = isset($arr['line']) ? $arr['line'] : 'X';
-                    $file = isset($arr['file']) ? $arr['file'] : $arr['function'];
-                    $stackTrace->text('#'.$index.' At class '.Util::extractClassName($file).'. Line '.$line);
-                    $stackTrace->br();
-                    $index++;
-                }
-
-                $this->page->insert($stackTrace);
-                $this->_showTip();
-            }
+        $traceCard = $row->addChild('v-col', [
+            'cols' => 12
+        ])->addChild('v-card');
+        $traceCard->addChild('v-card-title')->text('Stack Trace');
+        $traceList = $traceCard->addChild('v-card-text')->addChild('v-list', [
+            'dense'
+        ]);
+        $index = 0;
+        foreach ($throwableOrErr->getTrace() as $traceEntry) {
+            $traceList->addChild('v-list-item')->addChild('v-list-title')->text('#'.$index.' '.$traceEntry.'');
+            $index++;
         }
     }
-    private function _showTip() {
-        if (class_exists('webfiori\ui\HTMLNode')) {
-            $paragraph = new HTMLNode('p');
-            $paragraph->setClassName('mono');
-            $paragraph->addTextNode('<b style="color:yellow">Tip</b>: To'
-                .' display more details about the error, '
-                .'define the constant "WF_VERBOSE" and set its value to "true" in '
-                .'the class "GlobalConstants"', false);
-            $this->page->insert($paragraph);
-        } else {
-            return '<p class="mono"><b style="color:yellow">Tip</b>: To'
-                .' display more details about the error, '
-                .'define the constant "WF_VERBOSE" and set its value to "true" in '
-                .'the class "GlobalConstants".</p>';
-        }
+    private function addDetails(HTMLNode $list, $title, $message) {
+        $item = $list->addChild('v-list-item')->addChild('v-list-item-content');
+        $item->addChild('v-list-item-title')->text($title);
+        $item->addChild('v-list-item-subtitle')->text($message);
+    }
+    private function changeDom() {
+        $topDiv = new HTMLNode('v-app');
+        $topDiv->setID('app');
+        $headerSec = $this->getChildByID('page-header');
+        $this->getDocument()->removeChild($headerSec);
+        $bodySec = $this->getChildByID('page-body');
+        $this->getDocument()->removeChild($bodySec);
+        $footerSec = $this->getChildByID('page-footer');
+        $this->getDocument()->removeChild($footerSec);
+        $topDiv->addChild($footerSec)->addChild($headerSec)->addChild($bodySec);
+        $this->getDocument()->getBody()->addChild($topDiv);
+        $this->getDocument()->getChildByID('main-content-area')->setNodeName('v-main');
+        $this->getDocument()->getChildByID('main-content-area')->setAttribute('app');
     }
 }

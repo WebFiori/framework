@@ -53,8 +53,12 @@ class DefaultSessionStorage implements SessionStorage {
 
         if (!file_exists($this->storeLoc) && is_writable($sessionsStoragePath)) {
             set_error_handler(null);
-            mkdir($sessionsStoragePath);
-            mkdir($this->storeLoc);
+            if (!is_dir($sessionsStoragePath)) {
+                mkdir($sessionsStoragePath);
+            }
+            if (!is_dir($this->storeLoc)) {
+                mkdir($this->storeLoc);
+            }
             restore_error_handler();
         }
     }
@@ -149,7 +153,8 @@ class DefaultSessionStorage implements SessionStorage {
             //Session storage should be only allowed in testing env or http
             $file = new File($sessionId, $this->storeLoc);
             $file->setRawData($session);
-            $file->write(false, true);
+            $file->create();
+            $file->write();
         }
     }
 }

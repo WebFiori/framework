@@ -47,7 +47,7 @@ class SettingsCommand extends CLICommand {
      * method will return 0. Other than that, it will return false.
      * @since 1.0
      */
-    public function exec() {
+    public function exec() : int {
         $spaces = 25;
         $C = WebFioriApp::getAppConfig();
         $this->println("Framework Version Settings:", [

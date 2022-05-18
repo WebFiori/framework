@@ -240,7 +240,7 @@ class CLI {
      * 
      * @since 1.0.3
      */
-    public static function getInputStream() {
+    public static function getInputStream() : InputStream {
         if (self::$inputStream === null) {
             self::$inputStream = new StdIn();
         }
@@ -255,7 +255,7 @@ class CLI {
      * 
      * @since 1.0.3
      */
-    public static function getOutputStream() {
+    public static function getOutputStream() : OutputStream{
         if (self::$outputStream === null) {
             self::$outputStream = new StdOut();
         }
@@ -271,7 +271,7 @@ class CLI {
      * 
      * @since 1.0.2
      */
-    public static function getRegisteredCommands() {
+    public static function getRegisteredCommands() : array {
         return self::get()->commands;
     }
     /**
@@ -290,7 +290,7 @@ class CLI {
      * 
      * @since 1.0
      */
-    public static function isCLI() {
+    public static function isCLI() : bool {
         //best way to check if app is runing through CLi
         // or in a web server.
         // Did a lot of reaseach on that.
@@ -304,7 +304,7 @@ class CLI {
      * 
      * @since 1.0.3
      */
-    public static function isIntaractive() {
+    public static function isIntaractive() : bool {
         return self::get()->isInteractive;
     }
     /**
@@ -314,7 +314,7 @@ class CLI {
      * 
      * @since 1.0.2
      */
-    public static function register($cliCommand) {
+    public static function register(CLICommand $cliCommand) {
         if ($cliCommand instanceof CLICommand) {
             self::get()->_regCommand($cliCommand);
         }
@@ -356,7 +356,7 @@ class CLI {
      * return 0. 
      * 
      */
-    public static function runCLI() {
+    public static function runCLI() : int {
         self::registerCommands();
 
         if (self::isIntaractive()) {

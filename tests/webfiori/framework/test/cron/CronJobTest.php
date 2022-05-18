@@ -88,7 +88,7 @@ class CronJobTest extends TestCase {
      * @test
      */
     public function testConstructor01() {
-        $job = new CronJob(null);
+        $job = new CronJob();
         $this->assertEquals('* * * * *',$job->getExpression());
         $this->assertEquals('CRON-JOB',$job->getJobName());
         $this->assertTrue(!is_callable($job->getOnExecution()));

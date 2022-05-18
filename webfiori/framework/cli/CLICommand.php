@@ -24,6 +24,7 @@
  */
 namespace webfiori\framework\cli;
 
+use webfiori\framework\cli\CommandArgument;
 /**
  * An abstract class that can be used to create new CLI command.
  * The developer can extend this class and use it to create a custom CLI 
@@ -173,6 +174,13 @@ abstract class CLICommand {
             return true;
         }
 
+        return false;
+    }
+    public function addArgument(CommandArgument $arg) {
+        if (!$this->hasArg($arg->getName())) {
+            $this->commandArgs[] = $arg;
+            return true;
+        }
         return false;
     }
     /**
@@ -620,7 +628,12 @@ abstract class CLICommand {
      * @since 1.0
      */
     public function hasArg(string $argName) {
-        return isset($this->getArgs()[trim($argName)]);
+        foreach ($this->getArgs() as $arg) {
+            if ($arg->getName() == $argName) {
+                return true;
+            }
+        }
+        return false;
     }
     /**
      * Display a message that represents extra information.

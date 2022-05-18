@@ -31,7 +31,7 @@ class ArrayInputStream implements InputStream {
      * 
      * @return string The method will always return empty string.
      */
-    public function read($bytes = 1) {
+    public function read(int $bytes = 1) : string {
         return '';
     }
     /**
@@ -41,7 +41,7 @@ class ArrayInputStream implements InputStream {
      * 
      * @return string A string that represents a single line.
      */
-    public function readLine() {
+    public function readLine() : string {
         if ($this->currentLine >= count($this->inputsArr)) {
             throw new ArrayIndexOutOfBoundsException('Array index out of bounds: '.$this->currentLine);
         }

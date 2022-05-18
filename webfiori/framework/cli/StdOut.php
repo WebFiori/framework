@@ -11,7 +11,7 @@ namespace webfiori\framework\cli;
  * @version 1.0
  */
 class StdOut implements OutputStream {
-    public function println($str, ...$_) {
+    public function println(string $str, ...$_) {
         $toPass = [
             $this->asString($str)."\e[0m\e[k\n"
         ];
@@ -22,7 +22,7 @@ class StdOut implements OutputStream {
         call_user_func_array([$this, 'prints'], $toPass);
     }
 
-    public function prints($str, ...$_) {
+    public function prints(string $str, ...$_) {
         $arrayToPass = [
             STDOUT,
             $str

@@ -44,7 +44,7 @@ class FileOutputStream implements OutputStream {
         }
         return $retVal;
     }
-    public function println($str, ...$_) {
+    public function println(string $str, ...$_) {
         $toPass = [
             $this->asString($str)."\n"
         ];
@@ -55,7 +55,7 @@ class FileOutputStream implements OutputStream {
         call_user_func_array([$this, 'prints'], $toPass);
     }
 
-    public function prints($str, ...$_) {
+    public function prints(string $str, ...$_) {
         $arrayToPass = [
             $str
         ];

@@ -42,7 +42,7 @@ class StdIn implements InputStream {
      * 
      * @since 1.0
      */
-    public function read($bytes = 1) {
+    public function read(int $bytes = 1) : string {
         $input = '';
 
         while (strlen($input) < $bytes) {
@@ -78,7 +78,7 @@ class StdIn implements InputStream {
      * 
      * @since 1.0
      */
-    public function readLine() {
+    public function readLine() : string {
         return KeysMap::readLine($this);
     }
 }

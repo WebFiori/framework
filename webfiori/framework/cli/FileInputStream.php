@@ -32,7 +32,7 @@ class FileInputStream implements InputStream {
      * 
      * @since 1.0
      */
-    public function read($bytes = 1) {
+    public function read(int $bytes = 1) : string {
         $this->file->read($this->seek, $this->seek + $bytes);
         $this->seek += $bytes;
         return $this->file->getRawData();
@@ -48,7 +48,7 @@ class FileInputStream implements InputStream {
      * 
      * @since 1.0
      */
-    public function readLine() {
+    public function readLine() : string {
         return KeysMap::readLine($this);
     }
 }

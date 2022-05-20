@@ -162,21 +162,19 @@ abstract class CLICommand {
      * @since 1.0
      */
     public function addArg(string $name, array $options = []) {
-        $trimmed = trim($name);
         
-        if ($this->hasArg($trimmed)) {
-            return false;
-        }
-        
-        if (strlen($trimmed) > 0 && !strpos($trimmed, ' ')) {
-            $this->commandArgs[$trimmed] = $this->_checkArgOptions($options);
-
-            return true;
-        }
-
-        return false;
+        return $this->addArgument($name, $this->_checkArgOptions($options));
     }
-    public function addArgument(CommandArgument $arg) {
+    /**
+     * Adds new command argument.
+     * 
+     * @param CommandArgument $arg The argument that will be added.
+     * 
+     * @return boolean If the argument is added, the method will return true.
+     * If not, false is returned. The argument will not be added only if an argument
+     * which has same name is added.
+     */
+    public function addArgument(CommandArgument $arg) : bool {
         if (!$this->hasArg($arg->getName())) {
             $this->commandArgs[] = $arg;
             return true;
@@ -496,25 +494,37 @@ abstract class CLICommand {
     public function getArgValue(string $optionName) {
         $trimmedOptName = trim($optionName);
 
-        if (!CLI::isIntaractive() && isset($this->commandArgs[$trimmedOptName]['val'])) {
-            return $this->commandArgs[$trimmedOptName]['val'];
-        }
-
         foreach ($_SERVER['argv'] as $option) {
             $optionClean = filter_var($option, FILTER_DEFAULT);
             $optExpl = explode('=', $optionClean);
             $optionNameFromCLI = $optExpl[0];
 
             if ($optionNameFromCLI == $trimmedOptName) {
-                $this->commandArgs[$trimmedOptName]['provided'] = true;
-
+                
+                $arg = $this->getArg($trimmedOptName);
                 if (count($optExpl) == 2) {
-                    return $optExpl[1];
+                    $arg->setValue($optExpl[1]);
+                } else {
+                    //If arg is provided, set its value empty string first
+                    $arg->setValue('');
                 }
 
-                return null;
-            } else {
-                $this->commandArgs[$trimmedOptName]['provided'] = false;
+                return $arg->getValue();
+            }
+        }
+    }
+    /**
+     * Returns an object that holds argument info if the command.
+     * 
+     * @param string $name The name of command argument.
+     * 
+     * @return CommandArgument|null If the command has an argument with the
+     * given name, it will be returned. Other than that, null is returned.
+     */
+    public function getArg(string $name) {
+        foreach ($this->getArgs() as $arg) {
+            if ($arg->getName() == $name) {
+                return $arg;
             }
         }
     }
@@ -1076,12 +1086,14 @@ abstract class CLICommand {
     private function _checkAllowedArgValues() {
         $invalidArgsVals = [];
 
-        foreach ($this->commandArgs as $argName => $argArray) {
-            if ($this->isArgProvided($argName) && count($argArray['values']) != 0) {
-                $argValue = $argArray['val'];
+        foreach ($this->commandArgs as $argObj) {
+            $argObj instanceof CommandArgument;
+            $argVal = $argObj->getVale();
+            $allowed = $argObj->getAllowedValues();
+            if ($argVal !== null && count($allowed) != 0) {
 
-                if (!in_array($argValue, $argArray['values'])) {
-                    $invalidArgsVals[] = $argName;
+                if (!in_array($argVal, $allowed)) {
+                    $invalidArgsVals[] = $argObj->getName();
                 }
             }
         }
@@ -1113,25 +1125,29 @@ abstract class CLICommand {
 
         return true;
     }
-    private function _checkArgOptions(&$options) {
-        $optinsArr = [];
-
+    private function _checkArgOptions($name, $options) {
+        $arg = new CommandArgument($name);
         if (isset($options['optional'])) {
-            $optinsArr['optional'] = $options['optional'] === true;
-        } else {
-            $optinsArr['optional'] = false;
+            $arg->setIsOptional($options['optional']);
         }
-        $optinsArr['description'] = isset($options['description']) ? $options['description'] : '<NO DESCRIPTION>';
-        $this->_checkDescIndex($optinsArr);
-        $optinsArr['values'] = isset($options['values']) ? $options['values'] : [];
-        $this->_checkValuesIndex($optinsArr);
+        $desc = isset($options['description']) ? trim($options['description']) : '<NO DESCRIPTION>';
+        
+        if (strlen($desc) != 0) {
+            $arg->setDescription($desc);
+        } else {
+            $arg->setDescription('<NO DESCRIPTION>');
+        }
+        $allowedVals = isset($options['values']) ? $options['values'] : [];
+        foreach ($allowedVals as $val) {
+            $arg->addAllowedValue($val);
+        }
 
 
         if (isset($options['default']) && gettype($options['default']) == 'string') {
-            $optinsArr['default'] = $options['default'];
+            $arg->setDefault($options['default']);
         }
 
-        return $optinsArr;
+        return $arg;
     }
     private function _checkDescIndex(&$options) {
         if (isset($options['description'])) {
@@ -1149,12 +1165,13 @@ abstract class CLICommand {
     private function _checkIsArgsSet() {
         $missingMandatury = [];
 
-        foreach ($this->commandArgs as $attrName => $attrArray) {
-            if (!$attrArray['optional'] && $attrArray['val'] === null) {
-                if (isset($attrArray['default'])) {
-                    $this->commandArgs[$attrName]['val'] = $attrArray['default'];
+        foreach ($this->commandArgs as $argObj) {
+            
+            if (!$argObj->isOptional() && $argObj->getValue() === null) {
+                if ($argObj->getDefault() != '') {
+                    $argObj->setValue($argObj->getDefault());
                 } else {
-                    $missingMandatury[] = $attrName;
+                    $missingMandatury[] = $argObj->getName();
                 }
             }
         }
@@ -1229,6 +1246,16 @@ abstract class CLICommand {
 
         return $outputString;
     }
+    /**
+     * Returns an array that contains the names of command arguments.
+     * 
+     * @return array An array of strings.
+     */
+    public function getArgsNames() : array {
+        return array_map(function ($el) {
+            return $el->getName();
+        }, $this->getArgs());
+    }
     private function _parseArgs() {
         $this->addArg('--ansi', [
             'optional' => true,
@@ -1238,10 +1265,10 @@ abstract class CLICommand {
             'optional' => true,
             'description' => 'Force the output to not use ANSI.'
         ]);
-        $options = array_keys($this->commandArgs);
+        $options = $this->getArgsNames();
 
         foreach ($options as $optName) {
-            $this->commandArgs[$optName]['val'] = $this->getArgValue($optName);
+            $this->getArgValue($optName);
         }
     }
     private function _printChoices($choices, $default) {

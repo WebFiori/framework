@@ -493,7 +493,11 @@ abstract class CLICommand {
      */
     public function getArgValue(string $optionName) {
         $trimmedOptName = trim($optionName);
-
+        $arg = $this->getArg($trimmedOptName);
+        
+        if ($arg !== null && $arg->getValue() !== null && !CLI::isIntaractive()) {
+            return $arg->getValue();
+        }
         foreach ($_SERVER['argv'] as $option) {
             $optionClean = filter_var($option, FILTER_DEFAULT);
             $optExpl = explode('=', $optionClean);
@@ -501,7 +505,7 @@ abstract class CLICommand {
 
             if ($optionNameFromCLI == $trimmedOptName) {
                 
-                $arg = $this->getArg($trimmedOptName);
+                
                 if (count($optExpl) == 2) {
                     $arg->setValue($optExpl[1]);
                 } else {
@@ -960,27 +964,13 @@ abstract class CLICommand {
      */
     public function setArgValue(string $argName, $argValue = '') {
         $trimmedArgName = trim($argName);
-        $trimmedArgVal = trim($argValue);
-        $retVal = false;
         $argObj = $this->getArg($trimmedArgName);
 
         if ($argObj !== null) {
-            $allowedVals = $argObj->getAllowedValues();
-
-            if (count($allowedVals) != 0) {
-                if (in_array($argValue, $allowedVals)) {
-                    $retVal = true;
-                }
-            } else {
-                $retVal = true;
-            }
+            return $argObj->setValue($argValue);
         }
         
-        if ($retVal) {
-            $argObj->setValue($argValue);
-        }
-
-        return $retVal;
+        return false;
     }
     /**
      * Sets the description of the command.

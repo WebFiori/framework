@@ -163,7 +163,7 @@ abstract class CLICommand {
      */
     public function addArg(string $name, array $options = []) {
         
-        return $this->addArgument($name, $this->_checkArgOptions($options));
+        return $this->addArgument($this->_checkArgOptions($name, $options));
     }
     /**
      * Adds new command argument.
@@ -962,9 +962,10 @@ abstract class CLICommand {
         $trimmedArgName = trim($argName);
         $trimmedArgVal = trim($argValue);
         $retVal = false;
+        $argObj = $this->getArg($trimmedArgName);
 
-        if (isset($this->commandArgs[$trimmedArgName])) {
-            $allowedVals = $this->commandArgs[$trimmedArgName]['values'];
+        if ($argObj !== null) {
+            $allowedVals = $argObj->getAllowedValues();
 
             if (count($allowedVals) != 0) {
                 if (in_array($argValue, $allowedVals)) {
@@ -974,10 +975,9 @@ abstract class CLICommand {
                 $retVal = true;
             }
         }
-
+        
         if ($retVal) {
-            $this->commandArgs[$trimmedArgName]['val'] = $argValue;
-            $this->commandArgs[$trimmedArgName]['provided'] = true;
+            $argObj->setValue($argValue);
         }
 
         return $retVal;
@@ -1087,8 +1087,8 @@ abstract class CLICommand {
         $invalidArgsVals = [];
 
         foreach ($this->commandArgs as $argObj) {
-            $argObj instanceof CommandArgument;
-            $argVal = $argObj->getVale();
+            
+            $argVal = $argObj->getValue();
             $allowed = $argObj->getAllowedValues();
             if ($argVal !== null && count($allowed) != 0) {
 

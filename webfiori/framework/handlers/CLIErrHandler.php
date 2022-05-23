@@ -3,7 +3,7 @@ namespace webfiori\framework\handlers;
 
 use webfiori\error\AbstractHandler;
 use webfiori\framework\cron\Cron;
-use webfiori\framework\cli\CLI;
+use webfiori\framework\cli\Runner;
 use webfiori\framework\cli\CLICommand;
 /**
  * Description of CLIExceptionHandler
@@ -48,7 +48,7 @@ class CLIErrHandler  extends AbstractHandler {
     }
 
     public function isActive(): bool {
-        return CLI::isCLI();
+        return Runner::isCLI();
     }
 
     public function isShutdownHandler(): bool {

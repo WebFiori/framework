@@ -25,6 +25,7 @@
 namespace webfiori\framework\cli;
 
 use webfiori\framework\cli\CommandArgument;
+use webfiori\framework\cli\Runner;
 /**
  * An abstract class that can be used to create new CLI command.
  * The developer can extend this class and use it to create a custom CLI 
@@ -124,8 +125,8 @@ abstract class CLICommand {
         if (!$this->setDescription($description)) {
             $this->setDescription('<NO DESCRIPTION>');
         }
-        $this->setInputStream(CLI::getInputStream());
-        $this->setOutputStream(CLI::getOutputStream());
+        $this->setInputStream(Runner::getInputStream());
+        $this->setOutputStream(Runner::getOutputStream());
     }
     /**
      * Add command argument.
@@ -353,7 +354,7 @@ abstract class CLICommand {
      * @since 1.0
      */
     public function excCommand() : int {
-        CLI::setActiveCommand($this);
+        Runner::setActiveCommand($this);
         $retVal = -1;
         $this->_parseArgs();
 
@@ -366,7 +367,7 @@ abstract class CLICommand {
 
             $retVal = intval($execResult);
         }
-        CLI::setActiveCommand(null);
+        Runner::setActiveCommand();
         return $retVal;
     }
     /**
@@ -495,7 +496,7 @@ abstract class CLICommand {
         $trimmedOptName = trim($optionName);
         $arg = $this->getArg($trimmedOptName);
         
-        if ($arg !== null && $arg->getValue() !== null && !CLI::isIntaractive()) {
+        if ($arg !== null && $arg->getValue() !== null && !Runner::isIntaractive()) {
             return $arg->getValue();
         }
         foreach ($_SERVER['argv'] as $option) {

@@ -18,9 +18,9 @@ class ArrayInputStream implements InputStream {
      * Creates new instance of the class.
      * 
      * @param array $inputs An array that contains lines of inputs.
-     * each index in the array will represent one line
+     * each index in the array will represent one line. Default is empty array.
      */
-    public function __construct(array $inputs) {
+    public function __construct(array $inputs = []) {
         $this->inputsArr = $inputs;
     }
     /**

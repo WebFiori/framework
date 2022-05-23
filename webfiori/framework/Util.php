@@ -24,9 +24,9 @@
  */
 namespace webfiori\framework;
 
-use webfiori\framework\cli\CLI;
 use webfiori\framework\ui\MessageBox;
 use webfiori\http\Response;
+use webfiori\framework\cli\Runner;
 /**
  * Framework utility class.
  * 
@@ -545,7 +545,7 @@ class Util {
         $file = $lastTrace['file'];
         $readable = print_r($expr, true);
 
-        if (CLI::isCLI()) {
+        if (Runner::isCLI()) {
             fprintf(STDOUT, "%s - %s:\n%s\n",$file, $lineNumber, $readable);
         } else {
             $htmlEntityAdded = str_replace('<', '&lt;', str_replace('>', '&gt;', $readable));

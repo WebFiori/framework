@@ -24,8 +24,8 @@
  */
 namespace webfiori\framework\cli\commands;
 
-use webfiori\framework\cli\CLI;
 use webfiori\framework\cli\CLICommand;
+use webfiori\framework\cli\Runner;
 
 /**
  * A class that represents help command of framework's CLI.
@@ -58,7 +58,7 @@ class HelpCommand extends CLICommand {
      * @since 1.0
      */
     public function exec() : int {
-        $regCommands = CLI::getRegisteredCommands();
+        $regCommands = Runner::getRegisteredCommands();
         $commandName = $this->getArgValue('--command-name');
 
         if ($commandName !== null) {

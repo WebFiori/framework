@@ -25,8 +25,8 @@
  */
 namespace webfiori\framework\cli\commands;
 
-use webfiori\framework\cli\CLI;
 use webfiori\framework\cli\CLICommand;
+use webfiori\framework\cli\Runner;
 /**
  * Description of VersionCommand
  *
@@ -40,7 +40,7 @@ class VersionCommand extends CLICommand {
      * Execute the command
      */
     public function exec() : int {
-        if (CLI::getActiveCommand()->getName() == $this->getName()) {
+        if (Runner::getActiveCommand()->getName() == $this->getName()) {
             $formattingOptions = [
                 'color' => 'light-blue',
                 'bold' => true

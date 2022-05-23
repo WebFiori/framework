@@ -162,6 +162,10 @@ class Runner {
      * @param array $args An optional array that can hold command arguments.
      * The keys of the array should be arguments names and the value of each index
      * is the value of the argument.
+     * 
+     * @return int The method will return an integer that represents exit status of
+     * running the command. Usually, if the command exit with a number other than 0,
+     * it means that there was an error in execution.
      */
     public static function runCommand(CLICommand $c = null, array $args = []) {
         

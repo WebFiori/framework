@@ -4,7 +4,8 @@ namespace webfiori\framework\cli\helpers;
 use webfiori\framework\cli\CLICommand;
 use webfiori\framework\Util;
 /**
- * A class which is used to read class information as prompt from terminal.
+ * A class which is used to read class information as prompt from any input stream
+ * which is set by the class 'Runner'.
  *
  * @author Ibrahim
  */

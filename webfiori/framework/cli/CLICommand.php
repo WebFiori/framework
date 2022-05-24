@@ -163,8 +163,11 @@ abstract class CLICommand {
      * @since 1.0
      */
     public function addArg(string $name, array $options = []) {
-        
-        return $this->addArgument($this->_checkArgOptions($name, $options));
+        $toAdd = $this->_checkArgOptions($name, $options);
+        if ($toAdd === null) {
+            return false;
+        }
+        return $this->addArgument($toAdd);
     }
     /**
      * Adds new command argument.
@@ -458,6 +461,7 @@ abstract class CLICommand {
      * @since 1.0
      */
     public function getArgInfo($argName) {
+        
         if ($this->hasArg($argName)) {
             return $this->commandArgs[$argName];
         }
@@ -1117,7 +1121,13 @@ abstract class CLICommand {
         return true;
     }
     private function _checkArgOptions($name, $options) {
+        if (strlen($name) == 0) {
+            return;
+        }
         $arg = new CommandArgument($name);
+        if ($arg->getName() == 'arg') {
+            return;
+        }
         if (isset($options['optional'])) {
             $arg->setIsOptional($options['optional']);
         }

@@ -118,6 +118,14 @@ class Runner {
         }
     }
     /**
+     * Reset input stream, output stream and, registered commands to default.
+     */
+    public static function reset() {
+        self::get()->inputStream = new StdIn();
+        self::get()->outputStream = new StdOut();
+        self::get()->commands = [];
+    }
+    /**
      * Checks if CLI is running in interactive mode or not.
      * 
      * @return boolean If CLI is running in interactive mode, the method will 

@@ -222,7 +222,7 @@ class Runner {
      * will have no effect.
      * 
      */
-    private static function registerCommands() {
+    public static function registerCommands() {
         //Register default framework cli commands.
         self::register(new HelpCommand());
         self::register(new VersionCommand());
@@ -248,7 +248,6 @@ class Runner {
      * it means that there was an error in execution.
      */
     public static function start() : int {
-        self::registerCommands();
 
         if (self::isIntaractive()) {
             self::getOutputStream()->println('Running CLI in interactive mode.');

@@ -2,7 +2,6 @@
 namespace webfiori\framework\test\cli;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\framework\cli\CommandRunner;
 use webfiori\framework\cli\commands\CreateCommand;
 use webfiori\framework\File;
 use webfiori\framework\cli\ArrayInputStream;

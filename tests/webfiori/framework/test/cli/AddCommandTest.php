@@ -3,9 +3,7 @@
 namespace webfiori\framework\test\cli;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\framework\cli\CommandRunner;
 use webfiori\framework\cli\commands\AddCommand;
-use webfiori\framework\WebFioriApp;
 use webfiori\framework\File;
 use webfiori\framework\ConfigController;
 use webfiori\framework\cli\Runner;

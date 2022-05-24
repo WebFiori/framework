@@ -2,9 +2,7 @@
 namespace webfiori\framework\test\cli;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\framework\cli\CommandRunner;
 use webfiori\framework\cli\commands\UpdateSettingsCommand;
-use webfiori\framework\WebFioriApp;
 use webfiori\framework\ConfigController;
 use webfiori\framework\cli\Runner;
 use webfiori\framework\cli\ArrayInputStream;

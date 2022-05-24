@@ -1,6 +1,7 @@
 <?php
 namespace webfiori\framework\cli\writers;
 
+use webfiori\framework\writers\ClassWriter;
 /**
  * A class which is used to write middleware classes.
  *
@@ -33,8 +34,8 @@ class MiddlewareClassWriter extends ClassWriter {
      * @param array $groupsArr An array that holds groups at which the middleware
      * will be added to.
      */
-    public function __construct(array $classInfoArr = [], $middlewareName = '', $priority = 0, array $groupsArr = []) {
-        parent::__construct($classInfoArr);
+    public function __construct($middlewareName = '', $priority = 0, array $groupsArr = []) {
+        parent::__construct('NewMiddleware', ROOT_DIR.DS.APP_DIR_NAME.DS.'middleware', APP_DIR_NAME.'\\middleware');
         $this->addUseStatement([
             "webfiori\\framework\\middleware\\AbstractMiddleware",
             "webfiori\\framework\\SessionsManager",

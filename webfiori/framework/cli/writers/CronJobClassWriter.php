@@ -1,7 +1,7 @@
 <?php
 namespace webfiori\framework\cli\writers;
 
-use webfiori\framework\cli\writers\ClassWriter;
+use webfiori\framework\writers\ClassWriter;
 /**
  * A class which is used to write cron jobs classes.
  *
@@ -33,8 +33,8 @@ class CronJobClassWriter extends ClassWriter {
      * @param array $argsArr An associative array that holds any arguments that
      * the job needs.
      */
-    public function __construct($classInfoArr = [], $jobName = '', $jobDesc = '', array $argsArr = []) {
-        parent::__construct($classInfoArr);
+    public function __construct($jobName = '', $jobDesc = '', array $argsArr = []) {
+        parent::__construct('NewJob', ROOT_DIR.DS.APP_DIR_NAME.DS.'jobs', APP_DIR_NAME.'\\jobs');
         $this->name = $jobName;
         $this->args = $argsArr;
         $this->desc = $jobDesc;

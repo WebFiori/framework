@@ -1,6 +1,7 @@
 <?php
 namespace webfiori\framework\cli\writers;
 
+use webfiori\framework\writers\ClassWriter;
 /**
  * A class which is used to create basic theme skeleton.
  *
@@ -42,17 +43,16 @@ class ThemeClassWriter extends ClassWriter {
      * <li>name: Holds theme name.</li>
      * </ul>
      */
-    public function __construct(array $classNameInfo = []) {
-        parent::__construct($classNameInfo);
-        $this->name = isset($classNameInfo['name']) ? "'".$classNameInfo['name']."'" : null;
+    public function __construct($themeName) {
+        parent::__construct('NewTheme', ROOT_DIR.DS.APP_DIR_NAME.DS.'themes', APP_DIR_NAME.'\\themes');
+        $this->name = $themeName;
         
     }
     private function writeComponent(string $className, string $extends, string $classComment, string $todoTxt) {
-        $writer = new ThemeComponentWriter([
-            'path' => $this->getPath(),
-            'namespace' => $this->getNamespace(),
-            'name' => $className
-        ], $extends, $classComment, $todoTxt);
+        $writer = new ThemeComponentWriter($extends, $classComment, $todoTxt);
+        $writer->setPath($this->getPath());
+        $writer->setNamespace($this->getNamespace());
+        $writer->setClassName($className);
         $writer->writeClass();
     }
 

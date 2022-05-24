@@ -56,7 +56,7 @@ abstract class ClassWriter {
      * @param array $classInfoArr An associative array that contains the information 
      * of the class that will be created. The array must have the following indices: 
      */
-    public function __construct(string $name, string $path, string $namespace) {
+    public function __construct(string $name = 'NewClass', string $path = ROOT_DIR, string $namespace = '\\') {
         $this->suffix = '';
         $this->useArr = [];
         if (!$this->setClassName($name)) {

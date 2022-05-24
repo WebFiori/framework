@@ -16,7 +16,7 @@ class CLIErrHandler  extends AbstractHandler {
         $this->setName('CLI Errors Handler');
     }
     public function handle() {
-        $stream = CLI::getOutputStream();
+        $stream = Runner::getOutputStream();
         $stream->prints(CLICommand::formatOutput("Uncaught Exception\n", [
             'color' => 'red',
             'bold' => true,

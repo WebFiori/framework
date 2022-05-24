@@ -118,6 +118,7 @@ abstract class ClassWriter {
             return false;
         }
         $this->ns = $trimmed;
+        return true;
     }
     /**
      * Sets the location at which the class will be created on.

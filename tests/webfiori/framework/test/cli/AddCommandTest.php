@@ -25,7 +25,6 @@ class AddCommandTest extends TestCase {
             '3'
         ]));
         Runner::setOutputStream(new ArrayOutputStream());
-        Runner::runCommand(new AddCommand());
         $this->assertEquals(0, Runner::runCommand(new AddCommand()));
         $this->assertEquals([
             "What would you like to add?\n",

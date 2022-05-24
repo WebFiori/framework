@@ -25,6 +25,7 @@
  */
 namespace webfiori\framework\cli\writers;
 
+use webfiori\framework\writers\ClassWriter;
 /**
  * A writer which is used to write any class that represents a language class.
  *
@@ -48,12 +49,7 @@ class LangClassWriter extends ClassWriter {
      * @since 1.0
      */
     public function __construct($langCode, $writingDir) {
-        $classInfoArr = [
-            'name' => 'Language'.$langCode,
-            'namespace' => APP_DIR_NAME."\\langs",
-            'path' => ROOT_DIR.DS.APP_DIR_NAME.DS.'langs'
-        ];
-        parent::__construct($classInfoArr);
+        parent::__construct('Language'.$langCode, ROOT_DIR.DS.APP_DIR_NAME.DS.'langs', APP_DIR_NAME."\\langs");
         $this->code = $langCode;
         $this->dir = $writingDir;
         $this->addUseStatement('webfiori\\framework\\i18n\\Language');

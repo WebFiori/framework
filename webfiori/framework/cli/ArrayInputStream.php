@@ -13,7 +13,7 @@ use webfiori\framework\exceptions\ArrayIndexOutOfBoundsException;
  */
 class ArrayInputStream implements InputStream {
     private $inputsArr;
-    private $currentLine = -1;
+    private $currentLine = 0;
     /**
      * Creates new instance of the class.
      * 
@@ -43,10 +43,12 @@ class ArrayInputStream implements InputStream {
      */
     public function readLine() : string {
         if ($this->currentLine >= count($this->inputsArr)) {
-            throw new ArrayIndexOutOfBoundsException('Array index out of bounds: '.$this->currentLine);
+            throw new ArrayIndexOutOfBoundsException('Reached end of stream while trying to read line number '.$this->currentLine);
         }
+        
+        $retVal = $this->inputsArr[$this->currentLine];
         $this->currentLine++;
-        return $this->inputsArr[$this->currentLine];
+        return $retVal;
     }
 
 }

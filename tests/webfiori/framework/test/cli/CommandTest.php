@@ -2,7 +2,9 @@
 
 namespace webfiori\framework\test\cli;
 use PHPUnit\Framework\TestCase;
-use webfiori\framework\cli\CommandRunner;
+use webfiori\framework\cli\Runner;
+use webfiori\framework\cli\ArrayInputStream;
+use \webfiori\framework\cli\ArrayOutputStream;
 /**
  * Description of CommandTest
  *
@@ -13,32 +15,34 @@ class CommandTest extends TestCase {
      * @test
      */
     public function test00() {
-        $test = new CommandRunner();
-        $test->runCommand(new TestCommand('hello', [
+        Runner::setInputStream(new ArrayInputStream());
+        Runner::setOutputStream(new ArrayOutputStream());
+        $command = new TestCommand('hello', [
             'name' => []
-        ]), [
-            'name' => 'Ibrahim'
         ]);
-        $this->assertTrue($test->isExitStatusEquals(0));
-        $this->assertTrue($test->isOutputEquals([
+        $this->assertEquals(0, Runner::runCommand($command, [
+            'name' => 'Ibrahim'
+        ]));
+        $this->assertEquals([
             "Hello Ibrahim!\n",
             "Ok\n",
-        ], $this));
+        ], Runner::getOutputStream()->getOutputArray());
     }
     /**
      * @test
      */
     public function test01() {
-        $test = new CommandRunner();
-        $test->runCommand(new TestCommand('hello', [
+        Runner::setInputStream(new ArrayInputStream());
+        Runner::setOutputStream(new ArrayOutputStream());
+        $command = new TestCommand('hello', [
             'name' => []
-        ]), [
-            'name' => 'Hassan Hussain'
         ]);
-        $this->assertTrue($test->isExitStatusEquals(0));
-        $this->assertTrue($test->isOutputEquals([
+        $this->assertEquals(0, Runner::runCommand($command, [
+            'name' => 'Hassan Hussain'
+        ]));
+        $this->assertEquals([
             "Hello Hassan Hussain!\n",
             "Ok\n",
-        ], $this));
+        ], Runner::getOutputStream()->getOutputArray());
     }
 }

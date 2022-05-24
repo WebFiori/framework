@@ -48,12 +48,10 @@ class CLICommandTest extends TestCase {
     public function testAddArg01() {
         $command = new TestCommand('new-command');
         $this->assertTrue($command->addArg('default-options'));
-        $argDetails = $command->getArgInfo('default-options');
-        $this->assertEquals([
-            'optional' => false,
-            'description' => '<NO DESCRIPTION>',
-            'values' => []
-        ], $argDetails);
+        $argDetails = $command->getArg('default-options');
+        $this->assertEquals('<NO DESCRIPTION>', $argDetails->getDescription());
+        $this->assertFalse($argDetails->isOptional());
+        $this->assertEquals([], $argDetails->getAllowedValues());
     }
     /**
      * @test
@@ -63,12 +61,10 @@ class CLICommandTest extends TestCase {
         $this->assertTrue($command->addArg('default-options', [
             'optional' => true
         ]));
-        $argDetails = $command->getArgInfo('default-options');
-        $this->assertEquals([
-            'optional' => true,
-            'description' => '<NO DESCRIPTION>',
-            'values' => []
-        ], $argDetails);
+        $argDetails = $command->getArg('default-options');
+        $this->assertEquals('<NO DESCRIPTION>', $argDetails->getDescription());
+        $this->assertTrue($argDetails->isOptional());
+        $this->assertEquals([], $argDetails->getAllowedValues());
     }
     /**
      * @test
@@ -78,11 +74,9 @@ class CLICommandTest extends TestCase {
         $this->assertTrue($command->addArg('default-options', [
             'optional' => true
         ]));
-        $argDetails = $command->getArgInfo('default-options');
-        $this->assertEquals([
-            'optional' => true,
-            'description' => '<NO DESCRIPTION>',
-            'values' => []
-        ], $argDetails);
+        $argDetails = $command->getArg('default-options');
+        $this->assertEquals('<NO DESCRIPTION>', $argDetails->getDescription());
+        $this->assertTrue($argDetails->isOptional());
+        $this->assertEquals([], $argDetails->getAllowedValues());
     }
 }

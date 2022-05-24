@@ -17,6 +17,7 @@ class RunnerTest extends TestCase {
      * @test
      */
     public function testSetStreams00() {
+        Runner::reset();
         $this->assertTrue(Runner::getOutputStream() instanceof StdOut);
         $this->assertTrue(Runner::getInputStream() instanceof StdIn);
         Runner::setInputStream(new ArrayInputStream());

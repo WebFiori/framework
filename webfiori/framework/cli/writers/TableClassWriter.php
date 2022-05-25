@@ -30,6 +30,7 @@ use webfiori\database\mssql\MSSQLTable;
 use webfiori\database\mysql\MySQLColumn;
 use webfiori\database\mysql\MySQLTable;
 use webfiori\database\Table;
+use webfiori\framework\writers\ClassWriter;
 
 /**
  * A class which is used to write database table classes.
@@ -83,18 +84,10 @@ class TableClassWriter extends ClassWriter {
      * 
      * @since 1.0
      */
-    public function __construct($tableObj = null, $classInfoArr = []) {
-        parent::__construct($classInfoArr);
-
+    public function __construct($tableObj = null) {
+        parent::__construct('NewTable', ROOT_DIR.DS.APP_DIR_NAME.DS.'database', APP_DIR_NAME.'\\database');
+        $this->setSuffix('Table');
         $this->tableObj = $tableObj;
-
-        if (isset($classInfoArr['entity-info'])) {
-            $this->entityMapper = new EntityMapper($this->tableObj, 
-                    $classInfoArr['entity-info']['name'], 
-                    $classInfoArr['entity-info']['path'], 
-                    $classInfoArr['entity-info']['namespace']);
-            $this->entityMapper->setUseJsonI($classInfoArr['entity-info']['implement-jsoni']);
-        }
     }
     public function setEntityInfo($infoArr) {
         $this->entityMapper = new EntityMapper($this->tableObj, 

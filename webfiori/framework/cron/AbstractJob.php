@@ -934,10 +934,18 @@ abstract class AbstractJob implements JsonI {
      * 
      * @param string $desc Job description.
      * 
+     * @return bool If the description is set, the method will return true. Other then
+     * that, the method will return false.
+     * 
      * @since 1.0.2
      */
-    public function setDescription(string $desc) {
-        $this->jobDesc = trim($desc);
+    public function setDescription(string $desc) : bool{
+        $trimmed = trim($desc);
+        if (strlen($trimmed) > 0) {
+            $this->jobDesc = $trimmed;
+            return true;
+        }
+        return false;
     }
     /**
      * Sets an optional name for the job.
@@ -948,11 +956,15 @@ abstract class AbstractJob implements JsonI {
      * 
      * @param string $name The name of the job.
      * 
+     * @return bool If job name is set, the method will return true. If not,
+     * the method will return false. The method will not set the name only if
+     * given value is empty string or the given name was used by a job which
+     * was already scheduled.
+     * 
      * @since 1.0
      */
     public function setJobName(string $name) {
         $trimmed = trim($name);
-        $this->getJobName();
 
         if (strlen($trimmed) > 0) {
             $tempJobsQueue = new Queue();
@@ -971,11 +983,10 @@ abstract class AbstractJob implements JsonI {
 
             if (!$nameTaken) {
                 $this->jobName = $trimmed;
-            } else {
-                $randF = is_callable('') ? 'random_int' : 'rand';
-                $this->setJobName($trimmed.'-'.call_user_func($randF, 0, 1000));
+                return true;
             }
         }
+        return false;
     }
     public function toJSON() : Json {
         $json = new Json([

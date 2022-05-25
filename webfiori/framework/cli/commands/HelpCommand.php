@@ -72,7 +72,6 @@ class HelpCommand extends CLICommand {
                 $vCommand = new VersionCommand();
                 if ($this->isArgProvided('--no-ansi')) {
                     $vCommand->addArg('--no-ansi');
-                    $vCommand->setArgValue('--no-ansi', $this->getArgValue('--no-ansi'));
                 }
                 $vCommand->exec();
             }

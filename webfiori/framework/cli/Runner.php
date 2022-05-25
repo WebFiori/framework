@@ -256,7 +256,7 @@ class Runner {
      * it means that there was an error in execution.
      */
     public static function start() : int {
-
+        self::registerCommands();
         if (self::isIntaractive()) {
             self::getOutputStream()->println('Running CLI in interactive mode.');
             self::getOutputStream()->println('WF-CLI > Type commant name or "exit" to close.');

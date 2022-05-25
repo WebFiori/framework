@@ -165,7 +165,8 @@ class Runner {
     /**
      * Executes a command given as object.
      * 
-     * @param CLICommand $c The command that will be executed.
+     * @param CLICommand $c The command that will be executed. If null is given,
+     * the method will execute the 'help' command.
      * 
      * @param array $args An optional array that can hold command arguments.
      * The keys of the array should be arguments names and the value of each index
@@ -179,10 +180,11 @@ class Runner {
         
         if ($c === null) {
             if (count($args) === 0) {
-                $args = $_SERVER['argv'];
+                $commandName = 'help';
+            } else {
+                $commandName = filter_var($args[1], FILTER_DEFAULT);
             }
-            $commandName = filter_var($args[1], FILTER_DEFAULT);
-
+            
             if (isset(self::get()->commands[$commandName])) {
                 $c = self::get()->commands[$commandName];
 

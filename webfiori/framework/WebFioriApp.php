@@ -132,10 +132,11 @@ class WebFioriApp {
         date_default_timezone_set(defined('DATE_TIMEZONE') ? DATE_TIMEZONE : 'Asia/Riyadh');
 
         $this->_initAutoLoader();
-        $this->_initAppConfig();
-
         //Initialize CLI
         Runner::get();
+        $this->_initAppConfig();
+
+        
 
 
         $this->_initThemesPath();

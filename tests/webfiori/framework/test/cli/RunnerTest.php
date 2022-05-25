@@ -32,6 +32,7 @@ class RunnerTest extends TestCase {
      * @depends testSetStreams00
      */
     public function testStart00() {
+        $_SERVER['argc'] = 0;
         $this->assertEquals(0, Runner::start());
         $outputArr = Runner::getOutputStream()->getOutputArray();
         $this->assertEquals([

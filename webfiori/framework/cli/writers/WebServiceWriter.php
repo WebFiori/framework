@@ -57,13 +57,15 @@ class WebServiceWriter extends ClassWriter {
      * provided, the constant ROOT_DIR is used. </li>
      * </ul>
      */
-    public function __construct($webServicesObj) {
+    public function __construct($webServicesObj = null) {
         parent::__construct('NewWebService', ROOT_DIR.DS.APP_DIR_NAME.DS.'apis', APP_DIR_NAME.'\\apis');
 
-        if (!$webServicesObj instanceof AbstractWebService) {
-            throw new InvalidArgumentException('Given parameter is not an instance of \'webfiori\http\AbstractWebService\'');
+        if (!($webServicesObj instanceof AbstractWebService)) {
+            $this->servicesObj = new ServiceHolder();
+        } else {
+            $this->servicesObj = $webServicesObj;
         }
-        $this->servicesObj = $webServicesObj;
+        $this->setSuffix('Service');
         $this->addUseStatement('webfiori\\framework\\EAbstractWebService');
     }
     /**

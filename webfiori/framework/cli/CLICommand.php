@@ -387,58 +387,6 @@ abstract class CLICommand {
      */
     public abstract function exec() : int;
     /**
-     * Formats an output string.
-     * 
-     * This method is used to add colors to the output string or 
-     * make it bold or underlined. The returned value of this 
-     * method can be sent to any output stream using the method 'fprintf()'. 
-     * Note that the support for colors
-     * and formatting will depend on the terminal configuration. In addition, 
-     * if the constant NO_COLOR is defined or is set in the environment, the 
-     * returned string will be returned as is.
-     * 
-     * @param string $string The string that will be formatted.
-     * 
-     * @param array $formatOptions An associative array of formatting 
-     * options. Supported options are:
-     * <ul>
-     * <li><b>color</b>: The foreground color of the output text. Supported colors 
-     * are: 
-     * <ul>
-     * <li>white</li>
-     * <li>black</li>
-     * <li>red</li>
-     * <li>light-red</li>
-     * <li>green</li>
-     * <li>light-green</li>
-     * <li>yellow</li>
-     * <li>light-yellow</li>
-     * <li>gray</li>
-     * <li>blue</li>
-     * <li>light-blue</li>
-     * </ul>
-     * </li>
-     * <li><b>bg-color</b>: The background color of the output text. Supported colors 
-     * are the same as the supported colors by the 'color' option.</li>
-     * <li><b>bold</b>: A boolean. If set to true, the text will 
-     * be bold.</li>
-     * <li><b>underline</b>: A boolean. If set to true, the text will 
-     * be underlined.</li>
-     * <li><b>reverse</b>: A boolean. If set to true, the foreground 
-     * color and background color will be reversed (invert the foreground and background colors).</li>
-     * <li><b>blink</b>: A boolean. If set to true, the text will 
-     * blink.</li>
-     * </ul>
-     * @return string The string after applying the formatting to it.
-     * 
-     * @since 1.0
-     */
-    public static function formatOutput(string $string, array $formatOptions) {
-        $validatedOptions = self::_validateOutputOptions($formatOptions);
-
-        return self::_getFormattedOutput($string, $validatedOptions);
-    }
-    /**
      * Returns an associative array that contains one argument information.
      * 
      * @param string $argName The name of the argument.
@@ -684,12 +632,9 @@ abstract class CLICommand {
      * @since 1.0
      */
     public function isArgProvided(string $argName) {
-        if ($this->hasArg($argName)) {
-            $trimmed = trim($argName);
-
-            if (isset($this->getArgs()[$trimmed]['provided'])) {
-                return $this->getArgs()[$trimmed]['provided'];
-            }
+        $argObj = $this->getArg($argName);
+        if ($argObj !== null && $argObj->getValue() == '') {
+            return true;
         }
 
         return false;
@@ -833,9 +778,8 @@ abstract class CLICommand {
 
         if ($argsCount != 0 && gettype($_[$argsCount - 1]) == 'array') {
             //Last index contains formatting options.
-            $_[$argsCount - 1]['no-ansi'] = $this->isArgProvided('--no-ansi');
-            $_[$argsCount - 1]['force-styling'] = $this->isArgProvided('--ansi');
-            $str = self::formatOutput($str, $_[$argsCount - 1]);
+            $_[$argsCount - 1]['ansi'] = !$this->isArgProvided('--no-ansi');
+            $str = OutputFormatter::formatOutput($str, $_[$argsCount - 1]);
         }
         call_user_func_array([$this->getOutputStream(), 'println'], $this->_createPassArray($str, $_));
     }
@@ -867,10 +811,9 @@ abstract class CLICommand {
             $formattingOptions = $_[$argCount - 1];
         }
 
-        $formattingOptions['force-styling'] = $this->isArgProvided('--ansi');
-        $formattingOptions['no-ansi'] = $this->isArgProvided('--no-ansi');
+        $formattingOptions['ansi'] = !$this->isArgProvided('--no-ansi');
 
-        $formattedStr = $this->formatOutput($str, $formattingOptions);
+        $formattedStr = OutputFormatter::formatOutput($str, $formattingOptions);
 
         call_user_func_array([$this->getOutputStream(), 'prints'], $this->_createPassArray($formattedStr, $_));
     }
@@ -1238,15 +1181,6 @@ abstract class CLICommand {
 
         return $retVal;
     }
-    private static function _getFormattedOutput($outputString, $formatOptions) {
-        $outputManner = self::getCharsManner($formatOptions);
-
-        if (strlen($outputManner) != 0) {
-            return "\e[".$outputManner."m$outputString\e[0m";
-        }
-
-        return $outputString;
-    }
     /**
      * Returns an array that contains the names of command arguments.
      * 
@@ -1285,53 +1219,7 @@ abstract class CLICommand {
             }
         }
     }
-    private static function _validateOutputOptions($formatArr) {
-        $noColor = 'NO_COLOR';
 
-        if (gettype($formatArr) == 'array' && count($formatArr) !== 0) {
-            if (!isset($formatArr['bold'])) {
-                $formatArr['bold'] = false;
-            }
-
-            if (!isset($formatArr['underline'])) {
-                $formatArr['underline'] = false;
-            }
-
-            if (!isset($formatArr['blink'])) {
-                $formatArr['blink'] = false;
-            }
-
-            if (!isset($formatArr['reverse'])) {
-                $formatArr['reverse'] = false;
-            }
-
-            if (!isset($formatArr['color'])) {
-                $formatArr['color'] = $noColor;
-            }
-
-            if (!isset($formatArr['bg-color'])) {
-                $formatArr['bg-color'] = $noColor;
-            }
-
-            return $formatArr;
-        }
-
-        return [
-            'bold' => false,
-            'underline' => false,
-            'reverse' => false,
-            'blink' => false,
-            'color' => $noColor, 
-            'bg-color' => $noColor
-        ];
-    }
-    private static function addManner($str, $code) {
-        if (strlen($str) > 0) {
-            return $str.';'.$code;
-        }
-
-        return $str.$code;
-    }
     private function asString($var) {
         $type = gettype($var);
 
@@ -1345,61 +1233,7 @@ abstract class CLICommand {
 
         return $var;
     }
-    private static function getCharsManner($options) {
-        $mannerStr = '';
-
-        if (isset($options['force-styling'])) {
-            $forceStyling = $options['force-styling'] === true;
-        } else {
-            $forceStyling = false;
-        }
-
-        if (isset($options['no-ansi']) && $options['no-ansi'] === true) {
-            return $mannerStr;
-        }
-
-        if (!$forceStyling) {
-            $os = php_uname('s');
-            $notSupported = [
-                'Windows NT'
-            ];
-
-            if (in_array($os, $notSupported)) {
-                return $mannerStr;
-            }
-        }
-
-        if ($options['bold']) {
-            $mannerStr = self::addManner($mannerStr, 1);
-        }
-
-        if ($options['underline']) {
-            $mannerStr = self::addManner($mannerStr, 4);
-        }
-
-        if ($options['blink']) {
-            $mannerStr = self::addManner($mannerStr, 5);
-        }
-
-        if ($options['reverse']) {
-            $mannerStr = self::addManner($mannerStr, 7);
-        }
-
-        if (defined('NO_COLOR') || isset($_SERVER['NO_COLOR']) || getenv('NO_COLOR') !== false) {
-            //See https://no-color.org/ for more info.
-            return $mannerStr;
-        }
-
-        if ($options['color'] != 'NO_COLOR') {
-            $mannerStr = self::addManner($mannerStr, self::COLORS[$options['color']]);
-        }
-
-        if ($options['bg-color'] != 'NO_COLOR') {
-            $mannerStr = self::addManner($mannerStr, self::COLORS[$options['bg-color']] + 10);
-        }
-
-        return $mannerStr;
-    }
+    
     /**
      * Validate user input and show error message if user input is invalid.
      * @param type $input

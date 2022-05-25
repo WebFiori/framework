@@ -20,6 +20,7 @@ class HelpCommandTest extends TestCase {
         Runner::setInputStream(new ArrayInputStream());
         Runner::setOutputStream(new ArrayOutputStream());
         Runner::registerCommands();
+        $_SERVER['argc'] = 0;
         $this->assertEquals(0, Runner::runCommand(new HelpCommand()));
         $this->assertEquals([
             'Usage:'."\n",

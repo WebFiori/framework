@@ -58,7 +58,7 @@ class HelpCommand extends CLICommand {
      * @since 1.0
      */
     public function exec() : int {
-        $regCommands = Runner::getRegisteredCommands();
+        $regCommands = Runner::getCommands();
         $commandName = $this->getArgValue('--command-name');
 
         if ($commandName !== null) {

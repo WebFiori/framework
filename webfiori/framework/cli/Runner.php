@@ -219,8 +219,7 @@ class Runner {
     }
     private static function readInteractiv() {
         $input = self::getInputStream()->readLine();
-        $args = explode(' ', $input);
-        return $args;
+        return explode(' ', $input);
     }
     /**
      * Register CLI commands.
@@ -298,17 +297,6 @@ class Runner {
         }
 
         return self::runCommand();
-    }
-    /**
-     * Returns an associative array of registered commands.
-     * 
-     * @return array The method will return an associative array. The keys of 
-     * the array are the names of the commands and the value of the key is 
-     * an object of type 'CLICommand'.
-     * 
-     */
-    public static function getRegisteredCommands() : array {
-        return self::get()->commands;
     }
     /**
      * Sets the command which is currently in execution stage.

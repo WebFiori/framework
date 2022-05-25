@@ -75,14 +75,14 @@ abstract class ClassWriter {
     /**
      * Sets a string as a suffix to the class name.
      * 
-     * @param string $suffix A string to append to class name such as 'Table' or
+     * @param string $classNameSuffix A string to append to class name such as 'Table' or
      * 'Service'. It must be a string which is considered as valid class name.
      * 
      * @return bool If set, the method will return true. False otherises.
      */
-    public function setSuffix(string $suffix) : bool {
-        if (self::isValidClassName($suffix)) {
-            $this->suffix = $suffix;
+    public function setSuffix(string $classNameSuffix) : bool {
+        if (self::isValidClassName($classNameSuffix)) {
+            $this->suffix = $classNameSuffix;
             $this->className = $this->fixClassName($this->className);
             return true;
         }

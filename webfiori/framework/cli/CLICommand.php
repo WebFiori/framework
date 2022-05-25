@@ -38,23 +38,6 @@ use webfiori\framework\cli\Runner;
  */
 abstract class CLICommand {
     /**
-     * An associative array that contains color codes and names.
-     * @since 1.0
-     */
-    const COLORS = [
-        'black' => 30,
-        'red' => 31,
-        'light-red' => 91,
-        'green' => 32,
-        'light-green' => 92,
-        'yellow' => 33,
-        'light-yellow' => 93,
-        'white' => 97,
-        'gray' => 37,
-        'blue' => 34,
-        'light-blue' => 94
-    ];
-    /**
      * An associative array that contains extra options that can be added to 
      * the command.
      * @var array
@@ -162,7 +145,7 @@ abstract class CLICommand {
      * 
      * @since 1.0
      */
-    public function addArg(string $name, array $options = []) {
+    public function addArg(string $name, array $options = []) : bool {
         $toAdd = $this->_checkArgOptions($name, $options);
         if ($toAdd === null) {
             return false;
@@ -387,36 +370,6 @@ abstract class CLICommand {
      */
     public abstract function exec() : int;
     /**
-     * Returns an associative array that contains one argument information.
-     * 
-     * @param string $argName The name of the argument.
-     * 
-     * @return array If the argument exist, the method will return an associative 
-     * array. The returned array will possibly have the following indices:
-     * <ul>
-     * <li><b>optional</b>: A booleean which is set to true if the argument is optional.</li>
-     * <li><b>description</b>: The description of the argument. Appears when help command 
-     * is executed.</li>
-     * <li><b>default</b>: A default value for the argument. It will be not set if no default 
-     * value for the argument is provided.</li>
-     * <li><b>values</b>: A set of values at which the argument can have.</li>
-     * <li><b>provided</b>: Set to true if the argument is provided in command line 
-     * interface.</li>
-     * <li><b>val</b>: The value of the argument taken from the command line interface.</li>
-     * </ul>
-     * If the argument does not exist, the returned array will be empty.
-     * 
-     * @since 1.0
-     */
-    public function getArgInfo($argName) {
-        
-        if ($this->hasArg($argName)) {
-            return $this->commandArgs[$argName];
-        }
-
-        return [];
-    }
-    /**
      * Returns an associative array that contains command args.
      * 
      * @return array An associative array. The indices of the array are 
@@ -448,25 +401,27 @@ abstract class CLICommand {
         $trimmedOptName = trim($optionName);
         $arg = $this->getArg($trimmedOptName);
         
-        if ($arg !== null && $arg->getValue() !== null && !Runner::isIntaractive()) {
-            return $arg->getValue();
-        }
-        foreach ($_SERVER['argv'] as $option) {
-            $optionClean = filter_var($option, FILTER_DEFAULT);
-            $optExpl = explode('=', $optionClean);
-            $optionNameFromCLI = $optExpl[0];
-
-            if ($optionNameFromCLI == $trimmedOptName) {
-                
-                
-                if (count($optExpl) == 2) {
-                    $arg->setValue($optExpl[1]);
-                } else {
-                    //If arg is provided, set its value empty string first
-                    $arg->setValue('');
-                }
-
+        if ($arg !== null) {
+            if ($arg->getValue() !== null && !Runner::isIntaractive()) {
                 return $arg->getValue();
+            }
+            foreach ($_SERVER['argv'] as $option) {
+                $optionClean = filter_var($option, FILTER_DEFAULT);
+                $optExpl = explode('=', $optionClean);
+                $optionNameFromCLI = $optExpl[0];
+
+                if ($optionNameFromCLI == $trimmedOptName) {
+
+
+                    if (count($optExpl) == 2) {
+                        $arg->setValue($optExpl[1]);
+                    } else {
+                        //If arg is provided, set its value empty string first
+                        $arg->setValue('');
+                    }
+
+                    return $arg->getValue();
+                }
             }
         }
     }
@@ -1028,11 +983,8 @@ abstract class CLICommand {
             
             $argVal = $argObj->getValue();
             $allowed = $argObj->getAllowedValues();
-            if ($argVal !== null && count($allowed) != 0) {
-
-                if (!in_array($argVal, $allowed)) {
-                    $invalidArgsVals[] = $argObj->getName();
-                }
+            if ($argVal !== null && count($allowed) != 0 && !in_array($argVal, $allowed)) {
+                $invalidArgsVals[] = $argObj->getName();
             }
         }
 
@@ -1065,11 +1017,11 @@ abstract class CLICommand {
     }
     private function _checkArgOptions($name, $options) {
         if (strlen($name) == 0) {
-            return;
+            return null;
         }
         $arg = new CommandArgument($name);
         if ($arg->getName() == 'arg') {
-            return;
+            return null;
         }
         if (isset($options['optional'])) {
             $arg->setIsOptional($options['optional']);
@@ -1092,19 +1044,6 @@ abstract class CLICommand {
         }
 
         return $arg;
-    }
-    private function _checkDescIndex(&$options) {
-        if (isset($options['description'])) {
-            $trimmedDesc = trim($options['description']);
-
-            if (strlen($trimmedDesc) > 0) {
-                $options['description'] = $trimmedDesc;
-            } else {
-                $options['description'] = '<NO DESCRIPTION>';
-            }
-        } else {
-            $options['description'] = '<NO DESCRIPTION>';
-        }
     }
     private function _checkIsArgsSet() {
         $missingMandatury = [];
@@ -1146,30 +1085,7 @@ abstract class CLICommand {
             $this->error('Invalid answer.');
         }
     }
-    private function _checkValuesIndex(&$options) {
-        if (isset($options['values']) && gettype($options['values']) == 'array') {
-            $vals = [];
-
-            foreach ($options['values'] as $val) {
-                $type = gettype($val);
-
-                if ($type == 'boolean') {
-                    if ($val === true) {
-                        $vals[] = 'y';
-                        $vals[] = 'Y';
-                    } else {
-                        $vals[] = 'n';
-                        $vals[] = 'N';
-                    }
-                } else if ($type != 'object' && $val !== null && strlen($val) != 0) {
-                    $vals[] = $val.'';
-                }
-            }
-            $options['values'] = $vals;
-        } else {
-            $options['values'] = [];
-        }
-    }
+    
     private function _createPassArray($string, array $args) {
         $retVal = [$string];
 
@@ -1195,10 +1111,6 @@ abstract class CLICommand {
         $this->addArg('--ansi', [
             'optional' => true,
             'description' => 'Force the use of ANSI output.'
-        ]);
-        $this->addArg('--no-ansi', [
-            'optional' => true,
-            'description' => 'Force the output to not use ANSI.'
         ]);
         $options = $this->getArgsNames();
 

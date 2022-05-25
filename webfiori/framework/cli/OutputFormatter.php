@@ -164,17 +164,12 @@ class OutputFormatter {
             return $mannerStr;
         }
         $colorsArr = self::COLORS;
-        if ($options['color'] != 'NO_COLOR') {
-            
-            if (isset($colorsArr[$options['color']])) {
-                $mannerStr = self::addManner($mannerStr, $colorsArr[$options['color']]);
-            }
+        if ($options['color'] != 'NO_COLOR' && isset($colorsArr[$options['color']])) {
+            $mannerStr = self::addManner($mannerStr, $colorsArr[$options['color']]);
         }
 
-        if ($options['bg-color'] != 'NO_COLOR') {
-            if (isset($colorsArr[$options['bg-color']])) {
-                $mannerStr = self::addManner($mannerStr, $colorsArr[$options['bg-color']] + 10);
-            }
+        if ($options['bg-color'] != 'NO_COLOR' && isset($colorsArr[$options['bg-color']])) {
+            $mannerStr = self::addManner($mannerStr, $colorsArr[$options['bg-color']] + 10);
         }
 
         return $mannerStr;

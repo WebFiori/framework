@@ -57,7 +57,7 @@ class WebServiceWriter extends ClassWriter {
      * provided, the constant ROOT_DIR is used. </li>
      * </ul>
      */
-    public function __construct($webServicesObj, $classInfoArr = []) {
+    public function __construct($webServicesObj) {
         parent::__construct('NewWebService', ROOT_DIR.DS.APP_DIR_NAME.DS.'apis', APP_DIR_NAME.'\\apis');
 
         if (!$webServicesObj instanceof AbstractWebService) {

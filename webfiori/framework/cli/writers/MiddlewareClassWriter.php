@@ -36,6 +36,7 @@ class MiddlewareClassWriter extends ClassWriter {
      */
     public function __construct($middlewareName = '', $priority = 0, array $groupsArr = []) {
         parent::__construct('NewMiddleware', ROOT_DIR.DS.APP_DIR_NAME.DS.'middleware', APP_DIR_NAME.'\\middleware');
+        $this->setSuffix('Middleware');
         $this->addUseStatement([
             "webfiori\\framework\\middleware\\AbstractMiddleware",
             "webfiori\\framework\\SessionsManager",
@@ -43,17 +44,71 @@ class MiddlewareClassWriter extends ClassWriter {
             "webfiori\\http\\Response",
         ]);
         $this->priority = $priority;
-        $this->name = $middlewareName;
+        if (!$this->setMiddlewareName($middlewareName)) {
+            $this->setMiddlewareName('New Middleware');
+        }
         $this->groups = $groupsArr;
     }
-    public function setGroups(array $groupsArr) {
-        $this->groups = $groupsArr;
+    /**
+     * Returns a string that represents the name of the middleware.
+     * 
+     * @return string A string that represents the name of the middleware.
+     * Default return value is 'New Middleware'.
+     */
+    public function getMiddlewareName() : string {
+        return $this->name;
     }
-    public function setMiddlewarePriority($pr) {
+    /**
+     * Returns a number that represents the priority of the middleware.
+     * 
+     * @return int A number that represents the priority of the middleware.
+     */
+    public function getMiddlewarePriority() : int {
+        return $this->priority;
+    }
+    /**
+     * Adds the middleware to a group.
+     * 
+     * @param string $gname The name of the group that the middleware will
+     * be added to.
+     */
+    public function addGroup(string $gname) {
+        $trimmed = trim($gname);
+        if (strlen($trimmed) > 0) {
+            $this->groups[] = $gname;
+        }
+    }
+    /**
+     * Returns an array that contains the names of all groups at which
+     * the middleware is added to.
+     * 
+     * @return array
+     */
+    public function getGroups() : array {
+        return $this->groups;
+    }
+    /**
+     * Sets the priority of the middleware.
+     * 
+     * @param int $pr An integer that represents the priority.
+     */
+    public function setMiddlewarePriority(int $pr) {
         $this->priority = $pr;
     }
-    public function setMiddlewareName($mdName) {
-        $this->name = $mdName;
+    /**
+     * Sets the name of the middleware.
+     * 
+     * @param string $mdName
+     * 
+     * @return bool If set, the method will return true. False otherwise.
+     */
+    public function setMiddlewareName(string $mdName) : bool {
+        $trimmed = trim($mdName);
+        if (strlen($trimmed) > 0) {
+            $this->name = $trimmed;
+            return true;
+        }
+        return false;
     }
     private function _writeConstructor() {
         $this->append([

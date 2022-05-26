@@ -588,7 +588,9 @@ abstract class CLICommand {
      */
     public function isArgProvided(string $argName) {
         $argObj = $this->getArg($argName);
-        if ($argObj !== null && $argObj->getValue() == '') {
+        $isNull = $argObj->getValue() == null;
+
+        if ($argObj !== null && !$isNull && $argObj->getValue() == '') {
             return true;
         }
 
@@ -733,7 +735,7 @@ abstract class CLICommand {
 
         if ($argsCount != 0 && gettype($_[$argsCount - 1]) == 'array') {
             //Last index contains formatting options.
-            $_[$argsCount - 1]['ansi'] = !$this->isArgProvided('--no-ansi');
+            $_[$argsCount - 1]['ansi'] = $this->isArgProvided('--ansi');
             $str = OutputFormatter::formatOutput($str, $_[$argsCount - 1]);
         }
         call_user_func_array([$this->getOutputStream(), 'println'], $this->_createPassArray($str, $_));
@@ -766,7 +768,7 @@ abstract class CLICommand {
             $formattingOptions = $_[$argCount - 1];
         }
 
-        $formattingOptions['ansi'] = !$this->isArgProvided('--no-ansi');
+        $formattingOptions['ansi'] = $this->isArgProvided('--ansi');
 
         $formattedStr = OutputFormatter::formatOutput($str, $formattingOptions);
 
@@ -1001,7 +1003,7 @@ abstract class CLICommand {
             foreach ($invalidArgsVals as $argName) {
                 $this->prints('Info:', [
                     'color' => 'light-yellow',
-                    'force-styling' => $this->isArgProvided('--ansi')
+                    'ansi' => $this->isArgProvided('--ansi')
                 ]);
                 $this->println("Allowed values for the argument '$argName':");
 

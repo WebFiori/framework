@@ -116,7 +116,9 @@ class OutputFormatter {
             if (!isset($formatArr['bg-color'])) {
                 $formatArr['bg-color'] = $noColor;
             }
-
+            if (!isset($formatArr['ansi'])) {
+                $formatArr['ansi'] = false;
+            }
             return $formatArr;
         }
 

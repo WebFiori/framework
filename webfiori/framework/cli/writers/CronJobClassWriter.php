@@ -200,7 +200,6 @@ class CronJobClassWriter extends ClassWriter {
             
 
             foreach ($args as $argObj) {
-                $argObj instanceof JobArgument;
                 $argsPartArr[] = " * <li>".$argObj->getName().": ".$argObj->getDescription()."</li>";
             }
             $argsPartArr[] = ' * </ul>';

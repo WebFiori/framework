@@ -20,7 +20,8 @@ class OutputFormatterTest extends TestCase {
      */
     public function test01() {
         $this->assertEquals("\e[31mHello\e[0m", OutputFormatter::formatOutput('Hello', [
-            'color' => 'red'
+            'color' => 'red',
+            'ansi' => true
         ]));
     }
     /**
@@ -28,7 +29,8 @@ class OutputFormatterTest extends TestCase {
      */
     public function test02() {
         $this->assertEquals("\e[1mHello\e[0m", OutputFormatter::formatOutput('Hello', [
-            'bold' => true
+            'bold' => true,
+            'ansi' => true
         ]));
     }
     /**
@@ -36,7 +38,8 @@ class OutputFormatterTest extends TestCase {
      */
     public function test03() {
         $this->assertEquals("\e[4mHello\e[0m", OutputFormatter::formatOutput('Hello', [
-            'underline' => true
+            'underline' => true,
+            'ansi' => true
         ]));
     }
     /**
@@ -45,7 +48,8 @@ class OutputFormatterTest extends TestCase {
     public function test04() {
         $this->assertEquals("\e[1;4mHello\e[0m", OutputFormatter::formatOutput('Hello', [
             'underline' => true,
-            'bold' => true
+            'bold' => true,
+            'ansi' => true
         ]));
     }
     /**
@@ -53,7 +57,8 @@ class OutputFormatterTest extends TestCase {
      */
     public function test05() {
         $this->assertEquals("\e[7mHello\e[0m", OutputFormatter::formatOutput('Hello', [
-            'reverse' => true
+            'reverse' => true,
+            'ansi' => true
         ]));
     }
     /**
@@ -63,7 +68,8 @@ class OutputFormatterTest extends TestCase {
         $this->assertEquals("\e[1;4;7mHello\e[0m", OutputFormatter::formatOutput('Hello', [
             'reverse' => true,
             'bold' => true,
-            'underline' => true
+            'underline' => true,
+            'ansi' => true
         ]));
     }
     /**
@@ -74,7 +80,8 @@ class OutputFormatterTest extends TestCase {
             'reverse' => true,
             'bold' => true,
             'underline' => true,
-            'color' => 'light-yellow'
+            'color' => 'light-yellow',
+            'ansi' => true
         ]));
     }
     /**
@@ -85,7 +92,8 @@ class OutputFormatterTest extends TestCase {
             'reverse' => true,
             'bold' => true,
             'underline' => true,
-            'color' => 'not supported'
+            'color' => 'not supported',
+            'ansi' => true
         ]));
     }
     /**
@@ -96,7 +104,8 @@ class OutputFormatterTest extends TestCase {
             'reverse' => true,
             'bold' => true,
             'underline' => true,
-            'bg-color' => 'black'
+            'bg-color' => 'black',
+            'ansi' => true
         ]));
     }
     /**
@@ -107,7 +116,8 @@ class OutputFormatterTest extends TestCase {
             'reverse' => true,
             'bold' => true,
             'underline' => true,
-            'bg-color' => 'ggg'
+            'bg-color' => 'ggg',
+            'ansi' => true
         ]));
     }
     /**
@@ -120,7 +130,8 @@ class OutputFormatterTest extends TestCase {
             'underline' => true,
             'bg-color' => 'yellow',
             'color' => 'yellow',
-            'blink' => true
+            'blink' => true,
+            'ansi' => true
         ]));
     }
     /**
@@ -134,7 +145,8 @@ class OutputFormatterTest extends TestCase {
             'underline' => true,
             'bg-color' => 'yellow',
             'color' => 'yellow',
-            'blink' => true
+            'blink' => true,
+            'ansi' => true
         ]));
     }
     /**

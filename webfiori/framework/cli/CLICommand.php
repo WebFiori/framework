@@ -588,10 +588,14 @@ abstract class CLICommand {
      */
     public function isArgProvided(string $argName) {
         $argObj = $this->getArg($argName);
-        $isNull = $argObj->getValue() == null;
+        
 
-        if ($argObj !== null && !$isNull && $argObj->getValue() == '') {
-            return true;
+        if ($argObj !== null) {
+            $isNull = $argObj->getValue() == null;
+            
+            if (!$isNull && $argObj->getValue() == '') {
+                return true;
+            }
         }
 
         return false;

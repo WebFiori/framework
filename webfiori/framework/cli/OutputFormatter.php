@@ -92,7 +92,7 @@ class OutputFormatter {
     private static function _validateOutputOptions($formatArr) {
         $noColor = 'NO_COLOR';
 
-        if (gettype($formatArr) == 'array' && count($formatArr) !== 0) {
+        if (gettype($formatArr) == 'array') {
             if (!isset($formatArr['bold'])) {
                 $formatArr['bold'] = false;
             }

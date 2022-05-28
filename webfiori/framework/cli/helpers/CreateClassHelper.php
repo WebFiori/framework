@@ -2,7 +2,7 @@
 namespace webfiori\framework\cli\helpers;
 
 use webfiori\framework\cli\commands\CreateCommand;
-use webfiori\framework\cli\writers\ClassWriter;
+use webfiori\framework\writers\ClassWriter;
 use webfiori\framework\cli\helpers\ClassInfoReader;
 /**
  * A wrapper class which helps in creating classes using CLI.

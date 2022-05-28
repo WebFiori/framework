@@ -24,6 +24,8 @@
  */
 namespace webfiori\framework\cli;
 
+use webfiori\framework\cli\CommandArgument;
+use webfiori\framework\cli\Runner;
 /**
  * An abstract class that can be used to create new CLI command.
  * The developer can extend this class and use it to create a custom CLI 
@@ -35,23 +37,6 @@ namespace webfiori\framework\cli;
  * @version 1.0.1
  */
 abstract class CLICommand {
-    /**
-     * An associative array that contains color codes and names.
-     * @since 1.0
-     */
-    const COLORS = [
-        'black' => 30,
-        'red' => 31,
-        'light-red' => 91,
-        'green' => 32,
-        'light-green' => 92,
-        'yellow' => 33,
-        'light-yellow' => 93,
-        'white' => 97,
-        'gray' => 37,
-        'blue' => 34,
-        'light-blue' => 94
-    ];
     /**
      * An associative array that contains extra options that can be added to 
      * the command.
@@ -123,8 +108,8 @@ abstract class CLICommand {
         if (!$this->setDescription($description)) {
             $this->setDescription('<NO DESCRIPTION>');
         }
-        $this->setInputStream(CLI::getInputStream());
-        $this->setOutputStream(CLI::getOutputStream());
+        $this->setInputStream(Runner::getInputStream());
+        $this->setOutputStream(Runner::getOutputStream());
     }
     /**
      * Add command argument.
@@ -160,19 +145,27 @@ abstract class CLICommand {
      * 
      * @since 1.0
      */
-    public function addArg(string $name, array $options = []) {
-        $trimmed = trim($name);
-        
-        if ($this->hasArg($trimmed)) {
+    public function addArg(string $name, array $options = []) : bool {
+        $toAdd = $this->_checkArgOptions($name, $options);
+        if ($toAdd === null) {
             return false;
         }
-        
-        if (strlen($trimmed) > 0 && !strpos($trimmed, ' ')) {
-            $this->commandArgs[$trimmed] = $this->_checkArgOptions($options);
-
+        return $this->addArgument($toAdd);
+    }
+    /**
+     * Adds new command argument.
+     * 
+     * @param CommandArgument $arg The argument that will be added.
+     * 
+     * @return boolean If the argument is added, the method will return true.
+     * If not, false is returned. The argument will not be added only if an argument
+     * which has same name is added.
+     */
+    public function addArgument(CommandArgument $arg) : bool {
+        if (!$this->hasArg($arg->getName())) {
+            $this->commandArgs[] = $arg;
             return true;
         }
-
         return false;
     }
     /**
@@ -347,7 +340,7 @@ abstract class CLICommand {
      * @since 1.0
      */
     public function excCommand() : int {
-        CLI::setActiveCommand($this);
+        Runner::setActiveCommand($this);
         $retVal = -1;
         $this->_parseArgs();
 
@@ -360,7 +353,7 @@ abstract class CLICommand {
 
             $retVal = intval($execResult);
         }
-        CLI::setActiveCommand(null);
+        Runner::setActiveCommand();
         return $retVal;
     }
     /**
@@ -376,87 +369,6 @@ abstract class CLICommand {
      * @since 1.0
      */
     public abstract function exec() : int;
-    /**
-     * Formats an output string.
-     * 
-     * This method is used to add colors to the output string or 
-     * make it bold or underlined. The returned value of this 
-     * method can be sent to any output stream using the method 'fprintf()'. 
-     * Note that the support for colors
-     * and formatting will depend on the terminal configuration. In addition, 
-     * if the constant NO_COLOR is defined or is set in the environment, the 
-     * returned string will be returned as is.
-     * 
-     * @param string $string The string that will be formatted.
-     * 
-     * @param array $formatOptions An associative array of formatting 
-     * options. Supported options are:
-     * <ul>
-     * <li><b>color</b>: The foreground color of the output text. Supported colors 
-     * are: 
-     * <ul>
-     * <li>white</li>
-     * <li>black</li>
-     * <li>red</li>
-     * <li>light-red</li>
-     * <li>green</li>
-     * <li>light-green</li>
-     * <li>yellow</li>
-     * <li>light-yellow</li>
-     * <li>gray</li>
-     * <li>blue</li>
-     * <li>light-blue</li>
-     * </ul>
-     * </li>
-     * <li><b>bg-color</b>: The background color of the output text. Supported colors 
-     * are the same as the supported colors by the 'color' option.</li>
-     * <li><b>bold</b>: A boolean. If set to true, the text will 
-     * be bold.</li>
-     * <li><b>underline</b>: A boolean. If set to true, the text will 
-     * be underlined.</li>
-     * <li><b>reverse</b>: A boolean. If set to true, the foreground 
-     * color and background color will be reversed (invert the foreground and background colors).</li>
-     * <li><b>blink</b>: A boolean. If set to true, the text will 
-     * blink.</li>
-     * </ul>
-     * @return string The string after applying the formatting to it.
-     * 
-     * @since 1.0
-     */
-    public static function formatOutput(string $string, array $formatOptions) {
-        $validatedOptions = self::_validateOutputOptions($formatOptions);
-
-        return self::_getFormattedOutput($string, $validatedOptions);
-    }
-    /**
-     * Returns an associative array that contains one argument information.
-     * 
-     * @param string $argName The name of the argument.
-     * 
-     * @return array If the argument exist, the method will return an associative 
-     * array. The returned array will possibly have the following indices:
-     * <ul>
-     * <li><b>optional</b>: A booleean which is set to true if the argument is optional.</li>
-     * <li><b>description</b>: The description of the argument. Appears when help command 
-     * is executed.</li>
-     * <li><b>default</b>: A default value for the argument. It will be not set if no default 
-     * value for the argument is provided.</li>
-     * <li><b>values</b>: A set of values at which the argument can have.</li>
-     * <li><b>provided</b>: Set to true if the argument is provided in command line 
-     * interface.</li>
-     * <li><b>val</b>: The value of the argument taken from the command line interface.</li>
-     * </ul>
-     * If the argument does not exist, the returned array will be empty.
-     * 
-     * @since 1.0
-     */
-    public function getArgInfo($argName) {
-        if ($this->hasArg($argName)) {
-            return $this->commandArgs[$argName];
-        }
-
-        return [];
-    }
     /**
      * Returns an associative array that contains command args.
      * 
@@ -487,26 +399,44 @@ abstract class CLICommand {
      */
     public function getArgValue(string $optionName) {
         $trimmedOptName = trim($optionName);
+        $arg = $this->getArg($trimmedOptName);
+        
+        if ($arg !== null) {
+            if ($arg->getValue() !== null && !Runner::isIntaractive()) {
+                return $arg->getValue();
+            }
+            foreach ($_SERVER['argv'] as $option) {
+                $optionClean = filter_var($option, FILTER_DEFAULT);
+                $optExpl = explode('=', $optionClean);
+                $optionNameFromCLI = $optExpl[0];
 
-        if (!CLI::isIntaractive() && isset($this->commandArgs[$trimmedOptName]['val'])) {
-            return $this->commandArgs[$trimmedOptName]['val'];
-        }
+                if ($optionNameFromCLI == $trimmedOptName) {
 
-        foreach ($_SERVER['argv'] as $option) {
-            $optionClean = filter_var($option, FILTER_DEFAULT);
-            $optExpl = explode('=', $optionClean);
-            $optionNameFromCLI = $optExpl[0];
 
-            if ($optionNameFromCLI == $trimmedOptName) {
-                $this->commandArgs[$trimmedOptName]['provided'] = true;
+                    if (count($optExpl) == 2) {
+                        $arg->setValue($optExpl[1]);
+                    } else {
+                        //If arg is provided, set its value empty string first
+                        $arg->setValue('');
+                    }
 
-                if (count($optExpl) == 2) {
-                    return $optExpl[1];
+                    return $arg->getValue();
                 }
-
-                return null;
-            } else {
-                $this->commandArgs[$trimmedOptName]['provided'] = false;
+            }
+        }
+    }
+    /**
+     * Returns an object that holds argument info if the command.
+     * 
+     * @param string $name The name of command argument.
+     * 
+     * @return CommandArgument|null If the command has an argument with the
+     * given name, it will be returned. Other than that, null is returned.
+     */
+    public function getArg(string $name) {
+        foreach ($this->getArgs() as $arg) {
+            if ($arg->getName() == $name) {
+                return $arg;
             }
         }
     }
@@ -620,7 +550,12 @@ abstract class CLICommand {
      * @since 1.0
      */
     public function hasArg(string $argName) {
-        return isset($this->getArgs()[trim($argName)]);
+        foreach ($this->getArgs() as $arg) {
+            if ($arg->getName() == $argName) {
+                return true;
+            }
+        }
+        return false;
     }
     /**
      * Display a message that represents extra information.
@@ -652,11 +587,14 @@ abstract class CLICommand {
      * @since 1.0
      */
     public function isArgProvided(string $argName) {
-        if ($this->hasArg($argName)) {
-            $trimmed = trim($argName);
+        $argObj = $this->getArg($argName);
+        
 
-            if (isset($this->getArgs()[$trimmed]['provided'])) {
-                return $this->getArgs()[$trimmed]['provided'];
+        if ($argObj !== null) {
+            $isNull = $argObj->getValue() == null;
+            
+            if (!$isNull && $argObj->getValue() == '') {
+                return true;
             }
         }
 
@@ -801,9 +739,8 @@ abstract class CLICommand {
 
         if ($argsCount != 0 && gettype($_[$argsCount - 1]) == 'array') {
             //Last index contains formatting options.
-            $_[$argsCount - 1]['no-ansi'] = $this->isArgProvided('--no-ansi');
-            $_[$argsCount - 1]['force-styling'] = $this->isArgProvided('--ansi');
-            $str = self::formatOutput($str, $_[$argsCount - 1]);
+            $_[$argsCount - 1]['ansi'] = $this->isArgProvided('--ansi');
+            $str = OutputFormatter::formatOutput($str, $_[$argsCount - 1]);
         }
         call_user_func_array([$this->getOutputStream(), 'println'], $this->_createPassArray($str, $_));
     }
@@ -835,10 +772,9 @@ abstract class CLICommand {
             $formattingOptions = $_[$argCount - 1];
         }
 
-        $formattingOptions['force-styling'] = $this->isArgProvided('--ansi');
-        $formattingOptions['no-ansi'] = $this->isArgProvided('--no-ansi');
+        $formattingOptions['ansi'] = $this->isArgProvided('--ansi');
 
-        $formattedStr = $this->formatOutput($str, $formattingOptions);
+        $formattedStr = OutputFormatter::formatOutput($str, $formattingOptions);
 
         call_user_func_array([$this->getOutputStream(), 'prints'], $this->_createPassArray($formattedStr, $_));
     }
@@ -937,27 +873,13 @@ abstract class CLICommand {
      */
     public function setArgValue(string $argName, $argValue = '') {
         $trimmedArgName = trim($argName);
-        $trimmedArgVal = trim($argValue);
-        $retVal = false;
+        $argObj = $this->getArg($trimmedArgName);
 
-        if (isset($this->commandArgs[$trimmedArgName])) {
-            $allowedVals = $this->commandArgs[$trimmedArgName]['values'];
-
-            if (count($allowedVals) != 0) {
-                if (in_array($argValue, $allowedVals)) {
-                    $retVal = true;
-                }
-            } else {
-                $retVal = true;
-            }
+        if ($argObj !== null) {
+            return $argObj->setValue($argValue);
         }
-
-        if ($retVal) {
-            $this->commandArgs[$trimmedArgName]['val'] = $argValue;
-            $this->commandArgs[$trimmedArgName]['provided'] = true;
-        }
-
-        return $retVal;
+        
+        return false;
     }
     /**
      * Sets the description of the command.
@@ -1063,13 +985,12 @@ abstract class CLICommand {
     private function _checkAllowedArgValues() {
         $invalidArgsVals = [];
 
-        foreach ($this->commandArgs as $argName => $argArray) {
-            if ($this->isArgProvided($argName) && count($argArray['values']) != 0) {
-                $argValue = $argArray['val'];
-
-                if (!in_array($argValue, $argArray['values'])) {
-                    $invalidArgsVals[] = $argName;
-                }
+        foreach ($this->commandArgs as $argObj) {
+            
+            $argVal = $argObj->getValue();
+            $allowed = $argObj->getAllowedValues();
+            if ($argVal !== null && count($allowed) != 0 && !in_array($argVal, $allowed)) {
+                $invalidArgsVals[] = $argObj->getName();
             }
         }
 
@@ -1086,7 +1007,7 @@ abstract class CLICommand {
             foreach ($invalidArgsVals as $argName) {
                 $this->prints('Info:', [
                     'color' => 'light-yellow',
-                    'force-styling' => $this->isArgProvided('--ansi')
+                    'ansi' => $this->isArgProvided('--ansi')
                 ]);
                 $this->println("Allowed values for the argument '$argName':");
 
@@ -1100,48 +1021,46 @@ abstract class CLICommand {
 
         return true;
     }
-    private function _checkArgOptions(&$options) {
-        $optinsArr = [];
-
-        if (isset($options['optional'])) {
-            $optinsArr['optional'] = $options['optional'] === true;
-        } else {
-            $optinsArr['optional'] = false;
+    private function _checkArgOptions($name, $options) {
+        if (strlen($name) == 0) {
+            return null;
         }
-        $optinsArr['description'] = isset($options['description']) ? $options['description'] : '<NO DESCRIPTION>';
-        $this->_checkDescIndex($optinsArr);
-        $optinsArr['values'] = isset($options['values']) ? $options['values'] : [];
-        $this->_checkValuesIndex($optinsArr);
+        $arg = new CommandArgument($name);
+        if ($arg->getName() == 'arg') {
+            return null;
+        }
+        if (isset($options['optional'])) {
+            $arg->setIsOptional($options['optional']);
+        }
+        $desc = isset($options['description']) ? trim($options['description']) : '<NO DESCRIPTION>';
+        
+        if (strlen($desc) != 0) {
+            $arg->setDescription($desc);
+        } else {
+            $arg->setDescription('<NO DESCRIPTION>');
+        }
+        $allowedVals = isset($options['values']) ? $options['values'] : [];
+        foreach ($allowedVals as $val) {
+            $arg->addAllowedValue($val);
+        }
 
 
         if (isset($options['default']) && gettype($options['default']) == 'string') {
-            $optinsArr['default'] = $options['default'];
+            $arg->setDefault($options['default']);
         }
 
-        return $optinsArr;
-    }
-    private function _checkDescIndex(&$options) {
-        if (isset($options['description'])) {
-            $trimmedDesc = trim($options['description']);
-
-            if (strlen($trimmedDesc) > 0) {
-                $options['description'] = $trimmedDesc;
-            } else {
-                $options['description'] = '<NO DESCRIPTION>';
-            }
-        } else {
-            $options['description'] = '<NO DESCRIPTION>';
-        }
+        return $arg;
     }
     private function _checkIsArgsSet() {
         $missingMandatury = [];
 
-        foreach ($this->commandArgs as $attrName => $attrArray) {
-            if (!$attrArray['optional'] && $attrArray['val'] === null) {
-                if (isset($attrArray['default'])) {
-                    $this->commandArgs[$attrName]['val'] = $attrArray['default'];
+        foreach ($this->commandArgs as $argObj) {
+            
+            if (!$argObj->isOptional() && $argObj->getValue() === null) {
+                if ($argObj->getDefault() != '') {
+                    $argObj->setValue($argObj->getDefault());
                 } else {
-                    $missingMandatury[] = $attrName;
+                    $missingMandatury[] = $argObj->getName();
                 }
             }
         }
@@ -1172,30 +1091,7 @@ abstract class CLICommand {
             $this->error('Invalid answer.');
         }
     }
-    private function _checkValuesIndex(&$options) {
-        if (isset($options['values']) && gettype($options['values']) == 'array') {
-            $vals = [];
-
-            foreach ($options['values'] as $val) {
-                $type = gettype($val);
-
-                if ($type == 'boolean') {
-                    if ($val === true) {
-                        $vals[] = 'y';
-                        $vals[] = 'Y';
-                    } else {
-                        $vals[] = 'n';
-                        $vals[] = 'N';
-                    }
-                } else if ($type != 'object' && $val !== null && strlen($val) != 0) {
-                    $vals[] = $val.'';
-                }
-            }
-            $options['values'] = $vals;
-        } else {
-            $options['values'] = [];
-        }
-    }
+    
     private function _createPassArray($string, array $args) {
         $retVal = [$string];
 
@@ -1207,28 +1103,25 @@ abstract class CLICommand {
 
         return $retVal;
     }
-    private static function _getFormattedOutput($outputString, $formatOptions) {
-        $outputManner = self::getCharsManner($formatOptions);
-
-        if (strlen($outputManner) != 0) {
-            return "\e[".$outputManner."m$outputString\e[0m";
-        }
-
-        return $outputString;
+    /**
+     * Returns an array that contains the names of command arguments.
+     * 
+     * @return array An array of strings.
+     */
+    public function getArgsNames() : array {
+        return array_map(function ($el) {
+            return $el->getName();
+        }, $this->getArgs());
     }
     private function _parseArgs() {
         $this->addArg('--ansi', [
             'optional' => true,
             'description' => 'Force the use of ANSI output.'
         ]);
-        $this->addArg('--no-ansi', [
-            'optional' => true,
-            'description' => 'Force the output to not use ANSI.'
-        ]);
-        $options = array_keys($this->commandArgs);
+        $options = $this->getArgsNames();
 
         foreach ($options as $optName) {
-            $this->commandArgs[$optName]['val'] = $this->getArgValue($optName);
+            $this->getArgValue($optName);
         }
     }
     private function _printChoices($choices, $default) {
@@ -1244,53 +1137,7 @@ abstract class CLICommand {
             }
         }
     }
-    private static function _validateOutputOptions($formatArr) {
-        $noColor = 'NO_COLOR';
 
-        if (gettype($formatArr) == 'array' && count($formatArr) !== 0) {
-            if (!isset($formatArr['bold'])) {
-                $formatArr['bold'] = false;
-            }
-
-            if (!isset($formatArr['underline'])) {
-                $formatArr['underline'] = false;
-            }
-
-            if (!isset($formatArr['blink'])) {
-                $formatArr['blink'] = false;
-            }
-
-            if (!isset($formatArr['reverse'])) {
-                $formatArr['reverse'] = false;
-            }
-
-            if (!isset($formatArr['color'])) {
-                $formatArr['color'] = $noColor;
-            }
-
-            if (!isset($formatArr['bg-color'])) {
-                $formatArr['bg-color'] = $noColor;
-            }
-
-            return $formatArr;
-        }
-
-        return [
-            'bold' => false,
-            'underline' => false,
-            'reverse' => false,
-            'blink' => false,
-            'color' => $noColor, 
-            'bg-color' => $noColor
-        ];
-    }
-    private static function addManner($str, $code) {
-        if (strlen($str) > 0) {
-            return $str.';'.$code;
-        }
-
-        return $str.$code;
-    }
     private function asString($var) {
         $type = gettype($var);
 
@@ -1304,61 +1151,7 @@ abstract class CLICommand {
 
         return $var;
     }
-    private static function getCharsManner($options) {
-        $mannerStr = '';
-
-        if (isset($options['force-styling'])) {
-            $forceStyling = $options['force-styling'] === true;
-        } else {
-            $forceStyling = false;
-        }
-
-        if (isset($options['no-ansi']) && $options['no-ansi'] === true) {
-            return $mannerStr;
-        }
-
-        if (!$forceStyling) {
-            $os = php_uname('s');
-            $notSupported = [
-                'Windows NT'
-            ];
-
-            if (in_array($os, $notSupported)) {
-                return $mannerStr;
-            }
-        }
-
-        if ($options['bold']) {
-            $mannerStr = self::addManner($mannerStr, 1);
-        }
-
-        if ($options['underline']) {
-            $mannerStr = self::addManner($mannerStr, 4);
-        }
-
-        if ($options['blink']) {
-            $mannerStr = self::addManner($mannerStr, 5);
-        }
-
-        if ($options['reverse']) {
-            $mannerStr = self::addManner($mannerStr, 7);
-        }
-
-        if (defined('NO_COLOR') || isset($_SERVER['NO_COLOR']) || getenv('NO_COLOR') !== false) {
-            //See https://no-color.org/ for more info.
-            return $mannerStr;
-        }
-
-        if ($options['color'] != 'NO_COLOR') {
-            $mannerStr = self::addManner($mannerStr, self::COLORS[$options['color']]);
-        }
-
-        if ($options['bg-color'] != 'NO_COLOR') {
-            $mannerStr = self::addManner($mannerStr, self::COLORS[$options['bg-color']] + 10);
-        }
-
-        return $mannerStr;
-    }
+    
     /**
      * Validate user input and show error message if user input is invalid.
      * @param type $input

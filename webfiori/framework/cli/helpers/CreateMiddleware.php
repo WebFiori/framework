@@ -25,14 +25,11 @@ class CreateMiddleware extends CreateClassHelper {
         $priority = $this->_getMiddlewareProprity();
 
         if ($this->confirm('Would you like to add the middleware to a group?', false)) {
-            $groupsArr = $this->_getGroups();
-        } else {
-            $groupsArr = [];
+            $this->_getGroups();
         }
         
         $this->getWriter()->setMiddlewareName($middlewareName);
         $this->getWriter()->setMiddlewarePriority($priority);
-        $this->getWriter()->setGroups($groupsArr);
         $this->writeClass();
     }
     private function _getGroups() {
@@ -43,7 +40,7 @@ class CreateMiddleware extends CreateClassHelper {
             $groupName = $this->getInput('Enter group name:');
 
             if (strlen($groupName) > 0) {
-                $groupsArr[] = $groupName;
+                $this->getWriter()->addGroup($groupName);
             }
             $addToMore = $this->confirm('Would you like to add the middleware to another group?', false);
         }

@@ -1,7 +1,7 @@
 <?php
 namespace webfiori\framework\cli\writers;
 
-use webfiori\framework\cli\writers\ClassWriter;
+use webfiori\framework\writers\ClassWriter;
 /**
  * A helper class which is used in generating theme template.
  *
@@ -11,8 +11,8 @@ class ThemeComponentWriter extends ClassWriter {
     private $extends;
     private $classComment;
     private $todo;
-    public function __construct($classInfoArr = [], $extendsClass = 'HTMLNode', $comment = '', $todoTxt = '') {
-        parent::__construct($classInfoArr);
+    public function __construct($extendsClass = 'HTMLNode', $comment = '', $todoTxt = '') {
+        parent::__construct();
         $this->extends = $extendsClass;
         $this->classComment = $comment;
         $this->todo = $todoTxt;

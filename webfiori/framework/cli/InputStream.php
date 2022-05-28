@@ -17,16 +17,18 @@ interface InputStream {
      * 
      * @param int $bytes The number of bytes at which the method will read.
      * 
-     * @return string The method should return the bytes as string.
+     * @return string The method should return the bytes as string. If nothing
+     * was fetched from the stream, the method should return empty string.
      */
-    public function read($bytes = 1);
+    public function read(int $bytes = 1) : string;
     /**
      * Reads bytes from a stream till end of line.
      * 
      * Usually, end of line is represented by the constant PHP_EOL. Also, end 
      * of line can be (CR) or (LF) in some cases.
      * 
-     * @return string The method should return the bytes as string.
+     * @return string The method should return the bytes as string. If nothing
+     * was fetched from the stream, the method should return empty string.
      */
-    public function readLine();
+    public function readLine() : string;
 }

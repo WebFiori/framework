@@ -1,7 +1,8 @@
 <?php
-namespace webfiori\framework\cli\writers;
+namespace webfiori\framework\writers;
 
-use webfiori\framework\cli\writers\ClassWriter;
+use webfiori\framework\writers\ClassWriter;
+
 /**
  * A class which is used to write CLI Commands classes.
  *
@@ -32,24 +33,85 @@ class CLICommandClassWriter extends ClassWriter {
      * @param array $argsArr An associative array that holds the names of the argument
      * the command will have.
      */
-    public function __construct($classInfoArr = '', $commandName = '', $commandDesc = '', $argsArr = []) {
-        parent::__construct($classInfoArr);
-        $this->name = $commandName;
-        $this->args = $argsArr;
-        $this->desc = $commandDesc;
-        
+    public function __construct() {
+        parent::__construct('NewCommand', ROOT_DIR.DS.APP_DIR_NAME.DS.'commands', APP_DIR_NAME.'\\commands');
+        $this->name = 'new-command';
+        $this->args = [];
+        $this->desc = '';
+        $this->setSuffix('Command');
+        $this->setNamespace(APP_DIR_NAME.'\\commands');
         $this->addUseStatement([
             'webfiori\\framework\\cli\\CLICommand'
         ]);
     }
+    /**
+     * Returns a string that represents the description of the command.
+     * 
+     * @return string A string that represents the description of the command.
+     * Default is empty string.
+     */
+    public function getDescription() : string {
+        return $this->desc;
+    }
+    /**
+     * Returns a string that represents the name of the command.
+     * 
+     * @return string A string that represents the description of the command.
+     * Default is 'new-command'.
+     */
+    public function getCommandName() : string {
+        return $this->name;
+    }
+    /**
+     * Returns an array that represents the arguments of the command.
+     * 
+     * @return array An array that represents the arguments of the command.
+     * Default is empty array.
+     */
+    public function getArgs() : array {
+        return $this->args;
+    }
+    /**
+     * Sets the array that will represents the arguments of the command.
+     * 
+     * @param array $argsArr
+     */
     public function setArgs(array $argsArr) {
         $this->args = $argsArr;
     }
-    public function setCommandDescription($desc) {
-        $this->desc = $desc;
+    /**
+     * Sets the description of the command.
+     * 
+     * @param string $desc
+     */
+    public function setCommandDescription(string $desc) {
+        $trimmed = trim($desc);
+        if (strlen($desc) == 0) {
+            return;
+        }
+        $this->desc = $trimmed;
     }
-    public function setCommandName($name) {
-        $this->name = $name;
+    /**
+     * Sets the name of the command.
+     * 
+     * The name of the command is simply the string that will be used to
+     * run it.
+     * 
+     * @param string $name
+     * 
+     * @return boolean If the name is successfully set, the method will return
+     * true. Other than that, the method will return false.
+     */
+    public function setCommandName(string $name) : bool {
+        $trimmed = trim($name);
+        if (strlen($trimmed) == 0) {
+            return false;
+        }
+        if (!strpos($trimmed, ' ')) {
+            $this->name = $trimmed;
+            return true;
+        }
+        return false;
     }
     private function _writeConstructor() {
         $this->append([

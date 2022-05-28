@@ -26,7 +26,7 @@ class ArrayOutputStream implements OutputStream {
      * 
      * @param array $_ Any extra formatting options.
      */
-    public function println($str, ...$_) {
+    public function println(string $str, ...$_) {
         $this->isPrintln = true;
         $toPass = [
             $this->asString($str)."\n"
@@ -47,7 +47,7 @@ class ArrayOutputStream implements OutputStream {
      * 
      * @param type $_ Any extra parameters that the string needs.
      */
-    public function prints($str, ...$_) {
+    public function prints(string $str, ...$_) {
         $arrayToPass = [
             $str
         ];

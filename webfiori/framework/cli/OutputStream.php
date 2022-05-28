@@ -21,7 +21,7 @@ interface OutputStream {
      * 
      * @since 1.0
      */
-    public function println($str, ...$_);
+    public function println(string $str, ...$_);
     /**
      * Print out a string.
      * 
@@ -34,5 +34,5 @@ interface OutputStream {
      * 
      * @since 1.0
      */
-    public function prints($str, ...$_);
+    public function prints(string $str, ...$_);
 }

@@ -26,13 +26,13 @@ namespace webfiori\framework\cron;
 
 use Exception;
 use webfiori\collections\Queue;
-use webfiori\framework\cli\CLI;
 use webfiori\framework\cli\CLICommand;
 use webfiori\framework\cron\webServices\CronServicesManager;
 use webfiori\framework\router\Router;
 use webfiori\framework\session\SessionsManager;
 use webfiori\framework\Util;
 use webfiori\framework\WebFioriApp;
+use webfiori\framework\cli\Runner;
 /**
  * A class that is used to manage scheduled background jobs.
  * 
@@ -503,7 +503,7 @@ class Cron {
      * using CLI or the constant 'CRON_THROUGH_HTTP' is set to true.
      */
     public static function registerJobs() {
-        if (CLI::isCLI() || (defined('CRON_THROUGH_HTTP') && CRON_THROUGH_HTTP === true)) {
+        if (Runner::isCLI() || (defined('CRON_THROUGH_HTTP') && CRON_THROUGH_HTTP === true)) {
             WebFioriApp::autoRegister('jobs', function ($job)
             {
                 Cron::scheduleJob($job);

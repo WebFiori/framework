@@ -1,6 +1,7 @@
 <?php
 namespace webfiori\framework\cli\writers;
 
+use webfiori\framework\writers\ClassWriter;
 /**
  * A class which is used to create basic theme skeleton.
  *
@@ -42,17 +43,42 @@ class ThemeClassWriter extends ClassWriter {
      * <li>name: Holds theme name.</li>
      * </ul>
      */
-    public function __construct(array $classNameInfo = []) {
-        parent::__construct($classNameInfo);
-        $this->name = isset($classNameInfo['name']) ? "'".$classNameInfo['name']."'" : null;
-        
+    public function __construct(string $themeName = '') {
+        parent::__construct('NewTheme', ROOT_DIR.DS.APP_DIR_NAME.DS.'themes', APP_DIR_NAME.'\\themes\\new');
+        if (!$this->setThemeName($themeName)) {
+            $this->setThemeName('New Theme');
+        }
+        $this->setSuffix('Theme');
+    }
+    /**
+     * Sets the name of the theme.
+     * 
+     * @param string $name A non empty string that must be unique to the theme.
+     * 
+     * @return bool If set, the method will return true. False otherwise.
+     */
+    public function setThemeName(string $name) : bool {
+        $trimmed = trim($name);
+        if (strlen($trimmed) > 0) {
+            $this->name = $trimmed;
+            return true;
+        }
+        return false;
+    }
+    /**
+     * Returns the name of the theme.
+     * 
+     * @return string The method will return a string that represents the
+     * name. Default return value is 'New Theme'.
+     */
+    public function getThemeName() : string {
+        return $this->name;
     }
     private function writeComponent(string $className, string $extends, string $classComment, string $todoTxt) {
-        $writer = new ThemeComponentWriter([
-            'path' => $this->getPath(),
-            'namespace' => $this->getNamespace(),
-            'name' => $className
-        ], $extends, $classComment, $todoTxt);
+        $writer = new ThemeComponentWriter($extends, $classComment, $todoTxt);
+        $writer->setPath($this->getPath());
+        $writer->setNamespace($this->getNamespace());
+        $writer->setClassName($className);
         $writer->writeClass();
     }
 

@@ -24,7 +24,6 @@
  */
 namespace webfiori\framework\cli\commands;
 
-use webfiori\framework\cli\CLI;
 use webfiori\framework\cli\CLICommand;
 use webfiori\framework\router\Router;
 /**

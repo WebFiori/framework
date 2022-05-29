@@ -288,14 +288,23 @@ abstract class ClassWriter {
      * Note that the suffix will be appended to the name of the class
      * if it is set.
      * 
+     * @param bool $withNs If this argument is set to true, the namespace of
+     * the class will be pre-appended tp class name.
+     * 
      * @return string The name of the class that will be created. Default is
      * 'NewClass'
      * 
      * @since 1.0
      */
-    public function getName() : string {
+    public function getName(bool $withNs = false) : string {
         
-        return $this->className.$this->getSuffix();
+        $retVal = $this->className.$this->getSuffix();
+        
+        if ($withNs) {
+            return $this->getNamespace().'\\'.$retVal;
+             
+        }
+        return $retVal;
     }
     /**
      * Returns the namespace at which the generated class will be added to.

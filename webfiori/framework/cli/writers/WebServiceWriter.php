@@ -124,38 +124,36 @@ class WebServiceWriter extends ClassWriter {
      * @param RequestParameter $param
      */
     private function _appendParam($param) {
-        $this->append('$this->addParameter([', 2);
-        $this->append("'name' => '".$param->getName()."',", 3);
-        $this->append("'type' => '".$param->getType()."',", 3);
+        $this->append("'".$param->getName()."' => [", 3);
+        $this->append("'type' => '".$param->getType()."',", 4);
 
         if ($param->isOptional()) {
-            $this->append("'optional' => true,", 3);
+            $this->append("'optional' => true,", 4);
         }
 
         if ($param->getDefault() !== null) {
-            $param->setDefault($param);
 
             if (($param->getType() == 'string' || $param->getType() == 'url' || $param->getType() == 'email') && strlen($param->getDefault()) > 0) {
-                $this->append("'default' => '".$param->getDefault()."',", 3);
+                $this->append("'default' => '".$param->getDefault()."',", 4);
             } else if ($param->getType() == 'boolean') {
                 if ($param->getDefault() === true) {
-                    $this->append("'default' => true,", 3);
+                    $this->append("'default' => true,", 4);
                 } else {
-                    $this->append("'default' => false,", 3);
+                    $this->append("'default' => false,", 4);
                 }
             } else {
-                $this->append("'default' => ".$param->getDefault().",", 3);
+                $this->append("'default' => ".$param->getDefault().",", 4);
             }
         }
 
         if (($param->getType() == 'string' || $param->getType() == 'url' || $param->getType() == 'email') && $param->isEmptyStringAllowed()) {
-            $this->append("'allow-empty' => '".$param->getDefault()."',", 3);
+            $this->append("'allow-empty' => true,", 4);
         }
 
         if ($param->getDescription() !== null) {
-            $this->append("'description' => '".str_replace('\'', '\\\'', $param->getDefault())."',", 3);
+            $this->append("'description' => '".str_replace('\'', '\\\'', $param->getDescription())."',", 4);
         }
-        $this->append(']);', 2);
+        $this->append('],', 3);
     }
     private function _implementMethods() {
         $name = $this->servicesObj->getName();
@@ -196,11 +194,18 @@ class WebServiceWriter extends ClassWriter {
         ], 1);
         $this->append('parent::__construct(\''.$this->servicesObj->getName().'\');', 2);
         $this->append('$this->addRequestMethod(\''.$this->servicesObj->getRequestMethods()[0].'\');', 2);
-
-        foreach ($this->servicesObj->getParameters() as $paramObj) {
-            $this->_appendParam($paramObj);
-        }
+        $this->_appendParams($this->servicesObj->getParameters());
         $this->append('}', 1);
+    }
+    private function _appendParams($paramsArray) {
+        if (count($paramsArray) !== 0) {
+            $this->append('$this->addParameters([', 2);
+            
+            foreach ($paramsArray as $paramObj) {
+                $this->_appendParam($paramObj);
+            }
+            $this->append(']);', 2);
+        }
     }
     private function _writeServiceDoc($service) {
         $docArr = [];

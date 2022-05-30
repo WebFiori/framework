@@ -87,16 +87,43 @@ class TableClassWriter extends ClassWriter {
     public function __construct($tableObj = null) {
         parent::__construct('NewTable', ROOT_DIR.DS.APP_DIR_NAME.DS.'database', APP_DIR_NAME.'\\database');
         $this->setSuffix('Table');
-        $this->tableObj = $tableObj;
-    }
-    public function setEntityInfo($infoArr) {
-        $this->entityMapper = new EntityMapper($this->tableObj, 
-                    $infoArr['name'], 
-                    $infoArr['path'], 
-                    $infoArr['namespace']);
-            $this->entityMapper->setUseJsonI($infoArr['implement-jsoni']);
+        if ($tableObj !== null) {
+            $this->setTable($tableObj);
+        } else {
+            $this->setTableType('mysql');
+        }
     }
     /**
+     * Returns the table object which was associated with the writer.
+     * 
+     * @return Table
+     */
+    public function getTable() : Table {
+        return $this->tableObj;
+    }
+    /**
+     * Sets the entity class info which mapps to a record in the table.
+     * 
+     * @param string $className The name of the entity class.
+     * 
+     * @param string $namespace The namespace at which the entity class will
+     * belongs to.
+     * 
+     * @param string $path The location at which the entity class will be
+     * created at.
+     * 
+     * @param bool $imlJsonI If set to true, the entity class will implement the
+     * interface JsonI.
+     */
+    public function setEntityInfo(string $className, string $namespace, string $path, bool $imlJsonI) {
+        $this->entityMapper = new EntityMapper($this->tableObj, 
+                    $className, 
+                    $path, 
+                    $namespace);
+            $this->entityMapper->setUseJsonI($imlJsonI);
+    }
+    /**
+     * Sets the table that the writer will use in writing the table class.
      * 
      * @param Table $table
      */
@@ -270,6 +297,24 @@ class TableClassWriter extends ClassWriter {
         $this->_addCols();
         $this->_addFks();
         $this->append('}', 1);
+    }
+    /**
+     * Sets the type of database table engine.
+     * 
+     * @param string $type The name of database server. It can have one of the
+     * following values:
+     * <ul>
+     * <li>mssql</li>
+     * <li>mysql</li>
+     * </ul>
+     * 
+     */
+    public function setTableType(string $type) {
+        if ($type == 'mssql') {
+            $this->tableObj = new MSSQLTable();
+        } else if ($type == 'mysql') {
+            $this->tableObj = new MySQLTable();
+        }
     }
     private function addAllUse() {
 

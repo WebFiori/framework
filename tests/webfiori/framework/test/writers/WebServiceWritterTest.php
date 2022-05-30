@@ -81,6 +81,19 @@ class WebServiceWritterTest extends TestCase {
             'type' => 'string',
             'allow-empty' => true
         ]);
+        $writter->addRequestParam([
+            'name' => 'param-5',
+            'type' => 'boolean',
+            'default' => true,
+            'description' => 'A second bool.'
+        ]);
+        $writter->addRequestParam([
+            'name' => 'param-6',
+            'type' => 'integer',
+            'default' => 66,
+            'description' => 'A number.',
+            'optional' => true
+        ]);
         $writter->addRequestMethod('get');
         $writter->writeClass();
         $clazz = $writter->getName(true);
@@ -88,7 +101,7 @@ class WebServiceWritterTest extends TestCase {
         $clazzObj = new $clazz();
         $writter->removeClass();
         $this->assertTrue($clazzObj instanceof AbstractWebService);
-        $this->assertEquals(4, count($clazzObj->getParameters()));
+        $this->assertEquals(6, count($clazzObj->getParameters()));
         
         $param1 = $clazzObj->getParameterByName('param-1');
         
@@ -111,5 +124,11 @@ class WebServiceWritterTest extends TestCase {
         $this->assertNull($param3->getDescription());
         $this->assertTrue($param3->isOptional());
         $this->assertTrue($param3->isEmptyStringAllowed());
+        
+        $param3 = $clazzObj->getParameterByName('param-6');
+        $this->assertEquals('integer', $param3->getType());
+        $this->assertEquals(66, $param3->getDefault());
+        $this->assertEquals('A number.', $param3->getDescription());
+        $this->assertTrue($param3->isOptional());
     }
 }

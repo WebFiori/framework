@@ -69,7 +69,7 @@ interface Config {
      * 
      * @since 1.0
      */
-    public function getAccount($name);
+    public function getAccount(string $name);
     /**
      * Returns an associative array that contains all email accounts.
      * 
@@ -80,25 +80,27 @@ interface Config {
      * 
      * @since 1.0
      */
-    public function getAccounts();
+    public function getAccounts() : array ;
     /**
      * Returns the name of the theme that is used in admin control pages.
      * 
      * @return string The name of the theme that is used in admin control pages.
+     * This also can be the class name of the theme.
      * 
      * @since 1.0
      */
-    public function getAdminThemeName();
+    public function getAdminThemeName() : string ;
     /**
      * Returns the name of base theme that is used in website pages.
      * 
      * Usually, this theme is used for the normally visitors of the web site.
      * 
      * @return string The name of base theme that is used in website pages.
+     * This also can be the class name of the theme.
      * 
      * @since 1.0
      */
-    public function getBaseThemeName();
+    public function getBaseThemeName() : string ;
     /**
      * Returns the base URL that is used to fetch resources.
      * 
@@ -109,7 +111,7 @@ interface Config {
      * 
      * @since 1.0
      */
-    public function getBaseURL();
+    public function getBaseURL() : string;
     /**
      * Returns version number of the configuration file.
      * 
@@ -119,7 +121,7 @@ interface Config {
      * 
      * @since 1.0
      */
-    public function getConfigVersion();
+    public function getConfigVersion() : string;
     /**
      * Returns sha256 hash of the password which is used to prevent unauthorized
      * access to run the jobs or access CRON web interface.
@@ -131,7 +133,7 @@ interface Config {
      * @return string Password hash or the string 'NO_PASSWORD' if there is no 
      * password.
      */
-    public function getCRONPassword();
+    public function getCRONPassword() : string;
     /**
      * Returns database connection information given connection name.
      * 
@@ -143,7 +145,7 @@ interface Config {
      * 
      * @since 1.0
      */
-    public function getDBConnection($conName);
+    public function getDBConnection(string $conName);
     /**
      * Returns an associative array that contain the information of database connections.
      * 
@@ -154,7 +156,7 @@ interface Config {
      * 
      * @since 1.0
      */
-    public function getDBConnections();
+    public function getDBConnections() : array;
     /**
      * Returns the global title of the web site that will be
      * used as default page title.
@@ -167,7 +169,7 @@ interface Config {
      * 
      * @since 1.0
      */
-    public function getDefaultTitle($langCode);
+    public function getDefaultTitle(string $langCode);
     /**
      * Returns the global description of the web site that will be
      * used as default page description.
@@ -180,7 +182,7 @@ interface Config {
      * 
      * @since 1.0
      */
-    public function getDescription($langCode);
+    public function getDescription(string $langCode);
     /**
      * Returns an associative array which contains different website descriptions
      * in different languages.
@@ -193,7 +195,7 @@ interface Config {
      * 
      * @since 1.0
      */
-    public function getDescriptions();
+    public function getDescriptions() : array;
     /**
      * Returns the home page URL of the website.
      * 
@@ -201,7 +203,7 @@ interface Config {
      * 
      * @since 1.0
      */
-    public function getHomePage();
+    public function getHomePage() : string;
     /**
      * Returns the primary language of the website.
      * 
@@ -209,7 +211,7 @@ interface Config {
      * 
      * @since 1.0
      */
-    public function getPrimaryLanguage();
+    public function getPrimaryLanguage() : string;
     /**
      * Returns the date at which the application was released at.
      * 
@@ -218,7 +220,7 @@ interface Config {
      * 
      * @since 1.0
      */
-    public function getReleaseDate();
+    public function getReleaseDate() : string;
     /**
      * Returns an array that holds the default page title for different display
      * languages.
@@ -229,7 +231,7 @@ interface Config {
      * 
      * @since 1.0
      */
-    public function getTitles();
+    public function getTitles() : array;
     /**
      * Returns the character (or string) that is used to separate page title from website name.
      * 
@@ -238,7 +240,7 @@ interface Config {
      * 
      * @since 1.0
      */
-    public function getTitleSep();
+    public function getTitleSep() : string;
     /**
      * Returns version number of the application.
      * 
@@ -247,7 +249,7 @@ interface Config {
      * 
      * @since 1.0
      */
-    public function getVersion();
+    public function getVersion() : string;
     /**
      * Returns a string that represents application release type.
      * 
@@ -256,7 +258,7 @@ interface Config {
      * 
      * @since 1.0
      */
-    public function getVersionType();
+    public function getVersionType() : string;
     /**
      * Returns the global website name.
      * 
@@ -268,7 +270,7 @@ interface Config {
      * 
      * @since 1.0
      */
-    public function getWebsiteName($langCode);
+    public function getWebsiteName(string $langCode);
     /**
      * Returns an array which contains different website names in different languages.
      * 
@@ -279,5 +281,5 @@ interface Config {
      * 
      * @since 1.0
      */
-    public function getWebsiteNames();
+    public function getWebsiteNames() : array;
 }

@@ -24,8 +24,8 @@
  */
 namespace webfiori\framework\cli\commands;
 
-use webfiori\framework\cli\CLI;
 use webfiori\framework\cli\CLICommand;
+use webfiori\framework\cli\Runner;
 
 /**
  * A class that represents help command of framework's CLI.
@@ -58,7 +58,7 @@ class HelpCommand extends CLICommand {
      * @since 1.0
      */
     public function exec() : int {
-        $regCommands = CLI::getRegisteredCommands();
+        $regCommands = Runner::getCommands();
         $commandName = $this->getArgValue('--command-name');
 
         if ($commandName !== null) {
@@ -72,7 +72,6 @@ class HelpCommand extends CLICommand {
                 $vCommand = new VersionCommand();
                 if ($this->isArgProvided('--no-ansi')) {
                     $vCommand->addArg('--no-ansi');
-                    $vCommand->setArgValue('--no-ansi', $this->getArgValue('--no-ansi'));
                 }
                 $vCommand->exec();
             }
@@ -112,21 +111,21 @@ class HelpCommand extends CLICommand {
                     'color' => 'light-blue'
                 ]);
 
-                foreach ($args as $argName => $options) {
-                    $this->prints("    %25s: ", $argName, [
+                foreach ($args as $argObj) {
+                    $this->prints("    %25s: ", $argObj->getName(), [
                         'bold' => true,
                         'color' => 'yellow'
                     ]);
 
-                    if ($options['optional']) {
+                    if ($argObj->isOptional()) {
                         $this->prints("[Optional]");
                     }
 
-                    if (isset($options['default'])) {
-                        $default = $options['default'];
+                    if ($argObj->getDefault() != '') {
+                        $default = $argObj->getDefault();
                         $this->prints("[Default = '$default']");
                     }
-                    $this->println(" %s", $options['description']);
+                    $this->println(" %s", $argObj->getDescription());
                 }
             }
         }

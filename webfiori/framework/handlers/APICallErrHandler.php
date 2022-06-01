@@ -32,7 +32,6 @@ class APICallErrHandler extends AbstractHandler {
         $index = 0;
         
         foreach ($this->getTrace() as $traceEntry) {
-            $traceEntry instanceof \webfiori\error\TraceEntry;
             $stackTrace->add('#'.$index,$traceEntry->getClass().' (Line '.$traceEntry->getClass().')');
             $index++;
         }

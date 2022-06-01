@@ -942,26 +942,30 @@ class Session implements JsonI {
             $defaultLang = WebFioriApp::getAppConfig()->getPrimaryLanguage();
             $langCodeFromReq = $this->_getLangFromRequest();
             $retVal = false;
-
-            if ($this->langCode != '' && $langCodeFromReq == null) {
-                $retVal = false;
-            } else if ($langCodeFromReq == null && $useDefault === true) {
-                $langCodeFromReq = $defaultLang;
-            } else if ($langCodeFromReq == null && $useDefault !== true) {
-                $retVal = false;
-            }
-            $langU = strtoupper($langCodeFromReq);
-
-            if (strlen($langU) == 2) {
-                $this->langCode = $langU;
-                $retVal = true;
+            $isNullCode = $langCodeFromReq === null;
+            
+            if ($isNullCode) {
+                if ($this->langCode != '' || $useDefault === false) {
+                    $retVal = false;
+                } else if ($useDefault) {
+                    $langCodeFromReq = $defaultLang;
+                }
             }
 
-            if ($useDefault && !$retVal && $this->langCode == '') {
-                $this->langCode = $defaultLang;
-                $retVal = true;
-            } else {
-                $retVal = false;
+            if ($langCodeFromReq !== null) {
+                $langU = strtoupper($langCodeFromReq);
+
+                if (strlen($langU) == 2) {
+                    $this->langCode = $langU;
+                    $retVal = true;
+                }
+
+                if ($useDefault && !$retVal && $this->langCode == '') {
+                    $this->langCode = $defaultLang;
+                    $retVal = true;
+                } else {
+                    $retVal = false;
+                }
             }
 
             return $retVal;

@@ -1,3 +1,0 @@
-#!/usr/bin/env php
-<?php
-require "public".DIRECTORY_SEPARATOR."index.php";

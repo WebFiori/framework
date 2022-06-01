@@ -80,7 +80,7 @@ class GreenyTheme extends Theme {
         $headTag = new HeadNode();
         $headTag->setBase(WebFioriApp::getAppConfig()->getBaseURL());
         $headTag->addLink('icon', $this->getImagesDirName().'/favicon.png');
-        $headTag->setCanonical(WebFioriApp::getAppConfig()->getBaseURL().Page::canonical());
+//        $headTag->setCanonical(WebFioriApp::getAppConfig()->getBaseURL().Page::canonical());
 
         $headTag->addMeta('robots', 'index, follow');
 
@@ -91,7 +91,7 @@ class GreenyTheme extends Theme {
         $headerSec = new HTMLNode();
         $headerSec->setClassName('pa-row');
         $headerBody = new HTMLNode();
-        $headerBody->setClassName('pa-'.Page::dir().'-col-12 show-border');
+        $headerBody->setClassName('pa-'.$this->getPage()->getWritingDir().'-col-12 show-border');
         $headerBody->setWritingDir(Page::dir());
         $headerBody->addTextNode('Header Sec');
         $headerSec->addChild($headerBody);

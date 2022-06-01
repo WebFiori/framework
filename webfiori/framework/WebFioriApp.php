@@ -25,14 +25,12 @@
 namespace webfiori\framework;
 
 use Exception;
-use webfiori\framework\cli\CLI;
 use webfiori\framework\cron\Cron;
 use webfiori\framework\exceptions\InitializationException;
 use webfiori\framework\middleware\MiddlewareManager;
 use webfiori\framework\router\Router;
 use webfiori\framework\router\RouterUri;
 use webfiori\framework\session\SessionsManager;
-use webfiori\framework\ui\ErrorBox;
 use webfiori\framework\ui\ServerErrView;
 use webfiori\http\Request;
 use webfiori\http\Response;
@@ -41,6 +39,7 @@ use webfiori\error\Handler;
 use webfiori\framework\handlers\CLIErrHandler;
 use webfiori\framework\handlers\APICallErrHandler;
 use webfiori\framework\handlers\HTTPErrHandler;
+use webfiori\framework\cli\Runner;
 /**
  * The time at which the framework was booted in microseconds as a float.
  * 
@@ -133,10 +132,11 @@ class WebFioriApp {
         date_default_timezone_set(defined('DATE_TIMEZONE') ? DATE_TIMEZONE : 'Asia/Riyadh');
 
         $this->_initAutoLoader();
+        //Initialize CLI
+        Runner::get();
         $this->_initAppConfig();
 
-        //Initialize CLI
-        CLI::init();
+        
 
 
         $this->_initThemesPath();
@@ -441,7 +441,7 @@ class WebFioriApp {
             ConfigController::get()->createIniClass('InitCron', 'A method that can be used to initialize cron jobs.');
         }
 
-        if (CLI::isCLI() || (defined('CRON_THROUGH_HTTP') && CRON_THROUGH_HTTP && in_array('cron', $pathArr))) {
+        if (Runner::isCLI() || (defined('CRON_THROUGH_HTTP') && CRON_THROUGH_HTTP && in_array('cron', $pathArr))) {
             if (defined('CRON_THROUGH_HTTP') && CRON_THROUGH_HTTP) {
                 Cron::initRoutes();
             }

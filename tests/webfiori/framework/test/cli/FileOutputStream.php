@@ -14,7 +14,7 @@ class FileOutputStream implements OutputStream {
         $this->file = new File(__DIR__.DS.'cli-output.txt');
         $this->file->create();
     }
-    public function println($str, ...$_) {
+    public function println(string $str, ...$_) {
         $args = [$str];
         foreach ($_ as $arg) {
             $args[] = $arg;
@@ -24,7 +24,7 @@ class FileOutputStream implements OutputStream {
         $this->file->write();
     }
 
-    public function prints($str, ...$_) {
+    public function prints(string $str, ...$_) {
         
         $args = [$str];
         foreach ($_ as $arg) {

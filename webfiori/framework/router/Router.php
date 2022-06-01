@@ -26,7 +26,6 @@ namespace webfiori\framework\router;
 
 use Error;
 use Exception;
-use webfiori\framework\cli\CLI;
 use webfiori\framework\exceptions\RoutingException;
 use webfiori\framework\File;
 use webfiori\framework\ui\HTTPCodeView;
@@ -39,6 +38,7 @@ use webfiori\http\Uri;
 use webfiori\http\WebServicesManager;
 use webfiori\json\Json;
 use webfiori\ui\HTMLNode;
+use webfiori\framework\cli\Runner;
 /**
  * The basic class that is used to route user requests to the correct 
  * location.
@@ -1573,7 +1573,7 @@ class Router {
                     if ($requestMethod == 'POST' || $requestMethod == 'PUT') {
                         $_POST[$varName] = filter_var(urldecode($requestedPathArr[$x]));
                     } else {
-                        if ($requestMethod == 'GET' || $requestMethod == 'DELETE' || CLI::isCLI()) {
+                        if ($requestMethod == 'GET' || $requestMethod == 'DELETE' || Runner::isCLI()) {
                             //usually, in CLI there is no request method. 
                             //but we store result in $_GET.
                             $_GET[$varName] = filter_var(urldecode($requestedPathArr[$x]));

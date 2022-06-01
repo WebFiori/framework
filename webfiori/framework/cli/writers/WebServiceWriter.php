@@ -27,6 +27,7 @@ namespace webfiori\framework\cli\writers;
 use InvalidArgumentException;
 use webfiori\http\AbstractWebService;
 use webfiori\http\RequestParameter;
+use webfiori\framework\writers\ClassWriter;
 
 /**
  * A writer class which is used to create new web service class.
@@ -57,52 +58,102 @@ class WebServiceWriter extends ClassWriter {
      * provided, the constant ROOT_DIR is used. </li>
      * </ul>
      */
-    public function __construct($webServicesObj, $classInfoArr = []) {
-        parent::__construct($classInfoArr);
+    public function __construct($webServicesObj = null) {
+        parent::__construct('NewWebService', ROOT_DIR.DS.APP_DIR_NAME.DS.'apis', APP_DIR_NAME.'\\apis');
 
-        if (!$webServicesObj instanceof AbstractWebService) {
-            throw new InvalidArgumentException('Given parameter is not an instance of \'webfiori\restEasy\AbstractWebService\'');
+        if (!($webServicesObj instanceof AbstractWebService)) {
+            $this->servicesObj = new ServiceHolder();
+        } else {
+            $this->servicesObj = $webServicesObj;
         }
-        $this->servicesObj = $webServicesObj;
+        $this->setSuffix('Service');
         $this->addUseStatement('webfiori\\framework\\EAbstractWebService');
+    }
+    /**
+     * Adds new request parameter.
+     * 
+     * The parameter will only be added if no parameter which has the same 
+     * name as the given one is added before.
+     * 
+     * @param RequestParameter|array $param The parameter that will be added. It 
+     * can be an object of type 'RequestParameter' or an associative array of 
+     * options. The array can have the following indices:
+     * <ul>
+     * <li><b>name</b>: The name of the parameter. It must be provided.</li>
+     * <li><b>type</b>: The datatype of the parameter. If not provided, 'string' is used.</li>
+     * <li><b>optional</b>: A boolean. If set to true, it means the parameter is 
+     * optional. If not provided, 'false' is used.</li>
+     * <li><b>min</b>: Minimum value of the parameter. Applicable only for 
+     * numeric types.</li>
+     * <li><b>max</b>: Maximum value of the parameter. Applicable only for 
+     * numeric types.</li>
+     * <li><b>allow-empty</b>: A boolean. If the type of the parameter is string or string-like 
+     * type and this is set to true, then empty strings will be allowed. If 
+     * not provided, 'false' is used.</li>
+     * <li><b>custom-filter</b>: A PHP function that can be used to filter the 
+     * parameter even further</li>
+     * <li><b>default</b>: An optional default value to use if the parameter is 
+     * not provided and is optional.</li>
+     * <li><b>description</b>: The description of the attribute.</li>
+     * </ul>
+     * 
+     * @return boolean If the given request parameter is added, the method will 
+     * return true. If it was not added for any reason, the method will return 
+     * false.
+     * 
+     * @since 1.0
+     */
+    public function addRequestParam($options) : bool {
+        return $this->servicesObj->addParameter($options);
+    }
+    /**
+     * Adds new request method.
+     * 
+     * The value that will be passed to this method can be any string 
+     * that represents HTTP request method (e.g. 'get', 'post', 'options' ...). It 
+     * can be in upper case or lower case.
+     * 
+     * @param string $meth The request method.
+     * 
+     */
+    public function addRequestMethod($meth) {
+        $this->servicesObj->addRequestMethod($meth);
     }
     /**
      * 
      * @param RequestParameter $param
      */
     private function _appendParam($param) {
-        $this->append('$this->addParameter([', 2);
-        $this->append("'name' => '".$param->getName()."',", 3);
-        $this->append("'type' => '".$param->getType()."',", 3);
+        $this->append("'".$param->getName()."' => [", 3);
+        $this->append("'type' => '".$param->getType()."',", 4);
 
         if ($param->isOptional()) {
-            $this->append("'optional' => true,", 3);
+            $this->append("'optional' => true,", 4);
         }
 
         if ($param->getDefault() !== null) {
-            $param->setDefault($param);
 
             if (($param->getType() == 'string' || $param->getType() == 'url' || $param->getType() == 'email') && strlen($param->getDefault()) > 0) {
-                $this->append("'default' => '".$param->getDefault()."',", 3);
+                $this->append("'default' => '".$param->getDefault()."',", 4);
             } else if ($param->getType() == 'boolean') {
                 if ($param->getDefault() === true) {
-                    $this->append("'default' => true,", 3);
+                    $this->append("'default' => true,", 4);
                 } else {
-                    $this->append("'default' => false,", 3);
+                    $this->append("'default' => false,", 4);
                 }
             } else {
-                $this->append("'default' => ".$param->getDefault().",", 3);
+                $this->append("'default' => ".$param->getDefault().",", 4);
             }
         }
 
         if (($param->getType() == 'string' || $param->getType() == 'url' || $param->getType() == 'email') && $param->isEmptyStringAllowed()) {
-            $this->append("'allow-empty' => '".$param->getDefault()."',", 3);
+            $this->append("'allow-empty' => true,", 4);
         }
 
         if ($param->getDescription() !== null) {
-            $this->append("'description' => '".str_replace('\'', '\\\'', $param->getDefault())."',", 3);
+            $this->append("'description' => '".str_replace('\'', '\\\'', $param->getDescription())."',", 4);
         }
-        $this->append(']);', 2);
+        $this->append('],', 3);
     }
     private function _implementMethods() {
         $name = $this->servicesObj->getName();
@@ -143,11 +194,18 @@ class WebServiceWriter extends ClassWriter {
         ], 1);
         $this->append('parent::__construct(\''.$this->servicesObj->getName().'\');', 2);
         $this->append('$this->addRequestMethod(\''.$this->servicesObj->getRequestMethods()[0].'\');', 2);
-
-        foreach ($this->servicesObj->getParameters() as $paramObj) {
-            $this->_appendParam($paramObj);
-        }
+        $this->_appendParams($this->servicesObj->getParameters());
         $this->append('}', 1);
+    }
+    private function _appendParams($paramsArray) {
+        if (count($paramsArray) !== 0) {
+            $this->append('$this->addParameters([', 2);
+            
+            foreach ($paramsArray as $paramObj) {
+                $this->_appendParam($paramObj);
+            }
+            $this->append(']);', 2);
+        }
     }
     private function _writeServiceDoc($service) {
         $docArr = [];

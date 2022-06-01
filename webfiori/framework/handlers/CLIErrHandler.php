@@ -3,8 +3,9 @@ namespace webfiori\framework\handlers;
 
 use webfiori\error\AbstractHandler;
 use webfiori\framework\cron\Cron;
-use webfiori\framework\cli\CLI;
+use webfiori\framework\cli\Runner;
 use webfiori\framework\cli\CLICommand;
+use webfiori\framework\cli\OutputFormatter;
 /**
  * Description of CLIExceptionHandler
  *
@@ -16,13 +17,13 @@ class CLIErrHandler  extends AbstractHandler {
         $this->setName('CLI Errors Handler');
     }
     public function handle() {
-        $stream = CLI::getOutputStream();
-        $stream->prints(CLICommand::formatOutput("Uncaught Exception\n", [
+        $stream = Runner::getOutputStream();
+        $stream->prints(OutputFormatter::formatOutput("Uncaught Exception\n", [
             'color' => 'red',
             'bold' => true,
             'blink' => true
         ]));
-        $stream->prints(CLICommand::formatOutput('Exception Message: ', [
+        $stream->prints(OutputFormatter::formatOutput('Exception Message: ', [
             'color' => 'yellow',
             'bold' => true,
         ]));
@@ -48,7 +49,7 @@ class CLIErrHandler  extends AbstractHandler {
     }
 
     public function isActive(): bool {
-        return CLI::isCLI();
+        return Runner::isCLI();
     }
 
     public function isShutdownHandler(): bool {

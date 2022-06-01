@@ -858,7 +858,7 @@ class ConfigController {
         $this->a($cFile, $this->blockEnd, 1);
         
         $this->writeFuncHeader($cFile, 
-                'public function getAccount($name)', 
+                'public function getAccount(string $name)', 
                 'Returns SMTP account given its name.', 
                 [
                     'The method will search for an account with the given name in the set',
@@ -884,7 +884,7 @@ class ConfigController {
         $this->a($cFile, $this->blockEnd, 1);
 
         $this->writeFuncHeader($cFile, 
-                'public function getAccounts()', 
+                'public function getAccounts() : array', 
                 'Returns an associative array that contains all email accounts.', 
                 [
                     'The indices of the array will act as the names of the accounts.',
@@ -899,7 +899,7 @@ class ConfigController {
         $this->a($cFile, $this->blockEnd, 1);
 
         $this->writeFuncHeader($cFile, 
-                'public function getAdminThemeName()', 
+                'public function getAdminThemeName() : string', 
                 'Returns the name of the theme that is used in admin control pages.', 
                 '', 
                 [], 
@@ -911,7 +911,7 @@ class ConfigController {
         $this->a($cFile, $this->blockEnd, 1);
 
         $this->writeFuncHeader($cFile, 
-                'public function getBaseThemeName()', 
+                'public function getBaseThemeName() : string', 
                 'Returns the name of base theme that is used in website pages.', 
                 'Usually, this theme is used for the normally visitors of the web site.', 
                 [], 
@@ -923,7 +923,7 @@ class ConfigController {
         $this->a($cFile, $this->blockEnd, 1);
 
         $this->writeFuncHeader($cFile, 
-                'public function getBaseURL()', 
+                'public function getBaseURL() : string', 
                 'Returns the base URL that is used to fetch resources.', 
                 [
                     "The return value of this method is usually used by the tag 'base'",
@@ -938,7 +938,7 @@ class ConfigController {
         $this->a($cFile, $this->blockEnd, 1);
 
         $this->writeFuncHeader($cFile, 
-                'public function getConfigVersion()', 
+                'public function getConfigVersion() : string', 
                 'Returns version number of the configuration file.', 
                 'This value can be used to check for the compatability of configuration file', 
                 [], 
@@ -950,7 +950,7 @@ class ConfigController {
         $this->a($cFile, $this->blockEnd, 1);
 
         $this->writeFuncHeader($cFile, 
-                'public function getCRONPassword()', 
+                'public function getCRONPassword() : string', 
                 'Returns sha256 hash of the password which is used to prevent unauthorized access to run the jobs or access CRON web interface.', 
                 '', 
                 [], 
@@ -962,7 +962,7 @@ class ConfigController {
         $this->a($cFile, $this->blockEnd, 1);
 
         $this->writeFuncHeader($cFile, 
-                'public function getDBConnection($conName)', 
+                'public function getDBConnection(string $conName)', 
                 'Returns database connection information given connection name.', 
                 '', 
                 [
@@ -988,7 +988,7 @@ class ConfigController {
         $this->a($cFile, $this->blockEnd, 1);
 
         $this->writeFuncHeader($cFile, 
-                'public function getDBConnections()', 
+                'public function getDBConnections() : array', 
                 'Returns an associative array that contain the information of database connections.', 
                 [
                     'The keys of the array will be the name of database connection and the',
@@ -1003,7 +1003,7 @@ class ConfigController {
         $this->a($cFile, $this->blockEnd, 1);
 
         $this->writeFuncHeader($cFile, 
-                'public function getDefaultTitle($langCode)', 
+                'public function getDefaultTitle(string $langCode)', 
                 'Returns the global title of the web site that will be used as default page title.', 
                 '', 
                 [
@@ -1030,7 +1030,7 @@ class ConfigController {
 
 
         $this->writeFuncHeader($cFile, 
-                'public function getDescription($langCode)', 
+                'public function getDescription(string $langCode)', 
                 'Returns the global description of the web site that will be used as default page description.', 
                 '', 
                 [
@@ -1055,7 +1055,7 @@ class ConfigController {
         $this->a($cFile, $this->blockEnd, 1);
 
         $this->writeFuncHeader($cFile, 
-                'public function getDescriptions()', 
+                'public function getDescriptions() : array', 
                 'Returns an associative array which contains different website descriptions in different languages.', 
                 [
                     'Each index will contain a language code and the value will be the description',
@@ -1073,7 +1073,7 @@ class ConfigController {
         $this->a($cFile, $this->blockEnd, 1);
 
         $this->writeFuncHeader($cFile, 
-                'public function getHomePage()', 
+                'public function getHomePage() : string', 
                 'Returns the home page URL of the website.', 
                 '', 
                 [], 
@@ -1085,7 +1085,7 @@ class ConfigController {
         $this->a($cFile, $this->blockEnd, 1);
 
         $this->writeFuncHeader($cFile, 
-                'public function getPrimaryLanguage()', 
+                'public function getPrimaryLanguage() : string', 
                 'Returns the primary language of the website.', 
                 '', 
                 [], 
@@ -1097,7 +1097,7 @@ class ConfigController {
         $this->a($cFile, $this->blockEnd, 1);
 
         $this->writeFuncHeader($cFile, 
-                'public function getReleaseDate()', 
+                'public function getReleaseDate() : string', 
                 'Returns the date at which the application was released at.', 
                 '', 
                 [], 
@@ -1112,7 +1112,7 @@ class ConfigController {
         $this->a($cFile, $this->blockEnd, 1);
 
         $this->writeFuncHeader($cFile, 
-                'public function getTitles()', 
+                'public function getTitles() : array', 
                 'Returns an array that holds the default page title for different display languages.', 
                 '', 
                 [], 
@@ -1127,7 +1127,7 @@ class ConfigController {
         $this->a($cFile, $this->blockEnd, 1);
 
         $this->writeFuncHeader($cFile, 
-                'public function getTitleSep()', 
+                'public function getTitleSep() : string', 
                 'Returns the character (or string) that is used to separate page title from website name.', 
                 '', 
                 [], 
@@ -1142,7 +1142,7 @@ class ConfigController {
         $this->a($cFile, $this->blockEnd, 1);
 
         $this->writeFuncHeader($cFile, 
-                'public function getVersion()', 
+                'public function getVersion() : string', 
                 'Returns version number of the application.', 
                 '', 
                 [], 
@@ -1157,7 +1157,7 @@ class ConfigController {
         $this->a($cFile, $this->blockEnd, 1);
 
         $this->writeFuncHeader($cFile, 
-                'public function getVersionType()', 
+                'public function getVersionType() : string', 
                 'Returns a string that represents application release type.', 
                 '', 
                 [], 
@@ -1172,7 +1172,7 @@ class ConfigController {
         $this->a($cFile, $this->blockEnd, 1);
 
         $this->writeFuncHeader($cFile, 
-                'public function getWebsiteName($langCode)', 
+                'public function getWebsiteName(string $langCode)', 
                 'Returns the global website name.', 
                 '', 
                 [
@@ -1198,7 +1198,7 @@ class ConfigController {
         $this->a($cFile, $this->blockEnd, 1);
 
         $this->writeFuncHeader($cFile, 
-                'public function getWebsiteNames()', 
+                'public function getWebsiteNames() : array', 
                 'Returns an array which contains different website names in different languages.', 
                 [
                     'Each index will contain a language code and the value will be the name',

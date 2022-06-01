@@ -13,14 +13,14 @@ use webfiori\framework\exceptions\ArrayIndexOutOfBoundsException;
  */
 class ArrayInputStream implements InputStream {
     private $inputsArr;
-    private $currentLine = -1;
+    private $currentLine = 0;
     /**
      * Creates new instance of the class.
      * 
      * @param array $inputs An array that contains lines of inputs.
-     * each index in the array will represent one line
+     * each index in the array will represent one line. Default is empty array.
      */
-    public function __construct(array $inputs) {
+    public function __construct(array $inputs = []) {
         $this->inputsArr = $inputs;
     }
     /**
@@ -31,7 +31,7 @@ class ArrayInputStream implements InputStream {
      * 
      * @return string The method will always return empty string.
      */
-    public function read($bytes = 1) {
+    public function read(int $bytes = 1) : string {
         return '';
     }
     /**
@@ -41,12 +41,14 @@ class ArrayInputStream implements InputStream {
      * 
      * @return string A string that represents a single line.
      */
-    public function readLine() {
+    public function readLine() : string {
         if ($this->currentLine >= count($this->inputsArr)) {
-            throw new ArrayIndexOutOfBoundsException('Array index out of bounds: '.$this->currentLine);
+            throw new ArrayIndexOutOfBoundsException('Reached end of stream while trying to read line number '.$this->currentLine);
         }
+        
+        $retVal = $this->inputsArr[$this->currentLine];
         $this->currentLine++;
-        return $this->inputsArr[$this->currentLine];
+        return $retVal;
     }
 
 }

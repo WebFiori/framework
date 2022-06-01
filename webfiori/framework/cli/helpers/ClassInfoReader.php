@@ -3,8 +3,10 @@ namespace webfiori\framework\cli\helpers;
 
 use webfiori\framework\cli\CLICommand;
 use webfiori\framework\Util;
+use webfiori\framework\writers\ClassWriter;
 /**
- * A class which is used to read class information as prompt from terminal.
+ * A class which is used to read class information as prompt from any input stream
+ * which is set by the class 'Runner'.
  *
  * @author Ibrahim
  */
@@ -156,7 +158,7 @@ class ClassInfoReader {
                 }
             }
             
-            $isNameValid = $this->_validateClassName($className);
+            $isNameValid = ClassWriter::isValidClassName($className);
 
             if (!$isNameValid) {
                 $this->getOwner()->error('Invalid class name is given.');

@@ -413,6 +413,7 @@ class ConfigController {
         $this->a($cFile, "        //TODO: Add your own routes here.");
         $this->a($cFile, $this->blockEnd, 1);
         $this->a($cFile, "}");
+        $cFile->create(true);
         $cFile->write();
         require_once $cFile->getAbsolutePath();
     }

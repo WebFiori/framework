@@ -92,7 +92,7 @@ class GreenyTheme extends Theme {
         $headerSec->setClassName('pa-row');
         $headerBody = new HTMLNode();
         $headerBody->setClassName('pa-'.$this->getPage()->getWritingDir().'-col-12 show-border');
-        $headerBody->setWritingDir(Page::dir());
+
         $headerBody->addTextNode('Header Sec');
         $headerSec->addChild($headerBody);
 

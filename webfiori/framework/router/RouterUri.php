@@ -460,7 +460,7 @@ class RouterUri extends Uri {
 
     private function _($originalUriWithVars, $uriVars, $varIndex, &$nodesArr) {
         $varName = $uriVars[$varIndex];
-        $varValues = $this->getParameterValue($varName);
+        $varValues = $this->getParameterValues($varName);
 
         foreach ($varValues as $varValue) {
             $uriWithVarsReplaced = str_replace('{'.$varName.'}', $varValue, $originalUriWithVars);

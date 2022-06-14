@@ -249,10 +249,14 @@ abstract class ClassWriter {
     public function addUseStatement($classesToUse) {
         if (gettype($classesToUse) == 'array') {
             foreach ($classesToUse as $class) {
-                $this->useArr[] = $class;
+                if (!in_array($class, $this->useArr)) {
+                    $this->useArr[] = $class;
+                }
             }
         } else {
-            $this->useArr[] = $classesToUse;
+            if (!in_array($classesToUse, $this->useArr)) {
+                $this->useArr[] = $classesToUse;
+            }
         }
     }
     /**

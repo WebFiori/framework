@@ -77,9 +77,18 @@ class CreateClassHelper {
         $this->setClassName($classInfo['name']);
         $this->setPath($classInfo['path']);
     }
-    public function writeClass() {
+    /**
+     * Creates the class which is based on the writer.
+     * 
+     * @param bool $showOutput If this is set to true, a message which
+     * states that a new class was created at the location which was specified
+     * by the writer.
+     */
+    public function writeClass(bool $showOutput = true) {
         $this->getWriter()->writeClass();
-        $this->info('New class was created at "'.$this->getWriter()->getPath().'".');
+        if ($showOutput) {
+            $this->info('New class was created at "'.$this->getWriter()->getPath().'".');
+        }
     }
     /**
      * 

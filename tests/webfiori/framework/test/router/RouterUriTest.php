@@ -365,7 +365,7 @@ class RouterUriTest extends TestCase {
         $uri = 'https://www3.programmingacademia.com:80/{some-var}/{x}/{some-var}';
         $uriObj = new RouterUri($uri, '');
         $this->assertEquals('/{some-var}/{x}/{some-var}',$uriObj->getPath());
-        $this->assertEquals(2,count($uriObj->getUriVars()));
+        $this->assertEquals(2,count($uriObj->getParameters()));
     }
     /**
      * @test

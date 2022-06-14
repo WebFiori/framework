@@ -9,6 +9,7 @@ use webfiori\database\mssql\MSSQLColumn;
 use webfiori\framework\AutoLoader;
 use webfiori\database\Column;
 use webfiori\framework\DB;
+use webfiori\database\mysql\MySQLTable;
 
 /**
  * A class which contains static methods which is used to create/modify tables.
@@ -52,7 +53,7 @@ class TableObjHelper {
             $col = new MSSQLColumn();
         }
         $col->setName(str_replace('-', '_', str_replace(' ', '_', $colKey)));
-        $colDatatype = $helper->select('Select column data type:', $col->getSupportedTypes(), 0);
+        $colDatatype = $helper->select('Column data type:', $col->getSupportedTypes(), 0);
         $col->setDatatype($colDatatype);
         $isAdded = $tempTable->addColumn($colKey, $col);
 
@@ -64,7 +65,7 @@ class TableObjHelper {
             $this->isPrimaryCheck($colObj);
             $this->addColComment($colObj);
         }
-        $this->getWriter()->writeClass();
+        $this->getCreateHelper()->writeClass(false);
     }
     public function createEntity() {
         $helper = $this->getCreateHelper();
@@ -89,14 +90,10 @@ class TableObjHelper {
 
     public function setTableComment() {
         $helper = $this->getCreateHelper();
-        $incComment = $helper->confirm('Would you like to add your comment about the table?', false);
+        $tableComment = $helper->getInput('Enter your optional comment about the table:');
 
-        if ($incComment) {
-            $tableComment = $helper->getInput('Enter your comment:');
-
-            if (strlen($tableComment) != 0) {
-                $this->getTable()->setComment($tableComment);
-            }
+        if (strlen($tableComment) != 0) {
+            $this->getTable()->setComment($tableComment);
         }
     }
     public function setTableName() {
@@ -121,12 +118,10 @@ class TableObjHelper {
      * @param MySQLColumn|MSSQLColumn $colObj
      */
     private function addColComment($colObj) {
-        if ($this->getCreateHelper()->confirm('Would you like to add your own comment about the column?', false)) {
-            $comment = $this->getCreateHelper()->getInput('Enter your comment:');
+        $comment = $this->getCreateHelper()->getInput('Enter your optional comment about the column:');
 
-            if (strlen($comment) != 0) {
-                $colObj->setComment($comment);
-            }
+        if (strlen($comment) != 0) {
+            $colObj->setComment($comment);
         }
         $this->getCreateHelper()->success('Column added.');
     }
@@ -356,7 +351,7 @@ class TableObjHelper {
         }
         
         $this->setClassInfo(get_class($tableObj));
-        $this->getCreateHelper()->writeClass();
+        $this->getCreateHelper()->writeClass(false);
         $helper->success('Column updated.');
     }
     /**
@@ -375,7 +370,7 @@ class TableObjHelper {
         $this->getTable()->removeColByKey($colToDrop);
         $class = get_class($this->getTable());
         $this->setClassInfo($class);
-        $this->getCreateHelper()->writeClass();
+        $this->getCreateHelper()->writeClass(false);
         $this->success('Column dropped.');
         return $colToDrop;
     }

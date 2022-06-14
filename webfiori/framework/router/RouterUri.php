@@ -296,8 +296,8 @@ class RouterUri extends Uri {
     public function getSitemapNodes() : array {
         $retVal = [];
 
-        if ($this->hasVars()) {
-            $this->_($this->getUri(), array_keys($this->getUriVars()), 0, $retVal);
+        if ($this->hasParameters()) {
+            $this->_($this->getUri(), $this->getParametersNames(), 0, $retVal);
         } else {
             $retVal[] = $this->_buildSitemapNode($this->getUri());
         }

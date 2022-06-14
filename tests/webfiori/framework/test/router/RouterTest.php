@@ -157,9 +157,9 @@ class RouterTest extends TestCase {
         Router::route(Util::getBaseURL().'/hello/world');
         $obj = Router::getRouteUri();
         $this->assertTrue($obj instanceof RouterUri);
-        $this->assertEquals('hello',$obj->getUriVar('var-1'));
-        $this->assertEquals('world',$obj->getUriVar('var-2'));
-        $this->assertTrue(Router::getVarValue('var-2') == $obj->getUriVar('var-2'));
+        $this->assertEquals('hello',$obj->getParameterValue('var-1'));
+        $this->assertEquals('world',$obj->getParameterValue('var-2'));
+        $this->assertTrue(Router::getParameterValue('var-2') == $obj->getParameterValue('var-2'));
     }
     /**
      * @test
@@ -178,7 +178,7 @@ class RouterTest extends TestCase {
         Router::route(Util::getBaseURL().'/hello/world/boy');
         $obj = Router::getRouteUri();
         $this->assertTrue($obj instanceof RouterUri);
-        $this->assertEquals('boy',$obj->getUriVar('var-1'));
-        $this->assertEquals('world',$obj->getUriVar('var-2'));
+        $this->assertEquals('boy',$obj->getParameterValue('var-1'));
+        $this->assertEquals('world',$obj->getParameterValue('var-2'));
     }
 }

@@ -496,6 +496,94 @@ class CreateTableTest extends TestCase {
         ], $output);
         
     }
+    /**
+     * @test
+     */
+    public function testCreateTable04() {
+        Runner::setInputStream(new ArrayInputStream([
+            '0',
+            'mysql',
+            'CoolWithEntity00Table',
+            '',
+            'cool_table_entity_00',
+            '',
+            'id',
+            '1',
+            '11',
+            'y',
+            'y',
+            'The unique ID of the cool thing.',
+            'n',
+            'n',
+            'y',
+            'MySuperCoolEntity00',
+            '',
+            'y',
+            'n'
+        ]));
+        Runner::setOutputStream(new ArrayOutputStream());
+        $this->assertEquals(0, Runner::runCommand(new CreateCommand()));
+        $output = Runner::getOutputStream()->getOutputArray();
+        $this->removeClass('\\app\\database\\CoolWithEntity00Table');
+        $clazz = '\\app\\entity\\MySuperCoolEntity00';
+        $this->assertTrue(class_exists($clazz));
+        $this->removeClass($clazz);
+        
+        $this->assertEquals([
+            "What would you like to create?\n",
+            "0: Database table class.\n",
+            "1: Entity class from table.\n",
+            "2: Web service.\n",
+            "3: Background job.\n",
+            "4: Middleware.\n",
+            "5: Database table from class.\n",
+            "6: CLI Command.\n",
+            "7: Theme.\n",
+            "8: Quit. <--\n",
+            "Database type:\n",
+            "0: mysql\n",
+            "1: mssql\n",
+            "Enter a name for the new class:\n",
+            "Enter an optional namespace for the class: Enter = \"app\database\"\n",
+            "Enter database table name:\n",
+            "Enter your optional comment about the table:\n",
+            "Now you have to add columns to the table.\n",
+            "Enter a name for column key:\n",
+            "Column data type:\n",
+            "0: char <--\n",
+            "1: int\n",
+            "2: varchar\n",
+            "3: timestamp\n",
+            "4: tinyblob\n",
+            "5: blob\n",
+            "6: mediumblob\n",
+            "7: longblob\n",
+            "8: datetime\n",
+            "9: text\n",
+            "10: mediumtext\n",
+            "11: decimal\n",
+            "12: double\n",
+            "13: float\n",
+            "14: boolean\n", 
+            "15: bool\n",
+            "16: bit\n",
+            "Enter column size:\n",
+            "Is this column primary?(y/N)\n",
+            "Is this column auto increment?(y/N)\n",
+            "Enter your optional comment about the column:\n",
+            "Success: Column added.\n",
+            "Would you like to add another column?(y/N)\n",
+            "Would you like to add foreign keys to the table?(y/N)\n",
+            "Would you like to create an entity class that maps to the database table?(y/N)\n",
+            "Enter a name for the new class:\n",
+            "Enter an optional namespace for the class: Enter = \"app\\entity\"\n",
+            "Would you like from your entity class to implement the interface JsonI?(Y/n)\n",
+            "Would you like to add extra attributes to the entity?(y/N)\n",
+            'Info: New class was created at "'.ROOT_DIR.DS.'app'.DS."database\".\n",
+            'Info: Entity class was created at "'.ROOT_DIR.DS.'app'.DS."entity\".\n",
+        ], $output);
+        
+    }
     private function removeClass($classPath) {
         $file = new File(ROOT_DIR.$classPath.'.php');
         $file->remove();

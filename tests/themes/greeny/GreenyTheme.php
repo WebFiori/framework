@@ -28,10 +28,11 @@ class GreenyTheme extends Theme {
             $page->getDocument()->getChildByID('page-body')->setClassName('pa-row');
 
             if ($page->hasAside()) {
-                $page->getDocument()->getChildByID('side-content-area')->setClassName('pa-'.Page::dir().'-col-2 show-border');
-                $page->getDocument()->getChildByID('main-content-area')->setClassName('pa-'.Page::dir().'-col-10 show-border');
+                $dir = $this->getPage()->getWritingDir();
+                $page->getDocument()->getChildByID('side-content-area')->setClassName('pa-'.$dir.'-col-2 show-border');
+                $page->getDocument()->getChildByID('main-content-area')->setClassName('pa-'.$dir.'-col-10 show-border');
             } else {
-                $page->getDocument()->getChildByID('main-content-area')->setClassName('pa-'.Page::dir().'-col-12 show-border');
+                $page->getDocument()->getChildByID('main-content-area')->setClassName('pa-'.$dir.'-col-12 show-border');
             }
             $page->getDocument()->getChildByID('main-content-area')->addTextNode('Main Content Area.');
         });

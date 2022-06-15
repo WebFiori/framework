@@ -60,7 +60,7 @@ class GreenyTheme extends Theme {
         $node->setAttribute('class', 'pa-row');
         $fNode = new HTMLNode('footer');
         $fNode->setAttribute('dir', $this->getPage()->getWritingDir());
-        $fNode->setAttribute('class','pa-'.Page::dir().'-col-12 show-border');
+        $fNode->setAttribute('class','pa-'.$this->getPage()->getWritingDir().'-col-12 show-border');
         $fNode->setAttribute('itemtype','http://schema.org/WPFooter');
         $fNav = new HTMLNode('nav');
         $fNavUl = new HTMLNode('ul');

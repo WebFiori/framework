@@ -90,7 +90,7 @@ class ThemeClassWriter extends ClassWriter {
             'public function __construct() {'
         ], 1);
         $this->append([
-            "parent::__construct($this->name);",
+            "parent::__construct('".$this->name."');",
             '//TODO: Set the properties of your theme.',
             '//$this->setName(\'Super Theme\');',
             '//$this->setVersion(\'1.0\');',

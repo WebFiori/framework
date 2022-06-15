@@ -3,6 +3,8 @@ namespace webfiori\framework\test\writers;
 
 use webfiori\framework\cli\writers\CronJobClassWriter;
 use PHPUnit\Framework\TestCase;
+use webfiori\framework\cron\JobArgument;
+use webfiori\framework\cron\AbstractJob;
 /**
  * Description of CronWritterTest
  *
@@ -24,5 +26,32 @@ class CronWritterTest extends TestCase {
         ], $writter->getUseStatements());
         $this->assertEquals('No Description', $writter->getJobDescription());
         $this->assertEquals(0, count($writter->getJob()->getArguments()));
+    }
+    /**
+     * @test
+     */
+    public function test01() {
+        $writter = new CronJobClassWriter();
+        $writter->setClassName('NewOk');
+        $this->assertEquals('NewOkJob', $writter->getName());
+        $this->assertEquals('app\\jobs', $writter->getNamespace());
+        $this->assertEquals('Job', $writter->getSuffix());
+        $this->assertEquals([
+            "webfiori\\framework\\cron\\AbstractJob",
+            "webfiori\\framework\\cron\\CronEmail",
+            "webfiori\\framework\\cron\\Cron",
+        ], $writter->getUseStatements());
+        $this->assertEquals('No Description', $writter->getJobDescription());
+        $this->assertEquals(0, count($writter->getJob()->getArguments()));
+        $writter->addArgument(new JobArgument('test', 'A test Arg.'));
+        $this->assertEquals(1, count($writter->getJob()->getArguments()));
+        $writter->addArgument(new JobArgument('test-2', 'Second test arg'));
+        $writter->writeClass();
+        $clazz = '\\'.$writter->getNamespace().'\\'.$writter->getName();
+        $this->assertTrue(class_exists($clazz));
+        $clazzObj = new $clazz();
+        $this->assertTrue($clazzObj instanceof AbstractJob);
+        $this->assertEquals(2, count($clazzObj->getArguments()));
+        $writter->removeClass();
     }
 }

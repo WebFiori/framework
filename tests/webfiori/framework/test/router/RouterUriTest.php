@@ -16,7 +16,7 @@ class RouterUriTest extends TestCase {
     public function testSetUriPossibleVar00() {
         $uri = new RouterUri('https://example.com/{first-var}', '');
         $uri->addVarValue('first-var', 'Hello World');
-        $this->assertEquals(['Hello World'], $uri->getVarValues('first-var'));
+        $this->assertEquals(['Hello World'], $uri->getParameterValues('first-var'));
         $this->assertEquals('/{first-var}', $uri->getPath());
         $this->assertEquals(['{first-var}'], $uri->getPathArray());
     }
@@ -26,7 +26,7 @@ class RouterUriTest extends TestCase {
     public function testSetUriPossibleVar01() {
         $uri = new RouterUri('https://example.com/{first-var}', '');
         $uri->addVarValue('  first-var  ', '  Hello World  ');
-        $this->assertEquals(['Hello World'], $uri->getVarValues('first-var'));
+        $this->assertEquals(['Hello World'], $uri->getParameterValues('first-var'));
     }
     /**
      * @test
@@ -34,7 +34,7 @@ class RouterUriTest extends TestCase {
     public function testSetUriPossibleVar02() {
         $uri = new RouterUri('https://example.com/{first-var}', '');
         $uri->addVarValues('first-var', ['Hello','World']);
-        $this->assertEquals(['Hello','World'], $uri->getVarValues('first-var'));
+        $this->assertEquals(['Hello','World'], $uri->getParameterValues('first-var'));
     }
     /**
      * @test
@@ -44,9 +44,9 @@ class RouterUriTest extends TestCase {
         $uri->addVarValues('first-var', ['Hello','World']);
         $uri->addVarValues('  second-var ', ['hell','is','not','heven']);
         $uri->addVarValues('  secohhnd-var ', ['hell','is']);
-        $this->assertEquals(['Hello','World'], $uri->getVarValues('first-var'));
-        $this->assertEquals(['hell','is','not','heven'], $uri->getVarValues('second-var'));
-        $this->assertEquals([], $uri->getVarValues('secohhnd-var'));
+        $this->assertEquals(['Hello','World'], $uri->getParameterValues('first-var'));
+        $this->assertEquals(['hell','is','not','heven'], $uri->getParameterValues('second-var'));
+        $this->assertEquals([], $uri->getParameterValues('secohhnd-var'));
     }
     /**
      * @test
@@ -365,7 +365,7 @@ class RouterUriTest extends TestCase {
         $uri = 'https://www3.programmingacademia.com:80/{some-var}/{x}/{some-var}';
         $uriObj = new RouterUri($uri, '');
         $this->assertEquals('/{some-var}/{x}/{some-var}',$uriObj->getPath());
-        $this->assertEquals(2,count($uriObj->getUriVars()));
+        $this->assertEquals(2,count($uriObj->getParameters()));
     }
     /**
      * @test

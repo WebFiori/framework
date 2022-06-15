@@ -193,14 +193,14 @@ class Router {
      * <ul>
      * <li><b>path</b>: The path part of the URI. For example, if the 
      * requested URI is 'http://www.example.com/user/ibrahim', the path 
-     * part of the URI is '/user/ibrahim'. It is possible to include variables 
-     * in the path. To include a variable in the path, its name must be enclosed 
-     * between {}. The value of the variable will be stored in either the array 
+     * part of the URI is '/user/ibrahim'. It is possible to include parameters 
+     * in the path. To include a parameter in the path, its name must be enclosed 
+     * between {}. The value of the parameter will be stored in either the array 
      * $_GET or $_POST after the requested URI is resolved. If we use the same 
      * example above to get any user profile, We would add the following as 
      * a path: 'user/{username}'. In this case, username will be available in 
      * $_GET['username']. Note that its possible to get the value of the 
-     * variable using the method <b>Router::<a href="#getVarValue">getVarValue()</a></b></li>
+     * parameter using the method <b>Router::<a href="#getParameterValue">getParameterValue()</a></b></li>
      * <li><b>route-to</b>: The path to the file that the route will point to. 
      * It can be any file in the scope of the variable ROOT_DIR.</li>
      * <li><b>as-api</b>: If this parameter is set to true, the route will be 
@@ -254,15 +254,15 @@ class Router {
      * <ul>
      * <li><b>path</b>: The path part of the URI. For example, if the 
      * requested URI is 'http://www.example.com/user/ibrahim', the path 
-     * part of the URI is '/user/ibrahim'. It is possible to include variables 
-     * in the path. To include a variable in the path, its name must be enclosed 
-     * between {}. The value of the variable will be stored in either the array 
+     * part of the URI is '/user/ibrahim'. It is possible to include parameters 
+     * in the path. To include a parameter in the path, its name must be enclosed 
+     * between {}. The value of the parameter will be stored in either the array 
      * $_GET or $_POST after the requested URI is resolved. If we use the same 
      * example above to get any user profile, We would add the following as 
      * a path: 'user/{username}'. In this case, username will be available in 
      * $_GET['username']. Note that its possible to get the value of the 
-     * variable using the method <b>Router::<a href="#getVarValue">getVarValue()</a></b>. 
-     * Note that for any route that points to a web services set, a variable which 
+     * parameter using the method <b>Router::<a href="#getParameterValue">getParameterValue()</a></b>. 
+     * Note that for any route that points to a web services set, a parameter which 
      * has the name 'service-name' must be added.</li>
      * <li><b>route-to</b>: The path to the API file. The root folder for 
      * all APIs is '/apis'. If the API name is 'get-user-profile.php', then the 
@@ -322,14 +322,14 @@ class Router {
      * <ul>
      * <li><b>path</b>: The path part of the URI. For example, if the 
      * requested URI is 'http://www.example.com/user/ibrahim', the path 
-     * part of the URI is '/user/ibrahim'. It is possible to include variables 
-     * in the path. To include a variable in the path, its name must be enclosed 
-     * between {}. The value of the variable will be stored in either the array 
+     * part of the URI is '/user/ibrahim'. It is possible to include parameters 
+     * in the path. To include a parameter in the path, its name must be enclosed 
+     * between {}. The value of the parameter will be stored in either the array 
      * $_GET or $_POST after the requested URI is resolved. If we use the same 
      * example above to get any user profile, We would add the following as 
      * a path: 'user/{username}'. In this case, username will be available in 
      * $_GET['username']. Note that its possible to get the value of the 
-     * variable using the method <b>Router::<a href="#getVarValue">getVarValue()</a></b></li>
+     * parameter using the method <b>Router::<a href="#getParameterValue">getParameterValue()</a></b></li>
      * <li><b>route-to</b>: A closure (A PHP function). </li>
      * <li><b>closure-params</b>: An array that contains values which 
      * can be passed to the closure.</li>
@@ -438,23 +438,23 @@ class Router {
         }
     }
     /**
-     * Returns the value of a variable which exist in the path part of the 
+     * Returns the value of a parameter which exist in the path part of the 
      * URI.
      * 
-     * @param string $varName The name of the variable. Note that it must 
+     * @param string $varName The name of the parameter. Note that it must 
      * not include braces.
      * 
      * @return string|null The method will return the value of the 
-     * variable if it was set. If it is not set or routing is still not yet 
+     * parameter if it was set. If it is not set or routing is still not yet 
      * happend, the method will return null.
      * 
      * @since 1.3.9
      */
-    public static function getVarValue(string $varName) {
+    public static function getParameterValue(string $varName) {
         $routeUri = self::getRouteUri();
 
         if ($routeUri instanceof RouterUri) {
-            return $routeUri->getUriVar($varName);
+            return $routeUri->getParameterValue($varName);
         }
 
         return null;
@@ -481,8 +481,8 @@ class Router {
      * If this method is called, a route in the form 'http://example.com/sitemam.xml'  
      * and in the form 'http://example.com/sitemam' will be created. 
      * The method will check all created routes objects and check if they 
-     * should be included in the site map. Note that if a URI has variables, it 
-     * will be not included unless possible values are given for the variable.
+     * should be included in the site map. Note that if a URI has parameters, it 
+     * will be not included unless possible values are given for the parameter.
      * 
      * @since 1.3.2
      */
@@ -549,9 +549,9 @@ class Router {
      * <ul>
      * <li><b>path</b>: The path part of the URI. For example, if the 
      * requested URI is 'http://www.example.com/user/ibrahim', the path 
-     * part of the URI is '/user/ibrahim'. It is possible to include variables 
-     * in the path. To include a variable in the path, its name must be enclosed 
-     * between {}. The value of the variable will be stored in either the array 
+     * part of the URI is '/user/ibrahim'. It is possible to include parameters 
+     * in the path. To include a parameter in the path, its name must be enclosed 
+     * between {}. The value of the parameter will be stored in either the array 
      * $_GET or $_POST after the requested URI is resolved. If we use the same 
      * example above to get any user profile, We would add the following as 
      * a path: 'user/{username}'. In this case, username will be available in 
@@ -706,7 +706,7 @@ class Router {
      * Returns an associative array that contains all routes.
      * 
      * The returned array will have two indices, 'static' and 'variable'. The 'static' 
-     * index will contain routes to resources at which they don't contain variables in 
+     * index will contain routes to resources at which they don't contain parameters in 
      * their path part. Each index of the two will have another sub associative array.
      * The indices of each sub array ill be URLs that represents the route and 
      * the value at each index will be an object of type 'RouterUri'. 
@@ -775,9 +775,9 @@ class Router {
      * <ul>
      * <li><b>path</b>: The path part of the URI. For example, if the 
      * requested URI is 'http://www.example.com/user/ibrahim', the path 
-     * part of the URI is '/user/ibrahim'. It is possible to include variables 
-     * in the path. To include a variable in the path, its name must be enclosed 
-     * between {}. The value of the variable will be stored in either the array 
+     * part of the URI is '/user/ibrahim'. It is possible to include parameters 
+     * in the path. To include a parameter in the path, its name must be enclosed 
+     * between {}. The value of the parameter will be stored in either the array 
      * $_GET or $_POST after the requested URI is resolved. If we use the same 
      * example above to get any user profile, We would add the following as 
      * a path: 'user/{username}'. In this case, username will be available in 
@@ -846,8 +846,8 @@ class Router {
      * <ul>
      * <li><b>path</b>: The path part of the URI (e.g. '/en/one/two'). If not 
      * given, the route will represents home page of the website. Its possible 
-     * to add variables to the path using this syntax: '/en/{var-one}/two/{var-two}'. 
-     * The value of the variable can be accessed later through the 
+     * to add parameters to the path using this syntax: '/en/{var-one}/two/{var-two}'. 
+     * The value of the parameter can be accessed later through the 
      * array $_GET or the array $_POST.</li>
      * <li><b>case-sensitive</b>: Make the URL case sensitive or not. 
      * If this one is set to false, then if a request is made to the URL 'https://example.com/one/two',
@@ -954,7 +954,7 @@ class Router {
                 $routeUri->addMiddleware($mwName);
             }
 
-            if ($routeUri->hasVars()) {
+            if ($routeUri->hasParameters()) {
                 $this->routes['variable'][$path] = $routeUri;
             } else {
                 $this->routes['static'][$path] = $routeUri;
@@ -1281,14 +1281,14 @@ class Router {
             $path = strtolower($path);
         }
 
-        if ($uriObj->hasVars()) {
+        if ($uriObj->hasParameters()) {
             return isset($this->routes['variable'][$path]);
         } else {
             return isset($this->routes['static'][$path]);
         }
     }
     /**
-     * Checks if a directory name is a variable or not.
+     * Checks if a directory name is a parameter or not.
      * 
      * @param type $dir
      * 
@@ -1380,11 +1380,11 @@ class Router {
             if ($routeUri->hasWWW() && defined('NO_WWW') && NO_WWW === true) {
                 $this->redirectToNonWWW($routeUri);
             }
-            //first, search for the URI wuthout checking variables
+            //first, search for the URI wuthout checking parameters
             if ($this->_searchRoute($routeUri, $uri, $loadResource)) {
                 return;
             }
-            //if no route found, try to replace variables with values 
+            //if no route found, try to replace parameters with values 
             //note that query string vars are optional.
             if ($this->_searchRoute($routeUri, $uri, $loadResource, true)) {
                 return;
@@ -1527,7 +1527,7 @@ class Router {
             foreach ($this->routes['variable'] as $route) {
                 $this->_setUriVars($route, $pathArray, $requestMethod);
 
-                if ($route->isAllVarsSet() && $route->setRequestedUri($uri)) {
+                if ($route->isAllParametersSet() && $route->setRequestedUri($uri)) {
                     $this->_routeFound($route, $loadResource);
 
                     return true;
@@ -1568,7 +1568,7 @@ class Router {
             for ($x = 0 ; $x < $pathVarsCount ; $x++) {
                 if ($this->_isDirectoryAVar($routePathArray[$x])) {
                     $varName = trim($routePathArray[$x], '{}');
-                    $uriRouteObj->setUriVar($varName, $requestedPathArr[$x]);
+                    $uriRouteObj->setParameterValue($varName, $requestedPathArr[$x]);
 
                     if ($requestMethod == 'POST' || $requestMethod == 'PUT') {
                         $_POST[$varName] = filter_var(urldecode($requestedPathArr[$x]));

@@ -50,11 +50,16 @@ class CreateTableObj extends CreateClassHelper {
         if ($this->confirm('Would you like to add foreign keys to the table?', false)) {
             $tableHelper->addForeignKeys();
         }
-
+        
+        $withEntity = false;
         if ($this->confirm('Would you like to create an entity class that maps to the database table?', false)) {
             $tableHelper->createEntity();
+            $withEntity = true;
         }
         
         $this->writeClass();
+        if ($withEntity) {
+            $this->info('Entity class was created at "'.$this->getWriter()->getEntityPath().'".');
+        }
     }
 }

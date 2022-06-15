@@ -138,10 +138,34 @@ class TableObjHelper {
             if (!($type == 'bool' || $type == 'boolean')) {
                 $colObj->setIsUnique($helper->confirm('Is this column unique?', false));
             }
-            $this->_setDefaultValue($colObj);
+            $this->setDefaultValue($colObj);
             $colObj->setIsNull($helper->confirm('Can this column have null values?', false));
         } else if ($colObj->getDatatype() == 'int' && $colObj instanceof MySQLColumn) {
             $colObj->setIsAutoInc($helper->confirm('Is this column auto increment?', false));
+        }
+    }
+    /**
+     * 
+     * @param Column $colObj
+     */
+    private function setDefaultValue($colObj) {
+        $helper = $this->getCreateHelper();
+        if ($colObj->getDatatype() == 'bool' || $colObj->getDatatype() == 'boolean') {
+            $defaultVal = $helper->getInput('Enter default value (true or false) (Hit "Enter" to skip):', '');
+
+            if ($defaultVal == 'true') {
+                $colObj->setDefault(true);
+            } else {
+                if ($defaultVal == 'false') {
+                    $colObj->setDefault(false);
+                }
+            }
+        } else {
+            $defaultVal = $helper->getInput('Enter default value (Hit "Enter" to skip):', '');
+
+            if (strlen($defaultVal) != 0) {
+                $colObj->setDefault($defaultVal);
+            }
         }
     }
     /**

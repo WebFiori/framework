@@ -42,7 +42,7 @@ class CreateCommandTest extends TestCase {
             "8: Quit. <--\n",
             "Enter a name for the new class:\n",
             "Enter an optional namespace for the class: Enter = \"app\jobs\"\n",
-            "Where would you like to store the ". "class? (must be a directory inside '".ROOT_DIR."') Enter ="." \"app\jobs\"\n",
+            "Where would you like to store the class? (must be a directory inside '".ROOT_DIR."') Enter ="." \"app\jobs\"\n",
             "Enter a name for the job:\n",
             "Provide short description of what does the job will do:\n",
             "Would you like to add arguments to the job?(y/N)\n",
@@ -51,83 +51,8 @@ class CreateCommandTest extends TestCase {
         $this->assertTrue(class_exists('\\app\\jobs\\SuperCoolJob'));
         $this->removeClass('\\app\\jobs\\SuperCoolJob');
     }
-    /**
-     * @test
-     */
-    public function testCreateTable00() {
-        Runner::setInputStream(new ArrayInputStream([
-            '0',
-            'mysql',
-            'Cool00Table',
-            '',
-            '',
-            'cool_table_00',
-            'This is the first cool table that was created using CLI.',
-            'id',
-            '1',
-            '11',
-            'y',
-            'y',
-            'The unique ID of the cool thing.',
-            'n',
-            'n',
-            'n'
-        ]));
-        Runner::setOutputStream(new ArrayOutputStream());
-        $this->assertEquals(0, Runner::runCommand(new CreateCommand()));
-        $this->assertTrue(class_exists('\\app\\database\\Cool00Table'));
-        $this->removeClass('\\app\\database\\Cool00Table');
-        $this->assertEquals([
-            "What would you like to create?\n",
-            "0: Database table class.\n",
-            "1: Entity class from table.\n",
-            "2: Web service.\n",
-            "3: Background job.\n",
-            "4: Middleware.\n",
-            "5: Database table from class.\n",
-            "6: CLI Command.\n",
-            "7: Theme.\n",
-            "8: Quit. <--\n",
-            "Database type:\n",
-            "0: mysql\n",
-            "1: mssql\n",
-            "Enter a name for the new class:\n",
-            "Enter an optional namespace for the class: Enter = \"app\database\"\n",
-            "Where would you like to store the ". "class? (must be a directory inside '".ROOT_DIR."') Enter ="." \"app\database\"\n",
-            "Enter database table name:\n",
-            "Enter your optional comment about the table:\n",
-            "Now you have to add columns to the table.\n",
-            "Enter a name for column key:\n",
-            "Column data type:\n",
-            "0: char <--\n",
-            "1: int\n",
-            "2: varchar\n",
-            "3: timestamp\n",
-            "4: tinyblob\n",
-            "5: blob\n",
-            "6: mediumblob\n",
-            "7: longblob\n",
-            "8: datetime\n",
-            "9: text\n",
-            "10: mediumtext\n",
-            "11: decimal\n",
-            "12: double\n",
-            "13: float\n",
-            "14: boolean\n", 
-            "15: bool\n",
-            "16: bit\n",
-            "Enter column size:\n",
-            "Is this column primary?(y/N)\n",
-            "Is this column auto increment?(y/N)\n",
-            "Enter your optional comment about the column:\n",
-            "Success: Column added.\n",
-            "Would you like to add another column?(y/N)\n",
-            "Would you like to add foreign keys to the table?(y/N)\n",
-            "Would you like to create an entity class that maps to the database table?(y/N)\n",
-            'Info: New class was created at "'.ROOT_DIR.DS.'app'.DS."database\".\n",
-        ], Runner::getOutputStream()->getOutputArray());
-        
-    }
+    
+    
     /**
      * @test
      */

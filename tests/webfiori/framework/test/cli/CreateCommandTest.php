@@ -203,7 +203,6 @@ class CreateCommandTest extends TestCase {
             '7',
             'NewTest',
             'themes\\fiori',
-            'themes\\fiori',
             '',
         ]));
         Runner::setOutputStream(new ArrayOutputStream());
@@ -221,7 +220,6 @@ class CreateCommandTest extends TestCase {
             "8: Quit. <--\n",
             "Enter a name for the new class:\n",
             "Enter an optional namespace for the class: Enter = \"themes\"\n",
-            "Where would you like to store the ". "class? (must be a directory inside '".ROOT_DIR."') Enter ="." \"themes\\fiori\"\n",
             'Creating theme at "'.ROOT_DIR.DS.'themes'.DS."fiori\"...\n",
             'Info: New class was created at "'.ROOT_DIR.DS.'themes'.DS."fiori\".\n",
         ], Runner::getOutputStream()->getOutputArray());

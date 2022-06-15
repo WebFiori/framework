@@ -71,7 +71,7 @@ class TableObjHelper {
         $helper = $this->getCreateHelper();
         $entityInfo = $helper->getClassInfo(APP_DIR_NAME.'\\entity');
         $entityInfo['implement-jsoni'] = $helper->confirm('Would you like from your entity class to implement the interface JsonI?', true);
-        $helper->getWriter()->setEntityInfo($entityInfo);
+        $helper->getWriter()->setEntityInfo($entityInfo['name'], $entityInfo['namespace'], $entityInfo['path'], $entityInfo['implement-jsoni']);
 
         if ($helper->confirm('Would you like to add extra attributes to the entity?', false)) {
             $addExtra = true;

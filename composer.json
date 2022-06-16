@@ -1,6 +1,11 @@
 {
     "name": "webfiori/framework",
     "description": "WebFiori framework. Made to make the web bloom.",
+    "homepage": "https://webfiori.com",
+    "support": {
+        "issues": "https://github.com/webfiori/framework/issues",
+        "source": "https://github.com/webfior/framework"
+    },
     "authors": [
         {
             "name": "Ibrahim BinAlshikh",

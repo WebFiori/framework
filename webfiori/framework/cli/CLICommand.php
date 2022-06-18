@@ -1172,7 +1172,7 @@ abstract class CLICommand {
     private function _printChoices($choices, $default) {
         $index = 0;
         foreach ($choices as $choiceTxt) {
-            if ($index == $default) {
+            if ($default !== null && $index == $default) {
                 $this->prints($index.": ".$choiceTxt, [
                     'color' => 'light-blue',
                     'bold' => 'true'

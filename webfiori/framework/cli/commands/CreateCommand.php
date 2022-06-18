@@ -43,7 +43,12 @@ use webfiori\framework\cli\helpers\CreateWebService;
  */
 class CreateCommand extends CLICommand {
     public function __construct() {
-        parent::__construct('create', [], 'Creates a system entity (middleware, web service, background process ...).');
+        parent::__construct('create', [
+            '--c' => [
+                'optional' => true,
+                'description' => 'What will be created. Possible values: table'
+            ]
+        ], 'Creates a system entity (middleware, web service, background process ...).');
     }
 
     public function _createEntityFromQuery() {

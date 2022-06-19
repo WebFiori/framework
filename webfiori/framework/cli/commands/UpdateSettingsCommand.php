@@ -18,45 +18,62 @@ use webfiori\framework\WebFioriApp;
  */
 class UpdateSettingsCommand extends CLICommand {
     public function __construct() {
-        parent::__construct('update-settings', [], 'Update application settings which are stored in the class "AppConfig".');
+        parent::__construct('update-settings', [
+            
+        ], 'Update application settings which are stored in the class "AppConfig".');
     }
     public function exec() : int {
         $options = [
-            'Update application version info.',
-            'Update application name.',
-            'Update CRON password.',
-            'Update default page title.',
-            'Update default page description.',
-            'Change primary language.',
-            'Change title separator.',
-            'Set home page.',
-            'Set primay theme.',
-            'Set admin theme.',
+            'version' => 'Update application version info.',
+            'app-name' => 'Update application name.',
+            'cron-pass' => 'Update CRON password.',
+            'page-title' => 'Update default page title.',
+            'page-description' => 'Update default page description.',
+            'primary-lang' => 'Change primary language.',
+            'title-sep' => 'Change title separator.',
+            'home-page' => 'Set home page.',
+            'primary-theme' => 'Set primay theme.',
+            'admin-theme' => 'Set admin theme.',
             'Quit.'
         ];
-        $whatToUpdate = $this->select('What would you like to update?', $options, count($options) - 1);
+        
+        $what = $this->getArgValue('--w');
+        $answer = null;
+        if ($what !== null) {
+            $answer = isset($options[$what]) ? $options[$what] : null;
+            
+            if ($answer === null) {
+                $this->warning('The argument --w has invalid value.');
+            }
+        }
+        
+        
+        
+        if ($answer === null) {
+            $answer = $this->select('What would you like to update?', $options, count($options) - 1);
+        }
 
-        if ($whatToUpdate == 'Quit.') {
+        if ($answer == 'Quit.') {
             return 0;
-        } else if ($whatToUpdate == 'Update application name.') {
+        } else if ($answer == 'Update application name.') {
             $this->_updateName();
-        } else if ($whatToUpdate == 'Update default page title.') {
+        } else if ($answer == 'Update default page title.') {
             $this->_updateTitle();
-        } else if ($whatToUpdate == 'Update CRON password.') {
+        } else if ($answer == 'Update CRON password.') {
             $this->_updateCronPass();
-        } else if ($whatToUpdate == 'Change title separator.') {
+        } else if ($answer == 'Change title separator.') {
             $this->_updateTitleSep();
-        } else if ($whatToUpdate == 'Update default page description.') {
+        } else if ($answer == 'Update default page description.') {
             $this->_updateDescription();
-        } else if ($whatToUpdate == 'Change primary language.') {
+        } else if ($answer == 'Change primary language.') {
             $this->_updatePrimaryLang();
-        } else if ($whatToUpdate == 'Set primay theme.') {
+        } else if ($answer == 'Set primay theme.') {
             $this->_setPrimaryTheme();
-        } else if ($whatToUpdate == 'Set admin theme.') {
+        } else if ($answer == 'Set admin theme.') {
             $this->_setAdminTheme();
-        } else if ($whatToUpdate == 'Set home page.') {
+        } else if ($answer == 'Set home page.') {
             $this->_setHome();
-        } else if ($whatToUpdate == 'Update application version info.') {
+        } else if ($answer == 'Update application version info.') {
             $this->_updateVersionInfo();
         } else {
             $this->println('Not implemented yet.');

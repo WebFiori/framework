@@ -16,6 +16,48 @@ class CreateCommandTest extends TestCase {
     /**
      * @test
      */
+    public function testCreate00() {
+        Runner::setInputStream(new ArrayInputStream([
+            '7',
+        ]));
+        Runner::setOutputStream(new ArrayOutputStream());
+        $this->assertEquals(0, Runner::runCommand(new CreateCommand()));
+        $this->assertEquals([
+            "What would you like to create?\n",
+            "0: Database table class.\n",
+            "1: Entity class from table.\n",
+            "2: Web service.\n",
+            "3: Background job.\n",
+            "4: Middleware.\n",
+            "5: CLI Command.\n",
+            "6: Theme.\n",
+            "7: Quit. <--\n",
+        ], Runner::getOutputStream()->getOutputArray());
+    }
+    /**
+     * @test
+     */
+    public function testCreate01() {
+        Runner::setInputStream(new ArrayInputStream([
+            '',
+        ]));
+        Runner::setOutputStream(new ArrayOutputStream());
+        $this->assertEquals(0, Runner::runCommand(new CreateCommand()));
+        $this->assertEquals([
+            "What would you like to create?\n",
+            "0: Database table class.\n",
+            "1: Entity class from table.\n",
+            "2: Web service.\n",
+            "3: Background job.\n",
+            "4: Middleware.\n",
+            "5: CLI Command.\n",
+            "6: Theme.\n",
+            "7: Quit. <--\n",
+        ], Runner::getOutputStream()->getOutputArray());
+    }
+    /**
+     * @test
+     */
     public function testCreateBackgroundJob00() {
         Runner::setInputStream(new ArrayInputStream([
             '3',
@@ -35,10 +77,9 @@ class CreateCommandTest extends TestCase {
             "2: Web service.\n",
             "3: Background job.\n",
             "4: Middleware.\n",
-            "5: Database table from class.\n",
-            "6: CLI Command.\n",
-            "7: Theme.\n",
-            "8: Quit. <--\n",
+            "5: CLI Command.\n",
+            "6: Theme.\n",
+            "7: Quit. <--\n",
             "Enter a name for the new class:\n",
             "Enter an optional namespace for the class: Enter = \"app\jobs\"\n",
             "Enter a name for the job:\n",
@@ -73,10 +114,9 @@ class CreateCommandTest extends TestCase {
             "2: Web service.\n",
             "3: Background job.\n",
             "4: Middleware.\n",
-            "5: Database table from class.\n",
-            "6: CLI Command.\n",
-            "7: Theme.\n",
-            "8: Quit. <--\n",
+            "5: CLI Command.\n",
+            "6: Theme.\n",
+            "7: Quit. <--\n",
             "Enter a name for the new class:\n",
             "Enter an optional namespace for the class: Enter = \"app\middleware\"\n",
             "Enter a name for the middleware:\n",
@@ -92,7 +132,7 @@ class CreateCommandTest extends TestCase {
      */
     public function testCreateCommand00() {
         Runner::setInputStream(new ArrayInputStream([
-            '6',
+            '5',
             'NewCLI',
             'app\commands',
             'print-hello',
@@ -109,10 +149,9 @@ class CreateCommandTest extends TestCase {
             "2: Web service.\n",
             "3: Background job.\n",
             "4: Middleware.\n",
-            "5: Database table from class.\n",
-            "6: CLI Command.\n",
-            "7: Theme.\n",
-            "8: Quit. <--\n",
+            "5: CLI Command.\n",
+            "6: Theme.\n",
+            "7: Quit. <--\n",
             "Enter a name for the new class:\n",
             "Enter an optional namespace for the class: Enter = \"app\commands\"\n",
             "Enter a name for the command:\n",
@@ -149,10 +188,9 @@ class CreateCommandTest extends TestCase {
             "2: Web service.\n",
             "3: Background job.\n",
             "4: Middleware.\n",
-            "5: Database table from class.\n",
-            "6: CLI Command.\n",
-            "7: Theme.\n",
-            "8: Quit. <--\n",
+            "5: CLI Command.\n",
+            "6: Theme.\n",
+            "7: Quit. <--\n",
             "Enter a name for the new class:\n",
             "Enter an optional namespace for the class: Enter = \"app\apis\"\n",
             "Enter a name for the new web service:\n",
@@ -192,7 +230,7 @@ class CreateCommandTest extends TestCase {
      */
     public function testCreateTheme00() {
         Runner::setInputStream(new ArrayInputStream([
-            '7',
+            '6',
             'NewTest',
             'themes\\fiori',
             '',
@@ -206,10 +244,9 @@ class CreateCommandTest extends TestCase {
             "2: Web service.\n",
             "3: Background job.\n",
             "4: Middleware.\n",
-            "5: Database table from class.\n",
-            "6: CLI Command.\n",
-            "7: Theme.\n",
-            "8: Quit. <--\n",
+            "5: CLI Command.\n",
+            "6: Theme.\n",
+            "7: Quit. <--\n",
             "Enter a name for the new class:\n",
             "Enter an optional namespace for the class: Enter = \"themes\"\n",
             'Creating theme at "'.ROOT_DIR.DS.'themes'.DS."fiori\"...\n",

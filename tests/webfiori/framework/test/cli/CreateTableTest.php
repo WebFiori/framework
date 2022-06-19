@@ -21,7 +21,6 @@ class CreateTableTest extends TestCase {
      */
     public function testCreateTable00() {
         Runner::setInputStream(new ArrayInputStream([
-            '0',
             'mysql',
             'Cool00Table',
             '',
@@ -38,7 +37,9 @@ class CreateTableTest extends TestCase {
             'n'
         ]));
         Runner::setOutputStream(new ArrayOutputStream());
-        $this->assertEquals(0, Runner::runCommand(new CreateCommand()));
+        $this->assertEquals(0, Runner::runCommand(new CreateCommand(), [            
+            '--c' => 'table'        
+        ]));
         $this->assertTrue(class_exists('\\app\\database\\Cool00Table'));
         $clazz = '\\app\\database\\Cool00Table';
         $this->removeClass($clazz);
@@ -55,16 +56,6 @@ class CreateTableTest extends TestCase {
         ], $testObj->getColsNames());
         
         $this->assertEquals([
-            "What would you like to create?\n",
-            "0: Database table class.\n",
-            "1: Entity class from table.\n",
-            "2: Web service.\n",
-            "3: Background job.\n",
-            "4: Middleware.\n",
-            "5: Database table from class.\n",
-            "6: CLI Command.\n",
-            "7: Theme.\n",
-            "8: Quit. <--\n",
             "Database type:\n",
             "0: mysql\n",
             "1: mssql\n",
@@ -109,7 +100,6 @@ class CreateTableTest extends TestCase {
      */
     public function testCreateTable01() {
         Runner::setInputStream(new ArrayInputStream([
-            '0',
             'mssql',
             'Cool01Table',
             '',
@@ -124,7 +114,9 @@ class CreateTableTest extends TestCase {
             'n'
         ]));
         Runner::setOutputStream(new ArrayOutputStream());
-        $this->assertEquals(0, Runner::runCommand(new CreateCommand()));
+        $this->assertEquals(0, Runner::runCommand(new CreateCommand(), [            
+            '--c' => 'table'        
+        ]));
         $clazz = '\\app\\database\\Cool01Table';
         $this->assertTrue(class_exists($clazz));
         $this->removeClass($clazz);
@@ -141,16 +133,6 @@ class CreateTableTest extends TestCase {
         ], $testObj->getColsNames());
         
         $this->assertEquals([
-            "What would you like to create?\n",
-            "0: Database table class.\n",
-            "1: Entity class from table.\n",
-            "2: Web service.\n",
-            "3: Background job.\n",
-            "4: Middleware.\n",
-            "5: Database table from class.\n",
-            "6: CLI Command.\n",
-            "7: Theme.\n",
-            "8: Quit. <--\n",
             "Database type:\n",
             "0: mysql\n",
             "1: mssql\n",
@@ -192,7 +174,6 @@ class CreateTableTest extends TestCase {
      */
     public function testCreateTable03() {
         Runner::setInputStream(new ArrayInputStream([
-            '0',
             'mysql',
             'Cool01Table',
             '',
@@ -233,7 +214,9 @@ class CreateTableTest extends TestCase {
             'n'
         ]));
         Runner::setOutputStream(new ArrayOutputStream());
-        $this->assertEquals(0, Runner::runCommand(new CreateCommand()));
+        $this->assertEquals(0, Runner::runCommand(new CreateCommand(), [            
+            '--c' => 'table'        
+        ]));
         $output = Runner::getOutputStream()->getOutputArray();
         $this->assertTrue(class_exists('\\app\\database\\Cool03Table'));
         $clazz = '\\app\\database\\Cool03Table';
@@ -255,16 +238,6 @@ class CreateTableTest extends TestCase {
         ], $testObj->getColsNames());
         
         $this->assertEquals([
-            "What would you like to create?\n",
-            "0: Database table class.\n",
-            "1: Entity class from table.\n",
-            "2: Web service.\n",
-            "3: Background job.\n",
-            "4: Middleware.\n",
-            "5: Database table from class.\n",
-            "6: CLI Command.\n",
-            "7: Theme.\n",
-            "8: Quit. <--\n",
             "Database type:\n",
             "0: mysql\n",
             "1: mssql\n",
@@ -365,7 +338,6 @@ class CreateTableTest extends TestCase {
      */
     public function testCreateTable02() {
         Runner::setInputStream(new ArrayInputStream([
-            '0',
             'mysql',
             'Cool02Table',
             '',
@@ -396,7 +368,9 @@ class CreateTableTest extends TestCase {
             'n'
         ]));
         Runner::setOutputStream(new ArrayOutputStream());
-        $this->assertEquals(0, Runner::runCommand(new CreateCommand()));
+        $this->assertEquals(0, Runner::runCommand(new CreateCommand(), [            
+            '--c' => 'table'        
+        ]));
         $output = Runner::getOutputStream()->getOutputArray();
         $this->assertTrue(class_exists('\\app\\database\\Cool02Table'));
         $clazz = '\\app\\database\\Cool02Table';
@@ -416,16 +390,6 @@ class CreateTableTest extends TestCase {
         ], $testObj->getColsNames());
         
         $this->assertEquals([
-            "What would you like to create?\n",
-            "0: Database table class.\n",
-            "1: Entity class from table.\n",
-            "2: Web service.\n",
-            "3: Background job.\n",
-            "4: Middleware.\n",
-            "5: Database table from class.\n",
-            "6: CLI Command.\n",
-            "7: Theme.\n",
-            "8: Quit. <--\n",
             "Database type:\n",
             "0: mysql\n",
             "1: mssql\n",
@@ -501,7 +465,6 @@ class CreateTableTest extends TestCase {
      */
     public function testCreateTable04() {
         Runner::setInputStream(new ArrayInputStream([
-            '0',
             'mysql',
             'CoolWithEntity00Table',
             '',
@@ -522,7 +485,9 @@ class CreateTableTest extends TestCase {
             'n'
         ]));
         Runner::setOutputStream(new ArrayOutputStream());
-        $this->assertEquals(0, Runner::runCommand(new CreateCommand()));
+        $this->assertEquals(0, Runner::runCommand(new CreateCommand(), [            
+            '--c' => 'table'        
+        ]));
         $output = Runner::getOutputStream()->getOutputArray();
         $this->removeClass('\\app\\database\\CoolWithEntity00Table');
         $clazz = '\\app\\entity\\MySuperCoolEntity00';
@@ -530,16 +495,6 @@ class CreateTableTest extends TestCase {
         $this->removeClass($clazz);
         
         $this->assertEquals([
-            "What would you like to create?\n",
-            "0: Database table class.\n",
-            "1: Entity class from table.\n",
-            "2: Web service.\n",
-            "3: Background job.\n",
-            "4: Middleware.\n",
-            "5: Database table from class.\n",
-            "6: CLI Command.\n",
-            "7: Theme.\n",
-            "8: Quit. <--\n",
             "Database type:\n",
             "0: mysql\n",
             "1: mssql\n",
@@ -583,6 +538,165 @@ class CreateTableTest extends TestCase {
             'Info: Entity class was created at "'.ROOT_DIR.DS.'app'.DS."entity\".\n",
         ], $output);
         
+    }
+    /**
+     * @test
+     */
+    public function testCreateTable05() {
+        Runner::setInputStream(new ArrayInputStream([
+            'mysql',
+            'Cool05Table',
+            '',
+            'cool_table_05',
+            'This is the first cool table that was created using CLI.',
+            'id',
+            '1',
+            '11',
+            'y',
+            'y',
+            'The unique ID of the cool thing.',
+            'n',
+            'n',
+            'n'
+        ]));
+        Runner::setOutputStream(new ArrayOutputStream());
+        $this->assertEquals(0, Runner::runCommand(new CreateCommand(), [            
+            '--c' => 'table'        
+        ]));
+        $clazz = '\\app\\database\\Cool05Table';
+        $this->assertTrue(class_exists($clazz));
+        return $clazz;
+    }
+    /**
+     * @test
+     * @depends testCreateTable05
+     */
+    public function testCreateTable06($refTable) {
+        Runner::setInputStream(new ArrayInputStream([
+            'mysql',
+            'Cool06Table',
+            '',
+            'cool_table_06',
+            '',
+            'id',
+            '1',
+            '11',
+            'y',
+            'n',
+            'The unique ID of the cool thing.',
+            'y',
+            'ref-id',
+            '1',
+            '11',
+            'y',
+            'n',
+            'no comment',
+            'n',
+            'y',
+            $refTable,
+            'ref_table_fk',
+            'ref-id',
+            'n',
+            '0',
+            '0',
+            '0',
+            'n',
+            'n'
+        ]));
+        Runner::setOutputStream(new ArrayOutputStream());
+        $this->assertEquals(0, Runner::runCommand(new CreateCommand(), [
+            '--c' => 'table'
+        ]));
+        $output = Runner::getOutputStream()->getOutputArray();
+        $clazz = '\\app\\database\\Cool06Table';
+        $this->assertTrue(class_exists($clazz));
+        $this->removeClass($clazz);
+        $this->removeClass($refTable);
+        $this->assertEquals([
+            "Database type:\n",
+            "0: mysql\n",
+            "1: mssql\n",
+            "Enter a name for the new class:\n",
+            "Enter an optional namespace for the class: Enter = \"app\database\"\n",
+            "Enter database table name:\n",
+            "Enter your optional comment about the table:\n",
+            "Now you have to add columns to the table.\n",
+            "Enter a name for column key:\n",
+            "Column data type:\n",
+            "0: char <--\n",
+            "1: int\n",
+            "2: varchar\n",
+            "3: timestamp\n",
+            "4: tinyblob\n",
+            "5: blob\n",
+            "6: mediumblob\n",
+            "7: longblob\n",
+            "8: datetime\n",
+            "9: text\n",
+            "10: mediumtext\n",
+            "11: decimal\n",
+            "12: double\n",
+            "13: float\n",
+            "14: boolean\n", 
+            "15: bool\n",
+            "16: bit\n",
+            "Enter column size:\n",
+            "Is this column primary?(y/N)\n",
+            "Is this column auto increment?(y/N)\n",
+            "Enter your optional comment about the column:\n",
+            "Success: Column added.\n",
+            "Would you like to add another column?(y/N)\n",
+            "Enter a name for column key:\n",
+            "Column data type:\n",
+            "0: char <--\n",
+            "1: int\n",
+            "2: varchar\n",
+            "3: timestamp\n",
+            "4: tinyblob\n",
+            "5: blob\n",
+            "6: mediumblob\n",
+            "7: longblob\n",
+            "8: datetime\n",
+            "9: text\n",
+            "10: mediumtext\n",
+            "11: decimal\n",
+            "12: double\n",
+            "13: float\n",
+            "14: boolean\n", 
+            "15: bool\n",
+            "16: bit\n",
+            "Enter column size:\n",
+            "Is this column primary?(y/N)\n",
+            "Is this column auto increment?(y/N)\n",
+            "Enter your optional comment about the column:\n",
+            "Success: Column added.\n",
+            "Would you like to add another column?(y/N)\n",
+            "Would you like to add foreign keys to the table?(y/N)\n",
+            "Enter the name of the referenced table class (with namespace):\n",
+            "Enter a name for the foreign key:\n",
+            "Select column #1:\n",
+            "0: id\n",
+            "1: ref-id\n",
+            "Would you like to add another column to the foreign key?(y/N)\n",
+            "Select the column that will be referenced by the column 'ref-id':\n",
+            "0: id\n",
+            "Choose on update condition:\n",
+            "0: cascade\n",
+            "1: restrict <--\n",
+            "2: set null\n",
+            "3: set default\n",
+            "4: no action\n",
+            "Choose on delete condition:\n",
+            "0: cascade\n",
+            "1: restrict <--\n",
+            "2: set null\n",
+            "3: set default\n",
+            "4: no action\n",
+            "Success: Foreign key added.\n",
+            "Would you like to add another foreign key?(y/N)\n",
+            "Would you like to create an entity class that maps to the database table?(y/N)\n",
+            'Info: New class was created at "'.ROOT_DIR.DS.'app'.DS."database\".\n",
+        ], $output);
     }
     private function removeClass($classPath) {
         $file = new File(ROOT_DIR.$classPath.'.php');

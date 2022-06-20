@@ -19,7 +19,13 @@ use webfiori\framework\WebFioriApp;
 class UpdateSettingsCommand extends CLICommand {
     public function __construct() {
         parent::__construct('update-settings', [
-            
+            '--w' => [
+                'description' => 'An argument which is used to indicate what will be updated. '
+                . 'Possible values are: version, app-name, cron-pass, page-title, '
+                . 'page-description, primary-lang, title-sep, home-page, primary-theme,'
+                . 'admin-theme.',
+                'optional' => true
+            ]
         ], 'Update application settings which are stored in the class "AppConfig".');
     }
     public function exec() : int {

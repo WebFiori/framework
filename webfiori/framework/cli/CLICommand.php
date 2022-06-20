@@ -518,7 +518,15 @@ abstract class CLICommand {
      * @return int
      */
     public function readInteger(string $prompt, int $default = null) : int {
-        return intval($this->getInput($prompt, $default));
+        $isInt = false;
+        do {
+            $val = $this->getInput($prompt, $default);
+            $isInt = $this->isInt($val);
+            if (!$isInt) {
+                $this->error('Provided value is not an integer!');
+            }
+        } while (!$isInt);
+        return intval($val);
     }
     /**
      * Reads a value as float.
@@ -1110,6 +1118,7 @@ abstract class CLICommand {
         return true;
     }
     private function _checkSelectedChoice($choices, $defaultIndex, $input) {
+        
         if (in_array($input, $choices)) {
             //Given input is exactly same as one of choices
             return $input;
@@ -1123,9 +1132,10 @@ abstract class CLICommand {
                 }
                 $index++;
             }
-        } else if (strlen($input) != 0) {
+        } else if ($this->isInt($input)) {
             //Selected option is an index. Search for it and return its value.
             $index = 0;
+            
             foreach ($choices as $choice) {
                 if ($index == $input) {
                     return $choice;
@@ -1136,7 +1146,18 @@ abstract class CLICommand {
             $this->error('Invalid answer.');
         }
     }
-    
+    private function isInt(string $val) : bool {
+        $len = strlen($val);
+        if ($len == 0) {
+            return false;
+        }
+        $isNum = true;
+        for ($x = 0 ; $x < $len ; $x++) {
+            $char = $val[$x];
+            $isNum = $char >= '0' && $char <= '9';
+        }
+        return $isNum;
+    }
     private function _createPassArray($string, array $args) {
         $retVal = [$string];
 

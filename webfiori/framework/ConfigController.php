@@ -379,7 +379,7 @@ class ConfigController {
         $this->a($cFile, "", 3);
         $this->a($cFile, "}", 1);
         $this->a($cFile, "}");
-        
+        $cFile->create(true);
         $cFile->write();
         require_once ROOT_DIR.DS.APP_DIR_NAME.DS.'ini'.DS."$className.php";
     }
@@ -413,6 +413,7 @@ class ConfigController {
         $this->a($cFile, "        //TODO: Add your own routes here.");
         $this->a($cFile, $this->blockEnd, 1);
         $this->a($cFile, "}");
+        $cFile->create(true);
         $cFile->write();
         require_once $cFile->getAbsolutePath();
     }
@@ -1220,7 +1221,7 @@ class ConfigController {
         $this->_writeAppVersionInfo($cFile);
 
         $this->a($cFile, "}");
-        $cFile->create();
+        $cFile->create(true);
         $cFile->write();
         require_once ROOT_DIR.DS.APP_DIR_NAME.DS.'AppConfig.php';
     }

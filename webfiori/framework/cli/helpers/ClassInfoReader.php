@@ -34,29 +34,13 @@ class ClassInfoReader {
         return $this->ownerCommand;
     }
     /**
-     * Reads and returns a string that represents the location at which the class will be
-     * created at.
-     * 
-     * @param string $default A default value for the path.
-     * 
-     * @return string A string that represents the location at which the class will be
-     * created at.
+     * Constructs class path based on its namespace.
      */
-    public function getPath($default) {
-        $validPath = false;
-
-        do {
-            clearstatcache();
-            $path = $this->getOwner()->getInput("Where would you like to store the class? (must be a directory inside '".ROOT_DIR."')", $default);
-            $fixedPath = ROOT_DIR.DS.trim(trim(str_replace('\\', DS, str_replace('/', DS, $path)),'/'),'\\');
-
-            if (Util::isDirectory($fixedPath, true)) {
-                $validPath = true;
-            } else {
-                $this->getOwner()->error('Provided direcory is not a directory or it does not exist.');
-            }
-        } while (!$validPath);
-
+    private function getPath($default) {
+        $fixedPath = ROOT_DIR.DS.trim(trim(str_replace('\\', DS, str_replace('/', DS, $default)),'/'),'\\');
+        if (!Util::isDirectory($fixedPath, true)) {
+            throw new \InvalidArgumentException("Unable to create class at $default");
+        }
         return $fixedPath;
     }
     /**

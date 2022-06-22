@@ -9,6 +9,7 @@ use webfiori\database\mssql\MSSQLColumn;
 use webfiori\framework\AutoLoader;
 use webfiori\database\Column;
 use webfiori\framework\DB;
+use webfiori\database\mysql\MySQLTable;
 
 /**
  * A class which contains static methods which is used to create/modify tables.
@@ -52,7 +53,7 @@ class TableObjHelper {
             $col = new MSSQLColumn();
         }
         $col->setName(str_replace('-', '_', str_replace(' ', '_', $colKey)));
-        $colDatatype = $helper->select('Select column data type:', $col->getSupportedTypes(), 0);
+        $colDatatype = $helper->select('Column data type:', $col->getSupportedTypes(), 0);
         $col->setDatatype($colDatatype);
         $isAdded = $tempTable->addColumn($colKey, $col);
 
@@ -64,13 +65,13 @@ class TableObjHelper {
             $this->isPrimaryCheck($colObj);
             $this->addColComment($colObj);
         }
-        $this->getWriter()->writeClass();
+        $this->getCreateHelper()->writeClass(false);
     }
     public function createEntity() {
         $helper = $this->getCreateHelper();
         $entityInfo = $helper->getClassInfo(APP_DIR_NAME.'\\entity');
         $entityInfo['implement-jsoni'] = $helper->confirm('Would you like from your entity class to implement the interface JsonI?', true);
-        $helper->getWriter()->setEntityInfo($entityInfo);
+        $helper->getWriter()->setEntityInfo($entityInfo['name'], $entityInfo['namespace'], $entityInfo['path'], $entityInfo['implement-jsoni']);
 
         if ($helper->confirm('Would you like to add extra attributes to the entity?', false)) {
             $addExtra = true;
@@ -89,14 +90,10 @@ class TableObjHelper {
 
     public function setTableComment() {
         $helper = $this->getCreateHelper();
-        $incComment = $helper->confirm('Would you like to add your comment about the table?', false);
+        $tableComment = $helper->getInput('Enter your optional comment about the table:');
 
-        if ($incComment) {
-            $tableComment = $helper->getInput('Enter your comment:');
-
-            if (strlen($tableComment) != 0) {
-                $this->getTable()->setComment($tableComment);
-            }
+        if (strlen($tableComment) != 0) {
+            $this->getTable()->setComment($tableComment);
         }
     }
     public function setTableName() {
@@ -121,12 +118,10 @@ class TableObjHelper {
      * @param MySQLColumn|MSSQLColumn $colObj
      */
     private function addColComment($colObj) {
-        if ($this->getCreateHelper()->confirm('Would you like to add your own comment about the column?', false)) {
-            $comment = $this->getCreateHelper()->getInput('Enter your comment:');
+        $comment = $this->getCreateHelper()->getInput('Enter your optional comment about the column:');
 
-            if (strlen($comment) != 0) {
-                $colObj->setComment($comment);
-            }
+        if (strlen($comment) != 0) {
+            $colObj->setComment($comment);
         }
         $this->getCreateHelper()->success('Column added.');
     }
@@ -143,10 +138,34 @@ class TableObjHelper {
             if (!($type == 'bool' || $type == 'boolean')) {
                 $colObj->setIsUnique($helper->confirm('Is this column unique?', false));
             }
-            $this->_setDefaultValue($colObj);
+            $this->setDefaultValue($colObj);
             $colObj->setIsNull($helper->confirm('Can this column have null values?', false));
         } else if ($colObj->getDatatype() == 'int' && $colObj instanceof MySQLColumn) {
             $colObj->setIsAutoInc($helper->confirm('Is this column auto increment?', false));
+        }
+    }
+    /**
+     * 
+     * @param Column $colObj
+     */
+    private function setDefaultValue($colObj) {
+        $helper = $this->getCreateHelper();
+        if ($colObj->getDatatype() == 'bool' || $colObj->getDatatype() == 'boolean') {
+            $defaultVal = $helper->getInput('Enter default value (true or false) (Hit "Enter" to skip):', '');
+
+            if ($defaultVal == 'true') {
+                $colObj->setDefault(true);
+            } else {
+                if ($defaultVal == 'false') {
+                    $colObj->setDefault(false);
+                }
+            }
+        } else {
+            $defaultVal = $helper->getInput('Enter default value (Hit "Enter" to skip):', '');
+
+            if (strlen($defaultVal) != 0) {
+                $colObj->setDefault($defaultVal);
+            }
         }
     }
     /**
@@ -356,7 +375,7 @@ class TableObjHelper {
         }
         
         $this->setClassInfo(get_class($tableObj));
-        $this->getCreateHelper()->writeClass();
+        $this->getCreateHelper()->writeClass(false);
         $helper->success('Column updated.');
     }
     /**
@@ -375,7 +394,7 @@ class TableObjHelper {
         $this->getTable()->removeColByKey($colToDrop);
         $class = get_class($this->getTable());
         $this->setClassInfo($class);
-        $this->getCreateHelper()->writeClass();
+        $this->getCreateHelper()->writeClass(false);
         $this->success('Column dropped.');
         return $colToDrop;
     }

@@ -56,26 +56,15 @@ class UpdateSettingsCommandTest extends TestCase {
      */
     public function testUpdateAppName00() {
         Runner::setInputStream(new ArrayInputStream([
-            '1',
             'EN',
             'Super App',
         ]));
         Runner::setOutputStream(new ArrayOutputStream());
         
-        $this->assertEquals(0, Runner::runCommand(new UpdateSettingsCommand()));
+        $this->assertEquals(0, Runner::runCommand(new UpdateSettingsCommand(), [
+            '--w' => 'app-name'
+        ]));
         $this->assertEquals([
-            "What would you like to update?\n",
-            "0: Update application version info.\n",
-            "1: Update application name.\n",
-            "2: Update CRON password.\n",
-            "3: Update default page title.\n",
-            "4: Update default page description.\n",
-            "5: Change primary language.\n",
-            "6: Change title separator.\n",
-            "7: Set home page.\n",
-            "8: Set primay theme.\n",
-            "9: Set admin theme.\n",
-            "10: Quit. <--\n",
             "In which language you would like to update?\n",
             "0: EN\n",
             "1: AR\n",
@@ -90,7 +79,6 @@ class UpdateSettingsCommandTest extends TestCase {
      */
     public function testUpdateAppName01() {
         Runner::setInputStream(new ArrayInputStream([
-            '1',
             '',
             'XC',
             '0',
@@ -98,20 +86,10 @@ class UpdateSettingsCommandTest extends TestCase {
         ]));
         Runner::setOutputStream(new ArrayOutputStream());
         
-        $this->assertEquals(0, Runner::runCommand(new UpdateSettingsCommand()));
+        $this->assertEquals(0, Runner::runCommand(new UpdateSettingsCommand(), [
+            '--w' => 'app-name'
+        ]));
         $this->assertEquals([
-            "What would you like to update?\n",
-            "0: Update application version info.\n",
-            "1: Update application name.\n",
-            "2: Update CRON password.\n",
-            "3: Update default page title.\n",
-            "4: Update default page description.\n",
-            "5: Change primary language.\n",
-            "6: Change title separator.\n",
-            "7: Set home page.\n",
-            "8: Set primay theme.\n",
-            "9: Set admin theme.\n",
-            "10: Quit. <--\n",
             "In which language you would like to update?\n",
             "0: EN\n",
             "1: AR\n",
@@ -132,7 +110,6 @@ class UpdateSettingsCommandTest extends TestCase {
      */
     public function testUpdateAppName02() {
         Runner::setInputStream(new ArrayInputStream([
-            '1',
             '0',
             '',
             '          ',
@@ -140,20 +117,10 @@ class UpdateSettingsCommandTest extends TestCase {
         ]));
         Runner::setOutputStream(new ArrayOutputStream());
         
-        $this->assertEquals(0, Runner::runCommand(new UpdateSettingsCommand()));
+        $this->assertEquals(0, Runner::runCommand(new UpdateSettingsCommand(), [
+            '--w' => 'app-name'
+        ]));
         $this->assertEquals([
-            "What would you like to update?\n",
-            "0: Update application version info.\n",
-            "1: Update application name.\n",
-            "2: Update CRON password.\n",
-            "3: Update default page title.\n",
-            "4: Update default page description.\n",
-            "5: Change primary language.\n",
-            "6: Change title separator.\n",
-            "7: Set home page.\n",
-            "8: Set primay theme.\n",
-            "9: Set admin theme.\n",
-            "10: Quit. <--\n",
             "In which language you would like to update?\n",
             "0: EN\n",
             "1: AR\n",
@@ -172,25 +139,14 @@ class UpdateSettingsCommandTest extends TestCase {
      */
     public function testUpdateCronPass00() {
         Runner::setInputStream(new ArrayInputStream([
-            '2',
             '123456'
         ]));
         Runner::setOutputStream(new ArrayOutputStream());
         
-        $this->assertEquals(0, Runner::runCommand(new UpdateSettingsCommand()));
+        $this->assertEquals(0, Runner::runCommand(new UpdateSettingsCommand(), [
+            '--w' => 'cron-pass'
+        ]));
         $this->assertEquals([
-            "What would you like to update?\n",
-            "0: Update application version info.\n",
-            "1: Update application name.\n",
-            "2: Update CRON password.\n",
-            "3: Update default page title.\n",
-            "4: Update default page description.\n",
-            "5: Change primary language.\n",
-            "6: Change title separator.\n",
-            "7: Set home page.\n",
-            "8: Set primay theme.\n",
-            "9: Set admin theme.\n",
-            "10: Quit. <--\n",
             "Enter new password: Enter = \"\"\n",
             "Success: Password successfully updated.\n"
         ], Runner::getOutputStream()->getOutputArray());
@@ -201,25 +157,14 @@ class UpdateSettingsCommandTest extends TestCase {
      */
     public function testUpdateCronPass01() {
         Runner::setInputStream(new ArrayInputStream([
-            '2',
             ''
         ]));
         Runner::setOutputStream(new ArrayOutputStream());
         
-        $this->assertEquals(0, Runner::runCommand(new UpdateSettingsCommand()));
+        $this->assertEquals(0, Runner::runCommand(new UpdateSettingsCommand(), [
+            '--w' => 'cron-pass'
+        ]));
         $this->assertEquals([
-            "What would you like to update?\n",
-            "0: Update application version info.\n",
-            "1: Update application name.\n",
-            "2: Update CRON password.\n",
-            "3: Update default page title.\n",
-            "4: Update default page description.\n",
-            "5: Change primary language.\n",
-            "6: Change title separator.\n",
-            "7: Set home page.\n",
-            "8: Set primay theme.\n",
-            "9: Set admin theme.\n",
-            "10: Quit. <--\n",
             "Enter new password: Enter = \"\"\n",
             "Success: Password successfully updated.\n"
         ], Runner::getOutputStream()->getOutputArray());
@@ -230,26 +175,15 @@ class UpdateSettingsCommandTest extends TestCase {
      */
     public function testUpdatePageTitle00() {
         Runner::setInputStream(new ArrayInputStream([
-            '3',
             'EN',
             'NEW PAGE'
         ]));
         Runner::setOutputStream(new ArrayOutputStream());
         
-        $this->assertEquals(0, Runner::runCommand(new UpdateSettingsCommand()));
+        $this->assertEquals(0, Runner::runCommand(new UpdateSettingsCommand(), [
+            '--w' => 'page-title'
+        ]));
         $this->assertEquals([
-            "What would you like to update?\n",
-            "0: Update application version info.\n",
-            "1: Update application name.\n",
-            "2: Update CRON password.\n",
-            "3: Update default page title.\n",
-            "4: Update default page description.\n",
-            "5: Change primary language.\n",
-            "6: Change title separator.\n",
-            "7: Set home page.\n",
-            "8: Set primay theme.\n",
-            "9: Set admin theme.\n",
-            "10: Quit. <--\n",
             "In which language you would like to update?\n",
             "0: EN\n",
             "1: AR\n",
@@ -264,26 +198,15 @@ class UpdateSettingsCommandTest extends TestCase {
      */
     public function testUpdatePageDescription00() {
         Runner::setInputStream(new ArrayInputStream([
-            '4',
             'EN',
             'NEW PAGE DESCRIPTION'
         ]));
         Runner::setOutputStream(new ArrayOutputStream());
         
-        $this->assertEquals(0, Runner::runCommand(new UpdateSettingsCommand()));
+        $this->assertEquals(0, Runner::runCommand(new UpdateSettingsCommand(), [
+            '--w' => 'page-description'
+        ]));
         $this->assertEquals([
-            "What would you like to update?\n",
-            "0: Update application version info.\n",
-            "1: Update application name.\n",
-            "2: Update CRON password.\n",
-            "3: Update default page title.\n",
-            "4: Update default page description.\n",
-            "5: Change primary language.\n",
-            "6: Change title separator.\n",
-            "7: Set home page.\n",
-            "8: Set primay theme.\n",
-            "9: Set admin theme.\n",
-            "10: Quit. <--\n",
             "In which language you would like to update?\n",
             "0: EN\n",
             "1: AR\n",
@@ -298,26 +221,15 @@ class UpdateSettingsCommandTest extends TestCase {
      */
     public function testUpdatePrimaryLang00() {
         Runner::setInputStream(new ArrayInputStream([
-            '4',
             'EN',
             'NEW PAGE DESCRIPTION'
         ]));
         Runner::setOutputStream(new ArrayOutputStream());
         
-        $this->assertEquals(0, Runner::runCommand(new UpdateSettingsCommand()));
+        $this->assertEquals(0, Runner::runCommand(new UpdateSettingsCommand(), [
+            '--w' => 'page-description'
+        ]));
         $this->assertEquals([
-            "What would you like to update?\n",
-            "0: Update application version info.\n",
-            "1: Update application name.\n",
-            "2: Update CRON password.\n",
-            "3: Update default page title.\n",
-            "4: Update default page description.\n",
-            "5: Change primary language.\n",
-            "6: Change title separator.\n",
-            "7: Set home page.\n",
-            "8: Set primay theme.\n",
-            "9: Set admin theme.\n",
-            "10: Quit. <--\n",
             "In which language you would like to update?\n",
             "0: EN\n",
             "1: AR\n",
@@ -360,24 +272,14 @@ class UpdateSettingsCommandTest extends TestCase {
      */
     public function testUpdateHomePage00() {
         Runner::setInputStream(new ArrayInputStream([
-            '7',
+            
         ]));
         Runner::setOutputStream(new ArrayOutputStream());
         
-        $this->assertEquals(0, Runner::runCommand(new UpdateSettingsCommand()));
+        $this->assertEquals(0, Runner::runCommand(new UpdateSettingsCommand(), [
+            '--w' => 'home-page'
+        ]));
         $this->assertEquals([
-            "What would you like to update?\n",
-            "0: Update application version info.\n",
-            "1: Update application name.\n",
-            "2: Update CRON password.\n",
-            "3: Update default page title.\n",
-            "4: Update default page description.\n",
-            "5: Change primary language.\n",
-            "6: Change title separator.\n",
-            "7: Set home page.\n",
-            "8: Set primay theme.\n",
-            "9: Set admin theme.\n",
-            "10: Quit. <--\n",
             "Info: Router has no routes. Nothing to change.\n",
         ], Runner::getOutputStream()->getOutputArray());
     }
@@ -386,25 +288,14 @@ class UpdateSettingsCommandTest extends TestCase {
      */
     public function testUpdatePrimaryTheme00() {
         Runner::setInputStream(new ArrayInputStream([
-            '8',
             'themes\\greeny\\GreenyTheme'
         ]));
         Runner::setOutputStream(new ArrayOutputStream());
         
-        $this->assertEquals(0, Runner::runCommand(new UpdateSettingsCommand()));
+        $this->assertEquals(0, Runner::runCommand(new UpdateSettingsCommand(), [
+            '--w' => 'primary-theme'
+        ]));
         $this->assertEquals([
-            "What would you like to update?\n",
-            "0: Update application version info.\n",
-            "1: Update application name.\n",
-            "2: Update CRON password.\n",
-            "3: Update default page title.\n",
-            "4: Update default page description.\n",
-            "5: Change primary language.\n",
-            "6: Change title separator.\n",
-            "7: Set home page.\n",
-            "8: Set primay theme.\n",
-            "9: Set admin theme.\n",
-            "10: Quit. <--\n",
             "Enter theme class name with namespace:\n",
             "Success: Primary theme successfully updated.\n"
         ], Runner::getOutputStream()->getOutputArray());
@@ -416,27 +307,16 @@ class UpdateSettingsCommandTest extends TestCase {
      */
     public function testUpdatePrimaryTheme01() {
         Runner::setInputStream(new ArrayInputStream([
-            '8',
             'themes\\greeny\\NotATheme',
             '',
             'themes\\greeny\\GreenyTheme'
         ]));
         Runner::setOutputStream(new ArrayOutputStream());
         
-        $this->assertEquals(0, Runner::runCommand(new UpdateSettingsCommand()));
+        $this->assertEquals(0, Runner::runCommand(new UpdateSettingsCommand(), [
+            '--w' => 'primary-theme'
+        ]));
         $this->assertEquals([
-            "What would you like to update?\n",
-            "0: Update application version info.\n",
-            "1: Update application name.\n",
-            "2: Update CRON password.\n",
-            "3: Update default page title.\n",
-            "4: Update default page description.\n",
-            "5: Change primary language.\n",
-            "6: Change title separator.\n",
-            "7: Set home page.\n",
-            "8: Set primay theme.\n",
-            "9: Set admin theme.\n",
-            "10: Quit. <--\n",
             "Enter theme class name with namespace:\n",
             "Error: Invalid input is given. Try again.\n",
             "Enter theme class name with namespace:\n",
@@ -452,25 +332,14 @@ class UpdateSettingsCommandTest extends TestCase {
      */
     public function testUpdateAdminTheme00() {
         Runner::setInputStream(new ArrayInputStream([
-            '9',
             'themes\\greeny\\GreenyTheme'
         ]));
         Runner::setOutputStream(new ArrayOutputStream());
         
-        $this->assertEquals(0, Runner::runCommand(new UpdateSettingsCommand()));
+        $this->assertEquals(0, Runner::runCommand(new UpdateSettingsCommand(), [
+            '--w' => 'admin-theme'
+        ]));
         $this->assertEquals([
-            "What would you like to update?\n",
-            "0: Update application version info.\n",
-            "1: Update application name.\n",
-            "2: Update CRON password.\n",
-            "3: Update default page title.\n",
-            "4: Update default page description.\n",
-            "5: Change primary language.\n",
-            "6: Change title separator.\n",
-            "7: Set home page.\n",
-            "8: Set primay theme.\n",
-            "9: Set admin theme.\n",
-            "10: Quit. <--\n",
             "Enter theme class name with namespace:\n",
             "Success: Admin theme successfully updated.\n"
         ], Runner::getOutputStream()->getOutputArray());
@@ -481,27 +350,16 @@ class UpdateSettingsCommandTest extends TestCase {
      */
     public function testUpdateAdminTheme01() {
         Runner::setInputStream(new ArrayInputStream([
-            '9',
             'themes\\greeny\\NotATheme',
             '',
             'themes\\greeny\\GreenyTheme'
         ]));
         Runner::setOutputStream(new ArrayOutputStream());
         
-        $this->assertEquals(0, Runner::runCommand(new UpdateSettingsCommand()));
+        $this->assertEquals(0, Runner::runCommand(new UpdateSettingsCommand(), [
+            '--w' => 'admin-theme'
+        ]));
         $this->assertEquals([
-            "What would you like to update?\n",
-            "0: Update application version info.\n",
-            "1: Update application name.\n",
-            "2: Update CRON password.\n",
-            "3: Update default page title.\n",
-            "4: Update default page description.\n",
-            "5: Change primary language.\n",
-            "6: Change title separator.\n",
-            "7: Set home page.\n",
-            "8: Set primay theme.\n",
-            "9: Set admin theme.\n",
-            "10: Quit. <--\n",
             "Enter theme class name with namespace:\n",
             "Error: Invalid input is given. Try again.\n",
             "Enter theme class name with namespace:\n",

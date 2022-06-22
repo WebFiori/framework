@@ -236,7 +236,7 @@ class ThemeLoader {
                 'path' => $themeDirName.'/'.$dir.'/{file-name}',
                 'route-to' => function ($fileDir, $themeDirName, $dir)
                 {
-                    $fileName = Router::getVarValue('file-name');
+                    $fileName = Router::getParameterValue('file-name');
 
                     if (file_exists($fileDir.DS.$dir.DS.$fileName)) {
                         $file = new File($fileDir.DS.$dir.DS.$fileName);

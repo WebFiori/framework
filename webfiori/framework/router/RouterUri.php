@@ -63,6 +63,11 @@ class RouterUri extends Uri {
     private $assignedMiddlewareList;
     /**
      * 
+     * @var Uri|null
+     */
+    private $requestedUri;
+    /**
+     * 
      * @var type 
      * @since 1.2
      */
@@ -111,6 +116,14 @@ class RouterUri extends Uri {
      */
     private $type;
     /**
+     * A boolean which is set to true if URI is case sensitive.
+     * 
+     * @var boolean 
+     * 
+     * @since 1.0
+     */
+    private $isCS;
+    /**
      * Creates new instance.
      * 
      * @param string $requestedUri The URI such as 'https://www3.programmingacademia.com:80/{some-var}/hell/{other-var}/?do=dnt&y=#xyz'
@@ -128,15 +141,103 @@ class RouterUri extends Uri {
      */
     public function __construct(string $requestedUri, $routeTo, bool $caseSensitive = true, array $closureParams = []) {
         parent::__construct($requestedUri);
+        $this->isCS = $caseSensitive;
         $this->setType(Router::CUSTOMIZED);
         $this->setRoute($routeTo);
-        $this->setIsCaseSensitive($caseSensitive);
         $this->assignedMiddlewareList = new LinkedList();
 
         $this->setClosureParams($closureParams);
         $this->incInSiteMap = false;
         $this->languages = [];
         $this->addMiddleware('global');
+    }
+    /**
+     * Sets the requested URI.
+     * 
+     * @param string $uri A string that represents requested URI.
+     * 
+     * @return boolean If the requested URI is a match with the original URI which 
+     * is stored in the object, it will be set and the method will return true. 
+     * Other than that, the method will return false.
+     * 
+     * @since 1.0
+     */
+    public function setRequestedUri(string $uri) {
+        $reuested = new Uri($uri);
+
+        if ($this->_comparePath($reuested)) {
+            $this->requestedUri = $reuested;
+
+            return true;
+        }
+
+        return false;
+    }
+    /**
+     * Returns the value of the property that tells if the URI is case sensitive 
+     * or not.
+     * 
+     * @return boolean  True if URI case sensitive. False if not. Default is false.
+     * 
+     * @since 1.0
+     */
+    public function isCaseSensitive() : bool {
+        return $this->isCS;
+    }
+    /**
+     * Make the URI case sensitive or not.
+     * 
+     * This is mainly used in case the developer would like to use the 
+     * URI in routing.
+     *  
+     * @param boolean $caseSensitive True to make it case sensitive. False to 
+     * not.
+     * 
+     * @since 1.0 
+     */
+    public function setIsCaseSensitive(bool $caseSensitive) {
+        $this->isCS = $caseSensitive === true;
+    }
+    /**
+     * Validate the path part of original URI and the requested one.
+     * 
+     * @return boolean
+     * 
+     * @since 1.0
+     */
+    private function _comparePath(Uri $requestedUri) {
+        $requestedArr = $requestedUri->getComponents();
+
+        $originalPath = $this->getPathArray();
+        $requestedPath = $requestedArr['path'];
+
+        if (count($originalPath) == count($requestedPath)) {
+            return $this->_comparePathHelper($originalPath, $requestedPath);
+        }
+
+        return false;
+    }
+    private function _comparePathHelper($originalPath, $requestedPath) {
+        $count = count($originalPath);
+
+        for ($x = 0 ; $x < $count ; $x++) {
+            $original = $originalPath[$x];
+
+            if (!($original[0] == '{' && $original[strlen($original) - 1] == '}')) {
+                $requested = $requestedPath[$x];
+
+                if (!$this->isCaseSensitive()) {
+                    $requested = strtolower($requested);
+                    $original = strtolower($original);
+                }
+
+                if ($requested != $original) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
     /**
      * Adds a language to the set of languages at which the resource that the URI 
@@ -248,28 +349,13 @@ class RouterUri extends Uri {
     /**
      * Returns an array that contains requested URI information.
      * 
-     * @return array The method will return an associative array that 
-     * contains the components of the URI. The array will have the 
-     * following indices:
-     * <ul>
-     * <li><b>uri</b>: The original URI.</li>
-     * <li><b>port</b>: The port number taken from the authority part.</li>
-     * <li><b>host</b>: Will be always empty string.</li>
-     * <li><b>authority</b>: Authority part of the URI.</li>
-     * <li><b>scheme</b>: Scheme part of the URI (e.g. http or https).</li>
-     * <li><b>query-string</b>: Query string if the URI has any.</li>
-     * <li><b>fragment</b>: Any string that comes after the character '#' in the URI.</li>
-     * <li><b>full-path</b>: A string which is similar to '/path/to/resource' that represents path part of 
-     * a URL.</li>
-     * <li><b>path</b>: An array that contains the names of path directories</li>
-     * <li><b>query-string-vars</b>: An array that contains query string parameter and values.</li>
-     * <li><b>uri-vars</b>: An array that contains URI path variable and values.</li>
-     * </ul>
+     * @return Uri|null If the requested URI is set, the method will return
+     * its information contained in an object. Other than that, null is returned.
      * 
      * @since 1.3.4
      */
-    public function getRequestedUri() : array {
-        return isset($this->getComponents()['requested-uri']) ? $this->getComponents()['requested-uri'] : null;
+    public function getRequestedUri() {
+        return $this->requestedUri;
     }
     /**
      * Returns the location where the URI will route to.
@@ -296,8 +382,8 @@ class RouterUri extends Uri {
     public function getSitemapNodes() : array {
         $retVal = [];
 
-        if ($this->hasVars()) {
-            $this->_($this->getUri(), array_keys($this->getUriVars()), 0, $retVal);
+        if ($this->hasParameters()) {
+            $this->_($this->getUri(), $this->getParametersNames(), 0, $retVal);
         } else {
             $retVal[] = $this->_buildSitemapNode($this->getUri());
         }
@@ -460,7 +546,7 @@ class RouterUri extends Uri {
 
     private function _($originalUriWithVars, $uriVars, $varIndex, &$nodesArr) {
         $varName = $uriVars[$varIndex];
-        $varValues = $this->getVarValues($varName);
+        $varValues = $this->getParameterValues($varName);
 
         foreach ($varValues as $varValue) {
             $uriWithVarsReplaced = str_replace('{'.$varName.'}', $varValue, $originalUriWithVars);

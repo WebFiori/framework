@@ -28,10 +28,11 @@ class GreenyTheme extends Theme {
             $page->getDocument()->getChildByID('page-body')->setClassName('pa-row');
 
             if ($page->hasAside()) {
-                $page->getDocument()->getChildByID('side-content-area')->setClassName('pa-'.Page::dir().'-col-2 show-border');
-                $page->getDocument()->getChildByID('main-content-area')->setClassName('pa-'.Page::dir().'-col-10 show-border');
+                $dir = $this->getPage()->getWritingDir();
+                $page->getDocument()->getChildByID('side-content-area')->setClassName('pa-'.$dir.'-col-2 show-border');
+                $page->getDocument()->getChildByID('main-content-area')->setClassName('pa-'.$dir.'-col-10 show-border');
             } else {
-                $page->getDocument()->getChildByID('main-content-area')->setClassName('pa-'.Page::dir().'-col-12 show-border');
+                $page->getDocument()->getChildByID('main-content-area')->setClassName('pa-'.$dir.'-col-12 show-border');
             }
             $page->getDocument()->getChildByID('main-content-area')->addTextNode('Main Content Area.');
         });
@@ -59,8 +60,8 @@ class GreenyTheme extends Theme {
         $node = new HTMLNode('div');
         $node->setAttribute('class', 'pa-row');
         $fNode = new HTMLNode('footer');
-        $fNode->setAttribute('dir', Page::dir());
-        $fNode->setAttribute('class','pa-'.Page::dir().'-col-12 show-border');
+        $fNode->setAttribute('dir', $this->getPage()->getWritingDir());
+        $fNode->setAttribute('class','pa-'.$this->getPage()->getWritingDir().'-col-12 show-border');
         $fNode->setAttribute('itemtype','http://schema.org/WPFooter');
         $fNav = new HTMLNode('nav');
         $fNavUl = new HTMLNode('ul');
@@ -92,7 +93,7 @@ class GreenyTheme extends Theme {
         $headerSec->setClassName('pa-row');
         $headerBody = new HTMLNode();
         $headerBody->setClassName('pa-'.$this->getPage()->getWritingDir().'-col-12 show-border');
-        $headerBody->setWritingDir(Page::dir());
+
         $headerBody->addTextNode('Header Sec');
         $headerSec->addChild($headerBody);
 

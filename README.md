@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/WebFiori/framework/actions"><img src="https://github.com/WebFiori/framework/workflows/Build%20PHP%207,8/badge.svg?branch=master"></a>
+  <a href="https://github.com/WebFiori/framework/actions"><img src="https://github.com/WebFiori/framework/workflows/Build%20PHP%208.1/badge.svg?branch=master"></a>
   <a href="https://codecov.io/gh/WebFiori/framework">
     <img src="https://codecov.io/gh/WebFiori/framework/branch/master/graph/badge.svg" />
   </a>
@@ -27,37 +27,49 @@
 WebFiori Framework is a mini web development framework which is built using PHP language. The framework is fully object oriented (OOP). It uses semi-MVC model but it does not force it. The framework comes with many features which can help in making your website or web application up and running in no time.
 
 ## Supported PHP Versions
-The framework can be run on PHP 5.6 up to PHP 8.0 .
+| Build Status |
+|:-----------:|
+|<a target="_blank" href="https://github.com/WebFiori/framework/actions/workflows/php70.yml"><img src="https://github.com/WebFiori/framework/workflows/Build%20PHP%207.0/badge.svg?branch=master"></a>|
+|<a target="_blank" href="https://github.com/WebFiori/framework/actions/workflows/php71.yml"><img src="https://github.com/WebFiori/framework/workflows/Build%20PHP%207.1/badge.svg?branch=master"></a>|
+|<a target="_blank" href="https://github.com/WebFiori/framework/actions/workflows/php72.yml"><img src="https://github.com/WebFiori/framework/workflows/Build%20PHP%207.2/badge.svg?branch=master"></a>|
+|<a target="_blank" href="https://github.com/WebFiori/framework/actions/workflows/php73.yml"><img src="https://github.com/WebFiori/framework/workflows/Build%20PHP%207.3/badge.svg?branch=master"></a>|
+|<a target="_blank" href="https://github.com/WebFiori/framework/actions/workflows/php74.yml"><img src="https://github.com/WebFiori/framework/workflows/Build%20PHP%207.4/badge.svg?branch=master"></a>|
+|<a target="_blank" href="https://github.com/WebFiori/framework/actions/workflows/php80.yml"><img src="https://github.com/WebFiori/framework/workflows/Build%20PHP%208.0/badge.svg?branch=master"></a>|
+|<a target="_blank" href="https://github.com/WebFiori/framework/actions/workflows/php81.yml"><img src="https://github.com/WebFiori/framework/workflows/Build%20PHP%208.1/badge.svg?branch=master"></a>|
+|<a target="_blank" href="https://github.com/WebFiori/framework/actions/workflows/php82.yml"><img src="https://github.com/WebFiori/framework/workflows/Build%20PHP%208.2/badge.svg?branch=dev"></a><br>(dev)|
 
 ## Key Features
 
 * Provide minimum utilities to setup a small web application.
-* Theming and the ability to create multiple UIs for the same web page using any CSS or JavaScript framework.
+* Theming and the ability to create multiple UIs for the same web app using any CSS or JavaScript framework.
 * Building and manipulating the DOM of a web page using PHP language.
 * Basic template engine.
-* Fast routing system that makes the ability of creating search-engine-friendly URLs an easy task.
+* Fast and simple routing system.
 * Creation of web services (or APIs) that supports JSON with data filtering and validation.
 * Middleware support which can help in filtering HTTP requests before reaching application level.
 * Basic support for MySQL and MSSQL schema and query building.
 * Lightweight. The total size of framework core files is less than 3 megabytes.
 * Access management by assigning system user a set of privileges.
 * Simple sessions manager.
-* Support for creating and sending nice-looking HTML emails in a simple way using SMTP protocol.
+* Support for creating and sending nice-looking HTML emails.
 * Autoloading of user defined classes (loading composer packages also supported).
-* The ability to create background tasks and let them run in specific time using CRON.
+* Ability to create background tasks and let them run in specific time using CRON.
 * Well-defined file upload and file handling sub-system.
 * Basic support for running the framework throgh CLI.
 * Ability to implement custom CLI commands.
 
 ## Standard Libraries
 
+The following table shows build status of the standard libraries that the framework is composed of. The build is based on the latest stable PHP release. 
+
 | Library | Build | Latest |
 |----|----|----|
-| [HTTP](https://github.com/WebFiori/http) | <a href="https://github.com/WebFiori/http/actions"><img src="https://github.com/WebFiori/http/workflows/Build%20PHP%207,8/badge.svg?branch=master"></a> | <a href="https://github.com/WebFiori/http/releases"><img src="https://img.shields.io/github/release/WebFiori/restEasy.svg" /></a> |
-| [Json](https://github.com/WebFiori/json) | <a href="https://github.com/WebFiori/json/actions"><img src="https://github.com/WebFiori/json/workflows/Build%20PHP%207,8/badge.svg?branch=master"></a> | <a href="https://github.com/WebFiori/json/releases"><img src="https://img.shields.io/github/release/WebFiori/json.svg" /></a> |
-| [UI](https://github.com/WebFiori/ui) | <a href="https://github.com/WebFiori/ui/actions"><img src="https://github.com/WebFiori/ui/workflows/Build%20PHP%207,8/badge.svg?branch=master"></a> | <a href="https://github.com/WebFiori/ui/releases"><img src="https://img.shields.io/github/release/WebFiori/ui.svg" /></a> |
-| [Collections](https://github.com/WebFiori/collections) | <a href="https://github.com/WebFiori/collections/actions"><img src="https://github.com/WebFiori/collections/workflows/Build%20PHP%207,8/badge.svg?branch=master"></a> | <a href="https://github.com/WebFiori/collections/releases"><img src="https://img.shields.io/github/release/WebFiori/collections.svg" /></a> |
-| [Database](https://github.com/WebFiori/database) | <a href="https://github.com/WebFiori/database/actions"><img src="https://github.com/WebFiori/database/workflows/Build%20PHP%207,8/badge.svg?branch=main"></a> | <a href="https://github.com/WebFiori/database/releases"><img src="https://img.shields.io/github/release/WebFiori/database.svg" /></a> |
+| [HTTP](https://github.com/WebFiori/http) | <a href="https://github.com/WebFiori/http/actions"><img src="https://github.com/WebFiori/http/workflows/Build%20PHP%208.1/badge.svg?branch=master"></a> | <a href="https://github.com/WebFiori/http/releases"><img src="https://img.shields.io/github/release/WebFiori/http.svg" /></a> |
+| [File](https://github.com/WebFiori/file) | <a href="https://github.com/WebFiori/file/actions"><img src="https://github.com/WebFiori/file/workflows/Build%20PHP%208.1/badge.svg?branch=main"></a> | <a href="https://github.com/WebFiori/file/releases"><img src="https://img.shields.io/github/release/WebFiori/file.svg" /></a> |
+| [Json](https://github.com/WebFiori/json) | <a href="https://github.com/WebFiori/json/actions"><img src="https://github.com/WebFiori/json/workflows/Build%20PHP%208.1/badge.svg?branch=master"></a> | <a href="https://github.com/WebFiori/json/releases"><img src="https://img.shields.io/github/release/WebFiori/json.svg" /></a> |
+| [UI](https://github.com/WebFiori/ui) | <a href="https://github.com/WebFiori/ui/actions"><img src="https://github.com/WebFiori/ui/workflows/Build%20PHP%208.1/badge.svg?branch=master"></a> | <a href="https://github.com/WebFiori/ui/releases"><img src="https://img.shields.io/github/release/WebFiori/ui.svg" /></a> |
+| [Collections](https://github.com/WebFiori/collections) | <a href="https://github.com/WebFiori/collections/actions"><img src="https://github.com/WebFiori/collections/workflows/Build%20PHP%208.1/badge.svg?branch=master"></a> | <a href="https://github.com/WebFiori/collections/releases"><img src="https://img.shields.io/github/release/WebFiori/collections.svg" /></a> |
+| [Database](https://github.com/WebFiori/database) | <a href="https://github.com/WebFiori/database/actions"><img src="https://github.com/WebFiori/database/workflows/Build%20PHP%208.1/badge.svg?branch=main"></a> | <a href="https://github.com/WebFiori/database/releases"><img src="https://img.shields.io/github/release/WebFiori/database.svg" /></a> |
 
 ## Problems Solved
 

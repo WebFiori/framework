@@ -747,7 +747,7 @@ class WebPage {
         $this->theme = null;
         $this->incAside = true;
         $this->setWritingDir();
-        $this->setCanonical(Request::getRequestedURL());
+        $this->setCanonical(Request::getRequestedURI());
         $this->document->setLanguage($this->getLangCode());
         $headNode = $this->_getHead();
         $this->document->setHeadNode($headNode);

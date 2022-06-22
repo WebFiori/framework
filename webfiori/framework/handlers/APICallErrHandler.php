@@ -6,8 +6,11 @@ use webfiori\json\Json;
 use webfiori\http\Response;
 use webfiori\framework\router\Router;
 use webfiori\framework\Util;
+use webfiori\framework\WebFioriApp;
 /**
  * Exceptions handler which is used to handle exceptions in case of API call.
+ * 
+ * This handler is also used to handle startup exceptions.
  *
  * @author Ibrahim
  */
@@ -39,12 +42,16 @@ class APICallErrHandler extends AbstractHandler {
         if (!Response::isSent()) {
             Response::clear();
             Response::setCode(500);
+            Response::addHeader('content-type', 'application/json');
             Response::write($j);
             Response::send();
         }
     }
 
     public function isActive(): bool {
+        if (WebFioriApp::getClassStatus() == WebFioriApp::STATUS_INITIALIZING) {
+            return true;
+        }
         $routeUri = Router::getUriObjByURL(Util::getRequestedURL());
 
         if ($routeUri !== null) {

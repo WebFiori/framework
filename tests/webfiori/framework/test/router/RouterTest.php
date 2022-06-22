@@ -164,6 +164,29 @@ class RouterTest extends TestCase {
     /**
      * @test
      */
+    public function testOptionalParam00() {
+        Router::removeAll();
+        Router::setOnNotFound(function()
+        {
+        });
+        Router::closure([
+            'path' => '{var-1}/{var-2?}',
+            'route-to' => function()
+            {
+            }
+        ]);
+        $obj = Router::getUriObj('/{var-1}/{var-2?}');
+        $this->assertNotNull($obj);
+        
+        $this->assertEquals(2, count($obj->getParameters()));
+        Router::route(Util::getBaseURL().'/hello/world');
+
+        $this->assertEquals('hello',$obj->getParameterValue('var-1'));
+        $this->assertEquals('world',$obj->getParameterValue('var-2'));
+    }
+    /**
+     * @test
+     */
     public function testRoute01() {
         Router::removeAll();
         Router::setOnNotFound(function()

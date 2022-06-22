@@ -132,6 +132,7 @@ class WebFioriApp {
         date_default_timezone_set(defined('DATE_TIMEZONE') ? DATE_TIMEZONE : 'Asia/Riyadh');
 
         $this->_initAutoLoader();
+        $this->_setHandlers();
         //Initialize CLI
         Runner::get();
         $this->_initAppConfig();
@@ -140,7 +141,6 @@ class WebFioriApp {
 
 
         $this->_initThemesPath();
-        $this->_setHandlers();
         $this->_checkStandardLibs();
 
         if (!class_exists(APP_DIR_NAME.'\ini\InitPrivileges')) {
@@ -363,8 +363,9 @@ class WebFioriApp {
             'webfiori/collections' => 'webfiori\\collections\\Node',
             'webfiori/ui' => 'webfiori\\ui\\HTMLNode',
             'webfiori/jsonx' => 'webfiori\\json\\Json',
-            'webfiori/database' => 'webfiori\database\ResultSet',
-            'webfiori/http' => 'webfiori\http\Response'
+            'webfiori/database' => 'webfiori\\database\\ResultSet',
+            'webfiori/http' => 'webfiori\\http\\Response',
+            'webfiori/file' => 'webfiori\\framework\\File'
         ];
 
         foreach ($standardLibsClasses as $lib => $class) {

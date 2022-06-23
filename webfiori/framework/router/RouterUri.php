@@ -211,16 +211,15 @@ class RouterUri extends Uri {
         $originalPath = $this->getPathArray();
         $requestedPath = $requestedArr['path'];
 
-        if (count($originalPath) == count($requestedPath)) {
-            return $this->_comparePathHelper($originalPath, $requestedPath);
-        }
-
-        return false;
+        return $this->_comparePathHelper($originalPath, $requestedPath);
     }
     private function _comparePathHelper($originalPath, $requestedPath) {
         $count = count($originalPath);
-
+        $requestedCount = count($requestedPath);
         for ($x = 0 ; $x < $count ; $x++) {
+            if ($x == $requestedCount) {
+                break;
+            }
             $original = $originalPath[$x];
 
             if (!($original[0] == '{' && $original[strlen($original) - 1] == '}')) {

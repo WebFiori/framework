@@ -18,13 +18,13 @@ class UpdateSettingsCommandTest extends TestCase {
      * @test
      */
     public function testUpdateVersion00() {
-        Runner::setInputStream(new ArrayInputStream([
+        Runner::setInput([
             '0',
             '2.0.1',
             'Beta',
             ''
-        ]));
-        Runner::setOutputStream(new ArrayOutputStream());
+        ]);
+        
         
         $this->assertEquals(0, Runner::runCommand(new UpdateSettingsCommand()));
         $this->assertEquals([
@@ -44,7 +44,7 @@ class UpdateSettingsCommandTest extends TestCase {
             "Application version type: Enter = \"Stable\"\n",
             "Release date (YYYY-MM-DD): Enter = \"".date('Y-m-d')."\"\n",
             "Version information successfully updated.\n"
-        ], Runner::getOutputStream()->getOutputArray());
+        ], Runner::getOutput());
 
         $version = ConfigController::get()->getAppVersionInfo();
         $this->assertEquals('2.0.1', $version['version']);
@@ -55,11 +55,11 @@ class UpdateSettingsCommandTest extends TestCase {
      * @test
      */
     public function testUpdateAppName00() {
-        Runner::setInputStream(new ArrayInputStream([
+        Runner::setInput([
             'EN',
             'Super App',
-        ]));
-        Runner::setOutputStream(new ArrayOutputStream());
+        ]);
+        
         
         $this->assertEquals(0, Runner::runCommand(new UpdateSettingsCommand(), [
             '--w' => 'app-name'
@@ -70,7 +70,7 @@ class UpdateSettingsCommandTest extends TestCase {
             "1: AR\n",
             "Enter new name:\n",
             "Name successfully updated.\n",
-        ], Runner::getOutputStream()->getOutputArray());
+        ], Runner::getOutput());
         
         $this->assertEquals('Super App', ConfigController::get()->getWebsiteNames()['EN']);
     }
@@ -78,13 +78,13 @@ class UpdateSettingsCommandTest extends TestCase {
      * @test
      */
     public function testUpdateAppName01() {
-        Runner::setInputStream(new ArrayInputStream([
+        Runner::setInput([
             '',
             'XC',
             '0',
             'Super App',
-        ]));
-        Runner::setOutputStream(new ArrayOutputStream());
+        ]);
+        
         
         $this->assertEquals(0, Runner::runCommand(new UpdateSettingsCommand(), [
             '--w' => 'app-name'
@@ -103,19 +103,19 @@ class UpdateSettingsCommandTest extends TestCase {
             "1: AR\n",
             "Enter new name:\n",
             "Name successfully updated.\n",
-        ], Runner::getOutputStream()->getOutputArray());
+        ], Runner::getOutput());
     }
     /**
      * @test
      */
     public function testUpdateAppName02() {
-        Runner::setInputStream(new ArrayInputStream([
+        Runner::setInput([
             '0',
             '',
             '          ',
             '  Super App X '
-        ]));
-        Runner::setOutputStream(new ArrayOutputStream());
+        ]);
+        
         
         $this->assertEquals(0, Runner::runCommand(new UpdateSettingsCommand(), [
             '--w' => 'app-name'
@@ -130,7 +130,7 @@ class UpdateSettingsCommandTest extends TestCase {
             "Error: Invalid input is given. Try again.\n",
             "Enter new name:\n",
             "Name successfully updated.\n",
-        ], Runner::getOutputStream()->getOutputArray());
+        ], Runner::getOutput());
         $this->assertEquals('Super App X', ConfigController::get()->getWebsiteNames()['EN']);
     }
     
@@ -138,10 +138,10 @@ class UpdateSettingsCommandTest extends TestCase {
      * @test
      */
     public function testUpdateCronPass00() {
-        Runner::setInputStream(new ArrayInputStream([
+        Runner::setInput([
             '123456'
-        ]));
-        Runner::setOutputStream(new ArrayOutputStream());
+        ]);
+        
         
         $this->assertEquals(0, Runner::runCommand(new UpdateSettingsCommand(), [
             '--w' => 'cron-pass'
@@ -149,17 +149,17 @@ class UpdateSettingsCommandTest extends TestCase {
         $this->assertEquals([
             "Enter new password: Enter = \"\"\n",
             "Success: Password successfully updated.\n"
-        ], Runner::getOutputStream()->getOutputArray());
+        ], Runner::getOutput());
         $this->assertEquals(hash('sha256', '123456'), ConfigController::get()->getCRONPassword());
     }
     /**
      * @test
      */
     public function testUpdateCronPass01() {
-        Runner::setInputStream(new ArrayInputStream([
+        Runner::setInput([
             ''
-        ]));
-        Runner::setOutputStream(new ArrayOutputStream());
+        ]);
+        
         
         $this->assertEquals(0, Runner::runCommand(new UpdateSettingsCommand(), [
             '--w' => 'cron-pass'
@@ -167,18 +167,18 @@ class UpdateSettingsCommandTest extends TestCase {
         $this->assertEquals([
             "Enter new password: Enter = \"\"\n",
             "Success: Password successfully updated.\n"
-        ], Runner::getOutputStream()->getOutputArray());
+        ], Runner::getOutput());
         $this->assertEquals('NO_PASSWORD', ConfigController::get()->getCRONPassword());
     }
     /**
      * @test
      */
     public function testUpdatePageTitle00() {
-        Runner::setInputStream(new ArrayInputStream([
+        Runner::setInput([
             'EN',
             'NEW PAGE'
-        ]));
-        Runner::setOutputStream(new ArrayOutputStream());
+        ]);
+        
         
         $this->assertEquals(0, Runner::runCommand(new UpdateSettingsCommand(), [
             '--w' => 'page-title'
@@ -189,7 +189,7 @@ class UpdateSettingsCommandTest extends TestCase {
             "1: AR\n",
             "Enter new title:\n",
             "Success: Title successfully updated.\n"
-        ], Runner::getOutputStream()->getOutputArray());
+        ], Runner::getOutput());
         
         $this->assertEquals('NEW PAGE', ConfigController::get()->getTitles()['EN']);
     }
@@ -197,11 +197,11 @@ class UpdateSettingsCommandTest extends TestCase {
      * @test
      */
     public function testUpdatePageDescription00() {
-        Runner::setInputStream(new ArrayInputStream([
+        Runner::setInput([
             'EN',
             'NEW PAGE DESCRIPTION'
-        ]));
-        Runner::setOutputStream(new ArrayOutputStream());
+        ]);
+        
         
         $this->assertEquals(0, Runner::runCommand(new UpdateSettingsCommand(), [
             '--w' => 'page-description'
@@ -212,7 +212,7 @@ class UpdateSettingsCommandTest extends TestCase {
             "1: AR\n",
             "Enter new description:\n",
             "Success: Description successfully updated.\n"
-        ], Runner::getOutputStream()->getOutputArray());
+        ], Runner::getOutput());
         
         $this->assertEquals('NEW PAGE DESCRIPTION', ConfigController::get()->getDescriptions()['EN']);
     }
@@ -220,11 +220,11 @@ class UpdateSettingsCommandTest extends TestCase {
      * @test
      */
     public function testUpdatePrimaryLang00() {
-        Runner::setInputStream(new ArrayInputStream([
+        Runner::setInput([
             'EN',
             'NEW PAGE DESCRIPTION'
-        ]));
-        Runner::setOutputStream(new ArrayOutputStream());
+        ]);
+        
         
         $this->assertEquals(0, Runner::runCommand(new UpdateSettingsCommand(), [
             '--w' => 'page-description'
@@ -235,18 +235,18 @@ class UpdateSettingsCommandTest extends TestCase {
             "1: AR\n",
             "Enter new description:\n",
             "Success: Description successfully updated.\n"
-        ], Runner::getOutputStream()->getOutputArray());
+        ], Runner::getOutput());
         $this->assertEquals('NEW PAGE DESCRIPTION', ConfigController::get()->getDescriptions()['EN']);
     }
     /**
      * @test
      */
     public function testUpdateTitleSep00() {
-        Runner::setInputStream(new ArrayInputStream([
+        Runner::setInput([
             '6',
             '+-+'
-        ]));
-        Runner::setOutputStream(new ArrayOutputStream());
+        ]);
+        
         
         $this->assertEquals(0, Runner::runCommand(new UpdateSettingsCommand()));
         $this->assertEquals([
@@ -264,33 +264,33 @@ class UpdateSettingsCommandTest extends TestCase {
             "10: Quit. <--\n",
             "Enter new title separator string: Enter = \"|\"\n",
             "Success: Title separator successfully updated.\n"
-        ], Runner::getOutputStream()->getOutputArray());
+        ], Runner::getOutput());
         $this->assertEquals('+-+', ConfigController::get()->getTitleSep());
     }
     /**
      * @test
      */
     public function testUpdateHomePage00() {
-        Runner::setInputStream(new ArrayInputStream([
+        Runner::setInput([
             
-        ]));
-        Runner::setOutputStream(new ArrayOutputStream());
+        ]);
+        
         
         $this->assertEquals(0, Runner::runCommand(new UpdateSettingsCommand(), [
             '--w' => 'home-page'
         ]));
         $this->assertEquals([
             "Info: Router has no routes. Nothing to change.\n",
-        ], Runner::getOutputStream()->getOutputArray());
+        ], Runner::getOutput());
     }
     /**
      * @test
      */
     public function testUpdatePrimaryTheme00() {
-        Runner::setInputStream(new ArrayInputStream([
+        Runner::setInput([
             'themes\\greeny\\GreenyTheme'
-        ]));
-        Runner::setOutputStream(new ArrayOutputStream());
+        ]);
+        
         
         $this->assertEquals(0, Runner::runCommand(new UpdateSettingsCommand(), [
             '--w' => 'primary-theme'
@@ -298,7 +298,7 @@ class UpdateSettingsCommandTest extends TestCase {
         $this->assertEquals([
             "Enter theme class name with namespace:\n",
             "Success: Primary theme successfully updated.\n"
-        ], Runner::getOutputStream()->getOutputArray());
+        ], Runner::getOutput());
         
         $this->assertEquals('themes\\greeny\\GreenyTheme', ConfigController::get()->getBaseTheme());
     }
@@ -306,12 +306,12 @@ class UpdateSettingsCommandTest extends TestCase {
      * @test
      */
     public function testUpdatePrimaryTheme01() {
-        Runner::setInputStream(new ArrayInputStream([
+        Runner::setInput([
             'themes\\greeny\\NotATheme',
             '',
             'themes\\greeny\\GreenyTheme'
-        ]));
-        Runner::setOutputStream(new ArrayOutputStream());
+        ]);
+        
         
         $this->assertEquals(0, Runner::runCommand(new UpdateSettingsCommand(), [
             '--w' => 'primary-theme'
@@ -323,7 +323,7 @@ class UpdateSettingsCommandTest extends TestCase {
             "Error: Invalid input is given. Try again.\n",
             "Enter theme class name with namespace:\n",
             "Success: Primary theme successfully updated.\n"
-        ], Runner::getOutputStream()->getOutputArray());
+        ], Runner::getOutput());
         
         $this->assertEquals('themes\\greeny\\GreenyTheme', ConfigController::get()->getBaseTheme());
     }
@@ -331,10 +331,10 @@ class UpdateSettingsCommandTest extends TestCase {
      * @test
      */
     public function testUpdateAdminTheme00() {
-        Runner::setInputStream(new ArrayInputStream([
+        Runner::setInput([
             'themes\\greeny\\GreenyTheme'
-        ]));
-        Runner::setOutputStream(new ArrayOutputStream());
+        ]);
+        
         
         $this->assertEquals(0, Runner::runCommand(new UpdateSettingsCommand(), [
             '--w' => 'admin-theme'
@@ -342,19 +342,19 @@ class UpdateSettingsCommandTest extends TestCase {
         $this->assertEquals([
             "Enter theme class name with namespace:\n",
             "Success: Admin theme successfully updated.\n"
-        ], Runner::getOutputStream()->getOutputArray());
+        ], Runner::getOutput());
         $this->assertEquals('themes\\greeny\\GreenyTheme', ConfigController::get()->getAdminTheme());
     }
     /**
      * @test
      */
     public function testUpdateAdminTheme01() {
-        Runner::setInputStream(new ArrayInputStream([
+        Runner::setInput([
             'themes\\greeny\\NotATheme',
             '',
             'themes\\greeny\\GreenyTheme'
-        ]));
-        Runner::setOutputStream(new ArrayOutputStream());
+        ]);
+        
         
         $this->assertEquals(0, Runner::runCommand(new UpdateSettingsCommand(), [
             '--w' => 'admin-theme'
@@ -366,7 +366,7 @@ class UpdateSettingsCommandTest extends TestCase {
             "Error: Invalid input is given. Try again.\n",
             "Enter theme class name with namespace:\n",
             "Success: Admin theme successfully updated.\n"
-        ], Runner::getOutputStream()->getOutputArray());
+        ], Runner::getOutput());
         $this->assertEquals('themes\\greeny\\GreenyTheme', ConfigController::get()->getAdminTheme());
     }
 }

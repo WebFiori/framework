@@ -19,10 +19,9 @@ class AddCommandTest extends TestCase {
      * @test
      */
     public function test00() {
-        Runner::setInputStream(new ArrayInputStream([
+        Runner::setInput([
             '3'
-        ]));
-        Runner::setOutputStream(new ArrayOutputStream());
+        ]);
         $this->assertEquals(0, Runner::runCommand(new AddCommand()));
         $this->assertEquals([
             "What would you like to add?\n",
@@ -30,7 +29,7 @@ class AddCommandTest extends TestCase {
             "1: New SMTP connection.\n",
             "2: New website language.\n",
             "3: Quit. <--\n"
-        ], Runner::getOutputStream()->getOutputArray());
+        ], Runner::getOutput());
     }
     /**
      * @test
@@ -152,15 +151,14 @@ class AddCommandTest extends TestCase {
      * @test
      */
     public function testAddLang00() {
-        Runner::setInputStream(new ArrayInputStream([
+        Runner::setInput([
             '2',
             'FK',
             'F Name',
             'F description',
             'Default f Title',
             'ltr',
-        ]));
-        Runner::setOutputStream(new ArrayOutputStream());
+        ]);
         $this->assertEquals(0, Runner::runCommand(new AddCommand()));
         $this->assertEquals([
             "What would you like to add?\n",
@@ -176,7 +174,7 @@ class AddCommandTest extends TestCase {
             "0: ltr\n",
             "1: rtl\n",
             "Success: Language added. Also, a class for the language is created at \"".APP_DIR_NAME."\langs\" for that language.\n"
-        ], Runner::getOutputStream()->getOutputArray());
+        ], Runner::getOutput());
         $this->assertTrue(class_exists('\\app\\langs\\LanguageFK'));
         $this->removeClass('\\app\\langs\\LanguageFK');
         ConfigController::get()->resetConfig();
@@ -185,11 +183,10 @@ class AddCommandTest extends TestCase {
      * @test
      */
     public function testAddLang01() {
-        Runner::setInputStream(new ArrayInputStream([
+        Runner::setInput([
             '2',
             'EN',
-        ]));
-        Runner::setOutputStream(new ArrayOutputStream());
+        ]);
         $this->assertEquals(0, Runner::runCommand(new AddCommand()));
         $this->assertEquals([
             "What would you like to add?\n",
@@ -199,17 +196,17 @@ class AddCommandTest extends TestCase {
             "3: Quit. <--\n",
             "Language code:\n",
             "Info: This language already added. Nothing changed.\n",
-        ], Runner::getOutputStream()->getOutputArray());
+        ], Runner::getOutput());
         ConfigController::get()->resetConfig();
     }
     /**
      * @test
      */
     public function testAddLang02() {
-        Runner::setInputStream(new ArrayInputStream([
+        Runner::setInput([
             '2',
             'FKRR',
-        ]));
+        ]);
         Runner::setOutputStream(new ArrayOutputStream());
         $this->assertEquals(-1, Runner::runCommand(new AddCommand()));
         $this->assertEquals([
@@ -220,7 +217,7 @@ class AddCommandTest extends TestCase {
             "3: Quit. <--\n",
             "Language code:\n",
             "Error: Invalid language code.\n",
-        ], Runner::getOutputStream()->getOutputArray());
+        ], Runner::getOutput());
         $this->assertTrue(class_exists('\\app\\langs\\LanguageFK'));
         $this->removeClass('\\app\\langs\\LanguageFK');
     }

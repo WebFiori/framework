@@ -15,8 +15,7 @@ class CommandTest extends TestCase {
      * @test
      */
     public function test00() {
-        Runner::setInputStream(new ArrayInputStream());
-        Runner::setOutputStream(new ArrayOutputStream());
+        Runner::setInput([]);
         $command = new TestCommand('hello', [
             'name' => []
         ]);
@@ -26,14 +25,13 @@ class CommandTest extends TestCase {
         $this->assertEquals([
             "Hello Ibrahim!\n",
             "Ok\n",
-        ], Runner::getOutputStream()->getOutputArray());
+        ], Runner::getOutput());
     }
     /**
      * @test
      */
     public function test01() {
-        Runner::setInputStream(new ArrayInputStream());
-        Runner::setOutputStream(new ArrayOutputStream());
+        Runner::setInput([]);
         $command = new TestCommand('hello', [
             'name' => []
         ]);
@@ -43,6 +41,6 @@ class CommandTest extends TestCase {
         $this->assertEquals([
             "Hello Hassan Hussain!\n",
             "Ok\n",
-        ], Runner::getOutputStream()->getOutputArray());
+        ], Runner::getOutput());
     }
 }

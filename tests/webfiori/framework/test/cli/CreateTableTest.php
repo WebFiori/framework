@@ -20,7 +20,7 @@ class CreateTableTest extends TestCase {
      * @test
      */
     public function testCreateTable00() {
-        Runner::setInputStream(new ArrayInputStream([
+        Runner::setInput([
             'mysql',
             'Cool00Table',
             '',
@@ -35,8 +35,8 @@ class CreateTableTest extends TestCase {
             'n',
             'n',
             'n'
-        ]));
-        Runner::setOutputStream(new ArrayOutputStream());
+        ]);
+        
         $this->assertEquals(0, Runner::runCommand(new CreateCommand(), [            
             '--c' => 'table'        
         ]));
@@ -92,14 +92,14 @@ class CreateTableTest extends TestCase {
             "Would you like to add foreign keys to the table?(y/N)\n",
             "Would you like to create an entity class that maps to the database table?(y/N)\n",
             'Info: New class was created at "'.ROOT_DIR.DS.'app'.DS."database\".\n",
-        ], Runner::getOutputStream()->getOutputArray());
+        ], Runner::getOutput());
         
     }
     /**
      * @test
      */
     public function testCreateTable01() {
-        Runner::setInputStream(new ArrayInputStream([
+        Runner::setInput([
             'mssql',
             'Cool01Table',
             '',
@@ -112,8 +112,8 @@ class CreateTableTest extends TestCase {
             'n',
             'n',
             'n'
-        ]));
-        Runner::setOutputStream(new ArrayOutputStream());
+        ]);
+        
         $this->assertEquals(0, Runner::runCommand(new CreateCommand(), [            
             '--c' => 'table'        
         ]));
@@ -166,14 +166,14 @@ class CreateTableTest extends TestCase {
             "Would you like to add foreign keys to the table?(y/N)\n",
             "Would you like to create an entity class that maps to the database table?(y/N)\n",
             'Info: New class was created at "'.ROOT_DIR.DS.'app'.DS."database\".\n",
-        ], Runner::getOutputStream()->getOutputArray());
+        ], Runner::getOutput());
         
     }
     /**
      * @test
      */
     public function testCreateTable03() {
-        Runner::setInputStream(new ArrayInputStream([
+        Runner::setInput([
             'mysql',
             'Cool01Table',
             '',
@@ -212,12 +212,12 @@ class CreateTableTest extends TestCase {
 
             'n',
             'n'
-        ]));
-        Runner::setOutputStream(new ArrayOutputStream());
+        ]);
+        
         $this->assertEquals(0, Runner::runCommand(new CreateCommand(), [            
             '--c' => 'table'        
         ]));
-        $output = Runner::getOutputStream()->getOutputArray();
+        $output = Runner::getOutput();
         $this->assertTrue(class_exists('\\app\\database\\Cool03Table'));
         $clazz = '\\app\\database\\Cool03Table';
         $this->removeClass($clazz);
@@ -337,7 +337,7 @@ class CreateTableTest extends TestCase {
      * @test
      */
     public function testCreateTable02() {
-        Runner::setInputStream(new ArrayInputStream([
+        Runner::setInput([
             'mysql',
             'Cool02Table',
             '',
@@ -366,12 +366,12 @@ class CreateTableTest extends TestCase {
             
             'n',
             'n'
-        ]));
-        Runner::setOutputStream(new ArrayOutputStream());
+        ]);
+        
         $this->assertEquals(0, Runner::runCommand(new CreateCommand(), [            
             '--c' => 'table'        
         ]));
-        $output = Runner::getOutputStream()->getOutputArray();
+        $output = Runner::getOutput();
         $this->assertTrue(class_exists('\\app\\database\\Cool02Table'));
         $clazz = '\\app\\database\\Cool02Table';
         $this->removeClass($clazz);
@@ -464,7 +464,7 @@ class CreateTableTest extends TestCase {
      * @test
      */
     public function testCreateTable04() {
-        Runner::setInputStream(new ArrayInputStream([
+        Runner::setInput([
             'mysql',
             'CoolWithEntity00Table',
             '',
@@ -483,12 +483,12 @@ class CreateTableTest extends TestCase {
             '',
             'y',
             'n'
-        ]));
-        Runner::setOutputStream(new ArrayOutputStream());
+        ]);
+        
         $this->assertEquals(0, Runner::runCommand(new CreateCommand(), [            
             '--c' => 'table'        
         ]));
-        $output = Runner::getOutputStream()->getOutputArray();
+        $output = Runner::getOutput();
         $this->removeClass('\\app\\database\\CoolWithEntity00Table');
         $clazz = '\\app\\entity\\MySuperCoolEntity00';
         $this->assertTrue(class_exists($clazz));
@@ -543,7 +543,7 @@ class CreateTableTest extends TestCase {
      * @test
      */
     public function testCreateTable05() {
-        Runner::setInputStream(new ArrayInputStream([
+        Runner::setInput([
             'mysql',
             'Cool05Table',
             '',
@@ -558,8 +558,8 @@ class CreateTableTest extends TestCase {
             'n',
             'n',
             'n'
-        ]));
-        Runner::setOutputStream(new ArrayOutputStream());
+        ]);
+        
         $this->assertEquals(0, Runner::runCommand(new CreateCommand(), [            
             '--c' => 'table'        
         ]));
@@ -572,7 +572,7 @@ class CreateTableTest extends TestCase {
      * @depends testCreateTable05
      */
     public function testCreateTable06($refTable) {
-        Runner::setInputStream(new ArrayInputStream([
+        Runner::setInput([
             'mysql',
             'Cool06Table',
             '',
@@ -602,12 +602,12 @@ class CreateTableTest extends TestCase {
             '0',
             'n',
             'n'
-        ]));
-        Runner::setOutputStream(new ArrayOutputStream());
+        ]);
+        
         $this->assertEquals(0, Runner::runCommand(new CreateCommand(), [
             '--c' => 'table'
         ]));
-        $output = Runner::getOutputStream()->getOutputArray();
+        $output = Runner::getOutput();
         $clazz = '\\app\\database\\Cool06Table';
         $this->assertTrue(class_exists($clazz));
         $this->removeClass($clazz);

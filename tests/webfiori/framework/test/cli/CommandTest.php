@@ -5,6 +5,7 @@ use PHPUnit\Framework\TestCase;
 use webfiori\framework\cli\Runner;
 use webfiori\framework\cli\ArrayInputStream;
 use \webfiori\framework\cli\ArrayOutputStream;
+use webfiori\framework\cli\OutputFormatter;
 /**
  * Description of CommandTest
  *
@@ -20,7 +21,7 @@ class CommandTest extends TestCase {
             'name' => []
         ]);
         $this->assertEquals(0, Runner::runCommand($command, [
-            'name' => 'Ibrahim'
+            'name' => 'Ibrahim',
         ]));
         $this->assertEquals([
             "Hello Ibrahim!\n",
@@ -40,6 +41,26 @@ class CommandTest extends TestCase {
         ]));
         $this->assertEquals([
             "Hello Hassan Hussain!\n",
+            "Ok\n",
+        ], Runner::getOutput());
+    }
+    /**
+     * @test
+     */
+    public function test02() {
+        Runner::setInput([]);
+        $command = new TestCommand('hello', [
+            'name' => []
+        ]);
+        $this->assertEquals(0, Runner::runCommand($command, [
+            'name' => 'Hassan Hussain',
+            '--ansi'
+        ]));
+        $this->assertEquals([
+            OutputFormatter::formatOutput('Hello Hassan Hussain!', [
+                'color' => 'red',
+                'ansi' => true
+            ])."\n",
             "Ok\n",
         ], Runner::getOutput());
     }

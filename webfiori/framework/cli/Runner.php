@@ -232,13 +232,23 @@ class Runner {
                 return -1;
             }
         }
-        
-        foreach ($args as $argName => $argVal) {
-            $c->setArgValue($argName, $argVal);
-        }
+        self::setArgV($args);
         self::get()->commandExitVal = $c->excCommand();
         return self::get()->commandExitVal;
     }
+    private static function setArgV(array $args) {
+        $argV = [];
+        
+        foreach ($args as $argName => $argVal) {
+            if (gettype($argName) == 'integer') {
+                $argV[] = $argVal;
+            } else {
+                $argV[] = $argName.'='.$argVal;
+            }
+        }
+        $_SERVER['argv'] = $argV;
+    }
+
     /**
      * Sets the stream at which the runner will be using to read inputs from.
      * 

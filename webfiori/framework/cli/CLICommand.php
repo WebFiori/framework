@@ -632,7 +632,7 @@ abstract class CLICommand {
         
 
         if ($argObj !== null) {
-            $isNull = $argObj->getValue() == null;
+            $isNull = $argObj->getValue() === null;
             
             if (!$isNull && $argObj->getValue() == '') {
                 return true;

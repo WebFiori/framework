@@ -30,6 +30,7 @@ use webfiori\framework\WebFioriApp;
 use webfiori\json\Json;
 use webfiori\json\JsonI;
 use webfiori\http\Request;
+use webfiori\http\HttpCookie;
 /**
  * A class that represents a session.
  *
@@ -85,14 +86,7 @@ class Session implements JsonI {
      * @since 1.0
      */
     const STATUS_RESUMED = 'status_resumed';
-    /**
-     * An associative array that contains session cookie parameters.
-     * 
-     * @var array
-     * 
-     * @since 1.0 
-     */
-    private $cookieParams;
+    private $sessionCookie;
     /**
      * The IP address of the user who is using the session.
      * 
@@ -162,14 +156,12 @@ class Session implements JsonI {
     /**
      * An object of type 'User' that represents session user.
      * 
-     * @var User
+     * @var SessionUser
      * 
      * @since 1.0 
      */
     private $sesstionUser;
-    private $sId;
 
-    private $sName;
     /**
      * The timestamp at which the session was started in as Unix timestamp.
      * 
@@ -201,10 +193,13 @@ class Session implements JsonI {
     public function __construct(array $options = []) {
         //used to support older PHP versions which does not have 'random_int'.
         self::$randFunc = is_callable('random_int') ? 'random_int' : 'rand';
+        $this->sessionCookie = new HttpCookie();
+        $this->sesstionUser = null;
+        
         $this->sessionStatus = self::STATUS_INACTIVE;
         $this->passedTime = 0;
         $this->langCode = '';
-        $this->sesstionUser = new User();
+        
         
         if (isset($options['refresh'])) {
             $this->setIsRefresh($options['refresh']);
@@ -222,7 +217,7 @@ class Session implements JsonI {
             throw new SessionException('Invalid session name: \''.$tempSName.'\'.');
         }
 
-        $this->sId = isset($options['session-id']) ? trim($options['session-id']) : $this->_generateSessionID();
+        $this->getCookie()->setValue(isset($options['session-id']) ? trim($options['session-id']) : $this->_generateSessionID());
         $this->setIsRefresh(false);
 
         
@@ -236,14 +231,13 @@ class Session implements JsonI {
 
         $this->ipAddr = Request::getClientIP();
         $expires = $this->isPersistent() ? time() + $this->getDuration() : 0;
-        $this->cookieParams = [
-            'expires' => $expires,
-            'domain' => trim(filter_var($_SERVER['HTTP_HOST']),'/'),
-            'path' => '/',
-            'secure' => true,
-            'httponly' => true,
-            'samesite' => 'Lax'
-        ];
+        
+        
+        $this->getCookie()->setExpires($expires);
+        $this->getCookie()->setSameSite('Lax');
+        $this->getCookie()->setIsSecure(true);
+        $this->getCookie()->setIsHttpOnly(true);
+        
     }
     /**
      * Returns a JSON string that represents the session.
@@ -300,44 +294,15 @@ class Session implements JsonI {
      * @since 1.0
      */
     public function getCookieHeader() : string {
-        $cookieData = $this->getCookieParams();
-        $httpOnly = $cookieData['httponly'] === true ? '; HttpOnly' : '';
-        $secure = $cookieData['secure'] === true ? '; Secure' : '';
-        $sameSite = $cookieData['samesite'];
-
-        if ($cookieData['expires'] == 0) {
-            $lifetime = '';
-        } else {
-            $lifetime = '; expires='.date(DATE_COOKIE, $cookieData['expires']);
-        }
-        $name = $this->getName();
-        $value = $this->getId();
-
-        return "$name=$value"
-                ."$lifetime; "
-                ."path=".$cookieData['path']
-                ."$secure"
-                ."$httpOnly"
-                .'; SameSite='.$sameSite;
+        return $this->sessionCookie.'';;
     }
     /**
-     * Returns an associative array that contains session cookie's information.
+     * Returns the cookie which is associated with the cookie.
      * 
-     * @return array The array will contain the following indices:
-     * <ul>
-     * <li>expires: The time at which session cookie will expire. If the cookie is 
-     * persistent, this will have a non-zero value.</li>
-     * <li>domain: The domain at which session cookie will operate in.</li>
-     * <li>path: The path that the cookie will operate in.</li>
-     * <li>httponly</li>
-     * <li>secure</li>
-     * <li>samesite</li>
-     * </ul>
-     * 
-     * @since 1.0
+     * @return HttpCookie An object that holds session cookie information.
      */
-    public function getCookieParams() : array {
-        return $this->cookieParams;
+    public function getCookie() : HttpCookie {
+        return $this->sessionCookie;
     }
     /**
      * Returns the amount of time at which the session will be kept alive in.
@@ -356,7 +321,7 @@ class Session implements JsonI {
      * @return string The ID of the session.
      */
     public function getId() : string {
-        return $this->sId;
+        return $this->getCookie()->getValue();
     }
     /**
      * Returns the IP address of the client at which the request has come from.
@@ -397,7 +362,7 @@ class Session implements JsonI {
      * @since 1.0
      */
     public function getName() : string {
-        return $this->sName;
+        return $this->getCookie()->getName();
     }
     /**
      * Returns the number of seconds that has been passed since the session started.
@@ -477,13 +442,14 @@ class Session implements JsonI {
         return $this->sessionStatus;
     }
     /**
-     * Returns an object of type 'User' that represents session user.
+     * Returns an object of type 'SessionUser' that represents session user.
      * 
-     * @return User An object of type 'User' that represents session user.
+     * @return SessionUser|null An object of type 'User' that represents session user.
+     * If session user is not set, the method will return null.
      * 
      * @since 1.0
      */
-    public function getUser() : User {
+    public function getUser() {
         return $this->sesstionUser;
     }
     /**
@@ -565,7 +531,7 @@ class Session implements JsonI {
     public function kill() {
         SessionsManager::getStorage()->remove($this->getId());
         $this->sessionStatus = self::STATUS_KILLED;
-        $this->cookieParams['expires'] = time() - 1;
+        $this->sessionCookie->kill();
     }
     /**
      * Retrieves the value of a session variable and removes it from the session.
@@ -594,9 +560,9 @@ class Session implements JsonI {
      * @since 1.0
      */
     public function reGenerateID() : string {
-        $this->sId = $this->_generateSessionID();
+        $this->getCookie()->setValue($this->_generateSessionID());
 
-        return $this->sId;
+        return $this->getCookie()->getValue();
     }
     /**
      * Removes the value of a session variable.
@@ -697,7 +663,8 @@ class Session implements JsonI {
 
         if ($asFloat >= 0) {
             $this->lifeTime = $asFloat;
-            $this->cookieParams['expires'] = $asFloat == 0 ? 0 : time() + $this->getDuration();
+            $expires = $asFloat == 0 ? 0 : time() + $this->getDuration();
+            $this->sessionCookie->setExpires($expires);
             $this->_checkIfExpired();
 
             return true;
@@ -726,22 +693,18 @@ class Session implements JsonI {
      * @since 1.0
      */
     public function setSameSite(string $val) {
-        $trimmed = strtolower(trim($val));
-
-        if ($trimmed == 'lax' || $trimmed == 'none' || $trimmed == 'strict') {
-            $this->cookieParams['samesite'] = strtoupper($trimmed[0]).substr($trimmed, 1);
-        }
+        $this->getCookie()->setSameSite($val);
     }
     /**
      * Sets the user that represents session user.
      * 
      * Note that the user will be set only if the session is active.
      * 
-     * @param User $userObj An object of type 'User'.
+     * @param SessionUser $userObj An object of type 'User'.
      * 
      * @since 1.0
      */
-    public function setUser(User $userObj) {
+    public function setUser(SessionUser $userObj) {
         if ($this->isRunning()) {
             $this->sesstionUser = $userObj;
         }
@@ -844,17 +807,15 @@ class Session implements JsonI {
         if ($this->getRemainingTime() < 0) {
             SessionsManager::getStorage()->remove($this->getId());
             $this->sessionStatus = self::STATUS_EXPIERED;
-            $this->cookieParams['expires'] = time() - 1;
+            $this->sessionCookie->kill();
         } else if ($this->isRefresh()) {
-            $this->cookieParams['expires'] = time() + $this->getDuration();
+            $this->sessionCookie->setExpires(time() + $this->getDuration());
         }
     }
-    private function _clone($session) {
+    private function _clone(Session $session) {
         $this->startedAt = $session->startedAt;
-        $this->cookieParams = $session->cookieParams;
+        $this->sessionCookie = $session->sessionCookie;
         $this->sessionArr = $session->sessionArr;
-        $this->sName = $session->sName;
-        $this->sId = $session->sId;
         $this->isRef = $session->isRef;
         $this->resumedAt = time();
         $this->lifeTime = $session->lifeTime;
@@ -995,8 +956,8 @@ class Session implements JsonI {
                 return false;
             }
         }
-        $this->sName = $trimmed;
-
+        $this->getCookie()->setName($trimmed);
+        
         return true;
     }
 }

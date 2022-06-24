@@ -1559,31 +1559,31 @@ class Router {
      * 
      * @param string $requestMethod
      */
-    private function _setUriVars($uriRouteObj, $requestedPathArr, $requestMethod) {
+    private function _setUriVars(RouterUri $uriRouteObj, $requestedPathArr, $requestMethod) {
         $routePathArray = $uriRouteObj->getPathArray();
+        $pathVarsCount = count($routePathArray);
+        $requestedPathPartsCount = count($requestedPathArr);
 
-        if (count($routePathArray) == count($requestedPathArr)) {
-            $pathVarsCount = count($routePathArray);
-
-            for ($x = 0 ; $x < $pathVarsCount ; $x++) {
-                if ($this->_isDirectoryAVar($routePathArray[$x])) {
-                    $varName = trim($routePathArray[$x], '{}');
-                    $uriRouteObj->setParameterValue($varName, $requestedPathArr[$x]);
-
-                    if ($requestMethod == 'POST' || $requestMethod == 'PUT') {
-                        $_POST[$varName] = filter_var(urldecode($requestedPathArr[$x]));
-                    } else {
-                        if ($requestMethod == 'GET' || $requestMethod == 'DELETE' || Runner::isCLI()) {
-                            //usually, in CLI there is no request method. 
-                            //but we store result in $_GET.
-                            $_GET[$varName] = filter_var(urldecode($requestedPathArr[$x]));
-                        }
-                    }
-                } else {
-                    if ((!$uriRouteObj->isCaseSensitive() && (strtolower($routePathArray[$x]) != strtolower($requestedPathArr[$x]))) || $routePathArray[$x] != $requestedPathArr[$x]) {
-                        break;
-                    }
+        for ($x = 0 ; $x < $pathVarsCount ; $x++) {
+            if ($x == $requestedPathPartsCount) {
+                break;
+            }
+            if ($this->_isDirectoryAVar($routePathArray[$x])) {
+                $varName = trim($routePathArray[$x], '{}');
+                if ($varName[strlen($varName) - 1] == '?') {
+                    $varName = trim($varName, '?');
                 }
+                $uriRouteObj->setParameterValue($varName, $requestedPathArr[$x]);
+
+                if ($requestMethod == 'POST' || $requestMethod == 'PUT') {
+                    $_POST[$varName] = filter_var(urldecode($requestedPathArr[$x]));
+                } else if ($requestMethod == 'GET' || $requestMethod == 'DELETE' || Runner::isCLI()) {
+                    //usually, in CLI there is no request method. 
+                    //but we store result in $_GET.
+                    $_GET[$varName] = filter_var(urldecode($requestedPathArr[$x]));
+                }
+            } else if ((!$uriRouteObj->isCaseSensitive() && (strtolower($routePathArray[$x]) != strtolower($requestedPathArr[$x]))) || $routePathArray[$x] != $requestedPathArr[$x]) {
+                break;
             }
         }
     }

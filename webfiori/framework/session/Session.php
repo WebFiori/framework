@@ -220,18 +220,10 @@ class Session implements JsonI {
         }
 
         $this->getCookie()->setValue(isset($options['session-id']) ? trim($options['session-id']) : $this->_generateSessionID());
-        
-
-
-        
-
-
         $this->resumedAt = 0;
         $this->startedAt = 0;
         $this->sessionArr = [];
-
         $this->passedTime = 0;
-
         $this->ipAddr = Request::getClientIP();
         $this->getCookie()->setSameSite('Lax');
         $this->getCookie()->setIsSecure(true);

@@ -79,7 +79,7 @@ class SessionsManagerTest extends TestCase {
         $this->assertEquals(Session::STATUS_PAUSED, $activeSesstion->getStatus());
         $active2 = SessionsManager::getActiveSession();
         $this->assertEquals(300, $active2->getDuration());
-        $this->assertFalse($active2->isRefresh());
+        $this->assertTrue($active2->isRefresh());
         $this->assertTrue($active2->isRunning());
         $this->assertNull(SessionsManager::get('var-3 '));
         $this->assertNull(SessionsManager::get(' var-4 '));

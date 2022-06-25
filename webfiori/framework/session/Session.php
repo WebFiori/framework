@@ -204,13 +204,15 @@ class Session implements JsonI {
         if (isset($options['refresh'])) {
             $this->setIsRefresh($options['refresh']);
         } else {
-            $this->isRef = false;
+            $this->setIsRefresh(false);
         }
         
         if (!(isset($options['duration']) && $this->setDuration($options['duration']))) {
             $this->setDuration(self::DEFAULT_SESSION_DURATION);
         }
-
+        if ($this->getDuration() == 0) {
+            $this->setIsRefresh(false);
+        }
         $tempSName = isset($options['name']) ? trim($options['name']) : null;
 
         if (!$this->_setName($tempSName)) {
@@ -218,7 +220,8 @@ class Session implements JsonI {
         }
 
         $this->getCookie()->setValue(isset($options['session-id']) ? trim($options['session-id']) : $this->_generateSessionID());
-        $this->setIsRefresh(false);
+        
+
 
         
 
@@ -230,10 +233,6 @@ class Session implements JsonI {
         $this->passedTime = 0;
 
         $this->ipAddr = Request::getClientIP();
-        $expires = $this->isPersistent() ? time() + $this->getDuration() : 0;
-        
-        
-        $this->getCookie()->setExpires($expires);
         $this->getCookie()->setSameSite('Lax');
         $this->getCookie()->setIsSecure(true);
         $this->getCookie()->setIsHttpOnly(true);
@@ -305,7 +304,7 @@ class Session implements JsonI {
         return $this->sessionCookie;
     }
     /**
-     * Returns the amount of time at which the session will be kept alive in.
+     * Returns the amount of time at which the session will live for in seconds.
      * 
      * @return int This method will return session duration in seconds. The
      * default duration of any new session is 120 minutes (7200 seconds).
@@ -663,8 +662,7 @@ class Session implements JsonI {
 
         if ($asFloat >= 0) {
             $this->lifeTime = $asFloat;
-            $expires = $asFloat == 0 ? 0 : time() + $this->getDuration();
-            $this->sessionCookie->setExpires($expires);
+            $this->sessionCookie->setExpires($asFloat);
             $this->_checkIfExpired();
 
             return true;
@@ -809,7 +807,7 @@ class Session implements JsonI {
             $this->sessionStatus = self::STATUS_EXPIERED;
             $this->sessionCookie->kill();
         } else if ($this->isRefresh()) {
-            $this->sessionCookie->setExpires(time() + $this->getDuration());
+            $this->sessionCookie->setExpires($this->getDuration());
         }
     }
     private function _clone(Session $session) {

@@ -1339,6 +1339,15 @@ class ConfigController {
         $this->a($cFile, $this->since10, 1);
         $this->a($cFile, $this->docEnd, 1);
         $this->a($cFile, "    private \$defaultPageTitles;");
+        
+        $this->a($cFile, $this->docStart, 1);
+        $this->a($cFile, "     * An array that is used to hold default page descriptions for different languages.");
+        $this->a($cFile, $this->docEmptyLine, 1);
+        $this->a($cFile, "     * @var array");
+        $this->a($cFile, $this->docEmptyLine, 1);
+        $this->a($cFile, $this->since10, 1);
+        $this->a($cFile, $this->docEnd, 1);
+        $this->a($cFile, "    private \$descriptions;");
 
         $this->a($cFile, $this->docStart, 1);
         $this->a($cFile, "     * An array that holds SMTP connections information.");

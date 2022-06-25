@@ -16,17 +16,11 @@ class CreateCommandTest extends TestCase {
     /**
      * @test
      */
-    public function testCreateBackgroundJob00() {
-        Runner::setInputStream(new ArrayInputStream([
-            '3',
-            'SuperCoolJob',
-            'app\jobs',
-            'The Greatest Job',
-            'The job will do nothing.',
-            'N',
-            '',
-        ]));
-        Runner::setOutputStream(new ArrayOutputStream());
+    public function testCreate00() {
+        Runner::setInput([
+            '7',
+        ]);
+        
         $this->assertEquals(0, Runner::runCommand(new CreateCommand()));
         $this->assertEquals([
             "What would you like to create?\n",
@@ -35,17 +29,64 @@ class CreateCommandTest extends TestCase {
             "2: Web service.\n",
             "3: Background job.\n",
             "4: Middleware.\n",
-            "5: Database table from class.\n",
-            "6: CLI Command.\n",
-            "7: Theme.\n",
-            "8: Quit. <--\n",
+            "5: CLI Command.\n",
+            "6: Theme.\n",
+            "7: Quit. <--\n",
+        ], Runner::getOutput());
+    }
+    /**
+     * @test
+     */
+    public function testCreate01() {
+        Runner::setInput([
+            '',
+        ]);
+        
+        $this->assertEquals(0, Runner::runCommand(new CreateCommand()));
+        $this->assertEquals([
+            "What would you like to create?\n",
+            "0: Database table class.\n",
+            "1: Entity class from table.\n",
+            "2: Web service.\n",
+            "3: Background job.\n",
+            "4: Middleware.\n",
+            "5: CLI Command.\n",
+            "6: Theme.\n",
+            "7: Quit. <--\n",
+        ], Runner::getOutput());
+    }
+    /**
+     * @test
+     */
+    public function testCreateBackgroundJob00() {
+        Runner::setInput([
+            '3',
+            'SuperCoolJob',
+            'app\jobs',
+            'The Greatest Job',
+            'The job will do nothing.',
+            'N',
+            '',
+        ]);
+        
+        $this->assertEquals(0, Runner::runCommand(new CreateCommand()));
+        $this->assertEquals([
+            "What would you like to create?\n",
+            "0: Database table class.\n",
+            "1: Entity class from table.\n",
+            "2: Web service.\n",
+            "3: Background job.\n",
+            "4: Middleware.\n",
+            "5: CLI Command.\n",
+            "6: Theme.\n",
+            "7: Quit. <--\n",
             "Enter a name for the new class:\n",
             "Enter an optional namespace for the class: Enter = \"app\jobs\"\n",
             "Enter a name for the job:\n",
             "Provide short description of what does the job will do:\n",
             "Would you like to add arguments to the job?(y/N)\n",
             "Info: New class was created at \"".ROOT_DIR.DS.'app'.DS."jobs\".\n",
-        ], Runner::getOutputStream()->getOutputArray());
+        ], Runner::getOutput());
         $this->assertTrue(class_exists('\\app\\jobs\\SuperCoolJob'));
         $this->removeClass('\\app\\jobs\\SuperCoolJob');
     }
@@ -55,7 +96,7 @@ class CreateCommandTest extends TestCase {
      * @test
      */
     public function testCreateMiddleware00() {
-        Runner::setInputStream(new ArrayInputStream([
+        Runner::setInput([
             '4',
             'NewCoolMd',
             'app\middleware',
@@ -63,8 +104,8 @@ class CreateCommandTest extends TestCase {
             '22',
             '',
             '',
-        ]));
-        Runner::setOutputStream(new ArrayOutputStream());
+        ]);
+        
         $this->assertEquals(0, Runner::runCommand(new CreateCommand()));
         $this->assertEquals([
             "What would you like to create?\n",
@@ -73,17 +114,16 @@ class CreateCommandTest extends TestCase {
             "2: Web service.\n",
             "3: Background job.\n",
             "4: Middleware.\n",
-            "5: Database table from class.\n",
-            "6: CLI Command.\n",
-            "7: Theme.\n",
-            "8: Quit. <--\n",
+            "5: CLI Command.\n",
+            "6: Theme.\n",
+            "7: Quit. <--\n",
             "Enter a name for the new class:\n",
             "Enter an optional namespace for the class: Enter = \"app\middleware\"\n",
             "Enter a name for the middleware:\n",
             "Enter middleware priority: Enter = \"0\"\n",
             "Would you like to add the middleware to a group?(y/N)\n",
             'Info: New class was created at "'.ROOT_DIR.DS.'app'.DS."middleware\".\n",
-        ], Runner::getOutputStream()->getOutputArray());
+        ], Runner::getOutput());
         $this->assertTrue(class_exists('\\app\\middleware\\NewCoolMdMiddleware'));
         $this->removeClass('\\app\\middleware\\NewCoolMdMiddleware');
     }
@@ -91,16 +131,16 @@ class CreateCommandTest extends TestCase {
      * @test
      */
     public function testCreateCommand00() {
-        Runner::setInputStream(new ArrayInputStream([
-            '6',
+        Runner::setInput([
+            '5',
             'NewCLI',
             'app\commands',
             'print-hello',
             'Prints \'Hello World\' in the console.',
             'N',
             '',
-        ]));
-        Runner::setOutputStream(new ArrayOutputStream());
+        ]);
+        
         $this->assertEquals(0, Runner::runCommand(new CreateCommand()));
         $this->assertEquals([
             "What would you like to create?\n",
@@ -109,17 +149,16 @@ class CreateCommandTest extends TestCase {
             "2: Web service.\n",
             "3: Background job.\n",
             "4: Middleware.\n",
-            "5: Database table from class.\n",
-            "6: CLI Command.\n",
-            "7: Theme.\n",
-            "8: Quit. <--\n",
+            "5: CLI Command.\n",
+            "6: Theme.\n",
+            "7: Quit. <--\n",
             "Enter a name for the new class:\n",
             "Enter an optional namespace for the class: Enter = \"app\commands\"\n",
             "Enter a name for the command:\n",
             "Give a short description of the command:\n",
             "Would you like to add arguments to the command?(y/N)\n",
             'Info: New class was created at "'.ROOT_DIR.DS.'app'.DS."commands\".\n",
-        ], Runner::getOutputStream()->getOutputArray());
+        ], Runner::getOutput());
         $this->assertTrue(class_exists('\\app\\commands\\NewCLICommand'));
         $this->removeClass('\\app\\commands\\NewCLICommand');
     }
@@ -127,7 +166,7 @@ class CreateCommandTest extends TestCase {
      * @test
      */
     public function testCreateWebService00() {
-        Runner::setInputStream(new ArrayInputStream([
+        Runner::setInput([
             '2',
             'NewWeb',
             '',
@@ -139,8 +178,8 @@ class CreateCommandTest extends TestCase {
             'n',
             'n',
             '',
-        ]));
-        Runner::setOutputStream(new ArrayOutputStream());
+        ]);
+        
         $this->assertEquals(0, Runner::runCommand(new CreateCommand()));
         $this->assertEquals([
             "What would you like to create?\n",
@@ -149,10 +188,9 @@ class CreateCommandTest extends TestCase {
             "2: Web service.\n",
             "3: Background job.\n",
             "4: Middleware.\n",
-            "5: Database table from class.\n",
-            "6: CLI Command.\n",
-            "7: Theme.\n",
-            "8: Quit. <--\n",
+            "5: CLI Command.\n",
+            "6: Theme.\n",
+            "7: Quit. <--\n",
             "Enter a name for the new class:\n",
             "Enter an optional namespace for the class: Enter = \"app\apis\"\n",
             "Enter a name for the new web service:\n",
@@ -183,7 +221,7 @@ class CreateCommandTest extends TestCase {
             "Creating the class...\n",
             'Info: New class was created at "'.ROOT_DIR.DS.'app'.DS."apis\".\n",
             "Info: Don't forget to add the service to a services manager.\n",
-        ], Runner::getOutputStream()->getOutputArray());
+        ], Runner::getOutput());
         $this->assertTrue(class_exists('\\app\\apis\\NewWebService'));
         $this->removeClass('\\app\\apis\\NewWebService');
     }
@@ -191,13 +229,13 @@ class CreateCommandTest extends TestCase {
      * @test
      */
     public function testCreateTheme00() {
-        Runner::setInputStream(new ArrayInputStream([
-            '7',
+        Runner::setInput([
+            '6',
             'NewTest',
             'themes\\fiori',
             '',
-        ]));
-        Runner::setOutputStream(new ArrayOutputStream());
+        ]);
+        
         $this->assertEquals(0, Runner::runCommand(new CreateCommand()));
         $this->assertEquals([
             "What would you like to create?\n",
@@ -206,15 +244,14 @@ class CreateCommandTest extends TestCase {
             "2: Web service.\n",
             "3: Background job.\n",
             "4: Middleware.\n",
-            "5: Database table from class.\n",
-            "6: CLI Command.\n",
-            "7: Theme.\n",
-            "8: Quit. <--\n",
+            "5: CLI Command.\n",
+            "6: Theme.\n",
+            "7: Quit. <--\n",
             "Enter a name for the new class:\n",
             "Enter an optional namespace for the class: Enter = \"themes\"\n",
             'Creating theme at "'.ROOT_DIR.DS.'themes'.DS."fiori\"...\n",
             'Info: New class was created at "'.ROOT_DIR.DS.'themes'.DS."fiori\".\n",
-        ], Runner::getOutputStream()->getOutputArray());
+        ], Runner::getOutput());
 
         $this->assertTrue(class_exists('\\themes\\fiori\\NewTestTheme'));
         $this->removeClass('\\themes\\fiori\\NewTestTheme');

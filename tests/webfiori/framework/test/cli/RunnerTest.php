@@ -34,7 +34,7 @@ class RunnerTest extends TestCase {
     public function testStart00() {
         $_SERVER['argc'] = 0;
         $this->assertEquals(0, Runner::start());
-        $outputArr = Runner::getOutputStream()->getOutputArray();
+        $outputArr = Runner::getOutput();
         $this->assertEquals([
             'Usage:'."\n",
             '    command [arg1 arg2="val" arg3...]'."\n\n",

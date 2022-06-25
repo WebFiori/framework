@@ -28,9 +28,7 @@ class ArrayOutputStream implements OutputStream {
      */
     public function println(string $str, ...$_) {
         $this->isPrintln = true;
-        $toPass = [
-            $this->asString($str)."\n"
-        ];
+        $toPass = [$str."\n"];
 
         foreach ($_ as $val) {
             $toPass[] = $val;
@@ -48,9 +46,7 @@ class ArrayOutputStream implements OutputStream {
      * @param type $_ Any extra parameters that the string needs.
      */
     public function prints(string $str, ...$_) {
-        $arrayToPass = [
-            $str
-        ];
+        $arrayToPass = [$str];
 
         foreach ($_ as $val) {
             $type = gettype($val);
@@ -88,16 +84,5 @@ class ArrayOutputStream implements OutputStream {
      */
     public function reset() {
         $this->outputArr = [];
-    }
-    private function asString($var) {
-        $type = gettype($var);
-
-        if ($type == 'boolean') {
-            return $var === true ? 'true' : 'false';
-        } else if ($type == 'null') {
-            return 'null';
-        }
-
-        return $var;
     }
 }

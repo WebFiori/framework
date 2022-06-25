@@ -43,7 +43,12 @@ use webfiori\framework\cli\helpers\CreateWebService;
  */
 class CreateCommand extends CLICommand {
     public function __construct() {
-        parent::__construct('create', [], 'Creates a system entity (middleware, web service, background process ...).');
+        parent::__construct('create', [
+            '--c' => [
+                'optional' => true,
+                'description' => 'What will be created. Possible values: table'
+            ]
+        ], 'Creates a system entity (middleware, web service, background process ...).');
     }
 
     public function _createEntityFromQuery() {
@@ -102,17 +107,28 @@ class CreateCommand extends CLICommand {
     }
     public function exec() : int {
         $options = [
-            'Database table class.',
-            'Entity class from table.',
-            'Web service.',
-            'Background job.',
-            'Middleware.',
-            'Database table from class.',
-            'CLI Command.',
-            'Theme.',
-            'Quit.'
+           'table' => 'Database table class.',
+           'entity' => 'Entity class from table.',
+           'web-service' => 'Web service.',
+           'background-job' => 'Background job.',
+           'middleware' => 'Middleware.',
+           'command' => 'CLI Command.',
+           'theme' => 'Theme.',
+           'Quit.'
         ];
-        $answer = $this->select('What would you like to create?', $options, count($options) - 1);
+        $what = $this->getArgValue('--c');
+        $answer = null;
+        if ($what !== null) {
+            $answer = isset($options[$what]) ? $options[$what] : null;
+            
+            if ($answer === null) {
+                $this->warning('The argument --c has invalid value.');
+            }
+        }
+        if ($answer === null) {
+            $answer = $this->select('What would you like to create?', $options, count($options) - 1);
+        }
+        
         if ($answer == 'Quit.') {
         } else if ($answer == 'Database table class.') {
             $create = new CreateTableObj($this);

@@ -77,6 +77,41 @@ class Runner {
     public static function register(CLICommand $cliCommand) {
         self::get()->commands[$cliCommand->getName()] = $cliCommand;
     }
+    /**
+     * Sets an array as an input for running specific command.
+     * 
+     * This method is used to test the execution process of specific command.
+     * The developer can use it to mimic the inputs which could be provided
+     * by the user when actually running the command through a terminal.
+     * The developer can use the method 'Runner::getOutput()' to get generated
+     * output and compare it with expected output.
+     * 
+     * Note that this method will set the input stream to 'ArrayInputStream' 
+     * and output stream to 'ArrayOutputStream'.
+     * 
+     * @param array $inputs An array that contain lines of inputs.
+     */
+    public static function setInput(array $inputs = []) {
+        self::setInputStream(new ArrayInputStream($inputs));
+        self::setOutputStream(new ArrayOutputStream());
+    }
+    /**
+     * Returns an array that contain all generated output by executing a command.
+     * 
+     * This method should be only used when testing the execution process of a
+     * command The method will return empty array if output stream type
+     * is not ArrayOutputStream.
+     * 
+     * @return array An array that contains all output lines which are generated
+     * by executing a specific command.
+     */
+    public static function getOutput() : array {
+        $outputStream = self::getOutputStream();
+        if ($outputStream instanceof ArrayOutputStream) {
+            return $outputStream->getOutputArray();
+        }
+        return [];
+    }
     private function __construct() {
         $this->commands = [];
         $this->isInteractive = false;
@@ -166,11 +201,13 @@ class Runner {
      * Executes a command given as object.
      * 
      * @param CLICommand $c The command that will be executed. If null is given,
-     * the method will execute the 'help' command.
+     * the method will take command name from the array '$args'.
      * 
      * @param array $args An optional array that can hold command arguments.
      * The keys of the array should be arguments names and the value of each index
-     * is the value of the argument.
+     * is the value of the argument. Note that if the first parameter of the
+     * method is null, the first index of the array should hold
+     * the name of the command that will be executed.
      * 
      * @return int The method will return an integer that represents exit status of
      * running the command. Usually, if the command exit with a number other than 0,
@@ -182,7 +219,8 @@ class Runner {
             if (count($args) === 0) {
                 $commandName = 'help';
             } else {
-                $commandName = filter_var($args[1], FILTER_DEFAULT);
+                $commandName = filter_var($args[0], FILTER_DEFAULT);
+                $args = array_slice($args, 1);
             }
             
             if (isset(self::get()->commands[$commandName])) {
@@ -194,13 +232,23 @@ class Runner {
                 return -1;
             }
         }
-        
-        foreach ($args as $argName => $argVal) {
-            $c->setArgValue($argName, $argVal);
-        }
+        self::setArgV($args);
         self::get()->commandExitVal = $c->excCommand();
         return self::get()->commandExitVal;
     }
+    private static function setArgV(array $args) {
+        $argV = [];
+        
+        foreach ($args as $argName => $argVal) {
+            if (gettype($argName) == 'integer') {
+                $argV[] = $argVal;
+            } else {
+                $argV[] = $argName.'='.$argVal;
+            }
+        }
+        $_SERVER['argv'] = $argV;
+    }
+
     /**
      * Sets the stream at which the runner will be using to read inputs from.
      * 
@@ -218,8 +266,8 @@ class Runner {
         self::get()->outputStream = $stream;
     }
     private static function readInteractiv() {
-        $input = self::getInputStream()->readLine();
-        return explode(' ', $input);
+        $input = trim(self::getInputStream()->readLine());
+        return strlen($input) != 0 ? explode(' ', $input) : [];
     }
     /**
      * Register CLI commands.
@@ -267,23 +315,30 @@ class Runner {
             while (!$exit) {
                 $args = self::readInteractiv();
                 $argsCount = count($args);
-
-                if ($argsCount >= 2) {
-                    $exit = $args[1] == 'exit';
-
-                    if (!$exit) {
-                        self::run($args);
+                if ($argsCount == 0) {
+                    self::getOutputStream()->println('No input. Type "help" to display help.');
+                } else {
+                    if ($args[0] == 'exit') {
+                        return 0;
                     }
+                    self::runCommand(null, $args);
                 }
                 self::getOutputStream()->prints('>>');
             }
         } else {
-            return self::run($_SERVER['argv']);
+            return self::run();
         }
         return 0;
     }
-    private static function run($args) {
-        if (count($args) == 1) {
+    /**
+     * Run the command line as single run.
+     * 
+     * @param type $args
+     * @return type
+     */
+    private static function run() {
+        $argsArr = array_splice($_SERVER['argv'], 1);
+        if (count($argsArr) == 0) {
             $command = self::get()->commands['help'];
 
             if (!defined('__PHPUNIT_PHAR__')) {
@@ -296,7 +351,7 @@ class Runner {
             }
         }
 
-        return self::runCommand();
+        return self::runCommand(null, $argsArr);
     }
     /**
      * Sets the command which is currently in execution stage.

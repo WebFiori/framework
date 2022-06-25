@@ -97,6 +97,14 @@ class AppConfig implements Config {
      */
     private $defaultPageTitles;
     /**
+     * An array that is used to hold default page descriptions for different languages.
+     * 
+     * @var array
+     * 
+     * @since 1.0
+     */
+    private $descriptions;
+    /**
      * An array that holds SMTP connections information.
      * 
      * @var string

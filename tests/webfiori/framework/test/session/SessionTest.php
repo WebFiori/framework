@@ -62,14 +62,13 @@ class SessionTest extends TestCase {
         $this->assertEquals('', $session->getLangCode());
         //$this->assertNull($session->getUser());
         $this->assertEquals(Session::STATUS_INACTIVE,$session->getStatus());
-        $this->assertEquals([
-            'expires' => 60 * 120 + time(),
-            'domain' => 'example.com',
-            'path' => '/',
-            'secure' => true,
-            'httponly' => true,
-            'samesite' => 'Lax'
-        ],$session->getCookieParams());
+        $cookie = $session->getCookie();
+        $this->assertEquals(time() + 7200, $cookie->getExpires());
+        $this->assertEquals(date(DATE_COOKIE, Session::DEFAULT_SESSION_DURATION*60 + time()), $cookie->getLifetime());
+        $this->assertEquals('/', $cookie->getPath());
+        $this->assertTrue($cookie->isSecure());
+        $this->assertTrue($cookie->isHttpOnly());
+        $this->assertEquals('Lax', $cookie->getSameSite());
         $this->assertTrue($session->isPersistent());
         $this->assertFalse($session->isRunning());
         $this->assertFalse($session->isRefresh());
@@ -86,14 +85,13 @@ class SessionTest extends TestCase {
         $this->assertFalse($session->isPersistent());
         $this->assertFalse($session->isRunning());
         $this->assertFalse($session->isRefresh());
-        $this->assertEquals([
-            'expires' => 0,
-            'domain' => 'example.com',
-            'path' => '/',
-            'secure' => true,
-            'httponly' => true,
-            'samesite' => 'Lax'
-        ],$session->getCookieParams());
+        $cookie = $session->getCookie();
+        $this->assertEquals('', $cookie->getLifetime());
+        $this->assertEquals('/', $cookie->getPath());
+        $this->assertTrue($cookie->isSecure());
+        $this->assertTrue($cookie->isHttpOnly());
+        $this->assertEquals('Lax', $cookie->getSameSite());
+        
     }
     /**
      * @test
@@ -178,17 +176,18 @@ class SessionTest extends TestCase {
         $s = new Session([
             'name' => 'super-session'
         ]);
-        $params = $s->getCookieParams();
+        $cookie = $s->getCookie();
+        $cookie->setDomain();
         $this->assertEquals('super-session='.$s->getId().'; '
-                . 'expires='.date(DATE_COOKIE,$params['expires']).'; '
+                . 'expires='.$cookie->getLifetime().'; '
                 . 'path=/; Secure; HttpOnly; SameSite=Lax',$s->getCookieHeader());
-        $s->setSameSite('none');
+        $s->setSameSite('None');
         $this->assertEquals('super-session='.$s->getId().'; '
-                . 'expires='.date(DATE_COOKIE,$params['expires']).'; '
+                . 'expires='.$cookie->getLifetime().'; '
                 . 'path=/; Secure; HttpOnly; SameSite=None',$s->getCookieHeader());
-        $s->setSameSite(' strict');
+        $s->setSameSite(' Strict');
         $this->assertEquals('super-session='.$s->getId().'; '
-                . 'expires='.date(DATE_COOKIE,$params['expires']).'; '
+                . 'expires='.$cookie->getLifetime().'; '
                 . 'path=/; Secure; HttpOnly; SameSite=Strict',$s->getCookieHeader());
         $s->setDuration(0);
         $this->assertEquals('super-session='.$s->getId().'; '
@@ -226,7 +225,7 @@ class SessionTest extends TestCase {
                 . '"is_refresh":false,'
                 . '"is_persistent":true,'
                 . '"status":"status_none",'
-                . '"user":{"user_id":-1,"email":"","display_name":null,"username":""},'
+                . '"user":null,'
                 . '"vars":[]}',$j.'');
         $s->start();
        // $j = $s->toJSON();
@@ -242,7 +241,7 @@ class SessionTest extends TestCase {
                 . '"isRefresh":false,'
                 . '"isPersistent":true,'
                 . '"status":"status_new",'
-                . '"user":{"userId":-1,"email":"","displayName":null,"username":""},'
+                . '"user":null,'
                 . '"vars":[]}',$s.'');
     }
     /**
@@ -264,7 +263,7 @@ class SessionTest extends TestCase {
                 . '"is_refresh":false,'
                 . '"is_persistent":true,'
                 . '"status":"status_none",'
-                . '"user":{"user_id":-1,"email":"","display_name":null,"username":""},'
+                . '"user":null,'
                 . '"vars":[]}',$j.'');
         $s->start();
         $j = $s->toJSON();
@@ -280,7 +279,7 @@ class SessionTest extends TestCase {
                 . '"is_refresh":false,'
                 . '"is_persistent":true,'
                 . '"status":"status_new",'
-                . '"user":{"user_id":-1,"email":"","display_name":null,"username":""},'
+                . '"user":null,'
                 . '"vars":[]}',$j.'');
     }
     /**

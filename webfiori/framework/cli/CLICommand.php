@@ -1125,27 +1125,34 @@ abstract class CLICommand {
         } else if (strlen($input) == 0 && $defaultIndex !== null) {
             //Given input is empty string (enter hit). 
             //Return defult if specified.
-            $index = 0;
-            foreach ($choices as $choice) {
-                if ($index == $defaultIndex) {
-                    return $choice;
-                }
-                $index++;
-            }
+            return $this->_getDefault($choices, $defaultIndex);
         } else if ($this->isInt($input)) {
             //Selected option is an index. Search for it and return its value.
-            $index = 0;
-            
-            foreach ($choices as $choice) {
-                if ($index == $input) {
-                    return $choice;
-                }
-                $index++;
-            }
+            return $this->_getChoiceAtIndex($choices, $input);
         } else {
             $this->error('Invalid answer.');
         }
     }
+    private function _getChoiceAtIndex(array $choices, $input) {
+        $index = 0;
+            
+        foreach ($choices as $choice) {
+            if ($index == $input) {
+                return $choice;
+            }
+            $index++;
+        }
+    }
+    private function _getDefault(array $choices, $defaultIndex) {
+        $index = 0;
+        foreach ($choices as $choice) {
+            if ($index == $defaultIndex) {
+                return $choice;
+            }
+            $index++;
+        }
+    }
+
     private function isInt(string $val) : bool {
         $len = strlen($val);
         if ($len == 0) {
@@ -1229,7 +1236,7 @@ abstract class CLICommand {
      * 'value'. The 'valid' index contains a boolean that is set to true if the 
      * value is valid. The index 'value' will contain the passed value.
      */
-    private function getInputHelper($input, callable $validator = null, $default, array $callbackParams) {
+    private function getInputHelper($input, callable $validator = null, $default = null , array $callbackParams = []) {
         $retVal = [
             'valid' => true,
             'value' => $input

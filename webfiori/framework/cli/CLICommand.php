@@ -211,23 +211,22 @@ abstract class CLICommand {
      * @since 1.0
      */
     public function clear(int $numberOfCols = 1, bool $beforeCursor = true) {
-        $asInt = intval($numberOfCols);
 
-        if ($asInt >= 1) {
+        if ($numberOfCols >= 1) {
             if ($beforeCursor) {
                 for ($x = 0 ; $x < $numberOfCols ; $x++) {
                     $this->moveCursorLeft();
                     $this->prints(" ");
                     $this->moveCursorLeft();
                 }
-                $this->moveCursorRight($asInt);
+                $this->moveCursorRight($numberOfCols);
             } else {
                 $this->moveCursorRight();
 
                 for ($x = 0 ; $x < $numberOfCols ; $x++) {
                     $this->prints(" ");
                 }
-                $this->moveCursorLeft($asInt + 1);
+                $this->moveCursorLeft($numberOfCols + 1);
             }
         }
     }
@@ -345,13 +344,7 @@ abstract class CLICommand {
         $this->_parseArgs();
 
         if ($this->_checkIsArgsSet() && $this->_checkAllowedArgValues()) {
-            $execResult = $this->exec();
-            
-            if ($execResult === null) {
-                $execResult = 0;
-            }
-
-            $retVal = intval($execResult);
+            $retVal = $this->exec();
         }
         Runner::setActiveCommand();
         return $retVal;
@@ -653,10 +646,9 @@ abstract class CLICommand {
      * @since 1.0
      */
     public function moveCursorDown(int $lines = 1) {
-        $asInt = intval($lines);
 
-        if ($asInt >= 1) {
-            $this->prints("\e[".$asInt."B");
+        if ($lines >= 1) {
+            $this->prints("\e[".$lines."B");
         }
     }
     /**
@@ -671,10 +663,9 @@ abstract class CLICommand {
      * @since 1.0
      */
     public function moveCursorLeft(int $numberOfCols = 1) {
-        $asInt = intval($numberOfCols);
 
-        if ($asInt >= 1) {
-            $this->prints("\e[".$asInt."D");
+        if ($numberOfCols >= 1) {
+            $this->prints("\e[".$numberOfCols."D");
         }
     }
     /**
@@ -689,10 +680,9 @@ abstract class CLICommand {
      * @since 1.0
      */
     public function moveCursorRight(int $numberOfCols = 1) {
-        $asInt = intval($numberOfCols);
 
-        if ($asInt >= 1) {
-            $this->prints("\e[".$asInt."C");
+        if ($numberOfCols >= 1) {
+            $this->prints("\e[".$numberOfCols."C");
         }
     }
     /**
@@ -712,11 +702,9 @@ abstract class CLICommand {
      * @since 1.0
      */
     public function moveCursorTo(int $line = 0, int $col = 0) {
-        $lineAsInt = intval($line);
-        $colAsInt = intval($col);
 
-        if ($lineAsInt > -1 && $colAsInt > -1) {
-            $this->prints("\e[".$lineAsInt.";".$colAsInt."H");
+        if ($line > -1 && $col > -1) {
+            $this->prints("\e[".$line.";".$col."H");
         }
     }
     /**
@@ -731,10 +719,9 @@ abstract class CLICommand {
      * @since 1.0
      */
     public function moveCursorUp(int $lines = 1) {
-        $asInt = intval($lines);
 
-        if ($asInt >= 1) {
-            $this->prints("\e[".$asInt."A");
+        if ($lines >= 1) {
+            $this->prints("\e[".$lines."A");
         }
     }
     /**
@@ -749,13 +736,11 @@ abstract class CLICommand {
      * @since 1.0
      */
     public function printList(array $array) {
-        if (gettype($array) == 'array') {
-            for ($x = 0 ; $x < count($array) ; $x++) {
-                $this->prints("- ", [
-                    'color' => 'green'
-                ]);
-                $this->println($array[$x]);
-            }
+        for ($x = 0 ; $x < count($array) ; $x++) {
+            $this->prints("- ", [
+                'color' => 'green'
+            ]);
+            $this->println($array[$x]);
         }
     }
     /**

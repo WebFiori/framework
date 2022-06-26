@@ -27,6 +27,7 @@ namespace webfiori\framework;
 use webfiori\json\Json;
 use webfiori\json\JsonI;
 use webfiori\http\Request;
+use webfiori\framework\MIME;
 /**
  * A helper class that is used to upload most types of files to the server's file system.
  * 
@@ -465,7 +466,7 @@ class Uploader implements JsonI {
     }
     private function _createFileObjFromArray($arr) {
         $file = new UploadFile(filter_var($arr['name'], FILTER_SANITIZE_FULL_SPECIAL_CHARS), $arr['upload-path']);
-        $file->setMIMEType($arr['mime']);
+        $file->setMIME($arr['mime']);
 
         if (isset($arr['is-replace'])) {
             $file->setIsReplace($arr['is-replace']);
@@ -518,7 +519,7 @@ class Uploader implements JsonI {
                                 $fileInfoArr[$indices[6]] = mime_content_type($fPath);
                             } else {
                                 $ext = pathinfo($fileInfoArr[$indices[0]], PATHINFO_EXTENSION);
-                                $fileInfoArr[$indices[6]] = File::getMIMEType($ext);
+                                $fileInfoArr[$indices[6]] = MIME::getType($ext);
                             }
                         } else {
                             $fileInfoArr[$indices[7]] = false;
@@ -531,7 +532,7 @@ class Uploader implements JsonI {
                             $fileInfoArr[$indices[6]] = mime_content_type($fPath);
                         } else {
                             $ext = pathinfo($fileInfoArr[$indices[0]], PATHINFO_EXTENSION);
-                            $fileInfoArr[$indices[6]] = File::getMIMEType($ext);
+                            $fileInfoArr[$indices[6]] = MIME::getType($ext);
                         }
 
                         if ($replaceIfExist) {

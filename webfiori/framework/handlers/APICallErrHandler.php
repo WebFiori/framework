@@ -35,7 +35,7 @@ class APICallErrHandler extends AbstractHandler {
         $index = 0;
         
         foreach ($this->getTrace() as $traceEntry) {
-            $stackTrace->add('#'.$index,$traceEntry->getClass().' (Line '.$traceEntry->getClass().')');
+            $stackTrace->add('#'.$index,$traceEntry->getClass().' (Line '.$traceEntry->getLine().')');
             $index++;
         }
         $j->add('stack-trace',$stackTrace);

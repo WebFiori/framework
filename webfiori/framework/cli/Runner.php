@@ -77,6 +77,41 @@ class Runner {
     public static function register(CLICommand $cliCommand) {
         self::get()->commands[$cliCommand->getName()] = $cliCommand;
     }
+    /**
+     * Sets an array as an input for running specific command.
+     * 
+     * This method is used to test the execution process of specific command.
+     * The developer can use it to mimic the inputs which could be provided
+     * by the user when actually running the command through a terminal.
+     * The developer can use the method 'Runner::getOutput()' to get generated
+     * output and compare it with expected output.
+     * 
+     * Note that this method will set the input stream to 'ArrayInputStream' 
+     * and output stream to 'ArrayOutputStream'.
+     * 
+     * @param array $inputs An array that contain lines of inputs.
+     */
+    public static function setInput(array $inputs = []) {
+        self::setInputStream(new ArrayInputStream($inputs));
+        self::setOutputStream(new ArrayOutputStream());
+    }
+    /**
+     * Returns an array that contain all generated output by executing a command.
+     * 
+     * This method should be only used when testing the execution process of a
+     * command The method will return empty array if output stream type
+     * is not ArrayOutputStream.
+     * 
+     * @return array An array that contains all output lines which are generated
+     * by executing a specific command.
+     */
+    public static function getOutput() : array {
+        $outputStream = self::getOutputStream();
+        if ($outputStream instanceof ArrayOutputStream) {
+            return $outputStream->getOutputArray();
+        }
+        return [];
+    }
     private function __construct() {
         $this->commands = [];
         $this->isInteractive = false;
@@ -197,13 +232,23 @@ class Runner {
                 return -1;
             }
         }
-        
-        foreach ($args as $argName => $argVal) {
-            $c->setArgValue($argName, $argVal);
-        }
+        self::setArgV($args);
         self::get()->commandExitVal = $c->excCommand();
         return self::get()->commandExitVal;
     }
+    private static function setArgV(array $args) {
+        $argV = [];
+        
+        foreach ($args as $argName => $argVal) {
+            if (gettype($argName) == 'integer') {
+                $argV[] = $argVal;
+            } else {
+                $argV[] = $argName.'='.$argVal;
+            }
+        }
+        $_SERVER['argv'] = $argV;
+    }
+
     /**
      * Sets the stream at which the runner will be using to read inputs from.
      * 

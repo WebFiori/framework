@@ -17,8 +17,7 @@ class HelpCommandTest extends TestCase {
      * @test
      */
     public function test00() {
-        Runner::setInputStream(new ArrayInputStream());
-        Runner::setOutputStream(new ArrayOutputStream());
+        Runner::setInput();
         Runner::registerCommands();
         $_SERVER['argc'] = 0;
         $this->assertEquals(0, Runner::runCommand(new HelpCommand()));
@@ -64,7 +63,7 @@ class HelpCommandTest extends TestCase {
 
             '    update-settings'."\n",
             '        Update application settings which are stored in the class "AppConfig".'."\n\n",
-        ], Runner::getOutputStream()->getOutputArray());
+        ], Runner::getOutput());
         
     }
     /**
@@ -72,8 +71,8 @@ class HelpCommandTest extends TestCase {
      */
     public function test01() {
         $_SERVER['argc'] = 1;
-        Runner::setInputStream(new ArrayInputStream());
-        Runner::setOutputStream(new ArrayOutputStream());
+        Runner::setInput();
+        
         Runner::registerCommands();
         $this->assertEquals(0, Runner::runCommand(new HelpCommand()));
         $this->assertEquals([
@@ -134,14 +133,14 @@ class HelpCommandTest extends TestCase {
             '    update-settings'."\n",
             '        Update application settings which are stored in the class "AppConfig".'."\n\n",
 
-        ], Runner::getOutputStream()->getOutputArray());
+        ], Runner::getOutput());
     }
     /**
      * @test
      */
     public function test02() {
-        Runner::setInputStream(new ArrayInputStream());
-        Runner::setOutputStream(new ArrayOutputStream());
+        Runner::setInput();
+        
         Runner::register(new HelpCommand());
         $this->assertEquals(0, Runner::runCommand(new HelpCommand(), [
             '--command-name' => 'help'
@@ -152,41 +151,41 @@ class HelpCommandTest extends TestCase {
             '    Supported Arguments:'."\n",
             '               --command-name: [Optional] An optional command name. If provided, help will be specific to the given command only.'."\n",
         
-        ], Runner::getOutputStream()->getOutputArray());
+        ], Runner::getOutput());
     }
     /**
      * @test
      */
     public function test03() {
-        Runner::setInputStream(new ArrayInputStream());
-        Runner::setOutputStream(new ArrayOutputStream());
+        Runner::setInput();
+        
         $this->assertEquals(0, Runner::runCommand(new HelpCommand(), [
             '--command-name' => 'no-command'
         ]));
         $this->assertEquals([
             'Error: Command \'no-command\' is not supported.'."\n",
-        ], Runner::getOutputStream()->getOutputArray());
+        ], Runner::getOutput());
     }
     /**
      * @test
      */
     public function test04() {
-        Runner::setInputStream(new ArrayInputStream());
-        Runner::setOutputStream(new ArrayOutputStream());
+        Runner::setInput();
+        
         $this->assertEquals(0, Runner::runCommand(new HelpCommand(), [
             '--command-name' => 'no-command'
         ]));
         $this->assertEquals([
             'Error: Command \'no-command\' is not supported.'."\n",
-        ], Runner::getOutputStream()->getOutputArray());
+        ], Runner::getOutput());
     }
     /**
      * @test
      */
     public function test05() {
         Runner::register(new \webfiori\framework\cli\commands\CronCommand());
-        Runner::setInputStream(new ArrayInputStream());
-        Runner::setOutputStream(new ArrayOutputStream());
+        Runner::setInput();
+        
         $this->assertEquals(0, Runner::runCommand(new HelpCommand(), [
             '--command-name' => 'cron'
         ]));
@@ -201,7 +200,7 @@ class HelpCommandTest extends TestCase {
             '              --show-job-args: [Optional] If this one is provided with job name and a job has custom execution args, they will be shown.'."\n",
             '                   --show-log: [Optional] If set, execution log will be shown after execution is completed.'."\n",
         
-        ], Runner::getOutputStream()->getOutputArray());
+        ], Runner::getOutput());
         
     }
 }

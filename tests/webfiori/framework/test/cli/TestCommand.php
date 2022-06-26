@@ -10,7 +10,9 @@ class TestCommand extends CLICommand {
     }
     public function exec() : int {
         $name = $this->getArgValue('name');
-        $this->println('Hello '.$name.'!');
+        $this->println('Hello '.$name.'!', [
+            'color' => 'red',
+        ]);
         $this->println('Ok');
         return 0;
     }

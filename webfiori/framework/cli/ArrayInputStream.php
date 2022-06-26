@@ -43,7 +43,7 @@ class ArrayInputStream implements InputStream {
      */
     public function readLine() : string {
         if ($this->currentLine >= count($this->inputsArr)) {
-            throw new ArrayIndexOutOfBoundsException('Reached end of stream while trying to read line number '.$this->currentLine);
+            throw new ArrayIndexOutOfBoundsException('Reached end of stream while trying to read line number '.($this->currentLine+1));
         }
         
         $retVal = $this->inputsArr[$this->currentLine];

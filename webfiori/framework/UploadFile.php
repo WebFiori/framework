@@ -24,6 +24,7 @@
  */
 namespace webfiori\framework;
 
+use webfiori\json\Json;
 /**
  * A class which is used by the class 'Uploader' to represents uploaded files.
  * 

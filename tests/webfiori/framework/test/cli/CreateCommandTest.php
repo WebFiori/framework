@@ -4,8 +4,6 @@ namespace webfiori\framework\test\cli;
 use PHPUnit\Framework\TestCase;
 use webfiori\framework\cli\commands\CreateCommand;
 use webfiori\framework\File;
-use webfiori\framework\cli\ArrayInputStream;
-use webfiori\framework\cli\ArrayOutputStream;
 use webfiori\framework\cli\Runner;
 /**
  * Description of TestCreateCommand

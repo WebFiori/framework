@@ -7,8 +7,8 @@ use webfiori\framework\cli\commands\AddCommand;
 use webfiori\framework\File;
 use webfiori\framework\ConfigController;
 use webfiori\framework\cli\Runner;
-use webfiori\framework\cli\ArrayInputStream;
-use webfiori\framework\cli\ArrayOutputStream;
+use webfiori\framework\cli\streams\ArrayInputStream;
+use webfiori\framework\cli\streams\ArrayOutputStream;
 /**
  * Description of TestAddCommand
  *

@@ -10,6 +10,7 @@
     "require": {
         "php": ">=7.0",
         "webfiori/err":"1.0.3",
+        "webfiori/cli":"1.0.0",
         "webfiori/file":"1.1.3",
         "webfiori/collections":"1.1.0",
         "webfiori/ui":"2.3.2",

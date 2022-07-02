@@ -25,7 +25,7 @@
 namespace webfiori\framework\session;
 
 use webfiori\framework\File;
-use webfiori\framework\cli\Runner;
+use webfiori\cli\Runner;
 /**
  * The default sessions storage engine.
  *

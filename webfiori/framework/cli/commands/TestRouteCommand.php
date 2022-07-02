@@ -24,7 +24,7 @@
  */
 namespace webfiori\framework\cli\commands;
 
-use webfiori\framework\cli\CLICommand;
+use webfiori\cli\CLICommand;
 use webfiori\framework\router\Router;
 /**
  * A CLI Command which is used to test the result of routing to a specific 

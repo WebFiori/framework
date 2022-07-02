@@ -39,7 +39,7 @@ use webfiori\error\Handler;
 use webfiori\framework\handlers\CLIErrHandler;
 use webfiori\framework\handlers\APICallErrHandler;
 use webfiori\framework\handlers\HTTPErrHandler;
-use webfiori\framework\cli\Runner;
+use webfiori\cli\Runner;
 /**
  * The time at which the framework was booted in microseconds as a float.
  * 
@@ -55,6 +55,11 @@ define('MICRO_START', microtime(true));
  * @version 1.3.7
  */
 class WebFioriApp {
+    /**
+     * 
+     * @var Runner
+     */
+    private $cliRunner;
     /**
      * A constant that indicates that the status of the class is 'none'.
      * 
@@ -134,7 +139,7 @@ class WebFioriApp {
         $this->_initAutoLoader();
         $this->_setHandlers();
         //Initialize CLI
-        Runner::get();
+        $this->cliRunner = new Runner();
         $this->_initAppConfig();
 
         
@@ -451,6 +456,15 @@ class WebFioriApp {
             call_user_func(APP_DIR_NAME.'\ini\InitCron::init');
             Cron::registerJobs();
         }
+    }
+    /**
+     * Returns an instance which represents the class that is used to run the
+     * terminal.
+     * 
+     * @return Runner
+     */
+    public function getRunner() : Runner {
+        return $this->cliRunner;
     }
     private function _initMiddleware() {
         WebFioriApp::autoRegister('middleware', function($inst)

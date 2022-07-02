@@ -3,7 +3,7 @@ namespace webfiori\framework\cli\commands;
 
 use Error;
 use Exception;
-use webfiori\framework\cli\CLICommand;
+use webfiori\cli\CLICommand;
 use webfiori\framework\ConfigController;
 use webfiori\framework\router\Router;
 use webfiori\framework\Theme;

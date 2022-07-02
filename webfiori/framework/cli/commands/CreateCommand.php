@@ -25,7 +25,7 @@
 namespace webfiori\framework\cli\commands;
 
 use webfiori\database\Table;
-use webfiori\framework\cli\CLICommand;
+use webfiori\cli\CLICommand;
 use webfiori\framework\cli\helpers\CreateCLIClassHelper;
 use webfiori\framework\cli\helpers\CreateCronJob;
 use webfiori\framework\cli\helpers\CreateMiddleware;

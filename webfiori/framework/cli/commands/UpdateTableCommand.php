@@ -17,7 +17,7 @@ use webfiori\database\mysql\MySQLColumn;
 use webfiori\database\mysql\MySQLTable;
 use webfiori\database\Table;
 use webfiori\framework\AutoLoader;
-use webfiori\framework\cli\CLICommand;
+use webfiori\cli\CLICommand;
 use webfiori\framework\cli\writers\TableClassWriter;
 use webfiori\framework\DB;
 use webfiori\framework\WebFioriApp;

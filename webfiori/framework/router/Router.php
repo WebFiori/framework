@@ -38,7 +38,7 @@ use webfiori\http\Uri;
 use webfiori\http\WebServicesManager;
 use webfiori\json\Json;
 use webfiori\ui\HTMLNode;
-use webfiori\framework\cli\Runner;
+use webfiori\cli\Runner;
 /**
  * The basic class that is used to route user requests to the correct 
  * location.

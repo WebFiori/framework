@@ -17,7 +17,7 @@ class CLICommandClassWriterTest extends TestCase {
         $this->assertEquals('', $writer->getDescription());
         $this->assertEquals([], $writer->getArgs());
         $this->assertEquals([
-            'webfiori\framework\cli\CLICommand'
+            'webfiori\cli\CLICommand'
         ], $writer->getUseStatements());
         $writer->writeClass();
         $this->assertTrue(class_exists($writer->getNamespace().'\\'.$writer->getName()));
@@ -42,7 +42,7 @@ class CLICommandClassWriterTest extends TestCase {
         $this->assertEquals('', $writer->getDescription());
         $this->assertEquals([], $writer->getArgs());
         $this->assertEquals([
-            'webfiori\framework\cli\CLICommand'
+            'webfiori\cli\CLICommand'
         ], $writer->getUseStatements());
         $writer->writeClass();
         $this->assertTrue(class_exists($writer->getNamespace().'\\'.$writer->getName()));

@@ -8,6 +8,7 @@ use webfiori\framework\ConfigController;
 use webfiori\framework\router\Router;
 use webfiori\framework\Theme;
 use webfiori\framework\WebFioriApp;
+use webfiori\cli\InputValidator;
 /**
  * This class implements a CLI command which is used to update the settings which are 
  * stored in the class 'AppConfing' of the application.
@@ -125,12 +126,10 @@ class UpdateSettingsCommand extends CLICommand {
     }
     private function _updateDescription() {
         $lang = $this->whichLang();
-        $newName = $this->getInput('Enter new description:', null, function ($val)
+        $newName = $this->getInput('Enter new description:', null, new InputValidator(function ($val)
         {
-            $trimmed = trim($val);
-
-            return strlen($trimmed) != 0;
-        });
+            return strlen(trim($val)) != 0;
+        }));
         $descriptions = WebFioriApp::getAppConfig()->getDescriptions();
         $descriptions[$lang] = $newName;
         ConfigController::get()->updateSiteInfo([
@@ -140,12 +139,10 @@ class UpdateSettingsCommand extends CLICommand {
     }
     private function _updateName() {
         $lang = $this->whichLang();
-        $newName = $this->getInput('Enter new name:', null, function ($val)
+        $newName = $this->getInput('Enter new name:', null, new InputValidator(function ($val)
         {
-            $trimmed = trim($val);
-
-            return strlen($trimmed) != 0;
-        });
+            return strlen(trim($val)) != 0;
+        }));
         $names = WebFioriApp::getAppConfig()->getWebsiteNames();
         $names[$lang] = trim($newName);
         ConfigController::get()->updateSiteInfo([
@@ -163,12 +160,10 @@ class UpdateSettingsCommand extends CLICommand {
     }
     private function _updateTitle() {
         $lang = $this->whichLang();
-        $newName = $this->getInput('Enter new title:', null, function ($val)
+        $newName = $this->getInput('Enter new title:', null, new InputValidator(function ($val)
         {
-            $trimmed = trim($val);
-
-            return strlen($trimmed) != 0;
-        });
+            return strlen(trim($val)) != 0;
+        }));
         $titles = WebFioriApp::getAppConfig()->getTitles();
         $titles[$lang] = trim($newName);
         ConfigController::get()->updateSiteInfo([
@@ -177,25 +172,25 @@ class UpdateSettingsCommand extends CLICommand {
         $this->success('Title successfully updated.');
     }
     private function _updateTitleSep() {
-        $newSep = $this->getInput('Enter new title separator string:', '|', function ($val)
+        $newSep = $this->getInput('Enter new title separator string:', '|', new InputValidator(function ($val)
         {
             return strlen(trim($val)) != 0;
-        });
+        }));
         ConfigController::get()->updateSiteInfo([
             'title-sep' => $newSep
         ]);
         $this->success('Title separator successfully updated.');
     }
     private function _updateVersionInfo() {
-        $versionNum = $this->getInput('Application version:', WebFioriApp::getAppConfig()->getVersion(), function ($val)
+        $versionNum = $this->getInput('Application version:', WebFioriApp::getAppConfig()->getVersion(), new InputValidator(function ($val)
         {
             return strlen(trim($val)) != 0;
-        });
-        $versionType = $this->getInput('Application version type:', WebFioriApp::getAppConfig()->getVersionType(), function ($val)
+        }));
+        $versionType = $this->getInput('Application version type:', WebFioriApp::getAppConfig()->getVersionType(), new InputValidator(function ($val)
         {
             return strlen(trim($val)) != 0;
-        });
-        $versionReleaseDate = $this->getInput('Release date (YYYY-MM-DD):', date('Y-m-d'), function ($val)
+        }));
+        $versionReleaseDate = $this->getInput('Release date (YYYY-MM-DD):', date('Y-m-d'), new InputValidator(function ($val)
         {
             $trimmed = trim($val);
 
@@ -214,12 +209,12 @@ class UpdateSettingsCommand extends CLICommand {
                 && intval($expl[1]) < 13
                 && intval($expl[2]) > 0
                 && intval($expl[2]) < 32;
-        });
+        }));
         ConfigController::get()->updateAppVersionInfo($versionNum, $versionType, date('Y-m-d', strtotime($versionReleaseDate)));
         $this->println('Version information successfully updated.');
     }
     private function getThemeNs() {
-        return $this->getInput('Enter theme class name with namespace:', null, function ($themeNs)
+        return $this->getInput('Enter theme class name with namespace:', null, new InputValidator(function ($themeNs)
         {
             if (!class_exists($themeNs)) {
                 return false;
@@ -235,7 +230,7 @@ class UpdateSettingsCommand extends CLICommand {
             } catch (Error $exc) {
                 return false;
             }
-        });
+        }));
     }
     private function whichLang() {
         $langs = array_keys(WebFioriApp::getAppConfig()->getWebsiteNames());

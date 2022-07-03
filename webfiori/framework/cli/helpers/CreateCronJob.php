@@ -4,6 +4,7 @@ namespace webfiori\framework\cli\helpers;
 use webfiori\framework\cli\commands\CreateCommand;
 use webfiori\framework\cli\writers\CronJobClassWriter;
 use webfiori\framework\cron\JobArgument;
+use webfiori\cli\InputValidator;
 /**
  * A helper class which is used to help in creating cron jobs classes using CLI.
  *
@@ -38,34 +39,36 @@ class CreateCronJob extends CreateClassHelper {
 
         while ($addToMore) {
             $argObj = new JobArgument($this->getInput('Enter argument name:'));
-            $argObj->setDescription($this->getInput('Enter argument description:', 'No Description.', function ($val) {
-                if (strlen($val) != 0) {
-                    return $val;
+            $argObj->setDescription($this->getInput('Enter argument description:', 'No Description.', new InputValidator(function ($val)
+            {
+                if (strlen($val) > 0) {
+                    return true;
                 }
+
                 return false;
-            }));
+            })));
             $this->getWriter()->addArgument($argObj);
             $addToMore = $this->confirm('Would you like to add more arguments?', false);
         }
     }
     private function _getJobDesc() {
-        return $this->getInput('Provide short description of what does the job will do:', null, function ($val)
+        return $this->getInput('Provide short description of what does the job will do:', null, new InputValidator(function ($val)
         {
             if (strlen($val) > 0) {
                 return true;
             }
 
             return false;
-        });
+        }));
     }
     private function _getJobName() {
-        return $this->getInput('Enter a name for the job:', null, function ($val)
+        return $this->getInput('Enter a name for the job:', null, new InputValidator(function ($val)
         {
             if (strlen($val) > 0) {
                 return true;
             }
 
             return false;
-        });
+        }));
     }
 }

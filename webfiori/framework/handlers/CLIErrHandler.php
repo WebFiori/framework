@@ -6,6 +6,7 @@ use webfiori\framework\cron\Cron;
 use webfiori\cli\Runner;
 use webfiori\cli\CLICommand;
 use webfiori\cli\Formatter;
+use webfiori\framework\WebFioriApp;
 /**
  * Description of CLIExceptionHandler
  *
@@ -17,7 +18,7 @@ class CLIErrHandler  extends AbstractHandler {
         $this->setName('CLI Errors Handler');
     }
     public function handle() {
-        $stream = Runner::getOutputStream();
+        $stream = WebFioriApp::getRunner()->getOutputStream();
         $stream->prints(Formatter::format("Uncaught Exception\n", [
             'color' => 'red',
             'bold' => true,

@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 use webfiori\framework\cli\commands\AddCommand;
 use webfiori\framework\File;
 use webfiori\framework\ConfigController;
-use webfiori\framework\cli\Runner;
+use webfiori\cli\Runner;
 use webfiori\framework\cli\streams\ArrayInputStream;
 use webfiori\framework\cli\streams\ArrayOutputStream;
 /**
@@ -19,17 +19,18 @@ class AddCommandTest extends TestCase {
      * @test
      */
     public function test00() {
-        Runner::setInput([
+        $runner = new Runner();
+        $runner->setInput([
             '3'
         ]);
-        $this->assertEquals(0, Runner::runCommand(new AddCommand()));
+        $this->assertEquals(0, $runner->runCommand(new AddCommand()));
         $this->assertEquals([
             "What would you like to add?\n",
             "0: New database connection.\n",
             "1: New SMTP connection.\n",
             "2: New website language.\n",
             "3: Quit. <--\n"
-        ], Runner::getOutput());
+        ], $runner->getOutput());
     }
     /**
      * @test
@@ -151,7 +152,8 @@ class AddCommandTest extends TestCase {
      * @test
      */
     public function testAddLang00() {
-        Runner::setInput([
+        $runner = new Runner();
+        $runner->setInput([
             '2',
             'FK',
             'F Name',
@@ -159,7 +161,7 @@ class AddCommandTest extends TestCase {
             'Default f Title',
             'ltr',
         ]);
-        $this->assertEquals(0, Runner::runCommand(new AddCommand()));
+        $this->assertEquals(0, $runner->runCommand(new AddCommand()));
         $this->assertEquals([
             "What would you like to add?\n",
             "0: New database connection.\n",
@@ -174,7 +176,7 @@ class AddCommandTest extends TestCase {
             "0: ltr\n",
             "1: rtl\n",
             "Success: Language added. Also, a class for the language is created at \"".APP_DIR_NAME."\langs\" for that language.\n"
-        ], Runner::getOutput());
+        ], $runner->getOutput());
         $this->assertTrue(class_exists('\\app\\langs\\LanguageFK'));
         $this->removeClass('\\app\\langs\\LanguageFK');
         ConfigController::get()->resetConfig();
@@ -183,11 +185,12 @@ class AddCommandTest extends TestCase {
      * @test
      */
     public function testAddLang01() {
-        Runner::setInput([
+        $runner = new Runner();
+        $runner->setInput([
             '2',
             'EN',
         ]);
-        $this->assertEquals(0, Runner::runCommand(new AddCommand()));
+        $this->assertEquals(0, $runner->runCommand(new AddCommand()));
         $this->assertEquals([
             "What would you like to add?\n",
             "0: New database connection.\n",
@@ -196,19 +199,20 @@ class AddCommandTest extends TestCase {
             "3: Quit. <--\n",
             "Language code:\n",
             "Info: This language already added. Nothing changed.\n",
-        ], Runner::getOutput());
+        ], $runner->getOutput());
         ConfigController::get()->resetConfig();
     }
     /**
      * @test
      */
     public function testAddLang02() {
-        Runner::setInput([
+        $runner = new Runner();
+        $runner->setInput([
             '2',
             'FKRR',
         ]);
-        Runner::setOutputStream(new ArrayOutputStream());
-        $this->assertEquals(-1, Runner::runCommand(new AddCommand()));
+        
+        $this->assertEquals(-1, $runner->runCommand(new AddCommand()));
         $this->assertEquals([
             "What would you like to add?\n",
             "0: New database connection.\n",
@@ -217,7 +221,7 @@ class AddCommandTest extends TestCase {
             "3: Quit. <--\n",
             "Language code:\n",
             "Error: Invalid language code.\n",
-        ], Runner::getOutput());
+        ], $runner->getOutput());
         $this->assertTrue(class_exists('\\app\\langs\\LanguageFK'));
         $this->removeClass('\\app\\langs\\LanguageFK');
     }

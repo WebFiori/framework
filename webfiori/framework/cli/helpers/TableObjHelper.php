@@ -10,6 +10,7 @@ use webfiori\framework\AutoLoader;
 use webfiori\database\Column;
 use webfiori\framework\DB;
 use webfiori\database\mysql\MySQLTable;
+use webfiori\cli\InputValidator;
 
 /**
  * A class which contains static methods which is used to create/modify tables.
@@ -257,7 +258,7 @@ class TableObjHelper {
         }
 
         if ($refTable instanceof Table) {
-            $fkName = $helper->getInput('Enter a name for the foreign key:', null, function ($val)
+            $fkName = $helper->getInput('Enter a name for the foreign key:', null, new InputValidator(function ($val)
             {
                 $trimmed = trim($val);
 
@@ -266,7 +267,7 @@ class TableObjHelper {
                 }
 
                 return true;
-            });
+            }));
             $fkCols = $this->getFkCols();
             $fkColsArr = [];
 

@@ -466,6 +466,48 @@ class WebFioriApp {
     public static function getRunner() : Runner {
         if (self::$CliRunner === null) {
             self::$CliRunner = new Runner();
+            if (Runner::isCLI()) {
+                if (defined('CLI_HTTP_HOST')) {
+                    $host = CLI_HTTP_HOST;
+                } else {
+                    $host = '127.0.0.1';
+                    define('CLI_HTTP_HOST', $host);
+                }
+                $_SERVER['HTTP_HOST'] = $host;
+                $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
+
+                if (defined('ROOT_DIR')) {
+                    $_SERVER['DOCUMENT_ROOT'] = ROOT_DIR;
+                }
+                $_SERVER['REQUEST_URI'] = '/';
+                putenv('HTTP_HOST='.$host);
+                putenv('REQUEST_URI=/');
+
+                if (defined('USE_HTTP') && USE_HTTP === true) {
+                    $_SERVER['HTTPS'] = 'no';
+                } else {
+                    $_SERVER['HTTPS'] = 'yes';
+                }
+            }
+            self::$CliRunner->setBeforeStart(function (Runner $r) {
+                $commands = [
+                    '\\webfiori\\cli\\commands\\HelpCommand',
+                    '\\webfiori\\framework\\cli\\commands\\VersionCommand',
+                    '\\webfiori\\framework\\cli\\commands\\SettingsCommand',
+                    '\\webfiori\\framework\\cli\\commands\\CronCommand',
+                    '\\webfiori\\framework\\cli\\commands\\CreateCommand',
+                    '\\webfiori\\framework\\cli\\commands\\AddCommand',
+                    '\\webfiori\\framework\\cli\\commands\\ListRoutesCommand',
+                    '\\webfiori\\framework\\cli\\commands\\ListThemesCommand',
+                    '\\webfiori\\framework\\cli\\commands\\RunSQLQueryCommand',
+                    '\\webfiori\\framework\\cli\\commands\\TestRouteCommand',
+                    '\\webfiori\\framework\\cli\\commands\\UpdateSettingsCommand',
+                    '\\webfiori\\framework\\cli\\commands\\UpdateTableCommand',
+                ];
+                foreach ($commands as $c) {
+                    $r->register(new $c());
+                }
+            });
         }
         return self::$CliRunner;
     }

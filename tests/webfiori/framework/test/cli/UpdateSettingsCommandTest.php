@@ -39,9 +39,9 @@ class UpdateSettingsCommandTest extends TestCase {
             "8: Set primay theme.\n",
             "9: Set admin theme.\n",
             "10: Quit. <--\n",
-            "Application version: Enter = \"1.0\"\n",
-            "Application version type: Enter = \"Stable\"\n",
-            "Release date (YYYY-MM-DD): Enter = \"".date('Y-m-d')."\"\n",
+            "Application version: Enter = '1.0'\n",
+            "Application version type: Enter = 'Stable'\n",
+            "Release date (YYYY-MM-DD): Enter = '".date('Y-m-d')."'\n",
             "Version information successfully updated.\n"
         ], $runner->getOutput());
 
@@ -150,7 +150,7 @@ class UpdateSettingsCommandTest extends TestCase {
             '--w' => 'cron-pass'
         ]));
         $this->assertEquals([
-            "Enter new password: Enter = \"\"\n",
+            "Enter new password: Enter = ''\n",
             "Success: Password successfully updated.\n"
         ], $runner->getOutput());
         $this->assertEquals(hash('sha256', '123456'), ConfigController::get()->getCRONPassword());
@@ -169,7 +169,7 @@ class UpdateSettingsCommandTest extends TestCase {
             '--w' => 'cron-pass'
         ]));
         $this->assertEquals([
-            "Enter new password: Enter = \"\"\n",
+            "Enter new password: Enter = ''\n",
             "Success: Password successfully updated.\n"
         ], $runner->getOutput());
         $this->assertEquals('NO_PASSWORD', ConfigController::get()->getCRONPassword());
@@ -270,7 +270,7 @@ class UpdateSettingsCommandTest extends TestCase {
             "8: Set primay theme.\n",
             "9: Set admin theme.\n",
             "10: Quit. <--\n",
-            "Enter new title separator string: Enter = \"|\"\n",
+            "Enter new title separator string: Enter = '|'\n",
             "Success: Title separator successfully updated.\n"
         ], $runner->getOutput());
         $this->assertEquals('+-+', ConfigController::get()->getTitleSep());

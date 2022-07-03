@@ -43,7 +43,7 @@ class ListRoutesCommandTest extends TestCase {
         ]);
         $runner->start();
         $this->assertEquals([
-            "https://example.com/xyz  =>  webfiori\\framework\\router\\Router\n"
+            "https://example.com/xyz  =>  ".Router::class."\n"
         ], $runner->getOutput());
         Router::removeAll();
     }

@@ -463,7 +463,7 @@ class WebFioriApp {
      * 
      * @return Runner
      */
-    public function getRunner() : Runner {
+    public static function getRunner() : Runner {
         return $this->cliRunner;
     }
     private function _initMiddleware() {

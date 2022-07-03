@@ -59,7 +59,7 @@ class WebFioriApp {
      * 
      * @var Runner
      */
-    private $cliRunner;
+    private static $CliRunner;
     /**
      * A constant that indicates that the status of the class is 'none'.
      * 
@@ -139,7 +139,7 @@ class WebFioriApp {
         $this->_initAutoLoader();
         $this->_setHandlers();
         //Initialize CLI
-        $this->cliRunner = new Runner();
+        self::getRunner();
         $this->_initAppConfig();
 
         
@@ -464,7 +464,10 @@ class WebFioriApp {
      * @return Runner
      */
     public static function getRunner() : Runner {
-        return $this->cliRunner;
+        if (self::$CliRunner === null) {
+            self::$CliRunner = new Runner();
+        }
+        return self::$CliRunner;
     }
     private function _initMiddleware() {
         WebFioriApp::autoRegister('middleware', function($inst)

@@ -140,9 +140,9 @@ class WebFioriApp {
         $this->_setHandlers();
         //Initialize CLI
         self::getRunner();
+        
         $this->_initAppConfig();
 
-        
 
 
         $this->_initThemesPath();
@@ -370,7 +370,10 @@ class WebFioriApp {
             'webfiori/jsonx' => 'webfiori\\json\\Json',
             'webfiori/database' => 'webfiori\\database\\ResultSet',
             'webfiori/http' => 'webfiori\\http\\Response',
-            'webfiori/file' => 'webfiori\\framework\\File'
+            'webfiori/file' => 'webfiori\\file\\File',
+            'webfiori/mailer' => 'webfiori\\email\\SMTPAccount',
+            'webfiori/cli' => 'webfiori\\cli\\CLICommand',
+            'webfiori/err' => 'webfiori\\error\\ErrorHandlerException'
         ];
 
         foreach ($standardLibsClasses as $lib => $class) {

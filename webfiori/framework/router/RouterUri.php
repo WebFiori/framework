@@ -128,9 +128,11 @@ class RouterUri extends Uri {
      * 
      * @param string $requestedUri The URI such as 'https://www3.programmingacademia.com:80/{some-var}/hell/{other-var}/?do=dnt&y=#xyz'
      * 
-     * @param string|Closure $routeTo The file that the route will take the user to ar a closure.
+     * @param string|callable $routeTo The file that the route will take the user
+     * to. This can be an absolute path to a file, a closure or class
+     * name.
      * 
-     * @param boolean $caseSensitive A boolean. If the URI is case sensitive, 
+     * @param bool $caseSensitive A boolean. If the URI is case sensitive, 
      * then this value must be set to true. False if not. Default is true.
      * 
      * @param array $closureParams If the closure needs to use parameters, 
@@ -505,12 +507,15 @@ class RouterUri extends Uri {
      */
     public function setRoute($routeTo) {
         $this->isDynamic = true;
-
-        if ($routeTo instanceof Closure) {
+        $xRouteTo = null;
+        if (is_callable($routeTo)) {
             $this->setType(Router::CLOSURE_ROUTE);
+            $xRouteTo = $routeTo;
+        } else if (class_exists($routeTo)) {
+            $xRouteTo = $routeTo;
         } else {
             $cleaned = str_replace('\\', DS, $routeTo);
-            $routeTo = str_replace('/', DS, $cleaned);
+            $xRouteTo = str_replace('/', DS, $cleaned);
             $expl = explode('.', $routeTo);
             $extension = $expl[count($expl) - 1];
 
@@ -518,7 +523,7 @@ class RouterUri extends Uri {
                 $this->isDynamic = false;
             }
         }
-        $this->routeTo = $routeTo;
+        $this->routeTo = $xRouteTo;
     }
     /**
      * Sets the type of element that the URI will route to.

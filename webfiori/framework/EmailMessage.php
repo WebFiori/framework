@@ -1,10 +1,11 @@
 <?php
-namespace webfiori\framework\mail;
+namespace webfiori\framework;
 
 use webfiori\framework\exceptions\MissingLangException;
 use webfiori\email\exceptions\SMTPException;
 use webfiori\framework\i18n\Language;
 use webfiori\framework\WebFioriApp;
+use webfiori\email\SMTPAccount;
 
 /**
  * A class that can be used to write HTML formatted Email messages.

@@ -28,7 +28,7 @@ use webfiori\database\ConnectionInfo;
 use webfiori\framework\cli\writers\LangClassWriter;
 use webfiori\framework\exceptions\InitializationException;
 use webfiori\email\SMTPAccount;
-
+use webfiori\file\File;
 /**
  * A class that can be used to modify basic configuration settings of 
  * the web application. 

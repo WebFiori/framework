@@ -3,7 +3,7 @@ namespace webfiori\framework\test\cli;
 
 use PHPUnit\Framework\TestCase;
 use webfiori\framework\cli\commands\CreateCommand;
-use webfiori\framework\File;
+use webfiori\file\File;
 use webfiori\cli\Runner;
 /**
  * Description of TestCreateCommand

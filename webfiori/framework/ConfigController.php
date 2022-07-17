@@ -27,7 +27,7 @@ namespace webfiori\framework;
 use webfiori\database\ConnectionInfo;
 use webfiori\framework\cli\writers\LangClassWriter;
 use webfiori\framework\exceptions\InitializationException;
-use webfiori\framework\mail\SMTPAccount;
+use webfiori\email\SMTPAccount;
 
 /**
  * A class that can be used to modify basic configuration settings of 
@@ -1236,7 +1236,7 @@ class ConfigController {
         $this->a($cFile, "namespace ".APP_DIR_NAME.";");
         $this->a($cFile, "");
         $this->a($cFile, "use webfiori\\database\\ConnectionInfo;");
-        $this->a($cFile, "use webfiori\\framework\\mail\\SMTPAccount;");
+        $this->a($cFile, "use webfiori\\email\\SMTPAccount;");
         $this->a($cFile, "use webfiori\\framework\\Config;");
         $this->a($cFile, "use webfiori\\http\\Uri;");
         $this->a($cFile, "/**");

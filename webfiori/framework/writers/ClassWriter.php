@@ -1,7 +1,7 @@
 <?php
 namespace webfiori\framework\writers;
 
-use webfiori\framework\File;
+use webfiori\file\File;
 /**
  * A utility class which is used as a helper class to auto-generate PHP classes.
  * This class can be used to write .php classes.

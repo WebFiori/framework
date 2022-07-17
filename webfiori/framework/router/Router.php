@@ -27,7 +27,7 @@ namespace webfiori\framework\router;
 use Error;
 use Exception;
 use webfiori\framework\exceptions\RoutingException;
-use webfiori\framework\File;
+use webfiori\file\File;
 use webfiori\framework\ui\HTTPCodeView;
 use webfiori\framework\ui\StarterPage;
 use webfiori\framework\ui\WebPage;

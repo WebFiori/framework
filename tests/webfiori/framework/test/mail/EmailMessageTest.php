@@ -3,8 +3,6 @@ namespace webfiori\framework\test\mail;
 
 use PHPUnit\Framework\TestCase;
 use webfiori\framework\mail\EmailMessage;
-use webfiori\framework\mail\SMTPAccount;
-use webfiori\framework\WebFioriApp;
 /**
  * A test class for testing the class 'webfiori\framework\mail\EmailMessage'.
  *

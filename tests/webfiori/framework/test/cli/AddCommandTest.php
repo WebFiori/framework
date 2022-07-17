@@ -4,11 +4,10 @@ namespace webfiori\framework\test\cli;
 
 use PHPUnit\Framework\TestCase;
 use webfiori\framework\cli\commands\AddCommand;
-use webfiori\framework\File;
+use webfiori\file\File;
 use webfiori\framework\ConfigController;
 use webfiori\cli\Runner;
-use webfiori\framework\cli\streams\ArrayInputStream;
-use webfiori\framework\cli\streams\ArrayOutputStream;
+
 /**
  * Description of TestAddCommand
  *

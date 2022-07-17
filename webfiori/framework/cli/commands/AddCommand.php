@@ -29,8 +29,8 @@ use webfiori\database\ConnectionInfo;
 use webfiori\cli\CLICommand;
 use webfiori\framework\ConfigController;
 use webfiori\framework\DB;
-use webfiori\framework\mail\SMTPAccount;
-use webfiori\framework\mail\SMTPServer;
+use webfiori\email\SMTPAccount;
+use webfiori\email\SMTPServer;
 use webfiori\framework\WebFioriApp;
 use webfiori\framework\cli\writers\LangClassWriter;
 

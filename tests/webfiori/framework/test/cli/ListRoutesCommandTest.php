@@ -1,11 +1,10 @@
 <?php
 namespace webfiori\framework\test\cli;
 
-use webfiori\cli\Runner;
-use webfiori\framework\cli\commands\ListRoutesCommand;
 use PHPUnit\Framework\TestCase;
 use webfiori\framework\WebFioriApp;
 use webfiori\framework\router\Router;
+use webfiori\framework\ui\WebPage;
 /**
  * Description of ListRoutesCommandTest
  *
@@ -43,11 +42,11 @@ class ListRoutesCommandTest extends TestCase {
         ]);
         Router::addRoute([
             'path' => 'xyzb',
-            'route-to' => new \webfiori\framework\ui\WebPage()
+            'route-to' => new WebPage()
         ]);
         $runner->start();
         $this->assertEquals([
-            "https://example.com/xyz  =>  ".Router::class."\n",
+            "https://example.com/xyz   =>  ".Router::class."\n",
             "https://example.com/xyzb  =>  ".WebPage::class."\n"
         ], $runner->getOutput());
         Router::removeAll();

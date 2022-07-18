@@ -508,9 +508,12 @@ class RouterUri extends Uri {
     public function setRoute($routeTo) {
         $this->isDynamic = true;
         $xRouteTo = null;
+        $type = gettype($routeTo);
         if (is_callable($routeTo)) {
             $this->setType(Router::CLOSURE_ROUTE);
             $xRouteTo = $routeTo;
+        } else if ($type == 'object') {
+            $xRouteTo = get_class($routeTo);
         } else if (class_exists($routeTo)) {
             $xRouteTo = $routeTo;
         } else {

@@ -24,4 +24,21 @@ class VersionCommandTest extends TestCase {
             'Version Type: '.WF_VERSION_TYPE."\n",
         ], $runner->getOutput());
     }
+    /**
+     * @test
+     */
+    public function test01() {
+        $runner = new Runner();
+        $runner->setInput();
+        $runner->register(new VersionCommand());
+        $this->assertEquals(0, $runner->runCommand(null, [
+            'v',
+            '--ansi'
+        ]));
+        $this->assertEquals([
+            "\e[1;94mFramework Version: \e[0m".WF_VERSION."\n",
+            "\e[1;94mRelease Date: \e[0m".WF_RELEASE_DATE."\n",
+            "\e[1;94mVersion Type: \e[0m".WF_VERSION_TYPE."\n",
+        ], $runner->getOutput());
+    }
 }

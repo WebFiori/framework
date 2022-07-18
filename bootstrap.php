@@ -80,7 +80,7 @@ foreach ($dirs as $dir) {
     fprintf(STDOUT, $dir."\n");
 }
 $themesPath = TESTS_DIRECTORY.DIRECTORY_SEPARATOR.'themes';
-fprintf(STDOUT, 'Setting themes path to "'.$themesPath.'" ...');
+fprintf(STDOUT, 'Setting themes path to "'.$themesPath.'" ...'."\n");
 define('THEMES_PATH', $themesPath);
 fprintf(STDOUT,"Initializing application...\n");
 WebFioriApp::start();

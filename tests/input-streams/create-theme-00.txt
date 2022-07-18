@@ -1,4 +1,0 @@
-7
-NewTest
-themes\fiori
-themes\fiori

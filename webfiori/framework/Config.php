@@ -25,7 +25,7 @@
 namespace webfiori\framework;
 
 use webfiori\database\ConnectionInfo;
-use webfiori\framework\mail\SMTPAccount;
+use webfiori\email\SMTPAccount;
 /**
  * An interface which holds basic methods that any application configuration 
  * class must have.

@@ -2,7 +2,7 @@
 namespace webfiori\framework\test\session;
 
 use PHPUnit\Framework\TestCase;
-use webfiori\framework\File;
+use webfiori\file\File;
 use webfiori\framework\session\Session;
 /**
  * Description of SessionTest

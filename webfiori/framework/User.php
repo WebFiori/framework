@@ -26,6 +26,7 @@ namespace webfiori\framework;
 
 use webfiori\json\Json;
 use webfiori\json\JsonI;
+use webfiori\framework\session\SessionUser;
 /**
  * A class that represents a system user.
  * 
@@ -33,7 +34,7 @@ use webfiori\json\JsonI;
  * 
  * @version 1.7.2
  */
-class User implements JsonI {
+class User implements JsonI, SessionUser {
     /**
      * @since 1.2
      * 
@@ -222,7 +223,7 @@ class User implements JsonI {
      * 
      * @since 1.0
      */
-    public function getID() {
+    public function getId() : int {
         return $this->id;
     }
     /**
@@ -446,7 +447,7 @@ class User implements JsonI {
      * 
      * @since 1.0
      */
-    public function setID($id) {
+    public function setID(int $id) {
         $this->id = $id;
     }
     /**

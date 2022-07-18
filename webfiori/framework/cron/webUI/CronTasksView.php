@@ -25,7 +25,7 @@
 namespace webfiori\framework\cron\webUI;
 
 use webfiori\framework\cron\Cron;
-use webfiori\framework\File;
+use webfiori\file\File;
 use webfiori\ui\HTMLNode;
 /**
  * A view to display information about CRON Jobs.

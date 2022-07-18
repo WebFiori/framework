@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit stderr="true" colors="true" bootstrap="bootstrap.php">
+<phpunit colors="true" bootstrap="bootstrap.php">
     <php>
     </php>
     <filter>
@@ -19,17 +19,9 @@
             <file>./webfiori/framework/session/Session.php</file>
             <file>./webfiori/framework/session/SessionsManager.php</file>
             <file>./webfiori/framework/session/DefaultSessionStorage.php</file>
-            <file>./webfiori/framework/cli/CLICommand.php</file>
-            <file>./webfiori/framework/cli/CommandRunner.php</file>
-            <file>./webfiori/framework/cli/OutputFormatter.php</file>
-            <file>./webfiori/framework/cli/ArrayInputStream.php</file>
-            <file>./webfiori/framework/cli/ArrayOutputStream.php</file>
-            <file>./webfiori/framework/cli/FileInputStream.php</file>
-            <file>./webfiori/framework/cli/FileOutputStream.php</file>
             <file>./webfiori/framework/cli/commands/AddCommand.php</file>
             <file>./webfiori/framework/cli/commands/CreateCommand.php</file>
             <file>./webfiori/framework/cli/commands/CronCommand.php</file>
-            <file>./webfiori/framework/cli/commands/HelpCommand.php</file>
             <file>./webfiori/framework/cli/commands/ListCronCommand.php</file>
             <file>./webfiori/framework/cli/commands/ListRoutesCommand.php</file>
             <file>./webfiori/framework/cli/commands/ListThemesCommand.php</file>
@@ -39,7 +31,6 @@
             <file>./webfiori/framework/cli/commands/UpdateSettingsCommand.php</file>
             <file>./webfiori/framework/cli/commands/UpdateTableCommand.php</file>
             <file>./webfiori/framework/cli/commands/VersionCommand.php</file>
-            <file>./webfiori/framework/cli/writers/CLICommandClassWriter.php</file>
             <file>./webfiori/framework/cli/writers/ClassWriter.php</file>
             <file>./webfiori/framework/cli/writers/CronJobClassWriter.php</file>
             <file>./webfiori/framework/cli/writers/LangClassWriter.php</file>

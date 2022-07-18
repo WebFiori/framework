@@ -3,7 +3,7 @@
 namespace app;
 
 use webfiori\database\ConnectionInfo;
-use webfiori\framework\mail\SMTPAccount;
+use webfiori\email\SMTPAccount;
 use webfiori\framework\Config;
 use webfiori\http\Uri;
 /**

@@ -26,13 +26,13 @@ namespace webfiori\framework\cron;
 
 use Exception;
 use webfiori\collections\Queue;
-use webfiori\framework\cli\CLICommand;
+use webfiori\cli\CLICommand;
 use webfiori\framework\cron\webServices\CronServicesManager;
 use webfiori\framework\router\Router;
 use webfiori\framework\session\SessionsManager;
 use webfiori\framework\Util;
 use webfiori\framework\WebFioriApp;
-use webfiori\framework\cli\Runner;
+use webfiori\cli\Runner;
 /**
  * A class that is used to manage scheduled background jobs.
  * 

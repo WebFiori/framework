@@ -39,7 +39,7 @@ use webfiori\error\Handler;
 use webfiori\framework\handlers\CLIErrHandler;
 use webfiori\framework\handlers\APICallErrHandler;
 use webfiori\framework\handlers\HTTPErrHandler;
-use webfiori\framework\cli\Runner;
+use webfiori\cli\Runner;
 /**
  * The time at which the framework was booted in microseconds as a float.
  * 
@@ -55,6 +55,11 @@ define('MICRO_START', microtime(true));
  * @version 1.3.7
  */
 class WebFioriApp {
+    /**
+     * 
+     * @var Runner
+     */
+    private static $CliRunner;
     /**
      * A constant that indicates that the status of the class is 'none'.
      * 
@@ -134,10 +139,10 @@ class WebFioriApp {
         $this->_initAutoLoader();
         $this->_setHandlers();
         //Initialize CLI
-        Runner::get();
+        self::getRunner();
+        
         $this->_initAppConfig();
 
-        
 
 
         $this->_initThemesPath();
@@ -365,7 +370,10 @@ class WebFioriApp {
             'webfiori/jsonx' => 'webfiori\\json\\Json',
             'webfiori/database' => 'webfiori\\database\\ResultSet',
             'webfiori/http' => 'webfiori\\http\\Response',
-            'webfiori/file' => 'webfiori\\framework\\File'
+            'webfiori/file' => 'webfiori\\file\\File',
+            'webfiori/mailer' => 'webfiori\\email\\SMTPAccount',
+            'webfiori/cli' => 'webfiori\\cli\\CLICommand',
+            'webfiori/err' => 'webfiori\\error\\ErrorHandlerException'
         ];
 
         foreach ($standardLibsClasses as $lib => $class) {
@@ -451,6 +459,60 @@ class WebFioriApp {
             call_user_func(APP_DIR_NAME.'\ini\InitCron::init');
             Cron::registerJobs();
         }
+    }
+    /**
+     * Returns an instance which represents the class that is used to run the
+     * terminal.
+     * 
+     * @return Runner
+     */
+    public static function getRunner() : Runner {
+        if (self::$CliRunner === null) {
+            self::$CliRunner = new Runner();
+            if (Runner::isCLI()) {
+                if (defined('CLI_HTTP_HOST')) {
+                    $host = CLI_HTTP_HOST;
+                } else {
+                    $host = '127.0.0.1';
+                    define('CLI_HTTP_HOST', $host);
+                }
+                $_SERVER['HTTP_HOST'] = $host;
+                $_SERVER['REMOTE_ADDR'] = '127.0.0.1';
+
+                if (defined('ROOT_DIR')) {
+                    $_SERVER['DOCUMENT_ROOT'] = ROOT_DIR;
+                }
+                $_SERVER['REQUEST_URI'] = '/';
+                putenv('HTTP_HOST='.$host);
+                putenv('REQUEST_URI=/');
+
+                if (defined('USE_HTTP') && USE_HTTP === true) {
+                    $_SERVER['HTTPS'] = 'no';
+                } else {
+                    $_SERVER['HTTPS'] = 'yes';
+                }
+            }
+            self::$CliRunner->setBeforeStart(function (Runner $r) {
+                $commands = [
+                    '\\webfiori\\cli\\commands\\HelpCommand',
+                    '\\webfiori\\framework\\cli\\commands\\VersionCommand',
+                    '\\webfiori\\framework\\cli\\commands\\SettingsCommand',
+                    '\\webfiori\\framework\\cli\\commands\\CronCommand',
+                    '\\webfiori\\framework\\cli\\commands\\CreateCommand',
+                    '\\webfiori\\framework\\cli\\commands\\AddCommand',
+                    '\\webfiori\\framework\\cli\\commands\\ListRoutesCommand',
+                    '\\webfiori\\framework\\cli\\commands\\ListThemesCommand',
+                    '\\webfiori\\framework\\cli\\commands\\RunSQLQueryCommand',
+                    '\\webfiori\\framework\\cli\\commands\\TestRouteCommand',
+                    '\\webfiori\\framework\\cli\\commands\\UpdateSettingsCommand',
+                    '\\webfiori\\framework\\cli\\commands\\UpdateTableCommand',
+                ];
+                foreach ($commands as $c) {
+                    $r->register(new $c());
+                }
+            });
+        }
+        return self::$CliRunner;
     }
     private function _initMiddleware() {
         WebFioriApp::autoRegister('middleware', function($inst)

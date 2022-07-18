@@ -24,7 +24,7 @@
  */
 namespace webfiori\framework\cli\commands;
 
-use webfiori\framework\cli\CLICommand;
+use webfiori\cli\CLICommand;
 use webfiori\framework\ThemeLoader;
 
 /**

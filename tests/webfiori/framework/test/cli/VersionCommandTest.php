@@ -4,9 +4,7 @@ namespace webfiori\framework\test\cli;
 
 use PHPUnit\Framework\TestCase;
 use webfiori\framework\cli\commands\VersionCommand;
-use webfiori\framework\cli\Runner;
-use webfiori\framework\cli\ArrayInputStream;
-use webfiori\framework\cli\ArrayOutputStream;
+use webfiori\cli\Runner;
 /**
  * Description of VersionCommandTest
  *
@@ -17,25 +15,30 @@ class VersionCommandTest extends TestCase {
      * @test
      */
     public function test00() {
-        Runner::setInput([]);
-        
-        $this->assertEquals(0, Runner::runCommand(new VersionCommand()));
+        $runner = new Runner();
+        $runner->setInput();
+        $this->assertEquals(0, $runner->runCommand(new VersionCommand()));
         $this->assertEquals([
             'Framework Version: '.WF_VERSION."\n",
             'Release Date: '.WF_RELEASE_DATE."\n",
             'Version Type: '.WF_VERSION_TYPE."\n",
-        ], Runner::getOutput());
+        ], $runner->getOutput());
     }
     /**
-     * @TEST
+     * @test
      */
     public function test01() {
-        Runner::setInput([]);
-        $this->assertEquals(0, Runner::runCommand(new VersionCommand()));
+        $runner = new Runner();
+        $runner->setInput();
+        $runner->register(new VersionCommand());
+        $this->assertEquals(0, $runner->runCommand(null, [
+            'v',
+            '--ansi'
+        ]));
         $this->assertEquals([
-            'Framework Version: '.WF_VERSION."\n",
-            'Release Date: '.WF_RELEASE_DATE."\n",
-            'Version Type: '.WF_VERSION_TYPE."\n",
-        ], Runner::getOutput());
+            "\e[1;94mFramework Version: \e[0m".WF_VERSION."\n",
+            "\e[1;94mRelease Date: \e[0m".WF_RELEASE_DATE."\n",
+            "\e[1;94mVersion Type: \e[0m".WF_VERSION_TYPE."\n",
+        ], $runner->getOutput());
     }
 }

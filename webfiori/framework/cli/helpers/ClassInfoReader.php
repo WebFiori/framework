@@ -1,7 +1,7 @@
 <?php
 namespace webfiori\framework\cli\helpers;
 
-use webfiori\framework\cli\CLICommand;
+use webfiori\cli\CLICommand;
 use webfiori\framework\Util;
 use webfiori\framework\writers\ClassWriter;
 /**

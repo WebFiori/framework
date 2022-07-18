@@ -41,7 +41,7 @@ class CLICommandClassWriter extends ClassWriter {
         $this->setSuffix('Command');
         $this->setNamespace(APP_DIR_NAME.'\\commands');
         $this->addUseStatement([
-            'webfiori\\framework\\cli\\CLICommand'
+            'webfiori\\cli\\CLICommand'
         ]);
     }
     /**
@@ -160,7 +160,7 @@ class CLICommandClassWriter extends ClassWriter {
             'public function exec() : int {',
         ], 1);
         $this->append([
-            '//TODO: Write the code that represents the command.',
+            '//TODO: Write the logic of the command.',
             'return 0;',
         ], 2);
         $this->append('}', 1);

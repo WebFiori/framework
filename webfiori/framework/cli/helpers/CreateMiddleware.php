@@ -4,6 +4,7 @@ namespace webfiori\framework\cli\helpers;
 use webfiori\framework\cli\commands\CreateCommand;
 use webfiori\framework\cli\helpers\CreateClassHelper;
 use webfiori\framework\cli\writers\MiddlewareClassWriter;
+use webfiori\cli\InputValidator;
 /**
  * A helper class that works with the create command to create a middleware.
  *
@@ -48,23 +49,23 @@ class CreateMiddleware extends CreateClassHelper {
         return $groupsArr;
     }
     private function _getMiddlewareName() {
-        return $this->getInput('Enter a name for the middleware:', null, function ($val)
+        return $this->getInput('Enter a name for the middleware:', null, new InputValidator(function ($val)
         {
             if (strlen($val) > 0) {
                 return true;
             }
 
             return false;
-        });
+        }));
     }
     private function _getMiddlewareProprity() {
-        return $this->getInput('Enter middleware priority:', 0, function ($val)
+        return $this->getInput('Enter middleware priority:', 0, new InputValidator(function ($val)
         {
             if ($val >= 0) {
                 return true;
             }
 
             return false;
-        });
+        }));
     }
 }

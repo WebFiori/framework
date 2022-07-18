@@ -27,10 +27,10 @@ namespace webfiori\framework\cli\commands;
 
 use webfiori\database\DatabaseException;
 use webfiori\database\Table;
-use webfiori\framework\cli\CLICommand;
+use webfiori\cli\CLICommand;
 use webfiori\framework\DB;
 use webfiori\framework\WebFioriApp;
-use webfiori\framework\File;
+use webfiori\file\File;
 /**
  * A command which can be used to execute SQL queries on 
  * specific database.

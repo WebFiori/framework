@@ -41,9 +41,14 @@ class ListRoutesCommandTest extends TestCase {
             'path' => 'xyz',
             'route-to' => Router::class
         ]);
+        Router::addRoute([
+            'path' => 'xyzb',
+            'route-to' => new \webfiori\framework\ui\WebPage()
+        ]);
         $runner->start();
         $this->assertEquals([
-            "https://example.com/xyz  =>  ".Router::class."\n"
+            "https://example.com/xyz  =>  ".Router::class."\n",
+            "https://example.com/xyzb  =>  ".WebPage::class."\n"
         ], $runner->getOutput());
         Router::removeAll();
     }

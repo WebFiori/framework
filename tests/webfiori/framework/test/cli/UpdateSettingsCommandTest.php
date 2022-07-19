@@ -298,7 +298,7 @@ class UpdateSettingsCommandTest extends TestCase {
     public function testUpdatePrimaryTheme00() {
         $runner = new Runner();
         $runner->setInput([
-            'themes\\fioriTheme2\\NewTestTheme'
+            'themes\\fioriTheme2\\NewTestTheme2'
         ]);
         
         
@@ -310,7 +310,7 @@ class UpdateSettingsCommandTest extends TestCase {
             "Success: Primary theme successfully updated.\n"
         ], $runner->getOutput());
         
-        $this->assertEquals('themes\\fioriTheme2\\NewTestTheme', ConfigController::get()->getBaseTheme());
+        $this->assertEquals('themes\\fioriTheme2\\NewTestTheme2', ConfigController::get()->getBaseTheme());
     }
     /**
      * @test
@@ -320,7 +320,7 @@ class UpdateSettingsCommandTest extends TestCase {
         $runner->setInput([
             'themes\\greeny\\NotATheme',
             '',
-            'themes\\fioriTheme2\\NewTestTheme'
+            'themes\\fioriTheme2\\NewTestTheme2'
         ]);
         
         
@@ -336,7 +336,7 @@ class UpdateSettingsCommandTest extends TestCase {
             "Success: Primary theme successfully updated.\n"
         ], $runner->getOutput());
         
-        $this->assertEquals('themes\\fioriTheme2\\NewTestTheme', ConfigController::get()->getBaseTheme());
+        $this->assertEquals('themes\\fioriTheme2\\NewTestTheme2', ConfigController::get()->getBaseTheme());
     }
     /**
      * @test

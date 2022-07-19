@@ -230,9 +230,7 @@ class NewFTestTheme extends Theme {
                 }
             }
         }
-        $node = new HTMLNode();
-
-        return $node;
+        return parent::createHTMLNode($options);
     }
 }
 return __NAMESPACE__;

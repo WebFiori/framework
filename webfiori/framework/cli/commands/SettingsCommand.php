@@ -15,7 +15,7 @@ class SettingsCommand extends CLICommand {
      * the configuration of the framework.
      */
     public function __construct() {
-        parent::__construct('show-config', [], 'Display framework configuration.');
+        parent::__construct('show-settings', [], 'Display application configuration.');
     }
     /**
      * Execute the command.

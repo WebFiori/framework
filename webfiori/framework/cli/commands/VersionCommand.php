@@ -39,37 +39,16 @@ class VersionCommand extends CLICommand {
      * Execute the command
      */
     public function exec() : int {
-        if ($this->getOwner()->getActiveCommand()->getName() == $this->getName()) {
-            $formattingOptions = [
-                'color' => 'light-blue',
-                'bold' => true
-            ];
-            $this->prints("Framework Version: ", $formattingOptions);
-            $this->println(WF_VERSION);
-            $this->prints("Release Date: ", $formattingOptions);
-            $this->println(WF_RELEASE_DATE);
-            $this->prints("Version Type: ", $formattingOptions);
-            $this->println(WF_VERSION_TYPE);
-        } else {
-            $wfLogo = "|\                /|                          \n"
-                ."| \      /\      / |              |  / \  |\n"
-                ."\  \    /  \    /  / __________   |\/   \/|\n"
-                ." \  \  /    \  /  / /  /______ /  | \/ \/ |\n"
-                ."  \  \/  /\  \/  / /  /           |  \ /  |\n"
-                ."   \    /  \    / /  /______      |\  |  /|\n"
-                ."    \  /    \  / /  /______ /       \ | /  \n"
-                ."     \/  /\  \/ /  /                  |    \n"
-                ."      \ /  \ / /  /                   |    \n"
-                ."       ______ /__/                    |    \n";
-            $this->println($wfLogo);
-            $formattingOptions = [
-                'color' => 'light-green',
-                'bold' => true
-            ];
-            $this->prints('WebFiori Framework ', $formattingOptions);
-            $this->prints(' (c) Version ');
-            $this->println(WF_VERSION." ".WF_VERSION_TYPE."\n\n", $formattingOptions);
-        }
+        $formattingOptions = [
+            'color' => 'light-blue',
+            'bold' => true
+        ];
+        $this->prints("Framework Version: ", $formattingOptions);
+        $this->println(WF_VERSION);
+        $this->prints("Release Date: ", $formattingOptions);
+        $this->println(WF_RELEASE_DATE);
+        $this->prints("Version Type: ", $formattingOptions);
+        $this->println(WF_VERSION_TYPE);
         return 0;
     }
 }

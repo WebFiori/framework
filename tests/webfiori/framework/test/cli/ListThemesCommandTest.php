@@ -54,7 +54,7 @@ class ListThemesCommandTest extends TestCase {
         ]);
         $runner->start();
         $this->assertEquals([
-            "Theme Name:     : New Theme\n",
+            "Theme Name:     : New Super Theme\n",
             "Author:         : <NOT SET>\n",
             "Author URL:     : <NOT SET>\n",
             "License:        : <NOT SET>\n",

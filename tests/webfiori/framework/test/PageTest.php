@@ -195,11 +195,11 @@ class PageTest extends TestCase{
         $page->setTheme(get_class($theme));
         $theme2 = $page->getTheme();
         $this->assertTrue($theme2 === $theme);
-        $page->setTheme('New Super Theme');
+        $page->setTheme('New Theme 2');
         $theme3 = $page->getTheme();
         $this->assertFalse($theme3 === $theme2);
-        $page->setTheme('New Super Theme');
-        $theme4 = $page->getTheme('New Super Theme');
+        $page->setTheme('New Theme 2');
+        $theme4 = $page->getTheme('New Theme 2');
         $this->assertTrue($theme3 === $theme4);
     }
     /**

@@ -442,8 +442,8 @@ class AppConfig implements Config {
         $this->baseUrl = Uri::getBaseURL();
         $this->titleSep = '|';
         $this->primaryLang = 'EN';
-        $this->baseThemeName = \themes\newFiori\NewFiori::class;
-        $this->adminThemeName = \themes\newFiori\NewFiori::class;
+        $this->baseThemeName = \themes\fioriTheme\NewFTestTheme::class;
+        $this->adminThemeName = \themes\fioriTheme\NewFTestTheme::class;
         $this->homePage = Uri::getBaseURL();
     }
     /**

@@ -50,7 +50,7 @@ class ListThemesCommandTest extends TestCase {
         $runner->setArgsVector([
             'webfiori',
             'list-themes',
-            '--theme-name' => "New Theme"
+            '--theme-name' => "New Super Theme"
         ]);
         $runner->start();
         $this->assertEquals([

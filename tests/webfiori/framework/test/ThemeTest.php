@@ -23,7 +23,7 @@ class ThemeTest extends TestCase {
         $theme = ThemeLoader::usingTheme();
         $j = $theme->toJSON();
         $j->setPropsStyle('camel');
-        $this->assertEquals('{"themesPath":"'. \webfiori\json\Json::escapeJSONSpecialChars(THEMES_PATH).'","name":"New Fiori","url":"","license":"MIT","licenseUrl":"","version":"1.0","author":"","authorUrl":"","imagesDirName":"images","themeDirName":"newFiori","cssDirName":"css","jsDirName":"js"}',$j.'');
+        $this->assertEquals('{"themesPath":"'. \webfiori\json\Json::escapeJSONSpecialChars(THEMES_PATH).'","name":"New Super Theme","url":"","license":"","licenseUrl":"","version":"1.0.0","author":"","authorUrl":"","imagesDirName":"images","themeDirName":"fioriTheme","cssDirName":"css","jsDirName":"js"}',$j.'');
     }
     /**
      * @test
@@ -48,7 +48,7 @@ class ThemeTest extends TestCase {
     public function testUseTheme01() {
         $theme = ThemeLoader::usingTheme();
         $this->assertTrue($theme instanceof Theme);
-        $this->assertEquals('New Fiori', $theme->getName());
+        $this->assertEquals('New Super Theme', $theme->getName());
         $this->assertEquals(WebFioriApp::getAppConfig()->getBaseURL(),$theme->getBaseURL());
         $theme->setBaseURL('https://example.com/x');
         $this->assertEquals('https://example.com/x',$theme->getBaseURL());
@@ -59,7 +59,7 @@ class ThemeTest extends TestCase {
     public function testCreateHTMLNode00() {
         $theme = ThemeLoader::usingTheme();
         $this->assertTrue($theme instanceof Theme);
-        $this->assertEquals('New Fiori', $theme->getName());
+        $this->assertEquals('New Super Theme', $theme->getName());
         $node = $theme->createHTMLNode();
         $this->assertEquals('div', $node->getNodeName());
         

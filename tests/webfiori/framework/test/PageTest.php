@@ -118,7 +118,7 @@ class PageTest extends TestCase{
      */
     public function testReset00() {
         $page = new WebPage();
-        $page->setTheme('WebFiori Theme');
+        $page->setTheme('New Super Theme');
         $page->setDescription('This is a test page.');
         $page->setLang('ar');
         $page->setTitle('Login');
@@ -179,9 +179,9 @@ class PageTest extends TestCase{
     public function testDirs01() {
         $page = new WebPage();
         $page->setTheme();
-        $this->assertEquals('assets/newFiori/css',$page->getThemeCSSDir());
-        $this->assertEquals('assets/newFiori/images',$page->getThemeImagesDir());
-        $this->assertEquals('assets/newFiori/js',$page->getThemeJSDir());
+        $this->assertEquals('assets/fioriTheme/css',$page->getThemeCSSDir());
+        $this->assertEquals('assets/fioriTheme/images',$page->getThemeImagesDir());
+        $this->assertEquals('assets/fioriTheme/js',$page->getThemeJSDir());
     }
     /**
      * @test
@@ -217,7 +217,7 @@ class PageTest extends TestCase{
      */
     public function testTheme02() {
         $page = new WebPage();
-        $page->setTheme('      Template Theme      ');
+        $page->setTheme('      New Super Theme      ');
         $theme3 = $page->getTheme();
         $this->assertTrue($theme3 instanceof Theme);
     }
@@ -225,8 +225,8 @@ class PageTest extends TestCase{
      * @test
      */
     public function testTheme03() {
-        $firstThemeName = 'Template Theme';
-        $secondThemeName = 'WebFiori Theme';
+        $firstThemeName = 'New Super Theme';
+        $secondThemeName = 'New Theme 2';
         $page = new WebPage();
         $page->setTheme($firstThemeName);
         $theme3 = $page->getTheme();
@@ -476,7 +476,7 @@ class PageTest extends TestCase{
      */
     public function testCreateHtmlNode02() {
         $page = new WebPage();
-        $page->setTheme(\themes\webfiori108\WebFioriV108::class);
+        $page->setTheme(\themes\fioriTheme\NewFTestTheme::class);
         $node = $page->createHTMLNode([
             'type' => 'section',
             'element-id' => 'super-sec'

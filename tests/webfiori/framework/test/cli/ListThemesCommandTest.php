@@ -25,7 +25,7 @@ class ListThemesCommandTest extends TestCase {
         $this->assertEquals([
             "Total Number of Themes: 2 .\n",
             "--------- Theme #01 ---------\n\n",
-            "Theme Name:     : New Theme\n",
+            "Theme Name:     : New Super Theme\n",
             "Author:         : <NOT SET>\n",
             "Author URL:     : <NOT SET>\n",
             "License:        : <NOT SET>\n",

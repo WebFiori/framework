@@ -1,27 +1,4 @@
 <?php
-/*
- * The MIT License
- *
- * Copyright 2020 Ibrahim, WebFiori Framework.
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
 namespace webfiori\framework\cli\commands;
 
 use webfiori\cli\CLICommand;
@@ -73,25 +50,20 @@ class ListThemesCommand extends CLICommand {
 
                 return -1;
             }
-        }
-        $this->println("Total Number of Themes: $themsCount .");
+        } else {
+            $this->println("Total Number of Themes: $themsCount .");
 
-        foreach ($themesArr as $themeObj) {
-            if ($index < 10) {
-                $this->println("--------- Theme #0$index ---------\n", [
+            foreach ($themesArr as $themeObj) {
+                $number = $index < 10 ? '0'.$index : $index;
+
+                $this->println("--------- Theme #$number ---------\n", [
                     'color' => 'light-blue',
                     'bold' => true
                 ]);
-            } else {
-                $this->println("--------- Theme #$index ---------\n", [
-                    'color' => 'light-blue',
-                    'bold' => true
-                ]);
+                $this->_printThemeObj($themeObj);
+                $index++;
             }
-            $this->_printThemeObj($themeObj);
-            $index++;
         }
-
         return 0;
     }
 
@@ -103,11 +75,17 @@ class ListThemesCommand extends CLICommand {
         $len03 = $spaceSize - strlen('License');
         $len04 = $spaceSize - strlen('License URL');
 
-        $this->println("Theme Name: %".$len00."s %s",':',$themeObj->getName());
-        $this->println("Author: %".$len01."s %s",':',$themeObj->getAuthor());
-        $this->println("Author URL: %".$len02."s %s",':',$themeObj->getAuthorUrl());
-        $this->println("License: %".$len03."s %s",':',$themeObj->getLicenseName());
-        $this->println("License URL: %".$len04."s %s",':',$themeObj->getLicenseUrl());
-        $this->println("Theme Desription: %s",$themeObj->getDescription());
+        $this->println("Theme Name: %".$len00."s %s",':', $this->isSet($themeObj->getName()));
+        $this->println("Author: %".$len01."s %s",':', $this->isSet($themeObj->getAuthor()));
+        $this->println("Author URL: %".$len02."s %s",':', $this->isSet($themeObj->getAuthorUrl()));
+        $this->println("License: %".$len03."s %s",':', $this->isSet($themeObj->getLicenseName()));
+        $this->println("License URL: %".$len04."s %s",':', $this->isSet($themeObj->getLicenseUrl()));
+        $this->println("Theme Desription: %s", $this->isSet($themeObj->getDescription()));
+    }
+    private function isSet($var) {
+        if (strlen($var) == 0) {
+            return '<NOT SET>';
+        }
+        return $var;
     }
 }

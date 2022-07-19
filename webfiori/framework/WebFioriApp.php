@@ -494,7 +494,7 @@ class WebFioriApp {
             }
             self::$CliRunner->setBeforeStart(function (Runner $r) {
                 $commands = [
-                    '\\webfiori\\cli\\commands\\HelpCommand',
+                    '\\webfiori\\framework\\cli\commands\\WHelpCommand',
                     '\\webfiori\\framework\\cli\\commands\\VersionCommand',
                     '\\webfiori\\framework\\cli\\commands\\SettingsCommand',
                     '\\webfiori\\framework\\cli\\commands\\CronCommand',
@@ -510,6 +510,7 @@ class WebFioriApp {
                 foreach ($commands as $c) {
                     $r->register(new $c());
                 }
+                $r->setDefaultCommand('help');
             });
         }
         return self::$CliRunner;

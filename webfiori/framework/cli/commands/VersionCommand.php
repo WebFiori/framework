@@ -39,10 +39,7 @@ class VersionCommand extends CLICommand {
      * Execute the command
      */
     public function exec() : int {
-        $formattingOptions = [
-            'color' => 'light-blue',
-            'bold' => true
-        ];
+        $formattingOptions = ['color' => 'light-blue', 'bold' => true];
         $this->prints("Framework Version: ", $formattingOptions);
         $this->println(WF_VERSION);
         $this->prints("Release Date: ", $formattingOptions);

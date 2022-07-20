@@ -21,6 +21,7 @@ class NewTestTheme2 extends Theme {
         $this->setAuthorUrl('https://ibrahim-binalshikh.me');
         $this->setLicenseName('MIT');
         $this->setLicenseUrl('https://opensource.org/licenses/MIT');
+        $this->setUrl('https://my-theme-side.com');
     }
     /**
      * Returns an object of type 'HTMLNode' that represents aside section of the page. 

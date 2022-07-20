@@ -1,27 +1,5 @@
 <?php
-/*
- * The MIT License
- *
- * Copyright 2019 Ibrahim, WebFiori Framework.
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
+
 namespace webfiori\framework;
 
 use webfiori\json\Json;
@@ -233,33 +211,51 @@ class PrivilegesGroup implements JsonI {
      * @since 1.0
      */
     public function setID(string $id) : bool {
-        $xid = trim($id);
-        $len = strlen($xid);
+        if (!self::isValidID($id)) {
+            return false;
+        }
+        
         $parentG = $this->getParentGroup();
 
-        if ($parentG !== null) {
-            $testInst = $parentG;
-
-            while ($parentG !== null) {
-                $parentG = $parentG->getParentGroup();
-
-                if ($parentG !== null) {
-                    $testInst = $parentG;
-                }
-            }
-            $taken = $this->_checkID($id, $testInst);
-
-            if ($taken === true) {
-                return false;
-            }
-        } else {
+        if ($parentG === null) {
             $taken = $this->_checkID($id, $this);
 
             if ($taken === true) {
                 return false;
             }
         }
+        
+        $testInst = $parentG;
 
+        while ($parentG !== null) {
+            $parentG = $parentG->getParentGroup();
+
+            if ($parentG !== null) {
+                $testInst = $parentG;
+            }
+        }
+        
+        if ($testInst !== null) {
+            $taken = $this->_checkID($id, $testInst);
+        }
+        
+
+        if ($taken === true) {
+            return false;
+        }
+        $this->groupId = trim($id);
+        return true;
+    }
+    /**
+     * Checks if provided group ID is valid or not.
+     * 
+     * @param string $id The ID of the privilege or the group.
+     * 
+     * @return bool If valid, true is returned. False otherwise.
+     */
+    public static function isValidID(string $id) : bool {
+        $xid = trim($id);
+        $len = strlen($xid);
         for ($x = 0 ; $x < $len ; $x++) {
             $ch = $xid[$x];
 
@@ -267,8 +263,6 @@ class PrivilegesGroup implements JsonI {
                 return false;
             }
         }
-        $this->groupId = $xid;
-
         return true;
     }
     /**
@@ -316,13 +310,11 @@ class PrivilegesGroup implements JsonI {
 
                 return true;
             }
-        } else {
-            if ($group === null && $this->parentGroup !== null) {
-                $this->parentGroup->_removeChildGroup($this->getID());
-                $this->parentGroup = null;
+        } else if ($group === null && $this->parentGroup !== null) {
+            $this->parentGroup->_removeChildGroup($this->getID());
+            $this->parentGroup = null;
 
-                return true;
-            }
+            return true;
         }
 
         return false;

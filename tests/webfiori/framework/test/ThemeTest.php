@@ -23,7 +23,7 @@ class ThemeTest extends TestCase {
         $theme = ThemeLoader::usingTheme();
         $j = $theme->toJSON();
         $j->setPropsStyle('camel');
-        $this->assertEquals('{"themesPath":"'. \webfiori\json\Json::escapeJSONSpecialChars(THEMES_PATH).'","name":"New Super Theme","url":"","license":"","licenseUrl":"","version":"1.0.0","author":"","authorUrl":"","imagesDirName":"images","themeDirName":"fioriTheme","cssDirName":"css","jsDirName":"js"}',$j.'');
+        $this->assertEquals('{"name":"New Super Theme","url":"","license":"","licenseUrl":"","version":"1.0.0","author":"","authorUrl":""}',$j.'');
     }
     /**
      * @test
@@ -41,6 +41,9 @@ class ThemeTest extends TestCase {
         $this->assertEquals('https://opensource.org/licenses/MIT',$theme->getLicenseUrl());
         $this->assertEquals('MIT',$theme->getLicenseName());
         $this->assertEquals(1,count(ThemeLoader::getLoadedThemes()));
+        $this->assertEquals('fioriTheme2', $theme->getDirectoryName());
+        $this->assertEquals('https://my-theme-side.com', $theme->getUrl());
+        $this->assertEquals(ROOT_DIR.DS.'themes'.DS.'fioriTheme2'.DS, $theme->getAbsolutePath());
     }
     /**
      * @test

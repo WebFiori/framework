@@ -1,6 +1,6 @@
 <?php
 namespace webfiori\tests\entity;
-use webfiori\framework\i18n\Language;
+use webfiori\framework\Language;
 use PHPUnit\Framework\TestCase;
 /**
  * Description of LanguageTest

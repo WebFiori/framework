@@ -1,11 +1,20 @@
 <?php
+/**
+ * This file is licensed under MIT License.
+ * 
+ * Copyright (c) 2022 Ibrahim BinAlshikh
+ * 
+ * For more information on the license, please visit: 
+ * https://github.com/WebFiori/.github/blob/main/LICENSE
+ * 
+ */
 namespace webfiori\framework\handlers;
 
 use webfiori\error\AbstractHandler;
 use webfiori\framework\ui\ServerErrView;
 use webfiori\framework\Util;
 use webfiori\framework\router\Router;
-use webfiori\framework\i18n\Language;
+use webfiori\framework\Language;
 use webfiori\http\Response;
 /**
  * Description of HTTPExceptionHandler

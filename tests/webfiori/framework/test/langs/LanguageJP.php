@@ -1,6 +1,6 @@
 <?php
 namespace app\langs;
-use webfiori\framework\i18n\Language;
+use webfiori\framework\Language;
 
 class LanguageJP extends Language {
     public function __construct() {

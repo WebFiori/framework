@@ -1,7 +1,7 @@
 <?php
 namespace app\langs;
 
-use webfiori\framework\i18n\Language;
+use webfiori\framework\Language;
 
 /**
  * A class which holds language information for the language which has code 'AR'.

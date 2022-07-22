@@ -1,10 +1,16 @@
 <?php
-
+/**
+ * This file is licensed under MIT License.
+ * 
+ * Copyright (c) 2019 Ibrahim BinAlshikh
+ * 
+ * For more information on the license, please visit: 
+ * https://github.com/WebFiori/.github/blob/main/LICENSE
+ * 
+ */
 namespace webfiori\framework\cli\commands;
 
 use webfiori\cli\commands\HelpCommand;
-use webfiori\framework\cli\commands\VersionCommand;
-use webfiori\framework\WebFioriApp;
 /**
  * Description of WHelpCommand
  *

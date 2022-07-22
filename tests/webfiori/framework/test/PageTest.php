@@ -4,7 +4,7 @@ namespace webfiori\framework\test;
 use PHPUnit\Framework\TestCase;
 use webfiori\ui\HTMLNode;
 use webfiori\framework\Theme;
-use webfiori\framework\i18n\Language;
+use webfiori\framework\Language;
 use webfiori\framework\WebFioriApp;
 use webfiori\framework\ui\WebPage;
 /**

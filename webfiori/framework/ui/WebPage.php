@@ -1,33 +1,19 @@
 <?php
-/*
- * The MIT License
- *
- * Copyright 2021 Ibrahim, WebFiori Framework.
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+/**
+ * This file is licensed under MIT License.
+ * 
+ * Copyright (c) 2020 Ibrahim BinAlshikh
+ * 
+ * For more information on the license, please visit: 
+ * https://github.com/WebFiori/.github/blob/main/LICENSE
+ * 
  */
 namespace webfiori\framework\ui;
 
 use Exception;
 use webfiori\framework\exceptions\MissingLangException;
 use webfiori\framework\exceptions\UIException;
-use webfiori\framework\i18n\Language;
+use webfiori\framework\Language;
 use webfiori\framework\session\Session;
 use webfiori\framework\session\SessionsManager;
 use webfiori\framework\Theme;
@@ -338,9 +324,7 @@ class WebPage {
     public function createHTMLNode(array $nodeInfo = []) : HTMLNode {
         $pageTheme = $this->getTheme();
 
-        if ($pageTheme !== null) {
-            return $pageTheme->createHTMLNode($nodeInfo);
-        } else {
+        if ($pageTheme === null) {
             $name = isset($nodeInfo['name']) ? trim((string)$nodeInfo['name']) : 'div';
             
             if (strlen($name) == 0) {
@@ -350,6 +334,8 @@ class WebPage {
             
             return new HTMLNode($name, $attrs);
         }
+        
+        return $pageTheme->createHTMLNode($nodeInfo);
     }
     /**
      * Returns the value of a language label.
@@ -704,12 +690,12 @@ class WebPage {
             call_user_func_array($this->beforeRenderCallbacks[$x], $this->beforeRenderParams[$x]);
         }
 
-        if ($returnResult) {
-            return $this->getDocument();
-        } else {
+        if (!$returnResult) {
             $formatted = $formatted === true || (defined('WF_VERBOSE') && WF_VERBOSE);
             Response::write($this->getDocument()->toHTML($formatted));
+            return;
         }
+        return $this->getDocument();
     }
     /**
      * Resets page attributes to default values.
@@ -736,11 +722,7 @@ class WebPage {
 
         $langObj = $this->getTranslation();
 
-        if ($langObj !== null) {
-            $this->contentDir = $langObj->getWritingDir();
-        } else {
-            $this->contentDir = 'ltr';
-        }
+        $this->contentDir = $langObj === null ? 'ltr' : $langObj->getWritingDir();
 
         $this->incFooter = true;
         $this->incHeader = true;
@@ -822,14 +804,14 @@ class WebPage {
     public function setDescription(string $val) {
         $trimmed = trim($val);
         
-        if (strlen($trimmed) != 0) {
-            $this->description = $trimmed;
-            $this->document->getHeadNode()->addMeta('description', $trimmed, true);
-        } else {
+        if (strlen($trimmed) == 0) {
             $descNode = $this->document->getHeadNode()->getMeta('description');
             $this->document->getHeadNode()->removeChild($descNode);
             $this->description = null;
+            return;
         }
+        $this->description = $trimmed;
+        $this->document->getHeadNode()->addMeta('description', $trimmed, true);
     }
     /**
      * Sets the property that is used to check if page has an aside section or not.
@@ -1110,17 +1092,17 @@ class WebPage {
         }
         $langCodeFromSession = $session !== null ? $session->getLangCode(true) : null;
 
-        if ($langCodeFromSession !== null) {
-            $this->setLang($langCodeFromSession);
-        } else {
+        if ($langCodeFromSession === null) {
             $langCodeFromRequest = Request::getParam('lang');
 
-            if ($langCodeFromRequest !== null) {
-                $this->setLang($langCodeFromRequest);
-            } else {
+            if ($langCodeFromRequest === null) {
                 $this->setLang(WebFioriApp::getAppConfig()->getPrimaryLanguage());
+                return;
             }
+            $this->setLang($langCodeFromRequest);
+            return;
         }
+        $this->setLang($langCodeFromSession);
     }
     private function _getComponent($methToCall, $nodeId) {
         $loadedTheme = $this->getTheme();
@@ -1130,30 +1112,28 @@ class WebPage {
             $node = $loadedTheme->$methToCall();
         }
 
-        if ($loadedTheme !== null && !$node instanceof HTMLNode) {
-            throw new UIException('The the method "'.get_class($loadedTheme).'::'.$methToCall.'()" did not return '
-                    .'an instance of the class "webfiori\\ui\\HTMLNode".');
-        } else {
+        if ($loadedTheme === null || ($node instanceof HTMLNode)) {
+            
             $node->setID($nodeId);
+            return $node;
         }
 
-        return $node;
+        throw new UIException('The the method "'.get_class($loadedTheme).'::'.$methToCall.'()" did not return '
+                    .'an instance of the class "webfiori\\ui\\HTMLNode".');
     }
 
     
     private function _getHead() {
         $loadedTheme = $this->getTheme();
-
-        if ($loadedTheme === null) {
-            $headNode = new HeadNode(
-                $this->getTitle().$this->getTitleSep().$this->getWebsiteName(),
-                $this->getCanonical(),
-                WebFioriApp::getAppConfig()->getBaseURL()
-            );
-        } else {
+        $headNode = new HeadNode(
+            $this->getTitle().$this->getTitleSep().$this->getWebsiteName(),
+            $this->getCanonical(),
+            WebFioriApp::getAppConfig()->getBaseURL()
+        );
+        if ($loadedTheme !== null) {
             $headNode = $loadedTheme->getHeadNode();
 
-            if (!$headNode instanceof HeadNode) {
+            if (!($headNode instanceof HeadNode)) {
                 throw new UIException('The method "'.get_class($loadedTheme).'::getHeadNode()" did not return '
                         .'an instance of the class "webfiori\\ui\\HeadNode".');
             }

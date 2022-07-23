@@ -1,28 +1,14 @@
 <?php
-/*
- * The MIT License
- *
- * Copyright 2019 Ibrahim, WebFiori Framework.
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+/**
+ * This file is licensed under MIT License.
+ * 
+ * Copyright (c) 2020 Ibrahim BinAlshikh
+ * 
+ * For more information on the license, please visit: 
+ * https://github.com/WebFiori/.github/blob/main/LICENSE
+ * 
  */
-namespace webfiori\framework\i18n;
+namespace webfiori\framework;
 
 use webfiori\framework\exceptions\MissingLangException;
 /**
@@ -156,12 +142,12 @@ class Language {
             $subSplit = explode('/', $trim01);
 
             if (count($subSplit) != 0) {
-                if (isset($this->languageVars[$subSplit[0]])) {
-                    $this->_create($subSplit, $this->languageVars[$subSplit[0]],1);
-                } else {
+                if (!isset($this->languageVars[$subSplit[0]])) {
                     $this->languageVars[$subSplit[0]] = [];
                     $this->_create($subSplit, $this->languageVars[$subSplit[0]],1);
+                    return;
                 }
+                $this->_create($subSplit, $this->languageVars[$subSplit[0]],1);
             }
         }
     }
@@ -187,13 +173,11 @@ class Language {
             if (isset($this->languageVars[$subSplit[0]])) {
                 $toReturn = $this->languageVars[$subSplit[0]];
             }
-        } else {
-            if (isset($this->languageVars[$subSplit[0]])) {
-                $val = $this->_get($subSplit, $this->languageVars[$subSplit[0]], 1);
+        } else if (isset($this->languageVars[$subSplit[0]])) {
+            $val = $this->_get($subSplit, $this->languageVars[$subSplit[0]], 1);
 
-                if ($val !== null) {
-                    $toReturn = $val;
-                }
+            if ($val !== null) {
+                $toReturn = $val;
             }
         }
 
@@ -266,26 +250,23 @@ class Language {
 
         if (isset(self::$loadedLangs[$uLangCode])) {
             return self::$loadedLangs[$uLangCode];
-        } else {
-            $langClassName = APP_DIR_NAME.'\\langs\\Language'.$uLangCode;
+        } 
+        $langClassName = APP_DIR_NAME.'\\langs\\Language'.$uLangCode;
 
-            if (class_exists($langClassName)) {
-                $class = new $langClassName();
-
-                if ($class instanceof Language) {
-                    if (isset(self::$loadedLangs[$uLangCode])) {
-                        return self::$loadedLangs[$uLangCode];
-                    } else {
-                        throw new MissingLangException('The translation file was found. But no object of type \'Language\' is stored. Make sure that the parameter '
-                                .'$addtoLoadedAfterCreate is set to true when creating the language object.');
-                    }
-                } else {
-                    throw new MissingLangException('A language class for the language \''.$uLangCode.'\' was found. But it is not a sub class of \'Language\'.');
-                }
-            } else {
-                throw new MissingLangException('No language class was found for the language \''.$uLangCode.'\'.');
-            }
+        if (!class_exists($langClassName)) {
+            throw new MissingLangException('No language class was found for the language \''.$uLangCode.'\'.');
         }
+        $class = new $langClassName();
+
+        if (!($class instanceof Language)) {
+            throw new MissingLangException('A language class for the language \''.$uLangCode.'\' was found. But it is not a sub class of \'Language\'.');
+        }
+        
+        if (!isset(self::$loadedLangs[$uLangCode])) {
+            throw new MissingLangException('The translation file was found. But no object of type \'Language\' is stored. Make sure that the parameter '
+                    .'$addtoLoadedAfterCreate is set to true when creating the language object.');
+        }
+        return self::$loadedLangs[$uLangCode];
     }
     /**
      * Removes all loaded languages.
@@ -323,13 +304,13 @@ class Language {
                 if (isset($this->languageVars[$subSplit[0]])) {
                     $this->languageVars[$subSplit[0]][$varTrimmed] = $varValue;
                 }
+                return;
             } else if (isset($this->languageVars[$subSplit[0]])) {
                 return $this->_set($subSplit, $this->languageVars[$subSplit[0]],$varTrimmed,$varValue, 1);
-            } else {
-                $this->createAndSet($dir, [
-                    $varName => $varValue
-                ]);
-            }
+            } 
+            $this->createAndSet($dir, [
+                $varName => $varValue
+            ]);
         }
     }
     /**
@@ -379,9 +360,9 @@ class Language {
             if (gettype($v) == 'array') {
                 $this->createDirectory($dir.'/'.$k);
                 $this->setMultiple($dir.'/'.$k, $v);
-            } else {
-                $this->set($dir, $k, $v);
+                continue;
             }
+            $this->set($dir, $k, $v);
         }
     }
     /**
@@ -432,13 +413,12 @@ class Language {
         $count = count($subs);
 
         if ($index < $count) {
-            if (isset($top[$subs[$index]])) {
-                return $this->_create($subs, $top[$subs[$index]],++$index);
-            } else {
+            if (!isset($top[$subs[$index]])) {
                 $top[$subs[$index]] = [];
 
                 return $this->_create($subs, $top[$subs[$index]],++$index);
             }
+            return $this->_create($subs, $top[$subs[$index]],++$index);
         }
     }
     private function _get(&$subs,&$top,$index) {
@@ -448,10 +428,8 @@ class Language {
             if (isset($top[$subs[$index]])) {
                 return $top[$subs[$index]];
             }
-        } else {
-            if (isset($top[$subs[$index]])) {
-                return $this->_get($subs, $top[$subs[$index]], ++$index);
-            }
+        } else if (isset($top[$subs[$index]])) {
+            return $this->_get($subs, $top[$subs[$index]], ++$index);
         }
 
         return null;
@@ -466,10 +444,8 @@ class Language {
 
                 return true;
             }
-        } else {
-            if (isset($top[$subs[$index]])) {
-                return $this->_set($subs,$top[$subs[$index]],$var,$val, ++$index);
-            }
+        } else if (isset($top[$subs[$index]])) {
+            return $this->_set($subs,$top[$subs[$index]],$var,$val, ++$index);
         }
 
         return false;

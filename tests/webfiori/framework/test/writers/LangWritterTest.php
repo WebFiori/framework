@@ -3,6 +3,7 @@ namespace webfiori\framework\test\writers;
 
 use webfiori\framework\cli\writers\LangClassWriter;
 use PHPUnit\Framework\TestCase;
+use webfiori\framework\Language;
 /**
  * Description of CronWritterTest
  *
@@ -18,7 +19,7 @@ class LangWritterTest extends TestCase {
         $this->assertEquals('app\\langs', $writter->getNamespace());
         $this->assertEquals('', $writter->getSuffix());
         $this->assertEquals([
-            "webfiori\\framework\\i18n\\Language",
+                Language::class
         ], $writter->getUseStatements());
     }
 }

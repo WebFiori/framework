@@ -1,72 +1,66 @@
 <?php
-namespace themes\webfiori108;
+namespace themes\fioriTheme;
 
-use webfiori\framework\Page;
-use webfiori\framework\session\SessionsManager;
 use webfiori\framework\Theme;
-use webfiori\framework\WebFioriApp;
-use webfiori\ui\Anchor;
 use webfiori\ui\HeadNode;
 use webfiori\ui\HTMLNode;
-use webfiori\ui\ListItem;
-use webfiori\ui\UnorderedList;
-/**
- * WebFiori Theme Which is bundled with v1.0.8 of the framework.
- *
- * @author Ibrahim
- */
-class WebFioriV108 extends Theme {
+use themes\fioriTheme\AsideSection;
+use themes\fioriTheme\FooterSection;
+use themes\fioriTheme\HeadSection;
+use themes\fioriTheme\HeaderSection;
+class NewFTestTheme extends Theme {
+    /**
+     * Creates new instance of the class.
+     */
     public function __construct() {
-        parent::__construct();
-        $this->setVersion('1.0');
-        $this->setAuthor('Ibrahim Ali');
-        $this->setName('WebFiori V108');
-        $this->setLicenseName('MIT License');
-        $this->setUrl('https://ibrahim-2017.blogspot.com/');
-        $this->setLicenseUrl('https://opensource.org/licenses/MIT');
-        $this->setAfterLoaded(function (Theme $theme)
-        {
-            $activeSession = SessionsManager::getActiveSession();
-
-            if ($activeSession !== null) {
-                $theme->getPage()->setLang($activeSession->getLangCode(true));
-            } else {
-                $theme->getPage()->setLang(WebFioriApp::getAppConfig()->getPrimaryLanguage());
-            }
-        });
-        $this->setAfterLoaded(function(Theme $theme)
-        {
-            $page = $theme->getPage();
-
-            $page->getChildByID('page-body')->setClassName('row  ml-0 mr-0');
-            $page->getChildByID('page-body')->setStyle([
-                'margin-top' => '50px'
-            ]);
-            $page->getDocument()->getBody()->setStyle([
-                'max-height' => '10px',
-                'height' => '10px'
-            ]);
-            $page->getChildByID('main-content-area')->setClassName('col-10 p-5');
-            $img = new HTMLNode('img');
-            $img->setAttribute('src','assets/images/favicon.png');
-            $img->setStyle([
-                'background-position' => 'left',
-                'opacity' => '0.3',
-                'position' => 'fixed',
-                'top' => 0,
-                'left' => '50px',
-                'z-index' => -1,
-            ]);
-            $page->getDocument()->getBody()->addChild($img);
-            $page->addBeforeRender(function ($page)
-            {
-                $js = new \webfiori\ui\JsCode();
-                $js->addCode("window.Prism = window.Prism || {};");
-                $page->getDocument()->getHeadNode()->addChild($js);
-            });
-        });
+        parent::__construct('New Super Theme');
+        //TODO: Set the properties of your theme.
+        //$this->setName('Super Theme');
+        //$this->setVersion('1.0');
+        //$this->setAuthor('Me');
+        //$this->setDescription('My Super Cool Theme.');
+        //$this->setAuthorUrl('https://me.com');
+        //$this->setLicenseName('MIT');
+        //$this->setLicenseUrl('https://opensource.org/licenses/MIT');
+        //$this->setCssDirName('css');
+        //$this->setJsDirName('js');
+        //$this->setImagesDirName('images');
     }
-
+    /**
+     * Returns an object of type 'HTMLNode' that represents aside section of the page. 
+     *
+     * @return HTMLNode|null An object of type 'HTMLNode'. If the theme has no aside
+     * section, the method might return null.
+     */
+    public function getAsideNode() : HTMLNode {
+        return new AsideSection();
+    }
+    /**
+     * Returns an object of type 'HTMLNode' that represents footer section of the page.
+     *
+     * @return HTMLNode|null An object of type 'HTMLNode'. If the theme has no footer
+     * section, the method might return null.
+     */
+    public function getFooterNode() : HTMLNode {
+        return new FooterSection();
+    }
+    /**
+     * Returns an object of type HeadNode that represents HTML &lt;head&gt; node.
+     *
+     * @return HeadNode
+     */
+    public function getHeadNode() : HeadNode {
+        return new HeadSection();
+    }
+    /**
+     * Returns an object of type HTMLNode that represents header section of the page.
+     *
+     * @return HTMLNode|null @return HTMLNode|null An object of type 'HTMLNode'. If the theme has no header
+     * section, the method might return null.
+     */
+    public function getHeaderNode() : HTMLNode {
+        return new HeaderSection();
+    }
     public function createHTMLNode(array $options = []) : HTMLNode {
         $nodeType = isset($options['type']) ? $options['type'] : '';
         $elementId = isset($options['element-id']) ? $options['element-id'] : null;
@@ -236,111 +230,7 @@ class WebFioriV108 extends Theme {
                 }
             }
         }
-        $node = new HTMLNode();
-
-        return $node;
-    }
-
-    public function getAsideNode() : HTMLNode {
-        $aside = new HTMLNode();
-        $aside->setClassName('col-2');
-
-        return $aside;
-    }
-
-    public function getFooterNode() : HTMLNode {
-        $footer = new HTMLNode('footer');
-        $footer->setClassName('bd-footer text-muted');
-        $footer->setClassName('container-fluid p-md-4');
-        $footerLinksUl = new UnorderedList();
-        $footerLinksUl->setClassName('nav justify-content-center');
-        $footerLinksUl->addListItems([
-            '<a href="https://github.com/usernane/webfiori">GitHub</a>',
-            '<a href="https://twitter.com/webfiori_" >Twitter</a>',
-            '<a href="https://t.me/webfiori" >Telegram</a>'
-        ], false);
-        $footerLinksUl->getChild(0)->setClassName('nav-item');
-        $footerLinksUl->getChild(1)->setClassName('nav-item ml-3');
-        $footerLinksUl->getChild(2)->setClassName('nav-item ml-3');
-        $footer->addChild($footerLinksUl);
-        $powerdByNode = new HTMLNode('p');
-        $powerdByNode->addTextNode('Powered by: <a href="https://webfiori.com">WebFiori Framework</a> v'.WF_VERSION.'. '
-                .'Code licensed under the <a href="https://opensource.org/licenses/MIT">MIT License</a>.', false);
-        $footer->addChild($powerdByNode);
-        $img = new HTMLNode('img');
-        $img->setAttribute('src', 'assets/images/favicon.png');
-        $img->setAttribute('alt', 'logo');
-        $img->setStyle([
-            'height' => '25px'
-        ]);
-        $footer->addChild($img);
-        $copywriteNotice = new HTMLNode('p');
-        $copywriteNotice->addTextNode('All Rights Reserved © '.date('Y'));
-        $footer->addChild($copywriteNotice);
-
-        return $footer;
-    }
-    public function getHeadNode() : HeadNode {
-        $head = new HeadNode();
-        $head->addCSS('https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css');
-        $head->addJs('https://code.jquery.com/jquery-3.4.1.slim.min.js');
-        $head->addJs('https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js');
-        $head->addJs('https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js');
-
-        return $head;
-    }
-
-    public function getHeaderNode() : HTMLNode {
-        $header = new HTMLNode('header');
-        $header->setClassName('container-fluid');
-        $mainNav = new HTMLNode('nav');
-        $header->addChild($mainNav);
-        $mainNav->setClassName('navbar navbar-expand-lg navbar-light fixed-top');
-        $mainNav->setStyle([
-            'background-color' => '#c1ec9b',
-            'padding' => '0'
-        ]);
-        $logo = new HTMLNode('img', [
-            'id' => 'main-logo',
-            'src' => 'favicon.png',
-            'alt' => 'logo',
-            'style' => 'width:40px'
-        ]);
-        $logoLink = new Anchor(WebFioriApp::getAppConfig()->getHomePage(), $logo->toHTML());
-        $logoLink->setClassName('navbar-brand ml-3');
-        $mainNav->addChild($logoLink);
-
-        $button = new HTMLNode('button');
-        $button->setClassName('navbar-toggler');
-        $button->addTextNode('<span class="navbar-toggler-icon"></span>', false);
-        $button->setAttribute('data-toggle', 'collapse');
-        $button->setAttribute('data-target', '#navItemsContainer');
-        $button->setAttribute('type', 'button');
-        $button->setAttribute('aria-controls', 'navItemsContainer');
-        $button->setAttribute('aria-expanded', 'false');
-        $mainNav->addChild($button);
-
-        $navItemsContainer = new HTMLNode();
-        $navItemsContainer->setID('navItemsContainer');
-        $navItemsContainer->setClassName('collapse navbar-collapse');
-        $mainNav->addChild($navItemsContainer);
-
-        $mainLinksUl = new UnorderedList();
-        $mainLinksUl->setClassName('navbar-nav justify-content-center');
-        $mainLinksUl->addListItems([
-            '<a href="download" class="nav-link">Download</a>',
-            '<a href="docs" class="nav-link">API Docs</a>',
-            '<a href="learn" class="nav-link">Learn</a>',
-            '<a href="contribute" class="nav-link">Contribute</a>'
-        ], false);
-        $mainLinksUl->getChild(0)->setClassName('nav-item');
-        $mainLinksUl->getChild(1)->setClassName('nav-item');
-        $mainLinksUl->getChild(2)->setClassName('nav-item');
-        $mainLinksUl->getChild(3)->setClassName('nav-item');
-        $navItemsContainer->addChild($mainLinksUl);
-
-        return $header;
+        return parent::createHTMLNode($options);
     }
 }
-
 return __NAMESPACE__;

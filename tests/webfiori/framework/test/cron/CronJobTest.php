@@ -1,9 +1,10 @@
 <?php
 namespace webfiori\framework\test\cron;
 
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use webfiori\framework\cron\CronJob;
-use InvalidArgumentException;
+use webfiori\framework\cron\JobArgument;
 /**
  * A set of test units for testing the class 'CronJob'.
  *
@@ -68,6 +69,35 @@ class CronJobTest extends TestCase {
         $this->expectExceptionMessage('Invalid argument name: <empty string>');
         $job = new CronJob();
         $job->addExecutionArg('    ');
+    }
+    /**
+     * @test
+     */
+    public function testAttributes06() {
+        $job = new CronJob();
+        $job->addExecutionArgs([
+            'one' => [
+                'description' => 'Arg #1'
+            ],
+            'new-arg',
+            new JobArgument('three', 'The Third Arg')
+        ]);
+        $this->assertEquals(3,count($job->getExecArgs()));
+        $arg1 = $job->getArgument('one');
+        $this->assertEquals('one', $arg1->getName());
+        $this->assertEquals('Arg #1', $arg1->getDescription());
+        
+        $arg2 = $job->getArgument('new-arg');
+        $this->assertEquals('new-arg', $arg2->getName());
+        $this->assertEquals('NO DESCRIPTION', $arg2->getDescription());
+        
+        $arg3 = $job->getArgument('three');
+        $this->assertEquals('three', $arg3->getName());
+        $this->assertEquals('The Third Arg', $arg3->getDescription());
+        
+        $this->assertEquals([
+            'one', 'new-arg', 'three'
+        ], $job->getExecArgsNames());
     }
     /**
      * @test

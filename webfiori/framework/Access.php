@@ -1,26 +1,12 @@
 <?php
-/*
- * The MIT License
- *
- * Copyright 2019 Ibrahim, WebFiori Framework.
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+/**
+ * This file is licensed under MIT License.
+ * 
+ * Copyright (c) 2020 Ibrahim BinAlshikh
+ * 
+ * For more information on the license, please visit: 
+ * https://github.com/WebFiori/.github/blob/main/LICENSE
+ * 
  */
 namespace webfiori\framework;
 
@@ -399,16 +385,15 @@ class Access {
             $group = new PrivilegesGroup();
             $group->setID($trimmedId);
 
-            if ($parentGroupID !== null) {
-                $parentG = $this->getGroup($parentGroupID);
-
-                if ($parentG instanceof PrivilegesGroup) {
-                    $group->setParentGroup($parentG);
-
-                    return true;
-                }
-            } else {
+            if ($parentGroupID === null) {
                 $this->userGroups[] = $group;
+
+                return true;
+            }
+            $parentG = $this->getGroup($parentGroupID);
+
+            if ($parentG instanceof PrivilegesGroup) {
+                $group->setParentGroup($parentG);
 
                 return true;
             }
@@ -419,23 +404,24 @@ class Access {
     private function _createPermissionsHelper2($userPrivileges, $groupsBelongsTo) {
         $str = '';
 
-        if (count($groupsBelongsTo) != 0) {
+        if (count($groupsBelongsTo) == 0) {
             foreach ($userPrivileges as $privilege) {
-                $privilegeHasGroup = false;
+                $str .= $privilege->getID().'-1;';
+            }
+            return $str;
+        }
+        
+        foreach ($userPrivileges as $privilege) {
+            $privilegeHasGroup = false;
 
-                foreach ($groupsBelongsTo as $group) {
-                    if ($group->hasPrivilege($privilege)) {
-                        $privilegeHasGroup = true;
-                        break;
-                    }
-                }
-
-                if (!$privilegeHasGroup) {
-                    $str .= $privilege->getID().'-1;';
+            foreach ($groupsBelongsTo as $group) {
+                if ($group->hasPrivilege($privilege)) {
+                    $privilegeHasGroup = true;
+                    break;
                 }
             }
-        } else {
-            foreach ($userPrivileges as $privilege) {
+
+            if (!$privilegeHasGroup) {
                 $str .= $privilege->getID().'-1;';
             }
         }
@@ -467,19 +453,19 @@ class Access {
      * @param type $arr
      */
     private function _createPermissionsStrHelper($user,$group,&$arr,&$str) {
-        if ($user->inGroup($group->getID())) {
-            $arr[] = $group;
-            $str .= 'G-'.$group->getID().';';
-        } else {
+        if (!$user->inGroup($group->getID())) {
             foreach ($group->childGroups() as $groupX) {
-                if ($user->inGroup($groupX->getID())) {
-                    $arr[] = $groupX;
-                    $str .= 'G-'.$groupX->getID().';';
-                } else {
+                if (!$user->inGroup($groupX->getID())) {
                     $this->_createPermissionsStrHelper($user, $groupX, $arr, $str);
+                    continue;
                 }
+                $arr[] = $groupX;
+                $str .= 'G-'.$groupX->getID().';';
             }
+            return;
         }
+        $arr[] = $group;
+        $str .= 'G-'.$group->getID().';';
     }
     /**
      * 
@@ -525,15 +511,15 @@ class Access {
         $trimmedId = trim($groupId);
 
         foreach ($this->userGroups as $g) {
-            if ($g->getID() == $trimmedId) {
-                return $g;
-            } else {
+            if ($g->getID() != $trimmedId) {
                 $g = $this->_getGroupHelper($g, $trimmedId);
 
                 if ($g instanceof PrivilegesGroup) {
                     return $g;
                 }
+                continue;
             }
+            return $g;
         }
 
         return null;
@@ -606,18 +592,17 @@ class Access {
             $prSplit = explode('-', $privilegeStr);
 
             if (count($prSplit) == 2) {
-                if ($prSplit[0] == 'G') {
-                    $groupsBelongsTo[] = $prSplit[1];
-                } else {
+                if ($prSplit[0] != 'G') {
                     $pirivelegeId = $prSplit[0];
 
-                    if ($prSplit[1] == '1') {
-                        //It means the user has the privilege.
-                        $privilegesToHave[] = $pirivelegeId;
-                    } else {
+                    if ($prSplit[1] != '1') {
                         $privilegesToNotHave[] = $pirivelegeId;
                     }
+                    //It means the user has the privilege.
+                    $privilegesToHave[] = $pirivelegeId;
+                    continue;
                 }
+                $groupsBelongsTo[] = $prSplit[1];
             }
         }
 
@@ -677,20 +662,15 @@ class Access {
      * @param PrivilegesGroup $group
      */
     private function _hasPrivilegeHelper($prId,$groupId,$group) {
-        $retVal = false;
 
-        if ($groupId !== null && $group->getID() == $groupId) {
-            return $this->_groupHasPrivilege($prId, $group);
-        } else {
-            if ($groupId == null) {
-                return $this->_groupHasPrivilege($prId, $group) 
-                    || $this->_childGroupHasPrivilege($prId, $groupId, $group);
-            } else {
-                $retVal = $this->_childGroupHasPrivilege($prId, $groupId, $group);
+        if ($groupId === null || $group->getID() != $groupId) {
+            if ($groupId !== null) {
+                return $this->_childGroupHasPrivilege($prId, $groupId, $group);
             }
+            return $this->_groupHasPrivilege($prId, $group) 
+                    || $this->_childGroupHasPrivilege($prId, $groupId, $group);
         }
-
-        return $retVal;
+        return $this->_groupHasPrivilege($prId, $group);
     }
 
     private function _privileges($groupId = null) {
@@ -718,14 +698,12 @@ class Access {
             }
 
             return;
-        } else {
-            if ($group->getID() == $groupId) {
-                foreach ($group->privileges() as $pr) {
-                    $array[] = $pr;
-                }
-
-                return;
+        } else if ($group->getID() == $groupId) {
+            foreach ($group->privileges() as $pr) {
+                $array[] = $pr;
             }
+
+            return;
         }
 
         foreach ($group->childGroups() as $g) {

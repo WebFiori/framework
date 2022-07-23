@@ -1,9 +1,18 @@
 <?php
+/**
+ * This file is licensed under MIT License.
+ * 
+ * Copyright (c) 2020 Ibrahim BinAlshikh
+ * 
+ * For more information on the license, please visit: 
+ * https://github.com/WebFiori/.github/blob/main/LICENSE
+ * 
+ */
 namespace webfiori\framework;
 
 use webfiori\framework\exceptions\MissingLangException;
 use webfiori\email\exceptions\SMTPException;
-use webfiori\framework\i18n\Language;
+use webfiori\framework\Language;
 use webfiori\framework\WebFioriApp;
 use webfiori\email\SMTPAccount;
 

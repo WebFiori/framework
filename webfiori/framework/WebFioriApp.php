@@ -1,45 +1,30 @@
 <?php
-/*
- * The MIT License
- *
- * Copyright 2019, WebFiori Framework.
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+/**
+ * This file is licensed under MIT License.
+ * 
+ * Copyright (c) 2019 Ibrahim BinAlshikh
+ * 
+ * For more information on the license, please visit: 
+ * https://github.com/WebFiori/.github/blob/main/LICENSE
+ * 
  */
 namespace webfiori\framework;
 
-use Exception;
+use Closure;
+use Error;
+use webfiori\cli\Runner;
+use webfiori\error\Handler;
 use webfiori\framework\cron\Cron;
 use webfiori\framework\exceptions\InitializationException;
+use webfiori\framework\handlers\APICallErrHandler;
+use webfiori\framework\handlers\CLIErrHandler;
+use webfiori\framework\handlers\HTTPErrHandler;
 use webfiori\framework\middleware\MiddlewareManager;
 use webfiori\framework\router\Router;
 use webfiori\framework\router\RouterUri;
 use webfiori\framework\session\SessionsManager;
-use webfiori\framework\ui\ServerErrView;
 use webfiori\http\Request;
 use webfiori\http\Response;
-use webfiori\json\Json;
-use webfiori\error\Handler;
-use webfiori\framework\handlers\CLIErrHandler;
-use webfiori\framework\handlers\APICallErrHandler;
-use webfiori\framework\handlers\HTTPErrHandler;
-use webfiori\cli\Runner;
 /**
  * The time at which the framework was booted in microseconds as a float.
  * 
@@ -179,7 +164,7 @@ class WebFioriApp {
                 foreach ($sessionsCookiesHeaders as $headerVal) {
                     Response::addHeader('set-cookie', $headerVal);
                 }
-            } catch (\Error $exc) {
+            } catch (Error $exc) {
             }
 
             $uriObj = Router::getRouteUri();
@@ -268,7 +253,7 @@ class WebFioriApp {
                 $toPass[] = $param;
             }
             call_user_func_array($regCallback, $toPass);
-        } catch (\Error $ex) {
+        } catch (Error $ex) {
         }
     }
     /**
@@ -494,7 +479,7 @@ class WebFioriApp {
             }
             self::$CliRunner->setBeforeStart(function (Runner $r) {
                 $commands = [
-                    '\\webfiori\\cli\\commands\\HelpCommand',
+                    '\\webfiori\\framework\\cli\commands\\WHelpCommand',
                     '\\webfiori\\framework\\cli\\commands\\VersionCommand',
                     '\\webfiori\\framework\\cli\\commands\\SettingsCommand',
                     '\\webfiori\\framework\\cli\\commands\\CronCommand',
@@ -510,6 +495,7 @@ class WebFioriApp {
                 foreach ($commands as $c) {
                     $r->register(new $c());
                 }
+                $r->setDefaultCommand('help');
             });
         }
         return self::$CliRunner;

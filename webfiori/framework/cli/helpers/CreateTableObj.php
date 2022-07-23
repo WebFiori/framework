@@ -1,18 +1,22 @@
 <?php
+/**
+ * This file is licensed under MIT License.
+ * 
+ * Copyright (c) 2019 Ibrahim BinAlshikh
+ * 
+ * For more information on the license, please visit: 
+ * https://github.com/WebFiori/.github/blob/main/LICENSE
+ * 
+ */
 namespace webfiori\framework\cli\helpers;
 
-use Error;
-use Exception;
 use webfiori\database\ConnectionInfo;
-use webfiori\database\mssql\MSSQLColumn;
 use webfiori\database\mssql\MSSQLTable;
-use webfiori\database\mysql\MySQLColumn;
 use webfiori\database\mysql\MySQLTable;
-use webfiori\database\Table;
 use webfiori\framework\cli\commands\CreateCommand;
-use webfiori\framework\cli\writers\TableClassWriter;
 use webfiori\framework\cli\helpers\CreateClassHelper;
 use webfiori\framework\cli\helpers\TableObjHelper;
+use webfiori\framework\cli\writers\TableClassWriter;
 /**
  * A helper class for creating database tables classes.
  *

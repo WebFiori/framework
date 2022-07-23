@@ -13,7 +13,8 @@ use webfiori\framework\ThemeLoader;
 class ThemeTest extends TestCase {
     public function testAvailableThemes00() {
         $themes = ThemeLoader::getAvailableThemes();
-        $this->assertEquals(9,count($themes));
+        $this->assertEquals(2, count($themes));
+        
     }
     /**
      * @test
@@ -22,24 +23,27 @@ class ThemeTest extends TestCase {
         $theme = ThemeLoader::usingTheme();
         $j = $theme->toJSON();
         $j->setPropsStyle('camel');
-        $this->assertEquals('{"themesPath":"'. \webfiori\json\Json::escapeJSONSpecialChars(THEMES_PATH).'","name":"New Fiori","url":"","license":"MIT","licenseUrl":"","version":"1.0","author":"","authorUrl":"","imagesDirName":"images","themeDirName":"newFiori","cssDirName":"css","jsDirName":"js"}',$j.'');
+        $this->assertEquals('{"name":"New Super Theme","url":"","license":"","licenseUrl":"","version":"1.0.0","author":"","authorUrl":""}',$j.'');
     }
     /**
      * @test
      */
     public function testUseTheme00() {
-        $themeName = 'WebFiori Theme';
+        $themeName = 'New Theme 2';
         ThemeLoader::resetLoaded();
         //$this->assertFalse(Theme::isThemeLoaded($themeName));
         $theme = ThemeLoader::usingTheme($themeName);
         $this->assertTrue($theme instanceof Theme);
         $this->assertTrue(ThemeLoader::isThemeLoaded($themeName));
-        $this->assertEquals('1.0.1',$theme->getVersion());
-        $this->assertEquals('The main theme for WebFiori Framework.',$theme->getDescription());
+        $this->assertEquals('1.0',$theme->getVersion());
+        $this->assertEquals('Colofull Theme.',$theme->getDescription());
         $this->assertEquals('Ibrahim Ali',$theme->getAuthor());
         $this->assertEquals('https://opensource.org/licenses/MIT',$theme->getLicenseUrl());
-        $this->assertEquals('MIT License',$theme->getLicenseName());
+        $this->assertEquals('MIT',$theme->getLicenseName());
         $this->assertEquals(1,count(ThemeLoader::getLoadedThemes()));
+        $this->assertEquals('fioriTheme2', $theme->getDirectoryName());
+        $this->assertEquals('https://my-theme-side.com', $theme->getUrl());
+        $this->assertEquals(ROOT_DIR.DS.'themes'.DS.'fioriTheme2'.DS, $theme->getAbsolutePath());
     }
     /**
      * @test
@@ -47,7 +51,7 @@ class ThemeTest extends TestCase {
     public function testUseTheme01() {
         $theme = ThemeLoader::usingTheme();
         $this->assertTrue($theme instanceof Theme);
-        $this->assertEquals('New Fiori', $theme->getName());
+        $this->assertEquals('New Super Theme', $theme->getName());
         $this->assertEquals(WebFioriApp::getAppConfig()->getBaseURL(),$theme->getBaseURL());
         $theme->setBaseURL('https://example.com/x');
         $this->assertEquals('https://example.com/x',$theme->getBaseURL());
@@ -58,7 +62,7 @@ class ThemeTest extends TestCase {
     public function testCreateHTMLNode00() {
         $theme = ThemeLoader::usingTheme();
         $this->assertTrue($theme instanceof Theme);
-        $this->assertEquals('New Fiori', $theme->getName());
+        $this->assertEquals('New Super Theme', $theme->getName());
         $node = $theme->createHTMLNode();
         $this->assertEquals('div', $node->getNodeName());
         

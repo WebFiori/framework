@@ -4,7 +4,7 @@ namespace webfiori\framework\test;
 use PHPUnit\Framework\TestCase;
 use webfiori\ui\HTMLNode;
 use webfiori\framework\Theme;
-use webfiori\framework\i18n\Language;
+use webfiori\framework\Language;
 use webfiori\framework\WebFioriApp;
 use webfiori\framework\ui\WebPage;
 /**
@@ -118,7 +118,7 @@ class PageTest extends TestCase{
      */
     public function testReset00() {
         $page = new WebPage();
-        $page->setTheme('WebFiori Theme');
+        $page->setTheme('New Super Theme');
         $page->setDescription('This is a test page.');
         $page->setLang('ar');
         $page->setTitle('Login');
@@ -179,9 +179,9 @@ class PageTest extends TestCase{
     public function testDirs01() {
         $page = new WebPage();
         $page->setTheme();
-        $this->assertEquals('assets/newFiori/css',$page->getThemeCSSDir());
-        $this->assertEquals('assets/newFiori/images',$page->getThemeImagesDir());
-        $this->assertEquals('assets/newFiori/js',$page->getThemeJSDir());
+        $this->assertEquals('assets/fioriTheme/css',$page->getThemeCSSDir());
+        $this->assertEquals('assets/fioriTheme/images',$page->getThemeImagesDir());
+        $this->assertEquals('assets/fioriTheme/js',$page->getThemeJSDir());
     }
     /**
      * @test
@@ -195,11 +195,11 @@ class PageTest extends TestCase{
         $page->setTheme(get_class($theme));
         $theme2 = $page->getTheme();
         $this->assertTrue($theme2 === $theme);
-        $page->setTheme('Template Theme');
+        $page->setTheme('New Theme 2');
         $theme3 = $page->getTheme();
         $this->assertFalse($theme3 === $theme2);
-        $page->setTheme('Template Theme');
-        $theme4 = $page->getTheme('Template Theme');
+        $page->setTheme('New Theme 2');
+        $theme4 = $page->getTheme('New Theme 2');
         $this->assertTrue($theme3 === $theme4);
     }
     /**
@@ -217,7 +217,7 @@ class PageTest extends TestCase{
      */
     public function testTheme02() {
         $page = new WebPage();
-        $page->setTheme('      Template Theme      ');
+        $page->setTheme('      New Super Theme      ');
         $theme3 = $page->getTheme();
         $this->assertTrue($theme3 instanceof Theme);
     }
@@ -225,8 +225,8 @@ class PageTest extends TestCase{
      * @test
      */
     public function testTheme03() {
-        $firstThemeName = 'Template Theme';
-        $secondThemeName = 'WebFiori Theme';
+        $firstThemeName = 'New Theme 2';
+        $secondThemeName = 'New Super Theme';
         $page = new WebPage();
         $page->setTheme($firstThemeName);
         $theme3 = $page->getTheme();
@@ -476,7 +476,7 @@ class PageTest extends TestCase{
      */
     public function testCreateHtmlNode02() {
         $page = new WebPage();
-        $page->setTheme(\themes\webfiori108\WebFioriV108::class);
+        $page->setTheme(\themes\fioriTheme\NewFTestTheme::class);
         $node = $page->createHTMLNode([
             'type' => 'section',
             'element-id' => 'super-sec'

@@ -298,7 +298,7 @@ class UpdateSettingsCommandTest extends TestCase {
     public function testUpdatePrimaryTheme00() {
         $runner = new Runner();
         $runner->setInput([
-            'themes\\greeny\\GreenyTheme'
+            'themes\\fioriTheme2\\NewTestTheme2'
         ]);
         
         
@@ -310,7 +310,7 @@ class UpdateSettingsCommandTest extends TestCase {
             "Success: Primary theme successfully updated.\n"
         ], $runner->getOutput());
         
-        $this->assertEquals('themes\\greeny\\GreenyTheme', ConfigController::get()->getBaseTheme());
+        $this->assertEquals('themes\\fioriTheme2\\NewTestTheme2', ConfigController::get()->getBaseTheme());
     }
     /**
      * @test
@@ -320,7 +320,7 @@ class UpdateSettingsCommandTest extends TestCase {
         $runner->setInput([
             'themes\\greeny\\NotATheme',
             '',
-            'themes\\greeny\\GreenyTheme'
+            'themes\\fioriTheme2\\NewTestTheme2'
         ]);
         
         
@@ -336,7 +336,7 @@ class UpdateSettingsCommandTest extends TestCase {
             "Success: Primary theme successfully updated.\n"
         ], $runner->getOutput());
         
-        $this->assertEquals('themes\\greeny\\GreenyTheme', ConfigController::get()->getBaseTheme());
+        $this->assertEquals('themes\\fioriTheme2\\NewTestTheme2', ConfigController::get()->getBaseTheme());
     }
     /**
      * @test
@@ -344,7 +344,7 @@ class UpdateSettingsCommandTest extends TestCase {
     public function testUpdateAdminTheme00() {
         $runner = new Runner();
         $runner->setInput([
-            'themes\\greeny\\GreenyTheme'
+            'themes\\fioriTheme\\NewFTestTheme'
         ]);
         
         
@@ -355,7 +355,7 @@ class UpdateSettingsCommandTest extends TestCase {
             "Enter theme class name with namespace:\n",
             "Success: Admin theme successfully updated.\n"
         ], $runner->getOutput());
-        $this->assertEquals('themes\\greeny\\GreenyTheme', ConfigController::get()->getAdminTheme());
+        $this->assertEquals('themes\\fioriTheme\\NewFTestTheme', ConfigController::get()->getAdminTheme());
     }
     /**
      * @test
@@ -365,7 +365,7 @@ class UpdateSettingsCommandTest extends TestCase {
         $runner->setInput([
             'themes\\greeny\\NotATheme',
             '',
-            'themes\\greeny\\GreenyTheme'
+            'themes\\fioriTheme2\\NewTestTheme2'
         ]);
         
         
@@ -380,6 +380,6 @@ class UpdateSettingsCommandTest extends TestCase {
             "Enter theme class name with namespace:\n",
             "Success: Admin theme successfully updated.\n"
         ], $runner->getOutput());
-        $this->assertEquals('themes\\greeny\\GreenyTheme', ConfigController::get()->getAdminTheme());
+        $this->assertEquals('themes\\fioriTheme2\\NewTestTheme2', ConfigController::get()->getAdminTheme());
     }
 }

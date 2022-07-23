@@ -579,14 +579,6 @@ class Router {
         return self::view($options);
     }
     /**
-     * Display all routes details.
-     * 
-     * @since 1.3.8
-     */
-    public static function printRoutes() {
-        self::get()->_printRoutes();
-    }
-    /**
      * Adds a redirect route.
      * 
      * @param string $path The path at which when the user visits will be redirected. 
@@ -1323,20 +1315,6 @@ class Router {
             }
         } else {
             $fileObj->view();
-        }
-    }
-    /**
-     * Display all routes details.
-     * 
-     * @since 1.1
-     */
-    private function _printRoutes() {
-        foreach ($this->routes['static'] as $route) {
-            $route->printUri();
-        }
-
-        foreach ($this->routes['variable'] as $route) {
-            $route->printUri();
         }
     }
     /**

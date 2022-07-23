@@ -7,6 +7,7 @@
             <file>./webfiori/framework/cron/CronJob.php</file>
             <file>./webfiori/framework/cron/AbstractJob.php</file>
             <file>./webfiori/framework/cron/Cron.php</file>
+            <file>./webfiori/framework/cron/JobArgument.php</file>
             <file>./webfiori/framework/router/RouterUri.php</file>
             <file>./webfiori/framework/Language.php</file>
             <file>./webfiori/framework/Access.php</file>

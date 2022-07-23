@@ -358,6 +358,28 @@ class RouterUriTest extends TestCase {
         $this->assertEquals('https://www3.programmingacademia.com:80/{some-var}/hell/{other-var}#xyz',$uriObj->getUri(false,true));
         $this->assertEquals('https://www3.programmingacademia.com:80/{some-var}/hell/{other-var}?do=dnt&y=#xyz',$uriObj->getUri(true,true));
     }
+    public function testSetRequestedURI00() {
+        $uri = 'https://www3.programmingacademia.com:80/a/b/c';
+        $uriObj = new RouterUri($uri, '');
+        $uriObj->setIsCaseSensitive(false);
+        $this->assertFalse($uriObj->setRequestedUri('https://exmple.com//super//x'));
+        $this->assertNull($uriObj->getRequestedUri());
+        $this->assertTrue($uriObj->setRequestedUri('https://exmple.com//a//b//c'));
+        $this->assertEquals('https://exmple.com/a/b/c', $uriObj->getRequestedUri()->getUri());
+        $this->assertTrue($uriObj->setRequestedUri('https://exmple.com//a//B//c'));
+        $this->assertEquals('https://exmple.com/a/B/c', $uriObj->getRequestedUri()->getUri());
+    }
+    public function testSetRequestedURI01() {
+        $uri = 'https://www3.programmingacademia.com:80/a/b/c';
+        $uriObj = new RouterUri($uri, '');
+        $uriObj->setIsCaseSensitive(true);
+        $this->assertFalse($uriObj->setRequestedUri('https://exmple.com//super//x'));
+        $this->assertNull($uriObj->getRequestedUri());
+        $this->assertTrue($uriObj->setRequestedUri('https://exmple.com//a//b//c'));
+        $this->assertEquals('https://exmple.com/a/b/c', $uriObj->getRequestedUri()->getUri());
+        $this->assertFalse($uriObj->setRequestedUri('https://exmple.com//a//B//c'));
+        $this->assertEquals('https://exmple.com/a/b/c', $uriObj->getRequestedUri()->getUri());
+    }
     /**
      * @test
      */

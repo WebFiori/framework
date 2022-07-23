@@ -26,7 +26,7 @@ class CronJob extends AbstractJob {
      * @since 1.0 
      */
     private $events;
-
+    
 
     /**
      * Creates new instance of the class.
@@ -40,16 +40,14 @@ class CronJob extends AbstractJob {
      */
     public function __construct(string $when = '* * * * *') {
         parent::__construct('CRON-JOB', $when);
-        $this->events = [
-            'on' => [
-                'func' => null,
-                'params' => []
-            ],
-            'on-failure' => [
-                'func' => null,
-                'params' => []
-            ]
-        ];
+        $this->events = [];
+        $this->events['on'] = [];
+        $this->events['on']['func'] = null;
+        $this->events['on']['params'] = [];
+        
+        $this->events['on-failure'] = [];
+        $this->events['on-failure']['func'] = null;
+        $this->events['on-failure']['params'] = [];
     }
     /**
      * A method that does nothing.

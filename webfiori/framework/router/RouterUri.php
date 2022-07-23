@@ -252,15 +252,15 @@ class RouterUri extends Uri {
     public function addMiddleware(string $name) {
         $mw = MiddlewareManager::getMiddleware($name);
 
-        if ($mw !== null) {
-            $this->assignedMiddlewareList->add($mw);
-        } else {
+        if ($mw === null) {
             $group = MiddlewareManager::getGroup($name);
 
             foreach ($group as $mw) {
                 $this->assignedMiddlewareList->add($mw);
             }
+            return;
         }
+        $this->assignedMiddlewareList->add($mw);
     }
     /**
      * Returns the name of the action that will be called in the controller.
@@ -369,12 +369,12 @@ class RouterUri extends Uri {
     public function getSitemapNodes() : array {
         $retVal = [];
 
-        if ($this->hasParameters()) {
-            $this->_($this->getUri(), $this->getParametersNames(), 0, $retVal);
-        } else {
+        if (!$this->hasParameters()) {
             $retVal[] = $this->_buildSitemapNode($this->getUri());
+            return $retVal;
         }
-
+        
+        $this->_($this->getUri(), $this->getParametersNames(), 0, $retVal);
         return $retVal;
     }
     /**
@@ -436,17 +436,6 @@ class RouterUri extends Uri {
         return $this->incInSiteMap;
     }
     /**
-     * Print the details of the generated URI.
-     * 
-     * This method will use the method 'Util::print_r()' to print the array 
-     * that contains URI details.
-     * 
-     * @since 1.0
-     */
-    public function printUri() {
-        Util::print_r($this->getComponents(),false);
-    }
-    /**
      * Sets the name of the action that will be called in the controller.
      * 
      * @param string $action The name of the controller method.
@@ -495,14 +484,8 @@ class RouterUri extends Uri {
         $this->isDynamic = true;
         $xRouteTo = null;
         $type = gettype($routeTo);
-        if (is_callable($routeTo)) {
-            $this->setType(Router::CLOSURE_ROUTE);
-            $xRouteTo = $routeTo;
-        } else if ($type == 'object') {
-            $xRouteTo = get_class($routeTo);
-        } else if (class_exists($routeTo)) {
-            $xRouteTo = $routeTo;
-        } else {
+        
+        if (!is_callable($routeTo) && $type != 'object' && !class_exists($routeTo)) {
             $cleaned = str_replace('\\', DS, $routeTo);
             $xRouteTo = str_replace('/', DS, $cleaned);
             $expl = explode('.', $routeTo);
@@ -511,7 +494,15 @@ class RouterUri extends Uri {
             if ($extension != 'php') {
                 $this->isDynamic = false;
             }
+        } else if (is_callable($routeTo)) {
+            $this->setType(Router::CLOSURE_ROUTE);
+            $xRouteTo = $routeTo;
+        } else if ($type == 'object') {
+            $xRouteTo = get_class($routeTo);
+        } else if (class_exists($routeTo)) {
+            $xRouteTo = $routeTo;
         }
+        
         $this->routeTo = $xRouteTo;
     }
     /**
@@ -544,11 +535,11 @@ class RouterUri extends Uri {
         foreach ($varValues as $varValue) {
             $uriWithVarsReplaced = str_replace('{'.$varName.'}', $varValue, $originalUriWithVars);
 
-            if ($varIndex + 1 == count($uriVars)) {
-                $nodesArr[] = $this->_buildSitemapNode($uriWithVarsReplaced);
-            } else {
+            if ($varIndex + 1 != count($uriVars)) {
                 $this->_($uriWithVarsReplaced, $uriVars, $varIndex + 1, $nodesArr);
+                continue;
             }
+            $nodesArr[] = $this->_buildSitemapNode($uriWithVarsReplaced);
         }
     }
     private function _buildSitemapNode($uri) {

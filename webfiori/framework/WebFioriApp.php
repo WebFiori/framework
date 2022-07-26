@@ -546,7 +546,7 @@ class WebFioriApp {
          * 
          * @since 2.1
          */
-        define('WF_VERSION', '2.4.7');
+        define('WF_VERSION', '3.0.0-RC0');
         /**
          * A constant that tells the type of framework version.
          * 
@@ -554,7 +554,7 @@ class WebFioriApp {
          * 
          * @since 2.1
          */
-        define('WF_VERSION_TYPE', 'Stable');
+        define('WF_VERSION_TYPE', 'Beta');
         /**
          * The date at which the framework version was released.
          * 
@@ -562,7 +562,7 @@ class WebFioriApp {
          * 
          * @since 2.1
          */
-        define('WF_RELEASE_DATE', '2022-01-31');
+        define('WF_RELEASE_DATE', '2022-07-26');
     }
     private function _loadConstants() {
         if (!class_exists(APP_DIR_NAME.'\ini\GlobalConstants')) {

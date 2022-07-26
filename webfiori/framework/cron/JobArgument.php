@@ -31,6 +31,7 @@ class JobArgument implements JsonI {
      * @since 1.0
      */
     private $argName;
+    private $argVal;
     /**
      * 
      * @var string
@@ -147,6 +148,14 @@ class JobArgument implements JsonI {
             }
         }
         $this->argName = $nTrim;
+    }
+    /**
+     * Sets the value of the argument.
+     * 
+     * @param string $val A string that represents the value of the argument.
+     */
+    public function setValue(string $val) {
+        $this->argVal = $val;
     }
     /**
      * Returns an object that represents the argument in JSON.

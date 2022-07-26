@@ -1213,7 +1213,12 @@ class ConfigController {
     }
     private function _mkdir($dir) {
         if (!is_dir($dir)) {
+            set_error_handler(function (int $errno, string $errstr) {
+                http_response_code(500);
+                die('Unable to create one or more of application directories due to an error: "Code: '.$errno.', Message: '.$errstr.'"');
+            });
             mkdir($dir);
+            restore_error_handler();
         }
     }
     private function _writeAppConfigAttrs(&$cFile) {

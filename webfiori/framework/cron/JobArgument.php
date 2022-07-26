@@ -64,7 +64,7 @@ class JobArgument implements JsonI {
      *  
      * @since 1.0
      */
-    public function getDescription() {
+    public function getDescription() : string {
         return $this->description;
     }
     /**
@@ -74,7 +74,7 @@ class JobArgument implements JsonI {
      * 
      * @since 1.0
      */
-    public function getName() {
+    public function getName() : string {
         return $this->argName;
     }
     /**
@@ -117,7 +117,7 @@ class JobArgument implements JsonI {
      * 
      * @since 1.0
      */
-    public function setDescription($desc) {
+    public function setDescription(string $desc) {
         $trimmed = trim($desc);
 
         if (strlen($trimmed) > 0) {
@@ -136,7 +136,7 @@ class JobArgument implements JsonI {
      * 
      * @throws InvalidArgumentException If the name of the argument is invalid.
      */
-    public function setName($name) {
+    public function setName(string $name) {
         $nTrim = trim($name);
 
         if (!$this->_validateName($nTrim)) {

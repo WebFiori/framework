@@ -18,7 +18,7 @@ class CronJobTest extends TestCase {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid argument name: Hello&world');
         $job = new CronJob();
-        $this->assertEquals(0,count($job->getExecArgs()));
+        $this->assertEquals(0,count($job->getArgsValues()));
         $job->addExecutionArg('Hello&world');
     }
     /**
@@ -27,9 +27,9 @@ class CronJobTest extends TestCase {
     public function testAttributes01() {
         $job = new CronJob();
         $job->addExecutionArg('hello');
-        $this->assertEquals(1,count($job->getExecArgs()));
+        $this->assertEquals(1,count($job->getArgsValues()));
         $job->addExecutionArg('Hello');
-        $this->assertEquals(2,count($job->getExecArgs()));
+        $this->assertEquals(2,count($job->getArgsValues()));
     }
     /**
      * @test
@@ -38,7 +38,7 @@ class CronJobTest extends TestCase {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid argument name: hello#world');
         $job = new CronJob();
-        $this->assertEquals(0,count($job->getExecArgs()));
+        $this->assertEquals(0,count($job->getArgsValues()));
         $job->addExecutionArg('hello#world');
     }
     /**
@@ -48,7 +48,7 @@ class CronJobTest extends TestCase {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid argument name: hello=x');
         $job = new CronJob();
-        $this->assertEquals(0,count($job->getExecArgs()));
+        $this->assertEquals(0,count($job->getArgsValues()));
         $job->addExecutionArg('hello=x');
     }
     /**
@@ -58,7 +58,7 @@ class CronJobTest extends TestCase {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Invalid argument name: ?hello World');
         $job = new CronJob();
-        $this->assertEquals(0,count($job->getExecArgs()));
+        $this->assertEquals(0,count($job->getArgsValues()));
         $job->addExecutionArg('?hello World');
     }
     /**
@@ -82,7 +82,7 @@ class CronJobTest extends TestCase {
             'new-arg',
             new JobArgument('three', 'The Third Arg')
         ]);
-        $this->assertEquals(3,count($job->getExecArgs()));
+        $this->assertEquals(3,count($job->getArgsValues()));
         $arg1 = $job->getArgument('one');
         $this->assertEquals('one', $arg1->getName());
         $this->assertEquals('Arg #1', $arg1->getDescription());

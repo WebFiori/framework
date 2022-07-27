@@ -202,8 +202,46 @@ class CronCommandTest extends TestCase {
             "Forceing job 'Success 1' to execute...\n",
             "Active job: \"Success 1\" ...\n",
             "Calling the method app\jobs\SuccessTestJob::execute()\n",
-            "Start: \n",
+            "Start: 2021-07-08\n",
             "End: \n",
+            "Calling the method app\jobs\SuccessTestJob::onSuccess()\n",
+            "Calling the method app\jobs\SuccessTestJob::afterExec()\n",
+            "Check finished.\n",
+            "Total number of jobs: 5\n",
+            "Executed Jobs: 1\n",
+            "Successfully finished jobs:\n",
+            "    Success 1\n",
+            "Failed jobs:\n",
+            "    <NONE>\n"
+        ], $runner->getOutput());
+    }
+    /**
+     * @test
+     */
+    public function test07() {
+        $runner = WebFioriApp::getRunner();
+        $runner->setInput([
+            'N'
+        ]);
+        $runner->setArgsVector([
+            'webfiori',
+            'cron',
+            '--force',
+            '--show-log',
+            '--job-name' => 'Success 1',
+            'start' => '2021',
+            'end' => '2022',
+            'p' => '123456'
+        ]);
+        $this->assertEquals(0, $runner->start());
+        $this->assertEquals([
+            "Would you like to customize execution arguments?(y/N)\n",
+            "Running job(s) check...\n",
+            "Forceing job 'Success 1' to execute...\n",
+            "Active job: \"Success 1\" ...\n",
+            "Calling the method app\jobs\SuccessTestJob::execute()\n",
+            "Start: 2021\n",
+            "End: 2022\n",
             "Calling the method app\jobs\SuccessTestJob::onSuccess()\n",
             "Calling the method app\jobs\SuccessTestJob::afterExec()\n",
             "Check finished.\n",

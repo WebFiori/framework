@@ -23,7 +23,8 @@ class SuccessTestJob extends AbstractJob {
         $this->setDescription('The job will execute every day to send sales report to management.');
         $this->addExecutionArgs([
             'start' => [
-                'description' => 'Start date of the report.'
+                'description' => 'Start date of the report.',
+                'default' => '2021-07-08'
             ],
             'end' => [
                 'description' => 'End date of the report.'

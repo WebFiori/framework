@@ -11,14 +11,17 @@
 namespace webfiori\framework\cron;
 
 use Exception;
-use webfiori\collections\Queue;
 use webfiori\cli\CLICommand;
+use webfiori\cli\Runner;
+use webfiori\collections\Queue;
+use webfiori\framework\cli\commands\CronCommand;
 use webfiori\framework\cron\webServices\CronServicesManager;
+use webfiori\framework\cron\webUI\CronLoginView;
+use webfiori\framework\cron\webUI\CronTasksView;
 use webfiori\framework\router\Router;
 use webfiori\framework\session\SessionsManager;
 use webfiori\framework\Util;
 use webfiori\framework\WebFioriApp;
-use webfiori\cli\Runner;
 /**
  * A class that is used to manage scheduled background jobs.
  * 
@@ -345,7 +348,7 @@ class Cron {
     public static function initRoutes() {
         Router::addRoute([
             'path' => '/cron/login',
-            'route-to' => webUI\CronLoginView::class
+            'route-to' => CronLoginView::class
         ]);
         Router::addRoute([
             'path' => '/cron/apis/{action}',
@@ -354,11 +357,11 @@ class Cron {
         ]);
         Router::addRoute([
             'path' => '/cron',
-            'route-to' => webUI\CronLoginView::class
+            'route-to' => CronLoginView::class
         ]);
         Router::addRoute([
             'path' => '/cron/jobs',
-            'route-to' => webUI\CronTasksView::class
+            'route-to' => CronTasksView::class
         ]);
     }
     /**
@@ -547,7 +550,7 @@ class Cron {
             'total-jobs' => Cron::jobsQueue()->size(),
             'executed-count' => 0,
             'successfully-completed' => [],
-            'failed' => []
+            'failed' => [],
         ];
 
         if ($jobName !== null) {
@@ -863,17 +866,19 @@ class Cron {
      * @param AbstractJob $job
      * @param type $xForce
      */
-    private static function _runJob(&$retVal, $job, $xForce, $command = null) {
+    private static function _runJob(&$retVal, $job, $xForce, CronCommand $command = null) {
         if ($job->isTime() || $xForce) {
             if ($command !== null) {
                 $job->setCommand($command);
 
-                foreach ($job->getExecArgsNames() as $attr) {
-                    $command->addArg($attr);
-                    $val = $command->getArgValue($attr);
+                foreach ($job->getArguments() as $attr) {
+                    $command->addArg($attr->getName(), [
+                        'default' => $attr->getDefault()
+                    ]);
+                    $val = $command->getArgValue($attr->getName());
 
                     if ($val !== null) {
-                        $_POST[$attr] = $val;
+                        $_POST[$attr->getName()] = $val;
                     }
                 }
             }

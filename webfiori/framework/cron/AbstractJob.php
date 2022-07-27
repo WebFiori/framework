@@ -10,11 +10,11 @@
  */
 namespace webfiori\framework\cron;
 
-use Error;
-use Exception;
+use Throwable;
 use webfiori\collections\Queue;
 use webfiori\framework\cli\commands\CronCommand;
 use webfiori\framework\exceptions\InvalidCRONExprException;
+use webfiori\http\Request;
 use webfiori\json\Json;
 use webfiori\json\JsonI;
 /**
@@ -383,6 +383,8 @@ abstract class AbstractJob implements JsonI {
         $this->setIsForced($xForce);
 
         if ($xForce || $this->isTime()) {
+            //Called to set the values of job args
+            $this->getArgsValues();
             $isSuccessRun = $this->_callMethod('execute');
             $retVal = true;
             $this->isSuccess = $isSuccessRun === true || $isSuccessRun === null;
@@ -459,15 +461,53 @@ abstract class AbstractJob implements JsonI {
      * @since 1.0
      */
     public function getArgValue(string $name) {
-        $trimmed = trim($name);
-        $args = $this->getExecArgs();
+        $argObj = $this->getArgument($name);
 
-        if (isset($args[$trimmed])) {
-            return $args[$trimmed];
+        if ($argObj === null) {
+            
+            return null;
         }
 
-        return null;
+        $val = $argObj->getValue();
+        
+        if ($val !== null) {
+            
+            return $val;
+        }
+        
+        $val = $this->getArgValFromRequest($name);
+        
+        if ($val === null) {
+            $val = $this->getArgValFromTerminal($name);
+        }
+        
+        if ($val !== null) {
+            $argObj->setValue($val);
+        }
+        
+        return $val;
     }
+    private function getArgValFromTerminal($name) {
+        $c = $this->getCommand();
+        
+        if ($c === null) {
+            return null;
+        }
+        
+        return $c->getArgValue($name);
+    }
+
+    private function getArgValFromRequest($name) {
+        $uName = str_replace(' ', '_', $name);
+        $retVal = Request::getParam($name);
+
+        if ($retVal === null) {
+            $retVal = Request::getParam($uName);
+        }
+
+        return $retVal;
+    }
+
     /**
      * Returns the command that was used to execute the job.
      * 
@@ -497,17 +537,17 @@ abstract class AbstractJob implements JsonI {
      * Returns an associative array that contains the values of 
      * custom execution parameters.
      * 
-     * @return array An associative array. The keys are attributes names and 
+     * @return array An associative array. The keys are parameters names and 
      * the values are the values which are given as input. If a value 
      * is not provided, it will be set to null.
      * 
      * @since 1.0
      */
-    public function getExecArgs() : array {
+    public function getArgsValues() : array {
         $retVal = [];
 
         foreach ($this->customAttrs as $attrObj) {
-            $retVal[$attrObj->getName()] = $attrObj->getValue();
+            $retVal[$attrObj->getName()] = $this->getArgValue($attrObj->getName());
         }
 
         return $retVal;
@@ -522,7 +562,7 @@ abstract class AbstractJob implements JsonI {
      * @since 1.0
      */
     public function getExecArgsNames() : array {
-        return array_map(function($obj) {
+        return array_map(function(JobArgument $obj) {
             return $obj->getName();
         }, $this->getArguments());
     }
@@ -911,6 +951,9 @@ abstract class AbstractJob implements JsonI {
      * have its own name. Also, the name of the job is used to force job 
      * execution. It can be supplied as a part of cron URL. 
      * 
+     * Note that job name will be considered invalid 
+     * if it contains one of the following characters: '=', '&', '#' and '?'.
+     * 
      * @param string $name The name of the job.
      * 
      * @return bool If job name is set, the method will return true. If not,
@@ -920,7 +963,11 @@ abstract class AbstractJob implements JsonI {
      * 
      * @since 1.0
      */
-    public function setJobName(string $name) {
+    public function setJobName(string $name) : bool {
+        if (!self::isNameValid($name)) {
+            return false;
+        }
+        
         $trimmed = trim($name);
 
         if (strlen($trimmed) > 0) {
@@ -943,6 +990,32 @@ abstract class AbstractJob implements JsonI {
                 return true;
             }
         }
+        return false;
+    }
+    /**
+     * Checks if job name is valid or not.
+     * 
+     * This method is also used to validate names of job arguments.
+     * 
+     * @param string $val The name of the job.
+     * 
+     * @return bool If valid, the method will return true. False otherwise.
+     */
+    public static function isNameValid(string $val) : bool {
+        $len = strlen($val);
+
+        if ($len > 0) {
+            for ($x = 0 ; $x < $len ; $x++) {
+                $char = $val[$x];
+
+                if ($char == '=' || $char == '&' || $char == '#' || $char == '?') {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
         return false;
     }
     public function toJSON() : Json {
@@ -1015,11 +1088,7 @@ abstract class AbstractJob implements JsonI {
         Cron::log('Calling the method '.get_class($this)."::$fName()");
         try {
             return $this->$fName();
-        } catch (Exception $ex) {
-            $this->_logExeException($ex, $fName);
-
-            return false;
-        } catch (Error $ex) {
+        } catch (Throwable $ex) {
             $this->_logExeException($ex, $fName);
 
             return false;
@@ -1437,9 +1506,9 @@ abstract class AbstractJob implements JsonI {
     }
     /**
      * 
-     * @param \Exception|\Error $ex
+     * @param \Throwable
      */
-    private function _logExeException($ex, $meth = '') {
+    private function _logExeException(\Throwable $ex, $meth = '') {
         Cron::log('WARNING: An exception was thrown while performing the operation '.get_class($this).'::'.$meth.'. '
                 .'The output of the job might be not as expected.');
         Cron::log('Exception class: "'.get_class($ex).'"');
@@ -1530,7 +1599,7 @@ abstract class AbstractJob implements JsonI {
      * 
      * @since 1.0
      */
-    private function setIsForced($bool) {
+    private function setIsForced(bool $bool) {
         $this->isForced = $bool === true;
     }
 }

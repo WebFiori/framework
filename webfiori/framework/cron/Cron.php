@@ -563,8 +563,14 @@ class Cron {
                 return 'JOB_NOT_FOUND';
             }
         } else {
+            $tempQ = new Queue();
+            
             while ($job = Cron::jobsQueue()->dequeue()) {
+                $tempQ->enqueue($job);
                 self::_runJob($retVal, $job, $xForce, $command);
+            }
+            while ($job = $tempQ->dequeue()) {
+                self::_get()->cronJobsQueue->enqueue($job);
             }
         }
         self::log('Check finished.');

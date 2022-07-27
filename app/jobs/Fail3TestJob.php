@@ -19,7 +19,7 @@ class Fail3TestJob extends AbstractJob {
      * Creates new instance of the class.
      */
     public function __construct(){
-        parent::__construct('Send Sales Report 2');
+        parent::__construct('Fail 3');
         // TODO: Specify the time at which the process will run at.
         // You can use one of the following methods to specifiy the time:
         //$this->dailyAt(4, 30)
